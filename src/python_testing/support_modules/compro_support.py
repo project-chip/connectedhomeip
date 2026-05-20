@@ -168,14 +168,25 @@ class EDFixture:
     async def start(self):
         """Start the ED app so it is commissionable."""
         if self._ssh_host:
-            await self._start_remote()
+            # Block the commissioner's eth0 path *before* launching the ED so
+            # no mDNS leak window exists.  If the ED start then fails, undo
+            # the block so the rig is left clean.
+            await self._block_eth0_up()
+            try:
+                await self._start_remote()
+            except Exception:
+                await self._block_eth0_down()
+                raise
         else:
             await self._start_local()
 
     async def stop(self):
         """Stop the ED app so it is no longer commissionable."""
         if self._ssh_host:
-            await self._stop_remote()
+            try:
+                await self._stop_remote()
+            finally:
+                await self._block_eth0_down()
         else:
             await self._stop_local()
 
@@ -280,6 +291,32 @@ class EDFixture:
         self._remote_pid = None
         await asyncio.sleep(1)
         logger.info("Remote ED fixture stopped")
+
+    # ------------------------------------------------------------------
+    # eth0 block — hide the ED's eth0 from the commissioner while a test
+    # runs so the commissioner is forced onto the WiFi path post-
+    # ConnectNetwork.  Without this, TC_COMPRO_2_4 (and friends) can
+    # silently pass over eth0 even when WiFi association never happened.
+    # See project_eth0_path_masks_paf_bugs and ~/README-test-rig.md on
+    # the ED.  The ED-side script is idempotent and self-disarms after
+    # ~20 min of inactivity, so a crashed test won't leave the rig stuck.
+    # ------------------------------------------------------------------
+
+    _BLOCK_SCRIPT = "/home/ubuntu/scripts/block-eth0-from-commissioner.sh"
+
+    async def _block_eth0_up(self):
+        try:
+            await self._ssh(f"sudo -n {self._BLOCK_SCRIPT} up")
+        except Exception as exc:
+            logger.warning("Could not engage eth0 block on %s (continuing): %s",
+                           self._ssh_host, exc)
+
+    async def _block_eth0_down(self):
+        try:
+            await self._ssh(f"sudo -n {self._BLOCK_SCRIPT} down")
+        except Exception as exc:
+            logger.warning("Could not clear eth0 block on %s: %s",
+                           self._ssh_host, exc)
 
     async def _ssh(self, remote_cmd: str) -> str:
         """Run a command on the remote host via SSH, return stdout."""
