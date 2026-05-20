@@ -26,6 +26,8 @@
 #include <app/server-cluster/testing/AttributeTesting.h>
 #include <app/server-cluster/testing/ClusterTester.h>
 #include <app/server-cluster/testing/ValidateGlobalAttributes.h>
+#include <app/server-cluster/testing/FabricTestFixture.h>
+#include <lib/support/TestPersistentStorageDelegate.h>
 #include <clusters/AccessControl/Enums.h>
 #include <clusters/AccessControl/Metadata.h>
 #include <lib/core/CHIPError.h>
@@ -275,6 +277,100 @@ TEST_F(TestAccessControlCluster, ReadAttributesTest)
 #endif // CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestAccessControlCluster, ReadAuxiliaryAclEmptyTargetsError)
+{
+    // Create mock classes to setup a group aux delegate that will return an aux ACL entry 
+    // with no targets (an empty endpoint list)
+    class MockEntryDelegate : public Access::AccessControl::Entry::Delegate
+    {
+    public:
+        CHIP_ERROR GetTargetCount(size_t & count) const override
+        {
+            count = 0;
+            return CHIP_NO_ERROR;
+        }
+    };
+
+    class MockIteratorDelegate : public Access::AccessControl::EntryIterator::Delegate
+    {
+    public:
+        MockIteratorDelegate(Access::AccessControl::Entry::Delegate & entryDelegate) : mEntryDelegate(entryDelegate) {}
+
+        CHIP_ERROR Next(Access::AccessControl::Entry & entry) override
+        {
+            if (mCalled)
+            {
+                return CHIP_ERROR_SENTINEL;
+            }
+            mCalled = true;
+            entry.SetDelegate(mEntryDelegate);
+            return CHIP_NO_ERROR;
+        }
+
+    private:
+        bool mCalled = false;
+        Access::AccessControl::Entry::Delegate & mEntryDelegate;
+    };
+
+    class MockGroupAuxDelegate : public Access::AccessControl::Delegate
+    {
+    public:
+        MockGroupAuxDelegate(Access::AccessControl::EntryIterator::Delegate & iteratorDelegate) : mIteratorDelegate(iteratorDelegate) {}
+
+        CHIP_ERROR AuxiliaryEntries(Access::AccessControl::EntryIterator & iterator, const FabricIndex * fabricIndex) const override
+        {
+            iterator.SetDelegate(mIteratorDelegate);
+            return CHIP_NO_ERROR;
+        }
+
+        void Release() override {}
+    
+    private:
+        Access::AccessControl::EntryIterator::Delegate & mIteratorDelegate;
+    };
+
+    // Setup test persistent storage and fabric
+    TestPersistentStorageDelegate storage;
+    Testing::FabricTestFixture fabricHelper{ &storage };
+
+    FabricIndex fabricIndex = kMinValidFabricIndex;
+    ASSERT_EQ(fabricHelper.SetUpTestFabric(fabricIndex), CHIP_NO_ERROR);
+    ASSERT_NE(fabricIndex, kUndefinedFabricIndex);
+
+    // Create cluster and cluster testser
+    AccessControlCluster::Context customContext{
+        .persistentStorage = storage,
+        .fabricTable       = fabricHelper.GetFabricTable(),
+        .accessControl     = Access::GetAccessControl(),
+    };
+    AccessControlCluster cluster(customContext);
+    Testing::ClusterTester tester(cluster);
+    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    // Instantiate mock classes defined above
+    MockEntryDelegate entryDelegate;
+    MockIteratorDelegate iteratorDelegate(entryDelegate);
+    MockGroupAuxDelegate groupAuxDelegate(iteratorDelegate);
+
+    // Register the group aux delegate
+    ASSERT_EQ(Access::GetAccessControl().RegisterGroupAuxiliaryDelegate(&groupAuxDelegate), CHIP_NO_ERROR);
+
+    // Attempt to read AuxiliaryACL attribute
+    AccessControl::Attributes::AuxiliaryACL::TypeInfo::DecodableType auxiliaryAcl;
+    auto status = tester.ReadAttribute(AccessControl::Attributes::AuxiliaryACL::Id, auxiliaryAcl);
+
+    // We expect it to fail with CHIP_ERROR_INVALID_LIST_LENGTH
+    ASSERT_FALSE(status.IsSuccess());
+    ASSERT_EQ(status.GetUnderlyingError(), CHIP_ERROR_INVALID_LIST_LENGTH);
+
+    // Unregister the delegate to clean up and shutdown cluster
+    Access::GetAccessControl().UnregisterGroupAuxiliaryDelegate();
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+
+    // Tear down fabric
+    ASSERT_EQ(fabricHelper.TearDownTestFabric(fabricIndex), CHIP_NO_ERROR);
 }
 
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
