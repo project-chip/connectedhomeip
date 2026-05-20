@@ -10,6 +10,10 @@ void RvcDevice::Init()
     SuccessOrDie(mRunModeInstance.Init());
     SuccessOrDie(mCleanModeInstance.Init());
     SuccessOrDie(mOperationalStateInstance.Init());
+
+    // set the current-mode at start-up
+    mRunModeInstance.UpdateCurrentMode(RvcRunMode::ModeIdle);
+    SetDeviceToIdleState();
 }
 
 void RvcDevice::SetDeviceToIdleState()
