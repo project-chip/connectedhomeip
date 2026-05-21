@@ -16,10 +16,11 @@ limitations under the License.
 """
 
 import logging
-import os
 import sys
 
 from helper.CHIPTestBase import CHIPVirtualHome
+from helper.paths import (CHIP_ALL_CLUSTERS_APP, CHIP_REPO_STR, CONTROLLER_TEST_SCRIPTS_DIR, MATTER_CONTROLLER_WHEELS_STR,
+                          MATTER_DEVELOPMENT_PAA_ROOT_CERTS)
 
 """
 Basic Subscription Resumption Test to validate that the device can resume subscriptions after restarting.
@@ -41,12 +42,9 @@ logger.addHandler(sh)
 CHIP_PORT = 5540
 
 CIRQUE_URL = "http://localhost:5000"
-CHIP_REPO = os.path.join(os.path.abspath(
-    os.path.dirname(__file__)), "..", "..", "..")
 TEST_EXTPANID = "fedcba9876543210"
 TEST_DISCRIMINATOR = 3840
-MATTER_DEVELOPMENT_PAA_ROOT_CERTS = "credentials/development/paa-root-certs"
-TEST_END_DEVICE_APP = "standalone/chip-all-clusters-app"
+TEST_SCRIPT = CONTROLLER_TEST_SCRIPTS_DIR / "subscription_resumption_test.py"
 
 DEVICE_CONFIG = {
     'device0': {
@@ -56,7 +54,7 @@ DEVICE_CONFIG = {
         'rcp_mode': True,
         'docker_network': 'Ipv6',
         'traffic_control': {'latencyMs': 25},
-        "mount_pairs": [[CHIP_REPO, CHIP_REPO]],
+        "mount_pairs": [[CHIP_REPO_STR, CHIP_REPO_STR]],
     },
     'device1': {
         'type': 'CHIPEndDevice',
@@ -65,7 +63,7 @@ DEVICE_CONFIG = {
         'rcp_mode': True,
         'docker_network': 'Ipv6',
         'traffic_control': {'latencyMs': 25},
-        "mount_pairs": [[CHIP_REPO, CHIP_REPO]],
+        "mount_pairs": [[CHIP_REPO_STR, CHIP_REPO_STR]],
     }
 }
 
@@ -94,26 +92,18 @@ class TestSubscriptionResumption(CHIPVirtualHome):
         self.execute_device_cmd(server_device_id, "service ssh start")
         self.execute_device_cmd(
             server_device_id,
-            ("CHIPCirqueDaemon.py -- run gdb -batch -return-child-result -q -ex \"set pagination off\" "
-             "-ex run -ex \"thread apply all bt\" --args {} --thread --discriminator {}").format(
-                os.path.join(CHIP_REPO, "out/debug", TEST_END_DEVICE_APP), TEST_DISCRIMINATOR))
+            'CHIPCirqueDaemon.py -- run gdb -batch -return-child-result -q -ex "set pagination off" -ex run '
+            f'-ex "thread apply all bt" --args {CHIP_ALL_CLUSTERS_APP} --thread --discriminator {TEST_DISCRIMINATOR}')
 
         self.reset_thread_devices(server_ids)
 
         req_device_id = req_ids[0]
 
-        self.execute_device_cmd(req_device_id, "pip3 install --break-system-packages {}".format(os.path.join(
-            CHIP_REPO, "out/debug/linux_x64_gcc/controller/python/matter_clusters-1.0.0-py3-none-any.whl")))
-        self.execute_device_cmd(req_device_id, "pip3 install --break-system-packages {}".format(os.path.join(
-            CHIP_REPO, "out/debug/linux_x64_gcc/controller/python/matter_core-1.0.0-cp311-abi3-linux_x86_64.whl")))
-        self.execute_device_cmd(req_device_id, "pip3 install --break-system-packages {}".format(os.path.join(
-            CHIP_REPO, "out/debug/linux_x64_gcc/controller/python/matter_repl-1.0.0-py3-none-any.whl")))
+        self.execute_device_cmd(req_device_id, f"pip3 install --break-system-packages {MATTER_CONTROLLER_WHEELS_STR}")
 
-        command = ("gdb -batch -return-child-result -q -ex run -ex \"thread apply all bt\" "
-                   "--args python3 {} -t 300 -a {} --paa-trust-store-path {} --remote-server-app {}").format(
-            os.path.join(
-                CHIP_REPO, "src/controller/python/tests/scripts/subscription_resumption_test.py"), ethernet_ip,
-            os.path.join(CHIP_REPO, MATTER_DEVELOPMENT_PAA_ROOT_CERTS), TEST_END_DEVICE_APP)
+        command = (f'gdb -batch -return-child-result -q -ex run -ex "thread apply all bt" --args python3 {TEST_SCRIPT} -t 300 '
+                   f'-a {ethernet_ip} --paa-trust-store-path {MATTER_DEVELOPMENT_PAA_ROOT_CERTS} '
+                   f'--remote-server-app {CHIP_ALL_CLUSTERS_APP}')
         ret = self.execute_device_cmd(req_device_id, command)
 
         self.assertEqual(ret['return_code'], '0',

@@ -17,12 +17,12 @@ limitations under the License.
 
 import json
 import logging
-import os
 import sys
 import time
 from optparse import OptionParser
 
 from helper.CHIPTestBase import CHIPVirtualHome
+from helper.paths import CHIP_REPO
 
 #############################################################
 
@@ -46,8 +46,6 @@ CHIP_PORT = 5540
 #############################################################
 
 CIRQUE_URL = "http://localhost:5000"
-CHIP_REPO = os.path.join(os.path.abspath(
-    os.path.dirname(__file__)), "..", "..", "..")
 
 logger = logging.getLogger('CHIPCirqueTest')
 logger.setLevel(logging.INFO)
@@ -123,7 +121,7 @@ if __name__ == "__main__":
     if not options.topologyFile:
         raise Exception("Must specify a topology file!")
 
-    with open(os.path.join(CHIP_REPO, options.topologyFile), "r") as fp:
+    with open(CHIP_REPO / options.topologyFile, "r") as fp:
         config_operations = [_parse_mount_dir]
         DEVICE_CONFIG = json.load(fp)
         for op in config_operations:
