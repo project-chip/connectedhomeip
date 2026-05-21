@@ -40,8 +40,8 @@
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-#include <devices/root-node/WifiRootNodeDevice.h>
-#include <platform/silabs/NetworkCommissioningWiFiDriver.h>
+#include <devices/root-node/WifiRootNodeDevice.h>            // nogncheck
+#include <platform/silabs/NetworkCommissioningWiFiDriver.h> // nogncheck
 #endif
 
 #include <platform/silabs/platformAbstraction/SilabsPlatform.h>
