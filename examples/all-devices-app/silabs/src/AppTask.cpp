@@ -21,6 +21,8 @@
 #include "AppConfig.h"
 #include "AppEvent.h"
 
+#include <cstring>
+
 #include <app/DefaultSafeAttributePersistenceProvider.h>
 #include <app/persistence/DefaultAttributePersistenceProvider.h>
 
@@ -188,7 +190,7 @@ CHIP_ERROR AppTask::InitCodeDrivenDataModel(chip::PersistentStorageDelegate & st
     CHIP_ERROR storedErr      = storage.SyncGetKeyValue("all-devices/dev-type", storedDeviceType, storedLen);
     if (storedErr == CHIP_NO_ERROR && storedLen > 0)
     {
-        deviceType = std::string(storedDeviceType, storedLen);
+        deviceType = std::string(storedDeviceType, strnlen(storedDeviceType, storedLen));
     }
 
     auto & deviceFactory = chip::app::DeviceFactory::GetInstance();

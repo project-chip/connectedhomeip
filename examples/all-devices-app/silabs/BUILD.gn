@@ -116,7 +116,7 @@ silabs_executable("all_devices_app") {
     "${chip_root}/examples/all-devices-app/all-devices-common/providers:all-devices-example-device-instance-info-provider",
 
     # zzz_generated
-    "${chip_root}/zzz_generated/app-common/devices/",
+    "${chip_root}/zzz_generated/app-common/devices",
   ]
 
   if (chip_enable_wifi) {
