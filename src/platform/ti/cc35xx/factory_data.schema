@@ -1,0 +1,100 @@
+{
+    "$id": "TI_Factory_Data_schema",
+    "$schema": "https://example.com/employee.schema.json",
+    "description": "A representation of all factory data used in TI Matter devices",
+    "type": "object",
+    "properties": {
+        "elements": {
+            "type": "array",
+            "items":{
+                "description":"Factory data elements",
+                "type": "object",
+                "properties": {
+                    "serial_number": {
+                        "description": "Serial number of device",
+                        "type": "string",
+                        "maxLength": 32
+                    },
+                    "vendor_id": {
+                        "description": "Vendor Identifier",
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum":  65524
+                    },
+                    "product_id": {
+                        "description": "Product Identifier",
+                        "type": "integer",
+                        "minimum": 1, 
+                        "maximum":  65535
+                    },
+                    "vendor_name": {
+                        "description": "human-readable vendor name",
+                        "type": "string",
+                        "maxLength": 32
+                    },
+                    "product_name": {
+                        "description": "human-readable product name",
+                        "type": "string",
+                        "maxLength": 32
+                    },
+                    "manufacturing_date": {
+                        "description": "Manufacturing date according to ISO 8601 in notation YYYY-MM-DD",
+                        "type": "string",
+                        "format": "date",
+                        "minLength": 10,
+                        "maxLength": 10,
+                        "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+                    },
+                    "hw_ver": {
+                        "description": "Hardware version - integer",
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 65535
+                    },
+                    "hw_ver_str": {
+                        "description": "A string representation of hardware version",
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 64
+                    },
+                    "rd_uid": {
+                        "description": "A randomly-generated 128-bit or longer octet string. Length has been expanded with 'hex:' prefix",
+                        "type": "string",
+                        "pattern": "^hex:([0-9A-Fa-f]{2}){16,}$",
+                        "minLength": 36,
+                        "maxLength": 68
+                    },
+                    "dac_cert": {
+                        "description": "DAC certificate string",
+                        "type": "string"
+                    },
+                    "dac_priv_key": {
+                        "description": "DAC private key string",
+                        "type": "string"
+                    },
+                    "pai_cert": {
+                        "description": "PAI certificate string",
+                        "type": "string"
+                    },
+                    "spake2_it": {
+                        "description": "An Iteration counter for the Symmetric Password-Authenticated Key Exchange",
+                        "type": "integer",
+                        "minimum": 1000,
+                        "maximum": 100000
+                    },
+                    "spake2_salt": {
+                        "description": "A key-derivation function for the Symmetric Password-Authenticated Key Exchange.",
+                        "type": "string",
+                        "pattern": "^hex:([0-9A-Fa-f]{2}){16,}$"
+                    },
+                    "spake2_verifier": {
+                        "description": "A verifier for the Symmetric Password-Authenticated Key Exchange",
+                        "type": "string",
+                        "pattern": "^hex:([0-9A-Fa-f]{2}){16,}$"
+                    }
+                }
+            }
+        }
+    }
+}
+    
