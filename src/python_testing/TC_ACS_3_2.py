@@ -52,9 +52,9 @@ from matter.testing.runner import TestStep, default_matter_test_main
 log = logging.getLogger(__name__)
 
 # Namespace in integer (not hex)
-HUMANACTIVITYNAMESPACEID = 75  # 0x4B
-OBJECTIDENTIFICATIONNAMESPACEID = 73  # 0x49
-SOUNDIDENTIFICATIONNAMESPACEID = 74  # 0x4A
+HUMANACTIVITYNAMESPACEID = 75 # 0x4B
+OBJECTIDENTIFICATIONNAMESPACEID = 73 # 0x49
+SOUNDIDENTIFICATIONNAMESPACEID = 74 # 0x4A
 
 
 class TC_ACS_3_2(MatterBaseTest):
@@ -81,7 +81,6 @@ class TC_ACS_3_2(MatterBaseTest):
             TestStep("9", "TH reads the AmbientContextType attribute and check a Boolean attribute related to the step 6.",
                      "Verify that DUT response contains the Boolean attribute (HumanActivityDetected, ObjectIdentified, AudioContextDetected) is read False.")
         ]
-
     def setup_test(self):
         super().setup_test()
         self.is_ci = self.matter_test_config.global_test_params.get('simulate_ambientsensing', True)
@@ -97,6 +96,7 @@ class TC_ACS_3_2(MatterBaseTest):
         # Delay for pipe command to be processed (otherwise tests are flaky)
         time.sleep(0.001)
 
+
     @run_if_endpoint_matches(has_cluster(Clusters.AmbientContextSensing))
     async def test_TC_ACS_3_2(self):
         node_id = self.dut_node_id
@@ -105,7 +105,7 @@ class TC_ACS_3_2(MatterBaseTest):
         attr = Clusters.AmbientContextSensing.Attributes
         dev_ctrl = self.default_controller
 
-        self.step("1")
+        self.step("1") ####################################################################################
         # Commission DUT - already done
         # Implicit step to get the feature map to ensure attribute operations
         # are performed on supported features
@@ -122,19 +122,18 @@ class TC_ACS_3_2(MatterBaseTest):
         self.PredictedActivitySupported = ((aFeatureMap & cluster.Bitmaps.Feature.kPredictedActivity) != 0)
         log.info(f"Rx'd PredictedActivitySupported: {self.PredictedActivitySupported}")
 
-        self.step("2")
+        self.step("2") ####################################################################################
         # Add AmbientContextSupported elements based on DUT capability for ci
         # Human activity walking, Object identification person, Audio identification barking
         if self.is_ci:
-            self.write_to_app_pipe(
-                '{"Name":"SetAmbientContextSupport","EndpointId":1,"AmbientContextType":[{"TypeId":73, "TagId":3},{"TypeId":74, "TagId":4},{"TypeId":75,"TagId":3}]}')
+            self.write_to_app_pipe('{"Name":"SetAmbientContextSupport","EndpointId":1,"AmbientContextType":[{"TypeId":73, "TagId":3},{"TypeId":74, "TagId":4},{"TypeId":75,"TagId":3}]}')
 
         # subscription setup for the following trigger testing
         attrib_listener = AttributeSubscriptionHandler(expected_cluster=cluster)
         await attrib_listener.start(dev_ctrl, node_id, endpoint=endpoint, min_interval_sec=0, max_interval_sec=30, keepSubscriptions=False)
         attrib_listener.reset()
 
-        self.step("3")
+        self.step("3") ####################################################################################
         log.info("\n\n Holdtime changed to 30 seconds. \n\n")
 
         holdTime_input = 30  # 30 seconds
@@ -154,7 +153,7 @@ class TC_ACS_3_2(MatterBaseTest):
         asserts.assert_true(holdTime_sub, holdTime_input, "Subscribed HoldTime is different from the input HoldTime.")
         attrib_listener.reset()
 
-        self.step("4")
+        self.step("4") ####################################################################################
         log.info("\n\n First trigger. \n\n")
 
         # CI call to trigger on
@@ -163,14 +162,14 @@ class TC_ACS_3_2(MatterBaseTest):
             namespaceID1 = HUMANACTIVITYNAMESPACEID
             tag1 = 3  # walking
             self.write_to_app_pipe(
-                '{"Name":"AddAmbientContextDetect", "EndpointId":1, "AmbientContextType":[{"TypeId":75, "TagId":3}]}')
+                    '{"Name":"AddAmbientContextDetect", "EndpointId":1, "AmbientContextType":[{"TypeId":75, "TagId":3}]}')
         else:
             # Trigger the ambient sensor to change AmbientContextType.AmbientContextSensed.NamespaceID
             # and AmbientContextType.AmbientContextSensed.Tag => TESTER ACTION on DUT
             user_data = self.wait_for_user_input(
                 prompt_msg="Type in namespace ID and tag ID of a desired ambient sensing event (ex [0x4B, 0x03]) and press ENTER after the desired ambient sensing is actuated.")
             # user_data = "[0x4B, 0x03]"
-            list_dec = ast.literal_eval(user_data)  # convert string hex to decimal
+            list_dec = ast.literal_eval(user_data) # convert string hex to decimal
             namespaceID1 = list_dec[0]
             tag1 = list_dec[1]
             log.info(f"user input: {namespaceID1} {tag1}")
@@ -178,7 +177,7 @@ class TC_ACS_3_2(MatterBaseTest):
         # Add 1 second delay to make sure it's done
         await asyncio.sleep(1)
 
-        self.step("5")
+        self.step("5") ####################################################################################
         # Check the boolean attribute subscription
         if namespaceID1 == HUMANACTIVITYNAMESPACEID:
             subscription_expected1 = attrib_listener.attribute_reports[cluster.Attributes.HumanActivityDetected]
@@ -221,9 +220,9 @@ class TC_ACS_3_2(MatterBaseTest):
         asserts.assert_true(subscription_expected[0].ambientContextSensed[0].tag == tag1,
                             f"Unexpected tag, {subscription_expected[0].ambientContextSensed[0].tag}, exp {tag1}")
 
-        # attrib_listener.reset()
+        #attrib_listener.reset()
 
-        self.step("6")
+        self.step("6") ####################################################################################
         # Trigger the sensor with same ambient context within HoldTime duration
         # Human activity walking for ci
         log.info("\n\n Re-triger another same type ambient sensing event \n\n")
@@ -231,14 +230,14 @@ class TC_ACS_3_2(MatterBaseTest):
         # CI call to trigger on
         if self.is_ci:
             self.write_to_app_pipe(
-                '{"Name":"AddAmbientContextDetect", "EndpointId":1, "AmbientContextType":[{"TypeId":75, "TagId":3}]}')
+                    '{"Name":"AddAmbientContextDetect", "EndpointId":1, "AmbientContextType":[{"TypeId":75, "TagId":3}]}')
         else:
             # Trigger the ambient sensor to change AmbientContextType.AmbientContextSensed.NamespaceID
             # and AmbientContextType.AmbientContextSensed.Tag => TESTER ACTION on DUT
             user_data = self.wait_for_user_input(
                 prompt_msg="Type in namespace ID and tag ID of the previous ambient sensing event (ex [0x4B, 0x03]) and press ENTER after the desired ambient sensing is actuated.")
             # user_data = "[0x4B, 0x03]"
-            list_dec = ast.literal_eval(user_data)  # convert string hex to decimal
+            list_dec = ast.literal_eval(user_data) # convert string hex to decimal
             namespaceID1 = list_dec[0]
             tag1 = list_dec[1]
             log.info(f"user input: {namespaceID1} {tag1}")
@@ -249,7 +248,7 @@ class TC_ACS_3_2(MatterBaseTest):
         # Add 1 second delay to make sure it's done
         await asyncio.sleep(1)
 
-        self.step("7")
+        self.step("7") ####################################################################################
         ambientContextType = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.AmbientContextType)
         log.info(f"Rx'd AmbientContextType: {ambientContextType}")
@@ -296,17 +295,16 @@ class TC_ACS_3_2(MatterBaseTest):
 
         attrib_listener.reset()
 
-        self.step("8")
+        self.step("8") ####################################################################################
         # make sure to wait until HoldTime duration expires
         # CI call to trigger on
         if self.is_ci:
             holdtime_dut = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.HoldTime)
             await asyncio.sleep(holdtime_dut)
         else:
-            self.wait_for_user_input(
-                prompt_msg="Type any letter and press ENTER after HoldTime duration from the step4 has passed.")
+            self.wait_for_user_input(prompt_msg="Type any letter and press ENTER after HoldTime duration from the step4 has passed.")
 
-        self.step("9")
+        self.step("9") ####################################################################################
         # check the subscription of AmbientContextType attribute (to be empty list)
         subscription_expected = attrib_listener.attribute_reports[cluster.Attributes.AmbientContextType][0].value
         asserts.assert_true(len(subscription_expected) == 0, "AmbientContext attribute is not empty.")
