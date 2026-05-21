@@ -605,7 +605,15 @@ CHIP_ERROR JointFabricDatastore::ContinueRefresh()
                     {
                         if (entry.endpointID == bindingEntry.endpointID && BindingMatches(entry.binding, bindingEntry.binding))
                         {
-                            entry.statusEntry.state = Clusters::JointFabricDatastore::DatastoreStateEnum::kCommitted;
+                            if (bindingEntry.statusEntry.state == Clusters::JointFabricDatastore::DatastoreStateEnum::kCommitFailed)
+                            {
+                                entry.statusEntry.state       = Clusters::JointFabricDatastore::DatastoreStateEnum::kCommitFailed;
+                                entry.statusEntry.failureCode = bindingEntry.statusEntry.failureCode;
+                            }
+                            else
+                            {
+                                entry.statusEntry.state = Clusters::JointFabricDatastore::DatastoreStateEnum::kCommitted;
+                            }
                             break;
                         }
                     }
@@ -1503,39 +1511,6 @@ CHIP_ERROR JointFabricDatastore::AddGroupIDToEndpointForNode(NodeId nodeId, chip
 
     VerifyOrReturnError(IsGroupIDInDatastore(groupId, index) == CHIP_NO_ERROR, CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
-    if (mGroupInformationEntries[index].groupKeySetID.IsNull() == false)
-    {
-        uint16_t groupKeySetID = mGroupInformationEntries[index].groupKeySetID.Value();
-
-        // make sure mNodeKeySetEntries contains an entry for this keyset and node, else add one and update device
-        bool nodeKeySetExists = false;
-        for (auto & entry : mNodeKeySetEntries)
-        {
-            if (entry.nodeID == nodeId && entry.groupKeySetID == groupKeySetID)
-            {
-                nodeKeySetExists = true;
-                break; // Found the group key set, no need to add it again
-            }
-        }
-
-        if (!nodeKeySetExists)
-        {
-            // Create a new group key set entry if it doesn't exist
-            Clusters::JointFabricDatastore::Structs::DatastoreNodeKeySetEntryStruct::Type newNodeKeySet;
-            newNodeKeySet.nodeID            = nodeId;
-            newNodeKeySet.groupKeySetID     = groupKeySetID;
-            newNodeKeySet.statusEntry.state = Clusters::JointFabricDatastore::DatastoreStateEnum::kPending;
-
-            mNodeKeySetEntries.push_back(newNodeKeySet);
-
-            ReturnErrorOnFailure(mDelegate->SyncNode(nodeId, newNodeKeySet, [this, nodeId, groupKeySetID]() {
-                detail::MarkEntryCommittedIfFound(mNodeKeySetEntries, [&](const auto & entry) {
-                    return entry.nodeID == nodeId && entry.groupKeySetID == groupKeySetID;
-                });
-            }));
-        }
-    }
-
     // Check if the group ID already exists for the endpoint
     for (auto & entry : mEndpointGroupIDEntries)
     {
@@ -1554,8 +1529,50 @@ CHIP_ERROR JointFabricDatastore::AddGroupIDToEndpointForNode(NodeId nodeId, chip
     newGroupEntry.groupID           = groupId;
     newGroupEntry.statusEntry.state = Clusters::JointFabricDatastore::DatastoreStateEnum::kPending;
 
-    // Add the new ACL entry to the datastore
+    // Add the new endpoint-group entry to the datastore.
     mEndpointGroupIDEntries.push_back(newGroupEntry);
+
+    // Ensure the node has the required keyset before issuing AddGroup on the target endpoint.
+    if (mGroupInformationEntries[index].groupKeySetID.IsNull() == false)
+    {
+        uint16_t groupKeySetID = mGroupInformationEntries[index].groupKeySetID.Value();
+
+        bool nodeKeySetExists = false;
+        for (const auto & entry : mNodeKeySetEntries)
+        {
+            if (entry.nodeID == nodeId && entry.groupKeySetID == groupKeySetID)
+            {
+                nodeKeySetExists = true;
+                break;
+            }
+        }
+
+        if (!nodeKeySetExists)
+        {
+            Clusters::JointFabricDatastore::Structs::DatastoreNodeKeySetEntryStruct::Type newNodeKeySet;
+            newNodeKeySet.nodeID            = nodeId;
+            newNodeKeySet.groupKeySetID     = groupKeySetID;
+            newNodeKeySet.statusEntry.state = Clusters::JointFabricDatastore::DatastoreStateEnum::kPending;
+
+            mNodeKeySetEntries.push_back(newNodeKeySet);
+
+            return mDelegate->SyncNode(nodeId, newNodeKeySet, [this, nodeId, groupKeySetID, newGroupEntry, endpointId, groupId]() {
+                detail::MarkEntryCommittedIfFound(
+                    mNodeKeySetEntries, [&](const auto & e) { return e.nodeID == nodeId && e.groupKeySetID == groupKeySetID; });
+
+                CHIP_ERROR err = mDelegate->SyncNode(nodeId, newGroupEntry, [this, nodeId, endpointId, groupId]() {
+                    detail::MarkEntryCommittedIfFound(mEndpointGroupIDEntries, [&](const auto & entry) {
+                        return entry.nodeID == nodeId && entry.endpointID == endpointId && entry.groupID == groupId;
+                    });
+                });
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(DataManagement, "Failed to sync endpoint group after keyset sync: %" CHIP_ERROR_FORMAT,
+                                 err.Format());
+                }
+            });
+        }
+    }
 
     return mDelegate->SyncNode(nodeId, newGroupEntry, [this, nodeId, endpointId, groupId]() {
         detail::MarkEntryCommittedIfFound(mEndpointGroupIDEntries, [&](const auto & entry) {
@@ -1738,10 +1755,10 @@ JointFabricDatastore::AddBindingToEndpointForNode(
     // Add the new binding entry to the datastore
     mEndpointBindingEntries.push_back(newBindingEntry);
 
-    const uint16_t listID = newBindingEntry.listID;
-    return mDelegate->SyncNode(nodeId, newBindingEntry, [this, nodeId, endpointId, listID]() {
+    const uint16_t syncedListId = newBindingEntry.listID;
+    return mDelegate->SyncNode(nodeId, newBindingEntry, [this, nodeId, endpointId, syncedListId]() {
         detail::MarkEntryCommittedIfFound(mEndpointBindingEntries, [&](const auto & entry) {
-            return entry.nodeID == nodeId && entry.endpointID == endpointId && entry.listID == listID;
+            return entry.nodeID == nodeId && entry.endpointID == endpointId && entry.listID == syncedListId;
         });
     });
 }
