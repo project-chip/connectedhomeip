@@ -222,7 +222,7 @@ limitations under the License.
         <scope>Endpoint</scope>
         <clusters>
             <include cluster="Fan Control" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Humidistat" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Humidistat" client="false" server="true" clientLocked="true" serverLocked="true"></include>
             <include cluster="Identify" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="Relative Humidity Measurement" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="Water Tank Level Monitoring" client="false" server="false" clientLocked="true" serverLocked="false"></include>
