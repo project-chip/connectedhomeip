@@ -36,6 +36,7 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+import ast
 import asyncio
 import logging
 import time
@@ -216,7 +217,7 @@ class TC_ACS_3_3(MatterBaseTest):
             humanActivityDetected = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.HumanActivityDetected
             )
-            asserts.assert_true(humanActivityDetected == False, "Expected False Boolean value.")
+            asserts.assert_true(not humanActivityDetected, "Expected False Boolean value.")
 
             self.step("3b")
             # Human activity walking for ci
@@ -323,7 +324,7 @@ class TC_ACS_3_3(MatterBaseTest):
             objectIdentified = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.ObjectIdentified
             )
-            asserts.assert_true(objectIdentified == False, "Expected False Boolean value.")
+            asserts.assert_true(not objectIdentified, "Expected False Boolean value.")
 
             self.step("4b")
             # Object Identification person for ci
@@ -417,7 +418,7 @@ class TC_ACS_3_3(MatterBaseTest):
             audioContextDetected = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.AudioContextDetected
             )
-            asserts.assert_true(audioContextDetected == False, "Expected False Boolean value.")
+            asserts.assert_true(not audioContextDetected, "Expected False Boolean value.")
 
             self.step("5b")
             # PSound Identification barking for ci
