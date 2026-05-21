@@ -39,6 +39,11 @@
 #include <platform/NetworkCommissioning.h>
 #endif
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+#include <devices/root-node/WifiRootNodeDevice.h>
+#include <platform/silabs/NetworkCommissioningWiFiDriver.h>
+#endif
+
 #include <platform/silabs/platformAbstraction/SilabsPlatform.h>
 
 #define APP_FUNCTION_BUTTON 0
@@ -157,6 +162,11 @@ CHIP_ERROR AppTask::InitCodeDrivenDataModel(chip::PersistentStorageDelegate & st
                                                                         chip::app::ThreadRootNodeDevice::ThreadContext{
                                                                             .threadDriver = sThreadDriver,
                                                                         });
+#elif CHIP_DEVICE_CONFIG_ENABLE_WIFI
+    sRootNodeDevice = std::make_unique<chip::app::WifiRootNodeDevice>(rootNodeContext,
+                                                                      chip::app::WifiRootNodeDevice::WifiContext{
+                                                                          .wifiDriver = *chip::DeviceLayer::NetworkCommissioning::SlWiFiDriver::GetInstance(),
+                                                                      });
 #else
     sRootNodeDevice = std::make_unique<chip::app::RootNodeDevice>(rootNodeContext);
 #endif

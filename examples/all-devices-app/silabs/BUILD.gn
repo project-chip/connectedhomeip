@@ -22,20 +22,18 @@ import("${silabs_sdk_build_root}/silabs_executable.gni")
 import("${chip_root}/src/platform/device.gni")
 import("${chip_root}/third_party/silabs/silabs_board.gni")
 
-import("${chip_root}/examples/all-devices-app/all-devices-common/devices/enabled_devices.gni")
+import(
+    "${chip_root}/examples/all-devices-app/all-devices-common/devices/enabled_devices.gni")
 
 assert(current_os == "freertos")
 
 silabs_project_dir = "${chip_root}/examples/all-devices-app/silabs"
 examples_common_plat_dir = "${chip_root}/examples/platform/silabs"
 
-if (wifi_soc) {
-  import("${chip_root}/third_party/silabs/SiWx917_sdk.gni")
-  examples_plat_dir = "${chip_root}/examples/platform/silabs/SiWx917"
-} else {
-  import("${silabs_sdk_build_root}/efr32_sdk.gni")
-  examples_plat_dir = "${chip_root}/examples/platform/silabs/efr32"
-}
+assert(!wifi_soc, "Wi-Fi variants are not supported for examples/all-devices-app/silabs.")
+
+import("${silabs_sdk_build_root}/efr32_sdk.gni")
+examples_plat_dir = "${chip_root}/examples/platform/silabs/efr32"
 
 import("${examples_common_plat_dir}/args.gni")
 
@@ -60,44 +58,22 @@ if (slc_generate) {
                     "list lines"))
 }
 
+efr32_sdk("sdk") {
+  sources = [
+    "${examples_common_plat_dir}/freertos_config/FreeRTOSConfig.h",
+    "${silabs_project_dir}/include/CHIPProjectConfig.h",
+  ]
 
+  include_dirs = [
+    "${chip_root}/src/platform/silabs/efr32",
+    "${silabs_project_dir}/include",
+    "${examples_plat_dir}",
+    "${chip_root}/src/lib",
+    "${examples_common_plat_dir}",
+    "${examples_common_plat_dir}/freertos_config",
+  ]
 
-if (wifi_soc) {
-  siwx917_sdk("sdk") {
-    sources = [
-      "${examples_common_plat_dir}/freertos_config/FreeRTOSConfig.h",
-      "${silabs_project_dir}/include/CHIPProjectConfig.h",
-    ]
-
-    include_dirs = [
-      "${chip_root}/src/platform/silabs/SiWx",
-      "${silabs_project_dir}/include",
-      "${examples_plat_dir}",
-      "${chip_root}/src/lib",
-      "${examples_common_plat_dir}",
-      "${examples_common_plat_dir}/freertos_config",
-    ]
-
-    defines = []
-  }
-} else {
-  efr32_sdk("sdk") {
-    sources = [
-      "${examples_common_plat_dir}/freertos_config/FreeRTOSConfig.h",
-      "${silabs_project_dir}/include/CHIPProjectConfig.h",
-    ]
-
-    include_dirs = [
-      "${chip_root}/src/platform/silabs/efr32",
-      "${silabs_project_dir}/include",
-      "${examples_plat_dir}",
-      "${chip_root}/src/lib",
-      "${examples_common_plat_dir}",
-      "${examples_common_plat_dir}/freertos_config",
-    ]
-
-    defines = []
-  }
+  defines = []
 }
 
 silabs_executable("all_devices_app") {
@@ -114,21 +90,19 @@ silabs_executable("all_devices_app") {
     defines += [ "SL_STATUS_LED=0" ]
   }
 
-  sources = [
-    "src/AppTask.cpp",
-  ]
+  sources = [ "src/AppTask.cpp" ]
 
   deps = [
     ":sdk",
     "${chip_root}/src/platform/logging:default",
-    
+
     # Code-driven data model providers
     "${chip_root}/src/data-model-providers/codedriven",
-    
+
     # All devices common targets
-    "${chip_root}/examples/all-devices-app/all-devices-common/devices/device-factory",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/boolean-state-sensor",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/chime",
+    "${chip_root}/examples/all-devices-app/all-devices-common/devices/device-factory",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/dimmable-light",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/occupancy-sensor",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/on-off-light",
@@ -136,7 +110,7 @@ silabs_executable("all_devices_app") {
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/soil-sensor",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/speaker",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/temperature-sensor",
-    
+
     # Providers
     "${chip_root}/examples/all-devices-app/all-devices-common/providers:all-devices-example-device-info-provider",
     "${chip_root}/examples/all-devices-app/all-devices-common/providers:all-devices-example-device-instance-info-provider",
@@ -146,18 +120,12 @@ silabs_executable("all_devices_app") {
   ]
 
   if (chip_enable_wifi) {
-     deps += [ "${chip_root}/examples/all-devices-app/all-devices-common/devices/root-node:wifi" ]
+    deps += [ "${chip_root}/examples/all-devices-app/all-devices-common/devices/root-node:wifi" ]
   } else {
-     deps += [ "${chip_root}/examples/all-devices-app/all-devices-common/devices/root-node:thread" ]
+    deps += [ "${chip_root}/examples/all-devices-app/all-devices-common/devices/root-node:thread" ]
   }
 
-  if (wifi_soc) {
-    deps += [ "${examples_plat_dir}:siwx917-common" ]
-  } else {
-    deps += [ "${examples_plat_dir}:efr32-common" ]
-  }
-
-
+  deps += [ "${examples_plat_dir}:efr32-common" ]
 
   if (is_clang) {
     ldscript = "${examples_common_plat_dir}/ldscripts/${silabs_family}-clang.ld"

@@ -64,4 +64,3 @@ source_set("thread") {
     "${chip_root}/src/app/clusters/network-commissioning",
   ]
 }
-
