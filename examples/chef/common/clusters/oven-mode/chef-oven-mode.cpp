@@ -52,7 +52,7 @@ void InitOvenModeForEndpoint(EndpointId endpointId)
     TEMPORARY_RETURN_IGNORED gDelegateTable[epIndex]->Init();
 
     uint32_t featureMap = 0;
-    VerifyOrDieWithMsg(OvenMode::Attributes::FeatureMap::Get(endpointId, &featureMap) == Status::Success, DeviceLayer,
+    VerifyOrDieWithMsg(OvenMode::Attributes::FeatureMap::GetDefault(endpointId, &featureMap) == Status::Success, DeviceLayer,
                        "Failed to read OvenMode feature map for endpoint %d", endpointId);
     gInstanceTable[epIndex] =
         std::make_unique<ModeBase::Instance>(gDelegateTable[epIndex].get(), endpointId, OvenMode::Id, featureMap);
