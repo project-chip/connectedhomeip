@@ -22,6 +22,7 @@
 #include <devices/boolean-state-sensor/BooleanStateSensorDevice.h>
 #include <devices/chime/ChimeDevice.h>
 #include <devices/dimmable-light/impl/LoggingDimmableLightDevice.h>
+#include <devices/nim/LoggingBorderRouterDelegate.h>
 #include <devices/nim/NimDevice.h>
 #include <devices/occupancy-sensor/impl/TogglingOccupancySensorDevice.h>
 #include <devices/on-off-light/LoggingOnOffLightDevice.h>
@@ -158,7 +159,8 @@ private:
         {
             RegisterCreator("nim", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return std::make_unique<NimDevice>(mContext->storageDelegate);
+                auto delegate = std::make_unique<LoggingBorderRouterDelegate>();
+                return std::make_unique<NimDevice>(mContext->storageDelegate, std::move(delegate));
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_ON_OFF_LIGHT)

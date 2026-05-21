@@ -22,15 +22,16 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Span.h>
 #include <lib/support/ThreadOperationalDataset.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 
 namespace chip {
 namespace app {
 
-class FakeBorderRouterDelegate final : public Clusters::ThreadBorderRouterManagementDelegate
+class LoggingBorderRouterDelegate : public Clusters::ThreadBorderRouterManagementDelegate
 {
 public:
-    ~FakeBorderRouterDelegate() override
+    ~LoggingBorderRouterDelegate() override
     {
         DeviceLayer::SystemLayer().CancelTimer(ActivateActiveDataset, this);
         DeviceLayer::SystemLayer().CancelTimer(ActivatePendingDataset, this);
@@ -38,19 +39,26 @@ public:
 
     CHIP_ERROR Init(AttributeChangeCallback * attributeChangeCallback) override
     {
+        ChipLogProgress(AppServer, "LoggingBorderRouterDelegate::Init called");
         mAttributeChangeCallback = attributeChangeCallback;
         return CHIP_NO_ERROR;
     }
 
-    bool GetPanChangeSupported() override { return true; }
+    bool GetPanChangeSupported() override
+    {
+        ChipLogProgress(AppServer, "LoggingBorderRouterDelegate::GetPanChangeSupported called");
+        return true;
+    }
 
     void GetBorderRouterName(MutableCharSpan & borderRouterName) override
     {
+        ChipLogProgress(AppServer, "LoggingBorderRouterDelegate::GetBorderRouterName called");
         TEMPORARY_RETURN_IGNORED CopyCharSpanToMutableCharSpan("all-devices-br"_span, borderRouterName);
     }
 
     CHIP_ERROR GetBorderAgentId(MutableByteSpan & borderAgentId) override
     {
+        ChipLogProgress(AppServer, "LoggingBorderRouterDelegate::GetBorderAgentId called");
         static constexpr uint8_t kBorderAgentId[] = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77,
                                                       0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff };
         VerifyOrReturnError(borderAgentId.size() == Clusters::ThreadBorderRouterManagementDelegate::kBorderAgentIdLength,
@@ -58,12 +66,21 @@ public:
         return CopySpanToMutableSpan(ByteSpan(kBorderAgentId), borderAgentId);
     }
 
-    uint16_t GetThreadVersion() override { return /* Thread 1.3.1 */ 5; }
+    uint16_t GetThreadVersion() override
+    {
+        ChipLogProgress(AppServer, "LoggingBorderRouterDelegate::GetThreadVersion called");
+        return /* Thread 1.3.1 */ 5;
+    }
 
-    bool GetInterfaceEnabled() override { return !mActiveDataset.IsEmpty(); }
+    bool GetInterfaceEnabled() override
+    {
+        ChipLogProgress(AppServer, "LoggingBorderRouterDelegate::GetInterfaceEnabled called");
+        return !mActiveDataset.IsEmpty();
+    }
 
     CHIP_ERROR GetDataset(Thread::OperationalDataset & dataset, DatasetType type) override
     {
+        ChipLogProgress(AppServer, "LoggingBorderRouterDelegate::GetDataset called (type: %d)", static_cast<int>(type));
         Thread::OperationalDataset * source;
         switch (type)
         {
@@ -83,6 +100,7 @@ public:
     void SetActiveDataset(const Thread::OperationalDataset & activeDataset, uint32_t sequenceNum,
                           ActivateDatasetCallback * callback) override
     {
+        ChipLogProgress(AppServer, "LoggingBorderRouterDelegate::SetActiveDataset called (seq: %" PRIu32 ")", sequenceNum);
         if (mActivateDatasetCallback != nullptr)
         {
             callback->OnActivateDatasetComplete(sequenceNum, CHIP_ERROR_INCORRECT_STATE);
@@ -101,11 +119,20 @@ public:
         DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(1000), ActivateActiveDataset, this);
     }
 
-    CHIP_ERROR CommitActiveDataset() override { return CHIP_NO_ERROR; }
-    CHIP_ERROR RevertActiveDataset() override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR CommitActiveDataset() override
+    {
+        ChipLogProgress(AppServer, "LoggingBorderRouterDelegate::CommitActiveDataset called");
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR RevertActiveDataset() override
+    {
+        ChipLogProgress(AppServer, "LoggingBorderRouterDelegate::RevertActiveDataset called");
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
 
     CHIP_ERROR SetPendingDataset(const Thread::OperationalDataset & pendingDataset) override
     {
+        ChipLogProgress(AppServer, "LoggingBorderRouterDelegate::SetPendingDataset called");
         ReturnErrorOnFailure(mPendingDataset.Init(pendingDataset.AsByteSpan()));
         uint32_t delayTimerMillis;
         ReturnErrorOnFailure(mPendingDataset.GetDelayTimer(delayTimerMillis));
@@ -115,7 +142,7 @@ public:
 private:
     static void ActivateActiveDataset(System::Layer *, void * context)
     {
-        auto * self                    = static_cast<FakeBorderRouterDelegate *>(context);
+        auto * self                    = static_cast<LoggingBorderRouterDelegate *>(context);
         auto * callback                = self->mActivateDatasetCallback;
         auto sequenceNum               = self->mActivateDatasetSequence;
         self->mActivateDatasetCallback = nullptr;
@@ -124,7 +151,7 @@ private:
 
     static void ActivatePendingDataset(System::Layer *, void * context)
     {
-        auto * self = static_cast<FakeBorderRouterDelegate *>(context);
+        auto * self = static_cast<LoggingBorderRouterDelegate *>(context);
         TEMPORARY_RETURN_IGNORED self->mActiveDataset.Init(self->mPendingDataset.AsByteSpan());
         self->mPendingDataset.Clear();
         if (self->mAttributeChangeCallback)

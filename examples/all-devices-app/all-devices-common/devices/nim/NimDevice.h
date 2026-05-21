@@ -23,8 +23,8 @@
 #include <app/clusters/thread-network-directory-server/DefaultThreadNetworkDirectoryStorage.h>
 #include <app/clusters/thread-network-directory-server/ThreadNetworkDirectoryCluster.h>
 #include <app/clusters/wifi-network-management-server/WiFiNetworkManagementCluster.h>
+#include <app/clusters/thread-border-router-management-server/ThreadBorderRouterManagementDelegate.h>
 #include <devices/interface/SingleEndpointDevice.h>
-#include <devices/nim/FakeBorderRouterDelegate.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 
 namespace chip {
@@ -43,7 +43,7 @@ private:
 class NimDevice : public SingleEndpointDevice
 {
 public:
-    NimDevice(PersistentStorageDelegate & storage);
+    NimDevice(PersistentStorageDelegate & storage, std::unique_ptr<Clusters::ThreadBorderRouterManagementDelegate> tbrDelegate);
     ~NimDevice() override = default;
 
     CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
@@ -51,7 +51,7 @@ public:
     void Unregister(CodeDrivenDataModelProvider & provider) override;
 
 protected:
-    FakeBorderRouterDelegate mBorderRouterDelegate;
+    std::unique_ptr<Clusters::ThreadBorderRouterManagementDelegate> mTbrDelegate;
     SimpleBreadCrumbTracker mBreadCrumbTracker;
     DefaultThreadNetworkDirectoryStorage mThreadNetworkDirectoryStorage;
 

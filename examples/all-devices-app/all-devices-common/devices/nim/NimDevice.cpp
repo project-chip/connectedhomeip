@@ -19,6 +19,7 @@
 #include <devices/Types.h>
 #include <devices/nim/NimDevice.h>
 #include <lib/support/Span.h>
+#include <memory>
 #include <platform/PlatformManager.h>
 
 using namespace chip::app::Clusters;
@@ -31,8 +32,9 @@ inline ByteSpan ByteSpanFromCharSpan(CharSpan span)
     return ByteSpan(Uint8::from_const_char(span.data()), span.size());
 }
 
-NimDevice::NimDevice(PersistentStorageDelegate & storage) :
+NimDevice::NimDevice(PersistentStorageDelegate & storage, std::unique_ptr<Clusters::ThreadBorderRouterManagementDelegate> tbrDelegate) :
     SingleEndpointDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kNetworkInfrastructureManager, 1)),
+    mTbrDelegate(std::move(tbrDelegate)),
     mThreadNetworkDirectoryStorage(storage)
 {}
 
@@ -41,7 +43,8 @@ CHIP_ERROR NimDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelPro
     ReturnErrorOnFailure(SingleEndpointRegistration(endpoint, provider, parentId));
 
     // 1. Thread Border Router Management
-    ThreadBorderRouterManagementCluster::Config tbrConfig(mBorderRouterDelegate, Server::GetInstance().GetFailSafeContext(),
+    VerifyOrReturnError(mTbrDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    ThreadBorderRouterManagementCluster::Config tbrConfig(*mTbrDelegate, Server::GetInstance().GetFailSafeContext(),
                                                           mBreadCrumbTracker, DeviceLayer::PlatformMgr());
     mThreadBorderRouterManagementCluster.Create(endpoint, tbrConfig);
     ReturnErrorOnFailure(provider.AddCluster(mThreadBorderRouterManagementCluster.Registration()));
