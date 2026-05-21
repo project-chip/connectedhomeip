@@ -11,8 +11,9 @@ the data model when an attribute changes in the way that the spec mandates.
 
 ## Usage
 
-The cluster needs to be created manually and registered directly using `CodeDrivenDataModelProvider`.
-Creation can be done using `RegisteredServerCluster` and `LazyRegisteredServerCluster` in
+The cluster needs to be created manually and registered directly using
+`CodeDrivenDataModelProvider`. Creation can be done using
+`RegisteredServerCluster` and `LazyRegisteredServerCluster` in
 `src/app/server-cluster/SingleEndpointServerClusterRegistry.h`.
 
 ### How does the cluster work

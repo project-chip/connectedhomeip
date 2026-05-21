@@ -247,7 +247,8 @@ private:
         {
             RegisterCreator("power-source", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return std::make_unique<BatteryPowerSourceDevice>("Simple battery"_span, Clusters::PowerSource::BatReplaceabilityEnum::kNotReplaceable, mContext->timerDelegate);
+                return std::make_unique<BatteryPowerSourceDevice>(
+                    "Simple battery"_span, Clusters::PowerSource::BatReplaceabilityEnum::kNotReplaceable, mContext->timerDelegate);
             });
         }
 

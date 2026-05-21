@@ -27,13 +27,15 @@ namespace app {
 
 class BatteryPowerSourceDevice : public SingleEndpointDevice
 {
-    using Feature = Clusters::PowerSource::Feature;
+    using Feature                               = Clusters::PowerSource::Feature;
     constexpr static auto BatPercentRemainingId = Clusters::PowerSource::Attributes::BatPercentRemaining::Id;
 
 public:
-    using SimpleBatteryPowerSourceCluster = Clusters::PowerSourceCluster<BitFlags<Feature>(Feature::kBattery).Raw(), OptionalAttributeSet<BatPercentRemainingId>::All()>;
+    using SimpleBatteryPowerSourceCluster = Clusters::PowerSourceCluster<BitFlags<Feature>(Feature::kBattery).Raw(),
+                                                                         OptionalAttributeSet<BatPercentRemainingId>::All()>;
     // Takes delegates for the clusters.
-    BatteryPowerSourceDevice(CharSpan description, Clusters::PowerSource::BatReplaceabilityEnum replaceability, TimerDelegate & timerDelegate);
+    BatteryPowerSourceDevice(CharSpan description, Clusters::PowerSource::BatReplaceabilityEnum replaceability,
+                             TimerDelegate & timerDelegate);
     ~BatteryPowerSourceDevice() override = default;
 
     CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,

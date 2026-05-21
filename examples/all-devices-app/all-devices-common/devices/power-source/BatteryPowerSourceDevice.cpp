@@ -24,12 +24,15 @@ using namespace chip::app::Clusters;
 namespace chip {
 namespace app {
 
-BatteryPowerSourceDevice::BatteryPowerSourceDevice(CharSpan description, Clusters::PowerSource::BatReplaceabilityEnum replaceability, TimerDelegate & timerDelegate) :
+BatteryPowerSourceDevice::BatteryPowerSourceDevice(CharSpan description,
+                                                   Clusters::PowerSource::BatReplaceabilityEnum replaceability,
+                                                   TimerDelegate & timerDelegate) :
     SingleEndpointDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kPowerSource, 1)),
     mTimerDelegate(timerDelegate), desc(description), replability(replaceability)
 {}
 
-CHIP_ERROR BatteryPowerSourceDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointId parentId)
+CHIP_ERROR BatteryPowerSourceDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
+                                              EndpointId parentId)
 {
     ReturnErrorOnFailure(SingleEndpointRegistration(endpoint, provider, parentId));
 
@@ -37,7 +40,7 @@ CHIP_ERROR BatteryPowerSourceDevice::Register(chip::EndpointId endpoint, CodeDri
     SimpleBatteryPowerSourceCluster::ConfigType config(endpoint, desc, replability, mTimerDelegate);
     config.usedOptionalAttributes.Set<BatPercentRemainingId>();
     config.status = Clusters::PowerSource::PowerSourceStatusEnum::kActive;
-    config.order = 0;
+    config.order  = 0;
 
     mBatteryPowerSourceCluster.Create(config);
     LogErrorOnFailure(mBatteryPowerSourceCluster.Cluster().SetEndpointList(Span<const EndpointId>(&endpoint, 1)));
