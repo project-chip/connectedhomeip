@@ -47,7 +47,8 @@ public:
     {
         static constexpr uint8_t kBorderAgentId[] = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77,
                                                       0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff };
-        VerifyOrReturnError(borderAgentId.size() == 16, CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(borderAgentId.size() == Clusters::ThreadBorderRouterManagementDelegate::kBorderAgentIdLength,
+                            CHIP_ERROR_INVALID_ARGUMENT);
         return CopySpanToMutableSpan(ByteSpan(kBorderAgentId), borderAgentId);
     }
 
