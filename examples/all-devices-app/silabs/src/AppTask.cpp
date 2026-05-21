@@ -22,6 +22,8 @@
 #include "AppEvent.h"
 
 #include <cstring>
+#include <memory>
+#include <string>
 
 #include <app/DefaultSafeAttributePersistenceProvider.h>
 #include <app/persistence/DefaultAttributePersistenceProvider.h>
