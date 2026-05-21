@@ -39,6 +39,7 @@ import logging
 import time
 
 from mobly import asserts
+from support_modules.idm_support import IDMBaseTest
 
 import matter.clusters as Clusters
 from matter.ChipDeviceCtrl import ChipDeviceController
@@ -50,7 +51,6 @@ from matter.testing.event_attribute_reporting import (AttributeSubscriptionHandl
 from matter.testing.global_attribute_ids import is_standard_cluster_id
 from matter.testing.matter_testing import TestStep
 from matter.testing.runner import default_matter_test_main
-from support_modules.idm_support import IDMBaseTest
 
 log = logging.getLogger(__name__)
 
