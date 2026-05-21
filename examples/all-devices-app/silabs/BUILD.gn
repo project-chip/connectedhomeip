@@ -30,7 +30,8 @@ assert(current_os == "freertos")
 silabs_project_dir = "${chip_root}/examples/all-devices-app/silabs"
 examples_common_plat_dir = "${chip_root}/examples/platform/silabs"
 
-assert(!wifi_soc, "Wi-Fi variants are not supported for examples/all-devices-app/silabs.")
+assert(!wifi_soc,
+       "Wi-Fi variants are not supported for examples/all-devices-app/silabs.")
 
 import("${silabs_sdk_build_root}/efr32_sdk.gni")
 examples_plat_dir = "${chip_root}/examples/platform/silabs/efr32"
