@@ -1,4 +1,4 @@
-# Copyright (c) 2020 Project CHIP Authors
+# Copyright (c) 2026 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,8 +23,6 @@ check_system_includes = true
 default_args = {
   target_cpu = "arm"
   target_os = "freertos"
-  chip_openthread_ftd = true
 
-  import("//openthread.gni")
-  sl_matter_use_code_driven_dm = true
+  import("//args.gni")
 }
