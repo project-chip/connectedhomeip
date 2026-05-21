@@ -1302,6 +1302,7 @@ RendezVousTest
 REPL
 repo
 repos
+Repurpose
 req
 Requestor
 RequestorCanConsent
@@ -1310,6 +1311,7 @@ Requestors
 responder
 RestrictedEvent
 retargeting
+retransmission
 reusability
 reviwed
 rfid
