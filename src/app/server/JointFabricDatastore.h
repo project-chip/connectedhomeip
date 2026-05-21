@@ -168,6 +168,14 @@ public:
         }
 
         virtual CHIP_ERROR
+        SyncNode(NodeId nodeId, EndpointId endpointId,
+                 std::vector<Clusters::JointFabricDatastore::Structs::DatastoreEndpointBindingEntryStruct::Type> & bindingEntries,
+                 std::function<void()> onSuccess)
+        {
+            return CHIP_ERROR_NOT_IMPLEMENTED;
+        }
+
+        virtual CHIP_ERROR
         SyncNode(NodeId nodeId,
                  std::vector<Clusters::JointFabricDatastore::Structs::DatastoreEndpointBindingEntryStruct::Type> & bindingEntries,
                  std::function<void()> onSuccess)
