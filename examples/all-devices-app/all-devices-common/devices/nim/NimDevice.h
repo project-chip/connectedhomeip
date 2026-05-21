@@ -18,7 +18,6 @@
 #pragma once
 
 #include <app/clusters/general-commissioning-server/BreadCrumbTracker.h>
-#include <optional>
 #include <app/clusters/thread-border-router-management-server/ThreadBorderRouterManagementCluster.h>
 #include <app/clusters/thread-network-diagnostics-server/ThreadNetworkDiagnosticsCluster.h>
 #include <app/clusters/thread-network-directory-server/DefaultThreadNetworkDirectoryStorage.h>
@@ -26,6 +25,7 @@
 #include <app/clusters/wifi-network-management-server/WiFiNetworkManagementCluster.h>
 #include <devices/interface/SingleEndpointDevice.h>
 #include <devices/nim/FakeBorderRouterDelegate.h>
+#include <optional>
 
 namespace chip {
 namespace app {
