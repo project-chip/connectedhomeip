@@ -56,7 +56,7 @@ CHIP_ERROR ESP32P256Keypair::Initialize(ECPKeyTarget keyTarget, int efuseBlock)
 {
     Clear();
 
-    psa_status_t status = PSA_SUCCESS;
+    psa_status_t status     = PSA_SUCCESS;
     size_t key_size_in_bits = 256;
 
     // opaque reference for the efuse-stored ec key
@@ -74,7 +74,7 @@ CHIP_ERROR ESP32P256Keypair::Initialize(ECPKeyTarget keyTarget, int efuseBlock)
 
     // validate efuse block exists and has correct key purpose
     psa_key_id_t key_id = PSA_KEY_ID_NULL;
-    status = psa_import_key(&key_attr, reinterpret_cast<const uint8_t *>(&opaque_key), sizeof(opaque_key), &key_id);
+    status              = psa_import_key(&key_attr, reinterpret_cast<const uint8_t *>(&opaque_key), sizeof(opaque_key), &key_id);
     psa_reset_key_attributes(&key_attr);
 
     VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL,
@@ -88,8 +88,7 @@ CHIP_ERROR ESP32P256Keypair::Initialize(ECPKeyTarget keyTarget, int efuseBlock)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ESP32P256Keypair::ECDSA_sign_msg(const uint8_t * msg, const size_t msg_length,
-                                            P256ECDSASignature & out_signature) const
+CHIP_ERROR ESP32P256Keypair::ECDSA_sign_msg(const uint8_t * msg, const size_t msg_length, P256ECDSASignature & out_signature) const
 {
     VerifyOrReturnError(mInitialized, CHIP_ERROR_UNINITIALIZED);
     VerifyOrReturnError((msg != nullptr) && (msg_length > 0), CHIP_ERROR_INVALID_ARGUMENT);
@@ -102,8 +101,8 @@ CHIP_ERROR ESP32P256Keypair::ECDSA_sign_msg(const uint8_t * msg, const size_t ms
     uint8_t signature[kP256_ECDSA_Signature_Length_Raw];
     size_t sig_len = 0;
 
-    psa_status_t status = psa_sign_hash(ctx->key_id, PSA_ALG_ECDSA(PSA_ALG_SHA_256), digest, sizeof(digest), signature,
-                                        sizeof(signature), &sig_len);
+    psa_status_t status =
+        psa_sign_hash(ctx->key_id, PSA_ALG_ECDSA(PSA_ALG_SHA_256), digest, sizeof(digest), signature, sizeof(signature), &sig_len);
 
     VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL,
                         ChipLogError(Crypto, "psa_sign_hash failed, status:%d", static_cast<int>(status)));
@@ -111,7 +110,6 @@ CHIP_ERROR ESP32P256Keypair::ECDSA_sign_msg(const uint8_t * msg, const size_t ms
 
     memcpy(out_signature.Bytes(), signature, sig_len);
     return out_signature.SetLength(kP256_ECDSA_Signature_Length_Raw);
-
 }
 
 } // namespace Crypto
@@ -198,8 +196,7 @@ exit:
     return error;
 }
 
-CHIP_ERROR ESP32P256Keypair::ECDSA_sign_msg(const uint8_t * msg, const size_t msg_length,
-                                            P256ECDSASignature & out_signature) const
+CHIP_ERROR ESP32P256Keypair::ECDSA_sign_msg(const uint8_t * msg, const size_t msg_length, P256ECDSASignature & out_signature) const
 {
     VerifyOrReturnError(mInitialized, CHIP_ERROR_UNINITIALIZED);
     VerifyOrReturnError((msg != nullptr) && (msg_length > 0), CHIP_ERROR_INVALID_ARGUMENT);
