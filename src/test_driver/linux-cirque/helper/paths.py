@@ -14,8 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
-from pathlib import Path
 import shlex
+from pathlib import Path
 
 CHIP_REPO = Path(__file__).resolve().parents[4]
 CHIP_REPO_STR = str(CHIP_REPO)
