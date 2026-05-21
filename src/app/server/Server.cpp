@@ -945,11 +945,8 @@ void Server::Shutdown()
     mICDManager.Shutdown();
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
-    // NOTE: chip::Platform::MemoryShutdown() intentionally NOT called here.
-    // It belongs to outer code (AppMain/PlatformMgr) which controls the full
-    // platform lifecycle. Calling it here destroys objects (e.g. EndPointManager)
-    // before PlatformMgr().Shutdown() has a chance to shut them down properly.
-    // See TODO(16969).
+    // TODO(16969): Remove chip::Platform::MemoryInit() call from Server class, it belongs to outer code
+    chip::Platform::MemoryShutdown();
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
