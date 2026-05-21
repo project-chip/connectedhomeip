@@ -31,5 +31,7 @@ CHIP_TOOL = CHIP_REPO / "out/debug/standalone/chip-tool"
 LIT_ICD_APP = CHIP_REPO / "out/debug/lit_icd/lit-icd-app"
 
 MATTER_CONTROLLER_WHEEL_DIR = CHIP_REPO / "out/debug/linux_x64_gcc/controller/python"
-MATTER_CONTROLLER_WHEELS = list(MATTER_CONTROLLER_WHEEL_DIR.glob("*.whl"))
+MATTER_CONTROLLER_WHEELS = sorted(MATTER_CONTROLLER_WHEEL_DIR.glob("*.whl"))
+if not MATTER_CONTROLLER_WHEELS:
+    raise RuntimeError(f"No Matter controller wheels found in {MATTER_CONTROLLER_WHEEL_DIR}")
 MATTER_CONTROLLER_WHEELS_STR = " ".join(str(wheel) for wheel in MATTER_CONTROLLER_WHEELS)
