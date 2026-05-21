@@ -29,6 +29,7 @@
 #include <platform/Linux/dbus/wpa/DBusWpaBss.h>
 #include <platform/Linux/dbus/wpa/DBusWpaInterface.h>
 #include <platform/Linux/dbus/wpa/DBusWpaNetwork.h>
+#include <platform/NetworkCommissioning.h>
 #include <system/SystemMutex.h>
 
 #define WPA_SUPPLICANT_CLIENT_LOG_PREFIX "wpa_supplicant: "
@@ -173,6 +174,25 @@ protected:
      *
      */
     bool IsWiFiInterfaceEnabled() const noexcept CHIP_REQUIRES(mWpaSupplicantMutex);
+
+    /**
+     *  @brief
+     *    Get the Wi-Fi station service set identifier (SSID) and
+     *    connected state.
+     *
+     *  This attempts to get, if any, the currently connected (that
+     *  is, associated) Wi-Fi station service set identifier (SSID)
+     *  and connected state.
+     *
+     *  @param[out]  outNetwork
+     *    A reference to the mutable network commissioning state to
+     *    which to copy the currently connected Wi-Fi station SSID and
+     *    connected state.
+     *
+     *  @sa IsWiFiInterfaceEnabled
+     *
+     */
+    CHIP_ERROR GetConfiguredNetwork(NetworkCommissioning::Network & outNetwork) noexcept;
 
     /**
      *  @brief
