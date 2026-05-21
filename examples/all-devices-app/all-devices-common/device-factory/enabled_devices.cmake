@@ -108,6 +108,7 @@ foreach(_key
         network-infrastructure-manager
         occupancy-sensor
         on-off-light
+        power-source
         proximity-ranger
         soil-sensor
         speaker
