@@ -39,6 +39,8 @@
 namespace chip {
 namespace Access {
 
+class GroupAuxiliaryAccessControlDelegate;
+
 class AccessControl
 {
 public:
@@ -426,19 +428,7 @@ public:
     AccessControl(const AccessControl &)             = delete;
     AccessControl & operator=(const AccessControl &) = delete;
 
-    ~AccessControl()
-    {
-        if (IsGroupAuxiliaryDelegateRegistered())
-        {
-            mGroupAuxDelegate->Release();
-        }
-
-        // Never-initialized AccessControl instances will not have the delegate set.
-        if (IsInitialized())
-        {
-            mDelegate->Release();
-        }
-    }
+    ~AccessControl();
 
     /**
      * Initialize the access control module. Must be called before first use.
@@ -655,12 +645,7 @@ public:
      * @param [in]  fabricIndex   Fabric index for which to iterate auxiliary entries.
      * @param [out] iterator      Iterator controlling the iteration.
      */
-    CHIP_ERROR AuxiliaryEntries(FabricIndex fabricIndex, EntryIterator & iterator) const
-    {
-        VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
-        VerifyOrReturnError(IsGroupAuxiliaryDelegateRegistered(), CHIP_ERROR_NOT_IMPLEMENTED);
-        return mGroupAuxDelegate->AuxiliaryEntries(iterator, &fabricIndex);
-    }
+    CHIP_ERROR AuxiliaryEntries(FabricIndex fabricIndex, EntryIterator & iterator) const;
 
     // Adds a listener to the end of the listener list, if not already in the list.
     void AddEntryListener(EntryListener & listener);
@@ -680,27 +665,14 @@ public:
      * @retval #CHIP_ERROR_INCORRECT_STATE if a delegate is already registered.
      * @retval #CHIP_NO_ERROR on success.
      */
-    CHIP_ERROR RegisterGroupAuxiliaryDelegate(Delegate * delegate)
-    {
-        VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-        VerifyOrReturnError(mGroupAuxDelegate == nullptr, CHIP_ERROR_INCORRECT_STATE);
-        mGroupAuxDelegate = delegate;
-        return CHIP_NO_ERROR;
-    }
+    CHIP_ERROR RegisterGroupAuxiliaryDelegate(GroupAuxiliaryAccessControlDelegate * delegate);
 
     bool IsGroupAuxiliaryDelegateRegistered() const { return (mGroupAuxDelegate != nullptr); }
 
     /**
      * @brief Unregisters the delegate handling auxiliary access control entries.
      */
-    void UnregisterGroupAuxiliaryDelegate()
-    {
-        if (IsGroupAuxiliaryDelegateRegistered())
-        {
-            mGroupAuxDelegate->Release();
-            mGroupAuxDelegate = nullptr;
-        }
-    }
+    void UnregisterGroupAuxiliaryDelegate();
 
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
     // Set an optional AcceessRestriction object for MNGD feature.
@@ -763,8 +735,8 @@ private:
     // the LN feature, and the access control cluster protected by the AUX feature. It is expected that
     // this delegate will have an implementation of the AuxiliaryEntries() funciton for reporting these
     // entries. It is also expected to implement a Check() function to actually use these entries
-    // to approve/deny access control.
-    Delegate * mGroupAuxDelegate = nullptr;
+    // to approve/deny access control. Must call Initialize() on this before use.
+    GroupAuxiliaryAccessControlDelegate * mGroupAuxDelegate = nullptr;
 
     DeviceTypeResolver * mDeviceTypeResolver = nullptr;
 

@@ -23,6 +23,8 @@
 
 #include "AccessControl.h"
 
+#include "GroupAuxiliaryAccessControlDelegate.h"
+
 #include <lib/core/Global.h>
 #include <lib/support/TypeTraits.h>
 
@@ -213,6 +215,17 @@ char GetRequestTypeStringForLogging(RequestType requestType)
 Global<AccessControl::Entry::Delegate> AccessControl::Entry::mDefaultDelegate;
 Global<AccessControl::EntryIterator::Delegate> AccessControl::EntryIterator::mDefaultDelegate;
 
+AccessControl::~AccessControl()
+{
+    UnregisterGroupAuxiliaryDelegate();
+
+    // Never-initialized AccessControl instances will not have the delegate set.
+    if (IsInitialized())
+    {
+        mDelegate->Release();
+    }
+}
+
 CHIP_ERROR AccessControl::Init(AccessControl::Delegate * delegate, DeviceTypeResolver & deviceTypeResolver)
 {
     VerifyOrReturnError(!IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
@@ -241,6 +254,30 @@ void AccessControl::Finish()
     {
         mGroupAuxDelegate->Finish();
         UnregisterGroupAuxiliaryDelegate();
+    }
+}
+
+CHIP_ERROR AccessControl::AuxiliaryEntries(FabricIndex fabricIndex, EntryIterator & iterator) const
+{
+    VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(IsGroupAuxiliaryDelegateRegistered(), CHIP_ERROR_NOT_IMPLEMENTED);
+    return mGroupAuxDelegate->AuxiliaryEntries(iterator, &fabricIndex);
+}
+
+CHIP_ERROR AccessControl::RegisterGroupAuxiliaryDelegate(GroupAuxiliaryAccessControlDelegate * delegate)
+{
+    VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(mGroupAuxDelegate == nullptr, CHIP_ERROR_INCORRECT_STATE);
+    mGroupAuxDelegate = delegate;
+    return CHIP_NO_ERROR;
+}
+
+void AccessControl::UnregisterGroupAuxiliaryDelegate()
+{
+    if (IsGroupAuxiliaryDelegateRegistered())
+    {
+        mGroupAuxDelegate->Release();
+        mGroupAuxDelegate = nullptr;
     }
 }
 

@@ -2172,7 +2172,7 @@ TEST_F(TestAccessControl, TestGroupAuxiliaryDelegateLifecycle)
 TEST_F(TestAccessControl, TestGroupAuxiliaryDelegateRegistration)
 {
     // The delegate is already registered in SetUpTestSuite.
-    AccessControl::Delegate * delegate = &gGroupAuxiliaryAccessControlDelegate;
+    GroupAuxiliaryAccessControlDelegate * delegate = &gGroupAuxiliaryAccessControlDelegate;
 
     // Verify registering again fails.
     EXPECT_EQ(accessControl.RegisterGroupAuxiliaryDelegate(delegate), CHIP_ERROR_INCORRECT_STATE);
