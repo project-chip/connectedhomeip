@@ -1102,11 +1102,10 @@ void ChipLinuxAppMainLoop(chip::ServerInitParams & initParams, AppMainLoopImplem
     Server::GetInstance().Shutdown();
 
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
-    // Commissioner shutdown call shuts down entire stack, including the platform manager.
     ShutdownCommissioner();
-#else
-    DeviceLayer::PlatformMgr().Shutdown();
 #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+
+    DeviceLayer::PlatformMgr().Shutdown();
 
 #if ENABLE_TRACING
     tracing_setup.StopTracing();
