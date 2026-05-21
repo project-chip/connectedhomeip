@@ -18730,7 +18730,7 @@ namespace Attributes {
 
 namespace Mode {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::app::Clusters::Humidistat::ModeEnum * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::Humidistat::ModeEnum * value)
 {
     using Traits = NumericAttributeTraits<chip::app::Clusters::Humidistat::ModeEnum>;
     Traits::StorageType temp;
@@ -18744,41 +18744,13 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::app::Clusters
     }
     *value = Traits::StorageToWorking(temp);
     return status;
-}
-
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::Humidistat::ModeEnum value,
-                                        MarkAttributeDirty markDirty)
-{
-    using Traits = NumericAttributeTraits<chip::app::Clusters::Humidistat::ModeEnum>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
-    {
-        return Protocols::InteractionModel::Status::ConstraintError;
-    }
-    Traits::StorageType storageValue;
-    Traits::WorkingToStorage(value, storageValue);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::Humidistat::Id, Id),
-                                 EmberAfWriteDataInput(writable, ZCL_ENUM8_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
-}
-
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::Humidistat::ModeEnum value)
-{
-    using Traits = NumericAttributeTraits<chip::app::Clusters::Humidistat::ModeEnum>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
-    {
-        return Protocols::InteractionModel::Status::ConstraintError;
-    }
-    Traits::StorageType storageValue;
-    Traits::WorkingToStorage(value, storageValue);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::Humidistat::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 } // namespace Mode
 
 namespace SystemState {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::app::Clusters::Humidistat::SystemStateEnum * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::Humidistat::SystemStateEnum * value)
 {
     using Traits = NumericAttributeTraits<chip::app::Clusters::Humidistat::SystemStateEnum>;
     Traits::StorageType temp;
@@ -18792,41 +18764,13 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::app::Clusters
     }
     *value = Traits::StorageToWorking(temp);
     return status;
-}
-
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::Humidistat::SystemStateEnum value,
-                                        MarkAttributeDirty markDirty)
-{
-    using Traits = NumericAttributeTraits<chip::app::Clusters::Humidistat::SystemStateEnum>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
-    {
-        return Protocols::InteractionModel::Status::ConstraintError;
-    }
-    Traits::StorageType storageValue;
-    Traits::WorkingToStorage(value, storageValue);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::Humidistat::Id, Id),
-                                 EmberAfWriteDataInput(writable, ZCL_ENUM8_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
-}
-
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::Humidistat::SystemStateEnum value)
-{
-    using Traits = NumericAttributeTraits<chip::app::Clusters::Humidistat::SystemStateEnum>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
-    {
-        return Protocols::InteractionModel::Status::ConstraintError;
-    }
-    Traits::StorageType storageValue;
-    Traits::WorkingToStorage(value, storageValue);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::Humidistat::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 } // namespace SystemState
 
 namespace UserSetpoint {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::Percent * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::Percent * value)
 {
     using Traits = NumericAttributeTraits<chip::Percent>;
     Traits::StorageType temp;
@@ -18840,40 +18784,13 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::Percent * val
     }
     *value = Traits::StorageToWorking(temp);
     return status;
-}
-
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::Percent value, MarkAttributeDirty markDirty)
-{
-    using Traits = NumericAttributeTraits<chip::Percent>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
-    {
-        return Protocols::InteractionModel::Status::ConstraintError;
-    }
-    Traits::StorageType storageValue;
-    Traits::WorkingToStorage(value, storageValue);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::Humidistat::Id, Id),
-                                 EmberAfWriteDataInput(writable, ZCL_PERCENT_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
-}
-
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::Percent value)
-{
-    using Traits = NumericAttributeTraits<chip::Percent>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
-    {
-        return Protocols::InteractionModel::Status::ConstraintError;
-    }
-    Traits::StorageType storageValue;
-    Traits::WorkingToStorage(value, storageValue);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::Humidistat::Id, Id, writable, ZCL_PERCENT_ATTRIBUTE_TYPE);
 }
 
 } // namespace UserSetpoint
 
 namespace MinSetpoint {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::Percent * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::Percent * value)
 {
     using Traits = NumericAttributeTraits<chip::Percent>;
     Traits::StorageType temp;
@@ -18887,40 +18804,13 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::Percent * val
     }
     *value = Traits::StorageToWorking(temp);
     return status;
-}
-
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::Percent value, MarkAttributeDirty markDirty)
-{
-    using Traits = NumericAttributeTraits<chip::Percent>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
-    {
-        return Protocols::InteractionModel::Status::ConstraintError;
-    }
-    Traits::StorageType storageValue;
-    Traits::WorkingToStorage(value, storageValue);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::Humidistat::Id, Id),
-                                 EmberAfWriteDataInput(writable, ZCL_PERCENT_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
-}
-
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::Percent value)
-{
-    using Traits = NumericAttributeTraits<chip::Percent>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
-    {
-        return Protocols::InteractionModel::Status::ConstraintError;
-    }
-    Traits::StorageType storageValue;
-    Traits::WorkingToStorage(value, storageValue);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::Humidistat::Id, Id, writable, ZCL_PERCENT_ATTRIBUTE_TYPE);
 }
 
 } // namespace MinSetpoint
 
 namespace MaxSetpoint {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::Percent * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::Percent * value)
 {
     using Traits = NumericAttributeTraits<chip::Percent>;
     Traits::StorageType temp;
@@ -18934,40 +18824,13 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::Percent * val
     }
     *value = Traits::StorageToWorking(temp);
     return status;
-}
-
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::Percent value, MarkAttributeDirty markDirty)
-{
-    using Traits = NumericAttributeTraits<chip::Percent>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
-    {
-        return Protocols::InteractionModel::Status::ConstraintError;
-    }
-    Traits::StorageType storageValue;
-    Traits::WorkingToStorage(value, storageValue);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::Humidistat::Id, Id),
-                                 EmberAfWriteDataInput(writable, ZCL_PERCENT_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
-}
-
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::Percent value)
-{
-    using Traits = NumericAttributeTraits<chip::Percent>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
-    {
-        return Protocols::InteractionModel::Status::ConstraintError;
-    }
-    Traits::StorageType storageValue;
-    Traits::WorkingToStorage(value, storageValue);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::Humidistat::Id, Id, writable, ZCL_PERCENT_ATTRIBUTE_TYPE);
 }
 
 } // namespace MaxSetpoint
 
 namespace Step {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::Percent * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::Percent * value)
 {
     using Traits = NumericAttributeTraits<chip::Percent>;
     Traits::StorageType temp;
@@ -18981,40 +18844,13 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::Percent * val
     }
     *value = Traits::StorageToWorking(temp);
     return status;
-}
-
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::Percent value, MarkAttributeDirty markDirty)
-{
-    using Traits = NumericAttributeTraits<chip::Percent>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
-    {
-        return Protocols::InteractionModel::Status::ConstraintError;
-    }
-    Traits::StorageType storageValue;
-    Traits::WorkingToStorage(value, storageValue);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::Humidistat::Id, Id),
-                                 EmberAfWriteDataInput(writable, ZCL_PERCENT_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
-}
-
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::Percent value)
-{
-    using Traits = NumericAttributeTraits<chip::Percent>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
-    {
-        return Protocols::InteractionModel::Status::ConstraintError;
-    }
-    Traits::StorageType storageValue;
-    Traits::WorkingToStorage(value, storageValue);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::Humidistat::Id, Id, writable, ZCL_PERCENT_ATTRIBUTE_TYPE);
 }
 
 } // namespace Step
 
 namespace TargetSetpoint {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::Percent * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::Percent * value)
 {
     using Traits = NumericAttributeTraits<chip::Percent>;
     Traits::StorageType temp;
@@ -19028,40 +18864,14 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::Percent * val
     }
     *value = Traits::StorageToWorking(temp);
     return status;
-}
-
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::Percent value, MarkAttributeDirty markDirty)
-{
-    using Traits = NumericAttributeTraits<chip::Percent>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
-    {
-        return Protocols::InteractionModel::Status::ConstraintError;
-    }
-    Traits::StorageType storageValue;
-    Traits::WorkingToStorage(value, storageValue);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::Humidistat::Id, Id),
-                                 EmberAfWriteDataInput(writable, ZCL_PERCENT_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
-}
-
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::Percent value)
-{
-    using Traits = NumericAttributeTraits<chip::Percent>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
-    {
-        return Protocols::InteractionModel::Status::ConstraintError;
-    }
-    Traits::StorageType storageValue;
-    Traits::WorkingToStorage(value, storageValue);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::Humidistat::Id, Id, writable, ZCL_PERCENT_ATTRIBUTE_TYPE);
 }
 
 } // namespace TargetSetpoint
 
 namespace MistType {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::BitMask<chip::app::Clusters::Humidistat::MistTypeBitmap> * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
+                                               chip::BitMask<chip::app::Clusters::Humidistat::MistTypeBitmap> * value)
 {
     using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::Humidistat::MistTypeBitmap>>;
     Traits::StorageType temp;
@@ -19075,41 +18885,13 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::BitMask<chip:
     }
     *value = Traits::StorageToWorking(temp);
     return status;
-}
-
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::BitMask<chip::app::Clusters::Humidistat::MistTypeBitmap> value,
-                                        MarkAttributeDirty markDirty)
-{
-    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::Humidistat::MistTypeBitmap>>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
-    {
-        return Protocols::InteractionModel::Status::ConstraintError;
-    }
-    Traits::StorageType storageValue;
-    Traits::WorkingToStorage(value, storageValue);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::Humidistat::Id, Id),
-                                 EmberAfWriteDataInput(writable, ZCL_BITMAP8_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
-}
-
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::BitMask<chip::app::Clusters::Humidistat::MistTypeBitmap> value)
-{
-    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::Humidistat::MistTypeBitmap>>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
-    {
-        return Protocols::InteractionModel::Status::ConstraintError;
-    }
-    Traits::StorageType storageValue;
-    Traits::WorkingToStorage(value, storageValue);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::Humidistat::Id, Id, writable, ZCL_BITMAP8_ATTRIBUTE_TYPE);
 }
 
 } // namespace MistType
 
 namespace Continuous {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, bool * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value)
 {
     using Traits = NumericAttributeTraits<bool>;
     Traits::StorageType temp;
@@ -19123,40 +18905,13 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, bool * value)
     }
     *value = Traits::StorageToWorking(temp);
     return status;
-}
-
-Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value, MarkAttributeDirty markDirty)
-{
-    using Traits = NumericAttributeTraits<bool>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
-    {
-        return Protocols::InteractionModel::Status::ConstraintError;
-    }
-    Traits::StorageType storageValue;
-    Traits::WorkingToStorage(value, storageValue);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::Humidistat::Id, Id),
-                                 EmberAfWriteDataInput(writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
-}
-
-Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value)
-{
-    using Traits = NumericAttributeTraits<bool>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
-    {
-        return Protocols::InteractionModel::Status::ConstraintError;
-    }
-    Traits::StorageType storageValue;
-    Traits::WorkingToStorage(value, storageValue);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::Humidistat::Id, Id, writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
 }
 
 } // namespace Continuous
 
 namespace Sleep {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, bool * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value)
 {
     using Traits = NumericAttributeTraits<bool>;
     Traits::StorageType temp;
@@ -19170,40 +18925,13 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, bool * value)
     }
     *value = Traits::StorageToWorking(temp);
     return status;
-}
-
-Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value, MarkAttributeDirty markDirty)
-{
-    using Traits = NumericAttributeTraits<bool>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
-    {
-        return Protocols::InteractionModel::Status::ConstraintError;
-    }
-    Traits::StorageType storageValue;
-    Traits::WorkingToStorage(value, storageValue);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::Humidistat::Id, Id),
-                                 EmberAfWriteDataInput(writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
-}
-
-Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value)
-{
-    using Traits = NumericAttributeTraits<bool>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
-    {
-        return Protocols::InteractionModel::Status::ConstraintError;
-    }
-    Traits::StorageType storageValue;
-    Traits::WorkingToStorage(value, storageValue);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::Humidistat::Id, Id, writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
 }
 
 } // namespace Sleep
 
 namespace Optimal {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, bool * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value)
 {
     using Traits = NumericAttributeTraits<bool>;
     Traits::StorageType temp;
@@ -19217,40 +18945,13 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, bool * value)
     }
     *value = Traits::StorageToWorking(temp);
     return status;
-}
-
-Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value, MarkAttributeDirty markDirty)
-{
-    using Traits = NumericAttributeTraits<bool>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
-    {
-        return Protocols::InteractionModel::Status::ConstraintError;
-    }
-    Traits::StorageType storageValue;
-    Traits::WorkingToStorage(value, storageValue);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::Humidistat::Id, Id),
-                                 EmberAfWriteDataInput(writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
-}
-
-Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value)
-{
-    using Traits = NumericAttributeTraits<bool>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
-    {
-        return Protocols::InteractionModel::Status::ConstraintError;
-    }
-    Traits::StorageType storageValue;
-    Traits::WorkingToStorage(value, storageValue);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::Humidistat::Id, Id, writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
 }
 
 } // namespace Optimal
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
 {
     using Traits = NumericAttributeTraits<uint32_t>;
     Traits::StorageType temp;
@@ -19264,40 +18965,13 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, uint32_t * value)
     }
     *value = Traits::StorageToWorking(temp);
     return status;
-}
-
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, MarkAttributeDirty markDirty)
-{
-    using Traits = NumericAttributeTraits<uint32_t>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
-    {
-        return Protocols::InteractionModel::Status::ConstraintError;
-    }
-    Traits::StorageType storageValue;
-    Traits::WorkingToStorage(value, storageValue);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::Humidistat::Id, Id),
-                                 EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
-}
-
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value)
-{
-    using Traits = NumericAttributeTraits<uint32_t>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
-    {
-        return Protocols::InteractionModel::Status::ConstraintError;
-    }
-    Traits::StorageType storageValue;
-    Traits::WorkingToStorage(value, storageValue);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::Humidistat::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace FeatureMap
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
 {
     using Traits = NumericAttributeTraits<uint16_t>;
     Traits::StorageType temp;
@@ -19311,33 +18985,6 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value)
     }
     *value = Traits::StorageToWorking(temp);
     return status;
-}
-
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty)
-{
-    using Traits = NumericAttributeTraits<uint16_t>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
-    {
-        return Protocols::InteractionModel::Status::ConstraintError;
-    }
-    Traits::StorageType storageValue;
-    Traits::WorkingToStorage(value, storageValue);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::Humidistat::Id, Id),
-                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
-}
-
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value)
-{
-    using Traits = NumericAttributeTraits<uint16_t>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
-    {
-        return Protocols::InteractionModel::Status::ConstraintError;
-    }
-    Traits::StorageType storageValue;
-    Traits::WorkingToStorage(value, storageValue);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::Humidistat::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -25572,7 +25219,7 @@ namespace Attributes {
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
 {
     using Traits = NumericAttributeTraits<uint16_t>;
     Traits::StorageType temp;
@@ -25586,33 +25233,6 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value)
     }
     *value = Traits::StorageToWorking(temp);
     return status;
-}
-
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty)
-{
-    using Traits = NumericAttributeTraits<uint16_t>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
-    {
-        return Protocols::InteractionModel::Status::ConstraintError;
-    }
-    Traits::StorageType storageValue;
-    Traits::WorkingToStorage(value, storageValue);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::ThreadBorderRouterManagement::Id, Id),
-                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
-}
-
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value)
-{
-    using Traits = NumericAttributeTraits<uint16_t>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
-    {
-        return Protocols::InteractionModel::Status::ConstraintError;
-    }
-    Traits::StorageType storageValue;
-    Traits::WorkingToStorage(value, storageValue);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ThreadBorderRouterManagement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision

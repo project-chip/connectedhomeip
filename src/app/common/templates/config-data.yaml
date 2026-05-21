@@ -133,6 +133,7 @@ CodeDrivenClusters:
     - Groupcast
     - Groups
     - HEPA Filter Monitoring
+    - Humidistat
     - ICD Management
     - Identify
     - Illuminance Measurement
@@ -155,6 +156,7 @@ CodeDrivenClusters:
     - TLS Client Management
     - Temperature Control
     - Temperature Measurement
+    - Thread Border Router Management
     - Thread Network Diagnostics
     - Time Format Localization
     - Time Synchronization

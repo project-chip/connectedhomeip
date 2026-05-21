@@ -64,7 +64,6 @@ Davis, CA 95616, USA
   <classification class="simple" scope="endpoint"/>
   <conditions>
     <condition name="ActiveTariff" summary="The tariff represents the currently active tariff"/>
-    <condition name="AuxiliarySwitch" summary="The tariff contains information about controlling auxiliary switches"/>
   </conditions>
   <clusters>
     <cluster id="0x0095" name="Commodity Price" side="server">
@@ -76,19 +75,7 @@ Davis, CA 95616, USA
       <optionalConform/>
     </cluster>
     <cluster id="0x0700" name="Commodity Tariff" side="server">
-      <otherwiseConform>
-        <mandatoryConform>
-          <condition name="AuxiliarySwitch"/>
-        </mandatoryConform>
-        <optionalConform choice="a" more="true" min="1"/>
-      </otherwiseConform>
-      <features>
-        <feature code="AUXLD">
-          <mandatoryConform>
-            <condition name="AuxiliarySwitch"/>
-          </mandatoryConform>
-        </feature>
-      </features>
+      <optionalConform choice="a" more="true" min="1"/>
     </cluster>
   </clusters>
 </deviceType>
