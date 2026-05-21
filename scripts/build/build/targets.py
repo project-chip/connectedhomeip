@@ -842,7 +842,9 @@ def BuildTelinkTarget():
 
     # Single-device subset builds for all-devices-app.
     # Each modifier selects exactly one device; the binary is named example-device-app.
-    # Multi-device subsets can be built directly with gn gen --args.
+    # Multi-device subsets should be built by passing
+    # -DALL_DEVICES_ENABLED_DEVICES=<device1;device2;...> through the
+    # Zephyr/west+CMake build system (for example via build_examples).
     for _device in _ALL_DEVICES_APP_DEVICES:
         app_parts.append(TargetPart(f'all-devices-{_device}', app=TelinkApp.ALL_DEVICES, all_devices_enabled_devices=[_device]))
 
