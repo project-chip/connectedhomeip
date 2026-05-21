@@ -80,7 +80,7 @@ class TestInteractionModel(CHIPVirtualHome):
 
         for _id in resp_ids:
             self.execute_device_cmd(
-                _id, f"CHIPCirqueDaemon.py -- run gdb -batch -return-child-result -q -ex run -ex bt {CHIP_IM_RESPONDER}")
+                _id, f"CHIPCirqueDaemon.py -- run gdb -batch -return-child-result -q -ex run -ex bt --args {CHIP_IM_RESPONDER}")
 
         command = f"gdb -return-child-result -q -ex run -ex bt --args {CHIP_IM_INITIATOR} {{}}"
 
