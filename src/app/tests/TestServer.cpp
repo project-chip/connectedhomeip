@@ -36,8 +36,6 @@ public:
     {
         ASSERT_EQ(Platform::MemoryInit(), CHIP_NO_ERROR);
         ASSERT_EQ(PlatformMgr().InitChipStack(), CHIP_NO_ERROR);
-        // Clear any leaked fail-safe state from previous test suites
-        Server::GetInstance().GetFailSafeContext().DisarmFailSafe();
     }
     static void TearDownTestSuite()
     {
@@ -46,21 +44,24 @@ public:
     }
 };
 
-class TestEventHandler
+class TestFactoryResetEventHandler
 {
 public:
     ChipDeviceEvent mEvent{};
 
     static void EventHandler(const ChipDeviceEvent * event, intptr_t arg)
     {
-        reinterpret_cast<TestEventHandler *>(arg)->mEvent = *event;
+        if (event->Type == DeviceEventType::kFactoryReset)
+        {
+            reinterpret_cast<TestFactoryResetEventHandler *>(arg)->mEvent = *event;
+        }
     }
 };
 
 TEST_F(TestServer, TestFactoryResetEvent)
 {
-    TestEventHandler handler;
-    EXPECT_SUCCESS(PlatformMgr().AddEventHandler(TestEventHandler::EventHandler, reinterpret_cast<intptr_t>(&handler)));
+    TestFactoryResetEventHandler handler;
+    EXPECT_SUCCESS(PlatformMgr().AddEventHandler(TestFactoryResetEventHandler::EventHandler, reinterpret_cast<intptr_t>(&handler)));
 
     Server::GetInstance().ScheduleFactoryReset();
 
@@ -70,7 +71,7 @@ TEST_F(TestServer, TestFactoryResetEvent)
 
     EXPECT_EQ(handler.mEvent.Type, DeviceEventType::kFactoryReset);
 
-    PlatformMgr().RemoveEventHandler(TestEventHandler::EventHandler, reinterpret_cast<intptr_t>(&handler));
+    PlatformMgr().RemoveEventHandler(TestFactoryResetEventHandler::EventHandler, reinterpret_cast<intptr_t>(&handler));
 }
 
 } // namespace server
