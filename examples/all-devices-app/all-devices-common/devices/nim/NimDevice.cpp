@@ -32,10 +32,10 @@ inline ByteSpan ByteSpanFromCharSpan(CharSpan span)
     return ByteSpan(Uint8::from_const_char(span.data()), span.size());
 }
 
-NimDevice::NimDevice(PersistentStorageDelegate & storage, std::unique_ptr<Clusters::ThreadBorderRouterManagementDelegate> tbrDelegate) :
+NimDevice::NimDevice(PersistentStorageDelegate & storage,
+                     std::unique_ptr<Clusters::ThreadBorderRouterManagementDelegate> tbrDelegate) :
     SingleEndpointDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kNetworkInfrastructureManager, 1)),
-    mTbrDelegate(std::move(tbrDelegate)),
-    mThreadNetworkDirectoryStorage(storage)
+    mTbrDelegate(std::move(tbrDelegate)), mThreadNetworkDirectoryStorage(storage)
 {}
 
 CHIP_ERROR NimDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointId parentId)
