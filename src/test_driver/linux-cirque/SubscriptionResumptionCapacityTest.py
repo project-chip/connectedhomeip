@@ -16,11 +16,12 @@ limitations under the License.
 """
 
 import logging
+import shlex
 import sys
 
 from helper.CHIPTestBase import CHIPVirtualHome
-from helper.paths import (CHIP_ALL_CLUSTERS_APP, CHIP_REPO_STR, CONTROLLER_TEST_SCRIPTS_DIR, MATTER_CONTROLLER_INSTALL_WHEELS,
-                          MATTER_DEVELOPMENT_PAA_ROOT_CERTS)
+from helper.paths import (CHIP_ALL_CLUSTERS_APP_ESC, CHIP_REPO_STR, CONTROLLER_TEST_SCRIPTS_DIR, MATTER_CONTROLLER_INSTALL_WHEELS,
+                          MATTER_DEVELOPMENT_PAA_ROOT_CERTS_ESC)
 
 """
 Test to verify that the device can still handle new subscription requests when resuming the maximum subscriptions.
@@ -51,8 +52,8 @@ CIRQUE_URL = "http://localhost:5000"
 TEST_EXTPANID = "fedcba9876543210"
 TEST_DISCRIMINATOR = 3840
 TEST_SUBSCRIPTION_CAPACITY = 3
-TEST_SCRIPT_CTRL1 = CONTROLLER_TEST_SCRIPTS_DIR / "subscription_resumption_capacity_test_ctrl1.py"
-TEST_SCRIPT_CTRL2 = CONTROLLER_TEST_SCRIPTS_DIR / "subscription_resumption_capacity_test_ctrl2.py"
+TEST_SCRIPT_CTRL1_ESC = shlex.quote(str(CONTROLLER_TEST_SCRIPTS_DIR / "subscription_resumption_capacity_test_ctrl1.py"))
+TEST_SCRIPT_CTRL2_ESC = shlex.quote(str(CONTROLLER_TEST_SCRIPTS_DIR / "subscription_resumption_capacity_test_ctrl2.py"))
 
 
 # TODO: If using one Mobile Device, the CHIPEndDevice can still resolve the address for first controller
@@ -116,7 +117,7 @@ class TestSubscriptionResumptionCapacity(CHIPVirtualHome):
         self.execute_device_cmd(
             server_device_id,
             'CHIPCirqueDaemon.py -- run gdb -batch -return-child-result -q -ex "set pagination off" -ex run '
-            f'-ex "thread apply all bt" --args {CHIP_ALL_CLUSTERS_APP} --thread --discriminator {TEST_DISCRIMINATOR} '
+            f'-ex "thread apply all bt" --args {CHIP_ALL_CLUSTERS_APP_ESC} --thread --discriminator {TEST_DISCRIMINATOR} '
             f'--subscription-capacity {TEST_SUBSCRIPTION_CAPACITY}')
 
         self.reset_thread_devices(server_ids)
@@ -124,17 +125,17 @@ class TestSubscriptionResumptionCapacity(CHIPVirtualHome):
         for req_device_id in req_ids:
             self.execute_device_cmd(req_device_id, MATTER_CONTROLLER_INSTALL_WHEELS)
 
-        command1 = (f'gdb -batch -return-child-result -q -ex run -ex "thread apply all bt" --args python3 {TEST_SCRIPT_CTRL1} '
-                    f'-t 300 --paa-trust-store-path {MATTER_DEVELOPMENT_PAA_ROOT_CERTS} '
+        command1 = (f'gdb -batch -return-child-result -q -ex run -ex "thread apply all bt" --args python3 {TEST_SCRIPT_CTRL1_ESC} '
+                    f'-t 300 --paa-trust-store-path {MATTER_DEVELOPMENT_PAA_ROOT_CERTS_ESC} '
                     f'--subscription-capacity {TEST_SUBSCRIPTION_CAPACITY}')
         ret1 = self.execute_device_cmd(req_ids[0], command1)
 
         self.assertEqual(ret1['return_code'], '0',
                          "Test failed: non-zero return code")
 
-        command2 = (f'gdb -batch -return-child-result -q -ex run -ex "thread apply all bt" --args python3 {TEST_SCRIPT_CTRL2} '
-                    f'-t 300 -a {ethernet_ip} --paa-trust-store-path {MATTER_DEVELOPMENT_PAA_ROOT_CERTS} '
-                    f'--remote-server-app {CHIP_ALL_CLUSTERS_APP} --subscription-capacity {TEST_SUBSCRIPTION_CAPACITY}')
+        command2 = (f'gdb -batch -return-child-result -q -ex run -ex "thread apply all bt" --args python3 {TEST_SCRIPT_CTRL2_ESC} '
+                    f'-t 300 -a {ethernet_ip} --paa-trust-store-path {MATTER_DEVELOPMENT_PAA_ROOT_CERTS_ESC} '
+                    f'--remote-server-app {CHIP_ALL_CLUSTERS_APP_ESC} --subscription-capacity {TEST_SUBSCRIPTION_CAPACITY}')
         ret2 = self.execute_device_cmd(req_ids[1], command2)
 
         self.assertEqual(ret2['return_code'], '0',

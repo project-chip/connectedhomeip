@@ -16,11 +16,12 @@ limitations under the License.
 """
 
 import logging
+import shlex
 import sys
 
 from helper.CHIPTestBase import CHIPVirtualHome
-from helper.paths import (CHIP_ALL_CLUSTERS_APP, CHIP_REPO_STR, CONTROLLER_TEST_SCRIPTS_DIR, MATTER_CONTROLLER_INSTALL_WHEELS,
-                          MATTER_DEVELOPMENT_PAA_ROOT_CERTS)
+from helper.paths import (CHIP_ALL_CLUSTERS_APP_ESC, CHIP_REPO_STR, CONTROLLER_TEST_SCRIPTS_DIR, MATTER_CONTROLLER_INSTALL_WHEELS,
+                          MATTER_DEVELOPMENT_PAA_ROOT_CERTS_ESC)
 
 logger = logging.getLogger('MobileDeviceTest')
 logger.setLevel(logging.INFO)
@@ -37,7 +38,7 @@ CIRQUE_URL = "http://localhost:5000"
 TEST_EXTPANID = "fedcba9876543210"
 TEST_DISCRIMINATOR = 3840
 TEST_DISCRIMINATOR2 = 3584
-TEST_SCRIPT = CONTROLLER_TEST_SCRIPTS_DIR / "python_commissioning_flow_test.py"
+TEST_SCRIPT_ESC = shlex.quote(str(CONTROLLER_TEST_SCRIPTS_DIR / "python_commissioning_flow_test.py"))
 
 DEVICE_CONFIG = {
     'device0': {
@@ -99,7 +100,7 @@ class TestCommissioner(CHIPVirtualHome):
             self.execute_device_cmd(
                 server['id'],
                 'CHIPCirqueDaemon.py -- run gdb -return-child-result -q -ex "set pagination off" -ex run -ex "bt 25" '
-                f'--args {CHIP_ALL_CLUSTERS_APP} --thread --discriminator {server["discriminator"]}')
+                f'--args {CHIP_ALL_CLUSTERS_APP_ESC} --thread --discriminator {server["discriminator"]}')
 
         self.reset_thread_devices([server['id'] for server in servers])
 
@@ -107,15 +108,16 @@ class TestCommissioner(CHIPVirtualHome):
 
         self.execute_device_cmd(req_device_id, MATTER_CONTROLLER_INSTALL_WHEELS)
 
-        command = (f"gdb -return-child-result -q -ex run -ex bt --args python3 {TEST_SCRIPT} -t 150 -d {TEST_DISCRIMINATOR} "
-                   f"--paa-trust-store-path {MATTER_DEVELOPMENT_PAA_ROOT_CERTS} --nodeid {servers[0]['nodeid']}")
+        command = (f"gdb -return-child-result -q -ex run -ex bt --args python3 {TEST_SCRIPT_ESC} -t 150 -d {TEST_DISCRIMINATOR} "
+                   f"--paa-trust-store-path {MATTER_DEVELOPMENT_PAA_ROOT_CERTS_ESC} --nodeid {servers[0]['nodeid']}")
         ret = self.execute_device_cmd(req_device_id, command)
 
         self.assertEqual(ret['return_code'], '0',
                          "Test failed: non-zero return code")
 
-        command = (f"gdb -return-child-result -q -ex run -ex bt --args python3 {TEST_SCRIPT} -t 150 -d {TEST_DISCRIMINATOR2} "
-                   f"--paa-trust-store-path {MATTER_DEVELOPMENT_PAA_ROOT_CERTS} --nodeid {servers[1]['nodeid']} --bad-cert-issuer")
+        command = (f"gdb -return-child-result -q -ex run -ex bt --args python3 {TEST_SCRIPT_ESC} -t 150 -d {TEST_DISCRIMINATOR2} "
+                   f"--paa-trust-store-path {MATTER_DEVELOPMENT_PAA_ROOT_CERTS_ESC} --nodeid {servers[1]['nodeid']} "
+                   "--bad-cert-issuer")
         ret = self.execute_device_cmd(req_device_id, command)
 
         self.assertEqual(ret['return_code'], '0',

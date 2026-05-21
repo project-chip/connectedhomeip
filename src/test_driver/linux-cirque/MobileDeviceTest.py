@@ -16,11 +16,12 @@ limitations under the License.
 """
 
 import logging
+import shlex
 import sys
 
 from helper.CHIPTestBase import CHIPVirtualHome
-from helper.paths import (CHIP_ALL_CLUSTERS_APP, CHIP_REPO_STR, CONTROLLER_TEST_SCRIPTS_DIR, MATTER_CONTROLLER_INSTALL_WHEELS,
-                          MATTER_DEVELOPMENT_PAA_ROOT_CERTS)
+from helper.paths import (CHIP_ALL_CLUSTERS_APP_ESC, CHIP_REPO_STR, CONTROLLER_TEST_SCRIPTS_DIR, MATTER_CONTROLLER_INSTALL_WHEELS,
+                          MATTER_DEVELOPMENT_PAA_ROOT_CERTS_ESC)
 
 logger = logging.getLogger('MobileDeviceTest')
 logger.setLevel(logging.INFO)
@@ -36,7 +37,7 @@ CHIP_PORT = 5540
 CIRQUE_URL = "http://localhost:5000"
 TEST_EXTPANID = "fedcba9876543210"
 TEST_DISCRIMINATOR = 3840
-TEST_SCRIPT = CONTROLLER_TEST_SCRIPTS_DIR / "mobile-device-test.py"
+TEST_SCRIPT_ESC = shlex.quote(str(CONTROLLER_TEST_SCRIPTS_DIR / "mobile-device-test.py"))
 
 DEVICE_CONFIG = {
     'device0': {
@@ -81,7 +82,7 @@ class TestPythonController(CHIPVirtualHome):
             self.execute_device_cmd(
                 server,
                 f'CHIPCirqueDaemon.py -- run gdb -batch -return-child-result -q -ex "set pagination off" -ex run '
-                f'-ex "thread apply all bt" --args {CHIP_ALL_CLUSTERS_APP} --thread --discriminator {TEST_DISCRIMINATOR}')
+                f'-ex "thread apply all bt" --args {CHIP_ALL_CLUSTERS_APP_ESC} --thread --discriminator {TEST_DISCRIMINATOR}')
 
         self.reset_thread_devices(server_ids)
 
@@ -89,8 +90,8 @@ class TestPythonController(CHIPVirtualHome):
 
         self.execute_device_cmd(req_device_id, MATTER_CONTROLLER_INSTALL_WHEELS)
 
-        command = (f'gdb -batch -return-child-result -q -ex run -ex \"thread apply all bt\" --args python3 {TEST_SCRIPT} -t 300 '
-                   f'--paa-trust-store-path {MATTER_DEVELOPMENT_PAA_ROOT_CERTS}')
+        command = (f'gdb -batch -return-child-result -q -ex run -ex \"thread apply all bt\" --args python3 {TEST_SCRIPT_ESC} '
+                   f'-t 300 --paa-trust-store-path {MATTER_DEVELOPMENT_PAA_ROOT_CERTS_ESC}')
         ret = self.execute_device_cmd(req_device_id, command)
 
         self.assertEqual(ret['return_code'], '0',

@@ -20,7 +20,7 @@ import sys
 import time
 
 from helper.CHIPTestBase import CHIPVirtualHome
-from helper.paths import CHIP_LIGHTING_APP, CHIP_REPO_STR, CHIP_TOOL
+from helper.paths import CHIP_LIGHTING_APP_ESC, CHIP_REPO_STR, CHIP_TOOL_ESC
 
 logger = logging.getLogger('CHIPOnOffTest')
 logger.setLevel(logging.INFO)
@@ -79,14 +79,14 @@ class TestOnOffCluster(CHIPVirtualHome):
         tool_device_id = tool_ids[0]
 
         for device_id in server_ids:
-            self.execute_device_cmd(device_id, f"CHIPCirqueDaemon.py -- run {CHIP_LIGHTING_APP} --thread")
+            self.execute_device_cmd(device_id, f"CHIPCirqueDaemon.py -- run {CHIP_LIGHTING_APP_ESC} --thread")
             server_ip_address.add(self.get_device_thread_ip(device_id))
 
-        command = f"{CHIP_TOOL} onoff {{}} 1"
+        command = f"{CHIP_TOOL_ESC} onoff {{}} 1"
 
         for ip in server_ip_address:
             ret = self.execute_device_cmd(
-                tool_device_id, f"{CHIP_TOOL} pairing softap {SETUPPINCODE} {DISCRIMINATOR} {ip} {CHIP_PORT}")
+                tool_device_id, f"{CHIP_TOOL_ESC} pairing softap {SETUPPINCODE} {DISCRIMINATOR} {ip} {CHIP_PORT}")
             self.assertEqual(ret['return_code'], '0', "{} command failure: {}".format(
                 "pairing softap", ret['output']))
 

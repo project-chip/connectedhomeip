@@ -20,16 +20,16 @@ import shlex
 CHIP_REPO = Path(__file__).resolve().parents[4]
 CHIP_REPO_STR = str(CHIP_REPO)
 CONTROLLER_TEST_SCRIPTS_DIR = CHIP_REPO / "src/controller/python/tests/scripts"
-MATTER_DEVELOPMENT_PAA_ROOT_CERTS = CHIP_REPO / "credentials/development/paa-root-certs"
+MATTER_DEVELOPMENT_PAA_ROOT_CERTS_ESC = shlex.quote(str(CHIP_REPO / "credentials/development/paa-root-certs"))
 
-CHIP_ALL_CLUSTERS_APP = CHIP_REPO / "out/debug/standalone/chip-all-clusters-app"
-CHIP_ECHO_REQUESTER = CHIP_REPO / "out/debug/linux_x64_gcc/chip-echo-requester"
-CHIP_ECHO_RESPONDER = CHIP_REPO / "out/debug/linux_x64_gcc/chip-echo-responder"
-CHIP_IM_INITIATOR = CHIP_REPO / "out/debug/linux_x64_gcc/chip-im-initiator"
-CHIP_IM_RESPONDER = CHIP_REPO / "out/debug/linux_x64_gcc/chip-im-responder"
-CHIP_LIGHTING_APP = CHIP_REPO / "out/debug/standalone/chip-lighting-app"
-CHIP_TOOL = CHIP_REPO / "out/debug/standalone/chip-tool"
-LIT_ICD_APP = CHIP_REPO / "out/debug/lit_icd/lit-icd-app"
+CHIP_ALL_CLUSTERS_APP_ESC = shlex.quote(str(CHIP_REPO / "out/debug/standalone/chip-all-clusters-app"))
+CHIP_ECHO_REQUESTER_ESC = shlex.quote(str(CHIP_REPO / "out/debug/linux_x64_gcc/chip-echo-requester"))
+CHIP_ECHO_RESPONDER_ESC = shlex.quote(str(CHIP_REPO / "out/debug/linux_x64_gcc/chip-echo-responder"))
+CHIP_IM_INITIATOR_ESC = shlex.quote(str(CHIP_REPO / "out/debug/linux_x64_gcc/chip-im-initiator"))
+CHIP_IM_RESPONDER_ESC = shlex.quote(str(CHIP_REPO / "out/debug/linux_x64_gcc/chip-im-responder"))
+CHIP_LIGHTING_APP_ESC = shlex.quote(str(CHIP_REPO / "out/debug/standalone/chip-lighting-app"))
+CHIP_TOOL_ESC = shlex.quote(str(CHIP_REPO / "out/debug/standalone/chip-tool"))
+LIT_ICD_APP_ESC = shlex.quote(str(CHIP_REPO / "out/debug/lit_icd/lit-icd-app"))
 
 MATTER_CONTROLLER_WHEEL_DIR = CHIP_REPO / "out/debug/linux_x64_gcc/controller/python"
 MATTER_CONTROLLER_WHEELS = ["matter_clusters", "matter_core", "matter_repl"]

@@ -16,11 +16,12 @@ limitations under the License.
 """
 
 import logging
+import shlex
 import sys
 
 from helper.CHIPTestBase import CHIPVirtualHome
-from helper.paths import (CHIP_REPO_STR, CONTROLLER_TEST_SCRIPTS_DIR, LIT_ICD_APP, MATTER_CONTROLLER_INSTALL_WHEELS,
-                          MATTER_DEVELOPMENT_PAA_ROOT_CERTS)
+from helper.paths import (CHIP_REPO_STR, CONTROLLER_TEST_SCRIPTS_DIR, LIT_ICD_APP_ESC, MATTER_CONTROLLER_INSTALL_WHEELS,
+                          MATTER_DEVELOPMENT_PAA_ROOT_CERTS_ESC)
 
 logger = logging.getLogger('MobileDeviceTest')
 logger.setLevel(logging.INFO)
@@ -41,7 +42,7 @@ TEST_DISCRIMINATOR3 = 1203
 TEST_DISCRIMINATOR4 = 2145
 TEST_DISCOVERY_TYPE = [0, 1, 2]
 TEST_PASSCODE = 20202021
-TEST_SCRIPT = CONTROLLER_TEST_SCRIPTS_DIR / "icd_device_test.py"
+TEST_SCRIPT_ESC = shlex.quote(str(CONTROLLER_TEST_SCRIPTS_DIR / "icd_device_test.py"))
 
 TEST_EVENT_KEY_HEX = "00112233445566778899aabbccddeeff"
 
@@ -88,7 +89,7 @@ class TestCommissioner(CHIPVirtualHome):
             self.execute_device_cmd(
                 server,
                 f'CHIPCirqueDaemon.py -- run gdb -batch -return-child-result -q -ex "set pagination off" -ex run '
-                f'-ex "thread apply all bt" --args {LIT_ICD_APP} --thread --discriminator {TEST_DISCRIMINATOR} '
+                f'-ex "thread apply all bt" --args {LIT_ICD_APP_ESC} --thread --discriminator {TEST_DISCRIMINATOR} '
                 f'--enable-key {TEST_EVENT_KEY_HEX}')
 
         self.reset_thread_devices(server_ids)
@@ -97,9 +98,9 @@ class TestCommissioner(CHIPVirtualHome):
 
         self.execute_device_cmd(req_device_id, MATTER_CONTROLLER_INSTALL_WHEELS)
 
-        command = (f'gdb -batch -return-child-result -q -ex run -ex \"thread apply all bt\" --args python3 {TEST_SCRIPT} -t 300 '
-                   f'--discriminator {TEST_DISCRIMINATOR} --passcode {TEST_PASSCODE} '
-                   f'--paa-trust-store-path {MATTER_DEVELOPMENT_PAA_ROOT_CERTS} --test-event-key {TEST_EVENT_KEY_HEX}')
+        command = (f'gdb -batch -return-child-result -q -ex run -ex \"thread apply all bt\" --args python3 {TEST_SCRIPT_ESC} '
+                   f'-t 300 --discriminator {TEST_DISCRIMINATOR} --passcode {TEST_PASSCODE} '
+                   f'--paa-trust-store-path {MATTER_DEVELOPMENT_PAA_ROOT_CERTS_ESC} --test-event-key {TEST_EVENT_KEY_HEX}')
         ret = self.execute_device_cmd(req_device_id, command)
 
         self.assertEqual(ret['return_code'], '0',

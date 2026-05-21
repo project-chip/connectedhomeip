@@ -16,11 +16,12 @@ limitations under the License.
 """
 
 import logging
+import shlex
 import sys
 
 from helper.CHIPTestBase import CHIPVirtualHome
-from helper.paths import (CHIP_ALL_CLUSTERS_APP, CHIP_REPO_STR, CONTROLLER_TEST_SCRIPTS_DIR, MATTER_CONTROLLER_INSTALL_WHEELS,
-                          MATTER_DEVELOPMENT_PAA_ROOT_CERTS)
+from helper.paths import (CHIP_ALL_CLUSTERS_APP_ESC, CHIP_REPO_STR, CONTROLLER_TEST_SCRIPTS_DIR, MATTER_CONTROLLER_INSTALL_WHEELS,
+                          MATTER_DEVELOPMENT_PAA_ROOT_CERTS_ESC)
 
 logger = logging.getLogger('MobileDeviceTest')
 logger.setLevel(logging.INFO)
@@ -40,7 +41,7 @@ TEST_DISCRIMINATOR2 = 3584
 TEST_DISCRIMINATOR3 = 1203
 TEST_DISCRIMINATOR4 = 2145
 TEST_DISCOVERY_TYPE = [0, 1, 2]
-TEST_SCRIPT = CONTROLLER_TEST_SCRIPTS_DIR / "commissioning_test.py"
+TEST_SCRIPT_ESC = shlex.quote(str(CONTROLLER_TEST_SCRIPTS_DIR / "commissioning_test.py"))
 
 DEVICE_CONFIG = {
     'device0': {
@@ -124,7 +125,7 @@ class TestCommissioner(CHIPVirtualHome):
             self.execute_device_cmd(
                 server['id'],
                 'CHIPCirqueDaemon.py -- run gdb -return-child-result -q -ex "set pagination off" -ex run -ex "bt 25" '
-                f'--args {CHIP_ALL_CLUSTERS_APP} --thread --discriminator {server["discriminator"]}')
+                f'--args {CHIP_ALL_CLUSTERS_APP_ESC} --thread --discriminator {server["discriminator"]}')
 
         self.reset_thread_devices([server['id'] for server in servers])
 
@@ -132,24 +133,24 @@ class TestCommissioner(CHIPVirtualHome):
 
         self.execute_device_cmd(req_device_id, MATTER_CONTROLLER_INSTALL_WHEELS)
 
-        command = (f"gdb -return-child-result -q -ex run -ex bt --args python3 {TEST_SCRIPT} -t 150 "
-                   f"--paa-trust-store-path {MATTER_DEVELOPMENT_PAA_ROOT_CERTS} --discriminator {servers[1]['discriminator']} "
+        command = (f"gdb -return-child-result -q -ex run -ex bt --args python3 {TEST_SCRIPT_ESC} -t 150 "
+                   f"--paa-trust-store-path {MATTER_DEVELOPMENT_PAA_ROOT_CERTS_ESC} --discriminator {servers[1]['discriminator']} "
                    f"--setup-payload 33331712336 --nodeid {servers[1]['nodeid']} --discovery-type {TEST_DISCOVERY_TYPE[2]}")
         ret = self.execute_device_cmd(req_device_id, command)
 
         self.assertEqual(ret['return_code'], '0',
                          "Test failed: non-zero return code")
 
-        command = (f"gdb -return-child-result -q -ex run -ex bt --args python3 {TEST_SCRIPT} -t 150 "
-                   f"--paa-trust-store-path {MATTER_DEVELOPMENT_PAA_ROOT_CERTS} --discriminator {servers[2]['discriminator']} "
+        command = (f"gdb -return-child-result -q -ex run -ex bt --args python3 {TEST_SCRIPT_ESC} -t 150 "
+                   f"--paa-trust-store-path {MATTER_DEVELOPMENT_PAA_ROOT_CERTS_ESC} --discriminator {servers[2]['discriminator']} "
                    f"--setup-payload 10054912339 --nodeid {servers[2]['nodeid']} --discovery-type {TEST_DISCOVERY_TYPE[0]}")
         ret = self.execute_device_cmd(req_device_id, command)
 
         self.assertEqual(ret['return_code'], '0',
                          "Test failed: non-zero return code")
 
-        command = (f"gdb -return-child-result -q -ex run -ex bt --args python3 {TEST_SCRIPT} -t 150 "
-                   f"--paa-trust-store-path {MATTER_DEVELOPMENT_PAA_ROOT_CERTS} --discriminator {servers[3]['discriminator']} "
+        command = (f"gdb -return-child-result -q -ex run -ex bt --args python3 {TEST_SCRIPT_ESC} -t 150 "
+                   f"--paa-trust-store-path {MATTER_DEVELOPMENT_PAA_ROOT_CERTS_ESC} --discriminator {servers[3]['discriminator']} "
                    f"--setup-payload 20054912334 --nodeid {servers[3]['nodeid']} --discovery-type {TEST_DISCOVERY_TYPE[1]}")
         ret = self.execute_device_cmd(req_device_id, command)
 

@@ -19,7 +19,7 @@ import logging
 import sys
 
 from helper.CHIPTestBase import CHIPVirtualHome
-from helper.paths import CHIP_ECHO_REQUESTER, CHIP_ECHO_RESPONDER, CHIP_REPO_STR
+from helper.paths import CHIP_ECHO_REQUESTER_ESC, CHIP_ECHO_RESPONDER_ESC, CHIP_REPO_STR
 
 logger = logging.getLogger('CHIPEchoTest')
 logger.setLevel(logging.INFO)
@@ -80,9 +80,10 @@ class TestEcho(CHIPVirtualHome):
 
         for _id in resp_ids:
             self.execute_device_cmd(
-                _id, f"CHIPCirqueDaemon.py -- run gdb -batch -return-child-result -q -ex run -ex bt --args {CHIP_ECHO_RESPONDER}")
+                _id,
+                f"CHIPCirqueDaemon.py -- run gdb -batch -return-child-result -q -ex run -ex bt --args {CHIP_ECHO_RESPONDER_ESC}")
 
-        command = f"gdb -return-child-result -q -ex run -ex bt --args {CHIP_ECHO_REQUESTER} {{}}"
+        command = f"gdb -return-child-result -q -ex run -ex bt --args {CHIP_ECHO_REQUESTER_ESC} {{}}"
 
         for ip in resp_ips:
             ret = self.execute_device_cmd(
