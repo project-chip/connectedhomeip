@@ -20,8 +20,8 @@ import shlex
 import sys
 
 from helper.CHIPTestBase import CHIPVirtualHome
-from helper.paths import (CHIP_ALL_CLUSTERS_APP_ESC, CHIP_REPO_STR, CONTROLLER_TEST_SCRIPTS_DIR, MATTER_CONTROLLER_INSTALL_WHEELS,
-                          MATTER_DEVELOPMENT_PAA_ROOT_CERTS_ESC)
+from helper.paths import (CHIP_ALL_CLUSTERS_APP_ESC, CHIP_ALL_CLUSTERS_APP_FRAGMENT, CHIP_REPO_STR, CONTROLLER_TEST_SCRIPTS_DIR,
+                          MATTER_CONTROLLER_INSTALL_WHEELS, MATTER_DEVELOPMENT_PAA_ROOT_CERTS_ESC)
 
 """
 Basic Subscription Resumption Test to validate that the device can resume subscriptions after restarting.
@@ -104,7 +104,7 @@ class TestSubscriptionResumption(CHIPVirtualHome):
 
         command = (f'gdb -batch -return-child-result -q -ex run -ex "thread apply all bt" --args python3 {TEST_SCRIPT_ESC} -t 300 '
                    f'-a {ethernet_ip} --paa-trust-store-path {MATTER_DEVELOPMENT_PAA_ROOT_CERTS_ESC} '
-                   f'--remote-server-app {CHIP_ALL_CLUSTERS_APP_ESC}')
+                   f'--remote-server-app {CHIP_ALL_CLUSTERS_APP_FRAGMENT}')
         ret = self.execute_device_cmd(req_device_id, command)
 
         self.assertEqual(ret['return_code'], '0',

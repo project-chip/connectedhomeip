@@ -22,7 +22,8 @@ CHIP_REPO_STR = str(CHIP_REPO)
 CONTROLLER_TEST_SCRIPTS_DIR = CHIP_REPO / "src/controller/python/tests/scripts"
 MATTER_DEVELOPMENT_PAA_ROOT_CERTS_ESC = shlex.quote(str(CHIP_REPO / "credentials/development/paa-root-certs"))
 
-CHIP_ALL_CLUSTERS_APP_ESC = shlex.quote(str(CHIP_REPO / "out/debug/standalone/chip-all-clusters-app"))
+CHIP_ALL_CLUSTERS_APP_FRAGMENT = "standalone/chip-all-clusters-app"
+CHIP_ALL_CLUSTERS_APP_ESC = shlex.quote(str(CHIP_REPO / "out/debug"/ CHIP_ALL_CLUSTERS_APP_FRAGMENT))
 CHIP_ECHO_REQUESTER_ESC = shlex.quote(str(CHIP_REPO / "out/debug/linux_x64_gcc/chip-echo-requester"))
 CHIP_ECHO_RESPONDER_ESC = shlex.quote(str(CHIP_REPO / "out/debug/linux_x64_gcc/chip-echo-responder"))
 CHIP_IM_INITIATOR_ESC = shlex.quote(str(CHIP_REPO / "out/debug/linux_x64_gcc/chip-im-initiator"))
