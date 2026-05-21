@@ -809,7 +809,7 @@ class WildcardAttributeSubscriptionHandler:
         """
         report_key = (endpoint_id, cluster_type, attribute_type)
         with self._lock:
-            return report_key in self._attribute_reports and len(self._attribute_reports[report_key]) > 0
+            return report_key in self._attribute_reports
 
     def get_attribute_report_count(self, endpoint_id: int, cluster_type, attribute_type) -> int:
         """
