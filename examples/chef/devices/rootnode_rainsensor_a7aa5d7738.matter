@@ -1988,8 +1988,8 @@ endpoint 1 {
     emits event AlarmsStateChanged;
     emits event SensorFault;
     callback attribute currentSensitivityLevel;
-    ram      attribute supportedSensitivityLevels;
-    ram      attribute defaultSensitivityLevel;
+    ram      attribute supportedSensitivityLevels default = 10;
+    ram      attribute defaultSensitivityLevel default = 1;
     callback attribute alarmsActive;
     callback attribute alarmsSuppressed;
     callback attribute alarmsEnabled;
