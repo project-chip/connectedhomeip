@@ -55,10 +55,13 @@ namespace Crypto {
 
 ESP32P256Keypair::~ESP32P256Keypair()
 {
+    // Destroy PSA key handle before base destructor runs P256Keypair::Clear().
+    // Base Clear() checks mInitialized and skips mbedTLS free once we set it false.
     if (mInitialized)
     {
-        const PsaEcdsaContext * ctx = to_const_psa_ctx(&mKeypair);
+        PsaEcdsaContext * ctx = to_psa_ctx(&mKeypair);
         psa_destroy_key(ctx->key_id);
+        mInitialized = false;
     }
 }
 
@@ -73,7 +76,6 @@ CHIP_ERROR ESP32P256Keypair::Initialize(ECPKeyTarget keyTarget, int efuseBlock)
         psa_destroy_key(ctx->key_id);
         mInitialized = false;
     }
-    Clear();
 
     psa_status_t status     = PSA_SUCCESS;
     size_t key_size_in_bits = 256;

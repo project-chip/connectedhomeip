@@ -424,6 +424,7 @@ static CHIP_ERROR ParseIPAddresses(ResolveContext * ctx)
                 }
                 addr = addr->next;
             }
+            ctx->mAddressCount = addressIndex;
             return CHIP_NO_ERROR;
         }
     }
