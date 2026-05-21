@@ -17,6 +17,21 @@
 
 #pragma once
 
+/**
+ * @file LoggingBorderRouterDelegate.h
+ * @brief Reference/mock implementation of ThreadBorderRouterManagementDelegate.
+ *
+ * This file implements a mock Thread Border Router Management delegate designed for
+ * reference and testing purposes inside the all-devices-app. It simulates typical border router
+ * behaviors (active/pending datasets in-memory storage, fake border agent ID, name, version) and
+ * prints verbose progress logging for every interface function called.
+ *
+ * To keep the NIM device common implementation lightweight and simple, this reference delegate
+ * is implemented header-only (inline). Platforms (like POSIX) can specialize it by inheriting from
+ * this class and overriding specific virtual methods, or they can inject their own real platform
+ * delegate from scratch when constructing the NimDevice.
+ */
+
 #include <app/clusters/thread-border-router-management-server/ThreadBorderRouterManagementDelegate.h>
 #include <clusters/ThreadBorderRouterManagement/Attributes.h>
 #include <lib/support/CodeUtils.h>
