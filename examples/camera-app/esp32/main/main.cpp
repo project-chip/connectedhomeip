@@ -35,10 +35,10 @@
 #include <platform/ESP32/ESP32Utils.h>
 #include <setup_payload/OnboardingCodesUtil.h>
 
-#include "esp_hosted_coprocessor.h"
+#include "network_coprocessor.h"
 #include "esp_webrtc_time.h"
 #include "esp_work_queue.h"
-#include "host_power_save.h"
+// #include "host_power_save.h"
 #include "signaling_serializer.h"
 #include "webrtc_bridge.h"
 
@@ -56,6 +56,10 @@
 
 #if CONFIG_SEC_CERT_DAC_PROVIDER
 #include <platform/ESP32/ESP32SecureCertDACProvider.h>
+#endif
+
+#ifdef CONFIG_SLAVE_LWIP_ENABLED
+#define CONFIG_ESP_HOSTED_NETWORK_SPLIT_ENABLED 1
 #endif
 
 using namespace ::chip;
@@ -162,9 +166,9 @@ extern "C" void app_main()
 #endif
 
     signaling_serializer_init();
-    esp_hosted_coprocessor_init();
+    network_coprocessor_init();
 
-    host_power_save_init(NULL);
+    // host_power_save_init(NULL);
 
     esp_work_queue_init();
     esp_work_queue_start();
