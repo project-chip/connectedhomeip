@@ -19,6 +19,7 @@
 
 #include <mutex>
 
+#include <lib/support/CHIPMemString.h>
 #include <platform/CHIPDeviceConfig.h>
 
 namespace chip {
@@ -83,6 +84,16 @@ CHIP_ERROR WpaSupplicantClient::GetIfName(CharSpan & outIfName) const noexcept
 
     return CHIP_NO_ERROR;
 }
+
+CHIP_ERROR WpaSupplicantClient::SetIfName(const CharSpan & inIfName) noexcept
+{
+    VerifyOrReturnError(inIfName.size() < std::size(mWiFiIfName), CHIP_ERROR_BUFFER_TOO_SMALL);
+
+    Platform::CopyString(mWiFiIfName, inIfName);
+
+    return CHIP_NO_ERROR;
+}
+
 
 } // namespace Internal
 } // namespace DeviceLayer

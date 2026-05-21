@@ -171,8 +171,30 @@ protected:
      *    A reference to the mutable character span to which to assign
      *    the Wi-Fi network interface name extent.
      *
+     *  @sa SetIfName
+     *
      */
     CHIP_ERROR GetIfName(CharSpan & outIfName) const noexcept;
+
+    /**
+     *  @brief
+     *    Set the Wi-Fi network interface name.
+     *
+     *  @param[in]  inIfName
+     *    A reference to the immutable character span from which to
+     *    copy the Wi-Fi network interface name.
+     *
+     *  @retval  CHIP_NO_ERROR
+     *    If successful.
+     *
+     *  @retval  CHIP_ERROR_BUFFER_TOO_SMALL
+     *    If the length of @a inIfName exceeds the internal buffer
+     *    space.
+     *
+     *  @sa GetIfName
+     *
+     */
+    CHIP_ERROR SetIfName(const CharSpan & inIfName) noexcept;
 
     struct GDBusWpaSupplicant
     {
