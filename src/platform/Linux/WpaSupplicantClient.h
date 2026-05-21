@@ -29,7 +29,7 @@
 #include <platform/Linux/dbus/wpa/DBusWpaNetwork.h>
 #include <system/SystemMutex.h>
 
-#define CONNECTIVITY_MANAGER_WPA_SUPPLICANT_LOG_PREFIX "wpa_supplicant: "
+#define WPA_SUPPLICANT_CLIENT_LOG_PREFIX "wpa_supplicant: "
 
 namespace chip {
 
@@ -111,16 +111,10 @@ protected:
      *  wpa_supplicant D-Bus signals (for example, scan results,
      *  connection state changes).
      *
-     *  This method may only be called once. Subsequent calls
-     *  return #CHIP_ERROR_ALREADY_INITIALIZED.
-     *
      *  @param[in]  inConnectivityManagerImpl
      *    A reference to the platform Connectivity Manager
      *    implementation to which wpa_supplicant events will be
      *    dispatched.
-     *
-     *  @retval #CHIP_NO_ERROR                  On success.
-     *  @retval #CHIP_ERROR_ALREADY_INITIALIZED If already initialized.
      *
      *  @sa Shutdown
      *  @sa Reset
@@ -160,12 +154,24 @@ protected:
      */
     void Reset() noexcept;
 
+    /**
+     *  @brief
+     *    Return whether the wpa_supplicant client has been started.
+     *
+     */
+    bool IsStarted() const noexcept;
+
     struct GDBusWpaSupplicant
     {
         GAutoPtr<WpaSupplicant1> proxy;
         GAutoPtr<WpaSupplicant1Interface> iface;
         GAutoPtr<char> interfacePath;
         GAutoPtr<char> networkPath;
+
+        // Must be called synchronously on the GLib thread while the
+        // GLib main loop is still running.
+
+        void Reset();
     };
 
     GDBusWpaSupplicant mWpaSupplicant CHIP_GUARDED_BY(mWpaSupplicantMutex);
