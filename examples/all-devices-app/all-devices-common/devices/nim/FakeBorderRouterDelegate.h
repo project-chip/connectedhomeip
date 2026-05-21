@@ -30,6 +30,12 @@ namespace app {
 class FakeBorderRouterDelegate final : public Clusters::ThreadBorderRouterManagementDelegate
 {
 public:
+    ~FakeBorderRouterDelegate() override
+    {
+        DeviceLayer::SystemLayer().CancelTimer(ActivateActiveDataset, this);
+        DeviceLayer::SystemLayer().CancelTimer(ActivatePendingDataset, this);
+    }
+
     CHIP_ERROR Init(AttributeChangeCallback * attributeChangeCallback) override
     {
         mAttributeChangeCallback = attributeChangeCallback;
