@@ -55,9 +55,9 @@ CHIP_ERROR NetworkInfrastructureManagerDevice::Register(chip::EndpointId endpoin
     ReturnErrorOnFailure(provider.AddCluster(mThreadBorderRouterManagementCluster.Registration()));
 
     // 2. WiFi Network Management
-    mWiFiNetworkManagementCluster.Create(
-        endpoint,
-        WiFiNetworkManagementCluster::Config(ByteSpanFromCharSpan("MatterAP"_span), ByteSpanFromCharSpan("Setec Astronomy"_span)));
+    mWiFiNetworkManagementCluster.Create(endpoint);
+    ReturnErrorOnFailure(mWiFiNetworkManagementCluster.Cluster().SetNetworkCredentials(
+        ByteSpanFromCharSpan("MatterAP"_span), ByteSpanFromCharSpan("Setec Astronomy"_span)));
 
     // 3. Thread Network Directory
     mThreadNetworkDirectoryCluster.Create(endpoint, mThreadNetworkDirectoryStorage);
