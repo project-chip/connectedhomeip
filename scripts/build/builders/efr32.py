@@ -223,8 +223,6 @@ class Efr32Builder(GnBuilder):
         super(Efr32Builder, self).__init__(root=app.BuildRoot(root), runner=runner, output_dir_lock=output_dir_lock)
         self.app = app
         self.extra_gn_options = ['silabs_board="%s"' % board.GnArgName()]
-        if app == Efr32App.ALL_DEVICES:
-            self.extra_gn_options.append('sl_matter_use_code_driven_dm=true')
         self.all_devices_enabled_devices = all_devices_enabled_devices or []
         if self.all_devices_enabled_devices:
             devices_str = '[' + ','.join(f'\"{d}\"' for d in self.all_devices_enabled_devices) + ']'
