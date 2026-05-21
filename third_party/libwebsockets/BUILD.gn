@@ -27,6 +27,7 @@ config("libwebsockets_config_disable_warnings") {
     "-Wno-unreachable-code",
     "-Wno-format-nonliteral",
     "-Wno-implicit-fallthrough",
+    "-Wno-discarded-qualifiers",
   ]
 }
 
