@@ -15,8 +15,8 @@
 #    limitations under the License.
 #
 
-# Authoritative device-selection configuration for the GN (POSIX) build.
-# Parallel to all-devices-common/devices/enabled_devices.cmake for the GN build.
+# Authoritative device configuration for the CMake (ESP32) build.
+# Parallel to all-devices-common/devices/enabled_devices.gni for the GN build.
 #
 # Callers must define ALL_DEVICES_COMMON_DIR before including this file.
 #
@@ -27,61 +27,6 @@
 # After including this file, callers must append ${CMAKE_CURRENT_BINARY_DIR}
 # to their include-directory list so that the generated
 # app_config/enabled_devices.h is reachable as <app_config/enabled_devices.h>.
-
-# ---------------------------------------------------------------------------
-# Device selection.
-# ALL_DEVICES_ENABLED_DEVICES: semicolon-separated list of device keys to
-# enable.  Empty (the default) means all devices are enabled.
-# ---------------------------------------------------------------------------
-if(NOT DEFINED ALL_DEVICES_ENABLED_DEVICES)
-    set(ALL_DEVICES_ENABLED_DEVICES "")
-endif()
-
-# Determine whether every device is enabled.
-if(ALL_DEVICES_ENABLED_DEVICES)
-    set(_all_devices_all OFF)
-else()
-    set(_all_devices_all ON)
-endif()
-
-# Initialise all per-device variables to 0, then set the enabled ones to 1.
-# The macro name is derived from the registry key: "foo-bar" → ALL_DEVICES_ENABLE_FOO_BAR.
-#
-# IMPORTANT:
-#   - Keep list in sync with enabled_devices.gni
-#   - ensure enabled_devices_config.h.in contains required ALL_DEVICES_ENABLE* defines
-#   - Update scripts/build/build/targets.py to include the new device
-foreach(_key
-        # keep-sorted: start
-        chime
-        contact-sensor
-        dimmable-light
-        nim
-        occupancy-sensor
-        on-off-light
-        proximity-ranger
-        soil-sensor
-        speaker
-        temperature-sensor
-        water-leak-detector
-        # keep-sorted: end
-    )
-    string(REPLACE "-" "_" _suffix "${_key}")
-    string(TOUPPER "${_suffix}" _suffix)
-    if(_all_devices_all)
-        set("ALL_DEVICES_ENABLE_${_suffix}" 1)
-    else()
-        set("ALL_DEVICES_ENABLE_${_suffix}" 0)
-    endif()
-endforeach()
-
-if(NOT _all_devices_all)
-    foreach(_device ${ALL_DEVICES_ENABLED_DEVICES})
-        string(REPLACE "-" "_" _suffix "${_device}")
-        string(TOUPPER "${_suffix}" _suffix)
-        set("ALL_DEVICES_ENABLE_${_suffix}" 1)
-    endforeach()
-endif()
 
 # ---------------------------------------------------------------------------
 # Source files for devices and common interfaces (for non-component CMake builds).
@@ -113,10 +58,6 @@ set(ALL_DEVICES_DEVICE_SOURCES
     # keep-sorted: end
 )
 
-if(ALL_DEVICES_ENABLE_NIM)
-    list(APPEND ALL_DEVICES_DEVICE_SOURCES "${ALL_DEVICES_COMMON_DIR}/devices/nim/NimDevice.cpp")
-endif()
-
 # ---------------------------------------------------------------------------
 # Source directories (unconditional — all device sources are always compiled;
 # LTO eliminates unreachable device code when only a subset is registered).
@@ -128,6 +69,60 @@ foreach(_src IN LISTS ALL_DEVICES_DEVICE_SOURCES)
     list(APPEND ALL_DEVICES_DEVICE_SRCDIRS "${_dir}")
 endforeach()
 list(REMOVE_DUPLICATES ALL_DEVICES_DEVICE_SRCDIRS)
+
+# ---------------------------------------------------------------------------
+# Device selection.
+# ALL_DEVICES_ENABLED_DEVICES: semicolon-separated list of device keys to
+# enable.  Empty (the default) means all devices are enabled.
+# ---------------------------------------------------------------------------
+if(NOT DEFINED ALL_DEVICES_ENABLED_DEVICES)
+    set(ALL_DEVICES_ENABLED_DEVICES "")
+endif()
+
+# Determine whether every device is enabled.
+if(ALL_DEVICES_ENABLED_DEVICES)
+    set(_all_devices_all OFF)
+else()
+    set(_all_devices_all ON)
+endif()
+
+# Initialise all per-device variables to 0, then set the enabled ones to 1.
+# The macro name is derived from the registry key: "foo-bar" → ALL_DEVICES_ENABLE_FOO_BAR.
+#
+# IMPORTANT:
+#   - Keep list in sync with enabled_devices.gni
+#   - ensure enabled_devices_config.h.in contains required ALL_DEVICES_ENABLE* defines
+#   - Update scripts/build/build/targets.py to include the new device
+foreach(_key
+        # keep-sorted: start
+        chime
+        contact-sensor
+        dimmable-light
+        occupancy-sensor
+        on-off-light
+        proximity-ranger
+        soil-sensor
+        speaker
+        temperature-sensor
+        water-leak-detector
+        # keep-sorted: end
+    )
+    string(REPLACE "-" "_" _suffix "${_key}")
+    string(TOUPPER "${_suffix}" _suffix)
+    if(_all_devices_all)
+        set("ALL_DEVICES_ENABLE_${_suffix}" 1)
+    else()
+        set("ALL_DEVICES_ENABLE_${_suffix}" 0)
+    endif()
+endforeach()
+
+if(NOT _all_devices_all)
+    foreach(_device ${ALL_DEVICES_ENABLED_DEVICES})
+        string(REPLACE "-" "_" _suffix "${_device}")
+        string(TOUPPER "${_suffix}" _suffix)
+        set("ALL_DEVICES_ENABLE_${_suffix}" 1)
+    endforeach()
+endif()
 
 # ---------------------------------------------------------------------------
 # Generate app_config/enabled_devices.h.
