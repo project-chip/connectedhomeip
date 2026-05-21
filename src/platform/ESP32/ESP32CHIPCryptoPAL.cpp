@@ -71,6 +71,7 @@ CHIP_ERROR ESP32P256Keypair::Initialize(ECPKeyTarget keyTarget, int efuseBlock)
     {
         PsaEcdsaContext * ctx = to_psa_ctx(&mKeypair);
         psa_destroy_key(ctx->key_id);
+        mInitialized = false;
     }
     Clear();
 

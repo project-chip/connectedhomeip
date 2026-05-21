@@ -413,8 +413,15 @@ static CHIP_ERROR ParseIPAddresses(ResolveContext * ctx)
             auto * addr = ctx->mAddrQueryResult->addr;
             while (addr)
             {
-                LogErrorOnFailure(GetIPAddress(ctx->mAddresses[addressIndex], addr));
-                addressIndex++;
+                CHIP_ERROR err = GetIPAddress(ctx->mAddresses[addressIndex], addr);
+                if (err == CHIP_NO_ERROR)
+                {
+                    addressIndex++;
+                }
+                else
+                {
+                    ChipLogError(DeviceLayer, "GetIPAddress failed, error:%" CHIP_ERROR_FORMAT, err.Format());
+                }
                 addr = addr->next;
             }
             return CHIP_NO_ERROR;
