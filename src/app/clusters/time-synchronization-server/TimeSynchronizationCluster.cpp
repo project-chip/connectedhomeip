@@ -378,12 +378,14 @@ void TimeSynchronizationCluster::AttemptToGetFallbackNTPTimeFromDelegate()
     if (GetDefaultNtp(span) != CHIP_NO_ERROR)
     {
         EmitTimeFailureEvent(GetDelegate(), GetEventsGenerator());
+        return;
     }
-    else if (span.size() > kMaxDefaultNTPSize)
+    if (span.size() > kMaxDefaultNTPSize)
     {
         EmitTimeFailureEvent(GetDelegate(), GetEventsGenerator());
+        return;
     }
-    else if (GetDelegate()->UpdateTimeUsingNTPFallback(span, &mOnFallbackNTPCompletion) != CHIP_NO_ERROR)
+    if (GetDelegate()->UpdateTimeUsingNTPFallback(span, &mOnFallbackNTPCompletion) != CHIP_NO_ERROR)
     {
         EmitTimeFailureEvent(GetDelegate(), GetEventsGenerator());
     }
