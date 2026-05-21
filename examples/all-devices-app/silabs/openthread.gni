@@ -22,7 +22,6 @@ chip_build_libshell = true
 app_data_model = ""
 chip_enable_ota_requestor = false
 chip_enable_thread = true
-sl_matter_use_code_driven_dm = true
 
 
 openthread_external_platform =

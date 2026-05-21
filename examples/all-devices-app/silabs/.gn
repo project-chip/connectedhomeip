@@ -26,4 +26,5 @@ default_args = {
   chip_openthread_ftd = true
 
   import("//openthread.gni")
+  sl_matter_use_code_driven_dm = true
 }
