@@ -25,9 +25,9 @@
 #include <app/clusters/wifi-network-management-server/WiFiNetworkManagementCluster.h>
 #include <devices/interface/SingleEndpointDevice.h>
 #include <devices/nim/FakeBorderRouterDelegate.h>
+#include <lib/core/CHIPPersistentStorageDelegate.h>
 
 namespace chip {
-class PersistentStorageDelegate;
 namespace app {
 
 class SimpleBreadCrumbTracker : public Clusters::BreadCrumbTracker

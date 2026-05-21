@@ -31,12 +31,9 @@
 #include <devices/temperature-sensor/impl/IncreasingTemperatureSensorDevice.h>
 #include <functional>
 #include <lib/core/CHIPError.h>
+#include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <map>
 #include <platform/DefaultTimerDelegate.h>
-
-namespace chip {
-class PersistentStorageDelegate;
-}
 
 namespace chip::app {
 
