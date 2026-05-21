@@ -113,7 +113,7 @@ bool NetworkInfrastructureManagerDevice::GetPanChangeSupported()
 void NetworkInfrastructureManagerDevice::GetBorderRouterName(MutableCharSpan & borderRouterName)
 {
     ChipLogProgress(AppServer, "NetworkInfrastructureManagerDevice::GetBorderRouterName called");
-    TEMPORARY_RETURN_IGNORED CopyCharSpanToMutableCharSpan("all-devices-br"_span, borderRouterName);
+    CopyCharSpanToMutableCharSpanWithTruncation("all-devices-br"_span, borderRouterName);
 }
 
 CHIP_ERROR NetworkInfrastructureManagerDevice::GetBorderAgentId(MutableByteSpan & borderAgentId)
@@ -129,7 +129,8 @@ CHIP_ERROR NetworkInfrastructureManagerDevice::GetBorderAgentId(MutableByteSpan 
 uint16_t NetworkInfrastructureManagerDevice::GetThreadVersion()
 {
     ChipLogProgress(AppServer, "NetworkInfrastructureManagerDevice::GetThreadVersion called");
-    return /* Thread 1.3.1 */ 5;
+    static constexpr uint16_t kThreadVersionForThread_1_3_1 = 5;
+    return kThreadVersionForThread_1_3_1;
 }
 
 bool NetworkInfrastructureManagerDevice::GetInterfaceEnabled()
