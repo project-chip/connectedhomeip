@@ -165,6 +165,17 @@ protected:
 
     /**
      *  @brief
+     *    Return whether the Wi-Fi network interface is enabled.
+     *
+     *  @return
+     *    @c True if the Wi-Fi network interface is enabled;
+     *    otherwise, @c false.
+     *
+     */
+    bool IsWiFiInterfaceEnabled() const noexcept CHIP_REQUIRES(mWpaSupplicantMutex);
+
+    /**
+     *  @brief
      *    Get the Wi-Fi network interface name.
      *
      *  @param[out]  outIfName

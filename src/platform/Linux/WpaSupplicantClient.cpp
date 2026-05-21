@@ -78,6 +78,13 @@ bool WpaSupplicantClient::IsStarted() const noexcept
     return !!mWpaSupplicant.iface;
 }
 
+bool WpaSupplicantClient::IsWiFiInterfaceEnabled() const noexcept
+{
+    VerifyOrReturnValue(mWpaSupplicant.iface, false);
+    // Check if the interface is not disabled (for example, due to rfkill or some other reasons).
+    return g_strcmp0(wpa_supplicant_1_interface_get_state(mWpaSupplicant.iface.get()), "interface_disabled") != 0;
+}
+
 CHIP_ERROR WpaSupplicantClient::GetIfName(CharSpan & outIfName) const noexcept
 {
     outIfName = CharSpan::fromCharString(mWiFiIfName);
