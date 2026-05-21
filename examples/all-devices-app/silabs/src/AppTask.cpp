@@ -145,7 +145,7 @@ CHIP_ERROR AppTask::InitCodeDrivenDataModel(chip::PersistentStorageDelegate & st
         .deviceControlServer              = chip::DeviceLayer::DeviceControlServer::DeviceControlSvr(),
         .fabricTable                      = chip::Server::GetInstance().GetFabricTable(),
         .accessControl                    = chip::Server::GetInstance().GetAccessControl(),
-        .persistentStorage                = chip::Server::GetInstance().GetPersistentStorage(),
+        .persistentStorage                = storage,
         .failSafeContext                  = chip::Server::GetInstance().GetFailSafeContext(),
         .deviceInstanceInfoProvider       = *deviceInfoProvider,
         .platformManager                  = chip::DeviceLayer::PlatformMgr(),
