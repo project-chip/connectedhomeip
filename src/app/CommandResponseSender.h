@@ -155,6 +155,8 @@ public:
 #endif // CHIP_WITH_NLFAULTINJECTION
 
 private:
+    friend class TestSessionRelease;
+
     enum class State : uint8_t
     {
         ReadyForInvokeResponses,       ///< Accepting InvokeResponses to send back to requester.

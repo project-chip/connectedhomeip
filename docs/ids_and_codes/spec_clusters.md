@@ -9,7 +9,7 @@ The following markers are used in this document (matches the ID master list):
 | C     | Certifiable                    |
 | P     | Provisional                    |
 
-| ID (Decimal) | ID (hex) | Name                                                     | PICS Code     |1.0|1.1|1.2|1.3|1.4|1.4.1|1.4.2-mve-1|1.5|1.5.1|1.6-attempt-1|
+| ID (Decimal) | ID (hex) | Name                                                     | PICS Code     |1.0|1.1|1.2|1.3|1.4|1.4.1|1.4.2-mve-1|1.5|1.5.1|1.6-attempt-2|
 |--------------|----------|----------------------------------------------------------|---------------|---|---|---|---|---|-----|-----------|---|-----|-------------|
 |3             |0x0003    |Identify                                                  |I              |C  |C  |C  |C  |C  |C    |C          |C  |C    |C            |
 |4             |0x0004    |Groups                                                    |G              |C  |C  |C  |C  |C  |C    |C          |C  |C    |C            |
@@ -84,7 +84,7 @@ The following markers are used in this document (matches the ID master list):
 |151           |0x0097    |Messages                                                  |MESS           |   |   |   |C  |C  |C    |C          |C  |C    |C            |
 |152           |0x0098    |Device Energy Management                                  |DEM            |   |   |   |P  |C  |C    |C          |C  |C    |C            |
 |153           |0x0099    |Energy EVSE                                               |EEVSE          |   |   |   |C  |C  |C    |C          |C  |C    |C            |
-|155           |0x009B    |Energy Preference                                         |EPREF          |   |   |   |P  |P  |P    |P          |P  |P    |P            |
+|155           |0x009B    |Energy Preference                                         |EPREF          |   |   |   |P  |P  |P    |P          |P  |P    |C            |
 |156           |0x009C    |Power Topology                                            |PWRTL          |   |   |   |C  |C  |C    |C          |C  |C    |C            |
 |157           |0x009D    |Energy EVSE Mode                                          |EEVSEM         |   |   |   |C  |C  |C    |C          |C  |C    |C            |
 |158           |0x009E    |Water Heater Mode                                         |WHM            |   |   |   |   |C  |C    |C          |C  |C    |C            |
