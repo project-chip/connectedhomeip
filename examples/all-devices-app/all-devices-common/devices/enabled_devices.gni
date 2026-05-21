@@ -55,8 +55,8 @@ _available_devices = [
     "DIMMABLE_LIGHT",
   ],
   [
-    "nim",
-    "NIM",
+    "network-infrastructure-manager",
+    "NETWORK_INFRASTRUCTURE_MANAGER",
   ],
   [
     "occupancy-sensor",

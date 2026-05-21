@@ -22,8 +22,7 @@
 #include <devices/boolean-state-sensor/BooleanStateSensorDevice.h>
 #include <devices/chime/ChimeDevice.h>
 #include <devices/dimmable-light/impl/LoggingDimmableLightDevice.h>
-#include <devices/nim/LoggingBorderRouterDelegate.h>
-#include <devices/nim/NimDevice.h>
+#include <devices/network-infrastructure-manager/NetworkInfrastructureManagerDevice.h>
 #include <devices/occupancy-sensor/impl/TogglingOccupancySensorDevice.h>
 #include <devices/on-off-light/LoggingOnOffLightDevice.h>
 #include <devices/proximity-ranger/ProximityRangerDevice.h>
@@ -155,12 +154,11 @@ private:
                 });
             });
         }
-        if constexpr (ALL_DEVICES_ENABLE_NIM)
+        if constexpr (ALL_DEVICES_ENABLE_NETWORK_INFRASTRUCTURE_MANAGER)
         {
-            RegisterCreator("nim", [this]() {
+            RegisterCreator("network-infrastructure-manager", [this]() {
                 VerifyOrDie(mContext.has_value());
-                auto delegate = std::make_unique<LoggingBorderRouterDelegate>();
-                return std::make_unique<NimDevice>(mContext->storageDelegate, std::move(delegate));
+                return std::make_unique<NetworkInfrastructureManagerDevice>(mContext->storageDelegate);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_ON_OFF_LIGHT)

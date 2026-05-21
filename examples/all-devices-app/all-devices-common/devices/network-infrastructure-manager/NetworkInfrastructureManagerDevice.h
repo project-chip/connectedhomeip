@@ -40,18 +40,31 @@ private:
     uint64_t mBreadCrumb = 0;
 };
 
-class NimDevice : public SingleEndpointDevice
+class NetworkInfrastructureManagerDevice : public SingleEndpointDevice, public Clusters::ThreadBorderRouterManagementDelegate
 {
 public:
-    NimDevice(PersistentStorageDelegate & storage, std::unique_ptr<Clusters::ThreadBorderRouterManagementDelegate> tbrDelegate);
-    ~NimDevice() override = default;
+    NetworkInfrastructureManagerDevice(PersistentStorageDelegate & storage);
+    ~NetworkInfrastructureManagerDevice() override;
 
     CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
                         EndpointId parentId = kInvalidEndpointId) override;
     void Unregister(CodeDrivenDataModelProvider & provider) override;
 
+    // ThreadBorderRouterManagementDelegate
+    CHIP_ERROR Init(AttributeChangeCallback * attributeChangeCallback) override;
+    bool GetPanChangeSupported() override;
+    void GetBorderRouterName(MutableCharSpan & borderRouterName) override;
+    CHIP_ERROR GetBorderAgentId(MutableByteSpan & borderAgentId) override;
+    uint16_t GetThreadVersion() override;
+    bool GetInterfaceEnabled() override;
+    CHIP_ERROR GetDataset(Thread::OperationalDataset & dataset, DatasetType type) override;
+    void SetActiveDataset(const Thread::OperationalDataset & activeDataset, uint32_t sequenceNum,
+                          ActivateDatasetCallback * callback) override;
+    CHIP_ERROR CommitActiveDataset() override;
+    CHIP_ERROR RevertActiveDataset() override;
+    CHIP_ERROR SetPendingDataset(const Thread::OperationalDataset & pendingDataset) override;
+
 protected:
-    std::unique_ptr<Clusters::ThreadBorderRouterManagementDelegate> mTbrDelegate;
     SimpleBreadCrumbTracker mBreadCrumbTracker;
     DefaultThreadNetworkDirectoryStorage mThreadNetworkDirectoryStorage;
 
@@ -59,6 +72,17 @@ protected:
     LazyRegisteredServerCluster<Clusters::WiFiNetworkManagementCluster> mWiFiNetworkManagementCluster;
     LazyRegisteredServerCluster<Clusters::ThreadNetworkDirectoryCluster> mThreadNetworkDirectoryCluster;
     LazyRegisteredServerCluster<Clusters::ThreadNetworkDiagnosticsCluster> mThreadNetworkDiagnosticsCluster;
+
+private:
+    static void ActivateActiveDataset(System::Layer *, void * context);
+    static void ActivatePendingDataset(System::Layer *, void * context);
+
+    AttributeChangeCallback * mAttributeChangeCallback = nullptr;
+    Thread::OperationalDataset mActiveDataset;
+    Thread::OperationalDataset mPendingDataset;
+
+    ActivateDatasetCallback * mActivateDatasetCallback = nullptr;
+    uint32_t mActivateDatasetSequence;
 };
 
 } // namespace app
