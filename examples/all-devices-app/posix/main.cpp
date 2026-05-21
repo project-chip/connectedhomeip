@@ -197,7 +197,7 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
         .groupDataProvider = gGroupDataProvider,                     //
         .fabricTable       = Server::GetInstance().GetFabricTable(), //
         .timerDelegate     = gTimerDelegate,                         //
-        .storageDelegate   = *initParams.persistentStorageDelegate,   //
+        .storageDelegate   = *initParams.persistentStorageDelegate,  //
     });
 
     RegisterDeviceFactoryOverrides(gTimerDelegate, initParams.persistentStorageDelegate);

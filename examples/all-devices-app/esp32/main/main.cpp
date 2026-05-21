@@ -297,7 +297,7 @@ void InitServer(intptr_t context)
         .groupDataProvider = gGroupDataProvider,                     //
         .fabricTable       = Server::GetInstance().GetFabricTable(), //
         .timerDelegate     = gTimerDelegate,                         //
-        .storageDelegate   = *initParams.persistentStorageDelegate,   //
+        .storageDelegate   = *initParams.persistentStorageDelegate,  //
     });
 
 #if ALL_DEVICES_ENABLE_DIMMABLE_LIGHT
