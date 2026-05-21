@@ -32,6 +32,10 @@ inline ByteSpan ByteSpanFromCharSpan(CharSpan span)
     return ByteSpan(Uint8::from_const_char(span.data()), span.size());
 }
 
+namespace {
+constexpr uint16_t kThreadVersionForThread_1_3_1 = 5;
+} // namespace
+
 NetworkInfrastructureManagerDevice::NetworkInfrastructureManagerDevice(PersistentStorageDelegate & storage) :
     SingleEndpointDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kNetworkInfrastructureManager, 1)),
     mThreadNetworkDirectoryStorage(storage)
@@ -129,7 +133,6 @@ CHIP_ERROR NetworkInfrastructureManagerDevice::GetBorderAgentId(MutableByteSpan 
 uint16_t NetworkInfrastructureManagerDevice::GetThreadVersion()
 {
     ChipLogProgress(AppServer, "NetworkInfrastructureManagerDevice::GetThreadVersion called");
-    static constexpr uint16_t kThreadVersionForThread_1_3_1 = 5;
     return kThreadVersionForThread_1_3_1;
 }
 
