@@ -21,13 +21,13 @@
 #include "AppConfig.h"
 #include "AppEvent.h"
 
-#include <app/persistence/DefaultAttributePersistenceProvider.h>
 #include <app/DefaultSafeAttributePersistenceProvider.h>
+#include <app/persistence/DefaultAttributePersistenceProvider.h>
 
-#include <app/InteractionModelEngine.h>
-#include <app/server/Server.h>
-#include <app/server/Dnssd.h>
 #include <app/EventManagement.h>
+#include <app/InteractionModelEngine.h>
+#include <app/server/Dnssd.h>
+#include <app/server/Server.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <setup_payload/OnboardingCodesUtil.h>
 
@@ -115,7 +115,8 @@ void AppTask::ButtonEventHandler(uint8_t button, uint8_t btnAction)
     }
 }
 
-CHIP_ERROR AppTask::InitCodeDrivenDataModel(chip::PersistentStorageDelegate & storage, chip::Credentials::GroupDataProvider * groupDataProvider)
+CHIP_ERROR AppTask::InitCodeDrivenDataModel(chip::PersistentStorageDelegate & storage,
+                                            chip::Credentials::GroupDataProvider * groupDataProvider)
 {
     ReturnErrorOnFailure(sAttributePersistenceProvider.Init(&storage));
     ReturnErrorOnFailure(sSafeAttributePersistenceProvider.Init(&storage));
@@ -153,9 +154,9 @@ CHIP_ERROR AppTask::InitCodeDrivenDataModel(chip::PersistentStorageDelegate & st
 
 #if CHIP_ENABLE_OPENTHREAD
     sRootNodeDevice = std::make_unique<chip::app::ThreadRootNodeDevice>(rootNodeContext,
-                                                             chip::app::ThreadRootNodeDevice::ThreadContext{
-                                                                 .threadDriver = sThreadDriver,
-                                                             });
+                                                                        chip::app::ThreadRootNodeDevice::ThreadContext{
+                                                                            .threadDriver = sThreadDriver,
+                                                                        });
 #else
     sRootNodeDevice = std::make_unique<chip::app::RootNodeDevice>(rootNodeContext);
 #endif
@@ -170,10 +171,10 @@ CHIP_ERROR AppTask::InitCodeDrivenDataModel(chip::PersistentStorageDelegate & st
     });
 
     std::string deviceType = "on-off-light"; // Default
-    
+
     char storedDeviceType[64] = {};
-    uint16_t storedLen = sizeof(storedDeviceType);
-    CHIP_ERROR storedErr = storage.SyncGetKeyValue("all-devices/dev-type", storedDeviceType, storedLen);
+    uint16_t storedLen        = sizeof(storedDeviceType);
+    CHIP_ERROR storedErr      = storage.SyncGetKeyValue("all-devices/dev-type", storedDeviceType, storedLen);
     if (storedErr == CHIP_NO_ERROR && storedLen > 0)
     {
         deviceType = std::string(storedDeviceType, storedLen);

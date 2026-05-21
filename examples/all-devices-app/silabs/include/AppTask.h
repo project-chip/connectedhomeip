@@ -20,11 +20,11 @@
 #pragma once
 
 #include <ble/Ble.h>
-#include <lib/core/CHIPError.h>
-#include <platform/CHIPDeviceLayer.h>
-#include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <credentials/GroupDataProvider.h>
 #include <data-model-providers/codedriven/CodeDrivenDataModelProvider.h>
+#include <lib/core/CHIPError.h>
+#include <lib/core/CHIPPersistentStorageDelegate.h>
+#include <platform/CHIPDeviceLayer.h>
 
 #include "BaseApplication.h"
 
@@ -47,7 +47,8 @@ public:
     static void ButtonEventHandler(uint8_t button, uint8_t btnAction);
 
     // Code-driven data model initialization hooks required by MatterConfig.cpp
-    static CHIP_ERROR InitCodeDrivenDataModel(chip::PersistentStorageDelegate & storage, chip::Credentials::GroupDataProvider * groupDataProvider);
+    static CHIP_ERROR InitCodeDrivenDataModel(chip::PersistentStorageDelegate & storage,
+                                              chip::Credentials::GroupDataProvider * groupDataProvider);
     static chip::app::CodeDrivenDataModelProvider * GetDataModelProvider();
 
 private:

@@ -104,4 +104,3 @@
 
 // Skip app-specific generated headers since this is a code-driven app without ZAP
 #define CHIP_CONFIG_SKIP_APP_SPECIFIC_GENERATED_HEADER_INCLUDES 1
-
