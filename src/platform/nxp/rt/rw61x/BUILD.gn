@@ -194,7 +194,10 @@ static_library("nxp_platform") {
       "../../common/ThreadStackManagerImpl.h",
     ]
 
-    deps += [ "${chip_root}/third_party/openthread:openthread" ]
+    deps += [
+      "${chip_root}/src/app/clusters/thread-border-router-management-server",
+      "${chip_root}/third_party/openthread:openthread",
+    ]
 
     public_deps += [ "${chip_root}/third_party/openthread:openthread-platform" ]
 
