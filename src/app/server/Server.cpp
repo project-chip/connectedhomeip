@@ -310,9 +310,20 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
         SuccessOrExit(err);
     }
 
+    mGroupsProvider = initParams.groupDataProvider;
+    SetGroupDataProvider(mGroupsProvider);
+    mGroupsProvider->SetGroupcastEnabled(CHIP_CONFIG_ENABLE_GROUPCAST);
+
     SuccessOrExit(err = mAccessControl.Init(initParams.accessDelegate, sDeviceTypeResolver));
     if (initParams.groupAuxiliaryAccessControlDelegate != nullptr)
     {
+        // If the application handed us an uninitialized delegate (e.g. the default owned by
+        // CommonCaseDeviceServerInitParams), Initialize it now with the Server's FabricTable
+        // so auxiliary-entry iteration walks only provisioned fabric indices.
+        if (!initParams.groupAuxiliaryAccessControlDelegate->IsInitialized())
+        {
+            SuccessOrExit(err = initParams.groupAuxiliaryAccessControlDelegate->Initialize(mGroupsProvider, &mFabrics));
+        }
         SuccessOrExit(mAccessControl.RegisterGroupAuxiliaryDelegate(initParams.groupAuxiliaryAccessControlDelegate));
     }
     Access::SetAccessControl(mAccessControl);
@@ -326,9 +337,6 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
 
     mAclStorage = initParams.aclStorage;
     SuccessOrExit(err = mAclStorage->Init(*mDeviceStorage, mFabrics.begin(), mFabrics.end()));
-
-    mGroupsProvider = initParams.groupDataProvider;
-    SetGroupDataProvider(mGroupsProvider);
 
     mReportScheduler = initParams.reportScheduler;
 

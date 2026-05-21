@@ -16,7 +16,7 @@
  *    limitations under the License.
  */
 
-#include "GroupAuxiliaryAccessControlDelegate.h"
+#include "GroupAuxiliaryAccessControlDelegateImpl.h"
 
 #include <credentials/FabricTable.h>
 #include <credentials/GroupDataProvider.h>
@@ -268,6 +268,22 @@ namespace chip {
 namespace Access {
 namespace Examples {
 
+CHIP_ERROR GroupAuxiliaryAccessControlDelegateImpl::Initialize(Credentials::GroupDataProvider * groupDataProvider,
+                                                               FabricTable * fabricTable)
+{
+    VerifyOrReturnError(groupDataProvider != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(mGroupDataProvider == nullptr, CHIP_ERROR_INCORRECT_STATE);
+    mGroupDataProvider = groupDataProvider;
+    mFabricTable       = fabricTable;
+    return CHIP_NO_ERROR;
+}
+
+void GroupAuxiliaryAccessControlDelegateImpl::Shutdown()
+{
+    mGroupDataProvider = nullptr;
+    mFabricTable       = nullptr;
+}
+
 /*
  * This function (in conjunction with Next() from the AuxiliaryEntryIteratorDelegate) will create an auxiliary
  * ACL entry for every <fabric index, group ID, endpoint ID> that belongs based on the information from
@@ -275,9 +291,10 @@ namespace Examples {
  * like. The structure of auxiliary ACL entries can be formatted differently, as long as the equivalence class
  * maps to this simplest base case.
  */
-CHIP_ERROR GroupAuxiliaryAccessControlDelegate::AuxiliaryEntries(AccessControl::EntryIterator & iterator,
-                                                                 const FabricIndex * fabricIndex) const
+CHIP_ERROR GroupAuxiliaryAccessControlDelegateImpl::AuxiliaryEntries(AccessControl::EntryIterator & iterator,
+                                                                     const FabricIndex * fabricIndex) const
 {
+    VerifyOrReturnError(mGroupDataProvider != nullptr, CHIP_ERROR_INCORRECT_STATE);
     auto * delegate = Platform::New<AuxiliaryEntryIteratorDelegate>();
     if (delegate)
     {
@@ -287,8 +304,8 @@ CHIP_ERROR GroupAuxiliaryAccessControlDelegate::AuxiliaryEntries(AccessControl::
     return CHIP_ERROR_NO_MEMORY;
 }
 
-CHIP_ERROR GroupAuxiliaryAccessControlDelegate::Check(const SubjectDescriptor & subjectDescriptor, const RequestPath & requestPath,
-                                                      Privilege requestPrivilege)
+CHIP_ERROR GroupAuxiliaryAccessControlDelegateImpl::Check(const SubjectDescriptor & subjectDescriptor,
+                                                          const RequestPath & requestPath, Privilege requestPrivilege)
 {
     if (IsGroupId(subjectDescriptor.subject) && (mGroupDataProvider != nullptr))
     {
