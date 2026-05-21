@@ -18,9 +18,6 @@
 #pragma once
 
 /**
- * @file LoggingBorderRouterDelegate.h
- * @brief Reference/mock implementation of ThreadBorderRouterManagementDelegate.
- *
  * This file implements a mock Thread Border Router Management delegate designed for
  * reference and testing purposes inside the all-devices-app. It simulates typical border router
  * behaviors (active/pending datasets in-memory storage, fake border agent ID, name, version) and
