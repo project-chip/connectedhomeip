@@ -40,7 +40,7 @@
 #endif
 
 #if defined(CHIP_DEVICE_CONFIG_ENABLE_WIFI) && CHIP_DEVICE_CONFIG_ENABLE_WIFI
-#include <devices/root-node/WifiRootNodeDevice.h>            // nogncheck
+#include <devices/root-node/WifiRootNodeDevice.h>           // nogncheck
 #include <platform/silabs/NetworkCommissioningWiFiDriver.h> // nogncheck
 #endif
 
@@ -163,10 +163,11 @@ CHIP_ERROR AppTask::InitCodeDrivenDataModel(chip::PersistentStorageDelegate & st
                                                                             .threadDriver = sThreadDriver,
                                                                         });
 #elif defined(CHIP_DEVICE_CONFIG_ENABLE_WIFI) && CHIP_DEVICE_CONFIG_ENABLE_WIFI
-    sRootNodeDevice = std::make_unique<chip::app::WifiRootNodeDevice>(rootNodeContext,
-                                                                      chip::app::WifiRootNodeDevice::WifiContext{
-                                                                          .wifiDriver = *chip::DeviceLayer::NetworkCommissioning::SlWiFiDriver::GetInstance(),
-                                                                      });
+    sRootNodeDevice = std::make_unique<chip::app::WifiRootNodeDevice>(
+        rootNodeContext,
+        chip::app::WifiRootNodeDevice::WifiContext{
+            .wifiDriver = *chip::DeviceLayer::NetworkCommissioning::SlWiFiDriver::GetInstance(),
+        });
 #else
     sRootNodeDevice = std::make_unique<chip::app::RootNodeDevice>(rootNodeContext);
 #endif
