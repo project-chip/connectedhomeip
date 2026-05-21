@@ -19,7 +19,7 @@ import logging
 import sys
 
 from helper.CHIPTestBase import CHIPVirtualHome
-from helper.paths import (CHIP_ALL_CLUSTERS_APP, CHIP_REPO_STR, CONTROLLER_TEST_SCRIPTS_DIR, MATTER_CONTROLLER_WHEELS_STR,
+from helper.paths import (CHIP_ALL_CLUSTERS_APP, CHIP_REPO_STR, CONTROLLER_TEST_SCRIPTS_DIR, MATTER_CONTROLLER_INSTALL_WHEELS,
                           MATTER_DEVELOPMENT_PAA_ROOT_CERTS)
 
 """
@@ -99,7 +99,7 @@ class TestSubscriptionResumption(CHIPVirtualHome):
 
         req_device_id = req_ids[0]
 
-        self.execute_device_cmd(req_device_id, f"pip3 install --break-system-packages {MATTER_CONTROLLER_WHEELS_STR}")
+        self.execute_device_cmd(req_device_id, MATTER_CONTROLLER_INSTALL_WHEELS)
 
         command = (f'gdb -batch -return-child-result -q -ex run -ex "thread apply all bt" --args python3 {TEST_SCRIPT} -t 300 '
                    f'-a {ethernet_ip} --paa-trust-store-path {MATTER_DEVELOPMENT_PAA_ROOT_CERTS} '

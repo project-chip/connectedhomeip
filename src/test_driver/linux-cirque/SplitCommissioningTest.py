@@ -19,7 +19,7 @@ import logging
 import sys
 
 from helper.CHIPTestBase import CHIPVirtualHome
-from helper.paths import (CHIP_ALL_CLUSTERS_APP, CHIP_REPO_STR, CONTROLLER_TEST_SCRIPTS_DIR, MATTER_CONTROLLER_WHEELS_STR,
+from helper.paths import (CHIP_ALL_CLUSTERS_APP, CHIP_REPO_STR, CONTROLLER_TEST_SCRIPTS_DIR, MATTER_CONTROLLER_INSTALL_WHEELS,
                           MATTER_DEVELOPMENT_PAA_ROOT_CERTS)
 
 logger = logging.getLogger('MobileDeviceTest')
@@ -97,7 +97,7 @@ class TestSplitCommissioning(CHIPVirtualHome):
 
         req_device_id = req_ids[0]
 
-        self.execute_device_cmd(req_device_id, f"pip3 install --break-system-packages {MATTER_CONTROLLER_WHEELS_STR}")
+        self.execute_device_cmd(req_device_id, MATTER_CONTROLLER_INSTALL_WHEELS)
 
         command = (f"gdb -return-child-result -q -ex run -ex bt --args python3 {TEST_SCRIPT} -t 150 --address1 {ethernet_ips[0]} "
                    f"--address2 {ethernet_ips[1]} --paa-trust-store-path {MATTER_DEVELOPMENT_PAA_ROOT_CERTS}")

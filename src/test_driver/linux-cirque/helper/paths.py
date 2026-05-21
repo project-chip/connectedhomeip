@@ -15,6 +15,7 @@ limitations under the License.
 """
 
 from pathlib import Path
+import shlex
 
 CHIP_REPO = Path(__file__).resolve().parents[4]
 CHIP_REPO_STR = str(CHIP_REPO)
@@ -31,21 +32,7 @@ CHIP_TOOL = CHIP_REPO / "out/debug/standalone/chip-tool"
 LIT_ICD_APP = CHIP_REPO / "out/debug/lit_icd/lit-icd-app"
 
 MATTER_CONTROLLER_WHEEL_DIR = CHIP_REPO / "out/debug/linux_x64_gcc/controller/python"
-MATTER_CONTROLLER_WHEELS: list[Path]
-MATTER_CONTROLLER_WHEELS_STR: str
-
-
-def _get_matter_controller_wheels():
-    if not (wheels := sorted(MATTER_CONTROLLER_WHEEL_DIR.glob("*.whl"))):
-        raise RuntimeError(f"No Matter controller wheels found in {MATTER_CONTROLLER_WHEEL_DIR}")
-    return wheels
-
-
-def __getattr__(name):
-    match name:
-        case "MATTER_CONTROLLER_WHEELS":
-            return _get_matter_controller_wheels()
-        case "MATTER_CONTROLLER_WHEELS_STR":
-            return " ".join(str(wheel) for wheel in _get_matter_controller_wheels())
-        case _:
-            raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+MATTER_CONTROLLER_WHEELS = ["matter_clusters", "matter_core", "matter_repl"]
+MATTER_CONTROLLER_INSTALL_WHEELS = (
+    f"pip3 install --break-system-packages --find-links {shlex.quote(str(MATTER_CONTROLLER_WHEEL_DIR))} "
+    f"{' '.join(MATTER_CONTROLLER_WHEELS)}")
