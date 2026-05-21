@@ -523,7 +523,7 @@ advertising by ~35 s. Canceling NAN immediately after `ConnectNetwork` would
 risk tearing down the link before the `ConnectNetworkResponse` PAFTP frame is
 acknowledged by the proxy. The tx-idle trigger ensures all in-flight PAFTP data
 has been confirmed by the peer before NAN is torn down. With this fix mDNS
-resolves in ~3 s and CASE completes without MRP retransmissions. Tearing down
+resolves in ~3 s and CASE completes without a MRP retransmission. Tearing down
 publish at the same point also closes the PAFTP session and discharges any
 pending standalone-ACK obligation.
 
