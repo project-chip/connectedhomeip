@@ -219,7 +219,7 @@
             "electrical-grid-conditions-server"
         ],
         "GROUPCAST_CLUSTER": ["groupcast"],
-        "HUMIDISTAT_CLUSTER": [],
+        "HUMIDISTAT_CLUSTER": ["humidistat-server"],
         "METER_IDENTIFICATION_CLUSTER": ["meter-identification-server"],
         "MICROWAVE_OVEN_MODE_CLUSTER": ["mode-base-server"],
         "DOOR_LOCK_CLUSTER": ["door-lock-server"],
