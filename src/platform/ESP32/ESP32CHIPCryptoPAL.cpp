@@ -52,8 +52,25 @@ static inline const PsaEcdsaContext * to_const_psa_ctx(const chip::Crypto::P256K
 namespace chip {
 namespace Crypto {
 
+ESP32P256Keypair::~ESP32P256Keypair()
+{
+    if (mInitialized)
+    {
+        const PsaEcdsaContext * ctx = to_const_psa_ctx(&mKeypair);
+        psa_destroy_key(ctx->key_id);
+    }
+}
+
 CHIP_ERROR ESP32P256Keypair::Initialize(ECPKeyTarget keyTarget, int efuseBlock)
 {
+    VerifyOrReturnError(efuseBlock >= 0 && efuseBlock <= UINT8_MAX, CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Destroy existing PSA key handle if re-initializing
+    if (mInitialized)
+    {
+        PsaEcdsaContext * ctx = to_psa_ctx(&mKeypair);
+        psa_destroy_key(ctx->key_id);
+    }
     Clear();
 
     psa_status_t status     = PSA_SUCCESS;
@@ -166,6 +183,11 @@ static void _log_mbedTLS_error(int error_code)
 
 namespace chip {
 namespace Crypto {
+
+ESP32P256Keypair::~ESP32P256Keypair()
+{
+    // Base class destructor calls Clear() which handles mbedtls_ecp_keypair_free
+}
 
 CHIP_ERROR ESP32P256Keypair::Initialize(ECPKeyTarget keyTarget, int efuseBlock)
 {
