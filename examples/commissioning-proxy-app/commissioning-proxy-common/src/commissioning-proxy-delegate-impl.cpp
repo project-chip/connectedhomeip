@@ -51,7 +51,6 @@ static DelegateState & GetState(const void * self)
 
 uint8_t MyCPDelegate::GetScanMaxTime()
 {
-    ChipLogProgress(AppServer, "===SHM %s()", __func__);
     return GetState(this).scanMaxTime;
 }
 
@@ -59,7 +58,6 @@ void MyCPDelegate::SetScanMaxTime(uint8_t seconds)
 {
     auto & st      = GetState(this);
     st.scanMaxTime = seconds;
-    ChipLogProgress(AppServer, "===SHM %s() scanMaxTime=%u", __func__, static_cast<unsigned>(seconds));
 }
 
 uint8_t MyCPDelegate::GetMaxCachedResults()
@@ -75,7 +73,6 @@ uint16_t MyCPDelegate::GetCacheTimeout()
 void MyCPDelegate::SetCacheTimeout(uint16_t seconds)
 {
     GetState(this).cacheTimeout = seconds;
-    ChipLogProgress(AppServer, "===SHM %s() cacheTimeout=%u", __func__, static_cast<unsigned>(seconds));
 }
 
 chip::BitMask<WiFiBandBitmap> MyCPDelegate::GetSupportedWiFiBands()
@@ -86,7 +83,6 @@ chip::BitMask<WiFiBandBitmap> MyCPDelegate::GetSupportedWiFiBands()
 void MyCPDelegate::SetSupportedWiFiBands(chip::BitMask<WiFiBandBitmap> bands)
 {
     mSupportedWiFiBands = bands;
-    ChipLogProgress(AppServer, "===SHM %s() bands=0x%04x", __func__, static_cast<unsigned>(bands.Raw()));
 }
 
 } // namespace CommissioningProxy

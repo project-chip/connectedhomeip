@@ -205,7 +205,6 @@ CHIP_ERROR WiFiPAFTP::EncodeStandAloneAck(const PacketBufferHandle & data)
 
     // Include sequence number for stand-alone ack itself.
     characteristic[2] = GetAndIncrementNextTxSeqNum();
-    ChipLogProgress(WiFiPAF, "===SHM TX standalone ACK seq=%u (ack=%u)", characteristic[2], characteristic[1]);
 
     // Set ack payload data length.
     data->SetDataLength(kTransferProtocolStandaloneAckHeaderSize);
@@ -479,7 +478,6 @@ bool WiFiPAFTP::HandleCharacteristicSend(System::PacketBufferHandle data, bool s
         }
 
         characteristic[cursor++] = GetAndIncrementNextTxSeqNum();
-        ChipLogProgress(WiFiPAF, "===SHM TX start fragment seq=%u msgLen=%u", characteristic[cursor - 1], mTxLength);
         characteristic[cursor++] = static_cast<uint8_t>(mTxLength & 0xff);
         characteristic[cursor++] = static_cast<uint8_t>(mTxLength >> 8);
 
@@ -528,7 +526,6 @@ bool WiFiPAFTP::HandleCharacteristicSend(System::PacketBufferHandle data, bool s
         }
 
         characteristic[cursor++] = GetAndIncrementNextTxSeqNum();
-        ChipLogProgress(WiFiPAF, "===SHM TX continue fragment seq=%u", characteristic[cursor - 1]);
 
         if ((mTxLength + cursor) <= mTxFragmentSize)
         {

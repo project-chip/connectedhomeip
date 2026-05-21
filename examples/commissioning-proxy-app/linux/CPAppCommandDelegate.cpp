@@ -31,7 +31,6 @@ using namespace chip::DeviceLayer;
 
 CPAppCommandHandler * CPAppCommandHandler::FromJSON(const char * json)
 {
-    ChipLogProgress(NotSpecified, "===SHM %s()", __func__);
     Json::Reader reader;
     Json::Value value;
 
@@ -59,7 +58,6 @@ CPAppCommandHandler * CPAppCommandHandler::FromJSON(const char * json)
 
 void CPAppCommandHandler::HandleCommand(intptr_t context)
 {
-    ChipLogProgress(NotSpecified, "===SHM %s()", __func__);
     auto * self      = reinterpret_cast<CPAppCommandHandler *>(context);
     std::string name = self->mJsonValue["Name"].asString();
 
@@ -121,7 +119,6 @@ exit:
 
 bool CPAppCommandHandler::IsClusterPresentOnAnyEndpoint(ClusterId clusterId)
 {
-    ChipLogProgress(NotSpecified, "===SHM %s()", __func__);
     EnabledEndpointsWithServerCluster enabledEndpoints(clusterId);
 
     return (enabledEndpoints.begin() != enabledEndpoints.end());
@@ -129,7 +126,6 @@ bool CPAppCommandHandler::IsClusterPresentOnAnyEndpoint(ClusterId clusterId)
 
 void CPAppCommandHandler::OnRebootSignalHandler(BootReasonType bootReason)
 {
-    ChipLogProgress(NotSpecified, "===SHM %s()", __func__);
     if (ConfigurationMgr().StoreBootReason(static_cast<uint32_t>(bootReason)) == CHIP_NO_ERROR)
     {
         Server::GetInstance().GenerateShutDownEvent();
@@ -144,8 +140,6 @@ void CPAppCommandHandler::OnRebootSignalHandler(BootReasonType bootReason)
 
 void CPAppCommandHandler::OnGeneralFaultEventHandler(uint32_t eventId)
 {
-    ChipLogProgress(NotSpecified, "===SHM %s()", __func__);
-
     if (!IsClusterPresentOnAnyEndpoint(Clusters::GeneralDiagnostics::Id))
         return;
 
@@ -203,8 +197,6 @@ void CPAppCommandHandler::OnGeneralFaultEventHandler(uint32_t eventId)
 
 void CPAppCommandHandler::OnSoftwareFaultEventHandler(uint32_t eventId)
 {
-    ChipLogProgress(NotSpecified, "===SHM %s()", __func__);
-
     VerifyOrReturn(eventId == Clusters::SoftwareDiagnostics::Events::SoftwareFault::Id,
                    ChipLogError(NotSpecified, "Unknown software fault event received"));
 
@@ -232,7 +224,6 @@ void CPAppCommandHandler::OnSoftwareFaultEventHandler(uint32_t eventId)
 
 void CPAppCommandDelegate::OnEventCommandReceived(const char * json)
 {
-    ChipLogProgress(NotSpecified, "===SHM %s()", __func__);
     auto handler = CPAppCommandHandler::FromJSON(json);
     if (nullptr == handler)
     {

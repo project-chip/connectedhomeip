@@ -544,8 +544,6 @@ CHIP_ERROR WiFiPAFLayer::RmPafSession(PafInfoAccess accType, WiFiPAFSession & Se
     uint8_t i;
     WiFiPAFSession * pPafSession;
 
-    ChipLogError(WiFiPAF, "===SHM %s()", __func__);
-
     for (i = 0; i < WIFIPAF_LAYER_NUM_PAF_ENDPOINTS; i++)
     {
         pPafSession = &mPafInfoVect[i];
@@ -554,7 +552,6 @@ CHIP_ERROR WiFiPAFLayer::RmPafSession(PafInfoAccess accType, WiFiPAFSession & Se
         case PafInfoAccess::kAccSessionId:
             if (pPafSession->id == SessionInfo.id)
             {
-                ChipLogError(WiFiPAF, "===SHM %s() Removing session with id: %u", __func__, pPafSession->id);
                 ChipLogProgress(WiFiPAF, "Removing session with id: %u", pPafSession->id);
                 CleanPafInfo(*pPafSession);
                 return CHIP_NO_ERROR;

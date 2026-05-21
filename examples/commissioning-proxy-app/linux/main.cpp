@@ -145,12 +145,10 @@ bool emberAfCommissioningProxyClusterProxyScanRequestCallback(
         return true;
     }
 
-    ChipLogProgress(Controller, "===SHM %s() Before", __func__);
     // Ensure Response Timeout is greater than the ScanMaxTime
     if (auto * ec = commandObj->GetExchangeContext())
     {
         ec->SetResponseTimeout(chip::System::Clock::Seconds16(140));
-        ChipLogProgress(Controller, "===SHM %s() In", __func__);
     }
 
     return true;
@@ -183,10 +181,6 @@ bool emberAfCommissioningProxyClusterProxyBackGroundScanStartRequestCallback(
             localNodeId = fabricInfo->GetNodeId();
         }
     }
-
-    ChipLogProgress(AppServer,
-                    "===SHM %s(): fabricIndex=%u localNodeId=0x" ChipLogFormatX64, __func__,
-                    static_cast<unsigned>(fabricIndex), ChipLogValueX64(localNodeId));
 
     return true;
 }

@@ -1056,8 +1056,6 @@ CHIP_ERROR InteractionModelEngine::OnUnsolicitedMessageReceived(const PayloadHea
 CHIP_ERROR InteractionModelEngine::OnMessageReceived(Messaging::ExchangeContext * apExchangeContext,
                                                      const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload)
 {
-    ChipLogProgress(AppServer, "===SHM %s()", __func__);
-
     using namespace Protocols::InteractionModel;
 
     Protocols::InteractionModel::Status status = Status::Failure;
@@ -1827,12 +1825,8 @@ Protocols::InteractionModel::Status InteractionModelEngine::ValidateCommandCanBe
 {
     DataModel::AcceptedCommandEntry acceptedCommandEntry;
 
-    ChipLogProgress(DataManagement, "===SHM %s()", __func__);
-
     const Status existenceStatus = CheckCommandExistence(request.path, acceptedCommandEntry);
     const bool commandExists     = (existenceStatus == Status::Success);
-
-    ChipLogProgress(DataManagement, "===SHM %s() commandExists:%d", __func__, commandExists);
 
     // If the command exists, then the spec defines either doing a check for Operate access
     // followed by a check for the actual access level of the command (in the concrete path case)
@@ -1934,15 +1928,10 @@ Protocols::InteractionModel::Status InteractionModelEngine::CheckCommandExistenc
 {
     auto provider = GetDataModelProvider();
 
-    ChipLogProgress(DataManagement, "===SHM %s()", __func__);
-
     ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> acceptedCommands;
     (void) provider->AcceptedCommands(aCommandPath, acceptedCommands);
     for (auto & existing : acceptedCommands.TakeBuffer())
     {
-        ChipLogProgress(DataManagement, "===SHM %s() existing.commandId=0x%X aCommandPath.mCommandId=0x%X", __func__,
-                        existing.commandId, aCommandPath.mCommandId);
-
         if (existing.commandId == aCommandPath.mCommandId)
         {
             entry = existing;
