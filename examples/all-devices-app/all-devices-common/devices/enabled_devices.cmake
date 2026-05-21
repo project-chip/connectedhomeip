@@ -15,8 +15,8 @@
 #    limitations under the License.
 #
 
-# Authoritative device configuration for the CMake (ESP32) build.
-# Parallel to all-devices-common/devices/enabled_devices.gni for the GN build.
+# Authoritative device-selection configuration for the GN (POSIX) build.
+# Parallel to all-devices-common/devices/enabled_devices.cmake for the GN build.
 #
 # Callers must define ALL_DEVICES_COMMON_DIR before including this file.
 #
@@ -27,49 +27,6 @@
 # After including this file, callers must append ${CMAKE_CURRENT_BINARY_DIR}
 # to their include-directory list so that the generated
 # app_config/enabled_devices.h is reachable as <app_config/enabled_devices.h>.
-
-# ---------------------------------------------------------------------------
-# Source files for devices and common interfaces (for non-component CMake builds).
-# Excludes root-node specialization files (Thread/WiFi) which require platform
-# specific selection.
-# ---------------------------------------------------------------------------
-set(ALL_DEVICES_DEVICE_SOURCES
-    # keep-sorted: start
-    "${ALL_DEVICES_COMMON_DIR}/devices/boolean-state-sensor/BooleanStateSensorDevice.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/devices/chime/ChimeDevice.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/devices/dimmable-light/DimmableLightDevice.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/devices/dimmable-light/impl/LoggingDimmableLightDevice.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/devices/interface/DeviceInterface.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/devices/interface/SingleEndpointDevice.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/devices/nim/NimDevice.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/devices/occupancy-sensor/OccupancySensorDevice.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/devices/occupancy-sensor/impl/TogglingOccupancySensorDevice.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/devices/on-off-light/LoggingOnOffLightDevice.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/devices/proximity-ranger/DefaultProximityRangingDriver.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/devices/proximity-ranger/ProximityRangerDevice.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/devices/proximity-ranger/RangingTechnologyController.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/devices/proximity-ranger/impl/BleRssiRangingAdapter.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/devices/root-node/RootNodeDevice.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/devices/soil-sensor/SoilSensorDevice.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/devices/soil-sensor/impl/IncreasingMoistureSoilSensorDevice.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/devices/speaker/SpeakerDevice.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/devices/speaker/impl/LoggingSpeakerDevice.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/devices/temperature-sensor/TemperatureSensorDevice.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/devices/temperature-sensor/impl/IncreasingTemperatureSensorDevice.cpp"
-    # keep-sorted: end
-)
-
-# ---------------------------------------------------------------------------
-# Source directories (unconditional — all device sources are always compiled;
-# LTO eliminates unreachable device code when only a subset is registered).
-# Derived automatically from ALL_DEVICES_DEVICE_SOURCES.
-# ---------------------------------------------------------------------------
-set(ALL_DEVICES_DEVICE_SRCDIRS "")
-foreach(_src IN LISTS ALL_DEVICES_DEVICE_SOURCES)
-    get_filename_component(_dir "${_src}" DIRECTORY)
-    list(APPEND ALL_DEVICES_DEVICE_SRCDIRS "${_dir}")
-endforeach()
-list(REMOVE_DUPLICATES ALL_DEVICES_DEVICE_SRCDIRS)
 
 # ---------------------------------------------------------------------------
 # Device selection.
@@ -125,6 +82,52 @@ if(NOT _all_devices_all)
         set("ALL_DEVICES_ENABLE_${_suffix}" 1)
     endforeach()
 endif()
+
+# ---------------------------------------------------------------------------
+# Source files for devices and common interfaces (for non-component CMake builds).
+# Excludes root-node specialization files (Thread/WiFi) which require platform
+# specific selection.
+# ---------------------------------------------------------------------------
+set(ALL_DEVICES_DEVICE_SOURCES
+    # keep-sorted: start
+    "${ALL_DEVICES_COMMON_DIR}/devices/boolean-state-sensor/BooleanStateSensorDevice.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/devices/chime/ChimeDevice.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/devices/dimmable-light/DimmableLightDevice.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/devices/dimmable-light/impl/LoggingDimmableLightDevice.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/devices/interface/DeviceInterface.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/devices/interface/SingleEndpointDevice.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/devices/occupancy-sensor/OccupancySensorDevice.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/devices/occupancy-sensor/impl/TogglingOccupancySensorDevice.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/devices/on-off-light/LoggingOnOffLightDevice.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/devices/proximity-ranger/DefaultProximityRangingDriver.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/devices/proximity-ranger/ProximityRangerDevice.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/devices/proximity-ranger/RangingTechnologyController.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/devices/proximity-ranger/impl/BleRssiRangingAdapter.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/devices/root-node/RootNodeDevice.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/devices/soil-sensor/SoilSensorDevice.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/devices/soil-sensor/impl/IncreasingMoistureSoilSensorDevice.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/devices/speaker/SpeakerDevice.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/devices/speaker/impl/LoggingSpeakerDevice.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/devices/temperature-sensor/TemperatureSensorDevice.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/devices/temperature-sensor/impl/IncreasingTemperatureSensorDevice.cpp"
+    # keep-sorted: end
+)
+
+if(ALL_DEVICES_ENABLE_NIM)
+    list(APPEND ALL_DEVICES_DEVICE_SOURCES "${ALL_DEVICES_COMMON_DIR}/devices/nim/NimDevice.cpp")
+endif()
+
+# ---------------------------------------------------------------------------
+# Source directories (unconditional — all device sources are always compiled;
+# LTO eliminates unreachable device code when only a subset is registered).
+# Derived automatically from ALL_DEVICES_DEVICE_SOURCES.
+# ---------------------------------------------------------------------------
+set(ALL_DEVICES_DEVICE_SRCDIRS "")
+foreach(_src IN LISTS ALL_DEVICES_DEVICE_SOURCES)
+    get_filename_component(_dir "${_src}" DIRECTORY)
+    list(APPEND ALL_DEVICES_DEVICE_SRCDIRS "${_dir}")
+endforeach()
+list(REMOVE_DUPLICATES ALL_DEVICES_DEVICE_SRCDIRS)
 
 # ---------------------------------------------------------------------------
 # Generate app_config/enabled_devices.h.

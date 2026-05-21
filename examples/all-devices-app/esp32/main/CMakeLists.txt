@@ -39,9 +39,6 @@ set(ALL_DEVICES_ENABLED_DEVICES
 
 include("${ALL_DEVICES_COMMON_DIR}/devices/enabled_devices.cmake")
 
-# Remove NIM device sources as they are not supported on ESP32 (requires Linux/Border Router support)
-list(REMOVE_ITEM ALL_DEVICES_DEVICE_SRCDIRS "${ALL_DEVICES_COMMON_DIR}/devices/nim")
-
 set(PRIV_INCLUDE_DIRS_LIST
                       "${CMAKE_CURRENT_LIST_DIR}"
                       "${ALL_DEVICES_COMMON_DIR}"

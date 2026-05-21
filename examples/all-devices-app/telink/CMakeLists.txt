@@ -38,9 +38,6 @@ set(ALL_DEVICES_ENABLED_DEVICES
 
 include(${ALL_DEVICES_COMMON_DIR}/devices/enabled_devices.cmake)
 
-# Remove NIM device sources as they are not supported on Telink (requires Linux/Border Router support)
-list(REMOVE_ITEM ALL_DEVICES_DEVICE_SOURCES "${ALL_DEVICES_COMMON_DIR}/devices/nim/NimDevice.cpp")
-
 add_compile_definitions(IDENTIFY_CLUSTER_DISABLED=1)
 
 project(chip-telink-all-devices-app-example)
