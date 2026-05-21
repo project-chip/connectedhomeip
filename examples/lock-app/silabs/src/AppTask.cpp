@@ -903,8 +903,8 @@ void AppTask::ActuatorMovementEventHandler(AppEvent * aEvent)
             LockRequest req          = lock->mPendingRequest;
             lock->mHasPendingRequest = false;
             ChipLogDetail(Zcl, "Door Lock App: replaying queued %s (action=%u, target=%u)",
-                            req.isButtonAction ? "button" : "remote", to_underlying(req.action),
-                            to_underlying(req.targetClusterState));
+                          req.isButtonAction ? "button" : "remote", to_underlying(req.action),
+                          to_underlying(req.targetClusterState));
             appInstance().HandleLockRequestOnAppTask(req);
         }
         if (lock->mLockActuatorState == LockActuatorState::kLockCompleted ||
@@ -972,7 +972,7 @@ void AppTask::HandleLockRequestOnAppTask(const LockRequest & request)
     if (IsActuatorBusy())
     {
         ChipLogDetail(NotSpecified, "Door Lock App: actuator busy; queueing %s (replacing any prior pending)",
-                        request.isButtonAction ? "button" : "remote");
+                      request.isButtonAction ? "button" : "remote");
         mPendingRequest    = request;
         mHasPendingRequest = true;
         return;
@@ -984,7 +984,7 @@ void AppTask::HandleLockRequestOnAppTask(const LockRequest & request)
         if (request.targetClusterState == currentTerminal)
         {
             ChipLogDetail(NotSpecified, "Door Lock App: remote request target (%u) matches current LockState; skipping no-op",
-                            to_underlying(request.targetClusterState));
+                          to_underlying(request.targetClusterState));
             return;
         }
     }
@@ -1148,7 +1148,7 @@ bool AppTask::DMDoorLockGetCredential(EndpointId endpointId, uint16_t credential
     VerifyOrReturnValue(IsValidCredentialIndex(credentialIndex, credentialType), false);
 
     ChipLogDetail(Zcl, "Lock App: AppTask::DMDoorLockGetCredential [credentialType=%u], credentialIndex=%d",
-                   to_underlying(credentialType), credentialIndex);
+                  to_underlying(credentialType), credentialIndex);
 
     StorageKeyName key = LockCredentialEndpoint(endpointId, credentialType, credentialIndex);
     LockCredentialInfo credentialInStorage;
