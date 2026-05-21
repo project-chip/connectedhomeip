@@ -18,7 +18,9 @@ import os
 import shlex
 from enum import Enum, auto
 
-from .builder import BuilderOutput
+from runner.runner import Runner
+
+from .builder import BuilderOutput, OutDirLock, lock_output_dir
 from .gn import GnBuilder
 
 log = logging.getLogger(__name__)
@@ -153,8 +155,9 @@ class NxpLogLevel(Enum):
 class NxpBuilder(GnBuilder):
 
     def __init__(self,
-                 root,
-                 runner,
+                 root: str,
+                 runner: Runner,
+                 output_dir_lock: OutDirLock,
                  app: NxpApp = NxpApp.LIGHTING,
                  board: NxpBoard = NxpBoard.MCXW72,
                  board_variant: NxpBoardVariant = None,
@@ -185,7 +188,8 @@ class NxpBuilder(GnBuilder):
                  ):
         super(NxpBuilder, self).__init__(
             root=app.BuildRoot(root, board, os_env, build_system),
-            runner=runner)
+            runner=runner,
+            output_dir_lock=output_dir_lock)
         self.code_root = root
         self.app = app
         self.board = board
@@ -391,6 +395,7 @@ class NxpBuilder(GnBuilder):
             return prj_file
         raise Exception("Configuration not supported, no conf file available: %s" % prj_file_abs_path)
 
+    @lock_output_dir
     def generate(self):
         if self.build_system is NxpBuildSystem.CMAKE:
             build_flags = self.CmakeBuildFlags()
@@ -445,6 +450,7 @@ class NxpBuilder(GnBuilder):
                 build_flags=build_flags)
             self._Execute(['bash', '-c', cmd], title='Generating ' + self.identifier)
 
+    @lock_output_dir
     def build_outputs(self):
         name = 'chip-%s-%s' % (self.board.Name(self.os_env), self.app.NameSuffix())
         if self.os_env == NxpOsUsed.ZEPHYR:

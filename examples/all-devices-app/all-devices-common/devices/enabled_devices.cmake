@@ -29,30 +29,6 @@
 # app_config/enabled_devices.h is reachable as <app_config/enabled_devices.h>.
 
 # ---------------------------------------------------------------------------
-# Source directories (unconditional — all device sources are always compiled;
-# LTO eliminates unreachable device code when only a subset is registered).
-# ---------------------------------------------------------------------------
-set(ALL_DEVICES_DEVICE_SRCDIRS
-    # keep-sorted: start
-    "${ALL_DEVICES_COMMON_DIR}/devices/boolean-state-sensor"
-    "${ALL_DEVICES_COMMON_DIR}/devices/chime"
-    "${ALL_DEVICES_COMMON_DIR}/devices/dimmable-light"
-    "${ALL_DEVICES_COMMON_DIR}/devices/dimmable-light/impl"
-    "${ALL_DEVICES_COMMON_DIR}/devices/interface"
-    "${ALL_DEVICES_COMMON_DIR}/devices/occupancy-sensor"
-    "${ALL_DEVICES_COMMON_DIR}/devices/occupancy-sensor/impl"
-    "${ALL_DEVICES_COMMON_DIR}/devices/on-off-light"
-    "${ALL_DEVICES_COMMON_DIR}/devices/root-node"
-    "${ALL_DEVICES_COMMON_DIR}/devices/soil-sensor"
-    "${ALL_DEVICES_COMMON_DIR}/devices/soil-sensor/impl"
-    "${ALL_DEVICES_COMMON_DIR}/devices/speaker"
-    "${ALL_DEVICES_COMMON_DIR}/devices/speaker/impl"
-    "${ALL_DEVICES_COMMON_DIR}/devices/temperature-sensor"
-    "${ALL_DEVICES_COMMON_DIR}/devices/temperature-sensor/impl"
-    # keep-sorted: end
-)
-
-# ---------------------------------------------------------------------------
 # Source files for devices and common interfaces (for non-component CMake builds).
 # Excludes root-node specialization files (Thread/WiFi) which require platform
 # specific selection.
@@ -68,6 +44,10 @@ set(ALL_DEVICES_DEVICE_SOURCES
     "${ALL_DEVICES_COMMON_DIR}/devices/occupancy-sensor/OccupancySensorDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/occupancy-sensor/impl/TogglingOccupancySensorDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/on-off-light/LoggingOnOffLightDevice.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/devices/proximity-ranger/DefaultProximityRangingDriver.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/devices/proximity-ranger/ProximityRangerDevice.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/devices/proximity-ranger/RangingTechnologyController.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/devices/proximity-ranger/impl/BleRssiRangingAdapter.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/root-node/RootNodeDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/soil-sensor/SoilSensorDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/soil-sensor/impl/IncreasingMoistureSoilSensorDevice.cpp"
@@ -77,6 +57,18 @@ set(ALL_DEVICES_DEVICE_SOURCES
     "${ALL_DEVICES_COMMON_DIR}/devices/temperature-sensor/impl/IncreasingTemperatureSensorDevice.cpp"
     # keep-sorted: end
 )
+
+# ---------------------------------------------------------------------------
+# Source directories (unconditional — all device sources are always compiled;
+# LTO eliminates unreachable device code when only a subset is registered).
+# Derived automatically from ALL_DEVICES_DEVICE_SOURCES.
+# ---------------------------------------------------------------------------
+set(ALL_DEVICES_DEVICE_SRCDIRS "")
+foreach(_src IN LISTS ALL_DEVICES_DEVICE_SOURCES)
+    get_filename_component(_dir "${_src}" DIRECTORY)
+    list(APPEND ALL_DEVICES_DEVICE_SRCDIRS "${_dir}")
+endforeach()
+list(REMOVE_DUPLICATES ALL_DEVICES_DEVICE_SRCDIRS)
 
 # ---------------------------------------------------------------------------
 # Device selection.
@@ -108,6 +100,7 @@ foreach(_key
         dimmable-light
         occupancy-sensor
         on-off-light
+        proximity-ranger
         soil-sensor
         speaker
         temperature-sensor

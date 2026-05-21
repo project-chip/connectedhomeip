@@ -21,7 +21,6 @@
 #include <DeviceFactoryPlatformOverride.h>
 #include <LinuxCommissionableDataProvider.h>
 #include <TracingCommandLineArgument.h>
-#include <access/examples/GroupAuxiliaryAccessControlDelegate.h>
 #include <app/DefaultSafeAttributePersistenceProvider.h>
 #include <app/DeviceLoadStatusProvider.h>
 #include <app/InteractionModelEngine.h>
@@ -197,18 +196,18 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
         .timerDelegate     = gTimerDelegate,                         //
     });
 
-    RegisterDeviceFactoryOverrides(gTimerDelegate);
-
     static chip::CommonCaseDeviceServerInitParams initParams;
 
     SuccessOrDie(initParams.InitializeStaticResourcesBeforeServerInit());
+
+    RegisterDeviceFactoryOverrides(gTimerDelegate, initParams.persistentStorageDelegate);
 
 #if CHIP_CONFIG_ENABLE_GROUPCAST
     // TODO(#72056): Once groupcast is enabled by default, this should not be dependent on the app argument.
     if (AppOptions::GetConfig().enableGroupcast)
     {
-        static chip::Access::Examples::GroupAuxiliaryAccessControlDelegate groupAuxDelegate(
-            &gGroupDataProvider, &Server::GetInstance().GetFabricTable());
+        static chip::Access::Examples::GroupAuxiliaryAccessControlDelegateImpl groupAuxDelegate;
+        SuccessOrDie(groupAuxDelegate.Initialize(&gGroupDataProvider, &Server::GetInstance().GetFabricTable()));
         initParams.groupAuxiliaryAccessControlDelegate = &groupAuxDelegate;
         gGroupDataProvider.SetGroupcastEnabled(true);
     }
