@@ -521,6 +521,10 @@ config MBEDTLS_PSA_CRYPTO_C
     bool "MBEDTLS_PSA_CRYPTO_C"
     default n
 
+config TELINK_TLX_SHA_HW_SLOTS
+    int
+    default 8 if SOC_RISCV_TELINK_TLX
+
 endif # !ZEPHYR_VERSION_3_3
 
 config GETOPT_LONG
