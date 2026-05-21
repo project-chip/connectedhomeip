@@ -25,9 +25,9 @@
 #include <app/clusters/wifi-network-management-server/WiFiNetworkManagementCluster.h>
 #include <devices/interface/SingleEndpointDevice.h>
 #include <devices/nim/FakeBorderRouterDelegate.h>
-#include <optional>
 
 namespace chip {
+class PersistentStorageDelegate;
 namespace app {
 
 class SimpleBreadCrumbTracker : public Clusters::BreadCrumbTracker
@@ -43,10 +43,8 @@ private:
 class NimDevice : public SingleEndpointDevice
 {
 public:
-    NimDevice();
+    NimDevice(PersistentStorageDelegate & storage);
     ~NimDevice() override = default;
-
-    static void SetStorageDelegate(PersistentStorageDelegate * storage) { sStorageDelegate = storage; }
 
     CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
                         EndpointId parentId = kInvalidEndpointId) override;
@@ -55,15 +53,12 @@ public:
 protected:
     FakeBorderRouterDelegate mBorderRouterDelegate;
     SimpleBreadCrumbTracker mBreadCrumbTracker;
-    std::optional<DefaultThreadNetworkDirectoryStorage> mThreadNetworkDirectoryStorage;
+    DefaultThreadNetworkDirectoryStorage mThreadNetworkDirectoryStorage;
 
     LazyRegisteredServerCluster<Clusters::ThreadBorderRouterManagementCluster> mThreadBorderRouterManagementCluster;
     LazyRegisteredServerCluster<Clusters::WiFiNetworkManagementCluster> mWiFiNetworkManagementCluster;
     LazyRegisteredServerCluster<Clusters::ThreadNetworkDirectoryCluster> mThreadNetworkDirectoryCluster;
     LazyRegisteredServerCluster<Clusters::ThreadNetworkDiagnosticsCluster> mThreadNetworkDiagnosticsCluster;
-
-private:
-    static PersistentStorageDelegate * sStorageDelegate;
 };
 
 } // namespace app

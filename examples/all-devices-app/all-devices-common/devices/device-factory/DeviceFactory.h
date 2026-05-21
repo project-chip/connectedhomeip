@@ -34,6 +34,10 @@
 #include <map>
 #include <platform/DefaultTimerDelegate.h>
 
+namespace chip {
+class PersistentStorageDelegate;
+}
+
 namespace chip::app {
 
 /**
@@ -54,6 +58,7 @@ public:
         Credentials::GroupDataProvider & groupDataProvider;
         FabricTable & fabricTable;
         TimerDelegate & timerDelegate;
+        PersistentStorageDelegate & storageDelegate;
     };
 
     static DeviceFactory & GetInstance()
@@ -156,7 +161,7 @@ private:
         {
             RegisterCreator("nim", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return std::make_unique<NimDevice>();
+                return std::make_unique<NimDevice>(mContext->storageDelegate);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_ON_OFF_LIGHT)
