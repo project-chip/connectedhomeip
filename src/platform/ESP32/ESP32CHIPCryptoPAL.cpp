@@ -26,6 +26,7 @@
 // ESP-IDF v6.0+ uses PSA Crypto for hardware ECDSA operations
 #include <psa/crypto.h>
 #include <psa_crypto_driver_esp_ecdsa.h>
+#include <rom/efuse.h>
 
 namespace {
 
@@ -63,7 +64,7 @@ ESP32P256Keypair::~ESP32P256Keypair()
 
 CHIP_ERROR ESP32P256Keypair::Initialize(ECPKeyTarget keyTarget, int efuseBlock)
 {
-    VerifyOrReturnError(efuseBlock >= 0 && efuseBlock <= UINT8_MAX, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(efuseBlock >= 0 && efuseBlock < ETS_EFUSE_BLOCK_MAX, CHIP_ERROR_INVALID_ARGUMENT);
 
     // Destroy existing PSA key handle if re-initializing
     if (mInitialized)
