@@ -20,8 +20,8 @@ import shlex
 import sys
 
 from helper.CHIPTestBase import CHIPVirtualHome
-from helper.paths import (CHIP_ALL_CLUSTERS_APP_ESC, CHIP_REPO_STR, CONTROLLER_TEST_SCRIPTS_DIR, MATTER_CONTROLLER_INSTALL_WHEELS,
-                          MATTER_DEVELOPMENT_PAA_ROOT_CERTS_ESC)
+from helper.paths import (CHIP_ALL_CLUSTERS_APP_ESC, CHIP_ALL_CLUSTERS_APP_FRAGMENT, CHIP_REPO_STR, CONTROLLER_TEST_SCRIPTS_DIR,
+                          MATTER_CONTROLLER_INSTALL_WHEELS, MATTER_DEVELOPMENT_PAA_ROOT_CERTS_ESC)
 
 """
 Test to verify that the device can still handle new subscription requests when resuming the maximum subscriptions.
@@ -135,7 +135,7 @@ class TestSubscriptionResumptionCapacity(CHIPVirtualHome):
 
         command2 = (f'gdb -batch -return-child-result -q -ex run -ex "thread apply all bt" --args python3 {TEST_SCRIPT_CTRL2_ESC} '
                     f'-t 300 -a {ethernet_ip} --paa-trust-store-path {MATTER_DEVELOPMENT_PAA_ROOT_CERTS_ESC} '
-                    f'--remote-server-app {CHIP_ALL_CLUSTERS_APP_ESC} --subscription-capacity {TEST_SUBSCRIPTION_CAPACITY}')
+                    f'--remote-server-app {CHIP_ALL_CLUSTERS_APP_FRAGMENT} --subscription-capacity {TEST_SUBSCRIPTION_CAPACITY}')
         ret2 = self.execute_device_cmd(req_ids[1], command2)
 
         self.assertEqual(ret2['return_code'], '0',
