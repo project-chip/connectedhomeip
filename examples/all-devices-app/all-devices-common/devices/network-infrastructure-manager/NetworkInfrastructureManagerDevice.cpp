@@ -43,19 +43,21 @@ NetworkInfrastructureManagerDevice::~NetworkInfrastructureManagerDevice()
     DeviceLayer::SystemLayer().CancelTimer(ActivatePendingDataset, this);
 }
 
-CHIP_ERROR NetworkInfrastructureManagerDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointId parentId)
+CHIP_ERROR NetworkInfrastructureManagerDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
+                                                        EndpointId parentId)
 {
     ReturnErrorOnFailure(SingleEndpointRegistration(endpoint, provider, parentId));
 
     // 1. Thread Border Router Management
-    ThreadBorderRouterManagementCluster::Config tbrConfig(*this, Server::GetInstance().GetFailSafeContext(),
-                                                          mBreadCrumbTracker, DeviceLayer::PlatformMgr());
+    ThreadBorderRouterManagementCluster::Config tbrConfig(*this, Server::GetInstance().GetFailSafeContext(), mBreadCrumbTracker,
+                                                          DeviceLayer::PlatformMgr());
     mThreadBorderRouterManagementCluster.Create(endpoint, tbrConfig);
     ReturnErrorOnFailure(provider.AddCluster(mThreadBorderRouterManagementCluster.Registration()));
 
     // 2. WiFi Network Management
-    mWiFiNetworkManagementCluster.Create(endpoint, WiFiNetworkManagementCluster::Config(
-        ByteSpanFromCharSpan("MatterAP"_span), ByteSpanFromCharSpan("Setec Astronomy"_span)));
+    mWiFiNetworkManagementCluster.Create(
+        endpoint,
+        WiFiNetworkManagementCluster::Config(ByteSpanFromCharSpan("MatterAP"_span), ByteSpanFromCharSpan("Setec Astronomy"_span)));
 
     // 3. Thread Network Directory
     mThreadNetworkDirectoryCluster.Create(endpoint, mThreadNetworkDirectoryStorage);
@@ -155,7 +157,7 @@ CHIP_ERROR NetworkInfrastructureManagerDevice::GetDataset(Thread::OperationalDat
 }
 
 void NetworkInfrastructureManagerDevice::SetActiveDataset(const Thread::OperationalDataset & activeDataset, uint32_t sequenceNum,
-                                                     ActivateDatasetCallback * callback)
+                                                          ActivateDatasetCallback * callback)
 {
     ChipLogProgress(AppServer, "NetworkInfrastructureManagerDevice::SetActiveDataset called (seq: %" PRIu32 ")", sequenceNum);
     if (mActivateDatasetCallback != nullptr)
