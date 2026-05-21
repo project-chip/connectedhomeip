@@ -34,6 +34,7 @@ For physical hardware that communicates only via WiFiPAF (not Ethernet), omit
 """
 
 import asyncio
+import contextlib
 import json
 import logging
 import os
@@ -75,10 +76,8 @@ def commission_if_needed() -> None:
         if args[i] == "--storage-path" and i + 1 < len(args):
             storage_path = args[i + 1]
         elif args[i] == "--nodeId" and i + 1 < len(args):
-            try:
+            with contextlib.suppress(ValueError):
                 node_id = int(args[i + 1], 0)
-            except ValueError:
-                pass
         i += 1
 
     if not storage_path or not os.path.exists(storage_path):
@@ -268,7 +267,7 @@ class EDFixture:
         )
         pid_str = await self._ssh(app_cmd)
         # Take the last non-empty line to skip any SSH banner or warning lines.
-        lines = [l.strip() for l in pid_str.splitlines() if l.strip()]
+        lines = [line.strip() for line in pid_str.splitlines() if line.strip()]
         if not lines:
             raise RuntimeError(f"Remote ED start did not return a PID; output: {pid_str!r}")
         self._remote_pid = int(lines[-1])
@@ -475,5 +474,4 @@ class COMPROBaseTest(MatterBaseTest):
 
     def pick_single_transport_bit(self, transport_bitmap: int) -> int:
         """Return the lowest set bit from a transport bitmap (for use in connect requests)."""
-        lsb = transport_bitmap & (-transport_bitmap)
-        return lsb
+        return transport_bitmap & (-transport_bitmap)
