@@ -21,6 +21,8 @@
 
 #include <glib.h>
 
+#include <inet/InetInterface.h>
+#include <lib/support/Span.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/GLibTypeDeleter.h>
 #include <platform/Linux/dbus/wpa/DBusWpa.h>
@@ -161,6 +163,17 @@ protected:
      */
     bool IsStarted() const noexcept;
 
+    /**
+     *  @brief
+     *    Get the Wi-Fi network interface name.
+     *
+     *  @param[out]  outIfName
+     *    A reference to the mutable character span to which to assign
+     *    the Wi-Fi network interface name extent.
+     *
+     */
+    CHIP_ERROR GetIfName(CharSpan & outIfName) const noexcept;
+
     struct GDBusWpaSupplicant
     {
         GAutoPtr<WpaSupplicant1> proxy;
@@ -184,6 +197,7 @@ protected:
 
 private:
     ConnectivityManagerImpl * mConnectivityManagerImpl = nullptr;
+    char mWiFiIfName[Inet::InterfaceId::kMaxIfNameLength];
 };
 
 } // namespace Internal

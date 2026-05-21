@@ -49,6 +49,8 @@ CHIP_ERROR WpaSupplicantClient::Init(ConnectivityManagerImpl & inConnectivityMan
     // propagation through to this client 'Shutdown' and re-add the
     // assertion.
 
+    mWiFiIfName[0] = '\0';
+
     mConnectivityManagerImpl = &inConnectivityManagerImpl;
 
     return CHIP_NO_ERROR;
@@ -73,6 +75,13 @@ bool WpaSupplicantClient::IsStarted() const noexcept
     std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
 
     return !!mWpaSupplicant.iface;
+}
+
+CHIP_ERROR WpaSupplicantClient::GetIfName(CharSpan & outIfName) const noexcept
+{
+    outIfName = CharSpan::fromCharString(mWiFiIfName);
+
+    return CHIP_NO_ERROR;
 }
 
 } // namespace Internal
