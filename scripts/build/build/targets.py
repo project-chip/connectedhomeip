@@ -333,6 +333,7 @@ def BuildEfr32Target():
     # apps
     target.AppendFixedTargets([
         TargetPart('air-quality-sensor-app', app=Efr32App.AIR_QUALITY_SENSOR),
+        TargetPart('all-devices', app=Efr32App.ALL_DEVICES),
         TargetPart('closure', app=Efr32App.CLOSURE),
         TargetPart('evse', app=Efr32App.EVSE),
         TargetPart('water-heater', app=Efr32App.WATER_HEATER),

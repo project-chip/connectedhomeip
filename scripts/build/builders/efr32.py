@@ -40,6 +40,7 @@ class Efr32App(Enum):
     AIR_QUALITY_SENSOR = auto()
     CLOSURE = auto()
     SMOKE_CO_ALARM = auto()
+    ALL_DEVICES = auto()
 
     def ExampleName(self):
         if self == Efr32App.EVSE:
@@ -64,6 +65,8 @@ class Efr32App(Enum):
             return 'closure-app'
         if self == Efr32App.SMOKE_CO_ALARM:
             return 'smoke-co-alarm-app'
+        if self == Efr32App.ALL_DEVICES:
+            return 'all-devices-app'
         raise Exception('Unknown app type: %r' % self)
 
     def AppNamePrefix(self):
@@ -91,6 +94,8 @@ class Efr32App(Enum):
             return 'matter-silabs-closure-example'
         if self == Efr32App.SMOKE_CO_ALARM:
             return 'matter-silabs-smoke-co-alarm-example'
+        if self == Efr32App.ALL_DEVICES:
+            return 'matter-silabs-all-devices-example'
         raise Exception('Unknown app type: %r' % self)
 
     def FlashBundleName(self):
@@ -118,6 +123,8 @@ class Efr32App(Enum):
             return 'closure_app.flashbundle.txt'
         if self == Efr32App.SMOKE_CO_ALARM:
             return 'smoke_co_alarm_app.flashbundle.txt'
+        if self == Efr32App.ALL_DEVICES:
+            return 'all_devices_app.flashbundle.txt'
         raise Exception('Unknown app type: %r' % self)
 
     def BuildRoot(self, root):
@@ -215,6 +222,8 @@ class Efr32Builder(GnBuilder):
         super(Efr32Builder, self).__init__(root=app.BuildRoot(root), runner=runner, output_dir_lock=output_dir_lock)
         self.app = app
         self.extra_gn_options = ['silabs_board="%s"' % board.GnArgName()]
+        if app == Efr32App.ALL_DEVICES:
+            self.extra_gn_options.append('sl_matter_use_code_driven_dm=true')
         self.dotfile = ''
 
         if enable_rpcs:
