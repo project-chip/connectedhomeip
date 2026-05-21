@@ -349,7 +349,8 @@ def BuildEfr32Target():
 
     # Single-device subset builds for all-devices-app.
     for _device in _ALL_DEVICES_APP_DEVICES:
-        app_parts.append(TargetPart(f'all-devices-{_device}', app=Efr32App.ALL_DEVICES, all_devices_enabled_devices=[_device]).ExceptIfRe('-(wifi|brd4338a|brd2605a|brd4343a|brd4342a|brd2708a|brd2911a)'))
+        app_parts.append(TargetPart(f'all-devices-{_device}', app=Efr32App.ALL_DEVICES, all_devices_enabled_devices=[
+                         _device]).ExceptIfRe('-(wifi|brd4338a|brd2605a|brd4343a|brd4342a|brd2708a|brd2911a)'))
 
     target.AppendFixedTargets(app_parts)
 
