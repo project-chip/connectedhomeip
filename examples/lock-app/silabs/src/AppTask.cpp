@@ -77,7 +77,6 @@ using namespace ::chip::DeviceLayer::Internal;
 using chip::app::DataModel::MakeNullable;
 using chip::Protocols::InteractionModel::Status;
 using namespace chip::TLV;
-using namespace ::chip::DeviceLayer;
 
 namespace {
 
@@ -162,24 +161,6 @@ StorageKeyName LockHolidayScheduleEndpoint(EndpointId endpoint, uint16_t schedul
 }
 
 // ---- Misc helpers ----------------------------------------------------------
-
-[[maybe_unused]] const char * LockStateToString(DlLockState lockState)
-{
-    switch (lockState)
-    {
-    case DlLockState::kNotFullyLocked:
-        return "Not Fully Locked";
-    case DlLockState::kLocked:
-        return "Locked";
-    case DlLockState::kUnlocked:
-        return "Unlocked";
-    case DlLockState::kUnlatched:
-        return "Unlatched";
-    case DlLockState::kUnknownEnumValue:
-        break;
-    }
-    return "Unknown";
-}
 
 void CancelUnlatchTimer(void)
 {
@@ -450,8 +431,8 @@ void AppTask::DMPostAttributeChangeCallback(const app::ConcreteAttributePath & a
     if (clusterId == DoorLock::Id && attributeId == DoorLock::Attributes::LockState::Id)
     {
         [[maybe_unused]] DlLockState lockState = *(reinterpret_cast<DlLockState *>(value));
-        ChipLogProgress(Zcl, "Door lock cluster: " ChipLogFormatMEI " state %d", ChipLogValueMEI(clusterId),
-                        to_underlying(lockState));
+        ChipLogDetail(Zcl, "Door lock cluster: " ChipLogFormatMEI " state %d", ChipLogValueMEI(clusterId),
+                      to_underlying(lockState));
 #ifdef SL_MATTER_ENABLE_AWS
         MatterAwsSendMsg("lock/state", (const char *) (lockState == DlLockState::kLocked ? "lock" : "unlock"));
 #endif // SL_MATTER_ENABLE_AWS
@@ -462,7 +443,7 @@ bool AppTask::DMDoorLockOnDoorLockCommand(EndpointId endpointId, const Nullable<
                                           const Nullable<NodeId> & nodeId, const Optional<ByteSpan> & pinCode,
                                           OperationErrorEnum & err)
 {
-    ChipLogProgress(Zcl, "Door Lock App: Lock Command endpoint=%d", endpointId);
+    ChipLogDetail(Zcl, "Door Lock App: Lock Command endpoint=%d", endpointId);
     VerifyOrReturnValue(endpointId == LOCK_ENDPOINT, false,
                         ChipLogError(Zcl, "Door Lock App: rejecting command on unsupported endpoint %d (only %d supported)",
                                      endpointId, LOCK_ENDPOINT);
@@ -492,7 +473,7 @@ bool AppTask::DMDoorLockOnDoorUnlockCommand(EndpointId endpointId, const Nullabl
                                             const Nullable<NodeId> & nodeId, const Optional<ByteSpan> & pinCode,
                                             OperationErrorEnum & err)
 {
-    ChipLogProgress(Zcl, "Door Lock App: Unlock Command endpoint=%d", endpointId);
+    ChipLogDetail(Zcl, "Door Lock App: Unlock Command endpoint=%d", endpointId);
     VerifyOrReturnValue(endpointId == LOCK_ENDPOINT, false,
                         ChipLogError(Zcl, "Door Lock App: rejecting command on unsupported endpoint %d (only %d supported)",
                                      endpointId, LOCK_ENDPOINT);
@@ -522,7 +503,7 @@ bool AppTask::DMDoorLockOnDoorUnboltCommand(EndpointId endpointId, const Nullabl
                                             const Nullable<NodeId> & nodeId, const Optional<ByteSpan> & pinCode,
                                             OperationErrorEnum & err)
 {
-    ChipLogProgress(Zcl, "Door Lock App: Unbolt Command endpoint=%d", endpointId);
+    ChipLogDetail(Zcl, "Door Lock App: Unbolt Command endpoint=%d", endpointId);
     VerifyOrReturnValue(endpointId == LOCK_ENDPOINT, false,
                         ChipLogError(Zcl, "Door Lock App: rejecting command on unsupported endpoint %d (only %d supported)",
                                      endpointId, LOCK_ENDPOINT);
@@ -758,7 +739,7 @@ bool AppTask::InitiateLockAction(LockAction aAction, bool fromButton)
         if (aAction == LockAction::kUnlock || aAction == LockAction::kLock)
         {
             bool locked = (aAction == LockAction::kLock);
-            ChipLogProgress(Zcl, "%s Action has been initiated", locked ? "Lock" : "Unlock");
+            ChipLogDetail(Zcl, "%s Action has been initiated", locked ? "Lock" : "Unlock");
             sLockLED.Set(!locked);
 
 #ifdef DISPLAY_ENABLED
@@ -767,7 +748,7 @@ bool AppTask::InitiateLockAction(LockAction aAction, bool fromButton)
         }
         else if (aAction == LockAction::kUnlatch)
         {
-            ChipLogProgress(Zcl, "Unlatch Action has been initiated");
+            ChipLogDetail(Zcl, "Unlatch Action has been initiated");
         }
         if (fromButton)
         {
@@ -868,16 +849,16 @@ void AppTask::ActuatorMovementEventHandler(AppEvent * aEvent)
         switch (actionCompleted)
         {
         case LockAction::kLock:
-            ChipLogProgress(Zcl, "Lock Action has been completed");
+            ChipLogDetail(Zcl, "Lock Action has been completed");
             stateToReport = DlLockState::kLocked;
             break;
         case LockAction::kUnlatch:
-            ChipLogProgress(Zcl, "Unlatch Action has been completed");
+            ChipLogDetail(Zcl, "Unlatch Action has been completed");
             StartUnlatchTimer(UNLATCH_TIME_MS);
             stateToReport = DlLockState::kUnlatched;
             break;
         case LockAction::kUnlock:
-            ChipLogProgress(Zcl, "Unlock Action has been completed");
+            ChipLogDetail(Zcl, "Unlock Action has been completed");
             stateToReport = DlLockState::kUnlocked;
             break;
         case LockAction::kInvalid:
@@ -921,9 +902,9 @@ void AppTask::ActuatorMovementEventHandler(AppEvent * aEvent)
         {
             LockRequest req          = lock->mPendingRequest;
             lock->mHasPendingRequest = false;
-            ChipLogProgress(Zcl, "Door Lock App: replaying queued %s (action=%u, target=%s)",
+            ChipLogDetail(Zcl, "Door Lock App: replaying queued %s (action=%u, target=%u)",
                             req.isButtonAction ? "button" : "remote", to_underlying(req.action),
-                            LockStateToString(req.targetClusterState));
+                            to_underlying(req.targetClusterState));
             appInstance().HandleLockRequestOnAppTask(req);
         }
         if (lock->mLockActuatorState == LockActuatorState::kLockCompleted ||
@@ -932,7 +913,7 @@ void AppTask::ActuatorMovementEventHandler(AppEvent * aEvent)
             LockRequest stagedReq;
             if (TryDrainStagedLockRequest(stagedReq))
             {
-                ChipLogProgress(Zcl, "Door Lock App: draining staged lock request from action-complete fallback");
+                ChipLogDetail(Zcl, "Door Lock App: draining staged lock request from action-complete fallback");
                 appInstance().HandleLockRequestOnAppTask(stagedReq);
             }
         }
@@ -990,7 +971,7 @@ void AppTask::HandleLockRequestOnAppTask(const LockRequest & request)
 {
     if (IsActuatorBusy())
     {
-        ChipLogProgress(NotSpecified, "Door Lock App: actuator busy; queueing %s (replacing any prior pending)",
+        ChipLogDetail(NotSpecified, "Door Lock App: actuator busy; queueing %s (replacing any prior pending)",
                         request.isButtonAction ? "button" : "remote");
         mPendingRequest    = request;
         mHasPendingRequest = true;
@@ -1002,8 +983,8 @@ void AppTask::HandleLockRequestOnAppTask(const LockRequest & request)
             (mLockActuatorState == LockActuatorState::kLockCompleted) ? DlLockState::kLocked : DlLockState::kUnlocked;
         if (request.targetClusterState == currentTerminal)
         {
-            ChipLogProgress(NotSpecified, "Door Lock App: remote request target (%s) matches current LockState; skipping no-op",
-                            LockStateToString(request.targetClusterState));
+            ChipLogDetail(NotSpecified, "Door Lock App: remote request target (%u) matches current LockState; skipping no-op",
+                            to_underlying(request.targetClusterState));
             return;
         }
     }
@@ -1045,7 +1026,7 @@ bool AppTask::DMDoorLockGetUser(EndpointId endpointId, uint16_t userIndex, Ember
     userIndex--;
     VerifyOrReturnValue(IsValidUserIndex(userIndex), false);
     VerifyOrReturnValue(kInvalidEndpointId != endpointId, false);
-    ChipLogProgress(Zcl, "Door Lock App: AppTask::DMDoorLockGetUser [endpoint=%d,userIndex=%hu]", endpointId, userIndex);
+    ChipLogDetail(Zcl, "Door Lock App: AppTask::DMDoorLockGetUser [endpoint=%d,userIndex=%hu]", endpointId, userIndex);
 
     // Get User struct from nvm3
     uint16_t size = kLockUserInfoSize;
@@ -1153,7 +1134,7 @@ bool AppTask::DMDoorLockSetUser(EndpointId endpointId, uint16_t userIndex, Fabri
     StorageKeyName userKey = LockUserEndpoint(endpointId, userIndex);
     VerifyOrReturnValue(mStorage->SyncSetKeyValue(userKey.KeyName(), &userInStorage, kLockUserInfoSize) == CHIP_NO_ERROR, false);
 
-    ChipLogProgress(Zcl, "Successfully set the user [mEndpointId=%d,index=%d]", endpointId, userIndex);
+    ChipLogDetail(Zcl, "Successfully set the user [mEndpointId=%d,index=%d]", endpointId, userIndex);
 
     return true;
 }
@@ -1166,8 +1147,8 @@ bool AppTask::DMDoorLockGetCredential(EndpointId endpointId, uint16_t credential
     VerifyOrReturnValue(IsValidCredentialType(credentialType), false);
     VerifyOrReturnValue(IsValidCredentialIndex(credentialIndex, credentialType), false);
 
-    ChipLogProgress(Zcl, "Lock App: AppTask::DMDoorLockGetCredential [credentialType=%u], credentialIndex=%d",
-                    to_underlying(credentialType), credentialIndex);
+    ChipLogDetail(Zcl, "Lock App: AppTask::DMDoorLockGetCredential [credentialType=%u], credentialIndex=%d",
+                   to_underlying(credentialType), credentialIndex);
 
     StorageKeyName key = LockCredentialEndpoint(endpointId, credentialType, credentialIndex);
     LockCredentialInfo credentialInStorage;
@@ -1235,7 +1216,7 @@ bool AppTask::DMDoorLockSetCredential(EndpointId endpointId, uint16_t credential
     StorageKeyName key = LockCredentialEndpoint(endpointId, credentialType, credentialIndex);
     error              = mStorage->SyncSetKeyValue(key.KeyName(), &credentialInStorage, kLockCredentialInfoSize);
     VerifyOrReturnValue(error == CHIP_NO_ERROR, false, ChipLogError(Zcl, "Error reading from KVS key"));
-    ChipLogProgress(Zcl, "Successfully set the credential [credentialType=%u]", to_underlying(credentialType));
+    ChipLogDetail(Zcl, "Successfully set the credential [credentialType=%u]", to_underlying(credentialType));
     return true;
 }
 
