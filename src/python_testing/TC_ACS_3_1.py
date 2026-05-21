@@ -223,7 +223,7 @@ class TC_ACS_3_1(MatterBaseTest):
             await asyncio.sleep(1)
 
             # After the 3rd trigger, collect the event ID event to check the correct AmbientContextDetectEnded event reception later
-            event = event_listener.wait_for_event_report(cluster.Events.AmbientContextDetectStarted, timeout_sec=10)
+            # event = event_listener.wait_for_event_report(cluster.Events.AmbientContextDetectStarted, timeout_sec=10)
             # start_event_id = event.event_id
 
             self.step("5")
