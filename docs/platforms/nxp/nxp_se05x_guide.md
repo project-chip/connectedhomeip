@@ -524,7 +524,7 @@ GPIO notification is currently implemented on:
 
 -   FRDM-i.MX93
 -   RW61x
--   RT1060 EVKB
+-   RT1060 EVKC
 -   W72
 
 **Enable GPIO notification:**
@@ -540,6 +540,12 @@ GPIO notification is currently implemented on:
 
 ### Platform-Specific GPIO Connections
 
+To enable GPIO notification functionality, hardware connections between the host
+MCU and the SE05x board are required. The setup differs based on which SE05x
+board variant you are using.
+
+### Option A: Standard SE051ARD Board
+
 To enable GPIO notification functionality, additional hardware modifications are required on the OM-SE051ARD board.
 
 #### Hardware Setup Requirements
@@ -552,10 +558,37 @@ To enable GPIO notification functionality, additional hardware modifications are
 4. **Connect Host GPIO Notification Pin** to **SE051ARD IO2** (J11)
 5. **Set J10 on SE051ARD board**. This connects the pull-up resistor to IO2 which let IO2 be always high be default.
 
+**Software Configuration:**
+
+Ensure `CONFIG_SE05X_BOARD_H2` is set to `0` in `third_party/simw-top-mini/repo/demos/se05x_host_gpio/se05x_host_gpio.h`:
+
+```c:third_party/simw-top-mini/repo/demos/se05x_host_gpio/se05x_host_gpio.h
+/* Make this to 1 in case SE05x ARD H2 board is used */
+#define CONFIG_SE05X_BOARD_H2 0
+```
+
 > **Note:** If the host GPIO cannot drive the SE05x directly, use an additional OM-SE051ARD board as a switch/driver circuit.
 The connection of the 3 platforms tested are given below.
 
 ---
+
+### Option B: SE05x ARD H2 Board
+
+**Hardware Requirements:**
+
+1. SE05x ARD H2 board
+3. Set jumper **J10** on SE051ARDH2 board — this connects the pull-up resistor
+   to IO2, keeping IO2 high by default.
+4. Connect jumper JP4 on the SE051ARDH2 board to pins 2-3
+
+**Software Configuration:**
+
+In `third_party/simw-top-mini/repo/demos/se05x_host_gpio/se05x_host_gpio.h` `CONFIG_SE05X_BOARD_H2` is set to `0` by default. Update it to `1`:
+
+```c:third_party/simw-top-mini/repo/demos/se05x_host_gpio/se05x_host_gpio.h
+/* Make this to 1 in case SE05x ARD H2 board is used */
+#define CONFIG_SE05X_BOARD_H2 1
+```
 
 #### FRDM-i.MX93 GPIO Configuration
 
@@ -568,12 +601,32 @@ The connection of the 3 platforms tested are given below.
 
 **Hardware Connections (with SE051ARD switch and DUT board):**
 
-| Source                                  | Destination                     |
-| --------------------------------------- | ------------------------------- |
-| FRDM-i.MX93 3.3V                        | SE051ARD (switch) Vin (J16-2)   |
-| FRDM-i.MX93 Pin 31 on P11 Connector     | SE051ARD (DUT) IO2 (J11)        |
-| FRDM-i.MX93 Pin 29 on P11 Connector     | SE051ARD (switch) Enable (J13-2)|
-| SE051ARD (switch) Vout (J11-5)          | SE051ARD (DUT) SE_VDD (J14-2)   |
+| Source                                       | Destination                     |
+| -------------------------------------------- | ------------------------------- |
+| FRDM-i.MX93 3.3V Pin 1 on P12 Connector      | SE051ARD (DUT) 3v3 (J8-4)       |
+| FRDM-i.MX93 GND Pin 6 on P12 Connector       | SE051ARD (DUT) GND (J8-7)       |
+| FRDM-i.MX93 I2C_SCL Pin 7 on P12 Connector   | SE051ARD (DUT) SCL (J2-10)      |
+| FRDM-i.MX93 I2C_SDA Pin 9 on P12 Connector   | SE051ARD (DUT) SDA (J2-9)       |
+| FRDM-i.MX93 3.3V Pin 1 on P11 Connector      | SE051ARD (switch) Vin (J16-2)   |
+| FRDM-i.MX93 Pin 31 on P11 Connector          | SE051ARD (DUT) IO2 (J11-8)      |
+| FRDM-i.MX93 Pin 29 on P11 Connector          | SE051ARD (switch) Enable (J13-2)|
+| SE051ARD (switch) Vout (J11-5)               | SE051ARD (DUT) SE_VDD (J14-2)   |
+| SE051ARD (switch) GND (J2-7)                 | SE051ARD (DUT) GND (J2-7)       |
+| SE051ARD (DUT) ENA (J13-2)                   | SE051ARD (DUT) VDD (J11-1)      |
+
+
+**Hardware Connections (with SE051H2 DUT board):**
+
+| Source                                         | Destination                     |
+| ---------------------------------------------- | ------------------------------- |
+| FRDM-i.MX93 3.3V Pin 1 on P12 Connector        | SE051H2 Vin (J8-4)              |
+| FRDM-i.MX93 GND Pin 6 on P12 Connector         | SE051H2 GND (J8-7)              |
+| FRDM-i.MX93 I2C_SCL Pin 7 on P12 Connector     | SE051H2 SCL (J2-10)             |
+| FRDM-i.MX93 I2C_SDA Pin 9 on P12 Connector     | SE051H2 SDA (J2-9)              |
+| FRDM-i.MX93 Pin 31 on P11 Connector            | SE051H2 IO2 (J11-5)             |
+| FRDM-i.MX93 Pin 29 on P11 Connector            | SE051H2 IO/MOSI (J2-4)          |
+| FRDM-i.MX93 3.3V Pin 1 on P11 Connector (HIGH) | SE051H2 Enable(J1-6)            |
+
 
 **Software Implementation:**
 
@@ -601,12 +654,30 @@ third_party/simw-top-mini/repo/demos/se05x_host_gpio/se05x_host_gpio.c
 
 **Hardware Connections (with SE051ARD switch and DUT board):**
 
+| Source                               | Destination                     |
+| -------------------------------------| ------------------------------- |
+| RW612 3.3V (J3-8)                    | SE051ARD (DUT) 3v3 (J8-4)       |
+| RW612 GND  (J3-14)                   | SE051ARD (DUT) GND (J8-7)       |
+| RW612 I2C_SCL (J1-4)                 | SE051ARD (DUT) SCL (J2-10)      |
+| RW612 I2C_SDA (J1-2)                 | SE051ARD (DUT) SDA (J2-9)       |
+| RW612 3.3V (J2-16)                   | SE051ARD (switch) Vin (J16-2)   |
+| RW612 J1-10                          | SE051ARD (DUT) IO2 (J11-8)      |
+| RW612 J1-12                          | SE051ARD (switch) Enable (J13-2)|
+| SE051ARD (switch) Vout (J11-5)       | SE051ARD (DUT) SE_VDD (J14-2)   |
+| SE051ARD (switch) GND (J2-7)         | SE051ARD (DUT) GND (J2-7)       |
+| SE051ARD (DUT) ENA (J13-2)           | SE051ARD (DUT) VDD (J11-1)      |
+
+**Hardware Connections (with SE051H2 DUT board):**
+
 | Source                                  | Destination                     |
 | --------------------------------------- | ------------------------------- |
-| RW612 3.3V                              | SE051ARD (switch) Vin (J16-2)   |
-| RW612 J1_10                             | SE051ARD (DUT) IO2 (J11)        |
-| RW612 J1_12                             | SE051ARD (switch) Enable (J13-2)|
-| SE051ARD (switch) Vout (J11-5)          | SE051ARD (DUT) SE_VDD (J14-2)   |
+| RW612 3.3V (J3-8)                       | SE051H2 3v3 (J8-4)              |
+| RW612 GND  (J3-14)                      | SE051H2 GND (J8-7)              |
+| RW612 I2C_SCL (J1-4)                    | SE051H2 SCL (J2-10)             |
+| RW612 I2C_SDA (J1-2)                    | SE051H2 SDA (J2-9)              |
+| RW612 J1-10                             | SE051H2 IO2 (J11-5)             |
+| RW612 J1-12                             | SE051H2 IO/MOSI (J2-4)          |
+| RW612 3.3V (J2-16) (HIGH)               | SE051H2 Enable(J1-6)            |
 
 **Software Implementation:**
 
@@ -623,7 +694,7 @@ third_party/simw-top-mini/repo/demos/se05x_host_gpio/se05x_host_gpio_rw61x.c
 
 ---
 
-#### RT1060 EVKB GPIO Configuration
+#### RT1060 EVKC GPIO Configuration
 
 **Pin Assignments:**
 
@@ -636,10 +707,28 @@ third_party/simw-top-mini/repo/demos/se05x_host_gpio/se05x_host_gpio_rw61x.c
 
 | Source                                  | Destination                     |
 | --------------------------------------- | ------------------------------- |
-| EVKBMIMXRT1060 3.3V                     | SE051ARD (switch) Vin (J16-2)   |
-| EVKBMIMXRT1060 J17_2                    | SE051ARD (DUT) IO2 (J11)        |
-| EVKBMIMXRT1060 J17_1                    | SE051ARD (switch) Enable (J13-2)|
+| EVKCMIMXRT1060 3.3V (J32-4)             | SE051ARD (DUT) 3v3 (J8-4)       |
+| EVKCMIMXRT1060 GND (J17_7)              | SE051ARD (DUT) GND (J8-7)       |
+| EVKCMIMXRT1060 I2C_SCL (J17-10)         | SE051ARD (DUT) SCL (J2-10)      |
+| EVKCMIMXRT1060 I2C_SDA (J17-9)          | SE051ARD (DUT) SDA (J2-9)       |
+| EVKCMIMXRT1060 3.3V (J17-8)             | SE051ARD (switch) Vin (J16-2)   |
+| EVKCMIMXRT1060 J17-2                    | SE051ARD (DUT) IO2 (J11-8)      |
+| EVKCMIMXRT1060 J17-1                    | SE051ARD (switch) Enable (J13-2)|
 | SE051ARD (switch) Vout (J11-5)          | SE051ARD (DUT) SE_VDD (J14-2)   |
+| SE051ARD (switch) GND (J2-7)            | SE051ARD (DUT) GND (J2-7)       |
+| SE051ARD (DUT) ENA (J13-2)              | SE051ARD (DUT) VDD (J11-1)      |
+
+**Hardware Connections (with SE051H2 DUT board):**
+
+| Source                                  | Destination                     |
+| --------------------------------------- | ------------------------------- |
+| EVKCMIMXRT1060 3.3V (J32-4)             | SE051H2 Vin (J8-4)              |
+| EVKCMIMXRT1060 GND (J17-7)              | SE051H2 (DUT) GND (J8-7)        |
+| EVKCMIMXRT1060 I2C_SCL (J17-10)         | SE051H2 (DUT) SCL (J2-10)       |
+| EVKCMIMXRT1060 I2C_SDA (J17-9)          | SE051H2 (DUT) SDA (J2-9)        |
+| EVKCMIMXRT1060 J17-2                    | SE051H2 IO2 (J11-5)             |
+| EVKCMIMXRT1060 J17-1                    | SE051H2 IO/MOSI (J2-4)          |
+| EVKCMIMXRT1060 3.3V (J17-8) (HIGH)      | SE051H2 Enable(J1-6)            |
 
 **Software Implementation:**
 
@@ -660,19 +749,39 @@ third_party/simw-top-mini/repo/demos/se05x_host_gpio/se05x_host_gpio_rt1060.c
 
 **Pin Assignments:**
 
-| Function                  | RT1060 EVKB Pin |
-| ------------------------- | --------------- |
-| Enable Pin                | TBU             |
-| GPIO Notification Pin     | TBU             |
+**Pin Assignments:**
+
+| Function                  | FRDM W72 Pin |
+| ------------------------- | ------------ |
+| Enable Pin                | J2_10        |
+| GPIO Notification Pin     | J1_3         |
 
 **Hardware Connections (with SE051ARD switch and DUT board):**
 
 | Source                                  | Destination                     |
 | --------------------------------------- | ------------------------------- |
-| TBU                                     | SE051ARD (switch) Vin (J16-2)   |
-| TBU                                     | SE051ARD (DUT) IO2 (J11)        |
-| TBU                                     | SE051ARD (switch) Enable (J13-2)|
-| TBU                                     | SE051ARD (DUT) SE_VDD (J14-2)   |
+| FRDM W72 3.3V (J3-2)                    | SE051ARD (DUT) 3v3 (J8-4)       |
+| FRDM W72 GND (J3-7)                     | SE051ARD (DUT) GND (J8-7)       |
+| FRDM W72 I2C_SCL (J2-1)                 | SE051ARD (DUT) SCL (J2-10)      |
+| FRDM W72 I2C_SDA (J2-2)                 | SE051ARD (DUT) SDA (J2-9)       |
+| FRDM W72 3.3V (J3-4)                    | SE051ARD (switch) Vin (J16-2)   |
+| FRDM W72 J1-3                           | SE051ARD (DUT) IO2 (J11-8)      |
+| FRDM W72 J2-10                          | SE051ARD (switch) Enable (J13-2)|
+| SE051ARD (switch) Vout (J11-5)          | SE051ARD (DUT) SE_VDD (J14-2)   |
+| SE051ARD (switch) GND (J2-7)            | SE051ARD (DUT) GND (J2-7)       |
+| SE051ARD (DUT) ENA (J13-2)              | SE051ARD (DUT) VDD (J11-1)      |
+
+**Hardware Connections (with SE051H2 DUT board):**
+
+| Source                                  | Destination                     |
+| --------------------------------------- | ------------------------------- |
+| FRDM W72 3.3V (J3-4)                    | SE051H2 Vin (J8-4)              |
+| FRDM W72 GND (J3-7)                     | SE051H2 (DUT) GND (J8-7)        |
+| FRDM W72 I2C_SCL (J2-1)                 | SE051H2 (DUT) SCL (J2-10)       |
+| FRDM W72 I2C_SDA (J2-2)                 | SE051H2 (DUT) SDA (J2-9)        |
+| FRDM W72 J1-3                           | SE051H2 IO2 (J11-5)             |
+| FRDM W72 J2-10                          | SE051H2 IO/MOSI (J2-4)          |
+| FRDM W72 3.3V (J3-2) (HIGH)             | SE051H2 Enable(J1-6)            |
 
 **Software Implementation:**
 

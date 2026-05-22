@@ -57,7 +57,7 @@ CHIP_ERROR NFCDataRetrievalInfo::Init()
         ChipLogDetail(Crypto, "SE05x :: No NFC commissioned data found");
         ReturnErrorOnFailure(se05x_close_session());
 
-#if defined(CONFIG_SE05X_HOST_GPIO)
+#if defined(CONFIG_SE05X_HOST_GPIO) || defined(CONFIG_SE05X_HOST_GPIO_FRDM_IMX93)
         // Check commissioning status and initialize GPIO if needed
         CHIP_ERROR gpioStatus = CheckCommissioningStatusAndInitGPIO();
         if (gpioStatus == CHIP_NO_ERROR)
@@ -135,7 +135,7 @@ uint32_t NFCDataRetrievalInfo::GetRemainingFailSafeTimerForSE05x()
     return fail_safe_time;
 }
 
-#if defined(CONFIG_SE05X_HOST_GPIO)
+#if defined(CONFIG_SE05X_HOST_GPIO) || defined(CONFIG_SE05X_HOST_GPIO_FRDM_IMX93)
 CHIP_ERROR NFCDataRetrievalInfo::CheckCommissioningStatusAndInitGPIO()
 {
     constexpr size_t kMaxBufferSize        = 256;
@@ -162,12 +162,55 @@ CHIP_ERROR NFCDataRetrievalInfo::CheckCommissioningStatusAndInitGPIO()
     ChipLogProgress(Crypto, "SE05x :: Device not commissioned, initializing GPIO notification for NFC");
 
     // Initialize GPIO notification for NFC commissioning
+#if defined(CONFIG_SE05X_HOST_GPIO_FRDM_IMX93)
+    pthread_t tid;
+    pthread_attr_t attr;
+
+    // Initialize thread attributes
+    int result = pthread_attr_init(&attr);
+    if (result != 0)
+    {
+        ChipLogError(NotSpecified, "Failed to initialize thread attributes: %d", result);
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    // Set thread to detached state
+    result = pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+    if (result != 0)
+    {
+        ChipLogError(NotSpecified, "Failed to set thread detach state: %d", result);
+        if (pthread_attr_destroy(&attr) != 0)
+        {
+            ChipLogError(NotSpecified, "Failed to destroy thread attributes during cleanup");
+        }
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    // Create the callback thread
+    result = pthread_create(&tid, &attr, se05x_host_gpio_notification_monitor_init, NULL);
+    if (result != 0)
+    {
+        ChipLogError(NotSpecified, "Failed to create NFC callback thread: %d", result);
+        if (pthread_attr_destroy(&attr) != 0)
+        {
+            ChipLogError(NotSpecified, "Failed to destroy thread attributes during cleanup");
+        }
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    // Clean up thread attributes
+    if (pthread_attr_destroy(&attr) != 0)
+    {
+        ChipLogError(NotSpecified, "Failed to destroy thread attributes");
+    }
+#else
     void * gpioResult = se05x_host_gpio_notification_monitor_init(nullptr);
     if (gpioResult != NULL)
     {
         ChipLogError(Crypto, "SE05x :: Failed to initialize GPIO notification ");
         return CHIP_ERROR_INTERNAL;
     }
+#endif
 
     ChipLogProgress(Crypto, "SE05x :: GPIO notification successfully initialized");
     return CHIP_NO_ERROR;
