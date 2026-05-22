@@ -16,7 +16,7 @@
 #
 
 from dataclasses import dataclass
-from enum import Enum
+from enum import StrEnum
 from typing import Optional, Union
 
 from matter.testing.conversions import cluster_id_with_name, format_decimal_and_hex
@@ -154,7 +154,7 @@ ProblemLocation = Union[ClusterPathLocation, DeviceTypePathLocation, UnknownProb
 # from `str` is used. See https://stackoverflow.com/a/51976841.
 
 
-class ProblemSeverity(str, Enum):
+class ProblemSeverity(StrEnum):
     NOTE = "NOTE"
     WARNING = "WARNING"
     ERROR = "ERROR"
