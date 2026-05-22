@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from collections.abc import Iterator
 import difflib
 import logging
 import os
@@ -27,13 +28,13 @@ log = logging.getLogger(__name__)
 SCRIPT_ROOT = os.path.dirname(__file__)
 
 
-def build_expected_output(root: str, out: str) -> list[str]:
+def build_expected_output(root: str, out: str) -> Iterator[str]:
     with open(os.path.join(SCRIPT_ROOT, 'expected_test_cmakelists.txt')) as file:
         for line in file.readlines():
             yield line.replace("{root}", root).replace("{out}", out)
 
 
-def build_actual_output(root: str, out: str) -> list[str]:
+def build_actual_output(root: str, out: str) -> Iterator[str]:
     # Fake out that we have a project root
     binary = os.path.join(SCRIPT_ROOT, '../gn_to_cmakelists.py')
     project = os.path.join(SCRIPT_ROOT, "test_project.json")
