@@ -73,10 +73,10 @@ AttributeReadRequest: typing.TypeAlias = (
     | ClusterAttribute.TypedAttributePath  # Directly specified attribute path
 )
 
-AttributeReadRequestList = typing.Optional[list[AttributeReadRequest]]
+AttributeReadRequestList: typing.TypeAlias = list[AttributeReadRequest] | None
 
 # Type alias for subscription target specifications
-SubscriptionTargetList = list[tuple[int, ClusterObjects.Cluster | ClusterObjects.ClusterAttributeDescriptor]]
+SubscriptionTargetList: typing.TypeAlias = list[tuple[int, ClusterObjects.Cluster | ClusterObjects.ClusterAttributeDescriptor]]
 
 
 # Defined in $CHIP_ROOT/src/lib/core/CHIPError.h

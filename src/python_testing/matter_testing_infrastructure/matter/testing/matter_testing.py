@@ -210,7 +210,7 @@ class BackgroundWildcardSubscriptionCache:
         _lock: Threading lock for thread-safe access to internal data structures.
     """
 
-    def __init__(self, excluded_attribute_ids: Optional[frozenset[tuple[int, int]]] = None):
+    def __init__(self, excluded_attribute_ids: frozenset[tuple[int, int]] | None = None):
         """Initialize the background wildcard subscription cache.
 
         Parameters:
@@ -219,7 +219,7 @@ class BackgroundWildcardSubscriptionCache:
                 XmlAttribute.changes_omitted / XmlAttribute.quieter_reporting flags in
                 spec_parsing to exclude C- and Q-quality attributes from subscription checks.
         """
-        self._subscription: Optional[Any] = None
+        self._subscription: Any | None = None
         self._excluded_attribute_ids: frozenset[tuple[int, int]] = excluded_attribute_ids or frozenset()
         self._q: queue.Queue = queue.Queue()
         self._attribute_reports: dict[tuple, list[AttributeValue]] = {}
@@ -407,7 +407,7 @@ class BackgroundWildcardSubscriptionCache:
         with self._lock:
             return list(self._attribute_reports.keys())
 
-    def get_latest_value(self, endpoint_id: int, cluster_id: int, attr_id: int) -> Optional[Any]:
+    def get_latest_value(self, endpoint_id: int, cluster_id: int, attr_id: int) -> Any | None:
         """Return the most recently reported value for the given attribute, or None if not yet seen.
 
         Parameters:
@@ -525,7 +525,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         # List of accumulated problems across all tests
         self.problems = []
         self.is_commissioning = False
-        self.cached_steps: dict[str, Optional[list[TestStep]]] = {}
+        self.cached_steps: dict[str, list[TestStep] | None] = {}
         self.cleanup_config = TestCleanupConfig()
         self._extra_controllers: list[ChipDeviceCtrl.ChipDeviceController] = []
         self._extra_cas: list[matter.CertificateAuthority.CertificateAuthority] = []
@@ -690,7 +690,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             or getattr(self, "disable_wildcard_subscription", False)
         )
 
-    def _effective_verify_wildcard_subscription(self, verify_wildcard_subscription: Optional[bool]) -> bool:
+    def _effective_verify_wildcard_subscription(self, verify_wildcard_subscription: bool | None) -> bool:
         """Resolve whether to compare a read against the wildcard subscription cache."""
         if verify_wildcard_subscription is not None:
             return verify_wildcard_subscription
@@ -2185,7 +2185,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             raise  # Help mypy understand this never returns
 
     async def read_single_attribute(
-            self, dev_ctrl: ChipDeviceCtrl.ChipDeviceController, node_id: int, endpoint: int, attribute: type[ClusterObjects.ClusterAttributeDescriptor], fabricFiltered: bool = True, verify_wildcard_subscription: Optional[bool] = None) -> object:
+            self, dev_ctrl: ChipDeviceCtrl.ChipDeviceController, node_id: int, endpoint: int, attribute: type[ClusterObjects.ClusterAttributeDescriptor], fabricFiltered: bool = True, verify_wildcard_subscription: bool | None = None) -> object:
         """Read a single attribute value from a device.
 
         Args:
@@ -2226,8 +2226,8 @@ class MatterBaseTest(base_test.BaseTestClass):
 
     async def read_single_attribute_all_endpoints(
             self, cluster: ClusterObjects.Cluster, attribute: type[ClusterObjects.ClusterAttributeDescriptor],
-            dev_ctrl: Optional[ChipDeviceCtrl.ChipDeviceController] = None, node_id: Optional[int] = None,
-            verify_wildcard_subscription: Optional[bool] = None):
+            dev_ctrl: ChipDeviceCtrl.ChipDeviceController | None = None, node_id: int | None = None,
+            verify_wildcard_subscription: bool | None = None):
         """Reads a single attribute of a specified cluster across all endpoints.
 
         Args:
@@ -2277,7 +2277,7 @@ class MatterBaseTest(base_test.BaseTestClass):
 
     async def read_single_attribute_check_success(
             self, cluster: ClusterObjects.Cluster, attribute: type[ClusterObjects.ClusterAttributeDescriptor],
-            dev_ctrl: Optional[ChipDeviceCtrl.ChipDeviceController] = None, node_id: Optional[int] = None, endpoint: Optional[int] = None, fabric_filtered: bool = True, assert_on_error: bool = True, test_name: str = "", payloadCapability: int = ChipDeviceCtrl.TransportPayloadCapability.MRP_PAYLOAD, verify_wildcard_subscription: Optional[bool] = None) -> object:
+            dev_ctrl: ChipDeviceCtrl.ChipDeviceController | None = None, node_id: int | None = None, endpoint: int | None = None, fabric_filtered: bool = True, assert_on_error: bool = True, test_name: str = "", payloadCapability: int = ChipDeviceCtrl.TransportPayloadCapability.MRP_PAYLOAD, verify_wildcard_subscription: bool | None = None) -> object:
         if dev_ctrl is None:
             dev_ctrl = self.default_controller
         if node_id is None:
@@ -2332,10 +2332,10 @@ class MatterBaseTest(base_test.BaseTestClass):
             self,
             attribute: type[ClusterObjects.ClusterAttributeDescriptor],
             read_value: Any,
-            endpoint_id: Optional[int] = None,
+            endpoint_id: int | None = None,
             test_name: str = "",
             assert_on_error: bool = True,
-            dev_ctrl: Optional[ChipDeviceCtrl.ChipDeviceController] = None) -> bool:
+            dev_ctrl: ChipDeviceCtrl.ChipDeviceController | None = None) -> bool:
         """Compare a freshly-read attribute value against the background wildcard subscription cache.
 
         Called automatically from the base-class read helpers so any single-attribute read

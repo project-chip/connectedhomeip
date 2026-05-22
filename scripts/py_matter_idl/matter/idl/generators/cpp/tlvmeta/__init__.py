@@ -14,7 +14,6 @@
 # limitations under the License.
 import os
 from dataclasses import dataclass
-from typing import Optional
 from collections.abc import Generator
 
 from matter.idl.generators import CodeGenerator

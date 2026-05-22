@@ -24,7 +24,7 @@ import re
 from abc import ABC, abstractmethod
 from configparser import ConfigParser
 from ctypes import CFUNCTYPE, POINTER, c_bool, c_char, c_char_p, c_uint16, c_void_p, py_object
-from typing import Any, Optional
+from typing import Any
 
 from ..native import GetLibraryHandle
 

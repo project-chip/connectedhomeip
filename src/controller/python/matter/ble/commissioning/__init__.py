@@ -17,7 +17,6 @@
 from dataclasses import dataclass
 from enum import Enum
 from queue import Queue
-from typing import Optional
 
 from ...internal import GetCommissioner
 from ...internal.commissioner import PairingState

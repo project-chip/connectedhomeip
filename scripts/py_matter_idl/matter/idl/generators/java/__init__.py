@@ -17,7 +17,6 @@ import dataclasses
 import enum
 import logging
 import os
-from typing import Optional
 
 from matter.idl.generators import CodeGenerator
 from matter.idl.generators.filters import upfirst

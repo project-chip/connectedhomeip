@@ -20,7 +20,6 @@ import functools
 import glob
 import os
 import platform
-import typing
 from dataclasses import dataclass
 
 import construct  # type: ignore

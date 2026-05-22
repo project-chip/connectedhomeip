@@ -47,7 +47,7 @@ LOGGER = logging.getLogger(__name__)
 # Type alias maintained for constants access; actual values are ints at runtime
 ACCESS_CONTROL_PRIVILEGE_ENUM = Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum
 
-_PRIVILEGE_STR: dict[Optional[int], str] = {
+_PRIVILEGE_STR: dict[int | None, str] = {
     None: "N/A",
     ACCESS_CONTROL_PRIVILEGE_ENUM.kView: "V",
     ACCESS_CONTROL_PRIVILEGE_ENUM.kOperate: "O",
@@ -69,7 +69,7 @@ def get_access_privilege_or_unknown(access_value: int | None) -> int:
     return ACCESS_CONTROL_PRIVILEGE_ENUM.kUnknownEnumValue
 
 
-def _parse_numeric_constraint_value(value_str: str) -> Optional[int | float]:
+def _parse_numeric_constraint_value(value_str: str) -> int | float | None:
     """Parse a numeric constraint value, handling integers, floats, and hex strings.
 
     Returns None if the value is not purely numeric (e.g., 'MaxMeasuredValue - 1'),
@@ -104,7 +104,7 @@ class DataTypeEnum(StrEnum):
 class ConstraintReference:
     """Reference to another attribute for dynamic constraint values."""
     attribute: str
-    field: Optional[str] = None
+    field: str | None = None
 
     def __str__(self):
         if self.field:
@@ -115,18 +115,18 @@ class ConstraintReference:
 @dataclass
 class Constraints:
     """Constraint information for attributes, commands, and device types."""
-    min_value: Optional[int | float] = None
-    max_value: Optional[int | float] = None
-    min_length: Optional[int] = None
-    max_length: Optional[int] = None
-    min_count: Optional[int] = None
-    max_count: Optional[int] = None
+    min_value: int | float | None = None
+    max_value: int | float | None = None
+    min_length: int | None = None
+    max_length: int | None = None
+    min_count: int | None = None
+    max_count: int | None = None
     # Dynamic constraint references
-    min_value_ref: Optional[ConstraintReference] = None
-    max_value_ref: Optional[ConstraintReference] = None
-    min_count_ref: Optional[ConstraintReference] = None
-    max_count_ref: Optional[ConstraintReference] = None
-    allowed: Optional[list[str]] = None
+    min_value_ref: ConstraintReference | None = None
+    max_value_ref: ConstraintReference | None = None
+    min_count_ref: ConstraintReference | None = None
+    max_count_ref: ConstraintReference | None = None
+    allowed: list[str] | None = None
 
     def has_constraints(self) -> bool:
         """Check if any constraints are defined."""
@@ -181,7 +181,7 @@ class XmlDataTypeComponent:
     type_info: str | None = None  # Data type for struct fields
     is_optional: bool = False  # Whether field is optional
     is_nullable: bool = False  # Whether field can be null
-    constraints: Optional[Constraints] = None  # For min/max values, lists, etc.
+    constraints: Constraints | None = None  # For min/max values, lists, etc.
 
 
 @dataclass
@@ -220,7 +220,7 @@ class XmlAttribute:
     quieter_reporting: bool = False  # Q quality: attribute may be reported less frequently than normal
     scene: bool = False   # S quality: attribute value is stored/restored by the Scenes cluster
     atomic_write: bool = False  # Atomic Write quality: written via atomic transaction; staged values not reported until commit
-    constraints: Optional[Constraints] = None
+    constraints: Constraints | None = None
 
     def access_string(self):
         read_marker = "R" if self.read_access is not ACCESS_CONTROL_PRIVILEGE_ENUM.kUnknownEnumValue else ""
@@ -733,7 +733,7 @@ class ClusterParser:
         quality = xml_attribute.find('./quality')
         return quality is not None and quality.get('atomicWrite', 'false').lower() == 'true'
 
-    def _parse_field_constraints(self, xml_field: ElementTree.Element) -> Optional[Constraints]:
+    def _parse_field_constraints(self, xml_field: ElementTree.Element) -> Constraints | None:
         """
         Parse constraint information from XML field element.
 
@@ -751,7 +751,7 @@ class ClusterParser:
             return None
 
         # Helper to parse integer values (for counts)
-        def parse_int_value(value_str: str) -> Optional[int]:
+        def parse_int_value(value_str: str) -> int | None:
             """Parse integer constraint value (for counts)."""
             try:
                 return int(value_str, 0)
@@ -934,7 +934,7 @@ class ClusterParser:
                                         conformance=conformance)
         return features
 
-    def parse_attribute_constraints(self, element: ElementTree.Element) -> Optional[Constraints]:
+    def parse_attribute_constraints(self, element: ElementTree.Element) -> Constraints | None:
         """Parse constraint information from an attribute element.
 
         Args:
@@ -949,7 +949,7 @@ class ClusterParser:
             return None
 
         # Helper to parse constraint reference from attribute value or element
-        def parse_reference(elem: ElementTree.Element, value_str: Optional[str] = None) -> Optional[ConstraintReference]:
+        def parse_reference(elem: ElementTree.Element, value_str: str | None = None) -> ConstraintReference | None:
             """Parse dynamic constraint reference to another attribute."""
             # First try to find a child attribute element
             attr_ref = elem.find('./attribute')

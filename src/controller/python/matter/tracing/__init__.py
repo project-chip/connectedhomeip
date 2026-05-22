@@ -16,7 +16,6 @@
 
 import ctypes
 from enum import Enum, auto
-from typing import Optional
 
 from ..native import GetLibraryHandle, HandleFlags, NativeLibraryHandleMethodArguments, PyChipError
 

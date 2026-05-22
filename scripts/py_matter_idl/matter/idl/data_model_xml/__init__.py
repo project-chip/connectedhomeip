@@ -16,7 +16,6 @@ import logging
 import typing
 import xml.sax.handler
 from dataclasses import dataclass
-from typing import Optional
 
 from matter.idl.data_model_xml.handlers import Context, DataModelXmlHandler
 from matter.idl.matter_idl_types import Idl

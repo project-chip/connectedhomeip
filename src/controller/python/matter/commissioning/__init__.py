@@ -19,7 +19,6 @@ import abc
 import dataclasses
 import enum
 import os
-from typing import Optional
 
 ROOT_ENDPOINT_ID = 0
 

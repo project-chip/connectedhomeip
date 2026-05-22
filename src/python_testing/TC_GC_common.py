@@ -305,7 +305,7 @@ class OperateOnlyCommand:
     command_object: Clusters.ClusterObjects.ClusterCommand
 
 
-async def get_operate_only_commands(dev_ctrl: ChipDeviceController, node_id: int, exclude_ep0: bool = True, endpoint_id_to_search: Optional[int] = None) -> dict[int, list[OperateOnlyCommand]]:
+async def get_operate_only_commands(dev_ctrl: ChipDeviceController, node_id: int, exclude_ep0: bool = True, endpoint_id_to_search: int | None = None) -> dict[int, list[OperateOnlyCommand]]:
     """
     Reads all AcceptedCommandList attributes and the SpecificationVersion to determine all
     commands that only require Operate privilege.

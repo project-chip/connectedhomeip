@@ -64,7 +64,7 @@ class Stream(BaseModel):
     id: int
     strict_mode: bool = True
     interface: SupportedIngestInterface
-    expected_track_names: Optional[list[str]] = None
+    expected_track_names: list[str] | None = None
     # Keep track of the various sessions encountered
     sessions: list[Session] = []
     # tracking uploads with unique file paths

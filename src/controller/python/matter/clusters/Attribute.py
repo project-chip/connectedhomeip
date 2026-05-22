@@ -704,7 +704,7 @@ class AsyncReadTransaction:
         events: list[ClusterEvent]
         tlvAttributes: dict[int, Any]
 
-    def __init__(self, future: Future, eventLoop, devCtrl, returnClusterObject: bool, nodeId: Optional[int] = None):
+    def __init__(self, future: Future, eventLoop, devCtrl, returnClusterObject: bool, nodeId: int | None = None):
         self._event_loop = eventLoop
         self._future = future
         self._subscription_handler = None
@@ -713,7 +713,7 @@ class AsyncReadTransaction:
         self._cache = AttributeCache(returnClusterObject=returnClusterObject)
         self._changedPathSet: set[AttributePath] = set()
         self._pReadClient = None
-        self._resultError: Optional[PyChipError] = None
+        self._resultError: PyChipError | None = None
         self._notify_subscription_still_active_callback = None
         self._nodeId = nodeId
 
