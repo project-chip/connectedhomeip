@@ -21,7 +21,6 @@
 #      This file is utility for Chip
 #
 
-from __future__ import absolute_import, print_function
 
 import binascii
 from ctypes import c_byte, c_void_p, cast, memmove

@@ -22,7 +22,6 @@
 #      BLE Central support for Chip Device Controller via OSX CoreBluetooth APIs.
 #
 
-from __future__ import absolute_import, print_function
 
 import logging
 import queue
