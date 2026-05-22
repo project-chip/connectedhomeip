@@ -83,59 +83,6 @@ void RefrigeratorAndTemperatureControlledCabinetMode::Shutdown()
     gTccModeDelegate.reset();
 }
 
-chip::Protocols::InteractionModel::Status
-chefRefrigeratorAndTemperatureControlledCabinetModeExternalReadCallback(chip::EndpointId endpointId, chip::ClusterId clusterId,
-                                                                        const EmberAfAttributeMetadata * attributeMetadata,
-                                                                        uint8_t * buffer, uint16_t maxReadLength)
-{
-    chip::Protocols::InteractionModel::Status ret = chip::Protocols::InteractionModel::Status::Success;
-    chip::AttributeId attributeId                 = attributeMetadata->attributeId;
-
-    switch (attributeId)
-    {
-    case chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Attributes::CurrentMode::Id: {
-        *buffer = gTccModeInstance->GetCurrentMode();
-        ChipLogDetail(DeviceLayer, "Reading RunMode CurrentMode : %d", static_cast<int>(attributeId));
-    }
-    break;
-    default:
-        ret = chip::Protocols::InteractionModel::Status::UnsupportedRead;
-        ChipLogDetail(DeviceLayer, "Unsupported attributeId %d from reading RefrigeratorAndTemperatureControlledCabinetMode",
-                      static_cast<int>(attributeId));
-        break;
-    }
-
-    return ret;
-}
-
-chip::Protocols::InteractionModel::Status chefRefrigeratorAndTemperatureControlledCabinetModeExternalWriteCallback(
-    chip::EndpointId endpointId, chip::ClusterId clusterId, const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer)
-{
-    VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1
-    VerifyOrDie(gTccModeInstance != nullptr);
-    chip::Protocols::InteractionModel::Status ret;
-    chip::AttributeId attributeId = attributeMetadata->attributeId;
-
-    switch (attributeId)
-    {
-    case chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Attributes::CurrentMode::Id: {
-        uint8_t m = static_cast<uint8_t>(buffer[0]);
-        ret       = gTccModeInstance->UpdateCurrentMode(m);
-        if (chip::Protocols::InteractionModel::Status::Success != ret)
-        {
-            ChipLogError(DeviceLayer, "Invalid Attribute Update status: %d", static_cast<int>(ret));
-        }
-    }
-    break;
-    default:
-        ret = chip::Protocols::InteractionModel::Status::UnsupportedWrite;
-        ChipLogError(DeviceLayer, "Unsupported Writng Attribute ID: %d", static_cast<int>(attributeId));
-        break;
-    }
-
-    return ret;
-}
-
 void MatterRefrigeratorAndTemperatureControlledCabinetModeClusterInitCallback(chip::EndpointId endpointId)
 {
     VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1.

@@ -282,31 +282,10 @@ Protocols::InteractionModel::Status emberAfExternalAttributeReadCallback(Endpoin
     case chip::app::Clusters::ActivatedCarbonFilterMonitoring::Id:
         return chefResourceMonitoringExternalReadCallback(endpoint, clusterId, attributeMetadata, buffer, maxReadLength);
 #endif
-#ifdef MATTER_DM_PLUGIN_RVC_RUN_MODE_SERVER
-    case chip::app::Clusters::RvcRunMode::Id:
-        return chefRvcRunModeReadCallback(endpoint, clusterId, attributeMetadata, buffer, maxReadLength);
-#endif
-#ifdef MATTER_DM_PLUGIN_RVC_CLEAN_MODE_SERVER
-    case chip::app::Clusters::RvcCleanMode::Id:
-        return chefRvcCleanModeReadCallback(endpoint, clusterId, attributeMetadata, buffer, maxReadLength);
-#endif
 #ifdef MATTER_DM_PLUGIN_RVC_OPERATIONAL_STATE_SERVER
     case chip::app::Clusters::RvcOperationalState::Id:
         return chefRvcOperationalStateReadCallback(endpoint, clusterId, attributeMetadata, buffer, maxReadLength);
 #endif
-#ifdef MATTER_DM_PLUGIN_REFRIGERATOR_AND_TEMPERATURE_CONTROLLED_CABINET_MODE_SERVER
-    case chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Id:
-        return chefRefrigeratorAndTemperatureControlledCabinetModeExternalReadCallback(endpoint, clusterId, attributeMetadata,
-                                                                                       buffer, maxReadLength);
-#endif
-#ifdef MATTER_DM_PLUGIN_DISHWASHER_MODE_SERVER
-    case chip::app::Clusters::DishwasherMode::Id:
-        return chefDishwasherModeReadCallback(endpoint, clusterId, attributeMetadata, buffer, maxReadLength);
-#endif // MATTER_DM_PLUGIN_DISHWASHER_MODE_SERVER
-#ifdef MATTER_DM_PLUGIN_LAUNDRY_WASHER_MODE_SERVER
-    case chip::app::Clusters::LaundryWasherMode::Id:
-        return chefLaundryWasherModeReadCallback(endpoint, clusterId, attributeMetadata, buffer, maxReadLength);
-#endif // MATTER_DM_PLUGIN_LAUNDRY_WASHER_MODE_SERVER
 #ifdef MATTER_DM_PLUGIN_OPERATIONAL_STATE_SERVER
     case chip::app::Clusters::OperationalState::Id:
         return chefOperationalStateReadCallback(endpoint, clusterId, attributeMetadata, buffer, maxReadLength);
@@ -364,31 +343,10 @@ Protocols::InteractionModel::Status emberAfExternalAttributeWriteCallback(Endpoi
     case chip::app::Clusters::ActivatedCarbonFilterMonitoring::Id:
         return chefResourceMonitoringExternalWriteCallback(endpoint, clusterId, attributeMetadata, buffer);
 #endif
-#ifdef MATTER_DM_PLUGIN_RVC_RUN_MODE_SERVER
-    case chip::app::Clusters::RvcRunMode::Id:
-        return chefRvcRunModeWriteCallback(endpoint, clusterId, attributeMetadata, buffer);
-#endif
-#ifdef MATTER_DM_PLUGIN_RVC_CLEAN_MODE_SERVER
-    case chip::app::Clusters::RvcCleanMode::Id:
-        return chefRvcCleanModeWriteCallback(endpoint, clusterId, attributeMetadata, buffer);
-#endif
 #ifdef MATTER_DM_PLUGIN_RVC_OPERATIONAL_STATE_SERVER
     case chip::app::Clusters::RvcOperationalState::Id:
         return chefRvcOperationalStateWriteCallback(endpoint, clusterId, attributeMetadata, buffer);
 #endif
-#ifdef MATTER_DM_PLUGIN_REFRIGERATOR_AND_TEMPERATURE_CONTROLLED_CABINET_MODE_SERVER
-    case chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Id:
-        return chefRefrigeratorAndTemperatureControlledCabinetModeExternalWriteCallback(endpoint, clusterId, attributeMetadata,
-                                                                                        buffer);
-#endif
-#ifdef MATTER_DM_PLUGIN_DISHWASHER_MODE_SERVER
-    case chip::app::Clusters::DishwasherMode::Id:
-        return chefDishwasherModeWriteCallback(endpoint, clusterId, attributeMetadata, buffer);
-#endif // MATTER_DM_PLUGIN_DISHWASHER_MODE_SERVER
-#ifdef MATTER_DM_PLUGIN_LAUNDRY_WASHER_MODE_SERVER
-    case chip::app::Clusters::LaundryWasherMode::Id:
-        return chefLaundryWasherModeWriteCallback(endpoint, clusterId, attributeMetadata, buffer);
-#endif // MATTER_DM_PLUGIN_LAUNDRY_WASHER_MODE_SERVER
 #ifdef MATTER_DM_PLUGIN_OPERATIONAL_STATE_SERVER
     case chip::app::Clusters::OperationalState::Id:
         return chefOperationalStateWriteCallback(endpoint, clusterId, attributeMetadata, buffer);
