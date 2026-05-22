@@ -9393,7 +9393,7 @@
           ]
         }
       ]
-    },
+    }
   ],
   "endpoints": [
     {
@@ -9475,6 +9475,6 @@
       "endpointId": 9,
       "networkId": 0,
       "parentEndpointIdentifier": 0
-    },
+    }
   ]
 }
