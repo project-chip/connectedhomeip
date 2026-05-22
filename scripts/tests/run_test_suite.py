@@ -27,7 +27,7 @@ import time
 import warnings
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Protocol
+from typing import Any
 
 import chiptest
 import click
@@ -291,16 +291,6 @@ def cmd_list(context: click.Context) -> None:
             tags = f" ({tags})"
 
         print("%s%s" % (test.name, tags))
-
-
-class Terminable(Protocol):
-    """Protocol for resources that can be explicitly terminated or cleaned up.
-
-    Implement this protocol for any class that manages external resources (such as subprocesses, network connections, or files) that
-    require explicit cleanup. The `terminate` method should perform any necessary actions to release or clean up the resource.
-    """
-
-    def terminate(self) -> None: ...
 
 
 class CommissioningMethod(enum.StrEnum):
