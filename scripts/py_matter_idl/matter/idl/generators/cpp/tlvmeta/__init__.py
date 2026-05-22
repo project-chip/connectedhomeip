@@ -258,9 +258,9 @@ def IndexInTable(name: Optional[str], table: List[Table]) -> str:
     for idx, t in enumerate(table):
         if t.full_name == name:
             # Index skipping hard-coded items
-            return "%d" % (idx + 2)
+            return str(idx + 2)
 
-    raise Exception("Name {!r} not found in table".format(name))
+    raise Exception(f"Name {name!r} not found in table")
 
 
 class TLVMetaDataGenerator(CodeGenerator):

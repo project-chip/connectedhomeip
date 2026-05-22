@@ -142,7 +142,7 @@ Commands:
             print(usage)
             sys.exit(-1)
         ch = ComputeCheckChar(sys.argv[2])
-        print("%s%c" % (sys.argv[2], ch))
+        print(f"{sys.argv[2]}{ch}")
     elif (sys.argv[1] == "verify"):
         if (len(sys.argv) < 3):
             print(usage)
@@ -166,7 +166,7 @@ Commands:
             sys.stdout.write("    ")
             for y in range(0, base):
                 o = DihedralMultiply(x, y, n)
-                sys.stdout.write("%2d, " % o)
+                sys.stdout.write(f"{o:2d}, ")
             sys.stdout.write("\n")
     else:
         print(usage)

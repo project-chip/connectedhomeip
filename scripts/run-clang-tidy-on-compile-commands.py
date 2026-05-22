@@ -317,11 +317,7 @@ class ClangTidyRunner:
             "Storing temporary fix files into '%s'", self.fixes_temporary_file_dir.name
         )
         for idx, e in enumerate(self.entries):
-            e.ExportFixesTo(
-                os.path.join(
-                    self.fixes_temporary_file_dir.name, "fixes%d.yaml" % (idx + 1,)
-                )
-            )
+            e.ExportFixesTo(os.path.join(self.fixes_temporary_file_dir.name, f"fixes{idx + 1}.yaml"))
 
     def SetChecks(self, checks: str):
         for e in self.entries:

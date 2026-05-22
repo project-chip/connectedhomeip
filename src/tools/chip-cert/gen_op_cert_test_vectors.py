@@ -492,8 +492,8 @@ def full_cert_arrays(cert_file: str, array_name: str) -> tuple[str, str]:
 
 def start_test_cases_array(array_name: str, array_size: int) -> tuple[str, str]:
     """Returns strings with the headers for the test cases array"""
-    h = 'extern const ByteSpan %s[%d];\n\n' % (array_name, array_size)
-    c = 'const ByteSpan %s[%d] = {\n' % (array_name, array_size)
+    h = f'extern const ByteSpan {array_name}[{array_size}];\n\n'
+    c = f'const ByteSpan {array_name}[{array_size}] = {{\n'
     return [h, c]
 
 

@@ -46,8 +46,7 @@ class LintError:
     def __init__(self, text: str, location: Optional[LocationInFile] = None):
         self.message = text
         if location:
-            self.message += " at %s:%d:%d" % (location.file_name,
-                                              location.line, location.column)
+            self.message += f" at {location.file_name}:{location.line}:{location.column}"
 
     def __str__(self):
         return self.message
@@ -190,16 +189,18 @@ class ClusterValidationRule(ErrorAccumulatingRule):
                     continue
 
                 if requirement.cluster_code not in cluster_codes:
-                    self._AddLintError("Endpoint %d DOES NOT expose cluster %s (%d)" %
-                                       (requirement.endpoint_id, requirement.cluster_name, requirement.cluster_code), location=None)
+                    self._AddLintError(
+                        f"Endpoint {requirement.endpoint_id} DOES NOT expose cluster {requirement.cluster_name} ({requirement.cluster_code})",
+                        location=None)
 
             for requirement in self._rejected_clusters:
                 if requirement.endpoint_id != endpoint.number:
                     continue
 
                 if requirement.cluster_code in cluster_codes:
-                    self._AddLintError("Endpoint %d EXPOSES cluster %s (%d)" %
-                                       (requirement.endpoint_id, requirement.cluster_name, requirement.cluster_code), location=None)
+                    self._AddLintError(
+                        f"Endpoint {requirement.endpoint_id} EXPOSES cluster {requirement.cluster_name} ({requirement.cluster_code})",
+                        location=None)
 
 
 class RequiredAttributesRule(ErrorAccumulatingRule):
@@ -293,10 +294,9 @@ class RequiredAttributesRule(ErrorAccumulatingRule):
                         continue
 
                     if check.code not in attribute_codes:
-                        self._AddLintError("EP%d:%s does not expose %s(%d) attribute" %
-                                           (endpoint.number, cluster.name,
-                                            check.name, check.code),
-                                           self._ParseLocation(cluster.parse_meta))
+                        self._AddLintError(
+                            f"EP{endpoint.number}:{cluster.name} does not expose {check.name}({check.code}) attribute",
+                            self._ParseLocation(cluster.parse_meta))
 
                 # Lint rejected attributes
                 for check in self._deny_attributes:
@@ -341,7 +341,7 @@ class RequiredCommandsRule(ErrorAccumulatingRule):
         if self._mandatory_commands:
             result += "  mandatory_commands:\n"
             for key, value in self._mandatory_commands.items():
-                result += "    - cluster %d:\n" % key
+                result += f"    - cluster {key}:\n"
                 for requirement in value:
                     result += "        - {!r}\n".format(requirement)
 
@@ -371,7 +371,6 @@ class RequiredCommandsRule(ErrorAccumulatingRule):
                     continue  # command exists
 
                 self._AddLintError(
-                    "Cluster %s does not define mandatory command %s(%d)" % (
-                        cluster.name, requirement.command_name, requirement.command_code),
+                    f"Cluster {cluster.name} does not define mandatory command {requirement.command_name}({requirement.command_code})",
                     self._ParseLocation(cluster.parse_meta)
                 )

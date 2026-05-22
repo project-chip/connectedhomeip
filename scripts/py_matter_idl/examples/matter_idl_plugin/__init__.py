@@ -182,8 +182,7 @@ def toFieldTag(field: Field):
 def toFieldComment(field: Field):
     protobufType = toProtobufType(field.data_type.name)
     typeNum = EncodingDataType.fromType(protobufType)
-    return "/** %s Type: %d IsList: %d FieldId: %d */" % (
-        field.data_type.name, typeNum, field.is_list, field.code)
+    return f"/** {field.data_type.name} Type: {typeNum} IsList: {field.is_list:d} FieldId: {field.code} */"
 
 
 class CustomGenerator(CodeGenerator):

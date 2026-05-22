@@ -135,7 +135,7 @@ class TC_RVCRUNM_2_1(MatterBaseTest):
 
         rvcRunCodes = [code.value for code in Clusters.RvcRunMode.Enums.StatusCode]
 
-        self.print_step(4, "Send ChangeToMode command with NewMode set to %d" % (old_current_mode))
+        self.print_step(4, f"Send ChangeToMode command with NewMode set to {old_current_mode}")
 
         ret = await self.send_change_to_mode_cmd(newMode=old_current_mode)
         asserts.assert_true(ret.status == CommonCodes.SUCCESS.value, "Changing the mode to the current mode should be a no-op")
@@ -144,21 +144,22 @@ class TC_RVCRUNM_2_1(MatterBaseTest):
         can_manually_control = self.check_pics("RVCRUNM.S.M.CAN_MANUALLY_CONTROLLED")
         if can_test_mode_failure and can_manually_control:
             asserts.assert_true(self.mode_fail in modes,
-                                "The MODE_CHANGE_FAIL PIXIT value (%d) is not a supported mode" % (self.mode_fail))
-            self.print_step(5, "Manually put the device in a state from which it will FAIL to transition to mode %d" % (self.mode_fail))
+                                f"The MODE_CHANGE_FAIL PIXIT value ({self.mode_fail}) is not a supported mode")
+            self.print_step(5, f"Manually put the device in a state from which it will FAIL to transition to mode {self.mode_fail}")
             if self.is_ci:
                 print("Change to RVC Run mode Cleaning")
                 await self.send_change_to_mode_cmd(newMode=1)
             else:
                 self.wait_for_user_input(
-                    prompt_msg="Manually put the device in a state from which it will FAIL to transition to mode %d, and press Enter when ready." % (self.mode_fail))
+                    prompt_msg=f"Manually put the device in a state from which it will FAIL to transition to mode {self.mode_fail},"
+                    " and press Enter when ready.")
 
             self.print_step(6, "Read CurrentMode attribute")
             old_current_mode = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
 
-            log.info("CurrentMode: {}".format(old_current_mode))
+            log.info(f"CurrentMode: {old_current_mode}")
 
-            self.print_step(7, "Send ChangeToMode command with NewMode set to %d" % (self.mode_fail))
+            self.print_step(7, f"Send ChangeToMode command with NewMode set to {self.mode_fail}")
 
             ret = await self.send_change_to_mode_cmd(newMode=self.mode_fail)
             st = ret.status
@@ -166,48 +167,49 @@ class TC_RVCRUNM_2_1(MatterBaseTest):
             is_err_code = (st == CommonCodes.GENERIC_FAILURE.value) or (
                 st == CommonCodes.INVALID_IN_MODE.value) or (st in rvcRunCodes) or is_mfg_code
             asserts.assert_true(
-                is_err_code, "Changing to mode %d must fail due to the current state of the device" % (self.mode_fail))
+                is_err_code, f"Changing to mode {self.mode_fail} must fail due to the current state of the device")
             st_text_len = len(ret.statusText)
-            asserts.assert_true(st_text_len in range(1, 65), "StatusText length (%d) must be between 1 and 64" % (st_text_len))
+            asserts.assert_true(st_text_len in range(1, 65), f"StatusText length ({st_text_len}) must be between 1 and 64")
 
             self.print_step(8, "Read CurrentMode attribute")
             current_mode = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
 
-            log.info("CurrentMode: {}".format(current_mode))
+            log.info(f"CurrentMode: {current_mode}")
 
             asserts.assert_true(current_mode == old_current_mode, "CurrentMode changed after failed ChangeToMode command!")
 
-        self.print_step(9, "Manually put the device in a state from which it will SUCCESSFULLY transition to mode %d" % (self.mode_ok))
+        self.print_step(9, f"Manually put the device in a state from which it will SUCCESSFULLY transition to mode {self.mode_ok}")
         if self.is_ci:
             print("Continuing...")
         else:
             self.wait_for_user_input(
-                prompt_msg="Manually put the device in a state from which it will SUCCESSFULLY transition to mode %d, and press Enter when ready." % (self.mode_ok))
+                prompt_msg=f"Manually put the device in a state from which it will SUCCESSFULLY transition to mode {self.mode_ok}, "
+                "and press Enter when ready.")
 
         self.print_step(10, "Read CurrentMode attribute")
         old_current_mode = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
 
-        log.info("CurrentMode: {}".format(old_current_mode))
+        log.info(f"CurrentMode: {old_current_mode}")
 
-        self.print_step(11, "Send ChangeToMode command with NewMode set to %d" % (self.mode_ok))
+        self.print_step(11, f"Send ChangeToMode command with NewMode set to {self.mode_ok}")
 
         ret = await self.send_change_to_mode_cmd(newMode=self.mode_ok)
         asserts.assert_true(ret.status == CommonCodes.SUCCESS.value,
-                            "Changing to mode %d must succeed due to the current state of the device" % (self.mode_ok))
+                            f"Changing to mode {self.mode_ok} must succeed due to the current state of the device")
 
         self.print_step(12, "Read CurrentMode attribute")
         current_mode = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
 
-        log.info("CurrentMode: {}".format(current_mode))
+        log.info(f"CurrentMode: {current_mode}")
 
         asserts.assert_true(current_mode == self.mode_ok,
                             "CurrentMode doesn't match the argument of the successful ChangeToMode command!")
 
-        self.print_step(13, "Send ChangeToMode command with NewMode set to %d" % (invalid_mode))
+        self.print_step(13, f"Send ChangeToMode command with NewMode set to {invalid_mode}")
 
         ret = await self.send_change_to_mode_cmd(newMode=invalid_mode)
         asserts.assert_true(ret.status == CommonCodes.UNSUPPORTED_MODE.value,
-                            "Attempt to change to invalid mode %d didn't fail as expected" % (invalid_mode))
+                            f"Attempt to change to invalid mode {invalid_mode} didn't fail as expected")
 
         self.print_step(14, "Read CurrentMode attribute")
         current_mode = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)

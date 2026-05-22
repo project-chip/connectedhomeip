@@ -48,7 +48,7 @@ def make_c_array(byte_string: bytes, name: str, linelen: int) -> str:
         return span
 
     byte_string = bytearray(byte_string)
-    output = "const uint8_t %s[%d] = {\n" % (name, len(byte_string))
+    output = f"const uint8_t {name}[{len(byte_string)}] = {{\n"
     while len(byte_string) > 0:
         current_line_bytes = _extract_front(byte_string, linelen)
         output += "    {},\n".format(", ".join(["0x{:02x}".format(b) for b in current_line_bytes]))

@@ -134,8 +134,8 @@ class TC_SC_3_6(MatterBaseTest):
         all_names = []
         for fabric_idx in range(num_fabrics_to_commission):
             for controller_idx in range(num_controllers_per_fabric):
-                all_names.append("RD%d%s" % (fabric_idx + 1, chr(ord('A') + controller_idx)))
-        log.info("Client names that will be used: {}".format(all_names))
+                all_names.append(f"RD{fabric_idx + 1}{chr(ord('A') + controller_idx)}")
+        log.info(f"Client names that will be used: {all_names}")
         client_list = []
 
         log.info("Pre-conditions: validate CapabilityMinima.CaseSessionsPerFabric >= 3")
@@ -166,8 +166,8 @@ class TC_SC_3_6(MatterBaseTest):
                 await dev_ctrl.SendCommand(
                     self.dut_node_id, 0, Clusters.OperationalCredentials.Commands.RemoveFabric(fabricIndex=fabric.fabricIndex))
 
-        log.info("Pre-conditions: use existing fabric to configure new fabrics so that total is %d fabrics" %
-                 num_fabrics_to_commission)
+        log.info(
+            f"Pre-conditions: use existing fabric to configure new fabrics so that total is {num_fabrics_to_commission} fabrics")
 
         # Generate Node IDs for subsequent controllers start at 200, follow 200, 300, ...
         node_ids = [200 + (i * 100) for i in range(num_controllers_per_fabric - 1)]
@@ -191,7 +191,7 @@ class TC_SC_3_6(MatterBaseTest):
         # Prepare clients for subsequent fabrics
         for i in range(num_fabrics_to_commission - 1):
             admin_index = 2 + i
-            log.info("Commissioning fabric %d/%d" % (admin_index, num_fabrics_to_commission))
+            log.info(f"Commissioning fabric {admin_index}/{num_fabrics_to_commission}")
             new_certificate_authority = self.certificate_authority_manager.NewCertificateAuthority()
             new_fabric_admin = new_certificate_authority.NewFabricAdmin(vendorId=0xFFF1, fabricId=1)
             new_admin_ctrl = new_fabric_admin.NewController(nodeId=dev_ctrl.nodeId)
@@ -230,9 +230,9 @@ class TC_SC_3_6(MatterBaseTest):
         resub_catchers = []
         output_queue = queue.Queue()
 
-        log.info("Step 1 (first part): Establish subscription with all %d clients" % len(client_list))
+        log.info(f"Step 1 (first part): Establish subscription with all {len(client_list)} clients")
         for sub_idx, client in enumerate(client_list):
-            log.info("Establishing subscription %d/%d from controller node %s" % (sub_idx + 1, len(client_list), client.name))
+            log.info(f"Establishing subscription {sub_idx + 1}/{len(client_list)} from controller node {client.name}")
 
             sub = await client.ReadAttribute(
                 nodeId=self.dut_node_id,

@@ -102,8 +102,7 @@ class TC_RVCRUNM_2_2(MatterBaseTest):
         run_mode = await self.read_mod_attribute_expect_success(
             Clusters.RvcRunMode,
             Clusters.RvcRunMode.Attributes.CurrentMode)
-        asserts.assert_true(run_mode == expected_mode,
-                            "Expected the current mode to be %i, got %i" % (expected_mode, run_mode))
+        asserts.assert_true(run_mode == expected_mode, f"Expected the current mode to be {expected_mode}, got {run_mode}")
 
     async def send_change_to_mode_cmd(self, new_mode) -> Clusters.Objects.RvcRunMode.Commands.ChangeToModeResponse:
         return await self.send_single_cmd(cmd=Clusters.Objects.RvcRunMode.Commands.ChangeToMode(newMode=new_mode),
@@ -156,7 +155,7 @@ class TC_RVCRUNM_2_2(MatterBaseTest):
             self.write_to_app_pipe({"Name": "Reset"})
         test_step = ("Manually put the device in a RVC Run Mode cluster mode with "
                      "the Idle(0x4000) mode tag and in a device state that allows changing to either "
-                     "of these modes: %i, %i" % (self.mode_a, self.mode_b))
+                     f"of these modes: {self.mode_a}, {self.mode_b}")
         self.print_step(2, test_step)
         if not self.is_ci:
             self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when ready.")

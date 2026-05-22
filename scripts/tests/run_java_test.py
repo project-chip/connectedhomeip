@@ -89,7 +89,7 @@ def main(app: str, app_args: str, tool_path: str, tool_cluster: str, tool_args: 
             log.info("Crash Log FileName: '%s'", fileName)
             with open(fileName, 'w') as f:
                 for i in range(1, 1000):
-                    data = "%d\n" % i
+                    data = f"{i}\n"
                     f.write(data)
 
         if '--network_diagnostics_log' in app_args:
@@ -98,7 +98,7 @@ def main(app: str, app_args: str, tool_path: str, tool_cluster: str, tool_args: 
             log.info("Network Diag Log FileName: '%s'", fileName)
             with open(fileName, 'w') as f:
                 for i in range(1, 500):
-                    data = "%d\n" % i
+                    data = f"{i}\n"
                     f.write(data)
 
         if '--end_user_support_log' in app_args:
@@ -107,7 +107,7 @@ def main(app: str, app_args: str, tool_path: str, tool_cluster: str, tool_args: 
             log.info("EndUser Support Log FileName: '%s'", fileName)
             with open(fileName, 'w') as f:
                 for i in range(1, 10):
-                    data = "%d\n" % i
+                    data = f"{i}\n"
                     f.write(data)
 
         app_process = subprocess.Popen(

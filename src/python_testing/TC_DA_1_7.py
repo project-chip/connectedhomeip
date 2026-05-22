@@ -202,7 +202,7 @@ class TC_DA_1_7(MatterBaseTest):
         log.info("Pre-condition: load all PAAs SKIDs")
         conf = self.matter_test_config
         paa_by_skid = load_all_paa(conf.paa_trust_store_path)
-        log.info("Found %d PAAs" % len(paa_by_skid))
+        log.info(f"Found {len(paa_by_skid)} PAAs")
 
         # Test plan step introducing test for each DUT
         self.step(f'{dut_index}')
@@ -229,7 +229,7 @@ class TC_DA_1_7(MatterBaseTest):
         pai_cert = load_der_x509_certificate(pai)
         pai_akid = extract_akid(pai_cert)
         if pai_akid not in paa_by_skid:
-            asserts.fail("DUT %d PAI (%s) not matched in PAA trust store" % (dut_index, hex_from_bytes(pai_akid)))
+            asserts.fail(f"DUT {dut_index} PAI ({hex_from_bytes(pai_akid)}) not matched in PAA trust store")
 
         filename, paa_cert = paa_by_skid[pai_akid]
         log.info("Matched PAA file {}, subject: {}".format(filename, paa_cert.subject))
@@ -239,10 +239,10 @@ class TC_DA_1_7(MatterBaseTest):
             public_key.verify(signature=pai_cert.signature, data=pai_cert.tbs_certificate_bytes,
                               signature_algorithm=ec.ECDSA(hashes.SHA256()))
         except InvalidSignature as e:
-            asserts.fail("DUT %d: Failed to verify PAI signature against PAA public key: %s" % (dut_index, str(e)))
+            asserts.fail(f"DUT {dut_index}: Failed to verify PAI signature against PAA public key: {e}")
         log.info("Validated PAI signature against PAA")
 
-        log.info("DUT {} Step 3 check 2: Verify PAI AKID not in denylist of SDK PAIs".format(dut_index))
+        log.info(f"DUT {dut_index} Step 3 check 2: Verify PAI AKID not in denylist of SDK PAIs")
         if self.allow_sdk_dac:
             log.warning("===> TEST STEP SKIPPED: Allowing SDK DACs!")
         else:

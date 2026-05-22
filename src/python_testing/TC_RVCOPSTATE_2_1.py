@@ -114,7 +114,7 @@ class TC_RVCOPSTATE_2_1(MatterBaseTest):
 
                 phase_list_len = len(phase_list)
 
-                asserts.assert_less_equal(phase_list_len, 32, "PhaseList length(%d) must be less than 32!" % phase_list_len)
+                asserts.assert_less_equal(phase_list_len, 32, f"PhaseList length({phase_list_len}) must be less than 32!")
 
         if await self.attribute_guard(endpoint=self.endpoint, attribute=attributes.CurrentPhase):
             self.print_step(3, "Read CurrentPhase attribute")
@@ -125,7 +125,7 @@ class TC_RVCOPSTATE_2_1(MatterBaseTest):
                 asserts.assert_true(current_phase == NullValue, "CurrentPhase({}) should be null".format(current_phase))
             else:
                 asserts.assert_true(0 <= current_phase < phase_list_len,
-                                    "CurrentPhase(%s) must be between 0 and %d" % (current_phase, (phase_list_len - 1)))
+                                    f"CurrentPhase({current_phase}) must be between 0 and {phase_list_len - 1}")
 
         if await self.attribute_guard(endpoint=self.endpoint, attribute=attributes.CountdownTime):
             self.print_step(4, "Read CountdownTime attribute")

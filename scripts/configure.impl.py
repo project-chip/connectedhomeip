@@ -119,7 +119,7 @@ class ProjectArgProcessor:
             self.default = str(data['default']['value'])
             self.type = self.default[0].translate(self.ARG_TYPE_TRANS)  # 's'tring, 'b'ool, 'i'integer, '[' list, '{' struct
             file = data['default'].get('file', None)
-            self.source = '%s:%d' % (file, data['default']['line']) if file else None
+            self.source = f"{file}:{data['default']['line']}" if file else None
             self.comment = str(data.get('comment', '')).strip()
 
         def alias_candidates(self):

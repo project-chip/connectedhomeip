@@ -109,8 +109,7 @@ class Context:
         if code in self._global_attributes:
             return self._global_attributes[code]
 
-        raise Exception(
-            'Global attribute 0x%X (%d) not found. You probably need to load global-attributes.xml' % (code, code))
+        raise Exception(f'Global attribute 0x{code:X} ({code}) not found. You probably need to load global-attributes.xml')
 
     def GetGlobalAttributes(self):
         return [attribute for code, attribute in self._global_attributes.items()]

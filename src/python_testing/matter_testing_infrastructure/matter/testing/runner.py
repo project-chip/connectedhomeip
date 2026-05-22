@@ -961,11 +961,11 @@ def parse_matter_test_args(argv: Optional[List[str]] = None):
     basic_group.add_argument('-N', '--controller-node-id', type=int_decimal_or_hex,
                              metavar='NODE_ID',
                              default=TestingDefaults.CONTROLLER_NODE_ID,
-                             help='NodeID to use for initial/default controller (default: %d)' % TestingDefaults.CONTROLLER_NODE_ID)
+                             help=f'NodeID to use for initial/default controller (default: {TestingDefaults.CONTROLLER_NODE_ID})')
     basic_group.add_argument('-n', '--dut-node-id', '--nodeId', type=int_decimal_or_hex,
                              metavar='NODE_ID', dest='dut_node_ids', default=[],
                              help='Node ID for primary DUT communication, '
-                             'and NodeID to assign if commissioning (default: %d)' % TestingDefaults.DUT_NODE_ID, nargs="+")
+                             f'and NodeID to assign if commissioning (default: {TestingDefaults.DUT_NODE_ID})', nargs="+")
     basic_group.add_argument('--endpoint', type=int, default=None, help="Endpoint under test")
     basic_group.add_argument('--app-pipe', type=str, default=None,
                              help="The full path of the app to send an out-of-band command from test to app")
@@ -1050,7 +1050,7 @@ def parse_matter_test_args(argv: Optional[List[str]] = None):
     fabric_group.add_argument('-r', '--root-index', type=root_index,
                               metavar='ROOT_INDEX_OR_NAME', default=TestingDefaults.TRUST_ROOT_INDEX,
                               help='Root of trust under which to operate/commission for single-fabric basic usage. '
-                              'alpha/beta/gamma are aliases for 1/2/3. Default (%d)' % TestingDefaults.TRUST_ROOT_INDEX)
+                              f'alpha/beta/gamma are aliases for 1/2/3. Default ({TestingDefaults.TRUST_ROOT_INDEX})')
 
     fabric_group.add_argument('-c', '--chip-tool-credentials-path', type=pathlib.Path,
                               metavar='PATH',

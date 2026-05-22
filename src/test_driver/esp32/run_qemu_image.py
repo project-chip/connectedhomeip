@@ -100,8 +100,7 @@ def main(log_level, log_timestamps, image, file_image_list, qemu, verbose):
 
         try:
             if status.returncode != 0:
-                raise Exception("Execution of %s failed with code %d" %
-                                (path, status.returncode))
+                raise Exception(f"Execution of {path} failed with code {status.returncode}")
 
             # Parse output of the unit test. Generally expect things like:
             # I (3034) CHIP-tests: Starting CHIP tests!
