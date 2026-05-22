@@ -821,7 +821,9 @@ public:
         if (mContext != nullptr && val != this->order)
         {
             AttributePersistence attributePersistence(mContext->attributeStorage);
-            ReturnErrorOnFailure(attributePersistence.StoreNativeEndianValue({ mPath.mEndpointId, mPath.mClusterId, Order::Id }, val).GetUnderlyingError());
+            ReturnErrorOnFailure(
+                attributePersistence.StoreNativeEndianValue({ mPath.mEndpointId, mPath.mClusterId, Order::Id }, val)
+                    .GetUnderlyingError());
         }
 
         SetAttributeValue(this->order, val, Order::Id);
@@ -867,7 +869,8 @@ public:
     {
         ENABLE_IF_ATTRIBUTE_SUPPORTED(ActiveWiredFaults)
         {
-            uint8_t bitset = PowerSource::detail::SpanToBitSet<uint8_t, to_underlying(WiredFaultEnum::kUnknownEnumValue)>(PowerSource::detail::ConvertSpanType<const uint8_t>(val));
+            uint8_t bitset = PowerSource::detail::SpanToBitSet<uint8_t, to_underlying(WiredFaultEnum::kUnknownEnumValue)>(
+                PowerSource::detail::ConvertSpanType<const uint8_t>(val));
             if (this->activeWiredFaultsBitSet == bitset)
             {
                 return CHIP_NO_ERROR;
@@ -1019,8 +1022,8 @@ public:
     {
         ENABLE_IF_ATTRIBUTE_SUPPORTED(ActiveBatFaults)
         {
-            uint8_t newBitSet =
-                PowerSource::detail::SpanToBitSet<uint8_t, to_underlying(BatFaultEnum::kUnknownEnumValue)>(PowerSource::detail::ConvertSpanType<const uint8_t>(val));
+            uint8_t newBitSet = PowerSource::detail::SpanToBitSet<uint8_t, to_underlying(BatFaultEnum::kUnknownEnumValue)>(
+                PowerSource::detail::ConvertSpanType<const uint8_t>(val));
             if (this->activeBatFaultsBitSet == newBitSet)
             {
                 return CHIP_NO_ERROR;
@@ -1128,8 +1131,8 @@ public:
     {
         ENABLE_IF_ATTRIBUTE_SUPPORTED(ActiveBatChargeFaults)
         {
-            uint16_t newBitSet =
-                PowerSource::detail::SpanToBitSet<uint16_t, to_underlying(BatChargeFaultEnum::kUnknownEnumValue)>(PowerSource::detail::ConvertSpanType<const uint8_t>(val));
+            uint16_t newBitSet = PowerSource::detail::SpanToBitSet<uint16_t, to_underlying(BatChargeFaultEnum::kUnknownEnumValue)>(
+                PowerSource::detail::ConvertSpanType<const uint8_t>(val));
             if (this->activeBatChargeFaultsBitSet == newBitSet)
             {
                 return CHIP_NO_ERROR;
