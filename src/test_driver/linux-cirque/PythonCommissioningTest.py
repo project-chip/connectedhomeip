@@ -19,6 +19,7 @@ import logging
 import os
 import sys
 from pathlib import Path
+
 from helper.CHIPTestBase import CHIPVirtualHome
 
 logger = logging.getLogger('MobileDeviceTest')

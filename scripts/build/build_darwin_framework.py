@@ -20,6 +20,7 @@ import platform
 from pathlib import Path
 from subprocess import PIPE, Popen
 
+
 def get_file_from_pigweed(name):
     CHIP_ROOT = next(filter(lambda p: (p / 'SPECIFICATION_VERSION').is_file(), Path(__file__).parents))
     PIGWEED = os.path.join(CHIP_ROOT, ".environment/cipd/packages/pigweed")

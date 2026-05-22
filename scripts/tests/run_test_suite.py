@@ -51,6 +51,7 @@ if sys.platform == 'darwin':
 
 DEFAULT_CHIP_ROOT = next(filter(lambda p: (p / 'SPECIFICATION_VERSION').is_file(), Path(__file__).parents))
 
+
 class ManualHandling(enum.Enum):
     INCLUDE = enum.auto()
     SKIP = enum.auto()

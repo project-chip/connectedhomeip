@@ -23,6 +23,7 @@ import subprocess
 from collections import namedtuple
 from pathlib import Path
 
+
 class PlatformAction(argparse.Action):
     """Expand comma- or space-separated platform tokens and validate against ALL_PLATFORMS."""
 

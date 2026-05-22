@@ -22,6 +22,7 @@ import subprocess
 import sys
 from pathlib import Path
 
+
 def get_commit_sha(repository_location, rev):
     command = ['git', '-C', repository_location, 'rev-list', '-n', '1', rev]
     process = subprocess.run(command, check=True, stdout=subprocess.PIPE)

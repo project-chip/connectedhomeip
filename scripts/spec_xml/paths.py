@@ -17,6 +17,7 @@
 import os
 from pathlib import Path
 
+
 def get_chip_root():
     """
     Returns the CHIP root directory, trying the environment variable first
