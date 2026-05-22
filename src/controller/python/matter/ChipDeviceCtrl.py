@@ -77,8 +77,7 @@ AttributeReadRequest = typing.Union[
 AttributeReadRequestList = typing.Optional[list[AttributeReadRequest]]
 
 # Type alias for subscription target specifications
-SubscriptionTargetList = list[tuple[int,
-                                    typing.Union[ClusterObjects.Cluster, ClusterObjects.ClusterAttributeDescriptor]]]
+SubscriptionTargetList = list[tuple[int, ClusterObjects.Cluster | ClusterObjects.ClusterAttributeDescriptor]]
 
 
 # Defined in $CHIP_ROOT/src/lib/core/CHIPError.h
@@ -1196,7 +1195,8 @@ class ChipDeviceControllerBase:
     async def DiscoverCommissionableNodes(self,
                                             filterType: discovery.FilterType = discovery.FilterType.NONE,
                                             filter: typing.Any = None,  # noqa: A002
-                                            stopOnFirst: bool = False, timeoutSecond: int = 5) -> typing.Union[None, CommissionableNode, list[CommissionableNode]]:
+                                            stopOnFirst: bool = False, timeoutSecond: int = 5
+                                            ) -> None | CommissionableNode | list[CommissionableNode]:
         '''
         Discover commissionable nodes via DNS-SD with specified filters.
         Supported filters are:
@@ -1735,10 +1735,8 @@ class ChipDeviceControllerBase:
 
     def _prepare_write_attribute_requests(
         self,
-        attributes: list[typing.Union[
-            tuple[int, ClusterObjects.ClusterAttributeDescriptor],
-            tuple[int, ClusterObjects.ClusterAttributeDescriptor, int]
-        ]]
+        attributes: list[tuple[int, ClusterObjects.ClusterAttributeDescriptor]
+                         | tuple[int, ClusterObjects.ClusterAttributeDescriptor, int]]
     ) -> list[ClusterAttribute.AttributeWriteRequest]:
         """Helper method to prepare attribute write requests."""
         attrs = []
@@ -1760,12 +1758,10 @@ class ChipDeviceControllerBase:
         return attrs
 
     async def TestOnlyWriteAttributeWithMismatchedTimedRequestField(self, nodeid: int,
-                                                                    attributes: list[typing.Union[
-                                                                        tuple[int,
-                                                                                     ClusterObjects.ClusterAttributeDescriptor],
-                                                                        tuple[int,
-                                                                              ClusterObjects.ClusterAttributeDescriptor, int]
-                                                                    ]],
+                                                                    attributes: list[
+                                                                        tuple[int, ClusterObjects.ClusterAttributeDescriptor]
+                                                                        | tuple[int, ClusterObjects.ClusterAttributeDescriptor, int]
+                                                                    ],
                                                                     timedRequestTimeoutMs: int,
                                                                     timedRequestFieldValue: bool,
                                                                     interactionTimeoutMs: typing.Optional[int] = None, busyWaitMs: typing.Optional[int] = None,
@@ -1904,10 +1900,10 @@ class ChipDeviceControllerBase:
         return
 
     async def WriteAttribute(self, nodeId: int,
-                             attributes: list[typing.Union[
-                                 tuple[int, ClusterObjects.ClusterAttributeDescriptor],
-                                 tuple[int, ClusterObjects.ClusterAttributeDescriptor, int]
-                             ]],
+                             attributes: list[
+                                 tuple[int, ClusterObjects.ClusterAttributeDescriptor]
+                                 | tuple[int, ClusterObjects.ClusterAttributeDescriptor, int]
+                             ],
                              timedRequestTimeoutMs: typing.Optional[int] = None,
                              interactionTimeoutMs: typing.Optional[int] = None, busyWaitMs: typing.Optional[int] = None,
                              payloadCapability: int = TransportPayloadCapability.MRP_PAYLOAD):
@@ -1939,10 +1935,10 @@ class ChipDeviceControllerBase:
                                           forceLegacyListEncoding=False)
 
     async def _WriteAttribute(self, nodeId: int,
-                              attributes: list[typing.Union[
-                                  tuple[int, ClusterObjects.ClusterAttributeDescriptor],
-                                  tuple[int, ClusterObjects.ClusterAttributeDescriptor, int]
-                              ]],
+                              attributes: list[
+                                  tuple[int, ClusterObjects.ClusterAttributeDescriptor]
+                                  | tuple[int, ClusterObjects.ClusterAttributeDescriptor, int]
+                              ],
                               timedRequestTimeoutMs: typing.Optional[int] = None,
                               interactionTimeoutMs: typing.Optional[int] = None, busyWaitMs: typing.Optional[int] = None,
                               payloadCapability: int = TransportPayloadCapability.MRP_PAYLOAD, forceLegacyListEncoding: bool = False):
@@ -1962,10 +1958,10 @@ class ChipDeviceControllerBase:
         return await future
 
     async def TestOnlyWriteAttributeWithLegacyList(self, nodeId: int,
-                                                   attributes: list[typing.Union[
-                                                       tuple[int, ClusterObjects.ClusterAttributeDescriptor],
-                                                       tuple[int, ClusterObjects.ClusterAttributeDescriptor, int]
-                                                   ]],
+                                                   attributes: list[
+                                                       tuple[int, ClusterObjects.ClusterAttributeDescriptor]
+                                                       | tuple[int, ClusterObjects.ClusterAttributeDescriptor, int]
+                                                   ],
                                                    timedRequestTimeoutMs: typing.Optional[int] = None,
                                                    interactionTimeoutMs: typing.Optional[int] = None, busyWaitMs: typing.Optional[int] = None,
                                                    payloadCapability: int = TransportPayloadCapability.MRP_PAYLOAD):
@@ -3499,7 +3495,7 @@ class BareChipDeviceController(ChipDeviceControllerBase):
     '''
 
     def __init__(self, operationalKey: p256keypair.P256Keypair, noc: bytes,
-                 icac: typing.Union[bytes, None], rcac: bytes, ipk: typing.Union[bytes, None], adminVendorId: int, name: typing.Optional[str] = None):
+                 icac: bytes | None, rcac: bytes, ipk: bytes | None, adminVendorId: int, name: typing.Optional[str] = None):
         '''
         Creates a controller without AutoCommissioner.
 

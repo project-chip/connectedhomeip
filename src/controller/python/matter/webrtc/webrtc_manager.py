@@ -21,7 +21,7 @@ import logging
 import threading
 from collections import defaultdict
 from ctypes import string_at
-from typing import Optional, Union
+from typing import Optional
 
 from .async_websocket_client import AsyncWebSocketClient
 from .browser_peer_connection import BrowserPeerConnection
@@ -133,7 +133,7 @@ class WebRTCManager(WebRTCRequestorNativeBindings):
     @staticmethod
     def get_peer(
         session_id: Optional[int] = None, node_id: Optional[int] = None
-    ) -> Union[LibdatachannelPeerConnection, BrowserPeerConnection, None]:
+    ) -> LibdatachannelPeerConnection | BrowserPeerConnection | None:
         """Retrieves the PeerConnection instance associated with the given session ID or node ID."""
         if session_id is None and node_id is None:
             raise ValueError("session_id and node_id both are None")

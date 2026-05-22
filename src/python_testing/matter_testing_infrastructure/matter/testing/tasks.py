@@ -21,7 +21,7 @@ import sys
 import threading
 from dataclasses import dataclass, replace
 from enum import StrEnum
-from typing import BinaryIO, Callable, Optional, Union
+from typing import BinaryIO, Callable, Optional
 
 LOGGER = logging.getLogger(__name__)
 
@@ -99,7 +99,7 @@ class Subprocess(threading.Thread):
         self.output_match: Optional[re.Pattern] = None
         self.returncode = None
 
-    def set_output_match(self, pattern: Union[str, re.Pattern]):
+    def set_output_match(self, pattern: str | re.Pattern):
         if isinstance(pattern, str):
             self.output_match = re.compile(re.escape(pattern.encode()))
         else:
@@ -161,7 +161,7 @@ class Subprocess(threading.Thread):
                 forwarding_stderr_thread.join()
 
     def start(self,
-              expected_output: Optional[Union[str, re.Pattern]] = None,
+              expected_output: Optional[str | re.Pattern] = None,
               timeout: Optional[float] = None):
         """Start a subprocess and optionally wait for a specific output."""
 
@@ -183,7 +183,7 @@ class Subprocess(threading.Thread):
             self.expected_output = None
 
     def send(self, message: str, end: str = "\n",
-             expected_output: Optional[Union[str, re.Pattern]] = None,
+             expected_output: Optional[str | re.Pattern] = None,
              timeout: float = 300):
         """Send a message to a process and optionally wait for a response."""
 

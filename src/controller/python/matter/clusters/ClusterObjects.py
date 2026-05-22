@@ -18,7 +18,7 @@
 import enum
 import typing
 from dataclasses import asdict, dataclass, field, make_dataclass
-from typing import Any, ClassVar, Mapping, Union
+from typing import Any, ClassVar, Mapping
 
 from dacite import from_dict  # type: ignore
 
@@ -314,7 +314,7 @@ class ClusterAttributeDescriptor:
             ALL_ATTRIBUTES[cls.cluster_id][cls.attribute_id] = cls
 
     @classmethod
-    def ToTLV(cls, tag: Union[int, None], value):
+    def ToTLV(cls, tag: int | None, value):
         writer = tlv.TLVWriter()
         wrapped_value = cls._cluster_object(Value=value)
         cls.attribute_type.PutFieldToTLV(tag,

@@ -15,7 +15,6 @@
 #    limitations under the License.
 #
 import pathlib
-import typing
 from dataclasses import dataclass, field
 from datetime import timedelta
 from typing import Optional
@@ -36,11 +35,11 @@ class MatterTestConfig:
     global_test_params: dict = field(default_factory=dict)
     # List of explicit tests to run by name. If empty, all tests will run
     tests: list[str] = field(default_factory=list)
-    timeout: typing.Union[int, None] = None
-    endpoint: typing.Union[int, None] = 0
+    timeout: int | None = None
+    endpoint: int | None = 0
     app_pid: int = 0
-    pipe_name: typing.Union[str, None] = None
-    pipe_name_out: typing.Union[str, None] = None
+    pipe_name: str | None = None
+    pipe_name_out: str | None = None
     fail_on_skipped_tests: bool = False
 
     commissioning_method: Optional[str] = None

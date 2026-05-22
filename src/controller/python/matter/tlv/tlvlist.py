@@ -19,7 +19,7 @@
 
 import dataclasses
 import enum
-from typing import Any, Iterator, Union
+from typing import Any, Iterator
 
 
 class TLVList:
@@ -77,7 +77,7 @@ class TLVList:
 
     @dataclasses.dataclass
     class TLVListItem:
-        tag: Union[None, int]
+        tag: None | int
         value: Any
 
         def as_tuple(self):
@@ -111,7 +111,7 @@ class TLVList:
             res = next(self._iterator)
             return res.tag, res.value
 
-    def __init__(self, items: list[tuple[Union[int, None], Any]] = []):
+    def __init__(self, items: list[tuple[int | None, Any]] = []):
         """Constructs a TLVList.
 
         items: A list of tuples for the tag and value for the items in the TLVList.
@@ -150,7 +150,7 @@ class TLVList:
             return self._get_item_by_tag(access)
         raise ValueError("Invalid access method")
 
-    def append(self, tag: Union[None, int], value: Any) -> None:
+    def append(self, tag: None | int, value: Any) -> None:
         """Appends an item to the list."""
         if (tag is not None) and (not isinstance(tag, int)):
             raise KeyError(f"Tag should be a integer or none for anonymous tag, {type(tag)} got")

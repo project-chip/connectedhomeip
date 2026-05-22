@@ -28,7 +28,7 @@ from .errors import ValidationError
 
 @dataclass
 class _TargetTypeInfo:
-    field: typing.Union[list[matter_idl_types.Field], matter_idl_types.Field]
+    field: list[matter_idl_types.Field] | matter_idl_types.Field
     is_fabric_scoped: bool
 
 
