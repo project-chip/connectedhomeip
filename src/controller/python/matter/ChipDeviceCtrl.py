@@ -377,7 +377,7 @@ class CommissionableNode(discovery.CommissionableNode):
                 yield k, self.__dict__[k]
 
 
-class DeviceProxyWrapper():
+class DeviceProxyWrapper:
     ''' Encapsulates a pointer to OperationalDeviceProxy on the c++ side that needs to be
         freed when DeviceProxyWrapper goes out of scope. There is a potential issue where
         if this is copied around that a double free will occur, but how this is used today
@@ -497,7 +497,7 @@ DiscoveryFilterType: typing.TypeAlias = discovery.FilterType
 DiscoveryType: typing.TypeAlias = discovery.DiscoveryType
 
 
-class ChipDeviceControllerBase():
+class ChipDeviceControllerBase:
     activeList: typing.Set = set()
 
     def __init__(self, name: str = ''):
@@ -1518,7 +1518,7 @@ class ChipDeviceControllerBase():
                 LOGGER.info('Using PASE connection')
                 return DeviceProxyWrapper(returnDevice, DeviceProxyWrapper.DeviceProxyType.COMMISSIONEE, self._dmLib)
 
-        class DeviceAvailableClosure():
+        class DeviceAvailableClosure:
             def deviceAvailable(self, device, err):
                 nonlocal returnDevice
                 nonlocal returnErr
@@ -1592,7 +1592,7 @@ class ChipDeviceControllerBase():
         eventLoop = asyncio.get_running_loop()
         future = eventLoop.create_future()
 
-        class DeviceAvailableClosure():
+        class DeviceAvailableClosure:
             def __init__(self, loop, future: asyncio.Future):
                 self._returnDevice = c_void_p(None)
                 self._returnErr = None
