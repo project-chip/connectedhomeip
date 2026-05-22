@@ -227,6 +227,10 @@ protected:
      */
     CHIP_ERROR SetIfName(const CharSpan & inIfName) noexcept;
 
+private:
+    bool GetBssInfo(const gchar * inBssPath, NetworkCommissioning::WiFiScanResponse & outWiFiScanResponse) const noexcept;
+
+protected:
     struct GDBusWpaSupplicant
     {
         GAutoPtr<WpaSupplicant1> proxy;
