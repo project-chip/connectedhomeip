@@ -530,12 +530,10 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int, app_path: li
 
     with (multiprocessing.Manager() as mp_manager,
           LogMessageCounter(mp_manager) as log_msg_counter,
+          context.obj.log_config.filter.msg_counter_ctx(log_msg_counter),
           ResultProcessingThread(run_summary, expected_failures, keep_going, summary_file) as result_thread,
           contextlib.ExitStack() as stack):
-        prev_counter = context.obj.log_config.filter.msg_counter
         try:
-            context.obj.log_config.filter.msg_counter = log_msg_counter
-
             mgmt_ns_wrapper: str | None = None
             if sys.platform == 'linux':
                 app_name = 'wlx-app' if wifi_required else 'eth-app'
@@ -635,8 +633,6 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int, app_path: li
             # We just print the message, as the actual test failure with stack trace has already been logged.
             log.error("%s", error)
             raise SystemExit(2) from None
-        finally:
-            context.obj.log_config.filter.msg_counter = prev_counter
 
 
 @main.command(
