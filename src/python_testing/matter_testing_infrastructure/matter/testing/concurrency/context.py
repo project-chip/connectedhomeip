@@ -28,11 +28,15 @@ class TerminableResource(contextlib.AbstractContextManager, ABC):
         log.debug("Starting %s", self.__class__.__name__)
         try:
             self.resource_start()
-        except BaseException as e:
-            log.error("Failed to start resource %s: %r", self.__class__.__name__, e)
-            e.add_note(f"Failure during start of resource {self.__class__.__name__}")
-            self.resource_terminate()
-            raise
+        except BaseException as start_ex:
+            log.error("Failed to start resource %s: %r", self.__class__.__name__, start_ex)
+            start_ex.add_note(f"Failure during start of resource {self.__class__.__name__}")
+            try:
+                self.resource_terminate()
+            except BaseException as term_ex:
+                log.error("Failed to terminate resource %s during start failure: %r", self.__class__.__name__, term_ex)
+                raise term_ex from start_ex
+            raise start_ex
         return self
 
     def __exit__(self, exc_type: type[BaseException] | None, exc_value: BaseException | None,
