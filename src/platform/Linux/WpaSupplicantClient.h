@@ -230,6 +230,7 @@ protected:
     CHIP_ERROR SetIfName(const CharSpan & inIfName) noexcept;
 
     void NotifyWiFiConnectivityChange(const ConnectivityChange & inChange);
+    CHIP_ERROR ScanNetwork(const ByteSpan & ssid);
     void Start();
     CHIP_ERROR StartSync();
     CHIP_ERROR StopAutoScan();

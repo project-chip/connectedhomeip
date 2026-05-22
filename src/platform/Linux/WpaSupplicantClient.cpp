@@ -440,6 +440,38 @@ CHIP_ERROR WpaSupplicantClient::SetIfName(const CharSpan & inIfName) noexcept
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR WpaSupplicantClient::ScanNetwork(const ByteSpan & inSsid)
+{
+    std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
+
+    VerifyOrReturnError(mWpaSupplicant.iface, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(inSsid.size() <= mInterestedSSID.capacity(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    GAutoPtr<GError> err;
+    GVariant * args = nullptr;
+    GVariantBuilder builder;
+
+    mInterestedSSID = inSsid;
+
+    g_variant_builder_init(&builder, G_VARIANT_TYPE_VARDICT);
+    g_variant_builder_add(&builder, "{sv}", "Type", g_variant_new_string("active"));
+    args = g_variant_builder_end(&builder);
+
+    if (!wpa_supplicant_1_interface_call_scan_sync(mWpaSupplicant.iface.get(), args, nullptr, &err.GetReceiver()))
+    {
+        ChipLogProgress(DeviceLayer, WPA_SUPPLICANT_CLIENT_LOG_PREFIX "failed to start network scan: %s",
+                        err ? err->message : "unknown error");
+
+        mInterestedSSID.reset();
+
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    ChipLogProgress(DeviceLayer, WPA_SUPPLICANT_CLIENT_LOG_PREFIX "initialized network scan");
+
+    return CHIP_NO_ERROR;
+}
+
 void WpaSupplicantClient::OnWpaPropertiesChanged(WpaSupplicant1Interface * iface, GVariant * changedProperties)
 {
     const char * state = nullptr;
