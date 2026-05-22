@@ -50,7 +50,7 @@ class ThreadBorderRouter(TerminableResource):
                                       text=True,
                                       encoding='UTF-8')
 
-        threading.Thread(target=self._otbr_read_stdout, daemon=True).start()
+        threading.Thread(name="OTBRReadStdout", target=self._otbr_read_stdout, daemon=True).start()
 
         self.expect(r'Co-processor version:', timeout=20)
         self.join_network(dataset)
