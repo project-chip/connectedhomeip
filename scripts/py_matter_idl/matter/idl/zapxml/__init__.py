@@ -16,7 +16,7 @@ import logging
 import typing
 import xml.sax.handler
 from dataclasses import dataclass
-from typing import Optional, Union
+from typing import Optional
 
 import click
 

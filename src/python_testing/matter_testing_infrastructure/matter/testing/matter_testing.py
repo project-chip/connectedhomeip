@@ -33,7 +33,7 @@ import typing
 from dataclasses import asdict, dataclass
 from datetime import UTC, datetime, timedelta
 from enum import IntFlag
-from typing import Any, Callable, Optional, Union
+from typing import Any, Callable, Optional, TypeAlias
 
 import matter.testing.matchers as matchers
 
@@ -69,8 +69,8 @@ from matter.tlv import uint
 # TODO: Add utilities to keep track of controllers/fabrics
 
 # Type aliases for common patterns to improve readability
-StepNumber = Union[int, str]  # Test step numbers can be integers or strings
-OptionalTimeout = Optional[int]  # Optional timeout values
+StepNumber: TypeAlias = int | str  # Test step numbers can be integers or strings
+OptionalTimeout: TypeAlias = int | None  # Optional timeout values
 
 LOGGER = logging.getLogger(__name__)
 LOGGER.setLevel(logging.INFO)

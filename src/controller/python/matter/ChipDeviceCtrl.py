@@ -61,18 +61,15 @@ __all__ = ["ChipDeviceController", "CommissioningParameters",
            "AttributeReadRequest", "AttributeReadRequestList", "SubscriptionTargetList"]
 
 # Type aliases for ReadAttribute method to improve type safety
-AttributeReadRequest = typing.Union[
-    None,  # Empty tuple, all wildcard
-    tuple[int],  # Endpoint
-    # Wildcard endpoint, Cluster id present
-    tuple[type[ClusterObjects.Cluster]],
-    # Wildcard endpoint, Cluster + Attribute present
-    tuple[type[ClusterObjects.ClusterAttributeDescriptor]],
-    tuple[int, type[ClusterObjects.Cluster]],  # Wildcard attribute id
-    # Concrete path
-    tuple[int, type[ClusterObjects.ClusterAttributeDescriptor]],
-    ClusterAttribute.TypedAttributePath  # Directly specified attribute path
-]
+AttributeReadRequest: typing.TypeAlias = (
+    None  # Empty tuple, all wildcard
+    | tuple[int]  # Endpoint
+    | tuple[type[ClusterObjects.Cluster]]  # Wildcard endpoint, Cluster id present
+    | tuple[type[ClusterObjects.ClusterAttributeDescriptor]]  # Wildcard endpoint, Cluster + Attribute present
+    | tuple[int, type[ClusterObjects.Cluster]]  # Wildcard attribute id
+    | tuple[int, type[ClusterObjects.ClusterAttributeDescriptor]]  # Concrete path
+    | ClusterAttribute.TypedAttributePath  # Directly specified attribute path
+)
 
 AttributeReadRequestList = typing.Optional[list[AttributeReadRequest]]
 
