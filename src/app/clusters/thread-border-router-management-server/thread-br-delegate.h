@@ -21,7 +21,7 @@
 // New code should include the new CodeDriven files directly:
 // #include <app/clusters/thread-border-router-management-server/ThreadBorderRouterManagementDelegate.h>
 
-#include <app/clusters/thread-border-router-management-server/ThreadBorderRouterManagementDelegate.h> // nogncheck
+#include <app/clusters/thread-border-router-management-server/ThreadBorderRouterManagementDelegate.h>
 
 namespace chip {
 namespace app {

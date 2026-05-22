@@ -153,6 +153,7 @@ static_library("nxp_platform") {
     sources += [
       # Temporary fix, to be revert once PR #34662 is merged, build issue when using GN check argument
       "${chip_root}/src/app/clusters/thread-border-router-management-server/thread-br-delegate.h",
+      "${chip_root}/src/app/clusters/thread-border-router-management-server/ThreadBorderRouterManagementDelegate.h",
       "../../../OpenThread/GenericThreadBorderRouterDelegate.cpp",
       "../../../OpenThread/GenericThreadBorderRouterDelegate.h",
       "../../../OpenThread/OpenThreadUtils.cpp",
