@@ -528,12 +528,12 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int, app_path: li
     thread_ba_port = None
     task_queue: TaskQueueT = CancellableQueue()
 
-    with (multiprocessing.Manager() as mp_manager,
-          LogMessageCounter(mp_manager) as log_msg_counter,
-          context.obj.log_config.filter.msg_counter_ctx(log_msg_counter),
-          ResultProcessingThread(run_summary, expected_failures, keep_going, summary_file) as result_thread,
-          contextlib.ExitStack() as stack):
-        try:
+    try:
+        with (multiprocessing.Manager() as mp_manager,
+                LogMessageCounter(mp_manager) as log_msg_counter,
+                context.obj.log_config.filter.msg_counter_ctx(log_msg_counter),
+                ResultProcessingThread(run_summary, expected_failures, keep_going, summary_file) as result_thread,
+                contextlib.ExitStack() as stack):
             mgmt_ns_wrapper: str | None = None
             if sys.platform == 'linux':
                 app_name = 'wlx-app' if wifi_required else 'eth-app'
@@ -626,13 +626,13 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int, app_path: li
                     break
 
                 time.sleep(0.5)
-        except KeyboardInterrupt:
-            log.info("Interrupting execution on user request")
-            raise
-        except ResultError as error:
-            # We just print the message, as the actual test failure with stack trace has already been logged.
-            log.error("%s", error)
-            raise SystemExit(2) from None
+    except KeyboardInterrupt:
+        log.info("Interrupting execution on user request")
+        raise
+    except ResultError as error:
+        # We just print the message, as the actual test failure with stack trace has already been logged.
+        log.error("%s", error)
+        raise SystemExit(2) from None
 
 
 @main.command(
