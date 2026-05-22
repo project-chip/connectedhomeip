@@ -1,5 +1,6 @@
 #include "DeviceTypes.h"
 #include "FakeAttributeAccess.h"
+#include "multi_column_switch_tags.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/callback.h>
 #include <app/data-model/Nullable.h>
@@ -822,6 +823,23 @@ void InitModeSelect()
 #endif // MATTER_DM_MODE_SELECT_CLUSTER_SERVER_ENDPOINT_COUNT
 }
 
+void InitMultiColumnSwitch()
+{
+    EndpointId num_endpoints = sizeof(kMultiColumnSwitchTags) / sizeof(kMultiColumnSwitchTags[0]);
+
+    // Check if this is the multi column switch.
+    for (auto ep = 1; ep <= num_endpoints; ++ep)
+    {
+        if (!DeviceTypes::EndpointHasDeviceType(ep, Device::kGenericSwitchDeviceTypeId))
+            return;
+    }
+
+    for (auto ep = 1; ep <= num_endpoints; ++ep)
+    {
+        LogErrorOnFailure(SetTagList(ep, kMultiColumnSwitchTags[ep - 1]));
+    }
+}
+
 void ApplicationInit()
 {
     ChipLogProgress(NotSpecified, "Chef Application Init !!!");
@@ -834,6 +852,7 @@ void ApplicationInit()
     WaterHeaterInit();
     ChimeInit();
     InitModeSelect();
+    InitMultiColumnSwitch();
 
 #ifdef MATTER_DM_PLUGIN_PUMP_CONFIGURATION_AND_CONTROL_SERVER
 #ifdef MATTER_DM_PLUGIN_ON_OFF_SERVER
