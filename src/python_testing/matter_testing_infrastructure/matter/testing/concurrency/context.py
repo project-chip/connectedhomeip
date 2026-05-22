@@ -14,10 +14,10 @@
 
 import contextlib
 import logging
+import threading
 from abc import ABC, abstractmethod
 from types import TracebackType
 from typing import Self
-import threading
 
 log = logging.getLogger(__name__)
 
