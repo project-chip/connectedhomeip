@@ -17,6 +17,9 @@ limitations under the License.
 import shlex
 from pathlib import Path
 
+# _STR are string represenattion of the path.
+# _ESC are the escaped string representation of the path, which can be used in shell commands.
+
 CHIP_REPO = Path(__file__).absolute().parents[4]
 CHIP_REPO_STR = str(CHIP_REPO)
 CONTROLLER_TEST_SCRIPTS_DIR = CHIP_REPO / "src/controller/python/tests/scripts"
