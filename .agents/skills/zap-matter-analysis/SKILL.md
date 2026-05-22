@@ -1,5 +1,5 @@
 ---
-name: ZAP and Matter File Analysis
+name: zap-matter-analysis
 description:
     Guidelines and common jq/grep/awk queries for investigating ZAP (.zap) and
     Matter (.matter) files to understand endpoints, clusters, attributes, and
@@ -9,7 +9,7 @@ description:
 # ZAP and Matter File Analysis Skill
 
 This skill provides instructions and common commands for analyzing ZAP (.zap)
-and Matter (.matter) files in the ConnectedHomeIP repository. These files define
+and `.matter` files in the Matter repository. These files define
 the data model of the applications.
 
 ## 1. ZAP File Analysis (.zap)
@@ -61,7 +61,7 @@ all endpoint types:
 jq '.endpointTypes[] | {
   id,
   name,
-  enabledAttributes: [.clusters[] | select(.code == <cluster_code> and .side == "<side>" and .enabled == 1) | .attributes[] | select(.included == 1) | .name]
+  enabledAttributes: [.clusters[] | select(.code == <cluster_code> and .side == "<side>" and .enabled == 1) | .attributes?[] | select(.included == 1) | .name]
 }' <path_to_zap_file>
 ```
 
@@ -77,7 +77,7 @@ all endpoint types:
 jq '.endpointTypes[] | {
   id,
   name,
-  enabledCommands: [.clusters[] | select(.code == <cluster_code> and .side == "<side>" and .enabled == 1) | .commands[] | select(.isEnabled == 1) | .name]
+  enabledCommands: [.clusters[] | select(.code == <cluster_code> and .side == "<side>" and .enabled == 1) | .commands?[] | select(.isEnabled == 1) | .name]
 }' <path_to_zap_file>
 ```
 
@@ -114,9 +114,9 @@ programmatically. Below is the schema/structure of a `.zap` file:
     -   `code` (number): Cluster ID (e.g., `6`).
     -   `side` (string): `"client"` or `"server"`.
     -   `enabled` (number): `1` if enabled, `0` if disabled.
-    -   `attributes` (array): Configuration of attributes for this cluster.
-    -   `commands` (array): Configuration of commands for this cluster.
-    -   `events` (array): Configuration of events for this cluster.
+    -   `attributes` (array, optional): Configuration of attributes for this cluster.
+    -   `commands` (array, optional): Configuration of commands for this cluster.
+    -   `events` (array, optional): Configuration of events for this cluster.
 
 -   **`attributes` Object (inside `clusters`)**:
 
@@ -161,7 +161,7 @@ To extract the definition block of a specific endpoint (e.g., `endpoint 1`) and
 list all its server clusters:
 
 ```bash
-sed -n '/endpoint <endpoint_id> {/,/^}/p' <path_to_matter_file> | grep "server cluster"
+sed -n '/endpoint[[:space:]]\+<endpoint_id>[[:space:]]*{/,/^}/p' <path_to_matter_file> | grep "server cluster"
 ```
 
 _Example for endpoint 1:_ `sed -n '/endpoint 1 {/,/^}/p' ...`
@@ -172,7 +172,7 @@ To extract the definition block of a specific endpoint (e.g., `endpoint 1`) and
 list all its binding (client) clusters:
 
 ```bash
-sed -n '/endpoint <endpoint_id> {/,/^}/p' <path_to_matter_file> | grep "binding cluster"
+sed -n '/endpoint[[:space:]]\+<endpoint_id>[[:space:]]*{/,/^}/p' <path_to_matter_file> | grep "binding cluster"
 ```
 
 ### 2.4 Detect Duplicate Cluster Definitions (Generator Bugs)
@@ -182,7 +182,7 @@ the generator might bug out and generate duplicate top-level cluster
 definitions. Use this command to detect them:
 
 ```bash
-awk '/^cluster [A-Za-z0-9]+ = [0-9]+ {/ { count[$0]++; } END { for (line in count) { if (count[line] > 1) print count[line], line; } }' <path_to_matter_file>
+awk '/^cluster [A-Za-z0-9_]+ = (0x[0-9A-Fa-f]+|[0-9]+) \{/ { count[$0]++; } END { for (line in count) { if (count[line] > 1) print count[line], line; } }' <path_to_matter_file>
 ```
 
 This will output the count and the cluster definition line for any duplicates
