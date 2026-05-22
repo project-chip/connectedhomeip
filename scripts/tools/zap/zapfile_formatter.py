@@ -17,7 +17,6 @@
 
 import argparse
 import json
-from typing import List
 
 _DEFAULT_CLUSTER_REVISION_ATTRIBUTE = {
     "entry": {
@@ -222,7 +221,7 @@ def saveZapfile(body: object, filename: str):
         return json.dump(body, outfile, indent=2)
 
 
-def mutateZapbody(body: object, mutators: List[Mutator]):
+def mutateZapbody(body: object, mutators: list[Mutator]):
     work_list = [body]
     while len(work_list):
         current_item = work_list.pop()

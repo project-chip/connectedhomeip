@@ -17,7 +17,6 @@
 import glob
 import json
 import os
-import typing
 import xml.etree.ElementTree as ET
 
 import matter.clusters as Clusters
@@ -57,7 +56,7 @@ def client_pics_str(pics_base: str) -> str:
     return f'{pics_base}.C'
 
 
-def parse_pics(lines: typing.List[str]) -> dict[str, bool]:
+def parse_pics(lines: list[str]) -> dict[str, bool]:
     pics = {}
     for raw in lines:
         line, _, _ = raw.partition("#")

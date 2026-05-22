@@ -50,7 +50,6 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-from typing import List
 
 from mobly import asserts
 
@@ -141,13 +140,13 @@ class TC_G_2_2(MatterBaseTest):
         kGroupName1 = "Gp1"
         kGroupId1 = 1
         cmd = Clusters.Groups.Commands.AddGroup(kGroupId1, kGroupName1)
-        groupTableList: List[Clusters.GroupKeyManagement.Attributes.GroupTable] = await self.read_single_attribute_check_success(
+        groupTableList: list[Clusters.GroupKeyManagement.Attributes.GroupTable] = await self.read_single_attribute_check_success(
             cluster=Clusters.GroupKeyManagement, attribute=Clusters.GroupKeyManagement.Attributes.GroupTable, endpoint=0)
         result = await th1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.Groups.Commands.AddGroup(kGroupId1, kGroupName1))
         asserts.assert_equal(result.status, Status.Success, "Adding Group 0x0001 failed")
 
         self.step("2a")
-        groupTableList: List[Clusters.GroupKeyManagement.Attributes.GroupTable] = await self.read_single_attribute_check_success(
+        groupTableList: list[Clusters.GroupKeyManagement.Attributes.GroupTable] = await self.read_single_attribute_check_success(
             cluster=Clusters.GroupKeyManagement, attribute=Clusters.GroupKeyManagement.Attributes.GroupTable, endpoint=0)
         expected_group_id = 0x0001
         expected_endpoint = self.matter_test_config.endpoint
@@ -185,7 +184,7 @@ class TC_G_2_2(MatterBaseTest):
         asserts.assert_equal(result.status, Status.Success, "Adding Group 0x0002 failed")
 
         self.step("4a")
-        groupTableList: List[Clusters.GroupKeyManagement.Attributes.GroupTable] = await self.read_single_attribute_check_success(
+        groupTableList: list[Clusters.GroupKeyManagement.Attributes.GroupTable] = await self.read_single_attribute_check_success(
             cluster=Clusters.GroupKeyManagement, attribute=Clusters.GroupKeyManagement.Attributes.GroupTable, endpoint=0)
         found = any(entry.groupId == kGroupId2 for entry in groupTableList)
         asserts.assert_true(found, f"GroupId {kGroupId2} not found in GroupTable")
@@ -212,7 +211,7 @@ class TC_G_2_2(MatterBaseTest):
             asserts.assert_equal(result.status, Status.Success, f"Adding Group 0x{groupKeyMapStruct[i].groupId:04X} failed")
 
         self.step("6")
-        groupTableList: List[Clusters.GroupKeyManagement.Attributes.GroupTable] = await self.read_single_attribute_check_success(
+        groupTableList: list[Clusters.GroupKeyManagement.Attributes.GroupTable] = await self.read_single_attribute_check_success(
             cluster=Clusters.GroupKeyManagement, attribute=Clusters.GroupKeyManagement.Attributes.GroupTable, endpoint=0)
         # Get the group IDs that were added in step 5
         added_group_ids = [groupKeyMapStruct[i].groupId for i in range(2, maxgroups - 1)]
@@ -235,7 +234,7 @@ class TC_G_2_2(MatterBaseTest):
                              "Returned status is different from expected ResourceExhausted")
 
         self.step("8")
-        groupTableList: List[Clusters.GroupKeyManagement.Attributes.GroupTable] = await self.read_single_attribute_check_success(
+        groupTableList: list[Clusters.GroupKeyManagement.Attributes.GroupTable] = await self.read_single_attribute_check_success(
             cluster=Clusters.GroupKeyManagement, attribute=Clusters.GroupKeyManagement.Attributes.GroupTable, endpoint=0)
         asserts.assert_true(all(entry.groupId != kGroupIdUnused for entry in groupTableList),
                             f"Group ID {kGroupIdUnused} was unexpectedly found in the group table")
@@ -277,7 +276,7 @@ class TC_G_2_2(MatterBaseTest):
         asserts.assert_equal(result.status, Status.NotFound, "Unexpected error GroupID as 0x0001 must be NOT_FOUND")
 
         self.step("16")
-        groupTableList: List[Clusters.GroupKeyManagement.Attributes.GroupTable] = await self.read_single_attribute_check_success(
+        groupTableList: list[Clusters.GroupKeyManagement.Attributes.GroupTable] = await self.read_single_attribute_check_success(
             cluster=Clusters.GroupKeyManagement, attribute=Clusters.GroupKeyManagement.Attributes.GroupTable, endpoint=0)
         for entry in groupTableList:
             asserts.assert_not_equal(entry.groupId, kGroupId1, f"GroupID 0x{kGroupId1:04X} should not be present in GroupTable")
@@ -291,7 +290,7 @@ class TC_G_2_2(MatterBaseTest):
         asserts.assert_equal(result.status, Status.NotFound, "Unexpected error from RemoveGroupResponse")
 
         self.step("19")
-        groupTableList: List[Clusters.GroupKeyManagement.Attributes.GroupTable] = await self.read_single_attribute_check_success(
+        groupTableList: list[Clusters.GroupKeyManagement.Attributes.GroupTable] = await self.read_single_attribute_check_success(
             cluster=Clusters.GroupKeyManagement, attribute=Clusters.GroupKeyManagement.Attributes.GroupTable, endpoint=0)
         for entry in groupTableList:
             asserts.assert_not_equal(entry.groupId, kGroupId1, f"GroupID 0x{kGroupId1:04X} should not be present in GroupTable")
@@ -304,7 +303,7 @@ class TC_G_2_2(MatterBaseTest):
         asserts.assert_equal(result.status, Status.NotFound, "Unexpected error GroupID as 0x0002 must be NOT_FOUND")
 
         self.step("22")
-        groupTableList: List[Clusters.GroupKeyManagement.Attributes.GroupTable] = await self.read_single_attribute_check_success(
+        groupTableList: list[Clusters.GroupKeyManagement.Attributes.GroupTable] = await self.read_single_attribute_check_success(
             cluster=Clusters.GroupKeyManagement, attribute=Clusters.GroupKeyManagement.Attributes.GroupTable, endpoint=0)
         asserts.assert_true(all(entry.endpoint != self.matter_test_config.endpoint for entry in groupTableList),
                             f"Unexpected group entries found for endpoint {self.matter_test_config.endpoint}: {groupTableList}")
@@ -319,7 +318,7 @@ class TC_G_2_2(MatterBaseTest):
             self.mark_current_step_skipped()
 
         self.step("24")
-        groupTableList: List[Clusters.GroupKeyManagement.Attributes.GroupTable] = await self.read_single_attribute_check_success(
+        groupTableList: list[Clusters.GroupKeyManagement.Attributes.GroupTable] = await self.read_single_attribute_check_success(
             cluster=Clusters.GroupKeyManagement, attribute=Clusters.GroupKeyManagement.Attributes.GroupTable, endpoint=0)
         asserts.assert_true(all(entry.endpoint != self.matter_test_config.endpoint for entry in groupTableList),
                             f"Unexpected group entries found for endpoint {self.matter_test_config.endpoint}: {groupTableList}")

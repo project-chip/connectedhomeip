@@ -18,7 +18,7 @@
 import datetime
 import random
 import string
-from typing import Callable, List, Optional, Union
+from typing import Callable, Optional, Union
 
 from cryptography import x509
 from cryptography.hazmat.primitives import hashes, serialization
@@ -254,7 +254,7 @@ class TLSUtils:
             return e
 
     async def send_provision_client_command(
-            self, certificate: bytes, ccdid: int, intermediates: List[bytes] = [],
+            self, certificate: bytes, ccdid: int, intermediates: list[bytes] = [],
             expected_status: Status = Status.Success) -> InteractionModelError:
         try:
             result = await self.test.send_single_cmd(cmd=Clusters.TlsCertificateManagement.Commands.ProvisionClientCertificate(ccdid=ccdid, clientCertificate=certificate, intermediateCertificates=intermediates),
