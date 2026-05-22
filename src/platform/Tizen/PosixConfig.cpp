@@ -63,8 +63,8 @@ const PosixConfig::Key PosixConfig::kConfigKey_SetupPinCode = MakeConfigKey(kCon
 CHIP_CPP20(constinit)
 const PosixConfig::Key PosixConfig::kConfigKey_SetupDiscriminator = MakeConfigKey(kConfigNamespace_ChipFactory, "discriminator");
 CHIP_CPP20(constinit)
-const PosixConfig::Key PosixConfig::kConfigKey_Spake2pIterationCount = MakeConfigKey(kConfigNamespace_ChipFactory,
-                                                                                     "iteration-count");
+const PosixConfig::Key PosixConfig::kConfigKey_Spake2pIterationCount =
+    MakeConfigKey(kConfigNamespace_ChipFactory, "iteration-count");
 CHIP_CPP20(constinit)
 const PosixConfig::Key PosixConfig::kConfigKey_Spake2pSalt = MakeConfigKey(kConfigNamespace_ChipFactory, "salt");
 CHIP_CPP20(constinit)
@@ -86,8 +86,8 @@ const PosixConfig::Key PosixConfig::kConfigKey_LastUsedEpochKeyId = MakeConfigKe
 CHIP_CPP20(constinit)
 const PosixConfig::Key PosixConfig::kConfigKey_FailSafeArmed = MakeConfigKey(kConfigNamespace_ChipConfig, "fail-safe-armed");
 CHIP_CPP20(constinit)
-const PosixConfig::Key PosixConfig::kConfigKey_RegulatoryLocation = MakeConfigKey(kConfigNamespace_ChipConfig,
-                                                                                  "regulatory-location");
+const PosixConfig::Key PosixConfig::kConfigKey_RegulatoryLocation =
+    MakeConfigKey(kConfigNamespace_ChipConfig, "regulatory-location");
 CHIP_CPP20(constinit)
 const PosixConfig::Key PosixConfig::kConfigKey_CountryCode = MakeConfigKey(kConfigNamespace_ChipConfig, "country-code");
 CHIP_CPP20(constinit)
@@ -95,8 +95,8 @@ const PosixConfig::Key PosixConfig::kConfigKey_UniqueId = MakeConfigKey(kConfigN
 
 // Keys stored in the Chip-counters namespace
 CHIP_CPP20(constinit)
-const PosixConfig::Key PosixConfig::kCounterKey_TotalOperationalHours = MakeConfigKey(kConfigNamespace_ChipCounters,
-                                                                                      "total-operational-hours");
+const PosixConfig::Key PosixConfig::kCounterKey_TotalOperationalHours =
+    MakeConfigKey(kConfigNamespace_ChipCounters, "total-operational-hours");
 CHIP_CPP20(constinit)
 const PosixConfig::Key PosixConfig::kCounterKey_BootReason = MakeConfigKey(kConfigNamespace_ChipCounters, "boot-reason");
 
