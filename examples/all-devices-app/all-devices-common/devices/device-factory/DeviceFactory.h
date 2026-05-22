@@ -121,17 +121,17 @@ private:
                 return std::make_unique<AirQualitySensorDevice>(
                     mContext->timerDelegate,
                     AirQualitySensorDevice::Config{
-                        .airQualityFeatures = BitFlags<Clusters::AirQuality::Feature>(Clusters::AirQuality::Feature::kFair,
-                                                                            Clusters::AirQuality::Feature::kModerate,
-                                                                            Clusters::AirQuality::Feature::kVeryPoor,
-                                                                            Clusters::AirQuality::Feature::kExtremelyPoor),
-                        .co2Config = ConcentrationMeasurementCluster::Config{
-                            .clusterId = Clusters::CarbonDioxideConcentrationMeasurement::Id,
-                            .features  = BitFlags<Feature>(Feature::kNumericMeasurement, Feature::kPeakMeasurement,
-                                                           Feature::kAverageMeasurement, Feature::kLevelIndication),
-                            .medium    = MeasurementMediumEnum::kAir,
-                            .unit      = MeasurementUnitEnum::kPpm,
-                        },
+                        .airQualityFeatures = BitFlags<Clusters::AirQuality::Feature>(
+                            Clusters::AirQuality::Feature::kFair, Clusters::AirQuality::Feature::kModerate,
+                            Clusters::AirQuality::Feature::kVeryPoor, Clusters::AirQuality::Feature::kExtremelyPoor),
+                        .co2Config =
+                            ConcentrationMeasurementCluster::Config{
+                                .clusterId = Clusters::CarbonDioxideConcentrationMeasurement::Id,
+                                .features  = BitFlags<Feature>(Feature::kNumericMeasurement, Feature::kPeakMeasurement,
+                                                              Feature::kAverageMeasurement, Feature::kLevelIndication),
+                                .medium    = MeasurementMediumEnum::kAir,
+                                .unit      = MeasurementUnitEnum::kPpm,
+                            },
                     });
             });
         }
