@@ -91,7 +91,13 @@ silabs_executable("all_devices_app") {
     defines += [ "SL_STATUS_LED=0" ]
   }
 
-  sources = [ "src/AppTask.cpp" ]
+  sources = [
+    "include/AppKeys.h",
+    "include/AppTask.h",
+    "include/DeviceShellCommands.h",
+    "src/AppTask.cpp",
+    "src/DeviceShellCommands.cpp",
+  ]
 
   deps = [
     ":sdk",
