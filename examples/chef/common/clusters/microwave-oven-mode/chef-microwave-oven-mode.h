@@ -68,6 +68,8 @@ public:
 } // namespace chip
 
 namespace ChefMicrowaveOvenMode {
+void InitMicrowaveOvenModeForEndpoint(chip::EndpointId endpointId);
+void ShutdownMicrowaveOvenModeForEndpoint(chip::EndpointId endpointId);
 void InitChefMicrowaveOvenModeCluster();
 chip::app::Clusters::ModeBase::Instance * GetInstance(chip::EndpointId endpointId);
 } // namespace ChefMicrowaveOvenMode
