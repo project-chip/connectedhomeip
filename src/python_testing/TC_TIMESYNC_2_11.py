@@ -39,7 +39,7 @@ import asyncio
 import contextlib
 import queue
 import typing
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta, UTC
 
 from mobly import asserts
 
@@ -128,12 +128,12 @@ class TC_TIMESYNC_2_11(MatterBaseTest):
         asserts.assert_greater_equal(dst_list_size, 1, "Invalid dst list size")
 
         self.print_step(5, "TH sets two DST items if dst_list_size > 1")
-        th_utc = utc_time_in_matter_epoch(datetime.now(tz=timezone.utc))
-        expiry_first = utc_time_in_matter_epoch(datetime.now(tz=timezone.utc) + timedelta(seconds=10))
+        th_utc = utc_time_in_matter_epoch(datetime.now(tz=UTC))
+        expiry_first = utc_time_in_matter_epoch(datetime.now(tz=UTC) + timedelta(seconds=10))
         dst_first = dst_struct(offset=3600, validStarting=0, validUntil=expiry_first)
         if dst_list_size > 1:
-            start_second = utc_time_in_matter_epoch(datetime.now(tz=timezone.utc) + timedelta(seconds=25))
-            expiry_second = utc_time_in_matter_epoch(datetime.now(tz=timezone.utc) + timedelta(seconds=40))
+            start_second = utc_time_in_matter_epoch(datetime.now(tz=UTC) + timedelta(seconds=25))
+            expiry_second = utc_time_in_matter_epoch(datetime.now(tz=UTC) + timedelta(seconds=40))
             dst_second = dst_struct(offset=3600, validStarting=start_second, validUntil=expiry_second)
             dst = [dst_first, dst_second]
             await self.send_set_dst_cmd(dst)
