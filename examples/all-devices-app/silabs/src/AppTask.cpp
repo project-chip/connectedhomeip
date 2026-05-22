@@ -183,6 +183,7 @@ CHIP_ERROR AppTask::InitCodeDrivenDataModel(chip::PersistentStorageDelegate & st
         .groupDataProvider = *groupDataProvider,
         .fabricTable       = chip::Server::GetInstance().GetFabricTable(),
         .timerDelegate     = sTimerDelegate,
+        .storageDelegate   = storage,
     });
 
     std::string deviceType = "on-off-light"; // Default
