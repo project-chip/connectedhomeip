@@ -42,7 +42,6 @@
 # === END CI TEST ARGUMENTS ===
 
 
-
 from mobly import asserts
 from TC_SETRF_TestBase import CommodityTariffTestBaseHelper
 

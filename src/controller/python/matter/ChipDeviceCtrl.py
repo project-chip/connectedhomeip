@@ -69,7 +69,7 @@ AttributeReadRequest = typing.Union[
     # Wildcard endpoint, Cluster + Attribute present
     tuple[type[ClusterObjects.ClusterAttributeDescriptor]],
     tuple[int, type[ClusterObjects.Cluster]
-                 ],  # Wildcard attribute id
+          ],  # Wildcard attribute id
     # Concrete path
     tuple[int, type[ClusterObjects.ClusterAttributeDescriptor]],
     ClusterAttribute.TypedAttributePath  # Directly specified attribute path
@@ -79,7 +79,7 @@ AttributeReadRequestList = typing.Optional[list[AttributeReadRequest]]
 
 # Type alias for subscription target specifications
 SubscriptionTargetList = list[tuple[int,
-                                                  typing.Union[ClusterObjects.Cluster, ClusterObjects.ClusterAttributeDescriptor]]]
+                                    typing.Union[ClusterObjects.Cluster, ClusterObjects.ClusterAttributeDescriptor]]]
 
 
 # Defined in $CHIP_ROOT/src/lib/core/CHIPError.h
@@ -1765,7 +1765,7 @@ class ChipDeviceControllerBase():
                                                                         tuple[int,
                                                                                      ClusterObjects.ClusterAttributeDescriptor],
                                                                         tuple[int,
-                                                                                     ClusterObjects.ClusterAttributeDescriptor, int]
+                                                                              ClusterObjects.ClusterAttributeDescriptor, int]
                                                                     ]],
                                                                     timedRequestTimeoutMs: int,
                                                                     timedRequestFieldValue: bool,
@@ -2147,7 +2147,7 @@ class ChipDeviceControllerBase():
         tuple[int, type[ClusterObjects.Cluster], int],
         # Concrete path
         tuple[int,
-                     type[ClusterObjects.ClusterEvent], int]
+              type[ClusterObjects.ClusterEvent], int]
     ]):
         if pathTuple in [('*'), ()]:
             # Wildcard
