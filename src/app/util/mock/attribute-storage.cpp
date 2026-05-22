@@ -51,6 +51,7 @@
 
 #include <app/util/af-types.h>
 #include <app/util/attribute-metadata.h>
+#include <app/util/attribute-storage-detail.h>
 
 typedef uint8_t EmberAfClusterMask;
 
@@ -582,3 +583,8 @@ void ResetMockNodeConfig()
 
 } // namespace Testing
 } // namespace chip
+
+void emAfCallShutdowns(MatterClusterShutdownType shutdownType)
+{
+    // No-op in mock: no real clusters to shut down.
+}

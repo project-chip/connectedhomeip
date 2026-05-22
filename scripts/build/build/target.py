@@ -45,7 +45,8 @@ import re
 from dataclasses import dataclass
 from typing import Any, Dict, Iterable, List, Optional
 
-from builders.builder import BuilderOptions, BuildProfile
+from builders.builder import Builder, BuilderOptions, BuildProfile, OutDirLock
+from runner.runner import Runner
 
 log = logging.getLogger(__name__)
 
@@ -204,7 +205,7 @@ def _StringIntoParts(full_input: str, remaining_input: str, fixed_targets: List[
 
 class BuildTarget:
 
-    def __init__(self, name, builder_class, **kwargs):
+    def __init__(self, name: str, builder_class: type[Builder], **kwargs):
         """ Sets up a new build target starting with the given builder class
             and initial arguments
         """
@@ -448,8 +449,8 @@ class BuildTarget:
 
         return _StringIntoParts(value, suffix, self.fixed_targets, self.modifiers)
 
-    def Create(self, name: str, runner, repository_path: str, output_prefix: str,
-               verbose: bool, quiet: bool, ninja_jobs: int, builder_options: BuilderOptions):
+    def Create(self, name: str, runner: Runner, repository_path: str, output_prefix: str, verbose: bool, quiet: bool,
+               ninja_jobs: int, builder_options: BuilderOptions, output_dir_lock: OutDirLock):
 
         parts = self.StringIntoTargetParts(name)
 
@@ -463,7 +464,7 @@ class BuildTarget:
         if not quiet:
             log.info("Preparing builder '%s'" % (name,))
 
-        builder = self.builder_class(repository_path, runner=runner, **kargs)
+        builder = self.builder_class(repository_path, runner=runner, output_dir_lock=output_dir_lock, **kargs)
         builder.target = self
         builder.identifier = name
         if self.isUnifiedBuild(parts):

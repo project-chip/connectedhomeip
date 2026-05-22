@@ -67,12 +67,9 @@ Usage: ./out/linux-x64-all-devices-boringssl-no-ble/all-devices-app
 PROGRAM OPTIONS
 
   --device <chime|contact-sensor|dimmable-light|occupancy-sensor|on-off-light|soil-sensor|speaker|water-leak-detector>
-       Select the device to start up. Format: 'type' or 'type:endpoint'
+       Select the device to start up. Format: 'type' or 'type:endpoint' or 'type:endpoint,parent=parentId'
        Can be specified multiple times for multi-endpoint devices.
-       Example: --device chime:1 --device speaker:2
-
-  --endpoint <endpoint-number>
-       Define the endpoint for the preceding device (default 1)
+       Example: --device chime:1 --device speaker:2,parent=1
 
   --wifi
        Enable wifi support for commissioning
@@ -95,15 +92,19 @@ Build the application using the following command:
 ## Running the Application
 
 To run the application, specify the device type using the `--device` flag. The
-application supports running multiple devices simultaneously by specifying the
-flag multiple times.
+format is `type:endpoint` or `type:endpoint,parent=parentId`, where the optional
+`parent` option allows establishing parent/child endpoint relationships for
+logical grouping.
+
+The application supports running multiple devices simultaneously by specifying
+the flag multiple times.
 
 ```bash
 # Clean up KVS storage if needed
 rm -rf /tmp/chip_*
 
-# Run a chime on endpoint 1 and a speaker on endpoint 2
-./out/linux-x64-all-devices-boringssl-no-ble/all-devices-app --device chime:1 --device speaker:2
+# Run a chime on endpoint 1, a speaker on endpoint 2 (child of endpoint 1), and a dimmable light on endpoint 3
+./out/linux-x64-all-devices-boringssl-no-ble/all-devices-app --device chime:1 --device speaker:2,parent=1 --device dimmable-light:3
 ```
 
 ## Testing with chip-tool
