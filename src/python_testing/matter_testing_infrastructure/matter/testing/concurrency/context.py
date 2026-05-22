@@ -49,7 +49,9 @@ class TerminableResource(contextlib.AbstractContextManager, ABC):
         except BaseException as e:
             log.error("Failed to terminate resource %s: %r", self.__class__.__name__, e)
             e.add_note(f"Failure during termination of resource {self.__class__.__name__}")
-            raise e.with_traceback(e.__traceback__) from exc_value
+            if exc_value is not None:
+                raise e.with_traceback(e.__traceback__) from exc_value
+            raise
         return None
 
     def resource_start(self) -> None:
