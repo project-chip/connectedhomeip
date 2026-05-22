@@ -115,7 +115,7 @@ struct PosixConfig::Key
     bool operator==(const Key & other) const;
 };
 
-CHIP_CPP20(consteval) PosixConfig::Key MakeConfigKey(const char * ns, const char * name)
+inline CHIP_CPP20(consteval) PosixConfig::Key MakeConfigKey(const char * ns, const char * name)
 {
     return PosixConfig::Key{ ns, name };
 }
