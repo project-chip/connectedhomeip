@@ -298,8 +298,6 @@ class JinjaCodegenTarget():
         log.info("  %s", shlex.join(self.command))
 
 
-
-
 def setupArgumentsParser():
     parser = argparse.ArgumentParser(
         description='Generate content from ZAP files')

@@ -26,7 +26,6 @@ CHIP_ROOT_DIR = os.path.realpath(
     os.path.join(os.path.dirname(__file__), '../..'))
 
 
-
 zapFilesToSkip = {
     # examples/chef/sample_app_util/test_files/sample_zap_file.zap is
     # not a real .zap file; it's input to generating .zap files.  So

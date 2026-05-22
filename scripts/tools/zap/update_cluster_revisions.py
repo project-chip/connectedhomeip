@@ -53,8 +53,6 @@ def getTargets(cluster_id: int):
     return targets
 
 
-
-
 def runArgumentsParser():
     parser = argparse.ArgumentParser(
         description='Update the ClusterRevision for a chosen cluster in all .zap files')

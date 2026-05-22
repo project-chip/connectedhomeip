@@ -29,7 +29,6 @@ from __future__ import absolute_import, print_function
 
 import sys
 
-
 __all__ = ['ComputeCheckChar',   'VerifyCheckChar',
            'ComputeCheckChar16', 'VerifyCheckChar16',
            'ComputeCheckChar32', 'VerifyCheckChar32',

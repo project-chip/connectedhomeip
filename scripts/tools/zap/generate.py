@@ -57,8 +57,6 @@ CHIP_ROOT_DIR = os.path.realpath(
     os.path.join(os.path.dirname(__file__), '../../..'))
 
 
-
-
 def checkFileExists(path):
     if not os.path.isfile(path):
         print('Error: ' + path + ' does not exists or is not a file.')
