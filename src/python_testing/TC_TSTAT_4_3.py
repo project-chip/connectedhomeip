@@ -37,7 +37,7 @@
 import asyncio
 import logging
 import random
-from datetime import datetime, timedelta, UTC
+from datetime import UTC, datetime, timedelta
 
 from mobly import asserts
 

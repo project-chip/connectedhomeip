@@ -26,7 +26,7 @@ Examples:
     $ python3 timeoperations.py
 """
 
-from datetime import datetime, timedelta, UTC
+from datetime import UTC, datetime, timedelta
 from typing import Optional
 
 from mobly import asserts

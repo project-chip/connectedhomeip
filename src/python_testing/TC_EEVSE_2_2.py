@@ -41,7 +41,7 @@
 
 import asyncio
 import logging
-from datetime import datetime, timedelta, UTC
+from datetime import UTC, datetime, timedelta
 
 from mobly import asserts
 from TC_EEVSE_Utils import EEVSEBaseTestHelper

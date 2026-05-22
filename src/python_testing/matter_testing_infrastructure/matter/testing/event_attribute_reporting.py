@@ -31,7 +31,7 @@ import logging
 import queue
 import threading
 import time
-from datetime import datetime, UTC
+from datetime import UTC, datetime
 from typing import Any, Iterable, Optional
 
 from mobly import asserts

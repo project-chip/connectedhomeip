@@ -24,7 +24,6 @@
 #
 
 
-
 import struct
 from collections import OrderedDict
 from collections.abc import Mapping, Sequence

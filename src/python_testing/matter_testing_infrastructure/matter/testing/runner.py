@@ -29,7 +29,7 @@ import typing
 from binascii import unhexlify
 from dataclasses import asdict as dataclass_asdict
 from dataclasses import dataclass
-from datetime import datetime, timedelta, UTC
+from datetime import UTC, datetime, timedelta
 from itertools import chain
 from pathlib import Path
 from typing import Any, List, Optional, Tuple

@@ -31,7 +31,7 @@ import textwrap
 import time
 import typing
 from dataclasses import asdict, dataclass
-from datetime import datetime, timedelta, UTC
+from datetime import UTC, datetime, timedelta
 from enum import IntFlag
 from typing import Any, Callable, List, Optional, Tuple, Type, Union
 
