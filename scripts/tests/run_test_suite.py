@@ -673,10 +673,9 @@ if sys.platform == 'linux':
         help='Index of Linux network namespace'
     )
     def cmd_shell(ns_index: int) -> None:
-        chiptest.linux.IsolatedNetworkNamespace(ns_index)
-
-        shell = os.environ.get("SHELL", "bash")
-        os.execvpe(shell, [shell], os.environ.copy())
+        with chiptest.linux.IsolatedNetworkNamespace(ns_index):
+            shell = os.environ.get("SHELL", "bash")
+            os.execvpe(shell, [shell], os.environ.copy())
 
 
 if __name__ == '__main__':
