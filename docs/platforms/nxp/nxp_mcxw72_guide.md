@@ -198,7 +198,44 @@ dedicated guide
 
 ### Hardware connections
 
-Connect OM-SE051ARD board on the arduino connector of MCXW72 board.
+-   Connections using OM-SE051ARD board :
+
+    | Signal         | MCXW72 Pin    | OM-SE051ARD Pin |
+    | -------------- | --------------| --------------- |
+    | I2C SDA        | J2-2          | J2-9            |
+    | I2C SCL        | J2-1          | J2-10           |
+    | 3V3            | J3-2          | J8-4            |
+    | GND            | J3-7          | J8-7            |
+    | ENA (optional) | J2-10         | J1-6            |
+
+### Hardware Connections for GPIO Notification
+
+- Connections using SE051ARD switch and DUT board :
+
+| Source                                  | Destination                     |
+| --------------------------------------- | ------------------------------- |
+| FRDM W72 3.3V (J3-2)                    | SE051ARD (DUT) 3v3 (J8-4)       |
+| FRDM W72 GND (J3-7)                     | SE051ARD (DUT) GND (J8-7)       |
+| FRDM W72 I2C_SCL (J2-1)                 | SE051ARD (DUT) SCL (J2-10)      |
+| FRDM W72 I2C_SDA (J2-2)                 | SE051ARD (DUT) SDA (J2-9)       |
+| FRDM W72 3.3V (J3-4)                    | SE051ARD (switch) Vin (J16-2)   |
+| FRDM W72 J1-3                           | SE051ARD (DUT) IO2 (J11-8)      |
+| FRDM W72 J2-10                          | SE051ARD (switch) Enable (J13-2)|
+| SE051ARD (switch) Vout (J11-5)          | SE051ARD (DUT) SE_VDD (J14-2)   |
+| SE051ARD (switch) GND (J2-7)            | SE051ARD (DUT) GND (J2-7)       |
+| SE051ARD (DUT) ENA (J13-2)              | SE051ARD (DUT) VDD (J11-1)      |
+
+- Connections using SE051H2 DUT board :
+
+| Source                                  | Destination                     |
+| --------------------------------------- | ------------------------------- |
+| FRDM W72 3.3V (J3-4)                    | SE051H2 Vin (J8-4)              |
+| FRDM W72 GND (J3-7)                     | SE051H2 GND (J8-7)              |
+| FRDM W72 I2C_SCL (J2-1)                 | SE051H2 SCL (J2-10)             |
+| FRDM W72 I2C_SDA (J2-2)                 | SE051H2 SDA (J2-9)              |
+| FRDM W72 J1-3                           | SE051H2 IO2 (J11-5)             |
+| FRDM W72 J2-10                          | SE051H2 IO/MOSI (J2-4)          |
+| FRDM W72 3.3V (J3-2) (HIGH)             | SE051H2 Enable(J1-6)            |
 
 ### Provision SE05x with required keys (One time step)
 
