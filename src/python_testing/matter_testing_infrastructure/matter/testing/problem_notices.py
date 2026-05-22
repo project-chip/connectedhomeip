@@ -150,7 +150,6 @@ class UnknownProblemLocation:
 ProblemLocation = Union[ClusterPathLocation, DeviceTypePathLocation, UnknownProblemLocation, NamespacePathLocation]
 
 
-
 class ProblemSeverity(StrEnum):
     NOTE = "NOTE"
     WARNING = "WARNING"
