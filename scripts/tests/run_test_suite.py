@@ -634,7 +634,7 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int, app_path: li
         except ResultError as error:
             # We just print the message, as the actual test failure with stack trace has already been logged.
             log.error("%s", error)
-            raise SystemExit(2)
+            raise SystemExit(2) from None
         finally:
             context.obj.log_config.filter.msg_counter = prev_counter
 
