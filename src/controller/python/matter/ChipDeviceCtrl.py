@@ -2273,7 +2273,7 @@ class ChipDeviceControllerBase:
     async def Read(
         self,
         nodeId: int,
-        attributes: typing.Optional[list[
+        attributes: list[
             None  # Empty tuple, all wildcard
             | tuple[int]  # Endpoint
             | tuple[type[ClusterObjects.Cluster]]  # Wildcard endpoint, Cluster id present
@@ -2281,8 +2281,8 @@ class ChipDeviceControllerBase:
             | tuple[int, type[ClusterObjects.Cluster]]  # Wildcard attribute id
             | tuple[int, type[ClusterObjects.ClusterAttributeDescriptor]]  # Concrete path
             | ClusterAttribute.AttributePath  # Directly specified attribute path
-        ]] = None,
-        dataVersionFilters: list[tuple[int, type[ClusterObjects.Cluster], int]] | None = None, events: typing.Optional[list[
+        ] | None = None,
+        dataVersionFilters: list[tuple[int, type[ClusterObjects.Cluster], int]] | None = None, events: list[
             None  # Empty tuple, all wildcard
             | tuple[str, int]  # all wildcard with urgency set
             | tuple[int, int]  # Endpoint
@@ -2290,7 +2290,7 @@ class ChipDeviceControllerBase:
             | tuple[type[ClusterObjects.ClusterEvent], int]  # Wildcard endpoint, Cluster + Event present
             | tuple[int, type[ClusterObjects.Cluster], int]  # Wildcard event id
             | tuple[int, type[ClusterObjects.ClusterEvent], int]  # Concrete path
-        ]] = None,
+        ] | None = None,
         eventNumberFilter: int | None = None,
         returnClusterObject: bool = False, reportInterval: tuple[int, int] | None = None,
         fabricFiltered: bool = True, keepSubscriptions: bool = False, autoResubscribe: bool = True,
@@ -2406,7 +2406,7 @@ class ChipDeviceControllerBase:
     async def ReadAttribute(
         self,
         nodeId: int,
-        attributes: typing.Optional[list[
+        attributes: list[
             None  # Empty tuple, all wildcard
             | tuple[int]  # Endpoint
             | tuple[type[ClusterObjects.Cluster]]  # Wildcard endpoint, Cluster id present
@@ -2414,7 +2414,8 @@ class ChipDeviceControllerBase:
             | tuple[int, type[ClusterObjects.Cluster]]  # Wildcard attribute id
             | tuple[int, type[ClusterObjects.ClusterAttributeDescriptor]]  # Concrete path
             | ClusterAttribute.AttributePath  # Directly specified attribute path
-        ]], dataVersionFilters: list[tuple[int, type[ClusterObjects.Cluster], int]] | None = None,
+        ] | None,
+        dataVersionFilters: list[tuple[int, type[ClusterObjects.Cluster], int]] | None = None,
         returnClusterObject: bool = False,
         reportInterval: tuple[int, int] | None = None,
         fabricFiltered: bool = True, keepSubscriptions: bool = False, autoResubscribe: bool = True,
