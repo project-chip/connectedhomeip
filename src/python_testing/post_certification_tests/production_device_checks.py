@@ -380,7 +380,7 @@ def get_setup_code() -> (str, bool):
             print("Invalid manual code - please try again")
 
 
-class TestConfig(object):
+class TestConfig:
     def __init__(self, code: str, code_type: SetupCodeType):
         tmp_uuid = str(uuid.uuid4())
         tmpdir_paa = f'paas_{tmp_uuid}'

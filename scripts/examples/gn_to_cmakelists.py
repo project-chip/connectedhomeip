@@ -155,7 +155,7 @@ source_file_types = {
 }
 
 
-class CMakeTargetType(object):
+class CMakeTargetType:
     def __init__(self, command, modifier, property_modifier, is_linkable):
         self.command = command
         self.modifier = modifier
@@ -188,7 +188,7 @@ def FindFirstOf(s, a):
     return min(s.find(i) for i in a if i in s)
 
 
-class Project(object):
+class Project:
     def __init__(self, project_json):
         self.targets = project_json['targets']
         build_settings = project_json['build_settings']
@@ -255,7 +255,7 @@ class Project(object):
         return CMakeTargetEscape(cmake_target_name)
 
 
-class Target(object):
+class Target:
     def __init__(self, gn_target_name, project):
         self.gn_name = gn_target_name
         self.properties = project.targets[self.gn_name]

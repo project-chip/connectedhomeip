@@ -46,7 +46,7 @@ def _singleton(cls):
 
 
 @_singleton
-class ChipCommissionableNodeController(object):
+class ChipCommissionableNodeController:
     def __init__(self, chipStack: ChipStack):
         self.commissionableNodeCtrl = None
         self._ChipStack = chipStack

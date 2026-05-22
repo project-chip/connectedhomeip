@@ -143,7 +143,7 @@ _ChipThreadTaskRunnerFunct = CFUNCTYPE(None, py_object)
 
 
 @_singleton
-class ChipStack(object):
+class ChipStack:
     def __init__(self, persistentStorage: PersistentStorage, enableServerInteractions=True):
         builtins.enableDebugMode = False
 

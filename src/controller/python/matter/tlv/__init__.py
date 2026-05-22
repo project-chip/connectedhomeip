@@ -137,7 +137,7 @@ class float32(float):
     pass
 
 
-class TLVWriter(object):
+class TLVWriter:
     def __init__(self, encoding=None, implicitProfile=None):
         self._encoding = encoding if encoding is not None else bytearray()
         self._implicitProfile = implicitProfile
@@ -446,7 +446,7 @@ class TLVWriter(object):
             raise ValueError("Invalid TLV container type")
 
 
-class TLVReader(object):
+class TLVReader:
     def __init__(self, tlv):
         self._tlv = tlv
         self._bytesRead = 0
