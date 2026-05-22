@@ -55,7 +55,7 @@ TAG_STDOUT = f"[{Fore.YELLOW}STDOUT{Style.RESET_ALL}]".encode()
 TAG_STDERR = f"[{Fore.RED}STDERR{Style.RESET_ALL}]".encode()
 
 # RegExp which matches the timestamp in the output of CHIP application
-OUTPUT_TIMESTAMP_MATCH = re.compile(r'(?P<prefix>.*)\[(?P<ts>\d+\.\d+)\](?P<suffix>\[\d+:\d+\].*)'.encode())
+OUTPUT_TIMESTAMP_MATCH = re.compile(br'(?P<prefix>.*)\[(?P<ts>\d+\.\d+)\](?P<suffix>\[\d+:\d+\].*)')
 
 
 def chip_output_extract_timestamp(line: bytes) -> (float, bytes):
