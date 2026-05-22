@@ -19,6 +19,7 @@
 
 #include <app_config/enabled_devices.h>
 #include <devices/Types.h>
+#include <devices/air-quality-sensor/AirQualitySensorDevice.h>
 #include <devices/boolean-state-sensor/BooleanStateSensorDevice.h>
 #include <devices/chime/ChimeDevice.h>
 #include <devices/dimmable-light/impl/LoggingDimmableLightDevice.h>
@@ -112,6 +113,28 @@ private:
         // NOTE: context is set in `::Init`, so each lambda checks its
         //       existence separately. `Init` must be called before mRegistry
         //       factories are usable.
+        if constexpr (ALL_DEVICES_ENABLE_AIR_QUALITY_SENSOR)
+        {
+            RegisterCreator("air-quality-sensor", [this]() {
+                VerifyOrDie(mContext.has_value());
+                using namespace Clusters::ConcentrationMeasurement;
+                return std::make_unique<AirQualitySensorDevice>(
+                    mContext->timerDelegate,
+                    AirQualitySensorDevice::Config{
+                        .airQualityFeatures = BitFlags<Clusters::AirQuality::Feature>(Clusters::AirQuality::Feature::kFair,
+                                                                            Clusters::AirQuality::Feature::kModerate,
+                                                                            Clusters::AirQuality::Feature::kVeryPoor,
+                                                                            Clusters::AirQuality::Feature::kExtremelyPoor),
+                        .co2Config = ConcentrationMeasurementCluster::Config{
+                            .clusterId = Clusters::CarbonDioxideConcentrationMeasurement::Id,
+                            .features  = BitFlags<Feature>(Feature::kNumericMeasurement, Feature::kPeakMeasurement,
+                                                           Feature::kAverageMeasurement, Feature::kLevelIndication),
+                            .medium    = MeasurementMediumEnum::kAir,
+                            .unit      = MeasurementUnitEnum::kPpm,
+                        },
+                    });
+            });
+        }
         if constexpr (ALL_DEVICES_ENABLE_CONTACT_SENSOR)
         {
             RegisterCreator("contact-sensor", [this]() {
