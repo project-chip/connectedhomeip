@@ -20,7 +20,7 @@ import shlex
 import sys
 
 from helper.CHIPTestBase import CHIPVirtualHome
-from helper.paths import (CHIP_REPO_STR, CONTROLLER_TEST_SCRIPTS_DIR, LIT_ICD_APP_ESC, MATTER_CONTROLLER_INSTALL_WHEELS,
+from helper.paths import (CHIP_REPO_STR, CONTROLLER_TEST_SCRIPTS_DIR_PATH, LIT_ICD_APP_ESC, MATTER_CONTROLLER_INSTALL_WHEELS,
                           MATTER_DEVELOPMENT_PAA_ROOT_CERTS_ESC)
 
 logger = logging.getLogger('MobileDeviceTest')
@@ -42,7 +42,7 @@ TEST_DISCRIMINATOR3 = 1203
 TEST_DISCRIMINATOR4 = 2145
 TEST_DISCOVERY_TYPE = [0, 1, 2]
 TEST_PASSCODE = 20202021
-TEST_SCRIPT_ESC = shlex.quote(str(CONTROLLER_TEST_SCRIPTS_DIR / "icd_device_test.py"))
+TEST_SCRIPT_ESC = shlex.quote(str(CONTROLLER_TEST_SCRIPTS_DIR_PATH / "icd_device_test.py"))
 
 TEST_EVENT_KEY_HEX = "00112233445566778899aabbccddeeff"
 

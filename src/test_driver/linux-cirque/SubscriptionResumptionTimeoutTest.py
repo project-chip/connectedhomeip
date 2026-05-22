@@ -21,8 +21,8 @@ import sys
 import time
 
 from helper.CHIPTestBase import CHIPVirtualHome
-from helper.paths import (CHIP_ALL_CLUSTERS_APP_ESC, CHIP_REPO_STR, CONTROLLER_TEST_SCRIPTS_DIR, MATTER_CONTROLLER_INSTALL_WHEELS,
-                          MATTER_DEVELOPMENT_PAA_ROOT_CERTS_ESC)
+from helper.paths import (CHIP_ALL_CLUSTERS_APP_ESC, CHIP_REPO_STR, CONTROLLER_TEST_SCRIPTS_DIR_PATH,
+                          MATTER_CONTROLLER_INSTALL_WHEELS, MATTER_DEVELOPMENT_PAA_ROOT_CERTS_ESC)
 
 """
 Subscription Resumption Timeout Test to validate that the device will keep resuming subscription
@@ -47,7 +47,7 @@ CHIP_PORT = 5540
 CIRQUE_URL = "http://localhost:5000"
 TEST_EXTPANID = "fedcba9876543210"
 TEST_DISCRIMINATOR = 3840
-TEST_SCRIPT_ESC = shlex.quote(str(CONTROLLER_TEST_SCRIPTS_DIR / "subscription_resumption_timeout_test.py"))
+TEST_SCRIPT_ESC = shlex.quote(str(CONTROLLER_TEST_SCRIPTS_DIR_PATH / "subscription_resumption_timeout_test.py"))
 
 DEVICE_CONFIG = {
     'device0': {

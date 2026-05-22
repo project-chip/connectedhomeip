@@ -20,8 +20,8 @@ import shlex
 import sys
 
 from helper.CHIPTestBase import CHIPVirtualHome
-from helper.paths import (CHIP_ALL_CLUSTERS_APP_ESC, CHIP_REPO_STR, CONTROLLER_TEST_SCRIPTS_DIR, MATTER_CONTROLLER_INSTALL_WHEELS,
-                          MATTER_DEVELOPMENT_PAA_ROOT_CERTS_ESC)
+from helper.paths import (CHIP_ALL_CLUSTERS_APP_ESC, CHIP_REPO_STR, CONTROLLER_TEST_SCRIPTS_DIR_PATH,
+                          MATTER_CONTROLLER_INSTALL_WHEELS, MATTER_DEVELOPMENT_PAA_ROOT_CERTS_ESC)
 
 logger = logging.getLogger('MobileDeviceTest')
 logger.setLevel(logging.INFO)
@@ -38,7 +38,7 @@ CIRQUE_URL = "http://localhost:5000"
 TEST_EXTPANID = "fedcba9876543210"
 TEST_DISCRIMINATOR = 3840
 TEST_PASSCODE = 20202021
-TEST_SCRIPT_ESC = shlex.quote(str(CONTROLLER_TEST_SCRIPTS_DIR / "failsafe_tests.py"))
+TEST_SCRIPT_ESC = shlex.quote(str(CONTROLLER_TEST_SCRIPTS_DIR_PATH / "failsafe_tests.py"))
 
 DEVICE_CONFIG = {
     'device0': {

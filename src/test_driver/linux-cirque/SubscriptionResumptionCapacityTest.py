@@ -20,8 +20,8 @@ import shlex
 import sys
 
 from helper.CHIPTestBase import CHIPVirtualHome
-from helper.paths import (CHIP_ALL_CLUSTERS_APP_ESC, CHIP_ALL_CLUSTERS_APP_FRAGMENT, CHIP_REPO_STR, CONTROLLER_TEST_SCRIPTS_DIR,
-                          MATTER_CONTROLLER_INSTALL_WHEELS, MATTER_DEVELOPMENT_PAA_ROOT_CERTS_ESC)
+from helper.paths import (CHIP_ALL_CLUSTERS_APP_ESC, CHIP_ALL_CLUSTERS_APP_FRAGMENT, CHIP_REPO_STR,
+                          CONTROLLER_TEST_SCRIPTS_DIR_PATH, MATTER_CONTROLLER_INSTALL_WHEELS, MATTER_DEVELOPMENT_PAA_ROOT_CERTS_ESC)
 
 """
 Test to verify that the device can still handle new subscription requests when resuming the maximum subscriptions.
@@ -52,8 +52,8 @@ CIRQUE_URL = "http://localhost:5000"
 TEST_EXTPANID = "fedcba9876543210"
 TEST_DISCRIMINATOR = 3840
 TEST_SUBSCRIPTION_CAPACITY = 3
-TEST_SCRIPT_CTRL1_ESC = shlex.quote(str(CONTROLLER_TEST_SCRIPTS_DIR / "subscription_resumption_capacity_test_ctrl1.py"))
-TEST_SCRIPT_CTRL2_ESC = shlex.quote(str(CONTROLLER_TEST_SCRIPTS_DIR / "subscription_resumption_capacity_test_ctrl2.py"))
+TEST_SCRIPT_CTRL1_ESC = shlex.quote(str(CONTROLLER_TEST_SCRIPTS_DIR_PATH / "subscription_resumption_capacity_test_ctrl1.py"))
+TEST_SCRIPT_CTRL2_ESC = shlex.quote(str(CONTROLLER_TEST_SCRIPTS_DIR_PATH / "subscription_resumption_capacity_test_ctrl2.py"))
 
 
 # TODO: If using one Mobile Device, the CHIPEndDevice can still resolve the address for first controller
