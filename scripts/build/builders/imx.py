@@ -77,7 +77,7 @@ class IMXBuilder(GnBuilder):
                  release: bool = False,
                  trusty: bool = False,
                  ele: bool = False):
-        super(IMXBuilder, self).__init__(
+        super().__init__(
             root=os.path.join(root, 'examples', app.ExamplePath()),
             runner=runner,
             output_dir_lock=output_dir_lock)
