@@ -41,7 +41,7 @@ class BluetoothMock(subprocess.Popen[str], TerminableResource):
         super().__init__(["bluezoo", "--auto-enable"] + adapters,
                          stderr=subprocess.PIPE, text=True)
         self.event = threading.Event()
-        threading.Thread(target=self.__forward_stderr, daemon=True).start()
+        threading.Thread(name="BluetoothMockStderr", target=self.__forward_stderr, daemon=True).start()
         # Wait for the adapters to be ready.
         self.event.wait()
 
