@@ -17,6 +17,7 @@ import threading
 from collections.abc import Callable
 from typing import ClassVar, TypeAlias
 
+from chiptest.concurrency.context import TerminableResource
 from chiptest.concurrency.work_queue import CancellableQueue, EndOfQueue, QueueCancelled
 from chiptest.results import ResultQueueT, TestResult
 
@@ -26,7 +27,7 @@ log = logging.getLogger(__name__)
 TaskQueueT: TypeAlias = CancellableQueue[Callable[[], TestResult]]
 
 
-class WorkerThread(threading.Thread):
+class WorkerThread(threading.Thread, TerminableResource):
     """Worker thread that executes test jobs from the work queue and puts results to the result queue."""
 
     THREAD_TERMINATE_TIMEOUT_S: ClassVar[float] = 5.0
@@ -59,7 +60,10 @@ class WorkerThread(threading.Thread):
         finally:
             log.debug("Worker thread finished")
 
-    def terminate(self) -> None:
+    def resource_start(self) -> None:
+        self.start()
+
+    def resource_terminate(self) -> None:
         # Immediately cancel the work queue to unblock the thread if it's waiting for work. In regular flow, the work queue is
         # expected to be externally closed instead, to allow for graceful shutdown. In that case, cancellation is effectively a
         # no-op, as the thread should be already stopped.

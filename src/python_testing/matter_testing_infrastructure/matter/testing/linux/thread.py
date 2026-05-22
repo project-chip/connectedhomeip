@@ -21,6 +21,7 @@ import subprocess
 import threading
 from typing import Optional, Pattern
 
+from matter.testing.concurrency.context import TerminableResource
 from matter.testing.tasks import SubprocessKind
 
 from .namespace import IsolatedNetworkNamespace
@@ -28,7 +29,7 @@ from .namespace import IsolatedNetworkNamespace
 log = logging.getLogger(__name__)
 
 
-class ThreadBorderRouter:
+class ThreadBorderRouter(TerminableResource):
 
     # The Thread radio simulation node id, choose other if there is a conflict.
     NODE_ID = 9
@@ -103,7 +104,7 @@ class ThreadBorderRouter:
     def get_border_agent_host(self) -> str:
         return '10.10.10.1'
 
-    def terminate(self):
+    def resource_terminate(self):
         if self._otbr:
             self._otbr.terminate()
             self._otbr.wait()

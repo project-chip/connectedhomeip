@@ -26,6 +26,7 @@ from contextlib import suppress
 from typing import IO, TYPE_CHECKING, Any, Protocol
 
 import python_path
+from chiptest.concurrency.context import TerminableResource
 
 if TYPE_CHECKING:
     from .test_definition import AppsRegister, ExecutionCapture
@@ -139,7 +140,7 @@ class RunnerWaitQueue:
         return self.queue.get()
 
 
-class Executor:
+class Executor(TerminableResource):
     CLEANUP_TIMEOUT_S = 5
 
     def __init__(self) -> None:
@@ -152,7 +153,7 @@ class Executor:
                                                         stdout=stdout, stderr=stderr))  # type: ignore[arg-type]
         return process
 
-    def terminate(self) -> None:
+    def resource_terminate(self) -> None:
         while True:
             # Get process from the queue.
             try:

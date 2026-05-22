@@ -28,7 +28,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any, Callable, Concatenate, ParamSpec, Self, TypeAlias, TypeVar
 from xmlrpc.server import SimpleXMLRPCServer
 
-from chiptest.concurrency.context import StartStopContextMixin, mp_wrapped_spawn_context
+from chiptest.concurrency.context import StartStopContextMixin, TerminableResource, mp_wrapped_spawn_context
 from chiptest.concurrency.process import ProcessConfig, WrappedProcess, with_annotated_exception
 from chiptest.concurrency.work_queue import CancellableQueue, QueueCancelled
 from chiptest.log_config import LogConfig
@@ -261,7 +261,7 @@ def with_accessories_lock(fn: Callable[Concatenate[S, P], R]) -> Callable[Concat
     return wrapper
 
 
-class AppsRegister:
+class AppsRegister(TerminableResource):
     def __init__(self, net_ns_wrapper: str | None = None, log_config: LogConfig | None = None) -> None:
         self._accessories: dict[str, App] = {}
         self._accessories_lock = threading.RLock()
@@ -292,8 +292,9 @@ class AppsRegister:
         self._server_manager = None
         log.debug("XMLRPC Manager stopped")
 
-    def terminate(self):
-        self.uninit()
+    # Function aliases for TerminableResource interface.
+    resource_start = init
+    resource_terminate = uninit
 
     @property
     @with_accessories_lock

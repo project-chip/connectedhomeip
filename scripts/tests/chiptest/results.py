@@ -29,6 +29,7 @@ from pathlib import Path
 from types import TracebackType
 from typing import Any, ClassVar, TypeAlias
 
+from chiptest.concurrency.context import TerminableResource
 from chiptest.concurrency.work_queue import CancellableQueue, EndOfQueue
 from chiptest.log_config import LogConfig
 
@@ -395,7 +396,7 @@ ResultQueueT: TypeAlias = CancellableQueue[TestResult]
 
 
 @dataclass(eq=False)
-class ResultProcessingThread(threading.Thread):
+class ResultProcessingThread(threading.Thread, TerminableResource):
     """Thread that processes test results from the result queue, keeps track of test run summary and prints it at the end."""
 
     summary: RunSummary
@@ -443,7 +444,11 @@ class ResultProcessingThread(threading.Thread):
                 raise ResultError(
                     f"Iteration {iteration}: expected failure count {self.expected_failures}, but got {observed_failures}")
 
-    def terminate(self) -> None:
+    def resource_start(self) -> None:
+        """Start the result processing thread."""
+        self.start()
+
+    def resource_terminate(self) -> None:
         """Terminate the result processing thread."""
         try:
             # Close the result queue to unblock the thread if it's waiting for results.

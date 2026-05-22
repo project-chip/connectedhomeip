@@ -18,8 +18,10 @@ import os
 import pathlib
 import subprocess
 
+from matter.testing.concurrency.context import TerminableResource
 
-class DBusTestSystemBus(subprocess.Popen[bytes]):
+
+class DBusTestSystemBus(subprocess.Popen[bytes], TerminableResource):
     """Run a dbus-daemon in a subprocess as a test system bus."""
 
     SOCKET = pathlib.Path(f"/tmp/chip-dbus-{os.getpid()}")
@@ -33,7 +35,7 @@ class DBusTestSystemBus(subprocess.Popen[bytes]):
         assert self.stdout is not None, "stdout should have been set to subprocess.PIPE"
         self.stdout.readline()
 
-    def terminate(self):
+    def resource_terminate(self):
         super().terminate()
         self.SOCKET.unlink(True)
         self.wait()

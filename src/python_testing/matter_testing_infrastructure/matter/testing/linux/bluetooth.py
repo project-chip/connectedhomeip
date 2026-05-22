@@ -18,10 +18,12 @@ import logging
 import subprocess
 import threading
 
+from matter.testing.concurrency.context import TerminableResource
+
 log = logging.getLogger(__name__)
 
 
-class BluetoothMock(subprocess.Popen[str]):
+class BluetoothMock(subprocess.Popen[str], TerminableResource):
     """Run a BlueZ mock server in a subprocess."""
 
     # The MAC addresses of the virtual Bluetooth adapters.
@@ -43,6 +45,6 @@ class BluetoothMock(subprocess.Popen[str]):
         # Wait for the adapters to be ready.
         self.event.wait()
 
-    def terminate(self):
+    def resource_terminate(self):
         super().terminate()
         self.wait()

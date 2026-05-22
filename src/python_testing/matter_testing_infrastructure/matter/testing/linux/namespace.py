@@ -26,6 +26,7 @@ import subprocess
 import sys
 import time
 
+from matter.testing.concurrency.context import TerminableResource
 from matter.testing.tasks import SubprocessKind
 
 log = logging.getLogger(__name__)
@@ -258,7 +259,7 @@ class NetworkNamespace(NetworkResource):
         return self.netns_cmd_wrapper + cmd
 
 
-class IsolatedNetworkNamespace:
+class IsolatedNetworkNamespace(TerminableResource):
     """Helper class to create and remove network namespaces for tests."""
 
     def __init__(self, index: int = 0, mgmt_link_name: str = 'eth-mgmt', tool_link_name: str = 'eth-tool', app_link_name: str = 'eth-app',
@@ -279,55 +280,64 @@ class IsolatedNetworkNamespace:
         if add_ula:
             app_ipv6.append("fd00:0:1:1::1/64")
         self.app_link = NetworkLink(f"{app_link_name}-{index}", ipv4_addrs=["10.10.10.1/24"], ipv6_addrs=app_ipv6, ns=self.app_ns)
+        self._app_link_up = app_link_up
 
         tool_ipv6 = ["fe80::2/64"]
         if add_ula:
             tool_ipv6.append("fd00:0:1:1::2/64")
         self.tool_link = NetworkLink(f"{tool_link_name}-{index}",
                                      ipv4_addrs=["10.10.10.2/24"], ipv6_addrs=tool_ipv6, ns=self.tool_ns)
+        self._tool_link_up = tool_link_up
 
         mgmt_ipv6 = ["fe80::5/64"]
         if add_ula:
             mgmt_ipv6.append("fd00:0:1:1::5/64")
         self.mgmt_link = NetworkLink(f"{mgmt_link_name}-{index}",
                                      ipv4_addrs=["10.10.10.5/24"], ipv6_addrs=mgmt_ipv6, ns=self.mgmt_ns)
+        self._mgmt_link_up = mgmt_link_up
 
         self.bridge = NetworkBridge(f"br-{index}")
         self.bridge.attach_link(self.app_link)
         self.bridge.attach_link(self.tool_link)
         self.bridge.attach_link(self.mgmt_link)
 
-        try:
-            # Bring up selected links in parallel to reduce wait time.
-            with concurrent.futures.ThreadPoolExecutor(max_workers=3, thread_name_prefix="NetnsSetup") as executor:
-                list(executor.map(lambda x: x(), (
-                    self.app_ns.setup,
-                    self.tool_ns.setup,
-                    self.mgmt_ns.setup,
-                )))
+    def resource_start(self) -> None:
+        """Bring up selected links in parallel to reduce wait time."""
+        with concurrent.futures.ThreadPoolExecutor(max_workers=3, thread_name_prefix="NetnsSetup") as executor:
+            list(executor.map(lambda x: x(), (
+                self.app_ns.setup,
+                self.tool_ns.setup,
+                self.mgmt_ns.setup,
+            )))
 
-                list(executor.map(lambda x: x(), (
-                    self.app_link.setup,
-                    self.tool_link.setup,
-                    self.mgmt_link.setup,
-                )))
+            list(executor.map(lambda x: x(), (
+                self.app_link.setup,
+                self.tool_link.setup,
+                self.mgmt_link.setup,
+            )))
 
-                self.bridge.setup()
+            self.bridge.setup()
 
-                list(executor.map(lambda x: x(), (
-                    link.up for link, should_up in (
-                        (self.app_link, app_link_up),
-                        (self.tool_link, tool_link_up),
-                        (self.mgmt_link, mgmt_link_up)
-                    ) if should_up)))
+            list(executor.map(lambda x: x(), (
+                link.up for link, should_up in (
+                    (self.app_link, self._app_link_up),
+                    (self.tool_link, self._tool_link_up),
+                    (self.mgmt_link, self._mgmt_link_up)
+                ) if should_up)))
 
-                self.bridge.up()
+            self.bridge.up()
 
-        except BaseException:
-            log.exception("Encountered error while setting up network namespaces")
-            # Ensure that we leave a clean state on any exception.
-            self.terminate()
-            raise
+    def resource_terminate(self):
+        """Execute all teardown, gracefully omitting errors."""
+        for obj in (
+            self.bridge,
+            self.app_link, self.tool_link, self.mgmt_link,
+            self.app_ns, self.tool_ns, self.mgmt_ns
+        ):
+            try:
+                obj.teardown()
+            except Exception:
+                log.exception("Encountered an error during teardown of network resource '%s'", obj)
 
     def netns_for_subprocess_kind(self, kind: SubprocessKind) -> NetworkNamespace:
         match kind:
@@ -339,15 +349,3 @@ class IsolatedNetworkNamespace:
                 return self.mgmt_ns
             case _:
                 raise ValueError(f"Subprocess kind {kind} doesn't map to a network namespace.")
-
-    def terminate(self):
-        """Execute all teardown, gracefully omitting errors."""
-        for obj in (
-            self.bridge,
-            self.app_link, self.tool_link, self.mgmt_link,
-            self.app_ns, self.tool_ns, self.mgmt_ns
-        ):
-            try:
-                obj.teardown()
-            except Exception:
-                log.exception("Encountered an error during teardown of network resource '%s'", obj)

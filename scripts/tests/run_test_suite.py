@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import contextlib
 import enum
 import functools
 import logging
@@ -535,25 +536,22 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int, app_path: li
     ble_controller_tool = None
     thread_ba_host = None
     thread_ba_port = None
-    to_terminate: list[Terminable] = []
     task_queue: TaskQueueT = CancellableQueue()
-    errors: list[BaseException] = []
 
     with (multiprocessing.Manager() as mp_manager,
-          LogMessageCounter(mp_manager) as log_msg_counter):
+          LogMessageCounter(mp_manager) as log_msg_counter,
+          ResultProcessingThread(run_summary, expected_failures, keep_going, summary_file) as result_thread,
+          contextlib.ExitStack() as stack):
         prev_counter = context.obj.log_config.filter.msg_counter
         try:
             context.obj.log_config.filter.msg_counter = log_msg_counter
-
-            # Initialize result thread first so that it's closed last.
-            to_terminate.append(result_thread := ResultProcessingThread(run_summary, expected_failures, keep_going, summary_file))
 
             mgmt_ns_wrapper: str | None = None
             if sys.platform == 'linux':
                 app_name = 'wlx-app' if wifi_required else 'eth-app'
                 tool_name = 'wlx-tool' if commissioning_method == 'wifipaf-wifi' else 'eth-tool'
 
-                to_terminate.append(ns := chiptest.linux.IsolatedNetworkNamespace(
+                ns = stack.enter_context(chiptest.linux.IsolatedNetworkNamespace(
                     index=0,
                     # Do not bring up the app interface link automatically when doing BLE-WiFi commissioning.
                     app_link_up=not wifi_required,
@@ -565,43 +563,42 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int, app_path: li
 
                 match commissioning_method:
                     case CommissioningMethod.BLE_WIFI:
-                        to_terminate.append(chiptest.linux.DBusTestSystemBus())
-                        to_terminate.append(chiptest.linux.BluetoothMock())
-                        to_terminate.append(chiptest.linux.WpaSupplicantMock([app_name], "MatterAP", "MatterAPPassword", ns))
+                        stack.enter_context(chiptest.linux.DBusTestSystemBus())
+                        stack.enter_context(chiptest.linux.BluetoothMock())
+                        stack.enter_context(chiptest.linux.WpaSupplicantMock([app_name], "MatterAP", "MatterAPPassword", ns))
                         ble_controller_app = 0   # Bind app to the first BLE controller
                         ble_controller_tool = 1  # Bind tool to the second BLE controller
                     case CommissioningMethod.BLE_THREAD:
-                        to_terminate.append(chiptest.linux.DBusTestSystemBus())
-                        to_terminate.append(chiptest.linux.BluetoothMock())
-                        to_terminate.append(chiptest.linux.ThreadBorderRouter(TEST_THREAD_DATASET, ns))
+                        stack.enter_context(chiptest.linux.DBusTestSystemBus())
+                        stack.enter_context(chiptest.linux.BluetoothMock())
+                        stack.enter_context(chiptest.linux.ThreadBorderRouter(TEST_THREAD_DATASET, ns))
                         ble_controller_app = 0   # Bind app to the first BLE controller
                         ble_controller_tool = 1  # Bind tool to the second BLE controller
                     case CommissioningMethod.THREAD_MESHCOP:
-                        to_terminate.append(tbr := chiptest.linux.ThreadBorderRouter(TEST_THREAD_DATASET, ns))
+                        tbr = stack.enter_context(chiptest.linux.ThreadBorderRouter(TEST_THREAD_DATASET, ns))
                         thread_ba_host = tbr.get_border_agent_host()
                         thread_ba_port = tbr.get_border_agent_port()
                     case CommissioningMethod.WIFIPAF_WIFI:
-                        to_terminate.append(chiptest.linux.DBusTestSystemBus())
-                        to_terminate.append(chiptest.linux.WpaSupplicantMock(
+                        stack.enter_context(chiptest.linux.DBusTestSystemBus())
+                        stack.enter_context(chiptest.linux.WpaSupplicantMock(
                             [app_name, tool_name], "MatterAP", "MatterAPPassword", ns))
 
-                to_terminate.append(executor := chiptest.linux.LinuxNamespacedExecutor(ns))
+                executor = stack.enter_context(chiptest.linux.LinuxNamespacedExecutor(ns))
             elif sys.platform == 'darwin':
-                to_terminate.append(executor := chiptest.darwin.DarwinExecutor())
+                executor = stack.enter_context(chiptest.darwin.DarwinExecutor())
             else:
                 log.warning("No platform-specific executor for '%s'", sys.platform)
-                to_terminate.append(executor := Executor())
+                executor = stack.enter_context(Executor())
 
             runner = chiptest.runner.Runner(executor=executor)
 
-            to_terminate.append(apps_register := AppsRegister(mgmt_ns_wrapper, context.obj.log_config))
-            apps_register.init()
+            apps_register = stack.enter_context(AppsRegister(mgmt_ns_wrapper, context.obj.log_config))
 
             status_thread = PeriodicStatusThread(run_summary, log_msg_counter, periodicity=periodic_status)
             status_thread.start()
 
-            # Initialize the worker thread last, to ensure it's terminated first.
-            to_terminate.append(worker_thread := WorkerThread(task_queue, result_thread.result_queue))
+            # Initialize and start the worker thread last, to ensure it's terminated first.
+            worker_thread = stack.enter_context(WorkerThread(task_queue, result_thread.result_queue))
 
             # Schedule all tests.
             log.info("Each test will be executed %d times", iterations)
@@ -626,10 +623,6 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int, app_path: li
 
             log.info("All jobs scheduled")
 
-            # Start worker and result threads.
-            result_thread.start()
-            worker_thread.start()
-
             # Wait for exception or completion.
             while True:
                 # First check if there is an exception first in result thread, then in worker and propagate it to the main thread.
@@ -645,37 +638,15 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int, app_path: li
                     break
 
                 time.sleep(0.5)
-        except BaseException as e:
-            errors.append(e)
+        except KeyboardInterrupt:
+            log.info("Interrupting execution on user request")
+            raise
+        except ResultError as error:
+            # We just print the message, as the actual test failure with stack trace has already been logged.
+            log.error("%s", error)
+            raise SystemExit(2)
         finally:
-            for item in reversed(to_terminate):
-                item_name = item.__class__.__name__
-                try:
-                    log.info("Cleaning up %s", item_name)
-                    item.terminate()
-                except Exception as e:
-                    log.warning("Encountered exception during cleanup of %s: %r", item_name, e)
-                    errors.append(e)
-
             context.obj.log_config.filter.msg_counter = prev_counter
-
-    # If there is only one error, we handle some special cases. Otherwise, we raise an exception group with all the errors
-    # encountered during execution and cleanup.
-    if len(errors) == 1:
-        match error := errors[0]:
-            case KeyboardInterrupt():
-                log.info("Interrupting execution on user request")
-                raise error
-            case ResultError():
-                # We just print the message, as the actual test failure with stack trace has already been logged.
-                log.error("%s", error)
-                raise SystemExit(2)
-            case _:
-                # Reraise the single exception with its original traceback preserved.
-                raise error.with_traceback(error.__traceback__)
-
-    if errors:
-        raise BaseExceptionGroup("Encountered exceptions during test execution or cleanup", errors)
 
 
 @main.command(
