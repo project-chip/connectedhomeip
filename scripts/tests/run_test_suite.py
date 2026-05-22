@@ -539,7 +539,7 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int, app_path: li
                 app_name = 'wlx-app' if wifi_required else 'eth-app'
                 tool_name = 'wlx-tool' if commissioning_method == 'wifipaf-wifi' else 'eth-tool'
 
-                ns = stack.enter_context(chiptest.linux.IsolatedNetworkNamespace(
+                ns: chiptest.linux.IsolatedNetworkNamespace = stack.enter_context(chiptest.linux.IsolatedNetworkNamespace(
                     index=0,
                     # Do not bring up the app interface link automatically when doing BLE-WiFi commissioning.
                     app_link_up=not wifi_required,
@@ -563,7 +563,8 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int, app_path: li
                         ble_controller_app = 0   # Bind app to the first BLE controller
                         ble_controller_tool = 1  # Bind tool to the second BLE controller
                     case CommissioningMethod.THREAD_MESHCOP:
-                        tbr = stack.enter_context(chiptest.linux.ThreadBorderRouter(TEST_THREAD_DATASET, ns))
+                        tbr: chiptest.linux.ThreadBorderRouter = stack.enter_context(
+                            chiptest.linux.ThreadBorderRouter(TEST_THREAD_DATASET, ns))
                         thread_ba_host = tbr.get_border_agent_host()
                         thread_ba_port = tbr.get_border_agent_port()
                     case CommissioningMethod.WIFIPAF_WIFI:
@@ -571,22 +572,22 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int, app_path: li
                         stack.enter_context(chiptest.linux.WpaSupplicantMock(
                             [app_name, tool_name], "MatterAP", "MatterAPPassword", ns))
 
-                executor = stack.enter_context(chiptest.linux.LinuxNamespacedExecutor(ns))
+                executor: chiptest.linux.LinuxNamespacedExecutor = stack.enter_context(chiptest.linux.LinuxNamespacedExecutor(ns))
             elif sys.platform == 'darwin':
-                executor = stack.enter_context(chiptest.darwin.DarwinExecutor())
+                executor: chiptest.darwin.DarwinExecutor = stack.enter_context(chiptest.darwin.DarwinExecutor())
             else:
                 log.warning("No platform-specific executor for '%s'", sys.platform)
-                executor = stack.enter_context(Executor())
+                executor: Executor = stack.enter_context(Executor())
 
             runner = chiptest.runner.Runner(executor=executor)
 
-            apps_register = stack.enter_context(AppsRegister(mgmt_ns_wrapper, context.obj.log_config))
+            apps_register: AppsRegister = stack.enter_context(AppsRegister(mgmt_ns_wrapper, context.obj.log_config))
 
             status_thread = PeriodicStatusThread(run_summary, log_msg_counter, periodicity=periodic_status)
             status_thread.start()
 
             # Initialize and start the worker thread last, to ensure it's terminated first.
-            worker_thread = stack.enter_context(WorkerThread(task_queue, result_thread.result_queue))
+            worker_thread: WorkerThread = stack.enter_context(WorkerThread(task_queue, result_thread.result_queue))
 
             # Schedule all tests.
             log.info("Each test will be executed %d times", iterations)
