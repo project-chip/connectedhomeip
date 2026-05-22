@@ -34,26 +34,6 @@ LIT_ICD_APP_ESC = shlex.quote(str(CHIP_REPO / "out/debug/lit_icd/lit-icd-app"))
 
 MATTER_CONTROLLER_WHEEL_DIR = CHIP_REPO / "out/debug/linux_x64_gcc/controller/python"
 MATTER_CONTROLLER_WHEELS = ["matter_clusters", "matter_core", "matter_repl"]
-MATTER_CONTROLLER_WHEELS_PATHS: list[Path]
-MATTER_CONTROLLER_INSTALL_WHEELS: str
-
-
-def _get_matter_controller_wheels() -> list[Path]:
-    wheel_paths = []
-    for package_name in MATTER_CONTROLLER_WHEELS:
-        if len(matches := list(MATTER_CONTROLLER_WHEEL_DIR.glob(f"{package_name}-*.whl"))) != 1:
-            raise FileNotFoundError(
-                f"Expected exactly one wheel for {package_name} in {MATTER_CONTROLLER_WHEEL_DIR}, found {len(matches)}"
-            )
-        wheel_paths.append(matches[0])
-    return wheel_paths
-
-
-def __getattr__(name):
-    match name:
-        case "MATTER_CONTROLLER_WHEELS_PATHS":
-            return _get_matter_controller_wheels()
-        case "MATTER_CONTROLLER_INSTALL_WHEELS":
-            return (f"pip3 install --break-system-packages {shlex.join(str(wheel) for wheel in _get_matter_controller_wheels())}")
-        case _:
-            raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+MATTER_CONTROLLER_INSTALL_WHEELS = (
+    f"pip3 install --break-system-packages --find-links {shlex.quote(str(MATTER_CONTROLLER_WHEEL_DIR))} "
+    f"{' '.join(MATTER_CONTROLLER_WHEELS)}")
