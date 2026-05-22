@@ -98,9 +98,10 @@ bool VerifyAndLogIfNoEventGenerator(DataModel::EventsGenerator * eventsGenerator
     return true;
 }
 
-void EmitDSTTableEmptyEvent(DataModel::EventsGenerator * eventsGenerator)
+void EmitDSTTableEmptyEvent(DataModel::EventsGenerator * eventsGenerator, const BitFlags<TimeSynchronization::Feature> features)
 {
     VerifyOrReturn(VerifyAndLogIfNoEventGenerator(eventsGenerator));
+    VerifyOrReturn(features.Has(Feature::kTimeZone));
 
     Events::DSTTableEmpty::Type event;
     eventsGenerator->GenerateEvent(event, kRootEndpointId);
@@ -109,9 +110,11 @@ void EmitDSTTableEmptyEvent(DataModel::EventsGenerator * eventsGenerator)
     // delegate->scheduleDSTTableEmptyEvent()
 }
 
-void EmitDSTStatusEvent(bool dstOffsetActive, DataModel::EventsGenerator * eventsGenerator)
+void EmitDSTStatusEvent(bool dstOffsetActive, DataModel::EventsGenerator * eventsGenerator,
+                        const BitFlags<TimeSynchronization::Feature> features)
 {
     VerifyOrReturn(VerifyAndLogIfNoEventGenerator(eventsGenerator));
+    VerifyOrReturn(features.Has(Feature::kTimeZone));
 
     Events::DSTStatus::Type event;
     event.DSTOffsetActive = dstOffsetActive;
@@ -119,9 +122,10 @@ void EmitDSTStatusEvent(bool dstOffsetActive, DataModel::EventsGenerator * event
 }
 
 void EmitTimeZoneStatusEvent(const Span<TimeSyncDataProvider::TimeZoneStore> & timeZone,
-                             DataModel::EventsGenerator * eventsGenerator)
+                             DataModel::EventsGenerator * eventsGenerator, const BitFlags<TimeSynchronization::Feature> features)
 {
     VerifyOrReturn(VerifyAndLogIfNoEventGenerator(eventsGenerator));
+    VerifyOrReturn(features.Has(Feature::kTimeZone));
 
     const auto & tzList = timeZone;
     VerifyOrReturn(tzList.size() != 0);
@@ -148,9 +152,11 @@ void EmitTimeFailureEvent(TimeSynchronization::Delegate * delegate, DataModel::E
     // https://github.com/project-chip/connectedhomeip/issues/27200
 }
 
-void EmitMissingTrustedTimeSourceEvent(DataModel::EventsGenerator * eventsGenerator)
+void EmitMissingTrustedTimeSourceEvent(DataModel::EventsGenerator * eventsGenerator,
+                                       const BitFlags<TimeSynchronization::Feature> features)
 {
     VerifyOrReturn(VerifyAndLogIfNoEventGenerator(eventsGenerator));
+    VerifyOrReturn(features.Has(Feature::kTimeSyncClient));
 
     Events::MissingTrustedTimeSource::Type event;
     eventsGenerator->GenerateEvent(event, kRootEndpointId);
@@ -164,10 +170,10 @@ void EmitMissingTrustedTimeSourceEvent(DataModel::EventsGenerator * eventsGenera
 TimeSynchronizationCluster::TimeSynchronizationCluster(EndpointId endpoint, const BitFlags<TimeSynchronization::Feature> features,
                                                        const OptionalAttributeSet & optionalAttributeSet,
                                                        const StartupConfiguration & config, Context context) :
-    DefaultServerCluster({ endpoint, TimeSynchronization::Id }),
-    mFeatures(features), mOptionalAttributeSet(optionalAttributeSet), mSupportsDNSResolve(config.supportsDNSResolve),
-    mNTPServerAvailable(config.ntpServerAvailable), mTimeZoneDatabase(config.timeZoneDatabase), mTimeSource(config.timeSource),
-    mDelegate(config.delegate), mTimeSyncContext(context),
+    DefaultServerCluster({ endpoint, TimeSynchronization::Id }), mFeatures(features), mOptionalAttributeSet(optionalAttributeSet),
+    mSupportsDNSResolve(config.supportsDNSResolve), mNTPServerAvailable(config.ntpServerAvailable),
+    mTimeZoneDatabase(config.timeZoneDatabase), mTimeSource(config.timeSource), mDelegate(config.delegate),
+    mTimeSyncContext(context),
 #if TIME_SYNC_ENABLE_TSC_FEATURE
     mOnDeviceConnectedCallback(OnDeviceConnectedWrapper, this),
     mOnDeviceConnectionFailureCallback(OnDeviceConnectionFailureWrapper, this),
@@ -819,10 +825,7 @@ CHIP_ERROR TimeSynchronizationCluster::ClearDSTOffset()
 {
     InitDSTOffset();
     ReturnErrorOnFailure(mTimeSyncDataProvider.ClearDSTOffset());
-    if (mFeatures.Has(Feature::kTimeZone))
-    {
-        EmitDSTTableEmptyEvent(GetEventsGenerator());
-    }
+    EmitDSTTableEmptyEvent(GetEventsGenerator(), mFeatures);
     return CHIP_NO_ERROR;
 }
 
@@ -883,10 +886,7 @@ CHIP_ERROR TimeSynchronizationCluster::GetLocalTime(DataModel::Nullable<uint64_t
     VerifyOrReturnError(UnixEpochToChipEpochMicros(utcTime.count(), chipEpochTime), CHIP_ERROR_INVALID_TIME);
     if (TimeState::kChanged == UpdateTimeZoneState())
     {
-        if (mFeatures.Has(Feature::kTimeZone))
-        {
-            EmitTimeZoneStatusEvent(GetTimeZone(), GetEventsGenerator());
-        }
+        EmitTimeZoneStatusEvent(GetTimeZone(), GetEventsGenerator(), mFeatures);
     }
     VerifyOrReturnError(GetTimeZone().size() != 0, CHIP_ERROR_INVALID_TIME);
     const auto & tzStore = GetTimeZone()[0];
@@ -905,10 +905,7 @@ CHIP_ERROR TimeSynchronizationCluster::GetLocalTime(DataModel::Nullable<uint64_t
     localTime.SetNonNull((localTimeSec * kMicrosecondsPerSecond) + usRemainder);
     if (newState == TimeState::kChanged)
     {
-        if (mFeatures.Has(Feature::kTimeZone))
-        {
-            EmitDSTStatusEvent(dstOffset != 0, GetEventsGenerator());
-        }
+        EmitDSTStatusEvent(dstOffset != 0, GetEventsGenerator(), mFeatures);
     }
     return CHIP_NO_ERROR;
 }
@@ -1026,10 +1023,7 @@ void TimeSynchronizationCluster::OnFabricRemoved(const FabricTable & fabricTable
     {
         DataModel::Nullable<Structs::TrustedTimeSourceStruct::Type> tts;
         TEMPORARY_RETURN_IGNORED SetTrustedTimeSource(tts);
-        if (mFeatures.Has(Feature::kTimeSyncClient))
-        {
-            EmitMissingTrustedTimeSourceEvent(GetEventsGenerator());
-        }
+        EmitMissingTrustedTimeSourceEvent(GetEventsGenerator(), mFeatures);
     }
 }
 
@@ -1158,10 +1152,7 @@ TimeSynchronizationCluster::HandleSetTrustedTimeSource(CommandHandler * commandO
     else
     {
         tts.SetNull();
-        if (mFeatures.Has(Feature::kTimeSyncClient))
-        {
-            EmitMissingTrustedTimeSourceEvent(GetEventsGenerator());
-        }
+        EmitMissingTrustedTimeSourceEvent(GetEventsGenerator(), mFeatures);
     }
 
     TEMPORARY_RETURN_IGNORED SetTrustedTimeSource(tts);
@@ -1191,10 +1182,7 @@ TimeSynchronizationCluster::HandleSetTimeZone(CommandHandler * commandObj, const
     if (to_underlying(mEventFlag) & to_underlying(TimeSyncEventFlag::kTimeZoneStatus))
     {
         ClearEventFlag(TimeSyncEventFlag::kTimeZoneStatus);
-        if (mFeatures.Has(Feature::kTimeZone))
-        {
-            EmitTimeZoneStatusEvent(GetTimeZone(), GetEventsGenerator());
-        }
+        EmitTimeZoneStatusEvent(GetTimeZone(), GetEventsGenerator(), mFeatures);
     }
     GetDelegate()->TimeZoneListChanged(GetTimeZone());
 
@@ -1208,10 +1196,7 @@ TimeSynchronizationCluster::HandleSetTimeZone(CommandHandler * commandObj, const
         if (tz.name.HasValue() && GetDelegate()->HandleUpdateDSTOffset(tz.name.Value()))
         {
             response.DSTOffsetRequired = false;
-            if (mFeatures.Has(Feature::kTimeZone))
-            {
-                EmitDSTStatusEvent(true, GetEventsGenerator());
-            }
+            EmitDSTStatusEvent(true, GetEventsGenerator(), mFeatures);
         }
     }
 
@@ -1221,10 +1206,7 @@ TimeSynchronizationCluster::HandleSetTimeZone(CommandHandler * commandObj, const
         TEMPORARY_RETURN_IGNORED ClearDSTOffset();
         if (dstState == TimeState::kActive || dstState == TimeState::kChanged)
         {
-            if (mFeatures.Has(Feature::kTimeZone))
-            {
-                EmitDSTStatusEvent(false, GetEventsGenerator());
-            }
+            EmitDSTStatusEvent(false, GetEventsGenerator(), mFeatures);
         }
     }
 
@@ -1256,10 +1238,7 @@ TimeSynchronizationCluster::HandleSetDSTOffset(CommandHandler * commandObj, cons
     // if DST state changes, generate DSTStatus event
     if (dstState != UpdateDSTOffsetState())
     {
-        if (mFeatures.Has(Feature::kTimeZone))
-        {
-            EmitDSTStatusEvent(TimeState::kActive == UpdateDSTOffsetState(), GetEventsGenerator());
-        }
+        EmitDSTStatusEvent(TimeState::kActive == UpdateDSTOffsetState(), GetEventsGenerator(), mFeatures);
     }
 
     return Protocols::InteractionModel::Status::Success;
