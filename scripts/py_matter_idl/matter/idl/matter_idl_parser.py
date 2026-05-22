@@ -67,8 +67,7 @@ class PrefixCppDocComment:
             yield cluster
             for attribute in cluster.attributes:
                 yield attribute.definition
-            for command in cluster.commands:
-                yield command
+            yield from cluster.commands
             for struct in cluster.structs:
                 yield struct
                 for field in struct.fields:
