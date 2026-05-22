@@ -817,6 +817,9 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
     err = chip::NXP::App::Se05x::PostInit();
     SuccessOrExit(err);
 
+    // Close SE05x session
+    TEMPORARY_RETURN_IGNORED se05x_close_session();
+
 exit:
     if (err != CHIP_NO_ERROR)
     {
