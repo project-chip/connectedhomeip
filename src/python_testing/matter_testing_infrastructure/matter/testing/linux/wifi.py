@@ -549,3 +549,10 @@ class WpaSupplicantMock(TerminableThread):
     def resource_terminate(self):
         self.loop.call_soon_threadsafe(self.loop.stop)
         super().resource_terminate()
+
+        if not self.loop.is_closed():
+            try:
+                self.loop.close()
+            except Exception:
+                log.exception("Failed to close WpaSupplicantMock event loop")
+                raise
