@@ -68,8 +68,7 @@ AttributeReadRequest = typing.Union[
     tuple[type[ClusterObjects.Cluster]],
     # Wildcard endpoint, Cluster + Attribute present
     tuple[type[ClusterObjects.ClusterAttributeDescriptor]],
-    tuple[int, type[ClusterObjects.Cluster]
-          ],  # Wildcard attribute id
+    tuple[int, type[ClusterObjects.Cluster]],  # Wildcard attribute id
     # Concrete path
     tuple[int, type[ClusterObjects.ClusterAttributeDescriptor]],
     ClusterAttribute.TypedAttributePath  # Directly specified attribute path

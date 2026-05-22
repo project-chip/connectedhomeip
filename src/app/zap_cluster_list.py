@@ -8,9 +8,7 @@ import pathlib
 import sys
 
 
-def get_cluster_sources(clusters: set[str],
-                        source_map: dict[str,
-                                         list[str]], side: str):
+def get_cluster_sources(clusters: set[str], source_map: dict[str, list[str]], side: str):
     """Returns a list of cluster source directories for the given clusters.
 
     Returns:
