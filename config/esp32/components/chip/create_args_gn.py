@@ -61,7 +61,7 @@ def expand_response_file(flag):
         with open(response_file_path) as f:
             content = f.read()
             return shlex.split(content)
-    except (IOError, OSError) as e:
+    except OSError as e:
         raise Exception(f"Failed to read response file '{response_file_path}': {e}")
 
 

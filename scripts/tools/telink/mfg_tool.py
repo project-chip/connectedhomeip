@@ -141,7 +141,7 @@ def read_der_file(path: str):
     try:
         with open(path, 'rb') as f:
             return f.read()
-    except IOError as e:
+    except OSError as e:
         log.exception(e)
         raise e
 
