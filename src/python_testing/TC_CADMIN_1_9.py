@@ -70,13 +70,12 @@ class TC_CADMIN_1_9(CADMINBaseTest):
     async def CommissionAttempt(self, params: CustomCommissioningParameters, expectedErrCode: int):
         if expectedErrCode == 3:
             for cycle in range(20):
-                log.info("-----------------Current Iteration {}-------------------------".format(cycle+1))
+                log.info(f"-----------------Current Iteration {cycle+1}-------------------------")
                 new_params = deepcopy(params)
                 new_params.commissioningParameters.setupPinCode = self.generate_unique_random_value(
                     params.commissioningParameters.setupPinCode)
                 errcode = await self.CommissionOnNetwork(new_params)
-                log.info('Commissioning complete done. Successful? {}, errorcode = {}, cycle={}'.format(
-                    errcode.is_success, errcode, (cycle+1)))
+                log.info(f'Commissioning complete done. Successful? {errcode.is_success}, errorcode = {errcode}, cycle={cycle+1}')
                 asserts.assert_false(errcode.is_success, 'Commissioning complete did not error as expected')
                 asserts.assert_true(errcode.sdk_code == expectedErrCode,
                                     'Unexpected error code returned from CommissioningComplete')
@@ -84,7 +83,7 @@ class TC_CADMIN_1_9(CADMINBaseTest):
         elif expectedErrCode == 50:
             log.info("-----------------Attempting connection expecting timeout-------------------------")
             errcode = await self.CommissionOnNetwork(params)
-            log.info('Commissioning complete done. Successful? {}, errorcode = {}'.format(errcode.is_success, errcode))
+            log.info(f'Commissioning complete done. Successful? {errcode.is_success}, errorcode = {errcode}')
             asserts.assert_false(errcode.is_success, 'Commissioning complete did not error as expected')
             # TODO: Adding try or except clause here as the errcode code be either 50 for timeout or 3 for incorrect state at this time
             # until issue mentioned in https://github.com/project-chip/connectedhomeip/issues/34383 can be resolved

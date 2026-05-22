@@ -419,7 +419,7 @@ class TC_RR_1_1(MatterBaseTest):
         asserts.assert_true(Clusters.BasicInformation in basic_info[0], "Must have read Basic Information cluster data")
         for attribute in large_read_contents:
             asserts.assert_true(attribute in basic_info[0][Clusters.BasicInformation],
-                                "Must have read back attribute {}".format(attribute.__name__))
+                                f"Must have read back attribute {attribute.__name__}")
 
         # Step 7: Trigger a change on NodeLabel
         log.info(
@@ -443,7 +443,7 @@ class TC_RR_1_1(MatterBaseTest):
                 # Record arrival of an expected subscription change when seen
                 if endpoint == 0 and attribute == Clusters.BasicInformation.Attributes.NodeLabel and value == AFTER_LABEL:
                     if not all_changes[client_name]:
-                        log.info("Got expected attribute change for client {}".format(client_name))
+                        log.info(f"Got expected attribute change for client {client_name}")
                         all_changes[client_name] = True
 
                 # We are done waiting when we have accumulated all results
@@ -462,10 +462,10 @@ class TC_RR_1_1(MatterBaseTest):
 
         for catcher in resub_catchers:
             if catcher.caught_resubscription:
-                log.error("Client {} saw a resubscription".format(catcher.name))
+                log.error(f"Client {catcher.name} saw a resubscription")
                 sub_test_failed = True
             else:
-                log.info("Client {} correctly did not see a resubscription".format(catcher.name))
+                log.info(f"Client {catcher.name} correctly did not see a resubscription")
 
         all_reports_gotten = all(all_changes.values())
         if not all_reports_gotten:
@@ -600,9 +600,8 @@ class TC_RR_1_1(MatterBaseTest):
         if check_heap_watermarks:
             log.info("Read Heap info after stress test")
             high_watermark_after, current_usage_after = await self.read_heap_statistics(dev_ctrl)
-            log.info("=== Heap Usage Diagnostics ===\nHigh watermark: {} (before) / {} (after)\n"
-                     "Current usage: {} (before) / {} (after)".format(high_watermark_before, high_watermark_after,
-                                                                      current_usage_before, current_usage_after))
+            log.info(f"=== Heap Usage Diagnostics ===\nHigh watermark: {high_watermark_before} (before) / {high_watermark_after} (after)\n"
+                     f"Current usage: {current_usage_before} (before) / {current_usage_after} (after)")
 
     async def validate_groupcast_resources(
             self,
@@ -1130,7 +1129,7 @@ class TC_RR_1_1(MatterBaseTest):
         asserts.assert_true(Clusters.SoftwareDiagnostics in swdiag_info[0], "Must have read Software Diagnostics cluster data")
         for attribute in diagnostics_contents:
             asserts.assert_true(attribute in swdiag_info[0][Clusters.SoftwareDiagnostics],
-                                "Must have read back attribute {}".format(attribute.__name__))
+                                f"Must have read back attribute {attribute.__name__}")
         high_watermark = swdiag_info[0][Clusters.SoftwareDiagnostics][
             Clusters.SoftwareDiagnostics.Attributes.CurrentHeapHighWatermark]
         current_usage = swdiag_info[0][Clusters.SoftwareDiagnostics][

@@ -196,13 +196,12 @@ class TC_OPSTATE_BASE():
         attr_value.sort()
         expected_contains.sort()
 
-        log.info("## Current value: [{}]".format(attr_value))
-        log.info("## Expected value: [{}]".format(expected_contains))
+        log.info(f"## Current value: [{attr_value}]")
+        log.info(f"## Expected value: [{expected_contains}]")
 
         for item in expected_contains:
             if item not in attr_value:
-                asserts.fail("Entry ({}), not found! The returned value SHALL include all the entries: [{}]!".format(
-                    item, expected_contains))
+                asserts.fail(f"Entry ({item}), not found! The returned value SHALL include all the entries: [{expected_contains}]!")
 
     ############################
     #   TEST CASE 1.1

@@ -33,7 +33,7 @@ class CredentialSource(Enum):
             return "development"
         if self == CredentialSource.kProduction:
             return "production"
-        raise KeyError("Invalid enum: {!r}".format(self))
+        raise KeyError(f"Invalid enum: {self!r}")
 
 
 class CertificatePurpose(Enum):
@@ -46,7 +46,7 @@ class CertificatePurpose(Enum):
             return "paa-root-certs"
         if self == CertificatePurpose.kCD:
             return "cd-certs"
-        raise KeyError("Invalid enum: {!r}".format(self))
+        raise KeyError(f"Invalid enum: {self!r}")
 
 
 def _get_credentials(credential_source: Union[CredentialSource, Traversable], certificate_purpose: CertificatePurpose) -> Traversable:

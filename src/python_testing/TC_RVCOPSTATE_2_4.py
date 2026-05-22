@@ -87,17 +87,16 @@ class TC_RVCOPSTATE_2_4(MatterBaseTest):
         self.print_step(step_number, "Send GoHome command")
         ret = await self.send_go_home_cmd()
         asserts.assert_equal(ret.commandResponseState.errorStateID, expected_error,
-                             "errorStateID({}) should be {}".format(ret.commandResponseState.errorStateID,
-                                                                    error_enum_to_text(expected_error)))
+                             f"errorStateID({ret.commandResponseState.errorStateID}) should be {error_enum_to_text(expected_error)}")
 
     # Prints the step number, reads the operational state attribute and checks if it matches with expected_state
     async def read_operational_state_with_check(self, step_number, expected_state):
         self.print_step(step_number, "Read OperationalState")
         operational_state = await self.read_mod_attribute_expect_success(
             endpoint=self.endpoint, attribute=Clusters.RvcOperationalState.Attributes.OperationalState)
-        log.info("OperationalState: {}".format(operational_state))
+        log.info(f"OperationalState: {operational_state}")
         asserts.assert_equal(operational_state, expected_state,
-                             "OperationalState({}) should be {}".format(operational_state, state_enum_to_text(expected_state)))
+                             f"OperationalState({operational_state}) should be {state_enum_to_text(expected_state)}")
 
     # Sends an RvcRunMode Change to mode command
     async def send_run_change_to_mode_cmd(self, new_mode):

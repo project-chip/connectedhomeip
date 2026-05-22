@@ -92,7 +92,7 @@ def main(log_level, log_timestamps, image, file_image_list, qemu, verbose):
         log.info("Executing image %s", path)
 
         status = subprocess.run([qemu, "-nographic", "-no-reboot", "-machine", "esp32",
-                                 "-drive", "file={},if=mtd,format=raw".format(path)], capture_output=True)
+                                 "-drive", f"file={path},if=mtd,format=raw"], capture_output=True)
 
         # Encoding is NOT valid, but want to not try to decode potential
         # invalid UTF-8 sequences. The strings we care about are ascii anyway
@@ -125,16 +125,16 @@ def main(log_level, log_timestamps, image, file_image_list, qemu, verbose):
                 if 'CHIP-tests: CHIP test status: 0' in line:
                     in_test = False
                 elif 'CHIP-tests: CHIP test status: ' in line:
-                    raise Exception("CHIP test status is NOT 0: {}".format(line))
+                    raise Exception(f"CHIP test status is NOT 0: {line}")
 
                 # Ignore FAILED messages not in the middle of a test, to reduce
                 # the chance of false positives from other logging.
                 if in_test and re.search(r'  \[  FAILED  \] ', line):
-                    raise Exception("Step failed: {}".format(line))
+                    raise Exception(f"Step failed: {line}")
 
                 # TODO: Figure out why exit(0) in man_app.cpp's tester_task is aborting and fix that.
                 if in_test and line.startswith('abort() was called at PC'):
-                    raise Exception("Unexpected crash: {}".format(line))
+                    raise Exception(f"Unexpected crash: {line}")
 
             if in_test:
                 raise Exception('Not expected to be in the middle of a test when the log ends')

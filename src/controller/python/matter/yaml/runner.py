@@ -714,7 +714,7 @@ class DiscoveryCommandAction(BaseAction):
             filterType=self.filterType, filter=self.filter, stopOnFirst=True, timeoutSecond=5)
 
         # Devices will be a list: [CommissionableNode(), ...]
-        LOGGER.info("Discovered devices: {!r}".format(devices))
+        LOGGER.info(f"Discovered devices: {devices!r}")
 
         if not devices:
             LOGGER.error("No devices found")

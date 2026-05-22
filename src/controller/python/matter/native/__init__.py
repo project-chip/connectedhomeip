@@ -191,7 +191,7 @@ def FindNativeLibraryPath(library: Library) -> str:
     # running script looking for an CHIP build directory containing the Chip Device
     # Manager DLL. This makes it possible to import and use the ChipDeviceMgr module
     # directly from a built copy of the CHIP source tree.
-    buildMachineGlob = "{}-*-{}*".format(platform.machine(), platform.system().lower())
+    buildMachineGlob = f"{platform.machine()}-*-{platform.system().lower()}*"
     relDMDLLPathGlob = os.path.join(
         "build",
         buildMachineGlob,

@@ -291,7 +291,7 @@ def StringToAccessPrivilege(value: str) -> AccessPrivilege:
         return AccessPrivilege.MANAGE
     if value == "admin":
         return AccessPrivilege.ADMINISTER
-    raise Exception("UNKNOWN privilege level: {!r}".format(value))
+    raise Exception(f"UNKNOWN privilege level: {value!r}")
 
 
 def AttributesToCommand(attrs: AttributesImpl) -> Command:

@@ -267,7 +267,7 @@ def main():
     for zap_filename in args.zap_filenames:
         body = loadZapfile(zap_filename)
 
-        print("==== Processing {} ====".format(zap_filename))
+        print(f"==== Processing {zap_filename} ====")
         mutateZapbody(
             body, mutators=mutators)
         saveZapfile(body, zap_filename)

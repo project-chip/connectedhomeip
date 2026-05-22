@@ -110,7 +110,7 @@ class TC_MWOM_1_2(MatterBaseTest):
         except AttributeError:
             derivedTags = Clusters.MicrowaveOvenMode.Enums.ModeTag
 
-        log.info("Derived tags: {}".format(derivedTags))
+        log.info(f"Derived tags: {derivedTags}")
 
         for m in supported_modes:
             for t in m.modeTags:
@@ -125,7 +125,7 @@ class TC_MWOM_1_2(MatterBaseTest):
 
         self.step(3)
         current_mode = await self.read_mod_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentMode)
-        log.info("CurrentMode: {}".format(current_mode))
+        log.info(f"CurrentMode: {current_mode}")
         asserts.assert_true(current_mode in modes, "CurrentMode is not a supported mode!")
 
 

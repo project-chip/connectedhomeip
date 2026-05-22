@@ -72,7 +72,7 @@ class GnBuilder(Builder):
         cmd = [
             'gn', 'gen', '--check', '--fail-on-unused-args',
             '--add-export-compile-commands=*',
-            '--root={}'.format(self.root),
+            f'--root={self.root}',
         ]
 
         if self.quiet:
@@ -88,7 +88,7 @@ class GnBuilder(Builder):
             # setting environment variables
             cmd = [
                 'bash', '-c', '\n' + ' '.join(
-                    ['{}="{}" \\\n'.format(key, value) for key, value in env.items()] +
+                    [f'{key}="{value}" \\\n' for key, value in env.items()] +
                     [shlex.join(cmd)]
                 )
             ]
@@ -114,7 +114,7 @@ class GnBuilder(Builder):
             # setting environment variables
             cmd = [
                 'bash', '-c', '\n' + ' '.join(
-                    ['{}="{}" \\\n'.format(key, value) for key, value in env.items()] +
+                    [f'{key}="{value}" \\\n' for key, value in env.items()] +
                     [shlex.join(cmd)]
                 )
             ]

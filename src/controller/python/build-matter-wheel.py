@@ -117,8 +117,8 @@ try:
     #
     packages = manifest['packages']
 
-    print("packageName: {}".format(packageName))
-    print("libName: {}".format(libName))
+    print(f"packageName: {packageName}")
+    print(f"libName: {libName}")
 
     # Invoke the setuptools 'bdist_wheel' command to generate a wheel
     # containing Matter Python packages, shared libraries and scripts.

@@ -69,7 +69,7 @@ def parse_pics(lines: typing.List[str]) -> dict[str, bool]:
         key, _, val = line.partition("=")
         val = val.strip()
         if val not in ["1", "0"]:
-            raise ValueError('PICS {} must have a value of 0 or 1'.format(key))
+            raise ValueError(f'PICS {key} must have a value of 0 or 1')
 
         pics[key.strip()] = (val == "1")
     return pics

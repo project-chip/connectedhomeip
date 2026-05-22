@@ -57,7 +57,7 @@ class ASRApp(Enum):
             return 'dishwasher-app'
         if self == ASRApp.REFRIGERATOR:
             return 'refrigerator-app'
-        raise Exception('Unknown app type: {!r}'.format(self))
+        raise Exception(f'Unknown app type: {self!r}')
 
     def AppNamePrefix(self):
         if self == ASRApp.ALL_CLUSTERS:
@@ -82,7 +82,7 @@ class ASRApp(Enum):
             return 'chip-asr-dishwasher-example'
         if self == ASRApp.REFRIGERATOR:
             return 'chip-asr-refrigerator-example'
-        raise Exception('Unknown app type: {!r}'.format(self))
+        raise Exception(f'Unknown app type: {self!r}')
 
     def BuildRoot(self, root):
         return os.path.join(root, 'examples', self.ExampleName(), 'asr')
@@ -100,7 +100,7 @@ class ASRBoard(Enum):
             return 'asr595x'
         if self == ASRBoard.ASR550X:
             return 'asr550x'
-        raise Exception('Unknown board #: {!r}'.format(self))
+        raise Exception(f'Unknown board #: {self!r}')
 
 
 class ASRBuilder(GnBuilder):
@@ -126,7 +126,7 @@ class ASRBuilder(GnBuilder):
         self.app = app
 
         asr_chip = self.board.GetIC()
-        self.extra_gn_options = ['asr_ic_family="{}"'.format(asr_chip)]
+        self.extra_gn_options = [f'asr_ic_family="{asr_chip}"']
 
         if asr_chip == "asr582x":
             ASR_ARCH = "arm"
@@ -137,15 +137,15 @@ class ASRBuilder(GnBuilder):
         elif asr_chip == "asr550x":
             ASR_ARCH = "arm"
             ASR_SDK_ROOT = "//third_party/connectedhomeip/third_party/asr/asr550x"
-        self.extra_gn_options.append('target_cpu="{}"'.format(ASR_ARCH))
+        self.extra_gn_options.append(f'target_cpu="{ASR_ARCH}"')
 
         toolchain = os.path.join(root, os.path.split(os.path.realpath(__file__))[0], '../../../config/asr/toolchain')
-        toolchain = 'custom_toolchain="{}:asrtoolchain"'.format(toolchain)
+        toolchain = f'custom_toolchain="{toolchain}:asrtoolchain"'
         if toolchain:
             self.extra_gn_options.append(toolchain)
 
-        self.extra_gn_options.append('asr_sdk_build_root="{}"'.format(ASR_SDK_ROOT))
-        self.extra_gn_options.append('mbedtls_target="{}:asr_build"'.format(ASR_SDK_ROOT))
+        self.extra_gn_options.append(f'asr_sdk_build_root="{ASR_SDK_ROOT}"')
+        self.extra_gn_options.append(f'mbedtls_target="{ASR_SDK_ROOT}:asr_build"')
 
         if (asr_chip == "asr582x"
                 or asr_chip == "asr595x"):

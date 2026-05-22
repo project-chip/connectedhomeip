@@ -270,8 +270,7 @@ class TC_DRLK_2_13(MatterBaseTest):
                 asserts.assert_true(matchers.is_type(response, Clusters.DoorLock.Commands.GetCredentialStatusResponse),
                                     "Unexpected return type for GetCredentialStatus")
                 asserts.assert_true(response.credentialExists == credential_exists,
-                                    "Error when executing GetCredentialStatus command, credentialExists={}".format(
-                                        str(response.credentialExists)))
+                                    f"Error when executing GetCredentialStatus command, credentialExists={str(response.credentialExists)}")
                 asserts.assert_equal(userIndex, response.userIndex,
                                      f"User Index is not matching, UserIndex={response.userIndex}")
                 return response
@@ -301,7 +300,7 @@ class TC_DRLK_2_13(MatterBaseTest):
                 asserts.assert_true(matchers.is_type(response, Clusters.Objects.DoorLock.Commands.SetCredentialResponse),
                                     "Unexpected return type for SetCredential")
                 asserts.assert_true(response.status == expected_status,
-                                    "Error sending SetCredential command, status={}".format(str(response.status)))
+                                    f"Error sending SetCredential command, status={str(response.status)}")
             except InteractionModelError as e:
                 log.exception(e)
                 asserts.assert_equal(e.status, Status.Success, f"Unexpected error returned: {e}")

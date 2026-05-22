@@ -221,7 +221,7 @@ def gen_test_certs(chip_cert: str,
     def convert_pem_to_der(chip_cert, action, pem):
 
         if not os.path.isfile(pem):
-            raise Exception("File {} is not existed.".format(pem))
+            raise Exception(f"File {pem} is not existed.")
 
         der = Path(pem).with_suffix(".der")
         if not os.path.isfile(der):
@@ -273,8 +273,8 @@ def gen_test_certs(chip_cert: str,
 
     if dac_cert is None:
         dac_disc_vp = "{}_{}_{}".format(hex(dac_vendor_id).split("x")[-1], hex(dac_product_id).split("x")[-1], discriminator)
-        dac_cert = os.path.join(output, "out_{}_dac_cert.pem".format(dac_disc_vp))
-        dac_key = os.path.join(output, "out_{}_dac_key.pem".format(dac_disc_vp))
+        dac_cert = os.path.join(output, f"out_{dac_disc_vp}_dac_cert.pem")
+        dac_key = os.path.join(output, f"out_{dac_disc_vp}_dac_key.pem")
 
     gen_dac_certificate(chip_cert, device_name, dac_vendor_id, dac_product_id, pai_cert,
                         pai_key, dac_cert, dac_key, pai_issue_date, pai_expire_date, discriminator)
@@ -336,7 +336,7 @@ def gen_mfd_partition(args, mfd_output):
             return data.to_bytes(byte_len, byteorder='little')
         if data is None:
             return bytes([])
-        raise Exception("Data is invalid type: {}".format(type(data)))
+        raise Exception(f"Data is invalid type: {type(data)}")
 
     def gen_tlvs(mfdDict, need_sec):
         MFD_ID_RAW_MASK = 0x8000
@@ -507,10 +507,10 @@ def main():
     spake2p_it, spake2p_salt, spake2p_verifier = gen_test_spake2(passcode, args.spake2p_it, args.spake2p_salt)
 
     vp_info = "{}_{}".format(hex(args.vendor_id).split('x')[-1], hex(args.product_id).split('x')[-1])
-    vp_disc_info = "{}_{}".format(vp_info, discriminator)
+    vp_disc_info = f"{vp_info}_{discriminator}"
 
     if args.cd is None:
-        args.cd = os.path.join(args.output, "out_{}_cd.der".format(vp_info))
+        args.cd = os.path.join(args.output, f"out_{vp_info}_cd.der")
 
     cd, pai_cert_der, dac_cert_der, dac_key_der = gen_test_certs(args.chip_cert,
                                                                  args.output,
@@ -529,7 +529,7 @@ def main():
                                                                  args.dac_pid,
                                                                  discriminator)
 
-    mfd_output = os.path.join(args.output, "out_{}_mfd.bin".format(vp_disc_info))
+    mfd_output = os.path.join(args.output, f"out_{vp_disc_info}_mfd.bin")
     args.dac_cert = dac_cert_der
     args.dac_key = dac_key_der
     args.passcode = passcode
@@ -543,8 +543,8 @@ def main():
     args.key = to_bytes(args.key)
     gen_mfd_partition(args, mfd_output)
 
-    onboard_txt = os.path.join(args.output, "out_{}_onboard.txt".format(vp_disc_info))
-    onboard_png = os.path.join(args.output, "out_{}_onboard.png".format(vp_disc_info))
+    onboard_txt = os.path.join(args.output, f"out_{vp_disc_info}_onboard.txt")
+    onboard_png = os.path.join(args.output, f"out_{vp_disc_info}_onboard.png")
     manualcode, qrcode = gen_onboarding_data(args, onboard_txt, onboard_png, args.rendezvous)
 
     log.info("")

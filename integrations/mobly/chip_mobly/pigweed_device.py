@@ -35,8 +35,8 @@ class PigweedDevice:
         self.pw_rpc_client = HdlcRpcClient(lambda: ser.read(4096),
                                            [PROTO], default_channels(ser.write))
         self._platform = None
-        print("Platform args: {}".format(platform_args))
-        print("Platform module: {}".format(platform_module))
+        print(f"Platform args: {platform_args}")
+        print(f"Platform module: {platform_module}")
         if platform_module:
             m = importlib.import_module(platform_module)
             create_platform_method = getattr(m, "create_platform")
@@ -88,4 +88,4 @@ def _validate_config(config):
     required_keys = ["device_tty", "baud"]  # A placeholder.
     for key in required_keys:
         if key not in config:
-            raise Error("Required key {} missing from config {}".format(key, config))
+            raise Error(f"Required key {key} missing from config {config}")

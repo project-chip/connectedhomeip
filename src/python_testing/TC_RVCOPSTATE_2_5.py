@@ -198,7 +198,7 @@ class TC_RVCOPSTATE_2_5(MatterBaseTest):
             self.step("3")
             supported_run_modes_dut = await self.read_supported_mode(endpoint=self.endpoint)
             # Logging the SupportedModes Attribute output responses from the DUT:
-            log.info("SupportedModes: {}".format(supported_run_modes_dut))
+            log.info(f"SupportedModes: {supported_run_modes_dut}")
             # As per SPEC, the SupportedModes must have at least two entries
             asserts.assert_greater_equal(len(supported_run_modes_dut), 2, "SupportedModes must have at least two entries!")
 

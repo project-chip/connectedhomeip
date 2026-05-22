@@ -70,7 +70,7 @@ ALLOWED_SKIPPED_FILENAMES = [
 
 
 def load_all_paa(paa_path: Path) -> dict:
-    log.info("Loading all PAAs in {}".format(paa_path))
+    log.info(f"Loading all PAAs in {paa_path}")
 
     paa_by_skid = {}
     for filename in glob(str(paa_path.joinpath("*.der"))):
@@ -213,7 +213,7 @@ class TC_DA_1_7(MatterBaseTest):
                                             Clusters.OperationalCredentials.Commands.CertificateChainRequest(2))
         pai = result.certificate
         asserts.assert_less_equal(len(pai), 600, "PAI cert must be at most 600 bytes")
-        key = 'pai_{}'.format(dut_index)
+        key = f'pai_{dut_index}'
         self.record_data({key: hex_from_bytes(pai)})
 
         self.step(f'{dut_index}.2')
@@ -221,18 +221,18 @@ class TC_DA_1_7(MatterBaseTest):
                                             Clusters.OperationalCredentials.Commands.CertificateChainRequest(1))
         dac = result.certificate
         asserts.assert_less_equal(len(dac), 600, "DAC cert must be at most 600 bytes")
-        key = 'dac_{}'.format(dut_index)
+        key = f'dac_{dut_index}'
         self.record_data({key: hex_from_bytes(dac)})
 
         self.step(f'{dut_index}.3')
-        log.info("DUT {} Step 3 check 1: Ensure PAI's AKID matches a PAA and signature is valid".format(dut_index))
+        log.info(f"DUT {dut_index} Step 3 check 1: Ensure PAI's AKID matches a PAA and signature is valid")
         pai_cert = load_der_x509_certificate(pai)
         pai_akid = extract_akid(pai_cert)
         if pai_akid not in paa_by_skid:
             asserts.fail(f"DUT {dut_index} PAI ({hex_from_bytes(pai_akid)}) not matched in PAA trust store")
 
         filename, paa_cert = paa_by_skid[pai_akid]
-        log.info("Matched PAA file {}, subject: {}".format(filename, paa_cert.subject))
+        log.info(f"Matched PAA file {filename}, subject: {paa_cert.subject}")
         public_key = paa_cert.public_key()
 
         try:
@@ -260,8 +260,8 @@ class TC_DA_1_7(MatterBaseTest):
 
         self.step(f'{dut_index}.6')
         pk = dac_cert.public_key().public_bytes(encoding=Encoding.X962, format=PublicFormat.UncompressedPoint)
-        log.info("Subject public key pk: {}".format(hex_from_bytes(pk)))
-        key = 'pk_{}'.format(dut_index)
+        log.info(f"Subject public key pk: {hex_from_bytes(pk)}")
+        key = f'pk_{dut_index}'
         self.record_data({key: hex_from_bytes(pk)})
         return pk
 

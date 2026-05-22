@@ -123,7 +123,7 @@ def dump_table(header_path: Path, descriptor: ErrorDescriptor):
     data = []
 
     for code in sorted(codes_for_section, key=attrgetter("code")):
-        line = [code.code, "0x{:02X}".format(code.code), f"`{code.name}`"]
+        line = [code.code, f"0x{code.code:02X}", f"`{code.name}`"]
         if descriptor.include_description:
             line.append(code.description)
         data.append(line)

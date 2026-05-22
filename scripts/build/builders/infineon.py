@@ -36,7 +36,7 @@ class InfineonApp(Enum):
             return 'all-clusters-app'
         if self == InfineonApp.ALL_CLUSTERS_MINIMAL:
             return 'all-clusters-minimal-app'
-        raise Exception('Unknown app type: {!r}'.format(self))
+        raise Exception(f'Unknown app type: {self!r}')
 
     def AppNamePrefix(self):
         if self == InfineonApp.LOCK:
@@ -47,7 +47,7 @@ class InfineonApp(Enum):
             return 'chip-psoc6-clusters-example'
         if self == InfineonApp.ALL_CLUSTERS_MINIMAL:
             return 'chip-psoc6-clusters-minimal-example'
-        raise Exception('Unknown app type: {!r}'.format(self))
+        raise Exception(f'Unknown app type: {self!r}')
 
     def FlashBundleName(self):
         if self == InfineonApp.LOCK:
@@ -58,7 +58,7 @@ class InfineonApp(Enum):
             return 'clusters_minimal_app.flashbundle.txt'
         if self == InfineonApp.LIGHT:
             return 'lighting_app.flashbundle.txt'
-        raise Exception('Unknown app type: {!r}'.format(self))
+        raise Exception(f'Unknown app type: {self!r}')
 
     def BuildRoot(self, root):
         return os.path.join(root, 'examples', self.ExampleName(), 'infineon/psoc6')
@@ -70,7 +70,7 @@ class InfineonBoard(Enum):
     def GnArgName(self):
         if self == InfineonBoard.PSOC6BOARD:
             return 'CY8CKIT-062S2-43012'
-        raise Exception('Unknown board type: {!r}'.format(self))
+        raise Exception(f'Unknown board type: {self!r}')
 
 
 class InfineonBuilder(GnBuilder):
@@ -87,7 +87,7 @@ class InfineonBuilder(GnBuilder):
         super().__init__(root=app.BuildRoot(root), runner=runner, output_dir_lock=output_dir_lock)
 
         self.app = app
-        self.extra_gn_options = ['psoc6_board="{}"'.format(board.GnArgName())]
+        self.extra_gn_options = [f'psoc6_board="{board.GnArgName()}"']
 
         if enable_ota_requestor:
             self.extra_gn_options.append('chip_enable_ota_requestor=true')

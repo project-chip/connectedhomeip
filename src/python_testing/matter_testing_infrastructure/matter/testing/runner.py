@@ -317,9 +317,8 @@ def _find_test_class():
     leaf_subclasses = [s for s in subclasses_matter_test_base if not has_subclasses(s)]
 
     if len(leaf_subclasses) != 1:
-        print(
-            'Exactly one subclass of `MatterBaseTest` should be in the main file. Found {}.'.format(
-                str([subclass.__name__ for subclass in leaf_subclasses])))
+        print('Exactly one subclass of `MatterBaseTest` should be in the main file. '
+              f'Found {str([subclass.__name__ for subclass in leaf_subclasses])}.')
         sys.exit(1)
 
     return leaf_subclasses[0]
@@ -620,7 +619,7 @@ def populate_commissioning_args(args: argparse.Namespace, config) -> bool:
     config.fabric_id = args.fabric_id if args.fabric_id is not None else config.root_of_trust_index
 
     if args.chip_tool_credentials_path is not None and not args.chip_tool_credentials_path.exists():
-        print("error: chip-tool credentials path {} doesn't exist!".format(args.chip_tool_credentials_path))
+        print(f"error: chip-tool credentials path {args.chip_tool_credentials_path} doesn't exist!")
         return False
     config.chip_tool_credentials_path = args.chip_tool_credentials_path
 
@@ -795,13 +794,13 @@ def convert_args_to_matter_config(args: argparse.Namespace):
     if config.pipe_name is not None and not os.path.exists(config.pipe_name):
         # Named pipes are unique, so we MUST have consistent paths
         # Verify from start the named pipe exists.
-        LOGGER.error("Named pipe {!r} does NOT exist".format(config.pipe_name))
-        raise FileNotFoundError("CANNOT FIND {!r}".format(config.pipe_name))
+        LOGGER.error(f"Named pipe {config.pipe_name!r} does NOT exist")
+        raise FileNotFoundError(f"CANNOT FIND {config.pipe_name!r}")
 
     config.pipe_name_out = args.app_pipe_out
     if config.pipe_name_out is not None and not os.path.exists(config.pipe_name_out):
-        LOGGER.error("Named pipe {!r} does NOT exist".format(config.pipe_name_out))
-        raise FileNotFoundError("CANNOT FIND {!r}".format(config.pipe_name_out))
+        LOGGER.error(f"Named pipe {config.pipe_name_out!r} does NOT exist")
+        raise FileNotFoundError(f"CANNOT FIND {config.pipe_name_out!r}")
 
     config.fail_on_skipped_tests = args.fail_on_skipped
 
@@ -837,7 +836,7 @@ def str_from_manual_code(s: str) -> str:
     regex = r"^([0-9]{11}|[0-9]{21})$"
     match = re.match(regex, s)
     if not match:
-        raise ValueError("Invalid manual code format, does not match {}".format(regex))
+        raise ValueError(f"Invalid manual code format, does not match {regex}")
 
     return s
 
@@ -846,7 +845,7 @@ def int_named_arg(s: str) -> Tuple[str, int]:
     regex = r"^(?P<name>[a-zA-Z_0-9_.-]+):((?P<hex_value>0x[0-9a-fA-F_]+)|(?P<decimal_value>-?\d+))$"
     match = re.match(regex, s)
     if not match:
-        raise ValueError("Invalid int argument format, does not match {}".format(regex))
+        raise ValueError(f"Invalid int argument format, does not match {regex}")
 
     name = match.group("name")
     if match.group("hex_value"):
@@ -860,7 +859,7 @@ def str_named_arg(s: str) -> Tuple[str, str]:
     regex = r"^(?P<name>[a-zA-Z_0-9.]+):(?P<value>.*)$"
     match = re.match(regex, s)
     if not match:
-        raise ValueError("Invalid string argument format, does not match {}".format(regex))
+        raise ValueError(f"Invalid string argument format, does not match {regex}")
 
     return (match.group("name"), match.group("value"))
 
@@ -869,7 +868,7 @@ def float_named_arg(s: str) -> Tuple[str, float]:
     regex = r"^(?P<name>[a-zA-Z_0-9.]+):(?P<value>.*)$"
     match = re.match(regex, s)
     if not match:
-        raise ValueError("Invalid float argument format, does not match {}".format(regex))
+        raise ValueError(f"Invalid float argument format, does not match {regex}")
 
     name = match.group("name")
     value = float(match.group("value"))
@@ -881,7 +880,7 @@ def json_named_arg(s: str) -> Tuple[str, object]:
     regex = r"^(?P<name>[a-zA-Z_0-9.]+):(?P<value>.*)$"
     match = re.match(regex, s)
     if not match:
-        raise ValueError("Invalid JSON argument format, does not match {}".format(regex))
+        raise ValueError(f"Invalid JSON argument format, does not match {regex}")
 
     name = match.group("name")
     value = json.loads(match.group("value"))
@@ -893,7 +892,7 @@ def bool_named_arg(s: str) -> Tuple[str, bool]:
     regex = r"^(?P<name>[a-zA-Z_0-9.]+):((?P<truth_value>true|false)|(?P<decimal_value>[01]))$"
     match = re.match(regex, s, re.IGNORECASE)
     if not match:
-        raise ValueError("Invalid bool argument format, does not match {}".format(regex))
+        raise ValueError(f"Invalid bool argument format, does not match {regex}")
 
     name = match.group("name")
     if match.group("truth_value"):
@@ -908,7 +907,7 @@ def bytes_as_hex_named_arg(s: str) -> Tuple[str, bytes]:
     regex = r"^(?P<name>[a-zA-Z_0-9.]+):(?P<value>[0-9a-fA-F:]+)$"
     match = re.match(regex, s)
     if not match:
-        raise ValueError("Invalid bytes as hex argument format, does not match {}".format(regex))
+        raise ValueError(f"Invalid bytes as hex argument format, does not match {regex}")
 
     name = match.group("name")
     value_str = match.group("value")
@@ -953,7 +952,7 @@ def parse_matter_test_args(argv: Optional[List[str]] = None):
     basic_group.add_argument('--logs-path', action="store", type=pathlib.Path, metavar="PATH", help="Location for test logs")
     paa_path_default = get_default_paa_trust_store(pathlib.Path.cwd())
     basic_group.add_argument('--paa-trust-store-path', action="store", type=pathlib.Path, metavar="PATH", default=paa_path_default,
-                             help="PAA trust store path (default: {})".format(str(paa_path_default)))
+                             help=f"PAA trust store path (default: {str(paa_path_default)})")
     basic_group.add_argument('--dac-revocation-set-path', action="store", type=pathlib.Path, metavar="PATH",
                              help="Path to JSON file containing the device attestation revocation set.")
     basic_group.add_argument('--ble-controller', action="store", type=int,
@@ -1017,8 +1016,7 @@ def parse_matter_test_args(argv: Optional[List[str]] = None):
 
     commission_group.add_argument('--admin-vendor-id', action="store", type=int_decimal_or_hex, default=TestingDefaults.ADMIN_VENDOR_ID,
                                   metavar="VENDOR_ID",
-                                  help="VendorID to use during commissioning (default 0x{:04X})".format(
-                                      TestingDefaults.ADMIN_VENDOR_ID))
+                                  help=f"VendorID to use during commissioning (default 0x{TestingDefaults.ADMIN_VENDOR_ID:04X})")
     commission_group.add_argument('--case-admin-subject', action="store", type=int_decimal_or_hex,
                                   metavar="CASE_ADMIN_SUBJECT",
                                   help="Set the CASE admin subject to an explicit value (default to commissioner Node ID)")

@@ -60,7 +60,7 @@ class TidyResult:
         else:
             status = "FAIL"
 
-        return "{}({})".format(status, self.path)
+        return f"{status}({self.path})"
 
     def __str__(self):
         return self.__repr__()

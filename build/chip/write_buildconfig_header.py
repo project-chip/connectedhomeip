@@ -118,13 +118,13 @@ def WriteHeader(options):
         if options.rulename:
             output_file.write('// From "' + options.rulename + '"\n')
 
-        output_file.write('\n#ifndef {}\n'.format(options.header_guard))
-        output_file.write('#define {}\n\n'.format(options.header_guard))
+        output_file.write(f'\n#ifndef {options.header_guard}\n')
+        output_file.write(f'#define {options.header_guard}\n\n')
 
         for pair in options.defines:
             output_file.write('#define {} {}\n'.format(*pair))
 
-        output_file.write('\n#endif  // {}\n'.format(options.header_guard))
+        output_file.write(f'\n#endif  // {options.header_guard}\n')
 
 
 options = GetOptions()

@@ -110,7 +110,7 @@ class TC_RVCRUNM_2_1(MatterBaseTest):
         self.print_step(2, "Read SupportedModes attribute")
         supported_modes = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.SupportedModes)
 
-        log.info("SupportedModes: {}".format(supported_modes))
+        log.info(f"SupportedModes: {supported_modes}")
 
         asserts.assert_greater_equal(len(supported_modes), 2, "SupportedModes must have at least two entries!")
 
@@ -120,7 +120,7 @@ class TC_RVCRUNM_2_1(MatterBaseTest):
 
         old_current_mode = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
 
-        log.info("CurrentMode: {}".format(old_current_mode))
+        log.info(f"CurrentMode: {old_current_mode}")
 
         # pick a value that's not on the list of supported modes
         invalid_mode = max(modes) + 1
@@ -214,7 +214,7 @@ class TC_RVCRUNM_2_1(MatterBaseTest):
         self.print_step(14, "Read CurrentMode attribute")
         current_mode = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
 
-        log.info("CurrentMode: {}".format(current_mode))
+        log.info(f"CurrentMode: {current_mode}")
 
         asserts.assert_true(current_mode == self.mode_ok, "CurrentMode changed after failed ChangeToMode command!")
 

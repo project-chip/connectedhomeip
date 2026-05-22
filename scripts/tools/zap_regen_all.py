@@ -442,7 +442,7 @@ def getTargets(target_type):
                 if t.distinct_output() == o:
                     log.error("   %s", t.zap_config)
 
-            raise Exception("Duplicate/overlapping output directory: {!r}".format(o))
+            raise Exception(f"Duplicate/overlapping output directory: {o!r}")
 
         distinct_outputs.add(o)
 

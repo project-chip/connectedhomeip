@@ -97,7 +97,7 @@ class ErrorAccumulatingRule(LintRule):
 
     def _AddLintError(self, text, location):
         self._lint_errors.append(
-            LintError("{}: {}".format(self.name, text), location))
+            LintError(f"{self.name}: {text}", location))
 
     def _ParseLocation(self, meta: Optional[ParseMetaData]) -> Optional[LocationInFile]:
         """Create a location in the current file that is being parsed. """
@@ -132,12 +132,12 @@ class ClusterValidationRule(ErrorAccumulatingRule):
         if self._mandatory_clusters:
             result += "  mandatory_clusters:\n"
             for cluster in self._mandatory_clusters:
-                result += "    - {!r}\n".format(cluster)
+                result += f"    - {cluster!r}\n"
 
         if self._rejected_clusters:
             result += "   rejected_clusters:\n"
             for cluster in self._rejected_clusters:
-                result += "    - {!r}\n".format(cluster)
+                result += f"    - {cluster!r}\n"
 
         result += "}"
 
@@ -160,12 +160,12 @@ class ClusterValidationRule(ErrorAccumulatingRule):
         cluster_definition = [c for c in self._idl.clusters if c.name == name]
         if not cluster_definition:
             self._AddLintError(
-                "Cluster definition for {} not found".format(name), location)
+                f"Cluster definition for {name} not found", location)
             return None
 
         if len(cluster_definition) > 1:
             self._AddLintError(
-                "Multiple cluster definitions found for {}".format(name), location)
+                f"Multiple cluster definitions found for {name}", location)
             return None
 
         return cluster_definition[0].code
@@ -215,12 +215,12 @@ class RequiredAttributesRule(ErrorAccumulatingRule):
         if self._mandatory_attributes:
             result += "  mandatory_attributes:\n"
             for attr in self._mandatory_attributes:
-                result += "    - {!r}\n".format(attr)
+                result += f"    - {attr!r}\n"
 
         if self._deny_attributes:
             result += "  deny_attributes:\n"
             for attr in self._deny_attributes:
-                result += "    - {!r}\n".format(attr)
+                result += f"    - {attr!r}\n"
 
         result += "}"
         return result
@@ -244,12 +244,12 @@ class RequiredAttributesRule(ErrorAccumulatingRule):
         cluster_definition = [c for c in self._idl.clusters if c.name == name]
         if not cluster_definition:
             self._AddLintError(
-                "Cluster definition for {} not found".format(name), location)
+                f"Cluster definition for {name} not found", location)
             return None
 
         if len(cluster_definition) > 1:
             self._AddLintError(
-                "Multiple cluster definitions found for {}".format(name), location)
+                f"Multiple cluster definitions found for {name}", location)
             return None
 
         return cluster_definition[0]
@@ -282,8 +282,8 @@ class RequiredAttributesRule(ErrorAccumulatingRule):
                 # For all the instantiated attributes, figure out their code
                 for attr in cluster.attributes:
                     if attr.name not in name_to_code_map:
-                        self._AddLintError("Could not find attribute defintion (no code) for {}:{}".format(
-                            cluster.name, attr.name), self._ParseLocation(cluster.parse_meta))
+                        self._AddLintError(f"Could not find attribute defintion (no code) for {cluster.name}:{attr.name}",
+                                           self._ParseLocation(cluster.parse_meta))
                         continue
 
                     attribute_codes.add(name_to_code_map[attr.name])
@@ -332,8 +332,7 @@ class RequiredCommandsRule(ErrorAccumulatingRule):
         super().__init__(name)
 
         # Maps cluster id to mandatory cluster requirement
-        self._mandatory_commands: MutableMapping[int,
-                                                 List[ClusterCommandRequirement]] = {}
+        self._mandatory_commands: MutableMapping[int, List[ClusterCommandRequirement]] = {}
 
     def __repr__(self):
         result = "RequiredCommandsRule{\n"
@@ -343,7 +342,7 @@ class RequiredCommandsRule(ErrorAccumulatingRule):
             for key, value in self._mandatory_commands.items():
                 result += f"    - cluster {key}:\n"
                 for requirement in value:
-                    result += "        - {!r}\n".format(requirement)
+                    result += f"        - {requirement!r}\n"
 
         result += "}"
         return result

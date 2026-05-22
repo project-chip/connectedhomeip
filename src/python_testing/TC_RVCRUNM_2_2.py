@@ -111,8 +111,8 @@ class TC_RVCRUNM_2_2(MatterBaseTest):
     async def send_change_to_mode_with_check(self, new_mode, expected_error):
         response = await self.send_change_to_mode_cmd(new_mode)
         asserts.assert_true(response.status == expected_error,
-                            "Expected a ChangeToMode response status of {}, got {}".format(
-                                error_enum_to_text(expected_error), error_enum_to_text(response.status)))
+                            f"Expected a ChangeToMode response status of {error_enum_to_text(expected_error)}, "
+                            f"got {error_enum_to_text(response.status)}")
 
     async def read_op_state_operational_state(self) -> Clusters.Objects.RvcOperationalState.Attributes.OperationalState:
         return await self.read_mod_attribute_expect_success(

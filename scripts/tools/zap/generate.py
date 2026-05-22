@@ -232,7 +232,7 @@ def matterPathFromZapPath(zap_config_path):
     if not target_path.endswith(".matter"):
         # We expect "something.zap" and don't handle corner cases of
         # multiple extensions. This is to work with existing codebase only
-        raise Exception("Unexpected input zap file  {}".format(zap_config_path))
+        raise Exception(f"Unexpected input zap file  {zap_config_path}")
 
     return target_path
 
@@ -430,7 +430,7 @@ def main():
     if cmdLineArgs.delete_output_dir:
         shutil.rmtree(cmdLineArgs.outputDir)
     else:
-        print("Files generated in: {}".format(cmdLineArgs.outputDir))
+        print(f"Files generated in: {cmdLineArgs.outputDir}")
 
 
 if __name__ == '__main__':

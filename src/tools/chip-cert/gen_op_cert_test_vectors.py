@@ -594,19 +594,19 @@ def main():
         os.mkdir(args.testdir)
 
     if not os.path.exists(chipcert):
-        raise Exception('Path not found: {}'.format(chipcert))
+        raise Exception(f'Path not found: {chipcert}')
 
     if not os.path.exists(rcac_cert):
-        raise Exception('Path not found: {}'.format(rcac_cert))
+        raise Exception(f'Path not found: {rcac_cert}')
 
     if not os.path.exists(rcac_key):
-        raise Exception('Path not found: {}'.format(rcac_key))
+        raise Exception(f'Path not found: {rcac_key}')
 
     if not os.path.exists(icac_cert):
-        raise Exception('Path not found: {}'.format(icac_cert))
+        raise Exception(f'Path not found: {icac_cert}')
 
     if not os.path.exists(icac_key):
-        raise Exception('Path not found: {}'.format(icac_key))
+        raise Exception(f'Path not found: {icac_key}')
 
     with open(args.outfile + '.h', "w") as hfile, open(args.outfile + '.cpp', "w") as cfile:
         h_cert_arrays_declarations = ''

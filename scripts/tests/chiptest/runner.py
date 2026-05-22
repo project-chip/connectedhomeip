@@ -206,7 +206,7 @@ class Runner:
         errpipe = LogPipe(logging.INFO, capture_delegate=self.capture_delegate, name=name + ' STDERR')
 
         if self.capture_delegate:
-            self.capture_delegate.Log(name, 'EXECUTING {!r}'.format(cmd))
+            self.capture_delegate.Log(name, f'EXECUTING {cmd!r}')
 
         s = self.executor.run(subproc, stdin=stdin, stdout=outpipe, stderr=errpipe)
         outpipe.close()

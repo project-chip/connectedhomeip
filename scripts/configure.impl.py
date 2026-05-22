@@ -43,8 +43,8 @@ def process_project_args(gn_args_json_file, *params):
     processor.process_env()
     processor.process_parameters(params)
     for arg, value in processor.args.items():
-        info(" - {} = {}".format(arg, value))
-        print("{} = {}".format(arg, value))
+        info(f" - {arg} = {value}")
+        print(f"{arg} = {value}")
 
 
 def describe_args(gn_args_json_file):
@@ -170,24 +170,24 @@ class ProjectArgProcessor:
             # format strings and booleans as JSON, otherwise pass through as is
             self.args[arg.name] = (json.dumps(value) if arg.type in 'sb' else value)
         elif required:
-            fail("Project has no build arg '{}'".format(nameOrArg))
+            fail(f"Project has no build arg '{nameOrArg}'")
 
     def add_env_arg(self, name, envvar, default=None, is_list=False):
         """Add an argument from an environment variable"""
         if not (value := os.environ.get(envvar, default)):
             return
         if not (arg := self.gn_args.get(name, None)):
-            info("Warning: Not propagating {}, project has no build arg '{}'".format(envvar, name))
+            info(f"Warning: Not propagating {envvar}, project has no build arg '{name}'")
             return
         # bypass add_arg() to handle list splitting / formatting directly
         self.args[arg.name] = json.dumps(value if arg.type != '[' else value.split() if is_list else [value])
 
     def process_triplet_parameter(self, name, value):
         if value is None:
-            fail("Project option --{} requires an argument".format(name))
+            fail(f"Project option --{name} requires an argument")
         triplet = value.split('-')
         if len(triplet) not in (2, 3, 4):
-            fail("Project option --{} argument must be a cpu-os pair or cpu-vendor-os[-abi] triplet".format(name))
+            fail(f"Project option --{name} argument must be a cpu-os pair or cpu-vendor-os[-abi] triplet")
         prefix = 'host_' if name == 'build' else 'target_'  # "host" has different meanings in GNU and GN!
         self.add_arg(prefix + 'cpu', triplet[0])
         self.add_arg(prefix + 'os', triplet[1 if len(triplet) == 2 else 2])
@@ -195,25 +195,25 @@ class ProjectArgProcessor:
     def option(self, option):
         """Returns the GnArg for the given option name, or None"""
         if not (arg := self.options.get(option, None)):
-            info("Warning: Project has no build option '{}'".format(option))
+            info(f"Warning: Project has no build option '{option}'")
         return arg
 
     def process_enable_parameter(self, option, value):
         if not (arg := self.option(option.removeprefix('enable-'))):
             return
         if arg.type != 'b':
-            fail("Project build arg '{}' is not a boolean".format(arg))
+            fail(f"Project build arg '{arg}' is not a boolean")
         if value != 'no' and value is not None:
-            fail("Invalid argument for --{}, must be absent or 'no'".format(option))
+            fail(f"Invalid argument for --{option}, must be absent or 'no'")
         self.add_arg(arg, value is None)
 
     def process_generic_parameter(self, option, value):
         if not (arg := self.option(option)):
             return
         if arg.type == 'b':
-            fail("Project build arg '{}' is a boolean, use --enable-...".format(arg))
+            fail(f"Project build arg '{arg}' is a boolean, use --enable-...")
         if value is None:
-            fail("Project option --{} requires an argument".format(option))
+            fail(f"Project option --{option} requires an argument")
         self.add_arg(arg, value)
 
     def process_parameter(self, option, value):
@@ -229,7 +229,7 @@ class ProjectArgProcessor:
         for param in params:
             match = re.fullmatch(r'--([a-z][a-z0-9-]*)(?:=(.*))?', param)
             if not match:
-                fail("Invalid argument: '{}'".format(param))
+                fail(f"Invalid argument: '{param}'")
             self.process_parameter(match.group(1), match.group(2))
 
 

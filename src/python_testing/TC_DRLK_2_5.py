@@ -94,7 +94,7 @@ class TC_DRLK_2_5(MatterBaseTest):
             return attribute_value
         except Exception as e:
             log.error(e)
-            log.info("Error reading attributes,{}".format(attribute))
+            log.info(f"Error reading attributes,{attribute}")
 
     def pics_TC_DRLK_2_5(self) -> list[str]:
         return ["DRLK.S", "DRLK.S.F04"]
@@ -130,27 +130,20 @@ class TC_DRLK_2_5(MatterBaseTest):
             if (expected_status == Status.Success):
 
                 asserts.assert_true(response.weekDayIndex == week_day_index,
-                                    "Error when executing GetWeekDayScheduleResponse command, weekDayIndex={}".format(
-                                        str(response.weekDayIndex)))
+                                    f"Error when executing GetWeekDayScheduleResponse command, weekDayIndex={str(response.weekDayIndex)}")
                 asserts.assert_true(response.userIndex == user_index,
-                                    "Error when executing GetWeekDayScheduleResponse command, userIndex={}".format(
-                                        str(response.userIndex)))
+                                    f"Error when executing GetWeekDayScheduleResponse command, userIndex={str(response.userIndex)}")
 
                 asserts.assert_true(response.daysMask == days_Mask,
-                                    "Error when executing GetWeekDayScheduleResponse command, days_Mask={}".format(
-                                        str(response.daysMask)))
+                                    f"Error when executing GetWeekDayScheduleResponse command, days_Mask={str(response.daysMask)}")
                 asserts.assert_true(response.startHour == start_Hour,
-                                    "Error when executing GetWeekDayScheduleResponse command, startHour={}".format(
-                                        str(response.startHour)))
+                                    f"Error when executing GetWeekDayScheduleResponse command, startHour={str(response.startHour)}")
                 asserts.assert_true(response.startMinute == start_Minute,
-                                    "Error when executing GetWeekDayScheduleResponse command, startMinute={}".format(
-                                        str(response.startMinute)))
+                                    f"Error when executing GetWeekDayScheduleResponse command, startMinute={str(response.startMinute)}")
                 asserts.assert_true(response.endHour == end_Hour,
-                                    "Error when executing GetWeekDayScheduleResponse command, endHour={}".format(
-                                        str(response.endHour)))
+                                    f"Error when executing GetWeekDayScheduleResponse command, endHour={str(response.endHour)}")
                 asserts.assert_true(response.endMinute == end_Minute,
-                                    "Error when executing GetWeekDayScheduleResponse command, endMinute={}".format(
-                                        str(response.endMinute)))
+                                    f"Error when executing GetWeekDayScheduleResponse command, endMinute={str(response.endMinute)}")
 
             return response
         except InteractionModelError as e:
@@ -207,7 +200,7 @@ class TC_DRLK_2_5(MatterBaseTest):
             number_week_day_schedules_supported_per_user = await self.read_attributes_from_dut(endpoint=self.app_cluster_endpoint,
                                                                                                cluster=drlkcluster,
                                                                                                attribute=Clusters.DoorLock.Attributes.NumberOfWeekDaySchedulesSupportedPerUser)
-            log.info("NumberOfWeekDaySchedulesSupportedPerUser {}".format(number_week_day_schedules_supported_per_user))
+            log.info(f"NumberOfWeekDaySchedulesSupportedPerUser {number_week_day_schedules_supported_per_user}")
             asserts.assert_in(number_week_day_schedules_supported_per_user, range(
                 0, 255), "NumberOfWeekDaySchedulesSupportedPerUser value is out of range")
         self.step("2a")

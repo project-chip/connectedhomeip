@@ -462,7 +462,7 @@ class BuildTarget:
             kargs.update(part.build_arguments)
 
         if not quiet:
-            log.info("Preparing builder '{}'".format(name))
+            log.info(f"Preparing builder '{name}'")
 
         builder = self.builder_class(repository_path, runner=runner, output_dir_lock=output_dir_lock, **kargs)
         builder.target = self

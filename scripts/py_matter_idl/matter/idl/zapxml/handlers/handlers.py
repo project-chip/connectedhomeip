@@ -458,7 +458,7 @@ class CommandHandler(BaseHandler):
     def GetNextProcessor(self, name: str, attrs):
         if name.lower() == 'access':
             if attrs['op'] != 'invoke':
-                raise Exception('Unknown access for {!r}'.format(self._struct))
+                raise Exception(f'Unknown access for {self._struct!r}')
 
             if self._command:
                 self._command.invokeacl = AttrsToAccessPrivilege(attrs)

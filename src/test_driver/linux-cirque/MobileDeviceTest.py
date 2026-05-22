@@ -117,15 +117,14 @@ class TestPythonController(CHIPVirtualHome):
 
         # Check if device can be controlled by controller
         for device_id in server_ids:
-            self.logger.info("checking device log for {}".format(
-                self.get_device_pretty_id(device_id)))
+            self.logger.info(f"checking device log for {self.get_device_pretty_id(device_id)}")
             self.assertTrue(self.sequenceMatch(self.get_device_log(device_id).decode('utf-8'), [
                 "Received command for Endpoint=1 Cluster=0x0000_0006 Command=0x0000_0001",
                 "Toggle ep1 on/off from state 0 to 1",
                 "Received command for Endpoint=1 Cluster=0x0000_0006 Command=0x0000_0000",
                 "Toggle ep1 on/off from state 1 to 0",
                 "No command 0x0000_0001 in Cluster 0x0000_0006 on Endpoint 233"]),
-                "Datamodel test failed: cannot find matching string from device {}".format(device_id))
+                f"Datamodel test failed: cannot find matching string from device {device_id}")
 
 
 if __name__ == "__main__":

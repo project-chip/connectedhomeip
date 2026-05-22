@@ -57,14 +57,14 @@ class ShellCommand:
     def __call__(self):
         if not self._args:
             return CommandResponse(CommandStatus.INVALID_ARGUMENT, "Cannot spwan background process")
-        log.info("Will run command: {}".format(self._args))
+        log.info(f"Will run command: {self._args}")
         try:
             # As the command will be execued in background, we won't return the exit code of the program.
             subprocess.Popen(
                 self._args, stdout=sys.stdout, stderr=sys.stderr)
             return CommandResponse(CommandStatus.SUCCESS)
         except Exception as ex:
-            return CommandResponse(CommandStatus.FAILURE, "Failed to run command: {}".format(ex))
+            return CommandResponse(CommandStatus.FAILURE, f"Failed to run command: {ex}")
 
 
 class InvalidCommand:
@@ -94,7 +94,7 @@ def ServerMain(args):
     }
 
     with Listener(SERVER_ADDRESS) as listener:
-        log.info("Server running on {}".format(SERVER_ADDRESS))
+        log.info(f"Server running on {SERVER_ADDRESS}")
         for extraOption in args:
             cmd = extraOptions.get(extraOption, InvalidCommand())
             cmd()

@@ -75,7 +75,7 @@ class AttributeChangeAccumulator:
                 'attribute': path.AttributeType,
                 'value': data
             }
-            log.info("Got subscription report on client {} for {}: {}".format(self.name, path.AttributeType, data))
+            log.info(f"Got subscription report on client {self.name} for {path.AttributeType}: {data}")
             self._output.put(value)
 
     @property
@@ -90,7 +90,7 @@ class ResubscriptionCatcher:
 
     def __call__(self, transaction: SubscriptionTransaction, terminationError, nextResubscribeIntervalMsec):
         self._got_resubscription_event.set()
-        log.info("Got resubscription on client {}".format(self.name))
+        log.info(f"Got resubscription on client {self.name}")
 
     @property
     def name(self) -> str:
@@ -276,7 +276,7 @@ class TC_SC_3_6(MatterBaseTest):
                 # Record arrival of an expected subscription change when seen
                 if endpoint == 0 and attribute == Clusters.BasicInformation.Attributes.NodeLabel and value == AFTER_LABEL:
                     if not all_changes[client_name]:
-                        log.info("Got expected attribute change for client {}".format(client_name))
+                        log.info(f"Got expected attribute change for client {client_name}")
                         all_changes[client_name] = True
 
                 # We are done waiting when we have accumulated all results
@@ -295,10 +295,10 @@ class TC_SC_3_6(MatterBaseTest):
 
         for catcher in resub_catchers:
             if catcher.caught_resubscription:
-                log.error("Client {} saw a resubscription".format(catcher.name))
+                log.error(f"Client {catcher.name} saw a resubscription")
                 failed = True
             else:
-                log.info("Client {} correctly did not see a resubscription".format(catcher.name))
+                log.info(f"Client {catcher.name} correctly did not see a resubscription")
 
         all_reports_gotten = all(all_changes.values())
         if not all_reports_gotten:

@@ -35,14 +35,14 @@ class BouffalolabApp(Enum):
             return 'lighting-app'
         if self == BouffalolabApp.CONTACT:
             return 'contact-sensor-app'
-        raise Exception('Unknown app type: {!r}'.format(self))
+        raise Exception(f'Unknown app type: {self!r}')
 
     def AppNamePrefix(self, chip_name):
         if self == BouffalolabApp.LIGHT:
-            return ('chip-{}-lighting-example'.format(chip_name))
+            return (f'chip-{chip_name}-lighting-example')
         if self == BouffalolabApp.CONTACT:
-            return ('chip-{}-contact-sensor-example'.format(chip_name))
-        raise Exception('Unknown app type: {!r}'.format(self))
+            return (f'chip-{chip_name}-contact-sensor-example')
+        raise Exception(f'Unknown app type: {self!r}')
 
 
 class BouffalolabBoard(Enum):
@@ -67,7 +67,7 @@ class BouffalolabBoard(Enum):
             return 'BL602-NIGHT-LIGHT'
         if self == BouffalolabBoard.BL706_NIGHT_LIGHT:
             return 'BL706-NIGHT-LIGHT'
-        raise Exception('Unknown board #: {!r}'.format(self))
+        raise Exception(f'Unknown board #: {self!r}')
 
 
 class BouffalolabThreadType(Enum):
@@ -303,10 +303,10 @@ class BouffalolabBuilder(GnBuilder):
 
     @lock_output_dir
     def PreBuildCommand(self):
-        os.system("rm -rf {}/config".format(self.output_dir))
-        os.system("rm -rf {}/ota_images".format(self.output_dir))
+        os.system(f"rm -rf {self.output_dir}/config")
+        os.system(f"rm -rf {self.output_dir}/ota_images")
         os.system("rm -rf {}".format(os.path.join(self.output_dir, 'boot2*.bin')))
-        os.system("rm -rf {}".format(os.path.join(self.output_dir, '{}*'.format(self.app.AppNamePrefix(self.chip_name)))))
+        os.system("rm -rf {}".format(os.path.join(self.output_dir, f'{self.app.AppNamePrefix(self.chip_name)}*')))
 
     @lock_output_dir
     def PostBuildCommand(self):
@@ -324,13 +324,13 @@ class BouffalolabBuilder(GnBuilder):
 
             log.info('*' * 80)
 
-            log.info("Firmware is built out at: {}".format(path_fw))
+            log.info(f"Firmware is built out at: {path_fw}")
             log.info("Command to generate ota image: ")
-            log.info('./{} --build-ota --vendor-id <vendor id> --product-id <product id> '
+            log.info(f'./{path_flash_script} --build-ota --vendor-id <vendor id> --product-id <product id> '
                      '--version <version> --version-str <version string> '
-                     '--digest-algorithm <digest algorithm>'.format(path_flash_script))
+                     '--digest-algorithm <digest algorithm>')
             log.info("Command to generate and sign ota image: ")
-            log.info('./{} --build-ota --vendor-id <vendor id> --product-id <product id> '
+            log.info(f'./{path_flash_script} --build-ota --vendor-id <vendor id> --product-id <product id> '
                      '--version <version> --version-str <version string> '
-                     '--digest-algorithm <digest algorithm> --sk <private key>'.format(path_flash_script))
+                     '--digest-algorithm <digest algorithm> --sk <private key>')
             log.info('*' * 80)

@@ -150,7 +150,7 @@ def main():
     if options.sysroot:
         libdir = SetConfigPath(options)
         if options.debug:
-            sys.stderr.write('PKG_CONFIG_LIBDIR={}\n'.format(libdir))
+            sys.stderr.write(f'PKG_CONFIG_LIBDIR={libdir}\n')
         prefix = GetPkgConfigPrefixToStrip(options, args)
     else:
         prefix = ''
@@ -179,7 +179,7 @@ def main():
     if options.libdir:
         cmd = [options.pkg_config, "--variable=libdir"] + args
         if options.debug:
-            sys.stderr.write('Running: {}\n'.format(cmd))
+            sys.stderr.write(f'Running: {cmd}\n')
         try:
             libdir = subprocess.check_output(cmd).decode('utf-8')
         except Exception:
@@ -191,7 +191,7 @@ def main():
     if options.dridriverdir:
         cmd = [options.pkg_config, "--variable=dridriverdir"] + args
         if options.debug:
-            sys.stderr.write('Running: {}\n'.format(cmd))
+            sys.stderr.write(f'Running: {cmd}\n')
         try:
             dridriverdir = subprocess.check_output(cmd).decode('utf-8')
         except Exception:

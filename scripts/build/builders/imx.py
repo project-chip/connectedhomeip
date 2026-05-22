@@ -44,7 +44,7 @@ class IMXApp(Enum):
             return 'all-clusters-minimal-app/linux'
         if self == IMXApp.OTA_PROVIDER:
             return 'ota-provider-app/linux'
-        raise Exception('Unknown app type: {!r}'.format(self))
+        raise Exception(f'Unknown app type: {self!r}')
 
     def OutputNames(self):
         if self == IMXApp.CHIP_TOOL:
@@ -164,11 +164,11 @@ class IMXBuilder(GnBuilder):
         args.extend([
             'treat_warnings_as_errors=false',
             'target_os="linux"',
-            'target_cpu="{}"'.format(target_cpu),
-            'arm_arch="{}"'.format(arm_arch),
+            f'target_cpu="{target_cpu}"',
+            f'arm_arch="{arm_arch}"',
             'import(\"//build_overrides/build.gni\")',
             'custom_toolchain=\"${build_root}/toolchain/custom\"',
-            'sysroot="{}"'.format(sdk_target_sysroot),
+            f'sysroot="{sdk_target_sysroot}"',
             'target_cflags=[ "-DCHIP_DEVICE_CONFIG_WIFI_STATION_IF_NAME=\\"mlan0\\"", "-DCHIP_DEVICE_CONFIG_LINUX_DHCPC_CMD=\\"udhcpc -b -i %s \\"" ]',
             'target_cc="{}/sysroots/x86_64-pokysdk-linux/usr/bin/{}/{}"'.format(
                 self.SysRootPath('IMX_SDK_ROOT'), cross_compile, cc),
@@ -193,7 +193,7 @@ class IMXBuilder(GnBuilder):
 
     def SysRootPath(self, name):
         if name not in os.environ:
-            raise Exception('Missing environment variable "{}"'.format(name))
+            raise Exception(f'Missing environment variable "{name}"')
         return os.environ[name]
 
     @lock_output_dir

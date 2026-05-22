@@ -104,7 +104,7 @@ async def main():
                                               nodeId=1),
                       "Failed to establish PASE connection with device")
             FailIfNot(await test.TestCommissionFailureOnReport(1, testFailureStage),
-                      "Commissioning failure tests failed for simulated report failure on stage {}".format(testFailureStage))
+                      f"Commissioning failure tests failed for simulated report failure on stage {testFailureStage}")
 
     else:
         # [kArmFailsafe, kConfigureTrustedTimeSource] (inclusive). TODO: https://github.com/project-chip/connectedhomeip/issues/36629
@@ -114,7 +114,7 @@ async def main():
                                               nodeId=1),
                       "Failed to establish PASE connection with device")
             FailIfNot(await test.TestCommissionFailure(1, testFailureStage),
-                      "Commissioning failure tests failed for simulated stage failure on stage {}".format(testFailureStage))
+                      f"Commissioning failure tests failed for simulated stage failure on stage {testFailureStage}")
 
     # Ensure we can still commission for real
     FailIfNot(await test.TestPaseOnly(ip=options.deviceAddress1,

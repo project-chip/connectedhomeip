@@ -119,7 +119,7 @@ class EventSubscriptionHandler:
         try:
             res = self._q.get(block=True, timeout=timeout_sec)
         except queue.Empty:
-            asserts.fail("Failed to receive a report for the event {}".format(expected_event))
+            asserts.fail(f"Failed to receive a report for the event {expected_event}")
 
         asserts.assert_equal(res.Header.ClusterId, expected_event.cluster_id, "Expected cluster ID not found in event report")
         asserts.assert_equal(res.Header.EventId, expected_event.event_id, "Expected event ID not found in event report")

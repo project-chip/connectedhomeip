@@ -1002,7 +1002,7 @@ def python_tests(
         app_filter_list = _parse_filters(app_filter)
 
     if skip:
-        print("SKIP IS {!r}".format(skip))
+        print(f"SKIP IS {skip!r}")
         skip = _parse_filters(skip)
 
     if from_filter:

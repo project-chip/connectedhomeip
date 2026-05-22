@@ -291,7 +291,7 @@ const OIDNameTableEntry sOIDNameTable[] =
 
 oid_category_enums = "{\n"
 for (catName, catEnum) in oidCategories:
-    oid_category_enums += "    kOIDCategory_{} = 0x{:04X},\n".format(catName, catEnum)
+    oid_category_enums += f"    kOIDCategory_{catName} = 0x{catEnum:04X},\n"
 oid_category_enums += '''
     kOIDCategory_NotSpecified = 0,
     kOIDCategory_Unknown = 0x0F00,
@@ -302,7 +302,7 @@ oid_enums = "{\n"
 for (catName, catEnum) in oidCategories:
     for (oidCatName, oidName, oidEnum, oid) in oids:
         if (oidCatName == catName):
-            oid_enums += "    kOID_{}_{} = 0x{:04X},\n".format(catName, oidName, catEnum + oidEnum)
+            oid_enums += f"    kOID_{catName}_{oidName} = 0x{catEnum + oidEnum:04X},\n"
     oid_enums += "\n"
 oid_enums += '''    kOID_NotSpecified = 0,
     kOID_Unknown = 0xFFFF,
@@ -312,17 +312,16 @@ oid_enums += '''    kOID_NotSpecified = 0,
 oid_utf8_strings = "\n"
 for (catName, oidName, oidEnum, oid) in oids:
     oid_utf8_strings += "static const uint8_t sOID_{}_{}[] = {{ {} }};\n".format(
-        catName, oidName, ", ".join(["0x{:02X}".format(x) for x in encodeOID(oid)]))
+        catName, oidName, ", ".join([f"0x{x:02X}" for x in encodeOID(oid)]))
 
 oid_table = "{\n"
 for (catName, oidName, oidEnum, oid) in oids:
-    oid_table += "    {{ kOID_{}_{}, sOID_{}_{}, sizeof(sOID_{}_{}) }},\n".format(
-        catName, oidName, catName, oidName, catName, oidName)
+    oid_table += f"    {{ kOID_{catName}_{oidName}, sOID_{catName}_{oidName}, sizeof(sOID_{catName}_{oidName}) }},\n"
 oid_table += "    { kOID_NotSpecified, NULL, 0 }\n};"
 
 oid_name_table = "{\n"
 for (catName, oidName, oidEnum, oid) in oids:
-    oid_name_table += "    {{ kOID_{}_{}, \"{}\" }},\n".format(catName, oidName, oidName)
+    oid_name_table += f"    {{ kOID_{catName}_{oidName}, \"{oidName}\" }},\n"
 oid_name_table += "    { kOID_NotSpecified, NULL }\n};"
 
 

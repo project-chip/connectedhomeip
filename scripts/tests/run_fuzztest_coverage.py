@@ -128,7 +128,7 @@ def run_fuzz_test(context):
         context.coverage_output_base_name = "{}".format(context.selected_fuzz_test_case.replace('.', "_"))
     elif context.run_mode == FuzzTestMode.UNIT_TEST_MODE:
         # Use the FuzzTest Binary Name  as the name for coverage output
-        context.coverage_output_base_name = "{}".format(context.fuzz_test_binary_name)
+        context.coverage_output_base_name = f"{context.fuzz_test_binary_name}"
 
     env = os.environ.copy()
     if context.is_coverage_instrumented:

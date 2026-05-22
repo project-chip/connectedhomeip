@@ -88,14 +88,14 @@ class BleTxEvent:
 
     def Print(self, prefix=""):
         print("{}BleEvent Type: {}".format(prefix, ("TX" if self.EventType == BLE_EVENT_TYPE_TX else "ERROR")))
-        print("{}Status: {}".format(prefix, str(self.Status)))
+        print(f"{prefix}Status: {str(self.Status)}")
 
         if self.SvcId:
-            print("{}SvcId:".format(prefix))
+            print(f"{prefix}SvcId:")
             print(ChipUtility.Hexlify(self.SvcId))
 
         if self.CharId:
-            print("{}CharId:".format(prefix))
+            print(f"{prefix}CharId:")
             print(ChipUtility.Hexlify(self.CharId))
 
     def SetField(self, name, val):
@@ -120,7 +120,7 @@ class BleDisconnectEvent:
 
     def Print(self, prefix=""):
         print("{}BleEvent Type: {}".format(prefix, ("DC" if self.EventType == BLE_EVENT_TYPE_DISCONNECT else "ERROR")))
-        print("{}Error: {}".format(prefix, str(self.Error)))
+        print(f"{prefix}Error: {str(self.Error)}")
 
     def SetField(self, name, val):
         name = name.lower()
@@ -143,15 +143,15 @@ class BleRxEvent:
     def Print(self, prefix=""):
         print("{}BleEvent Type: {}".format(prefix, ("RX" if self.EventType == BLE_EVENT_TYPE_RX else "ERROR")))
         if self.Buffer:
-            print("{}Buffer:".format(prefix))
+            print(f"{prefix}Buffer:")
             print(ChipUtility.Hexlify(self.Buffer))
 
         if self.SvcId:
-            print("{}SvcId:".format(prefix))
+            print(f"{prefix}SvcId:")
             print(ChipUtility.Hexlify(self.SvcId))
 
         if self.CharId:
-            print("{}CharId:".format(prefix))
+            print(f"{prefix}CharId:")
             print(ChipUtility.Hexlify(self.CharId))
 
     def SetField(self, name, val):
@@ -191,7 +191,7 @@ class BleSubscribeEvent:
                  BLE_EVENT_TYPE_SUBSCRIBE else "ERROR"),
             )
         )
-        print("{}Status: {}".format(prefix, str(self.Status)))
+        print(f"{prefix}Status: {str(self.Status)}")
         print(
             "{}Operation: {}".format(
                 prefix,
@@ -204,11 +204,11 @@ class BleSubscribeEvent:
         )
 
         if self.SvcId:
-            print("{}SvcId:".format(prefix))
+            print(f"{prefix}SvcId:")
             print(ChipUtility.Hexlify(self.SvcId))
 
         if self.CharId:
-            print("{}CharId:".format(prefix))
+            print(f"{prefix}CharId:")
             print(ChipUtility.Hexlify(self.CharId))
 
     def SetField(self, name, val):

@@ -34,7 +34,7 @@ def get_file_from_pigweed(name):
 def run_command(command):
     returncode = -1
     command_log = b''
-    print("Running {}".format(command))
+    print(f"Running {command}")
     with Popen(command, cwd=os.getcwd(), stdout=PIPE, stderr=PIPE) as process:
         for line in process.stdout:
             command_log += line
@@ -52,7 +52,7 @@ def run_command(command):
         # command_log is binary, so decoding as utf-8 might technically fail.  We don't want
         # to throw on that.
         with contextlib.suppress(Exception):
-            print("Failure log: {}".format(command_log.decode()))
+            print(f"Failure log: {command_log.decode()}")
 
     return returncode
 
@@ -72,7 +72,7 @@ def build_darwin_framework(args):
         args.project_path,
         '-derivedDataPath',
         abs_path,
-        "ARCHS={}".format(args.target_arch),
+        f"ARCHS={args.target_arch}",
     ]
 
     if args.target_sdk != "macosx":
@@ -135,7 +135,7 @@ def build_darwin_framework(args):
 
     command += ["OTHER_CFLAGS=" + ' '.join(cflags), "OTHER_LDFLAGS=" + ' '.join(ldflags)]
     command_result = run_command(command)
-    print("Build Framework Result: {}".format(command_result))
+    print(f"Build Framework Result: {command_result}")
     exit(command_result)
 
 

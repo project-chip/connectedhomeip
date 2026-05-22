@@ -156,11 +156,10 @@ class TestSubscriptionResumptionCapacity(CHIPVirtualHome):
                          "Test failed: non-zero return code")
 
         # Check the device can evit existing subscriptions
-        self.logger.info("checking device log for {}".format(
-            self.get_device_pretty_id(server_device_id)))
+        self.logger.info(f"checking device log for {self.get_device_pretty_id(server_device_id)}")
         self.assertFalse(self.sequenceMatch(self.get_device_log(server_device_id).decode('utf-8'), [
             "Failed to get required resources by evicting existing subscriptions"]),
-            "SubscriptionResumptionCapacity test failed: find abort log from device {}".format(server_device_id))
+            f"SubscriptionResumptionCapacity test failed: find abort log from device {server_device_id}")
 
 
 if __name__ == "__main__":
