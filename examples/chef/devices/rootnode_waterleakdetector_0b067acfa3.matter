@@ -2079,11 +2079,24 @@ endpoint 1 {
   }
 
   server cluster BooleanStateConfiguration {
+    emits event AlarmsStateChanged;
+    emits event SensorFault;
+    callback attribute currentSensitivityLevel;
+    ram      attribute supportedSensitivityLevels default = 10;
+    ram      attribute defaultSensitivityLevel default = 1;
+    callback attribute alarmsActive;
+    callback attribute alarmsSuppressed;
+    callback attribute alarmsEnabled;
+    ram      attribute alarmsSupported default = 3;
+    callback attribute sensorFault;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    ram      attribute featureMap default = 15;
     callback attribute clusterRevision;
+
+    handle command SuppressAlarm;
+    handle command EnableDisableAlarm;
   }
 }
 
