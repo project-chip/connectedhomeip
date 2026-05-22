@@ -76,7 +76,7 @@ class TC_DA_1_1(MatterBaseTest):
             TestStep(3, "Factory reset DUT", "Perform the necessary actions to put the DUT into a commissionable state"),
             TestStep(4, "TH2 opens a PASE session with the DUT"),
             TestStep(5, "TH2 does a non-fabric-filtered read of the Fabrics attribute from the Node Operational Credentials cluster", """
-                     - Verify that TH1's FabricID is not present in TH2's Fabrics list"""),
+                     - Verify that TH1's fabric (public key + fabric ID) is not present in TH2's Fabrics list"""),
             TestStep(6, "TH2 sends ArmFailSafe command with expiryLengthSeconds set to 0 to the DUT to clear the fail-safe timer and close the PASE session"),
             TestStep(7, "DUT is commissioned to TH2's fabric"),
             TestStep(8, "TH2 does a non-fabric-filtered read of the Fabrics attribute from the Node Operational Credentials cluster", """
@@ -85,8 +85,10 @@ class TC_DA_1_1(MatterBaseTest):
             TestStep(9, "TH2 does a non-fabric-filtered read of the NOCs attribute from the Node Operational Credentials cluster", """
                      - Locate TH2's NOC entry by matching fabric index
                      - Verify that TH2's NOCs entry's public key is different than TH1's NOCs entry's public key"""),
-            TestStep(10, "Factory reset DUT", "Perform the necessary actions to put the DUT into a commissionable state"),
-            TestStep(11, "TH1 commissions DUT to TH1's fabric")
+            TestStep(10, "TH2 opens an Enhanced Commissioning Window on the DUT"),
+            TestStep(11, "TH1 commissions DUT to TH1's fabric via the window; TH1 removes TH2's fabric", """
+                     - Verify that TH1's fabric is present in the Fabrics list
+                     - Verify that TH2's fabric is absent from the Fabrics list""")
         ]
 
     def get_new_controller(self) -> ChipDeviceCtrl.ChipDeviceController:
@@ -187,10 +189,11 @@ class TC_DA_1_1(MatterBaseTest):
             fabricFiltered=False
         )
 
-        # Verify that TH1's FabricID is not present in TH2's Fabrics list
-        fabrics_th2_ids_pase = [f.fabricID for f in fabrics_th2_pase[0][opcreds_cluster][fabrics_attr]]
-        asserts.assert_not_in(th1_fabric.fabricID, fabrics_th2_ids_pase,
-                              f"TH1's FabricID ({th1_fabric.fabricID}) should not be present in TH2's Fabrics list, found: {fabrics_th2_ids_pase}")
+        # Verify that TH1's fabric (public key + fabric ID) is not present in TH2's Fabrics list
+        fabrics_th2_ids_pase = [(f.rootPublicKey, f.fabricID) for f in fabrics_th2_pase[0][opcreds_cluster][fabrics_attr]]
+        th1_fabric_identity = (th1_fabric.rootPublicKey, th1_fabric.fabricID)
+        asserts.assert_not_in(th1_fabric_identity, fabrics_th2_ids_pase,
+                              f"TH1's fabric (rootPublicKey={th1_fabric.rootPublicKey.hex()}, fabricID={th1_fabric.fabricID}) should not be present in TH2's Fabrics list, found: {fabrics_th2_ids_pase}")
 
         # *** STEP 6 ***
         # TH2 sends ArmFailSafe command with expiryLengthSeconds set to 0 to
@@ -248,15 +251,37 @@ class TC_DA_1_1(MatterBaseTest):
                                  f"The public key of the TH2 NOCs entry ({nocs_th2_decoded_pk.hex()}) must be different from TH1's NOCs entry public key ({nocs_th1_decoded_pk.hex()})")
 
         # *** STEP 10 ***
-        # Factory reset DUT
+        # TH2 opens an Enhanced Commissioning Window on the DUT
         self.step(10)
-        await self.request_device_factory_reset()
+        params = await th2.OpenCommissioningWindow(
+            nodeId=th2_node_id,
+            timeout=180,
+            iteration=1000,
+            discriminator=self.discriminator,
+            option=1
+        )
 
         # *** STEP 11 ***
-        # TH1 commissions DUT to TH1's fabric
+        # TH1 commissions via the window; TH1 removes TH2's fabric
         self.step(11)
-        status = await commission_device(th1, self.dut_node_id, setupPayloadInfo[0], commissioning_info)
-        asserts.assert_true(status, f"TH1 re-commissioning failed: {status}")
+        await th1.CommissionOnNetwork(
+            nodeId=self.dut_node_id,
+            setupPinCode=params.setupPinCode,
+            filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
+            filter=self.discriminator
+        )
+        remove_fabric_cmd = Clusters.OperationalCredentials.Commands.RemoveFabric(th2_fabric.fabricIndex)
+        await th1.SendCommand(nodeId=self.dut_node_id, endpoint=0, payload=remove_fabric_cmd)
+
+        # Verify TH1's fabric is present and TH2's fabric is absent
+        fabrics_final = await self.read_fabrics(th1)
+        fabric_ids_final = [(f.rootPublicKey, f.fabricID) for f in fabrics_final]
+        th1_fabric_identity = (th1_fabric.rootPublicKey, th1_fabric.fabricID)
+        th2_fabric_identity = (th2_fabric.rootPublicKey, th2_fabric.fabricID)
+        asserts.assert_in(th1_fabric_identity, fabric_ids_final,
+                          f"TH1's fabric should be present in Fabrics list after re-commissioning")
+        asserts.assert_not_in(th2_fabric_identity, fabric_ids_final,
+                              f"TH2's fabric should be absent from Fabrics list after removal")
 
 
 if __name__ == "__main__":
