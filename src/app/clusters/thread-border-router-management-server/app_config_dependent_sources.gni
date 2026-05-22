@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 app_config_dependent_sources = [
-  "ThreadBorderRouterManagementCluster.cpp",
+  "CodegenIntegration.cpp",
+  "CodegenIntegration.h",
   "thread-border-router-management-server.h",
   "thread-br-delegate.h",
 ]
