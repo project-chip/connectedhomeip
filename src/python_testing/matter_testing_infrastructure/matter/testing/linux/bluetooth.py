@@ -46,5 +46,7 @@ class BluetoothMock(subprocess.Popen[str], TerminableResource):
         self.event.wait()
 
     def resource_terminate(self):
-        super().terminate()
-        self.wait()
+        try:
+            super().terminate()
+        finally:
+            subprocess.Popen.__exit__(self, None, None, None)

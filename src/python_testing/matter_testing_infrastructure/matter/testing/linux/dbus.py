@@ -36,6 +36,8 @@ class DBusTestSystemBus(subprocess.Popen[bytes], TerminableResource):
         self.stdout.readline()
 
     def resource_terminate(self):
-        super().terminate()
-        self.SOCKET.unlink(True)
-        self.wait()
+        try:
+            super().terminate()
+            self.SOCKET.unlink(True)
+        finally:
+            subprocess.Popen.__exit__(self, None, None, None)
