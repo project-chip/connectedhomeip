@@ -60,30 +60,10 @@ source scripts/bootstrap.sh -p all,esp32
 Whenever Matter environment is out of date, it can be updated by running above
 command.
 
-In IDF v4.4.x, `esptool` is part of the esp-idf repository, but in IDF v5.x, it
-is moved out as a Python package which can be installed using pip.
-
-If you are using IDF v5.x or later, please install `esptool` using the command
-below:
-
-```
-# Please make sure to run this command in the Matter Python environment
-python3 -m pip install esptool
-```
-
 ## Using ESP-IDF v6.0 (beta)
 
-ESP-IDF v6.0 requires additional Python dependencies to be installed in the
-Matter environment. Run the following after bootstrapping:
-
-```
-# Please make sure to run these commands in the Matter Python environment
-pip install -U cryptography==45.0.4
-pip install esp-idf-kconfig==3.6.0
-```
-
-> **Note:** Only examples without display support have been verified with
-> ESP-IDF v6.0. Tested on ESP32-C3-Devkit
+Only examples without display support have been verified with ESP-IDF v6.0.
+Tested on ESP32-C3-Devkit.
 
 ---
 

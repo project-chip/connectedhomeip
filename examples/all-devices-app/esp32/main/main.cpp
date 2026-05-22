@@ -82,6 +82,9 @@ static const ESP32Config::Key kConfigKey_DeviceType{ ESP32Config::kConfigNamespa
 static std::string gDeviceType;
 static const size_t kMaxDeviceTypeLength = 64;
 
+#include "DeviceFactoryPlatformOverride.h"
+#include "Esp32BleRssiRangingAdapter.h"
+
 namespace {
 
 // Use the singleton - platform event handlers report to GetInstance()
@@ -306,6 +309,8 @@ void InitServer(intptr_t context)
         ESP_LOGE(TAG, "InitializeStaticResourcesBeforeServerInit() failed: %" CHIP_ERROR_FORMAT, err.Format());
         return;
     }
+
+    RegisterDeviceFactoryOverrides(gTimerDelegate, initParams.persistentStorageDelegate);
 
     initParams.groupDataProvider = &gGroupDataProvider;
     gGroupDataProvider.SetStorageDelegate(initParams.persistentStorageDelegate);

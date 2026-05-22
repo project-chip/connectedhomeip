@@ -63,6 +63,7 @@ if (wifi_soc) {
       "${examples_plat_dir}",
       "${chip_root}/src/lib",
       "${examples_common_plat_dir}",
+      "${examples_common_plat_dir}/customer",
       "${examples_common_plat_dir}/freertos_config",
     ]
 
@@ -87,6 +88,7 @@ if (wifi_soc) {
       "${examples_plat_dir}",
       "${chip_root}/src/lib",
       "${examples_common_plat_dir}",
+      "${examples_common_plat_dir}/customer",
       "${examples_common_plat_dir}/freertos_config",
     ]
 
@@ -114,11 +116,9 @@ silabs_executable("thermostat_app") {
   defines = []
 
   sources = [
+    "${examples_common_plat_dir}/customer/CustomerAppTask.cpp",
     "${thermostat_common_dir}/src/thermostat-delegate-impl.cpp",
     "src/AppTask.cpp",
-    "src/DataModelCallbacks.cpp",
-    "src/SensorManager.cpp",
-    "src/TemperatureManager.cpp",
   ]
 
   if (!disable_lcd) {
