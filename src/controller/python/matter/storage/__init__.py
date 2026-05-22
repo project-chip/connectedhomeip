@@ -331,7 +331,7 @@ class PersistentStorageINI(PersistentStorageBase):
             # Preserves case of keys.
             return option
 
-    def __init__(self, path: str, chipToolFabricStoragePath: Optional[str] = None):
+    def __init__(self, path: str, chipToolFabricStoragePath: str | None = None):
         """Initializes the persistent storage from an INI file.
 
         Optionally, a chipToolFabricStoragePath can be provided to load fabric CA

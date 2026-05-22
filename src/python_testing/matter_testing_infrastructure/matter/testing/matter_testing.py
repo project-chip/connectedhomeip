@@ -35,7 +35,7 @@ import typing
 from dataclasses import asdict, dataclass, fields
 from datetime import UTC, datetime, timedelta
 from enum import IntFlag
-from typing import Any, Optional, TypeAlias
+from typing import Any, TypeAlias
 from collections.abc import Callable
 
 import matter.testing.matchers as matchers
@@ -99,7 +99,7 @@ def clear_queue(report_queue: queue.Queue):
             break
 
 
-def get_first_setup_code(dev_ctrl: ChipDeviceCtrl.ChipDeviceControllerBase, matter_test_config: MatterTestConfig) -> Optional[str]:
+def get_first_setup_code(dev_ctrl: ChipDeviceCtrl.ChipDeviceControllerBase, matter_test_config: MatterTestConfig) -> str | None:
     created_codes = []
     for idx, discriminator in enumerate(matter_test_config.discriminators):
         created_codes.append(dev_ctrl.CreateManualCode(discriminator, matter_test_config.setup_passcodes[idx]))
@@ -115,7 +115,7 @@ class AttributeValue:
     endpoint_id: int
     attribute: ClusterObjects.ClusterAttributeDescriptor
     value: Any
-    timestamp_utc: Optional[datetime] = None
+    timestamp_utc: datetime | None = None
 
 
 class AttributeMatcher:
@@ -1693,7 +1693,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         return self.matter_test_config.dut_node_ids[0]
 
     @property
-    def first_setup_code(self) -> Optional[str]:
+    def first_setup_code(self) -> str | None:
         return get_first_setup_code(self.default_controller, self.matter_test_config)
 
     @property
@@ -1803,7 +1803,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         steps = self.get_defined_test_steps(test)
         return [TestStep(1, "Run entire test")] if steps is None else steps
 
-    def get_defined_test_steps(self, test: str) -> Optional[list[TestStep]]:
+    def get_defined_test_steps(self, test: str) -> list[TestStep] | None:
         """Retrieves test steps from a 'steps_*' function or AST extraction, using a cache.
 
         Checks for an explicit steps_* method first. If none exists, falls back to
@@ -1825,7 +1825,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         self.cached_steps[test] = steps
         return steps
 
-    def get_restart_flag_file(self) -> Optional[str]:
+    def get_restart_flag_file(self) -> str | None:
         if self.matter_test_config.restart_flag_file is None:
             return None
         return str(self.matter_test_config.restart_flag_file)
@@ -1842,7 +1842,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         pics = self._get_defined_pics(test)
         return [] if pics is None else pics
 
-    def _get_defined_pics(self, test: str) -> Optional[list[str]]:
+    def _get_defined_pics(self, test: str) -> list[str] | None:
         """Retrieve PICS list from a 'pics_*' function or @pics decorator.
 
         The pics_* method takes precedence over the @pics decorator.
@@ -2156,7 +2156,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             self._dut_confirmed_available = True
         return result
 
-    async def open_commissioning_window(self, dev_ctrl: Optional[ChipDeviceCtrl.ChipDeviceController] = None, node_id: Optional[int] = None, timeout: int = 900) -> CustomCommissioningParameters:
+    async def open_commissioning_window(self, dev_ctrl: ChipDeviceCtrl.ChipDeviceController | None = None, node_id: int | None = None, timeout: int = 900) -> CustomCommissioningParameters:
         """Open a commissioning window on the target device.
 
         Args:
@@ -2576,7 +2576,7 @@ class MatterBaseTest(base_test.BaseTestClass):
 
     async def read_single_attribute_expect_error(
             self, cluster: ClusterObjects.Cluster, attribute: type[ClusterObjects.ClusterAttributeDescriptor],
-            error: Status, dev_ctrl: Optional[ChipDeviceCtrl.ChipDeviceController] = None, node_id: Optional[int] = None, endpoint: Optional[int] = None,
+            error: Status, dev_ctrl: ChipDeviceCtrl.ChipDeviceController | None = None, node_id: int | None = None, endpoint: int | None = None,
             fabric_filtered: bool = True, assert_on_error: bool = True, test_name: str = "") -> object:
         if dev_ctrl is None:
             dev_ctrl = self.default_controller
@@ -2600,7 +2600,7 @@ class MatterBaseTest(base_test.BaseTestClass):
 
         return attr_ret
 
-    async def write_single_attribute(self, attribute_value: ClusterObjects.ClusterAttributeDescriptor, endpoint_id: Optional[int] = None, expect_success: bool = True) -> Status:
+    async def write_single_attribute(self, attribute_value: ClusterObjects.ClusterAttributeDescriptor, endpoint_id: int | None = None, expect_success: bool = True) -> Status:
         """Write a single `attribute_value` on a given `endpoint_id` and assert on failure.
 
         If `endpoint_id` is None, the default DUT endpoint for the test is selected.
@@ -2622,11 +2622,11 @@ class MatterBaseTest(base_test.BaseTestClass):
 
     def read_from_app_pipe(
         self,
-        app_pipe_out: Optional[str] = None,
+        app_pipe_out: str | None = None,
         timeout: float = 2.0,
         max_bytes: int = 66536,
         chunk: int = 4096,
-        ip_env_var: Optional[str] = None,
+        ip_env_var: str | None = None,
     ) -> Any:
         """
         Read an out-of-band command from a Matter app.
@@ -2649,7 +2649,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             LOGGER.error("Named pipe %r does NOT exist", app_pipe_out)
             raise FileNotFoundError("CANNOT FIND %r" % app_pipe_out)
 
-        dut_ip: Optional[str] = os.getenv(ip_env_var) if ip_env_var else None
+        dut_ip: str | None = os.getenv(ip_env_var) if ip_env_var else None
 
         # If no DUT IP is provided, the Matter app is assumed to be local and the command
         # is read directly from the named pipe. If a DUT IP is present, the pipe is read
@@ -2715,7 +2715,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         out_str = out.decode("utf-8").strip()
         return json.loads(out_str)
 
-    def write_to_app_pipe(self, command_dict: dict, app_pipe: Optional[str] = None, ip_env_var: Optional[str] = None):
+    def write_to_app_pipe(self, command_dict: dict, app_pipe: str | None = None, ip_env_var: str | None = None):
         """
         Send an out-of-band command to a Matter app.
         Args:
@@ -2752,7 +2752,7 @@ class MatterBaseTest(base_test.BaseTestClass):
 
         command = json.dumps(command_dict)
 
-        dut_ip: Optional[str] = os.getenv(ip_env_var) if ip_env_var else None
+        dut_ip: str | None = os.getenv(ip_env_var) if ip_env_var else None
 
         # If no DUT IP is provided, the Matter app is assumed to be local and the command
         # is read directly from the named pipe. If a DUT IP is present, the pipe is read
@@ -2776,7 +2776,7 @@ class MatterBaseTest(base_test.BaseTestClass):
 
     async def send_single_cmd(
             self, cmd: Clusters.ClusterObjects.ClusterCommand,
-            dev_ctrl: Optional[ChipDeviceCtrl.ChipDeviceController] = None, node_id: Optional[int] = None, endpoint: Optional[int] = None,
+            dev_ctrl: ChipDeviceCtrl.ChipDeviceController | None = None, node_id: int | None = None, endpoint: int | None = None,
             timedRequestTimeoutMs: OptionalTimeout = None,
             payloadCapability: int = ChipDeviceCtrl.TransportPayloadCapability.MRP_PAYLOAD) -> object:
         """Send a single command to a Matter device.
@@ -2802,7 +2802,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         return await dev_ctrl.SendCommand(nodeId=node_id, endpoint=endpoint, payload=cmd, timedRequestTimeoutMs=timedRequestTimeoutMs,
                                           payloadCapability=payloadCapability)
 
-    async def send_test_event_triggers(self, eventTrigger: int, enableKey: Optional[bytes] = None):
+    async def send_test_event_triggers(self, eventTrigger: int, enableKey: bytes | None = None):
         """This helper function sends a test event trigger to the General Diagnostics cluster on endpoint 0
 
            The enableKey can be passed into the function, or omitted which will then
@@ -2908,7 +2908,7 @@ class MatterBaseTest(base_test.BaseTestClass):
     def wait_for_user_input(self,
                             prompt_msg: str,
                             prompt_msg_placeholder: str = "Submit anything to continue",
-                            default_value: str = "y") -> Optional[str]:
+                            default_value: str = "y") -> str | None:
         """Ask for user input and wait for it.
 
         Args:

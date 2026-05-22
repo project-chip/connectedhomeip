@@ -34,8 +34,8 @@ class PairNotificationType(Enum):
 @dataclass
 class _PairNotification:
     type: PairNotificationType
-    csr: Optional[bytes]
-    error_code: Optional[int]
+    csr: bytes | None
+    error_code: int | None
 
 
 class Connection:
@@ -104,7 +104,7 @@ class Connection:
                                 step.error_code)
 
 
-def _StartAsyncConnection(discriminator: int, pin: int, deprecated_nodeid: Optional[int] = None) -> Connection:
+def _StartAsyncConnection(discriminator: int, pin: int, deprecated_nodeid: int | None = None) -> Connection:
     """Initiates the connection to a BLE device for the purpose of commissioning
 
     Args:
@@ -131,7 +131,7 @@ def _StartAsyncConnection(discriminator: int, pin: int, deprecated_nodeid: Optio
     return connection
 
 
-def Connect(discriminator: int, pin: int, deprecated_nodeid: Optional[int] = None) -> Connection:
+def Connect(discriminator: int, pin: int, deprecated_nodeid: int | None = None) -> Connection:
     """Connects to a BLE device for the purpose of commissioning.
     Will block until the remote device can be operated on (e.g. setting network
     credentials or operational credentials.)

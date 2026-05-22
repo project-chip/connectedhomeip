@@ -19,7 +19,7 @@
 import datetime
 import logging
 import sys
-from typing import Optional, cast
+from typing import cast
 from collections.abc import Mapping
 
 import memdf.report
@@ -71,7 +71,7 @@ QUERY_CONFIG = {
 }
 
 
-def argsplit(metavar: str, value: str) -> tuple[Optional[tuple], dict]:
+def argsplit(metavar: str, value: str) -> tuple[tuple | None, dict]:
     """Given comma-separated metavar and values, match them up."""
     values = tuple(value.split(','))
     names = metavar.split(',')
@@ -309,7 +309,7 @@ QUERY_CONFIG |= {
 }
 
 
-def get_build_sections(db: SizeDatabase, build: str) -> Optional[tuple]:
+def get_build_sections(db: SizeDatabase, build: str) -> tuple | None:
     """Split a build arg and get its thing_id and sections."""
     values, args = argsplit('PLATFORM,CONFIG,TARGET', build)
     if not values:
@@ -358,7 +358,7 @@ def make_build_sizes_query(config: Config, thing_id: str,
 
 
 def query_build_sizes(config: Config, db: SizeDatabase,
-                      build: str) -> Optional[pd.DataFrame]:
+                      build: str) -> pd.DataFrame | None:
     """Get all sizes for the given build."""
     t = get_build_sections(db, build)
     if not t:

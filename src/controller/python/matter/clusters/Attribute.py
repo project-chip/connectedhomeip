@@ -27,7 +27,7 @@ from asyncio.futures import Future
 from ctypes import CFUNCTYPE, POINTER, c_bool, c_size_t, c_uint8, c_uint16, c_uint32, c_uint64, c_void_p, cast, py_object
 from dataclasses import dataclass, field
 from enum import Enum, unique
-from typing import Any, Optional
+from typing import Any
 from collections.abc import Callable
 
 import construct  # type: ignore
@@ -59,9 +59,9 @@ class EventPriority(Enum):
 
 @dataclass(frozen=True)
 class AttributePath:
-    EndpointId: Optional[int] = None
-    ClusterId: Optional[int] = None
-    AttributeId: Optional[int] = None
+    EndpointId: int | None = None
+    ClusterId: int | None = None
+    AttributeId: int | None = None
 
     @staticmethod
     def from_cluster(EndpointId: int, Cluster: Cluster) -> AttributePath:
@@ -81,9 +81,9 @@ class AttributePath:
 
 @dataclass(frozen=True)
 class DataVersionFilter:
-    EndpointId: Optional[int] = None
-    ClusterId: Optional[int] = None
-    DataVersion: Optional[int] = None
+    EndpointId: int | None = None
+    ClusterId: int | None = None
+    DataVersion: int | None = None
 
     @staticmethod
     def from_cluster(EndpointId: int, Cluster: Cluster, DataVersion: int) -> DataVersionFilter:
@@ -100,12 +100,12 @@ class TypedAttributePath:
     ''' Encapsulates an attribute path that has strongly typed references to cluster and attribute
         cluster object types. These types serve as keys into the attribute cache.
     '''
-    ClusterType: Optional[Cluster] = None
-    AttributeType: Optional[ClusterAttributeDescriptor] = None
-    AttributeName: Optional[str] = None
-    Path: Optional[AttributePath] = None
-    ClusterId: Optional[int] = None
-    AttributeId: Optional[int] = None
+    ClusterType: Cluster | None = None
+    AttributeType: ClusterAttributeDescriptor | None = None
+    AttributeName: str | None = None
+    Path: AttributePath | None = None
+    ClusterId: int | None = None
+    AttributeId: int | None = None
 
     def __post_init__(self):
         '''Only one of either ClusterType and AttributeType OR Path may be provided.'''
@@ -150,19 +150,19 @@ class TypedAttributePath:
 
 @dataclass(frozen=True)
 class EventPath:
-    EndpointId: Optional[int] = None
-    ClusterId: Optional[int] = None
-    EventId: Optional[int] = None
-    Urgent: Optional[int] = None
+    EndpointId: int | None = None
+    ClusterId: int | None = None
+    EventId: int | None = None
+    Urgent: int | None = None
 
     @staticmethod
-    def from_cluster(EndpointId: int, Cluster: Cluster, EventId: Optional[int] = None, Urgent: Optional[int] = None) -> EventPath:
+    def from_cluster(EndpointId: int, Cluster: Cluster, EventId: int | None = None, Urgent: int | None = None) -> EventPath:
         if Cluster is None:
             raise ValueError("Cluster cannot be None")
         return EventPath(EndpointId=EndpointId, ClusterId=Cluster.id, EventId=EventId, Urgent=Urgent)
 
     @staticmethod
-    def from_event(EndpointId: int, Event: ClusterEvent, Urgent: Optional[int] = None) -> EventPath:
+    def from_event(EndpointId: int, Event: ClusterEvent, Urgent: int | None = None) -> EventPath:
         if Event is None:
             raise ValueError("Event cannot be None")
         return EventPath(EndpointId=EndpointId, ClusterId=Event.cluster_id, EventId=Event.event_id, Urgent=Urgent)
@@ -173,13 +173,13 @@ class EventPath:
 
 @dataclass
 class EventHeader:
-    EndpointId: Optional[int] = None
-    ClusterId: Optional[int] = None
-    EventId: Optional[int] = None
-    EventNumber: Optional[int] = None
-    Priority: Optional[EventPriority] = None
-    Timestamp: Optional[int] = None
-    TimestampType: Optional[EventTimestampType] = None
+    EndpointId: int | None = None
+    ClusterId: int | None = None
+    EventId: int | None = None
+    EventNumber: int | None = None
+    Priority: EventPriority | None = None
+    Timestamp: int | None = None
+    TimestampType: EventTimestampType | None = None
 
     def __str__(self) -> str:
         return (f"{self.EndpointId}/{self.ClusterId}/{self.EventId}/"
@@ -237,7 +237,7 @@ class ValueDecodeFailure:
     '''
 
     TLVValue: Any = None
-    Reason: Optional[Exception] = None
+    Reason: Exception | None = None
 
 
 @dataclass
@@ -447,8 +447,7 @@ class SubscriptionTransaction:
         self._subscriptionId = subscriptionId
         self._devCtrl = devCtrl
         self._isDone = False
-        self._onResubscriptionSucceededCb: Optional[Callable[[
-            SubscriptionTransaction], None]] = None
+        self._onResubscriptionSucceededCb: Callable[[SubscriptionTransaction], None] | None = None
         self._onResubscriptionSucceededCb_isAsync = False
         self._onResubscriptionAttemptedCb_isAsync = False
         self._nodeId = transaction._nodeId
@@ -897,7 +896,7 @@ class AsyncWriteTransaction:
         self._event_loop = eventLoop
         self._future = future
         self._resultData: list[AttributeWriteResult] = []
-        self._resultError: Optional[PyChipError] = None
+        self._resultError: PyChipError | None = None
 
     def handleResponse(self, path: AttributePath, status: int):
         try:
@@ -1170,9 +1169,9 @@ _ReadParams = construct.Struct(
 
 
 def Read(transaction: AsyncReadTransaction, device,
-         attributes: Optional[list[AttributePath]] = None, dataVersionFilters: Optional[list[DataVersionFilter]] = None,
-         events: Optional[list[EventPath]] = None, eventNumberFilter: Optional[int] = None,
-         subscriptionParameters: Optional[SubscriptionParameters] = None,
+         attributes: list[AttributePath] | None = None, dataVersionFilters: list[DataVersionFilter] | None = None,
+         events: list[EventPath] | None = None, eventNumberFilter: int | None = None,
+         subscriptionParameters: SubscriptionParameters | None = None,
          fabricFiltered: bool = True, keepSubscriptions: bool = False, autoResubscribe: bool = True, allowLargePayload: None | bool = None) -> PyChipError:
     if (not attributes) and dataVersionFilters:
         raise ValueError(

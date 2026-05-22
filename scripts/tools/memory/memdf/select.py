@@ -15,7 +15,6 @@
 #
 """Data frame selection utilities."""
 
-from typing import Optional
 from collections.abc import Mapping
 
 import memdf.name
@@ -159,7 +158,7 @@ def select_configured(config: Config, df: DF, columns=SELECTION_CHOICES) -> DF:
     return df
 
 
-def groupby(config: Config, df: DF, by: Optional[str] = None):
+def groupby(config: Config, df: DF, by: str | None = None):
     if not by:
         by = config['report.by']
     df = df[[by, 'size']].groupby(by).aggregate(np.sum).reset_index()

@@ -2,7 +2,7 @@ import asyncio
 import json
 import logging
 from dataclasses import asdict
-from typing import Any, Optional
+from typing import Any
 from collections.abc import Callable
 
 import websockets
@@ -14,7 +14,7 @@ LOGGER.setLevel(logging.INFO)
 
 
 class AsyncWebSocketClient:
-    def __init__(self, uri: str, message_handler: Optional[Callable] = None):
+    def __init__(self, uri: str, message_handler: Callable | None = None):
         self.uri = uri
         self.websocket = None
         self.send_queue = asyncio.Queue()

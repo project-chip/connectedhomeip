@@ -86,7 +86,7 @@ class Parameters:
     commissionee_info: CommissioneeInfo
     wifi_credentials: WiFiCredentials
     thread_credentials: bytes
-    tc_acknowledgements: Optional[TermsAndConditionsParameters] = None
+    tc_acknowledgements: TermsAndConditionsParameters | None = None
     failsafe_expiry_length_seconds: int = 600
 
 
@@ -125,8 +125,8 @@ class GetCommissioneeCredentialsResponse:
     ipk: bytes
     case_admin_node: int
     admin_vendor_id: int
-    node_id: Optional[int] = None
-    fabric_id: Optional[int] = None
+    node_id: int | None = None
+    fabric_id: int | None = None
 
 
 class CredentialProvider:

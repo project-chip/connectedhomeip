@@ -29,7 +29,6 @@ from copy import deepcopy
 from dataclasses import dataclass, field
 from enum import Enum, StrEnum, auto
 from importlib.resources.abc import Traversable
-from typing import Optional
 
 import matter.clusters as Clusters
 import matter.testing.conformance as conformance_support
@@ -61,7 +60,7 @@ def to_access_code(privilege: int) -> str:
     return _PRIVILEGE_STR.get(privilege, "")
 
 
-def get_access_privilege_or_unknown(access_value: Optional[int]) -> int:
+def get_access_privilege_or_unknown(access_value: int | None) -> int:
     """
     Returns the given access_value if not None, otherwise returns the default unknown privilege.
     """
@@ -178,8 +177,8 @@ class XmlDataTypeComponent:
     name: str
     conformance: ConformanceCallable
     # Additional datatype component fields from cluster XML's
-    summary: Optional[str] = None  # For descriptions/documentation
-    type_info: Optional[str] = None  # Data type for struct fields
+    summary: str | None = None  # For descriptions/documentation
+    type_info: str | None = None  # Data type for struct fields
     is_optional: bool = False  # Whether field is optional
     is_nullable: bool = False  # Whether field can be null
     constraints: Optional[Constraints] = None  # For min/max values, lists, etc.
@@ -195,7 +194,7 @@ class XmlDataType:
     name: str
     components: dict[uint, XmlDataTypeComponent]
     # if this is None, this is a global struct
-    cluster_ids: Optional[list[uint]]
+    cluster_ids: list[uint] | None
 
 
 @dataclass
@@ -256,7 +255,7 @@ class XmlEvent:
 class XmlCluster:
     name: str
     revision: int
-    derived: Optional[str]
+    derived: str | None
     feature_map: dict[str, uint]
     attribute_map: dict[str, uint]
     command_map: dict[str, uint]
@@ -334,7 +333,7 @@ class XmlTag:
     """Represents a tag within a namespace"""
     id: int = 0
     name: str = ""
-    description: Optional[str] = None
+    description: str | None = None
 
     def __str__(self) -> str:
         desc = f" - {self.description}" if self.description else ""
@@ -351,7 +350,7 @@ class XmlDeviceType:
     classification_class: str
     classification_scope: str
     revision_desc: dict[int, str]
-    superset_of_device_type_name: Optional[str] = None
+    superset_of_device_type_name: str | None = None
     superset_of_device_type_id: int = 0
 
     def __str__(self):
@@ -400,7 +399,7 @@ def _fuzzy_name(to_fuzz: str):
     return to_fuzz.lower().strip().replace(' ', '').replace('/', '')
 
 
-def get_location_from_element(element: ElementTree.Element, cluster_id: Optional[int]):
+def get_location_from_element(element: ElementTree.Element, cluster_id: int | None):
     if cluster_id is None:
         cluster_id = 0
     cluster_location = ClusterPathLocation(endpoint_id=0, cluster_id=cluster_id)
@@ -423,7 +422,7 @@ def get_location_from_element(element: ElementTree.Element, cluster_id: Optional
         return cluster_location
 
 
-def get_conformance(element: ElementTree.Element, cluster_id: Optional[uint]) -> tuple[ElementTree.Element, typing.Optional[ProblemNotice]]:
+def get_conformance(element: ElementTree.Element, cluster_id: uint | None) -> tuple[ElementTree.Element, ProblemNotice | None]:
     for sub in element:
         if sub.tag in TOP_LEVEL_CONFORMANCE_TAGS:
             return sub, None
@@ -434,7 +433,7 @@ def get_conformance(element: ElementTree.Element, cluster_id: Optional[uint]) ->
 
 
 # Tuple of the root element, the conformance xml element within the root and the optional access element within the root
-XmlElementDescriptor = tuple[ElementTree.Element, ElementTree.Element, Optional[ElementTree.Element]]
+XmlElementDescriptor = tuple[ElementTree.Element, ElementTree.Element, ElementTree.Element | None]
 
 
 def parse_revision_history(top_level: ElementTree.Element) -> tuple[dict[int, str], list[ProblemNotice]]:
@@ -455,7 +454,7 @@ def parse_revision_history(top_level: ElementTree.Element) -> tuple[dict[int, st
 
 class ClusterParser:
     # Cluster ID is optional to support base clusters that have no ID of their own.
-    def __init__(self, cluster: ElementTree.Element, cluster_id: Optional[uint], name: str):
+    def __init__(self, cluster: ElementTree.Element, cluster_id: uint | None, name: str):
         self._problems: list[ProblemNotice] = []
         self._cluster = cluster
         self._cluster_id = cluster_id
@@ -476,7 +475,7 @@ class ClusterParser:
                 if cid.attrib['name'] == name and list(cid.iter('provisionalConform')):
                     self._is_provisional = True
 
-        self._pics: Optional[str] = None
+        self._pics: str | None = None
         try:
             classification = next(cluster.iter('classification'))
             self._pics = classification.attrib['picsCode']
@@ -502,7 +501,7 @@ class ClusterParser:
             self._problems.append(problem)
         return element
 
-    def get_access(self, element: ElementTree.Element) -> Optional[ElementTree.Element]:
+    def get_access(self, element: ElementTree.Element) -> ElementTree.Element | None:
         for sub in element:
             if sub.tag == 'access':
                 return sub
@@ -558,7 +557,7 @@ class ClusterParser:
             commands[element.attrib['name']] = uint(int(element.attrib['id'], 0))
         return commands
 
-    def parse_conformance(self, conformance_xml: ElementTree.Element) -> Optional[ConformanceCallable]:
+    def parse_conformance(self, conformance_xml: ElementTree.Element) -> ConformanceCallable | None:
         try:
             return parse_callable_from_xml(conformance_xml, self.params)
         except ConformanceException as ex:
@@ -568,12 +567,12 @@ class ClusterParser:
                                                 severity=ProblemSeverity.WARNING, problem=str(ex)))
             return None
 
-    def parse_write_optional(self, element_xml: ElementTree.Element, access_xml: Optional[ElementTree.Element]) -> bool:
+    def parse_write_optional(self, element_xml: ElementTree.Element, access_xml: ElementTree.Element | None) -> bool:
         if access_xml is None:
             return False
         return access_xml.attrib['write'] == 'optional'
 
-    def parse_access(self, element_xml: ElementTree.Element, access_xml: Optional[ElementTree.Element], conformance: ConformanceCallable) -> tuple[Optional[int], Optional[int], Optional[int]]:
+    def parse_access(self, element_xml: ElementTree.Element, access_xml: ElementTree.Element | None, conformance: ConformanceCallable) -> tuple[int | None, int | None, int | None]:
         ''' Returns a tuple of access types for read / write / invoke'''
         def str_to_access_type(privilege_str: str) -> int:
             if privilege_str == 'view':
@@ -1233,7 +1232,7 @@ def add_cluster_data_from_xml(xml: ElementTree.Element, clusters: dict[uint, Xml
         for cid in ids:
             name = cid.get('name')
             cluster_id_str = cid.get('id')
-            cluster_id: Optional[uint] = None
+            cluster_id: uint | None = None
             if cluster_id_str:
                 cluster_id = uint(int(cluster_id_str, 0))
 
@@ -1869,7 +1868,7 @@ def parse_single_device_type(root: ElementTree.Element, cluster_definition_xml: 
     return device_types, problems
 
 
-def build_xml_device_types(data_model_directory: PrebuiltDataModelDirectory | Traversable, cluster_definition_xml: Optional[dict[uint, XmlCluster]] = None) -> tuple[dict[int, XmlDeviceType], list[ProblemNotice]]:
+def build_xml_device_types(data_model_directory: PrebuiltDataModelDirectory | Traversable, cluster_definition_xml: dict[uint, XmlCluster] | None = None) -> tuple[dict[int, XmlDeviceType], list[ProblemNotice]]:
     top = get_data_model_directory(data_model_directory, DataModelLevel.kDeviceType)
     device_types: dict[int, XmlDeviceType] = {}
     problems: list[ProblemNotice] = []

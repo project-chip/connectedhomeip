@@ -55,7 +55,7 @@ def GetUnionUnderlyingType(typeToCheck, matchingType=None):
 @dataclass
 class ClusterObjectFieldDescriptor:
     Label: str = ''
-    Tag: typing.Optional[int] = None
+    Tag: int | None = None
     Type: type = type(None)
 
     def _PutSingleElementToTLV(self, tag, val, elementType, writer: tlv.TLVWriter, debugPath: str = '?'):
@@ -121,13 +121,13 @@ class ClusterObjectFieldDescriptor:
 class ClusterObjectDescriptor:
     Fields: list[ClusterObjectFieldDescriptor]
 
-    def GetFieldByTag(self, tag: int) -> typing.Optional[ClusterObjectFieldDescriptor]:
+    def GetFieldByTag(self, tag: int) -> ClusterObjectFieldDescriptor | None:
         for _field in self.Fields:
             if _field.Tag == tag:
                 return _field
         return None
 
-    def GetFieldByLabel(self, label: str) -> typing.Optional[ClusterObjectFieldDescriptor]:
+    def GetFieldByLabel(self, label: str) -> ClusterObjectFieldDescriptor | None:
         for _field in self.Fields:
             if _field.Label == label:
                 return _field
