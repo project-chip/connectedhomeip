@@ -76,4 +76,5 @@ class TerminableThread(TerminableResource, threading.Thread):
         return not self.is_alive()
 
     def resource_terminate(self) -> None:
-        self.resource_thread_join()
+        if not self.resource_thread_join():
+            raise RuntimeError(f"Thread {self.name} is still alive after termination, it might be stuck on some operation")
