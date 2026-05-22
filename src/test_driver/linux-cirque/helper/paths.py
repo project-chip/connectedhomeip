@@ -38,5 +38,5 @@ LIT_ICD_APP_ESC = shlex.quote(str(CHIP_REPO / "out/debug/lit_icd/lit-icd-app"))
 MATTER_CONTROLLER_WHEEL_DIR = CHIP_REPO / "out/debug/linux_x64_gcc/controller/python"
 MATTER_CONTROLLER_WHEELS = ["matter_clusters", "matter_core", "matter_repl"]
 MATTER_CONTROLLER_INSTALL_WHEELS = (
-    f"pip3 install --break-system-packages --force-reinstall --find-links {shlex.quote(str(MATTER_CONTROLLER_WHEEL_DIR))} "
+    f"pip3 install --break-system-packages --find-links {shlex.quote(str(MATTER_CONTROLLER_WHEEL_DIR))} "
     f"{' '.join(MATTER_CONTROLLER_WHEELS)}")
