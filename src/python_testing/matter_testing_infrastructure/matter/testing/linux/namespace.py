@@ -260,7 +260,10 @@ class NetworkNamespace(NetworkResource):
 
 
 class IsolatedNetworkNamespace(TerminableResource):
-    """Helper class to create and remove network namespaces for tests."""
+    """Helper class to create and remove network namespaces for tests.
+
+    Should be used as a context manager or with explicit call to `resource_start()` and `resource_terminate()`.
+    """
 
     def __init__(self, index: int = 0, mgmt_link_name: str = 'eth-mgmt', tool_link_name: str = 'eth-tool', app_link_name: str = 'eth-app',
                  mgmt_link_up: bool = True, tool_link_up: bool = True, app_link_up: bool = True, add_ula: bool = True):

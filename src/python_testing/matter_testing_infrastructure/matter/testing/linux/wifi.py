@@ -180,6 +180,9 @@ class WpaSupplicantMock(TerminableThread):
     link to simulate network connectivity.
 
     Extended to support NAN (Neighbor Awareness Networking) for WiFi-PAF testing.
+
+    Should be used as a context manager or with explicit call to `resource_start()`
+    and `resource_terminate()`.
     """
 
     class Wpa(sdbus.DbusInterfaceCommonAsync,
