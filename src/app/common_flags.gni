@@ -39,6 +39,14 @@ declare_args() {
       current_os == "linux" || current_os == "ios" || current_os == "mac" ||
       current_os == "android"
 
+  # Enable shutdown callbacks in CodegenDataModelProvider::Shutdown() so that
+  # Server::Shutdown() → Server::Init() cycles re-initialize clusters correctly.
+  # Disabled by default on embedded platforms to avoid pulling in per-cluster
+  # shutdown callbacks (~7-8K flash on some lighting apps).
+  chip_enable_server_restart_support =
+      current_os == "linux" || current_os == "ios" || current_os == "mac" ||
+      current_os == "android"
+
   # Flag that controls whether the camera server is enabled
   matter_enable_camera_server = false
 
