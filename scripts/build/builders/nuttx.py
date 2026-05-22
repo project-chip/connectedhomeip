@@ -30,12 +30,12 @@ class NuttXApp(Enum):
     def ExampleName(self):
         if self == NuttXApp.LIGHT:
             return 'lighting-app'
-        raise Exception('Unknown app type: %r' % self)
+        raise Exception('Unknown app type: {!r}'.format(self))
 
     def AppNamePrefix(self, chip_name):
         if self == NuttXApp.LIGHT:
-            return ('chip-%s-lighting-example' % chip_name)
-        raise Exception('Unknown app type: %r' % self)
+            return ('chip-{}-lighting-example'.format(chip_name))
+        raise Exception('Unknown app type: {!r}'.format(self))
 
 
 class NuttXBoard(Enum):

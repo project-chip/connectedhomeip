@@ -127,13 +127,13 @@ def VerifyCheckChar36(s, charSet=CharSet_Base36):
 
 if __name__ == "__main__":
 
-    usage = """Usage: %s <command> [ <args> ]
+    usage = """Usage: {} <command> [ <args> ]
 
 Commands:
   generate <string>
   verify <string-with-check-digit>
   gen-multiply-table <base>
-""" % (sys.argv[0])
+""".format(sys.argv[0])
 
     if (len(sys.argv) < 2):
         print(usage)
@@ -148,10 +148,10 @@ Commands:
             print(usage)
             sys.exit(-1)
         if (VerifyCheckChar(sys.argv[2])):
-            print("%s is VALID" % (sys.argv[2]))
+            print("{} is VALID".format(sys.argv[2]))
             sys.exit(0)
         else:
-            print("%s is INVALID" % (sys.argv[2]))
+            print("{} is INVALID".format(sys.argv[2]))
             sys.exit(-1)
     elif (sys.argv[1] == "gen-multiply-table"):
         if (len(sys.argv) < 3):

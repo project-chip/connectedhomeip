@@ -728,7 +728,7 @@ class DevCertBuilder:
         self.valid_from = valid_from
 
         if not os.path.exists(self.chipcert):
-            raise Exception('Path not found: %s' % self.chipcert)
+            raise Exception('Path not found: {}'.format(self.chipcert))
 
         if not os.path.exists(test_case_out_dir):
             os.mkdir(test_case_out_dir)
@@ -867,7 +867,7 @@ def main():
     chipcert = args.chipcertdir + 'chip-cert'
 
     if not os.path.exists(chipcert):
-        raise Exception('Path not found: %s' % chipcert)
+        raise Exception('Path not found: {}'.format(chipcert))
 
     cd_cert = args.cdpath + 'Cert.pem'
     cd_key = args.cdpath + 'Key.pem'

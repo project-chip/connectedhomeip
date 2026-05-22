@@ -70,7 +70,7 @@ ALLOWED_SKIPPED_FILENAMES = [
 
 
 def load_all_paa(paa_path: Path) -> dict:
-    log.info("Loading all PAAs in %s" % paa_path)
+    log.info("Loading all PAAs in {}".format(paa_path))
 
     paa_by_skid = {}
     for filename in glob(str(paa_path.joinpath("*.der"))):
@@ -232,7 +232,7 @@ class TC_DA_1_7(MatterBaseTest):
             asserts.fail("DUT %d PAI (%s) not matched in PAA trust store" % (dut_index, hex_from_bytes(pai_akid)))
 
         filename, paa_cert = paa_by_skid[pai_akid]
-        log.info("Matched PAA file %s, subject: %s" % (filename, paa_cert.subject))
+        log.info("Matched PAA file {}, subject: {}".format(filename, paa_cert.subject))
         public_key = paa_cert.public_key()
 
         try:
@@ -260,7 +260,7 @@ class TC_DA_1_7(MatterBaseTest):
 
         self.step(f'{dut_index}.6')
         pk = dac_cert.public_key().public_bytes(encoding=Encoding.X962, format=PublicFormat.UncompressedPoint)
-        log.info("Subject public key pk: %s" % hex_from_bytes(pk))
+        log.info("Subject public key pk: {}".format(hex_from_bytes(pk)))
         key = 'pk_{}'.format(dut_index)
         self.record_data({key: hex_from_bytes(pk)})
         return pk

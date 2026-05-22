@@ -207,7 +207,7 @@ class LintRulesContext:
         if name not in self._cluster_codes:
             # Name may be a number. If this can be parsed as a number, accept it anyway
             try:
-                return "ID_%s" % name, parseNumberString(name)
+                return "ID_{}".format(name), parseNumberString(name)
             except ValueError:
                 log.error("UNKNOWN cluster name '%s'", name)
                 log.error("Known names: '%s'", ",".join(self._cluster_codes.keys()))
@@ -322,7 +322,7 @@ class LintRulesTransformer(Transformer):
             elif type(rule) is ClusterAttributeDeny:
                 self.context.Deny(rule)
             else:
-                raise Exception("Unkown endpoint requirement: %r" % rule)
+                raise Exception("Unkown endpoint requirement: {!r}".format(rule))
 
         return Discard
 
@@ -343,8 +343,7 @@ class LintRulesTransformer(Transformer):
             elif requirement.action == ClusterActionEnum.REJECT:
                 self.context.RejectClusterInEndpoint(requirement.id, code)
             else:
-                raise Exception("Unexpected requirement action %r" %
-                                requirement.action)
+                raise Exception("Unexpected requirement action {!r}".format(requirement.action))
 
         return Discard
 

@@ -35,7 +35,7 @@ class NxpOsUsed(Enum):
             return 'zephyr'
         if self == NxpOsUsed.FREERTOS:
             return 'freertos'
-        raise Exception('Unknown OS type: %r' % self)
+        raise Exception('Unknown OS type: {!r}'.format(self))
 
 
 class NxpBuildSystem(Enum):
@@ -47,7 +47,7 @@ class NxpBuildSystem(Enum):
             return 'gn'
         if self == NxpBuildSystem.CMAKE:
             return 'cmake'
-        raise Exception('Unknown build system: %r' % self)
+        raise Exception('Unknown build system: {!r}'.format(self))
 
 
 class NxpBoard(Enum):
@@ -67,7 +67,7 @@ class NxpBoard(Enum):
             return 'rw61x'
         if self == NxpBoard.MCXW72:
             return 'mcxw72'
-        raise Exception('Unknown board type: %r' % self)
+        raise Exception('Unknown board type: {!r}'.format(self))
 
     def FolderName(self, os_env):
         if self == NxpBoard.RT1060:
@@ -80,7 +80,7 @@ class NxpBoard(Enum):
             return 'rt/rw61x'
         if self == NxpBoard.MCXW72:
             return 'mcxw72'
-        raise Exception('Unknown board type: %r' % self)
+        raise Exception('Unknown board type: {!r}'.format(self))
 
 
 class NxpBoardVariant(Enum):
@@ -113,7 +113,7 @@ class NxpApp(Enum):
             return "lock-app"
         if self == NxpApp.UNIT_TEST:
             return "unit-test"
-        raise Exception('Unknown app type: %r' % self)
+        raise Exception('Unknown app type: {!r}'.format(self))
 
     def NameSuffix(self):
         if self == NxpApp.LIGHTING:
@@ -130,7 +130,7 @@ class NxpApp(Enum):
             return "lock-example"
         if self == NxpApp.UNIT_TEST:
             return "unit-test-example"
-        raise Exception('Unknown app type: %r' % self)
+        raise Exception('Unknown app type: {!r}'.format(self))
 
     def BuildRoot(self, root, board, os_env, build_system):
         if os_env == NxpOsUsed.ZEPHYR:
@@ -321,7 +321,7 @@ class NxpBuilder(GnBuilder):
         if self.board_variant:
             board_variant_value = self.BoardVariantName(self.board, self.os_env, self.board_variant)
             if self.board == NxpBoard.RT1060:
-                flag_board_variant = "evkname=\\\"%s\\\"" % board_variant_value
+                flag_board_variant = "evkname=\\\"{}\\\"".format(board_variant_value)
                 args.append(flag_board_variant)
             if self.board == NxpBoard.RW61X:
                 flag_board_variant = "board_version=\"frdm\""
@@ -393,7 +393,7 @@ class NxpBuilder(GnBuilder):
         prj_file_abs_path = os.path.dirname(os.path.realpath(__file__)) + "/../../../examples/platform/nxp/config/" + prj_file
         if os.path.isfile(prj_file_abs_path):
             return prj_file
-        raise Exception("Configuration not supported, no conf file available: %s" % prj_file_abs_path)
+        raise Exception("Configuration not supported, no conf file available: {}".format(prj_file_abs_path))
 
     @lock_output_dir
     def generate(self):
@@ -411,7 +411,7 @@ class NxpBuilder(GnBuilder):
             cmd += '\nunset ZEPHYR_TOOLCHAIN_VARIANT'
         else:
             if self.build_system is NxpBuildSystem.CMAKE and self.app.name != "UNIT_TEST":
-                build_flags += " " + "-DCONF_FILE_NAME=%s" % self.get_conf_file()
+                build_flags += " " + "-DCONF_FILE_NAME={}".format(self.get_conf_file())
             cmd = ''
             # will be used with next sdk version to get sdk path
             if 'NXP_UPDATE_SDK_SCRIPT_DOCKER' in os.environ:
@@ -430,14 +430,14 @@ class NxpBuilder(GnBuilder):
                 if 'PW_ENVIRONMENT_ROOT' in os.environ:
                     cmd += 'export ARMGCC_DIR=$PW_ENVIRONMENT_ROOT/cipd/packages/arm' + ' \n '
                 else:
-                    cmd += 'export ARMGCC_DIR=%s/.environment/cipd/packages/arm' % os.path.abspath(self.code_root) + ' \n '
+                    cmd += 'export ARMGCC_DIR={}/.environment/cipd/packages/arm'.format(os.path.abspath(self.code_root)) + ' \n '
 
         if ((self.os_env == NxpOsUsed.FREERTOS) and (self.build_system == NxpBuildSystem.GN)):
             # add empty space at the end to avoid concatenation issue when there is no --args
-            cmd += 'gn gen --check --fail-on-unused-args --add-export-compile-commands=* --root=%s ' % self.root
+            cmd += 'gn gen --check --fail-on-unused-args --add-export-compile-commands=* --root={} '.format(self.root)
 
             if args := self.GnBuildArgs():
-                cmd += " --args=%s " % shlex.quote(" ".join(args))
+                cmd += " --args={} ".format(shlex.quote(" ".join(args)))
 
             cmd += self.output_dir
 
@@ -452,7 +452,7 @@ class NxpBuilder(GnBuilder):
 
     @lock_output_dir
     def build_outputs(self):
-        name = 'chip-%s-%s' % (self.board.Name(self.os_env), self.app.NameSuffix())
+        name = 'chip-{}-{}'.format(self.board.Name(self.os_env), self.app.NameSuffix())
         if self.os_env == NxpOsUsed.ZEPHYR:
             yield BuilderOutput(
                 os.path.join(self.output_dir, 'zephyr', 'zephyr.elf'),

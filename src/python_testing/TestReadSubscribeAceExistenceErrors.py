@@ -101,10 +101,9 @@ class TestReadSubscribeAceExistenceErrors(MatterBaseTest):
         else:
             attrs = res
 
-        asserts.assert_true(ep in attrs, "Must have read endpoint %s data" % ep)
-        asserts.assert_true(cluster in attrs[ep], "Must have read %s cluster data" % cluster.__name__)
-        asserts.assert_true(attribute in attrs[ep][cluster],
-                            "Must have read back attribute %s" % attribute.__name__)
+        asserts.assert_true(ep in attrs, "Must have read endpoint {} data".format(ep))
+        asserts.assert_true(cluster in attrs[ep], "Must have read {} cluster data".format(cluster.__name__))
+        asserts.assert_true(attribute in attrs[ep][cluster], "Must have read back attribute {}".format(attribute.__name__))
 
     @staticmethod
     def assert_event_exists(res, cluster, event, ep=ROOT_NODE_ENDPOINT_ID):
@@ -119,7 +118,7 @@ class TestReadSubscribeAceExistenceErrors(MatterBaseTest):
                 and isinstance(e.Data, event)
                 for e in res_events
             ),
-            "Must have read back event %s at endpoint %s" % (event.__name__, ep)
+            "Must have read back event {} at endpoint {}".format(event.__name__, ep)
         )
 
     @staticmethod

@@ -229,8 +229,7 @@ class CustomGenerator(CodeGenerator):
         # Every cluster has its own impl, to avoid
         # very large compilations (running out of RAM)
         for cluster in self.idl.clusters:
-            filename = "proto/%s_cluster.proto" % toLowerSnakeCase(
-                cluster.name)
+            filename = "proto/{}_cluster.proto".format(toLowerSnakeCase(cluster.name))
 
             # Header containing a macro to initialize all cluster plugins
             self.internal_render_one_output(

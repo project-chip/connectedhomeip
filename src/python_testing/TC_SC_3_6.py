@@ -75,7 +75,7 @@ class AttributeChangeAccumulator:
                 'attribute': path.AttributeType,
                 'value': data
             }
-            log.info("Got subscription report on client %s for %s: %s" % (self.name, path.AttributeType, data))
+            log.info("Got subscription report on client {} for {}: {}".format(self.name, path.AttributeType, data))
             self._output.put(value)
 
     @property
@@ -90,7 +90,7 @@ class ResubscriptionCatcher:
 
     def __call__(self, transaction: SubscriptionTransaction, terminationError, nextResubscribeIntervalMsec):
         self._got_resubscription_event.set()
-        log.info("Got resubscription on client %s" % self.name)
+        log.info("Got resubscription on client {}".format(self.name))
 
     @property
     def name(self) -> str:
@@ -135,7 +135,7 @@ class TC_SC_3_6(MatterBaseTest):
         for fabric_idx in range(num_fabrics_to_commission):
             for controller_idx in range(num_controllers_per_fabric):
                 all_names.append("RD%d%s" % (fabric_idx + 1, chr(ord('A') + controller_idx)))
-        log.info("Client names that will be used: %s" % all_names)
+        log.info("Client names that will be used: {}".format(all_names))
         client_list = []
 
         log.info("Pre-conditions: validate CapabilityMinima.CaseSessionsPerFabric >= 3")
@@ -276,7 +276,7 @@ class TC_SC_3_6(MatterBaseTest):
                 # Record arrival of an expected subscription change when seen
                 if endpoint == 0 and attribute == Clusters.BasicInformation.Attributes.NodeLabel and value == AFTER_LABEL:
                     if not all_changes[client_name]:
-                        log.info("Got expected attribute change for client %s" % client_name)
+                        log.info("Got expected attribute change for client {}".format(client_name))
                         all_changes[client_name] = True
 
                 # We are done waiting when we have accumulated all results
@@ -295,15 +295,15 @@ class TC_SC_3_6(MatterBaseTest):
 
         for catcher in resub_catchers:
             if catcher.caught_resubscription:
-                log.error("Client %s saw a resubscription" % catcher.name)
+                log.error("Client {} saw a resubscription".format(catcher.name))
                 failed = True
             else:
-                log.info("Client %s correctly did not see a resubscription" % catcher.name)
+                log.info("Client {} correctly did not see a resubscription".format(catcher.name))
 
         all_reports_gotten = all(all_changes.values())
         if not all_reports_gotten:
-            log.error("Missing reports from the following clients: %s" %
-                      ", ".join([name for name, value in all_changes.items() if value is False]))
+            log.error("Missing reports from the following clients: {}".format(
+                ", ".join([name for name, value in all_changes.items() if value is False])))
             failed = True
         else:
             log.info("Got successful reports from all clients, meaning all concurrent CASE sessions worked")

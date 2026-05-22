@@ -109,7 +109,7 @@ class Context:
                 if unified_variants is None:
                     unified_variants = variants
                 elif unified_variants != variants:
-                    raise Exception("Incompatible build variants: %s and %s" % (unified_variants, variants))
+                    raise Exception("Incompatible build variants: {} and {}".format(unified_variants, variants))
 
         # whenever builders change, assume generation is required again
         self.completed_steps.discard(BuildSteps.GENERATED)

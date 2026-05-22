@@ -579,7 +579,7 @@ class Flasher(firmware_utils.Flasher):
             lhex = ((intvalue & 0xff000000) >> 24) | ((intvalue & 0xff0000) >> 8)
             lhex |= ((intvalue & 0xff00) << 8) | ((intvalue & 0xff) << 24)
 
-            return "%08x" % lhex
+            return "{:08x}".format(lhex)
 
         def get_tools():
             bflb_tools = os.path.join(MATTER_ROOT, "third_party/bouffalolab/repo_bouffalo_sdk/tools/bflb_tools")

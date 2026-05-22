@@ -963,7 +963,7 @@ class PrebuiltDataModelDirectory(Enum):
             return "1.5.1"
         if self == PrebuiltDataModelDirectory.k1_6:
             return "1.6"
-        raise KeyError("Invalid enum: %r" % self)
+        raise KeyError("Invalid enum: {!r}".format(self))
 
 
 class DataModelLevel(Enum):
@@ -982,7 +982,7 @@ class DataModelLevel(Enum):
             return "globals"
         if self == DataModelLevel.kNamespace:
             return "namespaces"
-        raise KeyError("Invalid enum: %r" % self)
+        raise KeyError("Invalid enum: {!r}".format(self))
 
 
 def get_data_model_directory(data_model_directory: Union[PrebuiltDataModelDirectory, Traversable], data_model_level: DataModelLevel = DataModelLevel.kCluster) -> Traversable:

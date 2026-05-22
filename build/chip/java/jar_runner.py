@@ -86,7 +86,7 @@ def main():
 
     args = sys.argv[1:]
     if len(args) < 1:
-        sys.stderr.write('usage: %s [jar_args]...\n' % sys.argv[0])
+        sys.stderr.write('usage: {} [jar_args]...\n'.format(sys.argv[0]))
         sys.exit(EXIT_FAILURE)
 
     return subprocess.check_call([java_home] + args)

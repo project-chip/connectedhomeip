@@ -87,7 +87,7 @@ class PrefixCppDocComment:
                     yield entry
 
     def __repr__(self):
-        return ("PREFIXDoc: %r at %r" % (self.value, self.start_pos))
+        return ("PREFIXDoc: {!r} at {!r}".format(self.value, self.start_pos))
 
 
 class AddServerClusterToEndpointTransform:
@@ -408,8 +408,7 @@ class MatterIdlTransformer(Transformer):
                 elif operation == AttributeOperation.WRITE:
                     acl['writeacl'] = access
                 else:
-                    raise Exception(
-                        "Unknown attribute operation: %r" % operation)
+                    raise Exception("Unknown attribute operation: {!r}".format(operation))
 
         return (args[-1], acl)
 
@@ -539,7 +538,7 @@ class MatterIdlTransformer(Transformer):
             elif isinstance(item, Command):
                 result.commands.append(item)
             else:
-                raise Exception("UNKNOWN cluster content item: %r" % item)
+                raise Exception("UNKNOWN cluster content item: {!r}".format(item))
 
         return result
 
@@ -565,7 +564,7 @@ class MatterIdlTransformer(Transformer):
                 global_structs.append(
                     dataclasses.replace(item, is_global=True))
             else:
-                raise Exception("UNKNOWN idl content item: %r" % item)
+                raise Exception("UNKNOWN idl content item: {!r}".format(item))
 
         return Idl(clusters=clusters, endpoints=endpoints, global_bitmaps=global_bitmaps, global_enums=global_enums, global_structs=global_structs)
 

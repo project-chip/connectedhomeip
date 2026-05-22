@@ -198,7 +198,7 @@ class TizenBuilder(GnBuilder):
         env = 'TIZEN_SDK_ROOT'
         if env not in os.environ:
             raise Exception(
-                "Environment %s missing, cannot build Tizen target" % env)
+                "Environment {} missing, cannot build Tizen target".format(env))
 
         sysroot = None
 
@@ -206,7 +206,7 @@ class TizenBuilder(GnBuilder):
             env = 'TIZEN_SDK_SYSROOT_ARM64'
             if env not in os.environ:
                 raise Exception(
-                    "Environment %s missing, cannot build Tizen target" % env)
+                    "Environment {} missing, cannot build Tizen target".format(env))
 
             sysroot = os.environ[env]
 
@@ -214,7 +214,7 @@ class TizenBuilder(GnBuilder):
             env = 'TIZEN_SDK_SYSROOT'
             if env not in os.environ:
                 raise Exception(
-                    "Environment %s missing, cannot build Tizen target" % env)
+                    "Environment {} missing, cannot build Tizen target".format(env))
 
             sysroot = os.environ[env]
 
@@ -225,9 +225,9 @@ class TizenBuilder(GnBuilder):
         args.extend(self.extra_gn_options)
         args.extend([
             'target_os="tizen"',
-            'target_cpu="%s"' % self.board.value.target_cpu,
-            'tizen_sdk_root="%s"' % os.environ['TIZEN_SDK_ROOT'],
-            'tizen_sdk_sysroot="%s"' % sysroot,
+            'target_cpu="{}"'.format(self.board.value.target_cpu),
+            'tizen_sdk_root="{}"'.format(os.environ['TIZEN_SDK_ROOT']),
+            'tizen_sdk_sysroot="{}"'.format(sysroot),
         ])
         return args
 

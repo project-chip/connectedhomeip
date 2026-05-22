@@ -30,14 +30,14 @@ class cc32xxApp(Enum):
             return 'lock-app'
         if self == cc32xxApp.AIR_PURIFIER:
             return 'air-purifier-app'
-        raise Exception('Unknown app type: %r' % self)
+        raise Exception('Unknown app type: {!r}'.format(self))
 
     def AppNamePrefix(self):
         if self == cc32xxApp.LOCK:
             return 'chip-CC3235SF_LAUNCHXL-lock-example'
         if self == cc32xxApp.AIR_PURIFIER:
             return 'chip-CC3235SF_LAUNCHXL-air-purifier-example'
-        raise Exception('Unknown app type: %r' % self)
+        raise Exception('Unknown app type: {!r}'.format(self))
 
     def BuildRoot(self, root):
         return os.path.join(root, 'examples', self.ExampleName(), 'cc32xx')
@@ -73,7 +73,7 @@ class cc32xxBuilder(GnBuilder):
         elif (self.app == cc32xxApp.AIR_PURIFIER):
             extensions = ["out", "bin"]
         else:
-            raise Exception('Unknown app type: %r' % self.app)
+            raise Exception('Unknown app type: {!r}'.format(self.app))
         if self.options.enable_link_map_file:
             extensions.append("out.map")
         for ext in extensions:

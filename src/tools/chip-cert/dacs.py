@@ -51,8 +51,7 @@ def make_c_array(byte_string: bytes, name: str, linelen: int) -> str:
     output = "const uint8_t %s[%d] = {\n" % (name, len(byte_string))
     while len(byte_string) > 0:
         current_line_bytes = _extract_front(byte_string, linelen)
-        output += "    %s,\n" % ", ".join(["0x%02x" %
-                                          b for b in current_line_bytes])
+        output += "    {},\n".format(", ".join(["0x{:02x}".format(b) for b in current_line_bytes]))
     output += "};\n"
 
     return output
@@ -111,7 +110,7 @@ class DevCertBuilder:
         self.chipcert = chip_cert_dir + 'chip-cert'
 
         if not os.path.exists(self.chipcert):
-            raise Exception('Path not found: %s' % self.chipcert)
+            raise Exception('Path not found: {}'.format(self.chipcert))
 
         paa = Names(CertType.PAA, test_dir, dev_dir, vid, pid)
         pai = Names(CertType.PAI, test_dir, dev_dir, vid, pid)

@@ -292,7 +292,7 @@ def NamedFilter(choices: List, name: str):
     for choice in choices:
         if choice.name == name:
             return choice
-    raise Exception("No item named %s in %r" % (name, choices))
+    raise Exception("No item named {} in {!r}".format(name, choices))
 
 
 def ToBoxedJavaType(field: Field):
@@ -405,13 +405,13 @@ class EncodableValue:
     def get_underlying_struct(self):
         s = self.context.find_struct(self.data_type.name)
         if not s:
-            raise Exception("Struct %s not found" % self.data_type.name)
+            raise Exception("Struct {} not found".format(self.data_type.name))
         return s
 
     def get_underlying_enum(self):
         e = self.context.find_enum(self.data_type.name)
         if not e:
-            raise Exception("Enum %s not found" % self.data_type.name)
+            raise Exception("Enum {} not found".format(self.data_type.name))
         return e
 
     @property
@@ -468,7 +468,7 @@ class EncodableValue:
     @property
     def unboxed_java_signature(self):
         if self.is_optional or self.is_list:
-            raise Exception("Not a basic type: %r" % self)
+            raise Exception("Not a basic type: {!r}".format(self))
 
         t = ParseDataType(self.data_type, self.context)
 
@@ -484,7 +484,7 @@ class EncodableValue:
             if t.byte_count >= 3:
                 return "J"
             return "I"
-        raise Exception("Not a basic type: %r" % self)
+        raise Exception("Not a basic type: {!r}".format(self))
 
     @property
     def boxed_java_signature(self):

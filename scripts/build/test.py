@@ -87,8 +87,8 @@ class TestBuilder(unittest.TestCase):
                 for line in build_actual_output(ROOT, OUT, args):
                     fo.write(line.replace(ROOT, '{root}').replace(OUT, '{out}'))
 
-            msg = "DIFFERENCE between expected and generated output in %s\n" % expected_file
-            msg += "Expected file can be found in %s" % reference
+            msg = "DIFFERENCE between expected and generated output in {}\n".format(expected_file)
+            msg += "Expected file can be found in {}".format(reference)
             for line in diffs:
                 msg += ("\n   " + line.replace(ROOT,
                                                '{root}').replace(OUT, '{out}').strip())

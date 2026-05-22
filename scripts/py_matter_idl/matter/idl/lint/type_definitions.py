@@ -98,7 +98,7 @@ class ErrorAccumulatingRule(LintRule):
 
     def _AddLintError(self, text, location):
         self._lint_errors.append(
-            LintError("%s: %s" % (self.name, text), location))
+            LintError("{}: {}".format(self.name, text), location))
 
     def _ParseLocation(self, meta: Optional[ParseMetaData]) -> Optional[LocationInFile]:
         """Create a location in the current file that is being parsed. """
@@ -133,12 +133,12 @@ class ClusterValidationRule(ErrorAccumulatingRule):
         if self._mandatory_clusters:
             result += "  mandatory_clusters:\n"
             for cluster in self._mandatory_clusters:
-                result += "    - %r\n" % cluster
+                result += "    - {!r}\n".format(cluster)
 
         if self._rejected_clusters:
             result += "   rejected_clusters:\n"
             for cluster in self._rejected_clusters:
-                result += "    - %r\n" % cluster
+                result += "    - {!r}\n".format(cluster)
 
         result += "}"
 
@@ -161,12 +161,12 @@ class ClusterValidationRule(ErrorAccumulatingRule):
         cluster_definition = [c for c in self._idl.clusters if c.name == name]
         if not cluster_definition:
             self._AddLintError(
-                "Cluster definition for %s not found" % name, location)
+                "Cluster definition for {} not found".format(name), location)
             return None
 
         if len(cluster_definition) > 1:
             self._AddLintError(
-                "Multiple cluster definitions found for %s" % name, location)
+                "Multiple cluster definitions found for {}".format(name), location)
             return None
 
         return cluster_definition[0].code
@@ -214,12 +214,12 @@ class RequiredAttributesRule(ErrorAccumulatingRule):
         if self._mandatory_attributes:
             result += "  mandatory_attributes:\n"
             for attr in self._mandatory_attributes:
-                result += "    - %r\n" % attr
+                result += "    - {!r}\n".format(attr)
 
         if self._deny_attributes:
             result += "  deny_attributes:\n"
             for attr in self._deny_attributes:
-                result += "    - %r\n" % attr
+                result += "    - {!r}\n".format(attr)
 
         result += "}"
         return result
@@ -243,12 +243,12 @@ class RequiredAttributesRule(ErrorAccumulatingRule):
         cluster_definition = [c for c in self._idl.clusters if c.name == name]
         if not cluster_definition:
             self._AddLintError(
-                "Cluster definition for %s not found" % name, location)
+                "Cluster definition for {} not found".format(name), location)
             return None
 
         if len(cluster_definition) > 1:
             self._AddLintError(
-                "Multiple cluster definitions found for %s" % name, location)
+                "Multiple cluster definitions found for {}".format(name), location)
             return None
 
         return cluster_definition[0]
@@ -281,8 +281,8 @@ class RequiredAttributesRule(ErrorAccumulatingRule):
                 # For all the instantiated attributes, figure out their code
                 for attr in cluster.attributes:
                     if attr.name not in name_to_code_map:
-                        self._AddLintError("Could not find attribute defintion (no code) for %s:%s" %
-                                           (cluster.name, attr.name), self._ParseLocation(cluster.parse_meta))
+                        self._AddLintError("Could not find attribute defintion (no code) for {}:{}".format(
+                            cluster.name, attr.name), self._ParseLocation(cluster.parse_meta))
                         continue
 
                     attribute_codes.add(name_to_code_map[attr.name])
@@ -343,7 +343,7 @@ class RequiredCommandsRule(ErrorAccumulatingRule):
             for key, value in self._mandatory_commands.items():
                 result += "    - cluster %d:\n" % key
                 for requirement in value:
-                    result += "        - %r\n" % requirement
+                    result += "        - {!r}\n".format(requirement)
 
         result += "}"
         return result

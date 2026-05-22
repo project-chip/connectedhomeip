@@ -146,9 +146,9 @@ class LightingMgrCmd(Cmd):
             except AttributeError:
                 doc = None
             if doc:
-                self.stdout.write("%s\n" % textwrap.dedent(doc))
+                self.stdout.write("{}\n".format(textwrap.dedent(doc)))
             else:
-                self.stdout.write("No help on %s\n" % (line))
+                self.stdout.write("No help on {}\n".format(line))
         else:
             self.print_topics(
                 "\nAvailable commands (type help <name> for more information):",

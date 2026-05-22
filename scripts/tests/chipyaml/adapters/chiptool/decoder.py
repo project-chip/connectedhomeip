@@ -298,8 +298,8 @@ class FloatConverter(BaseConverter):
 
     def maybe_convert(self, typename, value):
         if typename == 'single':
-            float_representation = float("%.16f" % value)
-            value = float('%g' % float_representation)
+            float_representation = float("{:.16f}".format(value))
+            value = float('{:g}'.format(float_representation))
         return value
 
 

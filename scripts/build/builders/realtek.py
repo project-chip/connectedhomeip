@@ -29,7 +29,7 @@ class RtkOsUsed(Enum):
             return 'zephyr'
         if self == RtkOsUsed.FREERTOS:
             return 'freertos'
-        raise Exception('Unknown OS type: %r' % self)
+        raise Exception('Unknown OS type: {!r}'.format(self))
 
 
 class RealtekBoard(Enum):
@@ -42,7 +42,7 @@ class RealtekBoard(Enum):
             return 'rtl8777g'
         if self == RealtekBoard.RTL87X2G:
             return 'rtl87x2g'
-        raise Exception('Unknown board type: %r' % self)
+        raise Exception('Unknown board type: {!r}'.format(self))
 
 
 class RealtekApp(Enum):
@@ -70,7 +70,7 @@ class RealtekApp(Enum):
             return 'ota-requestor-app'
         if self == RealtekApp.THERMOSTAT:
             return 'thermostat'
-        raise Exception('Unknown app type: %r' % self)
+        raise Exception('Unknown app type: {!r}'.format(self))
 
     @property
     def TargetName(self):
@@ -88,7 +88,7 @@ class RealtekApp(Enum):
             return 'matter-cli-ftd'
         if self == RealtekApp.THERMOSTAT:
             return 'matter-cli-mtd'
-        raise Exception('Unknown app type: %r' % self)
+        raise Exception('Unknown app type: {!r}'.format(self))
 
     @property
     def AppNamePrefix(self):
@@ -106,7 +106,7 @@ class RealtekApp(Enum):
             return 'chip-rtl8777g-ota-requestor-app'
         if self == RealtekApp.THERMOSTAT:
             return 'chip-rtl8777g-thermostat-app'
-        raise Exception('Unknown app type: %r' % self)
+        raise Exception('Unknown app type: {!r}'.format(self))
 
 
 class RealtekBuilder(Builder):
@@ -134,7 +134,7 @@ class RealtekBuilder(Builder):
         elif self.board == RealtekBoard.RTL8777G:
             self.os_env = RtkOsUsed.FREERTOS
         else:
-            raise Exception('Unknown board type: %r' % self.board)
+            raise Exception('Unknown board type: {!r}'.format(self.board))
 
     def CmakeBuildFlags(self) -> str:
         flags = [

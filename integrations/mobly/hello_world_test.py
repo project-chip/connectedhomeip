@@ -31,11 +31,11 @@ class HelloWorldTest(base_test.BaseTestClass):
     def test_hello(self):
         expected = "hello!"
         status, payload = self.dut.rpcs().EchoService.Echo(msg=expected)
-        asserts.assert_true(status.ok(), "Status is %s" % status)
+        asserts.assert_true(status.ok(), "Status is {}".format(status))
         asserts.assert_equal(
             payload.msg,
             expected,
-            'Returned payload is "%s" expected "%s"' % (payload.msg, expected),
+            'Returned payload is "{}" expected "{}"'.format(payload.msg, expected),
         )
 
 

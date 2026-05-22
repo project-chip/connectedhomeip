@@ -86,7 +86,7 @@ class TelinkApp(Enum):
             return 'thermostat'
         if self == TelinkApp.WINDOW_COVERING:
             return 'window-app'
-        raise Exception('Unknown app type: %r' % self)
+        raise Exception('Unknown app type: {!r}'.format(self))
 
     def AppNamePrefix(self):
         if self == TelinkApp.AIR_QUALITY_SENSOR:
@@ -125,7 +125,7 @@ class TelinkApp(Enum):
             return 'chip-telink-thermostat-example'
         if self == TelinkApp.WINDOW_COVERING:
             return 'chip-telink-window-example'
-        raise Exception('Unknown app type: %r' % self)
+        raise Exception('Unknown app type: {!r}'.format(self))
 
 
 class TelinkBoard(Enum):
@@ -164,7 +164,7 @@ class TelinkBoard(Enum):
             return 'tl7218x_ml7m'
         if self == TelinkBoard.TL7218X_RETENTION:
             return 'tl7218x_retention'
-        raise Exception('Unknown board type: %r' % self)
+        raise Exception('Unknown board type: {!r}'.format(self))
 
 
 class TelinkBuilder(Builder):
@@ -285,7 +285,7 @@ class TelinkBuilder(Builder):
         elif self.log_level == TelinkLogLevel.NONE:
             flags.append("-DTLNK_LOG_LEVEL=none")
         else:
-            raise Exception("Unknown log level: %r" % self.log_level)
+            raise Exception("Unknown log level: {!r}".format(self.log_level))
 
         build_flags = " -- " + " ".join(flags) if len(flags) > 0 else ""
 
@@ -305,10 +305,10 @@ class TelinkBuilder(Builder):
     def _build(self):
         log.info('Compiling Telink at %s', self.output_dir)
 
-        cmd = self.get_cmd_prefixes() + ("ninja -C %s" % self.output_dir)
+        cmd = self.get_cmd_prefixes() + ("ninja -C {}".format(self.output_dir))
 
         if self.ninja_jobs is not None:
-            cmd += " -j%s" % str(self.ninja_jobs)
+            cmd += " -j{}".format(str(self.ninja_jobs))
 
         self._Execute(['bash', '-c', cmd], title='Building ' + self.identifier)
 

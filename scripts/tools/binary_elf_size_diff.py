@@ -464,7 +464,7 @@ def main(
             writer.writerow(HEADER)
             writer.writerows(delta)
         else:
-            raise Exception("Unknown output type: %r" % output)
+            raise Exception("Unknown output type: {!r}".format(output))
 
 
 if __name__ == "__main__":

@@ -72,7 +72,7 @@ class TC_SEAR_1_2(MatterBaseTest):
         self.print_step(step, "Read SupportedMaps attribute")
         supported_maps = await self.read_sear_attribute_expect_success(
             endpoint=self.endpoint, attribute=Clusters.ServiceArea.Attributes.SupportedMaps)
-        log.info("SupportedMaps: %s" % supported_maps)
+        log.info("SupportedMaps: {}".format(supported_maps))
         asserts.assert_less_equal(len(supported_maps), 255,
                                   "SupportedMaps should have max 255 entries")
 
@@ -89,7 +89,7 @@ class TC_SEAR_1_2(MatterBaseTest):
         self.print_step(step, "Read SupportedAreas attribute")
         supported_areas = await self.read_sear_attribute_expect_success(
             endpoint=self.endpoint, attribute=Clusters.ServiceArea.Attributes.SupportedAreas)
-        log.info("SupportedAreas: %s" % supported_areas)
+        log.info("SupportedAreas: {}".format(supported_areas))
         asserts.assert_less_equal(len(supported_areas), 255,
                                   "SupportedAreas should have max 255 entries")
         areaid_list = []

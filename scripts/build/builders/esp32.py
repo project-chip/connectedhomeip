@@ -79,7 +79,7 @@ class Esp32App(Enum):
             return 'examples/ota-provider-app'
         if self == Esp32App.TESTS:
             return 'src/test_driver'
-        raise Exception('Unknown app type: %r' % self)
+        raise Exception('Unknown app type: {!r}'.format(self))
 
     @property
     def AppNamePrefix(self):
@@ -111,7 +111,7 @@ class Esp32App(Enum):
             return 'chip-ota-provider-app'
         if self == Esp32App.TESTS:
             return None
-        raise Exception('Unknown app type: %r' % self)
+        raise Exception('Unknown app type: {!r}'.format(self))
 
     def FlashBundleName(self, is_all_devices_selective):
         if not self.AppNamePrefix:
@@ -190,7 +190,7 @@ class Esp32Builder(Builder):
     def _IdfEnvExecute(self, cmd, title=None):
         # Run activate.sh after export.sh to ensure using the chip environment.
         self._Execute(
-            ['bash', '-c', 'source $IDF_PATH/export.sh; source scripts/activate.sh; %s' % cmd],
+            ['bash', '-c', 'source $IDF_PATH/export.sh; source scripts/activate.sh; {}'.format(cmd)],
             title=title)
 
     @property
@@ -222,7 +222,7 @@ class Esp32Builder(Builder):
             self.board, self.app, self.enable_rpcs))
 
         if not self._runner.dry_run and not os.path.exists(defaults):
-            raise Exception('SDK defaults file missing: %s' % defaults)
+            raise Exception('SDK defaults file missing: {}'.format(defaults))
 
         defaults_out = os.path.join(self.output_dir, 'sdkconfig.defaults')
 
@@ -239,9 +239,9 @@ class Esp32Builder(Builder):
 
         if not self.enable_ipv4:
             self._Execute(
-                ['bash', '-c', 'echo -e "\\nCONFIG_DISABLE_IPV4=y\\n" >>%s' % shlex.quote(defaults_out)])
+                ['bash', '-c', 'echo -e "\\nCONFIG_DISABLE_IPV4=y\\n" >>{}'.format(shlex.quote(defaults_out))])
             self._Execute(
-                ['bash', '-c', 'echo -e "\\nCONFIG_LWIP_IPV4=n\\n" >>%s' % shlex.quote(defaults_out)])
+                ['bash', '-c', 'echo -e "\\nCONFIG_LWIP_IPV4=n\\n" >>{}'.format(shlex.quote(defaults_out))])
 
         if self.enable_insights_trace:
             insights_flag = 'y'
@@ -250,7 +250,10 @@ class Esp32Builder(Builder):
 
         # pre-requisite
         self._Execute(
-            ['bash', '-c', 'echo -e "\\nCONFIG_ESP_INSIGHTS_ENABLED=%s\\nCONFIG_CHIP_ENABLE_ESP_DIAGNOSTICS=%s\\n" >>%s' % (insights_flag, insights_flag, shlex.quote(defaults_out))])
+            ['bash',
+             '-c',
+             'echo -e "\\nCONFIG_ESP_INSIGHTS_ENABLED={}\\nCONFIG_CHIP_ENABLE_ESP_DIAGNOSTICS={}\\n" >>{}'.format(
+                 insights_flag, insights_flag, shlex.quote(defaults_out))])
 
         cmake_flags = []
 

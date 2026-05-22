@@ -1164,7 +1164,7 @@ class MatterBaseTest(base_test.BaseTestClass):
 
         if not os.path.exists(app_pipe_out):
             LOGGER.error("Named pipe %r does NOT exist", app_pipe_out)
-            raise FileNotFoundError("CANNOT FIND %r" % app_pipe_out)
+            raise FileNotFoundError("CANNOT FIND {!r}".format(app_pipe_out))
 
         dut_ip: Optional[str] = os.getenv(ip_env_var) if ip_env_var else None
 
@@ -1262,7 +1262,7 @@ class MatterBaseTest(base_test.BaseTestClass):
 
         if not os.path.exists(app_pipe):
             LOGGER.error("Named pipe %r does NOT exist", app_pipe)
-            raise FileNotFoundError("CANNOT FIND %r" % app_pipe)
+            raise FileNotFoundError("CANNOT FIND {!r}".format(app_pipe))
 
         if not isinstance(command_dict, dict):
             raise TypeError("The command must be passed as a dictionary value")
@@ -1288,7 +1288,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             asserts.assert_true(dut_uname is not None, "The LINUX_DUT_USER environment variable must be set")
             LOGGER.info(f"Using DUT user name: {dut_uname}")
             command_fixed = shlex.quote(json.dumps(command_dict))
-            cmd = "echo \"%s\" | ssh %s@%s \'cat > %s\'" % (command_fixed, dut_uname, dut_ip, app_pipe)
+            cmd = "echo \"{}\" | ssh {}@{} \'cat > {}\'".format(command_fixed, dut_uname, dut_ip, app_pipe)
             os.system(cmd)
 
     async def send_single_cmd(

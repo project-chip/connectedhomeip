@@ -35,14 +35,14 @@ class BouffalolabApp(Enum):
             return 'lighting-app'
         if self == BouffalolabApp.CONTACT:
             return 'contact-sensor-app'
-        raise Exception('Unknown app type: %r' % self)
+        raise Exception('Unknown app type: {!r}'.format(self))
 
     def AppNamePrefix(self, chip_name):
         if self == BouffalolabApp.LIGHT:
-            return ('chip-%s-lighting-example' % chip_name)
+            return ('chip-{}-lighting-example'.format(chip_name))
         if self == BouffalolabApp.CONTACT:
-            return ('chip-%s-contact-sensor-example' % chip_name)
-        raise Exception('Unknown app type: %r' % self)
+            return ('chip-{}-contact-sensor-example'.format(chip_name))
+        raise Exception('Unknown app type: {!r}'.format(self))
 
 
 class BouffalolabBoard(Enum):
@@ -67,7 +67,7 @@ class BouffalolabBoard(Enum):
             return 'BL602-NIGHT-LIGHT'
         if self == BouffalolabBoard.BL706_NIGHT_LIGHT:
             return 'BL706-NIGHT-LIGHT'
-        raise Exception('Unknown board #: %r' % self)
+        raise Exception('Unknown board #: {!r}'.format(self))
 
 
 class BouffalolabThreadType(Enum):
@@ -255,7 +255,7 @@ class BouffalolabBuilder(GnBuilder):
         self.argsOpt.append("chip_generate_link_map_file=true")
 
         try:
-            self.argsOpt.append('bouffalolab_sdk_root="%s"' % os.environ['BOUFFALOLAB_SDK_ROOT'])
+            self.argsOpt.append('bouffalolab_sdk_root="{}"'.format(os.environ['BOUFFALOLAB_SDK_ROOT']))
         except KeyError as err:
             self.print_enviroment_error()
             raise err
@@ -306,7 +306,7 @@ class BouffalolabBuilder(GnBuilder):
         os.system("rm -rf {}/config".format(self.output_dir))
         os.system("rm -rf {}/ota_images".format(self.output_dir))
         os.system("rm -rf {}".format(os.path.join(self.output_dir, 'boot2*.bin')))
-        os.system("rm -rf {}".format(os.path.join(self.output_dir, '%s*' % self.app.AppNamePrefix(self.chip_name))))
+        os.system("rm -rf {}".format(os.path.join(self.output_dir, '{}*'.format(self.app.AppNamePrefix(self.chip_name)))))
 
     @lock_output_dir
     def PostBuildCommand(self):

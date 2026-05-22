@@ -36,7 +36,7 @@ class Cyw30739App(Enum):
             return "lock-app"
         if self == Cyw30739App.THERMOSTAT:
             return "thermostat"
-        raise Exception("Unknown app type: %r" % self)
+        raise Exception("Unknown app type: {!r}".format(self))
 
     def AppNamePrefix(self):
         return self.ExampleName().replace("-", "_")
@@ -63,7 +63,7 @@ class Cyw30739Board(Enum):
             return "CYW930739M2EVB-01"
         if self == Cyw30739Board.CYW930739M2EVB_02:
             return "CYW930739M2EVB-02"
-        raise Exception("Unknown board #: %r" % self)
+        raise Exception("Unknown board #: {!r}".format(self))
 
 
 class Cyw30739Builder(GnBuilder):

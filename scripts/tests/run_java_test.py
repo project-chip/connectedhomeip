@@ -60,8 +60,8 @@ def main(app: str, app_args: str, tool_path: str, tool_cluster: str, tool_args: 
         kvs_match = re.search(r"--KVS (?P<kvs_path>[^ ]+)", app_args)
         if kvs_match:
             kvs_path_to_remove = kvs_match.group("kvs_path")
-            retcode = subprocess.call("rm -f %s" % kvs_path_to_remove, shell=True)
-            print("Trying to remove KVS path %s" % kvs_path_to_remove)
+            retcode = subprocess.call("rm -f {}".format(kvs_path_to_remove), shell=True)
+            print("Trying to remove KVS path {}".format(kvs_path_to_remove))
             if retcode != 0:
                 raise RuntimeError(f"Failed to remove {kvs_path_to_remove} for factory reset.")
 

@@ -221,7 +221,7 @@ class TC_DRLK_2_9(MatterBaseTest, DRLK_COMMON):
             asserts.assert_true(response.userUniqueID == useruniqueid,
                                 "Error when executing GetUserResponse command, userUniqueID={}".format(
                                     str(response.userUniqueID)))
-            log.info("Credentials value is GetUserResponse Command %s" % (str(response.credentials)))
+            log.info("Credentials value is GetUserResponse Command {}".format(str(response.credentials)))
 
             asserts.assert_equal(len(credentiallist), len(response.credentials),  "Error mismatch in expected credential from GetUserResponse command = {}".format(
                 str(credentiallist)))
@@ -272,7 +272,7 @@ class TC_DRLK_2_9(MatterBaseTest, DRLK_COMMON):
             credentialIndex=credentialIndex)
         try:
 
-            log.info("Credential Data is %s" % (credentialData))
+            log.info("Credential Data is {}".format(credentialData))
             response = await self.send_single_cmd(cmd=drlkcluster.Commands.SetCredential(
                 operationType=operationType,
                 credential=credentials,
@@ -629,7 +629,7 @@ class TC_DRLK_2_9(MatterBaseTest, DRLK_COMMON):
                 while 1:
                     uniquePincodeString = await self.generate_max_pincode_len(self.maxpincodelength)
                     uniquePincode = bytes(uniquePincodeString, 'ascii')
-                    log.info("Credential Data value is %s" % (uniquePincode))
+                    log.info("Credential Data value is {}".format(uniquePincode))
                     if start_credential_index <= (numberofcredentialsupportedperuser):
                         nextCredentialIndex = await self.set_credential_cmd(credentialData=uniquePincode,
                                                                             operationType=drlkcluster.Enums.DataOperationTypeEnum.kAdd,

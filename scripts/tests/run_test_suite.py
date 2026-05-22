@@ -289,7 +289,7 @@ def cmd_list(context: click.Context) -> None:
         if tags:
             tags = f" ({tags})"
 
-        print("%s%s" % (test.name, tags))
+        print("{}{}".format(test.name, tags))
 
 
 class Terminable(Protocol):

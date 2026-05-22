@@ -98,7 +98,7 @@ def _get_name(item) -> str:
         return getattr(item, "name")
     if hasattr(item, "definition"):
         return getattr(item, "definition").name
-    raise Exception("Cannot find name of `%r`" % item)
+    raise Exception("Cannot find name of `{!r}`".format(item))
 
 
 def _compare_maturity(matter_items, data_model_items, path: list[str] = []):

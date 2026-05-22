@@ -57,7 +57,7 @@ class ASRApp(Enum):
             return 'dishwasher-app'
         if self == ASRApp.REFRIGERATOR:
             return 'refrigerator-app'
-        raise Exception('Unknown app type: %r' % self)
+        raise Exception('Unknown app type: {!r}'.format(self))
 
     def AppNamePrefix(self):
         if self == ASRApp.ALL_CLUSTERS:
@@ -82,7 +82,7 @@ class ASRApp(Enum):
             return 'chip-asr-dishwasher-example'
         if self == ASRApp.REFRIGERATOR:
             return 'chip-asr-refrigerator-example'
-        raise Exception('Unknown app type: %r' % self)
+        raise Exception('Unknown app type: {!r}'.format(self))
 
     def BuildRoot(self, root):
         return os.path.join(root, 'examples', self.ExampleName(), 'asr')
@@ -100,7 +100,7 @@ class ASRBoard(Enum):
             return 'asr595x'
         if self == ASRBoard.ASR550X:
             return 'asr550x'
-        raise Exception('Unknown board #: %r' % self)
+        raise Exception('Unknown board #: {!r}'.format(self))
 
 
 class ASRBuilder(GnBuilder):
@@ -126,7 +126,7 @@ class ASRBuilder(GnBuilder):
         self.app = app
 
         asr_chip = self.board.GetIC()
-        self.extra_gn_options = ['asr_ic_family="%s"' % asr_chip]
+        self.extra_gn_options = ['asr_ic_family="{}"'.format(asr_chip)]
 
         if asr_chip == "asr582x":
             ASR_ARCH = "arm"
@@ -137,15 +137,15 @@ class ASRBuilder(GnBuilder):
         elif asr_chip == "asr550x":
             ASR_ARCH = "arm"
             ASR_SDK_ROOT = "//third_party/connectedhomeip/third_party/asr/asr550x"
-        self.extra_gn_options.append('target_cpu="%s"' % ASR_ARCH)
+        self.extra_gn_options.append('target_cpu="{}"'.format(ASR_ARCH))
 
         toolchain = os.path.join(root, os.path.split(os.path.realpath(__file__))[0], '../../../config/asr/toolchain')
         toolchain = 'custom_toolchain="{}:asrtoolchain"'.format(toolchain)
         if toolchain:
             self.extra_gn_options.append(toolchain)
 
-        self.extra_gn_options.append('asr_sdk_build_root="%s"' % ASR_SDK_ROOT)
-        self.extra_gn_options.append('mbedtls_target="%s:asr_build"' % ASR_SDK_ROOT)
+        self.extra_gn_options.append('asr_sdk_build_root="{}"'.format(ASR_SDK_ROOT))
+        self.extra_gn_options.append('mbedtls_target="{}:asr_build"'.format(ASR_SDK_ROOT))
 
         if (asr_chip == "asr582x"
                 or asr_chip == "asr595x"):
@@ -174,7 +174,7 @@ class ASRBuilder(GnBuilder):
         if enable_lwip_ip6_hook:
             self.extra_gn_options.append('chip_lwip_ip6_hook=true')
 
-        self.extra_gn_options.append('asr_toolchain_root="%s"' % os.environ['ASR_TOOLCHAIN_PATH'])
+        self.extra_gn_options.append('asr_toolchain_root="{}"'.format(os.environ['ASR_TOOLCHAIN_PATH']))
 
     def GnBuildArgs(self):
         args = super().GnBuildArgs()

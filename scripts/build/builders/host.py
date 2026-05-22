@@ -88,7 +88,7 @@ class HostCryptoLibrary(Enum):
             return 'chip_crypto="mbedtls"'
         if self == HostCryptoLibrary.BORINGSSL:
             return 'chip_crypto="boringssl"'
-        raise ValueError("Unknown host crypto library: %r" % self)
+        raise ValueError("Unknown host crypto library: {!r}".format(self))
 
 
 class HostFuzzingType(Enum):
@@ -263,7 +263,7 @@ class HostApp(Enum):
             return 'jf-admin-app/linux'
         if self == HostApp.CLOSURE:
             return 'closure-app/linux'
-        raise Exception('Unknown app type: %r' % self)
+        raise Exception('Unknown app type: {!r}'.format(self))
 
     def OutputNames(self):
         if self == HostApp.ALL_CLUSTERS:
@@ -409,7 +409,7 @@ class HostApp(Enum):
             yield 'closure-app'
             yield 'closure-app.map'
         else:
-            raise Exception('Unknown app type: %r' % self)
+            raise Exception('Unknown app type: {!r}'.format(self))
 
 
 class HostBoard(Enum):
@@ -442,7 +442,7 @@ class HostBoard(Enum):
             return 'arm'
         if self == HostBoard.FAKE:
             return 'fake'
-        raise Exception('Unknown host board type: %r' % self)
+        raise Exception('Unknown host board type: {!r}'.format(self))
 
     def PlatformName(self):
         if self == HostBoard.NATIVE:
@@ -595,7 +595,7 @@ class HostBuilder(GnBuilder):
         if minmdns_address_policy:
             if use_platform_mdns:
                 raise Exception('Address policy applies to minmdns only')
-            self.extra_gn_options.append('chip_minmdns_default_policy="%s"' % minmdns_address_policy)
+            self.extra_gn_options.append('chip_minmdns_default_policy="{}"'.format(minmdns_address_policy))
 
         if use_platform_mdns:
             self.extra_gn_options.append('chip_mdns="platform"')
@@ -724,12 +724,12 @@ class HostBuilder(GnBuilder):
             case HostBoard.ARM64:
                 args.extend([
                     'target_cpu="arm64"',
-                    'sysroot="%s"' % self.SysRootPath('SYSROOT_AARCH64')
+                    'sysroot="{}"'.format(self.SysRootPath('SYSROOT_AARCH64'))
                 ])
             case HostBoard.ARM:
                 args.extend([
                     'target_cpu="arm"',
-                    'sysroot="%s"' % self.SysRootPath('SYSROOT_ARMHF'),
+                    'sysroot="{}"'.format(self.SysRootPath('SYSROOT_ARMHF')),
                 ])
             case HostBoard.FAKE:
                 args.extend([
@@ -746,7 +746,7 @@ class HostBuilder(GnBuilder):
             [
                 "chmod",
                 "+x",
-                "%s/bin/%s" % (self.output_dir, java_program),
+                "{}/bin/{}".format(self.output_dir, java_program),
             ],
             title="Make Java program executable",
         )
@@ -778,7 +778,7 @@ class HostBuilder(GnBuilder):
 
     def SysRootPath(self, name):
         if name not in os.environ:
-            raise Exception('Missing environment variable "%s"' % name)
+            raise Exception('Missing environment variable "{}"'.format(name))
         return os.environ[name]
 
     @lock_output_dir
