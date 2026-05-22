@@ -26,12 +26,6 @@ CHIP_ROOT_DIR = os.path.realpath(
     os.path.join(os.path.dirname(__file__), '../..'))
 
 
-def checkPythonVersion():
-    if sys.version_info[0] < 3:
-        print('Must use Python 3. Current version is ' +
-              str(sys.version_info[0]))
-        exit(1)
-
 
 zapFilesToSkip = {
     # examples/chef/sample_app_util/test_files/sample_zap_file.zap is
@@ -79,7 +73,6 @@ def convertOne(target):
 
 def main():
     args = runArgumentsParser()
-    checkPythonVersion()
 
     if args.run_bootstrap:
         subprocess.check_call(os.path.join(CHIP_ROOT_DIR, "scripts/tools/zap/zap_bootstrap.sh"), shell=True)

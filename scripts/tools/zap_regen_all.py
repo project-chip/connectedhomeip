@@ -298,11 +298,6 @@ class JinjaCodegenTarget():
         log.info("  %s", shlex.join(self.command))
 
 
-def checkPythonVersion():
-    if sys.version_info[0] < 3:
-        print('Must use Python 3. Current version is ' +
-              str(sys.version_info[0]))
-        exit(1)
 
 
 def setupArgumentsParser():
@@ -482,7 +477,6 @@ def main():
             os.execv(launcher, [launcher, shlex.join(what_to_run)])
         sys.exit(1)
 
-    checkPythonVersion()
     os.chdir(CHIP_ROOT_DIR)
     args = setupArgumentsParser()
 
