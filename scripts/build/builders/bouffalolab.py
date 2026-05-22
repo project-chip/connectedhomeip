@@ -274,7 +274,7 @@ class BouffalolabBuilder(GnBuilder):
         pattern = r'PROJECT_SDK_VERSION\s+"([^"]+)"'
 
         try:
-            with open(filepath, 'r', encoding='utf-8') as f:
+            with open(filepath, encoding='utf-8') as f:
                 content = f.read()
             match = re.search(pattern, content)
             if match:

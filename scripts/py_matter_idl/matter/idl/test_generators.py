@@ -94,7 +94,7 @@ class TestCaseStorage(GeneratorStorage):
             dir_path = os.path.dirname(path)
             if not os.path.exists(dir_path):
                 os.makedirs(dir_path)
-            with open(path, 'wt') as golden:
+            with open(path, "w") as golden:
                 golden.write(content)
                 return
 

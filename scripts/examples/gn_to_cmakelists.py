@@ -761,7 +761,7 @@ def main():
 
     json_path = sys.argv[1]
     project = None
-    with open(json_path, 'r') as json_file:
+    with open(json_path) as json_file:
         project = json.loads(json_file.read())
 
     WriteProject(Project(project))

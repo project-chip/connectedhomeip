@@ -421,7 +421,7 @@ def monitor_app_restart_requests(
             time.sleep(0.5)
             continue
 
-        with open(restart_flag_file, 'r') as f:
+        with open(restart_flag_file) as f:
             flag_file_content = f.read().strip()
 
         # Determine reset type and remove app/ctrl config and storage
