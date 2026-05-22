@@ -81,10 +81,9 @@ CHIP_ERROR ESP32P256Keypair::Initialize(ECPKeyTarget keyTarget, int efuseBlock)
     size_t key_size_in_bits = 256;
 
     // opaque reference for the efuse-stored ec key
-    esp_ecdsa_opaque_key_t opaque_key = {};
+    esp_ecdsa_opaque_key_t opaque_key = { 0 };
     opaque_key.curve                  = ESP_ECDSA_CURVE_SECP256R1;
     opaque_key.efuse_block            = static_cast<uint8_t>(efuseBlock);
-    opaque_key.use_km_key             = false;
 
     psa_key_attributes_t key_attr = PSA_KEY_ATTRIBUTES_INIT;
     psa_set_key_type(&key_attr, PSA_KEY_TYPE_ECC_KEY_PAIR(PSA_ECC_FAMILY_SECP_R1));
