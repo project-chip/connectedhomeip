@@ -440,15 +440,12 @@ Davis, CA 95616, USA
     <attribute id="0x0018" name="ConfigurationVersion" type="uint32" default="1">
       <access read="true" readPrivilege="view"/>
       <quality persistence="nonVolatile"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform>
-          <greaterOrEqualTerm>
-            <revision value="current"/>
-            <revision value="5"/>
-          </greaterOrEqualTerm>
-        </mandatoryConform>
-      </otherwiseConform>
+      <mandatoryConform>
+        <greaterOrEqualTerm>
+          <revision value="current"/>
+          <revision value="5"/>
+        </greaterOrEqualTerm>
+      </mandatoryConform>
       <constraint>
         <min value="1"/>
       </constraint>

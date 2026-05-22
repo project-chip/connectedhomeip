@@ -98,7 +98,8 @@ CHIP_ERROR RootNodeDevice::Register(EndpointId endpointId, CodeDrivenDataModelPr
         mGroupcastCluster.Create(GroupcastContext{ .fabricTable       = mContext.fabricTable,
                                                    .groupDataProvider = mContext.groupDataProvider,
                                                    .timerDelegate     = mContext.timerDelegate,
-                                                   .accessControl     = mContext.accessControl },
+                                                   .accessControl     = mContext.accessControl,
+                                                   .testing           = Groupcast::GetTesting() },
                                  BitFlags<Clusters::Groupcast::Feature>(Clusters::Groupcast::Feature::kListener,
                                                                         Clusters::Groupcast::Feature::kSender,
                                                                         Clusters::Groupcast::Feature::kPerGroup));

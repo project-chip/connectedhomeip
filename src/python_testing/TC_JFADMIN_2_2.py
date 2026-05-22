@@ -396,18 +396,28 @@ class TC_JFADMIN_2_2(CADMINBaseTest):
         log.info("JCM commissioning complete")
 
         self.step("6")
+        # nodeId=11 is the JF-Admin app's node ID on Fabric B (commissioned by fabric_b_ctrl)
+        response_b = await _devCtrlEcoB.ReadAttribute(
+            nodeId=11, attributes=[(0, Clusters.OperationalCredentials.Attributes.CurrentFabricIndex)], fabricFiltered=True,
+            returnClusterObject=True)
+        joint_fabric_index = response_b[0][Clusters.OperationalCredentials].currentFabricIndex
+
         response = await _devCtrlEcoA.ReadAttribute(
             nodeId=1, attributes=[(0, Clusters.OperationalCredentials.Attributes.NOCs)], fabricFiltered=False,
             returnClusterObject=True)
 
-        fabricIndex2_noc = None
+        joint_fabric_noc = None
+        available_fabric_indices = []
         for _nocs in response[0][Clusters.OperationalCredentials].NOCs:
-            if _nocs.fabricIndex == 2:
-                fabricIndex2_noc = _nocs.noc
-        asserts.assert_is_not_none(fabricIndex2_noc, "No NOC on fabric index 2 found!")
+            available_fabric_indices.append(_nocs.fabricIndex)
+            if _nocs.fabricIndex == joint_fabric_index:
+                joint_fabric_noc = _nocs.noc
+        asserts.assert_is_not_none(
+            joint_fabric_noc,
+            f"No NOC found on joint fabric index {joint_fabric_index}. Available fabric indexes: {available_fabric_indices}")
 
         # Search Administrator CAT (FFFF0001) in JF-Admin NOC on Ecosystem A
-        noc_tlv_data = matter.tlv.TLVReader(fabricIndex2_noc).get()
+        noc_tlv_data = matter.tlv.TLVReader(joint_fabric_noc).get()
         _admin_cat_found = False
         for _tag, _value in noc_tlv_data['Any'][6]:
             if _tag == 22 and _value == int(self.ecoBCATs, 16):
