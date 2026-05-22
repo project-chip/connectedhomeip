@@ -365,6 +365,10 @@ if (CONFIG_CHIP_ENABLE_GROUPCAST)
 chip_gn_arg_bool("chip_config_enable_groupcast" CONFIG_CHIP_ENABLE_GROUPCAST)
 endif()
 
+if (CONFIG_ENABLE_THREAD_MESHCOP_COMMISSIONING)
+chip_gn_arg_bool("chip_device_config_enable_thread_meshcop" CONFIG_ENABLE_THREAD_MESHCOP_COMMISSIONING)
+endif()
+
 set(args_gn_input "${CMAKE_CURRENT_BINARY_DIR}/args.gn.in")
 file(GENERATE OUTPUT "${args_gn_input}" CONTENT "${chip_gn_args}")
 
