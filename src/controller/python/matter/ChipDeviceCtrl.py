@@ -2072,20 +2072,15 @@ class ChipDeviceControllerBase:
     # Fixing these typing errors is a high risk to affect existing functionality.
     # these mismatches are intentional and safe within the current logic
     # TODO:  Explore proper typing for dynamic attributes in ChipDeviceCtrl.py #618
-    def _parseAttributePathTuple(self, pathTuple: typing.Union[
-        None,  # Empty tuple, all wildcard
-        tuple[int],  # Endpoint
-        # Wildcard endpoint, Cluster id present
-        tuple[type[ClusterObjects.Cluster]],
-        # Wildcard endpoint, Cluster + Attribute present
-        tuple[type[ClusterObjects.ClusterAttributeDescriptor]],
-        # Wildcard attribute id
-        tuple[int, type[ClusterObjects.Cluster]],
-        # Concrete path
-        tuple[int, type[ClusterObjects.ClusterAttributeDescriptor]],
-        # Directly specified attribute path
-        ClusterAttribute.AttributePath
-    ]):
+    def _parseAttributePathTuple(self, pathTuple: (
+        None  # Empty tuple, all wildcard
+        | tuple[int]  # Endpoint
+        | tuple[type[ClusterObjects.Cluster]]  # Wildcard endpoint, Cluster id present
+        | tuple[type[ClusterObjects.ClusterAttributeDescriptor]]  # Wildcard endpoint, Cluster + Attribute present
+        | tuple[int, type[ClusterObjects.Cluster]]  # Wildcard attribute id
+        | tuple[int, type[ClusterObjects.ClusterAttributeDescriptor]]  # Concrete path
+        | ClusterAttribute.AttributePath  # Directly specified attribute path
+    )):
         if isinstance(pathTuple, ClusterAttribute.AttributePath):
             return pathTuple
         if pathTuple == ('*') or pathTuple == ():
@@ -2130,20 +2125,15 @@ class ChipDeviceControllerBase:
         return ClusterAttribute.DataVersionFilter.from_cluster(
             EndpointId=endpoint, Cluster=cluster, DataVersion=dataVersion)  # type: ignore[arg-type]
 
-    def _parseEventPathTuple(self, pathTuple: typing.Union[
-        None,  # Empty tuple, all wildcard
-        tuple[str, int],  # all wildcard with urgency set
-        tuple[int, int],  # Endpoint,
-        # Wildcard endpoint, Cluster id present
-        tuple[type[ClusterObjects.Cluster], int],
-        # Wildcard endpoint, Cluster + Event present
-        tuple[type[ClusterObjects.ClusterEvent], int],
-        # Wildcard event id
-        tuple[int, type[ClusterObjects.Cluster], int],
-        # Concrete path
-        tuple[int,
-              type[ClusterObjects.ClusterEvent], int]
-    ]):
+    def _parseEventPathTuple(self, pathTuple: (
+        None  # Empty tuple, all wildcard
+        | tuple[str, int]  # all wildcard with urgency set
+        | tuple[int, int]  # Endpoint
+        | tuple[type[ClusterObjects.Cluster], int]  # Wildcard endpoint, Cluster id present
+        | tuple[type[ClusterObjects.ClusterEvent], int]  # Wildcard endpoint, Cluster + Event present
+        | tuple[int, type[ClusterObjects.Cluster], int]  # Wildcard event id
+        | tuple[int, type[ClusterObjects.ClusterEvent], int]  # Concrete path
+    )):
         if pathTuple in [('*'), ()]:
             # Wildcard
             return ClusterAttribute.EventPath()
@@ -2181,34 +2171,24 @@ class ChipDeviceControllerBase:
     async def Read(
         self,
         nodeId: int,
-        attributes: typing.Optional[list[typing.Union[
-            None,  # Empty tuple, all wildcard
-            tuple[int],  # Endpoint
-            # Wildcard endpoint, Cluster id present
-            tuple[type[ClusterObjects.Cluster]],
-            # Wildcard endpoint, Cluster + Attribute present
-            tuple[type[ClusterObjects.ClusterAttributeDescriptor]],
-            # Wildcard attribute id
-            tuple[int, type[ClusterObjects.Cluster]],
-            # Concrete path
-            tuple[int, type[ClusterObjects.ClusterAttributeDescriptor]],
-            # Directly specified attribute path
-            ClusterAttribute.AttributePath
-        ]]] = None,
+        attributes: typing.Optional[list[
+            None  # Empty tuple, all wildcard
+            | tuple[int]  # Endpoint
+            | tuple[type[ClusterObjects.Cluster]]  # Wildcard endpoint, Cluster id present
+            | tuple[type[ClusterObjects.ClusterAttributeDescriptor]]  # Wildcard endpoint, Cluster + Attribute present
+            | tuple[int, type[ClusterObjects.Cluster]]  # Wildcard attribute id
+            | tuple[int, type[ClusterObjects.ClusterAttributeDescriptor]]  # Concrete path
+            | ClusterAttribute.AttributePath  # Directly specified attribute path
+        ]] = None,
         dataVersionFilters: typing.Optional[list[tuple[int, type[ClusterObjects.Cluster], int]]] = None, events: typing.Optional[list[
-            typing.Union[
-            None,  # Empty tuple, all wildcard
-            tuple[str, int],  # all wildcard with urgency set
-            tuple[int, int],  # Endpoint,
-            # Wildcard endpoint, Cluster id present
-            tuple[type[ClusterObjects.Cluster], int],
-            # Wildcard endpoint, Cluster + Event present
-            tuple[type[ClusterObjects.ClusterEvent], int],
-            # Wildcard event id
-            tuple[int, type[ClusterObjects.Cluster], int],
-            # Concrete path
-            tuple[int, type[ClusterObjects.ClusterEvent], int]
-            ]]] = None,
+            None  # Empty tuple, all wildcard
+            | tuple[str, int]  # all wildcard with urgency set
+            | tuple[int, int]  # Endpoint
+            | tuple[type[ClusterObjects.Cluster], int]  # Wildcard endpoint, Cluster id present
+            | tuple[type[ClusterObjects.ClusterEvent], int]  # Wildcard endpoint, Cluster + Event present
+            | tuple[int, type[ClusterObjects.Cluster], int]  # Wildcard event id
+            | tuple[int, type[ClusterObjects.ClusterEvent], int]  # Concrete path
+        ]] = None,
         eventNumberFilter: typing.Optional[int] = None,
         returnClusterObject: bool = False, reportInterval: typing.Optional[tuple[int, int]] = None,
         fabricFiltered: bool = True, keepSubscriptions: bool = False, autoResubscribe: bool = True,
@@ -2307,20 +2287,15 @@ class ChipDeviceControllerBase:
     async def ReadAttribute(
         self,
         nodeId: int,
-        attributes: typing.Optional[list[typing.Union[
-            None,  # Empty tuple, all wildcard
-            tuple[int],  # Endpoint
-            # Wildcard endpoint, Cluster id present
-            tuple[type[ClusterObjects.Cluster]],
-            # Wildcard endpoint, Cluster + Attribute present
-            tuple[type[ClusterObjects.ClusterAttributeDescriptor]],
-            # Wildcard attribute id
-            tuple[int, type[ClusterObjects.Cluster]],
-            # Concrete path
-            tuple[int, type[ClusterObjects.ClusterAttributeDescriptor]],
-            # Directly specified attribute path
-            ClusterAttribute.AttributePath
-        ]]], dataVersionFilters: typing.Optional[list[tuple[int, type[ClusterObjects.Cluster], int]]] = None,
+        attributes: typing.Optional[list[
+            None  # Empty tuple, all wildcard
+            | tuple[int]  # Endpoint
+            | tuple[type[ClusterObjects.Cluster]]  # Wildcard endpoint, Cluster id present
+            | tuple[type[ClusterObjects.ClusterAttributeDescriptor]]  # Wildcard endpoint, Cluster + Attribute present
+            | tuple[int, type[ClusterObjects.Cluster]]  # Wildcard attribute id
+            | tuple[int, type[ClusterObjects.ClusterAttributeDescriptor]]  # Concrete path
+            | ClusterAttribute.AttributePath  # Directly specified attribute path
+        ]], dataVersionFilters: typing.Optional[list[tuple[int, type[ClusterObjects.Cluster], int]]] = None,
         returnClusterObject: bool = False,
         reportInterval: typing.Optional[tuple[int, int]] = None,
         fabricFiltered: bool = True, keepSubscriptions: bool = False, autoResubscribe: bool = True,
@@ -2396,19 +2371,15 @@ class ChipDeviceControllerBase:
     async def ReadEvent(
         self,
         nodeId: int,
-        events: list[typing.Union[
-            None,  # Empty tuple, all wildcard
-            tuple[str, int],  # all wildcard with urgency set
-            tuple[int, int],  # Endpoint,
-            # Wildcard endpoint, Cluster id present
-            tuple[type[ClusterObjects.Cluster], int],
-            # Wildcard endpoint, Cluster + Event present
-            tuple[type[ClusterObjects.ClusterEvent], int],
-            # Wildcard event id
-            tuple[int, type[ClusterObjects.Cluster], int],
-            # Concrete path
-            tuple[int, type[ClusterObjects.ClusterEvent], int]
-        ]], eventNumberFilter: typing.Optional[int] = None,
+        events: list[
+            None  # Empty tuple, all wildcard
+            | tuple[str, int]  # all wildcard with urgency set
+            | tuple[int, int]  # Endpoint
+            | tuple[type[ClusterObjects.Cluster], int]  # Wildcard endpoint, Cluster id present
+            | tuple[type[ClusterObjects.ClusterEvent], int]  # Wildcard endpoint, Cluster + Event present
+            | tuple[int, type[ClusterObjects.Cluster], int]  # Wildcard event id
+            | tuple[int, type[ClusterObjects.ClusterEvent], int]  # Concrete path
+        ], eventNumberFilter: typing.Optional[int] = None,
         fabricFiltered: bool = True,
         reportInterval: typing.Optional[tuple[int, int]] = None,
         keepSubscriptions: bool = False,
