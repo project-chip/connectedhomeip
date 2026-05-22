@@ -19,7 +19,15 @@
 #pragma once
 
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app/data-model/Nullable.h>
+#include <app/util/attribute-storage.h>
+#include <devices/Types.h>
+#include <lib/core/DataModelTypes.h>
+#include <lib/core/Optional.h>
+#include <lib/support/CodeUtils.h>
 #include <lib/support/Span.h>
+
+#include "DeviceTypes.h"
 
 namespace chef {
 
@@ -98,5 +106,36 @@ inline const chip::Span<const SemanticTagStructType> kMultiColumnSwitchTags[] = 
     chip::Span<const SemanticTagStructType>(kDownTags),   // Endpoint 8
     chip::Span<const SemanticTagStructType>(kToggleTags), // Endpoint 9
 };
+
+/**
+ * Returns true if endpoints 1-9 all have generic switch device type.
+ */
+bool isMultiColumnSwitch()
+{
+    chip::EndpointId num_endpoints = sizeof(kMultiColumnSwitchTags) / sizeof(kMultiColumnSwitchTags[0]);
+    // Check if this is the multi column switch.
+    for (chip::EndpointId ep = 1; ep <= num_endpoints; ++ep)
+    {
+        if (!DeviceTypes::EndpointHasDeviceType(ep, chip::app::Device::kGenericSwitchDeviceTypeId))
+            return false;
+    }
+    return true;
+}
+
+/**
+ * Initialises the multi column switch app. Sets semantic tags.
+ */
+void InitMultiColumnSwitch()
+{
+    if (!isMultiColumnSwitch())
+        return;
+
+    chip::EndpointId num_endpoints = sizeof(kMultiColumnSwitchTags) / sizeof(kMultiColumnSwitchTags[0]);
+
+    for (chip::EndpointId ep = 1; ep <= num_endpoints; ++ep)
+    {
+        LogErrorOnFailure(SetTagList(ep, kMultiColumnSwitchTags[ep - 1]));
+    }
+}
 
 } // namespace chef

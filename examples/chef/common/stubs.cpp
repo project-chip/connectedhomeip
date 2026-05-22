@@ -669,6 +669,12 @@ void GenericSwitchInit()
     {
         return;
     }
+
+    if (isMultiColumnSwitch())
+    {
+        return;
+    }
+
     // Rotary endpoint
     LogErrorOnFailure(SetTagList(1, Span(GenericSwitch::BilresaRotary::kRotaryTagList)));
 
@@ -821,23 +827,6 @@ void InitModeSelect()
         setSupportedModesManager(&supportedModesManager);
     }
 #endif // MATTER_DM_MODE_SELECT_CLUSTER_SERVER_ENDPOINT_COUNT
-}
-
-void InitMultiColumnSwitch()
-{
-    EndpointId num_endpoints = sizeof(kMultiColumnSwitchTags) / sizeof(kMultiColumnSwitchTags[0]);
-
-    // Check if this is the multi column switch.
-    for (auto ep = 1; ep <= num_endpoints; ++ep)
-    {
-        if (!DeviceTypes::EndpointHasDeviceType(ep, Device::kGenericSwitchDeviceTypeId))
-            return;
-    }
-
-    for (auto ep = 1; ep <= num_endpoints; ++ep)
-    {
-        LogErrorOnFailure(SetTagList(ep, kMultiColumnSwitchTags[ep - 1]));
-    }
 }
 
 void ApplicationInit()
