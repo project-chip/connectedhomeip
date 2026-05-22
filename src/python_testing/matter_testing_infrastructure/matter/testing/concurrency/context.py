@@ -29,7 +29,7 @@ class TerminableResource(contextlib.AbstractContextManager, ABC):
         try:
             self.resource_start()
         except BaseException as e:
-            log.error("Failed to start resource: %s", e)
+            log.error("Failed to start resource %s: %r", self.__class__.__name__, e)
             e.add_note(f"Failure during start of resource {self.__class__.__name__}")
             self.resource_terminate()
             raise
@@ -41,6 +41,7 @@ class TerminableResource(contextlib.AbstractContextManager, ABC):
         try:
             self.resource_terminate()
         except BaseException as e:
+            log.error("Failed to terminate resource %s: %r", self.__class__.__name__, e)
             e.add_note(f"Failure during termination of resource {self.__class__.__name__}")
             raise
         return None
