@@ -35,9 +35,7 @@
 #include <queue>
 #include <thread>
 #ifdef __APPLE__
-// Use pcsclite.h instead of winscard.h to avoid pulling in wintypes.h,
-// which defines BOOL as int16_t and conflicts with ObjC's BOOL.
-#include <PCSC/pcsclite.h>
+#include <PCSC/winscard.h>
 #else
 #include <winscard.h>
 #endif
