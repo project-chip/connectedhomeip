@@ -98,7 +98,7 @@ class TestCommissioner(CHIPVirtualHome):
 
         self.execute_device_cmd(req_device_id, MATTER_CONTROLLER_INSTALL_WHEELS)
 
-        command = (f'gdb -batch -return-child-result -q -ex run -ex \"thread apply all bt\" --args python3 {TEST_SCRIPT_ESC} '
+        command = (f'gdb -batch -return-child-result -q -ex run -ex "thread apply all bt" --args python3 {TEST_SCRIPT_ESC} '
                    f'-t 300 --discriminator {TEST_DISCRIMINATOR} --passcode {TEST_PASSCODE} '
                    f'--paa-trust-store-path {MATTER_DEVELOPMENT_PAA_ROOT_CERTS_ESC} --test-event-key {TEST_EVENT_KEY_HEX}')
         ret = self.execute_device_cmd(req_device_id, command)
