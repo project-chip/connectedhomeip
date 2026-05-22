@@ -506,19 +506,31 @@ public:
 
     CHIP_ERROR SendOnNfcTagResponse(System::PacketBufferHandle && buffer)
     {
-        auto * ctx       = new NfcResponseContext();
+        auto * ctx = new (std::nothrow) NfcResponseContext();
+        VerifyOrReturnError(ctx != nullptr, CHIP_ERROR_NO_MEMORY);
         ctx->nfcBase     = nfcBase;
         ctx->peerAddress = peerAddress;
         ctx->buffer      = std::move(buffer);
-        return DeviceLayer::PlatformMgr().ScheduleWork(DispatchNfcTagResponse, reinterpret_cast<intptr_t>(ctx));
+        CHIP_ERROR err   = DeviceLayer::PlatformMgr().ScheduleWork(DispatchNfcTagResponse, reinterpret_cast<intptr_t>(ctx));
+        if (err != CHIP_NO_ERROR)
+        {
+            delete ctx;
+        }
+        return err;
     }
 
     CHIP_ERROR SendOnNfcTagError()
     {
-        auto * ctx       = new NfcResponseContext();
+        auto * ctx = new (std::nothrow) NfcResponseContext();
+        VerifyOrReturnError(ctx != nullptr, CHIP_ERROR_NO_MEMORY);
         ctx->nfcBase     = nfcBase;
         ctx->peerAddress = peerAddress;
-        return DeviceLayer::PlatformMgr().ScheduleWork(DispatchNfcTagError, reinterpret_cast<intptr_t>(ctx));
+        CHIP_ERROR err   = DeviceLayer::PlatformMgr().ScheduleWork(DispatchNfcTagError, reinterpret_cast<intptr_t>(ctx));
+        if (err != CHIP_NO_ERROR)
+        {
+            delete ctx;
+        }
+        return err;
     }
 };
 
