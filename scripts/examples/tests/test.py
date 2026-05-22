@@ -45,7 +45,7 @@ def build_actual_output(root: str, out: str) -> List[str]:
     ], stdout=subprocess.PIPE, check=True, encoding='UTF-8')
 
     with open(cmake) as f:
-        yield from f.readlines()
+        yield from f
 
 
 def main():
