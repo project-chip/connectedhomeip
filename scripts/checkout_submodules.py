@@ -21,7 +21,7 @@ import logging
 import os
 import subprocess
 from collections import namedtuple
-
+from pathlib import Path
 
 class PlatformAction(argparse.Action):
     """Expand comma- or space-separated platform tokens and validate against ALL_PLATFORMS."""
@@ -38,7 +38,7 @@ class PlatformAction(argparse.Action):
 
 log = logging.getLogger(__name__)
 
-CHIP_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+CHIP_ROOT = next(filter(lambda p: (p / 'SPECIFICATION_VERSION').is_file(), Path(__file__).parents))
 
 ALL_PLATFORMS = {
     'ameba',

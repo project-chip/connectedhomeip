@@ -21,6 +21,7 @@ remain completely unaffected by the slim decoder feature.
 
 import os
 import re
+from pathlib import Path
 
 from hypothesis import HealthCheck, given, settings
 from hypothesis import strategies as st
@@ -29,7 +30,7 @@ from hypothesis import strategies as st
 # Paths
 # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 
-REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
+REPO_ROOT = next(filter(lambda p: (p / 'SPECIFICATION_VERSION').is_file(), Path(__file__).parents))
 CONFIG_GNI = os.path.join(REPO_ROOT, "build", "chip", "java", "config.gni")
 ARGS_GNI = os.path.join(REPO_ROOT, "examples", "tv-casting-app", "android", "args.gni")
 

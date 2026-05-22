@@ -18,6 +18,7 @@ limitations under the License.
 import logging
 import os
 import sys
+from pathlib import Path
 
 from helper.CHIPTestBase import CHIPVirtualHome
 
@@ -47,9 +48,7 @@ logger.addHandler(sh)
 CHIP_PORT = 5540
 
 CIRQUE_URL = "http://localhost:5000"
-CHIP_REPO = os.path.join(os.path.abspath(
-    os.path.dirname(__file__)), "..", "..", "..")
-TEST_EXTPANID = "fedcba9876543210"
+CHIP_REPO = next(filter(lambda p: (p / 'SPECIFICATION_VERSION').is_file(), Path(__file__).parents))
 TEST_DISCRIMINATOR = 3840
 MATTER_DEVELOPMENT_PAA_ROOT_CERTS = "credentials/development/paa-root-certs"
 TEST_END_DEVICE_APP = "standalone/chip-all-clusters-app"

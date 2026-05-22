@@ -21,6 +21,7 @@ import os
 import sys
 import time
 from optparse import OptionParser
+from pathlib import Path
 
 from helper.CHIPTestBase import CHIPVirtualHome
 
@@ -46,8 +47,7 @@ CHIP_PORT = 5540
 #############################################################
 
 CIRQUE_URL = "http://localhost:5000"
-CHIP_REPO = os.path.join(os.path.abspath(
-    os.path.dirname(__file__)), "..", "..", "..")
+CHIP_REPO = next(filter(lambda p: (p / 'SPECIFICATION_VERSION').is_file(), Path(__file__).parents))
 
 logger = logging.getLogger('CHIPCirqueTest')
 logger.setLevel(logging.INFO)

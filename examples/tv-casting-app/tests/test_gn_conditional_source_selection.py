@@ -16,6 +16,7 @@ This ensures that non-empty overrides compile the slim file, while empty
 
 import os
 import re
+from pathlib import Path
 
 from hypothesis import HealthCheck, given, settings
 from hypothesis import strategies as st
@@ -24,7 +25,7 @@ from hypothesis import strategies as st
 # Paths
 # ---------------------------------------------------------------------------
 
-REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
+REPO_ROOT = next(filter(lambda p: (p / 'SPECIFICATION_VERSION').is_file(), Path(__file__).parents))
 BUILD_GN = os.path.join(REPO_ROOT, "src", "controller", "java", "BUILD.gn")
 
 # ---------------------------------------------------------------------------

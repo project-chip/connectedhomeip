@@ -19,6 +19,7 @@ import logging
 import os
 import sys
 import time
+from pathlib import Path
 
 from helper.CHIPTestBase import CHIPVirtualHome
 
@@ -34,8 +35,7 @@ logger.addHandler(sh)
 SETUPPINCODE = 20202021
 DISCRIMINATOR = 1  # Randomw number, not used
 CHIP_PORT = 5540
-CHIP_REPO = os.path.join(os.path.abspath(
-    os.path.dirname(__file__)), "..", "..", "..")
+CHIP_REPO = next(filter(lambda p: (p / 'SPECIFICATION_VERSION').is_file(), Path(__file__).parents))
 
 CIRQUE_URL = "http://localhost:5000"
 

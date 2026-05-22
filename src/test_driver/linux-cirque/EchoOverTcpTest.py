@@ -18,6 +18,7 @@ limitations under the License.
 import logging
 import os
 import sys
+from pathlib import Path
 
 from helper.CHIPTestBase import CHIPVirtualHome
 
@@ -30,8 +31,7 @@ sh.setFormatter(
         '%(asctime)s [%(name)s] %(levelname)s %(message)s'))
 logger.addHandler(sh)
 
-CHIP_REPO = os.path.join(os.path.abspath(
-    os.path.dirname(__file__)), "..", "..", "..")
+CHIP_REPO = next(filter(lambda p: (p / 'SPECIFICATION_VERSION').is_file(), Path(__file__).parents))
 
 DEVICE_CONFIG = {
     'device0': {

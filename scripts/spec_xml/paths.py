@@ -15,7 +15,7 @@
 # limitations under the License.
 
 import os
-
+from pathlib import Path
 
 def get_chip_root():
     """
@@ -26,7 +26,7 @@ def get_chip_root():
     if chip_root:
         return chip_root
     try:
-        return os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
+        return next(filter(lambda p: (p / 'SPECIFICATION_VERSION').is_file(), Path(__file__).parents))
     except Exception as e:
         raise EnvironmentError(
             "Unable to determine CHIP root directory. Please ensure the environment is activated."

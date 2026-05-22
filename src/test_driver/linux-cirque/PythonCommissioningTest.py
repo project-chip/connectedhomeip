@@ -18,7 +18,7 @@ limitations under the License.
 import logging
 import os
 import sys
-
+from pathlib import Path
 from helper.CHIPTestBase import CHIPVirtualHome
 
 logger = logging.getLogger('MobileDeviceTest')
@@ -33,8 +33,7 @@ logger.addHandler(sh)
 CHIP_PORT = 5540
 
 CIRQUE_URL = "http://localhost:5000"
-CHIP_REPO = os.path.join(os.path.abspath(
-    os.path.dirname(__file__)), "..", "..", "..")
+CHIP_REPO = next(filter(lambda p: (p / 'SPECIFICATION_VERSION').is_file(), Path(__file__).parents))
 TEST_EXTPANID = "fedcba9876543210"
 TEST_DISCRIMINATOR = 3840
 TEST_DISCRIMINATOR2 = 3584
