@@ -22,7 +22,7 @@ import time
 from optparse import OptionParser
 
 from helper.CHIPTestBase import CHIPVirtualHome
-from helper.paths import CHIP_REPO_PATH
+from helper.paths import CHIP_REPO_PATH, CHIP_REPO_STR
 
 #############################################################
 
@@ -90,8 +90,8 @@ def _parse_mount_dir(config):
             continue
         _mount_pairs = v.get("mount_pairs", [])
         for mount in _mount_pairs:
-            mount[0] = mount[0].format(chip_repo=CHIP_REPO_PATH)
-            mount[1] = mount[1].format(chip_repo=CHIP_REPO_PATH)
+            mount[0] = mount[0].format(chip_repo=CHIP_REPO_STR)
+            mount[1] = mount[1].format(chip_repo=CHIP_REPO_STR)
         v["mount_pairs"] = _mount_pairs
     return config
 
