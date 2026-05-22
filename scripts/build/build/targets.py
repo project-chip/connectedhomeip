@@ -331,8 +331,9 @@ def BuildEfr32Target():
     ])
 
     # apps
-    target.AppendFixedTargets([
+    app_parts = [
         TargetPart('air-quality-sensor-app', app=Efr32App.AIR_QUALITY_SENSOR),
+        TargetPart('all-devices', app=Efr32App.ALL_DEVICES).ExceptIfRe('-(wifi|brd4338a|brd2605a|brd4343a|brd4342a|brd2708a|brd2911a)'),
         TargetPart('closure', app=Efr32App.CLOSURE),
         TargetPart('evse', app=Efr32App.EVSE),
         TargetPart('water-heater', app=Efr32App.WATER_HEATER),
@@ -344,7 +345,14 @@ def BuildEfr32Target():
         TargetPart('thermostat', app=Efr32App.THERMOSTAT),
         TargetPart('unit-test', app=Efr32App.UNIT_TEST),
         TargetPart('window-covering', app=Efr32App.WINDOW_COVERING),
-    ])
+    ]
+
+    # Single-device subset builds for all-devices-app.
+    for _device in _ALL_DEVICES_APP_DEVICES:
+        app_parts.append(TargetPart(f'all-devices-{_device}', app=Efr32App.ALL_DEVICES, all_devices_enabled_devices=[
+                         _device]).ExceptIfRe('-(wifi|brd4338a|brd2605a|brd4343a|brd4342a|brd2708a|brd2911a)'))
+
+    target.AppendFixedTargets(app_parts)
 
     target.AppendModifier('rpc', enable_rpcs=True)
     target.AppendModifier('with-ota-requestor', enable_ota_requestor=True)
