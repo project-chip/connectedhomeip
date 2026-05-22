@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from collections.abc import Iterator
 import difflib
 import os
 import subprocess
@@ -23,7 +24,7 @@ import unittest
 SCRIPT_ROOT = os.path.dirname(__file__)
 
 
-def build_expected_output(source: str, root: str, out: str) -> list[str]:
+def build_expected_output(source: str, root: str, out: str) -> Iterator[str]:
     with open(os.path.join(SCRIPT_ROOT, source)) as f:
         for line in f.readlines():
             yield line.replace("{root}", root).replace("{out}", out)
