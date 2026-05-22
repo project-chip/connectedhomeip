@@ -551,4 +551,5 @@ class WpaSupplicantMock(threading.Thread, TerminableResource):
 
     def resource_terminate(self):
         self.loop.call_soon_threadsafe(self.loop.stop)
-        self.join()
+        if self.ident is not None:
+            self.join()
