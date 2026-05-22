@@ -239,7 +239,7 @@ class TC_FAN_3_1(MatterBaseTest):
 
         # Write value to attribute and read back to verify the result
         allowed_update = (_FAN_MODE_ALLOWED_WRITE_STATUSES if attr_to_update == attr.FanMode
-                           else _PERCENT_OR_SPEED_ALLOWED_WRITE_STATUSES)
+                          else _PERCENT_OR_SPEED_ALLOWED_WRITE_STATUSES)
         for value_to_write in value_range:
             await self.write_and_verify_attribute(attr_to_update, value_to_write, allowed_update)
 
