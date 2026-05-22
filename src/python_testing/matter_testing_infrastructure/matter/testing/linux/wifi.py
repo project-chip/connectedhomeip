@@ -27,7 +27,7 @@ from typing import Any, Union
 
 import sdbus
 
-from matter.testing.concurrency.context import TerminableResource
+from matter.testing.concurrency.context import TerminableThread
 
 from .namespace import IsolatedNetworkNamespace
 
@@ -164,7 +164,7 @@ class NANSimulator:
         receiver.NANReceive.emit(receive_args)
 
 
-class WpaSupplicantMock(threading.Thread, TerminableResource):
+class WpaSupplicantMock(TerminableThread):
     """Mock server for WpaSupplicant D-Bus API.
 
     This mock runs on its own thread and exposes a minimal subset of the
@@ -546,10 +546,6 @@ class WpaSupplicantMock(threading.Thread, TerminableResource):
         self.loop.run_until_complete(self.startup())
         super().__init__(target=self.loop.run_forever)
 
-    def resource_start(self) -> None:
-        self.start()
-
     def resource_terminate(self):
         self.loop.call_soon_threadsafe(self.loop.stop)
-        if self.ident is not None:
-            self.join()
+        super().resource_terminate()

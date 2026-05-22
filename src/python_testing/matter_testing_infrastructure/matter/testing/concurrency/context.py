@@ -17,6 +17,7 @@ import logging
 from abc import ABC, abstractmethod
 from types import TracebackType
 from typing import Self
+import threading
 
 log = logging.getLogger(__name__)
 
@@ -56,3 +57,22 @@ class TerminableResource(contextlib.AbstractContextManager, ABC):
     @abstractmethod
     def resource_terminate(self) -> None:
         """Terminate the resource."""
+
+
+class TerminableThread(TerminableResource, threading.Thread):
+    """Thread that can be terminated using the TerminableResource context manager."""
+
+    JOIN_TIMEOUT_S: float = 5.0
+
+    def resource_start(self) -> None:
+        self.start()
+
+    def resource_thread_join(self) -> bool:
+        """Join the thread and return whether it has been successfully joined (i.e. is not alive anymore)."""
+        if self.ident is not None:
+            log.debug("Joining thread %s", self.name)
+            self.join(timeout=self.JOIN_TIMEOUT_S)
+        return not self.is_alive()
+
+    def resource_terminate(self) -> None:
+        self.resource_thread_join()
