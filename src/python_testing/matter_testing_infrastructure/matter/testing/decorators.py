@@ -25,7 +25,8 @@ import asyncio
 import logging
 from enum import IntFlag
 from functools import partial, wraps
-from typing import TYPE_CHECKING, Callable
+from typing import TYPE_CHECKING
+from collections.abc import Callable
 
 from mobly import asserts
 

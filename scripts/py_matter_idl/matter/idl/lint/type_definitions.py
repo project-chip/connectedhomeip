@@ -14,7 +14,8 @@
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from typing import MutableMapping, Optional
+from typing import Optional
+from collections.abc import MutableMapping
 
 from matter.idl.matter_idl_types import Idl, ParseMetaData
 

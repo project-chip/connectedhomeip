@@ -16,7 +16,8 @@
 """Collect information from various sources into Memory Map DataFrames."""
 
 import bisect
-from typing import Callable, Mapping, Optional, Sequence
+from typing import Optional
+from collections.abc import Callable, Mapping, Sequence
 
 import memdf.collector.bloaty
 import memdf.collector.csv

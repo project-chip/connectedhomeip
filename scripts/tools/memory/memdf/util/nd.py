@@ -15,7 +15,8 @@
 #
 """Nested dictionary utilities."""
 
-from typing import Any, Mapping, MutableMapping, Optional, Sequence
+from typing import Any, Optional
+from collections.abc import Mapping, MutableMapping, Sequence
 
 Key = Sequence
 

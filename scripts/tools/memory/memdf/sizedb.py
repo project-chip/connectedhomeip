@@ -21,7 +21,8 @@ import logging
 import sqlite3
 import zipfile
 from pathlib import Path
-from typing import IO, Iterable, Optional
+from typing import IO, Optional
+from collections.abc import Iterable
 
 import memdf.util.sqlite
 

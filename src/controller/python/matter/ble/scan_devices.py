@@ -18,7 +18,7 @@ import ctypes
 from dataclasses import dataclass
 from queue import Queue
 from threading import Thread
-from typing import Generator
+from collections.abc import Generator
 
 from .library_handle import _GetBleLibraryHandle
 from .types import DeviceScannedCallback, ScanDoneCallback, ScanErrorCallback

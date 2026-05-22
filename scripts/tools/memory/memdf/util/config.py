@@ -19,7 +19,9 @@ import argparse
 import ast
 import logging
 import re
-from typing import Any, Mapping, MutableMapping, Optional, Pattern, Sequence
+from typing import Any, Optional
+from re import Pattern
+from collections.abc import Mapping, MutableMapping, Sequence
 
 import humanfriendly  # type: ignore
 import memdf.util.nd as nd

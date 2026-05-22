@@ -19,7 +19,8 @@ import logging
 import threading
 import time
 from dataclasses import dataclass
-from typing import Callable, Optional
+from typing import Optional
+from collections.abc import Callable
 
 from ..native import PyChipError
 from .library_handle import _GetDiscoveryLibraryHandle

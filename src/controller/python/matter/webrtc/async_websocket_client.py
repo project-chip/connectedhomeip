@@ -2,7 +2,8 @@ import asyncio
 import json
 import logging
 from dataclasses import asdict
-from typing import Any, Callable, Optional
+from typing import Any, Optional
+from collections.abc import Callable
 
 import websockets
 

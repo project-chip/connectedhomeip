@@ -19,7 +19,8 @@
 
 import logging
 import sys
-from typing import Optional, Pattern
+from typing import Optional
+from re import Pattern
 
 import memdf.collect
 import memdf.name

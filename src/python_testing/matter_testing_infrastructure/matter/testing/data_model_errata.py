@@ -19,7 +19,8 @@ import logging
 import re
 from importlib.resources.abc import Traversable
 from pathlib import Path
-from typing import Any, Mapping, Optional
+from typing import Any, Optional
+from collections.abc import Mapping
 
 import yaml
 

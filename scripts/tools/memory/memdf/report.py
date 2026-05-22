@@ -20,7 +20,8 @@ import io
 import json
 import pathlib
 import sys
-from typing import IO, Any, Callable, Mapping, Optional, Protocol, Sequence, TypeAlias
+from typing import IO, Any, Optional, Protocol, TypeAlias
+from collections.abc import Callable, Mapping, Sequence
 
 import cxxfilt  # type: ignore
 import memdf.df

@@ -19,7 +19,8 @@
 from __future__ import annotations
 
 import logging
-from typing import Callable, Optional
+from typing import Optional
+from collections.abc import Callable
 
 from . import CertificateAuthority, ChipDeviceCtrl
 from .crypto import p256keypair

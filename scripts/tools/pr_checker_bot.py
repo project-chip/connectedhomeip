@@ -20,7 +20,8 @@ import logging
 import os
 import urllib.request
 from enum import Enum
-from typing import Iterable, NamedTuple
+from typing import NamedTuple
+from collections.abc import Iterable
 
 import click
 import coloredlogs

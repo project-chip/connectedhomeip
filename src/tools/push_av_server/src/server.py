@@ -8,7 +8,8 @@ import logging
 import signal
 import socket
 import ssl
-from typing import Awaitable, Callable, Optional
+from typing import Optional
+from collections.abc import Awaitable, Callable
 
 from api import PushAvServer
 from certificates import CAHierarchy

@@ -37,7 +37,8 @@ import operator
 import xml.etree.ElementTree as ElementTree
 from dataclasses import dataclass
 from enum import Enum, auto
-from typing import Callable, Optional
+from typing import Optional
+from collections.abc import Callable
 
 from matter.tlv import uint
 

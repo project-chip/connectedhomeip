@@ -19,7 +19,8 @@ import itertools
 import logging
 import os
 import subprocess
-from typing import Iterable, Mapping, Optional
+from typing import Optional
+from collections.abc import Iterable, Mapping
 
 import dateutil  # type: ignore
 import dateutil.parser  # type: ignore

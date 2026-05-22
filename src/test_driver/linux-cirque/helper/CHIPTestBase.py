@@ -23,7 +23,7 @@ import sys
 import time
 import traceback
 from enum import IntEnum
-from typing import Mapping
+from collections.abc import Mapping
 from urllib.parse import urljoin
 
 import requests

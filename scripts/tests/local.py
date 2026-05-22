@@ -29,7 +29,8 @@ import sys
 import textwrap
 import time
 from dataclasses import dataclass
-from typing import Iterable, Optional
+from typing import Optional
+from collections.abc import Iterable
 
 import alive_progress
 import click

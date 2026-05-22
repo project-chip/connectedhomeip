@@ -14,7 +14,8 @@
 
 import os
 from dataclasses import dataclass
-from typing import Mapping, Optional
+from typing import Optional
+from collections.abc import Mapping
 
 from matter.idl.generators import CodeGenerator
 from matter.idl.generators.cluster_selection import server_side_clusters

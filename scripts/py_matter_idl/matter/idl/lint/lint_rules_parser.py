@@ -17,7 +17,8 @@ import os
 import xml.etree.ElementTree
 from dataclasses import dataclass
 from enum import Enum, auto
-from typing import MutableMapping, Optional
+from typing import Optional
+from collections.abc import MutableMapping
 
 from lark import Lark
 from lark.visitors import Discard, Transformer, v_args

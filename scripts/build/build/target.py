@@ -43,7 +43,8 @@ import logging
 import os
 import re
 from dataclasses import dataclass
-from typing import Any, Iterable, Optional
+from typing import Any, Optional
+from collections.abc import Iterable
 
 from builders.builder import Builder, BuilderOptions, BuildProfile, OutDirLock
 from runner.runner import Runner

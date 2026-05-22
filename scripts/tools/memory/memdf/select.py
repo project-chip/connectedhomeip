@@ -15,7 +15,8 @@
 #
 """Data frame selection utilities."""
 
-from typing import Mapping, Optional
+from typing import Optional
+from collections.abc import Mapping
 
 import memdf.name
 import memdf.util.config

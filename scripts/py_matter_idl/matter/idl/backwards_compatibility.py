@@ -16,7 +16,8 @@ import dataclasses
 import enum
 import logging
 import sys
-from typing import Callable, Optional, Protocol, TypeVar
+from typing import Optional, Protocol, TypeVar
+from collections.abc import Callable
 
 import click
 import coloredlogs

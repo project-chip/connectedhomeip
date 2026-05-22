@@ -26,7 +26,8 @@ import sys
 import tempfile
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Generator, Optional
+from typing import Optional
+from collections.abc import Generator
 
 from clang_format import getClangFormatBinary
 from zap_execution import ZapTool

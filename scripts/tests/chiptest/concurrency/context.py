@@ -23,7 +23,8 @@ from contextlib import contextmanager
 from multiprocessing.context import SpawnContext
 from pathlib import Path
 from types import TracebackType
-from typing import Iterator, Literal, Self
+from typing import Literal, Self
+from collections.abc import Iterator
 
 from python_path import PythonPath
 

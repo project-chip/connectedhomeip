@@ -21,7 +21,8 @@ import sys
 import threading
 from dataclasses import dataclass, replace
 from enum import StrEnum
-from typing import BinaryIO, Callable, Self
+from typing import BinaryIO, Self
+from collections.abc import Callable
 
 LOGGER = logging.getLogger(__name__)
 

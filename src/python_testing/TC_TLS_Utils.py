@@ -18,7 +18,8 @@
 import datetime
 import random
 import string
-from typing import Callable, Optional
+from typing import Optional
+from collections.abc import Callable
 
 from cryptography import x509
 from cryptography.hazmat.primitives import hashes, serialization

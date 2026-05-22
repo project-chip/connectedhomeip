@@ -51,7 +51,8 @@ import re
 import subprocess
 from dataclasses import dataclass, replace
 from enum import Enum, auto
-from typing import Callable, Optional
+from typing import Optional
+from collections.abc import Callable
 
 import click
 import coloredlogs

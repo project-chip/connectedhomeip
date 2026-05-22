@@ -18,7 +18,8 @@ import subprocess
 import threading
 from abc import abstractmethod
 from types import TracebackType
-from typing import Any, Callable, Generic, Self, TypeVar
+from typing import Any, Generic, Self, TypeVar
+from collections.abc import Callable
 
 log = logging.getLogger(__name__)
 
