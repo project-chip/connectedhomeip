@@ -17,7 +17,7 @@ limitations under the License.
 import shlex
 from pathlib import Path
 
-# _STR are string represenattion of the path.
+# _STR are string representation of the path.
 # _ESC are the escaped string representation of the path, which can be used in shell commands.
 
 CHIP_REPO = Path(__file__).absolute().parents[4]
