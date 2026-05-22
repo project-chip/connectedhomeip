@@ -190,15 +190,15 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
 {
     gMainLoopImplementation = mainLoop;
 
+    static chip::CommonCaseDeviceServerInitParams initParams;
+    SuccessOrDie(initParams.InitializeStaticResourcesBeforeServerInit());
+
     DeviceFactory::GetInstance().Init(DeviceFactory::Context{
         .groupDataProvider = gGroupDataProvider,                     //
         .fabricTable       = Server::GetInstance().GetFabricTable(), //
         .timerDelegate     = gTimerDelegate,                         //
+        .storageDelegate   = *initParams.persistentStorageDelegate,  //
     });
-
-    static chip::CommonCaseDeviceServerInitParams initParams;
-
-    SuccessOrDie(initParams.InitializeStaticResourcesBeforeServerInit());
 
     RegisterDeviceFactoryOverrides(gTimerDelegate, initParams.persistentStorageDelegate);
 
