@@ -28,10 +28,10 @@
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/core/TLV.h>
 #include <lib/support/CHIPMem.h>
+#include <lib/support/DefaultStorageKeyAllocator.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
 #include <lib/support/tests/ExtraPwTestMacros.h>
 #include <platform/KeyValueStoreManager.h>
-#include <lib/support/DefaultStorageKeyAllocator.h>
 
 using namespace chip::Credentials;
 using GroupInfo      = GroupDataProvider::GroupInfo;
@@ -890,7 +890,7 @@ TEST_F(TestGroupDataProvider, TestKeySetCacheAndSyncRemap)
 
     // 2. Read the saved TLV from storage
     auto keyName = DefaultStorageKeyAllocator::FabricKeyset(kFabric1, kKeysetId1);
-    
+
     uint8_t tlvBuffer[128];
     uint16_t tlvLength = sizeof(tlvBuffer);
     EXPECT_EQ(sDelegate.SyncGetKeyValue(keyName.KeyName(), tlvBuffer, tlvLength), CHIP_NO_ERROR);
@@ -908,7 +908,7 @@ TEST_F(TestGroupDataProvider, TestKeySetCacheAndSyncRemap)
     ASSERT_EQ(tlvBuffer[1], 0x24); // Context Tag 1-byte value
     ASSERT_EQ(tlvBuffer[2], 0x01); // Tag 1 (Policy)
     ASSERT_EQ(tlvBuffer[3], 0x00); // Value (kTrustFirst)
-    
+
     tlvBuffer[3] = 1; // Change to kCacheAndSync (1)
 
     // 4. Write it back to storage
@@ -926,7 +926,7 @@ TEST_F(TestGroupDataProvider, TestKeySetInvalidPolicy)
     EXPECT_TRUE(provider);
     ResetProvider(provider);
 
-    // Verify setting a keyset with an invalid security policy (like the currently unimplemented 
+    // Verify setting a keyset with an invalid security policy (like the currently unimplemented
     // cache and sync policy), throws an error
     KeySet keySetToSet(kKeysetId1, SecurityPolicy::kCacheAndSync, 1);
     keySetToSet.epoch_keys[0].start_time = 1234;
