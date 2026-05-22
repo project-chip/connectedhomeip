@@ -1,4 +1,4 @@
-# Copyright (c) 2025 Project CHIP Authors
+# Copyright (c) 2025-2026 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,6 +18,9 @@ TARGET_SOURCES(
   PRIVATE
     "${CLUSTER_DIR}/BDXDownloader.cpp"
     "${CLUSTER_DIR}/BDXDownloader.h"
+    "${CLUSTER_DIR}/CodegenIntegration.cpp"
+    "${CLUSTER_DIR}/CodegenIntegration.h"
+    "${CLUSTER_DIR}/CodegenIntegrationInternal.h"
     "${CLUSTER_DIR}/DefaultOTARequestor.cpp"
     "${CLUSTER_DIR}/DefaultOTARequestor.h"
     "${CLUSTER_DIR}/DefaultOTARequestorDriver.cpp"
@@ -27,10 +30,28 @@ TARGET_SOURCES(
     "${CLUSTER_DIR}/DefaultOTARequestorUserConsent.h"
     "${CLUSTER_DIR}/ExtendedOTARequestorDriver.cpp"
     "${CLUSTER_DIR}/ExtendedOTARequestorDriver.h"
-    "${CLUSTER_DIR}/OTARequestorCluster.cpp"
-    "${CLUSTER_DIR}/OTARequestorDriver.h"
-    "${CLUSTER_DIR}/OTARequestorStorage.h"
     "${CLUSTER_DIR}/OTATestEventTriggerHandler.cpp"
     "${CLUSTER_DIR}/OTATestEventTriggerHandler.h"
-    "${CLUSTER_DIR}/ota-requestor-server.h"
+)
+
+# This is equivalent to BUILD.gn's ota-requestor source set.
+TARGET_SOURCES(
+  ${APP_TARGET}
+  PRIVATE
+    "${CLUSTER_DIR}/DefaultOTARequestorEventGenerator.h"
+    "${CLUSTER_DIR}/OTARequestorAttributes.cpp"
+    "${CLUSTER_DIR}/OTARequestorAttributes.h"
+    "${CLUSTER_DIR}/OTARequestorCluster.cpp"
+    "${CLUSTER_DIR}/OTARequestorCluster.h"
+)
+
+# This is equivalent to BUILD.gn's interface source set.
+TARGET_SOURCES(
+  ${APP_TARGET}
+  PRIVATE
+    "${CLUSTER_DIR}/OTADownloader.h"
+    "${CLUSTER_DIR}/OTARequestorDriver.h"
+    "${CLUSTER_DIR}/OTARequestorInterface.h"
+    "${CLUSTER_DIR}/OTARequestorStorage.h"
+    "${CLUSTER_DIR}/OTARequestorUserConsentDelegate.h"
 )

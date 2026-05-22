@@ -686,11 +686,15 @@ public:
     static IPAddress MakeIPv6PrefixMulticast(uint8_t aScope, uint8_t aPrefixLength, const uint64_t & aPrefix, uint32_t aGroupId);
 
     /**
-     * @brief   Construct an IPv4 broadcast address.
+     * @brief   Construct the well-known IPv6 multicast address ff05::fa.
+     *
+     * @details
+     *  Returns the site-local scoped well-known multicast address
+     *  with group identifier 0xFA, used for Matter groupcast messaging.
      *
      * @return  The constructed IP address.
      */
-    static IPAddress MakeIPv4Broadcast();
+    static IPAddress MakeIPv6MatterIANAMulticastAddr();
 
     /**
      * @brief   The distinguished unspecified IP address object.

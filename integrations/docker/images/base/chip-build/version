@@ -1,1 +1,1 @@
-190 : [Telink] Update Docker image (Zephyr update)
+197 : [crosscompile] Bump {armhf,aarch64} sysroot tag to `version:build-2026.05.14`

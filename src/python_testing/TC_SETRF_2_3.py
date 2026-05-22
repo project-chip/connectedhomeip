@@ -216,7 +216,7 @@ class TC_SETRF_2_3(CommodityTariffTestBaseHelper):
             self.step("7a")
             self.calendarPeriodsValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.CalendarPeriods)
             await self.check_calendar_periods_attribute(endpoint, self.calendarPeriodsValue)
-            dayPatternIDsCurrentValue = await self.get_day_pattern_IDs_for_active_calendar_period(next=False)
+            dayPatternIDsCurrentValue = await self.get_day_pattern_IDs_for_active_calendar_period(next_day=False)
 
             self.step("7b")
             # we search DayPattern that corresponds to day of week defined on step 4 and compare DayEntryIDs from CurrentDay and found DayPattern

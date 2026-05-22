@@ -26,6 +26,7 @@
 #include <app/clusters/boolean-state-server/CodegenIntegration.h>
 #include <app/clusters/illuminance-measurement-server/CodegenIntegration.h>
 #include <app/clusters/occupancy-sensor-server/CodegenIntegration.h>
+#include <app/clusters/relative-humidity-measurement-server/CodegenIntegration.h>
 #include <app/clusters/temperature-measurement-server/CodegenIntegration.h>
 
 #include <string>
@@ -199,7 +200,8 @@ public:
             {
                 // update the current humidity here for hardcoded endpoint 1
                 ESP_LOGI(TAG, "Humidity changed to : %d", n);
-                app::Clusters::RelativeHumidityMeasurement::Attributes::MeasuredValue::Set(1, static_cast<int16_t>(n * 100));
+                LogErrorOnFailure(app::Clusters::RelativeHumidityMeasurement::SetMeasuredValue(
+                    1, app::DataModel::MakeNullable(static_cast<uint16_t>(n * 100))));
             }
             else if (name == "OccupiedCoolingSetpoint")
             {
@@ -587,7 +589,8 @@ void SetupPretendDevices()
     AddEndpoint("External");
     AddCluster("Humidity Sensor");
     AddAttribute("Humidity", "30");
-    app::Clusters::RelativeHumidityMeasurement::Attributes::MeasuredValue::Set(1, static_cast<int16_t>(30 * 100));
+    LogErrorOnFailure(
+        app::Clusters::RelativeHumidityMeasurement::SetMeasuredValue(1, app::DataModel::MakeNullable<uint16_t>(30 * 100)));
 
     AddDevice("Light Sensor");
     AddEndpoint("External");
@@ -705,14 +708,11 @@ void InitDeviceDisplay()
     // Initialize the screen manager
     ScreenManager::Init();
 
-    // Connect the status LED to VLEDs.
-    int vled1 = ScreenManager::AddVLED(TFT_GREEN);
-    int vled2 = ScreenManager::AddVLED(TFT_RED);
-    statusLED1.SetVLED(vled1, vled2);
-
-    int vled3 = ScreenManager::AddVLED(TFT_CYAN);
-    int vled4 = ScreenManager::AddVLED(TFT_ORANGE);
-    statusLED2.SetVLED(vled3, vled4);
+    // Wire status LEDs to virtual LEDs on display
+    static int sStatusLED1_VLED = ScreenManager::AddVLED(TFT_GREEN);
+    static int sStatusLED2_VLED = ScreenManager::AddVLED(TFT_CYAN);
+    statusLED1.SetStateChangeCallback([](LEDWidget *, bool state) { ScreenManager::SetVLED(sStatusLED1_VLED, state); });
+    statusLED2.SetStateChangeCallback([](LEDWidget *, bool state) { ScreenManager::SetVLED(sStatusLED2_VLED, state); });
 
     bluetoothLED.SetVLED(ScreenManager::AddVLED(TFT_BLUE));
     wifiLED.SetVLED(ScreenManager::AddVLED(TFT_YELLOW));

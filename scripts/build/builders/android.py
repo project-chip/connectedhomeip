@@ -17,7 +17,9 @@ import os
 import shlex
 from enum import Enum, auto
 
-from .builder import Builder, BuilderOutput, BuildProfile
+from runner.runner import Runner
+
+from .builder import Builder, BuilderOutput, BuildProfile, OutDirLock, lock_output_dir
 
 log = logging.getLogger(__name__)
 
@@ -66,8 +68,6 @@ class AndroidApp(Enum):
     CHIP_TEST = auto()
     TV_SERVER = auto()
     TV_CASTING_APP = auto()
-    JAVA_MATTER_CONTROLLER = auto()
-    KOTLIN_MATTER_CONTROLLER = auto()
     VIRTUAL_DEVICE_APP = auto()
 
     def AppName(self):
@@ -121,13 +121,14 @@ class AndroidApp(Enum):
 
 class AndroidBuilder(Builder):
     def __init__(self,
-                 root,
-                 runner,
-                 board: AndroidBoard,
-                 app: AndroidApp):
-        super(AndroidBuilder, self).__init__(root, runner)
+                 root: str,
+                 runner: Runner,
+                 output_dir_lock: OutDirLock, board: AndroidBoard, app: AndroidApp,
+                 optimize_size: bool = False):
+        super(AndroidBuilder, self).__init__(root, runner, output_dir_lock)
         self.board = board
         self.app = app
+        self.optimize_size = optimize_size
 
     def _get_sdk_manager_paths(self):
         """Get list of possible SDK manager paths for Android SDK compatibility."""
@@ -354,6 +355,8 @@ class AndroidBuilder(Builder):
     def gradlewBuildExampleAndroid(self):
 
         # Example compilation
+        optimize_flag = "-PoptimizeApkSize=true" if self.optimize_size else "-PoptimizeApkSize=false"
+
         if self.app.Modules():
             for module in self.app.Modules():
                 self._Execute(
@@ -366,6 +369,7 @@ class AndroidBuilder(Builder):
                         "-PmatterBuildSrcDir=%s" % self.output_dir,
                         "-PmatterSdkSourceBuild=false",
                         "-PbuildDir=%s/%s" % (self.output_dir, module),
+                        optimize_flag,
                         ":%s:assembleDebug" % module,
                     ],
                     title="Building Example %s, module %s" % (
@@ -382,11 +386,13 @@ class AndroidBuilder(Builder):
                     "-PmatterBuildSrcDir=%s" % self.output_dir,
                     "-PmatterSdkSourceBuild=false",
                     "-PbuildDir=%s" % self.output_dir,
+                    optimize_flag,
                     "assembleDebug",
                 ],
                 title="Building Example " + self.identifier,
             )
 
+    @lock_output_dir
     def generate(self):
         self._Execute(
             ["python3", "third_party/android_deps/set_up_android_deps.py"],
@@ -431,6 +437,39 @@ class AndroidBuilder(Builder):
 
             if exampleName == "chip-test":
                 gn_args["chip_build_tests"] = True
+            if self.optimize_size:
+                gn_args["optimize_apk_size"] = True
+                gn_args["is_debug"] = False
+                gn_args["matter_enable_tracing_support"] = False
+                gn_args["use_static_libcxx"] = True
+
+                # TV Casting App size optimizations: compile only the
+                # ~36 casting-relevant clusters instead of the full
+                # generated cluster-objects.cpp, and use slim TLV
+                # decoder source overrides covering only the 18
+                # casting clusters so that ChipClusters.java
+                # read/subscribe APIs remain functional at runtime.
+                # These must be passed as explicit GN build args
+                # because args.gni is evaluated inside default_args
+                # (before args.gn is applied), so the
+                # if (optimize_apk_size) conditional there cannot see
+                # the args.gn value.
+                if self.app == AndroidApp.TV_CASTING_APP:
+                    gn_args["chip_cluster_objects_source_override"] = (
+                        "//third_party/connectedhomeip/examples/"
+                        "tv-casting-app/tv-casting-common/"
+                        "casting-cluster-objects.cpp"
+                    )
+                    gn_args["chip_tlv_decoder_attribute_source_override"] = (
+                        "//third_party/connectedhomeip/examples/"
+                        "tv-casting-app/tv-casting-common/"
+                        "casting-CHIPAttributeTLVValueDecoder.cpp"
+                    )
+                    gn_args["chip_tlv_decoder_event_source_override"] = (
+                        "//third_party/connectedhomeip/examples/"
+                        "tv-casting-app/tv-casting-common/"
+                        "casting-CHIPEventTLVValueDecoder.cpp"
+                    )
             gn_args.update(self.app.AppGnArgs())
 
             args_str = ""
@@ -471,6 +510,7 @@ class AndroidBuilder(Builder):
             # Handle SDK manager license acceptance
             self._handle_sdk_license_acceptance()
 
+    @lock_output_dir
     def stripSymbols(self):
         output_libs_dir = os.path.join(
             self.output_dir,
@@ -487,6 +527,7 @@ class AndroidBuilder(Builder):
                     "Stripping symbols from " + lib
                 )
 
+    @lock_output_dir
     def _build(self):
         if self.board.IsIde():
             # App compilation IDE
@@ -532,7 +573,12 @@ class AndroidBuilder(Builder):
                     self.root, "examples/", self.app.ExampleName(), "android/App/app/libs"
                 )
 
-                libs = ["libc++_shared.so", "libTvCastingApp.so"]
+                # When size-optimized with static libc++, libc++_shared.so is
+                # folded into libTvCastingApp.so and doesn't need to be shipped.
+                if self.optimize_size:
+                    libs = ["libTvCastingApp.so"]
+                else:
+                    libs = ["libc++_shared.so", "libTvCastingApp.so"]
 
                 jars = {
                     "AndroidPlatform.jar": "third_party/connectedhomeip/src/platform/android/AndroidPlatform.jar",
@@ -611,9 +657,10 @@ class AndroidBuilder(Builder):
                 self.copyToExampleApp(jnilibs_dir, libs_dir, libs, jars)
                 self.gradlewBuildExampleAndroid()
 
-            if self.options.build_profile in [BuildProfile.RELEASE, BuildProfile.RELEASE_SIZE]:
+            if self.options.build_profile in [BuildProfile.RELEASE, BuildProfile.RELEASE_SIZE] or self.optimize_size:
                 self.stripSymbols()
 
+    @lock_output_dir
     def build_outputs(self):
         if self.board.IsIde():
             yield BuilderOutput(

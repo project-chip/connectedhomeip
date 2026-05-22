@@ -79,6 +79,14 @@ public:
     //       as other attributes are controlled by feature flags
     using OptionalAttributeSet = app::OptionalAttributeSet<TimeSynchronization::Attributes::TimeSource::Id>;
 
+    struct Context
+    {
+        FabricTable & fabricTable;
+        CASESessionManager & caseSessionManager;
+        DeviceLayer::PlatformManager & platformManager;
+        InteractionModelEngine & interactionModelEngine;
+    };
+
     struct StartupConfiguration
     {
         TimeSynchronization::Attributes::SupportsDNSResolve::TypeInfo::Type supportsDNSResolve{ false };
@@ -89,7 +97,8 @@ public:
     };
 
     TimeSynchronizationCluster(EndpointId endpoint, const BitFlags<TimeSynchronization::Feature> features,
-                               const OptionalAttributeSet & optionalAttributeSet, const StartupConfiguration & config);
+                               const OptionalAttributeSet & optionalAttributeSet, const StartupConfiguration & config,
+                               Context context);
 
     CHIP_ERROR Startup(ServerClusterContext & context) override;
     void Shutdown(ClusterShutdownType type) override;
@@ -178,6 +187,7 @@ private:
     TimeSynchronization::TimeZoneDatabaseEnum mTimeZoneDatabase;
     TimeSynchronization::TimeSourceEnum mTimeSource;
     TimeSynchronization::Delegate * mDelegate = nullptr;
+    Context mTimeSyncContext;
 
     TimeSyncDataProvider mTimeSyncDataProvider;
     TimeSynchronization::TimeSyncEventFlag mEventFlag = TimeSynchronization::TimeSyncEventFlag::kNone;

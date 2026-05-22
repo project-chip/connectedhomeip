@@ -434,9 +434,6 @@ void BLEManagerImpl::HandlePlatformSpecificBLEEvent(const ChipDeviceEvent * apEv
     default:
         break;
     }
-
-    mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Disabled;
-    return;
 }
 
 static int OnUnsubscribeCharComplete(uint16_t conn_handle, const struct ble_gatt_error * error, struct ble_gatt_attr * attr,
@@ -1199,22 +1196,24 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
             return err;
         }
 
-        ble_addr_t addr;
-
-        /* generate new non-resolvable private address */
-        err = MapBLEError(ble_hs_id_gen_rnd(1, &addr));
-        if (err != CHIP_NO_ERROR)
+        if (mFlags.Has(Flags::kFastAdvertisingEnabled))
         {
-            ChipLogError(DeviceLayer, "ble_hs_id_gen_rnd failed: %" CHIP_ERROR_FORMAT, err.Format());
-            return err;
-        }
+            ble_addr_t addr;
+            /* generate static random address */
+            err = MapBLEError(ble_hs_id_gen_rnd(0, &addr));
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(DeviceLayer, "ble_hs_id_gen_rnd failed: %" CHIP_ERROR_FORMAT, err.Format());
+                return err;
+            }
 
-        /* Set generated address */
-        err = MapBLEError(ble_gap_ext_adv_set_addr(kMatterAdvInstance, &addr));
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(DeviceLayer, "ble_gap_ext_adv_set_addr failed: %" CHIP_ERROR_FORMAT, err.Format());
-            return err;
+            /* Set generated address */
+            err = MapBLEError(ble_gap_ext_adv_set_addr(kMatterAdvInstance, &addr));
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(DeviceLayer, "ble_gap_ext_adv_set_addr failed: %" CHIP_ERROR_FORMAT, err.Format());
+                return err;
+            }
         }
 
         struct os_mbuf * data = os_msys_get_pkthdr(mMatterAdvDataLen, 0);
@@ -2074,7 +2073,7 @@ void BLEManagerImpl::OnDeviceScanned(const ble_addr_t & addr, const chip::Ble::C
     DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(kConnectTimeout), HandleConnectTimeout, nullptr);
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
-    mDeviceScanner.StopScan();
+    LogErrorOnFailure(mDeviceScanner.StopScan());
 
     ConnectDevice(addr, kConnectTimeout);
 }
@@ -2145,7 +2144,7 @@ void BLEManagerImpl::NewConnection(BleLayer * bleLayer, void * appState, const S
     mBLEScanConfig.mAppState      = appState;
 
     // Initiate async scan
-    PlatformMgr().ScheduleWork(InitiateScan, static_cast<intptr_t>(BleScanState::kScanForDiscriminator));
+    LogErrorOnFailure(PlatformMgr().ScheduleWork(InitiateScan, static_cast<intptr_t>(BleScanState::kScanForDiscriminator)));
 }
 
 CHIP_ERROR BLEManagerImpl::CancelConnection()

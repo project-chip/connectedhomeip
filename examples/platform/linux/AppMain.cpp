@@ -59,6 +59,10 @@
 #include <ControllerShellCommands.h>
 #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 
+#ifndef CHIP_LINUX_APP_START_COMMISSIONER_AT_BOOT
+#define CHIP_LINUX_APP_START_COMMISSIONER_AT_BOOT 1
+#endif
+
 #if defined(ENABLE_CHIP_SHELL)
 #include <CommissioneeShellCommands.h>
 #include <lib/shell/Engine.h> // nogncheck
@@ -154,8 +158,6 @@
 #include <openthread-system.h>
 #include <openthread/instance.h>
 #endif
-
-#include <access/examples/GroupAuxiliaryAccessControlDelegate.h>
 
 using namespace chip;
 using namespace chip::ArgParser;
@@ -731,10 +733,8 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
             ChipLogProgress(WiFiPAF, "Wi-Fi Management started");
             DeviceLayer::ConnectivityManager::WiFiPAFAdvertiseParam args;
 
-            args.enable        = LinuxDeviceOptions::GetInstance().mWiFiPAF;
             args.freq_list_len = WiFiPAFGet_FreqList(LinuxDeviceOptions::GetInstance().mWiFiPAFExtCmds, args.freq_list);
-            TEMPORARY_RETURN_IGNORED DeviceLayer::ConnectivityMgr().WiFiPAFPublish(args);
-            LinuxDeviceOptions::GetInstance().mPublishId = args.publish_id;
+            DeviceLayer::ConnectivityMgr().WiFiPAFSetParam(args);
         }
     }
 #endif
@@ -985,13 +985,6 @@ void ChipLinuxAppMainLoop(chip::ServerInitParams & initParams, AppMainLoopImplem
         initParams.advertiseCommissionableIfNoFabrics = false;
     }
 
-#if CHIP_CONFIG_ENABLE_GROUPCAST
-    initParams.groupDataProvider->SetGroupcastEnabled(true);
-    static chip::Access::Examples::GroupAuxiliaryAccessControlDelegate groupAuxDelegate(initParams.groupDataProvider,
-                                                                                        &Server::GetInstance().GetFabricTable());
-    initParams.groupAuxiliaryAccessControlDelegate = &groupAuxDelegate;
-#endif
-
     // Set DAC provider before server init because Operational Credentials may snapshot
     // the provider during cluster construction.
     SetDeviceAttestationCredentialsProvider(LinuxDeviceOptions::GetInstance().dacProvider);
@@ -1017,17 +1010,6 @@ void ChipLinuxAppMainLoop(chip::ServerInitParams & initParams, AppMainLoopImplem
         SuccessOrDie(exampleAccessRestrictionProvider->SetEntries(1, LinuxDeviceOptions::GetInstance().arlEntries.Value()));
     }
 #endif
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-    if (Server::GetInstance().GetFabricTable().FabricCount() != 0)
-    {
-        ChipLogProgress(AppServer, "Fabric already commissioned. Canceling publishing");
-        // TODO #40789: Should we just NOT call WiFiPAFShutdown at startup and instead make sure that WiFiPAF is not published at
-        // all? or Change the handling within WiFiPAFShutdown?
-        // TODO #40814: Check the Return Value of the call to WiFiPAFShutdown
-        TEMPORARY_RETURN_IGNORED DeviceLayer::ConnectivityMgr().WiFiPAFShutdown(LinuxDeviceOptions::GetInstance().mPublishId,
-                                                                                chip::WiFiPAF::WiFiPafRole::kWiFiPafRole_Publisher);
-    }
-#endif
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     // Set ReadHandler Capacity for Subscriptions
@@ -1049,11 +1031,13 @@ void ChipLinuxAppMainLoop(chip::ServerInitParams & initParams, AppMainLoopImplem
     PrintOnboardingCodes(LinuxDeviceOptions::GetInstance().payload);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+#if CHIP_LINUX_APP_START_COMMISSIONER_AT_BOOT
     ChipLogProgress(AppServer, "Starting commissioner");
     VerifyOrReturn(InitCommissioner(LinuxDeviceOptions::GetInstance().securedCommissionerPort,
                                     LinuxDeviceOptions::GetInstance().unsecuredCommissionerPort,
                                     LinuxDeviceOptions::GetInstance().commissionerFabricId) == CHIP_NO_ERROR);
     ChipLogProgress(AppServer, "Started commissioner");
+#endif // CHIP_LINUX_APP_START_COMMISSIONER_AT_BOOT
 #if defined(ENABLE_CHIP_SHELL)
     Shell::RegisterControllerCommands();
 #endif // defined(ENABLE_CHIP_SHELL)
@@ -1118,11 +1102,10 @@ void ChipLinuxAppMainLoop(chip::ServerInitParams & initParams, AppMainLoopImplem
     Server::GetInstance().Shutdown();
 
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
-    // Commissioner shutdown call shuts down entire stack, including the platform manager.
     ShutdownCommissioner();
-#else
-    DeviceLayer::PlatformMgr().Shutdown();
 #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+
+    DeviceLayer::PlatformMgr().Shutdown();
 
 #if ENABLE_TRACING
     tracing_setup.StopTracing();

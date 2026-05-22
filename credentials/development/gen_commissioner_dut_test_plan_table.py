@@ -48,7 +48,7 @@ def write_validation_steps(filename: str, cases: TestInfo):
     with open(filename, "w") as output:
         for f in cases:
             cmd = f'./chip-all-clusters-app --trace_decode 1 --dac_provider $CHIP_ROOT/credentials/development/commissioner_dut/{f.dir}/test_case_vector.json --product-id {f.pid}'
-            output.write(f'{f.desc.replace(",","")}, {f.dir}, {f.pid}, {cmd}\n')
+            output.write(f'{f.desc.replace(",", "")}, {f.dir}, {f.pid}, {cmd}\n')
 
 
 def main():

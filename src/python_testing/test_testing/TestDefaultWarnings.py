@@ -17,10 +17,10 @@
 
 from typing import Callable
 
-import DefaultChecker as DefaultChecker
 from mobly import asserts
 
 import matter.clusters as Clusters
+import matter.testing.default_checker as DefaultChecker
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import default_matter_test_main
 

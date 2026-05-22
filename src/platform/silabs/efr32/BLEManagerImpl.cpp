@@ -104,8 +104,6 @@ namespace {
 
 osTimerId_t sbleAdvTimeoutTimer; // SW timer
 
-const uint8_t UUID_CHIPoBLEService[]      = { 0xFB, 0x34, 0x9B, 0x5F, 0x80, 0x00, 0x00, 0x80,
-                                              0x00, 0x10, 0x00, 0x00, 0xF6, 0xFF, 0x00, 0x00 };
 const uint8_t ShortUUID_CHIPoBLEService[] = { 0xF6, 0xFF };
 
 bd_addr randomizedAddr = { 0 };
@@ -162,6 +160,17 @@ uint16_t BLEManagerImpl::_NumConnections(void)
     }
 
     return numCons;
+}
+
+CHIP_ERROR BLEManagerImpl::PrintBLEInfo() const
+{
+    ChipLogProgress(DeviceLayer, "BLE Info:");
+    ChipLogProgress(DeviceLayer, "  Service Mode: %d", mServiceMode);
+    ChipLogProgress(DeviceLayer, "  Device Name: %s", mDeviceName);
+    ChipLogProgress(DeviceLayer, "  Random Static Address: %02X:%02X:%02X:%02X:%02X:%02X", randomizedAddr.addr[5],
+                    randomizedAddr.addr[4], randomizedAddr.addr[3], randomizedAddr.addr[2], randomizedAddr.addr[1],
+                    randomizedAddr.addr[0]);
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR BLEManagerImpl::_SetAdvertisingEnabled(bool val)
@@ -484,9 +493,9 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
             err = MapBLEError(ret);
             ChipLogError(DeviceLayer, "sl_bt_advertiser_set_random_address() failed: %" CHIP_ERROR_FORMAT, err.Format());
         });
-        ChipLogDetail(DeviceLayer, "BLE Static Device Address %02X:%02X:%02X:%02X:%02X:%02X", randomizedAddr.addr[5],
-                      randomizedAddr.addr[4], randomizedAddr.addr[3], randomizedAddr.addr[2], randomizedAddr.addr[1],
-                      randomizedAddr.addr[0]);
+        ChipLogProgress(DeviceLayer, "BLE Static Device Address %02X:%02X:%02X:%02X:%02X:%02X", randomizedAddr.addr[5],
+                        randomizedAddr.addr[4], randomizedAddr.addr[3], randomizedAddr.addr[2], randomizedAddr.addr[1],
+                        randomizedAddr.addr[0]);
     }
 
     ret = sl_bt_legacy_advertiser_set_data(advertising_set_handle, sl_bt_advertiser_advertising_data_packet, index,

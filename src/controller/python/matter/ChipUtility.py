@@ -33,10 +33,10 @@ class ChipUtility(object):
         return binascii.hexlify(val).decode()
 
     @staticmethod
-    def VoidPtrToByteArray(ptr, len):
+    def VoidPtrToByteArray(ptr, length):
         if ptr:
-            v = bytearray(len)
-            memmove((c_byte * len).from_buffer(v), ptr, len)
+            v = bytearray(length)
+            memmove((c_byte * length).from_buffer(v), ptr, length)
             return v
         return None
 

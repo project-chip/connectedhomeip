@@ -106,35 +106,54 @@ class TC_JFADMIN_1_1(MatterBaseTest):
     @async_test_body
     async def test_TC_JFADMIN_1_1(self):
         self.step("1")
-        self.JFADMIN_fabric_a_passcode = random.randint(110220011, 110220999)
         self.jfctrl_fabric_a_vid = random.randint(0x0001, 0xFFF0)
+        dut_rpc_server_port = None
+        dut_rpc_server_ip = None
+        jfadmin_fabric_a_discriminator = None
 
-        # Start Fabric A JF-Administrator App
-        self.fabric_a_admin = AppServerSubprocess(
-            self.jfa_server_app,
-            storage_dir=self.storage_fabric_a,
-            port=random.randint(5001, 5999),
-            discriminator=random.randint(0, 4095),
-            passcode=self.JFADMIN_fabric_a_passcode,
-            extra_args=["--capabilities", "0x04", "--rpc-server-port", "33033"])
-        self.fabric_a_admin.start(
-            expected_output="Server initialization complete",
-            timeout=20)
+        if self.is_pics_sdk_ci_only:
+            dut_rpc_server_ip = "127.0.0.1"
+            jfadmin_fabric_a_passcode = random.randint(110220011, 110220999)
+            jfadmin_fabric_a_discriminator = random.randint(0, 4095)
+            dut_rpc_server_port = "33033"
+            # Start Fabric A JF-Administrator App
+            self.fabric_a_admin = AppServerSubprocess(
+                self.jfa_server_app,
+                storage_dir=self.storage_fabric_a,
+                port=random.randint(5001, 5999),
+                discriminator=jfadmin_fabric_a_discriminator,
+                passcode=jfadmin_fabric_a_passcode,
+                extra_args=["--capabilities", "0x04", "--rpc-server-port", dut_rpc_server_port])
+            self.fabric_a_admin.start(
+                expected_output="Server initialization complete",
+                timeout=20)
+        else:
+            # We have a DUT that is already running, connect to it via RPC
+            dut_rpc_server_ip = self.user_params.get("dut_rpc_server_ip", None)
+            if not dut_rpc_server_ip:
+                asserts.fail("DUT RPC server IP must be specified via --string-arg dut_rpc_server_ip:<ip_address>")
+            dut_rpc_server_port = self.user_params.get("dut_rpc_server_port", None)
+            if not dut_rpc_server_port:
+                asserts.fail("DUT RPC server PORT must be specified via --string-arg dut_rpc_server_port:<port>")
+            if not self.matter_test_config.setup_passcodes:
+                asserts.fail("JF-Administrator passcode must be specified via --passcode:<passcode>")
+            jfadmin_fabric_a_passcode = self.matter_test_config.setup_passcodes[0]
 
         # Start Fabric A JF-Controller App
         self.fabric_a_ctrl = JFControllerSubprocess(
             self.jfc_server_app,
             "JFC-A",
-            rpc_server_port=33033,
+            rpc_server_port=dut_rpc_server_port,
             storage_dir=self.storage_fabric_a,
-            vendor_id=self.jfctrl_fabric_a_vid)
+            vendor_id=self.jfctrl_fabric_a_vid,
+            extra_args=["--rpc-server-ip", dut_rpc_server_ip])
         self.fabric_a_ctrl.start(
             expected_output="CHIP task running",
             timeout=20)
 
         # Commission JF-ADMIN app with JF-Controller on Fabric A
         self.fabric_a_ctrl.send(
-            message=f"pairing onnetwork 1 {self.JFADMIN_fabric_a_passcode} --anchor true",
+            message=f"pairing onnetwork 1 {jfadmin_fabric_a_passcode} --anchor true",
             expected_output="[JF] Anchor Administrator (nodeId=1) commissioned with success",
             timeout=20)
 
