@@ -37,7 +37,7 @@ class TerminableResource(contextlib.AbstractContextManager, ABC):
 
     def __exit__(self, exc_type: type[BaseException] | None, exc_value: BaseException | None,
                  traceback: TracebackType | None) -> bool | None:
-        log.error("Terminating %s", self.__class__.__name__)
+        log.debug("Terminating %s", self.__class__.__name__)
         try:
             self.resource_terminate()
         except BaseException as e:
