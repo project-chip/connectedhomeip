@@ -53,9 +53,8 @@ def ValidateRepoPath(context, parameter, value):
     for name in ['BUILD.gn', '.gn', os.path.join('scripts', 'bootstrap.sh')]:
         expected_file = os.path.join(value, name)
         if not os.path.exists(expected_file):
-            raise click.BadParameter(
-                ("'%s' does not look like a valid repository path: "
-                 "%s not found.") % (value, expected_file))
+            raise click.BadParameter("'%s' does not look like a valid repository path: "
+                                     "%s not found." % (value, expected_file))
     return value
 
 
