@@ -29,7 +29,6 @@ from __future__ import absolute_import, print_function
 
 import sys
 
-from six.moves import range  # noqa: A004
 
 __all__ = ['ComputeCheckChar',   'VerifyCheckChar',
            'ComputeCheckChar16', 'VerifyCheckChar16',
