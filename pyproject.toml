@@ -51,29 +51,20 @@ select = [
     # Check for builtin symbols aliasing
     "A",
     # pyupgrade rules to update syntax to the new preferred variant
-    "UP019",
-    "UP020",
-    "UP021",
-    "UP022",
-    "UP026",
-    "UP028",
-    "UP029",
-    "UP030",
-    "UP036",
-    "UP042",
+    "UP019", "UP020", "UP021", "UP022", "UP026", "UP028", "UP029", "UP030", "UP036", "UP042",
 ]
 ignore = [
-    "ASYNC109",  # Sometimes we use "timeout" argument in async functions
-    "ASYNC230",  # Allow open() calls in async functions
-    "ASYNC240",  # Do not force 3rd party library to handle os.path.exists()
-    "ASYNC250",  # TODO: Refactor the usage of input() in async functions
-    "COM812",  # Do not enforce trailing commas in multi-line collections for now
-    "SIM102",  # Nested if statements can be more readable in some cases
-    "SIM108",  # Do not enforce ternary operator in place of if/else blocks
-    "SIM114",  # Separate if statements can be more readable in some cases
-    "SIM905",  # Sometimes using "command arg1 arg2".split() is more readable
-    "E501",  # Do not report line length issues (formatter should handle this)
-    "E721",  # We use it for good reasons
+    "ASYNC109", # Sometimes we use "timeout" argument in async functions
+    "ASYNC230", # Allow open() calls in async functions
+    "ASYNC240", # Do not force 3rd party library to handle os.path.exists()
+    "ASYNC250", # TODO: Refactor the usage of input() in async functions
+    "COM812", # Do not enforce trailing commas in multi-line collections for now
+    "SIM102", # Nested if statements can be more readable in some cases
+    "SIM108", # Do not enforce ternary operator in place of if/else blocks
+    "SIM114", # Separate if statements can be more readable in some cases
+    "SIM905", # Sometimes using "command arg1 arg2".split() is more readable
+    "E501", # Do not report line length issues (formatter should handle this)
+    "E721", # We use it for good reasons
 ]
 
 [tool.mypy]
