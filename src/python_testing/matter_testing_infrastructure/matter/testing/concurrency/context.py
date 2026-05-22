@@ -45,6 +45,7 @@ class TerminableResource(contextlib.AbstractContextManager, ABC):
         log.debug("Terminating %s", self.__class__.__name__)
         try:
             self.resource_terminate()
+            log.debug("Terminated %s", self.__class__.__name__)
         except BaseException as e:
             log.error("Failed to terminate resource %s: %r", self.__class__.__name__, e)
             e.add_note(f"Failure during termination of resource {self.__class__.__name__}")
