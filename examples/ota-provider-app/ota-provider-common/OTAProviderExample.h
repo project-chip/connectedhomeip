@@ -104,6 +104,7 @@ public:
     uint16_t GetProductId() const { return mProductId; }
     uint16_t GetHardwareVersion() const { return mHardwareVersion; }
     uint32_t GetSoftwareVersion() const { return mRequestorSoftwareVersion; }
+    uint32_t GetApplyRequestSentStatus() const { return mApplyUpdateRequestSent; }
     chip::Span<const DownloadProtocolEnum> GetProtocolsSupported() const
     {
         return chip::Span<const DownloadProtocolEnum>(mProtocolsSupported);
@@ -161,4 +162,5 @@ private:
     DownloadProtocolEnum mProtocolsSupported[kMaxProtocolsSupported];
     bool mRequestorCanConsent;
     char mLocation[kMaxLocation] = { 0, 0, 0 };
+    bool mApplyUpdateRequestSent = false;
 };

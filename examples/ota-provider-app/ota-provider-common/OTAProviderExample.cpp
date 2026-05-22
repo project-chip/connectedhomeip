@@ -511,6 +511,8 @@ void OTAProviderExample::HandleApplyUpdateRequest(app::CommandHandler * commandO
     mDelayedApplyActionTimeSec = 0;
     // Reset back to success case for subsequent uses
     mUpdateAction = OTAApplyUpdateAction::kProceed;
+    // Get the value for named pipes
+    mApplyUpdateRequestSent = true;
 
     // Either sends the response or an error status
     commandObj->AddResponse(commandPath, response);
@@ -525,6 +527,7 @@ void OTAProviderExample::HandleNotifyUpdateApplied(app::CommandHandler * command
 
     GetUpdateTokenString(commandData.updateToken, tokenBuf, kUpdateTokenStrLen);
     ChipLogDetail(SoftwareUpdate, "%s: token: %s, version: %" PRIu32, __FUNCTION__, tokenBuf, commandData.softwareVersion);
+    mApplyUpdateRequestSent = false;
 
     commandObj->AddStatus(commandPath, Status::Success);
 }

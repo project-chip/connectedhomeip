@@ -39,6 +39,8 @@
 #       --PICS src/app/tests/suites/certification/ci-pics-values
 #       --string-arg provider_app_path:${OTA_PROVIDER_APP}
 #       --string-arg ota_image:${SU_OTA_REQUESTOR_V2}
+#       --string-arg provider_app_pipe_out:/tmp/provider_pipe_out_2_5
+#       --string-arg provider_app_pipe:/tmp/provider_pipe_2_5
 #       --int-arg ota_image_expected_version:2
 #       --int-arg ota_provider_port:5541
 #       --int-arg ota_image_download_timeout:300
@@ -95,6 +97,8 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         self.ota_provider_port = self.user_params.get('ota_provider_port', 5541)
         self.provider_kvs_path = self.user_params.get('provider_kvs_path', '/tmp/chip_kvs_provider')
         self.provider_log = self.user_params.get('provider_log_path', '/tmp/provider_log_2_5.log')
+        self.provider_app_pipe_out = self.user_params.get('provider_app_pipe_out', '/tmp/provider_app_pipe_2_5')
+        self.provider_app_pipe = self.user_params.get('provider_app_pipe', '/tmp/provider_app_pipe_2_5')
         # On average the ota image build for the CI is 1.8 MB which takes 4-5 min to download. Adjust if needed.
         self.ota_image_download_timeout = self.user_params.get('ota_image_download_timeout', 60*5)
         logger.info(f"Image download timeout is set to {self.ota_image_download_timeout} seconds")
@@ -121,8 +125,12 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         self.requestor_node_id = self.dut_node_id  # 123 with discriminator 123
         self.requestor_passcode = self.matter_test_config.setup_passcodes[0]
         self.controller = self.default_controller
+
+        # pipe out arguments
+        self.pipe_arguments = ['--app-pipe-out', self.provider_app_pipe_out, '--app-pipe', self.provider_app_pipe]
+        logger.info(f"PROVIDER PIPE OUT {self.provider_app_pipe_out} ,  PROVIDER PIPE {self.provider_app_pipe}")
         # Extra Arguments required for the step 1
-        extra_arguments = ['--applyUpdateAction', 'proceed', '--delayedApplyActionTimeSec', '0']
+        extra_arguments = ['--applyUpdateAction', 'proceed', '--delayedApplyActionTimeSec', '0'] + self.pipe_arguments
 
         self.start_provider(
             provider_app_path=self.provider_app_path,
@@ -214,12 +222,18 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
             "Update state is Downloading",
             lambda report: report.value == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading)
         update_state_attr_handler.await_all_expected_report_matches([update_state_match], timeout_sec=600)
-
+        self.write_to_app_pipe(command_dict={"Name": "GetApplyUpdateRequestStatus"}, app_pipe=self.provider_app_pipe)
+        pipe_data = self.read_from_app_pipe(self.provider_app_pipe_out)
+        logger.info(f"PIPE INFO {pipe_data}")
         update_state_match = AttributeMatcher.from_callable(
             "Update state is Applying",
             lambda report: report.value == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kApplying)
         update_state_attr_handler.await_all_expected_report_matches(
             [update_state_match], timeout_sec=self.ota_image_download_timeout)
+
+        self.write_to_app_pipe(command_dict={"Name": "GetApplyUpdateRequestStatus"}, app_pipe=self.provider_app_pipe)
+        pipe_data = self.read_from_app_pipe(self.provider_app_pipe_out)
+        logger.info(f"PIPE INFO {pipe_data}")
 
         await self._wait_for_idle_after_softwareaupdate(update_state_handler=update_state_attr_handler)
 
@@ -241,7 +255,8 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
             cluster=Clusters.BasicInformation,
             attribute=Clusters.BasicInformation.Attributes.SoftwareVersion,
             node_id=self.requestor_node_id)
-        extra_arguments = ['--applyUpdateAction', 'proceed', '--delayedApplyActionTimeSec', str(delayed_apply_action_time)]
+        extra_arguments = ['--applyUpdateAction', 'proceed', '--delayedApplyActionTimeSec',
+                           str(delayed_apply_action_time)] + self.pipe_arguments
         self.start_provider(
             provider_app_path=self.provider_app_path,
             ota_image_path=self.ota_image,
@@ -271,6 +286,9 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
                                               fabric_filtered=False, min_interval_sec=0, max_interval_sec=5)
 
         await self.announce_ota_provider(self.controller, self.provider_node_id, self.requestor_node_id)
+        self.write_to_app_pipe(command_dict={"Name": "GetApplyUpdateRequestStatus"}, app_pipe=self.provider_app_pipe)
+        pipe_data = self.read_from_app_pipe(self.provider_app_pipe_out)
+        logger.info(f"PIPE INFO {pipe_data}")
 
         update_state_match = AttributeMatcher.from_callable(
             "Update state is Downloading",
@@ -282,6 +300,9 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
             lambda report: report.value == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kApplying)
         update_state_attr_handler.await_all_expected_report_matches(
             [update_state_match], timeout_sec=self.ota_image_download_timeout)
+        self.write_to_app_pipe(command_dict={"Name": "GetApplyUpdateRequestStatus"}, app_pipe=self.provider_app_pipe)
+        pipe_data = self.read_from_app_pipe(self.provider_app_pipe_out)
+        logger.info(f"PIPE INFO {pipe_data}")
 
         # Device should stay in ApplyingState During 180 seconds and not Apply the software Update after the 60 seconds.
         software_version_match = AttributeMatcher.from_callable(
