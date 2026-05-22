@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -807,6 +807,7 @@ public:
 
     CHIP_ERROR SetStatus(PowerSourceStatusEnum val)
     {
+        VerifyOrReturnError(val != PowerSourceStatusEnum::kUnknownEnumValue, CHIP_ERROR_INVALID_ARGUMENT);
         SetAttributeValue(this->status, val, PowerSource::Attributes::Status::Id);
         return CHIP_NO_ERROR;
     }
@@ -817,7 +818,7 @@ public:
         if (mContext != nullptr && val != this->order)
         {
             AttributePersistence attributePersistence(mContext->attributeStorage);
-            attributePersistence.StoreNativeEndianValue({ mPath.mEndpointId, mPath.mClusterId, Order::Id }, val);
+            LogErrorOnFailure(attributePersistence.StoreNativeEndianValue({ mPath.mEndpointId, mPath.mClusterId, Order::Id }, val));
         }
 
         SetAttributeValue(this->order, val, Order::Id);
@@ -980,6 +981,7 @@ public:
     {
         ENABLE_IF_ATTRIBUTE_SUPPORTED(BatChargeLevel)
         {
+            VerifyOrReturnError(val != BatChargeLevelEnum::kUnknownEnumValue, CHIP_ERROR_INVALID_ARGUMENT);
             SetAttributeValue(this->batChargeLevel, val, PowerSource::Attributes::BatChargeLevel::Id);
             return CHIP_NO_ERROR;
         }
@@ -1047,6 +1049,7 @@ public:
     {
         ENABLE_IF_ATTRIBUTE_SUPPORTED(BatChargeState)
         {
+            VerifyOrReturnError(val != BatChargeStateEnum::kUnknownEnumValue, CHIP_ERROR_INVALID_ARGUMENT);
             SetAttributeValue(this->batChargeState, val, PowerSource::Attributes::BatChargeState::Id);
             return CHIP_NO_ERROR;
         }

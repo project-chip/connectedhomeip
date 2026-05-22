@@ -30,9 +30,9 @@ This will be made more clear using examples
     optional attributes
 
     ```cpp
-    #include <app/clusters/PowerSourceCluster.h>
+    #include <app/clusters/power-source-server/PowerSourceCluster.h>
     #include <app/server-cluster/SingleEndpointServerClusterRegistry.h>
-    #include <data-model-provider/CodeDrivenDataModelProvider.h>
+    #include <data-model-providers/codedriven/CodeDrivenDataModelProvider.h>
 
     using namespace app;
     using namespace app::Clusters;
@@ -99,10 +99,10 @@ This will be made more clear using examples
     of these configurations.
 
     ```cpp
-     #include <app/clusters/PowerSourceCluster.h>
+     #include <app/clusters/power-source-server/PowerSourceCluster.h>
      #include <app/server-cluster/SingleEndpointServerClusterRegistry.h>
      #include <platform/DefaultTimerDelegate.h>
-     #include <data-model-provider/CodeDrivenDataModelProvider.h>
+     #include <data-model-providers/codedriven/CodeDrivenDataModelProvider.h>
 
      using namespace app;
      using namespace app::Clusters;
@@ -207,10 +207,10 @@ This will be made more clear using examples
     possible to do this with one template specialization by design.
 
     ```cpp
-     #include <app/clusters/PowerSourceCluster.h>
+     #include <app/clusters/power-source-server/PowerSourceCluster.h>
      #include <app/server-cluster/SingleEndpointServerClusterRegistry.h>
      #include <platform/DefaultTimerDelegate.h>
-     #include <data-model-provider/CodeDrivenDataModelProvider.h>
+     #include <data-model-providers/codedriven/CodeDrivenDataModelProvider.h>
 
      using namespace app;
      using namespace app::Clusters;
