@@ -9,8 +9,8 @@ description:
 # ZAP and Matter File Analysis Skill
 
 This skill provides instructions and common commands for analyzing ZAP (.zap)
-and `.matter` files in the Matter repository. These files define
-the data model of the applications.
+and `.matter` files in the Matter repository. These files define the data model
+of the applications.
 
 ## 1. ZAP File Analysis (.zap)
 
@@ -114,8 +114,10 @@ programmatically. Below is the schema/structure of a `.zap` file:
     -   `code` (number): Cluster ID (e.g., `6`).
     -   `side` (string): `"client"` or `"server"`.
     -   `enabled` (number): `1` if enabled, `0` if disabled.
-    -   `attributes` (array, optional): Configuration of attributes for this cluster.
-    -   `commands` (array, optional): Configuration of commands for this cluster.
+    -   `attributes` (array, optional): Configuration of attributes for this
+        cluster.
+    -   `commands` (array, optional): Configuration of commands for this
+        cluster.
     -   `events` (array, optional): Configuration of events for this cluster.
 
 -   **`attributes` Object (inside `clusters`)**:
