@@ -17,7 +17,7 @@ limitations under the License.
 import shlex
 from pathlib import Path
 
-CHIP_REPO = Path(__file__).resolve().parents[4]
+CHIP_REPO = Path(__file__).absolute().parents[4]
 CHIP_REPO_STR = str(CHIP_REPO)
 CONTROLLER_TEST_SCRIPTS_DIR = CHIP_REPO / "src/controller/python/tests/scripts"
 MATTER_DEVELOPMENT_PAA_ROOT_CERTS_ESC = shlex.quote(str(CHIP_REPO / "credentials/development/paa-root-certs"))
