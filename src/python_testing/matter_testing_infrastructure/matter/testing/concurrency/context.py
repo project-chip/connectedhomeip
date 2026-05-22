@@ -26,7 +26,13 @@ class TerminableResource(contextlib.AbstractContextManager, ABC):
 
     def __enter__(self) -> Self:
         log.debug("Starting %s", self.__class__.__name__)
-        self.resource_start()
+        try:
+            self.resource_start()
+        except BaseException as e:
+            log.error("Failed to start resource: %s", e)
+            e.add_note(f"Failure during start of resource {self.__class__.__name__}")
+            self.resource_terminate()
+            raise
         return self
 
     def __exit__(self, exc_type: type[BaseException] | None, exc_value: BaseException | None,
