@@ -21,7 +21,7 @@ import subprocess
 from matter.testing.concurrency.context import TerminableResource
 
 
-class DBusTestSystemBus(subprocess.Popen[bytes], TerminableResource):
+class DBusTestSystemBus(TerminableResource, subprocess.Popen[bytes]):
     """Run a dbus-daemon in a subprocess as a test system bus."""
 
     SOCKET = pathlib.Path(f"/tmp/chip-dbus-{os.getpid()}")

@@ -23,7 +23,7 @@ from matter.testing.concurrency.context import TerminableResource
 log = logging.getLogger(__name__)
 
 
-class BluetoothMock(subprocess.Popen[str], TerminableResource):
+class BluetoothMock(TerminableResource, subprocess.Popen[str]):
     """Run a BlueZ mock server in a subprocess."""
 
     # The MAC addresses of the virtual Bluetooth adapters.
