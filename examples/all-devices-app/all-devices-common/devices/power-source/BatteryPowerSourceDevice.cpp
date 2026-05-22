@@ -28,7 +28,7 @@ BatteryPowerSourceDevice::BatteryPowerSourceDevice(CharSpan description,
                                                    Clusters::PowerSource::BatReplaceabilityEnum replaceability,
                                                    TimerDelegate & timerDelegate) :
     SingleEndpointDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kPowerSource, 1)),
-    mTimerDelegate(timerDelegate), desc(description), replability(replaceability)
+    mTimerDelegate(timerDelegate), mDescription(description), mReplaceability(replaceability)
 {}
 
 CHIP_ERROR BatteryPowerSourceDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
@@ -37,7 +37,7 @@ CHIP_ERROR BatteryPowerSourceDevice::Register(chip::EndpointId endpoint, CodeDri
     ReturnErrorOnFailure(SingleEndpointRegistration(endpoint, provider, parentId));
 
     // Power Source (some arbitrary configuration)
-    SimpleBatteryPowerSourceCluster::ConfigType config(endpoint, desc, replability, mTimerDelegate);
+    SimpleBatteryPowerSourceCluster::ConfigType config(endpoint, mDescription, mReplaceability, mTimerDelegate);
     config.usedOptionalAttributes.Set<BatPercentRemainingId>();
     config.status = Clusters::PowerSource::PowerSourceStatusEnum::kActive;
     config.order  = 0;

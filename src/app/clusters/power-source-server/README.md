@@ -181,7 +181,7 @@ This will be made more clear using examples
 
     MyBatteryPowerSourceCluster::ConfigType config3(powerSourceEndpointId1, "Replaceable battery cluster"_span, PowerSource::BatReplaceabilityEnum::kUserReplaceable, timerDelegate);
     // make it replaceable
-    config3.MakeReplaceable("Description for replacement", /* quantity */ 1);
+    config3.MakeReplaceable("Description for replacement"_span, /* quantity */ 1);
     config3.batTimeRemaining = 3600; // 1h estimated uptime
     config3.batCapacity = 2000; // 2000 mAh capacity
     config3.usedOptionalAttributes = attrSet3;

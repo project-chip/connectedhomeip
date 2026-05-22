@@ -47,8 +47,8 @@ public:
 
 protected:
     TimerDelegate & mTimerDelegate;
-    CharSpan desc;
-    Clusters::PowerSource::BatReplaceabilityEnum replability;
+    CharSpan mDescription;
+    Clusters::PowerSource::BatReplaceabilityEnum mReplaceability;
 
     LazyRegisteredServerCluster<SimpleBatteryPowerSourceCluster> mBatteryPowerSourceCluster;
 };
