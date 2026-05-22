@@ -159,8 +159,6 @@
 #include <openthread/instance.h>
 #endif
 
-#include <access/examples/GroupAuxiliaryAccessControlDelegate.h>
-
 using namespace chip;
 using namespace chip::ArgParser;
 using namespace chip::Credentials;
@@ -987,13 +985,6 @@ void ChipLinuxAppMainLoop(chip::ServerInitParams & initParams, AppMainLoopImplem
         initParams.advertiseCommissionableIfNoFabrics = false;
     }
 
-#if CHIP_CONFIG_ENABLE_GROUPCAST
-    initParams.groupDataProvider->SetGroupcastEnabled(true);
-    static chip::Access::Examples::GroupAuxiliaryAccessControlDelegate groupAuxDelegate(initParams.groupDataProvider,
-                                                                                        &Server::GetInstance().GetFabricTable());
-    initParams.groupAuxiliaryAccessControlDelegate = &groupAuxDelegate;
-#endif
-
     // Set DAC provider before server init because Operational Credentials may snapshot
     // the provider during cluster construction.
     SetDeviceAttestationCredentialsProvider(LinuxDeviceOptions::GetInstance().dacProvider);
@@ -1111,11 +1102,10 @@ void ChipLinuxAppMainLoop(chip::ServerInitParams & initParams, AppMainLoopImplem
     Server::GetInstance().Shutdown();
 
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
-    // Commissioner shutdown call shuts down entire stack, including the platform manager.
     ShutdownCommissioner();
-#else
-    DeviceLayer::PlatformMgr().Shutdown();
 #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+
+    DeviceLayer::PlatformMgr().Shutdown();
 
 #if ENABLE_TRACING
     tracing_setup.StopTracing();
