@@ -84,7 +84,7 @@ public:
 
     bool HasTemperature() const override { return true; }
     temperature Temperature() const override { return mTemperature; }
-    void SetTemperature(temperature temp) { mTemperature = temp; }
+    bool SetTemperature(temperature temp); // returns true if the temperature was changed
 
 private:
     temperature mTemperature;
@@ -107,7 +107,7 @@ public:
 
     bool HasTemperature() const override { return mTemperature.HasValue(); }
     temperature Temperature() const override { return mTemperature.Value(); }
-    void SetTemperature(temperature temp) { mTemperature.SetValue(temp); }
+    bool SetTemperature(temperature temp); // returns true if the temperature was changed
 
 private:
     Optional<temperature> mTemperature;

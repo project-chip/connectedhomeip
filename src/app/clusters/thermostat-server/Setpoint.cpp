@@ -25,6 +25,20 @@ namespace app {
 namespace Clusters {
 namespace Thermostat {
 
+bool AbsoluteSetpoint::SetTemperature(temperature temp)
+{
+    bool changed = (mTemperature != temp);
+    mTemperature = temp;
+    return changed;
+}
+
+bool OptionalSetpoint::SetTemperature(temperature temp)
+{
+    bool changed = !mTemperature.HasValue() || (mTemperature.Value() != temp);
+    mTemperature.SetValue(temp);
+    return changed;
+}
+
 SystemModeEnum BaseSetpoint::Mode() const
 {
     switch (mAttributeId)

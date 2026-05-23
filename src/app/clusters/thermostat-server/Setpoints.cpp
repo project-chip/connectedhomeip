@@ -201,16 +201,20 @@ void Setpoints::FixUserLimits(SetpointLimits<AbsoluteSetpoint> & absoluteLimits,
         ChipLogError(Zcl, "Thermostat:Setpoints::FixUserLimits: invalid user %s minimum: %" PRId16,
                      userLimits.absoluteLimits.Mode() == SystemModeEnum::kHeat ? "heating" : "cooling",
                      userLimits.minimum.Temperature());
-        userLimits.minimum.SetTemperature(absoluteLimits.Minimum());
-        fixedAttributes.Set(userLimits.minimum.AttributeId());
+        if (userLimits.minimum.SetTemperature(absoluteLimits.Minimum()))
+        {
+            fixedAttributes.Set(userLimits.minimum.AttributeId());
+        }
     }
     if (!absoluteLimits.Valid(userLimits.maximum))
     {
         ChipLogError(Zcl, "Thermostat:Setpoints::FixUserLimits: invalid user %s maximum: %" PRId16,
                      userLimits.absoluteLimits.Mode() == SystemModeEnum::kHeat ? "heating" : "cooling",
                      userLimits.maximum.Temperature());
-        userLimits.maximum.SetTemperature(absoluteLimits.Maximum());
-        fixedAttributes.Set(userLimits.maximum.AttributeId());
+        if (userLimits.maximum.SetTemperature(absoluteLimits.Maximum()))
+        {
+            fixedAttributes.Set(userLimits.maximum.AttributeId());
+        }
     }
     if (!userLimits.IsValid()) {
         // We somehow ended up with a user limit maximum that's less than the minimum
@@ -221,8 +225,10 @@ void Setpoints::FixUserLimits(SetpointLimits<AbsoluteSetpoint> & absoluteLimits,
                          ", moving maximum to %" PRId16,
                          userLimits.absoluteLimits.Mode() == SystemModeEnum::kHeat ? "heating" : "cooling",
                          userLimits.minimum.Temperature(), userLimits.maximum.Temperature(), userLimits.Minimum());
-            userLimits.maximum.SetTemperature(userLimits.Minimum());
-            fixedAttributes.Set(userLimits.maximum.AttributeId());
+            if (userLimits.maximum.SetTemperature(userLimits.Minimum()))
+            {
+                fixedAttributes.Set(userLimits.maximum.AttributeId());
+            }
         }
         else if (changedAttributes.Has(userLimits.maximum.AttributeId()))
         {
@@ -231,8 +237,10 @@ void Setpoints::FixUserLimits(SetpointLimits<AbsoluteSetpoint> & absoluteLimits,
                          ", moving minimum to %" PRId16,
                          userLimits.absoluteLimits.Mode() == SystemModeEnum::kHeat ? "heating" : "cooling",
                          userLimits.minimum.Temperature(), userLimits.maximum.Temperature(), userLimits.Maximum());
-            userLimits.minimum.SetTemperature(userLimits.Maximum());
-            fixedAttributes.Set(userLimits.minimum.AttributeId());
+            if (userLimits.minimum.SetTemperature(userLimits.Maximum()))
+            {
+                fixedAttributes.Set(userLimits.minimum.AttributeId());
+            }
         }
         else
         {
@@ -263,7 +271,7 @@ void Setpoints::FixUserLimitDeadband(OptionalSetpoint & heatLimit, OptionalSetpo
         return;
     }
     // Our new limits violate the deadband
-    if (changedAttributes.HasAny(heatLimit.AttributeId()))
+    if (changedAttributes.HasAny(Attributes::MinHeatSetpointLimit::Id, Attributes::MaxHeatSetpointLimit::Id))
     {
         // If the user was adjusting the heat limit, then we assume they
         // want to keep it at that value, and we'll move the cool
@@ -275,8 +283,10 @@ void Setpoints::FixUserLimitDeadband(OptionalSetpoint & heatLimit, OptionalSetpo
                             "Thermostat:Setpoints::FixUserLimitDeadband: increasing cool limit from %" PRId16 " to %" PRId16
                             " to maintain deadband %" PRId16 "",
                             coolLimit.Temperature(), newCoolLimit, deadBand);
-            coolLimit.SetTemperature(newCoolLimit);
-            fixedAttributes.Set(coolLimit.AttributeId());
+            if (coolLimit.SetTemperature(newCoolLimit))
+            {
+                fixedAttributes.Set(coolLimit.AttributeId());
+            }
         }
         else
         {
@@ -286,13 +296,17 @@ void Setpoints::FixUserLimitDeadband(OptionalSetpoint & heatLimit, OptionalSetpo
                             "Thermostat:Setpoints::FixUserLimitDeadband: setting cool limit to absolute max %" PRId16
                             ", and heat limit to %" PRId16 " to maintain deadband %" PRId16 "",
                             absoluteCoolLimit, absoluteCoolLimit - deadBand, deadBand);
-            coolLimit.SetTemperature(absoluteCoolLimit);
-            heatLimit.SetTemperature(absoluteCoolLimit - deadBand);
-            fixedAttributes.Set(coolLimit.AttributeId());
-            fixedAttributes.Set(heatLimit.AttributeId());
+            if (coolLimit.SetTemperature(absoluteCoolLimit))
+            {
+                fixedAttributes.Set(coolLimit.AttributeId());
+            }
+            if (heatLimit.SetTemperature(absoluteCoolLimit - deadBand))
+            {
+                fixedAttributes.Set(heatLimit.AttributeId());
+            }
         }
     }
-    else if (changedAttributes.Has(coolLimit.AttributeId()))
+    else if (changedAttributes.HasAny(Attributes::MinCoolSetpointLimit::Id, Attributes::MaxCoolSetpointLimit::Id))
     {
         // If the user was adjusting the cool limit, then we assume they 
         // want to keep it at that value, and we'll move the heat
@@ -304,18 +318,24 @@ void Setpoints::FixUserLimitDeadband(OptionalSetpoint & heatLimit, OptionalSetpo
                             "Thermostat:Setpoints::FixUserLimitDeadband: decreasing heat limit from %" PRId16 " to %" PRId16
                             " to maintain deadband %" PRId16 "",
                             heatLimit.Temperature(), newHeatLimit, deadBand);
-            heatLimit.SetTemperature(newHeatLimit);
-            fixedAttributes.Set(heatLimit.AttributeId());
+            if (heatLimit.SetTemperature(newHeatLimit))
+            {
+                fixedAttributes.Set(heatLimit.AttributeId());
+            }
         }
         else
         {
             // ...unless that violates the absolute maximum, in which case we set the heat max to the absolute max,
             // and adjust the cool max upwards to maintain the deadband
             ChipLogProgress(Zcl, "Thermostat:Setpoints::FixUserLimitDeadband: setting heat limit to absolute max %" PRId16 ", and cool limit to %" PRId16 " to maintain deadband %" PRId16 "", absoluteHeatLimit, absoluteHeatLimit + deadBand, deadBand);
-            heatLimit.SetTemperature(absoluteHeatLimit);
-            coolLimit.SetTemperature(absoluteHeatLimit + deadBand);
-            fixedAttributes.Set(coolLimit.AttributeId());
-            fixedAttributes.Set(heatLimit.AttributeId());
+            if (heatLimit.SetTemperature(absoluteHeatLimit))
+            {
+                fixedAttributes.Set(heatLimit.AttributeId());
+            }
+            if (coolLimit.SetTemperature(absoluteHeatLimit + deadBand))
+            {
+                fixedAttributes.Set(coolLimit.AttributeId());
+            }
         }
     }
     else
@@ -332,8 +352,10 @@ void Setpoints::FixRange(SetpointRange & range, SetpointAttributes & changedAttr
                         "Thermostat:Setpoints::FixRange: heating setpoint %" PRId16 " is outside the allowed limits ( %" PRId16
                         " - %" PRId16 "), clamping...",
                         range.heating.Temperature(), userHeatLimits.Minimum(), userHeatLimits.Maximum());
-        range.heating.SetTemperature(userHeatLimits.Clamp(range.heating.Temperature()));
-        fixedAttributes.Set(range.heating.AttributeId());
+        if (range.heating.SetTemperature(userHeatLimits.Clamp(range.heating.Temperature())))
+        {
+            fixedAttributes.Set(range.heating.AttributeId());
+        }
     }
     if (!userCoolLimits.Valid(range.cooling))
     {
@@ -341,8 +363,10 @@ void Setpoints::FixRange(SetpointRange & range, SetpointAttributes & changedAttr
                         "Thermostat:Setpoints::FixRange: cooling setpoint %" PRId16 " is outside the allowed limits ( %" PRId16
                         " - %" PRId16 "), clamping...",
                         range.cooling.Temperature(), userCoolLimits.Minimum(), userCoolLimits.Maximum());
-        range.cooling.SetTemperature(userCoolLimits.Clamp(range.cooling.Temperature()));
-        fixedAttributes.Set(range.cooling.AttributeId());
+        if (range.cooling.SetTemperature(userCoolLimits.Clamp(range.cooling.Temperature())))
+        {
+            fixedAttributes.Set(range.cooling.AttributeId());
+        }
     }
     ChipLogProgress(
         Zcl, "Thermostat:Setpoints::FixRange: autoSupported: %s, min deadband is %" PRId16 ", actual deadband is %" PRId16 "",
@@ -365,8 +389,10 @@ void Setpoints::FixRange(SetpointRange & range, SetpointAttributes & changedAttr
                             "Thermostat:Setpoints::FixRange: increasing cooling setpoint from %" PRId16 " to %" PRId16
                             " to maintain deadband %" PRId16 "",
                             range.cooling.Temperature(), newCoolLimit, deadBand);
-            range.cooling.SetTemperature(newCoolLimit);
-            fixedAttributes.Set(range.cooling.AttributeId());
+            if (range.cooling.SetTemperature(newCoolLimit))
+            {
+                fixedAttributes.Set(range.cooling.AttributeId());
+            }
         }
         else
         {
@@ -376,10 +402,14 @@ void Setpoints::FixRange(SetpointRange & range, SetpointAttributes & changedAttr
                             "Thermostat:Setpoints::FixRange: cooling setpoint %" PRId16 " is outside the allowed limits ( %" PRId16
                             " - %" PRId16 "), clamping to cooling limit max to maintain deadband %" PRId16 "",
                             range.cooling.Temperature(), userCoolLimits.Minimum(), userCoolLimits.Maximum(), deadBand);
-            range.cooling.SetTemperature(userCoolLimits.Maximum());
-            range.heating.SetTemperature(range.cooling.Temperature() - deadBand);
-            fixedAttributes.Set(range.cooling.AttributeId());
-            fixedAttributes.Set(range.heating.AttributeId());
+            if (range.cooling.SetTemperature(userCoolLimits.Maximum()))
+            {
+                fixedAttributes.Set(range.cooling.AttributeId());
+            }
+            if (range.heating.SetTemperature(range.cooling.Temperature() - deadBand))
+            {
+                fixedAttributes.Set(range.heating.AttributeId());
+            }
         }
     }
     else if (changedAttributes.HasAny(range.cooling.AttributeId(), Attributes::MinCoolSetpointLimit::Id,
@@ -391,17 +421,23 @@ void Setpoints::FixRange(SetpointRange & range, SetpointAttributes & changedAttr
         temperature newHeatLimit = range.cooling.Temperature() - deadBand;
         if (userHeatLimits.Valid(newHeatLimit))
         {
-            range.heating.SetTemperature(newHeatLimit);
-            fixedAttributes.Set(range.heating.AttributeId());
+            if (range.heating.SetTemperature(newHeatLimit))
+            {
+                fixedAttributes.Set(range.heating.AttributeId());
+            }
         }
         else
         {
             // ...unless that violates the heating limit minimum, in which case we set the heating setpoint to the limit min,
             // and adjust the cooling setpoint upwards to maintain the deadband
-            range.heating.SetTemperature(userHeatLimits.Minimum());
-            range.cooling.SetTemperature(range.heating.Temperature() + deadBand);
-            fixedAttributes.Set(range.cooling.AttributeId());
-            fixedAttributes.Set(range.heating.AttributeId());
+            if (range.heating.SetTemperature(userHeatLimits.Minimum()))
+            {
+                fixedAttributes.Set(range.heating.AttributeId());
+            }
+            if (range.cooling.SetTemperature(range.heating.Temperature() + deadBand))
+            {
+                fixedAttributes.Set(range.cooling.AttributeId());
+            }
         }
     }
     else
@@ -479,33 +515,37 @@ Status Setpoints::ChangeRange(SetpointRange & range, Optional<temperature> heat,
                     to_underlying(clamp));
     if (heatSupported && heat.HasValue())
     {
+        temperature heatVal = heat.Value();
         if (clamp == ClampMode::kClamp)
         {
-            range.heating.SetTemperature(userHeatLimits.Clamp(heat.Value()));
+            heatVal = userHeatLimits.Clamp(heatVal);
         }
-        else if (!userHeatLimits.Valid(heat.Value()))
+        else if (!userHeatLimits.Valid(heatVal))
         {
             ChipLogError(Zcl, "Thermostat: ChangeRange: heating setpoint %" PRId16 " is outside the allowed limits (%" PRId16 "-%" PRId16 ")", heat.Value(), userHeatLimits.Minimum(), userHeatLimits.Maximum());
             return Status::ConstraintError;
-        } else {
-            range.heating.SetTemperature(heat.Value());
         }
-        changedAttributes.Set(range.heating.AttributeId());
+        if (range.heating.SetTemperature(heatVal))
+        {
+            changedAttributes.Set(range.heating.AttributeId());
+        }
     }
     if (coolSupported && cool.HasValue())
     {
+        temperature coolVal = cool.Value();
         if (clamp == ClampMode::kClamp)
         {
-            range.cooling.SetTemperature(userCoolLimits.Clamp(cool.Value()));
+            coolVal = userCoolLimits.Clamp(coolVal);
         }
-        else if (!userCoolLimits.Valid(cool.Value()))
+        else if (!userCoolLimits.Valid(coolVal))
         {
             ChipLogError(Zcl, "Thermostat: ChangeRange: cooling setpoint %" PRId16 " is outside the allowed limits ( %" PRId16 " - %" PRId16 ")", cool.Value(), userCoolLimits.Minimum(), userCoolLimits.Maximum());
             return Status::ConstraintError;
-        } else {
-            range.cooling.SetTemperature(cool.Value());
         }
-        changedAttributes.Set(range.cooling.AttributeId());
+        if (range.cooling.SetTemperature(coolVal))
+        {
+            changedAttributes.Set(range.cooling.AttributeId());
+        }
     }
     return Fix(changedAttributes);
 }
@@ -534,16 +574,20 @@ Status Setpoints::ChangeLimits(UserSetpointLimits & userLimits, Optional<tempera
             ChipLogError(Zcl, "Thermostat: ChangeLimits: minimum setpoint %" PRId16 " is outside the allowed limits ( %" PRId16 " - %" PRId16 ")", min.Value(), userLimits.absoluteLimits.Minimum(), userLimits.absoluteLimits.Maximum());
             return Status::ConstraintError;
         }
-        userLimits.minimum.SetTemperature(min.Value());
-        changedAttributes.Set(userLimits.minimum.AttributeId());
+        if (userLimits.minimum.SetTemperature(min.Value()))
+        {
+            changedAttributes.Set(userLimits.minimum.AttributeId());
+        }
     } else {
         if (!userLimits.absoluteLimits.Valid(max.Value()))
         {
             ChipLogError(Zcl, "Thermostat: ChangeLimits: maximum setpoint %" PRId16 " is outside the allowed limits ( %" PRId16 " - %" PRId16 ")", max.Value(), userLimits.absoluteLimits.Minimum(), userLimits.absoluteLimits.Maximum());
             return Status::ConstraintError;
         }
-        userLimits.maximum.SetTemperature(max.Value());
-        changedAttributes.Set(userLimits.maximum.AttributeId());
+        if (userLimits.maximum.SetTemperature(max.Value()))
+        {
+            changedAttributes.Set(userLimits.maximum.AttributeId());
+        }
     }
 
     return Fix(changedAttributes);
