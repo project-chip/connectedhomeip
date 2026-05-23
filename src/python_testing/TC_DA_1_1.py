@@ -53,6 +53,7 @@ logger = logging.getLogger(__name__)
 '''
 Purpose
 This test case validates the following condition:
+
 - NOCs attribute gets deleted on the DUT after factory reset.
 
 Test Plan
@@ -77,16 +78,15 @@ class TC_DA_1_1(MatterBaseTest):
             TestStep(4, "TH2 opens a PASE session with the DUT"),
             TestStep(5, "TH2 does a non-fabric-filtered read of the Fabrics attribute from the Node Operational Credentials cluster", """
                      - Verify that TH1's fabric (public key + fabric ID) is not present in TH2's Fabrics list"""),
-            TestStep(6, "TH2 sends ArmFailSafe command with expiryLengthSeconds set to 0 to the DUT to clear the fail-safe timer and close the PASE session"),
-            TestStep(7, "DUT is commissioned to TH2's fabric"),
-            TestStep(8, "TH2 does a non-fabric-filtered read of the Fabrics attribute from the Node Operational Credentials cluster", """
+            TestStep(6, "DUT is commissioned to TH2's fabric"),
+            TestStep(7, "TH2 does a non-fabric-filtered read of the Fabrics attribute from the Node Operational Credentials cluster", """
                      - Verify that TH2's FabricID is present in the Fabrics list
                      - Verify that TH2 and TH1's Fabrics attribute's FabricIDs are different"""),
-            TestStep(9, "TH2 does a non-fabric-filtered read of the NOCs attribute from the Node Operational Credentials cluster", """
+            TestStep(8, "TH2 does a non-fabric-filtered read of the NOCs attribute from the Node Operational Credentials cluster", """
                      - Locate TH2's NOC entry by matching fabric index
                      - Verify that TH2's NOCs entry's public key is different than TH1's NOCs entry's public key"""),
-            TestStep(10, "TH2 opens an Enhanced Commissioning Window on the DUT"),
-            TestStep(11, "TH1 commissions DUT to TH1's fabric via the window; TH1 removes TH2's fabric", """
+            TestStep(9, "TH2 opens an Enhanced Commissioning Window on the DUT"),
+            TestStep(10, "TH1 commissions DUT to TH1's fabric via the window; TH1 removes TH2's fabric", """
                      - Verify that TH1's fabric is present in the Fabrics list
                      - Verify that TH2's fabric is absent from the Fabrics list""")
         ]
@@ -196,22 +196,15 @@ class TC_DA_1_1(MatterBaseTest):
                               f"TH1's fabric (rootPublicKey={th1_fabric.rootPublicKey.hex()}, fabricID={th1_fabric.fabricID}) should not be present in TH2's Fabrics list, found: {fabrics_th2_ids_pase}")
 
         # *** STEP 6 ***
-        # TH2 sends ArmFailSafe command with expiryLengthSeconds set to 0 to
-        # the DUT to clear the fail-safe timer and close the PASE session
-        self.step(6)
-        cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=0, breadcrumb=0)
-        await th2.SendCommand(nodeId=pase_node_id, endpoint=0, payload=cmd)
-
-        # *** STEP 7 ***
         # DUT is commissioned to TH2's fabric
-        self.step(7)
-        th2_node_id = self.dut_node_id + 2
+        self.step(6)
+        th2_node_id = pase_node_id
         status = await commission_device(th2, th2_node_id, setupPayloadInfo[0], commissioning_info)
         asserts.assert_true(status, f"TH2 commissioning failed: {status}")
 
-        # *** STEP 8 ***
+        # *** STEP 7 ***
         # TH2 does a non-fabric-filtered read of the Fabrics attribute from the Node Operational Credentials cluster
-        self.step(8)
+        self.step(7)
         fabrics_th2 = await self.read_single_attribute_check_success(
             dev_ctrl=th2,
             node_id=th2_node_id,
@@ -229,9 +222,9 @@ class TC_DA_1_1(MatterBaseTest):
         asserts.assert_not_equal(th2_fabric.fabricID, th1_fabric.fabricID,
                                  f"TH2's FabricID ({th2_fabric.fabricID}) must be different from TH1's FabricID ({th1_fabric.fabricID})")
 
-        # *** STEP 9 ***
+        # *** STEP 8 ***
         # TH2 does a non-fabric-filtered read of the NOCs attribute from the Node Operational Credentials cluster
-        self.step(9)
+        self.step(8)
         nocs_th2 = await self.read_single_attribute_check_success(
             dev_ctrl=th2,
             node_id=th2_node_id,
@@ -250,9 +243,9 @@ class TC_DA_1_1(MatterBaseTest):
         asserts.assert_not_equal(nocs_th1_decoded_pk, nocs_th2_decoded_pk,
                                  f"The public key of the TH2 NOCs entry ({nocs_th2_decoded_pk.hex()}) must be different from TH1's NOCs entry public key ({nocs_th1_decoded_pk.hex()})")
 
-        # *** STEP 10 ***
+        # *** STEP 9 ***
         # TH2 opens an Enhanced Commissioning Window on the DUT
-        self.step(10)
+        self.step(9)
         params = await th2.OpenCommissioningWindow(
             nodeId=th2_node_id,
             timeout=180,
@@ -261,25 +254,30 @@ class TC_DA_1_1(MatterBaseTest):
             option=1
         )
 
-        # *** STEP 11 ***
+        # *** STEP 10 ***
         # TH1 commissions via the window; TH1 removes TH2's fabric
-        self.step(11)
+        self.step(10)
         await th1.CommissionOnNetwork(
             nodeId=self.dut_node_id,
             setupPinCode=params.setupPinCode,
             filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
             filter=self.discriminator
         )
+
+        # TH1 removes TH2's fabric
         remove_fabric_cmd = Clusters.OperationalCredentials.Commands.RemoveFabric(th2_fabric.fabricIndex)
         await th1.SendCommand(nodeId=self.dut_node_id, endpoint=0, payload=remove_fabric_cmd)
 
-        # Verify TH1's fabric is present and TH2's fabric is absent
         fabrics_final = await self.read_fabrics(th1)
         fabric_ids_final = [(f.rootPublicKey, f.fabricID) for f in fabrics_final]
         th1_fabric_identity = (th1_fabric.rootPublicKey, th1_fabric.fabricID)
         th2_fabric_identity = (th2_fabric.rootPublicKey, th2_fabric.fabricID)
+
+        # Verify that TH1's fabric is present in the Fabrics list
         asserts.assert_in(th1_fabric_identity, fabric_ids_final,
                           f"TH1's fabric should be present in Fabrics list after re-commissioning")
+
+        # Verify that TH2's fabric is absent from the Fabrics list
         asserts.assert_not_in(th2_fabric_identity, fabric_ids_final,
                               f"TH2's fabric should be absent from Fabrics list after removal")
 
