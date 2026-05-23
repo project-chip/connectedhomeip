@@ -78,10 +78,8 @@ public:
         autoSupported(spl.autoSupported), heatSupported(spl.heatSupported), coolSupported(spl.coolSupported),
         occupancySupported(spl.occupancySupported), eventsSupported(spl.eventsSupported),
         absoluteHeatLimits(spl.absoluteHeatLimits), absoluteCoolLimits(spl.absoluteCoolLimits),
-        userHeatLimits(absoluteHeatLimits, spl.userHeatLimits),
-        userCoolLimits(absoluteCoolLimits, spl.userCoolLimits),
-        occupied(spl.occupied), unoccupied(spl.unoccupied),
-        deadBand(spl.deadBand)
+        userHeatLimits(absoluteHeatLimits, spl.userHeatLimits), userCoolLimits(absoluteCoolLimits, spl.userCoolLimits),
+        occupied(spl.occupied), unoccupied(spl.unoccupied), deadBand(spl.deadBand)
     {}
 
     bool Valid();
