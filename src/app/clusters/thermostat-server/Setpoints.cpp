@@ -807,7 +807,7 @@ Status SaveSetpoints(EndpointId endpoint, Setpoints & setpoints, SetpointAttribu
         {
             return status;
         }
-        ChipLogProgress(Zcl, "Thermostat: SaveSetpoints: Set Dead Band: %" PRIi8, deadband);
+        ChipLogProgress(Zcl, "Thermostat: SaveSetpoints: Set Dead Band: %i", deadband);
     }
     if (affectedAttributes.Has(Attributes::MinHeatSetpointLimit::Id) && setpoints.userHeatLimits.minimum.HasTemperature())
     {
