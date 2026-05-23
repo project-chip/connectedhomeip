@@ -25,8 +25,6 @@
 #include <app/util/attribute-storage.h>
 #include <protocols/interaction_model/Constants.h>
 
-using namespace chip::app::Clusters::Thermostat::Attributes;
-
 namespace chip {
 namespace app {
 namespace Clusters {

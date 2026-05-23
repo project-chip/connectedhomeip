@@ -17,6 +17,8 @@
 
 #include "SetpointAttributes.h"
 
+using namespace chip::app::Clusters::Thermostat::Attributes;
+
 namespace chip {
 namespace app {
 namespace Clusters {
