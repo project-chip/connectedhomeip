@@ -30,7 +30,7 @@ namespace Clusters {
 namespace Thermostat {
 
 Protocols::InteractionModel::Status ValidateSetpointChange(Setpoints & setpoints, chip::AttributeId attributeId, temperature value,
-                                                         SetpointAttributes & changedAttributes);
+                                                           SetpointAttributes & changedAttributes);
 Protocols::InteractionModel::Status HandleSetpointWrite(const ConcreteAttributePath & attributePath);
 
 Protocols::InteractionModel::Status SetpointRaiseLower(const EndpointId endpointId,

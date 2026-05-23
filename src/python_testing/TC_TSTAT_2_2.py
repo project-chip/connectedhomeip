@@ -34,11 +34,10 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import asyncio
 import queue
-from typing import Optional
 
 from mobly import asserts
+from TC_TSTAT_Utils import ThermostatSimulator, ThermostatState
 
 import matter.clusters as Clusters
 from matter.interaction_model import Status
@@ -46,7 +45,6 @@ from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import EventSubscriptionHandler
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import TestStep, default_matter_test_main
-from TC_TSTAT_Utils import ThermostatState, ThermostatSimulator
 
 cluster = Clusters.Thermostat
 
@@ -136,7 +134,7 @@ class TC_TSTAT_2_2(MatterBaseTest):
             for idx, received in enumerate(received_events):
                 if (received.systemMode == expected['systemMode'] and
                     received.occupancy == expected['occupancy'] and
-                    received.currentSetpoint == expected['currentSetpoint']):
+                        received.currentSetpoint == expected['currentSetpoint']):
                     matched = True
                     received_events.pop(idx)
                     break
@@ -289,8 +287,8 @@ class TC_TSTAT_2_2(MatterBaseTest):
 
             events_callback = EventSubscriptionHandler(expected_cluster=Clusters.Thermostat)
             await events_callback.start(self.default_controller,
-                                         self.dut_node_id,
-                                         endpoint=endpoint)
+                                        self.dut_node_id,
+                                        endpoint=endpoint)
             self.events_callback = events_callback
 
         ControlSequenceOfOperation = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ControlSequenceOfOperation)
@@ -370,7 +368,8 @@ class TC_TSTAT_2_2(MatterBaseTest):
 
         self.step("2a")
         if self.pics_guard(hasCoolingFeature):
-            target_val = self.state.minCoolSetpointLimit + ((self.state.maxCoolSetpointLimit - self.state.minCoolSetpointLimit) // 2)
+            target_val = self.state.minCoolSetpointLimit + \
+                ((self.state.maxCoolSetpointLimit - self.state.minCoolSetpointLimit) // 2)
             await self.write_setpoint(cluster.Attributes.OccupiedCoolingSetpoint, target_val)
 
         self.step("2b")
@@ -392,7 +391,8 @@ class TC_TSTAT_2_2(MatterBaseTest):
 
         self.step("3a")
         if self.pics_guard(hasHeatingFeature):
-            target_val = self.state.minHeatSetpointLimit + ((self.state.maxHeatSetpointLimit - self.state.minHeatSetpointLimit) // 2)
+            target_val = self.state.minHeatSetpointLimit + \
+                ((self.state.maxHeatSetpointLimit - self.state.minHeatSetpointLimit) // 2)
             await self.write_setpoint(cluster.Attributes.OccupiedHeatingSetpoint, target_val)
 
         self.step("3b")
@@ -414,7 +414,8 @@ class TC_TSTAT_2_2(MatterBaseTest):
 
         self.step("4a")
         if self.pics_guard(hasOccupancyFeature and hasCoolingFeature):
-            target_val = self.state.minCoolSetpointLimit + ((self.state.maxCoolSetpointLimit - self.state.minCoolSetpointLimit) // 2)
+            target_val = self.state.minCoolSetpointLimit + \
+                ((self.state.maxCoolSetpointLimit - self.state.minCoolSetpointLimit) // 2)
             await self.write_setpoint(cluster.Attributes.UnoccupiedCoolingSetpoint, target_val)
 
         self.step("4b")
@@ -436,7 +437,8 @@ class TC_TSTAT_2_2(MatterBaseTest):
 
         self.step("5a")
         if self.pics_guard(hasOccupancyFeature and hasHeatingFeature):
-            target_val = self.state.minHeatSetpointLimit + ((self.state.maxHeatSetpointLimit - self.state.minHeatSetpointLimit) // 2)
+            target_val = self.state.minHeatSetpointLimit + \
+                ((self.state.maxHeatSetpointLimit - self.state.minHeatSetpointLimit) // 2)
             await self.write_setpoint(cluster.Attributes.UnoccupiedHeatingSetpoint, target_val)
 
         self.step("5b")
@@ -604,7 +606,8 @@ class TC_TSTAT_2_2(MatterBaseTest):
 
         if self.pics_guard(hasCoolingFeature and not hasHeatingFeature):
             await self.write_single_attribute(
-                attribute_value=cluster.Attributes.ControlSequenceOfOperation(cluster.Enums.ControlSequenceOfOperationEnum.kCoolingWithReheat),
+                attribute_value=cluster.Attributes.ControlSequenceOfOperation(
+                    cluster.Enums.ControlSequenceOfOperationEnum.kCoolingWithReheat),
                 endpoint_id=endpoint
             )
             val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ControlSequenceOfOperation)
@@ -613,7 +616,8 @@ class TC_TSTAT_2_2(MatterBaseTest):
 
         if self.pics_guard(hasHeatingFeature and not hasCoolingFeature):
             await self.write_single_attribute(
-                attribute_value=cluster.Attributes.ControlSequenceOfOperation(cluster.Enums.ControlSequenceOfOperationEnum.kHeatingWithReheat),
+                attribute_value=cluster.Attributes.ControlSequenceOfOperation(
+                    cluster.Enums.ControlSequenceOfOperationEnum.kHeatingWithReheat),
                 endpoint_id=endpoint
             )
             val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ControlSequenceOfOperation)
@@ -622,7 +626,8 @@ class TC_TSTAT_2_2(MatterBaseTest):
 
         if self.pics_guard(hasHeatingFeature and hasCoolingFeature):
             await self.write_single_attribute(
-                attribute_value=cluster.Attributes.ControlSequenceOfOperation(cluster.Enums.ControlSequenceOfOperationEnum.kCoolingAndHeating),
+                attribute_value=cluster.Attributes.ControlSequenceOfOperation(
+                    cluster.Enums.ControlSequenceOfOperationEnum.kCoolingAndHeating),
                 endpoint_id=endpoint
             )
             val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ControlSequenceOfOperation)

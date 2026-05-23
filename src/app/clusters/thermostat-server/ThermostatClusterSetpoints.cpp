@@ -41,7 +41,7 @@ namespace Clusters {
 namespace Thermostat {
 
 Status ValidateSetpointChange(Setpoints & setpoints, chip::AttributeId attributeId, temperature value,
-                            SetpointAttributes & changedAttributes)
+                              SetpointAttributes & changedAttributes)
 {
     switch (attributeId)
     {
@@ -84,7 +84,6 @@ Status ValidateSetpointChange(Setpoints & setpoints, chip::AttributeId attribute
     }
 }
 
-
 Status HandleSetpointWrite(const ConcreteAttributePath & attributePath)
 {
     Setpoints setpoints;
@@ -124,7 +123,8 @@ Status HandleSetpointWrite(const ConcreteAttributePath & attributePath)
         return Status::Failure;
     }
 
-    ChipLogProgress(Zcl, "Thermostat: HandleSetpointWrite: attribute: %s (0x%x), temp: %" PRIi16, SetpointAttributeName(attributePath.mAttributeId), attributePath.mAttributeId, temp);
+    ChipLogProgress(Zcl, "Thermostat: HandleSetpointWrite: attribute: %s (0x%x), temp: %" PRIi16,
+                    SetpointAttributeName(attributePath.mAttributeId), attributePath.mAttributeId, temp);
 
     SetpointAttributes affectedAttributes;
     affectedAttributes.Set(attributePath.mAttributeId);

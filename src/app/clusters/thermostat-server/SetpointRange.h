@@ -25,7 +25,6 @@
 #include "SetpointAttributes.h"
 #include "Temperature.h"
 
-
 namespace chip {
 namespace app {
 namespace Clusters {

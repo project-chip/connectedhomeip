@@ -33,13 +33,13 @@ class ThermostatState:
         self.maxHeatSetpointLimit = maxHeatSetpointLimit
         self.minCoolSetpointLimit = minCoolSetpointLimit
         self.maxCoolSetpointLimit = maxCoolSetpointLimit
- 
+
         self.absMinHeatSetpointLimit = absMinHeatSetpointLimit
         self.absMaxHeatSetpointLimit = absMaxHeatSetpointLimit
         self.absMinCoolSetpointLimit = absMinCoolSetpointLimit
         self.absMaxCoolSetpointLimit = absMaxCoolSetpointLimit
         self.minSetpointDeadBand = minSetpointDeadBand  # in hundredths of a degree C
- 
+
         self.hasHeat = hasHeat
         self.hasCool = hasCool
         self.hasAuto = hasAuto
@@ -58,7 +58,7 @@ class ThermostatState:
             if self.minHeatSetpointLimit is not None and self.maxHeatSetpointLimit is not None and self.minHeatSetpointLimit > self.maxHeatSetpointLimit:
                 return False
             if self.occupiedHeatingSetpoint is not None and (self.occupiedHeatingSetpoint < (self.minHeatSetpointLimit if self.minHeatSetpointLimit is not None else self.absMinHeatSetpointLimit) or
-                                         self.occupiedHeatingSetpoint > (self.maxHeatSetpointLimit if self.maxHeatSetpointLimit is not None else self.absMaxHeatSetpointLimit)):
+                                                             self.occupiedHeatingSetpoint > (self.maxHeatSetpointLimit if self.maxHeatSetpointLimit is not None else self.absMaxHeatSetpointLimit)):
                 return False
             if self.hasOccupancy and self.unoccupiedHeatingSetpoint is not None:
                 if self.unoccupiedHeatingSetpoint < (self.minHeatSetpointLimit if self.minHeatSetpointLimit is not None else self.absMinHeatSetpointLimit) or \
@@ -68,7 +68,7 @@ class ThermostatState:
             if self.minCoolSetpointLimit is not None and self.maxCoolSetpointLimit is not None and self.minCoolSetpointLimit > self.maxCoolSetpointLimit:
                 return False
             if self.occupiedCoolingSetpoint is not None and (self.occupiedCoolingSetpoint < (self.minCoolSetpointLimit if self.minCoolSetpointLimit is not None else self.absMinCoolSetpointLimit) or
-                                         self.occupiedCoolingSetpoint > (self.maxCoolSetpointLimit if self.maxCoolSetpointLimit is not None else self.absMaxCoolSetpointLimit)):
+                                                             self.occupiedCoolingSetpoint > (self.maxCoolSetpointLimit if self.maxCoolSetpointLimit is not None else self.absMaxCoolSetpointLimit)):
                 return False
             if self.hasOccupancy and self.unoccupiedCoolingSetpoint is not None:
                 if self.unoccupiedCoolingSetpoint < (self.minCoolSetpointLimit if self.minCoolSetpointLimit is not None else self.absMinCoolSetpointLimit) or \
@@ -270,7 +270,7 @@ class ThermostatSimulator:
         # Deadband violation!
         if (heat_id in changed_ids or
             cluster.Attributes.MinHeatSetpointLimit.attribute_id in changed_ids or
-            cluster.Attributes.MaxHeatSetpointLimit.attribute_id in changed_ids):
+                cluster.Attributes.MaxHeatSetpointLimit.attribute_id in changed_ids):
             new_cool = heat_val + state.minSetpointDeadBand
             if min_cool <= new_cool <= max_cool:
                 cool_val = new_cool
@@ -371,18 +371,22 @@ class ThermostatSimulator:
         match mode:
             case cluster.Enums.SetpointRaiseLowerModeEnum.kHeat:
                 if current_state.hasHeat:
-                    heat_val = adjust_setpoint(heat_val, current_state.minHeatSetpointLimit, current_state.maxHeatSetpointLimit, current_state.absMinHeatSetpointLimit, current_state.absMaxHeatSetpointLimit)
+                    heat_val = adjust_setpoint(heat_val, current_state.minHeatSetpointLimit, current_state.maxHeatSetpointLimit,
+                                               current_state.absMinHeatSetpointLimit, current_state.absMaxHeatSetpointLimit)
                     changed_ids.add(heat_attr)
             case cluster.Enums.SetpointRaiseLowerModeEnum.kCool:
                 if current_state.hasCool:
-                    cool_val = adjust_setpoint(cool_val, current_state.minCoolSetpointLimit, current_state.maxCoolSetpointLimit, current_state.absMinCoolSetpointLimit, current_state.absMaxCoolSetpointLimit)
+                    cool_val = adjust_setpoint(cool_val, current_state.minCoolSetpointLimit, current_state.maxCoolSetpointLimit,
+                                               current_state.absMinCoolSetpointLimit, current_state.absMaxCoolSetpointLimit)
                     changed_ids.add(cool_attr)
             case cluster.Enums.SetpointRaiseLowerModeEnum.kBoth:
                 if current_state.hasHeat:
-                    heat_val = adjust_setpoint(heat_val, current_state.minHeatSetpointLimit, current_state.maxHeatSetpointLimit, current_state.absMinHeatSetpointLimit, current_state.absMaxHeatSetpointLimit)
+                    heat_val = adjust_setpoint(heat_val, current_state.minHeatSetpointLimit, current_state.maxHeatSetpointLimit,
+                                               current_state.absMinHeatSetpointLimit, current_state.absMaxHeatSetpointLimit)
                     changed_ids.add(heat_attr)
                 if current_state.hasCool:
-                    cool_val = adjust_setpoint(cool_val, current_state.minCoolSetpointLimit, current_state.maxCoolSetpointLimit, current_state.absMinCoolSetpointLimit, current_state.absMaxCoolSetpointLimit)
+                    cool_val = adjust_setpoint(cool_val, current_state.minCoolSetpointLimit, current_state.maxCoolSetpointLimit,
+                                               current_state.absMinCoolSetpointLimit, current_state.absMaxCoolSetpointLimit)
                     changed_ids.add(cool_attr)
 
         new_state = current_state.copy()

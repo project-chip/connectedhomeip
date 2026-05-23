@@ -35,7 +35,7 @@ class Setpoints;
 template <typename T>
 struct SetpointLimits
 {
-    virtual ~SetpointLimits()       = default;
+    virtual ~SetpointLimits() = default;
 
     SetpointLimits(T minimum, T maximum) : minimum(minimum), maximum(maximum){};
     SetpointLimits(const SetpointLimits<T> & al) : minimum(al.minimum), maximum(al.maximum){};

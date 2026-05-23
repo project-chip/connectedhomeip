@@ -35,7 +35,6 @@ namespace Thermostat {
 class Setpoints
 {
 public:
-
     enum class ClampMode : uint8_t
     {
         kDontClamp,
@@ -79,10 +78,8 @@ public:
         autoSupported(spl.autoSupported), heatSupported(spl.heatSupported), coolSupported(spl.coolSupported),
         occupancySupported(spl.occupancySupported), eventsSupported(spl.eventsSupported),
         absoluteHeatLimits(spl.absoluteHeatLimits), absoluteCoolLimits(spl.absoluteCoolLimits),
-        userHeatLimits(absoluteHeatLimits, spl.userHeatLimits),
-        userCoolLimits(absoluteCoolLimits, spl.userCoolLimits), 
-        occupied(spl.occupied), unoccupied(spl.unoccupied),
-        deadBand(spl.deadBand)
+        userHeatLimits(absoluteHeatLimits, spl.userHeatLimits), userCoolLimits(absoluteCoolLimits, spl.userCoolLimits),
+        occupied(spl.occupied), unoccupied(spl.unoccupied), deadBand(spl.deadBand)
     {}
 
     bool Valid();
@@ -157,10 +154,11 @@ public:
                                                            SetpointAttributes & changedAttributes);
 
     /**
-    * Attempt to fix any violations of the setpoint rules
-    * @param changedAttributes The set of attributes that were changed prior to this operation.
-    * @return The status of the operation; Success if the setpoints are now valid, ConstraintError if it was not possible to fix them
-    */
+     * Attempt to fix any violations of the setpoint rules
+     * @param changedAttributes The set of attributes that were changed prior to this operation.
+     * @return The status of the operation; Success if the setpoints are now valid, ConstraintError if it was not possible to fix
+     * them
+     */
     Protocols::InteractionModel::Status Fix(SetpointAttributes & changedAttributes);
 
     void Log(char const * prefix);

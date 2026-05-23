@@ -100,7 +100,7 @@ private:
 
 char const * SetpointAttributeName(chip::AttributeId id);
 
-}
+} // namespace Thermostat
 } // namespace Clusters
 } // namespace app
 } // namespace chip

@@ -15,9 +15,9 @@
  *    limitations under the License.
  */
 
- #include "SetpointAttributes.h"
+#include "SetpointAttributes.h"
 
- namespace chip {
+namespace chip {
 namespace app {
 namespace Clusters {
 namespace Thermostat {
@@ -59,7 +59,7 @@ SetpointAttributes & SetpointAttributes::Clear(chip::AttributeId attribute)
 
 SetpointAttributes & SetpointAttributes::ClearAll()
 {
-    mValue = 0;
+    mValue               = 0;
     mFirstDirtyAttribute = chip::kInvalidAttributeId;
     return *this;
 }
@@ -75,30 +75,32 @@ void SetpointAttributes::Log(char const * prefix)
     }
 }
 
-char const * SetpointAttributeName(chip::AttributeId id) {
-    switch (id) {
-        case OccupiedHeatingSetpoint::Id:
-            return "OccupiedHeatingSetpoint";
-        case OccupiedCoolingSetpoint::Id:
-            return "OccupiedCoolingSetpoint";
-        case UnoccupiedHeatingSetpoint::Id:
-            return "UnoccupiedHeatingSetpoint";
-        case UnoccupiedCoolingSetpoint::Id:
-            return "UnoccupiedCoolingSetpoint";
-        case MinHeatSetpointLimit::Id:
-            return "MinHeatSetpointLimit";
-        case MaxHeatSetpointLimit::Id:
-            return "MaxHeatSetpointLimit";
-        case MinCoolSetpointLimit::Id:
-            return "MinCoolSetpointLimit";
-        case MaxCoolSetpointLimit::Id:
-            return "MaxCoolSetpointLimit";
-        default:
-            return "Unknown";
+char const * SetpointAttributeName(chip::AttributeId id)
+{
+    switch (id)
+    {
+    case OccupiedHeatingSetpoint::Id:
+        return "OccupiedHeatingSetpoint";
+    case OccupiedCoolingSetpoint::Id:
+        return "OccupiedCoolingSetpoint";
+    case UnoccupiedHeatingSetpoint::Id:
+        return "UnoccupiedHeatingSetpoint";
+    case UnoccupiedCoolingSetpoint::Id:
+        return "UnoccupiedCoolingSetpoint";
+    case MinHeatSetpointLimit::Id:
+        return "MinHeatSetpointLimit";
+    case MaxHeatSetpointLimit::Id:
+        return "MaxHeatSetpointLimit";
+    case MinCoolSetpointLimit::Id:
+        return "MinCoolSetpointLimit";
+    case MaxCoolSetpointLimit::Id:
+        return "MaxCoolSetpointLimit";
+    default:
+        return "Unknown";
     }
 }
 
-}
-}
-}
-}
+} // namespace Thermostat
+} // namespace Clusters
+} // namespace app
+} // namespace chip
