@@ -163,6 +163,8 @@ public:
     */
     Protocols::InteractionModel::Status Fix(SetpointAttributes & changedAttributes);
 
+    void Log(char const * prefix);
+
 private:
     Protocols::InteractionModel::Status ChangeLimits(UserSetpointLimits & limits, Optional<temperature> min,
                                                      Optional<temperature> max, SetpointAttributes & changedAttributes);

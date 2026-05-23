@@ -724,22 +724,28 @@ Status LoadSetpoints(EndpointId endpoint, Setpoints & setpoints)
         }
     }
 
-    ChipLogProgress(Zcl, "Thermostat: Loaded Setpoints");
-    ChipLogProgress(Zcl, "Thermostat: Auto: %s Heat: %s Cool: %s Occupancy: %s Events: %s", setpoints.autoSupported ? "True" : "False", setpoints.heatSupported ? "True" : "False", setpoints.coolSupported ? "True" : "False", setpoints.occupancySupported ? "True" : "False", setpoints.eventsSupported ? "True" : "False");
-    ChipLogProgress(Zcl, "Thermostat: Absolute Heat Limits: min %" PRIi16 " max %" PRIi16, setpoints.absoluteHeatLimits.Minimum(),
-                    setpoints.absoluteHeatLimits.Maximum());
-    ChipLogProgress(Zcl, "Thermostat: Absolute Cool Limits: min %" PRIi16 " max %" PRIi16, setpoints.absoluteCoolLimits.Minimum(),
-                    setpoints.absoluteCoolLimits.Maximum());
-    ChipLogProgress(Zcl, "Thermostat: User Heat Limits: min %" PRIi16 " max %" PRIi16, setpoints.userHeatLimits.Minimum(),
-                    setpoints.userHeatLimits.Maximum());
-    ChipLogProgress(Zcl, "Thermostat: User Cool Limits: min %" PRIi16 " max %" PRIi16, setpoints.userCoolLimits.Minimum(),
-                    setpoints.userCoolLimits.Maximum());
-    ChipLogProgress(Zcl, "Thermostat: Dead Band: %" PRIi16, setpoints.deadBand);
-    ChipLogProgress(Zcl, "Thermostat: Occupied Heating Setpoint: %" PRIi16, setpoints.occupied.heating.Temperature());
-    ChipLogProgress(Zcl, "Thermostat: Occupied Cooling Setpoint: %" PRIi16, setpoints.occupied.cooling.Temperature());
-    ChipLogProgress(Zcl, "Thermostat: Unoccupied Heating Setpoint: %" PRIi16, setpoints.unoccupied.heating.Temperature());
-    ChipLogProgress(Zcl, "Thermostat: Unoccupied Cooling Setpoint: %" PRIi16, setpoints.unoccupied.cooling.Temperature());
+    setpoints.Log("Loaded");
     return Status::Success;
+}
+
+void Setpoints::Log(char const * prefix)
+{
+    ChipLogProgress(Zcl, "Thermostat: %s Auto: %s Heat: %s Cool: %s Occupancy: %s Events: %s", prefix,
+                    autoSupported ? "True" : "False", heatSupported ? "True" : "False", coolSupported ? "True" : "False",
+                    occupancySupported ? "True" : "False", eventsSupported ? "True" : "False");
+    ChipLogProgress(Zcl, "Thermostat: %s Absolute Heat Limits: min %" PRIi16 " max %" PRIi16, prefix, absoluteHeatLimits.Minimum(),
+                    absoluteHeatLimits.Maximum());
+    ChipLogProgress(Zcl, "Thermostat: %s Absolute Cool Limits: min %" PRIi16 " max %" PRIi16, prefix, absoluteCoolLimits.Minimum(),
+                    absoluteCoolLimits.Maximum());
+    ChipLogProgress(Zcl, "Thermostat: %s User Heat Limits: min %" PRIi16 " max %" PRIi16, prefix, userHeatLimits.Minimum(),
+                    userHeatLimits.Maximum());
+    ChipLogProgress(Zcl, "Thermostat: %s User Cool Limits: min %" PRIi16 " max %" PRIi16, prefix, userCoolLimits.Minimum(),
+                    userCoolLimits.Maximum());
+    ChipLogProgress(Zcl, "Thermostat: %s Dead Band: %" PRIi16, prefix, deadBand);
+    ChipLogProgress(Zcl, "Thermostat: %s Occupied Heating Setpoint: %" PRIi16, prefix, occupied.heating.Temperature());
+    ChipLogProgress(Zcl, "Thermostat: %s Occupied Cooling Setpoint: %" PRIi16, prefix, occupied.cooling.Temperature());
+    ChipLogProgress(Zcl, "Thermostat: %s Unoccupied Heating Setpoint: %" PRIi16, prefix, unoccupied.heating.Temperature());
+    ChipLogProgress(Zcl, "Thermostat: %s Unoccupied Cooling Setpoint: %" PRIi16, prefix, unoccupied.cooling.Temperature());
 }
 
 Status SaveFirstDirtySetpoint(EndpointId endpoint, Setpoints & setpoints, SetpointAttributes & dirtyAttributes)
