@@ -565,8 +565,8 @@ Status MatterThermostatClusterServerPreAttributeChangedCallback(const app::Concr
     case MinCoolSetpointLimit::Id:
     case MaxCoolSetpointLimit::Id: {
         int16_t temperature = static_cast<int16_t>(chip::Encoding::LittleEndian::Get16(value));
-        ChipLogProgress(Zcl, "Thermostat: HandlePreAttributeChange: attribute: 0x%" PRIx32 ", %s temp: %" PRIi16, attributePath.mAttributeId,
-                        SetpointAttributeName(attributePath.mAttributeId), temperature);
+        ChipLogProgress(Zcl, "Thermostat: HandlePreAttributeChange: attribute: 0x%" PRIx32 ", %s temp: %" PRIi16,
+                        attributePath.mAttributeId, SetpointAttributeName(attributePath.mAttributeId), temperature);
         Setpoints setpoints;
         auto status = LoadSetpoints(attributePath.mEndpointId, setpoints);
         if (status != Status::Success)

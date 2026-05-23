@@ -252,8 +252,7 @@ void Setpoints::FixUserLimits(SetpointLimits<AbsoluteSetpoint> & absoluteLimits,
         }
         else
         {
-            ChipLogError(Zcl,
-                         "Thermostat:Setpoints::FixUserLimits: invalid user %s limits on unknown attribute change: 0x%" PRIx32,
+            ChipLogError(Zcl, "Thermostat:Setpoints::FixUserLimits: invalid user %s limits on unknown attribute change: 0x%" PRIx32,
                          userLimits.absoluteLimits.Mode() == SystemModeEnum::kHeat ? "heating" : "cooling",
                          changedAttributes.Raw());
         }
