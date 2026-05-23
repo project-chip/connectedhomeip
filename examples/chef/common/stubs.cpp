@@ -670,7 +670,7 @@ void GenericSwitchInit()
         return;
     }
 
-    if (isMultiColumnSwitch())
+    if (chef::isMultiColumnSwitch())
     {
         return;
     }
