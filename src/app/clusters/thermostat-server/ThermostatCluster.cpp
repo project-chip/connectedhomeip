@@ -513,6 +513,8 @@ Status HandleSetpointWrite(const ConcreteAttributePath & attributePath)
     ChipLogProgress(Zcl, "Thermostat: HandleSetpointWrite: attribute: %s (0x%x), temp: %" PRIi16, SetpointAttributeName(attributePath.mAttributeId), attributePath.mAttributeId, temp);
 
     SetpointAttributes affectedAttributes;
+    affectedAttributes.Set(attributePath.mAttributeId);
+    affectedAttributes.ClearFirstDirtyAttribute();
     status = HandleSetpointChange(setpoints, attributePath.mAttributeId, temp, affectedAttributes);
     // In theory, this should always succeed, as the values will have been filtered in
     // MatterThermostatClusterServerPreAttributeChangedCallback
@@ -521,7 +523,7 @@ Status HandleSetpointWrite(const ConcreteAttributePath & attributePath)
         affectedAttributes.Clear(attributePath.mAttributeId);
         if (!affectedAttributes.Empty())
         {
-            status = SaveSetpoints(attributePath.mEndpointId, setpoints, affectedAttributes, true);
+            status = SaveFirstDirtySetpoint(attributePath.mEndpointId, setpoints, affectedAttributes);
         }
     }
     else

@@ -179,7 +179,9 @@ private:
 
 Protocols::InteractionModel::Status LoadSetpoints(EndpointId endpoint, Setpoints & setpoints);
 Protocols::InteractionModel::Status SaveSetpoints(EndpointId endpoint, Setpoints & setpoints,
-                                                  SetpointAttributes & changedAttributes, bool onlySaveOne);
+                                                  SetpointAttributes & changedAttributes);
+Protocols::InteractionModel::Status SaveFirstDirtySetpoint(EndpointId endpoint, Setpoints & setpoints,
+                                                           SetpointAttributes & changedAttributes);
 
 } // namespace Thermostat
 } // namespace Clusters

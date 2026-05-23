@@ -82,6 +82,9 @@ public:
 
     void Log(char const * prefix);
 
+    chip::AttributeId FirstDirtyAttribute() { return mFirstDirtyAttribute; }
+    void ClearFirstDirtyAttribute() { mFirstDirtyAttribute = chip::kInvalidAttributeId; }
+
 private:
     template <typename... Args>
     static constexpr uint32_t Or(chip::AttributeId attribute, Args... args)
@@ -91,6 +94,8 @@ private:
     static constexpr uint32_t Or() { return 0; }
 
     uint32_t mValue = 0;
+
+    chip::AttributeId mFirstDirtyAttribute = chip::kInvalidAttributeId;
 };
 
 char const * SetpointAttributeName(chip::AttributeId id);

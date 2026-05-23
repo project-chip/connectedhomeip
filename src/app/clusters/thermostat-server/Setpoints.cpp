@@ -181,7 +181,7 @@ bool Setpoints::Valid()
 }
 
 /**
- * @brief Fix user limits if they are outside the absolute limits or create an invalid deadband
+ * @brief Fix user limits if they are outside the absolute limits or are inverted
  * @param absoluteLimits The absolute limits for this setpoint mode.
  * @param userLimits The user limits to fix.
  * @param minAttribute The attribute ID of the minimum setpoint.
@@ -742,7 +742,19 @@ Status LoadSetpoints(EndpointId endpoint, Setpoints & setpoints)
     return Status::Success;
 }
 
-Status SaveSetpoints(EndpointId endpoint, Setpoints & setpoints, SetpointAttributes & affectedAttributes, bool onlySaveOne)
+Status SaveFirstDirtySetpoint(EndpointId endpoint, Setpoints & setpoints, SetpointAttributes & dirtyAttributes)
+{
+    AttributeId firstDirty = dirtyAttributes.FirstDirtyAttribute();
+    if (firstDirty == chip::kInvalidAttributeId)
+    {
+        return Status::Success;
+    }
+    SetpointAttributes firstDirtySet;
+    firstDirtySet.Set(firstDirty);
+    return SaveSetpoints(endpoint, setpoints, firstDirtySet);
+}
+
+Status SaveSetpoints(EndpointId endpoint, Setpoints & setpoints, SetpointAttributes & affectedAttributes)
 {
     Status status;
     if (affectedAttributes.Has(Attributes::MinSetpointDeadBand::Id))
@@ -753,10 +765,6 @@ Status SaveSetpoints(EndpointId endpoint, Setpoints & setpoints, SetpointAttribu
             return status;
         }
         ChipLogProgress(Zcl, "Thermostat: SaveSetpoints: Set Dead Band: %" PRIi8, deadband);
-        if (onlySaveOne)
-        {
-            return Status::Success;
-        }
     }
     if (affectedAttributes.Has(Attributes::MinHeatSetpointLimit::Id) && setpoints.userHeatLimits.minimum.HasTemperature())
     {
@@ -766,10 +774,6 @@ Status SaveSetpoints(EndpointId endpoint, Setpoints & setpoints, SetpointAttribu
         }
         ChipLogProgress(Zcl, "Thermostat: SaveSetpoints: Set Min Heat Setpoint Limit: %" PRIi16,
                         setpoints.userHeatLimits.minimum.Temperature());
-        if (onlySaveOne)
-        {
-            return Status::Success;
-        }
     }
     if (affectedAttributes.Has(Attributes::MaxHeatSetpointLimit::Id) && setpoints.userHeatLimits.maximum.HasTemperature())
     {
@@ -779,10 +783,6 @@ Status SaveSetpoints(EndpointId endpoint, Setpoints & setpoints, SetpointAttribu
         }
         ChipLogProgress(Zcl, "Thermostat: SaveSetpoints: Set Max Heat Setpoint Limit: %" PRIi16,
                         setpoints.userHeatLimits.maximum.Temperature());
-        if (onlySaveOne)
-        {
-            return Status::Success;
-        }
     }
     if (affectedAttributes.Has(Attributes::MinCoolSetpointLimit::Id) && setpoints.userCoolLimits.minimum.HasTemperature())
     {
@@ -792,10 +792,6 @@ Status SaveSetpoints(EndpointId endpoint, Setpoints & setpoints, SetpointAttribu
         }
         ChipLogProgress(Zcl, "Thermostat: SaveSetpoints: Set Min Cool Setpoint Limit: %" PRIi16,
                         setpoints.userCoolLimits.minimum.Temperature());
-        if (onlySaveOne)
-        {
-            return Status::Success;
-        }
     }
     if (affectedAttributes.Has(Attributes::MaxCoolSetpointLimit::Id) && setpoints.userCoolLimits.maximum.HasTemperature())
     {
@@ -805,10 +801,6 @@ Status SaveSetpoints(EndpointId endpoint, Setpoints & setpoints, SetpointAttribu
         }
         ChipLogProgress(Zcl, "Thermostat: SaveSetpoints: Set Max Cool Setpoint Limit: %" PRIi16,
                         setpoints.userCoolLimits.maximum.Temperature());
-        if (onlySaveOne)
-        {
-            return Status::Success;
-        }
     }
     if (affectedAttributes.Has(Attributes::OccupiedHeatingSetpoint::Id))
     {
@@ -818,10 +810,6 @@ Status SaveSetpoints(EndpointId endpoint, Setpoints & setpoints, SetpointAttribu
         }
         ChipLogProgress(Zcl, "Thermostat: SaveSetpoints: Set Occupied Heating Setpoint: %" PRIi16,
                         setpoints.occupied.heating.Temperature());
-        if (onlySaveOne)
-        {
-            return Status::Success;
-        }
     }
     if (affectedAttributes.Has(Attributes::OccupiedCoolingSetpoint::Id))
     {
@@ -831,10 +819,6 @@ Status SaveSetpoints(EndpointId endpoint, Setpoints & setpoints, SetpointAttribu
         }
         ChipLogProgress(Zcl, "Thermostat: SaveSetpoints: Set Occupied Cooling Setpoint: %" PRIi16,
                         setpoints.occupied.cooling.Temperature());
-        if (onlySaveOne)
-        {
-            return Status::Success;
-        }
     }
     if (affectedAttributes.Has(Attributes::UnoccupiedHeatingSetpoint::Id))
     {
@@ -844,10 +828,6 @@ Status SaveSetpoints(EndpointId endpoint, Setpoints & setpoints, SetpointAttribu
         }
         ChipLogProgress(Zcl, "Thermostat: SaveSetpoints: Set Unoccupied Heating Setpoint: %" PRIi16,
                         setpoints.unoccupied.heating.Temperature());
-        if (onlySaveOne)
-        {
-            return Status::Success;
-        }
     }
     if (affectedAttributes.Has(Attributes::UnoccupiedCoolingSetpoint::Id))
     {
@@ -857,10 +837,6 @@ Status SaveSetpoints(EndpointId endpoint, Setpoints & setpoints, SetpointAttribu
         }
         ChipLogProgress(Zcl, "Thermostat: SaveSetpoints: Set Unoccupied Cooling Setpoint: %" PRIi16,
                         setpoints.unoccupied.cooling.Temperature());
-        if (onlySaveOne)
-        {
-            return Status::Success;
-        }
     }
     return Status::Success;
 }
