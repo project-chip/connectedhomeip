@@ -75,8 +75,8 @@ def CMakeTargetEscape(a):
     return ''.join(map(Escape, a))
 
 
-def RemoveByPrefix(list, prefixs):
-    ret = list
+def RemoveByPrefix(str_list, prefixs):
+    ret = str_list
     for pre in prefixs:
         ret = [x for x in ret if not x.startswith(pre)]
 

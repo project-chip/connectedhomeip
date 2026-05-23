@@ -39,7 +39,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-telink:193
+            image: ghcr.io/project-chip/chip-build-telink:194
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
 
@@ -108,6 +108,32 @@ jobs:
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     telink tlsr9528a all-clusters-minimal-app \
                     out/telink-tlsr9528a-all-clusters-minimal-nfc-payload/zephyr/zephyr.elf \
+                    /tmp/bloat_reports/
+
+            - name: clean out build output (keep tools)
+              run: rm -rf ./out/telink*
+
+            - name: Build example Telink (W91) All Devices App
+              # Run test for master and all PRs
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                    "./scripts/build/build_examples.py --target 'telink-tlsr9118bdk40d-all-devices' build"
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    telink tlsr9118bdk40d all-devices-app \
+                    out/telink-tlsr9118bdk40d-all-devices/zephyr/zephyr.elf \
+                    /tmp/bloat_reports/
+
+            - name: clean out build output (keep tools)
+              run: rm -rf ./out/telink*
+
+            - name: Build example Telink (tl721x) All Devices App
+              # Run test for master and all PRs
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                    "./scripts/build/build_examples.py --target 'telink-tl7218x-all-devices' build"
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    telink tl7218x all-devices-app \
+                    out/telink-tl7218x-all-devices/zephyr/zephyr.elf \
                     /tmp/bloat_reports/
 
             - name: clean out build output (keep tools)
@@ -393,7 +419,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-telink-zephyr_3_3:193
+            image: ghcr.io/project-chip/chip-build-telink-zephyr_3_3:194
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
 

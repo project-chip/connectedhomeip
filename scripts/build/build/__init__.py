@@ -1,11 +1,15 @@
 import logging
+import math
+import multiprocessing
 import os
 import shutil
 import time
 from enum import Enum, auto
+from concurrent.futures import ThreadPoolExecutor
 from typing import Sequence
 
-from builders.builder import BuilderOptions
+from builders.builder import BuilderOptions, Builder, OutDirLock
+from runner.runner import Runner
 
 from .targets import BUILD_TARGETS
 
@@ -22,14 +26,18 @@ class BuildTimer:
         self._total_end_time = None
         self._build_times = {}
 
-    def time_builds(self, builders):
-        self._total_start_time = time.time()
-        for builder in builders:
+    def time_builds(self, builders: list[Builder], concurrency: int) -> None:
+
+        def _single_build(builder: Builder):
             start_time = time.time()
             builder.build()
-            end_time = time.time()
-            self._build_times[builder.identifier] = end_time - start_time
-        self._total_end_time = time.time()
+            return builder.identifier, time.time() - start_time
+
+        with ThreadPoolExecutor(thread_name_prefix="Builder", max_workers=concurrency) as pool:
+            self._total_start_time = time.time()
+            for identifier, build_time in pool.map(_single_build, builders):
+                self._build_times[identifier] = build_time
+            self._total_end_time = time.time()
 
     def print_timing_report(self):
         total_time = self._total_end_time - self._total_start_time
@@ -52,14 +60,21 @@ class Context:
          to generate make/ninja instructions and to compile.
       """
 
-    def __init__(self, runner, repository_path: str, output_prefix: str, verbose: bool, quiet: bool, ninja_jobs: int):
-        self.builders = []
+    def __init__(self, runner: Runner, repository_path: str, output_prefix: str, verbose: bool, quiet: bool, ninja_jobs: int,
+                 concurrent_generation: int, concurrent_builders: int):
+        self.builders: list[Builder] = []
         self.runner = runner
         self.repository_path = repository_path
         self.output_prefix = output_prefix
         self.verbose = verbose
         self.quiet = quiet
-        self.ninja_jobs = ninja_jobs
+        self.out_dir_lock = OutDirLock()
+        self.concurrent_generation = concurrent_generation
+        self.concurrent_builders = concurrent_builders
+        if concurrent_builders > 1 and (ninja_jobs is None or ninja_jobs == 0):
+            self.ninja_jobs = max(1, math.floor(multiprocessing.cpu_count() / concurrent_builders))
+        else:
+            self.ninja_jobs = ninja_jobs
         self.completed_steps = set()
 
     def SetupBuilders(self, targets: Sequence[str], options: BuilderOptions):
@@ -73,9 +88,8 @@ class Context:
         for target in targets:
             found_choice = None
             for choice in BUILD_TARGETS:
-                builder = choice.Create(target, self.runner, self.repository_path,
-                                        self.output_prefix, self.verbose, self.quiet, self.ninja_jobs,
-                                        options)
+                builder = choice.Create(target, self.runner, self.repository_path, self.output_prefix, self.verbose, self.quiet,
+                                        self.ninja_jobs, options, self.out_dir_lock)
                 if builder:
                     self.builders.append(builder)
                     found_choice = choice
@@ -110,10 +124,14 @@ class Context:
 
         self.runner.StartCommandExecution()
 
-        for builder in self.builders:
+        def _single_generate(builder: Builder):
             if not builder.quiet:
                 log.info('Generating %s', builder.output_dir)
             builder.generate()
+
+        max_workers = self.concurrent_generation if self.concurrent_generation > 0 else multiprocessing.cpu_count()
+        with ThreadPoolExecutor(thread_name_prefix="Generator", max_workers=max_workers) as pool:
+            list(pool.map(_single_generate, self.builders))
 
         self.completed_steps.add(BuildSteps.GENERATED)
 
@@ -121,7 +139,7 @@ class Context:
         self.Generate()
 
         timer = BuildTimer()
-        timer.time_builds(self.builders)
+        timer.time_builds(self.builders, self.concurrent_builders)
         if not self.quiet:
             timer.print_timing_report()
 

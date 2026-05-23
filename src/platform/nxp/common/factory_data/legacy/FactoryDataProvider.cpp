@@ -346,6 +346,7 @@ CHIP_ERROR FactoryDataProvider::GetSpake2pSalt(MutableByteSpan & saltBuf)
     size_t saltLen = chip::Base64Decode32(saltB64, saltB64Len, reinterpret_cast<uint8_t *>(saltB64));
 
     VerifyOrReturnError(saltLen <= saltBuf.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
+    VerifyOrReturnError(saltLen <= sizeof(saltB64), CHIP_ERROR_BUFFER_TOO_SMALL);
     memcpy(saltBuf.data(), saltB64, saltLen);
     saltBuf.reduce_size(saltLen);
 
@@ -520,9 +521,9 @@ CHIP_ERROR FactoryDataProvider::GetRotatingDeviceIdUniqueId(MutableByteSpan & un
 
 CHIP_ERROR FactoryDataProvider::GetProductFinish(app::Clusters::BasicInformation::ProductFinishEnum * finish)
 {
-    uint8_t productFinish;
-    uint16_t length = 0;
-    auto err        = SearchForId(FactoryDataId::kProductFinish, &productFinish, sizeof(productFinish), length);
+    uint8_t productFinish = 0;
+    uint16_t length       = 0;
+    auto err              = SearchForId(FactoryDataId::kProductFinish, &productFinish, sizeof(productFinish), length);
     VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_ERROR_NOT_IMPLEMENTED);
 
     *finish = static_cast<app::Clusters::BasicInformation::ProductFinishEnum>(productFinish);
@@ -532,7 +533,7 @@ CHIP_ERROR FactoryDataProvider::GetProductFinish(app::Clusters::BasicInformation
 
 CHIP_ERROR FactoryDataProvider::GetProductPrimaryColor(app::Clusters::BasicInformation::ColorEnum * primaryColor)
 {
-    uint8_t color;
+    uint8_t color   = 0;
     uint16_t length = 0;
     auto err        = SearchForId(FactoryDataId::kProductPrimaryColor, &color, sizeof(color), length);
     VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_ERROR_NOT_IMPLEMENTED);

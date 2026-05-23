@@ -21,7 +21,9 @@
 #include <app/icd/server/ICDServerConfig.h>
 
 #include <access/AccessControl.h>
+#include <access/GroupAuxiliaryAccessControlDelegate.h>
 #include <access/examples/ExampleAccessControlDelegate.h>
+#include <access/examples/GroupAuxiliaryAccessControlDelegateImpl.h>
 #include <app/CASEClientPool.h>
 #include <app/CASESessionManager.h>
 #include <app/DefaultSafeAttributePersistenceProvider.h>
@@ -190,8 +192,11 @@ struct ServerInitParams
     // initialized before being provided.
     Access::AccessControl::Delegate * accessDelegate = nullptr;
     // Access control auxiliary delegate: Optional. Used to look up auxiliary access control rules.
-    // If provided, must be initialized before being provided.
-    Access::AccessControl::Delegate * groupAuxiliaryAccessControlDelegate = nullptr;
+    // May be either pre-initialized (Initialize already called) or default-constructed:
+    // Server::Init will call Initialize with its own FabricTable on a not-yet-initialized
+    // delegate before registering it. Applications may substitute their own subclass of
+    // Access::GroupAuxiliaryAccessControlDelegate rather than reusing the default Impl.
+    Access::GroupAuxiliaryAccessControlDelegate * groupAuxiliaryAccessControlDelegate = nullptr;
     // ACL storage: MUST be injected. Used to store ACL entries in persistent storage. Must NOT
     // be initialized before being provided.
     app::AclStorage * aclStorage = nullptr;
@@ -365,6 +370,16 @@ struct CommonCaseDeviceServerInitParams : public ServerInitParams
         }
 #endif
 
+#if CHIP_CONFIG_ENABLE_GROUPCAST
+        if (this->groupAuxiliaryAccessControlDelegate == nullptr)
+        {
+            // The delegate is left uninitialized here on purpose: Server::Init will call
+            // Initialize on it with the Server-owned FabricTable, which is not reachable
+            // from this scope.
+            this->groupAuxiliaryAccessControlDelegate = &mGroupAuxiliaryAccessControlDelegate;
+        }
+#endif // CHIP_CONFIG_ENABLE_GROUPCAST
+
         return CHIP_NO_ERROR;
     }
 
@@ -392,6 +407,12 @@ private:
 
 #if CHIP_CONFIG_ENABLE_ICD_CIP
     app::DefaultICDCheckInBackOffStrategy mICDCheckInBackOffStrategy;
+#endif
+
+#if CHIP_CONFIG_ENABLE_GROUPCAST
+    // Default delegate used when the application does not provide its own. Concrete Impl,
+    // exposed through the abstract base via groupAuxiliaryAccessControlDelegate above.
+    Access::Examples::GroupAuxiliaryAccessControlDelegateImpl mGroupAuxiliaryAccessControlDelegate;
 #endif
 };
 
@@ -556,8 +577,8 @@ private:
             }
 
             const Transport::PeerAddress & address = new_group.UsePerGroupAddress()
-                ? Transport::PeerAddress::Multicast(fabric->GetFabricId(), new_group.group_id)
-                : Transport::PeerAddress::Groupcast();
+                ? Transport::PeerAddress::BuildMatterPerGroupMulticastAddress(fabric->GetFabricId(), new_group.group_id)
+                : Transport::PeerAddress::BuildMatterIanaMulticastAddress();
 
             if (CHIP_NO_ERROR != mServer->GetTransportManager().MulticastGroupJoinLeave(address, true))
             {
@@ -577,7 +598,7 @@ private:
                     return;
                 }
                 const Transport::PeerAddress & address =
-                    Transport::PeerAddress::Multicast(fabric->GetFabricId(), old_group.group_id);
+                    Transport::PeerAddress::BuildMatterPerGroupMulticastAddress(fabric->GetFabricId(), old_group.group_id);
                 VerifyOrReturn(CHIP_NO_ERROR == mServer->GetTransportManager().MulticastGroupJoinLeave(address, false));
             }
             else
@@ -603,7 +624,7 @@ private:
                 if (!in_use)
                 {
                     // Groupcast address no longer in use, unsubscribe
-                    const Transport::PeerAddress & address = Transport::PeerAddress::Groupcast();
+                    const Transport::PeerAddress & address = Transport::PeerAddress::BuildMatterIanaMulticastAddress();
                     VerifyOrReturn(CHIP_NO_ERROR == mServer->GetTransportManager().MulticastGroupJoinLeave(address, false));
                 }
             }
