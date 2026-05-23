@@ -98,7 +98,7 @@ class TC_IDM_9_1(IDMBaseTest, BasicCompositionTests):
                     asserts.fail("Expected CONSTRAINT_ERROR but command succeeded")
                 except InteractionModelError as e:
                     asserts.assert_equal(e.status, Status.ConstraintError,
-                                        f"Expected CONSTRAINT_ERROR, but got {e.status}")
+                                         f"Expected CONSTRAINT_ERROR, but got {e.status}")
 
             # Step 1b: Test octstr min length constraint violation using GeneralDiagnostics TestEventTrigger command.
             # EnableKey is an octstr with allowed=16 (must be exactly 16 bytes); a 15-byte value violates the length constraint.
@@ -114,7 +114,7 @@ class TC_IDM_9_1(IDMBaseTest, BasicCompositionTests):
                     asserts.fail("Expected CONSTRAINT_ERROR but command succeeded")
                 except InteractionModelError as e:
                     asserts.assert_equal(e.status, Status.ConstraintError,
-                                        f"Expected CONSTRAINT_ERROR, but got {e.status}")
+                                         f"Expected CONSTRAINT_ERROR, but got {e.status}")
 
         # Step 1c: Test string max length constraint violation using GeneralCommissioning clusters SetRegulatoryConfig command
         self.step("1c")
