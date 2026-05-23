@@ -257,7 +257,7 @@ void CameraApp::CreateAndInitializeCameraAVStreamMgmt()
         avsmOptionalAttrs.Set(CameraAvStreamManagement::OptionalAttribute::kImageRotation);
     }
 
-    uint32_t maxConcurrentVideoEncoders  = mCameraDevice->GetCameraHALInterface().GetMaxConcurrentEncoders();
+    uint8_t maxConcurrentVideoEncoders   = mCameraDevice->GetCameraHALInterface().GetMaxConcurrentEncoders();
     uint32_t maxEncodedPixelRate         = mCameraDevice->GetCameraHALInterface().GetMaxEncodedPixelRate();
     VideoSensorParamsStruct sensorParams = mCameraDevice->GetCameraHALInterface().GetVideoSensorParams();
     bool nightVisionUsesInfrared         = mCameraDevice->GetCameraHALInterface().GetNightVisionUsesInfrared();
@@ -284,7 +284,7 @@ void CameraApp::CreateAndInitializeCameraAVStreamMgmt()
         .endpointId                   = mEndpoint,
         .features                     = avsmFeatures,
         .optionalAttrs                = avsmOptionalAttrs,
-        .maxConcurrentEncoders        = static_cast<uint8_t>(maxConcurrentVideoEncoders),
+        .maxConcurrentEncoders        = maxConcurrentVideoEncoders,
         .maxEncodedPixelRate          = maxEncodedPixelRate,
         .videoSensorParams            = sensorParams,
         .nightVisionUsesInfrared      = nightVisionUsesInfrared,
