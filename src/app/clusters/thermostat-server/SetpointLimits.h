@@ -37,7 +37,7 @@ struct SetpointLimits
 {
     virtual ~SetpointLimits() = default;
 
-    SetpointLimits(T minimum, T maximum) : minimum(minimum), maximum(maximum){};
+    SetpointLimits(T min, T max) : minimum(min), maximum(max){};
     SetpointLimits(const SetpointLimits<T> & al) : minimum(al.minimum), maximum(al.maximum){};
 
     T minimum;
