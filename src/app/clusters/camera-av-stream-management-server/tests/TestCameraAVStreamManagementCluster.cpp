@@ -86,19 +86,20 @@ static std::vector<StreamUsageEnum> & GetSupportedStreamUsages()
     return supportedStreamUsage;
 }
 
-static CameraAVStreamManagementCluster::InitArguments MakeInitArguments(CameraAVStreamManagementDelegate & delegate, SafeAttributePersistenceProvider & persistenceProvider)
+static CameraAVStreamManagementCluster::InitArguments MakeInitArguments(CameraAVStreamManagementDelegate & delegate,
+                                                                        SafeAttributePersistenceProvider & persistenceProvider)
 {
     CameraAVStreamManagementCluster::InitArguments args{
-        .context                      = { persistenceProvider },
-        .delegate                     = delegate,
-        .endpointId                   = kTestEndpointId,
-        .features                     = chip::BitFlags<CameraAvStreamManagement::Feature>(
+        .context    = { persistenceProvider },
+        .delegate   = delegate,
+        .endpointId = kTestEndpointId,
+        .features   = chip::BitFlags<CameraAvStreamManagement::Feature>(
             CameraAvStreamManagement::Feature::kVideo, CameraAvStreamManagement::Feature::kAudio,
             CameraAvStreamManagement::Feature::kSnapshot, CameraAvStreamManagement::Feature::kSpeaker,
             CameraAvStreamManagement::Feature::kImageControl, CameraAvStreamManagement::Feature::kPrivacy,
             CameraAvStreamManagement::Feature::kWatermark, CameraAvStreamManagement::Feature::kHighDynamicRange,
             CameraAvStreamManagement::Feature::kNightVision),
-        .optionalAttrs                = chip::BitFlags<CameraAvStreamManagement::OptionalAttribute>(
+        .optionalAttrs = chip::BitFlags<CameraAvStreamManagement::OptionalAttribute>(
             CameraAvStreamManagement::OptionalAttribute::kHardPrivacyModeOn,
             CameraAvStreamManagement::OptionalAttribute::kMicrophoneAGCEnabled,
             CameraAvStreamManagement::OptionalAttribute::kImageRotation,
@@ -319,8 +320,7 @@ struct TestCameraAVStreamManagementCluster : public ::testing::Test
 
     TestCameraAVStreamManagementCluster() :
         mMockDelegate(&mVideoStreams, &mAudioStreams, &mSnapshotStreams),
-        mServer(MakeInitArguments(mMockDelegate, mPersistenceProvider)),
-        mClusterTester(mServer)
+        mServer(MakeInitArguments(mMockDelegate, mPersistenceProvider)), mClusterTester(mServer)
     {}
 
     void SetUp() override
