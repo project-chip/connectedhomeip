@@ -73,25 +73,10 @@ struct UserSetpointLimits : public SetpointLimits<OptionalSetpoint>
     UserSetpointLimits(const SetpointLimits<AbsoluteSetpoint> & al, const UserSetpointLimits & override) :
         SetpointLimits(override.minimum, override.maximum), absoluteLimits(al){};
 
-    bool IsValid() const override
-    {
-        if (!absoluteLimits.IsValid())
-        {
-            return false;
-        }
-        if (minimum.HasTemperature() && !absoluteLimits.Valid(minimum.Temperature()))
-        {
-            return false;
-        }
-        if (maximum.HasTemperature() && !absoluteLimits.Valid(maximum.Temperature()))
-        {
-            return false;
-        }
-        return SetpointLimits::IsValid();
-    }
+    bool IsValid() const override;
 
-    temperature Minimum() const override { return minimum.HasTemperature() ? minimum.Temperature() : absoluteLimits.Minimum(); };
-    temperature Maximum() const override { return maximum.HasTemperature() ? maximum.Temperature() : absoluteLimits.Maximum(); };
+    temperature Minimum() const override;
+    temperature Maximum() const override;
 };
 
 } // namespace Thermostat

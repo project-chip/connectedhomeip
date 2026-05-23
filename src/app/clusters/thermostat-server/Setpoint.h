@@ -29,28 +29,52 @@ namespace app {
 namespace Clusters {
 namespace Thermostat {
 
+/*
+ * The Setpoint class represents a setpoint value and its associated attributes.
+ */
 class Setpoint
 {
 public:
     virtual ~Setpoint() = default;
 
-    virtual bool HasTemperature() const                                  = 0;
-    virtual temperature Temperature() const                              = 0;
-    virtual chip::app::Clusters::Thermostat::SystemModeEnum Mode() const = 0;
-    virtual chip::AttributeId AttributeId() const                        = 0;
+    /*
+     * Return true if the setpoint has a temperature value, false otherwise.
+     */
+    virtual bool HasTemperature() const = 0;
+
+    /*
+     * Return the temperature value.
+     */
+    virtual temperature Temperature() const = 0;
+
+    /*
+     * Return the mode of the setpoint.
+     */
+    virtual SystemModeEnum Mode() const = 0;
+
+    /*
+     * Return the attribute id associated with the setpoint.
+     */
+    virtual chip::AttributeId AttributeId() const = 0;
 };
 
+/*
+ * Base class for all setpoints, containing the attribute id
+ */
 class BaseSetpoint : public Setpoint
 {
 public:
     BaseSetpoint(chip::AttributeId attributeId) : mAttributeId(attributeId) {}
     chip::AttributeId AttributeId() const override { return mAttributeId; }
-    chip::app::Clusters::Thermostat::SystemModeEnum Mode() const override;
+    SystemModeEnum Mode() const override;
 
 protected:
     chip::AttributeId mAttributeId;
 };
 
+/*
+ * The AbsoluteSetpoint class represents an absolute setpoint value.
+ */
 class AbsoluteSetpoint : public BaseSetpoint
 {
 public:
@@ -66,6 +90,10 @@ private:
     temperature mTemperature;
 };
 
+/*
+ * The OptionalSetpoint class represents an optional setpoint value. It is used for setpoints which can be optionally overridden by
+ * the user
+ */
 class OptionalSetpoint : public BaseSetpoint
 {
 public:

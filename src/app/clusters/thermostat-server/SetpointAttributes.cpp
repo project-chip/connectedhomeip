@@ -22,6 +22,46 @@ namespace app {
 namespace Clusters {
 namespace Thermostat {
 
+SetpointAttributes & SetpointAttributes::Set(chip::AttributeId attribute)
+{
+    mValue |= static_cast<uint32_t>(1 << attribute);
+    return *this;
+}
+
+SetpointAttributes & SetpointAttributes::Set(const SetpointAttributes & other)
+{
+    mValue |= other.mValue;
+    return *this;
+}
+
+bool SetpointAttributes::Has(chip::AttributeId attribute) const
+{
+    return (mValue & static_cast<uint32_t>(1 << attribute)) != 0;
+}
+
+SetpointAttributes & SetpointAttributes::Clear(chip::AttributeId attribute)
+{
+    mValue &= ~static_cast<uint32_t>(1 << attribute);
+    return *this;
+}
+
+SetpointAttributes & SetpointAttributes::ClearAll()
+{
+    mValue = 0;
+    return *this;
+}
+
+void SetpointAttributes::Log(char const * prefix)
+{
+    for (uint32_t i = 0; i < 32; i++)
+    {
+        if ((mValue & (1 << i)) != 0)
+        {
+            ChipLogProgress(Zcl, " %s %s", prefix, SetpointAttributeName(i));
+        }
+    }
+}
+
 char const * SetpointAttributeName(chip::AttributeId id) {
     switch (id) {
         case OccupiedHeatingSetpoint::Id:

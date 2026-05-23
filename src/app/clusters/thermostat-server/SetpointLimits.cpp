@@ -36,6 +36,32 @@ namespace app {
 namespace Clusters {
 namespace Thermostat {
 
+bool UserSetpointLimits::IsValid() const
+{
+    if (!absoluteLimits.IsValid())
+    {
+        return false;
+    }
+    if (minimum.HasTemperature() && !absoluteLimits.Valid(minimum.Temperature()))
+    {
+        return false;
+    }
+    if (maximum.HasTemperature() && !absoluteLimits.Valid(maximum.Temperature()))
+    {
+        return false;
+    }
+    return SetpointLimits::IsValid();
+}
+
+temperature UserSetpointLimits::Minimum() const
+{
+    return minimum.HasTemperature() ? minimum.Temperature() : absoluteLimits.Minimum();
+}
+temperature UserSetpointLimits::Maximum() const
+{
+    return maximum.HasTemperature() ? maximum.Temperature() : absoluteLimits.Maximum();
+}
+
 /*EffectiveSetpointLimits::EffectiveSetpointLimits(const Setpoints & sp, SystemModeEnum systemMode) :
     SetpointLimits(systemMode), setpoints(sp)
 {

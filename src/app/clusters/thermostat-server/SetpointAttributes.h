@@ -32,57 +32,63 @@ namespace app {
 namespace Clusters {
 namespace Thermostat {
 
-class SetpointAttributes {
+/*
+ * The SetpointAttributes class is used to keep track of which setpoints have been changed or fixed.
+ *
+ * Note: this relies heavily on the fact that all the setpoint attributes have IDs below 32, and can thus be used
+ * to bit-shift into a flag map. This is NOT a generic class for tracking arbitrary attribute changes.
+ */
+class SetpointAttributes
+{
 
-    public:
-    SetpointAttributes & Set(chip::AttributeId attribute)
-    {
-        mValue |= static_cast<uint32_t>(1 << attribute);
-        return *this;
-    }
+public:
+    /*
+     * Set the flag for the given attribute.
+     */
+    SetpointAttributes & Set(chip::AttributeId attribute);
 
-    SetpointAttributes & Set(const SetpointAttributes & other)
-    {
-        mValue |= other.mValue;
-        return *this;
-    }
+    /*
+     * Set the flags for the given attributes.
+     */
+    SetpointAttributes & Set(const SetpointAttributes & other);
 
-    bool Has(chip::AttributeId attribute) const
-    {
-        return (mValue & static_cast<uint32_t>(1 << attribute)) != 0;
-    }
+    /*
+     * Check if the flag for the given attribute is set.
+     */
+    bool Has(chip::AttributeId attribute) const;
 
-    template<typename... Args>
-    bool HasAny(Args ... args) const
+    /*
+     * Check if any of the given attributes are set.
+     */
+    template <typename... Args>
+    bool HasAny(Args... args) const
     {
         return (mValue & Or(std::forward<chip::AttributeId>(args)...)) != 0;
     }
 
-    SetpointAttributes & Clear(chip::AttributeId attribute)
-    {
-        mValue &= ~static_cast<uint32_t>(1 << attribute);
-        return *this;
-    }
+    /*
+     * Clear the flag for the given attribute.
+     */
+    SetpointAttributes & Clear(chip::AttributeId attribute);
 
-    SetpointAttributes & ClearAll()
-    {
-        mValue = 0;
-        return *this;
-    }
+    /*
+     * Clear all the flags.
+     */
+    SetpointAttributes & ClearAll();
+
+    bool Empty() const { return mValue == 0; }
 
     uint32_t Raw() const { return mValue; }
-    
-    private:
 
-    template<typename... Args>
-    static constexpr uint32_t Or(chip::AttributeId attribute, Args ... args)
+    void Log(char const * prefix);
+
+private:
+    template <typename... Args>
+    static constexpr uint32_t Or(chip::AttributeId attribute, Args... args)
     {
         return static_cast<uint32_t>(1 << attribute) | Or(args...);
     }
-    static constexpr uint32_t Or()
-    {
-        return 0;
-    }
+    static constexpr uint32_t Or() { return 0; }
 
     uint32_t mValue = 0;
 };

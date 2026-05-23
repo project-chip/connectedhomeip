@@ -25,7 +25,7 @@ namespace app {
 namespace Clusters {
 namespace Thermostat {
 
-chip::app::Clusters::Thermostat::SystemModeEnum BaseSetpoint::Mode() const
+SystemModeEnum BaseSetpoint::Mode() const
 {
     switch (mAttributeId)
     {
