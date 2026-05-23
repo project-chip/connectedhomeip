@@ -74,37 +74,47 @@ class TC_IDM_9_1(IDMBaseTest, BasicCompositionTests):
         self.build_spec_xmls()
         self.endpoint = MatterBaseTest.get_endpoint(self)
 
-        # Step 1a: Test octstr max length constraint violation using GeneralDiagnostics TestEventTrigger command.
-        # EnableKey is an octstr with allowed=16 (must be exactly 16 bytes); a 17-byte value violates the length constraint.
-        # TestEventTrigger lives on the root node (endpoint 0).
-        self.step("1a")
-        if await MatterBaseTest.command_guard(self, endpoint=0, command=Clusters.GeneralDiagnostics.Commands.TestEventTrigger):
-            try:
-                cmd = Clusters.GeneralDiagnostics.Commands.TestEventTrigger(
-                    enableKey=b'\x00' * 17,
-                    eventTrigger=0,
-                )
-                await self.default_controller.SendCommand(nodeId=self.dut_node_id, endpoint=0, payload=cmd)
-                asserts.fail("Expected CONSTRAINT_ERROR but command succeeded")
-            except InteractionModelError as e:
-                asserts.assert_equal(e.status, Status.ConstraintError,
-                                     f"Expected CONSTRAINT_ERROR, but got {e.status}")
+        test_event_triggers_enabled = await self.read_single_attribute_check_success(
+            cluster=Clusters.GeneralDiagnostics,
+            attribute=Clusters.GeneralDiagnostics.Attributes.TestEventTriggersEnabled,
+            endpoint=0,
+        )
+        if not test_event_triggers_enabled:
+            log.info("TestEventTriggersEnabled is not enabled, skipping test step 1a and 1b")
+            self.mark_step_range_skipped("1a", "1b")
 
-        # Step 1b: Test octstr min length constraint violation using GeneralDiagnostics TestEventTrigger command.
-        # EnableKey is an octstr with allowed=16 (must be exactly 16 bytes); a 15-byte value violates the length constraint.
-        # TestEventTrigger lives on the root node (endpoint 0).
-        self.step("1b")
-        if await MatterBaseTest.command_guard(self, endpoint=0, command=Clusters.GeneralDiagnostics.Commands.TestEventTrigger):
-            try:
-                cmd = Clusters.GeneralDiagnostics.Commands.TestEventTrigger(
-                    enableKey=b'\x00' * 15,
-                    eventTrigger=0,
-                )
-                await self.default_controller.SendCommand(nodeId=self.dut_node_id, endpoint=0, payload=cmd)
-                asserts.fail("Expected CONSTRAINT_ERROR but command succeeded")
-            except InteractionModelError as e:
-                asserts.assert_equal(e.status, Status.ConstraintError,
-                                     f"Expected CONSTRAINT_ERROR, but got {e.status}")
+        else:
+            self.step("1a")
+            # Step 1a: Test octstr max length constraint violation using GeneralDiagnostics TestEventTrigger command.
+            # EnableKey is an octstr with allowed=16 (must be exactly 16 bytes); a 17-byte value violates the length constraint.
+            # TestEventTrigger lives on the root node (endpoint 0).
+            if await MatterBaseTest.command_guard(self, endpoint=0, command=Clusters.GeneralDiagnostics.Commands.TestEventTrigger):
+                try:
+                    cmd = Clusters.GeneralDiagnostics.Commands.TestEventTrigger(
+                        enableKey=b'\x00' * 17,
+                        eventTrigger=0,
+                    )
+                    await self.default_controller.SendCommand(nodeId=self.dut_node_id, endpoint=0, payload=cmd)
+                    asserts.fail("Expected CONSTRAINT_ERROR but command succeeded")
+                except InteractionModelError as e:
+                    asserts.assert_equal(e.status, Status.ConstraintError,
+                                        f"Expected CONSTRAINT_ERROR, but got {e.status}")
+
+            # Step 1b: Test octstr min length constraint violation using GeneralDiagnostics TestEventTrigger command.
+            # EnableKey is an octstr with allowed=16 (must be exactly 16 bytes); a 15-byte value violates the length constraint.
+            # TestEventTrigger lives on the root node (endpoint 0).
+            self.step("1b")
+            if await MatterBaseTest.command_guard(self, endpoint=0, command=Clusters.GeneralDiagnostics.Commands.TestEventTrigger):
+                try:
+                    cmd = Clusters.GeneralDiagnostics.Commands.TestEventTrigger(
+                        enableKey=b'\x00' * 15,
+                        eventTrigger=0,
+                    )
+                    await self.default_controller.SendCommand(nodeId=self.dut_node_id, endpoint=0, payload=cmd)
+                    asserts.fail("Expected CONSTRAINT_ERROR but command succeeded")
+                except InteractionModelError as e:
+                    asserts.assert_equal(e.status, Status.ConstraintError,
+                                        f"Expected CONSTRAINT_ERROR, but got {e.status}")
 
         # Step 1c: Test string max length constraint violation using GeneralCommissioning clusters SetRegulatoryConfig command
         self.step("1c")
