@@ -110,9 +110,9 @@ inline const chip::Span<const SemanticTagStructType> kMultiColumnSwitchTags[] = 
 /**
  * Returns true if endpoints 1-9 all have generic switch device type.
  */
-bool isMultiColumnSwitch()
+inline bool isMultiColumnSwitch()
 {
-    chip::EndpointId num_endpoints = sizeof(kMultiColumnSwitchTags) / sizeof(kMultiColumnSwitchTags[0]);
+    chip::EndpointId num_endpoints = ArraySize(kMultiColumnSwitchTags);
     // Check if this is the multi column switch.
     for (chip::EndpointId ep = 1; ep <= num_endpoints; ++ep)
     {
@@ -125,12 +125,12 @@ bool isMultiColumnSwitch()
 /**
  * Initialises the multi column switch app. Sets semantic tags.
  */
-void InitMultiColumnSwitch()
+inline void InitMultiColumnSwitch()
 {
     if (!isMultiColumnSwitch())
         return;
 
-    chip::EndpointId num_endpoints = sizeof(kMultiColumnSwitchTags) / sizeof(kMultiColumnSwitchTags[0]);
+    chip::EndpointId num_endpoints = ArraySize(kMultiColumnSwitchTags);
 
     for (chip::EndpointId ep = 1; ep <= num_endpoints; ++ep)
     {

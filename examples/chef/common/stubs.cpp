@@ -841,7 +841,7 @@ void ApplicationInit()
     WaterHeaterInit();
     ChimeInit();
     InitModeSelect();
-    InitMultiColumnSwitch();
+    chef::InitMultiColumnSwitch();
 
 #ifdef MATTER_DM_PLUGIN_PUMP_CONFIGURATION_AND_CONTROL_SERVER
 #ifdef MATTER_DM_PLUGIN_ON_OFF_SERVER
