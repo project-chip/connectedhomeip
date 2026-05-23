@@ -252,7 +252,8 @@ void Setpoints::FixUserLimits(SetpointLimits<AbsoluteSetpoint> & absoluteLimits,
         }
         else
         {
-            ChipLogError(Zcl, "Thermostat:Setpoints::FixUserLimits: invalid user %s limits on unknown attribute change: 0x%x",
+            ChipLogError(Zcl,
+                         "Thermostat:Setpoints::FixUserLimits: invalid user %s limits on unknown attribute change: 0x%" PRIx32,
                          userLimits.absoluteLimits.Mode() == SystemModeEnum::kHeat ? "heating" : "cooling",
                          changedAttributes.Raw());
         }
@@ -355,7 +356,7 @@ void Setpoints::FixUserLimitDeadband(OptionalSetpoint & heatLimit, OptionalSetpo
     }
     else
     {
-        ChipLogError(Zcl, "Thermostat:Setpoints::FixUserLimitDeadband: invalid user limits on unknown attribute change: 0x%x",
+        ChipLogError(Zcl, "Thermostat:Setpoints::FixUserLimitDeadband: invalid user limits on unknown attribute change: 0x%" PRIx32,
                      changedAttributes.Raw());
     }
 }
@@ -458,7 +459,7 @@ void Setpoints::FixRange(SetpointRange & range, SetpointAttributes & changedAttr
     }
     else
     {
-        ChipLogError(Zcl, "Thermostat:Setpoints::FixRange: no setpoint attribute changed: 0x%x", changedAttributes.Raw());
+        ChipLogError(Zcl, "Thermostat:Setpoints::FixRange: no setpoint attribute changed: 0x%" PRIx32, changedAttributes.Raw());
     }
 }
 

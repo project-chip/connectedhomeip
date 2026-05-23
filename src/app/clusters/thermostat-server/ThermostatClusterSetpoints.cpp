@@ -123,7 +123,7 @@ Status HandleSetpointWrite(const ConcreteAttributePath & attributePath)
         return Status::Failure;
     }
 
-    ChipLogProgress(Zcl, "Thermostat: HandleSetpointWrite: attribute: %s (0x%x), temp: %" PRIi16,
+    ChipLogProgress(Zcl, "Thermostat: HandleSetpointWrite: attribute: %s (0x%" PRIx32 "), temp: %" PRIi16,
                     SetpointAttributeName(attributePath.mAttributeId), attributePath.mAttributeId, temp);
 
     SetpointAttributes affectedAttributes;
