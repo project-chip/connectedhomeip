@@ -18,11 +18,11 @@
 
 #include <app/AttributeValueDecoder.h>
 #include <app/CommandHandler.h>
-#include <app/persistence/AttributePersistenceProvider.h>
 #include <app/clusters/camera-av-stream-management-server/CameraAVStreamManagementCluster.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model-provider/tests/TestConstants.h>
 #include <app/data-model/Decode.h>
+#include <app/persistence/AttributePersistenceProvider.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/testing/ClusterTester.h>
 #include <app/server-cluster/testing/ValidateGlobalAttributes.h>
@@ -300,6 +300,7 @@ public:
         VerifyOrReturnError(mProvider != nullptr, CHIP_ERROR_INCORRECT_STATE);
         return mProvider->ReadValue(aPath, aValue);
     }
+
 private:
     app::AttributePersistenceProvider * mProvider = nullptr;
 };
