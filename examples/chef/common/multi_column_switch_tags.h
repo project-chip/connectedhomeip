@@ -112,7 +112,7 @@ inline const chip::Span<const SemanticTagStructType> kMultiColumnSwitchTags[] = 
  */
 inline bool isMultiColumnSwitch()
 {
-    chip::EndpointId num_endpoints = ArraySize(kMultiColumnSwitchTags);
+    chip::EndpointId num_endpoints = MATTER_ARRAY_SIZE(kMultiColumnSwitchTags);
     // Check if this is the multi column switch.
     for (chip::EndpointId ep = 1; ep <= num_endpoints; ++ep)
     {
@@ -130,7 +130,7 @@ inline void InitMultiColumnSwitch()
     if (!isMultiColumnSwitch())
         return;
 
-    chip::EndpointId num_endpoints = ArraySize(kMultiColumnSwitchTags);
+    chip::EndpointId num_endpoints = MATTER_ARRAY_SIZE(kMultiColumnSwitchTags);
 
     for (chip::EndpointId ep = 1; ep <= num_endpoints; ++ep)
     {
