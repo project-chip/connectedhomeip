@@ -48,7 +48,7 @@ constexpr uint8_t kTagSwitchesNext         = 5;
 constexpr uint8_t kTagSwitchesPrevious     = 6;
 constexpr uint8_t kTagSwitchesCustom       = 8;
 
-const SemanticTagStructType kUpTags[] = {
+inline const SemanticTagStructType kUpTags[] = {
     { .namespaceID = kNamespaceCommonPosition,
       .tag         = kTagCommonPositionColumn,
       .label       = chip::MakeOptional(chip::app::DataModel::Nullable<chip::CharSpan>(chip::CharSpan("Column", 6))) },
@@ -60,7 +60,7 @@ const SemanticTagStructType kUpTags[] = {
       .label       = chip::MakeOptional(chip::app::DataModel::Nullable<chip::CharSpan>(chip::CharSpan("Custom", 6))) }
 };
 
-const SemanticTagStructType kDownTags[] = {
+inline const SemanticTagStructType kDownTags[] = {
     { .namespaceID = kNamespaceCommonPosition,
       .tag         = kTagCommonPositionColumn,
       .label       = chip::MakeOptional(chip::app::DataModel::Nullable<chip::CharSpan>(chip::CharSpan("Column", 6))) },
@@ -72,7 +72,7 @@ const SemanticTagStructType kDownTags[] = {
       .label       = chip::MakeOptional(chip::app::DataModel::Nullable<chip::CharSpan>(chip::CharSpan("Custom", 6))) }
 };
 
-const SemanticTagStructType kToggleTags[] = {
+inline const SemanticTagStructType kToggleTags[] = {
     { .namespaceID = kNamespaceCommonPosition,
       .tag         = kTagCommonPositionColumn,
       .label       = chip::MakeOptional(chip::app::DataModel::Nullable<chip::CharSpan>(chip::CharSpan("Column", 6))) },
