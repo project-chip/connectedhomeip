@@ -40,7 +40,7 @@ namespace app {
 namespace Clusters {
 namespace Thermostat {
 
-Status HandleSetpointChange(Setpoints & setpoints, chip::AttributeId attributeId, temperature value,
+Status ValidateSetpointChange(Setpoints & setpoints, chip::AttributeId attributeId, temperature value,
                             SetpointAttributes & changedAttributes)
 {
     switch (attributeId)
@@ -84,6 +84,69 @@ Status HandleSetpointChange(Setpoints & setpoints, chip::AttributeId attributeId
     }
 }
 
+
+Status HandleSetpointWrite(const ConcreteAttributePath & attributePath)
+{
+    Setpoints setpoints;
+    auto status = LoadSetpoints(attributePath.mEndpointId, setpoints);
+    if (status != Status::Success)
+    {
+        return status;
+    }
+    temperature temp;
+    switch (attributePath.mAttributeId)
+    {
+    case OccupiedHeatingSetpoint::Id:
+        temp = setpoints.occupied.heating.Temperature();
+        break;
+    case OccupiedCoolingSetpoint::Id:
+        temp = setpoints.occupied.cooling.Temperature();
+        break;
+    case UnoccupiedHeatingSetpoint::Id:
+        temp = setpoints.unoccupied.heating.Temperature();
+        break;
+    case UnoccupiedCoolingSetpoint::Id:
+        temp = setpoints.unoccupied.cooling.Temperature();
+        break;
+    case MinHeatSetpointLimit::Id:
+        temp = setpoints.userHeatLimits.minimum.Temperature();
+        break;
+    case MaxHeatSetpointLimit::Id:
+        temp = setpoints.userHeatLimits.maximum.Temperature();
+        break;
+    case MinCoolSetpointLimit::Id:
+        temp = setpoints.userCoolLimits.minimum.Temperature();
+        break;
+    case MaxCoolSetpointLimit::Id:
+        temp = setpoints.userCoolLimits.maximum.Temperature();
+        break;
+    default:
+        return Status::Failure;
+    }
+
+    ChipLogProgress(Zcl, "Thermostat: HandleSetpointWrite: attribute: %s (0x%x), temp: %" PRIi16, SetpointAttributeName(attributePath.mAttributeId), attributePath.mAttributeId, temp);
+
+    SetpointAttributes affectedAttributes;
+    affectedAttributes.Set(attributePath.mAttributeId);
+    affectedAttributes.ClearFirstDirtyAttribute();
+    status = ValidateSetpointChange(setpoints, attributePath.mAttributeId, temp, affectedAttributes);
+    // In theory, this should always succeed, as the values will have been filtered in
+    // MatterThermostatClusterServerPreAttributeChangedCallback
+    if (status == Status::Success)
+    {
+        affectedAttributes.Clear(attributePath.mAttributeId);
+        if (!affectedAttributes.Empty())
+        {
+            status = SaveFirstDirtySetpoint(attributePath.mEndpointId, setpoints, affectedAttributes);
+        }
+    }
+    else
+    {
+        ChipLogProgress(Zcl, "Thermostat: HandleSetpointWrite: failed to fix setpoint violations");
+    }
+    return status;
+}
+
 Status SetpointRaiseLower(const EndpointId endpointId, const Commands::SetpointRaiseLower::DecodableType & commandData)
 {
 
@@ -106,7 +169,7 @@ Status SetpointRaiseLower(const EndpointId endpointId, const Commands::SetpointR
         {
             return status;
         }
-        isOccupied = OccupancyBitmap::kOccupied;
+        isOccupied = occupancy.Has(OccupancyBitmap::kOccupied) ? OccupancyBitmap::kOccupied : OccupancyBitmap(0);
     }
     else
     {
