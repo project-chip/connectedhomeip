@@ -275,11 +275,11 @@ class TC_DA_1_1(MatterBaseTest):
 
         # Verify that TH1's fabric is present in the Fabrics list
         asserts.assert_in(th1_fabric_identity, fabric_ids_final,
-                          f"TH1's fabric should be present in Fabrics list after re-commissioning")
+                          "TH1's fabric should be present in Fabrics list after re-commissioning")
 
         # Verify that TH2's fabric is absent from the Fabrics list
         asserts.assert_not_in(th2_fabric_identity, fabric_ids_final,
-                              f"TH2's fabric should be absent from Fabrics list after removal")
+                              "TH2's fabric should be absent from Fabrics list after removal")
 
 
 if __name__ == "__main__":
