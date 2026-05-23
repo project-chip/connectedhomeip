@@ -690,7 +690,7 @@ Status LoadSetpoints(EndpointId endpoint, Setpoints & setpoints)
     return Status::Success;
 }
 
-Status SaveSetpoints(EndpointId endpoint, Setpoints & setpoints, SetpointAttributes & affectedAttributes)
+Status SaveSetpoints(EndpointId endpoint, Setpoints & setpoints, SetpointAttributes & affectedAttributes, bool onlySaveOne)
 {
     Status status;
     if (affectedAttributes.Has(Attributes::MinSetpointDeadBand::Id))
@@ -700,12 +700,20 @@ Status SaveSetpoints(EndpointId endpoint, Setpoints & setpoints, SetpointAttribu
         {
             return status;
         }
+        if (onlySaveOne)
+        {
+            return Status::Success;
+        }
     }
     if (affectedAttributes.Has(Attributes::MinHeatSetpointLimit::Id) && setpoints.userHeatLimits.minimum.HasTemperature())
     {
         if ((status = MinHeatSetpointLimit::Set(endpoint, setpoints.userHeatLimits.minimum.Temperature())) != Status::Success)
         {
             return status;
+        }
+        if (onlySaveOne)
+        {
+            return Status::Success;
         }
     }
     if (affectedAttributes.Has(Attributes::MaxHeatSetpointLimit::Id) && setpoints.userHeatLimits.maximum.HasTemperature())
@@ -714,12 +722,20 @@ Status SaveSetpoints(EndpointId endpoint, Setpoints & setpoints, SetpointAttribu
         {
             return status;
         }
+        if (onlySaveOne)
+        {
+            return Status::Success;
+        }
     }
     if (affectedAttributes.Has(Attributes::MinCoolSetpointLimit::Id) && setpoints.userCoolLimits.minimum.HasTemperature())
     {
         if ((status = MinCoolSetpointLimit::Set(endpoint, setpoints.userCoolLimits.minimum.Temperature())) != Status::Success)
         {
             return status;
+        }
+        if (onlySaveOne)
+        {
+            return Status::Success;
         }
     }
     if (affectedAttributes.Has(Attributes::MaxCoolSetpointLimit::Id) && setpoints.userCoolLimits.maximum.HasTemperature())
@@ -728,12 +744,20 @@ Status SaveSetpoints(EndpointId endpoint, Setpoints & setpoints, SetpointAttribu
         {
             return status;
         }
+        if (onlySaveOne)
+        {
+            return Status::Success;
+        }
     }
     if (affectedAttributes.Has(Attributes::OccupiedHeatingSetpoint::Id))
     {
         if ((status = OccupiedHeatingSetpoint::Set(endpoint, setpoints.occupied.heating.Temperature())) != Status::Success)
         {
             return status;
+        }
+        if (onlySaveOne)
+        {
+            return Status::Success;
         }
     }
     if (affectedAttributes.Has(Attributes::OccupiedCoolingSetpoint::Id))
@@ -742,6 +766,10 @@ Status SaveSetpoints(EndpointId endpoint, Setpoints & setpoints, SetpointAttribu
         {
             return status;
         }
+        if (onlySaveOne)
+        {
+            return Status::Success;
+        }
     }
     if (affectedAttributes.Has(Attributes::UnoccupiedHeatingSetpoint::Id))
     {
@@ -749,12 +777,20 @@ Status SaveSetpoints(EndpointId endpoint, Setpoints & setpoints, SetpointAttribu
         {
             return status;
         }
+        if (onlySaveOne)
+        {
+            return Status::Success;
+        }
     }
     if (affectedAttributes.Has(Attributes::UnoccupiedCoolingSetpoint::Id))
     {
         if ((status = UnoccupiedCoolingSetpoint::Set(endpoint, setpoints.unoccupied.cooling.Temperature())) != Status::Success)
         {
             return status;
+        }
+        if (onlySaveOne)
+        {
+            return Status::Success;
         }
     }
     return Status::Success;

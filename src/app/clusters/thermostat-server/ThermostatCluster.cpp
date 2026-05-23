@@ -519,10 +519,14 @@ Status HandleSetpointWrite(const ConcreteAttributePath & attributePath)
     if (status == Status::Success)
     {
         affectedAttributes.Clear(attributePath.mAttributeId);
-        if (affectedAttributes.HasAny())
+        if (!affectedAttributes.Empty())
         {
-            status = SaveSetpoints(attributePath.mEndpointId, setpoints, affectedAttributes);
+            status = SaveSetpoints(attributePath.mEndpointId, setpoints, affectedAttributes, true);
         }
+    }
+    else
+    {
+        ChipLogProgress(Zcl, "Thermostat: HandleSetpointWrite: failed to fix setpoint violations");
     }
     return status;
 }

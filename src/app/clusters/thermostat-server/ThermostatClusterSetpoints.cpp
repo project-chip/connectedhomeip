@@ -113,7 +113,7 @@ Status SetpointRaiseLower(const EndpointId endpointId, const Commands::SetpointR
         isOccupied = OccupancyBitmap::kOccupied;
     }
 
-    auto range = setpoints.GetRange(isOccupied);
+    auto & range = setpoints.GetRange(isOccupied);
 
     chip::Optional<temperature> heat;
     chip::Optional<temperature> cool;
@@ -156,7 +156,7 @@ Status SetpointRaiseLower(const EndpointId endpointId, const Commands::SetpointR
         status = setpoints.ChangeRange(range, heat, cool, Setpoints::ClampMode::kClamp, changedAttributes);
         if (status == Status::Success)
         {
-            return SaveSetpoints(endpointId, setpoints, changedAttributes);
+            return SaveSetpoints(endpointId, setpoints, changedAttributes, false);
         }
     }
 
