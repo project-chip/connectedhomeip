@@ -639,21 +639,21 @@ class TC_TSTAT_2_2(MatterBaseTest):
             await self.write_setpoint(cluster.Attributes.OccupiedCoolingSetpoint, OccupiedCoolingSetpointValue)
         if self.pics_guard(hasHeatingFeature):
             await self.write_setpoint(cluster.Attributes.OccupiedHeatingSetpoint, OccupiedHeatingSetpointValue)
-            await self.send_raise_lower_and_verify(mode=0, amount=-30)
+            await self.send_raise_lower_and_verify(mode=cluster.Enums.SetpointRaiseLowerModeEnum.kHeat, amount=-30)
 
         self.step("14")
         if self.pics_guard(hasHeatingFeature):
             await self.write_setpoint(cluster.Attributes.OccupiedHeatingSetpoint, OccupiedHeatingSetpointValue)
-            await self.send_raise_lower_and_verify(mode=0, amount=30)
+            await self.send_raise_lower_and_verify(mode=cluster.Enums.SetpointRaiseLowerModeEnum.kHeat, amount=30)
 
         self.step("15")
         if self.pics_guard(hasCoolingFeature):
-            await self.send_raise_lower_and_verify(mode=1, amount=-30)
+            await self.send_raise_lower_and_verify(mode=cluster.Enums.SetpointRaiseLowerModeEnum.kCool, amount=-30)
 
         self.step("16")
         if self.pics_guard(hasCoolingFeature):
             await self.write_setpoint(cluster.Attributes.OccupiedCoolingSetpoint, OccupiedCoolingSetpointValue)
-            await self.send_raise_lower_and_verify(mode=1, amount=30)
+            await self.send_raise_lower_and_verify(mode=cluster.Enums.SetpointRaiseLowerModeEnum.kCool, amount=30)
 
         self.step("17")
         if self.pics_guard(hasCoolingFeature):
@@ -661,7 +661,7 @@ class TC_TSTAT_2_2(MatterBaseTest):
         if self.pics_guard(hasHeatingFeature):
             await self.write_setpoint(cluster.Attributes.OccupiedHeatingSetpoint, OccupiedHeatingSetpointValue)
         if self.pics_guard(hasHeatingFeature or hasCoolingFeature):
-            await self.send_raise_lower_and_verify(mode=2, amount=-30)
+            await self.send_raise_lower_and_verify(mode=cluster.Enums.SetpointRaiseLowerModeEnum.kBoth, amount=-30)
 
         self.step("18")
         if self.pics_guard(hasCoolingFeature):
@@ -669,8 +669,9 @@ class TC_TSTAT_2_2(MatterBaseTest):
         if self.pics_guard(hasHeatingFeature):
             await self.write_setpoint(cluster.Attributes.OccupiedHeatingSetpoint, OccupiedHeatingSetpointValue)
         if self.pics_guard(hasHeatingFeature or hasCoolingFeature):
-            await self.send_raise_lower_and_verify(mode=2, amount=30)
+            await self.send_raise_lower_and_verify(mode=cluster.Enums.SetpointRaiseLowerModeEnum.kBoth, amount=30)
 
+        self.step("19")
         if self.pics_guard(hasCoolingFeature):
             await self.write_setpoint(cluster.Attributes.OccupiedCoolingSetpoint, OccupiedCoolingSetpointValue)
         if self.pics_guard(hasHeatingFeature):
