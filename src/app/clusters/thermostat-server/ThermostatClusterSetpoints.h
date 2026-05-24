@@ -17,10 +17,10 @@
 
 #pragma once
 
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/util/attribute-storage.h>
 #include <protocols/interaction_model/Constants.h>
-#include <app-common/zap-generated/cluster-objects.h>
 
 #include "Setpoint.h"
 #include "Setpoints.h"
