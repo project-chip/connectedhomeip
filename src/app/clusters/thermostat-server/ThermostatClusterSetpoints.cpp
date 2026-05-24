@@ -90,7 +90,8 @@ void HandleSetpointWrite(const ConcreteAttributePath & attributePath)
     auto status = LoadSetpoints(attributePath.mEndpointId, setpoints);
     if (status != Status::Success)
     {
-        ChipLogError(Zcl, "Thermostat: HandleSetpointWrite: failed to load setpoints: " ChipLogFormatIMStatus, ChipLogValueIMStatus(status));
+        ChipLogError(Zcl, "Thermostat: HandleSetpointWrite: failed to load setpoints: " ChipLogFormatIMStatus,
+                     ChipLogValueIMStatus(status));
         return;
     }
     temperature temp;
@@ -145,7 +146,8 @@ void HandleSetpointWrite(const ConcreteAttributePath & attributePath)
         status = SaveFirstDirtySetpoint(attributePath.mEndpointId, setpoints, changedAttributes);
         if (status != Status::Success)
         {
-            ChipLogError(Zcl, "Thermostat: HandleSetpointWrite: failed to save dirty setpoint: " ChipLogFormatIMStatus, ChipLogValueIMStatus(status));
+            ChipLogError(Zcl, "Thermostat: HandleSetpointWrite: failed to save dirty setpoint: " ChipLogFormatIMStatus,
+                         ChipLogValueIMStatus(status));
         }
     }
 }

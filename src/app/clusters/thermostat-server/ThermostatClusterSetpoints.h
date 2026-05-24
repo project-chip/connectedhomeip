@@ -31,10 +31,10 @@ namespace Thermostat {
 
 /**
 Validates a proposed change to a setpoint attribute.  Returns a constraint error if
-the change is not allowed, otherwise returns Success.  
+the change is not allowed, otherwise returns Success.
 
 In the event that the change is allowed, this method may also adjust the values of other setpoints to
-maintain the setpoint rules.  The setpoint attributes that are changed by this 
+maintain the setpoint rules.  The setpoint attributes that are changed by this
 operation are returned in the changedAttributes set.
 
 @param setpoints the Setpoints object to use for validation
@@ -53,7 +53,7 @@ Protocols::InteractionModel::Status ValidateSetpointChange(Setpoints & setpoints
 Handles the successful write of a setpoint attribute. It re-runs ValidateSetpointChange
 and looks for any associated attribute changes. If any other attributes were affected, it writes
 the first one to storage. This will re-invoke the PreAttributeChangedCallback for that
-attribute, which kicks off the process again. 
+attribute, which kicks off the process again.
 
 Eventually, all changed attributes will have been saved in the correct order.
 

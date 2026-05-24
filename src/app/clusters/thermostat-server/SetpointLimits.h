@@ -97,7 +97,8 @@ struct SetpointLimits
 };
 
 /*
-UserSetpointLimits is used for an optional setpoint. It wraps the absolute setpoint limits, which it can fall back on when the user limit is not provided.
+UserSetpointLimits is used for an optional setpoint. It wraps the absolute setpoint limits, which it can fall back on when the user
+limit is not provided.
 */
 struct UserSetpointLimits : public SetpointLimits<OptionalSetpoint>
 {

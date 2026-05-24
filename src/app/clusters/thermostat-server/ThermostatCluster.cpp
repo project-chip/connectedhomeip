@@ -555,10 +555,10 @@ This callback is invoked before the Ember framework updates an attribute to a ne
 
 If the client is modifying a setpoint attribute, we must validate the new value in the context of the
 other setpoints to which the attribute is related. Depending on the value, we may need to either adjust the
-other setpoints to maintain the setpoint rules, adjust the provided value, or return a constraint error. 
+other setpoints to maintain the setpoint rules, adjust the provided value, or return a constraint error.
 
 The order of operations is to first check to see if it's possible to take this new value, even if it means adjusting
-other setpoint attributes. If not, we will return a constraint error. 
+other setpoint attributes. If not, we will return a constraint error.
 
 This method works around a limitation of the ember framework. When a client changes a setpoint attribute,
 other attributes may need to be updated as well. For example, if a client changes the occupied heating setpoint,
