@@ -39,6 +39,12 @@ bool OptionalSetpoint::SetTemperature(temperature temp)
     return changed;
 }
 
+bool OptionalSetpoint::ClearTemperature() {
+    bool changed = mTemperature.HasValue();
+    mTemperature.ClearValue();
+    return changed;
+}
+
 SystemModeEnum BaseSetpoint::Mode() const
 {
     switch (mAttributeId)

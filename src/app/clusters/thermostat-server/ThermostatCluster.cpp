@@ -518,14 +518,14 @@ void MatterThermostatClusterServerAttributeChangedCallback(const ConcreteAttribu
         clearActivePreset = supportsPresets && !occupied;
         break;
     }
+    if (featureMap.Has(Feature::kEvents))
+    {
+        gThermostatAttrAccess.GenerateEvents(attributePath);
+    }
     if (clearActivePreset)
     {
         ChipLogProgress(Zcl, "Setting active preset to null");
         gThermostatAttrAccess.SetActivePreset(attributePath.mEndpointId, std::nullopt);
-    }
-    if (featureMap.Has(Feature::kEvents))
-    {
-        gThermostatAttrAccess.GenerateEvents(attributePath);
     }
 }
 
@@ -550,6 +550,25 @@ void emberAfThermostatClusterServerInitCallback(chip::EndpointId endpoint)
     // or should this just be the responsibility of the thermostat application?
 }
 
+/*
+This callback is invoked before the Ember framework updates an attribute to a new value.
+
+If the client is modifying a setpoint attribute, we must validate the new value in the context of the
+other setpoints to which the attribute is related. Depending on the value, we may need to either adjust the
+other setpoints to maintain the setpoint rules, adjust the provided value, or return a constraint error. 
+
+The order of operations is to first check to see if it's possible to take this new value, even if it means adjusting
+other setpoint attributes. If not, we will return a constraint error. 
+
+This method works around a limitation of the ember framework. When a client changes a setpoint attribute,
+other attributes may need to be updated as well. For example, if a client changes the occupied heating setpoint,
+the occupied cooling setpoint may also need to be updated to maintain the setpoint rules. However, it's possible
+that a setpoint value cannot be set without violating one of the other rules, and we'll need to return a constraint
+error.
+
+That error needs to be returned in MatterThermostatClusterServerPreAttributeChangedCallback, otherwise the new
+setpoint value will be committed to the Matter Data Storage even when it should not have been.
+*/
 Status MatterThermostatClusterServerPreAttributeChangedCallback(const app::ConcreteAttributePath & attributePath,
                                                                 EmberAfAttributeType attributeType, uint16_t size, uint8_t * value)
 {

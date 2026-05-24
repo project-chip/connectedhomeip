@@ -30,27 +30,57 @@ namespace app {
 namespace Clusters {
 namespace Thermostat {
 
-class Setpoints;
-
+/*
+SetpointLimits provides a maximum and minimum value for a type of setpoint (either an absolute or optional).
+*/
 template <typename T>
 struct SetpointLimits
 {
     virtual ~SetpointLimits() = default;
 
+    /*
+    Constructor to create a SetpointLimits from a min and max setpoint.
+    */
     SetpointLimits(T min, T max) : minimum(min), maximum(max){};
+
+    /*
+    Copy constructor to create a SetpointLimits from another SetpointLimits.
+    */
     SetpointLimits(const SetpointLimits<T> & al) : minimum(al.minimum), maximum(al.maximum){};
 
+    /*
+    Return the minimum setpoint.
+    */
     T minimum;
+
+    /*
+    Return the maximum setpoint.
+    */
     T maximum;
 
-    chip::app::Clusters::Thermostat::SystemModeEnum Mode() const { return minimum.Mode(); };
-
+    /*
+    Get the minimum value for this setpoint limit
+    */
     virtual temperature Minimum() const { return minimum.Temperature(); };
+
+    /*
+    Get the maximum value for this setpoint limit
+    */
     virtual temperature Maximum() const { return maximum.Temperature(); };
 
+    /*
+    Check if the setpoint limits are valid
+    */
     virtual bool IsValid() const { return Minimum() <= Maximum(); }
 
+    /*
+    Check if a temperature is within the setpoint limits
+    */
     bool Valid(const temperature temp) const { return (Minimum() <= temp && temp <= Maximum()); };
+
+    /*
+    Check if a setpoint is within the setpoint limits
+    */
     bool Valid(const Setpoint & setpoint) const
     {
         if (setpoint.HasTemperature())
@@ -60,16 +90,27 @@ struct SetpointLimits
         return false;
     };
 
+    /*
+    Clamp a temperature to the setpoint limits
+    */
     temperature Clamp(const temperature temp) const { return std::clamp(temp, Minimum(), Maximum()); };
 };
+
+/*
+UserSetpointLimits is used for an optional setpoint. It wraps the absolute setpoint limits, which it can fall back on when the user limit is not provided.
+*/
 struct UserSetpointLimits : public SetpointLimits<OptionalSetpoint>
 {
     const SetpointLimits<AbsoluteSetpoint> & absoluteLimits;
 
-    UserSetpointLimits(UserSetpointLimits & override) :
-        SetpointLimits(override.minimum, override.maximum), absoluteLimits(override.absoluteLimits){};
+    /*
+    Constructor to create a UserSetpointLimits from absolute limits and optional user limits.
+    */
     UserSetpointLimits(const SetpointLimits<AbsoluteSetpoint> & al, OptionalSetpoint min, OptionalSetpoint max) :
         SetpointLimits(min, max), absoluteLimits(al){};
+    /*
+    Constructor to create a UserSetpointLimits from absolute limits and another UserSetpointLimits.
+    */
     UserSetpointLimits(const SetpointLimits<AbsoluteSetpoint> & al, const UserSetpointLimits & override) :
         SetpointLimits(override.minimum, override.maximum), absoluteLimits(al){};
 

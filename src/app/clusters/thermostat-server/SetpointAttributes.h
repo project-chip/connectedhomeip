@@ -76,9 +76,23 @@ public:
 
     bool Empty() const { return mValue == 0; }
 
+    /*
+     * Return the raw value of the setpoint attributes.
+     */
     uint32_t Raw() const { return mValue; }
 
-    chip::AttributeId FirstDirtyAttribute() { return mFirstDirtyAttribute; }
+    /*
+     * Return the first attribute that was set on this map.
+     *
+     * Note: this is temporary, to work around a limitation of the ember framework
+     * that relies on a chain of callbacks when one attribute forces the change of
+     * another. This code will be removed in the code-driven cluster revision of Thermostat
+     */
+    chip::AttributeId FirstDirtyAttribute() const { return mFirstDirtyAttribute; }
+
+    /*
+     * Clear the attribute that is returned by FirstDirtyAttribute().
+     */
     void ClearFirstDirtyAttribute() { mFirstDirtyAttribute = chip::kInvalidAttributeId; }
 
 private:

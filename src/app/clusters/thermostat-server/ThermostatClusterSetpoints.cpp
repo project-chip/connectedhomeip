@@ -84,13 +84,14 @@ Status ValidateSetpointChange(Setpoints & setpoints, chip::AttributeId attribute
     }
 }
 
-Status HandleSetpointWrite(const ConcreteAttributePath & attributePath)
+void HandleSetpointWrite(const ConcreteAttributePath & attributePath)
 {
     Setpoints setpoints;
     auto status = LoadSetpoints(attributePath.mEndpointId, setpoints);
     if (status != Status::Success)
     {
-        return status;
+        ChipLogError(Zcl, "Thermostat: HandleSetpointWrite: failed to load setpoints: " ChipLogFormatIMStatus, ChipLogValueIMStatus(status));
+        return;
     }
     temperature temp;
     switch (attributePath.mAttributeId)
@@ -120,28 +121,33 @@ Status HandleSetpointWrite(const ConcreteAttributePath & attributePath)
         temp = setpoints.userCoolLimits.maximum.Temperature();
         break;
     default:
-        return Status::Failure;
+        ChipLogError(Zcl, "Thermostat: HandleSetpointWrite: unexpected attributeId: 0x%" PRIx32, attributePath.mAttributeId);
+        return;
     }
 
-    SetpointAttributes affectedAttributes;
-    affectedAttributes.Set(attributePath.mAttributeId);
-    affectedAttributes.ClearFirstDirtyAttribute();
-    status = ValidateSetpointChange(setpoints, attributePath.mAttributeId, temp, affectedAttributes);
+    SetpointAttributes changedAttributes;
+    changedAttributes.Set(attributePath.mAttributeId);
+    changedAttributes.ClearFirstDirtyAttribute();
+
     // In theory, this should always succeed, as the values will have been filtered in
     // MatterThermostatClusterServerPreAttributeChangedCallback
-    if (status == Status::Success)
+    if (ValidateSetpointChange(setpoints, attributePath.mAttributeId, temp, changedAttributes) != Status::Success)
     {
-        affectedAttributes.Clear(attributePath.mAttributeId);
-        if (!affectedAttributes.Empty())
+        ChipLogError(Zcl, "Thermostat: HandleSetpointWrite: failed to validate setpoint after write");
+        return;
+    }
+
+    // Clear the attribute that was just written
+    changedAttributes.Clear(attributePath.mAttributeId);
+    if (!changedAttributes.Empty())
+    {
+        // If there were any other attributes that were changed, we save the first one
+        status = SaveFirstDirtySetpoint(attributePath.mEndpointId, setpoints, changedAttributes);
+        if (status != Status::Success)
         {
-            status = SaveFirstDirtySetpoint(attributePath.mEndpointId, setpoints, affectedAttributes);
+            ChipLogError(Zcl, "Thermostat: HandleSetpointWrite: failed to save dirty setpoint: " ChipLogFormatIMStatus, ChipLogValueIMStatus(status));
         }
     }
-    else
-    {
-        ChipLogProgress(Zcl, "Thermostat: HandleSetpointWrite: failed to fix setpoint violations");
-    }
-    return status;
 }
 
 Status SetpointRaiseLower(const EndpointId endpointId, const Commands::SetpointRaiseLower::DecodableType & commandData)

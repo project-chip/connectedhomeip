@@ -82,19 +82,22 @@ public:
         occupied(spl.occupied), unoccupied(spl.unoccupied), deadBand(spl.deadBand)
     {}
 
+    /*
+    Checks to make sure that the setpoints follow the rules from the Matter spec
+    */
     bool Valid();
 
-    /**
-     * Get the current setpoint range, based on occupancy.
-     *
-     * @param occupancy  The current occupancy status.
-     * @return A reference to the current setpoint range.
-     */
+    /*
+    Get the appropriate setpoint range, based on occupancy.
+    */
     SetpointRange & GetRange(chip::app::Clusters::Thermostat::OccupancyBitmap occupancy);
 
+    /*
+    Get the appropriate setpoint limits, based on mode
+    */
     SetpointLimits<AbsoluteSetpoint> GetLimits(chip::app::Clusters::Thermostat::SystemModeEnum mode);
 
-    /**
+    /*
      * Change the heating value of a given setpoint range.
      *
      * @param range The setpoint range to modify.
@@ -161,8 +164,6 @@ public:
      */
     Protocols::InteractionModel::Status Fix(SetpointAttributes & changedAttributes);
 
-    void Log(char const * prefix);
-
 private:
     Protocols::InteractionModel::Status ChangeLimits(UserSetpointLimits & limits, Optional<temperature> min,
                                                      Optional<temperature> max, SetpointAttributes & changedAttributes);
@@ -177,9 +178,37 @@ private:
     void FixRange(SetpointRange & range, SetpointAttributes & changedAttributes, SetpointAttributes & fixedAttributes);
 };
 
+/*
+Load setpoints from the Matter Data Storage
+
+@param endpoint The endpoint to load setpoints from
+@param setpoints The Setpoints object to load setpoints into
+@return The status of the operation
+*/
 Protocols::InteractionModel::Status LoadSetpoints(EndpointId endpoint, Setpoints & setpoints);
+
+/*
+Save setpoints to the Matter Data Storage
+
+@param endpoint The endpoint to save setpoints to
+@param setpoints The Setpoints object to save setpoints from
+@param changedAttributes The set of attributes changed by this operation
+@return The status of the operation
+*/
 Protocols::InteractionModel::Status SaveSetpoints(EndpointId endpoint, Setpoints & setpoints,
                                                   SetpointAttributes & changedAttributes);
+
+/*
+Save first dirty setpoint to the Matter Data Storage.
+
+This method is temporary until the conversion to code-driven cluster. See MatterThermostatClusterServerPreAttributeChangedCallback
+for details.
+
+@param endpoint The endpoint to save first dirty setpoint to
+@param setpoints The Setpoints object to save first dirty setpoint from
+@param changedAttributes The set of attributes changed by this operation
+@return The status of the operation
+*/
 Protocols::InteractionModel::Status SaveFirstDirtySetpoint(EndpointId endpoint, Setpoints & setpoints,
                                                            SetpointAttributes & changedAttributes);
 
