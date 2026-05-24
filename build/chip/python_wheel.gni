@@ -19,7 +19,7 @@ import("$dir_pw_build/python.gni")
 import("${chip_root}/src/system/system.gni")
 
 declare_args() {
-  chip_python_version = "1.0.0"
+  chip_python_version = "1.5.0"
   chip_python_package_prefix = "matter"
   chip_python_supports_stack_locking = chip_system_config_locking != "none"
 }
