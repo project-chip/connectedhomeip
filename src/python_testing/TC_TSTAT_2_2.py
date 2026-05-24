@@ -671,5 +671,6 @@ class TC_TSTAT_2_2(MatterBaseTest):
         if self.pics_guard(hasHeatingFeature or hasCoolingFeature):
             await self.send_raise_lower_and_verify(mode=cluster.Enums.SetpointRaiseLowerModeEnum.kBoth, amount=30)
 
+
 if __name__ == "__main__":
     default_matter_test_main()
