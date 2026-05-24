@@ -481,7 +481,6 @@ config("sanitize_address") {
   cflags = [
     "-fsanitize=address",
     "-fno-omit-frame-pointer",
-    "-fsanitize-address-use-after-return=always",
     "-fsanitize=pointer-subtract",
     "-fsanitize=pointer-compare",
   ]
@@ -489,8 +488,13 @@ config("sanitize_address") {
   ldflags = [
     "-fsanitize=address",
     "-fno-omit-frame-pointer",
-    "-fsanitize-address-use-after-return=always",
   ]
+  if (is_clang) {
+    # -fsanitize-address-use-after-return=always is Clang-only; GCC doesn't
+    # recognise it (camera GCC ASAN build broke on it).
+    cflags += [ "-fsanitize-address-use-after-return=always" ]
+    ldflags += [ "-fsanitize-address-use-after-return=always" ]
+  }
   if (_asan_use_padded_libcxx) {
     cflags += [ "-fsanitize-address-field-padding=1" ]
     cflags_cc += [
