@@ -19,7 +19,7 @@
 #include "data-model-providers/codegen/CodegenDataModelProvider.h"
 #include "tls-certificate-management-instance.h"
 #include "tls-client-management-instance.h"
-#include <app/SafeAttributePersistenceProvider.h>
+#include <app/persistence/AttributePersistenceProviderInstance.h>
 #include <app/clusters/push-av-stream-transport-server/CodegenIntegration.h>
 
 using namespace chip;
@@ -279,7 +279,7 @@ void CameraApp::CreateAndInitializeCameraAVStreamMgmt()
 
     // Instantiate the CameraAVStreamMgmt Server
     CameraAVStreamManagementCluster::InitArguments args{
-        .context                      = CameraAVStreamManagementCluster::Context{ *app::GetSafeAttributePersistenceProvider() },
+        .context                      = CameraAVStreamManagementCluster::Context{ *app::GetAttributePersistenceProvider() },
         .delegate                     = mCameraDevice->GetCameraAVStreamMgmtDelegate(),
         .endpointId                   = mEndpoint,
         .features                     = avsmFeatures,
