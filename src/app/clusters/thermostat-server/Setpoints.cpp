@@ -210,7 +210,7 @@ void Setpoints::FixUserLimitDeadband(OptionalSetpoint & heatLimit, OptionalSetpo
         // If the user was adjusting the heat limit, then we assume they
         // want to keep it at that value, and we'll move the cool
         // limit up...
-        temperature newCoolLimit = heatLimit.Temperature() + deadBand;
+        temperature newCoolLimit = static_cast<temperature>(heatLimit.Temperature() + deadBand);
         if (absoluteCoolLimits.Valid(newCoolLimit))
         {
             if (coolLimit.SetTemperature(newCoolLimit))
@@ -226,7 +226,7 @@ void Setpoints::FixUserLimitDeadband(OptionalSetpoint & heatLimit, OptionalSetpo
             {
                 fixedAttributes.Set(coolLimit.AttributeId());
             }
-            if (heatLimit.SetTemperature(absoluteCoolLimit - deadBand))
+            if (heatLimit.SetTemperature(static_cast<temperature>(absoluteCoolLimit - deadBand)))
             {
                 fixedAttributes.Set(heatLimit.AttributeId());
             }
@@ -237,7 +237,7 @@ void Setpoints::FixUserLimitDeadband(OptionalSetpoint & heatLimit, OptionalSetpo
         // If the user was adjusting the cool limit, then we assume they
         // want to keep it at that value, and we'll move the heat
         // limit down...
-        temperature newHeatLimit = coolLimit.Temperature() - deadBand;
+        temperature newHeatLimit = static_cast<temperature>(coolLimit.Temperature() - deadBand);
         if (absoluteHeatLimits.Valid(newHeatLimit))
         {
             if (heatLimit.SetTemperature(newHeatLimit))
@@ -253,7 +253,7 @@ void Setpoints::FixUserLimitDeadband(OptionalSetpoint & heatLimit, OptionalSetpo
             {
                 fixedAttributes.Set(heatLimit.AttributeId());
             }
-            if (coolLimit.SetTemperature(absoluteHeatLimit + deadBand))
+            if (coolLimit.SetTemperature(static_cast<temperature>(absoluteHeatLimit + deadBand)))
             {
                 fixedAttributes.Set(coolLimit.AttributeId());
             }
@@ -288,7 +288,7 @@ void Setpoints::FixRange(SetpointRange & range, SetpointAttributes & changedAttr
         // If the user was adjusting a heating setpoint, then we assume they
         // want to keep it at that value, and we'll move the cooling
         // setpoint up...
-        temperature newCoolLimit = range.heating.Temperature() + deadBand;
+        temperature newCoolLimit = static_cast<temperature>(range.heating.Temperature() + deadBand);
         if (userCoolLimits.Valid(newCoolLimit))
         {
             if (range.cooling.SetTemperature(newCoolLimit))
@@ -304,7 +304,7 @@ void Setpoints::FixRange(SetpointRange & range, SetpointAttributes & changedAttr
             {
                 fixedAttributes.Set(range.cooling.AttributeId());
             }
-            if (range.heating.SetTemperature(range.cooling.Temperature() - deadBand))
+            if (range.heating.SetTemperature(static_cast<temperature>(range.cooling.Temperature() - deadBand)))
             {
                 fixedAttributes.Set(range.heating.AttributeId());
             }
@@ -316,7 +316,7 @@ void Setpoints::FixRange(SetpointRange & range, SetpointAttributes & changedAttr
         // If the user was adjusting the cooling setpoint, then we assume they
         // want to keep it at that value, and we'll move the heating
         // setpoint down...
-        temperature newHeatLimit = range.cooling.Temperature() - deadBand;
+        temperature newHeatLimit = static_cast<temperature>(range.cooling.Temperature() - deadBand);
         if (userHeatLimits.Valid(newHeatLimit))
         {
             if (range.heating.SetTemperature(newHeatLimit))
@@ -332,7 +332,7 @@ void Setpoints::FixRange(SetpointRange & range, SetpointAttributes & changedAttr
             {
                 fixedAttributes.Set(range.heating.AttributeId());
             }
-            if (range.cooling.SetTemperature(range.heating.Temperature() + deadBand))
+            if (range.cooling.SetTemperature(static_cast<temperature>(range.heating.Temperature() + deadBand)))
             {
                 fixedAttributes.Set(range.cooling.AttributeId());
             }
