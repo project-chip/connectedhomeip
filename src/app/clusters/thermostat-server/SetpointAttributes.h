@@ -78,8 +78,6 @@ public:
 
     uint32_t Raw() const { return mValue; }
 
-    void Log(char const * prefix);
-
     chip::AttributeId FirstDirtyAttribute() { return mFirstDirtyAttribute; }
     void ClearFirstDirtyAttribute() { mFirstDirtyAttribute = chip::kInvalidAttributeId; }
 
@@ -95,8 +93,6 @@ private:
 
     chip::AttributeId mFirstDirtyAttribute = chip::kInvalidAttributeId;
 };
-
-char const * SetpointAttributeName(chip::AttributeId id);
 
 } // namespace Thermostat
 } // namespace Clusters

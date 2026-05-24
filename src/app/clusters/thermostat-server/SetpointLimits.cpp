@@ -62,27 +62,6 @@ temperature UserSetpointLimits::Maximum() const
     return maximum.HasTemperature() ? maximum.Temperature() : absoluteLimits.Maximum();
 }
 
-/*EffectiveSetpointLimits::EffectiveSetpointLimits(const Setpoints & sp, SystemModeEnum systemMode) :
-    SetpointLimits(systemMode), setpoints(sp)
-{
-    temperature minHeat = setpoints.userHeatLimits.Minimum();
-    temperature maxHeat = setpoints.userHeatLimits.Maximum();
-    temperature minCool = setpoints.userCoolLimits.Minimum();
-    temperature maxCool = setpoints.userCoolLimits.Maximum();
-
-    switch (systemMode)
-    {
-    case SystemModeEnum::kHeat:
-        minimum = minHeat;
-        maximum = setpoints.autoSupported ? std::min(maxHeat, static_cast<int16_t>(maxCool - setpoints.deadBand)) : maxHeat;
-        break;
-    default:
-        minimum = setpoints.autoSupported ? std::max(minCool, static_cast<int16_t>(minHeat + setpoints.deadBand)) : minCool;
-        maximum = maxCool;
-        break;
-    }
-}*/
-
 } // namespace Thermostat
 } // namespace Clusters
 } // namespace app

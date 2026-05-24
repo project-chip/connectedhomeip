@@ -66,42 +66,6 @@ SetpointAttributes & SetpointAttributes::ClearAll()
     return *this;
 }
 
-void SetpointAttributes::Log(char const * prefix)
-{
-    for (uint32_t i = 0; i < 32; i++)
-    {
-        if ((mValue & (1 << i)) != 0)
-        {
-            ChipLogProgress(Zcl, " %s %s", prefix, SetpointAttributeName(i));
-        }
-    }
-}
-
-char const * SetpointAttributeName(chip::AttributeId id)
-{
-    switch (id)
-    {
-    case OccupiedHeatingSetpoint::Id:
-        return "OccupiedHeatingSetpoint";
-    case OccupiedCoolingSetpoint::Id:
-        return "OccupiedCoolingSetpoint";
-    case UnoccupiedHeatingSetpoint::Id:
-        return "UnoccupiedHeatingSetpoint";
-    case UnoccupiedCoolingSetpoint::Id:
-        return "UnoccupiedCoolingSetpoint";
-    case MinHeatSetpointLimit::Id:
-        return "MinHeatSetpointLimit";
-    case MaxHeatSetpointLimit::Id:
-        return "MaxHeatSetpointLimit";
-    case MinCoolSetpointLimit::Id:
-        return "MinCoolSetpointLimit";
-    case MaxCoolSetpointLimit::Id:
-        return "MaxCoolSetpointLimit";
-    default:
-        return "Unknown";
-    }
-}
-
 } // namespace Thermostat
 } // namespace Clusters
 } // namespace app
