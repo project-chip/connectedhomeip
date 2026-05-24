@@ -20,6 +20,8 @@
 #include <app/ConcreteAttributePath.h>
 #include <app/util/attribute-storage.h>
 #include <protocols/interaction_model/Constants.h>
+#include <app-common/zap-generated/cluster-objects.h>
+#include <app-common/zap-generated/ids/Attributes.h>
 
 #include "Setpoint.h"
 #include "SetpointAttributes.h"
@@ -59,10 +61,10 @@ public:
     temperature deadBand;
 
     Setpoints() :
-        absoluteHeatLimits(AbsoluteSetpoint(Attributes::OccupiedHeatingSetpoint::Id, kDefaultAbsMinHeatSetpointLimit),
-                           AbsoluteSetpoint(Attributes::OccupiedHeatingSetpoint::Id, kDefaultAbsMaxHeatSetpointLimit)),
-        absoluteCoolLimits(AbsoluteSetpoint(Attributes::OccupiedCoolingSetpoint::Id, kDefaultAbsMinCoolSetpointLimit),
-                           AbsoluteSetpoint(Attributes::OccupiedCoolingSetpoint::Id, kDefaultAbsMaxCoolSetpointLimit)),
+        absoluteHeatLimits(AbsoluteSetpoint(Attributes::AbsMinHeatSetpointLimit::Id, kDefaultAbsMinHeatSetpointLimit),
+                           AbsoluteSetpoint(Attributes::AbsMaxHeatSetpointLimit::Id, kDefaultAbsMaxHeatSetpointLimit)),
+        absoluteCoolLimits(AbsoluteSetpoint(Attributes::AbsMinCoolSetpointLimit::Id, kDefaultAbsMinCoolSetpointLimit),
+                           AbsoluteSetpoint(Attributes::AbsMaxCoolSetpointLimit::Id, kDefaultAbsMaxCoolSetpointLimit)),
         userHeatLimits(absoluteHeatLimits, OptionalSetpoint(Attributes::MinHeatSetpointLimit::Id),
                        OptionalSetpoint(Attributes::MaxHeatSetpointLimit::Id)),
         userCoolLimits(absoluteCoolLimits, OptionalSetpoint(Attributes::MinCoolSetpointLimit::Id),

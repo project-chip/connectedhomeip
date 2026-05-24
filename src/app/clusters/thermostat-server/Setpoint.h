@@ -21,6 +21,7 @@
 #include <app/util/attribute-storage.h>
 #include <lib/core/Optional.h>
 #include <protocols/interaction_model/Constants.h>
+#include <app-common/zap-generated/cluster-objects.h>
 
 #include "Temperature.h"
 

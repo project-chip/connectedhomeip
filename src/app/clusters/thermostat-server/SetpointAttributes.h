@@ -61,7 +61,7 @@ public:
     template <typename... Args>
     bool HasAny(Args... args) const
     {
-        return (mValue & Or(std::forward<chip::AttributeId>(args)...)) != 0;
+        return (mValue & Or(args...)) != 0;
     }
 
     /*
@@ -99,7 +99,7 @@ private:
     template <typename... Args>
     static constexpr uint32_t Or(chip::AttributeId attribute, Args... args)
     {
-        return static_cast<uint32_t>(1 << attribute) | Or(args...);
+        return (1U << attribute) | Or(args...);
     }
     static constexpr uint32_t Or() { return 0; }
 

@@ -26,7 +26,7 @@ namespace Thermostat {
 
 SetpointAttributes & SetpointAttributes::Set(chip::AttributeId attribute)
 {
-    mValue |= static_cast<uint32_t>(1 << attribute);
+    mValue |= (1U << attribute);
     if (mFirstDirtyAttribute == chip::kInvalidAttributeId)
     {
         mFirstDirtyAttribute = attribute;
@@ -46,12 +46,12 @@ SetpointAttributes & SetpointAttributes::Set(const SetpointAttributes & other)
 
 bool SetpointAttributes::Has(chip::AttributeId attribute) const
 {
-    return (mValue & static_cast<uint32_t>(1 << attribute)) != 0;
+    return (mValue & (1U << attribute)) != 0;
 }
 
 SetpointAttributes & SetpointAttributes::Clear(chip::AttributeId attribute)
 {
-    mValue &= ~static_cast<uint32_t>(1 << attribute);
+    mValue &= ~(1U << attribute);
     if (mFirstDirtyAttribute == attribute)
     {
         mFirstDirtyAttribute = chip::kInvalidAttributeId;
