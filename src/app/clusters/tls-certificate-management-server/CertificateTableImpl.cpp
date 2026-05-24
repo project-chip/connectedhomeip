@@ -21,6 +21,7 @@
 #include <app/storage/FabricTableImpl.ipp>
 #include <app/storage/TableEntry.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
+#include <memory>
 #include <stdlib.h>
 
 using namespace chip;
@@ -270,6 +271,7 @@ CHIP_ERROR RootSerializer::DeserializeData(TLV::TLVReader & reader, CertificateT
 template <>
 void RootSerializer::Clear(CertificateTable::RootCertStruct & data)
 {
+    std::destroy_at(&data);
     new (&data) CertificateTable::RootCertStruct();
 }
 
@@ -364,6 +366,7 @@ CHIP_ERROR ClientSerializer::DeserializeData(TLV::TLVReader & reader, Certificat
 template <>
 void ClientSerializer::Clear(CertificateTable::ClientCertWithKey & data)
 {
+    std::destroy_at(&data);
     new (&data) CertificateTable::ClientCertWithKey();
 }
 
