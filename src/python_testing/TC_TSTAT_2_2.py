@@ -671,16 +671,5 @@ class TC_TSTAT_2_2(MatterBaseTest):
         if self.pics_guard(hasHeatingFeature or hasCoolingFeature):
             await self.send_raise_lower_and_verify(mode=cluster.Enums.SetpointRaiseLowerModeEnum.kBoth, amount=30)
 
-        self.step("19")
-        if self.pics_guard(hasCoolingFeature):
-            await self.write_setpoint(cluster.Attributes.OccupiedCoolingSetpoint, OccupiedCoolingSetpointValue)
-        if self.pics_guard(hasHeatingFeature):
-            await self.write_setpoint(cluster.Attributes.OccupiedHeatingSetpoint, OccupiedHeatingSetpointValue)
-        if self.pics_guard(hasOccupancyFeature and hasCoolingFeature):
-            await self.write_setpoint(cluster.Attributes.UnoccupiedCoolingSetpoint, UnoccupiedCoolingSetpointValue)
-        if self.pics_guard(hasOccupancyFeature and hasHeatingFeature):
-            await self.write_setpoint(cluster.Attributes.UnoccupiedHeatingSetpoint, UnoccupiedHeatingSetpointValue)
-
-
 if __name__ == "__main__":
     default_matter_test_main()
