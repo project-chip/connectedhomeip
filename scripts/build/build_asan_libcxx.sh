@@ -228,6 +228,7 @@ cmake -G Ninja -S "$SRC/llvm-project/runtimes" -B "$SRC/build" \
     -DCMAKE_CXX_COMPILER="$PW_CLANGXX" \
     -DCMAKE_INSTALL_PREFIX="$SYSROOT" \
     -DLLVM_ENABLE_RUNTIMES='libcxx;libcxxabi;libunwind' \
+    -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
     -DCMAKE_C_FLAGS='-fsanitize=address -fno-omit-frame-pointer' \
     -DCMAKE_CXX_FLAGS='-fsanitize=address -fno-omit-frame-pointer' \
     -DLIBCXX_ADDITIONAL_COMPILE_FLAGS='-fsanitize-address-field-padding=1' \
