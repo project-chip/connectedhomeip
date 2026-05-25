@@ -137,7 +137,7 @@ class SampleDeviceInstanceInfoProvider: NSObject, MCDeviceInstanceInfoProvider {
     }
 
     func deviceName() -> String? {
-        return "My Living Room Speaker"
+        return "My Casting App"
     }
 }
 

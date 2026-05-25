@@ -48,7 +48,7 @@ public:
      *
      * @param configNamespace  The config namespace (e.g. "chip-factory")
      * @param name             The config key name (e.g. "device-name")
-     * @param buf              Buffer to write the value into
+     * @param buf              Buffer to write the null-terminated value into
      * @param bufSize          Size of the buffer
      * @param outLen           Set to the length of the value written (excluding null terminator)
      * @return CHIP_NO_ERROR if a value was provided,

@@ -258,7 +258,6 @@ CHIP_ERROR ConfigurationManagerImpl::StoreProductId(uint16_t productId)
 
 CHIP_ERROR ConfigurationManagerImpl::GetCommissionableDeviceName(char * buf, size_t bufSize)
 {
-#if CHIP_DISABLE_PLATFORM_KVS
     if (mConfigValueProvider != nullptr)
     {
         size_t outLen  = 0;
@@ -269,18 +268,10 @@ CHIP_ERROR ConfigurationManagerImpl::GetCommissionableDeviceName(char * buf, siz
             return err;
         }
     }
+
+#if CHIP_DISABLE_PLATFORM_KVS
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 #else  // CHIP_DISABLE_PLATFORM_KVS
-    if (mConfigValueProvider != nullptr)
-    {
-        size_t outLen  = 0;
-        CHIP_ERROR err = mConfigValueProvider(PosixConfig::kConfigKey_DeviceName.Namespace, PosixConfig::kConfigKey_DeviceName.Name,
-                                              buf, bufSize, outLen);
-        if (err != CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
-        {
-            return err;
-        }
-    }
     size_t outLen  = 0;
     CHIP_ERROR err = ReadConfigValueStr(PosixConfig::kConfigKey_DeviceName, buf, bufSize, outLen);
     if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
