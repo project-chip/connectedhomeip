@@ -22,6 +22,7 @@
 #include <devices/boolean-state-sensor/BooleanStateSensorDevice.h>
 #include <devices/chime/ChimeDevice.h>
 #include <devices/dimmable-light/impl/LoggingDimmableLightDevice.h>
+#include <devices/network-infrastructure-manager/NetworkInfrastructureManagerDevice.h>
 #include <devices/occupancy-sensor/impl/TogglingOccupancySensorDevice.h>
 #include <devices/on-off-light/LoggingOnOffLightDevice.h>
 #include <devices/proximity-ranger/ProximityRangerDevice.h>
@@ -30,6 +31,7 @@
 #include <devices/temperature-sensor/impl/IncreasingTemperatureSensorDevice.h>
 #include <functional>
 #include <lib/core/CHIPError.h>
+#include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <map>
 #include <platform/DefaultTimerDelegate.h>
 
@@ -53,6 +55,7 @@ public:
         Credentials::GroupDataProvider & groupDataProvider;
         FabricTable & fabricTable;
         TimerDelegate & timerDelegate;
+        PersistentStorageDelegate & storageDelegate;
     };
 
     static DeviceFactory & GetInstance()
@@ -149,6 +152,13 @@ private:
                     .fabricTable       = mContext->fabricTable,
                     .timerDelegate     = mContext->timerDelegate,
                 });
+            });
+        }
+        if constexpr (ALL_DEVICES_ENABLE_NETWORK_INFRASTRUCTURE_MANAGER)
+        {
+            RegisterCreator("network-infrastructure-manager", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return std::make_unique<NetworkInfrastructureManagerDevice>(mContext->storageDelegate);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_ON_OFF_LIGHT)

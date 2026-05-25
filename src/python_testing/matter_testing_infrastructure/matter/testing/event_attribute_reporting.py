@@ -33,7 +33,7 @@ import queue
 import threading
 import time
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import UTC, datetime, timezone
 from typing import Any, Iterable, Optional
 
 from mobly import asserts
@@ -318,7 +318,7 @@ class AttributeSubscriptionHandler:
         if valid_report:
             data = transaction.GetAttribute(path)
             value = AttributeValue(endpoint_id=path.Path.EndpointId, attribute=path.AttributeType,
-                                   value=data, timestamp_utc=datetime.now(timezone.utc))
+                                   value=data, timestamp_utc=datetime.now(UTC))
             LOGGER.info(f"[AttributeSubscriptionHandler] Received attribute report: {path.AttributeType} = {data}")
             self._q.put(value)
             if self._lock:

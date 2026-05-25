@@ -152,6 +152,7 @@ CHIP_ERROR PopulateAllDevicesDataModelProvider(CommonCaseDeviceServerInitParams 
         .groupDataProvider = gGroupDataProvider,
         .fabricTable       = Server::GetInstance().GetFabricTable(),
         .timerDelegate     = gTimerDelegate,
+        .storageDelegate   = *initParams.persistentStorageDelegate,
     });
 
     VerifyOrReturnError(!gDeviceType.empty(), CHIP_ERROR_INVALID_ARGUMENT);
