@@ -179,6 +179,10 @@
 #include <clusters/DoorLock/Commands.h>
 #include <clusters/DoorLock/Events.h>
 #include <clusters/DoorLock/Structs.h>
+#include <clusters/DynamicLighting/Attributes.h>
+#include <clusters/DynamicLighting/Commands.h>
+#include <clusters/DynamicLighting/Events.h>
+#include <clusters/DynamicLighting/Structs.h>
 #include <clusters/EcosystemInformation/Attributes.h>
 #include <clusters/EcosystemInformation/Commands.h>
 #include <clusters/EcosystemInformation/Events.h>
@@ -339,6 +343,10 @@
 #include <clusters/NetworkCommissioning/Commands.h>
 #include <clusters/NetworkCommissioning/Events.h>
 #include <clusters/NetworkCommissioning/Structs.h>
+#include <clusters/NetworkIdentityManagement/Attributes.h>
+#include <clusters/NetworkIdentityManagement/Commands.h>
+#include <clusters/NetworkIdentityManagement/Events.h>
+#include <clusters/NetworkIdentityManagement/Structs.h>
 #include <clusters/NitrogenDioxideConcentrationMeasurement/Attributes.h>
 #include <clusters/NitrogenDioxideConcentrationMeasurement/Commands.h>
 #include <clusters/NitrogenDioxideConcentrationMeasurement/Events.h>

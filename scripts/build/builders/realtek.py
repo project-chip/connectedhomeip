@@ -15,7 +15,9 @@
 import os
 from enum import Enum, auto
 
-from .builder import Builder, BuilderOutput
+from runner.runner import Runner
+
+from .builder import Builder, BuilderOutput, OutDirLock, lock_output_dir
 
 
 class RtkOsUsed(Enum):
@@ -110,14 +112,15 @@ class RealtekApp(Enum):
 class RealtekBuilder(Builder):
 
     def __init__(self,
-                 root,
-                 runner,
+                 root: str,
+                 runner: Runner,
+                 output_dir_lock: OutDirLock,
                  board: RealtekBoard = RealtekBoard.RTL8777G,
                  app: RealtekApp = RealtekApp.LIGHT,
                  enable_cli: bool = False,
                  enable_rpc: bool = False,
                  enable_shell: bool = False):
-        super(RealtekBuilder, self).__init__(root, runner)
+        super(RealtekBuilder, self).__init__(root, runner, output_dir_lock)
         self.board = board
         self.app = app
         self.enable_cli = enable_cli
@@ -169,6 +172,7 @@ class RealtekBuilder(Builder):
 
         return cmd
 
+    @lock_output_dir
     def generate(self):
         if self.os_env != RtkOsUsed.FREERTOS:
             # For freertos, app.ld needs to be precompiled with gcc
@@ -183,6 +187,7 @@ class RealtekBuilder(Builder):
             out_folder=self.output_dir)
         self._Execute(['bash', '-c', cmd], title='Generating ' + self.identifier)
 
+    @lock_output_dir
     def _build(self):
         if self.os_env == RtkOsUsed.FREERTOS:
             cmd = ['ninja', '-C', self.output_dir]
@@ -200,6 +205,7 @@ class RealtekBuilder(Builder):
                 example_folder=os.path.join(self.root, 'examples', self.app.ExampleName, 'realtek', 'zephyr'))
             self._Execute(['bash', '-c', cmd], title='Building ' + self.identifier)
 
+    @lock_output_dir
     def build_outputs(self):
         if self.os_env == RtkOsUsed.FREERTOS:
             yield BuilderOutput(

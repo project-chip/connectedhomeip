@@ -32,21 +32,18 @@ CommandHandlerInterfaceOnlyClusters:
     - Energy EVSE Mode
     - Joint Fabric Administrator
     - Laundry Washer Mode
-    - Microwave Oven Control
     - Network Commissioning
     - Operational State
     - Oven Cavity Operational State
     - Oven Mode
+    - Proximity Ranging
     - RVC Clean Mode
     - RVC Operational State
     - RVC Run Mode
     - Refrigerator And Temperature Controlled Cabinet Mode
     - Sample MEI
-    - Scenes Management
     - Service Area
     - Soil Measurement
-    - TLS Certificate Management
-    - TLS Client Management
     - Thread Border Router Management
     - Thread Network Directory
     - Water Heater Management
@@ -117,6 +114,7 @@ CodeDrivenClusters:
     - Binding
     - Boolean State
     - Boolean State Configuration
+    - Bridged Device Basic Information
     - Camera AV Stream Management
     - Chime
     - Closure Control
@@ -136,15 +134,20 @@ CodeDrivenClusters:
     - Groupcast
     - Groups
     - HEPA Filter Monitoring
+    - Humidistat
     - ICD Management
     - Identify
     - Illuminance Measurement
     - Localization Configuration
+    - Microwave Oven Control
+    - Network Identity Management
     - OTA Software Update Provider
     - OTA Software Update Requestor
     - Occupancy Sensing
     - Operational Credentials
     - Power Topology
+    - Pressure Measurement
+    - Proximity Ranging
     - Push AV Stream Transport
     - Relative Humidity Measurement
     - Scenes Management
@@ -154,6 +157,7 @@ CodeDrivenClusters:
     - TLS Client Management
     - Temperature Control
     - Temperature Measurement
+    - Thread Border Router Management
     - Thread Network Diagnostics
     - Time Format Localization
     - Time Synchronization

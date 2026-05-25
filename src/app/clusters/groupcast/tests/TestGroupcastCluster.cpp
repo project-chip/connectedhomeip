@@ -219,9 +219,12 @@ struct TestGroupcastCluster : public ::testing::Test
     FabricTestFixture mFabricHelper{ &mTestContext.StorageDelegate() };
     ScopedAttributeChangeListenerRegistration mScopedListenerRegistration; // RAII registration
 
-    app::Clusters::GroupcastCluster mSender{ { mFabricHelper.GetFabricTable(), mProvider, mMockTimerDelegate, mAccessControl },
+    chip::Groupcast::Testing mTesting;
+    app::Clusters::GroupcastCluster mSender{ { mFabricHelper.GetFabricTable(), mProvider, mMockTimerDelegate, mAccessControl,
+                                               mTesting },
                                              BitFlags<Feature>{ Feature::kSender } };
-    app::Clusters::GroupcastCluster mListener{ { mFabricHelper.GetFabricTable(), mProvider, mMockTimerDelegate, mAccessControl },
+    app::Clusters::GroupcastCluster mListener{ { mFabricHelper.GetFabricTable(), mProvider, mMockTimerDelegate, mAccessControl,
+                                                 mTesting },
                                                BitFlags<Feature>{ Feature::kListener, Feature::kPerGroup } };
 
     TestGroupcastCluster() : mScopedListenerRegistration(customDataModel, mTestContext) {}
@@ -336,6 +339,7 @@ TEST_F(TestGroupcastCluster, TestJoinGroupFailsOnBadAargs)
         joinGroupCmd.endpoints       = DataModel::List<const EndpointId>(kEndpoints, 1);
 
         auto result = tester.Invoke(Commands::JoinGroup::Id, joinGroupCmd);
+        ASSERT_TRUE(result.GetStatusCode().has_value());
         EXPECT_EQ(result.GetStatusCode()->GetStatus(), Status::Success);
     }
 
@@ -902,7 +906,8 @@ TEST_F(TestGroupcastCluster, TestJoinGroupCommand)
 
     // Neither Listener, nor Sender
     {
-        app::Clusters::GroupcastCluster cluster({ mFabricHelper.GetFabricTable(), mProvider, mMockTimerDelegate, mAccessControl });
+        app::Clusters::GroupcastCluster cluster(
+            { mFabricHelper.GetFabricTable(), mProvider, mMockTimerDelegate, mAccessControl, mTesting });
         chip::Testing::ClusterTester tester(cluster);
         tester.SetFabricIndex(kTestFabricIndex);
         tester.SetSubjectDescriptor(kAdminSubjectDescriptor);
@@ -920,6 +925,17 @@ TEST_F(TestGroupcastCluster, TestJoinGroupCommand)
         // Join group: New keyset and key
         auto result = tester.Invoke(Commands::JoinGroup::Id, data);
         EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::Success));
+
+        // Per spec 11.27.7.1.4 (JoinGroup Command/Key Field), a keyset created via JoinGroup with a Key has exactly one epoch
+        // key (num_keys_used == 1) with EpochStartTime0 = 1.
+        {
+            Credentials::GroupDataProvider::KeySet storedKeyset;
+            EXPECT_EQ(mProvider.GetKeySet(kTestFabricIndex, kKeyset, storedKeyset), CHIP_NO_ERROR);
+            EXPECT_EQ(storedKeyset.keyset_id, kKeyset);
+            EXPECT_EQ(storedKeyset.policy, Credentials::GroupDataProvider::SecurityPolicy::kTrustFirst);
+            EXPECT_EQ(storedKeyset.num_keys_used, 1u);
+            EXPECT_EQ(storedKeyset.epoch_keys[0].start_time, 1u);
+        }
 
         // Join group: Existing keyset and key (invalid)
         data.groupID = 2;
@@ -1423,7 +1439,7 @@ TEST_F(TestGroupcastCluster, TestLeaveGroup)
     // Create a Listener and Sender capable group with 1 endpoint.
     // Remove the endpoint from the group. Verify that the group still exists for Sender.
     app::Clusters::GroupcastCluster ListenerAndSender{ { mFabricHelper.GetFabricTable(), mProvider, mMockTimerDelegate,
-                                                         mAccessControl },
+                                                         mAccessControl, mTesting },
                                                        BitFlags<Feature>{ Feature::kListener, Feature::kSender } };
     ASSERT_EQ(ListenerAndSender.Startup(*clusterContext), CHIP_NO_ERROR);
     chip::Testing::ClusterTester listenerAndSenderTester(ListenerAndSender);

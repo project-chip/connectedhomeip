@@ -19,52 +19,23 @@
 
 #pragma once
 
-/**********************************************************
- * Includes
- *********************************************************/
-
-#include <stdbool.h>
-#include <stdint.h>
-
-#ifdef DISPLAY_ENABLED
-#include "ThermostatUI.h"
-#endif
-
-#include "AppEvent.h"
 #include "BaseApplication.h"
-#include "SensorManager.h"
-#include "TemperatureManager.h"
-#include <ble/Ble.h>
-#include <cmsis_os2.h>
+
+#include <app/ConcreteAttributePath.h>
+#include <cstdint>
 #include <lib/core/CHIPError.h>
-#include <platform/CHIPDeviceLayer.h>
 
-/**********************************************************
- * Defines
- *********************************************************/
-
-// Application-defined error codes in the CHIP_ERROR space.
-#define APP_ERROR_EVENT_QUEUE_FAILED CHIP_APPLICATION_ERROR(0x01)
-#define APP_ERROR_CREATE_TASK_FAILED CHIP_APPLICATION_ERROR(0x02)
-#define APP_ERROR_UNHANDLED_EVENT CHIP_APPLICATION_ERROR(0x03)
-#define APP_ERROR_CREATE_TIMER_FAILED CHIP_APPLICATION_ERROR(0x04)
-#define APP_ERROR_START_TIMER_FAILED CHIP_APPLICATION_ERROR(0x05)
-#define APP_ERROR_STOP_TIMER_FAILED CHIP_APPLICATION_ERROR(0x06)
-
-/**********************************************************
- * AppTask Declaration
- *********************************************************/
+struct AppEvent;
 
 class AppTask : public BaseApplication
 {
-
 public:
     AppTask() = default;
 
-    static AppTask & GetAppTask() { return sAppTask; }
+    static AppTask & GetAppTask();
 
     /**
-     * @brief AppTask task main loop function
+     * @brief AppTask task main loop function.
      *
      * @param pvParameter FreeRTOS task parameter
      */
@@ -72,39 +43,57 @@ public:
 
     CHIP_ERROR StartAppTask();
 
-    /**
-     * @brief Request an update of the Thermostat LCD UI
-     */
-    void UpdateThermoStatUI();
+    static void UpdateThermoStatUI();
 
     /**
-     * @brief Event handler when a button is pressed
-     * Function posts an event for button processing
+     * @brief Event handler when a button is pressed.
      *
-     * @param buttonHandle APP_LIGHT_SWITCH or APP_FUNCTION_BUTTON
-     * @param btnAction button action - SL_SIMPLE_BUTTON_PRESSED,
-     *                  SL_SIMPLE_BUTTON_RELEASED or SL_SIMPLE_BUTTON_DISABLED
+     * @param button    APP_FUNCTION_BUTTON
+     * @param btnAction SL_SIMPLE_BUTTON_PRESSED, SL_SIMPLE_BUTTON_RELEASED or SL_SIMPLE_BUTTON_DISABLED
      */
     static void ButtonEventHandler(uint8_t button, uint8_t btnAction);
 
-private:
-    static AppTask sAppTask;
+    /**
+     * @brief Periodic CMSIS timer callback. Posts a temperature-update event into the AppTask queue.
+     */
+    static void SensorTimerEventHandler(void * arg);
 
     /**
-     * @brief Override of BaseApplication::AppInit() virtual method, called by BaseApplication::Init()
-     *
-     * @return CHIP_ERROR
+     * @brief AppTask-thread handler that reads the sensor (Si70xx or simulated) and pushes
+     *        Thermostat::LocalTemperature.
      */
+    static void TemperatureUpdateEventHandler(AppEvent * aEvent);
+
+    /**
+     * @brief Thermostat-cluster post-attribute-change callback. Logs per-attribute info and
+     *        triggers a UI refresh. Also fans out to the AWS hook when SL_MATTER_ENABLE_AWS is set.
+     */
+    void DMPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
+                                       uint8_t * value);
+
+    /**
+     * @brief Initialize the temperature sensor backing this thermostat.
+     *
+     * Default behavior: when `SL_MATTER_USE_SI70XX_SENSOR` is set, initializes the
+     * Si70xx driver; otherwise this is a no-op (simulated reads do not need init).
+     */
+    CHIP_ERROR InitSensor();
+
+    /**
+     * @brief Read the current temperature into @p temperature, in units of 0.01 deg C
+     *        (matches the `Thermostat::LocalTemperature` cluster schema).
+     *
+     * Default behavior: averages 100 Si70xx samples when `SL_MATTER_USE_SI70XX_SENSOR`
+     * is set, otherwise steps through a canned simulated table. On error @p temperature
+     * is left untouched and the caller (`TemperatureUpdateEventHandler`) skips the
+     * `LocalTemperature::Set` for that tick.
+     */
+    CHIP_ERROR GetTemperature(int16_t & temperature);
+
+protected:
+    /** Override of `BaseApplication::AppInit()`. */
     CHIP_ERROR AppInit() override;
 
-    /**
-     * @brief PB0 Button event processing function
-     *        Press and hold will trigger a factory reset timer start
-     *        Press and release will restart BLEAdvertising if not commisionned
-     *
-     * @param aEvent button event being processed
-     */
-    static void ButtonHandler(AppEvent * aEvent);
-
-    static void ThermostatActionEventHandler(AppEvent * aEvent);
+    /** Bring up the thermostat app: sensor timer, sensor driver, first UI paint. */
+    CHIP_ERROR InitThermostat();
 };

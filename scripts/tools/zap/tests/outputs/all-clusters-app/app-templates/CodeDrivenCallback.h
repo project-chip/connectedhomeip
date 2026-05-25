@@ -181,6 +181,10 @@ void MatterTemperatureMeasurementClusterInitCallback(chip::EndpointId endpointId
 
 void MatterTemperatureMeasurementClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
 
+void MatterPressureMeasurementClusterInitCallback(chip::EndpointId endpointId);
+
+void MatterPressureMeasurementClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
+
 void MatterFlowMeasurementClusterInitCallback(chip::EndpointId endpointId);
 
 void MatterFlowMeasurementClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);

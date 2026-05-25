@@ -64,41 +64,6 @@ menu "Demo"
         string "CHIP Project Configuration file"
         default "main/include/CHIPProjectConfig.h"
 
-    choice LED_TYPE
-        prompt "LED type"
-        default LED_TYPE_RMT if DEVICE_TYPE_ESP32_C3_DEVKITM || DEVICE_TYPE_ESP32_S3_DEVKITM || DEVICE_TYPE_ESP32H2_DEVKITC || DEVICE_TYPE_ESP32_C6_DEVKITC
-        default LED_TYPE_GPIO
-        help
-            Defines the default LED type used in the example
-
-        config LED_TYPE_GPIO
-            bool "GPIO"
-        config LED_TYPE_RMT
-            bool "RMT - Addressable LED"
-    endchoice
-
-    config LED_RMT_CHANNEL
-        depends on LED_TYPE_RMT
-        int "RMT Channel"
-        range 0 7
-        default 0
-        help
-            Set the RMT peripheral channel.
-            ESP32 RMT channel from 0 to 7
-            ESP32-S3 RMT channel from 0 to 3
-            ESP32-C3 RMT channel from 0 to 1
-
-    config LED_GPIO
-        int "LED GPIO number"
-        range 0 48
-        default 26 if DEVICE_TYPE_ESP32_WROVER_KIT
-        default 8 if DEVICE_TYPE_ESP32_C3_DEVKITM || DEVICE_TYPE_ESP32H2_DEVKITC || DEVICE_TYPE_ESP32_C2_DEVKITM || DEVICE_TYPE_ESP32_C6_DEVKITC
-        default 48 if DEVICE_TYPE_ESP32_S3_DEVKITM
-        default 5 if DEVICE_TYPE_M5STACK
-        default 5
-        help
-            GPIO number (IOxx) to blink on and off or the RMT signal for the addressable LED.
-
     choice
       prompt "Rendezvous Mode"
       default RENDEZVOUS_MODE_BLE

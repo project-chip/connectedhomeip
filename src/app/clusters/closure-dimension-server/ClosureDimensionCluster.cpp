@@ -290,10 +290,8 @@ CHIP_ERROR ClosureDimensionCluster::SetCurrentState(const DataModel::Nullable<Ge
 
     mCurrentState = incomingCurrentState;
 
-    if (markDirty)
-    {
-        NotifyAttributeChanged(Attributes::CurrentState::Id);
-    }
+    NotifyAttributeChanged(Attributes::CurrentState::Id,
+                           markDirty ? DataModel::AttributeChangeType::kReportable : DataModel::AttributeChangeType::kQuiet);
 
     return CHIP_NO_ERROR;
 }

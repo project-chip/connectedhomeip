@@ -14377,6 +14377,86 @@ static id _Nullable DecodeAttributeValueForBallastConfigurationCluster(Attribute
     *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
     return nil;
 }
+static id _Nullable DecodeAttributeValueForDynamicLightingCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::DynamicLighting;
+    switch (aAttributeId) {
+    case Attributes::AvailableEffects::Id: {
+        using TypeInfo = Attributes::AvailableEffects::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSArray * _Nonnull value;
+        { // Scope for our temporary variables
+            auto * array_0 = [NSMutableArray new];
+            auto iter_0 = cppValue.begin();
+            while (iter_0.Next()) {
+                auto & entry_0 = iter_0.GetValue();
+                MTRDynamicLightingClusterEffectStruct * newElement_0;
+                newElement_0 = [MTRDynamicLightingClusterEffectStruct new];
+                newElement_0.effectID = [NSNumber numberWithUnsignedShort:entry_0.effectID];
+                newElement_0.source = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.source)];
+                newElement_0.label = AsString(entry_0.label);
+                if (newElement_0.label == nil) {
+                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                    *aError = err;
+                    return nil;
+                }
+                newElement_0.maxSpeed = [NSNumber numberWithUnsignedShort:entry_0.maxSpeed];
+                newElement_0.defaultSpeed = [NSNumber numberWithUnsignedShort:entry_0.defaultSpeed];
+                newElement_0.supportsColorPalette = [NSNumber numberWithBool:entry_0.supportsColorPalette];
+                [array_0 addObject:newElement_0];
+            }
+            CHIP_ERROR err = iter_0.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                *aError = err;
+                return nil;
+            }
+            value = array_0;
+        }
+        return value;
+    }
+    case Attributes::CurrentEffectID::Id: {
+        using TypeInfo = Attributes::CurrentEffectID::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nullable value;
+        if (cppValue.IsNull()) {
+            value = nil;
+        } else {
+            value = [NSNumber numberWithUnsignedShort:cppValue.Value()];
+        }
+        return value;
+    }
+    case Attributes::CurrentSpeed::Id: {
+        using TypeInfo = Attributes::CurrentSpeed::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nullable value;
+        if (cppValue.IsNull()) {
+            value = nil;
+        } else {
+            value = [NSNumber numberWithUnsignedShort:cppValue.Value()];
+        }
+        return value;
+    }
+    default: {
+        // Not a known DynamicLighting attribute.
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
+    return nil;
+}
 static id _Nullable DecodeAttributeValueForIlluminanceMeasurementCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::IlluminanceMeasurement;
@@ -17095,6 +17175,99 @@ static id _Nullable DecodeAttributeValueForProximityRangingCluster(AttributeId a
     *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
     return nil;
 }
+static id _Nullable DecodeAttributeValueForNetworkIdentityManagementCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::NetworkIdentityManagement;
+    switch (aAttributeId) {
+    case Attributes::ActiveNetworkIdentities::Id: {
+        using TypeInfo = Attributes::ActiveNetworkIdentities::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSArray * _Nonnull value;
+        { // Scope for our temporary variables
+            auto * array_0 = [NSMutableArray new];
+            auto iter_0 = cppValue.begin();
+            while (iter_0.Next()) {
+                auto & entry_0 = iter_0.GetValue();
+                MTRNetworkIdentityManagementClusterActiveNetworkIdentityStruct * newElement_0;
+                newElement_0 = [MTRNetworkIdentityManagementClusterActiveNetworkIdentityStruct new];
+                newElement_0.index = [NSNumber numberWithUnsignedShort:entry_0.index];
+                newElement_0.type = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.type)];
+                newElement_0.identifier = AsData(entry_0.identifier);
+                newElement_0.createdTimestamp = [NSNumber numberWithUnsignedInt:entry_0.createdTimestamp];
+                newElement_0.current = [NSNumber numberWithBool:entry_0.current];
+                if (entry_0.remainingClients.IsNull()) {
+                    newElement_0.remainingClients = nil;
+                } else {
+                    newElement_0.remainingClients = [NSNumber numberWithUnsignedShort:entry_0.remainingClients.Value()];
+                }
+                [array_0 addObject:newElement_0];
+            }
+            CHIP_ERROR err = iter_0.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                *aError = err;
+                return nil;
+            }
+            value = array_0;
+        }
+        return value;
+    }
+    case Attributes::Clients::Id: {
+        using TypeInfo = Attributes::Clients::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSArray * _Nonnull value;
+        { // Scope for our temporary variables
+            auto * array_0 = [NSMutableArray new];
+            auto iter_0 = cppValue.begin();
+            while (iter_0.Next()) {
+                auto & entry_0 = iter_0.GetValue();
+                MTRNetworkIdentityManagementClusterClientStruct * newElement_0;
+                newElement_0 = [MTRNetworkIdentityManagementClusterClientStruct new];
+                newElement_0.clientIndex = [NSNumber numberWithUnsignedShort:entry_0.clientIndex];
+                newElement_0.clientIdentifier = AsData(entry_0.clientIdentifier);
+                if (entry_0.networkIdentityIndex.IsNull()) {
+                    newElement_0.networkIdentityIndex = nil;
+                } else {
+                    newElement_0.networkIdentityIndex = [NSNumber numberWithUnsignedShort:entry_0.networkIdentityIndex.Value()];
+                }
+                [array_0 addObject:newElement_0];
+            }
+            CHIP_ERROR err = iter_0.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                *aError = err;
+                return nil;
+            }
+            value = array_0;
+        }
+        return value;
+    }
+    case Attributes::ClientTableSize::Id: {
+        using TypeInfo = Attributes::ClientTableSize::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithUnsignedShort:cppValue];
+        return value;
+    }
+    default: {
+        // Not a known NetworkIdentityManagement attribute.
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
+    return nil;
+}
 static id _Nullable DecodeAttributeValueForWiFiNetworkManagementCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::WiFiNetworkManagement;
@@ -19575,6 +19748,17 @@ static id _Nullable DecodeAttributeValueForCameraAVStreamManagementCluster(Attri
         value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue)];
         return value;
     }
+    case Attributes::ImageRotationDiscreteAngles::Id: {
+        using TypeInfo = Attributes::ImageRotationDiscreteAngles::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithUnsignedShort:cppValue];
+        return value;
+    }
     default: {
         // Not a known CameraAVStreamManagement attribute.
         break;
@@ -21455,7 +21639,6 @@ static id _Nullable DecodeAttributeValueForJointFabricDatastoreCluster(Attribute
                 } else {
                     newElement_0.epochStartTime2 = [NSNumber numberWithUnsignedLongLong:entry_0.epochStartTime2.Value()];
                 }
-                newElement_0.groupKeyMulticastPolicy = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.groupKeyMulticastPolicy)];
                 [array_0 addObject:newElement_0];
             }
             CHIP_ERROR err = iter_0.GetStatus();
@@ -21834,10 +22017,6 @@ static id _Nullable DecodeAttributeValueForJointFabricDatastoreCluster(Attribute
                     *aError = err;
                     return nil;
                 }
-                newElement_0.statusEntry = [MTRJointFabricDatastoreClusterDatastoreStatusEntryStruct new];
-                newElement_0.statusEntry.state = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.statusEntry.state)];
-                newElement_0.statusEntry.updateTimestamp = [NSNumber numberWithUnsignedInt:entry_0.statusEntry.updateTimestamp];
-                newElement_0.statusEntry.failureCode = [NSNumber numberWithUnsignedChar:entry_0.statusEntry.failureCode];
                 [array_0 addObject:newElement_0];
             }
             CHIP_ERROR err = iter_0.GetStatus();
@@ -24166,6 +24345,9 @@ id _Nullable MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::T
     case Clusters::BallastConfiguration::Id: {
         return DecodeAttributeValueForBallastConfigurationCluster(aPath.mAttributeId, aReader, aError);
     }
+    case Clusters::DynamicLighting::Id: {
+        return DecodeAttributeValueForDynamicLightingCluster(aPath.mAttributeId, aReader, aError);
+    }
     case Clusters::IlluminanceMeasurement::Id: {
         return DecodeAttributeValueForIlluminanceMeasurementCluster(aPath.mAttributeId, aReader, aError);
     }
@@ -24222,6 +24404,9 @@ id _Nullable MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::T
     }
     case Clusters::ProximityRanging::Id: {
         return DecodeAttributeValueForProximityRangingCluster(aPath.mAttributeId, aReader, aError);
+    }
+    case Clusters::NetworkIdentityManagement::Id: {
+        return DecodeAttributeValueForNetworkIdentityManagementCluster(aPath.mAttributeId, aReader, aError);
     }
     case Clusters::WiFiNetworkManagement::Id: {
         return DecodeAttributeValueForWiFiNetworkManagementCluster(aPath.mAttributeId, aReader, aError);
