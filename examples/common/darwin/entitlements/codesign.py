@@ -20,12 +20,12 @@ import subprocess
 
 
 def run_command(command):
-    print(f"Running {command}")
-    return str(subprocess.check_output(command.split()))
+    print("Running {}".format(" ".join(command)))
+    return subprocess.check_output(command).decode("utf-8")
 
 
 def get_identity():
-    command = "/usr/bin/security find-identity -v -p codesigning"
+    command = ["/usr/bin/security", "find-identity", "-v", "-p", "codesigning"]
     command_result = run_command(command)
 
     failure_str = "Error: 0 valid identities found"
@@ -34,7 +34,6 @@ def get_identity():
             "No valid identity has been found. Application will run without entitlements.")
         exit(0)
 
-    command_result = command_result.replace("\\n", "\n")
     identity = re.search(r'\b[0-9a-fA-F]{40}\b(?![^\n]*\(CSSMERR_TP_CERT_EXPIRED\))', command_result)
     if identity is None:
         print(
@@ -45,7 +44,7 @@ def get_identity():
 
 
 def codesign(args):
-    command = f"codesign --force -d --sign {get_identity()} {args.target_path}"
+    command = ["codesign", "--force", "-d", "--sign", get_identity(), args.target_path]
     command_result = run_command(command)
 
     print(f"Codesign Result: {command_result}")
