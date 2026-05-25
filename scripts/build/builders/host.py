@@ -22,7 +22,9 @@ from enum import Enum, auto
 from platform import uname
 from typing import Optional
 
-from .builder import BuilderOutput
+from runner.runner import Runner
+
+from .builder import BuilderOutput, OutDirLock, lock_output_dir
 from .gn import GnBuilder
 
 _MSAN_DEFAULT_SYSROOT = Path.home() / '.cache/matter/msan_sysroot'
@@ -453,7 +455,7 @@ class HostBoard(Enum):
 
 class HostBuilder(GnBuilder):
 
-    def __init__(self, root, runner, app: HostApp, board=HostBoard.NATIVE,
+    def __init__(self, root: str, runner: Runner, output_dir_lock: OutDirLock, app: HostApp, board=HostBoard.NATIVE,
                  enable_ipv4=True, enable_ble=True, enable_wifi=True, enable_wifipaf=True,
                  enable_groupcast=True, enable_thread=True, use_tsan=False, use_asan=False, use_ubsan=False, use_msan=False,
                  separate_event_loop=True, fuzzing_type: HostFuzzingType = HostFuzzingType.NONE, use_clang=False,
@@ -488,7 +490,7 @@ class HostBuilder(GnBuilder):
         if not unified:
             root = os.path.join(root, 'examples', app.ExamplePath())
 
-        super(HostBuilder, self).__init__(root=root, runner=runner)
+        super(HostBuilder, self).__init__(root=root, runner=runner, output_dir_lock=output_dir_lock)
 
         self.app = app
         self.board = board
@@ -738,6 +740,7 @@ class HostBuilder(GnBuilder):
                 ])
         return args
 
+    @lock_output_dir
     def createJavaExecutable(self, java_program):
         self._Execute(
             [
@@ -778,6 +781,7 @@ class HostBuilder(GnBuilder):
             raise Exception('Missing environment variable "%s"' % name)
         return os.environ[name]
 
+    @lock_output_dir
     def generate(self):
         super(HostBuilder, self).generate(dedup=self.unified)
         if 'JAVA_HOME' in os.environ:
@@ -810,6 +814,7 @@ class HostBuilder(GnBuilder):
             self.coverage_dir = os.path.join(self.output_dir, 'coverage')
             self._Execute(['mkdir', '-p', self.coverage_dir], title="Create coverage output location")
 
+    @lock_output_dir
     def PreBuildCommand(self):
         if self.app == HostApp.TESTS and self.use_coverage and not self.use_clang:
             cmd = ['ninja', '-C', self.output_dir]
@@ -828,6 +833,7 @@ class HostBuilder(GnBuilder):
                            '--exclude', '/usr/include/*',
                            '--output-file', os.path.join(self.coverage_dir, 'lcov_base.info')], title="Initial coverage baseline")
 
+    @lock_output_dir
     def PostBuildCommand(self):
         # TODO: CLANG coverage is not yet implemented, requires different tooling
         if self.app == HostApp.TESTS and self.use_coverage and not self.use_clang:
@@ -928,6 +934,7 @@ class HostBuilder(GnBuilder):
             return 'example-device-app'
         return 'all-devices-app'
 
+    @lock_output_dir
     def build_outputs(self):
         if self.app == HostApp.ALL_DEVICES_APP:
             base = self._AllDevicesOutputName()

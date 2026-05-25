@@ -15,7 +15,9 @@
 import os
 from enum import Enum, auto
 
-from .builder import BuilderOutput
+from runner.runner import Runner
+
+from .builder import BuilderOutput, OutDirLock, lock_output_dir
 from .gn import GnBuilder
 
 
@@ -74,16 +76,15 @@ class InfineonBoard(Enum):
 class InfineonBuilder(GnBuilder):
 
     def __init__(self,
-                 root,
-                 runner,
+                 root: str,
+                 runner: Runner,
+                 output_dir_lock: OutDirLock,
                  app: InfineonApp = InfineonApp.LOCK,
                  board: InfineonBoard = InfineonBoard.PSOC6BOARD,
                  enable_ota_requestor: bool = False,
                  update_image: bool = False,
                  enable_trustm: bool = False):
-        super(InfineonBuilder, self).__init__(
-            root=app.BuildRoot(root),
-            runner=runner)
+        super(InfineonBuilder, self).__init__(root=app.BuildRoot(root), runner=runner, output_dir_lock=output_dir_lock)
 
         self.app = app
         self.extra_gn_options = ['psoc6_board="%s"' % board.GnArgName()]
@@ -102,6 +103,7 @@ class InfineonBuilder(GnBuilder):
         args.extend(self.extra_gn_options)
         return args
 
+    @lock_output_dir
     def build_outputs(self):
         extensions = ['out']
         if self.options.enable_link_map_file:
@@ -110,6 +112,7 @@ class InfineonBuilder(GnBuilder):
             name = f"{self.app.AppNamePrefix()}.{ext}"
             yield BuilderOutput(os.path.join(self.output_dir, name), name)
 
+    @lock_output_dir
     def bundle_outputs(self):
         with open(os.path.join(self.output_dir, self.app.FlashBundleName())) as f:
             for line in filter(None, [x.strip() for x in f.readlines()]):

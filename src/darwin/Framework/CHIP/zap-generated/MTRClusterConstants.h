@@ -7144,6 +7144,7 @@ typedef NS_ENUM(uint32_t, MTRDeviceTypeIDType) {
     MTRDeviceTypeIDTypeExtractorHoodID MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2)) = 0x0000007A,
     MTRDeviceTypeIDTypeOvenID MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2)) = 0x0000007B,
     MTRDeviceTypeIDTypeLaundryDryerID MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2)) = 0x0000007C,
+    MTRDeviceTypeIDTypeHumidifierDehumidifierID MTR_PROVISIONALLY_AVAILABLE = 0x0000007D,
     MTRDeviceTypeIDTypeNetworkInfrastructureManagerID MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2)) = 0x00000090,
     MTRDeviceTypeIDTypeThreadBorderRouterID MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2)) = 0x00000091,
     MTRDeviceTypeIDTypeOnOffLightID MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2)) = 0x00000100,

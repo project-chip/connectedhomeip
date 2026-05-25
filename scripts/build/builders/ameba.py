@@ -15,7 +15,8 @@
 import os
 from enum import Enum, auto
 
-from .builder import Builder, BuilderOutput
+from runner.runner import Runner
+from .builder import Builder, BuilderOutput, OutDirLock, lock_output_dir
 
 
 class AmebaBoard(Enum):
@@ -61,14 +62,16 @@ class AmebaApp(Enum):
 class AmebaBuilder(Builder):
 
     def __init__(self,
-                 root,
-                 runner,
+                 root: str,
+                 runner: Runner,
+                 output_dir_lock: OutDirLock,
                  board: AmebaBoard = AmebaBoard.AMEBAD,
                  app: AmebaApp = AmebaApp.ALL_CLUSTERS):
-        super(AmebaBuilder, self).__init__(root, runner)
+        super(AmebaBuilder, self).__init__(root, runner, output_dir_lock)
         self.board = board
         self.app = app
 
+    @lock_output_dir
     def generate(self):
         cmd = '$AMEBA_PATH/project/realtek_amebaD_va0_example/GCC-RELEASE/build.sh '
         if self.app.ExampleName == 'pigweed-app':
@@ -82,6 +85,7 @@ class AmebaBuilder(Builder):
         self._Execute(['bash', '-c', cmd],
                       title='Generating ' + self.identifier)
 
+    @lock_output_dir
     def _build(self):
         cmd = ['ninja', '-C', self.output_dir]
 
@@ -90,6 +94,7 @@ class AmebaBuilder(Builder):
 
         self._Execute(cmd, title='Building ' + self.identifier)
 
+    @lock_output_dir
     def build_outputs(self):
         yield BuilderOutput(
             os.path.join(self.output_dir, 'asdk', 'target_image2.axf'),
