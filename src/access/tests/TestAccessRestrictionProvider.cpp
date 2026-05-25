@@ -216,7 +216,7 @@ public: // protected
         AccessControl::Delegate * delegate = Examples::GetAccessControlDelegate();
         SetAccessControl(accessControl);
         GetAccessControl().SetAccessRestrictionProvider(&accessRestrictionProvider);
-        SuccessOrDie(GetAccessControl().Init(delegate, testDeviceTypeResolver));
+        ASSERT_SUCCESS(GetAccessControl().Init(delegate, testDeviceTypeResolver));
         EXPECT_EQ(LoadAccessControl(accessControl, aclEntryData, aclEntryDataCount), CHIP_NO_ERROR);
 
         gGroupStorage.ClearStorage();
@@ -226,8 +226,8 @@ public: // protected
         ASSERT_EQ(gGroupsProvider.Init(), CHIP_NO_ERROR);
         Credentials::SetGroupDataProvider(&gGroupsProvider);
 
-        SuccessOrDie(gGroupAuxDelegate.Initialize(&gGroupsProvider, nullptr));
-        SuccessOrDie(GetAccessControl().RegisterGroupAuxiliaryDelegate(&gGroupAuxDelegate));
+        ASSERT_SUCCESS(gGroupAuxDelegate.Initialize(&gGroupsProvider, nullptr));
+        ASSERT_SUCCESS(GetAccessControl().RegisterGroupAuxiliaryDelegate(&gGroupAuxDelegate));
     }
     static void TearDownTestSuite()
     {
@@ -236,6 +236,7 @@ public: // protected
         Credentials::SetGroupDataProvider(nullptr);
         GetAccessControl().Finish();
         ResetAccessControlToDefault();
+        chip::Platform::MemoryShutdown();
     }
 };
 
