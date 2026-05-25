@@ -103,16 +103,16 @@ private:
 class OptionalSetpoint : public BaseSetpoint
 {
 public:
-    OptionalSetpoint(chip::AttributeId attributeId) : BaseSetpoint(attributeId) {}
-    OptionalSetpoint(chip::AttributeId attributeId, Optional<temperature> value) : BaseSetpoint(attributeId)
-    {
-        mTemperature = value;
-    }
+    OptionalSetpoint(chip::AttributeId attributeId, const AbsoluteSetpoint & absoluteSetpoint) :
+        BaseSetpoint(attributeId), mAbsoluteSetpoint(absoluteSetpoint)
+    {}
 
-    OptionalSetpoint(const OptionalSetpoint & other) : BaseSetpoint(other.mAttributeId) { mTemperature = other.mTemperature; };
+    OptionalSetpoint(const OptionalSetpoint & other, const AbsoluteSetpoint & absoluteSetpoint) :
+        BaseSetpoint(other.mAttributeId), mAbsoluteSetpoint(absoluteSetpoint), mTemperature(other.mTemperature)
+    {}
 
     bool HasTemperature() const override { return mTemperature.HasValue(); }
-    temperature Temperature() const override { return mTemperature.Value(); }
+    temperature Temperature() const override { if (mTemperature.HasValue()) return mTemperature.Value(); return mAbsoluteSetpoint.Temperature(); }
 
     /*
      * Set the temperature value.
@@ -127,6 +127,7 @@ public:
     bool ClearTemperature();
 
 private:
+    const AbsoluteSetpoint & mAbsoluteSetpoint;
     Optional<temperature> mTemperature;
 };
 

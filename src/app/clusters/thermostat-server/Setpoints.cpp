@@ -83,6 +83,14 @@ bool Setpoints::Valid()
         {
             return false;
         }
+        if (!absoluteHeatLimits.Valid(userHeatLimits.minimum))
+        {
+            return false;
+        }
+        if (!absoluteHeatLimits.Valid(userHeatLimits.maximum))
+        {
+            return false;
+        }
         if (!userHeatLimits.Valid(occupied.heating))
         {
             return false;
@@ -102,6 +110,14 @@ bool Setpoints::Valid()
         {
             return false;
         }
+        if (!absoluteCoolLimits.Valid(userCoolLimits.minimum))
+        {
+            return false;
+        }
+        if (!absoluteCoolLimits.Valid(userCoolLimits.maximum))
+        {
+            return false;
+        }
         if (!userCoolLimits.Valid(occupied.cooling))
         {
             return false;
@@ -113,22 +129,20 @@ bool Setpoints::Valid()
     }
     if (autoSupported)
     {
-        if (userHeatLimits.maximum.HasTemperature() && userCoolLimits.maximum.HasTemperature() &&
-            userCoolLimits.maximum.Temperature() - userHeatLimits.maximum.Temperature() < deadBand)
+        if (static_cast<temperature>(userCoolLimits.maximum.Temperature() - userHeatLimits.maximum.Temperature()) < deadBand)
         {
             return false;
         }
-        if (userHeatLimits.minimum.HasTemperature() && userCoolLimits.minimum.HasTemperature() &&
-            userCoolLimits.minimum.Temperature() - userHeatLimits.minimum.Temperature() < deadBand)
+        if (static_cast<temperature>(userCoolLimits.minimum.Temperature() - userHeatLimits.minimum.Temperature()) < deadBand)
         {
             return false;
         }
-        if (static_cast<int16_t>(occupied.cooling.Temperature() - occupied.heating.Temperature()) < deadBand)
+        if (static_cast<temperature>(occupied.cooling.Temperature() - occupied.heating.Temperature()) < deadBand)
         {
             return false;
         }
         if (occupancySupported &&
-            static_cast<int16_t>(unoccupied.cooling.Temperature() - unoccupied.heating.Temperature()) < deadBand)
+            static_cast<temperature>(unoccupied.cooling.Temperature() - unoccupied.heating.Temperature()) < deadBand)
         {
             return false;
         }
@@ -145,7 +159,7 @@ bool Setpoints::Valid()
  * @param changedAttributes Bit flags for attributes that were changed prior to this call
  * @param fixedAttributes Bit flags for attributes that were fixed by this call
  */
-void Setpoints::FixUserLimits(SetpointLimits<AbsoluteSetpoint> & absoluteLimits, UserSetpointLimits & userLimits,
+void Setpoints::FixUserLimits(AbsoluteSetpointLimits & absoluteLimits, UserSetpointLimits & userLimits,
                               SetpointAttributes & changedAttributes, SetpointAttributes & fixedAttributes)
 {
     if (!absoluteLimits.IsValid())

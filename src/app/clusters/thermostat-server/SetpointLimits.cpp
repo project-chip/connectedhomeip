@@ -42,24 +42,15 @@ bool UserSetpointLimits::IsValid() const
     {
         return false;
     }
-    if (minimum.HasTemperature() && !absoluteLimits.Valid(minimum.Temperature()))
+    if (!absoluteLimits.Valid(minimum.Temperature()))
     {
         return false;
     }
-    if (maximum.HasTemperature() && !absoluteLimits.Valid(maximum.Temperature()))
+    if (!absoluteLimits.Valid(maximum.Temperature()))
     {
         return false;
     }
     return SetpointLimits::IsValid();
-}
-
-temperature UserSetpointLimits::Minimum() const
-{
-    return minimum.HasTemperature() ? minimum.Temperature() : absoluteLimits.Minimum();
-}
-temperature UserSetpointLimits::Maximum() const
-{
-    return maximum.HasTemperature() ? maximum.Temperature() : absoluteLimits.Maximum();
 }
 
 } // namespace Thermostat

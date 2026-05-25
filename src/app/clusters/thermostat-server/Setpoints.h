@@ -49,8 +49,8 @@ public:
     bool occupancySupported = false;
     bool eventsSupported    = false;
 
-    SetpointLimits<AbsoluteSetpoint> absoluteHeatLimits;
-    SetpointLimits<AbsoluteSetpoint> absoluteCoolLimits;
+    AbsoluteSetpointLimits absoluteHeatLimits;
+    AbsoluteSetpointLimits absoluteCoolLimits;
 
     UserSetpointLimits userHeatLimits;
     UserSetpointLimits userCoolLimits;
@@ -65,10 +65,10 @@ public:
                            AbsoluteSetpoint(Attributes::AbsMaxHeatSetpointLimit::Id, kDefaultAbsMaxHeatSetpointLimit)),
         absoluteCoolLimits(AbsoluteSetpoint(Attributes::AbsMinCoolSetpointLimit::Id, kDefaultAbsMinCoolSetpointLimit),
                            AbsoluteSetpoint(Attributes::AbsMaxCoolSetpointLimit::Id, kDefaultAbsMaxCoolSetpointLimit)),
-        userHeatLimits(absoluteHeatLimits, OptionalSetpoint(Attributes::MinHeatSetpointLimit::Id),
-                       OptionalSetpoint(Attributes::MaxHeatSetpointLimit::Id)),
-        userCoolLimits(absoluteCoolLimits, OptionalSetpoint(Attributes::MinCoolSetpointLimit::Id),
-                       OptionalSetpoint(Attributes::MaxCoolSetpointLimit::Id)),
+        userHeatLimits(OptionalSetpoint(Attributes::MinHeatSetpointLimit::Id, absoluteHeatLimits.minimum),
+                       OptionalSetpoint(Attributes::MaxHeatSetpointLimit::Id, absoluteHeatLimits.maximum), absoluteHeatLimits),
+        userCoolLimits(OptionalSetpoint(Attributes::MinCoolSetpointLimit::Id, absoluteCoolLimits.minimum),
+                       OptionalSetpoint(Attributes::MaxCoolSetpointLimit::Id, absoluteCoolLimits.maximum), absoluteCoolLimits),
         occupied(AbsoluteSetpoint(Attributes::OccupiedHeatingSetpoint::Id, kDefaultHeatingSetpoint),
                  AbsoluteSetpoint(Attributes::OccupiedCoolingSetpoint::Id, kDefaultCoolingSetpoint)),
         unoccupied(AbsoluteSetpoint(Attributes::UnoccupiedHeatingSetpoint::Id, kDefaultHeatingSetpoint),
@@ -80,7 +80,7 @@ public:
         autoSupported(spl.autoSupported), heatSupported(spl.heatSupported), coolSupported(spl.coolSupported),
         occupancySupported(spl.occupancySupported), eventsSupported(spl.eventsSupported),
         absoluteHeatLimits(spl.absoluteHeatLimits), absoluteCoolLimits(spl.absoluteCoolLimits),
-        userHeatLimits(absoluteHeatLimits, spl.userHeatLimits), userCoolLimits(absoluteCoolLimits, spl.userCoolLimits),
+        userHeatLimits(spl.userHeatLimits, absoluteHeatLimits), userCoolLimits(spl.userCoolLimits, absoluteCoolLimits),
         occupied(spl.occupied), unoccupied(spl.unoccupied), deadBand(spl.deadBand)
     {}
 
@@ -124,12 +124,12 @@ public:
                                                            SetpointAttributes & changedAttributes);
 
     /**
-     * Change the values of a given setpoint range.
+     * Change either or both of the values of a given setpoint range.
      *
      * @param range The setpoint range to modify.
-     * @param heat The new heating setpoint value to set for the given range.
-     * @param cool The new cooling setpoint value to set for the given range.
-     * @param clamp Whether to clamp the setpoint range.
+     * @param heat The optional new heating setpoint value to set for the given range.
+     * @param cool The optional new cooling setpoint value to set for the given range.
+     * @param clamp Whether to clamp the setpoint range to the limits associated with it.
      * @param changedAttributes The set of attributes changed by this operation.
      * @return The status of the operation.
      */
@@ -167,16 +167,46 @@ public:
     Protocols::InteractionModel::Status Fix(SetpointAttributes & changedAttributes);
 
 private:
+    /*
+    Change either the min or max value of a setpoint limits
+    @param limits The setpoint limits to modify.
+    @param min The new minimum setpoint value to set for the given limits.
+    @param max The new maximum setpoint value to set for the given limits.
+    @param changedAttributes The set of attributes changed by this operation.
+    @return The status of the operation; Success if the setpoints are now valid, ConstraintError if it was not possible to fix them
+    */
     Protocols::InteractionModel::Status ChangeLimits(UserSetpointLimits & limits, Optional<temperature> min,
                                                      Optional<temperature> max, SetpointAttributes & changedAttributes);
 
+    /*
+    Attempt to fix the user setpoint limits to comply with the deadband
+    @param heatLimit The heating setpoint limit to modify.
+    @param coolLimit The cooling setpoint limit to modify.
+    @param absoluteHeatLimit The absolute heat setpoint limit.
+    @param absoluteCoolLimit The absolute cooling setpoint limit.
+    @param changedAttributes The set of attributes changed before this operation.
+    @param fixedAttributes The set of attributes fixed by this operation.
+    */
     void FixUserLimitDeadband(OptionalSetpoint & heatLimit, OptionalSetpoint & coolLimit, temperature absoluteHeatLimit,
                               temperature absoluteCoolLimit, SetpointAttributes & changedAttributes,
                               SetpointAttributes & fixedAttributes);
 
-    void FixUserLimits(SetpointLimits<AbsoluteSetpoint> & absoluteLimits, UserSetpointLimits & userLimits,
+    /*
+    Attempt to fix a given user setpoint limits to comply with the absolute limits and the deadband
+    @param absoluteLimits The absolute setpoint limits that apply to the user setpoint limits.
+    @param userLimits The user setpoint limits to modify.
+    @param changedAttributes The set of attributes changed before this operation.
+    @param fixedAttributes The set of attributes fixed by this operation.
+    */
+    void FixUserLimits(AbsoluteSetpointLimits & absoluteLimits, UserSetpointLimits & userLimits,
                        SetpointAttributes & changedAttributes, SetpointAttributes & fixedAttributes);
 
+    /*
+    Attempt to fix a given setpoint range to comply with all setpoint rules
+    @param range The setpoint range to modify.
+    @param changedAttributes The set of attributes changed before this operation.
+    @param fixedAttributes The set of attributes fixed by this operation.
+    */
     void FixRange(SetpointRange & range, SetpointAttributes & changedAttributes, SetpointAttributes & fixedAttributes);
 };
 

@@ -63,12 +63,12 @@ struct SetpointLimits
     /*
     Get the minimum value for this setpoint limit
     */
-    virtual temperature Minimum() const { return minimum.Temperature(); };
+    temperature Minimum() const { return minimum.Temperature(); };
 
     /*
     Get the maximum value for this setpoint limit
     */
-    virtual temperature Maximum() const { return maximum.Temperature(); };
+    temperature Maximum() const { return maximum.Temperature(); };
 
     /*
     Check if the setpoint limits are valid
@@ -98,30 +98,25 @@ struct SetpointLimits
     temperature Clamp(const temperature temp) const { return std::clamp(temp, Minimum(), Maximum()); };
 };
 
+typedef SetpointLimits<AbsoluteSetpoint> AbsoluteSetpointLimits;
+
 /*
-UserSetpointLimits is used for an optional setpoint. It wraps the absolute setpoint limits, which it can fall back on when the user
+UserSetpointLimits is used for optional setpoint limits. It wraps the absolute setpoint limits, which it can fall back on when the user
 limit is not provided.
 */
-struct UserSetpointLimits : public SetpointLimits<OptionalSetpoint>
-{
-    const SetpointLimits<AbsoluteSetpoint> & absoluteLimits;
+struct UserSetpointLimits : SetpointLimits<OptionalSetpoint> {
 
-    /*
-    Constructor to create a UserSetpointLimits from absolute limits and optional user limits.
-    */
-    UserSetpointLimits(const SetpointLimits<AbsoluteSetpoint> & al, OptionalSetpoint min, OptionalSetpoint max) :
-        SetpointLimits(min, max), absoluteLimits(al){};
-    /*
-    Constructor to create a UserSetpointLimits from absolute limits and another UserSetpointLimits.
-    */
-    UserSetpointLimits(const SetpointLimits<AbsoluteSetpoint> & al, const UserSetpointLimits & override) :
-        SetpointLimits(override.minimum, override.maximum), absoluteLimits(al){};
+    const AbsoluteSetpointLimits & absoluteLimits;
+
+    UserSetpointLimits(OptionalSetpoint min, OptionalSetpoint max,const AbsoluteSetpointLimits & absLimits) :
+         SetpointLimits<OptionalSetpoint>(min, max), absoluteLimits(absLimits) {}
+
+    UserSetpointLimits(const UserSetpointLimits & other, const AbsoluteSetpointLimits & absoluteSetpointLimits) :
+        SetpointLimits<OptionalSetpoint>(OptionalSetpoint(other.minimum, absoluteSetpointLimits.minimum),  OptionalSetpoint(other.maximum, absoluteSetpointLimits.maximum)), absoluteLimits(absoluteSetpointLimits) {}
 
     bool IsValid() const override;
-
-    temperature Minimum() const override;
-    temperature Maximum() const override;
 };
+
 
 } // namespace Thermostat
 } // namespace Clusters
