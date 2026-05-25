@@ -140,7 +140,6 @@ public:
     // Setters and Getters
     BitFlags<Feature> GetFeatureMap() const { return mFeatureMap; }
 
-    void SetType(Type type) { SetAttributeValue(mType, type, Attributes::Type::Id); }
     Type GetType() const { return mType; }
 
     void SetNumberOfActuationsLift(uint16_t numOfLifts);
@@ -167,7 +166,6 @@ public:
     void SetTargetPositionTiltPercent100ths(NPercent100ths newTargetLift);
     NPercent100ths GetTargetPositionTiltPercent100ths() const { return mTargetPositionTiltPercent100ths; }
 
-    void SetEndProductType(EndProductType type);
     EndProductType GetEndProductType() const { return mEndProductType; }
 
     void SetCurrentPositionLiftPercent100ths(NPercent100ths curLiftPercent100ths);
@@ -184,6 +182,10 @@ public:
 
     void SetDelegate(WindowCoveringDelegate * delegate) { mDelegate = delegate; }
     WindowCoveringDelegate * GetDelegate() const { return mDelegate; }
+
+protected:
+    void SetType(Type type) { SetAttributeValue(mType, type, Attributes::Type::Id); }
+    void SetEndProductType(EndProductType type);
 
 private:
     /**
