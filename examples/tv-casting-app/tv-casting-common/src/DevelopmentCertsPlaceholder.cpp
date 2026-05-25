@@ -47,7 +47,6 @@ ByteSpan kDacCert;
 ByteSpan kDacPrivateKey;
 ByteSpan kDacPublicKey;
 ByteSpan kPaiCert;
-ByteSpan kDeclaration;
 
 } // namespace DevelopmentCerts
 } // namespace chip
