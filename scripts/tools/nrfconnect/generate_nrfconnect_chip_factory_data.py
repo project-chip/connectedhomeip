@@ -568,14 +568,14 @@ def main():
     if args.schema and no_jsonschema_module:
         log.error("Requested verification of the JSON file using jsonschema, but the module is not installed. \n"
                   "Install only the module by invoking: pip3 install jsonschema \n"
-                   "Alternatively, install it with all dependencies for Matter by invoking: pip3 install "
-                   "-r ./scripts/setup/requirements.nrfconnect.txt from the Matter root directory.")
+                  "Alternatively, install it with all dependencies for Matter by invoking: pip3 install "
+                  "-r ./scripts/setup/requirements.nrfconnect.txt from the Matter root directory.")
         sys.exit(1)
 
     if args.generate_onboarding and no_onboarding_modules:
         log.error("Requested generation of onboarding codes, but the some modules are not installed. \n"
                   "Install all dependencies for Matter by invoking: pip3 install "
-                   "-r ./scripts/setup/requirements.nrfconnect.txt from the Matter root directory.")
+                  "-r ./scripts/setup/requirements.nrfconnect.txt from the Matter root directory.")
         sys.exit(1)
 
     generator = FactoryDataGenerator(args)

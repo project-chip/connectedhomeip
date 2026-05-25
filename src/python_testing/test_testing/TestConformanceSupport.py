@@ -672,8 +672,8 @@ class TestConformanceSupport(MatterBaseTest):
 
         # Ensure that we can only have greater terms with exactly 2 value
         xml = create_xml('<attribute name="attr1" />'
-                          '<attribute name="attr2" />'
-                          '<literal value="1" />')
+                         '<attribute name="attr2" />'
+                         '<literal value="1" />')
         et = ElementTree.fromstring(xml)
         try:
             xml_callable = parse_callable_from_xml(et, self.params)
