@@ -79,14 +79,13 @@ CHIP_ERROR FanControlCluster::Startup(ServerClusterContext & context)
     attrPersistence.LoadNativeEndianValue(ConcreteAttributePath(mPath.mEndpointId, FanControl::Id, FanMode::Id), restoredFanMode,
                                           mFanMode);
 
-    DataModel::ActionReturnStatus status = SetFanMode(restoredFanMode);
-    if (!status.IsSuccess())
+    // Best-effort restore; fall back to kOff (always valid) if the stored mode is rejected.
+    if (SetFanMode(restoredFanMode) != Status::Success)
     {
-        status = SetFanMode(FanModeEnum::kOff);
+        SetFanMode(FanModeEnum::kOff);
     }
 
-    // a best-effort - guaranteed CHIP_NO_ERROR if status is success.
-    return status.GetUnderlyingError();
+    return CHIP_NO_ERROR;
 }
 
 void FanControlCluster::CommitFanModeOffState()
