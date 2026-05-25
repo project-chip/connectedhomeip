@@ -38,6 +38,32 @@
 	pinctrl-names = "default";
 };
 
+&pinctrl {
+    pinmux_flexcomm1_i2c: pinmux_flexcomm1_i2c {
+        group0 {
+            pinmux = <IO_MUX_FC1_I2C_8_9>;
+			bias-pull-up;
+            slew-rate = "normal";
+        };
+    };
+};
+
+&flexcomm1 {
+    status = "okay";
+    compatible = "nxp,lpc-i2c";
+    #address-cells = <1>;
+    #size-cells = <0>;
+    clock-frequency = <I2C_BITRATE_FAST>;
+    pinctrl-0 = <&pinmux_flexcomm1_i2c>;
+    pinctrl-names = "default";
+};
+
+/ {
+	aliases {
+		se05x-i2c = &flexcomm1;
+	};
+};
+
 /delete-node/ &sram_data;
 /delete-node/ &sram_code;
 /delete-node/ &boot_partition;
