@@ -230,7 +230,7 @@ void FanControlCluster::ApplySpeedSettingChanged()
 
     if (mSpeedMax == 0)
     {
-        ChipLogError(Zcl, "FanControlCluster: mSpeedMax is 0; cannot compute PercentSetting");
+        // without a max speed, percent cannot be computed
         return;
     }
     uint8_t speedSetting  = mSpeedSetting.Value();
@@ -330,10 +330,14 @@ CHIP_ERROR FanControlCluster::Attributes(const ConcreteClusterPath & path,
 {
     using OptionalEntry                = AttributeListBuilder::OptionalAttributeEntry;
     OptionalEntry optionalAttributes[] = {
-        { SupportsMultiSpeed(), SpeedMax::kMetadataEntry },     { SupportsMultiSpeed(), SpeedSetting::kMetadataEntry },
-        { SupportsMultiSpeed(), SpeedCurrent::kMetadataEntry }, { SupportsRocking(), RockSupport::kMetadataEntry },
-        { SupportsRocking(), RockSetting::kMetadataEntry },     { SupportsWind(), WindSupport::kMetadataEntry },
-        { SupportsWind(), WindSetting::kMetadataEntry },        { SupportsAirflowDirection(), AirflowDirection::kMetadataEntry },
+        { SupportsMultiSpeed(), SpeedMax::kMetadataEntry },               //
+        { SupportsMultiSpeed(), SpeedSetting::kMetadataEntry },           //
+        { SupportsMultiSpeed(), SpeedCurrent::kMetadataEntry },           //
+        { SupportsRocking(), RockSupport::kMetadataEntry },               //
+        { SupportsRocking(), RockSetting::kMetadataEntry },               //
+        { SupportsWind(), WindSupport::kMetadataEntry },                  //
+        { SupportsWind(), WindSetting::kMetadataEntry },                  //
+        { SupportsAirflowDirection(), AirflowDirection::kMetadataEntry }, //
     };
 
     AttributeListBuilder listBuilder(builder);
@@ -410,23 +414,17 @@ DataModel::ActionReturnStatus FanControlCluster::SetFanMode(FanModeEnum value)
         return Status::InvalidInState;
     }
 
-    FanModeEnum newMode = value;
-
-    if (value == FanModeEnum::kOn)
-    {
-        newMode = FanModeEnum::kHigh;
-    }
-    else if (value == FanModeEnum::kSmart)
-    {
-        if (SupportsAuto())
+    const FanModeEnum newMode = [this, value]() {
+        if (value == FanModeEnum::kOn)
         {
-            newMode = FanModeEnum::kAuto;
+            return FanModeEnum::kHigh;
         }
-        else
+        if (value == FanModeEnum::kSmart)
         {
-            newMode = FanModeEnum::kHigh;
+            return SupportsAuto() ? FanModeEnum::kAuto : FanModeEnum::kHigh;
         }
-    }
+        return value;
+    }();
 
     if (!SetAttributeValue(mFanMode, newMode, FanMode::Id))
     {
