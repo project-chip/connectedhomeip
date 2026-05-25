@@ -797,12 +797,12 @@ menu "CHIP Device Layer"
                 images and requires CONFIG_OPENTHREAD_PLATFORM_NETIF to be disabled when
                 that ESP-IDF option is available.
 
-        config ENABLE_THREAD_MESHCOP_COMMISSIONING
-            bool "Enable Thread MeshCop Commissioning"
+        config CHIP_DEVICE_ENABLE_THREAD_MESHCOP
+            bool "Enable Thread MeshCop"
             default n
             depends on ENABLE_MATTER_OVER_THREAD && !ENABLE_CONCURRENT_CONNECTION
             help
-                Enable Thread MeshCoP commissioning
+                Enable Matter commissioning over Thread MeshCoP
 
     endmenu
 

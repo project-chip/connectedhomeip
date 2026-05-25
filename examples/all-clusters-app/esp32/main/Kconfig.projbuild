@@ -80,7 +80,7 @@ menu "Demo"
           bool "On-Network"
       config RENDEZVOUS_MODE_THREAD_MESHCOP
           bool "Thread MeshCop"
-          depends on ENABLE_THREAD_MESHCOP_COMMISSIONING
+          depends on CHIP_DEVICE_ENABLE_THREAD_MESHCOP
       config RENDEZVOUS_MODE_SOFTAP_ON_NETWORK
           bool "Soft-AP / On-Network"
           select ESP_WIFI_SOFTAP_SUPPORT

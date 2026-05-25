@@ -39,7 +39,7 @@
 
 #include <lib/support/logging/CHIPLogging.h>
 
-#if !defined(CONFIG_CHIP_USE_OT_ENDPOINT) && defined(CONFIG_ENABLE_THREAD_MESHCOP_COMMISSIONING)
+#if !defined(CONFIG_CHIP_USE_OT_ENDPOINT) && defined(CONFIG_CHIP_DEVICE_ENABLE_THREAD_MESHCOP)
 #include <inet/EndPointStateLwIP.h>
 #endif
 
@@ -53,7 +53,7 @@ class ThreadStackManagerImpl;
  * Concrate implementation of the ThreadStackManager singleton object for ESP32 platform.
  */
 class ThreadStackManagerImpl final : public ThreadStackManager,
-#if !defined(CONFIG_CHIP_USE_OT_ENDPOINT) && defined(CONFIG_ENABLE_THREAD_MESHCOP_COMMISSIONING)
+#if !defined(CONFIG_CHIP_USE_OT_ENDPOINT) && defined(CONFIG_CHIP_DEVICE_ENABLE_THREAD_MESHCOP)
                                      public Inet::EndPointStateLwIP,
 #endif
                                      public Internal::GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>
