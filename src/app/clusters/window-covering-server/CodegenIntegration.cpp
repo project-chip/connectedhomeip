@@ -35,7 +35,22 @@ namespace {
 constexpr size_t kWindowCoveringFixedClusterCount = WindowCovering::StaticApplicationConfig::kFixedClusterConfig.size();
 constexpr size_t kWindowCoveringMaxClusterCount   = kWindowCoveringFixedClusterCount + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 
-LazyRegisteredServerCluster<WindowCoveringCluster> gServers[kWindowCoveringMaxClusterCount];
+class CodegenWindowCoveringCluster : public WindowCoveringCluster
+{
+    using WindowCoveringCluster::SetEndProductType;
+    using WindowCoveringCluster::SetType;
+    using WindowCoveringCluster::WindowCoveringCluster;
+};
+
+LazyRegisteredServerCluster<CodegenWindowCoveringCluster> gServers[kWindowCoveringMaxClusterCount];
+
+// Helper for the derived class
+CodegenWindowCoveringCluster * FindCodegenCluster(chip::EndpointId endpoint)
+{
+    WindowCoveringCluster * baseCluster = WindowCovering::FindClusterOnEndpoint(endpoint);
+
+    return static_cast<CodegenWindowCoveringCluster *>(baseCluster);
+}
 
 class IntegrationDelegate : public CodegenClusterIntegration::Delegate
 {
