@@ -25,7 +25,6 @@ namespace chip::app {
 CHIP_ERROR InitBle(uint32_t bleController)
 {
 #if CONFIG_NETWORK_LAYER_BLE
-    // Darwin does not support BLE advertising (peripheral role); only configure the controller.
     ReturnErrorOnFailure(DeviceLayer::Internal::BLEMgrImpl().ConfigureBle(bleController, false));
 #endif
     return CHIP_NO_ERROR;
