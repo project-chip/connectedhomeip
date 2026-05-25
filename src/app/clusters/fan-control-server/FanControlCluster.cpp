@@ -84,9 +84,9 @@ CHIP_ERROR FanControlCluster::Startup(ServerClusterContext & context)
     {
         status = SetFanMode(FanModeEnum::kOff);
     }
-    VerifyOrReturnError(status.IsSuccess(), CHIP_ERROR_INTERNAL);
 
-    return CHIP_NO_ERROR;
+    // a best-effort - guaranteed CHIP_NO_ERROR if status is success.
+    return status.GetUnderlyingError();
 }
 
 void FanControlCluster::CommitFanModeOffState()
