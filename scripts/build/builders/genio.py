@@ -39,7 +39,7 @@ class GenioApp(Enum):
 class GenioBuilder(GnBuilder):
 
     def __init__(self, root: str, runner: Runner, output_dir_lock: OutDirLock, app: GenioApp = GenioApp.LIGHT):
-        super(GenioBuilder, self).__init__(root=app.BuildRoot(root), runner=runner, output_dir_lock=output_dir_lock)
+        super().__init__(root=app.BuildRoot(root), runner=runner, output_dir_lock=output_dir_lock)
         self.app = app
 
     @lock_output_dir

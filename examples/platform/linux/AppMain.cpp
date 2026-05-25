@@ -1051,12 +1051,10 @@ void ChipLinuxAppMainLoop(chip::ServerInitParams & initParams, AppMainLoopImplem
 #if CHIP_SYSTEM_CONFIG_USE_DISPATCH
     auto & platformMgr = chip::DeviceLayer::PlatformMgrImpl();
     platformMgr.RegisterSignalHandler(SIGINT, ^{
-        platformMgr.UnregisterAllSignalHandlers();
         StopSignalHandler(SIGINT);
     });
 
     platformMgr.RegisterSignalHandler(SIGTERM, ^{
-        platformMgr.UnregisterAllSignalHandlers();
         StopSignalHandler(SIGTERM);
     });
 #else
@@ -1097,6 +1095,10 @@ void ChipLinuxAppMainLoop(chip::ServerInitParams & initParams, AppMainLoopImplem
 
 #if defined(ENABLE_CHIP_SHELL)
     shellThread.join();
+#endif
+
+#if CHIP_DEVICE_LAYER_TARGET_DARWIN && CHIP_SYSTEM_CONFIG_USE_DISPATCH
+    platformMgr.UnregisterAllSignalHandlers();
 #endif
 
     Server::GetInstance().Shutdown();
