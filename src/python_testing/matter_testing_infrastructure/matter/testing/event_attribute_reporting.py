@@ -33,7 +33,7 @@ import queue
 import threading
 import time
 from dataclasses import dataclass
-from datetime import UTC, datetime, timezone
+from datetime import UTC, datetime
 from typing import Any, Iterable, Optional
 
 from mobly import asserts
@@ -759,7 +759,7 @@ class WildcardAttributeSubscriptionHandler:
                 self._attribute_reports[report_key] = []
             self._attribute_reports[report_key].append(WildcardAttributeReportSnapshot(
                 value=data,
-                timestamp=datetime.now(timezone.utc)
+                timestamp=datetime.now(UTC)
             ))
 
     async def start(self, dev_ctrl, node_id: int, attributes: list,
