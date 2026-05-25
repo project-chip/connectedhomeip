@@ -73,8 +73,6 @@ namespace {} // namespace
         return CHIP_ERROR_INTERNAL;                                                                                                \
     }
 
-static SCARD_IO_REQUEST pioSendPci;
-
 // This NFC Tag contains all the variables, handles and buffers related to one NFC tag instance
 class TagInstance
 {
@@ -83,6 +81,7 @@ private:
     const Transport::PeerAddress peerAddress;
     char * readerName;
     SCARDHANDLE cardHandle;
+    const SCARD_IO_REQUEST * pioSendPci;
     uint16_t discriminator;
 
     bool mIsValid = true;
@@ -99,8 +98,9 @@ private:
     uint32_t mChainedResponseLength = 0;
 
 public:
-    TagInstance(Transport::NFCBase * base, const Transport::PeerAddress address, const char * name, SCARDHANDLE handle) :
-        nfcBase(base), peerAddress(address), cardHandle(handle)
+    TagInstance(Transport::NFCBase * base, const Transport::PeerAddress address, const char * name, SCARDHANDLE handle,
+                const SCARD_IO_REQUEST * sendPci) :
+        nfcBase(base), peerAddress(address), cardHandle(handle), pioSendPci(sendPci)
     {
         readerName    = strdup(name); // Allocate memory and copy the string
         discriminator = 0;            // Will be retrieved when RetrieveDiscriminator() is called
@@ -361,7 +361,7 @@ public:
             0x00                                                  // Le
         };
 
-        LONG result = SCardTransmit(cardHandle, &pioSendPci, select_matter_applet, sizeof(select_matter_applet), NULL, dataReceived,
+        LONG result = SCardTransmit(cardHandle, pioSendPci, select_matter_applet, sizeof(select_matter_applet), NULL, dataReceived,
                                     &receivedLength);
         if (result == SCARD_S_SUCCESS)
         {
@@ -463,7 +463,7 @@ public:
         // After the transceive, they will contain the length of the received data.
         DWORD dwRecvLength = static_cast<DWORD>(*pRcvLength);
 
-        LONG result = SCardTransmit(cardHandle, &pioSendPci, pSendBuffer, sendBufferLength, NULL, pRcvBuffer, &dwRecvLength);
+        LONG result = SCardTransmit(cardHandle, pioSendPci, pSendBuffer, sendBufferLength, NULL, pRcvBuffer, &dwRecvLength);
 
         if ((result == SCARD_S_SUCCESS) && (dwRecvLength >= 2))
         {
@@ -536,13 +536,7 @@ public:
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
-SCARDCONTEXT hPcscContext;
-std::shared_ptr<TagInstance> lastTagInstanceUsed;
-
-// Empty vector of TagInstance pointers
-std::vector<std::shared_ptr<TagInstance>> tagInstances;
-
-NFCCommissioningManagerImpl NFCCommissioningManagerImpl::sInstance;
+Global<NFCCommissioningManagerImpl> NFCCommissioningManagerImpl::sInstance;
 
 // ===== start impl of NFCCommissioningManager internal interface, ref NFCCommissioningManager.h
 
@@ -577,10 +571,10 @@ CHIP_ERROR NFCCommissioningManagerImpl::EnsureProcessingThreadStarted()
     }
 
     // Creates an Application Context to the PC/SC Resource Manager.
-    LONG result = SCardEstablishContext(SCARD_SCOPE_SYSTEM, NULL, NULL, &hPcscContext);
+    LONG result = SCardEstablishContext(SCARD_SCOPE_SYSTEM, NULL, NULL, &mPcscContext);
     CHECK_FOR_SCARD_SUCCESS("SCardEstablishContext", result)
 
-    lastTagInstanceUsed = nullptr;
+    mLastTagInstanceUsed = nullptr;
 
     // Start the NFC processing thread
     mThreadRunning = true;
@@ -608,8 +602,8 @@ bool NFCCommissioningManagerImpl::CanSendToPeer(const Transport::PeerAddress & a
     // nfcShortId is used to find the peer device
     uint16_t nfcShortId = address.GetNFCShortId();
 
-    // Check if lastTagInstanceUsed corresponds to the same nfcShortId
-    if ((lastTagInstanceUsed != nullptr) && (lastTagInstanceUsed->GetDiscriminator() == nfcShortId))
+    // Check if mLastTagInstanceUsed corresponds to the same nfcShortId
+    if ((mLastTagInstanceUsed != nullptr) && (mLastTagInstanceUsed->GetDiscriminator() == nfcShortId))
     {
         return true;
     }
@@ -636,7 +630,7 @@ bool NFCCommissioningManagerImpl::CanSendToPeer(const Transport::PeerAddress & a
     }
 
     // Save the pointer to this TagInstance for a faster access at next call
-    lastTagInstanceUsed = tagInstance;
+    mLastTagInstanceUsed = tagInstance;
 
     return canSendToPeer;
 }
@@ -659,10 +653,10 @@ CHIP_ERROR NFCCommissioningManagerImpl::SendToNfcTag(const Transport::PeerAddres
     // nfcShortId is used to find the peer device
     uint16_t nfcShortId = address.GetNFCShortId();
 
-    // Check if lastTagInstanceUsed corresponds to the same nfcShortId
-    if ((lastTagInstanceUsed != nullptr) && (lastTagInstanceUsed->GetDiscriminator() == nfcShortId))
+    // Check if mLastTagInstanceUsed corresponds to the same nfcShortId
+    if ((mLastTagInstanceUsed != nullptr) && (mLastTagInstanceUsed->GetDiscriminator() == nfcShortId))
     {
-        targetedTagInstance = lastTagInstanceUsed;
+        targetedTagInstance = mLastTagInstanceUsed;
     }
     else
     {
@@ -737,7 +731,7 @@ CHIP_ERROR NFCCommissioningManagerImpl::ScanAllReaders(uint16_t nfcShortId)
     LPTSTR mszReaders; // LPTSTR is a "typedef char *"
     DWORD dwReaders;
 
-    result = SCardListReaders(hPcscContext, NULL, NULL, &dwReaders);
+    result = SCardListReaders(mPcscContext, NULL, NULL, &dwReaders);
     CHECK_FOR_SCARD_SUCCESS("SCardListReaders", result)
 
     // dwReaders now contains "mszReaders" data size
@@ -749,7 +743,7 @@ CHIP_ERROR NFCCommissioningManagerImpl::ScanAllReaders(uint16_t nfcShortId)
         return CHIP_ERROR_NO_MEMORY;
     }
 
-    result = SCardListReaders(hPcscContext, NULL, mszReaders, &dwReaders);
+    result = SCardListReaders(mPcscContext, NULL, mszReaders, &dwReaders);
     CHECK_FOR_SCARD_SUCCESS("SCardListReaders", result)
 
     // "mszReaders" contains a multi-string with list of readers.
@@ -791,19 +785,21 @@ CHIP_ERROR NFCCommissioningManagerImpl::ScanReader(uint16_t nfcShortId, char * r
     // Before launching a new scan of a reader, we should discard all the saved instances using this readerName
     EraseAllTagInstancesUsingReaderName(readerName);
 
-    LONG result = SCardConnect(hPcscContext, readerName, SCARD_SHARE_SHARED, SCARD_PROTOCOL_T0 | SCARD_PROTOCOL_T1, &cardHandle,
+    LONG result = SCardConnect(mPcscContext, readerName, SCARD_SHARE_SHARED, SCARD_PROTOCOL_T0 | SCARD_PROTOCOL_T1, &cardHandle,
                                &dwActiveProtocol);
     switch (result)
     {
     case static_cast<LONG>(SCARD_S_SUCCESS):
+    {
+        const SCARD_IO_REQUEST * sendPci = nullptr;
         switch (dwActiveProtocol)
         {
         case static_cast<DWORD>(SCARD_PROTOCOL_T0):
-            pioSendPci = *SCARD_PCI_T0;
+            sendPci = SCARD_PCI_T0;
             break;
 
         case static_cast<DWORD>(SCARD_PROTOCOL_T1):
-            pioSendPci = *SCARD_PCI_T1;
+            sendPci = SCARD_PCI_T1;
             break;
         }
 
@@ -817,12 +813,13 @@ CHIP_ERROR NFCCommissioningManagerImpl::ScanReader(uint16_t nfcShortId, char * r
         {
             // This couple (readerName, cardHandle) is not known yet: Create a new TagInstance
             auto newTagInstance =
-                std::make_shared<TagInstance>(mNFCBase, Transport::PeerAddress::NFC(nfcShortId), readerName, cardHandle);
+                std::make_shared<TagInstance>(mNFCBase, Transport::PeerAddress::NFC(nfcShortId), readerName, cardHandle, sendPci);
 
             ReturnErrorOnFailure(newTagInstance->RetrieveDiscriminator());
 
-            tagInstances.push_back(newTagInstance);
+            mTagInstances.push_back(newTagInstance);
         }
+    }
         break;
 
     case static_cast<LONG>(SCARD_E_NO_SMARTCARD):
@@ -842,7 +839,7 @@ CHIP_ERROR NFCCommissioningManagerImpl::ScanReader(uint16_t nfcShortId, char * r
 std::shared_ptr<TagInstance> NFCCommissioningManagerImpl::SearchTagInstanceFromReaderNameAndCardHandle(const char * readerName,
                                                                                                        SCARDHANDLE cardHandle)
 {
-    for (auto & instance : tagInstances)
+    for (auto & instance : mTagInstances)
     {
         if (strcmp(instance->GetReaderName(), readerName) == 0 && instance->GetCardHandle() == cardHandle)
         {
@@ -855,7 +852,7 @@ std::shared_ptr<TagInstance> NFCCommissioningManagerImpl::SearchTagInstanceFromR
 // Function to search for a TagInstance based on discriminator
 std::shared_ptr<TagInstance> NFCCommissioningManagerImpl::SearchTagInstanceFromDiscriminator(uint16_t discriminator)
 {
-    for (auto & instance : tagInstances)
+    for (auto & instance : mTagInstances)
     {
         if (instance->GetDiscriminator() == discriminator)
         {
@@ -868,19 +865,19 @@ std::shared_ptr<TagInstance> NFCCommissioningManagerImpl::SearchTagInstanceFromD
 // Erase all the TagInstance(s) using the given readerName
 void NFCCommissioningManagerImpl::EraseAllTagInstancesUsingReaderName(const char * readerName)
 {
-    if ((lastTagInstanceUsed != nullptr) && (strcmp(lastTagInstanceUsed->GetReaderName(), readerName) == 0))
+    if ((mLastTagInstanceUsed != nullptr) && (strcmp(mLastTagInstanceUsed->GetReaderName(), readerName) == 0))
     {
-        lastTagInstanceUsed = nullptr;
+        mLastTagInstanceUsed = nullptr;
     }
 
-    for (auto it = tagInstances.begin(); it != tagInstances.end();)
+    for (auto it = mTagInstances.begin(); it != mTagInstances.end();)
     {
         if (strcmp((*it)->GetReaderName(), readerName) == 0)
         {
             (*it)->Invalidate(); // Mark as invalid before erasing
-            // tagInstance will be deleted automatically when both the tagInstances vector
+            // tagInstance will be deleted automatically when both the mTagInstances vector
             //  and the message queue will no more use it.
-            it = tagInstances.erase(it);
+            it = mTagInstances.erase(it);
         }
         else
         {
