@@ -535,7 +535,7 @@ def main():
 
         config = ".." + timing.config[len(timing.config) - 48:] if len(timing.config) > 50 else timing.config
         template = ".." + tmpl[len(tmpl) - 48:] if len(tmpl) > 50 else tmpl
-        print(f" {timing.generate_time:8d} | {config:>50s} | {template:>50s}")
+        print(f" {timing.generate_time:8} | {config:>50s} | {template:>50s}")
 
 
 if __name__ == '__main__':
