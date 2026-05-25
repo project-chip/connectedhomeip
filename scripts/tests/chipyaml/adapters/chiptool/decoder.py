@@ -307,7 +307,7 @@ class OctetStringConverter(BaseConverter):
     def maybe_convert(self, typename, value):
         if typename == 'octet_string' or typename == 'long_octet_string':
             if value == '':
-                value = bytes()
+                value = b''
             elif value.startswith('base64:'):
                 value = base64.b64decode(value.removeprefix('base64:'))
 

@@ -73,12 +73,6 @@ public:
      */
     virtual sl_status_t EnableSi70xxSensorGpio() { return SL_STATUS_OK; }
 
-    // Watchdog
-    virtual void WatchdogInit(){};
-    virtual void WatchdogFeed(){};
-    virtual void WatchdogEnable(){};
-    virtual void WatchdogDisable(){};
-
     /**
      * @brief Function trigger the platform to execute a software reset.
      *              Anything after this function will not be executed since the device will reboot.

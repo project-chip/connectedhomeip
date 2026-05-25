@@ -45,7 +45,7 @@ def dump_zapfile_clusters(zap_file_path: pathlib.Path,
     # List of directories in src/app/clusters to build for client clusters.
     CLIENT_CLUSTERS: typing.Dict[str, typing.List[str]] = {}
 
-    with open(implementation_data_path, "r") as implementation_data_file:
+    with open(implementation_data_path) as implementation_data_file:
         implementation_data = json.load(implementation_data_file)
         SERVER_CLUSTERS = implementation_data["ServerDirectories"]
         CLIENT_CLUSTERS = implementation_data["ClientDirectories"]
@@ -53,7 +53,7 @@ def dump_zapfile_clusters(zap_file_path: pathlib.Path,
     client_clusters: typing.Set[str] = set()
     server_clusters: typing.Set[str] = set()
 
-    with open(zap_file_path, "r") as zap_file:
+    with open(zap_file_path) as zap_file:
         zap_json = json.loads(zap_file.read())
 
         for endpoint_type in zap_json.get('endpointTypes'):

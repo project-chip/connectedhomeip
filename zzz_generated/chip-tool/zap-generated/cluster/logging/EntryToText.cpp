@@ -4646,6 +4646,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "StatusLightEnabled";
         case chip::app::Clusters::CameraAvStreamManagement::Attributes::StatusLightBrightness::Id:
             return "StatusLightBrightness";
+        case chip::app::Clusters::CameraAvStreamManagement::Attributes::ImageRotationDiscreteAngles::Id:
+            return "ImageRotationDiscreteAngles";
         case chip::app::Clusters::CameraAvStreamManagement::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::CameraAvStreamManagement::Attributes::AcceptedCommandList::Id:
@@ -7481,6 +7483,8 @@ char const * DeviceTypeIdToText(chip::DeviceTypeId id)
         return "Oven";
     case 0x0000007C:
         return "Laundry Dryer";
+    case 0x0000007D:
+        return "Humidifier/Dehumidifier";
     case 0x00000090:
         return "Network Infrastructure Manager";
     case 0x00000091:

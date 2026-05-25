@@ -15,7 +15,9 @@
 import os
 from enum import Enum, auto
 
-from .builder import BuilderOutput
+from runner.runner import Runner
+
+from .builder import BuilderOutput, OutDirLock, lock_output_dir
 from .gn import GnBuilder
 
 
@@ -44,12 +46,11 @@ class cc32xxApp(Enum):
 class cc32xxBuilder(GnBuilder):
 
     def __init__(self,
-                 root,
-                 runner,
+                 root: str,
+                 runner: Runner,
+                 output_dir_lock: OutDirLock,
                  app: cc32xxApp = cc32xxApp.LOCK):
-        super(cc32xxBuilder, self).__init__(
-            root=app.BuildRoot(root),
-            runner=runner)
+        super().__init__(root=app.BuildRoot(root), runner=runner, output_dir_lock=output_dir_lock)
         self.code_root = root
         self.app = app
 
@@ -65,6 +66,7 @@ class cc32xxBuilder(GnBuilder):
         args.append(f'ti_sysconfig_root="{sysconfig_root}"')
         return args
 
+    @lock_output_dir
     def build_outputs(self):
         if (self.app == cc32xxApp.LOCK):
             extensions = ["out", "bin"]

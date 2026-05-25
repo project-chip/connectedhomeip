@@ -59,8 +59,8 @@ def get_supersets(xml_device_types: dict[int, XmlDeviceType]) -> list[set[int]]:
 
     # Ex. in the above example, the top level device types would be blinkable light and color temperature light
     # because they are supersets of other things, but have no device types that are supersets of them.
-    top_level_device_types = [id for id, dt in xml_device_types.items(
-    ) if dt.superset_of_device_type_id != 0 and id not in device_types_that_have_supersets]
+    top_level_device_types = [_id for _id, dt in xml_device_types.items(
+    ) if dt.superset_of_device_type_id != 0 and _id not in device_types_that_have_supersets]
     supersets: list[set[int]] = []
     for top in top_level_device_types:
         line: set[int] = set()
@@ -80,10 +80,10 @@ class DeviceConformanceTests(BasicCompositionTests):
     def _get_device_type_id(self, device_type_name: str, xml_device_types: Optional[dict[uint, XmlDeviceType]] = None) -> int:
         if xml_device_types is None:
             xml_device_types = self.xml_device_types
-        id = [id for id, dt in xml_device_types.items() if dt.name.lower() == device_type_name.lower()]
-        if len(id) != 1:
+        _id = [_id for _id, dt in xml_device_types.items() if dt.name.lower() == device_type_name.lower()]
+        if len(_id) != 1:
             raise KeyError(f"Unable to find {device_type_name} device type")
-        return id[0]
+        return _id[0]
 
     def _has_device_type_supporting_macl(self):
         # Currently this is just NIM. We may later be able to pull this from the device type scrape using the ManagedAclAllowed condition,
@@ -427,28 +427,28 @@ class DeviceConformanceTests(BasicCompositionTests):
                                     location=location, problem=f"Feature bit {mask.bit_length() - 1} in cluster {cluster_requirement.name} is disallowed by element override for device type {xml_device.name}, but is present in the feature map")
 
                     def check_attribute_overrides(cluster_requirement: XmlDeviceTypeClusterRequirements, cluster_info: ConformanceAssessmentData) -> None:
-                        for id, conformance in cluster_requirement.attribute_overrides.items():
+                        for _id, conformance in cluster_requirement.attribute_overrides.items():
                             conformance_decision_with_choice = conformance(cluster_info)
-                            if conformance_decision_with_choice.is_mandatory() and id not in attribute_list:
+                            if conformance_decision_with_choice.is_mandatory() and _id not in attribute_list:
                                 record_error(
-                                    location=location, problem=f"Attribute {id} in cluster {cluster_requirement.name} is required by element override for device type {xml_device.name}, but is not present in the attribute list")
-                            if not conformance_allowed(conformance_decision_with_choice, allow_provisional_test_event_only_disallowed_for_certification) and id in attribute_list:
-                                if device_type_id == water_heater_id and cluster_id == Clusters.Thermostat.id and id == Clusters.Thermostat.Attributes.SystemMode.attribute_id:
+                                    location=location, problem=f"Attribute {_id} in cluster {cluster_requirement.name} is required by element override for device type {xml_device.name}, but is not present in the attribute list")
+                            if not conformance_allowed(conformance_decision_with_choice, allow_provisional_test_event_only_disallowed_for_certification) and _id in attribute_list:
+                                if device_type_id == water_heater_id and cluster_id == Clusters.Thermostat.id and _id == Clusters.Thermostat.Attributes.SystemMode.attribute_id:
                                     # This is a specific problem in the water heater device type where it is specifically disallowing a thing that shouldn't be disallowed
                                     # For now, ignore this requirement until the spec is fixed
                                     continue
                                 record_error(
-                                    location=location, problem=f"Attribute {id} in cluster {cluster_requirement.name} is disallowed by element override for device type {xml_device.name}, but is present in the attribute list")
+                                    location=location, problem=f"Attribute {_id} in cluster {cluster_requirement.name} is disallowed by element override for device type {xml_device.name}, but is present in the attribute list")
 
                     def check_command_overrides(cluster_requirement: XmlDeviceTypeClusterRequirements, cluster_info: ConformanceAssessmentData):
-                        for id, conformance in cluster_requirement.command_overrides.items():
+                        for _id, conformance in cluster_requirement.command_overrides.items():
                             conformance_decision_with_choice = conformance(cluster_info)
-                            if conformance_decision_with_choice.is_mandatory() and id not in cmd_list:
+                            if conformance_decision_with_choice.is_mandatory() and _id not in cmd_list:
                                 record_error(
-                                    location=location, problem=f"Command {id} in cluster {cluster_requirement.name} is required by element override for device type {xml_device.name}, but is not present in the cmd list")
-                            if not conformance_allowed(conformance_decision_with_choice, allow_provisional_test_event_only_disallowed_for_certification) and id in cmd_list:
+                                    location=location, problem=f"Command {_id} in cluster {cluster_requirement.name} is required by element override for device type {xml_device.name}, but is not present in the cmd list")
+                            if not conformance_allowed(conformance_decision_with_choice, allow_provisional_test_event_only_disallowed_for_certification) and _id in cmd_list:
                                 record_error(
-                                    location=location, problem=f"Command {id} in cluster {cluster_requirement.name} is disallowed by element override for device type {xml_device.name}, but is present in the cmd list")
+                                    location=location, problem=f"Command {_id} in cluster {cluster_requirement.name} is disallowed by element override for device type {xml_device.name}, but is present in the cmd list")
 
                     cluster = Clusters.ClusterObjects.ALL_CLUSTERS[cluster_id]
                     feature_map = endpoint[cluster][cluster.Attributes.FeatureMap]
@@ -553,7 +553,7 @@ class DeviceConformanceTests(BasicCompositionTests):
         # TODO: change this once https://github.com/project-chip/matter-test-scripts/issues/689 is implemented
 
         def get_namespace_id(name: str) -> uint:
-            ids = [id for id, xml in one_five_namespaces.items() if xml.name.lower() == name.lower()]
+            ids = [_id for _id, xml in one_five_namespaces.items() if xml.name.lower() == name.lower()]
             if len(ids) != 1:
                 raise ValueError(f"Unable to find unique namespace for '{name}'")
             return ids[0]
