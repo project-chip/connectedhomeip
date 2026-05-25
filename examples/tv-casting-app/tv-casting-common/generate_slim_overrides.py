@@ -128,7 +128,7 @@ def load_config(config_path):
         sys.exit(1)
 
     try:
-        with open(config_path, "r") as f:
+        with open(config_path) as f:
             config = yaml.safe_load(f)
     except yaml.YAMLError:
         logging.exception("invalid YAML in %s", config_path)
@@ -277,7 +277,7 @@ def generate_cluster_objects(full_source_path, casting_clusters, output_path):
         logging.error("full cluster-objects.cpp not found: %s", full_source_path)
         sys.exit(1)
 
-    with open(full_source_path, "r") as f:
+    with open(full_source_path) as f:
         full_text = f.read()
 
     full_lines = full_text.splitlines()
@@ -446,7 +446,7 @@ def generate_tlv_decoder(full_source_path, cluster_names, output_path, decoder_t
         logging.error("full TLV decoder not found: %s", full_source_path)
         sys.exit(1)
 
-    with open(full_source_path, "r") as f:
+    with open(full_source_path) as f:
         full_text = f.read()
 
     case_blocks = _extract_switch_case_blocks(full_text, cluster_names)
@@ -598,7 +598,7 @@ def generate_accessors(full_source_path, casting_clusters, output_path):
         logging.error("full Accessors.cpp not found: %s", full_source_path)
         sys.exit(1)
 
-    with open(full_source_path, "r") as f:
+    with open(full_source_path) as f:
         full_text = f.read()
 
     namespace_blocks = _extract_cluster_namespace_blocks(full_text, casting_clusters)
