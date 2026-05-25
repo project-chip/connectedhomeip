@@ -125,7 +125,7 @@ class AndroidBuilder(Builder):
                  runner: Runner,
                  output_dir_lock: OutDirLock, board: AndroidBoard, app: AndroidApp,
                  optimize_size: bool = False):
-        super(AndroidBuilder, self).__init__(root, runner, output_dir_lock)
+        super().__init__(root, runner, output_dir_lock)
         self.board = board
         self.app = app
         self.optimize_size = optimize_size

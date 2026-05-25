@@ -89,7 +89,7 @@ class PushAvServer:
         if file_path.endswith('.crt'):
             context['type'] = 'cert'
             p = self.stream_service.wd.path("streams", str(stream_id), file_path)
-            with open(p, "r") as f:
+            with open(p) as f:
                 context['cert'] = json.load(f)
         else:
             context['type'] = 'media'

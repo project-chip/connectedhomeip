@@ -31,9 +31,9 @@ def _strikethrough(s):
     return '\u0336'.join(s[i:i+1] for i in range(0, len(s), 1))
 
 
-_SUCCESS = click.style(u'\N{check mark}', fg='green')
-_FAILURE = click.style(u'\N{ballot x}', fg='red')
-_WARNING = click.style(u'\N{warning sign}', fg='yellow')
+_SUCCESS = click.style('\N{check mark}', fg='green')
+_FAILURE = click.style('\N{ballot x}', fg='red')
+_WARNING = click.style('\N{warning sign}', fg='yellow')
 
 
 class TestColoredLogPrinter():

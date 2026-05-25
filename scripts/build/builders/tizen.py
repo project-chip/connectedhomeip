@@ -99,7 +99,7 @@ class TizenBuilder(GnBuilder):
                  use_coverage: bool = False,
                  with_ui: bool = False,
                  ):
-        super(TizenBuilder, self).__init__(
+        super().__init__(
             root=os.path.join(root, app.value.source),
             runner=runner,
             output_dir_lock=output_dir_lock)
@@ -145,7 +145,7 @@ class TizenBuilder(GnBuilder):
 
     @lock_output_dir
     def generate(self):
-        super(TizenBuilder, self).generate()
+        super().generate()
         if self.app == TizenApp.TESTS and self.use_coverage:
             self.coverage_dir = os.path.join(self.output_dir, 'coverage')
             self._Execute(['mkdir', '-p', self.coverage_dir], title="Create coverage output location")
