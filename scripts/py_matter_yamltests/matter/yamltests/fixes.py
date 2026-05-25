@@ -124,7 +124,7 @@ def fix_typed_yaml_value(value):
 
 
 def add_yaml_support_for_scientific_notation_without_dot(loader):
-    regular_expression = re.compile(u'''^(?:
+    regular_expression = re.compile('''^(?:
      [-+]?(?:[0-9][0-9_]*)\\.[0-9_]*(?:[eE][-+]?[0-9]+)?
     |[-+]?(?:[0-9][0-9_]*)(?:[eE][-+]?[0-9]+)
     |\\.[0-9_]+(?:[eE][-+][0-9]+)?
@@ -133,9 +133,9 @@ def add_yaml_support_for_scientific_notation_without_dot(loader):
     |\\.(?:nan|NaN|NAN))$''', re.X)
 
     loader.add_implicit_resolver(
-        u'tag:yaml.org,2002:float',
+        'tag:yaml.org,2002:float',
         regular_expression,
-        list(u'-+0123456789.'))
+        list('-+0123456789.'))
 
 
 # This is a gross hack. The previous runner has a some internal states where an identity match one

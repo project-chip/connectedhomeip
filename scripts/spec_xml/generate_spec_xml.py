@@ -232,7 +232,7 @@ def cleanup_old_spec_dms(output_dir):
         filename = os.path.join(output_dir, 'device_types', 'DoorLock.xml')
         if not os.path.exists(filename):
             return
-        with open(filename, 'rt+') as file:
+        with open(filename, "r+") as file:
             tree = etree.parse(file)
             root = tree.getroot()
             for feature_tag in root.iter('feature'):
@@ -286,7 +286,7 @@ def cleanup_old_spec_dms(output_dir):
         filename = os.path.join(output_dir, 'device_types', 'BaseDeviceType.xml')
         if not os.path.exists(filename):
             return
-        with open(filename, 'rt+') as file:
+        with open(filename, "r+") as file:
             tree = etree.parse(file)
             root = tree.getroot()
             if root.find('clusters') is None:
@@ -309,7 +309,7 @@ def cleanup_old_spec_dms(output_dir):
         filename = os.path.join(output_dir, 'device_types', 'RootNodeDeviceType.xml')
         if not os.path.exists(filename):
             return
-        with open(filename, 'rt+') as file:
+        with open(filename, "r+") as file:
             tree = etree.parse(file)
             root = tree.getroot()
             for tag in root.iter('feature'):
@@ -331,14 +331,14 @@ def dump_versions(scraper, spec_root, output_dir):
     out = subprocess.run(['git', 'rev-parse', 'HEAD'],
                          capture_output=True, encoding="utf8", cwd=spec_root)
     sha = out.stdout
-    with open(sha_file, 'wt', encoding='utf8') as output:
+    with open(sha_file, "w", encoding='utf8') as output:
         output.write(sha)
     cmd = ['git', 'show-ref',  '--tags']
     out = subprocess.run(cmd, capture_output=True, encoding="utf-8", cwd=spec_root)
     tags = out.stdout.splitlines()
     tag = [t for t in tags if sha.strip() in t]
     if tag:
-        with open(tag_file, 'wt', encoding='utf8') as output:
+        with open(tag_file, "w", encoding='utf8') as output:
             output.write(f'{tag[0].split("/")[-1]}\n')
     else:
         log.warning("WARNING: no tag found for sha '%s'", sha)
@@ -350,7 +350,7 @@ def dump_versions(scraper, spec_root, output_dir):
     out = subprocess.run([scraper, version_cmd],
                          capture_output=True, encoding="utf8")
     version = out.stdout
-    with open(scraper_file, "wt", encoding='utf8') as output:
+    with open(scraper_file, "w", encoding='utf8') as output:
         output.write(f'alchemy {version}')
 
 
@@ -368,7 +368,7 @@ def dump_json_ids(output_dir):
     def write_json(elements: dict, path: str) -> None:
         json_dict = {element_id: c.name for element_id, c in sorted(elements.items())}
 
-        with open(path, "wt+") as outfile:
+        with open(path, "w+") as outfile:
             json.dump(json_dict, outfile, indent=4)
             outfile.write('\n')
     write_json(clusters, clusters_json_file)
@@ -480,7 +480,7 @@ def dump_ids_from_data_model_dirs():
         for version_dir in supported:
             tag_path = os.path.join(paths.get_data_model_path(), version_dir, 'spec_tag')
             try:
-                with open(tag_path, "r") as tag_file:
+                with open(tag_path) as tag_file:
                     version = tag_file.read().strip()
             except FileNotFoundError:
                 version = version_dir

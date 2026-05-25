@@ -285,10 +285,19 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
 
 void InitServer(intptr_t context)
 {
+    static chip::CommonCaseDeviceServerInitParams initParams;
+    CHIP_ERROR err = initParams.InitializeStaticResourcesBeforeServerInit();
+    if (err != CHIP_NO_ERROR)
+    {
+        ESP_LOGE(TAG, "InitializeStaticResourcesBeforeServerInit() failed: %" CHIP_ERROR_FORMAT, err.Format());
+        return;
+    }
+
     DeviceFactory::GetInstance().Init(DeviceFactory::Context{
         .groupDataProvider = gGroupDataProvider,                     //
         .fabricTable       = Server::GetInstance().GetFabricTable(), //
         .timerDelegate     = gTimerDelegate,                         //
+        .storageDelegate   = *initParams.persistentStorageDelegate,  //
     });
 
 #if ALL_DEVICES_ENABLE_DIMMABLE_LIGHT
@@ -301,14 +310,6 @@ void InitServer(intptr_t context)
         });
     });
 #endif
-
-    static chip::CommonCaseDeviceServerInitParams initParams;
-    CHIP_ERROR err = initParams.InitializeStaticResourcesBeforeServerInit();
-    if (err != CHIP_NO_ERROR)
-    {
-        ESP_LOGE(TAG, "InitializeStaticResourcesBeforeServerInit() failed: %" CHIP_ERROR_FORMAT, err.Format());
-        return;
-    }
 
     RegisterDeviceFactoryOverrides(gTimerDelegate, initParams.persistentStorageDelegate);
 

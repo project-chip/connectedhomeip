@@ -120,7 +120,7 @@ class RealtekBuilder(Builder):
                  enable_cli: bool = False,
                  enable_rpc: bool = False,
                  enable_shell: bool = False):
-        super(RealtekBuilder, self).__init__(root, runner, output_dir_lock)
+        super().__init__(root, runner, output_dir_lock)
         self.board = board
         self.app = app
         self.enable_cli = enable_cli
