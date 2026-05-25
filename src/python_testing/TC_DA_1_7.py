@@ -86,7 +86,7 @@ def load_all_paa(paa_path: Path) -> dict:
                     if extension.oid == SubjectKeyIdentifier.oid:
                         skid = extension.value.key_identifier
                         paa_by_skid[skid] = (Path(filename).name, paa_cert)
-            except (ValueError, IOError) as e:
+            except (OSError, ValueError) as e:
                 log.error(f"Failed to load {filename}: {str(e)}")
                 if Path(filename).name not in ALLOWED_SKIPPED_FILENAMES:
                     log.error(f"Re-raising error and failing: found new invalid PAA: {filename}")

@@ -104,12 +104,12 @@ def read_pics_from_file(path: str) -> dict[str, bool]:
     if os.path.isdir(os.path.abspath(path)):
         pics_dict = {}
         for filename in glob.glob(f'{path}/*.xml'):
-            with open(filename, 'r') as f:
+            with open(filename) as f:
                 contents = f.read()
                 pics_dict.update(parse_pics_xml(contents))
         return pics_dict
 
-    with open(path, 'r') as f:
+    with open(path) as f:
         lines = f.readlines()
         return parse_pics(lines)
 

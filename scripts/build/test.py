@@ -83,7 +83,7 @@ class TestBuilder(unittest.TestCase):
 
         if diffs:
             reference = os.path.basename(expected_file) + '.actual'
-            with open(reference, 'wt') as fo:
+            with open(reference, "w") as fo:
                 for line in build_actual_output(ROOT, OUT, args):
                     fo.write(line.replace(ROOT, '{root}').replace(OUT, '{out}'))
 

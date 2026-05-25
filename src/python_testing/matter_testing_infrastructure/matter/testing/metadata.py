@@ -50,7 +50,7 @@ def extract_runs_args(py_script_path: str) -> dict[str, dict[str, str]]:
     runs_arg_lines: dict[str, dict[str, str]] = {}
 
     ci_args_section_lines = []
-    with open(py_script_path, 'r', encoding='utf8') as py_script:
+    with open(py_script_path, encoding='utf8') as py_script:
         for line_idx, line in enumerate(py_script.readlines()):
             line = line.strip()
 

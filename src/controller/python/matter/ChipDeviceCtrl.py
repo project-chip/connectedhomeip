@@ -26,7 +26,7 @@
 """
 
 # Needed to use types in type hints before they are fully defined.
-from __future__ import absolute_import, annotations, print_function
+from __future__ import annotations
 
 import asyncio
 import builtins

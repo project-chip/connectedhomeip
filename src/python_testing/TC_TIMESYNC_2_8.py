@@ -37,7 +37,7 @@
 
 import asyncio
 import contextlib
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 from mobly import asserts
 
@@ -204,7 +204,7 @@ class TC_TIMESYNC_2_8(MatterBaseTest):
         compare_time(received=local, offset=timedelta(seconds=-3600), tolerance=timedelta(seconds=5))
 
         self.print_step(27, "Send SetDSTOffset command with DST starting in the future")
-        valid = utc_time_in_matter_epoch(datetime.now(tz=timezone.utc) + timedelta(seconds=10))
+        valid = utc_time_in_matter_epoch(datetime.now(tz=UTC) + timedelta(seconds=10))
         dst = [dst_struct(offset=3600, validStarting=valid, validUntil=NullValue)]
         await self.send_set_dst_cmd(dst)
 

@@ -38,7 +38,7 @@
 import asyncio
 import contextlib
 import queue
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 from mobly import asserts
 
@@ -127,10 +127,10 @@ class TC_TIMESYNC_2_12(MatterBaseTest):
         asserts.assert_greater_equal(tz_list_size, 1, "Invalid tz list size")
 
         self.print_step(5, "TH sets two TZ items if dst_list_size > 1")
-        th_utc = utc_time_in_matter_epoch(datetime.now(tz=timezone.utc))
+        th_utc = utc_time_in_matter_epoch(datetime.now(tz=UTC))
         tz_first = tz_struct(offset=3600, validAt=0, name="Not/Real")
         if tz_list_size > 1:
-            valid_second = utc_time_in_matter_epoch(datetime.now(tz=timezone.utc) + timedelta(seconds=10))
+            valid_second = utc_time_in_matter_epoch(datetime.now(tz=UTC) + timedelta(seconds=10))
             tz_second = tz_struct(offset=7200, validAt=valid_second, name="Un/Real")
             tz = [tz_first, tz_second]
             await self.send_set_time_zone_cmd(tz)

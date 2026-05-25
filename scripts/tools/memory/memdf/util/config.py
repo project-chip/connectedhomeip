@@ -246,7 +246,7 @@ class Config:
 
     def read_config_file(self, filename: str) -> 'Config':
         """Read a configuration file."""
-        with open(filename, 'r') as fp:
+        with open(filename) as fp:
             d = ast.literal_eval(fp.read())
             nd.update(self.d, d)
         return self

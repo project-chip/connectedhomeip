@@ -217,7 +217,7 @@ def loadZapfile(filename: str):
 
 
 def saveZapfile(body: object, filename: str):
-    with open(filename, "wt+") as outfile:
+    with open(filename, "w+") as outfile:
         return json.dump(body, outfile, indent=2)
 
 

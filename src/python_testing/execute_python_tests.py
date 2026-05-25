@@ -229,7 +229,7 @@ def cmd_run(search_directory, env_file, keep_going, dry_run: bool, glob: list[st
         log.error("No tests to execute")
         sys.exit(1)
 
-    run_summary = RunSummary(run_timestamp=datetime.datetime.now(datetime.timezone.utc))
+    run_summary = RunSummary(run_timestamp=datetime.datetime.now(datetime.UTC))
 
     failed_scripts = []
     try:
