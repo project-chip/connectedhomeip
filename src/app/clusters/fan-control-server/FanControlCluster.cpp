@@ -127,41 +127,25 @@ void FanControlCluster::ApplyFanModeSideEffects(FanModeEnum fanMode)
         return;
     }
 
-    // Apply percent
-    // kOff/kLow/kMedium/kHigh: set explicit values. kAuto: set to null.
-    if (!percentSettingTarget.IsNull())
-    {
-        SetAttributeValue(mPercentSetting, percentSettingTarget, PercentSetting::Id);
-        SetAttributeValue(mPercentCurrent, percentSettingTarget.Value(), PercentCurrent::Id);
-    }
-    else
-    {
-        // kAuto: fall back to stored setting before nulling it
-        if (!mPercentSetting.IsNull())
-        {
-            SetAttributeValue(mPercentCurrent, mPercentSetting.Value(), PercentCurrent::Id);
-        }
-        SetAttributeValue(mPercentSetting, percentSettingTarget, PercentSetting::Id);
-    }
+    // For non-kAuto modes: current = setting target (explicit value).
+    // For kAuto: current = stored current value (preserve auto state).
+    auto percentCurrentTarget = percentSettingTarget.IsNull() ? mPercentCurrent : percentSettingTarget;
+    auto speedCurrentTarget   = speedSettingTarget.IsNull() ? mSpeedCurrent : speedSettingTarget;
 
-    // Apply speed (only when multi-speed is supported)
-    // kOff/kLow/kMedium/kHigh: set explicit values. kAuto: set to null.
+    if (!percentCurrentTarget.IsNull())
+    {
+        SetAttributeValue(mPercentCurrent, percentCurrentTarget.Value(), PercentCurrent::Id);
+    }
+    SetAttributeValue(mPercentSetting, percentSettingTarget, PercentSetting::Id);
+
     if (SupportsMultiSpeed())
     {
-        if (!speedSettingTarget.IsNull())
+        // For kAuto: preserve stored current before nulling the setting.
+        if (!speedCurrentTarget.IsNull())
         {
-            SetAttributeValue(mSpeedSetting, speedSettingTarget, SpeedSetting::Id);
-            SetAttributeValue(mSpeedCurrent, speedSettingTarget.Value(), SpeedCurrent::Id);
+            SetAttributeValue(mSpeedCurrent, speedCurrentTarget.Value(), SpeedCurrent::Id);
         }
-        else
-        {
-            // kAuto: fall back to stored setting before nulling it
-            if (!mSpeedSetting.IsNull())
-            {
-                SetAttributeValue(mSpeedCurrent, mSpeedSetting.Value(), SpeedCurrent::Id);
-            }
-            SetAttributeValue(mSpeedSetting, speedSettingTarget, SpeedSetting::Id);
-        }
+        SetAttributeValue(mSpeedSetting, speedSettingTarget, SpeedSetting::Id);
     }
 }
 
