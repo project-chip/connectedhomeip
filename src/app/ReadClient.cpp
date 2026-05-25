@@ -355,7 +355,7 @@ CHIP_ERROR ReadClient::SendReadRequest(ReadPrepareParams & aReadPrepareParams)
 
     if (aReadPrepareParams.mTimeout == System::Clock::kZero)
     {
-        mExchange->UseSuggestedResponseTimeout(app::kExpectedIMProcessingTime);
+        ReturnErrorOnFailure(mExchange->UseSuggestedResponseTimeout(app::kExpectedIMProcessingTime));
     }
     else
     {
@@ -1283,7 +1283,7 @@ CHIP_ERROR ReadClient::SendSubscribeRequestImpl(const ReadPrepareParams & aReadP
 
     if (aReadPrepareParams.mTimeout == System::Clock::kZero)
     {
-        mExchange->UseSuggestedResponseTimeout(app::kExpectedIMProcessingTime);
+        ReturnErrorOnFailure(mExchange->UseSuggestedResponseTimeout(app::kExpectedIMProcessingTime));
     }
     else
     {

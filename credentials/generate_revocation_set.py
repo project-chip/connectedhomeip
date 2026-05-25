@@ -1006,7 +1006,7 @@ class TestRevocationSetGeneration(unittest.TestCase):
         return os.path.join(self.test_base_dir, 'test', filename)
 
     def get_expected_revocation_set(self, idx):
-        with open(os.path.join(self.test_base_dir, 'test/revoked-attestation-certificates/revocation-sets/revocation-set.json'), 'r') as f:
+        with open(os.path.join(self.test_base_dir, 'test/revoked-attestation-certificates/revocation-sets/revocation-set.json')) as f:
             return RevocationSet(**json.load(f)[idx])
 
     def compare_revocation_sets(self, generated_set, expected):

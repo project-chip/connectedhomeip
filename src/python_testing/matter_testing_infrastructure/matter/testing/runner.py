@@ -29,7 +29,7 @@ import typing
 from binascii import unhexlify
 from dataclasses import asdict as dataclass_asdict
 from dataclasses import dataclass
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from itertools import chain
 from pathlib import Path
 from typing import Any, List, Optional, Tuple
@@ -469,7 +469,7 @@ def run_tests_no_exit(
                 hooks.start(count=1)
                 # Mobly gives the test run time in seconds, lets be a bit more
                 # precise
-                runner_start_time = datetime.now(timezone.utc)
+                runner_start_time = datetime.now(UTC)
 
             try:
                 runner.run()
@@ -486,8 +486,7 @@ def run_tests_no_exit(
                 ok = False
 
     if hooks:
-        duration = (datetime.now(timezone.utc) -
-                    runner_start_time) / timedelta(microseconds=1)
+        duration = (datetime.now(UTC) - runner_start_time) / timedelta(microseconds=1)
         hooks.stop(duration=duration)
 
     if not external_stack:
@@ -543,7 +542,7 @@ class AsyncMock(MagicMock):
     """
 
     async def __call__(self, *args, **kwargs):
-        return super(AsyncMock, self).__call__(*args, **kwargs)
+        return super().__call__(*args, **kwargs)
 
 
 class MockTestRunner():
@@ -928,9 +927,9 @@ def root_index(s: str) -> int:
         "gamma": 3
     }
 
-    for name, id in CHIP_TOOL_COMPATIBILITY.items():
+    for name, _id in CHIP_TOOL_COMPATIBILITY.items():
         if s.lower() == name:
-            return id
+            return _id
     else:
         root_index = int(s)
         if root_index == 0:

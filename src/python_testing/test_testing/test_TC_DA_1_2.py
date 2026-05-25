@@ -93,7 +93,7 @@ def main():
     def load_test_case_vector(cert_path, p) -> tuple[str, bool, int]:
         ''' Loads the test_case_vector.json and returns a tuple with the path, expected success response and the pid'''
         path = str(os.path.join(cert_path, p, 'test_case_vector.json'))
-        with open(path, 'r') as f:
+        with open(path) as f:
             j = json.loads(f.read())
             success_expected = j['is_success_case'].lower() == 'true'
             pid = j['basic_info_pid']

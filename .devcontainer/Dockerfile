@@ -43,8 +43,11 @@ RUN apt-get update \
         icecc \
         iputils-ping \
         lsb-release \
+        nano \
         openssh-client \
+        ripgrep \
         sudo \
+        time \
         valgrind \
         vim \
         zsh \

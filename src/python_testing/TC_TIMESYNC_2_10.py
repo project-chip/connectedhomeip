@@ -38,7 +38,7 @@
 import asyncio
 import contextlib
 import typing
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 from mobly import asserts
 
@@ -107,8 +107,8 @@ class TC_TIMESYNC_2_10(MatterBaseTest):
         cb.wait_for_event_report(event, 5)
 
         self.print_step(7, "Set DSTOffset to expire in 10 seconds")
-        th_utc = utc_time_in_matter_epoch(datetime.now(tz=timezone.utc))
-        expiry = utc_time_in_matter_epoch(datetime.now(tz=timezone.utc) + timedelta(seconds=10))
+        th_utc = utc_time_in_matter_epoch(datetime.now(tz=UTC))
+        expiry = utc_time_in_matter_epoch(datetime.now(tz=UTC) + timedelta(seconds=10))
         dst = [dst_struct(offset=3600, validStarting=0, validUntil=expiry)]
         await self.send_set_dst_cmd(dst)
 

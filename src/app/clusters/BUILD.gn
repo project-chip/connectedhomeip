@@ -30,6 +30,7 @@ source_set("clusters") {
     "closure-control-server",
     "closure-dimension-server",
     "commissioner-control-server",
+    "concentration-measurement-server",
     "descriptor",
     "flow-measurement-server",
     "general-commissioning-server",
@@ -37,6 +38,7 @@ source_set("clusters") {
     "group-key-mgmt-server",
     "groupcast",
     "groups-server",
+    "humidistat-server",
     "identify-server",
     "illuminance-measurement-server",
     "level-control",
@@ -47,6 +49,7 @@ source_set("clusters") {
     "on-off-server",
     "operational-credentials-server",
     "pressure-measurement-server",
+    "proximity-ranging-server",
     "push-av-stream-transport-server",
     "relative-humidity-measurement-server",
     "resource-monitoring-server",
@@ -55,11 +58,14 @@ source_set("clusters") {
     "soil-measurement-server",
     "temperature-control-server",
     "temperature-measurement-server",
+    "thread-border-router-management-server",
+    "thread-network-diagnostics-server",
     "thread-network-directory-server",
     "tls-certificate-management-server",
     "tls-client-management-server",
     "webrtc-transport-provider-server",
     "wifi-network-diagnostics-server",
+    "wifi-network-management-server",
 
     # keep-sorted: end
   ]

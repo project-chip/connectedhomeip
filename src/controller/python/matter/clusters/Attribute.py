@@ -934,16 +934,16 @@ _OnReportEndCallbackFunct = CFUNCTYPE(
 
 
 @_OnReadAttributeDataCallbackFunct
-def _OnReadAttributeDataCallback(closure, dataVersion: int, endpoint: int, cluster: int, attribute: int, status, data, len):
-    dataBytes = ctypes.string_at(data, len)
+def _OnReadAttributeDataCallback(closure, dataVersion: int, endpoint: int, cluster: int, attribute: int, status, data, length):
+    dataBytes = ctypes.string_at(data, length)
     closure.handleAttributeData(AttributePath(
         EndpointId=endpoint, ClusterId=cluster, AttributeId=attribute), dataVersion, status, dataBytes[:])
 
 
 @_OnReadEventDataCallbackFunct
 def _OnReadEventDataCallback(closure, endpoint: int, cluster: int, event: c_uint64,
-                             number: int, priority: int, timestamp: int, timestampType: int, data, len, status):
-    dataBytes = ctypes.string_at(data, len)
+                             number: int, priority: int, timestamp: int, timestampType: int, data, length, status):
+    dataBytes = ctypes.string_at(data, length)
     path = EventPath(ClusterId=cluster, EventId=event)
 
     # EventHeader is valid only when successful
@@ -1174,27 +1174,26 @@ def Read(transaction: AsyncReadTransaction, device,
         dataVersionFiltersForCffiArrayType = c_void_p * numberOfDataVersionFilters
         dataVersionFiltersForCffi = dataVersionFiltersForCffiArrayType()
         for idx, f in enumerate(dataVersionFilters):
-            filter = DataVersionFilterIBstruct.parse(
+            flt = DataVersionFilterIBstruct.parse(
                 b'\xff' * DataVersionFilterIBstruct.sizeof())
             if f.EndpointId is not None:
-                filter.EndpointId = f.EndpointId
+                flt.EndpointId = f.EndpointId
             else:
                 raise ValueError(
                     "DataVersionFilter must provide EndpointId.")
             if f.ClusterId is not None:
-                filter.ClusterId = f.ClusterId
+                flt.ClusterId = f.ClusterId
             else:
                 raise ValueError(
                     "DataVersionFilter must provide ClusterId.")
             if f.DataVersion is not None:
-                filter.DataVersion = f.DataVersion
+                flt.DataVersion = f.DataVersion
             else:
                 raise ValueError(
                     "DataVersionFilter must provide DataVersion.")
-            filter = DataVersionFilterIBstruct.build(
-                filter)
+            flt = DataVersionFilterIBstruct.build(flt)
             dataVersionFiltersForCffi[idx] = cast(
-                ctypes.c_char_p(filter), c_void_p)
+                ctypes.c_char_p(flt), c_void_p)
 
     eventPathsForCffi = None
     if events is not None:

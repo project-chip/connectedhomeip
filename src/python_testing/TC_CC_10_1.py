@@ -161,7 +161,7 @@ class TC_CC_10_1(MatterBaseTest):
         self.groupKey = Clusters.GroupKeyManagement.Structs.GroupKeySetStruct(
             groupKeySetID=self.kGroupKeyset1,
             groupKeySecurityPolicy=Clusters.GroupKeyManagement.Enums.GroupKeySecurityPolicyEnum.kTrustFirst,
-            epochKey0="0123456789abcdef".encode(),
+            epochKey0=b"0123456789abcdef",
             epochStartTime0=1110000)
 
         await self.TH1.SendCommand(self.dut_node_id, 0, Clusters.GroupKeyManagement.Commands.KeySetWrite(self.groupKey))

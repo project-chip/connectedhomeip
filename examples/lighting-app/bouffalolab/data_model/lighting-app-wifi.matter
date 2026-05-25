@@ -2309,7 +2309,7 @@ cluster ColorControl = 768 {
 }
 
 endpoint 0 {
-  device type ma_rootdevice = 22, version 5;
+  device type ma_rootdevice = 22, version 4;
 
   binding cluster OtaSoftwareUpdateProvider;
 
@@ -2525,7 +2525,7 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type ma_extendedcolorlight = 269, version 1;
+  device type ma_extendedcolorlight = 269, version 4;
 
 
   server cluster Identify {

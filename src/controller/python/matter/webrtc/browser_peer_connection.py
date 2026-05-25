@@ -301,9 +301,9 @@ class BrowserPeerConnection(BrowserWebRTCClient):
             return
         self._local_events[Events.ICE_CANDIDATE].put(IceCandidate(candidate=candidate, sdpMid=mid, sdpMLineIndex=index))
 
-    def on_local_description_cb(self, sdp: str, type: str) -> None:
+    def on_local_description_cb(self, sdp: str, event_type: str) -> None:
         """Callback function called when a local SDP description is received."""
-        event = Events.OFFER if type.lower() == "offer" else Events.ANSWER
+        event = Events.OFFER if event_type.lower() == "offer" else Events.ANSWER
         self._local_events[event].put(sdp)
 
     def on_gathering_complete_cb(self) -> None:
