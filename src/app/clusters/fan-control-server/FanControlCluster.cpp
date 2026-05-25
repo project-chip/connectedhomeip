@@ -105,20 +105,19 @@ void FanControlCluster::ApplyFanModeSideEffects(FanModeEnum fanMode)
     {
     case FanModeEnum::kOff:
         percentSettingTarget = DataModel::MakeNullable<chip::Percent>(0);
-        speedSettingTarget = DataModel::MakeNullable<uint8_t>(0);
+        speedSettingTarget   = DataModel::MakeNullable<uint8_t>(0);
         break;
     case FanModeEnum::kLow:
         percentSettingTarget = DataModel::MakeNullable<chip::Percent>(33);
-        speedSettingTarget = DataModel::MakeNullable<uint8_t>(1);
+        speedSettingTarget   = DataModel::MakeNullable<uint8_t>(1);
         break;
     case FanModeEnum::kMedium:
         percentSettingTarget = DataModel::MakeNullable<chip::Percent>(66);
-        speedSettingTarget =
-            DataModel::MakeNullable<uint8_t>((mSpeedMax > 1) ? static_cast<uint8_t>((mSpeedMax + 1) / 2) : 1);
+        speedSettingTarget   = DataModel::MakeNullable<uint8_t>((mSpeedMax > 1) ? static_cast<uint8_t>((mSpeedMax + 1) / 2) : 1);
         break;
     case FanModeEnum::kHigh:
         percentSettingTarget = DataModel::MakeNullable<chip::Percent>(100);
-        speedSettingTarget = DataModel::MakeNullable<uint8_t>(mSpeedMax);
+        speedSettingTarget   = DataModel::MakeNullable<uint8_t>(mSpeedMax);
         break;
     case FanModeEnum::kAuto:
         // Leave as default-constructed (null)
