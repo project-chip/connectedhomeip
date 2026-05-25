@@ -100,7 +100,8 @@ private:
 public:
     TagInstance(Transport::NFCBase * base, const Transport::PeerAddress address, const char * name, SCARDHANDLE handle,
                 const SCARD_IO_REQUEST * sendPci) :
-        nfcBase(base), peerAddress(address), cardHandle(handle), pioSendPci(sendPci)
+        nfcBase(base),
+        peerAddress(address), cardHandle(handle), pioSendPci(sendPci)
     {
         readerName    = strdup(name); // Allocate memory and copy the string
         discriminator = 0;            // Will be retrieved when RetrieveDiscriminator() is called
@@ -789,8 +790,7 @@ CHIP_ERROR NFCCommissioningManagerImpl::ScanReader(uint16_t nfcShortId, char * r
                                &dwActiveProtocol);
     switch (result)
     {
-    case static_cast<LONG>(SCARD_S_SUCCESS):
-    {
+    case static_cast<LONG>(SCARD_S_SUCCESS): {
         const SCARD_IO_REQUEST * sendPci = nullptr;
         switch (dwActiveProtocol)
         {
@@ -820,7 +820,7 @@ CHIP_ERROR NFCCommissioningManagerImpl::ScanReader(uint16_t nfcShortId, char * r
             mTagInstances.push_back(newTagInstance);
         }
     }
-        break;
+    break;
 
     case static_cast<LONG>(SCARD_E_NO_SMARTCARD):
         ChipLogProgress(DeviceLayer, "No NFC Tag detected");
