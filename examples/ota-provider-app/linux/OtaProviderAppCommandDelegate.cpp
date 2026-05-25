@@ -62,10 +62,10 @@ static std::string ToString(const Json::Value & v)
 Json::Value OtaProviderAppCommandHandler::BuildAppyUpdateRequestSnapshot(uint16_t endpoint)
 {
     Json::Value payload(Json::objectValue);
-    payload["VendorID"]            = GetOtaProviderExample().GetVendorId();
-    payload["ProductID"]           = GetOtaProviderExample().GetProductId();
-    payload["SoftwareVersion"]     = GetOtaProviderExample().GetSoftwareVersion();
-    payload["ApplyUpdateRequestSentStatus"]     = GetOtaProviderExample().GetApplyRequestSentStatus();
+    payload["VendorID"]                     = GetOtaProviderExample().GetVendorId();
+    payload["ProductID"]                    = GetOtaProviderExample().GetProductId();
+    payload["SoftwareVersion"]              = GetOtaProviderExample().GetSoftwareVersion();
+    payload["ApplyUpdateRequestSentStatus"] = GetOtaProviderExample().GetApplyRequestSentStatus();
     return payload;
 }
 
@@ -142,7 +142,7 @@ void OtaProviderAppCommandHandler::HandleCommand(intptr_t context)
         return;
     }
 
-    if ( name == "GetApplyUpdateRequestStatus")
+    if (name == "GetApplyUpdateRequestStatus")
     {
         Json::Value out(Json::objectValue);
         Json::Value payload(Json::objectValue);
