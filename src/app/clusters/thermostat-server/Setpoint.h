@@ -79,9 +79,8 @@ protected:
 class AbsoluteSetpoint : public BaseSetpoint
 {
 public:
-    AbsoluteSetpoint(chip::AttributeId attributeId, temperature value) : BaseSetpoint(attributeId) { mTemperature = value; }
-
-    AbsoluteSetpoint(const AbsoluteSetpoint & other) : BaseSetpoint(other.mAttributeId) { mTemperature = other.mTemperature; };
+    AbsoluteSetpoint(chip::AttributeId attributeId, temperature value) : BaseSetpoint(attributeId), mTemperature(value) {}
+    AbsoluteSetpoint(const AbsoluteSetpoint & other) : BaseSetpoint(other.mAttributeId), mTemperature(other.mTemperature) {}
 
     bool HasTemperature() const override { return true; }
     temperature Temperature() const override { return mTemperature; }
