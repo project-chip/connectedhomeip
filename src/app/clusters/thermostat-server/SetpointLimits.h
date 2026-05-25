@@ -101,22 +101,26 @@ struct SetpointLimits
 typedef SetpointLimits<AbsoluteSetpoint> AbsoluteSetpointLimits;
 
 /*
-UserSetpointLimits is used for optional setpoint limits. It wraps the absolute setpoint limits, which it can fall back on when the user
-limit is not provided.
+UserSetpointLimits is used for optional setpoint limits. It wraps the absolute setpoint limits, which it can fall back on when the
+user limit is not provided.
 */
-struct UserSetpointLimits : SetpointLimits<OptionalSetpoint> {
+struct UserSetpointLimits : SetpointLimits<OptionalSetpoint>
+{
 
     const AbsoluteSetpointLimits & absoluteLimits;
 
-    UserSetpointLimits(OptionalSetpoint min, OptionalSetpoint max,const AbsoluteSetpointLimits & absLimits) :
-         SetpointLimits<OptionalSetpoint>(min, max), absoluteLimits(absLimits) {}
+    UserSetpointLimits(OptionalSetpoint min, OptionalSetpoint max, const AbsoluteSetpointLimits & absLimits) :
+        SetpointLimits<OptionalSetpoint>(min, max), absoluteLimits(absLimits)
+    {}
 
     UserSetpointLimits(const UserSetpointLimits & other, const AbsoluteSetpointLimits & absoluteSetpointLimits) :
-        SetpointLimits<OptionalSetpoint>(OptionalSetpoint(other.minimum, absoluteSetpointLimits.minimum),  OptionalSetpoint(other.maximum, absoluteSetpointLimits.maximum)), absoluteLimits(absoluteSetpointLimits) {}
+        SetpointLimits<OptionalSetpoint>(OptionalSetpoint(other.minimum, absoluteSetpointLimits.minimum),
+                                         OptionalSetpoint(other.maximum, absoluteSetpointLimits.maximum)),
+        absoluteLimits(absoluteSetpointLimits)
+    {}
 
     bool IsValid() const override;
 };
-
 
 } // namespace Thermostat
 } // namespace Clusters

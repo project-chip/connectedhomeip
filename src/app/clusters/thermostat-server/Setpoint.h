@@ -112,7 +112,12 @@ public:
     {}
 
     bool HasTemperature() const override { return mTemperature.HasValue(); }
-    temperature Temperature() const override { if (mTemperature.HasValue()) return mTemperature.Value(); return mAbsoluteSetpoint.Temperature(); }
+    temperature Temperature() const override
+    {
+        if (mTemperature.HasValue())
+            return mTemperature.Value();
+        return mAbsoluteSetpoint.Temperature();
+    }
 
     /*
      * Set the temperature value.
