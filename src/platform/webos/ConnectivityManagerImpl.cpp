@@ -1819,6 +1819,7 @@ CHIP_ERROR ConnectivityManagerImpl::GetWiFiSecurityType(SecurityTypeEnum & secur
     VerifyOrReturnError(mWpaSupplicant.iface, CHIP_ERROR_INCORRECT_STATE);
 
     const char * mode = wpa_supplicant_1_interface_get_current_auth_mode(mWpaSupplicant.iface.get());
+    VerifyOrReturnError(mode != nullptr, CHIP_ERROR_INCORRECT_STATE);
     ChipLogProgress(DeviceLayer, "WPA supplicant: Current Wi-Fi security type: %s", StringOrNullMarker(mode));
 
     if (strncmp(mode, "WPA-PSK", 7) == 0)
