@@ -1215,7 +1215,7 @@ class TC_DeviceBasicComposition(BasicCompositionTests):
             no_duplicate_tag_keys = set()
             for tag_struct in taglist:
                 self.print_step(
-                    5.1,f"verifying atleast 1 NamespaceID and tag property in the taglist struct for endpoint: {endpoint_id}")
+                    5.1, f"verifying atleast 1 NamespaceID and tag property in the taglist struct for endpoint: {endpoint_id}")
                 if not tag_struct.namespaceID:
                     self.fail_current_test("Atleast 1 NamespaceID is not present")
                 self.print_step(5.1, f"verifying Tag property in the taglist struct for endpoint: {endpoint_id}")
@@ -1287,7 +1287,8 @@ class TC_DeviceBasicComposition(BasicCompositionTests):
                         )
                         self.fail_current_test(
                             "EndpointUniqueId attribute in Descriptor cluster is more than 32 bytes for endpoint")
-                    self.print_step(7.3, f"Validate EndpointUniqueId attribute in Descriptor cluster is not a duplicate for endpoint : {endpoint_id}")
+                    self.print_step(
+                        7.3, f"Validate EndpointUniqueId attribute in Descriptor cluster is not a duplicate for endpoint : {endpoint_id}")
 
                     if value in unique_ids:
                         location = AttributePathLocation(endpoint_id, Clusters.Descriptor.id,

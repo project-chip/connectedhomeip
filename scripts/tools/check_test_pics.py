@@ -30,7 +30,8 @@ value_regexp = re.compile("=.*")
 
 def main():
     if len(sys.argv) != 3:
-        print(f'Expecting two arguments: the CI PICS values file and the YAML file defining all PICS values.  Got: {sys.argv[1:]!r}')
+        print(
+            f'Expecting two arguments: the CI PICS values file and the YAML file defining all PICS values.  Got: {sys.argv[1:]!r}')
         return 1
 
     value_defs = sys.argv[1]

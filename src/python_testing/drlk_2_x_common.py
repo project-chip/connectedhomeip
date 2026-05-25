@@ -279,7 +279,8 @@ class DRLK_COMMON:
             asserts.assert_in(userCodeTemporaryDisableTime_dut, range(1, 255), "UserCodeTemporaryDisableTime value is out of range")
 
         if self.check_pics(lockUnlockCmdRspPICS) and self.check_pics("DRLK.S.F00"):
-            self.print_step("12", f"TH sends {lockUnlockText} Command to the DUT with an invalid PINCode, repeated {wrongCodeEntryLimit_dut} times")
+            self.print_step(
+                "12", f"TH sends {lockUnlockText} Command to the DUT with an invalid PINCode, repeated {wrongCodeEntryLimit_dut} times")
             for i in range(wrongCodeEntryLimit_dut):
                 command = lockUnlockCommand(PINCode=invalidPincode)
                 await self.send_drlk_cmd_expect_error(command=command, error=Status.Failure)
