@@ -170,6 +170,7 @@ private:
 
     void ApplyPercentSettingChanged();
     void ApplySpeedSettingChanged();
+    void ApplyNonZeroFanDrive(chip::Percent percent, uint8_t speedSetting);
 
     void StoreFanModePersistence();
 
