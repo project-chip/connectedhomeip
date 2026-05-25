@@ -233,19 +233,15 @@ void Esp32AppServer::Init(AppDelegate * sAppDelegate)
         initParams.appDelegate = sAppDelegate;
     }
 
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD && CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
     ESPOpenThreadInit();
 
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD && CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
     static chip::Inet::EndPointStateOpenThread::OpenThreadEndpointInitParam nativeParams;
     nativeParams.lockCb                = [] { chip::DeviceLayer::ThreadStackMgr().LockThreadStack(); };
     nativeParams.unlockCb              = [] { chip::DeviceLayer::ThreadStackMgr().UnlockThreadStack(); };
     nativeParams.openThreadInstancePtr = chip::DeviceLayer::ThreadStackMgrImpl().OTInstance();
     VerifyOrDie(nativeParams.openThreadInstancePtr != nullptr);
     initParams.endpointNativeParams = static_cast<void *>(&nativeParams);
-#endif
-
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD && !CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
-    ESPOpenThreadInit();
 #endif
 
     TEMPORARY_RETURN_IGNORED chip::Server::GetInstance().Init(initParams);
