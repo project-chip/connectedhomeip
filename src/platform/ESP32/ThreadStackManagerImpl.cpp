@@ -70,7 +70,7 @@ CHIP_ERROR ThreadStackManagerImpl::_InitThreadStack()
         chip::Inet::InterfaceId interface(netif_get_by_index(esp_netif_get_netif_impl_index(openthread_netif)));
         GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>::SetRendezvousNetworkInterface(interface);
     });
-#endif // !CONFIG_CHIP_USE_OT_ENDPOINT && CHIP_DEVICE_CONFIG_ENABLE_THREAD_MESHCOP
+#endif // !defined(CONFIG_CHIP_USE_OT_ENDPOINT) && defined(CONFIG_ENABLE_THREAD_MESHCOP_COMMISSIONING)
     return CHIP_NO_ERROR;
 }
 
