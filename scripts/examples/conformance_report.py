@@ -94,7 +94,7 @@ def parse_test_logs(test_log_paths):
     for test_log_path in test_log_paths:
         print(f"  Parsing {test_log_path}")
         try:
-            with open(test_log_path, "r") as f:
+            with open(test_log_path) as f:
                 output_lines = f.readlines()
         except FileNotFoundError:
             print(f"Result file not found {test_log_path}. Skipping...")
@@ -304,7 +304,7 @@ def csv_to_html_report(csv_file_paths, html_page_title, html_out_dir, sha):
     """
 
     for csv_file_path in csv_file_paths:
-        with open(csv_file_path, 'r') as csv_file:
+        with open(csv_file_path) as csv_file:
             reader = csv.reader(csv_file)
             table_title = next(reader)[0]
             headers = next(reader)
