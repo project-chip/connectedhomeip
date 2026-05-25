@@ -17,7 +17,7 @@
 #include "BleInit.h"
 
 #if CONFIG_NETWORK_LAYER_BLE
-#include <platform/Darwin/BLEManagerImpl.h>
+#include <platform/CHIPDeviceLayer.h>
 #endif
 
 namespace chip::app {

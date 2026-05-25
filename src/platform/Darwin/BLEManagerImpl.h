@@ -30,6 +30,7 @@
 #include <platform/Darwin/BleConnectionDelegateImpl.h>
 #include <platform/Darwin/BlePlatformDelegateImpl.h>
 #include <platform/Darwin/BleScannerDelegate.h>
+# 
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
