@@ -23,6 +23,7 @@
 
 #include <app/ConcreteAttributePath.h>
 #include <app/util/attribute-storage.h>
+#include <lib/support/CodeUtils.h>
 #include <protocols/interaction_model/Constants.h>
 
 namespace chip {
@@ -99,6 +100,7 @@ private:
     template <typename... Args>
     static constexpr uint32_t Or(chip::AttributeId attribute, Args... args)
     {
+        VerifyOrDieWithoutLogging(attribute < 32);
         return (1U << attribute) | Or(args...);
     }
     static constexpr uint32_t Or() { return 0; }
