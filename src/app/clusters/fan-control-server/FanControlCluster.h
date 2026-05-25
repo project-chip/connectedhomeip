@@ -135,12 +135,12 @@ public:
     FanControl::AirflowDirectionEnum GetAirflowDirection() const { return mAirflowDirection; }
 
     // Setters
-    DataModel::ActionReturnStatus SetFanMode(FanControl::FanModeEnum value);
-    DataModel::ActionReturnStatus SetPercentSetting(DataModel::Nullable<chip::Percent> value);
-    DataModel::ActionReturnStatus SetSpeedSetting(DataModel::Nullable<uint8_t> value);
-    DataModel::ActionReturnStatus SetRockSetting(BitMask<FanControl::RockBitmap> value);
-    DataModel::ActionReturnStatus SetWindSetting(BitMask<FanControl::WindBitmap> value);
-    DataModel::ActionReturnStatus SetAirflowDirection(FanControl::AirflowDirectionEnum value);
+    Protocols::InteractionModel::Status SetFanMode(FanControl::FanModeEnum value);
+    Protocols::InteractionModel::Status SetPercentSetting(DataModel::Nullable<chip::Percent> value);
+    Protocols::InteractionModel::Status SetSpeedSetting(DataModel::Nullable<uint8_t> value);
+    Protocols::InteractionModel::Status SetRockSetting(BitMask<FanControl::RockBitmap> value);
+    Protocols::InteractionModel::Status SetWindSetting(BitMask<FanControl::WindBitmap> value);
+    Protocols::InteractionModel::Status SetAirflowDirection(FanControl::AirflowDirectionEnum value);
     bool SetPercentCurrent(chip::Percent value);
     bool SetSpeedCurrent(uint8_t value);
 

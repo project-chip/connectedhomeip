@@ -403,7 +403,7 @@ bool FanControlCluster::IsFanModeSupportedBySequence(FanModeEnum value) const
     return true;
 }
 
-DataModel::ActionReturnStatus FanControlCluster::SetFanMode(FanModeEnum value)
+Status FanControlCluster::SetFanMode(FanModeEnum value)
 {
     if (EnsureKnownEnumValue(value) == FanModeEnum::kUnknownEnumValue)
     {
@@ -442,7 +442,7 @@ DataModel::ActionReturnStatus FanControlCluster::SetFanMode(FanModeEnum value)
     return Status::Success;
 }
 
-DataModel::ActionReturnStatus FanControlCluster::SetPercentSetting(DataModel::Nullable<chip::Percent> value)
+Status FanControlCluster::SetPercentSetting(DataModel::Nullable<chip::Percent> value)
 {
     if (value.IsNull())
     {
@@ -468,7 +468,7 @@ DataModel::ActionReturnStatus FanControlCluster::SetPercentSetting(DataModel::Nu
     return Status::Success;
 }
 
-DataModel::ActionReturnStatus FanControlCluster::SetSpeedSetting(DataModel::Nullable<uint8_t> value)
+Status FanControlCluster::SetSpeedSetting(DataModel::Nullable<uint8_t> value)
 {
     if (value.IsNull())
     {
@@ -495,7 +495,7 @@ DataModel::ActionReturnStatus FanControlCluster::SetSpeedSetting(DataModel::Null
     return Status::Success;
 }
 
-DataModel::ActionReturnStatus FanControlCluster::SetRockSetting(BitMask<RockBitmap> value)
+Status FanControlCluster::SetRockSetting(BitMask<RockBitmap> value)
 {
     uint8_t rawValue   = value.Raw();
     uint8_t rawSupport = mRockSupport.Raw();
@@ -512,7 +512,7 @@ DataModel::ActionReturnStatus FanControlCluster::SetRockSetting(BitMask<RockBitm
     return Status::Success;
 }
 
-DataModel::ActionReturnStatus FanControlCluster::SetWindSetting(BitMask<WindBitmap> value)
+Status FanControlCluster::SetWindSetting(BitMask<WindBitmap> value)
 {
     uint8_t rawValue   = value.Raw();
     uint8_t rawSupport = mWindSupport.Raw();
@@ -529,7 +529,7 @@ DataModel::ActionReturnStatus FanControlCluster::SetWindSetting(BitMask<WindBitm
     return Status::Success;
 }
 
-DataModel::ActionReturnStatus FanControlCluster::SetAirflowDirection(AirflowDirectionEnum value)
+Status FanControlCluster::SetAirflowDirection(AirflowDirectionEnum value)
 {
     if (EnsureKnownEnumValue(value) == AirflowDirectionEnum::kUnknownEnumValue)
     {

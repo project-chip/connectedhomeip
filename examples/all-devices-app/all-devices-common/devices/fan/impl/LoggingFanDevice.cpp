@@ -164,7 +164,7 @@ Protocols::InteractionModel::Status LoggingFanDevice::HandleStep(FanControl::Ste
         ChipLogProgress(DeviceLayer, "LoggingFanDevice::HandleStep() -> Speed changed from NULL to %u", newSpeedSetting);
     }
 
-    return cluster.SetSpeedSetting(DataModel::MakeNullable(newSpeedSetting)).GetStatusCode().GetStatus();
+    return cluster.SetSpeedSetting(DataModel::MakeNullable(newSpeedSetting));
 }
 
 void LoggingFanDevice::OnFanDriveStateChanged(const FanControl::FanDriveState & newState)

@@ -100,7 +100,7 @@ public:
             mDidNestedPercentWrite = true;
             DataModel::Nullable<chip::Percent> percentSetting;
             percentSetting.SetNonNull(50);
-            EXPECT_TRUE(mCluster->SetPercentSetting(percentSetting).IsSuccess());
+            EXPECT_EQ(mCluster->SetPercentSetting(percentSetting), Protocols::InteractionModel::Status::Success);
         }
     }
 };

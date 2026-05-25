@@ -222,7 +222,7 @@ Status Set(EndpointId endpoint, FanModeEnum value)
     {
         return Status::UnsupportedEndpoint;
     }
-    return cluster->SetFanMode(value).GetStatusCode().GetStatus();
+    return cluster->SetFanMode(value);
 }
 
 } // namespace FanMode
@@ -269,7 +269,7 @@ Status Set(EndpointId endpoint, chip::Percent value)
     {
         return Status::UnsupportedEndpoint;
     }
-    return cluster->SetPercentSetting(DataModel::Nullable<chip::Percent>(value)).GetStatusCode().GetStatus();
+    return cluster->SetPercentSetting(DataModel::Nullable<chip::Percent>(value));
 }
 
 } // namespace PercentSetting
@@ -327,7 +327,7 @@ Status Set(EndpointId endpoint, const DataModel::Nullable<uint8_t> & value)
     {
         return Status::UnsupportedAttribute;
     }
-    return cluster->SetSpeedSetting(value).GetStatusCode().GetStatus();
+    return cluster->SetSpeedSetting(value);
 }
 
 Status Set(EndpointId endpoint, uint8_t value)
@@ -432,7 +432,7 @@ Status Set(EndpointId endpoint, AirflowDirectionEnum value)
     {
         return Status::UnsupportedAttribute;
     }
-    return cluster->SetAirflowDirection(value).GetStatusCode().GetStatus();
+    return cluster->SetAirflowDirection(value);
 }
 
 } // namespace AirflowDirection
@@ -491,7 +491,7 @@ Status Set(EndpointId endpoint, BitMask<RockBitmap> value)
     {
         return Status::UnsupportedAttribute;
     }
-    return cluster->SetRockSetting(value).GetStatusCode().GetStatus();
+    return cluster->SetRockSetting(value);
 }
 
 } // namespace RockSetting
@@ -550,7 +550,7 @@ Status Set(EndpointId endpoint, BitMask<WindBitmap> value)
     {
         return Status::UnsupportedAttribute;
     }
-    return cluster->SetWindSetting(value).GetStatusCode().GetStatus();
+    return cluster->SetWindSetting(value);
 }
 
 } // namespace WindSetting
