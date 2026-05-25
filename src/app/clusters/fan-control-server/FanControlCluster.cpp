@@ -130,30 +130,38 @@ void FanControlCluster::ApplyFanModeSideEffects(FanModeEnum fanMode)
 
     // Apply percent
     // kOff/kLow/kMedium/kHigh: set explicit values. kAuto: set to null.
-    SetAttributeValue(mPercentSetting, percentSettingTarget, PercentSetting::Id);
     if (!percentSettingTarget.IsNull())
     {
+        SetAttributeValue(mPercentSetting, percentSettingTarget, PercentSetting::Id);
         SetAttributeValue(mPercentCurrent, percentSettingTarget.Value(), PercentCurrent::Id);
     }
-    else if (!mPercentSetting.IsNull())
+    else
     {
-        // kAuto: fall back to stored setting
-        SetAttributeValue(mPercentCurrent, mPercentSetting.Value(), PercentCurrent::Id);
+        // kAuto: fall back to stored setting before nulling it
+        if (!mPercentSetting.IsNull())
+        {
+            SetAttributeValue(mPercentCurrent, mPercentSetting.Value(), PercentCurrent::Id);
+        }
+        SetAttributeValue(mPercentSetting, percentSettingTarget, PercentSetting::Id);
     }
 
     // Apply speed (only when multi-speed is supported)
     // kOff/kLow/kMedium/kHigh: set explicit values. kAuto: set to null.
     if (SupportsMultiSpeed())
     {
-        SetAttributeValue(mSpeedSetting, speedSettingTarget, SpeedSetting::Id);
         if (!speedSettingTarget.IsNull())
         {
+            SetAttributeValue(mSpeedSetting, speedSettingTarget, SpeedSetting::Id);
             SetAttributeValue(mSpeedCurrent, speedSettingTarget.Value(), SpeedCurrent::Id);
         }
-        else if (!mSpeedSetting.IsNull())
+        else
         {
-            // kAuto: fall back to stored setting
-            SetAttributeValue(mSpeedCurrent, mSpeedSetting.Value(), SpeedCurrent::Id);
+            // kAuto: fall back to stored setting before nulling it
+            if (!mSpeedSetting.IsNull())
+            {
+                SetAttributeValue(mSpeedCurrent, mSpeedSetting.Value(), SpeedCurrent::Id);
+            }
+            SetAttributeValue(mSpeedSetting, speedSettingTarget, SpeedSetting::Id);
         }
     }
 }
