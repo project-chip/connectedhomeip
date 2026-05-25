@@ -15,17 +15,17 @@ This test verifies that:
   - For each of the 12 commissioning-essential clusters, a server-side entry
     exists with "enabled": 1.
 
-The 11 removed clusters (ZAP names use spaces):
+The 10 removed clusters (ZAP names use spaces):
   Ethernet Network Diagnostics, Software Diagnostics,
   Wi-Fi Network Diagnostics, Time Synchronization,
   Time Format Localization, Unit Localization, Fixed Label, User Label,
-  Groupcast, ICD Management, Localization Configuration
+  ICD Management, Localization Configuration
 
-The 12 commissioning clusters (ZAP names use spaces):
+The 13 commissioning clusters (ZAP names use spaces):
   Descriptor, Binding, Access Control, Basic Information,
   General Commissioning, Network Commissioning, General Diagnostics,
   Administrator Commissioning, Operational Credentials,
-  Group Key Management, Identify, Groups
+  Group Key Management, Groupcast, Identify, Groups
 """
 
 import json
@@ -63,7 +63,6 @@ REMOVED_CLUSTERS_ZAP = [
     "Unit Localization",
     "Fixed Label",
     "User Label",
-    "Groupcast",
     "ICD Management",
     "Localization Configuration",
 ]
@@ -79,6 +78,7 @@ COMMISSIONING_CLUSTERS_ZAP = [
     "Administrator Commissioning",
     "Operational Credentials",
     "Group Key Management",
+    "Groupcast",
     "Identify",
     "Groups",
 ]

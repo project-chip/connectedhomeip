@@ -25,11 +25,14 @@ Usage:
 """
 
 import argparse
+import logging
 import os
 import re
 import sys
 
 import yaml
+
+logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 
 # ---------------------------------------------------------------------------
 # Constants
@@ -121,18 +124,18 @@ def load_config(config_path):
     Returns a dict with keys: casting_clusters, tlv_decoder_clusters, cluster_servers.
     """
     if not os.path.isfile(config_path):
-        print(f"Error: config file not found: {config_path}", file=sys.stderr)
+        logging.error("config file not found: %s", config_path)
         sys.exit(1)
 
     try:
         with open(config_path, "r") as f:
             config = yaml.safe_load(f)
-    except yaml.YAMLError as e:
-        print(f"Error: invalid YAML in {config_path}: {e}", file=sys.stderr)
+    except yaml.YAMLError:
+        logging.exception("invalid YAML in %s", config_path)
         sys.exit(1)
 
     if not isinstance(config, dict):
-        print(f"Error: config file must be a YAML mapping, got {type(config).__name__}", file=sys.stderr)
+        logging.error("config file must be a YAML mapping, got %s", type(config).__name__)
         sys.exit(1)
 
     casting_clusters = config.get("casting_clusters", [])
@@ -140,13 +143,13 @@ def load_config(config_path):
     cluster_servers = config.get("cluster_servers", [])
 
     if not isinstance(casting_clusters, list):
-        print("Error: 'casting_clusters' must be a list", file=sys.stderr)
+        logging.error("'casting_clusters' must be a list")
         sys.exit(1)
     if not isinstance(tlv_decoder_clusters, list):
-        print("Error: 'tlv_decoder_clusters' must be a list", file=sys.stderr)
+        logging.error("'tlv_decoder_clusters' must be a list")
         sys.exit(1)
     if not isinstance(cluster_servers, list):
-        print("Error: 'cluster_servers' must be a list", file=sys.stderr)
+        logging.error("'cluster_servers' must be a list")
         sys.exit(1)
 
     return {
@@ -271,7 +274,7 @@ def generate_cluster_objects(full_source_path, casting_clusters, output_path):
     and the three Command* functions with only casting-relevant case blocks.
     """
     if not os.path.isfile(full_source_path):
-        print(f"Error: full cluster-objects.cpp not found: {full_source_path}", file=sys.stderr)
+        logging.error("full cluster-objects.cpp not found: %s", full_source_path)
         sys.exit(1)
 
     with open(full_source_path, "r") as f:
@@ -297,7 +300,7 @@ def generate_cluster_objects(full_source_path, casting_clusters, output_path):
     # Warn about unmatched clusters
     for cluster in casting_clusters:
         if cluster not in matched_clusters:
-            print(f"Warning: cluster '{cluster}' not found in {full_source_path}", file=sys.stderr)
+            logging.warning("cluster '%s' not found in %s", cluster, full_source_path)
 
     # Extract Command* function case blocks
     timed_blocks = _extract_command_function_case_blocks(full_text, "CommandNeedsTimedInvoke", casting_clusters)
@@ -440,7 +443,7 @@ def generate_tlv_decoder(full_source_path, cluster_names, output_path, decoder_t
         decoder_type: "attribute" or "event"
     """
     if not os.path.isfile(full_source_path):
-        print(f"Error: full TLV decoder not found: {full_source_path}", file=sys.stderr)
+        logging.error("full TLV decoder not found: %s", full_source_path)
         sys.exit(1)
 
     with open(full_source_path, "r") as f:
@@ -452,7 +455,7 @@ def generate_tlv_decoder(full_source_path, cluster_names, output_path, decoder_t
     # Warn about unmatched clusters
     for cluster in cluster_names:
         if cluster not in matched_clusters:
-            print(f"Warning: cluster '{cluster}' not found in {full_source_path}", file=sys.stderr)
+            logging.warning("cluster '%s' not found in %s", cluster, full_source_path)
 
     if decoder_type == "attribute":
         error_macro = "CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB"
@@ -592,7 +595,7 @@ def generate_accessors(full_source_path, casting_clusters, output_path):
     Extracts namespace blocks for casting clusters.
     """
     if not os.path.isfile(full_source_path):
-        print(f"Error: full Accessors.cpp not found: {full_source_path}", file=sys.stderr)
+        logging.error("full Accessors.cpp not found: %s", full_source_path)
         sys.exit(1)
 
     with open(full_source_path, "r") as f:
@@ -604,7 +607,7 @@ def generate_accessors(full_source_path, casting_clusters, output_path):
     # Warn about unmatched clusters
     for cluster in casting_clusters:
         if cluster not in matched_clusters:
-            print(f"Warning: cluster '{cluster}' not found in {full_source_path}", file=sys.stderr)
+            logging.warning("cluster '%s' not found in %s", cluster, full_source_path)
 
     lines = []
     lines.append(CHIP_COPYRIGHT_HEADER)
@@ -700,14 +703,14 @@ def main(argv=None):
     )
 
     # Generate each file
-    print("Generating cluster-objects-override.cpp ...")
+    logging.info("Generating cluster-objects-override.cpp ...")
     generate_cluster_objects(
         cluster_objects_path,
         casting_clusters,
         os.path.join(output_dir, "cluster-objects-override.cpp"),
     )
 
-    print("Generating CHIPAttributeTLVValueDecoder-override.cpp ...")
+    logging.info("Generating CHIPAttributeTLVValueDecoder-override.cpp ...")
     generate_tlv_decoder(
         attr_decoder_path,
         tlv_decoder_clusters,
@@ -715,7 +718,7 @@ def main(argv=None):
         "attribute",
     )
 
-    print("Generating CHIPEventTLVValueDecoder-override.cpp ...")
+    logging.info("Generating CHIPEventTLVValueDecoder-override.cpp ...")
     generate_tlv_decoder(
         event_decoder_path,
         tlv_decoder_clusters,
@@ -723,20 +726,20 @@ def main(argv=None):
         "event",
     )
 
-    print("Generating Accessors-override.cpp ...")
+    logging.info("Generating Accessors-override.cpp ...")
     generate_accessors(
         accessors_path,
         casting_clusters,
         os.path.join(output_dir, "Accessors-override.cpp"),
     )
 
-    print("Generating cluster-servers-override.gni ...")
+    logging.info("Generating cluster-servers-override.gni ...")
     generate_cluster_servers_gni(
         cluster_servers,
         os.path.join(output_dir, "cluster-servers-override.gni"),
     )
 
-    print("Done.")
+    logging.info("Done.")
 
 
 if __name__ == "__main__":

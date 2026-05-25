@@ -12,7 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Clusters for cluster-objects-override.cpp and Accessors-override.cpp
+# Clusters for cluster-objects-override.cpp and Accessors-override.cpp.
+# Note: not all clusters have Accessors entries (e.g. Groupcast has
+# cluster-objects but no Accessors); the generator warns but proceeds.
 casting_clusters:
     # Infrastructure
     - AccessControl
