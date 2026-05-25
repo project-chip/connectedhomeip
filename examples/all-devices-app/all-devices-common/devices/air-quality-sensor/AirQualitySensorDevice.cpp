@@ -20,7 +20,6 @@
 #include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip::app::Clusters;
-using namespace chip::app::Clusters::ConcentrationMeasurement;
 
 namespace chip {
 namespace app {
