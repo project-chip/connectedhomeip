@@ -96,7 +96,7 @@ class QpgBuilder(GnBuilder):
                  board: QpgBoard = QpgBoard.QPG6200,
                  enable_rpcs: bool = False,
                  update_image: bool = False):
-        super(QpgBuilder, self).__init__(root=app.BuildRoot(root), runner=runner, output_dir_lock=output_dir_lock)
+        super().__init__(root=app.BuildRoot(root), runner=runner, output_dir_lock=output_dir_lock)
         self.app = app
         self.board = board
         self.enable_rpcs = enable_rpcs

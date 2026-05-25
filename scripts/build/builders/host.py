@@ -490,7 +490,7 @@ class HostBuilder(GnBuilder):
         if not unified:
             root = os.path.join(root, 'examples', app.ExamplePath())
 
-        super(HostBuilder, self).__init__(root=root, runner=runner, output_dir_lock=output_dir_lock)
+        super().__init__(root=root, runner=runner, output_dir_lock=output_dir_lock)
 
         self.app = app
         self.board = board
@@ -783,7 +783,7 @@ class HostBuilder(GnBuilder):
 
     @lock_output_dir
     def generate(self):
-        super(HostBuilder, self).generate(dedup=self.unified)
+        super().generate(dedup=self.unified)
         if 'JAVA_HOME' in os.environ:
             self._Execute(
                 ["third_party/java_deps/set_up_java_deps.sh"],

@@ -22,7 +22,6 @@
 #      BLE Central support for Chip Device Controller via OSX CoreBluetooth APIs.
 #
 
-from __future__ import absolute_import, print_function
 
 import logging
 import queue
@@ -44,16 +43,14 @@ try:
         "CoreBluetooth",
         globals(),
         bundle_path=objc.pathForFramework(
-            u"/System/Library/Frameworks/IOBluetooth.framework/Versions/A/Frameworks/CoreBluetooth.framework"
+            "/System/Library/Frameworks/IOBluetooth.framework/Versions/A/Frameworks/CoreBluetooth.framework"
         ),
     )
 except Exception:
     objc.loadBundle(
         "CoreBluetooth",
         globals(),
-        bundle_path=objc.pathForFramework(
-            u"/System/Library/Frameworks/CoreBluetooth.framework"
-        ),
+        bundle_path=objc.pathForFramework("/System/Library/Frameworks/CoreBluetooth.framework"),
     )
 
 LOGGER = logging.getLogger(__name__)
@@ -62,14 +59,12 @@ BLE_PERIPHERAL_STATE_DISCONNECTED = 0
 CBCharacteristicWriteWithResponse = 0
 CBCharacteristicWriteWithoutResponse = 1
 
-CHIP_SERVICE = CBUUID.UUIDWithString_(u"0000FFF6-0000-1000-8000-00805F9B34FB")
-CHIP_SERVICE_SHORT = CBUUID.UUIDWithString_(u"FFF6")
-CHIP_TX = CBUUID.UUIDWithString_(u"18EE2EF5-263D-4559-959F-4F9C429F9D11")
-CHIP_RX = CBUUID.UUIDWithString_(u"18EE2EF5-263D-4559-959F-4F9C429F9D12")
-CHROMECAST_SETUP_SERVICE = CBUUID.UUIDWithString_(
-    u"0000FEA0-0000-1000-8000-00805F9B34FB"
-)
-CHROMECAST_SETUP_SERVICE_SHORT = CBUUID.UUIDWithString_(u"FEA0")
+CHIP_SERVICE = CBUUID.UUIDWithString_("0000FFF6-0000-1000-8000-00805F9B34FB")
+CHIP_SERVICE_SHORT = CBUUID.UUIDWithString_("FFF6")
+CHIP_TX = CBUUID.UUIDWithString_("18EE2EF5-263D-4559-959F-4F9C429F9D11")
+CHIP_RX = CBUUID.UUIDWithString_("18EE2EF5-263D-4559-959F-4F9C429F9D12")
+CHROMECAST_SETUP_SERVICE = CBUUID.UUIDWithString_("0000FEA0-0000-1000-8000-00805F9B34FB")
+CHROMECAST_SETUP_SERVICE_SHORT = CBUUID.UUIDWithString_("FEA0")
 
 
 def _VoidPtrToCBUUID(ptr, length):
