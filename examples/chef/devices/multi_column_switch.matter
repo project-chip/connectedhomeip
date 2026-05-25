@@ -1957,9 +1957,7 @@ endpoint 1 {
 
   server cluster Switch {
     emits event InitialPress;
-    emits event LongPress;
     emits event ShortRelease;
-    emits event LongRelease;
     emits event MultiPressOngoing;
     emits event MultiPressComplete;
     ram      attribute numberOfPositions default = 2;
@@ -1968,7 +1966,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 30;
+    ram      attribute featureMap default = 22;
     callback attribute clusterRevision;
   }
 }
@@ -2026,9 +2024,7 @@ endpoint 2 {
 
   server cluster Switch {
     emits event InitialPress;
-    emits event LongPress;
     emits event ShortRelease;
-    emits event LongRelease;
     emits event MultiPressOngoing;
     emits event MultiPressComplete;
     ram      attribute numberOfPositions default = 2;
@@ -2037,7 +2033,7 @@ endpoint 2 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 30;
+    ram      attribute featureMap default = 22;
     callback attribute clusterRevision;
   }
 }
@@ -2164,9 +2160,7 @@ endpoint 4 {
 
   server cluster Switch {
     emits event InitialPress;
-    emits event LongPress;
     emits event ShortRelease;
-    emits event LongRelease;
     emits event MultiPressOngoing;
     emits event MultiPressComplete;
     ram      attribute numberOfPositions default = 2;
@@ -2175,7 +2169,7 @@ endpoint 4 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 30;
+    ram      attribute featureMap default = 22;
     callback attribute clusterRevision;
   }
 }
@@ -2233,9 +2227,7 @@ endpoint 5 {
 
   server cluster Switch {
     emits event InitialPress;
-    emits event LongPress;
     emits event ShortRelease;
-    emits event LongRelease;
     emits event MultiPressOngoing;
     emits event MultiPressComplete;
     ram      attribute numberOfPositions default = 2;
@@ -2244,7 +2236,7 @@ endpoint 5 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 30;
+    ram      attribute featureMap default = 22;
     callback attribute clusterRevision;
   }
 }
@@ -2371,9 +2363,7 @@ endpoint 7 {
 
   server cluster Switch {
     emits event InitialPress;
-    emits event LongPress;
     emits event ShortRelease;
-    emits event LongRelease;
     emits event MultiPressOngoing;
     emits event MultiPressComplete;
     ram      attribute numberOfPositions default = 2;
@@ -2382,7 +2372,7 @@ endpoint 7 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 30;
+    ram      attribute featureMap default = 22;
     callback attribute clusterRevision;
   }
 }
@@ -2440,9 +2430,7 @@ endpoint 8 {
 
   server cluster Switch {
     emits event InitialPress;
-    emits event LongPress;
     emits event ShortRelease;
-    emits event LongRelease;
     emits event MultiPressOngoing;
     emits event MultiPressComplete;
     ram      attribute numberOfPositions default = 2;
@@ -2451,7 +2439,7 @@ endpoint 8 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 30;
+    ram      attribute featureMap default = 22;
     callback attribute clusterRevision;
   }
 }
