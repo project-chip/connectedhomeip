@@ -98,64 +98,63 @@ void FanControlCluster::CommitFanModeOffState()
 
 void FanControlCluster::ApplyFanModeSideEffects(FanModeEnum fanMode)
 {
-    // specific values are easy to support, so we do so in common: they all change attribute values.
-    // This handling uses less flash than individual switch handing.
-    if ((fanMode == FanModeEnum::kOff) || (fanMode == FanModeEnum::kLow) || (fanMode == FanModeEnum::kMedium) ||
-        (fanMode == FanModeEnum::kHigh))
-    {
-        // we will index things directly into a value array
-        static_assert(to_underlying(FanModeEnum::kOff) == 0);
-        static_assert(to_underlying(FanModeEnum::kLow) == 1);
-        static_assert(to_underlying(FanModeEnum::kMedium) == 2);
-        static_assert(to_underlying(FanModeEnum::kHigh) == 3);
-
-        struct FanSettingValue
-        {
-            chip::Percent percent;
-            uint8_t speed;
-        };
-
-        const FanSettingValue kSettings[] = {
-            { .percent = 0, .speed = 0 },                                                                // off
-            { .percent = 33, .speed = 1 },                                                               // low
-            { .percent = 66, .speed = static_cast<uint8_t>((mSpeedMax > 1) ? (mSpeedMax + 1) / 2 : 1) }, // medium
-            {
-                .percent = 100,
-                .speed   = mSpeedMax,
-            }, // high
-        };
-
-        const FanSettingValue & kSetting = kSettings[to_underlying(fanMode)];
-        SetAttributeValue(mPercentSetting, DataModel::MakeNullable<chip::Percent>(kSetting.percent), PercentSetting::Id);
-        SetAttributeValue(mPercentCurrent, kSetting.percent, PercentCurrent::Id);
-        if (SupportsMultiSpeed())
-        {
-            SetAttributeValue(mSpeedSetting, DataModel::MakeNullable(kSetting.speed), SpeedSetting::Id);
-            SetAttributeValue(mSpeedCurrent, kSetting.speed, SpeedCurrent::Id);
-        }
-    }
+    DataModel::Nullable<chip::Percent> percentSettingTarget;
+    DataModel::Nullable<uint8_t> speedSettingTarget;
 
     switch (fanMode)
     {
+    case FanModeEnum::kOff:
+        percentSettingTarget = DataModel::MakeNullable<chip::Percent>(0);
+        speedSettingTarget = DataModel::MakeNullable<uint8_t>(0);
+        break;
+    case FanModeEnum::kLow:
+        percentSettingTarget = DataModel::MakeNullable<chip::Percent>(33);
+        speedSettingTarget = DataModel::MakeNullable<uint8_t>(1);
+        break;
+    case FanModeEnum::kMedium:
+        percentSettingTarget = DataModel::MakeNullable<chip::Percent>(66);
+        speedSettingTarget =
+            DataModel::MakeNullable<uint8_t>((mSpeedMax > 1) ? static_cast<uint8_t>((mSpeedMax + 1) / 2) : 1);
+        break;
+    case FanModeEnum::kHigh:
+        percentSettingTarget = DataModel::MakeNullable<chip::Percent>(100);
+        speedSettingTarget = DataModel::MakeNullable<uint8_t>(mSpeedMax);
+        break;
     case FanModeEnum::kAuto:
-        if (!mPercentSetting.IsNull())
-        {
-            SetAttributeValue(mPercentCurrent, mPercentSetting.Value(), PercentCurrent::Id);
-        }
-        SetAttributeValue(mPercentSetting, DataModel::NullNullable, PercentSetting::Id);
-
-        if (SupportsMultiSpeed())
-        {
-            if (!mSpeedSetting.IsNull())
-            {
-                SetAttributeValue(mSpeedCurrent, mSpeedSetting.Value(), SpeedCurrent::Id);
-            }
-            SetAttributeValue(mSpeedSetting, DataModel::NullNullable, SpeedSetting::Id);
-        }
+        // Leave as default-constructed (null)
         break;
-
     default:
-        break;
+        // kOn/kSmart/kUnknown: no side effects
+        return;
+    }
+
+    // Apply percent
+    // kOff/kLow/kMedium/kHigh: set explicit values. kAuto: set to null.
+    SetAttributeValue(mPercentSetting, percentSettingTarget, PercentSetting::Id);
+    if (!percentSettingTarget.IsNull())
+    {
+        SetAttributeValue(mPercentCurrent, percentSettingTarget.Value(), PercentCurrent::Id);
+    }
+    else if (!mPercentSetting.IsNull())
+    {
+        // kAuto: fall back to stored setting
+        SetAttributeValue(mPercentCurrent, mPercentSetting.Value(), PercentCurrent::Id);
+    }
+
+    // Apply speed (only when multi-speed is supported)
+    // kOff/kLow/kMedium/kHigh: set explicit values. kAuto: set to null.
+    if (SupportsMultiSpeed())
+    {
+        SetAttributeValue(mSpeedSetting, speedSettingTarget, SpeedSetting::Id);
+        if (!speedSettingTarget.IsNull())
+        {
+            SetAttributeValue(mSpeedCurrent, speedSettingTarget.Value(), SpeedCurrent::Id);
+        }
+        else if (!mSpeedSetting.IsNull())
+        {
+            // kAuto: fall back to stored setting
+            SetAttributeValue(mSpeedCurrent, mSpeedSetting.Value(), SpeedCurrent::Id);
+        }
     }
 }
 
