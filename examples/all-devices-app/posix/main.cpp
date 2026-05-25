@@ -45,6 +45,7 @@
 #include <string>
 #include <system/SystemLayer.h>
 
+#include <BleInit.h>
 #include <TermHandling.h>
 
 using namespace chip;
@@ -401,9 +402,7 @@ CHIP_ERROR Initialize(int argc, char * argv[])
     ReturnErrorOnFailure(DeviceLayer::PlatformMgrImpl().AddEventHandler(EventHandler, 0));
 
 #if CONFIG_NETWORK_LAYER_BLE
-    ReturnErrorOnFailure(DeviceLayer::ConnectivityMgr().SetBLEDeviceName(nullptr));
-    ReturnErrorOnFailure(DeviceLayer::Internal::BLEMgrImpl().ConfigureBle(AppOptions::GetConfig().bleController, false));
-    ReturnErrorOnFailure(DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(true));
+    ReturnErrorOnFailure(chip::app::InitBle(AppOptions::GetConfig().bleController));
 #endif
 
     return CHIP_NO_ERROR;
