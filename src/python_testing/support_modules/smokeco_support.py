@@ -15,15 +15,15 @@
 #    limitations under the License.
 
 import logging
-
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from enum import Enum, auto
+
 from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from matter.testing.matter_asserts import assert_int_in_range, assert_valid_bool, assert_valid_uint32
+from matter.testing.matter_asserts import assert_valid_bool, assert_valid_uint32
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.timeoperations import utc_datetime_from_matter_epoch_us
 
@@ -34,8 +34,9 @@ class EventDataCheck(Enum):
     MATCH_REPORT_DATA = auto()
     IGNORE = auto()
 
+
 class SmokeCoBaseTest(MatterBaseTest):
-    
+
     smokeco_cluster = Clusters.SmokeCoAlarm
     smokeco_enums = Clusters.SmokeCoAlarm.Enums
     gd_cluster = Clusters.GeneralDiagnostics
@@ -116,12 +117,10 @@ class SmokeCoBaseTest(MatterBaseTest):
         is_valid = any(attr == item.value and str(item.name).lower() != "unknown" for item in enum)
         asserts.assert_true(is_valid, f"Value {attr} is not in the range for the Enum {enum}")
 
-
     async def read_attribute_check_bool(self, attribute):
         """Reads an attribute from the SmokeCluster and validate against a boolean value."""
         attr = await self.read_smokeco_attribute_expect_success(attribute=attribute)
         assert_valid_bool(value=attr, description=f"Attribute {attribute} is not a bool instance {attr}")
-
 
     async def read_attribute_check_epoch(self, attribute, check_expired: bool = False):
         """Reads an attribute from the SmokeCluster and validate is a int value represeting the seconds of matter epoch."""
@@ -137,7 +136,7 @@ class SmokeCoBaseTest(MatterBaseTest):
         """Asserts if the value proviced is in the future (Not expired)."""
         # Convert the epoch time from the device into UTC to compare it to current date
         device_utc_datetime = utc_datetime_from_matter_epoch_us(matter_epoch * 1000000)
-        current_date = datetime.now(tz=timezone.utc)
+        current_date = datetime.now(tz=UTC)
         log.info(f"Current matter epoch  {device_utc_datetime}")
         asserts.assert_true(device_utc_datetime > current_date,
                             f"Current matter_epoch is lower than current date. {device_utc_datetime} is an expired date.")
