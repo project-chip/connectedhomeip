@@ -19,7 +19,7 @@
 #include "access/AccessControl.h"
 #include "access/AccessRestrictionProvider.h"
 #include "access/examples/ExampleAccessControlDelegate.h"
-#include "access/examples/GroupAuxiliaryAccessControlDelegate.h"
+#include "access/examples/GroupAuxiliaryAccessControlDelegateImpl.h"
 #include <pw_unit_test/framework.h>
 
 #include "lib/support/tests/ExtraPwTestMacros.h"
@@ -50,7 +50,7 @@ constexpr uint16_t kMaxGroupKeysPerFabric = 4;
 TestPersistentStorageDelegate gGroupStorage;
 Crypto::DefaultSessionKeystore gGroupSessionKeystore;
 Credentials::GroupDataProviderImpl gGroupsProvider(kMaxGroupsPerFabric, kMaxGroupKeysPerFabric);
-Examples::GroupAuxiliaryAccessControlDelegate gGroupAuxDelegate(&gGroupsProvider);
+Examples::GroupAuxiliaryAccessControlDelegateImpl gGroupAuxDelegate;
 
 constexpr ClusterId kNetworkCommissioningCluster = app::Clusters::NetworkCommissioning::Id;
 constexpr ClusterId kDescriptorCluster           = app::Clusters::Descriptor::Id;
@@ -225,6 +225,8 @@ public: // protected
         gGroupsProvider.SetGroupcastEnabled(true);
         ASSERT_EQ(gGroupsProvider.Init(), CHIP_NO_ERROR);
         Credentials::SetGroupDataProvider(&gGroupsProvider);
+
+        SuccessOrDie(gGroupAuxDelegate.Initialize(&gGroupsProvider, nullptr));
         SuccessOrDie(GetAccessControl().RegisterGroupAuxiliaryDelegate(&gGroupAuxDelegate));
     }
     static void TearDownTestSuite()
