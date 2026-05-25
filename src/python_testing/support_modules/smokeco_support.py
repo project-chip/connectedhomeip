@@ -254,7 +254,7 @@ class SmokeCoBaseTest(MatterBaseTest):
             attribute=self.gd_cluster.Attributes.TestEventTriggersEnabled,
             dev_ctrl=self.default_controller,
             endpoint=0)
-        asserts.assert_equal(test_event_trigger_enabled, True, "TestEventTriggersEnabled is not True")
+        asserts.assert_true(test_event_trigger_enabled, "Event Triggers are not enabled")
 
         self.step(5)
         # By default on endpoint 0
@@ -275,17 +275,15 @@ class SmokeCoBaseTest(MatterBaseTest):
         asserts.assert_equal(smoke_alarm_event_data.alarmSeverityLevel, self.smokeco_cluster.Enums.AlarmStateEnum.kWarning)
 
         self.step(9)
-        # Manually Start the Self Test
-        if self.is_pics_sdk_ci_only:
-            # LongPress will trigger the SelfTest in the SmokeCo cluster
-            command_dict = {"Name": "LongPress", "EndpointId": self.get_endpoint(), "NewPosition": 0}
-            self.write_to_app_pipe(command_dict=command_dict)
-        else:
-            self.wait_for_user_input(prompt_msg="Start manually DUT self-test", prompt_msg_placeholder="Enter 'y' when done")
+        # When the Device has one Active Alarm SMOKE/CO or InterconnectedDevice Test should not start as the device is BUSY
+        # Also ExpressedState should stay the same and not change to kTesting
+        self.start_device_self_test()
 
         self.step(10)
         test_in_progress = await self.read_smokeco_attribute_expect_success(attribute=self.smokeco_cluster.Attributes.TestInProgress)
-        asserts.assert_equal(test_in_progress, False)
+        asserts.assert_false(test_in_progress, "Test is not in progress")
+        expressed_state = await self.read_smokeco_attribute_expect_success(attribute=self.smokeco_cluster.Attributes.ExpressedState)
+        asserts.assert_equal(expressed_state, expressed_state_enum_value)
 
         # Gather these steps
         self.step(11)
@@ -295,10 +293,12 @@ class SmokeCoBaseTest(MatterBaseTest):
             await self.send_single_cmd(self_test_cmd, dev_ctrl=self.default_controller, endpoint=self.get_endpoint(), timedRequestTimeoutMs=5000)
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.Busy, "Unexpected error returned")
+            expressed_state = await self.read_smokeco_attribute_expect_success(attribute=self.smokeco_cluster.Attributes.ExpressedState)
+            asserts.assert_equal(expressed_state, expressed_state_enum_value)
 
         self.step(13)
         test_in_progress = await self.read_smokeco_attribute_expect_success(attribute=self.smokeco_cluster.Attributes.TestInProgress)
-        asserts.assert_equal(test_in_progress, False)
+        asserts.assert_false(test_in_progress, "Test is not in progress")
 
         self.step(14)
         await self.send_test_event_triggers(eventTrigger=pixit_critical)
