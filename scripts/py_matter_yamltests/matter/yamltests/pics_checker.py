@@ -37,7 +37,7 @@ class InvalidPICSParsingError(Exception):
     pass
 
 
-class PICSChecker():
+class PICSChecker:
     """Class to compute a PICS expression"""
 
     def __init__(self, pics_file: str):

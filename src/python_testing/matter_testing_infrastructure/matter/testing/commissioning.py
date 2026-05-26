@@ -129,7 +129,7 @@ class PairingStatus:
         return str(self.exception) if self.exception else "Pairing Successful"
 
 
-class Commission():
+class Commission:
     def __init__(
         self,
         dev_ctrl: ChipDeviceCtrl.ChipDeviceController,

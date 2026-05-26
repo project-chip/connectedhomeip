@@ -36,7 +36,7 @@ _FAILURE = click.style('\N{ballot x}', fg='red')
 _WARNING = click.style('\N{warning sign}', fg='yellow')
 
 
-class TestColoredLogPrinter():
+class TestColoredLogPrinter:
     def __init__(self, log_format='[{module}] {message}'):
         self.__log_format = log_format
         self.__log_styles = {

@@ -15,6 +15,7 @@
 #    limitations under the License.
 
 import logging
+from datetime import UTC, datetime
 from enum import Enum, auto
 
 from mobly import asserts
@@ -22,8 +23,9 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from matter.testing.matter_asserts import assert_int_in_range, assert_valid_bool, assert_valid_uint32
+from matter.testing.matter_asserts import assert_valid_bool, assert_valid_uint32
 from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.timeoperations import utc_datetime_from_matter_epoch_us
 
 log = logging.getLogger(__name__)
 
@@ -36,7 +38,10 @@ class EventDataCheck(Enum):
 class SmokeCoBaseTest(MatterBaseTest):
 
     smokeco_cluster = Clusters.SmokeCoAlarm
+    smokeco_enums = Clusters.SmokeCoAlarm.Enums
     gd_cluster = Clusters.GeneralDiagnostics
+    # Default Expiry Date : utc_time_in_matter_epoch(datetime(2126, 1, 1, 0, 0, 0, 0, tzinfo=timezone.utc)) / 1000000
+    default_ci_expiry_date = 3976214400
 
     # SmokeAlarm triggers
     pixit_test_event_warning_smoke_alarm = 0x005c000000000090
@@ -106,20 +111,35 @@ class SmokeCoBaseTest(MatterBaseTest):
             asserts.fail(f"Failed to retrieve event for {smokeco_event}")
         return smoke_alarm_event_data
 
-    async def read_attribute_check_range(self, attribute, range_low: int, range_high: int):
+    async def read_attribute_check_range(self, attribute, enum):
         """Reads an attribute from the SmokeCluster and validate against a range."""
         attr = await self.read_smokeco_attribute_expect_success(attribute=attribute)
-        assert_int_in_range(attr, range_low, range_high, f"Attribute {attribute} is out of range {attr}")
+        is_valid = any(attr == item.value and str(item.name).lower() != "unknown" for item in enum)
+        asserts.assert_true(is_valid, f"Value {attr} is not in the range for the Enum {enum}")
 
     async def read_attribute_check_bool(self, attribute):
         """Reads an attribute from the SmokeCluster and validate against a boolean value."""
         attr = await self.read_smokeco_attribute_expect_success(attribute=attribute)
         assert_valid_bool(value=attr, description=f"Attribute {attribute} is not a bool instance {attr}")
 
-    async def read_attribute_check_epoch(self, attribute):
-        """Reads an attribute from the SmokeCluster and validate against a valid timestamp value."""
+    async def read_attribute_check_epoch(self, attribute, check_expired: bool = False):
+        """Reads an attribute from the SmokeCluster and validate is a int value represeting the seconds of matter epoch."""
         attr = await self.read_smokeco_attribute_expect_success(attribute=attribute)
+        log.info(f"Reading attribte with value {attr} and checking the matter epoch ")
+        # Number of seconds representing the matter epoch
         assert_valid_uint32(attr, "Attribute is not in uint range")
+        if check_expired:
+            self.is_valid_expired_date(attr)
+        return attr
+
+    def is_valid_expired_date(self, matter_epoch: int):
+        """Asserts if the value proviced is in the future (Not expired)."""
+        # Convert the epoch time from the device into UTC to compare it to current date
+        device_utc_datetime = utc_datetime_from_matter_epoch_us(matter_epoch * 1000000)
+        current_date = datetime.now(tz=UTC)
+        log.info(f"Current matter epoch  {device_utc_datetime}")
+        asserts.assert_true(device_utc_datetime > current_date,
+                            f"Current matter_epoch is lower than current date. {device_utc_datetime} is an expired date.")
 
     async def read_general_diagnostics_test_event_triggers_enabled(self):
         "Read and return the TestEventTriggersEnabled from the GeneralDiagnosticsCluster"
@@ -234,7 +254,7 @@ class SmokeCoBaseTest(MatterBaseTest):
             attribute=self.gd_cluster.Attributes.TestEventTriggersEnabled,
             dev_ctrl=self.default_controller,
             endpoint=0)
-        asserts.assert_equal(test_event_trigger_enabled, True, "TestEventTriggersEnabled is not True")
+        asserts.assert_true(test_event_trigger_enabled, "Event Triggers are not enabled")
 
         self.step(5)
         # By default on endpoint 0
@@ -255,17 +275,15 @@ class SmokeCoBaseTest(MatterBaseTest):
         asserts.assert_equal(smoke_alarm_event_data.alarmSeverityLevel, self.smokeco_cluster.Enums.AlarmStateEnum.kWarning)
 
         self.step(9)
-        # Manually Start the Self Test
-        if self.is_pics_sdk_ci_only:
-            # LongPress will trigger the SelfTest in the SmokeCo cluster
-            command_dict = {"Name": "LongPress", "EndpointId": self.get_endpoint(), "NewPosition": 0}
-            self.write_to_app_pipe(command_dict=command_dict)
-        else:
-            self.wait_for_user_input(prompt_msg="Start manually DUT self-test", prompt_msg_placeholder="Enter 'y' when done")
+        # When the Device has one Active Alarm SMOKE/CO or InterconnectedDevice Test should not start as the device is BUSY
+        # Also ExpressedState should stay the same and not change to kTesting
+        self.start_device_self_test()
 
         self.step(10)
         test_in_progress = await self.read_smokeco_attribute_expect_success(attribute=self.smokeco_cluster.Attributes.TestInProgress)
-        asserts.assert_equal(test_in_progress, False)
+        asserts.assert_false(test_in_progress, "Test is not in progress")
+        expressed_state = await self.read_smokeco_attribute_expect_success(attribute=self.smokeco_cluster.Attributes.ExpressedState)
+        asserts.assert_equal(expressed_state, expressed_state_enum_value)
 
         # Gather these steps
         self.step(11)
@@ -275,10 +293,12 @@ class SmokeCoBaseTest(MatterBaseTest):
             await self.send_single_cmd(self_test_cmd, dev_ctrl=self.default_controller, endpoint=self.get_endpoint(), timedRequestTimeoutMs=5000)
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.Busy, "Unexpected error returned")
+            expressed_state = await self.read_smokeco_attribute_expect_success(attribute=self.smokeco_cluster.Attributes.ExpressedState)
+            asserts.assert_equal(expressed_state, expressed_state_enum_value)
 
         self.step(13)
         test_in_progress = await self.read_smokeco_attribute_expect_success(attribute=self.smokeco_cluster.Attributes.TestInProgress)
-        asserts.assert_equal(test_in_progress, False)
+        asserts.assert_false(test_in_progress, "Test is not in progress")
 
         self.step(14)
         await self.send_test_event_triggers(eventTrigger=pixit_critical)

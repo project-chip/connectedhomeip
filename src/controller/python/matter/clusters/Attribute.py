@@ -155,13 +155,13 @@ class EventPath:
     Urgent: Optional[int] = None
 
     @staticmethod
-    def from_cluster(EndpointId: int, Cluster: Cluster, EventId: Optional[int] = None, Urgent: Optional[int] = None) -> "EventPath":
+    def from_cluster(EndpointId: int, Cluster: Cluster, EventId: Optional[int] = None, Urgent: Optional[int] = None) -> EventPath:
         if Cluster is None:
             raise ValueError("Cluster cannot be None")
         return EventPath(EndpointId=EndpointId, ClusterId=Cluster.id, EventId=EventId, Urgent=Urgent)
 
     @staticmethod
-    def from_event(EndpointId: int, Event: ClusterEvent, Urgent: Optional[int] = None) -> "EventPath":
+    def from_event(EndpointId: int, Event: ClusterEvent, Urgent: Optional[int] = None) -> EventPath:
         if Event is None:
             raise ValueError("Event cannot be None")
         return EventPath(EndpointId=EndpointId, ClusterId=Event.cluster_id, EventId=Event.event_id, Urgent=Urgent)
