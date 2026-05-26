@@ -188,8 +188,8 @@ CHIP_ERROR WriteGroupKeyMap(GroupDataProvider & provider, const ConcreteDataAttr
         ReturnErrorOnFailure(aDecoder.Decode(list));
         ReturnErrorOnFailure(list.ComputeSize(&new_count));
 
-        // This is removing group key map entries, not "group keys". Ignore errors
-        RETURN_SAFELY_IGNORED provider.RemoveGroupKeys(fabric_index);
+        // This is removing group key map entries, not "group keys". Log errors on failure
+        LogErrorOnFailure(provider.RemoveGroupKeys(fabric_index));
 
         // Add the new keys
         auto iter = list.begin();
