@@ -584,11 +584,11 @@ TEST_F(TestCommodityTariffBaseDataClass, NullableListOfResourceStructs_UpdateRej
 
     for (uint32_t i = 0; i < mItemsCount; i++)
     {
-        char tmpStrBuf[32]   = { '\0' };
+        char tmpStrBuf[32] = { '\0' };
+        snprintf(tmpStrBuf, sizeof(tmpStrBuf), "resource_%" PRIu32, i);
         CharSpan tmpCharSpan = CharSpan::fromCharString(tmpStrBuf);
 
         data.GetNewValue().Value()[i].id = i;
-        sprintf(tmpStrBuf, "resource_%" PRIu32 "", i);
         EXPECT_EQ(data.GetNewValue().Value()[i].fillLabel(tmpCharSpan), CHIP_NO_ERROR);
     }
 
