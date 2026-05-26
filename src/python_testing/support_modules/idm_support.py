@@ -32,6 +32,7 @@ import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.clusters import ClusterObjects as ClusterObjects
 from matter.clusters.Attribute import AttributePath, TypedAttributePath, ValueDecodeFailure
+from matter.clusters.Types import NullValue
 from matter.exceptions import ChipStackError
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing import global_attribute_ids
@@ -594,15 +595,24 @@ class IDMBaseTest(MatterBaseTest):
     # "Incorrect state" error instead of the expected UNSUPPORTED_* status.
     #
     # The helpers below always instantiate the attribute class with a real
-    # value, falling back across `(0, "", b"")` to cover uint/int/str/octet
-    # shapes. Attribute types we still can't encode (lists, structs, etc.)
-    # are skipped rather than raised, since the *value* on the wire doesn't
-    # matter for these tests; only the path does.
-
-    # Fallback values that cover the common scalar attribute shapes (uint,
-    # int, char-string, octet-string). Lists and structs are skipped via
-    # the TypeError/ValueError catch in _try_write_with_fallback_values.
-    _WRITE_FALLBACK_VALUES = (0, "", b"")
+    # value, falling back across (NullValue, 0, "", b""):
+    #   - NullValue covers spec-nullable attributes (Union[Nullable, T]),
+    #     producing a proper Null TLV element.
+    #   - 0 / "" / b"" cover non-nullable scalar shapes (uint, int,
+    #     char-string, octet-string), including conformance-optional
+    #     attributes that are typed Optional[T] in Python but NOT spec-
+    #     nullable (e.g. BooleanStateConfiguration.CurrentSensitivityLevel,
+    #     which is Optional[uint] because it's feature-gated on SENSLVL).
+    # Attribute types we still can't encode (lists, structs, enums without
+    # a zero member, etc.) raise ValueError/TypeError and are skipped,
+    # since the *value* on the wire doesn't matter for these tests; only
+    # the path does.
+    # Fallback values that cover the common attribute shapes. NullValue is
+    # tried first for spec-nullable attributes; the scalar values cover
+    # non-nullable Optional[T] and plain T attributes. Skipped shapes
+    # (lists, structs, etc.) raise ValueError/TypeError and are caught
+    # in _try_write_with_fallback_values.
+    _WRITE_FALLBACK_VALUES = (NullValue, 0, "", b"")
 
     async def _try_write_with_fallback_values(
         self,
