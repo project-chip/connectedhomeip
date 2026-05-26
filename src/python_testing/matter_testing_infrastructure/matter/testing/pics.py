@@ -14,6 +14,8 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
+from __future__ import annotations
+
 import glob
 import json
 import os
@@ -21,13 +23,14 @@ import typing
 import xml.etree.ElementTree as ET
 import zipfile
 
-import matter.clusters as Clusters
-from matter.clusters.Attribute import AsyncReadTransaction
 from matter.testing.global_attribute_ids import (AttributeIdType, GlobalAttributeIds, attribute_id_type, is_standard_cluster_id,
                                                  is_standard_command_id)
-from matter.testing.problem_notices import ClusterPathLocation, ProblemNotice, ProblemSeverity
-from matter.testing.spec_parsing import XmlCluster
-from matter.tlv import uint
+
+if typing.TYPE_CHECKING:
+    from matter.clusters.Attribute import AsyncReadTransaction
+    from matter.testing.problem_notices import ProblemNotice
+    from matter.testing.spec_parsing import XmlCluster
+    from matter.tlv import uint
 
 
 def parse_pics(lines: typing.List[str]) -> dict[str, bool]:
@@ -193,6 +196,10 @@ def client_pics_str(pics_base: str) -> str:
 def generate_device_element_pics_from_device_wildcard(wildcard: AsyncReadTransaction.ReadResponse, xml_clusters: dict[uint, XmlCluster]) -> tuple[dict[int, list[str]], list[ProblemNotice]]:
     ''' Returns a list of device element PICS and problems from each device wildcard.
     '''
+    import matter.clusters as Clusters
+
+    from matter.testing.problem_notices import ClusterPathLocation, ProblemNotice, ProblemSeverity
+
     # Endpoint to list of device element PICS
     device_pics: dict[int, list[str]] = {}
     problems = []
