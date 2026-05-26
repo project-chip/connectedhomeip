@@ -1296,7 +1296,7 @@ TEST_F(TestGroupDataProvider, TestGroupDecryption)
 TEST_F(TestGroupDataProvider, TestKeySetRemovalGroupKeyMapUpdates)
 {
     GroupDataProvider * provider = GetGroupDataProvider();
-    EXPECT_TRUE(provider);
+    ASSERT_NE(provider, nullptr);
 
     // Reset test
     ResetProvider(provider);
