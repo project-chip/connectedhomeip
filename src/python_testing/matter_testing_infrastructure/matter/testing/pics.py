@@ -197,7 +197,6 @@ def generate_device_element_pics_from_device_wildcard(wildcard: AsyncReadTransac
     ''' Returns a list of device element PICS and problems from each device wildcard.
     '''
     import matter.clusters as Clusters
-
     from matter.testing.problem_notices import ClusterPathLocation, ProblemNotice, ProblemSeverity
 
     # Endpoint to list of device element PICS
