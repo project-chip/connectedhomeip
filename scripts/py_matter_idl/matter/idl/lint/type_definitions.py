@@ -92,7 +92,7 @@ class ErrorAccumulatingRule(LintRule):
     """Contains a lint error list and helps helpers to add to such a list of rules."""
 
     def __init__(self, name):
-        super(ErrorAccumulatingRule, self).__init__(name)
+        super().__init__(name)
         self._lint_errors = []
         self._idl = None
 
@@ -329,7 +329,7 @@ class ClusterCommandRequirement:
 
 class RequiredCommandsRule(ErrorAccumulatingRule):
     def __init__(self, name):
-        super(RequiredCommandsRule, self).__init__(name)
+        super().__init__(name)
 
         # Maps cluster id to mandatory cluster requirement
         self._mandatory_commands: MutableMapping[int,

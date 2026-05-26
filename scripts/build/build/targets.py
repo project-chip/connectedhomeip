@@ -331,8 +331,9 @@ def BuildEfr32Target():
     ])
 
     # apps
-    target.AppendFixedTargets([
+    app_parts = [
         TargetPart('air-quality-sensor-app', app=Efr32App.AIR_QUALITY_SENSOR),
+        TargetPart('all-devices', app=Efr32App.ALL_DEVICES).ExceptIfRe('-(wifi|brd4338a|brd2605a|brd4343a|brd4342a|brd2708a|brd2911a)'),
         TargetPart('closure', app=Efr32App.CLOSURE),
         TargetPart('evse', app=Efr32App.EVSE),
         TargetPart('water-heater', app=Efr32App.WATER_HEATER),
@@ -344,7 +345,14 @@ def BuildEfr32Target():
         TargetPart('thermostat', app=Efr32App.THERMOSTAT),
         TargetPart('unit-test', app=Efr32App.UNIT_TEST),
         TargetPart('window-covering', app=Efr32App.WINDOW_COVERING),
-    ])
+    ]
+
+    # Single-device subset builds for all-devices-app.
+    for _device in _ALL_DEVICES_APP_DEVICES:
+        app_parts.append(TargetPart(f'all-devices-{_device}', app=Efr32App.ALL_DEVICES, all_devices_enabled_devices=[
+                         _device]).ExceptIfRe('-(wifi|brd4338a|brd2605a|brd4343a|brd4342a|brd2708a|brd2911a)'))
+
+    target.AppendFixedTargets(app_parts)
 
     target.AppendModifier('rpc', enable_rpcs=True)
     target.AppendModifier('with-ota-requestor', enable_ota_requestor=True)
@@ -819,7 +827,7 @@ def BuildTelinkTarget():
         TargetPart('tl7218x_retention', board=TelinkBoard.TL7218X_RETENTION),
     ])
 
-    target.AppendFixedTargets([
+    app_parts = [
         TargetPart('air-quality-sensor', app=TelinkApp.AIR_QUALITY_SENSOR),
         TargetPart('all-clusters', app=TelinkApp.ALL_CLUSTERS),
         TargetPart('all-clusters-minimal', app=TelinkApp.ALL_CLUSTERS_MINIMAL),
@@ -838,7 +846,17 @@ def BuildTelinkTarget():
                    app=TelinkApp.TEMPERATURE_MEASUREMENT),
         TargetPart('thermostat', app=TelinkApp.THERMOSTAT),
         TargetPart('window-covering', app=TelinkApp.WINDOW_COVERING),
-    ])
+    ]
+
+    # Single-device subset builds for all-devices-app.
+    # Each modifier selects exactly one device; the binary is named example-device-app.
+    # Multi-device subsets should be built by passing
+    # -DALL_DEVICES_ENABLED_DEVICES=<device1;device2;...> through the
+    # Zephyr/west+CMake build system (for example via build_examples).
+    for _device in _ALL_DEVICES_APP_DEVICES:
+        app_parts.append(TargetPart(f'all-devices-{_device}', app=TelinkApp.ALL_DEVICES, all_devices_enabled_devices=[_device]))
+
+    target.AppendFixedTargets(app_parts)
 
     target.AppendModifier('ota', enable_ota=True)
     target.AppendModifier('dfu-smp', enable_dfu_smp=True)

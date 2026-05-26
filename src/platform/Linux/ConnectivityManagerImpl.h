@@ -247,7 +247,6 @@ private:
 #endif
 
 private:
-    bool _IsWiFiInterfaceEnabled() CHIP_REQUIRES(mWpaSupplicantMutex);
     CHIP_ERROR _ConnectWiFiNetworkAsync(GVariant * networkArgs,
                                         NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * connectCallback)
         CHIP_REQUIRES(mWpaSupplicantMutex);

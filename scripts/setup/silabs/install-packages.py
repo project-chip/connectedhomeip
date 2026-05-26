@@ -75,7 +75,7 @@ def parse_version_from_slt(file_path):
     # This regex finds the [dependency] section and captures the first version string in it.
     pattern = re.compile(r"\[dependency\][^\[]*version\s*=\s*\"([^\"]+)\"")
     try:
-        with open(file_path, "r") as f:
+        with open(file_path) as f:
             content = f.read()
     except OSError:
         return None
@@ -115,7 +115,7 @@ def read_install_done_versions():
         return None
     versions = {}
     try:
-        with open(path, "r") as f:
+        with open(path) as f:
             for line in f:
                 line = line.strip()
                 if "=" in line:
@@ -312,7 +312,7 @@ def is_git_submodule_checkout(dir_path):
     if not os.path.isfile(git_file):
         return False
     try:
-        with open(git_file, "r") as f:
+        with open(git_file) as f:
             return f.read().strip().startswith("gitdir:")
     except OSError:
         return False
@@ -421,7 +421,7 @@ def parse_key_from_file(file_path, key):
         return None
     prefix = key + ": "
     try:
-        with open(file_path, "r") as f:
+        with open(file_path) as f:
             for line in f:
                 line = line.strip()
                 if line.startswith(prefix):

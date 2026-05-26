@@ -281,7 +281,7 @@ def _AllYamlTests():
 def _TargetsForYaml(yaml_path: Path) -> list[TestTarget]:
     targets = []
 
-    with open(yaml_path, 'rt') as f:
+    with open(yaml_path) as f:
         data = yaml.safe_load(f)
         if 'CI' in data:
             for item in data['CI']:
