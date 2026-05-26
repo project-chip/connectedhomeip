@@ -17,7 +17,9 @@ RUN set -x \
 # CHIP build dependencies
 RUN set -x \
     && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-    libssl-dev libglib2.0-dev wget
+    libssl-dev \
+    libglib2.0-dev \
+    wget
 
 # Build and install OpenSSL 3.5 LTS (post-quantum ML-DSA / ML-KEM support)
 ARG OPENSSL_VERSION=3.5.0
@@ -31,6 +33,8 @@ RUN set -x \
     && ./Configure --prefix=/usr/local --openssldir=/etc/ssl --libdir=lib \
     && make -j$(nproc) \
     && make install_sw \
+    && rm -rf /usr/local/ssl/certs \
+    && ln -s /etc/ssl/certs /usr/local/ssl/certs \
     && ldconfig \
     && cd / && rm -rf /tmp/openssl-${OPENSSL_VERSION}* \
     && : # last line
