@@ -94,7 +94,7 @@ class Failure:
     exception: typing.Optional[Exception]
 
 
-class Hooks():
+class Hooks:
     def __init__(self):
         self.failures = {}
         self.current_step = 'unknown'
