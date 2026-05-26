@@ -392,6 +392,8 @@ delayedQueryActionTimeSec
 delayQuery
 deliverables
 demangle
+dep
+Depacketization
 deployable
 depottools
 deps
@@ -551,6 +553,7 @@ evk
 EVSE
 exceptfds
 ExchangeContext
+Excludable
 exe
 ExecStart
 executables
@@ -609,6 +612,7 @@ fvisibility
 FW
 Fxx
 gbl
+gc
 gcloud
 GDB
 gdbgui
@@ -667,6 +671,7 @@ gzbf
 HaloaceticAcidsConcentrationMeasurement
 HandleCommand
 hardcoded
+hardcodes
 hardknott
 hardwarever
 HardwareVersion
@@ -746,6 +751,7 @@ integrations
 IntelliSense
 InteractionModelEngine
 InteractionModelVersion
+interop
 Interoperable
 introvideos
 InvokeCommandRequests
@@ -785,6 +791,7 @@ jre
 js
 json
 jsoncpp
+jsontlv
 JTAG
 Jupyter
 jupyterlab
@@ -850,6 +857,7 @@ lightin
 LightingApp
 LightingColor
 LightingState
+linker's
 LinkSoftwareAndDocumentationPack
 lladdr
 LocalConfigDisabled
@@ -1614,6 +1622,7 @@ vous
 VPN
 VSC
 VSCode
+vtable
 WaitNewInputEvent
 WakeOnLan
 WantedBy

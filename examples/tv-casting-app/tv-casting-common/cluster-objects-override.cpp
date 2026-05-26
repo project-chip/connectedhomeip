@@ -16,7 +16,7 @@
  */
 
 /**
- * @file casting-cluster-objects.cpp
+ * @file cluster-objects-override.cpp
  *
  * Slim replacement for the generated cluster-objects.cpp that only includes
  * the cluster implementations (Attributes/Commands/Events/Structs .ipp files)
@@ -60,16 +60,6 @@
 #include <clusters/Descriptor/Events.ipp>
 #include <clusters/Descriptor/Structs.ipp>
 
-#include <clusters/EthernetNetworkDiagnostics/Attributes.ipp>
-#include <clusters/EthernetNetworkDiagnostics/Commands.ipp>
-#include <clusters/EthernetNetworkDiagnostics/Events.ipp>
-#include <clusters/EthernetNetworkDiagnostics/Structs.ipp>
-
-#include <clusters/FixedLabel/Attributes.ipp>
-#include <clusters/FixedLabel/Commands.ipp>
-#include <clusters/FixedLabel/Events.ipp>
-#include <clusters/FixedLabel/Structs.ipp>
-
 #include <clusters/GeneralCommissioning/Attributes.ipp>
 #include <clusters/GeneralCommissioning/Commands.ipp>
 #include <clusters/GeneralCommissioning/Events.ipp>
@@ -90,20 +80,10 @@
 #include <clusters/Groups/Events.ipp>
 #include <clusters/Groups/Structs.ipp>
 
-#include <clusters/IcdManagement/Attributes.ipp>
-#include <clusters/IcdManagement/Commands.ipp>
-#include <clusters/IcdManagement/Events.ipp>
-#include <clusters/IcdManagement/Structs.ipp>
-
 #include <clusters/Identify/Attributes.ipp>
 #include <clusters/Identify/Commands.ipp>
 #include <clusters/Identify/Events.ipp>
 #include <clusters/Identify/Structs.ipp>
-
-#include <clusters/LocalizationConfiguration/Attributes.ipp>
-#include <clusters/LocalizationConfiguration/Commands.ipp>
-#include <clusters/LocalizationConfiguration/Events.ipp>
-#include <clusters/LocalizationConfiguration/Structs.ipp>
 
 #include <clusters/NetworkCommissioning/Attributes.ipp>
 #include <clusters/NetworkCommissioning/Commands.ipp>
@@ -114,36 +94,6 @@
 #include <clusters/OperationalCredentials/Commands.ipp>
 #include <clusters/OperationalCredentials/Events.ipp>
 #include <clusters/OperationalCredentials/Structs.ipp>
-
-#include <clusters/SoftwareDiagnostics/Attributes.ipp>
-#include <clusters/SoftwareDiagnostics/Commands.ipp>
-#include <clusters/SoftwareDiagnostics/Events.ipp>
-#include <clusters/SoftwareDiagnostics/Structs.ipp>
-
-#include <clusters/TimeFormatLocalization/Attributes.ipp>
-#include <clusters/TimeFormatLocalization/Commands.ipp>
-#include <clusters/TimeFormatLocalization/Events.ipp>
-#include <clusters/TimeFormatLocalization/Structs.ipp>
-
-#include <clusters/TimeSynchronization/Attributes.ipp>
-#include <clusters/TimeSynchronization/Commands.ipp>
-#include <clusters/TimeSynchronization/Events.ipp>
-#include <clusters/TimeSynchronization/Structs.ipp>
-
-#include <clusters/UnitLocalization/Attributes.ipp>
-#include <clusters/UnitLocalization/Commands.ipp>
-#include <clusters/UnitLocalization/Events.ipp>
-#include <clusters/UnitLocalization/Structs.ipp>
-
-#include <clusters/UserLabel/Attributes.ipp>
-#include <clusters/UserLabel/Commands.ipp>
-#include <clusters/UserLabel/Events.ipp>
-#include <clusters/UserLabel/Structs.ipp>
-
-#include <clusters/WiFiNetworkDiagnostics/Attributes.ipp>
-#include <clusters/WiFiNetworkDiagnostics/Commands.ipp>
-#include <clusters/WiFiNetworkDiagnostics/Events.ipp>
-#include <clusters/WiFiNetworkDiagnostics/Structs.ipp>
 
 // ---------------------------------------------------------------------------
 // Casting-specific clusters
@@ -332,25 +282,6 @@ bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
         case Clusters::OperationalCredentials::Commands::UpdateNOC::Id:
         case Clusters::OperationalCredentials::Commands::UpdateFabricLabel::Id:
         case Clusters::OperationalCredentials::Commands::SetVIDVerificationStatement::Id:
-            return true;
-        default:
-            return false;
-        }
-    }
-    case Clusters::TimeSynchronization::Id: {
-        switch (aCommand)
-        {
-        case Clusters::TimeSynchronization::Commands::SetTrustedTimeSource::Id:
-            return true;
-        default:
-            return false;
-        }
-    }
-    case Clusters::IcdManagement::Id: {
-        switch (aCommand)
-        {
-        case Clusters::IcdManagement::Commands::RegisterClient::Id:
-        case Clusters::IcdManagement::Commands::UnregisterClient::Id:
             return true;
         default:
             return false;
