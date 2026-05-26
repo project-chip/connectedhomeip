@@ -230,6 +230,12 @@ constexpr uint8_t kCameraControllerDeviceTypeRevision = 1;
 constexpr DeviceTypeId kDoorbellDeviceTypeId  = 0x00000148;
 constexpr uint8_t kDoorbellDeviceTypeRevision = 1;
 
+constexpr DeviceTypeId kAmbientContextSensorDeviceTypeId  = 0x00000150;
+constexpr uint8_t kAmbientContextSensorDeviceTypeRevision = 1;
+
+constexpr DeviceTypeId kProximityRangerDeviceTypeId  = 0x00000152;
+constexpr uint8_t kProximityRangerDeviceTypeRevision = 1;
+
 constexpr DeviceTypeId kWindowCoveringDeviceTypeId  = 0x00000202;
 constexpr uint8_t kWindowCoveringDeviceTypeRevision = 4;
 
