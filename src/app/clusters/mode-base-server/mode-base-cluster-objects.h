@@ -19,7 +19,6 @@
 #pragma once
 
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app/CommandHandlerInterface.h>
 #include <app/util/util.h>
 #include <utility>
 
