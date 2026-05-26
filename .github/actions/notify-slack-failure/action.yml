@@ -11,18 +11,28 @@ runs:
       shell: bash
       env:
         EVENT_NAME: ${{ github.event_name }}
+        REF_NAME: ${{ github.ref_name }}
+        DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
         JOB_NAME: ${{ github.job }}
-        SERVER_URL: ${{ github.server_url }}
+        SERVER_URL: ${{ github.event.repository.html_url || github.server_url }} # use event repo url to be safe
         REPOSITORY: ${{ github.repository }}
         RUN_ID: ${{ github.run_id }}
         SLACK_WEBHOOK: ${{ inputs.slack-webhook }}
       run: |
-        # Do not notify on Pull Request failures
-        if [ "$EVENT_NAME" = "pull_request" ]; then
+        # 1. Do not notify on Pull Request / Merge Queue / PR-Target events
+        if [ "$EVENT_NAME" = "pull_request" ] || [ "$EVENT_NAME" = "pull_request_target" ] || [ "$EVENT_NAME" = "merge_group" ]; then
+          echo "Skipping Slack notification: PR/Merge-Queue event ($EVENT_NAME)."
           exit 0
         fi
 
-        RUN_URL="${SERVER_URL}/${REPOSITORY}/actions/runs/${RUN_ID}"
+        # 2. Only notify if running on the repository's default branch (usually master)
+        if [ "$REF_NAME" != "$DEFAULT_BRANCH" ]; then
+          echo "Skipping Slack notification: Not on default branch ($REF_NAME vs $DEFAULT_BRANCH)."
+          exit 0
+        fi
+
+        # 3. Send the Slack notification
+        RUN_URL="${SERVER_URL}/actions/runs/${RUN_ID}"
         PAYLOAD_TEXT="🚨 *CI Failure Alert* 🚨\n*Job:* ${JOB_NAME}\n*Run Details:* <${RUN_URL}|View Pipeline Logs>"
         
         curl -sS -X POST -H 'Content-type: application/json' \
