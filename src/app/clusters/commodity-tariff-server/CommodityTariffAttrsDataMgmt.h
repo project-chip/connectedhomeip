@@ -198,59 +198,39 @@ inline bool operator!=(const Type & lhs, const Type & rhs)
 
 namespace CommodityTariffAttrsDataMgmt {
 
-/// @brief Helper for copying spans to Matter data model lists
-/// @tparam T Type of elements to copy
-template <typename T>
-struct SpanCopier
-{
-    /**
-     * @brief Copies span data to a pre-allocated buffer
-     * @param source Input span to copy from
-     * @param destination_buffer Pre-allocated output buffer (must be large enough)
-     * @param maxCount Maximum number of elements to copy (default: unlimited)
-     * @return CHIP_NO_ERROR on success, error code on failure
-     */
-    static CHIP_ERROR Copy(Span<const T> source, T * destination_buffer, size_t maxCount = std::numeric_limits<size_t>::max())
-    {
-        // Destination buffer must be provided
-        VerifyOrReturnError(destination_buffer != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-        VerifyOrReturnError(source.size() <= maxCount, CHIP_ERROR_INVALID_LIST_LENGTH);
-
-        if (!source.empty())
-        {
-            const size_t bytesToCopy = source.size() * sizeof(T);
-            std::memmove(destination_buffer, source.data(), bytesToCopy);
-        }
-
-        return CHIP_NO_ERROR;
-    }
-};
+///// @brief Helper for copying spans to Matter data model lists
+///// @tparam T Type of elements to copy
+// template <typename T>
+// struct SpanCopier
+//{
+//     /**
+//      * @brief Copies span data to a pre-allocated buffer
+//      * @param source Input span to copy from
+//      * @param destination_buffer Pre-allocated output buffer (must be large enough)
+//      * @param maxCount Maximum number of elements to copy (default: unlimited)
+//      * @return CHIP_NO_ERROR on success, error code on failure
+//      */
+//     static CHIP_ERROR Copy(Span<const T> source, T * destination_buffer, size_t maxCount = std::numeric_limits<size_t>::max())
+//     {
+//         static_assert(std::is_trivially_copyable_v<T>, "Span<const T> must be trivially copyable");
+//
+//         // Destination buffer must be provided
+//         VerifyOrReturnError(destination_buffer != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+//         VerifyOrReturnError(source.size() <= maxCount, CHIP_ERROR_INVALID_LIST_LENGTH);
+//
+//         if (!source.empty())
+//         {
+//             const size_t bytesToCopy = source.size() * sizeof(T);
+//             std::memmove(destination_buffer, source.data(), bytesToCopy);
+//         }
+//
+//         return CHIP_NO_ERROR;
+//     }
+// };
 
 /// @brief Specialization for character spans with consistent maxCount semantics
-template <>
-struct SpanCopier<char>
+struct SpanCopier
 {
-    /**
-     * @brief Copies character span to a pre-allocated buffer
-     * @param source Input span to copy from
-     * @param destination_buffer Pre-allocated output buffer (must be large enough)
-     * @param maxCount Maximum number of characters to copy (default: unlimited)
-     * @return CHIP_NO_ERROR on success, error code on failure
-     */
-    static CHIP_ERROR Copy(const CharSpan source, char * destination_buffer, size_t maxCount = std::numeric_limits<size_t>::max())
-    {
-        // Destination buffer must be provided
-        VerifyOrReturnError(destination_buffer != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-        VerifyOrReturnError(source.size() <= maxCount, CHIP_ERROR_INVALID_STRING_LENGTH);
-
-        if (!source.empty())
-        {
-            std::memmove(destination_buffer, source.data(), source.size());
-        }
-
-        return CHIP_NO_ERROR;
-    }
-
     /**
      * @brief Copies character span to a nullable CharSpan
      * @param source Input span to copy from
@@ -279,20 +259,14 @@ struct SpanCopier<char>
 
         VerifyOrReturnError(source.size() <= maxCount, CHIP_ERROR_INVALID_STRING_LENGTH);
 
-        char * buffer = static_cast<char *>(Platform::MemoryCalloc(1, source.size()));
-        VerifyOrReturnError(buffer != nullptr, CHIP_ERROR_NO_MEMORY);
+        // ScopedMemoryBufferWithSize tracks the allocated size
+        Platform::ScopedMemoryBufferWithSize<char> buffer;
+        buffer.CopyFromSpan(chip::Span<const char>(source.data(), source.size()));
+        VerifyOrReturnError(buffer.Get() != nullptr, CHIP_ERROR_NO_MEMORY);
 
-        CharSpan tmpSpan = CharSpan(buffer, source.size());
-
-        auto freeGuard = [&buffer](CHIP_ERROR err) {
-            if (err != CHIP_NO_ERROR)
-            {
-                chip::Platform::MemoryFree(buffer);
-            }
-            return err;
-        };
-
-        ReturnErrorOnFailure(freeGuard(Copy(source, buffer, source.size())));
+        // Transfer ownership to destination
+        size_t size = buffer.AllocatedSize();
+        CharSpan tmpSpan(buffer.Release(), size);
         destination.SetNonNull(tmpSpan);
 
         return CHIP_NO_ERROR;
@@ -936,11 +910,10 @@ public:
             return false;
         }
 
-        if (aUpdateAllowed && (mUpdateState.load() == UpdateState::kValidated))
+        if (aUpdateAllowed && (mUpdateState.load() == UpdateState::kValidated) && HasChanged())
         {
             SwapActiveValueStorage();
-
-            ret = HasChanged();
+            ret = true;
         }
 
         CleanupByIdx(1 - mActiveValueIdx.load());
