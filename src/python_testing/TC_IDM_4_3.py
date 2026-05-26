@@ -172,7 +172,7 @@ class TC_IDM_4_3(IDMBaseTest, BasicCompositionTests):
         max_wait = sub_timeout_sec + 1
         try:
             await asyncio.wait_for(empty_report_event.wait(), timeout=max_wait)
-        except TimeoutError:
+        except (asyncio.TimeoutError, TimeoutError):
             asserts.fail("Empty report was not received")
 
         asserts.assert_is_not_none(empty_report_time, "Empty report timing not captured")
