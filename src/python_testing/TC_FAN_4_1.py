@@ -208,7 +208,8 @@ class TC_FAN_4_1(MatterBaseTest):
         self.step(10)
         if percent_current != percent_setting_original:
             print(f"Fan attribute {fan.Attributes.PercentCurrent}")
-            sub.await_all_final_values_reported(expected_final_values=[AttributeValue(endpoint_id=self.get_endpoint(), attribute=fan.Attributes.PercentCurrent, value=percent_setting_original)], timeout_sec=timeout)
+            sub.await_all_final_values_reported(expected_final_values=[AttributeValue(endpoint_id=self.get_endpoint(
+            ), attribute=fan.Attributes.PercentCurrent, value=percent_setting_original)], timeout_sec=timeout)
         else:
             self.mark_current_step_skipped()
 

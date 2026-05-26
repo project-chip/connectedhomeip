@@ -53,8 +53,8 @@ FanModeEnum ComputeFanModeFromPercent(chip::Percent percent, FanModeSequenceEnum
         return FanModeEnum::kOff;
     }
 
-    const bool hasThreeSpeeds = (fanModeSequence == FanModeSequenceEnum::kOffLowMedHigh ||
-                                 fanModeSequence == FanModeSequenceEnum::kOffLowMedHighAuto);
+    const bool hasThreeSpeeds =
+        (fanModeSequence == FanModeSequenceEnum::kOffLowMedHigh || fanModeSequence == FanModeSequenceEnum::kOffLowMedHighAuto);
     const bool hasLow = (fanModeSequence != FanModeSequenceEnum::kOffHigh && fanModeSequence != FanModeSequenceEnum::kOffHighAuto);
 
     if (hasThreeSpeeds)
@@ -139,8 +139,7 @@ void FanControlCluster::ApplyFanModeSideEffects(FanModeEnum fanMode)
     };
 
     const bool fanSequenceHasThreeDiscreteSpeeds =
-        (mFanModeSequence == FanModeSequenceEnum::kOffLowMedHigh ||
-         mFanModeSequence == FanModeSequenceEnum::kOffLowMedHighAuto);
+        (mFanModeSequence == FanModeSequenceEnum::kOffLowMedHigh || mFanModeSequence == FanModeSequenceEnum::kOffLowMedHighAuto);
 
     switch (fanMode)
     {
@@ -172,8 +171,8 @@ void FanControlCluster::ApplyFanModeSideEffects(FanModeEnum fanMode)
         break;
 
     case FanModeEnum::kLow: {
-        const bool hasLowStep = (mFanModeSequence != FanModeSequenceEnum::kOffHigh &&
-                                 mFanModeSequence != FanModeSequenceEnum::kOffHighAuto);
+        const bool hasLowStep =
+            (mFanModeSequence != FanModeSequenceEnum::kOffHigh && mFanModeSequence != FanModeSequenceEnum::kOffHighAuto);
         if (fanSequenceHasThreeDiscreteSpeeds || hasLowStep)
         {
             syncCommandedPercentAndSpeedSetting(33);
