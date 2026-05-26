@@ -457,7 +457,6 @@ void AppTask::DMPostAttributeChangeCallback(const chip::app::ConcreteAttributePa
                 break;
             }
 
-
             sLightOn = lightOn;
             sLightLED.Set(sLightOn);
 #ifdef DISPLAY_ENABLED
