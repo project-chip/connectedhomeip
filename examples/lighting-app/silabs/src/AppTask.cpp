@@ -425,7 +425,7 @@ void AppTask::OnTriggerOffWithEffect(OnOffEffect * effect)
     sOffEffectArmed = true;
     if (osTimerStart(sLightTimer, pdMS_TO_TICKS(offEffectDuration)) != osOK)
     {
-        DisarmOffWithEffectTimer();
+        sOffEffectArmed = false;
         SILABS_LOG("sLightTimer timer start() failed");
         appError(APP_ERROR_START_TIMER_FAILED);
     }
