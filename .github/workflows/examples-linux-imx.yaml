@@ -95,3 +95,8 @@ jobs:
                         build"
             - name: Clean out build output
               run: rm -rf ./out
+            - name: Notify Slack on Failure
+              if: failure()
+              uses: ./.github/actions/notify-slack-failure
+              with:
+                slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}
