@@ -53,9 +53,9 @@ namespace Clusters {
 namespace CameraAvStreamManagement {
 
 CameraAVStreamManagementCluster::CameraAVStreamManagementCluster(
-    CameraAVStreamManagementDelegate & aDelegate, EndpointId aEndpointId,
-    const BitFlags<Feature> aFeatures, const BitFlags<OptionalAttribute> aOptionalAttrs, uint8_t aMaxConcurrentEncoders,
-    uint32_t aMaxEncodedPixelRate, const VideoSensorParamsStruct & aVideoSensorParams, bool aNightVisionUsesInfrared,
+    CameraAVStreamManagementDelegate & aDelegate, EndpointId aEndpointId, const BitFlags<Feature> aFeatures,
+    const BitFlags<OptionalAttribute> aOptionalAttrs, uint8_t aMaxConcurrentEncoders, uint32_t aMaxEncodedPixelRate,
+    const VideoSensorParamsStruct & aVideoSensorParams, bool aNightVisionUsesInfrared,
     const VideoResolutionStruct & aMinViewPortRes,
     const std::vector<Structs::RateDistortionTradeOffPointsStruct::Type> & aRateDistortionTradeOffPoints,
     uint32_t aMaxContentBufferSize, const AudioCapabilitiesStruct & aMicrophoneCapabilities,
@@ -1115,9 +1115,9 @@ CHIP_ERROR CameraAVStreamManagementCluster::SetNightVision(TriStateAutoEnum aNig
 {
     if (mNightVision != aNightVision)
     {
-        mNightVision = aNightVision;
-        auto path         = ConcreteAttributePath(mPath.mEndpointId, CameraAvStreamManagement::Id, Attributes::NightVision::Id);
-        auto nightVision  = to_underlying(mNightVision);
+        mNightVision     = aNightVision;
+        auto path        = ConcreteAttributePath(mPath.mEndpointId, CameraAvStreamManagement::Id, Attributes::NightVision::Id);
+        auto nightVision = to_underlying(mNightVision);
         ReturnErrorOnFailure(mContext->attributeStorage.WriteValue(
             path, ByteSpan(reinterpret_cast<const uint8_t *>(&nightVision), sizeof(nightVision))));
         mDelegate.OnAttributeChanged(Attributes::NightVision::Id);
@@ -1131,7 +1131,7 @@ CHIP_ERROR CameraAVStreamManagementCluster::SetNightVisionIllum(TriStateAutoEnum
     if (mNightVisionIllum != aNightVisionIllum)
     {
         mNightVisionIllum = aNightVisionIllum;
-        auto path             = ConcreteAttributePath(mPath.mEndpointId, CameraAvStreamManagement::Id, Attributes::NightVisionIllum::Id);
+        auto path = ConcreteAttributePath(mPath.mEndpointId, CameraAvStreamManagement::Id, Attributes::NightVisionIllum::Id);
         auto nightVisionIllum = to_underlying(mNightVisionIllum);
         ReturnErrorOnFailure(mContext->attributeStorage.WriteValue(
             path, ByteSpan(reinterpret_cast<const uint8_t *>(&nightVisionIllum), sizeof(nightVisionIllum))));
@@ -1294,7 +1294,7 @@ CHIP_ERROR CameraAVStreamManagementCluster::SetStatusLightBrightness(Globals::Th
     if (mStatusLightBrightness != aStatusLightBrightness)
     {
         mStatusLightBrightness = aStatusLightBrightness;
-        auto path                  = ConcreteAttributePath(mPath.mEndpointId, CameraAvStreamManagement::Id, Attributes::StatusLightBrightness::Id);
+        auto path = ConcreteAttributePath(mPath.mEndpointId, CameraAvStreamManagement::Id, Attributes::StatusLightBrightness::Id);
         auto statusLightBrightness = to_underlying(mStatusLightBrightness);
         ReturnErrorOnFailure(mContext->attributeStorage.WriteValue(
             path, ByteSpan(reinterpret_cast<const uint8_t *>(&statusLightBrightness), sizeof(statusLightBrightness))));
@@ -1350,10 +1350,9 @@ void CameraAVStreamManagementCluster::LoadPersistentAttributes()
     // Load SoftRecordingPrivacyModeEnabled
     {
         const bool defaultValue = mSoftRecordingPrivacyModeEnabled;
-        if (attrPersistence.LoadNativeEndianValue<bool>(
-                ConcreteAttributePath(mPath.mEndpointId, CameraAvStreamManagement::Id,
-                                      Attributes::SoftRecordingPrivacyModeEnabled::Id),
-                mSoftRecordingPrivacyModeEnabled, defaultValue))
+        if (attrPersistence.LoadNativeEndianValue<bool>(ConcreteAttributePath(mPath.mEndpointId, CameraAvStreamManagement::Id,
+                                                                              Attributes::SoftRecordingPrivacyModeEnabled::Id),
+                                                        mSoftRecordingPrivacyModeEnabled, defaultValue))
         {
             ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Loaded SoftRecordingPrivacyModeEnabled as %u", mPath.mEndpointId,
                           mSoftRecordingPrivacyModeEnabled);
@@ -1369,10 +1368,9 @@ void CameraAVStreamManagementCluster::LoadPersistentAttributes()
     // Load SoftLivestreamPrivacyModeEnabled
     {
         const bool defaultValue = mSoftLivestreamPrivacyModeEnabled;
-        if (attrPersistence.LoadNativeEndianValue<bool>(
-                ConcreteAttributePath(mPath.mEndpointId, CameraAvStreamManagement::Id,
-                                      Attributes::SoftLivestreamPrivacyModeEnabled::Id),
-                mSoftLivestreamPrivacyModeEnabled, defaultValue))
+        if (attrPersistence.LoadNativeEndianValue<bool>(ConcreteAttributePath(mPath.mEndpointId, CameraAvStreamManagement::Id,
+                                                                              Attributes::SoftLivestreamPrivacyModeEnabled::Id),
+                                                        mSoftLivestreamPrivacyModeEnabled, defaultValue))
         {
             ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Loaded SoftLivestreamPrivacyModeEnabled as %u", mPath.mEndpointId,
                           mSoftLivestreamPrivacyModeEnabled);
@@ -1388,7 +1386,7 @@ void CameraAVStreamManagementCluster::LoadPersistentAttributes()
 
     // Load NightVision (stored as underlying uint8_t)
     {
-        uint8_t nightVision       = to_underlying(mNightVision);
+        uint8_t nightVision        = to_underlying(mNightVision);
         const uint8_t defaultValue = nightVision;
         if (attrPersistence.LoadNativeEndianValue<uint8_t>(
                 ConcreteAttributePath(mPath.mEndpointId, CameraAvStreamManagement::Id, Attributes::NightVision::Id), nightVision,
@@ -1591,10 +1589,9 @@ void CameraAVStreamManagementCluster::LoadPersistentAttributes()
     // Load LocalSnapshotRecordingEnabled
     {
         const bool defaultValue = mLocalSnapshotRecordingEnabled;
-        if (attrPersistence.LoadNativeEndianValue<bool>(
-                ConcreteAttributePath(mPath.mEndpointId, CameraAvStreamManagement::Id,
-                                      Attributes::LocalSnapshotRecordingEnabled::Id),
-                mLocalSnapshotRecordingEnabled, defaultValue))
+        if (attrPersistence.LoadNativeEndianValue<bool>(ConcreteAttributePath(mPath.mEndpointId, CameraAvStreamManagement::Id,
+                                                                              Attributes::LocalSnapshotRecordingEnabled::Id),
+                                                        mLocalSnapshotRecordingEnabled, defaultValue))
         {
             ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Loaded LocalSnapshotRecordingEnabled as %u", mPath.mEndpointId,
                           mLocalSnapshotRecordingEnabled);
@@ -1615,7 +1612,8 @@ void CameraAVStreamManagementCluster::LoadPersistentAttributes()
                 ConcreteAttributePath(mPath.mEndpointId, CameraAvStreamManagement::Id, Attributes::StatusLightEnabled::Id),
                 mStatusLightEnabled, defaultValue))
         {
-            ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Loaded StatusLightEnabled as %u", mPath.mEndpointId, mStatusLightEnabled);
+            ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Loaded StatusLightEnabled as %u", mPath.mEndpointId,
+                          mStatusLightEnabled);
         }
         else
         {
@@ -1626,8 +1624,8 @@ void CameraAVStreamManagementCluster::LoadPersistentAttributes()
 
     // Load StatusLightBrightness (stored as underlying uint8_t)
     {
-        uint8_t statusLightBrightness   = to_underlying(mStatusLightBrightness);
-        const uint8_t defaultValue = statusLightBrightness;
+        uint8_t statusLightBrightness = to_underlying(mStatusLightBrightness);
+        const uint8_t defaultValue    = statusLightBrightness;
         if (attrPersistence.LoadNativeEndianValue<uint8_t>(
                 ConcreteAttributePath(mPath.mEndpointId, CameraAvStreamManagement::Id, Attributes::StatusLightBrightness::Id),
                 statusLightBrightness, defaultValue))
@@ -1639,7 +1637,7 @@ void CameraAVStreamManagementCluster::LoadPersistentAttributes()
         else
         {
             ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Unable to load the StatusLightBrightness from the KVS. Defaulting to %d",
-                      mPath.mEndpointId, to_underlying(mStatusLightBrightness));
+                          mPath.mEndpointId, to_underlying(mStatusLightBrightness));
         }
     }
 

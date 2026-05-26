@@ -283,8 +283,7 @@ struct TestCameraAVStreamManagementCluster : public ::testing::Test
 
     TestCameraAVStreamManagementCluster() :
         mMockDelegate(&mVideoStreams, &mAudioStreams, &mSnapshotStreams),
-        mServer(mMockDelegate,
-                kTestEndpointId,
+        mServer(mMockDelegate, kTestEndpointId,
                 chip::BitFlags<CameraAvStreamManagement::Feature>(
                     CameraAvStreamManagement::Feature::kVideo, CameraAvStreamManagement::Feature::kAudio,
                     CameraAvStreamManagement::Feature::kSnapshot, CameraAvStreamManagement::Feature::kSpeaker,
@@ -1822,9 +1821,9 @@ struct TestCodegenCameraAVStreamManagementMigration : public ::testing::Test
     template <typename T>
     void WriteSafeScalar(AttributeId attrId, T value)
     {
-        ASSERT_EQ(mSafePersistence.WriteScalarValue(
-                      ConcreteAttributePath(kTestEndpointId, CameraAvStreamManagement::Id, attrId), value),
-                  CHIP_NO_ERROR);
+        ASSERT_EQ(
+            mSafePersistence.WriteScalarValue(ConcreteAttributePath(kTestEndpointId, CameraAvStreamManagement::Id, attrId), value),
+            CHIP_NO_ERROR);
     }
 
     std::vector<VideoStreamStruct> mVideoStreams;

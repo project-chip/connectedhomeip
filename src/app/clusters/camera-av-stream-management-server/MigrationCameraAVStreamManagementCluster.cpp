@@ -17,12 +17,12 @@
  */
 
 #include <app/SafeAttributePersistenceProvider.h>
-#include <app/clusters/camera-av-stream-management-server/MigrationCameraAVStreamManagementCluster.h>
 #include <app/clusters/camera-av-stream-management-server/MigrateCameraAVStreamManagementStorage.h>
+#include <app/clusters/camera-av-stream-management-server/MigrationCameraAVStreamManagementCluster.h>
 #include <lib/support/CodeUtils.h>
 
-CHIP_ERROR chip::app::Clusters::CameraAvStreamManagement::MigrationCameraAVStreamManagementCluster::Startup(
-    ServerClusterContext & context)
+CHIP_ERROR
+chip::app::Clusters::CameraAvStreamManagement::MigrationCameraAVStreamManagementCluster::Startup(ServerClusterContext & context)
 {
     SafeAttributePersistenceProvider * srcProvider = GetSafeAttributePersistenceProvider();
     if (srcProvider != nullptr)
