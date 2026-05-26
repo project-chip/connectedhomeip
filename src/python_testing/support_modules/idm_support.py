@@ -35,6 +35,7 @@ from matter.clusters.Attribute import AttributePath, TypedAttributePath, ValueDe
 from matter.exceptions import ChipStackError
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing import global_attribute_ids
+from matter.testing.basic_composition import BasicCompositionTests
 from matter.testing.event_attribute_reporting import WildcardAttributeSubscriptionHandler
 from matter.testing.global_attribute_ids import GlobalAttributeIds, is_standard_attribute_id
 from matter.testing.matter_testing import MatterBaseTest
@@ -119,7 +120,7 @@ def client_cmd(cmd_class):
 # IDMBaseTest - Main Base Class
 # ============================================================================
 
-class IDMBaseTest(MatterBaseTest):
+class IDMBaseTest(BasicCompositionTests):
     """Base test class for IDM tests with shared functionality."""
 
     ROOT_NODE_ENDPOINT_ID = 0
