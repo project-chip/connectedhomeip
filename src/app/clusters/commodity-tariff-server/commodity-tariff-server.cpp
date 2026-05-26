@@ -656,8 +656,10 @@ CHIP_ERROR Instance::UpdateDayInformation(uint32_t matterEpochNow_s)
     }
 
     auto DayIsDifferentFromCurrent = [](const auto & newDay, const auto & currDay) -> bool {
-        if (currDay.IsNull())
+        if (newDay.IsNull() != currDay.IsNull())
             return true;
+        if (newDay.IsNull())
+            return false;
         return newDay.Value().date != currDay.Value().date;
     };
 

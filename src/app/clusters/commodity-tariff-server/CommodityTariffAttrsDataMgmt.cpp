@@ -276,13 +276,7 @@ CHIP_ERROR CTC_BaseDataClass<DataModel::Nullable<DataModel::List<TariffPeriodStr
     // Handle label (nullable CharSpan) - NEEDS MEMORY ALLOCATION
     if (!input.label.IsNull())
     {
-        Platform::ScopedMemoryBufferWithSize<char> buffer;
-        buffer.CopyFromSpan(input.label.Value());
-        VerifyOrReturnError(buffer.Get() != nullptr, CHIP_ERROR_NO_MEMORY);
-
-        size_t size = buffer.AllocatedSize();
-        chip::CharSpan tmpLabel(buffer.Release(), size);
-        output.label.SetNonNull(tmpLabel);
+        ReturnErrorOnFailure(SpanCopier::CopyToNullable(input.label.Value(), output.label));
     }
 
     // Handle dayEntryIDs (non-nullable list) - NEEDS MEMORY ALLOCATION

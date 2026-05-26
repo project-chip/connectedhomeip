@@ -272,7 +272,7 @@ public:
     ScopedMemoryBufferWithSize & CopyFromSpan(const chip::Span<const U> & span)
     {
         static_assert(std::is_trivially_copyable_v<U>, "Span<const U> must be trivially copyable");
-        static_assert(sizeof(T) >= sizeof(U), "Cannot copy from a larger type");
+        static_assert(sizeof(T) == sizeof(U), "Cannot copy between types of different sizes");
 
         if (span.size() == 0)
         {
