@@ -182,9 +182,8 @@ Status AirPurifierManager::HandleStep(FanControl::StepDirectionEnum aDirection, 
 // This callback runs whenever the cluster finishes such an update.
 void AirPurifierManager::OnFanDriveStateChanged(const FanControl::FanDriveState & newState)
 {
-    uint32_t featureMap = 0;
-    const bool multiSpeed =
-        FanControl::Attributes::FeatureMap::Get(mEndpointId, &featureMap) == Status::Success &&
+    uint32_t featureMap   = 0;
+    const bool multiSpeed = FanControl::Attributes::FeatureMap::Get(mEndpointId, &featureMap) == Status::Success &&
         BitFlags<FanControl::Feature>(featureMap).Has(FanControl::Feature::kMultiSpeed);
 
     if (!mOnOffClusterOn || !IsFanDriveActive(newState))
