@@ -1478,6 +1478,8 @@ CHIP_ERROR ConnectivityManagerImpl::GetConfiguredNetwork(NetworkCommissioning::N
 
     network.connected     = wpa_fi_w1_wpa_supplicant1_network_get_enabled(networkInfo.get());
     GVariant * properties = wpa_fi_w1_wpa_supplicant1_network_get_properties(networkInfo.get());
+    VerifyOrReturnError(properties != nullptr, CHIP_ERROR_KEY_NOT_FOUND);
+
     GAutoPtr<GVariant> ssid(g_variant_lookup_value(properties, "ssid", nullptr));
     VerifyOrReturnError(ssid, CHIP_ERROR_KEY_NOT_FOUND);
     gsize length;
