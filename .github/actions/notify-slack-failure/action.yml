@@ -9,17 +9,22 @@ runs:
   steps:
     - name: Send Slack Notification
       shell: bash
+      env:
+        EVENT_NAME: ${{ github.event_name }}
+        JOB_NAME: ${{ github.job }}
+        SERVER_URL: ${{ github.server_url }}
+        REPOSITORY: ${{ github.repository }}
+        RUN_ID: ${{ github.run_id }}
+        SLACK_WEBHOOK: ${{ inputs.slack-webhook }}
       run: |
         # Do not notify on Pull Request failures
-        if [ "${{ github.event_name }}" = "pull_request" ]; then
+        if [ "$EVENT_NAME" = "pull_request" ]; then
           exit 0
         fi
 
-        JOB_NAME="${{ github.job }}"
-        RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-        
+        RUN_URL="${SERVER_URL}/${REPOSITORY}/actions/runs/${RUN_ID}"
         PAYLOAD_TEXT="🚨 *CI Failure Alert* 🚨\n*Job:* ${JOB_NAME}\n*Run Details:* <${RUN_URL}|View Pipeline Logs>"
         
-        curl -X POST -H 'Content-type: application/json' \
+        curl -sS -X POST -H 'Content-type: application/json' \
         --data "{\"text\":\"${PAYLOAD_TEXT}\"}" \
-        "${{ inputs.slack-webhook }}"
+        "$SLACK_WEBHOOK"
