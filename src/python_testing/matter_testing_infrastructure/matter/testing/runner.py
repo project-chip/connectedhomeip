@@ -545,7 +545,7 @@ class AsyncMock(MagicMock):
         return super().__call__(*args, **kwargs)
 
 
-class MockTestRunner():
+class MockTestRunner:
     """
     Test runner for mocking Matter device interactions.
 
