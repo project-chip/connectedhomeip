@@ -3,7 +3,7 @@ description: 'Sends a Slack notification when a post-merge or nightly job fails'
 inputs:
   slack-webhook:
     description: 'The Slack Webhook URL'
-    required: true
+    required: false
 runs:
   using: "composite"
   steps:
@@ -19,19 +19,19 @@ runs:
         SLACK_WEBHOOK: ${{ inputs.slack-webhook }}
       run: |
         # 1. Skip gracefully if the Slack webhook is not configured (e.g. on developer forks)
-        if [ -z "$SLACK_WEBHOOK" ]; then
+        if [[ -z "$SLACK_WEBHOOK" ]]; then
           echo "Slack webhook not configured. Skipping notification."
           exit 0
         fi
 
         # 2. Do not notify on Pull Request / Merge Queue / PR-Target events
-        if [ "$EVENT_NAME" = "pull_request" ] || [ "$EVENT_NAME" = "pull_request_target" ] || [ "$EVENT_NAME" = "merge_group" ]; then
+        if [[ "$EVENT_NAME" == "pull_request" || "$EVENT_NAME" == "pull_request_target" || "$EVENT_NAME" == "merge_group" ]]; then
           echo "Skipping Slack notification: PR/Merge-Queue event ($EVENT_NAME)."
           exit 0
         fi
 
         # 3. Only notify on master or release branches (matching v*-branch)
-        if [ "$REF_NAME" != "master" ] && [[ ! "$REF_NAME" == v*-branch ]]; then
+        if [[ "$REF_NAME" != "master" && ! "$REF_NAME" == v*-branch ]]; then
           echo "Skipping Slack notification: Not on master or a release branch ($REF_NAME)."
           exit 0
         fi
@@ -44,5 +44,6 @@ runs:
         PAYLOAD_TEXT="🚨 *CI Failure Alert* 🚨\n*Job:* ${JOB_NAME}\n*Run Details:* <${RUN_URL}|View Pipeline Logs>"
         
         curl -sS -X POST -H 'Content-type: application/json' \
-        --data "{\"text\":\"${PAYLOAD_TEXT}\"}" \
-        "$SLACK_WEBHOOK"
+          --data-binary @- "$SLACK_WEBHOOK" <<EOF
+        {"text":"${PAYLOAD_TEXT}"}
+        EOF
