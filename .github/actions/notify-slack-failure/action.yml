@@ -1,5 +1,5 @@
 name: 'Notify Slack on Failure'
-description: 'Sends a Slack notification when a Pull Request job fails'
+description: 'Sends a Slack notification when a post-merge or nightly job fails'
 inputs:
   slack-webhook:
     description: 'The Slack Webhook URL'
@@ -10,8 +10,8 @@ runs:
     - name: Send Slack Notification
       shell: bash
       run: |
-        # Only notify on Pull Request failures
-        if [ "${{ github.event_name }}" != "pull_request" ]; then
+        # Do not notify on Pull Request failures
+        if [ "${{ github.event_name }}" = "pull_request" ]; then
           exit 0
         fi
 
