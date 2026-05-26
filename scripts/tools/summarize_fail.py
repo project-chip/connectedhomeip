@@ -12,7 +12,7 @@ log = logging.getLogger(__name__)
 
 yesterday = (datetime.datetime.now() - datetime.timedelta(days=1)).strftime('%Y-%m-%d')
 
-with open("scripts/tools/build_fail_definitions.yaml", "r") as fail_defs:
+with open("scripts/tools/build_fail_definitions.yaml") as fail_defs:
     try:
         error_catalog = yaml.safe_load(fail_defs)
     except Exception:

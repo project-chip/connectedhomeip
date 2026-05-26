@@ -166,13 +166,11 @@ CHIP_ERROR CameraAVStreamManagementCluster::Init()
                          mPath.mEndpointId));
     }
 
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR CameraAVStreamManagementCluster::Startup(ServerClusterContext & context)
-{
-    ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
+    // Persistent data is stored in the cluster context, so the cluster should be correctly
+    // initialized before loading atttributes.
+    VerifyOrReturnError(mContext != nullptr, CHIP_ERROR_INCORRECT_STATE);
     LoadPersistentAttributes();
+
     return CHIP_NO_ERROR;
 }
 
@@ -1844,6 +1842,9 @@ CHIP_ERROR CameraAVStreamManagementCluster::LoadAllocatedStreams()
     {
         typename Traits::StreamStructType stream;
         ReturnErrorOnFailure(DataModel::Decode(reader, stream));
+        // Zero out the referenceCount and allow it to be updated based on how
+        // the stream gets used by the transports.
+        stream.referenceCount = 0;
         streams.push_back(stream);
     }
 

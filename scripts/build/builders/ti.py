@@ -82,7 +82,7 @@ class TIBuilder(GnBuilder):
                  board=TIBoard.LP_EM_CC1354P10_6,
                  app: TIApp = TIApp.LOCK,
                  openthread_ftd: Optional[bool] = None):
-        super(TIBuilder, self).__init__(root=app.BuildRoot(root, board), runner=runner, output_dir_lock=output_dir_lock)
+        super().__init__(root=app.BuildRoot(root, board), runner=runner, output_dir_lock=output_dir_lock)
         self.code_root = root
         self.app = app
         self.board = board

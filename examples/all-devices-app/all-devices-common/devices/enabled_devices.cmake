@@ -41,9 +41,14 @@ set(ALL_DEVICES_DEVICE_SOURCES
     "${ALL_DEVICES_COMMON_DIR}/devices/dimmable-light/impl/LoggingDimmableLightDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/interface/DeviceInterface.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/interface/SingleEndpointDevice.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/devices/network-infrastructure-manager/NetworkInfrastructureManagerDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/occupancy-sensor/OccupancySensorDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/occupancy-sensor/impl/TogglingOccupancySensorDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/on-off-light/LoggingOnOffLightDevice.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/devices/proximity-ranger/DefaultProximityRangingDriver.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/devices/proximity-ranger/ProximityRangerDevice.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/devices/proximity-ranger/RangingTechnologyController.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/devices/proximity-ranger/impl/BleRssiRangingAdapter.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/root-node/RootNodeDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/soil-sensor/SoilSensorDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/soil-sensor/impl/IncreasingMoistureSoilSensorDevice.cpp"
@@ -94,8 +99,10 @@ foreach(_key
         chime
         contact-sensor
         dimmable-light
+        network-infrastructure-manager
         occupancy-sensor
         on-off-light
+        proximity-ranger
         soil-sensor
         speaker
         temperature-sensor

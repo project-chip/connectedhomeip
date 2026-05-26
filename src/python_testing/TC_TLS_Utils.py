@@ -106,9 +106,9 @@ class TLSUtils:
             .issuer_name(root_cert_subject)
             .public_key(public_key)
             .serial_number(random_serial_number())
-            .not_valid_before(datetime.datetime.now(datetime.timezone.utc))
+            .not_valid_before(datetime.datetime.now(datetime.UTC))
             .not_valid_after(
-                datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(days=365.25*20)
+                datetime.datetime.now(datetime.UTC) + datetime.timedelta(days=365.25*20)
             )
             .add_extension(
                 # We make it so that our root can only issue leaf certificates, no intermediate here.
