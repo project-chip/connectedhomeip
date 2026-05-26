@@ -222,10 +222,11 @@ Status SetpointRaiseLower(const EndpointId endpointId, const Commands::SetpointR
     {
         SetpointAttributes changedAttributes;
         status = setpoints.ChangeRange(range, heat, cool, Setpoints::ClampMode::kClamp, changedAttributes);
-        if (status == Status::Success)
+        if (status != Status::Success)
         {
-            return SaveSetpoints(endpointId, setpoints, changedAttributes);
+            return status;
         }
+        return SaveSetpoints(endpointId, setpoints, changedAttributes);
     }
 
     return Status::Success;

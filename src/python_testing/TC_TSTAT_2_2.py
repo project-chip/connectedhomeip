@@ -109,7 +109,7 @@ class TC_TSTAT_2_2(MatterBaseTest):
         received_events = []
         while len(received_events) < len(expected_events):
             try:
-                event_result = events_callback.get_event_from_queue(block=True, timeout=0.5)
+                event_result = events_callback.get_event_from_queue(block=True, timeout=self.matter_test_config.timeout)
                 if event_result.Header.EventId == cluster.Events.SetpointChange.event_id:
                     received_events.append(event_result.Data)
             except queue.Empty:
