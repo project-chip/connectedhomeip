@@ -58,7 +58,7 @@ def warning_wrapper(override_flag: str):
     return warning_wrapper_internal
 
 
-class DefaultChecker():
+class DefaultChecker:
     @warning_wrapper(FLAG_PRODUCT_NAME)
     def check_default_product_name(self):
         cluster = Clusters.BasicInformation

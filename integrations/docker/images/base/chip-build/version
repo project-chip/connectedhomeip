@@ -1,1 +1,1 @@
-194 : [crosscompile] Add armhf sysroot, update aarch64 sysroot to build-2026.05.07
+198 : [chip-build] Add openssl 3.5

@@ -7844,7 +7844,7 @@ internal cluster FaultInjection = 4294048774 {
 }
 
 endpoint 0 {
-  device type ma_rootdevice = 22, version 5;
+  device type ma_rootdevice = 22, version 4;
   device type ma_powersource = 17, version 1;
 
   binding cluster OtaSoftwareUpdateProvider;
@@ -8327,7 +8327,7 @@ endpoint 0 {
 }
 endpoint 1 {
   device type ma_powersource = 17, version 1;
-  device type ma_onofflight = 256, version 4;
+  device type ma_onofflight = 256, version 3;
 
   binding cluster OnOff;
 
@@ -9102,7 +9102,7 @@ endpoint 1 {
     ram      attribute maxHeatSetpointLimit default = 0x0BB8;
     ram      attribute minCoolSetpointLimit default = 0x0640;
     ram      attribute maxCoolSetpointLimit default = 0x0C80;
-    ram      attribute minSetpointDeadBand default = 0x19;
+    ram      attribute minSetpointDeadBand default = 0x14;
     ram      attribute controlSequenceOfOperation default = 0x04;
     ram      attribute systemMode default = 0x01;
     callback attribute presetTypes;
@@ -9634,7 +9634,7 @@ endpoint 1 {
 }
 endpoint 2 {
   device type ma_powersource = 17, version 1;
-  device type ma_onofflight = 256, version 4;
+  device type ma_onofflight = 256, version 3;
 
 
   server cluster Identify {
