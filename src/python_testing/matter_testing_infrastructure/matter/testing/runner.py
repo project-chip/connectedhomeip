@@ -29,7 +29,7 @@ import typing
 from binascii import unhexlify
 from dataclasses import asdict as dataclass_asdict
 from dataclasses import dataclass
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from itertools import chain
 from pathlib import Path
 from typing import Any, List, Optional, Tuple
@@ -469,7 +469,7 @@ def run_tests_no_exit(
                 hooks.start(count=1)
                 # Mobly gives the test run time in seconds, lets be a bit more
                 # precise
-                runner_start_time = datetime.now(timezone.utc)
+                runner_start_time = datetime.now(UTC)
 
             try:
                 runner.run()
@@ -486,8 +486,7 @@ def run_tests_no_exit(
                 ok = False
 
     if hooks:
-        duration = (datetime.now(timezone.utc) -
-                    runner_start_time) / timedelta(microseconds=1)
+        duration = (datetime.now(UTC) - runner_start_time) / timedelta(microseconds=1)
         hooks.stop(duration=duration)
 
     if not external_stack:
@@ -543,10 +542,10 @@ class AsyncMock(MagicMock):
     """
 
     async def __call__(self, *args, **kwargs):
-        return super(AsyncMock, self).__call__(*args, **kwargs)
+        return super().__call__(*args, **kwargs)
 
 
-class MockTestRunner():
+class MockTestRunner:
     """
     Test runner for mocking Matter device interactions.
 
@@ -928,9 +927,9 @@ def root_index(s: str) -> int:
         "gamma": 3
     }
 
-    for name, id in CHIP_TOOL_COMPATIBILITY.items():
+    for name, _id in CHIP_TOOL_COMPATIBILITY.items():
         if s.lower() == name:
-            return id
+            return _id
     else:
         root_index = int(s)
         if root_index == 0:
@@ -986,11 +985,13 @@ def parse_matter_test_args(argv: Optional[List[str]] = None):
 
     commission_group.add_argument('-m', '--commissioning-method', type=str,
                                   metavar='METHOD_NAME',
-                                  choices=["on-network", "ble-wifi", "ble-thread", "nfc-thread", "nfc-wifi", "thread-meshcop"],
+                                  choices=["on-network", "ble-wifi", "ble-thread", "nfc-thread",
+                                           "nfc-wifi", "nfc-ethernet", "thread-meshcop"],
                                   help='Name of commissioning method to use')
     commission_group.add_argument('--in-test-commissioning-method', type=str,
                                   metavar='METHOD_NAME',
-                                  choices=["on-network", "ble-wifi", "ble-thread", "nfc-thread", "nfc-wifi", "thread-meshcop"],
+                                  choices=["on-network", "ble-wifi", "ble-thread", "nfc-thread",
+                                           "nfc-wifi", "nfc-ethernet", "thread-meshcop"],
                                   help='Name of commissioning method to use, for commissioning tests')
     commission_group.add_argument('-d', '--discriminator', type=int_decimal_or_hex,
                                   metavar='LONG_DISCRIMINATOR',

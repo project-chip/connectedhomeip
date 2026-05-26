@@ -49,6 +49,9 @@ void MatterClusterServerInitCallback(EndpointId endpoint, ClusterId clusterId)
     case app::Clusters::BasicInformation::Id:
         MatterBasicInformationClusterInitCallback(endpoint);
         break;
+    case app::Clusters::OtaSoftwareUpdateRequestor::Id:
+        MatterOtaSoftwareUpdateRequestorClusterInitCallback(endpoint);
+        break;
     case app::Clusters::LocalizationConfiguration::Id:
         MatterLocalizationConfigurationClusterInitCallback(endpoint);
         break;
@@ -142,6 +145,9 @@ void MatterClusterServerInitCallback(EndpointId endpoint, ClusterId clusterId)
     case app::Clusters::TemperatureMeasurement::Id:
         MatterTemperatureMeasurementClusterInitCallback(endpoint);
         break;
+    case app::Clusters::PressureMeasurement::Id:
+        MatterPressureMeasurementClusterInitCallback(endpoint);
+        break;
     case app::Clusters::FlowMeasurement::Id:
         MatterFlowMeasurementClusterInitCallback(endpoint);
         break;
@@ -187,6 +193,9 @@ void MatterClusterServerShutdownCallback(EndpointId endpoint, ClusterId clusterI
         break;
     case app::Clusters::BasicInformation::Id:
         MatterBasicInformationClusterShutdownCallback(endpoint, shutdownType);
+        break;
+    case app::Clusters::OtaSoftwareUpdateRequestor::Id:
+        MatterOtaSoftwareUpdateRequestorClusterShutdownCallback(endpoint, shutdownType);
         break;
     case app::Clusters::LocalizationConfiguration::Id:
         MatterLocalizationConfigurationClusterShutdownCallback(endpoint, shutdownType);
@@ -280,6 +289,9 @@ void MatterClusterServerShutdownCallback(EndpointId endpoint, ClusterId clusterI
         break;
     case app::Clusters::TemperatureMeasurement::Id:
         MatterTemperatureMeasurementClusterShutdownCallback(endpoint, shutdownType);
+        break;
+    case app::Clusters::PressureMeasurement::Id:
+        MatterPressureMeasurementClusterShutdownCallback(endpoint, shutdownType);
         break;
     case app::Clusters::FlowMeasurement::Id:
         MatterFlowMeasurementClusterShutdownCallback(endpoint, shutdownType);

@@ -228,7 +228,7 @@ class ZAPGenerateTarget:
         )
 
 
-class GoldenTestImageTarget():
+class GoldenTestImageTarget:
     def __init__(self):
         # NOTE: output-path is inside the tree. This is because clang-format
         #       will search for a .clang-format file in the directory tree
@@ -267,7 +267,7 @@ class GoldenTestImageTarget():
         log.info("  %s", shlex.join(self.command))
 
 
-class JinjaCodegenTarget():
+class JinjaCodegenTarget:
     def __init__(self, generator: str, output_directory: str, idl_path: str):
         # This runs a test, but the important bit is we pass `--regenerate`
         # to it and this will cause it to OVERWRITE golden images.
@@ -411,19 +411,19 @@ def getSpecificTemplatesTargets():
     return targets
 
 
-def getTargets(type):
+def getTargets(target_type):
     targets = []
 
-    if type & TargetType.GLOBAL:
+    if target_type & TargetType.GLOBAL:
         targets.extend(getGlobalTemplatesTargets())
 
-    if type & TargetType.SPECIFIC:
+    if target_type & TargetType.SPECIFIC:
         targets.extend(getSpecificTemplatesTargets())
 
-    if type & TargetType.IDL_CODEGEN:
+    if target_type & TargetType.IDL_CODEGEN:
         targets.extend(getCodegenTemplates())
 
-    if type & TargetType.GOLDEN_TEST_IMAGES:
+    if target_type & TargetType.GOLDEN_TEST_IMAGES:
         targets.extend(getGoldenTestImageTargets())
 
     log.info("Targets to be generated:")

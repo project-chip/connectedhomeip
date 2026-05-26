@@ -50,13 +50,13 @@ public:
         // Try to read the default value for these mandatory attributes but do not fail if the operation is not successful.
         // This is because not all apps are setting a default value for them in ember.
         DataModel::Nullable<uint16_t> minMeasuredValue{};
-        if (MinMeasuredValue::Get(endpointId, minMeasuredValue) != Status::Success)
+        if (MinMeasuredValue::GetDefault(endpointId, minMeasuredValue) != Status::Success)
         {
             minMeasuredValue.SetNull();
         }
 
         DataModel::Nullable<uint16_t> maxMeasuredValue{};
-        if (MaxMeasuredValue::Get(endpointId, maxMeasuredValue) != Status::Success)
+        if (MaxMeasuredValue::GetDefault(endpointId, maxMeasuredValue) != Status::Success)
         {
             maxMeasuredValue.SetNull();
         }
@@ -64,13 +64,13 @@ public:
         uint16_t tolerance{};
         if (optionalAttributeSet.IsSet(Tolerance::Id))
         {
-            VerifyOrDie(Tolerance::Get(endpointId, &tolerance) == Status::Success);
+            VerifyOrDie(Tolerance::GetDefault(endpointId, &tolerance) == Status::Success);
         }
 
         DataModel::Nullable<LightSensorTypeEnum> lightSensorType{};
         if (optionalAttributeSet.IsSet(LightSensorType::Id))
         {
-            VerifyOrDie(LightSensorType::Get(endpointId, lightSensorType) == Status::Success);
+            VerifyOrDie(LightSensorType::GetDefault(endpointId, lightSensorType) == Status::Success);
         }
 
         gServers[clusterInstanceIndex].Create(endpointId, optionalAttributeSet,

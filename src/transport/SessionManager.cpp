@@ -228,8 +228,8 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
         Credentials::GroupDataProvider::GroupInfo info;
         ReturnErrorOnFailure(groups->GetGroupInfo(groupSession->GetFabricIndex(), groupSession->GetGroupId(), info));
         destination_address = (info.UsePerGroupAddress())
-            ? Transport::PeerAddress::Multicast(fabric->GetFabricId(), groupSession->GetGroupId())
-            : Transport::PeerAddress::Groupcast();
+            ? Transport::PeerAddress::BuildMatterPerGroupMulticastAddress(fabric->GetFabricId(), groupSession->GetGroupId())
+            : Transport::PeerAddress::BuildMatterIanaMulticastAddress();
 
         Crypto::SymmetricKeyContext * keyContext =
             groups->GetKeyContext(groupSession->GetFabricIndex(), groupSession->GetGroupId());
@@ -431,8 +431,8 @@ CHIP_ERROR SessionManager::SendPreparedMessage(const SessionHandle & sessionHand
         Credentials::GroupDataProvider::GroupInfo info;
         ReturnErrorOnFailure(groups->GetGroupInfo(groupSession->GetFabricIndex(), groupSession->GetGroupId(), info));
         multicastAddress = (info.UsePerGroupAddress())
-            ? Transport::PeerAddress::Multicast(fabric->GetFabricId(), groupSession->GetGroupId())
-            : Transport::PeerAddress::Groupcast();
+            ? Transport::PeerAddress::BuildMatterPerGroupMulticastAddress(fabric->GetFabricId(), groupSession->GetGroupId())
+            : Transport::PeerAddress::BuildMatterIanaMulticastAddress();
         destination      = &multicastAddress;
     }
     break;
@@ -1057,6 +1057,11 @@ static bool GroupKeyDecryptAttempt(const PacketHeader & partialPacketHeader, Pac
         // Perform privacy deobfuscation, if applicable.
         uint8_t * privacyHeader = partialPacketHeader.PrivacyHeader(msgCopy->Start());
         size_t privacyLength    = partialPacketHeader.PrivacyHeaderLength();
+
+        // Bounds check: we decrypt in place a privacy header located inside the packet.
+        // Validate that we are still within the packet as the length is based on header flags.
+        VerifyOrReturnValue(privacyHeader + privacyLength <= msgCopy->Start() + msgCopy->DataLength(), false);
+
         if (CHIP_NO_ERROR != context.PrivacyDecrypt(privacyHeader, privacyLength, privacyHeader, partialPacketHeader, mac))
         {
             return false;
@@ -1169,14 +1174,29 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & partialPack
     iter.Release();
     // Groupcast Testing
     auto & testing = chip::Groupcast::GetTesting();
-    if (testing.IsEnabled() && testing.IsFabricUnderTest(groupContext.fabric_index))
+
+    if (testing.IsEnabled())
     {
-        testing.SetGroupID(packetHeaderCopy.GetDestinationGroupId().Value());
-        if (!decrypted)
+        if (decrypted)
         {
+            // We have a valid groupContext from the loop
+            if (testing.IsFabricUnderTest(groupContext.fabric_index))
+            {
+                testing.SetGroupID(packetHeaderCopy.GetDestinationGroupId().Value());
+            }
+        }
+        else
+        {
+            // FAILURE CASE: No valid groupContext or decryption failed. This can happen
+            // when there is an empty group key map. This means GroupSessions cannot be
+            // iterated over to populate groupContext, and the fabric index cannot be
+            // explicitly checked here.
+
             testing.SetTestResult(chip::Groupcast::Testing::Result::kNoAvailableKey);
+            testing.NotifyDelegate();
         }
     }
+
     if (!decrypted)
     {
         ChipLogError(Inet, "Failed to decrypt group message. Discarding everything");

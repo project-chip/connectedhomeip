@@ -1,5 +1,5 @@
 #
-#    Copyright (c) 2022-2025 Project CHIP Authors
+#    Copyright (c) 2022-2026 Project CHIP Authors
 #    All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
@@ -31,9 +31,9 @@ import textwrap
 import time
 import typing
 from dataclasses import asdict, dataclass
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from enum import IntFlag
-from typing import Any, Callable, List, Optional, Type, Union
+from typing import Any, Callable, List, Optional, Tuple, Type, Union
 
 import matter.testing.matchers as matchers
 
@@ -135,7 +135,7 @@ class AttributeMatcher:
         return self._description
 
     @staticmethod
-    def from_callable(description: str, matcher: Callable[[AttributeValue], bool]) -> "AttributeMatcher":
+    def from_callable(description: str, matcher: Callable[[AttributeValue], bool]) -> AttributeMatcher:
         """Take a single callable and wrap it into an AttributeMatcher object. Useful to wrap closures."""
         class AttributeMatcherFromCallable(AttributeMatcher):
             def __init__(self, description, matcher: Callable[[AttributeValue], bool]):
@@ -176,7 +176,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         # List of accumulated problems across all tests
         self.problems = []
         self.is_commissioning = False
-        self.cached_steps: dict[str, list[TestStep]] = {}
+        self.cached_steps: dict[str, Optional[list[TestStep]]] = {}
 
     #
     # Mobly Test Controller Methods (Framework Interface)
@@ -213,7 +213,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         # TODO: Move to using non-generated code and rather use data model description (.matter or .xml)
         self.cluster_mapper = ClusterMapper(self.default_controller._Cluster)
         self.current_step_index = 0
-        self.step_start_time = datetime.now(timezone.utc)
+        self.step_start_time = datetime.now(UTC)
         self.step_skipped = False
         # self.stored_global_wildcard stores value of self.global_wildcard after first async call.
         # Because setup_class can be called before commissioning, this variable is lazy-initialized
@@ -349,8 +349,8 @@ class MatterBaseTest(base_test.BaseTestClass):
         Test authors that implement this method should ensure super().setup_test() is called before any custom setup.
         """
         self.current_step_index = 0
-        self.test_start_time = datetime.now(timezone.utc)
-        self.step_start_time = datetime.now(timezone.utc)
+        self.test_start_time = datetime.now(UTC)
+        self.step_start_time = datetime.now(UTC)
         self.step_skipped = False
         self.failed = False
         if self.runner_hook and not self.is_commissioning:
@@ -382,12 +382,12 @@ class MatterBaseTest(base_test.BaseTestClass):
             exception = record.termination_signal.exception
 
             try:
-                step_duration = (datetime.now(timezone.utc) - self.step_start_time) / timedelta(microseconds=1)
+                step_duration = (datetime.now(UTC) - self.step_start_time) / timedelta(microseconds=1)
             except AttributeError:
                 # If we failed during setup, these may not be populated
                 step_duration = 0
             try:
-                test_duration = (datetime.now(timezone.utc) - self.test_start_time) / timedelta(microseconds=1)
+                test_duration = (datetime.now(UTC) - self.test_start_time) / timedelta(microseconds=1)
             except AttributeError:
                 test_duration = 0
             # TODO: I have no idea what logger, logs, request or received are. Hope None works because I have nothing to give
@@ -475,8 +475,8 @@ class MatterBaseTest(base_test.BaseTestClass):
         if self.runner_hook and not self.is_commissioning:
             # What is request? This seems like an implementation detail for the runner
             # TODO: As with failure, I have no idea what logger, logs or request are meant to be
-            step_duration = (datetime.now(timezone.utc) - self.step_start_time) / timedelta(microseconds=1)
-            test_duration = (datetime.now(timezone.utc) - self.test_start_time) / timedelta(microseconds=1)
+            step_duration = (datetime.now(UTC) - self.step_start_time) / timedelta(microseconds=1)
+            test_duration = (datetime.now(UTC) - self.test_start_time) / timedelta(microseconds=1)
             self.runner_hook.step_success(logger=None, logs=None, duration=step_duration, request=None)
 
         # TODO: this check could easily be annoying when doing dev. flag it somehow? Ditto with the in-order check
@@ -505,7 +505,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             record: TestResultRecord containing skip information.
         """
         if self.runner_hook and not self.is_commissioning:
-            test_duration = (datetime.now(timezone.utc) - self.test_start_time) / timedelta(microseconds=1)
+            test_duration = (datetime.now(UTC) - self.test_start_time) / timedelta(microseconds=1)
             test_name = self.current_test_info.name
             filename = inspect.getfile(self.__class__)
             self.runner_hook.test_skipped(filename, test_name)
@@ -620,18 +620,26 @@ class MatterBaseTest(base_test.BaseTestClass):
         return [TestStep(1, "Run entire test")] if steps is None else steps
 
     def get_defined_test_steps(self, test: str) -> Optional[list[TestStep]]:
-        """Retrieves test steps from a 'steps_*' function, using a cache."""
-        steps_name = f'steps_{test.removeprefix("test_")}'
+        """Retrieves test steps from a 'steps_*' function or AST extraction, using a cache.
+
+        Checks for an explicit steps_* method first. If none exists, falls back to
+        extracting steps from self.step() calls in the test method's source code.
+
+        Returns None if no steps are defined by either mechanism.
+        """
         if test in self.cached_steps:
             return self.cached_steps[test]
 
-        try:
-            fn = getattr(self, steps_name)
-            steps = fn()
-            self.cached_steps[test] = steps
-            return fn()
-        except AttributeError:
-            return None
+        steps = None
+        if steps_method := getattr(self, 'steps_' + test.removeprefix('test_'), None):
+            steps = steps_method()
+        else:
+            test_method = getattr(self, test)
+            from matter.testing.step_extractor import extract_steps_from_method
+            steps = extract_steps_from_method(test_method) or None
+
+        self.cached_steps[test] = steps
+        return steps
 
     def get_restart_flag_file(self) -> Optional[str]:
         if self.matter_test_config.restart_flag_file is None:
@@ -651,27 +659,27 @@ class MatterBaseTest(base_test.BaseTestClass):
         return [] if pics is None else pics
 
     def _get_defined_pics(self, test: str) -> Optional[list[str]]:
-        """Retrieve PICS list from a 'pics_*' function if it exists.
+        """Retrieve PICS list from a 'pics_*' function or @pics decorator.
+
+        The pics_* method takes precedence over the @pics decorator.
 
         Args:
             test: Name of the test to get PICS for.
 
         Returns:
-            List of PICS strings if pics function exists, None otherwise.
+            List of PICS strings if pics function or decorator exists, None otherwise.
         """
-        steps_name = f'pics_{test.removeprefix("test_")}'
-        try:
-            fn = getattr(self, steps_name)
-            return fn()
-        except AttributeError:
-            return None
+        if pics_method := getattr(self, 'pics_' + test.removeprefix('test_'), None):
+            return pics_method()
+        test_method = getattr(self, test)
+        return getattr(test_method, '_pics', None)  # set by @pics
 
     def get_test_desc(self, test: str) -> str:
         ''' Returns a description of this test
 
-            Test description is defined in the function called desc_<functionname>.
-            ex for test test_TC_TEST_1_1, the steps are in a function called
-            desc_TC_TEST_1_1.
+            Test description is defined in the function called desc_<functionname>,
+            or as a docstring on the test method itself.
+            The desc_* method takes precedence if both are defined.
 
             Format:
             <Test plan reference> [<test plan number>] <test plan name>
@@ -679,12 +687,12 @@ class MatterBaseTest(base_test.BaseTestClass):
             ex:
             133.1.1. [TC-ACL-1.1] Global attributes
         '''
-        desc_name = f'desc_{test.removeprefix("test_")}'
-        try:
-            fn = getattr(self, desc_name)
-            return fn()
-        except AttributeError:
-            return test
+        if desc_method := getattr(self, 'desc_' + test.removeprefix('test_'), None):
+            return desc_method()
+        test_method = getattr(self, test)
+        if doc := test_method.__doc__:
+            return doc.strip()
+        return test
 
     #
     # Matter Test API - Step Management & Execution
@@ -692,17 +700,30 @@ class MatterBaseTest(base_test.BaseTestClass):
     # These methods are used to mark test progress for the test harness and logs, to help with test
     # debugging, issue creation and log analysis by the test labs.
 
-    def step(self, step: typing.Union[int, str]):
+    def step(self, step: typing.Union[int, str], description: str = "", *,
+             is_commissioning: bool = False, expectation: str = ""):
         """Execute a test step and manage step progression.
 
         Validates step order, prints step information, and notifies runner hooks.
 
         Args:
             step: The step number or identifier to execute.
+            description: Step description for inline step definitions.
+                Should always be provided (not empty) when any keyword arguments
+                (is_commissioning, expectation) are passed.
+            is_commissioning: Mark this step as the commissioning step (keyword-only).
+            expectation: Expected outcome for test plan generation (keyword-only).
+
+            All arguments to step() must be constants for automatic extraction of
+            the test step list to work. If dynamic step() parameters are required
+            an explicit `steps_` method must be defined.
 
         Raises:
             AssertionError: If steps are called out of order or step doesn't exist.
         """
+        # description, is_commissioning, and expectation are not used at runtime.
+        # They exist so the AST step extractor can read them from source code to
+        # build the step list without needing a separate steps_* method.
         test_name = self.current_test_info.name
         steps = self.get_test_steps(test_name)
 
@@ -717,14 +738,14 @@ class MatterBaseTest(base_test.BaseTestClass):
             # If we've reached the next step with no assertion and the step wasn't skipped, it passed
             if not self.step_skipped and self.current_step_index != 0:
                 # TODO: As with failure, I have no idea what loger, logs or request are meant to be
-                step_duration = (datetime.now(timezone.utc) - self.step_start_time) / timedelta(microseconds=1)
+                step_duration = (datetime.now(UTC) - self.step_start_time) / timedelta(microseconds=1)
                 self.runner_hook.step_success(logger=None, logs=None, duration=step_duration, request=None)
 
             # TODO: it seems like the step start should take a number and a name
             name = f'{step} : {current_step.description}'
             self.runner_hook.step_start(name=name)
 
-        self.step_start_time = datetime.now(tz=timezone.utc)
+        self.step_start_time = datetime.now(tz=UTC)
         self.current_step_index = self.current_step_index + 1
         self.step_skipped = False
 
@@ -1045,6 +1066,30 @@ class MatterBaseTest(base_test.BaseTestClass):
                 self.record_error(test_name=test_name, location=location, problem=type_err_msg)
                 return None
         return attr_ret
+
+    async def poll_until_attributes_in_range(
+            self, cluster: ClusterObjects.Cluster,
+            attribute_bounds: List[Tuple[Type[ClusterObjects.ClusterAttributeDescriptor], int, int]],
+            timeout_sec: int = 1) -> None:
+        """Poll attributes until each value falls within [min_value, max_value].
+
+        Args:
+            cluster: Cluster to read attributes from.
+            attribute_bounds: List of (attribute, min_value, max_value) tuples.
+            timeout_sec: Maximum time to wait for each attribute to be in range.
+
+        Raises:
+            TimeoutError: If any attribute does not reach its expected range before timeout.
+        """
+        for attribute, min_value, max_value in attribute_bounds:
+            deadline = time.monotonic() + timeout_sec
+            value = await self.read_single_attribute_check_success(cluster, attribute)
+            while value < min_value or value > max_value:  # type: ignore[operator]
+                if time.monotonic() >= deadline:
+                    raise TimeoutError(
+                        f"Timeout waiting for {attribute} to be in range [{min_value}, {max_value}], last value: {value}")
+                await asyncio.sleep(0.1)
+                value = await self.read_single_attribute_check_success(cluster, attribute)
 
     async def read_single_attribute_expect_error(
             self, cluster: ClusterObjects.Cluster, attribute: Type[ClusterObjects.ClusterAttributeDescriptor],

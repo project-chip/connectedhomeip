@@ -22,7 +22,6 @@
 #      BLE Central support for Chip Device Manager via BlueZ APIs.
 #
 
-from __future__ import absolute_import, print_function
 
 import logging
 import queue
@@ -81,11 +80,11 @@ def get_bluez_objects(bluez, bus, interface, prefix_path):
         delegates = item[1].get(interface)
         if not delegates:
             continue
-        slice = {}
         if item[0].startswith(prefix_path):
-            slice["object"] = bus.get_object(BLUEZ_NAME, item[0])
-            slice["path"] = item[0]
-            results.append(slice)
+            results.append({
+                "object": bus.get_object(BLUEZ_NAME, item[0]),
+                "path": item[0]
+            })
     return results
 
 
@@ -206,9 +205,9 @@ class BluezDbusAdapter:
             LOGGER.debug(traceback.format_exc())
             return None
 
-    def SetDiscoveryFilter(self, dict):
+    def SetDiscoveryFilter(self, f: dict):
         try:
-            self.adapter.SetDiscoveryFilter(dict)
+            self.adapter.SetDiscoveryFilter(f)
         except dbus.exceptions.DBusException as ex:
             LOGGER.debug(str(ex))
         except Exception:

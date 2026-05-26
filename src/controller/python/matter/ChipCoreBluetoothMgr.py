@@ -22,7 +22,6 @@
 #      BLE Central support for Chip Device Controller via OSX CoreBluetooth APIs.
 #
 
-from __future__ import absolute_import, print_function
 
 import logging
 import queue
@@ -44,16 +43,14 @@ try:
         "CoreBluetooth",
         globals(),
         bundle_path=objc.pathForFramework(
-            u"/System/Library/Frameworks/IOBluetooth.framework/Versions/A/Frameworks/CoreBluetooth.framework"
+            "/System/Library/Frameworks/IOBluetooth.framework/Versions/A/Frameworks/CoreBluetooth.framework"
         ),
     )
 except Exception:
     objc.loadBundle(
         "CoreBluetooth",
         globals(),
-        bundle_path=objc.pathForFramework(
-            u"/System/Library/Frameworks/CoreBluetooth.framework"
-        ),
+        bundle_path=objc.pathForFramework("/System/Library/Frameworks/CoreBluetooth.framework"),
     )
 
 LOGGER = logging.getLogger(__name__)
@@ -62,19 +59,17 @@ BLE_PERIPHERAL_STATE_DISCONNECTED = 0
 CBCharacteristicWriteWithResponse = 0
 CBCharacteristicWriteWithoutResponse = 1
 
-CHIP_SERVICE = CBUUID.UUIDWithString_(u"0000FFF6-0000-1000-8000-00805F9B34FB")
-CHIP_SERVICE_SHORT = CBUUID.UUIDWithString_(u"FFF6")
-CHIP_TX = CBUUID.UUIDWithString_(u"18EE2EF5-263D-4559-959F-4F9C429F9D11")
-CHIP_RX = CBUUID.UUIDWithString_(u"18EE2EF5-263D-4559-959F-4F9C429F9D12")
-CHROMECAST_SETUP_SERVICE = CBUUID.UUIDWithString_(
-    u"0000FEA0-0000-1000-8000-00805F9B34FB"
-)
-CHROMECAST_SETUP_SERVICE_SHORT = CBUUID.UUIDWithString_(u"FEA0")
+CHIP_SERVICE = CBUUID.UUIDWithString_("0000FFF6-0000-1000-8000-00805F9B34FB")
+CHIP_SERVICE_SHORT = CBUUID.UUIDWithString_("FFF6")
+CHIP_TX = CBUUID.UUIDWithString_("18EE2EF5-263D-4559-959F-4F9C429F9D11")
+CHIP_RX = CBUUID.UUIDWithString_("18EE2EF5-263D-4559-959F-4F9C429F9D12")
+CHROMECAST_SETUP_SERVICE = CBUUID.UUIDWithString_("0000FEA0-0000-1000-8000-00805F9B34FB")
+CHROMECAST_SETUP_SERVICE_SHORT = CBUUID.UUIDWithString_("FEA0")
 
 
-def _VoidPtrToCBUUID(ptr, len):
+def _VoidPtrToCBUUID(ptr, length):
     try:
-        ptr = ChipUtility.VoidPtrToByteArray(ptr, len)
+        ptr = ChipUtility.VoidPtrToByteArray(ptr, length)
         ptr = ChipUtility.Hexlify(ptr)
         ptr = (
             ptr[:8]
@@ -415,14 +410,14 @@ class CoreBluetoothManager(ChipBleBase):
         """Called by CoreBluetooth via runloop when a new characteristic value is received for a
         characteristic to which this device has subscribed."""
         # len = characteristic.value().length()
-        bytes = bytearray(characteristic.value().bytes().tobytes())
+        buf = bytearray(characteristic.value().bytes().tobytes())
         charId = bytearray(characteristic.UUID().data().bytes().tobytes())
         svcId = bytearray(CHIP_SERVICE.data().bytes().tobytes())
 
         # Kick Chip thread to retrieve the saved packet.
         if self.devCtrl:
             # Save buffer, length, service UUID and characteristic UUID
-            rxEvent = BleRxEvent(charId=charId, svcId=svcId, buffer=bytes)
+            rxEvent = BleRxEvent(charId=charId, svcId=svcId, buffer=buf)
             self.chip_queue.put(rxEvent)
             self.devCtrl.DriveBleIO()
 
@@ -531,6 +526,6 @@ class CoreBluetoothManager(ChipBleBase):
 
         return True
 
-    def updateCharacteristic(self, bytes, svcId, charId):
+    def updateCharacteristic(self, buf, svcId, charId):
         # TODO: implement this for Peripheral support.
         return False

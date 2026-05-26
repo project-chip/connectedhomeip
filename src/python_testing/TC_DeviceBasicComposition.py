@@ -340,9 +340,12 @@ class TC_DeviceBasicComposition(BasicCompositionTests):
                                   problem=f'Root node does not contain required cluster {c}', spec_location="Root node device type")
                 self.fail_current_test()
 
-        self.print_step(6, "Verify that the specification version is 1.6 or above for the next steps")
+        # NOTE: This was provisional in 1.6.0, but due to issues with reaching the finish line,
+        #       this step was punted to a later release to reduce friction for SVE participants.
+        self.print_step(6, "Verify that the specification version is above 1.6.0 for the next steps")
         specification_version = root[Clusters.BasicInformation].get(Clusters.BasicInformation.Attributes.SpecificationVersion, 0)
-        if specification_version >= 0x01060000:
+        # Gate Groupcast requirements on Matter > 1.6.0
+        if specification_version > 0x01060000:
             groupcast_feature_map = 0
             if Clusters.Groupcast in root:
                 groupcast_feature_map = root[Clusters.Groupcast][Clusters.Groupcast.Attributes.FeatureMap]
@@ -376,6 +379,14 @@ class TC_DeviceBasicComposition(BasicCompositionTests):
                                   "feature is not present on the root node (EP0)",
                                   spec_location="Root node device type - GroupcastSenderCond")
                 self.fail_current_test()
+            if has_groupcast_listener:
+                acl_feature_map = root[Clusters.AccessControl][Clusters.AccessControl.Attributes.FeatureMap]
+                has_acl_aux = bool(acl_feature_map & Clusters.AccessControl.Bitmaps.Feature.kAuxiliary)
+                if not has_acl_aux:
+                    self.record_error(self.get_test_name(), location=AttributePathLocation(endpoint_id=0),
+                                      problem="Groupcast with Listener feature is on EP0 but Access Control cluster does not have Auxiliary feature",
+                                      spec_location="Root node device type - GroupcastListenerCond")
+                    self.fail_current_test()
 
     def test_TC_DT_1_1(self):
         self.print_step(1, "Perform a wildcard read of attributes on all endpoints - already done")
@@ -545,8 +556,9 @@ class TC_DeviceBasicComposition(BasicCompositionTests):
         mei_range_min = 0x0001_0000
         for endpoint_id, endpoint in self.endpoints_tlv.items():
             for cluster_id, cluster in endpoint.items():
-                globals = [a for a in cluster[GlobalAttributeIds.ATTRIBUTE_LIST_ID] if a >= global_range_min and a < mei_range_min]
-                unexpected_globals = sorted(set(globals) - set(allowed_globals))
+                endpoint_globals = filter(lambda a: a >= global_range_min and a < mei_range_min,
+                                          cluster[GlobalAttributeIds.ATTRIBUTE_LIST_ID])
+                unexpected_globals = sorted(set(endpoint_globals) - set(allowed_globals))
                 for unexpected in unexpected_globals:
                     location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, attribute_id=unexpected)
                     self.record_error(self.get_test_name(), location=location,
@@ -844,10 +856,10 @@ class TC_DeviceBasicComposition(BasicCompositionTests):
         self.print_step(5, "Check for cycles in the tree endpoints")
         part_list_errors = parts_list_problems(tree, self.endpoints)
         if len(part_list_errors) != 0:
-            for id in part_list_errors:
-                location = AttributePathLocation(endpoint_id=id, cluster_id=cluster_id, attribute_id=attribute_id)
+            for _id in part_list_errors:
+                location = AttributePathLocation(endpoint_id=_id, cluster_id=cluster_id, attribute_id=attribute_id)
                 self.record_error(self.get_test_name(), location=location,
-                                  problem=f"Endpoint {id} parts list includes a cycle or endpoint with multiple paths to the root or non-existent endpoint", spec_location="PartsList Attribute")
+                                  problem=f"Endpoint {_id} parts list includes a cycle or endpoint with multiple paths to the root or non-existent endpoint", spec_location="PartsList Attribute")
             self.fail_current_test()
 
         self.print_step(6, "Check flat lists include all sub ids")
@@ -930,7 +942,7 @@ class TC_DeviceBasicComposition(BasicCompositionTests):
                                          [Clusters.Descriptor.Attributes.DeviceTypeList]]
             parts_list[endpoint_id] = endpoint[Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList]
 
-        bridged_nodes = [id for (id, dev_type) in device_types.items() if BRIDGED_NODE_DEVICE_TYPE_ID in dev_type]
+        bridged_nodes = [_id for (_id, dev_type) in device_types.items() if BRIDGED_NODE_DEVICE_TYPE_ID in dev_type]
 
         for endpoint_id in bridged_nodes:
             if Clusters.PowerSource not in self.endpoints[endpoint_id]:

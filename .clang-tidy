@@ -26,6 +26,7 @@ Checks: >
   -bugprone-not-null-terminated-result,
   -bugprone-pointer-arithmetic-on-polymorphic-object,
   -bugprone-reserved-identifier,
+  -bugprone-signed-bitwise,
   -bugprone-signed-char-misuse,
   -bugprone-suspicious-include,
   -bugprone-switch-missing-default-case,

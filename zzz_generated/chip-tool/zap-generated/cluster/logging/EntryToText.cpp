@@ -205,6 +205,8 @@ char const * ClusterIdToText(chip::ClusterId id)
         return "ColorControl";
     case chip::app::Clusters::BallastConfiguration::Id:
         return "BallastConfiguration";
+    case chip::app::Clusters::DynamicLighting::Id:
+        return "DynamicLighting";
     case chip::app::Clusters::IlluminanceMeasurement::Id:
         return "IlluminanceMeasurement";
     case chip::app::Clusters::TemperatureMeasurement::Id:
@@ -243,6 +245,8 @@ char const * ClusterIdToText(chip::ClusterId id)
         return "AmbientContextSensing";
     case chip::app::Clusters::ProximityRanging::Id:
         return "ProximityRanging";
+    case chip::app::Clusters::NetworkIdentityManagement::Id:
+        return "NetworkIdentityManagement";
     case chip::app::Clusters::WiFiNetworkManagement::Id:
         return "WiFiNetworkManagement";
     case chip::app::Clusters::ThreadBorderRouterManagement::Id:
@@ -3412,6 +3416,29 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "Unknown";
         }
     }
+    case chip::app::Clusters::DynamicLighting::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::DynamicLighting::Attributes::AvailableEffects::Id:
+            return "AvailableEffects";
+        case chip::app::Clusters::DynamicLighting::Attributes::CurrentEffectID::Id:
+            return "CurrentEffectID";
+        case chip::app::Clusters::DynamicLighting::Attributes::CurrentSpeed::Id:
+            return "CurrentSpeed";
+        case chip::app::Clusters::DynamicLighting::Attributes::GeneratedCommandList::Id:
+            return "GeneratedCommandList";
+        case chip::app::Clusters::DynamicLighting::Attributes::AcceptedCommandList::Id:
+            return "AcceptedCommandList";
+        case chip::app::Clusters::DynamicLighting::Attributes::AttributeList::Id:
+            return "AttributeList";
+        case chip::app::Clusters::DynamicLighting::Attributes::FeatureMap::Id:
+            return "FeatureMap";
+        case chip::app::Clusters::DynamicLighting::Attributes::ClusterRevision::Id:
+            return "ClusterRevision";
+        default:
+            return "Unknown";
+        }
+    }
     case chip::app::Clusters::IlluminanceMeasurement::Id: {
         switch (id)
         {
@@ -4079,6 +4106,29 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "Unknown";
         }
     }
+    case chip::app::Clusters::NetworkIdentityManagement::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::NetworkIdentityManagement::Attributes::ActiveNetworkIdentities::Id:
+            return "ActiveNetworkIdentities";
+        case chip::app::Clusters::NetworkIdentityManagement::Attributes::Clients::Id:
+            return "Clients";
+        case chip::app::Clusters::NetworkIdentityManagement::Attributes::ClientTableSize::Id:
+            return "ClientTableSize";
+        case chip::app::Clusters::NetworkIdentityManagement::Attributes::GeneratedCommandList::Id:
+            return "GeneratedCommandList";
+        case chip::app::Clusters::NetworkIdentityManagement::Attributes::AcceptedCommandList::Id:
+            return "AcceptedCommandList";
+        case chip::app::Clusters::NetworkIdentityManagement::Attributes::AttributeList::Id:
+            return "AttributeList";
+        case chip::app::Clusters::NetworkIdentityManagement::Attributes::FeatureMap::Id:
+            return "FeatureMap";
+        case chip::app::Clusters::NetworkIdentityManagement::Attributes::ClusterRevision::Id:
+            return "ClusterRevision";
+        default:
+            return "Unknown";
+        }
+    }
     case chip::app::Clusters::WiFiNetworkManagement::Id: {
         switch (id)
         {
@@ -4596,6 +4646,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "StatusLightEnabled";
         case chip::app::Clusters::CameraAvStreamManagement::Attributes::StatusLightBrightness::Id:
             return "StatusLightBrightness";
+        case chip::app::Clusters::CameraAvStreamManagement::Attributes::ImageRotationDiscreteAngles::Id:
+            return "ImageRotationDiscreteAngles";
         case chip::app::Clusters::CameraAvStreamManagement::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::CameraAvStreamManagement::Attributes::AcceptedCommandList::Id:
@@ -6104,6 +6156,17 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "Unknown";
         }
     }
+    case chip::app::Clusters::DynamicLighting::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::DynamicLighting::Commands::StartEffect::Id:
+            return "StartEffect";
+        case chip::app::Clusters::DynamicLighting::Commands::StopEffect::Id:
+            return "StopEffect";
+        default:
+            return "Unknown";
+        }
+    }
     case chip::app::Clusters::ProximityRanging::Id: {
         switch (id)
         {
@@ -6111,6 +6174,23 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "StartRangingRequest";
         case chip::app::Clusters::ProximityRanging::Commands::StopRangingRequest::Id:
             return "StopRangingRequest";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::NetworkIdentityManagement::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::NetworkIdentityManagement::Commands::AddClient::Id:
+            return "AddClient";
+        case chip::app::Clusters::NetworkIdentityManagement::Commands::RemoveClient::Id:
+            return "RemoveClient";
+        case chip::app::Clusters::NetworkIdentityManagement::Commands::QueryIdentity::Id:
+            return "QueryIdentity";
+        case chip::app::Clusters::NetworkIdentityManagement::Commands::ImportAdminSecret::Id:
+            return "ImportAdminSecret";
+        case chip::app::Clusters::NetworkIdentityManagement::Commands::ExportAdminSecret::Id:
+            return "ExportAdminSecret";
         default:
             return "Unknown";
         }
@@ -7032,6 +7112,19 @@ char const * GeneratedCommandIdToText(chip::ClusterId cluster, chip::CommandId i
             return "Unknown";
         }
     }
+    case chip::app::Clusters::NetworkIdentityManagement::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::NetworkIdentityManagement::Commands::AddClientResponse::Id:
+            return "AddClientResponse";
+        case chip::app::Clusters::NetworkIdentityManagement::Commands::QueryIdentityResponse::Id:
+            return "QueryIdentityResponse";
+        case chip::app::Clusters::NetworkIdentityManagement::Commands::ExportAdminSecretResponse::Id:
+            return "ExportAdminSecretResponse";
+        default:
+            return "Unknown";
+        }
+    }
     case chip::app::Clusters::WiFiNetworkManagement::Id: {
         switch (id)
         {
@@ -7390,6 +7483,8 @@ char const * DeviceTypeIdToText(chip::DeviceTypeId id)
         return "Oven";
     case 0x0000007C:
         return "Laundry Dryer";
+    case 0x0000007D:
+        return "Humidifier/Dehumidifier";
     case 0x00000090:
         return "Network Infrastructure Manager";
     case 0x00000091:

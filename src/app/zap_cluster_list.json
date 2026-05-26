@@ -81,6 +81,7 @@
         "MESSAGES_CLUSTER": [],
         "MODE_SELECT_CLUSTER": [],
         "NETWORK_COMMISSIONING_CLUSTER": [],
+        "NETWORK_IDENTITY_MANAGEMENT_CLUSTER": [],
         "PROXIMITY_RANGING_CLUSTER": [],
         "PUSH_AV_STREAM_TRANSPORT_CLUSTER": [],
         "SAMPLE_MEI_CLUSTER": [],
@@ -153,6 +154,7 @@
         "WIFI_NETWORK_DIAGNOSTICS_CLUSTER": [],
         "WINDOW_COVERING_CLUSTER": [],
         "WI_FI_NETWORK_DIAGNOSTICS_CLUSTER": [],
+        "WIFI_NETWORK_MANAGEMENT_CLUSTER": [],
         "ZONE_MANAGEMENT_CLUSTER": []
     },
     "ServerDirectories": {
@@ -217,7 +219,7 @@
             "electrical-grid-conditions-server"
         ],
         "GROUPCAST_CLUSTER": ["groupcast"],
-        "HUMIDISTAT_CLUSTER": [],
+        "HUMIDISTAT_CLUSTER": ["humidistat-server"],
         "METER_IDENTIFICATION_CLUSTER": ["meter-identification-server"],
         "MICROWAVE_OVEN_MODE_CLUSTER": ["mode-base-server"],
         "DOOR_LOCK_CLUSTER": ["door-lock-server"],
@@ -266,10 +268,13 @@
         "MESSAGES_CLUSTER": ["messages-server"],
         "MODE_SELECT_CLUSTER": ["mode-select-server"],
         "NETWORK_COMMISSIONING_CLUSTER": ["network-commissioning"],
+        "NETWORK_IDENTITY_MANAGEMENT_CLUSTER": [
+            "network-identity-management-server"
+        ],
         "NITROGEN_DIOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER": [
             "concentration-measurement-server"
         ],
-        "PROXIMITY_RANGING_CLUSTER": [],
+        "PROXIMITY_RANGING_CLUSTER": ["proximity-ranging-server"],
         "PUSH_AV_STREAM_TRANSPORT_CLUSTER": ["push-av-stream-transport-server"],
         "SAMPLE_MEI_CLUSTER": ["sample-mei-server"],
         "OCCUPANCY_SENSING_CLUSTER": ["occupancy-sensor-server"],
@@ -302,7 +307,7 @@
         "POWER_SOURCE_CONFIGURATION_CLUSTER": [
             "power-source-configuration-server"
         ],
-        "PRESSURE_MEASUREMENT_CLUSTER": [],
+        "PRESSURE_MEASUREMENT_CLUSTER": ["pressure-measurement-server"],
         "PROXY_CONFIGURATION_CLUSTER": [],
         "PROXY_DISCOVERY_CLUSTER": [],
         "PROXY_VALID_CLUSTER": [],
