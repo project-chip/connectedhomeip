@@ -126,24 +126,23 @@ void FanControlCluster::ApplyFanModeSideEffects(FanModeEnum fanMode)
         return;
     }
 
-    // For non-kAuto modes: current = setting target (explicit value).
-    // For kAuto: current = stored current value (preserve auto state).
-    auto percentCurrentTarget = percentSettingTarget.IsNull() ? mPercentCurrent : percentSettingTarget;
-    auto speedCurrentTarget   = speedSettingTarget.IsNull() ? mSpeedCurrent : speedSettingTarget;
-
-    if (!percentCurrentTarget.IsNull())
+    // kOff: PercentCurrent / SpeedCurrent are set to 0, PercentSetting / SpeedSetting follow the
+    // mode targets above. kLow / kMedium / kHigh: only settings are updated, current attributes
+    // are left unchanged (application reflects actual drive). kAuto: settings are nulled, current
+    // attributes are left unchanged (preserve running auto state).
+    if (fanMode == FanModeEnum::kOff)
     {
-        SetAttributeValue(mPercentCurrent, percentCurrentTarget.Value(), PercentCurrent::Id);
+        SetAttributeValue(mPercentCurrent, chip::Percent(0), PercentCurrent::Id);
+        if (SupportsMultiSpeed())
+        {
+            SetAttributeValue(mSpeedCurrent, static_cast<uint8_t>(0), SpeedCurrent::Id);
+        }
     }
+
     SetAttributeValue(mPercentSetting, percentSettingTarget, PercentSetting::Id);
 
     if (SupportsMultiSpeed())
     {
-        // For kAuto: preserve stored current before nulling the setting.
-        if (!speedCurrentTarget.IsNull())
-        {
-            SetAttributeValue(mSpeedCurrent, speedCurrentTarget.Value(), SpeedCurrent::Id);
-        }
         SetAttributeValue(mSpeedSetting, speedSettingTarget, SpeedSetting::Id);
     }
 }
@@ -182,17 +181,12 @@ FanModeEnum ComputeFanModeFromPercent(chip::Percent percent, FanModeSequenceEnum
 
 } // namespace
 
-void FanControlCluster::ApplyNonZeroFanDrive(chip::Percent percent, uint8_t speedSetting)
+void FanControlCluster::ApplyNonZeroFanDrive(chip::Percent percent)
 {
     FanModeEnum newMode = ComputeFanModeFromPercent(percent, mFanModeSequence);
     if (SetAttributeValue(mFanMode, newMode, FanMode::Id))
     {
         StoreFanModePersistence();
-    }
-    SetAttributeValue(mPercentCurrent, percent, PercentCurrent::Id);
-    if (SupportsMultiSpeed())
-    {
-        SetAttributeValue(mSpeedCurrent, speedSetting, SpeedCurrent::Id);
     }
 }
 
@@ -210,16 +204,15 @@ void FanControlCluster::ApplyPercentSettingChanged()
         return;
     }
 
-    uint8_t speedSetting = 0;
     // Apply MultiSpeed before FanMode so delegates that react to FanMode (and read SpeedSetting)
     // observe a consistent pair; otherwise SpeedSetting can still be stale from the prior mode.
     if (SupportsMultiSpeed())
     {
-        speedSetting = static_cast<uint8_t>((mSpeedMax * percent + 99) / 100);
+        const uint8_t speedSetting = static_cast<uint8_t>((mSpeedMax * percent + 99) / 100);
         SetAttributeValue(mSpeedSetting, DataModel::MakeNullable(speedSetting), SpeedSetting::Id);
     }
 
-    ApplyNonZeroFanDrive(percent, speedSetting);
+    ApplyNonZeroFanDrive(percent);
 }
 
 void FanControlCluster::ApplySpeedSettingChanged()
@@ -241,11 +234,11 @@ void FanControlCluster::ApplySpeedSettingChanged()
         return;
     }
 
-    uint8_t speedSetting  = mSpeedSetting.Value();
-    chip::Percent percent = static_cast<chip::Percent>((speedSetting * 100) / mSpeedMax);
+    const uint8_t speedSetting  = mSpeedSetting.Value();
+    const chip::Percent percent = static_cast<chip::Percent>((speedSetting * 100) / mSpeedMax);
     SetAttributeValue(mPercentSetting, DataModel::MakeNullable(percent), PercentSetting::Id);
 
-    ApplyNonZeroFanDrive(percent, speedSetting);
+    ApplyNonZeroFanDrive(percent);
 }
 
 DataModel::ActionReturnStatus FanControlCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,

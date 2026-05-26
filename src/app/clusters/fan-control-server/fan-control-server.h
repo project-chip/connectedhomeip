@@ -18,4 +18,4 @@
 #pragma once
 
 // New code should directly use FanControlCluster.h instead.
-#include <app/clusters/fan-control-server/FanControlCluster.h>
+#include <app/clusters/fan-control-server/CodegenIntegration.h>

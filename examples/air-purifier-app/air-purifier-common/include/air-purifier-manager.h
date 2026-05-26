@@ -91,6 +91,10 @@ public:
      */
     Protocols::InteractionModel::Status HandleStep(FanControl::StepDirectionEnum aDirection, bool aWrap, bool aLowestOff) override;
 
+    /**
+     * @brief After FanControl commits drive attributes, updates PercentCurrent / SpeedCurrent from
+     *        the snapshot. Zeros both when On/Off is off or the drive is idle.
+     */
     void OnFanDriveStateChanged(const FanControl::FanDriveState & newState) override;
 
     /**
@@ -173,8 +177,6 @@ private:
     void ThermostatSystemModeWriteCallback(uint8_t aNewSystemMode);
 
     void HandleOnOff(AttributeId attributeId, uint8_t type, uint16_t size, uint8_t * value);
-
-    void ClampFanDriveCurrentWhenOff();
 };
 
 } // namespace Clusters

@@ -17,13 +17,34 @@
  */
 
 #include <air-purifier-manager.h>
-#include <app/clusters/fan-control-server/CodegenIntegration.h>
-#include <lib/support/CodeUtils.h>
 
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using Protocols::InteractionModel::Status;
+
+namespace {
+
+bool IsFanDriveActive(const FanControl::FanDriveState & state)
+{
+    using FanControl::FanModeEnum;
+
+    if (state.mode != FanModeEnum::kOff)
+    {
+        return true;
+    }
+    if (!state.percentSetting.IsNull() && state.percentSetting.Value() > 0)
+    {
+        return true;
+    }
+    if (!state.speedSetting.IsNull() && state.speedSetting.Value() > 0)
+    {
+        return true;
+    }
+    return false;
+}
+
+} // namespace
 
 void AirPurifierManager::Init()
 {
@@ -154,11 +175,52 @@ Status AirPurifierManager::HandleStep(FanControl::StepDirectionEnum aDirection, 
     return FanControl::Attributes::SpeedSetting::Set(mEndpointId, newSpeedSetting);
 }
 
+// Code-driven FanControl keeps PercentSetting / FanMode / SpeedSetting in sync with writes, but
+// leaves PercentCurrent and SpeedCurrent to the application: they represent measured output, not
+// the requested drive. When the On/Off attribute is false, both currents stay zero, when it is
+// true and the drive is non-idle, currents are updated from the committed snapshot in `newState`.
+// This callback runs whenever the cluster finishes such an update.
 void AirPurifierManager::OnFanDriveStateChanged(const FanControl::FanDriveState & newState)
 {
-    (void) newState;
+    uint32_t featureMap = 0;
+    const bool multiSpeed =
+        FanControl::Attributes::FeatureMap::Get(mEndpointId, &featureMap) == Status::Success &&
+        BitFlags<FanControl::Feature>(featureMap).Has(FanControl::Feature::kMultiSpeed);
 
-    ClampFanDriveCurrentWhenOff();
+    if (!mOnOffClusterOn || !IsFanDriveActive(newState))
+    {
+        Status st = FanControl::Attributes::PercentCurrent::Set(mEndpointId, 0);
+        if (st != Status::Success)
+        {
+            ChipLogError(NotSpecified, "OnFanDriveStateChanged: PercentCurrent=0 failed: %d", to_underlying(st));
+        }
+        if (multiSpeed)
+        {
+            st = FanControl::Attributes::SpeedCurrent::Set(mEndpointId, 0);
+            if (st != Status::Success)
+            {
+                ChipLogError(NotSpecified, "OnFanDriveStateChanged: SpeedCurrent=0 failed: %d", to_underlying(st));
+            }
+        }
+        return;
+    }
+
+    if (!newState.percentSetting.IsNull())
+    {
+        Status st = FanControl::Attributes::PercentCurrent::Set(mEndpointId, newState.percentSetting.Value());
+        if (st != Status::Success)
+        {
+            ChipLogError(NotSpecified, "OnFanDriveStateChanged: PercentCurrent failed: %d", to_underlying(st));
+        }
+    }
+    if (multiSpeed && !newState.speedSetting.IsNull())
+    {
+        Status st = FanControl::Attributes::SpeedCurrent::Set(mEndpointId, newState.speedSetting.Value());
+        if (st != Status::Success)
+        {
+            ChipLogError(NotSpecified, "OnFanDriveStateChanged: SpeedCurrent failed: %d", to_underlying(st));
+        }
+    }
 }
 
 void AirPurifierManager::HandleFanControlAttributeChange(AttributeId attributeId, uint8_t type, uint16_t size, uint8_t * value)
@@ -200,30 +262,6 @@ void AirPurifierManager::HandleFanControlAttributeChange(AttributeId attributeId
     default: {
         break;
     }
-    }
-
-    ClampFanDriveCurrentWhenOff();
-}
-
-void AirPurifierManager::ClampFanDriveCurrentWhenOff()
-{
-    if (mOnOffClusterOn)
-    {
-        return;
-    }
-
-    if (FanControl::Attributes::PercentCurrent::Set(mEndpointId, static_cast<chip::Percent>(0)) != Status::Success)
-    {
-        ChipLogError(NotSpecified, "AirPurifierManager::ClampFanDriveCurrentWhenOff: SetPercentCurrent failed");
-    }
-    uint32_t featureMap = 0;
-    if (FanControl::Attributes::FeatureMap::Get(mEndpointId, &featureMap) == Status::Success &&
-        BitFlags<FanControl::Feature>(featureMap).Has(FanControl::Feature::kMultiSpeed))
-    {
-        if (FanControl::Attributes::SpeedCurrent::Set(mEndpointId, 0) != Status::Success)
-        {
-            ChipLogError(NotSpecified, "AirPurifierManager::ClampFanDriveCurrentWhenOff: SetSpeedCurrent failed");
-        }
     }
 }
 
@@ -287,11 +325,9 @@ void AirPurifierManager::HandleOnOff(AttributeId attributeId, uint8_t type, uint
         new_percent = 0;
         new_speed   = 0;
     }
-
-    mOnOffClusterOn = on;
-
     FanControl::Attributes::SpeedCurrent::Set(mEndpointId, new_speed);
     FanControl::Attributes::PercentCurrent::Set(mEndpointId, new_percent);
+    mOnOffClusterOn = on;
 }
 
 void AirPurifierManager::PercentSettingWriteCallback(uint8_t aNewPercentSetting)
