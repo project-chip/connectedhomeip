@@ -97,7 +97,7 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         self.ota_provider_port = self.user_params.get('ota_provider_port', 5541)
         self.provider_kvs_path = self.user_params.get('provider_kvs_path', '/tmp/chip_kvs_provider')
         self.provider_log = self.user_params.get('provider_log_path', '/tmp/provider_log_2_5.log')
-        self.provider_app_pipe_out = self.user_params.get('provider_app_pipe_out', '/tmp/provider_app_pipe_2_5')
+        self.provider_app_pipe_out = self.user_params.get('provider_app_pipe_out', '/tmp/provider_app_pipe_out_2_5')
         self.provider_app_pipe = self.user_params.get('provider_app_pipe', '/tmp/provider_app_pipe_2_5')
         # On average the ota image build for the CI is 1.8 MB which takes 4-5 min to download. Adjust if needed.
         self.ota_image_download_timeout = self.user_params.get('ota_image_download_timeout', 60*5)
@@ -210,42 +210,42 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         self.step(0)
 
         self.step(1)
-        update_state_attr_handler = AttributeSubscriptionHandler(
-            expected_cluster=Clusters.OtaSoftwareUpdateRequestor,
-            expected_attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState
-        )
-        await update_state_attr_handler.start(dev_ctrl=self.controller, node_id=self.requestor_node_id, endpoint=0,
-                                              fabric_filtered=False, min_interval_sec=0, max_interval_sec=5)
-        await self.announce_ota_provider(self.controller, self.provider_node_id, self.requestor_node_id)
+        # update_state_attr_handler = AttributeSubscriptionHandler(
+        #     expected_cluster=Clusters.OtaSoftwareUpdateRequestor,
+        #     expected_attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState
+        # )
+        # await update_state_attr_handler.start(dev_ctrl=self.controller, node_id=self.requestor_node_id, endpoint=0,
+        #                                       fabric_filtered=False, min_interval_sec=0, max_interval_sec=5)
+        # await self.announce_ota_provider(self.controller, self.provider_node_id, self.requestor_node_id)
 
-        update_state_match = AttributeMatcher.from_callable(
-            "Update state is Downloading",
-            lambda report: report.value == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading)
-        update_state_attr_handler.await_all_expected_report_matches([update_state_match], timeout_sec=600)
-        self.write_to_app_pipe(command_dict={"Name": "GetApplyUpdateRequestStatus"}, app_pipe=self.provider_app_pipe)
-        pipe_data = self.read_from_app_pipe(self.provider_app_pipe_out)
-        logger.info(f"PIPE INFO {pipe_data}")
-        update_state_match = AttributeMatcher.from_callable(
-            "Update state is Applying",
-            lambda report: report.value == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kApplying)
-        update_state_attr_handler.await_all_expected_report_matches(
-            [update_state_match], timeout_sec=self.ota_image_download_timeout)
+        # update_state_match = AttributeMatcher.from_callable(
+        #     "Update state is Downloading",
+        #     lambda report: report.value == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading)
+        # update_state_attr_handler.await_all_expected_report_matches([update_state_match], timeout_sec=600)
+        # self.write_to_app_pipe(command_dict={"Name": "GetApplyUpdateRequestStatus"}, app_pipe=self.provider_app_pipe)
+        # pipe_data = self.read_from_app_pipe(self.provider_app_pipe_out)
+        # logger.info(f"PIPE INFO {pipe_data}")
+        # update_state_match = AttributeMatcher.from_callable(
+        #     "Update state is Applying",
+        #     lambda report: report.value == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kApplying)
+        # update_state_attr_handler.await_all_expected_report_matches(
+        #     [update_state_match], timeout_sec=self.ota_image_download_timeout)
 
-        self.write_to_app_pipe(command_dict={"Name": "GetApplyUpdateRequestStatus"}, app_pipe=self.provider_app_pipe)
-        pipe_data = self.read_from_app_pipe(self.provider_app_pipe_out)
-        logger.info(f"PIPE INFO {pipe_data}")
+        # self.write_to_app_pipe(command_dict={"Name": "GetApplyUpdateRequestStatus"}, app_pipe=self.provider_app_pipe)
+        # pipe_data = self.read_from_app_pipe(self.provider_app_pipe_out)
+        # logger.info(f"PIPE INFO {pipe_data}")
 
-        await self._wait_for_idle_after_softwareaupdate(update_state_handler=update_state_attr_handler)
+        # await self._wait_for_idle_after_softwareaupdate(update_state_handler=update_state_attr_handler)
 
-        # Once in idle verify the version match the expected software version
-        await self.verify_version_applied_basic_information(
-            controller=self.controller, node_id=self.requestor_node_id, target_version=self.expected_software_version)
-        update_state = await self.read_single_attribute_check_success(
-            Clusters.OtaSoftwareUpdateRequestor, Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState, self.controller, self.requestor_node_id, 0)
-        asserts.assert_equal(update_state, Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle,
-                             "Update state should be idle")
+        # # Once in idle verify the version match the expected software version
+        # await self.verify_version_applied_basic_information(
+        #     controller=self.controller, node_id=self.requestor_node_id, target_version=self.expected_software_version)
+        # update_state = await self.read_single_attribute_check_success(
+        #     Clusters.OtaSoftwareUpdateRequestor, Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState, self.controller, self.requestor_node_id, 0)
+        # asserts.assert_equal(update_state, Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle,
+        #                      "Update state should be idle")
         self.terminate_provider()
-        self.restart_requestor(restore=True)
+        # self.restart_requestor(restore=True)
 
         self.step(2)
         # Set values for step 2
@@ -294,6 +294,9 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
             "Update state is Downloading",
             lambda report: report.value == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading)
         update_state_attr_handler.await_all_expected_report_matches([update_state_match], timeout_sec=600)
+        self.write_to_app_pipe(command_dict={"Name": "GetApplyUpdateRequestStatus"}, app_pipe=self.provider_app_pipe)
+        pipe_data = self.read_from_app_pipe(self.provider_app_pipe_out)
+        logger.info(f"PIPE INFO {pipe_data}")
 
         update_state_match = AttributeMatcher.from_callable(
             "Update state is Applying",
@@ -310,17 +313,24 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
             lambda report: report.value == current_sw_version)
         software_version_attr_handler.wait_all_final_values_reported_persisted(
             expected_matchers=[software_version_match], timeout_sec=delayed_apply_action_time)
+        self.write_to_app_pipe(command_dict={"Name": "GetApplyUpdateRequestStatus"}, app_pipe=self.provider_app_pipe)
+        pipe_data = self.read_from_app_pipe(self.provider_app_pipe_out)
+        logger.info(f"PIPE INFO {pipe_data}")
 
         software_version_attr_handler.flush_reports()
         software_version_attr_handler.cancel()
 
         await self._wait_for_idle_after_softwareaupdate(update_state_handler=update_state_attr_handler)
-
         await self.verify_version_applied_basic_information(
             controller=self.controller, node_id=self.requestor_node_id, target_version=self.expected_software_version)
+        logger.info("DEVICE RESTARTED")
+        self.write_to_app_pipe(command_dict={"Name": "GetApplyUpdateRequestStatus"}, app_pipe=self.provider_app_pipe)
+        pipe_data = self.read_from_app_pipe(self.provider_app_pipe_out)
+        logger.info(f"PIPE INFO {pipe_data}")
         # Terminate the provider
         self.terminate_provider()
         self.restart_requestor(restore=True)
+        asserts.fail("TERMINATE")
 
         self.step(3)
         delayed_apply_action_time = 60

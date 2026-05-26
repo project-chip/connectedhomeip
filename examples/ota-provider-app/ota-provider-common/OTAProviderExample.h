@@ -104,7 +104,10 @@ public:
     uint16_t GetProductId() const { return mProductId; }
     uint16_t GetHardwareVersion() const { return mHardwareVersion; }
     uint32_t GetSoftwareVersion() const { return mRequestorSoftwareVersion; }
-    uint32_t GetApplyRequestSentStatus() const { return mApplyUpdateRequestSent; }
+    bool GetApplyRequestSentStatus() const { return mApplyUpdateRequestSent; }
+    chip::app::Clusters::OtaSoftwareUpdateProvider::OTAApplyUpdateAction  GetApplyRequestActionStatus() const { return mApplyUpdateRequestActionSent; }
+    uint32_t GetApplyRequestDelayStatus() const { return mApplyUpdateRequestDelaySent; }
+    uint16_t GetApplyRequestCount() const { return mApplyUpdateRequestCount; }
     chip::Span<const DownloadProtocolEnum> GetProtocolsSupported() const
     {
         return chip::Span<const DownloadProtocolEnum>(mProtocolsSupported);
@@ -163,4 +166,7 @@ private:
     bool mRequestorCanConsent;
     char mLocation[kMaxLocation] = { 0, 0, 0 };
     bool mApplyUpdateRequestSent = false;
+    OTAApplyUpdateAction mApplyUpdateRequestActionSent;
+    uint32_t mApplyUpdateRequestDelaySent;
+    u_int16_t mApplyUpdateRequestCount = 0;
 };
