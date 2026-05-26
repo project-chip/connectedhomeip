@@ -40,6 +40,7 @@ public:
         bool onOffValueForStartUp = false;
         SafeAttributePersistenceProvider & safeAttributePersistenceProvider;
         DeviceLayer::DiagnosticDataProvider & diagnosticDataProvider;
+        uint32_t clusterRevision = 0;
     };
 
     ModeBaseCluster(EndpointId endpointId, ClusterId aClusterId, const Config & config);
@@ -123,6 +124,7 @@ private:
     bool mOnOffValueForStartUp = false;
     SafeAttributePersistenceProvider & mSafeAttributePersistenceProvider;
     DeviceLayer::DiagnosticDataProvider & mDiagnosticDataProvider;
+    uint32_t mClusterRevision = 0;
 
     // Attribute data store
     uint8_t mCurrentMode = 0; // This is a temporary value and may not be valid. We will change this to the value of the first

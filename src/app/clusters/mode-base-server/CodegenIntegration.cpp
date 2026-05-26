@@ -19,6 +19,16 @@
 #include <app/SafeAttributePersistenceProvider.h>
 #include <app/clusters/mode-base-server/CodegenIntegration.h>
 #include <app/util/attribute-storage.h>
+#include <clusters/DeviceEnergyManagementMode/Metadata.h>
+#include <clusters/DishwasherMode/Metadata.h>
+#include <clusters/EnergyEvseMode/Metadata.h>
+#include <clusters/LaundryWasherMode/Metadata.h>
+#include <clusters/MicrowaveOvenMode/Metadata.h>
+#include <clusters/OvenMode/Metadata.h>
+#include <clusters/RefrigeratorAndTemperatureControlledCabinetMode/Metadata.h>
+#include <clusters/RvcCleanMode/Metadata.h>
+#include <clusters/RvcRunMode/Metadata.h>
+#include <clusters/WaterHeaterMode/Metadata.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <platform/DiagnosticDataProvider.h>
 
@@ -64,6 +74,43 @@ CHIP_ERROR Instance::Init()
     const EmberAfCluster * cluster = emberAfFindServerCluster(mClusterPath.mEndpointId, mClusterPath.mClusterId);
     VerifyOrReturnError(cluster != nullptr, CHIP_ERROR_NOT_FOUND);
 
+    uint32_t clusterRevision = 0;
+    switch (mClusterPath.mClusterId)
+    {
+    case DeviceEnergyManagementMode::Id:
+        clusterRevision = DeviceEnergyManagementMode::kRevision;
+        break;
+    case DishwasherMode::Id:
+        clusterRevision = DishwasherMode::kRevision;
+        break;
+    case EnergyEvseMode::Id:
+        clusterRevision = EnergyEvseMode::kRevision;
+        break;
+    case LaundryWasherMode::Id:
+        clusterRevision = LaundryWasherMode::kRevision;
+        break;
+    case MicrowaveOvenMode::Id:
+        clusterRevision = MicrowaveOvenMode::kRevision;
+        break;
+    case OvenMode::Id:
+        clusterRevision = OvenMode::kRevision;
+        break;
+    case RefrigeratorAndTemperatureControlledCabinetMode::Id:
+        clusterRevision = RefrigeratorAndTemperatureControlledCabinetMode::kRevision;
+        break;
+    case RvcCleanMode::Id:
+        clusterRevision = RvcCleanMode::kRevision;
+        break;
+    case RvcRunMode::Id:
+        clusterRevision = RvcRunMode::kRevision;
+        break;
+    case WaterHeaterMode::Id:
+        clusterRevision = WaterHeaterMode::kRevision;
+        break;
+    default:
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
     if (emberAfContainsAttribute(mClusterPath.mEndpointId, mClusterPath.mClusterId, StartUpMode::Id))
     {
         mOptionalAttributeSet.Set<StartUpMode::Id>();
@@ -104,7 +151,8 @@ CHIP_ERROR Instance::Init()
                                     .appDelegate                      = *mDelegate,
                                     .onOffValueForStartUp             = onOffValueForStartUp,
                                     .safeAttributePersistenceProvider = *safeAttributePersistenceProvider,
-                                    .diagnosticDataProvider           = diagnosticDataProvider };
+                                    .diagnosticDataProvider           = diagnosticDataProvider,
+                                    .clusterRevision                  = clusterRevision };
     mCluster.Create(mClusterPath.mEndpointId, mClusterPath.mClusterId, config);
     RegisterThisInstance();
     return CodegenDataModelProvider::Instance().Registry().Register(mCluster.Registration());

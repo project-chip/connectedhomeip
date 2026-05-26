@@ -45,11 +45,13 @@ ModeBaseCluster::ModeBaseCluster(EndpointId endpointId, ClusterId aClusterId, co
     DefaultServerCluster({ endpointId, aClusterId }), mFeature(config.feature), mOptionalAttributeSet(config.optionalAttributeSet),
     mAppDelegate(config.appDelegate), mOnOffValueForStartUp(config.onOffValueForStartUp),
     mSafeAttributePersistenceProvider(config.safeAttributePersistenceProvider),
-    mDiagnosticDataProvider(config.diagnosticDataProvider)
+    mDiagnosticDataProvider(config.diagnosticDataProvider), mClusterRevision(config.clusterRevision)
 {}
 
 CHIP_ERROR ModeBaseCluster::Startup(ServerClusterContext & context)
 {
+    ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
+
     // Initialise the current mode with the value of the first mode. This ensures that it is representing a valid mode.
     ReturnErrorOnFailure(mAppDelegate.GetModeValueByIndex(0, mCurrentMode));
 
@@ -255,9 +257,7 @@ DataModel::ActionReturnStatus ModeBaseCluster::ReadAttribute(const DataModel::Re
     switch (request.path.mAttributeId)
     {
     case ClusterRevision::Id:
-        // TODO: We need a way to know the current revision of the cluster.
-        // For now, we are returning a hardcoded value of 1.
-        return encoder.Encode<uint16_t>(1);
+        return encoder.Encode(mClusterRevision);
     case SupportedModes::Id:
         return encoder.EncodeList([this](const auto & encod) -> CHIP_ERROR { return EncodeSupportedModes(encod); });
     case CurrentMode::Id:

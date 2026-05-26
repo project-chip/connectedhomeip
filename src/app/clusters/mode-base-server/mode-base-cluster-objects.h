@@ -20,12 +20,29 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/util/util.h>
+#include <lib/core/DataModelTypes.h>
+
+#include <array>
 #include <utility>
 
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace ModeBase {
+
+// The 10 cluster IDs that share this attribute structure.
+static constexpr std::array<ClusterId, 10> AliasedClusters = {
+    DeviceEnergyManagementMode::Id,
+    DishwasherMode::Id,
+    EnergyEvseMode::Id,
+    LaundryWasherMode::Id,
+    MicrowaveOvenMode::Id,
+    OvenMode::Id,
+    RefrigeratorAndTemperatureControlledCabinetMode::Id,
+    RvcCleanMode::Id,
+    RvcRunMode::Id,
+    WaterHeaterMode::Id,
+};
 
 namespace Attributes {
 
