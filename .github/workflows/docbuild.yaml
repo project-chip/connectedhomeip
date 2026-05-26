@@ -53,8 +53,3 @@ jobs:
           publish_dir: matter/docs/_build/html
           # Keep only the latest version of the documentation
           force_orphan: true
-      - name: Notify Slack on Failure
-        if: failure()
-        uses: ./.github/actions/notify-slack-failure
-        with:
-          slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}

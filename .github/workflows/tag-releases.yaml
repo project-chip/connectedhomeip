@@ -50,8 +50,3 @@ jobs:
               ./scripts/tagging/tag_new_release.sh --generate-notes --target "$BRANCH_NAME" -d # Note this is a draft for now.
 
       
-          - name: Notify Slack on Failure
-            if: failure()
-            uses: ./.github/actions/notify-slack-failure
-            with:
-              slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}
