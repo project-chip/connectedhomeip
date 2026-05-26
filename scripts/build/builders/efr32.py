@@ -220,7 +220,7 @@ class Efr32Builder(GnBuilder):
                  use_rps_extension: bool = True,
                  all_devices_enabled_devices=None
                  ):
-        super(Efr32Builder, self).__init__(root=app.BuildRoot(root), runner=runner, output_dir_lock=output_dir_lock)
+        super().__init__(root=app.BuildRoot(root), runner=runner, output_dir_lock=output_dir_lock)
         self.app = app
         self.extra_gn_options = ['silabs_board="%s"' % board.GnArgName()]
         self.all_devices_enabled_devices = all_devices_enabled_devices or []

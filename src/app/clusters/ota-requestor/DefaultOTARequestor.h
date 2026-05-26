@@ -87,6 +87,9 @@ public:
     // cleared, UpdateState is reset to Idle
     void CancelImageUpdate() override;
 
+    // Aborts an in-flight OTA bound to the removed fabric and clears its persisted state.
+    void OnFabricRemoved(FabricIndex fabricIndex) override;
+
     // Clear all entries with the specified fabric index in the default OTA provider list
     CHIP_ERROR ClearDefaultOtaProviderList(FabricIndex fabricIndex) override;
 
