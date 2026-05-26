@@ -21,12 +21,15 @@
 
 #include <glib.h>
 
+#include <inet/InetInterface.h>
+#include <lib/support/Span.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/GLibTypeDeleter.h>
 #include <platform/Linux/dbus/wpa/DBusWpa.h>
 #include <platform/Linux/dbus/wpa/DBusWpaBss.h>
 #include <platform/Linux/dbus/wpa/DBusWpaInterface.h>
 #include <platform/Linux/dbus/wpa/DBusWpaNetwork.h>
+#include <platform/NetworkCommissioning.h>
 #include <system/SystemMutex.h>
 
 #define WPA_SUPPLICANT_CLIENT_LOG_PREFIX "wpa_supplicant: "
@@ -161,6 +164,69 @@ protected:
      */
     bool IsStarted() const noexcept;
 
+    /**
+     *  @brief
+     *    Return whether the Wi-Fi network interface is enabled.
+     *
+     *  @return
+     *    @c True if the Wi-Fi network interface is enabled;
+     *    otherwise, @c false.
+     *
+     */
+    bool IsWiFiInterfaceEnabled() const noexcept CHIP_REQUIRES(mWpaSupplicantMutex);
+
+    /**
+     *  @brief
+     *    Get the Wi-Fi station service set identifier (SSID) and
+     *    connected state.
+     *
+     *  This attempts to get, if any, the currently connected (that
+     *  is, associated) Wi-Fi station service set identifier (SSID)
+     *  and connected state.
+     *
+     *  @param[out]  outNetwork
+     *    A reference to the mutable network commissioning state to
+     *    which to copy the currently connected Wi-Fi station SSID and
+     *    connected state.
+     *
+     *  @sa IsWiFiInterfaceEnabled
+     *
+     */
+    CHIP_ERROR GetConfiguredNetwork(NetworkCommissioning::Network & outNetwork) noexcept;
+
+    /**
+     *  @brief
+     *    Get the Wi-Fi network interface name.
+     *
+     *  @param[out]  outIfName
+     *    A reference to the mutable character span to which to assign
+     *    the Wi-Fi network interface name extent.
+     *
+     *  @sa SetIfName
+     *
+     */
+    CHIP_ERROR GetIfName(CharSpan & outIfName) const noexcept;
+
+    /**
+     *  @brief
+     *    Set the Wi-Fi network interface name.
+     *
+     *  @param[in]  inIfName
+     *    A reference to the immutable character span from which to
+     *    copy the Wi-Fi network interface name.
+     *
+     *  @retval  CHIP_NO_ERROR
+     *    If successful.
+     *
+     *  @retval  CHIP_ERROR_BUFFER_TOO_SMALL
+     *    If the length of @a inIfName exceeds the internal buffer
+     *    space.
+     *
+     *  @sa GetIfName
+     *
+     */
+    CHIP_ERROR SetIfName(const CharSpan & inIfName) noexcept;
+
     struct GDBusWpaSupplicant
     {
         GAutoPtr<WpaSupplicant1> proxy;
@@ -184,6 +250,7 @@ protected:
 
 private:
     ConnectivityManagerImpl * mConnectivityManagerImpl = nullptr;
+    char mWiFiIfName[Inet::InterfaceId::kMaxIfNameLength];
 };
 
 } // namespace Internal

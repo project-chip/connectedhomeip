@@ -31,7 +31,7 @@ import textwrap
 import time
 import typing
 from dataclasses import asdict, dataclass
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from enum import IntFlag
 from typing import Any, Callable, List, Optional, Tuple, Type, Union
 
@@ -136,7 +136,7 @@ class AttributeMatcher:
         return self._description
 
     @staticmethod
-    def from_callable(description: str, matcher: Callable[[AttributeValue], bool]) -> "AttributeMatcher":
+    def from_callable(description: str, matcher: Callable[[AttributeValue], bool]) -> AttributeMatcher:
         """Take a single callable and wrap it into an AttributeMatcher object. Useful to wrap closures."""
         class AttributeMatcherFromCallable(AttributeMatcher):
             def __init__(self, description, matcher: Callable[[AttributeValue], bool]):
@@ -214,7 +214,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         # TODO: Move to using non-generated code and rather use data model description (.matter or .xml)
         self.cluster_mapper = ClusterMapper(self.default_controller._Cluster)
         self.current_step_index = 0
-        self.step_start_time = datetime.now(timezone.utc)
+        self.step_start_time = datetime.now(UTC)
         self.step_skipped = False
 
     def teardown_class(self):
@@ -346,8 +346,8 @@ class MatterBaseTest(base_test.BaseTestClass):
         Test authors that implement this method should ensure super().setup_test() is called before any custom setup.
         """
         self.current_step_index = 0
-        self.test_start_time = datetime.now(timezone.utc)
-        self.step_start_time = datetime.now(timezone.utc)
+        self.test_start_time = datetime.now(UTC)
+        self.step_start_time = datetime.now(UTC)
         self.step_skipped = False
         self.failed = False
         if self.runner_hook and not self.is_commissioning:
@@ -379,12 +379,12 @@ class MatterBaseTest(base_test.BaseTestClass):
             exception = record.termination_signal.exception
 
             try:
-                step_duration = (datetime.now(timezone.utc) - self.step_start_time) / timedelta(microseconds=1)
+                step_duration = (datetime.now(UTC) - self.step_start_time) / timedelta(microseconds=1)
             except AttributeError:
                 # If we failed during setup, these may not be populated
                 step_duration = 0
             try:
-                test_duration = (datetime.now(timezone.utc) - self.test_start_time) / timedelta(microseconds=1)
+                test_duration = (datetime.now(UTC) - self.test_start_time) / timedelta(microseconds=1)
             except AttributeError:
                 test_duration = 0
             # TODO: I have no idea what logger, logs, request or received are. Hope None works because I have nothing to give
@@ -472,8 +472,8 @@ class MatterBaseTest(base_test.BaseTestClass):
         if self.runner_hook and not self.is_commissioning:
             # What is request? This seems like an implementation detail for the runner
             # TODO: As with failure, I have no idea what logger, logs or request are meant to be
-            step_duration = (datetime.now(timezone.utc) - self.step_start_time) / timedelta(microseconds=1)
-            test_duration = (datetime.now(timezone.utc) - self.test_start_time) / timedelta(microseconds=1)
+            step_duration = (datetime.now(UTC) - self.step_start_time) / timedelta(microseconds=1)
+            test_duration = (datetime.now(UTC) - self.test_start_time) / timedelta(microseconds=1)
             self.runner_hook.step_success(logger=None, logs=None, duration=step_duration, request=None)
 
         # TODO: this check could easily be annoying when doing dev. flag it somehow? Ditto with the in-order check
@@ -502,7 +502,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             record: TestResultRecord containing skip information.
         """
         if self.runner_hook and not self.is_commissioning:
-            test_duration = (datetime.now(timezone.utc) - self.test_start_time) / timedelta(microseconds=1)
+            test_duration = (datetime.now(UTC) - self.test_start_time) / timedelta(microseconds=1)
             test_name = self.current_test_info.name
             filename = inspect.getfile(self.__class__)
             self.runner_hook.test_skipped(filename, test_name)
@@ -745,14 +745,14 @@ class MatterBaseTest(base_test.BaseTestClass):
             # If we've reached the next step with no assertion and the step wasn't skipped, it passed
             if not self.step_skipped and self.current_step_index != 0:
                 # TODO: As with failure, I have no idea what loger, logs or request are meant to be
-                step_duration = (datetime.now(timezone.utc) - self.step_start_time) / timedelta(microseconds=1)
+                step_duration = (datetime.now(UTC) - self.step_start_time) / timedelta(microseconds=1)
                 self.runner_hook.step_success(logger=None, logs=None, duration=step_duration, request=None)
 
             # TODO: it seems like the step start should take a number and a name
             name = f'{step} : {current_step.description}'
             self.runner_hook.step_start(name=name)
 
-        self.step_start_time = datetime.now(tz=timezone.utc)
+        self.step_start_time = datetime.now(tz=UTC)
         self.current_step_index = self.current_step_index + 1
         self.step_skipped = False
 

@@ -83,7 +83,7 @@ def main():
         if p in skip_cases:
             continue
         path = str(os.path.join(cert_path, p, 'test_case_vector.json'))
-        with open(path, 'r') as f:
+        with open(path) as f:
             j = json.loads(f.read())
             success_expected = j['is_success_case'].lower() == 'true'
             desc = TestInfo(desc=j['description'], dir=p, pid=int(j['basic_info_pid']))

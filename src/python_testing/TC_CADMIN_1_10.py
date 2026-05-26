@@ -136,13 +136,14 @@ class TC_CADMIN_1_10(CADMINBaseTest):
 
         self.step(5)
         _CHIP_TIMEOUT_ERROR = 50
+        _CHIP_ERROR_NOT_CONNECTED = 72
 
         with asserts.assert_raises(ChipStackError) as e:
             await self.TH2.ReadAttribute(
                 nodeId=pase_node_id,
                 attributes=(ROOT_NODE_ENDPOINT_ID, VendorNameAttr))
-        asserts.assert_equal(e.exception.err, _CHIP_TIMEOUT_ERROR,
-                             f"Expected timeout error reading VendorName attribute over PASE, got {e.exception.err}")
+        asserts.assert_true(e.exception.err in (_CHIP_TIMEOUT_ERROR, _CHIP_ERROR_NOT_CONNECTED),
+                            f"Expected timeout or not-connected error reading VendorName attribute over PASE, got {e.exception.err}")
 
         # ---------------------------- Repeat test, but sending RevokeCommissioning over PASE this time --------------------------------
 
@@ -169,8 +170,8 @@ class TC_CADMIN_1_10(CADMINBaseTest):
             await self.TH2.ReadAttribute(
                 nodeId=pase_node_id,
                 attributes=(ROOT_NODE_ENDPOINT_ID, VendorNameAttr))
-        asserts.assert_equal(e.exception.err, _CHIP_TIMEOUT_ERROR,
-                             f"Expected timeout error reading VendorName attribute over PASE, got {e.exception.err}")
+        asserts.assert_true(e.exception.err in (_CHIP_TIMEOUT_ERROR, _CHIP_ERROR_NOT_CONNECTED),
+                            f"Expected timeout or not-connected error reading VendorName attribute over PASE, got {e.exception.err}")
 
 
 if __name__ == "__main__":

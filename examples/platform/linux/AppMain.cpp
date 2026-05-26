@@ -1051,12 +1051,10 @@ void ChipLinuxAppMainLoop(chip::ServerInitParams & initParams, AppMainLoopImplem
 #if CHIP_SYSTEM_CONFIG_USE_DISPATCH
     auto & platformMgr = chip::DeviceLayer::PlatformMgrImpl();
     platformMgr.RegisterSignalHandler(SIGINT, ^{
-        platformMgr.UnregisterAllSignalHandlers();
         StopSignalHandler(SIGINT);
     });
 
     platformMgr.RegisterSignalHandler(SIGTERM, ^{
-        platformMgr.UnregisterAllSignalHandlers();
         StopSignalHandler(SIGTERM);
     });
 #else
@@ -1099,14 +1097,17 @@ void ChipLinuxAppMainLoop(chip::ServerInitParams & initParams, AppMainLoopImplem
     shellThread.join();
 #endif
 
+#if CHIP_DEVICE_LAYER_TARGET_DARWIN && CHIP_SYSTEM_CONFIG_USE_DISPATCH
+    platformMgr.UnregisterAllSignalHandlers();
+#endif
+
     Server::GetInstance().Shutdown();
 
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
-    // Commissioner shutdown call shuts down entire stack, including the platform manager.
     ShutdownCommissioner();
-#else
-    DeviceLayer::PlatformMgr().Shutdown();
 #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+
+    DeviceLayer::PlatformMgr().Shutdown();
 
 #if ENABLE_TRACING
     tracing_setup.StopTracing();
