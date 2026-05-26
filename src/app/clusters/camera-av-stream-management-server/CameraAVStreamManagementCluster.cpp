@@ -167,7 +167,7 @@ CHIP_ERROR CameraAVStreamManagementCluster::Init()
     }
 
     // Persistent data is stored in the cluster context, so the cluster should be correctly
-    // initialized before loading atttributes.
+    // initialized before loading attributes.
     VerifyOrReturnError(mContext != nullptr, CHIP_ERROR_INCORRECT_STATE);
     LoadPersistentAttributes();
 

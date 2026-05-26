@@ -37,7 +37,7 @@
 #include <app/DefaultSafeAttributePersistenceProvider.h>
 #include <app/SafeAttributePersistenceProvider.h>
 #include <app/clusters/camera-av-stream-management-server/MigrationCameraAVStreamManagementCluster.h>
-
+#include <app/persistence/DefaultAttributePersistenceProvider.h>
 namespace {
 
 using namespace chip;
