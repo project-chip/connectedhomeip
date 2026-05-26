@@ -198,36 +198,6 @@ inline bool operator!=(const Type & lhs, const Type & rhs)
 
 namespace CommodityTariffAttrsDataMgmt {
 
-///// @brief Helper for copying spans to Matter data model lists
-///// @tparam T Type of elements to copy
-// template <typename T>
-// struct SpanCopier
-//{
-//     /**
-//      * @brief Copies span data to a pre-allocated buffer
-//      * @param source Input span to copy from
-//      * @param destination_buffer Pre-allocated output buffer (must be large enough)
-//      * @param maxCount Maximum number of elements to copy (default: unlimited)
-//      * @return CHIP_NO_ERROR on success, error code on failure
-//      */
-//     static CHIP_ERROR Copy(Span<const T> source, T * destination_buffer, size_t maxCount = std::numeric_limits<size_t>::max())
-//     {
-//         static_assert(std::is_trivially_copyable_v<T>, "Span<const T> must be trivially copyable");
-//
-//         // Destination buffer must be provided
-//         VerifyOrReturnError(destination_buffer != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-//         VerifyOrReturnError(source.size() <= maxCount, CHIP_ERROR_INVALID_LIST_LENGTH);
-//
-//         if (!source.empty())
-//         {
-//             const size_t bytesToCopy = source.size() * sizeof(T);
-//             std::memmove(destination_buffer, source.data(), bytesToCopy);
-//         }
-//
-//         return CHIP_NO_ERROR;
-//     }
-// };
-
 /// @brief Specialization for character spans with consistent maxCount semantics
 struct SpanCopier
 {
