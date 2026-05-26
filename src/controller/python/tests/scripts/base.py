@@ -1276,7 +1276,7 @@ class BaseTestHelper:
             # condition between the last attribute update and the callback.
             try:
                 await asyncio.wait_for(taskAttributeChange, 1)
-            except asyncio.TimeoutError:
+            except TimeoutError:
                 # If attribute change task did not finish something is wrong. Cancel
                 # the task.
                 taskAttributeChange.cancel()

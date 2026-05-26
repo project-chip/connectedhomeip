@@ -60,12 +60,12 @@ class restartRemoteDevice(threading.Thread):
         try:
             client.connect(self.remote_ip, self.ssh_port, self.user, self.password)
             client.exec_command(
-                (f"kill \"$(ps aux | grep -E \'out/debug/{self.remote_server_app}\' | grep -v grep | grep -v gdb | "
-                 "awk \'{print $2}\')\""))
+                f"kill \"$(ps aux | grep -E \'out/debug/{self.remote_server_app}\' | grep -v grep | grep -v gdb | "
+                "awk \'{print $2}\')\"")
             time.sleep(1)
             stdin, stdout, stderr = client.exec_command(
-                (f"ps aux | grep -E \'out/debug/standalone/{self.remote_server_app}\' | grep -v grep | grep -v gdb | "
-                 "awk \'{print $2}\'"))
+                f"ps aux | grep -E \'out/debug/standalone/{self.remote_server_app}\' | grep -v grep | grep -v gdb | "
+                "awk \'{print $2}\'")
             if not stdout.read().decode().strip():
                 logger.info(f"Succeed to kill remote process {self.remote_server_app}")
             else:

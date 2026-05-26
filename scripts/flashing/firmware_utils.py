@@ -267,7 +267,7 @@ class Flasher:
             note = tool_info.get('error', 'Unable to execute {tool}.')
             note = textwrap.dedent(note).format(tool=tool, **vars(self.option))
             # textwrap.fill only handles single paragraphs:
-            note = '\n\n'.join((textwrap.fill(p) for p in note.split('\n\n')))
+            note = '\n\n'.join(textwrap.fill(p) for p in note.split('\n\n'))
             print(note, file=sys.stderr)
             return False
         return True
