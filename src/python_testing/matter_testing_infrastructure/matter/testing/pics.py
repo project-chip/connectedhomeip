@@ -121,10 +121,10 @@ def _read_pics_from_directory(dir_path: str) -> dict[str, bool]:
     pics_dict: dict[str, bool] = {}
     top_level = sorted(glob.glob(os.path.join(dir_path, '*.xml')))
     for filename in top_level:
-        with open(filename, 'r', encoding='utf-8') as f:
+        with open(filename, encoding='utf-8') as f:
             pics_dict.update(parse_pics_xml(f.read()))
     for xml_path in _iter_pics_xml_under_endpoint_dirs(dir_path):
-        with open(xml_path, 'r', encoding='utf-8') as f:
+        with open(xml_path, encoding='utf-8') as f:
             pics_dict.update(parse_pics_xml(f.read()))
     return pics_dict
 
@@ -157,7 +157,7 @@ def read_pics_from_file(path: str) -> dict[str, bool]:
     if os.path.isfile(ap) and zipfile.is_zipfile(ap):
         return _read_pics_from_zip(ap)
 
-    with open(ap, 'r', encoding='utf-8') as f:
+    with open(ap, encoding='utf-8') as f:
         lines = f.readlines()
     return parse_pics(lines)
 
