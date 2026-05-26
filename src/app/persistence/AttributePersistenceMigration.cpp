@@ -88,13 +88,18 @@ CHIP_ERROR MigrateValueFromSafe(const ConcreteAttributePath & attrPath, SafeAttr
         VerifyOrReturnError(buffer.size() == valueSize, CHIP_ERROR_INCORRECT_STATE);
         ReturnErrorOnFailure(HostSwapBySize(buffer.data(), valueSize));
     }
+    else
+    {
+        VerifyOrReturnError(buffer.size() <= valueSize, CHIP_ERROR_INCORRECT_STATE);
+    }
 #else
 
     // On big-endian, no need to swap non-scalar values.
     // For non-scalar values, just return the raw data.
     if (!isScalar)
     {
-        return provider.SafeReadValue(attrPath, buffer);
+        ReturnErrorOnFailure(provider.SafeReadValue(attrPath, buffer));
+        return buffer.size() <= valueSize ? CHIP_NO_ERROR : CHIP_ERROR_INCORRECT_STATE;
     }
 
     // For scalar values, read into a temp buffer, byte-swap, then copy out.
