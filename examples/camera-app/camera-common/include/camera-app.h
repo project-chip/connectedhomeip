@@ -52,7 +52,7 @@ private:
     std::unique_ptr<chip::app::Clusters::ChimeServer> mChimeServerPtr;
     chip::app::LazyRegisteredServerCluster<chip::app::Clusters::CameraAvSettingsUserLevelManagementCluster>
         mAVSettingsUserLevelMgmtServer;
-    chip::app::LazyRegisteredServerCluster<chip::app::Clusters::CameraAvStreamManagement::CodegenCameraAVStreamManagementCluster>
+    chip::app::LazyRegisteredServerCluster<chip::app::Clusters::CameraAvStreamManagement::MigrationCameraAVStreamManagementCluster>
         mAVStreamMgmtServer;
     std::unique_ptr<chip::app::Clusters::ZoneManagement::ZoneMgmtServer> mZoneMgmtServerPtr;
 

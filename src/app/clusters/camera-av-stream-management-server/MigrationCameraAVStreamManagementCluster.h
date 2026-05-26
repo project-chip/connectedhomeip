@@ -25,14 +25,14 @@ namespace Clusters {
 namespace CameraAvStreamManagement {
 
 /**
- * Codegen integration subclass for CameraAVStreamManagementCluster.
+ * Migration integration subclass for CameraAVStreamManagementCluster.
  *
  * This class extends the core cluster with one-time migration logic that runs
  * during Startup(): it attempts to migrate any attribute data previously stored
  * via SafeAttributePersistenceProvider into the standard AttributePersistenceProvider,
  * then delegates to the base Startup() which loads all persistent attributes.
  */
-class CodegenCameraAVStreamManagementCluster : public CameraAVStreamManagementCluster
+class MigrationCameraAVStreamManagementCluster : public CameraAVStreamManagementCluster
 {
 public:
     using CameraAVStreamManagementCluster::CameraAVStreamManagementCluster;

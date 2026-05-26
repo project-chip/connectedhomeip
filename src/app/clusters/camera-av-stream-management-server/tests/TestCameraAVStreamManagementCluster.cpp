@@ -36,7 +36,7 @@
 
 #include <app/DefaultSafeAttributePersistenceProvider.h>
 #include <app/SafeAttributePersistenceProvider.h>
-#include <app/clusters/camera-av-stream-management-server/CodegenIntegration.h>
+#include <app/clusters/camera-av-stream-management-server/MigrationCameraAVStreamManagementCluster.h>
 
 namespace {
 
@@ -1729,7 +1729,7 @@ TEST_F(TestCameraAVStreamManagementCluster, TestUpdateSnapshotStreamRefCount)
 }
 
 // ---------------------------------------------------------------------------
-// Migration tests for CodegenCameraAVStreamManagementCluster
+// Migration tests for MigrationCameraAVStreamManagementCluster
 // ---------------------------------------------------------------------------
 
 struct TestCodegenCameraAVStreamManagementMigration : public ::testing::Test
@@ -1795,7 +1795,7 @@ struct TestCodegenCameraAVStreamManagementMigration : public ::testing::Test
     std::vector<AudioStreamStruct> mAudioStreams;
     std::vector<SnapshotStreamStruct> mSnapshotStreams;
     MockCameraAVStreamManagementDelegate mMockDelegate;
-    CodegenCameraAVStreamManagementCluster mServer;
+    MigrationCameraAVStreamManagementCluster mServer;
     ClusterTester mClusterTester;
     app::DefaultSafeAttributePersistenceProvider mSafePersistence;
     app::SafeAttributePersistenceProvider * mOldSafePersistence = nullptr;
