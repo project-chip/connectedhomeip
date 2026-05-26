@@ -509,9 +509,9 @@ void OTAProviderExample::HandleApplyUpdateRequest(app::CommandHandler * commandO
 
     // Values for named pipes
     mApplyUpdateRequestCount++;
-    mApplyUpdateRequestSent = true;
+    mApplyUpdateRequestSent       = true;
     mApplyUpdateRequestActionSent = mUpdateAction;
-    mApplyUpdateRequestDelaySent = mDelayedApplyActionTimeSec;
+    mApplyUpdateRequestDelaySent  = mDelayedApplyActionTimeSec;
 
     // Reset delay back to 0 for subsequent uses
     mDelayedApplyActionTimeSec = 0;
@@ -531,7 +531,7 @@ void OTAProviderExample::HandleNotifyUpdateApplied(app::CommandHandler * command
 
     GetUpdateTokenString(commandData.updateToken, tokenBuf, kUpdateTokenStrLen);
     ChipLogDetail(SoftwareUpdate, "%s: token: %s, version: %" PRIu32, __FUNCTION__, tokenBuf, commandData.softwareVersion);
-    mApplyUpdateRequestSent = false;
+    mApplyUpdateRequestSent  = false;
     mApplyUpdateRequestCount = 0;
 
     commandObj->AddStatus(commandPath, Status::Success);

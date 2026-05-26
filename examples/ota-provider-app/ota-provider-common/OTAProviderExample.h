@@ -105,7 +105,10 @@ public:
     uint16_t GetHardwareVersion() const { return mHardwareVersion; }
     uint32_t GetSoftwareVersion() const { return mRequestorSoftwareVersion; }
     bool GetApplyRequestSentStatus() const { return mApplyUpdateRequestSent; }
-    chip::app::Clusters::OtaSoftwareUpdateProvider::OTAApplyUpdateAction  GetApplyRequestActionStatus() const { return mApplyUpdateRequestActionSent; }
+    chip::app::Clusters::OtaSoftwareUpdateProvider::OTAApplyUpdateAction GetApplyRequestActionStatus() const
+    {
+        return mApplyUpdateRequestActionSent;
+    }
     uint32_t GetApplyRequestDelayStatus() const { return mApplyUpdateRequestDelaySent; }
     uint16_t GetApplyRequestCount() const { return mApplyUpdateRequestCount; }
     chip::Span<const DownloadProtocolEnum> GetProtocolsSupported() const
