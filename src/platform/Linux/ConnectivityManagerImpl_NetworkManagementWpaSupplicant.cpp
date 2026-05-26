@@ -846,7 +846,7 @@ ConnectivityManagerImpl::_ConnectWiFiNetworkAsync(GVariant * args,
 
     const char * networkPath = wpa_supplicant_1_interface_get_current_network(mWpaSupplicant.iface.get());
     // wpa_supplicant DBus API: if network path of current network is not "/", means we have already selected some network.
-    if (strcmp(networkPath, "/") != 0)
+    if (networkPath != nullptr && strcmp(networkPath, "/") != 0)
     {
         if (!wpa_supplicant_1_interface_call_remove_network_sync(mWpaSupplicant.iface.get(), networkPath, nullptr,
                                                                  &err.GetReceiver()))
@@ -1167,6 +1167,7 @@ CHIP_ERROR ConnectivityManagerImpl::GetWiFiSecurityType(SecurityTypeEnum & secur
 
     const char * mode = wpa_supplicant_1_interface_get_current_auth_mode(mWpaSupplicant.iface.get());
     ChipLogProgress(DeviceLayer, WPA_SUPPLICANT_CLIENT_LOG_PREFIX "Current Wi-Fi security type: %s", StringOrNullMarker(mode));
+    VerifyOrReturnError(mode != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     if (strncmp(mode, "WPA-PSK", 7) == 0)
     {

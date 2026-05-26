@@ -22,7 +22,7 @@ import shutil
 import sys
 import tarfile
 import textwrap
-from typing import Any, Dict
+from typing import Any
 
 import constants
 import stateful_shell
@@ -112,7 +112,7 @@ def check_python_version() -> None:
         exit(1)
 
 
-def load_cicd_config() -> Dict[str, Any]:
+def load_cicd_config() -> dict[str, Any]:
     with open(_CICD_CONFIG_FILE_NAME) as config_file:
         return json.loads(config_file.read())
 

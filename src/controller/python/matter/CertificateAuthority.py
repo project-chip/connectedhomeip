@@ -22,7 +22,7 @@ import ctypes
 import logging
 from ctypes import c_void_p
 from datetime import timedelta
-from typing import List, Optional
+from typing import Optional
 
 from . import ChipStack, FabricAdmin
 from .native import GetLibraryHandle, PyChipError
@@ -103,7 +103,7 @@ class CertificateAuthority:
             raise ValueError("Encountered error initializing OpCreds adapter")
 
         self._isActive = True
-        self._activeAdmins: List[FabricAdmin.FabricAdmin] = []
+        self._activeAdmins: list[FabricAdmin.FabricAdmin] = []
 
     def LoadFabricAdminsFromStorage(self):
         ''' If FabricAdmins had been setup previously, this re-creates them using information from persistent storage.
@@ -266,7 +266,7 @@ class CertificateAuthorityManager:
             persistentStorage = self._chipStack.GetStorageManager()
 
         self._persistentStorage = persistentStorage
-        self._activeCaList: List[CertificateAuthority] = []
+        self._activeCaList: list[CertificateAuthority] = []
         self._isActive = True
 
     def _AllocateNextCaIndex(self):
@@ -357,7 +357,7 @@ class CertificateAuthorityManager:
         self._isActive = False
 
     @property
-    def activeCaList(self) -> List[CertificateAuthority]:
+    def activeCaList(self) -> list[CertificateAuthority]:
         return self._activeCaList
 
     def __del__(self):
