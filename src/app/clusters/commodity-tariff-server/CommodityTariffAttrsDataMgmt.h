@@ -253,7 +253,7 @@ struct SpanCopier
     {
         if (source.empty())
         {
-            destination.SetNull();
+            destination.SetNonNull(CharSpan());
             return CHIP_NO_ERROR;
         }
 

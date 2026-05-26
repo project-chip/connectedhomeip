@@ -520,7 +520,6 @@ std::unordered_set<const Structs::TariffPeriodStruct::Type *> FindTariffPeriodsB
 CHIP_ERROR UpdateTariffComponentAttrsDayEntryById(Instance * aInstance, CurrentTariffAttrsCtx & aCtx, uint32_t dayEntryID,
                                                   TariffComponentsDataClass & mgmtObj)
 {
-    CHIP_ERROR err                                   = CHIP_NO_ERROR;
     const Structs::TariffPeriodStruct::Type * period = FindTariffPeriodByDayEntryId(aCtx, dayEntryID);
 
     // Use a fixed-size array with maximum expected components
@@ -545,11 +544,8 @@ CHIP_ERROR UpdateTariffComponentAttrsDayEntryById(Instance * aInstance, CurrentT
         Structs::TariffComponentStruct::Type entry;
         auto current = GetListEntryById<Structs::TariffComponentStruct::Type>(aCtx.mTariffProvider->GetTariffComponents().Value(),
                                                                               componentIDs[i]);
-        if (current == nullptr)
-        {
-            err = CHIP_ERROR_NOT_FOUND;
-            break;
-        }
+        VerifyOrReturnError(current != nullptr, CHIP_ERROR_NOT_FOUND);
+
         entry = *current;
         if (current->label.HasValue())
         {
@@ -558,14 +554,21 @@ CHIP_ERROR UpdateTariffComponentAttrsDayEntryById(Instance * aInstance, CurrentT
             if (!current->label.Value().IsNull())
             {
                 chip::CharSpan srcLabelSpan = current->label.Value().Value();
-                tempLabelBuffers[i].CopyFromSpan(srcLabelSpan);
-                tmpNullLabel.SetNonNull(chip::CharSpan(tempLabelBuffers[i].Get(), srcLabelSpan.size()));
+                if (!srcLabelSpan.empty())
+                {
+                    tempLabelBuffers[i].CopyFromSpan(srcLabelSpan);
+                    VerifyOrReturnError(tempLabelBuffers[i].Get() != nullptr, CHIP_ERROR_NO_MEMORY);
+                    tmpNullLabel.SetNonNull(chip::CharSpan(tempLabelBuffers[i].Get(), srcLabelSpan.size()));
+                }
+                else
+                {
+                    tmpNullLabel.SetNonNull(chip::CharSpan());
+                }
             }
             entry.label = MakeOptional(tmpNullLabel);
         }
         tempBuffer[i] = entry;
     }
-    ReturnErrorOnFailure(err);
 
     ReturnErrorOnFailure(
         mgmtObj.SetNewValue(MakeNullable(DataModel::List<Structs::TariffComponentStruct::Type>(tempBuffer.Get(), componentCount))));
