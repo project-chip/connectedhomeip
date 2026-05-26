@@ -21,7 +21,7 @@
 #include <app-common/zap-generated/cluster-objects.h>
 
 #include "camera-device-interface.h"
-#include <app/clusters/camera-av-stream-management-server/CodegenIntegration.h>
+#include <app/clusters/camera-av-stream-management-server/MigrationCameraAVStreamManagementCluster.h>
 #include <app/util/config.h>
 #include <cstring>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>

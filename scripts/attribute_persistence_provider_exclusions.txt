@@ -46,7 +46,7 @@ src/app/clusters/boolean-state-configuration-server/MigrateBooleanStateConfigura
 src/app/clusters/boolean-state-configuration-server/MigrateBooleanStateConfigurationStorage.h
 
 # Cluster server implementations that currently use SafeAttributePersistenceProvider
-src/app/clusters/camera-av-stream-management-server/CodegenIntegration.cpp
+src/app/clusters/camera-av-stream-management-server/MigrationCameraAVStreamManagementCluster.cpp
 src/app/clusters/camera-av-stream-management-server/MigrateCameraAVStreamManagementStorage.cpp
 src/app/clusters/camera-av-stream-management-server/MigrateCameraAVStreamManagementStorage.h
 src/app/clusters/mode-base-server/mode-base-server.cpp
