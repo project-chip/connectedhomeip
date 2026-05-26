@@ -107,7 +107,7 @@ def updateOne(item):
     """
     (args, target) = item
 
-    with open(target, "r") as file:
+    with open(target) as file:
         data = json.load(file)
 
     for endpointType in data['endpointTypes']:
