@@ -31,8 +31,8 @@ namespace CameraAvStreamManagement {
  * during Startup(): it attempts to migrate any attribute data previously stored
  * via SafeAttributePersistenceProvider into the standard AttributePersistenceProvider,
  * then delegates to the base Startup(). Persistent attributes are loaded later in Init().
+ */
 class MigrationCameraAVStreamManagementCluster : public CameraAVStreamManagementCluster
-{
 public:
     using CameraAVStreamManagementCluster::CameraAVStreamManagementCluster;
 
