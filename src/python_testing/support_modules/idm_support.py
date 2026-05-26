@@ -38,7 +38,6 @@ from matter.testing import global_attribute_ids
 from matter.testing.basic_composition import BasicCompositionTests
 from matter.testing.event_attribute_reporting import WildcardAttributeSubscriptionHandler
 from matter.testing.global_attribute_ids import GlobalAttributeIds, is_standard_attribute_id
-from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.spec_parsing import ConstraintReference, Constraints
 from matter.tlv import uint
 
