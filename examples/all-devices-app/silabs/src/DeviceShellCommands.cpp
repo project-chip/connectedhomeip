@@ -23,6 +23,7 @@
 #include <lib/shell/streamer.h>
 #include <platform/silabs/SilabsConfig.h>
 #include <platform/silabs/platformAbstraction/SilabsPlatform.h>
+#include <cstring>
 
 namespace chip {
 namespace Shell {
@@ -81,8 +82,6 @@ CHIP_ERROR DeviceCommands::SetDeviceTypeHandler(int argc, char ** argv)
     return DeviceLayer::SystemLayer().StartTimer(
         System::Clock::Milliseconds32(SL_KVS_SAVE_DELAY_SECONDS * 1000 + 100),
         [](System::Layer *, void *) { chip::DeviceLayer::Silabs::GetPlatform().SoftwareReset(); }, nullptr);
-
-    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DeviceCommands::GetDeviceTypeHandler(int argc, char ** argv)
@@ -96,7 +95,7 @@ CHIP_ERROR DeviceCommands::GetDeviceTypeHandler(int argc, char ** argv)
     {
         streamer_printf(streamer_get(), "Failed to get stored device type: %" CHIP_ERROR_FORMAT " (using default: %s)\r\n",
                         err.Format(), chip::app::DeviceFactory::GetInstance().GetDefaultDevice().c_str());
-        return err;
+        return CHIP_NO_ERROR;
     }
 
     if (storedLen <= 0 || storedLen > sizeof(storedDeviceType))
@@ -106,7 +105,7 @@ CHIP_ERROR DeviceCommands::GetDeviceTypeHandler(int argc, char ** argv)
         return CHIP_ERROR_BUFFER_TOO_SMALL;
     }
 
-    streamer_printf(streamer_get(), "Current device type: %.*s\r\n", storedLen, storedDeviceType);
+    streamer_printf(streamer_get(), "Current device type: %.*s\r\n", static_cast<int>(storedLen), storedDeviceType);
 
     return CHIP_NO_ERROR;
 }

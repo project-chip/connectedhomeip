@@ -198,7 +198,7 @@ CHIP_ERROR AppTask::InitCodeDrivenDataModel(chip::PersistentStorageDelegate & st
 
     char storedDeviceType[64] = {};
     uint16_t storedLen        = sizeof(storedDeviceType);
-    CHIP_ERROR storedErr      = storage.SyncGetKeyValue(kDeviceTypeKey, storedDeviceType, storedLen);
+    CHIP_ERROR storedErr      = storage.SyncGetKeyValue(chip::kDeviceTypeKey, storedDeviceType, storedLen);
     if (storedErr == CHIP_NO_ERROR && storedLen > 0)
     {
         deviceType = std::string(storedDeviceType, strnlen(storedDeviceType, storedLen));
