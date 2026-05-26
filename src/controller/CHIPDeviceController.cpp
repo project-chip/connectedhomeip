@@ -2628,6 +2628,12 @@ CHIP_ERROR DeviceCommissioner::ParseNetworkCommissioningInfo(ReadCommissioningIn
             {
                 ChipLogProgress(Controller, "NetworkCommissioning Features: has Ethernet. endpointid = %u", path.mEndpointId);
                 info.network.eth.endpoint = path.mEndpointId;
+                // Add this check here because the default value of mNeedsNetworkSetup is true for
+                // NFC based commissioning, but for a Matter over Ethernet device, we don't want to require network setup.
+                if(info.network.eth.endpoint == kRootEndpointId)
+                {
+                    mAutoCommissioner.SetNetworkSetupNeeded(false);
+                }
             }
         }
         return CHIP_NO_ERROR;

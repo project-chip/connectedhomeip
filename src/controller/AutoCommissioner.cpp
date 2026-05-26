@@ -470,7 +470,7 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
         // operational network because the provisioning of certificates will trigger the device to start operational advertising.
         // skip network setup for Matter over Ethernet devices, which defined ETH feature in Network Commissioning cluster on
         // Root Node endpoint for commissioning.
-        if (mNeedsNetworkSetup && mDeviceCommissioningInfo.network.eth.endpoint != kRootEndpointId)
+        if (mNeedsNetworkSetup)
         {
             // if there is a WiFi or a Thread endpoint, then perform scan
             if (IsScanNeeded())
