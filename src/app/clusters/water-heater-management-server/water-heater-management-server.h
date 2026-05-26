@@ -20,4 +20,4 @@
 
 // This file is used for backwards compatibility, will include the Codegen references
 // after the cluster is migrated to SCI.
-#include "WaterHeaterManagementCluster.h"
+#include <app/clusters/water-heater-management-server/WaterHeaterManagementCluster.h>
