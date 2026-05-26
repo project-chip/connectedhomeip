@@ -30,7 +30,7 @@ Git:
     <define>CARBON_MONOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER</define>
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
-    <globalAttribute side="either" code="0xFFFD" value="3"/>
+    <globalAttribute side="either" code="0xFFFD" value="5"/>
     <features>
       <feature bit="0" code="MEA" name="NumericMeasurement" summary="Cluster supports numeric measurement of substance">
         <optionalConform choice="a" more="true" min="1"/>
