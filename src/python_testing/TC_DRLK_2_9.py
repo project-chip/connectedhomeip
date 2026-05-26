@@ -586,7 +586,7 @@ class TC_DRLK_2_9(MatterBaseTest, DRLK_COMMON):
 
         self.step("14c")
         if self.pics_guard(self.check_pics("DRLK.S.F08") and self.check_pics("DRLK.S.C1d.Rsp")):
-            await self.send_clear_user_cmd(user_index=int(0xFFFE))
+            await self.send_clear_user_cmd(user_index=0xFFFE)
 
         self.step("14d")
         if self.pics_guard(self.check_pics("DRLK.S.F00") and self.check_pics("DRLK.S.A0012")):
@@ -658,7 +658,7 @@ class TC_DRLK_2_9(MatterBaseTest, DRLK_COMMON):
             await self.clear_credentials_cmd(credential=credentials)
         self.step("15f")
         if self.pics_guard(self.check_pics("DRLK.S.F08") and self.check_pics("DRLK.S.C1d.Rsp")):
-            await self.send_clear_user_cmd(user_index=int(0xFFFE))
+            await self.send_clear_user_cmd(user_index=0xFFFE)
 
         self.step("16")
         if self.pics_guard(self.check_pics("DRLK.S.F08") and self.check_pics("DRLK.S.C1a.Rsp")):

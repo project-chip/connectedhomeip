@@ -112,7 +112,7 @@ class ParsedCommands:
     def __init__(self, path: str):
         log.info("Processing JSON file '%s'", path)
 
-        with open(path, "r") as f:
+        with open(path) as f:
             self.json_data = json.load(f)
 
         # data is a list of entries. We sort them since this as a sideffect places `/src/` before
