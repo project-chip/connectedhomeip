@@ -448,14 +448,15 @@ void AppTask::DMPostAttributeChangeCallback(const chip::app::ConcreteAttributePa
             MatterAwsSendMsg("light/state", (const char *) (value ? (*value ? "on" : "off") : "invalid"));
 #endif // SL_MATTER_ENABLE_AWS
             const bool lightOn = (*value != 0);
-            if (!lightOn && sOffEffectArmed)
-            {
-                break;
-            }
             if (lightOn)
             {
                 DisarmOffWithEffectTimer();
             }
+            else if (sOffEffectArmed)
+            {
+                break;
+            }
+
 
             sLightOn = lightOn;
             sLightLED.Set(sLightOn);
