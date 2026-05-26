@@ -44,6 +44,9 @@ runs:
         PAYLOAD_TEXT="🚨 *CI Failure Alert* 🚨\n*Job:* ${JOB_NAME}\n*Run Details:* <${RUN_URL}|View Pipeline Logs>"
         
         curl -sS -X POST -H 'Content-type: application/json' \
+          --connect-timeout 5 \
+          --max-time 10 \
+          --retry 3 \
           --data-binary @- "$SLACK_WEBHOOK" <<EOF
         {"text":"${PAYLOAD_TEXT}"}
         EOF
