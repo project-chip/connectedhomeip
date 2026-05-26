@@ -59,6 +59,11 @@ jobs:
                   cd integrations/docker/images/base/chip-build${{ matrix.img }}
                   ./build.sh --latest
 
+            - name: Notify Slack on Failure
+              if: failure()
+              uses: ./.github/actions/notify-slack-failure
+              with:
+                slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}
     # NOTE: docker images builds are disabled for all beyond base image because
     #       underlying image builds fail either due to size restrictions (we only
     #       have a few GB in github: 14GB for everything) or dependencies which
@@ -68,11 +73,6 @@ jobs:
     # developers to ignore CI failures.
     #
     # See https://github.com/project-chip/connectedhomeip/issues/30750
-            - name: Notify Slack on Failure
-              if: failure()
-              uses: ./.github/actions/notify-slack-failure
-              with:
-                slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}
     build_images_stage_1:
         needs: [build_images_base]
         name: Build Docker CHIP Build images - stage 1

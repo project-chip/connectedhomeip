@@ -16,7 +16,7 @@ runs:
         SERVER_URL: ${{ github.server_url }}
         REPOSITORY: ${{ github.repository }}
         RUN_ID: ${{ github.run_id }}
-        SLACK_WEBHOOK: ${{ inputs.slack-webhook }}
+        SLACK_WEBHOOK: ${{ inputs['slack-webhook'] }}
       run: |
         # 1. Skip gracefully if the Slack webhook is not configured (e.g. on developer forks)
         if [[ -z "$SLACK_WEBHOOK" ]]; then
