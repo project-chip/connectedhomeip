@@ -144,10 +144,15 @@ CHIP_ERROR ReadGroupKeyMap(FabricTable & fabricTable, GroupDataProvider & provid
         for (auto & fabric : fabricTable)
         {
             auto fabric_index = fabric.GetFabricIndex();
+
+            // This is iterating over group key map entries, not "group keys"
             auto iter         = provider.IterateGroupKeys(fabric_index);
             VerifyOrReturnError(nullptr != iter, CHIP_ERROR_NO_MEMORY);
 
+            // This is an individual group key map entry (as implied by the name), even 
+            // though the type is just called "GroupKey"
             GroupDataProvider::GroupKey mapping;
+
             while (iter->Next(mapping))
             {
                 GroupKeyManagement::Structs::GroupKeyMapStruct::Type key = {
@@ -183,7 +188,7 @@ CHIP_ERROR WriteGroupKeyMap(GroupDataProvider & provider, const ConcreteDataAttr
         ReturnErrorOnFailure(aDecoder.Decode(list));
         ReturnErrorOnFailure(list.ComputeSize(&new_count));
 
-        // Remove existing keys, ignore errors
+        // This is removing group key map entries, not "group keys". Ignore errors
         TEMPORARY_RETURN_IGNORED provider.RemoveGroupKeys(fabric_index);
 
         // Add the new keys
@@ -196,6 +201,7 @@ CHIP_ERROR WriteGroupKeyMap(GroupDataProvider & provider, const ConcreteDataAttr
             // Cannot map to IPK, see `GroupKeyMapStruct` in Group Key Management cluster spec
             VerifyOrReturnError(value.groupKeySetID != 0, CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
+            // This is setting the group key map entry at a particular index, not setting a "group key"
             ReturnErrorOnFailure(
                 provider.SetGroupKeyAt(value.fabricIndex, i++, GroupDataProvider::GroupKey(value.groupId, value.groupKeySetID)));
         }
@@ -211,6 +217,7 @@ CHIP_ERROR WriteGroupKeyMap(GroupDataProvider & provider, const ConcreteDataAttr
         VerifyOrReturnError(value.groupKeySetID != 0, CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
         {
+            // This is iterating over group key map entries, not "group keys"
             auto iter = provider.IterateGroupKeys(fabric_index);
             VerifyOrReturnError(nullptr != iter, CHIP_ERROR_NO_MEMORY);
 
@@ -218,6 +225,7 @@ CHIP_ERROR WriteGroupKeyMap(GroupDataProvider & provider, const ConcreteDataAttr
             iter->Release();
         }
 
+        // This is setting the group key map entry at a particular index, not setting a "group key"
         ReturnErrorOnFailure(provider.SetGroupKeyAt(value.fabricIndex, current_count,
                                                     GroupDataProvider::GroupKey(value.groupId, value.groupKeySetID)));
     }

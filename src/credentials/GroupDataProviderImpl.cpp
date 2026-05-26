@@ -1418,6 +1418,7 @@ CHIP_ERROR GroupDataProviderImpl::RemoveEndpoints(chip::FabricIndex fabric_index
 // Group-Key map
 //
 
+// This sets the group key map entry, not a "group key"
 CHIP_ERROR GroupDataProviderImpl::SetGroupKey(FabricIndex fabric_index, GroupId group_id, KeysetId keyset_id)
 {
     VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INTERNAL);
@@ -1443,11 +1444,14 @@ CHIP_ERROR GroupDataProviderImpl::SetGroupKey(FabricIndex fabric_index, GroupId 
         map.id = map.next;
     }
 
-    // New group, insert last
+    // New group key map entry, insert last
     GroupKey entry(group_id, keyset_id);
+
+    // This sets the group key map entry at the index, not a "group key"
     return SetGroupKeyAt(fabric_index, fabric.map_count, entry);
 }
 
+// This sets the group key map entry at the index, not a "group key"
 CHIP_ERROR GroupDataProviderImpl::SetGroupKeyAt(chip::FabricIndex fabric_index, size_t index, const GroupKey & in_map)
 {
     VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INTERNAL);
@@ -1501,6 +1505,7 @@ CHIP_ERROR GroupDataProviderImpl::SetGroupKeyAt(chip::FabricIndex fabric_index, 
     return fabric.Save(mStorage);
 }
 
+// This gets a group key map entry, not a "group key"
 CHIP_ERROR GroupDataProviderImpl::GetGroupKey(FabricIndex fabric_index, GroupId group_id, KeysetId & keyset_id)
 {
     VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INTERNAL);
@@ -1523,6 +1528,7 @@ CHIP_ERROR GroupDataProviderImpl::GetGroupKey(FabricIndex fabric_index, GroupId 
     return CHIP_ERROR_NOT_FOUND;
 }
 
+// This gets the group key map entry at the index, not a "group key"
 CHIP_ERROR GroupDataProviderImpl::GetGroupKeyAt(chip::FabricIndex fabric_index, size_t index, GroupKey & out_map)
 {
     VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INTERNAL);
@@ -1539,6 +1545,7 @@ CHIP_ERROR GroupDataProviderImpl::GetGroupKeyAt(chip::FabricIndex fabric_index, 
     return CHIP_NO_ERROR;
 }
 
+// This removes the group key map entry at the index, not a "group key"
 CHIP_ERROR GroupDataProviderImpl::RemoveGroupKeyAt(chip::FabricIndex fabric_index, size_t index)
 {
     VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INTERNAL);
@@ -1572,6 +1579,7 @@ CHIP_ERROR GroupDataProviderImpl::RemoveGroupKeyAt(chip::FabricIndex fabric_inde
     return fabric.Save(mStorage);
 }
 
+// This removes group key map entries, not "group keys"
 CHIP_ERROR GroupDataProviderImpl::RemoveGroupKeys(chip::FabricIndex fabric_index)
 {
     VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INTERNAL);
@@ -1761,6 +1769,7 @@ CHIP_ERROR GroupDataProviderImpl::RemoveKeySet(chip::FabricIndex fabric_index, u
         {
             break;
         }
+        // This removes the group key map entry at the index, not a "group key".
         // NOTE: It's unclear what should happen here if we have removed the key set
         // and possibly some mappings before failing. For now, ignoring errors, but
         // open to suggestsions for the correct behavior.
@@ -1830,15 +1839,13 @@ CHIP_ERROR GroupDataProviderImpl::RemoveFabric(chip::FabricIndex fabric_index)
     CHIP_ERROR err = fabric.Load(mStorage);
     VerifyOrReturnError(CHIP_NO_ERROR == err || CHIP_ERROR_NOT_FOUND == err, err);
 
-    // Remove Group mappings
-
+    // Remove Group Key Map Entries
     for (size_t i = 0; i < fabric.map_count; i++)
     {
         TEMPORARY_RETURN_IGNORED RemoveGroupKeyAt(fabric_index, fabric.map_count - i - 1);
     }
 
     // Remove group info
-
     for (size_t i = 0; i < fabric.group_count; i++)
     {
         TEMPORARY_RETURN_IGNORED RemoveGroupInfoAt(fabric_index, fabric.group_count - i - 1);
