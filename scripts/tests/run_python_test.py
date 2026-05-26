@@ -156,7 +156,7 @@ class AppProcessManager:
         return self.app_process
 
 
-class IpPacketCaptureManager():
+class IpPacketCaptureManager:
     def __init__(self, dump_filename: pathlib.Path):
         self.tcpdump_process = None
         self.dump_filename = dump_filename
