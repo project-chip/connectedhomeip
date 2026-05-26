@@ -185,7 +185,7 @@ def load_routing_configuration_file(file_path: Path) -> List[Route]:
         that can be hosted independently (e.g., on GitHub for DCL references).
     """
     try:
-        with open(file_path, "r") as file:
+        with open(file_path) as file:
             config = json.load(file)
         if "routes" not in config:
             log.error("Missing required 'routes' key in configuration file: %s", file_path)

@@ -32,7 +32,7 @@ namespace webrtc {
 CHIP_ERROR ConnectCommand::RunCommand()
 {
     ChipLogProgress(Camera, "Run ConnectCommand");
-    return WebRTCManager::Instance().Connnect(CurrentCommissioner(), mPeerNodeId, mPeerEndpointId);
+    return WebRTCManager::Instance().Connect(CurrentCommissioner(), mPeerNodeId, mPeerEndpointId);
 }
 
 CHIP_ERROR ProvideOfferCommand::RunCommand()

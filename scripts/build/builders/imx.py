@@ -77,7 +77,7 @@ class IMXBuilder(GnBuilder):
                  release: bool = False,
                  trusty: bool = False,
                  ele: bool = False):
-        super(IMXBuilder, self).__init__(
+        super().__init__(
             root=os.path.join(root, 'examples', app.ExamplePath()),
             runner=runner,
             output_dir_lock=output_dir_lock)
@@ -112,7 +112,7 @@ class IMXBuilder(GnBuilder):
                 raise Exception('The SDK environment setup script is not found, make sure the env IMX_SDK_ROOT is correctly set.')
             else:
 
-                with open(os.path.join(self.SysRootPath('IMX_SDK_ROOT'), env_setup_script), 'r') as env_setup_script_fd:
+                with open(os.path.join(self.SysRootPath('IMX_SDK_ROOT'), env_setup_script)) as env_setup_script_fd:
                     lines = env_setup_script_fd.readlines()
                     for line in lines:
                         line = line.strip('\n')
