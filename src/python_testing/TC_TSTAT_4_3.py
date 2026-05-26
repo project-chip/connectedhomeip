@@ -37,7 +37,7 @@
 import asyncio
 import logging
 import random
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 from mobly import asserts
 
@@ -55,7 +55,7 @@ time_cluster = Clusters.TimeSynchronization
 
 
 def get_epoch_utc_time():
-    return int((datetime.now(timezone.utc) - datetime(2000, 1, 1, 0, 0, 0, 0, timezone.utc)).total_seconds())
+    return int((datetime.now(UTC) - datetime(2000, 1, 1, 0, 0, 0, 0, UTC)).total_seconds())
 
 
 class TC_TSTAT_4_3(MatterBaseTest):
@@ -591,7 +591,7 @@ class TC_TSTAT_4_3(MatterBaseTest):
         asserts.assert_greater_equal(
             len(possiblePresetHandles), 1, "Couldn't run test step 10 since all preset handles are also the ActivePresetHandle on this Thermostat")
         presetHandle = possiblePresetHandles[0]
-        currentUTC = int((datetime.now(timezone.utc) - datetime(2000, 1, 1, 0, 0, 0, 0, timezone.utc)
+        currentUTC = int((datetime.now(UTC) - datetime(2000, 1, 1, 0, 0, 0, 0, UTC)
                           ).total_seconds()) + int(timedelta(hours=25).total_seconds())
         expirationInMinutes = 30
         # Verify that the AddThermostatSuggestion command returns INVALID_COMMAND.

@@ -337,11 +337,17 @@ Davis, CA 95616, USA
     </field>
     <field id="4" name="VideoStreamID" type="VideoStreamID">
       <quality nullable="true"/>
-      <disallowConform/>
+      <otherwiseConform>
+        <optionalConform/>
+        <deprecateConform/>
+      </otherwiseConform>
     </field>
     <field id="5" name="AudioStreamID" type="AudioStreamID">
       <quality nullable="true"/>
-      <disallowConform/>
+      <otherwiseConform>
+        <optionalConform/>
+        <deprecateConform/>
+      </otherwiseConform>
     </field>
     <field id="6" name="MetadataEnabled" type="bool">
       <mandatoryConform/>

@@ -179,7 +179,7 @@ class RunSummary(RunStats):
     """
     iterations: int
     tests_per_iteration: int
-    run_timestamp: datetime.datetime | str = field(default_factory=lambda: datetime.datetime.now(datetime.timezone.utc))
+    run_timestamp: datetime.datetime | str = field(default_factory=lambda: datetime.datetime.now(datetime.UTC))
     results: list[TestResult] = field(default_factory=list, init=False)
     test_stats: dict[str, RunStats] = field(default_factory=dict, init=False)
     exceptions: defaultdict[int, dict[str, ExceptionInfoT]] = field(default_factory=lambda: defaultdict(dict), init=False)
@@ -354,7 +354,7 @@ class RunSummary(RunStats):
                               no_content_msg="No failures recorded",
                               headers_fmt=(("Test name", "<"), ("Iter", ">"), ("Duration", ">")),
                               rows=((r.name_decorated, str(r.iteration), f"{r.duration_seconds:.2f}s")
-                              for r in sorted(failed_results, key=lambda x: x.name)))
+                                    for r in sorted(failed_results, key=lambda x: x.name)))
 
         if show_flaky and self.iterations > 1:
             flaky = tuple((name, stats) for name, stats in self.test_stats.items() if stats.failed > 0)
@@ -362,7 +362,7 @@ class RunSummary(RunStats):
                               no_content_msg="No flaky results",
                               headers_fmt=(("Test name", "<"), ("Failures", ">"), ("Rate", ">")),
                               rows=((name, f"{stats.failed}/{stats.total_runs:<2}", f"{100 * stats.fail_rate:.1f}%")
-                              for name, stats in sorted(flaky, key=lambda item: -item[1].failed)))
+                                    for name, stats in sorted(flaky, key=lambda item: -item[1].failed)))
 
         if top_slowest:
             slowest = sorted((r for r in self.results if r.status not in (TestStatus.DRY_RUN, TestStatus.CANCELLED)),
@@ -375,7 +375,7 @@ class RunSummary(RunStats):
             self._print_table(title=f"SLOWEST {len(slowest)} TEST RUNS:", no_content_msg="No tests to show for slowest list",
                               headers_fmt=(("Test name", "<"), ("Status", "<"), ("Iter", ">"), ("Duration", ">")),
                               rows=((r.name_decorated, r.status, str(r.iteration), f"{r.duration_seconds:.2f}s")
-                              for r in slowest))
+                                    for r in slowest))
 
         if show_all:
             self._print_table(title="STATS OF ALL TESTS:", no_content_msg="No tests to show", last_col_max_width=20,

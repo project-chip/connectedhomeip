@@ -29,7 +29,7 @@ import sys
 import textwrap
 import time
 from dataclasses import dataclass
-from typing import Iterable, List, Optional
+from typing import Iterable, Optional
 
 import alive_progress
 import click
@@ -47,7 +47,7 @@ with python_path.PythonPath("../../src/python_testing/matter_testing_infrastruct
 log = logging.getLogger(__name__)
 
 
-def _get_apps_from_script(path: str) -> List[str]:
+def _get_apps_from_script(path: str) -> list[str]:
     """
     Parses a python script and returns the apps it is for.
     """
@@ -294,7 +294,7 @@ def _get_targets(coverage: Optional[bool]) -> list[ApplicationTarget]:
             env_key="LIGHTING_APP_NO_UNIQUE_ID",
             cli_key="lighting",
             target=f"{target_prefix}-light-data-model-no-unique-id-ipv6only-no-wifi-{suffix}",
-            binary="chip-lighting-app",
+            binary="chip-lighting-data-model-no-unique-id-app",
         )
     )
 
@@ -486,7 +486,7 @@ def cli(log_level):
     )
 
 
-def _with_activate(build_cmd: List[str], output_path=None) -> List[str]:
+def _with_activate(build_cmd: list[str], output_path=None) -> list[str]:
     """
     Given a bash command list, will generate a new command suitable for subprocess
     with an execution of `scripts/activate.sh` prepended to it
@@ -616,7 +616,7 @@ def _maybe_with_runner(script_name: str, path: str, runner: BinaryRunner):
         os.mkdir("out/runners")
 
     script_name = f"out/runners/{script_name}.sh"
-    with open(script_name, "wt") as f:
+    with open(script_name, "w") as f:
         f.write(
             textwrap.dedent(
                 f"""\
@@ -772,7 +772,7 @@ def _raw_profile_to_info(profile: RawProfile):
             lines.append(line)
 
     # re-write it.
-    with open(info_path, 'wt') as f:
+    with open(info_path, "w") as f:
         f.write("\n".join(lines))
 
     return info_path
@@ -967,7 +967,7 @@ def python_tests(
     # create an env file
     override_binaries = dict(override_binary_path or [])
 
-    with open("./out/test_env.yaml", "wt") as f:
+    with open("./out/test_env.yaml", "w") as f:
         for target in _get_targets(coverage):
             if target.env_key in override_binaries:
                 run_path = as_runner(override_binaries[target.env_key])
@@ -1326,7 +1326,7 @@ def chip_tool_tests(
     # This likely should be run in docker to not allow breaking things
     # run as:
     #
-    # docker run --rm -it -v ~/devel/connectedhomeip:/workspace --privileged ghcr.io/project-chip/chip-build-vscode:181
+    # docker run --rm -it -v ~/devel/connectedhomeip:/workspace --privileged ghcr.io/project-chip/chip-build-vscode:<VERSION>
     runner = __RUNNERS__[runner]
 
     # make sure we are fully aware if running with or without coverage

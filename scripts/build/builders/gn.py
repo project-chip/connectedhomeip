@@ -14,19 +14,22 @@
 
 import shlex
 
-from .builder import Builder, BuildProfile
+from runner.runner import Runner
+
+from .builder import Builder, BuildProfile, OutDirLock, lock_output_dir
 
 
 class GnBuilder(Builder):
 
-    def __init__(self, root, runner):
+    def __init__(self, root: str, runner: Runner, output_dir_lock: OutDirLock):
         """Creates  a generic ninja builder.
 
         Args:
            root: the root where to run GN into
            runner: what to use to execute shell commands
+           output_dir_lock: lock for the output directory
         """
-        super(GnBuilder, self).__init__(root, runner)
+        super().__init__(root, runner, output_dir_lock)
 
         self.build_command = None
 
@@ -64,6 +67,7 @@ class GnBuilder(Builder):
         """Extra steps to run after 'build'"""
         pass
 
+    @lock_output_dir
     def generate(self, dedup=False):
         cmd = [
             'gn', 'gen', '--check', '--fail-on-unused-args',
@@ -91,6 +95,7 @@ class GnBuilder(Builder):
 
         self._Execute(cmd, title=f"Generating {self.identifier}", dedup=dedup)
 
+    @lock_output_dir
     def _build(self):
         self.PreBuildCommand()
 

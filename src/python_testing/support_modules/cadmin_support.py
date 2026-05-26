@@ -147,7 +147,7 @@ class CADMINBaseTest(MatterBaseTest):
         try:
             window_status_accumulator.await_all_expected_report_matches([status_match], timeout_sec=timeout_sec)
             log.info(f"✅ Window status changed to {status_name} (status={is_open_expected})")
-        except asyncio.TimeoutError as e:
+        except TimeoutError as e:
             error_msg = f"Timeout waiting for window status {is_open_expected} ({status_name}) after {timeout_sec}s: {e}"
             log.error(f"❌ {error_msg}")
             asserts.fail(error_msg)
