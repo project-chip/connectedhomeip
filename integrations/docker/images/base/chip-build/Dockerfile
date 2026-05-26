@@ -226,8 +226,6 @@ RUN set -x \
     && ./Configure --prefix=/usr/local --openssldir=/etc/ssl --libdir=lib \
     && make -j$(nproc) \
     && make install_sw \
-    && rm -rf /usr/local/ssl/certs \
-    && ln -s /etc/ssl/certs /usr/local/ssl/certs \
     && ldconfig \
     && cd / && rm -rf /tmp/openssl-${OPENSSL_VERSION}* \
     && : # last line
