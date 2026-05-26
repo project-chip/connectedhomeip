@@ -21,7 +21,6 @@
 #      Builds a Python wheel package for Matter.
 #
 
-from __future__ import absolute_import
 
 import argparse
 import json

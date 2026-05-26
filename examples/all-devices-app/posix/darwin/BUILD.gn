@@ -25,7 +25,9 @@ config("includes") {
 source_set("darwin") {
   sources = [
     "../include/AppRootNode.h",
+    "../include/BleInit.h",
     "../include/TermHandling.h",
+    "BleInit.cpp",
     "DeviceFactoryPlatformOverride.cpp",
     "TermHandling.cpp",
   ]

@@ -191,7 +191,7 @@ class TelinkBuilder(Builder):
                  log_level: TelinkLogLevel = TelinkLogLevel.DEFAULT,
                  all_devices_enabled_devices=None,
                  ):
-        super(TelinkBuilder, self).__init__(root, runner, output_dir_lock)
+        super().__init__(root, runner, output_dir_lock)
         self.app = app
         self.board = board
         self.enable_ota = enable_ota

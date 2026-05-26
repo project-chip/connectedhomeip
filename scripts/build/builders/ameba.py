@@ -67,7 +67,7 @@ class AmebaBuilder(Builder):
                  output_dir_lock: OutDirLock,
                  board: AmebaBoard = AmebaBoard.AMEBAD,
                  app: AmebaApp = AmebaApp.ALL_CLUSTERS):
-        super(AmebaBuilder, self).__init__(root, runner, output_dir_lock)
+        super().__init__(root, runner, output_dir_lock)
         self.board = board
         self.app = app
 
