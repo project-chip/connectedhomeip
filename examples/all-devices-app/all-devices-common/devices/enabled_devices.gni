@@ -55,12 +55,20 @@ _available_devices = [
     "DIMMABLE_LIGHT",
   ],
   [
+    "network-infrastructure-manager",
+    "NETWORK_INFRASTRUCTURE_MANAGER",
+  ],
+  [
     "occupancy-sensor",
     "OCCUPANCY_SENSOR",
   ],
   [
     "on-off-light",
     "ON_OFF_LIGHT",
+  ],
+  [
+    "proximity-ranger",
+    "PROXIMITY_RANGER",
   ],
   [
     "soil-sensor",

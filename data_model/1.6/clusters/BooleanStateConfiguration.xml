@@ -85,15 +85,12 @@ Davis, CA 95616, USA
       <optionalConform/>
     </feature>
     <feature bit="4" code="FAULTEV" name="FaultEvents" summary="Supports reporting fault events">
-      <otherwiseConform>
-        <provisionalConform/>
-        <optionalConform>
-          <greaterOrEqualTerm>
-            <revision value="current"/>
-            <revision value="2"/>
-          </greaterOrEqualTerm>
-        </optionalConform>
-      </otherwiseConform>
+      <optionalConform>
+        <greaterOrEqualTerm>
+          <revision value="current"/>
+          <revision value="2"/>
+        </greaterOrEqualTerm>
+      </optionalConform>
     </feature>
   </features>
   <dataTypes>

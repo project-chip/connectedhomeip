@@ -1816,6 +1816,9 @@ CHIP_ERROR CameraAVStreamManagementCluster::LoadAllocatedStreams()
     {
         typename Traits::StreamStructType stream;
         ReturnErrorOnFailure(DataModel::Decode(reader, stream));
+        // Zero out the referenceCount and allow it to be updated based on how
+        // the stream gets used by the transports.
+        stream.referenceCount = 0;
         streams.push_back(stream);
     }
 

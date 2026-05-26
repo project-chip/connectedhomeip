@@ -89,7 +89,7 @@ class EventSpecificChangeCallback:
         return res.Data
 
 
-class TC_OPSTATE_BASE():
+class TC_OPSTATE_BASE:
     def setup_base(self, test_info=None):
         asserts.assert_true(test_info is not None,
                             "You shall define the test info!")
@@ -855,7 +855,7 @@ class TC_OPSTATE_BASE():
 
         # STEP 13: Manually put the device in the Stopped(0x00) operational state
         self.step(13)
-        if self.pics_guard(self.check_pics((f"{self.test_info.pics_code}.S.M.ST_STOPPED"))):
+        if self.pics_guard(self.check_pics(f"{self.test_info.pics_code}.S.M.ST_STOPPED")):
             self.send_manual_or_pipe_command(name="OperationalStateChange",
                                              device=self.device,
                                              operation="Stop")
@@ -876,7 +876,7 @@ class TC_OPSTATE_BASE():
 
         # STEP 16: Manually put the device in the Error(0x03) operational state
         self.step(16)
-        if self.pics_guard(self.check_pics((f"{self.test_info.pics_code}.S.M.ST_ERROR"))):
+        if self.pics_guard(self.check_pics(f"{self.test_info.pics_code}.S.M.ST_ERROR")):
             self.send_manual_or_pipe_command(name="OperationalStateChange",
                                              device=self.device,
                                              operation="OnFault",
@@ -1170,7 +1170,7 @@ class TC_OPSTATE_BASE():
 
         # STEP 21: TH waits for half of initial-countdown-time
         self.step(21)
-        await asyncio.sleep((initial_countdown_time / 2))
+        await asyncio.sleep(initial_countdown_time / 2)
 
         # STEP 22: TH sends Resume command to the DUT
         self.step(22)
