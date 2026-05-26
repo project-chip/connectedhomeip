@@ -224,17 +224,14 @@ class TC_FAN_4_1(MatterBaseTest):
         step_num = 16
         num_substeps = 7
 
-        async def verify_onoff_off(attr: Clusters.ClusterObjects.ClusterAttributeDescriptor, expected_mode: Clusters.FanControl.Enums.FanModeEnum, expected_percent_setting: Optional[int], expected_speed_setting: Optional[int], *, accept_constraint_error: bool):
+        async def verify_onoff_off(attr: Clusters.ClusterObjects.ClusterAttributeDescriptor, expected_mode: Clusters.FanControl.Enums.FanModeEnum, expected_percent_setting: Optional[int], expected_speed_setting: Optional[int]):
             """ Writes specified attribute and checks expected results for On/Off cluster in Off mode
                 None on PercentSetting or SpeedSetting just verifies the values are not 0.
             """
             nonlocal step_num
             self.step(step_num)
             resp = await self.default_controller.WriteAttribute(nodeId=self.dut_node_id, attributes=[(self.get_endpoint(), attr)])
-            allowed_write_statuses = [Status.Success, Status.InvalidInState]
-            if accept_constraint_error:
-                allowed_write_statuses.append(Status.ConstraintError)
-            asserts.assert_in(resp[0].Status, allowed_write_statuses, "Unexpected status returned")
+            asserts.assert_in(resp[0].Status, [Status.Success, Status.InvalidInState], "Unexpected status returned")
             if resp[0].Status != Status.Success:
                 self.skip_step(step_num + 1)
                 self.skip_step(step_num + 2)
@@ -282,19 +279,19 @@ class TC_FAN_4_1(MatterBaseTest):
             step_num += num_substeps
 
         lowest_mode = self.get_fan_modes(supported_fan_modes)[1]
-        await verify_onoff_off(attr=fan.Attributes.PercentSetting(1), expected_mode=lowest_mode, expected_percent_setting=1, expected_speed_setting=1, accept_constraint_error=False)
-        await verify_onoff_off(attr=fan.Attributes.PercentSetting(0), expected_mode=fan.Enums.FanModeEnum.kOff, expected_percent_setting=0, expected_speed_setting=0, accept_constraint_error=False)
-        await verify_onoff_off(attr=fan.Attributes.FanMode(fan.Enums.FanModeEnum.kHigh), expected_mode=fan.Enums.FanModeEnum.kHigh, expected_percent_setting=None, expected_speed_setting=None, accept_constraint_error=True)
-        await verify_onoff_off(attr=fan.Attributes.FanMode(fan.Enums.FanModeEnum.kOff), expected_mode=fan.Enums.FanModeEnum.kOff, expected_percent_setting=0, expected_speed_setting=0, accept_constraint_error=True)
+        await verify_onoff_off(attr=fan.Attributes.PercentSetting(1), expected_mode=lowest_mode, expected_percent_setting=1, expected_speed_setting=1)
+        await verify_onoff_off(attr=fan.Attributes.PercentSetting(0), expected_mode=fan.Enums.FanModeEnum.kOff, expected_percent_setting=0, expected_speed_setting=0)
+        await verify_onoff_off(attr=fan.Attributes.FanMode(fan.Enums.FanModeEnum.kHigh), expected_mode=fan.Enums.FanModeEnum.kHigh, expected_percent_setting=None, expected_speed_setting=None)
+        await verify_onoff_off(attr=fan.Attributes.FanMode(fan.Enums.FanModeEnum.kOff), expected_mode=fan.Enums.FanModeEnum.kOff, expected_percent_setting=0, expected_speed_setting=0)
         if has_spd:
-            await verify_onoff_off(attr=fan.Attributes.SpeedSetting(speed_max), expected_mode=fan.Enums.FanModeEnum.kHigh, expected_percent_setting=None, expected_speed_setting=speed_max, accept_constraint_error=False)
-            await verify_onoff_off(attr=fan.Attributes.SpeedSetting(0), expected_mode=fan.Enums.FanModeEnum.kOff, expected_percent_setting=0, expected_speed_setting=0, accept_constraint_error=False)
+            await verify_onoff_off(attr=fan.Attributes.SpeedSetting(speed_max), expected_mode=fan.Enums.FanModeEnum.kHigh, expected_percent_setting=None, expected_speed_setting=speed_max)
+            await verify_onoff_off(attr=fan.Attributes.SpeedSetting(0), expected_mode=fan.Enums.FanModeEnum.kOff, expected_percent_setting=0, expected_speed_setting=0)
         else:
             for i in range(2*num_substeps):
                 self.skip_step(step_num + i)
             step_num += 2 * num_substeps
 
-        await verify_onoff_off(attr=fan.Attributes.PercentSetting(100), expected_mode=fan.Enums.FanModeEnum.kHigh, expected_percent_setting=100, expected_speed_setting=speed_max, accept_constraint_error=False)
+        await verify_onoff_off(attr=fan.Attributes.PercentSetting(100), expected_mode=fan.Enums.FanModeEnum.kHigh, expected_percent_setting=100, expected_speed_setting=speed_max)
 
         self.step(step_num)
         percent_setting_before_on = await self.read_single_attribute_check_success(cluster=fan, attribute=fan.Attributes.PercentSetting)
