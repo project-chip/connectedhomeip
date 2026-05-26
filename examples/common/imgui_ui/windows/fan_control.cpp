@@ -17,8 +17,7 @@
 #include "fan_control.h"
 #include "accessor_updaters.h"
 
-#include <app-common/zap-generated/attributes/Accessors.h>
-#include <app-common/zap-generated/cluster-enums.h>
+#include <app/clusters/fan-control-server/fan-control-server.h>
 
 #include <imgui.h>
 

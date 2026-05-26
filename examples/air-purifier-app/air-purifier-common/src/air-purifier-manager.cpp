@@ -88,11 +88,6 @@ void AirPurifierManager::PostAttributeChangeCallback(EndpointId endpoint, Cluste
 {
     switch (clusterId)
     {
-    case FanControl::Id: {
-        HandleFanControlAttributeChange(attributeId, type, size, value);
-        break;
-    }
-
     case Thermostat::Id: {
         HandleThermostatAttributeChange(attributeId, type, size, value);
         break;
@@ -222,48 +217,6 @@ void AirPurifierManager::OnFanDriveStateChanged(const FanControl::FanDriveState 
     }
 }
 
-void AirPurifierManager::HandleFanControlAttributeChange(AttributeId attributeId, uint8_t type, uint16_t size, uint8_t * value)
-{
-    switch (attributeId)
-    {
-    case FanControl::Attributes::PercentSetting::Id: {
-        DataModel::Nullable<Percent> percentSetting = static_cast<DataModel::Nullable<uint8_t>>(*value);
-        if (percentSetting.IsNull())
-        {
-            PercentSettingWriteCallback(0);
-        }
-        else
-        {
-            PercentSettingWriteCallback(percentSetting.Value());
-        }
-        break;
-    }
-
-    case FanControl::Attributes::SpeedSetting::Id: {
-        DataModel::Nullable<uint8_t> speedSetting = static_cast<DataModel::Nullable<uint8_t>>(*value);
-        if (speedSetting.IsNull())
-        {
-            SpeedSettingWriteCallback(0);
-        }
-        else
-        {
-            SpeedSettingWriteCallback(speedSetting.Value());
-        }
-        break;
-    }
-
-    case FanControl::Attributes::FanMode::Id: {
-        FanControl::FanModeEnum fanMode = static_cast<FanControl::FanModeEnum>(*value);
-        FanModeWriteCallback(fanMode);
-        break;
-    }
-
-    default: {
-        break;
-    }
-    }
-}
-
 void AirPurifierManager::HandleOnOff(AttributeId attributeId, uint8_t type, uint16_t size, uint8_t * value)
 {
     if (attributeId != OnOff::Attributes::OnOff::Id)
@@ -373,58 +326,6 @@ void AirPurifierManager::SpeedSettingWriteCallback(uint8_t aNewSpeedSetting)
     else if (aNewSpeedSetting <= FAN_MODE_HIGH_UPPER_BOUND)
     {
         FanControl::Attributes::FanMode::Set(mEndpointId, FanControl::FanModeEnum::kHigh);
-    }
-}
-
-void AirPurifierManager::FanModeWriteCallback(FanControl::FanModeEnum aNewFanMode)
-{
-    ChipLogDetail(NotSpecified, "AirPurifierManager::FanModeWriteCallback: %d", (uint8_t) aNewFanMode);
-    // If current speed setting is null, set it to an out-of-bounds value to force an update
-    uint8_t speedSettingCurrent = GetSpeedSetting().ValueOr(101);
-    switch (aNewFanMode)
-    {
-    case FanControl::FanModeEnum::kOff: {
-        if (speedSettingCurrent != 0)
-        {
-            DataModel::Nullable<uint8_t> speedSetting(0);
-            SetSpeedSetting(speedSetting);
-        }
-        break;
-    }
-    case FanControl::FanModeEnum::kLow: {
-        if (speedSettingCurrent < FAN_MODE_LOW_LOWER_BOUND || speedSettingCurrent > FAN_MODE_LOW_UPPER_BOUND)
-        {
-            DataModel::Nullable<uint8_t> speedSetting(FAN_MODE_LOW_LOWER_BOUND);
-            SetSpeedSetting(speedSetting);
-        }
-        break;
-    }
-    case FanControl::FanModeEnum::kMedium: {
-        if (speedSettingCurrent < FAN_MODE_MEDIUM_LOWER_BOUND || speedSettingCurrent > FAN_MODE_MEDIUM_UPPER_BOUND)
-        {
-            DataModel::Nullable<uint8_t> speedSetting(FAN_MODE_MEDIUM_LOWER_BOUND);
-            SetSpeedSetting(speedSetting);
-        }
-        break;
-    }
-    case FanControl::FanModeEnum::kOn:
-    case FanControl::FanModeEnum::kHigh: {
-        if (speedSettingCurrent < FAN_MODE_HIGH_LOWER_BOUND || speedSettingCurrent > FAN_MODE_HIGH_UPPER_BOUND)
-        {
-            DataModel::Nullable<uint8_t> speedSetting(FAN_MODE_HIGH_LOWER_BOUND);
-            SetSpeedSetting(speedSetting);
-        }
-        break;
-    }
-    case FanControl::FanModeEnum::kSmart:
-    case FanControl::FanModeEnum::kAuto: {
-        ChipLogProgress(NotSpecified, "AirPurifierManager::FanModeWriteCallback: Auto");
-        break;
-    }
-    case FanControl::FanModeEnum::kUnknownEnumValue: {
-        ChipLogProgress(NotSpecified, "AirPurifierManager::FanModeWriteCallback: Unknown");
-        break;
-    }
     }
 }
 
