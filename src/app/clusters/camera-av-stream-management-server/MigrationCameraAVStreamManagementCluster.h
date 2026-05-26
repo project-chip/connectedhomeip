@@ -32,15 +32,13 @@ namespace CameraAvStreamManagement {
  * via SafeAttributePersistenceProvider into the standard AttributePersistenceProvider,
  * then delegates to the base Startup(). Persistent attributes are loaded later in Init().
  */
-class MigrationCameraAVStreamManagementCluster : public CameraAVStreamManagementCluster
-public:
-    using CameraAVStreamManagementCluster::CameraAVStreamManagementCluster;
+class MigrationCameraAVStreamManagementCluster : public CameraAVStreamManagementCluster public
+    : using CameraAVStreamManagementCluster::CameraAVStreamManagementCluster;
 
-    CHIP_ERROR Startup(ServerClusterContext & context) override;
+CHIP_ERROR Startup(ServerClusterContext & context) override;
 };
 
 } // namespace CameraAvStreamManagement
 } // namespace Clusters
 } // namespace app
 } // namespace chip
-
