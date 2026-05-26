@@ -51,6 +51,10 @@
 #include <app/clusters/relative-humidity-measurement-server/CodegenIntegration.h>
 #endif
 
+#if MATTER_DM_BOOLEAN_STATE_CONFIGURATION_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+#include <app/clusters/boolean-state-configuration-server/CodegenIntegration.h>
+#endif
+
 namespace chip {
 namespace app {
 namespace Clusters {
@@ -322,6 +326,30 @@ public:
             }
             break;
 #endif // MATTER_DM_RELATIVE_HUMIDITY_MEASUREMENT_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+#if MATTER_DM_BOOLEAN_STATE_CONFIGURATION_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+        case BooleanStateConfiguration::Id:
+            switch (path.mAttributeId)
+            {
+            case BooleanStateConfiguration::Attributes::AlarmsActive::Id: {
+                BitMask<BooleanStateConfiguration::AlarmModeBitmap> alarms;
+                CHIP_ERROR err = decoder.Decode(alarms);
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(Zcl, "[Pw] Failed to decode alarms active: %" CHIP_ERROR_FORMAT, err.Format());
+                    return ::pw::Status::Internal();
+                }
+                err = BooleanStateConfiguration::SetAlarmsActive(path.mEndpointId, alarms);
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(Zcl, "[Pw] Failed to set alarms active: %" CHIP_ERROR_FORMAT, err.Format());
+                    return ::pw::Status::Internal();
+                }
+                ChipLogProgress(Zcl, "[Pw] Successfully set alarms active to 0x%02x.", alarms.Raw());
+                return ::pw::OkStatus();
+            }
+            }
+            break;
+#endif // MATTER_DM_BOOLEAN_STATE_CONFIGURATION_CLUSTER_SERVER_ENDPOINT_COUNT > 0
         }
         return std::nullopt;
     }

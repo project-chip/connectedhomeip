@@ -26,7 +26,7 @@
 """
 
 # Needed to use types in type hints before they are fully defined.
-from __future__ import absolute_import, annotations, print_function
+from __future__ import annotations
 
 import asyncio
 import builtins
@@ -351,7 +351,7 @@ class CommissioningContext(CallbackContext):
 
 
 class CommissionableNode(discovery.CommissionableNode):
-    def SetDeviceController(self, devCtrl: 'ChipDeviceController'):
+    def SetDeviceController(self, devCtrl: ChipDeviceController):
         self._devCtrl = devCtrl
 
     def Commission(self, nodeId: int, setupPinCode: int) -> int:
@@ -377,7 +377,7 @@ class CommissionableNode(discovery.CommissionableNode):
                 yield k, self.__dict__[k]
 
 
-class DeviceProxyWrapper():
+class DeviceProxyWrapper:
     ''' Encapsulates a pointer to OperationalDeviceProxy on the c++ side that needs to be
         freed when DeviceProxyWrapper goes out of scope. There is a potential issue where
         if this is copied around that a double free will occur, but how this is used today
@@ -497,7 +497,7 @@ DiscoveryFilterType: typing.TypeAlias = discovery.FilterType
 DiscoveryType: typing.TypeAlias = discovery.DiscoveryType
 
 
-class ChipDeviceControllerBase():
+class ChipDeviceControllerBase:
     activeList: typing.Set = set()
 
     def __init__(self, name: str = ''):
@@ -1194,8 +1194,10 @@ class ChipDeviceControllerBase():
         # Intentionally return None instead of raising exceptions on error
         return (address.value.decode(), port.value) if error == 0 else None
 
-    async def DiscoverCommissionableNodes(self, filterType: discovery.FilterType = discovery.FilterType.NONE, filter: typing.Any = None,
-                                          stopOnFirst: bool = False, timeoutSecond: int = 5) -> typing.Union[None, CommissionableNode, typing.List[CommissionableNode]]:
+    async def DiscoverCommissionableNodes(self,
+                                            filterType: discovery.FilterType = discovery.FilterType.NONE,
+                                            filter: typing.Any = None,  # noqa: A002
+                                            stopOnFirst: bool = False, timeoutSecond: int = 5) -> typing.Union[None, CommissionableNode, typing.List[CommissionableNode]]:
         '''
         Discover commissionable nodes via DNS-SD with specified filters.
         Supported filters are:
@@ -1219,7 +1221,7 @@ class ChipDeviceControllerBase():
         self.CheckIsActive()
 
         if isinstance(filter, int):
-            filter = str(filter)
+            filter = str(filter)  # noqa: A001
 
         # Discovery is also used during commissioning. Make sure this manual discovery
         # and commissioning attempts do not interfere with each other.
@@ -1516,7 +1518,7 @@ class ChipDeviceControllerBase():
                 LOGGER.info('Using PASE connection')
                 return DeviceProxyWrapper(returnDevice, DeviceProxyWrapper.DeviceProxyType.COMMISSIONEE, self._dmLib)
 
-        class DeviceAvailableClosure():
+        class DeviceAvailableClosure:
             def deviceAvailable(self, device, err):
                 nonlocal returnDevice
                 nonlocal returnErr
@@ -1590,7 +1592,7 @@ class ChipDeviceControllerBase():
         eventLoop = asyncio.get_running_loop()
         future = eventLoop.create_future()
 
-        class DeviceAvailableClosure():
+        class DeviceAvailableClosure:
             def __init__(self, loop, future: asyncio.Future):
                 self._returnDevice = c_void_p(None)
                 self._returnErr = None
@@ -3313,7 +3315,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
 
     async def CommissionOnNetwork(self, nodeId: int, setupPinCode: int,
                                   filterType: DiscoveryFilterType = DiscoveryFilterType.NONE,
-                                  filter: typing.Any = None,
+                                  filter: typing.Any = None,  # noqa: A002
                                   discoveryTimeoutMsec: int = 30000) -> int:
         '''
         Does the routine for OnNetworkCommissioning, with a filter for mDNS discovery.
@@ -3341,7 +3343,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
 
         # Convert numerical filters to string for passing down to binding.
         if isinstance(filter, int):
-            filter = str(filter)
+            filter = str(filter)  # noqa: A001
 
         async with self._commissioning_context as ctx:
             self._enablePairingCompleteCallback(True)

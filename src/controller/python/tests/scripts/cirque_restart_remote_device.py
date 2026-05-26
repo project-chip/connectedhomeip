@@ -46,7 +46,7 @@ logger.addHandler(sh)
 class restartRemoteDevice(threading.Thread):
     def __init__(self, remote_ip: str, ssh_port: int, user: str, password: str, remote_server_app: str,
                  extra_args: str):
-        super(restartRemoteDevice, self).__init__()
+        super().__init__()
         self.remote_ip = remote_ip
         self.ssh_port = ssh_port
         self.user = user
@@ -60,12 +60,12 @@ class restartRemoteDevice(threading.Thread):
         try:
             client.connect(self.remote_ip, self.ssh_port, self.user, self.password)
             client.exec_command(
-                ("kill \"$(ps aux | grep -E \'out/debug/{}\' | grep -v grep | grep -v gdb | "
-                 "awk \'{{print $2}}\')\"").format(self.remote_server_app))
+                "kill \"$(ps aux | grep -E \'out/debug/{}\' | grep -v grep | grep -v gdb | awk \'{{print $2}}\')\"".format(
+                    self.remote_server_app))
             time.sleep(1)
             stdin, stdout, stderr = client.exec_command(
-                ("ps aux | grep -E \'out/debug/standalone/{}\' | grep -v grep | grep -v gdb | "
-                 "awk \'{{print $2}}\'").format(self.remote_server_app))
+                "ps aux | grep -E \'out/debug/standalone/{}\' | grep -v grep | grep -v gdb | awk \'{{print $2}}\'".format(
+                    self.remote_server_app))
             if not stdout.read().decode().strip():
                 logger.info(f"Succeed to kill remote process {self.remote_server_app}")
             else:

@@ -7566,12 +7566,6 @@ bool emberAfFanControlClusterStepCallback(chip::app::CommandHandler * commandObj
                                           const chip::app::ConcreteCommandPath & commandPath,
                                           const chip::app::Clusters::FanControl::Commands::Step::DecodableType & commandData);
 /**
- * @brief Humidistat Cluster SetSettings Command callback (from client)
- */
-bool emberAfHumidistatClusterSetSettingsCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::Humidistat::Commands::SetSettings::DecodableType & commandData);
-/**
  * @brief Color Control Cluster MoveToHue Command callback (from client)
  */
 bool emberAfColorControlClusterMoveToHueCallback(
@@ -7697,18 +7691,6 @@ bool emberAfDynamicLightingClusterStartEffectCallback(
 bool emberAfDynamicLightingClusterStopEffectCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::DynamicLighting::Commands::StopEffect::DecodableType & commandData);
-/**
- * @brief Proximity Ranging Cluster StartRangingRequest Command callback (from client)
- */
-bool emberAfProximityRangingClusterStartRangingRequestCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::ProximityRanging::Commands::StartRangingRequest::DecodableType & commandData);
-/**
- * @brief Proximity Ranging Cluster StopRangingRequest Command callback (from client)
- */
-bool emberAfProximityRangingClusterStopRangingRequestCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::ProximityRanging::Commands::StopRangingRequest::DecodableType & commandData);
 /**
  * @brief Channel Cluster ChangeChannel Command callback (from client)
  */

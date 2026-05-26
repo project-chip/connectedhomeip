@@ -39,6 +39,7 @@ aef
 AES
 AFL
 AIDL
+aliased
 algs
 alloc
 allocator
@@ -126,6 +127,7 @@ backend
 backends
 backticks
 backtrace
+backwards
 BallastConfiguration
 BarrierControl
 BasicCHIPRegression
@@ -160,6 +162,7 @@ bluetoothd
 bluez
 Bonjour
 BOOL
+boolean
 booleans
 BooleanState
 bootable
@@ -190,6 +193,8 @@ bz
 bzip
 CACACACA
 cacerts
+callsite
+callsites
 CAfile
 cancelled
 capacitive
@@ -400,6 +405,7 @@ delayedQueryActionTimeSec
 delayQuery
 deliverables
 demangle
+dep
 Depacketization
 deployable
 depottools
@@ -409,6 +415,7 @@ dereference
 dereferencing
 desc
 descheduled
+destructor
 detokenization
 detokenizer
 dev
@@ -562,6 +569,7 @@ EVKBMIMXRT
 EVSE
 exceptfds
 ExchangeContext
+Excludable
 exe
 ExecStart
 executables
@@ -584,6 +592,7 @@ FDDE
 fddead
 fde
 fdx
+featuremap
 FECA
 FecalColiformAndEColiConcentrationMeasurement
 feff
@@ -605,8 +614,10 @@ FlowMeasurement
 FluorideConcentrationMeasurement
 focusable
 forkpty
+FormaldehydeConcentrationMeasurement
 formatter
 formatters
+forwarding
 FOTA
 framerate
 FRDM
@@ -626,6 +637,7 @@ fvisibility
 FW
 Fxx
 gbl
+gc
 gcloud
 GDB
 gdbgui
@@ -684,6 +696,7 @@ gzbf
 HaloaceticAcidsConcentrationMeasurement
 HandleCommand
 hardcoded
+hardcodes
 hardknott
 hardwarever
 HardwareVersion
@@ -753,6 +766,9 @@ Infineon
 ini
 init
 InitArgs
+initialize
+initializer
+initializers
 inlined
 inlining
 InputLoop
@@ -762,6 +778,7 @@ integrations
 IntelliSense
 InteractionModelEngine
 InteractionModelVersion
+interop
 Interoperable
 introvideos
 InvokeCommandRequests
@@ -802,6 +819,7 @@ jre
 js
 json
 jsoncpp
+jsontlv
 JTAG
 Jupyter
 jupyterlab
@@ -867,6 +885,7 @@ lightin
 LightingApp
 LightingColor
 LightingState
+linker's
 LinkSoftwareAndDocumentationPack
 linter
 linters
@@ -1168,6 +1187,9 @@ plaintext
 PlatformManager
 PlatformManagerImpl
 plt
+Pm1ConcentrationMeasurement
+Pm10ConcentrationMeasurement
+Pm25ConcentrationMeasurement
 PluginServerCallback
 png
 Podman
@@ -1181,6 +1203,7 @@ PowerConfiguration
 PowerProfile
 PowerSource
 PowerSourceConfiguration
+ppm
 pre
 PrebuiltDataModelDirectory
 prepends
@@ -1243,6 +1266,7 @@ queryImageStatus
 Quickstart
 qvCHIP
 RADVD
+RadonConcentrationMeasurement
 raspberryPi
 RasPi
 rAv
@@ -1267,7 +1291,10 @@ recurse
 refrigeratoralarm
 regen
 registerAttributeAccessOverride
+registration
 RegisterCommandHandler
+registry
+registrations
 RelativeHumidityMeasurement
 RemainAfterExit
 remoteDeviceId
@@ -1442,6 +1469,7 @@ subcommand
 subcommands
 subdirectories
 subdirectory
+subflag
 subfolder
 submodule
 submodules
@@ -1484,6 +1512,7 @@ TCP
 teardown
 Telink
 TemperatureMeasurement
+templated
 templating
 Tera
 testability
@@ -1545,6 +1574,7 @@ tos
 TotalColiformBacteriaConcentrationMeasurement
 totalTests
 TotalTrihalomethanesConcentrationMeasurement
+TotalVolatileOrganicCompoundsConcentrationMeasurement
 TPK
 trackAlloc
 trackFree
@@ -1599,6 +1629,7 @@ unlinking
 unpair
 unprovisioned
 unreferenced
+unregister
 unregistration
 Unsecure
 Unselect
@@ -1653,6 +1684,7 @@ vous
 VPN
 VSC
 VSCode
+vtable
 WaitNewInputEvent
 WakeOnLan
 Walkthrough

@@ -616,7 +616,7 @@ def _maybe_with_runner(script_name: str, path: str, runner: BinaryRunner):
         os.mkdir("out/runners")
 
     script_name = f"out/runners/{script_name}.sh"
-    with open(script_name, "wt") as f:
+    with open(script_name, "w") as f:
         f.write(
             textwrap.dedent(
                 f"""\
@@ -772,7 +772,7 @@ def _raw_profile_to_info(profile: RawProfile):
             lines.append(line)
 
     # re-write it.
-    with open(info_path, 'wt') as f:
+    with open(info_path, "w") as f:
         f.write("\n".join(lines))
 
     return info_path
@@ -967,7 +967,7 @@ def python_tests(
     # create an env file
     override_binaries = dict(override_binary_path or [])
 
-    with open("./out/test_env.yaml", "wt") as f:
+    with open("./out/test_env.yaml", "w") as f:
         for target in _get_targets(coverage):
             if target.env_key in override_binaries:
                 run_path = as_runner(override_binaries[target.env_key])

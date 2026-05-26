@@ -95,10 +95,8 @@ class CAHierarchy:
             .issuer_name(root_cert_subject)
             .public_key(self.root_key.public_key())
             .serial_number(x509.random_serial_number())
-            .not_valid_before(datetime.datetime.now(datetime.timezone.utc))
-            .not_valid_after(
-                datetime.datetime.now(datetime.timezone.utc) + self.default_ca_duration
-            )
+            .not_valid_before(datetime.datetime.now(datetime.UTC))
+            .not_valid_after(datetime.datetime.now(datetime.UTC) + self.default_ca_duration)
             .add_extension(
                 # We make it so that our root can only issue leaf certificates, no intermediate here.
                 x509.BasicConstraints(ca=True, path_length=0), critical=True
@@ -191,9 +189,9 @@ class CAHierarchy:
                    .issuer_name(self.root_cert.subject)
                    .public_key(public_key)
                    .serial_number(x509.random_serial_number())
-                   .not_valid_before(datetime.datetime.now(datetime.timezone.utc))
+                   .not_valid_before(datetime.datetime.now(datetime.UTC))
                    .not_valid_after(
-            datetime.datetime.now(datetime.timezone.utc) + duration
+            datetime.datetime.now(datetime.UTC) + duration
         )
             .add_extension(
                 x509.BasicConstraints(ca=False, path_length=None),
@@ -277,7 +275,7 @@ class CAHierarchy:
             key_path = self.directory / f"{dns}.key"
             if cert_path.exists() and key_path.exists():
                 cert = x509.load_pem_x509_certificate(cert_path.read_bytes())
-                if datetime.datetime.now(datetime.timezone.utc) < cert.not_valid_after:
+                if datetime.datetime.now(datetime.UTC) < cert.not_valid_after:
                     # We only reuse the certificate/key if the cert is still valid
                     return (key_path, cert_path, True)
 
