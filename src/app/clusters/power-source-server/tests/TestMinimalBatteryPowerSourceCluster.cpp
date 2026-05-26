@@ -84,7 +84,7 @@ TEST_F(TestMinimalBatteryPowerSourceCluster, TestGetters)
 
 TEST_F(TestMinimalBatteryPowerSourceCluster, TestSetters)
 {
-    MinimalBatteryPowerSourceConfig config(kRootEndpointId, CharSpan{}, BatReplaceabilityEnum::kUnspecified, timerDelegate);
+    MinimalBatteryPowerSourceConfig config(kTestEndpointId, CharSpan{}, BatReplaceabilityEnum::kUnspecified, timerDelegate);
     MinimalBatteryPowerSourceCluster cluster(config);
 
     EXPECT_EQ(cluster.SetStatus({}), CHIP_NO_ERROR);
@@ -96,7 +96,7 @@ TEST_F(TestMinimalBatteryPowerSourceCluster, TestSetters)
 
 TEST_F(TestMinimalBatteryPowerSourceCluster, TestPersistence)
 {
-    MinimalBatteryPowerSourceConfig config(kRootEndpointId, CharSpan{}, BatReplaceabilityEnum::kUnspecified, timerDelegate);
+    MinimalBatteryPowerSourceConfig config(kTestEndpointId, CharSpan{}, BatReplaceabilityEnum::kUnspecified, timerDelegate);
 
     TestOrderPersistence<MinimalBatteryPowerSourceCluster>(config);
 }

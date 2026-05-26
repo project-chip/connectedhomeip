@@ -1223,24 +1223,23 @@ private:
             return;
         }
 
-        uint8_t oldBuf[to_underlying(WiredFaultEnum::kUnknownEnumValue)];
-        uint8_t newBuf[to_underlying(WiredFaultEnum::kUnknownEnumValue)];
-
-        auto oldSpanNonConverted = Span(oldBuf, to_underlying(WiredFaultEnum::kUnknownEnumValue));
-        PowerSource::detail::BitSetToSpan(this->activeWiredFaultsBitSet, oldSpanNonConverted);
-        auto oldSpan             = PowerSource::detail::ConvertSpanType<WiredFaultEnum>(oldSpanNonConverted);
-        auto newSpanNonConverted = Span(newBuf, to_underlying(WiredFaultEnum::kUnknownEnumValue));
-        PowerSource::detail::BitSetToSpan(newBitSet, newSpanNonConverted);
-        auto newSpan = PowerSource::detail::ConvertSpanType<WiredFaultEnum>(newSpanNonConverted);
-
-        PowerSource::Events::WiredFaultChange::Type event_data{ oldSpan, newSpan };
         if (mContext != nullptr)
         {
+            uint8_t oldBuf[to_underlying(WiredFaultEnum::kUnknownEnumValue)];
+            uint8_t newBuf[to_underlying(WiredFaultEnum::kUnknownEnumValue)];
+
+            auto oldSpanNonConverted = Span(oldBuf, to_underlying(WiredFaultEnum::kUnknownEnumValue));
+            PowerSource::detail::BitSetToSpan(this->activeWiredFaultsBitSet, oldSpanNonConverted);
+            auto oldSpan             = PowerSource::detail::ConvertSpanType<WiredFaultEnum>(oldSpanNonConverted);
+            auto newSpanNonConverted = Span(newBuf, to_underlying(WiredFaultEnum::kUnknownEnumValue));
+            PowerSource::detail::BitSetToSpan(newBitSet, newSpanNonConverted);
+            auto newSpan = PowerSource::detail::ConvertSpanType<WiredFaultEnum>(newSpanNonConverted);
+
+            PowerSource::Events::WiredFaultChange::Type event_data{ oldSpan, newSpan };
             mContext->interactionContext.eventsGenerator.GenerateEvent(event_data, mPath.mEndpointId);
         }
 
-        this->activeWiredFaultsBitSet = newBitSet;
-        NotifyAttributeChanged(PowerSource::Attributes::ActiveWiredFaults::Id);
+        SetAttributeValue(this->activeWiredFaultsBitSet, newBitSet, PowerSource::Attributes::ActiveWiredFaults::Id);
     }
 
     void GenerateBatFaultEventAndSetAndNotify(uint8_t newBitSet)
@@ -1250,24 +1249,23 @@ private:
             return;
         }
 
-        uint8_t oldBuf[to_underlying(BatFaultEnum::kUnknownEnumValue)];
-        uint8_t newBuf[to_underlying(BatFaultEnum::kUnknownEnumValue)];
-
-        auto oldSpanNonConverted = Span(oldBuf, to_underlying(BatFaultEnum::kUnknownEnumValue));
-        PowerSource::detail::BitSetToSpan(this->activeBatFaultsBitSet, oldSpanNonConverted);
-        auto oldSpan             = PowerSource::detail::ConvertSpanType<BatFaultEnum>(oldSpanNonConverted);
-        auto newSpanNonConverted = Span(newBuf, to_underlying(BatFaultEnum::kUnknownEnumValue));
-        PowerSource::detail::BitSetToSpan(newBitSet, newSpanNonConverted);
-        auto newSpan = PowerSource::detail::ConvertSpanType<BatFaultEnum>(newSpanNonConverted);
-
-        PowerSource::Events::BatFaultChange::Type event_data{ oldSpan, newSpan };
         if (mContext != nullptr)
         {
+            uint8_t oldBuf[to_underlying(BatFaultEnum::kUnknownEnumValue)];
+            uint8_t newBuf[to_underlying(BatFaultEnum::kUnknownEnumValue)];
+
+            auto oldSpanNonConverted = Span(oldBuf, to_underlying(BatFaultEnum::kUnknownEnumValue));
+            PowerSource::detail::BitSetToSpan(this->activeBatFaultsBitSet, oldSpanNonConverted);
+            auto oldSpan             = PowerSource::detail::ConvertSpanType<BatFaultEnum>(oldSpanNonConverted);
+            auto newSpanNonConverted = Span(newBuf, to_underlying(BatFaultEnum::kUnknownEnumValue));
+            PowerSource::detail::BitSetToSpan(newBitSet, newSpanNonConverted);
+            auto newSpan = PowerSource::detail::ConvertSpanType<BatFaultEnum>(newSpanNonConverted);
+
+            PowerSource::Events::BatFaultChange::Type event_data{ oldSpan, newSpan };
             mContext->interactionContext.eventsGenerator.GenerateEvent(event_data, mPath.mEndpointId);
         }
 
-        this->activeBatFaultsBitSet = newBitSet;
-        NotifyAttributeChanged(PowerSource::Attributes::ActiveBatFaults::Id);
+        SetAttributeValue(this->activeBatFaultsBitSet, newBitSet, PowerSource::Attributes::ActiveBatFaults::Id);
     }
 
     void GenerateBatChargeFaultEventAndSetAndNotify(uint16_t newBitSet)
@@ -1277,24 +1275,23 @@ private:
             return;
         }
 
-        uint8_t oldBuf[to_underlying(BatChargeFaultEnum::kUnknownEnumValue)];
-        uint8_t newBuf[to_underlying(BatChargeFaultEnum::kUnknownEnumValue)];
-
-        auto oldSpanNonConverted = Span(oldBuf, to_underlying(BatChargeFaultEnum::kUnknownEnumValue));
-        PowerSource::detail::BitSetToSpan(this->activeBatChargeFaultsBitSet, oldSpanNonConverted);
-        auto oldSpan             = PowerSource::detail::ConvertSpanType<BatChargeFaultEnum>(oldSpanNonConverted);
-        auto newSpanNonConverted = Span(newBuf, to_underlying(BatChargeFaultEnum::kUnknownEnumValue));
-        PowerSource::detail::BitSetToSpan(newBitSet, newSpanNonConverted);
-        auto newSpan = PowerSource::detail::ConvertSpanType<BatChargeFaultEnum>(newSpanNonConverted);
-
-        PowerSource::Events::BatChargeFaultChange::Type event_data{ oldSpan, newSpan };
         if (mContext != nullptr)
         {
+            uint8_t oldBuf[to_underlying(BatChargeFaultEnum::kUnknownEnumValue)];
+            uint8_t newBuf[to_underlying(BatChargeFaultEnum::kUnknownEnumValue)];
+
+            auto oldSpanNonConverted = Span(oldBuf, to_underlying(BatChargeFaultEnum::kUnknownEnumValue));
+            PowerSource::detail::BitSetToSpan(this->activeBatChargeFaultsBitSet, oldSpanNonConverted);
+            auto oldSpan             = PowerSource::detail::ConvertSpanType<BatChargeFaultEnum>(oldSpanNonConverted);
+            auto newSpanNonConverted = Span(newBuf, to_underlying(BatChargeFaultEnum::kUnknownEnumValue));
+            PowerSource::detail::BitSetToSpan(newBitSet, newSpanNonConverted);
+            auto newSpan = PowerSource::detail::ConvertSpanType<BatChargeFaultEnum>(newSpanNonConverted);
+
+            PowerSource::Events::BatChargeFaultChange::Type event_data{ oldSpan, newSpan };
             mContext->interactionContext.eventsGenerator.GenerateEvent(event_data, mPath.mEndpointId);
         }
 
-        this->activeBatChargeFaultsBitSet = newBitSet;
-        NotifyAttributeChanged(PowerSource::Attributes::ActiveBatChargeFaults::Id);
+        SetAttributeValue(this->activeBatChargeFaultsBitSet, newBitSet, PowerSource::Attributes::ActiveBatChargeFaults::Id);
     }
 
     constexpr static System::Clock::Timeout kNotifyTimerDuration = System::Clock::Seconds16(10);
