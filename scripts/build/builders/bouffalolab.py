@@ -324,13 +324,13 @@ class BouffalolabBuilder(GnBuilder):
 
             log.info('*' * 80)
 
-            log.info("Firmware is built out at: {}".format(path_fw))
+            log.info("Firmware is built out at: %s", path_fw)
             log.info("Command to generate ota image: ")
-            log.info('./{} --build-ota --vendor-id <vendor id> --product-id <product id> '
-                     '--version <version> --version-str <version string> '
-                     '--digest-algorithm <digest algorithm>'.format(path_flash_script))
+            log.info("./%s --build-ota --vendor-id <vendor id> --product-id <product id> "
+                     "--version <version> --version-str <version string> "
+                     "--digest-algorithm <digest algorithm>", path_flash_script)
             log.info("Command to generate and sign ota image: ")
-            log.info('./{} --build-ota --vendor-id <vendor id> --product-id <product id> '
-                     '--version <version> --version-str <version string> '
-                     '--digest-algorithm <digest algorithm> --sk <private key>'.format(path_flash_script))
+            log.info("./%s --build-ota --vendor-id <vendor id> --product-id <product id> "
+                     "--version <version> --version-str <version string> "
+                     "--digest-algorithm <digest algorithm> --sk <private key>", path_flash_script)
             log.info('*' * 80)

@@ -894,22 +894,22 @@ class BluezManager(ChipBleBase):
             self.orig_input_hook()
 
     def dump_scan_result(self, device):
-        LOGGER.info("{:<16}= {}".format("Name", device.Name))
-        LOGGER.info("{:<16}= {}".format("ID", device.device_id))
-        LOGGER.info("{:<16}= {}".format("RSSI", device.RSSI))
-        LOGGER.info("{:<16}= {}".format("Address", device.Address))
+        LOGGER.info("%-16s= %s", "Name", device.Name)
+        LOGGER.info("%-16s= %s", "ID", device.device_id)
+        LOGGER.info("%-16s= %s", "RSSI", device.RSSI)
+        LOGGER.info("%-16s= %s", "Address", device.Address)
 
         devIdInfo = self.get_peripheral_devIdInfo(device)
         if devIdInfo is not None:
-            LOGGER.info("{:<16}= {}".format("Pairing State", devIdInfo.pairingState))
-            LOGGER.info("{:<16}= {}".format("Discriminator", devIdInfo.discriminator))
-            LOGGER.info("{:<16}= {}".format("Vendor Id", devIdInfo.vendorId))
-            LOGGER.info("{:<16}= {}".format("Product Id", devIdInfo.productId))
+            LOGGER.info("%-16s= %s", "Pairing State", devIdInfo.pairingState)
+            LOGGER.info("%-16s= %s", "Discriminator", devIdInfo.discriminator)
+            LOGGER.info("%-16s= %s", "Vendor Id", devIdInfo.vendorId)
+            LOGGER.info("%-16s= %s", "Product Id", devIdInfo.productId)
 
         if device.ServiceData:
             for advuuid in device.ServiceData:
-                LOGGER.info("{:<16}= {}".format("Adv UUID", str(advuuid)))
-                LOGGER.info("{:<16}= {}".format("Adv Data", bytes(device.ServiceData[advuuid]).hex()))
+                LOGGER.info("%-16s= %s", "Adv UUID", advuuid)
+                LOGGER.info("%-16s= %s", "Adv Data", bytes(device.ServiceData[advuuid]).hex())
         else:
             LOGGER.info("")
         LOGGER.info("")

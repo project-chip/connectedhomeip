@@ -173,7 +173,7 @@ class TestTimeout(threading.Thread):
 
     def run(self):
         stop_time = time.time() + self._timeout
-        logger.info("Test timeout set to {} seconds".format(self._timeout))
+        logger.info("Test timeout set to %s seconds", self._timeout)
         with self._cv:
             wait_time = stop_time - time.time()
             while wait_time > 0 and not self._should_stop:
@@ -214,15 +214,14 @@ class BaseTestHelper:
         return ctypes.string_at(addrStrStorage).decode("utf-8")
 
     async def TestDiscovery(self, discriminator: int):
-        self.logger.info(
-            f"Discovering commissionable nodes with discriminator {discriminator}")
+        self.logger.info("Discovering commissionable nodes with discriminator %s", discriminator)
         res = await self.devCtrl.DiscoverCommissionableNodes(
             matter.discovery.FilterType.LONG_DISCRIMINATOR, discriminator, stopOnFirst=True, timeoutSecond=3)
         if not res:
             self.logger.info(
                 "Device not found")
             return False
-        self.logger.info(f"Found device {res[0]}")
+        self.logger.info("Found device %s", res[0])
         return res[0]
 
     def CreateNewFabricController(self):
@@ -279,11 +278,9 @@ class BaseTestHelper:
         return True
 
     async def TestKeyExchangeBLE(self, discriminator: int, setuppin: int, nodeId: int):
-        self.logger.info(
-            "Conducting key exchange with device {}".format(discriminator))
+        self.logger.info("Conducting key exchange with device %s", discriminator)
         if not await self.devCtrl.ConnectBLE(discriminator, setuppin, nodeId):
-            self.logger.info(
-                "Failed to finish key exchange with device {}".format(discriminator))
+            self.logger.info("Failed to finish key exchange with device %s", discriminator)
             return False
         self.logger.info("Device finished key exchange.")
         return True
@@ -295,8 +292,7 @@ class BaseTestHelper:
             # We're not going to hit this stage during commissioning so no sense trying, just say it was fine.
             return True
 
-        self.logger.info(
-            "Commissioning device, expecting failure after stage {}".format(failAfter))
+        self.logger.info("Commissioning device, expecting failure after stage %s", failAfter)
         await self.devCtrl.Commission(nodeId)
         return self.devCtrl.CheckTestCommissionerCallbacks() and self.devCtrl.CheckTestCommissionerPaseConnection(nodeId)
 
@@ -306,18 +302,16 @@ class BaseTestHelper:
         if not a:
             # We're not going to hit this stage during commissioning so no sense trying, just say it was fine.
             return True
-        self.logger.info(
-            "Commissioning device, expecting failure on report for stage {}".format(failAfter))
+        self.logger.info("Commissioning device, expecting failure on report for stage %s", failAfter)
         await self.devCtrl.Commission(nodeId)
         return self.devCtrl.CheckTestCommissionerCallbacks() and self.devCtrl.CheckTestCommissionerPaseConnection(nodeId)
 
     async def TestCommissioningWithSetupPayload(self, setupPayload: str, nodeId: int, discoveryType: int = 2):
-        self.logger.info("Commissioning device with setup payload {}".format(setupPayload))
+        self.logger.info("Commissioning device with setup payload %s", setupPayload)
         try:
             await self.devCtrl.CommissionWithCode(setupPayload, nodeId, matter.discovery.DiscoveryType(discoveryType))
         except ChipStackException:
-            self.logger.exception(
-                "Failed to finish commissioning device {}".format(setupPayload))
+            self.logger.exception("Failed to finish commissioning device %s", setupPayload)
             return False
         self.logger.info("Commissioning finished.")
         return True
@@ -348,13 +342,11 @@ class BaseTestHelper:
             resp = await self.devCtrl.SendCommand(nodeId, 0,
                                                   Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=60, breadcrumb=1))
         except IM.InteractionModelError as ex:
-            self.logger.error(
-                "Failed to send arm failsafe command error is {}".format(ex.status))
+            self.logger.error("Failed to send arm failsafe command error is %s", ex.status)
             return False
 
         if resp.errorCode is not Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kOk:
-            self.logger.error(
-                "Incorrect response received from arm failsafe - wanted OK, received {}".format(resp))
+            self.logger.error("Incorrect response received from arm failsafe - wanted OK, received %s", resp)
             return False
 
         self.logger.info(
@@ -406,8 +398,7 @@ class BaseTestHelper:
             resp = await self.devCtrl.SendCommand(nodeId, 0,
                                                   Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=0, breadcrumb=1))
         except IM.InteractionModelError as ex:
-            self.logger.error(
-                "Failed to send arm failsafe command error is {}".format(ex.status))
+            self.logger.error("Failed to send arm failsafe command error is %s", ex.status)
             return False
 
         self.logger.info(
@@ -430,8 +421,7 @@ class BaseTestHelper:
             resp = await self.devCtrl.SendCommand(nodeId, 0,
                                                   Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=60, breadcrumb=1))
         except IM.InteractionModelError as ex:
-            self.logger.error(
-                "Failed to send arm failsafe command error is {}".format(ex.status))
+            self.logger.error("Failed to send arm failsafe command error is %s", ex.status)
             return False
         return resp.errorCode is Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kBusyWithOtherAdmin
 
@@ -1069,29 +1059,25 @@ class BaseTestHelper:
         return True
 
     async def TestOnOffCluster(self, nodeId: int, endpoint: int):
-        self.logger.info(
-            "Sending On/Off commands to device {} endpoint {}".format(nodeId, endpoint))
+        self.logger.info("Sending On/Off commands to device %s endpoint %s", nodeId, endpoint)
 
         try:
             await self.devCtrl.SendCommand(nodeId, endpoint,
                                            Clusters.OnOff.Commands.On())
         except IM.InteractionModelError as ex:
-            self.logger.error(
-                "failed to send OnOff.On: error is {}".format(ex.status))
+            self.logger.error("failed to send OnOff.On: error is %s", ex.status)
             return False
 
         try:
             await self.devCtrl.SendCommand(nodeId, endpoint,
                                            Clusters.OnOff.Commands.Off())
         except IM.InteractionModelError as ex:
-            self.logger.error(
-                "failed to send OnOff.Off: error is {}".format(ex.status))
+            self.logger.error("failed to send OnOff.Off: error is %s", ex.status)
             return False
         return True
 
     async def TestLevelControlCluster(self, nodeId: int, endpoint: int):
-        self.logger.info(
-            f"Sending MoveToLevel command to device {nodeId} endpoint {endpoint}")
+        self.logger.info("Sending MoveToLevel command to device %s endpoint %s", nodeId, endpoint)
 
         commonArgs = {'transitionTime': 0, 'optionsMask': 1, 'optionsOverride': 1}
 
@@ -1113,12 +1099,11 @@ class BaseTestHelper:
 
             return True
         except Exception as ex:
-            self.logger.exception(f"Level cluster test failed: {ex}")
+            self.logger.exception("Level cluster test failed: %s", ex)
             return False
 
     def TestResolve(self, nodeId):
-        self.logger.info(
-            "Resolve: node id = {:08x}".format(nodeId))
+        self.logger.info("Resolve: node id = %08x", nodeId)
         try:
             self.devCtrl.ResolveNode(nodeId=nodeId)
             addr = None
@@ -1136,10 +1121,10 @@ class BaseTestHelper:
             if not addr:
                 self.logger.exception("Addr is missing...")
                 return False
-            self.logger.info(f"Resolved address: {addr[0]}:{addr[1]}")
+            self.logger.info("Resolved address: %s:%s", addr[0], addr[1])
             return True
         except Exception as ex:
-            self.logger.exception("Failed to resolve. {}".format(ex))
+            self.logger.exception("Failed to resolve. %s", ex)
             return False
 
     async def TestTriggerTestEventHandler(self, nodeId, enable_key, event_trigger):
@@ -1148,7 +1133,7 @@ class BaseTestHelper:
             await self.devCtrl.SendCommand(nodeId, 0, Clusters.GeneralDiagnostics.Commands.TestEventTrigger(enableKey=enable_key, eventTrigger=event_trigger))
             return True
         except Exception as ex:
-            self.logger.exception("Failed to trigger test event handler {}".format(ex))
+            self.logger.exception("Failed to trigger test event handler %s", ex)
             return False
 
     async def TestWaitForActive(self, nodeId, stayActiveDurationMs=30000):
@@ -1157,7 +1142,7 @@ class BaseTestHelper:
             await self.devCtrl.WaitForActive(nodeId, stayActiveDurationMs=stayActiveDurationMs)
             return True
         except Exception as ex:
-            self.logger.exception("Failed to wait for active. {}".format(ex))
+            self.logger.exception("Failed to wait for active. %s", ex)
             return False
 
     async def TestReadBasicAttributes(self, nodeId: int, endpoint: int):

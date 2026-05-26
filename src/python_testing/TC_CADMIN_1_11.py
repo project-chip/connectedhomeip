@@ -60,7 +60,7 @@ class TC_CADMIN_1_11(CADMINBaseTest):
             await th.OpenCommissioningWindow(
                 nodeId=self.dut_node_id, timeout=self.timeout, iteration=10000, discriminator=self.discriminator, option=1)
         errcode = PyChipError.from_code(ctx.exception.err)
-        log.info('Commissioning complete done. Successful? {}, errorcode = {}'.format(errcode.is_success, errcode))
+        log.info('Commissioning complete done. Successful? %s, errorcode = %s', errcode.is_success, errcode)
         asserts.assert_false(errcode.is_success, 'Commissioning complete did not error as expected')
         asserts.assert_true(errcode.sdk_code == expectedErrCode,
                             'Unexpected error code returned from CommissioningComplete')

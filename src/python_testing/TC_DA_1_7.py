@@ -225,7 +225,7 @@ class TC_DA_1_7(MatterBaseTest):
         self.record_data({key: hex_from_bytes(dac)})
 
         self.step(f'{dut_index}.3')
-        log.info("DUT {} Step 3 check 1: Ensure PAI's AKID matches a PAA and signature is valid".format(dut_index))
+        log.info("DUT %s Step 3 check 1: Ensure PAI's AKID matches a PAA and signature is valid", dut_index)
         pai_cert = load_der_x509_certificate(pai)
         pai_akid = extract_akid(pai_cert)
         if pai_akid not in paa_by_skid:
@@ -242,7 +242,7 @@ class TC_DA_1_7(MatterBaseTest):
             asserts.fail("DUT %d: Failed to verify PAI signature against PAA public key: %s" % (dut_index, str(e)))
         log.info("Validated PAI signature against PAA")
 
-        log.info("DUT {} Step 3 check 2: Verify PAI AKID not in denylist of SDK PAIs".format(dut_index))
+        log.info("DUT %s Step 3 check 2: Verify PAI AKID not in denylist of SDK PAIs", dut_index)
         if self.allow_sdk_dac:
             log.warning("===> TEST STEP SKIPPED: Allowing SDK DACs!")
         else:

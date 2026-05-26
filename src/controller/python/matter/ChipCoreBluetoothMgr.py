@@ -255,16 +255,16 @@ class CoreBluetoothManager(ChipBleBase):
                 if not self.scan_quiet:
                     LOGGER.info("adding to scan list:")
                     LOGGER.info("")
-                    LOGGER.info("{:<16}= {:<80}".format("Name", str(peripheral._.name)))
-                    LOGGER.info("{:<16}= {:<80}".format("ID", str(peripheral._.identifier.UUIDString())))
-                    LOGGER.info("{:<16}= {:<80}".format("RSSI", rssi))
+                    LOGGER.info("%-16s= %-80s", "Name", peripheral._.name)
+                    LOGGER.info("%-16s= %-80s", "ID", peripheral._.identifier.UUIDString())
+                    LOGGER.info("%-16s= %-80s", "RSSI", rssi)
                     devIdInfo = BlePeripheral(
                         peripheral, data).getPeripheralDevIdInfo()
                     if devIdInfo:
-                        LOGGER.info("{:<16}= {}".format("Pairing State", devIdInfo.pairingState))
-                        LOGGER.info("{:<16}= {}".format("Discriminator", devIdInfo.discriminator))
-                        LOGGER.info("{:<16}= {}".format("Vendor Id", devIdInfo.vendorId))
-                        LOGGER.info("{:<16}= {}".format("Product Id", devIdInfo.productId))
+                        LOGGER.info("%-16s= %s", "Pairing State", devIdInfo.pairingState)
+                        LOGGER.info("%-16s= %s", "Discriminator", devIdInfo.discriminator)
+                        LOGGER.info("%-16s= %s", "Vendor Id", devIdInfo.vendorId)
+                        LOGGER.info("%-16s= %s", "Product Id", devIdInfo.productId)
                     LOGGER.info("ADV data: " + repr(data))
                     LOGGER.info("")
 

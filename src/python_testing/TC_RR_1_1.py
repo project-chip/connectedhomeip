@@ -601,9 +601,9 @@ class TC_RR_1_1(MatterBaseTest):
         if check_heap_watermarks:
             log.info("Read Heap info after stress test")
             high_watermark_after, current_usage_after = await self.read_heap_statistics(dev_ctrl)
-            log.info("=== Heap Usage Diagnostics ===\nHigh watermark: {} (before) / {} (after)\n"
-                     "Current usage: {} (before) / {} (after)".format(high_watermark_before, high_watermark_after,
-                                                                      current_usage_before, current_usage_after))
+            log.info("=== Heap Usage Diagnostics ===\nHigh watermark: %s (before) / %s (after)\n"
+                     "Current usage: %s (before) / %s (after)",
+                     high_watermark_before, high_watermark_after, current_usage_before, current_usage_after)
 
     async def validate_groupcast_resources(
             self,
