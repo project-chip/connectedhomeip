@@ -469,13 +469,13 @@ public:
     virtual ~CTC_BaseDataClassBase() = default;
 
     // Common interface
-    virtual bool IsValid() const { return true; };
-    virtual bool HasValue() const { return false; };
-    virtual bool HasNewValue() const { return false; };
-    virtual CHIP_ERROR MarkAsAssigned() { return CHIP_NO_ERROR; };
-    virtual CHIP_ERROR UpdateBegin(void * aUpdCtx) { return CHIP_NO_ERROR; };
-    virtual bool UpdateFinish(bool aUpdateAllow) { return aUpdateAllow; };
-    virtual bool Cleanup() { return false; };
+    virtual bool IsValid() const { return true; }
+    virtual bool HasValue() const { return false; }
+    virtual bool HasNewValue() const { return false; }
+    virtual CHIP_ERROR MarkAsAssigned() { return CHIP_NO_ERROR; }
+    virtual CHIP_ERROR UpdateBegin(void * aUpdCtx) { return CHIP_NO_ERROR; }
+    virtual bool UpdateFinish(bool aUpdateAllow) { return aUpdateAllow; }
+    virtual bool Cleanup() { return false; }
     virtual AttributeId GetAttrId() const = 0;
 
     // Type-erased methods for generic access
@@ -490,7 +490,7 @@ public:
     {
         outValue = nullptr;
         return CHIP_ERROR_NOT_IMPLEMENTED;
-    };
+    }
 
     /**
      * @brief Gets a pointer to the internal pending new value storage during updates.
@@ -501,7 +501,7 @@ public:
     {
         outValue = nullptr;
         return CHIP_ERROR_NOT_IMPLEMENTED;
-    };
+    }
 
     /**
      * @brief Copies data from external source to internal pending storage.

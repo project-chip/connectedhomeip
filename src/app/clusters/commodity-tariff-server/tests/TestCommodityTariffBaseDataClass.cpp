@@ -452,7 +452,7 @@ struct TestResourceStruct
         id = 0;
     }
 
-    ~TestResourceStruct() noexcept { Cleanup(); };
+    ~TestResourceStruct() noexcept { Cleanup(); }
 
     // Proper equality operator
     bool operator==(const TestResourceStruct & other) const
