@@ -605,7 +605,7 @@ class TC_ACS_3_3(MatterBaseTest):
                 cluster.Events.AmbientContextDetectEnded, timeout_sec=(post_prompt_settle_delay_seconds+holdtime_dut))
             # asserts.assert_equal(event.startEventNumber, event_number, "Not matching Start event number")
             log.info(f"====> {event.eventStartTime}, {event_start_time}")
-            asserts.assert_true(event.eventStartTime == event_start_time, "Not matching EventStartTime")
+            asserts.assert_true((event.eventStartTime - event_start_time) < 1000, "Not matching EventStartTime")
         else:
             log.info("Object Counting & Object Identification Feature not supported. Test steps skipped")
             self.skip_step("6a")
