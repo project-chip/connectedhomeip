@@ -15,3 +15,8 @@ jobs:
       - uses: buildjet/cache-delete@7184288b8396c4492a56728c47dd286fbd1e96ae # v1
         with:
           cache_key: ${{ inputs.cache_key }}
+      - name: Notify Slack on Failure
+        if: failure()
+        uses: ./.github/actions/notify-slack-failure
+        with:
+          slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}

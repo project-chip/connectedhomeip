@@ -1,0 +1,25 @@
+name: 'Notify Slack on Failure'
+description: 'Sends a Slack notification when a Pull Request job fails'
+inputs:
+  slack-webhook:
+    description: 'The Slack Webhook URL'
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: Send Slack Notification
+      shell: bash
+      run: |
+        # Only notify on Pull Request failures
+        if [ "${{ github.event_name }}" != "pull_request" ]; then
+          exit 0
+        fi
+
+        JOB_NAME="${{ github.job }}"
+        RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+        
+        PAYLOAD_TEXT="🚨 *CI Failure Alert* 🚨\n*Job:* ${JOB_NAME}\n*Run Details:* <${RUN_URL}|View Pipeline Logs>"
+        
+        curl -X POST -H 'Content-type: application/json' \
+        --data "{\"text\":\"${PAYLOAD_TEXT}\"}" \
+        "${{ inputs.slack-webhook }}"

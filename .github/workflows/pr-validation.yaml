@@ -63,3 +63,8 @@ jobs:
 
         run: |
           python -c 'import sys; print("Testing section missing (test failed)"); sys.exit(1)'
+      - name: Notify Slack on Failure
+        if: failure()
+        uses: ./.github/actions/notify-slack-failure
+        with:
+          slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}

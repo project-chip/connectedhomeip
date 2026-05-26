@@ -75,6 +75,11 @@ jobs:
         run: |
           scripts/run_in_python_env.sh out/venv 'python3 scripts/dm_xml_ci_change_enforcement.py data_model/1.6'
 
+      - name: Notify Slack on Failure
+        if: failure()
+        uses: ./.github/actions/notify-slack-failure
+        with:
+          slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}
   check-data_model-build-file:
     name: Check that all data_model files are listed in the data_model_xmls.gni build file
     runs-on: ubuntu-latest
@@ -95,3 +100,8 @@ jobs:
       - name: Check for uncommitted changes
         run: |
           git diff --exit-code HEAD -- src/python_testing/matter_testing_infrastructure/data_model_xmls.gni
+      - name: Notify Slack on Failure
+        if: failure()
+        uses: ./.github/actions/notify-slack-failure
+        with:
+          slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}

@@ -19,3 +19,8 @@ jobs:
           action: gradle/wrapper-validation-action@v1
           attempt_limit: 3
           attempt_delay: 2000
+      - name: Notify Slack on Failure
+        if: failure()
+        uses: ./.github/actions/notify-slack-failure
+        with:
+          slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}

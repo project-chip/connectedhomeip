@@ -51,3 +51,8 @@ jobs:
                     --github-limit-comments 20 \
                     --github-repository project-chip/connectedhomeip \
                     --github-api-token "${{ secrets.GITHUB_TOKEN }}"
+            - name: Notify Slack on Failure
+              if: failure()
+              uses: ./.github/actions/notify-slack-failure
+              with:
+                slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}

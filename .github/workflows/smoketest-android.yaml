@@ -77,3 +77,8 @@ jobs:
                     "./scripts/build/build_examples.py --target android-arm64-tv-server build"
             - name: Clean out build output
               run: rm -rf ./out examples/tv-app/android/App/app/libs/jniLibs/* examples/tv-app/android/App/app/libs/*.jar
+            - name: Notify Slack on Failure
+              if: failure()
+              uses: ./.github/actions/notify-slack-failure
+              with:
+                slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}
