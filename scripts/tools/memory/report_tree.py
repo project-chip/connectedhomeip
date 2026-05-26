@@ -58,8 +58,8 @@ class SourceTree:
     def __init__(self, name: str):
         self.name = name
         self.root = self.Node(memdf.name.TOTAL)
-        self.source_to_node: Dict[str, 'SourceTree.Node'] = {}
-        self.symbol_to_node: Dict[str, 'SourceTree.Node'] = {}
+        self.source_to_node: Dict[str, SourceTree.Node] = {}
+        self.symbol_to_node: Dict[str, SourceTree.Node] = {}
 
     def source_node(self, source: str) -> 'SourceTree.Node':
         """Create a SourceTree.Node for a source file."""

@@ -179,7 +179,7 @@ class RunSummary(RunStats):
     """
     iterations: int
     tests_per_iteration: int
-    run_timestamp: datetime.datetime | str = field(default_factory=lambda: datetime.datetime.now(datetime.timezone.utc))
+    run_timestamp: datetime.datetime | str = field(default_factory=lambda: datetime.datetime.now(datetime.UTC))
     results: list[TestResult] = field(default_factory=list, init=False)
     test_stats: dict[str, RunStats] = field(default_factory=dict, init=False)
     exceptions: defaultdict[int, dict[str, ExceptionInfoT]] = field(default_factory=lambda: defaultdict(dict), init=False)
