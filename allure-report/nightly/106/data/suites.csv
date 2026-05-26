@@ -1,0 +1,5 @@
+"DESCRIPTION","DURATION IN MS","NAME","PARENT SUITE","START TIME","STATUS","STOP TIME","SUB SUITE","SUITE","TEST CLASS","TEST METHOD"
+"","296793","TC_BRBINFO_4_1.py","","Tue May 26 00:42:15 UTC 2026","passed","Tue May 26 00:47:11 UTC 2026","","Nightly CI Tests","Nightly CI Tests",""
+"","152349","TC_CC_2_2.py","","Tue May 26 00:42:15 UTC 2026","passed","Tue May 26 00:44:47 UTC 2026","","Nightly CI Tests","Nightly CI Tests",""
+"","1384091","TC_SU_2_5.py","","Tue May 26 00:42:20 UTC 2026","passed","Tue May 26 01:05:24 UTC 2026","","Nightly CI Tests","Nightly CI Tests",""
+"","1116627","TC_SU_2_7.py","","Tue May 26 00:42:19 UTC 2026","passed","Tue May 26 01:00:55 UTC 2026","","Nightly CI Tests","Nightly CI Tests",""
