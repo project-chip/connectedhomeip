@@ -146,10 +146,10 @@ CHIP_ERROR ReadGroupKeyMap(FabricTable & fabricTable, GroupDataProvider & provid
             auto fabric_index = fabric.GetFabricIndex();
 
             // This is iterating over group key map entries, not "group keys"
-            auto iter         = provider.IterateGroupKeys(fabric_index);
+            auto iter = provider.IterateGroupKeys(fabric_index);
             VerifyOrReturnError(nullptr != iter, CHIP_ERROR_NO_MEMORY);
 
-            // This is an individual group key map entry (as implied by the name), even 
+            // This is an individual group key map entry (as implied by the name), even
             // though the type is just called "GroupKey"
             GroupDataProvider::GroupKey mapping;
 

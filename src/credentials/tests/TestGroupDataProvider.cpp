@@ -1313,7 +1313,7 @@ TEST_F(TestGroupDataProvider, TestKeySetRemovalGroupKeyMapUpdates)
     // Map Group 3 to Keyset 2 (different keyset)
     EXPECT_EQ(provider->SetGroupKeyAt(kFabric1, 2, GroupKey(kGroup3, kKeysetId2)), CHIP_NO_ERROR);
 
-    // Verify setup matches expectations. These getters get group key map entries at 
+    // Verify setup matches expectations. These getters get group key map entries at
     // particular indices, not "group keys"
     GroupKey pair;
     EXPECT_EQ(provider->GetGroupKeyAt(kFabric1, 0, pair), CHIP_NO_ERROR);
@@ -1337,13 +1337,13 @@ TEST_F(TestGroupDataProvider, TestKeySetRemovalGroupKeyMapUpdates)
     // Keyset 2 should still exist
     EXPECT_EQ(provider->GetKeySet(kFabric1, kKeysetId2, keyset), CHIP_NO_ERROR);
 
-    // 5. Verify mappings in group key map using IterateGroupKeys(). This iterates over 
+    // 5. Verify mappings in group key map using IterateGroupKeys(). This iterates over
     // individual group key map entires, not "group keys"
     // Since kKeysetId1 mappings were removed, the only remaining mapping should be (kGroup3 to kKeysetId2).
     auto it = provider->IterateGroupKeys(kFabric1);
     ASSERT_TRUE(it);
     EXPECT_EQ(it->Count(), 1u);
-    
+
     EXPECT_TRUE(it->Next(pair));
     EXPECT_EQ(pair.group_id, kGroup3);
     EXPECT_EQ(pair.keyset_id, kKeysetId2);
