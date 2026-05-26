@@ -91,8 +91,6 @@ public:
      */
     Protocols::InteractionModel::Status HandleStep(FanControl::StepDirectionEnum aDirection, bool aWrap, bool aLowestOff) override;
 
-    void OnFanDriveStateChanged(const FanControl::FanDriveState & newState) override;
-
     /**
      * @brief Callback that thermostat manager calls when the heating state changes
      */
@@ -173,8 +171,6 @@ private:
     void ThermostatSystemModeWriteCallback(uint8_t aNewSystemMode);
 
     void HandleOnOff(AttributeId attributeId, uint8_t type, uint16_t size, uint8_t * value);
-
-    void ClampFanDriveCurrentWhenOff();
 };
 
 } // namespace Clusters

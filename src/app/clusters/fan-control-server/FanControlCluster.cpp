@@ -45,6 +45,37 @@ struct FanControlPlaceholderDelegate final : public FanControl::Delegate
     FanControlPlaceholderDelegate() : FanControl::Delegate(kInvalidEndpointId) {}
     Status HandleStep(StepDirectionEnum, bool, bool) override { return Status::Failure; }
 };
+
+FanModeEnum ComputeFanModeFromPercent(chip::Percent percent, FanModeSequenceEnum fanModeSequence)
+{
+    if (percent == 0)
+    {
+        return FanModeEnum::kOff;
+    }
+
+    const bool hasThreeSpeeds = (fanModeSequence == FanModeSequenceEnum::kOffLowMedHigh ||
+                                 fanModeSequence == FanModeSequenceEnum::kOffLowMedHighAuto);
+    const bool hasLow = (fanModeSequence != FanModeSequenceEnum::kOffHigh && fanModeSequence != FanModeSequenceEnum::kOffHighAuto);
+
+    if (hasThreeSpeeds)
+    {
+        if (percent <= 33)
+        {
+            return FanModeEnum::kLow;
+        }
+        if (percent <= 66)
+        {
+            return FanModeEnum::kMedium;
+        }
+        return FanModeEnum::kHigh;
+    }
+    if (hasLow)
+    {
+        return (percent <= 50) ? FanModeEnum::kLow : FanModeEnum::kHigh;
+    }
+    return FanModeEnum::kHigh;
+}
+
 } // namespace
 
 FanControl::Delegate & FanControlCluster::PlaceholderDelegate()
@@ -98,6 +129,19 @@ void FanControlCluster::CommitFanModeOffState()
 
 void FanControlCluster::ApplyFanModeSideEffects(FanModeEnum fanMode)
 {
+    auto syncCommandedPercentAndSpeedSetting = [&](chip::Percent percent) {
+        SetAttributeValue(mPercentSetting, DataModel::MakeNullable(percent), PercentSetting::Id);
+        if (SupportsMultiSpeed() && mSpeedMax > 0)
+        {
+            const uint8_t speedSetting = static_cast<uint8_t>((mSpeedMax * percent + 99) / 100);
+            SetAttributeValue(mSpeedSetting, DataModel::MakeNullable(speedSetting), SpeedSetting::Id);
+        }
+    };
+
+    const bool fanSequenceHasThreeDiscreteSpeeds =
+        (mFanModeSequence == FanModeSequenceEnum::kOffLowMedHigh ||
+         mFanModeSequence == FanModeSequenceEnum::kOffLowMedHighAuto);
+
     switch (fanMode)
     {
     case FanModeEnum::kOff:
@@ -110,49 +154,6 @@ void FanControlCluster::ApplyFanModeSideEffects(FanModeEnum fanMode)
             SetAttributeValue(mSpeedCurrent, static_cast<uint8_t>(0), SpeedCurrent::Id);
         }
         break;
-
-    case FanModeEnum::kLow:
-        SetAttributeValue(mPercentSetting, DataModel::MakeNullable<chip::Percent>(33), PercentSetting::Id);
-        if (SupportsMultiSpeed())
-        {
-            SetAttributeValue(mSpeedSetting, DataModel::MakeNullable<uint8_t>(1), SpeedSetting::Id);
-        }
-        SetAttributeValue(mPercentCurrent, chip::Percent{ 33 }, PercentCurrent::Id);
-        if (SupportsMultiSpeed())
-        {
-            SetAttributeValue(mSpeedCurrent, static_cast<uint8_t>(1), SpeedCurrent::Id);
-        }
-        break;
-
-    case FanModeEnum::kMedium: {
-        const uint8_t speedSetting = (mSpeedMax > 1) ? static_cast<uint8_t>((mSpeedMax + 1) / 2) : 1;
-
-        SetAttributeValue(mPercentSetting, DataModel::MakeNullable<chip::Percent>(66), PercentSetting::Id);
-        if (SupportsMultiSpeed())
-        {
-            SetAttributeValue(mSpeedSetting, DataModel::MakeNullable(speedSetting), SpeedSetting::Id);
-        }
-        SetAttributeValue(mPercentCurrent, chip::Percent{ 66 }, PercentCurrent::Id);
-        if (SupportsMultiSpeed())
-        {
-            SetAttributeValue(mSpeedCurrent, speedSetting, SpeedCurrent::Id);
-        }
-        break;
-    }
-
-    case FanModeEnum::kHigh:
-        SetAttributeValue(mPercentSetting, DataModel::MakeNullable<chip::Percent>(100), PercentSetting::Id);
-        if (SupportsMultiSpeed())
-        {
-            SetAttributeValue(mSpeedSetting, DataModel::MakeNullable(mSpeedMax), SpeedSetting::Id);
-        }
-        SetAttributeValue(mPercentCurrent, chip::Percent{ 100 }, PercentCurrent::Id);
-        if (SupportsMultiSpeed())
-        {
-            SetAttributeValue(mSpeedCurrent, mSpeedMax, SpeedCurrent::Id);
-        }
-        break;
-
     case FanModeEnum::kAuto:
         if (!mPercentSetting.IsNull())
         {
@@ -170,44 +171,28 @@ void FanControlCluster::ApplyFanModeSideEffects(FanModeEnum fanMode)
         }
         break;
 
+    case FanModeEnum::kLow: {
+        const bool hasLowStep = (mFanModeSequence != FanModeSequenceEnum::kOffHigh &&
+                                 mFanModeSequence != FanModeSequenceEnum::kOffHighAuto);
+        if (fanSequenceHasThreeDiscreteSpeeds || hasLowStep)
+        {
+            syncCommandedPercentAndSpeedSetting(33);
+        }
+        break;
+    }
+    case FanModeEnum::kMedium:
+        if (fanSequenceHasThreeDiscreteSpeeds)
+        {
+            syncCommandedPercentAndSpeedSetting(66);
+        }
+        break;
+    case FanModeEnum::kHigh:
+        syncCommandedPercentAndSpeedSetting(100);
+        break;
     default:
         break;
     }
 }
-
-namespace {
-
-FanModeEnum ComputeFanModeFromPercent(chip::Percent percent, FanModeSequenceEnum fanModeSequence)
-{
-    if (percent == 0)
-    {
-        return FanModeEnum::kOff;
-    }
-
-    const bool hasThreeSpeeds =
-        (fanModeSequence == FanModeSequenceEnum::kOffLowMedHigh || fanModeSequence == FanModeSequenceEnum::kOffLowMedHighAuto);
-    const bool hasLow = (fanModeSequence != FanModeSequenceEnum::kOffHigh && fanModeSequence != FanModeSequenceEnum::kOffHighAuto);
-
-    if (hasThreeSpeeds)
-    {
-        if (percent <= 33)
-        {
-            return FanModeEnum::kLow;
-        }
-        if (percent <= 66)
-        {
-            return FanModeEnum::kMedium;
-        }
-        return FanModeEnum::kHigh;
-    }
-    if (hasLow)
-    {
-        return (percent <= 50) ? FanModeEnum::kLow : FanModeEnum::kHigh;
-    }
-    return FanModeEnum::kHigh;
-}
-
-} // namespace
 
 void FanControlCluster::ApplyPercentSettingChanged()
 {
@@ -229,7 +214,6 @@ void FanControlCluster::ApplyPercentSettingChanged()
         uint16_t percent     = mPercentSetting.Value();
         uint8_t speedSetting = static_cast<uint8_t>((mSpeedMax * percent + 99) / 100);
         SetAttributeValue(mSpeedSetting, DataModel::MakeNullable(speedSetting), SpeedSetting::Id);
-        SetAttributeValue(mSpeedCurrent, speedSetting, SpeedCurrent::Id);
     }
 
     FanModeEnum newMode = ComputeFanModeFromPercent(mPercentSetting.Value(), mFanModeSequence);
@@ -237,8 +221,6 @@ void FanControlCluster::ApplyPercentSettingChanged()
     {
         StoreFanModePersistence();
     }
-
-    SetAttributeValue(mPercentCurrent, mPercentSetting.Value(), PercentCurrent::Id);
 }
 
 void FanControlCluster::ApplySpeedSettingChanged()
@@ -268,9 +250,6 @@ void FanControlCluster::ApplySpeedSettingChanged()
     {
         StoreFanModePersistence();
     }
-
-    SetAttributeValue(mPercentCurrent, percent, PercentCurrent::Id);
-    SetAttributeValue(mSpeedCurrent, speedSetting, SpeedCurrent::Id);
 }
 
 DataModel::ActionReturnStatus FanControlCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,

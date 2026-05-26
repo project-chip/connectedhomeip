@@ -323,6 +323,10 @@ Status Set(EndpointId endpoint, const DataModel::Nullable<uint8_t> & value)
     {
         return Status::UnsupportedEndpoint;
     }
+    if (!cluster->GetFeatureMap().Has(Feature::kMultiSpeed))
+    {
+        return Status::UnsupportedAttribute;
+    }
     return cluster->SetSpeedSetting(value).GetStatusCode().GetStatus();
 }
 
@@ -424,6 +428,10 @@ Status Set(EndpointId endpoint, AirflowDirectionEnum value)
     {
         return Status::UnsupportedEndpoint;
     }
+    if (!cluster->GetFeatureMap().Has(Feature::kAirflowDirection))
+    {
+        return Status::UnsupportedAttribute;
+    }
     return cluster->SetAirflowDirection(value).GetStatusCode().GetStatus();
 }
 
@@ -479,6 +487,10 @@ Status Set(EndpointId endpoint, BitMask<RockBitmap> value)
     {
         return Status::UnsupportedEndpoint;
     }
+    if (!cluster->GetFeatureMap().Has(Feature::kRocking))
+    {
+        return Status::UnsupportedAttribute;
+    }
     return cluster->SetRockSetting(value).GetStatusCode().GetStatus();
 }
 
@@ -533,6 +545,10 @@ Status Set(EndpointId endpoint, BitMask<WindBitmap> value)
     if (cluster == nullptr)
     {
         return Status::UnsupportedEndpoint;
+    }
+    if (!cluster->GetFeatureMap().Has(Feature::kWind))
+    {
+        return Status::UnsupportedAttribute;
     }
     return cluster->SetWindSetting(value).GetStatusCode().GetStatus();
 }

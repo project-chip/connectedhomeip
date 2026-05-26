@@ -23,8 +23,6 @@
 #include <app/clusters/fan-control-server/fan-control-server.h>
 #include <app/reporting/reporting.h>
 #include <app/util/attribute-storage.h>
-#include <cstdint>
-#include <lib/support/BitFlags.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
@@ -46,7 +44,6 @@ public:
 
     void Init();
     void HandleFanControlAttributeChange(AttributeId attributeId, uint8_t type, uint16_t size, uint8_t * value);
-    void OnFanDriveStateChanged(const FanDriveState & newState) override;
     Status HandleStep(StepDirectionEnum aDirection, bool aWrap, bool aLowestOff) override;
     DataModel::Nullable<uint8_t> GetSpeedSetting();
     DataModel::Nullable<Percent> GetPercentSetting();
@@ -126,32 +123,6 @@ Status ChefFanControlManager::HandleStep(StepDirectionEnum aDirection, bool aWra
     }
 
     return SpeedSetting::Set(mEndpoint, newSpeedSetting);
-}
-
-void ChefFanControlManager::OnFanDriveStateChanged(const FanDriveState & newState)
-{
-    mSpeedCurrent = newState.speedCurrent;
-
-    FanModeWriteCallback(newState.mode);
-    SetPercentCurrent(newState.percentCurrent);
-
-    uint32_t featureMap = 0;
-    if (FanControl::Attributes::FeatureMap::Get(mEndpoint, &featureMap) == Status::Success &&
-        BitFlags<FanControl::Feature>(featureMap).Has(FanControl::Feature::kMultiSpeed))
-    {
-        SetSpeedCurrent(newState.speedCurrent);
-        const FanControl::FanModeEnum derivedMode = SpeedToFanMode(mSpeedCurrent);
-        FanControl::FanModeEnum currentMode       = FanControl::FanModeEnum::kOff;
-        if (FanControl::Attributes::FanMode::Get(mEndpoint, &currentMode) == Status::Success && currentMode != derivedMode)
-        {
-            Status st = FanControl::Attributes::FanMode::Set(mEndpoint, derivedMode);
-            if (st != Status::Success)
-            {
-                ChipLogError(NotSpecified, "ChefFanControlManager::OnFanDriveStateChanged: SetFanMode failed: %d",
-                             to_underlying(st));
-            }
-        }
-    }
 }
 
 void ChefFanControlManager::HandleFanControlAttributeChange(AttributeId attributeId, uint8_t type, uint16_t size, uint8_t * value)

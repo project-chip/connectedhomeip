@@ -18,7 +18,6 @@
 
 #include <air-purifier-manager.h>
 #include <app/clusters/fan-control-server/CodegenIntegration.h>
-#include <lib/support/CodeUtils.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -154,13 +153,6 @@ Status AirPurifierManager::HandleStep(FanControl::StepDirectionEnum aDirection, 
     return FanControl::Attributes::SpeedSetting::Set(mEndpointId, newSpeedSetting);
 }
 
-void AirPurifierManager::OnFanDriveStateChanged(const FanControl::FanDriveState & newState)
-{
-    (void) newState;
-
-    ClampFanDriveCurrentWhenOff();
-}
-
 void AirPurifierManager::HandleFanControlAttributeChange(AttributeId attributeId, uint8_t type, uint16_t size, uint8_t * value)
 {
     switch (attributeId)
@@ -200,30 +192,6 @@ void AirPurifierManager::HandleFanControlAttributeChange(AttributeId attributeId
     default: {
         break;
     }
-    }
-
-    ClampFanDriveCurrentWhenOff();
-}
-
-void AirPurifierManager::ClampFanDriveCurrentWhenOff()
-{
-    if (mOnOffClusterOn)
-    {
-        return;
-    }
-
-    if (FanControl::Attributes::PercentCurrent::Set(mEndpointId, static_cast<chip::Percent>(0)) != Status::Success)
-    {
-        ChipLogError(NotSpecified, "AirPurifierManager::ClampFanDriveCurrentWhenOff: SetPercentCurrent failed");
-    }
-    uint32_t featureMap = 0;
-    if (FanControl::Attributes::FeatureMap::Get(mEndpointId, &featureMap) == Status::Success &&
-        BitFlags<FanControl::Feature>(featureMap).Has(FanControl::Feature::kMultiSpeed))
-    {
-        if (FanControl::Attributes::SpeedCurrent::Set(mEndpointId, 0) != Status::Success)
-        {
-            ChipLogError(NotSpecified, "AirPurifierManager::ClampFanDriveCurrentWhenOff: SetSpeedCurrent failed");
-        }
     }
 }
 

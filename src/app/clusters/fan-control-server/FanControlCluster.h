@@ -163,9 +163,7 @@ private:
 
     void CommitFanModeOffState();
 
-    // Updates PercentSetting / PercentCurrent (and Speed* when MultiSpeed is supported) for the
-    // given FanMode: Off clears to 0, Low/Medium/High set fixed percentages 33/66/100 and matching
-    // speeds, Auto nulls settings while syncing current values from prior settings.
+    // Off: clears Percent/Speed settings and currents. Auto: nulls settings, copies prior values into currents.
     void ApplyFanModeSideEffects(FanControl::FanModeEnum fanMode);
 
     void ApplyPercentSettingChanged();
