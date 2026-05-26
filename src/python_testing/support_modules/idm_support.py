@@ -62,6 +62,7 @@ class WritableAttributeInfo:
     datatype: str
     constraints: Optional[Constraints]
 
+
 @dataclass
 class ChangedAttribute:
     """Record of an attribute write performed by IDM tests for later verification."""
