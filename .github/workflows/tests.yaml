@@ -237,6 +237,7 @@ jobs:
                       src/app/zap-templates/zcl/data-model/chip/switch-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/target-navigator-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/temperature-control-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/temperature-controlled-cabinet-topology-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/temperature-measurement-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/test-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/thermostat-user-interface-configuration-cluster.xml \
