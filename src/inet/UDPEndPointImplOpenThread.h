@@ -49,6 +49,10 @@ public:
     CHIP_ERROR SetMulticastLoopback(IPVersion aIPVersion, bool aLoopback) override;
     CHIP_ERROR BindInterfaceImpl(IPAddressType addressType, InterfaceId interfaceId) override;
 
+    // Complete any deferred IPv6 binds for endpoints whose OT instance was null at bind time.
+    // Call this after OpenThread is initialized (e.g. in non-concurrent commissioning mode).
+    static CHIP_ERROR CompleteDeferredOTBinds(otInstance * otInst);
+
 private:
     // UDPEndPoint overrides.
     CHIP_ERROR IPv6JoinLeaveMulticastGroupImpl(InterfaceId aInterfaceId, const IPAddress & aAddress, bool join) override;
@@ -64,6 +68,11 @@ private:
     InterfaceId mBoundIntfId;
     uint16_t mBoundPort;
     otUdpSocket mSocket;
+
+    // State for deferred bind (used when OT instance is not yet initialized)
+    bool mDeferredBind   = false;
+    IPAddress mDeferredAddr;
+    uint16_t mDeferredPort = 0;
 };
 
 using UDPEndPointImpl = UDPEndPointImplOT;

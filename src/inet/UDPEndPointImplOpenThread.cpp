@@ -37,6 +37,9 @@ using DeviceLayer::Internal::MapOpenThreadError;
 
 otInstance * globalOtInstance;
 
+// Single deferred endpoint — there is only one OT-based UDP endpoint (the Thread operational port).
+static UDPEndPointImplOT * sDeferredEndpoint = nullptr;
+
 namespace {
 // We want to reserve space for an IPPacketInfo in our buffer, but it needs to
 // be 4-byte aligned.  We ensure the alignment by masking off the low bits of
@@ -127,6 +130,22 @@ void UDPEndPointImplOT::handleUdpReceive(void * aContext, otMessage * aMessage, 
 CHIP_ERROR UDPEndPointImplOT::IPv6Bind(otUdpSocket & socket, const IPAddress & address, uint16_t port,
                                        [[maybe_unused]] InterfaceId interface)
 {
+#if CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+    // OT still not ready — defer the bind and return success so Server::Init() can proceed.
+    // CompleteDeferredOTBinds() must be called after OT is initialized.
+    if (mOTInstance == nullptr)
+    {
+        if (!mDeferredBind)
+        {
+            mDeferredAddr    = address;
+            mDeferredPort    = port;
+            mDeferredBind    = true;
+            sDeferredEndpoint = this;
+        }
+        return CHIP_NO_ERROR;
+    }
+#endif
+
     otError err = OT_ERROR_NONE;
     otSockAddr listenSockAddr;
 
@@ -242,6 +261,29 @@ CHIP_ERROR UDPEndPointImplOT::BindInterfaceImpl(IPAddressType addressType, Inter
     (void) addressType;
     (void) interfaceId;
     return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR UDPEndPointImplOT::CompleteDeferredOTBinds(otInstance * otInst)
+{
+    UDPEndPointImplOT * ep = sDeferredEndpoint;
+    sDeferredEndpoint      = nullptr;
+
+    if (ep == nullptr || !ep->mDeferredBind)
+        return CHIP_NO_ERROR;
+
+    ep->mOTInstance  = otInst;
+    globalOtInstance = otInst;
+
+    CHIP_ERROR err = ep->IPv6Bind(ep->mSocket, ep->mDeferredAddr, ep->mDeferredPort, ep->mBoundIntfId);
+    if (err == CHIP_NO_ERROR)
+    {
+        ep->mDeferredBind = false;
+    }
+    else
+    {
+        ChipLogError(Inet, "CompleteDeferredOTBinds: bind failed: %" CHIP_ERROR_FORMAT, err.Format());
+    }
+    return err;
 }
 
 CHIP_ERROR UDPEndPointImplOT::SendMsgImpl(const IPPacketInfo * aPktInfo, System::PacketBufferHandle && msg)
