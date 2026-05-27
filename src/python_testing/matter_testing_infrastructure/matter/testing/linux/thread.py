@@ -19,7 +19,7 @@ import os
 import re
 import subprocess
 import threading
-from typing import Optional, Pattern
+from re import Pattern
 
 from matter.testing.concurrency.context import TerminableResource
 from matter.testing.tasks import SubprocessKind
@@ -36,26 +36,33 @@ class ThreadBorderRouter(TerminableResource):
 
     def __init__(self, dataset: str, ns: IsolatedNetworkNamespace):
         self._event = threading.Event()
-        self._pattern: Optional[Pattern[str]] = None
         self._event.set()
+        self._pattern: Pattern[str] | None = None
         self._netns_app = ns.netns_for_subprocess_kind(SubprocessKind.APP)
         self._link_name_app = ns.app_link.name
+        self._dataset = dataset
+        self._otbr: subprocess.Popen | None = None
 
+    def resource_start(self) -> None:
         radio_url = f'spinel+hdlc+forkpty:///usr/bin/env?forkpty-arg=ot-rcp&forkpty-arg={self.NODE_ID}'
         cmd = self._netns_app.wrap_cmd(['otbr-agent', '-d7', '-v', f'-B{self._link_name_app}', radio_url])
+        self._otbr = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, encoding='UTF-8')
 
-        self._otbr = subprocess.Popen(cmd,
-                                      stdout=subprocess.PIPE,
-                                      stderr=subprocess.STDOUT,
-                                      text=True,
-                                      encoding='UTF-8')
-
-        threading.Thread(name="OTBRReadStdout", target=self._otbr_read_stdout, daemon=True).start()
+        threading.Thread(name="OTBRReadStdout", target=self._otbr_read_stdout, args=(self._otbr,), daemon=True).start()
 
         self.expect(r'Co-processor version:', timeout=20)
-        self.join_network(dataset)
+        self.join_network(self._dataset)
 
-    def join_network(self, dataset):
+    def resource_terminate(self) -> None:
+        if self._otbr is not None:
+            try:
+                self._otbr.terminate()
+                self._otbr.wait()
+            finally:
+                if self._otbr.stdout is not None:
+                    self._otbr.stdout.close()
+
+    def join_network(self, dataset: str) -> None:
         status = os.system(
             f'ot-ctl dataset init tlvs {dataset} &&'
             'ot-ctl dataset commit active &&'
@@ -74,15 +81,15 @@ class ThreadBorderRouter(TerminableResource):
 
         self.expect(r'Sent RA on infra netif', timeout=15)
 
-    def expect(self, pattern: str, timeout=10):
+    def expect(self, pattern: str, timeout: float | None = 10) -> None:
         self._pattern = re.compile(pattern)
         self._event.clear()
         if not self._event.wait(timeout):
             raise TimeoutError(f'Failed to expect: {pattern}')
 
-    def _otbr_read_stdout(self):
-        assert self._otbr.stdout is not None
-        while (line := self._otbr.stdout.readline()):
+    def _otbr_read_stdout(self, otbr: subprocess.Popen[str]) -> None:
+        assert otbr.stdout is not None, "stdout must be set to subprocess.PIPE"
+        while (line := otbr.stdout.readline()):
             log.info(line)
             if self._event.is_set():
                 continue
@@ -103,8 +110,3 @@ class ThreadBorderRouter(TerminableResource):
 
     def get_border_agent_host(self) -> str:
         return '10.10.10.1'
-
-    def resource_terminate(self):
-        if self._otbr:
-            self._otbr.terminate()
-            self._otbr.wait()
