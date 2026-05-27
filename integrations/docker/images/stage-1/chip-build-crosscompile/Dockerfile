@@ -16,17 +16,12 @@ WORKDIR /opt
 # are generally not required for compilation
 # Executables are also removed as those confuse cmake. It tries to run `make` from the sysroot and fails.
 RUN set -x \
-  && SYSROOT_VERSION="build-2026.05.07" \
+  && SYSROOT_VERSION="build-2026.05.14" \
   && git clone --depth 1 https://chromium.googlesource.com/chromium/tools/depot_tools.git /opt/depot_tools \
   # TODO: Remove experimental solution to create the sysroot file in cross-compile image
   && echo "experimental/matter/sysroot/ubuntu-24.04-aarch64 version:${SYSROOT_VERSION}" > ensure_file.txt \
   && echo "experimental/matter/sysroot/ubuntu-24.04-armhf version:${SYSROOT_VERSION}" >> ensure_file.txt \
   && ./depot_tools/cipd ensure -ensure-file ensure_file.txt -root ./ \
-  && for arch in aarch64 armhf; do \
-       for d in usr/bin usr/lib/firmware usr/lib/git-core usr/lib/modules lib/firmware lib/git-core lib/modules; do \
-         rm -rf "/opt/ubuntu-24.04-${arch}-sysroot/${d}"; \
-       done; \
-     done \
   && : # last line
 
 FROM ghcr.io/project-chip/chip-build:${VERSION}

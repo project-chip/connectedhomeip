@@ -21,7 +21,7 @@ import os
 import random
 import shutil
 import tempfile
-from enum import Enum
+from enum import StrEnum
 from typing import Optional
 
 import psutil
@@ -36,7 +36,7 @@ from matter.testing.tasks import Subprocess
 log = logging.getLogger(__name__)
 
 
-class SupportedIngestInterface(str, Enum):
+class SupportedIngestInterface(StrEnum):
     cmaf = "cmaf-ingest"  # Interface 1
     dash = "dash"  # Interface 2, DASH version
     hls = "hls"  # Interface 2, HLS version

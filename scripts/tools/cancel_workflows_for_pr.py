@@ -18,7 +18,7 @@
 import datetime
 import logging
 import re
-from typing import Optional, Set
+from typing import Optional
 
 import click
 import coloredlogs
@@ -75,8 +75,8 @@ class Canceller:
 
         log.info("Last commit is: '%s'", last_commit.sha)
 
-        in_progress_workflows: Set[int] = set()
-        failed_check_names: Set[str] = set()
+        in_progress_workflows: set[int] = set()
+        failed_check_names: set[str] = set()
 
         # Gather all workflows along with failed workflow names
         for check_suite in last_commit.get_check_suites():

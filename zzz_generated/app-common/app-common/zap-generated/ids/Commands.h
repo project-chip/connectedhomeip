@@ -136,6 +136,7 @@
 #include <clusters/ScenesManagement/CommandIds.h>
 #include <clusters/ServiceArea/CommandIds.h>
 #include <clusters/SmokeCoAlarm/CommandIds.h>
+#include <clusters/SmokeConcentrationMeasurement/CommandIds.h>
 #include <clusters/SoftwareDiagnostics/CommandIds.h>
 #include <clusters/SoilMeasurement/CommandIds.h>
 #include <clusters/Switch/CommandIds.h>

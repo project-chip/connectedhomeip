@@ -149,10 +149,10 @@ class TC_CLCTRL_4_4(MatterBaseTest):
         timeout: uint = self.matter_test_config.timeout if self.matter_test_config.timeout is not None else countdown_time_max
 
         self.step(1)
-        attributes: typing.List[uint] = Clusters.ClosureControl.Attributes
+        attributes: list[uint] = Clusters.ClosureControl.Attributes
 
         self.step("2a")
-        attribute_list: typing.List[uint] = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.AttributeList)
+        attribute_list: list[uint] = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.AttributeList)
         log.info(f"AttributeList: {attribute_list}")
 
         self.step("2b")
