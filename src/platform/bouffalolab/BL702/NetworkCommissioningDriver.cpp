@@ -271,8 +271,7 @@ void BflbWiFiDriver::OnScanWiFiNetworkDone(void * opaque)
 
             p->security.SetRaw(pmsg->records[i].auth_mode);
 
-            // Bounds check added to prevent buffer overflow vulnerabilities.
-            VerifyOrReturn(kMaxWiFiSSIDLength <= sizeof(p->ssid));
+            static_assert(kMaxWiFiSSIDLength <= sizeof(p->ssid), "SSID buffer too small for kMaxWiFiSSIDLength");
 
             // Keep old behaviour due to compatibility with SDK
             strncpy((char *) p->ssid, (const char *) pmsg->records[i].ssid,
