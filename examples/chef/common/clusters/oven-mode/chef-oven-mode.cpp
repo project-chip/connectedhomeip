@@ -41,6 +41,20 @@ static_assert(kOvenModeTableSize <= kEmberInvalidEndpointIndex, "OvenMode table 
 std::unique_ptr<OvenMode::ChefDelegate> gDelegateTable[kOvenModeTableSize];
 std::unique_ptr<ModeBase::Instance> gInstanceTable[kOvenModeTableSize];
 
+/// Fetch the featuremap from ember for the given endpoint/cluster
+Status LoadFeatureMap(EndpointId endpointId, ClusterId clusterId, uint32_t & featureMap)
+{
+    using Traits = NumericAttributeTraits<uint32_t>;
+    Traits::StorageType temp;
+    uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
+    Status status =
+        emberAfReadAttribute(endpointId, clusterId, Clusters::Globals::Attributes::FeatureMap::Id, readable, sizeof(temp));
+    VerifyOrReturnError(status == Status::Success, status);
+    // note: we do not try to check if value is representable: all the uint32_t values are representable
+    featureMap = Traits::StorageToWorking(temp);
+    return Status::Success;
+}
+
 void InitOvenModeForEndpoint(EndpointId endpointId)
 {
     uint16_t epIndex =
@@ -52,7 +66,7 @@ void InitOvenModeForEndpoint(EndpointId endpointId)
     TEMPORARY_RETURN_IGNORED gDelegateTable[epIndex]->Init();
 
     uint32_t featureMap = 0;
-    VerifyOrDieWithMsg(OvenMode::Attributes::FeatureMap::Get(endpointId, &featureMap) == Status::Success, DeviceLayer,
+    VerifyOrDieWithMsg(LoadFeatureMap(endpointId, OvenMode::Id, featureMap) == Status::Success, DeviceLayer,
                        "Failed to read OvenMode feature map for endpoint %d", endpointId);
     gInstanceTable[epIndex] =
         std::make_unique<ModeBase::Instance>(gDelegateTable[epIndex].get(), endpointId, OvenMode::Id, featureMap);
