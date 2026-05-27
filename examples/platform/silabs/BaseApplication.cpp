@@ -289,6 +289,8 @@ CHIP_ERROR BaseApplication::Init()
         appError(err);
         return err;
     }
+
+    mIsApplicationInitialized = (err == CHIP_NO_ERROR);
     return err;
 }
 
@@ -1043,6 +1045,8 @@ bool BaseApplication::GetProvisionStatus()
 void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
                                        uint8_t * value)
 {
+    // Verify that the App layer is initialized before propagating attribute changes callback to it.
+    VerifyOrReturn(CustomerAppTask::GetAppTask().IsApplicationInitialized());
     // Route through CustomerAppTask / AppTaskImpl (CRTP) so overrides use DMPostAttributeChangeCallbackImpl.
     CustomerAppTask::GetAppTask().DMPostAttributeChangeCallback(attributePath, type, size, value);
 }
