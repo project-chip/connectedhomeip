@@ -18,7 +18,7 @@ import subprocess
 import threading
 from abc import abstractmethod
 from types import TracebackType
-from typing import Callable, Generic, Self, TypeVar
+from typing import Any, Callable, Generic, Self, TypeVar
 
 log = logging.getLogger(__name__)
 
@@ -35,29 +35,35 @@ class TerminableResourceBase(contextlib.AbstractContextManager, Generic[Internal
     RESOURCE_TIMEOUT_TERMINATE_S: float = 5.0
     """Timeout for resource termination (if applicable), in seconds."""
 
+    def __init__(self, name: str | None = None, terminate_debug_logging: bool = True) -> None:
+        self._name = name or self.__class__.__name__
+        self._terminate_debug_logging = terminate_debug_logging
+
     def __enter__(self) -> Self | InternalResourceT:
-        log.debug("Starting %s", self.__class__.__name__)
+        log.debug("Starting %s", self._name)
         try:
             return resource if (resource := self.resource_start()) is not None else self
         except BaseException as start_ex:
-            log.error("Failed to start resource %s: %r", self.__class__.__name__, start_ex)
-            start_ex.add_note(f"Failure during start of resource {self.__class__.__name__}")
+            log.error("Failed to start resource %s: %r", self._name, start_ex)
+            start_ex.add_note(f"Failure during start of resource {self._name}")
             try:
                 self.resource_terminate()
             except BaseException as term_ex:
-                log.error("Failed to terminate resource %s during start failure: %r", self.__class__.__name__, term_ex)
+                log.error("Failed to terminate resource %s during start failure: %r", self._name, term_ex)
                 raise term_ex.with_traceback(term_ex.__traceback__) from start_ex
             raise
 
     def __exit__(self, exc_type: type[BaseException] | None, exc_value: BaseException | None,
                  traceback: TracebackType | None) -> bool | None:
-        log.debug("Terminating %s", self.__class__.__name__)
+        if self._terminate_debug_logging:
+            log.debug("Terminating %s", self._name)
         try:
             self.resource_terminate()
-            log.debug("Terminated %s", self.__class__.__name__)
+            if self._terminate_debug_logging:
+                log.debug("Terminated %s", self._name)
         except BaseException as e:
-            log.error("Failed to terminate resource %s: %r", self.__class__.__name__, e)
-            e.add_note(f"Failure during termination of resource {self.__class__.__name__}")
+            log.error("Failed to terminate resource %s: %r", self._name, e)
+            e.add_note(f"Failure during termination of resource {self._name}")
             if exc_value is not None:
                 raise e.with_traceback(e.__traceback__) from exc_value
             raise
@@ -82,6 +88,7 @@ class TerminableResource(TerminableResourceBase[None]):
     def resource_start(self) -> None:
         """Initialize or start the resource."""
 
+
 class TerminableThread(TerminableResource, threading.Thread):
     """
     Thread that can be terminated using the TerminableResource context manager.
@@ -90,6 +97,12 @@ class TerminableThread(TerminableResource, threading.Thread):
     in `resource_start()`, and you are expected to raise a TimeoutError exception if the thread fails to start within the
     `RESOURCE_TIMEOUT_START_S` timeout.
     """
+
+    def __init__(self, group: None = None, target: Callable[[], None] | None = None, name: str | None = None,
+                 args: tuple[Any, ...] = (), kwargs: dict[str, Any] | None = None, *, daemon: bool | None = None,
+                 terminate_debug_logging: bool = True) -> None:
+        threading.Thread.__init__(self, group, target, name, args, kwargs, daemon=daemon)
+        super().__init__(name, terminate_debug_logging)
 
     def resource_start(self) -> None:
         self.start()
@@ -122,7 +135,9 @@ class TerminablePopen(TerminableResourceBase[subprocess.Popen[PopenT]]):
     `RESOURCE_TIMEOUT_START_S` timeout.
     """
 
-    def __init__(self, create_popen: Callable[[], subprocess.Popen[PopenT]]) -> None:
+    def __init__(self, create_popen: Callable[[], subprocess.Popen[PopenT]], name: str | None = None,
+                 terminate_debug_logging: bool = True) -> None:
+        super().__init__(name, terminate_debug_logging)
         self._process: subprocess.Popen[PopenT] | None = None
         self._create_popen: Callable[[], subprocess.Popen[PopenT]] = create_popen
 

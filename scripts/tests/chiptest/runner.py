@@ -145,11 +145,14 @@ class Executor(contextlib.ExitStack):
 
     def run(self, subproc: SubprocessInfo, stdin: BinaryIO | None = None, stdout: BinaryIO | LogPipe | None = None,
             stderr: BinaryIO | LogPipe | None = None) -> subprocess.Popen[bytes]:
-        # Seems like LogPipe has all what Popen needs to perceive it as stdout/stderr,
-        # but mypy doesn't think the same.
+        cmd = subproc.to_cmd()
+        name = TerminablePopen.__class__.__name__ + (f"({cmd[0]})" if cmd else "")
+
+        # Seems like LogPipe has all what Popen needs to perceive it as stdout/stderr, but mypy doesn't think the same.
         terminable_process: TerminablePopen[bytes] = TerminablePopen(
-            lambda: subprocess.Popen(subproc.to_cmd(), stdin=stdin,
-                                     stdout=stdout, stderr=stderr))  # type: ignore[arg-type]
+            lambda: subprocess.Popen(cmd, stdin=stdin,
+                                     stdout=stdout, stderr=stderr),  # type: ignore[arg-type]
+            name, terminate_debug_logging=False)
         return self.enter_context(terminable_process)
 
 

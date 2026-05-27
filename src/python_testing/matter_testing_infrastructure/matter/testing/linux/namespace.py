@@ -273,6 +273,7 @@ class IsolatedNetworkNamespace(TerminableResource):
         - tool -- tool network for chip-tool.
         - app -- network for tested application(s).
         """
+        super().__init__()
         self.index = index
 
         self.app_ns = NetworkNamespace(f"ns-{app_link_name}-{index}")

@@ -263,6 +263,8 @@ def with_accessories_lock(fn: Callable[Concatenate[S, P], R]) -> Callable[Concat
 
 class AppsRegister(TerminableResource):
     def __init__(self, net_ns_wrapper: str | None = None, log_config: LogConfig | None = None) -> None:
+        super().__init__()
+
         self._accessories: dict[str, App] = {}
         self._accessories_lock = threading.RLock()
 
