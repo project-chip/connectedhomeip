@@ -171,6 +171,23 @@ CommissioningParameters PairingCommand::GetCommissioningParameters()
 {
     auto params = CommissioningParameters();
     params.SetSkipCommissioningComplete(mSkipCommissioningComplete.ValueOr(false));
+
+    switch (mNetworkType)
+    {
+    case PairingNetworkType::WiFi:
+        params.SetCommissioningNetworkType(CommissioningNetworkType::kWiFi);
+        break;
+    case PairingNetworkType::Thread:
+        params.SetCommissioningNetworkType(CommissioningNetworkType::kThread);
+        break;
+    case PairingNetworkType::WiFiOrThread:
+        params.SetCommissioningNetworkType(CommissioningNetworkType::kWiFiOrThread);
+        break;
+    case PairingNetworkType::None:
+        params.SetCommissioningNetworkType(CommissioningNetworkType::kNone);
+        break;
+    }
+
     if (mBypassAttestationVerifier.ValueOr(false))
     {
         params.SetDeviceAttestationDelegate(this);

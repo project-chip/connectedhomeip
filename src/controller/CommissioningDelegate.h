@@ -109,6 +109,14 @@ enum class ICDRegistrationStrategy : uint8_t
                      ///< Controller should provide a ICDKey manager for generating symmetric key
 };
 
+enum class CommissioningNetworkType : uint8_t
+{
+    kNone,
+    kWiFi,
+    kThread,
+    kWiFiOrThread,
+};
+
 const char * StageToString(CommissioningStage stage);
 
 #if MATTER_TRACING_ENABLED
@@ -556,6 +564,13 @@ public:
         return *this;
     }
 
+    Optional<CommissioningNetworkType> GetCommissioningNetworkType() const { return mCommissioningNetworkType; }
+    CommissioningParameters & SetCommissioningNetworkType(CommissioningNetworkType commissioningNetworkType)
+    {
+        mCommissioningNetworkType = MakeOptional(commissioningNetworkType);
+        return *this;
+    }
+
     // Check for matching fabric on target device by reading fabric list and looking for a
     // fabricId and RootCert match. If a match is detected, then use GetNodeId() to
     // access the nodeId for the device on the matching fabric.
@@ -697,6 +712,7 @@ private:
     Optional<bool> mAttemptWiFiNetworkScan;
     Optional<bool> mAttemptThreadNetworkScan; // This automatically gets set to false when a ThreadOperationalDataset is set
     Optional<bool> mSkipCommissioningComplete;
+    Optional<CommissioningNetworkType> mCommissioningNetworkType;
 
     Optional<NodeId> mICDCheckInNodeId;
     Optional<uint64_t> mICDMonitoredSubject;
