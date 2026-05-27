@@ -100,7 +100,7 @@ class TC_PICS_Checker(BasicCompositionTests):
                          "PICS is set if root node is present"),
                 TestStep(9, "If the device has any onboarding payload (MCORE.DD.QR or MCORE.DD.NFC), it has the manual pairing code PICS set (MCORE.DD.MANUAL_PC)",
                          "Manual pairing code PICS is set if QR or NFC is set"),
-                TestStep(10, "For every Base/MCORE PICS code derivable from the wildcard read (bridge role, OTA requestor/provider, multi-endpoint groups, Wi-Fi bands, MCORE.ROLE.COMMISSIONEE, MCORE.IDM.S), ensure each code's value in the PICS file matches what the device protocol reports. Codes the device reports false for must not be set in the PICS file; codes the device reports true for must be set.",
+                TestStep(10, "For every Base/MCORE PICS code derivable from the wildcard read (bridge role, OTA requestor/provider, multi-endpoint groups, MCORE.ROLE.COMMISSIONEE, MCORE.IDM.S), ensure each code's value in the PICS file matches what the device protocol reports. Codes the device reports false for must not be set in the PICS file; codes the device reports true for must be set.",
                          "Base/MCORE PICS exactly match the device for derivable items."),
                 TestStep(11, "If --assert-mandatory-events is set: for every event the spec marks MANDATORY for the device's cluster feature set, ensure the corresponding event PICS code (cluster.S.E<id>) is marked in the PICS file. Skipped by default.",
                          "Event PICS match spec conformance for the device's featureset."),

@@ -140,8 +140,6 @@ class TestPicsHelpers(MatterBaseTest):
             (BasePicsFacts(is_ota_requestor=True), "MCORE.OTA.Requestor"),
             (BasePicsFacts(is_ota_provider=True), "MCORE.OTA.Provider"),
             (BasePicsFacts(has_groups_on_multiple_endpoints=True), "MCORE.G.MULTIENDPOINT"),
-            (BasePicsFacts(supports_wifi_2g4=True), "MCORE.COM.WIFI_2P4GHZ"),
-            (BasePicsFacts(supports_wifi_5g=True), "MCORE.COM.WIFI_5GHZ"),
         ]
         for facts, expected_code in cases:
             codes = base_pics_facts_to_pics_codes(facts)
@@ -153,8 +151,7 @@ class TestPicsHelpers(MatterBaseTest):
         all_on = BasePicsFacts(
             is_commissionee=True, is_server=True, is_bridge=True,
             is_ota_requestor=True, is_ota_provider=True,
-            has_groups_on_multiple_endpoints=True,
-            supports_wifi_2g4=True, supports_wifi_5g=True)
+            has_groups_on_multiple_endpoints=True)
         asserts.assert_equal(base_pics_facts_to_pics_codes(all_on), set(BASE_PICS_CODES_DERIVED),
                              "All-on facts must produce the full tracked-codes set")
 
@@ -163,13 +160,11 @@ class TestPicsHelpers(MatterBaseTest):
         desc = Clusters.Descriptor
         opcreds = Clusters.OperationalCredentials
         groups = Clusters.Groups
-        netcomm = Clusters.NetworkCommissioning
         ota_req = Clusters.OtaSoftwareUpdateRequestor
 
         # Minimal "root node plus bridged child with Groups on EP1 and EP2" wildcard.
         # EP0: root node device type, OpCreds (so endpoint has a server),
-        #      OTA Requestor (server-side), Network Commissioning with WiFi
-        #      featuremap bit set and 2.4 GHz band reported.
+        #      OTA Requestor (server-side).
         # EP1: Aggregator device type, Groups server.
         # EP2: Groups server.
         wildcard = AsyncReadTransaction.ReadResponse(attributes={}, events=[], tlvAttributes={})
@@ -177,7 +172,6 @@ class TestPicsHelpers(MatterBaseTest):
         wildcard.attributes[0] = {
             desc: {desc.Attributes.DeviceTypeList: [
                 desc.Structs.DeviceTypeStruct(deviceType=0x16, revision=1)]},
-            netcomm: {netcomm.Attributes.SupportedWiFiBands: [netcomm.Enums.WiFiBandEnum.k2g4]},
         }
         wildcard.attributes[1] = {
             desc: {desc.Attributes.DeviceTypeList: [
@@ -203,8 +197,6 @@ class TestPicsHelpers(MatterBaseTest):
             desc.id: _empty_globals(),
             opcreds.id: _empty_globals(),
             ota_req.id: _empty_globals(),
-            # WiFi feature bit (0) set so the helper consults SupportedWiFiBands.
-            netcomm.id: _empty_globals(feature_map=1 << 0),
         }
         wildcard.tlvAttributes[1] = {
             desc.id: _empty_globals(),
@@ -224,15 +216,12 @@ class TestPicsHelpers(MatterBaseTest):
         asserts.assert_false(facts.is_ota_provider, "OTA Provider not present, must not derive is_ota_provider")
         asserts.assert_true(facts.has_groups_on_multiple_endpoints,
                             "Groups on EP1 + EP2 must derive has_groups_on_multiple_endpoints")
-        asserts.assert_true(facts.supports_wifi_2g4, "k2g4 in SupportedWiFiBands must derive supports_wifi_2g4")
-        asserts.assert_false(facts.supports_wifi_5g, "k5g not in SupportedWiFiBands, must not derive supports_wifi_5g")
 
         # Translator should map this exactly to the expected MCORE set,
-        # excluding the two it doesn't cover (Provider + 5 GHz).
+        # excluding the one it doesn't cover (OTA Provider).
         expected_codes = {
             "MCORE.ROLE.COMMISSIONEE", "MCORE.IDM.S", "MCORE.BRIDGE",
             "MCORE.OTA.Requestor", "MCORE.G.MULTIENDPOINT",
-            "MCORE.COM.WIFI_2P4GHZ",
         }
         asserts.assert_equal(base_pics_facts_to_pics_codes(facts), expected_codes,
                              "Translator output drifted from the per-rule facts")
@@ -319,7 +308,6 @@ class TestPicsHelpers(MatterBaseTest):
         asserts.assert_true(
             len(acl_mandatory) > 0,
             "AccessControl spec-mandatory events must be derived for any DUT with AccessControl on EP0")
-
 
 if __name__ == "__main__":
     default_matter_test_main()

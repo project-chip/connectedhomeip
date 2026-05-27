@@ -111,17 +111,12 @@ def GenerateBasePicsXmlFile(facts: _BasePicsFacts, outputPathStr: str) -> None:
     if facts.is_commissionee:
         auto_marked["MCORE.ROLE.COMMISSIONEE"] = True
 
-    # Only mark MCORE.COM.WIFI when we also know at least one band, otherwise
-    # the file ends up internally inconsistent (WIFI=true but no band marked,
-    # which the spec says makes WIFI's M condition unsatisfiable).
-    wifi_marked = False
-    if facts.supports_wifi and (facts.supports_wifi_2g4 or facts.supports_wifi_5g):
+    # MCORE.COM.WIFI_2P4GHZ / MCORE.COM.WIFI_5GHZ are about Public Action
+    # Frame support on the corresponding band, not radio band capability,
+    # and there's no protocol-observable signal for that. Leave both at the
+    # template default (false) and let the reviewer flip them if needed.
+    if facts.supports_wifi:
         auto_marked["MCORE.COM.WIFI"] = True
-        wifi_marked = True
-        if facts.supports_wifi_2g4:
-            auto_marked["MCORE.COM.WIFI_2P4GHZ"] = True
-        if facts.supports_wifi_5g:
-            auto_marked["MCORE.COM.WIFI_5GHZ"] = True
 
     if facts.supports_thread:
         auto_marked["MCORE.COM.THR"] = True
@@ -129,9 +124,10 @@ def GenerateBasePicsXmlFile(facts: _BasePicsFacts, outputPathStr: str) -> None:
     if facts.supports_ethernet:
         auto_marked["MCORE.COM.ETH"] = True
 
-    # Mirror what we actually marked above. Marking WIRELESS without marking
-    # one of WIFI/THR would leave the spec's M condition unsatisfied.
-    if wifi_marked or facts.supports_thread:
+    # MCORE.COM.WIRELESS conformance requires at least one of WIFI / THR to
+    # be set; mirror what we marked above so we don't leave the file
+    # internally inconsistent.
+    if facts.supports_wifi or facts.supports_thread:
         auto_marked["MCORE.COM.WIRELESS"] = True
 
     if facts.is_server:
@@ -382,7 +378,6 @@ async def DeviceMapping(devCtrl, nodeID, outputPathStr):
     # so the shared helper can derive the in-scope facts from a single pass
     # at the end. We populate the slices the helper actually reads:
     #   - attributes[ep][Clusters.Descriptor][...DeviceTypeList]  (parsed objects)
-    #   - attributes[ep][Clusters.NetworkCommissioning][...SupportedWiFiBands]
     #   - tlvAttributes[ep][cluster_id][global_attr_id]           (raw values)
     wildcard = AsyncReadTransaction.ReadResponse(attributes={}, events=[], tlvAttributes={})
 
@@ -463,19 +458,6 @@ async def DeviceMapping(devCtrl, nodeID, outputPathStr):
             if server == _NETWORK_COMMISSIONING_CLUSTER_ID:
                 if featureMapValue & (1 << _NETCOMM_FEATURE_BIT_WIFI):
                     transport_supports_wifi = True
-                    # SupportedWiFiBands is read here (rather than only in
-                    # the shared helper) so it ends up in the wildcard
-                    # accumulator for the helper to consume.
-                    try:
-                        wifiBandsResp = await devCtrl.ReadAttribute(
-                            nodeID, [(endpoint, clusterClass.Attributes.SupportedWiFiBands)])
-                        wifiBands = wifiBandsResp[endpoint][clusterClass][clusterClass.Attributes.SupportedWiFiBands]
-                        wildcard.attributes.setdefault(endpoint, {}).setdefault(
-                            Clusters.NetworkCommissioning, {})[
-                                Clusters.NetworkCommissioning.Attributes.SupportedWiFiBands] = wifiBands
-                    except Exception as e:
-                        console.print(f"[yellow]Could not read SupportedWiFiBands on EP{endpoint}: {e}; "
-                                      "leaving MCORE.COM.WIFI* unmarked")
                 if featureMapValue & (1 << _NETCOMM_FEATURE_BIT_THREAD):
                     transport_supports_thread = True
                 if featureMapValue & (1 << _NETCOMM_FEATURE_BIT_ETHERNET):
@@ -589,8 +571,6 @@ async def DeviceMapping(devCtrl, nodeID, outputPathStr):
         is_ota_requestor=shared_facts.is_ota_requestor,
         is_ota_provider=shared_facts.is_ota_provider,
         has_groups_on_multiple_endpoints=shared_facts.has_groups_on_multiple_endpoints,
-        supports_wifi_2g4=shared_facts.supports_wifi_2g4,
-        supports_wifi_5g=shared_facts.supports_wifi_5g,
         mandatory_events_by_cluster=shared_facts.mandatory_events_by_cluster,
         supports_wifi=transport_supports_wifi,
         supports_thread=transport_supports_thread,

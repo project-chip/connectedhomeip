@@ -40,11 +40,6 @@ _AGGREGATOR_DEVICE_TYPE_ID = 0x000E
 # device. Used to derive MCORE.ROLE.COMMISSIONEE.
 _ROOT_NODE_DEVICE_TYPE_ID = 0x0016
 
-# Network Commissioning cluster ID + WiFi feature bit. Used to gate the
-# SupportedWiFiBands read that drives the band PICS.
-_NETWORK_COMMISSIONING_CLUSTER_ID = 0x0031
-_NETCOMM_FEATURE_BIT_WIFI = 0
-
 
 def event_pics_str(pics_base: str, eid: int) -> str:
     return f'{pics_base}.S.E{eid:02x}'
@@ -141,11 +136,12 @@ class BasePicsFacts:
     today: PICSGenerator writes these to Base.xml, and TC_IDM_10_4 asserts
     them against the supplied PICS file.
 
-    Wi-Fi bands come from NetworkCommissioning's SupportedWiFiBands. Wi-Fi /
-    Thread / Ethernet top-level transport bits and MCORE.COM.WIRELESS are
-    intentionally not derived here while QA stress-test feedback on those is
-    outstanding (Cecille, May 2026). PICSGenerator continues to derive them
-    locally until the test-plans cleanup PRs land.
+    The MCORE.COM.* transport-related PICS (WIFI / THR / ETH / WIRELESS and
+    the WIFI_2P4GHZ / WIFI_5GHZ band marks) are intentionally not derived
+    here: per Cecille (May 2026), the band PICS are about Public Action
+    Frame support on the corresponding band, which is not protocol-
+    observable from a wildcard read. PICSGenerator continues to derive
+    transport bits locally until the test-plans cleanup PRs land.
     """
     is_commissionee: bool = False
     is_server: bool = False
@@ -153,8 +149,6 @@ class BasePicsFacts:
     is_ota_requestor: bool = False
     is_ota_provider: bool = False
     has_groups_on_multiple_endpoints: bool = False
-    supports_wifi_2g4: bool = False
-    supports_wifi_5g: bool = False
     # endpoint_id -> cluster_id -> set of event ids the spec marks MANDATORY
     # for this device's feature set, attribute list, command list, and
     # cluster revision. Populated by running each XmlEvent's parsed
@@ -172,8 +166,6 @@ BASE_PICS_CODES_DERIVED: frozenset[str] = frozenset({
     "MCORE.OTA.Requestor",
     "MCORE.OTA.Provider",
     "MCORE.G.MULTIENDPOINT",
-    "MCORE.COM.WIFI_2P4GHZ",
-    "MCORE.COM.WIFI_5GHZ",
 })
 
 
@@ -199,10 +191,6 @@ def base_pics_facts_to_pics_codes(facts: BasePicsFacts) -> set[str]:
         codes.add("MCORE.OTA.Provider")
     if facts.has_groups_on_multiple_endpoints:
         codes.add("MCORE.G.MULTIENDPOINT")
-    if facts.supports_wifi_2g4:
-        codes.add("MCORE.COM.WIFI_2P4GHZ")
-    if facts.supports_wifi_5g:
-        codes.add("MCORE.COM.WIFI_5GHZ")
     return codes
 
 
@@ -253,20 +241,6 @@ def derive_base_pics_facts_from_device_wildcard(
                 facts.is_ota_provider = True
             if cluster_id == Clusters.Groups.id:
                 groups_endpoint_count += 1
-
-            # Wi-Fi bands. Read SupportedWiFiBands from the
-            # NetworkCommissioning cluster when WiFi is in the feature map.
-            if cluster_id == _NETWORK_COMMISSIONING_CLUSTER_ID:
-                feature_map = cluster_attrs.get(GlobalAttributeIds.FEATURE_MAP_ID, 0)
-                if feature_map & (1 << _NETCOMM_FEATURE_BIT_WIFI):
-                    wifi_bands = wildcard.attributes.get(endpoint_id, {}).get(
-                        Clusters.NetworkCommissioning, {}).get(
-                            Clusters.NetworkCommissioning.Attributes.SupportedWiFiBands, [])
-                    WiFiBandEnum = Clusters.NetworkCommissioning.Enums.WiFiBandEnum
-                    if WiFiBandEnum.k2g4 in wifi_bands:
-                        facts.supports_wifi_2g4 = True
-                    if WiFiBandEnum.k5g in wifi_bands:
-                        facts.supports_wifi_5g = True
 
             # Mandatory events: build a ConformanceAssessmentData for this
             # cluster instance and ask each XmlEvent's conformance whether
