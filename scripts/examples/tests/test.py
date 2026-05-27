@@ -30,7 +30,7 @@ SCRIPT_ROOT = os.path.dirname(__file__)
 
 def build_expected_output(root: str, out: str) -> Iterator[str]:
     with open(os.path.join(SCRIPT_ROOT, 'expected_test_cmakelists.txt')) as file:
-        for line in file.readlines():
+        for line in file:
             yield line.replace("{root}", root).replace("{out}", out)
 
 
@@ -45,8 +45,7 @@ def build_actual_output(root: str, out: str) -> Iterator[str]:
     ], stdout=subprocess.PIPE, check=True, encoding='UTF-8')
 
     with open(cmake) as f:
-        for line in f.readlines():
-            yield line
+        yield from f
 
 
 def main():
