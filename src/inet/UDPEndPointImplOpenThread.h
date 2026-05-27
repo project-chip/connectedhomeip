@@ -70,7 +70,7 @@ private:
     otUdpSocket mSocket;
 
     // State for deferred bind (used when OT instance is not yet initialized)
-    bool mDeferredBind   = false;
+    bool mDeferredBind = false;
     IPAddress mDeferredAddr;
     uint16_t mDeferredPort = 0;
 };

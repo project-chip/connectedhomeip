@@ -137,9 +137,9 @@ CHIP_ERROR UDPEndPointImplOT::IPv6Bind(otUdpSocket & socket, const IPAddress & a
     {
         if (!mDeferredBind)
         {
-            mDeferredAddr    = address;
-            mDeferredPort    = port;
-            mDeferredBind    = true;
+            mDeferredAddr     = address;
+            mDeferredPort     = port;
+            mDeferredBind     = true;
             sDeferredEndpoint = this;
         }
         return CHIP_NO_ERROR;
