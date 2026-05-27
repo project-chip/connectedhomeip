@@ -71,24 +71,91 @@ Davis, CA 95616, USA
   <composedDeviceTypes>
     <deviceType deviceTypeId="0x050D" deviceTypeName="Device Energy Management">
       <mandatoryConform/>
+      <clusterRequirements>
+        <cluster id="0x0098" name="Device Energy Management">
+          <features>
+            <feature code="PA">
+              <mandatoryConform/>
+            </feature>
+          </features>
+        </cluster>
+      </clusterRequirements>
     </deviceType>
     <deviceType deviceTypeId="0x0510" deviceTypeName="Electrical Sensor">
       <mandatoryConform/>
       <constraint>
         <min value="2"/>
       </constraint>
+    </deviceType>
+    <deviceType deviceTypeId="0x0510" deviceTypeName="Electrical Sensor">
+      <mandatoryConform/>
       <clusterRequirements>
-        <cluster id="0x0090" name="Electrical Power Measurement">
-          <mandatoryConform/>
+        <cluster id="0x001D" name="Descriptor">
+          <features>
+            <feature code="TAGLIST">
+              <mandatoryConform/>
+            </feature>
+          </features>
         </cluster>
         <cluster id="0x0090" name="Electrical Power Measurement">
           <mandatoryConform/>
+          <features>
+            <feature code="ALTC">
+              <mandatoryConform/>
+            </feature>
+          </features>
+          <attributes>
+            <attribute code="0x0004" name="Voltage">
+              <mandatoryConform/>
+            </attribute>
+            <attribute code="0x0005" name="ActiveCurrent">
+              <mandatoryConform/>
+            </attribute>
+          </attributes>
         </cluster>
         <cluster id="0x0091" name="Electrical Energy Measurement">
           <mandatoryConform/>
+          <features>
+            <feature code="EXPE">
+              <mandatoryConform/>
+            </feature>
+          </features>
+        </cluster>
+      </clusterRequirements>
+    </deviceType>
+    <deviceType deviceTypeId="0x0510" deviceTypeName="Electrical Sensor">
+      <mandatoryConform/>
+      <clusterRequirements>
+        <cluster id="0x001D" name="Descriptor">
+          <features>
+            <feature code="TAGLIST">
+              <mandatoryConform/>
+            </feature>
+          </features>
+        </cluster>
+        <cluster id="0x0090" name="Electrical Power Measurement">
+          <mandatoryConform/>
+          <features>
+            <feature code="DIRC">
+              <mandatoryConform/>
+            </feature>
+          </features>
+          <attributes>
+            <attribute code="0x0004" name="Voltage">
+              <mandatoryConform/>
+            </attribute>
+            <attribute code="0x0005" name="ActiveCurrent">
+              <mandatoryConform/>
+            </attribute>
+          </attributes>
         </cluster>
         <cluster id="0x0091" name="Electrical Energy Measurement">
           <mandatoryConform/>
+          <features>
+            <feature code="EXPE">
+              <mandatoryConform/>
+            </feature>
+          </features>
         </cluster>
       </clusterRequirements>
     </deviceType>
@@ -98,11 +165,84 @@ Davis, CA 95616, USA
         <min value="2"/>
       </constraint>
     </deviceType>
+    <deviceType deviceTypeId="0x0011" deviceTypeName="Power Source">
+      <mandatoryConform/>
+      <clusterRequirements>
+        <cluster id="0x001D" name="Descriptor">
+          <features>
+            <feature code="TAGLIST">
+              <mandatoryConform/>
+            </feature>
+          </features>
+        </cluster>
+        <cluster id="0x002F" name="Power Source">
+          <features>
+            <feature code="WIRED">
+              <mandatoryConform/>
+            </feature>
+          </features>
+        </cluster>
+      </clusterRequirements>
+    </deviceType>
+    <deviceType deviceTypeId="0x0011" deviceTypeName="Power Source">
+      <mandatoryConform/>
+      <clusterRequirements>
+        <cluster id="0x001D" name="Descriptor">
+          <features>
+            <feature code="TAGLIST">
+              <mandatoryConform/>
+            </feature>
+          </features>
+        </cluster>
+        <cluster id="0x002F" name="Power Source">
+          <features>
+            <feature code="BAT">
+              <mandatoryConform/>
+            </feature>
+          </features>
+          <attributes>
+            <attribute code="0x000B" name="BatVoltage">
+              <mandatoryConform/>
+            </attribute>
+            <attribute code="0x000C" name="BatPercentRemaining">
+              <mandatoryConform/>
+            </attribute>
+            <attribute code="0x000D" name="BatTimeRemaining">
+              <mandatoryConform/>
+            </attribute>
+            <attribute code="0x0012" name="ActiveBatFaults">
+              <mandatoryConform/>
+            </attribute>
+            <attribute code="0x0018" name="BatCapacity">
+              <mandatoryConform/>
+            </attribute>
+            <attribute code="0x001B" name="BatTimeToFullCharge">
+              <mandatoryConform/>
+            </attribute>
+            <attribute code="0x001D" name="BatChargingCurrent">
+              <mandatoryConform/>
+            </attribute>
+            <attribute code="0x001E" name="ActiveBatChargeFaults">
+              <mandatoryConform/>
+            </attribute>
+          </attributes>
+        </cluster>
+      </clusterRequirements>
+    </deviceType>
     <deviceType deviceTypeId="0x0017" deviceTypeName="Solar Power">
       <optionalConform/>
     </deviceType>
     <deviceType deviceTypeId="0x0302" deviceTypeName="Temperature Sensor">
       <optionalConform/>
+      <clusterRequirements>
+        <cluster id="0x001D" name="Descriptor">
+          <features>
+            <feature code="TAGLIST">
+              <mandatoryConform/>
+            </feature>
+          </features>
+        </cluster>
+      </clusterRequirements>
     </deviceType>
   </composedDeviceTypes>
 </deviceType>

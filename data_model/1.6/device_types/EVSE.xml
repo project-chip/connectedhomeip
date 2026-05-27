@@ -83,6 +83,18 @@ Davis, CA 95616, USA
       <constraint>
         <min value="1"/>
       </constraint>
+      <clusterRequirements>
+        <cluster id="0x0098" name="Device Energy Management">
+          <features>
+            <feature code="PFR">
+              <mandatoryConform/>
+            </feature>
+            <feature code="PA">
+              <describedConform/>
+            </feature>
+          </features>
+        </cluster>
+      </clusterRequirements>
     </deviceType>
     <deviceType deviceTypeId="0x0510" deviceTypeName="Electrical Sensor">
       <mandatoryConform/>

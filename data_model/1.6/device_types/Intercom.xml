@@ -125,6 +125,15 @@ Davis, CA 95616, USA
       <constraint>
         <min value="1"/>
       </constraint>
+      <clusterRequirements>
+        <cluster id="0x003B" name="Switch">
+          <features>
+            <feature code="MS">
+              <mandatoryConform/>
+            </feature>
+          </features>
+        </cluster>
+      </clusterRequirements>
     </deviceType>
   </composedDeviceTypes>
 </deviceType>

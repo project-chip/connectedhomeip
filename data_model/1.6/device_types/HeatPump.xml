@@ -73,6 +73,15 @@ Davis, CA 95616, USA
   <composedDeviceTypes>
     <deviceType deviceTypeId="0x050D" deviceTypeName="Device Energy Management">
       <mandatoryConform/>
+      <clusterRequirements>
+        <cluster id="0x0098" name="Device Energy Management">
+          <features>
+            <feature code="PA">
+              <mandatoryConform/>
+            </feature>
+          </features>
+        </cluster>
+      </clusterRequirements>
     </deviceType>
     <deviceType deviceTypeId="0x0510" deviceTypeName="Electrical Sensor">
       <mandatoryConform/>
@@ -82,6 +91,19 @@ Davis, CA 95616, USA
       <clusterRequirements>
         <cluster id="0x0090" name="Electrical Power Measurement">
           <mandatoryConform/>
+          <features>
+            <feature code="ALTC">
+              <mandatoryConform/>
+            </feature>
+          </features>
+          <attributes>
+            <attribute code="0x0004" name="Voltage">
+              <mandatoryConform/>
+            </attribute>
+            <attribute code="0x0005" name="ActiveCurrent">
+              <mandatoryConform/>
+            </attribute>
+          </attributes>
         </cluster>
         <cluster id="0x0091" name="Electrical Energy Measurement">
           <mandatoryConform/>
@@ -90,13 +112,45 @@ Davis, CA 95616, USA
     </deviceType>
     <deviceType deviceTypeId="0x0011" deviceTypeName="Power Source">
       <mandatoryConform/>
+      <clusterRequirements>
+        <cluster id="0x001D" name="Descriptor">
+          <features>
+            <feature code="TAGLIST">
+              <mandatoryConform/>
+            </feature>
+          </features>
+        </cluster>
+        <cluster id="0x002F" name="Power Source">
+          <features>
+            <feature code="WIRED">
+              <mandatoryConform/>
+            </feature>
+          </features>
+        </cluster>
+      </clusterRequirements>
     </deviceType>
     <deviceType deviceTypeId="0x0302" deviceTypeName="Temperature Sensor">
       <optionalConform/>
+      <clusterRequirements>
+        <cluster id="0x001D" name="Descriptor">
+          <features>
+            <feature code="TAGLIST">
+              <mandatoryConform/>
+            </feature>
+          </features>
+        </cluster>
+      </clusterRequirements>
     </deviceType>
     <deviceType deviceTypeId="0x0301" deviceTypeName="Thermostat">
       <optionalConform/>
       <clusterRequirements>
+        <cluster id="0x001D" name="Descriptor">
+          <features>
+            <feature code="TAGLIST">
+              <mandatoryConform/>
+            </feature>
+          </features>
+        </cluster>
         <cluster id="0x0041" name="User Label">
           <mandatoryConform/>
         </cluster>
