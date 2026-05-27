@@ -256,19 +256,6 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::AtomicRequestT
         return EnumType::kUnknownEnumValue;
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::CertificationTypeEnum val)
-{
-    using EnumType = Globals::CertificationTypeEnum;
-    switch (val)
-    {
-    case EnumType::kDeviceAttestationPKI:
-    case EnumType::kOperationalPKI:
-    case EnumType::kVIDSignerPKI:
-        return val;
-    default:
-        return EnumType::kUnknownEnumValue;
-    }
-}
 static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::LandmarkTag val)
 {
     using EnumType = Globals::LandmarkTag;

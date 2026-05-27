@@ -103,12 +103,6 @@ enum AtomicRequestTypeEnum : enum8 {
   kRollbackWrite = 2;
 }
 
-enum CertificationTypeEnum : enum8 {
-  kDeviceAttestationPKI = 0;
-  kOperationalPKI = 1;
-  kVIDSignerPKI = 2;
-}
-
 enum LandmarkTag : enum8 {
   kAirConditioner = 0;
   kAirPurifier = 1;
