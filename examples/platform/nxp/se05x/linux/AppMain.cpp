@@ -138,13 +138,6 @@
 #include <app/server/TermsAndConditionsManager.h> // nogncheck
 #endif
 
-#if CHIP_DEVICE_LAYER_TARGET_DARWIN
-#include <platform/Darwin/NetworkCommissioningDriver.h>
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-#include <platform/Darwin/WiFi/NetworkCommissioningWiFiDriver.h>
-#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
-#endif // CHIP_DEVICE_LAYER_TARGET_DARWIN
-
 #if CHIP_DEVICE_LAYER_TARGET_LINUX
 #include <platform/Linux/NetworkCommissioningDriver.h>
 #endif // CHIP_DEVICE_LAYER_TARGET_LINUX
@@ -200,16 +193,6 @@ DeviceLayer::NetworkCommissioning::LinuxWiFiDriver sWiFiDriver;
 #define CHIP_APP_MAIN_HAS_ETHERNET_DRIVER 1
 DeviceLayer::NetworkCommissioning::LinuxEthernetDriver sEthernetDriver;
 #endif // CHIP_DEVICE_LAYER_TARGET_LINUX
-
-#if CHIP_DEVICE_LAYER_TARGET_DARWIN
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-#define CHIP_APP_MAIN_HAS_WIFI_DRIVER 1
-DeviceLayer::NetworkCommissioning::DarwinWiFiDriver sWiFiDriver;
-#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
-
-#define CHIP_APP_MAIN_HAS_ETHERNET_DRIVER 1
-DeviceLayer::NetworkCommissioning::DarwinEthernetDriver sEthernetDriver;
-#endif // CHIP_DEVICE_LAYER_TARGET_DARWIN
 
 #ifndef CHIP_APP_MAIN_HAS_THREAD_DRIVER
 #define CHIP_APP_MAIN_HAS_THREAD_DRIVER 0
@@ -1081,35 +1064,11 @@ void ChipLinuxAppMainLoop(chip::ServerInitParams & initParams, AppMainLoopImplem
 
     ApplicationInit();
 
-#if CHIP_DEVICE_LAYER_TARGET_DARWIN
-#if CHIP_SYSTEM_CONFIG_USE_DISPATCH
-    auto & platformMgr = chip::DeviceLayer::PlatformMgrImpl();
-    platformMgr.RegisterSignalHandler(SIGINT, ^{
-        platformMgr.UnregisterAllSignalHandlers();
-        StopSignalHandler(SIGINT);
-    });
-
-    platformMgr.RegisterSignalHandler(SIGTERM, ^{
-        platformMgr.UnregisterAllSignalHandlers();
-        StopSignalHandler(SIGTERM);
-    });
-#else
-    // NOTE: For some reason, on Darwin, the signal handler is not called if the signal is
-    //       registered with sigaction() call and TSAN is enabled. The problem seems to be
-    //       related with the dispatch_semaphore_wait() function in the RunEventLoop() method.
-    //       If this call is commented out, the signal handler is called as expected...
-    // NOLINTBEGIN(bugprone-signal-handler)
-    signal(SIGINT, StopSignalHandler);
-    signal(SIGTERM, StopSignalHandler);
-    // NOLINTEND(bugprone-signal-handler)
-#endif
-#else
     struct sigaction sa = {};
     sa.sa_handler       = StopSignalHandler;
     sa.sa_flags         = SA_RESETHAND;
     sigaction(SIGINT, &sa, nullptr);
     sigaction(SIGTERM, &sa, nullptr);
-#endif
 
     // This message is used as a marker for when the application process has started.
     // See: scripts/tests/chiptest/test_definition.py
