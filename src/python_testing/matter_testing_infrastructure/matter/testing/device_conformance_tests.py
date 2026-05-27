@@ -386,8 +386,6 @@ class DeviceConformanceTests(BasicCompositionTests):
         success = True
         problems = []
 
-
-
         def record_problem(location, problem, severity):
             problems.append(ProblemNotice("IDM-10.5", location, severity, problem, ""))
 
