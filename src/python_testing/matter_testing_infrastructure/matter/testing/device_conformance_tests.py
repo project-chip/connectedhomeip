@@ -477,12 +477,13 @@ class DeviceConformanceTests(BasicCompositionTests):
     def _get_candidate_endpoints(self, endpoint_id: int, location: str, parts_list: list[int]) -> list[int]:
         if location == 'deviceEndpoint':
             return [endpoint_id]
-        elif location == 'rootEndpoint':
+        if location == 'rootEndpoint':
             return [0]
-        elif location == 'anywhere':
+        if location == 'anywhere':
             return list(self.endpoints.keys())
-        elif location == 'descendantEndpoint':
+        if location == 'descendantEndpoint':
             descendants = []
+
             def add_descendants(ep):
                 if ep in self.endpoints and Clusters.Descriptor in self.endpoints[ep]:
                     pl = self.endpoints[ep][Clusters.Descriptor].get(Clusters.Descriptor.Attributes.PartsList, [])
@@ -491,8 +492,8 @@ class DeviceConformanceTests(BasicCompositionTests):
                         add_descendants(child)
             add_descendants(endpoint_id)
             return descendants
-        else: # childEndpoint or fallback
-            return parts_list
+        # childEndpoint or fallback
+        return parts_list
 
     def check_composed_device_type_requirements(self, allow_provisional: bool = False) -> tuple[bool, list[ProblemNotice]]:
         success = True
@@ -537,7 +538,7 @@ class DeviceConformanceTests(BasicCompositionTests):
                     req_matches = defaultdict(list)
                     for req_idx, req in enumerate(req_list):
                         candidate_eps = self._get_candidate_endpoints(endpoint_id, req.device_type_location, parts_list)
-                        
+
                         matching_eps = []
                         for candidate_ep_id in candidate_eps:
                             if candidate_ep_id in self.endpoints:
@@ -546,7 +547,7 @@ class DeviceConformanceTests(BasicCompositionTests):
                                     dt_list = candidate_ep[Clusters.Descriptor][Clusters.Descriptor.Attributes.DeviceTypeList]
                                     if any(dt.deviceType == req_dt_id for dt in dt_list):
                                         matching_eps.append(candidate_ep_id)
-                                        
+
                         for ep_id in matching_eps:
                             child_ep = self.endpoints[ep_id]
                             server_list = child_ep[Clusters.Descriptor].get(Clusters.Descriptor.Attributes.ServerList, [])
