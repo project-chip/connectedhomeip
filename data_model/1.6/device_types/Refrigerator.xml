@@ -101,7 +101,7 @@ Davis, CA 95616, USA
     </cluster>
   </clusters>
   <composedDeviceTypes>
-    <deviceType deviceTypeId="0x0071" deviceTypeName="Temperature Controlled Cabinet">
+    <deviceType deviceTypeId="0x0071" deviceTypeName="Temperature Controlled Cabinet" deviceTypeLocation="childEndpoint">
       <mandatoryConform/>
       <constraint>
         <min value="1"/>

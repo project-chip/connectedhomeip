@@ -63,13 +63,13 @@ Davis, CA 95616, USA
   </revisionHistory>
   <classification class="simple" scope="endpoint"/>
   <composedDeviceTypes>
-    <deviceType deviceTypeId="0x0142" deviceTypeName="Camera">
+    <deviceType deviceTypeId="0x0142" deviceTypeName="Camera" deviceTypeLocation="childEndpoint">
       <mandatoryConform/>
       <constraint>
         <allowed value="1"/>
       </constraint>
     </deviceType>
-    <deviceType deviceTypeId="0x0148" deviceTypeName="Doorbell">
+    <deviceType deviceTypeId="0x0148" deviceTypeName="Doorbell" deviceTypeLocation="childEndpoint">
       <mandatoryConform/>
       <constraint>
         <min value="1"/>

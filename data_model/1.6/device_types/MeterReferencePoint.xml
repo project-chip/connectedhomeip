@@ -78,7 +78,7 @@ Davis, CA 95616, USA
     </cluster>
   </clusters>
   <composedDeviceTypes>
-    <deviceType deviceTypeId="0x0513" deviceTypeName="Electrical Energy Tariff">
+    <deviceType deviceTypeId="0x0513" deviceTypeName="Electrical Energy Tariff" deviceTypeLocation="childEndpoint">
       <optionalConform choice="a" more="true" min="1">
         <condition name="ElectricalEnergy"/>
       </optionalConform>
@@ -100,7 +100,7 @@ Davis, CA 95616, USA
         </cluster>
       </clusterRequirements>
     </deviceType>
-    <deviceType deviceTypeId="0x0514" deviceTypeName="Electrical Meter">
+    <deviceType deviceTypeId="0x0514" deviceTypeName="Electrical Meter" deviceTypeLocation="childEndpoint">
       <optionalConform choice="a" more="true" min="1">
         <condition name="ElectricalEnergy"/>
       </optionalConform>

@@ -71,7 +71,7 @@ Davis, CA 95616, USA
     </cluster>
   </clusters>
   <composedDeviceTypes>
-    <deviceType deviceTypeId="0x050D" deviceTypeName="Device Energy Management">
+    <deviceType deviceTypeId="0x050D" deviceTypeName="Device Energy Management" deviceTypeLocation="childEndpoint">
       <mandatoryConform/>
       <clusterRequirements>
         <cluster id="0x0098" name="Device Energy Management">
@@ -83,7 +83,7 @@ Davis, CA 95616, USA
         </cluster>
       </clusterRequirements>
     </deviceType>
-    <deviceType deviceTypeId="0x0510" deviceTypeName="Electrical Sensor">
+    <deviceType deviceTypeId="0x0510" deviceTypeName="Electrical Sensor" deviceTypeLocation="childEndpoint">
       <mandatoryConform/>
       <constraint>
         <min value="1"/>
@@ -110,7 +110,7 @@ Davis, CA 95616, USA
         </cluster>
       </clusterRequirements>
     </deviceType>
-    <deviceType deviceTypeId="0x0011" deviceTypeName="Power Source">
+    <deviceType deviceTypeId="0x0011" deviceTypeName="Power Source" deviceTypeLocation="childEndpoint">
       <mandatoryConform/>
       <clusterRequirements>
         <cluster id="0x001D" name="Descriptor">
@@ -129,7 +129,7 @@ Davis, CA 95616, USA
         </cluster>
       </clusterRequirements>
     </deviceType>
-    <deviceType deviceTypeId="0x0302" deviceTypeName="Temperature Sensor">
+    <deviceType deviceTypeId="0x0302" deviceTypeName="Temperature Sensor" deviceTypeLocation="childEndpoint">
       <optionalConform/>
       <clusterRequirements>
         <cluster id="0x001D" name="Descriptor">
@@ -141,7 +141,7 @@ Davis, CA 95616, USA
         </cluster>
       </clusterRequirements>
     </deviceType>
-    <deviceType deviceTypeId="0x0301" deviceTypeName="Thermostat">
+    <deviceType deviceTypeId="0x0301" deviceTypeName="Thermostat" deviceTypeLocation="childEndpoint">
       <optionalConform/>
       <clusterRequirements>
         <cluster id="0x001D" name="Descriptor">
@@ -156,7 +156,7 @@ Davis, CA 95616, USA
         </cluster>
       </clusterRequirements>
     </deviceType>
-    <deviceType deviceTypeId="0x050F" deviceTypeName="Water Heater">
+    <deviceType deviceTypeId="0x050F" deviceTypeName="Water Heater" deviceTypeLocation="childEndpoint">
       <optionalConform/>
     </deviceType>
   </composedDeviceTypes>

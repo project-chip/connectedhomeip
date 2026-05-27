@@ -77,13 +77,13 @@ Davis, CA 95616, USA
     </cluster>
   </clusters>
   <composedDeviceTypes>
-    <deviceType deviceTypeId="0x0231" deviceTypeName="Closure Panel">
+    <deviceType deviceTypeId="0x0231" deviceTypeName="Closure Panel" deviceTypeLocation="childEndpoint">
       <optionalConform/>
     </deviceType>
-    <deviceType deviceTypeId="0x000A" deviceTypeName="Door Lock">
+    <deviceType deviceTypeId="0x000A" deviceTypeName="Door Lock" deviceTypeLocation="childEndpoint">
       <optionalConform/>
     </deviceType>
-    <deviceType deviceTypeId="0x0100" deviceTypeName="On/Off Light">
+    <deviceType deviceTypeId="0x0100" deviceTypeName="On/Off Light" deviceTypeLocation="childEndpoint">
       <optionalConform/>
     </deviceType>
   </composedDeviceTypes>

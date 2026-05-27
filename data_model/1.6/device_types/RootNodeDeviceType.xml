@@ -320,7 +320,7 @@ Davis, CA 95616, USA
     </cluster>
   </clusters>
   <composedDeviceTypes>
-    <deviceType deviceTypeId="0x0011" deviceTypeName="Power Source">
+    <deviceType deviceTypeId="0x0011" deviceTypeName="Power Source" deviceTypeLocation="deviceEndpoint">
       <otherwiseConform>
         <mandatoryConform>
           <condition name="PowerSourceCond"/>

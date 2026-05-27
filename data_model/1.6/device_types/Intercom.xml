@@ -120,7 +120,7 @@ Davis, CA 95616, USA
     </cluster>
   </clusters>
   <composedDeviceTypes>
-    <deviceType deviceTypeId="0x000F" deviceTypeName="Generic Switch">
+    <deviceType deviceTypeId="0x000F" deviceTypeName="Generic Switch" deviceTypeLocation="childEndpoint">
       <mandatoryConform/>
       <constraint>
         <min value="1"/>

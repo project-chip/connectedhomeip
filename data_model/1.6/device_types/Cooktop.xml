@@ -76,7 +76,7 @@ Davis, CA 95616, USA
     </cluster>
   </clusters>
   <composedDeviceTypes>
-    <deviceType deviceTypeId="0x0077" deviceTypeName="Cook Surface">
+    <deviceType deviceTypeId="0x0077" deviceTypeName="Cook Surface" deviceTypeLocation="childEndpoint">
       <optionalConform/>
       <constraint>
         <min value="1"/>

@@ -253,6 +253,7 @@ class XmlComposedDeviceTypeRequirement:
     conformance: ConformanceCallable
     min_instances: Optional[int] = None
     max_instances: Optional[int] = None
+    device_type_location: str = 'childEndpoint'
     cluster_requirements: dict[uint, XmlDeviceTypeClusterRequirements] = field(default_factory=dict)
 
 
@@ -1572,12 +1573,14 @@ def parse_single_device_type(root: ElementTree.Element, cluster_definition_xml: 
                         append_overrides('attribute', c, cluster, c_id, cluster_conformance_params, location, problems)
                         append_overrides('command', c, cluster, c_id, cluster_conformance_params, location, problems)
 
+                device_type_location = composed_dt.attrib.get('deviceTypeLocation', 'childEndpoint')
                 device_types[tid].composed_device_types.append(XmlComposedDeviceTypeRequirement(
                     device_type_id=composed_id,
                     device_type_name=composed_name,
                     conformance=conformance,
                     min_instances=min_instances,
                     max_instances=max_instances,
+                    device_type_location=device_type_location,
                     cluster_requirements=cluster_requirements
                 ))
         except Exception as e:
