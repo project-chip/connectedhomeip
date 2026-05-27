@@ -20,12 +20,14 @@
 #import "MCCommissionableDataProvider.h"
 #import "MCCommonCaseDeviceServerInitParamsProvider.h"
 #import "MCDeviceAttestationCredentialsProvider.h"
+#import "MCDeviceInstanceInfoProvider.h"
 #import "MCErrorUtils.h"
 #import "MCRotatingDeviceIdUniqueIdProvider.h"
 
 #import "core/Types.h"
 #include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
+#include <platform/DeviceInstanceInfoProvider.h>
 
 #import <Foundation/Foundation.h>
 
@@ -35,6 +37,7 @@
 @property matter::casting::support::MCRotatingDeviceIdUniqueIdProvider uniqueIdProvider;
 @property matter::casting::support::MCCommissionableDataProvider * commissionableDataProvider;
 @property matter::casting::support::MCDeviceAttestationCredentialsProvider * dacProvider;
+@property matter::casting::support::MCDeviceInstanceInfoProviderBridge * deviceInstanceInfoProvider;
 @property MCCommonCaseDeviceServerInitParamsProvider * serverInitParamsProvider;
 
 // queue used when calling the client code on completion blocks from any MatterTvCastingBridge API
@@ -92,6 +95,17 @@
 
     _serverInitParamsProvider = new MCCommonCaseDeviceServerInitParamsProvider();
 
+    // Initialize MCDeviceInstanceInfoProviderBridge if the dataSource provides a delegate
+    if ([dataSource respondsToSelector:@selector(castingAppDidReceiveRequestForDeviceInstanceInfoProvider:)]) {
+        id<MCDeviceInstanceInfoProvider> infoProvider = [dataSource castingAppDidReceiveRequestForDeviceInstanceInfoProvider:self];
+        if (infoProvider != nil) {
+            ChipLogProgress(AppServer, "MCCastingApp.initializeWithDataSource() setting up pull-based MCDeviceInstanceInfoProviderBridge");
+            delete _deviceInstanceInfoProvider;
+            _deviceInstanceInfoProvider = new matter::casting::support::MCDeviceInstanceInfoProviderBridge();
+            _deviceInstanceInfoProvider->SetDelegate(infoProvider);
+        }
+    }
+
     // Create cpp AppParameters
     // TODO: Properly validate revocation!
     chip::Credentials::DeviceAttestationRevocationDelegate * kDeviceAttestationRevocationNotChecked = nullptr;
@@ -104,6 +118,12 @@
     // Initialize cpp CastingApp
     VerifyOrReturnValue(matter::casting::core::CastingApp::GetInstance()->Initialize(_appParameters) == CHIP_NO_ERROR,
         [MCErrorUtils NSErrorFromChipError:CHIP_ERROR_INCORRECT_STATE]);
+
+    // Register the custom DeviceInstanceInfoProvider if one was created
+    if (_deviceInstanceInfoProvider != nullptr) {
+        ChipLogProgress(AppServer, "MCCastingApp.initializeWithDataSource() setting custom DeviceInstanceInfoProvider");
+        chip::DeviceLayer::SetDeviceInstanceInfoProvider(_deviceInstanceInfoProvider);
+    }
 
     // Get and store the CHIP Work queue
     _workQueue = chip::DeviceLayer::PlatformMgrImpl().GetWorkQueue();
@@ -134,16 +154,22 @@
         completion([MCErrorUtils NSErrorFromChipError:CHIP_ERROR_INCORRECT_STATE]);
     }));
 
-    dispatch_async(_workQueue, ^{
-        __block CHIP_ERROR err = matter::casting::core::CastingApp::GetInstance()->Start();
+    // Resume the work queue FIRST so it can process the Start() dispatch below.
+    __block CHIP_ERROR err = chip::DeviceLayer::PlatformMgrImpl().StartEventLoopTask();
+    if (err != CHIP_NO_ERROR) {
+        ChipLogError(AppServer, "MCCastingApp.start StartEventLoopTask failed: %s", err.AsString());
         dispatch_async(self->_clientQueue, ^{
             completion([MCErrorUtils NSErrorFromChipError:err]);
         });
+        return;
+    }
+
+    dispatch_async(_workQueue, ^{
+        CHIP_ERROR startErr = matter::casting::core::CastingApp::GetInstance()->Start();
+        dispatch_async(self->_clientQueue, ^{
+            completion([MCErrorUtils NSErrorFromChipError:startErr]);
+        });
     });
-    __block CHIP_ERROR err = chip::DeviceLayer::PlatformMgrImpl().StartEventLoopTask();
-    VerifyOrReturn(err == CHIP_NO_ERROR, dispatch_async(self->_clientQueue, ^{
-        completion([MCErrorUtils NSErrorFromChipError:err]);
-    }));
 }
 
 - (void)stopWithCompletionBlock:(void (^)(NSError *))completion
@@ -155,6 +181,16 @@
 
     dispatch_async(_workQueue, ^{
         __block CHIP_ERROR err = matter::casting::core::CastingApp::GetInstance()->Stop();
+
+        // Stop the event loop task so StartEventLoopTask() can succeed on the next Start().
+        // The work queue transitions from kRunning → kSuspended.
+        CHIP_ERROR stopEventLoopErr = chip::DeviceLayer::PlatformMgrImpl().StopEventLoopTask();
+        if (stopEventLoopErr != CHIP_NO_ERROR) {
+            ChipLogError(AppServer, "MCCastingApp.stop StopEventLoopTask failed: %s", stopEventLoopErr.AsString());
+            if (err == CHIP_NO_ERROR) {
+                err = stopEventLoopErr;
+            }
+        }
 
         dispatch_async(self->_clientQueue, ^{
             completion([MCErrorUtils NSErrorFromChipError:err]);

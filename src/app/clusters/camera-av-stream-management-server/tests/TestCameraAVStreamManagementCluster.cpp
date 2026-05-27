@@ -1728,4 +1728,38 @@ TEST_F(TestCameraAVStreamManagementCluster, TestUpdateSnapshotStreamRefCount)
     EXPECT_EQ(mServer.UpdateSnapshotStreamRefCount(999, true), CHIP_ERROR_NOT_FOUND);
 }
 
+TEST_F(TestCameraAVStreamManagementCluster, TestReferenceCountResetOnBoot)
+{
+    // 1. Prepare data with non-zero referenceCount
+    VideoStreamStruct stream{};
+    stream.videoStreamID  = 1;
+    stream.referenceCount = 5; // Non-zero
+
+    uint8_t buffer[kMaxAllocatedVideoStreamsSerializedSize];
+    TLV::TLVWriter writer;
+    writer.Init(buffer);
+
+    TLV::TLVType arrayType;
+    ASSERT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, arrayType), CHIP_NO_ERROR);
+    ASSERT_EQ(DataModel::Encode(writer, TLV::AnonymousTag(), stream), CHIP_NO_ERROR);
+    ASSERT_EQ(writer.EndContainer(arrayType), CHIP_NO_ERROR);
+
+    size_t len = writer.GetLengthWritten();
+
+    // 2. Write to persistence
+    ConcreteAttributePath path(kTestEndpointId, CameraAvStreamManagement::Id, Attributes::AllocatedVideoStreams::Id);
+    ASSERT_EQ(mPersistenceProvider.SafeWriteValue(path, ByteSpan(buffer, len)), CHIP_NO_ERROR);
+
+    // 3. Trigger Init to load from persistence
+    ASSERT_EQ(mServer.Init(), CHIP_NO_ERROR);
+
+    // 4. Verify in-memory state has reset refCount
+    Attributes::AllocatedVideoStreams::TypeInfo::DecodableType allocatedVideoStreams;
+    ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::AllocatedVideoStreams::Id, allocatedVideoStreams), CHIP_NO_ERROR);
+
+    auto it = allocatedVideoStreams.begin();
+    ASSERT_TRUE(it.Next());
+    EXPECT_EQ(it.GetValue().referenceCount, 0);
+}
+
 } // namespace

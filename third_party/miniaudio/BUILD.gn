@@ -18,23 +18,23 @@ import("//build_overrides/chip.gni")
 import("${build_root}/config/compiler/compiler.gni")
 
 config("miniaudio_config") {
-  include_dirs = [ "repo" ]
+  # Use -isystem instead of include_dirs to treat miniaudio.h as a system header
+  # and suppress warnings originating from it for dependents.
+  cflags = [ "-isystem" + rebase_path("repo", root_build_dir) ]
 }
 
 config("miniaudio_warnings") {
   cflags = [
     "-Wno-missing-format-attribute",
     "-Wno-implicit-fallthrough",
+    "-Wno-format-nonliteral",
+    "-Wno-conversion",
+    "-Wno-sign-conversion",
+    "-Wno-shadow",
   ]
 
   if (is_clang) {
-    cflags += [
-      "-Wno-shorten-64-to-32",
-      "-Wno-format-nonliteral",
-      "-Wno-conversion",
-      "-Wno-sign-conversion",
-      "-Wno-shadow",
-    ]
+    cflags += [ "-Wno-shorten-64-to-32" ]
   }
 }
 

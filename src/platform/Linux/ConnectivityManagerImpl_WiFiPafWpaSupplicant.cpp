@@ -31,6 +31,7 @@
 #include <platform/PlatformManager.h>
 
 #include "ConnectivityManagerImpl.h"
+#include "WpaSupplicantClient.h"
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
 using namespace ::chip::WiFiPAF;
@@ -382,7 +383,7 @@ void ConnectivityManagerImpl::OnNanReceive(GVariant * obj)
     dataValue.reset(value);
 
     auto rxbuf = g_variant_get_fixed_array(dataValue.get(), &bufferLen, sizeof(uint8_t));
-    ChipLogProgress(DeviceLayer, "WiFi-PAF: wpa_supplicant: nan-rx: [len: %" G_GSIZE_FORMAT "]", bufferLen);
+    ChipLogProgress(DeviceLayer, "WiFi-PAF: " WPA_SUPPLICANT_CLIENT_LOG_PREFIX "nan-rx: [len: %" G_GSIZE_FORMAT "]", bufferLen);
     buf = System::PacketBufferHandle::NewWithData(rxbuf, bufferLen);
 
     // Post an event to the Chip queue to deliver the data into the Chip stack.

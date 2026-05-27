@@ -37,7 +37,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-tizen:193
+            image: ghcr.io/project-chip/chip-build-tizen:194
             options: --user root
 
         steps:
@@ -59,3 +59,8 @@ jobs:
                           build \
                           --copy-artifacts-to out/artifacts \
                       "
+            - name: Notify Slack on Failure
+              if: failure()
+              uses: ./.github/actions/notify-slack-failure
+              with:
+                slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}

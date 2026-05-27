@@ -23124,16 +23124,16 @@ typedef NS_OPTIONS(uint32_t, MTRCommissionerControlSupportedDeviceCategoryBitmap
 } MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
 
 typedef NS_ENUM(uint8_t, MTRJointFabricDatastoreDatastoreAccessControlEntryAuthMode) {
-    MTRJointFabricDatastoreDatastoreAccessControlEntryAuthModePASE MTR_PROVISIONALLY_AVAILABLE = 0x00,
-    MTRJointFabricDatastoreDatastoreAccessControlEntryAuthModeCASE MTR_PROVISIONALLY_AVAILABLE = 0x01,
-    MTRJointFabricDatastoreDatastoreAccessControlEntryAuthModeGroup MTR_PROVISIONALLY_AVAILABLE = 0x02,
+    MTRJointFabricDatastoreDatastoreAccessControlEntryAuthModePASE MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTRJointFabricDatastoreDatastoreAccessControlEntryAuthModeCASE MTR_PROVISIONALLY_AVAILABLE = 0x02,
+    MTRJointFabricDatastoreDatastoreAccessControlEntryAuthModeGroup MTR_PROVISIONALLY_AVAILABLE = 0x03,
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRJointFabricDatastoreDatastoreAccessControlEntryPrivilege) {
-    MTRJointFabricDatastoreDatastoreAccessControlEntryPrivilegeView MTR_PROVISIONALLY_AVAILABLE = 0x00,
-    MTRJointFabricDatastoreDatastoreAccessControlEntryPrivilegeOperate MTR_PROVISIONALLY_AVAILABLE = 0x02,
-    MTRJointFabricDatastoreDatastoreAccessControlEntryPrivilegeManage MTR_PROVISIONALLY_AVAILABLE = 0x03,
-    MTRJointFabricDatastoreDatastoreAccessControlEntryPrivilegeAdminister MTR_PROVISIONALLY_AVAILABLE = 0x04,
+    MTRJointFabricDatastoreDatastoreAccessControlEntryPrivilegeView MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTRJointFabricDatastoreDatastoreAccessControlEntryPrivilegeOperate MTR_PROVISIONALLY_AVAILABLE = 0x03,
+    MTRJointFabricDatastoreDatastoreAccessControlEntryPrivilegeManage MTR_PROVISIONALLY_AVAILABLE = 0x04,
+    MTRJointFabricDatastoreDatastoreAccessControlEntryPrivilegeAdminister MTR_PROVISIONALLY_AVAILABLE = 0x05,
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRJointFabricDatastoreDatastoreGroupKeyMulticastPolicy) {

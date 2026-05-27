@@ -30,6 +30,7 @@ extern "C" {
 #endif
 
 #include "uart.h"
+#include <cinttypes>
 #include <stddef.h>
 #include <string.h>
 
@@ -188,7 +189,7 @@ static uint32_t sMissedLogCount = 0; // Count of logs that were not sent to the 
 
 namespace SilabsCoreLogs = chip::Logging::Platform;
 // sizeof struct on arm is 4+8 +sizeof(data) so 12 + number of character in the string
-typedef struct
+typedef struct UartTxStruct_t
 {
     uint8_t data[UART_TX_MAX_BUF_LEN];
     uint64_t timestamp                   = 0;
@@ -644,8 +645,9 @@ void uartMainLoop(void * args)
             {
                 // If there are missed logs, log the count
 
-                workBuffer.length = sprintf(reinterpret_cast<char *>(workBuffer.data), "\r\nMissed Logs: %lu\r\n", sMissedLogCount);
-                sMissedLogCount   = 0; // Reset the count after logging
+                workBuffer.length =
+                    sprintf(reinterpret_cast<char *>(workBuffer.data), "\r\nMissed Logs: %" PRIu32 "\r\n", sMissedLogCount);
+                sMissedLogCount = 0; // Reset the count after logging
                 uartSendBytes(workBuffer.data, workBuffer.length);
             }
             eventReceived = osMessageQueueGet(sUartTxQueue, &workBuffer, nullptr, 0);
