@@ -1,6 +1,5 @@
 /*
- *
- *    Copyright (c) 2024 Project CHIP Authors
+ *    Copyright (c) 2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,9 +14,10 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
 #pragma once
 
-// This file is used for backwards compatibility, will include the Codegen references
-// after the cluster is migrated to SCI.
-#include <app/clusters/water-heater-management-server/WaterHeaterManagementCluster.h>
+namespace chip {
+
+static constexpr const char * kDeviceTypeKey = "all-devices/dev-type";
+
+}

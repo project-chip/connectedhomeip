@@ -410,6 +410,11 @@ jobs:
               with:
                 platform-name: Telink
 
+            - name: Notify Slack on Failure
+              if: failure()
+              uses: ./.github/actions/notify-slack-failure
+              with:
+                slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}
     zephyr_3_3:
         name: Telink (Zephyr 3.3)
         env:
@@ -662,3 +667,8 @@ jobs:
 
             - name: clean out build output (keep tools)
               run: rm -rf ./out/telink*
+            - name: Notify Slack on Failure
+              if: failure()
+              uses: ./.github/actions/notify-slack-failure
+              with:
+                slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}
