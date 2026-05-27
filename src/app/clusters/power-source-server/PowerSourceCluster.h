@@ -228,9 +228,6 @@ struct PowerSourceClusterConfig
         return *this;
     }
 
-    /// if set true, `PowerSourceCluster::Startup` function will fetch the `Order` attribute's value from the persistent storage.
-    /// if set false, the value will be the default value set in the `PowerSourceClusterConfig` (0 if not set explicitly).
-    bool orderAttributeFetchFromPersistentStorageDuringStartup = true;
     PowerSourceOptionalAttributeSet usedOptionalAttributes{ UINT32_MAX }; // all supported attributes are marked as used by default.
     EndpointId mEndpointId{};
 };
@@ -264,21 +261,6 @@ public:
     PowerSourceCluster(const ConfigType & config) :
         ConfigType(config), DefaultServerCluster({ config.mEndpointId, PowerSource::Id })
     {}
-
-    CHIP_ERROR Startup(ServerClusterContext & context) override
-    {
-        ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
-
-        // the `Order` attribute is marked as `Persistent`.
-        VerifyOrReturnValue(this->orderAttributeFetchFromPersistentStorageDuringStartup, CHIP_NO_ERROR);
-
-        AttributePersistence attributePersistence(context.attributeStorage);
-        attributePersistence.LoadNativeEndianValue<uint8_t>(
-            { mPath.mEndpointId, mPath.mClusterId, PowerSource::Attributes::Order::Id }, this->order, this->order);
-
-        // if getting the value from persistent storage fails, continue with our lives.
-        return CHIP_NO_ERROR;
-    }
 
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override
@@ -804,70 +786,53 @@ public:
         SetAttributeValue(this->status, val, PowerSource::Attributes::Status::Id);
         return CHIP_NO_ERROR;
     }
-    CHIP_ERROR SetOrder(uint8_t val)
+    void SetOrder(uint8_t val)
     {
-        using namespace PowerSource::Attributes;
-        // This attribute is marked as `Persistent`.
-        if (mContext != nullptr && val != this->order)
-        {
-            AttributePersistence attributePersistence(mContext->attributeStorage);
-            ReturnErrorOnFailure(
-                attributePersistence.StoreNativeEndianValue({ mPath.mEndpointId, mPath.mClusterId, Order::Id }, val)
-                    .GetUnderlyingError());
-        }
+        // This attribute is marked as `Persistent` but the cluster will not support it becuase the attribute is `ReadOnly`.
 
-        SetAttributeValue(this->order, val, Order::Id);
-
-        return CHIP_NO_ERROR;
+        SetAttributeValue(this->order, val, PowerSource::Attributes::Order::Id);
     }
-    CHIP_ERROR SetWiredAssessedInputVoltage(DataModel::Nullable<uint32_t> val)
+    void SetWiredAssessedInputVoltage(DataModel::Nullable<uint32_t> val)
     {
-        ENABLE_IF_ATTRIBUTE_SUPPORTED(WiredAssessedInputVoltage)
+        ENABLE_IF_ATTRIBUTE_SUPPORTED_NO_RETURN(WiredAssessedInputVoltage)
         {
             this->wiredAssessedInputVoltage = val;
             // no notifying because attribute marked with 'Changes Omitted' quality
-            return CHIP_NO_ERROR;
         }
     }
-    CHIP_ERROR SetWiredAssessedInputFrequency(DataModel::Nullable<uint16_t> val)
+    void SetWiredAssessedInputFrequency(DataModel::Nullable<uint16_t> val)
     {
-        ENABLE_IF_ATTRIBUTE_SUPPORTED(WiredAssessedInputFrequency)
+        ENABLE_IF_ATTRIBUTE_SUPPORTED_NO_RETURN(WiredAssessedInputFrequency)
         {
             this->wiredAssessedInputFrequency = val;
             // no notifying because attribute marked with 'Changes Omitted' quality
-            return CHIP_NO_ERROR;
         }
     }
-    CHIP_ERROR SetWiredAssessedCurrent(DataModel::Nullable<uint32_t> val)
+    void SetWiredAssessedCurrent(DataModel::Nullable<uint32_t> val)
     {
-        ENABLE_IF_ATTRIBUTE_SUPPORTED(WiredAssessedCurrent)
+        ENABLE_IF_ATTRIBUTE_SUPPORTED_NO_RETURN(WiredAssessedCurrent)
         {
             this->wiredAssessedCurrent = val;
             // no notifying because attribute marked with 'Changes Omitted' quality
-            return CHIP_NO_ERROR;
         }
     }
-    CHIP_ERROR SetWiredPresent(bool val)
+    void SetWiredPresent(bool val)
     {
-        ENABLE_IF_ATTRIBUTE_SUPPORTED(WiredPresent)
+        ENABLE_IF_ATTRIBUTE_SUPPORTED_NO_RETURN(WiredPresent)
         {
             SetAttributeValue(this->wiredPresent, val, PowerSource::Attributes::WiredPresent::Id);
-            return CHIP_NO_ERROR;
         }
     }
-    CHIP_ERROR SetActiveWiredFaults(Span<const WiredFaultEnum> val)
+    void SetActiveWiredFaults(Span<const WiredFaultEnum> val)
     {
-        ENABLE_IF_ATTRIBUTE_SUPPORTED(ActiveWiredFaults)
+        ENABLE_IF_ATTRIBUTE_SUPPORTED_NO_RETURN(ActiveWiredFaults)
         {
             uint8_t bitset = PowerSource::detail::SpanToBitSet<uint8_t, to_underlying(WiredFaultEnum::kUnknownEnumValue)>(
                 PowerSource::detail::ConvertSpanType<const uint8_t>(val));
-            if (this->activeWiredFaultsBitSet == bitset)
+            if (this->activeWiredFaultsBitSet != bitset)
             {
-                return CHIP_NO_ERROR;
+                GenerateWiredFaultEventAndSetAndNotify(bitset);
             }
-
-            GenerateWiredFaultEventAndSetAndNotify(bitset);
-            return CHIP_NO_ERROR;
         }
     }
     CHIP_ERROR AddActiveWiredFault(WiredFaultEnum val)
@@ -908,13 +873,12 @@ public:
             return CHIP_NO_ERROR;
         }
     }
-    CHIP_ERROR SetBatVoltage(DataModel::Nullable<uint32_t> val)
+    void SetBatVoltage(DataModel::Nullable<uint32_t> val)
     {
-        ENABLE_IF_ATTRIBUTE_SUPPORTED(BatVoltage)
+        ENABLE_IF_ATTRIBUTE_SUPPORTED_NO_RETURN(BatVoltage)
         {
             this->batVoltage = val;
             // no notifying because attribute marked with 'Changes Omitted' quality
-            return CHIP_NO_ERROR;
         }
     }
     CHIP_ERROR SetBatPercentRemaining(DataModel::Nullable<uint8_t> val)
@@ -992,35 +956,30 @@ public:
             return CHIP_NO_ERROR;
         }
     }
-    CHIP_ERROR SetBatReplacementNeeded(bool val)
+    void SetBatReplacementNeeded(bool val)
     {
-        ENABLE_IF_ATTRIBUTE_SUPPORTED(BatReplacementNeeded)
+        ENABLE_IF_ATTRIBUTE_SUPPORTED_NO_RETURN(BatReplacementNeeded)
         {
             SetAttributeValue(this->batReplacementNeeded, val, PowerSource::Attributes::BatReplacementNeeded::Id);
-            return CHIP_NO_ERROR;
         }
     }
-    CHIP_ERROR SetBatPresent(bool val)
+    void SetBatPresent(bool val)
     {
-        ENABLE_IF_ATTRIBUTE_SUPPORTED(BatPresent)
+        ENABLE_IF_ATTRIBUTE_SUPPORTED_NO_RETURN(BatPresent)
         {
             SetAttributeValue(this->batPresent, val, PowerSource::Attributes::BatPresent::Id);
-            return CHIP_NO_ERROR;
         }
     }
-    CHIP_ERROR SetActiveBatFaults(Span<const BatFaultEnum> val)
+    void SetActiveBatFaults(Span<const BatFaultEnum> val)
     {
-        ENABLE_IF_ATTRIBUTE_SUPPORTED(ActiveBatFaults)
+        ENABLE_IF_ATTRIBUTE_SUPPORTED_NO_RETURN(ActiveBatFaults)
         {
             uint8_t newBitSet = PowerSource::detail::SpanToBitSet<uint8_t, to_underlying(BatFaultEnum::kUnknownEnumValue)>(
                 PowerSource::detail::ConvertSpanType<const uint8_t>(val));
-            if (this->activeBatFaultsBitSet == newBitSet)
+            if (this->activeBatFaultsBitSet != newBitSet)
             {
-                return CHIP_NO_ERROR;
+                GenerateBatFaultEventAndSetAndNotify(newBitSet);
             }
-
-            GenerateBatFaultEventAndSetAndNotify(newBitSet);
-            return CHIP_NO_ERROR;
         }
     }
     CHIP_ERROR AddActiveBatFault(BatFaultEnum val)
@@ -1100,36 +1059,31 @@ public:
             return CHIP_NO_ERROR;
         }
     }
-    CHIP_ERROR SetBatFunctionalWhileCharging(bool val)
+    void SetBatFunctionalWhileCharging(bool val)
     {
-        ENABLE_IF_ATTRIBUTE_SUPPORTED(BatFunctionalWhileCharging)
+        ENABLE_IF_ATTRIBUTE_SUPPORTED_NO_RETURN(BatFunctionalWhileCharging)
         {
             SetAttributeValue(this->batFunctionalWhileCharging, val, PowerSource::Attributes::BatFunctionalWhileCharging::Id);
-            return CHIP_NO_ERROR;
         }
     }
-    CHIP_ERROR SetBatChargingCurrent(DataModel::Nullable<uint32_t> val)
+    void SetBatChargingCurrent(DataModel::Nullable<uint32_t> val)
     {
-        ENABLE_IF_ATTRIBUTE_SUPPORTED(BatChargingCurrent)
+        ENABLE_IF_ATTRIBUTE_SUPPORTED_NO_RETURN(BatChargingCurrent)
         {
             this->batChargingCurrent = val;
             // no notifying because attribute marked with 'Changes Omitted' quality
-            return CHIP_NO_ERROR;
         }
     }
-    CHIP_ERROR SetActiveBatChargeFaults(Span<const BatChargeFaultEnum> val)
+    void SetActiveBatChargeFaults(Span<const BatChargeFaultEnum> val)
     {
-        ENABLE_IF_ATTRIBUTE_SUPPORTED(ActiveBatChargeFaults)
+        ENABLE_IF_ATTRIBUTE_SUPPORTED_NO_RETURN(ActiveBatChargeFaults)
         {
             uint16_t newBitSet = PowerSource::detail::SpanToBitSet<uint16_t, to_underlying(BatChargeFaultEnum::kUnknownEnumValue)>(
                 PowerSource::detail::ConvertSpanType<const uint8_t>(val));
-            if (this->activeBatChargeFaultsBitSet == newBitSet)
+            if (this->activeBatChargeFaultsBitSet != newBitSet)
             {
-                return CHIP_NO_ERROR;
+                GenerateBatChargeFaultEventAndSetAndNotify(newBitSet);
             }
-
-            GenerateBatChargeFaultEventAndSetAndNotify(newBitSet);
-            return CHIP_NO_ERROR;
         }
     }
     CHIP_ERROR AddActiveBatChargeFault(BatChargeFaultEnum val)

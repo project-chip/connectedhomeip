@@ -102,20 +102,13 @@ TEST_F(TestFullWiredPowerSourceCluster, TestSetters)
     FullWiredPowerSourceCluster cluster(config);
 
     EXPECT_EQ(cluster.SetStatus({}), CHIP_NO_ERROR);
-    EXPECT_EQ(cluster.SetOrder({}), CHIP_NO_ERROR);
-    EXPECT_EQ(cluster.SetWiredAssessedInputVoltage({}), CHIP_NO_ERROR);
-    EXPECT_EQ(cluster.SetWiredAssessedInputFrequency({}), CHIP_NO_ERROR);
-    EXPECT_EQ(cluster.SetWiredAssessedCurrent({}), CHIP_NO_ERROR);
-    EXPECT_EQ(cluster.SetWiredPresent({}), CHIP_NO_ERROR);
-    EXPECT_EQ(cluster.SetActiveWiredFaults({}), CHIP_NO_ERROR);
+    cluster.SetOrder({});
+    cluster.SetWiredAssessedInputVoltage({});
+    cluster.SetWiredAssessedInputFrequency({});
+    cluster.SetWiredAssessedCurrent({});
+    cluster.SetWiredPresent({});
+    cluster.SetActiveWiredFaults({});
     EXPECT_EQ(cluster.SetEndpointList({}), CHIP_NO_ERROR);
-}
-
-TEST_F(TestFullWiredPowerSourceCluster, TestPersistence)
-{
-    FullWiredPowerSourceConfig config(kTestEndpointId, CharSpan{}, WiredCurrentTypeEnum::kAc);
-
-    TestOrderPersistence<FullWiredPowerSourceCluster>(config);
 }
 
 TEST_F(TestFullWiredPowerSourceCluster, TestBounds)

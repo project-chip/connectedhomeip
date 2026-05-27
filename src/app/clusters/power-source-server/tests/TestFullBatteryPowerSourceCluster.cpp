@@ -155,29 +155,20 @@ TEST_F(TestFullBatteryPowerSourceCluster, TestSetters)
     FullBatteryPowerSourceCluster cluster(config);
 
     EXPECT_EQ(cluster.SetStatus({}), CHIP_NO_ERROR);
-    EXPECT_EQ(cluster.SetOrder({}), CHIP_NO_ERROR);
-    EXPECT_EQ(cluster.SetBatVoltage({}), CHIP_NO_ERROR);
+    cluster.SetOrder({});
+    cluster.SetBatVoltage({});
     EXPECT_EQ(cluster.SetBatPercentRemaining({}), CHIP_NO_ERROR);
     EXPECT_EQ(cluster.SetBatTimeRemaining({}), CHIP_NO_ERROR);
     EXPECT_EQ(cluster.SetBatChargeLevel({}), CHIP_NO_ERROR);
-    EXPECT_EQ(cluster.SetBatReplacementNeeded({}), CHIP_NO_ERROR);
-    EXPECT_EQ(cluster.SetBatPresent({}), CHIP_NO_ERROR);
-    EXPECT_EQ(cluster.SetActiveBatFaults({}), CHIP_NO_ERROR);
+    cluster.SetBatReplacementNeeded({});
+    cluster.SetBatPresent({});
+    cluster.SetActiveBatFaults({});
     EXPECT_EQ(cluster.SetBatChargeState({}), CHIP_NO_ERROR);
     EXPECT_EQ(cluster.SetBatTimeToFullCharge({}), CHIP_NO_ERROR);
-    EXPECT_EQ(cluster.SetBatFunctionalWhileCharging({}), CHIP_NO_ERROR);
-    EXPECT_EQ(cluster.SetBatChargingCurrent({}), CHIP_NO_ERROR);
-    EXPECT_EQ(cluster.SetActiveBatChargeFaults({}), CHIP_NO_ERROR);
+    cluster.SetBatFunctionalWhileCharging({});
+    cluster.SetBatChargingCurrent({});
+    cluster.SetActiveBatChargeFaults({});
     EXPECT_EQ(cluster.SetEndpointList({}), CHIP_NO_ERROR);
-}
-
-TEST_F(TestFullBatteryPowerSourceCluster, TestPersistence)
-{
-    FullBatteryPowerSourceConfig config(kTestEndpointId, CharSpan{}, BatReplaceabilityEnum::kUnspecified, timerDelegate);
-    config.MakeReplaceable(CharSpan{}, 0);
-    config.MakeRechargeable();
-
-    TestOrderPersistence<FullBatteryPowerSourceCluster>(config);
 }
 
 TEST_F(TestFullBatteryPowerSourceCluster, TestBounds)

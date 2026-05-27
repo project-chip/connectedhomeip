@@ -55,54 +55,6 @@ struct TestBase : public ::testing::Test
         EXPECT_LE(value.size(), AttrTypeInfo::MaxLength());
     }
 
-    template <typename ClusterType>
-    void TestOrderPersistence(typename ClusterType::ConfigType & config)
-    {
-        uint8_t testOrder = 3;
-        {
-            ClusterType cluster(config);
-            ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
-
-            EXPECT_EQ(cluster.SetOrder(testOrder), CHIP_NO_ERROR);
-            EXPECT_EQ(cluster.GetOrder(), testOrder);
-
-            cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
-        }
-
-        // test that order is persisted
-        {
-            ClusterType cluster(config);
-            ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
-
-            chip::Testing::ClusterTester tester(cluster);
-            uint8_t readOrder{};
-            ASSERT_EQ(tester.ReadAttribute(PowerSource::Attributes::Order::Id, readOrder), CHIP_NO_ERROR);
-            EXPECT_EQ(readOrder, testOrder);
-            EXPECT_EQ(cluster.GetOrder(), testOrder);
-
-            cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
-        }
-
-        // test that setting orderAttributeFetchFromPersistentStorageDuringStartup to false keeps the order value from persisting
-        {
-            uint8_t testOrderNewValue                                    = 123;
-            config.orderAttributeFetchFromPersistentStorageDuringStartup = false;
-            config.order                                                 = testOrderNewValue;
-            ClusterType cluster(config);
-
-            // this will not get the value from persistent storage.
-            ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
-
-            chip::Testing::ClusterTester tester(cluster);
-            uint8_t readOrder{};
-            ASSERT_EQ(tester.ReadAttribute(PowerSource::Attributes::Order::Id, readOrder), CHIP_NO_ERROR);
-            EXPECT_NE(readOrder, testOrder); // should not be the old value
-            EXPECT_EQ(readOrder, testOrderNewValue);
-
-            cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
-        }
-    }
-
     chip::Testing::TestServerClusterContext testContext;
     chip::TimerDelegateMock timerDelegate;
     EndpointId kTestEndpointId = 1;

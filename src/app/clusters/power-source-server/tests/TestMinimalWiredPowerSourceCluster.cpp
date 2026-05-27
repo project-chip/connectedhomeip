@@ -83,15 +83,8 @@ TEST_F(TestMinimalWiredPowerSourceCluster, TestSetters)
     MinimalWiredPowerSourceCluster cluster(config);
 
     EXPECT_EQ(cluster.SetStatus({}), CHIP_NO_ERROR);
-    EXPECT_EQ(cluster.SetOrder({}), CHIP_NO_ERROR);
+    cluster.SetOrder({});
     EXPECT_EQ(cluster.SetEndpointList({}), CHIP_NO_ERROR);
-}
-
-TEST_F(TestMinimalWiredPowerSourceCluster, TestPersistence)
-{
-    MinimalWiredPowerSourceConfig config(kTestEndpointId, CharSpan{}, WiredCurrentTypeEnum::kAc);
-
-    TestOrderPersistence<MinimalWiredPowerSourceCluster>(config);
 }
 
 TEST_F(TestMinimalWiredPowerSourceCluster, TestBounds)
