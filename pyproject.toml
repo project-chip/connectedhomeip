@@ -48,7 +48,7 @@ select = [
     # Check for common exception issues
     "RSE",
     # Check for common logging issues
-    "G001", "G002", "LOG",
+    "G001", "G002", "G003", "LOG",
     # Check for common optimization issues
     "SLOT",
     # Check for builtin symbols aliasing

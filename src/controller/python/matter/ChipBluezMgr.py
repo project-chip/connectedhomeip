@@ -661,10 +661,7 @@ class BluezDbusGattCharacteristic:
     def gatt_on_characteristic_changed_cb(
         self, interface, changed_properties, invalidated_properties
     ):
-        LOGGER.debug(
-            "property change in" +
-            str(self.characteristic) + str(changed_properties)
-        )
+        LOGGER.debug("property change in %s %s", self.characteristic, changed_properties)
 
         if len(changed_properties) == 0:
             return

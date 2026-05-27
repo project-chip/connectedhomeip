@@ -43,7 +43,7 @@ def run_single_test(otaimage: str, otaimage_version: int) -> int:
         OTA_TOOL_DIR, 'ota_image_tool.py'))
     extract_cmd = str(ota_tool) + ' extract ' + str(ota_image) + ' ' + str(ota_image_bin)
     status = subprocess.call(extract_cmd, shell=True)
-    log.info("Extract image : " + str(status))
+    log.info("Extract image : %s", str(status))
     if status != 0:
         log.error(f"Failed to extract the image from {ota_image}")
         exit(1)
