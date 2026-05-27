@@ -1137,6 +1137,16 @@ void emberAfProximityRangingClusterShutdownCallback(chip::EndpointId endpoint);
 /**
  * @param endpoint    Endpoint that is being initialized
  */
+void emberAfSmokeConcentrationMeasurementClusterInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfSmokeConcentrationMeasurementClusterShutdownCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
 void emberAfNetworkIdentityManagementClusterInitCallback(chip::EndpointId endpoint);
 
 /**
@@ -5756,6 +5766,45 @@ MatterProximityRangingClusterServerPreAttributeChangedCallback(const chip::app::
  * @param endpoint  Endpoint that is being served
  */
 void emberAfProximityRangingClusterServerTickCallback(chip::EndpointId endpoint);
+
+//
+// Smoke Concentration Measurement Cluster
+//
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfSmokeConcentrationMeasurementClusterServerInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterSmokeConcentrationMeasurementClusterServerShutdownCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfSmokeConcentrationMeasurementClusterClientInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param attributePath Concrete attribute path that changed
+ */
+void MatterSmokeConcentrationMeasurementClusterServerAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath);
+
+/**
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status MatterSmokeConcentrationMeasurementClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/**
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfSmokeConcentrationMeasurementClusterServerTickCallback(chip::EndpointId endpoint);
 
 //
 // Network Identity Management Cluster

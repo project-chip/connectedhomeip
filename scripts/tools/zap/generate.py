@@ -57,13 +57,6 @@ CHIP_ROOT_DIR = os.path.realpath(
     os.path.join(os.path.dirname(__file__), '../../..'))
 
 
-def checkPythonVersion():
-    if sys.version_info[0] < 3:
-        print('Must use Python 3. Current version is ' +
-              str(sys.version_info[0]))
-        exit(1)
-
-
 def checkFileExists(path):
     if not os.path.isfile(path):
         print('Error: ' + path + ' does not exists or is not a file.')
@@ -305,8 +298,7 @@ def expandPlaceholderWildcards(path: str) -> Generator[str, None, None]:
         path = path[:s] + '*' + path[e+1:]
 
     # path is a glob target, expand it
-    for result in glob.glob(path):
-        yield result
+    yield from glob.glob(path)
 
 
 def runClangPrettifier(templates_file, output_dir):
@@ -377,7 +369,6 @@ class LockFileSerializer:
 
 
 def main():
-    checkPythonVersion()
     cmdLineArgs = runArgumentsParser()
 
     with LockFileSerializer(cmdLineArgs.lock_file) as _:
