@@ -167,7 +167,7 @@ CHIP_ERROR BflbWiFiDriver::ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen
     if (keyLen)
     {
         // Bounds check added to prevent buffer overflow vulnerabilities.
-        VerifyOrReturnError(keyLen <= sizeof(conn_param.key), CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(keyLen <= sizeof(conn_param.key), CHIP_ERROR_BUFFER_TOO_SMALL);
 
         // Keep old behaviour due to compatibility with SDK
         strncpy((char *) conn_param.key, key, keyLen); // NOLINT(bugprone-unsafe-functions)
