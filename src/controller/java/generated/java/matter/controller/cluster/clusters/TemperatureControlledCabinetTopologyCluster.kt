@@ -330,7 +330,7 @@ class TemperatureControlledCabinetTopologyCluster(
               .filterIsInstance<ReadData.Attribute>()
               .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
 
-          requireNotNull(attributeData) { 
+          requireNotNull(attributeData) {
             "Generatedcommandlist attribute not found in Node State update"
           }
 
