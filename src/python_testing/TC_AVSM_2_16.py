@@ -187,7 +187,7 @@ class TC_AVSM_2_16(MatterBaseTest, AVSMTestBase):
         if self.privacySupport:
             result = await self.write_single_attribute(attr.SoftLivestreamPrivacyModeEnabled(False), endpoint_id=endpoint)
             asserts.assert_equal(result, Status.Success, "Error when trying to write SoftLivestreamPrivacyModeEnabled")
-            log.info(f"Tx'd : SoftLivestreamPrivacyModeEnabled{False}")
+            log.info("Tx'd : SoftLivestreamPrivacyModeEnabled%s", False)
 
             softLivestreamPrivMode = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.SoftLivestreamPrivacyModeEnabled
@@ -196,7 +196,7 @@ class TC_AVSM_2_16(MatterBaseTest, AVSMTestBase):
 
             result = await self.write_single_attribute(attr.SoftRecordingPrivacyModeEnabled(False), endpoint_id=endpoint)
             asserts.assert_equal(result, Status.Success, "Error when trying to write SoftRecordingPrivacyModeEnabled")
-            log.info(f"Tx'd : SoftRecordingPrivacyModeEnabled{False}")
+            log.info("Tx'd : SoftRecordingPrivacyModeEnabled%s", False)
 
             softRecordingPrivMode = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.SoftRecordingPrivacyModeEnabled

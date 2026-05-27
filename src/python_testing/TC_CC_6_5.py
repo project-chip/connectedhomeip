@@ -97,18 +97,18 @@ class TC_CC_6_5(MatterBaseTest):
         cc_cluster = Clusters.Objects.ColorControl
         cc_attributes = cc_cluster.Attributes
         self.endpoint = self.get_endpoint()
-        log.info(f"Starting test with endpoint {self.endpoint}")
+        log.info("Starting test with endpoint %s", self.endpoint)
 
         # commissioning - already done
         self.step("0")
 
         self.step("0a")
         self.TH1 = self.default_controller
-        log.info(f"Writing Options attribute on endpoint {self.endpoint}")
+        log.info("Writing Options attribute on endpoint %s", self.endpoint)
         await self.write_single_attribute(cc_attributes.Options(0x00), expect_success=True)
 
         self.step("0b")
-        log.info(f"Sending On command to endpoint {self.endpoint}")
+        log.info("Sending On command to endpoint %s", self.endpoint)
 
         await self.send_single_cmd(
             endpoint=self.endpoint,

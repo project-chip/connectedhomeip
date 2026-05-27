@@ -262,7 +262,7 @@ class SmokeCoBaseTest(MatterBaseTest):
 
         self.step(6)
         smoke_state_report = smoke_state_handler.wait_for_attribute_report(timeout_sec=300)
-        log.info(f"Smoke state report {smoke_state_report} with value {smoke_state_report.value}")
+        log.info("Smoke state report %s with value %s", smoke_state_report, smoke_state_report.value)
         asserts.assert_equal(smoke_state_report.value, self.smokeco_cluster.Enums.AlarmStateEnum.kWarning)
 
         self.step(7)

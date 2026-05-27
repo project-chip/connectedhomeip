@@ -187,10 +187,10 @@ class TC_ACE_1_6(MatterBaseTest):
             ep1 = operate_only_command.endpoint_id
 
             log.info("Endpoint value for ep~1~ used for test steps with groupcast cluster: %s", ep1)
-            log.info(
-                f"Targeted cluster used for groupcast case is: {operate_only_command.cluster_object.__name__} ({operate_only_command.cluster_object.id})")
-            log.info(
-                f"Targeted command with operate priviliege on the targeted cluster used for groupcast case is: {operate_only_command.command_object.__name__}")
+            log.info("Targeted cluster used for groupcast case is: %s (%s)",
+                     operate_only_command.cluster_object.__name__, operate_only_command.cluster_object.id)
+            log.info("Targeted command with operate priviliege on the targeted cluster used for groupcast case is: %s",
+                     operate_only_command.command_object.__name__)
 
         # Step 1a: KeySetWrite 0x01a3
         self.step("1a")

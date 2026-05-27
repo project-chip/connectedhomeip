@@ -138,9 +138,9 @@ class TC_FAN_3_2(MatterBaseTest):
         log.info("[FC] *** Initial FanMode: %s", init_fan_mode)
 
         # Logging the scenario being tested
-        log.info(
-            f"[FC] *** Update SpeedSetting {order.name.lower()}, verify PercentSetting, PercentCurrent, FanMode, SpeedSetting, and SpeedCurrent")
-        log.info(f"[FC] *** Value range to update: {value_range[0]} - {value_range[-1]}")
+        log.info("[FC] *** Update SpeedSetting %s, verify PercentSetting, PercentCurrent, FanMode, SpeedSetting, and SpeedCurrent",
+                 order.name.lower())
+        log.info("[FC] *** Value range to update: %s - %s", value_range[0], value_range[-1])
         log.info("[FC]")
 
     async def subscribe_to_attributes(self) -> None:
@@ -160,9 +160,9 @@ class TC_FAN_3_2(MatterBaseTest):
 
     def log_results(self) -> None:
         for sub in self.subscriptions:
-            log.info(f"[FC] - {sub._expected_attribute.__name__} Sub -")
+            log.info("[FC] - %s Sub -", sub._expected_attribute.__name__)
             for q in sub.attribute_queue.queue:
-                log.info(f"[FC] {q.attribute.__name__}: {q.value}")
+                log.info("[FC] %s: %s", q.attribute.__name__, q.value)
             log.info("[FC]")
 
     def verify_attribute_progression(self, order: OrderEnum, invalid_in_state_occurred: bool) -> None:
@@ -198,8 +198,8 @@ class TC_FAN_3_2(MatterBaseTest):
             correct_progression = all(comp(a, b) for a, b in zip(values, values[1:]))
             asserts.assert_true(correct_progression, f"[FC] {sub._expected_attribute.__name__}: {shared_str}")
 
-        log.info(
-            f"[FC] All attribute values progressed as expected ({order.name.lower()} order - current value {comp_str} than previous value).")
+        log.info("[FC] All attribute values progressed as expected (%s order - current value %s than previous value).",
+                 order.name.lower(), comp_str)
         log.info("[FC]")
 
     async def testing_scenario_update_speed_setting(self, order) -> None:

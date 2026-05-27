@@ -274,7 +274,7 @@ class TC_JFDS_2_4(MatterBaseTest):
         # Verify that an entry with NodeID of DUT (nodeId=1) exists
         found_dut = False
         for entry in adminList:
-            log.info(f"AdminList entry: NodeID={entry.nodeID}")
+            log.info("AdminList entry: NodeID=%s", entry.nodeID)
             if entry.nodeID == 1:
                 found_dut = True
                 break

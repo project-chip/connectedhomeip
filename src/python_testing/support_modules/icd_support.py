@@ -93,9 +93,9 @@ def uat_bit_name(bit):
 def uat_set_hints(hint_bitmap):
     """Return a list of individual UAT bits set in the given bitmap, logging each one."""
     hints = [bit for bit in uat if hint_bitmap & bit.value]
-    log.info(f"UserActiveModeTriggerHint has {len(hints)} bit(s) set:")
+    log.info("UserActiveModeTriggerHint has %s bit(s) set:", len(hints))
     for bit in hints:
-        log.info(f"  - {uat_bit_name(bit)} (0x{bit.value:05X})")
+        log.info("  - %s (0x%05X)", uat_bit_name(bit), bit.value)
     return hints
 
 # ============================================================================
@@ -181,7 +181,7 @@ class ICDBaseTest(MatterBaseTest):
         wait_s = self.compute_wait_time(transition,
                                         active_mode_duration_ms=active_mode_duration_ms,
                                         idle_mode_duration_s=idle_mode_duration_s)
-        log.info(f"Waiting {wait_s}s for {transition.name}...")
+        log.info("Waiting %ss for %s...", wait_s, transition.name)
         await asyncio.sleep(wait_s)
 
     async def unregister_all_clients(self):

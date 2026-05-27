@@ -121,7 +121,7 @@ class ClusterObjectTests:
         req = Clusters.UnitTesting.Commands.TestAddArguments(arg1=2, arg2=3)
         res = await devCtrl.SendCommand(nodeId=NODE_ID, endpoint=LIGHTING_ENDPOINT_ID, payload=req)
         if not isinstance(res, Clusters.UnitTesting.Commands.TestAddArgumentsResponse):
-            logger.error(f"Unexpected response of type {type(res)} received.")
+            logger.error("Unexpected response of type %s received.", type(res))
             raise ValueError
         logger.info("Received response: %s", res)
         if res.returnValue != 5:
@@ -161,8 +161,7 @@ class ClusterObjectTests:
         if res != expectedRes:
             for i in range(len(res)):
                 if res[i] != expectedRes[i]:
-                    logger.error(
-                        f"Item {i} is not expected, expect {expectedRes[i]} got {res[i]}")
+                    logger.error("Item %s is not expected, expect %s got %s", i, expectedRes[i], res[i])
             raise AssertionError("Write returned unexpected result.")
 
         logger.info("2: Write chunked list")
@@ -383,13 +382,12 @@ class ClusterObjectTests:
         VerifyDecodeSuccess(await devCtrl.ReadAttribute(nodeId=NODE_ID, attributes=req))
 
         res = await devCtrl.ReadAttribute(nodeId=NODE_ID, attributes=req, returnClusterObject=True)
-        logger.info(
-            f"Basic Cluster - Label: {res[0][Clusters.BasicInformation].productLabel}")
+        logger.info("Basic Cluster - Label: %s", res[0][Clusters.BasicInformation].productLabel)
         # TestCluster will be ValueDecodeError here, so we comment out the log below.
         # Values are not expected to be ValueDecodeError for real clusters.
         # logger.info(
         #    f"Test Cluster - Struct: {res[1][Clusters.UnitTesting].structAttr}")
-        logger.info(f"Test Cluster: {res[1][Clusters.UnitTesting]}")
+        logger.info("Test Cluster: %s", res[1][Clusters.UnitTesting])
 
         logger.info("7: Reading Chunked List")
         res = await devCtrl.ReadAttribute(nodeId=NODE_ID, attributes=[(1, Clusters.UnitTesting.Attributes.ListLongOctetString)])
@@ -430,7 +428,7 @@ class ClusterObjectTests:
     @classmethod
     async def _RetryForContent(cls, request, until, retryCount=10, intervalSeconds=1):
         for i in range(retryCount):
-            logger.info(f"Attempt {i + 1}/{retryCount}")
+            logger.info("Attempt %s/%s", i + 1, retryCount)
             res = await request()
             if until(res):
                 return res
@@ -623,8 +621,7 @@ class ClusterObjectTests:
         if res != expectedRes:
             for i in range(len(res)):
                 if res[i] != expectedRes[i]:
-                    logger.error(
-                        f"Item {i} is not expected, expect {expectedRes[i]} got {res[i]}")
+                    logger.error("Item %s is not expected, expect %s got %s", i, expectedRes[i], res[i])
             raise AssertionError("Write returned unexpected result.")
 
         req = [
@@ -655,8 +652,7 @@ class ClusterObjectTests:
         if res != expectedRes:
             for i in range(len(res)):
                 if res[i] != expectedRes[i]:
-                    logger.error(
-                        f"Item {i} is not expected, expect {expectedRes[i]} got {res[i]}")
+                    logger.error("Item %s is not expected, expect %s got %s", i, expectedRes[i], res[i])
             raise AssertionError("Write returned unexpected result.")
 
         res = await devCtrl.WriteAttribute(nodeId=NODE_ID,
@@ -673,8 +669,7 @@ class ClusterObjectTests:
         if res != expectedRes:
             for i in range(len(res)):
                 if res[i] != expectedRes[i]:
-                    logger.error(
-                        f"Item {i} is not expected, expect {expectedRes[i]} got {res[i]}")
+                    logger.error("Item %s is not expected, expect %s got %s", i, expectedRes[i], res[i])
             raise AssertionError("Write returned unexpected result.")
 
     @classmethod
@@ -701,8 +696,7 @@ class ClusterObjectTests:
 
         for attributes in attributePathPossibilities():
             for events in eventPathPossibilities():
-                logger.info(
-                    f"{testCount}: Reading mixed Attributes({attributes[0]}) Events({events[0]})")
+                logger.info("%s: Reading mixed Attributes(%s) Events(%s)", testCount, attributes[0], events[0])
                 await cls._TriggerEvent(devCtrl)
                 res = await cls._RetryForContent(request=lambda: devCtrl.Read(
                     nodeId=NODE_ID,

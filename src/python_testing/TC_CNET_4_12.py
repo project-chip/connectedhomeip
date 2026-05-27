@@ -79,7 +79,7 @@ class TC_CNET_4_12(MatterBaseTest):
 
         asserts.assert_equal(len(thread_network_id_bytes), 8, f"Extracted ExtPANID from {dataset_name} must be 8 bytes long.")
 
-        log.info(f"Extracted Network ID (ExtPANID) from {dataset_name}: {thread_network_id_bytes.hex()}")
+        log.info("Extracted Network ID (ExtPANID) from %s: %s", dataset_name, thread_network_id_bytes.hex())
 
         return thread_network_id_bytes
 
@@ -273,7 +273,7 @@ class TC_CNET_4_12(MatterBaseTest):
             cmd=cmd
         )
         # Verify that the DUT responds with ArmFailSafeResponse with ErrorCode as 'OK'(0)
-        log.info(f'Step #1: ArmFailSafeResponse with ErrorCode as OK: ({resp.errorCode})')
+        log.info('Step #1: ArmFailSafeResponse with ErrorCode as OK: (%s)', resp.errorCode)
         asserts.assert_equal(resp.errorCode, Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kOk,
                              "Failure status returned from arm failsafe")
 
@@ -302,7 +302,7 @@ class TC_CNET_4_12(MatterBaseTest):
                 userth_netidx = idx
                 asserts.assert_true(network.connected, "Thread network not connected")
                 break
-        log.info(f'Step #3: NetworkID from Networks attribute: {network.networkID}')
+        log.info('Step #3: NetworkID from Networks attribute: %s', network.networkID)
         log.info('Step #3: Expected NetworkID for THREAD_1ST: %s', thread_network_id_bytes_th1)
         log.info('Step #3: Index of THREAD_1ST in Networks list (Userth_netidx): %s', userth_netidx)
         asserts.assert_true(userth_netidx is not None, "Thread network not found in Networks list")
@@ -314,9 +314,9 @@ class TC_CNET_4_12(MatterBaseTest):
             node_id=self.dut_node_id,
             cmd=cmd
         )
-        log.info(f'Step #4: RemoveNetwork response for THREAD_1ST: ({vars(resp)})')
-        log.info(f'Step #4: RemoveNetwork Status for THREAD_1ST is success: ({resp.networkingStatus})')
-        log.info(f'Step #4: RemoveNetwork NetworkIndex for THREAD_1ST: ({resp.networkIndex})')
+        log.info('Step #4: RemoveNetwork response for THREAD_1ST: (%s)', vars(resp))
+        log.info('Step #4: RemoveNetwork Status for THREAD_1ST is success: (%s)', resp.networkingStatus)
+        log.info('Step #4: RemoveNetwork NetworkIndex for THREAD_1ST: (%s)', resp.networkIndex)
 
         # Verify that the DUT responds with Remove Network with NetworkingStatus as 'Success'(0)
         asserts.assert_equal(resp.networkingStatus, Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatusEnum.kSuccess,
@@ -333,8 +333,8 @@ class TC_CNET_4_12(MatterBaseTest):
             node_id=self.dut_node_id,
             cmd=cmd
         )
-        log.info(f'Step #5: AddOrUpdateThreadNetwork response for THREAD_2ND: ({vars(resp)})')
-        log.info(f'Step #5: AddOrUpdateThreadNetwork Status for THREAD_2ND is success: ({resp.networkingStatus})')
+        log.info('Step #5: AddOrUpdateThreadNetwork response for THREAD_2ND: (%s)', vars(resp))
+        log.info('Step #5: AddOrUpdateThreadNetwork Status for THREAD_2ND is success: (%s)', resp.networkingStatus)
 
         await self.verify_thread_network_response(resp)
 
@@ -360,8 +360,8 @@ class TC_CNET_4_12(MatterBaseTest):
             node_id=self.dut_node_id,
             cmd=cmd
         )
-        log.info(f'Step #7: ConnectNetwork resp for THREAD_2ND: ({vars(resp)})')
-        log.info(f'Step #7: ConnectNetwork Status for THREAD_2ND is success: ({resp.networkingStatus})')
+        log.info('Step #7: ConnectNetwork resp for THREAD_2ND: (%s)', vars(resp))
+        log.info('Step #7: ConnectNetwork Status for THREAD_2ND is success: (%s)', resp.networkingStatus)
         # Verify that the DUT responds with AddThreadNConnectNetworketwork with NetworkingStatus as 'Success'(0)
         asserts.assert_equal(resp.networkingStatus, Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatusEnum.kSuccess,
                              "Failure status returned from ConnectNetwork")
@@ -400,7 +400,7 @@ class TC_CNET_4_12(MatterBaseTest):
             cmd=cmd
         )
         # Verify that the DUT responds with ArmFailSafeResponse with ErrorCode as 'OK'(0)
-        log.info(f'Step #10: ArmFailSafeResponse with ErrorCode as OK: ({resp.errorCode})')
+        log.info('Step #10: ArmFailSafeResponse with ErrorCode as OK: (%s)', resp.errorCode)
         asserts.assert_equal(resp.errorCode, Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kOk,
                              "Failure status returned from arm failsafe")
 
@@ -443,7 +443,7 @@ class TC_CNET_4_12(MatterBaseTest):
             cmd=cmd
         )
         # Verify that the DUT responds with ArmFailSafeResponse with ErrorCode as 'OK'(0)
-        log.info(f'Step #13: ArmFailSafeResponse with ErrorCode as OK: ({resp.errorCode})')
+        log.info('Step #13: ArmFailSafeResponse with ErrorCode as OK: (%s)', resp.errorCode)
         asserts.assert_equal(resp.errorCode, Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kOk,
                              "Failure status returned from arm failsafe")
 
@@ -455,7 +455,7 @@ class TC_CNET_4_12(MatterBaseTest):
             cmd=cmd
         )
         network_index = resp.networkIndex
-        log.info(f'Step #14: RemoveNetwork Status for THREAD_1ST is success: ({resp.networkingStatus})')
+        log.info('Step #14: RemoveNetwork Status for THREAD_1ST is success: (%s)', resp.networkingStatus)
         log.info('Step #14: Network index for THREAD_1ST: (%s)', network_index)
 
         # Verify that the DUT responds with Remove Network with NetworkingStatus as 'Success'(0)
@@ -473,8 +473,8 @@ class TC_CNET_4_12(MatterBaseTest):
             node_id=self.dut_node_id,
             cmd=cmd
         )
-        log.info(f'Step #15: AddOrUpdateThreadNetwork response for THREAD_2ND: ({vars(resp)})')
-        log.info(f'Step #15: AddOrUpdateThreadNetwork Status for THREAD_2ND is success: ({resp.networkingStatus})')
+        log.info('Step #15: AddOrUpdateThreadNetwork response for THREAD_2ND: (%s)', vars(resp))
+        log.info('Step #15: AddOrUpdateThreadNetwork Status for THREAD_2ND is success: (%s)', resp.networkingStatus)
 
         await self.verify_thread_network_response(resp)
 
@@ -491,8 +491,8 @@ class TC_CNET_4_12(MatterBaseTest):
             node_id=self.dut_node_id,
             cmd=cmd
         )
-        log.info(f'Step #16: ConnectNetwork resp for THREAD_2ND: ({vars(resp)})')
-        log.info(f'Step #16: ConnectNetwork Status for THREAD_2ND is success ({resp.networkingStatus})')
+        log.info('Step #16: ConnectNetwork resp for THREAD_2ND: (%s)', vars(resp))
+        log.info('Step #16: ConnectNetwork Status for THREAD_2ND is success (%s)', resp.networkingStatus)
         # Verify that the DUT responds with AddThreadNConnectNetworketwork with NetworkingStatus as 'Success'(0)
         asserts.assert_equal(resp.networkingStatus, Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatusEnum.kSuccess,
                              "Failure status returned from ConnectNetwork")
@@ -533,8 +533,8 @@ class TC_CNET_4_12(MatterBaseTest):
             node_id=self.dut_node_id,
             cmd=cmd
         )
-        log.info(f'Step #19: CommissioningComplete response: ({vars(resp)})')
-        log.info(f'Step #19: CommissioningComplete Status is success: ({resp.errorCode})')
+        log.info('Step #19: CommissioningComplete response: (%s)', vars(resp))
+        log.info('Step #19: CommissioningComplete Status is success: (%s)', resp.errorCode)
         # Verify that the DUT responds with CommissioningComplete with ErrorCode as 'OK'(0)
         asserts.assert_equal(resp.errorCode, Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kOk,
                              "Failure status returned from CommissioningComplete")
@@ -559,7 +559,7 @@ class TC_CNET_4_12(MatterBaseTest):
             cmd=cmd
         )
         # Verify that the DUT responds with ArmFailSafeResponse with ErrorCode as 'OK'(0)
-        log.info(f'Step #21: ArmFailSafeResponse with ErrorCode as OK: ({resp.errorCode})')
+        log.info('Step #21: ArmFailSafeResponse with ErrorCode as OK: (%s)', resp.errorCode)
         asserts.assert_equal(resp.errorCode, Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kOk,
                              "Failure status returned from arm failsafe")
 
@@ -570,7 +570,7 @@ class TC_CNET_4_12(MatterBaseTest):
             cmd=cmd
         )
         network_index = resp.networkIndex
-        log.info(f'Step #21: RemoveNetwork Status for THREAD_2ND is success: ({resp.networkingStatus})')
+        log.info('Step #21: RemoveNetwork Status for THREAD_2ND is success: (%s)', resp.networkingStatus)
         log.info('Step #21: Network index for THREAD_2nd: (%s)', network_index)
 
         # Verify that the DUT responds with Remove Network with NetworkingStatus as 'Success'(0)
@@ -586,8 +586,8 @@ class TC_CNET_4_12(MatterBaseTest):
             node_id=self.dut_node_id,
             cmd=cmd
         )
-        log.info(f'Step #21: AddOrUpdateThreadNetwork response for THREAD_1ST: ({vars(resp)})')
-        log.info(f'Step #21: AddOrUpdateThreadNetwork Status for THREAD_1ST is success: ({resp.networkingStatus})')
+        log.info('Step #21: AddOrUpdateThreadNetwork response for THREAD_1ST: (%s)', vars(resp))
+        log.info('Step #21: AddOrUpdateThreadNetwork Status for THREAD_1ST is success: (%s)', resp.networkingStatus)
 
         await self.verify_thread_network_response(resp)
 
@@ -600,7 +600,7 @@ class TC_CNET_4_12(MatterBaseTest):
             node_id=self.dut_node_id,
             cmd=cmd
         )
-        log.info(f'Step #21: ConnectNetwork resp for for THREAD_1ST: ({vars(resp)})')
+        log.info('Step #21: ConnectNetwork resp for for THREAD_1ST: (%s)', vars(resp))
         # Verify that the DUT responds with ConnectNetwork with NetworkingStatus as 'Success'(0)
         asserts.assert_equal(resp.networkingStatus, Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatusEnum.kSuccess,
                              "Failure status returned from ConnectNetwork")

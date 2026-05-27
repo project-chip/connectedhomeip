@@ -72,8 +72,8 @@ class EventSpecificChangeCallback:
         """This is the subscription callback when an event is received.
            It checks the if the event is the expected one and then posts it into the queue for later processing."""
         if res.Status == Status.Success and res.Header.ClusterId == self._expected_cluster_id and res.Header.EventId == self._expected_event.event_id:
-            log.info(
-                f'Got subscription report for event {self._expected_event.event_id} on cluster {self._expected_cluster_id}: {res.Data}')
+            log.info('Got subscription report for event %s on cluster %s: %s',
+                     self._expected_event.event_id, self._expected_cluster_id, res.Data)
             self._q.put(res)
 
     def wait_for_event_report(self, timeout: int = 10):
@@ -1093,7 +1093,7 @@ class TC_OPSTATE_BASE:
 
         # STEP 11: TH waits for initial-countdown-time
         self.step(11)
-        log.info(f'Sleeping for {initial_countdown_time:.1f} seconds.')
+        log.info('Sleeping for %.1f seconds.', initial_countdown_time)
         await asyncio.sleep(initial_countdown_time)
 
         # STEP 12: TH sends Stop command to the DUT

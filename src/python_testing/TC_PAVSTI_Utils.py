@@ -60,7 +60,7 @@ class PushAvServerProcess(Subprocess):
         server_ip: str | None = None,
     ):
         if server_path is None:
-            log.error(f"No path provided for Push AV Server, using the default path for TH: {self.DEFAULT_SERVER_PATH}")
+            log.error("No path provided for Push AV Server, using the default path for TH: %s", self.DEFAULT_SERVER_PATH)
             server_path = self.DEFAULT_SERVER_PATH
         self._working_directory = os.path.join(tempfile.gettempdir(), "pavstest")
         if os.path.exists(self._working_directory):

@@ -64,7 +64,7 @@ def parse_openthread_dataset_stream(dataset_hex: str) -> dict[str, str] | None:
             # Read Value ('tlv_length' bytes)
             value_end = i + (tlv_length * 2)
             if value_end > len(dataset_hex):
-                log.error(f"Error: TLV (type 0x{tlv_type:02x}) length is out of bounds.")
+                log.error("Error: TLV (type 0x%02x) length is out of bounds.", tlv_type)
                 return None
 
             value_hex = dataset_hex[i:value_end]
@@ -187,7 +187,7 @@ class TC_CNET_4_10(MatterBaseTest):
                              f"Extended PAN ID must be 16 hex characters (8 bytes), got {len(ext_pan_id_hex)} characters")
 
         thread_network_id_bytes = bytes.fromhex(ext_pan_id_hex)
-        log.info(f"Extracted Extended PAN ID from dataset: {thread_network_id_bytes.hex()}")
+        log.info("Extracted Extended PAN ID from dataset: %s", thread_network_id_bytes.hex())
 
         # Step 2: Read Networks and verify thread network
         self.step(2)
@@ -418,7 +418,7 @@ class TC_CNET_4_10(MatterBaseTest):
                 found = True
                 # Check if connected status is True, although this might take time
                 # asserts.assert_true(network.connected, "Re-added network is not connected")
-                log.info(f"Network {network.networkID.hex()} found. Connected: {network.connected}")
+                log.info("Network %s found. Connected: %s", network.networkID.hex(), network.connected)
                 break
         asserts.assert_true(
             found, "Added network (matching dataset-extracted Extended PAN ID) not found in Networks list after cleanup")

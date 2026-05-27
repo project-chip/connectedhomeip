@@ -398,7 +398,7 @@ class TC_OPCREDS_VidVerify(MatterBaseTest):
             except (ValueError, IndexError, KeyError, TypeError) as e:
                 asserts.fail(f"Failed to parse root certificate for TH1's fabric: {str(e)}")
             log.info("Parsed TH1's RCAC successfully.")
-            log.info(f"  -> Root public key bytes: {to_octet_string(th1_root_public_key)}")
+            log.info("  -> Root public key bytes: %s", to_octet_string(th1_root_public_key))
 
         with test_step(1, description="Commission DUT in TH2's fabric. Cert chain must NOT include ICAC"):
             new_certificate_authority = self.certificate_authority_manager.NewCertificateAuthority()
@@ -429,7 +429,7 @@ class TC_OPCREDS_VidVerify(MatterBaseTest):
             except (ValueError, IndexError, KeyError, TypeError) as e:
                 asserts.fail(f"Failed to parse root certificate for TH2's fabric: {str(e)}")
             log.info("Parsed TH2's RCAC successfully.")
-            log.info(f"  -> Root public key bytes: {to_octet_string(th2_root_public_key)}")
+            log.info("  -> Root public key bytes: %s", to_octet_string(th2_root_public_key))
 
         # Read NOCs and validate that both the entry for TH1 and TH2 are readable
         # and have the right expected fabricId
@@ -477,7 +477,7 @@ class TC_OPCREDS_VidVerify(MatterBaseTest):
                         asserts.fail(f"Failed to parse NOC for fabric index {fabric_index}: {str(e)}")
 
                     log.info("Succeeded in parsing NOC for fabric index %s.", fabric_index)
-                    log.info(f"  -> NOC public key bytes: {to_octet_string(noc_public_keys_from_certs[controller_name])}")
+                    log.info("  -> NOC public key bytes: %s", to_octet_string(noc_public_keys_from_certs[controller_name]))
 
             log.info("Fabric IDs found: %s", fabric_ids_from_certs)
 

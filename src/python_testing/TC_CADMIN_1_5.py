@@ -126,7 +126,7 @@ class TC_CADMIN_1_5(CADMINBaseTest):
             expected_cm_value=2,
             expected_discriminator=params.randomDiscriminator
         )
-        log.info(f"Successfully found service with CM={service.txt.get('CM')}, D={service.txt.get('D')}")
+        log.info("Successfully found service with CM=%s, D=%s", service.txt.get('CM'), service.txt.get('D'))
         log.info("Test will now sleep for 190s while waiting for commissioning window to time out ... ")
         await asyncio.sleep(190)
 

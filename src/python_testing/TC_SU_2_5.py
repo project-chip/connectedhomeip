@@ -97,7 +97,7 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         self.provider_log = self.user_params.get('provider_log_path', '/tmp/provider_log_2_5.log')
         # On average the ota image build for the CI is 1.8 MB which takes 4-5 min to download. Adjust if needed.
         self.ota_image_download_timeout = self.user_params.get('ota_image_download_timeout', 60*5)
-        logger.info(f"Image download timeout is set to {self.ota_image_download_timeout} seconds")
+        logger.info("Image download timeout is set to %s seconds", self.ota_image_download_timeout)
 
         if not self.provider_kvs_path.startswith('/tmp'):
             asserts.fail("Provider KVS path must be placed in the /tmp directory.")
@@ -477,7 +477,7 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
             # Verify the default download path and the file size
             # Read file for /tmp/test.bin should exists and greater than 0
             ota_file_data = self.get_downloaded_ota_image_info()
-            logger.info(f"Downloaded ota image data {str(ota_file_data)}")
+            logger.info("Downloaded ota image data %s", ota_file_data)
             asserts.assert_equal(True, ota_file_data['exists'], f"File is was not downloaded  at {ota_file_data['path']}")
             asserts.assert_greater(ota_file_data['size'], 0, "Downloaded file is still at 0")
 
@@ -524,7 +524,7 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         asserts.assert_equal(update_state, Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle,
                              "Update state is not idle")
         ota_file_data = self.get_downloaded_ota_image_info()
-        logger.info(f"Downloaded ota image data {str(ota_file_data)}")
+        logger.info("Downloaded ota image data %s", ota_file_data)
         asserts.assert_equal(ota_file_data['exists'], False, f"Downloaded file is still present {ota_file_data['path']}")
         asserts.assert_equal(ota_file_data['size'], 0, "File size is greater than 0")
         update_state_progress = await self.read_single_attribute_check_success(

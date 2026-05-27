@@ -327,7 +327,8 @@ async def get_operate_only_commands(dev_ctrl: ChipDeviceController, node_id: int
 
                     except KeyError:
                         logger.warning(
-                            f"Command ID {cmd_id} on cluster {cluster.id} not found in spec XMLs. This may be a manufacturer-specific command.")
+                            "Command ID %s on cluster %s not found in spec XMLs. This may be a manufacturer-specific command.",
+                            cmd_id, cluster.id)
 
     # Main logic
     attributes, spec_version = await get_device_composition_and_spec(dev_ctrl, node_id)

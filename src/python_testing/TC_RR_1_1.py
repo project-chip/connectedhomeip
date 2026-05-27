@@ -230,12 +230,12 @@ class TC_RR_1_1(MatterBaseTest):
                 dev_ctrl, node_id=self.dut_node_id, endpoint=0,
                 attribute=Clusters.OperationalCredentials.Attributes.Fabrics, fabricFiltered=False)
             for fabric in fabrics:
-                log.info(
-                    f"-> Fabric at FabricIndex={fabric.fabricIndex}, FabricID: {fabric.fabricID}, NodeID: {fabric.nodeID}, Root Public key: {base64.b64encode(fabric.rootPublicKey)}")
+                log.info("-> Fabric at FabricIndex=%s, FabricID: %s, NodeID: %s, Root Public key: %s",
+                         fabric.fabricIndex, fabric.fabricID, fabric.nodeID, base64.b64encode(fabric.rootPublicKey))
                 if fabric.fabricIndex == current_fabric_index:
                     continue
 
-                log.info(f"  -> Removing extra fabric at FabricIndex {fabric.fabricIndex} from device.")
+                log.info("  -> Removing extra fabric at FabricIndex %s from device.", fabric.fabricIndex)
                 # This is not the test client's fabric, so remove it.
                 await dev_ctrl.SendCommand(
                     self.dut_node_id, 0, Clusters.OperationalCredentials.Commands.RemoveFabric(fabricIndex=fabric.fabricIndex))
@@ -305,8 +305,8 @@ class TC_RR_1_1(MatterBaseTest):
             endpoint=0, attribute=Clusters.OperationalCredentials.Attributes.Fabrics, fabricFiltered=False)
 
         for fabric in fabric_table:
-            log.info(
-                f"-> Fabric at FabricIndex={fabric.fabricIndex}, FabricID: {fabric.fabricID}, NodeID: {fabric.nodeID}, Root Public key: {base64.b64encode(fabric.rootPublicKey)}")
+            log.info("-> Fabric at FabricIndex=%s, FabricID: %s, NodeID: %s, Root Public key: %s",
+                     fabric.fabricIndex, fabric.fabricID, fabric.nodeID, base64.b64encode(fabric.rootPublicKey))
 
         asserts.assert_equal({f.fabricIndex for f in fabric_table}, set(fabric_table_entries_to_check.keys(
         )), "Fabric table read did not have matching fabricIndex entries compared to expected fabrics configured!")
@@ -505,12 +505,11 @@ class TC_RR_1_1(MatterBaseTest):
                 total_sessions = client.GetConnectedDeviceSync(self.dut_node_id).numTotalSessions
 
                 if (beginning_session_id != end_session_id):
-                    log.error(
-                        f"Test ended with a different session ID created from what we had before for {client.name} "
-                        f"(total sessions = {total_sessions})")
+                    log.error("Test ended with a different session ID created from what we had before for %s (total sessions = %s)",
+                              client.name, total_sessions)
                     num_failed_clients = num_failed_clients + 1
                 elif (total_sessions != 1):
-                    log.error(f"Test ended with more than 1 session for {client.name}")
+                    log.error("Test ended with more than 1 session for %s", client.name)
                     num_failed_clients = num_failed_clients + 1
 
             if (num_failed_clients > 0):
@@ -544,8 +543,8 @@ class TC_RR_1_1(MatterBaseTest):
                 node_id=self.dut_node_id,
                 endpoint=0,
                 attribute=Clusters.GroupKeyManagement.Attributes.MaxGroupsPerFabric)
-            log.info(
-                f"MaxGroupsPerFabric value: {indicated_max_groups_per_fabric}, number of endpoints with Groups clusters cluster: {counted_groups_clusters}, which are: {list(groups_cluster_endpoints.keys())}")
+            log.info("MaxGroupsPerFabric value: %s, number of endpoints with Groups clusters cluster: %s, which are: %s",
+                     indicated_max_groups_per_fabric, counted_groups_clusters, list(groups_cluster_endpoints.keys()))
             if indicated_max_groups_per_fabric < 4 * counted_groups_clusters:
                 asserts.fail("Failed Step 11: MaxGroupsPerFabric < 4 * counted_groups_clusters")
 
@@ -669,7 +668,7 @@ class TC_RR_1_1(MatterBaseTest):
                 responseType=Clusters.GroupKeyManagement.Commands.KeySetReadAllIndicesResponse)
             asserts.assert_equal(len(resp.groupKeySetIDs), max_keys_per_fabric,
                                  f"Fabric {client_idx}: expected {max_keys_per_fabric} key set IDs")
-            log.info(f"  Fabric {client_idx}: wrote {keys_to_write} key sets, read back {len(resp.groupKeySetIDs)} total")
+            log.info("  Fabric %s: wrote %s key sets, read back %s total", client_idx, keys_to_write, len(resp.groupKeySetIDs))
 
         # Step 19: JoinGroup across fabrics
         log.info("Step 19: JoinGroup across fabrics to fill MaxMembershipCount")
@@ -733,7 +732,7 @@ class TC_RR_1_1(MatterBaseTest):
                             f"Fabric {client_idx}: endpoints mismatch for GroupID {entry.groupID}")
 
             total_membership_count += len(membership)
-            log.info(f"  Fabric {client_idx}: {len(membership)} membership entries")
+            log.info("  Fabric %s: %s membership entries", client_idx, len(membership))
 
         asserts.assert_equal(total_membership_count, max_membership,
                              f"Total membership count ({total_membership_count}) must equal max_membership ({max_membership})")
@@ -973,10 +972,10 @@ class TC_RR_1_1(MatterBaseTest):
 
             acl = self.build_acl(enable_access_to_group_cluster)
 
-            log.info(f"Step {test_step}a: Writing ACL entry for fabric {fabric.fabricIndex}")
+            log.info("Step %sa: Writing ACL entry for fabric %s", test_step, fabric.fabricIndex)
             await client.WriteAttribute(self.dut_node_id, [(0, Clusters.AccessControl.Attributes.Acl(acl))])
 
-            log.info(f"Step {test_step}b: Validating ACL entry for fabric {fabric.fabricIndex}")
+            log.info("Step %sb: Validating ACL entry for fabric %s", test_step, fabric.fabricIndex)
             acl_readback = await self.read_single_attribute(
                 client, node_id=self.dut_node_id, endpoint=0, attribute=Clusters.AccessControl.Attributes.Acl)
             fabric_index = 9999

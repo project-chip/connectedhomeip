@@ -198,7 +198,7 @@ class TC_DEM_2_1(MatterBaseTest, DEMTestBase):
                 Clusters.DeviceEnergyManagement.Bitmaps.Feature.kForecastAdjustment & feature_map or \
                 Clusters.DeviceEnergyManagement.Bitmaps.Feature.kConstraintBasedAdjustment & feature_map:
             opt_out_state = await self.read_dem_attribute_expect_success(attribute="OptOutState")
-            log.info(f"OptOutState is {opt_out_state.name}:{opt_out_state}")
+            log.info("OptOutState is %s:%s", opt_out_state.name, opt_out_state)
 
 
 if __name__ == "__main__":

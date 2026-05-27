@@ -187,7 +187,7 @@ class TC_WEBRTCP_2_21(MatterBaseTest, WEBRTCPTestBase):
             # Verify that we got the expected NOT_FOUND status
             asserts.assert_equal(e.status, Status.NotFound,
                                  f"Expected NOT_FOUND status for invalid session ID, got {e.status}")
-            log.info(f"Correctly received NOT_FOUND status: {e.status}")
+            log.info("Correctly received NOT_FOUND status: %s", e.status)
 
         log.info("Successfully validated ProvideICECandidates with invalid session ID behavior")
 

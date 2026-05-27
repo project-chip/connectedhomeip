@@ -155,7 +155,7 @@ class TC_WEBRTCP_2_16(MatterBaseTest, WEBRTCPTestBase):
 
         # Try to allocate multiple sessions to reach the DUT's capacity limit
         for attempt in range(max_attempts):
-            log.info(f"Attempt {attempt + 1}: Sending ProvideOffer command")
+            log.info("Attempt %s: Sending ProvideOffer command", attempt + 1)
             resp = await self.send_single_cmd(
                 cmd=provide_offer_cmd,
                 endpoint=1,
@@ -163,7 +163,7 @@ class TC_WEBRTCP_2_16(MatterBaseTest, WEBRTCPTestBase):
             )
             asserts.assert_equal(type(resp), Clusters.WebRTCTransportProvider.Commands.ProvideOfferResponse,
                                  "Incorrect response type")
-            log.info(f"Successfully created ProvideOffer session {attempt + 1}")
+            log.info("Successfully created ProvideOffer session %s", attempt + 1)
 
         self.step(3)
         # Send an additional ProvideOffer command when DUT capacity is exhausted
@@ -182,7 +182,7 @@ class TC_WEBRTCP_2_16(MatterBaseTest, WEBRTCPTestBase):
             # Verify that we got the expected RESOURCE_EXHAUSTED status
             asserts.assert_equal(e.status, Status.ResourceExhausted,
                                  f"Expected RESOURCE_EXHAUSTED status, got {e.status}")
-            log.info(f"Correctly received RESOURCE_EXHAUSTED status: {e.status}")
+            log.info("Correctly received RESOURCE_EXHAUSTED status: %s", e.status)
 
         log.info("Successfully validated ProvideOffer resource exhaustion behavior")
 

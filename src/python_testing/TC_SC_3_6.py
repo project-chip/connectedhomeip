@@ -161,7 +161,7 @@ class TC_SC_3_6(MatterBaseTest):
                 if fabric.fabricIndex == current_fabric_index:
                     continue
                 # This is not the test client's fabric, so remove it.
-                log.info(f"Removing extra fabric at {fabric.fabricIndex} from device.")
+                log.info("Removing extra fabric at %s from device.", fabric.fabricIndex)
                 await dev_ctrl.SendCommand(
                     self.dut_node_id, 0, Clusters.OperationalCredentials.Commands.RemoveFabric(fabricIndex=fabric.fabricIndex))
 

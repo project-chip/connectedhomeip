@@ -236,8 +236,8 @@ class TC_CC_2_1(MatterBaseTest):
         tmp_a = numa & (2**4-1)
         tmp_b = numb & (2**4-1)
         log.info("Verifying if lower 4 bits are equal.")
-        log.info(f"Num a : {bin(tmp_a)}")
-        log.info(f"Num b : {bin(tmp_b)}")
+        log.info("Num a : %s", bin(tmp_a))
+        log.info("Num b : %s", bin(tmp_b))
         asserts.assert_equal(tmp_a, tmp_b, "Lower 4 bits of values are not equal")
 
     @property

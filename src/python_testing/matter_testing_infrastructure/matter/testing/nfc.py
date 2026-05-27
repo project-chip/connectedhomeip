@@ -79,7 +79,7 @@ class NFCReader:
 
         self.reader = reader_list[nfc_reader_index]
         self._monitor_manager = None
-        log.info(f"Using NFC reader: {self.reader}")
+        log.info("Using NFC reader: %s", self.reader)
 
     def read_nfc_tag_data(self) -> str:
         """
@@ -340,7 +340,7 @@ def _read_cc_file_content(connection) -> int:
     tag = cc_data[target_idx]
 
     if tag != 0x04:
-        log.error(f"Expected TLV Tag 0x04 at index {target_idx}, but got 0x{tag:02X}")
+        log.error("Expected TLV Tag 0x04 at index %s, but got 0x%02X", target_idx, tag)
         log.error("Full Data: %s", cc_data)
         raise ValueError(f"NDEF File Control TLV (0x04) not found at expected index {target_idx}")
 

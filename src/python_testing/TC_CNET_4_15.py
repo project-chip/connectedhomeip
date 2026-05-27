@@ -95,7 +95,7 @@ class TC_CNET_4_15(MatterBaseTest):
             )
         )
         # Log complete response object structure for debugging
-        log.info(f"RemoveNetwork complete response object: {vars(send_remove)}")
+        log.info("RemoveNetwork complete response object: %s", vars(send_remove))
 
         # Verify NetworkConfigResponse has NetworkIDNotFound status
         asserts.assert_equal(
@@ -114,7 +114,7 @@ class TC_CNET_4_15(MatterBaseTest):
             )
         )
         # Log complete response object structure for debugging
-        log.info(f"ConnectNetwork complete response object: {vars(send_connect)}")
+        log.info("ConnectNetwork complete response object: %s", vars(send_connect))
 
         # Verify ConnectNetworkResponse has NetworkIDNotFound status
         asserts.assert_equal(

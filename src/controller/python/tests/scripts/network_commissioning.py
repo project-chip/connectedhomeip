@@ -75,13 +75,10 @@ class NetworkCommissioningTests:
         return self._last_breadcrumb
 
     def log_interface_basic_info(self, values):
-        logger.info(f"The interface supports {values.maxNetworks} networks.")
-        logger.info(
-            f"ScanNetworks should take no more than {values.scanMaxTimeSeconds} seconds.")
-        logger.info(
-            f"ConnectNetwork should take no more than {values.connectMaxTimeSeconds} seconds.")
-        logger.info(
-            f"The feature map of this endpoint is {values.featureMap}.")
+        logger.info("The interface supports %s networks.", values.maxNetworks)
+        logger.info("ScanNetworks should take no more than %s seconds.", values.scanMaxTimeSeconds)
+        logger.info("ConnectNetwork should take no more than %s seconds.", values.connectMaxTimeSeconds)
+        logger.info("The feature map of this endpoint is %s.", values.featureMap)
 
     async def readLastNetworkingStateAttributes(self, endpointId):
         res = await self._devCtrl.ReadAttribute(
@@ -453,7 +450,7 @@ class NetworkCommissioningTests:
                 await self.test_thread(endpoint)
             else:
                 logger.info(
-                    f"Skip endpoint {endpoint} with featureMap {clus.featureMap}")
+                    "Skip endpoint %s with featureMap %s", endpoint, clus.featureMap)
 
     async def run(self):
         try:

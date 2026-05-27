@@ -143,7 +143,7 @@ class TC_OCC_3_1(MatterBaseTest):
 
         occupancy_event_supported = has_occevent_feature or self.check_pics("OCC.S.E00")
 
-        log.info(f"Feature map: 0x{feature_map:x}, OCCEVENT feature: {has_occevent_feature}")
+        log.info("Feature map: 0x%x, OCCEVENT feature: %s", feature_map, has_occevent_feature)
         log.info("HoldTime supported: %s, OccupancyChanged event supported: %s", has_hold_time, occupancy_event_supported)
 
         self.step(3)

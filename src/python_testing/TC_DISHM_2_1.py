@@ -128,8 +128,8 @@ class TC_DISHM_2_1(MatterBaseTest):
 
         self.is_ci = self.check_pics("PICS_SDK_CI_ONLY")
 
-        logger.info(f"Mode OK: {self.mode_ok}")
-        logger.info(f"Mode Fail: {self.mode_fail}")
+        logger.info("Mode OK: %s", self.mode_ok)
+        logger.info("Mode Fail: %s", self.mode_fail)
 
         # Commissioning, already done
         self.step(1)

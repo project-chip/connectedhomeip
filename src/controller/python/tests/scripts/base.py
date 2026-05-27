@@ -1225,7 +1225,7 @@ class BaseTestHelper:
 
             data = transaction.GetAttribute(path)
             logger.info(
-                f"Received report from server: path: {path.Path}, value: {data}")
+                "Received report from server: path: %s, value: %s", path.Path, data)
             receivedUpdate += 1
             loop.call_soon_threadsafe(updateEvent.set)
 
@@ -1333,7 +1333,7 @@ class BaseTestHelper:
 
             data = transaction.GetAttribute(path)
             logger.info(
-                f"Received report from server: path: {path.Path}, value: {data}")
+                "Received report from server: path: %s, value: %s", path.Path, data)
             loop.call_soon_threadsafe(updateEvent.set)
 
         try:

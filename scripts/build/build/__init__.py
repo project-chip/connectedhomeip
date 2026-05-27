@@ -43,8 +43,8 @@ class BuildTimer:
         total_time = self._total_end_time - self._total_start_time
         log.info("Build Time Summary:")
         for target, duration in self._build_times.items():
-            log.info(f"  - {target}: {self._format_duration(duration)}")
-        log.info(f"Total build time: {self._format_duration(total_time)}")
+            log.info("  - %s: %s", target, self._format_duration(duration))
+        log.info("Total build time: %s", self._format_duration(total_time))
 
     def _format_duration(self, seconds):
         minutes = int(seconds // 60)

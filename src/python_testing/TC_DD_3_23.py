@@ -54,9 +54,7 @@ class TC_DD_3_23(MatterBaseTest):
             if isinstance(stage, bytes):
                 stage = stage.decode("utf-8", errors="replace")
 
-            log.info(
-                f"[_stage_start_listener] node=0x{node_id:X}, stage={stage}"
-            )
+            log.info("[_stage_start_listener] node=0x%X, stage=%s", node_id, stage)
 
             self.commissionee_node_id = node_id
 

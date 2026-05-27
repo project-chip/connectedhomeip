@@ -169,7 +169,7 @@ class TC_REFALM_2_2(MatterBaseTest):
 
     async def _wait_thresshold(self):
         """Wait the defined time at the PIXIT.REFALM.AlarmThreshold to trigger it."""
-        log.info(f"Sleeping for {self.refalm_threshold_seconds} seconds defined at PIXIT.REFALM.AlarmThreshold")
+        log.info("Sleeping for %s seconds defined at PIXIT.REFALM.AlarmThreshold", self.refalm_threshold_seconds)
         await asyncio.sleep(self.refalm_threshold_seconds)
 
     def _send_open_door_command(self):
@@ -190,7 +190,7 @@ class TC_REFALM_2_2(MatterBaseTest):
         """Run the test steps."""
         self.endpoint = self.get_endpoint()
         cluster = Clusters.RefrigeratorAlarm
-        log.info(f"Default endpoint {self.endpoint}")
+        log.info("Default endpoint %s", self.endpoint)
         # Commision the device.
         # Read required variables.
         self.step(1)

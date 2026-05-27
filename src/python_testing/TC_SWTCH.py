@@ -230,7 +230,7 @@ class TC_SwitchTests(MatterBaseTest):
         actual_events = []
 
         while time_remaining > 0:
-            log.info(f"Expecting event {sequence[sequence_idx]} on endpoint {endpoint_id}")
+            log.info("Expecting event %s on endpoint %s", sequence[sequence_idx], endpoint_id)
             try:
                 item: EventReadResult = event_queue.get(block=True, timeout=time_remaining)
                 expected_event = sequence[sequence_idx]
@@ -240,7 +240,7 @@ class TC_SwitchTests(MatterBaseTest):
                     actual_events.append(event_data)
 
                     if event_data == expected_event:
-                        log.info(f"Got expected Event {sequence_idx+1}/{len(sequence)}: {event_data}")
+                        log.info("Got expected Event %s/%s: %s", sequence_idx + 1, len(sequence), event_data)
                         sequence_idx += 1
                     else:
                         asserts.assert_equal(event_data, expected_event, msg="Did not get expected event in correct sequence.")
@@ -263,8 +263,8 @@ class TC_SwitchTests(MatterBaseTest):
         elapsed = 0.0
         time_remaining = timeout_sec
 
-        log.info(f"Waiting {timeout_sec:.1f} seconds for no more events for "
-                 f"cluster {expected_cluster} on endpoint {endpoint_id}")
+        log.info("Waiting %.1f seconds for no more events for cluster %s on endpoint %s",
+                 timeout_sec, expected_cluster, endpoint_id)
         while time_remaining > 0:
             try:
                 item: EventReadResult = event_queue.get(block=True, timeout=time_remaining)
@@ -279,7 +279,7 @@ class TC_SwitchTests(MatterBaseTest):
             elapsed = time.time() - start_time
             time_remaining = timeout_sec - elapsed
 
-        log.info(f"Successfully waited for no further events on {expected_cluster} for {elapsed:.1f} seconds")
+        log.info("Successfully waited for no further events on %s for %.1f seconds", expected_cluster, elapsed)
 
     def _received_event(self, event_listener: EventSubscriptionHandler, target_event: ClusterObjects.ClusterEvent, timeout_s: int) -> bool:
         """
@@ -550,13 +550,13 @@ class TC_SwitchTests(MatterBaseTest):
         self._ask_for_long_press(endpoint_id, switch_pressed_position, feature_map)
 
         # - TH expects report of CurrentPosition 1, followed by a report of Current Position 0.
-        log.info(
-            f"Starting to wait for {post_prompt_settle_delay_seconds:.1f} seconds for CurrentPosition to go {switch_pressed_position}, then 0.")
+        log.info("Starting to wait for %.1f seconds for CurrentPosition to go %s, then 0.",
+                 post_prompt_settle_delay_seconds, switch_pressed_position)
         attrib_listener.await_sequence_of_reports(attribute=cluster.Attributes.CurrentPosition, sequence=[
                                                   switch_pressed_position, 0], timeout_sec=post_prompt_settle_delay_seconds)
 
         # - TH expects at least InitialPress with NewPosition = 1
-        log.info(f"Starting to wait for {post_prompt_settle_delay_seconds:.1f} seconds for InitialPress event.")
+        log.info("Starting to wait for %.1f seconds for InitialPress event.", post_prompt_settle_delay_seconds)
         expected_events = [cluster.Events.InitialPress(newPosition=switch_pressed_position)]
         self._await_sequence_of_events(event_queue=event_listener.event_queue, endpoint_id=endpoint_id,
                                        sequence=expected_events, timeout_sec=post_prompt_settle_delay_seconds)
@@ -566,7 +566,7 @@ class TC_SwitchTests(MatterBaseTest):
             log.info("Since MSL feature unsupported, skipping check for LongPress/LongRelease")
         else:
             # - TH expects report of LongPress, LongRelease in that order.
-            log.info(f"Starting to wait for {post_prompt_settle_delay_seconds:.1f} seconds for LongPress then LongRelease.")
+            log.info("Starting to wait for %.1f seconds for LongPress then LongRelease.", post_prompt_settle_delay_seconds)
             expected_events = []
             expected_events.append(cluster.Events.LongPress(newPosition=switch_pressed_position))
             expected_events.append(cluster.Events.LongRelease(previousPosition=switch_pressed_position))

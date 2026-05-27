@@ -98,7 +98,7 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
         self.provider_log = self.user_params.get('provider_log_path', '/tmp/provider_2_7.log')
         # On average the ota image build for the CI is 1.8 MB which takes 4-6 min to download. Adjust time if needed.
         self.ota_image_download_timeout = self.user_params.get('ota_image_download_timeout', 60*6)
-        logger.info(f"Image download timeout is set to {self.ota_image_download_timeout} seconds")
+        logger.info("Image download timeout is set to %s seconds", self.ota_image_download_timeout)
 
         if not self.provider_kvs_path.startswith('/tmp'):
             asserts.fail("Provider KVS path must be placed in the /tmp directory.")
@@ -293,7 +293,7 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
         self.verify_state_transition_event(event_report=event_report, expected_previous_state=self.ota_req.Enums.UpdateStateEnum.kQuerying,
                                            expected_new_state=self.ota_req.Enums.UpdateStateEnum.kDelayedOnQuery, expected_reason=self.ota_req.Enums.ChangeReasonEnum.kDelayByProvider)
         state_transition_event_handler.cancel()
-        logger.info(f"About close the provider app with proc {self.current_provider_app_proc}")
+        logger.info("About close the provider app with proc %s", self.current_provider_app_proc)
         self.terminate_provider()
 
         self.step(3)

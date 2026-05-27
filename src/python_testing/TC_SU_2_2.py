@@ -336,7 +336,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
             forbidden_values={kDownloading_s1, kApplying_s1},
             timeout_sec=120,
         )
-        logger.info(f'{step_number_s1}: Phase A complete — kDelayedOnQuery at {t_delayed_on_query_s1:.2f}')
+        logger.info('%s: Phase A complete — kDelayedOnQuery at %.2f', step_number_s1, t_delayed_on_query_s1)
 
         # ------------------------------------------------------------------------------------
         # [STEP_1]: Phase B — 120s guard window; kDownloading/kApplying are forbidden.
@@ -352,7 +352,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         )
 
         elapsed_s1 = time.time() - t_delayed_on_query_s1
-        logger.info(f'{step_number_s1}: Phase B complete — elapsed since kDelayedOnQuery: {elapsed_s1:.2f}s')
+        logger.info('%s: Phase B complete — elapsed since kDelayedOnQuery: %.2fs', step_number_s1, elapsed_s1)
 
         asserts.assert_true(
             elapsed_s1 >= 120,
@@ -422,7 +422,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
             forbidden_values={kDownloading_s2, kApplying_s2},
             timeout_sec=120,
         )
-        logger.info(f'{step_number_s2}: Phase A complete — kQuerying at {t_querying_s2:.2f}, 120s guard window starts')
+        logger.info('%s: Phase A complete — kQuerying at %.2f, 120s guard window starts', step_number_s2, t_querying_s2)
 
         # ------------------------------------------------------------------------------------
         # [STEP_2]: Phase B — 120s guard window; kDownloading/kApplying are forbidden.
@@ -440,7 +440,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         )
 
         elapsed_s2 = time.time() - t_querying_s2
-        logger.info(f'{step_number_s2}: Phase B complete — elapsed since kQuerying: {elapsed_s2:.2f}s')
+        logger.info('%s: Phase B complete — elapsed since kQuerying: %.2fs', step_number_s2, elapsed_s2)
 
         asserts.assert_true(
             elapsed_s2 >= min_interval_s2,
@@ -514,7 +514,8 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
             forbidden_values={kDownloading_s3, kApplying_s3},
             timeout_sec=120,
         )
-        logger.info(f'{step_number_s3}: Phase A complete — kDelayedOnQuery at {t_delayed_on_query_s3:.2f}, 180s guard window starts')
+        logger.info('%s: Phase A complete — kDelayedOnQuery at %.2f, 180s guard window starts',
+                    step_number_s3, t_delayed_on_query_s3)
 
         # ------------------------------------------------------------------------------------
         # [STEP_3]: Phase B — 180s guard window; kDownloading/kApplying are forbidden.
@@ -544,7 +545,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         )
 
         elapsed_s3 = t_downloading_s3 - t_delayed_on_query_s3
-        logger.info(f'{step_number_s3}: Phase C complete — elapsed kDelayedOnQuery → kDownloading: {elapsed_s3:.2f}s')
+        logger.info('%s: Phase C complete — elapsed kDelayedOnQuery → kDownloading: %.2fs', step_number_s3, elapsed_s3)
 
         asserts.assert_true(
             elapsed_s3 >= min_interval_s3 - tolerance_s3,
@@ -644,8 +645,8 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
             except queue.Empty:
                 # No event for 60 s — DUT may have missed AnnounceOTAProvider while busy.
                 # Re-send so the DUT queries as soon as it returns to kIdle.
-                logger.info(f"{step_number_s4}: No event in 60s, re-sending AnnounceOTAProvider "
-                            f"(elapsed: {time.time() - t_s4_start:.0f}s / {s4_timeout}s)")
+                logger.info("%s: No event in 60s, re-sending AnnounceOTAProvider (elapsed: %.0fs / %ss)",
+                            step_number_s4, time.time() - t_s4_start, s4_timeout)
                 await self.announce_ota_provider(
                     controller, provider_node_id=provider_node_id, requestor_node_id=requestor_node_id)
                 continue
@@ -662,8 +663,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
             if evt.newState in s4_forbidden_states:
                 asserts.fail(f"{step_number_s4}: DUT entered {evt.newState} — "
                              "image transfer started despite invalid BDX ImageURI!")
-            logger.info(f"{step_number_s4}: Discarding stale event: "
-                        f"{evt.previousState} → {evt.newState}")
+            logger.info("%s: Discarding stale event: %s → %s", step_number_s4, evt.previousState, evt.newState)
 
         asserts.assert_true(event1 is not None,
                             f"{step_number_s4}: Idle→Querying transition not found within {s4_timeout}s")
@@ -694,8 +694,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
             if evt2.newState in s4_forbidden_states:
                 asserts.fail(f"{step_number_s4}: DUT entered {evt2.newState} — "
                              "image transfer started despite invalid BDX ImageURI!")
-            logger.info(f"{step_number_s4}: Discarding stale event (transition 2): "
-                        f"{evt2.previousState} → {evt2.newState}")
+            logger.info("%s: Discarding stale event (transition 2): %s → %s", step_number_s4, evt2.previousState, evt2.newState)
 
         asserts.assert_true(event2 is not None,
                             f"{step_number_s4}: Querying→Idle transition not found within {s4_t2_timeout}s")
@@ -895,11 +894,11 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
                 await controller.GetConnectedDevice(
                     requestor_node_id, allowPASE=False, timeoutMs=reconnect_timeout_ms)
                 reconnected = True
-                logger.info(f'{step_number_s5}: Step #5.6 - DUT reconnected after OTA reboot (attempt {attempt + 1}).')
+                logger.info('%s: Step #5.6 - DUT reconnected after OTA reboot (attempt %s).', step_number_s5, attempt + 1)
                 break
             except (TimeoutError, ChipDeviceCtrl.ChipStackError):
-                logger.info(
-                    f'{step_number_s5}: Step #5.6 - Waiting for DUT to come back online (attempt {attempt + 1}/{reboot_timeout_sec // poll_interval_sec})...')
+                logger.info('%s: Step #5.6 - Waiting for DUT to come back online (attempt %s/%s)...',
+                            step_number_s5, attempt + 1, reboot_timeout_sec // poll_interval_sec)
 
         asserts.assert_true(
             reconnected, f'{step_number_s5}: DUT did not come back online within {reboot_timeout_sec}s after OTA reboot.')

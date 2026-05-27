@@ -25,12 +25,12 @@ class AsyncWebSocketClient:
         try:
             self.websocket = await websockets.connect(self.uri)
             self.running = True
-            LOGGER.debug(f"Connected to {self.uri}")
+            LOGGER.debug("Connected to %s", self.uri)
             self.tasks.append(asyncio.create_task(self._send_loop()))
             self.tasks.append(asyncio.create_task(self._receive_loop()))
 
         except Exception as e:
-            LOGGER.error(f"Failed to connect to {self.uri}: {e}")
+            LOGGER.error("Failed to connect to %s: %s", self.uri, e)
             raise e
 
     async def _send_loop(self):
@@ -84,4 +84,4 @@ class AsyncWebSocketClient:
         if self.websocket:
             await self.websocket.close()
             self.websocket = None
-            LOGGER.debug(f"Disconnected from {self.uri}")
+            LOGGER.debug("Disconnected from %s", self.uri)

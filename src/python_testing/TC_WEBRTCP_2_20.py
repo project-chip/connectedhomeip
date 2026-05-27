@@ -165,7 +165,7 @@ class TC_WEBRTCP_2_20(MatterBaseTest, WEBRTCPTestBase):
             Clusters.Globals.Structs.ICECandidateStruct(candidate=cand.candidate) for cand in local_candidates
         ]
 
-        log.info(f"Sending {len(local_candidates_struct_list)} ICE candidates to DUT")
+        log.info("Sending %s ICE candidates to DUT", len(local_candidates_struct_list))
 
         await self.send_single_cmd(
             cmd=Clusters.WebRTCTransportProvider.Commands.ProvideICECandidates(

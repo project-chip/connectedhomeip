@@ -77,7 +77,7 @@ class TC_CGEN_2_9(MatterBaseTest):
         fabrics.append(commissioner_fabric)
 
         for fabric in fabrics:
-            log.info(f"Removing fabric at fabricIndex {fabric.fabricIndex}")
+            log.info("Removing fabric at fabricIndex %s", fabric.fabricIndex)
             response: Clusters.OperationalCredentials.Commands.NOCResponse = await commissioner.SendCommand(
                 nodeId=self.dut_node_id,
                 endpoint=ROOT_ENDPOINT_ID,

@@ -523,7 +523,7 @@ After {maxDuration}, keep generating some motion activity during the {blindDurat
             (z for z in zones if z.zoneSource == enums.ZoneSourceEnum.kMfg), None)
         if matchingZone is not None:
             self.step("9")
-            log.info(f"Found Mfg Zone with Id : {matchingZone.zoneID}")
+            log.info("Found Mfg Zone with Id : %s", matchingZone.zoneID)
 
             try:
                 await self.send_single_cmd(endpoint=endpoint, cmd=commands.RemoveZone(zoneID=matchingZone.zoneID))
@@ -567,7 +567,7 @@ After {maxDuration}, keep generating some motion activity during the {blindDurat
         # Clean up all zones
         for zone in zones:
             try:
-                log.info(f"Removing zone with Id : {zone.zoneID}")
+                log.info("Removing zone with Id : %s", zone.zoneID)
                 await self.send_single_cmd(endpoint=endpoint, cmd=commands.RemoveZone(zoneID=zone.zoneID))
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.Success, "Unexpected error returned when trying to remove zone")

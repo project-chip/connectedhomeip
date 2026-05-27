@@ -244,8 +244,7 @@ class TC_LAUNDRYDRYER(MatterBaseTest):
                         endpoint=self._LAUNDRYDRYER_ENDPOINT)
                     asserts.assert_equal(await self._read_laundry_washer_current_mode(), mode_option.mode, f"Mode should be {mode_option.label}")
                     updated_supported_dryness = await self._read_supported_dryness_levels()
-                    logger.info(
-                        f"Mode {mode_option.label} supports dryness levels: {updated_supported_dryness}")
+                    logger.info("Mode %s supports dryness levels: %s", mode_option.label, updated_supported_dryness)
 
         # Step 9: Dead Front (Off State) Behavior
         self.step(9)

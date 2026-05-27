@@ -190,7 +190,7 @@ class TC_PAVST_2_11(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
                         cmd=pvcluster.Commands.DeallocatePushTransport(connectionID=cfg.ConnectionID),
                         endpoint=endpoint)
                 except InteractionModelError as e:
-                    log.warning(f"Failed to deallocate connection {cfg.ConnectionID} during cleanup: {e}")
+                    log.warning("Failed to deallocate connection %s during cleanup: %s", cfg.ConnectionID, e)
 
         # Step 2: Read supported formats
         self.step(2)

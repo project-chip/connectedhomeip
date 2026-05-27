@@ -265,7 +265,7 @@ async def commission_devices(
     """
     commissioned = []
     for node_id, setup_payload in zip(dut_node_ids, setup_payloads):
-        LOGGER.info(f"Commissioning method: {commissioning_info.commissioning_method}")
+        LOGGER.info("Commissioning method: %s", commissioning_info.commissioning_method)
         commissioned.append(await commission_device(dev_ctrl, node_id, setup_payload, commissioning_info))
 
     return all(commissioned)
@@ -433,10 +433,10 @@ async def _is_device_operational_via_dnssd(
         # Check if our expected instance is in the discovered services
         for service in services:
             if service.instance_name == expected_instance_name:
-                LOGGER.info(f"Device {node_id} found operational on fabric {compressed_fabric_id:016X} via DNS-SD")
+                LOGGER.info("Device %s found operational on fabric %016X via DNS-SD", node_id, compressed_fabric_id)
                 return True
 
-        LOGGER.info(f"Device {node_id} not found operational on fabric {compressed_fabric_id:016X} via DNS-SD")
+        LOGGER.info("Device %s not found operational on fabric %016X via DNS-SD", node_id, compressed_fabric_id)
         return False
 
     except (OSError, ValueError, RuntimeError, TypeError, ChipStackError) as e:
@@ -472,7 +472,7 @@ async def _is_device_commissionable_via_dnssd(
         )
 
         if services:
-            LOGGER.info(f"Found {len(services)} commissionable device(s) via DNS-SD")
+            LOGGER.info("Found %s commissionable device(s) via DNS-SD", len(services))
             return True
 
         LOGGER.info("No commissionable devices found via DNS-SD")
@@ -542,17 +542,17 @@ async def _establish_pase_or_case_session(
     try:
         # This will raise if the task failed
         completed_task.result()
-        LOGGER.info(f"Successfully established {completed_name.upper()} session to node {node_id}")
+        LOGGER.info("Successfully established %s session to node %s", completed_name.upper(), node_id)
     except (ChipStackError, RuntimeError, OSError) as e:
         # First task failed, wait for the other if there is one
         if pending:
-            LOGGER.info(f"{completed_name.upper()} failed ({e}), waiting for other connection attempt")
+            LOGGER.info("%s failed (%s), waiting for other connection attempt", completed_name.upper(), e)
             done2, pending2 = await asyncio.wait(pending, return_when=asyncio.FIRST_COMPLETED)
             completed_task2 = done2.pop()
             completed_name2 = completed_task2.get_name()
             try:
                 completed_task2.result()
-                LOGGER.info(f"Successfully established {completed_name2.upper()} session to node {node_id}")
+                LOGGER.info("Successfully established %s session to node %s", completed_name2.upper(), node_id)
                 # Cancel any remaining
                 for task in pending2:
                     task.cancel()

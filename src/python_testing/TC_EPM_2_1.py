@@ -137,8 +137,8 @@ class TC_EPM_2_1(MatterBaseTest, EnergyReportingBaseTestHelper):
         log.info("Checking Accuracy meets spec requirements")
         found_active_power = False
         for measurement in accuracy:
-            log.info(
-                f"measurementType:{measurement.measurementType} measured:{measurement.measured} minMeasuredValue:{measurement.minMeasuredValue} maxMeasuredValue:{measurement.maxMeasuredValue}")
+            log.info("measurementType:%s measured:%s minMeasuredValue:%s maxMeasuredValue:%s",
+                     measurement.measurementType, measurement.measured, measurement.minMeasuredValue, measurement.maxMeasuredValue)
 
             # Scan all measurement types to check we have the mandatory kActivePower
             if (measurement.measurementType == Clusters.ElectricalPowerMeasurement.Enums.MeasurementTypeEnum.kActivePower):
@@ -149,7 +149,10 @@ class TC_EPM_2_1(MatterBaseTest, EnergyReportingBaseTestHelper):
                                  "minMeasuredValue must be the same as 1st accuracyRange rangeMin")
 
             for index, range_entry in enumerate(measurement.accuracyRanges):
-                log.info(f"   [{index}] rangeMin:{range_entry.rangeMin} rangeMax:{range_entry.rangeMax} percentMax:{range_entry.percentMax} percentMin:{range_entry.percentMin} percentTypical:{range_entry.percentTypical} fixedMax:{range_entry.fixedMax} fixedMin:{range_entry.fixedMin} fixedTypical:{range_entry.fixedTypical}")
+                log.info("   [%s] rangeMin:%s rangeMax:%s percentMax:%s percentMin:%s percentTypical:%s fixedMax:%s fixedMin:%s "
+                         "fixedTypical:%s",
+                         index, range_entry.rangeMin, range_entry.rangeMax, range_entry.percentMax, range_entry.percentMin,
+                         range_entry.percentTypical, range_entry.fixedMax, range_entry.fixedMin, range_entry.fixedTypical)
                 asserts.assert_greater(
                     range_entry.rangeMax, range_entry.rangeMin, "rangeMax should be > rangeMin")
                 if index == 0:
@@ -245,8 +248,7 @@ class TC_EPM_2_1(MatterBaseTest, EnergyReportingBaseTestHelper):
             log.info("Rx'd HarmonicCurrents: %s", harmonic_currents)
             asserts.assert_is(type(harmonic_currents), list)
             for index, entry in enumerate(harmonic_currents):
-                log.info(
-                    f"   [{index}] order:{entry.order} measurement:{entry.measurement}")
+                log.info("   [%s] order:%s measurement:%s", index, entry.order, entry.measurement)
                 asserts.assert_greater_equal(entry.order, 1)
                 self.check_value_in_range(
                     "Measurement", entry.measurement, MIN_INT64_ALLOWED, MAX_INT64_ALLOWED)
@@ -257,8 +259,7 @@ class TC_EPM_2_1(MatterBaseTest, EnergyReportingBaseTestHelper):
             log.info("Rx'd HarmonicPhases: %s", harmonic_phases)
             asserts.assert_is(type(harmonic_phases), list)
             for index, entry in enumerate(harmonic_phases):
-                log.info(
-                    f"   [{index}] order:{entry.order} measurement:{entry.measurement}")
+                log.info("   [%s] order:%s measurement:%s", index, entry.order, entry.measurement)
                 asserts.assert_greater_equal(entry.order, 1)
                 self.check_value_in_range(
                     "Measurement", entry.measurement, MIN_INT64_ALLOWED, MAX_INT64_ALLOWED)

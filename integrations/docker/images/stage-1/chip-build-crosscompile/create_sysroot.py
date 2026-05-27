@@ -104,7 +104,7 @@ def extract_debs(full_dir, sysroot_dir):
         abs_sysroot_dir = os.path.abspath(sysroot_dir)
 
         for deb in tqdm(extracted_debs, desc="Extracting packages"):
-            logger.debug(f"Extracting {os.path.basename(deb)} ...")
+            logger.debug("Extracting %s ...", os.path.basename(deb))
             with tempfile.TemporaryDirectory() as tmp_extract_dir:
                 subprocess.run(
                     ["ar", "x", os.path.abspath(deb)],
@@ -140,9 +140,7 @@ def extract_debs(full_dir, sysroot_dir):
                         check=True,
                     )
                 else:
-                    logger.warning(
-                        f"No data.tar.* found in {os.path.basename(deb)}"
-                    )
+                    logger.warning("No data.tar.* found in %s", os.path.basename(deb))
 
 
 def ensure_lib_symlink(sysroot_dir):

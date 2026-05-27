@@ -126,7 +126,7 @@ class TC_WHM_2_1(MatterBaseTest):
         self.step(4)
 
         ret = await self.send_change_to_mode_cmd(newMode=old_current_mode)
-        log.info(f"ret.status {ret.status}")
+        log.info("ret.status %s", ret.status)
         asserts.assert_equal(ret.status, Status.Success,
                              "Changing the mode to the current mode should be a no-op")
 

@@ -118,8 +118,8 @@ class TC_OCC_3_2(MatterBaseTest):
         has_feature_ultrasonic = (feature_map & cluster.Bitmaps.Feature.kUltrasonic) != 0
         has_feature_contact = (feature_map & cluster.Bitmaps.Feature.kPhysicalContact) != 0
 
-        log.info(
-            f"Feature map: 0x{feature_map:x}. PIR: {has_feature_pir}, US:{has_feature_ultrasonic}, PHY:{has_feature_contact}")
+        log.info("Feature map: 0x%x. PIR: %s, US:%s, PHY:%s",
+                 feature_map, has_feature_pir, has_feature_ultrasonic, has_feature_contact)
 
         attribute_list = await self.read_occ_attribute_expect_success(attribute=attributes.AttributeList)
         has_pir_timing_attrib = attributes.PIROccupiedToUnoccupiedDelay.attribute_id in attribute_list

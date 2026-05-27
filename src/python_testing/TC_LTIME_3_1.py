@@ -99,7 +99,7 @@ class TC_LTIME_3_1(MatterBaseTest):
 
         self.step(1)
         hour_format = await self.read_single_attribute_check_success(self.cluster, self.cluster.Attributes.HourFormat)
-        log.info(f"HourFormat {type(hour_format)} with value {hour_format}")
+        log.info("HourFormat %s with value %s", type(hour_format), hour_format)
         # Validate Enum8
         matter_asserts.assert_valid_uint8(hour_format, description="HourFormat")
         asserts.assert_is_instance(hour_format, self.cluster.Enums.HourFormatEnum, "HourFormat is not type of HourFormatEnum")

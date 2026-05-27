@@ -172,8 +172,8 @@ class TC_WEBRTCP_2_17(MatterBaseTest, WEBRTCPTestBase):
         asserts.assert_true("m=video" in answer_sdp, "SDP answer missing media description line (m=video)")
         asserts.assert_true("m=audio" in answer_sdp, "SDP answer missing media description line (m=audio)")
 
-        log.info(f"SDP answer validated successfully. Answer length: {len(answer_sdp)} bytes")
-        log.info(f"SDP answer preview: {answer_sdp[:400]}...")
+        log.info("SDP answer validated successfully. Answer length: %s bytes", len(answer_sdp))
+        log.info("SDP answer preview: %s...", answer_sdp[:400])
 
         self.step(5)
         # Send EndSession command to terminate the WebRTC session

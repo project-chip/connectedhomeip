@@ -271,7 +271,7 @@ class TC_JFDS_2_3(MatterBaseTest):
 
         # Look for entries matching Admin CAT and Anchor CAT
         for entry in groupList:
-            log.info(f"GroupList entry: GroupID={entry.groupID}, CAT={entry.groupCAT}")
+            log.info("GroupList entry: GroupID=%s, CAT=%s", entry.groupID, entry.groupCAT)
 
             # Check if this entry's CAT matches our controller's CAT tags
             # Admin CAT should be present (commissioned with --anchor true)

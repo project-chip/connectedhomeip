@@ -332,7 +332,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             dump_string: The data to be logged
         """
         lines = dump_string.splitlines()
-        LOGGER.info(f'{start_tag}BEGIN ({len(lines)} lines)====')
+        LOGGER.info('%sBEGIN (%s lines)====', start_tag, len(lines))
         for line in lines:
             LOGGER.info('%s%s', start_tag, line)
         LOGGER.info('%sEND ====', start_tag)
@@ -1451,7 +1451,7 @@ class MatterBaseTest(base_test.BaseTestClass):
                                          default_value=default_value)
 
         LOGGER.info("========= USER PROMPT for Endpoint %s =========", endpoint_id)
-        LOGGER.info(f">>> {prompt_msg.rstrip()} (press enter to confirm)")
+        LOGGER.info(">>> %s (press enter to confirm)", prompt_msg.rstrip())
         try:
             return input()
         except EOFError:
@@ -1591,9 +1591,9 @@ class MatterBaseTest(base_test.BaseTestClass):
                     if controller.isActive:
                         try:
                             controller.ExpireSessions(self.dut_node_id)
-                            LOGGER.info(f"Expired sessions on controller with nodeId {controller.nodeId}")
+                            LOGGER.info("Expired sessions on controller with nodeId %s", controller.nodeId)
                         except ChipStackError as e:  # chipstack-ok
-                            LOGGER.warning(f"Failed to expire sessions on controller {controller.nodeId}: {e}")
+                            LOGGER.warning("Failed to expire sessions on controller %s: %s", controller.nodeId, e)
 
     async def request_device_reboot(self):
         """Request a reboot of the Device Under Test (DUT).

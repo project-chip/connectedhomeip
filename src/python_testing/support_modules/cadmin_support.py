@@ -164,7 +164,7 @@ class CADMINBaseTest(MatterBaseTest):
 
         log.info("%s=== COMMISSIONING WINDOW TIMING RESULTS ===", step_prefix)
         log.info("%sWindow closed: ✅ YES", step_prefix)
-        log.info(f"{step_prefix}Timing valid: {'✅ YES' if results.timing_valid else '❌ NO'}")
+        log.info("%sTiming valid: %s", step_prefix, '✅ YES' if results.timing_valid else '❌ NO')
 
         if results.actual_duration_seconds is not None:
             actual = results.actual_duration_seconds
@@ -174,23 +174,23 @@ class CADMINBaseTest(MatterBaseTest):
 
             log.info("%s⏱️  TIMING BREAKDOWN:", step_prefix)
             log.info("%s   Expected duration: %ss", step_prefix, expected)
-            log.info(f"{step_prefix}   Actual duration: {actual:.2f}s")
+            log.info("%s   Actual duration: %.2fs", step_prefix, actual)
             log.info("%s   Clock skew applied: %sms", step_prefix, skew_ms)
-            log.info(f"{step_prefix}   Maximum allowed: {max_allowed:.2f}s")
+            log.info("%s   Maximum allowed: %.2fs", step_prefix, max_allowed)
 
             if actual <= expected:
                 early_by = expected - actual
-                log.info(f"{step_prefix}   ✅ Window closed EARLY by {early_by:.2f}s")
+                log.info("%s   ✅ Window closed EARLY by %.2fs", step_prefix, early_by)
             elif actual <= max_allowed:
                 late_by = actual - expected
-                log.info(f"{step_prefix}   ⚠️  Window closed LATE but within tolerance by {late_by:.2f}s")
+                log.info("%s   ⚠️  Window closed LATE but within tolerance by %.2fs", step_prefix, late_by)
             else:
                 over_by = actual - max_allowed
-                log.error(f"{step_prefix}   ❌ Window closed TOO LATE by {over_by:.2f}s")
+                log.error("%s   ❌ Window closed TOO LATE by %.2fs", step_prefix, over_by)
 
-            log.info(f"{step_prefix}   Start time: {results.start_time}")
-            log.info(f"{step_prefix}   End time: {results.end_time}")
-            log.info(f"{step_prefix}   Total monitoring time: {actual:.2f}s")
+            log.info("%s   Start time: %s", step_prefix, results.start_time)
+            log.info("%s   End time: %s", step_prefix, results.end_time)
+            log.info("%s   Total monitoring time: %.2fs", step_prefix, actual)
 
         log.info("%s=== END TIMING RESULTS ===", step_prefix)
 
@@ -226,10 +226,10 @@ class CADMINBaseTest(MatterBaseTest):
         log.info("Monitoring commissioning window closure for node %s", node_id)
         log.info("Expected duration: %ss", expected_duration_seconds)
         log.info("Clock skew factor: %sms", clock_skew_ms)
-        log.info(f"Maximum allowed duration: {max_allowed_duration:.2f}s")
+        log.info("Maximum allowed duration: %.2fs", max_allowed_duration)
         log.info("Monitoring started at: %s", start_time)
-        log.info(f"Expected closure by: {start_time + timedelta(seconds=expected_duration_seconds)}")
-        log.info(f"Latest acceptable closure: {start_time + timedelta(seconds=max_allowed_duration)}")
+        log.info("Expected closure by: %s", start_time + timedelta(seconds=expected_duration_seconds))
+        log.info("Latest acceptable closure: %s", start_time + timedelta(seconds=max_allowed_duration))
 
         try:
             # Wait for window to close (status = 0) - will assert on timeout
@@ -426,7 +426,7 @@ class CADMINBaseTest(MatterBaseTest):
                     return parsed_service.service  # Return the original service object
 
             # Log what we found for debugging purposes
-            log.info(f"Found {len(services)} services, but none match CM={expected_cm_value}, D={expected_discriminator}")
+            log.info("Found %s services, but none match CM=%s, D=%s", len(services), expected_cm_value, expected_discriminator)
             for service in services:
                 log.info("  %s", service)
             else:
@@ -434,8 +434,8 @@ class CADMINBaseTest(MatterBaseTest):
 
             # Not on last attempt, wait and retry
             if attempt < max_attempts - 1:
-                log.info(f"Waiting for service with CM={expected_cm_value} and D={expected_discriminator}, "
-                         f"attempt {attempt+1}/{max_attempts}")
+                log.info("Waiting for service with CM=%s and D=%s, attempt %s/%s",
+                         expected_cm_value, expected_discriminator, attempt + 1, max_attempts)
                 await asyncio.sleep(delay_sec)
             else:
                 # Final retry attempt failed

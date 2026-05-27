@@ -495,7 +495,7 @@ class TC_ZONEMGMT_2_2(MatterBaseTest):
         log.info("Rx'd Zones: %s", zones)
         for zone in zones:
             try:
-                log.info(f"Removing zone with Id : {zone.zoneID}")
+                log.info("Removing zone with Id : %s", zone.zoneID)
                 await self.send_single_cmd(endpoint=endpoint, cmd=commands.RemoveZone(zoneID=zone.zoneID))
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.Success, "Unexpected error returned when trying to remove zone")

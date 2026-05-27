@@ -90,8 +90,7 @@ class TC_CGEN_2_2(MatterBaseTest):
         log.info('Waiting for %s seconds.', expiration_time_seconds)
         await asyncio.sleep(expiration_time_seconds)
         elapsed_time = time.time() - start_time
-        log.info(
-            f'Failsafe timer expired after: {elapsed_time:.2f} seconds.')
+        log.info('Failsafe timer expired after: %.2f seconds.', elapsed_time)
 
         return resp
 
@@ -129,9 +128,9 @@ class TC_CGEN_2_2(MatterBaseTest):
         asserts.assert_true(debug_text == '' or len(debug_text) <= 512,
                             "debugText must be empty or have a maximum length of 512 characters.")
         if is_first_run:
-            log.info(f'Step #3: ArmFailSafeResponse with ErrorCode as OK({resp.errorCode})')
+            log.info('Step #3: ArmFailSafeResponse with ErrorCode as OK(%s)', resp.errorCode)
         else:
-            log.info(f'Step #10 - Repeated Step #3: ArmFailSafeResponse with ErrorCode as OK({resp.errorCode})')
+            log.info('Step #10 - Repeated Step #3: ArmFailSafeResponse with ErrorCode as OK(%s)', resp.errorCode)
 
         if is_first_run:
             self.step(4)
@@ -395,7 +394,7 @@ class TC_CGEN_2_2(MatterBaseTest):
         debug_text = resp.debugText
         asserts.assert_true(debug_text == '' or len(debug_text) <= 512,
                             "debugText must be empty or have a maximum length of 512 characters.")
-        log.info(f'Step #11: ArmFailSafeResponse with ErrorCode as OK({resp.errorCode})')
+        log.info('Step #11: ArmFailSafeResponse with ErrorCode as OK(%s)', resp.errorCode)
 
         self.step(12)
         # Repeat TH1 steps #8 through #9 using the function run_steps_8_to_9
@@ -406,7 +405,7 @@ class TC_CGEN_2_2(MatterBaseTest):
         setup_pin_code = params.commissioningParameters.setupPinCode
         longDiscriminator = params.randomDiscriminator
         setup_qr_code = params.commissioningParameters.setupQRCode
-        log.info(f'Step #13: Open Commissioning Window params with vars: {vars(params)}')
+        log.info('Step #13: Open Commissioning Window params with vars: %s', vars(params))
 
         self.step(14)
         cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=failsafe_expiration_seconds)
@@ -417,7 +416,7 @@ class TC_CGEN_2_2(MatterBaseTest):
         # Verify that the DUT responds with ArmFailSafeResponse with ErrorCode as 'BusyWithOtherAdmin'(4)
         asserts.assert_equal(resp.errorCode, Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kBusyWithOtherAdmin,
                              "Failure status returned from arm failsafe")
-        log.info(f'Step #14: ArmFailSafeResponse with ErrorCode as BusyWithOtherAdmin ({resp.errorCode})')
+        log.info('Step #14: ArmFailSafeResponse with ErrorCode as BusyWithOtherAdmin (%s)', resp.errorCode)
 
         self.step(15)
         # Create TH2
@@ -450,7 +449,7 @@ class TC_CGEN_2_2(MatterBaseTest):
         debug_text = resp.debugText
         asserts.assert_true(debug_text == '' or len(debug_text) <= 512,
                             "debugText must be empty or have a maximum length of 512 characters.")
-        log.info(f'Step #17 - ArmFailSafeResponse with ErrorCode as OK({resp.errorCode})')
+        log.info('Step #17 - ArmFailSafeResponse with ErrorCode as OK(%s)', resp.errorCode)
 
         self.step(18)
         nocs = await self.read_single_attribute_check_success(
@@ -510,7 +509,7 @@ class TC_CGEN_2_2(MatterBaseTest):
                 cmd=cmd)
         except ChipStackException as e:
             # Expected behavior and proceeding to next step.
-            log.info(f"Step #22 - ArmFailSafe command failed as expected: {str(e)}. Proceeding to next step.")
+            log.info("Step #22 - ArmFailSafe command failed as expected: %s. Proceeding to next step.", e)
             pass
         else:
             # If no exception is raised, log that the device response before closing the connection is acceptable.
@@ -568,7 +567,7 @@ class TC_CGEN_2_2(MatterBaseTest):
         except InteractionModelError as e:
             asserts.assert_in('FailsafeRequired (0xca)',
                               str(e), f'Expected FailsafeRequired error, but got {str(e)}')
-            log.info(f'Step #27 - Expected error occurred: {str(e)}. Proceeding to next step.')
+            log.info('Step #27 - Expected error occurred: %s. Proceeding to next step.', e)
         else:
             asserts.assert_true(False, 'Expected InteractionModelError with FailsafeRequired, but no exception occurred.')
 
@@ -597,7 +596,7 @@ class TC_CGEN_2_2(MatterBaseTest):
         debug_text = resp.debugText
         asserts.assert_true(debug_text == '' or len(debug_text) <= 512,
                             "debugText must be empty or have a maximum length of 512 characters.")
-        log.info(f'Step #29: ArmFailSafeResponse with ErrorCode as OK({resp.errorCode})')
+        log.info('Step #29: ArmFailSafeResponse with ErrorCode as OK(%s)', resp.errorCode)
 
         self.step(30)
         # Re-use TrustedRootCertificate created in step #5 - Send command to add new trusted root certificate
@@ -630,7 +629,7 @@ class TC_CGEN_2_2(MatterBaseTest):
         # Verify that DebugText is empty or has a maximum length of 512 characters
         debug_text = resp.debugText
         assert debug_text == '' or len(debug_text) <= 512, "debugText must be empty or have a maximum length of 512 characters"
-        log.info(f'Step #32: ArmFailSafeResponse with ErrorCode as OK({resp.errorCode})')
+        log.info('Step #32: ArmFailSafeResponse with ErrorCode as OK(%s)', resp.errorCode)
 
         self.step(33)
         # Set the failsafe expiration timeout to 1s, must be less than maxFailsafe (max_fail_safe).
@@ -661,7 +660,7 @@ class TC_CGEN_2_2(MatterBaseTest):
             node_id=newNodeId+1,
             cmd=cmd)
         # Verify that the DUT responds with ArmFailSafeResponse with ErrorCode as 'BusyWithOtherAdmin'(4)
-        log.info(f'Step #35 - TH2 ArmFailSafeResponse with ErrorCode as BusyWithOtherAdmin ({resp.errorCode})')
+        log.info('Step #35 - TH2 ArmFailSafeResponse with ErrorCode as BusyWithOtherAdmin (%s)', resp.errorCode)
         asserts.assert_equal(resp.errorCode, Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kBusyWithOtherAdmin,
                              "Failure status returned from arm failsafe")
 
@@ -674,7 +673,7 @@ class TC_CGEN_2_2(MatterBaseTest):
         # Verify that the DUT responds with ArmFailSafeResponse with ErrorCode as 'OK'(0)
         asserts.assert_equal(resp.errorCode, Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kOk,
                              "Failure status returned from arm failsafe")
-        log.info(f'Step #36: ArmFailSafeResponse with ErrorCode as OK({resp.errorCode})')
+        log.info('Step #36: ArmFailSafeResponse with ErrorCode as OK(%s)', resp.errorCode)
 
         self.step(37)
         cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=maxFailsafe)
@@ -685,7 +684,7 @@ class TC_CGEN_2_2(MatterBaseTest):
         # Verify that the DUT responds with ArmFailSafeResponse with ErrorCode as 'OK'(0)
         asserts.assert_equal(resp.errorCode, Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kOk,
                              "Failure status returned from arm failsafe")
-        log.info(f'Step #37: ArmFailSafeResponse with ErrorCode as OK({resp.errorCode})')
+        log.info('Step #37: ArmFailSafeResponse with ErrorCode as OK(%s)', resp.errorCode)
 
         self.step(38)
         if self.is_pics_sdk_ci_only:
@@ -734,10 +733,9 @@ class TC_CGEN_2_2(MatterBaseTest):
 
             # Verify that at least half of the maxFailsafe time has passed, allowing TH1 to proceed.
             log.info(
-                f'Step #41: {run_type} - - MaxFailsafe is {maxFailsafe}. '
-                f'TH1 can proceed. Elapsed time: {elapsed_time:.2f} ms.'
-                f'The target time ({target_time} seconds) has passed. '
-                f'Confirmation that ArmFailSafe has not expired yet.'
+                'Step #41: %s - - MaxFailsafe is %s. TH1 can proceed. Elapsed time: %.2f ms.'
+                'The target time (%s seconds) has passed. Confirmation that ArmFailSafe has not expired yet.',
+                run_type, maxFailsafe, elapsed_time, target_time
             )
 
         self.step(42)
@@ -749,7 +747,7 @@ class TC_CGEN_2_2(MatterBaseTest):
         # Verify that the DUT responds with ArmFailSafeResponse with ErrorCode as 'OK'(0)
         asserts.assert_equal(resp.errorCode, Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kOk,
                              "Failure status returned from arm failsafe")
-        log.info(f'Step #42: ArmFailSafeResponse with ErrorCode as OK({resp.errorCode})')
+        log.info('Step #42: ArmFailSafeResponse with ErrorCode as OK(%s)', resp.errorCode)
 
         self.step(43)
         if self.is_pics_sdk_ci_only:
@@ -779,10 +777,9 @@ class TC_CGEN_2_2(MatterBaseTest):
             # Checks if the elapsed time from start_time has met or exceeded maxFailsafe
             # TH1 process can proceed
             log.info(
-                f'Step #43: {run_type} - MaxFailsafe is {maxFailsafe}. '
-                f'TH1 can proceed. Elapsed time: {elapsed_time:.2f} ms. '
-                f'The target time ({maxFailsafe} seconds) has passed '
-                f'Confirmation that ArmFailSafe has not expired yet.'
+                'Step #43: %s - MaxFailsafe is %s. TH1 can proceed. Elapsed time: %.2f ms. '
+                'The target time (%s seconds) has passed Confirmation that ArmFailSafe has not expired yet.',
+                run_type, maxFailsafe, elapsed_time, maxFailsafe
             )
 
         self.step(44)

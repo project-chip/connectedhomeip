@@ -104,7 +104,7 @@ def main(otaimages: str, otaimagesversions: int):
 
     for it in passes:
         if it[2] != 0:
-            log.error(f"Image version missmatched for ota image: {it[0]} expected: {it[1]}")
+            log.error("Image version missmatched for ota image: %s expected: %s", it[0], it[1])
             main_status = 1
 
     sys.exit(main_status)

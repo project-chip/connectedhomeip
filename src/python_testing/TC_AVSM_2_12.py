@@ -194,7 +194,7 @@ class TC_AVSM_2_12(MatterBaseTest):
             result = await self.write_single_attribute(attr.HDRModeEnabled(not hdrEnabled),
                                                        endpoint_id=endpoint)
             asserts.assert_equal(result, Status.Success, "Error when trying to write HDRModeEnabled")
-            log.info(f"Tx'd HDRModeEnabled: {not hdrEnabled}")
+            log.info("Tx'd HDRModeEnabled: %s", not hdrEnabled)
 
             self.step(4)
             hdrEnabledNew = await self.read_single_attribute_check_success(
@@ -219,7 +219,7 @@ class TC_AVSM_2_12(MatterBaseTest):
             result = await self.write_single_attribute(attr.SoftRecordingPrivacyModeEnabled(not softRecordingPrivMode),
                                                        endpoint_id=endpoint)
             asserts.assert_equal(result, Status.Success, "Error when trying to write SoftRecordingPrivacyModeEnabled")
-            log.info(f"Tx'd SoftRecordingPrivacyModeEnabled: {not softRecordingPrivMode}")
+            log.info("Tx'd SoftRecordingPrivacyModeEnabled: %s", not softRecordingPrivMode)
 
             self.step(7)
             softRecordingPrivModeNew = await self.read_single_attribute_check_success(
@@ -239,7 +239,7 @@ class TC_AVSM_2_12(MatterBaseTest):
             result = await self.write_single_attribute(attr.SoftLivestreamPrivacyModeEnabled(not softLivestreamPrivMode),
                                                        endpoint_id=endpoint)
             asserts.assert_equal(result, Status.Success, "Error when trying to write SoftLivestreamPrivacyModeEnabled")
-            log.info(f"Tx'd SoftLivestreamPrivacyModeEnabled: {not softLivestreamPrivMode}")
+            log.info("Tx'd SoftLivestreamPrivacyModeEnabled: %s", not softLivestreamPrivMode)
 
             self.step(10)
             softLivestreamPrivModeNew = await self.read_single_attribute_check_success(
@@ -345,7 +345,7 @@ class TC_AVSM_2_12(MatterBaseTest):
             result = await self.write_single_attribute(attr.SpeakerMuted(not speakerMuted),
                                                        endpoint_id=endpoint)
             asserts.assert_equal(result, Status.Success, "Error when trying to write SpeakerMuted")
-            log.info(f"Tx'd SpeakerMuted: {not speakerMuted}")
+            log.info("Tx'd SpeakerMuted: %s", not speakerMuted)
 
             self.step(22)
             speakerMutedNew = await self.read_single_attribute_check_success(
@@ -410,7 +410,7 @@ class TC_AVSM_2_12(MatterBaseTest):
             result = await self.write_single_attribute(attr.MicrophoneMuted(not micMuted),
                                                        endpoint_id=endpoint)
             asserts.assert_equal(result, Status.Success, "Error when trying to write MicrophoneMuted")
-            log.info(f"Tx'd MicrophoneMuted: {not micMuted}")
+            log.info("Tx'd MicrophoneMuted: %s", not micMuted)
 
             self.step(28)
             micMutedNew = await self.read_single_attribute_check_success(
@@ -468,7 +468,7 @@ class TC_AVSM_2_12(MatterBaseTest):
                 result = await self.write_single_attribute(attr.MicrophoneAGCEnabled(not micAGCEnabled),
                                                            endpoint_id=endpoint)
                 asserts.assert_equal(result, Status.Success, "Error when trying to write MicrophoneAGCEnabled")
-                log.info(f"Tx'd MicrophoneAGCEnabled: {not micAGCEnabled}")
+                log.info("Tx'd MicrophoneAGCEnabled: %s", not micAGCEnabled)
 
                 self.step(34)
                 micAGCEnabledNew = await self.read_single_attribute_check_success(
@@ -531,7 +531,7 @@ class TC_AVSM_2_12(MatterBaseTest):
                 result = await self.write_single_attribute(attr.ImageFlipHorizontal(not imageFlipHorizontal),
                                                            endpoint_id=endpoint)
                 asserts.assert_equal(result, Status.Success, "Error when trying to write ImageFlipHorizontal")
-                log.info(f"Tx'd ImageFlipHorizontal: {not imageFlipHorizontal}")
+                log.info("Tx'd ImageFlipHorizontal: %s", not imageFlipHorizontal)
 
                 self.step(40)
                 imageFlipHorizontalNew = await self.read_single_attribute_check_success(
@@ -554,7 +554,7 @@ class TC_AVSM_2_12(MatterBaseTest):
                 result = await self.write_single_attribute(attr.ImageFlipVertical(not imageFlipVertical),
                                                            endpoint_id=endpoint)
                 asserts.assert_equal(result, Status.Success, "Error when trying to write ImageFlipVertical")
-                log.info(f"Tx'd ImageFlipVertical: {not imageFlipVertical}")
+                log.info("Tx'd ImageFlipVertical: %s", not imageFlipVertical)
 
                 self.step(43)
                 imageFlipVerticalNew = await self.read_single_attribute_check_success(
@@ -588,7 +588,7 @@ class TC_AVSM_2_12(MatterBaseTest):
             result = await self.write_single_attribute(attr.LocalVideoRecordingEnabled(not localVideoRecordingEnabled),
                                                        endpoint_id=endpoint)
             asserts.assert_equal(result, Status.Success, "Error when trying to write LocalVideoRecordingEnabled")
-            log.info(f"Tx'd LocalVideoRecordingEnabled: {not localVideoRecordingEnabled}")
+            log.info("Tx'd LocalVideoRecordingEnabled: %s", not localVideoRecordingEnabled)
 
             self.step(46)
             localVideoRecordingEnabledNew = await self.read_single_attribute_check_success(
@@ -613,7 +613,7 @@ class TC_AVSM_2_12(MatterBaseTest):
             result = await self.write_single_attribute(attr.LocalSnapshotRecordingEnabled(not localSnapshotRecordingEnabled),
                                                        endpoint_id=endpoint)
             asserts.assert_equal(result, Status.Success, "Error when trying to write LocalSnapshotRecordingEnabled")
-            log.info(f"Tx'd LocalSnapshotRecordingEnabled: {not localSnapshotRecordingEnabled}")
+            log.info("Tx'd LocalSnapshotRecordingEnabled: %s", not localSnapshotRecordingEnabled)
 
             self.step(49)
             localSnapshotRecordingEnabledNew = await self.read_single_attribute_check_success(
@@ -637,7 +637,7 @@ class TC_AVSM_2_12(MatterBaseTest):
             result = await self.write_single_attribute(attr.StatusLightEnabled(not statusLightEnabled),
                                                        endpoint_id=endpoint)
             asserts.assert_equal(result, Status.Success, "Error when trying to write StatusLightEnabled")
-            log.info(f"Tx'd StatusLightEnabled: {not statusLightEnabled}")
+            log.info("Tx'd StatusLightEnabled: %s", not statusLightEnabled)
 
             self.step(52)
             statusLightEnabledNew = await self.read_single_attribute_check_success(

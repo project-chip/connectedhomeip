@@ -262,7 +262,7 @@ class BasicCompositionTests(MatterBaseTest):
     def build_spec_xmls(self):
         dm = self._get_dm()
         LOGGER.info("----------------------------------------------------------------------------------")
-        LOGGER.info(f"-- Running tests against Specification version {dm.dirname}")
+        LOGGER.info("-- Running tests against Specification version %s", dm.dirname)
         LOGGER.info("----------------------------------------------------------------------------------")
         self.xml_clusters, self.problems = build_xml_clusters(dm)
         self.xml_device_types, problems = build_xml_device_types(dm)

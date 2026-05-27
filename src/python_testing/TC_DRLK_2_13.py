@@ -587,8 +587,8 @@ class TC_DRLK_2_13(MatterBaseTest):
                 endpoint=self.app_cluster_endpoint,
                 cluster=Clusters.Objects.DoorLock,
                 attribute=Clusters.DoorLock.Attributes.NumberOfCredentialsSupportedPerUser)
-        log.info(f"After reading  attribute NumberOfCredentialsSupportedPerUser we get"
-                 f" value {self.numberofcredentialsupportedperuser} ")
+        log.info("After reading  attribute NumberOfCredentialsSupportedPerUser we get value %s ",
+                 self.numberofcredentialsupportedperuser)
         self.step("28b")
         await self.clear_all_aliro_credential()
         await self.send_clear_user_cmd(user_index=1)

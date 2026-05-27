@@ -678,7 +678,7 @@ class MdnsDiscovery:
             # If the time since the last discovered service exceeds the silence threshold,
             # we assume discovery is complete and signal to stop the browsing process.
             if self._discovered_services and time_since_last_discovery >= silence_threshold:
-                log.info(f"No new mDNS services discovered after {silence_threshold:.1f} seconds, stopping browse")
+                log.info("No new mDNS services discovered after %.1f seconds, stopping browse", silence_threshold)
                 self._event.set()
                 break
 

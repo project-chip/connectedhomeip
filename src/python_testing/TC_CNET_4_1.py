@@ -117,7 +117,7 @@ class TC_CNET_4_1(MatterBaseTest):
         networks_dict = await self.read_single_attribute_all_endpoints(
             cluster=Clusters.NetworkCommissioning,
             attribute=Clusters.NetworkCommissioning.Attributes.Networks)
-        log.info(f"List of network obj {list(networks_dict.values())}")
+        log.info("List of network obj %s", list(networks_dict.values()))
 
         network_count = {}
         network_ids = {}
@@ -147,7 +147,7 @@ class TC_CNET_4_1(MatterBaseTest):
             matter_asserts.assert_all(network, lambda x: isinstance(x.connected, bool),
                                       "NetworkID field is an octet string within a length range 1 to 32")
         else:
-            log.info(f"Current cluster is not connected in the endpoint: {self.get_endpoint()}, skipping.")
+            log.info("Current cluster is not connected in the endpoint: %s, skipping.", self.get_endpoint())
             self.mark_all_remaining_steps_skipped()
             return
 

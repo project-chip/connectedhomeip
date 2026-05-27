@@ -233,7 +233,7 @@ class IDMBaseTest(MatterBaseTest):
         Find an attribute that requires timed write on the actual device
         Uses the wildcard read data that's already in endpoints_data
         """
-        log.info(f"Searching for timed write attributes across {len(endpoints_data)} endpoints")
+        log.info("Searching for timed write attributes across %s endpoints", len(endpoints_data))
         for endpoint_id, endpoint in endpoints_data.items():
             for cluster_type, cluster_data in endpoint.items():
                 cluster_id = cluster_type.id
@@ -250,8 +250,8 @@ class IDMBaseTest(MatterBaseTest):
                             issubclass(attr_type, ClusterObjects.ClusterAttributeDescriptor)):
                         # Check if this attribute requires timed write using the must_use_timed_write class property
                         if attr_type.must_use_timed_write:
-                            log.info(f"Found timed write attribute: {attr_type.__name__} "
-                                     f"in cluster {cluster_type.__name__} on endpoint {endpoint_id}")
+                            log.info("Found timed write attribute: %s in cluster %s on endpoint %s",
+                                     attr_type.__name__, cluster_type.__name__, endpoint_id)
                             return endpoint_id, attr_type
         log.warning("No timed write attributes found on device")
         return None, None
@@ -716,7 +716,7 @@ class IDMBaseTest(MatterBaseTest):
 
             # Verify only the allowed cluster is returned
             returned_clusters = list(read_request.attributes[endpoint].keys())
-            log.info(f"Clusters returned with limited access (TH2): {[c.id for c in returned_clusters]}")
+            log.info("Clusters returned with limited access (TH2): %s", [c.id for c in returned_clusters])
 
             # The allowed cluster should be present
             allowed_cluster_obj = None

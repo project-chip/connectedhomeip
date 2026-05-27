@@ -216,7 +216,7 @@ class TC_AVSM_2_10(MatterBaseTest, AVSMTestBase):
             self.step(6)
             result = await self.write_single_attribute(attr.SoftLivestreamPrivacyModeEnabled(True), endpoint_id=endpoint)
             asserts.assert_equal(result, Status.Success, "Error when trying to write SoftLivestreamPrivacyModeEnabled")
-            log.info(f"Tx'd : SoftLivestreamPrivacyModeEnabled{True}")
+            log.info("Tx'd : SoftLivestreamPrivacyModeEnabled%s", True)
 
             self.step(7)
             try:
@@ -269,7 +269,7 @@ class TC_AVSM_2_10(MatterBaseTest, AVSMTestBase):
             # Cleanup Privacy state after test completion
             result = await self.write_single_attribute(attr.SoftLivestreamPrivacyModeEnabled(False), endpoint_id=endpoint)
             asserts.assert_equal(result, Status.Success, "Error when trying to write SoftLivestreamPrivacyModeEnabled")
-            log.info(f"Tx'd : SoftLivestreamPrivacyModeEnabled{False}")
+            log.info("Tx'd : SoftLivestreamPrivacyModeEnabled%s", False)
 
 
 if __name__ == "__main__":

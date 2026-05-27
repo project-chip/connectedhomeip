@@ -98,7 +98,7 @@ class TC_MOD_1_2(MatterBaseTest):
                                     "Element semantictag.Value is greater than 16 bits")
 
     def _log_attribute(self, name, value):
-        log.info(f"{name} attribute with value: {value} with type: {type(value)}")
+        log.info("%s attribute with value: %s with type: %s", name, value, type(value))
 
     @property
     def default_endpoint(self) -> int:
@@ -123,8 +123,8 @@ class TC_MOD_1_2(MatterBaseTest):
         asserts.assert_true(len(supported_modes) > 0, "Supported modes can not be empty.")
         supported_modes_values = []
         for supported_mode in supported_modes:
-            log.info(
-                f"Label {supported_mode} with type {type(supported_mode)} and {supported_mode.label} and {supported_mode.mode} and {supported_mode.semanticTags}")
+            log.info("Label %s with type %s and %s and %s and %s",
+                     supported_mode, type(supported_mode), supported_mode.label, supported_mode.mode, supported_mode.semanticTags)
             # Verify the struct values
             self._verify_supported_mode(supported_mode=supported_mode)
             # After verifying the struct is correct append the mode value.

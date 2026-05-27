@@ -78,7 +78,7 @@ class TC_CADMIN_1_15(MatterBaseTest):
     async def CommissionAttempt(
             self, setupPinCode: int, thnum: int, th):
 
-        log.info(f"-----------------Commissioning with TH_CR{str(thnum)}-------------------------")
+        log.info("-----------------Commissioning with TH_CR%s-------------------------", thnum)
         await th.CommissionOnNetwork(
             nodeId=self.dut_node_id, setupPinCode=setupPinCode,
             filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=self.discriminator)

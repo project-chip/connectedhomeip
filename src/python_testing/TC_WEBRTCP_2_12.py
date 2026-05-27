@@ -134,7 +134,7 @@ class TC_WEBRTCP_2_12(MatterBaseTest, WEBRTCPTestBase):
         # Try to allocate multiple sessions to reach the DUT's capacity limit
 
         for attempt in range(max_attempts):
-            log.info(f"Attempt {attempt + 1}: Sending SolicitOffer command")
+            log.info("Attempt %s: Sending SolicitOffer command", attempt + 1)
             resp: Clusters.WebRTCTransportProvider.Commands.SolicitOfferResponse = await webrtc_peer.send_command(
                 cmd=Clusters.WebRTCTransportProvider.Commands.SolicitOffer(
                     streamUsage=Clusters.Objects.Globals.Enums.StreamUsageEnum.kLiveView,
@@ -149,7 +149,7 @@ class TC_WEBRTCP_2_12(MatterBaseTest, WEBRTCPTestBase):
                                  "Incorrect response type")
             session_id = resp.webRTCSessionID
             asserts.assert_true(session_id >= 0, f"Invalid session ID: {session_id}")
-            log.info(f"Created session {session_id} in attempt {attempt + 1}")
+            log.info("Created session %s in attempt %s", session_id, attempt + 1)
             webrtc_manager.session_id_created(session_id, self.dut_node_id)
 
         self.step(3)

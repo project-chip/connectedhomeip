@@ -132,7 +132,7 @@ class TC_ICDB_1_2(ICDBaseTest):
         user_active_mode_trigger_instruction = await self.read_icdm_attribute_expect_success(attributes.UserActiveModeTriggerInstruction)
         log.info("ActiveModeDuration: %sms", active_mode_duration_ms)
         log.info("ActiveModeThreshold: %sms", active_mode_threshold_ms)
-        log.info(f"UserActiveModeTriggerHint: 0x{user_active_mode_trigger_hint:08X}")
+        log.info("UserActiveModeTriggerHint: 0x%08X", user_active_mode_trigger_hint)
         log.info("UserActiveModeTriggerInstruction: %s", user_active_mode_trigger_instruction)
 
         # *** STEP 3 ***
@@ -171,7 +171,7 @@ class TC_ICDB_1_2(ICDBaseTest):
         for i, bit in enumerate(hints_to_test, start=1):
             # Get current hint name
             bit_name = uat_bit_name(bit)
-            log.info(f"UAT hint {i}/{len(hints_to_test)}: {bit_name}...")
+            log.info("UAT hint %s/%s: %s...", i, len(hints_to_test), bit_name)
 
             # For the first hint, we don’t need to wait for the DUT to transition back to Idle Mode
             # because it’s already in Idle Mode from the previous step. For hints after the first,

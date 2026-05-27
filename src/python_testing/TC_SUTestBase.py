@@ -89,7 +89,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             # Assign the file descriptor to log_file
             log_file = tempfile.NamedTemporaryFile(  # noqa: SIM115
                 dir=storage_dir, prefix='provider_', suffix='.log', mode='ab')
-            log.info(f"Writing Provider logs at :{log_file.name}")
+            log.info("Writing Provider logs at :%s", log_file.name)
         else:
             log.info("Writing Provider logs at : %s", log_file)
         # Launch the Provider subprocess using the Wrapper
@@ -109,7 +109,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             timeout=timeout)
 
         self.current_provider_app_proc = proc
-        log.info(f"Provider started with PID:  {self.current_provider_app_proc.get_pid()}")
+        log.info("Provider started with PID:  %s", self.current_provider_app_proc.get_pid())
 
     def terminate_provider(self):
         if hasattr(self, "current_provider_app_proc") and self.current_provider_app_proc is not None:

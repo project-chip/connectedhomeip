@@ -253,7 +253,7 @@ class AccessChecker(BasicCompositionTests):
             log.warning('WARNING: Skipping OTA cluster check for CI. THIS IS DISALLOWED FOR CERTIFICATION')
             return
 
-        log.info(f'Testing commands on {xml_cluster.name} at privilege {privilege}')
+        log.info('Testing commands on %s at privilege %s', xml_cluster.name, privilege)
         for command_id in checkable_commands(cluster_id, device_cluster_data, xml_cluster):
             spec_requires = xml_cluster.accepted_commands[command_id].privilege
             command = Clusters.ClusterObjects.ALL_ACCEPTED_COMMANDS[cluster_id][command_id]
@@ -264,8 +264,8 @@ class AccessChecker(BasicCompositionTests):
                 # no side effects. Commands are checked with admin privilege in their cluster tests. The error that
                 # may be let through here is if the spec requires operate and the implementation requires admin.
                 continue
-            log.info(
-                f'  Testing command {xml_cluster.accepted_commands[command_id].name} from cluster {xml_cluster.name} - at privilege {privilege}, requires {spec_requires}')
+            log.info('  Testing command %s from cluster %s - at privilege %s, requires %s',
+                     xml_cluster.accepted_commands[command_id].name, xml_cluster.name, privilege, spec_requires)
             try:
                 timed = None
                 if command.must_use_timed_invoke:
@@ -322,7 +322,7 @@ class AccessChecker(BasicCompositionTests):
                 self.success = False
                 return False
 
-            log.info(f"Successfully established subscription (ID: {subscription.subscriptionId}) with privilege {privilege}")
+            log.info("Successfully established subscription (ID: %s) with privilege %s", subscription.subscriptionId, privilege)
             subscription.Shutdown()
             return True
 
@@ -365,8 +365,8 @@ class AccessChecker(BasicCompositionTests):
                 # - NetworkCommissioning
                 # - CameraAvStreamManagement
                 # - OperationalCredentials
-                log.warning(
-                    f"INVALID_ACTION: {cluster_class.__name__}.{attribute.__name__} (Cluster=0x{cluster_id:04X}, Attribute=0x{attribute_id:04X}, Endpoint={endpoint_id}, Privilege={privilege.name})")
+                log.warning("INVALID_ACTION: %s.%s (Cluster=0x%04X, Attribute=0x%04X, Endpoint=%s, Privilege=%s)",
+                            cluster_class.__name__, attribute.__name__, cluster_id, attribute_id, endpoint_id, privilege.name)
                 return None  # Indicates skip
             # Unexpected ChipStackError
             log.error("Unexpected ChipStackError subscribing to attribute %s: %s", attribute, e)
@@ -389,7 +389,7 @@ class AccessChecker(BasicCompositionTests):
             cluster_class = Clusters.ClusterObjects.ALL_CLUSTERS[cluster_id]
             test_name = f'Subscribe access checker - {privilege}'
 
-            log.info(f"Subscribing to attribute {attribute} cluster {xml_cluster.name} privilege {privilege}")
+            log.info("Subscribing to attribute %s cluster %s privilege %s", attribute, xml_cluster.name, privilege)
 
             if operation_allowed(spec_requires, privilege):
                 result = await self._subscribe_single_attribute_check_success(

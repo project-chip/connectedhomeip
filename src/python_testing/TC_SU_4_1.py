@@ -141,7 +141,7 @@ class TC_SU_4_1(SoftwareUpdateBaseTest):
         self.step(1)
 
         logger.info("Step #1 - DUT NodeID (OTA Requestor): %s", requestor_node_id)
-        logger.info(f"Step #1 - admin_fabric1 FabricID: {admin_fabric1.fabricId}")
+        logger.info("Step #1 - admin_fabric1 FabricID: %s", admin_fabric1.fabricId)
 
         # Read current DefaultOTAProviders value on Fabric1 (via admin_fabric1)
         actual_otap_info = await self.read_single_attribute_check_success(
@@ -199,13 +199,13 @@ class TC_SU_4_1(SoftwareUpdateBaseTest):
             nodeId=provider1_fabric2_node_id, useTestCommissioner=True
         )
 
-        logger.info(f"Step #3 - admin_fabric2 NodeID: {admin_fabric2.nodeId}")
-        logger.info(f"Step #3 - admin_fabric2 FabricID: {admin_fabric2.fabricId}")
+        logger.info("Step #3 - admin_fabric2 NodeID: %s", admin_fabric2.nodeId)
+        logger.info("Step #3 - admin_fabric2 FabricID: %s", admin_fabric2.fabricId)
 
         params = await self.open_commissioning_window(admin_fabric1, requestor_node_id)
         setup_pin_code = params.commissioningParameters.setupPinCode
         long_discriminator = params.randomDiscriminator
-        logger.info(f"Step #3 - Commissioning window opened: {vars(params)}")
+        logger.info("Step #3 - Commissioning window opened: %s", vars(params))
 
         logger.info("Step #3 - Commissioning DUT with admin_fabric2")
         resp = await admin_fabric2.CommissionOnNetwork(

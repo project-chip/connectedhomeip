@@ -175,7 +175,8 @@ class PushAvServer:
                 log.warning("Upload validation failed: %s", errors)
                 return JSONResponse(status_code=400, content={"errors": errors})
 
-            log.info(f"Upload successful: stream={stream_id}, file={file_path}.{ext}, errors={errors}, strict={stream.strict_mode}")
+            log.info("Upload successful: stream=%s, file=%s.%s, errors=%s, strict=%s",
+                     stream_id, file_path, ext, errors, stream.strict_mode)
             return Response(status_code=202)
 
     def ffprobe_check(self, stream_id: int, file_path: str):

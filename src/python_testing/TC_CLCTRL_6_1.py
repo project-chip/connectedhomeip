@@ -358,7 +358,7 @@ class TC_CLCTRL_6_1(MatterBaseTest):
         # Wait for the OperationalError event to be emitted
         data = event_sub_handler.wait_for_event_type_report(
             Clusters.ClosureControl.Events.OperationalError, timeout_sec=timeout)
-        log.info(f"-> OperationalError event last received: {data.errorState}")
+        log.info("-> OperationalError event last received: %s", data.errorState)
 
         asserts.assert_not_equal(data.errorState, [], "The CurrentErrorList attribute is empty.")
 

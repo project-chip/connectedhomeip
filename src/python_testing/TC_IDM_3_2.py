@@ -274,7 +274,7 @@ class TC_IDM_3_2(IDMBaseTest, BasicCompositionTests):
 
             # Get the current DataVersion
             current_data_version = read_result[self.endpoint][test_cluster][Clusters.Attribute.DataVersion]
-            log.info(f"Current DataVersion for cluster {test_cluster.id}: {current_data_version}")
+            log.info("Current DataVersion for cluster %s: %s", test_cluster.id, current_data_version)
 
             write_result = await self.default_controller.WriteAttribute(
                 self.dut_node_id,

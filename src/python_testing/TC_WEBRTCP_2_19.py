@@ -153,7 +153,7 @@ class TC_WEBRTCP_2_19(MatterBaseTest, WEBRTCPTestBase):
 
         # Verify the Offer contains valid SDP content
         asserts.assert_true(len(offer_sdp) > 0, "SDP offer is empty")
-        log.info(f"Received SDP offer with length: {len(offer_sdp)} bytes")
+        log.info("Received SDP offer with length: %s bytes", len(offer_sdp))
         webrtc_peer.set_remote_offer(offer_sdp)
 
         self.step(4)

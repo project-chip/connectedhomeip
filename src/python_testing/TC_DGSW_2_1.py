@@ -107,12 +107,12 @@ class TC_DGSW_2_1(MatterBaseTest):
                 stackSize = None
                 # The Id field is mandatory
                 matter_asserts.assert_valid_uint64(metric.id, "Id")
-                logger.info(f"Thread Metric ID: {metric.id}")
+                logger.info("Thread Metric ID: %s", metric.id)
 
                 # Validate the optional Name field
                 if metric.name is not None:
                     matter_asserts.assert_is_string(metric.name, "Name")
-                    logger.info(f"Thread Metric Name: {metric.name}")
+                    logger.info("Thread Metric Name: %s", metric.name)
 
                 # Validate the optional StackSize field
                 if metric.stackSize is not None:
@@ -121,7 +121,7 @@ class TC_DGSW_2_1(MatterBaseTest):
                     # Verify that StackSize is greater than 0.
                     asserts.assert_greater(stackSize, 0, "StackSize is not greater than 0.")
                 else:
-                    logger.warning(f"Thread Metric StackSize is None for ID: {metric.id}")
+                    logger.warning("Thread Metric StackSize is None for ID: %s", metric.id)
 
                 # Validate the optional StackFreeCurrent field
                 if metric.stackFreeCurrent is not None:
@@ -131,7 +131,7 @@ class TC_DGSW_2_1(MatterBaseTest):
                         asserts.assert_less(metric.stackFreeCurrent, stackSize,
                                             "StackFreeCurrent is not less than StackSize.")
                 else:
-                    logger.warning(f"Thread Metric StackFreeCurrent is None for ID: {metric.id}")
+                    logger.warning("Thread Metric StackFreeCurrent is None for ID: %s", metric.id)
 
                 # Validate the optional StackFreeMinimum field
                 if metric.stackFreeMinimum is not None:
@@ -141,7 +141,7 @@ class TC_DGSW_2_1(MatterBaseTest):
                         asserts.assert_less_equal(metric.stackFreeMinimum, metric.stackFreeCurrent,
                                                   "StackFreeMinimum is not less than or equal to StackFreeCurrent.")
                 else:
-                    logger.warning(f"Thread Metric StackFreeMinimum is None for ID: {metric.id}")
+                    logger.warning("Thread Metric StackFreeMinimum is None for ID: %s", metric.id)
 
         # STEP 3: TH reads from the DUT the CurrentHeapFree attribute
         self.step(3)

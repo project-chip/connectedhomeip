@@ -124,7 +124,7 @@ class TC_DISHALM_2_1(BasicCompositionTests):
 
         logger.info("Non-provisional alarm bits: %s", non_provisional_bits)
         logger.info("Provisional alarm bits: %s", provisional_bits)
-        logger.info(f"Valid alarm bitmap mask: 0x{mask:08X} (allow_provisional={allow_provisional})")
+        logger.info("Valid alarm bitmap mask: 0x%08X (allow_provisional=%s)", mask, allow_provisional)
 
         return mask
 
@@ -166,7 +166,7 @@ class TC_DISHALM_2_1(BasicCompositionTests):
                 )
                 asserts.fail(asserts_fail_msg)
 
-        logger.info(f"{attribute_name} bitmap validation passed: 0x{bitmap_value:08X}")
+        logger.info("%s bitmap validation passed: 0x%08X", attribute_name, bitmap_value)
 
     async def read_and_check_attributes_from_dishwasher_alarm(self, attribute: type[ClusterObjects.ClusterAttributeDescriptor], name: str) -> int:
         resp = await self.read_single_attribute_check_success(
