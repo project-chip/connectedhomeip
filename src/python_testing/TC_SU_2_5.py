@@ -52,10 +52,10 @@
 
 import asyncio
 import logging
+from time import time
 
 from mobly import asserts
 from TC_SUTestBase import SoftwareUpdateBaseTest
-from time import time
 
 import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
