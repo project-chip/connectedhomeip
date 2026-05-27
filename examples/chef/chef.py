@@ -23,6 +23,7 @@ import sys
 import tarfile
 import textwrap
 from typing import Any, Dict
+from pathlib import Path
 
 import constants
 import stateful_shell
