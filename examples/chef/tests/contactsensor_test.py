@@ -34,8 +34,8 @@ class TC_CONTACTSENSOR(MatterBaseTest):
 
     async def _read_state_value(self):
         return await self.read_single_attribute_check_success(
-            endpoint=self._CONTACTSENSOR_ENDPOINT, 
-            cluster=Clusters.Objects.BooleanState, 
+            endpoint=self._CONTACTSENSOR_ENDPOINT,
+            cluster=Clusters.Objects.BooleanState,
             attribute=Clusters.Objects.BooleanState.Attributes.StateValue
         )
 
@@ -58,10 +58,11 @@ class TC_CONTACTSENSOR(MatterBaseTest):
         self.step(2)
         # Read the StateValue attribute from the Boolean State cluster
         state_value = await self._read_state_value()
-        
+
         # Verify that it returns a boolean value
         asserts.assert_true(isinstance(state_value, bool), "StateValue must be a boolean.")
         logger.info(f"Contact Sensor StateValue: {state_value}")
+
 
 if __name__ == "__main__":
     default_matter_test_main()
