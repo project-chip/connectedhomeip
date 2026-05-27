@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-#include "water-heater-management-server.h"
+#include <app/clusters/water-heater-management-server/WaterHeaterManagementCluster.h>
 
 #include <app/AttributeAccessInterface.h>
 #include <app/AttributeAccessInterfaceRegistry.h>

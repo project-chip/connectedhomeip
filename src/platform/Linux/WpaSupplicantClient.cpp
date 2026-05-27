@@ -128,6 +128,7 @@ CHIP_ERROR WpaSupplicantClient::GetConfiguredNetwork(NetworkCommissioning::Netwo
     VerifyOrReturnError(properties != nullptr, CHIP_ERROR_KEY_NOT_FOUND);
 
     GAutoPtr<GVariant> ssid(g_variant_lookup_value(properties, "ssid", nullptr));
+    VerifyOrReturnError(ssid, CHIP_ERROR_KEY_NOT_FOUND);
     gsize length;
     const gchar * ssidStr = g_variant_get_string(ssid.get(), &length);
     // TODO: wpa_supplicant will return ssid with quotes! We should have a better way to get the actual ssid in bytes.

@@ -54,6 +54,11 @@ jobs:
               run: |
                   ./scripts/run_in_build_env.sh "./examples/chef/chef.py --ci_linux"
 
+            - name: Notify Slack on Failure
+              if: failure()
+              uses: ./.github/actions/notify-slack-failure
+              with:
+                slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}
     chef_device_functional_test:
         name: Chef - Device functional tests (Linux)
         if: github.actor != 'restyled-io[bot]'
@@ -92,6 +97,11 @@ jobs:
                   ./examples/chef/chef.py -br -d rootnode_dimmablelight_bCwGYSDpoe -t linux
                   scripts/run_in_python_env.sh out/python_env './scripts/tests/run_python_test.py --app examples/chef/linux/out/rootnode_dimmablelight_bCwGYSDpoe --factory-reset --script ./examples/chef/tests/dimmablelight_test.py --script-args "--commissioning-method on-network --discriminator 3840 --passcode 20202021" --app-stdin-pipe /tmp/chef_stdin.txt'
 
+            - name: Notify Slack on Failure
+              if: failure()
+              uses: ./.github/actions/notify-slack-failure
+              with:
+                slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}
     chef_esp32:
         name: Chef - ESP32 CI Examples
         runs-on: ubuntu-latest
@@ -116,6 +126,11 @@ jobs:
               run: |
                   ./scripts/run_in_build_env.sh "./examples/chef/chef.py --ci -t esp32"
 
+            - name: Notify Slack on Failure
+              if: failure()
+              uses: ./.github/actions/notify-slack-failure
+              with:
+                slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}
     chef_nrfconnect:
         name: Chef - NRFConnect CI Examples
         runs-on: ubuntu-latest
@@ -139,6 +154,11 @@ jobs:
               run: |
                   ./scripts/run_in_build_env.sh "./examples/chef/chef.py --ci -t nrfconnect"
 
+            - name: Notify Slack on Failure
+              if: failure()
+              uses: ./.github/actions/notify-slack-failure
+              with:
+                slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}
     chef_telink:
         name: Chef - Telink CI Examples
         runs-on: ubuntu-latest
@@ -164,3 +184,8 @@ jobs:
               shell: bash
               run: |
                   ./scripts/run_in_build_env.sh "./examples/chef/chef.py --ci -t telink"
+            - name: Notify Slack on Failure
+              if: failure()
+              uses: ./.github/actions/notify-slack-failure
+              with:
+                slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}
