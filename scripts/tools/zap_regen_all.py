@@ -29,7 +29,6 @@ import time
 from dataclasses import dataclass
 from enum import Flag, auto
 from pathlib import Path
-from typing import List
 
 log = logging.getLogger(__name__)
 
@@ -108,7 +107,7 @@ class ZapInput:
 
         return "chef" in self.zap_file
 
-    def build_command(self, script: str) -> List[str]:
+    def build_command(self, script: str) -> list[str]:
         """What command to execute for this zap input. """
         if self.zap_file:
             return [script, self.zap_file]

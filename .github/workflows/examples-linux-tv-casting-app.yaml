@@ -73,3 +73,8 @@ jobs:
                   ./scripts/run_in_build_env.sh \
                     "python3 ./scripts/tests/run_tv_casting_test.py --commissioner-generated-passcode=True"
               timeout-minutes: 2 # Comment this out to debug if GitHub Action times out.
+            - name: Notify Slack on Failure
+              if: failure()
+              uses: ./.github/actions/notify-slack-failure
+              with:
+                slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}

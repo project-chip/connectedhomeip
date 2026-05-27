@@ -226,7 +226,7 @@ class _Handle:
     initialized: bool = False
 
 
-_nativeLibraryHandles: typing.Dict[Library, _Handle] = {}
+_nativeLibraryHandles: dict[Library, _Handle] = {}
 
 
 def _GetLibraryHandle(lib: Library, expectAlreadyInitialized: bool) -> _Handle:

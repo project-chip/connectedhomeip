@@ -83,9 +83,6 @@ if (chip_device_platform == "darwin") {
 
 group("posix") {
   deps = [ ":all-devices-app" ]
-  if (chip_device_platform == "darwin") {
-    deps += [ ":codesign" ]
-  }
 }
 
 group("default") {

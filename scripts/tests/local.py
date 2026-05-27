@@ -29,7 +29,7 @@ import sys
 import textwrap
 import time
 from dataclasses import dataclass
-from typing import Iterable, List, Optional
+from typing import Iterable, Optional
 
 import alive_progress
 import click
@@ -47,7 +47,7 @@ with python_path.PythonPath("../../src/python_testing/matter_testing_infrastruct
 log = logging.getLogger(__name__)
 
 
-def _get_apps_from_script(path: str) -> List[str]:
+def _get_apps_from_script(path: str) -> list[str]:
     """
     Parses a python script and returns the apps it is for.
     """
@@ -486,7 +486,7 @@ def cli(log_level):
     )
 
 
-def _with_activate(build_cmd: List[str], output_path=None) -> List[str]:
+def _with_activate(build_cmd: list[str], output_path=None) -> list[str]:
     """
     Given a bash command list, will generate a new command suitable for subprocess
     with an execution of `scripts/activate.sh` prepended to it

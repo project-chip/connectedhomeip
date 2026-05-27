@@ -204,6 +204,11 @@ jobs:
                   path: .ccache
                   key: ${{ env.CCACHE_KEY }}
 
+            - name: Notify Slack on Failure
+              if: failure()
+              uses: ./.github/actions/notify-slack-failure
+              with:
+                slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}
     nightly_repl_tests_linux_run:
         name: Nightly REPL Tests - Linux (RUN)
         needs: nightly_repl_tests_linux_build
@@ -306,6 +311,11 @@ jobs:
                   retention-days: 30
                   if-no-files-found: warn
 
+            - name: Notify Slack on Failure
+              if: failure()
+              uses: ./.github/actions/notify-slack-failure
+              with:
+                slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}
     nightly_repl_tests_report:
         name: Nightly REPL Tests - Test Report
         needs: nightly_repl_tests_linux_run
@@ -373,6 +383,11 @@ jobs:
                   destination_dir: allure-report/nightly
                   keep_files: true
 
+            - name: Notify Slack on Failure
+              if: failure()
+              uses: ./.github/actions/notify-slack-failure
+              with:
+                slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}
     nightly_msan_tests_linux:
         name: Nightly MSAN Tests - Linux
         if: github.actor != 'restyled-io[bot]'
@@ -414,3 +429,8 @@ jobs:
               run: >-
                   ./scripts/run_in_build_env.sh "scripts/build/build_examples.py
                   --target linux-x64-tests-msan-clang build"
+            - name: Notify Slack on Failure
+              if: failure()
+              uses: ./.github/actions/notify-slack-failure
+              with:
+                slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}

@@ -46,11 +46,11 @@ def get_raw_type_list():
     double_nested_struct_list = test.Structs.DoubleNestedStructList()
     double_nested_struct_list_type = test.Structs.DoubleNestedStructList
     list_of_uints = [0, 1]
-    list_of_uints_type = typing.List[uint]
+    list_of_uints_type = list[uint]
     list_of_structs = [struct, struct]
-    list_of_structs_type = typing.List[struct_type]
+    list_of_structs_type = list[struct_type]
     list_of_double_nested_struct_list = [double_nested_struct_list, double_nested_struct_list]
-    list_of_double_nested_struct_list_type = typing.List[double_nested_struct_list_type]
+    list_of_double_nested_struct_list_type = list[double_nested_struct_list_type]
 
     # Create a list with all the types and a list of the values that should match for that type
     return {uint: [1],
