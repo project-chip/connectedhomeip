@@ -38,7 +38,7 @@ Usage example:
 """
 
 from dataclasses import dataclass
-from typing import Any, Type
+from typing import Any
 
 # Sentinel object to distinguish "no default provided" from None
 _PIXIT_NO_DEFAULT = object()
@@ -60,13 +60,13 @@ class PixitDefinition:
     """
 
     name: str
-    type: Type
+    type: type
     description: str
     required: bool = True
     default: Any = _PIXIT_NO_DEFAULT
 
 
-def pixit(name: str, value_type: Type, description: str, required: bool = True, default: Any = _PIXIT_NO_DEFAULT):
+def pixit(name: str, value_type: type, description: str, required: bool = True, default: Any = _PIXIT_NO_DEFAULT):
     """Decorator that declares a PIXIT parameter requirement for a test method.
 
     This decorator attaches PIXIT metadata to the test method. When the test runs,
@@ -194,7 +194,7 @@ def format_pixit_error(test_name: str, missing_required: list[PixitDefinition], 
     return "\n".join(lines)
 
 
-def _type_to_arg_flag(pixit_type: Type) -> str:
+def _type_to_arg_flag(pixit_type: type) -> str:
     """Map a Python type to the corresponding command-line argument flag.
 
     Args:
