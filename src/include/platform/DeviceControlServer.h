@@ -33,6 +33,14 @@ class DeviceControlServer final
 public:
     // ===== Members for internal use by other Device Layer components.
 
+    /**
+     *  Post an event that there was a change in the commissioning
+     *  window status.
+     *
+     *  @param[in]  status
+     *    The current commissioning window status.
+     */
+    CHIP_ERROR PostCommissioningWindowChangedEvent(app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum status);
     CHIP_ERROR PostCommissioningCompleteEvent(NodeId peerNodeId, FabricIndex accessingFabricIndex);
     CHIP_ERROR SetRegulatoryConfig(uint8_t location, const CharSpan & countryCode);
     CHIP_ERROR PostConnectedToOperationalNetworkEvent(ByteSpan networkID);
