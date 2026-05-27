@@ -878,6 +878,15 @@ static BOOL CommandNeedsTimedInvokeInBallastConfigurationCluster(AttributeId aAt
     }
     }
 }
+static BOOL CommandNeedsTimedInvokeInDynamicLightingCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::DynamicLighting;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL CommandNeedsTimedInvokeInIlluminanceMeasurementCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::IlluminanceMeasurement;
@@ -1043,6 +1052,15 @@ static BOOL CommandNeedsTimedInvokeInAmbientContextSensingCluster(AttributeId aA
 static BOOL CommandNeedsTimedInvokeInProximityRangingCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::ProximityRanging;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
+static BOOL CommandNeedsTimedInvokeInSmokeConcentrationMeasurementCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::SmokeConcentrationMeasurement;
     switch (aAttributeId) {
     default: {
         return NO;
@@ -1698,6 +1716,9 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     case Clusters::BallastConfiguration::Id: {
         return CommandNeedsTimedInvokeInBallastConfigurationCluster(commandID);
     }
+    case Clusters::DynamicLighting::Id: {
+        return CommandNeedsTimedInvokeInDynamicLightingCluster(commandID);
+    }
     case Clusters::IlluminanceMeasurement::Id: {
         return CommandNeedsTimedInvokeInIlluminanceMeasurementCluster(commandID);
     }
@@ -1754,6 +1775,9 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     }
     case Clusters::ProximityRanging::Id: {
         return CommandNeedsTimedInvokeInProximityRangingCluster(commandID);
+    }
+    case Clusters::SmokeConcentrationMeasurement::Id: {
+        return CommandNeedsTimedInvokeInSmokeConcentrationMeasurementCluster(commandID);
     }
     case Clusters::NetworkIdentityManagement::Id: {
         return CommandNeedsTimedInvokeInNetworkIdentityManagementCluster(commandID);

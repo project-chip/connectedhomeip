@@ -119,11 +119,13 @@ enum class MeasurementUnitEnum : uint8_t
     kNgm3 = 0x05,
     kPm3  = 0x06,
     kBqm3 = 0x07,
+    kDbpm = 0x08,
+    kPcft = 0x09,
     // All received enum values that are not listed above will be mapped
     // to kUnknownEnumValue. This is a helper enum value that should only
     // be used by code to process how it handles receiving and unknown
     // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 8,
+    kUnknownEnumValue = 10,
 };
 
 // Enum for ProductIdentifierTypeEnum

@@ -90,6 +90,8 @@
 #include <clusters/DishwasherMode/MetadataProvider.h>
 #include <clusters/DoorLock/Ids.h>
 #include <clusters/DoorLock/MetadataProvider.h>
+#include <clusters/DynamicLighting/Ids.h>
+#include <clusters/DynamicLighting/MetadataProvider.h>
 #include <clusters/EcosystemInformation/Ids.h>
 #include <clusters/EcosystemInformation/MetadataProvider.h>
 #include <clusters/ElectricalEnergyMeasurement/Ids.h>
@@ -242,6 +244,8 @@
 #include <clusters/ServiceArea/MetadataProvider.h>
 #include <clusters/SmokeCoAlarm/Ids.h>
 #include <clusters/SmokeCoAlarm/MetadataProvider.h>
+#include <clusters/SmokeConcentrationMeasurement/Ids.h>
+#include <clusters/SmokeConcentrationMeasurement/MetadataProvider.h>
 #include <clusters/SoftwareDiagnostics/Ids.h>
 #include <clusters/SoftwareDiagnostics/MetadataProvider.h>
 #include <clusters/SoilMeasurement/Ids.h>
@@ -521,6 +525,11 @@ std::optional<DataModel::AcceptedCommandEntry> AcceptedCommandEntryFor(ClusterId
     {
         if (id == DoorLock::Id)
             return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, DoorLock::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == DynamicLighting::Id) || ...))
+    {
+        if (id == DynamicLighting::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, DynamicLighting::Id>::EntryFor(command);
     }
     if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == EcosystemInformation::Id) || ...))
     {
@@ -904,6 +913,11 @@ std::optional<DataModel::AcceptedCommandEntry> AcceptedCommandEntryFor(ClusterId
     {
         if (id == SmokeCoAlarm::Id)
             return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, SmokeCoAlarm::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == SmokeConcentrationMeasurement::Id) || ...))
+    {
+        if (id == SmokeConcentrationMeasurement::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, SmokeConcentrationMeasurement::Id>::EntryFor(command);
     }
     if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == SoftwareDiagnostics::Id) || ...))
     {

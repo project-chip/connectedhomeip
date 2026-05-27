@@ -41,10 +41,20 @@ source_set("storage") {
     }
   } else {
     if (use_provision_flash_storage) {
-      libs =
-          [ "${sl_provision_root}/libs/libProvisionFlash_${silabs_family}.a" ]
+      if (is_clang) {
+        libs = [ "${sl_provision_root}/libs/libProvisionFlash-${silabs_family}-clang.a" ]
+      } else {
+        libs =
+            [ "${sl_provision_root}/libs/libProvisionFlash_${silabs_family}.a" ]
+      }
     } else {
-      libs = [ "${sl_provision_root}/libs/libProvision_${silabs_family}.a" ]
+      if (is_clang) {
+        libs = [
+          "${sl_provision_root}/libs/libProvision-${silabs_family}-clang.a",
+        ]
+      } else {
+        libs = [ "${sl_provision_root}/libs/libProvision_${silabs_family}.a" ]
+      }
     }
   }
 

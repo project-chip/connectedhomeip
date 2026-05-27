@@ -183,6 +183,10 @@
 #include <clusters/DoorLock/Commands.ipp>
 #include <clusters/DoorLock/Events.ipp>
 #include <clusters/DoorLock/Structs.ipp>
+#include <clusters/DynamicLighting/Attributes.ipp>
+#include <clusters/DynamicLighting/Commands.ipp>
+#include <clusters/DynamicLighting/Events.ipp>
+#include <clusters/DynamicLighting/Structs.ipp>
 #include <clusters/EcosystemInformation/Attributes.ipp>
 #include <clusters/EcosystemInformation/Commands.ipp>
 #include <clusters/EcosystemInformation/Events.ipp>
@@ -487,6 +491,10 @@
 #include <clusters/SmokeCoAlarm/Commands.ipp>
 #include <clusters/SmokeCoAlarm/Events.ipp>
 #include <clusters/SmokeCoAlarm/Structs.ipp>
+#include <clusters/SmokeConcentrationMeasurement/Attributes.ipp>
+#include <clusters/SmokeConcentrationMeasurement/Commands.ipp>
+#include <clusters/SmokeConcentrationMeasurement/Events.ipp>
+#include <clusters/SmokeConcentrationMeasurement/Structs.ipp>
 #include <clusters/SoftwareDiagnostics/Attributes.ipp>
 #include <clusters/SoftwareDiagnostics/Commands.ipp>
 #include <clusters/SoftwareDiagnostics/Events.ipp>
@@ -1259,6 +1267,13 @@ bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
         }
     }
     case Clusters::ColorControl::Id: {
+        switch (aCommand)
+        {
+        default:
+            return false;
+        }
+    }
+    case Clusters::DynamicLighting::Id: {
         switch (aCommand)
         {
         default:

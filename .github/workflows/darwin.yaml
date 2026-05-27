@@ -77,6 +77,11 @@ jobs:
               # Use the same derivedDataPath as the framework build, so we don't have to build the framework again and can use the one we already built.
               run: xcodebuild -scheme "CHIP Tool App" -derivedDataPath ./Framework/build ${{ matrix.options.arguments }} CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
 
+            - name: Notify Slack on Failure
+              if: failure()
+              uses: ./.github/actions/notify-slack-failure
+              with:
+                slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}
     tests:
         name: Run framework tests
         if: github.actor != 'restyled-io[bot]'
@@ -138,3 +143,8 @@ jobs:
                   name: darwin-framework-test-logs-${{ matrix.options.flavor }}
                   path: /tmp/darwin/framework-tests
                   retention-days: 5
+            - name: Notify Slack on Failure
+              if: failure()
+              uses: ./.github/actions/notify-slack-failure
+              with:
+                slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}

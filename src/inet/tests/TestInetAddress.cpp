@@ -1693,6 +1693,23 @@ TEST_F(TestInetAddress, TestCheckMakeIPv6PrefixMulticast)
     }
 }
 
+TEST_F(TestInetAddress, TestMakeIPv6MatterIANAMulticastAddr)
+{
+    IPAddress lAddress = IPAddress::MakeIPv6MatterIANAMulticastAddr();
+
+    EXPECT_TRUE(lAddress.IsIPv6());
+    EXPECT_TRUE(lAddress.IsIPv6Multicast());
+    EXPECT_TRUE(lAddress.IsMulticast());
+    EXPECT_FALSE(lAddress.IsIPv4());
+    EXPECT_FALSE(lAddress.IsIPv4Multicast());
+    EXPECT_FALSE(lAddress.IsIPv4Broadcast());
+    EXPECT_EQ(lAddress.Type(), IPAddressType::kIPv6);
+
+    char lAddressBuffer[INET6_ADDRSTRLEN];
+    lAddress.ToString(lAddressBuffer);
+    CheckAddressString(lAddressBuffer, "ff05::fa");
+}
+
 /**
  *  Test IPPrefix.
  */

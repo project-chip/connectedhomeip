@@ -32,10 +32,10 @@ def download(url, dest):
 
 def download_and_extract_zip(url, dest_dir, *member_names):
     file, *_ = urllib.request.urlretrieve(url)
-    with zipfile.ZipFile(file) as zip:
-        for member in zip.infolist():
+    with zipfile.ZipFile(file) as zip_file:
+        for member in zip_file.infolist():
             if member.filename in member_names:
-                zip.extract(member, dest_dir)
+                zip_file.extract(member, dest_dir)
 
 
 def process_project_args(gn_args_json_file, *params):
@@ -159,11 +159,11 @@ class ProjectArgProcessor:
         self.add_env_arg('target_cc', 'CC', 'cc')
         self.add_env_arg('target_cxx', 'CXX', 'cxx')
         self.add_env_arg('target_ar', 'AR', 'ar')
-        self.add_env_arg('target_cflags', 'CPPFLAGS', list=True)
-        self.add_env_arg('target_cflags_c', 'CFLAGS', list=True)
-        self.add_env_arg('target_cflags_cc', 'CXXFLAGS', list=True)
-        self.add_env_arg('target_cflags_objc', 'OBJCFLAGS', list=True)
-        self.add_env_arg('target_ldflags', 'LDFLAGS', list=True)
+        self.add_env_arg('target_cflags', 'CPPFLAGS', is_list=True)
+        self.add_env_arg('target_cflags_c', 'CFLAGS', is_list=True)
+        self.add_env_arg('target_cflags_cc', 'CXXFLAGS', is_list=True)
+        self.add_env_arg('target_cflags_objc', 'OBJCFLAGS', is_list=True)
+        self.add_env_arg('target_ldflags', 'LDFLAGS', is_list=True)
 
     def add_arg(self, nameOrArg, value, required=True):
         if arg := self.gn_args.get(nameOrArg, None) if isinstance(nameOrArg, str) else nameOrArg:
@@ -172,7 +172,7 @@ class ProjectArgProcessor:
         elif required:
             fail("Project has no build arg '%s'" % nameOrArg)
 
-    def add_env_arg(self, name, envvar, default=None, list=False):
+    def add_env_arg(self, name, envvar, default=None, is_list=False):
         """Add an argument from an environment variable"""
         if not (value := os.environ.get(envvar, default)):
             return
@@ -180,7 +180,7 @@ class ProjectArgProcessor:
             info("Warning: Not propagating %s, project has no build arg '%s'" % (envvar, name))
             return
         # bypass add_arg() to handle list splitting / formatting directly
-        self.args[arg.name] = json.dumps(value if arg.type != '[' else value.split() if list else [value])
+        self.args[arg.name] = json.dumps(value if arg.type != '[' else value.split() if is_list else [value])
 
     def process_triplet_parameter(self, name, value):
         if value is None:

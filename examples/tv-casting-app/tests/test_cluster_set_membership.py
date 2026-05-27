@@ -3,8 +3,8 @@ Property Test — Property 1: Casting cluster set membership (attribute & event 
 
 **Validates: Requirements 1.1, 2.1**
 
-This test parses `casting-CHIPAttributeTLVValueDecoder.cpp` and
-`casting-CHIPEventTLVValueDecoder.cpp` and verifies that the top-level switch
+This test parses `CHIPAttributeTLVValueDecoder-override.cpp` and
+`CHIPEventTLVValueDecoder-override.cpp` and verifies that the top-level switch
 in each contains case statements for exactly the 18 casting clusters — no more,
 no less.
 
@@ -28,14 +28,14 @@ SLIM_ATTR_DECODER = os.path.join(
     "examples",
     "tv-casting-app",
     "tv-casting-common",
-    "casting-CHIPAttributeTLVValueDecoder.cpp",
+    "CHIPAttributeTLVValueDecoder-override.cpp",
 )
 SLIM_EVENT_DECODER = os.path.join(
     REPO_ROOT,
     "examples",
     "tv-casting-app",
     "tv-casting-common",
-    "casting-CHIPEventTLVValueDecoder.cpp",
+    "CHIPEventTLVValueDecoder-override.cpp",
 )
 
 # ---------------------------------------------------------------------------
@@ -116,7 +116,7 @@ def test_each_expected_cluster_present_in_attribute_decoder(cluster):
 
     assert cluster in found_clusters, (
         f"Expected casting cluster `{cluster}` is missing from "
-        f"casting-CHIPAttributeTLVValueDecoder.cpp. "
+        f"CHIPAttributeTLVValueDecoder-override.cpp. "
         f"Found clusters: {sorted(found_clusters)}"
     )
 
@@ -138,7 +138,7 @@ def test_attribute_decoder_cluster_set_exact_match(dummy):
     found_clusters = _extract_top_level_cluster_cases(content)
 
     assert found_clusters == EXPECTED_CASTING_CLUSTERS, (
-        f"Cluster set mismatch in casting-CHIPAttributeTLVValueDecoder.cpp.\n"
+        f"Cluster set mismatch in CHIPAttributeTLVValueDecoder-override.cpp.\n"
         f"  Expected ({len(EXPECTED_CASTING_CLUSTERS)}): {sorted(EXPECTED_CASTING_CLUSTERS)}\n"
         f"  Found    ({len(found_clusters)}): {sorted(found_clusters)}\n"
         f"  Missing:  {sorted(EXPECTED_CASTING_CLUSTERS - found_clusters)}\n"
@@ -194,7 +194,7 @@ def test_each_expected_cluster_present_in_event_decoder(cluster):
 
     assert cluster in found_clusters, (
         f"Expected casting cluster `{cluster}` is missing from "
-        f"casting-CHIPEventTLVValueDecoder.cpp. "
+        f"CHIPEventTLVValueDecoder-override.cpp. "
         f"Found clusters: {sorted(found_clusters)}"
     )
 
@@ -216,7 +216,7 @@ def test_event_decoder_cluster_set_exact_match(dummy):
     found_clusters = _extract_top_level_cluster_cases(content)
 
     assert found_clusters == EXPECTED_CASTING_CLUSTERS, (
-        f"Cluster set mismatch in casting-CHIPEventTLVValueDecoder.cpp.\n"
+        f"Cluster set mismatch in CHIPEventTLVValueDecoder-override.cpp.\n"
         f"  Expected ({len(EXPECTED_CASTING_CLUSTERS)}): {sorted(EXPECTED_CASTING_CLUSTERS)}\n"
         f"  Found    ({len(found_clusters)}): {sorted(found_clusters)}\n"
         f"  Missing:  {sorted(EXPECTED_CASTING_CLUSTERS - found_clusters)}\n"

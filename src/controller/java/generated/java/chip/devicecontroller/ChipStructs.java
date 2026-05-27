@@ -11294,6 +11294,248 @@ public static class ThermostatClusterWeeklyScheduleTransitionStruct {
     return output.toString();
   }
 }
+public static class DynamicLightingClusterEffectColorStruct {
+  public @Nullable Integer level;
+  public @Nullable Integer x;
+  public @Nullable Integer y;
+  public @Nullable Integer hue;
+  public @Nullable Integer enhancedHue;
+  public @Nullable Integer saturation;
+  private static final long LEVEL_ID = 0L;
+  private static final long X_ID = 1L;
+  private static final long Y_ID = 2L;
+  private static final long HUE_ID = 3L;
+  private static final long ENHANCED_HUE_ID = 4L;
+  private static final long SATURATION_ID = 5L;
+
+  public DynamicLightingClusterEffectColorStruct(
+    @Nullable Integer level,
+    @Nullable Integer x,
+    @Nullable Integer y,
+    @Nullable Integer hue,
+    @Nullable Integer enhancedHue,
+    @Nullable Integer saturation
+  ) {
+    this.level = level;
+    this.x = x;
+    this.y = y;
+    this.hue = hue;
+    this.enhancedHue = enhancedHue;
+    this.saturation = saturation;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(LEVEL_ID, level != null ? new UIntType(level) : new NullType()));
+    values.add(new StructElement(X_ID, x != null ? new UIntType(x) : new NullType()));
+    values.add(new StructElement(Y_ID, y != null ? new UIntType(y) : new NullType()));
+    values.add(new StructElement(HUE_ID, hue != null ? new UIntType(hue) : new NullType()));
+    values.add(new StructElement(ENHANCED_HUE_ID, enhancedHue != null ? new UIntType(enhancedHue) : new NullType()));
+    values.add(new StructElement(SATURATION_ID, saturation != null ? new UIntType(saturation) : new NullType()));
+
+    return new StructType(values);
+  }
+
+  public static DynamicLightingClusterEffectColorStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    @Nullable Integer level = null;
+    @Nullable Integer x = null;
+    @Nullable Integer y = null;
+    @Nullable Integer hue = null;
+    @Nullable Integer enhancedHue = null;
+    @Nullable Integer saturation = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == LEVEL_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          level = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == X_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          x = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == Y_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          y = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == HUE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          hue = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == ENHANCED_HUE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          enhancedHue = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == SATURATION_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          saturation = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new DynamicLightingClusterEffectColorStruct(
+      level,
+      x,
+      y,
+      hue,
+      enhancedHue,
+      saturation
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("DynamicLightingClusterEffectColorStruct {\n");
+    output.append("\tlevel: ");
+    output.append(level);
+    output.append("\n");
+    output.append("\tx: ");
+    output.append(x);
+    output.append("\n");
+    output.append("\ty: ");
+    output.append(y);
+    output.append("\n");
+    output.append("\thue: ");
+    output.append(hue);
+    output.append("\n");
+    output.append("\tenhancedHue: ");
+    output.append(enhancedHue);
+    output.append("\n");
+    output.append("\tsaturation: ");
+    output.append(saturation);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class DynamicLightingClusterEffectStruct {
+  public Integer effectID;
+  public Integer source;
+  public String label;
+  public Integer maxSpeed;
+  public Integer defaultSpeed;
+  public Boolean supportsColorPalette;
+  private static final long EFFECT_ID_ID = 0L;
+  private static final long SOURCE_ID = 1L;
+  private static final long LABEL_ID = 2L;
+  private static final long MAX_SPEED_ID = 3L;
+  private static final long DEFAULT_SPEED_ID = 4L;
+  private static final long SUPPORTS_COLOR_PALETTE_ID = 5L;
+
+  public DynamicLightingClusterEffectStruct(
+    Integer effectID,
+    Integer source,
+    String label,
+    Integer maxSpeed,
+    Integer defaultSpeed,
+    Boolean supportsColorPalette
+  ) {
+    this.effectID = effectID;
+    this.source = source;
+    this.label = label;
+    this.maxSpeed = maxSpeed;
+    this.defaultSpeed = defaultSpeed;
+    this.supportsColorPalette = supportsColorPalette;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(EFFECT_ID_ID, new UIntType(effectID)));
+    values.add(new StructElement(SOURCE_ID, new UIntType(source)));
+    values.add(new StructElement(LABEL_ID, new StringType(label)));
+    values.add(new StructElement(MAX_SPEED_ID, new UIntType(maxSpeed)));
+    values.add(new StructElement(DEFAULT_SPEED_ID, new UIntType(defaultSpeed)));
+    values.add(new StructElement(SUPPORTS_COLOR_PALETTE_ID, new BooleanType(supportsColorPalette)));
+
+    return new StructType(values);
+  }
+
+  public static DynamicLightingClusterEffectStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer effectID = null;
+    Integer source = null;
+    String label = null;
+    Integer maxSpeed = null;
+    Integer defaultSpeed = null;
+    Boolean supportsColorPalette = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == EFFECT_ID_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          effectID = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == SOURCE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          source = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == LABEL_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          label = castingValue.value(String.class);
+        }
+      } else if (element.contextTagNum() == MAX_SPEED_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          maxSpeed = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == DEFAULT_SPEED_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          defaultSpeed = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == SUPPORTS_COLOR_PALETTE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Boolean) {
+          BooleanType castingValue = element.value(BooleanType.class);
+          supportsColorPalette = castingValue.value(Boolean.class);
+        }
+      }
+    }
+    return new DynamicLightingClusterEffectStruct(
+      effectID,
+      source,
+      label,
+      maxSpeed,
+      defaultSpeed,
+      supportsColorPalette
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("DynamicLightingClusterEffectStruct {\n");
+    output.append("\teffectID: ");
+    output.append(effectID);
+    output.append("\n");
+    output.append("\tsource: ");
+    output.append(source);
+    output.append("\n");
+    output.append("\tlabel: ");
+    output.append(label);
+    output.append("\n");
+    output.append("\tmaxSpeed: ");
+    output.append(maxSpeed);
+    output.append("\n");
+    output.append("\tdefaultSpeed: ");
+    output.append(defaultSpeed);
+    output.append("\n");
+    output.append("\tsupportsColorPalette: ");
+    output.append(supportsColorPalette);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class OccupancySensingClusterHoldTimeLimitsStruct {
   public Integer holdTimeMin;
   public Integer holdTimeMax;
@@ -21279,10 +21521,10 @@ public static class JointFabricDatastoreClusterDatastoreBindingTargetStruct {
   public Optional<Integer> group;
   public Optional<Integer> endpoint;
   public Optional<Long> cluster;
-  private static final long NODE_ID = 0L;
-  private static final long GROUP_ID = 1L;
-  private static final long ENDPOINT_ID = 2L;
-  private static final long CLUSTER_ID = 3L;
+  private static final long NODE_ID = 1L;
+  private static final long GROUP_ID = 2L;
+  private static final long ENDPOINT_ID = 3L;
+  private static final long CLUSTER_ID = 4L;
 
   public JointFabricDatastoreClusterDatastoreBindingTargetStruct(
     Optional<Long> node,
@@ -21552,10 +21794,10 @@ public static class JointFabricDatastoreClusterDatastoreAccessControlEntryStruct
   public Integer authMode;
   public @Nullable ArrayList<Long> subjects;
   public @Nullable ArrayList<ChipStructs.JointFabricDatastoreClusterDatastoreAccessControlTargetStruct> targets;
-  private static final long PRIVILEGE_ID = 0L;
-  private static final long AUTH_MODE_ID = 1L;
-  private static final long SUBJECTS_ID = 2L;
-  private static final long TARGETS_ID = 3L;
+  private static final long PRIVILEGE_ID = 1L;
+  private static final long AUTH_MODE_ID = 2L;
+  private static final long SUBJECTS_ID = 3L;
+  private static final long TARGETS_ID = 4L;
 
   public JointFabricDatastoreClusterDatastoreAccessControlEntryStruct(
     Integer privilege,
@@ -22026,7 +22268,6 @@ public static class JointFabricDatastoreClusterDatastoreGroupKeySetStruct {
   public @Nullable Long epochStartTime1;
   public @Nullable byte[] epochKey2;
   public @Nullable Long epochStartTime2;
-  public Integer groupKeyMulticastPolicy;
   private static final long GROUP_KEY_SET_ID_ID = 0L;
   private static final long GROUP_KEY_SECURITY_POLICY_ID = 1L;
   private static final long EPOCH_KEY0_ID = 2L;
@@ -22035,7 +22276,6 @@ public static class JointFabricDatastoreClusterDatastoreGroupKeySetStruct {
   private static final long EPOCH_START_TIME1_ID = 5L;
   private static final long EPOCH_KEY2_ID = 6L;
   private static final long EPOCH_START_TIME2_ID = 7L;
-  private static final long GROUP_KEY_MULTICAST_POLICY_ID = 8L;
 
   public JointFabricDatastoreClusterDatastoreGroupKeySetStruct(
     Integer groupKeySetID,
@@ -22045,8 +22285,7 @@ public static class JointFabricDatastoreClusterDatastoreGroupKeySetStruct {
     @Nullable byte[] epochKey1,
     @Nullable Long epochStartTime1,
     @Nullable byte[] epochKey2,
-    @Nullable Long epochStartTime2,
-    Integer groupKeyMulticastPolicy
+    @Nullable Long epochStartTime2
   ) {
     this.groupKeySetID = groupKeySetID;
     this.groupKeySecurityPolicy = groupKeySecurityPolicy;
@@ -22056,7 +22295,6 @@ public static class JointFabricDatastoreClusterDatastoreGroupKeySetStruct {
     this.epochStartTime1 = epochStartTime1;
     this.epochKey2 = epochKey2;
     this.epochStartTime2 = epochStartTime2;
-    this.groupKeyMulticastPolicy = groupKeyMulticastPolicy;
   }
 
   public StructType encodeTlv() {
@@ -22069,7 +22307,6 @@ public static class JointFabricDatastoreClusterDatastoreGroupKeySetStruct {
     values.add(new StructElement(EPOCH_START_TIME1_ID, epochStartTime1 != null ? new UIntType(epochStartTime1) : new NullType()));
     values.add(new StructElement(EPOCH_KEY2_ID, epochKey2 != null ? new ByteArrayType(epochKey2) : new NullType()));
     values.add(new StructElement(EPOCH_START_TIME2_ID, epochStartTime2 != null ? new UIntType(epochStartTime2) : new NullType()));
-    values.add(new StructElement(GROUP_KEY_MULTICAST_POLICY_ID, new UIntType(groupKeyMulticastPolicy)));
 
     return new StructType(values);
   }
@@ -22086,7 +22323,6 @@ public static class JointFabricDatastoreClusterDatastoreGroupKeySetStruct {
     @Nullable Long epochStartTime1 = null;
     @Nullable byte[] epochKey2 = null;
     @Nullable Long epochStartTime2 = null;
-    Integer groupKeyMulticastPolicy = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == GROUP_KEY_SET_ID_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -22128,11 +22364,6 @@ public static class JointFabricDatastoreClusterDatastoreGroupKeySetStruct {
           UIntType castingValue = element.value(UIntType.class);
           epochStartTime2 = castingValue.value(Long.class);
         }
-      } else if (element.contextTagNum() == GROUP_KEY_MULTICAST_POLICY_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          groupKeyMulticastPolicy = castingValue.value(Integer.class);
-        }
       }
     }
     return new JointFabricDatastoreClusterDatastoreGroupKeySetStruct(
@@ -22143,8 +22374,7 @@ public static class JointFabricDatastoreClusterDatastoreGroupKeySetStruct {
       epochKey1,
       epochStartTime1,
       epochKey2,
-      epochStartTime2,
-      groupKeyMulticastPolicy
+      epochStartTime2
     );
   }
 
@@ -22175,9 +22405,6 @@ public static class JointFabricDatastoreClusterDatastoreGroupKeySetStruct {
     output.append("\n");
     output.append("\tepochStartTime2: ");
     output.append(epochStartTime2);
-    output.append("\n");
-    output.append("\tgroupKeyMulticastPolicy: ");
-    output.append(groupKeyMulticastPolicy);
     output.append("\n");
     output.append("}\n");
     return output.toString();
