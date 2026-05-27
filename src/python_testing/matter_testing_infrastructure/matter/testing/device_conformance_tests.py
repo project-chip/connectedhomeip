@@ -23,7 +23,7 @@ import matter.clusters as Clusters
 from matter.testing.basic_composition import BasicCompositionTests
 from matter.testing.choice_conformance import (evaluate_attribute_choice_conformance, evaluate_command_choice_conformance,
                                                evaluate_feature_choice_conformance)
-from matter.testing.conformance import EMPTY_CLUSTER_GLOBAL_ATTRIBUTES, ConformanceAssessmentData, conformance_allowed
+from matter.testing.conformance import EMPTY_CLUSTER_GLOBAL_ATTRIBUTES, ConformanceAssessmentData, ConformanceDecision, conformance_allowed
 from matter.testing.global_attribute_ids import (ClusterIdType, DeviceTypeIdType, GlobalAttributeIds, cluster_id_type,
                                                  device_type_id_type, is_valid_device_type_id)
 from matter.testing.problem_notices import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, DeviceTypePathLocation,
@@ -347,6 +347,40 @@ class DeviceConformanceTests(BasicCompositionTests):
                         location, f"Expected Device type revision for device type {device_type_id} {self.xml_device_types[device_type_id].name} on endpoint {endpoint_id} does not match revision on DUT. Expected: {expected_revision} DUT: {actual_revision}")
         return success, problems
 
+    def _check_feature_overrides(self, cluster_requirement, cluster_info, feature_map, record_error, location, device_type_desc, allow_provisional):
+        for mask, conformance in cluster_requirement.feature_overrides.items():
+            conformance_decision_with_choice = conformance(cluster_info)
+            if conformance_decision_with_choice.is_mandatory() and ((feature_map & mask) == 0):
+                record_error(
+                    location=location, problem=f"Feature bit {mask.bit_length() - 1} in cluster {cluster_requirement.name} is required by element override for {device_type_desc}, but is not present in the feature map")
+            if not conformance_allowed(conformance_decision_with_choice, allow_provisional) and ((feature_map & mask) != 0):
+                record_error(
+                    location=location, problem=f"Feature bit {mask.bit_length() - 1} in cluster {cluster_requirement.name} is disallowed by element override for {device_type_desc}, but is present in the feature map")
+
+    def _check_attribute_overrides(self, cluster_requirement, cluster_info, attribute_list, record_error, location, device_type_desc, allow_provisional, device_type_id, cluster_id):
+        for _id, conformance in cluster_requirement.attribute_overrides.items():
+            conformance_decision_with_choice = conformance(cluster_info)
+            if conformance_decision_with_choice.is_mandatory() and _id not in attribute_list:
+                record_error(
+                    location=location, problem=f"Attribute {_id} in cluster {cluster_requirement.name} is required by element override for {device_type_desc}, but is not present in the attribute list")
+            if not conformance_allowed(conformance_decision_with_choice, allow_provisional) and _id in attribute_list:
+                if device_type_id == 0x050F and cluster_id == Clusters.Thermostat.id and _id == Clusters.Thermostat.Attributes.SystemMode.attribute_id:
+                    # This is a specific problem in the water heater device type where it is specifically disallowing a thing that shouldn't be disallowed
+                    # For now, ignore this requirement until the spec is fixed
+                    continue
+                record_error(
+                    location=location, problem=f"Attribute {_id} in cluster {cluster_requirement.name} is disallowed by element override for {device_type_desc}, but is present in the attribute list")
+
+    def _check_command_overrides(self, cluster_requirement, cluster_info, cmd_list, record_error, location, device_type_desc, allow_provisional):
+        for _id, conformance in cluster_requirement.command_overrides.items():
+            conformance_decision_with_choice = conformance(cluster_info)
+            if conformance_decision_with_choice.is_mandatory() and _id not in cmd_list:
+                record_error(
+                    location=location, problem=f"Command {_id} in cluster {cluster_requirement.name} is required by element override for {device_type_desc}, but is not present in the cmd list")
+            if not conformance_allowed(conformance_decision_with_choice, allow_provisional) and _id in cmd_list:
+                record_error(
+                    location=location, problem=f"Command {_id} in cluster {cluster_requirement.name} is disallowed by element override for {device_type_desc}, but is present in the cmd list")
+
     def check_device_type(self, fail_on_extra_clusters: bool = True, allow_provisional_test_event_only_disallowed_for_certification: bool = False) -> tuple[bool, list[ProblemNotice]]:
         success = True
         problems = []
@@ -419,40 +453,6 @@ class DeviceConformanceTests(BasicCompositionTests):
                         # Optional cluster not on this endpoint
                         continue
 
-                    def check_feature_overrides(cluster_requirement: XmlDeviceTypeClusterRequirements, cluster_info: ConformanceAssessmentData):
-                        for mask, conformance in cluster_requirement.feature_overrides.items():
-                            conformance_decision_with_choice = conformance(cluster_info)
-                            if conformance_decision_with_choice.is_mandatory() and ((feature_map & mask) == 0):
-                                record_error(
-                                    location=location, problem=f"Feature bit {mask.bit_length() - 1} in cluster {cluster_requirement.name} is required by element override for device type {xml_device.name}, but is not present in the feature map")
-                            if not conformance_allowed(conformance_decision_with_choice, allow_provisional_test_event_only_disallowed_for_certification) and ((feature_map & mask) != 0):
-                                record_error(
-                                    location=location, problem=f"Feature bit {mask.bit_length() - 1} in cluster {cluster_requirement.name} is disallowed by element override for device type {xml_device.name}, but is present in the feature map")
-
-                    def check_attribute_overrides(cluster_requirement: XmlDeviceTypeClusterRequirements, cluster_info: ConformanceAssessmentData) -> None:
-                        for _id, conformance in cluster_requirement.attribute_overrides.items():
-                            conformance_decision_with_choice = conformance(cluster_info)
-                            if conformance_decision_with_choice.is_mandatory() and _id not in attribute_list:
-                                record_error(
-                                    location=location, problem=f"Attribute {_id} in cluster {cluster_requirement.name} is required by element override for device type {xml_device.name}, but is not present in the attribute list")
-                            if not conformance_allowed(conformance_decision_with_choice, allow_provisional_test_event_only_disallowed_for_certification) and _id in attribute_list:
-                                if device_type_id == water_heater_id and cluster_id == Clusters.Thermostat.id and _id == Clusters.Thermostat.Attributes.SystemMode.attribute_id:
-                                    # This is a specific problem in the water heater device type where it is specifically disallowing a thing that shouldn't be disallowed
-                                    # For now, ignore this requirement until the spec is fixed
-                                    continue
-                                record_error(
-                                    location=location, problem=f"Attribute {_id} in cluster {cluster_requirement.name} is disallowed by element override for device type {xml_device.name}, but is present in the attribute list")
-
-                    def check_command_overrides(cluster_requirement: XmlDeviceTypeClusterRequirements, cluster_info: ConformanceAssessmentData):
-                        for _id, conformance in cluster_requirement.command_overrides.items():
-                            conformance_decision_with_choice = conformance(cluster_info)
-                            if conformance_decision_with_choice.is_mandatory() and _id not in cmd_list:
-                                record_error(
-                                    location=location, problem=f"Command {_id} in cluster {cluster_requirement.name} is required by element override for device type {xml_device.name}, but is not present in the cmd list")
-                            if not conformance_allowed(conformance_decision_with_choice, allow_provisional_test_event_only_disallowed_for_certification) and _id in cmd_list:
-                                record_error(
-                                    location=location, problem=f"Command {_id} in cluster {cluster_requirement.name} is disallowed by element override for device type {xml_device.name}, but is present in the cmd list")
-
                     cluster = Clusters.ClusterObjects.ALL_CLUSTERS[cluster_id]
                     feature_map = endpoint[cluster][cluster.Attributes.FeatureMap]
                     attribute_list = endpoint[cluster][cluster.Attributes.AttributeList]
@@ -460,9 +460,9 @@ class DeviceConformanceTests(BasicCompositionTests):
                     revision = endpoint[cluster][cluster.Attributes.ClusterRevision]
                     cluster_info = ConformanceAssessmentData(feature_map, attribute_list, cmd_list, revision)
 
-                    check_feature_overrides(cluster_requirement, cluster_info)
-                    check_attribute_overrides(cluster_requirement, cluster_info)
-                    check_command_overrides(cluster_requirement, cluster_info)
+                    self._check_feature_overrides(cluster_requirement, cluster_info, feature_map, record_error, location, f"device type {xml_device.name}", allow_provisional_test_event_only_disallowed_for_certification)
+                    self._check_attribute_overrides(cluster_requirement, cluster_info, attribute_list, record_error, location, f"device type {xml_device.name}", allow_provisional_test_event_only_disallowed_for_certification, device_type_id, cluster_id)
+                    self._check_command_overrides(cluster_requirement, cluster_info, cmd_list, record_error, location, f"device type {xml_device.name}", allow_provisional_test_event_only_disallowed_for_certification)
 
                 # If we want to check for extra clusters on the endpoint, we need to know the entire set of clusters in all the device type
                 # lists across all the device types on the endpoint.
@@ -508,40 +508,113 @@ class DeviceConformanceTests(BasicCompositionTests):
                     continue
 
                 xml_device = self.xml_device_types[device_type_id]
+                from collections import defaultdict
+                reqs_by_dt = defaultdict(list)
                 for req in xml_device.composed_device_types:
-                    # Conformance Assessment
-                    conformance_decision = req.conformance(EMPTY_CLUSTER_GLOBAL_ATTRIBUTES)
+                    reqs_by_dt[req.device_type_id].append(req)
+                    
+                parts_list = []
+                if Clusters.Descriptor.Attributes.PartsList in endpoint[Clusters.Descriptor]:
+                    parts_list = endpoint[Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList]
 
-                    # Count instances in child endpoints
-                    parts_list = []
-                    if Clusters.Descriptor.Attributes.PartsList in endpoint[Clusters.Descriptor]:
-                        parts_list = endpoint[Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList]
-
-                    count = 0
+                for req_dt_id, req_list in reqs_by_dt.items():
+                    # Find all child endpoints that have this device type
+                    matching_eps = []
                     for child_ep_id in parts_list:
                         if child_ep_id in self.endpoints:
                             child_ep = self.endpoints[child_ep_id]
                             if Clusters.Descriptor in child_ep:
                                 child_dt_list = child_ep[Clusters.Descriptor][Clusters.Descriptor.Attributes.DeviceTypeList]
-                                if any(child_dt.deviceType == req.device_type_id for child_dt in child_dt_list):
-                                    count += 1
-
+                                if any(child_dt.deviceType == req_dt_id for child_dt in child_dt_list):
+                                    matching_eps.append(child_ep_id)
+                                    
+                    # For each requirement, check which endpoints satisfy it
+                    req_matches = defaultdict(list)
+                    for req_idx, req in enumerate(req_list):
+                        for ep_id in matching_eps:
+                            child_ep = self.endpoints[ep_id]
+                            server_list = child_ep[Clusters.Descriptor][Clusters.Descriptor.Attributes.ServerList] if Clusters.Descriptor.Attributes.ServerList in child_ep[Clusters.Descriptor] else []
+                            
+                            matches = True
+                            for cid, cr in req.cluster_requirements.items():
+                                cconformance = cr.conformance(EMPTY_CLUSTER_GLOBAL_ATTRIBUTES)
+                                if cconformance.is_mandatory() and cid not in server_list:
+                                    matches = False
+                                    break
+                                elif cconformance.decision == ConformanceDecision.DISALLOWED and cid in server_list:
+                                    matches = False
+                                    break
+                                    
+                            if matches:
+                                # Also check element overrides!
+                                failed_override = False
+                                def dummy_record_error(location, problem):
+                                    nonlocal failed_override
+                                    failed_override = True
+                                    
+                                override_location = DeviceTypePathLocation(endpoint_id=ep_id, device_type_id=req.device_type_id)
+                                
+                                for cid, cr in req.cluster_requirements.items():
+                                    if cid not in server_list:
+                                        continue
+                                    cluster = Clusters.ClusterObjects.ALL_CLUSTERS[cid]
+                                    feature_map = child_ep[cluster][cluster.Attributes.FeatureMap]
+                                    attribute_list = child_ep[cluster][cluster.Attributes.AttributeList]
+                                    cmd_list = child_ep[cluster][cluster.Attributes.AcceptedCommandList]
+                                    revision = child_ep[cluster][cluster.Attributes.ClusterRevision]
+                                    cluster_info = ConformanceAssessmentData(feature_map, attribute_list, cmd_list, revision)
+                                    
+                                    self._check_feature_overrides(cr, cluster_info, feature_map, dummy_record_error, override_location, f"composed device type {req.device_type_name}", allow_provisional)
+                                    self._check_attribute_overrides(cr, cluster_info, attribute_list, dummy_record_error, override_location, f"composed device type {req.device_type_name}", allow_provisional, req.device_type_id, cid)
+                                    self._check_command_overrides(cr, cluster_info, cmd_list, dummy_record_error, override_location, f"composed device type {req.device_type_name}", allow_provisional)
+                                    
+                                if not failed_override:
+                                    req_matches[req_idx].append(ep_id)
+                                    
+                    # Try to satisfy all reqs with overrides first!
+                    reqs_with_overrides = []
+                    for r in req_list:
+                        if r.cluster_requirements:
+                            reqs_with_overrides.append(r)
+                    
+                    reqs_without_overrides = [r for r in req_list if r not in reqs_with_overrides]
+                    
+                    def satisfy_overrides(idx, assigned):
+                        if idx == len(reqs_with_overrides):
+                            return assigned
+                        req = reqs_with_overrides[idx]
+                        req_idx = req_list.index(req)
+                        for ep_id in req_matches[req_idx]:
+                            if ep_id not in assigned:
+                                res = satisfy_overrides(idx + 1, assigned | {ep_id})
+                                if res is not None:
+                                    return res
+                        return None
+                        
+                    assigned_for_overrides = satisfy_overrides(0, set())
+                    
                     location = DeviceTypePathLocation(endpoint_id=endpoint_id, device_type_id=device_type_id)
-
-                    if conformance_decision.is_mandatory() and count == 0:
-                        record_error(
-                            location, f"Mandatory composed device type {req.device_type_name} ({req.device_type_id}) for {xml_device.name} on endpoint {endpoint_id} is missing in child endpoints")
-                    elif not conformance_allowed(conformance_decision, allow_provisional) and count > 0:
-                        record_error(
-                            location, f"Disallowed composed device type {req.device_type_name} ({req.device_type_id}) for {xml_device.name} on endpoint {endpoint_id} is present in child endpoints")
-
-                    if conformance_allowed(conformance_decision, allow_provisional):
-                        if req.min_instances is not None and count < req.min_instances:
-                            record_error(
-                                location, f"Composed device type {req.device_type_name} ({req.device_type_id}) for {xml_device.name} on endpoint {endpoint_id} expects at least {req.min_instances} instances in child endpoints, but found {count}")
-                        if req.max_instances is not None and count > req.max_instances:
-                            record_error(
-                                location, f"Composed device type {req.device_type_name} ({req.device_type_id}) for {xml_device.name} on endpoint {endpoint_id} expects at most {req.max_instances} instances in child endpoints, but found {count}")
+                    
+                    if reqs_with_overrides and assigned_for_overrides is None:
+                        record_error(location, f"Could not find distinct child endpoints satisfying all labeled instances of composed device type {req_list[0].device_type_name}")
+                        continue
+                        
+                    # Now check constraints on base requirements
+                    total_matching = len(matching_eps)
+                    
+                    for req in reqs_without_overrides:
+                        conformance_decision = req.conformance(EMPTY_CLUSTER_GLOBAL_ATTRIBUTES)
+                        
+                        if conformance_decision.is_mandatory() and total_matching == 0:
+                            record_error(location, f"Mandatory composed device type {req.device_type_name} ({req.device_type_id}) is missing in child endpoints")
+                        elif not conformance_allowed(conformance_decision, allow_provisional) and total_matching > 0:
+                            record_error(location, f"Disallowed composed device type {req.device_type_name} ({req.device_type_id}) is present in child endpoints")
+                            
+                        if conformance_allowed(conformance_decision, allow_provisional):
+                            if req.min_instances is not None and total_matching < req.min_instances:
+                                record_error(location, f"Composed device type {req.device_type_name} ({req.device_type_id}) expects at least {req.min_instances} instances in child endpoints, but found {total_matching}")
+                            if req.max_instances is not None and total_matching > req.max_instances:
+                                record_error(location, f"Composed device type {req.device_type_name} ({req.device_type_id}) expects at most {req.max_instances} instances in child endpoints, but found {total_matching}")
 
         return success, problems
 

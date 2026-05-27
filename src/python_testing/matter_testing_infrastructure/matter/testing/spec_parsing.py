@@ -253,6 +253,7 @@ class XmlComposedDeviceTypeRequirement:
     conformance: ConformanceCallable
     min_instances: Optional[int] = None
     max_instances: Optional[int] = None
+    cluster_requirements: dict[uint, XmlDeviceTypeClusterRequirements] = field(default_factory=dict)
 
 
 @dataclass
@@ -1366,6 +1367,65 @@ def build_xml_namespaces(data_model_directory: typing.Union[PrebuiltDataModelDir
 def parse_single_device_type(root: ElementTree.Element, cluster_definition_xml: dict[uint, XmlCluster]) -> tuple[dict[int, XmlDeviceType], list[ProblemNotice]]:
     problems: list[ProblemNotice] = []
     device_types: dict[int, XmlDeviceType] = {}
+    def append_overrides(override_element_type: str, c: ElementTree.Element, cluster: XmlDeviceTypeClusterRequirements, c_id: uint, cluster_conformance_params: ConformanceParseParameters, location, problems: list[ProblemNotice]):
+        if override_element_type == 'feature':
+            name_to_id_map = {f.name: _id for _id, f in cluster_definition_xml[c_id].features.items()}
+            name_to_id_map.update(cluster_definition_xml[c_id].feature_map)
+            override = cluster.feature_overrides
+        elif override_element_type == 'attribute':
+            name_to_id_map = cluster_definition_xml[c_id].attribute_map
+            override = cluster.attribute_overrides
+        elif override_element_type == 'command':
+            name_to_id_map = cluster_definition_xml[c_id].command_map
+            override = cluster.command_overrides
+        else:
+            problems.append(ProblemNotice("Parse Device Type XML", location=location,
+                            severity=ProblemSeverity.WARNING, problem=f"Request for unknown element override type {override_element_type} - this is a script error"))
+            return
+
+        container = c.find(f'{override_element_type}s')
+        if container is None:
+            return
+
+        elements = container.iter(override_element_type)
+        for e in elements:
+            try:
+                element_name = e.attrib['name']
+            except KeyError:
+                if override_element_type == 'feature':
+                    try:
+                        element_name = e.attrib['code']
+                    except KeyError:
+                        element_name = None
+                else:
+                    element_name = None
+            if element_name is None:
+                problems.append(ProblemNotice("Parse Device Type XML", location=location,
+                                severity=ProblemSeverity.WARNING, problem=f"Missing {override_element_type} name for override in cluster 0x{c_id:04X}, e={str(e.attrib)}"))
+                continue
+
+            try:
+                conformance_xml, tmp_problem = get_conformance(e, c_id)
+                if tmp_problem:
+                    continue
+                conformance_override = parse_callable_from_xml(conformance_xml, cluster_conformance_params)
+
+                from matter.testing.spec_parsing import _fuzzy_name, is_disallowed
+                map_id = [name_to_id_map[n] for n in name_to_id_map if _fuzzy_name(n) == _fuzzy_name(element_name)]
+                if len(map_id) == 0:
+                    if is_disallowed(conformance_override):
+                        import logging
+                        logging.getLogger(__name__).info(f"Ignoring unknown {override_element_type} {element_name} in cluster {c_id} because the conformance is disallowed")
+                        continue
+                    problems.append(ProblemNotice("Parse Device Type XML", location=location,
+                                    severity=ProblemSeverity.WARNING, problem=f"Unknown {override_element_type} {element_name} in cluster 0x{c_id:04X} - map = {map_id}"))
+                else:
+                    override[map_id[0]] = conformance_override
+
+            except ConformanceException as ex:
+                problems.append(ProblemNotice("Parse Device Type XML", location=location,
+                                severity=ProblemSeverity.WARNING, problem=f"Unable to parse {override_element_type} conformance for {element_name} in cluster 0x{c_id:04X} - {ex}"))
+
     d = root
     if d.tag == 'deviceType':
         device_name = d.attrib['name']
@@ -1422,7 +1482,7 @@ def parse_single_device_type(root: ElementTree.Element, cluster_definition_xml: 
         for c in clusters:
             try:
                 try:
-                    cid = uint(int(c.attrib['id'], 0))
+                    c_id = uint(int(c.attrib['id'], 0))
                 except ValueError:
                     location = DeviceTypePathLocation(device_type_id=tid)
                     problems.append(ProblemNotice("Parse Device Type XML", location=location,
@@ -1430,155 +1490,94 @@ def parse_single_device_type(root: ElementTree.Element, cluster_definition_xml: 
                     continue
                 # Workaround for 1.3 device types with zigbee clusters and old scenes
                 # This is OK because there are other tests that ensure that unknown clusters do not appear on the device
-                if cid not in cluster_definition_xml:
-                    LOGGER.info(f"Skipping unknown cluster {cid:04X}")
+                if c_id not in cluster_definition_xml:
+                    LOGGER.info(f"Skipping unknown cluster {c_id:04X}")
                     continue
-                conformance_xml, tmp_problem = get_conformance(c, cid)
+                conformance_xml, tmp_problem = get_conformance(c, c_id)
                 if tmp_problem:
                     problems.append(tmp_problem)
                     continue
                 cluster_conformance_params = ConformanceParseParameters(
-                    feature_map=cluster_definition_xml[cid].feature_map, attribute_map=cluster_definition_xml[cid].attribute_map, command_map=cluster_definition_xml[cid].command_map)
+                    feature_map=cluster_definition_xml[c_id].feature_map, attribute_map=cluster_definition_xml[c_id].attribute_map, command_map=cluster_definition_xml[c_id].command_map)
                 conformance = parse_callable_from_xml(conformance_xml, cluster_conformance_params)
                 side_dict = {'server': ClusterSide.SERVER, 'client': ClusterSide.CLIENT}
                 side = side_dict[c.attrib['side']]
                 cluster_name = c.attrib['name']
-                if cid in CLUSTER_NAME_FIXES:
-                    cluster_name = CLUSTER_NAME_FIXES[cid]
+                if c_id in CLUSTER_NAME_FIXES:
+                    cluster_name = CLUSTER_NAME_FIXES[c_id]
                 cluster = XmlDeviceTypeClusterRequirements(name=cluster_name, side=side, conformance=conformance)
 
-                def append_overrides(override_element_type: str):
-                    if override_element_type == 'feature':
-                        # The device types use feature name rather than feature code. So we need to build a new map.
-                        name_to_id_map = {f.name: _id for _id, f in cluster_definition_xml[cid].features.items()}
-                        # But also...that's not universal, so let's be tolerant to using the code too.
-                        name_to_id_map.update(cluster_definition_xml[cid].feature_map)
-                        override = cluster.feature_overrides
-                    elif override_element_type == 'attribute':
-                        name_to_id_map = cluster_definition_xml[cid].attribute_map
-                        override = cluster.attribute_overrides
-                    elif override_element_type == 'command':
-                        name_to_id_map = cluster_definition_xml[cid].command_map
-                        override = cluster.command_overrides
-                    else:
-                        problems.append(ProblemNotice("Parse Device Type XML", location=location,
-                                        severity=ProblemSeverity.WARNING, problem=f"Request for unknown element override type {override_element_type} - this is a script error"))
-                        return
-
-                    container = c.find(f'{override_element_type}s')
-                    if container is None:
-                        return
-
-                    elements = container.iter(override_element_type)
-                    for e in elements:
-                        try:
-                            element_name = e.attrib['name']
-                        except KeyError:
-                            if override_element_type == 'feature':
-                                try:
-                                    element_name = e.attrib['code']
-                                except KeyError:
-                                    element_name = None
-                            else:
-                                element_name = None
-                        if element_name is None:
-                            problems.append(ProblemNotice("Parse Device Type XML", location=location,
-                                            severity=ProblemSeverity.WARNING, problem=f"Missing {override_element_type} name for override in cluster 0x{cid:04X}, e={str(e.attrib)}"))
-                            continue
-
-                        try:
-                            conformance_xml, tmp_problem = get_conformance(e, cid)
-                            if tmp_problem:
-                                # It's not actually a problem if there is no conformance override - it might be a constraint override. Just continue
-                                continue
-                            conformance_override = parse_callable_from_xml(conformance_xml, cluster_conformance_params)
-
-                            map_id = [name_to_id_map[n] for n in name_to_id_map if _fuzzy_name(n) ==
-                                      _fuzzy_name(element_name)]
-                            if len(map_id) == 0:
-                                # The thermostat in particular explicitly disallows some zigbee things that don't appear in the spec due to
-                                # ifdefs. We can ignore problems if the device type spec disallows things that don't exist.
-                                if is_disallowed(conformance_override):
-                                    LOGGER.info(
-                                        f"Ignoring unknown {override_element_type} {element_name} in cluster {cid} because the conformance is disallowed")
-                                    continue
-                                problems.append(ProblemNotice("Parse Device Type XML", location=location,
-                                                severity=ProblemSeverity.WARNING, problem=f"Unknown {override_element_type} {element_name} in cluster 0x{cid:04X} - map = {map_id}"))
-                            else:
-                                override[map_id[0]] = conformance_override
-
-                        except ConformanceException as ex:
-                            problems.append(ProblemNotice("Parse Device Type XML", location=location,
-                                            severity=ProblemSeverity.WARNING, problem=f"Unable to parse {override_element_type} conformance for {element_name} in cluster 0x{cid:04X} - {ex}"))
-
-                append_overrides('feature')
-                append_overrides('attribute')
-                append_overrides('command')
+                append_overrides('feature', c, cluster, c_id, cluster_conformance_params, location, problems)
+                append_overrides('attribute', c, cluster, c_id, cluster_conformance_params, location, problems)
+                append_overrides('command', c, cluster, c_id, cluster_conformance_params, location, problems)
 
                 if side == ClusterSide.SERVER:
-                    device_types[tid].server_clusters[cid] = cluster
+                    device_types[tid].server_clusters[c_id] = cluster
                 else:
-                    device_types[tid].client_clusters[cid] = cluster
+                    device_types[tid].client_clusters[c_id] = cluster
 
             except ConformanceException as ex:
-                location = DeviceTypePathLocation(device_type_id=tid, cluster_id=cid)
+                location = DeviceTypePathLocation(device_type_id=tid, cluster_id=c_id)
                 problems.append(ProblemNotice("Parse Device Type XML", location=location,
                                 severity=ProblemSeverity.WARNING, problem=f"Unable to parse conformance for cluster - {ex}"))
             # NOTE: Spec currently does a bad job of matching these exactly to the names and codes
             # so this will need a bit of fancy handling here to get this right.
 
         try:
-            main_composed_elements = d.findall('composedDeviceTypes')
-            for composed in main_composed_elements:
-                for composed_dt in composed.findall('deviceType'):
-                    try:
-                        composed_id = int(composed_dt.attrib['deviceTypeId'], 0)
-                        composed_name = composed_dt.attrib['deviceTypeName']
-                    except (KeyError, ValueError):
-                        problems.append(ProblemNotice("Parse Device Type XML", location=location,
-                                        severity=ProblemSeverity.WARNING, problem="Invalid composed device type id or name"))
-                        continue
+            composed_dts = d.findall('composedDeviceTypes/deviceType')
+            for composed_dt in composed_dts:
+                composed_id = int(composed_dt.attrib['deviceTypeId'], 0)
+                composed_name = composed_dt.attrib['deviceTypeName']
+                location = DeviceTypePathLocation(device_type_id=tid)
 
-                    # Conformance
-                    conformance_xml, tmp_problem = get_conformance(composed_dt, uint(id))
-                    if tmp_problem:
-                        # Composed device types in versions 1.5.1 and earlier often lack explicit conformance in XML.
-                        # Default them to optionalConform to prevent parser warnings.
-                        # TODO: Report as a problem once all data_model files are updated with composedDeviceType definitions.
-                        conformance_xml = ElementTree.Element('optionalConform')
+                # Conformance
+                conformance_xml, _ = get_conformance(composed_dt, uint(tid))
 
-                    try:
-                        conformance = parse_callable_from_xml(conformance_xml, ConformanceParseParameters(
-                            feature_map={}, attribute_map={}, command_map={}))
-                    except ConformanceException as ex:
-                        problems.append(ProblemNotice("Parse Device Type XML", location=location,
-                                        severity=ProblemSeverity.WARNING, problem=f"Unable to parse conformance for composed device type - {ex}"))
-                        continue
 
-                    min_instances = None
-                    max_instances = None
-                    constraint = composed_dt.find('constraint')
-                    if constraint is not None:
-                        allowed_el = constraint.find('allowed')
-                        if allowed_el is not None and 'value' in allowed_el.attrib:
-                            min_instances = int(allowed_el.attrib['value'], 0)
-                            max_instances = int(allowed_el.attrib['value'], 0)
-                        else:
-                            min_el = constraint.find('min')
-                            if min_el is not None and 'value' in min_el.attrib:
-                                min_instances = int(min_el.attrib['value'], 0)
+                conformance = parse_callable_from_xml(conformance_xml, ConformanceParseParameters(
+                    feature_map={}, attribute_map={}, command_map={}))
 
-                            max_el = constraint.find('max')
-                            if max_el is not None and 'value' in max_el.attrib:
-                                max_instances = int(max_el.attrib['value'], 0)
+                min_instances = None
+                max_instances = None
+                
+                if (constraint := composed_dt.find('constraint')) is not None:
+                    if (allowed := constraint.find('allowed')) is not None:
+                        min_instances = max_instances = int(allowed.attrib.get('value', 0), 0)
+                    else:
+                        min_el = constraint.find('min')
+                        max_el = constraint.find('max')
+                        
+                        min_instances = int(min_el.attrib.get('value', 0), 0) if min_el is not None else None
+                        max_instances = int(max_el.attrib.get('value', 0), 0) if max_el is not None else None
 
-                    device_types[id].composed_device_types.append(XmlComposedDeviceTypeRequirement(
-                        device_type_id=composed_id,
-                        device_type_name=composed_name,
-                        conformance=conformance,
-                        min_instances=min_instances,
-                        max_instances=max_instances
-                    ))
+                cluster_requirements = {}
+                cr_el = composed_dt.find('clusterRequirements')
+                if cr_el is not None:
+                    for c in cr_el.findall('cluster'):
+                        c_id = uint(int(c.attrib['id'], 0))
+                        c_name = c.attrib['name']
+                        c_conformance_xml, _ = get_conformance(c, c_id)
+                        c_conformance = parse_callable_from_xml(c_conformance_xml, ConformanceParseParameters(feature_map={}, attribute_map={}, command_map={}))
+                        cluster = XmlDeviceTypeClusterRequirements(name=c_name, side=ClusterSide.SERVER, conformance=c_conformance)
+                        cluster_requirements[c_id] = cluster
+                        
+                        cluster_conformance_params = ConformanceParseParameters(
+                            feature_map=cluster_definition_xml[c_id].feature_map, 
+                            attribute_map=cluster_definition_xml[c_id].attribute_map, 
+                            command_map=cluster_definition_xml[c_id].command_map
+                        )
+                        append_overrides('feature', c, cluster, c_id, cluster_conformance_params, location, problems)
+                        append_overrides('attribute', c, cluster, c_id, cluster_conformance_params, location, problems)
+                        append_overrides('command', c, cluster, c_id, cluster_conformance_params, location, problems)
+
+                device_types[tid].composed_device_types.append(XmlComposedDeviceTypeRequirement(
+                    device_type_id=composed_id,
+                    device_type_name=composed_name,
+                    conformance=conformance,
+                    min_instances=min_instances,
+                    max_instances=max_instances,
+                    cluster_requirements=cluster_requirements
+                ))
         except Exception as e:
             problems.append(ProblemNotice("Parse Device Type XML", location=location,
                             severity=ProblemSeverity.WARNING, problem=f"Error parsing composedDeviceTypes: {e}"))
