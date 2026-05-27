@@ -136,6 +136,7 @@
 #include <clusters/ScenesManagement/AttributeIds.h>
 #include <clusters/ServiceArea/AttributeIds.h>
 #include <clusters/SmokeCoAlarm/AttributeIds.h>
+#include <clusters/SmokeConcentrationMeasurement/AttributeIds.h>
 #include <clusters/SoftwareDiagnostics/AttributeIds.h>
 #include <clusters/SoilMeasurement/AttributeIds.h>
 #include <clusters/Switch/AttributeIds.h>
