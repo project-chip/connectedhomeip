@@ -170,11 +170,6 @@ Status AirPurifierManager::HandleStep(FanControl::StepDirectionEnum aDirection, 
     return FanControl::Attributes::SpeedSetting::Set(mEndpointId, newSpeedSetting);
 }
 
-// Code-driven FanControl keeps PercentSetting / FanMode / SpeedSetting in sync with writes, but
-// leaves PercentCurrent and SpeedCurrent to the application: they represent measured output, not
-// the requested drive. When the On/Off attribute is false, both currents stay zero, when it is
-// true and the drive is non-idle, currents are updated from the committed snapshot in `newState`.
-// This callback runs whenever the cluster finishes such an update.
 void AirPurifierManager::OnFanDriveStateChanged(const FanControl::FanDriveState & newState)
 {
     uint32_t featureMap   = 0;

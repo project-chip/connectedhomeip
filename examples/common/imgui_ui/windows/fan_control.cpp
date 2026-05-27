@@ -17,8 +17,6 @@
 #include "fan_control.h"
 #include "accessor_updaters.h"
 
-#include <app/clusters/fan-control-server/fan-control-server.h>
-
 #include <imgui.h>
 
 #include <lib/support/TypeTraits.h>

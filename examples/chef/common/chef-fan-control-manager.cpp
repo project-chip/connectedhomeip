@@ -125,11 +125,6 @@ Status ChefFanControlManager::HandleStep(StepDirectionEnum aDirection, bool aWra
     return SpeedSetting::Set(mEndpoint, newSpeedSetting);
 }
 
-// Code-driven FanControl keeps PercentSetting / FanMode / SpeedSetting in sync with writes, but
-// does not own how PercentCurrent / SpeedCurrent are exposed: this sample treats them as the
-// simulated output and copies the committed snapshot from `newState` into attribute storage.
-// FanModeWriteCallback applies mode-specific IO, with MultiSpeed, SpeedCurrent is written and
-// FanMode may be aligned to the resulting speed.
 void ChefFanControlManager::OnFanDriveStateChanged(const FanDriveState & newState)
 {
     mSpeedCurrent = newState.speedCurrent;
