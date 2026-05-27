@@ -16,10 +16,12 @@ limitations under the License.
 """
 
 import logging
-import os
+import shlex
 import sys
 
 from helper.CHIPTestBase import CHIPVirtualHome
+from helper.paths import (CHIP_ALL_CLUSTERS_APP_ESC, CHIP_ALL_CLUSTERS_APP_FRAGMENT, CHIP_REPO_STR,
+                          CONTROLLER_TEST_SCRIPTS_DIR_PATH, MATTER_CONTROLLER_INSTALL_WHEELS, MATTER_DEVELOPMENT_PAA_ROOT_CERTS_ESC)
 
 """
 Test to verify that the device can still handle new subscription requests when resuming the maximum subscriptions.
@@ -47,13 +49,11 @@ logger.addHandler(sh)
 CHIP_PORT = 5540
 
 CIRQUE_URL = "http://localhost:5000"
-CHIP_REPO = os.path.join(os.path.abspath(
-    os.path.dirname(__file__)), "..", "..", "..")
 TEST_EXTPANID = "fedcba9876543210"
 TEST_DISCRIMINATOR = 3840
-MATTER_DEVELOPMENT_PAA_ROOT_CERTS = "credentials/development/paa-root-certs"
-TEST_END_DEVICE_APP = "standalone/chip-all-clusters-app"
 TEST_SUBSCRIPTION_CAPACITY = 3
+TEST_SCRIPT_CTRL1_ESC = shlex.quote(str(CONTROLLER_TEST_SCRIPTS_DIR_PATH / "subscription_resumption_capacity_test_ctrl1.py"))
+TEST_SCRIPT_CTRL2_ESC = shlex.quote(str(CONTROLLER_TEST_SCRIPTS_DIR_PATH / "subscription_resumption_capacity_test_ctrl2.py"))
 
 
 # TODO: If using one Mobile Device, the CHIPEndDevice can still resolve the address for first controller
@@ -69,7 +69,7 @@ DEVICE_CONFIG = {
         'rcp_mode': True,
         'docker_network': 'Ipv6',
         'traffic_control': {'latencyMs': 25},
-        "mount_pairs": [[CHIP_REPO, CHIP_REPO]],
+        "mount_pairs": [[CHIP_REPO_STR, CHIP_REPO_STR]],
     },
     'device1': {
         'type': 'MobileDevice',
@@ -78,7 +78,7 @@ DEVICE_CONFIG = {
         'rcp_mode': True,
         'docker_network': 'Ipv6',
         'traffic_control': {'latencyMs': 25},
-        "mount_pairs": [[CHIP_REPO, CHIP_REPO]],
+        "mount_pairs": [[CHIP_REPO_STR, CHIP_REPO_STR]],
     },
     'device2': {
         'type': 'CHIPEndDevice',
@@ -87,7 +87,7 @@ DEVICE_CONFIG = {
         'rcp_mode': True,
         'docker_network': 'Ipv6',
         'traffic_control': {'latencyMs': 25},
-        "mount_pairs": [[CHIP_REPO, CHIP_REPO]],
+        "mount_pairs": [[CHIP_REPO_STR, CHIP_REPO_STR]],
     }
 }
 
@@ -116,40 +116,26 @@ class TestSubscriptionResumptionCapacity(CHIPVirtualHome):
         self.execute_device_cmd(server_device_id, "service ssh start")
         self.execute_device_cmd(
             server_device_id,
-            ("CHIPCirqueDaemon.py -- run gdb -batch -return-child-result -q -ex \"set pagination off\" "
-             "-ex run -ex \"thread apply all bt\" --args {} --thread --discriminator {} "
-             "--subscription-capacity {}").format(
-                 os.path.join(CHIP_REPO, "out/debug", TEST_END_DEVICE_APP), TEST_DISCRIMINATOR,
-                 TEST_SUBSCRIPTION_CAPACITY))
+            'CHIPCirqueDaemon.py -- run gdb -batch -return-child-result -q -ex "set pagination off" -ex run '
+            f'-ex "thread apply all bt" --args {CHIP_ALL_CLUSTERS_APP_ESC} --thread --discriminator {TEST_DISCRIMINATOR} '
+            f'--subscription-capacity {TEST_SUBSCRIPTION_CAPACITY}')
 
         self.reset_thread_devices(server_ids)
 
         for req_device_id in req_ids:
-            self.execute_device_cmd(req_device_id, "pip3 install --break-system-packages {}".format(os.path.join(
-                CHIP_REPO, "out/debug/linux_x64_gcc/controller/python/matter_clusters-1.0.0-py3-none-any.whl")))
-            self.execute_device_cmd(req_device_id, "pip3 install --break-system-packages {}".format(os.path.join(
-                CHIP_REPO, "out/debug/linux_x64_gcc/controller/python/matter_core-1.0.0-cp311-abi3-linux_x86_64.whl")))
-            self.execute_device_cmd(req_device_id, "pip3 install --break-system-packages {}".format(os.path.join(
-                CHIP_REPO, "out/debug/linux_x64_gcc/controller/python/matter_repl-1.0.0-py3-none-any.whl")))
+            self.execute_device_cmd(req_device_id, MATTER_CONTROLLER_INSTALL_WHEELS)
 
-        command1 = ("gdb -batch -return-child-result -q -ex run -ex \"thread apply all bt\" "
-                    "--args python3 {} -t 300 --paa-trust-store-path {} --subscription-capacity {}").format(
-                        os.path.join(CHIP_REPO, "src/controller/python/tests/scripts",
-                                     "subscription_resumption_capacity_test_ctrl1.py"),
-                        os.path.join(CHIP_REPO, MATTER_DEVELOPMENT_PAA_ROOT_CERTS),
-                        TEST_SUBSCRIPTION_CAPACITY)
+        command1 = (f'gdb -batch -return-child-result -q -ex run -ex "thread apply all bt" --args python3 {TEST_SCRIPT_CTRL1_ESC} '
+                    f'-t 300 --paa-trust-store-path {MATTER_DEVELOPMENT_PAA_ROOT_CERTS_ESC} '
+                    f'--subscription-capacity {TEST_SUBSCRIPTION_CAPACITY}')
         ret1 = self.execute_device_cmd(req_ids[0], command1)
 
         self.assertEqual(ret1['return_code'], '0',
                          "Test failed: non-zero return code")
 
-        command2 = ("gdb -batch -return-child-result -q -ex run -ex \"thread apply all bt\" "
-                    "--args python3 {} -t 300 -a {} --paa-trust-store-path {} --remote-server-app {} "
-                    "--subscription-capacity {}").format(
-                        os.path.join(CHIP_REPO, "src/controller/python/tests/scripts",
-                                     "subscription_resumption_capacity_test_ctrl2.py"),
-                        ethernet_ip, os.path.join(CHIP_REPO, MATTER_DEVELOPMENT_PAA_ROOT_CERTS),
-                        TEST_END_DEVICE_APP, TEST_SUBSCRIPTION_CAPACITY)
+        command2 = (f'gdb -batch -return-child-result -q -ex run -ex "thread apply all bt" --args python3 {TEST_SCRIPT_CTRL2_ESC} '
+                    f'-t 300 -a {ethernet_ip} --paa-trust-store-path {MATTER_DEVELOPMENT_PAA_ROOT_CERTS_ESC} '
+                    f'--remote-server-app {CHIP_ALL_CLUSTERS_APP_FRAGMENT} --subscription-capacity {TEST_SUBSCRIPTION_CAPACITY}')
         ret2 = self.execute_device_cmd(req_ids[1], command2)
 
         self.assertEqual(ret2['return_code'], '0',

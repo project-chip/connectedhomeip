@@ -130,7 +130,7 @@ class NetworkResource:
         log.debug("Executing: '%s' check=%s", shlex.join(cmd), check)
         try:
             # We're not interested in stdout/stderr for successful execution.
-            subprocess.run(cmd, check=check, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            subprocess.run(cmd, check=check, text=True, capture_output=True)
         except subprocess.CalledProcessError as e:
             raise RuntimeError(f"Failed to execute '{shlex.join(cmd)}'. Are you using --privileged if running in docker?",
                                f"Command stdout: '{e.stdout.rstrip()}'", f"Command stderr: '{e.stderr.rstrip()}'") from e

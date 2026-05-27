@@ -2,20 +2,20 @@
 Data models for the Push AV Server.
 """
 
-from enum import Enum
+from enum import StrEnum
 from typing import Optional
 
 from pydantic import BaseModel
 
 
-class SupportedIngestInterface(str, Enum):
+class SupportedIngestInterface(StrEnum):
     """Supported ingest interfaces for media streams."""
     cmaf = "cmaf-ingest"  # Interface 1
     dash = "dash"  # Interface 2, DASH version
     hls = "hls"  # Interface 2, HLS version
 
 
-class TrackState(str, Enum):
+class TrackState(StrEnum):
     """State of a track in the upload process."""
     NOT_STARTED = "not_started"
     INITIAL_PLAYLIST_UPLOADED = "initial_playlist_uploaded"  # HLS only

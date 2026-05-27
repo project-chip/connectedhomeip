@@ -28,8 +28,6 @@
 
 import sys
 
-from six.moves import range  # noqa: A004
-
 __all__ = ['ComputeCheckChar',   'VerifyCheckChar',
            'ComputeCheckChar16', 'VerifyCheckChar16',
            'ComputeCheckChar32', 'VerifyCheckChar32',
