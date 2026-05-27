@@ -17,10 +17,10 @@
 
 #pragma once
 
+#include <app/data-model/Nullable.h>
 #include <app/server-cluster/OptionalAttributeSet.h>
 #include <clusters/PowerSource/Attributes.h>
 #include <clusters/PowerSource/Enums.h>
-#include <data-model/Nullable.h>
 #include <lib/support/ScopedMemoryBuffer.h>
 #include <lib/support/Span.h>
 #include <lib/support/TimerDelegate.h>
