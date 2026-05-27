@@ -21,8 +21,10 @@
 #include <lib/core/CHIPEncoding.h>
 #include <lib/dnssd/TxtFields.h>
 #include <lib/dnssd/minimal_mdns/core/QNameString.h> // nogncheck
+#include <lib/support/BytesToHex.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/StringBuilder.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <transport/raw/MessageHeader.h>
 
@@ -64,6 +66,46 @@ std::vector<uint8_t> DiscoveryCodeToVector(Thread::DiscoveryCode code)
     Encoding::BigEndian::Put64(bytes, code.AsUInt64());
     return std::vector<uint8_t>(bytes, bytes + sizeof(bytes));
 }
+
+void AddJsonString(StringBuilderBase & builder, const char * value)
+{
+    builder.Add("\"");
+    for (const char * p = value; p != nullptr && *p != '\0'; ++p)
+    {
+        switch (*p)
+        {
+        case '\\':
+            builder.Add("\\\\");
+            break;
+        case '"':
+            builder.Add("\\\"");
+            break;
+        default:
+            builder.Add(p, 1);
+            break;
+        }
+    }
+    builder.Add("\"");
+}
+
+void BytesToHex(const uint8_t * bytes, size_t size, char * buffer, size_t bufferSize)
+{
+    if (bufferSize == 0)
+    {
+        return;
+    }
+
+    buffer[0] = '\0';
+    if (size == 0)
+    {
+        return;
+    }
+
+    if (Encoding::BytesToUppercaseHexString(bytes, size, buffer, bufferSize) != CHIP_NO_ERROR)
+    {
+        buffer[0] = '\0';
+    }
+}
 } // namespace
 
 namespace chip {
@@ -76,7 +118,7 @@ ThreadMeshcopCommissionProxy::ThreadMeshcopCommissionProxy() : mState(State::kCo
 
 ThreadMeshcopCommissionProxy::~ThreadMeshcopCommissionProxy()
 {
-    std::lock_guard<std::recursive_mutex> lock(mMutex);
+    std::unique_lock<std::recursive_mutex> lock(mMutex);
     if (mProxyFd != -1)
     {
         if (shutdown(mProxyFd, SHUT_RDWR) == 0 || errno != EBADF)
@@ -89,8 +131,32 @@ ThreadMeshcopCommissionProxy::~ThreadMeshcopCommissionProxy()
 
     if (mProxyThread.joinable())
     {
+        lock.unlock();
         mProxyThread.join();
     }
+}
+
+void ThreadMeshcopCommissionProxy::ResetCommissionerForDiscovery()
+{
+    std::unique_lock<std::recursive_mutex> lock(mMutex);
+    if (mProxyFd != -1)
+    {
+        if (shutdown(mProxyFd, SHUT_RDWR) == 0 || errno != EBADF)
+        {
+            close(mProxyFd);
+        }
+        mProxyFd = -1;
+    }
+
+    if (mProxyThread.joinable())
+    {
+        lock.unlock();
+        mProxyThread.join();
+        lock.lock();
+    }
+
+    mServicePort  = 0;
+    mCommissioner = ot::commissioner::Commissioner::Create(*this);
 }
 
 void ThreadMeshcopCommissionProxy::SetState(State state)
@@ -214,6 +280,49 @@ CHIP_ERROR ThreadMeshcopCommissionProxy::CreateProxySocket(chip::Dnssd::Commissi
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR ThreadMeshcopCommissionProxy::GetLastDiscoveryDiagnosticJson(char * buffer, size_t bufferSize)
+{
+    VerifyOrReturnError(buffer != nullptr && bufferSize > 0, CHIP_ERROR_INVALID_ARGUMENT);
+
+    std::lock_guard<std::recursive_mutex> lock(mMutex);
+    auto & diagnostic = mLastDiscoveryDiagnostic;
+    char steeringDataHex[ot::commissioner::kMaxSteeringDataLength * 2 + 1];
+    char rotatingIdHex[Dnssd::kMaxRotatingIdLen * 2 + 1];
+    BytesToHex(diagnostic.steeringData.data(), diagnostic.steeringData.size(), steeringDataHex, sizeof(steeringDataHex));
+    BytesToHex(diagnostic.commissionData.rotatingId, diagnostic.commissionData.rotatingIdLen, rotatingIdHex, sizeof(rotatingIdHex));
+
+    StringBuilderBase builder(buffer, bufferSize);
+    builder.AddFormat("{\"valid\":%s", diagnostic.valid ? "true" : "false");
+    builder.AddFormat(",\"requested_discriminator_type\":\"%s\"", diagnostic.requestedShort ? "short" : "long");
+    builder.AddFormat(",\"requested_discriminator\":%u", diagnostic.requestedValue);
+    builder.AddFormat(",\"expected_long_discriminator\":%u", diagnostic.expectedLongValue);
+    builder.AddFormat(",\"discovery_code\":%" PRIu64, diagnostic.discoveryCode);
+    builder.Add(",\"steering_data_hex\":");
+    AddJsonString(builder, steeringDataHex);
+    builder.AddFormat(",\"joiner_id\":%" PRIu64, diagnostic.joinerId);
+    builder.AddFormat(",\"joiner_udp_port\":%u", diagnostic.joinerUdpPort);
+    builder.Add(",\"dns_announcement\":{");
+    builder.AddFormat("\"long_discriminator\":%u", diagnostic.commissionData.longDiscriminator);
+    builder.AddFormat(",\"commissioning_mode\":%u", diagnostic.commissionData.commissioningMode);
+    builder.AddFormat(",\"device_type\":%" PRIu32, diagnostic.commissionData.deviceType);
+    builder.AddFormat(",\"vendor_id\":%u", diagnostic.commissionData.vendorId);
+    builder.AddFormat(",\"product_id\":%u", diagnostic.commissionData.productId);
+    builder.AddFormat(",\"pairing_hint\":%u", diagnostic.commissionData.pairingHint);
+    builder.AddFormat(",\"service_port\":%u", diagnostic.matterUdpPort);
+    builder.AddFormat(",\"thread_meshcop\":%s", diagnostic.commissionData.threadMeshcop ? "true" : "false");
+    builder.AddFormat(",\"supports_commissioner_generated_passcode\":%s",
+                      diagnostic.commissionData.supportsCommissionerGeneratedPasscode ? "true" : "false");
+    builder.Add(",\"instance_name\":");
+    AddJsonString(builder, diagnostic.commissionData.instanceName);
+    builder.Add(",\"hostname\":");
+    AddJsonString(builder, diagnostic.commissionData.hostName);
+    builder.Add(",\"rotating_id_hex\":");
+    AddJsonString(builder, rotatingIdHex);
+    builder.Add("}}");
+
+    return builder.Fit() ? CHIP_NO_ERROR : CHIP_ERROR_BUFFER_TOO_SMALL;
+}
+
 void ThreadMeshcopCommissionProxy::OnRecord(const mdns::Minimal::BytesRange & name, const mdns::Minimal::BytesRange & value)
 {
     ByteSpan key(name.Start(), name.Size());
@@ -253,6 +362,12 @@ void ThreadMeshcopCommissionProxy::ProcessAnnouncement(const std::vector<uint8_t
 
     mDiscoveredNodePromise.set_value(mNodeData);
     mPromiseFulfilled = true;
+
+    mLastDiscoveryDiagnostic.valid          = true;
+    mLastDiscoveryDiagnostic.joinerId       = JoinerIdFromBytes(joinerIdBytes);
+    mLastDiscoveryDiagnostic.joinerUdpPort  = joinerPort;
+    mLastDiscoveryDiagnostic.matterUdpPort  = mServicePort;
+    mLastDiscoveryDiagnostic.commissionData = mNodeData.Get<Dnssd::CommissionNodeData>();
 
     SetState(State::kDiscovered);
 
@@ -399,6 +514,7 @@ CHIP_ERROR ThreadMeshcopCommissionProxy::Discover(ByteSpan & pskc, const Transpo
     using ot::commissioner::Error;
 
     Error error;
+    ResetCommissionerForDiscovery();
 
     // Reset the promise and state for a new discovery session
     std::future<Dnssd::DiscoveredNodeData> future;
@@ -410,6 +526,13 @@ CHIP_ERROR ThreadMeshcopCommissionProxy::Discover(ByteSpan & pskc, const Transpo
         future                 = mDiscoveredNodePromise.get_future();
         mPromiseFulfilled      = false;
         mJoinerId              = 0;
+        mLastDiscoveryDiagnostic = DiscoveryDiagnostic();
+        mLastDiscoveryDiagnostic.requestedShort = expectedDiscriminator.IsShortDiscriminator();
+        mLastDiscoveryDiagnostic.requestedValue =
+            mLastDiscoveryDiagnostic.requestedShort ? expectedDiscriminator.GetShortValue() : expectedDiscriminator.GetLongValue();
+        mLastDiscoveryDiagnostic.expectedLongValue =
+            expectedDiscriminator.IsShortDiscriminator() ? 0 : expectedDiscriminator.GetLongValue();
+        mLastDiscoveryDiagnostic.discoveryCode     = code.AsUInt64();
     }
 
     ReturnErrorOnFailure(InitializeCommissioner(pskc));
@@ -431,7 +554,13 @@ CHIP_ERROR ThreadMeshcopCommissionProxy::Discover(ByteSpan & pskc, const Transpo
         ChipLogProgress(Controller, "Thread Commissioner active with ID: %s", id.c_str());
     }
 
-    error = mCommissioner->SetCommissionerDataset(MakeCommissionerDataset(code));
+    auto commissionerDataset = MakeCommissionerDataset(code);
+    {
+        std::lock_guard<std::recursive_mutex> lock(mMutex);
+        mLastDiscoveryDiagnostic.steeringData = commissionerDataset.mSteeringData;
+    }
+
+    error = mCommissioner->SetCommissionerDataset(commissionerDataset);
     if (error != ot::commissioner::ErrorCode::kNone)
     {
         ChipLogError(Controller, "Failed to set Steering Data: %s", error.GetMessage().c_str());

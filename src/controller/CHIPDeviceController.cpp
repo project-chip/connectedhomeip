@@ -690,6 +690,15 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, const char * se
                                        resolutionData);
 }
 
+CHIP_ERROR DeviceCommissioner::GetLastThreadMeshcopDiscoveryDiagnosticJson(char * buffer, size_t bufferSize)
+{
+#if CHIP_SUPPORT_THREAD_MESHCOP
+    return mThreadMeshcopCommissionProxy.GetLastDiscoveryDiagnosticJson(buffer, bufferSize);
+#else
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+#endif // CHIP_SUPPORT_THREAD_MESHCOP
+}
+
 CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, const char * setUpCode, DiscoveryType discoveryType,
                                           Optional<Dnssd::CommonResolutionData> resolutionData)
 {
