@@ -149,6 +149,9 @@ constexpr uint8_t kOvenDeviceTypeRevision = 2;
 constexpr DeviceTypeId kLaundryDryerDeviceTypeId  = 0x0000007C;
 constexpr uint8_t kLaundryDryerDeviceTypeRevision = 2;
 
+constexpr DeviceTypeId kHumidifierDehumidifierDeviceTypeId  = 0x0000007D;
+constexpr uint8_t kHumidifierDehumidifierDeviceTypeRevision = 1;
+
 constexpr DeviceTypeId kNetworkInfrastructureManagerDeviceTypeId  = 0x00000090;
 constexpr uint8_t kNetworkInfrastructureManagerDeviceTypeRevision = 2;
 

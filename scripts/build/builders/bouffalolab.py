@@ -114,7 +114,7 @@ class BouffalolabBuilder(GnBuilder):
         else:
             raise Exception(f"module_type {module_type} is not supported")
 
-        super(BouffalolabBuilder, self).__init__(
+        super().__init__(
             root=os.path.join(root, 'examples',
                               app.ExampleName(), 'bouffalolab', bouffalo_chip),
             runner=runner,
@@ -274,7 +274,7 @@ class BouffalolabBuilder(GnBuilder):
         pattern = r'PROJECT_SDK_VERSION\s+"([^"]+)"'
 
         try:
-            with open(filepath, 'r', encoding='utf-8') as f:
+            with open(filepath, encoding='utf-8') as f:
                 content = f.read()
             match = re.search(pattern, content)
             if match:

@@ -14,7 +14,7 @@
 
 import logging
 import os
-from typing import Dict, Optional
+from typing import Optional
 
 import jinja2
 
@@ -84,7 +84,7 @@ class CodeGenerator:
         """
         raise NotImplementedError("Method should be implemented by subclasses")
 
-    def internal_render_one_output(self, template_path: str, output_file_name: str, template_vars: Dict):
+    def internal_render_one_output(self, template_path: str, output_file_name: str, template_vars: dict):
         """
         Method to be called by subclasses to mark that a template is to be generated.
 

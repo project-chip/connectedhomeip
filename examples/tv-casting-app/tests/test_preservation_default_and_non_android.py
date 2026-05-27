@@ -1,26 +1,21 @@
 """
 Preservation Property Test -- Property 2: Default and Non-Android Builds Unchanged
 
-**Validates: Requirements 3.1, 3.2**
+**Validates: Requirements 14.1, 14.4**
 
 This test verifies that the baseline build configurations for default
 (non-optimized) Android builds and non-Android platforms (Linux, Darwin)
-remain unchanged. It follows observation-first methodology: the assertions
-encode the *current* state of the files so that any future change that
-accidentally regresses these configurations will be caught.
+remain unchanged after consolidation of override args into
+`chip_data_model_overrides_dir`.
 
-Observations (on UNFIXED code):
+Observations (on consolidated code):
 - android/args.gni default block: chip_build_libshell=true,
-  optimize_for_size=false, no chip_cluster_objects_source_override set,
-  no matter_enable_tlv_decoder_api set.
-- linux/args.gni: does NOT set chip_cluster_objects_source_override
-  unconditionally (set via host.py when chip_casting_simplified=true).
-- darwin/args.gni: chip_cluster_objects_source_override points to
-  casting-cluster-objects.cpp.
-- casting-cluster-objects.cpp exists and contains ~157 .ipp includes
-  spanning ~39 cluster directories plus the shared utilities directory.
-
-EXPECTED on UNFIXED code: ALL TESTS PASS -- confirms baseline to preserve.
+  optimize_for_size=false, no chip_data_model_overrides_dir set.
+- android/args.gni optimize_apk_size block: sets chip_data_model_overrides_dir.
+- linux/args.gni: does NOT set chip_data_model_overrides_dir unconditionally.
+- darwin/args.gni: chip_data_model_overrides_dir points to tv-casting-common/.
+- cluster-objects-override.cpp exists and contains ~117 .ipp includes
+  spanning ~29 cluster directories plus the shared utilities directory.
 """
 
 import os
@@ -51,7 +46,7 @@ SLIM_CLUSTER_FILE = os.path.join(
     "examples",
     "tv-casting-app",
     "tv-casting-common",
-    "casting-cluster-objects.cpp",
+    "cluster-objects-override.cpp",
 )
 
 # ---------------------------------------------------------------------------
@@ -115,6 +110,29 @@ def _extract_else_block(text: str) -> str:
     return stripped[else_body_start:epos - 1]
 
 
+def _extract_if_block(text: str) -> str:
+    """
+    Extract the body of the `if (optimize_apk_size)` block in args.gni.
+    """
+    stripped = _strip_comments(text)
+
+    match = re.search(r"if\s*\(\s*optimize_apk_size\s*\)", stripped)
+    if not match:
+        return ""
+
+    brace_start = stripped.index("{", match.end())
+    depth = 1
+    pos = brace_start + 1
+    while pos < len(stripped) and depth > 0:
+        if stripped[pos] == "{":
+            depth += 1
+        elif stripped[pos] == "}":
+            depth -= 1
+        pos += 1
+
+    return stripped[brace_start + 1:pos - 1]
+
+
 def _extract_top_level_assignment(text: str, var_name: str) -> str | None:
     """
     Return the RHS of a top-level `var_name = <value>` in *text*, or None.
@@ -152,13 +170,12 @@ def _unique_cluster_dirs(text: str) -> set:
 )
 def test_android_default_build_preserves_dev_flags(optimize_apk_size: bool):
     """
-    **Validates: Requirements 3.1**
+    **Validates: Requirements 14.1**
 
     Property 2a (Preservation): For an Android build with
     `optimize_apk_size = false` (the default), the build SHALL preserve
     `chip_build_libshell = true`, `optimize_for_size = false`, and SHALL NOT
-    set `chip_cluster_objects_source_override` or
-    `matter_enable_tlv_decoder_api`.
+    set `chip_data_model_overrides_dir`.
     """
     assert not optimize_apk_size, "This test covers the default (non-optimized) path"
 
@@ -193,23 +210,49 @@ def test_android_default_build_preserves_dev_flags(optimize_apk_size: bool):
         f"in the default build"
     )
 
-    # chip_cluster_objects_source_override should NOT be set in the else block
+    # chip_data_model_overrides_dir should NOT be set in the else block
     override_in_else = _extract_top_level_assignment(
-        else_block, "chip_cluster_objects_source_override"
+        else_block, "chip_data_model_overrides_dir"
     )
     assert override_in_else is None, (
-        f"REGRESSION: `chip_cluster_objects_source_override` is set to "
+        f"REGRESSION: `chip_data_model_overrides_dir` is set to "
         f"`{override_in_else}` in the default (else) block -- it should only "
-        f"be set in the optimize_apk_size block (if at all)"
+        f"be set in the optimize_apk_size block"
     )
 
-    # matter_enable_tlv_decoder_api should NOT be set in the else block
-    tlv_in_else = _extract_top_level_assignment(
-        else_block, "matter_enable_tlv_decoder_api"
+
+@given(optimize_apk_size=st.just(True))
+@settings(
+    max_examples=1,
+    suppress_health_check=[HealthCheck.function_scoped_fixture],
+    deadline=None,
+)
+def test_android_optimize_block_sets_overrides_dir(optimize_apk_size: bool):
+    """
+    **Validates: Requirements 14.1, 14.4**
+
+    Property 2a-opt (Preservation): For an Android build with
+    `optimize_apk_size = true`, the args.gni SHALL set
+    `chip_data_model_overrides_dir` pointing to the tv-casting-common directory.
+    """
+    assert optimize_apk_size, "This test covers the optimized path"
+
+    gni_text = _read_file(ANDROID_ARGS_GNI)
+    if_block = _extract_if_block(gni_text)
+    assert if_block, (
+        "Could not find the `if (optimize_apk_size)` block in android/args.gni"
     )
-    assert tlv_in_else is None, (
-        f"REGRESSION: `matter_enable_tlv_decoder_api` is set to `{tlv_in_else}` "
-        f"in the default (else) block -- it should not be overridden for dev builds"
+
+    override_val = _extract_top_level_assignment(
+        if_block, "chip_data_model_overrides_dir"
+    )
+    assert override_val is not None, (
+        "REGRESSION: `chip_data_model_overrides_dir` is not set in the "
+        "optimize_apk_size block of android/args.gni"
+    )
+    assert "tv-casting-common" in override_val, (
+        f"REGRESSION: `chip_data_model_overrides_dir` in the optimize_apk_size "
+        f"block is `{override_val}` -- expected it to reference tv-casting-common"
     )
 
 
@@ -219,30 +262,27 @@ def test_android_default_build_preserves_dev_flags(optimize_apk_size: bool):
     suppress_health_check=[HealthCheck.function_scoped_fixture],
     deadline=None,
 )
-def test_non_android_builds_use_slim_cluster_override(platform: str):
+def test_non_android_builds_use_overrides_dir(platform: str):
     """
-    **Validates: Requirements 3.2**
+    **Validates: Requirements 14.4**
 
     Property 2b (Preservation): Darwin builds SHALL continue to
-    set `chip_cluster_objects_source_override` pointing to
-    `casting-cluster-objects.cpp`.
-
-    Linux builds set the override conditionally via host.py when
-    chip_casting_simplified=true, so it is NOT in linux/args.gni.
+    set `chip_data_model_overrides_dir` pointing to the tv-casting-common
+    directory.
     """
     gni_text = _read_file(DARWIN_ARGS_GNI)
     stripped = _strip_comments(gni_text)
 
     override_val = _extract_top_level_assignment(
-        stripped, "chip_cluster_objects_source_override"
+        stripped, "chip_data_model_overrides_dir"
     )
     assert override_val is not None, (
-        f"REGRESSION: `chip_cluster_objects_source_override` is not set in "
-        f"{platform}/args.gni -- the slim cluster override must remain active"
+        f"REGRESSION: `chip_data_model_overrides_dir` is not set in "
+        f"{platform}/args.gni -- the override directory must remain active"
     )
-    assert "casting-cluster-objects.cpp" in override_val, (
-        f"REGRESSION: `chip_cluster_objects_source_override` in {platform}/args.gni "
-        f"is `{override_val}` -- expected it to reference casting-cluster-objects.cpp"
+    assert "tv-casting-common" in override_val, (
+        f"REGRESSION: `chip_data_model_overrides_dir` in {platform}/args.gni "
+        f"is `{override_val}` -- expected it to reference tv-casting-common"
     )
 
 
@@ -252,27 +292,24 @@ def test_non_android_builds_use_slim_cluster_override(platform: str):
     suppress_health_check=[HealthCheck.function_scoped_fixture],
     deadline=None,
 )
-def test_linux_args_gni_does_not_set_unconditional_cluster_override(dummy: bool):
+def test_linux_args_gni_does_not_set_unconditional_overrides_dir(dummy: bool):
     """
     **Validates: CI fix for linux-x64-tv-casting-app**
 
     Property 2b-linux: Linux args.gni SHALL NOT unconditionally set
-    chip_cluster_objects_source_override, because the legacy build path
+    chip_data_model_overrides_dir, because the legacy build path
     (chip_casting_simplified=false) needs the full cluster-objects.cpp.
-    The override is set conditionally via host.py when
-    chip_casting_simplified=true.
     """
     gni_text = _read_file(LINUX_ARGS_GNI)
     stripped = _strip_comments(gni_text)
 
     override_val = _extract_top_level_assignment(
-        stripped, "chip_cluster_objects_source_override"
+        stripped, "chip_data_model_overrides_dir"
     )
     assert override_val is None, (
-        f"REGRESSION: `chip_cluster_objects_source_override` is set unconditionally "
+        f"REGRESSION: `chip_data_model_overrides_dir` is set unconditionally "
         f"in linux/args.gni to `{override_val}` -- this breaks the legacy build path "
-        f"(chip_casting_simplified=false) which needs all clusters. The override "
-        f"should be set via host.py only when chip_casting_simplified=true."
+        f"(chip_casting_simplified=false) which needs all clusters."
     )
 
 
@@ -284,36 +321,32 @@ def test_linux_args_gni_does_not_set_unconditional_cluster_override(dummy: bool)
 )
 def test_casting_cluster_objects_file_exists_with_expected_includes(dummy: bool):
     """
-    **Validates: Requirements 3.2**
+    **Validates: Requirements 14.4**
 
-    Property 2c (Preservation): The slim `casting-cluster-objects.cpp` file
+    Property 2c (Preservation): The slim `cluster-objects-override.cpp` file
     SHALL exist and include .ipp files for the expected set of casting-relevant
-    and infrastructure clusters (~39 cluster directories plus shared utilities,
-    totalling ~157 .ipp includes).
+    and infrastructure clusters (~29 cluster directories plus shared utilities,
+    totalling ~117 .ipp includes).
     """
     assert os.path.isfile(SLIM_CLUSTER_FILE), (
-        f"REGRESSION: casting-cluster-objects.cpp not found at {SLIM_CLUSTER_FILE}"
+        f"REGRESSION: cluster-objects-override.cpp not found at {SLIM_CLUSTER_FILE}"
     )
 
     content = _read_file(SLIM_CLUSTER_FILE)
 
     # Count .ipp includes
     ipp_count = _count_ipp_includes(content)
-    # The file currently has ~157 .ipp includes. Allow a small tolerance
-    # (+-5) for minor cluster additions/removals, but catch large regressions
-    # like accidentally replacing with the full cluster-objects.cpp (~800+).
     assert 100 <= ipp_count <= 200, (
-        f"REGRESSION: casting-cluster-objects.cpp has {ipp_count} .ipp includes. "
-        f"Expected ~157 (between 100 and 200). If this is much larger, the slim "
+        f"REGRESSION: cluster-objects-override.cpp has {ipp_count} .ipp includes. "
+        f"Expected ~117 (between 100 and 200). If this is much larger, the slim "
         f"file may have been replaced with the full cluster-objects.cpp."
     )
 
     # Verify unique cluster directories
     cluster_dirs = _unique_cluster_dirs(content)
-    # Currently 39 cluster dirs + 'shared' = 40 total
     assert 30 <= len(cluster_dirs) <= 50, (
-        f"REGRESSION: casting-cluster-objects.cpp references {len(cluster_dirs)} "
-        f"unique cluster directories. Expected ~40 (between 30 and 50)."
+        f"REGRESSION: cluster-objects-override.cpp references {len(cluster_dirs)} "
+        f"unique cluster directories. Expected ~30 (between 30 and 50)."
     )
 
     # Verify key casting-specific clusters are present
@@ -337,7 +370,7 @@ def test_casting_cluster_objects_file_exists_with_expected_includes(dummy: bool)
     }
     missing = expected_casting_clusters - cluster_dirs
     assert not missing, (
-        f"REGRESSION: casting-cluster-objects.cpp is missing casting-specific "
+        f"REGRESSION: cluster-objects-override.cpp is missing casting-specific "
         f"clusters: {missing}"
     )
 
@@ -353,7 +386,7 @@ def test_casting_cluster_objects_file_exists_with_expected_includes(dummy: bool)
     }
     missing_infra = expected_infra_clusters - cluster_dirs
     assert not missing_infra, (
-        f"REGRESSION: casting-cluster-objects.cpp is missing infrastructure "
+        f"REGRESSION: cluster-objects-override.cpp is missing infrastructure "
         f"clusters: {missing_infra}"
     )
 
@@ -368,11 +401,13 @@ if __name__ == "__main__":
     tests = [
         ("2a: Android default build preserves dev flags",
          test_android_default_build_preserves_dev_flags),
-        ("2b: Darwin builds use slim cluster override",
-         test_non_android_builds_use_slim_cluster_override),
-        ("2b-linux: Linux args.gni does not set unconditional cluster override",
-         test_linux_args_gni_does_not_set_unconditional_cluster_override),
-        ("2c: casting-cluster-objects.cpp exists with expected includes",
+        ("2a-opt: Android optimize block sets overrides dir",
+         test_android_optimize_block_sets_overrides_dir),
+        ("2b: Darwin builds use overrides dir",
+         test_non_android_builds_use_overrides_dir),
+        ("2b-linux: Linux args.gni does not set unconditional overrides dir",
+         test_linux_args_gni_does_not_set_unconditional_overrides_dir),
+        ("2c: cluster-objects-override.cpp exists with expected includes",
          test_casting_cluster_objects_file_exists_with_expected_includes),
     ]
     all_passed = True

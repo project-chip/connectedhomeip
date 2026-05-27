@@ -9,7 +9,7 @@ The following markers are used in this document (matches the ID master list):
 | C     | Certifiable                    |
 | P     | Provisional                    |
 
-| ID (Decimal) | ID (hex) | Name                         |1.0|1.1|1.2|1.3|1.4|1.4.1|1.4.2-mve-1|1.5|1.5.1|1.6-attempt-1|
+| ID (Decimal) | ID (hex) | Name                         |1.0|1.1|1.2|1.3|1.4|1.4.1|1.4.2-mve-1|1.5|1.5.1|1.6-attempt-2|
 |--------------|----------|------------------------------|---|---|---|---|---|-----|-----------|---|-----|-------------|
 |10            |0x000A    |Door Lock                     |C  |C  |C  |C  |C  |C    |C          |C  |C    |C            |
 |11            |0x000B    |Door Lock Controller          |C  |C  |C  |C  |C  |C    |C          |C  |C    |C            |

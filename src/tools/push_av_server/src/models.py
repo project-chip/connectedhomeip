@@ -3,7 +3,7 @@ Data models for the Push AV Server.
 """
 
 from enum import Enum
-from typing import Dict, Optional, Tuple
+from typing import Optional
 
 from pydantic import BaseModel
 
@@ -49,11 +49,11 @@ class Session(BaseModel):
     # The id is the index in the stream's list.
     # Keeping a duplicated value here to have it included in API responses.
     id: int
-    uploaded_segments: list[Tuple[str, str]] = []
-    uploaded_manifests: list[Tuple[str, str]] = []
+    uploaded_segments: list[tuple[str, str]] = []
+    uploaded_manifests: list[tuple[str, str]] = []
     complete: bool = False
     # Track state management
-    tracks: Dict[str, Track] = {}
+    tracks: dict[str, Track] = {}
     # HLS-specific tracking attributes
     hls_expected_track_count: Optional[int] = None
     hls_completed_tracks: int = 0

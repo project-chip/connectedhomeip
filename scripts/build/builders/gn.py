@@ -29,7 +29,7 @@ class GnBuilder(Builder):
            runner: what to use to execute shell commands
            output_dir_lock: lock for the output directory
         """
-        super(GnBuilder, self).__init__(root, runner, output_dir_lock)
+        super().__init__(root, runner, output_dir_lock)
 
         self.build_command = None
 

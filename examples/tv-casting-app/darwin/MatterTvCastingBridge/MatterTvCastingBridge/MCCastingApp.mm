@@ -154,16 +154,22 @@
         completion([MCErrorUtils NSErrorFromChipError:CHIP_ERROR_INCORRECT_STATE]);
     }));
 
-    dispatch_async(_workQueue, ^{
-        __block CHIP_ERROR err = matter::casting::core::CastingApp::GetInstance()->Start();
+    // Resume the work queue FIRST so it can process the Start() dispatch below.
+    __block CHIP_ERROR err = chip::DeviceLayer::PlatformMgrImpl().StartEventLoopTask();
+    if (err != CHIP_NO_ERROR) {
+        ChipLogError(AppServer, "MCCastingApp.start StartEventLoopTask failed: %s", err.AsString());
         dispatch_async(self->_clientQueue, ^{
             completion([MCErrorUtils NSErrorFromChipError:err]);
         });
+        return;
+    }
+
+    dispatch_async(_workQueue, ^{
+        CHIP_ERROR startErr = matter::casting::core::CastingApp::GetInstance()->Start();
+        dispatch_async(self->_clientQueue, ^{
+            completion([MCErrorUtils NSErrorFromChipError:startErr]);
+        });
     });
-    __block CHIP_ERROR err = chip::DeviceLayer::PlatformMgrImpl().StartEventLoopTask();
-    VerifyOrReturn(err == CHIP_NO_ERROR, dispatch_async(self->_clientQueue, ^{
-        completion([MCErrorUtils NSErrorFromChipError:err]);
-    }));
 }
 
 - (void)stopWithCompletionBlock:(void (^)(NSError *))completion
@@ -175,6 +181,16 @@
 
     dispatch_async(_workQueue, ^{
         __block CHIP_ERROR err = matter::casting::core::CastingApp::GetInstance()->Stop();
+
+        // Stop the event loop task so StartEventLoopTask() can succeed on the next Start().
+        // The work queue transitions from kRunning → kSuspended.
+        CHIP_ERROR stopEventLoopErr = chip::DeviceLayer::PlatformMgrImpl().StopEventLoopTask();
+        if (stopEventLoopErr != CHIP_NO_ERROR) {
+            ChipLogError(AppServer, "MCCastingApp.stop StopEventLoopTask failed: %s", stopEventLoopErr.AsString());
+            if (err == CHIP_NO_ERROR) {
+                err = stopEventLoopErr;
+            }
+        }
 
         dispatch_async(self->_clientQueue, ^{
             completion([MCErrorUtils NSErrorFromChipError:err]);
