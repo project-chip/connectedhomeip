@@ -56,7 +56,6 @@ class ThreadBorderRouter(TerminablePopen[str]):
 
         return process
 
-
     def join_network(self, dataset: str) -> None:
         status = os.system(
             f'ot-ctl dataset init tlvs {dataset} &&'

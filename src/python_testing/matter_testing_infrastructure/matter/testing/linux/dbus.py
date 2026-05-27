@@ -59,7 +59,6 @@ class DBusTestSystemBus(TerminablePopen[str]):
 
         return process
 
-
     def resource_terminate(self) -> None:
         # Restore the environment variable so that clients will stop using this bus.
         if self._prev_system_bus_address is not None:
