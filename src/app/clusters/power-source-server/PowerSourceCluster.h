@@ -74,16 +74,6 @@ constexpr static Span<To> ConvertSpanType(Span<From> span)
 }
 
 template <typename T>
-CHIP_ERROR EncodeOptional(AttributeValueEncoder & encoder, const std::optional<T> & value)
-{
-    if (!value.has_value())
-    {
-        return encoder.EncodeNull();
-    }
-    return encoder.Encode(*value);
-}
-
-template <typename T>
 CHIP_ERROR EncodeListOfValues(AttributeValueEncoder & encoder, const T & valueList)
 {
     return encoder.EncodeList([&valueList](const auto & enc) -> CHIP_ERROR {
@@ -324,14 +314,14 @@ public:
         case WiredAssessedInputVoltage::Id:
             if constexpr (supportedOptionalAttributeSet.IsSet(WiredAssessedInputVoltage::Id))
             {
-                return EncodeOptional(encoder, this->wiredAssessedInputVoltage);
+                return encoder.Encode(this->wiredAssessedInputVoltage);
             }
             break;
 
         case WiredAssessedInputFrequency::Id:
             if constexpr (supportedOptionalAttributeSet.IsSet(WiredAssessedInputFrequency::Id))
             {
-                return EncodeOptional(encoder, this->wiredAssessedInputFrequency);
+                return encoder.Encode(this->wiredAssessedInputFrequency);
             }
             break;
 
@@ -345,7 +335,7 @@ public:
         case WiredAssessedCurrent::Id:
             if constexpr (supportedOptionalAttributeSet.IsSet(WiredAssessedCurrent::Id))
             {
-                return EncodeOptional(encoder, this->wiredAssessedCurrent);
+                return encoder.Encode(this->wiredAssessedCurrent);
             }
             break;
 
@@ -383,21 +373,21 @@ public:
         case BatVoltage::Id:
             if constexpr (supportedOptionalAttributeSet.IsSet(BatVoltage::Id))
             {
-                return EncodeOptional(encoder, this->batVoltage);
+                return encoder.Encode(this->batVoltage);
             }
             break;
 
         case BatPercentRemaining::Id:
             if constexpr (supportedOptionalAttributeSet.IsSet(BatPercentRemaining::Id))
             {
-                return EncodeOptional(encoder, this->batPercentRemaining);
+                return encoder.Encode(this->batPercentRemaining);
             }
             break;
 
         case BatTimeRemaining::Id:
             if constexpr (supportedOptionalAttributeSet.IsSet(BatTimeRemaining::Id))
             {
-                return EncodeOptional(encoder, this->batTimeRemaining);
+                return encoder.Encode(this->batTimeRemaining);
             }
             break;
 
@@ -501,7 +491,7 @@ public:
         case BatTimeToFullCharge::Id:
             if constexpr (supportedOptionalAttributeSet.IsSet(BatTimeToFullCharge::Id))
             {
-                return EncodeOptional(encoder, this->batTimeToFullCharge);
+                return encoder.Encode(this->batTimeToFullCharge);
             }
             break;
 
@@ -515,7 +505,7 @@ public:
         case BatChargingCurrent::Id:
             if constexpr (supportedOptionalAttributeSet.IsSet(BatChargingCurrent::Id))
             {
-                return EncodeOptional(encoder, this->batChargingCurrent);
+                return encoder.Encode(this->batChargingCurrent);
             }
             break;
 
@@ -596,14 +586,14 @@ public:
     PowerSourceStatusEnum GetStatus() const { return this->status; }
     uint8_t GetOrder() const { return this->order; }
     CharSpan GetDescription() const { return this->description; }
-    std::optional<uint32_t> GetWiredAssessedInputVoltage() const
+    DataModel::Nullable<uint32_t> GetWiredAssessedInputVoltage() const
     {
         ENABLE_IF_ATTRIBUTE_SUPPORTED(WiredAssessedInputVoltage)
         {
             return this->wiredAssessedInputVoltage;
         }
     }
-    std::optional<uint16_t> GetWiredAssessedInputFrequency() const
+    DataModel::Nullable<uint16_t> GetWiredAssessedInputFrequency() const
     {
         ENABLE_IF_ATTRIBUTE_SUPPORTED(WiredAssessedInputFrequency)
         {
@@ -617,7 +607,7 @@ public:
             return this->wiredCurrentType;
         }
     }
-    std::optional<uint32_t> GetWiredAssessedCurrent() const
+    DataModel::Nullable<uint32_t> GetWiredAssessedCurrent() const
     {
         ENABLE_IF_ATTRIBUTE_SUPPORTED(WiredAssessedCurrent)
         {
@@ -654,21 +644,21 @@ public:
             buffer = PowerSource::detail::ConvertSpanType<WiredFaultEnum>(span);
         }
     }
-    std::optional<uint32_t> GetBatVoltage() const
+    DataModel::Nullable<uint32_t> GetBatVoltage() const
     {
         ENABLE_IF_ATTRIBUTE_SUPPORTED(BatVoltage)
         {
             return this->batVoltage;
         }
     }
-    std::optional<uint8_t> GetBatPercentRemaining() const
+    DataModel::Nullable<uint8_t> GetBatPercentRemaining() const
     {
         ENABLE_IF_ATTRIBUTE_SUPPORTED(BatPercentRemaining)
         {
             return this->batPercentRemaining;
         }
     }
-    std::optional<uint32_t> GetBatTimeRemaining() const
+    DataModel::Nullable<uint32_t> GetBatTimeRemaining() const
     {
         ENABLE_IF_ATTRIBUTE_SUPPORTED(BatTimeRemaining)
         {
@@ -768,7 +758,7 @@ public:
             return this->batChargeState;
         }
     }
-    std::optional<uint32_t> GetBatTimeToFullCharge() const
+    DataModel::Nullable<uint32_t> GetBatTimeToFullCharge() const
     {
         ENABLE_IF_ATTRIBUTE_SUPPORTED(BatTimeToFullCharge)
         {
@@ -782,7 +772,7 @@ public:
             return this->batFunctionalWhileCharging;
         }
     }
-    std::optional<uint32_t> GetBatChargingCurrent() const
+    DataModel::Nullable<uint32_t> GetBatChargingCurrent() const
     {
         ENABLE_IF_ATTRIBUTE_SUPPORTED(BatChargingCurrent)
         {
@@ -830,7 +820,7 @@ public:
 
         return CHIP_NO_ERROR;
     }
-    CHIP_ERROR SetWiredAssessedInputVoltage(std::optional<uint32_t> val)
+    CHIP_ERROR SetWiredAssessedInputVoltage(DataModel::Nullable<uint32_t> val)
     {
         ENABLE_IF_ATTRIBUTE_SUPPORTED(WiredAssessedInputVoltage)
         {
@@ -839,7 +829,7 @@ public:
             return CHIP_NO_ERROR;
         }
     }
-    CHIP_ERROR SetWiredAssessedInputFrequency(std::optional<uint16_t> val)
+    CHIP_ERROR SetWiredAssessedInputFrequency(DataModel::Nullable<uint16_t> val)
     {
         ENABLE_IF_ATTRIBUTE_SUPPORTED(WiredAssessedInputFrequency)
         {
@@ -848,7 +838,7 @@ public:
             return CHIP_NO_ERROR;
         }
     }
-    CHIP_ERROR SetWiredAssessedCurrent(std::optional<uint32_t> val)
+    CHIP_ERROR SetWiredAssessedCurrent(DataModel::Nullable<uint32_t> val)
     {
         ENABLE_IF_ATTRIBUTE_SUPPORTED(WiredAssessedCurrent)
         {
@@ -918,7 +908,7 @@ public:
             return CHIP_NO_ERROR;
         }
     }
-    CHIP_ERROR SetBatVoltage(std::optional<uint32_t> val)
+    CHIP_ERROR SetBatVoltage(DataModel::Nullable<uint32_t> val)
     {
         ENABLE_IF_ATTRIBUTE_SUPPORTED(BatVoltage)
         {
@@ -927,14 +917,14 @@ public:
             return CHIP_NO_ERROR;
         }
     }
-    CHIP_ERROR SetBatPercentRemaining(std::optional<uint8_t> val)
+    CHIP_ERROR SetBatPercentRemaining(DataModel::Nullable<uint8_t> val)
     {
         ENABLE_IF_ATTRIBUTE_SUPPORTED(BatPercentRemaining)
         {
-            if (val.has_value())
+            if (!val.IsNull())
             {
                 // Maximum value of 200 representing 100% battery.
-                VerifyOrReturnError(val.value() <= 200, CHIP_ERROR_INVALID_INTEGER_VALUE);
+                VerifyOrReturnError(val.Value() <= 200, CHIP_ERROR_INVALID_INTEGER_VALUE);
             }
 
             if (this->batPercentRemaining == val)
@@ -942,7 +932,7 @@ public:
                 return CHIP_NO_ERROR;
             }
 
-            if (!this->batPercentRemaining.has_value() || !val.has_value())
+            if (this->batPercentRemaining.IsNull() || val.IsNull())
             {
                 SetAttributeValue(this->batPercentRemaining, val, PowerSource::Attributes::BatPercentRemaining::Id);
                 return CHIP_NO_ERROR;
@@ -963,7 +953,7 @@ public:
             return CHIP_NO_ERROR;
         }
     }
-    CHIP_ERROR SetBatTimeRemaining(std::optional<uint32_t> val)
+    CHIP_ERROR SetBatTimeRemaining(DataModel::Nullable<uint32_t> val)
     {
         ENABLE_IF_ATTRIBUTE_SUPPORTED(BatTimeRemaining)
         {
@@ -972,7 +962,7 @@ public:
                 return CHIP_NO_ERROR;
             }
 
-            if (!this->batTimeRemaining.has_value() || !val.has_value())
+            if (this->batTimeRemaining.IsNull() || val.IsNull())
             {
                 SetAttributeValue(this->batTimeRemaining, val, PowerSource::Attributes::BatTimeRemaining::Id);
                 return CHIP_NO_ERROR;
@@ -1080,7 +1070,7 @@ public:
             return CHIP_NO_ERROR;
         }
     }
-    CHIP_ERROR SetBatTimeToFullCharge(std::optional<uint32_t> val)
+    CHIP_ERROR SetBatTimeToFullCharge(DataModel::Nullable<uint32_t> val)
     {
         ENABLE_IF_ATTRIBUTE_SUPPORTED(BatTimeToFullCharge)
         {
@@ -1089,7 +1079,7 @@ public:
                 return CHIP_NO_ERROR;
             }
 
-            if (!this->batTimeToFullCharge.has_value() || !val.has_value())
+            if (this->batTimeToFullCharge.IsNull() || val.IsNull())
             {
                 SetAttributeValue(this->batTimeToFullCharge, val, PowerSource::Attributes::BatTimeToFullCharge::Id);
                 return CHIP_NO_ERROR;
@@ -1118,7 +1108,7 @@ public:
             return CHIP_NO_ERROR;
         }
     }
-    CHIP_ERROR SetBatChargingCurrent(std::optional<uint32_t> val)
+    CHIP_ERROR SetBatChargingCurrent(DataModel::Nullable<uint32_t> val)
     {
         ENABLE_IF_ATTRIBUTE_SUPPORTED(BatChargingCurrent)
         {

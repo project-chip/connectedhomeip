@@ -20,16 +20,17 @@
 #include <app/server-cluster/OptionalAttributeSet.h>
 #include <clusters/PowerSource/Attributes.h>
 #include <clusters/PowerSource/Enums.h>
+#include <data-model/Nullable.h>
 #include <lib/support/ScopedMemoryBuffer.h>
 #include <lib/support/Span.h>
 #include <lib/support/TimerDelegate.h>
 
 #include <atomic>
-#include <optional>
 #include <string>
 #include <type_traits>
 
 namespace chip::app::Clusters::PowerSource::detail {
+using DataModel::Nullable;
 
 // without EndpointList
 struct MandatoryModule
@@ -70,7 +71,7 @@ struct WiredAssessedInputVoltageModule
 template <>
 struct WiredAssessedInputVoltageModule<true>
 {
-    std::optional<uint32_t> wiredAssessedInputVoltage{};
+    Nullable<uint32_t> wiredAssessedInputVoltage{};
 };
 
 template <bool used>
@@ -80,7 +81,7 @@ struct WiredAssessedInputFrequencyModule
 template <>
 struct WiredAssessedInputFrequencyModule<true>
 {
-    std::optional<uint16_t> wiredAssessedInputFrequency{};
+    Nullable<uint16_t> wiredAssessedInputFrequency{};
 };
 
 template <bool used>
@@ -90,7 +91,7 @@ struct WiredAssessedCurrentModule
 template <>
 struct WiredAssessedCurrentModule<true>
 {
-    std::optional<uint32_t> wiredAssessedCurrent{};
+    Nullable<uint32_t> wiredAssessedCurrent{};
 };
 
 template <bool used>
@@ -141,7 +142,7 @@ struct BatVoltageModule
 template <>
 struct BatVoltageModule<true>
 {
-    std::optional<uint32_t> batVoltage{};
+    Nullable<uint32_t> batVoltage{};
 };
 
 template <bool used>
@@ -151,7 +152,7 @@ struct BatPercentRemainingModule
 template <>
 struct BatPercentRemainingModule<true>
 {
-    std::optional<uint8_t> batPercentRemaining{};
+    Nullable<uint8_t> batPercentRemaining{};
 };
 
 template <bool used>
@@ -161,7 +162,7 @@ struct BatTimeRemainingModule
 template <>
 struct BatTimeRemainingModule<true>
 {
-    std::optional<uint32_t> batTimeRemaining{};
+    Nullable<uint32_t> batTimeRemaining{};
 };
 
 template <bool used>
@@ -242,7 +243,7 @@ struct BatTimeToFullChargeModule
 template <>
 struct BatTimeToFullChargeModule<true>
 {
-    std::optional<uint32_t> batTimeToFullCharge{};
+    Nullable<uint32_t> batTimeToFullCharge{};
 };
 
 template <bool used>
@@ -252,7 +253,7 @@ struct BatChargingCurrentModule
 template <>
 struct BatChargingCurrentModule<true>
 {
-    std::optional<uint32_t> batChargingCurrent{};
+    Nullable<uint32_t> batChargingCurrent{};
 };
 
 template <bool used>
@@ -378,51 +379,6 @@ struct BatteryTimerContextsModule<true>
     BatteryTimerContext batPercentRemainingNotifyTimerContext{};
     BatteryTimerContext batTimeRemainingNotifyTimerContext{};
     BatteryTimerContext batTimeToFullChargeNotifyTimerContext{};
-};
-
-struct DescriptionStorageModule
-{
-    std::string description{};
-};
-
-template <bool used>
-struct BatReplacementDescriptionStorageModule
-{
-};
-template <>
-struct BatReplacementDescriptionStorageModule<true>
-{
-    std::string batReplacementDescription{};
-};
-
-template <bool used>
-struct BatANSIDesignationStorageModule
-{
-};
-template <>
-struct BatANSIDesignationStorageModule<true>
-{
-    std::string batANSIDesignation{};
-};
-
-template <bool used>
-struct BatIECDesignationStorageModule
-{
-};
-template <>
-struct BatIECDesignationStorageModule<true>
-{
-    std::string batIECDesignation{};
-};
-
-template <uint32_t optionalAttributeBits>
-struct StringAttributeStorageModule
-    : public DescriptionStorageModule,
-      public BatReplacementDescriptionStorageModule<
-          AttributeSet(optionalAttributeBits).IsSet(Attributes::BatReplacementDescription::Id)>,
-      public BatANSIDesignationStorageModule<AttributeSet(optionalAttributeBits).IsSet(Attributes::BatANSIDesignation::Id)>,
-      public BatIECDesignationStorageModule<AttributeSet(optionalAttributeBits).IsSet(Attributes::BatIECDesignation::Id)>
-{
 };
 
 } // namespace chip::app::Clusters::PowerSource::detail
