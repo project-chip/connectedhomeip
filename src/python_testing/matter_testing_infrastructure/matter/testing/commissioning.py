@@ -23,7 +23,7 @@ import asyncio
 import contextlib
 import logging
 from dataclasses import dataclass
-from enum import Enum
+from enum import StrEnum
 from typing import Any, Optional
 
 from mobly import asserts
@@ -387,7 +387,7 @@ class SetupParameters:
 DNSSD_DISCOVERY_TIMEOUT_SEC = 3
 
 
-class EstablishedSessionKind(str, Enum):
+class EstablishedSessionKind(StrEnum):
     """Session type that succeeded when establishing PASE and CASE in parallel."""
 
     PASE = "pase"
