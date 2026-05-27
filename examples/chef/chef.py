@@ -105,7 +105,6 @@ def load_config() -> None:
     return config
 
 
-
 def load_cicd_config() -> dict[str, Any]:
     with open(_CICD_CONFIG_FILE_NAME) as config_file:
         return json.loads(config_file.read())
