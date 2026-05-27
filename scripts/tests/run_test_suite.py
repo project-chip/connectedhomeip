@@ -703,10 +703,10 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int, app_path: li
     help='Path to output a compact, comma-separated list of failed test names.',
 )
 def cmd_summarize(summary_file: Path, top_slowest: int, show_all: bool, compact_failures_file: Path | None) -> None:
-    RunSummary.from_json(summary_file).print_summary(top_slowest=top_slowest, show_all=show_all)
+    summary = RunSummary.from_json(summary_file)
+    summary.print_summary(top_slowest=top_slowest, show_all=show_all)
 
     if compact_failures_file:
-        summary = RunSummary.from_json(summary_file)
         failed_results = tuple(r for r in summary.results if r.status == TestStatus.FAILED)
         if failed_results:
             existing = set()
