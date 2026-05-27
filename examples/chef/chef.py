@@ -22,8 +22,8 @@ import shutil
 import sys
 import tarfile
 import textwrap
-from typing import Any
 from pathlib import Path
+from typing import Any
 
 import constants
 import stateful_shell
