@@ -17,7 +17,7 @@ from __future__ import annotations
 
 import os
 from dataclasses import dataclass
-from typing import Any, Tuple, Union
+from typing import Any, Union
 
 from .errors import (TestStepArgumentsValueError, TestStepError, TestStepGroupEndPointError, TestStepGroupResponseError,
                      TestStepInvalidTypeError, TestStepKeyError, TestStepNodeIdAndGroupIdError, TestStepResponseVariableError,
@@ -164,7 +164,7 @@ yaml_tree = SchemaTree(schema=_TOP_LEVEL_SCHEMA, children={
 class YamlLoader:
     """This class loads a file from the disk and validates that the content is a well formed yaml test."""
 
-    def load(self, yaml_file: str) -> Tuple[str, Union[list, str], dict, list]:
+    def load(self, yaml_file: str) -> tuple[str, Union[list, str], dict, list]:
         filename = ''
         name = ''
         pics = None

@@ -50,7 +50,7 @@
 #include <app/clusters/laundry-washer-controls-server/laundry-washer-controls-server.h>
 #include <app/clusters/mode-base-server/mode-base-server.h>
 #include <app/clusters/temperature-control-server/temperature-control-server.h>
-#include <app/clusters/thermostat-server/thermostat-server.h>
+#include <app/clusters/thermostat-server/ThermostatCluster.h>
 #include <app/clusters/time-synchronization-server/time-synchronization-server.h>
 #include <app/clusters/unit-localization-server/unit-localization-server.h>
 #include <app/clusters/valve-configuration-and-control-server/valve-configuration-and-control-server.h>
@@ -227,6 +227,7 @@ void ApplicationInit()
             .groupDataProvider = *Credentials::GetGroupDataProvider(),
             .timerDelegate     = sTimerDelegate,
             .accessControl     = Server::GetInstance().GetAccessControl(),
+            .testing           = chip::Groupcast::GetTesting(),
         },
         BitFlags<Clusters::Groupcast::Feature>(Clusters::Groupcast::Feature::kListener, Clusters::Groupcast::Feature::kSender,
                                                Clusters::Groupcast::Feature::kPerGroup));

@@ -25,7 +25,9 @@
 #include <lib/core/CHIPVendorIdentifiers.hpp>
 #include <lib/core/NodeId.h>
 #include <lib/support/ReadOnlyBuffer.h>
+#include <map>
 #include <unordered_map>
+#include <utility>
 #include <vector>
 
 namespace chip {
@@ -63,6 +65,7 @@ enum RefreshState
     kRefreshingEndpoints,
     kRefreshingGroups,
     kRefreshingBindings,
+    kFetchingGroupKeySetList,
     kFetchingGroupKeySets,
     kRefreshingGroupKeySets,
     kRefreshingACLs,
@@ -223,10 +226,15 @@ public:
             return CHIP_ERROR_NOT_IMPLEMENTED;
         }
 
-        virtual CHIP_ERROR FetchGroupKeySetList(
-            NodeId nodeId,
-            std::function<void(CHIP_ERROR,
-                               const std::vector<Clusters::JointFabricDatastore::Structs::DatastoreGroupKeySetStruct::Type> &)>
+        virtual CHIP_ERROR FetchGroupKeySetList(NodeId nodeId,
+                                                std::function<void(CHIP_ERROR, const std::vector<uint16_t> &)> onSuccess)
+        {
+            return CHIP_ERROR_NOT_IMPLEMENTED;
+        }
+
+        virtual CHIP_ERROR FetchGroupKeySet(
+            NodeId nodeId, uint16_t groupKeySetID,
+            std::function<void(CHIP_ERROR, const app::Clusters::JointFabricDatastore::Structs::DatastoreGroupKeySetStruct::Type &)>
                 onSuccess)
         {
             return CHIP_ERROR_NOT_IMPLEMENTED;
@@ -332,7 +340,7 @@ public:
     CHIP_ERROR
     AddAdmin(const Clusters::JointFabricDatastore::Structs::DatastoreAdministratorInformationEntryStruct::Type & adminId);
     bool IsAdminEntryPresent(NodeId nodeId);
-    CHIP_ERROR UpdateAdmin(NodeId nodeId, CharSpan friendlyName, ByteSpan icac);
+    CHIP_ERROR UpdateAdmin(NodeId nodeId, Optional<CharSpan> friendlyName, Optional<ByteSpan> icac);
     CHIP_ERROR RemoveAdmin(NodeId nodeId);
 
     CHIP_ERROR AddGroup(const Clusters::JointFabricDatastore::Commands::AddGroup::DecodableType & commandData);
@@ -462,6 +470,7 @@ private:
     std::vector<Clusters::JointFabricDatastore::Structs::DatastoreNodeKeySetEntryStruct::Type> mNodeKeySetEntries;
     std::vector<datastore::ACLEntryStruct> mACLEntries;
     std::vector<Clusters::JointFabricDatastore::Structs::DatastoreEndpointEntryStruct::Type> mEndpointEntries;
+    std::map<std::pair<NodeId, EndpointId>, std::vector<char>> mEndpointFriendlyNameStorage;
 
     Listener * mListeners = nullptr;
 
@@ -504,6 +513,11 @@ private:
         Clusters::JointFabricDatastore::Structs::DatastoreAdministratorInformationEntryStruct::Type & destination);
     void RemoveAdminEntryStorage(NodeId nodeId);
 
+    void SetEndpointFriendlyNameWithOwnedStorage(
+        NodeId nodeId, EndpointId endpointId, const CharSpan & friendlyName,
+        Clusters::JointFabricDatastore::Structs::DatastoreEndpointEntryStruct::Type & destination);
+    void RemoveEndpointFriendlyNameStorage(NodeId nodeId, EndpointId endpointId);
+
     // Helper methods for copying optional ByteSpan and simple nullable values
     void CopyByteSpanWithOwnedStorage(const DataModel::Nullable<ByteSpan> & source, std::vector<uint8_t> & storage,
                                       DataModel::Nullable<ByteSpan> & destination);
@@ -520,13 +534,15 @@ private:
 
     Delegate * mDelegate = nullptr;
 
-    NodeId mRefreshingNodeId        = kUndefinedNodeId;
-    RefreshState mRefreshState      = kIdle;
-    size_t mRefreshingEndpointIndex = 0;
+    NodeId mRefreshingNodeId           = kUndefinedNodeId;
+    RefreshState mRefreshState         = kIdle;
+    size_t mRefreshingEndpointIndex    = 0;
+    size_t mRefreshingGroupKeySetIndex = 0;
 
     std::vector<Clusters::JointFabricDatastore::Structs::DatastoreEndpointEntryStruct::Type> mRefreshingEndpointsList;
     std::vector<Clusters::JointFabricDatastore::Structs::DatastoreEndpointBindingEntryStruct::Type> mRefreshingBindingEntries;
     std::vector<Clusters::JointFabricDatastore::Structs::DatastoreACLEntryStruct::Type> mRefreshingACLEntries;
+    std::vector<uint16_t> mRefreshingGroupKeySetIDs;
 };
 
 } // namespace app
