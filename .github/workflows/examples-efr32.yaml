@@ -70,6 +70,7 @@ jobs:
           ./scripts/run_in_build_env.sh \
              "./scripts/build/build_examples.py \
                 --enable-flashbundle \
+                --target efr32-brd4187c-all-devices \
                 --target efr32-brd4187c-light \
                 --target efr32-brd4187c-thermostat-use-ot-lib \
                 --target efr32-brd4187c-switch-shell-use-ot-coap-lib \
@@ -144,3 +145,8 @@ jobs:
         if: ${{ !env.ACT }}
         with:
           platform-name: EFR32
+      - name: Notify Slack on Failure
+        if: failure()
+        uses: ./.github/actions/notify-slack-failure
+        with:
+          slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}
