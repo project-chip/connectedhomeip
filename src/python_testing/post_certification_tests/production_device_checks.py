@@ -150,7 +150,7 @@ class DclCheck(BasicCompositionTests):
         key_model_versions = 'modelVersions'
         asserts.assert_true(key_model_versions in entry,
                             f"Unable to find {key_model_versions} in software versions schema for {self.vid_pid_str}")
-        log.info('Found version info for %s in the DCL:', self.vid_pid_str)
+        log.info('Found version info for vid=0x%s in the DCL:', self.vid_pid_str)
         log.info('%s', entry[key_model_versions])
         key_software_versions = 'softwareVersions'
         asserts.assert_true(key_software_versions in entry[key_model_versions],
