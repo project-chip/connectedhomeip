@@ -2622,142 +2622,146 @@ namespace Attributes {
 
 namespace HVACSystemTypeConfiguration {
 Protocols::InteractionModel::Status
-Get(EndpointId endpoint, chip::BitMask<chip::app::Clusters::Thermostat::HVACSystemTypeBitmap> * value); // HVACSystemTypeBitmap
+GetDefault(EndpointId endpoint,
+           chip::BitMask<chip::app::Clusters::Thermostat::HVACSystemTypeBitmap> * value); // HVACSystemTypeBitmap
 } // namespace HVACSystemTypeConfiguration
 
 namespace ThermostatRunningMode {
 Protocols::InteractionModel::Status
-Get(EndpointId endpoint, chip::app::Clusters::Thermostat::ThermostatRunningModeEnum * value); // ThermostatRunningModeEnum
+GetDefault(EndpointId endpoint, chip::app::Clusters::Thermostat::ThermostatRunningModeEnum * value); // ThermostatRunningModeEnum
 } // namespace ThermostatRunningMode
 
 namespace StartOfWeek {
-Protocols::InteractionModel::Status Get(EndpointId endpoint,
-                                        chip::app::Clusters::Thermostat::StartOfWeekEnum * value); // StartOfWeekEnum
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
+                                               chip::app::Clusters::Thermostat::StartOfWeekEnum * value); // StartOfWeekEnum
 } // namespace StartOfWeek
 
 namespace NumberOfWeeklyTransitions {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint8_t * value); // int8u
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value); // int8u
 } // namespace NumberOfWeeklyTransitions
 
 namespace NumberOfDailyTransitions {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint8_t * value); // int8u
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value); // int8u
 } // namespace NumberOfDailyTransitions
 
 namespace ThermostatProgrammingOperationMode {
-Protocols::InteractionModel::Status
-Get(EndpointId endpoint,
+Protocols::InteractionModel::Status GetDefault(
+    EndpointId endpoint,
     chip::BitMask<chip::app::Clusters::Thermostat::ProgrammingOperationModeBitmap> * value); // ProgrammingOperationModeBitmap
 } // namespace ThermostatProgrammingOperationMode
 
 namespace ThermostatRunningState {
 Protocols::InteractionModel::Status
-Get(EndpointId endpoint, chip::BitMask<chip::app::Clusters::Thermostat::RelayStateBitmap> * value); // RelayStateBitmap
+GetDefault(EndpointId endpoint, chip::BitMask<chip::app::Clusters::Thermostat::RelayStateBitmap> * value); // RelayStateBitmap
 } // namespace ThermostatRunningState
 
 namespace SetpointChangeSource {
 Protocols::InteractionModel::Status
-Get(EndpointId endpoint, chip::app::Clusters::Thermostat::SetpointChangeSourceEnum * value); // SetpointChangeSourceEnum
+GetDefault(EndpointId endpoint, chip::app::Clusters::Thermostat::SetpointChangeSourceEnum * value); // SetpointChangeSourceEnum
 } // namespace SetpointChangeSource
 
 namespace SetpointChangeAmount {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<int16_t> & value); // int16s
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<int16_t> & value); // int16s
 } // namespace SetpointChangeAmount
 
 namespace SetpointChangeSourceTimestamp {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint32_t * value); // epoch_s
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value); // epoch_s
 } // namespace SetpointChangeSourceTimestamp
 
 namespace OccupiedSetback {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<uint8_t> & value); // int8u
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint8_t> & value); // int8u
 } // namespace OccupiedSetback
 
 namespace OccupiedSetbackMin {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<uint8_t> & value); // int8u
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint8_t> & value); // int8u
 } // namespace OccupiedSetbackMin
 
 namespace OccupiedSetbackMax {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<uint8_t> & value); // int8u
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint8_t> & value); // int8u
 } // namespace OccupiedSetbackMax
 
 namespace UnoccupiedSetback {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<uint8_t> & value); // int8u
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint8_t> & value); // int8u
 } // namespace UnoccupiedSetback
 
 namespace UnoccupiedSetbackMin {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<uint8_t> & value); // int8u
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint8_t> & value); // int8u
 } // namespace UnoccupiedSetbackMin
 
 namespace UnoccupiedSetbackMax {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<uint8_t> & value); // int8u
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint8_t> & value); // int8u
 } // namespace UnoccupiedSetbackMax
 
 namespace EmergencyHeatDelta {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint8_t * value); // int8u
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value); // int8u
 } // namespace EmergencyHeatDelta
 
 namespace ACType {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::app::Clusters::Thermostat::ACTypeEnum * value); // ACTypeEnum
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
+                                               chip::app::Clusters::Thermostat::ACTypeEnum * value); // ACTypeEnum
 } // namespace ACType
 
 namespace ACCapacity {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value); // int16u
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value); // int16u
 } // namespace ACCapacity
 
 namespace ACRefrigerantType {
-Protocols::InteractionModel::Status Get(EndpointId endpoint,
-                                        chip::app::Clusters::Thermostat::ACRefrigerantTypeEnum * value); // ACRefrigerantTypeEnum
+Protocols::InteractionModel::Status
+GetDefault(EndpointId endpoint, chip::app::Clusters::Thermostat::ACRefrigerantTypeEnum * value); // ACRefrigerantTypeEnum
 } // namespace ACRefrigerantType
 
 namespace ACCompressorType {
-Protocols::InteractionModel::Status Get(EndpointId endpoint,
-                                        chip::app::Clusters::Thermostat::ACCompressorTypeEnum * value); // ACCompressorTypeEnum
+Protocols::InteractionModel::Status
+GetDefault(EndpointId endpoint, chip::app::Clusters::Thermostat::ACCompressorTypeEnum * value); // ACCompressorTypeEnum
 } // namespace ACCompressorType
 
 namespace ACErrorCode {
 Protocols::InteractionModel::Status
-Get(EndpointId endpoint, chip::BitMask<chip::app::Clusters::Thermostat::ACErrorCodeBitmap> * value); // ACErrorCodeBitmap
+GetDefault(EndpointId endpoint, chip::BitMask<chip::app::Clusters::Thermostat::ACErrorCodeBitmap> * value); // ACErrorCodeBitmap
 } // namespace ACErrorCode
 
 namespace ACLouverPosition {
-Protocols::InteractionModel::Status Get(EndpointId endpoint,
-                                        chip::app::Clusters::Thermostat::ACLouverPositionEnum * value); // ACLouverPositionEnum
+Protocols::InteractionModel::Status
+GetDefault(EndpointId endpoint, chip::app::Clusters::Thermostat::ACLouverPositionEnum * value); // ACLouverPositionEnum
 } // namespace ACLouverPosition
 
 namespace ACCoilTemperature {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<int16_t> & value); // temperature
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<int16_t> & value); // temperature
 } // namespace ACCoilTemperature
 
 namespace ACCapacityformat {
-Protocols::InteractionModel::Status Get(EndpointId endpoint,
-                                        chip::app::Clusters::Thermostat::ACCapacityFormatEnum * value); // ACCapacityFormatEnum
+Protocols::InteractionModel::Status
+GetDefault(EndpointId endpoint, chip::app::Clusters::Thermostat::ACCapacityFormatEnum * value); // ACCapacityFormatEnum
 } // namespace ACCapacityformat
 
 namespace NumberOfPresets {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint8_t * value); // int8u
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value); // int8u
 } // namespace NumberOfPresets
 
 namespace NumberOfSchedules {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint8_t * value); // int8u
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value); // int8u
 } // namespace NumberOfSchedules
 
 namespace NumberOfScheduleTransitions {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint8_t * value); // int8u
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value); // int8u
 } // namespace NumberOfScheduleTransitions
 
 namespace NumberOfScheduleTransitionPerDay {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<uint8_t> & value); // int8u
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint8_t> & value); // int8u
 } // namespace NumberOfScheduleTransitionPerDay
 
 namespace ActivePresetHandle {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<chip::MutableByteSpan> & value); // octet_string
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
+                                               DataModel::Nullable<chip::MutableByteSpan> & value); // octet_string
 } // namespace ActivePresetHandle
 
 namespace ActiveScheduleHandle {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<chip::MutableByteSpan> & value); // octet_string
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
+                                               DataModel::Nullable<chip::MutableByteSpan> & value); // octet_string
 } // namespace ActiveScheduleHandle
 
 namespace FeatureMap {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint32_t * value); // bitmap32
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value); // bitmap32
 } // namespace FeatureMap
 
 } // namespace Attributes

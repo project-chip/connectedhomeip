@@ -14432,8 +14432,8 @@ namespace Attributes {
 
 namespace HVACSystemTypeConfiguration {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint,
-                                        chip::BitMask<chip::app::Clusters::Thermostat::HVACSystemTypeBitmap> * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
+                                               chip::BitMask<chip::app::Clusters::Thermostat::HVACSystemTypeBitmap> * value)
 {
     using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::Thermostat::HVACSystemTypeBitmap>>;
     Traits::StorageType temp;
@@ -14453,7 +14453,8 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint,
 
 namespace ThermostatRunningMode {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::app::Clusters::Thermostat::ThermostatRunningModeEnum * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
+                                               chip::app::Clusters::Thermostat::ThermostatRunningModeEnum * value)
 {
     using Traits = NumericAttributeTraits<chip::app::Clusters::Thermostat::ThermostatRunningModeEnum>;
     Traits::StorageType temp;
@@ -14473,7 +14474,7 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::app::Clusters
 
 namespace StartOfWeek {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::app::Clusters::Thermostat::StartOfWeekEnum * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::Thermostat::StartOfWeekEnum * value)
 {
     using Traits = NumericAttributeTraits<chip::app::Clusters::Thermostat::StartOfWeekEnum>;
     Traits::StorageType temp;
@@ -14493,7 +14494,7 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::app::Clusters
 
 namespace NumberOfWeeklyTransitions {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
 {
     using Traits = NumericAttributeTraits<uint8_t>;
     Traits::StorageType temp;
@@ -14513,7 +14514,7 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, uint8_t * value)
 
 namespace NumberOfDailyTransitions {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
 {
     using Traits = NumericAttributeTraits<uint8_t>;
     Traits::StorageType temp;
@@ -14533,8 +14534,8 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, uint8_t * value)
 
 namespace ThermostatProgrammingOperationMode {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint,
-                                        chip::BitMask<chip::app::Clusters::Thermostat::ProgrammingOperationModeBitmap> * value)
+Protocols::InteractionModel::Status
+GetDefault(EndpointId endpoint, chip::BitMask<chip::app::Clusters::Thermostat::ProgrammingOperationModeBitmap> * value)
 {
     using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::Thermostat::ProgrammingOperationModeBitmap>>;
     Traits::StorageType temp;
@@ -14554,8 +14555,8 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint,
 
 namespace ThermostatRunningState {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint,
-                                        chip::BitMask<chip::app::Clusters::Thermostat::RelayStateBitmap> * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
+                                               chip::BitMask<chip::app::Clusters::Thermostat::RelayStateBitmap> * value)
 {
     using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::Thermostat::RelayStateBitmap>>;
     Traits::StorageType temp;
@@ -14575,7 +14576,8 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint,
 
 namespace SetpointChangeSource {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::app::Clusters::Thermostat::SetpointChangeSourceEnum * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
+                                               chip::app::Clusters::Thermostat::SetpointChangeSourceEnum * value)
 {
     using Traits = NumericAttributeTraits<chip::app::Clusters::Thermostat::SetpointChangeSourceEnum>;
     Traits::StorageType temp;
@@ -14595,7 +14597,7 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::app::Clusters
 
 namespace SetpointChangeAmount {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<int16_t> & value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<int16_t> & value)
 {
     using Traits = NumericAttributeTraits<int16_t>;
     Traits::StorageType temp;
@@ -14618,7 +14620,7 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable
 
 namespace SetpointChangeSourceTimestamp {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
 {
     using Traits = NumericAttributeTraits<uint32_t>;
     Traits::StorageType temp;
@@ -14638,7 +14640,7 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, uint32_t * value)
 
 namespace OccupiedSetback {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<uint8_t> & value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint8_t> & value)
 {
     using Traits = NumericAttributeTraits<uint8_t>;
     Traits::StorageType temp;
@@ -14661,7 +14663,7 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable
 
 namespace OccupiedSetbackMin {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<uint8_t> & value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint8_t> & value)
 {
     using Traits = NumericAttributeTraits<uint8_t>;
     Traits::StorageType temp;
@@ -14684,7 +14686,7 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable
 
 namespace OccupiedSetbackMax {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<uint8_t> & value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint8_t> & value)
 {
     using Traits = NumericAttributeTraits<uint8_t>;
     Traits::StorageType temp;
@@ -14707,7 +14709,7 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable
 
 namespace UnoccupiedSetback {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<uint8_t> & value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint8_t> & value)
 {
     using Traits = NumericAttributeTraits<uint8_t>;
     Traits::StorageType temp;
@@ -14730,7 +14732,7 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable
 
 namespace UnoccupiedSetbackMin {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<uint8_t> & value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint8_t> & value)
 {
     using Traits = NumericAttributeTraits<uint8_t>;
     Traits::StorageType temp;
@@ -14753,7 +14755,7 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable
 
 namespace UnoccupiedSetbackMax {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<uint8_t> & value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint8_t> & value)
 {
     using Traits = NumericAttributeTraits<uint8_t>;
     Traits::StorageType temp;
@@ -14776,7 +14778,7 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable
 
 namespace EmergencyHeatDelta {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
 {
     using Traits = NumericAttributeTraits<uint8_t>;
     Traits::StorageType temp;
@@ -14796,7 +14798,7 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, uint8_t * value)
 
 namespace ACType {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::app::Clusters::Thermostat::ACTypeEnum * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::Thermostat::ACTypeEnum * value)
 {
     using Traits = NumericAttributeTraits<chip::app::Clusters::Thermostat::ACTypeEnum>;
     Traits::StorageType temp;
@@ -14816,7 +14818,7 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::app::Clusters
 
 namespace ACCapacity {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
 {
     using Traits = NumericAttributeTraits<uint16_t>;
     Traits::StorageType temp;
@@ -14836,7 +14838,7 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value)
 
 namespace ACRefrigerantType {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::app::Clusters::Thermostat::ACRefrigerantTypeEnum * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::Thermostat::ACRefrigerantTypeEnum * value)
 {
     using Traits = NumericAttributeTraits<chip::app::Clusters::Thermostat::ACRefrigerantTypeEnum>;
     Traits::StorageType temp;
@@ -14856,7 +14858,7 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::app::Clusters
 
 namespace ACCompressorType {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::app::Clusters::Thermostat::ACCompressorTypeEnum * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::Thermostat::ACCompressorTypeEnum * value)
 {
     using Traits = NumericAttributeTraits<chip::app::Clusters::Thermostat::ACCompressorTypeEnum>;
     Traits::StorageType temp;
@@ -14876,8 +14878,8 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::app::Clusters
 
 namespace ACErrorCode {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint,
-                                        chip::BitMask<chip::app::Clusters::Thermostat::ACErrorCodeBitmap> * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
+                                               chip::BitMask<chip::app::Clusters::Thermostat::ACErrorCodeBitmap> * value)
 {
     using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::Thermostat::ACErrorCodeBitmap>>;
     Traits::StorageType temp;
@@ -14897,7 +14899,7 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint,
 
 namespace ACLouverPosition {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::app::Clusters::Thermostat::ACLouverPositionEnum * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::Thermostat::ACLouverPositionEnum * value)
 {
     using Traits = NumericAttributeTraits<chip::app::Clusters::Thermostat::ACLouverPositionEnum>;
     Traits::StorageType temp;
@@ -14917,7 +14919,7 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::app::Clusters
 
 namespace ACCoilTemperature {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<int16_t> & value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<int16_t> & value)
 {
     using Traits = NumericAttributeTraits<int16_t>;
     Traits::StorageType temp;
@@ -14940,7 +14942,7 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable
 
 namespace ACCapacityformat {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::app::Clusters::Thermostat::ACCapacityFormatEnum * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::Thermostat::ACCapacityFormatEnum * value)
 {
     using Traits = NumericAttributeTraits<chip::app::Clusters::Thermostat::ACCapacityFormatEnum>;
     Traits::StorageType temp;
@@ -14960,7 +14962,7 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::app::Clusters
 
 namespace NumberOfPresets {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
 {
     using Traits = NumericAttributeTraits<uint8_t>;
     Traits::StorageType temp;
@@ -14980,7 +14982,7 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, uint8_t * value)
 
 namespace NumberOfSchedules {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
 {
     using Traits = NumericAttributeTraits<uint8_t>;
     Traits::StorageType temp;
@@ -15000,7 +15002,7 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, uint8_t * value)
 
 namespace NumberOfScheduleTransitions {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
 {
     using Traits = NumericAttributeTraits<uint8_t>;
     Traits::StorageType temp;
@@ -15020,7 +15022,7 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, uint8_t * value)
 
 namespace NumberOfScheduleTransitionPerDay {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<uint8_t> & value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint8_t> & value)
 {
     using Traits = NumericAttributeTraits<uint8_t>;
     Traits::StorageType temp;
@@ -15043,7 +15045,7 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable
 
 namespace ActivePresetHandle {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<chip::MutableByteSpan> & value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<chip::MutableByteSpan> & value)
 {
     if (value.IsNull())
     {
@@ -15073,7 +15075,7 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable
 
 namespace ActiveScheduleHandle {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<chip::MutableByteSpan> & value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<chip::MutableByteSpan> & value)
 {
     if (value.IsNull())
     {
@@ -15103,7 +15105,7 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
 {
     using Traits = NumericAttributeTraits<uint32_t>;
     Traits::StorageType temp;
