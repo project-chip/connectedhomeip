@@ -121,6 +121,7 @@ private:
 
     std::shared_ptr<rtc::Track> mTrack;
     std::shared_ptr<rtc::Track> mAudioTrack;
+    std::shared_ptr<rtc::DataChannel> mDataChannel;
 
     // Callback to notify when session is established
     SessionEstablishedCallback mSessionEstablishedCallback;

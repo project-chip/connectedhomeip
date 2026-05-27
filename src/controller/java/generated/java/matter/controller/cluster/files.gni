@@ -486,6 +486,7 @@ matter_clusters_sources = [
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/clusters/ScenesManagementCluster.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/clusters/ServiceAreaCluster.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/clusters/SmokeCoAlarmCluster.kt",
+  "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/clusters/SmokeConcentrationMeasurementCluster.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/clusters/SoftwareDiagnosticsCluster.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/clusters/SoilMeasurementCluster.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/clusters/SwitchCluster.kt",

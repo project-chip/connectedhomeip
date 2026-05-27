@@ -16624,6 +16624,186 @@ public class ClusterReadMapping {
      
        return result;
     }
+    private static Map<String, InteractionInfo> readSmokeConcentrationMeasurementInteractionInfo() {
+       Map<String, InteractionInfo> result = new LinkedHashMap<>();Map<String, CommandParameterInfo> readSmokeConcentrationMeasurementMeasuredValueCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readSmokeConcentrationMeasurementMeasuredValueAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.SmokeConcentrationMeasurementCluster) cluster).readMeasuredValueAttribute(
+              (ChipClusters.SmokeConcentrationMeasurementCluster.MeasuredValueAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedSmokeConcentrationMeasurementClusterMeasuredValueAttributeCallback(),
+          readSmokeConcentrationMeasurementMeasuredValueCommandParams
+        );
+        result.put("readMeasuredValueAttribute", readSmokeConcentrationMeasurementMeasuredValueAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readSmokeConcentrationMeasurementMinMeasuredValueCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readSmokeConcentrationMeasurementMinMeasuredValueAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.SmokeConcentrationMeasurementCluster) cluster).readMinMeasuredValueAttribute(
+              (ChipClusters.SmokeConcentrationMeasurementCluster.MinMeasuredValueAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedSmokeConcentrationMeasurementClusterMinMeasuredValueAttributeCallback(),
+          readSmokeConcentrationMeasurementMinMeasuredValueCommandParams
+        );
+        result.put("readMinMeasuredValueAttribute", readSmokeConcentrationMeasurementMinMeasuredValueAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readSmokeConcentrationMeasurementMaxMeasuredValueCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readSmokeConcentrationMeasurementMaxMeasuredValueAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.SmokeConcentrationMeasurementCluster) cluster).readMaxMeasuredValueAttribute(
+              (ChipClusters.SmokeConcentrationMeasurementCluster.MaxMeasuredValueAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedSmokeConcentrationMeasurementClusterMaxMeasuredValueAttributeCallback(),
+          readSmokeConcentrationMeasurementMaxMeasuredValueCommandParams
+        );
+        result.put("readMaxMeasuredValueAttribute", readSmokeConcentrationMeasurementMaxMeasuredValueAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readSmokeConcentrationMeasurementPeakMeasuredValueCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readSmokeConcentrationMeasurementPeakMeasuredValueAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.SmokeConcentrationMeasurementCluster) cluster).readPeakMeasuredValueAttribute(
+              (ChipClusters.SmokeConcentrationMeasurementCluster.PeakMeasuredValueAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedSmokeConcentrationMeasurementClusterPeakMeasuredValueAttributeCallback(),
+          readSmokeConcentrationMeasurementPeakMeasuredValueCommandParams
+        );
+        result.put("readPeakMeasuredValueAttribute", readSmokeConcentrationMeasurementPeakMeasuredValueAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readSmokeConcentrationMeasurementPeakMeasuredValueWindowCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readSmokeConcentrationMeasurementPeakMeasuredValueWindowAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.SmokeConcentrationMeasurementCluster) cluster).readPeakMeasuredValueWindowAttribute(
+              (ChipClusters.LongAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+          readSmokeConcentrationMeasurementPeakMeasuredValueWindowCommandParams
+        );
+        result.put("readPeakMeasuredValueWindowAttribute", readSmokeConcentrationMeasurementPeakMeasuredValueWindowAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readSmokeConcentrationMeasurementAverageMeasuredValueCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readSmokeConcentrationMeasurementAverageMeasuredValueAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.SmokeConcentrationMeasurementCluster) cluster).readAverageMeasuredValueAttribute(
+              (ChipClusters.SmokeConcentrationMeasurementCluster.AverageMeasuredValueAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedSmokeConcentrationMeasurementClusterAverageMeasuredValueAttributeCallback(),
+          readSmokeConcentrationMeasurementAverageMeasuredValueCommandParams
+        );
+        result.put("readAverageMeasuredValueAttribute", readSmokeConcentrationMeasurementAverageMeasuredValueAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readSmokeConcentrationMeasurementAverageMeasuredValueWindowCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readSmokeConcentrationMeasurementAverageMeasuredValueWindowAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.SmokeConcentrationMeasurementCluster) cluster).readAverageMeasuredValueWindowAttribute(
+              (ChipClusters.LongAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+          readSmokeConcentrationMeasurementAverageMeasuredValueWindowCommandParams
+        );
+        result.put("readAverageMeasuredValueWindowAttribute", readSmokeConcentrationMeasurementAverageMeasuredValueWindowAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readSmokeConcentrationMeasurementUncertaintyCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readSmokeConcentrationMeasurementUncertaintyAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.SmokeConcentrationMeasurementCluster) cluster).readUncertaintyAttribute(
+              (ChipClusters.FloatAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedFloatAttributeCallback(),
+          readSmokeConcentrationMeasurementUncertaintyCommandParams
+        );
+        result.put("readUncertaintyAttribute", readSmokeConcentrationMeasurementUncertaintyAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readSmokeConcentrationMeasurementMeasurementUnitCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readSmokeConcentrationMeasurementMeasurementUnitAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.SmokeConcentrationMeasurementCluster) cluster).readMeasurementUnitAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readSmokeConcentrationMeasurementMeasurementUnitCommandParams
+        );
+        result.put("readMeasurementUnitAttribute", readSmokeConcentrationMeasurementMeasurementUnitAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readSmokeConcentrationMeasurementMeasurementMediumCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readSmokeConcentrationMeasurementMeasurementMediumAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.SmokeConcentrationMeasurementCluster) cluster).readMeasurementMediumAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readSmokeConcentrationMeasurementMeasurementMediumCommandParams
+        );
+        result.put("readMeasurementMediumAttribute", readSmokeConcentrationMeasurementMeasurementMediumAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readSmokeConcentrationMeasurementLevelValueCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readSmokeConcentrationMeasurementLevelValueAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.SmokeConcentrationMeasurementCluster) cluster).readLevelValueAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readSmokeConcentrationMeasurementLevelValueCommandParams
+        );
+        result.put("readLevelValueAttribute", readSmokeConcentrationMeasurementLevelValueAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readSmokeConcentrationMeasurementGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readSmokeConcentrationMeasurementGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.SmokeConcentrationMeasurementCluster) cluster).readGeneratedCommandListAttribute(
+              (ChipClusters.SmokeConcentrationMeasurementCluster.GeneratedCommandListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedSmokeConcentrationMeasurementClusterGeneratedCommandListAttributeCallback(),
+          readSmokeConcentrationMeasurementGeneratedCommandListCommandParams
+        );
+        result.put("readGeneratedCommandListAttribute", readSmokeConcentrationMeasurementGeneratedCommandListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readSmokeConcentrationMeasurementAcceptedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readSmokeConcentrationMeasurementAcceptedCommandListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.SmokeConcentrationMeasurementCluster) cluster).readAcceptedCommandListAttribute(
+              (ChipClusters.SmokeConcentrationMeasurementCluster.AcceptedCommandListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedSmokeConcentrationMeasurementClusterAcceptedCommandListAttributeCallback(),
+          readSmokeConcentrationMeasurementAcceptedCommandListCommandParams
+        );
+        result.put("readAcceptedCommandListAttribute", readSmokeConcentrationMeasurementAcceptedCommandListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readSmokeConcentrationMeasurementAttributeListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readSmokeConcentrationMeasurementAttributeListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.SmokeConcentrationMeasurementCluster) cluster).readAttributeListAttribute(
+              (ChipClusters.SmokeConcentrationMeasurementCluster.AttributeListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedSmokeConcentrationMeasurementClusterAttributeListAttributeCallback(),
+          readSmokeConcentrationMeasurementAttributeListCommandParams
+        );
+        result.put("readAttributeListAttribute", readSmokeConcentrationMeasurementAttributeListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readSmokeConcentrationMeasurementFeatureMapCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readSmokeConcentrationMeasurementFeatureMapAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.SmokeConcentrationMeasurementCluster) cluster).readFeatureMapAttribute(
+              (ChipClusters.LongAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+          readSmokeConcentrationMeasurementFeatureMapCommandParams
+        );
+        result.put("readFeatureMapAttribute", readSmokeConcentrationMeasurementFeatureMapAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readSmokeConcentrationMeasurementClusterRevisionCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readSmokeConcentrationMeasurementClusterRevisionAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.SmokeConcentrationMeasurementCluster) cluster).readClusterRevisionAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readSmokeConcentrationMeasurementClusterRevisionCommandParams
+        );
+        result.put("readClusterRevisionAttribute", readSmokeConcentrationMeasurementClusterRevisionAttributeInteractionInfo);
+     
+       return result;
+    }
     private static Map<String, InteractionInfo> readNetworkIdentityManagementInteractionInfo() {
        Map<String, InteractionInfo> result = new LinkedHashMap<>();Map<String, CommandParameterInfo> readNetworkIdentityManagementActiveNetworkIdentitiesCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readNetworkIdentityManagementActiveNetworkIdentitiesAttributeInteractionInfo = new InteractionInfo(
@@ -21594,6 +21774,7 @@ public class ClusterReadMapping {
             put("soilMeasurement", readSoilMeasurementInteractionInfo());
             put("ambientContextSensing", readAmbientContextSensingInteractionInfo());
             put("proximityRanging", readProximityRangingInteractionInfo());
+            put("smokeConcentrationMeasurement", readSmokeConcentrationMeasurementInteractionInfo());
             put("networkIdentityManagement", readNetworkIdentityManagementInteractionInfo());
             put("wiFiNetworkManagement", readWiFiNetworkManagementInteractionInfo());
             put("threadBorderRouterManagement", readThreadBorderRouterManagementInteractionInfo());

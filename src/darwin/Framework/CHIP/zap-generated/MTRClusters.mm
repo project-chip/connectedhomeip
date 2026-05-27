@@ -17074,6 +17074,90 @@ using chip::System::Clock::Timeout;
 
 @end
 
+@implementation MTRClusterSmokeConcentrationMeasurement
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeSmokeConcentrationMeasurementID) attributeID:@(MTRAttributeIDTypeClusterSmokeConcentrationMeasurementAttributeMeasuredValueID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeMinMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeSmokeConcentrationMeasurementID) attributeID:@(MTRAttributeIDTypeClusterSmokeConcentrationMeasurementAttributeMinMeasuredValueID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeMaxMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeSmokeConcentrationMeasurementID) attributeID:@(MTRAttributeIDTypeClusterSmokeConcentrationMeasurementAttributeMaxMeasuredValueID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributePeakMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeSmokeConcentrationMeasurementID) attributeID:@(MTRAttributeIDTypeClusterSmokeConcentrationMeasurementAttributePeakMeasuredValueID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributePeakMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeSmokeConcentrationMeasurementID) attributeID:@(MTRAttributeIDTypeClusterSmokeConcentrationMeasurementAttributePeakMeasuredValueWindowID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeAverageMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeSmokeConcentrationMeasurementID) attributeID:@(MTRAttributeIDTypeClusterSmokeConcentrationMeasurementAttributeAverageMeasuredValueID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeAverageMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeSmokeConcentrationMeasurementID) attributeID:@(MTRAttributeIDTypeClusterSmokeConcentrationMeasurementAttributeAverageMeasuredValueWindowID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeUncertaintyWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeSmokeConcentrationMeasurementID) attributeID:@(MTRAttributeIDTypeClusterSmokeConcentrationMeasurementAttributeUncertaintyID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeMeasurementUnitWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeSmokeConcentrationMeasurementID) attributeID:@(MTRAttributeIDTypeClusterSmokeConcentrationMeasurementAttributeMeasurementUnitID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeMeasurementMediumWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeSmokeConcentrationMeasurementID) attributeID:@(MTRAttributeIDTypeClusterSmokeConcentrationMeasurementAttributeMeasurementMediumID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeLevelValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeSmokeConcentrationMeasurementID) attributeID:@(MTRAttributeIDTypeClusterSmokeConcentrationMeasurementAttributeLevelValueID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeSmokeConcentrationMeasurementID) attributeID:@(MTRAttributeIDTypeClusterSmokeConcentrationMeasurementAttributeGeneratedCommandListID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeSmokeConcentrationMeasurementID) attributeID:@(MTRAttributeIDTypeClusterSmokeConcentrationMeasurementAttributeAcceptedCommandListID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeSmokeConcentrationMeasurementID) attributeID:@(MTRAttributeIDTypeClusterSmokeConcentrationMeasurementAttributeAttributeListID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeSmokeConcentrationMeasurementID) attributeID:@(MTRAttributeIDTypeClusterSmokeConcentrationMeasurementAttributeFeatureMapID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeSmokeConcentrationMeasurementID) attributeID:@(MTRAttributeIDTypeClusterSmokeConcentrationMeasurementAttributeClusterRevisionID) params:params];
+}
+
+@end
+
 @implementation MTRClusterNetworkIdentityManagement
 
 - (void)addClientWithParams:(MTRNetworkIdentityManagementClusterAddClientParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(void (^)(MTRNetworkIdentityManagementClusterAddClientResponseParams * _Nullable data, NSError * _Nullable error))completion
