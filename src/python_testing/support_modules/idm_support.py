@@ -957,7 +957,7 @@ class IDMBaseTest(MatterBaseTest):
 
                 cluster_data = self.endpoints_tlv[endpoint_id][cluster_id]
                 writable_attr_ids = self.get_writable_attributes_for_cluster(cluster_id, cluster_data)
-                log.info(f'Writable attributes for cluster {cluster_id}: {writable_attr_ids}')
+                log.info('Writable attributes for cluster %s: %s', cluster_id, writable_attr_ids)
 
                 if not writable_attr_ids:
                     continue
@@ -984,7 +984,7 @@ class IDMBaseTest(MatterBaseTest):
                         Clusters.BasicInformation.Attributes.Location,
                     ]
                     if attribute in ATTRIBUTES_WITH_WRITE_CONSTRAINTS:
-                        log.debug(f"{test_step}: Skipping {attribute.__name__} - known to have write constraints")
+                        log.debug("%s: Skipping %s - known to have write constraints", test_step, attribute.__name__)
                         continue
 
                     # Get current value from priming data
@@ -1008,8 +1008,7 @@ class IDMBaseTest(MatterBaseTest):
                         # List attribute - toggle between empty and non-empty to ensure actual change
                         if len(cached_val) == 0:
                             # Skip empty lists - writing a valid non-empty list requires XML spec knowledge to write valid data, this is outside the bounds of the IDM tests, and is covered by ACE tests
-                            log.info(
-                                f"{test_step}: Skipping {attribute.__name__} - empty list")
+                            log.info("%s: Skipping %s - empty list", test_step, attribute.__name__)
                             continue
                         # Non-empty list -> write empty list (safe change)
                         new_val = []
@@ -1032,11 +1031,11 @@ class IDMBaseTest(MatterBaseTest):
                     else:
                         # For other types, skip to avoid writing same value
                         # Writing the same value should NOT trigger a report
-                        log.info(f"{test_step}: Skipping {attribute.__name__} - unsupported type for change")
+                        log.info("%s: Skipping %s - unsupported type for change", test_step, attribute.__name__)
                         continue
 
                     # Write the attribute
-                    log.info(f"{test_step}: Writing {attribute.__name__} on EP{endpoint_id}: {cached_val} -> {new_val}")
+                    log.info("%s: Writing %s on EP%s: %s -> %s", test_step, attribute.__name__, endpoint_id, cached_val, new_val)
                     resp = await self.default_controller.WriteAttribute(
                         nodeId=self.dut_node_id,
                         attributes=[(endpoint_id, attribute(new_val))]
@@ -1044,8 +1043,9 @@ class IDMBaseTest(MatterBaseTest):
 
                     if resp[0].Status == Status.Success:
                         changed_count += 1
-                        log.info(
-                            f"{test_step}: [{changed_count}] Changed {attribute.__name__} (0x{attribute_id:04X}) on endpoint {endpoint_id}, cluster 0x{cluster_id:04X}: {cached_val} -> {new_val}")
+                        log.info("%s: [%s] Changed %s (0x%04X) on endpoint %s, cluster 0x%04X: %s -> %s",
+                                 test_step, changed_count, attribute.__name__, attribute_id, endpoint_id, cluster_id, cached_val,
+                                 new_val)
 
                         # Track this change for verification
                         changed_attributes.append(ChangedAttribute(
@@ -1062,7 +1062,7 @@ class IDMBaseTest(MatterBaseTest):
                     else:
                         # Other errors are acceptable per TC_AccessChecker pattern
                         # (e.g., InvalidValue, ConstraintError - as long as it's not UnsupportedAccess)
-                        log.info(f"{test_step}: Write to {attribute.__name__} returned {resp[0].Status}")
+                        log.info("%s: Write to %s returned %s", test_step, attribute.__name__, resp[0].Status)
 
         # Wait for change reports to arrive
         # Wait in small increments, checking periodically
@@ -1079,7 +1079,7 @@ class IDMBaseTest(MatterBaseTest):
             elif current_reports == changed_count:
                 break
             else:
-                log.debug(f"{test_step}: {count}s elapsed, {current_reports} unique attributes reported (no change)")
+                log.debug("%s: %ss elapsed, %s unique attributes reported (no change)", test_step, count, current_reports)
 
         # Verify that we received reports for all the changed attributes we wrote to
         verified_count = 0
@@ -1094,16 +1094,16 @@ class IDMBaseTest(MatterBaseTest):
             if handler.was_attribute_reported(ep, cluster, attr):
                 verified_count += 1
                 reports_count = handler.get_attribute_report_count(ep, cluster, attr)
-                log.info(f"Reports count for {cluster.__name__} on endpoint {ep}: {reports_count}")
+                log.info("Reports count for %s on endpoint %s: %s", cluster.__name__, ep, reports_count)
             else:
                 missing_reports.append(f"{attr.__name__} on endpoint {ep}")
 
-        log.info(
-            f"{test_step}: Verified {verified_count}/{len(changed_attributes)} attribute change reports received")
+        log.info("%s: Verified %s/%s attribute change reports received",
+                 test_step, verified_count, len(changed_attributes))
 
         # Report summary of all attributes that received reports
         all_reported = handler.get_all_reported_attributes()
-        log.info(f"{test_step}: Total unique attributes with reports: {len(all_reported)}")
+        log.info("%s: Total unique attributes with reports: %s", test_step, len(all_reported))
 
         asserts.assert_less_equal(
             len(missing_reports), 0,
