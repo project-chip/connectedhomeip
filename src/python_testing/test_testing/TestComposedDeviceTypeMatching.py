@@ -17,24 +17,25 @@
 
 import logging
 from xml.etree import ElementTree
-from collections import defaultdict
 
 from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.testing.device_conformance_tests import DeviceConformanceTests
-from matter.testing.spec_parsing import XmlDeviceType, XmlComposedDeviceTypeRequirement, XmlDeviceTypeClusterRequirements, parse_callable_from_xml, ConformanceParseParameters, ClusterSide
-from matter.testing.conformance import EMPTY_CLUSTER_GLOBAL_ATTRIBUTES, ConformanceAssessmentData
-from matter.testing.problem_notices import ProblemNotice, ProblemSeverity, DeviceTypePathLocation
 from matter.testing.runner import default_matter_test_main
+from matter.testing.spec_parsing import (ClusterSide, ConformanceParseParameters, XmlComposedDeviceTypeRequirement, XmlDeviceType,
+                                         XmlDeviceTypeClusterRequirements, parse_callable_from_xml)
 
 log = logging.getLogger(__name__)
+
 
 def get_mandatory_conformance():
     return parse_callable_from_xml(ElementTree.Element('mandatoryConform'), ConformanceParseParameters({}, {}, {}))
 
+
 def get_optional_conformance():
     return parse_callable_from_xml(ElementTree.Element('optionalConform'), ConformanceParseParameters({}, {}, {}))
+
 
 class TestComposedDeviceTypeMatching(DeviceConformanceTests):
     def setup_class(self):
@@ -63,7 +64,7 @@ class TestComposedDeviceTypeMatching(DeviceConformanceTests):
     def test_scenario_simple_match(self):
         dt_parent_id = 0x0001
         dt_child_id = 0x0002
-        
+
         # Mock spec data
         self.xml_device_types = {
             dt_parent_id: XmlDeviceType(
@@ -75,7 +76,8 @@ class TestComposedDeviceTypeMatching(DeviceConformanceTests):
                 classification_scope="endpoint",
                 revision_desc={},
                 composed_device_types=[
-                    self._create_mock_composed_req(dt_child_id, "Child Device", get_mandatory_conformance(), min_instances=1, max_instances=1)
+                    self._create_mock_composed_req(dt_child_id, "Child Device",
+                                                   get_mandatory_conformance(), min_instances=1, max_instances=1)
                 ]
             ),
             dt_child_id: XmlDeviceType(
@@ -88,7 +90,7 @@ class TestComposedDeviceTypeMatching(DeviceConformanceTests):
                 revision_desc={}
             )
         }
-        
+
         # Mock device endpoints
         self.endpoints = {
             0: {
@@ -104,11 +106,12 @@ class TestComposedDeviceTypeMatching(DeviceConformanceTests):
             },
             2: {
                 Clusters.Descriptor: {
-                    Clusters.Descriptor.Attributes.DeviceTypeList: [Clusters.Descriptor.Structs.DeviceTypeStruct(deviceType=dt_child_id, revision=1)]
+                    Clusters.Descriptor.Attributes.DeviceTypeList: [
+                        Clusters.Descriptor.Structs.DeviceTypeStruct(deviceType=dt_child_id, revision=1)]
                 }
             }
         }
-        
+
         success, problems = self.check_composed_device_type_requirements()
         for p in problems:
             log.info(p)
@@ -124,7 +127,7 @@ class TestComposedDeviceTypeMatching(DeviceConformanceTests):
     def test_scenario_missing_mandatory(self):
         dt_parent_id = 0x0001
         dt_child_id = 0x0002
-        
+
         self.xml_device_types = {
             dt_parent_id: XmlDeviceType(
                 name="Parent Device",
@@ -135,7 +138,8 @@ class TestComposedDeviceTypeMatching(DeviceConformanceTests):
                 classification_scope="endpoint",
                 revision_desc={},
                 composed_device_types=[
-                    self._create_mock_composed_req(dt_child_id, "Child Device", get_mandatory_conformance(), min_instances=1, max_instances=1)
+                    self._create_mock_composed_req(dt_child_id, "Child Device",
+                                                   get_mandatory_conformance(), min_instances=1, max_instances=1)
                 ]
             ),
             dt_child_id: XmlDeviceType(
@@ -148,7 +152,7 @@ class TestComposedDeviceTypeMatching(DeviceConformanceTests):
                 revision_desc={}
             )
         }
-        
+
         self.endpoints = {
             0: {
                 Clusters.BasicInformation: {
@@ -162,10 +166,10 @@ class TestComposedDeviceTypeMatching(DeviceConformanceTests):
                 }
             }
         }
-        
+
         success, problems = self.check_composed_device_type_requirements()
         asserts.assert_false(success, "Unexpected success when mandatory composed device type is missing")
-        
+
     # ==========================================================================
     # Scenario 3: Bipartite Matching (Distinct Overrides)
     # ==========================================================================
@@ -182,20 +186,22 @@ class TestComposedDeviceTypeMatching(DeviceConformanceTests):
         dt_child_id = 0x0002
         cluster_x_id = 0x0090
         cluster_y_id = 0x0091
-        
+
         # Mock spec data
         req_base = self._create_mock_composed_req(dt_child_id, "Child Device Base", get_mandatory_conformance(), min_instances=2)
-        
+
         req1 = self._create_mock_composed_req(dt_child_id, "Child Device #1", get_mandatory_conformance())
         req1.cluster_requirements = {
-            cluster_x_id: XmlDeviceTypeClusterRequirements(name="Cluster X", side=ClusterSide.SERVER, conformance=get_mandatory_conformance())
+            cluster_x_id: XmlDeviceTypeClusterRequirements(
+                name="Cluster X", side=ClusterSide.SERVER, conformance=get_mandatory_conformance())
         }
-        
+
         req2 = self._create_mock_composed_req(dt_child_id, "Child Device #2", get_mandatory_conformance())
         req2.cluster_requirements = {
-            cluster_y_id: XmlDeviceTypeClusterRequirements(name="Cluster Y", side=ClusterSide.SERVER, conformance=get_mandatory_conformance())
+            cluster_y_id: XmlDeviceTypeClusterRequirements(
+                name="Cluster Y", side=ClusterSide.SERVER, conformance=get_mandatory_conformance())
         }
-        
+
         self.xml_device_types = {
             dt_parent_id: XmlDeviceType(
                 name="Parent Device",
@@ -217,7 +223,7 @@ class TestComposedDeviceTypeMatching(DeviceConformanceTests):
                 revision_desc={}
             )
         }
-        
+
         # Mock device endpoints
         self.endpoints = {
             0: {
@@ -256,7 +262,7 @@ class TestComposedDeviceTypeMatching(DeviceConformanceTests):
                 }
             }
         }
-        
+
         success, problems = self.check_composed_device_type_requirements()
         for p in problems:
             log.info(p)
@@ -278,18 +284,20 @@ class TestComposedDeviceTypeMatching(DeviceConformanceTests):
         dt_child_id = 0x0002
         cluster_x_id = 0x0090
         cluster_y_id = 0x0091
-        
+
         # Mock spec data
         req1 = self._create_mock_composed_req(dt_child_id, "Child Device #1", get_mandatory_conformance())
         req1.cluster_requirements = {
-            cluster_x_id: XmlDeviceTypeClusterRequirements(name="Cluster X", side=ClusterSide.SERVER, conformance=get_mandatory_conformance())
+            cluster_x_id: XmlDeviceTypeClusterRequirements(
+                name="Cluster X", side=ClusterSide.SERVER, conformance=get_mandatory_conformance())
         }
-        
+
         req2 = self._create_mock_composed_req(dt_child_id, "Child Device #2", get_mandatory_conformance())
         req2.cluster_requirements = {
-            cluster_y_id: XmlDeviceTypeClusterRequirements(name="Cluster Y", side=ClusterSide.SERVER, conformance=get_mandatory_conformance())
+            cluster_y_id: XmlDeviceTypeClusterRequirements(
+                name="Cluster Y", side=ClusterSide.SERVER, conformance=get_mandatory_conformance())
         }
-        
+
         self.xml_device_types = {
             dt_parent_id: XmlDeviceType(
                 name="Parent Device",
@@ -311,7 +319,7 @@ class TestComposedDeviceTypeMatching(DeviceConformanceTests):
                 revision_desc={}
             )
         }
-        
+
         # Mock device endpoints
         self.endpoints = {
             0: {
@@ -350,9 +358,10 @@ class TestComposedDeviceTypeMatching(DeviceConformanceTests):
                 }
             }
         }
-        
+
         success, problems = self.check_composed_device_type_requirements()
         asserts.assert_false(success, "Unexpected success in bipartite conflict scenario")
+
 
 if __name__ == "__main__":
     default_matter_test_main()

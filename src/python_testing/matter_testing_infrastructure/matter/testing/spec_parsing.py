@@ -1367,6 +1367,7 @@ def build_xml_namespaces(data_model_directory: typing.Union[PrebuiltDataModelDir
 def parse_single_device_type(root: ElementTree.Element, cluster_definition_xml: dict[uint, XmlCluster]) -> tuple[dict[int, XmlDeviceType], list[ProblemNotice]]:
     problems: list[ProblemNotice] = []
     device_types: dict[int, XmlDeviceType] = {}
+
     def append_overrides(override_element_type: str, c: ElementTree.Element, cluster: XmlDeviceTypeClusterRequirements, c_id: uint, cluster_conformance_params: ConformanceParseParameters, location, problems: list[ProblemNotice]):
         if override_element_type == 'feature':
             name_to_id_map = {f.name: _id for _id, f in cluster_definition_xml[c_id].features.items()}
@@ -1415,7 +1416,8 @@ def parse_single_device_type(root: ElementTree.Element, cluster_definition_xml: 
                 if len(map_id) == 0:
                     if is_disallowed(conformance_override):
                         import logging
-                        logging.getLogger(__name__).info(f"Ignoring unknown {override_element_type} {element_name} in cluster {c_id} because the conformance is disallowed")
+                        logging.getLogger(__name__).info(
+                            f"Ignoring unknown {override_element_type} {element_name} in cluster {c_id} because the conformance is disallowed")
                         continue
                     problems.append(ProblemNotice("Parse Device Type XML", location=location,
                                     severity=ProblemSeverity.WARNING, problem=f"Unknown {override_element_type} {element_name} in cluster 0x{c_id:04X} - map = {map_id}"))
@@ -1533,20 +1535,19 @@ def parse_single_device_type(root: ElementTree.Element, cluster_definition_xml: 
                 # Conformance
                 conformance_xml, _ = get_conformance(composed_dt, uint(tid))
 
-
                 conformance = parse_callable_from_xml(conformance_xml, ConformanceParseParameters(
                     feature_map={}, attribute_map={}, command_map={}))
 
                 min_instances = None
                 max_instances = None
-                
+
                 if (constraint := composed_dt.find('constraint')) is not None:
                     if (allowed := constraint.find('allowed')) is not None:
                         min_instances = max_instances = int(allowed.attrib.get('value', 0), 0)
                     else:
                         min_el = constraint.find('min')
                         max_el = constraint.find('max')
-                        
+
                         min_instances = int(min_el.attrib.get('value', 0), 0) if min_el is not None else None
                         max_instances = int(max_el.attrib.get('value', 0), 0) if max_el is not None else None
 
@@ -1557,13 +1558,14 @@ def parse_single_device_type(root: ElementTree.Element, cluster_definition_xml: 
                         c_id = uint(int(c.attrib['id'], 0))
                         c_name = c.attrib['name']
                         c_conformance_xml, _ = get_conformance(c, c_id)
-                        c_conformance = parse_callable_from_xml(c_conformance_xml, ConformanceParseParameters(feature_map={}, attribute_map={}, command_map={}))
+                        c_conformance = parse_callable_from_xml(c_conformance_xml, ConformanceParseParameters(
+                            feature_map={}, attribute_map={}, command_map={}))
                         cluster = XmlDeviceTypeClusterRequirements(name=c_name, side=ClusterSide.SERVER, conformance=c_conformance)
                         cluster_requirements[c_id] = cluster
-                        
+
                         cluster_conformance_params = ConformanceParseParameters(
-                            feature_map=cluster_definition_xml[c_id].feature_map, 
-                            attribute_map=cluster_definition_xml[c_id].attribute_map, 
+                            feature_map=cluster_definition_xml[c_id].feature_map,
+                            attribute_map=cluster_definition_xml[c_id].attribute_map,
                             command_map=cluster_definition_xml[c_id].command_map
                         )
                         append_overrides('feature', c, cluster, c_id, cluster_conformance_params, location, problems)
