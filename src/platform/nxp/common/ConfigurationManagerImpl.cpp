@@ -33,9 +33,7 @@
 
 #include "fsl_device_registers.h"
 
-#if CONFIG_BOOT_REASON_SDK_SUPPORT
-#include "fsl_power.h"
-#endif
+#include <platform/nxp/common/BootReason.h>
 
 #if CONFIG_CHIP_PLAT_LOAD_REAL_FACTORY_DATA
 #include <platform/nxp/common/factory_data/legacy/FactoryDataProvider.h>
@@ -51,10 +49,6 @@ extern "C" {
 #include "fsl_silicon_id.h"
 #endif
 
-#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
-#include "OtaSupport.h"
-#endif
-
 namespace chip {
 namespace DeviceLayer {
 
@@ -66,45 +60,21 @@ ConfigurationManagerImpl & ConfigurationManagerImpl::GetDefaultInstance()
     return sInstance;
 }
 
-CHIP_ERROR ConfigurationManagerImpl::DetermineBootReason(uint32_t rebootCause)
+CHIP_ERROR ConfigurationManagerImpl::DetermineBootReason()
 {
-#if CONFIG_BOOT_REASON_SDK_SUPPORT
-    /*
-    With current implementation kBrownOutReset couldn't be catched
-    */
     BootReasonType bootReason = BootReasonType::kUnspecified;
 
-    if (rebootCause == 0)
-    {
-        bootReason = BootReasonType::kPowerOnReboot;
-    }
-
-    else if (rebootCause == kPOWER_ResetCauseWdt)
-    {
-        /* Reboot can be due to hardware or software watchdog */
-        bootReason = BootReasonType::kHardwareWatchdogReset;
-    }
-    else if (rebootCause == kPOWER_ResetCauseSysResetReq)
-    {
-        bootReason = BootReasonType::kSoftwareReset;
-#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
-        OtaImgState_t img_state = OTA_GetImgState();
-        if (img_state == OtaImgState_RunCandidate)
-        {
-            bootReason = BootReasonType::kSoftwareUpdateCompleted;
-        }
-#endif
-    }
+    ReturnErrorOnFailure(NXP::ReadAndDetermineBootReason(bootReason));
 
     return StoreBootReason(to_underlying(bootReason));
-#else
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-#endif
 }
 
 CHIP_ERROR ConfigurationManagerImpl::StoreSoftwareUpdateCompleted()
 {
-    /* Empty implementation*/
+#if CONFIG_CHIP_NXP_PLATFORM_MCXW72
+    ReturnErrorAndLogOnFailure(WriteConfigValue(NXPConfig::kConfigKey_AppOTADone, true), DeviceLayer,
+                               "Failed to store OTA completion flag");
+#endif
     return CHIP_NO_ERROR;
 }
 
@@ -112,11 +82,6 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
 {
     CHIP_ERROR err;
     uint32_t rebootCount = 0;
-
-#if CONFIG_BOOT_REASON_SDK_SUPPORT
-    uint32_t rebootCause = POWER_GetResetCause();
-    POWER_ClearResetCause(rebootCause);
-#endif
 
     // Initialize the generic implementation base class.
     err = Internal::GenericConfigurationManagerImpl<NXPConfig>::Init();
@@ -142,15 +107,8 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
         err = StoreTotalOperationalHours(0);
         SuccessOrExit(err);
     }
-#if CONFIG_BOOT_REASON_SDK_SUPPORT
-    SuccessOrExit(err = DetermineBootReason(rebootCause));
-#else
-    if (!NXPConfig::ConfigValueExists(NXPConfig::kCounterKey_BootReason))
-    {
-        err = StoreBootReason(to_underlying(BootReasonType::kUnspecified));
-        SuccessOrExit(err);
-    }
-#endif
+    err = DetermineBootReason();
+    SuccessOrExit(err);
 
     // TODO: Initialize the global GroupKeyStore object here
 
