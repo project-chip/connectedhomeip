@@ -61,8 +61,11 @@ runs:
 
         EXTRA_TEXT=""
         if [[ -n "$EXTRA_FILE" && -f "$EXTRA_FILE" ]]; then
-          CONTENT=$(head -n 2 "$EXTRA_FILE" | tr '\n' ' ' | sed -e 's/  */ /g' -e 's/^[[:space:]]*//;s/[[:space:]]*$//')
+          CONTENT=$(head -n 2 "$EXTRA_FILE" | tr '\n' ' ' | sed -e 's/  */ /g' -e 's/^[[:space:]]*//;s/[[:space:]]*$//' -e 's/@//g')
           if [[ -n "$CONTENT" ]]; then
+            if [[ ${#CONTENT} -gt 300 ]]; then
+              CONTENT="${CONTENT:0:300}..."
+            fi
             EXTRA_TEXT="\n*Failed Tests:* ${CONTENT}"
           fi
         fi
