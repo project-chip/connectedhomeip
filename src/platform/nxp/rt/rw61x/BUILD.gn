@@ -51,7 +51,6 @@ source_set("nxp_ota") {
 config("nxp_platform_config") {
   defines = [
     "EXTERNAL_BLEMANAGERIMPL_HEADER=\"platform/nxp/common/ble_zephyr/BLEManagerImpl.h\"",
-    "CONFIG_BOOT_REASON_SDK_SUPPORT=1",
   ]
   include_dirs = [
     ".",
@@ -90,6 +89,8 @@ static_library("nxp_platform") {
     "../../../FreeRTOS/SystemTimeSupport.cpp",
     "../../../SingletonConfigurationManager.cpp",
     "../../common/CHIPDevicePlatformEvent.h",
+    "../../common/BootReason.h",
+    "BootReason.cpp",
     "../../common/ConfigurationManagerImpl.cpp",
     "../../common/ConfigurationManagerImpl.h",
     "../../common/ConnectivityManagerImpl.cpp",

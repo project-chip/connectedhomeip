@@ -90,12 +90,14 @@ static_library("nxp_platform") {
     "../common/KeyValueStoreManagerImpl.cpp",
     "../common/KeyValueStoreManagerImpl.h",
     "../common/NXPConfig.h",
+    "../common/ConfigurationManagerImpl.cpp",
     "../common/NXPConfigNVS.cpp",
     "../common/NetworkProvisioningServerImpl.h",
     "../common/PlatformManagerImpl.h",
     "../common/SoftwareUpdateManagerImpl.h",
+    "BootReason.cpp",
+    "../common/BootReason.h",
     "CHIPDevicePlatformConfig.h",
-    "ConfigurationManagerImpl.cpp",
     "PlatformManagerImpl.cpp",
   ]
   deps = [ "${chip_root}/src/app:app_config" ]
