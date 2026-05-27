@@ -169,8 +169,16 @@ config POSIX_MAX_FDS
 
 # Application stack size
 config MAIN_STACK_SIZE
+	default 16384 if CHIP_SE05X  # Increase is due to the additional middle-ware APDU buffers and Zephyr
 	default 6144 if NET_L2_OPENTHREAD
 	default 3072
+
+config CHIP_TASK_STACK_SIZE
+	int "Matter task stack size"
+	default 13312 if CHIP_SE05X  # Increase is due to the additional middle-ware APDU buffers and Zephyr
+	default 8192
+	help
+	  Set the stack size (in bytes) for the chip task (CHIP event loop).
 
 config INIT_STACKS
 	default y
@@ -633,6 +641,19 @@ choice POSIX_AEP_CHOICE
 	prompt "POSIX Subprofile"
 	default POSIX_AEP_CHOICE_NONE
 endchoice
+
+config CHIP_SE05X
+	bool "Enable SE05X secure element support"
+	select SE05X_LIB
+	select I2C
+	select PINCTRL
+	help
+		Enable support for NXP SE05X secure element.
+		The SE05X provides hardware-based cryptographic operations,
+		secure key storage, and device attestation capabilities.
+		When enabled, cryptographic operations (ECDSA, ECDH, etc.)
+		will be offloaded to the SE05X hardware instead of using
+		software implementations.
 
 endif # CHIP
 

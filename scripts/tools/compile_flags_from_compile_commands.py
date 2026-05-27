@@ -47,7 +47,7 @@ import logging
 import os
 import re
 import shlex
-from typing import Any, List, Optional
+from typing import Any, Optional
 
 import click
 import coloredlogs
@@ -112,7 +112,7 @@ class ParsedCommands:
     def __init__(self, path: str):
         log.info("Processing JSON file '%s'", path)
 
-        with open(path, "r") as f:
+        with open(path) as f:
             self.json_data = json.load(f)
 
         # data is a list of entries. We sort them since this as a sideffect places `/src/` before
@@ -121,7 +121,7 @@ class ParsedCommands:
 
         log.info("Done. Loaded %d entries", len(self.json_data))
 
-    def all_matching(self, reg_expr: str) -> List[Any]:
+    def all_matching(self, reg_expr: str) -> list[Any]:
         r = re.compile(reg_expr)
 
         # JSON data is a list of entries:

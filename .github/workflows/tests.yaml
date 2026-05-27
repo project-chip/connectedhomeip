@@ -606,6 +606,11 @@ jobs:
                   path: .ccache
                   key: ${{ env.CCACHE_KEY }}
 
+            - name: Notify Slack on Failure
+              if: failure()
+              uses: ./.github/actions/notify-slack-failure
+              with:
+                slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}
     test_suites_darwin:
         name: Test Suites - Darwin
 
@@ -807,6 +812,11 @@ jobs:
                   path: .ccache
                   key: ${{ env.CCACHE_KEY }}
 
+            - name: Notify Slack on Failure
+              if: failure()
+              uses: ./.github/actions/notify-slack-failure
+              with:
+                slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}
     repl_tests_linux_build:
         name: REPL Tests - Linux (BUILD)
 
@@ -1058,6 +1068,11 @@ jobs:
                   path: .ccache
                   key: ${{ env.CCACHE_KEY }}
 
+            - name: Notify Slack on Failure
+              if: failure()
+              uses: ./.github/actions/notify-slack-failure
+              with:
+                slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}
     repl_tests_linux_run:
         name: REPL Tests - Linux (RUN)
         needs: repl_tests_linux_build
@@ -1274,6 +1289,11 @@ jobs:
             #     duration: 30m
             #     authorized-users: andy31415
     # TODO, factor out this job and the one in nightly.yaml into a separate action that can be called
+            - name: Notify Slack on Failure
+              if: failure()
+              uses: ./.github/actions/notify-slack-failure
+              with:
+                slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}
     repl_tests_linux_report:
       name: REPL Tests - Linux (REPORT RESULTS)
       needs: repl_tests_linux_run
@@ -1341,6 +1361,11 @@ jobs:
                 destination_dir: allure-report/ci_tests
                 keep_files: true
 
+          - name: Notify Slack on Failure
+            if: failure()
+            uses: ./.github/actions/notify-slack-failure
+            with:
+              slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}
     repl_tests_darwin:
         name: REPL Tests - Darwin (Build Only)
         strategy:
@@ -1424,3 +1449,8 @@ jobs:
                   path: objdir-clone/
                   # objdirs are big; don't hold on to them too long.
                   retention-days: 5
+            - name: Notify Slack on Failure
+              if: failure()
+              uses: ./.github/actions/notify-slack-failure
+              with:
+                slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}
