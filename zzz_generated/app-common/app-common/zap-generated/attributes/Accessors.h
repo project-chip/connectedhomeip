@@ -997,14 +997,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, Mar
 namespace OvenMode {
 namespace Attributes {
 
-namespace CurrentMode {
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value); // int8u
-} // namespace CurrentMode
-
-namespace FeatureMap {
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value); // bitmap32
-} // namespace FeatureMap
-
 namespace ClusterRevision {
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value); // int16u
 } // namespace ClusterRevision

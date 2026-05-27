@@ -122,22 +122,15 @@ Status ModeBaseCluster::UpdateCurrentMode(uint8_t aNewMode)
 {
     if (!IsSupportedMode(aNewMode))
     {
-        return Protocols::InteractionModel::Status::ConstraintError;
+        return Status::ConstraintError;
     }
-    uint8_t oldMode = mCurrentMode;
-    mCurrentMode    = aNewMode;
-    if (mCurrentMode != oldMode)
+    if (mCurrentMode != aNewMode)
     {
+        SetAttributeValue(mCurrentMode, aNewMode, CurrentMode::Id);
+
         // Write new value to persistent storage.
-        CHIP_ERROR err = mSafeAttributePersistenceProvider.WriteScalarValue(
-            ConcreteAttributePath(mPath.mEndpointId, mPath.mClusterId, CurrentMode::Id), mCurrentMode);
-        if (err != CHIP_NO_ERROR)
-        {
-            mCurrentMode = oldMode;
-            ChipLogError(Zcl, "ModeBase: Failed to write the CurrentMode to the KVS: %" CHIP_ERROR_FORMAT, err.Format());
-            return Protocols::InteractionModel::ClusterStatusCode(err).GetStatus();
-        }
-        NotifyAttributeChanged(CurrentMode::Id);
+        LogErrorOnFailure(mSafeAttributePersistenceProvider.WriteScalarValue(
+            { mPath.mEndpointId, mPath.mClusterId, CurrentMode::Id }, mCurrentMode));
     }
     return Status::Success;
 }
@@ -146,48 +139,34 @@ Status ModeBaseCluster::UpdateStartUpMode(DataModel::Nullable<uint8_t> aNewStart
 {
     if (!aNewStartUpMode.IsNull() && !IsSupportedMode(aNewStartUpMode.Value()))
     {
-        return Protocols::InteractionModel::Status::ConstraintError;
+        return Status::ConstraintError;
     }
-    DataModel::Nullable<uint8_t> oldStartUpMode = mStartUpMode;
-    mStartUpMode                                = aNewStartUpMode;
-    if (mStartUpMode != oldStartUpMode)
+    if (mStartUpMode != aNewStartUpMode)
     {
+        SetAttributeValue(mStartUpMode, aNewStartUpMode, StartUpMode::Id);
+
         // Write new value to persistent storage.
-        CHIP_ERROR err = mSafeAttributePersistenceProvider.WriteScalarValue(
-            ConcreteAttributePath(mPath.mEndpointId, mPath.mClusterId, StartUpMode::Id), mStartUpMode);
-        if (err != CHIP_NO_ERROR)
-        {
-            mStartUpMode = oldStartUpMode;
-            ChipLogError(Zcl, "ModeBase: Failed to write the StartUpMode to the KVS: %" CHIP_ERROR_FORMAT, err.Format());
-            return Protocols::InteractionModel::ClusterStatusCode(err).GetStatus();
-        }
-        NotifyAttributeChanged(StartUpMode::Id);
+        LogErrorOnFailure(mSafeAttributePersistenceProvider.WriteScalarValue(
+            { mPath.mEndpointId, mPath.mClusterId, StartUpMode::Id }, mStartUpMode));
     }
-    return Protocols::InteractionModel::Status::Success;
+    return Status::Success;
 }
 
 Status ModeBaseCluster::UpdateOnMode(DataModel::Nullable<uint8_t> aNewOnMode)
 {
     if (!aNewOnMode.IsNull() && !IsSupportedMode(aNewOnMode.Value()))
     {
-        return Protocols::InteractionModel::Status::ConstraintError;
+        return Status::ConstraintError;
     }
-    DataModel::Nullable<uint8_t> oldOnMode = mOnMode;
-    mOnMode                                = aNewOnMode;
-    if (mOnMode != oldOnMode)
+    if (mOnMode != aNewOnMode)
     {
+        SetAttributeValue(mOnMode, aNewOnMode, OnMode::Id);
+
         // Write new value to persistent storage.
-        CHIP_ERROR err = mSafeAttributePersistenceProvider.WriteScalarValue(
-            ConcreteAttributePath(mPath.mEndpointId, mPath.mClusterId, OnMode::Id), mOnMode);
-        if (err != CHIP_NO_ERROR)
-        {
-            mOnMode = oldOnMode;
-            ChipLogError(Zcl, "ModeBase: Failed to write the OnMode to the KVS: %" CHIP_ERROR_FORMAT, err.Format());
-            return Protocols::InteractionModel::ClusterStatusCode(err).GetStatus();
-        }
-        NotifyAttributeChanged(OnMode::Id);
+        LogErrorOnFailure(
+            mSafeAttributePersistenceProvider.WriteScalarValue({ mPath.mEndpointId, mPath.mClusterId, OnMode::Id }, mOnMode));
     }
-    return Protocols::InteractionModel::Status::Success;
+    return Status::Success;
 }
 
 void ModeBaseCluster::ReportSupportedModesChange()
@@ -308,14 +287,12 @@ CHIP_ERROR ModeBaseCluster::Attributes(const ConcreteClusterPath & path, ReadOnl
 CHIP_ERROR ModeBaseCluster::AcceptedCommands(const ConcreteClusterPath & path,
                                              ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
-    ReturnErrorOnFailure(builder.AppendElements({ Commands::ChangeToMode::kMetadataEntry }));
-    return CHIP_NO_ERROR;
+    return builder.AppendElements({ Commands::ChangeToMode::kMetadataEntry });
 }
 
 CHIP_ERROR ModeBaseCluster::GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder)
 {
-    ReturnErrorOnFailure(builder.AppendElements({ Commands::ChangeToModeResponse::Id }));
-    return CHIP_NO_ERROR;
+    return builder.AppendElements({ Commands::ChangeToModeResponse::Id });
 }
 
 std::optional<DataModel::ActionReturnStatus>

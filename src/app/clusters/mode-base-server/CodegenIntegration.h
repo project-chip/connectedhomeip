@@ -127,7 +127,7 @@ public:
     // Get mode value by mode tag
     CHIP_ERROR GetModeValueByModeTag(uint16_t modeTag, uint8_t & value);
 
-    bool GetFailTransition() { return mFailTransition; }
+    bool GetFailTransition() const { return mFailTransition; }
     void ToggleFailTransition() { mFailTransition = !mFailTransition; }
 
 private:
