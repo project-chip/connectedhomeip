@@ -42,31 +42,14 @@ DataModel::ActionReturnStatus ThermostatCluster::ReadAttribute(const DataModel::
                                                                AttributeValueEncoder & encoder)
 {
 
-    BitMask<Feature, uint32_t> featureMap;
-
-    ChipLogProgress(Zcl, "Reading Attribute:" ChipLogFormatMEI, ChipLogValueMEI(request.path.mAttributeId));
-
-    uint32_t flags;
-    if (FeatureMap::Get(request.path.mEndpointId, &flags) == Status::Success)
-    {
-        featureMap.SetRaw(flags);
-    }
-    else
-    {
-        ChipLogError(Zcl, "Getsetpoints: could not get feature flags");
-        featureMap.Set(Feature::kAutoMode);
-        featureMap.Set(Feature::kHeating);
-        featureMap.Set(Feature::kCooling);
-    }
-
-    bool localTemperatureNotExposedSupported = featureMap.Has(Feature::kLocalTemperatureNotExposed);
+    bool localTemperatureNotExposedSupported = mFeatures.Has(Feature::kLocalTemperatureNotExposed);
 
     switch (request.path.mAttributeId)
     {
     case ClusterRevision::Id:
         return encoder.Encode(Thermostat::kRevision);
     case Attributes::FeatureMap::Id:
-        return encoder.Encode(featureMap);
+        return encoder.Encode(mFeatures);
     case LocalTemperature::Id:
         if (localTemperatureNotExposedSupported)
         {
@@ -94,73 +77,73 @@ DataModel::ActionReturnStatus ThermostatCluster::ReadAttribute(const DataModel::
         {
             return Status::UnsupportedAttribute;
         }
-        return encoder.Encode(mSetpoints.occupiedHeatingSetpoint);
+        return encoder.Encode(mSetpoints.occupied.heating.Temperature());
     case OccupiedCoolingSetpoint::Id:
         if (!mSetpoints.coolSupported)
         {
             return Status::UnsupportedAttribute;
         }
-        return encoder.Encode(mSetpoints.occupiedCoolingSetpoint);
+        return encoder.Encode(mSetpoints.occupied.cooling.Temperature());
     case UnoccupiedHeatingSetpoint::Id:
         if (!mSetpoints.heatSupported || !mSetpoints.occupancySupported)
         {
             return Status::UnsupportedAttribute;
         }
-        return encoder.Encode(mSetpoints.unoccupiedHeatingSetpoint);
+        return encoder.Encode(mSetpoints.unoccupied.heating.Temperature());
     case UnoccupiedCoolingSetpoint::Id:
         if (!mSetpoints.coolSupported || !mSetpoints.occupancySupported)
         {
             return Status::UnsupportedAttribute;
         }
-        return encoder.Encode(mSetpoints.unoccupiedCoolingSetpoint);
+        return encoder.Encode(mSetpoints.unoccupied.cooling.Temperature());
     case AbsMinHeatSetpointLimit::Id:
         if (!mSetpoints.heatSupported)
         {
             return Status::UnsupportedAttribute;
         }
-        return encoder.Encode(mSetpoints.absoluteHeatLimits.minimum);
+        return encoder.Encode(mSetpoints.absoluteHeatLimits.minimum.Temperature());
     case AbsMaxHeatSetpointLimit::Id:
         if (!mSetpoints.heatSupported)
         {
             return Status::UnsupportedAttribute;
         }
-        return encoder.Encode(mSetpoints.absoluteHeatLimits.maximum);
+        return encoder.Encode(mSetpoints.absoluteHeatLimits.maximum.Temperature());
     case AbsMinCoolSetpointLimit::Id:
         if (!mSetpoints.coolSupported)
         {
             return Status::UnsupportedAttribute;
         }
-        return encoder.Encode(mSetpoints.absoluteCoolLimits.minimum);
+        return encoder.Encode(mSetpoints.absoluteCoolLimits.minimum.Temperature());
     case AbsMaxCoolSetpointLimit::Id:
         if (!mSetpoints.coolSupported)
         {
             return Status::UnsupportedAttribute;
         }
-        return encoder.Encode(mSetpoints.absoluteCoolLimits.maximum);
+        return encoder.Encode(mSetpoints.absoluteCoolLimits.maximum.Temperature());
     case MinHeatSetpointLimit::Id:
         if (!mSetpoints.heatSupported)
         {
             return Status::UnsupportedAttribute;
         }
-        return encoder.Encode(mSetpoints.heatLimitsOverride.Minimum());
+        return encoder.Encode(mSetpoints.userHeatLimits.minimum.Temperature());
     case MaxHeatSetpointLimit::Id:
         if (!mSetpoints.heatSupported)
         {
             return Status::UnsupportedAttribute;
         }
-        return encoder.Encode(mSetpoints.heatLimitsOverride.Maximum());
+        return encoder.Encode(mSetpoints.userHeatLimits.maximum.Temperature());
     case MinCoolSetpointLimit::Id:
         if (!mSetpoints.coolSupported)
         {
             return Status::UnsupportedAttribute;
         }
-        return encoder.Encode(mSetpoints.coolLimitsOverride.Minimum());
+        return encoder.Encode(mSetpoints.userCoolLimits.minimum.Temperature());
     case MaxCoolSetpointLimit::Id:
         if (!mSetpoints.coolSupported)
         {
             return Status::UnsupportedAttribute;
         }
-        return encoder.Encode(mSetpoints.coolLimitsOverride.Maximum());
+        return encoder.Encode(mSetpoints.userCoolLimits.maximum.Temperature());
     case MinSetpointDeadBand::Id: {
         if (!mSetpoints.autoSupported)
         {

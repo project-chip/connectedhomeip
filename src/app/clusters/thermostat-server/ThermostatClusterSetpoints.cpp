@@ -21,6 +21,7 @@
 #include "ThermostatCluster.h"
 
 #include "Setpoints.h"
+#include <new>
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
@@ -85,8 +86,7 @@ Status ThermostatCluster::HandleSetpointChange(Setpoints & setpoints, const Attr
     }
 }
 
-DataModel::ActionReturnStatus ThermostatCluster::SetpointRaiseLower(const Commands::SetpointRaiseLower::DecodableType & commandData,
-                                                                    AttributeValueDecoder & decoder)
+DataModel::ActionReturnStatus ThermostatCluster::SetpointRaiseLower(const Commands::SetpointRaiseLower::DecodableType & commandData)
 {
     auto & mode    = commandData.mode;
     int16_t amount = static_cast<int16_t>(commandData.amount * 10);
@@ -139,7 +139,8 @@ DataModel::ActionReturnStatus ThermostatCluster::SetpointRaiseLower(const Comman
     auto status = setpoints.ChangeRange(range, heat, cool, Setpoints::ClampMode::kClamp, changedAttributes);
     if (status == Status::Success)
     {
-        mSetpoints = setpoints;
+        mSetpoints.~Setpoints();
+        new (&mSetpoints) Setpoints(setpoints);
         return SaveSetpoints(setpoints, changedAttributes);
     }
 
@@ -149,20 +150,10 @@ DataModel::ActionReturnStatus ThermostatCluster::SetpointRaiseLower(const Comman
 Protocols::InteractionModel::Status ThermostatCluster::LoadSetpoints(Setpoints & setpoints, AttributePersistence & persistence)
 {
     auto endpoint = mPath.mEndpointId;
-
-    BitMask<Feature, uint32_t> featureMap;
-
-    uint32_t flags;
-    if (FeatureMap::Get(endpoint, &flags) != Status::Success)
-    {
-        flags = to_underlying(Feature::kAutoMode) | to_underlying(Feature::kHeating) | to_underlying(Feature::kCooling);
-    }
-    featureMap.SetRaw(flags);
-
-    setpoints.autoSupported      = featureMap.Has(Feature::kAutoMode);
-    setpoints.heatSupported      = featureMap.Has(Feature::kHeating);
-    setpoints.coolSupported      = featureMap.Has(Feature::kCooling);
-    setpoints.occupancySupported = featureMap.Has(Feature::kOccupancy);
+    setpoints.autoSupported      = mFeatures.Has(Feature::kAutoMode);
+    setpoints.heatSupported      = mFeatures.Has(Feature::kHeating);
+    setpoints.coolSupported      = mFeatures.Has(Feature::kCooling);
+    setpoints.occupancySupported = mFeatures.Has(Feature::kOccupancy);
 
     if (setpoints.autoSupported)
     {
@@ -260,11 +251,11 @@ Protocols::InteractionModel::Status ThermostatCluster::LoadSetpoints(Setpoints &
     } while (false)
 
 Protocols::InteractionModel::Status ThermostatCluster::SaveSetpoints(Setpoints setpoints,
-                                                                     chip::BitFlags<SetpointAttributes> changedAttributes)
+                                                                     SetpointAttributes changedAttributes)
 {
     EndpointId endpoint = mPath.mEndpointId;
 
-    if (changedAttributes.Has(SetpointAttributes::kOccupiedHeating))
+    if (changedAttributes.Has(OccupiedHeatingSetpoint::Id))
     {
         int16_t value = setpoints.occupied.heating.Temperature();
         ReturnStatusOnFailure(
@@ -272,7 +263,7 @@ Protocols::InteractionModel::Status ThermostatCluster::SaveSetpoints(Setpoints s
                                                   ByteSpan(reinterpret_cast<const uint8_t *>(&value), sizeof(value))));
         NotifyAttributeChanged(OccupiedHeatingSetpoint::Id);
     }
-    if (changedAttributes.Has(SetpointAttributes::kOccupiedCooling))
+    if (changedAttributes.Has(OccupiedCoolingSetpoint::Id))
     {
         int16_t value = setpoints.occupied.cooling.Temperature();
         ReturnStatusOnFailure(
@@ -282,7 +273,7 @@ Protocols::InteractionModel::Status ThermostatCluster::SaveSetpoints(Setpoints s
     }
     if (setpoints.occupancySupported)
     {
-        if (changedAttributes.Has(SetpointAttributes::kUnoccupiedHeating))
+        if (changedAttributes.Has(UnoccupiedHeatingSetpoint::Id))
         {
             int16_t value = setpoints.unoccupied.heating.Temperature();
             ReturnStatusOnFailure(
@@ -290,7 +281,7 @@ Protocols::InteractionModel::Status ThermostatCluster::SaveSetpoints(Setpoints s
                                                       ByteSpan(reinterpret_cast<const uint8_t *>(&value), sizeof(value))));
             NotifyAttributeChanged(UnoccupiedHeatingSetpoint::Id);
         }
-        if (changedAttributes.Has(SetpointAttributes::kUnoccupiedCooling))
+        if (changedAttributes.Has(UnoccupiedCoolingSetpoint::Id))
         {
             int16_t value = setpoints.unoccupied.cooling.Temperature();
             ReturnStatusOnFailure(
@@ -301,7 +292,7 @@ Protocols::InteractionModel::Status ThermostatCluster::SaveSetpoints(Setpoints s
     }
     if (setpoints.heatSupported)
     {
-        if (changedAttributes.Has(SetpointAttributes::kMinHeatSetpointLimit) && setpoints.userHeatLimits.minimum.HasTemperature())
+        if (changedAttributes.Has(MinHeatSetpointLimit::Id) && setpoints.userHeatLimits.minimum.HasTemperature())
         {
             int16_t value = setpoints.userHeatLimits.minimum.Temperature();
             ReturnStatusOnFailure(
@@ -309,7 +300,7 @@ Protocols::InteractionModel::Status ThermostatCluster::SaveSetpoints(Setpoints s
                                                       ByteSpan(reinterpret_cast<const uint8_t *>(&value), sizeof(value))));
             NotifyAttributeChanged(MinHeatSetpointLimit::Id);
         }
-        if (changedAttributes.Has(SetpointAttributes::kMaxHeatSetpointLimit) && setpoints.userHeatLimits.maximum.HasTemperature())
+        if (changedAttributes.Has(MaxHeatSetpointLimit::Id) && setpoints.userHeatLimits.maximum.HasTemperature())
         {
             int16_t value = setpoints.userHeatLimits.maximum.Temperature();
             ReturnStatusOnFailure(
@@ -320,7 +311,7 @@ Protocols::InteractionModel::Status ThermostatCluster::SaveSetpoints(Setpoints s
     }
     if (setpoints.coolSupported)
     {
-        if (changedAttributes.Has(SetpointAttributes::kMinCoolSetpointLimit) && setpoints.userCoolLimits.minimum.HasTemperature())
+        if (changedAttributes.Has(MinCoolSetpointLimit::Id) && setpoints.userCoolLimits.minimum.HasTemperature())
         {
             int16_t value = setpoints.userCoolLimits.minimum.Temperature();
             ReturnStatusOnFailure(
@@ -328,7 +319,7 @@ Protocols::InteractionModel::Status ThermostatCluster::SaveSetpoints(Setpoints s
                                                       ByteSpan(reinterpret_cast<const uint8_t *>(&value), sizeof(value))));
             NotifyAttributeChanged(MinCoolSetpointLimit::Id);
         }
-        if (changedAttributes.Has(SetpointAttributes::kMaxCoolSetpointLimit) && setpoints.userCoolLimits.maximum.HasTemperature())
+        if (changedAttributes.Has(MaxCoolSetpointLimit::Id) && setpoints.userCoolLimits.maximum.HasTemperature())
         {
             int16_t value = setpoints.userCoolLimits.maximum.Temperature();
             ReturnStatusOnFailure(
@@ -338,6 +329,21 @@ Protocols::InteractionModel::Status ThermostatCluster::SaveSetpoints(Setpoints s
         }
     }
     return Status::Success;
+}
+
+Protocols::InteractionModel::Status ThermostatCluster::ChangeSetpointAttribute(const AttributeId attributeId, int16_t temperature)
+{
+    Setpoints setpoints = mSetpoints;
+    SetpointAttributes changedAttributes;
+
+    auto status = HandleSetpointChange(setpoints, attributeId, temperature, changedAttributes);
+    if (status == Status::Success)
+    {
+        mSetpoints.~Setpoints();
+        new (&mSetpoints) Setpoints(setpoints);
+        return SaveSetpoints(setpoints, changedAttributes);
+    }
+    return status;
 }
 
 } // namespace Thermostat

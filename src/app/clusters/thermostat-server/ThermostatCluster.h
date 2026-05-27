@@ -127,7 +127,9 @@ private:
 
 
     Protocols::InteractionModel::Status SaveSetpoints(Setpoints setpoints,
-                                                      chip::BitFlags<SetpointAttributes> changedAttributes);
+                                                      SetpointAttributes changedAttributes);
+
+    Protocols::InteractionModel::Status LoadSetpoints(Setpoints & setpoints, AttributePersistence & persistence);
 
     /**
      * @brief Set the Active Preset to a given preset handle, or null
@@ -151,13 +153,7 @@ private:
 
     void GenerateEvents(const ConcreteAttributePath & attributePath);
 
-    /**
-     * @brief Callback for when the server is removed from a given fabric; all associated atomic writes are reset
-     *
-     * @param fabricTable The fabric table
-     * @param fabricIndex The fabric index
-     */
-    void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override;
+
 
     std::optional<DataModel::ActionReturnStatus>
     AddThermostatSuggestion(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
