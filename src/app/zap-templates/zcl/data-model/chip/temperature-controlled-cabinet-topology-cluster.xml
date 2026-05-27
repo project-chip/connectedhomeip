@@ -22,7 +22,7 @@ Git: 0.7-summer-2025-ncr-5573-g69bb963ff
 Alchemy: v1.6.14
 -->
 <configurator xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../zcl.xsd">
-  <domain name=""/>
+  <domain name="CHIP"/>
   <enum name="TopologyEnum" type="enum8">
     <cluster code="0x004B"/>
     <item name="Horizontal" value="0x00"/>

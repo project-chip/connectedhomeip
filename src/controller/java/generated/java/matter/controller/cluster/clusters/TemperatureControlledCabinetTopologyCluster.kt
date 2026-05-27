@@ -240,7 +240,7 @@ class TemperatureControlledCabinetTopologyCluster(
           val attributeData =
             subscriptionState.updateState.successes
               .filterIsInstance<ReadData.Attribute>()
-              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }  
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
 
           requireNotNull(attributeData) { "Topology attribute not found in Node State update" }
 
@@ -286,7 +286,7 @@ class TemperatureControlledCabinetTopologyCluster(
     val decodedValue: List<UInt>
     buildList<UInt> {
       tlvReader.enterArray(AnonymousTag)
-      while(!tlvReader.isEndOfContainer()) {
+      while (!tlvReader.isEndOfContainer()) {
         add(tlvReader.getUInt(AnonymousTag))
       }
       tlvReader.exitContainer()
@@ -328,9 +328,11 @@ class TemperatureControlledCabinetTopologyCluster(
           val attributeData =
             subscriptionState.updateState.successes
               .filterIsInstance<ReadData.Attribute>()
-              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }     
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
 
-          requireNotNull(attributeData) { "Generatedcommandlist attribute not found in Node State update" }
+          requireNotNull(attributeData) { 
+            "Generatedcommandlist attribute not found in Node State update"
+          }
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
@@ -402,9 +404,9 @@ class TemperatureControlledCabinetTopologyCluster(
 
     val subscribeRequest: SubscribeRequest =
       SubscribeRequest(
-        eventPaths = emptyList(), 
-        attributePaths = attributePaths, 
-        minInterval = Duration.ofSeconds(minInterval.toLong()), 
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
         maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
@@ -423,9 +425,9 @@ class TemperatureControlledCabinetTopologyCluster(
           val attributeData =
             subscriptionState.updateState.successes
               .filterIsInstance<ReadData.Attribute>()
-              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID } 
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
 
-          requireNotNull(attributeData) { 
+          requireNotNull(attributeData) {
             "Acceptedcommandlist attribute not found in Node State update"
           }
 
@@ -495,7 +497,7 @@ class TemperatureControlledCabinetTopologyCluster(
     val attributePaths =
       listOf(
         AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-    )
+      )
 
     val subscribeRequest: SubscribeRequest =
       SubscribeRequest(
@@ -661,15 +663,16 @@ class TemperatureControlledCabinetTopologyCluster(
     maxInterval: Int
   ): Flow<UShortSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65533u
-    val attributePaths = listOf(
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-    )
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
 
     val subscribeRequest: SubscribeRequest =
       SubscribeRequest(
-        eventPaths = emptyList(), 
-        attributePaths = attributePaths, 
-        minInterval = Duration.ofSeconds(minInterval.toLong()), 
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
         maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
@@ -690,7 +693,7 @@ class TemperatureControlledCabinetTopologyCluster(
               .filterIsInstance<ReadData.Attribute>()
               .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
 
-          requireNotNull(attributeData) { 
+          requireNotNull(attributeData) {
             "Clusterrevision attribute not found in Node State update"
           }
 
