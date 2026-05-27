@@ -23,8 +23,7 @@ import asyncio
 import contextlib
 import logging
 from dataclasses import dataclass
-from enum import Enum
-from typing import Any, Iterable, List, Optional, Set
+from typing import Any, Iterable, Optional
 
 from mobly import asserts
 
@@ -41,7 +40,7 @@ LOGGER.setLevel(logging.INFO)
 DiscoveryFilterType = ChipDeviceCtrl.DiscoveryFilterType
 
 
-def _successful_task_in_done_set(done: Set[asyncio.Task]) -> Optional[asyncio.Task]:
+def _successful_task_in_done_set(done: set[asyncio.Task]) -> Optional[asyncio.Task]:
     """
     Return a task from *done* that finished without raising, if any.
 
