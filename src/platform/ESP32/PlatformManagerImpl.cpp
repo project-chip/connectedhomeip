@@ -25,9 +25,9 @@
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
+#include "DiagnosticDataProviderImpl.h"
+#include "ESP32Utils.h"
 #include <crypto/CHIPCryptoPAL.h>
-#include <platform/ESP32/DiagnosticDataProviderImpl.h>
-#include <platform/ESP32/ESP32Utils.h>
 #include <platform/PlatformManager.h>
 #include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.ipp>
 
@@ -122,7 +122,11 @@ void PlatformManagerImpl::HandleESPSystemEvent(void * arg, esp_event_base_t even
         case IP_EVENT_GOT_IP6:
             memcpy(&event.Platform.ESPSystemEvent.Data.IpGotIp6, eventData, sizeof(event.Platform.ESPSystemEvent.Data.IpGotIp6));
             break;
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(6, 0, 0)
+        case IP_EVENT_ASSIGNED_IP_TO_CLIENT:
+#else
         case IP_EVENT_AP_STAIPASSIGNED:
+#endif
             memcpy(&event.Platform.ESPSystemEvent.Data.IpApStaIpAssigned, eventData,
                    sizeof(event.Platform.ESPSystemEvent.Data.IpApStaIpAssigned));
             break;

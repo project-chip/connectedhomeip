@@ -22,7 +22,6 @@
 #      This file is utility for Chip BLE
 #
 
-from __future__ import absolute_import, print_function
 
 from ctypes import Structure, c_bool, c_int32, c_uint16, c_void_p
 

@@ -65,3 +65,8 @@ jobs:
               --target nuttx-x64-light \
               build \
             "
+      - name: Notify Slack on Failure
+        if: failure()
+        uses: ./.github/actions/notify-slack-failure
+        with:
+          slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}

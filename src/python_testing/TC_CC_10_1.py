@@ -36,7 +36,6 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-from typing import List
 
 from mobly import asserts
 from TC_GC_common import is_groupcast_on_root_node
@@ -56,8 +55,8 @@ class TC_CC_10_1(MatterBaseTest):
     #
     # Class Helper functions
     #
-    def _prepare_cc_extension_field_set(self, attribute_value_list: List[Clusters.ScenesManagement.Structs.AttributeValuePairStruct]) -> Clusters.ScenesManagement.Structs.ExtensionFieldSetStruct:
-        efs_attribute_value_list: List[Clusters.ScenesManagement.Structs.AttributeValuePairStruct] = []
+    def _prepare_cc_extension_field_set(self, attribute_value_list: list[Clusters.ScenesManagement.Structs.AttributeValuePairStruct]) -> Clusters.ScenesManagement.Structs.ExtensionFieldSetStruct:
+        efs_attribute_value_list: list[Clusters.ScenesManagement.Structs.AttributeValuePairStruct] = []
         for attribute_id in kCCAttributeValueIDs:
             for pair in attribute_value_list:
                 if pair.attributeID == attribute_id:
@@ -161,14 +160,14 @@ class TC_CC_10_1(MatterBaseTest):
         self.groupKey = Clusters.GroupKeyManagement.Structs.GroupKeySetStruct(
             groupKeySetID=self.kGroupKeyset1,
             groupKeySecurityPolicy=Clusters.GroupKeyManagement.Enums.GroupKeySecurityPolicyEnum.kTrustFirst,
-            epochKey0="0123456789abcdef".encode(),
+            epochKey0=b"0123456789abcdef",
             epochStartTime0=1110000)
 
         await self.TH1.SendCommand(self.dut_node_id, 0, Clusters.GroupKeyManagement.Commands.KeySetWrite(self.groupKey))
 
         self.step("0b")
         if not self.groupcast_enabled:
-            mapping_structs: List[Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct] = []
+            mapping_structs: list[Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct] = []
             mapping_structs.append(Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct(
                 groupId=self.kGroup1,
                 groupKeySetID=self.kGroupKeyset1,
