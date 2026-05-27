@@ -1,20 +1,18 @@
 """
-Bug Condition Exploration Test — Property 1: Slim Cluster Override on Android
+Bug Condition Exploration Test — Property 1: Override Directory on Android
 
 Validates: Requirements 1.1, 2.1
 
 This test parses `examples/tv-casting-app/android/args.gni` and checks that
 when `optimize_apk_size = true`, the build configuration:
 
-  1. Sets `chip_cluster_objects_source_override` to the slim
-     `casting-cluster-objects.cpp` path (so only ~36 casting-relevant clusters
-     are compiled instead of all ~200+).
-  2. Sets `matter_enable_tlv_decoder_api = false` (so the Java TLV decoder
-     files that reference Decode() for every cluster are excluded, removing
-     the link-time dependency that blocks the slim override).
+  1. Sets `chip_data_model_overrides_dir` to the tv-casting-common directory
+     (so only ~36 casting-relevant clusters are compiled instead of all ~200+).
+     The directory-based override mechanism also handles TLV decoder overrides
+     via well-known filenames, eliminating the need for separate flags.
 
-EXPECTED on UNFIXED code: FAIL — the current `optimize_apk_size` block does
-NOT set either flag, confirming the bug exists.
+EXPECTED on FIXED code: PASS — the `optimize_apk_size` block sets
+`chip_data_model_overrides_dir` to the override directory.
 """
 
 import os
@@ -23,9 +21,9 @@ import re
 from hypothesis import HealthCheck, given, settings
 from hypothesis import strategies as st
 
-# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
+# ---------------------------------------------------------------------------
 # Helpers — lightweight GNI parser
-# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
+# ---------------------------------------------------------------------------
 
 REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
 ANDROID_ARGS_GNI = os.path.join(
@@ -36,7 +34,7 @@ SLIM_CLUSTER_FILE = os.path.join(
     "examples",
     "tv-casting-app",
     "tv-casting-common",
-    "casting-cluster-objects.cpp",
+    "cluster-objects-override.cpp",
 )
 
 
@@ -53,10 +51,7 @@ def _strip_comments(text: str) -> str:
 
 def _extract_optimize_block(text: str) -> str:
     """
-    Extract the body of the first `if (optimize_apk_size)
-{
-    ...
-}` block.
+    Extract the body of the first `if (optimize_apk_size) { ... }` block.
 
     Uses a simple brace-depth counter — sufficient for the flat structure of
     args.gni files.
@@ -66,7 +61,7 @@ def _extract_optimize_block(text: str) -> str:
     if not match:
         return ""
 
-# Find the opening brace
+    # Find the opening brace
     start = stripped.index("{", match.end())
     depth = 1
     pos = start + 1
@@ -77,7 +72,7 @@ def _extract_optimize_block(text: str) -> str:
             depth -= 1
         pos += 1
 
-    return stripped[start + 1: pos - 1]
+    return stripped[start + 1:pos - 1]
 
 
 def _extract_assignment(block: str, var_name: str) -> str | None:
@@ -91,14 +86,9 @@ def _extract_assignment(block: str, var_name: str) -> str | None:
         return None
     return m.group(1).strip().rstrip(";").strip()
 
-# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
-# Property - based test
-# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
-
-# We use Hypothesis to parameterise over a(trivially small) strategy so the
-# test is formally a property - based test, but the real assertion is against the
-# concrete file on disk.The strategy generates a boolean flag that is always
-# True — representing `optimize_apk_size = true`.
+# ---------------------------------------------------------------------------
+# Property-based test
+# ---------------------------------------------------------------------------
 
 
 @given(optimize_apk_size=st.just(True))
@@ -113,51 +103,38 @@ def test_android_optimized_build_uses_slim_cluster_override(optimize_apk_size: b
 
     Property 1 (Bug Condition): For an Android build with
     `optimize_apk_size = true`, the GN args SHALL set
-    `chip_cluster_objects_source_override` to the slim
-    `casting-cluster-objects.cpp` AND set
-    `matter_enable_tlv_decoder_api = false`.
+    `chip_data_model_overrides_dir` to the tv-casting-common directory.
+    The directory-based override mechanism handles all source overrides
+    (cluster-objects, TLV decoders, accessors, cluster servers).
     """
     assert optimize_apk_size, "Test only applies when optimize_apk_size is true"
 
-# -- - Parse the android args.gni -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
+    # --- Parse the android args.gni ---
     gni_text = _read_gni(ANDROID_ARGS_GNI)
     opt_block = _extract_optimize_block(gni_text)
     assert opt_block, (
         "Could not find `if (optimize_apk_size) { ... }` block in android/args.gni"
     )
 
-# -- - Assert 1 : chip_cluster_objects_source_override is set -- -- -- -- -- -- -- --
-    override_val = _extract_assignment(opt_block, "chip_cluster_objects_source_override")
+    # --- Assert 1: chip_data_model_overrides_dir is set ---
+    override_val = _extract_assignment(opt_block, "chip_data_model_overrides_dir")
     assert override_val is not None, (
-        "COUNTEREXAMPLE: `chip_cluster_objects_source_override` is NOT set inside "
+        "COUNTEREXAMPLE: `chip_data_model_overrides_dir` is NOT set inside "
         "the `optimize_apk_size` block of android/args.gni.  "
-        "The full generated cluster-objects.cpp (~200+ clusters) is still compiled "
+        "The full generated sources (~200+ clusters) are still compiled "
         "even when optimize_apk_size = true."
     )
 
-# The value should reference the slim casting - cluster - objects.cpp
-    assert "casting-cluster-objects.cpp" in override_val, (
-        f"COUNTEREXAMPLE: `chip_cluster_objects_source_override` is set to "
-        f"`{override_val}` which does not reference casting-cluster-objects.cpp"
-    )
-
-# -- - Assert 2 : matter_enable_tlv_decoder_api is false -- -- -- -- -- -- -- -- -- -- -
-    tlv_val = _extract_assignment(opt_block, "matter_enable_tlv_decoder_api")
-    assert tlv_val is not None, (
-        "COUNTEREXAMPLE: `matter_enable_tlv_decoder_api` is NOT set inside "
-        "the `optimize_apk_size` block of android/args.gni.  "
-        "The Java TLV decoders that reference Decode() for every cluster will "
-        "still be compiled, blocking use of the slim cluster override."
-    )
-    assert tlv_val == "false", (
-        f"COUNTEREXAMPLE: `matter_enable_tlv_decoder_api` is set to `{tlv_val}` "
-        f"instead of `false` — the TLV decoder dependency is not resolved."
+    # The value should reference the tv-casting-common directory
+    assert "tv-casting-common" in override_val, (
+        f"COUNTEREXAMPLE: `chip_data_model_overrides_dir` is set to "
+        f"`{override_val}` which does not reference tv-casting-common"
     )
 
 
-# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
-# Allow running directly : python test_bug_condition_android_cluster_override.py
-# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
+# ---------------------------------------------------------------------------
+# Allow running directly: python test_bug_condition_android_cluster_override.py
+# ---------------------------------------------------------------------------
 if __name__ == "__main__":
     print("Running bug condition exploration test...")
     try:

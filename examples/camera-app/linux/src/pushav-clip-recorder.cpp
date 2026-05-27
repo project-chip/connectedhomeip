@@ -111,25 +111,6 @@ PushAVClipRecorder::~PushAVClipRecorder()
         ChipLogProgress(Camera, "Worker thread completed for connection %u", mConnectionID);
     }
 
-    {
-        std::lock_guard<std::mutex> lock(mQueueMutex);
-        while (!mVideoQueue.empty())
-        {
-            AVPacket * packet = mVideoQueue.front();
-            mVideoQueue.pop();
-            av_packet_free(&packet);
-        }
-        while (!mAudioQueue.empty())
-        {
-            AVPacket * packet = mAudioQueue.front();
-            mAudioQueue.pop();
-            av_packet_free(&packet);
-        }
-    }
-
-    // Clean up FFmpeg resources
-    CleanupOutput();
-
     std::filesystem::path mpdPath = mUploadFileBasePath / "index.mpd";
     if (IsFileReadyForUpload(mpdPath))
     {
@@ -413,6 +394,23 @@ void PushAVClipRecorder::Stop()
                 chip::DeviceLayer::PlatformMgr().UnlockChipStack();
                 ChipLogProgress(Camera, "Async thread: NotifyTransportStopped completed for connection %u", connectionID);
             }).detach();
+        }
+        else
+        {
+            ChipLogError(Camera, "PushAVClipRecorder::Stop - Cluster server reference is null for connection %u", mConnectionID);
+        }
+
+        while (!mVideoQueue.empty())
+        {
+            AVPacket * packet = mVideoQueue.front();
+            mVideoQueue.pop();
+            av_packet_free(&packet);
+        }
+        while (!mAudioQueue.empty())
+        {
+            AVPacket * packet = mAudioQueue.front();
+            mAudioQueue.pop();
+            av_packet_free(&packet);
         }
     }
     else

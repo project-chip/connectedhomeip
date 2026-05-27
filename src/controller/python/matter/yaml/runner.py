@@ -20,7 +20,7 @@ import queue
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from enum import Enum, IntEnum
-from typing import Any, Optional, Tuple
+from typing import Any, Optional
 
 from matter.idl.generators.filters import to_pascal_case, to_snake_case
 from matter.yamltests.pseudo_clusters.pseudo_clusters import get_default_pseudo_clusters
@@ -673,7 +673,7 @@ class DiscoveryCommandAction(BaseAction):
     """DiscoveryCommand implementation (FindCommissionable* methods)."""
 
     @staticmethod
-    def _filter_for_step(test_step) -> Tuple[discovery.FilterType, Any]:
+    def _filter_for_step(test_step) -> tuple[discovery.FilterType, Any]:
         """Given a test step, figure out the correct filters to give to
            DiscoverCommissionableNodes.
         """

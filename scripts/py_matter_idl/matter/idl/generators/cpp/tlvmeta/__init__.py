@@ -14,7 +14,7 @@
 # limitations under the License.
 import os
 from dataclasses import dataclass
-from typing import Generator, List, Optional
+from typing import Generator, Optional
 
 from matter.idl.generators import CodeGenerator
 from matter.idl.generators.storage import GeneratorStorage
@@ -34,7 +34,7 @@ class TableEntry:
 class Table:
     # Usable variable fully qualified name (like <Cluster>_<name>)
     full_name: str
-    entries: List[TableEntry]
+    entries: list[TableEntry]
 
 
 class ClusterTablesGenerator:
@@ -236,14 +236,14 @@ class ClusterTablesGenerator:
             )
 
 
-def CreateTables(idl: Idl) -> List[Table]:
+def CreateTables(idl: Idl) -> list[Table]:
     result = []
     for cluster in idl.clusters:
         result.extend(ClusterTablesGenerator(cluster).GenerateTables())
     return result
 
 
-def IndexInTable(name: Optional[str], table: List[Table]) -> str:
+def IndexInTable(name: Optional[str], table: list[Table]) -> str:
     """Find the index of the given name in the table.
 
     The index is 1-based (to allow for a first entry containing a

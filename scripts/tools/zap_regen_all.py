@@ -29,7 +29,6 @@ import time
 from dataclasses import dataclass
 from enum import Flag, auto
 from pathlib import Path
-from typing import List
 
 log = logging.getLogger(__name__)
 
@@ -108,7 +107,7 @@ class ZapInput:
 
         return "chef" in self.zap_file
 
-    def build_command(self, script: str) -> List[str]:
+    def build_command(self, script: str) -> list[str]:
         """What command to execute for this zap input. """
         if self.zap_file:
             return [script, self.zap_file]
@@ -228,7 +227,7 @@ class ZAPGenerateTarget:
         )
 
 
-class GoldenTestImageTarget():
+class GoldenTestImageTarget:
     def __init__(self):
         # NOTE: output-path is inside the tree. This is because clang-format
         #       will search for a .clang-format file in the directory tree
@@ -267,7 +266,7 @@ class GoldenTestImageTarget():
         log.info("  %s", shlex.join(self.command))
 
 
-class JinjaCodegenTarget():
+class JinjaCodegenTarget:
     def __init__(self, generator: str, output_directory: str, idl_path: str):
         # This runs a test, but the important bit is we pass `--regenerate`
         # to it and this will cause it to OVERWRITE golden images.

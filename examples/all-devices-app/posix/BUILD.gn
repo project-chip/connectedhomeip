@@ -28,6 +28,7 @@ executable("all-devices-app") {
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/boolean-state-sensor",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/chime",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/device-factory",
+    "${chip_root}/examples/all-devices-app/all-devices-common/devices/network-infrastructure-manager",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/occupancy-sensor",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/proximity-ranger",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/proximity-ranger/impl:ble-rssi",
@@ -61,6 +62,23 @@ executable("all-devices-app") {
   ]
 
   output_dir = root_out_dir
+}
+
+if (chip_device_platform == "darwin") {
+  action("codesign") {
+    script = "${chip_root}/examples/common/darwin/entitlements/codesign.py"
+    public_deps = [ ":all-devices-app" ]
+
+    args = [
+      "--target_path",
+      rebase_path("${root_build_dir}/all-devices-app", root_build_dir),
+      "--log_path",
+      rebase_path("${root_build_dir}/codesign_log.txt", root_build_dir),
+    ]
+
+    output_name = "codesign_log.txt"
+    outputs = [ "${root_build_dir}/${output_name}" ]
+  }
 }
 
 group("posix") {

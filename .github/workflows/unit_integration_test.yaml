@@ -85,3 +85,8 @@ jobs:
             # - name: Upload Code Coverage
             #   if: ${{ contains('main', env.BUILD_TYPE) }}
             #   run: bash <(curl -s https://codecov.io/bash)
+            - name: Notify Slack on Failure
+              if: failure()
+              uses: ./.github/actions/notify-slack-failure
+              with:
+                slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}
