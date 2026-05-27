@@ -321,8 +321,8 @@ def cmd_summarize(summary_file: Path, top_slowest: int, compact_failures_file: P
         if compact_failures_file.exists():
             content = compact_failures_file.read_text().strip()
             if content:
-                existing = set(n.strip() for n in content.split(","))
-        new_names = [Path(r["name"]).stem for r in failed_results]
+                existing = {n.strip() for n in content.split(",") if n.strip()}
+        new_names = [r["name"].removesuffix(".py") for r in failed_results]
         all_names = sorted(existing.union(new_names))
         compact_failures_file.parent.mkdir(parents=True, exist_ok=True)
         compact_failures_file.write_text(", ".join(all_names) + "\n")

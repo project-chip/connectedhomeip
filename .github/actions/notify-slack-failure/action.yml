@@ -7,7 +7,7 @@ inputs:
   job-name:
     description: 'The display name of the job'
     required: false
-    default: ${{ github.job }}
+    default: ''
   job-details:
     description: 'Extra matrix or job details'
     required: false
@@ -24,7 +24,7 @@ runs:
       env:
         EVENT_NAME: ${{ github.event_name }}
         REF_NAME: ${{ github.ref_name }}
-        JOB_NAME: ${{ inputs['job-name'] }}
+        JOB_NAME: ${{ inputs['job-name'] || github.job }}
         JOB_DETAILS: ${{ inputs['job-details'] }}
         EXTRA_FILE: ${{ inputs['extra-details-file'] }}
         SERVER_URL: ${{ github.server_url }}
@@ -61,7 +61,7 @@ runs:
 
         EXTRA_TEXT=""
         if [[ -n "$EXTRA_FILE" && -f "$EXTRA_FILE" ]]; then
-          CONTENT=$(head -n 2 "$EXTRA_FILE" | tr '\n' ' ' | sed 's/  */ /g' | xargs)
+          CONTENT=$(head -n 2 "$EXTRA_FILE" | tr '\n' ' ' | sed -e 's/  */ /g' -e 's/^[[:space:]]*//;s/[[:space:]]*$//')
           if [[ -n "$CONTENT" ]]; then
             EXTRA_TEXT="\n*Failed Tests:* ${CONTENT}"
           fi

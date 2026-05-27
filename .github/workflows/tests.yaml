@@ -768,7 +768,7 @@ jobs:
                       echo ""
                       echo ">>> $f"
                       ./scripts/run_in_build_env.sh \
-                        "scripts/tests/run_test_suite.py summarize --summary-file $f" || true
+                        "scripts/tests/run_test_suite.py summarize --summary-file $f --compact-failures-file test-summaries/compact-failures.txt" || true
                   done
             - name: Upload test run summaries
               uses: actions/upload-artifact@v7
