@@ -19,6 +19,7 @@ from __future__ import annotations
 import glob
 import json
 import os
+import typing
 import xml.etree.ElementTree as ET
 import zipfile
 
