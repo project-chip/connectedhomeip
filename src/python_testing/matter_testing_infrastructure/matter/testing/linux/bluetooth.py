@@ -18,12 +18,12 @@ import logging
 import subprocess
 import threading
 
-from matter.testing.concurrency.context import TerminableResource
+from matter.testing.concurrency.context import TerminablePopen
 
 log = logging.getLogger(__name__)
 
 
-class BluetoothMock(TerminableResource):
+class BluetoothMock(TerminablePopen[str]):
     """Run a BlueZ mock server in a subprocess."""
 
     # The MAC addresses of the virtual Bluetooth adapters.
@@ -42,23 +42,17 @@ class BluetoothMock(TerminableResource):
             log.debug(line.strip())
 
     def __init__(self) -> None:
-        self._process: subprocess.Popen[str] | None = None
-
-    def resource_start(self) -> None:
         adapters = [f"--adapter={mac}" for mac in self.ADAPTERS]
-        self._process = subprocess.Popen(["bluezoo", "--auto-enable"] + adapters, stderr=subprocess.PIPE, text=True)
+        super().__init__(lambda: subprocess.Popen(["bluezoo", "--auto-enable"] + adapters, stderr=subprocess.PIPE, text=True))
+
+    def resource_start(self) -> subprocess.Popen[str]:
+        process = super().resource_start()
 
         event = threading.Event()
-        threading.Thread(name="BluetoothMockStderr", target=self._forward_stderr, args=(self._process, event), daemon=True).start()
+        threading.Thread(name="BluetoothMockStderr", target=self._forward_stderr, args=(process, event), daemon=True).start()
 
         # Wait for the adapters to be ready.
-        event.wait()
+        if not event.wait(self.RESOURCE_TIMEOUT_START_S):
+            raise TimeoutError(f"Bluetooth mock did not initialize within {self.RESOURCE_TIMEOUT_START_S} seconds")
 
-    def resource_terminate(self) -> None:
-        if self._process is not None:
-            try:
-                self._process.terminate()
-                self._process.wait()
-            finally:
-                if self._process.stderr is not None:
-                    self._process.stderr.close()
+        return process

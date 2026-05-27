@@ -270,7 +270,7 @@ class AppsRegister(TerminableResource):
         self._log_config = log_config if log_config is not None else LogConfig()
         self._server_manager: XmlRpcServerProcessManager | None = None
 
-    def init(self) -> None:
+    def resource_start(self) -> None:
         if self._server_manager is None:
             self._server_manager = XmlRpcServerProcessManager(self, self._net_ns_wrapper, self._log_config)
 
@@ -281,8 +281,9 @@ class AppsRegister(TerminableResource):
         log.debug("Starting XMLRPC Manager")
         self._server_manager.start()
         log.debug("XMLRPC Manager started")
+        return
 
-    def uninit(self) -> None:
+    def resource_terminate(self) -> None:
         if self._server_manager is None:
             log.debug("XMLRPC server is already down")
             return
@@ -292,9 +293,11 @@ class AppsRegister(TerminableResource):
         self._server_manager = None
         log.debug("XMLRPC Manager stopped")
 
-    # Function aliases for TerminableResource interface.
-    resource_start = init
-    resource_terminate = uninit
+    # Legacy function aliases for backward compatibility.
+    def init(self) -> None:
+        self.resource_start()
+
+    uninit = resource_terminate
 
     @property
     @with_accessories_lock

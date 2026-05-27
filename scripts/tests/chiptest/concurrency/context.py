@@ -28,7 +28,7 @@ from typing import Iterator, Literal, Self
 from python_path import PythonPath
 
 with PythonPath("../../../../src/python_testing/matter_testing_infrastructure", relative_to=__file__):
-    from matter.testing.concurrency.context import TerminableResource, TerminableThread
+    from matter.testing.concurrency.context import TerminablePopen, TerminableResource, TerminableThread
 
 log = logging.getLogger(__name__)
 
@@ -113,6 +113,7 @@ def mp_wrapped_spawn_context(wrapper_linux: str | None) -> Iterator[SpawnContext
 __all__ = [
     "mp_wrapped_spawn_context",
     "StartStopContextMixin",
+    "TerminablePopen",
     "TerminableResource",
     "TerminableThread",
 ]
