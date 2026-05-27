@@ -251,39 +251,7 @@ private:
     }
 };
 
-/*
-Load setpoints from the Matter Data Storage
 
-@param endpoint The endpoint to load setpoints from
-@param setpoints The Setpoints object to load setpoints into
-@return The status of the operation
-*/
-Protocols::InteractionModel::Status LoadSetpoints(EndpointId endpoint, Setpoints & setpoints);
-
-/*
-Save setpoints to the Matter Data Storage
-
-@param endpoint The endpoint to save setpoints to
-@param setpoints The Setpoints object to save setpoints from
-@param changedAttributes The set of attributes changed by this operation
-@return The status of the operation
-*/
-Protocols::InteractionModel::Status SaveSetpoints(EndpointId endpoint, Setpoints & setpoints,
-                                                  SetpointAttributes & changedAttributes);
-
-/*
-Save first dirty setpoint to the Matter Data Storage.
-
-This method is temporary until the conversion to code-driven cluster. See MatterThermostatClusterServerPreAttributeChangedCallback
-for details.
-
-@param endpoint The endpoint to save first dirty setpoint to
-@param setpoints The Setpoints object to save first dirty setpoint from
-@param changedAttributes The set of attributes changed by this operation
-@return The status of the operation
-*/
-Protocols::InteractionModel::Status SaveFirstDirtySetpoint(EndpointId endpoint, Setpoints & setpoints,
-                                                           SetpointAttributes & changedAttributes);
 
 } // namespace Thermostat
 } // namespace Clusters
