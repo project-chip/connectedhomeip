@@ -135,7 +135,7 @@ class TC_RR_1_1(MatterBaseTest):
         endpoints_with_user_label_list = await dev_ctrl.ReadAttribute(self.dut_node_id, [Clusters.UserLabel.Attributes.LabelList])
         has_user_labels = len(endpoints_with_user_label_list) > 0
         if has_user_labels:
-            log.info("--> User label cluster present on endpoints %s" %
+            log.info("--> User label cluster present on endpoints %s",
                      ", ".join(["%d" % ep for ep in endpoints_with_user_label_list]))
         else:
             log.info("--> User label cluster not present on any endpoitns")
@@ -249,7 +249,7 @@ class TC_RR_1_1(MatterBaseTest):
         log.info("Step 1e: Commission into all remaining fabric entries.")
         for i in range(num_fabrics_to_commission - 1):
             admin_index = 2 + i
-            log.info("Commissioning fabric %d/%d" % (admin_index, num_fabrics_to_commission))
+            log.info("Commissioning fabric %d/%d", admin_index, num_fabrics_to_commission)
             new_certificate_authority = self.certificate_authority_manager.NewCertificateAuthority()
             new_fabric_admin = new_certificate_authority.NewFabricAdmin(vendorId=0xFFF1, fabricId=admin_index)
 
@@ -336,8 +336,7 @@ class TC_RR_1_1(MatterBaseTest):
 
             # Send the UpdateLabel command
             label = (("%d." % fabric.fabricIndex) * 16)[:32]
-            log.info("Step 2a: Setting fabric label on fabric %d to '%s' using client %s" %
-                     (fabric.fabricIndex, label, client_name))
+            log.info("Step 2a: Setting fabric label on fabric %d to '%s' using client %s", fabric.fabricIndex, label, client_name)
             await client.SendCommand(self.dut_node_id, 0, Clusters.OperationalCredentials.Commands.UpdateFabricLabel(label))
 
             # Read back
@@ -374,9 +373,9 @@ class TC_RR_1_1(MatterBaseTest):
             Clusters.Descriptor  # All descriptors on all endpoints
         ]
 
-        log.info("Step 4 and 5 (first part): Establish subscription with all %d clients" % len(client_list))
+        log.info("Step 4 and 5 (first part): Establish subscription with all %d clients", len(client_list))
         for sub_idx, client in enumerate(client_list):
-            log.info("Establishing subscription %d/%d from controller node %s" % (sub_idx + 1, len(client_list), client.name))
+            log.info("Establishing subscription %d/%d from controller node %s", sub_idx + 1, len(client_list), client.name)
 
             sub = await client.ReadAttribute(
                 nodeId=self.dut_node_id,
@@ -444,7 +443,7 @@ class TC_RR_1_1(MatterBaseTest):
                 # Record arrival of an expected subscription change when seen
                 if endpoint == 0 and attribute == Clusters.BasicInformation.Attributes.NodeLabel and value == AFTER_LABEL:
                     if not all_changes[client_name]:
-                        log.info("Got expected attribute change for client %s" % client_name)
+                        log.info("Got expected attribute change for client %s", client_name)
                         all_changes[client_name] = True
 
                 # We are done waiting when we have accumulated all results
@@ -463,14 +462,14 @@ class TC_RR_1_1(MatterBaseTest):
 
         for catcher in resub_catchers:
             if catcher.caught_resubscription:
-                log.error("Client %s saw a resubscription" % catcher.name)
+                log.error("Client %s saw a resubscription", catcher.name)
                 sub_test_failed = True
             else:
-                log.info("Client %s correctly did not see a resubscription" % catcher.name)
+                log.info("Client %s correctly did not see a resubscription", catcher.name)
 
         all_reports_gotten = all(all_changes.values())
         if not all_reports_gotten:
-            log.error("Missing reports from the following clients: %s" %
+            log.error("Missing reports from the following clients: %s",
                       ", ".join([name for name, value in all_changes.items() if value is False]))
             sub_test_failed = True
         else:
@@ -483,7 +482,7 @@ class TC_RR_1_1(MatterBaseTest):
         # Step 8: Validate sessions have not changed by doing a read on NodeLabel from all clients
         log.info("Step 8a: Read back NodeLabel directly from all clients")
         for sub_idx, client in enumerate(client_list):
-            log.info("Reading NodeLabel (%d/%d) from controller node %s" % (sub_idx + 1, len(client_list), client.name))
+            log.info("Reading NodeLabel (%d/%d) from controller node %s", sub_idx + 1, len(client_list), client.name)
 
             label_readback = await self.read_single_attribute(client,
                                                               node_id=self.dut_node_id,
@@ -778,12 +777,12 @@ class TC_RR_1_1(MatterBaseTest):
             clusters = user_labels[endpoint_id]
             for cluster in clusters:
                 if cluster == Clusters.UserLabel:
-                    log.info("Step 9a: Filling UserLabel cluster on endpoint %d" % endpoint_id)
+                    log.info("Step 9a: Filling UserLabel cluster on endpoint %d", endpoint_id)
                     statuses = await dev_ctrl.WriteAttribute(target_node_id,
                                                              [(endpoint_id, Clusters.UserLabel.Attributes.LabelList(labels))])
                     asserts.assert_equal(statuses[0].Status, StatusEnum.Success, "Label write must succeed")
 
-                    log.info("Step 9b: Validate UserLabel cluster contents after write on endpoint %d" % endpoint_id)
+                    log.info("Step 9b: Validate UserLabel cluster contents after write on endpoint %d", endpoint_id)
                     read_back_labels = await self.read_single_attribute(dev_ctrl,
                                                                         node_id=target_node_id,
                                                                         endpoint=endpoint_id,
@@ -806,7 +805,7 @@ class TC_RR_1_1(MatterBaseTest):
             for group_key_cluster_idx in range(1, keys_per_fabric):
                 group_key_list_idx: int = group_key_cluster_idx - 1
 
-                log.info("Step 13: Setting group key on fabric %d at index '%d'" % (client_idx+1, group_key_cluster_idx))
+                log.info("Step 13: Setting group key on fabric %d at index '%d'", client_idx+1, group_key_cluster_idx)
                 group_keys[client_idx].append(self.build_group_key(client_idx, group_key_cluster_idx, keys_per_fabric))
                 await client.SendCommand(self.dut_node_id, 0, Clusters.GroupKeyManagement.Commands.KeySetWrite(
                     group_keys[client_idx][group_key_list_idx]))
@@ -815,7 +814,7 @@ class TC_RR_1_1(MatterBaseTest):
         for client_idx in range(fabrics):
             client: Any = clients[client_idx]
 
-            log.info("Step 13: Reading back group keys on fabric %d" % (client_idx+1))
+            log.info("Step 13: Reading back group keys on fabric %d", client_idx+1)
             resp = await client.SendCommand(self.dut_node_id, 0,
                                             Clusters.GroupKeyManagement.Commands.KeySetReadAllIndices(),
                                             responseType=Clusters.GroupKeyManagement.Commands.KeySetReadAllIndicesResponse)
@@ -851,7 +850,7 @@ class TC_RR_1_1(MatterBaseTest):
                     groupKeySetID=group_key_map[client_idx][group],
                     fabricIndex=fabric_idx))
 
-            log.info("Step 14: Setting group key map on fabric %d" % (fabric_idx))
+            log.info("Step 14: Setting group key map on fabric %d", fabric_idx)
             await client.WriteAttribute(
                 self.dut_node_id, [(0, Clusters.GroupKeyManagement.Attributes.GroupKeyMap(mapping_structs[client_idx]))])
 
@@ -860,7 +859,7 @@ class TC_RR_1_1(MatterBaseTest):
             client: Any = clients[client_idx]
             fabric_idx: int = fabric_table[client_idx].fabricIndex
 
-            log.info("Step 14: Reading group key map on fabric %d" % (fabric_idx))
+            log.info("Step 14: Reading group key map on fabric %d", fabric_idx)
             group_key_map_readback = await self.read_single_attribute(
                 client, node_id=self.dut_node_id, endpoint=0, attribute=Clusters.GroupKeyManagement.Attributes.GroupKeyMap)
 

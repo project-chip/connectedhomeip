@@ -77,7 +77,7 @@ class TC_PWRTL_2_1(MatterBaseTest):
             if available_endpoints == []:
                 log.info("AvailableEndpoints is an empty list")
             else:
-                log.info("AvailableEndpoints: %s" % (available_endpoints))
+                log.info("AvailableEndpoints: %s", available_endpoints)
                 asserts.assert_less_equal(len(available_endpoints), 20,
                                           "AvailableEndpoints length %d must be less than 21!" % len(available_endpoints))
 
@@ -88,7 +88,7 @@ class TC_PWRTL_2_1(MatterBaseTest):
 
         if act_endpoints_attr_id in attribute_list:
             active_endpoints = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=Clusters.Objects.PowerTopology,  attribute=attributes.ActiveEndpoints)
-            log.info("ActiveEndpoints: %s" % (active_endpoints))
+            log.info("ActiveEndpoints: %s", active_endpoints)
             asserts.assert_less_equal(len(active_endpoints), 20,
                                       "ActiveEndpoints length %d must be less than 21!" % len(active_endpoints))
 

@@ -142,10 +142,7 @@ class BluezDbusAdapter:
             return
 
         if len(invalidated_properties) > 0:
-            LOGGER.debug(
-                "invalidated_properties is not empty %s" % str(
-                    invalidated_properties)
-            )
+            LOGGER.debug("invalidated_properties is not empty %s", str(invalidated_properties))
             return
 
         if interface == ADAPTER_INTERFACE:
@@ -352,10 +349,7 @@ class BluezDbusDevice:
             return
 
         if len(invalidated_properties) > 0:
-            LOGGER.debug(
-                "invalidated_properties is not empty %s" % str(
-                    invalidated_properties)
-            )
+            LOGGER.debug("invalidated_properties is not empty %s", str(invalidated_properties))
             return
 
         if interface == DEVICE_INTERFACE:
@@ -816,8 +810,7 @@ class BluezManager(ChipBleBase):
                 )
             ]
             for adapter in adapters:
-                LOGGER.info("AdapterName: %s   AdapterAddress: %s" % (
-                    adapter.path.replace("/org/bluez/", ""), adapter.Address))
+                LOGGER.info("AdapterName: %s   AdapterAddress: %s", adapter.path.replace("/org/bluez/", ""), adapter.Address)
         except dbus.exceptions.DBusException as ex:
             LOGGER.debug(str(ex))
 
@@ -836,10 +829,7 @@ class BluezManager(ChipBleBase):
                     if (str(adapter.Address).upper() == str(identifier).upper() or
                             "/org/bluez/{}".format(identifier) == str(adapter.path)):
                         return adapter
-            LOGGER.info(
-                "adapter %s cannot be found, expect the ble mac address" % (
-                    identifier)
-            )
+            LOGGER.info("adapter %s cannot be found, expect the ble mac address", identifier)
             return None
 
         except dbus.exceptions.DBusException as ex:

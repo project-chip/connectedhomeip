@@ -196,8 +196,8 @@ class TC_OPSTATE_BASE:
         attr_value.sort()
         expected_contains.sort()
 
-        log.info("## Current value: [%s]" % attr_value)
-        log.info("## Expected value: [%s]" % expected_contains)
+        log.info("## Current value: [%s]", attr_value)
+        log.info("## Expected value: [%s]", expected_contains)
 
         for item in expected_contains:
             if item not in attr_value:
