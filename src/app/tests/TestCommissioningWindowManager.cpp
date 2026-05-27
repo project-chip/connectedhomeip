@@ -513,6 +513,47 @@ TEST_F(TestCommissioningWindowManager, CheckCommissioningWindowManagerWindowTime
     commissionMgr.SetAppDelegate(nullptr);
 }
 
+// Regression: ResetState must cancel HandleSessionEstablishmentTimeout.
+// Otherwise the orphaned timer fires HandleFailedAttempt after window
+// cleanup — detected here via the delegate's error-callback counter.
+TEST_F(TestCommissioningWindowManager, WindowTimeoutCancelsPASEEstablishmentTimer)
+{
+    System::Clock::Internal::RAIIMockClock clock;
+
+    CommissioningWindowManager & commissionMgr = Server::GetInstance().GetCommissioningWindowManager();
+    MockAppDelegate delegateApp;
+    commissionMgr.SetAppDelegate(&delegateApp);
+
+    constexpr auto kCommissioningWindowSeconds = chip::System::Clock::Seconds32(1);
+    constexpr uint16_t kCommissioningWindowMs  = 1000;
+    constexpr unsigned kSleepPadding           = 100;
+    constexpr uint32_t kPASETimerSeconds       = 60;
+
+    commissionMgr.OverrideMinCommissioningTimeout(kCommissioningWindowSeconds);
+    EXPECT_SUCCESS(
+        commissionMgr.OpenBasicCommissioningWindow(kCommissioningWindowSeconds, CommissioningWindowAdvertisement::kDnssdOnly));
+    EXPECT_TRUE(commissionMgr.IsCommissioningWindowOpen());
+
+    // Arm the 60s PASE-establishment timer (PBKDFParamRequest received).
+    commissionMgr.OnSessionEstablishmentStarted();
+
+    // Window times out: HandleCommissioningWindowTimeout -> CloseCommissioningWindow -> Cleanup -> ResetState.
+    clock.AdvanceMonotonic(chip::System::Clock::Milliseconds64(kCommissioningWindowMs + kSleepPadding));
+    ServiceEvents();
+    EXPECT_FALSE(commissionMgr.IsCommissioningWindowOpen());
+
+    const auto errorCallbacksBefore = delegateApp.mOnCommissioningSessionEstablishmentErrorCount;
+
+    // Advance past the 60s PASE timer. Bug present -> stale callback fires; fix in place -> no callback.
+    clock.AdvanceMonotonic(chip::System::Clock::Milliseconds64((kPASETimerSeconds + 1) * 1000));
+    ServiceEvents();
+
+    // If this fails: ResetState() did not cancel HandleSessionEstablishmentTimeout.
+    EXPECT_EQ(delegateApp.mOnCommissioningSessionEstablishmentErrorCount, errorCallbacksBefore);
+
+    commissionMgr.SetAppDelegate(nullptr);
+}
+
 TEST_F(TestCommissioningWindowManager, TestCheckCommissioningWindowManagerEnhancedWindow)
 {
     CommissioningWindowManager & commissionMgr = Server::GetInstance().GetCommissioningWindowManager();
