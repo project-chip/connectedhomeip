@@ -34,7 +34,7 @@ using namespace chip::app::Clusters::OperationalState;
 // ---------------------------------------------------------------------------
 
 InstanceBase::InstanceBase(OperationalStateCluster & cluster, ServerClusterRegistration & registration, Delegate * aDelegate) :
-    mDelegate(aDelegate), mClusterPtr(&cluster), mRegPtr(&registration)
+    mDelegate(aDelegate), mCluster(cluster), mRegPtr(&registration)
 {
     aDelegate->SetInstance(this);
 }
@@ -64,7 +64,7 @@ void InstanceBase::Shutdown()
 {
     VerifyOrReturn(mRegistered);
     mRegistered = false;
-    LogErrorOnFailure(CodegenDataModelProvider::Instance().Registry().Unregister(mClusterPtr));
+    LogErrorOnFailure(CodegenDataModelProvider::Instance().Registry().Unregister(&mCluster));
 }
 
 // ---------------------------------------------------------------------------

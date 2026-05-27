@@ -47,9 +47,8 @@ void OvenCavityOperationalState::Shutdown()
 
 void MatterOvenCavityOperationalStateClusterInitCallback(chip::EndpointId endpointId)
 {
-    VerifyOrDie(endpointId == 1); // NOLINT(bugprone-signed-bitwise) -- nlassert macro false positive
-    VerifyOrDie(gOvenCavityOperationalStateInstance == nullptr &&
-                gOvenCavityOperationalStateDelegate == nullptr); // NOLINT(bugprone-signed-bitwise)
+    VerifyOrDie(endpointId == 1u);
+    VerifyOrDie(gOvenCavityOperationalStateInstance == nullptr && gOvenCavityOperationalStateDelegate == nullptr);
 
     gOvenCavityOperationalStateDelegate = new OvenCavityOperationalStateDelegate;
     EndpointId operationalStateEndpoint = 0x01;

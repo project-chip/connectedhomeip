@@ -18,8 +18,10 @@
 
 #pragma once
 
-// Backward-compat stub — do not add new content here.
-// The cluster class and legacy Instance wrappers live in OperationalStateCluster.h;
-// the delegate interfaces live in OperationalStateDelegate.h.
+// Backward-compat umbrella header for the OperationalState cluster.
+// New code may include OperationalStateCluster.h (cluster only),
+// OperationalStateDelegate.h (codegen delegate base), or CodegenIntegration.h
+// (Instance wrappers) directly as needed.
+#include "CodegenIntegration.h"
 #include "OperationalStateCluster.h"
 #include "OperationalStateDelegate.h"

@@ -18,9 +18,7 @@ source_set("operational-state-server") {
   sources = [
     "OperationalStateCluster.cpp",
     "OperationalStateCluster.h",
-    "OperationalStateDelegate.h",
     "operational-state-cluster-objects.h",
-    "operational-state-server.h",
   ]
 
   public_deps = [
