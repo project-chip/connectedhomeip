@@ -2422,8 +2422,6 @@ limitations under the License.
                     </feature>
                 </features>
             </include>
-            <include cluster="Time Synchronization" client="false" server="false"
-                clientLocked="false" serverLocked="true"></include>
         </clusters>
     </deviceType>
     <deviceType>
@@ -2449,8 +2447,6 @@ limitations under the License.
             </include>
             <include cluster="Door Lock" client="true" server="false" clientLocked="true"
                 serverLocked="true"></include>
-            <include cluster="Time Synchronization" client="false" server="false"
-                clientLocked="true" serverLocked="false"></include>
         </clusters>
     </deviceType>
     <deviceType>
