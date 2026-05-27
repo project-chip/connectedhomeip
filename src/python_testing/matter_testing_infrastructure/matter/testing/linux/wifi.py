@@ -546,8 +546,11 @@ class WpaSupplicantMock(TerminableThread):
             self.nan_simulator.register_interface(name, interface)
 
         self.loop = asyncio.new_event_loop()
-        self.loop.run_until_complete(self.startup())
         super().__init__(target=self.loop.run_forever)
+
+    def resource_start(self) -> None:
+        self.loop.run_until_complete(self.startup())
+        super().resource_start()
 
     def resource_terminate(self):
         self.loop.call_soon_threadsafe(self.loop.stop)
