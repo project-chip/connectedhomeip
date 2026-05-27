@@ -103,7 +103,7 @@ private:
         uint16_t joinerUdpPort     = 0;
         uint16_t matterUdpPort     = 0;
         std::vector<uint8_t> steeringData;
-        Dnssd::CommissionNodeData commissionData;
+        Dnssd::CommissionNodeData commissionData{};
     };
 
     // Member Variables

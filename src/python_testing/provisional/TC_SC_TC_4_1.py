@@ -22,7 +22,7 @@
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
 #       --storage-path admin_storage.json
-#       --commissioning-method thread-meshcop
+#       --in-test-commissioning-method thread-meshcop
 #       --discriminator 1234
 #       --passcode 20202021
 #       --thread-ba-host 127.0.0.1

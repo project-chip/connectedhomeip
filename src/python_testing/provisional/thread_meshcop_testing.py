@@ -56,7 +56,11 @@ def get_setup_code(test: MatterBaseTest, use_short_discriminator: bool) -> str:
                                    "Long-discriminator MeshCoP test steps require --qr-code or --discriminator/--passcode.")
         return setup_payload.setup_code
 
-    return test.default_controller.CreateManualCode(setup_payload.filter_value, setup_payload.passcode)
+    if setup_payload.filter_type == discovery.FilterType.LONG_DISCRIMINATOR:
+        short_discriminator = (setup_payload.filter_value >> 8) & 0x0F
+    else:
+        short_discriminator = setup_payload.filter_value
+    return test.default_controller.CreateManualCode(short_discriminator, setup_payload.passcode)
 
 
 def discriminator_from_config(test: MatterBaseTest, use_short_discriminator: bool) -> int:

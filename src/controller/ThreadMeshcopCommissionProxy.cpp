@@ -80,6 +80,21 @@ void AddJsonString(StringBuilderBase & builder, const char * value)
         case '"':
             builder.Add("\\\"");
             break;
+        case '\n':
+            builder.Add("\\n");
+            break;
+        case '\r':
+            builder.Add("\\r");
+            break;
+        case '\t':
+            builder.Add("\\t");
+            break;
+        case '\b':
+            builder.Add("\\b");
+            break;
+        case '\f':
+            builder.Add("\\f");
+            break;
         default:
             builder.Add(p, 1);
             break;
@@ -286,13 +301,19 @@ CHIP_ERROR ThreadMeshcopCommissionProxy::GetLastDiscoveryDiagnosticJson(char * b
 
     std::lock_guard<std::recursive_mutex> lock(mMutex);
     auto & diagnostic = mLastDiscoveryDiagnostic;
+    StringBuilderBase builder(buffer, bufferSize);
+    if (!diagnostic.valid)
+    {
+        builder.Add("{\"valid\":false}");
+        return builder.Fit() ? CHIP_NO_ERROR : CHIP_ERROR_BUFFER_TOO_SMALL;
+    }
+
     char steeringDataHex[ot::commissioner::kMaxSteeringDataLength * 2 + 1];
     char rotatingIdHex[Dnssd::kMaxRotatingIdLen * 2 + 1];
     BytesToHex(diagnostic.steeringData.data(), diagnostic.steeringData.size(), steeringDataHex, sizeof(steeringDataHex));
     BytesToHex(diagnostic.commissionData.rotatingId, diagnostic.commissionData.rotatingIdLen, rotatingIdHex, sizeof(rotatingIdHex));
 
-    StringBuilderBase builder(buffer, bufferSize);
-    builder.AddFormat("{\"valid\":%s", diagnostic.valid ? "true" : "false");
+    builder.Add("{\"valid\":true");
     builder.AddFormat(",\"requested_discriminator_type\":\"%s\"", diagnostic.requestedShort ? "short" : "long");
     builder.AddFormat(",\"requested_discriminator\":%u", diagnostic.requestedValue);
     builder.AddFormat(",\"expected_long_discriminator\":%u", diagnostic.expectedLongValue);
