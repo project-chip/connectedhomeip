@@ -487,6 +487,10 @@
 #include <clusters/SmokeCoAlarm/Commands.ipp>
 #include <clusters/SmokeCoAlarm/Events.ipp>
 #include <clusters/SmokeCoAlarm/Structs.ipp>
+#include <clusters/SmokeConcentrationMeasurement/Attributes.ipp>
+#include <clusters/SmokeConcentrationMeasurement/Commands.ipp>
+#include <clusters/SmokeConcentrationMeasurement/Events.ipp>
+#include <clusters/SmokeConcentrationMeasurement/Structs.ipp>
 #include <clusters/SoftwareDiagnostics/Attributes.ipp>
 #include <clusters/SoftwareDiagnostics/Commands.ipp>
 #include <clusters/SoftwareDiagnostics/Events.ipp>
