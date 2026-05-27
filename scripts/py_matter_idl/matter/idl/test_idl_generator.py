@@ -19,7 +19,7 @@ import sys
 import unittest
 from difflib import unified_diff
 from pathlib import Path
-from typing import List, Optional
+from typing import Optional
 
 try:
     from matter.idl.matter_idl_parser import CreateParser
@@ -64,7 +64,7 @@ def RenderAsIdlTxt(idl: Idl) -> str:
     return storage.content or ""
 
 
-def SkipLeadingComments(txt: str, also_strip: List[str] = []) -> str:
+def SkipLeadingComments(txt: str, also_strip: list[str] = []) -> str:
     """Skips leading lines starting with // in a file. """
     lines = txt.split("\n")
     idx = 0

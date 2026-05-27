@@ -19,7 +19,7 @@ import logging
 import os
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Iterator, Set
+from typing import Iterator
 
 import yaml
 
@@ -85,7 +85,7 @@ def _LoadManualTestsJson(json_file_path: str) -> Iterator[str]:
                 yield f"{name}.yaml"
 
 
-def _GetManualTests() -> Set[str]:
+def _GetManualTests() -> set[str]:
     manualtests: set[str] = set()
 
     # Flagged as manual from: src/app/tests/suites/manualTests.json
@@ -95,7 +95,7 @@ def _GetManualTests() -> Set[str]:
     return manualtests
 
 
-def _GetFlakyTests() -> Set[str]:
+def _GetFlakyTests() -> set[str]:
     """List of flaky tests.
 
     While this list is empty, it remains here in case we need to quickly add a new test
@@ -104,7 +104,7 @@ def _GetFlakyTests() -> Set[str]:
     return set()
 
 
-def _GetSlowTests() -> Set[str]:
+def _GetSlowTests() -> set[str]:
     """Generally tests using sleep() a bit too freely.
 
        10s seems like a good threshold to consider something slow
@@ -139,7 +139,7 @@ def _GetSlowTests() -> Set[str]:
     }
 
 
-def _GetExtraSlowTests() -> Set[str]:
+def _GetExtraSlowTests() -> set[str]:
     """Generally tests using sleep() so much they should never run in CI.
 
        1 minute seems like a good threshold to consider something extra slow
@@ -149,7 +149,7 @@ def _GetExtraSlowTests() -> Set[str]:
     }
 
 
-def _GetInDevelopmentTests() -> Set[str]:
+def _GetInDevelopmentTests() -> set[str]:
     """Tests that fail in YAML for some reason."""
     return {
         "Test_TC_PSCFG_1_1.yaml",  # Power source configuration cluster is deprecated and removed from all-clusters
@@ -169,14 +169,14 @@ def _GetInDevelopmentTests() -> Set[str]:
     }
 
 
-def _GetChipToolUnsupportedTests() -> Set[str]:
+def _GetChipToolUnsupportedTests() -> set[str]:
     """Tests that fail in chip-tool for some reason"""
     return {
         "TestDiagnosticLogsDownloadCommand",  # chip-tool does not implement a bdx download command.
     }
 
 
-def _GetDarwinFrameworkToolUnsupportedTests() -> Set[str]:
+def _GetDarwinFrameworkToolUnsupportedTests() -> set[str]:
     """Tests that fail in darwin-framework-tool for some reason"""
     return {
         "DL_LockUnlock",  # darwin-framework-tool does not currently support reading or subscribing to Events
@@ -233,7 +233,7 @@ def _GetDarwinFrameworkToolUnsupportedTests() -> Set[str]:
     }
 
 
-def _GetReplUnsupportedTests() -> Set[str]:
+def _GetReplUnsupportedTests() -> set[str]:
     """Tests that fail in matter-repl for some reason"""
     return {
         "Test_AddNewFabricFromExistingFabric.yaml",     # matter-repl does not support GetCommissionerRootCertificate and IssueNocChain command
@@ -255,7 +255,7 @@ def _GetReplUnsupportedTests() -> Set[str]:
     }
 
 
-def _GetPurposefulFailureTests() -> Set[str]:
+def _GetPurposefulFailureTests() -> set[str]:
     """Tests that fail in YAML on purpose."""
     return {
         "TestPurposefulFailureEqualities.yaml",
@@ -281,7 +281,7 @@ def _AllYamlTests():
 def _TargetsForYaml(yaml_path: Path) -> list[TestTarget]:
     targets = []
 
-    with open(yaml_path, 'rt') as f:
+    with open(yaml_path) as f:
         data = yaml.safe_load(f)
         if 'CI' in data:
             for item in data['CI']:

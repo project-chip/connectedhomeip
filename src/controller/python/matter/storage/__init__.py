@@ -24,7 +24,7 @@ import re
 from abc import ABC, abstractmethod
 from configparser import ConfigParser
 from ctypes import CFUNCTYPE, POINTER, c_bool, c_char, c_char_p, c_uint16, c_void_p, py_object
-from typing import Any, Dict, Optional
+from typing import Any, Optional
 
 from ..native import GetLibraryHandle
 
@@ -191,7 +191,7 @@ class PersistentStorageBase(PersistentStorage):
     and SDK configurations.
     """
 
-    def __init__(self, data: Dict = {}, sdkData: Dict = {}):
+    def __init__(self, data: dict = {}, sdkData: dict = {}):
         """Initializes the persistent storage with provided data."""
         super().__init__()
         self._data = copy.deepcopy(data)
@@ -252,7 +252,7 @@ _caKeyMatch = re.compile(r'(ExampleCAIntermediateCert|ExampleCARootCert|ExampleO
 class PersistentStorageJSON(PersistentStorageBase):
     """Persistent storage back-end which stores data in a JSON file."""
 
-    def _caKeysBackwardCompatibilityRewrite(self, data: Dict, sdkData: Dict):
+    def _caKeysBackwardCompatibilityRewrite(self, data: dict, sdkData: dict):
         """Rewrites CA keys if the index does not start from 0.
 
         This rewrite is a backward compatibility patch for old CertificateAuthority

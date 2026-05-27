@@ -22,7 +22,6 @@
 #      BLE Central support for Chip Device Manager via BlueZ APIs.
 #
 
-from __future__ import absolute_import, print_function
 
 import logging
 import queue

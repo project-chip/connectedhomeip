@@ -17,7 +17,7 @@ import dataclasses
 import enum
 import logging
 import os
-from typing import List, Optional, Set
+from typing import Optional
 
 from matter.idl.generators import CodeGenerator
 from matter.idl.generators.filters import upfirst
@@ -322,7 +322,7 @@ def _IsUsingGlobalCallback(field: Field, context: TypeLookupContext):
     }
 
 
-def NamedFilter(choices: List, name: str):
+def NamedFilter(choices: list, name: str):
     for choice in choices:
         if choice.name == name:
             return choice
@@ -372,7 +372,7 @@ class EncodableValue:
         for the underlying types.
     """
 
-    def __init__(self, context: TypeLookupContext, data_type: DataType, attrs: Set[EncodableValueAttr]):
+    def __init__(self, context: TypeLookupContext, data_type: DataType, attrs: set[EncodableValueAttr]):
         self.context = context
         self.data_type = data_type
         self.attrs = attrs
