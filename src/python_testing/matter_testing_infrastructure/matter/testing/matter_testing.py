@@ -1084,7 +1084,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         dev_ctrl: ChipDeviceCtrl.ChipDeviceController,
         node_id: int,
         endpoint: int,
-        attribute: Type[ClusterObjects.ClusterAttributeDescriptor],
+        attribute: type[ClusterObjects.ClusterAttributeDescriptor],
         fabricFiltered: bool = True,
     ) -> object:
         """Read a single attribute value from a device.
@@ -1106,7 +1106,7 @@ class MatterBaseTest(base_test.BaseTestClass):
     async def read_single_attribute_all_endpoints(
         self,
         cluster: ClusterObjects.Cluster,
-        attribute: Type[ClusterObjects.ClusterAttributeDescriptor],
+        attribute: type[ClusterObjects.ClusterAttributeDescriptor],
         dev_ctrl: Optional[ChipDeviceCtrl.ChipDeviceController] = None,
         node_id: Optional[int] = None,
     ):
@@ -1132,7 +1132,7 @@ class MatterBaseTest(base_test.BaseTestClass):
     async def read_single_attribute_check_success(
         self,
         cluster: ClusterObjects.Cluster,
-        attribute: Type[ClusterObjects.ClusterAttributeDescriptor],
+        attribute: type[ClusterObjects.ClusterAttributeDescriptor],
         dev_ctrl: Optional[ChipDeviceCtrl.ChipDeviceController] = None,
         node_id: Optional[int] = None,
         endpoint: Optional[int] = None,
@@ -1196,7 +1196,7 @@ class MatterBaseTest(base_test.BaseTestClass):
     async def read_single_attribute_expect_error(
         self,
         cluster: ClusterObjects.Cluster,
-        attribute: Type[ClusterObjects.ClusterAttributeDescriptor],
+        attribute: type[ClusterObjects.ClusterAttributeDescriptor],
         error: Status,
         dev_ctrl: Optional[ChipDeviceCtrl.ChipDeviceController] = None,
         node_id: Optional[int] = None,
