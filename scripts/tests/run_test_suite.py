@@ -35,7 +35,7 @@ from chiptest.accessories import AppsRegister
 from chiptest.concurrency.work_queue import CancellableQueue
 from chiptest.glob_matcher import GlobMatcher
 from chiptest.log_config import LOG_LEVELS, LogConfig, LogMessageCounter
-from chiptest.results import ResultError, ResultProcessingThread, RunSummary, TestResult
+from chiptest.results import ResultError, ResultProcessingThread, RunSummary, TestResult, TestStatus
 from chiptest.runner import Executor, SubprocessKind
 from chiptest.status import PeriodicStatusThread
 from chiptest.test_definition import TEST_THREAD_DATASET, SubprocessInfoRepo, TestDefinition, TestRunTime, TestTag
@@ -654,8 +654,28 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int, app_path: li
     '--show-all',
     is_flag=True,
     help='Show statistics of all tests for all iterations.')
-def cmd_summarize(summary_file: Path, top_slowest: int, show_all: bool) -> None:
-    RunSummary.from_json(summary_file).print_summary(top_slowest=top_slowest, show_all=show_all)
+@click.option(
+    '--compact-failures-file',
+    type=click.Path(dir_okay=False, path_type=Path),
+    default=None,
+    help='Path to output a compact, comma-separated list of failed test names.',
+)
+def cmd_summarize(summary_file: Path, top_slowest: int, show_all: bool, compact_failures_file: Path | None) -> None:
+    summary = RunSummary.from_json(summary_file)
+    summary.print_summary(top_slowest=top_slowest, show_all=show_all)
+
+    if compact_failures_file:
+        failed_results = tuple(r for r in summary.results if r.status == TestStatus.FAILED)
+        if failed_results:
+            existing = set()
+            if compact_failures_file.exists():
+                content = compact_failures_file.read_text().strip()
+                if content:
+                    existing = {n.strip() for n in content.split(",") if n.strip()}
+            new_names = [r.name for r in failed_results]
+            all_names = sorted(existing.union(new_names))
+            compact_failures_file.parent.mkdir(parents=True, exist_ok=True)
+            compact_failures_file.write_text(", ".join(all_names) + "\n")
 
 
 # On Linux, allow an execution shell to be prepared

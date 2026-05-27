@@ -33,7 +33,7 @@ import typing
 from dataclasses import asdict, dataclass
 from datetime import UTC, datetime, timedelta
 from enum import IntFlag
-from typing import Any, Callable, List, Optional, Tuple, Type, Union
+from typing import Any, Callable, Optional, Union
 
 import matter.testing.matchers as matchers
 
@@ -135,7 +135,7 @@ class AttributeMatcher:
         return self._description
 
     @staticmethod
-    def from_callable(description: str, matcher: Callable[[AttributeValue], bool]) -> "AttributeMatcher":
+    def from_callable(description: str, matcher: Callable[[AttributeValue], bool]) -> AttributeMatcher:
         """Take a single callable and wrap it into an AttributeMatcher object. Useful to wrap closures."""
         class AttributeMatcherFromCallable(AttributeMatcher):
             def __init__(self, description, matcher: Callable[[AttributeValue], bool]):
@@ -592,7 +592,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         '''
         return self.matter_test_config.wifi_passphrase if self.matter_test_config.wifi_passphrase is not None else default
 
-    def get_setup_payload_info(self) -> List[SetupPayloadInfo]:
+    def get_setup_payload_info(self) -> list[SetupPayloadInfo]:
         """
         Get and builds the payload info provided in the execution.
         Returns:
@@ -953,8 +953,8 @@ class MatterBaseTest(base_test.BaseTestClass):
             True if commissioning succeeded, False otherwise.
         """
         dev_ctrl: ChipDeviceCtrl.ChipDeviceController = self.default_controller
-        dut_node_ids: List[int] = self.matter_test_config.dut_node_ids
-        setup_payloads: List[SetupPayloadInfo] = self.get_setup_payload_info()
+        dut_node_ids: list[int] = self.matter_test_config.dut_node_ids
+        setup_payloads: list[SetupPayloadInfo] = self.get_setup_payload_info()
         commissioning_info: CommissioningInfo = CommissioningInfo(
             commissionee_ip_address_just_for_testing=self.matter_test_config.commissionee_ip_address_just_for_testing,
             commissioning_method=self.matter_test_config.commissioning_method,
@@ -998,7 +998,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             raise  # Help mypy understand this never returns
 
     async def read_single_attribute(
-            self, dev_ctrl: ChipDeviceCtrl.ChipDeviceController, node_id: int, endpoint: int, attribute: Type[ClusterObjects.ClusterAttributeDescriptor], fabricFiltered: bool = True) -> object:
+            self, dev_ctrl: ChipDeviceCtrl.ChipDeviceController, node_id: int, endpoint: int, attribute: type[ClusterObjects.ClusterAttributeDescriptor], fabricFiltered: bool = True) -> object:
         """Read a single attribute value from a device.
 
         Args:
@@ -1016,7 +1016,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         return list(data.values())[0][attribute]
 
     async def read_single_attribute_all_endpoints(
-            self, cluster: ClusterObjects.Cluster, attribute: Type[ClusterObjects.ClusterAttributeDescriptor],
+            self, cluster: ClusterObjects.Cluster, attribute: type[ClusterObjects.ClusterAttributeDescriptor],
             dev_ctrl: Optional[ChipDeviceCtrl.ChipDeviceController] = None, node_id: Optional[int] = None):
         """Reads a single attribute of a specified cluster across all endpoints.
 
@@ -1038,7 +1038,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         return attrs
 
     async def read_single_attribute_check_success(
-            self, cluster: ClusterObjects.Cluster, attribute: Type[ClusterObjects.ClusterAttributeDescriptor],
+            self, cluster: ClusterObjects.Cluster, attribute: type[ClusterObjects.ClusterAttributeDescriptor],
             dev_ctrl: Optional[ChipDeviceCtrl.ChipDeviceController] = None, node_id: Optional[int] = None, endpoint: Optional[int] = None, fabric_filtered: bool = True, assert_on_error: bool = True, test_name: str = "", payloadCapability: int = ChipDeviceCtrl.TransportPayloadCapability.MRP_PAYLOAD) -> object:
         if dev_ctrl is None:
             dev_ctrl = self.default_controller
@@ -1069,7 +1069,7 @@ class MatterBaseTest(base_test.BaseTestClass):
 
     async def poll_until_attributes_in_range(
             self, cluster: ClusterObjects.Cluster,
-            attribute_bounds: List[Tuple[Type[ClusterObjects.ClusterAttributeDescriptor], int, int]],
+            attribute_bounds: list[tuple[type[ClusterObjects.ClusterAttributeDescriptor], int, int]],
             timeout_sec: int = 1) -> None:
         """Poll attributes until each value falls within [min_value, max_value].
 
@@ -1092,7 +1092,7 @@ class MatterBaseTest(base_test.BaseTestClass):
                 value = await self.read_single_attribute_check_success(cluster, attribute)
 
     async def read_single_attribute_expect_error(
-            self, cluster: ClusterObjects.Cluster, attribute: Type[ClusterObjects.ClusterAttributeDescriptor],
+            self, cluster: ClusterObjects.Cluster, attribute: type[ClusterObjects.ClusterAttributeDescriptor],
             error: Status, dev_ctrl: Optional[ChipDeviceCtrl.ChipDeviceController] = None, node_id: Optional[int] = None, endpoint: Optional[int] = None,
             fabric_filtered: bool = True, assert_on_error: bool = True, test_name: str = "") -> object:
         if dev_ctrl is None:
