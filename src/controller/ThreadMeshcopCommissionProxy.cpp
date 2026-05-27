@@ -522,17 +522,17 @@ CHIP_ERROR ThreadMeshcopCommissionProxy::Discover(ByteSpan & pskc, const Transpo
         std::lock_guard<std::recursive_mutex> lock(mMutex);
         mExpectedDiscriminator = expectedDiscriminator;
         SetState(State::kConnecting);
-        mDiscoveredNodePromise = std::promise<Dnssd::DiscoveredNodeData>();
-        future                 = mDiscoveredNodePromise.get_future();
-        mPromiseFulfilled      = false;
-        mJoinerId              = 0;
-        mLastDiscoveryDiagnostic = DiscoveryDiagnostic();
+        mDiscoveredNodePromise                  = std::promise<Dnssd::DiscoveredNodeData>();
+        future                                  = mDiscoveredNodePromise.get_future();
+        mPromiseFulfilled                       = false;
+        mJoinerId                               = 0;
+        mLastDiscoveryDiagnostic                = DiscoveryDiagnostic();
         mLastDiscoveryDiagnostic.requestedShort = expectedDiscriminator.IsShortDiscriminator();
         mLastDiscoveryDiagnostic.requestedValue =
             mLastDiscoveryDiagnostic.requestedShort ? expectedDiscriminator.GetShortValue() : expectedDiscriminator.GetLongValue();
         mLastDiscoveryDiagnostic.expectedLongValue =
             expectedDiscriminator.IsShortDiscriminator() ? 0 : expectedDiscriminator.GetLongValue();
-        mLastDiscoveryDiagnostic.discoveryCode     = code.AsUInt64();
+        mLastDiscoveryDiagnostic.discoveryCode = code.AsUInt64();
     }
 
     ReturnErrorOnFailure(InitializeCommissioner(pskc));

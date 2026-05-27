@@ -18,13 +18,12 @@
 # N/A - Test requires Thread MeshCoP hardware or simulation and will not run on CI.
 
 from mobly import asserts
+from thread_meshcop_testing import (assert_common_diagnostic_fields, discriminator_from_config, establish_pase_over_thread_meshcop,
+                                    get_setup_code)
 
 from matter.testing.decorators import async_test_body
 from matter.testing.matter_testing import MatterBaseTest, TestStep
 from matter.testing.runner import default_matter_test_main
-
-from thread_meshcop_testing import (assert_common_diagnostic_fields, discriminator_from_config,
-                                    establish_pase_over_thread_meshcop, get_setup_code)
 
 
 class TC_SC_TC_2_2(MatterBaseTest):

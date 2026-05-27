@@ -94,14 +94,14 @@ private:
 
     struct DiscoveryDiagnostic
     {
-        bool valid                     = false;
-        bool requestedShort           = false;
-        uint16_t requestedValue       = 0;
-        uint16_t expectedLongValue    = 0;
-        uint64_t discoveryCode        = 0;
-        uint64_t joinerId             = 0;
-        uint16_t joinerUdpPort        = 0;
-        uint16_t matterUdpPort        = 0;
+        bool valid                 = false;
+        bool requestedShort        = false;
+        uint16_t requestedValue    = 0;
+        uint16_t expectedLongValue = 0;
+        uint64_t discoveryCode     = 0;
+        uint64_t joinerId          = 0;
+        uint16_t joinerUdpPort     = 0;
+        uint16_t matterUdpPort     = 0;
         std::vector<uint8_t> steeringData;
         Dnssd::CommissionNodeData commissionData;
     };
