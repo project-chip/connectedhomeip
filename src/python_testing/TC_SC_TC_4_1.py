@@ -13,26 +13,9 @@
 #    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
+#
 
-
-# === BEGIN CI TEST ARGUMENTS ===
-# test-runner-runs:
-#   run1:
-#     app: ${ALL_CLUSTERS_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
-#     script-args: >
-#       --storage-path admin_storage.json
-#       --in-test-commissioning-method thread-meshcop
-#       --discriminator 1234
-#       --passcode 20202021
-#       --thread-ba-host 127.0.0.1
-#       --thread-ba-port 49152
-#       --thread-dataset-hex 0e08000000000001000000030000104a0300001635060004001fffe0020884fa18779329ac770708fd269658e44aa21a030f4f70656e5468726561642d32386335010228c50c0402a0f7f8051000112233445566778899aabbccddeeff041000112233445566778899aabbccddeeff
-#       --trace-to json:${TRACE_TEST_JSON}.json
-#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
-#     factory-reset: true
-#     quiet: true
-# === END CI TEST ARGUMENTS ===
+# N/A - Test requires Thread MeshCoP hardware or simulation and will not run on CI.
 
 import logging
 
