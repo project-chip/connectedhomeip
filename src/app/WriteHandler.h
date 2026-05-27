@@ -122,6 +122,11 @@ public:
     FabricIndex GetAccessingFabricIndex() const;
 
     /**
+     * Check whether the WriteRequest we are handling suppresses response.
+     */
+    bool IsSuppressResponse() const { return mStateFlags.Has(StateBits::kSuppressResponse); }
+
+    /**
      * Check whether the WriteRequest we are handling is a timed write.
      */
     bool IsTimedWrite() const { return mStateFlags.Has(StateBits::kIsTimedRequest); }

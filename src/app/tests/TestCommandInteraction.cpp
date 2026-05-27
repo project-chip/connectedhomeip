@@ -1486,7 +1486,7 @@ TEST_F(TestCommandInteraction, TestCommandHandler_WithOnInvokeReceivedEmptyDataM
             System::PacketBufferHandle commandDatabuf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
 
             chip::isCommandDispatched = false;
-            GenerateInvokeRequest(commandDatabuf, /* aSuppressResponse = */ true, messageIsTimed, kTestCommandIdNoData);
+            GenerateInvokeRequest(commandDatabuf, /* aSuppressResponse = */ false, messageIsTimed, kTestCommandIdNoData);
             MockCommandResponder mockCommandResponder;
             Protocols::InteractionModel::Status status =
                 commandHandler.OnInvokeCommandRequest(mockCommandResponder, std::move(commandDatabuf), transactionIsTimed);
@@ -1698,6 +1698,30 @@ TEST_F(TestCommandInteraction, TestCommandSenderSuppressResponseFlow)
     EXPECT_EQ(mockCommandSenderDelegate.onErrorCalledTimes, 0);
     EXPECT_EQ(commandSender.GetInvokeResponseMessageCount(), 0u);
 
+    EXPECT_EQ(GetNumActiveCommandResponderObjects(), 0u);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+}
+
+TEST_F(TestCommandInteraction, TestCommandSenderSuppressResponseFlowNoImpactOnStatusResponse)
+{
+
+    mockCommandSenderDelegate.ResetCounter();
+    app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager(), /* isTimedRequest = */ false,
+                                     /* suppressResponse = */ true);
+
+    chip::isCommandDispatched = false;
+    AddInvalidInvokeRequestData(&commandSender);
+    EXPECT_EQ(commandSender.SendCommandRequest(GetSessionBobToAlice()), CHIP_NO_ERROR);
+
+    DrainAndServiceIO();
+
+    EXPECT_FALSE(chip::isCommandDispatched);
+    EXPECT_EQ(mockCommandSenderDelegate.onResponseCalledTimes, 0);
+    EXPECT_EQ(mockCommandSenderDelegate.onFinalCalledTimes, 1);
+    // When suppressResponse is set to be true, any responses should be suppressed.
+    // The StatusResponse (if the status is not success) will not be sent.
+    EXPECT_EQ(mockCommandSenderDelegate.onErrorCalledTimes, 0);
+    EXPECT_EQ(commandSender.GetInvokeResponseMessageCount(), 0u);
     EXPECT_EQ(GetNumActiveCommandResponderObjects(), 0u);
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 }

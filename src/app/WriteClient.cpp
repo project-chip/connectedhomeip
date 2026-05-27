@@ -33,6 +33,12 @@ namespace app {
 
 void WriteClient::Close()
 {
+    // avoid mpCallback::OnDone being called more than once
+    if (mState == State::AwaitingDestruction)
+    {
+        return;
+    }
+
     MoveToState(State::AwaitingDestruction);
 
     if (mpCallback)
@@ -502,7 +508,7 @@ exit:
         // handle this object dying (e.g. due to IM enging shutdown) while the
         // async bits are pending we'd need to malloc some state bit that we can
         // twiddle if we die.  For now just do the OnDone callback sync.
-        if (session->IsGroupSession())
+        if (session->IsGroupSession() || (mSuppressResponse && mState != State::AwaitingTimedStatus))
         {
             // Always shutdown on Group communication
             ChipLogDetail(DataManagement, "Closing on group Communication ");
@@ -533,10 +539,16 @@ CHIP_ERROR WriteClient::SendWriteRequest()
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    // kExpectResponse is ignored by ExchangeContext in case of groupcast
-    ReturnErrorOnFailure(mExchangeCtx->SendMessage(MsgType::WriteRequest, std::move(data), SendMessageFlags::kExpectResponse));
-
-    MoveToState(State::AwaitingResponse);
+    if (mSuppressResponse)
+    {
+        ReturnErrorOnFailure(mExchangeCtx->SendMessage(MsgType::WriteRequest, std::move(data), SendMessageFlags::kNone));
+    }
+    else
+    {
+        // kExpectResponse is ignored by ExchangeContext in case of groupcast
+        ReturnErrorOnFailure(mExchangeCtx->SendMessage(MsgType::WriteRequest, std::move(data), SendMessageFlags::kExpectResponse));
+        MoveToState(State::AwaitingResponse);
+    }
     return CHIP_NO_ERROR;
 }
 

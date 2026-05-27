@@ -441,7 +441,7 @@ private:
 
     void SetExchangeInterface(CommandHandlerExchangeInterface * commandResponder);
 
-    bool ResponsesAccepted() { return mpResponder != nullptr && !mGroupRequest; }
+    bool ResponsesAccepted() { return mpResponder != nullptr && !mGroupRequest && !mSuppressResponse; }
 
     /**
      * Sets the state flag to keep the information that request we are handling is targeted to a group.
