@@ -486,7 +486,7 @@ class TestComposedDeviceTypeMatching(DeviceConformanceTests):
                 revision_desc={},
                 composed_device_types=[
                     self._create_mock_composed_req(dt_child_id, "Child Device", get_mandatory_conformance()),
-                    self._create_mock_composed_req(dt_power_source_id, "Power Source", get_mandatory_conformance(), device_type_location='anywhere')
+                    self._create_mock_composed_req(dt_power_source_id, "Power Source", get_mandatory_conformance(), device_type_location='anyEndpoint')
                 ]
             ),
             dt_child_id: XmlDeviceType(name="Child Device", revision=1, server_clusters={}, client_clusters={}, classification_class="Simple", classification_scope="Endpoint", revision_desc={}),
@@ -777,7 +777,7 @@ class TestComposedDeviceTypeMatching(DeviceConformanceTests):
                 revision_desc={},
                 composed_device_types=[
                     self._create_mock_composed_req(dt_child_id, "Child Device", get_mandatory_conformance()),
-                    self._create_mock_composed_req(dt_power_source_id, "Power Source", get_mandatory_conformance(), device_type_location='anywhere'),
+                    self._create_mock_composed_req(dt_power_source_id, "Power Source", get_mandatory_conformance(), device_type_location='anyEndpoint'),
                     self._create_mock_composed_req(dt_thermostat_id, "Thermostat", get_mandatory_conformance(), device_type_location='deviceEndpoint')
                 ]
             ),
@@ -836,6 +836,106 @@ class TestComposedDeviceTypeMatching(DeviceConformanceTests):
         
         success, problems = self.check_composed_device_type_requirements()
         asserts.assert_false(success, "Unexpected success in complex location scenario (negative case)")
+
+
+    # ==========================================================================
+    # Scenario 9: Element Overrides (Feature)
+    # ==========================================================================
+    # Requirement: Parent requires 1 instance of Child DT.
+    #              That instance requires Feature bit 0 to be enabled on Cluster X.
+    # Topology (Negative):
+    #           Endpoint 1 has Parent DT. PartsList = [2].
+    #           Endpoint 2 has Child DT and Cluster X (FeatureMap = 0).
+    # Expected: FAIL (Feature requirement not met).
+    # Topology (Positive):
+    #           Endpoint 1 has Parent DT. PartsList = [3].
+    #           Endpoint 3 has Child DT and Cluster X (FeatureMap = 1).
+    # Expected: PASS
+    # ==========================================================================
+    def test_scenario_element_overrides(self):
+        log.info("Running Scenario 9: Element Overrides (Feature)")
+        
+        dt_parent_id = 0x0001
+        dt_child_id = 0x0002
+        cluster_x_id = 0x0090 # ElectricalPowerMeasurement
+        
+        # Mock spec data
+        req = self._create_mock_composed_req(dt_child_id, "Child Device", get_mandatory_conformance())
+        req.cluster_requirements = {
+            cluster_x_id: XmlDeviceTypeClusterRequirements(
+                name="Cluster X", 
+                side=ClusterSide.SERVER, 
+                conformance=get_mandatory_conformance(),
+                feature_overrides={0x01: get_mandatory_conformance()} # Require bit 0!
+            )
+        }
+        
+        self.xml_device_types = {
+            dt_parent_id: XmlDeviceType(
+                name="Parent Device",
+                revision=1,
+                server_clusters={},
+                client_clusters={},
+                classification_class="simple",
+                classification_scope="endpoint",
+                revision_desc={},
+                composed_device_types=[req]
+            ),
+            dt_child_id: XmlDeviceType(name="Child Device", revision=1, server_clusters={}, client_clusters={}, classification_class="simple", classification_scope="endpoint", revision_desc={})
+        }
+        
+        # Mock device endpoints
+        # EP1: Parent Device
+        # EP2: Child Device (has cluster X, but FeatureMap = 0!) -> Should fail!
+        
+        self.endpoints = {
+            0: {
+                Clusters.BasicInformation: {
+                    Clusters.BasicInformation.Attributes.SpecificationVersion: 0x01060000
+                }
+            },
+            1: {
+                Clusters.Descriptor: {
+                    Clusters.Descriptor.Attributes.DeviceTypeList: [Clusters.Descriptor.Structs.DeviceTypeStruct(deviceType=dt_parent_id, revision=1)],
+                    Clusters.Descriptor.Attributes.PartsList: [2]
+                }
+            },
+            2: {
+                Clusters.Descriptor: {
+                    Clusters.Descriptor.Attributes.DeviceTypeList: [Clusters.Descriptor.Structs.DeviceTypeStruct(deviceType=dt_child_id, revision=1)],
+                    Clusters.Descriptor.Attributes.ServerList: [cluster_x_id]
+                },
+                Clusters.ElectricalPowerMeasurement: {
+                    Clusters.ElectricalPowerMeasurement.Attributes.FeatureMap: 0x00, # No features!
+                    Clusters.ElectricalPowerMeasurement.Attributes.AttributeList: [],
+                    Clusters.ElectricalPowerMeasurement.Attributes.AcceptedCommandList: [],
+                    Clusters.ElectricalPowerMeasurement.Attributes.ClusterRevision: 1
+                }
+            }
+        }
+        
+        success, problems = self.check_composed_device_type_requirements()
+        asserts.assert_false(success, "Unexpected success when feature override is not met")
+        
+        # Now add EP3 which meets the requirement
+        self.endpoints[1][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList] = [3]
+        self.endpoints[3] = {
+            Clusters.Descriptor: {
+                Clusters.Descriptor.Attributes.DeviceTypeList: [Clusters.Descriptor.Structs.DeviceTypeStruct(deviceType=dt_child_id, revision=1)],
+                Clusters.Descriptor.Attributes.ServerList: [cluster_x_id]
+            },
+            Clusters.ElectricalPowerMeasurement: {
+                Clusters.ElectricalPowerMeasurement.Attributes.FeatureMap: 0x01, # Has feature bit 0!
+                Clusters.ElectricalPowerMeasurement.Attributes.AttributeList: [],
+                Clusters.ElectricalPowerMeasurement.Attributes.AcceptedCommandList: [],
+                Clusters.ElectricalPowerMeasurement.Attributes.ClusterRevision: 1
+            }
+        }
+        
+        success, problems = self.check_composed_device_type_requirements()
+        for p in problems:
+            log.info(p)
+        asserts.assert_true(success, "Failure when feature override is met")
 
 
 if __name__ == "__main__":

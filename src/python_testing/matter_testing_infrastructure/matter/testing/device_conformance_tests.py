@@ -479,7 +479,7 @@ class DeviceConformanceTests(BasicCompositionTests):
             return [endpoint_id]
         elif location == 'rootEndpoint':
             return [0]
-        elif location == 'anywhere':
+        elif location == 'anyEndpoint':
             return list(self.endpoints.keys())
         elif location == 'descendantEndpoint':
             descendants = []
