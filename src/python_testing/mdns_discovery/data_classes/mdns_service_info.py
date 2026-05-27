@@ -16,7 +16,7 @@
 #
 
 from dataclasses import dataclass, field
-from typing import Dict, List, Optional
+from typing import Optional
 
 from zeroconf.asyncio import AsyncServiceInfo
 
@@ -65,7 +65,7 @@ class MdnsServiceInfo(JsonSerializable):
         return getattr(self.service_info, "server", None)
 
     @property
-    def addresses(self) -> Optional[List[str]]:
+    def addresses(self) -> Optional[list[str]]:
         si = self.service_info
         if si and hasattr(si, "parsed_addresses"):
             try:
@@ -79,7 +79,7 @@ class MdnsServiceInfo(JsonSerializable):
         return getattr(self.service_info, "port", None)
 
     @property
-    def txt(self) -> Optional[Dict[str, str]]:
+    def txt(self) -> Optional[dict[str, str]]:
         return getattr(self.service_info, "decoded_properties", None)
 
     @property

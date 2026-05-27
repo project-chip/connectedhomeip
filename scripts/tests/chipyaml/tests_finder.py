@@ -15,7 +15,6 @@
 
 import json
 import os.path
-from typing import List
 
 import click
 
@@ -41,7 +40,7 @@ class TestsFinder:
     def get_default_configuration_name() -> str:
         return _CI_CONFIGURATION_NAME
 
-    def get(self, test_name: str) -> List[str]:
+    def get(self, test_name: str) -> list[str]:
         test_names = []
 
         if self.__test_collections and test_name == _KEYWORD_ALL_TESTS:
@@ -55,10 +54,10 @@ class TestsFinder:
 
         return self.__get_paths(test_names)
 
-    def get_collections(self) -> List[str]:
+    def get_collections(self) -> list[str]:
         return self.__test_collections
 
-    def __get_collections(self, configuration_directory: str, configuration_name: str) -> List[str]:
+    def __get_collections(self, configuration_directory: str, configuration_name: str) -> list[str]:
         if os.path.isfile(configuration_name):
             configuration_filepath = configuration_name
         elif os.path.isfile(os.path.join(configuration_directory, configuration_name + _JSON_FILE_EXTENSION)):
@@ -86,7 +85,7 @@ class TestsFinder:
 
         return collections
 
-    def __get_paths(self, test_names: List[str]) -> List[str]:
+    def __get_paths(self, test_names: list[str]) -> list[str]:
         paths = []
 
         for name in test_names:
