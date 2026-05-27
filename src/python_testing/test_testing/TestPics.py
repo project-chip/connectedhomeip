@@ -309,5 +309,6 @@ class TestPicsHelpers(MatterBaseTest):
             len(acl_mandatory) > 0,
             "AccessControl spec-mandatory events must be derived for any DUT with AccessControl on EP0")
 
+
 if __name__ == "__main__":
     default_matter_test_main()
