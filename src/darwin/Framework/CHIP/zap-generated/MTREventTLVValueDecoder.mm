@@ -5063,6 +5063,19 @@ static id _Nullable DecodeEventPayloadForProximityRangingCluster(EventId aEventI
     *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
     return nil;
 }
+static id _Nullable DecodeEventPayloadForSmokeConcentrationMeasurementCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::SmokeConcentrationMeasurement;
+    switch (aEventId) {
+    default: {
+        // Not a known SmokeConcentrationMeasurement event.
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
 static id _Nullable DecodeEventPayloadForNetworkIdentityManagementCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::NetworkIdentityManagement;
@@ -6352,6 +6365,9 @@ id _Nullable MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVRead
     }
     case Clusters::ProximityRanging::Id: {
         return DecodeEventPayloadForProximityRangingCluster(aPath.mEventId, aReader, aError);
+    }
+    case Clusters::SmokeConcentrationMeasurement::Id: {
+        return DecodeEventPayloadForSmokeConcentrationMeasurementCluster(aPath.mEventId, aReader, aError);
     }
     case Clusters::NetworkIdentityManagement::Id: {
         return DecodeEventPayloadForNetworkIdentityManagementCluster(aPath.mEventId, aReader, aError);

@@ -16,7 +16,7 @@ import dataclasses
 import functools
 import logging
 import pprint
-from typing import Dict, List, Optional
+from typing import Optional
 
 import click
 from lark import Lark
@@ -67,8 +67,7 @@ class PrefixCppDocComment:
             yield cluster
             for attribute in cluster.attributes:
                 yield attribute.definition
-            for command in cluster.commands:
-                yield command
+            yield from cluster.commands
             for struct in cluster.structs:
                 yield struct
                 for field in struct.fields:
@@ -579,7 +578,7 @@ class MatterIdlTransformer(Transformer):
             self.doc_comments.append(PrefixCppDocComment(token))
 
 
-def _referenced_type_names(cluster: Cluster) -> List[str]:
+def _referenced_type_names(cluster: Cluster) -> list[str]:
     """
     Return the ORDERED and UNIQUE names of all data types referenced by the given cluster.
     """
@@ -709,7 +708,7 @@ class ParserWithLines:
         #
         # A zap PR to allow us to not need this is:
         #    https://github.com/project-chip/zap/pull/1216
-        clusters: Dict[int, Cluster] = {}
+        clusters: dict[int, Cluster] = {}
         for c in idl.clusters:
             if c.code in clusters:
                 if c != clusters[c.code]:

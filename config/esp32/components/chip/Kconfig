@@ -395,6 +395,13 @@ menu "CHIP Device Layer"
             help
                 Enables or Disables the support for Commissionable Device Type.
 
+        config ENABLE_CONCURRENT_CONNECTION
+            bool "Enable Concurrent Connection"
+            default y
+            help
+                Enables or Disables the support for Concurrent Connection, it will affect the logic of ConnectNetwork
+                Command in Network Commissioning cluster.
+
         menuconfig ENABLE_ICD_SERVER
             bool "Enable ICD server"
             depends on OPENTHREAD_MTD
@@ -643,6 +650,14 @@ menu "CHIP Device Layer"
             help
                 The maximum number of networks to return as a result of a CHIP NetworkProvisioning:ScanNetworks request.
 
+        config WIFI_SCAN_ALL_CHANNEL_MODE
+            bool "Enable All-channel Scan Mode"
+            default n
+            depends on ENABLE_WIFI_STATION
+            help
+                Select to enable all-channel scan mode for Wi-Fi station. Note that this option might increase the time of
+                the station connecting to the AP by about 1-2 seconds.
+
         config WIFI_SCAN_COMPLETION_TIMEOUT
             int "WiFi Scan Completion Timeout (ms)"
             range 0 65535
@@ -781,6 +796,13 @@ menu "CHIP Device Layer"
                 ESP-IDF OpenThread esp_netif/lwIP glue. This is intended for Thread-only
                 images and requires CONFIG_OPENTHREAD_PLATFORM_NETIF to be disabled when
                 that ESP-IDF option is available.
+
+        config CHIP_DEVICE_ENABLE_THREAD_MESHCOP
+            bool "Enable Thread MeshCoP"
+            default n
+            depends on ENABLE_MATTER_OVER_THREAD && !ENABLE_CONCURRENT_CONNECTION
+            help
+                Enable Matter commissioning over Thread MeshCoP
 
     endmenu
 

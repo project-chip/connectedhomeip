@@ -65,6 +65,7 @@ static /* constexpr */ const MTRDeviceTypeData knownDeviceTypes[] = {
     { 0x0000007A, MTRDeviceTypeClass::Simple, @"Extractor Hood" },
     { 0x0000007B, MTRDeviceTypeClass::Simple, @"Oven" },
     { 0x0000007C, MTRDeviceTypeClass::Simple, @"Laundry Dryer" },
+    { 0x0000007D, MTRDeviceTypeClass::Simple, @"Humidifier/Dehumidifier" },
     { 0x00000090, MTRDeviceTypeClass::Simple, @"Network Infrastructure Manager" },
     { 0x00000091, MTRDeviceTypeClass::Simple, @"Thread Border Router" },
     { 0x00000100, MTRDeviceTypeClass::Simple, @"On/Off Light" },

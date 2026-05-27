@@ -10,8 +10,8 @@ version of the casting library into their apps.
 
 | Metric                           | Default build | Optimized build | Reduction |
 | -------------------------------- | ------------- | --------------- | --------- |
-| `libTvCastingCommon.a` (archive) | 210 MB        | 144 MB          | 31 %      |
-| `__TEXT` (actual code)           | 12.1 MB       | 2.8 MB          | 77 %      |
+| `libTvCastingCommon.a` (archive) | 184 MB        | 135 MB          | 27 %      |
+| `__TEXT` (actual code)           | 11.6 MB       | 2.7 MB          | 77 %      |
 | `__DATA`                         | 0.4 MB        | 0.3 MB          | 25 %      |
 
 The `.a` archive sizes (210 / 144 MB) include debug info, symbol tables, and
@@ -67,15 +67,17 @@ statically links the C++ standard library by default.
 
 ## 3. What the Darwin Build Already Optimizes
 
-The darwin `args.gni` already sets the slim cluster-objects override:
+The darwin `args.gni` already sets the override directory for slim source files:
 
 ```python
-chip_cluster_objects_source_override =
-    "${chip_root}/examples/tv-casting-app/tv-casting-common/casting-cluster-objects.cpp"
+chip_data_model_overrides_dir =
+    "${chip_root}/examples/tv-casting-app/tv-casting-common"
 ```
 
-This compiles only ~36 casting-relevant clusters instead of the full ~200+
-generated `cluster-objects.cpp`. This is the same slim file used by the Android
+This directs the build system to look for well-known override filenames in the
+`tv-casting-common/` directory. The slim `cluster-objects-override.cpp` compiles
+only ~36 casting-relevant clusters instead of the full ~200+ generated
+`cluster-objects.cpp`. This is the same slim file used by the Android
 size-optimized build.
 
 Additionally, the darwin casting bridge uses its own zap-generated Objective-C
@@ -222,7 +224,7 @@ bundles all transitive dependencies into a single `.a` file:
 
 -   Matter core (transport, crypto, secure channel, interaction model)
 -   Casting common C++ layer (CastingApp, CastingPlayer, Endpoint, etc.)
--   Cluster implementations (~36 via slim `casting-cluster-objects.cpp`)
+-   Cluster implementations (~36 via slim `cluster-objects-override.cpp`)
 -   App server, data model provider
 -   Darwin platform layer (BLE, DNS-SD via Bonjour, KeyValueStore)
 -   mbedTLS (crypto backend)
@@ -273,7 +275,7 @@ If you're building a new app (not migrating from the old API):
 | C++ stdlib              | Separate `libc++_shared.so` (or static)                     | Always statically linked by Apple toolchain                 |
 | Cluster API surface     | Java `ChipClusters.java` (all ~200+ clusters, shrunk by R8) | ObjC `MCClusterObjects` (9 casting clusters only)           |
 | TLV decoders            | C++ `CHIPAttributeTLVValueDecoder.cpp` (full or slim)       | ObjC zap-generated `MCAttributeObjects.mm` (already scoped) |
-| Slim cluster-objects    | ✅ via `chip_cluster_objects_source_override`               | ✅ via `chip_cluster_objects_source_override`               |
+| Slim cluster-objects    | ✅ via `chip_data_model_overrides_dir`                      | ✅ via `chip_data_model_overrides_dir`                      |
 | Legacy source exclusion | ✅ via `optimize_apk_size=true`                             | ✅ via `optimize_apk_size=true` (Release builds)            |
 | Build system            | GN → ninja → Gradle                                         | GN → ninja → Xcode                                          |
 
@@ -282,7 +284,7 @@ Android build because:
 
 1. The Objective-C cluster API is pre-scoped to casting clusters (no equivalent
    of the 200+ cluster `ChipClusters.java`)
-2. The slim `casting-cluster-objects.cpp` is already set in `args.gni`
+2. The slim `cluster-objects-override.cpp` is already set in `args.gni`
 3. There's no separate C++ stdlib shared library to worry about
 
 The main remaining opportunity is enabling `optimize_apk_size=true` to drop the
@@ -291,3 +293,84 @@ legacy chip-tool sources and their transitive dependencies.
 ---
 
 _March 2026 — Initial analysis of Darwin casting framework size._
+
+---
+
+## 9. Phase 2 Optimizations — Darwin Applicability
+
+Phase 2 of the APK size reduction effort introduces five additional
+optimizations for the Android size-optimized build. Some of these also apply to
+Darwin builds; others are Android-specific due to platform differences.
+
+### Optimizations that apply to Darwin
+
+| Optimization                   | Darwin applicability | Notes                                                                                                                                                                                                          |
+| ------------------------------ | -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Cluster trimming (10 clusters) | ✅ Applies           | The slim `cluster-objects-override.cpp` is shared between Android and Darwin. Removing 10 non-essential infrastructure clusters reduces code in `libTvCastingCommon.a` identically.                            |
+| ICD client removal             | ✅ Applies           | The `tv-casting-common/BUILD.gn` conditional excluding `icd/client:handler` and `icd/client:manager` applies to all platforms when `optimize_apk_size=true`. Darwin casting builds do not use ICD client APIs. |
+
+### Optimizations that are Android-specific
+
+| Optimization                                                             | Why it doesn't apply to Darwin                                                                                                                                                                                                                                                           |
+| ------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Disable RTTI (`enable_rtti=false`)                                       | The Darwin Objective-C bridge (`MatterTvCastingBridge`) uses `typeid` in the ObjC-to-C++ interop layer. Disabling RTTI would break the bridge at compile time. RTTI is safe to disable only on Android where the JNI layer does not use `dynamic_cast` or `typeid`.                      |
+| Disable extra data-model logging (`chip_data_model_extra_logging=false`) | This GN arg is passed by `android.py` specifically for the `TV_CASTING_APP` target. Darwin builds use a separate build flow (Xcode + `chip_xcode_build_connector.sh`) and do not pass this argument. It could be added to `darwin/args.gni` in a future phase if desired.                |
+| Disable host unit-test hooks (`CONFIG_BUILD_FOR_HOST_UNIT_TEST=0`)       | The define override is applied via the `tv-casting-common/BUILD.gn` config block only when `optimize_apk_size=true`. While technically platform-agnostic, the primary motivation and testing is Android-focused. Darwin Release builds already strip test code via different mechanisms. |
+
+### Summary
+
+Of the five phase 2 optimizations, two (cluster trimming and ICD removal) are
+platform-agnostic and benefit Darwin builds automatically when
+`optimize_apk_size=true` is set. The remaining three (RTTI, extra logging,
+unit-test hooks) are Android-specific — RTTI cannot be disabled on Darwin due to
+`typeid` usage in the ObjC bridge, and the logging/test-hook flags are wired
+through the Android build pipeline.
+
+---
+
+_Updated March 2026 with phase 2 applicability notes for Darwin builds._
+
+---
+
+## 10. Phase 3 Optimizations — Darwin Applicability
+
+Phase 3 targets ~3.5 MB of additional binary bloat in the Android size-optimized
+build across four areas: cluster server exclusion, slim Accessors.cpp,
+jsoncpp/jsontlv removal, and controller code reduction. Some of these
+optimizations are platform-agnostic and can be adopted by Darwin builds; others
+are Android-specific.
+
+### Optimizations that apply to Darwin
+
+| Optimization             | Darwin applicability | How to enable                                                                                                                                                                                                                                                                                                                                                                                        |
+| ------------------------ | -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Cluster server exclusion | ✅ Applies           | The `chip_data_model_overrides_dir` GN arg is declared in `src/app/common_flags.gni` (platform-agnostic). Darwin builds set `chip_data_model_overrides_dir` in `darwin/args.gni` pointing to the `tv-casting-common/` directory, which contains `cluster-servers-override.gni` to compile only the 13 required cluster server implementations instead of all ~44 discovered from the `.matter` file. |
+| Slim Accessors.cpp       | ✅ Applies           | The `chip_data_model_overrides_dir` GN arg is declared in `src/app/common_flags.gni` (platform-agnostic). Darwin builds set `chip_data_model_overrides_dir` in `darwin/args.gni` pointing to the `tv-casting-common/` directory, which contains `Accessors-override.cpp` to compile only the 29 casting-relevant cluster accessors instead of the full ~200+ cluster Accessors.cpp.                  |
+
+Both override files are resolved automatically from the
+`chip_data_model_overrides_dir` already set in `darwin/args.gni`. No additional
+args.gni changes are needed since the override directory already contains all
+well-known override filenames (`cluster-objects-override.cpp`,
+`Accessors-override.cpp`, `cluster-servers-override.gni`, etc.).
+
+### Optimizations that are Android-specific
+
+| Optimization                                      | Why it doesn't apply to Darwin                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| ------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| jsoncpp/jsontlv removal (~350 KB)                 | The jsontlv dependency is in `src/controller/java/BUILD.gn`, which is the Android JNI layer (`android_chip_im_jni` and the `jni` shared library). Darwin does not use the Java controller or JNI — the Objective-C bridge (`MatterTvCastingBridge`) has its own interaction path. This optimization has no effect on Darwin builds.                                                                                                                                                                         |
+| Controller code reduction (future work — ~1.3 MB) | The dependency chain analysis through the JNI layer (`AndroidDeviceControllerWrapper.cpp`, etc.) is Android-specific. The general finding that the casting app does not need commissioner code (`CHIPDeviceController.cpp`, `CommissioningWindowOpener.cpp`, etc.) applies to both platforms, but the JNI-layer refactoring required to cleanly split the controller library is an Android concern. Darwin builds could independently investigate excluding commissioner code through their own build flow. |
+
+### Summary
+
+Of the four phase 3 optimization areas, two (cluster server exclusion and slim
+Accessors.cpp) are platform-agnostic — they use the
+`chip_data_model_overrides_dir` GN arg declared in `src/app/common_flags.gni`
+and are adopted by Darwin builds via the override directory already set in
+`darwin/args.gni`. The jsoncpp/jsontlv removal is Android JNI-specific and does
+not apply to Darwin. The controller code reduction analysis identifies savings
+relevant to both platforms, but the implementation path is tied to the Android
+JNI dependency chain.
+
+---
+
+_Updated March 2026 with phase 3 applicability notes for Darwin builds._

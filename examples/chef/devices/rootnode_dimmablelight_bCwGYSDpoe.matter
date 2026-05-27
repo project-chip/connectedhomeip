@@ -1982,7 +1982,7 @@ cluster OccupancySensing = 1030 {
 }
 
 endpoint 0 {
-  device type ma_rootdevice = 22, version 5;
+  device type ma_rootdevice = 22, version 4;
 
   binding cluster OtaSoftwareUpdateProvider;
 
@@ -2170,7 +2170,7 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type ma_dimmablelight = 257, version 1;
+  device type ma_dimmablelight = 257, version 3;
 
   binding cluster Binding;
   binding cluster OccupancySensing;
