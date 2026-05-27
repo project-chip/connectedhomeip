@@ -130,7 +130,7 @@ void UDPEndPointImplOT::handleUdpReceive(void * aContext, otMessage * aMessage, 
 CHIP_ERROR UDPEndPointImplOT::IPv6Bind(otUdpSocket & socket, const IPAddress & address, uint16_t port,
                                        [[maybe_unused]] InterfaceId interface)
 {
-#if CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+#if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
     // OT still not ready — defer the bind and return success so Server::Init() can proceed.
     // CompleteDeferredOTBinds() must be called after OT is initialized.
     if (mOTInstance == nullptr)
