@@ -58,7 +58,7 @@ class TemperatureControlledCabinetTopologyCluster(
 
     object SubscriptionEstablished : GeneratedCommandListAttributeSubscriptionState()
   }
-  
+
   class AcceptedCommandListAttribute(val value: List<UInt>)
 
   sealed class AcceptedCommandListAttributeSubscriptionState {
@@ -68,7 +68,7 @@ class TemperatureControlledCabinetTopologyCluster(
 
     object SubscriptionEstablished : AcceptedCommandListAttributeSubscriptionState()
   }
-  
+
   class AttributeListAttribute(val value: List<UInt>)
 
   sealed class AttributeListAttributeSubscriptionState {
@@ -78,7 +78,7 @@ class TemperatureControlledCabinetTopologyCluster(
 
     object SubscriptionEstablished : AttributeListAttributeSubscriptionState()
   }
-  
+
   suspend fun readDisabledCabinetsAttribute(): DisabledCabinetsAttribute {
     val ATTRIBUTE_ID: UInt = 0u
 
@@ -86,7 +86,7 @@ class TemperatureControlledCabinetTopologyCluster(
       AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
 
     val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-    
+
     val response = controller.read(readRequest)
 
     if (response.successes.isEmpty()) {
@@ -108,7 +108,7 @@ class TemperatureControlledCabinetTopologyCluster(
     val decodedValue: List<UShort> =
       buildList<UShort> {
         tlvReader.enterArray(AnonymousTag)
-        while(!tlvReader.isEndOfContainer()) {
+        while (!tlvReader.isEndOfContainer()) {
           add(tlvReader.getUShort(AnonymousTag))
         }
         tlvReader.exitContainer()
@@ -129,9 +129,9 @@ class TemperatureControlledCabinetTopologyCluster(
 
     val subscribeRequest: SubscribeRequest =
       SubscribeRequest(
-        eventPaths = emptyList(), 
-        attributePaths = attributePaths, 
-        minInterval = Duration.ofSeconds(minInterval.toLong()), 
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
         maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
@@ -161,7 +161,7 @@ class TemperatureControlledCabinetTopologyCluster(
           val decodedValue: List<UShort> =
             buildList<UShort> {
               tlvReader.enterArray(AnonymousTag)
-              while(!tlvReader.isEndOfContainer()) {
+              while (!tlvReader.isEndOfContainer()) {
                 add(tlvReader.getUShort(AnonymousTag))
               }
               tlvReader.exitContainer()
@@ -183,7 +183,7 @@ class TemperatureControlledCabinetTopologyCluster(
       AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
 
     val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-    
+
     val response = controller.read(readRequest)
 
     if (response.successes.isEmpty()) {
@@ -219,9 +219,9 @@ class TemperatureControlledCabinetTopologyCluster(
 
     val subscribeRequest: SubscribeRequest =
       SubscribeRequest(
-        eventPaths = emptyList(), 
-        attributePaths = attributePaths, 
-        minInterval = Duration.ofSeconds(minInterval.toLong()), 
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
         maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
@@ -240,8 +240,8 @@ class TemperatureControlledCabinetTopologyCluster(
           val attributeData =
             subscriptionState.updateState.successes
               .filterIsInstance<ReadData.Attribute>()
-              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }        
-             
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }  
+
           requireNotNull(attributeData) { "Topology attribute not found in Node State update" }
 
           // Decode the TLV data into the appropriate type
@@ -284,13 +284,13 @@ class TemperatureControlledCabinetTopologyCluster(
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
     val decodedValue: List<UInt>
-      buildList<UInt> {
-        tlvReader.enterArray(AnonymousTag)
-        while(!tlvReader.isEndOfContainer()) {
-          add(tlvReader.getUInt(AnonymousTag))
-        }
-        tlvReader.exitContainer()
+    buildList<UInt> {
+      tlvReader.enterArray(AnonymousTag)
+      while(!tlvReader.isEndOfContainer()) {
+        add(tlvReader.getUInt(AnonymousTag))
       }
+      tlvReader.exitContainer()
+    }
 
     return GeneratedCommandListAttribute(decodedValue)
   }
@@ -307,9 +307,9 @@ class TemperatureControlledCabinetTopologyCluster(
 
     val subscribeRequest: SubscribeRequest =
       SubscribeRequest(
-        eventPaths = emptyList(), 
-        attributePaths = attributePaths, 
-        minInterval = Duration.ofSeconds(minInterval.toLong()), 
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
         maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
@@ -337,7 +337,7 @@ class TemperatureControlledCabinetTopologyCluster(
           val decodedValue: List<UInt> =
             buildList<UInt> {
               tlvReader.enterArray(AnonymousTag)
-              while(!tlvReader.isEndOfContainer()) {
+              while (!tlvReader.isEndOfContainer()) {
                 add(tlvReader.getUInt(AnonymousTag))
               }
               tlvReader.exitContainer()
@@ -381,7 +381,7 @@ class TemperatureControlledCabinetTopologyCluster(
     val decodedValue: List<UInt> =
       buildList<UInt> {
         tlvReader.enterArray(AnonymousTag)
-        while(!tlvReader.isEndOfContainer()) {
+        while (!tlvReader.isEndOfContainer()) {
           add(tlvReader.getUInt(AnonymousTag))
         }
         tlvReader.exitContainer()
@@ -395,9 +395,10 @@ class TemperatureControlledCabinetTopologyCluster(
     maxInterval: Int
   ): Flow<AcceptedCommandListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65529u
-    val attributePaths = listOf(
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-    )
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
 
     val subscribeRequest: SubscribeRequest =
       SubscribeRequest(
@@ -422,16 +423,18 @@ class TemperatureControlledCabinetTopologyCluster(
           val attributeData =
             subscriptionState.updateState.successes
               .filterIsInstance<ReadData.Attribute>()
-              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }      
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID } 
 
-          requireNotNull(attributeData) { "Acceptedcommandlist attribute not found in Node State update" }
+          requireNotNull(attributeData) { 
+            "Acceptedcommandlist attribute not found in Node State update"
+          }
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
           val decodedValue: List<UInt> =
             buildList<UInt> {
               tlvReader.enterArray(AnonymousTag)
-              while(!tlvReader.isEndOfContainer()) {
+              while (!tlvReader.isEndOfContainer()) {
                 add(tlvReader.getUInt(AnonymousTag))
               }
               tlvReader.exitContainer()
@@ -445,12 +448,12 @@ class TemperatureControlledCabinetTopologyCluster(
       }
     }
   }
-  
+
   suspend fun readAttributeListAttribute(): AttributeListAttribute {
     val ATTRIBUTE_ID: UInt = 65531u
 
     val attributePath =
-    AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
 
     val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
 
@@ -475,7 +478,7 @@ class TemperatureControlledCabinetTopologyCluster(
     val decodedValue: List<UInt> =
       buildList<UInt> {
         tlvReader.enterArray(AnonymousTag)
-        while(!tlvReader.isEndOfContainer()) {
+        while (!tlvReader.isEndOfContainer()) {
           add(tlvReader.getUInt(AnonymousTag))
         }
         tlvReader.exitContainer()
@@ -496,9 +499,9 @@ class TemperatureControlledCabinetTopologyCluster(
 
     val subscribeRequest: SubscribeRequest =
       SubscribeRequest(
-        eventPaths = emptyList(), 
-        attributePaths = attributePaths, 
-        minInterval = Duration.ofSeconds(minInterval.toLong()), 
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
         maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
@@ -517,7 +520,7 @@ class TemperatureControlledCabinetTopologyCluster(
           val attributeData =
             subscriptionState.updateState.successes
               .filterIsInstance<ReadData.Attribute>()
-              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }        
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
 
           requireNotNull(attributeData) { "Attributelist attribute not found in Node State update" }
 
@@ -526,7 +529,7 @@ class TemperatureControlledCabinetTopologyCluster(
           val decodedValue: List<UInt> =
             buildList<UInt> {
               tlvReader.enterArray(AnonymousTag)
-              while(!tlvReader.isEndOfContainer()) {
+              while (!tlvReader.isEndOfContainer()) {
                 add(tlvReader.getUInt(AnonymousTag))
               }
               tlvReader.exitContainer()
@@ -577,15 +580,16 @@ class TemperatureControlledCabinetTopologyCluster(
     maxInterval: Int
   ): Flow<UIntSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65532u
-    val attributePaths = listOf(
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-    )
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
 
     val subscribeRequest: SubscribeRequest =
       SubscribeRequest(
-        eventPaths = emptyList(), 
-        attributePaths = attributePaths, 
-        minInterval = Duration.ofSeconds(minInterval.toLong()), 
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
         maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
@@ -684,9 +688,11 @@ class TemperatureControlledCabinetTopologyCluster(
           val attributeData =
             subscriptionState.updateState.successes
               .filterIsInstance<ReadData.Attribute>()
-              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }        
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
 
-          requireNotNull(attributeData) { "Clusterrevision attribute not found in Node State update" }
+          requireNotNull(attributeData) { 
+            "Clusterrevision attribute not found in Node State update"
+          }
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
