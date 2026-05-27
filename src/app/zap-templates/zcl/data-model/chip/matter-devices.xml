@@ -1063,12 +1063,6 @@ limitations under the License.
             </include>
             <include cluster="Identify" client="false" server="false" clientLocked="true"
                 serverLocked="false"></include>
-            <include cluster="Power Source" client="false" server="true" clientLocked="true"
-                serverLocked="true"></include>
-            <include cluster="TLS Certificate Management" client="false" server="true"
-                clientLocked="true" serverLocked="true"></include>
-            <include cluster="Time Synchronization" client="false" server="true" clientLocked="true"
-                serverLocked="true"></include>
             <include cluster="WebRTC Transport Provider" client="true" server="true"
                 clientLocked="true" serverLocked="true"></include>
             <include cluster="WebRTC Transport Requestor" client="true" server="true"
@@ -1099,16 +1093,8 @@ limitations under the License.
             </include>
             <include cluster="Identify" client="false" server="false" clientLocked="true"
                 serverLocked="false"></include>
-            <include cluster="Power Source" client="false" server="true" clientLocked="true"
-                serverLocked="true"></include>
             <include cluster="Push AV Stream Transport" client="false" server="false"
                 clientLocked="true" serverLocked="false"></include>
-            <include cluster="TLS Certificate Management" client="false" server="true"
-                clientLocked="true" serverLocked="true"></include>
-            <include cluster="TLS Client Management" client="false" server="false"
-                clientLocked="true" serverLocked="false"></include>
-            <include cluster="Time Synchronization" client="false" server="true" clientLocked="true"
-                serverLocked="true"></include>
             <include cluster="WebRTC Transport Provider" client="false" server="true"
                 clientLocked="false" serverLocked="true"></include>
             <include cluster="WebRTC Transport Requestor" client="true" server="false"
@@ -1129,8 +1115,6 @@ limitations under the License.
             <endpoint conformance="O">
                 <deviceType id="0x0107" name="Occupancy Sensor">
                     <clusters>
-                        <include cluster="Boolean State Configuration" client="false" server="false"
-                            clientLocked="true" serverLocked="false"></include>
                         <include cluster="Identify" client="false" server="true" clientLocked="true"
                             serverLocked="true"></include>
                         <include cluster="Occupancy Sensing" client="false" server="true"
@@ -1154,16 +1138,8 @@ limitations under the License.
                 serverLocked="false"></include>
             <include cluster="Occupancy Sensing" client="false" server="false" clientLocked="true"
                 serverLocked="false"></include>
-            <include cluster="Power Source" client="false" server="true" clientLocked="true"
-                serverLocked="true"></include>
             <include cluster="Push AV Stream Transport" client="false" server="false"
                 clientLocked="true" serverLocked="false"></include>
-            <include cluster="TLS Certificate Management" client="false" server="true"
-                clientLocked="true" serverLocked="true"></include>
-            <include cluster="TLS Client Management" client="false" server="false"
-                clientLocked="true" serverLocked="false"></include>
-            <include cluster="Time Synchronization" client="false" server="true" clientLocked="true"
-                serverLocked="true"></include>
             <include cluster="WebRTC Transport Provider" client="false" server="true"
                 clientLocked="false" serverLocked="true"></include>
             <include cluster="WebRTC Transport Requestor" client="true" server="false"
@@ -1212,18 +1188,8 @@ limitations under the License.
                         </include>
                         <include cluster="Identify" client="false" server="false"
                             clientLocked="true" serverLocked="false"></include>
-                        <include cluster="Occupancy Sensing" client="false" server="false"
-                            clientLocked="true" serverLocked="false"></include>
-                        <include cluster="Power Source" client="false" server="true"
-                            clientLocked="true" serverLocked="true"></include>
                         <include cluster="Push AV Stream Transport" client="false" server="false"
                             clientLocked="true" serverLocked="false"></include>
-                        <include cluster="TLS Certificate Management" client="false" server="true"
-                            clientLocked="true" serverLocked="true"></include>
-                        <include cluster="TLS Client Management" client="false" server="false"
-                            clientLocked="true" serverLocked="false"></include>
-                        <include cluster="Time Synchronization" client="false" server="true"
-                            clientLocked="true" serverLocked="true"></include>
                         <include cluster="WebRTC Transport Provider" client="false" server="true"
                             clientLocked="false" serverLocked="true"></include>
                         <include cluster="WebRTC Transport Requestor" client="true" server="false"
@@ -1295,16 +1261,8 @@ limitations under the License.
                             clientLocked="true" serverLocked="false"></include>
                         <include cluster="Occupancy Sensing" client="false" server="false"
                             clientLocked="true" serverLocked="false"></include>
-                        <include cluster="Power Source" client="false" server="true"
-                            clientLocked="true" serverLocked="true"></include>
                         <include cluster="Push AV Stream Transport" client="false" server="false"
                             clientLocked="true" serverLocked="false"></include>
-                        <include cluster="TLS Certificate Management" client="false" server="true"
-                            clientLocked="true" serverLocked="true"></include>
-                        <include cluster="TLS Client Management" client="false" server="false"
-                            clientLocked="true" serverLocked="false"></include>
-                        <include cluster="Time Synchronization" client="false" server="true"
-                            clientLocked="true" serverLocked="true"></include>
                         <include cluster="WebRTC Transport Provider" client="false" server="true"
                             clientLocked="false" serverLocked="true"></include>
                         <include cluster="WebRTC Transport Requestor" client="true" server="false"
@@ -1359,10 +1317,6 @@ limitations under the License.
                 serverLocked="false"></include>
             <include cluster="Occupancy Sensing" client="false" server="false" clientLocked="true"
                 serverLocked="false"></include>
-            <include cluster="Power Source" client="false" server="true" clientLocked="true"
-                serverLocked="true"></include>
-            <include cluster="Time Synchronization" client="false" server="false"
-                clientLocked="true" serverLocked="false"></include>
             <include cluster="Zone Management" client="false" server="false" clientLocked="true"
                 serverLocked="false"></include>
         </clusters>
@@ -1408,8 +1362,6 @@ limitations under the License.
             <include cluster="TLS Certificate Management" client="false" server="false"
                 clientLocked="false" serverLocked="true"></include>
             <include cluster="TLS Client Management" client="false" server="false"
-                clientLocked="false" serverLocked="true"></include>
-            <include cluster="Time Synchronization" client="false" server="false"
                 clientLocked="false" serverLocked="true"></include>
             <include cluster="WebRTC Transport Provider" client="true" server="false"
                 clientLocked="true" serverLocked="true"></include>
@@ -1838,8 +1790,6 @@ limitations under the License.
         <clusters>
             <include cluster="Meter Identification" client="false" server="true" clientLocked="true"
                 serverLocked="true"></include>
-            <include cluster="Time Synchronization" client="false" server="true" clientLocked="true"
-                serverLocked="true"></include>
         </clusters>
     </deviceType>
     <deviceType>
@@ -1855,8 +1805,6 @@ limitations under the License.
             <include cluster="Descriptor" client="false" server="true" clientLocked="true"
                 serverLocked="true"></include>
             <include cluster="Identify" client="false" server="true" clientLocked="true"
-                serverLocked="true"></include>
-            <include cluster="Time Synchronization" client="false" server="true" clientLocked="true"
                 serverLocked="true"></include>
         </clusters>
     </deviceType>
@@ -2168,8 +2116,6 @@ limitations under the License.
                 serverLocked="false">
                 <requireAttribute>BINDING</requireAttribute>
             </include>
-            <include cluster="Groups" client="false" server="false" clientLocked="false"
-                serverLocked="true"></include>
             <include cluster="Illuminance Measurement" client="false" server="true"
                 clientLocked="true" serverLocked="true">
                 <requireAttribute>ILLUM_MEASURED_VALUE</requireAttribute>
@@ -2207,8 +2153,6 @@ limitations under the License.
                 serverLocked="false">
                 <requireAttribute>BINDING</requireAttribute>
             </include>
-            <include cluster="Groups" client="false" server="false" clientLocked="false"
-                serverLocked="true"></include>
             <include cluster="Occupancy Sensing" client="false" server="true" clientLocked="true"
                 serverLocked="true">
                 <requireAttribute>OCCUPANCY</requireAttribute>
@@ -2554,27 +2498,6 @@ limitations under the License.
                 serverLocked="false">
                 <requireAttribute>BINDING</requireAttribute>
             </include>
-            <include cluster="Scenes Management" client="false" server="false" clientLocked="true"
-                serverLocked="false">
-                <requireAttribute>SCENE_COUNT</requireAttribute>
-                <requireAttribute>CURRENT_SCENE</requireAttribute>
-                <requireAttribute>CURRENT_GROUP</requireAttribute>
-                <requireAttribute>SCENE_VALID</requireAttribute>
-                <requireAttribute>SCENE_NAME_SUPPORT</requireAttribute>
-                <requireCommand>AddScene</requireCommand>
-                <requireCommand>AddSceneResponse</requireCommand>
-                <requireCommand>ViewScene</requireCommand>
-                <requireCommand>ViewSceneResponse</requireCommand>
-                <requireCommand>RemoveScene</requireCommand>
-                <requireCommand>RemoveSceneResponse</requireCommand>
-                <requireCommand>RemoveAllScenes</requireCommand>
-                <requireCommand>RemoveAllScenesResponse</requireCommand>
-                <requireCommand>StoreScene</requireCommand>
-                <requireCommand>StoreSceneResponse</requireCommand>
-                <requireCommand>RecallScene</requireCommand>
-                <requireCommand>GetSceneMembership</requireCommand>
-                <requireCommand>GetSceneMembershipResponse</requireCommand>
-            </include>
             <include cluster="Groups" client="false" server="false" clientLocked="true"
                 serverLocked="false">
                 <requireAttribute>GROUP_NAME_SUPPORT</requireAttribute>
@@ -2591,8 +2514,6 @@ limitations under the License.
             </include>
             <include cluster="Thermostat" client="false" server="true" clientLocked="true"
                 serverLocked="true"></include>
-            <include cluster="Time Synchronization" client="false" server="false"
-                clientLocked="false" serverLocked="false"></include>
             <include cluster="Thermostat User Interface Configuration" client="false" server="false"
                 clientLocked="true" serverLocked="false"></include>
             <include cluster="Fan Control" client="false" server="false" clientLocked="false"
@@ -2686,7 +2607,7 @@ limitations under the License.
                 serverLocked="false"></include>
             <include cluster="Low Power" client="false" server="true" clientLocked="false"
                 serverLocked="false"></include>
-            <include cluster="Wake on LAN" client="false" server="true" clientLocked="false"
+            <include cluster="Wake On LAN" client="false" server="true" clientLocked="false"
                 serverLocked="false"></include>
             <include cluster="Target Navigator" client="false" server="true" clientLocked="false"
                 serverLocked="false"></include>
@@ -2727,7 +2648,7 @@ limitations under the License.
                 serverLocked="false"></include>
             <include cluster="Low Power" client="false" server="true" clientLocked="false"
                 serverLocked="false"></include>
-            <include cluster="Wake on LAN" client="false" server="true" clientLocked="false"
+            <include cluster="Wake On LAN" client="false" server="true" clientLocked="false"
                 serverLocked="false"></include>
             <include cluster="Target Navigator" client="false" server="true" clientLocked="false"
                 serverLocked="false"></include>
@@ -2766,7 +2687,7 @@ limitations under the License.
                 serverLocked="false"></include>
             <include cluster="Level Control" client="true" server="false" clientLocked="false"
                 serverLocked="false"></include>
-            <include cluster="Wake on LAN" client="true" server="false" clientLocked="false"
+            <include cluster="Wake On LAN" client="true" server="false" clientLocked="false"
                 serverLocked="false"></include>
             <include cluster="Channel" client="true" server="false" clientLocked="false"
                 serverLocked="false"></include>
@@ -2817,7 +2738,7 @@ limitations under the License.
                 serverLocked="false"></include>
             <include cluster="Level Control" client="true" server="false" clientLocked="false"
                 serverLocked="false"></include>
-            <include cluster="Wake on LAN" client="true" server="false" clientLocked="false"
+            <include cluster="Wake On LAN" client="true" server="false" clientLocked="false"
                 serverLocked="false"></include>
             <include cluster="Channel" client="true" server="false" clientLocked="false"
                 serverLocked="false"></include>
@@ -2843,14 +2764,6 @@ limitations under the License.
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
-            <include cluster="Identify" client="false" server="true" clientLocked="true"
-                serverLocked="true">
-                <requireAttribute>IDENTIFY_TIME</requireAttribute>
-                <requireAttribute>IDENTIFY_TYPE</requireAttribute>
-                <requireCommand>Identify</requireCommand>
-                <requireCommand>IdentifyQuery</requireCommand>
-                <requireCommand>TriggerEffect</requireCommand>
-            </include>
             <include cluster="Descriptor" client="false" server="true" clientLocked="true"
                 serverLocked="true">
                 <requireAttribute>DEVICE_TYPE_LIST</requireAttribute>
@@ -2874,14 +2787,6 @@ limitations under the License.
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
-            <include cluster="Identify" client="false" server="true" clientLocked="true"
-                serverLocked="true">
-                <requireAttribute>IDENTIFY_TIME</requireAttribute>
-                <requireAttribute>IDENTIFY_TYPE</requireAttribute>
-                <requireCommand>Identify</requireCommand>
-                <requireCommand>IdentifyQuery</requireCommand>
-                <requireCommand>TriggerEffect</requireCommand>
-            </include>
             <include cluster="Descriptor" client="false" server="true" clientLocked="true"
                 serverLocked="true">
                 <requireAttribute>DEVICE_TYPE_LIST</requireAttribute>
@@ -2923,14 +2828,6 @@ limitations under the License.
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
-            <include cluster="Identify" client="false" server="true" clientLocked="true"
-                serverLocked="true">
-                <requireAttribute>IDENTIFY_TIME</requireAttribute>
-                <requireAttribute>IDENTIFY_TYPE</requireAttribute>
-                <requireCommand>Identify</requireCommand>
-                <requireCommand>IdentifyQuery</requireCommand>
-                <requireCommand>TriggerEffect</requireCommand>
-            </include>
             <include cluster="Descriptor" client="false" server="true" clientLocked="true"
                 serverLocked="true">
                 <requireAttribute>DEVICE_TYPE_LIST</requireAttribute>
@@ -3014,8 +2911,6 @@ limitations under the License.
                 clientLocked="true" serverLocked="false"></include>
             <include cluster="Carbon Monoxide Concentration Measurement" client="false"
                 server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Power Source" client="false" server="true" clientLocked="true"
-                serverLocked="true"></include>
             <include cluster="Descriptor" client="false" server="true" clientLocked="true"
                 serverLocked="true"></include>
         </clusters>
