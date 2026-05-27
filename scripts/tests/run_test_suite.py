@@ -563,8 +563,7 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int, app_path: li
                         ble_controller_app = 0   # Bind app to the first BLE controller
                         ble_controller_tool = 1  # Bind tool to the second BLE controller
                     case CommissioningMethod.THREAD_MESHCOP:
-                        tbr: chiptest.linux.ThreadBorderRouter = stack.enter_context(
-                            chiptest.linux.ThreadBorderRouter(TEST_THREAD_DATASET, ns))
+                        stack.enter_context(tbr := chiptest.linux.ThreadBorderRouter(TEST_THREAD_DATASET, ns))
                         thread_ba_host = tbr.get_border_agent_host()
                         thread_ba_port = tbr.get_border_agent_port()
                     case CommissioningMethod.WIFIPAF_WIFI:
