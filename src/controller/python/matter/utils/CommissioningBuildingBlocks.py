@@ -106,7 +106,7 @@ async def GrantPrivilege(adminCtrl: ChipDeviceController, grantedCtrl: ChipDevic
     # Step 4: Prune ACLs which have empty subjects.
     currentAcls = [acl for acl in currentAcls if acl.subjects != NullValue and len(acl.subjects) != 0]
 
-    LOGGER.info(f'GrantPrivilege: Writing acls: {currentAcls}')
+    LOGGER.info('GrantPrivilege: Writing acls: %s', currentAcls)
     await adminCtrl.WriteAttribute(targetNodeId, [(0, Clusters.AccessControl.Attributes.Acl(currentAcls))])
 
 
@@ -170,7 +170,7 @@ async def AddNOCForNewFabricFromExisting(commissionerDevCtrl, newFabricDevCtrl, 
     if (chainForAddNOC.rcacBytes is None or
             chainForAddNOC.nocBytes is None or chainForAddNOC.ipkBytes is None):
         # Expiring the failsafe timer in an attempt to clean up.
-        LOGGER.error(f"INTERNAL ERROR: Got invalid cert chain from issuer! Chain: {chainForAddNOC}. Disarming fail-safe!")
+        LOGGER.error("INTERNAL ERROR: Got invalid cert chain from issuer! Chain: %s. Disarming fail-safe!", chainForAddNOC)
         await commissionerDevCtrl.SendCommand(existingNodeId, 0, generalCommissioning.Commands.ArmFailSafe(0))
         return False, nocResp, None
 
@@ -235,7 +235,7 @@ async def UpdateNOC(devCtrl, existingNodeId, newNodeId, omitCommissioningComplet
     chainForUpdateNOC = await devCtrl.IssueNOCChain(csrForUpdateNOC, newNodeId)
     if (chainForUpdateNOC.rcacBytes is None or
             chainForUpdateNOC.nocBytes is None or chainForUpdateNOC.ipkBytes is None):
-        LOGGER.error(f"INTERNAL ERROR: Got invalid cert chain from issuer! Chain: {chainForUpdateNOC}. Disarming fail-safe!")
+        LOGGER.error("INTERNAL ERROR: Got invalid cert chain from issuer! Chain: %s. Disarming fail-safe!", chainForUpdateNOC)
         await devCtrl.SendCommand(existingNodeId, 0, generalCommissioning.Commands.ArmFailSafe(0))
         return False
 

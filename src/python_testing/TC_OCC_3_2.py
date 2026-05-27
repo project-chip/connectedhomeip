@@ -125,10 +125,10 @@ class TC_OCC_3_2(MatterBaseTest):
         has_pir_timing_attrib = attributes.PIROccupiedToUnoccupiedDelay.attribute_id in attribute_list
         has_ultrasonic_timing_attrib = attributes.UltrasonicOccupiedToUnoccupiedDelay.attribute_id in attribute_list
         has_contact_timing_attrib = attributes.PhysicalContactOccupiedToUnoccupiedDelay.attribute_id in attribute_list
-        log.info(f"Attribute list: {attribute_list}")
-        log.info(f"--> Has PIROccupiedToUnoccupiedDelay: {has_pir_timing_attrib}")
-        log.info(f"--> Has UltrasonicOccupiedToUnoccupiedDelay: {has_ultrasonic_timing_attrib}")
-        log.info(f"--> Has PhysicalContactOccupiedToUnoccupiedDelay: {has_contact_timing_attrib}")
+        log.info("Attribute list: %s", attribute_list)
+        log.info("--> Has PIROccupiedToUnoccupiedDelay: %s", has_pir_timing_attrib)
+        log.info("--> Has UltrasonicOccupiedToUnoccupiedDelay: %s", has_ultrasonic_timing_attrib)
+        log.info("--> Has PhysicalContactOccupiedToUnoccupiedDelay: %s", has_contact_timing_attrib)
 
         # min interval = 0, and max interval = 30 seconds
         attrib_listener = AttributeSubscriptionHandler(expected_cluster=Clusters.Objects.OccupancySensing)

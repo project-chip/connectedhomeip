@@ -215,7 +215,7 @@ class DclCheck(BasicCompositionTests):
             if key in entry and entry[key][sub_key] == software_version:
                 found_versions.append(software_version)
                 log.info(
-                    f'Found compliance info for {vid_pid_sv_str} in the DCL:')
+                    'Found compliance info for %s in the DCL:', vid_pid_sv_str)
                 log.info(f'{entry[key]}')
                 certified_model_entry = requests.get(
                     f"{self.url}/dcl/compliance/certified-models/{self.vid}/{self.pid}/{software_version}/matter").json()
@@ -244,7 +244,7 @@ class DclCheck(BasicCompositionTests):
             if key in entry and entry[key][sub_key] == software_version:
                 is_found = True
                 log.info(
-                    f'Found certified model for {vid_pid_sv_str} in the DCL:')
+                    'Found certified model for %s in the DCL:', vid_pid_sv_str)
                 log.info(f'{entry[key]}')
                 break
         asserts.assert_true(is_found,

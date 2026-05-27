@@ -35,7 +35,7 @@ class WEBRTCPTestBase:
 
         # First verify that ADO is supported
         aFeatureMap = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.FeatureMap)
-        log.info(f"Rx'd FeatureMap: {aFeatureMap}")
+        log.info("Rx'd FeatureMap: %s", aFeatureMap)
         adoSupport = aFeatureMap & cluster.Bitmaps.Feature.kAudio
         asserts.assert_equal(adoSupport, cluster.Bitmaps.Feature.kAudio, "Audio Feature is not supported.")
 
@@ -43,7 +43,7 @@ class WEBRTCPTestBase:
         aAllocatedAudioStreams = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedAudioStreams
         )
-        log.info(f"Rx'd AllocatedAudioStreams: {aAllocatedAudioStreams}")
+        log.info("Rx'd AllocatedAudioStreams: %s", aAllocatedAudioStreams)
         if len(aAllocatedAudioStreams) > 0:
             return aAllocatedAudioStreams[0].audioStreamID
 
@@ -51,11 +51,11 @@ class WEBRTCPTestBase:
         aMicrophoneCapabilities = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.MicrophoneCapabilities
         )
-        log.info(f"Rx'd MicrophoneCapabilities: {aMicrophoneCapabilities}")
+        log.info("Rx'd MicrophoneCapabilities: %s", aMicrophoneCapabilities)
         aStreamUsagePriorities = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.StreamUsagePriorities
         )
-        log.info(f"Rx'd StreamUsagePriorities : {aStreamUsagePriorities}")
+        log.info("Rx'd StreamUsagePriorities : %s", aStreamUsagePriorities)
         asserts.assert_greater(len(aStreamUsagePriorities), 0, "StreamUsagePriorities is empty")
 
         if (Globals.Enums.StreamUsageEnum.kLiveView not in aStreamUsagePriorities):
@@ -71,7 +71,7 @@ class WEBRTCPTestBase:
                 bitDepth=aMicrophoneCapabilities.supportedBitDepths[0],
             )
             audioStreamAllocateResponse = await self.send_single_cmd(endpoint=endpoint, cmd=adoStreamAllocateCmd)
-            log.info(f"Rx'd AudioStreamAllocateResponse: {audioStreamAllocateResponse}")
+            log.info("Rx'd AudioStreamAllocateResponse: %s", audioStreamAllocateResponse)
             asserts.assert_is_not_none(
                 audioStreamAllocateResponse.audioStreamID, "AudioStreamAllocateResponse does not contain StreamID"
             )
@@ -89,7 +89,7 @@ class WEBRTCPTestBase:
 
         # First verify that VDO is supported
         aFeatureMap = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.FeatureMap)
-        log.info(f"Rx'd FeatureMap: {aFeatureMap}")
+        log.info("Rx'd FeatureMap: %s", aFeatureMap)
         vdoSupport = aFeatureMap & cluster.Bitmaps.Feature.kVideo
         asserts.assert_equal(vdoSupport, cluster.Bitmaps.Feature.kVideo, "Video Feature is not supported.")
 
@@ -97,7 +97,7 @@ class WEBRTCPTestBase:
         aAllocatedVideoStreams = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedVideoStreams
         )
-        log.info(f"Rx'd AllocatedVideoStreams: {aAllocatedVideoStreams}")
+        log.info("Rx'd AllocatedVideoStreams: %s", aAllocatedVideoStreams)
         if len(aAllocatedVideoStreams) > 0:
             return aAllocatedVideoStreams[0].videoStreamID
 
@@ -105,7 +105,7 @@ class WEBRTCPTestBase:
         aStreamUsagePriorities = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.StreamUsagePriorities
         )
-        log.info(f"Rx'd StreamUsagePriorities: {aStreamUsagePriorities}")
+        log.info("Rx'd StreamUsagePriorities: %s", aStreamUsagePriorities)
         asserts.assert_greater(len(aStreamUsagePriorities), 0, "StreamUsagePriorities is empty")
 
         if (Globals.Enums.StreamUsageEnum.kLiveView not in aStreamUsagePriorities):
@@ -114,19 +114,19 @@ class WEBRTCPTestBase:
         aRateDistortionTradeOffPoints = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.RateDistortionTradeOffPoints
         )
-        log.info(f"Rx'd RateDistortionTradeOffPoints: {aRateDistortionTradeOffPoints}")
+        log.info("Rx'd RateDistortionTradeOffPoints: %s", aRateDistortionTradeOffPoints)
         aMinViewportRes = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.MinViewportResolution
         )
-        log.info(f"Rx'd MinViewportResolution: {aMinViewportRes}")
+        log.info("Rx'd MinViewportResolution: %s", aMinViewportRes)
         aVideoSensorParams = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.VideoSensorParams
         )
-        log.info(f"Rx'd VideoSensorParams: {aVideoSensorParams}")
+        log.info("Rx'd VideoSensorParams: %s", aVideoSensorParams)
         aMaxEncodedPixelRate = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.MaxEncodedPixelRate
         )
-        log.info(f"Rx'd MaxEncodedPixelRate: {aMaxEncodedPixelRate}")
+        log.info("Rx'd MaxEncodedPixelRate: %s", aMaxEncodedPixelRate)
 
         # Check for Watermark and OSD features
         watermark = True if (aFeatureMap & cluster.Bitmaps.Feature.kWatermark) != 0 else None
@@ -151,7 +151,7 @@ class WEBRTCPTestBase:
                 OSDEnabled=osd
             )
             videoStreamAllocateResponse = await self.send_single_cmd(endpoint=endpoint, cmd=videoStreamAllocateCmd)
-            log.info(f"Rx'd VideoStreamAllocateResponse: {videoStreamAllocateResponse}")
+            log.info("Rx'd VideoStreamAllocateResponse: %s", videoStreamAllocateResponse)
             asserts.assert_is_not_none(
                 videoStreamAllocateResponse.videoStreamID, "VideoStreamAllocateResponse does not contain StreamID"
             )

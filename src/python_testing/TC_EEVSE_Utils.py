@@ -295,7 +295,7 @@ class EEVSEBaseTestHelper:
                              f"Fault event faultStateCurrentState was {event_data.faultStateCurrentState}, expected {current_fault}")
 
     def log_get_targets_response(self, get_targets_response):
-        log.info(f" Rx'd: {get_targets_response}")
+        log.info(" Rx'd: %s", get_targets_response)
         for index, entry in enumerate(get_targets_response.chargingTargetSchedules):
             log.info(
                 f"   [{index}] DayOfWeekForSequence: {entry.dayOfWeekForSequence:02x}")

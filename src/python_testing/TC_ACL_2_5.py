@@ -124,7 +124,7 @@ class TC_ACL_2_5(MatterBaseTest):
         direct_event = direct_events[0]
 
         # Verify both methods return the same event data
-        log.info(f"Comparing subscription event: {subscription_event} with direct event: {direct_event}")
+        log.info("Comparing subscription event: %s with direct event: %s", subscription_event, direct_event)
         asserts.assert_equal(subscription_event, direct_event.Data, "Subscription event should be in direct event")
 
         asserts.assert_equal(subscription_event.changeType,
@@ -164,7 +164,7 @@ class TC_ACL_2_5(MatterBaseTest):
             [(0, extension_attr(value=extensions_list))],
             forceLegacyListEncoding=force_legacy_encoding
         )
-        log.info(f"Write result: {result}")
+        log.info("Write result: %s", result)
         asserts.assert_equal(
             result[0].Status, Status.Success, "Write should have succeeded")
 

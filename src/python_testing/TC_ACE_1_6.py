@@ -175,7 +175,7 @@ class TC_ACE_1_6(MatterBaseTest):
             asserts.assert_false(pixit_g_endpoint is None,
                                  "--endpoint <endpoint> with Groups cluster must be included on the command line.")
             asserts.assert_not_equal(pixit_g_endpoint, 0, "Not allowed to have groups clusters on endpoint 0.")
-            log.info(f"Endpoint value for PIXIT.G.ENDPOINT used for test steps with groups cluster: {pixit_g_endpoint}")
+            log.info("Endpoint value for PIXIT.G.ENDPOINT used for test steps with groups cluster: %s", pixit_g_endpoint)
         else:
             # Find "ep~1~" (not endpoint1) (non-root node endpoint) that will be used later. This is an endpoint that must have at least
             # one cluster with a command that has operate priviliege.
@@ -186,7 +186,7 @@ class TC_ACE_1_6(MatterBaseTest):
             operate_only_command = operate_only_command_list[0]
             ep1 = operate_only_command.endpoint_id
 
-            log.info(f"Endpoint value for ep~1~ used for test steps with groupcast cluster: {ep1}")
+            log.info("Endpoint value for ep~1~ used for test steps with groupcast cluster: %s", ep1)
             log.info(
                 f"Targeted cluster used for groupcast case is: {operate_only_command.cluster_object.__name__} ({operate_only_command.cluster_object.id})")
             log.info(

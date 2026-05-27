@@ -543,7 +543,7 @@ class IDMBaseTest(MatterBaseTest):
                 error=Status.UnsupportedCluster)
             asserts.assert_true(isinstance(result.Reason, InteractionModelError),
                                 msg=f"Unexpected success reading invalid cluster on endpoint {endpoint_id}")
-            log.info(f"Confirmed unsupported cluster {unsupported_cluster_id} returns error on endpoint {endpoint_id}")
+            log.info("Confirmed unsupported cluster %s returns error on endpoint %s", unsupported_cluster_id, endpoint_id)
 
     async def read_unsupported_attribute(self):
         """Attempt to read an unsupported attribute from a supported cluster on any endpoint.
@@ -565,7 +565,7 @@ class IDMBaseTest(MatterBaseTest):
                 if unsupported:
                     unsupported_attr = ClusterObjects.ALL_ATTRIBUTES[cluster_type.id][unsupported[0]]
                     log.info(
-                        f"Testing unsupported attribute: endpoint={endpoint_id}, cluster={cluster_type}, attribute={unsupported_attr}")
+                        "Testing unsupported attribute: endpoint=%s, cluster=%s, attribute=%s", endpoint_id, cluster_type, unsupported_attr)
                     # Only request this single attribute
                     result = await self.read_single_attribute_expect_error(
                         endpoint=endpoint_id,
@@ -575,7 +575,7 @@ class IDMBaseTest(MatterBaseTest):
                     )
                     asserts.assert_true(isinstance(result.Reason, InteractionModelError),
                                         msg="Unexpected success reading invalid attribute")
-                    log.info(f"Confirmed unsupported attribute {unsupported_attr} returns error on endpoint {endpoint_id}")
+                    log.info("Confirmed unsupported attribute %s returns error on endpoint %s", unsupported_attr, endpoint_id)
                     return
 
         # If we get here, we got problems as there should always be at least one unsupported attribute
@@ -609,7 +609,7 @@ class IDMBaseTest(MatterBaseTest):
                 asserts.assert_equal(first_attr_value, current_attr_value,
                                      f"Read {i} returned different value than first read")
 
-        log.info(f"Successfully completed {repeat_count} consistent reads of {attribute}")
+        log.info("Successfully completed %s consistent reads of %s", repeat_count, attribute)
         return results
 
     async def read_data_version_filter(self, endpoint, cluster, attribute, test_value=None):
@@ -703,7 +703,7 @@ class IDMBaseTest(MatterBaseTest):
             await self.default_controller.WriteAttribute(
                 self.dut_node_id,
                 [(endpoint, Clusters.AccessControl.Attributes.Acl(dut_acl))])
-            log.info(f"Granted TH2 View access to only cluster {cluster_id}")
+            log.info("Granted TH2 View access to only cluster %s", cluster_id)
 
             # Use TH2 to read ALL attributes from ALL clusters at the endpoint
             read_request = await TH2.Read(
@@ -742,7 +742,7 @@ class IDMBaseTest(MatterBaseTest):
                     [(endpoint, Clusters.AccessControl.Attributes.Acl(dut_acl_original))])
                 log.info("Restored original ACL")
             except Exception as e:
-                log.error(f"Failed to restore original ACL: {e}")
+                log.error("Failed to restore original ACL: %s", e)
 
             # Removes TH2 controller
             TH2.Shutdown()

@@ -135,7 +135,7 @@ class TC_FAN_3_2(MatterBaseTest):
 
         # Logging initial FanMode state
         init_fan_mode = "Off" if order == OrderEnum.Ascending else "High"
-        log.info(f"[FC] *** Initial FanMode: {init_fan_mode}")
+        log.info("[FC] *** Initial FanMode: %s", init_fan_mode)
 
         # Logging the scenario being tested
         log.info(
@@ -234,7 +234,7 @@ class TC_FAN_3_2(MatterBaseTest):
             if not invalid_in_state_occurred:
                 if write_status == Status.InvalidInState:
                     invalid_in_state_occurred = True
-                    log.info(f"[FC] InvalidInState occurred for SpeedSetting attribute write ({value_to_write})")
+                    log.info("[FC] InvalidInState occurred for SpeedSetting attribute write (%s)", value_to_write)
 
         # Log results of attribute reports per subscription
         self.log_results()

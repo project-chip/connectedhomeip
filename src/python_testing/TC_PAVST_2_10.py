@@ -133,7 +133,7 @@ class TC_PAVST_2_10(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         self.step(2)
         aSupportedFormats = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=pvcluster, attribute=pvattr.SupportedFormats)
-        log.info(f"aSupportedFormats={aSupportedFormats}")
+        log.info("aSupportedFormats=%s", aSupportedFormats)
 
         # Read allocated video streams (step 3)
         self.step(3)

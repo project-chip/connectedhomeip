@@ -94,7 +94,7 @@ class TC_CLCTRL_2_1(MatterBaseTest):
         # STEP 2: Read AttributeList attribute to determine supported attributes
         self.step(2)
         attribute_list: list[uint] = await self.read_closurecontrol_attribute_expect_success(endpoint=endpoint, attribute=attributes.AttributeList)
-        log.info(f"AttributeList: {attribute_list}")
+        log.info("AttributeList: %s", attribute_list)
 
         # STEP 3: Read FeatureMap attribute to determine supported features
         self.step(3)
@@ -105,7 +105,7 @@ class TC_CLCTRL_2_1(MatterBaseTest):
         is_speed_supported: bool = feature_map & Clusters.ClosureControl.Bitmaps.Feature.kSpeed
         is_instantaneous: bool = feature_map & Clusters.ClosureControl.Bitmaps.Feature.kInstantaneous
 
-        log.info(f"FeatureMap: {feature_map}")
+        log.info("FeatureMap: %s", feature_map)
         log.info(f"-> Positioning supported: \t\t {bool(is_positioning_supported)}")
         log.info(f"-> MotionLatching supported:\t {bool(is_latching_supported)}")
         log.info(f"-> Speed supported: \t\t {bool(is_speed_supported)}")
@@ -117,7 +117,7 @@ class TC_CLCTRL_2_1(MatterBaseTest):
                 is_positioning_supported and not is_instantaneous, "CountdownTime attribute should not be present if Positioning is not supported or Instantaneous is supported")
 
             countdown_time: typing.Union[None, Nullable, uint] = await self.read_closurecontrol_attribute_expect_success(endpoint=endpoint, attribute=attributes.CountdownTime)
-            log.info(f"CountdownTime: {countdown_time}")
+            log.info("CountdownTime: %s", countdown_time)
 
             if countdown_time is not NullValue:
                 asserts.assert_less_equal(countdown_time, 259200, "CountdownTime attribute is out of range")
@@ -136,7 +136,7 @@ class TC_CLCTRL_2_1(MatterBaseTest):
         # STEP 6: Read CurrentErrorList attribute
         self.step(6)
         current_error_list: list[Clusters.ClosureControl.Enums.ClosureErrorEnum] = await self.read_closurecontrol_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentErrorList)
-        log.info(f"CurrentErrorList: {current_error_list}")
+        log.info("CurrentErrorList: %s", current_error_list)
 
         asserts.assert_less_equal(len(current_error_list), 10, "CurrentErrorList length is out of range")
         asserts.assert_true(len(current_error_list) == len(set(current_error_list)), "CurrentErrorList contains duplicate values")
@@ -153,7 +153,7 @@ class TC_CLCTRL_2_1(MatterBaseTest):
         if overall_current_state is NullValue:
             log.info("OverallCurrentState is NULL, skipping field validations")
         else:
-            log.info(f"OverallCurrentState: {overall_current_state}")
+            log.info("OverallCurrentState: %s", overall_current_state)
 
             # Check Positioning feature in OverallCurrentState - PS feature (bit 0)
             if is_positioning_supported and overall_current_state.position is not NullValue:
@@ -195,7 +195,7 @@ class TC_CLCTRL_2_1(MatterBaseTest):
         if overall_target is NullValue:
             log.info("OverallTargetState is NULL, skipping field validations")
         else:
-            log.info(f"OverallTargetState: {overall_target}")
+            log.info("OverallTargetState: %s", overall_target)
 
             # Check Positioning feature in OverallTargetState
             if is_positioning_supported and overall_target.position is not NullValue:  # PS feature (bit 0)
@@ -228,7 +228,7 @@ class TC_CLCTRL_2_1(MatterBaseTest):
         self.step(9)
         if is_latching_supported:
             latch_control_modes: uint = await self.read_closurecontrol_attribute_expect_success(endpoint=endpoint, attribute=attributes.LatchControlModes)
-            log.info(f"LatchControlModes: {latch_control_modes}")
+            log.info("LatchControlModes: %s", latch_control_modes)
 
             asserts.assert_less_equal(latch_control_modes, 3, "LatchControlModes attribute is out of range")
             asserts.assert_greater_equal(latch_control_modes, 0, "LatchControlModes attribute is out of range")

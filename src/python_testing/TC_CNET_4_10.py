@@ -75,7 +75,7 @@ def parse_openthread_dataset_stream(dataset_hex: str) -> dict[str, str] | None:
             tlvs[key_name] = value_hex
 
         except (ValueError, IndexError) as e:
-            log.error(f"Error parsing OpenThread stream at index {i}: {e}")
+            log.error("Error parsing OpenThread stream at index %s: %s", i, e)
             return None
 
     return tlvs
@@ -176,7 +176,7 @@ class TC_CNET_4_10(MatterBaseTest):
 
         # Parse Extended PAN ID from the Thread operational dataset
         operational_dataset_hex = self.matter_test_config.thread_operational_dataset.hex()
-        log.info(f"Parsing Thread operational dataset: {operational_dataset_hex}")
+        log.info("Parsing Thread operational dataset: %s", operational_dataset_hex)
 
         parsed_dataset = parse_openthread_dataset_stream(operational_dataset_hex)
         asserts.assert_is_not_none(parsed_dataset, "Failed to parse Thread operational dataset")
@@ -194,11 +194,11 @@ class TC_CNET_4_10(MatterBaseTest):
         networks_dict = await self.read_single_attribute_all_endpoints(
             cluster=Clusters.NetworkCommissioning,
             attribute=Clusters.NetworkCommissioning.Attributes.Networks)
-        log.info(f"Networks by endpoint: {networks_dict}")
+        log.info("Networks by endpoint: %s", networks_dict)
         connected_network_count = {}
         for ep in networks_dict:
             connected_network_count[ep] = sum(x.connected for x in networks_dict[ep])
-        log.info(f"Connected networks count by endpoint: {connected_network_count}")
+        log.info("Connected networks count by endpoint: %s", connected_network_count)
         asserts.assert_equal(sum(connected_network_count.values()), 1,
                              "Verify that only one entry has connected status as TRUE across ALL endpoints")
 

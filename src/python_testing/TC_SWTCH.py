@@ -355,7 +355,7 @@ class TC_SwitchTests(MatterBaseTest):
             self._ask_for_switch_position(endpoint_id, expected_switch_position)
 
             data = event_listener.wait_for_event_report(cluster.Events.SwitchLatched, timeout_sec=post_prompt_settle_delay_seconds)
-            log.info(f"-> SwitchLatched event last received: {data}")
+            log.info("-> SwitchLatched event last received: %s", data)
             asserts.assert_equal(data, cluster.Events.SwitchLatched(
                 newPosition=expected_switch_position), "Did not get expected switch position")
 
@@ -364,7 +364,7 @@ class TC_SwitchTests(MatterBaseTest):
                 self.step(6)
             button_val = await self.read_single_attribute_check_success(cluster=cluster, attribute=cluster.Attributes.CurrentPosition)
             asserts.assert_equal(button_val, expected_switch_position, f"Switch position is not {expected_switch_position}")
-            log.info(f"Checking to see if a report for {expected_switch_position} is received")
+            log.info("Checking to see if a report for %s is received", expected_switch_position)
             attrib_listener.await_sequence_of_reports(attribute=cluster.Attributes.CurrentPosition, sequence=[
                                                       expected_switch_position], timeout_sec=post_prompt_settle_delay_seconds)
 
@@ -392,7 +392,7 @@ class TC_SwitchTests(MatterBaseTest):
         last_event = event_listener.get_last_event()
         asserts.assert_is_not_none(last_event, "Did not get SwitchLatched events since last operator action.")
         last_event_data = last_event.Data
-        log.info(f"-> SwitchLatched event last received: {last_event_data}")
+        log.info("-> SwitchLatched event last received: %s", last_event_data)
         asserts.assert_equal(last_event_data, cluster.Events.SwitchLatched(
             newPosition=expected_switch_position), "Did not get expected switch position")
 
@@ -403,7 +403,7 @@ class TC_SwitchTests(MatterBaseTest):
         button_val = await self.read_single_attribute_check_success(cluster=cluster, attribute=cluster.Attributes.CurrentPosition)
         asserts.assert_equal(button_val, 0, "Button value is not 0")
 
-        log.info(f"Checking to see if a report for {expected_switch_position} is received")
+        log.info("Checking to see if a report for %s is received", expected_switch_position)
         expected_final_value = [AttributeValue(
             endpoint_id, attribute=cluster.Attributes.CurrentPosition, value=expected_switch_position)]
         attrib_listener.await_all_final_values_reported(expected_final_value, timeout_sec=post_prompt_settle_delay_seconds)

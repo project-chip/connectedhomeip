@@ -187,7 +187,7 @@ class PAVSTIUtils:
 
         # TLS clusters are always on EP0, per spec
         tls_utils = TLSUtils(self, endpoint=0)
-        log.info(f"Using IP: {host_ip} as hostname to provision TLS Endpoint")
+        log.info("Using IP: %s as hostname to provision TLS Endpoint", host_ip)
         root_cert_der = server.get_root_cert()
         prc_result = await tls_utils.send_provision_root_command(certificate=root_cert_der)
         tls_utils.assert_valid_caid(prc_result.caid)

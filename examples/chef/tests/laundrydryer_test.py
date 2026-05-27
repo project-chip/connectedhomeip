@@ -223,7 +223,7 @@ class TC_LAUNDRYDRYER(MatterBaseTest):
                 # Check if it changes (optional but good)
                 updated_dryness = await self._read_supported_dryness_levels()
                 logger.info(
-                    f"Delicate mode supported dryness levels: {updated_dryness}")
+                    "Delicate mode supported dryness levels: %s", updated_dryness)
 
             if heavy_mode is not None:
                 await self.send_single_cmd(
@@ -233,7 +233,7 @@ class TC_LAUNDRYDRYER(MatterBaseTest):
                 asserts.assert_equal(await self._read_laundry_washer_current_mode(), heavy_mode, "Mode should be Heavy")
                 updated_dryness = await self._read_supported_dryness_levels()
                 logger.info(
-                    f"Heavy mode supported dryness levels: {updated_dryness}")
+                    "Heavy mode supported dryness levels: %s", updated_dryness)
 
             # If labels not found, just cycle through available modes
             if delicates_mode is None or heavy_mode is None:
@@ -279,11 +279,11 @@ class TC_LAUNDRYDRYER(MatterBaseTest):
         supported_temp_levels = await self._read_supported_temperature_levels()
         asserts.assert_greater(len(supported_temp_levels), 0,
                                "SupportedTemperatureLevels should not be empty")
-        logger.info(f"Supported temperature levels: {supported_temp_levels}")
+        logger.info("Supported temperature levels: %s", supported_temp_levels)
 
         # Step 11.2: Read Initial State
         initial_temp_level = await self._read_selected_temperature_level()
-        logger.info(f"Initial temperature level: {initial_temp_level}")
+        logger.info("Initial temperature level: %s", initial_temp_level)
 
         # Step 11.3: Execute Valid Change
         # Try to change to a different level if possible

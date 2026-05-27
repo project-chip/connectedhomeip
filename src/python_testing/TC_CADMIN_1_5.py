@@ -117,7 +117,7 @@ class TC_CADMIN_1_5(CADMINBaseTest):
 
         self.step(2)
         params = await self.open_commissioning_window(dev_ctrl=self.th1, timeout=180, node_id=self.dut_node_id)
-        log.info(f"Commissioning window params: {params}")
+        log.info("Commissioning window params: %s", params)
 
         self.step(3)
         # Wait for DNS-SD advertisement with correct CM value and discriminator

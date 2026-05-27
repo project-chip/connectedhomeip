@@ -351,7 +351,7 @@ class TC_DRLK_2_9(MatterBaseTest, DRLK_COMMON):
                     timedRequestTimeoutMs=1000)
                 asserts.assert_equal(expected_status, Status.Success)
         except InteractionModelError as e:
-            log.exception(f"Got exception when performing SetAliroReaderConfig {e}")
+            log.exception("Got exception when performing SetAliroReaderConfig %s", e)
             asserts.assert_equal(e.status, expected_status, f"Unexpected error returned: {e}")
 
     @property
@@ -636,11 +636,11 @@ class TC_DRLK_2_9(MatterBaseTest, DRLK_COMMON):
                                                                             credential_enum=drlkcluster.Enums.CredentialTypeEnum.kPin,
 
                                                                             credentialIndex=start_credential_index, userIndex=userIndex_1, userStatus=NullValue, userType=NullValue, statuscode=Status.Success)
-                        log.info(f"The updated value of nextCredentialIndex is {nextCredentialIndex}")
+                        log.info("The updated value of nextCredentialIndex is %s", nextCredentialIndex)
                         start_credential_index += 1
                         asserts.assert_true(nextCredentialIndex == start_credential_index,
                                             "Error mismatch in expected nextCredentialIndex={}".format(str(nextCredentialIndex)))
-                        log.info(f"The updated value of start_credential_index is {start_credential_index}")
+                        log.info("The updated value of start_credential_index is %s", start_credential_index)
                     else:
                         break
         self.step("15d")

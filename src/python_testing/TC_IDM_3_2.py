@@ -307,7 +307,7 @@ class TC_IDM_3_2(IDMBaseTest, BasicCompositionTests):
             )
 
             initial_data_version = initial_read[self.endpoint][test_cluster][Clusters.Attribute.DataVersion]
-            log.info(f"Initial DataVersion for step 6: {initial_data_version}")
+            log.info("Initial DataVersion for step 6: %s", initial_data_version)
 
             # Write without DataVersion (this should succeed and increment the DataVersion)
             new_value1 = "New-Label-Step6"
@@ -356,7 +356,7 @@ class TC_IDM_3_2(IDMBaseTest, BasicCompositionTests):
             '''
 
             # Test with the real timed-write attribute found on the device
-            log.info(f"Testing timed write attribute: {timed_attr}")
+            log.info("Testing timed write attribute: %s", timed_attr)
 
             # Test NEEDS_TIMED_INTERACTION - Writing timed-write-required attribute without timed transaction
             # Found below logic in /home/ubuntu/connectedhomeapi/connectedhomeip/src/controller/python/tests/scripts/cluster_objects.py and TC_IDM_1_2 test logic.

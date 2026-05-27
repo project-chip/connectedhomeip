@@ -148,7 +148,7 @@ class TC_DGSW_2_1(MatterBaseTest):
         attr_condition = await self.attribute_guard(endpoint=endpoint, attribute=attributes.CurrentHeapFree)
         if attr_condition:
             current_heap_free_attr = await self.read_dgsw_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentHeapFree)
-            logger.info(f"CurrentHeapFree: {current_heap_free_attr}")
+            logger.info("CurrentHeapFree: %s", current_heap_free_attr)
             matter_asserts.assert_valid_uint64(current_heap_free_attr, "CurrentHeapFree")
             # Verify that CurrentHeapFree is greater than or equal to 0.
             asserts.assert_greater_equal(current_heap_free_attr, 0, "CurrentHeapFree is not greater than or equal to 0.")
@@ -160,7 +160,7 @@ class TC_DGSW_2_1(MatterBaseTest):
         attr_condition = await self.attribute_guard(endpoint=endpoint, attribute=attributes.CurrentHeapUsed)
         if attr_condition:
             current_heap_used_attr = await self.read_dgsw_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentHeapUsed)
-            logger.info(f"CurrentHeapUsed: {current_heap_used_attr}")
+            logger.info("CurrentHeapUsed: %s", current_heap_used_attr)
             matter_asserts.assert_valid_uint64(current_heap_used_attr, "CurrentHeapUsed")
             # Verify that CurrentHeapUsed is greater than or equal to 0.
             asserts.assert_greater_equal(current_heap_used_attr, 0, "CurrentHeapUsed is not greater than or equal to 0.")
@@ -170,7 +170,7 @@ class TC_DGSW_2_1(MatterBaseTest):
         attr_condition = await self.attribute_guard(endpoint=endpoint, attribute=attributes.CurrentHeapHighWatermark)
         if attr_condition:
             current_heap_high_watermark_attr = await self.read_dgsw_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentHeapHighWatermark)
-            logger.info(f"CurrentHeapHighWatermark: {current_heap_high_watermark_attr}")
+            logger.info("CurrentHeapHighWatermark: %s", current_heap_high_watermark_attr)
             matter_asserts.assert_valid_uint64(current_heap_high_watermark_attr, "CurrentHeapHighWatermark")
             # Verify that CurrentHeapHighWatermark is greater than or equal to CurrentHeapUsed.
             asserts.assert_greater_equal(current_heap_high_watermark_attr, current_heap_used_attr,

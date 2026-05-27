@@ -519,7 +519,7 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
         if not attribute_value:
             attribute_value = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.TariffUnit)
 
-        log.info(f"TariffUnit attribute value is: {attribute_value}")
+        log.info("TariffUnit attribute value is: %s", attribute_value)
 
         if self.tariffInfoValue is not None and self.tariffInfoValue is NullValue:
             asserts.assert_equal(attribute_value, NullValue, "TariffUnit must be Null when TariffInfo is Null")
@@ -751,7 +751,7 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
         if not attribute_value:
             attribute_value = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.CurrentDayEntry)
 
-        log.info(f"CurrentDayEntry attribute value is: {attribute_value}")
+        log.info("CurrentDayEntry attribute value is: %s", attribute_value)
 
         if self.tariffInfoValue is not None and self.tariffInfoValue is NullValue:
             asserts.assert_equal(attribute_value, NullValue, "CurrentDayEntry must be Null when TariffInfo is Null")
@@ -794,7 +794,7 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
         if not attribute_value:
             attribute_value = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.NextDayEntry)
 
-        log.info(f"NextDayEntry attribute value is: {attribute_value}")
+        log.info("NextDayEntry attribute value is: %s", attribute_value)
 
         if self.tariffInfoValue is not None and self.tariffInfoValue is NullValue:
             asserts.assert_equal(attribute_value, NullValue, "NextDayEntry must be Null when TariffInfo is Null")

@@ -118,7 +118,7 @@ class TC_MOD_1_2(MatterBaseTest):
         # Verify if semantic tags has elements in list , and if there are values assert the values
         self.step(2)
         supported_modes = await self.read_single_attribute_check_success(endpoint=self.endpoint, cluster=self.cluster, attribute=self.cluster.Attributes.SupportedModes)
-        log.info(f"Supported modes {supported_modes}")
+        log.info("Supported modes %s", supported_modes)
         # List must not be empty
         asserts.assert_true(len(supported_modes) > 0, "Supported modes can not be empty.")
         supported_modes_values = []
@@ -132,7 +132,7 @@ class TC_MOD_1_2(MatterBaseTest):
         # Verify mode numbers are unique
         asserts.assert_equal(len(supported_modes_values), len(set(supported_modes_values)),
                              f"Duplicate value found for supported mode values :{supported_modes_values}.")
-        log.info(f"Supported modes values {supported_modes_values}")
+        log.info("Supported modes values %s", supported_modes_values)
 
         # Currentmode attribute check must be int and must be in the supported modes values.
         self.step(3)

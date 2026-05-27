@@ -144,7 +144,7 @@ class TC_OPSTATE_BASE:
         return False
 
     async def send_cmd(self, endpoint, cmd, timedRequestTimeoutMs=None):
-        log.info(f"##### Command {cmd}")
+        log.info("##### Command %s", cmd)
 
         try:
             return await self.send_single_cmd(cmd=cmd,
@@ -164,11 +164,11 @@ class TC_OPSTATE_BASE:
                              f"Command response ({ret.commandResponseState}) mismatched from expectation for {cmd} on {endpoint}")
 
     async def read_expect_success(self, endpoint, attribute):
-        log.info(f"##### Read {attribute}")
+        log.info("##### Read %s", attribute)
         attr_value = await self.read_single_attribute_check_success(endpoint=endpoint,
                                                                     cluster=self.test_info.cluster,
                                                                     attribute=attribute)
-        log.info(f"## {attribute}: {attr_value}")
+        log.info("## %s: %s", attribute, attr_value)
 
         return attr_value
 
@@ -668,8 +668,8 @@ class TC_OPSTATE_BASE:
                                                             attribute=attributes.CountdownTime)
 
             if (countdown_time is not NullValue) and (initial_countdown_time is not NullValue):
-                log.info(f" -> Initial countdown time: {initial_countdown_time}")
-                log.info(f" -> New countdown time: {countdown_time}")
+                log.info(" -> Initial countdown time: %s", initial_countdown_time)
+                log.info(" -> New countdown time: %s", countdown_time)
                 asserts.assert_less_equal(countdown_time, (initial_countdown_time - wait_time),
                                           f"The countdown time shall have decreased at least {wait_time:.1f} since start command")
 
@@ -806,7 +806,7 @@ class TC_OPSTATE_BASE:
             initial_countdown_time = await self.read_expect_success(endpoint=endpoint,
                                                                     attribute=attributes.CountdownTime)
             if initial_countdown_time is not NullValue:
-                log.info(f" -> Initial ountdown time: {initial_countdown_time}")
+                log.info(" -> Initial ountdown time: %s", initial_countdown_time)
                 asserts.assert_true(0 <= initial_countdown_time <= 259200,
                                     f"CountdownTime({initial_countdown_time}) must be between 0 and 259200")
 
@@ -821,8 +821,8 @@ class TC_OPSTATE_BASE:
                                                             attribute=attributes.CountdownTime)
 
             if (countdown_time is not NullValue) and (initial_countdown_time is not NullValue):
-                log.info(f" -> Initial countdown time: {initial_countdown_time}")
-                log.info(f" -> New countdown time: {countdown_time}")
+                log.info(" -> Initial countdown time: %s", initial_countdown_time)
+                log.info(" -> New countdown time: %s", countdown_time)
                 asserts.assert_equal(countdown_time, initial_countdown_time,
                                      "The countdown time shall be equal since pause command")
 

@@ -127,7 +127,7 @@ class TC_AVSM_2_10(MatterBaseTest, AVSMTestBase):
 
         self.step(1)
         aFeatureMap = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.FeatureMap)
-        log.info(f"Rx'd FeatureMap: {aFeatureMap}")
+        log.info("Rx'd FeatureMap: %s", aFeatureMap)
         snpSupport = (aFeatureMap & cluster.Bitmaps.Feature.kSnapshot) > 0
         self.privacySupport = (aFeatureMap & cluster.Bitmaps.Feature.kPrivacy) > 0
         asserts.assert_true(snpSupport, "Snapshot Feature is not supported.")
@@ -137,7 +137,7 @@ class TC_AVSM_2_10(MatterBaseTest, AVSMTestBase):
         aAllocatedSnapshotStreams = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedSnapshotStreams
         )
-        log.info(f"Rx'd AllocatedSnapshotStreams: {aAllocatedSnapshotStreams}")
+        log.info("Rx'd AllocatedSnapshotStreams: %s", aAllocatedSnapshotStreams)
         asserts.assert_equal(len(aAllocatedSnapshotStreams), 1, "The number of allocated snapshot streams in the list is not 1.")
         aStreamID = aAllocatedSnapshotStreams[0].snapshotStreamID
         aResolution = aAllocatedSnapshotStreams[0].minResolution
@@ -149,7 +149,7 @@ class TC_AVSM_2_10(MatterBaseTest, AVSMTestBase):
                 endpoint=endpoint,
                 payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD,
             )
-            log.info(f"Rx'd CaptureSnapshotResponse: {captureSnapshotResponse}")
+            log.info("Rx'd CaptureSnapshotResponse: %s", captureSnapshotResponse)
             asserts.assert_greater(len(captureSnapshotResponse.data), 0, "Image data returned by CaptureSnapshotResponse is empty")
             asserts.assert_equal(
                 captureSnapshotResponse.imageCodec,
@@ -192,7 +192,7 @@ class TC_AVSM_2_10(MatterBaseTest, AVSMTestBase):
                 endpoint=endpoint,
                 payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD,
             )
-            log.info(f"Rx'd CaptureSnapshotResponse: {captureSnapshotResponse}")
+            log.info("Rx'd CaptureSnapshotResponse: %s", captureSnapshotResponse)
             asserts.assert_greater(len(captureSnapshotResponse.data), 0, "Image data returned by CaptureSnapshotResponse is empty")
             asserts.assert_equal(
                 captureSnapshotResponse.imageCodec,
@@ -249,7 +249,7 @@ class TC_AVSM_2_10(MatterBaseTest, AVSMTestBase):
         aAllocatedSnapshotStreams = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedSnapshotStreams
         )
-        log.info(f"Rx'd AllocatedSnapshotStreams: {aAllocatedSnapshotStreams}")
+        log.info("Rx'd AllocatedSnapshotStreams: %s", aAllocatedSnapshotStreams)
         asserts.assert_equal(len(aAllocatedSnapshotStreams), 0, "The number of allocated snapshot streams in the list is not 0.")
 
         self.step(10)

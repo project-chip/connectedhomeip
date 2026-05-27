@@ -97,7 +97,7 @@ class Context:
                     break
 
             if found_choice is None:
-                log.error(f"Target '{target}' could not be found. Nothing executed for it")
+                log.error("Target '%s' could not be found. Nothing executed for it", target)
                 continue
 
             parts = found_choice.StringIntoTargetParts(target)

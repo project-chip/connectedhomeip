@@ -111,7 +111,7 @@ class EventSubscriptionHandler:
         if self._expected_event_id is not None and header.EventId != self._expected_event_id:
             return
 
-        LOGGER.info(f"[EventSubscriptionHandler] Received event: {header}")
+        LOGGER.info("[EventSubscriptionHandler] Received event: %s", header)
         self._q.put(event_result)
 
     async def start(self, dev_ctrl, node_id: int, endpoint: int, fabric_filtered: bool = False, min_interval_sec: int = 0, max_interval_sec: int = 30, keepSubscriptions: bool = True, autoResubscribe: bool = False) -> Any:
@@ -139,7 +139,7 @@ class EventSubscriptionHandler:
 
         asserts.assert_equal(res.Header.ClusterId, expected_event.cluster_id, "Expected cluster ID not found in event report")
         asserts.assert_equal(res.Header.EventId, expected_event.event_id, "Expected event ID not found in event report")
-        LOGGER.info(f"Successfully waited for {expected_event}")
+        LOGGER.info("Successfully waited for %s", expected_event)
         return res.Data
 
     def wait_for_event_report_with_duplication(self, expected_event: ClusterObjects.ClusterEvent, current_event_filter_func: Any, previous_event_filter_func: Optional[Any] = None, timeout_sec: float = 10.0) -> Any:
@@ -163,7 +163,7 @@ class EventSubscriptionHandler:
                 LOGGER.info("Successfully captured the expected new event.")
                 return event_data
             if previous_event_filter_func is not None and previous_event_filter_func(event_data):
-                LOGGER.warning(f"Discarding leftover/duplicate event from previous step: {event_data}")
+                LOGGER.warning("Discarding leftover/duplicate event from previous step: %s", event_data)
                 continue
             asserts.fail(f"Received unexpected event data neither matching the previous nor current expectation: {event_data}")
 

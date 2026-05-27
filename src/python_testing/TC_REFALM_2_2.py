@@ -205,7 +205,7 @@ class TC_REFALM_2_2(MatterBaseTest):
         self.step(3)
         # reads the state attribute , must be a bitMap32 ( list wich values are 32 bits)
         device_state = await self._read_refalm_state_attribute()
-        log.info(f"The device state is {device_state}")
+        log.info("The device state is %s", device_state)
         matter_asserts.assert_valid_uint32(device_state, "State")
         asserts.assert_equal(device_state, 0)
 
@@ -220,7 +220,7 @@ class TC_REFALM_2_2(MatterBaseTest):
         # # read the status
         self.step(6)
         device_state = await self._read_refalm_state_attribute()
-        log.info(f"The device state is {device_state}")
+        log.info("The device state is %s", device_state)
         matter_asserts.assert_valid_uint32(device_state, "State")
         asserts.assert_equal(device_state, 1)
 
@@ -231,7 +231,7 @@ class TC_REFALM_2_2(MatterBaseTest):
         # # read from the state attr
         self.step(8)
         device_status = await self._read_refalm_state_attribute()
-        log.info(f"The device state is {device_state}")
+        log.info("The device state is %s", device_state)
         asserts.assert_equal(device_status, 0)
         matter_asserts.assert_valid_uint32(device_state, "State")
 
@@ -260,7 +260,7 @@ class TC_REFALM_2_2(MatterBaseTest):
         await self._wait_thresshold()
         # Wait for the Notify event with the State value.
         event_data = event_callback.wait_for_event_report(cluster.Events.Notify, timeout_sec=5)
-        log.info(f"Event data {event_data}")
+        log.info("Event data %s", event_data)
         asserts.assert_equal(event_data.state, 1, "Unexpected value for State returned")
 
         self.step(13)
@@ -268,7 +268,7 @@ class TC_REFALM_2_2(MatterBaseTest):
         self._ask_for_closed_door()
         # Wait for the Notify event with the State value.
         event_data = event_callback.wait_for_event_report(cluster.Events.Notify, timeout_sec=5)
-        log.info(f"Event data {event_data}")
+        log.info("Event data %s", event_data)
         asserts.assert_equal(event_data.state, 0, "Unexpected value for State returned")
 
 

@@ -439,7 +439,7 @@ class BaseTestHelper:
         # Read out an attribute using the new controller. It has no privileges, so this should fail with an UnsupportedAccess error.
         res = await newControllers[0].ReadAttribute(nodeId=nodeId, attributes=[(0, Clusters.AccessControl.Attributes.Acl)])
         if (res[0][Clusters.AccessControl][Clusters.AccessControl.Attributes.Acl].Reason.status != IM.Status.UnsupportedAccess):
-            self.logger.error(f"1: Received data instead of an error:{res}")
+            self.logger.error("1: Received data instead of an error:%s", res)
             return False
 
         # Grant the new controller privilege by adding the CAT tag to the subject.
@@ -454,7 +454,7 @@ class BaseTestHelper:
         if (not isinstance(res[0][
                 Clusters.AccessControl][
                 Clusters.AccessControl.Attributes.Acl][0], Clusters.AccessControl.Structs.AccessControlEntryStruct)):
-            self.logger.error(f"2: Received something other than data:{res}")
+            self.logger.error("2: Received something other than data:%s", res)
             return False
 
         # Reset the privilege back to pre-test.
@@ -487,7 +487,7 @@ class BaseTestHelper:
         #
         res = await newControllers[0].ReadAttribute(nodeId=nodeId, attributes=[(0, Clusters.AccessControl.Attributes.Acl)])
         if (res[0][Clusters.AccessControl][Clusters.AccessControl.Attributes.Acl].Reason.status != IM.Status.UnsupportedAccess):
-            self.logger.error(f"1: Received data instead of an error:{res}")
+            self.logger.error("1: Received data instead of an error:%s", res)
             return False
 
         #
@@ -498,7 +498,7 @@ class BaseTestHelper:
         if (not isinstance(res[0][
                 Clusters.AccessControl][
                 Clusters.AccessControl.Attributes.Acl][0], Clusters.AccessControl.Structs.AccessControlEntryStruct)):
-            self.logger.error(f"2: Received something other than data:{res}")
+            self.logger.error("2: Received something other than data:%s", res)
             return False
 
         #
@@ -508,7 +508,7 @@ class BaseTestHelper:
         #
         res = await newControllers[0].ReadAttribute(nodeId=nodeId, attributes=[(0, Clusters.AccessControl.Attributes.Acl)])
         if (res[0][Clusters.AccessControl][Clusters.AccessControl.Attributes.Acl].Reason.status != IM.Status.UnsupportedAccess):
-            self.logger.error(f"3: Received data instead of an error:{res}")
+            self.logger.error("3: Received data instead of an error:%s", res)
             return False
 
         #
@@ -524,7 +524,7 @@ class BaseTestHelper:
         if (not isinstance(res[0][
                 Clusters.AccessControl][
                 Clusters.AccessControl.Attributes.Acl][0], Clusters.AccessControl.Structs.AccessControlEntryStruct)):
-            self.logger.error(f"4: Received something other than data:{res}")
+            self.logger.error("4: Received something other than data:%s", res)
             return False
 
         #
@@ -540,7 +540,7 @@ class BaseTestHelper:
         if (not isinstance(res[0][
                 Clusters.AccessControl][
                 Clusters.AccessControl.Attributes.Acl][0], Clusters.AccessControl.Structs.AccessControlEntryStruct)):
-            self.logger.error(f"5: Received something other than data:{res}")
+            self.logger.error("5: Received something other than data:%s", res)
             return False
 
         #
@@ -553,7 +553,7 @@ class BaseTestHelper:
             targetNodeId=nodeId)
         res = await newControllers[1].ReadAttribute(nodeId=nodeId, attributes=[(0, Clusters.AccessControl.Attributes.Acl)])
         if (res[0][Clusters.AccessControl][Clusters.AccessControl.Attributes.Acl].Reason.status != IM.Status.UnsupportedAccess):
-            self.logger.error(f"6: Received data5 instead of an error:{res}")
+            self.logger.error("6: Received data5 instead of an error:%s", res)
             return False
 
         #
@@ -564,7 +564,7 @@ class BaseTestHelper:
         if (not isinstance(res[0][
                 Clusters.BasicInformation][
                 Clusters.BasicInformation.Attributes.ClusterRevision], Clusters.BasicInformation.Attributes.ClusterRevision.attribute_type.Type)):
-            self.logger.error(f"7: Received something other than data:{res}")
+            self.logger.error("7: Received something other than data:%s", res)
             return False
 
         newControllers[0].Shutdown()
@@ -921,7 +921,7 @@ class BaseTestHelper:
             index = 0
 
             self.logger.info(
-                f"Comparing data from accessing fabric {accessingFabric}...")
+                "Comparing data from accessing fabric %s...", accessingFabric)
 
             for item in readListDataFabric:
                 if (item.fabricIndex == accessingFabric):
@@ -1050,7 +1050,7 @@ class BaseTestHelper:
             return True
         except Exception as ex:
             self.logger.exception(
-                f"Failed to close sessions with device {nodeId}: {ex}")
+                "Failed to close sessions with device %s: %s", nodeId, ex)
             return False
 
     def SetNetworkCommissioningParameters(self, dataset: str):
@@ -1169,7 +1169,7 @@ class BaseTestHelper:
             except Exception as ex:
                 failed_zcl[basic_attr] = str(ex)
         if failed_zcl:
-            self.logger.exception(f"Following attributes failed: {failed_zcl}")
+            self.logger.exception("Following attributes failed: %s", failed_zcl)
             return False
         return True
 
@@ -1208,7 +1208,7 @@ class BaseTestHelper:
             except Exception as ex:
                 failed_attribute_write.append(str(ex))
         if failed_attribute_write:
-            self.logger.exception(f"Following attributes failed: {failed_attribute_write}")
+            self.logger.exception("Following attributes failed: %s", failed_attribute_write)
             return False
         return True
 
@@ -1272,7 +1272,7 @@ class BaseTestHelper:
             return receivedUpdate == 5
 
         except Exception as ex:
-            self.logger.exception(f"Failed to finish API test: {ex}")
+            self.logger.exception("Failed to finish API test: %s", ex)
             return False
         finally:
             #
@@ -1296,7 +1296,7 @@ class BaseTestHelper:
                 raise Exception(
                     f"Wrong cluster info clusterName: {clusterInfo['clusterName']} expected 'UnitTesting'")
         except Exception as ex:
-            self.logger.exception(f"Failed to finish API test: {ex}")
+            self.logger.exception("Failed to finish API test: %s", ex)
             return False
         return True
 
@@ -1374,7 +1374,7 @@ class BaseTestHelper:
             return receivedUpdate
 
         except Exception as ex:
-            self.logger.exception(f"Failed to finish API test: {ex}")
+            self.logger.exception("Failed to finish API test: %s", ex)
             return False
 
         return True
@@ -1426,7 +1426,7 @@ class BaseTestHelper:
             return True
 
         except Exception as ex:
-            self.logger.exception(f"Failed to finish API test: {ex}")
+            self.logger.exception("Failed to finish API test: %s", ex)
             return False
 
         return True
@@ -1458,7 +1458,7 @@ class BaseTestHelper:
             return True
 
         except Exception as ex:
-            self.logger.exception(f"Failed to finish API test: {ex}")
+            self.logger.exception("Failed to finish API test: %s", ex)
             return False
 
         return True

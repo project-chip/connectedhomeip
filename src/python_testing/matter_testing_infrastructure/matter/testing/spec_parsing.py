@@ -1490,7 +1490,7 @@ def parse_single_device_type(root: ElementTree.Element, cluster_definition_xml: 
                                 # ifdefs. We can ignore problems if the device type spec disallows things that don't exist.
                                 if is_disallowed(conformance_override):
                                     LOGGER.info(
-                                        f"Ignoring unknown {override_element_type} {element_name} in cluster {cid} because the conformance is disallowed")
+                                        "Ignoring unknown %s %s in cluster %s because the conformance is disallowed", override_element_type, element_name, cid)
                                     continue
                                 problems.append(ProblemNotice("Parse Device Type XML", location=location,
                                                 severity=ProblemSeverity.WARNING, problem=f"Unknown {override_element_type} {element_name} in cluster 0x{cid:04X} - map = {map_id}"))

@@ -75,7 +75,7 @@ class TC_CGEN_2_1(MatterBaseTest):
         breadcrumb = await self.read_single_attribute_check_success(
             cluster=cluster, attribute=attributes.Breadcrumb)
         matter_asserts.assert_valid_uint64(breadcrumb, "Breadcrumb must be uint64")
-        log.info(f"Breadcrumb initial value: {breadcrumb}")
+        log.info("Breadcrumb initial value: %s", breadcrumb)
 
         self.step("3")
         await self.write_single_attribute(attributes.Breadcrumb(1), expect_success=True)
@@ -106,7 +106,7 @@ class TC_CGEN_2_1(MatterBaseTest):
         self.step("7")
         basic_info = await self.read_single_attribute_check_success(
             cluster=cluster, attribute=attributes.BasicCommissioningInfo)
-        log.info(f"BasicCommissioningInfo: {basic_info}")
+        log.info("BasicCommissioningInfo: %s", basic_info)
 
         failsafe = basic_info.failSafeExpiryLengthSeconds
         max_cumulative = basic_info.maxCumulativeFailsafeSeconds

@@ -358,7 +358,7 @@ class TC_DeviceBasicComposition(BasicCompositionTests):
                 Clusters.Groups in self.endpoints[ep_id]
                 for ep_id in self.endpoints if ep_id != 0
             )
-            log.info(f"has_groups_server: {has_groups_server}, has_groupcast_listener: {has_groupcast_listener}")
+            log.info("has_groups_server: %s, has_groupcast_listener: %s", has_groups_server, has_groupcast_listener)
             if has_groups_server and not has_groupcast_listener:
                 self.record_error(self.get_test_name(), location=AttributePathLocation(endpoint_id=0),
                                   problem="Groups server found on an endpoint but Groupcast cluster with Listener "
@@ -372,7 +372,7 @@ class TC_DeviceBasicComposition(BasicCompositionTests):
                 Clusters.Binding in self.endpoints[ep_id]
                 for ep_id in self.endpoints if ep_id != 0
             )
-            log.info(f"has_binding_server: {has_binding_server}, has_groupcast_sender: {has_groupcast_sender}")
+            log.info("has_binding_server: %s, has_groupcast_sender: %s", has_binding_server, has_groupcast_sender)
             if has_binding_server and not has_groupcast_sender:
                 self.record_error(self.get_test_name(), location=AttributePathLocation(endpoint_id=0),
                                   problem="Binding server found on an endpoint but Groupcast cluster with Sender "

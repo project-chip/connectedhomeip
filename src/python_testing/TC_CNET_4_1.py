@@ -87,7 +87,7 @@ class TC_CNET_4_1(MatterBaseTest):
         max_networks_count = await self.read_single_attribute_check_success(
             cluster=Clusters.NetworkCommissioning,
             attribute=Clusters.NetworkCommissioning.Attributes.MaxNetworks)
-        log.info(f"Max networks attribute: {max_networks_count}")
+        log.info("Max networks attribute: %s", max_networks_count)
         matter_asserts.assert_int_in_range(max_networks_count, min_value=1, max_value=255, description="MaxNetworks")
 
         self.step(2)
@@ -127,7 +127,7 @@ class TC_CNET_4_1(MatterBaseTest):
             network_count[ep] = sum(x.connected for x in networks_dict[ep])
             network_ids[ep] = [x.networkID for x in networks_dict[ep]]
             network_ids_list.extend(network_ids[ep])
-        log.info(f"All networkd ids found: {network_ids_list}")
+        log.info("All networkd ids found: %s", network_ids_list)
         # Check network attribute if is connected in the current cluster
         connected_networks = sum(network_count.values())
         asserts.assert_equal(connected_networks, 1, "Verify that only one entry has connected status as TRUE")
@@ -168,7 +168,7 @@ class TC_CNET_4_1(MatterBaseTest):
         last_network_id = await self.read_single_attribute_check_success(
             cluster=Clusters.NetworkCommissioning,
             attribute=Clusters.NetworkCommissioning.Attributes.LastNetworkID)
-        log.info(f"Last connected network: {last_network_id}")
+        log.info("Last connected network: %s", last_network_id)
         matching_networks_count = sum(x == last_network_id for x in network_ids_list)
         asserts.assert_equal(matching_networks_count, 1,
                              "Verify that LastNetworkID attribute matches the NetworkID count of the entries")

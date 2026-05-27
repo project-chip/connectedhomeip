@@ -39,21 +39,21 @@ class AsyncWebSocketClient:
                 message = await self.send_queue.get()
                 if self.websocket:
                     await self.websocket.send(message)
-                    LOGGER.debug(f"Sent message: {message}")
+                    LOGGER.debug("Sent message: %s", message)
 
             except websockets.exceptions.ConnectionClosed:
                 LOGGER.error("Websocket connection closed")
                 break
 
             except Exception as e:
-                LOGGER.error(f"Error in send loop: {e}")
+                LOGGER.error("Error in send loop: %s", e)
 
     async def _receive_loop(self):
         while self.running:
             try:
                 if self.websocket:
                     message = await self.websocket.recv()
-                    LOGGER.debug(f"Received message: {message}")
+                    LOGGER.debug("Received message: %s", message)
                     if self.message_handler:
                         self.message_handler(message)
 
@@ -62,7 +62,7 @@ class AsyncWebSocketClient:
                 break
 
             except Exception as e:
-                LOGGER.error(f"Error in receive loop: {e}")
+                LOGGER.error("Error in receive loop: %s", e)
 
     def send_message(self, message: Any):
         if not self.running:

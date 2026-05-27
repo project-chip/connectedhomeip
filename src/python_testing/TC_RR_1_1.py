@@ -161,10 +161,10 @@ class TC_RR_1_1(MatterBaseTest):
         await self._populate_wildcard()
         supports_vid_verification = Clusters.OperationalCredentials.Commands.SetVIDVerificationStatement.command_id in self.stored_global_wildcard.attributes[
             0][Clusters.OperationalCredentials][Clusters.OperationalCredentials.Attributes.AcceptedCommandList]
-        log.info(f"Device supports VID verification: {supports_vid_verification}")
+        log.info("Device supports VID verification: %s", supports_vid_verification)
 
         # Step 1: Commission 5 fabrics with maximized NOC chains. 1a and 1b have already been completed at this time.
-        log.info(f"Step 1: use existing fabric to configure new fabrics so that total is {num_fabrics_to_commission} fabrics")
+        log.info("Step 1: use existing fabric to configure new fabrics so that total is %s fabrics", num_fabrics_to_commission)
 
         log.info("Step 1a/1b: Setup first fabric")
 
@@ -291,7 +291,7 @@ class TC_RR_1_1(MatterBaseTest):
                              num_controllers_per_fabric, "Must have the right number of clients")
 
         commissioned_fabrics = num_fabrics_to_commission
-        log.info(f"Step 1e: Recorded commissioned_fabrics = {commissioned_fabrics}")
+        log.info("Step 1e: Recorded commissioned_fabrics = %s", commissioned_fabrics)
 
         log.info("Step 1f: validate fabric table contents for all fabrics so far")
         commissioned_fabric_count = await self.read_single_attribute(
@@ -348,7 +348,7 @@ class TC_RR_1_1(MatterBaseTest):
             asserts.assert_equal(fabric_metadata[0].label, label, "Fabrics[x].label must match what was written")
 
         # Before subscribing, set the NodeLabel to "Before Subscriptions"
-        log.info(f"Step 2b: Set BasicInformation.NodeLabel to {BEFORE_LABEL}")
+        log.info("Step 2b: Set BasicInformation.NodeLabel to %s", BEFORE_LABEL)
         await client_list[0].WriteAttribute(self.dut_node_id,
                                             [(0, Clusters.BasicInformation.Attributes.NodeLabel(value=BEFORE_LABEL))])
 
@@ -621,13 +621,13 @@ class TC_RR_1_1(MatterBaseTest):
                                      "MaxMembershipCount must be at least 10")
         per_fabric_limit = math.floor(max_membership / 2)
         remaining = max_membership - per_fabric_limit
-        log.info(f"  max_membership={max_membership}, per_fabric_limit={per_fabric_limit}, remaining={remaining}")
+        log.info("  max_membership=%s, per_fabric_limit=%s, remaining=%s", max_membership, per_fabric_limit, remaining)
 
         parts_list = await self.read_single_attribute(
             dev_ctrl, node_id=self.dut_node_id, endpoint=0,
             attribute=Clusters.Descriptor.Attributes.PartsList)
         all_endpoints = list(parts_list)
-        log.info(f"  all_endpoints from PartsList: {all_endpoints}")
+        log.info("  all_endpoints from PartsList: %s", all_endpoints)
 
         ln_enabled, _, _ = await get_feature_map(self)
         join_endpoints = all_endpoints[:20] if ln_enabled else []
@@ -708,7 +708,7 @@ class TC_RR_1_1(MatterBaseTest):
         total_groups = sum(len(fg) for fg in fabric_groups)
         asserts.assert_equal(total_groups, max_membership,
                              f"Total groups added ({total_groups}) must equal max_membership ({max_membership})")
-        log.info(f"  Added {total_groups} groups total across {commissioned_fabrics} fabrics")
+        log.info("  Added %s groups total across %s fabrics", total_groups, commissioned_fabrics)
 
         # Step 20: Read Membership from each fabric and validate
         log.info("Step 20: Read Membership attribute from each fabric and validate")

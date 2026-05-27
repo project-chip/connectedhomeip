@@ -298,7 +298,7 @@ class MatterBaseTest(base_test.BaseTestClass):
 
         if self.is_pics_sdk_ci_only:
             test_name = self.__class__.__name__
-            LOGGER.info(f"===== PICS_SDK_CI_ONLY is enabled (True) for test '{test_name}'.")
+            LOGGER.info("===== PICS_SDK_CI_ONLY is enabled (True) for test '%s'.", test_name)
 
         LOGGER.info("===== EXECUTION FLAGS SUMMARY END =====")
 
@@ -334,8 +334,8 @@ class MatterBaseTest(base_test.BaseTestClass):
         lines = dump_string.splitlines()
         LOGGER.info(f'{start_tag}BEGIN ({len(lines)} lines)====')
         for line in lines:
-            LOGGER.info(f'{start_tag}{line}')
-        LOGGER.info(f'{start_tag}END ====')
+            LOGGER.info('%s%s', start_tag, line)
+        LOGGER.info('%sEND ====', start_tag)
 
     def setup_test(self):
         """Set up for each individual test execution.
@@ -756,7 +756,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             stepnum: The step number or identifier.
             title: The descriptive title of the step.
         """
-        LOGGER.info(f'***** Test Step {stepnum} : {title}')
+        LOGGER.info('***** Test Step %s : %s', stepnum, title)
 
     def skip_step(self, step):
         """Execute and immediately mark a step as skipped.
@@ -782,7 +782,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             # TODO: I very much do not want to have people passing in strings here. Do we really need the expression
             #       as a string? Does it get used by the TH?
             self.runner_hook.step_skipped(name=str(num), expression="")
-        LOGGER.info(f'**** Skipping: {num}')
+        LOGGER.info('**** Skipping: %s', num)
         self.step_skipped = True
 
     def mark_all_remaining_steps_skipped(self, starting_step_number: typing.Union[int, str]) -> None:
@@ -1276,17 +1276,17 @@ class MatterBaseTest(base_test.BaseTestClass):
         # remotely via SSH from the target device.
         if dut_ip is None:
             with open(app_pipe, "w") as app_pipe_fp:
-                LOGGER.info(f"Sending out-of-band command: {command} to file: {app_pipe}")
+                LOGGER.info("Sending out-of-band command: %s to file: %s", command, app_pipe)
                 app_pipe_fp.write(json.dumps(command_dict) + "\n")
             # TODO(#31239): remove the need for sleep
             # This was tested with matter.js as being reliable enough
             time.sleep(0.05)
         else:
-            LOGGER.info(f"Using DUT IP address: {dut_ip}")
+            LOGGER.info("Using DUT IP address: %s", dut_ip)
 
             dut_uname = os.getenv('LINUX_DUT_USER')
             asserts.assert_true(dut_uname is not None, "The LINUX_DUT_USER environment variable must be set")
-            LOGGER.info(f"Using DUT user name: {dut_uname}")
+            LOGGER.info("Using DUT user name: %s", dut_uname)
             command_fixed = shlex.quote(json.dumps(command_dict))
             cmd = "echo \"%s\" | ssh %s@%s \'cat > %s\'" % (command_fixed, dut_uname, dut_ip, app_pipe)
             os.system(cmd)
@@ -1450,7 +1450,7 @@ class MatterBaseTest(base_test.BaseTestClass):
                                          placeholder=prompt_msg_placeholder,
                                          default_value=default_value)
 
-        LOGGER.info(f"========= USER PROMPT for Endpoint {endpoint_id} =========")
+        LOGGER.info("========= USER PROMPT for Endpoint %s =========", endpoint_id)
         LOGGER.info(f">>> {prompt_msg.rstrip()} (press enter to confirm)")
         try:
             return input()
@@ -1501,7 +1501,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             hook_method = getattr(self.runner_hook, hook_method_name)
             hook_method(msg=prompt_msg)
 
-            LOGGER.info(f"========= USER PROMPT for {validation_name} =========")
+            LOGGER.info("========= USER PROMPT for %s =========", validation_name)
 
             try:
                 result = input()
@@ -1633,7 +1633,7 @@ class MatterBaseTest(base_test.BaseTestClass):
                 LOGGER.info("App reboot completed successfully")
 
             except Exception as e:
-                LOGGER.error(f"Failed to reboot app: {e}")
+                LOGGER.error("Failed to reboot app: %s", e)
                 asserts.fail(f"App reboot failed: {e}")
 
     async def request_device_factory_reset(self, reset_ctrl: bool = False) -> None:

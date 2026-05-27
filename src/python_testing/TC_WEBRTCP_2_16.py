@@ -115,14 +115,14 @@ class TC_WEBRTCP_2_16(MatterBaseTest, WEBRTCPTestBase):
         if self.is_pics_sdk_ci_only:
             # Use default value for CI testing
             max_attempts = 5
-            log.info(f"Using default max_attempts={max_attempts} for CI testing")
+            log.info("Using default max_attempts=%s for CI testing", max_attempts)
         else:
             # Prompt user for DUT-specific value
             user_input = self.wait_for_user_input(prompt_msg)
             try:
                 max_attempts = int(user_input.strip())
                 asserts.assert_true(max_attempts > 0, "Maximum concurrent sessions must be greater than 0")
-                log.info(f"Using user-specified max_attempts={max_attempts}")
+                log.info("Using user-specified max_attempts=%s", max_attempts)
             except ValueError:
                 asserts.fail(f"Invalid input '{user_input}'. Please enter a valid number.")
 

@@ -467,7 +467,7 @@ class TC_OPCREDS_VidVerify(MatterBaseTest):
                         noc_struct.noc) > 0, "`noc` field in NOCs attribute entry not found for fabric index {fabric_index}! Ensure you are running a Matter stack for >= 1.4.2 where NOCStruct fields are not fabric-sensitive.")
 
                     try:
-                        log.info(f"Trying to parse NOC for fabric index {fabric_index}")
+                        log.info("Trying to parse NOC for fabric index %s", fabric_index)
                         noc_cert = MatterCertParser(noc_struct.noc)
                         for tag, value in noc_cert.get_subject_names().items():
                             if tag == noc_cert.SUBJECT_FABRIC_ID_TAG:
@@ -476,10 +476,10 @@ class TC_OPCREDS_VidVerify(MatterBaseTest):
                     except (ValueError, IndexError, KeyError, TypeError) as e:
                         asserts.fail(f"Failed to parse NOC for fabric index {fabric_index}: {str(e)}")
 
-                    log.info(f"Succeeded in parsing NOC for fabric index {fabric_index}.")
+                    log.info("Succeeded in parsing NOC for fabric index %s.", fabric_index)
                     log.info(f"  -> NOC public key bytes: {to_octet_string(noc_public_keys_from_certs[controller_name])}")
 
-            log.info(f"Fabric IDs found: {fabric_ids_from_certs}")
+            log.info("Fabric IDs found: %s", fabric_ids_from_certs)
 
             asserts.assert_true(th1_fabric_index in found_fabric_indices,
                                 f"Expected to have seen entry for TH1's fabric (fabric Index {th1_fabric_index}) in NOCs attribute, but did not find it!")

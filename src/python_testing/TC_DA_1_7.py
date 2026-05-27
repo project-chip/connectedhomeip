@@ -75,7 +75,7 @@ def load_all_paa(paa_path: Path) -> dict:
     paa_by_skid = {}
     for filename in glob(str(paa_path.joinpath("*.der"))):
         with open(filename, "rb") as derfile:
-            log.info(f"Loading PAA: {filename}")
+            log.info("Loading PAA: %s", filename)
             try:
                 # Load cert
                 paa_der = derfile.read()
@@ -89,7 +89,7 @@ def load_all_paa(paa_path: Path) -> dict:
             except (OSError, ValueError) as e:
                 log.error(f"Failed to load {filename}: {str(e)}")
                 if Path(filename).name not in ALLOWED_SKIPPED_FILENAMES:
-                    log.error(f"Re-raising error and failing: found new invalid PAA: {filename}")
+                    log.error("Re-raising error and failing: found new invalid PAA: %s", filename)
                     raise
 
     return paa_by_skid

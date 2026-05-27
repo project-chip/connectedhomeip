@@ -283,7 +283,7 @@ class AccessChecker(BasicCompositionTests):
                     self.record_error(test_name=name, location=location,
                                       problem=f'Unexpected error sending command {command} with privilege {privilege} - expected UNSUPPORTED_ACCESS, got {e.status}')
                     self.success = False
-                    log.info(f'      Received unexpected error {e}')
+                    log.info('      Received unexpected error %s', e)
                 else:
                     log.info('      Received expected error')
 
@@ -328,7 +328,7 @@ class AccessChecker(BasicCompositionTests):
 
         except ChipStackError as e:  # chipstack-ok
             # Unexpected ChipStackError
-            log.error(f"Unexpected ChipStackError subscribing to attribute {attribute}: {e}")
+            log.error("Unexpected ChipStackError subscribing to attribute %s: %s", attribute, e)
             self.record_error(test_name=test_name,
                               location=AttributePathLocation(endpoint_id=endpoint_id,
                                                              cluster_id=cluster_id, attribute_id=attribute_id),
@@ -369,7 +369,7 @@ class AccessChecker(BasicCompositionTests):
                     f"INVALID_ACTION: {cluster_class.__name__}.{attribute.__name__} (Cluster=0x{cluster_id:04X}, Attribute=0x{attribute_id:04X}, Endpoint={endpoint_id}, Privilege={privilege.name})")
                 return None  # Indicates skip
             # Unexpected ChipStackError
-            log.error(f"Unexpected ChipStackError subscribing to attribute {attribute}: {e}")
+            log.error("Unexpected ChipStackError subscribing to attribute %s: %s", attribute, e)
             self.record_error(test_name=test_name,
                               location=AttributePathLocation(endpoint_id=endpoint_id,
                                                              cluster_id=cluster_id, attribute_id=attribute_id),
@@ -409,7 +409,7 @@ class AccessChecker(BasicCompositionTests):
             cluster_class = Clusters.ClusterObjects.ALL_CLUSTERS[cluster_id]
             location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, attribute_id=attribute_id)
             test_name = f'Write access checker - {privilege}'
-            log.info(f"Testing attribute {attribute} on endpoint {endpoint_id}")
+            log.info("Testing attribute %s on endpoint %s", attribute, endpoint_id)
             if attribute == Clusters.AccessControl.Attributes.Acl and privilege == Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister:
                 log.info("Skipping ACL attribute check for admin privilege as this is known to be writeable and is being used for this test")
                 continue
@@ -475,7 +475,7 @@ class AccessChecker(BasicCompositionTests):
         enum = Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum
         privilege_enum = [p for p in enum if p != enum.kUnknownEnumValue and p != enum.kProxyView]
         for privilege in privilege_enum:
-            log.info(f"Testing for {privilege}")
+            log.info("Testing for %s", privilege)
             self.step(step_number_with_privilege(check_step, 'a', privilege))
             await self._setup_acl(privilege=privilege)
             self.step(step_number_with_privilege(check_step, 'b', privilege))

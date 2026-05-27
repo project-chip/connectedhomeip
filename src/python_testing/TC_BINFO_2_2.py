@@ -115,7 +115,7 @@ class TC_BINFO_2_2(MatterBaseTest):
             attribute=attributes.SoftwareVersion,
             endpoint=0
         )
-        log.info(f"SoftwareVersion: {software_version_from_attribute}")
+        log.info("SoftwareVersion: %s", software_version_from_attribute)
 
         # *** STEP 2 ***
         # TH reads the StartUp event from the DUT.

@@ -148,7 +148,7 @@ class TC_FAN_3_1(MatterBaseTest):
 
         # Logging initial FanMode state
         init_fan_mode = "Off" if order == OrderEnum.Ascending else "High"
-        log.info(f"[FC] *** Initial FanMode: {init_fan_mode}")
+        log.info("[FC] *** Initial FanMode: %s", init_fan_mode)
 
         # Logging the scenario being tested
         attr_to_verify = "FanMode" if attr_to_update == Clusters.FanControl.Attributes.PercentSetting else "PercentSetting, PercentCurrent"

@@ -150,7 +150,7 @@ class ICDBaseTest(MatterBaseTest):
             if idle_mode_duration_s is not None:
                 raise ValueError("ActiveToIdle does not use idle_mode_duration_s")
             wait_s = (active_mode_duration_ms / 1000.0) + 1.0
-            log.info(f"ActiveToIdle: active_mode_duration_ms={active_mode_duration_ms} -> Wait time: {wait_s}s")
+            log.info("ActiveToIdle: active_mode_duration_ms=%s -> Wait time: %ss", active_mode_duration_ms, wait_s)
             return wait_s
 
         if transition == ICDTransition.IdleToActive:
@@ -159,7 +159,7 @@ class ICDBaseTest(MatterBaseTest):
             if active_mode_duration_ms is not None:
                 raise ValueError("IdleToActive does not use active_mode_duration_ms")
             wait_s = idle_mode_duration_s + 1.0
-            log.info(f"IdleToActive: idle_mode_duration_s={idle_mode_duration_s} -> Wait time: {wait_s}s")
+            log.info("IdleToActive: idle_mode_duration_s=%s -> Wait time: %ss", idle_mode_duration_s, wait_s)
             return wait_s
 
         if transition == ICDTransition.FullCycle:
@@ -169,7 +169,7 @@ class ICDBaseTest(MatterBaseTest):
                 raise ValueError("FullCycle requires idle_mode_duration_s")
             wait_s = (active_mode_duration_ms / 1000.0) + 1.0 + idle_mode_duration_s + 1.0
             log.info(
-                f"FullCycle: active_mode_duration_ms={active_mode_duration_ms}, idle_mode_duration_s={idle_mode_duration_s} -> Wait time: {wait_s}s")
+                "FullCycle: active_mode_duration_ms=%s, idle_mode_duration_s=%s -> Wait time: %ss", active_mode_duration_ms, idle_mode_duration_s, wait_s)
             return wait_s
 
         raise ValueError(f"Unknown ICDTransition: {transition}")
@@ -195,7 +195,7 @@ class ICDBaseTest(MatterBaseTest):
         log.info("RegisteredClients is not empty; unregistering all clients...")
         for client in registeredClients:
             try:
-                log.info(f"Unregistering client: {client}...")
+                log.info("Unregistering client: %s...", client)
                 await self.send_single_icdm_command(commands.UnregisterClient(checkInNodeID=client.checkInNodeID))
             except InteractionModelError as e:
                 asserts.assert_fail(f"Unexpected error returned when unregistering client: {e}")

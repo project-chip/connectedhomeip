@@ -252,7 +252,7 @@ class TC_DRLK_2_13(MatterBaseTest):
                     timedRequestTimeoutMs=1000)
                 asserts.assert_equal(expected_status, Status.Success)
         except InteractionModelError as e:
-            log.exception(f"Got exception when performing SetAliroReaderConfig {e}")
+            log.exception("Got exception when performing SetAliroReaderConfig %s", e)
             asserts.assert_equal(e.status, expected_status, f"Unexpected error returned: {e}")
 
     async def get_credentials_status(self, credentialIndex: int, credentialType: cluster.Enums.CredentialTypeEnum,
@@ -631,7 +631,7 @@ class TC_DRLK_2_13(MatterBaseTest):
                                                   userStatus=NullValue,
                                                   userType=NullValue)
                     start_credential_index += 1
-                    log.info(f"The updated value of start_credential_index is {start_credential_index}")
+                    log.info("The updated value of start_credential_index is %s", start_credential_index)
                 else:
                     break
             self.step("30")

@@ -71,7 +71,7 @@ class TC_CNET_4_16(MatterBaseTest):
         # Precondition 3: DUT MaxNetworks attribute value is at least 1 and is saved as 'MaxNetworksValue' for future use
         maxNetworksValue = 0
         maxNetworksValue = await self.read_single_attribute_check_success(cluster=cnet, attribute=attr.MaxNetworks)
-        log.info(f" --- maxNetworksValue: {maxNetworksValue}")
+        log.info(" --- maxNetworksValue: %s", maxNetworksValue)
         assert_valid_uint8(maxNetworksValue, "MaxNetworksValue range")
         asserts.assert_greater_equal(maxNetworksValue, 1, "MaxNetworksValue not greater or equal to 1")
 

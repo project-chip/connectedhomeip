@@ -415,7 +415,7 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
             lambda report: report.value == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDelayedOnApply)
         update_state_attr_handler.await_all_expected_report_matches(
             [update_state_match], timeout_sec=self.ota_image_download_timeout)
-        logger.info(f"Waiting the time of DelayedApplyAction of {delayed_apply_action_time} seconds.")
+        logger.info("Waiting the time of DelayedApplyAction of %s seconds.", delayed_apply_action_time)
 
         # Device should stay in ApplyingState and not apply the update during the 180 seconds. Only after this timeframe.
         software_version_match = AttributeMatcher.from_callable(
@@ -530,7 +530,7 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         update_state_progress = await self.read_single_attribute_check_success(
             Clusters.OtaSoftwareUpdateRequestor, Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateStateProgress, self.controller, self.requestor_node_id, 0)
         asserts.assert_equal(update_state_progress, NullValue, "Progress is not Null")
-        logger.info(f"Progress is {update_state_progress}")
+        logger.info("Progress is %s", update_state_progress)
         # Verify version is the same as when it  started
         await self.verify_version_applied_basic_information(self.controller, self.requestor_node_id, current_sw_version)
 

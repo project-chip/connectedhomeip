@@ -128,27 +128,27 @@ class TC_AVSM_2_11(MatterBaseTest, AVSMTestBase):
             aAllocatedSnapshotStreams = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedSnapshotStreams
             )
-            log.info(f"Rx'd AllocatedSnapshotStreams: {aAllocatedSnapshotStreams}")
+            log.info("Rx'd AllocatedSnapshotStreams: %s", aAllocatedSnapshotStreams)
             asserts.assert_equal(len(aAllocatedSnapshotStreams), 0,
                                  "The number of allocated snapshot streams in the list is not 0.")
         if has_video:
             aAllocatedVideoStreams = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedVideoStreams
             )
-            log.info(f"Rx'd AllocatedVideoStreams: {aAllocatedVideoStreams}")
+            log.info("Rx'd AllocatedVideoStreams: %s", aAllocatedVideoStreams)
             asserts.assert_equal(len(aAllocatedVideoStreams), 0, "The number of allocated video streams in the list is not 0")
         if has_audio:
             aAllocatedAudioStreams = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedAudioStreams
             )
-            log.info(f"Rx'd AllocatedAudioStreams: {aAllocatedAudioStreams}")
+            log.info("Rx'd AllocatedAudioStreams: %s", aAllocatedAudioStreams)
             asserts.assert_equal(len(aAllocatedAudioStreams), 0, "The number of allocated audio streams in the list is not 0.")
 
         self.step(1)
         aSupportedStreamUsages = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.SupportedStreamUsages
         )
-        log.info(f"Rx'd SupportedStreamUsages: {aSupportedStreamUsages}")
+        log.info("Rx'd SupportedStreamUsages: %s", aSupportedStreamUsages)
 
         asserts.assert_true(len(aSupportedStreamUsages) > 0,
                             "SupportedStreamUsages list must not be empty")
@@ -166,7 +166,7 @@ class TC_AVSM_2_11(MatterBaseTest, AVSMTestBase):
         readStreamUsagePriorities = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.StreamUsagePriorities
         )
-        log.info(f"Rx'd StreamUsagePriorities: {readStreamUsagePriorities}")
+        log.info("Rx'd StreamUsagePriorities: %s", readStreamUsagePriorities)
         asserts.assert_equal(readStreamUsagePriorities, aStreamUsagePriorities,
                              "The read StreamUsagePriorities is different from the one set in SetStreamPriorities")
 
@@ -219,7 +219,7 @@ class TC_AVSM_2_11(MatterBaseTest, AVSMTestBase):
             aSnapshotCapabilities = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.SnapshotCapabilities
             )
-            log.info(f"Rx'd SnapshotCapabilities: {aSnapshotCapabilities}")
+            log.info("Rx'd SnapshotCapabilities: %s", aSnapshotCapabilities)
             asserts.assert_greater(len(aSnapshotCapabilities), 0, "SnapshotCapabilities list is empty")
 
             # TH sends the SnapshotStreamAllocate command.
@@ -234,7 +234,7 @@ class TC_AVSM_2_11(MatterBaseTest, AVSMTestBase):
                     OSDEnabled=osd,
                 )
                 allocate_resp = await self.send_single_cmd(endpoint=endpoint, cmd=snpStreamAllocateCmd)
-                log.info(f"Rx'd SnapshotStreamAllocateResponse: {allocate_resp}")
+                log.info("Rx'd SnapshotStreamAllocateResponse: %s", allocate_resp)
                 asserts.assert_is_not_none(
                     allocate_resp.snapshotStreamID, "SnapshotStreamAllocateResponse does not contain StreamID"
                 )
@@ -276,7 +276,7 @@ class TC_AVSM_2_11(MatterBaseTest, AVSMTestBase):
                     OSDEnabled=osd,
                 )
                 allocate_resp = await self.send_single_cmd(endpoint=endpoint, cmd=videoStreamAllocateCmd)
-                log.info(f"Rx'd VideoStreamAllocateResponse: {allocate_resp}")
+                log.info("Rx'd VideoStreamAllocateResponse: %s", allocate_resp)
                 asserts.assert_is_not_none(
                     allocate_resp.videoStreamID, "VideoStreamAllocateResponse does not contain StreamID"
                 )
@@ -311,7 +311,7 @@ class TC_AVSM_2_11(MatterBaseTest, AVSMTestBase):
                     bitDepth=aMicrophoneCapabilities.supportedBitDepths[0],
                 )
                 allocate_resp = await self.send_single_cmd(endpoint=endpoint, cmd=adoStreamAllocateCmd)
-                log.info(f"Rx'd AudioStreamAllocateResponse: {allocate_resp}")
+                log.info("Rx'd AudioStreamAllocateResponse: %s", allocate_resp)
                 asserts.assert_is_not_none(
                     allocate_resp.audioStreamID, "AudioStreamAllocateResponse does not contain StreamID"
                 )
