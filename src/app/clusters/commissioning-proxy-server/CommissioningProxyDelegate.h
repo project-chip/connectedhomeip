@@ -185,6 +185,18 @@ public:
     // ------------------------------------------------------------------
     // Get attribute methods
     virtual uint8_t GetMaxSessions()                                                                       = 0;
+    /**
+     * @brief Return the number of proxy sessions currently active (open or
+     *        pending-connect) for the spec MaxSessions check.
+     *
+     * The cluster compares this against GetMaxSessions() *before* invoking
+     * ProxyConnectRequest on the delegate; if the limit is reached the cluster
+     * returns ResourceExhausted to the Commissioner without entering the
+     * transport layer.  Implementations SHOULD count both established sessions
+     * and any in-flight ProxyConnectRequest whose response has not yet been
+     * sent, so that two concurrent connect attempts cannot both pass the gate.
+     */
+    virtual uint8_t GetActiveSessionCount()                                                                = 0;
     virtual uint8_t GetScanMaxTime()                                                                       = 0;
     virtual uint8_t GetMaxCachedResults()                                                                  = 0;
     virtual uint8_t GetNumCachedResults()                                                                  = 0;

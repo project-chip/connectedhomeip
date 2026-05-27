@@ -76,10 +76,12 @@ public:
                                    chip::NodeId nodeId) override;
 
     uint8_t GetMaxSessions() override;
+    uint8_t GetActiveSessionCount() override { return mActiveSessionCount; }
+    void SetActiveSessionCount(uint8_t v) { mActiveSessionCount = v; } // test helper
     uint8_t GetMaxCachedResults() override { return 10; }
     uint8_t GetNumCachedResults() override { return 0; }
-    uint16_t GetCacheTimeout() override { return 120; }
-    void SetCacheTimeout(uint16_t) override {}
+    uint16_t GetCacheTimeout() override { return mCacheTimeout; }
+    void SetCacheTimeout(uint16_t v) override { mCacheTimeout = v; }
     CHIP_ERROR EncodeCachedResults(app::AttributeValueEncoder &) override { return CHIP_NO_ERROR; }
 
     void SetServer(CommissioningProxyCluster * server) override { mServer = server; }
@@ -166,19 +168,9 @@ private:
     CommissioningProxyCluster * mServer = nullptr;
     uint8_t mScanMaxTime                = 120;
     chip::BitMask<WiFiBandBitmap> mSupportedWiFiBands;
-    uint8_t mMaxSessions = 1;
-    // uint8_t     mMaxCachedResult    = 1;
-    // uint16_t    mCacheTimeout       = 120;
-#if 0
- ESAStateEnum mESAState       = ESAStateEnum::kOnline;
-    ESATypeEnum mESAType         = ESATypeEnum::kEvse;
-    bool mESACanGenerate         = false;
-    int64_t mAbsMinPower         = kAbsMinPower;
-    int64_t mAbsMaxPower         = kAbsMaxPower;
-    OptOutStateEnum mOptOutState = OptOutStateEnum::kNoOptOut;
-    DataModel::Nullable<Structs::PowerAdjustCapabilityStruct::Type> mPowerAdjustmentCapability;
-    DataModel::Nullable<Structs::ForecastStruct::Type> mForecast;
-#endif
+    uint8_t mMaxSessions        = 1;
+    uint8_t mActiveSessionCount = 0;   // settable via SetActiveSessionCount() for MaxSessions tests
+    uint16_t mCacheTimeout      = 120; // spec default
 };
 
 } // namespace CommissioningProxy

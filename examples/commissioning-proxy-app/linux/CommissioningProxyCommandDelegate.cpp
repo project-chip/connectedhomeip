@@ -764,16 +764,6 @@ Protocols::InteractionModel::Status Clusters::CommissioningProxy::MyCPDelegate::
     ChipLogProgress(AppServer, "ProxyConnectRequest transport:%d wiFiBand:%d timeout:%u discriminator:%u", (int) transport,
                     (int) wiFiBand, timeout, discriminator);
 
-    // Enforce the MaxSessions limit before touching the transport layer.
-    // This returns synchronously so the IM sends a response immediately,
-    // rather than going async and timing out waiting for an unreachable ED.
-    if (sProxySessions.size() >= GetMaxSessions())
-    {
-        ChipLogError(AppServer, "ProxyConnectRequest: session limit reached (%zu/%u active)", sProxySessions.size(),
-                     GetMaxSessions());
-        return chip::Protocols::InteractionModel::Status::ResourceExhausted;
-    }
-
     // Per spec §10.5.7.1: if background scanning is active, pause it so that
     // the NAN subscribe slot can be reused for the PAF connect subscribe.
     // It will be resumed in ProxyDisconnectRequest when all sessions are gone.
@@ -1412,6 +1402,15 @@ Clusters::CommissioningProxy::MyCPDelegate::ProxyBackgroundScanStopRequest(Capab
 uint8_t Clusters::CommissioningProxy::MyCPDelegate::GetMaxSessions()
 {
     return kMaxProxySessions;
+}
+
+uint8_t Clusters::CommissioningProxy::MyCPDelegate::GetActiveSessionCount()
+{
+    // Count established sessions AND any in-flight ProxyConnectRequest whose
+    // response has not yet been sent — both occupy a MaxSessions slot per spec
+    // otherwise two concurrent connects could both pass the
+    // cluster-level gate before either completes.
+    return static_cast<uint8_t>(sProxySessions.size() + (sPendingConnectCtx != nullptr ? 1 : 0));
 }
 
 uint8_t Clusters::CommissioningProxy::MyCPDelegate::GetNumCachedResults()

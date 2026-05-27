@@ -19,16 +19,43 @@ import("//build_overrides/pigweed.gni")
 import("${chip_root}/build/chip/chip_test_suite.gni")
 
 chip_test_suite("tests") {
+  import(
+      "${chip_root}/src/app/clusters/commissioning-proxy-server/app_config_dependent_sources.gni")
+
   output_name = "TestCommissioningProxyCluster"
 
   test_sources = [ "TestCommissioningProxyCluster.cpp" ]
 
+  # The cluster .cpp lives in app_config_dependent_sources.gni so it compiles
+  # in the consumer's target context.  We pull it in here so the test's
+  # `defines` below are visible when the cluster sources compile — that is
+  # what gates GetSupportedTransports() advertising kBle / kWiFiPAF.
   sources = [
     "CommissioningProxyMockDelegate.cpp",
     "CommissioningProxyMockDelegate.h",
   ]
+  foreach(file, app_config_dependent_sources) {
+    sources += [ "../" + file ]
+  }
 
   cflags = [ "-Wconversion" ]
+
+  # Enable both CP transports for the unit-test build.  Tests query
+  # GetSupportedTransports() at runtime and skip transport-specific cases
+  # when the corresponding bit is not in the bitmap, so flipping either of
+  # these to 0 produces a correctly-running (but reduced) test suite.
+  #
+  # The cluster source is only compiled when the Commissioning Proxy is
+  # enabled (CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY) — we assert that
+  # here so any other CHIP code pulled into the test binary that gates on
+  # the flag also takes the proxy-on branch.  The per-transport advertisement
+  # then depends purely on the per-transport compile flag (see
+  # CommissioningProxyCluster::GetSupportedTransports()).
+  defines = [
+    "CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY=1",
+    "CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF=1",
+    "CONFIG_NETWORK_LAYER_BLE=1",
+  ]
 
   public_deps = [
     "${chip_root}/src/app/clusters/commissioning-proxy-server",

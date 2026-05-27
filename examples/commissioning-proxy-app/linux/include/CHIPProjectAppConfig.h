@@ -99,25 +99,13 @@
  */
 #define CHIP_CONFIG_MM_SUBSCRIBE_REBOOT_MAX 5
 
-/**
- * CHIP_DEVICE_CONFIG, Default channel Frequency in MHZ. S1G needs to override
- * the 24G channel Linux definition here to avoid modifying the core file
- * src/platform/Linux/ConnectivityManagerImpl.cpp. However for production this
- * will require a change to the core file as S1G will not have a default
- * frequency due to not having a harmonise world wide band.
- *
- * As wpa_supplicant currently override the 5GHz frequency, we have defaulted
- * to:
- *    5660 = 902.5MHz, US, Lowest S1G Freq in regulatory domain
- *    5660 = 863.5MHz, EU, Lowest S1G Freq in regulatory domain
- *       EU Covers 28 counties including GB
- *    5660 = 918.5MHz, KR, Lowest S1G Freq in regulatory domain
- *    AU, NZ, IN, JP, SG do not use this band. This is lowest common
- *    denominator for a default
- *
- */
-// #define CHIP_DEVICE_CONFIG_WIFIPAF_24G_DEFAUTL_CHNL 5660
 
+// Commissioning Proxy transports follow their own existing compile flags:
+//   WiFi-PAF: CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF (set in build args)
+//   BLE:      CONFIG_NETWORK_LAYER_BLE (BLE-wide GN arg
+//             chip_config_network_layer_ble, default true)
+// Drop either to produce a single-transport build; the cluster's
+// GetSupportedTransports() advertises whichever bits remain set.
 #define CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY 1
 
 // The Linux proxy reference runs on the same shared-radio hardware as the

@@ -80,6 +80,7 @@ protected:
                                    chip::NodeId nodeId) override;
 
     uint8_t GetMaxSessions() override;
+    uint8_t GetActiveSessionCount() override;
     uint8_t GetScanMaxTime() override;
     uint8_t GetMaxCachedResults() override;
     uint8_t GetNumCachedResults() override;

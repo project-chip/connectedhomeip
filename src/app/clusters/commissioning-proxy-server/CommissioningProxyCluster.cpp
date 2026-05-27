@@ -21,11 +21,13 @@
 #include <app/data-model/Decode.h>
 #include <app/data-model/Encode.h>
 #include <app/server-cluster/AttributeListBuilder.h>
+#include <ble/BleConfig.h>
 #include <clusters/CommissioningProxy/Attributes.h>
 #include <clusters/CommissioningProxy/Commands.h>
 #include <clusters/CommissioningProxy/Metadata.h>
 #include <clusters/CommissioningProxy/Structs.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/CHIPDeviceConfig.h>
 #include <protocols/interaction_model/StatusCode.h>
 
 using chip::Protocols::InteractionModel::Status;
@@ -94,6 +96,12 @@ DataModel::ActionReturnStatus CommissioningProxyCluster::ReadAttribute(const Dat
 {
     switch (request.path.mAttributeId)
     {
+    case Globals::Attributes::ClusterRevision::Id:
+        // Per spec ClusterRevision SHALL be the highest revision number in the
+        // Revision History table; sourced from the cluster's generated Metadata
+        // (CommissioningProxy::kRevision in Metadata.h).
+        return encoder.Encode(kRevision);
+
     case FeatureMap::Id:
         return encoder.Encode(mFeatureFlags);
 
@@ -129,9 +137,17 @@ DataModel::ActionReturnStatus CommissioningProxyCluster::ReadAttribute(const Dat
 chip::BitMask<CapabilitiesBitmap> CommissioningProxyCluster::GetSupportedTransports() const
 {
     chip::BitMask<CapabilitiesBitmap> supported;
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    // WiFiPAF is advertised when the WiFi-PAF stack is compiled in AND the WI
+    // feature is enabled on this cluster instance (spec [WI].a+ conformance).
     if (mFeatureFlags.Has(Feature::kWiFiNetworkInterface))
         supported.Set(CapabilitiesBitmap::kWiFiPAF);
-    // When Feature::kBleInterface is defined, add kBle here analogously.
+#endif
+#if CONFIG_NETWORK_LAYER_BLE
+    // BLE advertised whenever the BLE stack is compiled into the build
+    // (the BLE-wide GN arg chip_config_network_layer_ble).
+    supported.Set(CapabilitiesBitmap::kBle);
+#endif
     return supported;
 }
 
@@ -195,12 +211,18 @@ DataModel::ActionReturnStatus CommissioningProxyCluster::HandleProxyConnectReque
     VerifyOrReturnError(HasExactlyOneBitSet(commandData.transport.Raw()), Status::InvalidCommand);
 
     // The selected transport must be supported by this proxy instance.
-    // The supported set is derived from enabled feature flags (same as the Transport attribute).
-    // When Feature::kBleInterface is defined, kBle will automatically be accepted here.
     if (!GetSupportedTransports().HasAny(commandData.transport))
     {
         ChipLogError(Zcl, "Commissioning Proxy: requested transport not supported by this instance");
         return Status::InvalidTransportType;
+    }
+
+    // WiFiBand is meaningful only with the WiFiPAF transport per spec; if the
+    // selected transport is not kWiFiPAF, the field must be absent.
+    if (commandData.wiFiBand.HasValue() && commandData.transport != CapabilitiesBitmap::kWiFiPAF)
+    {
+        ChipLogError(Zcl, "Commissioning Proxy: WiFiBand provided with non-WiFiPAF transport");
+        return Status::InvalidCommand;
     }
 
     // WiFiBand is only valid when the WI feature is enabled per spec
@@ -223,6 +245,17 @@ DataModel::ActionReturnStatus CommissioningProxyCluster::HandleProxyConnectReque
         }
 
         wiFiBand = static_cast<chip::app::Clusters::CommissioningProxy::WiFiBandBitmap>(commandData.wiFiBand.Value().Raw());
+    }
+
+    // Spec "If MaxSessions are in use, a RESOURCE_EXHAUSTED status
+    // SHALL be returned."  Enforced here generically so every delegate inherits
+    // the check; the delegate need only report its current count via
+    // GetActiveSessionCount().
+    if (mDelegate.GetActiveSessionCount() >= mDelegate.GetMaxSessions())
+    {
+        ChipLogError(Zcl, "Commissioning Proxy: MaxSessions reached (%u/%u)", mDelegate.GetActiveSessionCount(),
+                     mDelegate.GetMaxSessions());
+        return Status::ResourceExhausted;
     }
 
     // Delegate SHALL establish the transport connection and call commandObj->AddResponse()
