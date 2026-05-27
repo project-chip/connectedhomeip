@@ -60,7 +60,7 @@ class stm32Builder(GnBuilder):
                  output_dir_lock: OutDirLock,
                  app: stm32App = stm32App.LIGHT,
                  board: stm32Board = stm32Board.STM32WB55XX):
-        super(stm32Builder, self).__init__(root=app.BuildRoot(root), runner=runner, output_dir_lock=output_dir_lock)
+        super().__init__(root=app.BuildRoot(root), runner=runner, output_dir_lock=output_dir_lock)
 
         self.board = board
         self.app = app

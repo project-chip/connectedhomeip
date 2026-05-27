@@ -115,7 +115,7 @@ def main(compile_commands_glob, source, mapping_file_dir,
             shutil.copyfile(compile_commands, compile_commands_file)
 
         # Prase json file for find target name
-        with open(compile_commands, 'r') as json_data:
+        with open(compile_commands) as json_data:
             json_data = json.load(json_data)
 
         for key in json_data:

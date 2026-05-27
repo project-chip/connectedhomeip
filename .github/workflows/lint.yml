@@ -349,6 +349,7 @@ jobs:
                       ':(exclude).agents/skills/'                                                                   \
                       ':(exclude).github/workflows/lint.yml'                                                        \
                       ':(exclude)AGENTS.md'                                                                  \
+                      ':(exclude)examples/tv-casting-app/tv-casting-common/Accessors-override.cpp'                   \
                       ':(exclude)src/app/dynamic_server/DynamicDispatcher.cpp'                                      \
                       ':(exclude)src/app/util/attribute-table.cpp'                                                  \
                       ':(exclude)src/app/util/attribute-table.h'                                                    \
@@ -375,6 +376,7 @@ jobs:
                       ':(exclude)AGENTS.md'                                                                  \
                       ':(exclude)examples/common/pigweed/rpc_services/Attributes.h'                          \
                       ':(exclude)examples/common/server-cluster-shim/ServerClusterShim.cpp'                  \
+                      ':(exclude)examples/tv-casting-app/tv-casting-common/Accessors-override.cpp'            \
                       ':(exclude)src/data-model-providers/codegen/CodegenDataModelProvider_Write.cpp'        \
                       ':(exclude)src/data-model-providers/codegen/tests/EmberReadWriteOverride.cpp'          \
                       ':(exclude)src/data-model-providers/codegen/tests/EmberReadWriteOverride.h'            \
@@ -474,3 +476,8 @@ jobs:
 
 # NOTE: Actions which do not require bootstrapping the build environment
 #       should be added above the "Checkout submodules & Bootstrap" step.
+            - name: Notify Slack on Failure
+              if: failure()
+              uses: ./.github/actions/notify-slack-failure
+              with:
+                slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}

@@ -55,7 +55,7 @@ TAG_STDOUT = f"[{Fore.YELLOW}STDOUT{Style.RESET_ALL}]".encode()
 TAG_STDERR = f"[{Fore.RED}STDERR{Style.RESET_ALL}]".encode()
 
 # RegExp which matches the timestamp in the output of CHIP application
-OUTPUT_TIMESTAMP_MATCH = re.compile(r'(?P<prefix>.*)\[(?P<ts>\d+\.\d+)\](?P<suffix>\[\d+:\d+\].*)'.encode())
+OUTPUT_TIMESTAMP_MATCH = re.compile(br'(?P<prefix>.*)\[(?P<ts>\d+\.\d+)\](?P<suffix>\[\d+:\d+\].*)')
 
 
 def chip_output_extract_timestamp(line: bytes) -> (float, bytes):
@@ -156,7 +156,7 @@ class AppProcessManager:
         return self.app_process
 
 
-class IpPacketCaptureManager():
+class IpPacketCaptureManager:
     def __init__(self, dump_filename: pathlib.Path):
         self.tcpdump_process = None
         self.dump_filename = dump_filename
@@ -421,7 +421,7 @@ def monitor_app_restart_requests(
             time.sleep(0.5)
             continue
 
-        with open(restart_flag_file, 'r') as f:
+        with open(restart_flag_file) as f:
             flag_file_content = f.read().strip()
 
         # Determine reset type and remove app/ctrl config and storage

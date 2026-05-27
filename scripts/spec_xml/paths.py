@@ -29,7 +29,7 @@ def get_chip_root():
     try:
         return next(filter(lambda p: (p / 'SPECIFICATION_VERSION').is_file(), Path(__file__).parents))
     except Exception as e:
-        raise EnvironmentError(
+        raise OSError(
             "Unable to determine CHIP root directory. Please ensure the environment is activated."
         ) from e
 

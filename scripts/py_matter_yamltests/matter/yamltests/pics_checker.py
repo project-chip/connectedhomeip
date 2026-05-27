@@ -14,7 +14,6 @@
 #    limitations under the License.
 
 import unicodedata
-from typing import List
 
 _COMMENT_CHARACTER = '#'
 _VALUE_SEPARATOR = '='
@@ -38,7 +37,7 @@ class InvalidPICSParsingError(Exception):
     pass
 
 
-class PICSChecker():
+class PICSChecker:
     """Class to compute a PICS expression"""
 
     def __init__(self, pics_file: str):
@@ -79,7 +78,7 @@ class PICSChecker():
                 line = f.readline()
         return pics
 
-    def __evaluate_expression(self, tokens: List[str], pics: dict):
+    def __evaluate_expression(self, tokens: list[str], pics: dict):
         leftExpr = self.__evaluate_sub_expression(tokens, pics)
         if self.__expression_index >= len(tokens):
             return leftExpr
@@ -103,7 +102,7 @@ class PICSChecker():
 
         raise InvalidPICSParsingError(f'Unknown token: {token}')
 
-    def __evaluate_sub_expression(self, tokens: List[str], pics: dict):
+    def __evaluate_sub_expression(self, tokens: list[str], pics: dict):
         token = tokens[self.__expression_index]
         if token == '(':
             self.__expression_index += 1
