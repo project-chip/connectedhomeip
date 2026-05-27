@@ -33,25 +33,19 @@ public:
     struct AppConfig
     {
         std::vector<DeviceTypeParser::Entry> deviceTypeEntries;
-        bool enableWiFi = false;
+        uint32_t bleController = 0;
+        bool enableWiFi        = false;
         std::string kvsPath;
         std::optional<uint16_t> discriminator;
         std::optional<uint16_t> vendorId;
         std::optional<uint16_t> productId;
         std::optional<uint16_t> port;
         std::optional<uint32_t> interfaceId;
+        bool enableGroupcast = false;
     };
 
     static chip::ArgParser::OptionSet * GetOptions();
-    static const AppConfig & GetConfig()
-    {
-        if (mConfig.deviceTypeEntries.empty())
-        {
-            mConfig.deviceTypeEntries.push_back({ "contact-sensor", 1, chip::kInvalidEndpointId });
-        }
-        return mConfig;
-    }
-
+    static const AppConfig & GetConfig();
     static const std::vector<DeviceTypeParser::Entry> & GetDeviceTypeEntries() { return GetConfig().deviceTypeEntries; }
 
 private:

@@ -90,17 +90,6 @@ protected:
     chip::Testing::ClusterTester mClusterTester;
 };
 
-static void CheckLogState(EventManagement & aLogMgmt, size_t expectedNumEvents, PriorityLevel aPriority)
-{
-    TLV::TLVReader reader;
-    size_t elementCount;
-    CircularEventBufferWrapper bufWrapper;
-    EXPECT_EQ(aLogMgmt.GetEventReader(reader, aPriority, &bufWrapper), CHIP_NO_ERROR);
-
-    EXPECT_EQ(TLV::Utilities::Count(reader, elementCount, false), CHIP_NO_ERROR);
-
-    EXPECT_EQ(elementCount, expectedNumEvents);
-}
 } // namespace app
 } // namespace chip
 
@@ -1571,10 +1560,6 @@ TEST_F(MockEventLogging, Test_AllocateTransport_SetTransportStatus_ManuallyTrigg
     triggerCommandData.activationReason = TriggerActivationReasonEnum::kUserInitiated;
 
     mServer.GetLogic().HandleManuallyTriggerTransport(triggerCommandHandler, kTriggerCommandPath, triggerCommandData);
-
-    EventManagement & logMgmt = EventManagement::GetInstance();
-
-    CheckLogState(logMgmt, 1, PriorityLevel::Info);
 }
 
 } // namespace PushAvStreamTransport

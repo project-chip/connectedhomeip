@@ -49,12 +49,14 @@ target_include_directories(app
 target_sources(app
     PRIVATE
     src/AppTask.cpp
+    src/DeviceCallbacks.cpp
     ../include/CHIPProjectConfig.h
     ${ZEPHYR_PLATFORM_COMMON}/main.cpp
     ${ZEPHYR_PLATFORM_COMMON}/AppTaskBase.cpp
     ${ZEPHYR_PLATFORM_COMMON}/AppTaskZephyr.cpp
     ${ZEPHYR_PLATFORM_COMMON}/CHIPDeviceManager.cpp
     ${ZEPHYR_PLATFORM_COMMON}/CommonDeviceCallbacks.cpp
+    ${ZEPHYR_PLATFORM_COMMON}/DataModelCallbacks.cpp
 )
 
 # TODO Implement OTA support
@@ -69,11 +71,11 @@ if(CONFIG_CHIP_OTA_REQUESTOR)
 endif()
 
 if(CONFIG_CHIP_WIFI)
-  chip_configure_data_model(app
+  chip_configure_data_model(app INCLUDE_SERVER
       ZAP_FILE ${SILABS_LIGHTING_COMMON}/data_model/lighting-wifi-app.zap
   )
 else()
-  chip_configure_data_model(app
+  chip_configure_data_model(app INCLUDE_SERVER
       ZAP_FILE ${SILABS_LIGHTING_COMMON}/data_model/lighting-thread-app.zap
   )
 endif()

@@ -1530,33 +1530,6 @@ std::optional<DataModel::ActionReturnStatus> PushAvStreamTransportServerLogic::H
     // Call the delegate
     status = mDelegate->ManuallyTriggerTransport(connectionID, activationReason, timeControl);
 
-    if (status == Status::Success)
-    {
-        // Get container type from transport configuration
-        ContainerFormatEnum containerType = transportConfiguration->transportOptions.Value().containerOptions.containerType;
-
-        // For CMAF container type, we need to provide CMAF session number
-        Optional<uint64_t> cmafSessionNumber;
-        if (containerType == ContainerFormatEnum::kCmaf)
-        {
-            uint64_t sessionNumber = 0;
-            if (mDelegate != nullptr && mDelegate->GetCMAFSessionNumber(connectionID, sessionNumber))
-            {
-                cmafSessionNumber = MakeOptional<uint64_t>(sessionNumber);
-            }
-            else
-            {
-                ChipLogError(Zcl, "GeneratePushTransportBeginEvent: Unable to get CMAF session number for connection %u",
-                             connectionID);
-                // Don't include the session number if we can't get it
-                cmafSessionNumber = Optional<uint64_t>();
-            }
-        }
-
-        GeneratePushTransportBeginEvent(connectionID, TransportTriggerTypeEnum::kCommand, MakeOptional(activationReason),
-                                        containerType, cmafSessionNumber);
-    }
-
     handler.AddStatus(commandPath, status);
 
     return std::nullopt;

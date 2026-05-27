@@ -13,7 +13,6 @@
 #    limitations under the License.
 
 import inspect
-from typing import List
 
 from .clusters.commissioner_commands import CommissionerCommands
 from .clusters.delay_commands import DelayCommands
@@ -26,7 +25,7 @@ from .pseudo_cluster import PseudoCluster
 
 
 class PseudoClusters:
-    def __init__(self, clusters: List[PseudoCluster]):
+    def __init__(self, clusters: list[PseudoCluster]):
         self.clusters = clusters
 
     def supports(self, request) -> bool:

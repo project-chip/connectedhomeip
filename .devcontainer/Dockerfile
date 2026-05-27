@@ -16,7 +16,7 @@ ARG BUILD_VERSION
 
 # All tools required for compilation belong in chip-build, forms "truth" for CHIP build tooling
 FROM ghcr.io/project-chip/chip-build-vscode:${BUILD_VERSION}
-LABEL org.opencontainers.image.source https://github.com/project-chip/connectedhomeip
+LABEL org.opencontainers.image.source="https://github.com/project-chip/connectedhomeip"
 
 # This Dockerfile contains things useful for an interactive development environment
 ARG USERNAME=vscode
@@ -43,8 +43,11 @@ RUN apt-get update \
         icecc \
         iputils-ping \
         lsb-release \
+        nano \
         openssh-client \
+        ripgrep \
         sudo \
+        time \
         valgrind \
         vim \
         zsh \

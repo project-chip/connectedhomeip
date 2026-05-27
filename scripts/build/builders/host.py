@@ -14,12 +14,64 @@
 
 import os
 import shlex
+import subprocess
+import sys
+
+from pathlib import Path
 from enum import Enum, auto
 from platform import uname
 from typing import Optional
 
-from .builder import BuilderOutput
+from runner.runner import Runner
+
+from .builder import BuilderOutput, OutDirLock, lock_output_dir
 from .gn import GnBuilder
+
+_MSAN_DEFAULT_SYSROOT = Path.home() / '.cache/matter/msan_sysroot'
+_MSAN_BUILD_SCRIPT = 'scripts/build/build_msan_sysroot.sh'
+
+
+def _msan_sysroot_path() -> Path:
+    """Resolve the MSAN sysroot path that GN will reference.
+    """
+    return Path(os.getenv('SYSROOT_MSAN', _MSAN_DEFAULT_SYSROOT)).absolute()
+
+
+def _msan_validate_sysroot(chip_root: str) -> None:
+    """Fail fast if the MSAN sysroot is missing or stale.
+
+    Delegates the freshness check to build_msan_sysroot.sh --check so the
+    hash logic has a single source of truth in bash. Passes the resolved
+    sysroot path explicitly so the script checks the same one GN will use.
+
+    Exits via sys.exit() rather than raising so the user sees a clean
+    actionable message instead of a click/builder traceback.
+    """
+    sysroot = _msan_sysroot_path()
+    script = Path(chip_root) / _MSAN_BUILD_SCRIPT
+    result = subprocess.run(
+        [script, '--out-dir', sysroot, '--check'],
+        capture_output=True, text=True,
+    )
+    if result.returncode == 0:
+        return
+
+    detail = result.stderr.strip() or result.stdout.strip() or '<no output>'
+    print(
+        '\n'
+        f'MSAN sysroot check failed: {detail}\n'
+        '\n'
+        'MSAN needs every dependency (libc++, libc++abi, OpenSSL, etc.) compiled \n'
+        'with -fsanitize=memory; uninstrumented code triggers false positives.\n'
+        '\n'
+        'Build it with:\n'
+        f'    {_MSAN_BUILD_SCRIPT}\n'
+        '\n'
+        'First-time build: 5-15 min, ~4 GB on disk during build\n'
+        'Override path with: export SYSROOT_MSAN=<path>',
+        file=sys.stderr,
+    )
+    sys.exit(result.returncode)
 
 
 class HostCryptoLibrary(Enum):
@@ -250,9 +302,12 @@ class HostApp(Enum):
         elif self == HostApp.TV_CASTING_APP:
             yield 'chip-tv-casting-app'
             yield 'chip-tv-casting-app.map'
-        elif self == HostApp.LIGHT or self == HostApp.LIGHT_DATA_MODEL_NO_UNIQUE_ID:
+        elif self == HostApp.LIGHT:
             yield 'chip-lighting-app'
             yield 'chip-lighting-app.map'
+        elif self == HostApp.LIGHT_DATA_MODEL_NO_UNIQUE_ID:
+            yield 'chip-lighting-data-model-no-unique-id-app'
+            yield 'chip-lighting-data-model-no-unique-id-app.map'
         elif self == HostApp.LOCK:
             yield 'chip-lock-app'
             yield 'chip-lock-app.map'
@@ -362,6 +417,7 @@ class HostBoard(Enum):
 
     # cross-compile support
     ARM64 = auto()
+    ARM = auto()
 
     # for test support
     FAKE = auto()
@@ -382,6 +438,8 @@ class HostBoard(Enum):
             return arch
         if self == HostBoard.ARM64:
             return 'arm64'
+        if self == HostBoard.ARM:
+            return 'arm'
         if self == HostBoard.FAKE:
             return 'fake'
         raise Exception('Unknown host board type: %r' % self)
@@ -397,9 +455,9 @@ class HostBoard(Enum):
 
 class HostBuilder(GnBuilder):
 
-    def __init__(self, root, runner, app: HostApp, board=HostBoard.NATIVE,
+    def __init__(self, root: str, runner: Runner, output_dir_lock: OutDirLock, app: HostApp, board=HostBoard.NATIVE,
                  enable_ipv4=True, enable_ble=True, enable_wifi=True, enable_wifipaf=True,
-                 enable_groupcast=True, enable_thread=True, use_tsan=False, use_asan=False, use_ubsan=False,
+                 enable_groupcast=True, enable_thread=True, use_tsan=False, use_asan=False, use_ubsan=False, use_msan=False,
                  separate_event_loop=True, fuzzing_type: HostFuzzingType = HostFuzzingType.NONE, use_clang=False,
                  interactive_mode=True, extra_tests=False, use_nl_fault_injection=False, use_platform_mdns=False, enable_rpcs=False,
                  use_coverage=False, use_dmalloc=False, minmdns_address_policy=None,
@@ -414,6 +472,7 @@ class HostBuilder(GnBuilder):
                  openthread_endpoint=False,
                  unified=False,
                  chip_enable_endpoint_unique_id: Optional[bool] = None,
+                 all_devices_enabled_devices=None,
                  ):
         """
         Construct a host builder.
@@ -424,11 +483,14 @@ class HostBuilder(GnBuilder):
                       into per-target directories. Directory name will be "unified"
         """
 
+        # Save before `root` is mutated below (used by MSAN validation later).
+        chip_root = os.path.abspath(root)
+
         # Unified builds use the top level root for compilation
         if not unified:
             root = os.path.join(root, 'examples', app.ExamplePath())
 
-        super(HostBuilder, self).__init__(root=root, runner=runner)
+        super().__init__(root=root, runner=runner, output_dir_lock=output_dir_lock)
 
         self.app = app
         self.board = board
@@ -436,6 +498,7 @@ class HostBuilder(GnBuilder):
         self.build_env = {}
         self.fuzzing_type = fuzzing_type
         self.unified = unified
+        self.use_msan = use_msan
 
         if enable_rpcs:
             self.extra_gn_options.append('import("//with_pw_rpc.gni")')
@@ -479,6 +542,13 @@ class HostBuilder(GnBuilder):
         if use_ubsan:
             self.extra_gn_options.append('is_ubsan=true')
 
+        if use_msan:
+            if not runner.dry_run:
+                _msan_validate_sysroot(chip_root)
+            self.extra_gn_options.append('is_msan=true')
+            # Tell GN to build against the same sysroot we just validated.
+            self.extra_gn_options.append(f'msan_sysroot="{_msan_sysroot_path()}"')
+
         if use_dmalloc:
             self.extra_gn_options.append('chip_config_memory_debug_checks=true')
             self.extra_gn_options.append('chip_config_memory_debug_dmalloc=true')
@@ -518,6 +588,7 @@ class HostBuilder(GnBuilder):
                 # so setting clang is not correct
                 raise Exception('Fake host board is always gcc (not clang)')
 
+        self.use_nl_fault_injection = use_nl_fault_injection
         if use_nl_fault_injection:
             self.extra_gn_options.append('chip_with_nlfaultinjection=true')
 
@@ -579,8 +650,8 @@ class HostBuilder(GnBuilder):
             self.extra_gn_options.append(f'chip_casting_simplified={str(chip_casting_simplified).lower()}')
             if chip_casting_simplified:
                 self.extra_gn_options.append(
-                    'chip_cluster_objects_source_override='
-                    '"${chip_root}/examples/tv-casting-app/tv-casting-common/casting-cluster-objects.cpp"'
+                    'chip_data_model_overrides_dir='
+                    '"${chip_root}/examples/tv-casting-app/tv-casting-common"'
                 )
 
         if enable_webrtc:
@@ -598,19 +669,24 @@ class HostBuilder(GnBuilder):
             else:
                 self.extra_gn_options.append('chip_enable_endpoint_unique_id=false')
 
+        self.all_devices_enabled_devices = all_devices_enabled_devices or []
+        if self.all_devices_enabled_devices:
+            devices_str = '[' + ','.join(f'"{d}"' for d in self.all_devices_enabled_devices) + ']'
+            self.extra_gn_options.append(f'all_devices_enabled_devices={devices_str}')
+
         if openthread_endpoint:
             if enable_wifi:
                 raise Exception("OpenThread EndPoint mode does not support Wifi")
 
             self.extra_gn_options.append('chip_system_config_use_openthread_inet_endpoints=true')
 
-        if self.board == HostBoard.ARM64:
+        if self.board in (HostBoard.ARM64, HostBoard.ARM):
             if not use_clang:
                 raise Exception("Cross compile only supported using clang")
 
         if app == HostApp.CERT_TOOL:
             # Certification only built for openssl
-            if self.board == HostBoard.ARM64 and crypto_library == HostCryptoLibrary.MBEDTLS:
+            if self.board in (HostBoard.ARM64, HostBoard.ARM) and crypto_library == HostCryptoLibrary.MBEDTLS:
                 raise Exception("MbedTLS not supported for cross compiling cert tool")
             self.build_command = 'src/tools/chip-cert'
         elif app == HostApp.ADDRESS_RESOLVE:
@@ -650,6 +726,11 @@ class HostBuilder(GnBuilder):
                     'target_cpu="arm64"',
                     'sysroot="%s"' % self.SysRootPath('SYSROOT_AARCH64')
                 ])
+            case HostBoard.ARM:
+                args.extend([
+                    'target_cpu="arm"',
+                    'sysroot="%s"' % self.SysRootPath('SYSROOT_ARMHF'),
+                ])
             case HostBoard.FAKE:
                 args.extend([
                     'custom_toolchain="//build/toolchain/fake:fake_x64_gcc"',
@@ -659,6 +740,7 @@ class HostBuilder(GnBuilder):
                 ])
         return args
 
+    @lock_output_dir
     def createJavaExecutable(self, java_program):
         self._Execute(
             [
@@ -673,11 +755,23 @@ class HostBuilder(GnBuilder):
         if self.board == HostBoard.ARM64:
             self.build_env['PKG_CONFIG_PATH'] = os.path.join(
                 self.SysRootPath('SYSROOT_AARCH64'), 'lib/aarch64-linux-gnu/pkgconfig')
+        if self.board == HostBoard.ARM:
+            self.build_env['PKG_CONFIG_PATH'] = os.path.join(
+                self.SysRootPath('SYSROOT_ARMHF'), 'lib/arm-linux-gnueabihf/pkgconfig')
+        if self.use_msan:
+            # make pkg-config use the instrumented OpenSSL/zlib/glib/etc. in the MSAN sysroot.
+            # Without this, Matter's GN config picks up the system's libs, and MSAN reports endless
+            # false positives from uninstrumented dependencies at runtime.
+            sysroot = _msan_sysroot_path()
+            self.build_env['PKG_CONFIG_PATH'] = ':'.join([
+                f'{sysroot}/lib/pkgconfig',
+                f'{sysroot}/lib64/pkgconfig',
+            ])
         if self.app == HostApp.TESTS and self.use_coverage and self.use_clang and self.fuzzing_type == HostFuzzingType.NONE:
             # Every test is expected to have a distinct build ID, so `%m` will be
             # distinct.
             #
-            # Output is relative to "oputput_dir" since that is where GN executs
+            # Output is relative to "output_dir" since that is where GN executes
             self.build_env['LLVM_PROFILE_FILE'] = os.path.join("coverage", "profiles", "run_%b.profraw")
 
         return self.build_env
@@ -687,8 +781,9 @@ class HostBuilder(GnBuilder):
             raise Exception('Missing environment variable "%s"' % name)
         return os.environ[name]
 
+    @lock_output_dir
     def generate(self):
-        super(HostBuilder, self).generate(dedup=self.unified)
+        super().generate(dedup=self.unified)
         if 'JAVA_HOME' in os.environ:
             self._Execute(
                 ["third_party/java_deps/set_up_java_deps.sh"],
@@ -719,6 +814,7 @@ class HostBuilder(GnBuilder):
             self.coverage_dir = os.path.join(self.output_dir, 'coverage')
             self._Execute(['mkdir', '-p', self.coverage_dir], title="Create coverage output location")
 
+    @lock_output_dir
     def PreBuildCommand(self):
         if self.app == HostApp.TESTS and self.use_coverage and not self.use_clang:
             cmd = ['ninja', '-C', self.output_dir]
@@ -737,6 +833,7 @@ class HostBuilder(GnBuilder):
                            '--exclude', '/usr/include/*',
                            '--output-file', os.path.join(self.coverage_dir, 'lcov_base.info')], title="Initial coverage baseline")
 
+    @lock_output_dir
     def PostBuildCommand(self):
         # TODO: CLANG coverage is not yet implemented, requires different tooling
         if self.app == HostApp.TESTS and self.use_coverage and not self.use_clang:
@@ -814,7 +911,38 @@ class HostBuilder(GnBuilder):
         if self.app == HostApp.KOTLIN_MATTER_CONTROLLER:
             self.createJavaExecutable("kotlin-matter-controller")
 
+        if self.app == HostApp.LIGHT_DATA_MODEL_NO_UNIQUE_ID:
+            self._Execute(
+                ['mv',
+                 os.path.join(self.output_dir, 'chip-lighting-app'),
+                 os.path.join(self.output_dir, 'chip-lighting-data-model-no-unique-id-app')],
+                title="Rename lighting-data-model-no-unique-id app binary"
+            )
+
+        if self.app == HostApp.ALL_CLUSTERS and self.use_nl_fault_injection:
+            self._Execute(
+                ['mv',
+                 os.path.join(self.output_dir, 'chip-all-clusters-app'),
+                 os.path.join(self.output_dir, 'chip-all-clusters-app-nlfaultinject')],
+                title="Rename all-clusters nlfaultinject app binary"
+            )
+
+    def _AllDevicesOutputName(self):
+        """Return the binary name produced by the all-devices-app build."""
+        if self.all_devices_enabled_devices:
+            # device built with all-examples does not change the name.
+            return 'example-device-app'
+        return 'all-devices-app'
+
+    @lock_output_dir
     def build_outputs(self):
+        if self.app == HostApp.ALL_DEVICES_APP:
+            base = self._AllDevicesOutputName()
+            for name in [base, base + '.map']:
+                if not self.options.enable_link_map_file and name.endswith('.map'):
+                    continue
+                yield BuilderOutput(os.path.join(self.output_dir, name), name)
+            return
         for name in self.app.OutputNames():
             if not self.options.enable_link_map_file and name.endswith(".map"):
                 continue
