@@ -358,15 +358,15 @@ def _AllFoundYamlTests(treat_repl_unsupported_as_in_development: bool, treat_dft
 
 
 def AllReplYamlTests():
-    for test in _AllFoundYamlTests(treat_repl_unsupported_as_in_development=True, treat_dft_unsupported_as_in_development=False, treat_chip_tool_unsupported_as_in_development=False, use_short_run_name=False):
-        yield test
+    yield from _AllFoundYamlTests(treat_repl_unsupported_as_in_development=True, treat_dft_unsupported_as_in_development=False,
+                                  treat_chip_tool_unsupported_as_in_development=False, use_short_run_name=False)
 
 
 def AllChipToolYamlTests(use_short_run_name: bool = True):
-    for test in _AllFoundYamlTests(treat_repl_unsupported_as_in_development=False, treat_dft_unsupported_as_in_development=False, treat_chip_tool_unsupported_as_in_development=True, use_short_run_name=use_short_run_name):
-        yield test
+    yield from _AllFoundYamlTests(treat_repl_unsupported_as_in_development=False, treat_dft_unsupported_as_in_development=False,
+                                  treat_chip_tool_unsupported_as_in_development=True, use_short_run_name=use_short_run_name)
 
 
 def AllDarwinFrameworkToolYamlTests():
-    for test in _AllFoundYamlTests(treat_repl_unsupported_as_in_development=False, treat_dft_unsupported_as_in_development=True, treat_chip_tool_unsupported_as_in_development=False, use_short_run_name=True):
-        yield test
+    yield from _AllFoundYamlTests(treat_repl_unsupported_as_in_development=False, treat_dft_unsupported_as_in_development=True,
+                                  treat_chip_tool_unsupported_as_in_development=False, use_short_run_name=True)
