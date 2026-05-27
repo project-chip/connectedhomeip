@@ -417,11 +417,9 @@ OperationalStateCluster::HandleStartOrStopState(const DataModel::InvokeRequest &
 // ---------------------------------------------------------------------------
 
 RvcOperationalState::RvcOperationalStateCluster::RvcOperationalStateCluster(
-    EndpointId endpointId, RvcOperationalState::Delegate * delegate,
+    EndpointId endpointId, OperationalState::OperationalStateCluster::Delegate * delegate,
     const OperationalState::OperationalStateCluster::Config & config) :
-    OperationalState::OperationalStateCluster(endpointId, RvcOperationalState::Id, RvcOperationalState::kRevision,
-                                              static_cast<OperationalState::Delegate *>(delegate), config),
-    mRvcDelegate(delegate)
+    OperationalState::OperationalStateCluster(endpointId, RvcOperationalState::Id, RvcOperationalState::kRevision, delegate, config)
 {}
 
 CHIP_ERROR
@@ -464,8 +462,7 @@ std::optional<DataModel::ActionReturnStatus>
 RvcOperationalState::RvcOperationalStateCluster::HandleGoHomeCommand(const DataModel::InvokeRequest & request,
                                                                      chip::TLV::TLVReader & input, CommandHandler * handler)
 {
-    RvcOperationalState::Commands::GoHome::DecodableType req;
-    if (DataModel::Decode(input, req) != CHIP_NO_ERROR)
+    if (input.VerifyEndOfContainer() != CHIP_NO_ERROR)
     {
         return Protocols::InteractionModel::Status::InvalidCommand;
     }
@@ -481,7 +478,7 @@ RvcOperationalState::RvcOperationalStateCluster::HandleGoHomeCommand(const DataM
 
     if (err.errorStateID == 0 && opState != to_underlying(RvcOperationalState::OperationalStateEnum::kSeekingCharger))
     {
-        mRvcDelegate->HandleGoHomeCommandCallback(err);
+        GetDelegate()->HandleGoHomeCommandCallback(err);
     }
 
     OperationalState::Commands::OperationalCommandResponse::Type response;
@@ -495,7 +492,7 @@ RvcOperationalState::RvcOperationalStateCluster::HandleGoHomeCommand(const DataM
 // ---------------------------------------------------------------------------
 
 OvenCavityOperationalState::OvenCavityOperationalStateCluster::OvenCavityOperationalStateCluster(
-    EndpointId endpointId, OperationalState::Delegate * delegate,
+    EndpointId endpointId, OperationalState::OperationalStateCluster::Delegate * delegate,
     const OperationalState::OperationalStateCluster::Config & config) :
     OperationalState::OperationalStateCluster(endpointId, OvenCavityOperationalState::Id, OvenCavityOperationalState::kRevision,
                                               delegate, config)

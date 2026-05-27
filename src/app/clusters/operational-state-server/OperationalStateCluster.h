@@ -18,14 +18,16 @@
 
 #pragma once
 
-#include "OperationalStateDelegate.h"
+#include "operational-state-cluster-objects.h"
 #include <app/cluster-building-blocks/QuieterReporting.h>
+#include <app/data-model/Nullable.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/OptionalAttributeSet.h>
 #include <app/server-cluster/ServerClusterInterfaceRegistry.h>
 #include <clusters/OperationalState/Metadata.h>
 #include <clusters/OvenCavityOperationalState/Metadata.h>
 #include <clusters/RvcOperationalState/Metadata.h>
+#include <lib/support/Span.h>
 
 namespace chip {
 namespace app {
@@ -53,6 +55,43 @@ public:
     };
 
     /**
+     * Application delegate interface for OperationalStateCluster.
+     *
+     * Concrete delegates inherit from this and implement the pure-virtual methods.
+     * The codegen backward-compat layer (OperationalState::Delegate in OperationalStateDelegate.h)
+     * extends this with SetInstance/GetInstance for legacy Instance wrappers.
+     */
+    class Delegate
+    {
+    public:
+        Delegate()          = default;
+        virtual ~Delegate() = default;
+
+        virtual app::DataModel::Nullable<uint32_t> GetCountdownTime() = 0;
+
+        virtual CHIP_ERROR GetOperationalStateAtIndex(size_t index, GenericOperationalState & operationalState) = 0;
+
+        virtual CHIP_ERROR GetOperationalPhaseAtIndex(size_t index, MutableCharSpan & operationalPhase) = 0;
+
+        virtual void HandlePauseStateCallback(GenericOperationalError & err) = 0;
+
+        virtual void HandleResumeStateCallback(GenericOperationalError & err) = 0;
+
+        virtual void HandleStartStateCallback(GenericOperationalError & err) = 0;
+
+        virtual void HandleStopStateCallback(GenericOperationalError & err) = 0;
+
+        /**
+         * Handle Command Callback in application: GoHome (RVC-specific).
+         * Default implementation returns kUnknownEnumValue (unsupported). Override in RVC delegates.
+         */
+        virtual void HandleGoHomeCommandCallback(GenericOperationalError & err)
+        {
+            err.Set(to_underlying(ErrorStateEnum::kUnknownEnumValue));
+        }
+    };
+
+    /**
      * Construct an OperationalState cluster for the given endpoint.
      *
      * @param endpointId        The endpoint on which this cluster exists.
@@ -64,7 +103,7 @@ public:
 
     ~OperationalStateCluster() override;
 
-    // ---- Application-facing API (preserved from legacy Instance) ----
+    // ---- Application-facing API ----
 
     CHIP_ERROR SetCurrentPhase(const DataModel::Nullable<uint8_t> & aPhase);
     CHIP_ERROR SetOperationalState(uint8_t aOpState);
@@ -103,20 +142,12 @@ public:
     CHIP_ERROR GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder) override;
 
 protected:
-    /**
-     * Constructor for derived cluster variants (RVC, OvenCavity) with a different cluster ID
-     * and spec revision.
-     */
     OperationalStateCluster(EndpointId endpointId, ClusterId clusterId, uint32_t revision, Delegate * delegate,
                             const Config & config = {});
 
     virtual bool IsDerivedClusterStatePauseCompatible(uint8_t aState) { return false; }
     virtual bool IsDerivedClusterStateResumeCompatible(uint8_t aState) { return false; }
 
-    /**
-     * Override to handle commands that are specific to a derived cluster (e.g. GoHome for RVC).
-     * Return UnsupportedCommand for unrecognised commands.
-     */
     virtual std::optional<DataModel::ActionReturnStatus>
     HandleDerivedClusterCommand(const DataModel::InvokeRequest & request, chip::TLV::TLVReader & input, CommandHandler * handler)
     {
@@ -125,6 +156,8 @@ protected:
 
     void UpdateCountdownTime(bool fromDelegate);
     void UpdateCountdownTimeFromClusterLogic() { UpdateCountdownTime(/* fromDelegate = */ false); }
+
+    Delegate * GetDelegate() { return mDelegate; }
 
 private:
     Delegate * mDelegate;
@@ -136,7 +169,8 @@ private:
     GenericOperationalError mOperationalError = to_underlying(ErrorStateEnum::kNoError);
     QuieterReportingAttribute<uint32_t> mCountdownTime{ DataModel::NullNullable };
 
-    // isPause=true → Pause, false → Resume. isStart=true → Start, false → Stop.
+    static bool CountdownTimePredicate(const QuieterReportingAttribute<uint32_t>::SufficientChangePredicateCandidate & candidate);
+
     std::optional<DataModel::ActionReturnStatus> HandlePauseOrResumeState(const DataModel::InvokeRequest & request,
                                                                           chip::TLV::TLVReader & input, CommandHandler * handler,
                                                                           bool isPause);
@@ -145,93 +179,14 @@ private:
                                                                         bool isStart);
 };
 
-/**
- * Legacy wrapper around OperationalStateCluster for backwards compatibility with existing applications
- * that construct Instance objects directly and call Init().
- *
- * NEW CODE should use OperationalStateCluster directly.
- *
- * InstanceBase holds all state and methods. The concrete Instance class (below) additionally
- * owns the cluster storage inline — no heap allocation.
- * Derived cluster Instances (RvcOperationalState::Instance, OvenCavityOperationalState::Instance)
- * inherit InstanceBase directly and supply their own cluster storage.
- */
-class InstanceBase
-{
-public:
-    ~InstanceBase();
-
-    CHIP_ERROR Init();
-    void Shutdown();
-
-    // Forwarding API — delegates to the underlying OperationalStateCluster.
-    CHIP_ERROR SetCurrentPhase(const DataModel::Nullable<uint8_t> & aPhase) { return Cluster().SetCurrentPhase(aPhase); }
-    CHIP_ERROR SetOperationalState(uint8_t aOpState) { return Cluster().SetOperationalState(aOpState); }
-    DataModel::Nullable<uint8_t> GetCurrentPhase() const { return Cluster().GetCurrentPhase(); }
-    uint8_t GetCurrentOperationalState() const { return Cluster().GetCurrentOperationalState(); }
-    void GetCurrentOperationalError(GenericOperationalError & error) const { Cluster().GetCurrentOperationalError(error); }
-    void UpdateCountdownTimeFromDelegate() { Cluster().UpdateCountdownTimeFromDelegate(); }
-    void OnOperationalErrorDetected(const Structs::ErrorStateStruct::Type & aError)
-    {
-        Cluster().OnOperationalErrorDetected(aError);
-    }
-    void OnOperationCompletionDetected(uint8_t aCompletionErrorCode,
-                                       const Optional<DataModel::Nullable<uint32_t>> & aTotalOperationalTime = NullOptional,
-                                       const Optional<DataModel::Nullable<uint32_t>> & aPausedTime           = NullOptional)
-    {
-        Cluster().OnOperationCompletionDetected(aCompletionErrorCode, aTotalOperationalTime, aPausedTime);
-    }
-    void ReportOperationalStateListChange() { Cluster().ReportOperationalStateListChange(); }
-    void ReportPhaseListChange() { Cluster().ReportPhaseListChange(); }
-    bool IsSupportedPhase(uint8_t aPhase) { return Cluster().IsSupportedPhase(aPhase); }
-    bool IsSupportedOperationalState(uint8_t aState) { return Cluster().IsSupportedOperationalState(aState); }
-
-protected:
-    InstanceBase(OperationalStateCluster & cluster, ServerClusterRegistration & registration, Delegate * aDelegate);
-
-    OperationalStateCluster & Cluster() { return *mClusterPtr; }
-    const OperationalStateCluster & Cluster() const { return *mClusterPtr; }
-
-    bool mRegistered = false;
-
-private:
-    Delegate * mDelegate;
-    OperationalStateCluster * mClusterPtr;
-    ServerClusterRegistration * mRegPtr;
-};
-
-namespace detail {
-struct OperationalInstanceBase
-{
-    RegisteredServerCluster<OperationalStateCluster> mCluster;
-    OperationalInstanceBase(Delegate * aDelegate, EndpointId aEndpointId, const OperationalStateCluster::Config & config = {}) :
-        mCluster(aEndpointId, aDelegate, config)
-    {}
-};
-} // namespace detail
-
-/**
- * Concrete Instance for standalone OperationalState cluster use. Owns the cluster storage inline
- * (no heap allocation), following the same embedded-storage pattern as RvcOperationalState::Instance
- * and OvenCavityOperationalState::Instance.
- */
-class Instance : private detail::OperationalInstanceBase, public InstanceBase
-{
-public:
-    Instance(Delegate * aDelegate, EndpointId aEndpointId, const OperationalStateCluster::Config & config = {}) :
-        detail::OperationalInstanceBase(aDelegate, aEndpointId, config),
-        InstanceBase(detail::OperationalInstanceBase::mCluster.Cluster(), detail::OperationalInstanceBase::mCluster.Registration(),
-                     aDelegate)
-    {}
-};
-
 } // namespace OperationalState
+
 namespace RvcOperationalState {
 
 class RvcOperationalStateCluster : public OperationalState::OperationalStateCluster
 {
 public:
-    RvcOperationalStateCluster(EndpointId endpointId, Delegate * delegate,
+    RvcOperationalStateCluster(EndpointId endpointId, OperationalState::OperationalStateCluster::Delegate * delegate,
                                const OperationalState::OperationalStateCluster::Config & config = {});
 
     CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,
@@ -246,32 +201,8 @@ protected:
                                                                              CommandHandler * handler) override;
 
 private:
-    Delegate * mRvcDelegate;
-
     std::optional<DataModel::ActionReturnStatus> HandleGoHomeCommand(const DataModel::InvokeRequest & request,
                                                                      chip::TLV::TLVReader & input, CommandHandler * handler);
-};
-
-namespace detail {
-struct RvcInstanceBase
-{
-    RegisteredServerCluster<RvcOperationalStateCluster> mCluster;
-    RvcInstanceBase(Delegate * aDelegate, EndpointId aEndpointId,
-                    const OperationalState::OperationalStateCluster::Config & config = {}) :
-        mCluster(aEndpointId, aDelegate, config)
-    {}
-};
-} // namespace detail
-
-class Instance : private detail::RvcInstanceBase, public OperationalState::InstanceBase
-{
-public:
-    Instance(Delegate * aDelegate, EndpointId aEndpointId, const OperationalState::OperationalStateCluster::Config & config = {}) :
-        detail::RvcInstanceBase(aDelegate, aEndpointId, config),
-        OperationalState::InstanceBase(detail::RvcInstanceBase::mCluster.Cluster(),
-                                       detail::RvcInstanceBase::mCluster.Registration(),
-                                       static_cast<OperationalState::Delegate *>(aDelegate))
-    {}
 };
 
 } // namespace RvcOperationalState
@@ -281,33 +212,11 @@ namespace OvenCavityOperationalState {
 class OvenCavityOperationalStateCluster : public OperationalState::OperationalStateCluster
 {
 public:
-    OvenCavityOperationalStateCluster(EndpointId endpointId, OperationalState::Delegate * delegate,
+    OvenCavityOperationalStateCluster(EndpointId endpointId, OperationalState::OperationalStateCluster::Delegate * delegate,
                                       const OperationalState::OperationalStateCluster::Config & config = {});
 
     CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,
                                 ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
-};
-
-namespace detail {
-struct OvenInstanceBase
-{
-    RegisteredServerCluster<OvenCavityOperationalStateCluster> mCluster;
-    OvenInstanceBase(OperationalState::Delegate * aDelegate, EndpointId aEndpointId,
-                     const OperationalState::OperationalStateCluster::Config & config = {}) :
-        mCluster(aEndpointId, aDelegate, config)
-    {}
-};
-} // namespace detail
-
-class Instance : private detail::OvenInstanceBase, public OperationalState::InstanceBase
-{
-public:
-    Instance(OperationalState::Delegate * aDelegate, EndpointId aEndpointId,
-             const OperationalState::OperationalStateCluster::Config & config = {}) :
-        detail::OvenInstanceBase(aDelegate, aEndpointId, config),
-        OperationalState::InstanceBase(detail::OvenInstanceBase::mCluster.Cluster(),
-                                       detail::OvenInstanceBase::mCluster.Registration(), aDelegate)
-    {}
 };
 
 } // namespace OvenCavityOperationalState

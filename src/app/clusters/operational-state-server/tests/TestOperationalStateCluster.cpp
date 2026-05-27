@@ -17,7 +17,6 @@
  */
 
 #include <app/clusters/operational-state-server/OperationalStateCluster.h>
-#include <app/clusters/operational-state-server/OperationalStateDelegate.h>
 #include <app/clusters/operational-state-server/operational-state-cluster-objects.h>
 #include <app/server-cluster/testing/ClusterTester.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
@@ -37,7 +36,7 @@ using namespace chip::Protocols::InteractionModel;
 // Mock delegate
 // ---------------------------------------------------------------------------
 
-class MockDelegate : public Delegate
+class MockDelegate : public OperationalStateCluster::Delegate
 {
 public:
     static constexpr uint8_t kStateCount = 4;
@@ -467,7 +466,7 @@ namespace RvcOperationalState {
 
 using namespace chip::app::Clusters::OperationalState;
 
-class MockRvcDelegate : public Delegate
+class MockRvcDelegate : public OperationalStateCluster::Delegate
 {
 public:
     static constexpr uint8_t kStateCount = 5;
@@ -494,6 +493,14 @@ public:
 
     void HandlePauseStateCallback(GenericOperationalError & err) override { err.Set(to_underlying(ErrorStateEnum::kNoError)); }
     void HandleResumeStateCallback(GenericOperationalError & err) override { err.Set(to_underlying(ErrorStateEnum::kNoError)); }
+    void HandleStartStateCallback(GenericOperationalError & err) override
+    {
+        err.Set(to_underlying(chip::app::Clusters::OperationalState::ErrorStateEnum::kUnknownEnumValue));
+    }
+    void HandleStopStateCallback(GenericOperationalError & err) override
+    {
+        err.Set(to_underlying(chip::app::Clusters::OperationalState::ErrorStateEnum::kUnknownEnumValue));
+    }
     void HandleGoHomeCommandCallback(GenericOperationalError & err) override
     {
         err.Set(to_underlying(ErrorStateEnum::kNoError));
@@ -574,7 +581,7 @@ namespace OvenCavityOperationalState {
 
 using namespace chip::app::Clusters::OperationalState;
 
-class MockOvenDelegate : public Delegate
+class MockOvenDelegate : public OperationalStateCluster::Delegate
 {
 public:
     static constexpr uint8_t kStateCount = 3;
