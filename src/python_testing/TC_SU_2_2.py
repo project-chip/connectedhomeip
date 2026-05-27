@@ -299,7 +299,8 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         #             correctly observed the minimum delay) does not cause a failure.
         # ------------------------------------------------------------------------------------
         step_number_s1 = "[STEP_1]"
-        logger.info('%s: Prerequisite #1.0 - Requestor (DUT), NodeID: %s, FabricId: %s', step_number_s1, requestor_node_id, fabric_id)
+        logger.info('%s: Prerequisite #1.0 - Requestor (DUT), NodeID: %s, FabricId: %s',
+                    step_number_s1, requestor_node_id, fabric_id)
 
         kDelayedOnQuery_s1 = Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDelayedOnQuery
         kDownloading_s1 = Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading
@@ -371,7 +372,8 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         # [STEP_2]: Prerequisites - Setup Provider
         # ------------------------------------------------------------------------------------
         step_number_s2 = "[STEP_2]"
-        logger.info('%s: Prerequisite #1.0 - Requestor (DUT), NodeID: %s, FabricId: %s', step_number_s2, requestor_node_id, fabric_id)
+        logger.info('%s: Prerequisite #1.0 - Requestor (DUT), NodeID: %s, FabricId: %s',
+                    step_number_s2, requestor_node_id, fabric_id)
 
         provider_extra_args_updateNotAvailable = [
             "-q", "updateNotAvailable",
@@ -462,7 +464,8 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         # in this step. The full OTA update happens in Step 5.
         # ------------------------------------------------------------------------------------
         step_number_s3 = "[STEP_3]"
-        logger.info('%s: Prerequisite #1.0 - Requestor (DUT), NodeID: %s, FabricId: %s', step_number_s3, requestor_node_id, fabric_id)
+        logger.info('%s: Prerequisite #1.0 - Requestor (DUT), NodeID: %s, FabricId: %s',
+                    step_number_s3, requestor_node_id, fabric_id)
 
         provider_extra_args_busy_180 = [
             "-q", "busy",
@@ -571,7 +574,8 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         # [STEP_4]: Prerequisites - Setup Provider
         # ------------------------------------------------------------------------------------
         step_number_s4 = "[STEP_4]"
-        logger.info('%s: Prerequisite #1.0 - Requestor (DUT), NodeID: %s, FabricId: %s', step_number_s4, requestor_node_id, fabric_id)
+        logger.info('%s: Prerequisite #1.0 - Requestor (DUT), NodeID: %s, FabricId: %s',
+                    step_number_s4, requestor_node_id, fabric_id)
 
         provider_extra_args_invalid_bdx = [
             "-i", "bdx://000000000000000X"
@@ -720,7 +724,8 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         # full OTA update in the entire test — the DUT applies V2 and reboots.
         # ------------------------------------------------------------------------------------
         step_number_s5 = "[STEP_5]"
-        logger.info('%s: Prerequisite #1.0 - Requestor (DUT), NodeID: %s, FabricId: %s', step_number_s5, requestor_node_id, fabric_id)
+        logger.info('%s: Prerequisite #1.0 - Requestor (DUT), NodeID: %s, FabricId: %s',
+                    step_number_s5, requestor_node_id, fabric_id)
         logger.info('%s: Prerequisite #1.0 - Launched Provider', step_number_s5)
 
         self.start_provider(
@@ -919,7 +924,8 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         # meaning only one firmware image is required for the entire test.
         # ------------------------------------------------------------------------------------
         step_number_s6 = "[STEP_6]"
-        logger.info('%s: Prerequisite #1.0 - Requestor (DUT), NodeID: %s, FabricId: %s', step_number_s6, requestor_node_id, fabric_id)
+        logger.info('%s: Prerequisite #1.0 - Requestor (DUT), NodeID: %s, FabricId: %s',
+                    step_number_s6, requestor_node_id, fabric_id)
 
         self.start_provider(
             provider_app_path=self.provider_app_path,

@@ -127,7 +127,8 @@ class TC_IDM_2_3(BasicCompositionTests):
         else:
             log.info("Basic Information Cluster revision is less than 6, read paths and subscribe paths are not part of CapabilityMinima struct.")
 
-        log.info("CapabilityMinima: readPathsSupported=%s, subscribePathsSupported=%s", num_read_paths_supported, num_subscribe_paths_supported)
+        log.info("CapabilityMinima: readPathsSupported=%s, subscribePathsSupported=%s",
+                 num_read_paths_supported, num_subscribe_paths_supported)
 
         # Step 2: Collect available paths
         self.step(2)
