@@ -35,9 +35,9 @@
 #include <platform/ESP32/ESP32Utils.h>
 #include <setup_payload/OnboardingCodesUtil.h>
 
-#include "network_coprocessor.h"
 #include "esp_webrtc_time.h"
 #include "esp_work_queue.h"
+#include "network_coprocessor.h"
 // #include "host_power_save.h"
 #include "signaling_serializer.h"
 #include "webrtc_bridge.h"
