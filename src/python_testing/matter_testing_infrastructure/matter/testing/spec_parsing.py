@@ -1543,13 +1543,13 @@ def parse_single_device_type(root: ElementTree.Element, cluster_definition_xml: 
 
                 if (constraint := composed_dt.find('constraint')) is not None:
                     if (allowed := constraint.find('allowed')) is not None:
-                        min_instances = max_instances = int(allowed.attrib.get('value', 0), 0)
+                        min_instances = max_instances = int(allowed.attrib.get('value', "0"), 0)
                     else:
                         min_el = constraint.find('min')
                         max_el = constraint.find('max')
 
-                        min_instances = int(min_el.attrib.get('value', 0), 0) if min_el is not None else None
-                        max_instances = int(max_el.attrib.get('value', 0), 0) if max_el is not None else None
+                        min_instances = int(min_el.attrib.get('value', "0"), 0) if min_el is not None else None
+                        max_instances = int(max_el.attrib.get('value', "0"), 0) if max_el is not None else None
 
                 cluster_requirements = {}
                 cr_el = composed_dt.find('clusterRequirements')

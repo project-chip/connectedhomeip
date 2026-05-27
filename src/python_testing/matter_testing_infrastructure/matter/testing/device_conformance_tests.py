@@ -386,13 +386,7 @@ class DeviceConformanceTests(BasicCompositionTests):
         success = True
         problems = []
 
-        # This is a specific problem in the 1.5 specification for water heater. For now this requirement is being removed as it is
-        # disallowed to overwrite a mandatory cluster requirement to disallowed in the device type
-        try:
-            water_heater_id = self._get_device_type_id('Water Heater')
-        except KeyError:
-            # water heater isn't in the spec, so just set it to an unused ID for checks
-            water_heater_id = 0
+
 
         def record_problem(location, problem, severity):
             problems.append(ProblemNotice("IDM-10.5", location, severity, problem, ""))
@@ -537,8 +531,7 @@ class DeviceConformanceTests(BasicCompositionTests):
                     for req_idx, req in enumerate(req_list):
                         for ep_id in matching_eps:
                             child_ep = self.endpoints[ep_id]
-                            server_list = child_ep[Clusters.Descriptor][Clusters.Descriptor.Attributes.ServerList] if Clusters.Descriptor.Attributes.ServerList in child_ep[Clusters.Descriptor] else [
-                            ]
+                            server_list = child_ep[Clusters.Descriptor].get(Clusters.Descriptor.Attributes.ServerList, [])
 
                             matches = True
                             for cid, cr in req.cluster_requirements.items():
