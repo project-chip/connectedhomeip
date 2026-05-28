@@ -396,7 +396,7 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
     //
     // Legend that can be used to decode this log line can be found in messaging/README.md
     //
-    ChipLogProgress(ExchangeManager,
+    ChipLogDetail(ExchangeManager,
                     "<<< [E:%s S:%u M:" ChipLogFormatMessageCounter "%s] (%s) Msg TX %s [%s] --- Type %s (%s:%s) (B:%u)",
                     exchangeStr, sessionHandle->SessionIdForLogging(), packetHeader.GetMessageCounter(), ackBuf,
                     Transport::GetSessionTypeString(sessionHandle), sourceDestinationStr, addressStr, typeStr, protocolName,
