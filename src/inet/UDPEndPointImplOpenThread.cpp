@@ -295,7 +295,7 @@ CHIP_ERROR UDPEndPointImplOT::CompleteDeferredOTBinds(otInstance * otInst)
     globalOtInstance    = otInst;
     CHIP_ERROR finalErr = CHIP_NO_ERROR;
 
-    while (sDeferredEndpoint  != nullptr)
+    while (sDeferredEndpoint != nullptr)
     {
         UDPEndPointImplOT * ep = sDeferredEndpoint;
         sDeferredEndpoint      = ep->mNextDeferred;
@@ -303,8 +303,8 @@ CHIP_ERROR UDPEndPointImplOT::CompleteDeferredOTBinds(otInstance * otInst)
 
         if (ep->mDeferredBind)
         {
-            ep->mOTInstance = otInst;
-            CHIP_ERROR err  = ep->IPv6Bind(ep->mSocket, ep->mDeferredAddr, ep->mDeferredPort, ep->mDeferredIntfId);
+            ep->mOTInstance   = otInst;
+            CHIP_ERROR err    = ep->IPv6Bind(ep->mSocket, ep->mDeferredAddr, ep->mDeferredPort, ep->mDeferredIntfId);
             ep->mDeferredBind = false;
             if (err != CHIP_NO_ERROR)
             {
