@@ -35,6 +35,7 @@
 # ---------------------------------------------------------------------------
 set(ALL_DEVICES_DEVICE_SOURCES
     # keep-sorted: start
+    "${ALL_DEVICES_COMMON_DIR}/devices/air-quality-sensor/AirQualitySensorDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/boolean-state-sensor/BooleanStateSensorDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/chime/ChimeDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/dimmable-light/DimmableLightDevice.cpp"
@@ -96,6 +97,7 @@ endif()
 #   - Update scripts/build/build/targets.py to include the new device
 foreach(_key
         # keep-sorted: start
+        air-quality-sensor
         chime
         contact-sensor
         dimmable-light

@@ -84,7 +84,7 @@ class InfineonBuilder(GnBuilder):
                  enable_ota_requestor: bool = False,
                  update_image: bool = False,
                  enable_trustm: bool = False):
-        super(InfineonBuilder, self).__init__(root=app.BuildRoot(root), runner=runner, output_dir_lock=output_dir_lock)
+        super().__init__(root=app.BuildRoot(root), runner=runner, output_dir_lock=output_dir_lock)
 
         self.app = app
         self.extra_gn_options = ['psoc6_board="%s"' % board.GnArgName()]

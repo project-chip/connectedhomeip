@@ -37,8 +37,7 @@
 
 import asyncio
 import contextlib
-import typing
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 from mobly import asserts
 
@@ -63,13 +62,13 @@ class TC_TIMESYNC_2_8(MatterBaseTest):
         cluster = Clusters.Objects.TimeSynchronization
         return await self.read_single_attribute_check_success(endpoint=self.endpoint, cluster=cluster, attribute=attribute)
 
-    async def send_set_time_zone_cmd(self, tz: typing.List[Clusters.Objects.TimeSynchronization.Structs.TimeZoneStruct]) -> Clusters.Objects.TimeSynchronization.Commands.SetTimeZoneResponse:
+    async def send_set_time_zone_cmd(self, tz: list[Clusters.Objects.TimeSynchronization.Structs.TimeZoneStruct]) -> Clusters.Objects.TimeSynchronization.Commands.SetTimeZoneResponse:
         ret = await self.send_single_cmd(cmd=Clusters.Objects.TimeSynchronization.Commands.SetTimeZone(timeZone=tz), endpoint=self.endpoint)
         asserts.assert_true(matchers.is_type(ret, Clusters.Objects.TimeSynchronization.Commands.SetTimeZoneResponse),
                             "Unexpected return type for SetTimeZone")
         return ret
 
-    async def send_set_dst_cmd(self, dst: typing.List[Clusters.Objects.TimeSynchronization.Structs.DSTOffsetStruct]) -> None:
+    async def send_set_dst_cmd(self, dst: list[Clusters.Objects.TimeSynchronization.Structs.DSTOffsetStruct]) -> None:
         await self.send_single_cmd(cmd=Clusters.Objects.TimeSynchronization.Commands.SetDSTOffset(DSTOffset=dst))
 
     async def send_set_utc_cmd(self, utc: uint) -> None:
@@ -205,7 +204,7 @@ class TC_TIMESYNC_2_8(MatterBaseTest):
         compare_time(received=local, offset=timedelta(seconds=-3600), tolerance=timedelta(seconds=5))
 
         self.print_step(27, "Send SetDSTOffset command with DST starting in the future")
-        valid = utc_time_in_matter_epoch(datetime.now(tz=timezone.utc) + timedelta(seconds=10))
+        valid = utc_time_in_matter_epoch(datetime.now(tz=UTC) + timedelta(seconds=10))
         dst = [dst_struct(offset=3600, validStarting=valid, validUntil=NullValue)]
         await self.send_set_dst_cmd(dst)
 

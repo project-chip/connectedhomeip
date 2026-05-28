@@ -358,6 +358,9 @@ public class ClusterIDMapping {
         if (clusterId == ProximityRanging.ID) {
             return new ProximityRanging();
         }
+        if (clusterId == SmokeConcentrationMeasurement.ID) {
+            return new SmokeConcentrationMeasurement();
+        }
         if (clusterId == NetworkIdentityManagement.ID) {
             return new NetworkIdentityManagement();
         }
@@ -15697,6 +15700,116 @@ public class ClusterIDMapping {
                         throw new NoSuchFieldError();
                     }
                 }@Override
+        public String getAttributeName(long id) throws NoSuchFieldError {
+            return Attribute.value(id).toString();
+        }
+
+        @Override
+        public String getEventName(long id) throws NoSuchFieldError {
+            return Event.value(id).toString();
+        }
+
+        @Override
+        public String getCommandName(long id) throws NoSuchFieldError {
+            return Command.value(id).toString();
+        }
+
+        @Override
+        public long getAttributeID(String name) throws IllegalArgumentException {
+            return Attribute.valueOf(name).getID();
+        }
+
+        @Override
+        public long getEventID(String name) throws IllegalArgumentException {
+            return Event.valueOf(name).getID();
+        }
+
+        @Override
+        public long getCommandID(String name) throws IllegalArgumentException {
+            return Command.valueOf(name).getID();
+        }
+    }
+    public static class SmokeConcentrationMeasurement implements BaseCluster {
+        public static final long ID = 1076L;
+        public long getID() {
+            return ID;
+        }
+
+        public enum Attribute {
+            MeasuredValue(0L),
+            MinMeasuredValue(1L),
+            MaxMeasuredValue(2L),
+            PeakMeasuredValue(3L),
+            PeakMeasuredValueWindow(4L),
+            AverageMeasuredValue(5L),
+            AverageMeasuredValueWindow(6L),
+            Uncertainty(7L),
+            MeasurementUnit(8L),
+            MeasurementMedium(9L),
+            LevelValue(10L),
+            GeneratedCommandList(65528L),
+            AcceptedCommandList(65529L),
+            AttributeList(65531L),
+            FeatureMap(65532L),
+            ClusterRevision(65533L),;
+            private final long id;
+            Attribute(long id) {
+                this.id = id;
+            }
+
+            public long getID() {
+                return id;
+            }
+
+            public static Attribute value(long id) throws NoSuchFieldError {
+                for (Attribute attribute : Attribute.values()) {
+                    if (attribute.getID() == id) {
+                        return attribute;
+                    }
+                }
+                throw new NoSuchFieldError();
+            }
+        }
+
+        public enum Event {;
+            private final long id;
+            Event(long id) {
+                this.id = id;
+            }
+
+            public long getID() {
+                return id;
+            }
+
+            public static Event value(long id) throws NoSuchFieldError {
+                for (Event event : Event.values()) {
+                    if (event.getID() == id) {
+                        return event;
+                    }
+                }
+                throw new NoSuchFieldError();
+            }
+        }
+
+        public enum Command {;
+            private final long id;
+            Command(long id) {
+                this.id = id;
+            }
+
+            public long getID() {
+                return id;
+            }
+
+            public static Command value(long id) throws NoSuchFieldError {
+                for (Command command : Command.values()) {
+                    if (command.getID() == id) {
+                        return command;
+                    }
+                }
+                throw new NoSuchFieldError();
+            }
+        }@Override
         public String getAttributeName(long id) throws NoSuchFieldError {
             return Attribute.value(id).toString();
         }

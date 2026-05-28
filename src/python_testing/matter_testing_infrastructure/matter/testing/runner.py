@@ -29,10 +29,10 @@ import typing
 from binascii import unhexlify
 from dataclasses import asdict as dataclass_asdict
 from dataclasses import dataclass
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from itertools import chain
 from pathlib import Path
-from typing import Any, List, Optional, Tuple
+from typing import Any, Optional
 from unittest.mock import MagicMock
 
 from mobly import signals, utils
@@ -469,7 +469,7 @@ def run_tests_no_exit(
                 hooks.start(count=1)
                 # Mobly gives the test run time in seconds, lets be a bit more
                 # precise
-                runner_start_time = datetime.now(timezone.utc)
+                runner_start_time = datetime.now(UTC)
 
             try:
                 runner.run()
@@ -486,8 +486,7 @@ def run_tests_no_exit(
                 ok = False
 
     if hooks:
-        duration = (datetime.now(timezone.utc) -
-                    runner_start_time) / timedelta(microseconds=1)
+        duration = (datetime.now(UTC) - runner_start_time) / timedelta(microseconds=1)
         hooks.stop(duration=duration)
 
     if not external_stack:
@@ -543,10 +542,10 @@ class AsyncMock(MagicMock):
     """
 
     async def __call__(self, *args, **kwargs):
-        return super(AsyncMock, self).__call__(*args, **kwargs)
+        return super().__call__(*args, **kwargs)
 
 
-class MockTestRunner():
+class MockTestRunner:
     """
     Test runner for mocking Matter device interactions.
 
@@ -843,7 +842,7 @@ def str_from_manual_code(s: str) -> str:
     return s
 
 
-def int_named_arg(s: str) -> Tuple[str, int]:
+def int_named_arg(s: str) -> tuple[str, int]:
     regex = r"^(?P<name>[a-zA-Z_0-9_.-]+):((?P<hex_value>0x[0-9a-fA-F_]+)|(?P<decimal_value>-?\d+))$"
     match = re.match(regex, s)
     if not match:
@@ -857,7 +856,7 @@ def int_named_arg(s: str) -> Tuple[str, int]:
     return (name, value)
 
 
-def str_named_arg(s: str) -> Tuple[str, str]:
+def str_named_arg(s: str) -> tuple[str, str]:
     regex = r"^(?P<name>[a-zA-Z_0-9.]+):(?P<value>.*)$"
     match = re.match(regex, s)
     if not match:
@@ -866,7 +865,7 @@ def str_named_arg(s: str) -> Tuple[str, str]:
     return (match.group("name"), match.group("value"))
 
 
-def float_named_arg(s: str) -> Tuple[str, float]:
+def float_named_arg(s: str) -> tuple[str, float]:
     regex = r"^(?P<name>[a-zA-Z_0-9.]+):(?P<value>.*)$"
     match = re.match(regex, s)
     if not match:
@@ -878,7 +877,7 @@ def float_named_arg(s: str) -> Tuple[str, float]:
     return (name, value)
 
 
-def json_named_arg(s: str) -> Tuple[str, object]:
+def json_named_arg(s: str) -> tuple[str, object]:
     regex = r"^(?P<name>[a-zA-Z_0-9.]+):(?P<value>.*)$"
     match = re.match(regex, s)
     if not match:
@@ -890,7 +889,7 @@ def json_named_arg(s: str) -> Tuple[str, object]:
     return (name, value)
 
 
-def bool_named_arg(s: str) -> Tuple[str, bool]:
+def bool_named_arg(s: str) -> tuple[str, bool]:
     regex = r"^(?P<name>[a-zA-Z_0-9.]+):((?P<truth_value>true|false)|(?P<decimal_value>[01]))$"
     match = re.match(regex, s, re.IGNORECASE)
     if not match:
@@ -905,7 +904,7 @@ def bool_named_arg(s: str) -> Tuple[str, bool]:
     return (name, value)
 
 
-def bytes_as_hex_named_arg(s: str) -> Tuple[str, bytes]:
+def bytes_as_hex_named_arg(s: str) -> tuple[str, bytes]:
     regex = r"^(?P<name>[a-zA-Z_0-9.]+):(?P<value>[0-9a-fA-F:]+)$"
     match = re.match(regex, s)
     if not match:
@@ -938,7 +937,7 @@ def root_index(s: str) -> int:
         return root_index
 
 
-def parse_matter_test_args(argv: Optional[List[str]] = None):
+def parse_matter_test_args(argv: Optional[list[str]] = None):
     parser = argparse.ArgumentParser(description='Matter standalone Python test')
 
     basic_group = parser.add_argument_group(title="Basic arguments", description="Overall test execution arguments")
