@@ -241,7 +241,7 @@ class AccessChecker(BasicCompositionTests):
                     continue
                 if command_id not in Clusters.ClusterObjects.ALL_ACCEPTED_COMMANDS.get(cluster_id, []):
                     self.record_error(test_name="Access Checker", location=location,
-                                       problem="Unknown command")
+                                      problem="Unknown command")
                     self.success = False
                     continue
 
@@ -300,7 +300,6 @@ class AccessChecker(BasicCompositionTests):
             cluster_class = Clusters.ClusterObjects.ALL_CLUSTERS.get(cluster_id)
             if attribute is None or cluster_class is None:
                 continue
-
 
             if operation_allowed(spec_requires, privilege):
                 ret = await self.read_single_attribute_check_success(dev_ctrl=self.TH2, endpoint=endpoint_id, cluster=cluster_class, attribute=attribute, assert_on_error=False, test_name=f"Read access Checker - {privilege}")
