@@ -16,6 +16,7 @@
 #include <app/clusters/groups-server/GroupsCluster.h>
 
 #include <app/ConcreteAttributePath.h>
+#include <app/clusters/access-control-server/AccessControlEventHelper.h>
 #include <app/clusters/scenes-server/Constants.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <clusters/GroupKeyManagement/Ids.h>
@@ -243,7 +244,7 @@ GroupsCluster::InvokeCommand(const DataModel::InvokeRequest & request, TLV::TLVR
 
         Groups::Commands::AddGroupResponse::Type response;
         response.groupID = request_data.groupID;
-        response.status  = to_underlying(AddGroup(request_data.groupID, request_data.groupName, fabricIndex));
+        response.status  = to_underlying(AddGroup(request_data.groupID, request_data.groupName, request.subjectDescriptor));
         handler->AddResponse(request.path, response);
 
         return std::nullopt;
@@ -326,6 +327,11 @@ GroupsCluster::InvokeCommand(const DataModel::InvokeRequest & request, TLV::TLVR
                 }()),
                 .groupID = request_data.groupID,
             });
+
+        if (mGroupDataProvider.ConsumeAuxAclNotificationNeeded())
+        {
+            AccessControl::EmitAuxiliaryAccessUpdated(mContext->interactionContext.eventsGenerator, request.subjectDescriptor);
+        }
         return std::nullopt;
     }
     case RemoveAllGroups::Id: {
@@ -350,6 +356,11 @@ GroupsCluster::InvokeCommand(const DataModel::InvokeRequest & request, TLV::TLVR
 
         LogIfFailure(mGroupDataProvider.RemoveEndpoint(fabricIndex, mPath.mEndpointId));
         NotifyGroupTableChanged(mContext);
+
+        if (mGroupDataProvider.ConsumeAuxAclNotificationNeeded())
+        {
+            AccessControl::EmitAuxiliaryAccessUpdated(mContext->interactionContext.eventsGenerator, request.subjectDescriptor);
+        }
         return Status::Success;
     }
     case AddGroupIfIdentifying::Id: {
@@ -361,30 +372,51 @@ GroupsCluster::InvokeCommand(const DataModel::InvokeRequest & request, TLV::TLVR
         VerifyOrReturnValue((mIdentifyIntegration != nullptr) && mIdentifyIntegration->IsIdentifying(), Status::Success);
 
         // AddGroupIfIdentifying is response `Y` in the spec: we return the status (not a structure, as opposed to AddGroup)
-        return AddGroup(request_data.groupID, request_data.groupName, fabricIndex);
+        return AddGroup(request_data.groupID, request_data.groupName, request.subjectDescriptor);
     }
     default:
         return Status::UnsupportedCommand;
     }
 }
 
-Status GroupsCluster::AddGroup(GroupId groupID, CharSpan groupName, FabricIndex fabricIndex)
+Status GroupsCluster::AddGroup(GroupId groupID, CharSpan groupName, const chip::Access::SubjectDescriptor & subjectDescriptor)
 {
+    FabricIndex fabricIndex = subjectDescriptor.fabricIndex;
     VerifyOrReturnError(IsValidGroupId(groupID), Status::ConstraintError);
     VerifyOrReturnError(groupName.size() <= GroupDataProvider::GroupInfo::kGroupNameMax, Status::ConstraintError);
 
     VerifyOrReturnError(KeyExists(mGroupDataProvider, fabricIndex, groupID), Status::UnsupportedAccess);
 
-    // Add a new entry to the GroupTable
-    if (CHIP_ERROR err = mGroupDataProvider.SetGroupInfo(fabricIndex, GroupDataProvider::GroupInfo(groupID, groupName));
-        err != CHIP_NO_ERROR)
+    GroupDataProvider::GroupInfo info;
+    CHIP_ERROR err = mGroupDataProvider.GetGroupInfo(fabricIndex, groupID, info);
+
+    // For backwards compatibility with groupcast, overwriting the existing group info can cause issues with
+    // other flags that exist for the group. For example, if a group is created through the groupcast cluster
+    // with HasAuxiliaryAcl set to true, and then this legacy AddGroup() call is used on that existing group
+    // id, the exisitng HasAuxiliaryAcl value should remain unchanged. Here, we can explicitly set the info that
+    // is being updated when the group exists already. When the group doesn't exist, a new GroupInfo can be made.
+    if (err == CHIP_NO_ERROR)
+    {
+        info.SetName(groupName);
+    }
+    else if (err == CHIP_ERROR_NOT_FOUND)
+    {
+        info = GroupDataProvider::GroupInfo(groupID, groupName);
+    }
+    else
+    {
+        return Status::Failure;
+    }
+
+    // Add/update entry in the GroupTable
+    if (err = mGroupDataProvider.SetGroupInfo(fabricIndex, info); err != CHIP_NO_ERROR)
     {
         ChipLogDetail(Zcl, "ERR: Failed to add mapping (end:%d, group:0x%x), err:%" CHIP_ERROR_FORMAT, mPath.mEndpointId, groupID,
                       err.Format());
         return Status::ResourceExhausted;
     }
 
-    if (CHIP_ERROR err = mGroupDataProvider.AddEndpoint(fabricIndex, groupID, mPath.mEndpointId); err != CHIP_NO_ERROR)
+    if (err = mGroupDataProvider.AddEndpoint(fabricIndex, groupID, mPath.mEndpointId); err != CHIP_NO_ERROR)
     {
         ChipLogDetail(Zcl, "ERR: Failed to add mapping (end:%d, group:0x%x), err:%" CHIP_ERROR_FORMAT, mPath.mEndpointId, groupID,
                       err.Format());
@@ -393,6 +425,12 @@ Status GroupsCluster::AddGroup(GroupId groupID, CharSpan groupName, FabricIndex 
         return Status::ResourceExhausted;
     }
     NotifyGroupTableChanged(mContext);
+
+    if (mGroupDataProvider.ConsumeAuxAclNotificationNeeded())
+    {
+        AccessControl::EmitAuxiliaryAccessUpdated(mContext->interactionContext.eventsGenerator, subjectDescriptor);
+    }
+
     return Status::Success;
 }
 
