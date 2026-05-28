@@ -25238,7 +25238,7 @@ namespace Attributes {
 
 namespace HumanActivityDetected {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, bool * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value)
 {
     using Traits = NumericAttributeTraits<bool>;
     Traits::StorageType temp;
@@ -25258,7 +25258,7 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, bool * value)
 
 namespace ObjectIdentified {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, bool * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value)
 {
     using Traits = NumericAttributeTraits<bool>;
     Traits::StorageType temp;
@@ -25278,7 +25278,7 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, bool * value)
 
 namespace AudioContextDetected {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, bool * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value)
 {
     using Traits = NumericAttributeTraits<bool>;
     Traits::StorageType temp;
@@ -25298,7 +25298,7 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, bool * value)
 
 namespace ObjectCountReached {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, bool * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value)
 {
     using Traits = NumericAttributeTraits<bool>;
     Traits::StorageType temp;
@@ -25318,7 +25318,7 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, bool * value)
 
 namespace ObjectCount {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
 {
     using Traits = NumericAttributeTraits<uint16_t>;
     Traits::StorageType temp;
@@ -25338,7 +25338,7 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value)
 
 namespace SimultaneousDetectionLimit {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
 {
     using Traits = NumericAttributeTraits<uint8_t>;
     Traits::StorageType temp;
@@ -25358,7 +25358,7 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, uint8_t * value)
 
 namespace HoldTime {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
 {
     using Traits = NumericAttributeTraits<uint16_t>;
     Traits::StorageType temp;
@@ -25378,7 +25378,7 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value)
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
 {
     using Traits = NumericAttributeTraits<uint32_t>;
     Traits::StorageType temp;
@@ -25398,7 +25398,7 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, uint32_t * value)
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
 {
     using Traits = NumericAttributeTraits<uint16_t>;
     Traits::StorageType temp;
