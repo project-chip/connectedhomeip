@@ -145,7 +145,7 @@ class WebRTCTransportRequestorClusterWebRTCSessionStruct(
           Optional.of(
             buildList<UShort> {
               tlvReader.enterArray(ContextSpecificTag(TAG_AUDIO_STREAMS))
-              while(!tlvReader.isEndOfContainer()) {
+              while (!tlvReader.isEndOfContainer()) {
                 add(tlvReader.getUShort(AnonymousTag))
               }
               tlvReader.exitContainer()
@@ -168,7 +168,8 @@ class WebRTCTransportRequestorClusterWebRTCSessionStruct(
         metadataEnabled,
         videoStreams,
         audioStreams,
-        fabricIndex)
+        fabricIndex
+      )
     }
   }
 }

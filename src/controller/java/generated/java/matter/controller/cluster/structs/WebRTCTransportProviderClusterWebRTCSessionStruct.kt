@@ -119,8 +119,8 @@ class WebRTCTransportProviderClusterWebRTCSessionStruct(
           null
         }
       val audioStreamID =
-      if (!tlvReader.isNull()) {
-        tlvReader.getUShort(ContextSpecificTag(TAG_AUDIO_STREAM_ID))
+        if (!tlvReader.isNull()) {
+          tlvReader.getUShort(ContextSpecificTag(TAG_AUDIO_STREAM_ID))
         } else {
           tlvReader.getNull(ContextSpecificTag(TAG_AUDIO_STREAM_ID))
           null
@@ -168,7 +168,8 @@ class WebRTCTransportProviderClusterWebRTCSessionStruct(
         metadataEnabled,
         videoStreams,
         audioStreams,
-        fabricIndex)
+        fabricIndex
+      )
     }
   }
 }

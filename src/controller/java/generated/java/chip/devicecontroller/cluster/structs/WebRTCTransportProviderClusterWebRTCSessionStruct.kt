@@ -167,7 +167,7 @@ class WebRTCTransportProviderClusterWebRTCSessionStruct(
         audioStreamID,
         metadataEnabled,
         videoStreams,
-        audioStreams, 
+        audioStreams,
         fabricIndex
       )
     }

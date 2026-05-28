@@ -168,7 +168,8 @@ class WebRTCTransportRequestorClusterWebRTCSessionStruct(
         metadataEnabled,
         videoStreams,
         audioStreams,
-        fabricIndex)
+        fabricIndex
+      )
     }
   }
 }
