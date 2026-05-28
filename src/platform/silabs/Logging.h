@@ -27,16 +27,15 @@ namespace Logging {
 namespace Platform {
 
 // Log category string constants
-constexpr const uint8_t kLogError[]  = "[error]";
-constexpr const uint8_t kLogWarn[]   = "[warn]";
-constexpr const uint8_t kLogInfo[]   = "[info]";
-constexpr const uint8_t kLogDetail[] = "[detail]";
-constexpr const uint8_t kLogLwip[]   = "[lwip]";
-constexpr const uint8_t kLogSilabs[] = "[silabs]";
-constexpr const uint8_t kLogNone[]   = "-";
-constexpr const uint8_t kOTModule[]  = "OT";
+constexpr const uint8_t kLogError[]        = "[error]";
+constexpr const uint8_t kLogWarn[]         = "[warn]";
+constexpr const uint8_t kLogInfo[]         = "[info]";
+constexpr const uint8_t kLogDetail[]       = "[detail]";
+constexpr const uint8_t kLogLwip[]         = "[lwip]";
+constexpr const uint8_t kLogSilabs[]       = "[silabs]";
+constexpr const uint8_t kLogNone[]         = "-";
+constexpr const uint8_t kOTModule[]        = "OT";
 constexpr const uint8_t kLogZigbeeModule[] = "ZB";
-
 
 static constexpr size_t kTimeStampStringSize = sizeof("[0000:00:00.000]"); // includes null terminator
 static constexpr size_t kMaxCategoryStrLen =

@@ -315,9 +315,11 @@ extern "C" void LwIPLog(const char * aFormat, ...)
 }
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if defined(SL_COMPONENT_CATALOG_PRESENT) && (defined(SL_CATALOG_ZIGBEE_ZCL_CLI_PRESENT) || defined(SL_CATALOG_ZIGBEE_DEBUG_PRINT_PRESENT))
+#if defined(SL_COMPONENT_CATALOG_PRESENT) &&                                                                                       \
+    (defined(SL_CATALOG_ZIGBEE_ZCL_CLI_PRESENT) || defined(SL_CATALOG_ZIGBEE_DEBUG_PRINT_PRESENT))
 #include "zcl-debug-print.h"
-extern "C" void sli_zigbee_af_print_internal_var_arg(uint16_t area, uint32_t log_level, bool newLine, const char * formatString, va_list ap )
+extern "C" void sli_zigbee_af_print_internal_var_arg(uint16_t area, uint32_t log_level, bool newLine, const char * formatString,
+                                                     va_list ap)
 {
 #if SILABS_LOG_ENABLED
     if (area == SL_ZIGBEE_AF_PRINT_CORE || area == 0x00)
@@ -336,16 +338,17 @@ extern "C" void sli_zigbee_af_print_internal_var_arg(uint16_t area, uint32_t log
             category = kLog_Progress;
             break;
         case SLI_ZIGBEE_AF_PRINT_LOG_LEVEL_DEBUG:
-        case SLI_ZIGBEE_AF_PRINT_LOG_LEVEL_NONE :
+        case SLI_ZIGBEE_AF_PRINT_LOG_LEVEL_NONE:
         default:
             category = kLog_Detail;
             break;
         }
-        // For core logs, we want to route them through the CHIP logging system so that they are timestamped and categorized appropriately.
+        // For core logs, we want to route them through the CHIP logging system so that they are timestamped and categorized
+        // appropriately.
         chip::Logging::Platform::HandleLog(reinterpret_cast<const char *>(kLogZigbeeModule), category, formatString, ap);
     }
 #endif
-    #if defined(ENABLE_CHIP_SHELL) && ENABLE_CHIP_SHELL
+#if defined(ENABLE_CHIP_SHELL) && ENABLE_CHIP_SHELL
     if (area == SL_ZIGBEE_AF_PRINT_CLI)
     {
 
@@ -353,10 +356,10 @@ extern "C" void sli_zigbee_af_print_internal_var_arg(uint16_t area, uint32_t log
         int chWritten = vsnprintf(buffer, sizeof(buffer), formatString, ap);
         uartConsoleWrite(const_cast<char *>(buffer), chWritten);
     }
-    #endif
-
+#endif
 }
-#endif // defined(SL_COMPONENT_CATALOG_PRESENT) && (defined(SL_CATALOG_ZIGBEE_ZCL_CLI_PRESENT) || defined(SL_CATALOG_ZIGBEE_DEBUG_PRINT_PRESENT))
+#endif // defined(SL_COMPONENT_CATALOG_PRESENT) && (defined(SL_CATALOG_ZIGBEE_ZCL_CLI_PRESENT) ||
+       // defined(SL_CATALOG_ZIGBEE_DEBUG_PRINT_PRESENT))
 
 /**
  * Platform logging function for OpenThread
