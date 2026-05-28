@@ -270,8 +270,6 @@
 #include <clusters/TimeFormatLocalization/MetadataProvider.h>
 #include <clusters/TimeSynchronization/Ids.h>
 #include <clusters/TimeSynchronization/MetadataProvider.h>
-#include <clusters/Timer/Ids.h>
-#include <clusters/Timer/MetadataProvider.h>
 #include <clusters/TlsCertificateManagement/Ids.h>
 #include <clusters/TlsCertificateManagement/MetadataProvider.h>
 #include <clusters/TlsClientManagement/Ids.h>
@@ -972,11 +970,6 @@ std::optional<DataModel::AcceptedCommandEntry> AcceptedCommandEntryFor(ClusterId
     {
         if (id == TimeFormatLocalization::Id)
             return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, TimeFormatLocalization::Id>::EntryFor(command);
-    }
-    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == Timer::Id) || ...))
-    {
-        if (id == Timer::Id)
-            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Timer::Id>::EntryFor(command);
     }
     if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == TimeSynchronization::Id) || ...))
     {

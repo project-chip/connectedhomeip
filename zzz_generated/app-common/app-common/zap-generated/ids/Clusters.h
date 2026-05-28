@@ -150,7 +150,6 @@
 #include <clusters/ThreadNetworkDirectory/ClusterId.h>
 #include <clusters/TimeFormatLocalization/ClusterId.h>
 #include <clusters/TimeSynchronization/ClusterId.h>
-#include <clusters/Timer/ClusterId.h>
 #include <clusters/TlsCertificateManagement/ClusterId.h>
 #include <clusters/TlsClientManagement/ClusterId.h>
 #include <clusters/TotalVolatileOrganicCompoundsConcentrationMeasurement/ClusterId.h>

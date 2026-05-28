@@ -150,7 +150,6 @@
 #include <clusters/ThreadNetworkDirectory/EventIds.h>
 #include <clusters/TimeFormatLocalization/EventIds.h>
 #include <clusters/TimeSynchronization/EventIds.h>
-#include <clusters/Timer/EventIds.h>
 #include <clusters/TlsCertificateManagement/EventIds.h>
 #include <clusters/TlsClientManagement/EventIds.h>
 #include <clusters/TotalVolatileOrganicCompoundsConcentrationMeasurement/EventIds.h>

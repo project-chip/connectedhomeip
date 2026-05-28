@@ -150,7 +150,6 @@
 #include <clusters/ThreadNetworkDirectory/AttributeIds.h>
 #include <clusters/TimeFormatLocalization/AttributeIds.h>
 #include <clusters/TimeSynchronization/AttributeIds.h>
-#include <clusters/Timer/AttributeIds.h>
 #include <clusters/TlsCertificateManagement/AttributeIds.h>
 #include <clusters/TlsClientManagement/AttributeIds.h>
 #include <clusters/TotalVolatileOrganicCompoundsConcentrationMeasurement/AttributeIds.h>
