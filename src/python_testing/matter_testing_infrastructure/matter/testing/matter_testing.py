@@ -30,7 +30,7 @@ import subprocess
 import textwrap
 import time
 import typing
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, fields
 from datetime import UTC, datetime, timedelta
 from enum import IntFlag
 from typing import Any, Callable, Optional, Union
@@ -192,6 +192,11 @@ class TestCleanupConfig:
 
     # Controller clean-up items
     shutdown_extra_controllers: bool = True    # shuts down extra controllers and removes their CAs from storage
+
+    @classmethod
+    def disabled(cls) -> "TestCleanupConfig":
+        """Returns a config with all cleanup steps disabled."""
+        return cls(**{f.name: False for f in fields(cls)})
 
 
 class MatterBaseTest(base_test.BaseTestClass):
