@@ -932,4 +932,66 @@ TEST_F(TestTCP, CheckProcessReceivedBuffer)
     EXPECT_TRUE(TestAccess::GetEndpoint(state).IsNull());
 }
 
+<<<<<<< HEAD
+=======
+TEST_F(TestTCP, RepeatedImmediateConnectFailuresDoNotExhaustEndpoints)
+{
+    TCPImpl tcp;
+    auto tcpListenParams = Transport::TcpListenParameters(mIOContext->GetTCPEndPointManager());
+
+    uint16_t chosenPort;
+    ASSERT_SUCCESS(RetryPortSetup(chosenPort, [&](uint16_t port) {
+        return tcp.Init(tcpListenParams.SetAddressType(IPAddressType::kIPv6).SetListenPort(port).SetServerListenEnabled(false));
+    }));
+
+    IPAddress addr;
+    ASSERT_TRUE(IPAddress::FromString("fe80::1", addr));
+
+    constexpr uint16_t kTestPort = 5540;
+    constexpr size_t kAttempts   = kMaxTcpActiveConnectionCount * 3;
+
+    for (size_t i = 0; i < kAttempts; ++i)
+    {
+        ActiveTCPConnectionHandle conn;
+        CHIP_ERROR err = tcp.TCPConnect(Transport::PeerAddress::TCP(addr, kTestPort, InterfaceId::Null()), nullptr, conn);
+
+        EXPECT_NE(err, CHIP_NO_ERROR);
+        EXPECT_NE(err, CHIP_ERROR_NO_MEMORY);
+        EXPECT_TRUE(conn.IsNull());
+    }
+}
+
+TEST_F(TestTCP, CheckMaxTCPMessageSizeBoundary)
+{
+    TCPImpl tcp;
+
+    IPAddress addr;
+    IPAddress::FromString("::1", addr);
+
+    uint16_t port;
+    MockTransportMgrDelegate gMockTransportMgrDelegate(mIOContext);
+    ASSERT_SUCCESS(gMockTransportMgrDelegate.InitializeMessageTest(tcp, addr, port));
+
+    gMockTransportMgrDelegate.SingleMessageTest(tcp, addr, port);
+
+    Transport::PeerAddress lPeerAddress = Transport::PeerAddress::TCP(addr, port);
+    auto state                          = TestAccess::FindActiveConnection(tcp, lPeerAddress);
+    ASSERT_TRUE(state);
+    TCPEndPointHandle lEndPoint = TestAccess::GetEndpoint(state);
+    ASSERT_TRUE(lEndPoint);
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    TestData testData[1];
+
+    // A message of exactly kMaxTCPMessageSize (kLargeBufMaxSizeWithoutReserve - 4)
+    // should be accepted, not rejected.
+    constexpr uint32_t kMaxValidSize = static_cast<uint32_t>(System::PacketBuffer::kLargeBufMaxSizeWithoutReserve - 4);
+    gMockTransportMgrDelegate.mReceiveHandlerCallCount = 0;
+    EXPECT_TRUE(testData[0].Init((const uint32_t[]){ kMaxValidSize, 0 }));
+    err = TestAccess::ProcessReceivedBuffer(tcp, lEndPoint, lPeerAddress, std::move(testData[0].mHandle));
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(gMockTransportMgrDelegate.mReceiveHandlerCallCount, 1);
+}
+
+>>>>>>> c241526172 (Fix off-by-one in TCP message size validation (#71938))
 } // namespace
