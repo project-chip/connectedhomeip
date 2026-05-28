@@ -562,10 +562,11 @@ jobs:
               run: |
                   for f in test-summaries/*.json; do
                       [ -f "$f" ] || continue
+                      [[ "$f" == *"purposeful-failures"* ]] && continue
                       echo ""
                       echo ">>> $f"
                       ./scripts/run_in_build_env.sh \
-                        "scripts/tests/run_test_suite.py summarize --summary-file $f" || true
+                        "scripts/tests/run_test_suite.py summarize --summary-file $f --compact-failures-file test-summaries/compact-failures.txt" || true
                   done
             - name: Upload test run summaries
               uses: actions/upload-artifact@v7
@@ -611,6 +612,9 @@ jobs:
               uses: ./.github/actions/notify-slack-failure
               with:
                 slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}
+                job-name: "Test Suites - Linux"
+                job-details: "${{ matrix.build_variant }}"
+                extra-details-file: "test-summaries/compact-failures.txt"
     test_suites_darwin:
         name: Test Suites - Darwin
 
@@ -762,10 +766,11 @@ jobs:
               run: |
                   for f in test-summaries/*.json; do
                       [ -f "$f" ] || continue
+                      [[ "$f" == *"purposeful-failures"* ]] && continue
                       echo ""
                       echo ">>> $f"
                       ./scripts/run_in_build_env.sh \
-                        "scripts/tests/run_test_suite.py summarize --summary-file $f" || true
+                        "scripts/tests/run_test_suite.py summarize --summary-file $f --compact-failures-file test-summaries/compact-failures.txt" || true
                   done
             - name: Upload test run summaries
               uses: actions/upload-artifact@v7
@@ -817,6 +822,9 @@ jobs:
               uses: ./.github/actions/notify-slack-failure
               with:
                 slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}
+                job-name: "Test Suites - Darwin"
+                job-details: "${{ matrix.os }}, ${{ matrix.arch }}, ${{ matrix.build_variant }}"
+                extra-details-file: "test-summaries/compact-failures.txt"
     repl_tests_linux_build:
         name: REPL Tests - Linux (BUILD)
 
@@ -1073,6 +1081,8 @@ jobs:
               uses: ./.github/actions/notify-slack-failure
               with:
                 slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}
+                job-name: "REPL Tests - Linux (BUILD)"
+                job-details: "${{ matrix.build_variant }}"
     repl_tests_linux_run:
         name: REPL Tests - Linux (RUN)
         needs: repl_tests_linux_build
@@ -1235,7 +1245,7 @@ jobs:
               run: |
                   [ -f test-summaries/python-tests.json ] && \
                     scripts/run_in_python_env.sh out/venv \
-                      'src/python_testing/execute_python_tests.py summarize --summary-file test-summaries/python-tests.json' || true
+                      'src/python_testing/execute_python_tests.py summarize --summary-file test-summaries/python-tests.json --compact-failures-file test-summaries/compact-failures.txt' || true
             - name: Upload python test summary
               uses: actions/upload-artifact@v7
               if: ${{ matrix.filter != '' && always() }}
@@ -1294,6 +1304,9 @@ jobs:
               uses: ./.github/actions/notify-slack-failure
               with:
                 slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}
+                job-name: "REPL Tests - Linux (RUN)"
+                job-details: "${{ matrix.filter }}"
+                extra-details-file: "test-summaries/compact-failures.txt"
     repl_tests_linux_report:
       name: REPL Tests - Linux (REPORT RESULTS)
       needs: repl_tests_linux_run
@@ -1366,6 +1379,7 @@ jobs:
             uses: ./.github/actions/notify-slack-failure
             with:
               slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}
+              job-name: "Deploy to GitHub Pages"
     repl_tests_darwin:
         name: REPL Tests - Darwin (Build Only)
         strategy:
@@ -1454,3 +1468,5 @@ jobs:
               uses: ./.github/actions/notify-slack-failure
               with:
                 slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}
+                job-name: "REPL Tests - Darwin (Build Only)"
+                job-details: "${{ matrix.os }}, ${{ matrix.arch }}, ${{ matrix.build_variant }}"
