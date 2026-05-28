@@ -1,5 +1,5 @@
 /*
- *    Copyright (c) 2025 Project CHIP Authors
+ *    Copyright (c) 2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -348,7 +348,7 @@ TEST_F(TestWaterHeaterManagementCluster, TestBoostValidation_ReheatAndOneShotMut
 
 TEST_F(TestWaterHeaterManagementCluster, TestBoostValidation_PercentFieldsRequireFeature)
 {
-    // Default fixture has no features — targetPercentage/targetReheat must be rejected
+    // Default fixture has no features — targetPercentage must be rejected
     Commands::Boost::Type req;
     req.boostInfo.duration         = 3600;
     req.boostInfo.targetPercentage = MakeOptional(static_cast<Percent>(80));
