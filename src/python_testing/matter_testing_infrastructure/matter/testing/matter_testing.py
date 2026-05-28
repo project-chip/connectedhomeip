@@ -190,7 +190,7 @@ class TestCleanupConfig:
     purge_tls_endpoints: bool = True           # removes all provisioned endpoints via TlsClientManagement
     unregister_icd_clients: bool = True        # unregisters all entries from IcdManagement.RegisteredClients
 
-    # Controller clean-up itmes
+    # Controller clean-up items
     shutdown_extra_controllers: bool = True    # shuts down extra controllers and removes their CAs from storage
 
 
