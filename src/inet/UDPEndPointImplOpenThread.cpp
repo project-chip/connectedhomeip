@@ -139,7 +139,9 @@ CHIP_ERROR UDPEndPointImplOT::IPv6Bind(otUdpSocket & socket, const IPAddress & a
         {
             mDeferredAddr     = address;
             mDeferredPort     = port;
+            mDeferredIntfId   = interface;
             mDeferredBind     = true;
+            mNextDeferred     = sDeferredEndpoint;
             sDeferredEndpoint = this;
         }
         return CHIP_NO_ERROR;
@@ -263,27 +265,61 @@ CHIP_ERROR UDPEndPointImplOT::BindInterfaceImpl(IPAddressType addressType, Inter
     return CHIP_NO_ERROR;
 }
 
+UDPEndPointImplOT::~UDPEndPointImplOT()
+{
+    if (mDeferredBind)
+    {
+        if (sDeferredEndpoint == this)
+        {  
+            sDeferredEndpoint = mNextDeferred;  
+        }  
+        else
+        {  
+            UDPEndPointImplOT * curr = sDeferredEndpoint;  
+            while (curr != nullptr && curr->mNextDeferred != this)  
+            {  
+                curr = curr->mNextDeferred;  
+            }  
+            if (curr != nullptr)  
+            {  
+                curr->mNextDeferred = mNextDeferred;  
+            }  
+        }  
+        mDeferredBind = false;  
+        mNextDeferred = nullptr;  
+    }  
+}
+
 CHIP_ERROR UDPEndPointImplOT::CompleteDeferredOTBinds(otInstance * otInst)
 {
+    globalOtInstance = otInst;
+    CHIP_ERROR finalErr = CHIP_NO_ERROR;
+
     UDPEndPointImplOT * ep = sDeferredEndpoint;
     sDeferredEndpoint      = nullptr;
 
-    if (ep == nullptr || !ep->mDeferredBind)
-        return CHIP_NO_ERROR;
-
-    ep->mOTInstance  = otInst;
-    globalOtInstance = otInst;
-
-    CHIP_ERROR err = ep->IPv6Bind(ep->mSocket, ep->mDeferredAddr, ep->mDeferredPort, ep->mBoundIntfId);
-    if (err == CHIP_NO_ERROR)
+    while (ep != nullptr)
     {
-        ep->mDeferredBind = false;
+        UDPEndPointImplOT * next = ep->mNextDeferred;
+        ep->mNextDeferred = nullptr;
+
+        if (ep->mDeferredBind)
+        {
+            ep->mOTInstance = otInst;
+            CHIP_ERROR err = ep->IPv6Bind(ep->mSocket, ep->mDeferredAddr, ep->mDeferredPort, ep->mDeferredIntfId);
+            if (err == CHIP_NO_ERROR)
+            {
+                ep->mDeferredBind = false;
+            }
+            else
+            {
+                ChipLogError(Inet, "CompleteDeferredOTBinds: bind failed: %" CHIP_ERROR_FORMAT, err.Format());
+                finalErr = err;
+            }
+        }
+        ep = next;
     }
-    else
-    {
-        ChipLogError(Inet, "CompleteDeferredOTBinds: bind failed: %" CHIP_ERROR_FORMAT, err.Format());
-    }
-    return err;
+    return finalErr;
 }
 
 CHIP_ERROR UDPEndPointImplOT::SendMsgImpl(const IPPacketInfo * aPktInfo, System::PacketBufferHandle && msg)

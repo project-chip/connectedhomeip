@@ -40,6 +40,7 @@ public:
     UDPEndPointImplOT(EndPointManager<UDPEndPoint> & endPointManager) :
         UDPEndPoint(endPointManager), mBoundIntfId(InterfaceId::Null())
     {}
+    ~UDPEndPointImplOT() override;
 
     // UDPEndPoint overrides.
     InterfaceId GetBoundInterface() const override;
@@ -73,6 +74,8 @@ private:
     bool mDeferredBind = false;
     IPAddress mDeferredAddr;
     uint16_t mDeferredPort = 0;
+    InterfaceId mDeferredIntfId;  
+    UDPEndPointImplOT * mNextDeferred = nullptr;  
 };
 
 using UDPEndPointImpl = UDPEndPointImplOT;
