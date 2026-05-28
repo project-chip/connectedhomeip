@@ -205,8 +205,9 @@ class MatterBaseTest(base_test.BaseTestClass):
         # Set to True by commission_devices() on success; gates the per-test ACL read in
         # setup_test so unit tests (which never commission) incur zero network overhead.
         self._dut_confirmed_available = False
-        # Set to True once _run_framework_cleanup has been awaited for the current test.
-        self._framework_cleanup_done = False
+        # Set to True by teardown_test so the decorator does not call the base teardown
+        # again when the override already called super().teardown_test().
+        self._teardown_ran = False
 
     #
     # Mobly Test Controller Methods (Framework Interface)
@@ -255,16 +256,21 @@ class MatterBaseTest(base_test.BaseTestClass):
         self.stored_global_wildcard = None
 
     def teardown_class(self):
-        """Final teardown after all tests: log all problems and dump device attributes if available.
-            Test authors may overwrite this method in the derived class to perform teardown that is common for all tests
-             This function is called only once per class. To perform teardown after each test, use teardown_test.
-             Test authors that implement steps in this function need to be careful of step handling if there is
-             more than one test in the class.
-             Test authors that implement this method should ensure super().teardown_class() is called after any
-             custom teardown code.
+        """Final teardown after all tests: run framework cleanup, log problems, dump attributes.
 
+        Runs _run_framework_cleanup() once after all test methods in the class have
+        completed. Framework cleanup is class-scoped rather than per-test because
+        multi-test classes run sequentially — between-test cleanup is not required
+        and would interfere with intentional class-scoped DUT state.
+
+        Test authors may overwrite this method in the derived class to perform teardown
+        that is common for all tests. This function is called only once per class.
+        Test authors that implement this method should ensure super().teardown_class()
+        is called after any custom teardown code.
         """
-        # Clear the hook set in setup_class, self._extra_controllers, if any, is fully populated by now.
+        self.event_loop.run_until_complete(self._run_framework_cleanup())
+
+        # Clear the hook set in setup_class; self._extra_controllers, if any, is fully populated by now.
         matter.FabricAdmin.FabricAdmin._new_controller_hook = None
 
         if len(self.problems) > 0:
@@ -282,19 +288,23 @@ class MatterBaseTest(base_test.BaseTestClass):
         super().teardown_class()
 
     async def async_teardown_test(self) -> None:
-        """Override to add async per-test teardown without @async_test_body boilerplate.
+        """Override to add async class-level teardown without @async_test_body boilerplate.
 
-        Called from _run_framework_cleanup before any framework cleanup runs,
-        so the DUT and all controllers are still fully available.
+        Called once from _run_framework_cleanup (which runs in teardown_class) before
+        any framework cleanup steps run, so the DUT and all controllers are still
+        fully available.
+
+        For per-test async teardown, override teardown_test with @async_test_body instead.
         """
         pass
 
     async def _run_framework_cleanup(self) -> None:
-        """Runs all enabled cleanup steps at the end of each test method.
+        """Runs all enabled cleanup steps once at class teardown.
 
-        DUT-side cleanup runs first (while the default controller is still active),
-        followed by controller-side cleanup. Each step is gated by TestCleanupConfig
-        so individual steps can be disabled by test authors when needed.
+        Called from teardown_class after all test methods have run. DUT-side cleanup
+        runs first (while the default controller is still active), followed by
+        controller-side cleanup. Each step is gated by TestCleanupConfig so individual
+        steps can be disabled by test authors when needed.
 
         Wildcard attributes are pre-fetched once so all cluster-presence checks within
         a single cleanup pass share the same read.
@@ -805,6 +815,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         self.step_start_time = datetime.now(UTC)
         self.step_skipped = False
         self.failed = False
+        self._teardown_ran = False
         if self.runner_hook and not self.is_commissioning:
             test_name = self.current_test_info.name
             steps = self.get_defined_test_steps(test_name)
@@ -848,35 +859,21 @@ class MatterBaseTest(base_test.BaseTestClass):
                 self._original_acl = None
 
     def teardown_test(self):
-        """Runs DUT and controller cleanup after each individual test method.
+        """Per-test teardown called by the Mobly framework after every test_ method.
 
-        Called by the Mobly framework after every test_ method, ensuring the DUT is
-        restored to a known-clean state before the next test runs.
+        Framework cleanup (DUT state restoration, extra controller shutdown) runs
+        once at class end in teardown_class, not here. Override this method to add
+        custom per-test teardown. Call super().teardown_test() so Mobly's base
+        teardown runs.
 
-        Test authors may override this method or async_teardown_test to add custom
-        per-test teardown. Call super().teardown_test() so that framework cleanup runs.
-
-        Re-entrancy: when a subclass decorates teardown_test with @async_test_body and
-        calls super().teardown_test() from within the coroutine, the decorator has
-        already opened a run_until_complete on the event loop. Calling
-        run_until_complete again on the same running loop raises RuntimeError. In that
-        case this method detects the running loop and returns without scheduling
-        cleanup, the @async_test_body wrapper runs _run_framework_cleanup itself
-        inside the already-open coroutine and sets _framework_cleanup_done.
+        Idempotency: _teardown_ran guards against double-execution when a subclass
+        decorates teardown_test with @async_test_body and calls super().teardown_test()
+        from within the coroutine — the @async_test_body decorator also calls this
+        method after the coroutine completes to cover overrides that skip super().
         """
-        if self._framework_cleanup_done:
+        if not self._teardown_ran:
+            self._teardown_ran = True
             super().teardown_test()
-            return
-        try:
-            running = asyncio.get_running_loop()
-        except RuntimeError:
-            running = None
-        if running is self.event_loop:
-            # Re-entered from inside @async_test_body, decorator handles cleanup.
-            return
-        self.event_loop.run_until_complete(self._run_framework_cleanup())
-        self._framework_cleanup_done = True
-        super().teardown_test()
 
     def on_fail(self, record):
         """Handle test failure callback from Mobly framework.

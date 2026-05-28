@@ -65,10 +65,14 @@
 # === END CI TEST ARGUMENTS ===
 
 '''
-Purpose
-Validates the MatterBaseTest teardown_test cleanup framework. Each test method leaves
-the DUT in a specific dirty state; teardown_test is expected to restore it to a clean
-state automatically, with no manual cleanup code in the test body.
+Purpose:
+Validate the MatterBaseTest cleanup framework.
+
+Each test leaves the DUT in a known dirty state. This class overrides teardown_test()
+to run framework cleanup after every test, so the next test starts from a clean state.
+
+This is intentional. These scenarios must be isolated from each other. In normal test
+classes, framework cleanup runs once in teardown_class(), not between individual tests.
 
 Scenarios covered:
   - test_acl_cleanup:                   adds an extra ACL entry
@@ -107,7 +111,19 @@ logger = logging.getLogger(__name__)
 class TestCleanupFramework(MatterBaseTest):
 
     def desc_TestCleanupFramework(self) -> str:
-        return "[TestCleanupFramework] Validates the MatterBaseTest teardown_test cleanup framework"
+        return "[TestCleanupFramework] Validates the MatterBaseTest cleanup framework"
+
+    @async_test_body
+    async def teardown_test(self):
+        """Invoke framework cleanup after each test to isolate scenarios from one another.
+
+        The default framework behavior runs cleanup once in teardown_class. This class
+        overrides teardown_test to trigger cleanup per test instead, because each
+        scenario leaves the DUT in a specific dirty state that would otherwise
+        interfere with subsequent test methods.
+        """
+        await self._run_framework_cleanup()
+        super().teardown_test()
 
     async def _find_endpoint_with_cluster(self, cluster) -> int | None:
         """Returns the first endpoint that has the given cluster, or None."""
@@ -137,7 +153,7 @@ class TestCleanupFramework(MatterBaseTest):
             [(0, Clusters.AccessControl.Attributes.Acl(current_acl + [extra_entry]))]
         )
         logger.info("ACL entry added — leaving ACL modified")
-        logger.info("Expected: teardown_test restores original ACL via _reset_acls_to_default")
+        logger.info("Expected: cleanup framework restores original ACL via _reset_acls_to_default")
 
     @async_test_body
     async def test_commissioning_window_cleanup(self):
@@ -146,7 +162,7 @@ class TestCleanupFramework(MatterBaseTest):
         ecw = await self.open_commissioning_window(dev_ctrl=self.default_controller, node_id=self.dut_node_id)
         logger.info(f"Window open: discriminator={ecw.randomDiscriminator}, "
                     f"pin={ecw.commissioningParameters.setupPinCode}")
-        logger.info("Expected: teardown_test closes this window via _close_commissioning_windows")
+        logger.info("Expected: cleanup framework closes this window via _close_commissioning_windows")
 
     @async_test_body
     async def test_extra_fabric_cleanup(self):
@@ -169,7 +185,7 @@ class TestCleanupFramework(MatterBaseTest):
         )
 
         logger.info("TH2 commissioned successfully")
-        logger.info("Expected: teardown_test auto-discovers and removes TH2's fabric via "
+        logger.info("Expected: cleanup framework auto-discovers and removes TH2's fabric via "
                     "_remove_extra_fabrics, and shuts down TH2 and its CA via _shutdown_extra_controllers")
 
     @async_test_body
@@ -182,7 +198,7 @@ class TestCleanupFramework(MatterBaseTest):
             endpoint=0
         )
         logger.info(f"ArmFailSafe response: errorCode={resp.errorCode}")
-        logger.info("Expected: teardown_test disarms this failsafe via _disarm_failsafes")
+        logger.info("Expected: cleanup framework disarms this failsafe via _disarm_failsafes")
 
     @async_test_body
     async def test_group_key_cleanup(self):
@@ -215,7 +231,7 @@ class TestCleanupFramework(MatterBaseTest):
             ]))]
         )
         logger.info(f"Group key set {key_set_id} and mapping added")
-        logger.info("Expected: teardown_test removes key sets and mappings via _purge_groups")
+        logger.info("Expected: cleanup framework removes key sets and mappings via _purge_groups")
 
     @async_test_body
     async def test_group_membership_cleanup(self):
@@ -232,7 +248,7 @@ class TestCleanupFramework(MatterBaseTest):
             endpoint=ep
         )
         logger.info(f"Group {group_id:#x} added on endpoint {ep}")
-        logger.info("Expected: teardown_test removes all group memberships via _purge_group_memberships")
+        logger.info("Expected: cleanup framework removes all group memberships via _purge_group_memberships")
 
     @async_test_body
     async def test_scenes_cleanup(self):
@@ -260,7 +276,7 @@ class TestCleanupFramework(MatterBaseTest):
             endpoint=ep
         )
         logger.info(f"Scene {scene_id:#x} stored for group {group_id:#x}")
-        logger.info("Expected: teardown_test removes scenes via _purge_scenes, "
+        logger.info("Expected: cleanup framework removes scenes via _purge_scenes, "
                     "then group membership via _purge_group_memberships")
 
     @async_test_body
@@ -288,7 +304,7 @@ class TestCleanupFramework(MatterBaseTest):
             timedRequestTimeoutMs=1000
         )
         logger.info("PIN credential set (user auto-created by DUT)")
-        logger.info("Expected: teardown_test clears all credentials and users via _purge_doorlock")
+        logger.info("Expected: cleanup framework clears all credentials and users via _purge_doorlock")
 
     @async_test_body
     async def test_icd_client_cleanup(self):
@@ -311,7 +327,7 @@ class TestCleanupFramework(MatterBaseTest):
             endpoint=0
         )
         logger.info(f"ICD client {check_in_node_id:#x} registered")
-        logger.info("Expected: teardown_test unregisters this client via _unregister_icd_clients")
+        logger.info("Expected: cleanup framework unregisters this client via _unregister_icd_clients")
 
     @async_test_body
     async def test_tls_endpoints_cleanup(self):
@@ -365,7 +381,7 @@ class TestCleanupFramework(MatterBaseTest):
             payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD,
         )
         logger.info("TLS endpoint provisioned and left open")
-        logger.info("Expected: teardown_test removes it via _purge_tls_endpoints")
+        logger.info("Expected: cleanup framework removes it via _purge_tls_endpoints")
 
 
 if __name__ == "__main__":

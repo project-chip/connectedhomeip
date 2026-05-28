@@ -254,41 +254,26 @@ def _async_runner(body, test_instance, *args, **kwargs):
 
 
 def async_test_body(body):
-    """Decorator required to be applied whenever a `test_*` method is `async def`.
+    """Decorator required to be applied whenever a `test_*` or `teardown_test` method is `async def`.
 
     Since Mobly doesn't support asyncio directly, and the test methods are called
     synchronously, we need a mechanism to allow an `async def` to be converted to
     a asyncio-run synchronous method. This decorator does the wrapping.
 
-    Special case for teardown_test: when applied to a teardown_test override,
-    the wrapper builds a single combined coroutine that runs the user body and then
-    unconditionally awaits _run_framework_cleanup() in the same run_until_complete.
+    For teardown_test overrides: after the async body completes, call the base
+    teardown_test so Mobly's pass/fail recording always runs even if the override
+    skips super(). If super() was already called, _teardown_ran makes this a no-op.
     """
     is_teardown = body.__name__ == 'teardown_test'
 
     @wraps(body)
     def async_runner(self: "MatterBaseTest", *args, **kwargs):
-        if not is_teardown:
-            return _async_runner(body, self, *args, **kwargs)
-
-        timeout = getattr(self.matter_test_config, 'timeout', None) or self.default_timeout
-        self._framework_cleanup_done = False
-
-        async def _combined():
-            try:
-                await body(self, *args, **kwargs)
-            finally:
-                if not self._framework_cleanup_done:
-                    await self._run_framework_cleanup()
-                    self._framework_cleanup_done = True
-
-        self.event_loop.run_until_complete(asyncio.wait_for(_combined(), timeout=timeout))
-        # Framework cleanup already ran inside _combined. Call teardown_test on the
-        # base class so so Mobly's BaseTestClass.teardown_test still runs.
-        # The _framework_cleanup_done flag short-circuits the cleanup portion.
-        from matter.testing.matter_testing import MatterBaseTest
-        MatterBaseTest.teardown_test(self)
-        return None
+        result = _async_runner(body, self, *args, **kwargs)
+        if is_teardown:
+            from matter.testing.matter_testing import MatterBaseTest
+            MatterBaseTest.teardown_test(self)
+            return None
+        return result
 
     return async_runner
 
