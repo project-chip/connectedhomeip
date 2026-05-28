@@ -34,7 +34,7 @@ import typing
 from dataclasses import asdict, dataclass
 from datetime import UTC, datetime, timedelta
 from enum import IntFlag
-from typing import Any, Callable, Optional, Union
+from typing import Any, Callable, Optional, Type, Union
 
 import matter.testing.matchers as matchers
 
@@ -265,7 +265,7 @@ class BackgroundWildcardSubscriptionCache:
             endpoint_id=endpoint_id,
             attribute=path.AttributeType,
             value=data,
-            timestamp_utc=datetime.now(timezone.utc),
+            timestamp_utc=datetime.now(UTC),
         )
 
         self._q.put(report)
