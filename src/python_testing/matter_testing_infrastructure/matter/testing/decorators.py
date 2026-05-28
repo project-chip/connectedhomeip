@@ -260,9 +260,11 @@ def async_test_body(body):
     synchronously, we need a mechanism to allow an `async def` to be converted to
     a asyncio-run synchronous method. This decorator does the wrapping.
 
-    For teardown_test overrides: after the async body completes, call the base
-    teardown_test so Mobly's pass/fail recording always runs even if the override
-    skips super(). If super() was already called, _teardown_ran makes this a no-op.
+    For teardown_test overrides: the base teardown_test only runs when the override
+    calls super(). The decorator is the only place that always runs after the async
+    body finishes, so it calls the base teardown_test there to make sure base cleanup
+    still happens. The _teardown_ran guard prevents duplicate work, if super() was
+    already called, the decorator's base teardown call is skipped.
     """
     is_teardown = body.__name__ == 'teardown_test'
 
