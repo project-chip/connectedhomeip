@@ -18,5 +18,6 @@
 
 // Enable cryptographic functions needed by CHIP which can't be enabled via Kconfig
 #define MBEDTLS_X509_CREATE_C
+#define MBEDTLS_X509_CRT_PARSE_C
 #define MBEDTLS_X509_CSR_PARSE_C
 #define MBEDTLS_X509_CSR_WRITE_C

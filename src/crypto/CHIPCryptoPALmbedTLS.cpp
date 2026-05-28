@@ -783,7 +783,7 @@ P256Keypair::~P256Keypair()
 
 CHIP_ERROR P256Keypair::NewCertificateSigningRequest(uint8_t * out_csr, size_t & csr_length) const
 {
-#if CHIP_CRYPTO_USE_X509
+#if CHIP_CRYPTO_USE_X509 && defined(MBEDTLS_X509_CSR_WRITE_C)
     CHIP_ERROR error = CHIP_NO_ERROR;
     int result       = 0;
     size_t out_length;
@@ -832,9 +832,13 @@ exit:
     _log_mbedTLS_error(result);
     return error;
 #else
+#if !CHIP_CRYPTO_USE_X509
+    ChipLogError(Crypto, "X.509 support is not enabled. CSR cannot be created");
+#else
     ChipLogError(Crypto, "MBEDTLS_X509_CSR_WRITE_C is not enabled. CSR cannot be created");
+#endif
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-#endif // CHIP_CRYPTO_USE_X509
+#endif // CHIP_CRYPTO_USE_X509 && defined(MBEDTLS_X509_CSR_WRITE_C)
 }
 
 typedef struct Spake2p_Context

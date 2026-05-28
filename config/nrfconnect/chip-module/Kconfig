@@ -474,9 +474,12 @@ config CHIP_QSPI_NOR_POWER_MANAGEMENT_SUPPORT
 
 config CHIP_CRYPTO_USE_X509
 	bool "X.509 certificate support"
+	depends on MBEDTLS_X509_LIBRARY || MBEDTLS
+	default y if CHIP_BUILD_TESTS
 	default n if CHIP_CRYPTO_PSA
-	default y if MBEDTLS_X509_LIBRARY # We still need it to be enabled if we use mbedTLS as the crypto backend
+	default y if MBEDTLS_X509_LIBRARY
 	help
-	  Enables X.509 certificate support for Matter.
+	  Controls compilation of X.509-related crypto functionality in Matter.
+	  Disable to reduce code footprint if your device does not need X.509 certificate parsing/validation.
 
 endif # CHIP
