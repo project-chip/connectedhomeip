@@ -54,7 +54,7 @@
 #include <app/util/ember-strings.h>
 #include <lib/core/CHIPEncoding.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <lib/support/odd-sized-integers.h>
+#include <app/util/odd-sized-integers.h>
 
 namespace chip {
 namespace app {
@@ -629,26 +629,6 @@ Get(EndpointId endpoint, DataModel::Nullable<chip::app::Clusters::GeneralCommiss
 }
 
 } // namespace NetworkRecoveryReason
-
-namespace IsCommissioningWithoutPower {
-
-Protocols::InteractionModel::Status Get(EndpointId endpoint, bool * value)
-{
-    using Traits = NumericAttributeTraits<bool>;
-    Traits::StorageType temp;
-    uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
-    Protocols::InteractionModel::Status status =
-        emberAfReadAttribute(endpoint, Clusters::GeneralCommissioning::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
-    {
-        return Protocols::InteractionModel::Status::ConstraintError;
-    }
-    *value = Traits::StorageToWorking(temp);
-    return status;
-}
-
-} // namespace IsCommissioningWithoutPower
 
 } // namespace Attributes
 } // namespace GeneralCommissioning

@@ -1300,6 +1300,7 @@ RTL
 rtld
 RTOS
 RTT
+RTTI
 RTX
 runArgs
 runIf
