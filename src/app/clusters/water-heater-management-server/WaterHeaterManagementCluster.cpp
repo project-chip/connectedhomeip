@@ -16,16 +16,9 @@
 
 #include <app/clusters/water-heater-management-server/WaterHeaterManagementCluster.h>
 
+#include <clusters/WaterHeaterManagement/Events.h>
 #include <clusters/WaterHeaterManagement/Metadata.h>
 #include <app/server-cluster/AttributeListBuilder.h>
-
-#include <app/AttributeAccessInterface.h>
-#include <app/AttributeAccessInterfaceRegistry.h>
-#include <app/CommandHandlerInterfaceRegistry.h>
-#include <app/ConcreteAttributePath.h>
-#include <app/EventLogging.h>
-#include <app/InteractionModelEngine.h>
-#include <app/util/attribute-storage.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -39,52 +32,6 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace WaterHeaterManagement {
-
-/***************************************************************************
- *
- * The Delegate implementation
- *
- ***************************************************************************/
-
-CHIP_ERROR Delegate::GenerateBoostStartedEvent(uint32_t durationSecs, Optional<bool> oneShot, Optional<bool> emergencyBoost,
-                                               Optional<int16_t> temporarySetpoint, Optional<Percent> targetPercentage,
-                                               Optional<Percent> targetReheat)
-{
-    Events::BoostStarted::Type event;
-    EventNumber eventNumber;
-
-    event.boostInfo.duration          = durationSecs;
-    event.boostInfo.oneShot           = oneShot;
-    event.boostInfo.emergencyBoost    = emergencyBoost;
-    event.boostInfo.temporarySetpoint = temporarySetpoint;
-    event.boostInfo.targetPercentage  = targetPercentage;
-    event.boostInfo.targetReheat      = targetReheat;
-
-    CHIP_ERROR err = LogEvent(event, mEndpointId, eventNumber);
-    if (CHIP_NO_ERROR != err)
-    {
-        ChipLogError(AppServer, "Unable to generate BoostStarted event: %" CHIP_ERROR_FORMAT, err.Format());
-        return err;
-    }
-
-    return err;
-}
-
-CHIP_ERROR Delegate::GenerateBoostEndedEvent()
-{
-    Events::BoostEnded::Type event;
-    EventNumber eventNumber;
-    ChipLogError(AppServer, "Delegate::GenerateBoostEndedEvent");
-
-    CHIP_ERROR err = LogEvent(event, mEndpointId, eventNumber);
-    if (CHIP_NO_ERROR != err)
-    {
-        ChipLogError(AppServer, "Unable to generate BoostEnded event: %" CHIP_ERROR_FORMAT, err.Format());
-        return err;
-    }
-
-    return err;
-}
 
 /***************************************************************************
  *
@@ -104,6 +51,43 @@ bool WaterHeaterManagementCluster::HasFeature(Feature aFeature) const
     return mFeature.Has(aFeature);
 }
 
+CHIP_ERROR WaterHeaterManagementCluster::GenerateBoostStartedEvent(uint32_t durationSecs, Optional<bool> oneShot,
+                                                                    Optional<bool> emergencyBoost,
+                                                                    Optional<int16_t> temporarySetpoint,
+                                                                    Optional<Percent> targetPercentage,
+                                                                    Optional<Percent> targetReheat)
+{
+    VerifyOrReturnError(mContext != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    Events::BoostStarted::Type event;
+    event.boostInfo.duration          = durationSecs;
+    event.boostInfo.oneShot           = oneShot;
+    event.boostInfo.emergencyBoost    = emergencyBoost;
+    event.boostInfo.temporarySetpoint = temporarySetpoint;
+    event.boostInfo.targetPercentage  = targetPercentage;
+    event.boostInfo.targetReheat      = targetReheat;
+
+    if (!mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId).has_value())
+    {
+        ChipLogError(AppServer, "Unable to generate BoostStarted event");
+        return CHIP_ERROR_INTERNAL;
+    }
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR WaterHeaterManagementCluster::GenerateBoostEndedEvent()
+{
+    VerifyOrReturnError(mContext != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    Events::BoostEnded::Type event;
+    if (!mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId).has_value())
+    {
+        ChipLogError(AppServer, "Unable to generate BoostEnded event");
+        return CHIP_ERROR_INTERNAL;
+    }
+    return CHIP_NO_ERROR;
+}
+
 // ServerClusterInterface implementation
 DataModel::ActionReturnStatus WaterHeaterManagementCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request, AttributeValueEncoder & encoder)
 {
@@ -114,22 +98,10 @@ DataModel::ActionReturnStatus WaterHeaterManagementCluster::ReadAttribute(const 
     case HeatDemand::Id:
         return encoder.Encode(mDelegate.GetHeatDemand());
     case TankVolume::Id:
-        if (!HasFeature(Feature::kEnergyManagement))
-        {
-            return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
-        }
         return encoder.Encode(mDelegate.GetTankVolume());
     case EstimatedHeatRequired::Id:
-        if (!HasFeature(Feature::kEnergyManagement))
-        {
-            return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
-        }
         return encoder.Encode(mDelegate.GetEstimatedHeatRequired());
     case TankPercentage::Id:
-        if (!HasFeature(Feature::kTankPercent))
-        {
-            return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
-        }
         return encoder.Encode(mDelegate.GetTankPercentage());
     case BoostState::Id:
         return encoder.Encode(mDelegate.GetBoostState());
@@ -150,15 +122,18 @@ std::optional<DataModel::ActionReturnStatus> WaterHeaterManagementCluster::Invok
 
     switch (request.path.mCommandId)
     {
-    case Boost::Id:
-        WaterHeaterManagement::Commands::Boost::DecodableType boostReq;
+    case Boost::Id: {
+        Commands::Boost::DecodableType boostReq;
         ReturnErrorOnFailure(boostReq.Decode(input_arguments));
         return HandleBoost(boostReq);
-    case CancelBoost::Id:
-        WaterHeaterManagement::Commands::CancelBoost::DecodableType cancelBoostReq;
+    }
+    case CancelBoost::Id: {
+        Commands::CancelBoost::DecodableType cancelBoostReq;
         ReturnErrorOnFailure(cancelBoostReq.Decode(input_arguments));
         return HandleCancelBoost(cancelBoostReq);
-
+    }
+    default:
+        return Protocols::InteractionModel::Status::UnsupportedCommand;
     }
 }
 
@@ -224,7 +199,6 @@ DataModel::ActionReturnStatus WaterHeaterManagementCluster::HandleCancelBoost(co
     if (status != Status::Success)
     {
         ChipLogError(Zcl, "WHM: CancelBoost command failed. status " ChipLogFormatIMStatus, ChipLogValueIMStatus(status));
-        return;
     }
     return status;
 }

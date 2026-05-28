@@ -21,13 +21,6 @@
 #include <app/server-cluster/DefaultServerCluster.h>
 
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app/AttributeAccessInterface.h>
-#include <app/CommandHandlerInterface.h>
-#include <app/ConcreteAttributePath.h>
-#include <app/InteractionModelEngine.h>
-#include <app/MessageDef/StatusIB.h>
-#include <app/reporting/reporting.h>
-#include <app/util/attribute-storage.h>
 #include <lib/core/CHIPError.h>
 #include <protocols/interaction_model/StatusCode.h>
 
@@ -114,26 +107,6 @@ public:
     virtual Percent GetTankPercentage()                           = 0;
     virtual BoostStateEnum GetBoostState()                        = 0;
 
-    // ------------------------------------------------------------------
-    // Event generation
-
-    /**
-     * @brief Generates a BoostStarted event.
-     *        The parameters are same as those passed to HandleBoost().
-     *
-     * @return CHIP_NO_ERROR if the event was successfully generated, otherwise an error.
-     */
-    CHIP_ERROR GenerateBoostStartedEvent(uint32_t durationSecs, Optional<bool> oneShot, Optional<bool> emergencyBoost,
-                                         Optional<int16_t> temporarySetpoint, Optional<Percent> targetPercentage,
-                                         Optional<Percent> targetReheat);
-
-    /**
-     * @brief Generates a BoostEnded event.
-     *
-     * @return CHIP_NO_ERROR if the event was successfully generated, otherwise an error.
-     */
-    CHIP_ERROR GenerateBoostEndedEvent();
-
 protected:
     EndpointId mEndpointId = 0;
 };
@@ -144,6 +117,11 @@ public:
     WaterHeaterManagementCluster(EndpointId aEndpointId, Delegate & aDelegate, Feature aFeature);
 
     bool HasFeature(Feature aFeature) const;
+
+    CHIP_ERROR GenerateBoostStartedEvent(uint32_t durationSecs, Optional<bool> oneShot, Optional<bool> emergencyBoost,
+                                         Optional<int16_t> temporarySetpoint, Optional<Percent> targetPercentage,
+                                         Optional<Percent> targetReheat);
+    CHIP_ERROR GenerateBoostEndedEvent();
 
 private:
     Delegate & mDelegate;
