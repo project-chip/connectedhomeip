@@ -460,7 +460,7 @@ class MatterBaseTest(base_test.BaseTestClass):
 
             # Read all fabrics unfiltered so we see every fabric, not just TH1's
             fabrics = typing.cast(
-                typing.List[Clusters.OperationalCredentials.Structs.FabricDescriptorStruct],
+                list[Clusters.OperationalCredentials.Structs.FabricDescriptorStruct],
                 await self.read_single_attribute_check_success(
                     cluster=Clusters.OperationalCredentials,  # type: ignore[arg-type]
                     attribute=Clusters.OperationalCredentials.Attributes.Fabrics,
@@ -640,7 +640,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             found_any = True
             try:
                 provisioned = typing.cast(
-                    typing.List[Clusters.TlsClientManagement.Structs.TLSEndpointStruct],
+                    list[Clusters.TlsClientManagement.Structs.TLSEndpointStruct],
                     await self.read_single_attribute_check_success(
                         cluster=Clusters.TlsClientManagement,  # type: ignore[arg-type]
                         attribute=Clusters.TlsClientManagement.Attributes.ProvisionedEndpoints,
