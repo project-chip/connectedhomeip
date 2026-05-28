@@ -543,10 +543,6 @@
 #include <clusters/TimeSynchronization/Commands.h>
 #include <clusters/TimeSynchronization/Events.h>
 #include <clusters/TimeSynchronization/Structs.h>
-#include <clusters/Timer/Attributes.h>
-#include <clusters/Timer/Commands.h>
-#include <clusters/Timer/Events.h>
-#include <clusters/Timer/Structs.h>
 #include <clusters/TlsCertificateManagement/Attributes.h>
 #include <clusters/TlsCertificateManagement/Commands.h>
 #include <clusters/TlsCertificateManagement/Events.h>
