@@ -268,7 +268,7 @@ struct ContainerOptionsStorage : public ContainerOptionsStruct
     {
         containerType = aContainerOptions.containerType;
 
-        if (containerType == ContainerFormatEnum::kCmaf)
+        if (containerType == ContainerFormatEnum::kCmaf && aContainerOptions.CMAFContainerOptions.HasValue())
         {
             mCMAFContainerStorage = aContainerOptions.CMAFContainerOptions.Value();
             CMAFContainerOptions.SetValue(mCMAFContainerStorage);
@@ -335,6 +335,14 @@ struct TransportOptionsStorage : public TransportOptionsStruct
         // Copy video streams storage (base types only)
         mVideoStreamsStorage = aTransportOptionsStorage.mVideoStreamsStorage;
 
+        // Rebind video stream name CharSpans to our own name buffer
+        for (size_t i = 0; i < mVideoStreamsStorage.size(); i++)
+        {
+            mVideoStreamsStorage[i].videoStreamName =
+                CharSpan(mVideoStreamNameBuffer.data() + i * kMaxStreamNameLength,
+                         mVideoStreamsStorage[i].videoStreamName.size());
+        }
+
         // Rebind videoStreams list view to point to our storage
         if (!mVideoStreamsStorage.empty())
         {
@@ -348,6 +356,14 @@ struct TransportOptionsStorage : public TransportOptionsStruct
 
         // Copy audio streams storage (base types only)
         mAudioStreamsStorage = aTransportOptionsStorage.mAudioStreamsStorage;
+
+        // Rebind audio stream name CharSpans to our own name buffer
+        for (size_t i = 0; i < mAudioStreamsStorage.size(); i++)
+        {
+            mAudioStreamsStorage[i].audioStreamName =
+                CharSpan(mAudioStreamNameBuffer.data() + i * kMaxStreamNameLength,
+                         mAudioStreamsStorage[i].audioStreamName.size());
+        }
 
         // Rebind audioStreams list view to point to our storage
         if (!mAudioStreamsStorage.empty())
