@@ -289,7 +289,7 @@ class TemperatureControlledCabinetTopologyCluster(
         while (!tlvReader.isEndOfContainer()) {
           add(tlvReader.getUInt(AnonymousTag))
         }
-       tlvReader.exitContainer()
+        tlvReader.exitContainer()
       }
 
     return GeneratedCommandListAttribute(decodedValue)
