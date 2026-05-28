@@ -41,6 +41,8 @@ public:
     CHIP_ERROR HandleStopRanging(uint8_t sessionId) override;
     CHIP_ERROR GetRangingCapabilities(AttributeValueEncoder & encoder) override;
     std::optional<BleRbcConfig> GetBleRbcConfig() override;
+    std::optional<WiFiUsdConfig> GetWiFiUsdConfig() override;
+    std::optional<BltcsConfig> GetBltcsConfig() override;
     size_t GetNumActiveSessionIds() override { return mController.GetNumActiveSessionIds(); }
     CHIP_ERROR GetActiveSessionIds(Span<uint8_t> & sessionIds) override;
 

@@ -33,7 +33,7 @@ namespace ProximityRanging {
  * Implementers should ensure this is set to the number of ranging technologies the
  * device plans to support.
  */
-static constexpr uint8_t kMaxControllerAdapters = 2;
+static constexpr uint8_t kMaxControllerAdapters = 4;
 
 /**
  * Routes ranging sessions to the appropriate technology adapter based on the
@@ -128,6 +128,16 @@ public:
     void OnAttributeChanged(chip::AttributeId attributeId) override;
 
     uint64_t GetBleDeviceId();
+
+    /// Returns the WiFi USD config from the registered Wi-Fi adapter, or
+    /// std::nullopt if no Wi-Fi technology adapter is registered or the
+    /// registered adapter does not expose a config.
+    std::optional<WiFiUsdConfig> GetWiFiUsdConfig();
+
+    /// Returns the BLTCS config from the registered Bluetooth Channel Sounding
+    /// adapter, or std::nullopt if no BLTCS adapter is registered or the
+    /// registered adapter does not expose a config.
+    std::optional<BltcsConfig> GetBltcsConfig();
 
 private:
     RangingAdapter * FindAdapter(RangingTechEnum technology);

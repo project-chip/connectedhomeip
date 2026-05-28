@@ -84,7 +84,6 @@ static std::string gDeviceType;
 static const size_t kMaxDeviceTypeLength = 64;
 
 #include "DeviceFactoryPlatformOverride.h"
-#include "Esp32BleRssiRangingAdapter.h"
 
 namespace {
 

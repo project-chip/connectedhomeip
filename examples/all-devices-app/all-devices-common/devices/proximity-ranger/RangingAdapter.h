@@ -16,6 +16,7 @@
  */
 #pragma once
 
+#include <app/clusters/proximity-ranging-server/ProximityRangingDriver.h>
 #include <clusters/ProximityRanging/Commands.h>
 #include <clusters/ProximityRanging/Enums.h>
 #include <clusters/ProximityRanging/Structs.h>
@@ -97,7 +98,18 @@ public:
 
     virtual CHIP_ERROR GetActiveSessionIds(std::vector<uint8_t> & sessionIds) = 0;
 
+    /// Override only when the adapter exposes a stable per-device 64-bit
+    /// identifier (e.g. BLE Device ID). Default returns std::nullopt.
     virtual std::optional<uint64_t> GetDeviceId() { return std::nullopt; }
+
+    /// Override only on adapters whose technology is one of the Wi-Fi USD
+    /// proximity-detection technologies (WiFiRoundTripTimeRanging or
+    /// WiFiNextGenerationRanging). Default returns std::nullopt.
+    virtual std::optional<WiFiUsdConfig> GetWiFiUsdConfig() { return std::nullopt; }
+
+    /// Override only on adapters whose technology is BluetoothChannelSounding.
+    /// Default returns std::nullopt.
+    virtual std::optional<BltcsConfig> GetBltcsConfig() { return std::nullopt; }
 
 protected:
     Callback * mCallback = nullptr;

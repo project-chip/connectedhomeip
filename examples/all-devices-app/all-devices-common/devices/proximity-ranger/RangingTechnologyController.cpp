@@ -246,6 +246,31 @@ uint64_t RangingTechnologyController::GetBleDeviceId()
     return deviceId.value_or(0);
 }
 
+std::optional<WiFiUsdConfig> RangingTechnologyController::GetWiFiUsdConfig()
+{
+    // The WFUSDPD feature covers two ranging-tech enums; either adapter, if
+    // registered, supplies the cluster-level WiFiDevIK.
+    if (auto * adapter = FindAdapter(RangingTechEnum::kWiFiRoundTripTimeRanging))
+    {
+        return adapter->GetWiFiUsdConfig();
+    }
+    if (auto * adapter = FindAdapter(RangingTechEnum::kWiFiNextGenerationRanging))
+    {
+        return adapter->GetWiFiUsdConfig();
+    }
+    return std::nullopt;
+}
+
+std::optional<BltcsConfig> RangingTechnologyController::GetBltcsConfig()
+{
+    auto * adapter = FindAdapter(RangingTechEnum::kBluetoothChannelSounding);
+    if (adapter == nullptr)
+    {
+        return std::nullopt;
+    }
+    return adapter->GetBltcsConfig();
+}
+
 } // namespace ProximityRanging
 } // namespace Clusters
 } // namespace app

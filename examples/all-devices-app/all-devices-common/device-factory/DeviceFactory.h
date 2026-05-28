@@ -35,6 +35,7 @@
 #include <devices/power-source/impl/DecreasingBatteryPowerSourceDevice.h>
 #include <devices/pressure-sensor/impl/IncreasingPressureSensorDevice.h>
 #include <devices/proximity-ranger/ProximityRangerDevice.h>
+#include <devices/proximity-ranger/impl/LoggingRangingAdapter.h>
 #include <devices/smoke-co-alarm/LoggingOnlySmokeCoAlarmDevice.h>
 #include <devices/soil-sensor/impl/IncreasingMoistureSoilSensorDevice.h>
 #include <devices/speaker/impl/LoggingSpeakerDevice.h>
@@ -278,8 +279,19 @@ private:
         {
             RegisterCreator("proximity-ranger", [this]() {
                 VerifyOrDie(mContext.has_value());
+                static Clusters::ProximityRanging::LoggingRangingAdapter sLoggingBleAdapter(
+                    Clusters::ProximityRanging::RangingTechEnum::kBLEBeaconRSSIRanging, mContext->timerDelegate);
+                static Clusters::ProximityRanging::LoggingRangingAdapter sLoggingWiFiAdapter(
+                    Clusters::ProximityRanging::RangingTechEnum::kWiFiRoundTripTimeRanging, mContext->timerDelegate);
+                static Clusters::ProximityRanging::LoggingRangingAdapter sLoggingBltcsAdapter(
+                    Clusters::ProximityRanging::RangingTechEnum::kBluetoothChannelSounding, mContext->timerDelegate);
+                static Clusters::ProximityRanging::RangingAdapter * sAdapters[] = {
+                    &sLoggingBleAdapter,
+                    &sLoggingWiFiAdapter,
+                    &sLoggingBltcsAdapter,
+                };
                 return std::make_unique<ProximityRangerDevice>(mContext->timerDelegate,
-                                                               Span<Clusters::ProximityRanging::RangingAdapter * const>());
+                                                               Span<Clusters::ProximityRanging::RangingAdapter * const>(sAdapters));
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_POWER_SOURCE)

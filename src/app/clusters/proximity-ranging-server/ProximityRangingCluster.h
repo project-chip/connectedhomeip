@@ -18,12 +18,9 @@
 
 #include <app/clusters/proximity-ranging-server/ProximityRangingDriver.h>
 #include <app/server-cluster/DefaultServerCluster.h>
-#include <clusters/ProximityRanging/AttributeIds.h>
 #include <clusters/ProximityRanging/ClusterId.h>
-#include <clusters/ProximityRanging/CommandIds.h>
 #include <clusters/ProximityRanging/Commands.h>
 #include <clusters/ProximityRanging/Enums.h>
-#include <clusters/ProximityRanging/Events.h>
 #include <clusters/ProximityRanging/Structs.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
@@ -66,7 +63,16 @@ public:
         DefaultServerCluster({ endpoint, ProximityRanging::Id }), mFeatureMap(config.mFeatureMap)
     {}
 
-    void SetDriver(ProximityRangingDriver * driver) { mDriver = driver; }
+    /**
+     * Set the technology driver. May be called either before Startup() or after
+     * (e.g. when the cluster is auto-registered via CodegenIntegration but the
+     * driver is supplied by the application during a later init hook). When
+     * called after Startup() with a non-null driver, immediately invokes
+     * driver->Init() so the cluster becomes operational. Replacing an existing
+     * initialized driver shuts the previous one down first. Passing nullptr
+     * clears the driver.
+     */
+    CHIP_ERROR SetDriver(ProximityRangingDriver * driver);
     ProximityRangingDriver * GetDriver() const { return mDriver; }
 
     // DefaultServerCluster implementation
@@ -97,8 +103,13 @@ private:
     // Session ID generation
     uint8_t GenerateSessionId();
 
+    // Spec preflight: reject before touching the driver if the requested technology
+    // is not in FeatureMap or its matching DeviceRoleConfig field is missing/inconsistent.
+    ResultCodeEnum ValidateStartRangingRequest(const Commands::StartRangingRequest::DecodableType & request) const;
+
     // Members
     ProximityRangingDriver * mDriver = nullptr;
+    bool mDriverInitialized          = false;
     const BitMask<Feature> mFeatureMap;
 
     uint8_t mNextSessionId = 0;

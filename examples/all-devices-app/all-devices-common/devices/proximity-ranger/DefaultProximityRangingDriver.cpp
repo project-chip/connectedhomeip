@@ -57,6 +57,16 @@ std::optional<BleRbcConfig> DefaultProximityRangingDriver::GetBleRbcConfig()
     return BleRbcConfig{ mController.GetBleDeviceId() };
 }
 
+std::optional<WiFiUsdConfig> DefaultProximityRangingDriver::GetWiFiUsdConfig()
+{
+    return mController.GetWiFiUsdConfig();
+}
+
+std::optional<BltcsConfig> DefaultProximityRangingDriver::GetBltcsConfig()
+{
+    return mController.GetBltcsConfig();
+}
+
 CHIP_ERROR DefaultProximityRangingDriver::GetActiveSessionIds(Span<uint8_t> & sessionIds)
 {
     return mController.GetActiveSessionIds(sessionIds);
