@@ -821,6 +821,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         self.step_skipped = False
         self.failed = False
         self._teardown_ran = False
+        self.cleanup_config = TestCleanupConfig()
         if self.runner_hook and not self.is_commissioning:
             test_name = self.current_test_info.name
             steps = self.get_defined_test_steps(test_name)
