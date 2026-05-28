@@ -34,7 +34,7 @@ import typing
 from dataclasses import asdict, dataclass
 from datetime import UTC, datetime, timedelta
 from enum import IntFlag
-from typing import Any, Callable, Optional, Type, Union
+from typing import Any, Callable, Optional, Union
 
 import matter.testing.matchers as matchers
 
@@ -1593,7 +1593,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             raise  # Help mypy understand this never returns
 
     async def read_single_attribute(
-            self, dev_ctrl: ChipDeviceCtrl.ChipDeviceController, node_id: int, endpoint: int, attribute: Type[ClusterObjects.ClusterAttributeDescriptor], fabricFiltered: bool = True, verify_wildcard_subscription: Optional[bool] = None) -> object:
+            self, dev_ctrl: ChipDeviceCtrl.ChipDeviceController, node_id: int, endpoint: int, attribute: type[ClusterObjects.ClusterAttributeDescriptor], fabricFiltered: bool = True, verify_wildcard_subscription: Optional[bool] = None) -> object:
         """Read a single attribute value from a device.
 
         Args:
@@ -1633,7 +1633,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         return attr_ret
 
     async def read_single_attribute_all_endpoints(
-            self, cluster: ClusterObjects.Cluster, attribute: Type[ClusterObjects.ClusterAttributeDescriptor],
+            self, cluster: ClusterObjects.Cluster, attribute: type[ClusterObjects.ClusterAttributeDescriptor],
             dev_ctrl: Optional[ChipDeviceCtrl.ChipDeviceController] = None, node_id: Optional[int] = None,
             verify_wildcard_subscription: Optional[bool] = None):
         """Reads a single attribute of a specified cluster across all endpoints.
@@ -1684,7 +1684,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         return attrs
 
     async def read_single_attribute_check_success(
-            self, cluster: ClusterObjects.Cluster, attribute: Type[ClusterObjects.ClusterAttributeDescriptor],
+            self, cluster: ClusterObjects.Cluster, attribute: type[ClusterObjects.ClusterAttributeDescriptor],
             dev_ctrl: Optional[ChipDeviceCtrl.ChipDeviceController] = None, node_id: Optional[int] = None, endpoint: Optional[int] = None, fabric_filtered: bool = True, assert_on_error: bool = True, test_name: str = "", payloadCapability: int = ChipDeviceCtrl.TransportPayloadCapability.MRP_PAYLOAD, verify_wildcard_subscription: Optional[bool] = None) -> object:
         if dev_ctrl is None:
             dev_ctrl = self.default_controller
@@ -1738,7 +1738,7 @@ class MatterBaseTest(base_test.BaseTestClass):
 
     async def verify_attribute_subscription_value(
             self,
-            attribute: Type[ClusterObjects.ClusterAttributeDescriptor],
+            attribute: type[ClusterObjects.ClusterAttributeDescriptor],
             read_value: Any,
             endpoint_id: Optional[int] = None,
             test_name: str = "",
