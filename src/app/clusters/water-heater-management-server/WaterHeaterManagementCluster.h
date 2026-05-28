@@ -18,6 +18,8 @@
 
 #pragma once
 
+#include <app/server-cluster/DefaultServerCluster.h>
+
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandlerInterface.h>
@@ -136,21 +138,10 @@ protected:
     EndpointId mEndpointId = 0;
 };
 
-class Instance : public AttributeAccessInterface, public CommandHandlerInterface
+class WaterHeaterManagementCluster : public DefaultServerCluster
 {
 public:
-    Instance(EndpointId aEndpointId, Delegate & aDelegate, Feature aFeature) :
-        AttributeAccessInterface(MakeOptional(aEndpointId), Id), CommandHandlerInterface(MakeOptional(aEndpointId), Id),
-        mDelegate(aDelegate), mFeature(aFeature)
-    {
-        /* set the base class delegates endpointId */
-        mDelegate.SetEndpointId(aEndpointId);
-    }
-
-    ~Instance() { Shutdown(); }
-
-    CHIP_ERROR Init();
-    void Shutdown();
+    WaterHeaterManagementCluster(EndpointId aEndpointId, Delegate & aDelegate, Feature aFeature);
 
     bool HasFeature(Feature aFeature) const;
 
@@ -158,15 +149,19 @@ private:
     Delegate & mDelegate;
     BitMask<Feature> mFeature;
 
-    // AttributeAccessInterface
-    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
-    // NOTE there are no writable attributes
 
-    // CommandHandlerInterface
-    void InvokeCommand(HandlerContext & handlerContext) override;
+    // Server cluster implementation
+    DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
+                                                AttributeValueEncoder & encoder) override;
+    std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
+                                                               chip::TLV::TLVReader & input_arguments,
+                                                               CommandHandler * handler) override;
+    CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
+    CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,
+                                ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
 
-    void HandleBoost(HandlerContext & ctx, const Commands::Boost::DecodableType & commandData);
-    void HandleCancelBoost(HandlerContext & ctx, const Commands::CancelBoost::DecodableType & commandData);
+    DataModel::ActionReturnStatus HandleBoost(const Commands::Boost::DecodableType & commandData);
+    DataModel::ActionReturnStatus HandleCancelBoost(const Commands::CancelBoost::DecodableType & commandData);
 };
 
 } // namespace WaterHeaterManagement

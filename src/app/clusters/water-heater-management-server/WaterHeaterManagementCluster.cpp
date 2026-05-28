@@ -16,6 +16,9 @@
 
 #include <app/clusters/water-heater-management-server/WaterHeaterManagementCluster.h>
 
+#include <clusters/WaterHeaterManagement/Metadata.h>
+#include <app/server-cluster/AttributeListBuilder.h>
+
 #include <app/AttributeAccessInterface.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandlerInterfaceRegistry.h>
@@ -36,8 +39,6 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace WaterHeaterManagement {
-
-constexpr uint16_t kClusterRevision = 2;
 
 /***************************************************************************
  *
@@ -91,84 +92,77 @@ CHIP_ERROR Delegate::GenerateBoostEndedEvent()
  *
  ***************************************************************************/
 
-CHIP_ERROR Instance::Init()
+WaterHeaterManagementCluster::WaterHeaterManagementCluster(EndpointId aEndpointId, Delegate & aDelegate, Feature aFeature) :
+    DefaultServerCluster({ aEndpointId, WaterHeaterManagement::Id }), mDelegate(aDelegate), mFeature(aFeature)
 {
-    ReturnErrorOnFailure(CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this));
-    VerifyOrReturnError(chip::app::AttributeAccessInterfaceRegistry::Instance().Register(this), CHIP_ERROR_INCORRECT_STATE);
-
-    return CHIP_NO_ERROR;
+    /* set the base class delegates endpointId */
+    mDelegate.SetEndpointId(aEndpointId);
 }
 
-void Instance::Shutdown()
-{
-    TEMPORARY_RETURN_IGNORED CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
-    chip::app::AttributeAccessInterfaceRegistry::Instance().Unregister(this);
-}
-
-bool Instance::HasFeature(Feature aFeature) const
+bool WaterHeaterManagementCluster::HasFeature(Feature aFeature) const
 {
     return mFeature.Has(aFeature);
 }
 
-// AttributeAccessInterface
-CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
+// ServerClusterInterface implementation
+DataModel::ActionReturnStatus WaterHeaterManagementCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request, AttributeValueEncoder & encoder)
 {
-    switch (aPath.mAttributeId)
+    switch (request.path.mAttributeId)
     {
     case HeaterTypes::Id:
-        return aEncoder.Encode(mDelegate.GetHeaterTypes());
+        return encoder.Encode(mDelegate.GetHeaterTypes());
     case HeatDemand::Id:
-        return aEncoder.Encode(mDelegate.GetHeatDemand());
+        return encoder.Encode(mDelegate.GetHeatDemand());
     case TankVolume::Id:
         if (!HasFeature(Feature::kEnergyManagement))
         {
             return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
         }
-        return aEncoder.Encode(mDelegate.GetTankVolume());
+        return encoder.Encode(mDelegate.GetTankVolume());
     case EstimatedHeatRequired::Id:
         if (!HasFeature(Feature::kEnergyManagement))
         {
             return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
         }
-        return aEncoder.Encode(mDelegate.GetEstimatedHeatRequired());
+        return encoder.Encode(mDelegate.GetEstimatedHeatRequired());
     case TankPercentage::Id:
         if (!HasFeature(Feature::kTankPercent))
         {
             return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
         }
-        return aEncoder.Encode(mDelegate.GetTankPercentage());
+        return encoder.Encode(mDelegate.GetTankPercentage());
     case BoostState::Id:
-        return aEncoder.Encode(mDelegate.GetBoostState());
+        return encoder.Encode(mDelegate.GetBoostState());
 
     /* FeatureMap - is held locally */
     case FeatureMap::Id:
-        return aEncoder.Encode(mFeature);
+        return encoder.Encode(mFeature);
     case ClusterRevision::Id:
-        return aEncoder.Encode(kClusterRevision);
+        return encoder.Encode(WaterHeaterManagement::kRevision);
+    default:
+        return Protocols::InteractionModel::Status::UnsupportedAttribute;
     }
-
-    /* Allow all other unhandled attributes to fall through to Ember */
-    return CHIP_NO_ERROR;
 }
 
-void Instance::InvokeCommand(HandlerContext & handlerContext)
+std::optional<DataModel::ActionReturnStatus> WaterHeaterManagementCluster::InvokeCommand(const DataModel::InvokeRequest & request, chip::TLV::TLVReader & input_arguments, CommandHandler * handler)
 {
     using namespace Commands;
 
-    switch (handlerContext.mRequestPath.mCommandId)
+    switch (request.path.mCommandId)
     {
     case Boost::Id:
-        HandleCommand<Boost::DecodableType>(
-            handlerContext, [this](HandlerContext & ctx, const auto & commandData) { HandleBoost(ctx, commandData); });
-        return;
+        WaterHeaterManagement::Commands::Boost::DecodableType boostReq;
+        ReturnErrorOnFailure(boostReq.Decode(input_arguments));
+        return HandleBoost(boostReq);
     case CancelBoost::Id:
-        HandleCommand<CancelBoost::DecodableType>(
-            handlerContext, [this](HandlerContext & ctx, const auto & commandData) { HandleCancelBoost(ctx, commandData); });
-        return;
+        WaterHeaterManagement::Commands::CancelBoost::DecodableType cancelBoostReq;
+        ReturnErrorOnFailure(cancelBoostReq.Decode(input_arguments));
+        return HandleCancelBoost(cancelBoostReq);
+
     }
 }
 
-void Instance::HandleBoost(HandlerContext & ctx, const Commands::Boost::DecodableType & commandData)
+DataModel::ActionReturnStatus WaterHeaterManagementCluster::HandleBoost(const Commands::Boost::DecodableType & commandData)
 {
     uint32_t duration                   = commandData.boostInfo.duration;
     Optional<bool> oneShot              = commandData.boostInfo.oneShot;
@@ -185,8 +179,7 @@ void Instance::HandleBoost(HandlerContext & ctx, const Commands::Boost::Decodabl
             if (targetPercentage.Value() > 100)
             {
                 ChipLogError(Zcl, "Bad targetPercentage %u", targetPercentage.Value());
-                ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
-                return;
+                return Status::InvalidCommand;
             }
         }
 
@@ -195,50 +188,70 @@ void Instance::HandleBoost(HandlerContext & ctx, const Commands::Boost::Decodabl
             if (targetReheat.Value() > 100)
             {
                 ChipLogError(Zcl, "Bad targetReheat %u", targetReheat.Value());
-                ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
-                return;
+                return Status::InvalidCommand;
             }
 
             if (!targetPercentage.HasValue())
             {
                 ChipLogError(Zcl, "targetPercentage must be specified if targetReheat specified");
-                ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
-                return;
+                return Status::InvalidCommand;
             }
 
             if (oneShot.HasValue())
             {
                 ChipLogError(Zcl, "Cannot specify targetReheat with targetPercentage and oneShot. oneShot must be excluded");
-                ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
-                return;
+                return Status::InvalidCommand;
             }
         }
     }
     else if (targetPercentage.HasValue() || targetReheat.HasValue())
     {
         ChipLogError(Zcl, "Cannot specify targetPercentage or targetReheat if the feature TankPercent is not supported");
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
-        return;
+        return Status::InvalidCommand;
     }
 
     Status status = mDelegate.HandleBoost(duration, oneShot, emergencyBoost, temporarySetpoint, targetPercentage, targetReheat);
-    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
     if (status != Status::Success)
     {
         ChipLogError(Zcl, "WHM: Boost command failed. status " ChipLogFormatIMStatus, ChipLogValueIMStatus(status));
     }
+    return status;
 }
 
-void Instance::HandleCancelBoost(HandlerContext & ctx, const Commands::CancelBoost::DecodableType & commandData)
+DataModel::ActionReturnStatus WaterHeaterManagementCluster::HandleCancelBoost(const Commands::CancelBoost::DecodableType & commandData)
 {
     Status status = mDelegate.HandleCancelBoost();
-    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
     if (status != Status::Success)
     {
         ChipLogError(Zcl, "WHM: CancelBoost command failed. status " ChipLogFormatIMStatus, ChipLogValueIMStatus(status));
         return;
     }
+    return status;
 }
+
+CHIP_ERROR WaterHeaterManagementCluster::Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
+{
+    // This cluster only has Mandatory attributes
+    AttributeListBuilder listBuilder(builder);
+
+    AttributeListBuilder::OptionalAttributeEntry optionalAttributes[] = {
+        { mFeature.Has(Feature::kEnergyManagement), TankVolume::kMetadataEntry },
+        { mFeature.Has(Feature::kEnergyManagement), EstimatedHeatRequired::kMetadataEntry },
+        { mFeature.Has(Feature::kTankPercent), TankPercentage::kMetadataEntry },
+    };
+
+    return listBuilder.Append(Span(WaterHeaterManagement::Attributes::kMandatoryMetadata), Span(optionalAttributes));
+}
+
+CHIP_ERROR WaterHeaterManagementCluster::AcceptedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
+{
+    static constexpr DataModel::AcceptedCommandEntry kCommands[] = {
+        Commands::Boost::kMetadataEntry,
+        Commands::CancelBoost::kMetadataEntry,
+    };
+    return builder.ReferenceExisting(Span(kCommands));
+}
+
 
 } // namespace WaterHeaterManagement
 } // namespace Clusters
