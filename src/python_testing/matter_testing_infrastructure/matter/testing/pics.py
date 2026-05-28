@@ -112,20 +112,28 @@ def parse_pics_xml(contents: str) -> dict[str, bool]:
     return pics
 
 
-def read_pics_from_file(path: str) -> dict[str, bool]:
-    """ Reads a dictionary of PICS from a file (ci format) or directory (xml format). """
+def read_pics_from_file(path: str, endpoint: int | None = None) -> dict[str, bool]:
+    """Reads PICS from a CI-format text file or a PICSGenerator-shaped directory.
+    For directory inputs, top-level *.xml files are always loaded (device-wide
+    codes like MCORE.*). If `endpoint` is supplied and `<path>/endpoint<N>/`
+    exists, that subdirectory's *.xml files are loaded too. Other endpoint
+    subdirs are skipped so per-endpoint test checks don't see foreign clusters.
+    """
     if os.path.isdir(os.path.abspath(path)):
-        pics_dict = {}
+        pics_dict: dict[str, bool] = {}
         for filename in glob.glob(f'{path}/*.xml'):
             with open(filename) as f:
-                contents = f.read()
-                pics_dict.update(parse_pics_xml(contents))
+                pics_dict.update(parse_pics_xml(f.read()))
+        if endpoint is not None:
+            ep_dir = os.path.join(path, f'endpoint{endpoint}')
+            if os.path.isdir(ep_dir):
+                for filename in glob.glob(f'{ep_dir}/*.xml'):
+                    with open(filename) as f:
+                        pics_dict.update(parse_pics_xml(f.read()))
         return pics_dict
 
     with open(path) as f:
-        lines = f.readlines()
-        return parse_pics(lines)
-
+        return parse_pics(f.readlines())
 
 @dataclass
 class BasePicsFacts:

@@ -194,12 +194,16 @@ def GenerateDevicePicsXmlFiles(clusterName, clusterPicsCode, featurePicsList, at
 
     picsFileName = map_cluster_name_to_pics_xml(clusterName, xmlFileList)
 
-    # Determine if file has already been handled and use this file
-    for outputFolderFileName in os.listdir(outputPathStr):
-        if picsFileName in outputFolderFileName:
+    # If we've already written an output for this cluster's template
+    # (e.g. OTA Software Update Provider and Requestor both resolve to
+    # the same template, or a cluster appears as both server and client
+    # on this endpoint), reuse the existing file as input so the new
+    # markings get merged in instead of writing a fresh copy.
+    if picsFileName:
+        existing_output = Path(outputPathStr) / picsFileName
+        if existing_output.is_file():
             xmlPath = outputPathStr
-            fileName = outputFolderFileName
-            break
+            fileName = picsFileName
 
     # If no file is found in output folder, determine if there is a match for the cluster name in input folder
     if fileName == "":
@@ -334,23 +338,21 @@ def GenerateDevicePicsXmlFiles(clusterName, clusterPicsCode, featurePicsList, at
             else:
                 console.print(f"  → not mandatory for this device (decision={decision.decision.name})")
 
-    # Grabbing the header from the XML templates
-    with (open(f"{xmlPath}{fileName}") as inputFile,
-          open(f"{outputPathStr}/{fileName}", "ab") as outputFile):
-
-        xmlHeader = ""
+    # Read the template/existing header before opening the output for
+    # write. "wb" truncates on open, so doing it under a single `with`
+    # would wipe the file we're reading from when xmlPath ==
+    # outputPathStr (server+client merge case, where the second pass
+    # reuses the file the first pass wrote).
+    xmlHeader = ""
+    with open(f"{xmlPath}{fileName}") as inputFile:
         inputLine = inputFile.readline().lstrip()
-
         while 'clusterPICS' not in inputLine:
             xmlHeader += inputLine
             inputLine = inputFile.readline().lstrip()
 
-        # Write the PICS XML header
+    with open(f"{outputPathStr}/{fileName}", "wb") as outputFile:
         outputFile.write(xmlHeader.encode())
-
-        # Write the PICS XML data
         tree.write(outputFile, encoding='utf-8', xml_declaration=False)
-
 
 async def DeviceMapping(devCtrl, nodeID, outputPathStr):
 
