@@ -1338,7 +1338,7 @@ TEST_F(TestGroupDataProvider, TestKeySetRemovalGroupKeyMapUpdates)
     EXPECT_EQ(provider->GetKeySet(kFabric1, kKeysetId2, keyset), CHIP_NO_ERROR);
 
     // 5. Verify mappings in group key map using IterateGroupKeys(). This iterates over
-    // individual group key map entries, not "group keys"
+    // individual group key map entries, not "group keys".
     // Since kKeysetId1 mappings were removed, the only remaining mapping should be (kGroup3 to kKeysetId2).
     auto it = provider->IterateGroupKeys(kFabric1);
     ASSERT_TRUE(it);
