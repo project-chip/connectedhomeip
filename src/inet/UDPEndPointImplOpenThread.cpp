@@ -37,7 +37,7 @@ using DeviceLayer::Internal::MapOpenThreadError;
 
 otInstance * globalOtInstance;
 
-// Single deferred endpoint — there is only one OT-based UDP endpoint (the Thread operational port).
+// Head of the deferred endpoints list.
 static UDPEndPointImplOT * sDeferredEndpoint = nullptr;
 
 namespace {
@@ -135,11 +135,11 @@ CHIP_ERROR UDPEndPointImplOT::IPv6Bind(otUdpSocket & socket, const IPAddress & a
     // CompleteDeferredOTBinds() must be called after OT is initialized.
     if (mOTInstance == nullptr)
     {
+        mDeferredAddr   = address;
+        mDeferredPort   = port;
+        mDeferredIntfId = interface;
         if (!mDeferredBind)
         {
-            mDeferredAddr     = address;
-            mDeferredPort     = port;
-            mDeferredIntfId   = interface;
             mDeferredBind     = true;
             mNextDeferred     = sDeferredEndpoint;
             sDeferredEndpoint = this;
@@ -295,29 +295,23 @@ CHIP_ERROR UDPEndPointImplOT::CompleteDeferredOTBinds(otInstance * otInst)
     globalOtInstance    = otInst;
     CHIP_ERROR finalErr = CHIP_NO_ERROR;
 
-    UDPEndPointImplOT * ep = sDeferredEndpoint;
-    sDeferredEndpoint      = nullptr;
-
-    while (ep != nullptr)
+    while (sDeferredEndpoint  != nullptr)
     {
-        UDPEndPointImplOT * next = ep->mNextDeferred;
-        ep->mNextDeferred        = nullptr;
+        UDPEndPointImplOT * ep = sDeferredEndpoint;
+        sDeferredEndpoint      = ep->mNextDeferred;
+        ep->mNextDeferred      = nullptr;
 
         if (ep->mDeferredBind)
         {
             ep->mOTInstance = otInst;
             CHIP_ERROR err  = ep->IPv6Bind(ep->mSocket, ep->mDeferredAddr, ep->mDeferredPort, ep->mDeferredIntfId);
-            if (err == CHIP_NO_ERROR)
-            {
-                ep->mDeferredBind = false;
-            }
-            else
+            ep->mDeferredBind = false;
+            if (err != CHIP_NO_ERROR)
             {
                 ChipLogError(Inet, "CompleteDeferredOTBinds: bind failed: %" CHIP_ERROR_FORMAT, err.Format());
                 finalErr = err;
             }
         }
-        ep = next;
     }
     return finalErr;
 }
