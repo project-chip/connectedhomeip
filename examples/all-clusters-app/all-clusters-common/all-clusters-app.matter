@@ -6437,28 +6437,28 @@ provisional cluster AmbientContextSensing = 1073 {
     percent confidence = 5;
   }
 
-  info event AmbientContextDetectStarted = 0 {
+  provisional info event AmbientContextDetectStarted = 0 {
     optional AmbientContextTypeStruct ambientContextDetected = 0;
     optional boolean objectCountReached = 1;
     optional int16u objectCount = 2;
   }
 
-  info event AmbientContextDetectEnded = 1 {
+  provisional info event AmbientContextDetectEnded = 1 {
     posix_ms eventStartTime = 0;
   }
 
-  readonly attribute optional boolean humanActivityDetected = 0;
-  readonly attribute optional boolean objectIdentified = 1;
-  readonly attribute optional boolean audioContextDetected = 2;
-  readonly attribute optional AmbientContextTypeStruct ambientContextType[] = 3;
-  readonly attribute optional SemanticTagStruct ambientContextTypeSupported[] = 4;
-  readonly attribute optional boolean objectCountReached = 5;
-  attribute access(write: manage) optional ObjectCountConfigStruct objectCountConfig = 6;
-  readonly attribute optional int16u objectCount = 7;
-  attribute int8u simultaneousDetectionLimit = 8;
-  attribute access(write: manage) int16u holdTime = 9;
-  readonly attribute HoldTimeLimitsStruct holdTimeLimits = 10;
-  readonly attribute optional PredictedActivityStruct predictedActivity[] = 11;
+  provisional readonly attribute optional boolean humanActivityDetected = 0;
+  provisional readonly attribute optional boolean objectIdentified = 1;
+  provisional readonly attribute optional boolean audioContextDetected = 2;
+  provisional readonly attribute optional AmbientContextTypeStruct ambientContextType[] = 3;
+  provisional readonly attribute optional SemanticTagStruct ambientContextTypeSupported[] = 4;
+  provisional readonly attribute optional boolean objectCountReached = 5;
+  provisional attribute access(write: manage) optional ObjectCountConfigStruct objectCountConfig = 6;
+  provisional readonly attribute optional int16u objectCount = 7;
+  provisional attribute int8u simultaneousDetectionLimit = 8;
+  provisional attribute access(write: manage) int16u holdTime = 9;
+  provisional readonly attribute HoldTimeLimitsStruct holdTimeLimits = 10;
+  provisional readonly attribute optional PredictedActivityStruct predictedActivity[] = 11;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
