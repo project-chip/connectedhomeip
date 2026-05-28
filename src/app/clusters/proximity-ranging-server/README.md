@@ -19,6 +19,10 @@ The cluster handles:
 -   Matter protocol interactions (attribute reads, command dispatch)
 -   Feature map ownership (immutable, set at construction via Config)
 -   Session ID allocation and tracking
+-   Spec preflight validation of `StartRangingRequest` (technology in feature
+    map, matching `DeviceRoleConfig` present, role enum within the matching
+    family, trigger and reporting-condition constraints) before any request
+    reaches the driver
 -   Event emission for ranging results and session status changes
 -   Attribute change notifications from the driver
 
@@ -39,22 +43,10 @@ The application is responsible for:
 └──────────────────────────┬──────────────────────────────────┘
                            │ ProximityRangingDriver interface
 ┌──────────────────────────▼──────────────────────────────────┐
-│ DefaultProximityRangingDriver (example, per-endpoint)       │
-│   - Routes to RangingTechnologyController                   │
-│   - Forwards callbacks to cluster                           │
-└──────────────────────────┬──────────────────────────────────┘
-                           │ RangingTechnologyController::Listener
-┌──────────────────────────▼──────────────────────────────────┐
-│ RangingTechnologyController (example, shared)               │
-│   - Routes sessions to adapters by technology               │
-│   - Multi-listener support for multiple endpoints           │
-└──────────┬────────────────────────────────┬─────────────────┘
-           │                                │
-┌──────────▼───────────┐     ┌──────────────▼─────────────────┐
-│ BleRssiRangingAdapter│     │ (Future: WiFi/UWB adapters)    │
-│   - Encode/Decode    │     │                                │
-│   - Platform subclass│     │                                │
-└──────────────────────┘     └────────────────────────────────┘
+│ Application-supplied driver                                 │
+│   - DefaultProximityRangingDriver in all-devices-app routes │
+│     to RangingTechnologyController + per-tech adapters      │
+└─────────────────────────────────────────────────────────────┘
 ```
 
 ## Features
@@ -105,108 +97,6 @@ if (cluster != nullptr)
 }
 ```
 
-## Usage (CodeDriven pattern)
-
-The all-devices-app demonstrates the recommended integration pattern where
-platform-specific code owns the ranging infrastructure.
-
-### 1. Cluster Construction
-
-The cluster is constructed with a `Config` that declares supported features. In
-the CodeDriven path, the application iterates its adapters to build the feature
-mask, then passes it to `Config::WithFeatures()`:
-
-```cpp
-BitMask<ProximityRanging::Feature> features;
-for (auto * adapter : adapters)
-{
-    switch (adapter->GetTechnology())
-    {
-    case RangingTechEnum::kBluetoothChannelSounding:
-        features.Set(Feature::kBluetoothChannelSounding);
-        break;
-    case RangingTechEnum::kWiFiRoundTripTimeRanging:
-    case RangingTechEnum::kWiFiNextGenerationRanging:
-        features.Set(Feature::kWiFiUsdProximityDetection);
-        break;
-    case RangingTechEnum::kBLEBeaconRSSIRanging:
-        features.Set(Feature::kBleBeaconRssi);
-        break;
-    default:
-        break;
-    }
-}
-
-mCluster.Create(endpoint, ProximityRanging::ProximityRangingCluster::Config().WithFeatures(features));
-mCluster.Cluster().SetDriver(&myDriver);
-```
-
-### 2. Platform Override File
-
-Each platform (POSIX, ESP32) has a `DeviceFactoryPlatformOverride` that owns the
-controller, driver, and adapter as statics:
-
-```cpp
-// DeviceFactoryPlatformOverride.cpp
-namespace {
-using namespace chip::app::Clusters::ProximityRanging;
-
-DarwinBleRssiRangingAdapter sBleAdapter;
-RangingTechnologyController sRangingController;
-DefaultProximityRangingDriver sRangingDriver{ sRangingController };
-} // namespace
-
-void RegisterDeviceFactoryOverrides(TimerDelegate & timerDelegate, PersistentStorageDelegate * storageDelegate)
-{
-    sBleAdapter.Init(storageDelegate);
-    sRangingController.RegisterAdapter(sBleAdapter);
-
-    DeviceFactory::GetInstance().RegisterCreator("proximity-ranger", [&timerDelegate]() {
-        return std::make_unique<ProximityRangerDevice>(ProximityRangerDevice::Context{
-            .timerDelegate = timerDelegate,
-            .driver        = sRangingDriver,
-        });
-    });
-}
-```
-
-### 3. Implement a Platform Adapter
-
-Platform adapters inherit from `BleRssiRangingAdapter` (which provides
-encode/decode and technology identification) and implement session management:
-
-```cpp
-class DarwinBleRssiRangingAdapter : public PosixBleRssiRangingAdapter
-{
-public:
-    ResultCodeEnum StartSession(uint8_t sessionId, const StartRangingRequest::DecodableType & request) override
-    {
-        AddSession(sessionId);
-        // Start platform BLE advertising/scanning
-        return ResultCodeEnum::kAccepted;
-    }
-
-    CHIP_ERROR StopSession(uint8_t sessionId) override
-    {
-        VerifyOrReturnError(RemoveSession(sessionId), CHIP_ERROR_NOT_FOUND);
-        // Stop platform BLE if no sessions remain
-        return CHIP_NO_ERROR;
-    }
-};
-```
-
-### 4. Lifecycle
-
-The `DefaultProximityRangingDriver` connects to the controller via
-`AddListener`/`RemoveListener`:
-
--   `Init()`: Stores the cluster callback, adds itself as a controller listener
--   `Shutdown()`: Removes itself as a listener, nulls the callback
-
-The controller and adapters are static objects with app lifetime. The
-controller's destruction calls `StopAllSessions()` on all adapters during
-program exit.
-
 ## Driver Interface
 
 | Method                     | Description                                           |
@@ -221,30 +111,43 @@ program exit.
 | `GetWiFiUsdConfig()`       | Return `WiFiUsdConfig` (optional, WFUSDPD feature)    |
 | `GetBltcsConfig()`         | Return `BltcsConfig` (optional, BLTCS feature)        |
 
-## Attribute Change Notifications
+See `ProximityRangingDriver.h` for callback method documentation.
 
-Adapters can notify the cluster when attributes change (e.g., BLE Device ID
-rotation). The notification chain is:
+## Preflight Validation
 
-```
-Adapter: mCallback->OnAttributeChanged(BLEDeviceID::Id)
-    → Controller: broadcasts to all listeners
-        → Driver: mCallback->OnAttributeChanged(attributeId)
-            → Cluster: NotifyAttributeChanged(attributeId) → subscription reports
-```
+`HandleStartRangingRequest` runs spec-derived validation before invoking the
+driver. A request is rejected with `kRejectedInfeasibleRanging` if any of the
+following hold:
+
+-   The requested technology's feature bit is not set in `FeatureMap`.
+-   The matching `DeviceRoleConfig` Optional is missing, OR a non-matching one
+    is present (inconsistent role configuration).
+-   The role enum is not in the family for the requested technology (e.g.,
+    `kBLTInitiatorRole` for `kBLEBeaconRSSIRanging`).
+-   `ReportingCondition.MinDistanceCondition == 0` or
+    `MaxDistanceCondition == 0`.
+
+Trigger-shape violations are rejected with `kRejectedInfeasibleRangingTriggers`:
+
+-   `Trigger.EndTime <= Trigger.StartTime`.
+-   `Trigger.RangingInstanceInterval == 0` (when present).
+
+Drivers can rely on these checks and only need to handle technology-specific
+infeasibility (e.g., requested frequency band unsupported by hardware).
 
 ## Command Flow
 
 `StartRangingRequest` and `StopRangingRequest` are handled synchronously:
 
 ```
-Client                    Cluster                     Driver/Controller/Adapter
-  │                         │                           │
-  ├─ StartRangingRequest ──►│                           │
-  │                         ├─ GenerateSessionId() ────►│ (GetActiveSessionIds)
-  │                         ├─ HandleStartRanging() ───►│
-  │                         │◄── ResultCodeEnum ────────┤
-  │◄─ StartRangingResponse ─┤                           │
+Client                    Cluster                          Driver
+  │                         │                                │
+  ├─ StartRangingRequest ──►│                                │
+  │                         ├─ ValidateStartRangingRequest() │
+  │                         ├─ GenerateSessionId() ─────────►│ (GetActiveSessionIds)
+  │                         ├─ HandleStartRanging() ────────►│
+  │                         │◄── ResultCodeEnum ─────────────┤
+  │◄─ StartRangingResponse ─┤                                │
 ```
 
 ## Events
@@ -254,29 +157,15 @@ Client                    Cluster                     Driver/Controller/Adapter
 -   **RangingSessionStatus**: Emitted when a session ends asynchronously.
     Delivered via `Callback::OnSessionStopped()`.
 
-## BLE Beacon Payload
+## Attribute Change Notifications
 
-The `BleRssiRangingAdapter` provides static encode/decode methods for the
-proximity ranging BLE advertisement payload
-(`ChipBLEProximityRangingIdentificationInfo`, 21 bytes):
-
-```cpp
-BleRssiRangingAdapter::EncodeBeaconPayload(bleDeviceId, msgCounter, txPower, sessionKey, outPayload);
-BleRssiRangingAdapter::DecodeBeaconPayload(payload, candidateId, sessionKey);
-```
-
-The BLE Device ID is obfuscated in the beacon using HMAC (not yet implemented;
-currently encoded in plain form).
-
-## Persistent Storage
-
-The `BleRssiRangingAdapter::Init(PersistentStorageDelegate *)` loads or
-generates the BLE Device ID and persists it under key `"g/pr/bledevid"`. This
-ensures the device maintains a stable identity across reboots.
+Drivers notify the cluster when an attribute they own changes (e.g., BLE Device
+ID rotation) by calling `Callback::OnAttributeChanged(attributeId)`. The cluster
+forwards this as an attribute-changed report so subscribers observe the new
+value.
 
 ## Multi-Endpoint Support
 
-Multiple endpoints can share a single `RangingTechnologyController` and adapter
-set. Each endpoint has its own or can share the `DefaultProximityRangingDriver`
-which registers as a listener on the shared controller. All listeners receive
-session events and attribute change notifications.
+Multiple endpoints each construct their own `ProximityRangingCluster` instance
+with its own feature map. Drivers may be shared (one driver registering with
+multiple cluster instances) or per-endpoint depending on the application.

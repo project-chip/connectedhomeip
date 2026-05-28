@@ -93,9 +93,32 @@ public:
     public:
         virtual ~Callback() = default;
 
+        /**
+         * Reports a single ranging measurement for an active session. The cluster emits a
+         * RangingResult event with the supplied measurement on the endpoint that owns this
+         * driver. The driver is responsible for ensuring the measurement satisfies any
+         * ReportingCondition supplied in the originating StartRangingRequest before
+         * invoking this; the cluster does not filter measurements.
+         */
         virtual void OnMeasurementData(uint8_t sessionId, const Structs::RangingMeasurementDataStruct::Type & measurement) = 0;
-        virtual void OnSessionStopped(uint8_t sessionId, RangingSessionStatusEnum status)                                  = 0;
-        virtual void OnAttributeChanged(AttributeId attributeId)                                                           = 0;
+
+        /**
+         * Notifies the cluster that an active session has terminated for a reason other
+         * than a client-issued StopRangingRequest (e.g. EndTime reached, peer not found,
+         * hardware error). The cluster emits a RangingSessionStatus event and removes
+         * the session ID from SessionIDList. Drivers MUST NOT invoke this in response
+         * to their own HandleStopRanging() returning success — that termination is
+         * already attributed to the client.
+         */
+        virtual void OnSessionStopped(uint8_t sessionId, RangingSessionStatusEnum status) = 0;
+
+        /**
+         * Notifies the cluster that the value of an attribute exposed by this driver has
+         * changed. The cluster issues an attribute-changed report so subscribers observe
+         * the new value. Use for driver-owned attributes whose values can change at
+         * runtime (e.g. BLEDeviceID after factory reset).
+         */
+        virtual void OnAttributeChanged(AttributeId attributeId) = 0;
     };
 
     virtual ~ProximityRangingDriver() = default;
