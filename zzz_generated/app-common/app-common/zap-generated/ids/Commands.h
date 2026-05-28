@@ -150,7 +150,6 @@
 #include <clusters/ThreadNetworkDirectory/CommandIds.h>
 #include <clusters/TimeFormatLocalization/CommandIds.h>
 #include <clusters/TimeSynchronization/CommandIds.h>
-#include <clusters/Timer/CommandIds.h>
 #include <clusters/TlsCertificateManagement/CommandIds.h>
 #include <clusters/TlsClientManagement/CommandIds.h>
 #include <clusters/TotalVolatileOrganicCompoundsConcentrationMeasurement/CommandIds.h>

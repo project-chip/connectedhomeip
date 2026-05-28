@@ -50,7 +50,6 @@ Generally regenerate using one of:
 |         68 |       0x44 | ProxyValid                                              |
 |         69 |       0x45 | BooleanState                                            |
 |         70 |       0x46 | IcdManagement                                           |
-|         71 |       0x47 | Timer                                                   |
 |         72 |       0x48 | OvenCavityOperationalState                              |
 |         73 |       0x49 | OvenMode                                                |
 |         74 |       0x4A | LaundryDryerControls                                    |
