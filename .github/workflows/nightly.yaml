@@ -14,15 +14,15 @@
 
 name: Daily Run for slow tests
 on:
-    # schedule:
-    #   - cron: '0 0 * * *'
+    schedule:
+      - cron: '0 0 * * *'
 # --- TEST SECTION: Uncomment below to test on PRs ---
-    push:
-        branches:
-            - master
-            - 'v*-branch'
-    pull_request:
-    merge_group:
+    # push:
+    #     branches:
+    #         - master
+    #         - 'v*-branch'
+    # pull_request:
+    # merge_group:
 # --- END TEST SECTION ---
     workflow_dispatch:
         inputs:
@@ -216,7 +216,7 @@ jobs:
                 # Regex filter by TC SU we think 45 minutes is more than engough for this task
                 # Each on one run to avoid all the jobs fail if one fails
                 # Add slow tests here as needed using the filter, individually or by group.
-                filter: ["", "TC_SU_2_2", "TC_SU_2_5", "TC_SU_2_7", "!TC_SU"]
+                filter: ["", "TC_SU_2_5", "TC_SU_2_7", "!TC_SU"]
         env:
             BUILD_VARIANT: ipv6only-no-ble-no-wifi-asan
             DISABLE_CCACHE: ${{ (github.event_name == 'workflow_dispatch' && inputs.disable_ccache == 'true') && 'true' || (contains(github.event.head_commit.message, '[no-ccache]') && 'true') || 'false' }}
