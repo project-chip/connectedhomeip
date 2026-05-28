@@ -83,23 +83,21 @@ class NFCReader:
 
     def read_nfc_tag_data(self) -> str:
         """
-        Read NDEF data from a tag.
+        Read the first URI record from the NDEF message stored on a tag.
 
-        This function reads NDEF data from any tag present in the reader's field.
-        It expects the first NDEF record to be a URI record.
-
-        Args:
-            This function takes no arguments.
+        The tag is expected to contain a valid NDEF message. This method navigates
+        the NDEF file structure, reads the message, decodes it, and returns the URI
+        contained in the first URI record found.
 
         Returns:
-            str: The decoded NDEF record data.
+            str: The decoded URI string from the first URI record.
 
         Raises:
-            AssertionError: If any message transmission fails.
-
-        Example:
-            >>> tag_data = reader.read_nfc_tag_data()
-            >>> print(f"NFC tag contains: {tag_data}")
+            AssertionError: If APDU/message transmission fails.
+            ValueError: If the NDEF message is empty, contains no records, or does
+                not contain a URI record.
+            UnicodeDecodeError: If the URI payload cannot be decoded.
+            ndef.DecodeError: If the NDEF message is malformed.
         """
         with NFCConnection(self) as connection:
             # Perform NDEF file system navigation sequence
@@ -110,29 +108,27 @@ class NFCReader:
 
             # Read NDEF message length and data
             ndef_length = _read_ndef_length(connection)
+            if ndef_length == 0:
+                raise ValueError("NDEF message is empty")
             ndef_data = _read_ndef_data(connection, ndef_length)
 
-            # Parse NDEF message into records and find record with data
             ndef_records = list(ndef.message_decoder(ndef_data))
             if not ndef_records:
                 raise ValueError("No NDEF records found in message - tag may be corrupted or empty")
 
             # Loop through records to find a URI record
             for record in ndef_records:
-                # Check for URI record type (well-known type 'U')
-                if record.type == NFC_WKT:
+                if isinstance(record, ndef.UriRecord):
                     # The payload is described in NFC Forum's "URI Record Type Definition Technical Specification"
                     # available here https://berlin.ccc.de/~starbug/felica/NFCForum-TS-RTD_URI_1.0.pdf
                     # As indicated in paragraph 3, the payload format is:
                     #     [identifier code (1 byte)] + [URI string]
                     # There is currently no prefix officially registered for Matter so the on-boarding data string
                     # is fully in the URI string.
-                    #
-                    # Ignore the identifier code and read the URI string
-                    if hasattr(record, 'data') and record.data and len(record.data) > 1:
-                        return record.data[1:].decode("utf-8")
-                    raise ValueError("NDEF URI record payload is missing or too short")
-            # If we get here, no URI record was found
+                    # Warning: NDEF URI parser is converting the URI to lower case
+                    log.info("NFC Onboarding data: %s", record.uri.upper())
+                    return record.uri.upper()
+
             raise ValueError("No NDEF URI record found in message")
 
     def write_ndef_uri(self, uri: str) -> None:

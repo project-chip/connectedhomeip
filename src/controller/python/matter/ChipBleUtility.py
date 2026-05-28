@@ -22,7 +22,6 @@
 #      This file is utility for Chip BLE
 #
 
-from __future__ import absolute_import, print_function
 
 from ctypes import Structure, c_bool, c_int32, c_uint16, c_void_p
 
@@ -46,9 +45,9 @@ FAKE_CONN_OBJ_VALUE = 12121212
 SERVICE_DATA_LEN = 8
 
 
-def VoidPtrToUUIDString(ptr, len):
+def VoidPtrToUUIDString(ptr, length):
     try:
-        ptr = ChipUtility.VoidPtrToByteArray(ptr, len)
+        ptr = ChipUtility.VoidPtrToByteArray(ptr, length)
         ptr = ChipUtility.Hexlify(ptr)
         ptr = (
             ptr[:8]

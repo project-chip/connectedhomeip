@@ -936,11 +936,11 @@ TEST_F(TestTCP, CheckProcessReceivedBuffer)
     TestData testData[2];
     gMockTransportMgrDelegate.SetCallback(TestDataCallbackCheck, testData);
 
-    // Test a single packet buffer with zero message size.
+    // Test a single packet buffer with zero message size - should be rejected.
     System::PacketBufferHandle buf = System::PacketBufferHandle::NewWithData(messageSize_TEST, 4);
     ASSERT_NE(&buf, nullptr);
     err = TestAccess::ProcessReceivedBuffer(tcp, lEndPoint, lPeerAddress, std::move(buf));
-    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(err, CHIP_ERROR_INVALID_MESSAGE_LENGTH);
 
     // Test a single packet buffer.
     gMockTransportMgrDelegate.mReceiveHandlerCallCount = 0;

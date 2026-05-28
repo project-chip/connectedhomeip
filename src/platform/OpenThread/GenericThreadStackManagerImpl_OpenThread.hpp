@@ -965,7 +965,7 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::TryNextNetwork()
     if (otSeekerSetUpNextConnection(mOTInst, &targetAddr) == OT_ERROR_NONE)
     {
         mRendezvousPeerAddr =
-            chip::Transport::PeerAddress::UDP(ToIPAddress(targetAddr.mAddress), targetAddr.mPort, Inet::InterfaceId::Null());
+            chip::Transport::PeerAddress::UDP(ToIPAddress(targetAddr.mAddress), targetAddr.mPort, mRendezvousInterface);
 
         DeviceLayer::SystemLayer().ScheduleLambda([this]() { SendRendezvousAnnouncement(); });
     }

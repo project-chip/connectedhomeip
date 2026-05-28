@@ -15,9 +15,5 @@
 #
 mainmenu "Matter Telink Light Switch Example Application"
 
-config CONFIG_CHIP_ENABLE_GROUPCAST
-	bool
-	default y
-
 rsource "../../../config/telink/chip-module/Kconfig.defaults"
 source "Kconfig.zephyr"

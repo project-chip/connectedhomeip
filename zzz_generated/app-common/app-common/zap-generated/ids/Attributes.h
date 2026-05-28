@@ -59,6 +59,7 @@
 #include <clusters/DishwasherAlarm/AttributeIds.h>
 #include <clusters/DishwasherMode/AttributeIds.h>
 #include <clusters/DoorLock/AttributeIds.h>
+#include <clusters/DynamicLighting/AttributeIds.h>
 #include <clusters/EcosystemInformation/AttributeIds.h>
 #include <clusters/ElectricalEnergyMeasurement/AttributeIds.h>
 #include <clusters/ElectricalGridConditions/AttributeIds.h>
@@ -135,6 +136,7 @@
 #include <clusters/ScenesManagement/AttributeIds.h>
 #include <clusters/ServiceArea/AttributeIds.h>
 #include <clusters/SmokeCoAlarm/AttributeIds.h>
+#include <clusters/SmokeConcentrationMeasurement/AttributeIds.h>
 #include <clusters/SoftwareDiagnostics/AttributeIds.h>
 #include <clusters/SoilMeasurement/AttributeIds.h>
 #include <clusters/Switch/AttributeIds.h>

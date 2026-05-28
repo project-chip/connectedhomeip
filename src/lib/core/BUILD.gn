@@ -153,8 +153,8 @@ source_set("types") {
 
   public_deps = [
     ":chip_config_header",
+    "${chip_root}/src/lib/support:codeutils",
     "${chip_root}/src/lib/support:memory",
-    "${chip_root}/src/lib/support:verifymacros",
   ]
 }
 

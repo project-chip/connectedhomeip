@@ -45,6 +45,12 @@ declare_args() {
   # Enable memory sanitizer
   is_msan = false
 
+  # MSAN builds need an instrumented C++ runtime and dependencies.
+  # build_examples.py resolves this in host.py and passes it as a GN arg
+  # (default: ~/.cache/matter/msan_sysroot, overridable via SYSROOT_MSAN).
+  # Raw `gn gen` users must set SYSROOT_MSAN or pass --args='msan_sysroot="..."'.
+  msan_sysroot = getenv("SYSROOT_MSAN")
+
   # enable undefined behavior sanitizer
   is_ubsan = false
 
@@ -468,14 +474,41 @@ config("sanitize_thread") {
   ldflags = cflags
 }
 
+# MSAN is implemented only by Clang; GCC has no -fsanitize=memory.
+assert(!is_msan || is_clang,
+       "is_msan=true requires is_clang=true. MSAN is only supported by Clang " +
+           "(GCC does not implement -fsanitize=memory).")
+
+# msan_sysroot is required by the sanitize_memory config below.
+assert(!is_msan || msan_sysroot != "",
+       "msan_sysroot must be set when is_msan=true. Run via " +
+           "scripts/build/build_examples.py --target ...-msan-clang, " +
+           "or set SYSROOT_MSAN before `gn gen`, or pass " +
+           "--args='msan_sysroot=\"<path>\"' explicitly.")
+
 config("sanitize_memory") {
   cflags = [
     "-fsanitize=memory",
     "-fsanitize-memory-track-origins",
     "-fno-omit-frame-pointer",
-  ]
-  ldflags = cflags
+    "-fsanitize-ignorelist=" +
+        rebase_path("msan_ignorelist.txt", root_build_dir),
+    "-nostdinc++",
+    "-isystem",
+    rebase_path("${msan_sysroot}/include/c++/v1", root_build_dir),
 
+    # TODO: Re-enable -O0 once other MSAN errors are resolved.
+    "-O1",  # Reduces stack frame sizes vs -O0, helps avoid MSan stack overflows
+  ]
+  ldflags = [
+    "-fsanitize=memory",
+    "-fsanitize-memory-track-origins",
+    "-fno-omit-frame-pointer",
+    "-nostdlib++",
+    "-L" + rebase_path("${msan_sysroot}/lib", root_build_dir),
+    "-lc++",
+    "-lc++abi",
+  ]
   defines = [ "CHIP_MEMORY_SANITIZER_ENABLED=1" ]
 }
 

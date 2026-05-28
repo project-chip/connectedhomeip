@@ -47,7 +47,7 @@ jobs:
     if: github.actor != 'restyled-io[bot]'
 
     container:
-      image: ghcr.io/project-chip/chip-build-nuttx:181
+      image: ghcr.io/project-chip/chip-build-nuttx:194
       volumes:
         - "/tmp/bloat_reports:/tmp/bloat_reports"
     steps:
@@ -65,3 +65,8 @@ jobs:
               --target nuttx-x64-light \
               build \
             "
+      - name: Notify Slack on Failure
+        if: failure()
+        uses: ./.github/actions/notify-slack-failure
+        with:
+          slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}

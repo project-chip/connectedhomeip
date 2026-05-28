@@ -395,7 +395,7 @@ class TC_DRLK_2_13(MatterBaseTest):
                                                                )
         self.step("1b")
         if self.pics_guard(self.check_pics("DRLK.S.C1d.Rsp")):
-            await self.send_clear_user_cmd(user_index=int(0xFFFE))
+            await self.send_clear_user_cmd(user_index=0xFFFE)
 
         self.step("1c")
         if self.pics_guard(self.check_pics("DRLK.S.C26.Rsp")):
