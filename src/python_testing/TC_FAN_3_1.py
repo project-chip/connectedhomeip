@@ -38,7 +38,7 @@
 import logging
 import operator
 from enum import Enum
-from typing import Any, Tuple
+from typing import Any
 
 from mobly import asserts
 
@@ -55,10 +55,10 @@ from matter.testing.runner import TestStep, default_matter_test_main
 # CONSTRAINT_ERROR for PercentSetting iterations.
 # Initialization always writes Off or High, which are always present in get_fan_modes() — only
 # SUCCESS/INVALID_IN_STATE apply (per cluster spec: CONSTRAINT_ERROR for unsupported sequence).
-_FAN_MODE_INIT_ALLOWED_WRITE_STATUSES: Tuple[Status, ...] = (Status.Success, Status.InvalidInState)
-_FAN_MODE_ALLOWED_WRITE_STATUSES: Tuple[Status, ...] = (
+_FAN_MODE_INIT_ALLOWED_WRITE_STATUSES: tuple[Status, ...] = (Status.Success, Status.InvalidInState)
+_FAN_MODE_ALLOWED_WRITE_STATUSES: tuple[Status, ...] = (
     Status.Success, Status.InvalidInState, Status.ConstraintError)
-_PERCENT_OR_SPEED_ALLOWED_WRITE_STATUSES: Tuple[Status, ...] = (Status.Success, Status.InvalidInState)
+_PERCENT_OR_SPEED_ALLOWED_WRITE_STATUSES: tuple[Status, ...] = (Status.Success, Status.InvalidInState)
 
 
 class OrderEnum(Enum):
@@ -93,7 +93,7 @@ class TC_FAN_3_1(MatterBaseTest):
         cluster = Clusters.Objects.FanControl
         return await self.read_single_attribute_check_success(endpoint=self.endpoint, cluster=cluster, attribute=attribute)
 
-    async def write_and_verify_attribute(self, attribute, value, allowed_write_statuses: Tuple[Status, ...]) -> Status:
+    async def write_and_verify_attribute(self, attribute, value, allowed_write_statuses: tuple[Status, ...]) -> Status:
         result = await self.default_controller.WriteAttribute(self.dut_node_id, [(self.endpoint, attribute(value))])
         write_status = result[0].Status
         allowed_names = ", ".join(s.name for s in allowed_write_statuses)
