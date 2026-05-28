@@ -235,6 +235,9 @@ config NET_TC_TX_SKIP_FOR_HIGH_PRIO
 config NET_CONTEXT_PRIORITY
 	default y
 
+config NET_CONTEXT_RECV_PKTINFO
+	default y
+
 # Network buffers
 config NET_PKT_RX_COUNT
 	default 14
