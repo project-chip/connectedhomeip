@@ -515,13 +515,10 @@ void AmbientContextSensingCluster::SendDetectStartEvent(const bool objectCountRe
     VerifyOrReturn(objectCount >= 1);
 
     Events::AmbientContextDetectStarted::Type event;
-    SemanticTagType tag = {
-        .namespaceID = mObjectCountConfig.countingObject.namespaceID,
-        .tag = mObjectCountConfig.countingObject.tag
-    };
+    SemanticTagType tag = { .namespaceID = mObjectCountConfig.countingObject.namespaceID,
+                            .tag         = mObjectCountConfig.countingObject.tag };
     chip::app::DataModel::List<const SemanticTagType> tagList(&tag, 1);
-    AmbientContextSensingType countACS = {
-        .ambientContextSensed = tagList };
+    AmbientContextSensingType countACS = { .ambientContextSensed = tagList };
     event.ambientContextDetected.SetValue(countACS);
     event.ambientContextDetected.Value().detectionStartTime.SetValue(static_cast<uint32_t>(mObjectCountStartEpoch / 1000));
     event.objectCountReached.SetValue(objectCountReached);
