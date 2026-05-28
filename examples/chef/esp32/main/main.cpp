@@ -166,7 +166,10 @@ void InitServer(intptr_t)
     // Device Attestation & Onboarding codes
     chip::Credentials::SetDeviceAttestationCredentialsProvider(chip::Credentials::Examples::GetExampleDACProvider());
 
-    chip::Server::GetInstance().Init(initParams);
+    if (chip::Server::GetInstance().Init(initParams) != CHIP_NO_ERROR)
+    {
+        ChipLogError(Shell, "chip::Server::GetInstance().Init(initParams) failed");
+    }
 
     sWiFiNetworkCommissioningInstance.Init();
     chip::DeviceLayer::ConfigurationMgr().LogDeviceConfig();
