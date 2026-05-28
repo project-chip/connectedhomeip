@@ -104,6 +104,7 @@ public:
     uint16_t GetProductId() const { return mProductId; }
     uint16_t GetHardwareVersion() const { return mHardwareVersion; }
     uint32_t GetSoftwareVersion() const { return mRequestorSoftwareVersion; }
+    // Variables used for named pipes
     bool GetApplyRequestSentStatus() const { return mApplyUpdateRequestSent; }
     chip::app::Clusters::OtaSoftwareUpdateProvider::OTAApplyUpdateAction GetApplyRequestActionStatus() const
     {
@@ -111,6 +112,7 @@ public:
     }
     uint32_t GetApplyRequestDelayStatus() const { return mApplyUpdateRequestDelaySent; }
     uint16_t GetApplyRequestCount() const { return mApplyUpdateRequestCount; }
+    // End of variables used for named pipes
     chip::Span<const DownloadProtocolEnum> GetProtocolsSupported() const
     {
         return chip::Span<const DownloadProtocolEnum>(mProtocolsSupported);

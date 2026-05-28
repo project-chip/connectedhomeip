@@ -127,12 +127,12 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         self.controller = self.default_controller
 
         # pipe out arguments
-        self.pipe_arguments = ['--app-pipe-out', self.provider_app_pipe_out, '--app-pipe', self.provider_app_pipe]
+        self.provider_pipe_arguments = ['--app-pipe-out', self.provider_app_pipe_out, '--app-pipe', self.provider_app_pipe]
         logger.info(f"PROVIDER PIPE OUT {self.provider_app_pipe_out} ,  PROVIDER PIPE {self.provider_app_pipe}")
         # Extra Arguments required for the step 3
         delayed_apply_action_time = 60
         extra_arguments = ['--applyUpdateAction', 'awaitNextAction',
-                           '--delayedApplyActionTimeSec', str(delayed_apply_action_time)] + self.pipe_arguments
+                           '--delayedApplyActionTimeSec', str(delayed_apply_action_time)] + self.provider_pipe_arguments
 
         self.start_provider(
             provider_app_path=self.provider_app_path,
@@ -168,11 +168,6 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
     def steps_TC_SU_2_5(self) -> list[TestStep]:
         return [
             TestStep(0, "Commissioning, already done", is_commissioning=True),
-            # TestStep(1, "OTA-P/TH sends the ApplyUpdateResponse Command to the DUT. Action field is set to \"Proceed\", DelayedActionTime is set to 0.", "Verify that the DUT starts updating its software."
-            #          "Once the update is finished, verify the SoftwareVersion attribute from the Basic Information cluster on the DUT to match the version downloaded for the software update."
-            #          "Verify on the OTA-P/TH that there is no other ApplyUpdateRequest from the DUT."),
-            # TestStep(2, "OTA-P/TH sends the ApplyUpdateResponse Command to the DUT. Action field is set to \"Proceed\", DelayedActionTime is set to 3 minutes.",
-            #          "Verify that the DUT starts updating its software after 3 minutes. Once the update is finished, verify the SoftwareVersion attribute from the Basic Information cluster on the DUT to match the version downloaded for the software update."),
             TestStep(3, "OTA-P/TH sends the ApplyUpdateResponse Command to the DUT. Action field is set to \"AwaitNextAction\", DelayedActionTime is set to 1 minute.", "Verify that the DUT waits for the minimum interval defined by spec which is 2 minutes before re-sending the ApplyUpdateRequest to the OTA-P."
                      "Verify that the DUT does not apply the software update within this time."),
             TestStep(4, "OTA-P/TH sends the ApplyUpdateResponse Command to the DUT. Action field is set to \"AwaitNextAction\", DelayedActionTime is set to 3 minutes. On the subsequent ApplyUpdateRequest command, TH/OTA-P sends the ApplyUpdateResponse back to DUT. Action field is set to \"Proceed\".", "Verify that the DUT waits for 3 minutes before sending the ApplyUpdateRequest to the OTA-P."
@@ -195,6 +190,7 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
     @async_test_body
     async def test_TC_SU_2_5(self):
 
+        # Commissioning already done
         self.step(0)
 
         self.step(3)
@@ -236,8 +232,8 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
             [update_state_match], timeout_sec=self.ota_image_download_timeout)
         self.write_to_app_pipe(command_dict={"Name": "GetApplyUpdateRequestStatus"}, app_pipe=self.provider_app_pipe)
         pipe_data = self.read_from_app_pipe(self.provider_app_pipe_out)
-        logger.info(f"Provider pipe kDelayedOnApply {pipe_data}")
-        # Assert the values from the Provider match
+        logger.info(f"Provider pipe info kDelayedOnApply {pipe_data}")
+        # Assert the values from the Provider named pipes
         asserts.assert_equal(pipe_data['Payload']['ApplyUpdateRequestActionResponse'],
                              Clusters.OtaSoftwareUpdateProvider.Enums.ApplyUpdateActionEnum.kAwaitNextAction, "Action from the provider is not AwaitNextAction")
         asserts.assert_equal(pipe_data['Payload']['ApplyUpdateRequestCount'],
@@ -251,7 +247,7 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         logger.info("Requestor is on Applying State")
         self.write_to_app_pipe(command_dict={"Name": "GetApplyUpdateRequestStatus"}, app_pipe=self.provider_app_pipe)
         pipe_data = self.read_from_app_pipe(self.provider_app_pipe_out)
-        logger.info(f"Provier pipe kApplying {pipe_data}")
+        logger.info(f"Provider pipe kApplying {pipe_data}")
 
         # Device should stay in ApplyingState During 120 seconds and not Apply the software Update after the 60 seconds.
         software_version_match = AttributeMatcher.from_callable(
@@ -263,6 +259,7 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
 
         # The provider needs to be terminated just before try to send the second ApplyUpdateRequest
         self.terminate_provider()
+        # Wait complementary time
         await asyncio.sleep(2)
 
         software_version_attr_handler.reset()
@@ -270,13 +267,13 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
 
         await self._wait_for_idle_after_softwareaupdate(update_state_handler=update_state_attr_handler)
 
-        # Software version should stay the same as the secon ApplyUpdateRequest was not sent when the provider was terminated.
+        # Software version should stay the same as the second ApplyUpdateRequest was not sent when the provider was terminated before re-sending the ApplyUpdateRequest
         await self.verify_version_applied_basic_information(controller=self.controller, node_id=self.requestor_node_id, target_version=current_sw_version)
 
         self.step(4)
         delayed_apply_action_time = 180
         extra_arguments = ['--applyUpdateAction', 'awaitNextAction',
-                           '--delayedApplyActionTimeSec', str(delayed_apply_action_time)] + self.pipe_arguments
+                           '--delayedApplyActionTimeSec', str(delayed_apply_action_time)] + self.provider_pipe_arguments
         self.start_provider(
             provider_app_path=self.provider_app_path,
             ota_image_path=self.ota_image,
@@ -314,7 +311,7 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         update_state_attr_handler.await_all_expected_report_matches([update_state_match], timeout_sec=600)
         self.write_to_app_pipe(command_dict={"Name": "GetApplyUpdateRequestStatus"}, app_pipe=self.provider_app_pipe)
         pipe_data = self.read_from_app_pipe(self.provider_app_pipe_out)
-        logger.info(f"Provider pipe kDownloading {pipe_data}")
+        logger.info(f"Status from provider pipe kDownloading {pipe_data}")
 
         update_state_match = AttributeMatcher.from_callable(
             "Update state is kDelayedOnApply",
@@ -325,17 +322,18 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
 
         self.write_to_app_pipe(command_dict={"Name": "GetApplyUpdateRequestStatus"}, app_pipe=self.provider_app_pipe)
         pipe_data = self.read_from_app_pipe(self.provider_app_pipe_out)
-        logger.info(f"Provider pipe kDelayedOnApply {pipe_data}")
+        logger.info(f"Status for provider pipe kDelayedOnApply {pipe_data}")
         asserts.assert_equal(pipe_data['Payload']['ApplyUpdateRequestActionResponse'],
                              Clusters.OtaSoftwareUpdateProvider.Enums.ApplyUpdateActionEnum.kAwaitNextAction, "Action from the provider is not AwaitNextAction")
         asserts.assert_equal(pipe_data['Payload']['ApplyUpdateRequestCount'],
                              1, "Only one request should be sent from the Provider")
-        # Device should stay in ApplyingState and not apply the update during the 180 seconds. Only after this timeframe.
+        # Device should stay in ApplyingState and not apply the update during the 180 seconds.
         software_version_match = AttributeMatcher.from_callable(
             f"Sofware Version should be: {current_sw_version}",
             lambda report: report.value == current_sw_version)
         software_version_attr_handler.wait_all_final_values_reported_persisted(
             expected_matchers=[software_version_match], timeout_sec=delayed_apply_action_time-2)
+        # Kill the provider before resending the ApplyUpdateRequest
         self.terminate_provider()
         software_version_attr_handler.reset()
         software_version_attr_handler.cancel()
@@ -345,12 +343,11 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
 
         await self._wait_for_idle_after_softwareaupdate(update_state_handler=update_state_attr_handler)
 
-        # Verify the version is the same
+        # Verify the version is the same as the second ApplyUpdateRequest was not sent.
         await self.verify_version_applied_basic_information(controller=self.controller, node_id=self.requestor_node_id, target_version=current_sw_version)
-        # self.restart_requestor(restore=True)
 
         self.step(5)
-        extra_arguments = ['--applyUpdateAction', 'discontinue'] + self.pipe_arguments
+        extra_arguments = ['--applyUpdateAction', 'discontinue'] + self.provider_pipe_arguments
         self.start_provider(
             provider_app_path=self.provider_app_path,
             ota_image_path=self.ota_image,
@@ -423,6 +420,7 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         download_progress_attr_handler.reset()
         download_progress_attr_handler.cancel()
 
+        # Use named pipes to confirm the ApplyUpdateAction
         self.write_to_app_pipe(command_dict={"Name": "GetApplyUpdateRequestStatus"}, app_pipe=self.provider_app_pipe)
         pipe_data = self.read_from_app_pipe(self.provider_app_pipe_out)
         logger.info(f"PIPE INFO kApplying {pipe_data}")
@@ -431,7 +429,7 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         asserts.assert_equal(pipe_data['Payload']['ApplyUpdateRequestCount'],
                              1, "Only one request should be sent from the Provider")
 
-        # Did not apply the software update
+        # Requestor did not apply and goes to kIdle as the action was set to Discontinue.
         update_state_attr_handler.await_all_expected_report_matches(
             [update_state_match], timeout_sec=self.ota_image_download_timeout)
         update_state_match = AttributeMatcher.from_callable(
