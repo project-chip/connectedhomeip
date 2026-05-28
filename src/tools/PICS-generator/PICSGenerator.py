@@ -354,6 +354,7 @@ def GenerateDevicePicsXmlFiles(clusterName, clusterPicsCode, featurePicsList, at
         outputFile.write(xmlHeader.encode())
         tree.write(outputFile, encoding='utf-8', xml_declaration=False)
 
+
 async def DeviceMapping(devCtrl, nodeID, outputPathStr):
 
     # --- Device mapping --- #

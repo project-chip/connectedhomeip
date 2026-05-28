@@ -135,6 +135,7 @@ def read_pics_from_file(path: str, endpoint: int | None = None) -> dict[str, boo
     with open(path) as f:
         return parse_pics(f.readlines())
 
+
 @dataclass
 class BasePicsFacts:
     """
