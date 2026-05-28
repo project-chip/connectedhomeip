@@ -239,7 +239,7 @@ class AccessChecker(BasicCompositionTests):
                                       problem="Cluster command not found in spec XML")
                     self.success = False
                     continue
-                if command_id not in Clusters.ClusterObjects.ALL_ACCEPTED_COMMANDS.get(cluster_id, []):
+                if command_id not in Clusters.ClusterObjects.ALL_ACCEPTED_COMMANDS.get(cluster_id, {}):
                     self.record_error(test_name="Access Checker", location=location,
                                       problem="Unknown command")
                     self.success = False
