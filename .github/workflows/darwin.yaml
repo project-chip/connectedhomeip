@@ -82,6 +82,8 @@ jobs:
               uses: ./.github/actions/notify-slack-failure
               with:
                 slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}
+                job-name: "Build framework"
+                job-details: "${{ matrix.os }}, ${{ matrix.options.flavor }}"
     tests:
         name: Run framework tests
         if: github.actor != 'restyled-io[bot]'
@@ -148,3 +150,5 @@ jobs:
               uses: ./.github/actions/notify-slack-failure
               with:
                 slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}
+                job-name: "Run framework tests"
+                job-details: "${{ matrix.os }}, ${{ matrix.options.flavor }}"
