@@ -1,7 +1,5 @@
-#!/usr/bin/env python
-
 #
-#    Copyright (c) 2021 Project CHIP Authors
+#    Copyright (c) 2026 Project CHIP Authors
 #    All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,8 +15,22 @@
 #    limitations under the License.
 #
 
-from matter.repl_main import main
+import shlex
+import sys
+
+import IPython
+from traitlets.config import Config
 
 
-if __name__ == "__main__":
-    main()
+def main():
+    c = Config()
+    c.InteractiveShellApp.exec_lines = [
+        "import importlib.util",
+        "spec = importlib.util.find_spec('matter.ReplStartup')",
+        "if spec is None: raise ImportError(\"Could not find 'matter.ReplStartup'. Please reinstall the 'matter-repl' and 'matter-core' packages.\")",
+        "%run {spec.origin} " + shlex.join(sys.argv[1:]),
+    ]
+
+    sys.argv = [sys.argv[0]]
+
+    IPython.start_ipython(config=c)
