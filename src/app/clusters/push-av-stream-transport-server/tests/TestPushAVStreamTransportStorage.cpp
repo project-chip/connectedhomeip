@@ -952,6 +952,169 @@ TEST_F(TestPushAVStreamTransportStorage, TestCopyAssignedStorageRetainsStreamNam
     }
 }
 
+TEST_F(TestPushAVStreamTransportStorage, TestTransportOptionsStorage_DecodableTypeOperatorTruncation)
+{
+    // Test that operator=(DecodableType) correctly truncates when given >16 streams.
+    // This is the defense-in-depth path that protects against malformed TLV payloads
+    // that might bypass cluster-level validation.
+
+    // Create a DecodableType transport options with 20 video streams (>kMaxVideoStreams=16)
+    TransportOptionsDecodableStruct transportOptionsDecodable;
+    transportOptionsDecodable.streamUsage   = StreamUsageEnum::kAnalysis;
+    transportOptionsDecodable.videoStreamID.ClearValue();
+    transportOptionsDecodable.audioStreamID.ClearValue();
+    transportOptionsDecodable.TLSEndpointID = 1;
+    std::string url                         = "https://192.168.1.100:554/stream/";
+    transportOptionsDecodable.url           = Span(url.data(), url.size());
+    transportOptionsDecodable.expiryTime.ClearValue();
+
+    // Create minimal valid trigger options
+    TransportTriggerOptionsDecodableStruct triggerOptions;
+    triggerOptions.triggerType        = TransportTriggerTypeEnum::kCommand;
+    triggerOptions.motionZones.ClearValue();
+    triggerOptions.motionSensitivity.ClearValue();
+    triggerOptions.motionTimeControl.ClearValue();
+    triggerOptions.maxPreRollLen.ClearValue();
+    transportOptionsDecodable.triggerOptions = triggerOptions;
+
+    // Create minimal valid container options
+    CMAFContainerOptionsStruct cmafContainerOptions;
+    cmafContainerOptions.CMAFInterface   = CMAFInterfaceEnum::kInterface1;
+    cmafContainerOptions.segmentDuration = 1000;
+    cmafContainerOptions.chunkDuration   = 500;
+    std::string trackName                = "video";
+    cmafContainerOptions.trackName       = Span(trackName.data(), trackName.size());
+    cmafContainerOptions.metadataEnabled.ClearValue();
+    cmafContainerOptions.CENCKey.ClearValue();
+    cmafContainerOptions.CENCKeyID.ClearValue();
+
+    ContainerOptionsStruct containerOptions;
+    containerOptions.containerType = ContainerFormatEnum::kCmaf;
+    containerOptions.CMAFContainerOptions.SetValue(cmafContainerOptions);
+    transportOptionsDecodable.containerOptions = containerOptions;
+
+    // Create 20 video streams (>kMaxVideoStreams=16)
+    // Keep names in a separate vector to maintain lifetime (avoid dangling pointer)
+    std::vector<Structs::VideoStreamStruct::Type> videoStreams;
+    std::vector<std::string> videoStreamNames;
+    videoStreams.reserve(20);
+    videoStreamNames.reserve(20);
+    for (size_t i = 0; i < 20; i++)
+    {
+        videoStreamNames.push_back("VideoStream" + std::to_string(i));
+        Structs::VideoStreamStruct::Type videoStream;
+        videoStream.videoStreamID   = static_cast<uint16_t>(i);
+        videoStream.videoStreamName = Span(videoStreamNames.back().data(), videoStreamNames.back().size());
+        videoStreams.push_back(videoStream);
+    }
+
+    // Encode video streams into TLV
+    uint8_t videoTlvBuffer[2048];
+    TLV::TLVWriter videoWriter;
+    videoWriter.Init(videoTlvBuffer, sizeof(videoTlvBuffer));
+    TLV::TLVWriter videoArrayWriter;
+    CHIP_ERROR err = videoWriter.OpenContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, videoArrayWriter);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    for (const auto & vs : videoStreams)
+    {
+        err = DataModel::Encode(videoArrayWriter, TLV::AnonymousTag(), vs);
+        EXPECT_EQ(err, CHIP_NO_ERROR);
+    }
+
+    err = videoWriter.CloseContainer(videoArrayWriter);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    // Decode into DecodableList
+    TLV::TLVReader videoReader;
+    videoReader.Init(videoTlvBuffer, static_cast<uint32_t>(videoWriter.GetLengthWritten()));
+    err = videoReader.Next();
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    DataModel::DecodableList<Structs::VideoStreamStruct::DecodableType> videoDecodableList;
+    err = videoDecodableList.Decode(videoReader);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    transportOptionsDecodable.videoStreams.SetValue(videoDecodableList);
+
+    // Create 20 audio streams (>kMaxAudioStreams=16)
+    // Keep names in a separate vector to maintain lifetime (avoid dangling pointer)
+    std::vector<Structs::AudioStreamStruct::Type> audioStreams;
+    std::vector<std::string> audioStreamNames;
+    audioStreams.reserve(20);
+    audioStreamNames.reserve(20);
+    for (size_t i = 0; i < 20; i++)
+    {
+        audioStreamNames.push_back("AudioStream" + std::to_string(i));
+        Structs::AudioStreamStruct::Type audioStream;
+        audioStream.audioStreamID   = static_cast<uint16_t>(i);
+        audioStream.audioStreamName = Span(audioStreamNames.back().data(), audioStreamNames.back().size());
+        audioStreams.push_back(audioStream);
+    }
+
+    // Encode audio streams into TLV
+    uint8_t audioTlvBuffer[2048];
+    TLV::TLVWriter audioWriter;
+    audioWriter.Init(audioTlvBuffer, sizeof(audioTlvBuffer));
+    TLV::TLVWriter audioArrayWriter;
+    err = audioWriter.OpenContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, audioArrayWriter);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    for (const auto & as : audioStreams)
+    {
+        err = DataModel::Encode(audioArrayWriter, TLV::AnonymousTag(), as);
+        EXPECT_EQ(err, CHIP_NO_ERROR);
+    }
+
+    err = audioWriter.CloseContainer(audioArrayWriter);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    // Decode into DecodableList
+    TLV::TLVReader audioReader;
+    audioReader.Init(audioTlvBuffer, static_cast<uint32_t>(audioWriter.GetLengthWritten()));
+    err = audioReader.Next();
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    DataModel::DecodableList<Structs::AudioStreamStruct::DecodableType> audioDecodableList;
+    err = audioDecodableList.Decode(audioReader);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    transportOptionsDecodable.audioStreams.SetValue(audioDecodableList);
+
+    // Now assign to TransportOptionsStorage using operator=(DecodableType)
+    // This should truncate at kMaxVideoStreams/kMaxAudioStreams (16 each)
+    TransportOptionsStorage storage;
+    storage = transportOptionsDecodable;
+
+    // Verify truncation occurred - should have exactly kMaxVideoStreams (16) video streams
+    EXPECT_TRUE(storage.videoStreams.HasValue());
+    EXPECT_EQ(storage.videoStreams.Value().size(), kMaxVideoStreams);
+
+    // Verify truncation occurred - should have exactly kMaxAudioStreams (16) audio streams
+    EXPECT_TRUE(storage.audioStreams.HasValue());
+    EXPECT_EQ(storage.audioStreams.Value().size(), kMaxAudioStreams);
+
+    // Verify the first 16 video streams are correct (no corruption)
+    DataModel::List<const Structs::VideoStreamStruct::Type> videoList = storage.videoStreams.Value();
+    for (size_t i = 0; i < kMaxVideoStreams; i++)
+    {
+        std::string expectedName = "VideoStream" + std::to_string(i);
+        std::string storedName(videoList[i].videoStreamName.data(), videoList[i].videoStreamName.size());
+        EXPECT_EQ(storedName, expectedName);
+        EXPECT_EQ(videoList[i].videoStreamID, static_cast<uint16_t>(i));
+    }
+
+    // Verify the first 16 audio streams are correct (no corruption)
+    DataModel::List<const Structs::AudioStreamStruct::Type> audioList = storage.audioStreams.Value();
+    for (size_t i = 0; i < kMaxAudioStreams; i++)
+    {
+        std::string expectedName = "AudioStream" + std::to_string(i);
+        std::string storedName(audioList[i].audioStreamName.data(), audioList[i].audioStreamName.size());
+        EXPECT_EQ(storedName, expectedName);
+        EXPECT_EQ(audioList[i].audioStreamID, static_cast<uint16_t>(i));
+    }
+}
+
 } // namespace PushAvStreamTransport
 } // namespace Clusters
 } // namespace app

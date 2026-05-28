@@ -584,8 +584,8 @@ private:
     std::vector<Structs::AudioStreamStruct::Type> mAudioStreamsStorage;
 
     // Separate flat storage for stream names (deep copy buffers)
-    std::array<char, 16 * kMaxStreamNameLength> mVideoStreamNameBuffer;
-    std::array<char, 16 * kMaxStreamNameLength> mAudioStreamNameBuffer;
+    std::array<char, kMaxVideoStreams * kMaxStreamNameLength> mVideoStreamNameBuffer;
+    std::array<char, kMaxAudioStreams * kMaxStreamNameLength> mAudioStreamNameBuffer;
 
     size_t mVideoStreamNameBufferUsed = 0;
     size_t mAudioStreamNameBufferUsed = 0;
