@@ -319,7 +319,7 @@ class MatterBaseTest(base_test.BaseTestClass):
                 # Lightweight reachability check, confirm the DUT is still alive before attempting cleanup.
                 await self.default_controller.Read(
                     self.dut_node_id,
-                    [(Clusters.BasicInformation.Attributes.VendorID)]
+                    [(0, Clusters.BasicInformation.Attributes.VendorID)]
                 )
             except Exception as e:  # DUT may be unreachable or mid-reboot; skip all DUT cleanup rather than failing the test
                 LOGGER.warning(f"[CLN] DUT is unreachable, skipping all DUT cleanup: {e}")
@@ -1390,7 +1390,7 @@ class MatterBaseTest(base_test.BaseTestClass):
 
     async def _populate_wildcard(self):
         """ Populates self.stored_global_wildcard if not already filled. """
-        if self.stored_global_wildcard is None:
+        if not hasattr(self, 'stored_global_wildcard') or self.stored_global_wildcard is None:
             global_wildcard = asyncio.wait_for(self.default_controller.Read(self.dut_node_id, [(Clusters.Descriptor), Attribute.AttributePath(None, None, GlobalAttributeIds.ATTRIBUTE_LIST_ID), Attribute.AttributePath(
                 None, None, GlobalAttributeIds.FEATURE_MAP_ID), Attribute.AttributePath(None, None, GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID)]), timeout=60)
             self.stored_global_wildcard = await global_wildcard
