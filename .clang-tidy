@@ -52,3 +52,5 @@ Checks: >
   -clang-diagnostic-missing-template-arg-list-after-template-kw
 WarningsAsErrors: '*'
 HeaderFilterRegex: '(src|examples|zzz_generated|credentials).*(?<!third_party.*repo)'
+CheckOptions:
+  bugprone-unsafe-functions.CustomFunctions: 'strncpy'
