@@ -14,11 +14,10 @@
 
 # This is the equivalent to app_config_dependent_sources.gni
 # These are the things that BUILD.gn dependencies would pull
+# This is the equivalent to app_config_dependent_sources.gni
 TARGET_SOURCES(
   ${APP_TARGET}
   PRIVATE
-    "${CLUSTER_DIR}/WaterHeaterManagementCluster.cpp"
-    "${CLUSTER_DIR}/WaterHeaterManagementCluster.h"
-    "${CLUSTER_DIR}/WaterHeaterManagementTestEventTriggerHandler.h"
-    "${CLUSTER_DIR}/water-heater-management-server.h"
+    "${CLUSTER_DIR}/CodegenIntegration.cpp"
+    "${CLUSTER_DIR}/CodegenIntegration.h"
 )

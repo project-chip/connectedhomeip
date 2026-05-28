@@ -35,7 +35,7 @@ namespace WaterHeaterManagement {
 
 /***************************************************************************
  *
- * The Instance implementation
+ * The Cluster implementation
  *
  ***************************************************************************/
 

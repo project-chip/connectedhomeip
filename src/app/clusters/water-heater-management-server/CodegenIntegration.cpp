@@ -1,7 +1,6 @@
-/*
+/**
  *
- *    Copyright (c) 2024 Project CHIP Authors
- *    All rights reserved.
+ *    Copyright (c) 2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,8 +14,3 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
-#pragma once
-
-// This include is used to keep backwards compatibility.
-#include <app/clusters/water-heater-management-server/CodegenIntegration.h>
