@@ -1741,19 +1741,6 @@ static id _Nullable DecodeEventPayloadForICDManagementCluster(EventId aEventId, 
     *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeEventPayloadForTimerCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
-{
-    using namespace Clusters::Timer;
-    switch (aEventId) {
-    default: {
-        // Not a known Timer event.
-        break;
-    }
-    }
-
-    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
-    return nil;
-}
 static id _Nullable DecodeEventPayloadForOvenCavityOperationalStateCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::OvenCavityOperationalState;
@@ -6149,9 +6136,6 @@ id _Nullable MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVRead
     }
     case Clusters::IcdManagement::Id: {
         return DecodeEventPayloadForICDManagementCluster(aPath.mEventId, aReader, aError);
-    }
-    case Clusters::Timer::Id: {
-        return DecodeEventPayloadForTimerCluster(aPath.mEventId, aReader, aError);
     }
     case Clusters::OvenCavityOperationalState::Id: {
         return DecodeEventPayloadForOvenCavityOperationalStateCluster(aPath.mEventId, aReader, aError);
