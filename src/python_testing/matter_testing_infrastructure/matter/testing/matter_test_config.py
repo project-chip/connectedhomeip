@@ -24,7 +24,9 @@ from matter.testing.defaults import TestingDefaults
 
 @dataclass
 class MatterTestConfig:
-    storage_path: pathlib.Path = pathlib.Path(".")
+    storage_path: Optional[pathlib.Path] = None
+    chip_tool_common_storage_path: Optional[pathlib.Path] = None
+    chip_tool_fabric_storage_path: Optional[pathlib.Path] = None
     logs_path: pathlib.Path = pathlib.Path(".")
     paa_trust_store_path: pathlib.Path | None = None
     ble_controller: int | None = None

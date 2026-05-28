@@ -21,7 +21,7 @@ from typing import TYPE_CHECKING
 
 import matter
 from matter.ChipStack import ChipStack
-from matter.storage import PersistentStorage, PersistentStorageJSON
+from matter.storage import PersistentStorage, PersistentStorageINI, PersistentStorageJSON
 
 LOGGER = logging.getLogger(__name__)
 LOGGER.setLevel(logging.INFO)
@@ -47,9 +47,14 @@ class MatterStackState:
 
         if not hasattr(builtins, "chipStack"):
             matter.native.Init(bluetoothAdapter=config.ble_controller)
-            if config.storage_path is None:
-                raise ValueError("Must have configured a MatterTestConfig.storage_path")
-            self._init_stack(already_initialized=False, persistentStorage=PersistentStorageJSON(config.storage_path))
+            if config.chip_tool_common_storage_path is not None and config.chip_tool_fabric_storage_path is not None:
+                self._init_stack(already_initialized=False, persistentStorage=PersistentStorageINI(
+                    config.chip_tool_common_storage_path, config.chip_tool_fabric_storage_path))
+            elif config.storage_path is not None:
+                self._init_stack(already_initialized=False, persistentStorage=PersistentStorageJSON(config.storage_path))
+            else:
+                raise ValueError(
+                    "Must have configured either a MatterTestConfig.storage_path or MatterTestConfig.chip_tool_common/fabric_storage_path")
             self._we_initialized_the_stack = True
         else:
             self._init_stack(already_initialized=True)
@@ -60,7 +65,7 @@ class MatterStackState:
             self._chip_stack = builtins.chipStack
             LOGGER.warning(
                 "Re-using existing ChipStack object found in current interpreter: "
-                "storage path %s will be ignored!", self._config.storage_path
+                "specified storage will be ignored!"
             )
             # TODO: Warn that storage will not follow what we set in config
         else:
