@@ -175,8 +175,10 @@ class TestCleanupConfig:
     """
     A class to keep track of which cleanup steps should be performed.
     Default behavior: all cleanup steps are enabled. Test classes can disable individual steps by
-    setting flags in setup_class or setup_test for per-test control, after calling super().
+    setting flags in setup_test or in the test method body, after calling super().
     """
+
+    # DUT clean-up items
     disarm_failsafes: bool = True              # sends ArmFailSafe(expiryLengthSeconds=0) on GeneralCommissioning
     reset_acls_to_default: bool = True         # restores ACL on endpoint 0 to the state captured before the test ran
     close_commissioning_windows: bool = True   # sends RevokeCommissioning on AdministratorCommissioning
@@ -187,6 +189,8 @@ class TestCleanupConfig:
     purge_doorlock: bool = True                # clears all DoorLock credentials and users
     purge_tls_endpoints: bool = True           # removes all provisioned endpoints via TlsClientManagement
     unregister_icd_clients: bool = True        # unregisters all entries from IcdManagement.RegisteredClients
+
+    # Controller clean-up itmes
     shutdown_extra_controllers: bool = True    # shuts down extra controllers and removes their CAs from storage
 
 
@@ -845,7 +849,7 @@ class MatterBaseTest(base_test.BaseTestClass):
                 self.step(1)
 
         # Capture the ACL before the test runs so _reset_acls_to_default can restore it
-        # in teardown_test. Skip when the DUT is not known to be available: unit tests
+        # in teardown_class. Skip when the DUT is not known to be available: unit tests
         # never commission a device so _dut_confirmed_available stays False, and
         # commissioning_method is None, eliminating any network overhead for them.
         # For runner-commissioned tests commissioning_method is set; for in-test
