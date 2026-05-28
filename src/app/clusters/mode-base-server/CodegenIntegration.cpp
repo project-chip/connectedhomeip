@@ -160,28 +160,26 @@ CHIP_ERROR Instance::Init()
 
 CHIP_ERROR Instance::Deinit()
 {
-    if (mDelegate)
-    {
-        mDelegate->SetInstance(nullptr);
-    }
+    VerifyOrReturnError(mDelegate != nullptr, CHIP_NO_ERROR);
+    mDelegate->SetInstance(nullptr);
     UnregisterThisInstance();
     VerifyOrReturnError(mCluster.IsConstructed(), CHIP_ERROR_INCORRECT_STATE);
     return CodegenDataModelProvider::Instance().Registry().Unregister(&(mCluster.Cluster()));
 }
 
-Protocols::InteractionModel::Status Instance::UpdateCurrentMode(uint8_t aNewMode)
+Status Instance::UpdateCurrentMode(uint8_t aNewMode)
 {
     VerifyOrDie(mCluster.IsConstructed());
     return mCluster.Cluster().UpdateCurrentMode(aNewMode);
 }
 
-Protocols::InteractionModel::Status Instance::UpdateStartUpMode(DataModel::Nullable<uint8_t> aNewStartUpMode)
+Status Instance::UpdateStartUpMode(DataModel::Nullable<uint8_t> aNewStartUpMode)
 {
     VerifyOrDie(mCluster.IsConstructed());
     return mCluster.Cluster().UpdateStartUpMode(aNewStartUpMode);
 }
 
-Protocols::InteractionModel::Status Instance::UpdateOnMode(DataModel::Nullable<uint8_t> aNewOnMode)
+Status Instance::UpdateOnMode(DataModel::Nullable<uint8_t> aNewOnMode)
 {
     VerifyOrDie(mCluster.IsConstructed());
     return mCluster.Cluster().UpdateOnMode(aNewOnMode);
@@ -239,9 +237,7 @@ void Instance::UnregisterThisInstance()
 void Instance::Shutdown()
 {
     RETURN_SAFELY_IGNORED Deinit();
+    mDelegate = nullptr;
 }
 
 } // namespace chip::app::Clusters::ModeBase
-
-// void MatterModeBaseClusterInitCallback(EndpointId) {}
-// void MatterModeBaseClusterShutdownCallback(EndpointId, MatterClusterShutdownType) {}

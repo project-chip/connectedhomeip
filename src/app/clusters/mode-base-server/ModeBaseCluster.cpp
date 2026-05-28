@@ -120,52 +120,34 @@ CHIP_ERROR ModeBaseCluster::Startup(ServerClusterContext & context)
 
 Status ModeBaseCluster::UpdateCurrentMode(uint8_t aNewMode)
 {
-    if (!IsSupportedMode(aNewMode))
-    {
-        return Status::ConstraintError;
-    }
-    if (mCurrentMode != aNewMode)
-    {
-        SetAttributeValue(mCurrentMode, aNewMode, CurrentMode::Id);
+    VerifyOrReturnValue(IsSupportedMode(aNewMode), Status::ConstraintError);
+    VerifyOrReturnValue(SetAttributeValue(mCurrentMode, aNewMode, CurrentMode::Id), Status::Success);
 
-        // Write new value to persistent storage.
-        LogErrorOnFailure(mSafeAttributePersistenceProvider.WriteScalarValue(
-            { mPath.mEndpointId, mPath.mClusterId, CurrentMode::Id }, mCurrentMode));
-    }
+    // Write new value to persistent storage.
+    LogErrorOnFailure(
+        mSafeAttributePersistenceProvider.WriteScalarValue({ mPath.mEndpointId, mPath.mClusterId, CurrentMode::Id }, mCurrentMode));
     return Status::Success;
 }
 
 Status ModeBaseCluster::UpdateStartUpMode(DataModel::Nullable<uint8_t> aNewStartUpMode)
 {
-    if (!aNewStartUpMode.IsNull() && !IsSupportedMode(aNewStartUpMode.Value()))
-    {
-        return Status::ConstraintError;
-    }
-    if (mStartUpMode != aNewStartUpMode)
-    {
-        SetAttributeValue(mStartUpMode, aNewStartUpMode, StartUpMode::Id);
+    VerifyOrReturnValue(aNewStartUpMode.IsNull() || IsSupportedMode(aNewStartUpMode.Value()), Status::ConstraintError);
+    VerifyOrReturnValue(SetAttributeValue(mStartUpMode, aNewStartUpMode, StartUpMode::Id), Status::Success);
 
-        // Write new value to persistent storage.
-        LogErrorOnFailure(mSafeAttributePersistenceProvider.WriteScalarValue(
-            { mPath.mEndpointId, mPath.mClusterId, StartUpMode::Id }, mStartUpMode));
-    }
+    // Write new value to persistent storage.
+    LogErrorOnFailure(
+        mSafeAttributePersistenceProvider.WriteScalarValue({ mPath.mEndpointId, mPath.mClusterId, StartUpMode::Id }, mStartUpMode));
     return Status::Success;
 }
 
 Status ModeBaseCluster::UpdateOnMode(DataModel::Nullable<uint8_t> aNewOnMode)
 {
-    if (!aNewOnMode.IsNull() && !IsSupportedMode(aNewOnMode.Value()))
-    {
-        return Status::ConstraintError;
-    }
-    if (mOnMode != aNewOnMode)
-    {
-        SetAttributeValue(mOnMode, aNewOnMode, OnMode::Id);
+    VerifyOrReturnValue(aNewOnMode.IsNull() || IsSupportedMode(aNewOnMode.Value()), Status::ConstraintError);
+    VerifyOrReturnValue(SetAttributeValue(mOnMode, aNewOnMode, OnMode::Id), Status::Success);
 
-        // Write new value to persistent storage.
-        LogErrorOnFailure(
-            mSafeAttributePersistenceProvider.WriteScalarValue({ mPath.mEndpointId, mPath.mClusterId, OnMode::Id }, mOnMode));
-    }
+    // Write new value to persistent storage.
+    LogErrorOnFailure(
+        mSafeAttributePersistenceProvider.WriteScalarValue({ mPath.mEndpointId, mPath.mClusterId, OnMode::Id }, mOnMode));
     return Status::Success;
 }
 
@@ -226,7 +208,7 @@ ModeBaseCluster::InvokeCommand(const DataModel::InvokeRequest & request, TLV::TL
         return HandleChangeToMode(*handler, request.path, data);
     }
     default:
-        return Protocols::InteractionModel::Status::UnsupportedCommand;
+        return Status::UnsupportedCommand;
     }
 }
 
@@ -248,7 +230,7 @@ DataModel::ActionReturnStatus ModeBaseCluster::ReadAttribute(const DataModel::Re
     case FeatureMap::Id:
         return encoder.Encode(mFeature);
     default:
-        return Protocols::InteractionModel::Status::UnsupportedAttribute;
+        return Status::UnsupportedAttribute;
     }
 }
 
@@ -268,7 +250,7 @@ DataModel::ActionReturnStatus ModeBaseCluster::WriteAttribute(const DataModel::W
         return UpdateOnMode(newValue);
     }
     default:
-        return Protocols::InteractionModel::Status::UnsupportedAttribute;
+        return Status::UnsupportedAttribute;
     }
 }
 
@@ -346,86 +328,66 @@ ModeBaseCluster::HandleChangeToMode(CommandHandler & commandObj, const ConcreteC
     return std::nullopt;
 }
 
+template <typename Func>
+void ModeBaseCluster::LoadScalarValue(const ConcreteAttributePath & path, Func func, const char * attributeName)
+{
+    uint8_t value  = 0;
+    CHIP_ERROR err = mSafeAttributePersistenceProvider.ReadScalarValue(path, value);
+
+    if (err == CHIP_NO_ERROR)
+    {
+        Status status = func(value);
+        if (status == Status::Success)
+        {
+            ChipLogDetail(Zcl, "ModeBase: Loaded %s as %u", attributeName, value);
+        }
+        else
+        {
+            ChipLogError(Zcl, "ModeBase: Could not update %s to %u: %u", attributeName, value, to_underlying(status));
+        }
+    }
+    else
+    {
+        // If we cannot find the previous value, we will assume it to be zero.
+        ChipLogDetail(Zcl, "ModeBase: Unable to load the %s from the KVS. Assuming zero.", attributeName);
+    }
+}
+
+template <typename Func>
+void ModeBaseCluster::LoadNullableScalarValue(const ConcreteAttributePath & path, Func func, const char * attributeName)
+{
+    DataModel::Nullable<uint8_t> value;
+    CHIP_ERROR err = mSafeAttributePersistenceProvider.ReadScalarValue(path, value);
+
+    if (err == CHIP_NO_ERROR)
+    {
+        Status status = func(value);
+        if (status == Status::Success)
+        {
+            ChipLogDetail(Zcl, "ModeBase: Loaded %s as %u", attributeName, value.Value());
+        }
+        else
+        {
+            ChipLogError(Zcl, "ModeBase: Could not update %s to %u: %u", attributeName, value.Value(), to_underlying(status));
+        }
+    }
+    else
+    {
+        // If we cannot find the previous value, we will assume it to be null.
+        ChipLogDetail(Zcl, "ModeBase: Unable to load the %s from the KVS. Assuming null.", attributeName);
+    }
+}
+
 void ModeBaseCluster::LoadPersistentAttributes()
 {
-    // Load Current Mode
-    uint8_t tempCurrentMode;
-    CHIP_ERROR err = mSafeAttributePersistenceProvider.ReadScalarValue(
-        ConcreteAttributePath(mPath.mEndpointId, mPath.mClusterId, CurrentMode::Id), tempCurrentMode);
-    if (err == CHIP_NO_ERROR)
-    {
-        Status status = UpdateCurrentMode(tempCurrentMode);
-        if (status == Status::Success)
-        {
-            ChipLogDetail(Zcl, "ModeBase: Loaded CurrentMode as %u", GetCurrentMode());
-        }
-        else
-        {
-            ChipLogError(Zcl, "ModeBase: Could not update CurrentMode to %u: %u", tempCurrentMode, to_underlying(status));
-        }
-    }
-    else
-    {
-        // If we cannot find the previous CurrentMode, we will assume it to be the first mode in the
-        // list, as was initialised in the constructor.
-        ChipLogDetail(Zcl, "ModeBase: Unable to load the CurrentMode from the KVS. Assuming %u", GetCurrentMode());
-    }
-
-    // Load Start-Up Mode
-    DataModel::Nullable<uint8_t> tempStartUpMode;
-    err = mSafeAttributePersistenceProvider.ReadScalarValue(
-        ConcreteAttributePath(mPath.mEndpointId, mPath.mClusterId, StartUpMode::Id), tempStartUpMode);
-    if (err == CHIP_NO_ERROR)
-    {
-        Status status = UpdateStartUpMode(tempStartUpMode);
-        if (status == Status::Success)
-        {
-            if (GetStartUpMode().IsNull())
-            {
-                ChipLogDetail(Zcl, "ModeBase: Loaded StartUpMode as null");
-            }
-            else
-            {
-                ChipLogDetail(Zcl, "ModeBase: Loaded StartUpMode as %u", GetStartUpMode().Value());
-            }
-        }
-        else
-        {
-            ChipLogError(Zcl, "ModeBase: Could not update StartUpMode: %u", to_underlying(status));
-        }
-    }
-    else
-    {
-        ChipLogDetail(Zcl, "ModeBase: Unable to load the StartUpMode from the KVS. Assuming null");
-    }
-
-    // Load On Mode
-    DataModel::Nullable<uint8_t> tempOnMode;
-    err = mSafeAttributePersistenceProvider.ReadScalarValue(ConcreteAttributePath(mPath.mEndpointId, mPath.mClusterId, OnMode::Id),
-                                                            tempOnMode);
-    if (err == CHIP_NO_ERROR)
-    {
-        Status status = UpdateOnMode(tempOnMode);
-        if (status == Status::Success)
-        {
-            if (GetOnMode().IsNull())
-            {
-                ChipLogDetail(Zcl, "ModeBase: Loaded OnMode as null");
-            }
-            else
-            {
-                ChipLogDetail(Zcl, "ModeBase: Loaded OnMode as %u", GetOnMode().Value());
-            }
-        }
-        else
-        {
-            ChipLogError(Zcl, "ModeBase: Could not update OnMode: %u", to_underlying(status));
-        }
-    }
-    else
-    {
-        ChipLogDetail(Zcl, "ModeBase: Unable to load the OnMode from the KVS. Assuming null");
-    }
+    LoadScalarValue(
+        { mPath.mEndpointId, mPath.mClusterId, CurrentMode::Id }, [this](const auto & value) { return UpdateCurrentMode(value); },
+        "CurrentMode");
+    LoadNullableScalarValue(
+        { mPath.mEndpointId, mPath.mClusterId, StartUpMode::Id }, [this](const auto & value) { return UpdateStartUpMode(value); },
+        "StartUpMode");
+    LoadNullableScalarValue(
+        { mPath.mEndpointId, mPath.mClusterId, OnMode::Id }, [this](const auto & value) { return UpdateOnMode(value); }, "OnMode");
 }
 
 CHIP_ERROR ModeBaseCluster::EncodeSupportedModes(const AttributeValueEncoder::ListEncodeHelper & encoder)

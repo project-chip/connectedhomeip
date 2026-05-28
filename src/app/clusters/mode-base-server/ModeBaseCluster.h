@@ -145,6 +145,12 @@ private:
      */
     void LoadPersistentAttributes();
 
+    template <typename Func>
+    void LoadScalarValue(const ConcreteAttributePath & path, Func func, const char * attributeName);
+
+    template <typename Func>
+    void LoadNullableScalarValue(const ConcreteAttributePath & path, Func func, const char * attributeName);
+
     /**
      * Helper function that encodes the supported modes.
      * @param encoder The encoder to encode the supported modes into.
