@@ -1872,7 +1872,22 @@ exit:
     if (err != CHIP_NO_ERROR)
     {
         ChipLogProgress(Controller, "Add NOC failed with error: %" CHIP_ERROR_FORMAT, err.Format());
-        commissioner->CommissioningStageComplete(err);
+        // Preserve the device-reported NodeOperationalCertStatusEnum (kInvalidPublicKey,
+        // kInvalidNodeOpId, kInvalidNOC, kFabricConflict, kLabelConflict, kInvalidFabricIndex,
+        // kTableFull, etc.) in the report so OnCommissioningFailure consumers can distinguish
+        // these without losing fidelity to the generic CHIP_ERROR returned by
+        // ConvertFromOperationalCertStatus.
+        CommissioningDelegate::CommissioningReport report;
+        // ConvertFromOperationalCertStatus succeeds on kOk and returns a non-success CHIP_ERROR
+        // for any other value, but `err` at this point can also be a downstream local failure
+        // (e.g. from OnOperationalCredentialsProvisioningCompletion) while data.statusCode is
+        // still kOk. Guard so we never publish a "success enum" alongside a non-success err to
+        // OnCommissioningFailure consumers.
+        if (data.statusCode != OperationalCredentials::NodeOperationalCertStatusEnum::kOk)
+        {
+            report.Set<OperationalCertErrorInfo>(data.statusCode);
+        }
+        commissioner->CommissioningStageComplete(err, report);
     }
 }
 
@@ -2172,10 +2187,7 @@ void DeviceCommissioner::SendCommissioningCompleteCallbacks(NodeId nodeId, const
     }
     else
     {
-        // TODO: We should propogate detailed error information (commissioningError, networkCommissioningStatus) from
-        // completionStatus.
-        mPairingDelegate->OnCommissioningFailure(peerId, completionStatus.err, completionStatus.failedStage.ValueOr(kError),
-                                                 completionStatus.attestationResult);
+        mPairingDelegate->OnCommissioningFailure(peerId, completionStatus);
     }
 }
 
@@ -2975,7 +2987,9 @@ void DeviceCommissioner::OnArmFailSafe(void * context,
     if (data.errorCode != GeneralCommissioning::CommissioningErrorEnum::kOk)
     {
         err = CHIP_ERROR_INTERNAL;
-        report.Set<CommissioningErrorInfo>(data.errorCode);
+        // Preserve the device-supplied debugText so failure consumers can disambiguate
+        // ambiguous error codes (e.g. kBusyWithOtherAdmin specifics).
+        report.Set<CommissioningErrorInfo>(data.errorCode, data.debugText);
     }
 
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
@@ -2992,7 +3006,7 @@ void DeviceCommissioner::OnSetRegulatoryConfigResponse(
     if (data.errorCode != GeneralCommissioning::CommissioningErrorEnum::kOk)
     {
         err = CHIP_ERROR_INTERNAL;
-        report.Set<CommissioningErrorInfo>(data.errorCode);
+        report.Set<CommissioningErrorInfo>(data.errorCode, data.debugText);
     }
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
     commissioner->CommissioningStageComplete(err, report);
@@ -3008,6 +3022,7 @@ void DeviceCommissioner::OnSetTCAcknowledgementsResponse(
     if (data.errorCode != GeneralCommissioning::CommissioningErrorEnum::kOk)
     {
         err = CHIP_ERROR_INTERNAL;
+        // SetTCAcknowledgementsResponse has no debugText field per spec.
         report.Set<CommissioningErrorInfo>(data.errorCode);
     }
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
@@ -3099,7 +3114,9 @@ void DeviceCommissioner::OnNetworkConfigResponse(void * context,
     if (data.networkingStatus != NetworkCommissioning::NetworkCommissioningStatusEnum::kSuccess)
     {
         err = CHIP_ERROR_INTERNAL;
-        report.Set<NetworkCommissioningStatusInfo>(data.networkingStatus);
+        // Preserve debugText alongside the status enum so callers can distinguish
+        // ambiguous statuses (e.g. kAuthFailure: "wrong password" vs "regulatory restriction").
+        report.Set<NetworkCommissioningStatusInfo>(data.networkingStatus, data.debugText.ValueOr(CharSpan{}));
     }
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
     commissioner->CommissioningStageComplete(err, report);
@@ -3115,7 +3132,12 @@ void DeviceCommissioner::OnConnectNetworkResponse(
     if (data.networkingStatus != NetworkCommissioning::NetworkCommissioningStatusEnum::kSuccess)
     {
         err = CHIP_ERROR_INTERNAL;
-        report.Set<NetworkCommissioningStatusInfo>(data.networkingStatus);
+        // Preserve debugText alongside the status enum (see OnNetworkConfigResponse). Also
+        // surface the device-specific errorValue which carries driver-level failure detail
+        // (TX-power-limited / interference / association-failure code) distinct from the
+        // spec-level networkingStatus enum.
+        Optional<int32_t> errorValue = data.errorValue.IsNull() ? NullOptional : MakeOptional(data.errorValue.Value());
+        report.Set<NetworkCommissioningStatusInfo>(data.networkingStatus, data.debugText.ValueOr(CharSpan{}), errorValue);
     }
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
     commissioner->CommissioningStageComplete(err, report);
@@ -3131,7 +3153,7 @@ void DeviceCommissioner::OnCommissioningCompleteResponse(
     if (data.errorCode != GeneralCommissioning::CommissioningErrorEnum::kOk)
     {
         err = CHIP_ERROR_INTERNAL;
-        report.Set<CommissioningErrorInfo>(data.errorCode);
+        report.Set<CommissioningErrorInfo>(data.errorCode, data.debugText);
     }
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
     commissioner->CommissioningStageComplete(err, report);
