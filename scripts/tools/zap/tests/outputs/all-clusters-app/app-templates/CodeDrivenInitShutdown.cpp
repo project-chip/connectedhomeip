@@ -193,9 +193,6 @@ void MatterClusterServerInitCallback(EndpointId endpoint, ClusterId clusterId)
     case app::Clusters::TlsClientManagement::Id:
         MatterTlsClientManagementClusterInitCallback(endpoint);
         break;
-    case app::Clusters::WaterHeaterMode::Id:
-        MatterWaterHeaterModeClusterInitCallback(endpoint);
-        break;
     }
 }
 
@@ -367,9 +364,6 @@ void MatterClusterServerShutdownCallback(EndpointId endpoint, ClusterId clusterI
         break;
     case app::Clusters::TlsClientManagement::Id:
         MatterTlsClientManagementClusterShutdownCallback(endpoint, shutdownType);
-        break;
-    case app::Clusters::WaterHeaterMode::Id:
-        MatterWaterHeaterModeClusterShutdownCallback(endpoint, shutdownType);
         break;
     }
 }
