@@ -41,7 +41,7 @@
 #       --int-arg ota_provider_port:5541
 #       --timeout 2100
 #     factory-reset: true
-#     quiet: true
+#     quiet: false
 # === END CI TEST ARGUMENTS ===
 
 import asyncio
