@@ -194,7 +194,7 @@ class TestCleanupConfig:
     shutdown_extra_controllers: bool = True    # shuts down extra controllers and removes their CAs from storage
 
     @classmethod
-    def disabled(cls) -> "TestCleanupConfig":
+    def disabled(cls) -> TestCleanupConfig:
         """Returns a config with all cleanup steps disabled."""
         return cls(**{f.name: False for f in fields(cls)})
 
