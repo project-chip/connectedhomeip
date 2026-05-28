@@ -678,9 +678,7 @@ CHIP_ERROR AutoCommissioner::StartCommissioning(DeviceCommissioner * commissione
 #if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
     if (transportType == Transport::Type::kNfc)
     {
-        mNeedsNetworkSetup = mNeedsNetworkSetup ||
-            (mParams.GetCommissioningNetworkType().ValueOr(CommissioningNetworkType::kNone) !=
-             CommissioningNetworkType::kNone);
+        mNeedsNetworkSetup = mNeedsNetworkSetup || mParams.GetRequiresNetworkSetup().ValueOr(false);
     }
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF

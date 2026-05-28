@@ -75,7 +75,7 @@ TEST_F(CommissioningDelegateTest, CommissioningParameters_DefaultsAndSettersExer
     EXPECT_FALSE(p.GetAttemptWiFiNetworkScan().HasValue());
     EXPECT_FALSE(p.GetAttemptThreadNetworkScan().HasValue());
     EXPECT_FALSE(p.GetSkipCommissioningComplete().HasValue());
-    EXPECT_FALSE(p.GetCommissioningNetworkType().HasValue());
+    EXPECT_FALSE(p.GetRequiresNetworkSetup().HasValue());
     EXPECT_FALSE(p.GetICDCheckInNodeId().HasValue());
     EXPECT_FALSE(p.GetICDMonitoredSubject().HasValue());
     EXPECT_FALSE(p.GetICDSymmetricKey().HasValue());
@@ -214,12 +214,12 @@ TEST_F(CommissioningDelegateTest, CommissioningParameters_DefaultsAndSettersExer
 
     // SkipCommissioningComplete + CheckForMatchingFabric flags
     p.SetSkipCommissioningComplete(true);
-    p.SetCommissioningNetworkType(CommissioningNetworkType::kNone);
+    p.SetRequiresNetworkSetup(false);
     p.SetCheckForMatchingFabric(true);
     ASSERT_TRUE(p.GetSkipCommissioningComplete().HasValue());
     EXPECT_TRUE(p.GetSkipCommissioningComplete().Value());
-    ASSERT_TRUE(p.GetCommissioningNetworkType().HasValue());
-    EXPECT_EQ(p.GetCommissioningNetworkType().Value(), CommissioningNetworkType::kNone);
+    ASSERT_TRUE(p.GetRequiresNetworkSetup().HasValue());
+    EXPECT_FALSE(p.GetRequiresNetworkSetup().Value());
     EXPECT_TRUE(p.GetCheckForMatchingFabric());
 
     // ICD knobs

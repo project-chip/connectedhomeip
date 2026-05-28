@@ -109,14 +109,6 @@ enum class ICDRegistrationStrategy : uint8_t
                      ///< Controller should provide a ICDKey manager for generating symmetric key
 };
 
-enum class CommissioningNetworkType : uint8_t
-{
-    kNone,
-    kWiFi,
-    kThread,
-    kWiFiOrThread,
-};
-
 const char * StageToString(CommissioningStage stage);
 
 #if MATTER_TRACING_ENABLED
@@ -564,10 +556,10 @@ public:
         return *this;
     }
 
-    Optional<CommissioningNetworkType> GetCommissioningNetworkType() const { return mCommissioningNetworkType; }
-    CommissioningParameters & SetCommissioningNetworkType(CommissioningNetworkType commissioningNetworkType)
+    Optional<bool> GetRequiresNetworkSetup() const { return mRequiresNetworkSetup; }
+    CommissioningParameters & SetRequiresNetworkSetup(bool requiresNetworkSetup)
     {
-        mCommissioningNetworkType = MakeOptional(commissioningNetworkType);
+        mRequiresNetworkSetup = MakeOptional(requiresNetworkSetup);
         return *this;
     }
 
@@ -712,7 +704,7 @@ private:
     Optional<bool> mAttemptWiFiNetworkScan;
     Optional<bool> mAttemptThreadNetworkScan; // This automatically gets set to false when a ThreadOperationalDataset is set
     Optional<bool> mSkipCommissioningComplete;
-    Optional<CommissioningNetworkType> mCommissioningNetworkType;
+    Optional<bool> mRequiresNetworkSetup;
 
     Optional<NodeId> mICDCheckInNodeId;
     Optional<uint64_t> mICDMonitoredSubject;
