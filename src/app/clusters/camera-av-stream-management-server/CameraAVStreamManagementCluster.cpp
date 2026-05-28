@@ -83,6 +83,13 @@ CameraAVStreamManagementCluster::~CameraAVStreamManagementCluster()
     mDelegate.SetCameraAVStreamManagementCluster(nullptr);
 }
 
+CHIP_ERROR CameraAVStreamManagementCluster::Startup(ServerClusterContext & context)
+{
+    ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
+    LoadPersistentAttributes();
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR CameraAVStreamManagementCluster::Init()
 {
     // Constraint checks for RateDistortionTardeOffPoints vector
@@ -165,11 +172,6 @@ CHIP_ERROR CameraAVStreamManagementCluster::Init()
                          "at least one of the ImageFlip or Rotation attributes shall be supported",
                          mPath.mEndpointId));
     }
-
-    // Persistent data is stored in the cluster context, so the cluster should be correctly
-    // initialized before loading attributes.
-    VerifyOrReturnError(mContext != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    LoadPersistentAttributes();
 
     return CHIP_NO_ERROR;
 }

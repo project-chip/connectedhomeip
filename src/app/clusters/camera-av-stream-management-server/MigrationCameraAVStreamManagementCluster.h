@@ -30,7 +30,7 @@ namespace CameraAvStreamManagement {
  * This class extends the core cluster with one-time migration logic that runs
  * during Startup(): it attempts to migrate any attribute data previously stored
  * via SafeAttributePersistenceProvider into the standard AttributePersistenceProvider,
- * then delegates to the base Startup(). Persistent attributes are loaded later in Init().
+ * then delegates to the base Startup(). Persistent attributes are loaded at the end of the base Startup().
  */
 class MigrationCameraAVStreamManagementCluster : public CameraAVStreamManagementCluster
 {

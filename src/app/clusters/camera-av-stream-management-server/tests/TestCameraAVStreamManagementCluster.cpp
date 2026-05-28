@@ -1751,7 +1751,10 @@ TEST_F(TestCameraAVStreamManagementCluster, TestReferenceCountResetOnBoot)
     ConcreteAttributePath path(kTestEndpointId, CameraAvStreamManagement::Id, Attributes::AllocatedVideoStreams::Id);
     ASSERT_EQ(mAttributePersistence.WriteValue(path, ByteSpan(buffer, len)), CHIP_NO_ERROR);
 
-    // 3. Trigger Init to load from persistence
+    // 3. Simulate a reboot: Startup reloads persistent attributes (resetting refCounts),
+    //    Init validates feature configuration.
+    mServer.Shutdown(ClusterShutdownType::kClusterShutdown);
+    ASSERT_EQ(mServer.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
     ASSERT_EQ(mServer.Init(), CHIP_NO_ERROR);
 
     // 4. Verify in-memory state has reset refCount
