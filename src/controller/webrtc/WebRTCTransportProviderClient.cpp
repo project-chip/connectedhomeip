@@ -75,7 +75,7 @@ PyChipError WebRTCTransportProviderClient::SendCommand(void * appContext, uint16
 void WebRTCTransportProviderClient::OnResponse(chip::app::CommandSender * client, const chip::app::ConcreteCommandPath & path,
                                                const chip::app::StatusIB & status, chip::TLV::TLVReader * data)
 {
-    ChipLogProgress(Camera, "WebRTCTransportProviderClient: ### OnResponse received for cluster: 0x%" PRIx32 " command: 0x%" PRIx32,
+    ChipLogProgress(Camera, "WebRTCTransportProviderClient: OnResponse received for cluster: 0x%" PRIx32 " command: 0x%" PRIx32,
                     path.mClusterId, path.mCommandId);
 
     CHIP_ERROR error = status.ToChipError();
@@ -326,23 +326,9 @@ void WebRTCTransportProviderClient::HandleProvideOfferResponse(TLV::TLVReader da
     session.peerEndpointID = mEndpointId;
     session.streamUsage    = mCurrentStreamUsage;
 
-    if (value.videoStreamID.HasValue())
-    {
-        session.videoStreamID.SetValue(value.videoStreamID.Value());
-    }
-    else
-    {
-        session.videoStreamID.SetValue(DataModel::MakeNullable<uint16_t>());
-    }
-
-    if (value.audioStreamID.HasValue())
-    {
-        session.audioStreamID.SetValue(value.audioStreamID.Value());
-    }
-    else
-    {
-        session.audioStreamID.SetValue(DataModel::MakeNullable<uint16_t>());
-    }
+    // Populate optional fields for video/audio stream IDs if present; set them to Null otherwise
+    session.videoStreamID = value.videoStreamID.HasValue() ? value.videoStreamID.Value() : DataModel::MakeNullable<uint16_t>();
+    session.audioStreamID = value.audioStreamID.HasValue() ? value.audioStreamID.Value() : DataModel::MakeNullable<uint16_t>();
 
     WebRTCTransportRequestorManager::Instance().UpsertSession(session);
 }
@@ -365,28 +351,13 @@ void WebRTCTransportProviderClient::HandleSolicitOfferResponse(TLV::TLVReader da
     session.streamUsage    = mCurrentStreamUsage;
 
     // Populate optional fields for video/audio stream IDs if present; set them to Null otherwise
-    if (value.videoStreamID.HasValue())
-    {
-        session.videoStreamID.SetValue(value.videoStreamID.Value());
-    }
-    else
-    {
-        session.videoStreamID.SetValue(DataModel::MakeNullable<uint16_t>());
-    }
-
-    if (value.audioStreamID.HasValue())
-    {
-        session.audioStreamID.SetValue(value.audioStreamID.Value());
-    }
-    else
-    {
-        session.audioStreamID.SetValue(DataModel::MakeNullable<uint16_t>());
-    }
+    session.videoStreamID = value.videoStreamID.HasValue() ? value.videoStreamID.Value() : chip::app::DataModel::NullNullable;
+    session.audioStreamID = value.audioStreamID.HasValue() ? value.audioStreamID.Value() : chip::app::DataModel::NullNullable;
 
     // If DeferredOffer == FALSE these fields MUST be valid
     if (!value.deferredOffer)
     {
-        if (session.videoStreamID.Value().IsNull() && session.audioStreamID.Value().IsNull())
+        if (session.videoStreamID.IsNull() && session.audioStreamID.IsNull())
         {
             ChipLogError(Camera, "Provider reported DeferredOffer=FALSE but did not supply valid Video and Audio stream IDs");
             return;
