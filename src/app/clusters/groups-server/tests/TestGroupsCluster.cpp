@@ -21,6 +21,7 @@
 #include <app/clusters/identify-server/IdentifyIntegrationDelegate.h>
 #include <app/server-cluster/testing/ClusterTester.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
+#include <clusters/AccessControl/Events.h>
 #include <clusters/Groups/Attributes.h>
 #include <clusters/Groups/Commands.h>
 #include <clusters/Groups/Metadata.h>
@@ -876,6 +877,99 @@ TEST_F(TestGroupsCluster, TestRemoveAllGroupsScenesCleanup)
     EXPECT_TRUE(result.IsSuccess());
 
     EXPECT_EQ(mScenesDelegate.mGroupWillBeRemovedCallCount, 3u); // 2 groups + global scene group
+}
+
+TEST_F(TestGroupsCluster, TestAuxiliaryAccessUpdatedEvent)
+{
+    ASSERT_EQ(mCluster->Startup(mClusterTester->GetServerClusterContext()), CHIP_NO_ERROR);
+    mClusterTester->SetFabricIndex(kFabricIndex1);
+    constexpr GroupId kGroupId = 1;
+    SetupKeySet(kFabricIndex1, kKeysetId);
+    MapGroupToKeyset(kFabricIndex1, kGroupId, kKeysetId);
+
+    // 1. Enable Groupcast in provider to enable AuxACL tracking
+    mGroupDataProvider.SetGroupcastEnabled(true);
+
+    // 2. Pre-create a group with HasAuxiliaryACL = true in GroupDataProvider (0 endpoints)
+    uint8_t flags = static_cast<uint8_t>(GroupDataProvider::GroupInfo::Flags::kHasAuxiliaryACL) |
+        static_cast<uint8_t>(GroupDataProvider::GroupInfo::Flags::kMcastAddrPolicy);
+    GroupDataProvider::GroupInfo info(kGroupId, "AuxGroup", flags);
+    ASSERT_EQ(mGroupDataProvider.SetGroupInfo(kFabricIndex1, info), CHIP_NO_ERROR);
+
+    // 3. Call legacy AddGroup -> Should preserve AuxACL as true and emit event (due to new endpoint added)
+    {
+        auto result = InvokeAddGroup(kGroupId, "UpdatedName");
+        ASSERT_TRUE(result.IsSuccess());
+        EXPECT_EQ(ResponseStatus(result), Status::Success);
+
+        auto event = mClusterTester->GetNextGeneratedEvent();
+        ASSERT_TRUE(event.has_value());
+        EXPECT_EQ(event.value().eventOptions.mPath.mClusterId, AccessControl::Id);
+        EXPECT_EQ(event.value().eventOptions.mPath.mEventId, AccessControl::Events::AuxiliaryAccessUpdated::Id);
+
+        AccessControl::Events::AuxiliaryAccessUpdated::DecodableType decodedEvent;
+        ASSERT_EQ(event.value().GetEventData(decodedEvent), CHIP_NO_ERROR);
+        EXPECT_EQ(decodedEvent.fabricIndex, kFabricIndex1);
+
+        // Verify AuxACL is still true (preserved)
+        GroupDataProvider::GroupInfo updatedInfo;
+        ASSERT_EQ(mGroupDataProvider.GetGroupInfo(kFabricIndex1, kGroupId, updatedInfo), CHIP_NO_ERROR);
+        EXPECT_TRUE(updatedInfo.HasAuxiliaryACL());
+    }
+
+    // 4. Call legacy AddGroup to update name (no new endpoint) -> Should NOT emit event
+    {
+        auto result = InvokeAddGroup(kGroupId, "UpdatedName2");
+        ASSERT_TRUE(result.IsSuccess());
+        EXPECT_EQ(ResponseStatus(result), Status::Success);
+
+        auto event = mClusterTester->GetNextGeneratedEvent();
+        EXPECT_FALSE(event.has_value());
+
+        // Verify AuxACL is still true and name is updated
+        GroupDataProvider::GroupInfo updatedInfo;
+        ASSERT_EQ(mGroupDataProvider.GetGroupInfo(kFabricIndex1, kGroupId, updatedInfo), CHIP_NO_ERROR);
+        EXPECT_TRUE(updatedInfo.HasAuxiliaryACL());
+        EXPECT_TRUE(CharSpan(updatedInfo.name, strlen(updatedInfo.name)).data_equal("UpdatedName2"_span));
+    }
+
+    // 5. Call legacy RemoveGroup -> Should generate event because group had HasAuxiliaryACL = true,
+    // so aux acl entries will be removed (or updated)
+    {
+        Groups::Commands::RemoveGroup::Type removeRequest;
+        removeRequest.groupID = kGroupId;
+        auto result           = mClusterTester->Invoke<Groups::Commands::RemoveGroup::Type>(removeRequest);
+        ASSERT_TRUE(result.IsSuccess());
+        EXPECT_EQ(ResponseStatus(result), Status::Success);
+
+        auto event = mClusterTester->GetNextGeneratedEvent();
+        ASSERT_TRUE(event.has_value());
+        EXPECT_EQ(event.value().eventOptions.mPath.mEventId, AccessControl::Events::AuxiliaryAccessUpdated::Id);
+    }
+
+    // 6. Call legacy RemoveAllGroups -> Should remove endpoint and generate event (since HasAuxiliaryACL is true)
+    {
+        // First, Re-create Aux-enabled group and clear events
+        GroupDataProvider::GroupInfo groupInfo(kGroupId, "AuxGroup2", flags);
+        ASSERT_EQ(mGroupDataProvider.SetGroupInfo(kFabricIndex1, groupInfo), CHIP_NO_ERROR);
+        ASSERT_EQ(mGroupDataProvider.AddEndpoint(kFabricIndex1, kGroupId, kTestEndpointId), CHIP_NO_ERROR);
+        mGroupDataProvider.ConsumeAuxAclNotificationNeeded(); // Reset flag
+        while (mClusterTester->GetNextGeneratedEvent().has_value())
+        {
+        } // Clear any events
+
+        // Remove all groups
+        Groups::Commands::RemoveAllGroups::Type removeAllRequest;
+        auto result = mClusterTester->Invoke<Groups::Commands::RemoveAllGroups::Type>(removeAllRequest);
+        EXPECT_TRUE(result.IsSuccess());
+
+        auto event = mClusterTester->GetNextGeneratedEvent();
+        ASSERT_TRUE(event.has_value());
+        EXPECT_EQ(event.value().eventOptions.mPath.mEventId, AccessControl::Events::AuxiliaryAccessUpdated::Id);
+
+        // Verify group is removed
+        EXPECT_FALSE(IsGroupInProvider(kFabricIndex1, kGroupId));
+    }
 }
 
 } // namespace
