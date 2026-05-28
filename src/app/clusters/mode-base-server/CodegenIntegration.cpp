@@ -116,6 +116,9 @@ CHIP_ERROR Instance::Init()
         mOptionalAttributeSet.Set<StartUpMode::Id>();
     }
 
+    // Although StartUpMode attribute is optional, spec says that none of the aliased clusters supports it.
+    VerifyOrReturnError(!mOptionalAttributeSet.IsSet(StartUpMode::Id), CHIP_ERROR_INCORRECT_STATE);
+
     bool onOffValueForStartUp = false;
 
 #ifdef MATTER_DM_PLUGIN_ON_OFF_SERVER
@@ -135,6 +138,9 @@ CHIP_ERROR Instance::Init()
             onOffValueForStartUp = startUpOnOffValue;
         }
     }
+#else
+    // Although ModeBase::Feature::kOnOff is optional, spec says that none of the aliased clusters supports it.
+    VerifyOrReturnError(!HasFeature(ModeBase::Feature::kOnOff), CHIP_ERROR_INCORRECT_STATE);
 #endif // MATTER_DM_PLUGIN_ON_OFF_SERVER
 
     VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);

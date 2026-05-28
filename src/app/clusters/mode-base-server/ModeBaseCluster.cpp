@@ -269,12 +269,22 @@ CHIP_ERROR ModeBaseCluster::Attributes(const ConcreteClusterPath & path, ReadOnl
 CHIP_ERROR ModeBaseCluster::AcceptedCommands(const ConcreteClusterPath & path,
                                              ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
-    return builder.AppendElements({ Commands::ChangeToMode::kMetadataEntry });
+    // MicrowaveOvenMode is a special case. It does not support the ChangeToMode command.
+    if (mPath.mClusterId != MicrowaveOvenMode::Id)
+    {
+        return builder.AppendElements({ Commands::ChangeToMode::kMetadataEntry });
+    }
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ModeBaseCluster::GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder)
 {
-    return builder.AppendElements({ Commands::ChangeToModeResponse::Id });
+    // MicrowaveOvenMode is a special case. It does not support the ChangeToModeResponse command.
+    if (mPath.mClusterId != MicrowaveOvenMode::Id)
+    {
+        return builder.AppendElements({ Commands::ChangeToModeResponse::Id });
+    }
+    return CHIP_NO_ERROR;
 }
 
 std::optional<DataModel::ActionReturnStatus>

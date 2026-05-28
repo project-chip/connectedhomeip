@@ -23,8 +23,8 @@
 #include <app/server-cluster/testing/ClusterTester.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <app/server-cluster/testing/ValidateGlobalAttributes.h>
+#include <clusters/DishwasherMode/Metadata.h>
 #include <clusters/GeneralDiagnostics/Enums.h>
-#include <clusters/MicrowaveOvenMode/Metadata.h>
 #include <platform/DiagnosticDataProvider.h>
 
 namespace {
@@ -40,7 +40,7 @@ using Status = Protocols::InteractionModel::Status;
 using ModeTagStructType    = chip::app::Clusters::detail::Structs::ModeTagStruct::Type;
 using ModeOptionStructType = chip::app::Clusters::detail::Structs::ModeOptionStruct::DecodableType;
 
-constexpr ClusterId kTestClusterId = MicrowaveOvenMode::Id;
+constexpr ClusterId kTestClusterId = DishwasherMode::Id;
 
 class TestDiagnosticDataProvider : public DeviceLayer::DiagnosticDataProvider
 {
@@ -127,7 +127,7 @@ struct TestModeBaseCluster : public ::testing::Test
             .onOffValueForStartUp             = onOffValueForStartUp,
             .safeAttributePersistenceProvider = persistenceProvider,
             .diagnosticDataProvider           = diagnosticDataProvider,
-            .clusterRevision                  = MicrowaveOvenMode::kRevision,
+            .clusterRevision                  = DishwasherMode::kRevision,
         };
     }
 
@@ -196,7 +196,7 @@ TEST_F(TestModeBaseCluster, ReadMandatoryAttributes)
 
     uint32_t revision = 0;
     ASSERT_EQ(tester.ReadAttribute(ClusterRevision::Id, revision), CHIP_NO_ERROR);
-    EXPECT_EQ(revision, MicrowaveOvenMode::kRevision);
+    EXPECT_EQ(revision, DishwasherMode::kRevision);
 
     uint32_t featureMap = 0;
     ASSERT_EQ(tester.ReadAttribute(FeatureMap::Id, featureMap), CHIP_NO_ERROR);
