@@ -202,6 +202,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         self._extra_controllers: list[ChipDeviceCtrl.ChipDeviceController] = []
         self._extra_cas: list[matter.CertificateAuthority.CertificateAuthority] = []
         self._original_acl = None
+        self._framework_cleanup_done = False
         # Set to True by commission_devices() on success; gates the per-test ACL read in
         # setup_test so unit tests (which never commission) incur zero network overhead.
         self._dut_confirmed_available = False
@@ -309,6 +310,12 @@ class MatterBaseTest(base_test.BaseTestClass):
         Wildcard attributes are pre-fetched once so all cluster-presence checks within
         a single cleanup pass share the same read.
         """
+
+        # If a teardown_test override already called this (per-test cleanup
+        # opt-in), teardown_class will skip it to avoid running cleanup twice.
+        if self._framework_cleanup_done:
+            return
+        self._framework_cleanup_done = True
         await self.async_teardown_test()
 
         # If setup_test could not read the ACL, the DUT was unreachable at test
@@ -821,6 +828,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         self.step_skipped = False
         self.failed = False
         self._teardown_ran = False
+        self._framework_cleanup_done = False
         self.cleanup_config = TestCleanupConfig()
         if self.runner_hook and not self.is_commissioning:
             test_name = self.current_test_info.name
