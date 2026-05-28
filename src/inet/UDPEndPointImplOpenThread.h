@@ -74,8 +74,8 @@ private:
     bool mDeferredBind = false;
     IPAddress mDeferredAddr;
     uint16_t mDeferredPort = 0;
-    InterfaceId mDeferredIntfId;  
-    UDPEndPointImplOT * mNextDeferred = nullptr;  
+    InterfaceId mDeferredIntfId;
+    UDPEndPointImplOT * mNextDeferred = nullptr;
 };
 
 using UDPEndPointImpl = UDPEndPointImplOT;

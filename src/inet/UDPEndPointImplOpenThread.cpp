@@ -270,29 +270,29 @@ UDPEndPointImplOT::~UDPEndPointImplOT()
     if (mDeferredBind)
     {
         if (sDeferredEndpoint == this)
-        {  
-            sDeferredEndpoint = mNextDeferred;  
-        }  
+        {
+            sDeferredEndpoint = mNextDeferred;
+        }
         else
-        {  
-            UDPEndPointImplOT * curr = sDeferredEndpoint;  
-            while (curr != nullptr && curr->mNextDeferred != this)  
-            {  
-                curr = curr->mNextDeferred;  
-            }  
-            if (curr != nullptr)  
-            {  
-                curr->mNextDeferred = mNextDeferred;  
-            }  
-        }  
-        mDeferredBind = false;  
-        mNextDeferred = nullptr;  
-    }  
+        {
+            UDPEndPointImplOT * curr = sDeferredEndpoint;
+            while (curr != nullptr && curr->mNextDeferred != this)
+            {
+                curr = curr->mNextDeferred;
+            }
+            if (curr != nullptr)
+            {
+                curr->mNextDeferred = mNextDeferred;
+            }
+        }
+        mDeferredBind = false;
+        mNextDeferred = nullptr;
+    }
 }
 
 CHIP_ERROR UDPEndPointImplOT::CompleteDeferredOTBinds(otInstance * otInst)
 {
-    globalOtInstance = otInst;
+    globalOtInstance    = otInst;
     CHIP_ERROR finalErr = CHIP_NO_ERROR;
 
     UDPEndPointImplOT * ep = sDeferredEndpoint;
@@ -301,12 +301,12 @@ CHIP_ERROR UDPEndPointImplOT::CompleteDeferredOTBinds(otInstance * otInst)
     while (ep != nullptr)
     {
         UDPEndPointImplOT * next = ep->mNextDeferred;
-        ep->mNextDeferred = nullptr;
+        ep->mNextDeferred        = nullptr;
 
         if (ep->mDeferredBind)
         {
             ep->mOTInstance = otInst;
-            CHIP_ERROR err = ep->IPv6Bind(ep->mSocket, ep->mDeferredAddr, ep->mDeferredPort, ep->mDeferredIntfId);
+            CHIP_ERROR err  = ep->IPv6Bind(ep->mSocket, ep->mDeferredAddr, ep->mDeferredPort, ep->mDeferredIntfId);
             if (err == CHIP_NO_ERROR)
             {
                 ep->mDeferredBind = false;
