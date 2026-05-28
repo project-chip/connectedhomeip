@@ -64,6 +64,15 @@ using CHIP_CONFIG_PERSISTED_STORAGE_KEY_TYPE = const char *;
 #define CHIP_CONFIG_BDX_MAX_NUM_TRANSFERS 1
 #endif // CHIP_CONFIG_BDX_MAX_NUM_TRANSFERS
 
+// Increase C++ lambda event size to accommodate larger local captures
+// for connman-based Connectivity Manager network management
+// implementation, particularly on [I]LP64 architectures in which
+// pointers are double the size of those on [I]LP32 architectures.
+
+#ifndef CHIP_CONFIG_LAMBDA_EVENT_SIZE
+#define CHIP_CONFIG_LAMBDA_EVENT_SIZE (48)
+#endif // CHIP_CONFIG_LAMBDA_EVENT_SIZE
+
 // ==================== Security Configuration Overrides ====================
 
 #ifndef CHIP_CONFIG_KVS_PATH
