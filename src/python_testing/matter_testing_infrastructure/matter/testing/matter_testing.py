@@ -326,6 +326,7 @@ class MatterBaseTest(base_test.BaseTestClass):
                 dut_reachable = False
 
         if dut_reachable:
+            await self._populate_wildcard()
             # DUT cleanup (run first as controller must still be alive to send commands)
             # - Scenes must be removed before group memberships: RemoveAllScenes requires the target
             #   group to still exist on the DUT, so group memberships cannot be cleared first.
@@ -459,7 +460,7 @@ class MatterBaseTest(base_test.BaseTestClass):
 
             # Read all fabrics unfiltered so we see every fabric, not just TH1's
             fabrics = typing.cast(
-                List[Clusters.OperationalCredentials.Structs.FabricDescriptorStruct],
+                typing.List[Clusters.OperationalCredentials.Structs.FabricDescriptorStruct],
                 await self.read_single_attribute_check_success(
                     cluster=Clusters.OperationalCredentials,  # type: ignore[arg-type]
                     attribute=Clusters.OperationalCredentials.Attributes.Fabrics,
@@ -639,7 +640,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             found_any = True
             try:
                 provisioned = typing.cast(
-                    List[Clusters.TlsClientManagement.Structs.TLSEndpointStruct],
+                    typing.List[Clusters.TlsClientManagement.Structs.TLSEndpointStruct],
                     await self.read_single_attribute_check_success(
                         cluster=Clusters.TlsClientManagement,  # type: ignore[arg-type]
                         attribute=Clusters.TlsClientManagement.Attributes.ProvisionedEndpoints,
