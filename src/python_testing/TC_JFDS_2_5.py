@@ -33,8 +33,8 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import base64
 import asyncio
+import base64
 import logging
 import os
 import random
@@ -763,7 +763,8 @@ class TC_JFDS_2_5(MatterBaseTest):
                                  "AddACLToNode with non-existent node should return CONSTRAINT_ERROR")
 
         # Step 16: TH sends AddACLToNode command with valid NodeId
-        self.step(16, "TH sends AddACLToNode command to DUT with NodeId=th_node_id, ACL fields: Privilege Manage (4), AuthMode CASE (2), Subjects [th_node_id2], Targets [{Cluster: null, Endpoint: 0, DeviceType: null}]")
+        self.step(
+            16, "TH sends AddACLToNode command to DUT with NodeId=th_node_id, ACL fields: Privilege Manage (4), AuthMode CASE (2), Subjects [th_node_id2], Targets [{Cluster: null, Endpoint: 0, DeviceType: null}]")
 
         acl_to_add = Clusters.JointFabricDatastore.Structs.DatastoreAccessControlEntryStruct(
             privilege=Clusters.JointFabricDatastore.Enums.DatastoreAccessControlEntryPrivilegeEnum.kManage,
