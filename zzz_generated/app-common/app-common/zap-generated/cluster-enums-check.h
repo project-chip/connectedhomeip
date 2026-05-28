@@ -138,6 +138,7 @@
 #include <clusters/ScenesManagement/EnumsCheck.h>
 #include <clusters/ServiceArea/EnumsCheck.h>
 #include <clusters/SmokeCoAlarm/EnumsCheck.h>
+#include <clusters/SmokeConcentrationMeasurement/EnumsCheck.h>
 #include <clusters/SoftwareDiagnostics/EnumsCheck.h>
 #include <clusters/SoilMeasurement/EnumsCheck.h>
 #include <clusters/Switch/EnumsCheck.h>

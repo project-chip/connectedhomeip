@@ -1058,6 +1058,15 @@ static BOOL CommandNeedsTimedInvokeInProximityRangingCluster(AttributeId aAttrib
     }
     }
 }
+static BOOL CommandNeedsTimedInvokeInSmokeConcentrationMeasurementCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::SmokeConcentrationMeasurement;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL CommandNeedsTimedInvokeInNetworkIdentityManagementCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::NetworkIdentityManagement;
@@ -1757,6 +1766,9 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     }
     case Clusters::ProximityRanging::Id: {
         return CommandNeedsTimedInvokeInProximityRangingCluster(commandID);
+    }
+    case Clusters::SmokeConcentrationMeasurement::Id: {
+        return CommandNeedsTimedInvokeInSmokeConcentrationMeasurementCluster(commandID);
     }
     case Clusters::NetworkIdentityManagement::Id: {
         return CommandNeedsTimedInvokeInNetworkIdentityManagementCluster(commandID);
