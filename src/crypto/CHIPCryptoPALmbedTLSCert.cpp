@@ -38,8 +38,6 @@
 #include <psa/crypto.h>
 #endif // (MBEDTLS_VERSION_NUMBER >= 0x04000000)
 
-#include <mbedtls/x509_csr.h>
-
 #if CHIP_CRYPTO_USE_X509
 #include <mbedtls/x509_crt.h>
 #endif // CHIP_CRYPTO_USE_X509
