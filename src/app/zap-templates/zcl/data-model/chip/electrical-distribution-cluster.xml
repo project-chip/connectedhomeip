@@ -22,7 +22,7 @@ Git: 1.6-attempt-2-29-g36e2edc76
 Alchemy: v1.6.16
 -->
 <configurator xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../zcl.xsd">
-  <domain name=""/>
+  <domain name="Energy Management"/>
   <enum name="EndOfLifeEnum" type="enum8" apiMaturity="provisional">
     <cluster code="0x00A2"/>
     <item name="None" value="0x00"/>
