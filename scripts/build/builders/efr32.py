@@ -16,7 +16,6 @@ import glob
 import logging
 import os
 import shlex
-import subprocess
 from enum import Enum, auto
 
 from runner.runner import Runner
