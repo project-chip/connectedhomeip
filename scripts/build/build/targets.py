@@ -376,8 +376,8 @@ def BuildEfr32Target():
         '-(wifi|use-ot-coap-lib)')
     target.AppendModifier('use-ot-coap-lib', enable_ot_coap_lib=True).ExceptIfRe(
         '-(wifi|use-ot-lib)')
-    target.AppendModifier('no-version', no_version=True)
     target.AppendModifier('skip-rps-generation', use_rps_extension=False)
+    target.AppendModifier('uart-log', uart_log=True)
 
     return target
 
