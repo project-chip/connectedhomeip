@@ -19,7 +19,6 @@ source_set("water-heater-management-server") {
     "WaterHeaterManagementCluster.cpp",
     "WaterHeaterManagementCluster.h",
     "WaterHeaterManagementTestEventTriggerHandler.h",
-    "water-heater-management-server.h",
   ]
 
   public_deps = [

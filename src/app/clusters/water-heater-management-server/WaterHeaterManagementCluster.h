@@ -29,6 +29,8 @@ namespace app {
 namespace Clusters {
 namespace WaterHeaterManagement {
 
+class WaterHeaterManagementCluster; // forward declaration for Delegate back-pointer
+
 class Delegate
 {
 public:
@@ -105,10 +107,21 @@ public:
     virtual uint16_t GetTankVolume()                              = 0;
     virtual Energy_mWh GetEstimatedHeatRequired()                 = 0;
     virtual Percent GetTankPercentage()                           = 0;
-    virtual BoostStateEnum GetBoostState()                        = 0;
+    virtual BoostStateEnum GetBoostState() = 0;
+
+    // ------------------------------------------------------------------
+    // Event generation helpers — concrete delegate implementations may call
+    // these to emit WaterHeaterManagement cluster events. Available once the
+    // owning WaterHeaterManagementCluster has been constructed.
+    void SetCluster(WaterHeaterManagementCluster * cluster) { mCluster = cluster; }
+    CHIP_ERROR GenerateBoostStartedEvent(uint32_t durationSecs, Optional<bool> oneShot, Optional<bool> emergencyBoost,
+                                         Optional<int16_t> temporarySetpoint, Optional<Percent> targetPercentage,
+                                         Optional<Percent> targetReheat);
+    CHIP_ERROR GenerateBoostEndedEvent();
 
 protected:
-    EndpointId mEndpointId = 0;
+    EndpointId mEndpointId                    = 0;
+    WaterHeaterManagementCluster * mCluster   = nullptr;
 };
 
 class WaterHeaterManagementCluster : public DefaultServerCluster

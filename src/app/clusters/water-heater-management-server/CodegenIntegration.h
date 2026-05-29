@@ -16,3 +16,49 @@
  */
 
 #pragma once
+
+#include <app/clusters/water-heater-management-server/WaterHeaterManagementCluster.h>
+#include <app/server-cluster/ServerClusterInterfaceRegistry.h>
+#include <lib/core/CHIPError.h>
+
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace WaterHeaterManagement {
+
+/**
+ * Backwards-compatible wrapper around WaterHeaterManagementCluster that
+ * provides the legacy Instance API used by example applications.
+ *
+ * Example apps that include water-heater-management-server.h can continue
+ * to construct an Instance, call Init()/Shutdown(), and query HasFeature()
+ * without any changes to their own code.
+ */
+class Instance
+{
+public:
+    Instance(EndpointId aEndpointId, Delegate & aDelegate, Feature aFeature) :
+        mCluster(aEndpointId, aDelegate, aFeature)
+    {}
+
+    ~Instance();
+
+    // Delete copy constructor and assignment operator.
+    Instance(const Instance &)             = delete;
+    Instance(const Instance &&)            = delete;
+    Instance & operator=(const Instance &) = delete;
+
+    CHIP_ERROR Init();
+    void Shutdown();
+
+    bool HasFeature(Feature aFeature) const { return mCluster.Cluster().HasFeature(aFeature); }
+
+private:
+    RegisteredServerCluster<WaterHeaterManagementCluster> mCluster;
+    bool mRegistered = false;
+};
+
+} // namespace WaterHeaterManagement
+} // namespace Clusters
+} // namespace app
+} // namespace chip
