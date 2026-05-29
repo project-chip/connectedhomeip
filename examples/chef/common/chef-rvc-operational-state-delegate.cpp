@@ -290,7 +290,7 @@ static void onOperationalStateTimerTick(System::Layer * systemLayer, void * data
 {
     RvcOperationalStateDelegate * delegate = reinterpret_cast<RvcOperationalStateDelegate *>(data);
 
-    OperationalState::InstanceBase * instance = gRvcOperationalStateInstance.get();
+    OperationalState::Instance * instance = gRvcOperationalStateInstance.get();
     RvcOperationalState::ChefRvcOperationalStateEnum state =
         static_cast<RvcOperationalState::ChefRvcOperationalStateEnum>(instance->GetCurrentOperationalState());
 

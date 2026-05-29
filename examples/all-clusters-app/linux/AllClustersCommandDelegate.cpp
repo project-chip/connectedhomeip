@@ -979,7 +979,7 @@ void AllClustersAppCommandHandler::OnGenericOperationalStateChange(std::string d
 
 void AllClustersAppCommandHandler::OnOvenOperationalStateChange(std::string device, std::string operation, Json::Value param)
 {
-    OvenCavityOperationalState::Instance * operationalStateInstance = OvenCavityOperationalState::GetOperationalStateInstance();
+    OperationalState::Instance * operationalStateInstance = OvenCavityOperationalState::GetOperationalStateInstance();
     if (operation == "Start" || operation == "Resume")
     {
         TEMPORARY_RETURN_IGNORED operationalStateInstance->SetOperationalState(

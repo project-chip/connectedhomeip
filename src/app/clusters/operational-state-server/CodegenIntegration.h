@@ -30,19 +30,37 @@ namespace app {
 namespace Clusters {
 namespace OperationalState {
 
+// detail:: base classes guarantee that the cluster + registration storage is initialized
+// before Instance receives references to them (base classes initialize before members).
+namespace detail {
+struct OperationalInstanceBase
+{
+    RegisteredServerCluster<OperationalStateCluster> mCluster;
+    OperationalInstanceBase(Delegate * aDelegate, EndpointId aEndpointId, const OperationalStateCluster::Config & config = {}) :
+        mCluster(aEndpointId, aDelegate, config)
+    {}
+};
+} // namespace detail
+
 /**
  * Backward-compat lifecycle wrapper around OperationalStateCluster.
  *
  * Provides Init()/Shutdown() for registering/unregistering the cluster with the
- * CodegenDataModelProvider, and forwards the full application-facing API to the
- * underlying cluster object.
+ * CodegenDataModelProvider, and forwards the full application-facing API.
+ *
+ * RvcOperationalState::Instance and OvenCavityOperationalState::Instance derive from this,
+ * so OperationalState::Instance * can hold any of the three cluster types.
  *
  * @note New applications should construct OperationalStateCluster directly.
  */
-class InstanceBase
+class Instance
 {
 public:
-    ~InstanceBase();
+    /**
+     * Standalone constructor: creates and owns an OperationalStateCluster for the given endpoint.
+     */
+    Instance(Delegate * aDelegate, EndpointId aEndpointId, const OperationalStateCluster::Config & config = {});
+    ~Instance();
 
     CHIP_ERROR Init();
     void Shutdown();
@@ -69,7 +87,11 @@ public:
     bool IsSupportedOperationalState(uint8_t aState) { return Cluster().IsSupportedOperationalState(aState); }
 
 protected:
-    InstanceBase(OperationalStateCluster & cluster, ServerClusterRegistration & registration, Delegate * aDelegate);
+    /**
+     * Constructor for derived instances (Rvc, OvenCavity) that supply their own cluster storage.
+     * The derived class must ensure the cluster and registration outlive this object.
+     */
+    Instance(OperationalStateCluster & cluster, ServerClusterRegistration & registration, Delegate * aDelegate);
 
     OperationalStateCluster & Cluster() { return mCluster; }
     const OperationalStateCluster & Cluster() const { return mCluster; }
@@ -78,30 +100,11 @@ protected:
 
 private:
     Delegate * mDelegate;
+    // mOwnedStorage declared before mCluster so it is initialized first in the standalone constructor,
+    // allowing mCluster to be bound to the storage's cluster object.
+    detail::OperationalInstanceBase * mOwnedStorage = nullptr;
     OperationalStateCluster & mCluster;
     ServerClusterRegistration * mRegPtr;
-};
-
-// detail:: base classes guarantee that the cluster + registration storage is initialized
-// before InstanceBase receives references to them (base classes initialize before members).
-namespace detail {
-struct OperationalInstanceBase
-{
-    RegisteredServerCluster<OperationalStateCluster> mCluster;
-    OperationalInstanceBase(Delegate * aDelegate, EndpointId aEndpointId, const OperationalStateCluster::Config & config = {}) :
-        mCluster(aEndpointId, aDelegate, config)
-    {}
-};
-} // namespace detail
-
-class Instance : private detail::OperationalInstanceBase, public InstanceBase
-{
-public:
-    Instance(Delegate * aDelegate, EndpointId aEndpointId, const OperationalStateCluster::Config & config = {}) :
-        detail::OperationalInstanceBase(aDelegate, aEndpointId, config),
-        InstanceBase(detail::OperationalInstanceBase::mCluster.Cluster(), detail::OperationalInstanceBase::mCluster.Registration(),
-                     aDelegate)
-    {}
 };
 
 } // namespace OperationalState
@@ -119,13 +122,13 @@ struct RvcInstanceBase
 };
 } // namespace detail
 
-class Instance : private detail::RvcInstanceBase, public OperationalState::InstanceBase
+class Instance : private detail::RvcInstanceBase, public OperationalState::Instance
 {
 public:
     Instance(Delegate * aDelegate, EndpointId aEndpointId, const OperationalState::OperationalStateCluster::Config & config = {}) :
         detail::RvcInstanceBase(aDelegate, aEndpointId, config),
-        OperationalState::InstanceBase(detail::RvcInstanceBase::mCluster.Cluster(),
-                                       detail::RvcInstanceBase::mCluster.Registration(), aDelegate)
+        OperationalState::Instance(detail::RvcInstanceBase::mCluster.Cluster(), detail::RvcInstanceBase::mCluster.Registration(),
+                                   aDelegate)
     {}
 };
 
@@ -144,14 +147,14 @@ struct OvenInstanceBase
 };
 } // namespace detail
 
-class Instance : private detail::OvenInstanceBase, public OperationalState::InstanceBase
+class Instance : private detail::OvenInstanceBase, public OperationalState::Instance
 {
 public:
     Instance(OperationalState::Delegate * aDelegate, EndpointId aEndpointId,
              const OperationalState::OperationalStateCluster::Config & config = {}) :
         detail::OvenInstanceBase(aDelegate, aEndpointId, config),
-        OperationalState::InstanceBase(detail::OvenInstanceBase::mCluster.Cluster(),
-                                       detail::OvenInstanceBase::mCluster.Registration(), aDelegate)
+        OperationalState::Instance(detail::OvenInstanceBase::mCluster.Cluster(), detail::OvenInstanceBase::mCluster.Registration(),
+                                   aDelegate)
     {}
 };
 

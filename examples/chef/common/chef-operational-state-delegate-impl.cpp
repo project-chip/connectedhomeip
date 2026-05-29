@@ -145,7 +145,7 @@ static void onOperationalStateTimerTick(System::Layer * systemLayer, void * data
 {
     GenericOperationalStateDelegateImpl * delegate = reinterpret_cast<GenericOperationalStateDelegateImpl *>(data);
 
-    OperationalState::InstanceBase * instance = delegate->GetInstance();
+    OperationalState::Instance * instance = delegate->GetInstance();
     if (!instance)
     {
         ChipLogError(DeviceLayer, "Inside chef onOperationalStateTimerTick: delegate->GetInstance() was NULL.");

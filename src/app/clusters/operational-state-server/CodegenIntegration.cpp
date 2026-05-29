@@ -30,29 +30,39 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::OperationalState;
 
 // ---------------------------------------------------------------------------
-// OperationalState::InstanceBase
+// OperationalState::Instance
 // ---------------------------------------------------------------------------
 
-InstanceBase::InstanceBase(OperationalStateCluster & cluster, ServerClusterRegistration & registration, Delegate * aDelegate) :
+// Standalone constructor: creates and owns an OperationalStateCluster.
+Instance::Instance(Delegate * aDelegate, EndpointId aEndpointId, const OperationalStateCluster::Config & config) :
+    mDelegate(aDelegate), mOwnedStorage(new detail::OperationalInstanceBase(aDelegate, aEndpointId, config)),
+    mCluster(mOwnedStorage->mCluster.Cluster()), mRegPtr(&mOwnedStorage->mCluster.Registration())
+{
+    aDelegate->SetInstance(this);
+}
+
+// Protected constructor: cluster storage is owned by the derived class (Rvc, OvenCavity).
+Instance::Instance(OperationalStateCluster & cluster, ServerClusterRegistration & registration, Delegate * aDelegate) :
     mDelegate(aDelegate), mCluster(cluster), mRegPtr(&registration)
 {
     aDelegate->SetInstance(this);
 }
 
-InstanceBase::~InstanceBase()
+Instance::~Instance()
 {
     if (mRegistered)
     {
-        ChipLogError(AppServer, "OperationalState::InstanceBase destroyed without Shutdown(); shutting down now.");
+        ChipLogError(AppServer, "OperationalState::Instance destroyed without Shutdown(); shutting down now.");
         Shutdown();
     }
     if (mDelegate)
     {
         mDelegate->SetInstance(nullptr);
     }
+    delete mOwnedStorage;
 }
 
-CHIP_ERROR InstanceBase::Init()
+CHIP_ERROR Instance::Init()
 {
     VerifyOrReturnError(!mRegistered, CHIP_NO_ERROR);
     ReturnErrorOnFailure(CodegenDataModelProvider::Instance().Registry().Register(*mRegPtr));
@@ -60,7 +70,7 @@ CHIP_ERROR InstanceBase::Init()
     return CHIP_NO_ERROR;
 }
 
-void InstanceBase::Shutdown()
+void Instance::Shutdown()
 {
     VerifyOrReturn(mRegistered);
     mRegistered = false;
