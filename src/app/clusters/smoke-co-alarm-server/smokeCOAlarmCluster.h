@@ -162,7 +162,7 @@ private:
 
     const Config mConfig;
 
-    // Runtime attribute storage — all initialised to alarm-off defaults
+    // Runtime attribute storage
     ExpressedStateEnum mExpressedState         = ExpressedStateEnum::kNormal;
     AlarmStateEnum mSmokeState                 = AlarmStateEnum::kNormal;
     AlarmStateEnum mCOState                    = AlarmStateEnum::kNormal;
