@@ -203,6 +203,10 @@
 #include <clusters/ElectricalPowerMeasurement/Commands.ipp>
 #include <clusters/ElectricalPowerMeasurement/Events.ipp>
 #include <clusters/ElectricalPowerMeasurement/Structs.ipp>
+#include <clusters/ElectricalProtectionAlarm/Attributes.ipp>
+#include <clusters/ElectricalProtectionAlarm/Commands.ipp>
+#include <clusters/ElectricalProtectionAlarm/Events.ipp>
+#include <clusters/ElectricalProtectionAlarm/Structs.ipp>
 #include <clusters/EnergyEvse/Attributes.ipp>
 #include <clusters/EnergyEvse/Commands.ipp>
 #include <clusters/EnergyEvse/Events.ipp>
@@ -1193,6 +1197,13 @@ bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
         }
     }
     case Clusters::DeviceEnergyManagementMode::Id: {
+        switch (aCommand)
+        {
+        default:
+            return false;
+        }
+    }
+    case Clusters::ElectricalProtectionAlarm::Id: {
         switch (aCommand)
         {
         default:
