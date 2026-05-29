@@ -50,6 +50,8 @@ public:
     {
         if (mCluster.IsConstructed())
         {
+            if (sInstance == this)
+                sInstance = nullptr;
             LogErrorOnFailure(CodegenDataModelProvider::Instance().Registry().Unregister(&mCluster.Cluster()));
         }
     }
@@ -64,6 +66,7 @@ public:
             mCluster.Destroy();
             return err;
         }
+        sInstance = this;
         return CHIP_NO_ERROR;
     }
 
@@ -73,10 +76,12 @@ public:
         return mCluster.Cluster();
     }
 
-    void SetExpressedStateByPriority(const std::array<ExpressedStateEnum, SmokeCoAlarmCluster::kPriorityOrderLength> & priorityOrder)
+    static constexpr size_t kPriorityOrderLength = SmokeCoAlarmCluster::kPriorityOrderLength;
+
+    static SmokeCoAlarmServer & Instance()
     {
-        VerifyOrDie(mCluster.IsConstructed());
-        mCluster.Cluster().SetExpressedStateByPriority(priorityOrder);
+        VerifyOrDie(sInstance != nullptr);
+        return *sInstance;
     }
 
     bool RequestSelfTest()
@@ -85,42 +90,118 @@ public:
         return mCluster.Cluster().RequestSelfTest();
     }
 
-    bool SetSmokeState(AlarmStateEnum v)                 { VerifyOrDie(mCluster.IsConstructed()); return mCluster.Cluster().SetSmokeState(v); }
-    bool SetCOState(AlarmStateEnum v)                    { VerifyOrDie(mCluster.IsConstructed()); return mCluster.Cluster().SetCOState(v); }
-    bool SetBatteryAlert(AlarmStateEnum v)               { VerifyOrDie(mCluster.IsConstructed()); return mCluster.Cluster().SetBatteryAlert(v); }
-    bool SetDeviceMuted(MuteStateEnum v)                 { VerifyOrDie(mCluster.IsConstructed()); return mCluster.Cluster().SetDeviceMuted(v); }
-    bool SetTestInProgress(bool v)                       { VerifyOrDie(mCluster.IsConstructed()); return mCluster.Cluster().SetTestInProgress(v); }
-    bool SetHardwareFaultAlert(bool v)                   { VerifyOrDie(mCluster.IsConstructed()); return mCluster.Cluster().SetHardwareFaultAlert(v); }
-    bool SetEndOfServiceAlert(EndOfServiceEnum v)        { VerifyOrDie(mCluster.IsConstructed()); return mCluster.Cluster().SetEndOfServiceAlert(v); }
-    bool SetInterconnectSmokeAlarm(AlarmStateEnum v)     { VerifyOrDie(mCluster.IsConstructed()); return mCluster.Cluster().SetInterconnectSmokeAlarm(v); }
-    bool SetInterconnectCOAlarm(AlarmStateEnum v)        { VerifyOrDie(mCluster.IsConstructed()); return mCluster.Cluster().SetInterconnectCOAlarm(v); }
-    bool SetContaminationState(ContaminationStateEnum v) { VerifyOrDie(mCluster.IsConstructed()); return mCluster.Cluster().SetContaminationState(v); }
-    bool SetSmokeSensitivityLevel(SensitivityEnum v)     { VerifyOrDie(mCluster.IsConstructed()); return mCluster.Cluster().SetSmokeSensitivityLevel(v); }
-    bool SetUnmountedState(bool v)                       { VerifyOrDie(mCluster.IsConstructed()); return mCluster.Cluster().SetUnmountedState(v); }
+    // Endpoint-taking overloads for backwards compatibility with old call sites.
+    // The endpoint param is ignored; Instance() already owns a specific endpoint.
+    void SetExpressedStateByPriority(EndpointId, const std::array<ExpressedStateEnum, kPriorityOrderLength> & o)
+    {
+        Cluster().SetExpressedStateByPriority(o);
+    }
+    bool SetSmokeState(EndpointId, AlarmStateEnum v) { return Cluster().SetSmokeState(v); }
+    bool SetCOState(EndpointId, AlarmStateEnum v) { return Cluster().SetCOState(v); }
+    bool SetBatteryAlert(EndpointId, AlarmStateEnum v) { return Cluster().SetBatteryAlert(v); }
+    bool SetDeviceMuted(EndpointId, MuteStateEnum v) { return Cluster().SetDeviceMuted(v); }
+    bool SetTestInProgress(EndpointId, bool v) { return Cluster().SetTestInProgress(v); }
+    bool SetHardwareFaultAlert(EndpointId, bool v) { return Cluster().SetHardwareFaultAlert(v); }
+    bool SetEndOfServiceAlert(EndpointId, EndOfServiceEnum v) { return Cluster().SetEndOfServiceAlert(v); }
+    bool SetInterconnectSmokeAlarm(EndpointId, AlarmStateEnum v) { return Cluster().SetInterconnectSmokeAlarm(v); }
+    bool SetInterconnectCOAlarm(EndpointId, AlarmStateEnum v) { return Cluster().SetInterconnectCOAlarm(v); }
+    bool SetContaminationState(EndpointId, ContaminationStateEnum v) { return Cluster().SetContaminationState(v); }
+    bool SetSmokeSensitivityLevel(EndpointId, SensitivityEnum v) { return Cluster().SetSmokeSensitivityLevel(v); }
+    bool SetUnmountedState(EndpointId, bool v) { return Cluster().SetUnmountedState(v); }
 
-    bool GetExpressedState(ExpressedStateEnum & v)         const { VerifyOrDie(mCluster.IsConstructed()); return mCluster.Cluster().GetExpressedState(v); }
-    bool GetSmokeState(AlarmStateEnum & v)                 const { VerifyOrDie(mCluster.IsConstructed()); return mCluster.Cluster().GetSmokeState(v); }
-    bool GetCOState(AlarmStateEnum & v)                    const { VerifyOrDie(mCluster.IsConstructed()); return mCluster.Cluster().GetCOState(v); }
-    bool GetBatteryAlert(AlarmStateEnum & v)               const { VerifyOrDie(mCluster.IsConstructed()); return mCluster.Cluster().GetBatteryAlert(v); }
-    bool GetDeviceMuted(MuteStateEnum & v)                 const { VerifyOrDie(mCluster.IsConstructed()); return mCluster.Cluster().GetDeviceMuted(v); }
-    bool GetTestInProgress(bool & v)                       const { VerifyOrDie(mCluster.IsConstructed()); return mCluster.Cluster().GetTestInProgress(v); }
-    bool GetHardwareFaultAlert(bool & v)                   const { VerifyOrDie(mCluster.IsConstructed()); return mCluster.Cluster().GetHardwareFaultAlert(v); }
-    bool GetEndOfServiceAlert(EndOfServiceEnum & v)        const { VerifyOrDie(mCluster.IsConstructed()); return mCluster.Cluster().GetEndOfServiceAlert(v); }
-    bool GetInterconnectSmokeAlarm(AlarmStateEnum & v)     const { VerifyOrDie(mCluster.IsConstructed()); return mCluster.Cluster().GetInterconnectSmokeAlarm(v); }
-    bool GetInterconnectCOAlarm(AlarmStateEnum & v)        const { VerifyOrDie(mCluster.IsConstructed()); return mCluster.Cluster().GetInterconnectCOAlarm(v); }
-    bool GetContaminationState(ContaminationStateEnum & v) const { VerifyOrDie(mCluster.IsConstructed()); return mCluster.Cluster().GetContaminationState(v); }
-    bool GetSmokeSensitivityLevel(SensitivityEnum & v)     const { VerifyOrDie(mCluster.IsConstructed()); return mCluster.Cluster().GetSmokeSensitivityLevel(v); }
-    bool GetExpiryDate(uint32_t & v)                       const { VerifyOrDie(mCluster.IsConstructed()); return mCluster.Cluster().GetExpiryDate(v); }
-    bool GetUnmountedState(bool & v)                       const { VerifyOrDie(mCluster.IsConstructed()); return mCluster.Cluster().GetUnmountedState(v); }
+    bool GetExpressedState(ExpressedStateEnum & v) const
+    {
+        VerifyOrDie(mCluster.IsConstructed());
+        return mCluster.Cluster().GetExpressedState(v);
+    }
+    bool GetSmokeState(AlarmStateEnum & v) const
+    {
+        VerifyOrDie(mCluster.IsConstructed());
+        return mCluster.Cluster().GetSmokeState(v);
+    }
+    bool GetCOState(AlarmStateEnum & v) const
+    {
+        VerifyOrDie(mCluster.IsConstructed());
+        return mCluster.Cluster().GetCOState(v);
+    }
+    bool GetBatteryAlert(AlarmStateEnum & v) const
+    {
+        VerifyOrDie(mCluster.IsConstructed());
+        return mCluster.Cluster().GetBatteryAlert(v);
+    }
+    bool GetDeviceMuted(MuteStateEnum & v) const
+    {
+        VerifyOrDie(mCluster.IsConstructed());
+        return mCluster.Cluster().GetDeviceMuted(v);
+    }
+    bool GetTestInProgress(bool & v) const
+    {
+        VerifyOrDie(mCluster.IsConstructed());
+        return mCluster.Cluster().GetTestInProgress(v);
+    }
+    bool GetHardwareFaultAlert(bool & v) const
+    {
+        VerifyOrDie(mCluster.IsConstructed());
+        return mCluster.Cluster().GetHardwareFaultAlert(v);
+    }
+    bool GetEndOfServiceAlert(EndOfServiceEnum & v) const
+    {
+        VerifyOrDie(mCluster.IsConstructed());
+        return mCluster.Cluster().GetEndOfServiceAlert(v);
+    }
+    bool GetInterconnectSmokeAlarm(AlarmStateEnum & v) const
+    {
+        VerifyOrDie(mCluster.IsConstructed());
+        return mCluster.Cluster().GetInterconnectSmokeAlarm(v);
+    }
+    bool GetInterconnectCOAlarm(AlarmStateEnum & v) const
+    {
+        VerifyOrDie(mCluster.IsConstructed());
+        return mCluster.Cluster().GetInterconnectCOAlarm(v);
+    }
+    bool GetContaminationState(ContaminationStateEnum & v) const
+    {
+        VerifyOrDie(mCluster.IsConstructed());
+        return mCluster.Cluster().GetContaminationState(v);
+    }
+    bool GetSmokeSensitivityLevel(SensitivityEnum & v) const
+    {
+        VerifyOrDie(mCluster.IsConstructed());
+        return mCluster.Cluster().GetSmokeSensitivityLevel(v);
+    }
+    bool GetExpiryDate(uint32_t & v) const
+    {
+        VerifyOrDie(mCluster.IsConstructed());
+        return mCluster.Cluster().GetExpiryDate(v);
+    }
+    bool GetUnmountedState(bool & v) const
+    {
+        VerifyOrDie(mCluster.IsConstructed());
+        return mCluster.Cluster().GetUnmountedState(v);
+    }
 
-    chip::BitFlags<Feature> GetFeatures() const { VerifyOrDie(mCluster.IsConstructed()); return mCluster.Cluster().GetFeatures(); }
-    bool SupportsSmokeAlarm()             const { VerifyOrDie(mCluster.IsConstructed()); return mCluster.Cluster().SupportsSmokeAlarm(); }
-    bool SupportsCOAlarm()                const { VerifyOrDie(mCluster.IsConstructed()); return mCluster.Cluster().SupportsCOAlarm(); }
+    chip::BitFlags<Feature> GetFeatures() const
+    {
+        VerifyOrDie(mCluster.IsConstructed());
+        return mCluster.Cluster().GetFeatures();
+    }
+    bool SupportsSmokeAlarm() const
+    {
+        VerifyOrDie(mCluster.IsConstructed());
+        return mCluster.Cluster().SupportsSmokeAlarm();
+    }
+    bool SupportsCOAlarm() const
+    {
+        VerifyOrDie(mCluster.IsConstructed());
+        return mCluster.Cluster().SupportsCOAlarm();
+    }
 
 private:
     EndpointId mEndpointId;
     SmokeCoAlarmCluster::Config mConfig;
     LazyRegisteredServerCluster<SmokeCoAlarmCluster> mCluster;
+
+    static SmokeCoAlarmServer * sInstance;
 };
 
 } // namespace SmokeCoAlarm

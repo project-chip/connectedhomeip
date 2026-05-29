@@ -29,6 +29,8 @@ namespace Clusters {
 
 SmokeCoAlarmCluster::SmokeCoAlarmCluster(EndpointId endpointId) : SmokeCoAlarmCluster(endpointId, Config{}) {}
 
+SmokeCoAlarmServer * SmokeCoAlarmServer::sInstance = nullptr;
+
 SmokeCoAlarmCluster::SmokeCoAlarmCluster(EndpointId endpointId) : SmokeCoAlarmCluster(endpointId, Config{}) {}
 
 SmokeCoAlarmCluster::SmokeCoAlarmCluster(EndpointId endpointId, const Config & config) :

@@ -34,7 +34,13 @@ using namespace chip::app::Clusters::SmokeCoAlarm;
 
 namespace {
 
-constexpr EndpointId kTestEndpointId = kRootEndpointId;
+constexpr EndpointId kTestEndpointId = 1; // matches old-style callers that pass endpoint 1
+
+static std::array<ExpressedStateEnum, SmokeCoAlarmServer::kPriorityOrderLength> sPriorityOrder = {
+    ExpressedStateEnum::kInoperative, ExpressedStateEnum::kSmokeAlarm,     ExpressedStateEnum::kInterconnectSmoke,
+    ExpressedStateEnum::kCOAlarm,     ExpressedStateEnum::kInterconnectCO, ExpressedStateEnum::kHardwareFault,
+    ExpressedStateEnum::kTesting,     ExpressedStateEnum::kEndOfService,   ExpressedStateEnum::kBatteryAlert
+};
 
 SmokeCoAlarmCluster::Config MakeFullConfig()
 {
@@ -50,6 +56,7 @@ struct TestSmokeCoAlarmBackwardsCompat : public ::testing::Test
     static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
 };
 
+// Fixture that owns a server and exposes it only through Instance() — the old singleton pattern.
 struct TestSmokeCoAlarmBackwardsCompatInitialized : public TestSmokeCoAlarmBackwardsCompat
 {
     void SetUp() override { ASSERT_EQ(server.Init(), CHIP_NO_ERROR); }
@@ -57,6 +64,12 @@ struct TestSmokeCoAlarmBackwardsCompatInitialized : public TestSmokeCoAlarmBackw
 };
 
 } // namespace
+
+TEST_F(TestSmokeCoAlarmBackwardsCompatInitialized, Instance_ReturnsRegisteredServer)
+{
+    // Old code calls SmokeCoAlarmServer::Instance() without holding a pointer.
+    EXPECT_EQ(&SmokeCoAlarmServer::Instance(), &server);
+}
 
 TEST_F(TestSmokeCoAlarmBackwardsCompatInitialized, Init_RegistersClusterInRegistry)
 {
@@ -71,51 +84,81 @@ TEST_F(TestSmokeCoAlarmBackwardsCompatInitialized, DoubleInit_IsNoOp)
 
 TEST_F(TestSmokeCoAlarmBackwardsCompatInitialized, Features_ReportedCorrectly)
 {
-    EXPECT_TRUE(server.SupportsSmokeAlarm());
-    EXPECT_TRUE(server.SupportsCOAlarm());
-    EXPECT_TRUE(server.GetFeatures().Has(Feature::kSmokeAlarm));
+    EXPECT_TRUE(SmokeCoAlarmServer::Instance().SupportsSmokeAlarm());
+    EXPECT_TRUE(SmokeCoAlarmServer::Instance().SupportsCOAlarm());
+    EXPECT_TRUE(SmokeCoAlarmServer::Instance().GetFeatures().Has(Feature::kSmokeAlarm));
 }
 
-TEST_F(TestSmokeCoAlarmBackwardsCompatInitialized, SettersAndGetters_RoundTrip)
+// Mirrors the pattern used by SmokeCOAlarmManager.cpp: Instance().SetXxx(endpointId, value)
+// followed by Instance().SetExpressedStateByPriority(endpointId, priorityOrder).
+TEST_F(TestSmokeCoAlarmBackwardsCompatInitialized, SettersViaInstance_RoundTrip)
 {
-    // Alarm states
-    EXPECT_TRUE(server.SetSmokeState(AlarmStateEnum::kWarning));
+    EXPECT_TRUE((SmokeCoAlarmServer::Instance().SetSmokeState(kTestEndpointId, AlarmStateEnum::kCritical)));
+    SmokeCoAlarmServer::Instance().SetExpressedStateByPriority(kTestEndpointId, sPriorityOrder);
     AlarmStateEnum smoke{};
-    EXPECT_TRUE(server.GetSmokeState(smoke));
-    EXPECT_EQ(smoke, AlarmStateEnum::kWarning);
+    EXPECT_TRUE(SmokeCoAlarmServer::Instance().GetSmokeState(smoke));
+    EXPECT_EQ(smoke, AlarmStateEnum::kCritical);
+    ExpressedStateEnum expressed{};
+    EXPECT_TRUE(SmokeCoAlarmServer::Instance().GetExpressedState(expressed));
+    EXPECT_EQ(expressed, ExpressedStateEnum::kSmokeAlarm);
 
-    EXPECT_TRUE(server.SetCOState(AlarmStateEnum::kCritical));
+    EXPECT_TRUE((SmokeCoAlarmServer::Instance().SetCOState(kTestEndpointId, AlarmStateEnum::kWarning)));
+    SmokeCoAlarmServer::Instance().SetExpressedStateByPriority(kTestEndpointId, sPriorityOrder);
     AlarmStateEnum co{};
-    EXPECT_TRUE(server.GetCOState(co));
-    EXPECT_EQ(co, AlarmStateEnum::kCritical);
+    EXPECT_TRUE(SmokeCoAlarmServer::Instance().GetCOState(co));
+    EXPECT_EQ(co, AlarmStateEnum::kWarning);
 
-    EXPECT_TRUE(server.SetBatteryAlert(AlarmStateEnum::kWarning));
+    EXPECT_TRUE((SmokeCoAlarmServer::Instance().SetBatteryAlert(kTestEndpointId, AlarmStateEnum::kWarning)));
     AlarmStateEnum battery{};
-    EXPECT_TRUE(server.GetBatteryAlert(battery));
+    EXPECT_TRUE(SmokeCoAlarmServer::Instance().GetBatteryAlert(battery));
     EXPECT_EQ(battery, AlarmStateEnum::kWarning);
 
-    // Boolean alerts
-    EXPECT_TRUE(server.SetHardwareFaultAlert(true));
+    EXPECT_TRUE((SmokeCoAlarmServer::Instance().SetHardwareFaultAlert(kTestEndpointId, true)));
+    SmokeCoAlarmServer::Instance().SetExpressedStateByPriority(kTestEndpointId, sPriorityOrder);
     bool hwFault{};
-    EXPECT_TRUE(server.GetHardwareFaultAlert(hwFault));
+    EXPECT_TRUE(SmokeCoAlarmServer::Instance().GetHardwareFaultAlert(hwFault));
     EXPECT_TRUE(hwFault);
 
-    EXPECT_TRUE(server.SetEndOfServiceAlert(EndOfServiceEnum::kExpired));
+    EXPECT_TRUE((SmokeCoAlarmServer::Instance().SetEndOfServiceAlert(kTestEndpointId, EndOfServiceEnum::kExpired)));
+    SmokeCoAlarmServer::Instance().SetExpressedStateByPriority(kTestEndpointId, sPriorityOrder);
     EndOfServiceEnum eos{};
-    EXPECT_TRUE(server.GetEndOfServiceAlert(eos));
+    EXPECT_TRUE(SmokeCoAlarmServer::Instance().GetEndOfServiceAlert(eos));
     EXPECT_EQ(eos, EndOfServiceEnum::kExpired);
 
-    // Sensitivity
-    EXPECT_TRUE(server.SetSmokeSensitivityLevel(SensitivityEnum::kLow));
+    EXPECT_TRUE((SmokeCoAlarmServer::Instance().SetSmokeSensitivityLevel(kTestEndpointId, SensitivityEnum::kLow)));
     SensitivityEnum sensitivity{};
-    EXPECT_TRUE(server.GetSmokeSensitivityLevel(sensitivity));
+    EXPECT_TRUE(SmokeCoAlarmServer::Instance().GetSmokeSensitivityLevel(sensitivity));
     EXPECT_EQ(sensitivity, SensitivityEnum::kLow);
+
+    // Muting is blocked while any alarm is Critical; clear smoke first.
+    EXPECT_TRUE((SmokeCoAlarmServer::Instance().SetSmokeState(kTestEndpointId, AlarmStateEnum::kNormal)));
+    EXPECT_TRUE((SmokeCoAlarmServer::Instance().SetDeviceMuted(kTestEndpointId, MuteStateEnum::kMuted)));
+    MuteStateEnum muted{};
+    EXPECT_TRUE(SmokeCoAlarmServer::Instance().GetDeviceMuted(muted));
+    EXPECT_EQ(muted, MuteStateEnum::kMuted);
+
+    EXPECT_TRUE((SmokeCoAlarmServer::Instance().SetInterconnectSmokeAlarm(kTestEndpointId, AlarmStateEnum::kWarning)));
+    EXPECT_TRUE((SmokeCoAlarmServer::Instance().SetInterconnectCOAlarm(kTestEndpointId, AlarmStateEnum::kWarning)));
+    SmokeCoAlarmServer::Instance().SetContaminationState(kTestEndpointId, ContaminationStateEnum::kCritical);
+}
+
+TEST_F(TestSmokeCoAlarmBackwardsCompatInitialized, ClearViaInstance_ResetsState)
+{
+    EXPECT_TRUE((SmokeCoAlarmServer::Instance().SetSmokeState(kTestEndpointId, AlarmStateEnum::kCritical)));
+    EXPECT_TRUE((SmokeCoAlarmServer::Instance().SetSmokeState(kTestEndpointId, AlarmStateEnum::kNormal)));
+    SmokeCoAlarmServer::Instance().SetExpressedStateByPriority(kTestEndpointId, sPriorityOrder);
+    AlarmStateEnum smoke{};
+    EXPECT_TRUE(SmokeCoAlarmServer::Instance().GetSmokeState(smoke));
+    EXPECT_EQ(smoke, AlarmStateEnum::kNormal);
+    ExpressedStateEnum expressed{};
+    EXPECT_TRUE(SmokeCoAlarmServer::Instance().GetExpressedState(expressed));
+    EXPECT_EQ(expressed, ExpressedStateEnum::kNormal);
 }
 
 TEST_F(TestSmokeCoAlarmBackwardsCompatInitialized, RequestSelfTest_ForwardsToCluster)
 {
-    EXPECT_TRUE(server.RequestSelfTest());
+    EXPECT_TRUE(SmokeCoAlarmServer::Instance().RequestSelfTest());
     ExpressedStateEnum expressed{};
-    EXPECT_TRUE(server.GetExpressedState(expressed));
+    EXPECT_TRUE(SmokeCoAlarmServer::Instance().GetExpressedState(expressed));
     EXPECT_EQ(expressed, ExpressedStateEnum::kTesting);
 }
