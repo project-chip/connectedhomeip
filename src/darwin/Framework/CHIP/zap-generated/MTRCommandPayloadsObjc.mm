@@ -39542,15 +39542,13 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
             definedValue_2.CMAFInterface = static_cast<std::remove_reference_t<decltype(definedValue_2.CMAFInterface)>>(self.transportOptions.containerOptions.cmafContainerOptions.cmafInterface.unsignedCharValue);
             definedValue_2.segmentDuration = self.transportOptions.containerOptions.cmafContainerOptions.segmentDuration.unsignedShortValue;
             definedValue_2.chunkDuration = self.transportOptions.containerOptions.cmafContainerOptions.chunkDuration.unsignedShortValue;
-            definedValue_2.sessionGroup = self.transportOptions.containerOptions.cmafContainerOptions.sessionGroup.unsignedCharValue;
-            definedValue_2.trackName = AsCharSpan(self.transportOptions.containerOptions.cmafContainerOptions.trackName);
-            if (self.transportOptions.containerOptions.cmafContainerOptions.cencKey != nil) {
-                auto & definedValue_4 = definedValue_2.CENCKey.Emplace();
-                definedValue_4 = AsByteSpan(self.transportOptions.containerOptions.cmafContainerOptions.cencKey);
+            if (self.transportOptions.containerOptions.cmafContainerOptions.sessionGroup != nil) {
+                auto & definedValue_4 = definedValue_2.sessionGroup.Emplace();
+                definedValue_4 = self.transportOptions.containerOptions.cmafContainerOptions.sessionGroup.unsignedCharValue;
             }
-            if (self.transportOptions.containerOptions.cmafContainerOptions.cencKeyID != nil) {
-                auto & definedValue_4 = definedValue_2.CENCKeyID.Emplace();
-                definedValue_4 = AsByteSpan(self.transportOptions.containerOptions.cmafContainerOptions.cencKeyID);
+            if (self.transportOptions.containerOptions.cmafContainerOptions.trackName != nil) {
+                auto & definedValue_4 = definedValue_2.trackName.Emplace();
+                definedValue_4 = AsCharSpan(self.transportOptions.containerOptions.cmafContainerOptions.trackName);
             }
             if (self.transportOptions.containerOptions.cmafContainerOptions.metadataEnabled != nil) {
                 auto & definedValue_4 = definedValue_2.metadataEnabled.Emplace();
@@ -39833,21 +39831,19 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                 self.transportConfiguration.transportOptions.containerOptions.cmafContainerOptions.cmafInterface = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.transportConfiguration.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().CMAFInterface)];
                 self.transportConfiguration.transportOptions.containerOptions.cmafContainerOptions.segmentDuration = [NSNumber numberWithUnsignedShort:decodableStruct.transportConfiguration.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().segmentDuration];
                 self.transportConfiguration.transportOptions.containerOptions.cmafContainerOptions.chunkDuration = [NSNumber numberWithUnsignedShort:decodableStruct.transportConfiguration.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().chunkDuration];
-                self.transportConfiguration.transportOptions.containerOptions.cmafContainerOptions.sessionGroup = [NSNumber numberWithUnsignedChar:decodableStruct.transportConfiguration.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().sessionGroup];
-                self.transportConfiguration.transportOptions.containerOptions.cmafContainerOptions.trackName = AsString(decodableStruct.transportConfiguration.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().trackName);
-                if (self.transportConfiguration.transportOptions.containerOptions.cmafContainerOptions.trackName == nil) {
-                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
-                    return err;
-                }
-                if (decodableStruct.transportConfiguration.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().CENCKey.HasValue()) {
-                    self.transportConfiguration.transportOptions.containerOptions.cmafContainerOptions.cencKey = AsData(decodableStruct.transportConfiguration.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().CENCKey.Value());
+                if (decodableStruct.transportConfiguration.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().sessionGroup.HasValue()) {
+                    self.transportConfiguration.transportOptions.containerOptions.cmafContainerOptions.sessionGroup = [NSNumber numberWithUnsignedChar:decodableStruct.transportConfiguration.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().sessionGroup.Value()];
                 } else {
-                    self.transportConfiguration.transportOptions.containerOptions.cmafContainerOptions.cencKey = nil;
+                    self.transportConfiguration.transportOptions.containerOptions.cmafContainerOptions.sessionGroup = nil;
                 }
-                if (decodableStruct.transportConfiguration.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().CENCKeyID.HasValue()) {
-                    self.transportConfiguration.transportOptions.containerOptions.cmafContainerOptions.cencKeyID = AsData(decodableStruct.transportConfiguration.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().CENCKeyID.Value());
+                if (decodableStruct.transportConfiguration.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().trackName.HasValue()) {
+                    self.transportConfiguration.transportOptions.containerOptions.cmafContainerOptions.trackName = AsString(decodableStruct.transportConfiguration.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().trackName.Value());
+                    if (self.transportConfiguration.transportOptions.containerOptions.cmafContainerOptions.trackName == nil) {
+                        CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                        return err;
+                    }
                 } else {
-                    self.transportConfiguration.transportOptions.containerOptions.cmafContainerOptions.cencKeyID = nil;
+                    self.transportConfiguration.transportOptions.containerOptions.cmafContainerOptions.trackName = nil;
                 }
                 if (decodableStruct.transportConfiguration.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().metadataEnabled.HasValue()) {
                     self.transportConfiguration.transportOptions.containerOptions.cmafContainerOptions.metadataEnabled = [NSNumber numberWithBool:decodableStruct.transportConfiguration.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().metadataEnabled.Value()];
@@ -40134,15 +40130,13 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
             definedValue_2.CMAFInterface = static_cast<std::remove_reference_t<decltype(definedValue_2.CMAFInterface)>>(self.transportOptions.containerOptions.cmafContainerOptions.cmafInterface.unsignedCharValue);
             definedValue_2.segmentDuration = self.transportOptions.containerOptions.cmafContainerOptions.segmentDuration.unsignedShortValue;
             definedValue_2.chunkDuration = self.transportOptions.containerOptions.cmafContainerOptions.chunkDuration.unsignedShortValue;
-            definedValue_2.sessionGroup = self.transportOptions.containerOptions.cmafContainerOptions.sessionGroup.unsignedCharValue;
-            definedValue_2.trackName = AsCharSpan(self.transportOptions.containerOptions.cmafContainerOptions.trackName);
-            if (self.transportOptions.containerOptions.cmafContainerOptions.cencKey != nil) {
-                auto & definedValue_4 = definedValue_2.CENCKey.Emplace();
-                definedValue_4 = AsByteSpan(self.transportOptions.containerOptions.cmafContainerOptions.cencKey);
+            if (self.transportOptions.containerOptions.cmafContainerOptions.sessionGroup != nil) {
+                auto & definedValue_4 = definedValue_2.sessionGroup.Emplace();
+                definedValue_4 = self.transportOptions.containerOptions.cmafContainerOptions.sessionGroup.unsignedCharValue;
             }
-            if (self.transportOptions.containerOptions.cmafContainerOptions.cencKeyID != nil) {
-                auto & definedValue_4 = definedValue_2.CENCKeyID.Emplace();
-                definedValue_4 = AsByteSpan(self.transportOptions.containerOptions.cmafContainerOptions.cencKeyID);
+            if (self.transportOptions.containerOptions.cmafContainerOptions.trackName != nil) {
+                auto & definedValue_4 = definedValue_2.trackName.Emplace();
+                definedValue_4 = AsCharSpan(self.transportOptions.containerOptions.cmafContainerOptions.trackName);
             }
             if (self.transportOptions.containerOptions.cmafContainerOptions.metadataEnabled != nil) {
                 auto & definedValue_4 = definedValue_2.metadataEnabled.Emplace();
@@ -40711,21 +40705,19 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                         newElement_0.transportOptions.containerOptions.cmafContainerOptions.cmafInterface = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().CMAFInterface)];
                         newElement_0.transportOptions.containerOptions.cmafContainerOptions.segmentDuration = [NSNumber numberWithUnsignedShort:entry_0.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().segmentDuration];
                         newElement_0.transportOptions.containerOptions.cmafContainerOptions.chunkDuration = [NSNumber numberWithUnsignedShort:entry_0.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().chunkDuration];
-                        newElement_0.transportOptions.containerOptions.cmafContainerOptions.sessionGroup = [NSNumber numberWithUnsignedChar:entry_0.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().sessionGroup];
-                        newElement_0.transportOptions.containerOptions.cmafContainerOptions.trackName = AsString(entry_0.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().trackName);
-                        if (newElement_0.transportOptions.containerOptions.cmafContainerOptions.trackName == nil) {
-                            CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
-                            return err;
-                        }
-                        if (entry_0.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().CENCKey.HasValue()) {
-                            newElement_0.transportOptions.containerOptions.cmafContainerOptions.cencKey = AsData(entry_0.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().CENCKey.Value());
+                        if (entry_0.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().sessionGroup.HasValue()) {
+                            newElement_0.transportOptions.containerOptions.cmafContainerOptions.sessionGroup = [NSNumber numberWithUnsignedChar:entry_0.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().sessionGroup.Value()];
                         } else {
-                            newElement_0.transportOptions.containerOptions.cmafContainerOptions.cencKey = nil;
+                            newElement_0.transportOptions.containerOptions.cmafContainerOptions.sessionGroup = nil;
                         }
-                        if (entry_0.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().CENCKeyID.HasValue()) {
-                            newElement_0.transportOptions.containerOptions.cmafContainerOptions.cencKeyID = AsData(entry_0.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().CENCKeyID.Value());
+                        if (entry_0.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().trackName.HasValue()) {
+                            newElement_0.transportOptions.containerOptions.cmafContainerOptions.trackName = AsString(entry_0.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().trackName.Value());
+                            if (newElement_0.transportOptions.containerOptions.cmafContainerOptions.trackName == nil) {
+                                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                                return err;
+                            }
                         } else {
-                            newElement_0.transportOptions.containerOptions.cmafContainerOptions.cencKeyID = nil;
+                            newElement_0.transportOptions.containerOptions.cmafContainerOptions.trackName = nil;
                         }
                         if (entry_0.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().metadataEnabled.HasValue()) {
                             newElement_0.transportOptions.containerOptions.cmafContainerOptions.metadataEnabled = [NSNumber numberWithBool:entry_0.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().metadataEnabled.Value()];

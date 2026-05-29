@@ -23210,6 +23210,7 @@ typedef NS_ENUM(uint8_t, MTRPushAVStreamTransportTransportTriggerType) {
     MTRPushAVStreamTransportTransportTriggerTypeCommand MTR_PROVISIONALLY_AVAILABLE = 0x00,
     MTRPushAVStreamTransportTransportTriggerTypeMotion MTR_PROVISIONALLY_AVAILABLE = 0x01,
     MTRPushAVStreamTransportTransportTriggerTypeContinuous MTR_PROVISIONALLY_AVAILABLE = 0x02,
+    MTRPushAVStreamTransportTransportTriggerTypeAmbientContext MTR_PROVISIONALLY_AVAILABLE = 0x03,
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRPushAVStreamTransportTriggerActivationReason) {

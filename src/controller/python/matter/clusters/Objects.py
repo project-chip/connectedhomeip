@@ -52545,11 +52545,12 @@ class PushAvStreamTransport(Cluster):
             kCommand = 0x00
             kMotion = 0x01
             kContinuous = 0x02
+            kAmbientContext = 0x03
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 3
+            kUnknownEnumValue = 4
 
         class TriggerActivationReasonEnum(MatterIntEnum):
             kUserInitiated = 0x00
@@ -52652,20 +52653,16 @@ class PushAvStreamTransport(Cluster):
                         ClusterObjectFieldDescriptor(Label="CMAFInterface", Tag=0, Type=PushAvStreamTransport.Enums.CMAFInterfaceEnum),
                         ClusterObjectFieldDescriptor(Label="segmentDuration", Tag=1, Type=uint),
                         ClusterObjectFieldDescriptor(Label="chunkDuration", Tag=2, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="sessionGroup", Tag=3, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="trackName", Tag=4, Type=str),
-                        ClusterObjectFieldDescriptor(Label="CENCKey", Tag=5, Type=typing.Optional[bytes]),
-                        ClusterObjectFieldDescriptor(Label="CENCKeyID", Tag=6, Type=typing.Optional[bytes]),
+                        ClusterObjectFieldDescriptor(Label="sessionGroup", Tag=3, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="trackName", Tag=4, Type=typing.Optional[str]),
                         ClusterObjectFieldDescriptor(Label="metadataEnabled", Tag=7, Type=typing.Optional[bool]),
                     ])
 
             CMAFInterface: 'PushAvStreamTransport.Enums.CMAFInterfaceEnum' = 0
             segmentDuration: 'uint' = 0
             chunkDuration: 'uint' = 0
-            sessionGroup: 'uint' = 0
-            trackName: 'str' = ""
-            CENCKey: 'typing.Optional[bytes]' = None
-            CENCKeyID: 'typing.Optional[bytes]' = None
+            sessionGroup: 'typing.Optional[uint]' = None
+            trackName: 'typing.Optional[str]' = None
             metadataEnabled: 'typing.Optional[bool]' = None
 
         @dataclass
@@ -53012,14 +53009,14 @@ class PushAvStreamTransport(Cluster):
                         ClusterObjectFieldDescriptor(Label="connectionID", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(Label="triggerType", Tag=1, Type=PushAvStreamTransport.Enums.TransportTriggerTypeEnum),
                         ClusterObjectFieldDescriptor(Label="activationReason", Tag=2, Type=typing.Optional[PushAvStreamTransport.Enums.TriggerActivationReasonEnum]),
-                        ClusterObjectFieldDescriptor(Label="containerType", Tag=3, Type=PushAvStreamTransport.Enums.ContainerFormatEnum),
+                        ClusterObjectFieldDescriptor(Label="containerType", Tag=3, Type=typing.Optional[PushAvStreamTransport.Enums.ContainerFormatEnum]),
                         ClusterObjectFieldDescriptor(Label="CMAFSessionNumber", Tag=4, Type=typing.Optional[uint]),
                     ])
 
             connectionID: uint = 0
             triggerType: PushAvStreamTransport.Enums.TransportTriggerTypeEnum = 0
             activationReason: typing.Optional[PushAvStreamTransport.Enums.TriggerActivationReasonEnum] = None
-            containerType: PushAvStreamTransport.Enums.ContainerFormatEnum = 0
+            containerType: typing.Optional[PushAvStreamTransport.Enums.ContainerFormatEnum] = None
             CMAFSessionNumber: typing.Optional[uint] = None
 
         @dataclass
@@ -53037,12 +53034,12 @@ class PushAvStreamTransport(Cluster):
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="connectionID", Tag=0, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="containerType", Tag=1, Type=PushAvStreamTransport.Enums.ContainerFormatEnum),
+                        ClusterObjectFieldDescriptor(Label="containerType", Tag=1, Type=typing.Optional[PushAvStreamTransport.Enums.ContainerFormatEnum]),
                         ClusterObjectFieldDescriptor(Label="CMAFSessionNumber", Tag=2, Type=typing.Optional[uint]),
                     ])
 
             connectionID: uint = 0
-            containerType: PushAvStreamTransport.Enums.ContainerFormatEnum = 0
+            containerType: typing.Optional[PushAvStreamTransport.Enums.ContainerFormatEnum] = None
             CMAFSessionNumber: typing.Optional[uint] = None
 
 

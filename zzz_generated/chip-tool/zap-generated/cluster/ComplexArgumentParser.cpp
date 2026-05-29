@@ -8611,10 +8611,6 @@ ComplexArgumentParser::Setup(const char * label,
                                                                   value.isMember("segmentDuration")));
     ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("CMAFContainerOptionsStruct.chunkDuration", "chunkDuration",
                                                                   value.isMember("chunkDuration")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("CMAFContainerOptionsStruct.sessionGroup", "sessionGroup",
-                                                                  value.isMember("sessionGroup")));
-    ReturnErrorOnFailure(
-        ComplexArgumentParser::EnsureMemberExist("CMAFContainerOptionsStruct.trackName", "trackName", value.isMember("trackName")));
 
     char labelWithMember[kMaxLabelLength];
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "CMAFInterface");
@@ -8629,27 +8625,19 @@ ComplexArgumentParser::Setup(const char * label,
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.chunkDuration, value["chunkDuration"]));
     valueCopy.removeMember("chunkDuration");
 
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "sessionGroup");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.sessionGroup, value["sessionGroup"]));
+    if (value.isMember("sessionGroup"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "sessionGroup");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.sessionGroup, value["sessionGroup"]));
+    }
     valueCopy.removeMember("sessionGroup");
 
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "trackName");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.trackName, value["trackName"]));
+    if (value.isMember("trackName"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "trackName");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.trackName, value["trackName"]));
+    }
     valueCopy.removeMember("trackName");
-
-    if (value.isMember("CENCKey"))
-    {
-        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "CENCKey");
-        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.CENCKey, value["CENCKey"]));
-    }
-    valueCopy.removeMember("CENCKey");
-
-    if (value.isMember("CENCKeyID"))
-    {
-        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "CENCKeyID");
-        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.CENCKeyID, value["CENCKeyID"]));
-    }
-    valueCopy.removeMember("CENCKeyID");
 
     if (value.isMember("metadataEnabled"))
     {
@@ -8669,8 +8657,6 @@ void ComplexArgumentParser::Finalize(
     ComplexArgumentParser::Finalize(request.chunkDuration);
     ComplexArgumentParser::Finalize(request.sessionGroup);
     ComplexArgumentParser::Finalize(request.trackName);
-    ComplexArgumentParser::Finalize(request.CENCKey);
-    ComplexArgumentParser::Finalize(request.CENCKeyID);
     ComplexArgumentParser::Finalize(request.metadataEnabled);
 }
 

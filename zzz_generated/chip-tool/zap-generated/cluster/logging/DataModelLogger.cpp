@@ -7655,22 +7655,6 @@ CHIP_ERROR DataModelLogger::LogValue(
         }
     }
     {
-        CHIP_ERROR err = LogValue("CENCKey", indent + 1, value.CENCKey);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'CENCKey'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("CENCKeyID", indent + 1, value.CENCKeyID);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'CENCKeyID'");
-            return err;
-        }
-    }
-    {
         CHIP_ERROR err = LogValue("MetadataEnabled", indent + 1, value.metadataEnabled);
         if (err != CHIP_NO_ERROR)
         {
