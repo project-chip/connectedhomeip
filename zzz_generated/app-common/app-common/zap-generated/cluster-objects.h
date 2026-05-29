@@ -179,6 +179,10 @@
 #include <clusters/DoorLock/Commands.h>
 #include <clusters/DoorLock/Events.h>
 #include <clusters/DoorLock/Structs.h>
+#include <clusters/DynamicLighting/Attributes.h>
+#include <clusters/DynamicLighting/Commands.h>
+#include <clusters/DynamicLighting/Events.h>
+#include <clusters/DynamicLighting/Structs.h>
 #include <clusters/EcosystemInformation/Attributes.h>
 #include <clusters/EcosystemInformation/Commands.h>
 #include <clusters/EcosystemInformation/Events.h>
@@ -255,6 +259,10 @@
 #include <clusters/HepaFilterMonitoring/Commands.h>
 #include <clusters/HepaFilterMonitoring/Events.h>
 #include <clusters/HepaFilterMonitoring/Structs.h>
+#include <clusters/Humidistat/Attributes.h>
+#include <clusters/Humidistat/Commands.h>
+#include <clusters/Humidistat/Events.h>
+#include <clusters/Humidistat/Structs.h>
 #include <clusters/IcdManagement/Attributes.h>
 #include <clusters/IcdManagement/Commands.h>
 #include <clusters/IcdManagement/Events.h>
@@ -335,6 +343,10 @@
 #include <clusters/NetworkCommissioning/Commands.h>
 #include <clusters/NetworkCommissioning/Events.h>
 #include <clusters/NetworkCommissioning/Structs.h>
+#include <clusters/NetworkIdentityManagement/Attributes.h>
+#include <clusters/NetworkIdentityManagement/Commands.h>
+#include <clusters/NetworkIdentityManagement/Events.h>
+#include <clusters/NetworkIdentityManagement/Structs.h>
 #include <clusters/NitrogenDioxideConcentrationMeasurement/Attributes.h>
 #include <clusters/NitrogenDioxideConcentrationMeasurement/Commands.h>
 #include <clusters/NitrogenDioxideConcentrationMeasurement/Events.h>
@@ -403,6 +415,10 @@
 #include <clusters/PressureMeasurement/Commands.h>
 #include <clusters/PressureMeasurement/Events.h>
 #include <clusters/PressureMeasurement/Structs.h>
+#include <clusters/ProximityRanging/Attributes.h>
+#include <clusters/ProximityRanging/Commands.h>
+#include <clusters/ProximityRanging/Events.h>
+#include <clusters/ProximityRanging/Structs.h>
 #include <clusters/ProxyConfiguration/Attributes.h>
 #include <clusters/ProxyConfiguration/Commands.h>
 #include <clusters/ProxyConfiguration/Events.h>
@@ -471,6 +487,10 @@
 #include <clusters/SmokeCoAlarm/Commands.h>
 #include <clusters/SmokeCoAlarm/Events.h>
 #include <clusters/SmokeCoAlarm/Structs.h>
+#include <clusters/SmokeConcentrationMeasurement/Attributes.h>
+#include <clusters/SmokeConcentrationMeasurement/Commands.h>
+#include <clusters/SmokeConcentrationMeasurement/Events.h>
+#include <clusters/SmokeConcentrationMeasurement/Structs.h>
 #include <clusters/SoftwareDiagnostics/Attributes.h>
 #include <clusters/SoftwareDiagnostics/Commands.h>
 #include <clusters/SoftwareDiagnostics/Events.h>
@@ -523,10 +543,6 @@
 #include <clusters/TimeSynchronization/Commands.h>
 #include <clusters/TimeSynchronization/Events.h>
 #include <clusters/TimeSynchronization/Structs.h>
-#include <clusters/Timer/Attributes.h>
-#include <clusters/Timer/Commands.h>
-#include <clusters/Timer/Events.h>
-#include <clusters/Timer/Structs.h>
 #include <clusters/TlsCertificateManagement/Attributes.h>
 #include <clusters/TlsCertificateManagement/Commands.h>
 #include <clusters/TlsCertificateManagement/Events.h>

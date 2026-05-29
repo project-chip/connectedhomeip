@@ -17,7 +17,7 @@ from __future__ import annotations
 
 import os
 from dataclasses import dataclass
-from typing import Any, Tuple, Union
+from typing import Any, Union
 
 from .errors import (TestStepArgumentsValueError, TestStepError, TestStepGroupEndPointError, TestStepGroupResponseError,
                      TestStepInvalidTypeError, TestStepKeyError, TestStepNodeIdAndGroupIdError, TestStepResponseVariableError,
@@ -37,6 +37,13 @@ _TOP_LEVEL_SCHEMA = {
     'PICS': (str, list),
     'config': dict,
     'tests': list,
+    'CI': list,
+}
+
+_CI_SCHEMA = {
+    'name': str,
+    'app': str,
+    'args': (type(None), list),
 }
 
 _TEST_STEP_SCHEMA = {
@@ -145,17 +152,19 @@ _test_step_tree = SchemaTree(schema=_TEST_STEP_SCHEMA, children={
                              'arguments': _arguments_tree, 'response': _response_tree})
 
 _config_variable_tree = SchemaTree(schema=_CONFIG_VARIABLE_SCHEMA)
+
 _config_tree = SchemaTree(schema=_CONFIG_SCHEMA, children={
-                          '_variableName_': _config_variable_tree})
+    '_variableName_': _config_variable_tree})
+_ci_tree = SchemaTree(schema=_CI_SCHEMA)
 
 yaml_tree = SchemaTree(schema=_TOP_LEVEL_SCHEMA, children={
-                       'tests': _test_step_tree, 'config': _config_tree})
+    'tests': _test_step_tree, 'config': _config_tree, 'CI': _ci_tree})
 
 
 class YamlLoader:
     """This class loads a file from the disk and validates that the content is a well formed yaml test."""
 
-    def load(self, yaml_file: str) -> Tuple[str, Union[list, str], dict, list]:
+    def load(self, yaml_file: str) -> tuple[str, Union[list, str], dict, list]:
         filename = ''
         name = ''
         pics = None

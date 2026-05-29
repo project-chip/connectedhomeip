@@ -82,6 +82,7 @@ void LayerImplSelect::Shutdown()
 {
     VerifyOrReturn(mLayerState.SetShuttingDown());
 
+    EventSourceClear();
 #if CHIP_SYSTEM_CONFIG_USE_LIBEV
     TimerList::Node * timer;
     while ((timer = mTimerList.PopEarliest()) != nullptr)
@@ -519,6 +520,32 @@ void LayerImplSelect::RemoveLoopHandler(EventLoopHandler & handler)
     LoopHandlerState(handler) = kLoopHandlerInactive;
 }
 
+void LayerImplSelect::EventSourceAdd(EventSource * source)
+{
+    assertChipStackLockedByCurrentThread();
+    if (mSources.Contains(source))
+    {
+        ChipLogDetail(DeviceLayer, "Warning: the EventSource is already added");
+        return;
+    }
+    mSources.PushBack(source);
+}
+
+void LayerImplSelect::EventSourceRemove(EventSource * source)
+{
+    assertChipStackLockedByCurrentThread();
+    if (mSources.Contains(source))
+    {
+        mSources.Remove(source);
+    }
+}
+
+void LayerImplSelect::EventSourceClear()
+{
+    assertChipStackLockedByCurrentThread();
+    mSources.Clear();
+}
+
 void LayerImplSelect::PrepareEvents()
 {
     assertChipStackLockedByCurrentThread();
@@ -565,6 +592,11 @@ void LayerImplSelect::PrepareEvents()
     FD_SET(mWakeEvent.GetReadFD(), &mSelected.mReadSet);
     mMaxFd = mWakeEvent.GetReadFD();
 #endif
+
+    for (auto & source : mSources)
+    {
+        source.PrepareEvents(mMaxFd, mSelected.mReadSet, mSelected.mWriteSet, mSelected.mErrorSet, mNextTimeout);
+    }
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     for (auto & w : mSocketWatchPool)
@@ -642,6 +674,14 @@ void LayerImplSelect::HandleEvents()
         }
     }
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
+
+    if (mSelectResult >= 0)
+    {
+        for (auto & source : mSources)
+        {
+            source.ProcessEvents(mSelected.mReadSet, mSelected.mWriteSet, mSelected.mErrorSet);
+        }
+    }
 
     // Call HandleEvents for active loop handlers
     auto loopIter = mLoopHandlers.begin();

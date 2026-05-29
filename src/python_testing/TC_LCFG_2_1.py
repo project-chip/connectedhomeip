@@ -45,8 +45,8 @@ import matter.clusters as Clusters
 from matter.interaction_model import Status
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches
 from matter.testing.matter_asserts import assert_non_empty_string
-from matter.testing.matter_testing import MatterBaseTest, TestStep
-from matter.testing.runner import default_matter_test_main
+from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
@@ -55,11 +55,11 @@ class Test_TC_LCFG_2_1(MatterBaseTest):
     def pics_TC_LCFG_2_1(self) -> list[str]:
         return ["LCFG.S"]
 
-    def has_repeated_values(self, list):
-        return len(list) != len(set(list))
+    def has_repeated_values(self, lst):
+        return len(lst) != len(set(lst))
 
-    def supported_locales_has_active_locale(self, list, str):
-        return str in list
+    def supported_locales_has_active_locale(self, lst, s):
+        return s in lst
 
     def steps_TC_LCFG_2_1(self) -> list[TestStep]:
         return [

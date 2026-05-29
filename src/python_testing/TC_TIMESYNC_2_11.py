@@ -38,27 +38,27 @@
 import asyncio
 import contextlib
 import queue
-import typing
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 from mobly import asserts
 
 import matter.clusters as Clusters
+import matter.testing.matchers as matchers
 from matter.clusters.Types import NullValue
 from matter.interaction_model import InteractionModelError
 from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import EventSubscriptionHandler
-from matter.testing.matter_testing import MatterBaseTest, matchers
+from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import default_matter_test_main
 from matter.testing.timeoperations import get_wait_seconds_from_set_time, utc_time_in_matter_epoch
 from matter.tlv import uint
 
 
 class TC_TIMESYNC_2_11(MatterBaseTest):
-    async def send_set_time_zone_cmd(self, tz: typing.List[Clusters.Objects.TimeSynchronization.Structs.TimeZoneStruct]) -> Clusters.Objects.TimeSynchronization.Commands.SetTimeZoneResponse:
+    async def send_set_time_zone_cmd(self, tz: list[Clusters.Objects.TimeSynchronization.Structs.TimeZoneStruct]) -> Clusters.Objects.TimeSynchronization.Commands.SetTimeZoneResponse:
         return await self.send_single_cmd(cmd=Clusters.Objects.TimeSynchronization.Commands.SetTimeZone(timeZone=tz), endpoint=self.endpoint)
 
-    async def send_set_dst_cmd(self, dst: typing.List[Clusters.Objects.TimeSynchronization.Structs.DSTOffsetStruct]) -> None:
+    async def send_set_dst_cmd(self, dst: list[Clusters.Objects.TimeSynchronization.Structs.DSTOffsetStruct]) -> None:
         await self.send_single_cmd(cmd=Clusters.Objects.TimeSynchronization.Commands.SetDSTOffset(DSTOffset=dst))
 
     async def send_set_utc_cmd(self, utc: uint) -> None:
@@ -127,12 +127,12 @@ class TC_TIMESYNC_2_11(MatterBaseTest):
         asserts.assert_greater_equal(dst_list_size, 1, "Invalid dst list size")
 
         self.print_step(5, "TH sets two DST items if dst_list_size > 1")
-        th_utc = utc_time_in_matter_epoch(datetime.now(tz=timezone.utc))
-        expiry_first = utc_time_in_matter_epoch(datetime.now(tz=timezone.utc) + timedelta(seconds=10))
+        th_utc = utc_time_in_matter_epoch(datetime.now(tz=UTC))
+        expiry_first = utc_time_in_matter_epoch(datetime.now(tz=UTC) + timedelta(seconds=10))
         dst_first = dst_struct(offset=3600, validStarting=0, validUntil=expiry_first)
         if dst_list_size > 1:
-            start_second = utc_time_in_matter_epoch(datetime.now(tz=timezone.utc) + timedelta(seconds=25))
-            expiry_second = utc_time_in_matter_epoch(datetime.now(tz=timezone.utc) + timedelta(seconds=40))
+            start_second = utc_time_in_matter_epoch(datetime.now(tz=UTC) + timedelta(seconds=25))
+            expiry_second = utc_time_in_matter_epoch(datetime.now(tz=UTC) + timedelta(seconds=40))
             dst_second = dst_struct(offset=3600, validStarting=start_second, validUntil=expiry_second)
             dst = [dst_first, dst_second]
             await self.send_set_dst_cmd(dst)

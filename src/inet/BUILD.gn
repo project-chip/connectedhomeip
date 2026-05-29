@@ -14,7 +14,6 @@
 
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
-import("//build_overrides/nlassert.gni")
 import("//build_overrides/nlfaultinjection.gni")
 
 import("${chip_root}/build/chip/buildconfig_header.gni")
@@ -152,7 +151,7 @@ static_library("inet") {
 
   if (chip_system_config_use_openthread_inet_endpoints &&
       current_os != "zephyr") {
-    public_deps += [ "${chip_root}/third_party/openthread:openthread" ]
+    public_deps += [ "${chip_root}/third_party/openthread" ]
   }
 
   if (chip_inet_config_enable_tcp_endpoint) {

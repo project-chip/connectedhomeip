@@ -18,8 +18,6 @@
 #include <clusters/Chime/Metadata.h>
 #include <pw_unit_test/framework.h>
 
-#include <app/DefaultSafeAttributePersistenceProvider.h>
-#include <app/SafeAttributePersistenceProvider.h>
 #include <app/server-cluster/testing/AttributeTesting.h>
 #include <app/server-cluster/testing/ClusterTester.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
@@ -75,7 +73,7 @@ public:
         }
         return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
     }
-    Protocols::InteractionModel::Status PlayChimeSound() override
+    Protocols::InteractionModel::Status PlayChimeSound(uint8_t chimeID) override
     {
         playChimeSoundCalled = true;
         return playChimeSoundStatus;
@@ -87,22 +85,15 @@ struct TestChimeCluster : public ::testing::Test
     static void SetUpTestSuite() { ASSERT_EQ(Platform::MemoryInit(), CHIP_NO_ERROR); }
     static void TearDownTestSuite() { Platform::MemoryShutdown(); }
 
-    void SetUp() override
-    {
-        VerifyOrDie(mPersistenceProvider.Init(&mClusterTester.GetServerClusterContext().storage) == CHIP_NO_ERROR);
-        app::SetSafeAttributePersistenceProvider(&mPersistenceProvider);
-        EXPECT_EQ(mCluster.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
-    }
+    void SetUp() override { EXPECT_EQ(mCluster.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR); }
 
-    void TearDown() override { app::SetSafeAttributePersistenceProvider(nullptr); }
+    void TearDown() override {}
 
     MockChimeDelegate mMockDelegate;
 
     ChimeCluster mCluster{ kTestEndpointId, mMockDelegate };
 
     ClusterTester mClusterTester{ mCluster };
-
-    app::DefaultSafeAttributePersistenceProvider mPersistenceProvider;
 };
 
 TEST_F(TestChimeCluster, TestAttributesList)
@@ -255,9 +246,6 @@ TEST_F(TestChimeCluster, TestWriteAttributes)
 TEST_F(TestChimeCluster, TestPersistence)
 {
     TestServerClusterContext context;
-    app::DefaultSafeAttributePersistenceProvider persistenceProvider;
-    EXPECT_EQ(persistenceProvider.Init(&context.Get().storage), CHIP_NO_ERROR);
-    app::SetSafeAttributePersistenceProvider(&persistenceProvider);
     MockChimeDelegate mockDelegate;
 
     // 1. Initial startup, verify default values

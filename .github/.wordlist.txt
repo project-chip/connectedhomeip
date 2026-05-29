@@ -39,6 +39,7 @@ aef
 AES
 AFL
 AIDL
+aliased
 algs
 alloc
 allocator
@@ -72,6 +73,7 @@ approver
 appspot
 appwrite
 aps
+ARD
 arg
 argc
 args
@@ -80,10 +82,6 @@ armeabi
 armino
 ARMmbed
 armv
-ARD
-SCL
-SDA
-VCC
 ASAN
 asdk
 ASR
@@ -93,6 +91,7 @@ ASYNC
 AsyncZeroconfServiceTypes
 ATL
 ATLs
+atomicity
 atomics
 att
 attId
@@ -128,6 +127,7 @@ backend
 backends
 backticks
 backtrace
+backwards
 BallastConfiguration
 BarrierControl
 BasicCHIPRegression
@@ -160,7 +160,9 @@ blocklist
 blockquote
 bluetoothd
 bluez
+Bonjour
 BOOL
+boolean
 booleans
 BooleanState
 bootable
@@ -191,6 +193,8 @@ bz
 bzip
 CACACACA
 cacerts
+callsite
+callsites
 CAfile
 cancelled
 capacitive
@@ -210,6 +214,7 @@ CCXML
 CDEEDC
 CDVersionNumber
 ced
+centric
 cfg
 CFLAGS
 cgit
@@ -246,6 +251,7 @@ ChlorodibromomethaneConcentrationMeasurement
 ChloroformConcentrationMeasurement
 chmod
 chown
+chroot
 chrpath
 CIPD
 CircleCI
@@ -290,6 +296,7 @@ commissionables
 commissionee
 CommissioningFlow
 commondatastorage
+Compat
 CONF
 CONFIG
 ConfigDescription
@@ -339,8 +346,8 @@ cstdint
 csu
 csv
 ctl
-CTS
 ctrl
+CTS
 ctypes
 CurrentHue
 CurrentLevel
@@ -398,13 +405,17 @@ delayedQueryActionTimeSec
 delayQuery
 deliverables
 demangle
+dep
 Depacketization
 deployable
 depottools
 deps
 der
+dereference
+dereferencing
 desc
 descheduled
+destructor
 detokenization
 detokenizer
 dev
@@ -425,6 +436,7 @@ DeviceNetworkProvisioningDelegate
 DeviceNetworkProvisioningDelegateImpl
 DevicePairingDelegate
 DeviceTemperatureConfiguration
+Devkit
 DevKitC
 DevKitM
 devtype
@@ -478,6 +490,7 @@ downcasting
 DownloadProtocolEnum
 Doxygen
 dpkg
+drawables
 dropdown
 dryrun
 DS
@@ -552,9 +565,11 @@ EvalFrameDefault
 EVB
 EventLogging
 evk
+EVKBMIMXRT
 EVSE
 exceptfds
 ExchangeContext
+Excludable
 exe
 ExecStart
 executables
@@ -577,6 +592,7 @@ FDDE
 fddead
 fde
 fdx
+featuremap
 FECA
 FecalColiformAndEColiConcentrationMeasurement
 feff
@@ -589,32 +605,39 @@ FFFFFFFFFFFF0102
 FFmpeg
 Fi
 filepath
+filesystems
 fini
 FixedLabel
+fixups
 flashdebug
 FlowMeasurement
 FluorideConcentrationMeasurement
 focusable
 forkpty
+FormaldehydeConcentrationMeasurement
 formatter
 formatters
+forwarding
 FOTA
 framerate
+FRDM
 FreeRTOS
 FreeRTOSConfig
-FRDM
 FS
 fsl
 fstab
 fsync
 ftd
+ftr
 fullclean
 fuzzer
 fuzzers
 fuzztest
+fvisibility
 FW
 Fxx
 gbl
+gc
 gcloud
 GDB
 gdbgui
@@ -673,6 +696,7 @@ gzbf
 HaloaceticAcidsConcentrationMeasurement
 HandleCommand
 hardcoded
+hardcodes
 hardknott
 hardwarever
 HardwareVersion
@@ -694,7 +718,6 @@ hostname
 hotfixes
 href
 hsm
-HSM
 HTTPS
 Humidistat
 HW
@@ -711,6 +734,7 @@ ICD
 ICDs
 iCloud
 ICMP
+idempotency
 IDF
 IDL
 IDLs
@@ -742,7 +766,11 @@ Infineon
 ini
 init
 InitArgs
+initialize
+initializer
+initializers
 inlined
+inlining
 InputLoop
 installDebug
 instantiation
@@ -750,6 +778,7 @@ integrations
 IntelliSense
 InteractionModelEngine
 InteractionModelVersion
+interop
 Interoperable
 introvideos
 InvokeCommandRequests
@@ -789,6 +818,8 @@ jpg
 jre
 js
 json
+jsoncpp
+jsontlv
 JTAG
 Jupyter
 jupyterlab
@@ -838,6 +869,7 @@ libglib
 libical
 libncurses
 libreadline
+libs
 libsdl
 libshell
 libssl
@@ -853,6 +885,7 @@ lightin
 LightingApp
 LightingColor
 LightingState
+linker's
 LinkSoftwareAndDocumentationPack
 linter
 linters
@@ -864,8 +897,8 @@ localhost
 LocalizationConfiguration
 localstatedir
 LockingState
-lookups
 LogEvent
+lookups
 loopback
 LowPower
 LPC
@@ -945,6 +978,7 @@ middleware
 MIMXRT
 minApplicableSoftwareVersion
 Minicom
+minifyEnabled
 MinInterval
 MinIntervalFloorSeconds
 minLength
@@ -956,6 +990,7 @@ MLD
 mmevk
 moal
 Mobly
+Mockito
 ModeSelect
 modprobe
 Modustoolbox
@@ -1037,6 +1072,7 @@ nwk
 NXP
 objcopy
 OccupancySensing
+OCMock
 OctetString
 OECORE
 OID
@@ -1066,8 +1102,8 @@ optionMask
 optionOverride
 optionsMask
 optionsOverride
-orgs
 Orchestrator
+orgs
 OSS
 OTA
 OTADownloader
@@ -1115,6 +1151,7 @@ params
 PartNumber
 PASE
 Passcode
+passcodes
 passRetained
 passwd
 Pausable
@@ -1150,6 +1187,9 @@ plaintext
 PlatformManager
 PlatformManagerImpl
 plt
+Pm1ConcentrationMeasurement
+Pm10ConcentrationMeasurement
+Pm25ConcentrationMeasurement
 PluginServerCallback
 png
 Podman
@@ -1163,8 +1203,10 @@ PowerConfiguration
 PowerProfile
 PowerSource
 PowerSourceConfiguration
+ppm
 pre
 PrebuiltDataModelDirectory
+prepends
 preprocessor
 Presetup
 PressureMeasurement
@@ -1224,6 +1266,7 @@ queryImageStatus
 Quickstart
 qvCHIP
 RADVD
+RadonConcentrationMeasurement
 raspberryPi
 RasPi
 rAv
@@ -1242,11 +1285,16 @@ Realtek
 rebase
 recommand
 recommanded
+Reconnection
+reconnections
 recurse
 refrigeratoralarm
 regen
 registerAttributeAccessOverride
+registration
 RegisterCommandHandler
+registry
+registrations
 RelativeHumidityMeasurement
 RemainAfterExit
 remoteDeviceId
@@ -1274,6 +1322,7 @@ riscv
 rloc
 rmw
 rnd
+Robolectric
 rodata
 Rollershade
 rootfs
@@ -1313,10 +1362,12 @@ scalability
 scalable
 schema
 schemas
+SCL
 scm
 sco
 scp
 ScriptBinding
+SDA
 SDB
 SDC
 SDHC
@@ -1363,6 +1414,7 @@ Silabs's
 SiliconLabs
 SimpleFileExFlags
 SimpleLink
+simw
 SiWx
 sizedb
 sl
@@ -1400,6 +1452,7 @@ StartScan
 startsWith
 StatusCode
 stderr
+stdlib
 stdout
 sterm
 stlink
@@ -1416,6 +1469,7 @@ subcommand
 subcommands
 subdirectories
 subdirectory
+subflag
 subfolder
 submodule
 submodules
@@ -1434,6 +1488,7 @@ svg
 SVR
 SWD
 SWU
+symlink
 symlinks
 sysbuild
 sysconfdir
@@ -1441,6 +1496,7 @@ SysConfig
 sysctl
 sysdeps
 SYSROOT
+sysroots
 systemctl
 systemd
 systemdsystemunitdir
@@ -1456,6 +1512,7 @@ TCP
 teardown
 Telink
 TemperatureMeasurement
+templated
 templating
 Tera
 testability
@@ -1517,6 +1574,7 @@ tos
 TotalColiformBacteriaConcentrationMeasurement
 totalTests
 TotalTrihalomethanesConcentrationMeasurement
+TotalVolatileOrganicCompoundsConcentrationMeasurement
 TPK
 trackAlloc
 trackFree
@@ -1567,8 +1625,11 @@ Unicast
 UniFlash
 UnitLocalization
 unittest
+unlinking
 unpair
 unprovisioned
+unreferenced
+unregister
 unregistration
 Unsecure
 Unselect
@@ -1598,6 +1659,7 @@ UUID
 ux
 valgrind
 validator
+VCC
 vcom
 VCP
 Vectorcall
@@ -1622,6 +1684,7 @@ vous
 VPN
 VSC
 VSCode
+vtable
 WaitNewInputEvent
 WakeOnLan
 Walkthrough
@@ -1663,6 +1726,7 @@ xcd
 Xcode
 xcodebuild
 xcodeproj
+Xcode's
 xcworkspace
 xd
 xds
@@ -1707,9 +1771,10 @@ zclsubscribe
 zclwrite
 ZephyrConfig
 zephyrproject
-zhengyaohan
 Zeroconf
+zhengyaohan
 Zigbee
 zigbeealliance
 zigbeethread
 zsdk
+ZXing

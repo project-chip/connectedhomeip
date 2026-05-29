@@ -69,12 +69,13 @@ import tempfile
 from mobly import asserts
 
 import matter.clusters as Clusters
+import matter.testing.matchers as matchers
 from matter import ChipDeviceCtrl
 from matter.interaction_model import Status
 from matter.testing.apps import AppServerSubprocess
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest, TestStep, matchers
-from matter.testing.runner import default_matter_test_main
+from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.runner import TestStep, default_matter_test_main
 from matter.testing.tasks import Subprocess
 
 log = logging.getLogger(__name__)
@@ -118,7 +119,7 @@ class FabricSyncApp(Subprocess):
         # Start process and block until it prints the expected output.
         super().start(expected_output="Successfully opened pairing window on the device")
 
-    def commission_on_network(self, node_id: int, setup_pin_code: int, filter_type=None, filter=None):
+    def commission_on_network(self, node_id: int, setup_pin_code: int, filter_type=None, filter_data=None):
         self.send(f"pairing onnetwork {node_id} {setup_pin_code}")
 
 
@@ -289,7 +290,7 @@ class TC_MCORE_FS_1_4(MatterBaseTest):
             node_id=th_server_th_fsa_node_id,
             setup_pin_code=params.setupPinCode,
             filter_type=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
-            filter=discriminator,
+            filter_data=discriminator,
         )
 
         get_dynamic_endpoint_retries = 60

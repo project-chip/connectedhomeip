@@ -36,7 +36,6 @@ else
     PW_PATH="$PW_ENVIRONMENT_ROOT/cipd/packages/pigweed"
 fi
 
-env
 USE_WIFI=false
 USE_DOCKER=false
 USE_GIT_SHA_FOR_VERSION=true
@@ -105,8 +104,6 @@ if [ "$#" == "0" ]; then
             --icd can be used to configure both arguments
         use_SiWx917
             Build wifi example with extension board SiWx917. (Default false)
-        use_wf200
-            Build wifi example with extension board wf200. (Default false)
         use_pw_rpc
             Use to build the example with pigweed RPC
         ota_periodic_query_timeout_sec
@@ -141,7 +138,7 @@ if [ "$#" == "0" ]; then
         --low-power
             disables all power consuming features for the most power efficient build
             This flag is to be used with --icd
-        --wifi <wf200 | SiWx917>
+        --wifi <SiWx917>
             build wifi example variant for given expansion board
         --additional_data_advertising
             enable Addition data advertissing and rotating device ID
@@ -189,16 +186,14 @@ else
                 ;;
             --wifi)
                 if [ -z "$2" ]; then
-                    echo "--wifi requires SiWx917 or wf200"
+                    echo "--wifi requires SiWx917"
                     exit 1
                 fi
 
                 if [ "$2" = "SiWx917" ]; then
                     optArgs+="use_SiWx917=true "
-                elif [ "$2" = "wf200" ]; then
-                    optArgs+="use_wf200=true "
                 else
-                    echo "Wifi usage: --wifi SiWx917|wf200"
+                    echo "Wifi usage: --wifi SiWx917"
                     exit 1
                 fi
 
@@ -273,7 +268,7 @@ else
                 shift
                 ;;
             --verbose)
-                optArgs+="sl_verbose_mode=true "
+                optArgs+="sl_verbose_mode=true chip_detail_logging=true "
                 VERBOSE_MODE=true
                 shift
                 ;;
@@ -293,7 +288,7 @@ else
                 shift
                 ;;
             *)
-                if [ "$1" =~ *"use_SiWx917=true"* ] || [ "$1" =~ *"use_wf200=true"* ]; then
+                if [[ "$1" == *use_SiWx917=true* ]]; then
                     USE_WIFI=true
                     # NCP Mode so base MCU is an EFR32
                     optArgs+="chip_device_platform =\"efr32\" "
@@ -324,6 +319,52 @@ else
         } &>/dev/null
     fi
 
+    # After a completed local install (.install-packages-done), run the Silabs package install step to check for updates. Docker never runs it (SDK is in the image).
+    if [ -f "$CHIP_ROOT/scripts/setup/silabs/.install-packages-done" ]; then # INSTALL_EVERYTHING
+        INSTALL_EVERYTHING=true
+    else
+        INSTALL_EVERYTHING=false
+    fi # INSTALL_EVERYTHING
+
+    # First-time local install: INSTALL_EVERYTHING is false until .install-packages-done (see above); respect opt-out. No prompt in Docker.
+    if [ "$USE_DOCKER" != true ] && [ "$INSTALL_EVERYTHING" != true ] && [ ! -f "$CHIP_ROOT/scripts/setup/silabs/.do-not-install-packages" ]; then # first-time install prompt
+        cat <<'EOF'
+        !!!!!!!!! FIRST TIME INSTALL !!!!!!!!!
+        Do you agree to install SILICON LABS PACKAGES MANAGER?
+
+        This will take around 8GB of spaces which will include but not limited to :
+        SLT (silabs packages manager), zap, arm-gcc,
+
+        Most of the files will be located under ~/.silabs,
+        some symbolic link will be created and it will replace simplicity_sdk submodule
+        This is required for the build to succeed.
+EOF
+
+        while true; do
+            read -p "Do you want to proceed? [Y/n]: " yn
+            case $yn in
+                "" | [Yy]*)
+                    INSTALL_EVERYTHING=true
+                    python3 -m pip install -q -r "$CHIP_ROOT/integrations/docker/images/stage-2/chip-build-efr32/requirements.txt" >/dev/null 2>&1 || true
+                    break
+                    ;; # Case for yes/Y (Enter accepts default)
+                [Nn]*)
+                    echo "You won't be asked again, cannot proceed with build. Exiting..."
+                    touch "$CHIP_ROOT/scripts/setup/silabs/.do-not-install-packages"
+                    exit 1
+                    break
+                    ;;                                                  # Case for no/N
+                *) echo "Invalid response. Please answer yes or no." ;; # Case for invalid input
+            esac
+        done
+    fi # first-time install prompt
+
+    # Local Silabs package install when agreed (INSTALL_EVERYTHING). Never under Docker.
+    if [ "$INSTALL_EVERYTHING" == true ] && [ "$USE_DOCKER" != true ]; then # run install-packages
+        python3 -m pip install -q -r "$CHIP_ROOT/integrations/docker/images/stage-2/chip-build-efr32/requirements.txt"
+        python3 "$CHIP_ROOT/scripts/setup/silabs/install-packages.py" || exit 1
+    fi # run install-packages
+
     # Zap generation requires activation
     source "$CHIP_ROOT/scripts/activate.sh"
 
@@ -344,7 +385,11 @@ else
 
     if [ "$USE_DOCKER" == true ] && [ "$USE_WIFI" == false ]; then
         echo "Switching OpenThread ROOT"
-        optArgs+="openthread_root=\"$GSDK_ROOT/util/third_party/openthread\" "
+        optArgs+="openthread_root=\"$GSDK_ROOT/openthread_stack/util/third_party/openthread\" "
+    fi
+
+    if [ "$VERBOSE_MODE" == false ]; then
+        optArgs+="chip_detail_logging=false "
     fi
 
     "$GN_PATH" gen --check --script-executable="$PYTHON_PATH" --fail-on-unused-args --add-export-compile-commands=* --root="$ROOT" --dotfile="$DOTFILE" --args="silabs_board=\"$SILABS_BOARD\" $optArgs" "$BUILD_DIR"

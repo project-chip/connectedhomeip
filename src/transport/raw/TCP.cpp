@@ -65,11 +65,7 @@ CHIP_ERROR GetPeerAddress(Inet::TCPEndPoint & endPoint, PeerAddress & outAddr)
 
 } // namespace
 
-TCPBase::~TCPBase()
-{
-    // Call Close to free the listening socket and close all active connections.
-    Close();
-}
+TCPBase::~TCPBase() = default;
 
 void TCPBase::CloseActiveConnections()
 {
@@ -160,6 +156,8 @@ ActiveTCPConnectionState * TCPBase::AllocateConnection(const Inet::TCPEndPointHa
                 char addrStr[Transport::PeerAddress::kMaxToStringSize];
                 activeConnection->mPeerAddr.ToString(addrStr);
                 ChipLogError(Inet, "Leaked TCP connection %p to %s.", activeConnection, addrStr);
+                // Try to notify callbacks in the hope that they release; the connection is no good
+                CloseConnectionInternal(*activeConnection, CHIP_ERROR_CONNECTION_CLOSED_UNEXPECTEDLY, SuppressCallback::No);
             }
             ActiveTCPConnectionHandle releaseUnclaimed(activeConnection);
         }
@@ -317,9 +315,9 @@ CHIP_ERROR TCPBase::StartConnect(const PeerAddress & addr, Transport::AppTCPConn
     activeConnection->mAppState        = appState;
     activeConnection->mConnectionState = TCPState::kConnecting;
 
-    ReturnErrorOnFailure(endPoint->Connect(addr.GetIPAddress(), addr.GetPort(), addr.GetInterface()));
-
     mUsedEndPointCount++;
+
+    ReturnErrorOnFailure(endPoint->Connect(addr.GetIPAddress(), addr.GetPort(), addr.GetInterface()));
 
     // Set the return value of the peer connection state to the allocated
     // connection.
@@ -391,7 +389,7 @@ CHIP_ERROR TCPBase::ProcessReceivedBuffer(const Inet::TCPEndPointHandle & endPoi
             return err;
         }
         uint32_t messageSize = LittleEndian::Get32(messageSizeBuf);
-        if (messageSize >= kMaxTCPMessageSize)
+        if (messageSize > kMaxTCPMessageSize)
         {
             // Message is too big for this node to process. Disconnect from peer.
             ChipLogError(Inet, "Received TCP message of length %" PRIu32 " exceeds limit.", messageSize);
@@ -410,8 +408,10 @@ CHIP_ERROR TCPBase::ProcessReceivedBuffer(const Inet::TCPEndPointHandle & endPoi
 
         if (messageSize == 0)
         {
-            // No payload but considered a valid message. Return success to keep the connection alive.
-            return CHIP_NO_ERROR;
+            // Zero-length messages are not valid Matter messages. Reject to
+            // prevent attackers from holding TCP connection slots indefinitely.
+            ChipLogError(Inet, "Received zero-length TCP message, closing connection.");
+            return CHIP_ERROR_INVALID_MESSAGE_LENGTH;
         }
 
         ReturnErrorOnFailure(ProcessSingleMessage(peerAddress, *state, messageSize));

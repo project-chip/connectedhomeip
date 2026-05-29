@@ -42,7 +42,7 @@ void FetchDefaults(BitFlags<TimeFormatLocalization::Feature> featureMap, TimeFor
                    TimeFormatLocalization::CalendarTypeEnum & defaultCalendarType)
 {
     // hour format always supported
-    if (TimeFormatLocalization::Attributes::HourFormat::Get(kRootEndpointId, &defaultHourFormat) != Status::Success)
+    if (TimeFormatLocalization::Attributes::HourFormat::GetDefault(kRootEndpointId, &defaultHourFormat) != Status::Success)
     {
         CodegenInitError("Failed to get HourFormat for endpoint %u", kRootEndpointId);
         defaultHourFormat = TimeFormatLocalization::HourFormatEnum::k12hr;
@@ -52,7 +52,8 @@ void FetchDefaults(BitFlags<TimeFormatLocalization::Feature> featureMap, TimeFor
     defaultCalendarType = TimeFormatLocalization::CalendarTypeEnum::kGregorian;
     if (featureMap.Has(TimeFormatLocalization::Feature::kCalendarFormat))
     {
-        if (TimeFormatLocalization::Attributes::ActiveCalendarType::Get(kRootEndpointId, &defaultCalendarType) != Status::Success)
+        if (TimeFormatLocalization::Attributes::ActiveCalendarType::GetDefault(kRootEndpointId, &defaultCalendarType) !=
+            Status::Success)
         {
             CodegenInitError("Failed to get ActiveCalendarType for endpoint %u", kRootEndpointId);
             defaultCalendarType = TimeFormatLocalization::CalendarTypeEnum::kGregorian;
@@ -73,7 +74,14 @@ public:
         const BitFlags<TimeFormatLocalization::Feature> featureMap(rawFeatureMap);
         FetchDefaults(featureMap, defaultHourFormat, defaultCalendarType);
 
-        gServer.Create(endpointId, featureMap, defaultHourFormat, defaultCalendarType);
+        gServer.Create(endpointId, featureMap, defaultHourFormat, defaultCalendarType,
+                       TimeFormatLocalizationCluster::Context{
+                           .deviceInfoProvider = []() -> DeviceLayer::DeviceInfoProvider & {
+                               auto provider = DeviceLayer::GetDeviceInfoProvider();
+                               VerifyOrDie(provider != nullptr);
+                               return *provider;
+                           }(),
+                       });
 
         return gServer.Registration();
     }

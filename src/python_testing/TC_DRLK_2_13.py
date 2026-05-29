@@ -42,12 +42,13 @@ from dataclasses import dataclass
 from mobly import asserts
 
 import matter.clusters as Clusters
+import matter.testing.matchers as matchers
 from matter.clusters.Attribute import EventPriority
 from matter.clusters.Types import NullValue
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest, TestStep, matchers
-from matter.testing.runner import default_matter_test_main
+from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
@@ -394,7 +395,7 @@ class TC_DRLK_2_13(MatterBaseTest):
                                                                )
         self.step("1b")
         if self.pics_guard(self.check_pics("DRLK.S.C1d.Rsp")):
-            await self.send_clear_user_cmd(user_index=int(0xFFFE))
+            await self.send_clear_user_cmd(user_index=0xFFFE)
 
         self.step("1c")
         if self.pics_guard(self.check_pics("DRLK.S.C26.Rsp")):

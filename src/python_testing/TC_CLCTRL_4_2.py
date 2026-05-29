@@ -45,8 +45,8 @@ from matter.clusters.Types import Nullable, NullValue
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from matter.testing.matter_testing import AttributeMatcher, AttributeValue, MatterBaseTest, TestStep
-from matter.testing.runner import default_matter_test_main
+from matter.testing.matter_testing import AttributeMatcher, AttributeValue, MatterBaseTest
+from matter.testing.runner import TestStep, default_matter_test_main
 from matter.tlv import uint
 
 log = logging.getLogger(__name__)
@@ -172,7 +172,7 @@ class TC_CLCTRL_4_2(MatterBaseTest):
         timeout: uint = self.matter_test_config.timeout if self.matter_test_config.timeout is not None else self.default_timeout  # default_timeout = 90 seconds
 
         self.step(1)
-        attributes: typing.List[uint] = Clusters.ClosureControl.Attributes
+        attributes: list[uint] = Clusters.ClosureControl.Attributes
 
         self.step("2a")
         feature_map: uint = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.FeatureMap)

@@ -23,8 +23,8 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.testing.decorators import has_feature, run_if_endpoint_matches
-from matter.testing.matter_testing import MatterBaseTest, TestStep
-from matter.testing.runner import default_matter_test_main
+from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
@@ -81,11 +81,10 @@ class TC_CNET_4_15(MatterBaseTest):
 
         log.info(f"Attempting to remove network with ID: {network_id}")
 
-        read_networks = await self.read_single_attribute(
-            dev_ctrl=self.default_controller,
-            node_id=self.dut_node_id,
-            endpoint=0,
-            attribute=cnet.Attributes.Networks
+        read_networks = await self.read_single_attribute_check_success(
+            cluster=cnet,
+            attribute=cnet.Attributes.Networks,
+            endpoint=0
         )
         log.info(f"Current networks on device: {read_networks}")
 

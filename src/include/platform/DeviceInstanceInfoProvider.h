@@ -30,6 +30,20 @@ public:
     virtual ~DeviceInstanceInfoProvider() = default;
 
     /**
+     * This struct contains some of the values that are a part of the
+     * CapabilityMinimaStruct from the basic information cluster. These are
+     * only the values that are retrieved from the device info provider, other
+     * values of the CapabilityMinimaStruct are populated elsewhere.
+     */
+    struct DeviceInfoCapabilityMinimas
+    {
+        uint16_t simultaneousInvocationsSupported;
+        uint16_t simultaneousWritesSupported;
+        uint16_t readPathsSupported;
+        uint16_t subscribePathsSupported;
+    };
+
+    /**
      * @brief Obtain the Vendor Name from the device's factory data.
      *
      * @param[out] buf Buffer to copy string.
@@ -229,6 +243,60 @@ public:
      * Administrator.
      */
     virtual CHIP_ERROR GetJointFabricMode(uint8_t & jointFabricMode) { return CHIP_ERROR_NOT_IMPLEMENTED; }
+
+    /**
+     * @brief Obtain the current value of LocalConfigDisabled flag
+     *
+     * This method provides the value of the LocalConfigDisabled flag, whether it is implemented by the device or not.
+     * This is so other system delegates can access this value without needing to access it from a global cluster instance
+     * (which in this case would mean getting it from the basic information cluster).
+     *
+     * @returns CHIP_NO_ERROR on success (which is returned here by default).
+     */
+    virtual CHIP_ERROR GetLocalConfigDisabled(bool & localConfigDisabled)
+    {
+        localConfigDisabled = mLocalConfigDisabled;
+        return CHIP_NO_ERROR;
+    }
+
+    /**
+     * @brief Set the current value of LocalConfigDisabled flag
+     *
+     * @param[in] localConfigDisabled the new value of to set mLocalConfigDisabled to.
+     * @returns CHIP_NO_ERROR on success (which is returned here by default).
+     */
+    virtual CHIP_ERROR SetLocalConfigDisabled(bool localConfigDisabled)
+    {
+        mLocalConfigDisabled = localConfigDisabled;
+        return CHIP_NO_ERROR;
+    }
+
+    /**
+     * Get information that is used to report capability minima values for the device.
+     * @retval An instance of the DeviceInfoCapabilityMinimas struct
+     */
+    virtual DeviceInfoCapabilityMinimas GetSupportedCapabilityMinimaValues()
+    {
+        static_assert(CHIP_IM_MAX_NUM_COMMAND_HANDLER >= 1 && CHIP_IM_MAX_NUM_COMMAND_HANDLER <= 10000,
+                      "CHIP_IM_MAX_NUM_COMMAND_HANDLER must be greater than or equal to 1 and less than or equal to 10000");
+        static_assert(CHIP_IM_MAX_NUM_WRITE_HANDLER >= 1 && CHIP_IM_MAX_NUM_WRITE_HANDLER <= 10000,
+                      "CHIP_IM_MAX_NUM_WRITE_HANDLER must be greater than or equal to 1 and less than or equal to 10000");
+        static_assert(
+            CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_READS >= 9 && CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_READS <= 10000,
+            "CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_READS must be greater than or equal to 9 and less than or equal to 10000");
+        static_assert(CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_SUBSCRIPTIONS >= 3 &&
+                          CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_SUBSCRIPTIONS <= 10000,
+                      "CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_SUBSCRIPTIONS must be greater than or equal to 3 and less than or "
+                      "equal to 10000");
+
+        return DeviceInfoCapabilityMinimas{ .simultaneousInvocationsSupported = CHIP_IM_MAX_NUM_COMMAND_HANDLER,
+                                            .simultaneousWritesSupported      = CHIP_IM_MAX_NUM_WRITE_HANDLER,
+                                            .readPathsSupported               = CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_READS,
+                                            .subscribePathsSupported = CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_SUBSCRIPTIONS };
+    }
+
+protected:
+    bool mLocalConfigDisabled = false;
 };
 
 /**
@@ -250,6 +318,11 @@ DeviceInstanceInfoProvider * GetDeviceInstanceInfoProvider();
  * @param[in] provider the DeviceInstanceInfoProvider pointer to start returning with the getter
  */
 void SetDeviceInstanceInfoProvider(DeviceInstanceInfoProvider * provider);
+
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+
+DeviceInstanceInfoProvider * TestOnlyTryGetDeviceInstanceInfoProvider();
+#endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
 
 } // namespace DeviceLayer
 } // namespace chip

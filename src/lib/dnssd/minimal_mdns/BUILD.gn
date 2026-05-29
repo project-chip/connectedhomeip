@@ -45,8 +45,8 @@ declare_args() {
   chip_minmdns_default_policy = "default"
 }
 
-buildconfig_header("buildconfig") {
-  header = "MinMdnsConfig.h"
+buildconfig_header("minmdns_buildconfig") {
+  header = "MinMdnsBuildConfig.h"
   header_dir = "minmdns"
 
   defines = []
@@ -72,6 +72,13 @@ buildconfig_header("buildconfig") {
     assert(chip_minmdns_default_policy == "none",
            "minmdns default policy should be a supported value")
   }
+
+  visibility = [ ":config" ]
+}
+
+source_set("config") {
+  sources = [ "MinMdnsConfig.h" ]
+  deps = [ ":minmdns_buildconfig" ]
 }
 
 source_set("address_policy") {
@@ -150,7 +157,7 @@ static_library("minimal_mdns") {
 
   public_deps = [
     ":address_policy",
-    ":buildconfig",
+    ":config",
     "${chip_root}/src/inet",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/dnssd/minimal_mdns/core",

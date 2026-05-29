@@ -1,0 +1,104 @@
+# Copyright (c) 2025 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+import("${build_root}/config/compiler/compiler.gni")
+
+# Static UriConfig.h with both features disabled (HAVE_WPRINTF and HAVE_REALLOCARRAY)
+
+# Static library for uriparser
+static_library("uriparser") {
+  # Public API header files
+  public = [
+    "${chip_root}/third_party/uriparser/repo/include/uriparser/Uri.h",
+    "${chip_root}/third_party/uriparser/repo/include/uriparser/UriBase.h",
+    "${chip_root}/third_party/uriparser/repo/include/uriparser/UriDefsAnsi.h",
+    "${chip_root}/third_party/uriparser/repo/include/uriparser/UriDefsConfig.h",
+    "${chip_root}/third_party/uriparser/repo/include/uriparser/UriDefsUnicode.h",
+    "${chip_root}/third_party/uriparser/repo/include/uriparser/UriIp4.h",
+  ]
+
+  sources = [
+    # Library source files
+    "${chip_root}/third_party/uriparser/repo/src/UriCommon.c",
+    "${chip_root}/third_party/uriparser/repo/src/UriCommon.h",
+    "${chip_root}/third_party/uriparser/repo/src/UriCompare.c",
+    "${chip_root}/third_party/uriparser/repo/src/UriCopy.c",
+    "${chip_root}/third_party/uriparser/repo/src/UriCopy.h",
+    "${chip_root}/third_party/uriparser/repo/src/UriEscape.c",
+    "${chip_root}/third_party/uriparser/repo/src/UriFile.c",
+    "${chip_root}/third_party/uriparser/repo/src/UriIp4.c",
+    "${chip_root}/third_party/uriparser/repo/src/UriIp4Base.c",
+    "${chip_root}/third_party/uriparser/repo/src/UriIp4Base.h",
+    "${chip_root}/third_party/uriparser/repo/src/UriMemory.c",
+    "${chip_root}/third_party/uriparser/repo/src/UriMemory.h",
+    "${chip_root}/third_party/uriparser/repo/src/UriNormalize.c",
+    "${chip_root}/third_party/uriparser/repo/src/UriNormalize.h",
+    "${chip_root}/third_party/uriparser/repo/src/UriNormalizeBase.c",
+    "${chip_root}/third_party/uriparser/repo/src/UriNormalizeBase.h",
+    "${chip_root}/third_party/uriparser/repo/src/UriParse.c",
+    "${chip_root}/third_party/uriparser/repo/src/UriParseBase.c",
+    "${chip_root}/third_party/uriparser/repo/src/UriParseBase.h",
+    "${chip_root}/third_party/uriparser/repo/src/UriQuery.c",
+    "${chip_root}/third_party/uriparser/repo/src/UriRecompose.c",
+    "${chip_root}/third_party/uriparser/repo/src/UriResolve.c",
+    "${chip_root}/third_party/uriparser/repo/src/UriSetFragment.c",
+    "${chip_root}/third_party/uriparser/repo/src/UriSetHostAuto.c",
+    "${chip_root}/third_party/uriparser/repo/src/UriSetHostBase.h",
+    "${chip_root}/third_party/uriparser/repo/src/UriSetHostCommon.c",
+    "${chip_root}/third_party/uriparser/repo/src/UriSetHostCommon.h",
+    "${chip_root}/third_party/uriparser/repo/src/UriSetHostIp4.c",
+    "${chip_root}/third_party/uriparser/repo/src/UriSetHostIp6.c",
+    "${chip_root}/third_party/uriparser/repo/src/UriSetHostIpFuture.c",
+    "${chip_root}/third_party/uriparser/repo/src/UriSetHostRegName.c",
+    "${chip_root}/third_party/uriparser/repo/src/UriSetPath.c",
+    "${chip_root}/third_party/uriparser/repo/src/UriSetPort.c",
+    "${chip_root}/third_party/uriparser/repo/src/UriSetQuery.c",
+    "${chip_root}/third_party/uriparser/repo/src/UriSetScheme.c",
+    "${chip_root}/third_party/uriparser/repo/src/UriSetUserInfo.c",
+    "${chip_root}/third_party/uriparser/repo/src/UriSets.h",
+    "${chip_root}/third_party/uriparser/repo/src/UriShorten.c",
+    "${chip_root}/third_party/uriparser/repo/src/UriVersion.c",
+  ]
+
+  # Public include directory for uriparser headers
+  public_configs = [ ":uriparser_include" ]
+
+  # Include directory for static UriConfig.h
+  include_dirs = [ "${chip_root}/third_party/uriparser" ]
+
+  # Compile definitions
+  defines = [
+    "URI_LIBRARY_BUILD",
+    "URI_STATIC_BUILD",
+  ]
+
+  # C standard
+  cflags_c = [ "-std=c99" ]
+
+  if (current_os == "mac" || current_os == "ios") {
+    configs += [ ":uriparser_disable_sign_conversion" ]
+  }
+}
+
+# Config to disable sign-conversion warnings for uriparser
+config("uriparser_disable_sign_conversion") {
+  cflags = [ "-Wno-sign-conversion" ]
+}
+
+# Config for public include directories
+config("uriparser_include") {
+  include_dirs = [ "${chip_root}/third_party/uriparser/repo/include" ]
+}

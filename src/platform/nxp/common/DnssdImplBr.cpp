@@ -163,7 +163,9 @@ static uint32_t mServiceListFreeIndex;
 CHIP_ERROR NxpChipDnssdInit(DnssdAsyncReturnCallback initCallback, DnssdAsyncReturnCallback errorCallback, void * context)
 {
     struct netif * extNetif = (ConnectivityManagerImpl().GetExternalInterface()).GetPlatformInterface();
-    mNetifIndex             = netif_get_index(extNetif);
+    VerifyOrReturnError(extNetif != nullptr, CHIP_ERROR_INCORRECT_STATE,
+                        ChipLogError(DeviceLayer, "External interface not set, DNS-SD init failed"));
+    mNetifIndex = netif_get_index(extNetif);
 
     if (!mListIsInit)
     {
@@ -232,7 +234,7 @@ CHIP_ERROR NxpChipDnssdRemoveServices()
 
     mServiceListFreeIndex = 0;
 
-    while (mServiceListFreeIndex <= kServiceListSize)
+    while (mServiceListFreeIndex < kServiceListSize)
     {
         // allocate memory for new entry if the entry is not allready allocated from previous iteration
         if (mServiceList[mServiceListFreeIndex] == nullptr)
@@ -360,6 +362,8 @@ CHIP_ERROR NxpChipDnssdPublishService(const DnssdService * service, DnssdPublish
         {
             otServiceData.mHostName = service->mHostName;
         }
+
+        VerifyOrReturnError(service->mSubTypeSize <= UINT16_MAX, CHIP_ERROR_INVALID_ARGUMENT);
 
         otServiceData.mServiceInstance     = service->mName;
         otServiceData.mServiceType         = serviceType;

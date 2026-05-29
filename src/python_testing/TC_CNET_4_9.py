@@ -21,11 +21,12 @@ import test_plan_support
 from mobly import asserts
 
 import matter.clusters as Clusters
+import matter.testing.matchers as matchers
 from matter.clusters.Types import NullValue
 from matter.testing.decorators import has_feature, run_if_endpoint_matches
 from matter.testing.matter_asserts import assert_non_empty_string, is_valid_bool_value
-from matter.testing.matter_testing import MatterBaseTest, TestStep, matchers
-from matter.testing.runner import default_matter_test_main
+from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
@@ -136,7 +137,7 @@ class TC_CNET_4_9(MatterBaseTest):
 
         # Verify that there is a single connected network across ALL network commissioning clusters
         for ep in networks_dict:
-            connected_network_count[ep] = sum((x.connected for x in networks_dict[ep]))
+            connected_network_count[ep] = sum(x.connected for x in networks_dict[ep])
             log.info(f"Connected networks count by endpoint: {connected_network_count}")
             asserts.assert_equal(sum(connected_network_count.values()), 1,
                                  "Verify that only one entry has connected status as TRUE across ALL endpoints")

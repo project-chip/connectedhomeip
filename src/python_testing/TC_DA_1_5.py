@@ -47,11 +47,12 @@ from pyasn1.error import PyAsn1Error
 from pyasn1_modules import rfc2986, rfc3279, rfc5480
 
 import matter.clusters as Clusters
+import matter.testing.matchers as matchers
 from matter import ChipDeviceCtrl
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.conversions import hex_from_bytes
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest, matchers
+from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import default_matter_test_main
 from matter.tlv import TLVReader
 

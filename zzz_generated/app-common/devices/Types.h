@@ -234,6 +234,11 @@ constexpr DataModel::DeviceTypeEntry kLaundryDryer = {
     .deviceTypeRevision = kLaundryDryerDeviceTypeRevision,
 };
 
+constexpr DataModel::DeviceTypeEntry kHumidifierDehumidifier = {
+    .deviceTypeId       = kHumidifierDehumidifierDeviceTypeId,
+    .deviceTypeRevision = kHumidifierDehumidifierDeviceTypeRevision,
+};
+
 constexpr DataModel::DeviceTypeEntry kNetworkInfrastructureManager = {
     .deviceTypeId       = kNetworkInfrastructureManagerDeviceTypeId,
     .deviceTypeRevision = kNetworkInfrastructureManagerDeviceTypeRevision,
@@ -362,6 +367,11 @@ constexpr DataModel::DeviceTypeEntry kDoorbell = {
 constexpr DataModel::DeviceTypeEntry kAmbientContextSensor = {
     .deviceTypeId       = kAmbientContextSensorDeviceTypeId,
     .deviceTypeRevision = kAmbientContextSensorDeviceTypeRevision,
+};
+
+constexpr DataModel::DeviceTypeEntry kProximityRanger = {
+    .deviceTypeId       = kProximityRangerDeviceTypeId,
+    .deviceTypeRevision = kProximityRangerDeviceTypeRevision,
 };
 
 constexpr DataModel::DeviceTypeEntry kWindowCovering = {

@@ -522,8 +522,8 @@ public:
     static bool sForceEarlyFailureIncomingConnection;
 #endif
 
-    inline bool operator==(const TCPEndPointHandle & other) const { return other == *this; }
-    inline bool operator!=(const TCPEndPointHandle & other) const { return other != *this; }
+    inline bool operator==(const TCPEndPointHandle & other) const { return other.IsReferencing(this); }
+    inline bool operator!=(const TCPEndPointHandle & other) const { return !other.IsReferencing(this); }
 
 protected:
     friend class TCPTest;

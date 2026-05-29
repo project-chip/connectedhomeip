@@ -59,6 +59,7 @@
 #include <clusters/DishwasherAlarm/AttributeIds.h>
 #include <clusters/DishwasherMode/AttributeIds.h>
 #include <clusters/DoorLock/AttributeIds.h>
+#include <clusters/DynamicLighting/AttributeIds.h>
 #include <clusters/EcosystemInformation/AttributeIds.h>
 #include <clusters/ElectricalEnergyMeasurement/AttributeIds.h>
 #include <clusters/ElectricalGridConditions/AttributeIds.h>
@@ -78,6 +79,7 @@
 #include <clusters/Groupcast/AttributeIds.h>
 #include <clusters/Groups/AttributeIds.h>
 #include <clusters/HepaFilterMonitoring/AttributeIds.h>
+#include <clusters/Humidistat/AttributeIds.h>
 #include <clusters/IcdManagement/AttributeIds.h>
 #include <clusters/Identify/AttributeIds.h>
 #include <clusters/IlluminanceMeasurement/AttributeIds.h>
@@ -98,6 +100,7 @@
 #include <clusters/MicrowaveOvenMode/AttributeIds.h>
 #include <clusters/ModeSelect/AttributeIds.h>
 #include <clusters/NetworkCommissioning/AttributeIds.h>
+#include <clusters/NetworkIdentityManagement/AttributeIds.h>
 #include <clusters/NitrogenDioxideConcentrationMeasurement/AttributeIds.h>
 #include <clusters/OccupancySensing/AttributeIds.h>
 #include <clusters/OnOff/AttributeIds.h>
@@ -115,6 +118,7 @@
 #include <clusters/PowerSourceConfiguration/AttributeIds.h>
 #include <clusters/PowerTopology/AttributeIds.h>
 #include <clusters/PressureMeasurement/AttributeIds.h>
+#include <clusters/ProximityRanging/AttributeIds.h>
 #include <clusters/ProxyConfiguration/AttributeIds.h>
 #include <clusters/ProxyDiscovery/AttributeIds.h>
 #include <clusters/ProxyValid/AttributeIds.h>
@@ -132,6 +136,7 @@
 #include <clusters/ScenesManagement/AttributeIds.h>
 #include <clusters/ServiceArea/AttributeIds.h>
 #include <clusters/SmokeCoAlarm/AttributeIds.h>
+#include <clusters/SmokeConcentrationMeasurement/AttributeIds.h>
 #include <clusters/SoftwareDiagnostics/AttributeIds.h>
 #include <clusters/SoilMeasurement/AttributeIds.h>
 #include <clusters/Switch/AttributeIds.h>
@@ -145,7 +150,6 @@
 #include <clusters/ThreadNetworkDirectory/AttributeIds.h>
 #include <clusters/TimeFormatLocalization/AttributeIds.h>
 #include <clusters/TimeSynchronization/AttributeIds.h>
-#include <clusters/Timer/AttributeIds.h>
 #include <clusters/TlsCertificateManagement/AttributeIds.h>
 #include <clusters/TlsClientManagement/AttributeIds.h>
 #include <clusters/TotalVolatileOrganicCompoundsConcentrationMeasurement/AttributeIds.h>

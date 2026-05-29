@@ -358,7 +358,7 @@ def fetch_crl_from_url(url: str, timeout: int) -> x509.CertificateRevocationList
         log.debug(f"Fetched CRL: {r.content}")
         return x509.load_der_x509_crl(r.content)
     except Exception as e:
-        log.error('Failed to fetch a valid CRL', e)
+        log.error("Failed to fetch a valid CRL: %s", e)
 
 
 class DclClientInterface:
@@ -439,7 +439,7 @@ class DclClientInterface:
                     break
 
             except Exception as e:
-                log.error('Failed to get PAA certificate', e)
+                log.error("Failed to get PAA certificate: %s", e)
                 return None
             log.debug(f"issuer_name: {issuer_certificate.subject.rfc4514_string()}")
             issuer_name = issuer_certificate.issuer
@@ -1006,7 +1006,7 @@ class TestRevocationSetGeneration(unittest.TestCase):
         return os.path.join(self.test_base_dir, 'test', filename)
 
     def get_expected_revocation_set(self, idx):
-        with open(os.path.join(self.test_base_dir, 'test/revoked-attestation-certificates/revocation-sets/revocation-set.json'), 'r') as f:
+        with open(os.path.join(self.test_base_dir, 'test/revoked-attestation-certificates/revocation-sets/revocation-set.json')) as f:
             return RevocationSet(**json.load(f)[idx])
 
     def compare_revocation_sets(self, generated_set, expected):

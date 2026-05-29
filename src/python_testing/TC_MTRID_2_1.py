@@ -49,8 +49,7 @@ from TC_MTRIDTestBase import MeterIdentificationTestBaseHelper
 
 from matter.clusters import MeterIdentification
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import TestStep
-from matter.testing.runner import default_matter_test_main
+from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 

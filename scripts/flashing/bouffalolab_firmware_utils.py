@@ -398,7 +398,7 @@ class Flasher(firmware_utils.Flasher):
             return boot2_images[0]
 
         def get_mfd_addr():
-            with open(self.args["pt"], 'r') as file:
+            with open(self.args["pt"]) as file:
                 partition_config = toml.load(file)
 
             mfd_addr = None
@@ -582,7 +582,7 @@ class Flasher(firmware_utils.Flasher):
             return "%08x" % lhex
 
         def get_tools():
-            bflb_tools = os.path.join(MATTER_ROOT, "third_party/bouffalolab/bouffalo_sdk/tools/bflb_tools")
+            bflb_tools = os.path.join(MATTER_ROOT, "third_party/bouffalolab/repo_bouffalo_sdk/tools/bflb_tools")
             bflb_tools_dict = {
                 "linux": {"fw_proc": "bflb_fw_post_proc/bflb_fw_post_proc-ubuntu", "flash_tool": "bouffalo_flash_cube/BLFlashCommand-ubuntu"},
                 "win32": {"fw_proc": "bflb_fw_post_proc/bflb_fw_post_proc.exe", "flash_tool": "bouffalo_flash_cube/BLFlashCommand.exe"},
@@ -611,7 +611,7 @@ class Flasher(firmware_utils.Flasher):
                 raise Exception("No partition file or one more partition file found.")
 
             partition_file = partition_file[0]
-            with open(partition_file, 'r') as file:
+            with open(partition_file) as file:
                 partition_config = toml.load(file)
 
             part_addr0 = partition_config["pt_table"]["address0"]

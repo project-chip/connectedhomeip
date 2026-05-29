@@ -241,8 +241,8 @@ private:
     bool mCancelPasscode            = false;
     uint8_t mPasscodeLength         = 0;
 
-    UDCClientProcessingState mUDCClientProcessingState;
-    System::Clock::Timestamp mExpirationTime = System::Clock::kZero;
+    UDCClientProcessingState mUDCClientProcessingState = UDCClientProcessingState::kNotInitialized;
+    System::Clock::Timestamp mExpirationTime           = System::Clock::kZero;
 
     uint32_t mCachedCommissionerPasscode = 0;
 };

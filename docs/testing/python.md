@@ -502,6 +502,40 @@ Fabric admin for default controller:
   second_ctrl = fa.new_fabric_admin.NewController(nodeId=node_id)
 ```
 
+Reboot the DUT during testing:
+
+```python
+# Simple reboot - device state persists
+await self.request_device_reboot()
+
+# Factory reset - clears device state (removes KVS)
+await self.request_device_factory_reset()
+```
+
+```shell
+# Example Command w/ run_python_test.py test runner:
+scripts/tests/run_python_test.py --factory-reset --app out/linux-x64-all-clusters/chip-all-clusters-app --app-args "--discriminator 1234 --KVS kvs1" --script-args "--storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --PICS src/app/tests/suites/certification/ci-pics-values --endpoint 1" --script src/python_testing/TC_ACL_2_10.py --app-ready-pattern "APP STATUS: Starting event loop"
+```
+
+The `request_device_reboot()` and `request_device_factory_reset()` methods work
+differently depending on the environment. When the test is started with
+`run_python_test.py` as it is in the CI, need to make sure to import
+MatterBaseTest and have your test module inherit from it to make this
+functionality accessible during your test, the device is automatically rebooted
+and possibly factory reset during the test depending on test implementation
+using the restart_flag_file. When the test is started by some other means (e.g.,
+during certification testing), you'll be prompted to manually reboot or factory
+reset the device using the device-specific mechanism.
+
+If reboot utilized automatically expires existing controller sessions to device
+to force reconnection once device is back up and stable or if factory reset
+utilized the device will automatically re-enter commissioning mode to allow new
+commissioning once the device is back up and stable.
+
+See
+[TC-ACL-2.10](https://github.com/project-chip/connectedhomeip/blob/master/src/python_testing/TC_ACL_2_10.py)
+for an example testing ACL persistence across reboots.
+
 ## Automating manual steps
 
 Some test plans have manual steps that require the tester to manually change the
@@ -860,3 +894,228 @@ for that run, e.g.:
 This structured format ensures that all necessary configurations are clearly
 defined and easily understood, allowing for consistent and reliable test
 execution.
+
+# Test Module Guards
+
+Guards let you run test steps only when certain conditions are met (e.g., a
+cluster has a feature, attribute, or command).
+
+See below sections for usage examples please.
+
+## Cluster Guards
+
+The following are inherited from the `matter_testing` module, so they do not
+need to be imported. For more examples on these guards, see
+`src/python_testing/support_modules/binfo_attributes_verification.py`.
+
+Use these to skip a test step when the endpoint or cluster does not support the
+feature, attribute, or command under test.
+
+### Attribute Guard
+
+Runs the test step only if the endpoint and cluster contain the given attribute:
+
+Example:
+
+```python
+self.step(<STEP_NUMBER>)
+if await self.attribute_guard(endpoint=self.endpoint, attribute=attributes.OperationalState):
+    # If attribute exists then test step continues, else test step is skipped.
+```
+
+### Feature Guard
+
+Runs the test step only if the cluster on the endpoint supports the given
+feature:
+
+Example:
+
+```python
+self.step(<STEP_NUMBER>)
+if await self.feature_guard(endpoint=self.endpoint, cluster=Clusters.BooleanStateConfiguration, feature_int=Clusters.BooleanStateConfiguration.Bitmaps.Feature.kAudible):
+    # IF feature available then do test step, else test step is skipped.
+```
+
+### Command Guard
+
+Runs the test step only if the endpoint has the cluster that supports the given
+command:
+
+Example:
+
+```python
+self.step(<STEP_NUMBER>)
+if await self.command_guard(endpoint=self.endpoint, command=commands.Resume):
+    # If command available, then do test step here, else test step is skipped
+```
+
+## Additional Test Guards
+
+This section covers the PICS guard and the `run_if_endpoint_matches` decorator,
+with an example for each.
+
+### PICS Guard
+
+Inherited from `matter_testing` (no import needed). Runs the test step only if
+the given PICS key is enabled in the PICS file:
+
+Example:
+
+```python
+if self.pics_guard(self.check_pics(<PICS here>)):
+    self.step(<STEP_NUMBER>)
+    # Do test step logic here
+else:
+    self.skip_step(<STEP_NUMBER>)
+    #skip test step
+```
+
+### run_if_endpoint_matches decorator
+
+Import the decorator and the check functions from `matter.testing.decorators`:
+
+```python
+from matter.testing.decorators import has_feature, has_command, has_attribute, has_cluster, run_if_endpoint_matches
+```
+
+Skips the whole test if the specified endpoint does not have the required
+cluster, feature, attribute, or command. Apply the decorator above the test
+function.
+
+Examples:
+
+```python
+#Feature:
+@run_if_endpoint_matches(
+        has_feature(Clusters.CameraAvStreamManagement, Clusters.CameraAvStreamManagement.Bitmaps.Feature.kSnapshot)
+    )
+async def test_TC_AVSM_2_2(self):
+    # Do test step logic if feature exists, else this test is skipped
+
+#Cluster
+@run_if_endpoint_matches(has_cluster(Clusters.AdministratorCommissioning))
+async def test_TC_CADMIN_1_3(self):
+    # Do test step logic if cluster exists, else this test is skipped
+
+#Attribute:
+@run_if_endpoint_matches(has_attribute(Clusters.AccessControl.Attributes.Extension))
+async def test_TC_ACL_2_3(self):
+    # Do test step logic if attribute exists, else this test is skipped
+
+#Command
+@run_if_endpoint_matches(has_command(Clusters.OperationalCredentials.Commands.SetVIDVerificationStatement))
+async def test_TC_OPCREDS_3_8(self):
+    # Do test step logic if command is available, else this test is skipped
+
+```
+
+## Wildcard subscription read verification
+
+This verification is enabled by default for tests that do not explicitly disable
+it.
+
+### Overview
+
+Certification tests can use a background **wildcard attribute subscription**
+(all endpoints, all clusters, all attributes) to cross-check routine attribute
+reads against values observed through the subscription path.
+
+The framework maintains a subscription-backed attribute cache and, when enabled,
+read helpers compare direct read responses against cached subscription values to
+help detect missing reports, stale values, or reporting inconsistencies.
+
+The comparison path is implemented in `matter_testing.py`
+(`verify_attribute_subscription_value`, `read_single_attribute_check_success`,
+and related helpers), while subscription client handling lives in
+`event_attribute_reporting.py`.
+
+### Architecture
+
+#### Secondary controller
+
+The wildcard subscription runs on a dedicated `ChipDeviceController` rather than
+`default_controller`.
+
+This avoids interference from test code that issues `ReadAttribute` calls with
+`keepSubscriptions=False` on the primary controller, which could otherwise tear
+down the background subscription.
+
+#### Subscription flags
+
+The wildcard subscribe uses:
+
+-   `keepSubscriptions=False`
+-   `autoResubscribe=False`
+
+`keepSubscriptions=False` avoids leaving stale server-side subscriptions behind
+if setup is retried.
+
+`autoResubscribe=False` avoids repeated client resubscribe attempts when tests
+temporarily overwrite ACLs in ways that remove the subscription controller's
+administer privilege, which can otherwise add noise and unnecessary DUT load.
+
+#### ACL handling
+
+Before the subscription starts, the framework snapshots the DUT ACL and appends
+an administer entry for the subscription controller.
+
+`teardown_test` restores the original ACL snapshot so each test starts from a
+known ACL state.
+
+Tests that replace the entire ACL during a step should include the subscription
+controller entry (see `get_subscription_acl_entry()` on `MatterBaseTest`) if
+subscription coverage needs to remain active through that step.
+
+### C/Q excluded attributes
+
+Attributes marked in the data model XML with:
+
+-   **Changes Omitted (C)**
+-   **Quieter Reporting (Q)**
+
+are excluded from wildcard subscription verification, since these attributes are
+not expected to behave like ordinary report-driven attributes.
+
+A small transitional allowlist (`_CQ_EXPECTED_BUT_NOT_YET_MARKED` in
+`matter_testing.py`) can treat additional attributes as C until XML/spec
+metadata catches up.
+
+Each temporary entry should cite a tracking issue and be removed once the data
+model is corrected and regenerated.
+
+### Disabling the wildcard subscription or verification
+
+**Disable the background subscription entirely** (no cache, no ACL append for
+the subscription controller):
+
+-   Per test class: `disable_wildcard_subscription = True`
+-   Per run / harness: `--no-wildcard-subscription`
+    (`matter_test_config.no_wildcard_subscription`)
+
+**Keep the subscription but skip comparing reads to the cache:**
+
+-   Per test class: `default_verify_wildcard_subscription = False`
+-   Single read: pass `verify_wildcard_subscription=False` to the read helper,
+    otherwise this defaults to True.
+
+### Known limitations
+
+This framework has exposed cases where some attributes are effectively polled on
+read in the SDK rather than updated through a reporting path.
+
+Such attributes may appear in the subscription priming read but later disagree
+with a direct read, producing mismatches that are not DUT subscription failures.
+
+The canonical example is Software Diagnostics heap counters.
+
+These issues are tracked separately as SDK/spec/XML alignment gaps rather than
+framework defects.
+
+Per-fabric attributes may also require special handling when comparing values
+across controllers operating on different fabrics (for example, fabric-scoped
+attributes such as CurrentFabricIndex can legitimately differ across fabrics and
+should not be treated as subscription failures).
+
+Direct reads may also occasionally overtake in-flight subscription reports
+during attribute transitions, which can create transient mismatches that are
+framework timing artifacts rather than missing DUT reports.

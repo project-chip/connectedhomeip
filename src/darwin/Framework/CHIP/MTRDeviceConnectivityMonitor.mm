@@ -50,6 +50,10 @@ static os_unfair_lock sConnectivityMonitorLock = OS_UNFAIR_LOCK_INIT;
 // Tracks number of currently active monitors. When this drops to zero, triggers timer
 // to cleanup sSharedResolverConnection after kSharedConnectionLingerIntervalSeconds.
 static NSUInteger sConnectivityMonitorCount;
+// Incremented each time a monitor starts; linger timers capture the current value and
+// only fire if it hasn't changed, preventing stale timers from freeing the shared
+// connection while newer child resolvers are still pending cleanup.
+static NSUInteger sSharedResolverLingerGeneration;
 static DNSServiceRef sSharedResolverConnection;
 static dispatch_queue_t sSharedResolverQueue;
 
@@ -318,6 +322,7 @@ static void ResolveCallback(
 
         if (_resolvers.size() != 0) {
             sConnectivityMonitorCount++;
+            sSharedResolverLingerGeneration++;
             result = YES;
             return;
         }
@@ -347,9 +352,10 @@ static void ResolveCallback(
         // Check if we should do linger cleanup
         std::lock_guard lock(sConnectivityMonitorLock);
         if (!sConnectivityMonitorCount) {
+            NSUInteger generationAtSchedule = sSharedResolverLingerGeneration;
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, kSharedConnectionLingerIntervalSeconds * NSEC_PER_SEC), sSharedResolverQueue, ^{
                 std::lock_guard lock(sConnectivityMonitorLock);
-                if (!sConnectivityMonitorCount && sSharedResolverConnection) {
+                if (!sConnectivityMonitorCount && sSharedResolverConnection && sSharedResolverLingerGeneration == generationAtSchedule) {
                     MTR_LOG("MTRDeviceConnectivityMonitor: Closing shared resolver connection");
                     DNSServiceRefDeallocate(sSharedResolverConnection);
                     sSharedResolverConnection = NULL;

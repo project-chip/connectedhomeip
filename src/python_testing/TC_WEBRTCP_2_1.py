@@ -36,6 +36,8 @@
 # === END CI TEST ARGUMENTS ===
 #
 
+import logging
+
 from mobly import asserts
 from TC_WEBRTCPTestBase import WEBRTCPTestBase
 
@@ -44,8 +46,10 @@ from matter import ChipDeviceCtrl
 from matter.clusters.Types import NullValue
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest, TestStep
-from matter.testing.runner import default_matter_test_main
+from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.runner import TestStep, default_matter_test_main
+
+log = logging.getLogger(__name__)
 
 
 class TC_WebRTCP_2_1(MatterBaseTest, WEBRTCPTestBase):
@@ -81,6 +85,7 @@ class TC_WebRTCP_2_1(MatterBaseTest, WEBRTCPTestBase):
             "AVSM.S",              # CameraAVStreamManagement Server
             "AVSM.S.F00",          # Audio Data Output feature
             "AVSM.S.F01",          # Video Data Output feature
+            "PS.S.F01",            # Battery feature
         ]
 
     @property
@@ -92,6 +97,12 @@ class TC_WebRTCP_2_1(MatterBaseTest, WEBRTCPTestBase):
         """
         Executes the test steps for the WebRTC Provider cluster scenario.
         """
+
+        # Only run the test script if the camera is battery powered, and so subject to standby flows
+        if not await self.is_battery_powered():
+            self.mark_all_remaining_steps_skipped("precondition")
+            log.info("WebRTCP 2_1 skipped as the device is not battery powered.")
+            return
 
         self.step("precondition")
         # Commission DUT - already done
@@ -192,6 +203,26 @@ class TC_WebRTCP_2_1(MatterBaseTest, WEBRTCPTestBase):
         )
 
         asserts.assert_equal(len(current_sessions), 1, "Expected CurrentSessions to be 1")
+
+        session = current_sessions[0]
+
+        # ID is uint16 type and contains a valid value (0–65534)
+        asserts.assert_true(isinstance(session.id, int), "Session ID should be an integer (uint16)")
+        asserts.assert_true(0 <= session.id <= 65534, "Session ID should be in valid uint16 range (0–65534)")
+
+        # PeerNodeID is node-id type and contains a valid non-zero node-id value
+        asserts.assert_true(isinstance(session.peerNodeID, int), "PeerNodeID should be an integer (node-id)")
+        asserts.assert_greater(session.peerNodeID, 0, "PeerNodeID should be a valid non-zero node-id")
+
+        # PeerEndpointID is endpoint-no type and contains a valid endpoint value (0–65534)
+        asserts.assert_true(isinstance(session.peerEndpointID, int), "PeerEndpointID should be an integer (endpoint-no)")
+        asserts.assert_true(0 <= session.peerEndpointID <= 65534, "PeerEndpointID should be in valid endpoint range (0–65534)")
+
+        # StreamUsage is StreamUsageEnum type and contains a valid StreamUsageEnum value
+        asserts.assert_true(isinstance(session.streamUsage, Clusters.Globals.Enums.StreamUsageEnum),
+                            "StreamUsage should be a StreamUsageEnum type")
+        asserts.assert_not_equal(session.streamUsage, Clusters.Globals.Enums.StreamUsageEnum.kUnknownEnumValue,
+                                 "StreamUsage should be a valid known StreamUsageEnum value")
 
 
 if __name__ == "__main__":

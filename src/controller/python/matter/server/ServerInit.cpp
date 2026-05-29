@@ -168,10 +168,11 @@ PyChipError pychip_server_native_init()
     initParams.operationalServicePort        = CHIP_PORT;
     initParams.userDirectedCommissioningPort = CHIP_UDC_PORT;
 
-    PyReturnErrorOnFailure(ToPyChipError(chip::Server::GetInstance().Init(initParams)));
-
-    // Initialize device attestation config
+    // Initialize device attestation config before server init so Operational
+    // Credentials sees the configured provider during cluster construction.
     SetDeviceAttestationCredentialsProvider(chip::Credentials::Examples::GetExampleDACProvider());
+
+    PyReturnErrorOnFailure(ToPyChipError(chip::Server::GetInstance().Init(initParams)));
 
     PyReturnErrorOnFailure(ToPyChipError(chip::DeviceLayer::PlatformMgr().StartEventLoopTask()));
 

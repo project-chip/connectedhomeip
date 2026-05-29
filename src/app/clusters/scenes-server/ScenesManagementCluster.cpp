@@ -18,6 +18,7 @@
 
 #include "ScenesManagementCluster.h"
 
+#include <app/clusters/scenes-server/Constants.h>
 #include <app/clusters/scenes-server/SceneTable.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <app/server-cluster/DefaultServerCluster.h>
@@ -40,6 +41,7 @@ using chip::Protocols::InteractionModel::Status;
 using namespace chip::app::Clusters::ScenesManagement::Attributes;
 using namespace chip::app::Clusters::ScenesManagement::Commands;
 using namespace chip::app::Clusters::ScenesManagement::Structs;
+using namespace chip::app::Clusters::ScenesManagement;
 
 namespace chip::app::Clusters {
 
@@ -64,28 +66,6 @@ constexpr Protocols::InteractionModel::Status ResponseStatus(CHIP_ERROR err)
     return StatusIB(err).mStatus;
 }
 
-/// RAII for a scenes management table provider:
-///    - does a `Take()` on a scene at creation
-///    - ensures `Release()` is called on destruction
-class ScopedSceneTable
-{
-public:
-    ScopedSceneTable(const ScopedSceneTable &)             = delete;
-    ScopedSceneTable & operator=(const ScopedSceneTable &) = delete;
-
-    ScopedSceneTable(ScenesManagementTableProvider & provider) : mProvider(provider), mTable(provider.Take()) {}
-    ~ScopedSceneTable() { mProvider.Release(mTable); }
-
-    SceneTable * operator->() { return mTable; }
-    const SceneTable * operator->() const { return mTable; }
-
-    operator bool() const { return mTable != nullptr; }
-
-private:
-    ScenesManagementTableProvider & mProvider;
-    SceneTable * mTable;
-};
-
 /// A very common pattern of:
 ///   - if error (i.e. NOT CHIP_NO_ERROR), then set response status and return response
 #define SuccessOrReturnWithFailureStatus(err_expr, response)                                                                       \
@@ -99,6 +79,16 @@ private:
     } while (0)
 
 } // namespace
+
+CHIP_ERROR ScenesManagementCluster::StoreCurrentGlobalScene(FabricIndex fabricIndex)
+{
+    return StoreCurrentScene(fabricIndex, scenes::kGlobalSceneGroupId, scenes::kGlobalSceneId);
+}
+
+CHIP_ERROR ScenesManagementCluster::RecallGlobalScene(FabricIndex fabricIndex)
+{
+    return RecallScene(fabricIndex, scenes::kGlobalSceneGroupId, scenes::kGlobalSceneId);
+}
 
 CHIP_ERROR ScenesManagementCluster::UpdateFabricSceneInfo(FabricIndex fabric, Optional<GroupId> group, Optional<SceneId> scene,
                                                           Optional<bool> sceneValid)
@@ -531,6 +521,7 @@ CHIP_ERROR ScenesManagementCluster::GroupWillBeRemoved(FabricIndex aFabricIdx, G
     }
 
     VerifyOrReturnError(nullptr != mGroupProvider, CHIP_ERROR_INCORRECT_STATE);
+
     if (0 != aGroupId && !mGroupProvider->HasEndpoint(aFabricIdx, aGroupId, mPath.mEndpointId))
     {
         return CHIP_NO_ERROR;

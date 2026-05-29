@@ -347,15 +347,6 @@ static BOOL CommandNeedsTimedInvokeInICDManagementCluster(AttributeId aAttribute
     }
     }
 }
-static BOOL CommandNeedsTimedInvokeInTimerCluster(AttributeId aAttributeId)
-{
-    using namespace Clusters::Timer;
-    switch (aAttributeId) {
-    default: {
-        return NO;
-    }
-    }
-}
 static BOOL CommandNeedsTimedInvokeInOvenCavityOperationalStateCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::OvenCavityOperationalState;
@@ -851,6 +842,15 @@ static BOOL CommandNeedsTimedInvokeInThermostatUserInterfaceConfigurationCluster
     }
     }
 }
+static BOOL CommandNeedsTimedInvokeInHumidistatCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::Humidistat;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL CommandNeedsTimedInvokeInColorControlCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::ColorControl;
@@ -863,6 +863,15 @@ static BOOL CommandNeedsTimedInvokeInColorControlCluster(AttributeId aAttributeI
 static BOOL CommandNeedsTimedInvokeInBallastConfigurationCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::BallastConfiguration;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
+static BOOL CommandNeedsTimedInvokeInDynamicLightingCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::DynamicLighting;
     switch (aAttributeId) {
     default: {
         return NO;
@@ -1026,6 +1035,42 @@ static BOOL CommandNeedsTimedInvokeInAmbientContextSensingCluster(AttributeId aA
 {
     using namespace Clusters::AmbientContextSensing;
     switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
+static BOOL CommandNeedsTimedInvokeInProximityRangingCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::ProximityRanging;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
+static BOOL CommandNeedsTimedInvokeInSmokeConcentrationMeasurementCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::SmokeConcentrationMeasurement;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
+static BOOL CommandNeedsTimedInvokeInNetworkIdentityManagementCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::NetworkIdentityManagement;
+    switch (aAttributeId) {
+    case Commands::AddClient::Id: {
+        return YES;
+    }
+    case Commands::RemoveClient::Id: {
+        return YES;
+    }
+    case Commands::ImportAdminSecret::Id: {
+        return YES;
+    }
     default: {
         return NO;
     }
@@ -1497,9 +1542,6 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     case Clusters::IcdManagement::Id: {
         return CommandNeedsTimedInvokeInICDManagementCluster(commandID);
     }
-    case Clusters::Timer::Id: {
-        return CommandNeedsTimedInvokeInTimerCluster(commandID);
-    }
     case Clusters::OvenCavityOperationalState::Id: {
         return CommandNeedsTimedInvokeInOvenCavityOperationalStateCluster(commandID);
     }
@@ -1644,11 +1686,17 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     case Clusters::ThermostatUserInterfaceConfiguration::Id: {
         return CommandNeedsTimedInvokeInThermostatUserInterfaceConfigurationCluster(commandID);
     }
+    case Clusters::Humidistat::Id: {
+        return CommandNeedsTimedInvokeInHumidistatCluster(commandID);
+    }
     case Clusters::ColorControl::Id: {
         return CommandNeedsTimedInvokeInColorControlCluster(commandID);
     }
     case Clusters::BallastConfiguration::Id: {
         return CommandNeedsTimedInvokeInBallastConfigurationCluster(commandID);
+    }
+    case Clusters::DynamicLighting::Id: {
+        return CommandNeedsTimedInvokeInDynamicLightingCluster(commandID);
     }
     case Clusters::IlluminanceMeasurement::Id: {
         return CommandNeedsTimedInvokeInIlluminanceMeasurementCluster(commandID);
@@ -1703,6 +1751,15 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     }
     case Clusters::AmbientContextSensing::Id: {
         return CommandNeedsTimedInvokeInAmbientContextSensingCluster(commandID);
+    }
+    case Clusters::ProximityRanging::Id: {
+        return CommandNeedsTimedInvokeInProximityRangingCluster(commandID);
+    }
+    case Clusters::SmokeConcentrationMeasurement::Id: {
+        return CommandNeedsTimedInvokeInSmokeConcentrationMeasurementCluster(commandID);
+    }
+    case Clusters::NetworkIdentityManagement::Id: {
+        return CommandNeedsTimedInvokeInNetworkIdentityManagementCluster(commandID);
     }
     case Clusters::WiFiNetworkManagement::Id: {
         return CommandNeedsTimedInvokeInWiFiNetworkManagementCluster(commandID);

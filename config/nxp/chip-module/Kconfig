@@ -14,27 +14,27 @@
 #   limitations under the License.
 #
 
-rsource "../../zephyr/Kconfig"
+if SOC_FAMILY_NXP_RW
+
 rsource "../cmake/Kconfig.matter.nxp"
 
-if CHIP
+config CHIP_APP_OPERATIONAL_KEYSTORE
+	bool "Use custom implementation of operational keystore"
+	default y if CHIP_SE05X
+	help
+		Use custom implementation of operational keystore.
 
-config CHIP_MALLOC_SYS_HEAP
-	default y if !ARCH_POSIX
+if CHIP_APP_OPERATIONAL_KEYSTORE
+	choice CHIP_APP_OPERATIONAL_KEYSTORE_SELECTION
+		prompt "Select Operation Keystore Implementation"
+		default CHIP_APP_OPERATIONAL_KEYSTORE_SE05X if CHIP_SE05X
 
-# See config/zephyr/Kconfig for full definition
-config CHIP_FACTORY_RESET_ERASE_SETTINGS
-	bool
-	default y
+	config CHIP_APP_OPERATIONAL_KEYSTORE_SE05X
+	bool "Operation Keystore SE05X"
+	help
+		Enable application Operational keystore SE05X implementation.
 
-endif
+	endchoice # CHIP_APP_OPERATIONAL_KEYSTORE_SELECTION
+endif # CHIP_APP_OPERATIONAL_KEYSTORE
 
-config CHIP_OTA_REQUESTOR
-	bool
-	select BOOTLOADER_MCUBOOT
-
-config BOOTLOADER_MCUBOOT
-	bool
-	select IMG_MANAGER
-	select STREAM_FLASH
-	select STREAM_FLASH_ERASE
+endif # SOC_FAMILY_NXP_RW

@@ -26,6 +26,7 @@
 #define _CHIP_WIFI_PAFTP_H
 #include "WiFiPAFTP.h"
 
+#include <cstdio>
 #include <lib/core/CHIPConfig.h>
 #include <lib/support/BitFlags.h>
 #include <lib/support/BufferReader.h>

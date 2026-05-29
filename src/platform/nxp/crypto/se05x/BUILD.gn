@@ -31,22 +31,23 @@ if (chip_crypto == "platform") {
 
 static_library("nxp_crypto_lib") {
   sources = [
-    "${chip_root}/src/platform/nxp/crypto/se05x/CHIPCryptoPALHost.cpp",
     "${chip_root}/src/platform/nxp/crypto/se05x/CHIPCryptoPALHsm_se05x_hkdf.cpp",
     "${chip_root}/src/platform/nxp/crypto/se05x/CHIPCryptoPALHsm_se05x_hmac.cpp",
     "${chip_root}/src/platform/nxp/crypto/se05x/CHIPCryptoPALHsm_se05x_p256.cpp",
     "${chip_root}/src/platform/nxp/crypto/se05x/CHIPCryptoPALHsm_se05x_pbkdf.cpp",
     "${chip_root}/src/platform/nxp/crypto/se05x/CHIPCryptoPALHsm_se05x_rng.cpp",
+    "${chip_root}/src/platform/nxp/crypto/se05x/CHIPCryptoPALHsm_se05x_spake2p.cpp",
     "${chip_root}/src/platform/nxp/crypto/se05x/CHIPCryptoPALHsm_se05x_utils.cpp",
     "${chip_root}/src/platform/nxp/crypto/se05x/CHIPCryptoPAL_HostFallBack.cpp",
     "${chip_root}/src/platform/nxp/crypto/se05x/PersistentStorageOperationalKeystore_se05x.cpp",
   ]
 
-  if (nxp_platform == "rt/rw61x") {
+  if (chip_device_platform == "linux" || nxp_platform == "rt/rw61x" ||
+      nxp_platform == "rt/rt1060") {
     sources += [
-      "${chip_root}/examples/platform/nxp/se05x/DeviceAttestationSe05xCredsExample.cpp",
-      "${chip_root}/src/credentials/examples/ExampleDACs.h",
-      "${chip_root}/src/credentials/examples/ExamplePAI.h",
+      "${chip_root}/src/crypto/CHIPCryptoPALmbedTLS.cpp",
+      "${chip_root}/src/crypto/CHIPCryptoPALmbedTLS.h",
+      "${chip_root}/src/crypto/CHIPCryptoPALmbedTLSCert.cpp",
     ]
   }
 
@@ -70,29 +71,21 @@ static_library("nxp_crypto_lib") {
       defines += [ "ENABLE_SE05X_RND_GEN=1" ]
     }
 
-    if (chip_se05x_gen_ec_key) {
-      defines += [ "ENABLE_SE05X_GENERATE_EC_KEY=1" ]
-    }
-
-    if (chip_se05x_ecdsa_verify) {
-      defines += [ "ENABLE_SE05X_ECDSA_VERIFY=1" ]
-    }
-
-    if (chip_se05x_pbkdf2_sha256) {
-      defines += [ "ENABLE_SE05X_PBKDF2_SHA256=1" ]
-    }
-
-    if (chip_se05x_hkdf_sha256) {
-      defines += [ "ENABLE_SE05X_HKDF_SHA256=1" ]
-    }
-
-    if (chip_se05x_hmac_sha256) {
-      defines += [ "ENABLE_SE05X_HMAC_SHA256=1" ]
-    }
-
     if (chip_se05x_device_attestation) {
       defines += [ "ENABLE_SE05X_DEVICE_ATTESTATION=1" ]
     }
+
+    if (chip_se05x_spake_verifier_use_tp_values) {
+      defines += [ "ENABLE_SE05X_SPAKE_VERIFIER_USE_TP_VALUES=1" ]
+    }
+
+    defines += [
+      "SE05X_SPAKE_VERIFIER_TP_SET_NO=$chip_se05x_spake_verifier_tp_set_no",
+    ]
+
+    defines += [
+      "SE05X_SPAKE_VERIFIER_TP_ITER_CNT=$chip_se05x_spake_verifier_tp_iter_cnt",
+    ]
   }
 
   external_mbedtls = current_os == "zephyr" || nxp_external_sdk

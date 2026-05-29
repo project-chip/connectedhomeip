@@ -50,7 +50,6 @@ Generally regenerate using one of:
 |         68 |       0x44 | ProxyValid                                              |
 |         69 |       0x45 | BooleanState                                            |
 |         70 |       0x46 | IcdManagement                                           |
-|         71 |       0x47 | Timer                                                   |
 |         72 |       0x48 | OvenCavityOperationalState                              |
 |         73 |       0x49 | OvenMode                                                |
 |         74 |       0x4A | LaundryDryerControls                                    |
@@ -99,8 +98,10 @@ Generally regenerate using one of:
 |        513 |      0x201 | Thermostat                                              |
 |        514 |      0x202 | FanControl                                              |
 |        516 |      0x204 | ThermostatUserInterfaceConfiguration                    |
+|        517 |      0x205 | Humidistat                                              |
 |        768 |      0x300 | ColorControl                                            |
 |        769 |      0x301 | BallastConfiguration                                    |
+|        773 |      0x305 | DynamicLighting                                         |
 |       1024 |      0x400 | IlluminanceMeasurement                                  |
 |       1026 |      0x402 | TemperatureMeasurement                                  |
 |       1027 |      0x403 | PressureMeasurement                                     |
@@ -119,6 +120,9 @@ Generally regenerate using one of:
 |       1071 |      0x42F | RadonConcentrationMeasurement                           |
 |       1072 |      0x430 | SoilMeasurement                                         |
 |       1073 |      0x431 | AmbientContextSensing                                   |
+|       1075 |      0x433 | ProximityRanging                                        |
+|       1076 |      0x434 | SmokeConcentrationMeasurement                           |
+|       1104 |      0x450 | NetworkIdentityManagement                               |
 |       1105 |      0x451 | WiFiNetworkManagement                                   |
 |       1106 |      0x452 | ThreadBorderRouterManagement                            |
 |       1107 |      0x453 | ThreadNetworkDirectory                                  |

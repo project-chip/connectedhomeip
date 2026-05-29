@@ -44,6 +44,7 @@
 #include <protocols/interaction_model/Constants.h>
 
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <app/server-cluster/testing/TestServerClusterContext.h>
 
 #include <app/util/mock/MockNodeConfig.h>
 
@@ -447,6 +448,8 @@ TEST_F(TestAclEvent, TestUnsupportedEventWithValidClusterPath)
 
     const ConcreteClusterPath kTestClusterPath(kTestEndpointId, MockClusterId(2));
     FakeDefaultServerCluster fakeClusterServer(kTestClusterPath);
+    chip::Testing::TestServerClusterContext testContext;
+    ASSERT_SUCCESS(fakeClusterServer.Startup(testContext.Get()));
     ServerClusterRegistration registration(fakeClusterServer);
 
     CodegenDataModelProvider model;
@@ -500,6 +503,7 @@ TEST_F(TestAclEvent, TestUnsupportedEventWithValidClusterPath)
     engine->SetDataModelProvider(mOldProvider);
 
     EXPECT_SUCCESS(model.Registry().Unregister(&fakeClusterServer));
+    fakeClusterServer.Shutdown(app::ClusterShutdownType::kClusterShutdown);
     EXPECT_SUCCESS(model.Shutdown());
 }
 

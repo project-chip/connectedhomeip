@@ -48,11 +48,15 @@ struct TestTimeFormatLocalizationCluster : public ::testing::Test
 
 TEST_F(TestTimeFormatLocalizationCluster, AttributeTest)
 {
+    chip::DeviceLayer::SampleDeviceProvider sampleProvider;
+
+    TimeFormatLocalizationCluster::Context clusterContext{ sampleProvider };
+
     {
         BitFlags<TimeFormatLocalization::Feature> features{ 0 };
 
         TimeFormatLocalizationCluster onlyMandatory(kRootEndpointId, features, TimeFormatLocalization::HourFormatEnum::k12hr,
-                                                    TimeFormatLocalization::CalendarTypeEnum::kBuddhist);
+                                                    TimeFormatLocalization::CalendarTypeEnum::kBuddhist, clusterContext);
 
         // Test attributes listing with no features enabled
         ASSERT_TRUE(IsAttributesListEqualTo(onlyMandatory,
@@ -65,7 +69,7 @@ TEST_F(TestTimeFormatLocalizationCluster, AttributeTest)
         BitFlags<TimeFormatLocalization::Feature> features{ TimeFormatLocalization::Feature::kCalendarFormat };
 
         TimeFormatLocalizationCluster withCalendarFeature(kRootEndpointId, features, TimeFormatLocalization::HourFormatEnum::k12hr,
-                                                          TimeFormatLocalization::CalendarTypeEnum::kBuddhist);
+                                                          TimeFormatLocalization::CalendarTypeEnum::kBuddhist, clusterContext);
 
         // Test attributes listing with CalendarFormat feature enabled
         ASSERT_TRUE(IsAttributesListEqualTo(withCalendarFeature,

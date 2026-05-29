@@ -54,7 +54,7 @@
 #if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
 #include <openthread/icmp6.h>
 #include <openthread/ip6.h>
-#if CHIP_DEVICE_LAYER_TARGET_NRFCONNECT
+#if CHIP_DEVICE_LAYER_TARGET_NRFCONNECT || CHIP_DEVICE_LAYER_TARGET_ZEPHYR
 // Currently to use openthread endpoint in nRFConnect, we must fetch defines from zephyr's net
 // OpenThread header. It will be removed once the Zephyr version is updated to 4.2.0.
 #include <zephyr/net/openthread.h>
@@ -686,11 +686,15 @@ public:
     static IPAddress MakeIPv6PrefixMulticast(uint8_t aScope, uint8_t aPrefixLength, const uint64_t & aPrefix, uint32_t aGroupId);
 
     /**
-     * @brief   Construct an IPv4 broadcast address.
+     * @brief   Construct the well-known IPv6 multicast address ff05::fa.
+     *
+     * @details
+     *  Returns the site-local scoped well-known multicast address
+     *  with group identifier 0xFA, used for Matter groupcast messaging.
      *
      * @return  The constructed IP address.
      */
-    static IPAddress MakeIPv4Broadcast();
+    static IPAddress MakeIPv6MatterIANAMulticastAddr();
 
     /**
      * @brief   The distinguished unspecified IP address object.

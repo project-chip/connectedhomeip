@@ -839,16 +839,25 @@ void MdnsAvahi::FreeResolveContext(size_t handle)
 
 void MdnsAvahi::StopResolve(const char * name)
 {
-    auto truncate_end = std::remove_if(mAllocatedResolves.begin(), mAllocatedResolves.end(),
-                                       [name](ResolveContext * ctx) { return strcmp(ctx->mName, name) == 0; });
+    // Cancel and delete any pending resolves for this instance name.
+    //
+    // Note: callbacks may re-enter into dnssd logic, so first detach matching contexts from
+    // `mAllocatedResolves`, then invoke callbacks and delete outside of the list iteration.
+    std::vector<ResolveContext *> contexts;
+    mAllocatedResolves.remove_if([&contexts, name](ResolveContext * ctx) {
+        if (strcmp(ctx->mName, name) == 0)
+        {
+            contexts.push_back(ctx);
+            return true;
+        }
+        return false;
+    });
 
-    for (auto it = truncate_end; it != mAllocatedResolves.end(); it++)
+    for (auto * context : contexts)
     {
-        (*it)->mCallback((*it)->mContext, nullptr, Span<Inet::IPAddress>(), CHIP_ERROR_CANCELLED);
-        chip::Platform::Delete(*it);
+        context->mCallback(context->mContext, nullptr, Span<Inet::IPAddress>(), CHIP_ERROR_CANCELLED);
+        chip::Platform::Delete(context);
     }
-
-    mAllocatedResolves.erase(truncate_end, mAllocatedResolves.end());
 }
 
 CHIP_ERROR MdnsAvahi::Resolve(const char * name, const char * type, DnssdServiceProtocol protocol, Inet::IPAddressType addressType,

@@ -35,7 +35,9 @@ from matter.ChipDeviceCtrl import ChipDeviceController
 from matter.clusters.Attribute import AttributeCache, ValueDecodeFailure
 from matter.MatterTlvJson import TLVJsonConverter
 from matter.testing.conformance import ConformanceException
-from matter.testing.matter_testing import MatterBaseTest, MatterTestConfig, ProblemNotice
+from matter.testing.matter_test_config import MatterTestConfig
+from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.problem_notices import ProblemNotice
 from matter.testing.spec_parsing import PrebuiltDataModelDirectory, build_xml_clusters, build_xml_device_types, dm_from_spec_version
 
 LOGGER = logging.getLogger(__name__)
@@ -131,7 +133,7 @@ def MatterTlvToJson(tlv_data: dict[int, Any]) -> dict[str, Any]:
 
 def JsonToMatterTlv(json_filename: str) -> AttributeCache:
     converter = TLVJsonConverter()
-    with open(json_filename, "r") as fin:
+    with open(json_filename) as fin:
         json_tlv = json.load(fin)
         return converter.convert_dump_to_cache(json_tlv)
 
@@ -158,9 +160,9 @@ class BasicCompositionTests(MatterBaseTest):
         LOGGER.debug(f"Raw TLV contents of Node: {json_dump_string}")
 
         if dump_device_composition_path is not None:
-            with open(pathlib.Path(dump_device_composition_path).with_suffix(".json"), "wt+") as outfile:
+            with open(pathlib.Path(dump_device_composition_path).with_suffix(".json"), "w+") as outfile:
                 json.dump(node_dump_dict, outfile, indent=2)
-            with open(pathlib.Path(dump_device_composition_path).with_suffix(".txt"), "wt+") as outfile:
+            with open(pathlib.Path(dump_device_composition_path).with_suffix(".txt"), "w+") as outfile:
                 pprint(self.endpoints, outfile, indent=1, width=200, compact=True)
         return (json_dump_string, pformat(self.endpoints, indent=1, width=200, compact=True))
 
