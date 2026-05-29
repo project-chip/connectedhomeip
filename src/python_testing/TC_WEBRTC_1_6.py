@@ -23,7 +23,10 @@ from test_plan_support import commission_if_required
 from matter.ChipDeviceCtrl import TransportPayloadCapability
 from matter.clusters import CameraAvStreamManagement, Objects, WebRTCTransportProvider
 from matter.clusters.Types import NullValue
-from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
+from matter.interaction_model import InteractionModelError, Status
+from matter.testing.decorators import has_feature, run_if_endpoint_matches
+from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.runner import TestStep, default_matter_test_main
 from matter.webrtc import BrowserPeerConnection, WebRTCManager
 
 
@@ -213,13 +216,20 @@ class TC_WEBRTC_1_6(MatterBaseTest, WebRTCTestHelper):
             self.user_verify_two_way_talk("Verify if two way talk back is working")
 
         self.step(9)
-        await self.send_single_cmd(
-            cmd=WebRTCTransportProvider.Commands.EndSession(
-                webRTCSessionID=session_id, reason=Objects.Globals.Enums.WebRTCEndReasonEnum.kUserHangup
-            ),
-            endpoint=endpoint,
-            payloadCapability=TransportPayloadCapability.LARGE_PAYLOAD,
-        )
+        try:
+            await self.send_single_cmd(
+                cmd=WebRTCTransportProvider.Commands.EndSession(
+                    webRTCSessionID=session_id, reason=Objects.Globals.Enums.WebRTCEndReasonEnum.kUserHangup
+                ),
+                endpoint=endpoint,
+                payloadCapability=TransportPayloadCapability.LARGE_PAYLOAD,
+            )
+        except InteractionModelError as e:
+            # Since on closing the browser popup, the PC state changes to Disconnected/Closed.
+            # Some implementations can remove session from CurrentSessions on connection state
+            # switching to Disconnected/Closed. Hence ignore NotFound status response.
+            if (e.status != Status.NotFound):
+                raise
 
         if dut_has_vdo_feature:
             self.step(10)

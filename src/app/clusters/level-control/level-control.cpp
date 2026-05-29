@@ -173,9 +173,6 @@ public:
 
         AttributeValuePair pairs[kLevelMaxScenableAttributes];
 
-        uint8_t maxLevel;
-        VerifyOrReturnError(Status::Success == Attributes::MaxLevel::Get(endpoint, &maxLevel), CHIP_ERROR_READ_FAILED);
-
         pairs[0].attributeID = Attributes::CurrentLevel::Id;
         if (!level.IsNull())
         {

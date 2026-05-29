@@ -316,8 +316,18 @@ void Instance::HandleSetCookingParameters(HandlerContext & ctx, const Commands::
                 Zcl,
                 "Microwave Oven Control: Failed to set PowerSetting, PowerSetting value must be multiple of PowerStep number"));
 
+        // Snapshot PowerSetting before the delegate call so this cluster server can emit the
+        // attribute-change report when the delegate updates its internal value.  The delegate owns
+        // storage for PowerSetting, but reporting is the server's responsibility (mirrors CookTime).
+        uint8_t oldPowerSettingNum = mDelegate->GetPowerSettingNum();
+
         status = mDelegate->HandleSetCookingParametersCallback(reqCookMode, reqCookTimeSec, reqStartAfterSetting,
                                                                MakeOptional(reqPowerSettingNum), NullOptional);
+
+        if (oldPowerSettingNum != mDelegate->GetPowerSettingNum())
+        {
+            MatterReportingAttributeChangeCallback(mEndpointId, mClusterId, Attributes::PowerSetting::Id);
+        }
     }
     else
     {

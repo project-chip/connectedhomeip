@@ -23,6 +23,7 @@
 #include <app/data-model/Encode.h>
 #include <app/reporting/reporting.h>
 #include <app/util/attribute-storage.h>
+#include <app/util/endpoint-config-api.h>
 #include <clusters/OccupancySensing/Metadata.h>
 #include <lib/core/CHIPError.h>
 
@@ -195,6 +196,21 @@ CHIP_ERROR SetHoldTime(EndpointId endpointId, uint16_t newHoldTime)
     if (previousHoldTime != newHoldTime)
     {
         MatterReportingAttributeChangeCallback(endpointId, OccupancySensing::Id, Attributes::HoldTime::Id);
+
+        // HoldTime is aliased to the deprecated *OccupiedToUnoccupiedDelay attributes.
+        // For each alias enabled in ZAP on this endpoint, report so legacy subscribers see the change.
+        constexpr AttributeId kAliasAttributes[] = {
+            Attributes::PIROccupiedToUnoccupiedDelay::Id,
+            Attributes::UltrasonicOccupiedToUnoccupiedDelay::Id,
+            Attributes::PhysicalContactOccupiedToUnoccupiedDelay::Id,
+        };
+        for (AttributeId aliasId : kAliasAttributes)
+        {
+            if (emberAfContainsAttribute(endpointId, OccupancySensing::Id, aliasId))
+            {
+                MatterReportingAttributeChangeCallback(endpointId, OccupancySensing::Id, aliasId);
+            }
+        }
     }
 
     return CHIP_NO_ERROR;
