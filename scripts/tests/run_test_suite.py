@@ -22,6 +22,7 @@ import multiprocessing
 import os
 import random
 import shlex
+import subprocess
 import sys
 import time
 import warnings
@@ -690,8 +691,7 @@ if sys.platform == 'linux':
     )
     def cmd_shell(ns_index: int) -> None:
         with chiptest.linux.IsolatedNetworkNamespace(ns_index):
-            shell = os.environ.get("SHELL", "bash")
-            subprocess.run(shell)
+            subprocess.run(os.environ.get("SHELL", "bash"))
 
 
 if __name__ == '__main__':
