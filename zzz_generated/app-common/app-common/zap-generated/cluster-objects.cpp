@@ -187,6 +187,10 @@
 #include <clusters/EcosystemInformation/Commands.ipp>
 #include <clusters/EcosystemInformation/Events.ipp>
 #include <clusters/EcosystemInformation/Structs.ipp>
+#include <clusters/ElectricalDistribution/Attributes.ipp>
+#include <clusters/ElectricalDistribution/Commands.ipp>
+#include <clusters/ElectricalDistribution/Events.ipp>
+#include <clusters/ElectricalDistribution/Structs.ipp>
 #include <clusters/ElectricalEnergyMeasurement/Attributes.ipp>
 #include <clusters/ElectricalEnergyMeasurement/Commands.ipp>
 #include <clusters/ElectricalEnergyMeasurement/Events.ipp>
@@ -543,10 +547,6 @@
 #include <clusters/TimeSynchronization/Commands.ipp>
 #include <clusters/TimeSynchronization/Events.ipp>
 #include <clusters/TimeSynchronization/Structs.ipp>
-#include <clusters/Timer/Attributes.ipp>
-#include <clusters/Timer/Commands.ipp>
-#include <clusters/Timer/Events.ipp>
-#include <clusters/Timer/Structs.ipp>
 #include <clusters/TlsCertificateManagement/Attributes.ipp>
 #include <clusters/TlsCertificateManagement/Commands.ipp>
 #include <clusters/TlsCertificateManagement/Events.ipp>
@@ -960,13 +960,6 @@ bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
             return true;
         case Clusters::IcdManagement::Commands::UnregisterClient::Id:
             return true;
-        default:
-            return false;
-        }
-    }
-    case Clusters::Timer::Id: {
-        switch (aCommand)
-        {
         default:
             return false;
         }
