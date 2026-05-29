@@ -1,0 +1,11 @@
+# Name,           Type, SubType,   Offset, Size,     Flags
+tee_0,            app,  tee_0,     ,       0x30000,
+tee_1,            app,  tee_1,     ,       0x30000,
+secure_storage,   data, nvs,       ,       0x10000,
+esp_secure_cert,  0x3F, ,          ,       0x2000,   encrypted
+nvs,              data, nvs,       ,       0xC000,
+otadata,          data, ota,       ,       0x2000,
+phy_init,         data, phy,       ,       0x1000,
+ota_0,            app,  ota_0,     ,       0x1E0000,
+ota_1,            app,  ota_1,     ,       0x1E0000,
+fctry,            data, nvs,       ,       0x6000,
