@@ -25,9 +25,11 @@ and activate the project's Python virtual environment.
 > folder:
 
 ```bash
-./scripts/build_python.sh -i out/venv
+./scripts/build_python.sh -i out/venv --enable_ipv4 true
 source out/venv/bin/activate
 ```
+
+Be sure to check the arguments in the `build_python.sh` script before setting up the virtual environment. Run the shell script with the `--help` argument to see all available options that may be relevant for the tests.
 
 ---
 
@@ -212,7 +214,7 @@ compile and activate this specific virtual environment path before running the
 command:
 
 ```bash
-./scripts/build_python.sh -i out/venv
+./scripts/build_python.sh -i out/venv --enable_ipv4 true
 source out/venv/bin/activate
 ```
 
