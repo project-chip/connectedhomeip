@@ -154,8 +154,18 @@ private:
         mThermostatManager(aThermostatEndpointId, [this]() { HeatingCallback(); })
     {}
 
+    /**
+     * @brief Handle attribute changes for the Fan Control Cluster
+     * @param[in] attributeId    Cluster attribute id that changed
+     * @param[in] type           Cluster attribute type
+     * @param[in] size           Size of the attribute
+     * @param[in] value          Pointer to the new value
+     */
+    void HandleFanControlAttributeChange(AttributeId attributeId, uint8_t type, uint16_t size, uint8_t * value);
+
     void PercentSettingWriteCallback(uint8_t aNewPercentSetting);
     void SpeedSettingWriteCallback(uint8_t aNewSpeedSetting);
+    void FanModeWriteCallback(FanControl::FanModeEnum aNewFanMode);
 
     void SetSpeedSetting(DataModel::Nullable<uint8_t> aNewSpeedSetting);
     DataModel::Nullable<uint8_t> GetSpeedSetting();
