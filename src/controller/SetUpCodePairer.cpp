@@ -352,7 +352,7 @@ CHIP_ERROR SetUpCodePairer::StartDiscoveryOverNFC()
     VerifyOrReturnValue(!connDiscriminator.IsShortDiscriminator(), CHIP_ERROR_INVALID_ARGUMENT,
                         ChipLogError(Controller, "Error, Long discriminator is required"));
     chip::Nfc::NFCTag::Identifier identifier{};
-    identifier.discriminator = payload.discriminator.GetLongValue();
+    identifier.discriminator                  = payload.discriminator.GetLongValue();
     Nfc::NFCReaderTransport * readerTransport = DeviceLayer::Internal::NFCCommissioningMgr().GetNFCReaderTransport();
     if (!readerTransport)
     {
