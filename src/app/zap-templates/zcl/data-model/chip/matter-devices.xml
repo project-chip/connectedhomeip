@@ -1659,7 +1659,7 @@ limitations under the License.
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters>
-            <include cluster="Electrical Distribution" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Electrical Distribution" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="Identify" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="On/Off" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="Power Topology" client="false" server="true" clientLocked="true" serverLocked="true"></include>
