@@ -258,8 +258,8 @@ on the ESP32-C6, with the required partition table and sdkconfig defaults:
     — partition table that reserves the TEE app (`tee_0`/`tee_1`) and the TEE
     `secure_storage` partitions.
 -   [`sdkconfig.defaults.esp32c6_tee`](../../../examples/lighting-app/esp32/sdkconfig.defaults.esp32c6_tee)
-    — config defaults that enable ESP-TEE, the secure cert DAC provider, and
-    TEE secure storage while disabling the DS peripheral.
+    — config defaults that enable ESP-TEE, the secure cert DAC provider, and TEE
+    secure storage while disabling the DS peripheral.
 
 `CONFIG_USE_ESP32_TEE_SECURE_STORAGE` is selected automatically when
 `SEC_CERT_DAC_PROVIDER` and `SECURE_ENABLE_TEE` are enabled while

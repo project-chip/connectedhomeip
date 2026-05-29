@@ -256,7 +256,7 @@ CHIP_ERROR ESP32P256Keypair::InitializeFromTEE(ECPKeyTarget keyTarget, const cha
         // The TEE-bound `d` MPI is a magic marker (s=ECDSA_KEY_MAGIC_TEE, p=key-id-ptr),
         // not a real scalar. Move it by struct assignment so the magic and pointer survive;
         // mbedtls_mpi_copy would value-copy and lose the marker.
-        ecdsa_ctx->MBEDTLS_PRIVATE(d) = keypair->MBEDTLS_PRIVATE(d);
+        ecdsa_ctx->MBEDTLS_PRIVATE(d)                  = keypair->MBEDTLS_PRIVATE(d);
         keypair->MBEDTLS_PRIVATE(d).MBEDTLS_PRIVATE(s) = 1;
         keypair->MBEDTLS_PRIVATE(d).MBEDTLS_PRIVATE(n) = 0;
         keypair->MBEDTLS_PRIVATE(d).MBEDTLS_PRIVATE(p) = nullptr;
