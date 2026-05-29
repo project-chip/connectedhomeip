@@ -7613,6 +7613,8 @@ char const * DeviceTypeIdToText(chip::DeviceTypeId id)
         return "Electrical Energy Tariff";
     case 0x00000514:
         return "Electrical Meter";
+    case 0x00000517:
+        return "Electrical Distribution Enclosure";
     case 0x00000840:
         return "Control Bridge";
     case 0x00000850:
