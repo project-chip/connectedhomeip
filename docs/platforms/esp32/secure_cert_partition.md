@@ -229,3 +229,57 @@ esptool.py -p (PORT) write_flash 0xd000 path/to/secure_cert_partition.bin
 ```
 esptool.py -p (PORT) write_flash 0x3E0000 path/to/factory_partition.bin
 ```
+
+## 1.7 Signing the DAC in TEE
+
+### 1.7.1 What is ESP-TEE
+
+ESP-TEE (Trusted Execution Environment) is a hardware-isolated secure
+environment available on SoCs such as the ESP32-C6. It splits the firmware into
+a secure world (TEE) and a non-secure world (REE, where the Matter application
+runs), so that secrets and sensitive operations stay isolated from the
+application.
+
+Using the TEE secure storage service, the DAC private key can be stored inside
+the TEE and all ECDSA signing with that key is performed within the secure
+world. The private key is therefore never exposed to the non-secure Matter
+application.
+
+For a detailed introduction to the architecture, services, and APIs, refer to
+the
+[ESP-IDF TEE documentation](https://docs.espressif.com/projects/esp-idf/en/latest/esp32c6/security/tee/index.html).
+
+### 1.7.2 TEE support in the lighting-app
+
+The lighting-app is already configured to sign the DAC from TEE secure storage
+on the ESP32-C6, with the required partition table and sdkconfig defaults:
+
+-   [`partitions_tee.csv`](../../../examples/lighting-app/esp32/partitions_tee.csv)
+    — partition table that reserves the TEE app (`tee_0`/`tee_1`) and the TEE
+    `secure_storage` partitions.
+-   [`sdkconfig.defaults.esp32c6_tee`](../../../examples/lighting-app/esp32/sdkconfig.defaults.esp32c6_tee)
+    — config defaults that enable ESP-TEE, the secure cert DAC provider, and
+    TEE secure storage while disabling the DS peripheral.
+
+`CONFIG_USE_ESP32_TEE_SECURE_STORAGE` is selected automatically when
+`SEC_CERT_DAC_PROVIDER` and `SECURE_ENABLE_TEE` are enabled while
+`ESP_SECURE_CERT_DS_PERIPHERAL` is disabled.
+
+### 1.7.3 Generating the provisioned partitions with the mfg tool
+
+Provisioning the DAC private key into TEE secure storage and generating the
+matching `esp_secure_cert` and factory partitions is handled by the Espressif
+manufacturing tool,
+[esp-matter-mfg-tool](https://github.com/espressif/esp-matter-tools/tree/main/mfg_tool).
+It produces the per-device partitions in the precise layout expected by the
+firmware.
+
+Install it with:
+
+```
+pip install esp-matter-mfg-tool
+```
+
+See the
+[esp-matter-mfg-tool documentation](https://docs.espressif.com/projects/esp-matter/en/latest/esp32/production.html)
+for the full set of options and the TEE-specific flags.
