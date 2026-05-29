@@ -17,7 +17,6 @@ limitations under the License.
 
 import logging
 import sys
-from pathlib import Path
 
 from helper.CHIPTestBase import CHIPVirtualHome
 from helper.paths import CHIP_IM_INITIATOR_ESC, CHIP_IM_RESPONDER_ESC, CHIP_REPO_STR

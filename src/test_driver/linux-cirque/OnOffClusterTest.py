@@ -18,7 +18,6 @@ limitations under the License.
 import logging
 import sys
 import time
-from pathlib import Path
 
 from helper.CHIPTestBase import CHIPVirtualHome
 from helper.paths import CHIP_LIGHTING_APP_ESC, CHIP_REPO_STR, CHIP_TOOL_ESC

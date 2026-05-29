@@ -20,7 +20,6 @@ import logging
 import sys
 import time
 from optparse import OptionParser
-from pathlib import Path
 
 from helper.CHIPTestBase import CHIPVirtualHome
 from helper.paths import CHIP_REPO_PATH, CHIP_REPO_STR
