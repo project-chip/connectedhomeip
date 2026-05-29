@@ -74,8 +74,8 @@ TEST(TestCharSpanToStdString, ResultIsIndependentOfSourceSpan)
 {
     // The helper returns an owning std::string. Mutating the source buffer or letting it go
     // out of scope must not affect the returned string.
-    char buf[] = "original";
+    char buf[]         = "original";
     std::string result = CharSpanToStdString(CharSpan(buf, sizeof(buf) - 1));
-    buf[0] = 'X'; // modify source after copy
+    buf[0]             = 'X'; // modify source after copy
     EXPECT_EQ(result, "original");
 }
