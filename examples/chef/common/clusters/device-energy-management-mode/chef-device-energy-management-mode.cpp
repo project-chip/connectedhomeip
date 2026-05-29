@@ -47,7 +47,7 @@ static std::unique_ptr<Instance> gDeviceEnergyManagementModeInstance;
 
 #endif // MATTER_DM_PLUGIN_DEVICE_ENERGY_MANAGEMENT_MODE_SERVER
 
-void MatterDeviceEnergyManagementModeClusterInitCallback(EndpointId endpointId)
+void MatterDeviceEnergyManagementModeClusterInitCallback(chip::EndpointId endpointId)
 {
     VerifyOrDie(endpointId == 1);
     VerifyOrDie(!gDeviceEnergyManagementModeInstance);
@@ -57,7 +57,7 @@ void MatterDeviceEnergyManagementModeClusterInitCallback(EndpointId endpointId)
     ChipLogProgress(DeviceLayer, "DeviceEnergyManagementMode initialized on endpoint %u", endpointId);
 }
 
-void MatterDeviceEnergyManagementModeClusterShutdownCallback(EndpointId endpointId, MatterClusterShutdownType)
+void MatterDeviceEnergyManagementModeClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType)
 {
     VerifyOrDie(endpointId == 1);
     if (gDeviceEnergyManagementModeInstance)
