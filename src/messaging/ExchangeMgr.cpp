@@ -269,6 +269,13 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
         msgFlags.Set(MessageFlagValues::kDuplicateMessage);
     }
 
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+    if (mTestOnlyReceivedObserver != nullptr)
+    {
+        mTestOnlyReceivedObserver->OnMessageReceived(packetHeader, payloadHeader, msgBuf);
+    }
+#endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
+
     // Skip retrieval of exchange for group message since no exchange is stored
     // for group msg (optimization)
     if (!packetHeader.IsGroupSession())
