@@ -16,11 +16,13 @@ limitations under the License.
 """
 
 import logging
-import os
+import shlex
 import sys
 from pathlib import Path
 
 from helper.CHIPTestBase import CHIPVirtualHome
+from helper.paths import (CHIP_ALL_CLUSTERS_APP_ESC, CHIP_REPO_STR, CONTROLLER_TEST_SCRIPTS_DIR_PATH,
+                          MATTER_CONTROLLER_INSTALL_WHEELS, MATTER_DEVELOPMENT_PAA_ROOT_CERTS_ESC)
 
 logger = logging.getLogger('MobileDeviceTest')
 logger.setLevel(logging.INFO)
@@ -35,9 +37,11 @@ CHIP_PORT = 5540
 
 CIRQUE_URL = "http://localhost:5000"
 CHIP_REPO = next(filter(lambda p: (p / 'SPECIFICATION_VERSION').is_file(), Path(__file__).parents))
+
+TEST_EXTPANID = "fedcba9876543210"
 TEST_DISCRIMINATOR = 3840
 TEST_PASSCODE = 20202021
-MATTER_DEVELOPMENT_PAA_ROOT_CERTS = "credentials/development/paa-root-certs"
+TEST_SCRIPT_ESC = shlex.quote(str(CONTROLLER_TEST_SCRIPTS_DIR_PATH / "failsafe_tests.py"))
 
 DEVICE_CONFIG = {
     'device0': {
@@ -47,7 +51,7 @@ DEVICE_CONFIG = {
         'rcp_mode': True,
         'docker_network': 'Ipv6',
         'traffic_control': {'latencyMs': 100},
-        "mount_pairs": [[CHIP_REPO, CHIP_REPO]],
+        "mount_pairs": [[CHIP_REPO_STR, CHIP_REPO_STR]],
     },
     'device1': {
         'type': 'CHIPEndDevice',
@@ -56,7 +60,7 @@ DEVICE_CONFIG = {
         'rcp_mode': True,
         'docker_network': 'Ipv6',
         'traffic_control': {'latencyMs': 100},
-        "mount_pairs": [[CHIP_REPO, CHIP_REPO]],
+        "mount_pairs": [[CHIP_REPO_STR, CHIP_REPO_STR]],
     }
 }
 
@@ -81,27 +85,17 @@ class TestFailsafe(CHIPVirtualHome):
         for server in server_ids:
             self.execute_device_cmd(
                 server,
-                ("CHIPCirqueDaemon.py -- run gdb -return-child-result -q -ex \"set pagination off\" "
-                 "-ex run -ex \"bt 25\" --args {} --thread --discriminator {}").format(
-                    os.path.join(CHIP_REPO, "out/debug/standalone/chip-all-clusters-app"), TEST_DISCRIMINATOR))
+                f'CHIPCirqueDaemon.py -- run gdb -return-child-result -q -ex "set pagination off" -ex run -ex "bt 25" '
+                f'--args {CHIP_ALL_CLUSTERS_APP_ESC} --thread --discriminator {TEST_DISCRIMINATOR}')
 
         self.reset_thread_devices(server_ids)
 
         req_device_id = req_ids[0]
 
-        self.execute_device_cmd(req_device_id, "pip3 install --break-system-packages {}".format(os.path.join(
-            CHIP_REPO, "out/debug/linux_x64_gcc/controller/python/matter_clusters-1.0.0-py3-none-any.whl")))
-        self.execute_device_cmd(req_device_id, "pip3 install --break-system-packages {}".format(os.path.join(
-            CHIP_REPO, "out/debug/linux_x64_gcc/controller/python/matter_core-1.0.0-cp311-abi3-linux_x86_64.whl")))
-        self.execute_device_cmd(req_device_id, "pip3 install --break-system-packages {}".format(os.path.join(
-            CHIP_REPO, "out/debug/linux_x64_gcc/controller/python/matter_repl-1.0.0-py3-none-any.whl")))
+        self.execute_device_cmd(req_device_id, MATTER_CONTROLLER_INSTALL_WHEELS)
 
-        command = "gdb -return-child-result -q -ex run -ex bt --args python3 {} -t 150 -d {} -c {} --paa-trust-store-path {}".format(
-            os.path.join(
-                CHIP_REPO, "src/controller/python/tests/scripts/failsafe_tests.py"),
-            TEST_DISCRIMINATOR,
-            TEST_PASSCODE,
-            os.path.join(CHIP_REPO, MATTER_DEVELOPMENT_PAA_ROOT_CERTS))
+        command = (f"gdb -return-child-result -q -ex run -ex bt --args python3 {TEST_SCRIPT_ESC} -t 150 -d {TEST_DISCRIMINATOR} "
+                   f"-c {TEST_PASSCODE} --paa-trust-store-path {MATTER_DEVELOPMENT_PAA_ROOT_CERTS_ESC}")
         ret = self.execute_device_cmd(req_device_id, command)
 
         self.assertEqual(ret['return_code'], '0',

@@ -16,11 +16,11 @@ limitations under the License.
 """
 
 import logging
-import os
 import sys
 from pathlib import Path
 
 from helper.CHIPTestBase import CHIPVirtualHome
+from helper.paths import CHIP_ECHO_REQUESTER_ESC, CHIP_ECHO_RESPONDER_ESC, CHIP_REPO_STR
 
 logger = logging.getLogger('CHIPEchoOverTcpTest')
 logger.setLevel(logging.INFO)
@@ -41,7 +41,7 @@ DEVICE_CONFIG = {
         'rcp_mode': True,
         'docker_network': 'Ipv6',
         'traffic_control': {'latencyMs': 100},
-        "mount_pairs": [[CHIP_REPO, CHIP_REPO]],
+        "mount_pairs": [[CHIP_REPO_STR, CHIP_REPO_STR]],
     },
     'device1': {
         'type': 'CHIP-Echo-Responder',
@@ -50,7 +50,7 @@ DEVICE_CONFIG = {
         'rcp_mode': True,
         'docker_network': 'Ipv6',
         'traffic_control': {'latencyMs': 100},
-        "mount_pairs": [[CHIP_REPO, CHIP_REPO]],
+        "mount_pairs": [[CHIP_REPO_STR, CHIP_REPO_STR]],
     }
 }
 
@@ -84,12 +84,9 @@ class TestEchoOverTCP(CHIPVirtualHome):
         for _id in resp_ids:
             self.execute_device_cmd(
                 _id,
-                "CHIPCirqueDaemon.py -- run gdb -batch -return-child-result -q -ex run -ex bt --args {}".format(
-                    os.path.join(CHIP_REPO, "out/debug/linux_x64_gcc/chip-echo-responder --tcp")))
+                f"CHIPCirqueDaemon.py -- run gdb -batch -return-child-result -q -ex run -ex bt --args {CHIP_ECHO_RESPONDER_ESC} --tcp")
 
-        command = "gdb -return-child-result -q -ex run -ex bt --args " + \
-            os.path.join(
-                CHIP_REPO, "out/debug/linux_x64_gcc/chip-echo-requester") + " {}" + " --tcp"
+        command = f"gdb -return-child-result -q -ex run -ex bt --args {CHIP_ECHO_REQUESTER_ESC} {{}} --tcp"
 
         for ip in resp_ips:
             ret = self.execute_device_cmd(

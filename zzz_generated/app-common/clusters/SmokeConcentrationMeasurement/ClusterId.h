@@ -1,6 +1,6 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Identifier constant values for cluster Timer (cluster code: 71/0x47)
+// Identifier constant values for cluster SmokeConcentrationMeasurement (cluster code: 1076/0x434)
 // based on src/controller/data_model/controller-clusters.matter
 #pragma once
 
@@ -9,9 +9,11 @@
 namespace chip {
 namespace app {
 namespace Clusters {
-namespace Timer {
-namespace Events {} // namespace Events
-} // namespace Timer
+namespace SmokeConcentrationMeasurement {
+
+inline constexpr ClusterId Id = 0x00000434;
+
+} // namespace SmokeConcentrationMeasurement
 } // namespace Clusters
 } // namespace app
 } // namespace chip

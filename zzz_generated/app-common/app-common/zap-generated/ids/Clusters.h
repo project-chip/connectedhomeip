@@ -136,6 +136,7 @@
 #include <clusters/ScenesManagement/ClusterId.h>
 #include <clusters/ServiceArea/ClusterId.h>
 #include <clusters/SmokeCoAlarm/ClusterId.h>
+#include <clusters/SmokeConcentrationMeasurement/ClusterId.h>
 #include <clusters/SoftwareDiagnostics/ClusterId.h>
 #include <clusters/SoilMeasurement/ClusterId.h>
 #include <clusters/Switch/ClusterId.h>
@@ -149,7 +150,6 @@
 #include <clusters/ThreadNetworkDirectory/ClusterId.h>
 #include <clusters/TimeFormatLocalization/ClusterId.h>
 #include <clusters/TimeSynchronization/ClusterId.h>
-#include <clusters/Timer/ClusterId.h>
 #include <clusters/TlsCertificateManagement/ClusterId.h>
 #include <clusters/TlsClientManagement/ClusterId.h>
 #include <clusters/TotalVolatileOrganicCompoundsConcentrationMeasurement/ClusterId.h>

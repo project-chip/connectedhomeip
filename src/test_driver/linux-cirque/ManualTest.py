@@ -17,13 +17,13 @@ limitations under the License.
 
 import json
 import logging
-import os
 import sys
 import time
 from optparse import OptionParser
 from pathlib import Path
 
 from helper.CHIPTestBase import CHIPVirtualHome
+from helper.paths import CHIP_REPO_PATH, CHIP_REPO_STR
 
 #############################################################
 
@@ -47,7 +47,6 @@ CHIP_PORT = 5540
 #############################################################
 
 CIRQUE_URL = "http://localhost:5000"
-CHIP_REPO = next(filter(lambda p: (p / 'SPECIFICATION_VERSION').is_file(), Path(__file__).parents))
 
 logger = logging.getLogger('CHIPCirqueTest')
 logger.setLevel(logging.INFO)
@@ -92,8 +91,8 @@ def _parse_mount_dir(config):
             continue
         _mount_pairs = v.get("mount_pairs", [])
         for mount in _mount_pairs:
-            mount[0] = mount[0].format(chip_repo=CHIP_REPO)
-            mount[1] = mount[1].format(chip_repo=CHIP_REPO)
+            mount[0] = mount[0].format(chip_repo=CHIP_REPO_STR)
+            mount[1] = mount[1].format(chip_repo=CHIP_REPO_STR)
         v["mount_pairs"] = _mount_pairs
     return config
 
@@ -123,7 +122,7 @@ if __name__ == "__main__":
     if not options.topologyFile:
         raise Exception("Must specify a topology file!")
 
-    with open(os.path.join(CHIP_REPO, options.topologyFile)) as fp:
+    with open(CHIP_REPO_PATH / options.topologyFile) as fp:
         config_operations = [_parse_mount_dir]
         DEVICE_CONFIG = json.load(fp)
         for op in config_operations:

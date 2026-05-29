@@ -16,11 +16,11 @@ limitations under the License.
 """
 
 import logging
-import os
 import sys
 from pathlib import Path
 
 from helper.CHIPTestBase import CHIPVirtualHome
+from helper.paths import CHIP_IM_INITIATOR_ESC, CHIP_IM_RESPONDER_ESC, CHIP_REPO_STR
 
 logger = logging.getLogger('CHIPInteractionModelTest')
 logger.setLevel(logging.INFO)
@@ -31,8 +31,6 @@ sh.setFormatter(
         '%(asctime)s [%(name)s] %(levelname)s %(message)s'))
 logger.addHandler(sh)
 
-CHIP_REPO = next(filter(lambda p: (p / 'SPECIFICATION_VERSION').is_file(), Path(__file__).parents))
-
 DEVICE_CONFIG = {
     'device0': {
         'type': 'CHIP-IM-Initiator',
@@ -41,7 +39,7 @@ DEVICE_CONFIG = {
         'rcp_mode': True,
         'docker_network': 'Ipv6',
         'traffic_control': {'latencyMs': 100},
-        "mount_pairs": [[CHIP_REPO, CHIP_REPO]],
+        "mount_pairs": [[CHIP_REPO_STR, CHIP_REPO_STR]],
     },
     'device1': {
         'type': 'CHIP-IM-Responder',
@@ -50,7 +48,7 @@ DEVICE_CONFIG = {
         'rcp_mode': True,
         'docker_network': 'Ipv6',
         'traffic_control': {'latencyMs': 100},
-        "mount_pairs": [[CHIP_REPO, CHIP_REPO]],
+        "mount_pairs": [[CHIP_REPO_STR, CHIP_REPO_STR]],
     }
 }
 
@@ -82,12 +80,10 @@ class TestInteractionModel(CHIPVirtualHome):
         req_device_id = req_ids[0]
 
         for _id in resp_ids:
-            self.execute_device_cmd(_id, "CHIPCirqueDaemon.py -- run gdb -batch -return-child-result -q -ex run -ex bt {}".format(
-                os.path.join(CHIP_REPO, "out/debug/linux_x64_gcc/chip-im-responder")))
+            self.execute_device_cmd(
+                _id, f"CHIPCirqueDaemon.py -- run gdb -batch -return-child-result -q -ex run -ex bt --args {CHIP_IM_RESPONDER_ESC}")
 
-        command = "gdb -return-child-result -q -ex run -ex bt --args " + \
-            os.path.join(
-                CHIP_REPO, "out/debug/linux_x64_gcc/chip-im-initiator") + " {}"
+        command = f"gdb -return-child-result -q -ex run -ex bt --args {CHIP_IM_INITIATOR_ESC} {{}}"
 
         for ip in resp_ips:
             ret = self.execute_device_cmd(

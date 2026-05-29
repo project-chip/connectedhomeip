@@ -242,6 +242,8 @@
 #include <clusters/ServiceArea/MetadataProvider.h>
 #include <clusters/SmokeCoAlarm/Ids.h>
 #include <clusters/SmokeCoAlarm/MetadataProvider.h>
+#include <clusters/SmokeConcentrationMeasurement/Ids.h>
+#include <clusters/SmokeConcentrationMeasurement/MetadataProvider.h>
 #include <clusters/SoftwareDiagnostics/Ids.h>
 #include <clusters/SoftwareDiagnostics/MetadataProvider.h>
 #include <clusters/SoilMeasurement/Ids.h>
@@ -268,8 +270,6 @@
 #include <clusters/TimeFormatLocalization/MetadataProvider.h>
 #include <clusters/TimeSynchronization/Ids.h>
 #include <clusters/TimeSynchronization/MetadataProvider.h>
-#include <clusters/Timer/Ids.h>
-#include <clusters/Timer/MetadataProvider.h>
 #include <clusters/TlsCertificateManagement/Ids.h>
 #include <clusters/TlsCertificateManagement/MetadataProvider.h>
 #include <clusters/TlsClientManagement/Ids.h>
@@ -905,6 +905,11 @@ std::optional<DataModel::AcceptedCommandEntry> AcceptedCommandEntryFor(ClusterId
         if (id == SmokeCoAlarm::Id)
             return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, SmokeCoAlarm::Id>::EntryFor(command);
     }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == SmokeConcentrationMeasurement::Id) || ...))
+    {
+        if (id == SmokeConcentrationMeasurement::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, SmokeConcentrationMeasurement::Id>::EntryFor(command);
+    }
     if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == SoftwareDiagnostics::Id) || ...))
     {
         if (id == SoftwareDiagnostics::Id)
@@ -965,11 +970,6 @@ std::optional<DataModel::AcceptedCommandEntry> AcceptedCommandEntryFor(ClusterId
     {
         if (id == TimeFormatLocalization::Id)
             return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, TimeFormatLocalization::Id>::EntryFor(command);
-    }
-    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == Timer::Id) || ...))
-    {
-        if (id == Timer::Id)
-            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Timer::Id>::EntryFor(command);
     }
     if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == TimeSynchronization::Id) || ...))
     {

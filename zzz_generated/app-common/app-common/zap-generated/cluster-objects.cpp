@@ -487,6 +487,10 @@
 #include <clusters/SmokeCoAlarm/Commands.ipp>
 #include <clusters/SmokeCoAlarm/Events.ipp>
 #include <clusters/SmokeCoAlarm/Structs.ipp>
+#include <clusters/SmokeConcentrationMeasurement/Attributes.ipp>
+#include <clusters/SmokeConcentrationMeasurement/Commands.ipp>
+#include <clusters/SmokeConcentrationMeasurement/Events.ipp>
+#include <clusters/SmokeConcentrationMeasurement/Structs.ipp>
 #include <clusters/SoftwareDiagnostics/Attributes.ipp>
 #include <clusters/SoftwareDiagnostics/Commands.ipp>
 #include <clusters/SoftwareDiagnostics/Events.ipp>
@@ -539,10 +543,6 @@
 #include <clusters/TimeSynchronization/Commands.ipp>
 #include <clusters/TimeSynchronization/Events.ipp>
 #include <clusters/TimeSynchronization/Structs.ipp>
-#include <clusters/Timer/Attributes.ipp>
-#include <clusters/Timer/Commands.ipp>
-#include <clusters/Timer/Events.ipp>
-#include <clusters/Timer/Structs.ipp>
 #include <clusters/TlsCertificateManagement/Attributes.ipp>
 #include <clusters/TlsCertificateManagement/Commands.ipp>
 #include <clusters/TlsCertificateManagement/Events.ipp>
@@ -956,13 +956,6 @@ bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
             return true;
         case Clusters::IcdManagement::Commands::UnregisterClient::Id:
             return true;
-        default:
-            return false;
-        }
-    }
-    case Clusters::Timer::Id: {
-        switch (aCommand)
-        {
         default:
             return false;
         }

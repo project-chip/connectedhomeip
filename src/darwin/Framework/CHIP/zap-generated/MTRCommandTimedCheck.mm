@@ -347,15 +347,6 @@ static BOOL CommandNeedsTimedInvokeInICDManagementCluster(AttributeId aAttribute
     }
     }
 }
-static BOOL CommandNeedsTimedInvokeInTimerCluster(AttributeId aAttributeId)
-{
-    using namespace Clusters::Timer;
-    switch (aAttributeId) {
-    default: {
-        return NO;
-    }
-    }
-}
 static BOOL CommandNeedsTimedInvokeInOvenCavityOperationalStateCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::OvenCavityOperationalState;
@@ -1058,6 +1049,15 @@ static BOOL CommandNeedsTimedInvokeInProximityRangingCluster(AttributeId aAttrib
     }
     }
 }
+static BOOL CommandNeedsTimedInvokeInSmokeConcentrationMeasurementCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::SmokeConcentrationMeasurement;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL CommandNeedsTimedInvokeInNetworkIdentityManagementCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::NetworkIdentityManagement;
@@ -1542,9 +1542,6 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     case Clusters::IcdManagement::Id: {
         return CommandNeedsTimedInvokeInICDManagementCluster(commandID);
     }
-    case Clusters::Timer::Id: {
-        return CommandNeedsTimedInvokeInTimerCluster(commandID);
-    }
     case Clusters::OvenCavityOperationalState::Id: {
         return CommandNeedsTimedInvokeInOvenCavityOperationalStateCluster(commandID);
     }
@@ -1757,6 +1754,9 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     }
     case Clusters::ProximityRanging::Id: {
         return CommandNeedsTimedInvokeInProximityRangingCluster(commandID);
+    }
+    case Clusters::SmokeConcentrationMeasurement::Id: {
+        return CommandNeedsTimedInvokeInSmokeConcentrationMeasurementCluster(commandID);
     }
     case Clusters::NetworkIdentityManagement::Id: {
         return CommandNeedsTimedInvokeInNetworkIdentityManagementCluster(commandID);

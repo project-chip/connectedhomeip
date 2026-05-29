@@ -134,7 +134,6 @@
         "thread-network-directory-cluster.xml",
         "time-format-localization-cluster.xml",
         "time-synchronization-cluster.xml",
-        "timer-cluster.xml",
         "tls-certificate-management-cluster.xml",
         "tls-client-management-cluster.xml",
         "user-label-cluster.xml",
