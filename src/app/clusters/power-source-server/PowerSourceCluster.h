@@ -845,13 +845,13 @@ public:
                 return CHIP_ERROR_INVALID_ARGUMENT;
             }
 
-            BitSetType newBitSet = this->activeWiredFaultsBitSet;
-            newBitSet.set(to_underlying(val));
-
-            if (this->activeWiredFaultsBitSet == newBitSet)
+            if (this->activeWiredFaultsBitSet.test(to_underlying(val)))
             {
                 return CHIP_NO_ERROR;
             }
+
+            BitSetType newBitSet = this->activeWiredFaultsBitSet;
+            newBitSet.set(to_underlying(val));
 
             GenerateWiredFaultEventAndSetAndNotify(newBitSet);
             return CHIP_NO_ERROR;
@@ -866,13 +866,13 @@ public:
                 return CHIP_ERROR_INVALID_ARGUMENT;
             }
 
-            BitSetType newBitSet = this->activeWiredFaultsBitSet;
-            newBitSet.set(to_underlying(val), false);
-
-            if (this->activeWiredFaultsBitSet == newBitSet)
+            if (!this->activeWiredFaultsBitSet.test(to_underlying(val)))
             {
                 return CHIP_NO_ERROR;
             }
+
+            BitSetType newBitSet = this->activeWiredFaultsBitSet;
+            newBitSet.set(to_underlying(val), false);
 
             GenerateWiredFaultEventAndSetAndNotify(newBitSet);
             return CHIP_NO_ERROR;
@@ -996,13 +996,13 @@ public:
                 return CHIP_ERROR_INVALID_ARGUMENT;
             }
 
-            BitSetType newBitSet = this->activeBatFaultsBitSet;
-            newBitSet.set(to_underlying(val));
-
-            if (this->activeBatFaultsBitSet == newBitSet)
+            if (this->activeBatFaultsBitSet.test(to_underlying(val)))
             {
                 return CHIP_NO_ERROR;
             }
+
+            BitSetType newBitSet = this->activeBatFaultsBitSet;
+            newBitSet.set(to_underlying(val));
 
             GenerateBatFaultEventAndSetAndNotify(newBitSet);
             return CHIP_NO_ERROR;
@@ -1017,13 +1017,13 @@ public:
                 return CHIP_ERROR_INVALID_ARGUMENT;
             }
 
-            BitSetType newBitSet = this->activeBatFaultsBitSet;
-            newBitSet.set(to_underlying(val), false);
-
-            if (this->activeBatFaultsBitSet == newBitSet)
+            if (!this->activeBatFaultsBitSet.test(to_underlying(val)))
             {
                 return CHIP_NO_ERROR;
             }
+
+            BitSetType newBitSet = this->activeBatFaultsBitSet;
+            newBitSet.set(to_underlying(val), false);
 
             GenerateBatFaultEventAndSetAndNotify(newBitSet);
             return CHIP_NO_ERROR;
@@ -1104,13 +1104,13 @@ public:
                 return CHIP_ERROR_INVALID_ARGUMENT;
             }
 
-            BitSetType newBitSet = this->activeBatChargeFaultsBitSet;
-            newBitSet.set(to_underlying(val));
-
-            if (this->activeBatChargeFaultsBitSet == newBitSet)
+            if (this->activeBatChargeFaultsBitSet.test(to_underlying(val)))
             {
                 return CHIP_NO_ERROR;
             }
+
+            BitSetType newBitSet = this->activeBatChargeFaultsBitSet;
+            newBitSet.set(to_underlying(val));
 
             GenerateBatChargeFaultEventAndSetAndNotify(newBitSet);
             return CHIP_NO_ERROR;
@@ -1125,13 +1125,13 @@ public:
                 return CHIP_ERROR_INVALID_ARGUMENT;
             }
 
-            BitSetType newBitSet = this->activeBatChargeFaultsBitSet;
-            newBitSet.set(to_underlying(val), false);
-
-            if (this->activeBatChargeFaultsBitSet == newBitSet)
+            if (!this->activeBatChargeFaultsBitSet.test(to_underlying(val)))
             {
                 return CHIP_NO_ERROR;
             }
+
+            BitSetType newBitSet = this->activeBatChargeFaultsBitSet;
+            newBitSet.set(to_underlying(val), false);
 
             GenerateBatChargeFaultEventAndSetAndNotify(newBitSet);
             return CHIP_NO_ERROR;
