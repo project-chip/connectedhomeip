@@ -179,6 +179,8 @@ char const * ClusterIdToText(chip::ClusterId id)
         return "DeviceEnergyManagementMode";
     case chip::app::Clusters::ElectricalGridConditions::Id:
         return "ElectricalGridConditions";
+    case chip::app::Clusters::ElectricalDistribution::Id:
+        return "ElectricalDistribution";
     case chip::app::Clusters::DoorLock::Id:
         return "DoorLock";
     case chip::app::Clusters::WindowCovering::Id:
@@ -2644,6 +2646,33 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
         case chip::app::Clusters::ElectricalGridConditions::Attributes::FeatureMap::Id:
             return "FeatureMap";
         case chip::app::Clusters::ElectricalGridConditions::Attributes::ClusterRevision::Id:
+            return "ClusterRevision";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::ElectricalDistribution::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::ElectricalDistribution::Attributes::MaxContinuousCurrent::Id:
+            return "MaxContinuousCurrent";
+        case chip::app::Clusters::ElectricalDistribution::Attributes::MaxVoltage::Id:
+            return "MaxVoltage";
+        case chip::app::Clusters::ElectricalDistribution::Attributes::NumberOfPoles::Id:
+            return "NumberOfPoles";
+        case chip::app::Clusters::ElectricalDistribution::Attributes::EndOfLife::Id:
+            return "EndOfLife";
+        case chip::app::Clusters::ElectricalDistribution::Attributes::ServiceEntranceRated::Id:
+            return "ServiceEntranceRated";
+        case chip::app::Clusters::ElectricalDistribution::Attributes::GeneratedCommandList::Id:
+            return "GeneratedCommandList";
+        case chip::app::Clusters::ElectricalDistribution::Attributes::AcceptedCommandList::Id:
+            return "AcceptedCommandList";
+        case chip::app::Clusters::ElectricalDistribution::Attributes::AttributeList::Id:
+            return "AttributeList";
+        case chip::app::Clusters::ElectricalDistribution::Attributes::FeatureMap::Id:
+            return "FeatureMap";
+        case chip::app::Clusters::ElectricalDistribution::Attributes::ClusterRevision::Id:
             return "ClusterRevision";
         default:
             return "Unknown";

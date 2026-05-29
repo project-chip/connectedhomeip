@@ -187,6 +187,10 @@
 #include <clusters/EcosystemInformation/Commands.h>
 #include <clusters/EcosystemInformation/Events.h>
 #include <clusters/EcosystemInformation/Structs.h>
+#include <clusters/ElectricalDistribution/Attributes.h>
+#include <clusters/ElectricalDistribution/Commands.h>
+#include <clusters/ElectricalDistribution/Events.h>
+#include <clusters/ElectricalDistribution/Structs.h>
 #include <clusters/ElectricalEnergyMeasurement/Attributes.h>
 #include <clusters/ElectricalEnergyMeasurement/Commands.h>
 #include <clusters/ElectricalEnergyMeasurement/Events.h>

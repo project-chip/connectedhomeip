@@ -187,6 +187,10 @@
 #include <clusters/EcosystemInformation/Commands.ipp>
 #include <clusters/EcosystemInformation/Events.ipp>
 #include <clusters/EcosystemInformation/Structs.ipp>
+#include <clusters/ElectricalDistribution/Attributes.ipp>
+#include <clusters/ElectricalDistribution/Commands.ipp>
+#include <clusters/ElectricalDistribution/Events.ipp>
+#include <clusters/ElectricalDistribution/Structs.ipp>
 #include <clusters/ElectricalEnergyMeasurement/Attributes.ipp>
 #include <clusters/ElectricalEnergyMeasurement/Commands.ipp>
 #include <clusters/ElectricalEnergyMeasurement/Events.ipp>

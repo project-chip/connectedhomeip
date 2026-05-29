@@ -719,6 +719,15 @@ static BOOL CommandNeedsTimedInvokeInElectricalGridConditionsCluster(AttributeId
     }
     }
 }
+static BOOL CommandNeedsTimedInvokeInElectricalDistributionCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::ElectricalDistribution;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL CommandNeedsTimedInvokeInDoorLockCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::DoorLock;
@@ -1658,6 +1667,9 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     }
     case Clusters::ElectricalGridConditions::Id: {
         return CommandNeedsTimedInvokeInElectricalGridConditionsCluster(commandID);
+    }
+    case Clusters::ElectricalDistribution::Id: {
+        return CommandNeedsTimedInvokeInElectricalDistributionCluster(commandID);
     }
     case Clusters::DoorLock::Id: {
         return CommandNeedsTimedInvokeInDoorLockCluster(commandID);
