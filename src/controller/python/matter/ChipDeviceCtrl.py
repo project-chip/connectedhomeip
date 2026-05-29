@@ -529,7 +529,8 @@ class ChipDeviceControllerBase:
             if err.is_success:
                 LOGGER.info("Commissioning complete")
             else:
-                LOGGER.warning("Failed to commission: %s", err)
+                err_str = str(err)  # For details why check PyChipError docstring.
+                LOGGER.warning("Failed to commission: %s", err_str)
 
             self._dmLib.pychip_DeviceController_SetIcdRegistrationParameters(False, None)
 
@@ -556,7 +557,8 @@ class ChipDeviceControllerBase:
                 commissioningParameters = CommissioningParameters(
                     setupPinCode=setupPinCode, setupManualCode=setupManualCode.decode(), setupQRCode=setupQRCode.decode())
             else:
-                LOGGER.warning("Failed to open commissioning window: %s", err)
+                err_str = str(err)  # For details why check PyChipError docstring.
+                LOGGER.warning("Failed to open commissioning window: %s", err_str)
 
             if self._open_window_context.future is None:
                 LOGGER.exception("HandleOpenWindowComplete called unexpectedly")
@@ -571,7 +573,8 @@ class ChipDeviceControllerBase:
             if err.is_success:
                 LOGGER.info("Successfully unpaired device with node ID 0x%016X", nodeId)
             else:
-                LOGGER.warning("Failed to unpair device: %s", err)
+                err_str = str(err)  # For details why check PyChipError docstring.
+                LOGGER.warning("Failed to unpair device: %s", err_str)
 
             if self._unpair_device_context.future is None:
                 LOGGER.exception("HandleUnpairDeviceComplete called unexpectedly")
@@ -584,7 +587,8 @@ class ChipDeviceControllerBase:
 
         def HandlePASEEstablishmentComplete(err: PyChipError):
             if not err.is_success:
-                LOGGER.warning("Failed to establish secure session to device: %s", err)
+                err_str = str(err)  # For details why check PyChipError docstring.
+                LOGGER.warning("Failed to establish secure session to device: %s", err_str)
             else:
                 LOGGER.info("Established secure session with Device")
 
