@@ -38,31 +38,31 @@ namespace chip::app::Clusters {
 
 namespace PowerSource::detail {
 
-template <class T, size_t MaxVal, class = std::enable_if_t<std::is_unsigned_v<T> && std::is_integral_v<T>, void>>
-constexpr static T SpanToBitSet(Span<const uint8_t> span)
+template <size_t MaxVal>
+constexpr static BitSetType SpanToBitSet(Span<const uint8_t> span)
 {
-    T val{};
+    static_assert(MaxVal < kBitSetSize, "MaxVal must be less than kBitSetSize to fit in the BitSetType");
+    BitSetType val{};
     for (uint8_t el : span)
     {
         if (el < MaxVal)
         {
-            val |= static_cast<T>(static_cast<T>(1) << el);
+            val.set(el);
         }
     }
     return val;
 }
 
 template <class = void> // to silence "unused" warnings
-static void BitSetToSpan(uint16_t bitset, Span<uint8_t> & buffer)
+static void BitSetToSpan(BitSetType bitset, Span<uint8_t> & buffer)
 {
     size_t bufInd = 0;
-    for (uint8_t i = 0; bitset > 0 && bufInd < buffer.size(); i++)
+    for (uint8_t i = 0; i < bitset.size() && bufInd < buffer.size(); i++)
     {
-        if (bitset & 1)
+        if (bitset.test(i))
         {
             buffer[bufInd++] = i;
         }
-        bitset = static_cast<uint16_t>(bitset >> 1);
     }
     buffer.reduce_size(bufInd);
 }
@@ -243,6 +243,7 @@ public:
     using ConfigType = PowerSourceClusterConfig<supportedFeatureBits, supportedOptionalAttributeBits>;
     using ConfigType::supportedFeatures;
     using ConfigType::supportedOptionalAttributeSet;
+    using BitSetType = typename PowerSource::detail::BitSetType;
 
     using PowerSourceStatusEnum    = PowerSource::PowerSourceStatusEnum;
     using WiredCurrentTypeEnum     = PowerSource::WiredCurrentTypeEnum;
@@ -827,7 +828,7 @@ public:
     {
         ENABLE_IF_ATTRIBUTE_SUPPORTED_NO_RETURN(ActiveWiredFaults)
         {
-            uint8_t bitset = PowerSource::detail::SpanToBitSet<uint8_t, to_underlying(WiredFaultEnum::kUnknownEnumValue)>(
+            BitSetType bitset = PowerSource::detail::SpanToBitSet<to_underlying(WiredFaultEnum::kUnknownEnumValue)>(
                 PowerSource::detail::ConvertSpanType<const uint8_t>(val));
             if (this->activeWiredFaultsBitSet != bitset)
             {
@@ -844,7 +845,9 @@ public:
                 return CHIP_ERROR_INVALID_ARGUMENT;
             }
 
-            uint8_t newBitSet = this->activeWiredFaultsBitSet | static_cast<uint8_t>(1 << to_underlying(val));
+            BitSetType newBitSet = this->activeWiredFaultsBitSet;
+            newBitSet.set(to_underlying(val));
+
             if (this->activeWiredFaultsBitSet == newBitSet)
             {
                 return CHIP_NO_ERROR;
@@ -863,7 +866,9 @@ public:
                 return CHIP_ERROR_INVALID_ARGUMENT;
             }
 
-            uint8_t newBitSet = this->activeWiredFaultsBitSet & static_cast<uint8_t>(~(1 << to_underlying(val)));
+            BitSetType newBitSet = this->activeWiredFaultsBitSet;
+            newBitSet.set(to_underlying(val), false);
+
             if (this->activeWiredFaultsBitSet == newBitSet)
             {
                 return CHIP_NO_ERROR;
@@ -974,7 +979,7 @@ public:
     {
         ENABLE_IF_ATTRIBUTE_SUPPORTED_NO_RETURN(ActiveBatFaults)
         {
-            uint8_t newBitSet = PowerSource::detail::SpanToBitSet<uint8_t, to_underlying(BatFaultEnum::kUnknownEnumValue)>(
+            BitSetType newBitSet = PowerSource::detail::SpanToBitSet<to_underlying(BatFaultEnum::kUnknownEnumValue)>(
                 PowerSource::detail::ConvertSpanType<const uint8_t>(val));
             if (this->activeBatFaultsBitSet != newBitSet)
             {
@@ -991,7 +996,9 @@ public:
                 return CHIP_ERROR_INVALID_ARGUMENT;
             }
 
-            uint8_t newBitSet = this->activeBatFaultsBitSet | static_cast<uint8_t>(1 << to_underlying(val));
+            BitSetType newBitSet = this->activeBatFaultsBitSet;
+            newBitSet.set(to_underlying(val));
+
             if (this->activeBatFaultsBitSet == newBitSet)
             {
                 return CHIP_NO_ERROR;
@@ -1010,7 +1017,9 @@ public:
                 return CHIP_ERROR_INVALID_ARGUMENT;
             }
 
-            uint8_t newBitSet = this->activeBatFaultsBitSet & static_cast<uint8_t>(~(1 << to_underlying(val)));
+            BitSetType newBitSet = this->activeBatFaultsBitSet;
+            newBitSet.set(to_underlying(val), false);
+
             if (this->activeBatFaultsBitSet == newBitSet)
             {
                 return CHIP_NO_ERROR;
@@ -1078,7 +1087,7 @@ public:
     {
         ENABLE_IF_ATTRIBUTE_SUPPORTED_NO_RETURN(ActiveBatChargeFaults)
         {
-            uint16_t newBitSet = PowerSource::detail::SpanToBitSet<uint16_t, to_underlying(BatChargeFaultEnum::kUnknownEnumValue)>(
+            BitSetType newBitSet = PowerSource::detail::SpanToBitSet<to_underlying(BatChargeFaultEnum::kUnknownEnumValue)>(
                 PowerSource::detail::ConvertSpanType<const uint8_t>(val));
             if (this->activeBatChargeFaultsBitSet != newBitSet)
             {
@@ -1095,7 +1104,9 @@ public:
                 return CHIP_ERROR_INVALID_ARGUMENT;
             }
 
-            uint16_t newBitSet = this->activeBatChargeFaultsBitSet | static_cast<uint16_t>(1 << to_underlying(val));
+            BitSetType newBitSet = this->activeBatChargeFaultsBitSet;
+            newBitSet.set(to_underlying(val));
+
             if (this->activeBatChargeFaultsBitSet == newBitSet)
             {
                 return CHIP_NO_ERROR;
@@ -1114,7 +1125,9 @@ public:
                 return CHIP_ERROR_INVALID_ARGUMENT;
             }
 
-            uint16_t newBitSet = this->activeBatChargeFaultsBitSet & static_cast<uint16_t>(~(1 << to_underlying(val)));
+            BitSetType newBitSet = this->activeBatChargeFaultsBitSet;
+            newBitSet.set(to_underlying(val), false);
+
             if (this->activeBatChargeFaultsBitSet == newBitSet)
             {
                 return CHIP_NO_ERROR;
@@ -1160,7 +1173,7 @@ private:
         }
     }
 
-    void GenerateWiredFaultEventAndSetAndNotify(uint8_t newBitSet)
+    void GenerateWiredFaultEventAndSetAndNotify(BitSetType newBitSet)
     {
         if constexpr (!supportedOptionalAttributeSet.IsSet(PowerSource::Attributes::ActiveWiredFaults::Id))
         {
@@ -1186,7 +1199,7 @@ private:
         SetAttributeValue(this->activeWiredFaultsBitSet, newBitSet, PowerSource::Attributes::ActiveWiredFaults::Id);
     }
 
-    void GenerateBatFaultEventAndSetAndNotify(uint8_t newBitSet)
+    void GenerateBatFaultEventAndSetAndNotify(BitSetType newBitSet)
     {
         if constexpr (!supportedOptionalAttributeSet.IsSet(PowerSource::Attributes::ActiveBatFaults::Id))
         {
@@ -1212,7 +1225,7 @@ private:
         SetAttributeValue(this->activeBatFaultsBitSet, newBitSet, PowerSource::Attributes::ActiveBatFaults::Id);
     }
 
-    void GenerateBatChargeFaultEventAndSetAndNotify(uint16_t newBitSet)
+    void GenerateBatChargeFaultEventAndSetAndNotify(BitSetType newBitSet)
     {
         if constexpr (!supportedOptionalAttributeSet.IsSet(PowerSource::Attributes::ActiveBatChargeFaults::Id))
         {

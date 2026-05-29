@@ -26,11 +26,13 @@
 #include <lib/support/TimerDelegate.h>
 
 #include <atomic>
-#include <string>
+#include <bitset>
 #include <type_traits>
 
 namespace chip::app::Clusters::PowerSource::detail {
 using DataModel::Nullable;
+constexpr size_t kBitSetSize = 16;
+using BitSetType = std::bitset<kBitSetSize>;
 
 // without EndpointList
 struct MandatoryModule
@@ -132,7 +134,7 @@ template <>
 struct ActiveWiredFaultsModule<true>
 {
 protected:
-    uint8_t activeWiredFaultsBitSet{};
+    BitSetType activeWiredFaultsBitSet{};
 };
 
 template <bool used>
@@ -183,7 +185,7 @@ template <>
 struct ActiveBatFaultsModule<true>
 {
 protected:
-    uint8_t activeBatFaultsBitSet{};
+    BitSetType activeBatFaultsBitSet{};
 };
 
 template <bool used>
@@ -264,7 +266,7 @@ template <>
 struct ActiveBatChargeFaultsModule<true>
 {
 protected:
-    uint16_t activeBatChargeFaultsBitSet{};
+    BitSetType activeBatChargeFaultsBitSet{};
 };
 
 struct EndpointListModule
