@@ -40,13 +40,7 @@ static constexpr uint8_t kInvalidSessionId = 0;
 CHIP_ERROR ProximityRangingCluster::Startup(ServerClusterContext & context)
 {
     ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
-    if (mDriver == nullptr)
-    {
-        // Driver may be supplied later via SetDriver() (e.g. after auto-registration
-        // through CodegenIntegration but before the application's post-init hook runs).
-        return CHIP_NO_ERROR;
-    }
-    CHIP_ERROR err = mDriver->Init(*this);
+    CHIP_ERROR err = mDriver.Init(*this);
     if (err != CHIP_NO_ERROR)
     {
         DefaultServerCluster::Shutdown(ClusterShutdownType::kClusterShutdown);
@@ -59,77 +53,53 @@ CHIP_ERROR ProximityRangingCluster::Startup(ServerClusterContext & context)
 void ProximityRangingCluster::Shutdown(ClusterShutdownType shutdownType)
 {
     DefaultServerCluster::Shutdown(shutdownType);
-    if (mDriver != nullptr && mDriverInitialized)
+    if (mDriverInitialized)
     {
-        mDriver->Shutdown();
+        mDriver.Shutdown();
         mDriverInitialized = false;
     }
-}
-
-CHIP_ERROR ProximityRangingCluster::SetDriver(ProximityRangingDriver * driver)
-{
-    if (driver == mDriver)
-    {
-        return CHIP_NO_ERROR;
-    }
-
-    if (mDriver != nullptr && mDriverInitialized)
-    {
-        mDriver->Shutdown();
-        mDriverInitialized = false;
-    }
-
-    mDriver = driver;
-
-    if (mDriver != nullptr && IsStarted())
-    {
-        ReturnErrorOnFailure(mDriver->Init(*this));
-        mDriverInitialized = true;
-    }
-    return CHIP_NO_ERROR;
 }
 
 DataModel::ActionReturnStatus ProximityRangingCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                                      AttributeValueEncoder & encoder)
 {
-    VerifyOrReturnError(mDriver != nullptr, CHIP_ERROR_INCORRECT_STATE);
     switch (request.path.mAttributeId)
     {
     case Attributes::RangingCapabilities::Id:
-        return mDriver->GetRangingCapabilities(encoder);
+        return mDriver.GetRangingCapabilities(encoder);
 
     case Attributes::BLEDeviceID::Id: {
-        auto config = mDriver->GetBleRbcConfig();
+        auto config = mDriver.GetBleRbcConfig();
         VerifyOrReturnError(config.has_value(), Status::UnsupportedAttribute);
         return encoder.Encode(config->deviceId);
     }
 
     case Attributes::WiFiDevIK::Id: {
-        auto config = mDriver->GetWiFiUsdConfig();
+        auto config = mDriver.GetWiFiUsdConfig();
         VerifyOrReturnError(config.has_value(), Status::UnsupportedAttribute);
         return encoder.Encode(ByteSpan(config->deviceIdentityKey));
     }
 
     case Attributes::BLTDevIK::Id: {
-        auto config = mDriver->GetBltcsConfig();
+        auto config = mDriver.GetBltcsConfig();
         VerifyOrReturnError(config.has_value(), Status::UnsupportedAttribute);
         return encoder.Encode(ByteSpan(config->deviceIdentityKey));
     }
 
     case Attributes::BLTCSSecurityLevel::Id: {
-        auto config = mDriver->GetBltcsConfig();
+        auto config = mDriver.GetBltcsConfig();
         VerifyOrReturnError(config.has_value(), Status::UnsupportedAttribute);
         return encoder.Encode(config->securityLevel);
     }
 
     case Attributes::BLTCSModeCapability::Id: {
-        auto config = mDriver->GetBltcsConfig();
+        auto config = mDriver.GetBltcsConfig();
         VerifyOrReturnError(config.has_value(), Status::UnsupportedAttribute);
         return encoder.Encode(config->modeCapability);
     }
 
     case Attributes::SessionIDList::Id: {
-        const size_t numSessions = mDriver->GetNumActiveSessionIds();
+        const size_t numSessions = mDriver.GetNumActiveSessionIds();
         if (numSessions == 0)
         {
             return encoder.EncodeEmptyList();
@@ -137,7 +107,7 @@ DataModel::ActionReturnStatus ProximityRangingCluster::ReadAttribute(const DataM
         Platform::ScopedMemoryBuffer<uint8_t> buf;
         VerifyOrReturnError(buf.Calloc(numSessions), Status::ResourceExhausted);
         Span<uint8_t> sessionIds(buf.Get(), numSessions);
-        ReturnErrorOnFailure(mDriver->GetActiveSessionIds(sessionIds));
+        ReturnErrorOnFailure(mDriver.GetActiveSessionIds(sessionIds));
         return encoder.EncodeList([&sessionIds](const auto & listEncoder) -> CHIP_ERROR {
             for (size_t i = 0; i < sessionIds.size(); i++)
             {
@@ -209,7 +179,6 @@ std::optional<DataModel::ActionReturnStatus>
 ProximityRangingCluster::HandleStartRangingRequest(const DataModel::InvokeRequest & request, TLV::TLVReader & reader,
                                                    CommandHandler * handler)
 {
-    VerifyOrReturnError(mDriver != nullptr, CHIP_ERROR_INCORRECT_STATE);
     Commands::StartRangingRequest::DecodableType commandData;
     ReturnErrorOnFailure(commandData.Decode(reader));
 
@@ -226,7 +195,7 @@ ProximityRangingCluster::HandleStartRangingRequest(const DataModel::InvokeReques
         }
         else
         {
-            resultCode = mDriver->HandleStartRanging(sessionId, commandData);
+            resultCode = mDriver.HandleStartRanging(sessionId, commandData);
         }
     }
 
@@ -248,11 +217,10 @@ ProximityRangingCluster::HandleStartRangingRequest(const DataModel::InvokeReques
 DataModel::ActionReturnStatus ProximityRangingCluster::HandleStopRangingRequest(const DataModel::InvokeRequest & request,
                                                                                 TLV::TLVReader & reader)
 {
-    VerifyOrReturnError(mDriver != nullptr, CHIP_ERROR_INCORRECT_STATE);
     Commands::StopRangingRequest::DecodableType commandData;
     VerifyOrReturnValue(commandData.Decode(reader) == CHIP_NO_ERROR, Status::InvalidCommand);
 
-    CHIP_ERROR err = mDriver->HandleStopRanging(commandData.sessionID);
+    CHIP_ERROR err = mDriver.HandleStopRanging(commandData.sessionID);
     if (err == CHIP_ERROR_NOT_FOUND)
     {
         // If SessionID does not match any active ranging session, the Server SHALL response with the status code INVALID_IN_STATE
@@ -358,8 +326,7 @@ ProximityRangingCluster::ValidateStartRangingRequest(const Commands::StartRangin
 
 uint8_t ProximityRangingCluster::GenerateSessionId()
 {
-    VerifyOrReturnValue(mDriver != nullptr, kInvalidSessionId);
-    const size_t numSessions = mDriver->GetNumActiveSessionIds();
+    const size_t numSessions = mDriver.GetNumActiveSessionIds();
     if (numSessions == 0)
     {
         uint8_t candidate = mNextSessionId++;
@@ -372,7 +339,7 @@ uint8_t ProximityRangingCluster::GenerateSessionId()
     Platform::ScopedMemoryBuffer<uint8_t> buf;
     VerifyOrReturnValue(buf.Calloc(numSessions), kInvalidSessionId);
     Span<uint8_t> activeSessions(buf.Get(), numSessions);
-    if (mDriver->GetActiveSessionIds(activeSessions) != CHIP_NO_ERROR)
+    if (mDriver.GetActiveSessionIds(activeSessions) != CHIP_NO_ERROR)
     {
         return kInvalidSessionId;
     }

@@ -45,10 +45,13 @@ class ProximityRangingCluster : public DefaultServerCluster, public ProximityRan
 public:
     /**
      * Configuration builder for ProximityRangingCluster.
+     *
+     * The driver reference is mandatory: the cluster cannot operate without one,
+     * and the caller must ensure the driver outlives the cluster.
      */
     struct Config
     {
-        Config() = default;
+        explicit Config(ProximityRangingDriver & driver) : mDriver(driver) {}
 
         Config & WithFeatures(BitMask<Feature> features)
         {
@@ -56,24 +59,13 @@ public:
             return *this;
         }
 
+        ProximityRangingDriver & mDriver;
         BitMask<Feature> mFeatureMap;
     };
 
     ProximityRangingCluster(EndpointId endpoint, const Config & config) :
-        DefaultServerCluster({ endpoint, ProximityRanging::Id }), mFeatureMap(config.mFeatureMap)
+        DefaultServerCluster({ endpoint, ProximityRanging::Id }), mDriver(config.mDriver), mFeatureMap(config.mFeatureMap)
     {}
-
-    /**
-     * Set the technology driver. May be called either before Startup() or after
-     * (e.g. when the cluster is auto-registered via CodegenIntegration but the
-     * driver is supplied by the application during a later init hook). When
-     * called after Startup() with a non-null driver, immediately invokes
-     * driver->Init() so the cluster becomes operational. Replacing an existing
-     * initialized driver shuts the previous one down first. Passing nullptr
-     * clears the driver.
-     */
-    CHIP_ERROR SetDriver(ProximityRangingDriver * driver);
-    ProximityRangingDriver * GetDriver() const { return mDriver; }
 
     // DefaultServerCluster implementation
     CHIP_ERROR Startup(ServerClusterContext & context) override;
@@ -108,8 +100,8 @@ private:
     ResultCodeEnum ValidateStartRangingRequest(const Commands::StartRangingRequest::DecodableType & request) const;
 
     // Members
-    ProximityRangingDriver * mDriver = nullptr;
-    bool mDriverInitialized          = false;
+    ProximityRangingDriver & mDriver;
+    bool mDriverInitialized = false;
     const BitMask<Feature> mFeatureMap;
 
     uint8_t mNextSessionId = 0;
