@@ -179,7 +179,7 @@ class Subprocess(threading.Thread):
             # Terminate the process, so the Python interpreter will not hang on the join call in our thread entry point in case of
             # Python process termination (not-caught exception).
             self.p.terminate()
-            raise TimeoutError("Expected output '%r' not found within %s seconds", expected_output, timeout)
+            raise TimeoutError(f"Expected output '{expected_output!r}' not found within {timeout} seconds")
 
     def send(self, message: str, end: str = "\n", expected_output: str | re.Pattern | None = None,
              timeout: float = DEFAULT_TIMEOUT_S) -> None:
