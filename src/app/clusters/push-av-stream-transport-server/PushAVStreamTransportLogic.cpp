@@ -1622,9 +1622,9 @@ Status PushAvStreamTransportServerLogic::GeneratePushTransportBeginEvent(
     Events::PushTransportBegin::Type event;
     EventNumber eventNumber;
 
-    event.connectionID      = connectionID;
-    event.triggerType       = triggerType;
-    event.activationReason  = activationReason;
+    event.connectionID     = connectionID;
+    event.triggerType      = triggerType;
+    event.activationReason = activationReason;
     event.containerType.SetValue(containerType);
     event.CMAFSessionNumber = cmafSessionNumber;
 

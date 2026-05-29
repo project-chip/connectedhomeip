@@ -35,9 +35,8 @@ namespace PushAvStreamTransport {
 // sessionGroup: 1 byte
 // mTrackNameBuffer: 16 bytes
 // metadataEnabled: ~2 bytes (EstimateStructOverhead)
-static constexpr size_t kCMAFContainerStorageSize =
-    TLV::EstimateStructOverhead(sizeof(uint8_t), sizeof(uint16_t), sizeof(uint16_t), sizeof(uint8_t), kMaxTrackNameLength, 
-        sizeof(bool));
+static constexpr size_t kCMAFContainerStorageSize = TLV::EstimateStructOverhead(sizeof(uint8_t), sizeof(uint16_t), sizeof(uint16_t),
+                                                                                sizeof(uint8_t), kMaxTrackNameLength, sizeof(bool));
 
 // Size calculation for ContainerOptionsStorage
 // containerType: 1 byte
