@@ -29,7 +29,9 @@ and activate the project's Python virtual environment.
 source out/venv/bin/activate
 ```
 
-Be sure to check the arguments in the `build_python.sh` script before setting up the virtual environment. Run the shell script with the `--help` argument to see all available options that may be relevant for the tests.
+Be sure to check the arguments in the `build_python.sh` script before setting up
+the virtual environment. Run the shell script with the `--help` argument to see
+all available options that may be relevant for the tests.
 
 ---
 
