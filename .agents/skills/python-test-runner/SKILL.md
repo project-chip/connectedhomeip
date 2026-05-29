@@ -4,9 +4,9 @@ description: >-
     Guidelines and instructions for building prerequisite example applications
     and running python-based integration and certification tests located in
     `src/python_testing/`. Use this skill to run important regression tests
-    during developement or,  when building new example apps, or when there is a need
-    to execute python test scripts or "certification test scripts"  or mentions of
-    run_python_test.py and local.py.
+    during developement or,  when building new example apps, or when there is a
+    need to execute python test scripts or "certification test scripts"  or
+    mentions of run_python_test.py and local.py.
 ---
 
 # Python Test Runner
@@ -143,8 +143,14 @@ parameter does using this description:
 -   **`app-args`**: Specifies the arguments to be passed to the application
     during the test.
     -   _Example_: `--discriminator 1234 --KVS kvs1`
-      -   **`--discriminator`**: Specifies the discriminator value used by the application during commissioning to uniquely identify the device during the discovery phase. This will change the pairing code for the device
-      -   **`--KVS`**: Specifies the path to the Key-Value Store (KVS) file. The KVS is a persistent database used by the application to store state (such as commissioned fabrics, node IDs, etc.) so that they survive application restarts. Specifying a unique KVS path prevents state interference between concurrent test runs.
+    -   **`--discriminator`**: Specifies the discriminator value used by the
+        application during commissioning to uniquely identify the device during
+        the discovery phase. This will change the pairing code for the device
+    -   **`--KVS`**: Specifies the path to the Key-Value Store (KVS) file. The
+        KVS is a persistent database used by the application to store state
+        (such as commissioned fabrics, node IDs, etc.) so that they survive
+        application restarts. Specifying a unique KVS path prevents state
+        interference between concurrent test runs.
 -   **`app-ready-pattern`**: Regular expression pattern to match against the
     application's stdout to determine when the application has completed
     initialization. The test runner blocks script execution until this pattern
@@ -292,7 +298,10 @@ With the Python environment active:
   --script src/python_testing/TC_IDM_2_3.py \
   --script-args "--storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --PICS src/app/tests/suites/certification/ci-pics-values"
 ```
-Note that the `--endpoint` script argument is relevant for most apps and tests. Some tests may exclude an endpoint argument and use the default one (which often is EP 0), but it is best to explicitly specify which endpoint should be used.
+
+Note that the `--endpoint` script argument is relevant for most apps and tests.
+Some tests may exclude an endpoint argument and use the default one (which often
+is EP 0), but it is best to explicitly specify which endpoint should be used.
 
 #### Example B: All Clusters App Test
 
@@ -322,7 +331,8 @@ In one terminal, run your locally built application binary:
   --discriminator 1234 \
   --KVS kvs1
 ```
-Note that the all devices app should always specify a device type and endpoint, 
+
+Note that the all devices app should always specify a device type and endpoint,
 in the format `device-type:endpoint-number`
 
 ### Step B: Run the Python Test Script
