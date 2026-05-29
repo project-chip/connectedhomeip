@@ -241,5 +241,5 @@ python3 src/python_testing/TC_IDM_2_3.py \
   --commissioning-method on-network \
   --discriminator 1234 \
   --passcode 20202021 \
-  --PICS src/app/tests/suites/certification/ci-pics-values"
+  --PICS src/app/tests/suites/certification/ci-pics-values
 ```
