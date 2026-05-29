@@ -146,9 +146,11 @@ def check_skip_if_up_to_date():
     files_slt_dir = get_files_slt_dir()
     sisdk_slt = os.path.join(files_slt_dir, "sisdk-pkg.slt")
     wiseconnect_slt = os.path.join(files_slt_dir, "wiseconnect-pkg.slt")
+    gcc_arm_none_eabi_slt = os.path.join(files_slt_dir, "gcc-arm-none-eabi-pkg.slt")
 
     slt_simplicity = parse_version_from_slt(sisdk_slt)
     slt_wiseconnect = parse_version_from_slt(wiseconnect_slt)
+    slt_gcc_arm_none_eabi = parse_version_from_slt(gcc_arm_none_eabi_slt)
 
     if slt_simplicity is None:
         logger.error("Could not parse version from %s", sisdk_slt)
@@ -156,17 +158,23 @@ def check_skip_if_up_to_date():
     if slt_wiseconnect is None:
         logger.error("Could not parse version from %s", wiseconnect_slt)
         sys.exit(1)
+    if slt_gcc_arm_none_eabi is None:
+        logger.error("Could not parse version from %s", gcc_arm_none_eabi_slt)
+        sys.exit(1)
 
     need_simplicity = version_greater(slt_simplicity, done["simplicity_sdk_version"])
     need_wiseconnect = version_greater(slt_wiseconnect, done["wiseconnect_version"])
+    need_gcc_arm_none_eabi = version_greater(slt_gcc_arm_none_eabi, done["gcc_arm_none_eabi_version"])
 
-    if not need_simplicity and not need_wiseconnect:
+    if not need_simplicity and not need_wiseconnect and not need_gcc_arm_none_eabi:
         logger.info(
-            "Installed SDK versions (%s, %s) are already >= requested in .slt (%s, %s). Skipping.",
+            "Installed SDK versions (%s, %s, %s) are already >= requested in .slt (%s, %s, %s). Skipping.",
             done["simplicity_sdk_version"],
             done["wiseconnect_version"],
+            done["gcc_arm_none_eabi_version"],
             slt_simplicity,
             slt_wiseconnect,
+            slt_gcc_arm_none_eabi,
         )
         sys.exit(0)
 
@@ -229,7 +237,7 @@ def update_slt_cli(slt_cli_path):
 
 
 def get_pkg_manifest_paths():
-    """Return paths to sisdk-pkg.slt and wiseconnect-pkg.slt from chip-build-efr32 files-slt."""
+    """Return paths to sisdk-pkg.slt, wiseconnect-pkg.slt and gcc-arm-none-eabi-pkg.slt from chip-build-efr32 files-slt."""
     repo_root = get_repo_root()
     files_slt_dir = os.path.join(
         repo_root, "integrations", "docker", "images", "stage-2", "chip-build-efr32", "files-slt"
@@ -237,11 +245,12 @@ def get_pkg_manifest_paths():
     return [
         os.path.join(files_slt_dir, "wiseconnect-pkg.slt"),
         os.path.join(files_slt_dir, "sisdk-pkg.slt"),
+        os.path.join(files_slt_dir, "gcc-arm-none-eabi-pkg.slt"),
     ]
 
 
 def install_sdk_packages(slt_cli_path):
-    """Install packages from sisdk-pkg.slt and wiseconnect-pkg.slt."""
+    """Install packages from sisdk-pkg.slt, wiseconnect-pkg.slt and gcc-arm-none-eabi-pkg.slt."""
     for pkg_path in get_pkg_manifest_paths():
         if not os.path.isfile(pkg_path):
             logger.error("Package manifest not found at %s", pkg_path)
