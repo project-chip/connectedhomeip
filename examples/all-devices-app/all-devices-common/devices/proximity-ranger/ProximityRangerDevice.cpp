@@ -19,70 +19,29 @@
 
 using namespace chip::app::Clusters;
 
-namespace {
-// Global controller shared across all ProximityRangerDevice instances.
-ProximityRanging::RangingTechnologyController & GetRangingController()
-{
-    static ProximityRanging::RangingTechnologyController sRangingController;
-    return sRangingController;
-}
-} // namespace
-
 namespace chip {
 namespace app {
 
-size_t ProximityRangerDevice::sActiveCount = 0;
-
-ProximityRangerDevice::ProximityRangerDevice(TimerDelegate & timerDelegate,
-                                             Span<ProximityRanging::RangingAdapter * const> adapters) :
+ProximityRangerDevice::ProximityRangerDevice(TimerDelegate & timerDelegate, Span<ProximityRanging::RangingAdapter * const> adapters,
+                                             BitMask<ProximityRanging::Feature> features) :
     SingleEndpointDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kProximityRanger, 1)),
-    mRangingDriver(GetRangingController()), mTimerDelegate(timerDelegate), mAdapters(adapters)
+    mTimerDelegate(timerDelegate), mDriver(adapters), mFeatures(features)
 {}
 
 CHIP_ERROR ProximityRangerDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointId parentId)
 {
     VerifyOrReturnError(!mRegistered, CHIP_ERROR_INCORRECT_STATE);
 
-    // Register adapters with the shared controller, skipping any already registered.
-    for (auto * adapter : mAdapters)
-    {
-        VerifyOrReturnError(adapter != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-        ReturnErrorOnFailure(GetRangingController().RegisterAdapter(*adapter).NoErrorIf(CHIP_ERROR_DUPLICATE_KEY_ID));
-    }
-
     ReturnErrorOnFailure(SingleEndpointRegistration(endpoint, provider, parentId));
 
     mIdentifyCluster.Create(IdentifyCluster::Config(endpoint, mTimerDelegate));
     ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
 
-    // Configure cluster features based on registered adapters' technologies.
-    BitMask<ProximityRanging::Feature> features;
-    for (auto * adapter : mAdapters)
-    {
-        switch (adapter->GetTechnology())
-        {
-        case ProximityRanging::RangingTechEnum::kBluetoothChannelSounding:
-            features.Set(ProximityRanging::Feature::kBluetoothChannelSounding);
-            break;
-        case ProximityRanging::RangingTechEnum::kWiFiRoundTripTimeRanging:
-        case ProximityRanging::RangingTechEnum::kWiFiNextGenerationRanging:
-            features.Set(ProximityRanging::Feature::kWiFiUsdProximityDetection);
-            break;
-        case ProximityRanging::RangingTechEnum::kBLEBeaconRSSIRanging:
-            features.Set(ProximityRanging::Feature::kBleBeaconRssi);
-            break;
-        default:
-            break;
-        }
-    }
-
-    mProximityRangingCluster.Create(endpoint,
-                                    ProximityRanging::ProximityRangingCluster::Config(mRangingDriver).WithFeatures(features));
+    mProximityRangingCluster.Create(endpoint, ProximityRanging::ProximityRangingCluster::Config(mDriver).WithFeatures(mFeatures));
     ReturnErrorOnFailure(provider.AddCluster(mProximityRangingCluster.Registration()));
 
     ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
     mRegistered = true;
-    sActiveCount++;
     return CHIP_NO_ERROR;
 }
 
@@ -102,24 +61,7 @@ void ProximityRangerDevice::Unregister(CodeDrivenDataModelProvider & provider)
         mIdentifyCluster.Destroy();
     }
 
-    if (!mRegistered)
-    {
-        return;
-    }
     mRegistered = false;
-
-    if (--sActiveCount != 0)
-    {
-        return;
-    }
-
-    for (auto * adapter : mAdapters)
-    {
-        if (adapter != nullptr)
-        {
-            LogErrorOnFailure(GetRangingController().UnregisterAdapter(*adapter));
-        }
-    }
 }
 
 } // namespace app

@@ -66,11 +66,6 @@ public:
      */
     void Deinit();
 
-    /**
-     * Underlying cluster instance once Init() has succeeded; nullptr otherwise.
-     */
-    ProximityRangingCluster * Cluster();
-
 private:
     const EndpointId mEndpointId;
     ProximityRangingDriver & mDriver;

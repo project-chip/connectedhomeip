@@ -51,7 +51,7 @@ public:
      */
     struct Config
     {
-        explicit Config(ProximityRangingDriver & driver) : mDriver(driver) {}
+        Config(ProximityRangingDriver & driver) : mDriver(driver) {}
 
         Config & WithFeatures(BitMask<Feature> features)
         {

@@ -17,6 +17,7 @@
 
 #include "LoggingRangingAdapter.h"
 
+#include <app/clusters/proximity-ranging-server/BleRssiRangingHelpers.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Span.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -73,9 +74,9 @@ constexpr const char * TechName(RangingTechEnum tech)
     case RangingTechEnum::kBluetoothChannelSounding:
         return "BluetoothChannelSounding";
     case RangingTechEnum::kWiFiRoundTripTimeRanging:
-        return "WiFiRTT";
+        return "WiFiRoundTripTime";
     case RangingTechEnum::kWiFiNextGenerationRanging:
-        return "WiFiNGR";
+        return "WiFiNextGeneration";
     case RangingTechEnum::kBLEBeaconRSSIRanging:
         return "BLEBeaconRSSI";
     default:
@@ -93,6 +94,7 @@ const char * LoggingRangingAdapter::LogTag() const
         return "BLERBC";
     case RangingTechEnum::kBluetoothChannelSounding:
         return "BLTCS";
+    case RangingTechEnum::kWiFiNextGenerationRanging:
     case RangingTechEnum::kWiFiRoundTripTimeRanging:
         return "WFUSDPD";
     default:
@@ -100,37 +102,88 @@ const char * LoggingRangingAdapter::LogTag() const
     }
 }
 
+// GetCapabilities populates the RangingCapabilitiesStruct surfaced via the
+// cluster's RangingCapabilities attribute. The cluster server reads this
+// once per Init and again any time OnAttributeChanged(RangingCapabilities)
+// is invoked, so the value should reflect the radio's true capabilities.
+//
+// REAL ADAPTER: technology is fixed at construction (one adapter, one tech).
+// frequencyBand and periodicRangingSupport must match what the radio actually
+// supports — query the radio driver rather than hard-coding.
 Structs::RangingCapabilitiesStruct::Type LoggingRangingAdapter::GetCapabilities() const
 {
     Structs::RangingCapabilitiesStruct::Type capabilities = {};
     capabilities.technology                               = mTechnology;
-    capabilities.periodicRangingSupport                   = true;
+    capabilities.periodicRangingSupport                   = mPeriodicRangingSupport;
     switch (mTechnology)
     {
+    case RangingTechEnum::kWiFiNextGenerationRanging:
     case RangingTechEnum::kWiFiRoundTripTimeRanging:
+        // Both Wi-Fi USD techs operate across 2.4/5/6 GHz; the actual set is
+        // platform-specific.
         capabilities.frequencyBand = BitMask<RadioBandBitmap>(RadioBandBitmap::k2g4, RadioBandBitmap::k5g, RadioBandBitmap::k6g);
         break;
     case RangingTechEnum::kBLEBeaconRSSIRanging:
     case RangingTechEnum::kBluetoothChannelSounding:
     default:
+        // BLE-based techs are 2.4 GHz only.
         capabilities.frequencyBand = BitMask<RadioBandBitmap>(RadioBandBitmap::k2g4);
         break;
     }
     return capabilities;
 }
 
-std::optional<uint64_t> LoggingRangingAdapter::GetDeviceId()
+// GetDeviceId / GetWiFiUsdConfig / GetBltcsConfig back the cluster's optional
+// per-technology attributes (BLEDeviceID, WiFiDevIK, BLTDevIK, etc.).
+// Returning std::nullopt makes the cluster surface UnsupportedAttribute.
+//
+// REAL ADAPTER: each Get* method MUST return Some(...) only on the adapter
+// whose technology is the one the attribute belongs to, and the value must
+// be the device's persisted, CSPRNG-derived identifier — not a constant.
+
+// Constructor: binds the adapter to a single technology and, for BLE Beacon
+// RSSI ranging, loads (or generates and persists) the local BLEDeviceID.
+// Non-BLE-RSSI technologies skip the storage path entirely; their `storage`
+// argument is unused and may be nullptr.
+//
+// REAL ADAPTER: equivalent setup is required — load the device's persisted
+// local identity (BLEDeviceID, WiFiDevIK, BLTDevIK), and on first boot
+// generate via CSPRNG and persist. The BleRssi helper functions in
+// app/clusters/proximity-ranging-server/BleRssiRangingHelpers.h provide a
+// CSPRNG-based generator for the BLEDeviceID. Storage failures here are
+// fatal — without a stable identity, beacons cannot be correlated by peers.
+LoggingRangingAdapter::LoggingRangingAdapter(RangingTechEnum technology, TimerDelegate & timerDelegate,
+                                             PersistentStorageDelegate * storage, bool periodicRangingSupport) :
+    mPeriodicRangingSupport(periodicRangingSupport),
+    mTechnology(technology), mTimerDelegate(timerDelegate), mpStore(storage)
 {
     if (mTechnology == RangingTechEnum::kBLEBeaconRSSIRanging)
     {
-        return kBleDeviceId;
+        VerifyOrDie(mpStore != nullptr);
+        VerifyOrDie(BleRssi::RetrieveGenerateBleDeviceId(*mpStore, mBleDeviceId) == CHIP_NO_ERROR);
+        ChipLogProgress(NotSpecified, "[LoggingRangingAdapter:%s] Generated and persisted new BLEDeviceID", LogTag());
+    }
+}
+
+std::optional<uint64_t> LoggingRangingAdapter::GetDeviceId()
+{
+    // BLE Device ID is only defined for BLE Beacon RSSI ranging; other
+    // technologies have no equivalent attribute and should return nullopt.
+    // mBleDeviceId is populated by Init() before the adapter is registered.
+    if (mTechnology == RangingTechEnum::kBLEBeaconRSSIRanging)
+    {
+        return mBleDeviceId;
     }
     return std::nullopt;
 }
 
 std::optional<WiFiUsdConfig> LoggingRangingAdapter::GetWiFiUsdConfig()
 {
-    if (mTechnology != RangingTechEnum::kWiFiRoundTripTimeRanging)
+    // WiFiDevIK is shared across both Wi-Fi USD ranging technologies
+    // (RoundTripTime and NextGeneration), so both branches surface the same
+    // local key. A real adapter still keeps a single per-device Wi-Fi USD
+    // identity even when both techs are simultaneously supported.
+    if (mTechnology != RangingTechEnum::kWiFiRoundTripTimeRanging && mTechnology != RangingTechEnum::kWiFiNextGenerationRanging)
     {
         return std::nullopt;
     }
@@ -147,16 +200,38 @@ std::optional<BltcsConfig> LoggingRangingAdapter::GetBltcsConfig()
     }
     BltcsConfig config{};
     memcpy(config.deviceIdentityKey, kBltDevIK, kDeviceIdentityKeyLen);
+    // REAL ADAPTER: securityLevel and modeCapability come from the
+    // controller's BLTCS feature set. Hard-coding "level three / both" keeps
+    // cert tests deterministic but is not what production reports.
     config.securityLevel  = BLTCSSecurityLevelEnum::kBLTCSSecurityLevelThree;
     config.modeCapability = BLTCSModeEnum::kBoth;
     return config;
 }
 
+// Destruction must terminate every active session — see RangingAdapter.h's
+// "every session the adapter has accepted MUST be reported via
+// OnRangingSessionStopped" contract. StopAllSessions() walks the list and
+// notifies the cluster for each entry; without it, the cluster server's
+// SessionIDList would retain stale IDs after the adapter disappeared.
 LoggingRangingAdapter::~LoggingRangingAdapter()
 {
     StopAllSessions();
 }
 
+// StartSession is the synchronous entry point invoked by the cluster server
+// when it has accepted a StartRangingRequest command. The adapter must:
+//   - return kAccepted only if the start succeeded (or is plausibly
+//     in-flight, with HardwareError to follow asynchronously);
+//   - reject infeasible requests synchronously with the appropriate
+//     ResultCodeEnum (e.g. kRejectedInfeasibleRangingTriggers,
+//     kRejectedInUse, kRejectedNoMemory);
+//   - NOT deliver OnRangingSessionStopped synchronously from inside this
+//     function — the cluster's bookkeeping isn't ready for it yet.
+//
+// REAL ADAPTER: the bulk of this function would translate `request` into a
+// radio-driver call (set scan filter, configure publisher, arm CS measurement
+// engine, etc.) and arm only the EndTime cutoff timer. Measurement cadence
+// itself is driven by the radio.
 ResultCodeEnum LoggingRangingAdapter::StartSession(uint8_t sessionId, const Commands::StartRangingRequest::DecodableType & request)
 {
     if (request.trigger.rangingInstanceInterval.HasValue())
@@ -202,12 +277,20 @@ ResultCodeEnum LoggingRangingAdapter::StartSession(uint8_t sessionId, const Comm
                         cfg.ltk.HasValue() ? "present" : "absent");
     }
 
+    // Spec: endTime MUST be strictly greater than startTime. Detecting this
+    // here keeps the rejection path symmetric with how a real adapter would
+    // surface a radio that refuses the request — synchronous, before any
+    // async machinery starts.
     if (request.trigger.endTime <= request.trigger.startTime)
     {
         ChipLogError(NotSpecified, "[LoggingRangingAdapter:%s] StartSession rejected: endTime <= startTime", LogTag());
         return ResultCodeEnum::kRejectedInfeasibleRangingTriggers;
     }
 
+    // REAL ADAPTER: a hardware adapter should also reject here on conditions
+    // its radio cannot satisfy — e.g. kRejectedInUse if a conflicting session
+    // already holds the radio, kRejectedSecurityNotSupported if the requested
+    // securityMode isn't available, kRejectedNoMemory on resource exhaustion.
     auto session = std::make_unique<Session>(*this, sessionId);
     auto now     = mTimerDelegate.GetCurrentMonotonicTimestamp();
     session->startAt =
@@ -258,6 +341,16 @@ ResultCodeEnum LoggingRangingAdapter::StartSession(uint8_t sessionId, const Comm
     return ResultCodeEnum::kAccepted;
 }
 
+// StopSession is invoked by the cluster when a client issues StopRanging.
+// Returns CHIP_ERROR_NOT_FOUND if the ID is not active so the cluster can
+// reflect that to the client. The adapter is required to deliver
+// OnRangingSessionStopped for every session it accepted via StartSession,
+// even when the termination is client-initiated.
+//
+// REAL ADAPTER: tear down the radio session here (cancel scan, release
+// publisher, abort CS measurement, etc.). If the radio's stop is async,
+// return CHIP_NO_ERROR and emit OnRangingSessionStopped only once the radio
+// has confirmed teardown.
 CHIP_ERROR LoggingRangingAdapter::StopSession(uint8_t sessionId)
 {
     ChipLogProgress(NotSpecified, "[LoggingRangingAdapter:%s] StopSession id=%u", LogTag(), sessionId);
@@ -265,12 +358,10 @@ CHIP_ERROR LoggingRangingAdapter::StopSession(uint8_t sessionId)
                            [sessionId](const std::unique_ptr<Session> & s) { return s->sessionId == sessionId; });
     VerifyOrReturnError(it != mSessions.end(), CHIP_ERROR_NOT_FOUND);
 
-    // Cancel any pending fire before unwinding the session.
     mTimerDelegate.CancelTimer(it->get());
 
     // Adapters are required to deliver OnRangingSessionStopped for every session
-    // termination. The controller treats client-initiated stop as a
-    // SessionEndTimeReached completion.
+    // termination. Client-initiated stop is reported as SessionEndTimeReached.
     Session & session = **it;
     if (mCallback != nullptr)
     {
@@ -280,6 +371,13 @@ CHIP_ERROR LoggingRangingAdapter::StopSession(uint8_t sessionId)
     return CHIP_NO_ERROR;
 }
 
+// StopAllSessions is invoked on shutdown and during destruction. Order
+// matters: cancel the timer first to prevent re-entry from a fired timer,
+// then notify the cluster via the callback, then erase the session record.
+//
+// REAL ADAPTER: do the equivalent radio teardown for each session. If the
+// radio supports a single "stop everything" call, prefer it over per-session
+// stops to keep shutdown fast.
 void LoggingRangingAdapter::StopAllSessions()
 {
     while (!mSessions.empty())
@@ -294,22 +392,40 @@ void LoggingRangingAdapter::StopAllSessions()
     }
 }
 
-CHIP_ERROR LoggingRangingAdapter::GetActiveSessionIds(std::vector<uint8_t> & sessionIds)
+// GetActiveSessionIds appends the adapter's currently-active session IDs into
+// the caller-supplied span. The cluster aggregates results across all
+// registered adapters to populate the SessionIDList attribute.
+//
+// REAL ADAPTER: the implementation is the same shape as below — iterate the
+// adapter's session bookkeeping and write each active ID into the span.
+CHIP_ERROR LoggingRangingAdapter::GetActiveSessionIds(Span<uint8_t> & sessionIds)
 {
-    sessionIds.clear();
-    sessionIds.reserve(mSessions.size());
+    VerifyOrReturnError(sessionIds.size() >= mSessions.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
+    size_t i = 0;
     for (const auto & session : mSessions)
     {
-        sessionIds.push_back(session->sessionId);
+        sessionIds[i++] = session->sessionId;
     }
+    sessionIds.reduce_size(i);
     return CHIP_NO_ERROR;
 }
 
+// Session::TimerFired is the synthesizer's tick. It plays three distinct
+// roles depending on session state:
+//   1. EndTime reached → terminate with SessionEndTimeReached.
+//   2. Instant ranging post-measurement tick → terminate (the deferred fire
+//      from kInstantRangingTerminateDelay).
+//   3. Otherwise → emit a measurement, advance to the next tick.
+//
+// REAL ADAPTER: this entire function is replaced by callbacks from the
+// radio. The radio reports each measurement directly into
+// OnMeasurementData(sessionId, measurement); the adapter only needs a
+// timer-driven path for the EndTime cutoff (case 1) and even that often
+// folds into the radio's own session-management layer.
 void LoggingRangingAdapter::Session::TimerFired()
 {
     auto now = owner.mTimerDelegate.GetCurrentMonotonicTimestamp();
 
-    // EndTime first: if reached, terminate without emitting another result.
     if (now >= endAt)
     {
         owner.TerminateSession(*this, RangingSessionStatusEnum::kSessionEndTimeReached);
@@ -327,7 +443,6 @@ void LoggingRangingAdapter::Session::TimerFired()
         return;
     }
 
-    // Build and (conditionally) emit a measurement.
     auto measurement = owner.BuildMeasurement(*this);
     bool emit        = !hasReporting || SatisfiesReporting(reporting, measurement);
     if (emit && owner.mCallback != nullptr)
@@ -345,6 +460,14 @@ void LoggingRangingAdapter::Session::TimerFired()
     owner.ScheduleNextFire(*this);
 }
 
+// Common termination path used by EndTime expiry, instant-ranging deferred
+// terminate, and any internal "stop this session now" reason. Cancels the
+// outstanding timer, notifies the cluster, and removes the session record.
+//
+// REAL ADAPTER: keep the same shape but replace the timer-cancel with the
+// radio's per-session teardown call. `status` should reflect the actual
+// reason the session ended — SessionEndTimeReached for natural expiry,
+// HardwareError for radio failure, etc.
 void LoggingRangingAdapter::TerminateSession(Session & session, RangingSessionStatusEnum status)
 {
     uint8_t sessionId = session.sessionId;
@@ -392,32 +515,30 @@ void LoggingRangingAdapter::ScheduleNextFire(Session & session)
     System::Clock::Milliseconds32 delay =
         (nextAt > now) ? std::chrono::duration_cast<System::Clock::Milliseconds32>(nextAt - now) : System::Clock::Milliseconds32(0);
 
-    auto failure      = mTimerDelegate.StartTimer(&session, delay);
-    bool startedTimer = failure.Handle([this, &session](CHIP_ERROR err) {
-        ChipLogError(NotSpecified, "[LoggingRangingAdapter:%s] StartTimer failed for sid=%u: %" CHIP_ERROR_FORMAT, LogTag(),
-                     session.sessionId, err.Format());
-    });
-    (void) startedTimer;
+    LogErrorOnFailure(mTimerDelegate.StartTimer(&session, delay));
 }
 
 bool LoggingRangingAdapter::SatisfiesReporting(const Structs::ReportingConditionStruct::Type & reporting,
                                                const Structs::RangingMeasurementDataStruct::Type & measurement)
 {
-    if (measurement.distance.IsNull())
+    if (!measurement.distance.IsNull())
+    {
+        uint16_t distance = measurement.distance.Value();
+        if (reporting.minDistanceCondition.HasValue() && distance < reporting.minDistanceCondition.Value())
+        {
+            return false;
+        }
+        if (reporting.maxDistanceCondition.HasValue() && distance > reporting.maxDistanceCondition.Value())
+        {
+            return false;
+        }
+    }
+    else if (reporting.minDistanceCondition.HasValue() || reporting.maxDistanceCondition.HasValue())
     {
         // Spec: "If Distance is null, the Server SHOULD still emit the
         // RangingResult event unless prohibited by a ReportingCondition."
         // A min/max distance condition cannot be evaluated against a null
         // distance, so suppress when any distance condition is present.
-        return !reporting.minDistanceCondition.HasValue() && !reporting.maxDistanceCondition.HasValue();
-    }
-    uint16_t distance = measurement.distance.Value();
-    if (reporting.minDistanceCondition.HasValue() && distance < reporting.minDistanceCondition.Value())
-    {
-        return false;
-    }
-    if (reporting.maxDistanceCondition.HasValue() && distance > reporting.maxDistanceCondition.Value())
-    {
         return false;
     }
     if (reporting.errorMarginCondition.HasValue() && measurement.errorMargin.HasValue() &&
@@ -428,6 +549,20 @@ bool LoggingRangingAdapter::SatisfiesReporting(const Structs::ReportingCondition
     return true;
 }
 
+// BuildMeasurement constructs a synthetic RangingMeasurementDataStruct with
+// deterministic defaults plus the technology-specific peer identity captured
+// at StartSession time.
+//
+// REAL ADAPTER: this function is replaced entirely. A hardware adapter
+// translates the radio's measurement output into RangingMeasurementDataStruct:
+//   - distance / errorMargin: from the radio's range estimate.
+//   - rssi / txPower: present for kBLEBeaconRSSIRanging; supplied by the
+//     radio.
+//   - BLEDeviceID / wiFiDevIK / BLTDevIK: identifies the *peer* the
+//     measurement is for, taken from the radio's session metadata. Only the
+//     field matching this adapter's technology is set.
+//   - Any spec-required null handling (e.g. distance=null when the radio
+//     could not converge) is preserved.
 Structs::RangingMeasurementDataStruct::Type LoggingRangingAdapter::BuildMeasurement(const Session & session) const
 {
     Structs::RangingMeasurementDataStruct::Type measurement{};
@@ -438,8 +573,9 @@ Structs::RangingMeasurementDataStruct::Type LoggingRangingAdapter::BuildMeasurem
     case RangingTechEnum::kBLEBeaconRSSIRanging:
         // Reflect the peer the SessionID is bound to (StartRangingRequest's
         // BLERangingDeviceRoleConfig.peerBLEDeviceID); fall back to the
-        // adapter's own ID only if the request omitted the role config.
-        measurement.BLEDeviceID.SetValue(session.peerBleDeviceId.value_or(kBleDeviceId));
+        // adapter's own (persisted) ID only if the request omitted the role
+        // config.
+        measurement.BLEDeviceID.SetValue(session.peerBleDeviceId.value_or(mBleDeviceId));
         // Spec: RSSI and TxPower SHALL be present when Technology == BLEBeaconRSSI.
         measurement.rssi.Emplace().SetNonNull(kDefaultRssiDbm);
         measurement.txPower.Emplace().SetNonNull(kDefaultTxPowerDbm);
@@ -455,6 +591,7 @@ Structs::RangingMeasurementDataStruct::Type LoggingRangingAdapter::BuildMeasurem
         }
         break;
     case RangingTechEnum::kWiFiRoundTripTimeRanging:
+    case RangingTechEnum::kWiFiNextGenerationRanging:
         if (session.peerWiFiDevIK.has_value())
         {
             measurement.wiFiDevIK.SetValue(ByteSpan(session.peerWiFiDevIK->data(), kDeviceIdentityKeyLen));

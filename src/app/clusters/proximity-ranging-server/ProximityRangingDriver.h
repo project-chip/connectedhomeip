@@ -17,12 +17,14 @@
 #pragma once
 
 #include <app/AttributeValueEncoder.h>
+#include <app/clusters/proximity-ranging-server/RangingAdapter.h>
 #include <clusters/ProximityRanging/Commands.h>
 #include <clusters/ProximityRanging/Enums.h>
 #include <clusters/ProximityRanging/Structs.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
-#include <lib/support/BitMask.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/Pool.h>
 #include <lib/support/Span.h>
 
 #include <optional>
@@ -32,124 +34,119 @@ namespace app {
 namespace Clusters {
 namespace ProximityRanging {
 
-/// Length of the Device Identity Key for Wi-Fi USD and BLTCS.
-inline constexpr size_t kDeviceIdentityKeyLen = 16;
-using DeviceIdentityKey                       = uint8_t[kDeviceIdentityKeyLen];
-
-/// Per-technology configuration exposed via the cluster's optional attributes.
-/// Drivers return one of these only when the corresponding feature is in the
-/// cluster's feature map; otherwise the matching Get accessor returns nullopt
-/// and the cluster surfaces UnsupportedAttribute.
-struct BleRbcConfig
-{
-    uint64_t deviceId;
-};
-
-struct WiFiUsdConfig
-{
-    DeviceIdentityKey deviceIdentityKey;
-};
-
-struct BltcsConfig
-{
-    DeviceIdentityKey deviceIdentityKey;
-    BLTCSSecurityLevelEnum securityLevel;
-    BLTCSModeEnum modeCapability;
-};
+// TODO document this
+static constexpr size_t kMaxConcurrentSessions = 16;
 
 /**
- * Driver interface for the Proximity Ranging cluster.
+ * Proximity Ranging driver - routes ranging operations between the cluster and
+ * a fixed set of per-technology RangingAdapters.
  *
- * Lifecycle: the driver is owned by the application and must outlive the
- * cluster. The cluster calls Init() during Startup() and Shutdown() during
- * cluster shutdown; the driver may be destroyed after Shutdown() returns.
+ * The application:
+ *   1. Implements one RangingAdapter per supported technology.
+ *   2. Constructs a ProximityRangingDriver with a Span over its adapter
+ *      pointers. The adapter set is fixed for the driver's lifetime - it
+ *      reflects the device's physical radio configuration, which does not
+ *      change at runtime.
+ *   3. Passes the driver as a reference to ProximityRangingCluster::Config.
  *
- * Session model: a "session" is a single ranging exchange with a peer.
- * Session IDs are 1-byte values allocated by the cluster (not the driver)
- * when a StartRangingRequest is accepted. The driver tracks which IDs are
- * currently active and exposes them via GetActiveSessionIds() so the cluster
- * can surface SessionIDList and avoid colliding IDs on subsequent starts.
+ * The driver owns the session→adapter table and forwards async results
+ * (measurements, terminations, attribute changes) from adapters to the cluster
+ * via the Callback supplied at Init() time. The cluster invokes Init/Shutdown
+ * automatically as part of its Startup/Shutdown lifecycle.
  *
- * Events: synchronous command results flow through HandleStartRanging /
- * HandleStopRanging. Async results — measurement data and unsolicited
- * session terminations — flow back through the Callback registered in Init().
- *
- * Threading: methods on this interface are called from the Matter main
- * thread. The registered Callback is thread-safe; drivers MAY invoke it from
- * any thread.
- *
- * Optional feature configuration: the Get*Config accessors return one
- * std::optional per supported technology and default to std::nullopt, which
- * the cluster maps to UnsupportedAttribute. Override the ones whose features
- * are present in the cluster's feature map. Adding new attributes within an
- * existing technology is a struct-field change rather than a new virtual on
- * every implementor.
+ * Threading: cluster-invoked methods run on the Matter main thread. Adapter
+ * callbacks (OnMeasurementData / OnRangingSessionStopped / OnAttributeChanged)
+ * may arrive from any thread; the driver forwards them under the same
+ * threading contract.
  */
-class ProximityRangingDriver
+class ProximityRangingDriver : public RangingAdapter::Callback
 {
 public:
+    /// Cluster-facing async result sink. Implemented by ProximityRangingCluster.
     class Callback
     {
     public:
         virtual ~Callback() = default;
-
-        /**
-         * Reports a single ranging measurement for an active session. The cluster emits a
-         * RangingResult event with the supplied measurement on the endpoint that owns this
-         * driver. The driver is responsible for ensuring the measurement satisfies any
-         * ReportingCondition supplied in the originating StartRangingRequest before
-         * invoking this; the cluster does not filter measurements.
-         */
         virtual void OnMeasurementData(uint8_t sessionId, const Structs::RangingMeasurementDataStruct::Type & measurement) = 0;
-
-        /**
-         * Notifies the cluster that an active session has terminated for a reason other
-         * than a client-issued StopRangingRequest (e.g. EndTime reached, peer not found,
-         * hardware error). The cluster emits a RangingSessionStatus event and removes
-         * the session ID from SessionIDList. Drivers MUST NOT invoke this in response
-         * to their own HandleStopRanging() returning success — that termination is
-         * already attributed to the client.
-         */
-        virtual void OnSessionStopped(uint8_t sessionId, RangingSessionStatusEnum status) = 0;
-
-        /**
-         * Notifies the cluster that the value of an attribute exposed by this driver has
-         * changed. The cluster issues an attribute-changed report so subscribers observe
-         * the new value. Use for driver-owned attributes whose values can change at
-         * runtime (e.g. BLEDeviceID after factory reset).
-         */
-        virtual void OnAttributeChanged(AttributeId attributeId) = 0;
+        virtual void OnSessionStopped(uint8_t sessionId, RangingSessionStatusEnum status)                                  = 0;
+        virtual void OnAttributeChanged(AttributeId attributeId)                                                           = 0;
     };
 
-    virtual ~ProximityRangingDriver() = default;
+    /**
+     * Construct a driver bound to a fixed adapter set.
+     *
+     * The backing array must outlive the driver. Each pointer must be non-null
+     * and each adapter's GetTechnology() must be unique within the set;
+     * violations terminate via VerifyOrDie because the adapter set is
+     * statically composed and any error is a configuration bug.
+     */
+    ProximityRangingDriver(Span<RangingAdapter * const> adapters);
+
+    ~ProximityRangingDriver() override;
+
+    // Not copyable or movable
+    ProximityRangingDriver(const ProximityRangingDriver &)             = delete;
+    ProximityRangingDriver & operator=(const ProximityRangingDriver &) = delete;
+
+    /// Called by the cluster from Startup(). The callback must remain valid
+    /// until Shutdown() returns.
+    CHIP_ERROR Init(Callback & callback);
+
+    /// Called by the cluster from Shutdown(). Stops all active sessions and
+    /// clears the cluster callback.
+    void Shutdown();
 
     /**
-     * The callback pointer remains valid until Shutdown() returns.
+     * Route a StartRangingRequest to the adapter matching the requested
+     * technology. The driver tags the new session with the provided ID; the
+     * caller (cluster) is responsible for ID allocation.
      */
-    virtual CHIP_ERROR Init(Callback & callback) = 0;
+    ResultCodeEnum HandleStartRanging(uint8_t sessionId, const Commands::StartRangingRequest::DecodableType & request);
 
     /**
-     * Stops all active sessions and releases resources before the driver
-     * may be destroyed.
+     * Route a StopRangingRequest to the adapter that owns the session.
+     *
+     * @return CHIP_NO_ERROR on success, CHIP_ERROR_NOT_FOUND if no active
+     *         session has the requested ID.
      */
-    virtual void Shutdown() = 0;
+    CHIP_ERROR HandleStopRanging(uint8_t sessionId);
 
-    virtual ResultCodeEnum HandleStartRanging(uint8_t sessionId, const Commands::StartRangingRequest::DecodableType & request) = 0;
-    virtual CHIP_ERROR HandleStopRanging(uint8_t sessionId)                                                                    = 0;
+    /// Encodes the capabilities of every bound adapter.
+    CHIP_ERROR GetRangingCapabilities(AttributeValueEncoder & encoder);
 
-    virtual CHIP_ERROR GetRangingCapabilities(AttributeValueEncoder & encoder) = 0;
+    /// Number of currently-active sessions across all adapters.
+    size_t GetNumActiveSessionIds() const;
 
-    virtual size_t GetNumActiveSessionIds()                            = 0;
-    virtual CHIP_ERROR GetActiveSessionIds(Span<uint8_t> & sessionIds) = 0;
+    /// Fills the caller-supplied span with active session IDs. The span's
+    /// capacity must be at least GetNumActiveSessionIds(); on return the
+    /// size reflects how many IDs were written.
+    CHIP_ERROR GetActiveSessionIds(Span<uint8_t> & out);
 
-    /// Override if the BLERBC feature is supported.
-    virtual std::optional<BleRbcConfig> GetBleRbcConfig() { return std::nullopt; }
+    std::optional<BleRbcConfig> GetBleRbcConfig();
+    std::optional<WiFiUsdConfig> GetWiFiUsdConfig();
+    std::optional<BltcsConfig> GetBltcsConfig();
 
-    /// Override if the WFUSDPD feature is supported.
-    virtual std::optional<WiFiUsdConfig> GetWiFiUsdConfig() { return std::nullopt; }
+    // RangingAdapter::Callback
+    void OnRangingSessionStopped(uint8_t sessionId, RangingSessionStatusEnum status) override;
+    void OnMeasurementData(uint8_t sessionId, const Structs::RangingMeasurementDataStruct::Type & measurement) override;
+    void OnAttributeChanged(AttributeId attributeId) override;
 
-    /// Override if the BLTCS feature is supported.
-    virtual std::optional<BltcsConfig> GetBltcsConfig() { return std::nullopt; }
+private:
+    struct Session
+    {
+        uint8_t id               = 0;
+        RangingAdapter * adapter = nullptr;
+    };
+
+    RangingAdapter * FindAdapter(RangingTechEnum technology) const;
+    Session * FindSession(uint8_t sessionId);
+    void RetireSession(uint8_t sessionId);
+
+    Span<RangingAdapter * const> mAdapters;
+
+    ObjectPool<Session, kMaxConcurrentSessions> mSessions;
+
+    Callback * mClusterCallback = nullptr;
 };
 
 } // namespace ProximityRanging
