@@ -18,7 +18,6 @@ limitations under the License.
 import logging
 import shlex
 import sys
-from pathlib import Path
 
 from helper.CHIPTestBase import CHIPVirtualHome
 from helper.paths import (CHIP_ALL_CLUSTERS_APP_ESC, CHIP_REPO_STR, CONTROLLER_TEST_SCRIPTS_DIR_PATH,
@@ -36,8 +35,6 @@ logger.addHandler(sh)
 CHIP_PORT = 5540
 
 CIRQUE_URL = "http://localhost:5000"
-CHIP_REPO = next(filter(lambda p: (p / 'SPECIFICATION_VERSION').is_file(), Path(__file__).parents))
-
 TEST_EXTPANID = "fedcba9876543210"
 TEST_DISCRIMINATOR = 3840
 TEST_PASSCODE = 20202021
