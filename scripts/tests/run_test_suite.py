@@ -691,7 +691,7 @@ if sys.platform == 'linux':
     def cmd_shell(ns_index: int) -> None:
         with chiptest.linux.IsolatedNetworkNamespace(ns_index):
             shell = os.environ.get("SHELL", "bash")
-            os.execvpe(shell, [shell], os.environ.copy())
+            subprocess.run(shell)
 
 
 if __name__ == '__main__':
