@@ -152,7 +152,6 @@
 #include <clusters/ThreadNetworkDirectory/EnumsCheck.h>
 #include <clusters/TimeFormatLocalization/EnumsCheck.h>
 #include <clusters/TimeSynchronization/EnumsCheck.h>
-#include <clusters/Timer/EnumsCheck.h>
 #include <clusters/TlsCertificateManagement/EnumsCheck.h>
 #include <clusters/TlsClientManagement/EnumsCheck.h>
 #include <clusters/TotalVolatileOrganicCompoundsConcentrationMeasurement/EnumsCheck.h>

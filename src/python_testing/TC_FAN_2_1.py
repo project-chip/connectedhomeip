@@ -78,9 +78,9 @@ class TC_FAN_2_1(MatterBaseTest):
     async def write_setting(self, attribute, value) -> Status:
         result = await self.default_controller.WriteAttribute(self.dut_node_id, [(self.endpoint, attribute(value))])
         write_status = result[0].Status
-        write_status_success = (write_status == Status.Success) or (write_status == Status.InvalidInState)
-        asserts.assert_true(write_status_success,
-                            f"[FC] {attribute.__name__} write did not return a result of either SUCCESS or INVALID_IN_STATE ({write_status.name})")
+        write_status_ok = write_status in (Status.Success, Status.InvalidInState)
+        asserts.assert_true(write_status_ok,
+                            f"[FC] {attribute.__name__} write did not return SUCCESS or INVALID_IN_STATE ({write_status.name})")
         return write_status
 
     async def verify_setting(self, attribute, expected_type, expected_range):
