@@ -36,7 +36,7 @@ CHIP_LIGHTING_APP_ESC = shlex.quote(str(CHIP_REPO_PATH / "out/debug/standalone/c
 CHIP_TOOL_ESC = shlex.quote(str(CHIP_REPO_PATH / "out/debug/standalone/chip-tool"))
 LIT_ICD_APP_ESC = shlex.quote(str(CHIP_REPO_PATH / "out/debug/lit_icd/lit-icd-app"))
 
-MATTER_CONTROLLER_WHEEL_DIR_PATH = CHIP_REPO_PATH / "out/debug/linux_x64_gcc/controller/python"
+MATTER_CONTROLLER_WHEEL_DIR_PATH = CHIP_REPO_PATH / "out/debug/linux_x64_gcc/obj/src/controller/python/matter-controller-wheels"
 MATTER_CONTROLLER_WHEELS = ["matter_clusters", "matter_core", "matter_repl"]
 MATTER_CONTROLLER_INSTALL_WHEELS = (
     f"pip3 install --break-system-packages --find-links {shlex.quote(str(MATTER_CONTROLLER_WHEEL_DIR_PATH))} "

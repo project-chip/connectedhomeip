@@ -132,7 +132,7 @@ jobs:
                      scripts/py_matter_idl
                   scripts/tools/not_known_to_gn.py \
                      -e py -e cpp -e cc -e c -e h -e hpp -e mm \
-                     --known-failure build-matter-wheel.py \
+                     --known-failure matter-repl.py \
                      --known-failure tests/scripts/base.py \
                      --known-failure tests/scripts/cirque_restart_remote_device.py \
                      --known-failure tests/scripts/cluster_objects.py \

@@ -132,9 +132,6 @@ NSString * MTRClusterNameForID(MTRClusterIDType clusterID)
     case MTRClusterIDTypeICDManagementID:
         result = @"ICDManagement";
         break;
-    case MTRClusterIDTypeTimerID:
-        result = @"Timer";
-        break;
     case MTRClusterIDTypeOvenCavityOperationalStateID:
         result = @"OvenCavityOperationalState";
         break;
@@ -251,6 +248,9 @@ NSString * MTRClusterNameForID(MTRClusterIDType clusterID)
         break;
     case MTRClusterIDTypeElectricalGridConditionsID:
         result = @"ElectricalGridConditions";
+        break;
+    case MTRClusterIDTypeElectricalDistributionID:
+        result = @"ElectricalDistribution";
         break;
     case MTRClusterIDTypeDoorLockID:
         result = @"DoorLock";
@@ -2780,50 +2780,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
         }
         break;
 
-    case MTRClusterIDTypeTimerID:
-
-        switch (attributeID) {
-
-            // Cluster Timer attributes
-        case MTRAttributeIDTypeClusterTimerAttributeSetTimeID:
-            result = @"SetTime";
-            break;
-
-        case MTRAttributeIDTypeClusterTimerAttributeTimeRemainingID:
-            result = @"TimeRemaining";
-            break;
-
-        case MTRAttributeIDTypeClusterTimerAttributeTimerStateID:
-            result = @"TimerState";
-            break;
-
-        case MTRAttributeIDTypeClusterTimerAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
-
-        case MTRAttributeIDTypeClusterTimerAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
-
-        case MTRAttributeIDTypeClusterTimerAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
-
-        case MTRAttributeIDTypeClusterTimerAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
-
-        case MTRAttributeIDTypeClusterTimerAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
-
-        default:
-            // Not a known Timer attribute.
-            result = [NSString stringWithFormat:@"<Unknown attributeID %u>", attributeID];
-            break;
-        }
-        break;
-
     case MTRClusterIDTypeOvenCavityOperationalStateID:
 
         switch (attributeID) {
@@ -4907,6 +4863,58 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         default:
             // Not a known ElectricalGridConditions attribute.
+            result = [NSString stringWithFormat:@"<Unknown attributeID %u>", attributeID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeElectricalDistributionID:
+
+        switch (attributeID) {
+
+            // Cluster ElectricalDistribution attributes
+        case MTRAttributeIDTypeClusterElectricalDistributionAttributeMaxContinuousCurrentID:
+            result = @"MaxContinuousCurrent";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalDistributionAttributeMaxVoltageID:
+            result = @"MaxVoltage";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalDistributionAttributeNumberOfPolesID:
+            result = @"NumberOfPoles";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalDistributionAttributeEndOfLifeID:
+            result = @"EndOfLife";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalDistributionAttributeServiceEntranceRatedID:
+            result = @"ServiceEntranceRated";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalDistributionAttributeGeneratedCommandListID:
+            result = @"GeneratedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalDistributionAttributeAcceptedCommandListID:
+            result = @"AcceptedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalDistributionAttributeAttributeListID:
+            result = @"AttributeList";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalDistributionAttributeFeatureMapID:
+            result = @"FeatureMap";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalDistributionAttributeClusterRevisionID:
+            result = @"ClusterRevision";
+            break;
+
+        default:
+            // Not a known ElectricalDistribution attribute.
             result = [NSString stringWithFormat:@"<Unknown attributeID %u>", attributeID];
             break;
         }
@@ -10722,32 +10730,6 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
         }
         break;
 
-    case MTRClusterIDTypeTimerID:
-
-        switch (commandID) {
-
-        case MTRCommandIDTypeClusterTimerCommandSetTimerID:
-            result = @"SetTimer";
-            break;
-
-        case MTRCommandIDTypeClusterTimerCommandResetTimerID:
-            result = @"ResetTimer";
-            break;
-
-        case MTRCommandIDTypeClusterTimerCommandAddTimeID:
-            result = @"AddTime";
-            break;
-
-        case MTRCommandIDTypeClusterTimerCommandReduceTimeID:
-            result = @"ReduceTime";
-            break;
-
-        default:
-            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
-            break;
-        }
-        break;
-
     case MTRClusterIDTypeOvenCavityOperationalStateID:
 
         switch (commandID) {
@@ -11393,6 +11375,16 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
         break;
 
     case MTRClusterIDTypeElectricalGridConditionsID:
+
+        switch (commandID) {
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeElectricalDistributionID:
 
         switch (commandID) {
 
@@ -13552,16 +13544,6 @@ NSString * MTRResponseCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDT
         }
         break;
 
-    case MTRClusterIDTypeTimerID:
-
-        switch (commandID) {
-
-        default:
-            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
-            break;
-        }
-        break;
-
     case MTRClusterIDTypeOvenCavityOperationalStateID:
 
         switch (commandID) {
@@ -14035,6 +14017,16 @@ NSString * MTRResponseCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDT
         break;
 
     case MTRClusterIDTypeElectricalGridConditionsID:
+
+        switch (commandID) {
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeElectricalDistributionID:
 
         switch (commandID) {
 
@@ -15561,16 +15553,6 @@ NSString * MTREventNameForID(MTRClusterIDType clusterID, MTREventIDType eventID)
         }
         break;
 
-    case MTRClusterIDTypeTimerID:
-
-        switch (eventID) {
-
-        default:
-            result = [NSString stringWithFormat:@"<Unknown eventID %u>", eventID];
-            break;
-        }
-        break;
-
     case MTRClusterIDTypeOvenCavityOperationalStateID:
 
         switch (eventID) {
@@ -16147,6 +16129,16 @@ NSString * MTREventNameForID(MTRClusterIDType clusterID, MTREventIDType eventID)
         case MTREventIDTypeClusterElectricalGridConditionsEventCurrentConditionsChangedID:
             result = @"CurrentConditionsChanged";
             break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown eventID %u>", eventID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeElectricalDistributionID:
+
+        switch (eventID) {
 
         default:
             result = [NSString stringWithFormat:@"<Unknown eventID %u>", eventID];

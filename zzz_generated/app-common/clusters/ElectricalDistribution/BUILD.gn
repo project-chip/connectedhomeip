@@ -83,7 +83,7 @@ source_set("metadata") {
   ]
 }
 
-source_set("Timer") {
+source_set("ElectricalDistribution") {
   public_deps = [
     ":ids",
     ":metadata",

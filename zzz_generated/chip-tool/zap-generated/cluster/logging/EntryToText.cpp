@@ -101,8 +101,6 @@ char const * ClusterIdToText(chip::ClusterId id)
         return "BooleanState";
     case chip::app::Clusters::IcdManagement::Id:
         return "IcdManagement";
-    case chip::app::Clusters::Timer::Id:
-        return "Timer";
     case chip::app::Clusters::OvenCavityOperationalState::Id:
         return "OvenCavityOperationalState";
     case chip::app::Clusters::OvenMode::Id:
@@ -181,6 +179,8 @@ char const * ClusterIdToText(chip::ClusterId id)
         return "DeviceEnergyManagementMode";
     case chip::app::Clusters::ElectricalGridConditions::Id:
         return "ElectricalGridConditions";
+    case chip::app::Clusters::ElectricalDistribution::Id:
+        return "ElectricalDistribution";
     case chip::app::Clusters::DoorLock::Id:
         return "DoorLock";
     case chip::app::Clusters::WindowCovering::Id:
@@ -1568,29 +1568,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "Unknown";
         }
     }
-    case chip::app::Clusters::Timer::Id: {
-        switch (id)
-        {
-        case chip::app::Clusters::Timer::Attributes::SetTime::Id:
-            return "SetTime";
-        case chip::app::Clusters::Timer::Attributes::TimeRemaining::Id:
-            return "TimeRemaining";
-        case chip::app::Clusters::Timer::Attributes::TimerState::Id:
-            return "TimerState";
-        case chip::app::Clusters::Timer::Attributes::GeneratedCommandList::Id:
-            return "GeneratedCommandList";
-        case chip::app::Clusters::Timer::Attributes::AcceptedCommandList::Id:
-            return "AcceptedCommandList";
-        case chip::app::Clusters::Timer::Attributes::AttributeList::Id:
-            return "AttributeList";
-        case chip::app::Clusters::Timer::Attributes::FeatureMap::Id:
-            return "FeatureMap";
-        case chip::app::Clusters::Timer::Attributes::ClusterRevision::Id:
-            return "ClusterRevision";
-        default:
-            return "Unknown";
-        }
-    }
     case chip::app::Clusters::OvenCavityOperationalState::Id: {
         switch (id)
         {
@@ -2669,6 +2646,33 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
         case chip::app::Clusters::ElectricalGridConditions::Attributes::FeatureMap::Id:
             return "FeatureMap";
         case chip::app::Clusters::ElectricalGridConditions::Attributes::ClusterRevision::Id:
+            return "ClusterRevision";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::ElectricalDistribution::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::ElectricalDistribution::Attributes::MaxContinuousCurrent::Id:
+            return "MaxContinuousCurrent";
+        case chip::app::Clusters::ElectricalDistribution::Attributes::MaxVoltage::Id:
+            return "MaxVoltage";
+        case chip::app::Clusters::ElectricalDistribution::Attributes::NumberOfPoles::Id:
+            return "NumberOfPoles";
+        case chip::app::Clusters::ElectricalDistribution::Attributes::EndOfLife::Id:
+            return "EndOfLife";
+        case chip::app::Clusters::ElectricalDistribution::Attributes::ServiceEntranceRated::Id:
+            return "ServiceEntranceRated";
+        case chip::app::Clusters::ElectricalDistribution::Attributes::GeneratedCommandList::Id:
+            return "GeneratedCommandList";
+        case chip::app::Clusters::ElectricalDistribution::Attributes::AcceptedCommandList::Id:
+            return "AcceptedCommandList";
+        case chip::app::Clusters::ElectricalDistribution::Attributes::AttributeList::Id:
+            return "AttributeList";
+        case chip::app::Clusters::ElectricalDistribution::Attributes::FeatureMap::Id:
+            return "FeatureMap";
+        case chip::app::Clusters::ElectricalDistribution::Attributes::ClusterRevision::Id:
             return "ClusterRevision";
         default:
             return "Unknown";
@@ -5654,21 +5658,6 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "Unknown";
         }
     }
-    case chip::app::Clusters::Timer::Id: {
-        switch (id)
-        {
-        case chip::app::Clusters::Timer::Commands::SetTimer::Id:
-            return "SetTimer";
-        case chip::app::Clusters::Timer::Commands::ResetTimer::Id:
-            return "ResetTimer";
-        case chip::app::Clusters::Timer::Commands::AddTime::Id:
-            return "AddTime";
-        case chip::app::Clusters::Timer::Commands::ReduceTime::Id:
-            return "ReduceTime";
-        default:
-            return "Unknown";
-        }
-    }
     case chip::app::Clusters::OvenCavityOperationalState::Id: {
         switch (id)
         {
@@ -7624,6 +7613,8 @@ char const * DeviceTypeIdToText(chip::DeviceTypeId id)
         return "Electrical Energy Tariff";
     case 0x00000514:
         return "Electrical Meter";
+    case 0x00000517:
+        return "Electrical Distribution Enclosure";
     case 0x00000840:
         return "Control Bridge";
     case 0x00000850:
