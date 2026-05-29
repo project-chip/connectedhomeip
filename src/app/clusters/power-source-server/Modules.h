@@ -32,7 +32,7 @@
 namespace chip::app::Clusters::PowerSource::detail {
 using DataModel::Nullable;
 constexpr size_t kBitSetSize = 16;
-using BitSetType = std::bitset<kBitSetSize>;
+using BitSetType             = std::bitset<kBitSetSize>;
 
 // without EndpointList
 struct MandatoryModule
