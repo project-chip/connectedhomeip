@@ -51,7 +51,7 @@ jobs:
                 platform: ameba
             # TODO:
             #  - flaky build, `ameba-amebad-pigweed` is disabled due to
-            #     https://github.com/project-chip/connectedhomeip/issues/72244
+            #    https://github.com/project-chip/connectedhomeip/issues/72244
             - name: Build example Ameba Apps
               run: |
                   ./scripts/run_in_build_env.sh \
