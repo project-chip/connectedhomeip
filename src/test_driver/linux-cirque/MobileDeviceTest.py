@@ -35,7 +35,6 @@ logger.addHandler(sh)
 CHIP_PORT = 5540
 
 CIRQUE_URL = "http://localhost:5000"
-
 TEST_EXTPANID = "fedcba9876543210"
 TEST_DISCRIMINATOR = 3840
 TEST_SCRIPT_ESC = shlex.quote(str(CONTROLLER_TEST_SCRIPTS_DIR_PATH / "mobile-device-test.py"))

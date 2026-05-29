@@ -47,7 +47,6 @@ sh.setFormatter(
 logger.addHandler(sh)
 
 CHIP_PORT = 5540
-
 CIRQUE_URL = "http://localhost:5000"
 
 TEST_EXTPANID = "fedcba9876543210"
