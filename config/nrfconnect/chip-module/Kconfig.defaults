@@ -268,6 +268,13 @@ config OPENTHREAD
 
 if OPENTHREAD
 
+config CHIP_SYSTEM_THREAD_LOCAL_STORAGE
+	default n
+
+# for nrfconnect use the OpenThread configuration from the nrf-sdk
+config CHIP_OPENTHREAD_FTD
+    default n
+
 config OPENTHREAD_THREAD_STACK_SIZE
     default 6144 if (PSA_CRYPTO_DRIVER_CC3XX && PSA_CRYPTO_DRIVER_OBERON) || PSA_CRYPTO_DRIVER_CRACEN
     default 4096
@@ -350,6 +357,10 @@ endif # CHIP_WIFI
 # ==============================================================================
 # Crypto configuration
 # ==============================================================================
+
+choice CHIP_CRYPTO_SPAKE2P
+    default CHIP_CRYPTO_SPAKE2P_PSA
+endchoice
 
 choice OPENTHREAD_SECURITY_CONFIG
     default OPENTHREAD_NRF_SECURITY_PSA_CHOICE if CHIP_CRYPTO_PSA

@@ -22,12 +22,12 @@ menuconfig CHIP
 if CHIP
 
 config CHIP_WIFI
-	bool "Enable Wi-Fi support"
+	bool "Wi-Fi support"
 	help
 		Enable Wi-Fi support.
 
 config CHIP_ETHERNET
-	bool "Enable Ethernet support"
+	bool "Ethernet support"
 	help
 		Enable Ethernet support.
 
@@ -245,7 +245,7 @@ config CHIP_DEVICE_SPAKE2_TEST_VERIFIER
 	  (Macro value is in quotes.)
 
 config CHIP_DEVICE_ENABLE_KEY
-	string "Enable Key for triggering test actions (HEX format)"
+	string "Test Enable Key for triggering test actions (HEX format)"
 	default "00112233445566778899AABBCCDDEEFF"
 	help
 	  Provides the Enable Key, which is a 16-byte value encoded in HEX that
@@ -289,6 +289,7 @@ config CHIP_OTA_REQUESTOR
 
 config CHIP_OTA_REQUESTOR_BUFFER_SIZE
 	int "OTA Requestor image buffer size"
+	default 1024 if CHIP_NRF_PLATFORM
 	default 256
 	depends on CHIP_OTA_REQUESTOR
 	help
@@ -344,7 +345,7 @@ config CHIP_COMMISSIONABLE_DEVICE_TYPE
 	  a specific device type.
 
 config CHIP_ENABLE_ACL_EXTENSIONS
-	bool "Enable Access Control's Extension attribute into FeatureMap"
+	bool "Access Control's Extension attribute into FeatureMap"
 	help
 	  Set Access Control's Extension attribute bit into the FeatureMap
 	  attribute of the same cluster.
@@ -492,7 +493,7 @@ config CHIP_THREAD_NETWORK_ENDPOINT_ID
 	  Specify the endpoint ID of the Thread network.
 
 config CHIP_OPENTHREAD_FTD
-	bool "Enable OpenThread Full Thread Device (FTD) support"
+	bool "OpenThread Full Thread Device (FTD) support"
 	default y
 	help
 	  Configure the platform as an OpenThread Full Thread Device (FTD).
@@ -630,7 +631,7 @@ config CHIP_DEVICE_CONFIG_BLE_ADVERTISING_TIMEOUT
 	  from the moment of slow advertisement commencement.
 
 config CHIP_DEVICE_CONFIG_ENABLE_SED
-	bool "Enable Sleepy End Device (SED) support"
+	bool "Sleepy End Device (SED) support"
 	help
 	  Enable Sleepy End Device configuration.
 
@@ -652,14 +653,14 @@ config CHIP_OPENTHREAD_CONFIG
 # Wi-Fi network features
 
 config CHIP_ENABLE_WIFI_STATION
-    bool "Enable Wi-Fi Station mode"
+    bool "Wi-Fi Station mode"
 	depends on CHIP_WIFI
     help
       Enable Wi-Fi station (client) mode for Matter-over-Wi-Fi devices.
       This allows the device to connect to an existing Wi-Fi network.
 
 config CHIP_ENABLE_WIFI_AP
-    bool "Enable Wi-Fi Access Point mode"
+    bool "Wi-Fi Access Point mode"
 	depends on CHIP_WIFI
     help
       Enable Wi-Fi Access Point mode for SoftAP commissioning.
@@ -701,7 +702,7 @@ config CHIP_WIFI_CONNECTION_RECOVERY_JITTER
 # Platform additions and configuration
 
 config CHIP_SYSTEM_THREAD_LOCAL_STORAGE
-	bool "Enable thread-local storage for Matter System Layer"
+	bool "Thread-local storage for Matter System Layer"
     default y
     help
       Enable use of thread-local storage (TLS) in the Matter System Layer.
@@ -741,7 +742,7 @@ config CHIP_MRP_LOCAL_IDLE_RETRY_INTERVAL
 	  Sets the local idle retry interval (in milliseconds) for Matter Message Reliability Protocol (MRP).
 
 config CHIP_ENABLE_READ_CLIENT
-	bool "Enable Read Client in the Interaction Model"
+	bool "Read Client in the Interaction Model"
 	help
 	  Enable support for Read Client in the Interaction Model.
 	  This config can be disabled for device types that do not require Read Client functionality.
@@ -766,13 +767,13 @@ config CHIP_BUILD_TESTS
 	  Enables building Matter unit tests.
 
 config BUILD_FOR_HOST_UNIT_TEST
-	bool "build host unit test"
+	bool "Build host unit test"
 	default y if CHIP_BUILD_TESTS
 	help
 	  Enable matter host unit test build.
 
 config CHIP_BUILD_NL_FAULT_INJECTION
-	bool "Enable NL fault injection for unit tests"
+	bool "NL fault injection for unit tests"
 	default y
 	depends on CHIP_BUILD_TESTS
 	help
@@ -803,7 +804,7 @@ config CHIP_CUSTOM_BLE_ADV_DATA
 	  Customization of BLE advertising data at the application layer
 
 config CHIP_INET_ENABLE_TCP_ENDPOINT
-	bool "Enable TCP endpoint in Inet layer"
+	bool "TCP endpoint in Inet layer"
 	default y if CHIP_BUILD_TESTS
 	help
 	  Enable TCP endpoint support in the Matter Inet layer.

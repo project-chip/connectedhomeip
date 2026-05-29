@@ -432,12 +432,15 @@ config CHIP_SYSTEM_PACKETBUFFER_POOL_SIZE
 	help
 	  Total number of packet buffers allocated by the stack for internal pool.
 
+# See config/common/cmake/Kconfig for full definition
 config CHIP_WIFI
-	bool "nRF Connect Wi-Fi support"
 	select WIFI_NRF70
 	select WIFI
 	select WIFI_NM_WPA_SUPPLICANT
 	select NETWORKING
+	imply NRF_SECURITY
+	imply MBEDTLS_ENTROPY_C
+	imply MBEDTLS_PSA_CRYPTO_C
 	imply NET_STATISTICS
 	imply NET_L2_ETHERNET
 	imply NET_PKT_TXTIME
