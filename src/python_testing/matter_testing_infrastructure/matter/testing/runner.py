@@ -781,6 +781,9 @@ def convert_args_to_matter_config(args: argparse.Namespace):
         if not (args.chip_tool_common_storage_path and args.chip_tool_fabric_storage_path):
             LOGGER.error("Error: One must specify both chip-tool common and chip-tool fabric storage paths")
             sys.exit(1)
+        elif args.storage_path is not None:
+            LOGGER.error("Error: Cannot specify both --storage-path and chip-tool storage paths")
+            sys.exit(1)
         else:
             config.chip_tool_common_storage_path = pathlib.Path(args.chip_tool_common_storage_path)
             config.chip_tool_fabric_storage_path = pathlib.Path(args.chip_tool_fabric_storage_path)
@@ -968,10 +971,10 @@ def matter_test_args_parser() -> argparse.ArgumentParser:
     basic_group.add_argument('--storage-path', action="store", type=pathlib.Path,
                              metavar="PATH", help="Location for persisted storage of instance")
     basic_group.add_argument(
-        "--chip-tool-common-storage-path", metavar="PATH",
+        "--chip-tool-common-storage-path", metavar="PATH", action="store", type=pathlib.Path,
         help="path to chip-tool common persistent storage configuration file (INI format)")
     basic_group.add_argument(
-        "--chip-tool-fabric-storage-path", metavar="PATH",
+        "--chip-tool-fabric-storage-path", metavar="PATH", action="store", type=pathlib.Path,
         help="path to chip-tool fabric persistent storage configuration file (INI format)")
     basic_group.add_argument('--logs-path', action="store", type=pathlib.Path, metavar="PATH", help="Location for test logs")
     paa_path_default = get_default_paa_trust_store(pathlib.Path.cwd())
