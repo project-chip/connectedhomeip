@@ -511,7 +511,6 @@ def BuildAmebaTarget():
         TargetPart('all-clusters-minimal', app=AmebaApp.ALL_CLUSTERS_MINIMAL),
         TargetPart('light', app=AmebaApp.LIGHT),
         TargetPart('light-switch', app=AmebaApp.LIGHT_SWITCH),
-        TargetPart('pigweed', app=AmebaApp.PIGWEED),
     ])
 
     return target
