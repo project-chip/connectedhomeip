@@ -201,7 +201,7 @@ private:
     SmokeCoAlarmCluster::Config mConfig;
     LazyRegisteredServerCluster<SmokeCoAlarmCluster> mCluster;
 
-    static SmokeCoAlarmServer * sInstance;
+    inline static SmokeCoAlarmServer * sInstance = nullptr;
 };
 
 } // namespace SmokeCoAlarm
