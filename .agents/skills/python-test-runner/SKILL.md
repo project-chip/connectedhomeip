@@ -143,6 +143,8 @@ parameter does using this description:
 -   **`app-args`**: Specifies the arguments to be passed to the application
     during the test.
     -   _Example_: `--discriminator 1234 --KVS kvs1`
+      -   **`--discriminator`**: Specifies the discriminator value used by the application during commissioning to uniquely identify the device during the discovery phase. This will change the pairing code for the device
+      -   **`--KVS`**: Specifies the path to the Key-Value Store (KVS) file. The KVS is a persistent database used by the application to store state (such as commissioned fabrics, node IDs, etc.) so that they survive application restarts. Specifying a unique KVS path prevents state interference between concurrent test runs.
 -   **`app-ready-pattern`**: Regular expression pattern to match against the
     application's stdout to determine when the application has completed
     initialization. The test runner blocks script execution until this pattern
@@ -286,10 +288,11 @@ With the Python environment active:
 ./scripts/tests/run_python_test.py \
   --factory-reset \
   --app ./out/linux-x64-all-devices-clang/all-devices-app \
-  --app-args "--device contact-sensor --discriminator 1234 --KVS kvs1" \
+  --app-args "--device contact-sensor:1 --discriminator 1234 --KVS kvs1" \
   --script src/python_testing/TC_IDM_2_3.py \
   --script-args "--storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --PICS src/app/tests/suites/certification/ci-pics-values"
 ```
+Note that the `--endpoint` script argument is relevant for most apps and tests. Some tests may exclude an endpoint argument and use the default one (which often is EP 0), but it is best to explicitly specify which endpoint should be used.
 
 #### Example B: All Clusters App Test
 
@@ -315,10 +318,12 @@ In one terminal, run your locally built application binary:
 
 ```bash
 ./out/linux-x64-all-devices-clang/all-devices-app \
-  --device contact-sensor \
+  --device contact-sensor:1 \
   --discriminator 1234 \
   --KVS kvs1
 ```
+Note that the all devices app should always specify a device type and endpoint, 
+in the format `device-type:endpoint-number`
 
 ### Step B: Run the Python Test Script
 
