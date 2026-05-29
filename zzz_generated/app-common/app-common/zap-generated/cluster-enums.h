@@ -63,6 +63,7 @@
 #include <clusters/DoorLock/Enums.h>
 #include <clusters/DynamicLighting/Enums.h>
 #include <clusters/EcosystemInformation/Enums.h>
+#include <clusters/ElectricalDistribution/Enums.h>
 #include <clusters/ElectricalEnergyMeasurement/Enums.h>
 #include <clusters/ElectricalGridConditions/Enums.h>
 #include <clusters/ElectricalPowerMeasurement/Enums.h>
@@ -152,7 +153,6 @@
 #include <clusters/ThreadNetworkDirectory/Enums.h>
 #include <clusters/TimeFormatLocalization/Enums.h>
 #include <clusters/TimeSynchronization/Enums.h>
-#include <clusters/Timer/Enums.h>
 #include <clusters/TlsCertificateManagement/Enums.h>
 #include <clusters/TlsClientManagement/Enums.h>
 #include <clusters/TotalVolatileOrganicCompoundsConcentrationMeasurement/Enums.h>
