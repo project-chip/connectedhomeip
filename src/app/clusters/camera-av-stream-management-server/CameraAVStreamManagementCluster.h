@@ -23,10 +23,8 @@
 #include <clusters/CameraAvStreamManagement/Attributes.h>
 #include <clusters/CameraAvStreamManagement/Commands.h>
 
-#include <app/persistence/AttributePersistenceProvider.h>
+#include <app/SafeAttributePersistenceProvider.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
-#include <lib/support/BufferReader.h>
-#include <lib/support/BufferWriter.h>
 #include <lib/support/TypeTraits.h>
 #include <optional>
 #include <protocols/interaction_model/StatusCode.h>
@@ -391,7 +389,7 @@ class CameraAVStreamManagementCluster : public DefaultServerCluster
 public:
     struct Context
     {
-        AttributePersistenceProvider & attributePersistenceProvider;
+        SafeAttributePersistenceProvider & safeAttributePersistenceProvider;
     };
 
     struct InitArguments
@@ -728,35 +726,6 @@ private:
     template <AttributeId TAttributeId>
     CHIP_ERROR PersistAndNotify();
 
-    template <typename T, std::enable_if_t<std::is_integral<T>::value, bool> = true>
-    CHIP_ERROR WriteScalarValue(const ConcreteAttributePath & aPath, T aValue)
-    {
-        uint8_t value[sizeof(T)];
-        auto w = Encoding::LittleEndian::BufferWriter(value, sizeof(T));
-        if constexpr (std::is_signed_v<T>)
-        {
-            w.EndianPutSigned(aValue, sizeof(T));
-        }
-        else
-        {
-            w.EndianPut(aValue, sizeof(T));
-        }
-
-        return mContext.attributePersistenceProvider.WriteValue(aPath, ByteSpan(value));
-    }
-
-    template <typename T, std::enable_if_t<std::is_integral<T>::value, bool> = true>
-    CHIP_ERROR ReadScalarValue(const ConcreteAttributePath & aPath, T & aValue)
-    {
-        uint8_t attrData[sizeof(T)];
-        MutableByteSpan tempVal(attrData);
-        ReturnErrorOnFailure(mContext.attributePersistenceProvider.ReadValue(aPath, tempVal));
-        VerifyOrReturnError(tempVal.size() == sizeof(T), CHIP_ERROR_INCORRECT_STATE);
-        Encoding::LittleEndian::Reader r(tempVal.data(), tempVal.size());
-        r.RawReadLowLevelBeCareful(&aValue);
-        return r.StatusCode();
-    }
-
     // Declared friend so that it can access the private stream vector members
     // from CameraAVStreamManagementCluster.
     template <AttributeId TAttributeId>
@@ -825,7 +794,7 @@ private:
             auto path    = ConcreteAttributePath(mPath.mEndpointId, CameraAvStreamManagement::Id, attributeId);
             if (shouldPersist)
             {
-                ReturnErrorOnFailure(WriteScalarValue(path, currentValue));
+                ReturnErrorOnFailure(mContext.safeAttributePersistenceProvider.WriteScalarValue(path, currentValue));
             }
             mDelegate.OnAttributeChanged(attributeId);
             NotifyAttributeChanged(attributeId);

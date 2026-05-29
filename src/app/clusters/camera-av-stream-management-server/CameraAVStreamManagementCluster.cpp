@@ -1103,7 +1103,7 @@ CHIP_ERROR CameraAVStreamManagementCluster::SetNightVision(TriStateAutoEnum aNig
     {
         mNightVision = aNightVision;
         auto path    = ConcreteAttributePath(mPath.mEndpointId, CameraAvStreamManagement::Id, Attributes::NightVision::Id);
-        ReturnErrorOnFailure(WriteScalarValue(path, to_underlying(mNightVision)));
+        ReturnErrorOnFailure(mContext.safeAttributePersistenceProvider.WriteScalarValue(path, to_underlying(mNightVision)));
         mDelegate.OnAttributeChanged(Attributes::NightVision::Id);
         NotifyAttributeChanged(Attributes::NightVision::Id);
     }
@@ -1116,7 +1116,7 @@ CHIP_ERROR CameraAVStreamManagementCluster::SetNightVisionIllum(TriStateAutoEnum
     {
         mNightVisionIllum = aNightVisionIllum;
         auto path = ConcreteAttributePath(mPath.mEndpointId, CameraAvStreamManagement::Id, Attributes::NightVisionIllum::Id);
-        ReturnErrorOnFailure(WriteScalarValue(path, to_underlying(mNightVisionIllum)));
+        ReturnErrorOnFailure(mContext.safeAttributePersistenceProvider.WriteScalarValue(path, to_underlying(mNightVisionIllum)));
         mDelegate.OnAttributeChanged(Attributes::NightVisionIllum::Id);
         NotifyAttributeChanged(Attributes::NightVisionIllum::Id);
     }
@@ -1278,7 +1278,7 @@ CHIP_ERROR CameraAVStreamManagementCluster::SetStatusLightBrightness(Globals::Th
         mStatusLightBrightness = aStatusLightBrightness;
         auto path = ConcreteAttributePath(mPath.mEndpointId, CameraAvStreamManagement::Id, Attributes::StatusLightBrightness::Id);
         ReturnErrorOnFailure(
-            WriteScalarValue(path, to_underlying(mStatusLightBrightness)));
+            mContext.safeAttributePersistenceProvider.WriteScalarValue(path, to_underlying(mStatusLightBrightness)));
         mDelegate.OnAttributeChanged(Attributes::StatusLightBrightness::Id);
         NotifyAttributeChanged(Attributes::StatusLightBrightness::Id);
     }
@@ -1290,7 +1290,7 @@ void CameraAVStreamManagementCluster::LoadPersistentAttributes()
     CHIP_ERROR err = CHIP_NO_ERROR;
     // Load HDR Mode Enabled
     bool storedHDRModeEnabled = false;
-    err                       = ReadScalarValue(
+    err                       = mContext.safeAttributePersistenceProvider.ReadScalarValue(
         ConcreteAttributePath(mPath.mEndpointId, CameraAvStreamManagement::Id, Attributes::HDRModeEnabled::Id),
         storedHDRModeEnabled);
     if (err == CHIP_NO_ERROR)
@@ -1333,7 +1333,7 @@ void CameraAVStreamManagementCluster::LoadPersistentAttributes()
 
     // Load SoftRecordingPrivacyModeEnabled
     bool softRecordingPrivacyModeEnabled = false;
-    err                                  = ReadScalarValue(
+    err                                  = mContext.safeAttributePersistenceProvider.ReadScalarValue(
         ConcreteAttributePath(mPath.mEndpointId, CameraAvStreamManagement::Id, Attributes::SoftRecordingPrivacyModeEnabled::Id),
         softRecordingPrivacyModeEnabled);
     if (err == CHIP_NO_ERROR)
@@ -1351,7 +1351,7 @@ void CameraAVStreamManagementCluster::LoadPersistentAttributes()
 
     // Load SoftLivestreamPrivacyModeEnabled
     bool softLivestreamPrivacyModeEnabled = false;
-    err                                   = ReadScalarValue(
+    err                                   = mContext.safeAttributePersistenceProvider.ReadScalarValue(
         ConcreteAttributePath(mPath.mEndpointId, CameraAvStreamManagement::Id, Attributes::SoftLivestreamPrivacyModeEnabled::Id),
         softLivestreamPrivacyModeEnabled);
     if (err == CHIP_NO_ERROR)
@@ -1369,7 +1369,7 @@ void CameraAVStreamManagementCluster::LoadPersistentAttributes()
 
     // Load NightVision
     uint8_t nightVision = 0;
-    err                 = ReadScalarValue(
+    err                 = mContext.safeAttributePersistenceProvider.ReadScalarValue(
         ConcreteAttributePath(mPath.mEndpointId, CameraAvStreamManagement::Id, Attributes::NightVision::Id), nightVision);
     if (err == CHIP_NO_ERROR)
     {
@@ -1384,7 +1384,7 @@ void CameraAVStreamManagementCluster::LoadPersistentAttributes()
 
     // Load NightVisionIllum
     uint8_t nightVisionIllum = 0;
-    err                      = ReadScalarValue(
+    err                      = mContext.safeAttributePersistenceProvider.ReadScalarValue(
         ConcreteAttributePath(mPath.mEndpointId, CameraAvStreamManagement::Id, Attributes::NightVisionIllum::Id), nightVisionIllum);
     if (err == CHIP_NO_ERROR)
     {
@@ -1413,7 +1413,7 @@ void CameraAVStreamManagementCluster::LoadPersistentAttributes()
 
     // Load SpeakerMuted
     bool speakerMuted = false;
-    err               = ReadScalarValue(
+    err               = mContext.safeAttributePersistenceProvider.ReadScalarValue(
         ConcreteAttributePath(mPath.mEndpointId, CameraAvStreamManagement::Id, Attributes::SpeakerMuted::Id), speakerMuted);
     if (err == CHIP_NO_ERROR)
     {
@@ -1428,7 +1428,7 @@ void CameraAVStreamManagementCluster::LoadPersistentAttributes()
 
     // Load SpeakerVolumeLevel
     uint8_t speakerVolumeLevel = 0;
-    err                        = ReadScalarValue(
+    err                        = mContext.safeAttributePersistenceProvider.ReadScalarValue(
         ConcreteAttributePath(mPath.mEndpointId, CameraAvStreamManagement::Id, Attributes::SpeakerVolumeLevel::Id),
         speakerVolumeLevel);
     if (err == CHIP_NO_ERROR)
@@ -1444,7 +1444,7 @@ void CameraAVStreamManagementCluster::LoadPersistentAttributes()
 
     // Load MicrophoneMuted
     bool microphoneMuted = false;
-    err                  = ReadScalarValue(
+    err                  = mContext.safeAttributePersistenceProvider.ReadScalarValue(
         ConcreteAttributePath(mPath.mEndpointId, CameraAvStreamManagement::Id, Attributes::MicrophoneMuted::Id), microphoneMuted);
     if (err == CHIP_NO_ERROR)
     {
@@ -1459,7 +1459,7 @@ void CameraAVStreamManagementCluster::LoadPersistentAttributes()
 
     // Load MicrophoneVolumeLevel
     uint8_t microphoneVolumeLevel = 0;
-    err                           = ReadScalarValue(
+    err                           = mContext.safeAttributePersistenceProvider.ReadScalarValue(
         ConcreteAttributePath(mPath.mEndpointId, CameraAvStreamManagement::Id, Attributes::MicrophoneVolumeLevel::Id),
         microphoneVolumeLevel);
     if (err == CHIP_NO_ERROR)
@@ -1476,7 +1476,7 @@ void CameraAVStreamManagementCluster::LoadPersistentAttributes()
 
     // Load MicrophoneAGCEnabled
     bool microphoneAGCEnabled = false;
-    err                       = ReadScalarValue(
+    err                       = mContext.safeAttributePersistenceProvider.ReadScalarValue(
         ConcreteAttributePath(mPath.mEndpointId, CameraAvStreamManagement::Id, Attributes::MicrophoneAGCEnabled::Id),
         microphoneAGCEnabled);
     if (err == CHIP_NO_ERROR)
@@ -1493,7 +1493,7 @@ void CameraAVStreamManagementCluster::LoadPersistentAttributes()
 
     // Load ImageRotation
     uint16_t imageRotation = 0;
-    err                    = ReadScalarValue(
+    err                    = mContext.safeAttributePersistenceProvider.ReadScalarValue(
         ConcreteAttributePath(mPath.mEndpointId, CameraAvStreamManagement::Id, Attributes::ImageRotation::Id), imageRotation);
     if (err == CHIP_NO_ERROR)
     {
@@ -1508,7 +1508,7 @@ void CameraAVStreamManagementCluster::LoadPersistentAttributes()
 
     // Load ImageFlipHorizontal
     bool imageFlipHorizontal = false;
-    err                      = ReadScalarValue(
+    err                      = mContext.safeAttributePersistenceProvider.ReadScalarValue(
         ConcreteAttributePath(mPath.mEndpointId, CameraAvStreamManagement::Id, Attributes::ImageFlipHorizontal::Id),
         imageFlipHorizontal);
     if (err == CHIP_NO_ERROR)
@@ -1524,7 +1524,7 @@ void CameraAVStreamManagementCluster::LoadPersistentAttributes()
 
     // Load ImageFlipVertical
     bool imageFlipVertical = false;
-    err                    = ReadScalarValue(
+    err                    = mContext.safeAttributePersistenceProvider.ReadScalarValue(
         ConcreteAttributePath(mPath.mEndpointId, CameraAvStreamManagement::Id, Attributes::ImageFlipVertical::Id),
         imageFlipVertical);
     if (err == CHIP_NO_ERROR)
@@ -1540,7 +1540,7 @@ void CameraAVStreamManagementCluster::LoadPersistentAttributes()
 
     // Load LocalVideoRecordingEnabled
     bool localVideoRecordingEnabled = false;
-    err                             = ReadScalarValue(
+    err                             = mContext.safeAttributePersistenceProvider.ReadScalarValue(
         ConcreteAttributePath(mPath.mEndpointId, CameraAvStreamManagement::Id, Attributes::LocalVideoRecordingEnabled::Id),
         localVideoRecordingEnabled);
     if (err == CHIP_NO_ERROR)
@@ -1558,7 +1558,7 @@ void CameraAVStreamManagementCluster::LoadPersistentAttributes()
 
     // Load LocalSnapshotRecordingEnabled
     bool localSnapshotRecordingEnabled = false;
-    err                                = ReadScalarValue(
+    err                                = mContext.safeAttributePersistenceProvider.ReadScalarValue(
         ConcreteAttributePath(mPath.mEndpointId, CameraAvStreamManagement::Id, Attributes::LocalSnapshotRecordingEnabled::Id),
         localSnapshotRecordingEnabled);
     if (err == CHIP_NO_ERROR)
@@ -1576,7 +1576,7 @@ void CameraAVStreamManagementCluster::LoadPersistentAttributes()
 
     // Load StatusLightEnabled
     bool statusLightEnabled = false;
-    err                     = ReadScalarValue(
+    err                     = mContext.safeAttributePersistenceProvider.ReadScalarValue(
         ConcreteAttributePath(mPath.mEndpointId, CameraAvStreamManagement::Id, Attributes::StatusLightEnabled::Id),
         statusLightEnabled);
     if (err == CHIP_NO_ERROR)
@@ -1592,7 +1592,7 @@ void CameraAVStreamManagementCluster::LoadPersistentAttributes()
 
     // Load StatusLightBrightness
     uint8_t statusLightBrightness = 0;
-    err                           = ReadScalarValue(
+    err                           = mContext.safeAttributePersistenceProvider.ReadScalarValue(
         ConcreteAttributePath(mPath.mEndpointId, CameraAvStreamManagement::Id, Attributes::StatusLightBrightness::Id),
         statusLightBrightness);
     if (err == CHIP_NO_ERROR)
@@ -1628,7 +1628,7 @@ CHIP_ERROR CameraAVStreamManagementCluster::StoreViewport(const Globals::Structs
     auto path = ConcreteAttributePath(mPath.mEndpointId, CameraAvStreamManagement::Id, Attributes::Viewport::Id);
     bufferSpan.reduce_size(writer.GetLengthWritten());
 
-    return mContext.attributePersistenceProvider.WriteValue(path, bufferSpan);
+    return mContext.safeAttributePersistenceProvider.SafeWriteValue(path, bufferSpan);
 }
 
 CHIP_ERROR CameraAVStreamManagementCluster::LoadViewport(Globals::Structs::ViewportStruct::Type & viewport)
@@ -1637,7 +1637,7 @@ CHIP_ERROR CameraAVStreamManagementCluster::LoadViewport(Globals::Structs::Viewp
     MutableByteSpan bufferSpan(buffer);
 
     auto path = ConcreteAttributePath(mPath.mEndpointId, CameraAvStreamManagement::Id, Attributes::Viewport::Id);
-    ReturnErrorOnFailure(mContext.attributePersistenceProvider.ReadValue(path, bufferSpan));
+    ReturnErrorOnFailure(mContext.safeAttributePersistenceProvider.SafeReadValue(path, bufferSpan));
 
     TLV::TLVReader reader;
 
@@ -1667,7 +1667,7 @@ CHIP_ERROR CameraAVStreamManagementCluster::StoreStreamUsagePriorities()
     bufferSpan.reduce_size(writer.GetLengthWritten());
 
     auto path = ConcreteAttributePath(mPath.mEndpointId, CameraAvStreamManagement::Id, Attributes::StreamUsagePriorities::Id);
-    return mContext.attributePersistenceProvider.WriteValue(path, bufferSpan);
+    return mContext.safeAttributePersistenceProvider.SafeWriteValue(path, bufferSpan);
 }
 
 CHIP_ERROR CameraAVStreamManagementCluster::LoadStreamUsagePriorities()
@@ -1676,7 +1676,7 @@ CHIP_ERROR CameraAVStreamManagementCluster::LoadStreamUsagePriorities()
     MutableByteSpan bufferSpan(buffer);
 
     auto path = ConcreteAttributePath(mPath.mEndpointId, CameraAvStreamManagement::Id, Attributes::StreamUsagePriorities::Id);
-    ReturnErrorOnFailure(mContext.attributePersistenceProvider.ReadValue(path, bufferSpan));
+    ReturnErrorOnFailure(mContext.safeAttributePersistenceProvider.SafeReadValue(path, bufferSpan));
 
     TLV::TLVReader reader;
     reader.Init(bufferSpan);
@@ -1768,7 +1768,7 @@ CHIP_ERROR CameraAVStreamManagementCluster::StoreAllocatedStreams()
     size_t len = writer.GetLengthWritten();
 
     auto path = ConcreteAttributePath(mPath.mEndpointId, CameraAvStreamManagement::Id, attributeId);
-    ReturnErrorOnFailure(mContext.attributePersistenceProvider.WriteValue(path, ByteSpan(buffer, len)));
+    ReturnErrorOnFailure(mContext.safeAttributePersistenceProvider.SafeWriteValue(path, ByteSpan(buffer, len)));
 
     ChipLogProgress(Zcl, "Saved %u %s streams", static_cast<unsigned int>(streams.size()), StreamTypeToString(Traits::kStreamType));
     return CHIP_NO_ERROR;
@@ -1785,7 +1785,7 @@ CHIP_ERROR CameraAVStreamManagementCluster::LoadAllocatedStreams()
     auto path      = ConcreteAttributePath(mPath.mEndpointId, CameraAvStreamManagement::Id, attributeId);
     auto & streams = (*this).*Traits::kStreamVectorMember;
 
-    CHIP_ERROR err = mContext.attributePersistenceProvider.ReadValue(path, span);
+    CHIP_ERROR err = mContext.safeAttributePersistenceProvider.SafeReadValue(path, span);
     if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
     {
         streams.clear();

@@ -18,11 +18,12 @@
 
 #include <app/AttributeValueDecoder.h>
 #include <app/CommandHandler.h>
+#include <app/DefaultSafeAttributePersistenceProvider.h>
+#include <app/SafeAttributePersistenceProvider.h>
 #include <app/clusters/camera-av-stream-management-server/CameraAVStreamManagementCluster.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model-provider/tests/TestConstants.h>
 #include <app/data-model/Decode.h>
-#include <app/persistence/AttributePersistenceProvider.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/testing/ClusterTester.h>
 #include <app/server-cluster/testing/ValidateGlobalAttributes.h>
@@ -86,7 +87,7 @@ static std::vector<StreamUsageEnum> & GetSupportedStreamUsages()
 }
 
 static CameraAVStreamManagementCluster::InitArguments MakeInitArguments(CameraAVStreamManagementDelegate & delegate,
-                                                                        AttributePersistenceProvider & persistenceProvider)
+                                                                        SafeAttributePersistenceProvider & persistenceProvider)
 {
     CameraAVStreamManagementCluster::InitArguments args{
         .context    = { persistenceProvider },
@@ -286,24 +287,6 @@ private:
     uint8_t mSnapshotStreamCount;
 };
 
-class TestAttributePersistenceProvider : public app::AttributePersistenceProvider
-{
-public:
-    void SetProvider(app::AttributePersistenceProvider * provider) { mProvider = provider; }
-    CHIP_ERROR WriteValue(const app::ConcreteAttributePath & aPath, const ByteSpan & aValue) override
-    {
-        VerifyOrReturnError(mProvider != nullptr, CHIP_ERROR_INCORRECT_STATE);
-        return mProvider->WriteValue(aPath, aValue);
-    }
-    CHIP_ERROR ReadValue(const app::ConcreteAttributePath & aPath, MutableByteSpan & aValue) override
-    {
-        VerifyOrReturnError(mProvider != nullptr, CHIP_ERROR_INCORRECT_STATE);
-        return mProvider->ReadValue(aPath, aValue);
-    }
-
-private:
-    app::AttributePersistenceProvider * mProvider = nullptr;
-};
 
 // initialize memory as ReadOnlyBufferBuilder may allocate
 struct TestCameraAVStreamManagementCluster : public ::testing::Test
@@ -343,7 +326,7 @@ struct TestCameraAVStreamManagementCluster : public ::testing::Test
 
     void SetUp() override
     {
-        mPersistenceProvider.SetProvider(&mClusterTester.GetServerClusterContext().attributeStorage);
+        VerifyOrDie(mPersistenceProvider.Init(&mClusterTester.GetServerClusterContext().storage) == CHIP_NO_ERROR);
         EXPECT_EQ(mServer.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
         EXPECT_EQ(InitializeCameraAVSMDefaults(mServer), CHIP_NO_ERROR);
         EXPECT_EQ(mServer.Init(), CHIP_NO_ERROR);
@@ -353,7 +336,7 @@ struct TestCameraAVStreamManagementCluster : public ::testing::Test
     std::vector<AudioStreamStruct> mAudioStreams;
     std::vector<SnapshotStreamStruct> mSnapshotStreams;
     MockCameraAVStreamManagementDelegate mMockDelegate;
-    TestAttributePersistenceProvider mPersistenceProvider;
+    app::DefaultSafeAttributePersistenceProvider mPersistenceProvider;
     CameraAvStreamManagement::CameraAVStreamManagementCluster mServer;
     ClusterTester mClusterTester;
 };
@@ -1786,7 +1769,7 @@ TEST_F(TestCameraAVStreamManagementCluster, TestReferenceCountResetOnBoot)
 
     // 2. Write to persistence
     ConcreteAttributePath path(kTestEndpointId, CameraAvStreamManagement::Id, Attributes::AllocatedVideoStreams::Id);
-    ASSERT_EQ(mPersistenceProvider.WriteValue(path, ByteSpan(buffer, len)), CHIP_NO_ERROR);
+    ASSERT_EQ(mPersistenceProvider.SafeWriteValue(path, ByteSpan(buffer, len)), CHIP_NO_ERROR);
 
     // 3. Trigger Init to load from persistence
     ASSERT_EQ(mServer.Init(), CHIP_NO_ERROR);
