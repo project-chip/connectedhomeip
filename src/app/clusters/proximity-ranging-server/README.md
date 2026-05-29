@@ -10,15 +10,15 @@ UWB).
 This directory contains a code-driven C++ implementation of the Matter Proximity
 Ranging cluster server (cluster ID `0x0433`). The implementation follows the
 `DefaultServerCluster` pattern with a `Config` + Builder API for feature
-configuration and `CodegenIntegration` for ZAP-based deployments. All
-technology-specific runtime operations are delegated to a
-`ProximityRangingDriver` set via `SetDriver()`.
+configuration and `CodegenIntegration` for ZAP-based deployments.
+Technology-specific runtime operations are delegated to a
+`ProximityRangingDriver` (concrete, supplied by the SDK) which fans out to one
+`RangingAdapter` per supported technology.
 
 The cluster handles:
 
 -   Matter protocol interactions (attribute reads, command dispatch)
 -   Feature map ownership (immutable, set at construction via Config)
--   Session ID allocation and tracking
 -   Spec preflight validation of `StartRangingRequest` (technology in feature
     map, matching `DeviceRoleConfig` present, role enum within the matching
     family, trigger and reporting-condition constraints) before any request
@@ -26,12 +26,22 @@ The cluster handles:
 -   Event emission for ranging results and session status changes
 -   Attribute change notifications from the driver
 
+The `ProximityRangingDriver` (SDK) handles:
+
+-   Session ID allocation and bookkeeping (session → adapter mapping)
+-   Routing `StartRangingRequest` / `StopRangingRequest` to the adapter that
+    owns the requested technology / session
+-   Aggregating `RangingCapabilities` and feature bits across registered
+    adapters
+-   Forwarding async adapter callbacks (measurement data, session-stopped,
+    attribute-changed) to the cluster
+
 The application is responsible for:
 
--   Configuring which features are supported (via `Config` builders)
--   Implementing the `ProximityRangingDriver` interface for runtime behavior
--   Owning ranging technology adapters and the controller
--   Persisting device identity attributes (e.g., BLE Device ID)
+-   Implementing one `RangingAdapter` per supported ranging technology
+-   Supplying those adapters as a `Span<RangingAdapter * const>` to the driver's
+    constructor — the adapter set is fixed for the driver's lifetime
+-   Persisting any per-adapter device identity values (e.g. BLE Device ID)
 
 ## Architecture
 
@@ -39,13 +49,18 @@ The application is responsible for:
 ┌─────────────────────────────────────────────────────────────┐
 │ ProximityRangingCluster (SDK, per-endpoint)                 │
 │   - ReadAttribute, InvokeCommand, Events                    │
-│   - SetDriver(ProximityRangingDriver *)                     │
+│   - Config { ProximityRangingDriver & driver }              │
 └──────────────────────────┬──────────────────────────────────┘
-                           │ ProximityRangingDriver interface
+                           │ ProximityRangingDriver::Callback
 ┌──────────────────────────▼──────────────────────────────────┐
-│ Application-supplied driver                                 │
-│   - DefaultProximityRangingDriver in all-devices-app routes │
-│     to RangingTechnologyController + per-tech adapters      │
+│ ProximityRangingDriver (SDK, concrete)                      │
+│   - Session ID allocation + session→adapter table           │
+│   - Routes Start/Stop to the adapter owning the technology  │
+│   - Aggregates capabilities / supported features            │
+└──────────────────────────┬──────────────────────────────────┘
+                           │ RangingAdapter interface
+┌──────────────────────────▼──────────────────────────────────┐
+│ Application-supplied RangingAdapters (one per technology)   │
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -66,7 +81,11 @@ time via `Config::WithFeatures()`:
     UWB.
 
 `WithFeatures()` sets the feature bits and marks the mandatory associated
-attributes as present. At least one feature must be enabled.
+attributes as present. At least one feature must be enabled. The application
+declares the feature mask explicitly at the construction site so the cluster's
+spec contract is visible at the call site rather than inferred at runtime from
+the registered adapter set; keeping the two in sync is a configuration
+responsibility, not something the driver derives.
 
 ## Codegen Integration
 
@@ -82,22 +101,28 @@ the application's post-`Server::Init()` hook.
 
 ```cpp
 #include <app/clusters/proximity-ranging-server/CodegenIntegration.h>
+#include <app/clusters/proximity-ranging-server/ProximityRangingDriver.h>
 
 namespace {
 constexpr EndpointId kRangingEndpoint = 2;
 
-MyProximityRangingDriver sDriver;
+MyBleAdapter   sBleAdapter;
+MyWiFiAdapter  sWiFiAdapter;
+MyBltcsAdapter sBltcsAdapter;
+
+ProximityRanging::RangingAdapter * sAdapters[] = { &sBleAdapter, &sWiFiAdapter, &sBltcsAdapter };
+ProximityRanging::ProximityRangingDriver sDriver{ Span<ProximityRanging::RangingAdapter * const>(sAdapters) };
 ProximityRanging::ProximityRangingServer sServer(kRangingEndpoint, sDriver);
 } // namespace
 
 void ApplicationInit()
 {
-    const BitMask<ProximityRanging::Feature> features{
+    constexpr BitMask<ProximityRanging::Feature> kFeatures{
         ProximityRanging::Feature::kBleBeaconRssi,
         ProximityRanging::Feature::kWiFiUsdProximityDetection,
         ProximityRanging::Feature::kBluetoothChannelSounding,
     };
-    if (CHIP_ERROR err = sServer.Init(features); err != CHIP_NO_ERROR)
+    if (CHIP_ERROR err = sServer.Init(kFeatures); err != CHIP_NO_ERROR)
     {
         ChipLogError(AppServer, "Proximity Ranging init failed: %" CHIP_ERROR_FORMAT, err.Format());
     }
@@ -109,26 +134,55 @@ void ApplicationShutdown()
 }
 ```
 
-Code-driven applications (e.g. `all-devices-app`) construct
-`ProximityRangingCluster` directly via its `Config(driver)` constructor — they
-do not need the wrapper because they already build the cluster registration tree
-explicitly.
+Code-driven applications construct `ProximityRangingCluster` directly via its
+`Config(driver)` constructor — they do not need the wrapper because they already
+build the cluster registration tree explicitly.
 
-## Driver Interface
+## RangingAdapter Interface
 
-| Method                     | Description                                           |
-| -------------------------- | ----------------------------------------------------- |
-| `Init(callback)`           | Store callback, register as listener                  |
-| `Shutdown()`               | Remove as listener, null callback                     |
-| `HandleStartRanging()`     | Start a ranging session (synchronous)                 |
-| `HandleStopRanging()`      | Stop a ranging session (synchronous)                  |
-| `GetRangingCapabilities()` | Encode the list of supported capabilities             |
-| `GetActiveSessionIds()`    | Return active session IDs (for session ID generation) |
-| `GetBleRbcConfig()`        | Return `BleRbcConfig` (optional, BLERBC feature)      |
-| `GetWiFiUsdConfig()`       | Return `WiFiUsdConfig` (optional, WFUSDPD feature)    |
-| `GetBltcsConfig()`         | Return `BltcsConfig` (optional, BLTCS feature)        |
+Each supported technology is implemented as a `RangingAdapter`. The application
+constructs one adapter per technology and supplies them to the driver as a
+`Span` at construction.
 
-See `ProximityRangingDriver.h` for callback method documentation.
+| Method                  | Description                                              |
+| ----------------------- | -------------------------------------------------------- |
+| `GetTechnology()`       | Returns the `RangingTechEnum` this adapter implements    |
+| `GetCapabilities()`     | Returns the `RangingCapabilitiesStruct` for this adapter |
+| `StartSession()`        | Start a ranging session (synchronous)                    |
+| `StopSession()`         | Stop a ranging session (synchronous)                     |
+| `StopAllSessions()`     | Stop every active session (called by driver on shutdown) |
+| `GetActiveSessionIds()` | Append this adapter's active session IDs to a Span       |
+| `GetDeviceId()`         | Optional: per-device 64-bit ID (BLERBC adapters)         |
+| `GetWiFiUsdConfig()`    | Optional: `WiFiUsdConfig` (Wi-Fi USD adapters only)      |
+| `GetBltcsConfig()`      | Optional: `BltcsConfig` (BLTCS adapters only)            |
+
+Adapters report async results to the driver through `RangingAdapter::Callback`:
+
+| Callback                    | When emitted                                       |
+| --------------------------- | -------------------------------------------------- |
+| `OnMeasurementData()`       | Per-session measurement available                  |
+| `OnRangingSessionStopped()` | Session ended (timeout, request, hardware failure) |
+| `OnAttributeChanged()`      | Adapter-owned attribute value changed              |
+
+The driver implements this Callback and forwards each event to the cluster after
+translating session IDs into the cluster's session-event sink.
+
+## Adapter Set
+
+The adapter set is fixed at driver construction — it reflects the device's
+physical radio configuration, which does not change at runtime.
+
+```cpp
+// Backing array must outlive the driver.
+RangingAdapter * sAdapters[] = { &sBleAdapter, &sWiFiAdapter, &sBltcsAdapter };
+ProximityRangingDriver sDriver{ Span<RangingAdapter * const>(sAdapters) };
+```
+
+Each pointer must be non-null and each adapter's `GetTechnology()` must be
+unique within the set; violations terminate via `VerifyOrDie` because static
+composition errors are configuration bugs. Up to
+`CHIP_CONFIG_PROXIMITY_RANGING_MAX_SESSIONS` concurrent sessions are supported
+across all adapters.
 
 ## Preflight Validation
 
@@ -149,7 +203,7 @@ Trigger-shape violations are rejected with `kRejectedInfeasibleRangingTriggers`:
 -   `Trigger.EndTime <= Trigger.StartTime`.
 -   `Trigger.RangingInstanceInterval == 0` (when present).
 
-Drivers can rely on these checks and only need to handle technology-specific
+Adapters can rely on these checks and only need to handle technology-specific
 infeasibility (e.g., requested frequency band unsupported by hardware).
 
 ## Command Flow
@@ -157,32 +211,41 @@ infeasibility (e.g., requested frequency band unsupported by hardware).
 `StartRangingRequest` and `StopRangingRequest` are handled synchronously:
 
 ```
-Client                    Cluster                          Driver
-  │                         │                                │
-  ├─ StartRangingRequest ──►│                                │
-  │                         ├─ ValidateStartRangingRequest() │
-  │                         ├─ GenerateSessionId() ─────────►│ (GetActiveSessionIds)
-  │                         ├─ HandleStartRanging() ────────►│
-  │                         │◄── ResultCodeEnum ─────────────┤
-  │◄─ StartRangingResponse ─┤                                │
+Client                    Cluster                   Driver                Adapter
+  │                         │                         │                     │
+  ├─ StartRangingRequest ──►│                         │                     │
+  │                         ├─ Validate request ─────►│                     │
+  │                         ├─ HandleStartRanging ───►│                     │
+  │                         │                         ├─ FindAdapter(tech)  │
+  │                         │                         ├─ allocate session   │
+  │                         │                         ├─ StartSession ─────►│
+  │                         │                         │◄── ResultCodeEnum ──┤
+  │                         │◄── ResultCodeEnum ──────┤                     │
+  │◄─ StartRangingResponse ─┤                         │                     │
 ```
 
 ## Events
 
--   **RangingResult**: Emitted when measurement data is available. Delivered via
-    `Callback::OnMeasurementData()`.
+-   **RangingResult**: Emitted when measurement data is available. Delivered
+    through the adapter's `Callback::OnMeasurementData()`, forwarded by the
+    driver as `ProximityRangingDriver::Callback::OnMeasurementData()`.
 -   **RangingSessionStatus**: Emitted when a session ends asynchronously.
-    Delivered via `Callback::OnSessionStopped()`.
+    Delivered through `Callback::OnRangingSessionStopped()` on the adapter side
+    and `Callback::OnSessionStopped()` on the cluster side.
 
 ## Attribute Change Notifications
 
-Drivers notify the cluster when an attribute they own changes (e.g., BLE Device
-ID rotation) by calling `Callback::OnAttributeChanged(attributeId)`. The cluster
-forwards this as an attribute-changed report so subscribers observe the new
-value.
+Adapters notify the driver when an attribute they own changes (e.g., BLE Device
+ID rotation) by calling `RangingAdapter::Callback::OnAttributeChanged()`. The
+driver forwards this through
+`ProximityRangingDriver::Callback::OnAttributeChanged()` to the cluster, which
+in turn marks the attribute dirty so subscribers observe the new value.
 
 ## Multi-Endpoint Support
 
-Multiple endpoints each construct their own `ProximityRangingCluster` instance
-with its own feature map. Drivers may be shared (one driver registering with
-multiple cluster instances) or per-endpoint depending on the application.
+Each endpoint constructs its own `ProximityRangingCluster` with its own feature
+map. `ProximityRangingDriver` currently retains a single cluster callback at a
+time, so a driver instance is bound to a single cluster instance for the
+duration of `Init()` / `Shutdown()`. Applications that expose proximity ranging
+on multiple endpoints should construct one driver (with its own adapter set) per
+endpoint.

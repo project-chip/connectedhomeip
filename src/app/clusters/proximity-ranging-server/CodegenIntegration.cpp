@@ -58,11 +58,6 @@ void ProximityRangingServer::Deinit()
     mCluster.Destroy();
 }
 
-ProximityRangingCluster * ProximityRangingServer::Cluster()
-{
-    return mCluster.IsConstructed() ? &mCluster.Cluster() : nullptr;
-}
-
 } // namespace ProximityRanging
 } // namespace Clusters
 } // namespace app

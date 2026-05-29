@@ -280,7 +280,8 @@ private:
             RegisterCreator("proximity-ranger", [this]() {
                 VerifyOrDie(mContext.has_value());
                 static Clusters::ProximityRanging::LoggingRangingAdapter sLoggingBleAdapter(
-                    Clusters::ProximityRanging::RangingTechEnum::kBLEBeaconRSSIRanging, mContext->timerDelegate);
+                    Clusters::ProximityRanging::RangingTechEnum::kBLEBeaconRSSIRanging, mContext->timerDelegate,
+                    &mContext->storageDelegate);
                 static Clusters::ProximityRanging::LoggingRangingAdapter sLoggingWiFiAdapter(
                     Clusters::ProximityRanging::RangingTechEnum::kWiFiRoundTripTimeRanging, mContext->timerDelegate);
                 static Clusters::ProximityRanging::LoggingRangingAdapter sLoggingBltcsAdapter(
@@ -290,8 +291,15 @@ private:
                     &sLoggingWiFiAdapter,
                     &sLoggingBltcsAdapter,
                 };
-                return std::make_unique<ProximityRangerDevice>(mContext->timerDelegate,
-                                                               Span<Clusters::ProximityRanging::RangingAdapter * const>(sAdapters));
+                // Feature map declared explicitly to match the static adapter
+                // set; keep this in sync with sAdapters above.
+                constexpr BitMask<Clusters::ProximityRanging::Feature> kFeatures{
+                    Clusters::ProximityRanging::Feature::kBleBeaconRssi,
+                    Clusters::ProximityRanging::Feature::kWiFiUsdProximityDetection,
+                    Clusters::ProximityRanging::Feature::kBluetoothChannelSounding,
+                };
+                return std::make_unique<ProximityRangerDevice>(
+                    mContext->timerDelegate, Span<Clusters::ProximityRanging::RangingAdapter * const>(sAdapters), kFeatures);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_POWER_SOURCE)

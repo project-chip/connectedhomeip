@@ -16,42 +16,69 @@
  */
 #pragma once
 
-#include <app/clusters/proximity-ranging-server/ProximityRangingDriver.h>
 #include <clusters/ProximityRanging/Commands.h>
 #include <clusters/ProximityRanging/Enums.h>
 #include <clusters/ProximityRanging/Structs.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
-#include <lib/support/BitMask.h>
 #include <lib/support/Span.h>
 
 #include <optional>
-#include <vector>
 
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace ProximityRanging {
 
+/// Length of the Device Identity Key for Wi-Fi USD and BLTCS.
+inline constexpr size_t kDeviceIdentityKeyLen = 16;
+using DeviceIdentityKey                       = uint8_t[kDeviceIdentityKeyLen];
+
+/// Per-technology configuration exposed via the cluster's optional attributes.
+/// Adapters return one of these only when they implement the matching technology;
+/// otherwise the corresponding Get accessor returns std::nullopt and the cluster
+/// surfaces UnsupportedAttribute.
+struct BleRbcConfig
+{
+    uint64_t deviceId;
+};
+
+struct WiFiUsdConfig
+{
+    DeviceIdentityKey deviceIdentityKey;
+};
+
+struct BltcsConfig
+{
+    DeviceIdentityKey deviceIdentityKey;
+    BLTCSSecurityLevelEnum securityLevel;
+    BLTCSModeEnum modeCapability;
+};
+
 /**
  * Interface for a single ranging technology (BLE RSSI, Channel Sounding, Wi-Fi USD, etc.).
  *
  * Lifecycle: platform-specific adapters are owned by the application and must
- * be registered with the RangingTechnologyController before the Proximity
- * Ranging cluster is initialized. Adapters must outlive the controller, or be
+ * be registered with ProximityRangingDriver before the Proximity Ranging
+ * cluster is initialised. Adapters must outlive the driver, or be
  * unregistered before destruction.
  *
- * Session model: the cluster allocates 1-byte session IDs and passes them to
- * StartSession. The adapter tracks which IDs are currently active, exposes
- * them via GetActiveSessionIds, and is responsible for reporting termination
- * of every session it has accepted — whether requested via StopSession or
- * driven by the underlying technology — through OnRangingSessionStopped.
+ * Session model: the driver allocates 1-byte session IDs and passes them to
+ * StartSession. The adapter tracks which IDs are currently active and is
+ * responsible for reporting termination of every session it has accepted -
+ * whether requested via StopSession or driven by the underlying technology -
+ * through OnRangingSessionStopped.
  *
  * StartSession / StopSession semantics: both return synchronously with the
  * status of the start/stop request. An adapter MAY return success early if
  * the underlying start takes too long; in that case it must subsequently
  * deliver OnRangingSessionStopped with HardwareError if the session fails to
  * come up.
+ *
+ * Adapters MUST NOT deliver OnRangingSessionStopped synchronously from inside
+ * StartSession. If the start is already known to have failed, return a
+ * non-Accepted ResultCodeEnum instead. Termination callbacks are valid only
+ * after StartSession has returned kAccepted.
  *
  * Async events:
  *   - OnMeasurementData: emitted per the session's measurement parameters
@@ -79,7 +106,7 @@ public:
 
         virtual void OnRangingSessionStopped(uint8_t sessionId, RangingSessionStatusEnum status)                           = 0;
         virtual void OnMeasurementData(uint8_t sessionId, const Structs::RangingMeasurementDataStruct::Type & measurement) = 0;
-        virtual void OnAttributeChanged(chip::AttributeId attributeId)                                                     = 0;
+        virtual void OnAttributeChanged(AttributeId attributeId)                                                           = 0;
     };
 
     virtual ~RangingAdapter() = default;
@@ -96,7 +123,13 @@ public:
     virtual CHIP_ERROR StopSession(uint8_t sessionId)                                                                    = 0;
     virtual void StopAllSessions()                                                                                       = 0;
 
-    virtual CHIP_ERROR GetActiveSessionIds(std::vector<uint8_t> & sessionIds) = 0;
+    /**
+     * Append the adapter's currently-active session IDs to the caller-supplied
+     * span. The span's size on entry is its capacity; on exit the size reflects
+     * how many IDs were written. Returns CHIP_ERROR_BUFFER_TOO_SMALL if the
+     * capacity is insufficient.
+     */
+    virtual CHIP_ERROR GetActiveSessionIds(Span<uint8_t> & sessionIds) = 0;
 
     /// Override only when the adapter exposes a stable per-device 64-bit
     /// identifier (e.g. BLE Device ID). Default returns std::nullopt.
