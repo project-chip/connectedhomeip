@@ -103,10 +103,10 @@ class AddressInfoHolder
 public:
     AddressInfoHolder(std::string & hostname, uint16_t port)
     {
-        struct addrinfo hints                       = {};
-        hints.ai_family                             = AF_INET;
-        hints.ai_socktype                           = SOCK_STREAM;
-        int err                                     = getaddrinfo(hostname.c_str(), std::to_string(port).c_str(), &hints, &mRes);
+        struct addrinfo hints = {};
+        hints.ai_family       = AF_INET;
+        hints.ai_socktype     = SOCK_STREAM;
+        int err               = getaddrinfo(hostname.c_str(), std::to_string(port).c_str(), &hints, &mRes);
 
 #if CHIP_ERROR_LOGGING
         constexpr const char * kErrorGetAddressInfo = "Failed to get address info: ";
@@ -159,7 +159,7 @@ public:
         int sock;
         VerifyOrReturnError(securityMode == HttpsSecurityMode::kDefault, CHIP_ERROR_NOT_IMPLEMENTED);
         ReturnErrorOnFailure(InitSocket(hostname, port, sock));
-        ReturnErrorOnFailure(InitSSL(sock));
+        ReturnErrorOnFailure(InitSSL(sock, hostname));
         return CHIP_NO_ERROR;
     }
 
@@ -215,7 +215,7 @@ private:
         return CHIP_ERROR_NOT_CONNECTED;
     }
 
-    CHIP_ERROR InitSSL(int sock)
+    CHIP_ERROR InitSSL(int sock, const std::string & hostname)
     {
         SSL_load_error_strings();
         OpenSSL_add_ssl_algorithms();
@@ -227,6 +227,7 @@ private:
         VerifyOrReturnError(nullptr != ssl, CHIP_ERROR_NOT_CONNECTED, ChipLogError(chipTool, "%s", kErrorSSLObjectCreate));
 
         SSL_set_fd(ssl, sock);
+        SSL_set_tlsext_host_name(ssl, hostname.c_str());
         VerifyOrReturnError(SSL_connect(ssl) > 0, CHIP_ERROR_NOT_CONNECTED, ChipLogError(chipTool, "%s", kErrorSSLHandshake));
 
         mContext = context;
