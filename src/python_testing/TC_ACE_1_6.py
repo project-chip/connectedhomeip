@@ -197,7 +197,7 @@ class TC_ACE_1_6(MatterBaseTest):
                         operate_only_command = cmds[0]
                         break
                 except Exception as e:
-                    log.warning(f"Failed to read ServerList for endpoint {ep}: {e}")
+                    log.warning("Failed to read ServerList for endpoint %s: %s", ep, e)
                     continue
 
             asserts.assert_not_equal(
