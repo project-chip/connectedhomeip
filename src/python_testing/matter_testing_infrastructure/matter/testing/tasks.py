@@ -205,13 +205,13 @@ class Subprocess(threading.Thread):
 
         self.p.terminate()
         self.join(self.TERMINATION_TIMEOUT_S)
-        if not self.is_alive() and self.p.poll() is not None:
+        if not self.is_alive() and self.returncode is not None:
             return
 
         LOGGER.warning("Subprocess or controller thread did not terminate within timeout. Killing the process instead")
         self.p.kill()
         self.join(self.TERMINATION_TIMEOUT_S)
-        if self.is_alive() or self.p.poll() is None:
+        if self.is_alive() or self.returncode is not None:
             LOGGER.warning("Failed to kill subprocess within timeout. We may be leaving a zombie process")
 
     def wait(self, timeout: float = DEFAULT_TIMEOUT_S) -> int | None:
