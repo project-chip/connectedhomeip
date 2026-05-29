@@ -43,10 +43,6 @@ static const Span<const detail::Structs::ModeOptionStruct::Type> kSupportedModes
 static DefaultChefDelegate gDeviceEnergyManagementModeDelegate(kSupportedModes);
 static std::unique_ptr<Instance> gDeviceEnergyManagementModeInstance;
 
-} // namespace
-
-#endif // MATTER_DM_PLUGIN_DEVICE_ENERGY_MANAGEMENT_MODE_SERVER
-
 void MatterDeviceEnergyManagementModeClusterInitCallback(chip::EndpointId endpointId)
 {
     VerifyOrDie(endpointId == 1);
@@ -67,3 +63,12 @@ void MatterDeviceEnergyManagementModeClusterShutdownCallback(chip::EndpointId en
     }
     DeviceEnergyManagementMode::Shutdown();
 }
+
+} // namespace
+
+#else
+
+void MatterDeviceEnergyManagementModeClusterInitCallback(chip::EndpointId endpointId) {}
+void MatterDeviceEnergyManagementModeClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType) {}
+
+#endif // MATTER_DM_PLUGIN_DEVICE_ENERGY_MANAGEMENT_MODE_SERVER
