@@ -1650,6 +1650,23 @@ limitations under the License.
         </clusters>
     </deviceType>
     <deviceType>
+        <name>MA-electrical-distribution-enclosure</name>
+        <domain>CHIP</domain>
+        <typeName>Electrical Distribution Enclosure</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0517</deviceId>
+        <revision editable="false">1</revision>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters>
+            <include cluster="Electrical Distribution" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Identify" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="On/Off" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Power Topology" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <!-- TODO: Add Electrical Protection Alarm (Provisional, Optional per spec) once https://github.com/project-chip/connectedhomeip/pull/72249 lands -->
+        </clusters>
+    </deviceType>
+    <deviceType>
         <name>MA-control-bridge</name>
         <domain>CHIP</domain>
         <typeName>Control Bridge</typeName>

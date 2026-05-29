@@ -1,6 +1,6 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Identifier constant values for cluster Timer (cluster code: 71/0x47)
+// Identifier constant values for cluster ElectricalDistribution (cluster code: 162/0xA2)
 // based on src/controller/data_model/controller-clusters.matter
 #pragma once
 
@@ -9,11 +9,9 @@
 namespace chip {
 namespace app {
 namespace Clusters {
-namespace Timer {
-
-inline constexpr ClusterId Id = 0x00000047;
-
-} // namespace Timer
+namespace ElectricalDistribution {
+namespace Events {} // namespace Events
+} // namespace ElectricalDistribution
 } // namespace Clusters
 } // namespace app
 } // namespace chip

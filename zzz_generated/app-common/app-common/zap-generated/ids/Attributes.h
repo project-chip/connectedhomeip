@@ -61,6 +61,7 @@
 #include <clusters/DoorLock/AttributeIds.h>
 #include <clusters/DynamicLighting/AttributeIds.h>
 #include <clusters/EcosystemInformation/AttributeIds.h>
+#include <clusters/ElectricalDistribution/AttributeIds.h>
 #include <clusters/ElectricalEnergyMeasurement/AttributeIds.h>
 #include <clusters/ElectricalGridConditions/AttributeIds.h>
 #include <clusters/ElectricalPowerMeasurement/AttributeIds.h>
@@ -150,7 +151,6 @@
 #include <clusters/ThreadNetworkDirectory/AttributeIds.h>
 #include <clusters/TimeFormatLocalization/AttributeIds.h>
 #include <clusters/TimeSynchronization/AttributeIds.h>
-#include <clusters/Timer/AttributeIds.h>
 #include <clusters/TlsCertificateManagement/AttributeIds.h>
 #include <clusters/TlsClientManagement/AttributeIds.h>
 #include <clusters/TotalVolatileOrganicCompoundsConcentrationMeasurement/AttributeIds.h>

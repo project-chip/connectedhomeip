@@ -3222,52 +3222,6 @@ cluster IcdManagement = 70 {
   command StayActiveRequest(StayActiveRequestRequest): StayActiveResponse = 3;
 }
 
-/** This cluster supports creating a simple timer functionality. */
-provisional cluster Timer = 71 {
-  revision 1;
-
-  enum TimerStatusEnum : enum8 {
-    kRunning = 0;
-    kPaused = 1;
-    kExpired = 2;
-    kReady = 3;
-  }
-
-  bitmap Feature : bitmap32 {
-    kReset = 0x1;
-  }
-
-  readonly attribute elapsed_s setTime = 0;
-  readonly attribute elapsed_s timeRemaining = 1;
-  readonly attribute TimerStatusEnum timerState = 2;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-
-  request struct SetTimerRequest {
-    elapsed_s newTime = 0;
-  }
-
-  request struct AddTimeRequest {
-    elapsed_s additionalTime = 0;
-  }
-
-  request struct ReduceTimeRequest {
-    elapsed_s timeReduction = 0;
-  }
-
-  /** This command is used to set the timer. */
-  command SetTimer(SetTimerRequest): DefaultSuccess = 0;
-  /** This command is used to reset the timer to the original value. */
-  command ResetTimer(): DefaultSuccess = 1;
-  /** This command is used to add time to the existing timer. */
-  command AddTime(AddTimeRequest): DefaultSuccess = 2;
-  /** This command is used to reduce time on the existing timer. */
-  command ReduceTime(ReduceTimeRequest): DefaultSuccess = 3;
-}
-
 /** This cluster supports remotely monitoring and, where supported, changing the operational state of an Oven. */
 cluster OvenCavityOperationalState = 72 {
   revision 2;
@@ -5854,6 +5808,29 @@ provisional cluster ElectricalGridConditions = 160 {
   attribute nullable boolean localGenerationAvailable = 0;
   readonly attribute nullable ElectricalGridConditionsStruct currentConditions = 1;
   readonly attribute optional ElectricalGridConditionsStruct forecastConditions[] = 2;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
+/** This cluster provides an interface for a device which distributes electrical power to other devices, providing information about the capacity of the device as well as whether it has been damaged or has reached the end of its service life. */
+provisional cluster ElectricalDistribution = 162 {
+  revision 1;
+
+  enum EndOfLifeEnum : enum8 {
+    kNone = 0;
+    kDamaged = 1;
+    kDegraded = 2;
+    kExpired = 3;
+  }
+
+  provisional readonly attribute nullable amperage_ma maxContinuousCurrent = 0;
+  provisional readonly attribute nullable voltage_mv maxVoltage = 1;
+  provisional readonly attribute nullable int16u numberOfPoles = 2;
+  provisional readonly attribute nullable EndOfLifeEnum endOfLife = 3;
+  provisional readonly attribute nullable boolean serviceEntranceRated = 4;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
