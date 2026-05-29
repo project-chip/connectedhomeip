@@ -3,9 +3,9 @@ name: python-test-runner
 description: >-
     Guidelines and instructions for building prerequisite example applications
     and running python-based integration and certification tests located in
-    `src/python_testing/`. Use this skill when needing to build test-specific
-    example apps or when executing python test scripts (manually or via helper
-    scripts like run_python_test.py and local.py).
+    `src/python_testing/`. Use this skill to run important regression tests during developement or, 
+    when building new example apps, or when there is a need to execute python test scripts or
+    "certification test scripts"  or mentions of run_python_test.py and local.py.
 ---
 
 # Python Test Runner
@@ -15,7 +15,7 @@ certification tests located in `src/python_testing/`.
 
 ## Prerequisite 1: Activating the Python Environment
 
-Before running any Python tests, you must compile and activate the project's
+Before running any Python tests, you must compile (if one doesn't exist in out/) and activate the project's
 Python virtual environment.
 
 > [!IMPORTANT] Different runner methods may expect different virtual
