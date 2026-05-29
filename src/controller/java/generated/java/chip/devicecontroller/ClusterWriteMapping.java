@@ -1038,6 +1038,8 @@ public class ClusterWriteMapping {
     );
     writeElectricalGridConditionsInteractionInfo.put("writeLocalGenerationAvailableAttribute", writeElectricalGridConditionsLocalGenerationAvailableAttributeInteractionInfo);
     writeAttributeMap.put("electricalGridConditions", writeElectricalGridConditionsInteractionInfo);
+    Map<String, InteractionInfo> writeElectricalDistributionInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("electricalDistribution", writeElectricalDistributionInteractionInfo);
     Map<String, InteractionInfo> writeDoorLockInteractionInfo = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> writeDoorLockDoorOpenEventsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo doorLockdoorOpenEventsCommandParameterInfo =

@@ -112,6 +112,7 @@
 | WaterHeaterMode                                                     | 0x009E |
 | DeviceEnergyManagementMode                                          | 0x009F |
 | ElectricalGridConditions                                            | 0x00A0 |
+| ElectricalDistribution                                              | 0x00A2 |
 | DoorLock                                                            | 0x0101 |
 | WindowCovering                                                      | 0x0102 |
 | ClosureControl                                                      | 0x0104 |
@@ -7951,6 +7952,26 @@ private:
 |------------------------------------------------------------------------------|
 | Events:                                                             |        |
 | * CurrentConditionsChanged                                          | 0x0000 |
+\*----------------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------------*\
+| Cluster ElectricalDistribution                                      | 0x00A2 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * MaxContinuousCurrent                                              | 0x0000 |
+| * MaxVoltage                                                        | 0x0001 |
+| * NumberOfPoles                                                     | 0x0002 |
+| * EndOfLife                                                         | 0x0003 |
+| * ServiceEntranceRated                                              | 0x0004 |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
+| * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
+| * ClusterRevision                                                   | 0xFFFD |
+|------------------------------------------------------------------------------|
+| Events:                                                             |        |
 \*----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------*\
@@ -26151,6 +26172,77 @@ void registerClusterElectricalGridConditions(Commands & commands, CredentialIssu
 
     commands.RegisterCluster(clusterName, clusterCommands);
 }
+void registerClusterElectricalDistribution(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+{
+    using namespace chip::app::Clusters::ElectricalDistribution;
+
+    const char * clusterName = "ElectricalDistribution";
+
+    commands_list clusterCommands = {
+        //
+        // Commands
+        //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig), //
+        //
+        // Attributes
+        //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                 //
+        make_unique<ReadAttribute>(Id, "max-continuous-current", Attributes::MaxContinuousCurrent::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "max-voltage", Attributes::MaxVoltage::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "number-of-poles", Attributes::NumberOfPoles::Id, credsIssuerConfig),               //
+        make_unique<ReadAttribute>(Id, "end-of-life", Attributes::EndOfLife::Id, credsIssuerConfig),                       //
+        make_unique<ReadAttribute>(Id, "service-entrance-rated", Attributes::ServiceEntranceRated::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<int64_t>>>(Id, "max-continuous-current", INT64_MIN, INT64_MAX,
+                                                                             Attributes::MaxContinuousCurrent::Id,
+                                                                             WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<int64_t>>>(Id, "max-voltage", INT64_MIN, INT64_MAX,
+                                                                             Attributes::MaxVoltage::Id,
+                                                                             WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint16_t>>>(Id, "number-of-poles", 0, UINT16_MAX,
+                                                                              Attributes::NumberOfPoles::Id,
+                                                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<chip::app::Clusters::ElectricalDistribution::EndOfLifeEnum>>>(
+            Id, "end-of-life", 0, UINT8_MAX, Attributes::EndOfLife::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<bool>>>(Id, "service-entrance-rated", 0, 1,
+                                                                          Attributes::ServiceEntranceRated::Id,
+                                                                          WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::AttributeId>>>(
+            Id, "attribute-list", Attributes::AttributeList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "feature-map", 0, UINT32_MAX, Attributes::FeatureMap::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig),                                //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                 //
+        make_unique<SubscribeAttribute>(Id, "max-continuous-current", Attributes::MaxContinuousCurrent::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "max-voltage", Attributes::MaxVoltage::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "number-of-poles", Attributes::NumberOfPoles::Id, credsIssuerConfig),               //
+        make_unique<SubscribeAttribute>(Id, "end-of-life", Attributes::EndOfLife::Id, credsIssuerConfig),                       //
+        make_unique<SubscribeAttribute>(Id, "service-entrance-rated", Attributes::ServiceEntranceRated::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        //
+        // Events
+        //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
+    };
+
+    commands.RegisterCluster(clusterName, clusterCommands);
+}
 void registerClusterDoorLock(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
     using namespace chip::app::Clusters::DoorLock;
@@ -33490,6 +33582,7 @@ void registerClusters(Commands & commands, CredentialIssuerCommands * credsIssue
     registerClusterWaterHeaterMode(commands, credsIssuerConfig);
     registerClusterDeviceEnergyManagementMode(commands, credsIssuerConfig);
     registerClusterElectricalGridConditions(commands, credsIssuerConfig);
+    registerClusterElectricalDistribution(commands, credsIssuerConfig);
     registerClusterDoorLock(commands, credsIssuerConfig);
     registerClusterWindowCovering(commands, credsIssuerConfig);
     registerClusterClosureControl(commands, credsIssuerConfig);
