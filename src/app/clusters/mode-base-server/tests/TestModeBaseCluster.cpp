@@ -286,10 +286,8 @@ TEST_F(TestModeBaseCluster, ChangeToModeUnsupportedMode)
     Commands::ChangeToMode::Type request;
     request.newMode = 99;
     auto result     = tester.Invoke(request);
-    ASSERT_TRUE(result.status.has_value());
-    ASSERT_TRUE(result.status->IsSuccess());
-    ASSERT_TRUE(result.response.has_value());
-    EXPECT_EQ(result.response->status, to_underlying(StatusCode::kUnsupportedMode));
+    ASSERT_TRUE(result.status.has_value() && result.status->IsSuccess());
+    ASSERT_TRUE(result.response.has_value() && result.response->status == to_underlying(StatusCode::kUnsupportedMode));
     EXPECT_EQ(cluster.GetCurrentMode(), 0u);
 }
 
@@ -302,10 +300,8 @@ TEST_F(TestModeBaseCluster, ChangeToModeSameModeReturnsSuccessWithoutUpdating)
     Commands::ChangeToMode::Type request;
     request.newMode = 0;
     auto result     = tester.Invoke(request);
-    ASSERT_TRUE(result.status.has_value());
-    ASSERT_TRUE(result.status->IsSuccess());
-    ASSERT_TRUE(result.response.has_value());
-    EXPECT_EQ(result.response->status, to_underlying(StatusCode::kSuccess));
+    ASSERT_TRUE(result.status.has_value() && result.status->IsSuccess());
+    ASSERT_TRUE(result.response.has_value() && result.response->status == to_underlying(StatusCode::kSuccess));
     EXPECT_EQ(cluster.GetCurrentMode(), 0u);
     EXPECT_EQ(appDelegate.mLastHandledNewMode, 0xFFu);
 }
@@ -319,10 +315,8 @@ TEST_F(TestModeBaseCluster, ChangeToModeSuccessUpdatesCurrentMode)
     Commands::ChangeToMode::Type request;
     request.newMode = 1;
     auto result     = tester.Invoke(request);
-    ASSERT_TRUE(result.status.has_value());
-    ASSERT_TRUE(result.status->IsSuccess());
-    ASSERT_TRUE(result.response.has_value());
-    EXPECT_EQ(result.response->status, to_underlying(StatusCode::kSuccess));
+    ASSERT_TRUE(result.status.has_value() && result.status->IsSuccess());
+    ASSERT_TRUE(result.response.has_value() && result.response->status == to_underlying(StatusCode::kSuccess));
     EXPECT_EQ(cluster.GetCurrentMode(), 1u);
     EXPECT_EQ(appDelegate.mLastHandledNewMode, 1u);
     EXPECT_TRUE(tester.IsAttributeDirty(CurrentMode::Id));
@@ -339,10 +333,8 @@ TEST_F(TestModeBaseCluster, ChangeToModeDelegateFailureLeavesCurrentModeUnchange
     Commands::ChangeToMode::Type request;
     request.newMode = 1;
     auto result     = tester.Invoke(request);
-    ASSERT_TRUE(result.status.has_value());
-    ASSERT_TRUE(result.status->IsSuccess());
-    ASSERT_TRUE(result.response.has_value());
-    EXPECT_EQ(result.response->status, to_underlying(StatusCode::kGenericFailure));
+    ASSERT_TRUE(result.status.has_value() && result.status->IsSuccess());
+    ASSERT_TRUE(result.response.has_value() && result.response->status == to_underlying(StatusCode::kGenericFailure));
     EXPECT_EQ(cluster.GetCurrentMode(), 0u);
 }
 

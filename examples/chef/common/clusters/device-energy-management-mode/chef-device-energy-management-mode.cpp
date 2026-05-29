@@ -45,6 +45,8 @@ static std::unique_ptr<Instance> gDeviceEnergyManagementModeInstance;
 
 } // namespace
 
+#endif // MATTER_DM_PLUGIN_DEVICE_ENERGY_MANAGEMENT_MODE_SERVER
+
 void MatterDeviceEnergyManagementModeClusterInitCallback(EndpointId endpointId)
 {
     VerifyOrDie(endpointId == 1);
@@ -65,5 +67,3 @@ void MatterDeviceEnergyManagementModeClusterShutdownCallback(EndpointId endpoint
     }
     DeviceEnergyManagementMode::Shutdown();
 }
-
-#endif // MATTER_DM_PLUGIN_DEVICE_ENERGY_MANAGEMENT_MODE_SERVER
