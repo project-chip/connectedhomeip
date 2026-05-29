@@ -70,6 +70,9 @@ class SubprocessInfo:
 class Subprocess(threading.Thread):
     """Run a subprocess in a thread."""
 
+    DEFAULT_TIMEOUT_S: float = 300.0
+    TERMINATION_TIMEOUT_S: float = 5.0
+
     def __init__(self, program: str, *args: str, output_cb: Callable[[bytes, bool], bytes] | None = None,
                  f_stdout: BinaryIO = sys.stdout.buffer, f_stderr: BinaryIO = sys.stderr.buffer) -> None:
         """Initialize the subprocess.
@@ -150,12 +153,16 @@ class Subprocess(threading.Thread):
                 self.returncode = -1
 
             if forwarding_stdout_thread is not None:
-                forwarding_stdout_thread.join()
+                forwarding_stdout_thread.join(self.TERMINATION_TIMEOUT_S)
+                if forwarding_stdout_thread.is_alive():
+                    LOGGER.warning("Forwarding stdout thread did not finish within timeout")
 
             if forwarding_stderr_thread is not None:
-                forwarding_stderr_thread.join()
+                forwarding_stderr_thread.join(self.TERMINATION_TIMEOUT_S)
+                if forwarding_stderr_thread.is_alive():
+                    LOGGER.warning("Forwarding stderr thread did not finish within timeout")
 
-    def start(self, expected_output: str | re.Pattern | None = None, timeout: float | None = None) -> None:
+    def start(self, expected_output: str | re.Pattern | None = None, timeout: float = DEFAULT_TIMEOUT_S) -> None:
         """Start a subprocess and optionally wait for a specific output."""
 
         if expected_output is not None:
@@ -165,18 +172,17 @@ class Subprocess(threading.Thread):
         super().start()
         # Wait for the thread to start, so the self.p attribute is available.
         self.event_started.wait()
+        if self.p is None:
+            raise RuntimeError("Subprocess failed to start")
 
-        if expected_output is not None:
-            if self.event.wait(timeout) is False:
-                # Terminate the process, so the Python interpreter will not
-                # hang on the join call in our thread entry point in case of
-                # Python process termination (not-caught exception).
-                self.p.terminate()
-                raise TimeoutError("Expected output '%r' not found within %s seconds" % (expected_output, timeout))
-            self.expected_output = None
+        if expected_output is not None and not self.event.wait(timeout):
+            # Terminate the process, so the Python interpreter will not hang on the join call in our thread entry point in case of
+            # Python process termination (not-caught exception).
+            self.p.terminate()
+            raise TimeoutError("Expected output '%r' not found within %s seconds", expected_output, timeout)
 
     def send(self, message: str, end: str = "\n", expected_output: str | re.Pattern | None = None,
-             timeout: float = 300) -> None:
+             timeout: float = DEFAULT_TIMEOUT_S) -> None:
         """Send a message to a process and optionally wait for a response."""
 
         if expected_output is not None:
@@ -198,9 +204,17 @@ class Subprocess(threading.Thread):
             return
 
         self.p.terminate()
-        self.join()
+        self.join(self.TERMINATION_TIMEOUT_S)
+        if not self.is_alive() and self.p.poll() is not None:
+            return
 
-    def wait(self, timeout: float | None = None) -> int | None:
+        LOGGER.warning("Subprocess or controller thread did not terminate within timeout. Killing the process instead")
+        self.p.kill()
+        self.join(self.TERMINATION_TIMEOUT_S)
+        if self.is_alive() or self.p.poll() is None:
+            LOGGER.warning("Subprocess did not kill within timeout. We may be leaving a zombie process")
+
+    def wait(self, timeout: float = DEFAULT_TIMEOUT_S) -> int | None:
         """Wait for the subprocess to finish."""
         self.join(timeout)
         return self.returncode
