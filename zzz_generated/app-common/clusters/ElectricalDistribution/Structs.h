@@ -35,9 +35,9 @@
 namespace chip {
 namespace app {
 namespace Clusters {
-namespace Timer {
+namespace ElectricalDistribution {
 namespace Structs {} // namespace Structs
-} // namespace Timer
+} // namespace ElectricalDistribution
 } // namespace Clusters
 } // namespace app
 } // namespace chip

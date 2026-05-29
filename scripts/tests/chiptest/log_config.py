@@ -135,6 +135,16 @@ class ProcessThreadTaskFilter(logging.Filter):
 
         return True
 
+    @contextlib.contextmanager
+    def msg_counter_ctx(self, msg_counter: LogMessageCounter) -> Iterator[Self]:
+        """Context manager to temporarily set the message counter for this filter."""
+        prev_counter = self.msg_counter
+        try:
+            self.msg_counter = msg_counter
+            yield self
+        finally:
+            self.msg_counter = prev_counter
+
 
 @dataclasses.dataclass
 class LogConfig:

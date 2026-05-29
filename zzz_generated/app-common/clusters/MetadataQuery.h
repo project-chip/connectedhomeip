@@ -92,6 +92,8 @@
 #include <clusters/DynamicLighting/MetadataProvider.h>
 #include <clusters/EcosystemInformation/Ids.h>
 #include <clusters/EcosystemInformation/MetadataProvider.h>
+#include <clusters/ElectricalDistribution/Ids.h>
+#include <clusters/ElectricalDistribution/MetadataProvider.h>
 #include <clusters/ElectricalEnergyMeasurement/Ids.h>
 #include <clusters/ElectricalEnergyMeasurement/MetadataProvider.h>
 #include <clusters/ElectricalGridConditions/Ids.h>
@@ -270,8 +272,6 @@
 #include <clusters/TimeFormatLocalization/MetadataProvider.h>
 #include <clusters/TimeSynchronization/Ids.h>
 #include <clusters/TimeSynchronization/MetadataProvider.h>
-#include <clusters/Timer/Ids.h>
-#include <clusters/Timer/MetadataProvider.h>
 #include <clusters/TlsCertificateManagement/Ids.h>
 #include <clusters/TlsCertificateManagement/MetadataProvider.h>
 #include <clusters/TlsClientManagement/Ids.h>
@@ -528,6 +528,11 @@ std::optional<DataModel::AcceptedCommandEntry> AcceptedCommandEntryFor(ClusterId
     {
         if (id == EcosystemInformation::Id)
             return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, EcosystemInformation::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == ElectricalDistribution::Id) || ...))
+    {
+        if (id == ElectricalDistribution::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, ElectricalDistribution::Id>::EntryFor(command);
     }
     if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == ElectricalEnergyMeasurement::Id) || ...))
     {
@@ -972,11 +977,6 @@ std::optional<DataModel::AcceptedCommandEntry> AcceptedCommandEntryFor(ClusterId
     {
         if (id == TimeFormatLocalization::Id)
             return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, TimeFormatLocalization::Id>::EntryFor(command);
-    }
-    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == Timer::Id) || ...))
-    {
-        if (id == Timer::Id)
-            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Timer::Id>::EntryFor(command);
     }
     if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == TimeSynchronization::Id) || ...))
     {
