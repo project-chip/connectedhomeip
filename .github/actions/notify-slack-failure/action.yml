@@ -70,7 +70,7 @@ runs:
           fi
         fi
 
-        PAYLOAD_TEXT="🚨 *CI Failure Alert* 🚨 *Job:* ${JOB_TEXT} *Run Details:* <${RUN_URL}|View Pipeline Logs>${EXTRA_TEXT}"
+        PAYLOAD_TEXT="🚨 *CI Failure Alert* 🚨 *Job:* ${JOB_TEXT} *Run Details:* <${RUN_URL}|View Pipeline Logs>${EXTRA_TEXT:-}"
 
         JSON_PAYLOAD=$(python3 -c 'import json, sys; print(json.dumps({"text": sys.argv[1]}))' "$PAYLOAD_TEXT")
 
