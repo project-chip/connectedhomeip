@@ -209,7 +209,8 @@ def _IssueNOCChainCallbackPythonCallback(devCtrl, status: PyChipError, noc: c_vo
             ipkBytes = string_at(ipk, ipkLen)[:]
         nocChain = NOCChain(nocBytes, icacBytes, rcacBytes, ipkBytes, adminSubject)
     else:
-        LOGGER.error("Failure to generate NOC Chain: %s. All NOCChain field will be None and commissioning will fail!", status)
+        status_str = str(status)  # For details why check PyChipError docstring.
+        LOGGER.error("Failure to generate NOC Chain: %s. All NOCChain field will be None and commissioning will fail!", status_str)
     devCtrl.NOCChainCallback(nocChain)
 
 
