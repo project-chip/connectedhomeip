@@ -29,6 +29,8 @@ namespace Clusters {
 
 SmokeCoAlarmCluster::SmokeCoAlarmCluster(EndpointId endpointId) : SmokeCoAlarmCluster(endpointId, Config{}) {}
 
+SmokeCoAlarmCluster::SmokeCoAlarmCluster(EndpointId endpointId) : SmokeCoAlarmCluster(endpointId, Config{}) {}
+
 SmokeCoAlarmCluster::SmokeCoAlarmCluster(EndpointId endpointId, const Config & config) :
     DefaultServerCluster({ endpointId, Id }), mConfig(config), mInoperativeWhenUnmounted(config.inoperativeWhenUnmounted)
 {}

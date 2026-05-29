@@ -59,7 +59,8 @@ public:
         bool inoperativeWhenUnmounted = false;
     };
 
-    explicit SmokeCoAlarmCluster(EndpointId endpointId, const Config & config = Config{});
+    explicit SmokeCoAlarmCluster(EndpointId endpointId);
+    explicit SmokeCoAlarmCluster(EndpointId endpointId, const Config & config);
 
     /* Expected byte size of the PriorityOrder */
     static constexpr size_t kPriorityOrderLength = 9;
@@ -98,6 +99,8 @@ public:
      * @return true on success, false on failure
      */
     bool SetUnmountedState(bool isUnmounted);
+
+    void SetInoperativeWhenUnmounted(bool v) { mInoperativeWhenUnmounted = v; }
 
     bool GetExpressedState(ExpressedStateEnum & expressedState) const;
     bool GetSmokeState(AlarmStateEnum & smokeState) const;
@@ -165,8 +168,9 @@ private:
     void SendEvent(T & event);
 
     const Config mConfig;
+    bool mInoperativeWhenUnmounted = false;
 
-    // Runtime attribute storage 
+    // Runtime attribute storage
     ExpressedStateEnum     mExpressedState         = ExpressedStateEnum::kNormal;
     AlarmStateEnum         mSmokeState             = AlarmStateEnum::kNormal;
     AlarmStateEnum         mCOState                = AlarmStateEnum::kNormal;
