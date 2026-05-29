@@ -803,6 +803,15 @@
             "ForecastConditions",
             "FeatureMap"
         ],
+        "Electrical Protection Alarm": [
+            "OverLoadRating",
+            "OverVoltageRating",
+            "SurgeProtectionRating",
+            "ShortCircuitRating",
+            "ResidualCurrentRating",
+            "ArcFaultRating",
+            "FeatureMap"
+        ],
         "Electrical Power Measurement": [
             "PowerMode",
             "NumberOfMeasurementTypes",
