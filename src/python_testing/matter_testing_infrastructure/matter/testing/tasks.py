@@ -83,7 +83,7 @@ class Subprocess(threading.Thread):
             f_stdout: The file to forward the stdout to.
             f_stderr: The file to forward the stderr to.
         """
-        super().__init__()
+        super().__init__(daemon=True)
         self.event = threading.Event()
         self.event_started = threading.Event()
         self.program = program
@@ -127,12 +127,11 @@ class Subprocess(threading.Thread):
 
             # Forward stdout and stderr with a tag attached.
             forwarding_stdout_thread = threading.Thread(
-                target=forward_f,
-                args=(self.p.stdout, self.f_stdout, self._check_output))
+                target=forward_f, args=(self.p.stdout, self.f_stdout, self._check_output), daemon=True)
             forwarding_stdout_thread.start()
+
             forwarding_stderr_thread = threading.Thread(
-                target=forward_f,
-                args=(self.p.stderr, self.f_stderr, self._check_output, True))
+                target=forward_f, args=(self.p.stderr, self.f_stderr, self._check_output, True), daemon=True)
             forwarding_stderr_thread.start()
 
         except Exception:
