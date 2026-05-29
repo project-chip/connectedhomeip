@@ -13,14 +13,15 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 3.2.3. [TC-DGSW-2.3] Command Received [DUT Sever]
+name: 5.1.3. [TC-DGSW-2.3] Command Received [DUT Sever]
 
 PICS:
     - DGSW.S
+    - DGSW.S.F00
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic Information"
+    cluster: "Software Diagnostics"
     endpoint: 0
 
 tests:
