@@ -68,34 +68,51 @@ time via `Config::WithFeatures()`:
 `WithFeatures()` sets the feature bits and marks the mandatory associated
 attributes as present. At least one feature must be enabled.
 
-## CodegenIntegration
+## Codegen Integration
 
-The cluster uses `CodegenIntegration.cpp` to bridge between ZAP-generated
-endpoint configuration and the code-driven cluster. The framework calls
-`MatterProximityRangingClusterInitCallback` which registers the cluster via
-`LazyRegisteredServerCluster`. The bridge reads the feature map from ember
-attribute storage and passes it directly to `Config::WithFeatures()`:
+`ProximityRangingCluster` requires a `ProximityRangingDriver &` at construction.
+That reference is owned by the application, so the auto-generated
+`MatterProximityRangingClusterInitCallback` cannot construct the cluster — by
+the time it fires the application has not yet had a chance to provide a driver.
 
-```cpp
-// Inside CodegenIntegration.cpp — CreateRegistration()
-ProximityRangingCluster::Config config(endpointId);
-config.WithFeatures(BitMask<Feature>(featureMap));
-
-gServers[idx].Create(config);
-```
-
-The application then calls `FindClusterOnEndpoint()` to get the cluster instance
-and set the driver:
+The codegen integration is therefore a no-op stub. Codegen consumers instead use
+`ProximityRangingServer`, which owns a `ProximityRangingCluster` bound to an
+endpoint and registers it with the codegen data model provider's registry from
+the application's post-`Server::Init()` hook.
 
 ```cpp
 #include <app/clusters/proximity-ranging-server/CodegenIntegration.h>
 
-auto * cluster = ProximityRanging::FindClusterOnEndpoint(endpointId);
-if (cluster != nullptr)
+namespace {
+constexpr EndpointId kRangingEndpoint = 2;
+
+MyProximityRangingDriver sDriver;
+ProximityRanging::ProximityRangingServer sServer(kRangingEndpoint, sDriver);
+} // namespace
+
+void ApplicationInit()
 {
-    cluster->SetDriver(&myDriver);
+    const BitMask<ProximityRanging::Feature> features{
+        ProximityRanging::Feature::kBleBeaconRssi,
+        ProximityRanging::Feature::kWiFiUsdProximityDetection,
+        ProximityRanging::Feature::kBluetoothChannelSounding,
+    };
+    if (CHIP_ERROR err = sServer.Init(features); err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "Proximity Ranging init failed: %" CHIP_ERROR_FORMAT, err.Format());
+    }
+}
+
+void ApplicationShutdown()
+{
+    sServer.Deinit();
 }
 ```
+
+Code-driven applications (e.g. `all-devices-app`) construct
+`ProximityRangingCluster` directly via its `Config(driver)` constructor — they
+do not need the wrapper because they already build the cluster registration tree
+explicitly.
 
 ## Driver Interface
 
