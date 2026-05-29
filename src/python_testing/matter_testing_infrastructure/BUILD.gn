@@ -35,6 +35,9 @@ pw_python_package("matter-testing-module") {
         "Programming Language :: Python :: 3",
       ]
     }
+    options = {
+      install_requires = [ "sdbus; sys_platform == \"linux\"" ]
+    }
   }
 
   inputs = [ "env_test.yaml" ]
