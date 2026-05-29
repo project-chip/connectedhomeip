@@ -138,6 +138,7 @@
 #include <clusters/ScenesManagement/EnumsCheck.h>
 #include <clusters/ServiceArea/EnumsCheck.h>
 #include <clusters/SmokeCoAlarm/EnumsCheck.h>
+#include <clusters/SmokeConcentrationMeasurement/EnumsCheck.h>
 #include <clusters/SoftwareDiagnostics/EnumsCheck.h>
 #include <clusters/SoilMeasurement/EnumsCheck.h>
 #include <clusters/Switch/EnumsCheck.h>
@@ -151,7 +152,6 @@
 #include <clusters/ThreadNetworkDirectory/EnumsCheck.h>
 #include <clusters/TimeFormatLocalization/EnumsCheck.h>
 #include <clusters/TimeSynchronization/EnumsCheck.h>
-#include <clusters/Timer/EnumsCheck.h>
 #include <clusters/TlsCertificateManagement/EnumsCheck.h>
 #include <clusters/TlsClientManagement/EnumsCheck.h>
 #include <clusters/TotalVolatileOrganicCompoundsConcentrationMeasurement/EnumsCheck.h>

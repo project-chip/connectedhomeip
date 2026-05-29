@@ -140,7 +140,7 @@ class MatterLog:
         return list(map(MatterLog, logs))
 
 
-class Converter():
+class Converter:
     """
     This class converts between the JSON representation used by chip-tool to transmit
     information and the response format expected by the test suite.
@@ -314,7 +314,7 @@ class OctetStringConverter(BaseConverter):
         return value
 
 
-class StructFieldsNameConverter():
+class StructFieldsNameConverter:
     """
     Converts fields identifiers to the field names specified in the cluster definition.
     """

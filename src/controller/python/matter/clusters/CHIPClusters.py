@@ -3968,89 +3968,6 @@ class ChipClusters:
             },
         },
     }
-    _TIMER_CLUSTER_INFO = {
-        "clusterName": "Timer",
-        "clusterId": 0x00000047,
-        "commands": {
-            0x00000000: {
-                "commandId": 0x00000000,
-                "commandName": "SetTimer",
-                "args": {
-                    "newTime": "int",
-                },
-            },
-            0x00000001: {
-                "commandId": 0x00000001,
-                "commandName": "ResetTimer",
-                "args": {
-                },
-            },
-            0x00000002: {
-                "commandId": 0x00000002,
-                "commandName": "AddTime",
-                "args": {
-                    "additionalTime": "int",
-                },
-            },
-            0x00000003: {
-                "commandId": 0x00000003,
-                "commandName": "ReduceTime",
-                "args": {
-                    "timeReduction": "int",
-                },
-            },
-        },
-        "attributes": {
-            0x00000000: {
-                "attributeName": "SetTime",
-                "attributeId": 0x00000000,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000001: {
-                "attributeName": "TimeRemaining",
-                "attributeId": 0x00000001,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000002: {
-                "attributeName": "TimerState",
-                "attributeId": 0x00000002,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFF8: {
-                "attributeName": "GeneratedCommandList",
-                "attributeId": 0x0000FFF8,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFF9: {
-                "attributeName": "AcceptedCommandList",
-                "attributeId": 0x0000FFF9,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFB: {
-                "attributeName": "AttributeList",
-                "attributeId": 0x0000FFFB,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFC: {
-                "attributeName": "FeatureMap",
-                "attributeId": 0x0000FFFC,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFD: {
-                "attributeName": "ClusterRevision",
-                "attributeId": 0x0000FFFD,
-                "type": "int",
-                "reportable": True,
-            },
-        },
-    }
     _OVEN_CAVITY_OPERATIONAL_STATE_CLUSTER_INFO = {
         "clusterName": "OvenCavityOperationalState",
         "clusterId": 0x00000048,
@@ -11882,6 +11799,110 @@ class ChipClusters:
             },
         },
     }
+    _SMOKE_CONCENTRATION_MEASUREMENT_CLUSTER_INFO = {
+        "clusterName": "SmokeConcentrationMeasurement",
+        "clusterId": 0x00000434,
+        "commands": {
+        },
+        "attributes": {
+            0x00000000: {
+                "attributeName": "MeasuredValue",
+                "attributeId": 0x00000000,
+                "type": "",
+                "reportable": True,
+            },
+            0x00000001: {
+                "attributeName": "MinMeasuredValue",
+                "attributeId": 0x00000001,
+                "type": "",
+                "reportable": True,
+            },
+            0x00000002: {
+                "attributeName": "MaxMeasuredValue",
+                "attributeId": 0x00000002,
+                "type": "",
+                "reportable": True,
+            },
+            0x00000003: {
+                "attributeName": "PeakMeasuredValue",
+                "attributeId": 0x00000003,
+                "type": "",
+                "reportable": True,
+            },
+            0x00000004: {
+                "attributeName": "PeakMeasuredValueWindow",
+                "attributeId": 0x00000004,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000005: {
+                "attributeName": "AverageMeasuredValue",
+                "attributeId": 0x00000005,
+                "type": "",
+                "reportable": True,
+            },
+            0x00000006: {
+                "attributeName": "AverageMeasuredValueWindow",
+                "attributeId": 0x00000006,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000007: {
+                "attributeName": "Uncertainty",
+                "attributeId": 0x00000007,
+                "type": "",
+                "reportable": True,
+            },
+            0x00000008: {
+                "attributeName": "MeasurementUnit",
+                "attributeId": 0x00000008,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000009: {
+                "attributeName": "MeasurementMedium",
+                "attributeId": 0x00000009,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000000A: {
+                "attributeName": "LevelValue",
+                "attributeId": 0x0000000A,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFF8: {
+                "attributeName": "GeneratedCommandList",
+                "attributeId": 0x0000FFF8,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFF9: {
+                "attributeName": "AcceptedCommandList",
+                "attributeId": 0x0000FFF9,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFB: {
+                "attributeName": "AttributeList",
+                "attributeId": 0x0000FFFB,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFC: {
+                "attributeName": "FeatureMap",
+                "attributeId": 0x0000FFFC,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFD: {
+                "attributeName": "ClusterRevision",
+                "attributeId": 0x0000FFFD,
+                "type": "int",
+                "reportable": True,
+            },
+        },
+    }
     _NETWORK_IDENTITY_MANAGEMENT_CLUSTER_INFO = {
         "clusterName": "NetworkIdentityManagement",
         "clusterId": 0x00000450,
@@ -16454,7 +16475,6 @@ class ChipClusters:
         0x00000044: _PROXY_VALID_CLUSTER_INFO,
         0x00000045: _BOOLEAN_STATE_CLUSTER_INFO,
         0x00000046: _ICD_MANAGEMENT_CLUSTER_INFO,
-        0x00000047: _TIMER_CLUSTER_INFO,
         0x00000048: _OVEN_CAVITY_OPERATIONAL_STATE_CLUSTER_INFO,
         0x00000049: _OVEN_MODE_CLUSTER_INFO,
         0x0000004A: _LAUNDRY_DRYER_CONTROLS_CLUSTER_INFO,
@@ -16526,6 +16546,7 @@ class ChipClusters:
         0x00000430: _SOIL_MEASUREMENT_CLUSTER_INFO,
         0x00000431: _AMBIENT_CONTEXT_SENSING_CLUSTER_INFO,
         0x00000433: _PROXIMITY_RANGING_CLUSTER_INFO,
+        0x00000434: _SMOKE_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
         0x00000450: _NETWORK_IDENTITY_MANAGEMENT_CLUSTER_INFO,
         0x00000451: _WI_FI_NETWORK_MANAGEMENT_CLUSTER_INFO,
         0x00000452: _THREAD_BORDER_ROUTER_MANAGEMENT_CLUSTER_INFO,
@@ -16604,7 +16625,6 @@ class ChipClusters:
         "ProxyValid": _PROXY_VALID_CLUSTER_INFO,
         "BooleanState": _BOOLEAN_STATE_CLUSTER_INFO,
         "IcdManagement": _ICD_MANAGEMENT_CLUSTER_INFO,
-        "Timer": _TIMER_CLUSTER_INFO,
         "OvenCavityOperationalState": _OVEN_CAVITY_OPERATIONAL_STATE_CLUSTER_INFO,
         "OvenMode": _OVEN_MODE_CLUSTER_INFO,
         "LaundryDryerControls": _LAUNDRY_DRYER_CONTROLS_CLUSTER_INFO,
@@ -16676,6 +16696,7 @@ class ChipClusters:
         "SoilMeasurement": _SOIL_MEASUREMENT_CLUSTER_INFO,
         "AmbientContextSensing": _AMBIENT_CONTEXT_SENSING_CLUSTER_INFO,
         "ProximityRanging": _PROXIMITY_RANGING_CLUSTER_INFO,
+        "SmokeConcentrationMeasurement": _SMOKE_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
         "NetworkIdentityManagement": _NETWORK_IDENTITY_MANAGEMENT_CLUSTER_INFO,
         "WiFiNetworkManagement": _WI_FI_NETWORK_MANAGEMENT_CLUSTER_INFO,
         "ThreadBorderRouterManagement": _THREAD_BORDER_ROUTER_MANAGEMENT_CLUSTER_INFO,

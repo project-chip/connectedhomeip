@@ -41,6 +41,15 @@
 - (NSNumber * _Nullable)hardwareVersion;
 - (NSString * _Nullable)hardwareVersionString;
 
+/**
+ * @brief The commissionable device name shown on the casting target's commissioning prompt.
+ *
+ * On Android, this corresponds to kConfigKey_DeviceName in PreferencesConfigurationManager.
+ * The value is written into the platform ConfigurationManager at init time so it is used
+ * by UDC and mDNS advertisements.
+ */
+- (NSString * _Nullable)deviceName;
+
 @end
 
 #endif /* MCDeviceInstanceInfo_h */

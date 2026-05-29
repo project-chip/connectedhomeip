@@ -18,7 +18,7 @@ import sys
 import unittest
 from difflib import unified_diff
 from pathlib import Path
-from typing import List, Optional, Union
+from typing import Optional, Union
 
 try:
     from matter.idl.data_model_xml import ParseSource, ParseXmls
@@ -56,7 +56,7 @@ def RenderAsIdlTxt(idl: Idl) -> str:
     return storage.content or ""
 
 
-def XmlToIdl(what: Union[str, List[str]]) -> Idl:
+def XmlToIdl(what: Union[str, list[str]]) -> Idl:
     if not isinstance(what, list):
         what = [what]
 

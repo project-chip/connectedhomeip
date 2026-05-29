@@ -894,28 +894,22 @@ class BluezManager(ChipBleBase):
             self.orig_input_hook()
 
     def dump_scan_result(self, device):
-        LOGGER.info("{0:<16}= {1}".format("Name", device.Name))
-        LOGGER.info("{0:<16}= {1}".format("ID", device.device_id))
-        LOGGER.info("{0:<16}= {1}".format("RSSI", device.RSSI))
-        LOGGER.info("{0:<16}= {1}".format("Address", device.Address))
+        LOGGER.info("{:<16}= {}".format("Name", device.Name))
+        LOGGER.info("{:<16}= {}".format("ID", device.device_id))
+        LOGGER.info("{:<16}= {}".format("RSSI", device.RSSI))
+        LOGGER.info("{:<16}= {}".format("Address", device.Address))
 
         devIdInfo = self.get_peripheral_devIdInfo(device)
         if devIdInfo is not None:
-            LOGGER.info("{0:<16}= {1}".format(
-                "Pairing State", devIdInfo.pairingState))
-            LOGGER.info("{0:<16}= {1}".format(
-                "Discriminator", devIdInfo.discriminator))
-            LOGGER.info("{0:<16}= {1}".format(
-                "Vendor Id", devIdInfo.vendorId))
-            LOGGER.info("{0:<16}= {1}".format(
-                "Product Id", devIdInfo.productId))
+            LOGGER.info("{:<16}= {}".format("Pairing State", devIdInfo.pairingState))
+            LOGGER.info("{:<16}= {}".format("Discriminator", devIdInfo.discriminator))
+            LOGGER.info("{:<16}= {}".format("Vendor Id", devIdInfo.vendorId))
+            LOGGER.info("{:<16}= {}".format("Product Id", devIdInfo.productId))
 
         if device.ServiceData:
             for advuuid in device.ServiceData:
-                LOGGER.info("{0:<16}= {1}".format(
-                    "Adv UUID", str(advuuid)))
-                LOGGER.info("{0:<16}= {1}".format(
-                    "Adv Data", bytes(device.ServiceData[advuuid]).hex()))
+                LOGGER.info("{:<16}= {}".format("Adv UUID", str(advuuid)))
+                LOGGER.info("{:<16}= {}".format("Adv Data", bytes(device.ServiceData[advuuid]).hex()))
         else:
             LOGGER.info("")
         LOGGER.info("")

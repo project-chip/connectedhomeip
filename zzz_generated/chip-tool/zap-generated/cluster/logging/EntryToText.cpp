@@ -101,8 +101,6 @@ char const * ClusterIdToText(chip::ClusterId id)
         return "BooleanState";
     case chip::app::Clusters::IcdManagement::Id:
         return "IcdManagement";
-    case chip::app::Clusters::Timer::Id:
-        return "Timer";
     case chip::app::Clusters::OvenCavityOperationalState::Id:
         return "OvenCavityOperationalState";
     case chip::app::Clusters::OvenMode::Id:
@@ -245,6 +243,8 @@ char const * ClusterIdToText(chip::ClusterId id)
         return "AmbientContextSensing";
     case chip::app::Clusters::ProximityRanging::Id:
         return "ProximityRanging";
+    case chip::app::Clusters::SmokeConcentrationMeasurement::Id:
+        return "SmokeConcentrationMeasurement";
     case chip::app::Clusters::NetworkIdentityManagement::Id:
         return "NetworkIdentityManagement";
     case chip::app::Clusters::WiFiNetworkManagement::Id:
@@ -1561,29 +1561,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
         case chip::app::Clusters::IcdManagement::Attributes::FeatureMap::Id:
             return "FeatureMap";
         case chip::app::Clusters::IcdManagement::Attributes::ClusterRevision::Id:
-            return "ClusterRevision";
-        default:
-            return "Unknown";
-        }
-    }
-    case chip::app::Clusters::Timer::Id: {
-        switch (id)
-        {
-        case chip::app::Clusters::Timer::Attributes::SetTime::Id:
-            return "SetTime";
-        case chip::app::Clusters::Timer::Attributes::TimeRemaining::Id:
-            return "TimeRemaining";
-        case chip::app::Clusters::Timer::Attributes::TimerState::Id:
-            return "TimerState";
-        case chip::app::Clusters::Timer::Attributes::GeneratedCommandList::Id:
-            return "GeneratedCommandList";
-        case chip::app::Clusters::Timer::Attributes::AcceptedCommandList::Id:
-            return "AcceptedCommandList";
-        case chip::app::Clusters::Timer::Attributes::AttributeList::Id:
-            return "AttributeList";
-        case chip::app::Clusters::Timer::Attributes::FeatureMap::Id:
-            return "FeatureMap";
-        case chip::app::Clusters::Timer::Attributes::ClusterRevision::Id:
             return "ClusterRevision";
         default:
             return "Unknown";
@@ -4106,6 +4083,45 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "Unknown";
         }
     }
+    case chip::app::Clusters::SmokeConcentrationMeasurement::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::SmokeConcentrationMeasurement::Attributes::MeasuredValue::Id:
+            return "MeasuredValue";
+        case chip::app::Clusters::SmokeConcentrationMeasurement::Attributes::MinMeasuredValue::Id:
+            return "MinMeasuredValue";
+        case chip::app::Clusters::SmokeConcentrationMeasurement::Attributes::MaxMeasuredValue::Id:
+            return "MaxMeasuredValue";
+        case chip::app::Clusters::SmokeConcentrationMeasurement::Attributes::PeakMeasuredValue::Id:
+            return "PeakMeasuredValue";
+        case chip::app::Clusters::SmokeConcentrationMeasurement::Attributes::PeakMeasuredValueWindow::Id:
+            return "PeakMeasuredValueWindow";
+        case chip::app::Clusters::SmokeConcentrationMeasurement::Attributes::AverageMeasuredValue::Id:
+            return "AverageMeasuredValue";
+        case chip::app::Clusters::SmokeConcentrationMeasurement::Attributes::AverageMeasuredValueWindow::Id:
+            return "AverageMeasuredValueWindow";
+        case chip::app::Clusters::SmokeConcentrationMeasurement::Attributes::Uncertainty::Id:
+            return "Uncertainty";
+        case chip::app::Clusters::SmokeConcentrationMeasurement::Attributes::MeasurementUnit::Id:
+            return "MeasurementUnit";
+        case chip::app::Clusters::SmokeConcentrationMeasurement::Attributes::MeasurementMedium::Id:
+            return "MeasurementMedium";
+        case chip::app::Clusters::SmokeConcentrationMeasurement::Attributes::LevelValue::Id:
+            return "LevelValue";
+        case chip::app::Clusters::SmokeConcentrationMeasurement::Attributes::GeneratedCommandList::Id:
+            return "GeneratedCommandList";
+        case chip::app::Clusters::SmokeConcentrationMeasurement::Attributes::AcceptedCommandList::Id:
+            return "AcceptedCommandList";
+        case chip::app::Clusters::SmokeConcentrationMeasurement::Attributes::AttributeList::Id:
+            return "AttributeList";
+        case chip::app::Clusters::SmokeConcentrationMeasurement::Attributes::FeatureMap::Id:
+            return "FeatureMap";
+        case chip::app::Clusters::SmokeConcentrationMeasurement::Attributes::ClusterRevision::Id:
+            return "ClusterRevision";
+        default:
+            return "Unknown";
+        }
+    }
     case chip::app::Clusters::NetworkIdentityManagement::Id: {
         switch (id)
         {
@@ -5609,21 +5625,6 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "UnregisterClient";
         case chip::app::Clusters::IcdManagement::Commands::StayActiveRequest::Id:
             return "StayActiveRequest";
-        default:
-            return "Unknown";
-        }
-    }
-    case chip::app::Clusters::Timer::Id: {
-        switch (id)
-        {
-        case chip::app::Clusters::Timer::Commands::SetTimer::Id:
-            return "SetTimer";
-        case chip::app::Clusters::Timer::Commands::ResetTimer::Id:
-            return "ResetTimer";
-        case chip::app::Clusters::Timer::Commands::AddTime::Id:
-            return "AddTime";
-        case chip::app::Clusters::Timer::Commands::ReduceTime::Id:
-            return "ReduceTime";
         default:
             return "Unknown";
         }
