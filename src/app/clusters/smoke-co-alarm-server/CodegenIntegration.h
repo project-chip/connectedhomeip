@@ -84,7 +84,7 @@ public:
         return *sInstance;
     }
 
-    bool RequestSelfTest()
+    bool RequestSelfTest(EndpointId endpoint)
     {
         VerifyOrDie(mCluster.IsConstructed());
         return mCluster.Cluster().RequestSelfTest();

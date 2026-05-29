@@ -798,7 +798,7 @@ void AllClustersAppCommandHandler::OnSwitchLongPressedHandler(uint8_t newPositio
     RETURN_SAFELY_IGNORED switchCluster->OnLongPress(newPosition);
 
     // Long press to trigger smokeco self-test
-    SmokeCoAlarmServer::Instance().RequestSelfTest(endpoint);
+    SmokeCoAlarm::SmokeCoAlarmServer::Instance().RequestSelfTest(endpoint);
 }
 
 void AllClustersAppCommandHandler::OnSwitchShortReleasedHandler(uint8_t previousPosition)
