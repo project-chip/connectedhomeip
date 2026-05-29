@@ -465,16 +465,15 @@ class MatterBaseTest(base_test.BaseTestClass):
 
     Wildcard subscription (see ``setup_test``):
 
-    * Set class attribute ``requires_dut = False`` for tests that do not interact with a
-      real DUT (e.g. parser/conformance unit tests under ``test_testing/``).  Such tests
+    * Set class attribute requires_dut = False for tests that do not interact with a
+      real DUT (e.g. parser/conformance unit tests under test_testing/).  Such tests
       will skip the background wildcard subscription so they don't try to subscribe to a
-      device that isn't there.  Default is ``True``.
-    * Set class attribute ``disable_wildcard_subscription = True`` to skip the background
-      wildcard subscription and its ACL side effects — same effect as ``--no-wildcard-subscription``.
-      Prefer this for certification so the test script does not rely on extra runner flags.
-    * When a wildcard subscription is active, ``read_single_attribute_check_success`` compares
-      each read to the subscription cache unless ``verify_wildcard_subscription=False`` is passed,
-      or the class sets ``default_verify_wildcard_subscription = False``.
+      device that isn't there.  Default is True.
+    * Set class attribute disable_wildcard_subscription = True to skip the background
+      wildcard subscription and its ACL side effects — same effect as --no-wildcard-subscription.
+    * When a wildcard subscription is active, read_single_attribute_check_success compares
+      each read to the subscription cache unless verify_wildcard_subscription=False is passed,
+      or the class sets default_verify_wildcard_subscription = False.
     """
 
     requires_dut: bool = True
@@ -584,25 +583,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         self._log_execution_parameters_summary()
         super().teardown_class()
 
-    # (cluster_id, attribute_id) pairs for attributes that are expected to carry the
-    # Changes Omitted (C) quality but are not yet marked as such in the data-model XML.
-    # Entries here are treated as if the XML already marked them C so that the background
-    # wildcard subscription does not flag them as missing or stale reports.
-    #
-    # Each entry MUST cite the tracking issue that will resolve the mismatch, and the
-    # entry should be removed as soon as the XML/spec is updated and the DM bundle in
-    # data_model/ is regenerated.
-    #
-    # - AccessControl (0x001F).AuxiliaryACL (0x0007):
-    #     Changes omitted in practice; tracked by project-chip/connectedhomeip#71428.
-    # - SoftwareDiagnostics (0x0034).CurrentHeapFree (0x0001) and CurrentHeapUsed (0x0002) and CurrentHeapHighWatermark (0x0003):
-    #     Volatile counters that report too frequently to be useful in subscriptions;
-    #     tracked by spec issue CHIP-Specifications/connectedhomeip-spec#12899.
     _CQ_EXPECTED_BUT_NOT_YET_MARKED: frozenset[tuple[int, int]] = frozenset({
-        (0x0000001F, 0x00000007),  # AccessControl.AuxiliaryACL                     -- chip#71428
-        (0x00000034, 0x00000001),  # SoftwareDiagnostics.CurrentHeapFree            -- spec#12899
-        (0x00000034, 0x00000002),  # SoftwareDiagnostics.CurrentHeapUsed            -- spec#12899
-        (0x00000034, 0x00000003),  # SoftwareDiagnostics.CurrentHeapHighWatermark   -- spec#12899
     })
 
     @staticmethod
