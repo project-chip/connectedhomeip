@@ -17,176 +17,231 @@
 
 /**
  * @file
- *   APIs and defines for the Smoke CO Alarm Server plugin.
+ *   Application-facing server API for the Smoke CO Alarm cluster.
  *
  */
 
 #pragma once
 
-#include <app-common/zap-generated/cluster-objects.h>
-#include <app/CommandHandler.h>
-#include <protocols/interaction_model/StatusCode.h>
+#include <app/clusters/smoke-co-alarm-server/smokeCOAlarmCluster.h>
+#include <app/server-cluster/ServerClusterInterfaceRegistry.h>
+#include <data-model-providers/codegen/CodegenDataModelProvider.h>
+
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace SmokeCoAlarm {
 
 /**
- * @brief Smoke CO Alarm Server Plugin class
+ * @brief Application-facing wrapper for SmokeCoAlarmCluster.
+ *
+ * Owns the cluster instance and manages its lifetime with the data model provider.
+ * The application creates one SmokeCoAlarmServer per endpoint, calls Init() to
+ * register with the provider, and destroys the object to unregister.
  */
 class SmokeCoAlarmServer
 {
 public:
-    static SmokeCoAlarmServer & Instance();
+    explicit SmokeCoAlarmServer(EndpointId endpointId, const SmokeCoAlarmCluster::Config & config) :
+        mEndpointId(endpointId), mConfig(config)
+    {}
 
-    /* Expected byte size of the PriorityOrder */
-    static constexpr size_t kPriorityOrderLength = 9;
+    ~SmokeCoAlarmServer()
+    {
+        if (mCluster.IsConstructed())
+        {
+            LogErrorOnFailure(CodegenDataModelProvider::Instance().Registry().Unregister(&mCluster.Cluster()));
+        }
+        // ~LazyRegisteredServerCluster calls Destroy() automatically if still constructed
+    }
 
-    using AlarmStateEnum         = chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum;
-    using ContaminationStateEnum = chip::app::Clusters::SmokeCoAlarm::ContaminationStateEnum;
-    using EndOfServiceEnum       = chip::app::Clusters::SmokeCoAlarm::EndOfServiceEnum;
-    using ExpressedStateEnum     = chip::app::Clusters::SmokeCoAlarm::ExpressedStateEnum;
-    using Feature                = chip::app::Clusters::SmokeCoAlarm::Feature;
-    using MuteStateEnum          = chip::app::Clusters::SmokeCoAlarm::MuteStateEnum;
-    using SensitivityEnum        = chip::app::Clusters::SmokeCoAlarm::SensitivityEnum;
+    CHIP_ERROR Init()
+    {
+        VerifyOrReturnValue(!mCluster.IsConstructed(), CHIP_NO_ERROR);
+        mCluster.Create(mEndpointId, mConfig);
+        CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(mCluster.Registration());
+        if (err != CHIP_NO_ERROR)
+        {
+            mCluster.Destroy();
+            return err;
+        }
+        return CHIP_NO_ERROR;
+    }
 
-    /**
-     * @brief Set the highest level of Expressed State according to priorityOrder
-     * @param endpointId ID of the endpoint
-     * @param priorityOrder Priority order of expressed state from highest to lowest
-     */
-    void SetExpressedStateByPriority(chip::EndpointId endpointId,
-                                     const std::array<ExpressedStateEnum, kPriorityOrderLength> & priorityOrder);
+    SmokeCoAlarmCluster & Cluster()
+    {
+        VerifyOrDie(mCluster.IsConstructed());
+        return mCluster.Cluster();
+    }
 
-    /**
-     * @brief Request self-test when receiving local commands
-     * @param endpointId ID of the endpoint
-     * @return true on success, false on failure
-     */
-    bool RequestSelfTest(chip::EndpointId endpointId);
+    void
+    SetExpressedStateByPriority(const std::array<ExpressedStateEnum, SmokeCoAlarmCluster::kPriorityOrderLength> & priorityOrder)
+    {
+        VerifyOrDie(mCluster.IsConstructed());
+        mCluster.Cluster().SetExpressedStateByPriority(priorityOrder);
+    }
 
-    /**
-     * For all the functions below, the return value is true on success, false on failure
-     */
+    bool RequestSelfTest()
+    {
+        VerifyOrDie(mCluster.IsConstructed());
+        return mCluster.Cluster().RequestSelfTest();
+    }
 
-    bool SetSmokeState(chip::EndpointId endpointId, AlarmStateEnum newSmokeState);
-    bool SetCOState(chip::EndpointId endpointId, AlarmStateEnum newCOState);
-    bool SetBatteryAlert(chip::EndpointId endpointId, AlarmStateEnum newBatteryAlert);
-    bool SetDeviceMuted(chip::EndpointId endpointId, MuteStateEnum newDeviceMuted);
-    bool SetTestInProgress(chip::EndpointId endpointId, bool newTestInProgress);
-    bool SetHardwareFaultAlert(chip::EndpointId endpointId, bool newHardwareFaultAlert);
-    bool SetEndOfServiceAlert(chip::EndpointId endpointId, EndOfServiceEnum newEndOfServiceAlert);
-    bool SetInterconnectSmokeAlarm(chip::EndpointId endpointId, AlarmStateEnum newInterconnectSmokeAlarm);
-    bool SetInterconnectCOAlarm(chip::EndpointId endpointId, AlarmStateEnum newInterconnectCOAlarm);
-    bool SetContaminationState(chip::EndpointId endpointId, ContaminationStateEnum newContaminationState);
-    bool SetSmokeSensitivityLevel(chip::EndpointId endpointId, SensitivityEnum newSmokeSensitivityLevel);
-    /**
-     * @brief Sets unmounted attribute and updates expressed state respectively.
-     * @param endpointId ID of the endpoint
-     * @param isUnmounted unmounted state
-     * @return true on success, false on failure
-     */
-    bool SetUnmountedState(chip::EndpointId endpointId, bool isUnmounted);
-    /**
-     * @brief If set to true, unmounting the device leads to inoperative state.
-     */
-    void SetInoperativeWhenUnmounted(bool inoperative) { mInoperativeWhenUnmounted = inoperative; }
+    bool SetSmokeState(AlarmStateEnum v)
+    {
+        VerifyOrDie(mCluster.IsConstructed());
+        return mCluster.Cluster().SetSmokeState(v);
+    }
+    bool SetCOState(AlarmStateEnum v)
+    {
+        VerifyOrDie(mCluster.IsConstructed());
+        return mCluster.Cluster().SetCOState(v);
+    }
+    bool SetBatteryAlert(AlarmStateEnum v)
+    {
+        VerifyOrDie(mCluster.IsConstructed());
+        return mCluster.Cluster().SetBatteryAlert(v);
+    }
+    bool SetDeviceMuted(MuteStateEnum v)
+    {
+        VerifyOrDie(mCluster.IsConstructed());
+        return mCluster.Cluster().SetDeviceMuted(v);
+    }
+    bool SetTestInProgress(bool v)
+    {
+        VerifyOrDie(mCluster.IsConstructed());
+        return mCluster.Cluster().SetTestInProgress(v);
+    }
+    bool SetHardwareFaultAlert(bool v)
+    {
+        VerifyOrDie(mCluster.IsConstructed());
+        return mCluster.Cluster().SetHardwareFaultAlert(v);
+    }
+    bool SetEndOfServiceAlert(EndOfServiceEnum v)
+    {
+        VerifyOrDie(mCluster.IsConstructed());
+        return mCluster.Cluster().SetEndOfServiceAlert(v);
+    }
+    bool SetInterconnectSmokeAlarm(AlarmStateEnum v)
+    {
+        VerifyOrDie(mCluster.IsConstructed());
+        return mCluster.Cluster().SetInterconnectSmokeAlarm(v);
+    }
+    bool SetInterconnectCOAlarm(AlarmStateEnum v)
+    {
+        VerifyOrDie(mCluster.IsConstructed());
+        return mCluster.Cluster().SetInterconnectCOAlarm(v);
+    }
+    bool SetContaminationState(ContaminationStateEnum v)
+    {
+        VerifyOrDie(mCluster.IsConstructed());
+        return mCluster.Cluster().SetContaminationState(v);
+    }
+    bool SetSmokeSensitivityLevel(SensitivityEnum v)
+    {
+        VerifyOrDie(mCluster.IsConstructed());
+        return mCluster.Cluster().SetSmokeSensitivityLevel(v);
+    }
+    bool SetUnmountedState(bool v)
+    {
+        VerifyOrDie(mCluster.IsConstructed());
+        return mCluster.Cluster().SetUnmountedState(v);
+    }
 
-    bool GetExpressedState(chip::EndpointId endpointId, ExpressedStateEnum & expressedState);
-    bool GetSmokeState(chip::EndpointId endpointId, AlarmStateEnum & smokeState);
-    bool GetCOState(chip::EndpointId endpointId, AlarmStateEnum & coState);
-    bool GetBatteryAlert(chip::EndpointId endpointId, AlarmStateEnum & batteryAlert);
-    bool GetDeviceMuted(chip::EndpointId endpointId, MuteStateEnum & deviceMuted);
-    bool GetTestInProgress(chip::EndpointId endpointId, bool & testInProgress);
-    bool GetHardwareFaultAlert(chip::EndpointId endpointId, bool & hardwareFaultAlert);
-    bool GetEndOfServiceAlert(chip::EndpointId endpointId, EndOfServiceEnum & endOfServiceAlert);
-    bool GetInterconnectSmokeAlarm(chip::EndpointId endpointId, AlarmStateEnum & interconnectSmokeAlarm);
-    bool GetInterconnectCOAlarm(chip::EndpointId endpointId, AlarmStateEnum & interconnectCOAlarm);
-    bool GetContaminationState(chip::EndpointId endpointId, ContaminationStateEnum & contaminationState);
-    bool GetSmokeSensitivityLevel(chip::EndpointId endpointId, SensitivityEnum & smokeSensitivityLevel);
-    bool GetExpiryDate(chip::EndpointId endpointId, uint32_t & expiryDate);
-    bool GetUnmountedState(chip::EndpointId endpointId, bool & unmountedState);
-    void GetInoperativeWhenUnmounted(bool & inoperative) { inoperative = mInoperativeWhenUnmounted; }
+    bool GetExpressedState(ExpressedStateEnum & v) const
+    {
+        VerifyOrDie(mCluster.IsConstructed());
+        return mCluster.Cluster().GetExpressedState(v);
+    }
+    bool GetSmokeState(AlarmStateEnum & v) const
+    {
+        VerifyOrDie(mCluster.IsConstructed());
+        return mCluster.Cluster().GetSmokeState(v);
+    }
+    bool GetCOState(AlarmStateEnum & v) const
+    {
+        VerifyOrDie(mCluster.IsConstructed());
+        return mCluster.Cluster().GetCOState(v);
+    }
+    bool GetBatteryAlert(AlarmStateEnum & v) const
+    {
+        VerifyOrDie(mCluster.IsConstructed());
+        return mCluster.Cluster().GetBatteryAlert(v);
+    }
+    bool GetDeviceMuted(MuteStateEnum & v) const
+    {
+        VerifyOrDie(mCluster.IsConstructed());
+        return mCluster.Cluster().GetDeviceMuted(v);
+    }
+    bool GetTestInProgress(bool & v) const
+    {
+        VerifyOrDie(mCluster.IsConstructed());
+        return mCluster.Cluster().GetTestInProgress(v);
+    }
+    bool GetHardwareFaultAlert(bool & v) const
+    {
+        VerifyOrDie(mCluster.IsConstructed());
+        return mCluster.Cluster().GetHardwareFaultAlert(v);
+    }
+    bool GetEndOfServiceAlert(EndOfServiceEnum & v) const
+    {
+        VerifyOrDie(mCluster.IsConstructed());
+        return mCluster.Cluster().GetEndOfServiceAlert(v);
+    }
+    bool GetInterconnectSmokeAlarm(AlarmStateEnum & v) const
+    {
+        VerifyOrDie(mCluster.IsConstructed());
+        return mCluster.Cluster().GetInterconnectSmokeAlarm(v);
+    }
+    bool GetInterconnectCOAlarm(AlarmStateEnum & v) const
+    {
+        VerifyOrDie(mCluster.IsConstructed());
+        return mCluster.Cluster().GetInterconnectCOAlarm(v);
+    }
+    bool GetContaminationState(ContaminationStateEnum & v) const
+    {
+        VerifyOrDie(mCluster.IsConstructed());
+        return mCluster.Cluster().GetContaminationState(v);
+    }
+    bool GetSmokeSensitivityLevel(SensitivityEnum & v) const
+    {
+        VerifyOrDie(mCluster.IsConstructed());
+        return mCluster.Cluster().GetSmokeSensitivityLevel(v);
+    }
+    bool GetExpiryDate(uint32_t & v) const
+    {
+        VerifyOrDie(mCluster.IsConstructed());
+        return mCluster.Cluster().GetExpiryDate(v);
+    }
+    bool GetUnmountedState(bool & v) const
+    {
+        VerifyOrDie(mCluster.IsConstructed());
+        return mCluster.Cluster().GetUnmountedState(v);
+    }
 
-    chip::BitFlags<Feature> GetFeatures(chip::EndpointId endpointId);
-
-    inline bool SupportsSmokeAlarm(chip::EndpointId endpointId) { return GetFeatures(endpointId).Has(Feature::kSmokeAlarm); }
-
-    inline bool SupportsCOAlarm(chip::EndpointId endpointId) { return GetFeatures(endpointId).Has(Feature::kCoAlarm); }
+    chip::BitFlags<Feature> GetFeatures() const
+    {
+        VerifyOrDie(mCluster.IsConstructed());
+        return mCluster.Cluster().GetFeatures();
+    }
+    bool SupportsSmokeAlarm() const
+    {
+        VerifyOrDie(mCluster.IsConstructed());
+        return mCluster.Cluster().SupportsSmokeAlarm();
+    }
+    bool SupportsCOAlarm() const
+    {
+        VerifyOrDie(mCluster.IsConstructed());
+        return mCluster.Cluster().SupportsCOAlarm();
+    }
 
 private:
-    /**
-     * @brief Updates the expressed state with new value
-     *
-     * @note If the value of ExpressedState is not Normal, the attribute corresponding to the value should not be Normal.
-     *
-     * @param endpointId ID of the endpoint
-     * @param newExpressedState new expressed state
-     */
-    void SetExpressedState(chip::EndpointId endpointId, ExpressedStateEnum newExpressedState);
-
-    /**
-     * @brief Common handler for SelfTestRequest commands
-     *
-     * @param commandObj    original command context
-     * @param commandPath   original command path
-     */
-    void HandleRemoteSelfTestRequest(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath);
-
-    /**
-     * @brief Send generic event
-     *
-     * @tparam T            Any event type supported by Matter
-     * @param endpointId    endpoint where SmokeCoAlarmServer is running
-     * @param event         event object built by caller
-     */
-    template <typename T>
-    void SendEvent(chip::EndpointId endpointId, T & event);
-
-    /**
-     * @brief Get generic attribute value
-     *
-     * @tparam T            attribute value type
-     * @param endpointId    endpoint where SmokeCoAlarmServer is running
-     * @param attributeId   attribute Id (used for logging only)
-     * @param getFn         attribute getter function as defined in <Accessors.h>
-     * @param value         actual attribute value on success
-     * @return true         on success (value is set to the actual attribute value)
-     * @return false        if attribute reading failed (value is kept unchanged)
-     */
-    template <typename T>
-    bool GetAttribute(chip::EndpointId endpointId, chip::AttributeId attributeId,
-                      chip::Protocols::InteractionModel::Status (*getFn)(chip::EndpointId endpointId, T * value), T & value) const;
-
-    /**
-     * @brief Set generic attribute value
-     *
-     * @tparam T            attribute value type
-     * @param endpointId    endpoint where SmokeCoAlarmServer is running
-     * @param attributeId   attribute Id (used for logging only)
-     * @param setFn         attribute setter function as defined in <Accessors.h>
-     * @param value         new attribute value
-     * @return true         on success
-     * @return false        if attribute writing failed
-     */
-    template <typename T>
-    bool SetAttribute(chip::EndpointId endpointId, chip::AttributeId attributeId,
-                      chip::Protocols::InteractionModel::Status (*setFn)(chip::EndpointId endpointId, T value), T value);
-
-    friend bool emberAfSmokeCoAlarmClusterSelfTestRequestCallback(
-        chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-        const chip::app::Clusters::SmokeCoAlarm::Commands::SelfTestRequest::DecodableType & commandData);
-
-    static SmokeCoAlarmServer sInstance;
-    bool mInoperativeWhenUnmounted = false;
+    EndpointId mEndpointId;
+    SmokeCoAlarmCluster::Config mConfig;
+    LazyRegisteredServerCluster<SmokeCoAlarmCluster> mCluster;
 };
 
-// =============================================================================
-// Plugin callbacks that are called by cluster server and should be implemented
-// by the server app
-// =============================================================================
-
-/**
- * @brief User handler for SelfTestRequest command (server)
- *
- * @note The application must set the ExpressedState to "Testing"
- *
- * @param endpointId endpoint for which SelfTestRequest command is called
- */
-void emberAfPluginSmokeCoAlarmSelfTestRequestCommand(chip::EndpointId endpointId);
+} // namespace SmokeCoAlarm
+} // namespace Clusters
+} // namespace app
+} // namespace chip
