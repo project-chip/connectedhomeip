@@ -29,7 +29,7 @@ namespace app {
 namespace Clusters {
 namespace OperationalState {
 
-class InstanceBase;
+class Instance;
 
 /**
  * Backward-compat delegate for OperationalState clusters using the old Instance wrappers.
@@ -44,21 +44,21 @@ public:
     virtual ~Delegate() = default;
 
     /**
-     * Binds this delegate to an InstanceBase. Called internally by the InstanceBase constructor.
+     * Binds this delegate to an Instance. Called internally by the Instance constructor.
      * @note For internal SDK use only.
      */
-    void SetInstance(InstanceBase * aInstance)
+    void SetInstance(Instance * aInstance)
     {
         VerifyOrDie(mInstance == nullptr || aInstance == nullptr || mInstance == aInstance);
         mInstance = aInstance;
     }
 
 protected:
-    const InstanceBase * GetInstance() const { return mInstance; }
-    InstanceBase * GetInstance() { return mInstance; }
+    const Instance * GetInstance() const { return mInstance; }
+    Instance * GetInstance() { return mInstance; }
 
 private:
-    InstanceBase * mInstance = nullptr;
+    Instance * mInstance = nullptr;
 };
 
 } // namespace OperationalState
