@@ -51,12 +51,9 @@ class MatterStackState:
                 self._init_stack(already_initialized=False, persistentStorage=PersistentStorageINI(
                     config.chip_tool_common_storage_path, config.chip_tool_fabric_storage_path),
                     enableServerInteractions=config.enable_server_interactions)
-            elif config.storage_path is not None:
+            else:
                 self._init_stack(already_initialized=False, persistentStorage=PersistentStorageJSON(config.storage_path),
                                  enableServerInteractions=config.enable_server_interactions)
-            else:
-                raise ValueError(
-                    "Must have configured either a MatterTestConfig.storage_path or MatterTestConfig.chip_tool_common/fabric_storage_path")
             self._we_initialized_the_stack = True
         else:
             self._init_stack(already_initialized=True)
