@@ -377,9 +377,8 @@ TEST_F(CommissioningDelegateTest, CompletionStatus_DefaultAndRoundTrip)
     cs.networkCommissioningStatus =
         MakeOptional(app::Clusters::NetworkCommissioning::NetworkCommissioningStatusEnum::kBoundsExceeded);
     cs.connectNetworkErrorValue = MakeOptional<int32_t>(-42);
-    cs.operationalCertStatus =
-        MakeOptional(app::Clusters::OperationalCredentials::NodeOperationalCertStatusEnum::kInvalidNOC);
-    cs.commissioningDebugText        = "commissioning-error-text";
+    cs.operationalCertStatus    = MakeOptional(app::Clusters::OperationalCredentials::NodeOperationalCertStatusEnum::kInvalidNOC);
+    cs.commissioningDebugText   = "commissioning-error-text";
     cs.networkCommissioningDebugText = "network-commissioning-error-text";
 
     p.SetCompletionStatus(cs);
@@ -398,8 +397,7 @@ TEST_F(CommissioningDelegateTest, CompletionStatus_DefaultAndRoundTrip)
     ASSERT_TRUE(got.connectNetworkErrorValue.HasValue());
     EXPECT_EQ(got.connectNetworkErrorValue.Value(), -42);
     ASSERT_TRUE(got.operationalCertStatus.HasValue());
-    EXPECT_EQ(got.operationalCertStatus.Value(),
-              app::Clusters::OperationalCredentials::NodeOperationalCertStatusEnum::kInvalidNOC);
+    EXPECT_EQ(got.operationalCertStatus.Value(), app::Clusters::OperationalCredentials::NodeOperationalCertStatusEnum::kInvalidNOC);
     EXPECT_EQ(got.commissioningDebugText, "commissioning-error-text");
     EXPECT_EQ(got.networkCommissioningDebugText, "network-commissioning-error-text");
 }
@@ -449,8 +447,7 @@ TEST_F(CommissioningDelegateTest, NetworkCommissioningStatusInfo_CharSpanCtorHan
     NetworkCommissioningStatusInfo info4(NetworkCommissioningStatusEnum::kIPV6Failed, CharSpan{});
     EXPECT_TRUE(info4.debugText.empty());
 
-    NetworkCommissioningStatusInfo info5(NetworkCommissioningStatusEnum::kIPBindFailed, CharSpan{},
-                                         MakeOptional<int32_t>(-1));
+    NetworkCommissioningStatusInfo info5(NetworkCommissioningStatusEnum::kIPBindFailed, CharSpan{}, MakeOptional<int32_t>(-1));
     EXPECT_TRUE(info5.debugText.empty());
     ASSERT_TRUE(info5.connectNetworkErrorValue.HasValue());
     EXPECT_EQ(info5.connectNetworkErrorValue.Value(), -1);
@@ -477,7 +474,7 @@ struct LegacyForwardingPairingDelegate : public DevicePairingDelegate
 
     int callCount = 0;
     PeerId capturedPeerId;
-    CHIP_ERROR capturedError = CHIP_NO_ERROR;
+    CHIP_ERROR capturedError         = CHIP_NO_ERROR;
     CommissioningStage capturedStage = CommissioningStage::kError;
     Optional<Credentials::AttestationVerificationResult> capturedAttestation;
 
@@ -501,8 +498,7 @@ TEST_F(CommissioningDelegateTest, DevicePairingDelegate_StructuredOverloadForwar
     status.err                = CHIP_ERROR_INTERNAL;
     status.failedStage        = MakeOptional(CommissioningStage::kAttestationVerification);
     status.attestationResult  = MakeOptional(Credentials::AttestationVerificationResult::kPaiAuthorityNotFound);
-    status.commissioningError =
-        MakeOptional(app::Clusters::GeneralCommissioning::CommissioningErrorEnum::kValueOutsideRange);
+    status.commissioningError = MakeOptional(app::Clusters::GeneralCommissioning::CommissioningErrorEnum::kValueOutsideRange);
 
     delegate.OnCommissioningFailure(kPeerId, status);
 
