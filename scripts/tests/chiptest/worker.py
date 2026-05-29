@@ -13,10 +13,10 @@
 # limitations under the License.
 
 import logging
-import threading
 from collections.abc import Callable
-from typing import ClassVar, TypeAlias
+from typing import TypeAlias
 
+from chiptest.concurrency.context import TerminableThread
 from chiptest.concurrency.work_queue import CancellableQueue, EndOfQueue, QueueCancelled
 from chiptest.results import ResultQueueT, TestResult
 
@@ -26,10 +26,8 @@ log = logging.getLogger(__name__)
 TaskQueueT: TypeAlias = CancellableQueue[Callable[[], TestResult]]
 
 
-class WorkerThread(threading.Thread):
+class WorkerThread(TerminableThread):
     """Worker thread that executes test jobs from the work queue and puts results to the result queue."""
-
-    THREAD_TERMINATE_TIMEOUT_S: ClassVar[float] = 5.0
 
     def __init__(self, task_queue: TaskQueueT, result_queue: ResultQueueT) -> None:
         super().__init__(name="Worker")
@@ -59,14 +57,12 @@ class WorkerThread(threading.Thread):
         finally:
             log.debug("Worker thread finished")
 
-    def terminate(self) -> None:
+    def resource_terminate(self) -> None:
         # Immediately cancel the work queue to unblock the thread if it's waiting for work. In regular flow, the work queue is
         # expected to be externally closed instead, to allow for graceful shutdown. In that case, cancellation is effectively a
         # no-op, as the thread should be already stopped.
         self._task_queue.cancel()
 
         # Wait for the thread to finish if it had been started.
-        if self.ident is not None:
-            self.join(self.THREAD_TERMINATE_TIMEOUT_S)
-            if self.is_alive():
-                raise RuntimeError("Worker thread is still alive, it might be stuck on processing work items")
+        if not self.resource_thread_join():
+            raise RuntimeError("Worker thread is still alive, it might be stuck on processing work items")
