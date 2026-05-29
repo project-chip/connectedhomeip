@@ -98,7 +98,7 @@ class IcdAppServerSubprocess(AppServerSubprocess):
 
     def resume(self, check_state: bool = True):
         if check_state and not self.paused:
-            raise ValueError("ICD TH Server unexpectedly is already running")
+            raise RuntimeError("ICD TH Server unexpectedly is already running")
         if self.p is None:
             raise RuntimeError("ICD TH Server process is not started")
         if self.paused:
