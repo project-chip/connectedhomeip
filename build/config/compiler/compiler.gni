@@ -43,7 +43,7 @@ declare_args() {
   c_standard = "gnu11"
 
   # C++ standard level (value for -std flag).
-  if (target_os == "linux") {
+  if (current_os == "linux" || current_os == "tizen") {
     cpp_standard = "gnu++20"
   } else {
     cpp_standard = "gnu++17"

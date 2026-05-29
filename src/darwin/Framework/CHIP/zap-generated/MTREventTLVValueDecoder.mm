@@ -1741,19 +1741,6 @@ static id _Nullable DecodeEventPayloadForICDManagementCluster(EventId aEventId, 
     *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeEventPayloadForTimerCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
-{
-    using namespace Clusters::Timer;
-    switch (aEventId) {
-    default: {
-        // Not a known Timer event.
-        break;
-    }
-    }
-
-    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
-    return nil;
-}
 static id _Nullable DecodeEventPayloadForOvenCavityOperationalStateCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::OvenCavityOperationalState;
@@ -3656,6 +3643,19 @@ static id _Nullable DecodeEventPayloadForElectricalGridConditionsCluster(EventId
     }
     default: {
         // Not a known ElectricalGridConditions event.
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
+static id _Nullable DecodeEventPayloadForElectricalDistributionCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::ElectricalDistribution;
+    switch (aEventId) {
+    default: {
+        // Not a known ElectricalDistribution event.
         break;
     }
     }
@@ -6150,9 +6150,6 @@ id _Nullable MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVRead
     case Clusters::IcdManagement::Id: {
         return DecodeEventPayloadForICDManagementCluster(aPath.mEventId, aReader, aError);
     }
-    case Clusters::Timer::Id: {
-        return DecodeEventPayloadForTimerCluster(aPath.mEventId, aReader, aError);
-    }
     case Clusters::OvenCavityOperationalState::Id: {
         return DecodeEventPayloadForOvenCavityOperationalStateCluster(aPath.mEventId, aReader, aError);
     }
@@ -6269,6 +6266,9 @@ id _Nullable MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVRead
     }
     case Clusters::ElectricalGridConditions::Id: {
         return DecodeEventPayloadForElectricalGridConditionsCluster(aPath.mEventId, aReader, aError);
+    }
+    case Clusters::ElectricalDistribution::Id: {
+        return DecodeEventPayloadForElectricalDistributionCluster(aPath.mEventId, aReader, aError);
     }
     case Clusters::DoorLock::Id: {
         return DecodeEventPayloadForDoorLockCluster(aPath.mEventId, aReader, aError);
