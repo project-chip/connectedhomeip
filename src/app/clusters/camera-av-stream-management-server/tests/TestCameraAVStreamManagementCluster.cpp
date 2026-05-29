@@ -287,7 +287,6 @@ private:
     uint8_t mSnapshotStreamCount;
 };
 
-
 // initialize memory as ReadOnlyBufferBuilder may allocate
 struct TestCameraAVStreamManagementCluster : public ::testing::Test
 {
