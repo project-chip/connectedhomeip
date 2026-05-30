@@ -161,6 +161,19 @@ private:
     bool TryingSecondaryNetwork() const { return mTryingNetworkType == NetworkAttemptType::kSecondary; }
     void ResetNetworkAttemptType() { mTryingNetworkType = NetworkAttemptType::kSingle; }
 
+    CommissioningStage GetInitialPhaseCompleteStage()
+    {
+#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
+        if (mCommissioneeDeviceProxy->GetSecureSession().Value()->AsSecureSession()->GetPeerAddress().GetTransportType() ==
+                Transport::Type::kNfc &&
+            mDeviceCommissioningInfo.general.isCommissioningWithoutPower)
+        {
+            return CommissioningStage::kUnpoweredInitialPhaseComplete;
+        }
+#endif
+        return CommissioningStage::kPoweredInitialPhaseComplete;
+    }
+
     NetworkAttemptType mTryingNetworkType = NetworkAttemptType::kSingle;
 
     // Whether the commissionee is holding a network configuration we wrote, which we would have to
