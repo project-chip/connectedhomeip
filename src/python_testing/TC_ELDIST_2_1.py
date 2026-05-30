@@ -136,7 +136,8 @@ class TC_ELDIST_2_1(MatterBaseTest):
         self.step(7)
         status = await self.write_single_attribute(
             attribute_value=cluster.Attributes.MaxContinuousCurrent(1),
-            endpoint_id=endpoint)
+            endpoint_id=endpoint,
+            expect_success=False)
         asserts.assert_equal(status, Status.UnsupportedWrite,
                              'Write to read-only MaxContinuousCurrent must return UNSUPPORTED_WRITE')
 
