@@ -17,6 +17,8 @@ import("//build_overrides/chip.gni")
 
 import("${chip_root}/src/platform/device.gni")
 
+import("${chip_root}/build/chip/fuzz_test.gni")
+
 declare_args() {
   # Platform DNSsd should always be running on darwin. On Linux
   # this depends on avahi being available and running.
@@ -97,6 +99,23 @@ if (chip_device_platform != "none") {
 
     if (chip_device_platform == "linux") {
       test_sources += [ "TestConnectivityMgr.cpp" ]
+    }
+  }
+
+  if (chip_device_platform == "webos" && chip_enable_ble) {
+    chip_fuzz_target("fuzz-webos-wbs-device-scanner") {
+      sources = [
+        "FuzzWebOSWbsDeviceScanner.cpp",
+        "webos_stubs/luna-service2++/handle.hpp",
+        "webos_stubs/luna-service2/lunaservice.h",
+        "webos_stubs/luna-service2/lunaservice.hpp",
+        "webos_stubs/pbnjson.hpp",
+      ]
+      public_deps = [
+        "${chip_root}/src/lib/support",
+        "${chip_root}/src/platform",
+        "${chip_root}/src/platform/logging:default",
+      ]
     }
   }
 } else {
