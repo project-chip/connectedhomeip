@@ -22,11 +22,28 @@ using namespace chip::app::Clusters;
 namespace chip {
 namespace app {
 
+ProximityRanging::ProximityRangingDriver &
+ProximityRangerDevice::GetRangingDriver(Span<ProximityRanging::RangingAdapter * const> adapters)
+{
+    // Meyer's singleton: initialized on the first call with the supplied
+    // adapter set, subsequent calls return the same instance and ignore
+    // their `adapters` argument. The DeviceFactory passes the same static
+    // adapter array on every Create("proximity-ranger") so the
+    // first-wins semantic is well-defined for the only production caller.
+    static ProximityRanging::ProximityRangingDriver instance{ adapters };
+    return instance;
+}
+
 ProximityRangerDevice::ProximityRangerDevice(TimerDelegate & timerDelegate, Span<ProximityRanging::RangingAdapter * const> adapters,
                                              BitMask<ProximityRanging::Feature> features) :
     SingleEndpointDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kProximityRanger, 1)),
-    mTimerDelegate(timerDelegate), mDriver(adapters), mFeatures(features)
-{}
+    mTimerDelegate(timerDelegate), mFeatures(features)
+{
+    // Trigger lazy initialization of the shared driver. On subsequent
+    // device constructions this is a no-op; the same static instance
+    // is reused across every ProximityRangerDevice.
+    (void) GetRangingDriver(adapters);
+}
 
 CHIP_ERROR ProximityRangerDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
                                            EndpointComposition composition)
@@ -45,7 +62,8 @@ CHIP_ERROR ProximityRangerDevice::Register(chip::EndpointId endpoint, CodeDriven
     mIdentifyCluster.Create(IdentifyCluster::Config(endpoint, mTimerDelegate));
     ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
 
-    mProximityRangingCluster.Create(endpoint, ProximityRanging::ProximityRangingCluster::Config(mDriver).WithFeatures(mFeatures));
+    mProximityRangingCluster.Create(endpoint,
+                                    ProximityRanging::ProximityRangingCluster::Config(GetRangingDriver()).WithFeatures(mFeatures));
     ReturnErrorOnFailure(provider.AddCluster(mProximityRangingCluster.Registration()));
 
     ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));

@@ -30,6 +30,28 @@ namespace app {
 class ProximityRangerDevice : public SingleEndpointDevice
 {
 public:
+    /**
+     * Returns the process-wide ProximityRangingDriver shared by every
+     * ProximityRangerDevice instance. The driver is lazily initialized
+     * on the first call with the supplied adapter set; subsequent calls
+     * return the same instance regardless of `adapters`.
+     *
+     * Sharing a single driver across devices keeps adapter Callback
+     * registrations stable when devices are constructed and destroyed
+     * in sequence: each ProximityRangingDriver constructor registers
+     * itself as the adapter callback, so per-device drivers would
+     * alias and overwrite each other.
+     *
+     * The backing array referenced by `adapters` MUST outlive the
+     * process, since the singleton driver lives until program exit.
+     *
+     * The constructor of ProximityRangerDevice triggers initialization;
+     * external callers that just need a reference to the existing
+     * driver may omit `adapters`.
+     */
+    static Clusters::ProximityRanging::ProximityRangingDriver &
+    GetRangingDriver(Span<Clusters::ProximityRanging::RangingAdapter * const> adapters = {});
+
     ProximityRangerDevice(TimerDelegate & timerDelegate, Span<Clusters::ProximityRanging::RangingAdapter * const> adapters,
                           BitMask<Clusters::ProximityRanging::Feature> features);
     ~ProximityRangerDevice() override = default;
@@ -40,10 +62,6 @@ public:
 
 private:
     TimerDelegate & mTimerDelegate;
-
-    // Driver is bound to its adapter set at construction. The backing array
-    // referenced by `adapters` must outlive this device.
-    Clusters::ProximityRanging::ProximityRangingDriver mDriver;
 
     BitMask<Clusters::ProximityRanging::Feature> mFeatures;
 
