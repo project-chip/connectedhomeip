@@ -18,7 +18,6 @@ package matter.controller.cluster.structs
 
 import java.util.Optional
 import matter.controller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -73,30 +72,43 @@ class PushAvStreamTransportClusterCMAFContainerOptionsStruct(
     private const val TAG_TRACK_NAME = 4
     private const val TAG_METADATA_ENABLED = 7
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): PushAvStreamTransportClusterCMAFContainerOptionsStruct {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader
+    ): PushAvStreamTransportClusterCMAFContainerOptionsStruct {
       tlvReader.enterStructure(tlvTag)
       val CMAFInterface = tlvReader.getUByte(ContextSpecificTag(TAG_CMAF_INTERFACE))
       val segmentDuration = tlvReader.getUShort(ContextSpecificTag(TAG_SEGMENT_DURATION))
       val chunkDuration = tlvReader.getUShort(ContextSpecificTag(TAG_CHUNK_DURATION))
-      val sessionGroup = if (tlvReader.isNextTag(ContextSpecificTag(TAG_SESSION_GROUP))) {
-      Optional.of(tlvReader.getUByte(ContextSpecificTag(TAG_SESSION_GROUP)))
-    } else {
-      Optional.empty()
-    }
-      val trackName = if (tlvReader.isNextTag(ContextSpecificTag(TAG_TRACK_NAME))) {
-      Optional.of(tlvReader.getString(ContextSpecificTag(TAG_TRACK_NAME)))
-    } else {
-      Optional.empty()
-    }
-      val metadataEnabled = if (tlvReader.isNextTag(ContextSpecificTag(TAG_METADATA_ENABLED))) {
-      Optional.of(tlvReader.getBoolean(ContextSpecificTag(TAG_METADATA_ENABLED)))
-    } else {
-      Optional.empty()
-    }
-      
+      val sessionGroup = 
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_SESSION_GROUP))) {
+          Optional.of(tlvReader.getUByte(ContextSpecificTag(TAG_SESSION_GROUP)))
+        } else {
+          Optional.empty()
+        }
+      val trackName = 
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_TRACK_NAME))) {
+          Optional.of(tlvReader.getString(ContextSpecificTag(TAG_TRACK_NAME)))
+        } else {
+          Optional.empty()
+        }
+      val metadataEnabled =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_METADATA_ENABLED))) {
+          Optional.of(tlvReader.getBoolean(ContextSpecificTag(TAG_METADATA_ENABLED)))
+        } else {
+          Optional.empty()
+        }
+
       tlvReader.exitContainer()
 
-      return PushAvStreamTransportClusterCMAFContainerOptionsStruct(CMAFInterface, segmentDuration, chunkDuration, sessionGroup, trackName, metadataEnabled)
+      return PushAvStreamTransportClusterCMAFContainerOptionsStruct(
+        CMAFInterface,
+        segmentDuration,
+        chunkDuration,
+        sessionGroup,
+        trackName,
+        metadataEnabled,
+      )
     }
   }
 }
