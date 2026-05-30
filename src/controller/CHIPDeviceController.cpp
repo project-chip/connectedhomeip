@@ -3873,7 +3873,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
     case CommissioningStage::kUnpoweredInitialPhaseComplete:
         FALLTHROUGH;
     case CommissioningStage::kPoweredInitialPhaseComplete:
-        CommissioningInitialStageComplete(proxy);
+        CommissioningInitialPhaseComplete(proxy);
         return;
     case CommissioningStage::kFindOperationalForStayActive:
     case CommissioningStage::kFindOperationalForCommissioningComplete: {
@@ -4065,7 +4065,7 @@ static bool IsInitialPhaseComplete(const CommissioningStage step, bool & isUnpow
     return step == CommissioningStage::kPoweredInitialPhaseComplete;
 }
 
-void DeviceCommissioner::CommissioningInitialStageComplete(DeviceProxy * proxy)
+void DeviceCommissioner::CommissioningInitialPhaseComplete(DeviceProxy * proxy)
 {
     bool isUnpowered;
     VerifyOrDie(IsInitialPhaseComplete(mCommissioningStage, isUnpowered));
@@ -4073,7 +4073,7 @@ void DeviceCommissioner::CommissioningInitialStageComplete(DeviceProxy * proxy)
     ChipLogProgress(Controller, "Completed initial phase of commissioning");
     if (mPairingDelegate != nullptr)
     {
-        mPairingDelegate->OnInitialStageComplete(
+        mPairingDelegate->OnInitialPhaseComplete(
             PeerId(GetCompressedFabricId(), proxy->GetDeviceId()),
             proxy->GetSecureSession().Value()->AsSecureSession()->GetPeerAddress().GetTransportType(), isUnpowered);
     }
