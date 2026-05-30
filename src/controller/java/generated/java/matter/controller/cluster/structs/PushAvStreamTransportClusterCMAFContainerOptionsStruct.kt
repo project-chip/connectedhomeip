@@ -29,7 +29,7 @@ class PushAvStreamTransportClusterCMAFContainerOptionsStruct(
   val chunkDuration: UShort,
   val sessionGroup: Optional<UByte>,
   val trackName: Optional<String>,
-  val metadataEnabled: Optional<Boolean>
+  val metadataEnabled: Optional<Boolean>,
 ) {
   override fun toString(): String = buildString {
     append("PushAvStreamTransportClusterCMAFContainerOptionsStruct {\n")
@@ -74,7 +74,7 @@ class PushAvStreamTransportClusterCMAFContainerOptionsStruct(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader
+      tlvReader: TlvReader,
     ): PushAvStreamTransportClusterCMAFContainerOptionsStruct {
       tlvReader.enterStructure(tlvTag)
       val CMAFInterface = tlvReader.getUByte(ContextSpecificTag(TAG_CMAF_INTERFACE))

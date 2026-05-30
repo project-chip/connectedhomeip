@@ -28,7 +28,7 @@ class PushAvStreamTransportClusterPushTransportBeginEvent(
   val triggerType: UByte,
   val activationReason: Optional<UByte>,
   val containerType: Optional<UByte>,
-  val CMAFSessionNumber: Optional<ULong>
+  val CMAFSessionNumber: Optional<ULong>,
 ) {
   override fun toString(): String = buildString {
     append("PushAvStreamTransportClusterPushTransportBeginEvent {\n")
@@ -70,7 +70,7 @@ class PushAvStreamTransportClusterPushTransportBeginEvent(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader
+      tlvReader: TlvReader,
     ): PushAvStreamTransportClusterPushTransportBeginEvent {
       tlvReader.enterStructure(tlvTag)
       val connectionID = tlvReader.getUShort(ContextSpecificTag(TAG_CONNECTION_ID))
