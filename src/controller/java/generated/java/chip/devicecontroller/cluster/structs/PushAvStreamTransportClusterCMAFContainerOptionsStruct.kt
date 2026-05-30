@@ -31,7 +31,7 @@ class PushAvStreamTransportClusterCMAFContainerOptionsStruct(
   val trackName: Optional<String>,
   val metadataEnabled: Optional<Boolean>,
 ) {
-  override fun toString(): String  = buildString {
+  override fun toString(): String = buildString {
     append("PushAvStreamTransportClusterCMAFContainerOptionsStruct {\n")
     append("\tCMAFInterface : $CMAFInterface\n")
     append("\tsegmentDuration : $segmentDuration\n")

@@ -30,7 +30,7 @@ class PushAvStreamTransportClusterPushTransportBeginEvent(
   val containerType: Optional<UInt>,
   val CMAFSessionNumber: Optional<ULong>,
 ) {
-  override fun toString(): String  = buildString {
+  override fun toString(): String = buildString {
     append("PushAvStreamTransportClusterPushTransportBeginEvent {\n")
     append("\tconnectionID : $connectionID\n")
     append("\ttriggerType : $triggerType\n")

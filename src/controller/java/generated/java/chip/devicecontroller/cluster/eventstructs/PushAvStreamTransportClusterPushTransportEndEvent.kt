@@ -28,7 +28,7 @@ class PushAvStreamTransportClusterPushTransportEndEvent(
   val containerType: Optional<UInt>,
   val CMAFSessionNumber: Optional<ULong>,
 ) {
-  override fun toString(): String  = buildString {
+  override fun toString(): String = buildString {
     append("PushAvStreamTransportClusterPushTransportEndEvent {\n")
     append("\tconnectionID : $connectionID\n")
     append("\tcontainerType : $containerType\n")
@@ -43,7 +43,7 @@ class PushAvStreamTransportClusterPushTransportEndEvent(
       if (containerType.isPresent) {
         val optcontainerType = containerType.get()
         put(ContextSpecificTag(TAG_CONTAINER_TYPE), optcontainerType)
-      } 
+      }
       if (CMAFSessionNumber.isPresent) {
         val optCMAFSessionNumber = CMAFSessionNumber.get()
         put(ContextSpecificTag(TAG_CMAF_SESSION_NUMBER), optCMAFSessionNumber)

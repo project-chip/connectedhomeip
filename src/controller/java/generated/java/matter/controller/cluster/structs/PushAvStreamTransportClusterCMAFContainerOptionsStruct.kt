@@ -80,13 +80,13 @@ class PushAvStreamTransportClusterCMAFContainerOptionsStruct(
       val CMAFInterface = tlvReader.getUByte(ContextSpecificTag(TAG_CMAF_INTERFACE))
       val segmentDuration = tlvReader.getUShort(ContextSpecificTag(TAG_SEGMENT_DURATION))
       val chunkDuration = tlvReader.getUShort(ContextSpecificTag(TAG_CHUNK_DURATION))
-      val sessionGroup = 
+      val sessionGroup =
         if (tlvReader.isNextTag(ContextSpecificTag(TAG_SESSION_GROUP))) {
           Optional.of(tlvReader.getUByte(ContextSpecificTag(TAG_SESSION_GROUP)))
         } else {
           Optional.empty()
         }
-      val trackName = 
+      val trackName =
         if (tlvReader.isNextTag(ContextSpecificTag(TAG_TRACK_NAME))) {
           Optional.of(tlvReader.getString(ContextSpecificTag(TAG_TRACK_NAME)))
         } else {

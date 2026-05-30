@@ -79,7 +79,7 @@ class PushAvStreamTransportClusterPushTransportEndEvent(
       tlvReader.exitContainer()
 
       return PushAvStreamTransportClusterPushTransportEndEvent(
-        connectionID, 
+        connectionID,
         containerType,
         CMAFSessionNumber,
       )
