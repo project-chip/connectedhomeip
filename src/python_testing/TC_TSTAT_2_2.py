@@ -108,9 +108,10 @@ class TC_TSTAT_2_2(MatterBaseTest):
 
     async def verify_events(self, expected_events: list[dict], events_callback: EventSubscriptionHandler) -> None:
         received_events = []
+        timeout = self.matter_test_config.timeout if self.matter_test_config.timeout is not None else self.default_timeout
         while len(received_events) < len(expected_events):
             try:
-                event_result = events_callback.get_event_from_queue(block=True, timeout=self.matter_test_config.timeout)
+                event_result = events_callback.get_event_from_queue(block=True, timeout=timeout)
                 if event_result.Header.EventId == cluster.Events.SetpointChange.event_id:
                     received_events.append(event_result.Data)
             except queue.Empty:

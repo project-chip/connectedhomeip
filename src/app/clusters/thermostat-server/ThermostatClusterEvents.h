@@ -50,8 +50,8 @@ void GenerateOccupancyChangeEvent(chip::EndpointId endpoint,
                                   chip::BitMask<chip::app::Clusters::Thermostat::OccupancyBitmap> currentOccupancy);
 
 void GenerateSetpointChangeEvent(chip::EndpointId endpoint, chip::app::Clusters::Thermostat::SystemModeEnum systemMode,
-                                 chip::Optional<chip::BitMask<chip::app::Clusters::Thermostat::OccupancyBitmap>> occupancy,
-                                 chip::Optional<int16_t> previousSetpoint, int16_t currentSetpoint);
+                                 chip::app::Clusters::Thermostat::OccupancyBitmap occupancy,
+                                 chip::Optional<temperature> previousSetpoint, temperature currentSetpoint);
 
 void GenerateRunningStateChangeEvent(
     chip::EndpointId endpoint,

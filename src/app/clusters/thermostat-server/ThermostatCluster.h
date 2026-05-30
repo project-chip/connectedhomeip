@@ -24,9 +24,14 @@
 
 #pragma once
 
+#include "SetpointRange.h"
 #include "ThermostatClusterAtomic.h"
 #include "ThermostatClusterSetpoints.h"
 #include "ThermostatDelegate.h"
+#include "app/ConcreteAttributePath.h"
+#include "app/clusters/thermostat-server/Temperature.h"
+#include "lib/core/DataModelTypes.h"
+#include "lib/support/CodeUtils.h"
 
 #include <app-common/zap-generated/callback.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
@@ -90,8 +95,8 @@ public:
     DataModel::Nullable<int16_t> GetLocalTemperature() const { return mLocalTemperature; }
     Protocols::InteractionModel::Status SetLocalTemperature(DataModel::Nullable<int16_t> localTemperature);
 
-    Protocols::InteractionModel::Status ChangeSetpointAttribute(const AttributeId attributeId, int16_t temperature);
-    Protocols::InteractionModel::Status SetpointRaiseLower(const SetpointRaiseLowerModeEnum mode, const int16_t amount);
+    DataModel::ActionReturnStatus ChangeSetpointAttribute(const AttributeId attributeId, temperature temp);
+    DataModel::ActionReturnStatus SetpointRaiseLower(const SetpointRaiseLowerModeEnum mode, const int16_t amount);
 
     BitFlags<Thermostat::Feature> mFeatures;
 
@@ -120,16 +125,15 @@ private:
     DataModel::ActionReturnStatus WriteNonAtomicAttribute(const DataModel::WriteAttributeRequest & request,
                                                           AttributeValueDecoder & decoder);
 
-    Protocols::InteractionModel::Status HandleSetpointChange(Setpoints & setpoints, const AttributeId attributeId,
+    DataModel::ActionReturnStatus HandleSetpointChange(Setpoints & setpoints, const AttributeId attributeId,
                                                              temperature value,
                                                              SetpointAttributes & changedAttributes);
     DataModel::ActionReturnStatus SetpointRaiseLower(const Commands::SetpointRaiseLower::DecodableType & commandData);
 
-
-    Protocols::InteractionModel::Status SaveSetpoints(Setpoints setpoints,
-                                                      SetpointAttributes changedAttributes);
-
     Protocols::InteractionModel::Status LoadSetpoints(Setpoints & setpoints, AttributePersistence & persistence);
+    Protocols::InteractionModel::Status SaveSetpoint(Setpoint & oldSetpoint, Setpoint & newSetpoint);
+    DataModel::ActionReturnStatus SaveSetpoints(Setpoints & setpoints, SetpointAttributes changedAttributes);
+
 
     /**
      * @brief Set the Active Preset to a given preset handle, or null
@@ -151,9 +155,7 @@ private:
 
     chip::Protocols::InteractionModel::Status PrecommitPresets();
 
-    void GenerateEvents(const ConcreteAttributePath & attributePath);
-
-
+    void GenerateSetpointEvent(AttributeId attributeId, temperature oldTemp, temperature newTemp);
 
     std::optional<DataModel::ActionReturnStatus>
     AddThermostatSuggestion(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,

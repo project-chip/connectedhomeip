@@ -49,6 +49,8 @@ public:
      */
     virtual temperature Temperature() const = 0;
 
+    virtual bool SetTemperature(temperature temp) = 0;
+
     /*
      * Set the temperature value.
      * Returns true if the temperature was changed, false otherwise.
@@ -72,6 +74,8 @@ public:
     }
     bool operator!=(const Setpoint & other) const { return !(*this == other); }
 
+    static constexpr bool kIsFabricScoped = false;
+
 protected:
     chip::AttributeId mAttributeId;
 };
@@ -85,6 +89,14 @@ public:
     AbsoluteSetpoint(chip::AttributeId attributeId, temperature value) : Setpoint(attributeId), mTemperature(value) {}
     AbsoluteSetpoint(const AbsoluteSetpoint & other) : Setpoint(other.mAttributeId), mTemperature(other.mTemperature) {}
     AbsoluteSetpoint & operator=(const AbsoluteSetpoint & other) = default;
+
+    CHIP_ERROR Encode(chip::TLV::TLVWriter & writer, chip::TLV::Tag tag) const {
+        return writer.Put(tag, mTemperature);
+    }
+
+    CHIP_ERROR Decode(chip::TLV::TLVReader & reader) {
+        return reader.Get(mTemperature);
+    }
 
     bool HasTemperature() const override { return true; }
     temperature Temperature() const override { return mTemperature; }
@@ -125,9 +137,12 @@ public:
         return *this;
     }
 
+    CHIP_ERROR Encode(chip::TLV::TLVWriter & writer, chip::TLV::Tag tag) const;
+
+    CHIP_ERROR Decode(chip::TLV::TLVReader & reader);
+
     bool HasTemperature() const override { return mTemperature.HasValue(); }
     temperature Temperature() const override;
-
     /*
      * Set the temperature value.
      * Returns true if the temperature was changed, false otherwise.
@@ -139,6 +154,8 @@ public:
      * Returns true if the temperature was cleared, false otherwise.
      */
     bool ClearTemperature();
+
+
 
 private:
     const AbsoluteSetpoint & mAbsoluteSetpoint;
