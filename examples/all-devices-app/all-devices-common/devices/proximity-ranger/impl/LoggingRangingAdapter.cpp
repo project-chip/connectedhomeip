@@ -360,14 +360,17 @@ CHIP_ERROR LoggingRangingAdapter::StopSession(uint8_t sessionId)
 
     mTimerDelegate.CancelTimer(it->get());
 
+    // Erase the session before invoking the callback so any synchronous
+    // query of the active session list during the callback observes a
+    // consistent state (the stopped session is no longer reported active).
+    mSessions.erase(it);
+
     // Adapters are required to deliver OnRangingSessionStopped for every session
     // termination. Client-initiated stop is reported as SessionEndTimeReached.
-    Session & session = **it;
     if (mCallback != nullptr)
     {
-        mCallback->OnRangingSessionStopped(session.sessionId, RangingSessionStatusEnum::kSessionEndTimeReached);
+        mCallback->OnRangingSessionStopped(sessionId, RangingSessionStatusEnum::kSessionEndTimeReached);
     }
-    mSessions.erase(it);
     return CHIP_NO_ERROR;
 }
 
@@ -476,13 +479,18 @@ void LoggingRangingAdapter::TerminateSession(Session & session, RangingSessionSt
     auto it = std::find_if(mSessions.begin(), mSessions.end(),
                            [sessionId](const std::unique_ptr<Session> & s) { return s->sessionId == sessionId; });
 
-    if (mCallback != nullptr)
-    {
-        mCallback->OnRangingSessionStopped(sessionId, status);
-    }
+    // Erase the session before invoking the callback so any synchronous
+    // query of the active session list during the callback observes a
+    // consistent state. After erase, the `session` reference is dangling
+    // and MUST NOT be used; sessionId was captured as a local above.
     if (it != mSessions.end())
     {
         mSessions.erase(it);
+    }
+
+    if (mCallback != nullptr)
+    {
+        mCallback->OnRangingSessionStopped(sessionId, status);
     }
 }
 

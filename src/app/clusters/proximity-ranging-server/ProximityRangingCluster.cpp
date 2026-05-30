@@ -319,6 +319,11 @@ ProximityRangingCluster::ValidateStartRangingRequest(const Commands::StartRangin
         {
             return ResultCodeEnum::kRejectedInfeasibleRanging;
         }
+        if (rc.minDistanceCondition.HasValue() && rc.maxDistanceCondition.HasValue() &&
+            rc.minDistanceCondition.Value() > rc.maxDistanceCondition.Value())
+        {
+            return ResultCodeEnum::kRejectedInfeasibleRanging;
+        }
     }
 
     return ResultCodeEnum::kAccepted;
