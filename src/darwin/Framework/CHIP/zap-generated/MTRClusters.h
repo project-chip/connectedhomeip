@@ -3997,6 +3997,62 @@ MTR_PROVISIONALLY_AVAILABLE
 @end
 
 /**
+ * Cluster Electrical Protection Alarm
+ *    This cluster is a derived cluster of the Alarm Base cluster and provides the alarm definition related to the Electrical Protection device type.
+ */
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRClusterElectricalProtectionAlarm : MTRGenericCluster
+
+- (void)modifyEnabledAlarmsWithParams:(MTRElectricalProtectionAlarmClusterModifyEnabledAlarmsParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeMaskWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeStateWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeSupportedWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeArcCauseWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeOverLoadRatingWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeOverVoltageRatingWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeSurgeProtectionRatingWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeShortCircuitRatingWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeResidualCurrentRatingWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeArcFaultRatingWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+
+@end
+
+@interface MTRClusterElectricalProtectionAlarm (Availability)
+
+/**
+ * For all instance methods that take a completion (i.e. command invocations),
+ * the completion will be called on the provided queue.
+ */
+- (instancetype _Nullable)initWithDevice:(MTRDevice *)device
+                              endpointID:(NSNumber *)endpointID
+                                   queue:(dispatch_queue_t)queue MTR_PROVISIONALLY_AVAILABLE;
+
+@end
+
+/**
  * Cluster Door Lock
  *    An interface to a generic way to secure a door
  */
