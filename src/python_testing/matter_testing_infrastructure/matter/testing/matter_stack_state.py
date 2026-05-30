@@ -78,7 +78,7 @@ class MatterStackState:
         if (len(self._certificate_authority_manager.activeCaList) == 0):
             LOGGER.warning(
                 "Didn't find any CertificateAuthorities in storage -- creating a new CertificateAuthority + FabricAdmin...")
-            ca = self._certificate_authority_manager.NewCertificateAuthority(caIndex=self._config.root_of_trust_index)
+            ca = self._certificate_authority_manager.NewCertificateAuthority()
             ca.maximizeCertChains = self._config.maximize_cert_chains
             ca.certificateValidityPeriodSec = self._config.certificate_validity_period
             ca.NewFabricAdmin(vendorId=0xFFF1, fabricId=self._config.fabric_id)
