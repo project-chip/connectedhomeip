@@ -179,7 +179,7 @@ void MTRDeviceControllerDelegateBridge::OnReadCommissioningInfo(const chip::Cont
     mCommissioningParameters = nil;
 }
 
-void MTRDeviceControllerDelegateBridge::OnInitialStageComplete(chip::PeerId peerId, chip::Transport::Type transportType, bool isUnpowered)
+void MTRDeviceControllerDelegateBridge::OnInitialPhaseComplete(chip::PeerId peerId, chip::Transport::Type transportType, bool isUnpowered)
 {
 }
 
