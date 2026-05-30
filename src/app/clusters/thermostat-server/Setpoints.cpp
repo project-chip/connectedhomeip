@@ -371,7 +371,7 @@ DataModel::ActionReturnStatus Setpoints::Fix(SetpointAttributes & changedAttribu
 }
 
 DataModel::ActionReturnStatus Setpoints::ChangeRangeHeating(SetpointRange & range, temperature heat, ClampMode clamp,
-                                                                  SetpointAttributes & changedAttributes)
+                                                            SetpointAttributes & changedAttributes)
 {
     if (!heatSupported)
     {
@@ -381,7 +381,7 @@ DataModel::ActionReturnStatus Setpoints::ChangeRangeHeating(SetpointRange & rang
 }
 
 DataModel::ActionReturnStatus Setpoints::ChangeRangeCooling(SetpointRange & range, temperature cool, ClampMode clamp,
-                                                                  SetpointAttributes & changedAttributes)
+                                                            SetpointAttributes & changedAttributes)
 {
     if (!coolSupported)
     {
@@ -390,8 +390,8 @@ DataModel::ActionReturnStatus Setpoints::ChangeRangeCooling(SetpointRange & rang
     return ChangeRange(range, Optional<temperature>::Missing(), MakeOptional(cool), clamp, changedAttributes);
 }
 
-DataModel::ActionReturnStatus Setpoints::ChangeRange(SetpointRange & range, Optional<temperature> heat, Optional<temperature> cool, ClampMode clamp,
-                              SetpointAttributes & changedAttributes)
+DataModel::ActionReturnStatus Setpoints::ChangeRange(SetpointRange & range, Optional<temperature> heat, Optional<temperature> cool,
+                                                     ClampMode clamp, SetpointAttributes & changedAttributes)
 {
     if (!heat.HasValue() && !cool.HasValue())
     {
@@ -433,17 +433,22 @@ DataModel::ActionReturnStatus Setpoints::ChangeRange(SetpointRange & range, Opti
     return Fix(changedAttributes);
 }
 
-DataModel::ActionReturnStatus Setpoints::ChangeLimitMinimum(UserSetpointLimits & userLimits,  AbsoluteSetpointLimits & absoluteLimits,temperature min, SetpointAttributes & changedAttributes)
+DataModel::ActionReturnStatus Setpoints::ChangeLimitMinimum(UserSetpointLimits & userLimits,
+                                                            AbsoluteSetpointLimits & absoluteLimits, temperature min,
+                                                            SetpointAttributes & changedAttributes)
 {
     return ChangeLimits(userLimits, absoluteLimits, MakeOptional(min), Optional<temperature>::Missing(), changedAttributes);
 }
 
-DataModel::ActionReturnStatus Setpoints::ChangeLimitMaximum(UserSetpointLimits & userLimits, AbsoluteSetpointLimits & absoluteLimits,temperature max, SetpointAttributes & changedAttributes)
+DataModel::ActionReturnStatus Setpoints::ChangeLimitMaximum(UserSetpointLimits & userLimits,
+                                                            AbsoluteSetpointLimits & absoluteLimits, temperature max,
+                                                            SetpointAttributes & changedAttributes)
 {
     return ChangeLimits(userLimits, absoluteLimits, Optional<temperature>::Missing(), MakeOptional(max), changedAttributes);
 }
-DataModel::ActionReturnStatus Setpoints::ChangeLimits(UserSetpointLimits & userLimits, AbsoluteSetpointLimits & absoluteLimits, Optional<temperature> min, Optional<temperature> max,
-                               SetpointAttributes & changedAttributes)
+DataModel::ActionReturnStatus Setpoints::ChangeLimits(UserSetpointLimits & userLimits, AbsoluteSetpointLimits & absoluteLimits,
+                                                      Optional<temperature> min, Optional<temperature> max,
+                                                      SetpointAttributes & changedAttributes)
 {
     bool settingMin = min.HasValue();
     bool settingMax = max.HasValue();

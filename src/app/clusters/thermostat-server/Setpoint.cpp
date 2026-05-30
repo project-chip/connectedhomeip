@@ -69,11 +69,13 @@ SystemModeEnum BaseSetpoint::Mode() const
     }
 }
 
-CHIP_ERROR OptionalSetpoint::Encode(chip::TLV::TLVWriter & writer, chip::TLV::Tag tag) const {
+CHIP_ERROR OptionalSetpoint::Encode(chip::TLV::TLVWriter & writer, chip::TLV::Tag tag) const
+{
     return writer.Put(tag, mTemperature.Value());
 }
 
-CHIP_ERROR OptionalSetpoint::Decode(chip::TLV::TLVReader & reader) {
+CHIP_ERROR OptionalSetpoint::Decode(chip::TLV::TLVReader & reader)
+{
     temperature temp;
     CHIP_ERROR error = reader.Get(temp);
     if (error == CHIP_NO_ERROR)
