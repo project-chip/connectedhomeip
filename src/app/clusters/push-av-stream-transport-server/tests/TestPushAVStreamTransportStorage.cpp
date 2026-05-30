@@ -188,7 +188,7 @@ TEST_F(TestPushAVStreamTransportStorage, TestCMAFContainerOptionsStorage)
 
     cmafContainerOptions.chunkDuration = 1000;
     cmafContainerOptions.metadataEnabled.SetValue(true);
-    std::string trackName              = "video";
+    std::string trackName = "video";
     cmafContainerOptions.trackName.SetValue(Span(trackName.data(), trackName.size()));
 
     CMAFContainerOptionsStorage cmafContainerOptionsStorage(cmafContainerOptions);
@@ -213,7 +213,7 @@ TEST_F(TestPushAVStreamTransportStorage, TestContainerOptionsStorage)
 
     cmafContainerOptions.chunkDuration = 1000;
     cmafContainerOptions.metadataEnabled.SetValue(true);
-    std::string trackName              = "video";
+    std::string trackName = "video";
     cmafContainerOptions.trackName.SetValue(Span(trackName.data(), trackName.size()));
 
     /*Test ContainerOptionsStorage*/
@@ -312,7 +312,7 @@ TEST_F(TestPushAVStreamTransportStorage, TestTransportOptionsStorage)
 
     cmafContainerOptions.chunkDuration = 1000;
     cmafContainerOptions.metadataEnabled.SetValue(true);
-    std::string trackName              = "video";
+    std::string trackName = "video";
     cmafContainerOptions.trackName.SetValue(Span(trackName.data(), trackName.size()));
 
     containerOptions.containerType = ContainerFormatEnum::kCmaf;
@@ -443,7 +443,7 @@ TEST_F(TestPushAVStreamTransportStorage, TestTransportConfigurationStorage)
 
     containerOptions.containerType = ContainerFormatEnum::kCmaf;
     containerOptions.CMAFContainerOptions.SetValue(cmafContainerOptions);
-    std::string trackName              = "video";
+    std::string trackName = "video";
     cmafContainerOptions.trackName.SetValue(Span(trackName.data(), trackName.size()));
 
     /*Test TransportOptionsStorage*/
