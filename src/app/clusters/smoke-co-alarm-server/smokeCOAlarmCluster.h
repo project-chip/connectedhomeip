@@ -40,11 +40,14 @@ public:
      * Tracks which optional attributes are present on this endpoint.
      * Populated at construction time from the ZAP/ember attribute store via CodegenIntegration.
      */
-    using OptionalAttributeSet =
-        chip::app::OptionalAttributeSet<Attributes::DeviceMuted::Id, Attributes::InterconnectSmokeAlarm::Id,
-                                        Attributes::InterconnectCOAlarm::Id, Attributes::ContaminationState::Id,
-                                        Attributes::SmokeSensitivityLevel::Id, Attributes::ExpiryDate::Id,
-                                        Attributes::Unmounted::Id>;
+    using OptionalAttributeSet = chip::app::OptionalAttributeSet<
+        Attributes::DeviceMuted::Id,
+        Attributes::InterconnectSmokeAlarm::Id,
+        Attributes::InterconnectCOAlarm::Id,
+        Attributes::ContaminationState::Id,
+        Attributes::SmokeSensitivityLevel::Id,
+        Attributes::ExpiryDate::Id,
+        Attributes::Unmounted::Id>;
     /**
      * Construction-time configuration.
      * Passed in by CodegenIntegration from the ZAP static config.
@@ -119,11 +122,12 @@ public:
     bool SupportsCOAlarm() const { return mConfig.featureMap.Has(Feature::kCoAlarm); }
 
     // DefaultServerCluster overrides
-    CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
+    CHIP_ERROR Attributes(const ConcreteClusterPath & path,
+                          ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
-                                                AttributeValueEncoder & encoder) override;
+                                               AttributeValueEncoder & encoder) override;
     DataModel::ActionReturnStatus WriteAttribute(const DataModel::WriteAttributeRequest & request,
-                                                 AttributeValueDecoder & decoder) override;
+                                                AttributeValueDecoder & decoder) override;
     std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
                                                                chip::TLV::TLVReader & input_arguments,
                                                                CommandHandler * handler) override;
@@ -152,7 +156,8 @@ private:
     /**
      * @brief Common handler for the SelfTestRequest command
      */
-    void HandleRemoteSelfTestRequest(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath);
+    void HandleRemoteSelfTestRequest(chip::app::CommandHandler * commandObj,
+                                     const chip::app::ConcreteCommandPath & commandPath);
 
     /**
      * @brief Send generic event
@@ -166,20 +171,20 @@ private:
     bool mInoperativeWhenUnmounted = false;
 
     // Runtime attribute storage
-    ExpressedStateEnum mExpressedState         = ExpressedStateEnum::kNormal;
-    AlarmStateEnum mSmokeState                 = AlarmStateEnum::kNormal;
-    AlarmStateEnum mCOState                    = AlarmStateEnum::kNormal;
-    AlarmStateEnum mBatteryAlert               = AlarmStateEnum::kNormal;
-    MuteStateEnum mDeviceMuted                 = MuteStateEnum::kNotMuted;
-    bool mTestInProgress                       = false;
-    bool mHardwareFaultAlert                   = false;
-    EndOfServiceEnum mEndOfServiceAlert        = EndOfServiceEnum::kNormal;
-    AlarmStateEnum mInterconnectSmokeAlarm     = AlarmStateEnum::kNormal;
-    AlarmStateEnum mInterconnectCOAlarm        = AlarmStateEnum::kNormal;
-    ContaminationStateEnum mContaminationState = ContaminationStateEnum::kNormal;
-    SensitivityEnum mSmokeSensitivityLevel     = SensitivityEnum::kHigh;
-    uint32_t mExpiryDate                       = 0;
-    bool mUnmounted                            = false;
+    ExpressedStateEnum     mExpressedState         = ExpressedStateEnum::kNormal;
+    AlarmStateEnum         mSmokeState             = AlarmStateEnum::kNormal;
+    AlarmStateEnum         mCOState                = AlarmStateEnum::kNormal;
+    AlarmStateEnum         mBatteryAlert           = AlarmStateEnum::kNormal;
+    MuteStateEnum          mDeviceMuted            = MuteStateEnum::kNotMuted;
+    bool                   mTestInProgress         = false;
+    bool                   mHardwareFaultAlert     = false;
+    EndOfServiceEnum       mEndOfServiceAlert      = EndOfServiceEnum::kNormal;
+    AlarmStateEnum         mInterconnectSmokeAlarm = AlarmStateEnum::kNormal;
+    AlarmStateEnum         mInterconnectCOAlarm    = AlarmStateEnum::kNormal;
+    ContaminationStateEnum mContaminationState     = ContaminationStateEnum::kNormal;
+    SensitivityEnum        mSmokeSensitivityLevel  = SensitivityEnum::kHigh;
+    uint32_t               mExpiryDate             = 0;
+    bool                   mUnmounted              = false;
 };
 
 } // namespace SmokeCoAlarm

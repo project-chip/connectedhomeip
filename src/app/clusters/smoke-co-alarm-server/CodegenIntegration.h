@@ -55,6 +55,7 @@ public:
             LogErrorOnFailure(CodegenDataModelProvider::Instance().Registry().Unregister(&mCluster.Cluster()));
         }
     }
+    void SetInoperativeWhenUnmounted(bool v) { Cluster().SetInoperativeWhenUnmounted(v); }
 
     CHIP_ERROR Init()
     {
@@ -109,77 +110,6 @@ public:
     bool SetSmokeSensitivityLevel(EndpointId, SensitivityEnum v) { return Cluster().SetSmokeSensitivityLevel(v); }
     bool SetUnmountedState(EndpointId, bool v) { return Cluster().SetUnmountedState(v); }
 
-    bool GetExpressedState(ExpressedStateEnum & v) const
-    {
-        VerifyOrDie(mCluster.IsConstructed());
-        return mCluster.Cluster().GetExpressedState(v);
-    }
-    bool GetSmokeState(AlarmStateEnum & v) const
-    {
-        VerifyOrDie(mCluster.IsConstructed());
-        return mCluster.Cluster().GetSmokeState(v);
-    }
-    bool GetCOState(AlarmStateEnum & v) const
-    {
-        VerifyOrDie(mCluster.IsConstructed());
-        return mCluster.Cluster().GetCOState(v);
-    }
-    bool GetBatteryAlert(AlarmStateEnum & v) const
-    {
-        VerifyOrDie(mCluster.IsConstructed());
-        return mCluster.Cluster().GetBatteryAlert(v);
-    }
-    bool GetDeviceMuted(MuteStateEnum & v) const
-    {
-        VerifyOrDie(mCluster.IsConstructed());
-        return mCluster.Cluster().GetDeviceMuted(v);
-    }
-    bool GetTestInProgress(bool & v) const
-    {
-        VerifyOrDie(mCluster.IsConstructed());
-        return mCluster.Cluster().GetTestInProgress(v);
-    }
-    bool GetHardwareFaultAlert(bool & v) const
-    {
-        VerifyOrDie(mCluster.IsConstructed());
-        return mCluster.Cluster().GetHardwareFaultAlert(v);
-    }
-    bool GetEndOfServiceAlert(EndOfServiceEnum & v) const
-    {
-        VerifyOrDie(mCluster.IsConstructed());
-        return mCluster.Cluster().GetEndOfServiceAlert(v);
-    }
-    bool GetInterconnectSmokeAlarm(AlarmStateEnum & v) const
-    {
-        VerifyOrDie(mCluster.IsConstructed());
-        return mCluster.Cluster().GetInterconnectSmokeAlarm(v);
-    }
-    bool GetInterconnectCOAlarm(AlarmStateEnum & v) const
-    {
-        VerifyOrDie(mCluster.IsConstructed());
-        return mCluster.Cluster().GetInterconnectCOAlarm(v);
-    }
-    bool GetContaminationState(ContaminationStateEnum & v) const
-    {
-        VerifyOrDie(mCluster.IsConstructed());
-        return mCluster.Cluster().GetContaminationState(v);
-    }
-    bool GetSmokeSensitivityLevel(SensitivityEnum & v) const
-    {
-        VerifyOrDie(mCluster.IsConstructed());
-        return mCluster.Cluster().GetSmokeSensitivityLevel(v);
-    }
-    bool GetExpiryDate(uint32_t & v) const
-    {
-        VerifyOrDie(mCluster.IsConstructed());
-        return mCluster.Cluster().GetExpiryDate(v);
-    }
-    bool GetUnmountedState(bool & v) const
-    {
-        VerifyOrDie(mCluster.IsConstructed());
-        return mCluster.Cluster().GetUnmountedState(v);
-    }
-
     chip::BitFlags<Feature> GetFeatures() const
     {
         VerifyOrDie(mCluster.IsConstructed());
@@ -195,6 +125,82 @@ public:
         VerifyOrDie(mCluster.IsConstructed());
         return mCluster.Cluster().SupportsCOAlarm();
     }
+
+    // Endpoint-taking Get overloads for backwards compatibility with old call sites.
+    // The endpoint param is ignored; Instance() already owns a specific endpoint.
+    bool GetExpressedState(EndpointId, ExpressedStateEnum & v) const
+    {
+        VerifyOrDie(mCluster.IsConstructed());
+        return mCluster.Cluster().GetExpressedState(v);
+    }
+    bool GetSmokeState(EndpointId, AlarmStateEnum & v) const
+    {
+        VerifyOrDie(mCluster.IsConstructed());
+        return mCluster.Cluster().GetSmokeState(v);
+    }
+    bool GetCOState(EndpointId, AlarmStateEnum & v) const
+    {
+        VerifyOrDie(mCluster.IsConstructed());
+        return mCluster.Cluster().GetCOState(v);
+    }
+    bool GetBatteryAlert(EndpointId, AlarmStateEnum & v) const
+    {
+        VerifyOrDie(mCluster.IsConstructed());
+        return mCluster.Cluster().GetBatteryAlert(v);
+    }
+    bool GetDeviceMuted(EndpointId, MuteStateEnum & v) const
+    {
+        VerifyOrDie(mCluster.IsConstructed());
+        return mCluster.Cluster().GetDeviceMuted(v);
+    }
+    bool GetTestInProgress(EndpointId, bool & v) const
+    {
+        VerifyOrDie(mCluster.IsConstructed());
+        return mCluster.Cluster().GetTestInProgress(v);
+    }
+    bool GetHardwareFaultAlert(EndpointId, bool & v) const
+    {
+        VerifyOrDie(mCluster.IsConstructed());
+        return mCluster.Cluster().GetHardwareFaultAlert(v);
+    }
+    bool GetEndOfServiceAlert(EndpointId, EndOfServiceEnum & v) const
+    {
+        VerifyOrDie(mCluster.IsConstructed());
+        return mCluster.Cluster().GetEndOfServiceAlert(v);
+    }
+    bool GetInterconnectSmokeAlarm(EndpointId, AlarmStateEnum & v) const
+    {
+        VerifyOrDie(mCluster.IsConstructed());
+        return mCluster.Cluster().GetInterconnectSmokeAlarm(v);
+    }
+    bool GetInterconnectCOAlarm(EndpointId, AlarmStateEnum & v) const
+    {
+        VerifyOrDie(mCluster.IsConstructed());
+        return mCluster.Cluster().GetInterconnectCOAlarm(v);
+    }
+    bool GetContaminationState(EndpointId, ContaminationStateEnum & v) const
+    {
+        VerifyOrDie(mCluster.IsConstructed());
+        return mCluster.Cluster().GetContaminationState(v);
+    }
+    bool GetSmokeSensitivityLevel(EndpointId, SensitivityEnum & v) const
+    {
+        VerifyOrDie(mCluster.IsConstructed());
+        return mCluster.Cluster().GetSmokeSensitivityLevel(v);
+    }
+    bool GetExpiryDate(EndpointId, uint32_t & v) const
+    {
+        VerifyOrDie(mCluster.IsConstructed());
+        return mCluster.Cluster().GetExpiryDate(v);
+    }
+    bool GetUnmountedState(EndpointId, bool & v) const
+    {
+        VerifyOrDie(mCluster.IsConstructed());
+        return mCluster.Cluster().GetUnmountedState(v);
+    }
+    chip::BitFlags<Feature> GetFeatures(EndpointId) const { return GetFeatures(); }
+    bool SupportsSmokeAlarm(EndpointId) const { return SupportsSmokeAlarm(); }
+    bool SupportsCOAlarm(EndpointId) const { return SupportsCOAlarm(); }
 
 private:
     EndpointId mEndpointId;
