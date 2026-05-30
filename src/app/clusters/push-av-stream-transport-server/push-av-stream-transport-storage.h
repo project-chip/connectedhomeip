@@ -213,10 +213,13 @@ struct CMAFContainerOptionsStorage : public CMAFContainerOptionsStruct
         chunkDuration   = aCMAFContainerOptions.chunkDuration;
         sessionGroup    = aCMAFContainerOptions.sessionGroup;
 
-        MutableCharSpan trackNameBuffer(mTrackNameBuffer);
-        // ValidateIncomingTransportOptions() function already checked the trackName length
-        CopyCharSpanToMutableCharSpanWithTruncation(aCMAFContainerOptions.trackName.Value(), trackNameBuffer);
-        trackName.SetValue(trackNameBuffer);
+        if (aCMAFContainerOptions.trackName.HasValue()) {
+            
+            MutableCharSpan trackNameBuffer(mTrackNameBuffer);
+            // ValidateIncomingTransportOptions() function already checked the trackName length
+            CopyCharSpanToMutableCharSpanWithTruncation(aCMAFContainerOptions.trackName.Value(), trackNameBuffer);
+            trackName.SetValue(trackNameBuffer);
+        }
 
         metadataEnabled = aCMAFContainerOptions.metadataEnabled;
 
