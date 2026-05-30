@@ -53,19 +53,18 @@ DataModel::ActionReturnStatus ThermostatCluster::WriteNonAtomicAttribute(const D
     case MaxHeatSetpointLimit::Id:
     case MinCoolSetpointLimit::Id:
     case MaxCoolSetpointLimit::Id: {
-        int16_t setpoint;
+        temperature setpoint;
         ReturnErrorOnFailure(decoder.Decode(setpoint));
 
         return ChangeSetpointAttribute(request.path.mAttributeId, setpoint);
     }
-    // return persistence.DecodeAndStoreNativeEndianValue(request.path, decoder, mLocalConfigDisabled);
     case MinSetpointDeadBand::Id: {
 
-        int8_t db;
+        int16_t db;
         ReturnErrorOnFailure(decoder.Decode(db));
-        if (db < 0)
+        if (db < 0 || db > 127)
         {
-            return Status::InvalidValue;
+            return Status::ConstraintError;
         }
         // Per spec change, invisibly swallow valid writes to Deadband
         return Status::Success;
