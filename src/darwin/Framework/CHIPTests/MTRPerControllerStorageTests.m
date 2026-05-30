@@ -289,6 +289,50 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
 
 @end
 
+#pragma mark - DataVersionFilter failure-injection helper (rdar://171763086)
+
+// NSDictionary subclass that returns nil for one specified key on -objectForKey:,
+// while still enumerating that key. Mirrors a real "value vanished mid-enumeration"
+// caller bug, exercising the defense-in-depth nil check in
+// _createDataVersionFilterListFromDictionary.
+@interface MTRNilReturningDataVersionDictionary : NSDictionary
+- (instancetype)initWithBacking:(NSDictionary *)backing nilForKey:(id)key;
+@end
+
+@implementation MTRNilReturningDataVersionDictionary {
+    NSDictionary * _backing;
+    id _nilKey;
+}
+
+- (instancetype)initWithBacking:(NSDictionary *)backing nilForKey:(id)key
+{
+    if ((self = [super init])) {
+        _backing = [backing copy];
+        _nilKey = key;
+    }
+    return self;
+}
+
+- (NSUInteger)count
+{
+    return _backing.count;
+}
+
+- (id)objectForKey:(id)aKey
+{
+    if ([aKey isEqual:_nilKey]) {
+        return nil;
+    }
+    return [_backing objectForKey:aKey];
+}
+
+- (NSEnumerator *)keyEnumerator
+{
+    return [_backing keyEnumerator];
+}
+
+@end
+
 @interface MTRPerControllerStorageTests : MTRTestCase
 @end
 
@@ -3885,6 +3929,262 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
 
     [controller shutdown];
     XCTAssertFalse([controller isRunning]);
+}
+
+#pragma mark - DataVersionFilter nil-skip tests (rdar://171763086)
+
+// Helper: spin up a minimal controller and create an in-memory MTRDevice for it.
+// Tests below exercise _getCachedDataVersions / _createDataVersionFilterListFromDictionary
+// which are pure in-memory operations on cluster state — no commissioning needed.
+- (MTRDevice *)_dataVersionFilterTestDeviceAndController:(MTRDeviceController * _Nullable * _Nonnull)outController
+{
+    __auto_type * factory = [MTRDeviceControllerFactory sharedInstance];
+    XCTAssertNotNil(factory);
+
+    __auto_type * rootKeys = [[MTRTestKeys alloc] init];
+    XCTAssertNotNil(rootKeys);
+
+    __auto_type * operationalKeys = [[MTRTestKeys alloc] init];
+    XCTAssertNotNil(operationalKeys);
+
+    __auto_type * storageDelegate = [[MTRTestPerControllerStorage alloc] initWithControllerID:[NSUUID UUID]];
+
+    NSNumber * nodeID = @(0xC0FFEE);
+    NSNumber * fabricID = @(0xBEEF);
+
+    NSError * error;
+    MTRDeviceController * controller = [self startControllerWithRootKeys:rootKeys
+                                                         operationalKeys:operationalKeys
+                                                                fabricID:fabricID
+                                                                  nodeID:nodeID
+                                                                 storage:storageDelegate
+                                                                   error:&error];
+    XCTAssertNil(error);
+    XCTAssertNotNil(controller);
+    XCTAssertTrue([controller isRunning]);
+
+    *outController = controller;
+
+    return [MTRDevice deviceWithNodeID:@(0xDEADBEEF) controller:controller];
+}
+
+- (void)testGetCachedDataVersionsSkipsNilDataVersion
+{
+    MTRDeviceController * controller = nil;
+    MTRDevice * device = [self _dataVersionFilterTestDeviceAndController:&controller];
+
+    MTRClusterPath * pathWithNil = [MTRClusterPath clusterPathWithEndpointID:@(1) clusterID:@(0x101)];
+    MTRClusterPath * pathWithVersion = [MTRClusterPath clusterPathWithEndpointID:@(1) clusterID:@(0x102)];
+
+    // Cluster with dataVersion == nil but pendingDataVersion populated. The
+    // pending version must NOT leak into the filter list — that would suppress
+    // a legitimate full re-read of attributes the device has not yet committed.
+    MTRDeviceClusterData * nilVersionCluster = [[MTRDeviceClusterData alloc] initWithDataVersion:nil attributes:@{}];
+    nilVersionCluster.pendingDataVersion = @(42);
+
+    MTRDeviceClusterData * committedCluster = [[MTRDeviceClusterData alloc] initWithDataVersion:@(7) attributes:@{}];
+
+    [device unitTestSetPersistedClusterData:@{
+        pathWithNil : nilVersionCluster,
+        pathWithVersion : committedCluster,
+    }];
+
+    NSDictionary<MTRClusterPath *, NSNumber *> * versions = [device unitTestGetCachedDataVersions];
+
+    XCTAssertNil(versions[pathWithNil]);
+    XCTAssertEqualObjects(versions[pathWithVersion], @(7));
+
+    [controller shutdown];
+}
+
+- (void)testGetCachedDataVersionsIncludesAllClustersWithCommittedVersion
+{
+    MTRDeviceController * controller = nil;
+    MTRDevice * device = [self _dataVersionFilterTestDeviceAndController:&controller];
+
+    MTRClusterPath * path1 = [MTRClusterPath clusterPathWithEndpointID:@(1) clusterID:@(0x201)];
+    MTRClusterPath * path2 = [MTRClusterPath clusterPathWithEndpointID:@(2) clusterID:@(0x202)];
+
+    [device unitTestSetPersistedClusterData:@{
+        path1 : [[MTRDeviceClusterData alloc] initWithDataVersion:@(11) attributes:@{}],
+        path2 : [[MTRDeviceClusterData alloc] initWithDataVersion:@(22) attributes:@{}],
+    }];
+
+    NSDictionary<MTRClusterPath *, NSNumber *> * versions = [device unitTestGetCachedDataVersions];
+
+    XCTAssertEqualObjects(versions[path1], @(11));
+    XCTAssertEqualObjects(versions[path2], @(22));
+    XCTAssertEqual(versions.count, 2u);
+
+    [controller shutdown];
+}
+
+- (void)testCreateDataVersionFilterListSkipsNilEntries
+{
+    MTRDeviceController * controller = nil;
+    MTRDevice * device = [self _dataVersionFilterTestDeviceAndController:&controller];
+
+    MTRClusterPath * pathA = [MTRClusterPath clusterPathWithEndpointID:@(1) clusterID:@(0x301)];
+    MTRClusterPath * pathB = [MTRClusterPath clusterPathWithEndpointID:@(1) clusterID:@(0x302)];
+
+    // Plant a cluster with nil dataVersion + a cluster with a real dataVersion;
+    // _getCachedDataVersions feeds _createDataVersionFilterListFromDictionary,
+    // so a round-trip through both methods should yield only the committed
+    // entry. This pins both the nil-skip semantic and the *count = i fix.
+    MTRDeviceClusterData * nilVersionCluster = [[MTRDeviceClusterData alloc] initWithDataVersion:nil attributes:@{}];
+    MTRDeviceClusterData * committedCluster = [[MTRDeviceClusterData alloc] initWithDataVersion:@(99) attributes:@{}];
+
+    [device unitTestSetPersistedClusterData:@{
+        pathA : nilVersionCluster,
+        pathB : committedCluster,
+    }];
+
+    NSDictionary<MTRClusterPath *, NSNumber *> * cached = [device unitTestGetCachedDataVersions];
+    NSDictionary<MTRClusterPath *, NSNumber *> * roundTripped = [device unitTestRoundTripDataVersionFilterListFromDictionary:cached];
+
+    XCTAssertEqual(roundTripped.count, 1u);
+    XCTAssertNil(roundTripped[pathA]);
+    XCTAssertEqualObjects(roundTripped[pathB], @(99));
+
+    [controller shutdown];
+}
+
+- (void)testCreateDataVersionFilterListCountMatchesNonNilEntriesAtScale
+{
+    MTRDeviceController * controller = nil;
+    MTRDevice * device = [self _dataVersionFilterTestDeviceAndController:&controller];
+
+    // 3 nil-versioned clusters interleaved with 3 committed clusters; resulting
+    // filter list count must be exactly 3 — stresses the *count = i fix at scale
+    // and catches a regression of the legacy *count = dataVersionFilterSize bug.
+    MTRClusterPath * nilPath1 = [MTRClusterPath clusterPathWithEndpointID:@(1) clusterID:@(0x401)];
+    MTRClusterPath * committedPath1 = [MTRClusterPath clusterPathWithEndpointID:@(1) clusterID:@(0x402)];
+    MTRClusterPath * nilPath2 = [MTRClusterPath clusterPathWithEndpointID:@(2) clusterID:@(0x403)];
+    MTRClusterPath * committedPath2 = [MTRClusterPath clusterPathWithEndpointID:@(2) clusterID:@(0x404)];
+    MTRClusterPath * nilPath3 = [MTRClusterPath clusterPathWithEndpointID:@(3) clusterID:@(0x405)];
+    MTRClusterPath * committedPath3 = [MTRClusterPath clusterPathWithEndpointID:@(3) clusterID:@(0x406)];
+
+    [device unitTestSetPersistedClusterData:@{
+        nilPath1 : [[MTRDeviceClusterData alloc] initWithDataVersion:nil attributes:@{}],
+        committedPath1 : [[MTRDeviceClusterData alloc] initWithDataVersion:@(10) attributes:@{}],
+        nilPath2 : [[MTRDeviceClusterData alloc] initWithDataVersion:nil attributes:@{}],
+        committedPath2 : [[MTRDeviceClusterData alloc] initWithDataVersion:@(20) attributes:@{}],
+        nilPath3 : [[MTRDeviceClusterData alloc] initWithDataVersion:nil attributes:@{}],
+        committedPath3 : [[MTRDeviceClusterData alloc] initWithDataVersion:@(30) attributes:@{}],
+    }];
+
+    NSDictionary<MTRClusterPath *, NSNumber *> * cached = [device unitTestGetCachedDataVersions];
+    NSDictionary<MTRClusterPath *, NSNumber *> * roundTripped = [device unitTestRoundTripDataVersionFilterListFromDictionary:cached];
+
+    XCTAssertEqual(roundTripped.count, 3u);
+    XCTAssertNil(roundTripped[nilPath1]);
+    XCTAssertNil(roundTripped[nilPath2]);
+    XCTAssertNil(roundTripped[nilPath3]);
+    XCTAssertEqualObjects(roundTripped[committedPath1], @(10));
+    XCTAssertEqualObjects(roundTripped[committedPath2], @(20));
+    XCTAssertEqualObjects(roundTripped[committedPath3], @(30));
+
+    [controller shutdown];
+}
+
+- (void)testCreateDataVersionFilterListInjectedNilEntryDoesNotProduceBogusZeroVersionFilter
+{
+    MTRDeviceController * controller = nil;
+    MTRDevice * device = [self _dataVersionFilterTestDeviceAndController:&controller];
+
+    // Failure injection: hand _createDataVersionFilterListFromDictionary an
+    // input dictionary subclass that returns nil for one enumerated key. Pre-fix,
+    // the dict-builder produced a DataVersion=0 filter for that entry AND the
+    // returned *count was the full input size (off-by-one). Post-fix, the entry
+    // is dropped and *count reflects only the committed cluster.
+    MTRClusterPath * pathReal = [MTRClusterPath clusterPathWithEndpointID:@(1) clusterID:@(0x501)];
+    MTRClusterPath * pathNilOnLookup = [MTRClusterPath clusterPathWithEndpointID:@(1) clusterID:@(0x502)];
+
+    MTRNilReturningDataVersionDictionary * malformed =
+        [[MTRNilReturningDataVersionDictionary alloc] initWithBacking:@{ pathReal : @(123), pathNilOnLookup : @(999) }
+                                                            nilForKey:pathNilOnLookup];
+
+    NSDictionary<MTRClusterPath *, NSNumber *> * roundTripped = [device unitTestRoundTripDataVersionFilterListFromDictionary:(NSDictionary *) malformed];
+
+    XCTAssertEqual(roundTripped.count, 1u);
+    XCTAssertEqualObjects(roundTripped[pathReal], @(123));
+    XCTAssertNil(roundTripped[pathNilOnLookup]);
+    // Critical: a bogus DataVersion=0 entry must NOT surface; pre-fix the
+    // off-by-one *count = dataVersionFilterSize would have leaked a zero-version
+    // filter that suppresses legitimate reports for the affected cluster.
+    XCTAssertNotEqualObjects(roundTripped[pathNilOnLookup], @(0));
+
+    [controller shutdown];
+}
+
+- (void)testCreateDataVersionFilterListBoundaryInputs
+{
+    MTRDeviceController * controller = nil;
+    MTRDevice * device = [self _dataVersionFilterTestDeviceAndController:&controller];
+
+    // Boundary input: nil-versioned cluster alongside @(0) and @(UINT32_MAX)
+    // committed clusters. Both extreme values must round-trip unchanged and
+    // the nil entry must be dropped.
+    MTRClusterPath * pathNil = [MTRClusterPath clusterPathWithEndpointID:@(1) clusterID:@(0x601)];
+    MTRClusterPath * pathZero = [MTRClusterPath clusterPathWithEndpointID:@(1) clusterID:@(0x602)];
+    MTRClusterPath * pathMax = [MTRClusterPath clusterPathWithEndpointID:@(1) clusterID:@(0x603)];
+
+    [device unitTestSetPersistedClusterData:@{
+        pathNil : [[MTRDeviceClusterData alloc] initWithDataVersion:nil attributes:@{}],
+        pathZero : [[MTRDeviceClusterData alloc] initWithDataVersion:@(0) attributes:@{}],
+        pathMax : [[MTRDeviceClusterData alloc] initWithDataVersion:@(UINT32_MAX) attributes:@{}],
+    }];
+
+    NSDictionary<MTRClusterPath *, NSNumber *> * cached = [device unitTestGetCachedDataVersions];
+    NSDictionary<MTRClusterPath *, NSNumber *> * roundTripped = [device unitTestRoundTripDataVersionFilterListFromDictionary:cached];
+
+    XCTAssertEqual(roundTripped.count, 2u);
+    XCTAssertNil(roundTripped[pathNil]);
+    XCTAssertEqualObjects(roundTripped[pathZero], @(0));
+    XCTAssertEqualObjects(roundTripped[pathMax], @(UINT32_MAX));
+
+    [controller shutdown];
+}
+
+- (void)testCreateDataVersionFilterListAllNilProducesEmptyList
+{
+    // Worst-case input that would trigger the (count == 0, list != nullptr)
+    // shape that VerifyOrDies inside MTRBaseSubscriptionCallback::OnDeallocatePaths.
+    // Plant several clusters all with nil dataVersion, then round-trip through
+    // both _getCachedDataVersions and _createDataVersionFilterListFromDictionary.
+    // The cached dict must be empty, and the round-tripped result must be empty
+    // — the underlying unitTestRoundTrip... helper delete[]s the list pointer
+    // regardless of count, so a leaked non-null buffer here would be caught
+    // by asan; more importantly, returning an empty round-trip proves the
+    // (i == 0) early-return branch fired and reset *dataVersionFilterList to
+    // nullptr instead of handing OnDeallocatePaths a dangling buffer.
+    MTRDeviceController * controller = nil;
+    MTRDevice * device = [self _dataVersionFilterTestDeviceAndController:&controller];
+
+    MTRClusterPath * pathA = [MTRClusterPath clusterPathWithEndpointID:@(1) clusterID:@(0x701)];
+    MTRClusterPath * pathB = [MTRClusterPath clusterPathWithEndpointID:@(1) clusterID:@(0x702)];
+    MTRClusterPath * pathC = [MTRClusterPath clusterPathWithEndpointID:@(2) clusterID:@(0x703)];
+
+    [device unitTestSetPersistedClusterData:@{
+        pathA : [[MTRDeviceClusterData alloc] initWithDataVersion:nil attributes:@{}],
+        pathB : [[MTRDeviceClusterData alloc] initWithDataVersion:nil attributes:@{}],
+        pathC : [[MTRDeviceClusterData alloc] initWithDataVersion:nil attributes:@{}],
+    }];
+
+    // _getCachedDataVersions must skip every nil-versioned cluster, producing
+    // the same empty-dict shape that triggers the early-return branch below.
+    NSDictionary<MTRClusterPath *, NSNumber *> * cached = [device unitTestGetCachedDataVersions];
+    XCTAssertEqual(cached.count, 0u);
+
+    // Round-tripping the empty cached dict must yield count == 0.
+    NSDictionary<MTRClusterPath *, NSNumber *> * roundTrippedFromCached = [device unitTestRoundTripDataVersionFilterListFromDictionary:cached];
+    XCTAssertEqual(roundTrippedFromCached.count, 0u);
+
+    // Empty input shortcut path also covered.
+    NSDictionary<MTRClusterPath *, NSNumber *> * roundTrippedEmpty = [device unitTestRoundTripDataVersionFilterListFromDictionary:@{}];
+    XCTAssertEqual(roundTrippedEmpty.count, 0u);
+
+    [controller shutdown];
 }
 
 @end

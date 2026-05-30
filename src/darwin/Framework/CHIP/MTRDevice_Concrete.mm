@@ -2754,11 +2754,24 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     NSMutableDictionary<MTRClusterPath *, NSNumber *> * dataVersions = [NSMutableDictionary dictionary];
     std::lock_guard lock(_lock);
 
+    NSUInteger skippedCount = 0;
     for (MTRClusterPath * path in [self _knownClusters]) {
-        dataVersions[path] = [self _clusterDataForPath:path].dataVersion;
+        // Per the Matter Interaction Model spec, a DataVersionFilter must
+        // only carry known-valid versions. A cluster whose committed
+        // dataVersion is nil (e.g. priming report did not include this
+        // cluster, or persistence restored partial state) must be omitted
+        // so the next SubscribeRequest performs a full read for it instead
+        // of silently suppressing reports.
+        NSNumber * dataVersion = [self _clusterDataForPath:path].dataVersion;
+        if (dataVersion == nil) {
+            MTR_LOG_DEBUG("%@ _getCachedDataVersions skipping cluster %@: no committed dataVersion", self, path);
+            ++skippedCount;
+            continue;
+        }
+        dataVersions[path] = dataVersion;
     }
 
-    MTR_LOG_DEBUG("%@ _getCachedDataVersions dataVersions count: %lu", self, static_cast<unsigned long>(dataVersions.count));
+    MTR_LOG("%@ _getCachedDataVersions: %lu of %lu known clusters have committed dataVersion, %lu skipped", self, (unsigned long) dataVersions.count, (unsigned long) (dataVersions.count + skippedCount), (unsigned long) skippedCount);
 
     return dataVersions;
 }
@@ -2874,11 +2887,31 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     size_t i = 0;
     for (MTRClusterPath * path in dataVersions) {
         NSNumber * dataVersionNumber = dataVersions[path];
+        // Defense in depth: _getCachedDataVersions is the only in-tree caller
+        // and already skips nil entries, but callers could pass a dictionary
+        // built elsewhere. A nil version here would produce an invalid filter
+        // entry (DataVersion=0) and silently suppress reports for that cluster.
+        if (dataVersionNumber == nil) {
+            MTR_LOG_ERROR("%@ _createDataVersionFilterListFromDictionary: skipping cluster %@ with nil dataVersion (caller bug - _getCachedDataVersions should filter these)", self, path);
+            continue;
+        }
         dataVersionFilterArray[i++] = DataVersionFilter(static_cast<chip::EndpointId>(path.endpoint.unsignedShortValue), static_cast<chip::ClusterId>(path.cluster.unsignedLongValue), static_cast<chip::DataVersion>(dataVersionNumber.unsignedLongValue));
     }
 
+    // If every entry was skipped (e.g. caller passed an all-nil dictionary),
+    // we must not return a non-null pointer with count == 0:
+    // MTRBaseSubscriptionCallback::OnDeallocatePaths VerifyOrDies on the
+    // (size == 0) <=> (pList == nullptr) invariant. Free the unused buffer
+    // and return the empty-list shape instead.
+    if (i == 0) {
+        delete[] dataVersionFilterArray;
+        *dataVersionFilterList = nullptr;
+        *count = 0;
+        return;
+    }
+
     *dataVersionFilterList = dataVersionFilterArray;
-    *count = dataVersionFilterSize;
+    *count = i;
 }
 
 - (void)_setupConnectivityMonitoring
@@ -4804,6 +4837,35 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     std::lock_guard lock(_lock);
 
     return [_persistedClusters containsObject:path];
+}
+
+- (NSDictionary<MTRClusterPath *, NSNumber *> *)unitTestGetCachedDataVersions
+{
+    return [self _getCachedDataVersions];
+}
+
+- (void)unitTestSetPersistedClusterData:(NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *)clusterData
+{
+    std::lock_guard lock(_lock);
+    for (MTRClusterPath * clusterPath in clusterData) {
+        [_persistedClusters addObject:clusterPath];
+        [_persistedClusterData setObject:clusterData[clusterPath] forKey:clusterPath];
+    }
+}
+
+- (NSDictionary<MTRClusterPath *, NSNumber *> *)unitTestRoundTripDataVersionFilterListFromDictionary:(NSDictionary<MTRClusterPath *, NSNumber *> *)dataVersions
+{
+    DataVersionFilter * filterList = nullptr;
+    size_t count = 0;
+    [self _createDataVersionFilterListFromDictionary:dataVersions dataVersionFilterList:&filterList count:&count];
+
+    NSMutableDictionary<MTRClusterPath *, NSNumber *> * result = [NSMutableDictionary dictionary];
+    for (size_t i = 0; i < count; ++i) {
+        auto * path = [MTRClusterPath clusterPathWithEndpointID:@(filterList[i].mEndpointId) clusterID:@(filterList[i].mClusterId)];
+        result[path] = @(filterList[i].mDataVersion.Value());
+    }
+    delete[] filterList;
+    return result;
 }
 #endif
 

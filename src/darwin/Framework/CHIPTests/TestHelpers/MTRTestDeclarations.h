@@ -102,6 +102,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSSet<MTRClusterPath *> *)unitTestGetPersistedClusters;
 - (BOOL)unitTestClusterHasBeenPersisted:(MTRClusterPath *)path;
 - (NSUInteger)unitTestAttributeCount;
+- (NSDictionary<MTRClusterPath *, NSNumber *> *)unitTestGetCachedDataVersions;
+- (void)unitTestSetPersistedClusterData:(NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *)clusterData;
+- (NSDictionary<MTRClusterPath *, NSNumber *> *)unitTestRoundTripDataVersionFilterListFromDictionary:(NSDictionary<MTRClusterPath *, NSNumber *> *)dataVersions;
 - (void)unitTestSyncRunOnDeviceQueue:(dispatch_block_t)block;
 @end
 #endif
