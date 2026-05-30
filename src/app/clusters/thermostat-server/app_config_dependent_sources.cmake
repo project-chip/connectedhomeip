@@ -23,7 +23,6 @@ TARGET_SOURCES(
     "${CLUSTER_DIR}/Setpoint.h"
     "${CLUSTER_DIR}/SetpointAttributes.h"
     "${CLUSTER_DIR}/SetpointAttributes.cpp"
-    "${CLUSTER_DIR}/SetpointLimits.cpp"
     "${CLUSTER_DIR}/SetpointLimits.h"
     "${CLUSTER_DIR}/SetpointRange.h"
     "${CLUSTER_DIR}/Setpoints.cpp"

@@ -48,6 +48,8 @@ public:
      */
     virtual temperature Temperature() const = 0;
 
+    virtual bool SetTemperature(temperature temp) = 0;
+
     /*
      * Return the mode of the setpoint.
      */
@@ -57,6 +59,9 @@ public:
      * Return the attribute id associated with the setpoint.
      */
     virtual chip::AttributeId AttributeId() const = 0;
+
+    virtual bool operator==(const Setpoint& other) const = 0;
+    virtual bool operator!=(const Setpoint& other) const = 0;
 };
 
 /*
@@ -69,8 +74,19 @@ public:
     chip::AttributeId AttributeId() const override { return mAttributeId; }
     SystemModeEnum Mode() const override;
 
+    static constexpr bool kIsFabricScoped = false;
+
+    bool operator==(const Setpoint& other) const override {
+        return isEqual(other);
+    }
+
+    bool operator!=(const Setpoint& other) const override {
+        return !isEqual(other);
+    }
+
 protected:
     chip::AttributeId mAttributeId;
+    virtual bool isEqual(const Setpoint& other) const = 0;
 };
 
 /*
@@ -81,6 +97,23 @@ class AbsoluteSetpoint : public BaseSetpoint
 public:
     AbsoluteSetpoint(chip::AttributeId attributeId, temperature value) : BaseSetpoint(attributeId), mTemperature(value) {}
     AbsoluteSetpoint(const AbsoluteSetpoint & other) : BaseSetpoint(other.mAttributeId), mTemperature(other.mTemperature) {}
+    AbsoluteSetpoint & operator=(const AbsoluteSetpoint & other) = default;
+
+    bool operator==(const AbsoluteSetpoint& other) const {
+        return this->mTemperature == other.mTemperature;
+    }
+
+    bool operator!=(const AbsoluteSetpoint& other) const {
+        return this->mTemperature != other.mTemperature;
+    }
+
+    CHIP_ERROR Encode(chip::TLV::TLVWriter & writer, chip::TLV::Tag tag) const {
+        return writer.Put(tag, mTemperature);
+    }
+
+    CHIP_ERROR Decode(chip::TLV::TLVReader & reader) {
+        return reader.Get(mTemperature);
+    }
 
     bool HasTemperature() const override { return true; }
     temperature Temperature() const override { return mTemperature; }
@@ -89,7 +122,13 @@ public:
      * Set the temperature value.
      * Returns true if the temperature was changed, false otherwise.
      */
-    bool SetTemperature(temperature temp);
+    bool SetTemperature(temperature temp) override;
+
+protected:
+    bool isEqual(const Setpoint& other) const override {
+        auto otherSetpoint = static_cast<const AbsoluteSetpoint*>(&other);
+        return otherSetpoint != nullptr && mTemperature == otherSetpoint->mTemperature;
+    }
 
 private:
     temperature mTemperature;
@@ -110,25 +149,42 @@ public:
         BaseSetpoint(other.mAttributeId), mAbsoluteSetpoint(absoluteSetpoint), mTemperature(other.mTemperature)
     {}
 
-    bool HasTemperature() const override { return mTemperature.HasValue(); }
-    temperature Temperature() const override
+    OptionalSetpoint(const OptionalSetpoint & other) = default;
+
+    OptionalSetpoint & operator=(const OptionalSetpoint & other)
     {
-        if (mTemperature.HasValue())
-            return mTemperature.Value();
-        return mAbsoluteSetpoint.Temperature();
+        if (this != &other)
+        {
+            BaseSetpoint::operator=(other);
+            mTemperature = other.mTemperature;
+        }
+        return *this;
     }
+
+    CHIP_ERROR Encode(chip::TLV::TLVWriter & writer, chip::TLV::Tag tag) const;
+
+    CHIP_ERROR Decode(chip::TLV::TLVReader & reader);
+
+    bool HasTemperature() const override { return mTemperature.HasValue(); }
+    temperature Temperature() const override;
 
     /*
      * Set the temperature value.
      * Returns true if the temperature was changed, false otherwise.
      */
-    bool SetTemperature(temperature temp);
+    bool SetTemperature(temperature temp) override;
 
     /*
      * Clear the temperature value.
      * Returns true if the temperature was cleared, false otherwise.
      */
     bool ClearTemperature();
+
+protected:
+    bool isEqual(const Setpoint& other) const override {
+        auto otherSetpoint = static_cast<const OptionalSetpoint*>(&other);
+        return otherSetpoint != nullptr && mTemperature == otherSetpoint->mTemperature;
+    }
 
 private:
     const AbsoluteSetpoint & mAbsoluteSetpoint;

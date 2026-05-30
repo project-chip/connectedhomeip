@@ -28,6 +28,7 @@
 #include "SetpointRange.h"
 #include "Setpoints.h"
 #include "Temperature.h"
+#include "app/data-model-provider/ActionReturnStatus.h"
 
 using namespace chip;
 using namespace chip::app;
@@ -150,15 +151,6 @@ bool Setpoints::Valid()
     return true;
 }
 
-/**
- * @brief Fix user limits if they are outside the absolute limits or are inverted
- * @param absoluteLimits The absolute limits for this setpoint mode.
- * @param userLimits The user limits to fix.
- * @param minAttribute The attribute ID of the minimum setpoint.
- * @param maxAttribute The attribute ID of the maximum setpoint.
- * @param changedAttributes Bit flags for attributes that were changed prior to this call
- * @param fixedAttributes Bit flags for attributes that were fixed by this call
- */
 void Setpoints::FixUserLimits(AbsoluteSetpointLimits & absoluteLimits, UserSetpointLimits & userLimits,
                               SetpointAttributes & changedAttributes, SetpointAttributes & fixedAttributes)
 {
@@ -201,15 +193,6 @@ void Setpoints::FixUserLimits(AbsoluteSetpointLimits & absoluteLimits, UserSetpo
     }
 }
 
-/**
- * @brief Fix the user limits to maintain the deadband
- * @param heatLimit The user heat limit.
- * @param coolLimit The user cool limit.
- * @param absoluteHeatLimit The absolute heat limit.
- * @param absoluteCoolLimit The absolute cool limit.
- * @param changedAttributes Bit flags for attributes that were changed prior to this call.
- * @param fixedAttributes Bit flags for attributes that were fixed by this call.
- */
 void Setpoints::FixUserLimitDeadband(OptionalSetpoint & heatLimit, OptionalSetpoint & coolLimit, temperature absoluteHeatLimit,
                                      temperature absoluteCoolLimit, SetpointAttributes & changedAttributes,
                                      SetpointAttributes & fixedAttributes)
@@ -356,12 +339,7 @@ void Setpoints::FixRange(SetpointRange & range, SetpointAttributes & changedAttr
     }
 }
 
-/**
- * @brief Attempt to fix any violations in the setpoints
- * @param changedAttributes Bit flags for attributes that were changed prior to this call
- * @return Status::Success if we were able to fix all violations, otherwise an error status code (e.g. Status::ConstraintError)
- */
-Status Setpoints::Fix(SetpointAttributes & changedAttributes)
+DataModel::ActionReturnStatus Setpoints::Fix(SetpointAttributes & changedAttributes)
 {
     if (Valid())
     {
@@ -392,7 +370,7 @@ Status Setpoints::Fix(SetpointAttributes & changedAttributes)
     return Valid() ? Status::Success : Status::ConstraintError;
 }
 
-Protocols::InteractionModel::Status Setpoints::ChangeRangeHeating(SetpointRange & range, temperature heat, ClampMode clamp,
+DataModel::ActionReturnStatus Setpoints::ChangeRangeHeating(SetpointRange & range, temperature heat, ClampMode clamp,
                                                                   SetpointAttributes & changedAttributes)
 {
     if (!heatSupported)
@@ -402,7 +380,7 @@ Protocols::InteractionModel::Status Setpoints::ChangeRangeHeating(SetpointRange 
     return ChangeRange(range, MakeOptional(heat), Optional<temperature>::Missing(), clamp, changedAttributes);
 }
 
-Protocols::InteractionModel::Status Setpoints::ChangeRangeCooling(SetpointRange & range, temperature cool, ClampMode clamp,
+DataModel::ActionReturnStatus Setpoints::ChangeRangeCooling(SetpointRange & range, temperature cool, ClampMode clamp,
                                                                   SetpointAttributes & changedAttributes)
 {
     if (!coolSupported)
@@ -412,12 +390,12 @@ Protocols::InteractionModel::Status Setpoints::ChangeRangeCooling(SetpointRange 
     return ChangeRange(range, Optional<temperature>::Missing(), MakeOptional(cool), clamp, changedAttributes);
 }
 
-Status Setpoints::ChangeRange(SetpointRange & range, Optional<temperature> heat, Optional<temperature> cool, ClampMode clamp,
+DataModel::ActionReturnStatus Setpoints::ChangeRange(SetpointRange & range, Optional<temperature> heat, Optional<temperature> cool, ClampMode clamp,
                               SetpointAttributes & changedAttributes)
 {
     if (!heat.HasValue() && !cool.HasValue())
     {
-        return Status::InvalidValue;
+        return Status::ConstraintError;
     }
     if (heatSupported && heat.HasValue())
     {
@@ -451,20 +429,20 @@ Status Setpoints::ChangeRange(SetpointRange & range, Optional<temperature> heat,
             changedAttributes.Set(range.cooling.AttributeId());
         }
     }
+    ChipLogProgress(Zcl, "Changed setpoint ranges, calling Fix");
     return Fix(changedAttributes);
 }
 
-Status Setpoints::ChangeLimitMinimum(UserSetpointLimits & userLimits, temperature min, SetpointAttributes & changedAttributes)
+DataModel::ActionReturnStatus Setpoints::ChangeLimitMinimum(UserSetpointLimits & userLimits,  AbsoluteSetpointLimits & absoluteLimits,temperature min, SetpointAttributes & changedAttributes)
 {
-    return ChangeLimits(userLimits, MakeOptional(min), Optional<temperature>::Missing(), changedAttributes);
+    return ChangeLimits(userLimits, absoluteLimits, MakeOptional(min), Optional<temperature>::Missing(), changedAttributes);
 }
 
-Status Setpoints::ChangeLimitMaximum(UserSetpointLimits & userLimits, temperature max, SetpointAttributes & changedAttributes)
+DataModel::ActionReturnStatus Setpoints::ChangeLimitMaximum(UserSetpointLimits & userLimits, AbsoluteSetpointLimits & absoluteLimits,temperature max, SetpointAttributes & changedAttributes)
 {
-    return ChangeLimits(userLimits, Optional<temperature>::Missing(), MakeOptional(max), changedAttributes);
+    return ChangeLimits(userLimits, absoluteLimits, Optional<temperature>::Missing(), MakeOptional(max), changedAttributes);
 }
-
-Status Setpoints::ChangeLimits(UserSetpointLimits & userLimits, Optional<temperature> min, Optional<temperature> max,
+DataModel::ActionReturnStatus Setpoints::ChangeLimits(UserSetpointLimits & userLimits, AbsoluteSetpointLimits & absoluteLimits, Optional<temperature> min, Optional<temperature> max,
                                SetpointAttributes & changedAttributes)
 {
     bool settingMin = min.HasValue();
@@ -476,7 +454,7 @@ Status Setpoints::ChangeLimits(UserSetpointLimits & userLimits, Optional<tempera
     }
     if (settingMin)
     {
-        if (!userLimits.absoluteLimits.Valid(min.Value()))
+        if (!absoluteLimits.Valid(min.Value()))
         {
             return Status::ConstraintError;
         }
@@ -487,7 +465,7 @@ Status Setpoints::ChangeLimits(UserSetpointLimits & userLimits, Optional<tempera
     }
     else
     {
-        if (!userLimits.absoluteLimits.Valid(max.Value()))
+        if (!absoluteLimits.Valid(max.Value()))
         {
             return Status::ConstraintError;
         }
@@ -499,8 +477,6 @@ Status Setpoints::ChangeLimits(UserSetpointLimits & userLimits, Optional<tempera
 
     return Fix(changedAttributes);
 }
-
-
 
 } // namespace Thermostat
 } // namespace Clusters

@@ -19,7 +19,6 @@ app_config_dependent_sources = [
   "Setpoint.h",
   "SetpointAttributes.cpp",
   "SetpointAttributes.h",
-  "SetpointLimits.cpp",
   "SetpointLimits.h",
   "SetpointRange.h",
   "Setpoints.cpp",

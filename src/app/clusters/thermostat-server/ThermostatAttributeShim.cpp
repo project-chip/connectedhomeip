@@ -166,7 +166,7 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, int16_t value)
         ChipLogError(Zcl, "No thermostat cluster found for endpoint %d", endpoint);
         return Protocols::InteractionModel::Status::UnsupportedEndpoint;
     }
-    return cluster->ChangeSetpointAttribute(Id, value);
+    return cluster->ChangeSetpointAttribute(Id, value).GetStatusCode().GetStatus();
 }
 } // namespace AbsMinHeatSetpointLimit
 
@@ -190,7 +190,7 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, int16_t value)
         ChipLogError(Zcl, "No thermostat cluster found for endpoint %d", endpoint);
         return Protocols::InteractionModel::Status::UnsupportedEndpoint;
     }
-    return cluster->ChangeSetpointAttribute(Id, value);
+    return cluster->ChangeSetpointAttribute(Id, value).GetStatusCode().GetStatus();
 }
 } // namespace AbsMaxHeatSetpointLimit
 
@@ -215,7 +215,7 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, int16_t value)
         ChipLogError(Zcl, "No thermostat cluster found for endpoint %d", endpoint);
         return Protocols::InteractionModel::Status::UnsupportedEndpoint;
     }
-    return cluster->ChangeSetpointAttribute(Id, value);
+    return cluster->ChangeSetpointAttribute(Id, value).GetStatusCode().GetStatus();
 }
 
 } // namespace OccupiedCoolingSetpoint
@@ -241,7 +241,7 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, int16_t value)
         ChipLogError(Zcl, "No thermostat cluster found for endpoint %d", endpoint);
         return Protocols::InteractionModel::Status::UnsupportedEndpoint;
     }
-    return cluster->ChangeSetpointAttribute(Id, value);
+    return cluster->ChangeSetpointAttribute(Id, value).GetStatusCode().GetStatus();
 }
 
 } // namespace OccupiedHeatingSetpoint
@@ -267,7 +267,7 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, int16_t value)
         ChipLogError(Zcl, "No thermostat cluster found for endpoint %d", endpoint);
         return Protocols::InteractionModel::Status::UnsupportedEndpoint;
     }
-    return cluster->ChangeSetpointAttribute(Id, value);
+    return cluster->ChangeSetpointAttribute(Id, value).GetStatusCode().GetStatus();
 }
 
 } // namespace UnoccupiedCoolingSetpoint
@@ -293,7 +293,7 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, int16_t value)
         ChipLogError(Zcl, "No thermostat cluster found for endpoint %d", endpoint);
         return Protocols::InteractionModel::Status::UnsupportedEndpoint;
     }
-    return cluster->ChangeSetpointAttribute(Id, value);
+    return cluster->ChangeSetpointAttribute(Id, value).GetStatusCode().GetStatus();
 }
 
 } // namespace UnoccupiedHeatingSetpoint

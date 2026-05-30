@@ -21,6 +21,7 @@
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/util/attribute-storage.h>
+#include <app/data-model-provider/ActionReturnStatus.h>
 #include <protocols/interaction_model/Constants.h>
 
 #include "Setpoint.h"
@@ -66,9 +67,9 @@ public:
         absoluteCoolLimits(AbsoluteSetpoint(Attributes::AbsMinCoolSetpointLimit::Id, kDefaultAbsMinCoolSetpointLimit),
                            AbsoluteSetpoint(Attributes::AbsMaxCoolSetpointLimit::Id, kDefaultAbsMaxCoolSetpointLimit)),
         userHeatLimits(OptionalSetpoint(Attributes::MinHeatSetpointLimit::Id, absoluteHeatLimits.minimum),
-                       OptionalSetpoint(Attributes::MaxHeatSetpointLimit::Id, absoluteHeatLimits.maximum), absoluteHeatLimits),
+                       OptionalSetpoint(Attributes::MaxHeatSetpointLimit::Id, absoluteHeatLimits.maximum)),
         userCoolLimits(OptionalSetpoint(Attributes::MinCoolSetpointLimit::Id, absoluteCoolLimits.minimum),
-                       OptionalSetpoint(Attributes::MaxCoolSetpointLimit::Id, absoluteCoolLimits.maximum), absoluteCoolLimits),
+                       OptionalSetpoint(Attributes::MaxCoolSetpointLimit::Id, absoluteCoolLimits.maximum)),
         occupied(AbsoluteSetpoint(Attributes::OccupiedHeatingSetpoint::Id, kDefaultHeatingSetpoint),
                  AbsoluteSetpoint(Attributes::OccupiedCoolingSetpoint::Id, kDefaultCoolingSetpoint)),
         unoccupied(AbsoluteSetpoint(Attributes::UnoccupiedHeatingSetpoint::Id, kDefaultHeatingSetpoint),
@@ -80,9 +81,14 @@ public:
         autoSupported(spl.autoSupported), heatSupported(spl.heatSupported), coolSupported(spl.coolSupported),
         occupancySupported(spl.occupancySupported), eventsSupported(spl.eventsSupported),
         absoluteHeatLimits(spl.absoluteHeatLimits), absoluteCoolLimits(spl.absoluteCoolLimits),
-        userHeatLimits(spl.userHeatLimits, absoluteHeatLimits), userCoolLimits(spl.userCoolLimits, absoluteCoolLimits),
+        userHeatLimits(OptionalSetpoint(spl.userHeatLimits.minimum, absoluteHeatLimits.minimum),
+                       OptionalSetpoint(spl.userHeatLimits.maximum, absoluteHeatLimits.maximum)),
+        userCoolLimits(OptionalSetpoint(spl.userCoolLimits.minimum, absoluteCoolLimits.minimum),
+                       OptionalSetpoint(spl.userCoolLimits.maximum, absoluteCoolLimits.maximum)),
         occupied(spl.occupied), unoccupied(spl.unoccupied), deadBand(spl.deadBand)
     {}
+
+    Setpoints & operator=(const Setpoints & other) = default;
 
     /*
     Checks to make sure that the setpoints follow the rules from the Matter spec
@@ -108,7 +114,7 @@ public:
      * @param changedAttributes The set of attributes changed by this operation.
      * @return The status of the operation.
      */
-    Protocols::InteractionModel::Status ChangeRangeHeating(SetpointRange & range, temperature heat, ClampMode clamp,
+    DataModel::ActionReturnStatus ChangeRangeHeating(SetpointRange & range, temperature heat, ClampMode clamp,
                                                            SetpointAttributes & changedAttributes);
 
     /**
@@ -120,7 +126,7 @@ public:
      * @param changedAttributes The set of attributes changed by this operation.
      * @return The status of the operation.
      */
-    Protocols::InteractionModel::Status ChangeRangeCooling(SetpointRange & range, temperature cool, ClampMode clamp,
+    DataModel::ActionReturnStatus ChangeRangeCooling(SetpointRange & range, temperature cool, ClampMode clamp,
                                                            SetpointAttributes & changedAttributes);
 
     /**
@@ -133,7 +139,7 @@ public:
      * @param changedAttributes The set of attributes changed by this operation.
      * @return The status of the operation.
      */
-    Protocols::InteractionModel::Status ChangeRange(SetpointRange & range, Optional<temperature> heat, Optional<temperature> cool,
+    DataModel::ActionReturnStatus ChangeRange(SetpointRange & range, Optional<temperature> heat, Optional<temperature> cool,
                                                     ClampMode clamp, SetpointAttributes & changedAttributes);
 
     /**
@@ -144,7 +150,7 @@ public:
      * @param changedAttributes The set of attributes changed by this operation.
      * @return The status of the operation.
      */
-    Protocols::InteractionModel::Status ChangeLimitMinimum(UserSetpointLimits & limits, temperature min,
+    DataModel::ActionReturnStatus ChangeLimitMinimum(UserSetpointLimits & limits, AbsoluteSetpointLimits & absoluteLimits, temperature min,
                                                            SetpointAttributes & changedAttributes);
 
     /**
@@ -155,7 +161,7 @@ public:
      * @param changedAttributes The set of attributes changed by this operation.
      * @return The status of the operation.
      */
-    Protocols::InteractionModel::Status ChangeLimitMaximum(UserSetpointLimits & limits, temperature max,
+    DataModel::ActionReturnStatus ChangeLimitMaximum(UserSetpointLimits & limits, AbsoluteSetpointLimits & absoluteLimits, temperature max,
                                                            SetpointAttributes & changedAttributes);
 
     /**
@@ -164,7 +170,7 @@ public:
      * @return The status of the operation; Success if the setpoints are now valid, ConstraintError if it was not possible to fix
      * them
      */
-    Protocols::InteractionModel::Status Fix(SetpointAttributes & changedAttributes);
+    DataModel::ActionReturnStatus Fix(SetpointAttributes & changedAttributes);
 
 private:
     /*
@@ -175,7 +181,7 @@ private:
     @param changedAttributes The set of attributes changed by this operation.
     @return The status of the operation; Success if the setpoints are now valid, ConstraintError if it was not possible to fix them
     */
-    Protocols::InteractionModel::Status ChangeLimits(UserSetpointLimits & limits, Optional<temperature> min,
+    DataModel::ActionReturnStatus ChangeLimits(UserSetpointLimits & limits, AbsoluteSetpointLimits & absoluteLimits, Optional<temperature> min,
                                                      Optional<temperature> max, SetpointAttributes & changedAttributes);
 
     /*

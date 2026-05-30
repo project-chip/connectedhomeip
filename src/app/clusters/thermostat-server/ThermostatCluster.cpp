@@ -76,7 +76,7 @@ CHIP_ERROR ThermostatCluster::Startup(ServerClusterContext & context)
     LoadSetpoints(mSetpoints, persistence);
 
     TEMPORARY_RETURN_IGNORED Server::GetInstance().GetFabricTable().AddFabricDelegate(this);
-    return CHIP_NO_ERROR;
+    return DefaultServerCluster::Startup(context);
 }
 
 void ThermostatCluster::Shutdown(ClusterShutdownType type)

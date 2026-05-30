@@ -21,6 +21,9 @@
 #include "ThermostatCluster.h"
 
 #include "Setpoints.h"
+#include "app/data-model-provider/ActionReturnStatus.h"
+#include "lib/support/Assertions.h"
+#include "protocols/interaction_model/StatusCode.h"
 #include <new>
 
 #include <app-common/zap-generated/attributes/Accessors.h>
@@ -41,7 +44,7 @@ namespace app {
 namespace Clusters {
 namespace Thermostat {
 
-Status ThermostatCluster::HandleSetpointChange(Setpoints & setpoints, const AttributeId attributeId,
+DataModel::ActionReturnStatus ThermostatCluster::HandleSetpointChange(Setpoints & setpoints, const AttributeId attributeId,
                                                temperature value,
                                                SetpointAttributes & changedAttributes)
 {
@@ -66,19 +69,19 @@ Status ThermostatCluster::HandleSetpointChange(Setpoints & setpoints, const Attr
     case MinHeatSetpointLimit::Id:
         if (!setpoints.heatSupported)
             return Status::UnsupportedAttribute;
-        return setpoints.ChangeLimitMinimum(setpoints.userHeatLimits, value, changedAttributes);
+        return setpoints.ChangeLimitMinimum(setpoints.userHeatLimits, setpoints.absoluteHeatLimits, value, changedAttributes);
     case MaxHeatSetpointLimit::Id:
         if (!setpoints.heatSupported)
             return Status::UnsupportedAttribute;
-        return setpoints.ChangeLimitMaximum(setpoints.userHeatLimits, value, changedAttributes);
+        return setpoints.ChangeLimitMaximum(setpoints.userHeatLimits, setpoints.absoluteHeatLimits, value, changedAttributes);
     case MinCoolSetpointLimit::Id:
         if (!setpoints.coolSupported)
             return Status::UnsupportedAttribute;
-        return setpoints.ChangeLimitMinimum(setpoints.userCoolLimits, value, changedAttributes);
+        return setpoints.ChangeLimitMinimum(setpoints.userCoolLimits, setpoints.absoluteCoolLimits, value, changedAttributes);
     case MaxCoolSetpointLimit::Id:
         if (!setpoints.coolSupported)
             return Status::UnsupportedAttribute;
-        return setpoints.ChangeLimitMaximum(setpoints.userCoolLimits, value, changedAttributes);
+        return setpoints.ChangeLimitMaximum(setpoints.userCoolLimits, setpoints.absoluteCoolLimits, value, changedAttributes);
     case MinSetpointDeadBand::Id:
         return Status::Success;
     default:
@@ -137,11 +140,13 @@ DataModel::ActionReturnStatus ThermostatCluster::SetpointRaiseLower(const Comman
 
     SetpointAttributes changedAttributes;
     auto status = setpoints.ChangeRange(range, heat, cool, Setpoints::ClampMode::kClamp, changedAttributes);
-    if (status == Status::Success)
+    if (status != Status::Success)
     {
-        mSetpoints.~Setpoints();
-        new (&mSetpoints) Setpoints(setpoints);
-        return SaveSetpoints(setpoints, changedAttributes);
+        return status;
+    }
+    status = SaveSetpoints(setpoints, changedAttributes);
+    if (status == Protocols::InteractionModel::Status::Success) {
+        mSetpoints = setpoints;
     }
 
     return status;
@@ -240,108 +245,92 @@ Protocols::InteractionModel::Status ThermostatCluster::LoadSetpoints(Setpoints &
     return Status::Success;
 }
 
-#define ReturnStatusOnFailure(expr)                                                                                                \
-    do                                                                                                                             \
-    {                                                                                                                              \
-        auto __status = StatusIB(expr);                                                                                            \
-        if (!__status.IsSuccess())                                                                                                 \
-        {                                                                                                                          \
-            return __status.mStatus;                                                                                               \
-        }                                                                                                                          \
-    } while (false)
+Protocols::InteractionModel::Status ThermostatCluster::SaveSetpoint(Setpoint & oldSetpoint, Setpoint & newSetpoint) {
+    VerifyOrReturnValue(oldSetpoint.AttributeId() == newSetpoint.AttributeId(), Status::InvalidCommand);
+    VerifyOrReturnValue(oldSetpoint.Temperature() != newSetpoint.Temperature(), Status::Success);
+    temperature newTemp = newSetpoint.Temperature();
+    auto status = mContext->attributeStorage.WriteValue(
+        ConcreteAttributePath(mPath.mEndpointId, Thermostat::Id, oldSetpoint.AttributeId()), ByteSpan(reinterpret_cast<const uint8_t *>(&newTemp), sizeof(newTemp)));
+    if (status != CHIP_NO_ERROR) {
+        return chip::Protocols::InteractionModel::ClusterStatusCode(status).GetStatus();
+    }
+    GenerateSetpointEvent(oldSetpoint.AttributeId(), oldSetpoint.Temperature(), newSetpoint.Temperature());
+    oldSetpoint.SetTemperature(newSetpoint.Temperature());
+    return Status::Success;
+}
 
-Protocols::InteractionModel::Status ThermostatCluster::SaveSetpoints(Setpoints setpoints,
+DataModel::ActionReturnStatus ThermostatCluster::SaveSetpoints(Setpoints & setpoints,
                                                                      SetpointAttributes changedAttributes)
 {
-    EndpointId endpoint = mPath.mEndpointId;
+    if (!setpoints.Valid()) {
+        return Status::ConstraintError;
+    }
 
-    if (changedAttributes.Has(OccupiedHeatingSetpoint::Id))
-    {
-        int16_t value = setpoints.occupied.heating.Temperature();
-        ReturnStatusOnFailure(
-            mContext->attributeStorage.WriteValue({ endpoint, Thermostat::Id, OccupiedHeatingSetpoint::Id },
-                                                  ByteSpan(reinterpret_cast<const uint8_t *>(&value), sizeof(value))));
-        NotifyAttributeChanged(OccupiedHeatingSetpoint::Id);
-    }
-    if (changedAttributes.Has(OccupiedCoolingSetpoint::Id))
-    {
-        int16_t value = setpoints.occupied.cooling.Temperature();
-        ReturnStatusOnFailure(
-            mContext->attributeStorage.WriteValue({ endpoint, Thermostat::Id, OccupiedCoolingSetpoint::Id },
-                                                  ByteSpan(reinterpret_cast<const uint8_t *>(&value), sizeof(value))));
-        NotifyAttributeChanged(OccupiedCoolingSetpoint::Id);
-    }
-    if (setpoints.occupancySupported)
-    {
-        if (changedAttributes.Has(UnoccupiedHeatingSetpoint::Id))
-        {
-            int16_t value = setpoints.unoccupied.heating.Temperature();
-            ReturnStatusOnFailure(
-                mContext->attributeStorage.WriteValue({ endpoint, Thermostat::Id, UnoccupiedHeatingSetpoint::Id },
-                                                      ByteSpan(reinterpret_cast<const uint8_t *>(&value), sizeof(value))));
-            NotifyAttributeChanged(UnoccupiedHeatingSetpoint::Id);
-        }
-        if (changedAttributes.Has(UnoccupiedCoolingSetpoint::Id))
-        {
-            int16_t value = setpoints.unoccupied.cooling.Temperature();
-            ReturnStatusOnFailure(
-                mContext->attributeStorage.WriteValue({ endpoint, Thermostat::Id, UnoccupiedCoolingSetpoint::Id },
-                                                      ByteSpan(reinterpret_cast<const uint8_t *>(&value), sizeof(value))));
-            NotifyAttributeChanged(UnoccupiedCoolingSetpoint::Id);
-        }
-    }
+    Status status;
     if (setpoints.heatSupported)
     {
         if (changedAttributes.Has(MinHeatSetpointLimit::Id) && setpoints.userHeatLimits.minimum.HasTemperature())
         {
-            int16_t value = setpoints.userHeatLimits.minimum.Temperature();
-            ReturnStatusOnFailure(
-                mContext->attributeStorage.WriteValue({ endpoint, Thermostat::Id, MinHeatSetpointLimit::Id },
-                                                      ByteSpan(reinterpret_cast<const uint8_t *>(&value), sizeof(value))));
-            NotifyAttributeChanged(MinHeatSetpointLimit::Id);
+            status = SaveSetpoint(mSetpoints.userHeatLimits.minimum, setpoints.userHeatLimits.minimum);
+            VerifyOrReturnValue(status == Status::Success, status);
         }
         if (changedAttributes.Has(MaxHeatSetpointLimit::Id) && setpoints.userHeatLimits.maximum.HasTemperature())
         {
-            int16_t value = setpoints.userHeatLimits.maximum.Temperature();
-            ReturnStatusOnFailure(
-                mContext->attributeStorage.WriteValue({ endpoint, Thermostat::Id, MaxHeatSetpointLimit::Id },
-                                                      ByteSpan(reinterpret_cast<const uint8_t *>(&value), sizeof(value))));
-            NotifyAttributeChanged(MaxHeatSetpointLimit::Id);
+            status = SaveSetpoint(mSetpoints.userHeatLimits.maximum, setpoints.userHeatLimits.maximum);
+            VerifyOrReturnValue(status == Status::Success, status);
         }
+        if (changedAttributes.Has(OccupiedHeatingSetpoint::Id))
+        {
+            status = SaveSetpoint(mSetpoints.occupied.heating, setpoints.occupied.heating);
+            VerifyOrReturnValue(status == Status::Success, status);
+        }
+        if (setpoints.occupancySupported)
+        {
+            if (changedAttributes.Has(UnoccupiedHeatingSetpoint::Id))
+            {
+                status = SaveSetpoint(mSetpoints.unoccupied.heating, setpoints.unoccupied.heating);
+                VerifyOrReturnValue(status == Status::Success, status);
+            }
+        }   
     }
     if (setpoints.coolSupported)
     {
         if (changedAttributes.Has(MinCoolSetpointLimit::Id) && setpoints.userCoolLimits.minimum.HasTemperature())
         {
-            int16_t value = setpoints.userCoolLimits.minimum.Temperature();
-            ReturnStatusOnFailure(
-                mContext->attributeStorage.WriteValue({ endpoint, Thermostat::Id, MinCoolSetpointLimit::Id },
-                                                      ByteSpan(reinterpret_cast<const uint8_t *>(&value), sizeof(value))));
-            NotifyAttributeChanged(MinCoolSetpointLimit::Id);
+            status = SaveSetpoint(mSetpoints.userCoolLimits.minimum, setpoints.userCoolLimits.minimum);
+            VerifyOrReturnValue(status == Status::Success, status);
         }
         if (changedAttributes.Has(MaxCoolSetpointLimit::Id) && setpoints.userCoolLimits.maximum.HasTemperature())
         {
-            int16_t value = setpoints.userCoolLimits.maximum.Temperature();
-            ReturnStatusOnFailure(
-                mContext->attributeStorage.WriteValue({ endpoint, Thermostat::Id, MaxCoolSetpointLimit::Id },
-                                                      ByteSpan(reinterpret_cast<const uint8_t *>(&value), sizeof(value))));
-            NotifyAttributeChanged(MaxCoolSetpointLimit::Id);
+            status = SaveSetpoint(mSetpoints.userCoolLimits.maximum, setpoints.userCoolLimits.maximum);
+            VerifyOrReturnValue(status == Status::Success, status);
         }
+        if (changedAttributes.Has(OccupiedCoolingSetpoint::Id))
+        {
+            status = SaveSetpoint(mSetpoints.occupied.cooling, setpoints.occupied.cooling);
+            VerifyOrReturnValue(status == Status::Success, status);
+        }
+        if (setpoints.occupancySupported)
+        {
+            if (changedAttributes.Has(UnoccupiedCoolingSetpoint::Id))
+            {
+                status = SaveSetpoint(mSetpoints.unoccupied.cooling, setpoints.unoccupied.cooling);
+                VerifyOrReturnValue(status == Status::Success, status);
+            }
+        } 
     }
     return Status::Success;
 }
 
-Protocols::InteractionModel::Status ThermostatCluster::ChangeSetpointAttribute(const AttributeId attributeId, int16_t temperature)
+DataModel::ActionReturnStatus ThermostatCluster::ChangeSetpointAttribute(const AttributeId attributeId, temperature temp)
 {
     Setpoints setpoints = mSetpoints;
     SetpointAttributes changedAttributes;
 
-    auto status = HandleSetpointChange(setpoints, attributeId, temperature, changedAttributes);
+    auto status = HandleSetpointChange(setpoints, attributeId, temp, changedAttributes);
     if (status == Status::Success)
     {
-        mSetpoints.~Setpoints();
-        new (&mSetpoints) Setpoints(setpoints);
-        return SaveSetpoints(setpoints, changedAttributes);
+        status = SaveSetpoints(setpoints, changedAttributes);
     }
     return status;
 }
