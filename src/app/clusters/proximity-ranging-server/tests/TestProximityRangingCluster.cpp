@@ -672,6 +672,33 @@ TEST_F(TestProximityRangingCluster, TestStartRangingTriggerIntervalZero)
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
+TEST_F(TestProximityRangingCluster, TestStartRangingReportingMinDistanceGreaterThanMax)
+{
+    TestServerClusterContext context;
+    MockRangingAdapter bleAdapter(RangingTechEnum::kBLEBeaconRSSIRanging);
+    RangingAdapter * adapters[] = { &bleAdapter };
+    ProximityRangingDriver driver{ Span<RangingAdapter * const>(adapters) };
+
+    ProximityRangingCluster cluster(
+        kTestEndpointId, ProximityRangingCluster::Config(driver).WithFeatures(BitMask<Feature>{ Feature::kBleBeaconRssi }));
+    ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+    ClusterTester tester(cluster);
+
+    auto request = MakeValidBleBeaconRequest();
+    Structs::ReportingConditionStruct::Type rc;
+    rc.minDistanceCondition.SetValue(500);
+    rc.maxDistanceCondition.SetValue(100);
+    request.reportingCondition.SetValue(rc);
+
+    auto result = tester.Invoke(request);
+    ASSERT_TRUE(result.IsSuccess());
+    ASSERT_TRUE(result.response.has_value());
+    EXPECT_EQ(result.response.value().resultCode, ResultCodeEnum::kRejectedInfeasibleRanging);
+    EXPECT_EQ(bleAdapter.mStartCalls, 0);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
 TEST_F(TestProximityRangingCluster, TestStopRangingSuccess)
 {
     TestServerClusterContext context;
