@@ -57,8 +57,8 @@ import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
 from matter.interaction_model import Status
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches
-from matter.testing.matter_asserts import (assert_int_in_range, assert_valid_bool, assert_valid_enum,
-                                           assert_valid_int64, assert_valid_uint16)
+from matter.testing.matter_asserts import (assert_int_in_range, assert_valid_bool, assert_valid_enum, assert_valid_int64,
+                                           assert_valid_uint16)
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import TestStep, default_matter_test_main
 
