@@ -481,7 +481,7 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
         {
             return CommissioningStage::kCleanup;
         }
-        return CommissioningStage::kEvictPreviousCaseSessions;
+        return GetInitialPhaseCompleteStage();
     case CommissioningStage::kScanNetworks:
     case CommissioningStage::kRequestWiFiCredentials:
     case CommissioningStage::kRequestThreadCredentials:
@@ -503,35 +503,19 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
             return CommissioningStage::kCleanup;
         }
         SetCASEFailsafeTimerIfNeeded();
-        return CommissioningStage::kEvictPreviousCaseSessions;
+        return GetInitialPhaseCompleteStage();
     case CommissioningStage::kThreadNetworkEnable:
         SetCASEFailsafeTimerIfNeeded();
         if (mParams.GetSkipCommissioningComplete().ValueOr(false))
         {
             return CommissioningStage::kCleanup;
         }
+        return GetInitialPhaseCompleteStage();
+    case CommissioningStage::kUnpoweredInitialPhaseComplete:
+        return CommissioningStage::kCleanup; // End commissioning (initial phase)
+    case CommissioningStage::kPoweredInitialPhaseComplete:
         return CommissioningStage::kEvictPreviousCaseSessions;
     case CommissioningStage::kEvictPreviousCaseSessions:
-#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
-        // If there is no secure session, means commissioning has been continued after the unpowered phase was completed
-        // In such case, move on setup the CASE session over operational network
-        if (!mCommissioneeDeviceProxy->GetSecureSession().HasValue())
-        {
-            return CommissioningStage::kFindOperationalForStayActive;
-        }
-
-        // If the transport is NFC, move to unpowered phase complete to end the first phase of commissioning
-        if (mCommissioneeDeviceProxy->GetSecureSession().Value()->AsSecureSession()->GetPeerAddress().GetTransportType() ==
-                Transport::Type::kNfc &&
-            mDeviceCommissioningInfo.general.isCommissioningWithoutPower)
-        {
-            return CommissioningStage::kUnpoweredInitialPhaseComplete;
-        }
-#endif
-        return CommissioningStage::kPoweredInitialPhaseComplete;
-    case CommissioningStage::kUnpoweredInitialPhaseComplete:
-        return CommissioningStage::kCleanup; // End commissioning (phase 1)
-    case CommissioningStage::kPoweredInitialPhaseComplete:
         return CommissioningStage::kFindOperationalForStayActive;
     case CommissioningStage::kPrimaryOperationalNetworkFailed:
         if (mDeviceCommissioningInfo.network.wifi.endpoint == kRootEndpointId)
