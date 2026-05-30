@@ -214,7 +214,7 @@ struct CMAFContainerOptionsStorage : public CMAFContainerOptionsStruct
         sessionGroup    = aCMAFContainerOptions.sessionGroup;
 
         if (aCMAFContainerOptions.trackName.HasValue()) {
-            
+
             MutableCharSpan trackNameBuffer(mTrackNameBuffer);
             // ValidateIncomingTransportOptions() function already checked the trackName length
             CopyCharSpanToMutableCharSpanWithTruncation(aCMAFContainerOptions.trackName.Value(), trackNameBuffer);
