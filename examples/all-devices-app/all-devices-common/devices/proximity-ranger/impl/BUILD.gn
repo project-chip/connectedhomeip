@@ -21,8 +21,9 @@ source_set("logging") {
     "LoggingRangingAdapter.h",
   ]
 
-  public_configs =
-      [ "${chip_root}/examples/all-devices-app/all-devices-common/devices:includes" ]
+  public_configs = [
+    "${chip_root}/examples/all-devices-app/all-devices-common/devices:includes",
+  ]
 
   public_deps = [
     "${chip_root}/src/app/clusters/proximity-ranging-server",
