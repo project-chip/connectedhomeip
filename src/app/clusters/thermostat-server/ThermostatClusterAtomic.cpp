@@ -78,7 +78,7 @@ void ClearTimer(AtomicWriteSession * session)
  *
  * @param[in] commandObj The command handler object.
  *
- * @return The scoped node id of the source node. If the scoped node id is not retreived, return ScopedNodeId().
+ * @return The scoped node id of the source node. If the scoped node id is not retrieved, return ScopedNodeId().
  */
 ScopedNodeId GetSourceScopedNodeId(CommandHandler * commandObj)
 {

@@ -40,7 +40,7 @@ async def _IsNodeInFabricList(devCtrl, nodeId):
 
 async def GrantPrivilege(adminCtrl: ChipDeviceController, grantedCtrl: ChipDeviceController,
                          privilege: Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum,
-                         targetNodeId: int, targetCatTags: typing.List[int] = []):
+                         targetNodeId: int, targetCatTags: list[int] = []):
     ''' Given an existing controller with admin privileges over a target node, grants the specified privilege
         to the new ChipDeviceController instance to the entire Node. This is achieved
         by updating the ACL entries on the target.
@@ -112,11 +112,11 @@ async def GrantPrivilege(adminCtrl: ChipDeviceController, grantedCtrl: ChipDevic
 
 async def CreateControllersOnFabric(fabricAdmin: FabricAdmin,
                                     adminDevCtrl: ChipDeviceController,
-                                    controllerNodeIds: typing.List[int],
+                                    controllerNodeIds: list[int],
                                     privilege: Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum,
                                     targetNodeId: int,
-                                    catTags: typing.List[int] = [],
-                                    paaTrustStorePath: str = "") -> typing.List[ChipDeviceController]:
+                                    catTags: list[int] = [],
+                                    paaTrustStorePath: str = "") -> list[ChipDeviceController]:
     ''' Create new ChipDeviceController instances on a given fabric with a specific privilege on a target node.
 
         Args:

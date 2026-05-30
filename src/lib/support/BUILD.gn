@@ -263,6 +263,7 @@ static_library("support") {
     "BytesToHex.h",
     "CHIPCounter.h",
     "CHIPMemString.h",
+    "CharSpanToStdString.h",
     "CommonIterator.h",
     "CommonPersistentData.h",
     "DLLUtil.h",
