@@ -385,13 +385,19 @@ void LoggingRangingAdapter::StopAllSessions()
 {
     while (!mSessions.empty())
     {
-        Session & session = *mSessions.back();
-        mTimerDelegate.CancelTimer(&session);
+        // Capture the sessionId locally because mSessions.pop_back()
+        // destroys the back element; we then erase before invoking the
+        // callback so any synchronous query of the active session list
+        // observes a consistent state. Same ordering as StopSession and
+        // TerminateSession.
+        uint8_t sessionId = mSessions.back()->sessionId;
+        mTimerDelegate.CancelTimer(mSessions.back().get());
+        mSessions.pop_back();
+
         if (mCallback != nullptr)
         {
-            mCallback->OnRangingSessionStopped(session.sessionId, RangingSessionStatusEnum::kSessionEndTimeReached);
+            mCallback->OnRangingSessionStopped(sessionId, RangingSessionStatusEnum::kSessionEndTimeReached);
         }
-        mSessions.pop_back();
     }
 }
 
