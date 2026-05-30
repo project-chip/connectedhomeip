@@ -240,7 +240,7 @@ public:
 
     /**
      * @brief
-     *   Called when the initial stage of commissioning is completed.
+     *   Called when the initial phase of commissioning is completed.
      *
      * @param[in] peerId an identifier for the commissioning process.  This is the actual
      *                   NodeID of the node, combined with the compressed fabric ID for
@@ -248,7 +248,7 @@ public:
      * @param[in] transportType the transport type of the commissioning channel used for the initial phase of commissioning.
      * @param[in] isUnpowered true if the device was unpowered during the initial phase of commissioning, false otherwise     *
      */
-    virtual void OnInitialStageComplete(PeerId peerId, Transport::Type transportType, bool isUnpowered) {}
+    virtual void OnInitialPhaseComplete(PeerId peerId, Transport::Type transportType, bool isUnpowered) {}
 };
 
 } // namespace Controller
