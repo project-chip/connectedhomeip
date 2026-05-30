@@ -525,13 +525,27 @@ ResolveContext::ResolveContext(DiscoverNodeDelegate * delegate, chip::Inet::IPAd
 void ResolveContext::DispatchFailure(const char * errorStr, CHIP_ERROR err)
 {
     ChipLogError(Discovery, "Mdns: Resolve failure (%s)", errorStr);
+    // If a deferred teardown timer was scheduled against us, cancel it so it
+    // doesn't fire after we are deleted.
+    CancelDeferredTeardownIfScheduled(this);
     // Remove before dispatching, so calls back into
     // ChipDnssdResolveNoLongerNeeded don't find us and try to also remove us.
     bool needDelete = MdnsContexts::GetInstance().RemoveWithoutDeleting(this);
 
     if (nullptr == callback)
     {
-        // Nothing to do.
+        // Delegate-based ResolveContext (no DnssdResolveCallback). The
+        // deferred-teardown rescue/coalesce path can dispatch
+        // CHIP_ERROR_CANCELLED here long after the consumer thinks the
+        // resolve has gone away, but the delegate API has no failure-signal
+        // hook. Log so the silent drop is at least observable in the field.
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Discovery,
+                         "Mdns: Delegate-based resolve %s failed with %" CHIP_ERROR_FORMAT
+                         " -- no delegate failure callback exists; silently dropping",
+                         instanceName.c_str(), err.Format());
+        }
     }
     else
     {
@@ -546,6 +560,9 @@ void ResolveContext::DispatchFailure(const char * errorStr, CHIP_ERROR err)
 
 void ResolveContext::DispatchSuccess()
 {
+    // If a deferred teardown timer was scheduled against us, cancel it so it
+    // doesn't fire after we are deleted.
+    CancelDeferredTeardownIfScheduled(this);
     // Remove before dispatching, so calls back into
     // ChipDnssdResolveNoLongerNeeded don't find us and try to also remove us.
     bool needDelete = MdnsContexts::GetInstance().RemoveWithoutDeleting(this);
