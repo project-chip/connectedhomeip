@@ -19,10 +19,10 @@ The cluster handles:
 
 -   Matter protocol interactions (attribute reads, command dispatch)
 -   Feature map ownership (immutable, set at construction via Config)
--   Spec preflight validation of `StartRangingRequest` (technology in feature
-    map, matching `DeviceRoleConfig` present, role enum within the matching
-    family, trigger and reporting-condition constraints) before any request
-    reaches the driver
+-   Spec early validation of `StartRangingRequest` (technology in feature map,
+    matching `DeviceRoleConfig` present, role enum within the matching family,
+    trigger and reporting-condition constraints) before any request reaches the
+    driver
 -   Event emission for ranging results and session status changes
 -   Attribute change notifications from the driver
 
@@ -184,7 +184,7 @@ composition errors are configuration bugs. Up to
 `CHIP_CONFIG_PROXIMITY_RANGING_MAX_SESSIONS` concurrent sessions are supported
 across all adapters.
 
-## Preflight Validation
+## Early Validation
 
 `HandleStartRangingRequest` runs spec-derived validation before invoking the
 driver. A request is rejected with `kRejectedInfeasibleRanging` if any of the
@@ -204,7 +204,7 @@ Trigger-shape violations are rejected with `kRejectedInfeasibleRangingTriggers`:
 -   `Trigger.RangingInstanceInterval == 0` (when present).
 
 Adapters can rely on these checks and only need to handle technology-specific
-infeasibility (e.g., requested frequency band unsupported by hardware).
+limitations (e.g., requested frequency band unsupported by hardware).
 
 ## Command Flow
 
