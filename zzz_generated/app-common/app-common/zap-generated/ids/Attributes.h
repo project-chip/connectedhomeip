@@ -65,6 +65,7 @@
 #include <clusters/ElectricalEnergyMeasurement/AttributeIds.h>
 #include <clusters/ElectricalGridConditions/AttributeIds.h>
 #include <clusters/ElectricalPowerMeasurement/AttributeIds.h>
+#include <clusters/ElectricalProtectionAlarm/AttributeIds.h>
 #include <clusters/EnergyEvse/AttributeIds.h>
 #include <clusters/EnergyEvseMode/AttributeIds.h>
 #include <clusters/EnergyPreference/AttributeIds.h>
