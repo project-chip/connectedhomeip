@@ -88,7 +88,34 @@ public:
         occupied(spl.occupied), unoccupied(spl.unoccupied), deadBand(spl.deadBand)
     {}
 
-    Setpoints & operator=(const Setpoints & other) = default;
+    Setpoints & operator=(const Setpoints & other)
+    {
+        if (this == &other)
+        {
+            return *this;
+        }
+
+        autoSupported      = other.autoSupported;
+        heatSupported      = other.heatSupported;
+        coolSupported      = other.coolSupported;
+        occupancySupported = other.occupancySupported;
+        eventsSupported    = other.eventsSupported;
+
+        absoluteHeatLimits = other.absoluteHeatLimits;
+        absoluteCoolLimits = other.absoluteCoolLimits;
+
+        userHeatLimits = UserSetpointLimits(OptionalSetpoint(other.userHeatLimits.minimum, absoluteHeatLimits.minimum),
+                                            OptionalSetpoint(other.userHeatLimits.maximum, absoluteHeatLimits.maximum));
+
+        userCoolLimits = UserSetpointLimits(OptionalSetpoint(other.userCoolLimits.minimum, absoluteCoolLimits.minimum),
+                                            OptionalSetpoint(other.userCoolLimits.maximum, absoluteCoolLimits.maximum));
+
+        occupied   = other.occupied;
+        unoccupied = other.unoccupied;
+        deadBand   = other.deadBand;
+
+        return *this;
+    }
 
     /*
     Checks to make sure that the setpoints follow the rules from the Matter spec
