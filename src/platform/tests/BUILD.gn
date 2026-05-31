@@ -99,6 +99,10 @@ if (chip_device_platform != "none") {
     if (chip_device_platform == "linux") {
       test_sources += [ "TestConnectivityMgr.cpp" ]
     }
+
+    if (chip_device_platform == "darwin") {
+      test_sources += [ "TestDarwinDnssdError.cpp" ]
+    }
   }
 } else {
   import("${chip_root}/build/chip/chip_test_group.gni")
