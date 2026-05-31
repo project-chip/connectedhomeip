@@ -27,7 +27,6 @@
 #include <app/server-cluster/ServerClusterInterfaceRegistry.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 
-
 using namespace chip::app::Clusters::SmokeCoAlarm;
 namespace chip {
 namespace app {
