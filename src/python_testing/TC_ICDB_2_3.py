@@ -101,8 +101,6 @@ class TC_ICDB_2_3(ICDBaseTest):
             thread_operational_dataset=self.matter_test_config.thread_operational_dataset,
             wifi_passphrase=self.matter_test_config.wifi_passphrase,
             wifi_ssid=self.matter_test_config.wifi_ssid,
-            tc_version_to_simulate=self.matter_test_config.tc_version_to_simulate,
-            tc_user_response_to_simulate=self.matter_test_config.tc_user_response_to_simulate,
             thread_ba_host=self.matter_test_config.thread_ba_host,
             thread_ba_port=self.matter_test_config.thread_ba_port,
         )
