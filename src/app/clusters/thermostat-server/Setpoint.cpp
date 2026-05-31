@@ -46,7 +46,7 @@ bool OptionalSetpoint::ClearTemperature()
     return changed;
 }
 
-SystemModeEnum BaseSetpoint::Mode() const
+SystemModeEnum Setpoint::Mode() const
 {
     switch (mAttributeId)
     {

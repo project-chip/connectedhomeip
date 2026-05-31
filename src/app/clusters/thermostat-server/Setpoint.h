@@ -36,6 +36,7 @@ namespace Thermostat {
 class Setpoint
 {
 public:
+    Setpoint(chip::AttributeId attributeId) : mAttributeId(attributeId) {}
     virtual ~Setpoint() = default;
 
     /*
@@ -53,32 +54,15 @@ public:
     /*
      * Return the mode of the setpoint.
      */
-    virtual SystemModeEnum Mode() const = 0;
+    SystemModeEnum Mode() const;
 
     /*
      * Return the attribute id associated with the setpoint.
      */
-    virtual chip::AttributeId AttributeId() const = 0;
+    chip::AttributeId AttributeId() const { return mAttributeId; }
 
-    virtual bool operator==(const Setpoint & other) const = 0;
-    virtual bool operator!=(const Setpoint & other) const = 0;
-};
-
-/*
- * Base class for all setpoints, containing the attribute id
- */
-class BaseSetpoint : public Setpoint
-{
-public:
-    BaseSetpoint(chip::AttributeId attributeId) : mAttributeId(attributeId) {}
-    chip::AttributeId AttributeId() const override { return mAttributeId; }
-    SystemModeEnum Mode() const override;
-
-    static constexpr bool kIsFabricScoped = false;
-
-    bool operator==(const Setpoint & other) const override { return isEqual(other); }
-
-    bool operator!=(const Setpoint & other) const override { return !isEqual(other); }
+    bool operator==(const Setpoint & other) const { return isEqual(other); }
+    bool operator!=(const Setpoint & other) const { return !isEqual(other); }
 
 protected:
     chip::AttributeId mAttributeId;
@@ -88,11 +72,11 @@ protected:
 /*
  * The AbsoluteSetpoint class represents an absolute setpoint value.
  */
-class AbsoluteSetpoint : public BaseSetpoint
+class AbsoluteSetpoint : public Setpoint
 {
 public:
-    AbsoluteSetpoint(chip::AttributeId attributeId, temperature value) : BaseSetpoint(attributeId), mTemperature(value) {}
-    AbsoluteSetpoint(const AbsoluteSetpoint & other) : BaseSetpoint(other.mAttributeId), mTemperature(other.mTemperature) {}
+    AbsoluteSetpoint(chip::AttributeId attributeId, temperature value) : Setpoint(attributeId), mTemperature(value) {}
+    AbsoluteSetpoint(const AbsoluteSetpoint & other) : Setpoint(other.mAttributeId), mTemperature(other.mTemperature) {}
     AbsoluteSetpoint & operator=(const AbsoluteSetpoint & other) = default;
 
     CHIP_ERROR Encode(chip::TLV::TLVWriter & writer, chip::TLV::Tag tag) const { return writer.Put(tag, mTemperature); }
@@ -123,15 +107,15 @@ private:
  * The OptionalSetpoint class represents an optional setpoint value. It is used for setpoints which can be optionally overridden by
  * the user
  */
-class OptionalSetpoint : public BaseSetpoint
+class OptionalSetpoint : public Setpoint
 {
 public:
     OptionalSetpoint(chip::AttributeId attributeId, const AbsoluteSetpoint & absoluteSetpoint) :
-        BaseSetpoint(attributeId), mAbsoluteSetpoint(absoluteSetpoint)
+        Setpoint(attributeId), mAbsoluteSetpoint(absoluteSetpoint)
     {}
 
     OptionalSetpoint(const OptionalSetpoint & other, const AbsoluteSetpoint & absoluteSetpoint) :
-        BaseSetpoint(other.mAttributeId), mAbsoluteSetpoint(absoluteSetpoint), mTemperature(other.mTemperature)
+        Setpoint(other.mAttributeId), mAbsoluteSetpoint(absoluteSetpoint), mTemperature(other.mTemperature)
     {}
 
     OptionalSetpoint(const OptionalSetpoint & other) = default;
@@ -140,7 +124,7 @@ public:
     {
         if (this != &other)
         {
-            BaseSetpoint::operator=(other);
+            Setpoint::operator=(other);
             mTemperature = other.mTemperature;
         }
         return *this;
