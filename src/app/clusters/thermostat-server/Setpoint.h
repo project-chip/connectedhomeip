@@ -95,9 +95,6 @@ public:
     AbsoluteSetpoint(const AbsoluteSetpoint & other) : BaseSetpoint(other.mAttributeId), mTemperature(other.mTemperature) {}
     AbsoluteSetpoint & operator=(const AbsoluteSetpoint & other) = default;
 
-    bool operator==(const AbsoluteSetpoint & other) const { return this->mTemperature == other.mTemperature; }
-    bool operator!=(const AbsoluteSetpoint & other) const { return this->mTemperature != other.mTemperature; }
-
     CHIP_ERROR Encode(chip::TLV::TLVWriter & writer, chip::TLV::Tag tag) const { return writer.Put(tag, mTemperature); }
 
     CHIP_ERROR Decode(chip::TLV::TLVReader & reader) { return reader.Get(mTemperature); }
