@@ -272,14 +272,25 @@ class TC_EPALM_2_1(MatterBaseTest):
             matter_asserts.assert_valid_enum(
                 s.waveform, 'Waveform must be a CurrentWaveformEnum',
                 cluster.Enums.CurrentWaveformEnum)
-        # Conditional conformance: if Waveform is present, TrippingCharacteristic MUST be present.
+        # Conditional conformance for TrippingCharacteristic:
+        #   * If Waveform is present, TrippingCharacteristic MUST be present (and validates as map8).
+        #   * If Waveform is absent, TrippingCharacteristic MUST be absent.
         if s.waveform is not None:
-            asserts.assert_not_equal(s.trippingCharacteristic, NullValue,
-                                     'TrippingCharacteristic must be present when Waveform is present')
+            asserts.assert_is_not_none(
+                s.trippingCharacteristic,
+                'TrippingCharacteristic must be present when Waveform is present')
+            asserts.assert_not_equal(
+                s.trippingCharacteristic, NullValue,
+                'TrippingCharacteristic must not be null when Waveform is present')
             matter_asserts.assert_valid_map8(
                 s.trippingCharacteristic, 'TrippingCharacteristic must be a valid map8')
-            asserts.assert_less_equal(s.trippingCharacteristic, 7,
-                                      'TrippingCharacteristic may only set TrippingCharacteristicsBitmap bits 0..2')
+            asserts.assert_less_equal(
+                s.trippingCharacteristic, 7,
+                'TrippingCharacteristic may only set TrippingCharacteristicsBitmap bits 0..2')
+        else:
+            asserts.assert_is_none(
+                s.trippingCharacteristic,
+                'TrippingCharacteristic must be absent when Waveform is absent')
         if s.ultimateMaxCurrent is not None:
             matter_asserts.assert_valid_int64(s.ultimateMaxCurrent, 'UltimateMaxCurrent must be an int64')
             asserts.assert_greater_equal(s.ultimateMaxCurrent, 1)
@@ -291,6 +302,7 @@ class TC_EPALM_2_1(MatterBaseTest):
             self, s: 'cluster.Structs.ShortCircuitRatingsStruct') -> None:
         if s.tripCurrent is not None:
             matter_asserts.assert_valid_int64(s.tripCurrent, 'TripCurrent must be an int64')
+            asserts.assert_greater_equal(s.tripCurrent, 1)
         if s.tripMechanism is not None:
             matter_asserts.assert_valid_map8(s.tripMechanism, 'TripMechanism must be a valid map8')
             asserts.assert_less_equal(s.tripMechanism, 7,
@@ -301,10 +313,13 @@ class TC_EPALM_2_1(MatterBaseTest):
                 cluster.Enums.CurrentTripCurveEnum)
         if s.ultimateMaxCurrent is not None:
             matter_asserts.assert_valid_int64(s.ultimateMaxCurrent, 'UltimateMaxCurrent must be an int64')
+            asserts.assert_greater_equal(s.ultimateMaxCurrent, 1)
         if s.serviceMaxCurrent is not None:
             matter_asserts.assert_valid_int64(s.serviceMaxCurrent, 'ServiceMaxCurrent must be an int64')
+            asserts.assert_greater_equal(s.serviceMaxCurrent, 1)
         if s.maxCurrent is not None:
             matter_asserts.assert_valid_int64(s.maxCurrent, 'MaxCurrent must be an int64')
+            asserts.assert_greater_equal(s.maxCurrent, 1)
 
     def _check_surge_protection_ratings_struct(
             self, s: 'cluster.Structs.SurgeProtectionRatingsStruct') -> None:
