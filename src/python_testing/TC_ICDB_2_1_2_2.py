@@ -104,13 +104,14 @@ class TC_ICDB_2_1_2_2(ICDBaseTest):
                      Verify that the RegisteredClients entry's checkInNodeID and monitoredSubject match TH's node ID."""),
             TestStep(3, "TH reads from the DUT the IdleModeDuration and ActiveModeDuration attributes.",
                      "Store values for later use."),
-            TestStep(4, "Wait for a full active-to-idle-to-active ICD transition cycle.", """
-                     Verify current ICDCounter is greater than the ICDCounter after registration."""),
-            TestStep(5, "TH sends the UnregisterClient command to the DUT with the checkInNodeID from Step 2.",
-                     "TH is no longer registered as a client on the DUT."),
-            TestStep(6, "Wait for a full active-to-idle-to-active ICD transition cycle.", """
+            TestStep(4, "Wait for a full active-to-idle-to-active ICD transition cycle (IdleModeDuration + ActiveModeDuration).", """
+                     Verify current ICDCounter is greater than the ICDCounter after registration, indicating a check-in message was sent."""),
+            TestStep(5, "TH sends the UnregisterClient command to the DUT with the checkInNodeID from Step 2. TH reads the RegisteredClients attribute.", """
+                     TH is no longer registered as a client on the DUT.
+                     Verify the RegisteredClients attribute no longer contains TH's checkInNodeID."""),
+            TestStep(6, "Wait for a full active-to-idle-to-active ICD transition cycle (IdleModeDuration + ActiveModeDuration).", """
                      No check-in message is sent.
-                     Verify ICDCounter is unchanged from the value read after Step 4."""),
+                     Verify ICDCounter is unchanged from the value read after Step 4. An unchanged counter confirms no check-in was sent."""),
         ]
 
     def pics_TC_ICDB_2_1(self) -> list[str]:
@@ -170,13 +171,13 @@ class TC_ICDB_2_1_2_2(ICDBaseTest):
         log.info(f"ActiveModeDuration: {active_mode_duration_ms}ms")
 
         # *** STEP 4 ***
-        # Wait for a full active-to-idle-to-active ICD transition cycle
+        # Wait for a full active-to-idle-to-active ICD transition cycle (IdleModeDuration + ActiveModeDuration)
         self.step(4)
         await self.wait_for_transition(ICDTransition.FullCycle,
                                        active_mode_duration_ms=active_mode_duration_ms,
                                        idle_mode_duration_s=idle_mode_duration_s)
 
-        # Verify current ICDCounter is greater than the ICDCounter after registration
+        # Verify current ICDCounter is greater than the ICDCounter after registration, indicating a check-in was sent
         icd_counter_after_idle = await self.read_icdm_attribute_expect_success(attributes.ICDCounter)
         asserts.assert_greater(icd_counter_after_idle, icd_counter_at_registration,
                                f"ICDCounter should have incremented after idle cycle (check-in sent). "
@@ -188,9 +189,15 @@ class TC_ICDB_2_1_2_2(ICDBaseTest):
         await self.send_single_icdm_command(commands.UnregisterClient(checkInNodeID=rc_entry.checkInNodeID))
         log.info(f"UnregisterClient SUCCESS for checkInNodeID={rc_entry.checkInNodeID}")
 
+        # Verify the RegisteredClients attribute no longer contains TH's checkInNodeID
+        registered_clients_after = await self.read_icdm_attribute_expect_success(attributes.RegisteredClients)
+        remaining_ids = [c.checkInNodeID for c in registered_clients_after]
+        asserts.assert_not_in(TH.nodeId, remaining_ids,
+                              f"TH's checkInNodeID {TH.nodeId} should have been removed from RegisteredClients")
+
         # *** STEP 6 ***
-        # Wait for a full active-to-idle-to-active ICD transition cycle
-        #   - No check-in message is sent.
+        # Wait for a full active-to-idle-to-active ICD transition cycle (IdleModeDuration + ActiveModeDuration)
+        #   - No check-in message is sent. Confirmed by unchanged ICDCounter.
         self.step(6)
         await self.wait_for_transition(ICDTransition.FullCycle,
                                        active_mode_duration_ms=active_mode_duration_ms,
@@ -226,15 +233,15 @@ class TC_ICDB_2_1_2_2(ICDBaseTest):
             TestStep(4, "TH subscribes to the NodeLabel attribute with MinIntervalFloor=0 and MaxIntervalCeiling=IdleModeDuration. TH reads the current ICDCounter value.", """
                      Subscription is established successfully.
                      Store the ICDCounter value as icd_counter_at_subscription."""),
-            TestStep(5, "Wait for a full active-to-idle-to-active ICD transition cycle.",
-                     "No check-in message is sent."),
+            TestStep(5, "Wait for a full active-to-idle-to-active ICD transition cycle (IdleModeDuration + ActiveModeDuration).",
+                     "No check-in message is sent. Confirmed by unchanged ICDCounter in step 6."),
             TestStep(6, "TH reads the ICDCounter attribute.",
-                     "Verify ICDCounter is unchanged from icd_counter_at_subscription."),
-            TestStep(7, "Wait for a full active-to-idle-to-active ICD transition cycle. TH writes a new value to the NodeLabel attribute. Verify the existing subscription reports the change.",
+                     "Verify ICDCounter is unchanged from icd_counter_at_subscription. An unchanged counter confirms no check-in was sent."),
+            TestStep(7, "Wait for a full active-to-idle-to-active ICD transition cycle (IdleModeDuration + ActiveModeDuration). TH writes a new value to the NodeLabel attribute. Verify the existing subscription reports the change.",
                      "The subscription receives a report for the NodeLabel attribute within MaxInterval."),
-            TestStep(8, "TH shuts down the subscription. Wait for a full active-to-idle-to-active ICD transition cycle.", """
+            TestStep(8, "TH shuts down the subscription. Wait for a full active-to-idle-to-active ICD transition cycle (IdleModeDuration + ActiveModeDuration).", """
                      DUT resumed sending check-in messages after the subscription was torn down.
-                     Verify ICDCounter is greater than icd_counter_at_subscription."""),
+                     Verify ICDCounter is greater than icd_counter_at_subscription, indicating a check-in was sent."""),
         ]
 
     def pics_TC_ICDB_2_2(self) -> list[str]:
@@ -310,8 +317,8 @@ class TC_ICDB_2_1_2_2(ICDBaseTest):
         log.info(f"ICDCounter at subscription: {icd_counter_at_subscription}")
 
         # *** STEP 5 ***
-        # Wait for a full active-to-idle-to-active ICD transition cycle
-        #   - No check-in message is sent.
+        # Wait for a full active-to-idle-to-active ICD transition cycle (IdleModeDuration + ActiveModeDuration)
+        #   - No check-in message is sent. Confirmed by unchanged ICDCounter in step 6.
         self.step(5)
         await self.wait_for_transition(ICDTransition.FullCycle,
                                        active_mode_duration_ms=active_mode_duration_ms,
@@ -323,14 +330,14 @@ class TC_ICDB_2_1_2_2(ICDBaseTest):
         icd_counter_while_subscribed = await self.read_icdm_attribute_expect_success(attributes.ICDCounter)
         log.info(f"ICDCounter while subscribed: {icd_counter_while_subscribed}")
 
-        # Verify ICDCounter is unchanged from icd_counter_at_subscription
+        # Verify ICDCounter is unchanged from icd_counter_at_subscription. An unchanged counter confirms no check-in was sent.
         asserts.assert_equal(icd_counter_while_subscribed, icd_counter_at_subscription,
                              f"ICDCounter must not increment while the subscription is active. "
                              f"DUT should not send check-in messages while subscribed. "
                              f"Before: {icd_counter_at_subscription}, After: {icd_counter_while_subscribed}")
 
         # *** STEP 7 ***
-        # Wait for a full active-to-idle-to-active ICD transition cycle.
+        # Wait for a full active-to-idle-to-active ICD transition cycle (IdleModeDuration + ActiveModeDuration).
         # TH writes a new value to the NodeLabel attribute and verifies the existing subscription reports it.
         self.step(7)
         await self.wait_for_transition(ICDTransition.FullCycle,
@@ -360,8 +367,8 @@ class TC_ICDB_2_1_2_2(ICDBaseTest):
         subscription.Shutdown()
 
         # *** STEP 8 ***
-        # TH shuts down the subscription. Wait for a full active-to-idle-to-active ICD transition cycle.
-        #   - DUT resumed sending check-in messages after the subscription was torn down.
+        # TH shuts down the subscription. Wait for a full active-to-idle-to-active ICD transition cycle (IdleModeDuration + ActiveModeDuration).
+        #   - DUT resumed sending check-in messages. Confirmed by ICDCounter increment.
         self.step(8)
         subscription.Shutdown()
         log.info("Subscription shut down.")
@@ -369,7 +376,7 @@ class TC_ICDB_2_1_2_2(ICDBaseTest):
                                        active_mode_duration_ms=active_mode_duration_ms,
                                        idle_mode_duration_s=idle_mode_duration_s)
 
-        # Verify ICDCounter is greater than icd_counter_at_subscription
+        # Verify ICDCounter is greater than icd_counter_at_subscription, indicating a check-in was sent
         icd_counter_after_shutdown = await self.read_icdm_attribute_expect_success(attributes.ICDCounter)
         asserts.assert_greater(icd_counter_after_shutdown, icd_counter_at_subscription,
                                f"ICDCounter must increment after subscription shutdown (check-in resumed). "
