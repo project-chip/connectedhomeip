@@ -354,7 +354,7 @@ class TC_ICDB_2_1_2_2(ICDBaseTest):
         try:
             await asyncio.wait_for(report_received.wait(), timeout=max_interval_s + 1)
             log.info(f"Subscription received report for NodeLabel within MaxInterval ({max_interval_s}s)")
-        except asyncio.TimeoutError:
+        except TimeoutError:
             asserts.fail(f"Subscription did not receive report for NodeLabel within MaxInterval ({max_interval_s}s)")
 
         subscription.Shutdown()
