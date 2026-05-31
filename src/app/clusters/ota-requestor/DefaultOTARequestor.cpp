@@ -20,7 +20,7 @@
  * OTA Requestor logic is contained in this class.
  */
 
-#include <app/clusters/ota-requestor/CodegenIntegrationInternal.h>
+#include <app/clusters/ota-requestor/CodegenIntegrationInternal.h> // nogncheck
 #include <controller/CHIPCluster.h>
 #include <lib/core/CHIPEncoding.h>
 #include <platform/CHIPDeviceLayer.h>
@@ -245,6 +245,34 @@ void DefaultOTARequestor::OnQueryImageResponse(void * context, const QueryImageR
     }
 }
 
+CHIP_ERROR DefaultOTARequestor::ReclassifyPeerDisappearedError(CHIP_ERROR error, const char * phase)
+{
+    // CHIP_ERROR_TIMEOUT on a QueryImage exchange means the provider did not respond — the peer
+    // effectively disappeared mid-exchange. This is symmetric with the kInvalidSession case
+    // (a previously-valid CASE session has gone bad) so we tear down the session and re-classify
+    // as CHIP_ERROR_CONNECTION_CLOSED_UNEXPECTEDLY. MapErrorToIdleStateReason then routes this
+    // through IdleStateReason::kInvalidSession, which schedules a single quick retry instead of
+    // sitting in the 24h periodic-query path for what is often a transient hiccup.
+    //
+    // IMPORTANT: This reclassification is ONLY safe for OnQueryImageFailure. Do NOT call from
+    // the Apply / NotifyUpdateApplied phases:
+    //   - OnApplyUpdateFailure: a CHIP_ERROR_TIMEOUT may indicate the accessory is mid-apply (and
+    //     unresponsive while rebooting). Restarting OTA via SendQueryImage in that window risks
+    //     abandoning a successful update.
+    //   - OnNotifyUpdateAppliedFailure: runs after Reset() has cleared mProviderLocation, so
+    //     DisconnectFromProvider() would hit the no-provider branch and emit a spurious
+    //     RecordErrorUpdateState(CHIP_ERROR_INCORRECT_STATE) producing a double idle transition.
+    //     The shared 1-shot kInvalidSession budget can also be drained across phases.
+    // Both Apply and Notify phases should fall through to the kUnknown / 24h periodic path.
+    if (error == CHIP_ERROR_TIMEOUT)
+    {
+        ChipLogError(SoftwareUpdate, "%s timed out; tearing down CASE session and treating as invalid-session retry", phase);
+        DisconnectFromProvider();
+        return CHIP_ERROR_CONNECTION_CLOSED_UNEXPECTEDLY;
+    }
+    return error;
+}
+
 void DefaultOTARequestor::OnQueryImageFailure(void * context, CHIP_ERROR error)
 {
     DefaultOTARequestor * requestorCore = static_cast<DefaultOTARequestor *>(context);
@@ -252,13 +280,7 @@ void DefaultOTARequestor::OnQueryImageFailure(void * context, CHIP_ERROR error)
 
     ChipLogError(SoftwareUpdate, "Received QueryImage failure response: %" CHIP_ERROR_FORMAT, error.Format());
 
-    // A previously valid CASE session may have become invalid
-    if (error == CHIP_ERROR_TIMEOUT)
-    {
-        ChipLogError(SoftwareUpdate, "CASE session may be invalid, tear down session");
-        requestorCore->DisconnectFromProvider();
-        error = CHIP_ERROR_CONNECTION_CLOSED_UNEXPECTEDLY;
-    }
+    error = requestorCore->ReclassifyPeerDisappearedError(error, "QueryImage");
 
     TEMPORARY_RETURN_IGNORED requestorCore->RecordErrorUpdateState(error);
 }
@@ -295,6 +317,9 @@ void DefaultOTARequestor::OnApplyUpdateFailure(void * context, CHIP_ERROR error)
     VerifyOrDie(requestorCore != nullptr);
 
     ChipLogDetail(SoftwareUpdate, "ApplyUpdate failure response %" CHIP_ERROR_FORMAT, error.Format());
+    // Do NOT reclassify peer-disappeared timeouts here — see ReclassifyPeerDisappearedError comment.
+    // An Apply timeout falls through to kUnknown so the requestor waits on the 24h periodic timer
+    // rather than restarting OTA mid-apply.
     requestorCore->RecordErrorUpdateState(error);
 }
 
@@ -306,6 +331,9 @@ void DefaultOTARequestor::OnNotifyUpdateAppliedFailure(void * context, CHIP_ERRO
     VerifyOrDie(requestorCore != nullptr);
 
     ChipLogDetail(SoftwareUpdate, "NotifyUpdateApplied failure response %" CHIP_ERROR_FORMAT, error.Format());
+    // Do NOT reclassify peer-disappeared timeouts here — see ReclassifyPeerDisappearedError comment.
+    // NotifyUpdateApplied runs after Reset() has cleared mProviderLocation, so attempting to
+    // DisconnectFromProvider would emit a spurious double idle transition.
     requestorCore->RecordErrorUpdateState(error);
 }
 
@@ -642,7 +670,68 @@ void DefaultOTARequestor::OnDownloadStateChanged(OTADownloader::State state, OTA
     case OTADownloader::State::kIdle:
         if (reason != OTAChangeReasonEnum::kSuccess)
         {
-            RecordErrorUpdateState(CHIP_ERROR_CONNECTION_ABORTED, reason);
+            // BDXDownloader funnels several distinct failure modes through a generic kFailure /
+            // kTimeOut reason. Use GetLastFailureCause() to disambiguate so only a true peer-driven
+            // abort (BDX StatusReport mid-transfer) takes the kAbortedByPeer short-retry path; local
+            // failures and timeouts keep the kUnknown -> periodic-query behavior.
+            //
+            // This block MUST always reach RecordNewUpdateStateWithIdleReason and the
+            // mBdxMessenger.Reset() below even if mBdxDownloader / its image processor are null, or
+            // the state machine wedges in kDownloading and the exchange context leaks. The null-checks
+            // below guard ONLY the DownloadError event emission, not the state transition.
+            BDXDownloader::LastFailureCause cause =
+                (mBdxDownloader != nullptr) ? mBdxDownloader->GetLastFailureCause() : BDXDownloader::LastFailureCause::kNone;
+            IdleStateReason idleReason = IdleStateReason::kUnknown;
+            // Self-describing CHIP_ERROR per cause for the DownloadError event and the log line below.
+            CHIP_ERROR loggedError = CHIP_ERROR_CONNECTION_ABORTED;
+            switch (cause)
+            {
+            case BDXDownloader::LastFailureCause::kPeerStatusReport:
+                idleReason  = IdleStateReason::kAbortedByPeer;
+                loggedError = CHIP_ERROR_CONNECTION_ABORTED;
+                break;
+            case BDXDownloader::LastFailureCause::kTimeout:
+                loggedError = CHIP_ERROR_TIMEOUT;
+                break;
+            case BDXDownloader::LastFailureCause::kLocalPrepareFailed:
+                loggedError = CHIP_ERROR_INCORRECT_STATE;
+                break;
+            case BDXDownloader::LastFailureCause::kLocalInternalError:
+                loggedError = CHIP_ERROR_INTERNAL;
+                break;
+            case BDXDownloader::LastFailureCause::kNone:
+                // Defensive: the downloader should always set a cause before a failure idle. Fall
+                // back to the pre-PR sentinel so existing DownloadError consumers keep working.
+                ChipLogError(SoftwareUpdate, "OnDownloadStateChanged: kIdle/failure with no recorded failure cause");
+                loggedError = CHIP_ERROR_CONNECTION_ABORTED;
+                break;
+            }
+            ChipLogProgress(SoftwareUpdate,
+                            "OTA download ended in idle state; raw reason=%u, lastFailureCause=%s, "
+                            "classified error=%" CHIP_ERROR_FORMAT,
+                            to_underlying(reason), BDXDownloader::LastFailureCauseToString(cause), loggedError.Format());
+            // Emit the DownloadError event before the idle transition (as RecordErrorUpdateState
+            // does), but skip it gracefully if downloader / image processor are null -- unlike
+            // RecordErrorUpdateState, this BDX path can race a concurrent teardown.
+            OTAImageProcessorInterface * imageProcessor =
+                (mBdxDownloader != nullptr) ? mBdxDownloader->GetImageProcessorDelegate() : nullptr;
+            if (imageProcessor != nullptr && mEventGenerator != nullptr)
+            {
+                Nullable<uint8_t> progressPercent = imageProcessor->GetPercentComplete();
+                Nullable<int64_t> platformCode;
+                DefaultOTARequestorEventGenerator::DownloadErrorEvent event{ mTargetVersion, imageProcessor->GetBytesDownloaded(),
+                                                                             progressPercent, platformCode };
+                CHIP_ERROR generator_error = mEventGenerator->GenerateDownloadErrorEvent(event);
+                SuccessOrLog(generator_error, SoftwareUpdate, "Failed to record DownloadError event: %" CHIP_ERROR_FORMAT,
+                             generator_error.Format());
+            }
+            else
+            {
+                ChipLogError(
+                    SoftwareUpdate, "Skipping DownloadError event emission: bdxDownloader=%p imageProcessor=%p eventGenerator=%p",
+                    static_cast<void *>(mBdxDownloader), static_cast<void *>(imageProcessor), static_cast<void *>(mEventGenerator));
+            }
+            RecordNewUpdateStateWithIdleReason(OTAUpdateStateEnum::kIdle, reason, idleReason);
         }
         mBdxMessenger.Reset();
         break;
@@ -666,11 +755,22 @@ IdleStateReason DefaultOTARequestor::MapErrorToIdleStateReason(CHIP_ERROR error)
     {
         return IdleStateReason::kInvalidSession;
     }
+    // CHIP_ERROR_CONNECTION_ABORTED is intentionally NOT mapped to kAbortedByPeer here: the
+    // short-retry path is only valid for a BDXDownloader::LastFailureCause::kPeerStatusReport, which
+    // OnDownloadStateChanged routes via RecordNewUpdateStateWithIdleReason. Other callers
+    // (Apply/Notify/QueryImage failures) can surface CHIP_ERROR_CONNECTION_ABORTED from the messaging
+    // layer without a peer BDX abort, and must fall through to the periodic-query path.
 
     return IdleStateReason::kUnknown;
 }
 
 void DefaultOTARequestor::RecordNewUpdateState(OTAUpdateStateEnum newState, OTAChangeReasonEnum reason, CHIP_ERROR error)
+{
+    RecordNewUpdateStateWithIdleReason(newState, reason, MapErrorToIdleStateReason(error));
+}
+
+void DefaultOTARequestor::RecordNewUpdateStateWithIdleReason(OTAUpdateStateEnum newState, OTAChangeReasonEnum reason,
+                                                             IdleStateReason idleReason)
 {
     // The UpdateStateProgress attribute only applies to the downloading state
     if (newState != OTAUpdateStateEnum::kDownloading)
@@ -692,8 +792,7 @@ void DefaultOTARequestor::RecordNewUpdateState(OTAUpdateStateEnum newState, OTAC
 
     if ((newState == OTAUpdateStateEnum::kIdle) && (prevState != OTAUpdateStateEnum::kIdle))
     {
-        IdleStateReason idleStateReason = MapErrorToIdleStateReason(error);
-        mOtaRequestorDriver->HandleIdleStateEnter(idleStateReason);
+        mOtaRequestorDriver->HandleIdleStateEnter(idleReason);
     }
     else if ((prevState == OTAUpdateStateEnum::kIdle) && (newState != OTAUpdateStateEnum::kIdle))
     {

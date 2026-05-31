@@ -50,12 +50,23 @@ enum class UpdateNotFoundReason
     kUpToDate,
 };
 
-// The reasons for why the OTA Requestor has entered idle state
+// The reasons for why the OTA Requestor has entered idle state.
+//
+// MIGRATION NOTE: kAbortedByPeer was added in May 2026. Subclasses of OTARequestorDriver that
+// override HandleIdleStateEnter MUST handle this value explicitly. The recommended fallback for
+// drivers that do not implement short-retry-on-peer-abort is to treat kAbortedByPeer the same as
+// kUnknown (i.e., arm the periodic query timer). Failure to handle the new value may leave the
+// OTA state machine stuck idle on platforms whose implementation switches on IdleStateReason
+// without a default case.
 enum class IdleStateReason
 {
     kUnknown,
     kIdle,
     kInvalidSession,
+    // The peer (provider) explicitly aborted an in-progress BDX transfer (e.g. accessory
+    // sent a BDX StatusReport mid-download). Distinct from kUnknown so the driver can
+    // schedule a short retry instead of waiting for the next periodic-query interval.
+    kAbortedByPeer,
 };
 
 // The current selected OTA Requestor timer to be running
