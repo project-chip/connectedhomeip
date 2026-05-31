@@ -60,6 +60,7 @@ Test Plan:
 """
 
 import logging
+import os
 
 from mobly import asserts
 from support_modules.icd_support import ICDBaseTest, ICDTransition
@@ -76,6 +77,7 @@ log = logging.getLogger(__name__)
 cluster = Clusters.Objects.IcdManagement
 attributes = cluster.Attributes
 commands = cluster.Commands
+ClientTypeEnum = cluster.Enums.ClientTypeEnum
 
 
 class TC_ICDB_2_3(ICDBaseTest):
@@ -87,12 +89,8 @@ class TC_ICDB_2_3(ICDBaseTest):
         # Commission DUT to TH1 with ICD registration
         # Commission DUT to TH2 with ICD registration
 
-        # TH1 setup with ICD registration on its own fabric
+        # TH1 commissions DUT (ICD registration done explicitly via RegisterClient in the test body)
         self.th1 = self.default_controller
-        th1_icd_params = self.th1.GenerateICDRegistrationParameters()
-        self.th1.EnableICDRegistration(th1_icd_params)
-
-        # TH1 commissions DUT
         setup_payload_infos = get_setup_payload_info_config(self.matter_test_config)
         setup_payload_info = setup_payload_infos[0]
         commissioning_info = CommissioningInfo(
@@ -108,15 +106,10 @@ class TC_ICDB_2_3(ICDBaseTest):
         status = await commission_device(self.th1, self.th1_dut_node_id, setup_payload_info, commissioning_info)
         asserts.assert_true(status, f"Failed to commission DUT to TH1's fabric: {status}")
 
-        # TH2 setup with ICD registration on its own fabric
+        # TH2 commissions DUT on a separate fabric (ICD registration done explicitly via RegisterClient in the test body)
         th2_ca = self.certificate_authority_manager.NewCertificateAuthority()
         th2_fabric_admin = th2_ca.NewFabricAdmin(vendorId=0xFFF1, fabricId=self.th1.fabricId + 1)
         self.th2 = th2_fabric_admin.NewController(nodeId=2, useTestCommissioner=True)
-        th2_icd_params = self.th2.GenerateICDRegistrationParameters()
-        self.th2_expected_check_in_node_id = th2_icd_params.checkInNodeId
-        self.th2.EnableICDRegistration(th2_icd_params)
-
-        # TH2 commissions DUT
         ecw = await self.open_commissioning_window(dev_ctrl=self.th1, node_id=self.dut_node_id, timeout=600)
         self.th2_dut_node_id = self.dut_node_id + 1
         await self.th2.CommissionOnNetwork(
@@ -136,11 +129,13 @@ class TC_ICDB_2_3(ICDBaseTest):
 
     def steps_TC_ICDB_2_3(self) -> list[TestStep]:
         return [
-            TestStep("precondition", "Commissioning DUT to TH1 and TH2 with ICD client registration."),
-            TestStep(1, "TH1 reads from the DUT the RegisteredClients attribute.", """
+            TestStep("precondition", "DUT is commissioned to TH1 and TH2."),
+            TestStep(1, "TH1 sends the RegisterClient command to the DUT with TH1's node ID as checkInNodeID and monitoredSubject. TH1 reads the RegisteredClients attribute.", """
+                     TH1 is registered as an ICD client on the DUT.
                      Verify exactly one RegisteredClients entry is present.
                      Verify that the RegisteredClients entry's checkInNodeID and monitoredSubject match TH1's node ID."""),
-            TestStep(2, "TH2 reads from the DUT the RegisteredClients attribute.", """
+            TestStep(2, "TH2 sends the RegisterClient command to the DUT with TH2's node ID as checkInNodeID and monitoredSubject. TH2 reads the RegisteredClients attribute.", """
+                     TH2 is registered as an ICD client on the DUT.
                      Verify exactly one RegisteredClients entry is present.
                      Verify that the RegisteredClients entry's checkInNodeID and monitoredSubject match TH2's node ID."""),
             TestStep(3, "TH1 reads from the DUT the IdleModeDuration, ActiveModeDuration, and ICDCounter attributes.",
@@ -167,46 +162,62 @@ class TC_ICDB_2_3(ICDBaseTest):
     async def test_TC_ICDB_2_3(self):
 
         # *** PRECONDITION ***
-        # Commissioning DUT to TH1 and TH2 with ICD client registration.
+        # DUT is commissioned to TH1 and TH2.
         self.step("precondition")
 
         # *** STEP 1 ***
-        # TH1 reads from the DUT the RegisteredClients attribute.
+        # TH1 sends the RegisterClient command to the DUT with TH1's node ID as checkInNodeID and monitoredSubject.
         self.step(1)
+        th1_checkin_key = os.urandom(16)
+        th1_check_in_node_id = self.th1.nodeId
+        await self.send_single_icdm_command(commands.RegisterClient(
+            checkInNodeID=th1_check_in_node_id,
+            monitoredSubject=th1_check_in_node_id,
+            key=th1_checkin_key,
+            clientType=ClientTypeEnum.kPermanent,
+        ))
+        log.info(f"TH1 RegisterClient SUCCESS for checkInNodeID={th1_check_in_node_id}")
+
+        # TH1 reads RegisteredClients to verify registration
         th1_registered_clients = await self.read_icdm_attribute_expect_success(attributes.RegisteredClients)
-        th1_check_in_node_id = th1_registered_clients[0].checkInNodeID
-        th1_monitored_subject = th1_registered_clients[0].monitoredSubject
 
         # Verify exactly one RegisteredClients entry is present.
         asserts.assert_equal(len(th1_registered_clients), 1,
-                             f"Exactly one RegisteredClients entry must be present, got {len(th1_registered_clients)}, {th1_registered_clients}")
+                             f"Exactly one RegisteredClients entry must be present, got {len(th1_registered_clients)}")
 
-        # Verify that the RegisteredClients entry's checkInNodeID and monitoredSubject match TH1's node ID.
-        asserts.assert_equal(th1_check_in_node_id, self.matter_test_config.controller_node_id,
-                             f"The RegisteredClients entry's checkInNodeID ({th1_check_in_node_id}) must match TH1's node ID ({self.matter_test_config.controller_node_id}).")
-
-        # Verify that the RegisteredClients entry's monitoredSubject matches TH1's node ID.
-        asserts.assert_equal(th1_monitored_subject, self.matter_test_config.controller_node_id,
-                             f"The RegisteredClients entry's monitoredSubject ({th1_monitored_subject}) must match TH1's node ID ({self.matter_test_config.controller_node_id}).")
+        # Verify checkInNodeID and monitoredSubject match TH1's node ID.
+        rc_th1 = th1_registered_clients[0]
+        asserts.assert_equal(rc_th1.checkInNodeID, th1_check_in_node_id,
+                             f"checkInNodeID ({rc_th1.checkInNodeID}) must match TH1's node ID ({th1_check_in_node_id})")
+        asserts.assert_equal(rc_th1.monitoredSubject, th1_check_in_node_id,
+                             f"monitoredSubject ({rc_th1.monitoredSubject}) must match TH1's node ID ({th1_check_in_node_id})")
 
         # *** STEP 2 ***
-        # TH2 reads from the DUT the RegisteredClients attribute.
+        # TH2 sends the RegisterClient command to the DUT with TH2's node ID as checkInNodeID and monitoredSubject.
         self.step(2)
+        th2_checkin_key = os.urandom(16)
+        th2_check_in_node_id = self.th2.nodeId
+        await self.send_single_icdm_command(commands.RegisterClient(
+            checkInNodeID=th2_check_in_node_id,
+            monitoredSubject=th2_check_in_node_id,
+            key=th2_checkin_key,
+            clientType=ClientTypeEnum.kPermanent,
+        ), controller=self.th2, node_id=self.th2_dut_node_id)
+        log.info(f"TH2 RegisterClient SUCCESS for checkInNodeID={th2_check_in_node_id}")
+
+        # TH2 reads RegisteredClients to verify registration
         th2_registered_clients = await self.read_icdm_attribute_expect_success(attributes.RegisteredClients, controller=self.th2, node_id=self.th2_dut_node_id)
-        th2_check_in_node_id = th2_registered_clients[0].checkInNodeID
-        th2_monitored_subject = th2_registered_clients[0].monitoredSubject
 
         # Verify exactly one RegisteredClients entry is present.
         asserts.assert_equal(len(th2_registered_clients), 1,
-                             f"Exactly one RegisteredClients entry must be present, got {len(th2_registered_clients)}, {th2_registered_clients}")
+                             f"Exactly one RegisteredClients entry must be present, got {len(th2_registered_clients)}")
 
-        # Verify that the RegisteredClients entry's checkInNodeID and monitoredSubject match TH2's node ID.
-        asserts.assert_equal(th2_check_in_node_id, self.th2_expected_check_in_node_id,
-                             f"The RegisteredClients entry's checkInNodeID ({th2_check_in_node_id}) must match TH2's node ID ({self.th2_expected_check_in_node_id})")
-
-        # Verify that the RegisteredClients entry's monitoredSubject matches TH2's node ID.
-        asserts.assert_equal(th2_monitored_subject, self.th2_expected_check_in_node_id,
-                             f"The RegisteredClients entry's monitoredSubject ({th2_monitored_subject}) must match TH2's node ID ({self.th2_expected_check_in_node_id})")
+        # Verify checkInNodeID and monitoredSubject match TH2's node ID.
+        rc_th2 = th2_registered_clients[0]
+        asserts.assert_equal(rc_th2.checkInNodeID, th2_check_in_node_id,
+                             f"checkInNodeID ({rc_th2.checkInNodeID}) must match TH2's node ID ({th2_check_in_node_id})")
+        asserts.assert_equal(rc_th2.monitoredSubject, th2_check_in_node_id,
+                             f"monitoredSubject ({rc_th2.monitoredSubject}) must match TH2's node ID ({th2_check_in_node_id})")
 
         # *** STEP 3 ***
         # TH1 reads from the DUT the IdleModeDuration, ActiveModeDuration, and ICDCounter attributes.
