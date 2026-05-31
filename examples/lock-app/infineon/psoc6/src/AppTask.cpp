@@ -50,6 +50,10 @@
 #include <DeviceAttestationCredsExampleTrustM.h>
 #endif
 
+#if !ENABLE_TRUSTM_RANDOM
+#include <crypto/CHIPCryptoPAL.h>
+#endif
+
 /* OTA related includes */
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
 #include <app/clusters/ota-requestor/BDXDownloader.h>
@@ -156,6 +160,33 @@ static void InitServer(intptr_t context)
 {
     // Initialize device attestation config before server init so Operational
     // Credentials sees the configured provider during cluster construction.
+  #if defined(ENABLE_DEVICE_ATTESTATION) && !ENABLE_TRUSTM_RANDOM
+    // Pre-seed the CTR-DRBG here, in the CHIP event loop task, before BLE
+    // advertising starts.
+    {
+        uint8_t seed_buf[16];
+        CHIP_ERROR seed_err = chip::Crypto::DRBG_get_bytes(seed_buf, sizeof(seed_buf));
+        if (seed_err != CHIP_NO_ERROR)
+        {
+            PSOC6_LOG("DRBG pre-seed failed");
+            appError(seed_err);
+        }
+        memset(seed_buf, 0, sizeof(seed_buf));
+    }
+#endif
+
+#if ENABLE_DEVICE_ATTESTATION
+    // Pre-load PAI, DAC and CD certs from TrustM into RAM before Server::Init()
+    {
+        CHIP_ERROR cert_err = chip::Credentials::Examples::PreloadTrustMAttestationCerts();
+        if (cert_err != CHIP_NO_ERROR)
+        {
+            PSOC6_LOG("TrustM cert preload failed");
+            appError(cert_err);
+        }
+    }
+#endif
+
 #if ENABLE_DEVICE_ATTESTATION
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleTrustMDACProvider());
 #else
@@ -166,10 +197,10 @@ static void InitServer(intptr_t context)
     static chip::CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
     initParams.dataModelProvider = CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
-    TEMPORARY_RETURN_IGNORED chip::Server::GetInstance().Init(initParams);
-
-    gExampleDeviceInfoProvider.SetStorageDelegate(&Server::GetInstance().GetPersistentStorage());
+    gExampleDeviceInfoProvider.SetStorageDelegate(initParams.persistentStorageDelegate);
     chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
+
+    TEMPORARY_RETURN_IGNORED chip::Server::GetInstance().Init(initParams);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
     GetAppTask().InitOTARequestor();

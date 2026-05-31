@@ -21,6 +21,8 @@
  */
 
 #include "CHIPCryptoPAL.h"
+#include "CHIPCryptoPALHsm_config_trustm.h"
+#include "CHIPCryptoPALHsm_utils_trustm.h"
 
 #include <type_traits>
 
@@ -406,12 +408,23 @@ static EntropyContext * get_entropy_context()
         mbedtls_entropy_init(&gsEntropyContext.mEntropy);
         mbedtls_ctr_drbg_init(&gsEntropyContext.mDRBGCtxt);
 
+#if !ENABLE_TRUSTM_RANDOM
+        // mbedtls_entropy_init() auto-registers mbedtls_hardware_poll (PSoC6
+        // TRNG) because MBEDTLS_ENTROPY_HARDWARE_ALT is defined globally.
+        gsEntropyContext.mEntropy.source_count = 0;
+
+        // Register TrustM as the only strong entropy source for CHIP's DRBG.
+        (void) mbedtls_entropy_add_source(&gsEntropyContext.mEntropy, trustm_entropy_source, nullptr,
+                                          MBEDTLS_CTR_DRBG_ENTROPY_LEN, MBEDTLS_ENTROPY_SOURCE_STRONG);
+#endif
+
         gsEntropyContext.mInitialized = true;
     }
 
     return &gsEntropyContext;
 }
 
+#if !ENABLE_TRUSTM_RANDOM
 static mbedtls_ctr_drbg_context * get_drbg_context()
 {
     EntropyContext * const context = get_entropy_context();
@@ -432,6 +445,7 @@ static mbedtls_ctr_drbg_context * get_drbg_context()
 
     return drbgCtxt;
 }
+#endif // !ENABLE_TRUSTM_RANDOM
 
 CHIP_ERROR add_entropy_source(entropy_source fn_source, void * p_source, size_t threshold)
 {
@@ -446,6 +460,7 @@ CHIP_ERROR add_entropy_source(entropy_source fn_source, void * p_source, size_t 
     return CHIP_NO_ERROR;
 }
 
+#if !ENABLE_TRUSTM_RANDOM
 CHIP_ERROR DRBG_get_bytes(uint8_t * out_buffer, const size_t out_length)
 {
     VerifyOrReturnError(out_buffer != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
@@ -459,6 +474,7 @@ CHIP_ERROR DRBG_get_bytes(uint8_t * out_buffer, const size_t out_length)
 
     return CHIP_NO_ERROR;
 }
+#endif // !ENABLE_TRUSTM_RANDOM
 
 static int CryptoRNG(void * ctxt, uint8_t * out_buffer, size_t out_length)
 {
