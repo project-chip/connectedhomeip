@@ -4006,8 +4006,8 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
     MTRClusterPath * path2 = [MTRClusterPath clusterPathWithEndpointID:@(2) clusterID:@(0x202)];
 
     [device unitTestSetPersistedClusterData:@{
-        path1 : [[MTRDeviceClusterData alloc] initWithDataVersion:@(11) attributes:@{}],
-        path2 : [[MTRDeviceClusterData alloc] initWithDataVersion:@(22) attributes:@{}],
+        path1 : [[MTRDeviceClusterData alloc] initWithDataVersion:@(11) attributes:@ {}],
+        path2 : [[MTRDeviceClusterData alloc] initWithDataVersion:@(22) attributes:@ {}],
     }];
 
     NSDictionary<MTRClusterPath *, NSNumber *> * versions = [device unitTestGetCachedDataVersions];
@@ -4065,12 +4065,12 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
     MTRClusterPath * committedPath3 = [MTRClusterPath clusterPathWithEndpointID:@(3) clusterID:@(0x406)];
 
     [device unitTestSetPersistedClusterData:@{
-        nilPath1 : [[MTRDeviceClusterData alloc] initWithDataVersion:nil attributes:@{}],
-        committedPath1 : [[MTRDeviceClusterData alloc] initWithDataVersion:@(10) attributes:@{}],
-        nilPath2 : [[MTRDeviceClusterData alloc] initWithDataVersion:nil attributes:@{}],
-        committedPath2 : [[MTRDeviceClusterData alloc] initWithDataVersion:@(20) attributes:@{}],
-        nilPath3 : [[MTRDeviceClusterData alloc] initWithDataVersion:nil attributes:@{}],
-        committedPath3 : [[MTRDeviceClusterData alloc] initWithDataVersion:@(30) attributes:@{}],
+        nilPath1 : [[MTRDeviceClusterData alloc] initWithDataVersion:nil attributes:@ {}],
+        committedPath1 : [[MTRDeviceClusterData alloc] initWithDataVersion:@(10) attributes:@ {}],
+        nilPath2 : [[MTRDeviceClusterData alloc] initWithDataVersion:nil attributes:@ {}],
+        committedPath2 : [[MTRDeviceClusterData alloc] initWithDataVersion:@(20) attributes:@ {}],
+        nilPath3 : [[MTRDeviceClusterData alloc] initWithDataVersion:nil attributes:@ {}],
+        committedPath3 : [[MTRDeviceClusterData alloc] initWithDataVersion:@(30) attributes:@ {}],
     }];
 
     NSDictionary<MTRClusterPath *, NSNumber *> * cached = [device unitTestGetCachedDataVersions];
@@ -4130,9 +4130,9 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
     MTRClusterPath * pathMax = [MTRClusterPath clusterPathWithEndpointID:@(1) clusterID:@(0x603)];
 
     [device unitTestSetPersistedClusterData:@{
-        pathNil : [[MTRDeviceClusterData alloc] initWithDataVersion:nil attributes:@{}],
-        pathZero : [[MTRDeviceClusterData alloc] initWithDataVersion:@(0) attributes:@{}],
-        pathMax : [[MTRDeviceClusterData alloc] initWithDataVersion:@(UINT32_MAX) attributes:@{}],
+        pathNil : [[MTRDeviceClusterData alloc] initWithDataVersion:nil attributes:@ {}],
+        pathZero : [[MTRDeviceClusterData alloc] initWithDataVersion:@(0) attributes:@ {}],
+        pathMax : [[MTRDeviceClusterData alloc] initWithDataVersion:@(UINT32_MAX) attributes:@ {}],
     }];
 
     NSDictionary<MTRClusterPath *, NSNumber *> * cached = [device unitTestGetCachedDataVersions];
@@ -4166,9 +4166,9 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
     MTRClusterPath * pathC = [MTRClusterPath clusterPathWithEndpointID:@(2) clusterID:@(0x703)];
 
     [device unitTestSetPersistedClusterData:@{
-        pathA : [[MTRDeviceClusterData alloc] initWithDataVersion:nil attributes:@{}],
-        pathB : [[MTRDeviceClusterData alloc] initWithDataVersion:nil attributes:@{}],
-        pathC : [[MTRDeviceClusterData alloc] initWithDataVersion:nil attributes:@{}],
+        pathA : [[MTRDeviceClusterData alloc] initWithDataVersion:nil attributes:@ {}],
+        pathB : [[MTRDeviceClusterData alloc] initWithDataVersion:nil attributes:@ {}],
+        pathC : [[MTRDeviceClusterData alloc] initWithDataVersion:nil attributes:@ {}],
     }];
 
     // _getCachedDataVersions must skip every nil-versioned cluster, producing
