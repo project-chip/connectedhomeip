@@ -414,8 +414,8 @@ static EntropyContext * get_entropy_context()
         gsEntropyContext.mEntropy.source_count = 0;
 
         // Register TrustM as the only strong entropy source for CHIP's DRBG.
-        (void) mbedtls_entropy_add_source(&gsEntropyContext.mEntropy, trustm_entropy_source, nullptr,
-                                          MBEDTLS_CTR_DRBG_ENTROPY_LEN, MBEDTLS_ENTROPY_SOURCE_STRONG);
+        (void) mbedtls_entropy_add_source(&gsEntropyContext.mEntropy, trustm_entropy_source, nullptr, MBEDTLS_CTR_DRBG_ENTROPY_LEN,
+                                          MBEDTLS_ENTROPY_SOURCE_STRONG);
 #endif
 
         gsEntropyContext.mInitialized = true;

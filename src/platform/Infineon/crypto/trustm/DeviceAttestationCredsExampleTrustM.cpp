@@ -37,12 +37,12 @@ namespace Examples {
 namespace {
 
 // Attestation cert caches — populated once by PreloadTrustMAttestationCerts().
-static uint8_t  gPAICertBuf[1024];
+static uint8_t gPAICertBuf[1024];
 static uint16_t gPAICertLen = 0;
-static uint8_t  gDACCertBuf[1024];
+static uint8_t gDACCertBuf[1024];
 static uint16_t gDACCertLen = 0;
-static uint8_t  gCDBuf[1024];
-static uint16_t gCDLen      = 0;
+static uint8_t gCDBuf[1024];
+static uint16_t gCDLen = 0;
 
 class ExampleTrustMDACProvider : public DeviceAttestationCredentialsProvider
 {
@@ -159,8 +159,7 @@ CHIP_ERROR PreloadTrustMAttestationCerts()
     gCDLen = sizeof(gCDBuf);
     ReturnErrorOnFailure(trustmGetCertificate(CERT_DECLARATION_ID, gCDBuf, &gCDLen));
 
-    ChipLogProgress(Crypto, "TrustM attestation certs preloaded (PAI=%u DAC=%u CD=%u bytes)",
-                    gPAICertLen, gDACCertLen, gCDLen);
+    ChipLogProgress(Crypto, "TrustM attestation certs preloaded (PAI=%u DAC=%u CD=%u bytes)", gPAICertLen, gDACCertLen, gCDLen);
     return CHIP_NO_ERROR;
 }
 

@@ -160,7 +160,7 @@ static void InitServer(intptr_t context)
 {
     // Initialize device attestation config before server init so Operational
     // Credentials sees the configured provider during cluster construction.
-  #if defined(ENABLE_DEVICE_ATTESTATION) && !ENABLE_TRUSTM_RANDOM
+#if defined(ENABLE_DEVICE_ATTESTATION) && !ENABLE_TRUSTM_RANDOM
     // Pre-seed the CTR-DRBG here, in the CHIP event loop task, before BLE
     // advertising starts.
     {
