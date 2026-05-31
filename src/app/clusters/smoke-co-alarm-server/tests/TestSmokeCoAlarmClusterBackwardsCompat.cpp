@@ -157,7 +157,7 @@ TEST_F(TestSmokeCoAlarmBackwardsCompatInitialized, ClearViaInstance_ResetsState)
 
 TEST_F(TestSmokeCoAlarmBackwardsCompatInitialized, RequestSelfTest_ForwardsToCluster)
 {
-    EXPECT_TRUE(SmokeCoAlarmServer::Instance().RequestSelfTest());
+    EXPECT_TRUE(SmokeCoAlarmServer::Instance().RequestSelfTest(kTestEndpointId));
     ExpressedStateEnum expressed{};
     EXPECT_TRUE(SmokeCoAlarmServer::Instance().GetExpressedState(kTestEndpointId, expressed));
     EXPECT_EQ(expressed, ExpressedStateEnum::kTesting);
