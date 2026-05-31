@@ -18,6 +18,7 @@
 #include "LoggingRangingAdapter.h"
 
 #include <app/clusters/proximity-ranging-server/BleRssiRangingHelpers.h>
+#include <crypto/CHIPCryptoPAL.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Span.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -56,6 +57,49 @@ constexpr int8_t kDefaultTxPowerDbm      = 0;
 /// ranging session terminates when the radio reports the single
 /// measurement, with no need to space it out from a synthesized fire.
 constexpr System::Clock::Milliseconds32 kInstantRangingTerminateDelay{ 3000 };
+
+/// Sentinel "unknown peer" identity values used by cert tests to exercise
+/// the kPeerNotFound termination path. When a StartRangingRequest arrives
+/// carrying one of these as the peer identity for the matching technology,
+/// the adapter accepts the session but suppresses every OnMeasurementData
+/// emission; the session's peerFound flag therefore stays false, and the
+/// EndTime cutoff terminates with kPeerNotFound instead of
+/// kSessionEndTimeReached.
+///
+/// REAL ADAPTER: these sentinels do not exist in production. A hardware
+/// adapter naturally produces no measurements when the requested peer is
+/// not in range, so the cluster server's existing kPeerNotFound semantics
+/// are reached without any peer-recognition shim. We need this only because
+/// the stub adapter would otherwise emit a default measurement for every
+/// session, regardless of the peer key carried in the request.
+constexpr uint64_t kUnknownPeerBleDeviceId                     = 0xDEADBEEFCAFEBABEULL;
+constexpr uint8_t kUnknownPeerWiFiDevIK[kDeviceIdentityKeyLen] = {
+    0xDE, 0xAD, 0xBE, 0xEF, 0xCA, 0xFE, 0xBA, 0xBE, 0xDE, 0xAD, 0xBE, 0xEF, 0xCA, 0xFE, 0xBA, 0xBE,
+};
+constexpr uint8_t kUnknownPeerBltDevIK[kDeviceIdentityKeyLen] = {
+    0xDE, 0xAD, 0xBE, 0xEF, 0xCA, 0xFE, 0xBA, 0xBE, 0xDE, 0xAD, 0xBE, 0xEF, 0xCA, 0xFE, 0xBA, 0xBE,
+};
+
+/// Returns true if the captured peer identity for `tech` matches the
+/// "unknown peer" sentinel — i.e. the cluster client deliberately asked us
+/// to range against a peer the (stub) radio cannot find.
+bool IsUnknownPeerIdentity(RangingTechEnum tech, const std::optional<uint64_t> & peerBleDeviceId,
+                           const std::optional<std::array<uint8_t, kDeviceIdentityKeyLen>> & peerWiFiDevIK,
+                           const std::optional<std::array<uint8_t, kDeviceIdentityKeyLen>> & peerBltDevIK)
+{
+    switch (tech)
+    {
+    case RangingTechEnum::kBLEBeaconRSSIRanging:
+        return peerBleDeviceId.has_value() && peerBleDeviceId.value() == kUnknownPeerBleDeviceId;
+    case RangingTechEnum::kWiFiRoundTripTimeRanging:
+    case RangingTechEnum::kWiFiNextGenerationRanging:
+        return peerWiFiDevIK.has_value() && memcmp(peerWiFiDevIK->data(), kUnknownPeerWiFiDevIK, kDeviceIdentityKeyLen) == 0;
+    case RangingTechEnum::kBluetoothChannelSounding:
+        return peerBltDevIK.has_value() && memcmp(peerBltDevIK->data(), kUnknownPeerBltDevIK, kDeviceIdentityKeyLen) == 0;
+    default:
+        return false;
+    }
+}
 
 constexpr const char * RoleName(RangingRoleEnum role)
 {
@@ -181,6 +225,24 @@ LoggingRangingAdapter::LoggingRangingAdapter(RangingTechEnum technology, TimerDe
         VerifyOrDie(BleRssi::RetrieveGenerateBleDeviceId(*mpStore, mBleDeviceId) == CHIP_NO_ERROR);
         ChipLogProgress(NotSpecified, "[LoggingRangingAdapter:%s] Generated and persisted new BLEDeviceID", LogTag());
     }
+
+    // CSPRNG-fill the device identity key for the matching technology. These
+    // keys are NOT persisted; they regenerate on every process start. A real
+    // adapter must persist them across reboots — see header comment.
+    switch (mTechnology)
+    {
+    case RangingTechEnum::kWiFiRoundTripTimeRanging:
+    case RangingTechEnum::kWiFiNextGenerationRanging:
+        VerifyOrDie(Crypto::DRBG_get_bytes(mWiFiDevIK, kDeviceIdentityKeyLen) == CHIP_NO_ERROR);
+        ChipLogProgress(NotSpecified, "[LoggingRangingAdapter:%s] Generated random WiFiDevIK", LogTag());
+        break;
+    case RangingTechEnum::kBluetoothChannelSounding:
+        VerifyOrDie(Crypto::DRBG_get_bytes(mBltDevIK, kDeviceIdentityKeyLen) == CHIP_NO_ERROR);
+        ChipLogProgress(NotSpecified, "[LoggingRangingAdapter:%s] Generated random BLTDevIK", LogTag());
+        break;
+    default:
+        break;
+    }
 }
 
 // GetDeviceId / GetWiFiUsdConfig / GetBltcsConfig back the cluster's optional
@@ -214,7 +276,7 @@ std::optional<WiFiUsdConfig> LoggingRangingAdapter::GetWiFiUsdConfig()
         return std::nullopt;
     }
     WiFiUsdConfig config{};
-    memcpy(config.deviceIdentityKey, kWiFiDevIK, kDeviceIdentityKeyLen);
+    memcpy(config.deviceIdentityKey, mWiFiDevIK, kDeviceIdentityKeyLen);
     return config;
 }
 
@@ -225,7 +287,7 @@ std::optional<BltcsConfig> LoggingRangingAdapter::GetBltcsConfig()
         return std::nullopt;
     }
     BltcsConfig config{};
-    memcpy(config.deviceIdentityKey, kBltDevIK, kDeviceIdentityKeyLen);
+    memcpy(config.deviceIdentityKey, mBltDevIK, kDeviceIdentityKeyLen);
     // REAL ADAPTER: securityLevel and modeCapability come from the
     // controller's BLTCS feature set. Hard-coding "level three / both" keeps
     // cert tests deterministic but is not what production reports.
@@ -380,6 +442,20 @@ ResultCodeEnum LoggingRangingAdapter::StartSession(uint8_t sessionId, const Comm
         }
     }
 
+    // One-time peer-identity sentinel check: if the request targets the
+    // technology-specific "unknown peer" pattern, mark the session so
+    // TimerFired never emits OnMeasurementData. peerFound stays false and the
+    // EndTime cutoff terminates with kPeerNotFound.
+    session->isUnknownPeer =
+        IsUnknownPeerIdentity(mTechnology, session->peerBleDeviceId, session->peerWiFiDevIK, session->peerBltDevIK);
+    if (session->isUnknownPeer)
+    {
+        ChipLogProgress(
+            NotSpecified,
+            "[LoggingRangingAdapter:%s] sid=%u peer identity matches kUnknownPeer sentinel; will report kPeerNotFound at endTime",
+            LogTag(), sessionId);
+    }
+
     Session * sessionPtr = session.get();
     mSessions.push_back(std::move(session));
     ScheduleNextFire(*sessionPtr);
@@ -466,9 +542,13 @@ CHIP_ERROR LoggingRangingAdapter::GetActiveSessionIds(Span<uint8_t> & sessionIds
 
 // Session::TimerFired is the synthesizer's tick. It plays three distinct
 // roles depending on session state:
-//   1. EndTime reached → terminate with SessionEndTimeReached.
+//   1. EndTime reached → terminate. Status is kSessionEndTimeReached if at
+//      least one measurement was delivered (peerFound), otherwise
+//      kPeerNotFound — every reporting tick was suppressed by the
+//      ReportingCondition gate, so the peer was never observed.
 //   2. Instant ranging post-measurement tick → terminate (the deferred fire
-//      from kInstantRangingTerminateDelay).
+//      from kInstantRangingTerminateDelay), with the same peerFound-driven
+//      status selection.
 //   3. Otherwise → emit a measurement, advance to the next tick.
 //
 // REAL ADAPTER: this entire function is replaced by callbacks from the
@@ -480,9 +560,11 @@ void LoggingRangingAdapter::Session::TimerFired()
 {
     auto now = owner.mTimerDelegate.GetCurrentMonotonicTimestamp();
 
+    auto terminationStatus = peerFound ? RangingSessionStatusEnum::kSessionEndTimeReached : RangingSessionStatusEnum::kPeerNotFound;
+
     if (now >= endAt)
     {
-        owner.TerminateSession(*this, RangingSessionStatusEnum::kSessionEndTimeReached);
+        owner.TerminateSession(*this, terminationStatus);
         return;
     }
 
@@ -493,18 +575,22 @@ void LoggingRangingAdapter::Session::TimerFired()
     // MarkDirty calls into a single report carrying the final empty state.
     if (firstFired && interval == System::Clock::Milliseconds32(0))
     {
-        owner.TerminateSession(*this, RangingSessionStatusEnum::kSessionEndTimeReached);
+        owner.TerminateSession(*this, terminationStatus);
         return;
     }
 
     auto measurement = owner.BuildMeasurement(*this);
-    bool emit        = !hasReporting || SatisfiesReporting(reporting, measurement);
+    bool emit        = !isUnknownPeer && (!hasReporting || SatisfiesReporting(reporting, measurement));
     if (emit && owner.mCallback != nullptr)
     {
         owner.mCallback->OnMeasurementData(sessionId, measurement);
+        peerFound = true;
     }
-    else if (!emit)
+    else if (!emit && !isUnknownPeer)
     {
+        // ReportingCondition gate suppressed the emission. The unknown-peer
+        // case is intentionally silent at TimerFired time — its log already
+        // fired once at StartSession.
         ChipLogProgress(NotSpecified,
                         "[LoggingRangingAdapter:%s] sid=%u suppressing measurement (ReportingCondition not satisfied)",
                         owner.LogTag(), sessionId);
@@ -646,7 +732,7 @@ Structs::RangingMeasurementDataStruct::Type LoggingRangingAdapter::BuildMeasurem
         }
         else
         {
-            measurement.BLTDevIK.SetValue(ByteSpan(kBltDevIK, kDeviceIdentityKeyLen));
+            measurement.BLTDevIK.SetValue(ByteSpan(mBltDevIK, kDeviceIdentityKeyLen));
         }
         break;
     case RangingTechEnum::kWiFiRoundTripTimeRanging:
@@ -657,7 +743,7 @@ Structs::RangingMeasurementDataStruct::Type LoggingRangingAdapter::BuildMeasurem
         }
         else
         {
-            measurement.wiFiDevIK.SetValue(ByteSpan(kWiFiDevIK, kDeviceIdentityKeyLen));
+            measurement.wiFiDevIK.SetValue(ByteSpan(mWiFiDevIK, kDeviceIdentityKeyLen));
         }
         break;
     default:
