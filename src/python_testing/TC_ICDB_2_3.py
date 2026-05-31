@@ -129,7 +129,7 @@ class TC_ICDB_2_3(ICDBaseTest):
 
     def steps_TC_ICDB_2_3(self) -> list[TestStep]:
         return [
-            TestStep("precondition", "DUT is commissioned to TH1 and TH2."),
+            TestStep("precondition", "Commission DUT to TH1 and TH2."),
             TestStep(1, "TH1 sends the RegisterClient command to the DUT with TH1's node ID as checkInNodeID and monitoredSubject. TH1 reads the RegisteredClients attribute.", """
                      TH1 is registered as an ICD client on the DUT.
                      Verify exactly one RegisteredClients entry is present.
@@ -162,7 +162,7 @@ class TC_ICDB_2_3(ICDBaseTest):
     async def test_TC_ICDB_2_3(self):
 
         # *** PRECONDITION ***
-        # DUT is commissioned to TH1 and TH2.
+        # Commission DUT to TH1 and TH2.
         self.step("precondition")
 
         # *** STEP 1 ***
