@@ -140,7 +140,9 @@ private:
 
     RangingAdapter * FindAdapter(RangingTechEnum technology) const;
     Session * FindSession(uint8_t sessionId);
-    void RetireSession(uint8_t sessionId);
+    /// Release the pool slot for @e sessionId and notify the cluster that
+    /// SessionIDList has changed. Returns false if no session matched.
+    bool RetireSession(uint8_t sessionId);
 
     Span<RangingAdapter * const> mAdapters;
 

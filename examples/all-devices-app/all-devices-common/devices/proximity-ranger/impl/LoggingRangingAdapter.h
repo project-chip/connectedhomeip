@@ -42,6 +42,14 @@ namespace ProximityRanging {
  * Hardware-free RangingAdapter that logs every API call and synthesizes
  * measurement events from the StartRangingRequest's timing fields.
  *
+ * Read `RangingAdapter.h` first for the full platform-integration contract
+ * (registration lifecycle, threading, callback semantics, optional
+ * capabilities). This class is a *fake* implementation of a Proximity Ranger
+ * device that deliberately avoids calling any platform radio APIs so that
+ * the Proximity Ranging cluster server can be exercised on developer
+ * machines and in CI without ranging hardware, and so that platform
+ * integrators have a worked example of every required override.
+ *
  * Purpose
  * -------
  * This file is intended to serve two roles:
@@ -61,10 +69,11 @@ namespace ProximityRanging {
  * ---------------------------
  * Each instance is bound to a single RangingTechEnum value via the
  * constructor. ProximityRangingDriver expects one adapter per supported
- * technology, registered before Init(). Real platforms typically build one
- * adapter class per backend (e.g. a WiFiRttAdapter, a BltcsAdapter) rather
- * than dispatching internally on the technology enum, but the pattern below
- * shows both styles by switching on mTechnology.
+ * technology, registered before ProximityRangingDriver::Init(). Real
+ * platforms typically build one adapter class per backend (e.g. a
+ * WiFiRttAdapter, a BltcsAdapter) rather than dispatching internally on the
+ * technology enum, but the pattern below shows both styles by switching on
+ * mTechnology.
  *
  * Supported technologies:
  *   - kBLEBeaconRSSIRanging       (PROXR feature: BLERBC)
@@ -94,7 +103,7 @@ namespace ProximityRanging {
  * ReportingCondition before emission. Measurements that do not satisfy the
  * condition are silently dropped — this lets cert tests exercise both the
  * satisfied and unsatisfiable code paths by choosing a condition relative to
- * the fixed default distance (kDefaultDistanceCm).
+ * the fixed default distance baked into BuildMeasurement.
  *
  * REAL ADAPTER: ReportingCondition is a *transport-level* filter that the
  * cluster server already applies before invoking OnMeasurementData consumers.
@@ -109,31 +118,6 @@ namespace ProximityRanging {
 class LoggingRangingAdapter : public RangingAdapter
 {
 public:
-    /// Synthetic fixed measurement defaults — chosen to satisfy a permissive
-    /// ReportingCondition, and deterministic so cert tests can assert them.
-    ///
-    /// REAL ADAPTER: these constants do not exist in production. Distance,
-    /// error margin, RSSI and Tx power are reported from the radio's own
-    /// measurement output; values vary with the channel, peer, and
-    /// environment.
-    static constexpr uint16_t kDefaultDistanceCm    = 100;
-    static constexpr uint16_t kDefaultErrorMarginCm = 10;
-    static constexpr int8_t kDefaultRssiDbm         = -50;
-    static constexpr int8_t kDefaultTxPowerDbm      = 0;
-
-    /// Gap between the measurement fire and the terminate fire for instant
-    /// ranging. Simulates a realistic measurement duration (BLE scan, WiFi RTT
-    /// round trip, etc.) and gives the subscription engine time to flush a
-    /// SessionIDList "session added" report before the "session removed"
-    /// report — without it the two MarkDirty calls collapse into a single
-    /// report carrying the final empty state, and one-shot reads from
-    /// chip-tool race past the active window.
-    ///
-    /// REAL ADAPTER: this delay is purely a stub artifact. A real instant
-    /// ranging session terminates when the radio reports the single
-    /// measurement, with no need to space it out from a synthesized fire.
-    static constexpr System::Clock::Milliseconds32 kInstantRangingTerminateDelay{ 3000 };
-
     /// Deterministic 16-byte WiFiDevIK (a fixed, distinguishable pattern so
     /// cert tests can assert exact attribute reads).
     ///
@@ -168,8 +152,28 @@ public:
     /// (in which case the BLEDeviceID must be persisted across reboots so
     /// peers can correlate beacons over time) and is otherwise unused. Pass
     /// nullptr for non-BLE-RSSI technologies. The pointer is borrowed and
-    /// must outlive this adapter. Init() VerifyOrDies if storage is missing
-    /// for a BLE-RSSI adapter.
+    /// must outlive this adapter. The constructor VerifyOrDies if storage
+    /// is missing for a BLE-RSSI adapter.
+    ///
+    /// Per-technology identity persistence: the BLE Beacon Ranging
+    /// BLEDeviceID is defined at the Matter layer and is therefore
+    /// generated and persisted by the cluster/adapter directly via the
+    /// supplied PersistentStorageDelegate. Platform adapters that own
+    /// similar per-radio identity keys (WiFiDevIK, BLTDevIK, …) should
+    /// follow the same pattern: on construction, retrieve the persisted
+    /// value from storage and, if absent, CSPRNG-generate it and persist
+    /// it before the cluster's Init runs, so the Get* accessors always
+    /// have a stable value to return.
+    ///
+    /// Optional Init() pattern: platforms that need to query the radio for
+    /// runtime properties (frequency band support, security capabilities,
+    /// identity key material that lives in the radio rather than in
+    /// PersistentStorageDelegate) MAY add a public Init() method that the
+    /// application invokes before registering the adapter with the driver.
+    /// Caching those properties in member fields lets the synchronous
+    /// Get* methods return without blocking on the radio. This adapter
+    /// does all of its setup in the constructor because it has no radio
+    /// to talk to.
     ///
     /// `periodicRangingSupport` controls the RangingCapabilitiesStruct field
     /// of the same name. Real adapters derive this from the radio's
@@ -198,6 +202,15 @@ public:
     CHIP_ERROR StopSession(uint8_t sessionId) override;
     void StopAllSessions() override;
     CHIP_ERROR GetActiveSessionIds(Span<uint8_t> & sessionIds) override;
+
+    // The optional Get* accessors below all default to std::nullopt in
+    // RangingAdapter's base class. A concrete adapter SHOULD override only
+    // the accessor that matches its bound technology (e.g. a BLE-RSSI
+    // adapter overrides GetDeviceId; a BLTCS adapter overrides
+    // GetBltcsConfig; a Wi-Fi USD adapter overrides GetWiFiUsdConfig) and
+    // leave the others unimplemented so the cluster surfaces
+    // UnsupportedAttribute. This stub overrides all three only because a
+    // single instance is reused across every technology in the example app.
     std::optional<uint64_t> GetDeviceId() override;
     std::optional<WiFiUsdConfig> GetWiFiUsdConfig() override;
     std::optional<BltcsConfig> GetBltcsConfig() override;
@@ -299,9 +312,9 @@ private:
     PersistentStorageDelegate * mpStore = nullptr;
 
     /// Local BLEDeviceID for BLE Beacon RSSI ranging. Loaded from `mpStore`
-    /// on Init(); on first boot Init() generates a new one via the BleRssi
-    /// helper and persists it. Holds kInvalidBleDeviceId on technologies
-    /// other than kBLEBeaconRSSIRanging and before Init() runs.
+    /// in the constructor; on first boot the constructor generates a new
+    /// one via the BleRssi helper and persists it. Holds kInvalidBleDeviceId
+    /// on technologies other than kBLEBeaconRSSIRanging.
     uint64_t mBleDeviceId = BleRssi::kInvalidBleDeviceId;
 
     /// Active sessions. unique_ptr keeps Session addresses stable across

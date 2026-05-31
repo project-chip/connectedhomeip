@@ -66,25 +66,13 @@ CHIP_ERROR ProximityRangingDriver::Init(Callback & callback)
 
 void ProximityRangingDriver::Shutdown()
 {
-    // Take a snapshot list since adapter->StopSession will fire
-    // OnRangingSessionStopped synchronously, which mutates mSessions.
-    uint8_t snapshot[kMaxConcurrentSessions];
-    size_t snapshotCount = 0;
-    mSessions.ForEachActiveObject([&](Session * s) {
-        if (snapshotCount < kMaxConcurrentSessions)
-        {
-            snapshot[snapshotCount++] = s->id;
-        }
+    // ObjectPool::ForEachActiveObject permits ReleaseObject (via the adapter's
+    // synchronous OnRangingSessionStopped → RetireSession path) on the current
+    // element during iteration.
+    mSessions.ForEachActiveObject([](Session * s) {
+        LogErrorOnFailure(s->adapter->StopSession(s->id));
         return Loop::Continue;
     });
-    for (size_t i = 0; i < snapshotCount; i++)
-    {
-        Session * s = FindSession(snapshot[i]);
-        if (s != nullptr)
-        {
-            LogErrorOnFailure(s->adapter->StopSession(snapshot[i]));
-        }
-    }
 
     // Release any sessions an adapter failed to retire synchronously so a
     // re-Init starts from a clean pool.
@@ -201,9 +189,12 @@ void ProximityRangingDriver::OnRangingSessionStopped(uint8_t sessionId, RangingS
 {
     // Drop spurious or stale adapter notifications for sessions the driver no
     // longer tracks (e.g. duplicate stop, post-Shutdown delivery).
-    VerifyOrReturn(FindSession(sessionId) != nullptr);
-    // RetireSession dirties SessionIDList as part of releasing the pool slot.
-    RetireSession(sessionId);
+    // RetireSession dirties SessionIDList as part of releasing the pool slot,
+    // and is a no-op if the session is already gone.
+    if (!RetireSession(sessionId))
+    {
+        return;
+    }
     VerifyOrReturn(mClusterCallback != nullptr);
     mClusterCallback->OnSessionStopped(sessionId, status);
 }
@@ -247,18 +238,19 @@ ProximityRangingDriver::Session * ProximityRangingDriver::FindSession(uint8_t se
     return found;
 }
 
-void ProximityRangingDriver::RetireSession(uint8_t sessionId)
+bool ProximityRangingDriver::RetireSession(uint8_t sessionId)
 {
     Session * s = FindSession(sessionId);
     if (s == nullptr)
     {
-        return;
+        return false;
     }
     mSessions.ReleaseObject(s);
     if (mClusterCallback != nullptr)
     {
         mClusterCallback->OnAttributeChanged(Attributes::SessionIDList::Id);
     }
+    return true;
 }
 
 } // namespace ProximityRanging

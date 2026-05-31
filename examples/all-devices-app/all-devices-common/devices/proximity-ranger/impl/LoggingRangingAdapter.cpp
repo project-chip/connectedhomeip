@@ -33,6 +33,30 @@ namespace ProximityRanging {
 
 namespace {
 
+/// Synthetic fixed measurement defaults — chosen to satisfy a permissive
+/// ReportingCondition, and deterministic so cert tests can assert them.
+///
+/// REAL ADAPTER: these constants do not exist in production. Distance,
+/// error margin, RSSI and Tx power are reported from the radio's own
+/// measurement output; values vary with the channel, peer, and environment.
+constexpr uint16_t kDefaultDistanceCm    = 100;
+constexpr uint16_t kDefaultErrorMarginCm = 10;
+constexpr int8_t kDefaultRssiDbm         = -50;
+constexpr int8_t kDefaultTxPowerDbm      = 0;
+
+/// Gap between the measurement fire and the terminate fire for instant
+/// ranging. Simulates a realistic measurement duration (BLE scan, WiFi RTT
+/// round trip, etc.) and gives the subscription engine time to flush a
+/// SessionIDList "session added" report before the "session removed"
+/// report — without it the two MarkDirty calls collapse into a single
+/// report carrying the final empty state, and one-shot reads from
+/// chip-tool race past the active window.
+///
+/// REAL ADAPTER: this delay is purely a stub artifact. A real instant
+/// ranging session terminates when the radio reports the single
+/// measurement, with no need to space it out from a synthesized fire.
+constexpr System::Clock::Milliseconds32 kInstantRangingTerminateDelay{ 3000 };
+
 constexpr const char * RoleName(RangingRoleEnum role)
 {
     switch (role)
@@ -104,8 +128,9 @@ const char * LoggingRangingAdapter::LogTag() const
 
 // GetCapabilities populates the RangingCapabilitiesStruct surfaced via the
 // cluster's RangingCapabilities attribute. The cluster server reads this
-// once per Init and again any time OnAttributeChanged(RangingCapabilities)
-// is invoked, so the value should reflect the radio's true capabilities.
+// once during cluster initialisation and again any time
+// OnAttributeChanged(RangingCapabilities) is invoked, so the value should
+// reflect the radio's true capabilities.
 //
 // REAL ADAPTER: technology is fixed at construction (one adapter, one tech).
 // frequencyBand and periodicRangingSupport must match what the radio actually
@@ -133,14 +158,6 @@ Structs::RangingCapabilitiesStruct::Type LoggingRangingAdapter::GetCapabilities(
     return capabilities;
 }
 
-// GetDeviceId / GetWiFiUsdConfig / GetBltcsConfig back the cluster's optional
-// per-technology attributes (BLEDeviceID, WiFiDevIK, BLTDevIK, etc.).
-// Returning std::nullopt makes the cluster surface UnsupportedAttribute.
-//
-// REAL ADAPTER: each Get* method MUST return Some(...) only on the adapter
-// whose technology is the one the attribute belongs to, and the value must
-// be the device's persisted, CSPRNG-derived identifier — not a constant.
-
 // Constructor: binds the adapter to a single technology and, for BLE Beacon
 // RSSI ranging, loads (or generates and persists) the local BLEDeviceID.
 // Non-BLE-RSSI technologies skip the storage path entirely; their `storage`
@@ -150,8 +167,7 @@ Structs::RangingCapabilitiesStruct::Type LoggingRangingAdapter::GetCapabilities(
 // local identity (BLEDeviceID, WiFiDevIK, BLTDevIK), and on first boot
 // generate via CSPRNG and persist. The BleRssi helper functions in
 // app/clusters/proximity-ranging-server/BleRssiRangingHelpers.h provide a
-// CSPRNG-based generator for the BLEDeviceID. Storage failures here are
-// fatal — without a stable identity, beacons cannot be correlated by peers.
+// CSPRNG-based generator for the BLEDeviceID.
 LoggingRangingAdapter::LoggingRangingAdapter(RangingTechEnum technology, TimerDelegate & timerDelegate,
                                              PersistentStorageDelegate * storage, bool periodicRangingSupport) :
     mPeriodicRangingSupport(periodicRangingSupport),
@@ -159,17 +175,27 @@ LoggingRangingAdapter::LoggingRangingAdapter(RangingTechEnum technology, TimerDe
 {
     if (mTechnology == RangingTechEnum::kBLEBeaconRSSIRanging)
     {
+        // Storage failures are fatal here, without stable identity ranging sessions
+        // cannot be correlated to beacons
         VerifyOrDie(mpStore != nullptr);
         VerifyOrDie(BleRssi::RetrieveGenerateBleDeviceId(*mpStore, mBleDeviceId) == CHIP_NO_ERROR);
         ChipLogProgress(NotSpecified, "[LoggingRangingAdapter:%s] Generated and persisted new BLEDeviceID", LogTag());
     }
 }
 
+// GetDeviceId / GetWiFiUsdConfig / GetBltcsConfig back the cluster's optional
+// per-technology attributes (BLEDeviceID, WiFiDevIK, BLTDevIK, etc.).
+// Returning std::nullopt makes the cluster surface UnsupportedAttribute.
+//
+// REAL ADAPTER: each Get* method MUST return Some(...) only on the adapter
+// whose technology is the one the attribute belongs to, and the value must
+// be the device's persisted, CSPRNG-derived identifier — not a constant.
 std::optional<uint64_t> LoggingRangingAdapter::GetDeviceId()
 {
     // BLE Device ID is only defined for BLE Beacon RSSI ranging; other
     // technologies have no equivalent attribute and should return nullopt.
-    // mBleDeviceId is populated by Init() before the adapter is registered.
+    // mBleDeviceId is populated by the constructor before the adapter is
+    // registered with the driver.
     if (mTechnology == RangingTechEnum::kBLEBeaconRSSIRanging)
     {
         return mBleDeviceId;
@@ -220,11 +246,30 @@ LoggingRangingAdapter::~LoggingRangingAdapter()
 
 // StartSession is the synchronous entry point invoked by the cluster server
 // when it has accepted a StartRangingRequest command. The adapter must:
-//   - return kAccepted only if the start succeeded (or is plausibly
-//     in-flight, with HardwareError to follow asynchronously);
-//   - reject infeasible requests synchronously with the appropriate
-//     ResultCodeEnum (e.g. kRejectedInfeasibleRangingTriggers,
-//     kRejectedInUse, kRejectedNoMemory);
+//   - Determine whether the request is compatible with what the radio can
+//     do and synchronously return kRejectedInfeasibleRanging (or, for
+//     out-of-range trigger timing specifically,
+//     kRejectedInfeasibleRangingTriggers) when it is not. Capability
+//     checks belong to the adapter, not the cluster, because only the
+//     adapter knows the radio's true capabilities.
+//   - Return kAccepted as soon as the adapter has committed to the
+//     session. If the radio's start handshake takes too long to wait on
+//     synchronously, returning kAccepted here is acceptable; the adapter
+//     is then responsible for emitting OnRangingSessionStopped with an
+//     appropriate RangingSessionStatusEnum (e.g. kHardwareError) if the
+//     session subsequently fails to come up.
+//   - Track every accepted session by its 1-byte sessionId so the
+//     matching StopSession call (and any radio-driven termination) can
+//     map back to the correct in-flight session. The adapter is
+//     responsible for delivering OnRangingSessionStopped exactly once
+//     per accepted session — whether termination is client-initiated,
+//     EndTime expiry, or hardware failure — so the cluster's
+//     SessionIDList stays consistent.
+//   - Forward every measurement received from the radio into the
+//     callback's OnMeasurementData with a fully populated
+//     RangingMeasurementDataStruct, deriving each field from the radio's
+//     measurement output (distance, error margin, RSSI / Tx power for
+//     BLE Beacon RSSI, peer identity field for the bound technology, …).
 //   - NOT deliver OnRangingSessionStopped synchronously from inside this
 //     function — the cluster's bookkeeping isn't ready for it yet.
 //
