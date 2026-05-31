@@ -131,9 +131,11 @@ class TC_PWRTL_2_2(MatterBaseTest):
             CircuitNodeStruct(node=0x000000000000B001),
             CircuitNodeStruct(node=0x000000000000B002, endpoint=1, label="circuit-A"),
         ]
-        status = await self.write_single_attribute(
+        # write_single_attribute asserts SUCCESS internally when expect_success is left at
+        # its default (True), so the success-path writes below do not need an extra
+        # assert_equal on the returned status.
+        await self.write_single_attribute(
             attribute_value=attr(entries_2), endpoint_id=endpoint)
-        asserts.assert_equal(status, Status.Success, 'Write of 2-entry list must succeed')
 
         self.step(3)
         read_back = await self.read_single_attribute_check_success(
@@ -143,9 +145,8 @@ class TC_PWRTL_2_2(MatterBaseTest):
 
         self.step(4)
         entries_50 = [CircuitNodeStruct(node=0x000000000000B000 + i) for i in range(50)]
-        status = await self.write_single_attribute(
+        await self.write_single_attribute(
             attribute_value=attr(entries_50), endpoint_id=endpoint)
-        asserts.assert_equal(status, Status.Success, 'Write of 50-entry list (at max) must succeed')
 
         self.step(5)
         entries_51 = [CircuitNodeStruct(node=0x000000000000B000 + i) for i in range(51)]
@@ -157,9 +158,8 @@ class TC_PWRTL_2_2(MatterBaseTest):
         self.step(6)
         label_128 = "x" * 128
         entries_label_max = [CircuitNodeStruct(node=0x000000000000B001, label=label_128)]
-        status = await self.write_single_attribute(
+        await self.write_single_attribute(
             attribute_value=attr(entries_label_max), endpoint_id=endpoint)
-        asserts.assert_equal(status, Status.Success, 'Write with 128-char Label (at max) must succeed')
 
         self.step(7)
         label_129 = "x" * 129
