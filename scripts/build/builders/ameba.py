@@ -15,7 +15,8 @@
 import os
 from enum import Enum, auto
 
-from .builder import Builder, BuilderOutput
+from runner.runner import Runner
+from .builder import Builder, BuilderOutput, OutDirLock, lock_output_dir
 
 
 class AmebaBoard(Enum):
@@ -26,7 +27,6 @@ class AmebaApp(Enum):
     ALL_CLUSTERS = auto()
     ALL_CLUSTERS_MINIMAL = auto()
     LIGHT = auto()
-    PIGWEED = auto()
     LIGHT_SWITCH = auto()
 
     @property
@@ -39,8 +39,6 @@ class AmebaApp(Enum):
             return 'lighting-app'
         if self == AmebaApp.LIGHT_SWITCH:
             return 'light-switch-app'
-        if self == AmebaApp.PIGWEED:
-            return 'pigweed-app'
         raise Exception('Unknown app type: %r' % self)
 
     @property
@@ -53,35 +51,33 @@ class AmebaApp(Enum):
             return 'chip-ameba-lighting-app'
         if self == AmebaApp.LIGHT_SWITCH:
             return 'chip-ameba-light-switch-app'
-        if self == AmebaApp.PIGWEED:
-            return 'chip-ameba-pigweed-app'
         raise Exception('Unknown app type: %r' % self)
 
 
 class AmebaBuilder(Builder):
 
     def __init__(self,
-                 root,
-                 runner,
+                 root: str,
+                 runner: Runner,
+                 output_dir_lock: OutDirLock,
                  board: AmebaBoard = AmebaBoard.AMEBAD,
                  app: AmebaApp = AmebaApp.ALL_CLUSTERS):
-        super(AmebaBuilder, self).__init__(root, runner)
+        super().__init__(root, runner, output_dir_lock)
         self.board = board
         self.app = app
 
+    @lock_output_dir
     def generate(self):
         cmd = '$AMEBA_PATH/project/realtek_amebaD_va0_example/GCC-RELEASE/build.sh '
-        if self.app.ExampleName == 'pigweed-app':
-            # rpc flag: -r
-            cmd += '-r '
-
         # <build root> <build_system> <output_directory> <application>
+
         cmd += ' '.join([self.root, 'ninja', self.output_dir,
                         self.app.ExampleName])
 
         self._Execute(['bash', '-c', cmd],
                       title='Generating ' + self.identifier)
 
+    @lock_output_dir
     def _build(self):
         cmd = ['ninja', '-C', self.output_dir]
 
@@ -90,6 +86,7 @@ class AmebaBuilder(Builder):
 
         self._Execute(cmd, title='Building ' + self.identifier)
 
+    @lock_output_dir
     def build_outputs(self):
         yield BuilderOutput(
             os.path.join(self.output_dir, 'asdk', 'target_image2.axf'),

@@ -225,7 +225,7 @@ class TC_RVCOPSTATE_2_3(MatterBaseTest):
 
         state_ids = {s.operationalStateID for s in op_state_list}
 
-        asserts.assert_true(all(id in state_ids for id in defined_states), "OperationalStateList is missing a required entry")
+        asserts.assert_true(all(_id in state_ids for _id in defined_states), "OperationalStateList is missing a required entry")
 
         self.print_step(4, "Read OperationalState")
         old_opstate_dut = await self.read_mod_attribute_expect_success(endpoint=self.endpoint,

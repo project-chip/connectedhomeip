@@ -30,7 +30,7 @@ jobs:
 
         runs-on: ubuntu-latest
         container:
-            image: ghcr.io/project-chip/chip-build:193
+            image: ghcr.io/project-chip/chip-build:194
         defaults:
             run:
                 shell: sh
@@ -52,3 +52,8 @@ jobs:
               with:
                 default_author: github_actions
                 message: Regenerating ZAP
+            - name: Notify Slack on Failure
+              if: failure()
+              uses: ./.github/actions/notify-slack-failure
+              with:
+                slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}

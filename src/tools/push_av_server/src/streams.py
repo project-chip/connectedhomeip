@@ -32,7 +32,7 @@ class StreamService:
             if stream_path.is_dir():
                 stream_file = stream_path / "stream.json"
                 if stream_file.exists():
-                    with open(stream_file, 'r', encoding='utf-8') as f:
+                    with open(stream_file, encoding='utf-8') as f:
                         stream_data = json.load(f)
                         streams[stream_path.name] = Stream.model_validate(stream_data)
         return streams

@@ -23,6 +23,7 @@
 
 #include <glib.h>
 
+#include <lib/support/CHIPMemString.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CommissionableDataProvider.h>
 #include <platform/ConnectivityManager.h>
@@ -31,6 +32,7 @@
 #include <platform/PlatformManager.h>
 
 #include "ConnectivityManagerImpl.h"
+#include "WpaSupplicantClient.h"
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
 using namespace ::chip::WiFiPAF;
@@ -198,7 +200,7 @@ void ConnectivityManagerImpl::OnDiscoveryResult(GVariant * discov_info)
     value = g_variant_lookup_value(discov_info, "peer_addr", G_VARIANT_TYPE_STRING);
     dataValue.reset(value);
     g_variant_get(dataValue.get(), "&s", &paddr);
-    strncpy(addr_str, paddr, sizeof(addr_str));
+    chip::Platform::CopyString(addr_str, paddr);
     sscanf(addr_str, "%02hhx:%02hhx:%02hhx:%02hhx:%02hhx:%02hhx", &peer_addr[0], &peer_addr[1], &peer_addr[2], &peer_addr[3],
            &peer_addr[4], &peer_addr[5]);
 
@@ -291,7 +293,7 @@ void ConnectivityManagerImpl::OnReplied(GVariant * reply_info)
     value = g_variant_lookup_value(reply_info, "peer_addr", G_VARIANT_TYPE_STRING);
     dataValue.reset(value);
     g_variant_get(dataValue.get(), "&s", &paddr);
-    strncpy(addr_str, paddr, sizeof(addr_str));
+    chip::Platform::CopyString(addr_str, paddr);
     sscanf(addr_str, "%02hhx:%02hhx:%02hhx:%02hhx:%02hhx:%02hhx", &peer_addr[0], &peer_addr[1], &peer_addr[2], &peer_addr[3],
            &peer_addr[4], &peer_addr[5]);
 
@@ -370,7 +372,7 @@ void ConnectivityManagerImpl::OnNanReceive(GVariant * obj)
     value = g_variant_lookup_value(obj, "peer_addr", G_VARIANT_TYPE_STRING);
     dataValue.reset(value);
     g_variant_get(dataValue.get(), "&s", &paddr);
-    strncpy(addr_str, paddr, sizeof(addr_str));
+    chip::Platform::CopyString(addr_str, paddr);
     sscanf(addr_str, "%02hhx:%02hhx:%02hhx:%02hhx:%02hhx:%02hhx", &RxInfo.peer_addr[0], &RxInfo.peer_addr[1], &RxInfo.peer_addr[2],
            &RxInfo.peer_addr[3], &RxInfo.peer_addr[4], &RxInfo.peer_addr[5]);
 
@@ -382,7 +384,7 @@ void ConnectivityManagerImpl::OnNanReceive(GVariant * obj)
     dataValue.reset(value);
 
     auto rxbuf = g_variant_get_fixed_array(dataValue.get(), &bufferLen, sizeof(uint8_t));
-    ChipLogProgress(DeviceLayer, "WiFi-PAF: wpa_supplicant: nan-rx: [len: %" G_GSIZE_FORMAT "]", bufferLen);
+    ChipLogProgress(DeviceLayer, "WiFi-PAF: " WPA_SUPPLICANT_CLIENT_LOG_PREFIX "nan-rx: [len: %" G_GSIZE_FORMAT "]", bufferLen);
     buf = System::PacketBufferHandle::NewWithData(rxbuf, bufferLen);
 
     // Post an event to the Chip queue to deliver the data into the Chip stack.

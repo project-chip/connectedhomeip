@@ -111,30 +111,11 @@ PushAVClipRecorder::~PushAVClipRecorder()
         ChipLogProgress(Camera, "Worker thread completed for connection %u", mConnectionID);
     }
 
-    {
-        std::lock_guard<std::mutex> lock(mQueueMutex);
-        while (!mVideoQueue.empty())
-        {
-            AVPacket * packet = mVideoQueue.front();
-            mVideoQueue.pop();
-            av_packet_free(&packet);
-        }
-        while (!mAudioQueue.empty())
-        {
-            AVPacket * packet = mAudioQueue.front();
-            mAudioQueue.pop();
-            av_packet_free(&packet);
-        }
-    }
-
-    // Clean up FFmpeg resources
-    CleanupOutput();
-
     std::filesystem::path mpdPath = mUploadFileBasePath / "index.mpd";
     if (IsFileReadyForUpload(mpdPath))
     {
         UpdateMPDParams(mpdPath);
-        ChipLogProgress(Camera, "Uploading final MPD: %s for track: %s, sessionID: %lu, connectionID: %u", mpdPath.c_str(),
+        ChipLogProgress(Camera, "Uploading final MPD: %s for track: %s, sessionID: %" PRIu64 ", connectionID: %u", mpdPath.c_str(),
                         mClipInfo.mTrackName.c_str(), mClipInfo.mSessionNumber, mConnectionID);
         CheckAndUploadFile(mpdPath.string());
     }
@@ -296,7 +277,7 @@ AVPacket * PushAVClipRecorder::CreatePacket(const uint8_t * data, int size, int6
                 mClipInfo.mClipStartPTS = timestampMs;
             packet->flags = AV_PKT_FLAG_KEY;
 
-            ChipLogProgress(Camera, "Found I-frame at timestamp: %ld ms", timestampMs);
+            ChipLogProgress(Camera, "Found I-frame at timestamp: %" PRId64 " ms", timestampMs);
         }
 
         if (mClipInfo.mHasVideo && mClipInfo.mClipStartPTS == 0)
@@ -413,6 +394,23 @@ void PushAVClipRecorder::Stop()
                 chip::DeviceLayer::PlatformMgr().UnlockChipStack();
                 ChipLogProgress(Camera, "Async thread: NotifyTransportStopped completed for connection %u", connectionID);
             }).detach();
+        }
+        else
+        {
+            ChipLogError(Camera, "PushAVClipRecorder::Stop - Cluster server reference is null for connection %u", mConnectionID);
+        }
+
+        while (!mVideoQueue.empty())
+        {
+            AVPacket * packet = mVideoQueue.front();
+            mVideoQueue.pop();
+            av_packet_free(&packet);
+        }
+        while (!mAudioQueue.empty())
+        {
+            AVPacket * packet = mAudioQueue.front();
+            mAudioQueue.pop();
+            av_packet_free(&packet);
         }
     }
     else

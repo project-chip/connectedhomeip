@@ -16,7 +16,7 @@
 
 
 import logging
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from typing import Optional
 
 from mobly import asserts
@@ -177,7 +177,7 @@ class CommodityPriceTestBaseHelper:
     async def send_test_event_trigger_forecast_update(self):
         await self.send_test_event_triggers(eventTrigger=self.kEventTriggerForecastUpdate)
 
-    def convert_epoch_s_to_time(self, epoch_s, tz=timezone.utc) -> Optional[datetime]:
+    def convert_epoch_s_to_time(self, epoch_s, tz=UTC) -> Optional[datetime]:
         if epoch_s is not NullValue:
             delta_from_epoch = timedelta(seconds=epoch_s)
             matter_epoch = datetime(2000, 1, 1, 0, 0, 0, 0, tz)

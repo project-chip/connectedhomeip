@@ -46,6 +46,9 @@
         "diagnostic-logs-cluster.xml",
         "dishwasher-alarm-cluster.xml",
         "dishwasher-mode-cluster.xml",
+        "dynamic-lighting-cluster.xml",
+        "electrical-distribution-cluster.xml",
+        "electrical-protection-alarm-cluster.xml",
         "groupcast-cluster.xml",
         "humidistat-cluster.xml",
         "microwave-oven-mode-cluster.xml",
@@ -134,7 +137,6 @@
         "thread-network-directory-cluster.xml",
         "time-format-localization-cluster.xml",
         "time-synchronization-cluster.xml",
-        "timer-cluster.xml",
         "tls-certificate-management-cluster.xml",
         "tls-client-management-cluster.xml",
         "user-label-cluster.xml",
@@ -801,6 +803,15 @@
             "ForecastConditions",
             "FeatureMap"
         ],
+        "Electrical Protection Alarm": [
+            "OverLoadRating",
+            "OverVoltageRating",
+            "SurgeProtectionRating",
+            "ShortCircuitRating",
+            "ResidualCurrentRating",
+            "ArcFaultRating",
+            "FeatureMap"
+        ],
         "Electrical Power Measurement": [
             "PowerMode",
             "NumberOfMeasurementTypes",
@@ -897,6 +908,7 @@
             "LocalSnapshotRecordingEnabled",
             "StatusLightEnabled",
             "StatusLightBrightness",
+            "ImageRotationDiscreteAngles",
             "FeatureMap"
         ],
         "Camera AV Settings User Level Management": [

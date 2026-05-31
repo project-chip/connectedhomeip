@@ -662,8 +662,8 @@ class TestConformanceSupport(MatterBaseTest):
                     f'{xml_mid}'
                     f'</{term}>'
                     '</mandatoryConform>')
-        xml = create_xml(('<attribute name="attr1" />'
-                          '<literal value="1" />'))
+        xml = create_xml('<attribute name="attr1" />'
+                         '<literal value="1" />')
         et = ElementTree.fromstring(xml)
         xml_callable = parse_callable_from_xml(et, self.params)
         # TODO: switch this to check greater than once the update to the base is done (#33422)
@@ -671,9 +671,9 @@ class TestConformanceSupport(MatterBaseTest):
         asserts.assert_equal(str(xml_callable), f'attr1 {symbol} 1')
 
         # Ensure that we can only have greater terms with exactly 2 value
-        xml = create_xml(('<attribute name="attr1" />'
-                          '<attribute name="attr2" />'
-                          '<literal value="1" />'))
+        xml = create_xml('<attribute name="attr1" />'
+                         '<attribute name="attr2" />'
+                         '<literal value="1" />')
         et = ElementTree.fromstring(xml)
         try:
             xml_callable = parse_callable_from_xml(et, self.params)
@@ -681,7 +681,7 @@ class TestConformanceSupport(MatterBaseTest):
         except ConformanceException:
             pass
 
-        xml = create_xml(('<attribute name="attr1" />'))
+        xml = create_xml('<attribute name="attr1" />')
         et = ElementTree.fromstring(xml)
         try:
             xml_callable = parse_callable_from_xml(et, self.params)
@@ -690,8 +690,8 @@ class TestConformanceSupport(MatterBaseTest):
             pass
 
         # Only attributes and literals allowed because arithmetic operations require values
-        xml = create_xml(('<feature name="AB" />'
-                          '<literal value="1" />'))
+        xml = create_xml('<feature name="AB" />'
+                         '<literal value="1" />')
         et = ElementTree.fromstring(xml)
         try:
             xml_callable = parse_callable_from_xml(et, self.params)
