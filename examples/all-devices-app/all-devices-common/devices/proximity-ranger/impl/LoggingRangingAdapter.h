@@ -118,26 +118,6 @@ namespace ProximityRanging {
 class LoggingRangingAdapter : public RangingAdapter
 {
 public:
-    /// Deterministic 16-byte WiFiDevIK (a fixed, distinguishable pattern so
-    /// cert tests can assert exact attribute reads).
-    ///
-    /// REAL ADAPTER: WiFiDevIK is the local Wi-Fi USD Device Identity Key.
-    /// The spec requires it to be a CSPRNG-generated 16-byte value persisted
-    /// across reboots; the value here is intentionally NOT a secret and MUST
-    /// NOT be reused on a real device.
-    static constexpr uint8_t kWiFiDevIK[kDeviceIdentityKeyLen] = {
-        0x57, 0x49, 0x46, 0x49, 0x44, 0x65, 0x76, 0x49, 0x4B, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01,
-    };
-
-    /// Deterministic 16-byte BLTDevIK.
-    ///
-    /// REAL ADAPTER: BLTDevIK is the local Bluetooth Channel Sounding Device
-    /// Identity Key. Same generation/persistence requirements as WiFiDevIK —
-    /// CSPRNG-derived, persisted, and never hard-coded.
-    static constexpr uint8_t kBltDevIK[kDeviceIdentityKeyLen] = {
-        0x42, 0x4C, 0x54, 0x44, 0x65, 0x76, 0x49, 0x4B, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02,
-    };
-
     /// Constructs a logging adapter bound to one of the supported technologies.
     /// `technology` MUST be one of: kBLEBeaconRSSIRanging,
     /// kBluetoothChannelSounding, kWiFiRoundTripTimeRanging, OR
@@ -243,6 +223,21 @@ private:
         Structs::ReportingConditionStruct::Type reporting;
         bool firstFired = false;
 
+        /// Set true the first time OnMeasurementData fires for this session
+        /// (i.e. a measurement passed all reporting filters and was actually
+        /// delivered to the cluster). Drives the termination status: if this
+        /// remains false at session end, terminate with kPeerNotFound instead
+        /// of kSessionEndTimeReached.
+        bool peerFound = false;
+
+        /// Set at StartSession when the captured peer identity for this
+        /// session's technology matches the "unknown peer" sentinel pattern.
+        /// While true, TimerFired never emits OnMeasurementData, so peerFound
+        /// stays false and the EndTime cutoff terminates with kPeerNotFound —
+        /// the spec-correct outcome when a hardware radio cannot range
+        /// against the requested peer.
+        bool isUnknownPeer = false;
+
         /// Per-session peer identity captured from the StartRangingRequest,
         /// surfaced in the synthesized measurement so cert tests can verify
         /// the result matches the SessionID's peer.
@@ -316,6 +311,17 @@ private:
     /// one via the BleRssi helper and persists it. Holds kInvalidBleDeviceId
     /// on technologies other than kBLEBeaconRSSIRanging.
     uint64_t mBleDeviceId = BleRssi::kInvalidBleDeviceId;
+
+    /// Local 16-byte device identity keys for the Wi-Fi USD and Bluetooth
+    /// Channel Sounding technologies. Filled with CSPRNG bytes in the
+    /// constructor for the matching technology only; the unused buffer for
+    /// the other tech is left zeroed and never read. Regenerated each process
+    /// start — persistence is intentionally out of scope for this stub.
+    ///
+    /// REAL ADAPTER: a production Wi-Fi USD or BLTCS adapter MUST persist
+    /// these keys across reboots so peers can correlate sessions over time.
+    uint8_t mWiFiDevIK[kDeviceIdentityKeyLen] = {};
+    uint8_t mBltDevIK[kDeviceIdentityKeyLen]  = {};
 
     /// Active sessions. unique_ptr keeps Session addresses stable across
     /// vector reallocations — important because each Session is registered
