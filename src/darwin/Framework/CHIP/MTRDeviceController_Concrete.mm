@@ -1576,8 +1576,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 // the monitor's lifetime via -unitTestLastConnectivityMonitor rather than a completion.
 - (void)unitTestForceThreadGetSessionForNode:(uint64_t)nodeID
 {
-    [self unitTestForceThreadGetSessionForNode:nodeID completion:^(BOOL success) {
-    }];
+    [self unitTestForceThreadGetSessionForNode:nodeID completion:^(BOOL success) {}];
 }
 
 // As above, but surfaces whether the caller completion fired (success = a non-error session was
