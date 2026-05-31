@@ -135,7 +135,7 @@ class PostProcessResponseResult:
 
     There are multiple operations that occur when post processing a response. This contains all the
     results for each operation performed. Note that the number and types of steps performed is
-    dependant on test step itself.
+    dependent on test step itself.
     '''
 
     def __init__(self):

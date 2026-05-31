@@ -195,7 +195,7 @@ restylers:
           - prettier
           - "--write"
       arguments: []
-      enabled: true
+      enabled: false # Moved to pre-commit.ci
       include:
           - "**/*.md"
           - "**/*.markdown"

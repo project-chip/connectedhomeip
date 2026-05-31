@@ -18,7 +18,9 @@ import shlex
 from enum import Enum, auto
 from typing import Optional
 
-from .builder import Builder, BuilderOutput
+from runner.runner import Runner
+
+from .builder import Builder, BuilderOutput, OutDirLock, lock_output_dir
 
 log = logging.getLogger(__name__)
 
@@ -163,8 +165,9 @@ def DefaultsFileName(board: Esp32Board, app: Esp32App, enable_rpcs: bool):
 class Esp32Builder(Builder):
 
     def __init__(self,
-                 root,
-                 runner,
+                 root: str,
+                 runner: Runner,
+                 output_dir_lock: OutDirLock,
                  board: Esp32Board = Esp32Board.M5Stack,
                  app: Esp32App = Esp32App.ALL_CLUSTERS,
                  enable_rpcs: bool = False,
@@ -172,7 +175,7 @@ class Esp32Builder(Builder):
                  enable_insights_trace: bool = False,
                  all_devices_enabled_devices=None,
                  ):
-        super(Esp32Builder, self).__init__(root, runner)
+        super().__init__(root, runner, output_dir_lock)
         self.board = board
         self.app = app
         self.enable_rpcs = enable_rpcs
@@ -210,6 +213,7 @@ class Esp32Builder(Builder):
     def ExamplePath(self):
         return os.path.join(self.app.ExamplePath, 'esp32')
 
+    @lock_output_dir
     def generate(self):
         if os.path.exists(os.path.join(self.output_dir, 'build.ninja')):
             return
@@ -270,6 +274,7 @@ class Esp32Builder(Builder):
         # This will do a 'cmake reconfigure' which will create ninja files without rebuilding
         self._IdfEnvExecute(cmd)
 
+    @lock_output_dir
     def _build(self):
         log.info('Compiling Esp32 at %s', self.output_dir)
 
@@ -298,6 +303,7 @@ class Esp32Builder(Builder):
             return 'example-device-app'
         return 'all-devices-app'
 
+    @lock_output_dir
     def build_outputs(self):
         if self.app == Esp32App.TESTS:
             # Include the runnable image names as artifacts
@@ -314,6 +320,7 @@ class Esp32Builder(Builder):
             name = f"{app_name}.{ext}"
             yield BuilderOutput(os.path.join(self.output_dir, name), name)
 
+    @lock_output_dir
     def bundle_outputs(self):
         flash_bundle_name = self.app.FlashBundleName(self.all_devices_enabled_devices)
         if not flash_bundle_name:
