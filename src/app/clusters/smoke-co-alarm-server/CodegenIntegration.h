@@ -27,10 +27,11 @@
 #include <app/server-cluster/ServerClusterInterfaceRegistry.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 
+
+using namespace chip::app::Clusters::SmokeCoAlarm;
 namespace chip {
 namespace app {
 namespace Clusters {
-namespace SmokeCoAlarm {
 
 /**
  * @brief Application-facing wrapper for SmokeCoAlarmCluster.
@@ -210,7 +211,6 @@ private:
     inline static SmokeCoAlarmServer * sInstance = nullptr;
 };
 
-} // namespace SmokeCoAlarm
 } // namespace Clusters
 } // namespace app
 } // namespace chip
