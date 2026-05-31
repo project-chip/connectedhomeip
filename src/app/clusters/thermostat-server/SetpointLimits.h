@@ -48,7 +48,7 @@ struct SetpointLimits
     /*
     Copy constructor to create a SetpointLimits from another SetpointLimits.
     */
-    SetpointLimits(const SetpointLimits<T> &) = default;
+    SetpointLimits(const SetpointLimits<T> &)             = default;
     SetpointLimits & operator=(const SetpointLimits<T> &) = default;
 
     /*
