@@ -106,6 +106,9 @@ CHIP_ERROR ToChipError(DNSServiceErrorType errorCode)
         return CHIP_ERROR_NO_MEMORY;
     case kDNSServiceErr_NoAuth:
         return CHIP_ERROR_DNS_SD_UNAUTHORIZED;
+    case kDNSServiceErr_NoSuchName:
+    case kDNSServiceErr_NoSuchRecord:
+        return CHIP_ERROR_DNS_SD_NXDOMAIN;
     default:
         return CHIP_ERROR_INTERNAL;
     }
