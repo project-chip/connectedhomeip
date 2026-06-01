@@ -67,6 +67,7 @@
 #include <clusters/ElectricalEnergyMeasurement/Enums.h>
 #include <clusters/ElectricalGridConditions/Enums.h>
 #include <clusters/ElectricalPowerMeasurement/Enums.h>
+#include <clusters/ElectricalProtectionAlarm/Enums.h>
 #include <clusters/EnergyEvse/Enums.h>
 #include <clusters/EnergyEvseMode/Enums.h>
 #include <clusters/EnergyPreference/Enums.h>
