@@ -29,6 +29,42 @@ namespace ProximityRanging {
 
 static_assert(kMaxConcurrentSessions >= 1, "ProximityRangingDriver must support at least 1 session");
 
+namespace {
+
+/// Translate a decoded StartRangingRequest into the narrowed parameter set
+/// that adapters consume. ReportingCondition is intentionally excluded — the
+/// driver applies it on every OnMeasurementData callback so adapters never
+/// need to evaluate it themselves.
+StartSessionParams BuildStartParams(const Commands::StartRangingRequest::DecodableType & request)
+{
+    StartSessionParams params;
+    params.technology = request.technology;
+    params.trigger    = request.trigger;
+    if (request.BLERangingDeviceRoleConfig.HasValue())
+    {
+        params.bleRoleConfig = request.BLERangingDeviceRoleConfig.Value();
+    }
+    if (request.wiFiRangingDeviceRoleConfig.HasValue())
+    {
+        params.wifiRoleConfig = request.wiFiRangingDeviceRoleConfig.Value();
+    }
+    if (request.BLTChannelSoundingDeviceRoleConfig.HasValue())
+    {
+        params.bltRoleConfig = request.BLTChannelSoundingDeviceRoleConfig.Value();
+    }
+    if (request.frequencyBand.HasValue())
+    {
+        params.frequencyBand = request.frequencyBand.Value();
+    }
+    if (request.bandwidth.HasValue())
+    {
+        params.bandwidth = request.bandwidth.Value();
+    }
+    return params;
+}
+
+} // namespace
+
 ProximityRangingDriver::ProximityRangingDriver(Span<RangingAdapter * const> adapters) : mAdapters(adapters)
 {
     // Adapter set is fixed at construction; configuration errors panic here
@@ -91,7 +127,7 @@ ResultCodeEnum ProximityRangingDriver::HandleStartRanging(uint8_t sessionId,
     // Adapters are required (see RangingAdapter.h) to defer any termination
     // callback until after StartSession has returned, so the session record
     // can safely be committed only after a successful start.
-    ResultCodeEnum result = adapter->StartSession(sessionId, request);
+    ResultCodeEnum result = adapter->StartSession(sessionId, BuildStartParams(request));
     VerifyOrReturnValue(result == ResultCodeEnum::kAccepted, result);
 
     Session * session = mSessions.CreateObject(Session{ sessionId, adapter });
@@ -101,6 +137,11 @@ ResultCodeEnum ProximityRangingDriver::HandleStartRanging(uint8_t sessionId,
         // session so its bookkeeping does not diverge from the driver's.
         LogErrorOnFailure(adapter->StopSession(sessionId));
         return ResultCodeEnum::kBusySessionCapacityReached;
+    }
+
+    if (request.reportingCondition.HasValue())
+    {
+        session->reporting = request.reportingCondition.Value();
     }
 
     if (mClusterCallback != nullptr)
@@ -189,6 +230,17 @@ std::optional<BltcsConfig> ProximityRangingDriver::GetBltcsConfig()
 
 void ProximityRangingDriver::OnRangingSessionStopped(uint8_t sessionId, RangingSessionStatusEnum status)
 {
+    // For "normal end" terminations (kSessionEndTimeReached), only the driver
+    // knows whether a measurement actually passed the ReportingCondition
+    // filter. If none did, remap to kPeerNotFound. Other terminal statuses
+    // (kHardwareError, kSecurityFailure, etc.) carry adapter-only context
+    // and pass through verbatim.
+    Session * s = FindSession(sessionId);
+    if (s != nullptr && status == RangingSessionStatusEnum::kSessionEndTimeReached && !s->peerFound)
+    {
+        status = RangingSessionStatusEnum::kPeerNotFound;
+    }
+
     // Drop spurious or stale adapter notifications for sessions the driver no
     // longer tracks (e.g. duplicate stop, post-Shutdown delivery).
     // RetireSession dirties SessionIDList as part of releasing the pool slot,
@@ -203,9 +255,50 @@ void ProximityRangingDriver::OnRangingSessionStopped(uint8_t sessionId, RangingS
 
 void ProximityRangingDriver::OnMeasurementData(uint8_t sessionId, const Structs::RangingMeasurementDataStruct::Type & measurement)
 {
-    VerifyOrReturn(FindSession(sessionId) != nullptr);
+    Session * s = FindSession(sessionId);
+    VerifyOrReturn(s != nullptr);
+
+    if (s->reporting.has_value() && !SatisfiesReporting(*s->reporting, measurement))
+    {
+        ChipLogProgress(Zcl, "[ProximityRangingDriver] sid=%u suppressing measurement (ReportingCondition not satisfied)",
+                        sessionId);
+        return;
+    }
+
+    s->peerFound = true;
     VerifyOrReturn(mClusterCallback != nullptr);
     mClusterCallback->OnMeasurementData(sessionId, measurement);
+}
+
+bool ProximityRangingDriver::SatisfiesReporting(const Structs::ReportingConditionStruct::Type & reporting,
+                                                const Structs::RangingMeasurementDataStruct::Type & measurement)
+{
+    if (!measurement.distance.IsNull())
+    {
+        const uint16_t distance = measurement.distance.Value();
+        if (reporting.minDistanceCondition.HasValue() && distance < reporting.minDistanceCondition.Value())
+        {
+            return false;
+        }
+        if (reporting.maxDistanceCondition.HasValue() && distance > reporting.maxDistanceCondition.Value())
+        {
+            return false;
+        }
+    }
+    else if (reporting.minDistanceCondition.HasValue() || reporting.maxDistanceCondition.HasValue())
+    {
+        // Spec: "If Distance is null, the Server SHOULD still emit the
+        // RangingResult event unless prohibited by a ReportingCondition."
+        // A min/max distance condition cannot be evaluated against a null
+        // distance, so suppress when any distance condition is present.
+        return false;
+    }
+    if (reporting.errorMarginCondition.HasValue() && measurement.errorMargin.HasValue() &&
+        measurement.errorMargin.Value() > reporting.errorMarginCondition.Value())
+    {
+        return false;
+    }
+    return true;
 }
 
 void ProximityRangingDriver::OnAttributeChanged(AttributeId attributeId)

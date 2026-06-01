@@ -153,6 +153,18 @@ private:
     {
         uint8_t id               = 0;
         RangingAdapter * adapter = nullptr;
+
+        /// ReportingCondition captured at HandleStartRanging time so the
+        /// driver can apply min/max distance and errorMargin filtering on
+        /// every OnMeasurementData callback. Set only when the request
+        /// carried a ReportingCondition.
+        std::optional<Structs::ReportingConditionStruct::Type> reporting;
+
+        /// True once a measurement has passed the driver's reporting filter
+        /// and been forwarded to the cluster. The driver remaps an
+        /// adapter-supplied kSessionEndTimeReached status to kPeerNotFound
+        /// when this stays false through the session's lifetime.
+        bool peerFound = false;
     };
 
     RangingAdapter * FindAdapter(RangingTechEnum technology) const;
@@ -160,6 +172,13 @@ private:
     /// Release the pool slot for @e sessionId and notify the cluster that
     /// SessionIDList has changed. Returns false if no session matched.
     bool RetireSession(uint8_t sessionId);
+
+    /// Returns true when @e measurement satisfies @e reporting. See the spec:
+    /// distance bounds drop the measurement when out of range or when distance
+    /// is null while a min/max condition is present; errorMargin > condition
+    /// drops the measurement.
+    static bool SatisfiesReporting(const Structs::ReportingConditionStruct::Type & reporting,
+                                   const Structs::RangingMeasurementDataStruct::Type & measurement);
 
     Span<RangingAdapter * const> mAdapters;
 

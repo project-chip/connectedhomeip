@@ -57,9 +57,10 @@ public:
         return cap;
     }
 
-    ResultCodeEnum StartSession(uint8_t sessionId, const Commands::StartRangingRequest::DecodableType & request) override
+    ResultCodeEnum StartSession(uint8_t sessionId, const StartSessionParams & params) override
     {
         mLastStartSessionId = sessionId;
+        mLastStartParams    = params;
         mStartCalls++;
         if (mStartResult == ResultCodeEnum::kAccepted)
         {
@@ -123,6 +124,7 @@ public:
     uint8_t mLastStartSessionId = 0;
     uint8_t mLastStopSessionId  = 0;
     int mStartCalls             = 0;
+    StartSessionParams mLastStartParams{};
     std::vector<uint8_t> mActiveIds;
     std::optional<uint64_t> mDeviceId;
     std::optional<WiFiUsdConfig> mWiFiUsdConfig;
@@ -493,7 +495,7 @@ TEST_F(TestProximityRangingCluster, TestStartRangingAccepted)
     ASSERT_TRUE(result.IsSuccess());
     if (result.response.has_value())
     {
-        auto & response = result.response.value();
+        auto & response = *result.response;
         EXPECT_EQ(response.resultCode, ResultCodeEnum::kAccepted);
         EXPECT_FALSE(response.sessionID.IsNull());
         EXPECT_NE(response.sessionID.Value(), 0);
@@ -526,7 +528,7 @@ TEST_F(TestProximityRangingCluster, TestStartRangingAdapterRejects)
     ASSERT_TRUE(result.IsSuccess());
     if (result.response.has_value())
     {
-        EXPECT_EQ(result.response.value().resultCode, ResultCodeEnum::kRejectedInfeasibleRanging);
+        EXPECT_EQ(result.response->resultCode, ResultCodeEnum::kRejectedInfeasibleRanging);
     }
     else
     {
@@ -558,7 +560,7 @@ TEST_F(TestProximityRangingCluster, TestStartRangingTechnologyNotInFeatureMap)
     auto result = tester.Invoke(request);
     ASSERT_TRUE(result.IsSuccess());
     ASSERT_TRUE(result.response.has_value());
-    auto & response = result.response.value();
+    auto & response = *result.response;
     EXPECT_EQ(response.resultCode, ResultCodeEnum::kRejectedInfeasibleRanging);
     EXPECT_TRUE(response.sessionID.IsNull());
     EXPECT_EQ(bleAdapter.mStartCalls, 0);
@@ -585,7 +587,7 @@ TEST_F(TestProximityRangingCluster, TestStartRangingMissingMatchingRoleConfig)
     auto result = tester.Invoke(request);
     ASSERT_TRUE(result.IsSuccess());
     ASSERT_TRUE(result.response.has_value());
-    auto & response = result.response.value();
+    auto & response = *result.response;
     EXPECT_EQ(response.resultCode, ResultCodeEnum::kRejectedInfeasibleRanging);
     EXPECT_TRUE(response.sessionID.IsNull());
     EXPECT_EQ(bleAdapter.mStartCalls, 0);
@@ -617,7 +619,7 @@ TEST_F(TestProximityRangingCluster, TestStartRangingMismatchedRoleConfig)
     auto result = tester.Invoke(request);
     ASSERT_TRUE(result.IsSuccess());
     ASSERT_TRUE(result.response.has_value());
-    auto & response = result.response.value();
+    auto & response = *result.response;
     EXPECT_EQ(response.resultCode, ResultCodeEnum::kRejectedInfeasibleRanging);
     EXPECT_TRUE(response.sessionID.IsNull());
     EXPECT_EQ(bleAdapter.mStartCalls, 0);
@@ -645,7 +647,7 @@ TEST_F(TestProximityRangingCluster, TestStartRangingTriggerEndTimeNotAfterStart)
     auto result = tester.Invoke(request);
     ASSERT_TRUE(result.IsSuccess());
     ASSERT_TRUE(result.response.has_value());
-    auto & response = result.response.value();
+    auto & response = *result.response;
     EXPECT_EQ(response.resultCode, ResultCodeEnum::kRejectedInfeasibleRangingTriggers);
     EXPECT_EQ(bleAdapter.mStartCalls, 0);
 
@@ -670,7 +672,7 @@ TEST_F(TestProximityRangingCluster, TestStartRangingTriggerIntervalZero)
     auto result = tester.Invoke(request);
     ASSERT_TRUE(result.IsSuccess());
     ASSERT_TRUE(result.response.has_value());
-    auto & response = result.response.value();
+    auto & response = *result.response;
     EXPECT_EQ(response.resultCode, ResultCodeEnum::kRejectedInfeasibleRangingTriggers);
     EXPECT_EQ(bleAdapter.mStartCalls, 0);
 
@@ -698,7 +700,7 @@ TEST_F(TestProximityRangingCluster, TestStartRangingReportingMinDistanceGreaterT
     auto result = tester.Invoke(request);
     ASSERT_TRUE(result.IsSuccess());
     ASSERT_TRUE(result.response.has_value());
-    auto & response = result.response.value();
+    auto & response = *result.response;
     EXPECT_EQ(response.resultCode, ResultCodeEnum::kRejectedInfeasibleRanging);
     EXPECT_EQ(bleAdapter.mStartCalls, 0);
 
@@ -722,7 +724,7 @@ TEST_F(TestProximityRangingCluster, TestStopRangingSuccess)
         auto startResult = tester.Invoke(MakeValidBleBeaconRequest());
         ASSERT_TRUE(startResult.IsSuccess());
         ASSERT_TRUE(startResult.response.has_value());
-        auto & startResponse = startResult.response.value();
+        auto & startResponse = *startResult.response;
         EXPECT_EQ(startResponse.resultCode, ResultCodeEnum::kAccepted);
     }
 
@@ -821,15 +823,26 @@ TEST_F(TestProximityRangingCluster, TestOnSessionStoppedEvent)
     startRequest.technology = RangingTechEnum::kBLEBeaconRSSIRanging;
     ASSERT_EQ(driver.HandleStartRanging(7, startRequest), ResultCodeEnum::kAccepted);
 
+    // Forward a measurement so the driver's peerFound flips true; otherwise
+    // the driver remaps kSessionEndTimeReached to kPeerNotFound at stop time.
     ASSERT_NE(bleAdapter.GetCallback(), nullptr);
+    Structs::RangingMeasurementDataStruct::Type measurement;
+    measurement.distance.SetNonNull(static_cast<uint16_t>(100));
+    bleAdapter.GetCallback()->OnMeasurementData(7, measurement);
+
     bleAdapter.GetCallback()->OnRangingSessionStopped(7, RangingSessionStatusEnum::kSessionEndTimeReached);
+
+    // First event is the RangingResult from OnMeasurementData; skip past it
+    // to assert on the RangingSessionStatus event.
+    auto first = context.EventsGenerator().GetNextEvent();
+    ASSERT_TRUE(first.has_value());
 
     auto eventInfo = context.EventsGenerator().GetNextEvent();
 
     Events::RangingSessionStatus::DecodableType decodedEvent;
     if (eventInfo.has_value())
     {
-        EXPECT_EQ(eventInfo.value().GetEventData(decodedEvent), CHIP_NO_ERROR);
+        EXPECT_EQ(eventInfo->GetEventData(decodedEvent), CHIP_NO_ERROR);
     }
     else
     {
@@ -939,10 +952,7 @@ TEST_F(TestProximityRangingCluster, TestDriverGetWiFiUsdConfigViaNextGenerationA
 
     auto resolved = driver.GetWiFiUsdConfig();
     ASSERT_TRUE(resolved.has_value());
-    if (resolved.has_value())
-    {
-        EXPECT_EQ(resolved->deviceIdentityKey[0], 0x5A);
-    }
+    EXPECT_EQ(resolved->deviceIdentityKey[0], 0x5A);
 }
 
 // --- Cluster-level coverage: read paths and validation branches not yet exercised.
@@ -962,7 +972,7 @@ TEST_F(TestProximityRangingCluster, TestReadSessionIdListNonEmpty)
     auto startResult = tester.Invoke(MakeValidBleBeaconRequest());
     ASSERT_TRUE(startResult.IsSuccess());
     ASSERT_TRUE(startResult.response.has_value());
-    auto & response = startResult.response.value();
+    auto & response = *startResult.response;
     ASSERT_EQ(response.resultCode, ResultCodeEnum::kAccepted);
 
     Attributes::SessionIDList::TypeInfo::DecodableType sessionList;
@@ -1032,7 +1042,7 @@ TEST_F(TestProximityRangingCluster, TestStartRangingInvalidBleRole)
     auto result = tester.Invoke(request);
     ASSERT_TRUE(result.IsSuccess());
     ASSERT_TRUE(result.response.has_value());
-    auto & response = result.response.value();
+    auto & response = *result.response;
     EXPECT_EQ(response.resultCode, ResultCodeEnum::kRejectedInfeasibleRanging);
     EXPECT_EQ(bleAdapter.mStartCalls, 0);
 
@@ -1063,7 +1073,7 @@ TEST_F(TestProximityRangingCluster, TestStartRangingInvalidWiFiRole)
     auto result = tester.Invoke(request);
     ASSERT_TRUE(result.IsSuccess());
     ASSERT_TRUE(result.response.has_value());
-    auto & response = result.response.value();
+    auto & response = *result.response;
     EXPECT_EQ(response.resultCode, ResultCodeEnum::kRejectedInfeasibleRanging);
     EXPECT_EQ(wifiAdapter.mStartCalls, 0);
 
@@ -1094,7 +1104,7 @@ TEST_F(TestProximityRangingCluster, TestStartRangingInvalidBltRole)
     auto result = tester.Invoke(request);
     ASSERT_TRUE(result.IsSuccess());
     ASSERT_TRUE(result.response.has_value());
-    auto & response = result.response.value();
+    auto & response = *result.response;
     EXPECT_EQ(response.resultCode, ResultCodeEnum::kRejectedInfeasibleRanging);
     EXPECT_EQ(bltAdapter.mStartCalls, 0);
 
@@ -1125,7 +1135,7 @@ TEST_F(TestProximityRangingCluster, TestStartRangingExtraRoleConfigPresent)
     auto result = tester.Invoke(request);
     ASSERT_TRUE(result.IsSuccess());
     ASSERT_TRUE(result.response.has_value());
-    auto & response = result.response.value();
+    auto & response = *result.response;
     EXPECT_EQ(response.resultCode, ResultCodeEnum::kRejectedInfeasibleRanging);
     EXPECT_EQ(bleAdapter.mStartCalls, 0);
     EXPECT_EQ(bltAdapter.mStartCalls, 0);
@@ -1153,7 +1163,7 @@ TEST_F(TestProximityRangingCluster, TestStartRangingReportingMinDistanceZero)
     auto result = tester.Invoke(request);
     ASSERT_TRUE(result.IsSuccess());
     ASSERT_TRUE(result.response.has_value());
-    auto & response = result.response.value();
+    auto & response = *result.response;
     EXPECT_EQ(response.resultCode, ResultCodeEnum::kRejectedInfeasibleRanging);
     EXPECT_EQ(bleAdapter.mStartCalls, 0);
 
@@ -1180,7 +1190,7 @@ TEST_F(TestProximityRangingCluster, TestStartRangingReportingMaxDistanceZero)
     auto result = tester.Invoke(request);
     ASSERT_TRUE(result.IsSuccess());
     ASSERT_TRUE(result.response.has_value());
-    auto & response = result.response.value();
+    auto & response = *result.response;
     EXPECT_EQ(response.resultCode, ResultCodeEnum::kRejectedInfeasibleRanging);
     EXPECT_EQ(bleAdapter.mStartCalls, 0);
 
