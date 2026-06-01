@@ -817,6 +817,16 @@ void emberAfElectricalDistributionClusterShutdownCallback(chip::EndpointId endpo
 /**
  * @param endpoint    Endpoint that is being initialized
  */
+void emberAfElectricalProtectionAlarmClusterInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfElectricalProtectionAlarmClusterShutdownCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
 void emberAfDoorLockClusterInitCallback(chip::EndpointId endpoint);
 
 /**
@@ -4526,6 +4536,44 @@ chip::Protocols::InteractionModel::Status MatterElectricalDistributionClusterSer
 void emberAfElectricalDistributionClusterServerTickCallback(chip::EndpointId endpoint);
 
 //
+// Electrical Protection Alarm Cluster
+//
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfElectricalProtectionAlarmClusterServerInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterElectricalProtectionAlarmClusterServerShutdownCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfElectricalProtectionAlarmClusterClientInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param attributePath Concrete attribute path that changed
+ */
+void MatterElectricalProtectionAlarmClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+
+/**
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status MatterElectricalProtectionAlarmClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/**
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfElectricalProtectionAlarmClusterServerTickCallback(chip::EndpointId endpoint);
+
+//
 // Door Lock Cluster
 //
 
@@ -7363,6 +7411,12 @@ bool emberAfMessagesClusterPresentMessagesRequestCallback(
 bool emberAfMessagesClusterCancelMessagesRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::Messages::Commands::CancelMessagesRequest::DecodableType & commandData);
+/**
+ * @brief Electrical Protection Alarm Cluster ModifyEnabledAlarms Command callback (from client)
+ */
+bool emberAfElectricalProtectionAlarmClusterModifyEnabledAlarmsCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::ElectricalProtectionAlarm::Commands::ModifyEnabledAlarms::DecodableType & commandData);
 /**
  * @brief Door Lock Cluster LockDoor Command callback (from client)
  */

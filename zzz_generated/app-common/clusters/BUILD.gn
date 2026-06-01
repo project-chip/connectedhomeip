@@ -55,6 +55,7 @@ template("declare_all_items_target") {
       "${chip_root}/zzz_generated/app-common/clusters/ElectricalEnergyMeasurement" + invoker.target,
       "${chip_root}/zzz_generated/app-common/clusters/ElectricalGridConditions" + invoker.target,
       "${chip_root}/zzz_generated/app-common/clusters/ElectricalPowerMeasurement" + invoker.target,
+      "${chip_root}/zzz_generated/app-common/clusters/ElectricalProtectionAlarm" + invoker.target,
       "${chip_root}/zzz_generated/app-common/clusters/EnergyEvse" + invoker.target,
       "${chip_root}/zzz_generated/app-common/clusters/EnergyEvseMode" + invoker.target,
       "${chip_root}/zzz_generated/app-common/clusters/EnergyPreference" + invoker.target,

@@ -26,10 +26,13 @@
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 #include <credentials/jcm/TrustVerification.h>
 #include <crypto/CHIPCryptoPAL.h>
+#include <lib/support/CharSpanToStdString.h>
 #include <lib/support/Span.h>
 #include <lib/support/Variant.h>
 #include <matter/tracing/build_config.h>
 #include <system/SystemClock.h>
+
+#include <string>
 
 namespace chip {
 namespace Controller {
@@ -137,11 +140,30 @@ struct NOCChainGenerationParameters
 struct CompletionStatus
 {
     CompletionStatus() : err(CHIP_NO_ERROR), failedStage(NullOptional), attestationResult(NullOptional) {}
+
     CHIP_ERROR err;
     Optional<CommissioningStage> failedStage;
     Optional<Credentials::AttestationVerificationResult> attestationResult;
     Optional<app::Clusters::GeneralCommissioning::CommissioningErrorEnum> commissioningError;
     Optional<app::Clusters::NetworkCommissioning::NetworkCommissioningStatusEnum> networkCommissioningStatus;
+    /// Optional device-reported low-level error from ConnectNetworkResponse.errorValue (e.g.
+    /// driver-specific TX-power-limited / interference / association-failure code), distinct
+    /// from the spec-level NetworkCommissioningStatusEnum already captured above.
+    Optional<int32_t> connectNetworkErrorValue;
+    /// Optional NodeOperationalCertStatusEnum from the device's NOCResponse during the
+    /// AddNOC / UpdateNOC / RemoveFabric flows. Lets callers distinguish kInvalidPublicKey
+    /// from kInvalidNodeOpId from kFabricConflict from kLabelConflict, etc., without losing
+    /// fidelity to a generic CHIP_ERROR.
+    Optional<app::Clusters::OperationalCredentials::NodeOperationalCertStatusEnum> operationalCertStatus;
+
+    /// Owned copy of the device-supplied GeneralCommissioning debugText from
+    /// ArmFailSafeResponse / SetRegulatoryConfigResponse / CommissioningCompleteResponse.
+    /// Empty if no debug text was provided.
+    std::string commissioningDebugText;
+
+    /// Owned copy of the device-supplied NetworkCommissioning debugText from
+    /// NetworkConfigResponse / ConnectNetworkResponse. Empty if no debug text was provided.
+    std::string networkCommissioningDebugText;
 };
 
 inline constexpr uint16_t kDefaultFailsafeTimeout = 60;
@@ -842,7 +864,22 @@ struct AttestationErrorInfo
 struct CommissioningErrorInfo
 {
     CommissioningErrorInfo(app::Clusters::GeneralCommissioning::CommissioningErrorEnum result) : commissioningError(result) {}
+    CommissioningErrorInfo(app::Clusters::GeneralCommissioning::CommissioningErrorEnum result, CharSpan text) :
+        commissioningError(result), debugText(CharSpanToStdString(text))
+    {}
     app::Clusters::GeneralCommissioning::CommissioningErrorEnum commissioningError;
+    /// Owned copy of the device-supplied `debugText` from
+    /// ArmFailSafeResponse / SetRegulatoryConfigResponse / CommissioningCompleteResponse.
+    /// Empty when the device did not provide debug text.
+    std::string debugText;
+};
+
+struct OperationalCertErrorInfo
+{
+    OperationalCertErrorInfo(app::Clusters::OperationalCredentials::NodeOperationalCertStatusEnum result) :
+        operationalCertStatus(result)
+    {}
+    app::Clusters::OperationalCredentials::NodeOperationalCertStatusEnum operationalCertStatus;
 };
 
 struct NetworkCommissioningStatusInfo
@@ -850,7 +887,23 @@ struct NetworkCommissioningStatusInfo
     NetworkCommissioningStatusInfo(app::Clusters::NetworkCommissioning::NetworkCommissioningStatusEnum result) :
         networkCommissioningStatus(result)
     {}
+    NetworkCommissioningStatusInfo(app::Clusters::NetworkCommissioning::NetworkCommissioningStatusEnum result, CharSpan text) :
+        networkCommissioningStatus(result), debugText(CharSpanToStdString(text))
+    {}
+    NetworkCommissioningStatusInfo(app::Clusters::NetworkCommissioning::NetworkCommissioningStatusEnum result, CharSpan text,
+                                   Optional<int32_t> errorValue) :
+        networkCommissioningStatus(result),
+        debugText(CharSpanToStdString(text)), connectNetworkErrorValue(errorValue)
+    {}
     app::Clusters::NetworkCommissioning::NetworkCommissioningStatusEnum networkCommissioningStatus;
+    /// Owned copy of the device-supplied `debugText` from
+    /// `NetworkConfigResponse` / `ConnectNetworkResponse`. Empty when the device did not
+    /// provide debug text.
+    std::string debugText;
+    /// Optional device-specific connect failure code from ConnectNetworkResponse.errorValue.
+    /// Only populated for ConnectNetwork failures; null for NetworkConfig failures (which
+    /// don't carry an errorValue field).
+    Optional<int32_t> connectNetworkErrorValue;
 };
 
 class CommissioningDelegate
@@ -874,7 +927,7 @@ public:
      * kSendOpCertSigningRequest: CSRResponse
      * kGenerateNOCChain: NocChain
      * kSendTrustedRootCert: None
-     * kSendNOC: None
+     * kSendNOC: OperationalCertErrorInfo if AddNOC returned a non-success NodeOperationalCertStatusEnum
      * kConfigureTrustedTimeSource: None
      * kWiFiNetworkSetup: NetworkCommissioningStatusInfo if there is an error
      * kThreadNetworkSetup: NetworkCommissioningStatusInfo if there is an error
@@ -889,8 +942,8 @@ public:
      */
     struct CommissioningReport
         : Variant<RequestedCertificate, AttestationResponse, CSRResponse, NocChain, OperationalNodeFoundData, ReadCommissioningInfo,
-                  AttestationErrorInfo, CommissioningErrorInfo, NetworkCommissioningStatusInfo, TimeZoneResponseInfo,
-                  Credentials::JCM::TrustVerificationError>
+                  AttestationErrorInfo, CommissioningErrorInfo, OperationalCertErrorInfo, NetworkCommissioningStatusInfo,
+                  TimeZoneResponseInfo, Credentials::JCM::TrustVerificationError>
     {
         CommissioningReport() : stageCompleted(CommissioningStage::kError) {}
         CommissioningStage stageCompleted;

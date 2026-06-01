@@ -5600,7 +5600,7 @@ cluster PowerTopology = 156 {
 
   readonly attribute optional endpoint_no availableEndpoints[] = 0;
   readonly attribute optional endpoint_no activeEndpoints[] = 1;
-  attribute optional CircuitNodeStruct electricalCircuitNodes[] = 2;
+  provisional attribute optional CircuitNodeStruct electricalCircuitNodes[] = 2;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -5836,6 +5836,176 @@ provisional cluster ElectricalDistribution = 162 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+}
+
+/** This cluster is a derived cluster of the Alarm Base cluster and provides the alarm definition related to the Electrical Protection device type. */
+provisional cluster ElectricalProtectionAlarm = 163 {
+  revision 1;
+
+  enum CurrentTripCurveEnum : enum8 {
+    kTypeZ = 0;
+    kTypeB = 1;
+    kTypeC = 2;
+    kTypeK = 3;
+    kTypeD = 4;
+  }
+
+  enum CurrentWaveformEnum : enum8 {
+    kAC = 0 [spec_name = "AC"];
+    kA = 1;
+    kF = 2;
+    kB = 3;
+  }
+
+  enum GroundFaultClassEnum : enum8 {
+    kClassA = 0;
+    kClassB = 1;
+    kClassC = 2;
+    kClassD = 3;
+    kClassE = 4;
+  }
+
+  bitmap AlarmBitmap : bitmap32 {
+    kShortCircuitFault = 0x1;
+    kOverLoadFault = 0x2;
+    kOverVoltageFault = 0x4;
+    kVoltageSurgeFault = 0x8;
+    kResidualCurrentFault = 0x10;
+    kArcFault = 0x20;
+    kSelfTest = 0x40;
+  }
+
+  bitmap ArcCauseBitmap : bitmap8 {
+    kSeries = 0x1;
+    kParallelToNeutral = 0x2;
+    kParallelToGround = 0x4;
+  }
+
+  bitmap CurrentTripMechanismBitmap : bitmap8 {
+    kThermal = 0x1;
+    kMagnetic = 0x2;
+    kElectronic = 0x4;
+  }
+
+  bitmap Feature : bitmap32 {
+    kShortCircuit = 0x100000;
+    kOverLoad = 0x200000;
+    kOverVoltage = 0x400000;
+    kSurgeProtection = 0x800000;
+    kResidualCurrent = 0x1000000;
+    kArcFault = 0x2000000;
+    kSelfTest = 0x4000000;
+  }
+
+  bitmap SurgeProtectionClassBitmap : bitmap16 {
+    kClassI = 0x1;
+    kClassII = 0x2;
+    kClassIII = 0x4;
+  }
+
+  bitmap SurgeProtectionTypeBitmap : bitmap16 {
+    kType1 = 0x1;
+    kType2 = 0x2;
+    kType3 = 0x4;
+  }
+
+  bitmap TrippingCharacteristicsBitmap : bitmap16 {
+    kShortDelay = 0x1;
+    kSelective = 0x2;
+    kSuperImmune = 0x4;
+  }
+
+  bitmap VoltageTripMechanismBitmap : bitmap8 {
+    kMOV = 0x1 [spec_name = "MOV"];
+    kSAD = 0x2 [spec_name = "SAD"];
+    kGDT = 0x4 [spec_name = "GDT"];
+  }
+
+  struct ArcFaultRatingsStruct {
+    optional amperage_ma seriesArcCurrentSensitivity = 0;
+    optional amperage_ma parallelArcCurrentSensitivity = 1;
+    optional ArcCauseBitmap supportedArcCauses = 2;
+  }
+
+  struct OverLoadRatingsStruct {
+    optional amperage_ma tripCurrent = 0;
+    optional CurrentTripCurveEnum tripCurve = 1;
+    optional CurrentTripMechanismBitmap tripMechanism = 2;
+    optional amperage_ma ultimateMaxCurrent = 3;
+    optional amperage_ma serviceMaxCurrent = 4;
+  }
+
+  struct OverVoltageRatingsStruct {
+    optional VoltageTripMechanismBitmap tripMechanism = 0;
+    optional voltage_mv tripVoltage = 1;
+    optional voltage_mv maxContinuousOperatingVoltage = 2;
+    optional int64u responseTime = 3;
+  }
+
+  struct ResidualCurrentFaultRatingsStruct {
+    optional amperage_ma currentSensitivity = 0;
+    optional CurrentTripMechanismBitmap tripMechanism = 1;
+    optional boolean voltageDependent = 2;
+    optional GroundFaultClassEnum groundFaultClass = 3;
+    optional CurrentWaveformEnum waveform = 4;
+    optional TrippingCharacteristicsBitmap trippingCharacteristic = 5;
+    optional amperage_ma ultimateMaxCurrent = 6;
+    optional amperage_ma serviceMaxCurrent = 7;
+  }
+
+  struct ShortCircuitRatingsStruct {
+    optional amperage_ma tripCurrent = 0;
+    optional CurrentTripMechanismBitmap tripMechanism = 1;
+    optional CurrentTripCurveEnum tripCurve = 2;
+    optional amperage_ma ultimateMaxCurrent = 3;
+    optional amperage_ma serviceMaxCurrent = 4;
+    optional amperage_ma maxCurrent = 5;
+  }
+
+  struct SurgeProtectionRatingsStruct {
+    optional VoltageTripMechanismBitmap tripMechanism = 0;
+    optional SurgeProtectionClassBitmap protectionClass = 1;
+    optional SurgeProtectionTypeBitmap protectionType = 2;
+    optional voltage_mv maxContinuousOperatingVoltage = 3;
+    optional voltage_mv maxVoltageProtection = 4;
+    optional voltage_mv maxTemporaryVoltage = 5;
+    optional amperage_ma nominalDischargeCurrent = 6;
+    optional amperage_ma maximumDishargeCurrent = 7;
+    optional amperage_ma ratedShortCircuitCurrent = 8;
+    optional amperage_ma ratedShortTimeWithstandCurrent = 9;
+    optional int64u energyAbsorptionCapability = 10;
+    optional int64u responseTime = 11;
+  }
+
+  provisional info event Notify = 0 {
+    AlarmBitmap active = 0;
+    AlarmBitmap inactive = 1;
+    AlarmBitmap state = 2;
+    AlarmBitmap mask = 3;
+  }
+
+  provisional readonly attribute AlarmBitmap mask = 0;
+  provisional readonly attribute AlarmBitmap state = 2;
+  provisional readonly attribute AlarmBitmap supported = 3;
+  provisional readonly attribute optional nullable ArcCauseBitmap arcCause = 128;
+  provisional readonly attribute optional nullable OverLoadRatingsStruct overLoadRating = 129;
+  provisional readonly attribute optional nullable OverVoltageRatingsStruct overVoltageRating = 130;
+  provisional readonly attribute optional nullable SurgeProtectionRatingsStruct surgeProtectionRating = 131;
+  provisional readonly attribute optional nullable ShortCircuitRatingsStruct shortCircuitRating = 132;
+  provisional readonly attribute optional nullable ResidualCurrentFaultRatingsStruct residualCurrentRating = 133;
+  provisional readonly attribute optional nullable ArcFaultRatingsStruct arcFaultRating = 134;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct ModifyEnabledAlarmsRequest {
+    AlarmBitmap mask = 0;
+  }
+
+  /** This command allows a client to request that an alarm be enabled or suppressed at the server. */
+  command ModifyEnabledAlarms(ModifyEnabledAlarmsRequest): DefaultSuccess = 1;
 }
 
 /** An interface to a generic way to secure a door */
