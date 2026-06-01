@@ -226,7 +226,7 @@ bool SmokeCoAlarmCluster::SetInterconnectCOAlarm(AlarmStateEnum newInterconnectC
 
 void SmokeCoAlarmCluster::SetContaminationState(ContaminationStateEnum newContaminationState)
 {
-    VerifyOrReturn(SupportsSmokeAlarm());
+    VerifyOrReturnValue(mConfig.optionalAttribs.IsSet(ContaminationState::Id), false);
     SetAttributeValue(mContaminationState, newContaminationState, ContaminationState::Id);
 }
 
@@ -240,6 +240,12 @@ void SmokeCoAlarmCluster::SetExpiryDate(uint32_t newExpiryDate)
 {
     VerifyOrReturn(mConfig.optionalAttribs.IsSet(ExpiryDate::Id));
     SetAttributeValue(mExpiryDate, newExpiryDate, ExpiryDate::Id);
+}
+
+bool SmokeCoAlarmCluster::SetExpiryDate(uint32_t newExpiryDate)
+{
+    SetAttributeValue(mExpiryDate, newExpiryDate, ExpiryDate::Id);
+    return true;
 }
 
 bool SmokeCoAlarmCluster::SetUnmountedState(bool isUnmounted)

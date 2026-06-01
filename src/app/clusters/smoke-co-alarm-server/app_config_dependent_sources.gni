@@ -13,6 +13,7 @@
 # limitations under the License.
 app_config_dependent_sources = [
   "CodegenIntegration.h",
+  "CodegenIntegration.cpp",
   "SmokeCOTestEventTriggerHandler.h",
   "smoke-co-alarm-server.h",
 ]

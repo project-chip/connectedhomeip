@@ -24,10 +24,6 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::SmokeCoAlarm;
 
-// ---------------------------------------------------------------------------
-// SmokeCoAlarmServer implementation
-// ---------------------------------------------------------------------------
-
 SmokeCoAlarmServer::SmokeCoAlarmServer(EndpointId endpointId, const SmokeCoAlarmCluster::Config & config) :
     mEndpointId(endpointId), mConfig(config)
 {}
@@ -247,10 +243,6 @@ bool SmokeCoAlarmServer::SupportsCOAlarm(EndpointId) const
 {
     return SupportsCOAlarm();
 }
-
-// ---------------------------------------------------------------------------
-// Ember shim callbacks
-// ---------------------------------------------------------------------------
 
 bool emberAfSmokeCoAlarmClusterSelfTestRequestCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                                                        const SmokeCoAlarm::Commands::SelfTestRequest::DecodableType & commandData)

@@ -18,5 +18,6 @@ TARGET_SOURCES(
   PRIVATE
     "${CLUSTER_DIR}/CodegenIntegration.h"
     "${CLUSTER_DIR}/SmokeCOTestEventTriggerHandler.h"
+    "${CLUSTER_DIR}/CodegenIntegration.cpp"
     "${CLUSTER_DIR}/smoke-co-alarm-server.h"
 )

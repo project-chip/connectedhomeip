@@ -89,7 +89,7 @@ public:
     bool SetInterconnectCOAlarm(AlarmStateEnum newInterconnectCOAlarm);
     bool SetContaminationState(ContaminationStateEnum newContaminationState);
     bool SetSmokeSensitivityLevel(SensitivityEnum newSmokeSensitivityLevel);
-
+    bool SetExpiryDate(uint32_t newExpiryDate);
     /**
      * @brief Sets Unmounted attribute and updates ExpressedState accordingly.
      * @param isUnmounted new unmounted state
