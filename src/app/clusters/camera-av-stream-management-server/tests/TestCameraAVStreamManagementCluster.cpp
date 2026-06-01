@@ -319,8 +319,8 @@ struct TestCameraAVStreamManagementCluster : public ::testing::Test
     }
 
     TestCameraAVStreamManagementCluster() :
-        mMockDelegate(&mVideoStreams, &mAudioStreams, &mSnapshotStreams),
-        mServer(MakeInitArguments(mMockDelegate)), mClusterTester(mServer)
+        mMockDelegate(&mVideoStreams, &mAudioStreams, &mSnapshotStreams), mServer(MakeInitArguments(mMockDelegate)),
+        mClusterTester(mServer)
     {}
 
     void SetUp() override
@@ -1794,8 +1794,7 @@ struct TestCodegenCameraAVStreamManagementMigration : public ::testing::Test
     static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
 
     TestCodegenCameraAVStreamManagementMigration() :
-        mMockDelegate(&mVideoStreams, &mAudioStreams, &mSnapshotStreams),
-        mServer(MakeInitArguments(mMockDelegate)),
+        mMockDelegate(&mVideoStreams, &mAudioStreams, &mSnapshotStreams), mServer(MakeInitArguments(mMockDelegate)),
         mClusterTester(mServer)
     {}
 

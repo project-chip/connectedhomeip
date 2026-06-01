@@ -386,7 +386,6 @@ enum class OptionalAttribute : uint32_t
 class CameraAVStreamManagementCluster : public DefaultServerCluster
 {
 public:
-
     struct InitArguments
     {
         /**
