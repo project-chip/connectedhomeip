@@ -2094,6 +2094,16 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #ifndef CHIP_CONFIG_MAX_NUM_ZONES
 #define CHIP_CONFIG_MAX_NUM_ZONES 4
 #endif // CHIP_CONFIG_MAX_NUM_ZONES
+
+/**
+ * @def CHIP_MEMORY_SANITIZER_ENABLED
+ *
+ * @brief True when building with Clang MemorySanitizer (MSan).
+ */
+#ifndef CHIP_MEMORY_SANITIZER_ENABLED
+#define CHIP_MEMORY_SANITIZER_ENABLED 0
+#endif
+
 /**
  * @}
  */

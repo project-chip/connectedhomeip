@@ -88,14 +88,20 @@
 #include <clusters/DishwasherMode/MetadataProvider.h>
 #include <clusters/DoorLock/Ids.h>
 #include <clusters/DoorLock/MetadataProvider.h>
+#include <clusters/DynamicLighting/Ids.h>
+#include <clusters/DynamicLighting/MetadataProvider.h>
 #include <clusters/EcosystemInformation/Ids.h>
 #include <clusters/EcosystemInformation/MetadataProvider.h>
+#include <clusters/ElectricalDistribution/Ids.h>
+#include <clusters/ElectricalDistribution/MetadataProvider.h>
 #include <clusters/ElectricalEnergyMeasurement/Ids.h>
 #include <clusters/ElectricalEnergyMeasurement/MetadataProvider.h>
 #include <clusters/ElectricalGridConditions/Ids.h>
 #include <clusters/ElectricalGridConditions/MetadataProvider.h>
 #include <clusters/ElectricalPowerMeasurement/Ids.h>
 #include <clusters/ElectricalPowerMeasurement/MetadataProvider.h>
+#include <clusters/ElectricalProtectionAlarm/Ids.h>
+#include <clusters/ElectricalProtectionAlarm/MetadataProvider.h>
 #include <clusters/EnergyEvse/Ids.h>
 #include <clusters/EnergyEvse/MetadataProvider.h>
 #include <clusters/EnergyEvseMode/Ids.h>
@@ -168,6 +174,8 @@
 #include <clusters/ModeSelect/MetadataProvider.h>
 #include <clusters/NetworkCommissioning/Ids.h>
 #include <clusters/NetworkCommissioning/MetadataProvider.h>
+#include <clusters/NetworkIdentityManagement/Ids.h>
+#include <clusters/NetworkIdentityManagement/MetadataProvider.h>
 #include <clusters/NitrogenDioxideConcentrationMeasurement/Ids.h>
 #include <clusters/NitrogenDioxideConcentrationMeasurement/MetadataProvider.h>
 #include <clusters/OccupancySensing/Ids.h>
@@ -238,6 +246,8 @@
 #include <clusters/ServiceArea/MetadataProvider.h>
 #include <clusters/SmokeCoAlarm/Ids.h>
 #include <clusters/SmokeCoAlarm/MetadataProvider.h>
+#include <clusters/SmokeConcentrationMeasurement/Ids.h>
+#include <clusters/SmokeConcentrationMeasurement/MetadataProvider.h>
 #include <clusters/SoftwareDiagnostics/Ids.h>
 #include <clusters/SoftwareDiagnostics/MetadataProvider.h>
 #include <clusters/SoilMeasurement/Ids.h>
@@ -264,8 +274,6 @@
 #include <clusters/TimeFormatLocalization/MetadataProvider.h>
 #include <clusters/TimeSynchronization/Ids.h>
 #include <clusters/TimeSynchronization/MetadataProvider.h>
-#include <clusters/Timer/Ids.h>
-#include <clusters/Timer/MetadataProvider.h>
 #include <clusters/TlsCertificateManagement/Ids.h>
 #include <clusters/TlsCertificateManagement/MetadataProvider.h>
 #include <clusters/TlsClientManagement/Ids.h>
@@ -513,10 +521,20 @@ std::optional<DataModel::AcceptedCommandEntry> AcceptedCommandEntryFor(ClusterId
         if (id == DoorLock::Id)
             return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, DoorLock::Id>::EntryFor(command);
     }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == DynamicLighting::Id) || ...))
+    {
+        if (id == DynamicLighting::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, DynamicLighting::Id>::EntryFor(command);
+    }
     if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == EcosystemInformation::Id) || ...))
     {
         if (id == EcosystemInformation::Id)
             return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, EcosystemInformation::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == ElectricalDistribution::Id) || ...))
+    {
+        if (id == ElectricalDistribution::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, ElectricalDistribution::Id>::EntryFor(command);
     }
     if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == ElectricalEnergyMeasurement::Id) || ...))
     {
@@ -532,6 +550,11 @@ std::optional<DataModel::AcceptedCommandEntry> AcceptedCommandEntryFor(ClusterId
     {
         if (id == ElectricalPowerMeasurement::Id)
             return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, ElectricalPowerMeasurement::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == ElectricalProtectionAlarm::Id) || ...))
+    {
+        if (id == ElectricalProtectionAlarm::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, ElectricalProtectionAlarm::Id>::EntryFor(command);
     }
     if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == EnergyEvse::Id) || ...))
     {
@@ -714,6 +737,11 @@ std::optional<DataModel::AcceptedCommandEntry> AcceptedCommandEntryFor(ClusterId
         if (id == NetworkCommissioning::Id)
             return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, NetworkCommissioning::Id>::EntryFor(command);
     }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == NetworkIdentityManagement::Id) || ...))
+    {
+        if (id == NetworkIdentityManagement::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, NetworkIdentityManagement::Id>::EntryFor(command);
+    }
     if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == NitrogenDioxideConcentrationMeasurement::Id) || ...))
     {
         if (id == NitrogenDioxideConcentrationMeasurement::Id)
@@ -891,6 +919,11 @@ std::optional<DataModel::AcceptedCommandEntry> AcceptedCommandEntryFor(ClusterId
         if (id == SmokeCoAlarm::Id)
             return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, SmokeCoAlarm::Id>::EntryFor(command);
     }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == SmokeConcentrationMeasurement::Id) || ...))
+    {
+        if (id == SmokeConcentrationMeasurement::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, SmokeConcentrationMeasurement::Id>::EntryFor(command);
+    }
     if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == SoftwareDiagnostics::Id) || ...))
     {
         if (id == SoftwareDiagnostics::Id)
@@ -951,11 +984,6 @@ std::optional<DataModel::AcceptedCommandEntry> AcceptedCommandEntryFor(ClusterId
     {
         if (id == TimeFormatLocalization::Id)
             return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, TimeFormatLocalization::Id>::EntryFor(command);
-    }
-    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == Timer::Id) || ...))
-    {
-        if (id == Timer::Id)
-            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Timer::Id>::EntryFor(command);
     }
     if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == TimeSynchronization::Id) || ...))
     {

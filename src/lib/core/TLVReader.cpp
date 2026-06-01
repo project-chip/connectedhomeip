@@ -441,12 +441,12 @@ CHIP_ERROR TLVReader::GetString(char * buf, size_t bufSize)
     if (!TLVTypeIsString(ElementType()))
         return CHIP_ERROR_WRONG_TLV_TYPE;
 
-    if ((mElemLenOrVal + 1) > bufSize)
+    if (mElemLenOrVal >= bufSize)
         return CHIP_ERROR_BUFFER_TOO_SMALL;
 
     buf[mElemLenOrVal] = 0;
 
-    return GetBytes(reinterpret_cast<uint8_t *>(buf), bufSize - 1);
+    return GetBytes(reinterpret_cast<uint8_t *>(buf), static_cast<uint32_t>(mElemLenOrVal));
 }
 
 CHIP_ERROR TLVReader::DupBytes(uint8_t *& buf, uint32_t & dataLen)

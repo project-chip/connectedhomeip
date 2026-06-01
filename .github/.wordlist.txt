@@ -39,6 +39,7 @@ aef
 AES
 AFL
 AIDL
+aliased
 algs
 alloc
 allocator
@@ -72,6 +73,7 @@ approver
 appspot
 appwrite
 aps
+ARD
 arg
 argc
 args
@@ -80,10 +82,6 @@ armeabi
 armino
 ARMmbed
 armv
-ARD
-SCL
-SDA
-VCC
 ASAN
 asdk
 ASR
@@ -93,6 +91,7 @@ ASYNC
 AsyncZeroconfServiceTypes
 ATL
 ATLs
+atomicity
 atomics
 att
 attId
@@ -128,6 +127,7 @@ backend
 backends
 backticks
 backtrace
+backwards
 BallastConfiguration
 BarrierControl
 BasicCHIPRegression
@@ -162,6 +162,7 @@ bluetoothd
 bluez
 Bonjour
 BOOL
+boolean
 booleans
 BooleanState
 bootable
@@ -192,6 +193,8 @@ bz
 bzip
 CACACACA
 cacerts
+callsite
+callsites
 CAfile
 cancelled
 capacitive
@@ -248,6 +251,7 @@ ChlorodibromomethaneConcentrationMeasurement
 ChloroformConcentrationMeasurement
 chmod
 chown
+chroot
 chrpath
 CIPD
 CircleCI
@@ -293,7 +297,6 @@ commissionee
 CommissioningFlow
 commondatastorage
 Compat
-compat
 CONF
 CONFIG
 ConfigDescription
@@ -343,8 +346,8 @@ cstdint
 csu
 csv
 ctl
-CTS
 ctrl
+CTS
 ctypes
 CurrentHue
 CurrentLevel
@@ -402,6 +405,7 @@ delayedQueryActionTimeSec
 delayQuery
 deliverables
 demangle
+dep
 Depacketization
 deployable
 depottools
@@ -411,6 +415,7 @@ dereference
 dereferencing
 desc
 descheduled
+destructor
 detokenization
 detokenizer
 dev
@@ -431,6 +436,7 @@ DeviceNetworkProvisioningDelegate
 DeviceNetworkProvisioningDelegateImpl
 DevicePairingDelegate
 DeviceTemperatureConfiguration
+Devkit
 DevKitC
 DevKitM
 devtype
@@ -557,12 +563,13 @@ EvalCode
 EvalCodeWithName
 EvalFrameDefault
 EVB
-EVKBMIMXRT
 EventLogging
 evk
+EVKBMIMXRT
 EVSE
 exceptfds
 ExchangeContext
+Excludable
 exe
 ExecStart
 executables
@@ -585,6 +592,7 @@ FDDE
 fddead
 fde
 fdx
+featuremap
 FECA
 FecalColiformAndEColiConcentrationMeasurement
 feff
@@ -597,20 +605,24 @@ FFFFFFFFFFFF0102
 FFmpeg
 Fi
 filepath
+filesystems
 fini
 FixedLabel
+fixups
 flashdebug
 FlowMeasurement
 FluorideConcentrationMeasurement
 focusable
 forkpty
+FormaldehydeConcentrationMeasurement
 formatter
 formatters
+forwarding
 FOTA
 framerate
+FRDM
 FreeRTOS
 FreeRTOSConfig
-FRDM
 FS
 fsl
 fstab
@@ -625,6 +637,7 @@ fvisibility
 FW
 Fxx
 gbl
+gc
 gcloud
 GDB
 gdbgui
@@ -683,6 +696,7 @@ gzbf
 HaloaceticAcidsConcentrationMeasurement
 HandleCommand
 hardcoded
+hardcodes
 hardknott
 hardwarever
 HardwareVersion
@@ -704,7 +718,6 @@ hostname
 hotfixes
 href
 hsm
-HSM
 HTTPS
 Humidistat
 HW
@@ -753,6 +766,9 @@ Infineon
 ini
 init
 InitArgs
+initialize
+initializer
+initializers
 inlined
 inlining
 InputLoop
@@ -762,6 +778,7 @@ integrations
 IntelliSense
 InteractionModelEngine
 InteractionModelVersion
+interop
 Interoperable
 introvideos
 InvokeCommandRequests
@@ -802,6 +819,7 @@ jre
 js
 json
 jsoncpp
+jsontlv
 JTAG
 Jupyter
 jupyterlab
@@ -867,6 +885,7 @@ lightin
 LightingApp
 LightingColor
 LightingState
+linker's
 LinkSoftwareAndDocumentationPack
 linter
 linters
@@ -878,8 +897,8 @@ localhost
 LocalizationConfiguration
 localstatedir
 LockingState
-lookups
 LogEvent
+lookups
 loopback
 LowPower
 LPC
@@ -1083,8 +1102,8 @@ optionMask
 optionOverride
 optionsMask
 optionsOverride
-orgs
 Orchestrator
+orgs
 OSS
 OTA
 OTADownloader
@@ -1168,6 +1187,9 @@ plaintext
 PlatformManager
 PlatformManagerImpl
 plt
+Pm1ConcentrationMeasurement
+Pm10ConcentrationMeasurement
+Pm25ConcentrationMeasurement
 PluginServerCallback
 png
 Podman
@@ -1181,8 +1203,10 @@ PowerConfiguration
 PowerProfile
 PowerSource
 PowerSourceConfiguration
+ppm
 pre
 PrebuiltDataModelDirectory
+prepends
 preprocessor
 Presetup
 PressureMeasurement
@@ -1242,6 +1266,7 @@ queryImageStatus
 Quickstart
 qvCHIP
 RADVD
+RadonConcentrationMeasurement
 raspberryPi
 RasPi
 rAv
@@ -1261,13 +1286,15 @@ rebase
 recommand
 recommanded
 Reconnection
-reconnection
 reconnections
 recurse
 refrigeratoralarm
 regen
 registerAttributeAccessOverride
+registration
 RegisterCommandHandler
+registry
+registrations
 RelativeHumidityMeasurement
 RemainAfterExit
 remoteDeviceId
@@ -1335,10 +1362,12 @@ scalability
 scalable
 schema
 schemas
+SCL
 scm
 sco
 scp
 ScriptBinding
+SDA
 SDB
 SDC
 SDHC
@@ -1440,6 +1469,7 @@ subcommand
 subcommands
 subdirectories
 subdirectory
+subflag
 subfolder
 submodule
 submodules
@@ -1458,6 +1488,7 @@ svg
 SVR
 SWD
 SWU
+symlink
 symlinks
 sysbuild
 sysconfdir
@@ -1465,6 +1496,7 @@ SysConfig
 sysctl
 sysdeps
 SYSROOT
+sysroots
 systemctl
 systemd
 systemdsystemunitdir
@@ -1480,6 +1512,7 @@ TCP
 teardown
 Telink
 TemperatureMeasurement
+templated
 templating
 Tera
 testability
@@ -1541,6 +1574,7 @@ tos
 TotalColiformBacteriaConcentrationMeasurement
 totalTests
 TotalTrihalomethanesConcentrationMeasurement
+TotalVolatileOrganicCompoundsConcentrationMeasurement
 TPK
 trackAlloc
 trackFree
@@ -1591,8 +1625,11 @@ Unicast
 UniFlash
 UnitLocalization
 unittest
+unlinking
 unpair
 unprovisioned
+unreferenced
+unregister
 unregistration
 Unsecure
 Unselect
@@ -1622,6 +1659,7 @@ UUID
 ux
 valgrind
 validator
+VCC
 vcom
 VCP
 Vectorcall
@@ -1646,6 +1684,7 @@ vous
 VPN
 VSC
 VSCode
+vtable
 WaitNewInputEvent
 WakeOnLan
 Walkthrough
@@ -1732,8 +1771,8 @@ zclsubscribe
 zclwrite
 ZephyrConfig
 zephyrproject
-zhengyaohan
 Zeroconf
+zhengyaohan
 Zigbee
 zigbeealliance
 zigbeethread

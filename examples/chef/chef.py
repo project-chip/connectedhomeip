@@ -22,7 +22,7 @@ import shutil
 import sys
 import tarfile
 import textwrap
-from typing import Any, Dict
+from typing import Any
 
 import constants
 import stateful_shell
@@ -43,7 +43,6 @@ _CD_STAGING_DIR = os.path.join(_CHEF_SCRIPT_PATH, "staging")
 _EXCLUDE_DEVICE_FROM_LINUX_CI = [
     "noip_rootnode_dimmablelight_bCwGYSDpoe",  # Broken.
     "rootnode_genericswitch_2dfff6e516",  # not actively developed,
-    "rootnode_mounteddimmableloadcontrol_a9a1a87f2d",  # not actively developed,
 ]
 # Pattern to filter (based on device-name) devices that need ICD support.
 _ICD_DEVICE_PATTERN = "^icd_"
@@ -106,14 +105,7 @@ def load_config() -> None:
     return config
 
 
-def check_python_version() -> None:
-    if sys.version_info[0] < 3:
-        flush_print('Must use Python 3. Current version is ' +
-                    str(sys.version_info[0]))
-        exit(1)
-
-
-def load_cicd_config() -> Dict[str, Any]:
+def load_cicd_config() -> dict[str, Any]:
     with open(_CICD_CONFIG_FILE_NAME) as config_file:
         return json.loads(config_file.read())
 
@@ -276,7 +268,6 @@ def bundle_telink(device_name: str) -> None:
 
 def main() -> int:
 
-    check_python_version()
     config = load_config()
     cicd_config = load_cicd_config()
 
@@ -540,7 +531,7 @@ def main() -> int:
         shell.run_cmd(
             f"export ZEPHYR_BASE={config['nrfconnect']['ZEPHYR_BASE']}")
         shell.run_cmd(
-            f'source {config["nrfconnect"]["ZEPHYR_BASE"]}/zephyr-env.sh')
+            f'source {config["nrfconnect"]["ZEPHYR_BASE"]}/../.zephyrrc')
         # QUIRK:
         # When the Zephyr SDK is installed as a part of the NCS toolchain, the build system will use
         # build tools from the NCS toolchain, but it will not update the PATH and LD_LIBRARY_PATH

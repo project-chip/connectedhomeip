@@ -180,6 +180,16 @@ template("siwx917_sdk") {
       ]
     }
 
+    if (sl_enable_si70xx_sensor) {
+      _include_dirs += [
+        "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/hardware_drivers/si70xx_sensor/inc",
+        "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/hardware_drivers/si70xx_sensor/config",
+        "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/unified_api/inc",
+        "${wifi_sdk_root}/components/board/silabs/config/common_config",
+        "${wifi_sdk_root}/components/board/silabs/config/common_config_opn",
+      ]
+    }
+
     if (use_system_view) {
       _include_dirs += [
         "${efr32_sdk_root}/segger/systemview/SEGGER",
@@ -282,6 +292,8 @@ template("siwx917_sdk") {
       ]
     }
 
+    defines += [ "SL_MATTER_USE_SI70XX_SENSOR=${sl_enable_si70xx_sensor}" ]
+
     if (silabs_log_enabled && chip_logging) {
       defines += [ "SILABS_LOG_ENABLED=1" ]
     } else {
@@ -361,6 +373,9 @@ template("siwx917_sdk") {
     }
 
     cflags += [ "-Wno-shadow" ]
+
+    # Suppress VLA warnings for wifi-sdk files that use variable-length arrays
+    cflags += [ "-Wno-vla" ]
 
     foreach(include_dir, _include_dirs) {
       cflags += [ "-isystem" + rebase_path(include_dir, root_build_dir) ]
@@ -784,6 +799,14 @@ template("siwx917_sdk") {
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/hal/src/sl_si91x_hal_soc_soft_reset.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/wireless/firmware_upgrade/firmware_upgradation.c",
     ]
+    if (sl_enable_si70xx_sensor) {
+      sources += [
+        "${matter_support_root}/board-support/si91x/siwx917/${silabs_board}/autogen/sl_i2c_init.c",
+        "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/hardware_drivers/si70xx_sensor/src/sl_si91x_si70xx.c",
+        "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/unified_api/src/sl_si91x_i2c.c",
+        "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/unified_peripheral_drivers/src/sl_si91x_peripheral_i2c.c",
+      ]
+    }
 
     if (sl_enable_rgb_led) {
       sources += [

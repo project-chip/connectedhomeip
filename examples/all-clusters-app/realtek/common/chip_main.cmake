@@ -1,8 +1,8 @@
-cmake_minimum_required(VERSION 3.6)
+cmake_minimum_required(VERSION 3.20)
 
 project(chip_main)
 
-set(chip_dir "${bee_matter_root}")
+set(chip_dir "${matter_root}")
 set(chip_dir_output "${matter_output_path}/chip")
 set(chip_main chip_main)
 set(list_chip_main_sources chip_main_sources)
@@ -144,7 +144,6 @@ list(
     ${chip_dir}/src/app/clusters/ota-requestor/DefaultOTARequestor.cpp
     ${chip_dir}/src/app/clusters/ota-requestor/DefaultOTARequestorDriver.cpp
     ${chip_dir}/src/app/clusters/ota-requestor/DefaultOTARequestorStorage.cpp
-    ${chip_dir}/src/app/clusters/ota-requestor/OTARequestorCluster.cpp
     ${chip_dir}/examples/platform/realtek/ota/OTAInitializer.cpp
 )
 endif (matter_enable_ota_requestor)
@@ -178,7 +177,7 @@ list(
     ${chip_dir}/examples/all-clusters-app/realtek/common/main/chipinterface.cpp
     ${chip_dir}/examples/all-clusters-app/realtek/common/main/DeviceCallbacks.cpp
     ${chip_dir}/examples/all-clusters-app/realtek/common/main/CHIPDeviceManager.cpp
-    ${chip_dir}/examples/all-clusters-app/realtek/common/main/Globals.cpp 
+    ${chip_dir}/examples/all-clusters-app/realtek/common/main/Globals.cpp
     ${chip_dir}/examples/platform/realtek/util/LEDWidget.cpp
     ${chip_dir}/examples/providers/DeviceInfoProviderImpl.cpp
     ${chip_dir}/examples/platform/realtek/dac_provider/CommonDACProvider.cpp

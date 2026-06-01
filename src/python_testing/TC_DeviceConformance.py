@@ -47,20 +47,20 @@
 #       --PICS src/app/tests/suites/certification/ci-pics-values
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
-#       --tests test_TC_IDM_10_2 test_TC_IDM_10_6 test_TC_DESC_2_3 test_TC_IDM_14_1 test_TC_IDM_10_5
+#       --tests test_TC_IDM_10_2 test_TC_IDM_10_6 test_TC_DESC_2_3 test_TC_IDM_14_1 test_TC_IDM_10_5 test_TC_IDM_10_3
 #       --debug
 #     factory-reset: true
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-# TODO: Enable 10.5 in CI once the door lock OTA requestor problem is sorted.
-from test_testing.DeviceConformanceTests import DeviceConformanceTests
-
 from matter.testing.decorators import async_test_body
+# TODO: Enable 10.5 in CI once the door lock OTA requestor problem is sorted.
+from matter.testing.device_conformance_tests import DeviceConformanceTests
 from matter.testing.runner import TestStep, default_matter_test_main
 
 
 class TC_DeviceConformance(DeviceConformanceTests):
+
     @async_test_body
     async def setup_class(self):
         super().setup_class()

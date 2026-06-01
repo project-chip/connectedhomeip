@@ -16,9 +16,11 @@
  */
 #pragma once
 
-#include <app/server/Server.h>
+#include <access/AccessControl.h>
+#include <credentials/FabricTable.h>
 #include <credentials/GroupDataProvider.h>
 #include <lib/support/TimerDelegate.h>
+#include <transport/raw/GroupcastTesting.h>
 
 namespace chip {
 namespace app {
@@ -29,6 +31,8 @@ struct GroupcastContext
     chip::FabricTable & fabricTable;
     chip::Credentials::GroupDataProvider & groupDataProvider;
     chip::TimerDelegate & timerDelegate;
+    chip::Access::AccessControl & accessControl;
+    chip::Groupcast::Testing & testing;
 };
 
 } // namespace Clusters

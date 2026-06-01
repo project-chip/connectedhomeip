@@ -16,8 +16,8 @@
 TARGET_SOURCES(
   ${APP_TARGET}
   PRIVATE
-    "${CLUSTER_DIR}/MicrowaveOvenControlCluster.cpp"
+    "${CLUSTER_DIR}/CodegenIntegration.cpp"
     "${CLUSTER_DIR}/CodegenIntegration.h"
-    "${CLUSTER_DIR}/microwave-oven-control-server.h"
     "${CLUSTER_DIR}/Delegate.h"
+    "${CLUSTER_DIR}/microwave-oven-control-server.h"
 )

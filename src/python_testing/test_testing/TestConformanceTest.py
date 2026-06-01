@@ -19,12 +19,12 @@ import logging
 from enum import StrEnum
 from typing import Any
 
-from DeviceConformanceTests import DeviceConformanceTests
 from fake_device_builder import create_minimal_cluster, create_minimal_dt
 from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.testing.basic_composition import arls_populated
+from matter.testing.device_conformance_tests import DeviceConformanceTests
 from matter.testing.problem_notices import AttributePathLocation, CommandPathLocation, ProblemLocation
 from matter.testing.runner import default_matter_test_main
 from matter.testing.spec_parsing import PrebuiltDataModelDirectory, build_xml_clusters, build_xml_device_types, build_xml_namespaces
@@ -423,16 +423,16 @@ class TestConformanceTest(DeviceConformanceTests):
         xml_clusters, _ = build_xml_clusters(PrebuiltDataModelDirectory.k1_5)
         xml_device_types, _ = build_xml_device_types(PrebuiltDataModelDirectory.k1_5)
         # TODO: change this once https://github.com/project-chip/matter-test-scripts/issues/689 is implemented
-        closure_id = [id for id, xml in xml_device_types.items() if xml.name == 'Closure'][0]
-        closure_panel_id = [id for id, xml in xml_device_types.items() if xml.name == 'Closure Panel'][0]
-        window_covering_id = [id for id, xml in xml_device_types.items() if xml.name == 'Window Covering'][0]
-        on_off_id = [id for id, xml in xml_device_types.items() if xml.name == 'On/Off Light'][0]
+        closure_id = [_id for _id, xml in xml_device_types.items() if xml.name == 'Closure'][0]
+        closure_panel_id = [_id for _id, xml in xml_device_types.items() if xml.name == 'Closure Panel'][0]
+        window_covering_id = [_id for _id, xml in xml_device_types.items() if xml.name == 'Window Covering'][0]
+        on_off_id = [_id for _id, xml in xml_device_types.items() if xml.name == 'On/Off Light'][0]
 
-        def run_checks_for_device_type(id: int):
-            one_five_revision = xml_device_types[id].revision
+        def run_checks_for_device_type(tid: int):
+            one_five_revision = xml_device_types[tid].revision
 
             def create_endpoint(rev: int, cluster_list: list[Clusters.Objects.Cluster]):
-                self.endpoints = {1: create_minimal_dt(xml_clusters, xml_device_types, id, is_tlv_endpoint=False)}
+                self.endpoints = {1: create_minimal_dt(xml_clusters, xml_device_types, tid, is_tlv_endpoint=False)}
                 self.endpoints[1].pop(Clusters.ClosureControl, None)
                 self.endpoints[1].pop(Clusters.ClosureDimension, None)
                 self.endpoints[1].pop(Clusters.WindowCovering, None)
@@ -514,13 +514,13 @@ class TestConformanceTest(DeviceConformanceTests):
         xml_device_types, _ = build_xml_device_types(PrebuiltDataModelDirectory.k1_5)
         xml_namespaces, _ = build_xml_namespaces(PrebuiltDataModelDirectory.k1_5)
         # TODO: change this once https://github.com/project-chip/matter-test-scripts/issues/689 is implemented
-        closure_id = [id for id, xml in xml_device_types.items() if xml.name == 'Closure'][0]
-        closure_panel_id = [id for id, xml in xml_device_types.items() if xml.name == 'Closure Panel'][0]
-        closure_namespace_id = [id for id, xml in xml_namespaces.items() if xml.name == 'Closure'][0]
-        closure_panel_namespace_id = [id for id, xml in xml_namespaces.items() if xml.name == 'Closure Panel'][0]
+        closure_id = [_id for _id, xml in xml_device_types.items() if xml.name == 'Closure'][0]
+        closure_panel_id = [_id for _id, xml in xml_device_types.items() if xml.name == 'Closure Panel'][0]
+        closure_namespace_id = [_id for _id, xml in xml_namespaces.items() if xml.name == 'Closure'][0]
+        closure_panel_namespace_id = [_id for _id, xml in xml_namespaces.items() if xml.name == 'Closure Panel'][0]
 
-        def create_endpoint(id: int, rev: int, tag_list: list[Clusters.Globals.Structs.SemanticTagStruct]):
-            self.endpoints = {1: create_minimal_dt(xml_clusters, xml_device_types, id, is_tlv_endpoint=False)}
+        def create_endpoint(eid: int, rev: int, tag_list: list[Clusters.Globals.Structs.SemanticTagStruct]):
+            self.endpoints = {1: create_minimal_dt(xml_clusters, xml_device_types, eid, is_tlv_endpoint=False)}
             # For the purposes of this test, I don't care that no clusters are present
 
             self.endpoints[1][Clusters.Descriptor][Clusters.Descriptor.Attributes.DeviceTypeList][0].revision = rev

@@ -63,20 +63,24 @@ void ProcessOnOffUnicastBindingCommand(CommandId commandId, const Binding::Table
 
     switch (commandId)
     {
-    case Clusters::OnOff::Commands::Toggle::Id:
+    case Clusters::OnOff::Commands::Toggle::Id: {
         Clusters::OnOff::Commands::Toggle::Type toggleCommand;
-        Controller::InvokeCommandRequest(exchangeMgr, sessionHandle, binding.remote, toggleCommand, onSuccess, onFailure);
+        LogErrorOnFailure(
+            Controller::InvokeCommandRequest(exchangeMgr, sessionHandle, binding.remote, toggleCommand, onSuccess, onFailure));
         break;
-
-    case Clusters::OnOff::Commands::On::Id:
+    }
+    case Clusters::OnOff::Commands::On::Id: {
         Clusters::OnOff::Commands::On::Type onCommand;
-        Controller::InvokeCommandRequest(exchangeMgr, sessionHandle, binding.remote, onCommand, onSuccess, onFailure);
+        LogErrorOnFailure(
+            Controller::InvokeCommandRequest(exchangeMgr, sessionHandle, binding.remote, onCommand, onSuccess, onFailure));
         break;
-
-    case Clusters::OnOff::Commands::Off::Id:
+    }
+    case Clusters::OnOff::Commands::Off::Id: {
         Clusters::OnOff::Commands::Off::Type offCommand;
-        Controller::InvokeCommandRequest(exchangeMgr, sessionHandle, binding.remote, offCommand, onSuccess, onFailure);
+        LogErrorOnFailure(
+            Controller::InvokeCommandRequest(exchangeMgr, sessionHandle, binding.remote, offCommand, onSuccess, onFailure));
         break;
+    }
     }
 }
 
@@ -86,21 +90,21 @@ void ProcessOnOffGroupBindingCommand(CommandId commandId, const Binding::TableEn
 
     switch (commandId)
     {
-    case Clusters::OnOff::Commands::Toggle::Id:
+    case Clusters::OnOff::Commands::Toggle::Id: {
         Clusters::OnOff::Commands::Toggle::Type toggleCommand;
-        Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, toggleCommand);
+        LogErrorOnFailure(Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, toggleCommand));
         break;
-
-    case Clusters::OnOff::Commands::On::Id:
+    }
+    case Clusters::OnOff::Commands::On::Id: {
         Clusters::OnOff::Commands::On::Type onCommand;
-        Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, onCommand);
-
+        LogErrorOnFailure(Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, onCommand));
         break;
-
-    case Clusters::OnOff::Commands::Off::Id:
+    }
+    case Clusters::OnOff::Commands::Off::Id: {
         Clusters::OnOff::Commands::Off::Type offCommand;
-        Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, offCommand);
+        LogErrorOnFailure(Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, offCommand));
         break;
+    }
     }
 }
 
@@ -140,9 +144,14 @@ void LightSwitchContextReleaseHandler(void * context)
 
 void InitBindingHandlerInternal(intptr_t arg)
 {
-    auto & server = chip::Server::GetInstance();
-    Binding::Manager::GetInstance().Init(
+    auto & server  = chip::Server::GetInstance();
+    CHIP_ERROR err = Binding::Manager::GetInstance().Init(
         { &server.GetFabricTable(), server.GetCASESessionManager(), &server.GetPersistentStorage() });
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "Failed to initialize Binding Manager: %" CHIP_ERROR_FORMAT, err.Format());
+        return;
+    }
     Binding::Manager::GetInstance().RegisterBoundDeviceChangedHandler(LightSwitchChangedHandler);
     Binding::Manager::GetInstance().RegisterBoundDeviceContextReleaseHandler(LightSwitchContextReleaseHandler);
 }
@@ -189,34 +198,39 @@ CHIP_ERROR OnOffSwitchCommandHandler(int argc, char ** argv)
     return sShellSwitchOnOffSubCommands.ExecCommand(argc, argv);
 }
 
-CHIP_ERROR OnSwitchCommandHandler(int argc, char ** argv)
+namespace {
+
+CHIP_ERROR CommandDispatcher_Internal(ClusterId clusterId, CommandId commandId, bool isGroup = false)
 {
     BindingCommandData * data = Platform::New<BindingCommandData>();
-    data->commandId           = Clusters::OnOff::Commands::On::Id;
-    data->clusterId           = Clusters::OnOff::Id;
+    VerifyOrReturnError(data != nullptr, CHIP_ERROR_NO_MEMORY);
+    data->commandId = commandId;
+    data->clusterId = clusterId;
+    data->isGroup   = isGroup;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
-    return CHIP_NO_ERROR;
+    CHIP_ERROR err = DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    if (err != CHIP_NO_ERROR)
+    {
+        Platform::Delete(data);
+    }
+    return err;
+}
+
+} // anonymous namespace
+
+CHIP_ERROR OnSwitchCommandHandler(int argc, char ** argv)
+{
+    return CommandDispatcher_Internal(Clusters::OnOff::Id, Clusters::OnOff::Commands::On::Id);
 }
 
 CHIP_ERROR OffSwitchCommandHandler(int argc, char ** argv)
 {
-    BindingCommandData * data = Platform::New<BindingCommandData>();
-    data->commandId           = Clusters::OnOff::Commands::Off::Id;
-    data->clusterId           = Clusters::OnOff::Id;
-
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
-    return CHIP_NO_ERROR;
+    return CommandDispatcher_Internal(Clusters::OnOff::Id, Clusters::OnOff::Commands::Off::Id);
 }
 
 CHIP_ERROR ToggleSwitchCommandHandler(int argc, char ** argv)
 {
-    BindingCommandData * data = Platform::New<BindingCommandData>();
-    data->commandId           = Clusters::OnOff::Commands::Toggle::Id;
-    data->clusterId           = Clusters::OnOff::Id;
-
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
-    return CHIP_NO_ERROR;
+    return CommandDispatcher_Internal(Clusters::OnOff::Id, Clusters::OnOff::Commands::Toggle::Id);
 }
 
 /********************************************************
@@ -245,8 +259,14 @@ CHIP_ERROR BindingGroupBindCommandHandler(int argc, char ** argv)
 
     Binding::TableEntry * entry =
         Platform::New<Binding::TableEntry>(atoi(argv[0]), atoi(argv[1]), 1, std::make_optional<ClusterId>(6));
-    DeviceLayer::PlatformMgr().ScheduleWork(BindingWorkerFunction, reinterpret_cast<intptr_t>(entry));
-    return CHIP_NO_ERROR;
+    VerifyOrReturnError(entry != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    CHIP_ERROR err = DeviceLayer::PlatformMgr().ScheduleWork(BindingWorkerFunction, reinterpret_cast<intptr_t>(entry));
+    if (err != CHIP_NO_ERROR)
+    {
+        Platform::Delete(entry);
+    }
+    return err;
 }
 
 CHIP_ERROR BindingUnicastBindCommandHandler(int argc, char ** argv)
@@ -255,8 +275,14 @@ CHIP_ERROR BindingUnicastBindCommandHandler(int argc, char ** argv)
 
     Binding::TableEntry * entry =
         Platform::New<Binding::TableEntry>(atoi(argv[0]), atoi(argv[1]), 1, atoi(argv[2]), std::make_optional<ClusterId>(6));
-    DeviceLayer::PlatformMgr().ScheduleWork(BindingWorkerFunction, reinterpret_cast<intptr_t>(entry));
-    return CHIP_NO_ERROR;
+    VerifyOrReturnError(entry != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    CHIP_ERROR err = DeviceLayer::PlatformMgr().ScheduleWork(BindingWorkerFunction, reinterpret_cast<intptr_t>(entry));
+    if (err != CHIP_NO_ERROR)
+    {
+        Platform::Delete(entry);
+    }
+    return err;
 }
 
 /********************************************************
@@ -301,35 +327,17 @@ CHIP_ERROR GroupsOnOffSwitchCommandHandler(int argc, char ** argv)
 
 CHIP_ERROR GroupOnSwitchCommandHandler(int argc, char ** argv)
 {
-    BindingCommandData * data = Platform::New<BindingCommandData>();
-    data->commandId           = Clusters::OnOff::Commands::On::Id;
-    data->clusterId           = Clusters::OnOff::Id;
-    data->isGroup             = true;
-
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
-    return CHIP_NO_ERROR;
+    return CommandDispatcher_Internal(Clusters::OnOff::Id, Clusters::OnOff::Commands::On::Id, true /* isGroup */);
 }
 
 CHIP_ERROR GroupOffSwitchCommandHandler(int argc, char ** argv)
 {
-    BindingCommandData * data = Platform::New<BindingCommandData>();
-    data->commandId           = Clusters::OnOff::Commands::Off::Id;
-    data->clusterId           = Clusters::OnOff::Id;
-    data->isGroup             = true;
-
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
-    return CHIP_NO_ERROR;
+    return CommandDispatcher_Internal(Clusters::OnOff::Id, Clusters::OnOff::Commands::Off::Id, true /* isGroup */);
 }
 
 CHIP_ERROR GroupToggleSwitchCommandHandler(int argc, char ** argv)
 {
-    BindingCommandData * data = Platform::New<BindingCommandData>();
-    data->commandId           = Clusters::OnOff::Commands::Toggle::Id;
-    data->clusterId           = Clusters::OnOff::Id;
-    data->isGroup             = true;
-
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
-    return CHIP_NO_ERROR;
+    return CommandDispatcher_Internal(Clusters::OnOff::Id, Clusters::OnOff::Commands::Toggle::Id, true /* isGroup */);
 }
 
 /**
@@ -395,7 +403,16 @@ void SwitchWorkerFunction(intptr_t context)
     VerifyOrReturn(context != 0, ChipLogError(NotSpecified, "SwitchWorkerFunction - Invalid work data"));
 
     BindingCommandData * data = reinterpret_cast<BindingCommandData *>(context);
-    Binding::Manager::GetInstance().NotifyBoundClusterChanged(data->localEndpointId, data->clusterId, static_cast<void *>(data));
+    CHIP_ERROR err            = Binding::Manager::GetInstance().NotifyBoundClusterChanged(data->localEndpointId, data->clusterId,
+                                                                                          static_cast<void *>(data));
+    // In case of success, the binding manager calls LightSwitchContextReleaseHandler which does Platform::Delete(data)
+    // so it's freed by the callback. We only need to free the data if the operation failed.
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "SwitchWorkerFunction - Failed to notify bound cluster changed: %" CHIP_ERROR_FORMAT,
+                     err.Format());
+        Platform::Delete(data);
+    }
 }
 
 void BindingWorkerFunction(intptr_t context)
@@ -403,7 +420,7 @@ void BindingWorkerFunction(intptr_t context)
     VerifyOrReturn(context != 0, ChipLogError(NotSpecified, "BindingWorkerFunction - Invalid work data"));
 
     Binding::TableEntry * entry = reinterpret_cast<Binding::TableEntry *>(context);
-    AddBindingEntry(*entry);
+    LogErrorOnFailure(AddBindingEntry(*entry));
 
     Platform::Delete(entry);
 }
@@ -413,7 +430,7 @@ CHIP_ERROR InitBindingHandler()
     // The initialization of binding manager will try establishing connection with unicast peers
     // so it requires the Server instance to be correctly initialized. Post the init function to
     // the event queue so that everything is ready when initialization is conducted.
-    chip::DeviceLayer::PlatformMgr().ScheduleWork(InitBindingHandlerInternal);
+    ReturnErrorOnFailure(chip::DeviceLayer::PlatformMgr().ScheduleWork(InitBindingHandlerInternal));
 #if CONFIG_ENABLE_CHIP_SHELL
     RegisterSwitchCommands();
 #endif

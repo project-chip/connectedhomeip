@@ -50,22 +50,22 @@ private:
                                                                 { .value = to_underlying(ModeTag::kGridOptimization) } };
 
     const detail::Structs::ModeOptionStruct::Type kModeOptions[5] = {
-        detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("No energy management (forecast only)"),
+        detail::Structs::ModeOptionStruct::Type{ .label    = "No energy management (forecast only)"_span,
                                                  .mode     = kModeNoOptimization,
                                                  .modeTags = DataModel::List<const ModeTagStructType>(ModeTagsNoOptimization) },
-        detail::Structs::ModeOptionStruct::Type{ .label = CharSpan::fromCharString("Device optimizes (no local or grid control)"),
+        detail::Structs::ModeOptionStruct::Type{ .label = "Device optimizes (no local or grid control)"_span,
                                                  .mode  = kModeDeviceOnlyOptimization,
                                                  .modeTags =
                                                      DataModel::List<const ModeTagStructType>(ModeTagsDeviceOnlyOptimization) },
-        detail::Structs::ModeOptionStruct::Type{ .label = CharSpan::fromCharString("Optimized within building"),
+        detail::Structs::ModeOptionStruct::Type{ .label = "Optimized within building"_span,
                                                  .mode  = kModeDeviceAndLocalOptimization,
                                                  .modeTags =
                                                      DataModel::List<const ModeTagStructType>(ModeTagsDeviceAndLocalOptimization) },
-        detail::Structs::ModeOptionStruct::Type{ .label = CharSpan::fromCharString("Optimized for grid"),
+        detail::Structs::ModeOptionStruct::Type{ .label = "Optimized for grid"_span,
                                                  .mode  = kModeDeviceAndGridOptimization,
                                                  .modeTags =
                                                      DataModel::List<const ModeTagStructType>(ModeTagsDeviceAndGridOptimization) },
-        detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Optimized for grid and building"),
+        detail::Structs::ModeOptionStruct::Type{ .label    = "Optimized for grid and building"_span,
                                                  .mode     = kModeAllOptimization,
                                                  .modeTags = DataModel::List<const ModeTagStructType>(ModeTagsAllOptimization) },
 

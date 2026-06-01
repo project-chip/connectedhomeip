@@ -29,6 +29,7 @@
 #       --string-arg jfc_server_app:${JF_CONTROL_APP}
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#       --PICS src/app/tests/suites/certification/ci-pics-values
 #     factory-reset: true
 # === END CI TEST ARGUMENTS ===
 
@@ -133,38 +134,58 @@ class TC_JFADMIN_2_1(MatterBaseTest):
         _devCtrlEcoB = None
         _fabric_a_persistent_storage = None
         _fabric_b_persistent_storage = None
+        jfadmin_fabric_a_passcode = None
+        dut_rpc_server_ip = None
+        dut_rpc_server_port = None
 
         self.step("1")
-        self.jfadmin_fabric_a_passcode = random.randint(110220011, 110220999)
         self.jfctrl_fabric_a_vid = random.randint(0x0001, 0xFFF0)
 
-        # Start Fabric A JF-Administrator App (DUT)
-        self.fabric_a_admin = JFAdministratorSubprocess(
-            self.jfa_server_app,
-            prefix="JFA-A",
-            storage_dir=self.storage_fabric_a,
-            port=random.randint(5001, 5999),
-            discriminator=random.randint(0, 4095),
-            passcode=self.jfadmin_fabric_a_passcode,
-            extra_args=["--capabilities", "0x04", "--rpc-server-port", "33033"])
-        self.fabric_a_admin.start(
-            expected_output="Server initialization complete",
-            timeout=20)
+        # If test is executed in CI environment, start JFA app for Fabric A
+        if self.is_pics_sdk_ci_only:
+            dut_rpc_server_ip = "127.0.0.1"
+            jfadmin_fabric_a_passcode = random.randint(110220011, 110220999)
+            dut_rpc_server_port = "33033"
+            # Start Fabric A JF-Administrator App (DUT)
+            self.fabric_a_admin = JFAdministratorSubprocess(
+                self.jfa_server_app,
+                prefix="JFA-A",
+                storage_dir=self.storage_fabric_a,
+                port=random.randint(5001, 5999),
+                discriminator=random.randint(0, 4095),
+                passcode=jfadmin_fabric_a_passcode,
+                extra_args=["--capabilities", "0x04", "--rpc-server-port", dut_rpc_server_port])
+            self.fabric_a_admin.start(
+                expected_output="Server initialization complete",
+                timeout=20)
+        else:
+            # We have a DUT that is already running, connect to it via RPC
+            dut_rpc_server_ip = self.user_params.get("dut_rpc_server_ip", None)
+            if not dut_rpc_server_ip:
+                asserts.fail("DUT RPC server IP must be specified via --string-arg dut_rpc_server_ip:<ip_address>")
+            dut_rpc_server_port = self.user_params.get("dut_rpc_server_port", None)
+            if not dut_rpc_server_port:
+                asserts.fail("DUT RPC server PORT must be specified via --string-arg dut_rpc_server_port:<port>")
+            jfadmin_fabric_a_passcode = self.matter_test_config.setup_passcodes[0]
+            if not jfadmin_fabric_a_passcode:
+                asserts.fail(
+                    "JF-Administrator passcode and discriminator must be specified via --passcode:<passcode> --discriminator:<discriminator>")
 
         # Start Fabric A JF-Controller App
         self.fabric_a_ctrl = JFControllerSubprocess(
             self.jfc_server_app,
             prefix="JFC-A",
-            rpc_server_port=33033,
+            rpc_server_port=dut_rpc_server_port,
             storage_dir=self.storage_fabric_a,
-            vendor_id=self.jfctrl_fabric_a_vid)
+            vendor_id=self.jfctrl_fabric_a_vid,
+            extra_args=["--rpc-server-ip", dut_rpc_server_ip])
         self.fabric_a_ctrl.start(
             expected_output="CHIP task running",
             timeout=20)
 
         # Commission JF-ADMIN app with JF-Controller on Fabric A
         self.fabric_a_ctrl.send(
-            message=f"pairing onnetwork 1 {self.jfadmin_fabric_a_passcode} --anchor true",
+            message=f"pairing onnetwork 1 {jfadmin_fabric_a_passcode} --anchor true",
             expected_output="[JF] Anchor Administrator (nodeId=1) commissioned with success",
             timeout=20)
 
@@ -239,13 +260,16 @@ class TC_JFADMIN_2_1(MatterBaseTest):
         asserts.assert_true(_admin_cat_found, "Administrator CAT not found in Admin App NOC on Ecosystem A")
         asserts.assert_true(_anchor_cat_found, "Anchor CAT not found in Admin App NOC on Ecosystem A")
         # Search jf-anchor-cat in Subject field of JF-Admin ICAC on Ecoystem A
-        icac_tlv_data = matter.tlv.TLVReader(response[0][Clusters.OperationalCredentials].NOCs[0].icac).get()
-        _found = False
-        for _tag, _value in icac_tlv_data['Any'][6]:
-            if _tag == 8 and _value == 'jf-anchor-icac':
-                _found = True
-                break
-        asserts.assert_true(_found, "Anchor ICAC (jf-anchor-icac) not found in Admin App ICAC Subject field on Ecosystem A")
+        try:
+            icac_tlv_data = matter.tlv.TLVReader(response[0][Clusters.OperationalCredentials].NOCs[0].icac).get()
+            _found = False
+            for _tag, _value in icac_tlv_data['Any'][6]:
+                if _tag == 8 and _value == 'jf-anchor-icac':
+                    _found = True
+                    break
+            asserts.assert_true(_found, "Anchor ICAC (jf-anchor-icac) not found in Admin App ICAC Subject field on Ecosystem A")
+        except (TypeError, AttributeError) as e:
+            asserts.fail(f"Failed to parse ICAC in precondition 2: {e}")
 
         response = await _devCtrlEcoA.ReadAttribute(
             nodeId=2, attributes=[(0, Clusters.OperationalCredentials.Attributes.Fabrics)],
@@ -367,13 +391,16 @@ class TC_JFADMIN_2_1(MatterBaseTest):
         asserts.assert_true(_admin_cat_found, "Administrator CAT not found in Admin App NOC on Ecosystem A")
         asserts.assert_true(_anchor_cat_found, "Anchor CAT not found in Admin App NOC on Ecosystem A")
         # Search jf-anchor-cat in Subject field of JF-Admin ICAC on Ecoystem A
-        icac_tlv_data = matter.tlv.TLVReader(response[0][Clusters.OperationalCredentials].NOCs[0].icac).get()
-        _found = False
-        for _tag, _value in icac_tlv_data['Any'][6]:
-            if _tag == 8 and _value == 'jf-anchor-icac':
-                _found = True
-                break
-        asserts.assert_true(_found, "Anchor ICAC (jf-anchor-icac) not found in Admin App ICAC Subject field on Ecosystem A")
+        try:
+            icac_tlv_data = matter.tlv.TLVReader(response[0][Clusters.OperationalCredentials].NOCs[0].icac).get()
+            _found = False
+            for _tag, _value in icac_tlv_data['Any'][6]:
+                if _tag == 8 and _value == 'jf-anchor-icac':
+                    _found = True
+                    break
+            asserts.assert_true(_found, "Anchor ICAC (jf-anchor-icac) not found in Admin App ICAC Subject field on Ecosystem A")
+        except (TypeError, AttributeError) as e:
+            asserts.fail(f"Failed to parse ICAC in precondition 2 (Ecosystem B): {e}")
 
         response = await _devCtrlEcoB.ReadAttribute(
             nodeId=22, attributes=[(0, Clusters.OperationalCredentials.Attributes.Fabrics)],
@@ -422,19 +449,57 @@ class TC_JFADMIN_2_1(MatterBaseTest):
             asserts.fail(f'Exception {e} occured during OJCW')
 
         self.step("4")
-        log.info("Setup event on fabric_a_admin for JCM completion message")
-        self.fabric_a_admin.set_output_match("[JF] Joint Commissioning Method (nodeId=15) success")
-        self.fabric_a_admin.event.clear()
-
         self.fabric_a_ctrl.send(
             message=f"pairing onnetwork-long 15 {response.setupPinCode} {discriminator} --jcm true",
             expected_output="[CTL] Commissioning complete for node ID 0x000000000000000F: success",
             timeout=60)
 
-        log.info("Waiting for transfer of ownership from the commissioner(controller) to the administrator and completion of commissioning")
-        if self.fabric_a_admin.event.wait(30) is False:
-            raise TimeoutError("Timed out waiting for commissioning to complete")
-        log.info("JCM commissioning complete")
+        fabric_a_trusted_roots = await _devCtrlEcoA.ReadAttribute(
+            nodeId=1, attributes=[(0, Clusters.OperationalCredentials.Attributes.TrustedRootCertificates)],
+            returnClusterObject=True, fabricFiltered=False)
+
+        fabric_b_nocs = await _devCtrlEcoB.ReadAttribute(
+            nodeId=11, attributes=[(0, Clusters.OperationalCredentials.Attributes.NOCs)],
+            returnClusterObject=True, fabricFiltered=False)
+
+        fabric_a_root_subjects = []
+        fabric_a_roots = fabric_a_trusted_roots[0][Clusters.OperationalCredentials].trustedRootCertificates
+        for root_cert in fabric_a_roots:
+            try:
+                rcac_data = matter.tlv.TLVReader(root_cert).get()
+                root_subject = dict(rcac_data.get('Any', [])).get(6)  # Tag 6 = Subject
+                if root_subject is not None:
+                    fabric_a_root_subjects.append(root_subject)
+            except (TypeError, AttributeError):
+                # Skip root certs that can't be parsed
+                continue
+
+        asserts.assert_true(
+            len(fabric_a_root_subjects) > 0,
+            "No valid RCAC Subject found in Ecosystem A TrustedRootCertificates")
+
+        icac_issuers = []
+        for noc in fabric_b_nocs[0][Clusters.OperationalCredentials].NOCs:
+            if noc.icac is None:
+                continue
+            try:
+                icac_data = matter.tlv.TLVReader(noc.icac).get()
+                icac_issuer = dict(icac_data.get('Any', [])).get(3)  # Tag 3 = Issuer
+                if icac_issuer is not None:
+                    icac_issuers.append(icac_issuer)
+            except (TypeError, AttributeError):
+                # Skip NOCs with unparseable ICAC (e.g., Nullable wrapper types)
+                continue
+
+        asserts.assert_true(
+            len(icac_issuers) > 0,
+            "No valid ICAC Issuer found in Ecosystem B NOCs")
+
+        log.info("Verify the chain of trust between Ecosystem A and Ecosystem B. Issuer of an ICAC for Ecosystem B should match a RCAC Subject from Ecosystem A")
+        asserts.assert_true(
+            any(issuer in fabric_a_root_subjects for issuer in icac_issuers),
+            "No Ecosystem B ICAC Issuer matches any Ecosystem A RCAC Subject"
+        )
 
         # Shutdown the Python Controllers started at the beginning of this script
         if _devCtrlEcoA is not None:

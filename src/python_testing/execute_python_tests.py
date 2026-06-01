@@ -212,21 +212,24 @@ def cmd_run(search_directory, env_file, keep_going, dry_run: bool, glob: list[st
             def match(p): return r.search(p) is not None
         all_python_files = [path for path in all_python_files if match(path)]
 
-    # If nightly flag is set that mean only super slow tests are going to run, some of these test may be in the not_automated
-    # section as tests are super slow and they should not run on each PR, only on nightly runs.
+    # If nightly flag is set, only run tests listed under the nightly section.
+    # Otherwise, exclude both not_automated tests and nightly tests from the regular CI run
+    # (nightly tests are reserved for the nightly workflow).
     if nightly and nightly_tests is not None:
         python_files = [file for file in all_python_files if os.path.basename(file) in nightly_tests]
-
-    if not nightly:
-        # Filter out the files matching the excluded patterns
-        python_files = [file for file in all_python_files if os.path.basename(file) not in excluded_patterns]
+    else:
+        python_files = [
+            file for file in all_python_files
+            if os.path.basename(file) not in excluded_patterns
+            and os.path.basename(file) not in nightly_tests
+        ]
 
     if len(python_files) == 0:
         # No files match
         log.error("No tests to execute")
         sys.exit(1)
 
-    run_summary = RunSummary(run_timestamp=datetime.datetime.now(datetime.timezone.utc))
+    run_summary = RunSummary(run_timestamp=datetime.datetime.now(datetime.UTC))
 
     failed_scripts = []
     try:
@@ -275,7 +278,13 @@ def cmd_run(search_directory, env_file, keep_going, dry_run: bool, glob: list[st
     type=click.IntRange(min=1),
     help='Number of slowest tests to include in the timing table.',
 )
-def cmd_summarize(summary_file: Path, top_slowest: int) -> None:
+@click.option(
+    '--compact-failures-file',
+    type=click.Path(dir_okay=False, path_type=Path),
+    default=None,
+    help='Path to output a compact, comma-separated list of failed test names.',
+)
+def cmd_summarize(summary_file: Path, top_slowest: int, compact_failures_file: Path | None) -> None:
     raw = json.loads(summary_file.read_text())
     results: list[dict] = raw.get("results", [])
 
@@ -306,6 +315,17 @@ def cmd_summarize(summary_file: Path, top_slowest: int) -> None:
             print(f"  {'✗  ' + r['name']:<60} {r['duration_seconds']:>9.2f}s")
     else:
         print("\n  No failures recorded.")
+
+    if compact_failures_file and failed_results:
+        existing = set()
+        if compact_failures_file.exists():
+            content = compact_failures_file.read_text().strip()
+            if content:
+                existing = {n.strip() for n in content.split(",") if n.strip()}
+        new_names = [r["name"].removesuffix(".py") for r in failed_results]
+        all_names = sorted(existing.union(new_names))
+        compact_failures_file.parent.mkdir(parents=True, exist_ok=True)
+        compact_failures_file.write_text(", ".join(all_names) + "\n")
 
     slowest = sorted(
         [r for r in results if r["status"] != "dry_run"],

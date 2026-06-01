@@ -59,10 +59,13 @@
 #include <clusters/DishwasherAlarm/CommandIds.h>
 #include <clusters/DishwasherMode/CommandIds.h>
 #include <clusters/DoorLock/CommandIds.h>
+#include <clusters/DynamicLighting/CommandIds.h>
 #include <clusters/EcosystemInformation/CommandIds.h>
+#include <clusters/ElectricalDistribution/CommandIds.h>
 #include <clusters/ElectricalEnergyMeasurement/CommandIds.h>
 #include <clusters/ElectricalGridConditions/CommandIds.h>
 #include <clusters/ElectricalPowerMeasurement/CommandIds.h>
+#include <clusters/ElectricalProtectionAlarm/CommandIds.h>
 #include <clusters/EnergyEvse/CommandIds.h>
 #include <clusters/EnergyEvseMode/CommandIds.h>
 #include <clusters/EnergyPreference/CommandIds.h>
@@ -99,6 +102,7 @@
 #include <clusters/MicrowaveOvenMode/CommandIds.h>
 #include <clusters/ModeSelect/CommandIds.h>
 #include <clusters/NetworkCommissioning/CommandIds.h>
+#include <clusters/NetworkIdentityManagement/CommandIds.h>
 #include <clusters/NitrogenDioxideConcentrationMeasurement/CommandIds.h>
 #include <clusters/OccupancySensing/CommandIds.h>
 #include <clusters/OnOff/CommandIds.h>
@@ -134,6 +138,7 @@
 #include <clusters/ScenesManagement/CommandIds.h>
 #include <clusters/ServiceArea/CommandIds.h>
 #include <clusters/SmokeCoAlarm/CommandIds.h>
+#include <clusters/SmokeConcentrationMeasurement/CommandIds.h>
 #include <clusters/SoftwareDiagnostics/CommandIds.h>
 #include <clusters/SoilMeasurement/CommandIds.h>
 #include <clusters/Switch/CommandIds.h>
@@ -147,7 +152,6 @@
 #include <clusters/ThreadNetworkDirectory/CommandIds.h>
 #include <clusters/TimeFormatLocalization/CommandIds.h>
 #include <clusters/TimeSynchronization/CommandIds.h>
-#include <clusters/Timer/CommandIds.h>
 #include <clusters/TlsCertificateManagement/CommandIds.h>
 #include <clusters/TlsClientManagement/CommandIds.h>
 #include <clusters/TotalVolatileOrganicCompoundsConcentrationMeasurement/CommandIds.h>

@@ -47,7 +47,7 @@ import logging
 import os
 import re
 import shlex
-from typing import Any, List, Optional
+from typing import Any, Optional
 
 import click
 import coloredlogs
@@ -60,10 +60,10 @@ __LOG_LEVELS__ = logging.getLevelNamesMapping()
 
 
 class CompileCommand:
-    def __init__(self, dir, file, command):
+    def __init__(self, directory, file, command):
         args = shlex.split(command)
 
-        self.dir = dir
+        self.directory = directory
         self.file = file
         self.compiler = args[0]
         self.args = []
@@ -87,7 +87,7 @@ class CompileCommand:
                 if arg.startswith(p + "/"):
                     continue
                 path = arg[len(p):]  # full path
-                path = os.path.abspath(os.path.join(self.dir, path))
+                path = os.path.abspath(os.path.join(self.directory, path))
                 arg = f"{p}{path}"
                 break
 
@@ -105,14 +105,14 @@ class CompileCommand:
 
     def __str__(self):
         prefix = "\n      "  # have all args on newlines with an indent
-        return f"[{self.dir}: {self.file}] -> {prefix}{prefix.join(self.args)}"
+        return f"[{self.directory}: {self.file}] -> {prefix}{prefix.join(self.args)}"
 
 
 class ParsedCommands:
     def __init__(self, path: str):
         log.info("Processing JSON file '%s'", path)
 
-        with open(path, "r") as f:
+        with open(path) as f:
             self.json_data = json.load(f)
 
         # data is a list of entries. We sort them since this as a sideffect places `/src/` before
@@ -121,7 +121,7 @@ class ParsedCommands:
 
         log.info("Done. Loaded %d entries", len(self.json_data))
 
-    def all_matching(self, reg_expr: str) -> List[Any]:
+    def all_matching(self, reg_expr: str) -> list[Any]:
         r = re.compile(reg_expr)
 
         # JSON data is a list of entries:
