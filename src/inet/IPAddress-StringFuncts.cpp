@@ -46,7 +46,7 @@ namespace Inet {
 // non-canonical.
 static void NormalizeIp6ToLower(char * str)
 {
-    for (char *p = str; *p != '\0'; ++p)
+    for (char * p = str; *p != '\0'; ++p)
     {
         if (*p >= 'A' && *p <= 'F')
         {
