@@ -16,33 +16,54 @@
  */
 #include <devices/Types.h>
 #include <devices/proximity-ranger/ProximityRangerDevice.h>
+#include <devices/proximity-ranger/impl/LoggingRangingAdapter.h>
+#include <lib/support/CodeUtils.h>
 
 using namespace chip::app::Clusters;
 
 namespace chip {
 namespace app {
+namespace {
 
-ProximityRanging::ProximityRangingDriver &
-ProximityRangerDevice::GetRangingDriver(Span<ProximityRanging::RangingAdapter * const> adapters)
+ProximityRanging::ProximityRangingDriver * gDriver = nullptr;
+
+} // namespace
+
+ProximityRanging::ProximityRangingDriver & ProximityRangerDevice::GetRangingDriver()
 {
-    // Meyer's singleton: initialized on the first call with the supplied
-    // adapter set, subsequent calls return the same instance and ignore
-    // their `adapters` argument. The DeviceFactory passes the same static
-    // adapter array on every Create("proximity-ranger") so the
-    // first-wins semantic is well-defined for the only production caller.
-    static ProximityRanging::ProximityRangingDriver instance{ adapters };
-    return instance;
+    // The first ProximityRangerDevice constructor sets gDriver via the
+    // static initialization block below. Calling this before any
+    // ProximityRangerDevice exists is a programming error.
+    VerifyOrDie(gDriver != nullptr);
+    return *gDriver;
 }
 
-ProximityRangerDevice::ProximityRangerDevice(TimerDelegate & timerDelegate, Span<ProximityRanging::RangingAdapter * const> adapters,
+ProximityRangerDevice::ProximityRangerDevice(TimerDelegate & timerDelegate, PersistentStorageDelegate & storage,
                                              BitMask<ProximityRanging::Feature> features) :
     SingleEndpointDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kProximityRanger, 1)),
     mTimerDelegate(timerDelegate), mFeatures(features)
 {
-    // Trigger lazy initialization of the shared driver. On subsequent
-    // device constructions this is a no-op; the same static instance
-    // is reused across every ProximityRangerDevice.
-    (void) GetRangingDriver(adapters);
+    // Function-local statics give us first-construction-wins semantics for
+    // the shared driver and its adapter set: timerDelegate and storage are
+    // captured on the first ProximityRangerDevice construction and ignored
+    // thereafter. The driver lives until process exit, so the adapters
+    // (also static) outlive it.
+    static ProximityRanging::LoggingRangingAdapter sLoggingBleAdapter(ProximityRanging::RangingTechEnum::kBLEBeaconRSSIRanging,
+                                                                      timerDelegate, &storage);
+    static ProximityRanging::LoggingRangingAdapter sLoggingWiFiAdapter(ProximityRanging::RangingTechEnum::kWiFiRoundTripTimeRanging,
+                                                                       timerDelegate);
+    static ProximityRanging::LoggingRangingAdapter sLoggingBltcsAdapter(
+        ProximityRanging::RangingTechEnum::kBluetoothChannelSounding, timerDelegate);
+    static ProximityRanging::RangingAdapter * sAdapters[] = {
+        &sLoggingBleAdapter,
+        &sLoggingWiFiAdapter,
+        &sLoggingBltcsAdapter,
+    };
+    static ProximityRanging::ProximityRangingDriver sDriver{ Span<ProximityRanging::RangingAdapter * const>(sAdapters) };
+    if (gDriver == nullptr)
+    {
+        gDriver = &sDriver;
+    }
 }
 
 CHIP_ERROR ProximityRangerDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
