@@ -1,7 +1,7 @@
 # Matter Silicon Labs Lighting Example (Zephyr)
 
-An example showing the use of CHIP on Silicon Labs SoCs running Zephyr RTOS.
-The same application can be built for either:
+An example showing the use of CHIP on Silicon Labs SoCs running Zephyr RTOS. The
+same application can be built for either:
 
 -   **Wi-Fi** transport on the **SiWx917** Wi-Fi SoC (board `siwx917_rb4338a`).
 -   **Thread (OpenThread)** transport on the **EFR32MG24** SoC (board
@@ -66,17 +66,17 @@ west build -b siwx917_rb4338a examples/lighting-app/silabs/zephyr -t menuconfig
 west build -b xg24_rb4187c examples/lighting-app/silabs/zephyr -t menuconfig
 ```
 
-This will open an interactive configuration menu where you can browse and
-modify settings. Changes are automatically saved to the build configuration.
+This will open an interactive configuration menu where you can browse and modify
+settings. Changes are automatically saved to the build configuration.
 
 ## Supported Hardware
 
 The example can be built for any of the following Silicon Labs boards:
 
-| Board            | SoC        | Transport          |
-| ---------------- | ---------- | ------------------ |
-| `siwx917_rb4338a`| SiWx917    | Wi-Fi (2.4 GHz)    |
-| `xg24_rb4187c`   | EFR32MG24  | Thread (OpenThread)|
+| Board             | SoC       | Transport           |
+| ----------------- | --------- | ------------------- |
+| `siwx917_rb4338a` | SiWx917   | Wi-Fi (2.4 GHz)     |
+| `xg24_rb4187c`    | EFR32MG24 | Thread (OpenThread) |
 
 The board name selected with `west build -b <board>` determines both the target
 SoC and the network transport used by Matter.
@@ -149,8 +149,8 @@ SoC and the network transport used by Matter.
         binaries are available in the Assets section of the Releases page on
         [Wiseconnect](https://github.com/SiliconLabs/wiseconnect/tree/v3.5.0/connectivity_firmware/standard).
     -   The **EFR32MG24** boards require a Gecko bootloader. Refer to the
-        Silicon Labs documentation for the appropriate bootloader image for
-        your board.
+        Silicon Labs documentation for the appropriate bootloader image for your
+        board.
 
 ## Running the Complete Example
 
@@ -165,8 +165,8 @@ network credentials:
 
 **Creating the Matter Network**
 
-This procedure uses the chip-tool installed on the Matter Hub. The
-commissioning procedure does the following:
+This procedure uses the chip-tool installed on the Matter Hub. The commissioning
+procedure does the following:
 
 -   chip-tool scans BLE and locates the Silicon Labs device that uses the
     specified discriminator
@@ -176,8 +176,7 @@ commissioning procedure does the following:
 -   The Silicon Labs device joins the operational network and obtains an IPv6
     (and IPv4 for Wi-Fi) address
 -   It then starts providing mDNS records on the operational network
--   Future communications happen over the operational network (Wi-Fi or
-    Thread)
+-   Future communications happen over the operational network (Wi-Fi or Thread)
 
 ### Testing with chip-tool
 
@@ -200,9 +199,9 @@ Here are examples using chip-tool:
 ./out/linux-x64-chip-tool/chip-tool pairing ble-thread ${NODE_ID} hex:${THREAD_DATASET} 20202021 3840
 ```
 
-`${THREAD_DATASET}` is the active Thread operational dataset in TLV
-hexadecimal format (for example as returned by `ot-ctl dataset active -x` on
-an OpenThread border router).
+`${THREAD_DATASET}` is the active Thread operational dataset in TLV hexadecimal
+format (for example as returned by `ot-ctl dataset active -x` on an OpenThread
+border router).
 
 #### Control the device (turn on/off):
 
@@ -297,16 +296,15 @@ This example has the following limitations:
    Wi-Fi is supported on the SiWx917 boards and Thread is supported on the
    EFR32MG24 boards; the two cannot be combined in a single image.
 
-3. **Memory Constraints:** Both SoCs have limited RAM and flash memory.
-   Complex applications may require memory optimization.
+3. **Memory Constraints:** Both SoCs have limited RAM and flash memory. Complex
+   applications may require memory optimization.
 
-4. **Power Management:** Advanced power management features available in
-   other Silicon Labs SDKs may not yet be exposed in this Zephyr-based
-   example.
+4. **Power Management:** Advanced power management features available in other
+   Silicon Labs SDKs may not yet be exposed in this Zephyr-based example.
 
-For production applications requiring GPIO control or features not yet
-available here, consider using the standard Silicon Labs lighting example on
-the EFR32 platform.
+For production applications requiring GPIO control or features not yet available
+here, consider using the standard Silicon Labs lighting example on the EFR32
+platform.
 
 ---
 
