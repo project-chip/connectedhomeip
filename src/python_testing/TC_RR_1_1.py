@@ -107,7 +107,7 @@ class TC_RR_1_1(MatterBaseTest):
         # 10 minutes max reporting interval --> We don't care about keep-alives per-se and
         # want to avoid resubscriptions
         max_report_interval_sec = self.user_params.get("max_report_interval_sec", 10 * 60)
-        # Time to wait after changing NodeLabel for subscriptions to all hit. This is dependant
+        # Time to wait after changing NodeLabel for subscriptions to all hit. This is dependent
         # on MRP params of subscriber and on actual min_report_interval.
         # TODO: Determine the correct max value depending on target. Test plan doesn't say!
         timeout_delay_sec = self.user_params.get("timeout_delay_sec", max_report_interval_sec * 2)

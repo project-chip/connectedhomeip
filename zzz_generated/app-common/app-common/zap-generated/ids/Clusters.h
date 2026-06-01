@@ -65,6 +65,7 @@
 #include <clusters/ElectricalEnergyMeasurement/ClusterId.h>
 #include <clusters/ElectricalGridConditions/ClusterId.h>
 #include <clusters/ElectricalPowerMeasurement/ClusterId.h>
+#include <clusters/ElectricalProtectionAlarm/ClusterId.h>
 #include <clusters/EnergyEvse/ClusterId.h>
 #include <clusters/EnergyEvseMode/ClusterId.h>
 #include <clusters/EnergyPreference/ClusterId.h>

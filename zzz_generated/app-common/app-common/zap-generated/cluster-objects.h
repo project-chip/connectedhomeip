@@ -203,6 +203,10 @@
 #include <clusters/ElectricalPowerMeasurement/Commands.h>
 #include <clusters/ElectricalPowerMeasurement/Events.h>
 #include <clusters/ElectricalPowerMeasurement/Structs.h>
+#include <clusters/ElectricalProtectionAlarm/Attributes.h>
+#include <clusters/ElectricalProtectionAlarm/Commands.h>
+#include <clusters/ElectricalProtectionAlarm/Events.h>
+#include <clusters/ElectricalProtectionAlarm/Structs.h>
 #include <clusters/EnergyEvse/Attributes.h>
 #include <clusters/EnergyEvse/Commands.h>
 #include <clusters/EnergyEvse/Events.h>

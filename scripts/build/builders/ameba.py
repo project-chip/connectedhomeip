@@ -27,7 +27,6 @@ class AmebaApp(Enum):
     ALL_CLUSTERS = auto()
     ALL_CLUSTERS_MINIMAL = auto()
     LIGHT = auto()
-    PIGWEED = auto()
     LIGHT_SWITCH = auto()
 
     @property
@@ -40,8 +39,6 @@ class AmebaApp(Enum):
             return 'lighting-app'
         if self == AmebaApp.LIGHT_SWITCH:
             return 'light-switch-app'
-        if self == AmebaApp.PIGWEED:
-            return 'pigweed-app'
         raise Exception('Unknown app type: %r' % self)
 
     @property
@@ -54,8 +51,6 @@ class AmebaApp(Enum):
             return 'chip-ameba-lighting-app'
         if self == AmebaApp.LIGHT_SWITCH:
             return 'chip-ameba-light-switch-app'
-        if self == AmebaApp.PIGWEED:
-            return 'chip-ameba-pigweed-app'
         raise Exception('Unknown app type: %r' % self)
 
 
@@ -74,11 +69,8 @@ class AmebaBuilder(Builder):
     @lock_output_dir
     def generate(self):
         cmd = '$AMEBA_PATH/project/realtek_amebaD_va0_example/GCC-RELEASE/build.sh '
-        if self.app.ExampleName == 'pigweed-app':
-            # rpc flag: -r
-            cmd += '-r '
-
         # <build root> <build_system> <output_directory> <application>
+
         cmd += ' '.join([self.root, 'ninja', self.output_dir,
                         self.app.ExampleName])
 
