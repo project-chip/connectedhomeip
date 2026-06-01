@@ -118,6 +118,25 @@ private:
             uint8_t raw       = state.speedSetting.Value();
             MatterPostAttributeChangeCallback(path, ZCL_INT8U_ATTRIBUTE_TYPE, 1, &raw);
         }
+
+        // FanControlCluster::ApplyNonZeroFanDrive sets PercentCurrent / SpeedCurrent
+        // unconditionally for non-Off modes. Legacy apps (e.g. air-purifier) gate those
+        // writes on the On/Off cluster state — their PercentSettingWriteCallback /
+        // SpeedSettingWriteCallback are no-ops when On/Off is Off, so the cluster's
+        // pre-set value leaks through.  Correct that here: after the legacy callbacks
+        // have run, if On/Off is Off reset *Current back to 0.
+        if (state.mode != FanModeEnum::kOff)
+        {
+            bool onOff = true;
+            if (chip::app::Clusters::OnOff::Attributes::OnOff::Get(mEndpoint, &onOff) == Status::Success && !onOff)
+            {
+                FanControl::Attributes::PercentCurrent::Set(mEndpoint, static_cast<chip::Percent>(0));
+                if (!state.speedSetting.IsNull())
+                {
+                    FanControl::Attributes::SpeedCurrent::Set(mEndpoint, static_cast<uint8_t>(0));
+                }
+            }
+        }
     }
 };
 
