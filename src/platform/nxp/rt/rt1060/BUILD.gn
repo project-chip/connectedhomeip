@@ -72,9 +72,8 @@ static_library("nxp_platform") {
   sources = [
     "../../../FreeRTOS/SystemTimeSupport.cpp",
     "../../../SingletonConfigurationManager.cpp",
-    "../../common/CHIPDevicePlatformEvent.h",
     "../../common/BootReason.h",
-    "BootReason.cpp",
+    "../../common/CHIPDevicePlatformEvent.h",
     "../../common/ConfigurationManagerImpl.cpp",
     "../../common/ConfigurationManagerImpl.h",
     "../../common/ConnectivityManagerImpl.cpp",
@@ -88,6 +87,7 @@ static_library("nxp_platform") {
     "../../common/NetworkProvisioningServerImpl.h",
     "../../common/PlatformManagerImpl.h",
     "../../common/SoftwareUpdateManagerImpl.h",
+    "BootReason.cpp",
     "CHIPDevicePlatformConfig.h",
     "PlatformManagerImpl.cpp",
   ]
