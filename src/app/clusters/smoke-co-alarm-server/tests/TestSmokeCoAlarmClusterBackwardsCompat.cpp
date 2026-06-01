@@ -106,7 +106,7 @@ TEST_F(TestSmokeCoAlarmBackwardsCompatInitialized, Features_ReportedCorrectly)
     EXPECT_TRUE(SmokeCoAlarmServer::Instance().SupportsCOAlarm(kTestEndpointId));
 }
 
-// Mirrors the pattern used by SmokeCOAlarmManager.cpp: Instance().SetXxx(endpointId, value)
+// Mirrors the pattern used by SmokeCoAlarmManager.cpp: Instance().SetXxx(endpointId, value)
 // followed by Instance().SetExpressedStateByPriority(endpointId, priorityOrder).
 TEST_F(TestSmokeCoAlarmBackwardsCompatInitialized, SettersViaInstance_RoundTrip)
 {

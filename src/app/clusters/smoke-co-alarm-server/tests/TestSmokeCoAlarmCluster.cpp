@@ -16,7 +16,7 @@
  *    limitations under the License.
  */
 
-#include <app/clusters/smoke-co-alarm-server/smokeCOAlarmCluster.h>
+#include <app/clusters/smoke-co-alarm-server/SmokeCoAlarmCluster.h>
 #include <pw_unit_test/framework.h>
 
 #include <app/server-cluster/testing/ClusterTester.h>

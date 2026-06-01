@@ -23,7 +23,7 @@
 
 #pragma once
 
-#include <app/clusters/smoke-co-alarm-server/smokeCOAlarmCluster.h>
+#include <app/clusters/smoke-co-alarm-server/SmokeCoAlarmCluster.h>
 #include <app/server-cluster/ServerClusterInterfaceRegistry.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 
