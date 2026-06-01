@@ -1660,10 +1660,10 @@ limitations under the License.
         <scope>Endpoint</scope>
         <clusters>
             <include cluster="Electrical Distribution" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Electrical Protection Alarm" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="Identify" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="On/Off" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="Power Topology" client="false" server="true" clientLocked="true" serverLocked="true"></include>
-            <!-- TODO: Add Electrical Protection Alarm (Provisional, Optional per spec) once https://github.com/project-chip/connectedhomeip/pull/72249 lands -->
         </clusters>
     </deviceType>
     <deviceType>
