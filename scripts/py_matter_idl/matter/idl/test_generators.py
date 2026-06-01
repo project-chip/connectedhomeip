@@ -19,7 +19,6 @@ import sys
 import unittest
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import List
 
 import yaml
 
@@ -48,7 +47,7 @@ class ExpectedOutput:
 @dataclass
 class GeneratorTestCase:
     input_idl: str
-    outputs: List[ExpectedOutput] = field(default_factory=list)
+    outputs: list[ExpectedOutput] = field(default_factory=list)
 
     def add_outputs(self, yaml_outputs_dict):
         for file_name, golden_path in yaml_outputs_dict.items():
@@ -94,7 +93,7 @@ class TestCaseStorage(GeneratorStorage):
             dir_path = os.path.dirname(path)
             if not os.path.exists(dir_path):
                 os.makedirs(dir_path)
-            with open(path, 'wt') as golden:
+            with open(path, "w") as golden:
                 golden.write(content)
                 return
 
@@ -113,7 +112,7 @@ class TestCaseStorage(GeneratorStorage):
 @dataclass
 class GeneratorTest:
     generator_name: str
-    test_cases: List[GeneratorTestCase] = field(default_factory=list)
+    test_cases: list[GeneratorTestCase] = field(default_factory=list)
 
     def add_test_cases(self, yaml_test_case_dict):
         for idl_path, outputs in yaml_test_case_dict.items():
@@ -151,7 +150,7 @@ class GeneratorTest:
                 checker.assertEqual(storage.checked_files, {x.file_name for x in test.outputs})
 
 
-def build_tests(yaml_data) -> List[GeneratorTest]:
+def build_tests(yaml_data) -> list[GeneratorTest]:
     """
     Transforms the YAML dictonary (Dict[str, Dict[str, Dict[str,str]]]) into
     a generator test structure.

@@ -114,7 +114,8 @@ def checkable_attributes(cluster_id, cluster, xml_cluster) -> list[uint]:
 
     def is_known_cluster_attribute(attribute_id) -> bool:
         ''' Returns true if this is a non-manufacturer specific attribute that has information in the XML and has python codegen data'''
-        return is_standard_attribute_id(attribute_id) and attribute_id in xml_cluster.attributes and attribute_id in Clusters.ClusterObjects.ALL_ATTRIBUTES[cluster_id]
+        return is_standard_attribute_id(attribute_id) and attribute_id in xml_cluster.attributes and attribute_id in Clusters.ClusterObjects.ALL_ATTRIBUTES.get(cluster_id, {})
+
     return [attr_id for attr_id in all_attrs if is_known_cluster_attribute(attr_id)]
 
 
@@ -123,7 +124,8 @@ def checkable_commands(cluster_id, cluster, xml_cluster) -> list[uint]:
 
     def is_known_cluster_cmd(command_id) -> bool:
         ''' Returns true if this is a non-manufacturer specific command that has information in the XML and has python codegen data'''
-        return is_standard_command_id(command_id) and command_id in xml_cluster.accepted_commands and command_id in Clusters.ClusterObjects.ALL_ACCEPTED_COMMANDS[cluster_id]
+        return is_standard_command_id(command_id) and command_id in xml_cluster.accepted_commands and command_id in Clusters.ClusterObjects.ALL_ACCEPTED_COMMANDS.get(cluster_id, {})
+
     return [cmd_id for cmd_id in all_cmds if is_known_cluster_cmd(cmd_id)]
 
 
@@ -237,9 +239,9 @@ class AccessChecker(BasicCompositionTests):
                                       problem="Cluster command not found in spec XML")
                     self.success = False
                     continue
-                if command_id not in Clusters.ClusterObjects.ALL_ACCEPTED_COMMANDS[cluster_id]:
-                    self._record_error(test_name="Access Checker", location=location,
-                                       problem="Unknown command")
+                if command_id not in Clusters.ClusterObjects.ALL_ACCEPTED_COMMANDS.get(cluster_id, {}):
+                    self.record_error(test_name="Access Checker", location=location,
+                                      problem="Unknown command")
                     self.success = False
                     continue
 
@@ -256,8 +258,11 @@ class AccessChecker(BasicCompositionTests):
         log.info(f'Testing commands on {xml_cluster.name} at privilege {privilege}')
         for command_id in checkable_commands(cluster_id, device_cluster_data, xml_cluster):
             spec_requires = xml_cluster.accepted_commands[command_id].privilege
-            command = Clusters.ClusterObjects.ALL_ACCEPTED_COMMANDS[cluster_id][command_id]
+            command = Clusters.ClusterObjects.ALL_ACCEPTED_COMMANDS.get(cluster_id, {}).get(command_id)
+            if command is None:
+                continue
             location = CommandPathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, command_id=command_id)
+
             name = f"Command test - privilege {privilege}"
             if operation_allowed(spec_requires, privilege):
                 # In this test, we're only checking that the disallowed commands are rejected so that there are
@@ -291,8 +296,10 @@ class AccessChecker(BasicCompositionTests):
         # TODO: This assumes all attributes are readable. Which they are currently. But we don't have a general way to mark otherwise.
         for attribute_id in checkable_attributes(cluster_id, device_cluster_data, xml_cluster):
             spec_requires = xml_cluster.attributes[attribute_id].read_access
-            attribute = Clusters.ClusterObjects.ALL_ATTRIBUTES[cluster_id][attribute_id]
-            cluster_class = Clusters.ClusterObjects.ALL_CLUSTERS[cluster_id]
+            attribute = Clusters.ClusterObjects.ALL_ATTRIBUTES.get(cluster_id, {}).get(attribute_id)
+            cluster_class = Clusters.ClusterObjects.ALL_CLUSTERS.get(cluster_id)
+            if attribute is None or cluster_class is None:
+                continue
 
             if operation_allowed(spec_requires, privilege):
                 ret = await self.read_single_attribute_check_success(dev_ctrl=self.TH2, endpoint=endpoint_id, cluster=cluster_class, attribute=attribute, assert_on_error=False, test_name=f"Read access Checker - {privilege}")
@@ -385,8 +392,11 @@ class AccessChecker(BasicCompositionTests):
         """
         for attribute_id in checkable_attributes(cluster_id, device_cluster_data, xml_cluster):
             spec_requires = xml_cluster.attributes[attribute_id].read_access
-            attribute = Clusters.ClusterObjects.ALL_ATTRIBUTES[cluster_id][attribute_id]
-            cluster_class = Clusters.ClusterObjects.ALL_CLUSTERS[cluster_id]
+            attribute = Clusters.ClusterObjects.ALL_ATTRIBUTES.get(cluster_id, {}).get(attribute_id)
+            cluster_class = Clusters.ClusterObjects.ALL_CLUSTERS.get(cluster_id)
+            if attribute is None or cluster_class is None:
+                continue
+
             test_name = f'Subscribe access checker - {privilege}'
 
             log.info(f"Subscribing to attribute {attribute} cluster {xml_cluster.name} privilege {privilege}")
@@ -405,8 +415,11 @@ class AccessChecker(BasicCompositionTests):
             spec_requires = xml_cluster.attributes[attribute_id].write_access
             is_optional_write = xml_cluster.attributes[attribute_id].write_optional
 
-            attribute = Clusters.ClusterObjects.ALL_ATTRIBUTES[cluster_id][attribute_id]
-            cluster_class = Clusters.ClusterObjects.ALL_CLUSTERS[cluster_id]
+            attribute = Clusters.ClusterObjects.ALL_ATTRIBUTES.get(cluster_id, {}).get(attribute_id)
+            cluster_class = Clusters.ClusterObjects.ALL_CLUSTERS.get(cluster_id)
+            if attribute is None or cluster_class is None:
+                continue
+
             location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, attribute_id=attribute_id)
             test_name = f'Write access checker - {privilege}'
             log.info(f"Testing attribute {attribute} on endpoint {endpoint_id}")

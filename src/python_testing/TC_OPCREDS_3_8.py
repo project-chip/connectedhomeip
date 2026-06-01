@@ -226,7 +226,7 @@ class TestStepBlockPassException(Exception):
     pass
 
 
-class test_step(object):
+class test_step:
     """Context manager for `with test_tesp(...) as step` that allows for aggregating step descriptions automatically.
 
     Use like:

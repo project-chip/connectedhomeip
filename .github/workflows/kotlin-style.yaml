@@ -37,6 +37,11 @@ jobs:
         with:
           args: --parallel --build-upon-default-config --config kotlin-detect-config.yaml --input examples/android/CHIPTest/app,examples/android/CHIPTool,examples/java-matter-controller/java,src/controller/java
 
+      - name: Notify Slack on Failure
+        if: failure()
+        uses: ./.github/actions/notify-slack-failure
+        with:
+          slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}
   ktlint:
     name: "Format check"
     runs-on: ubuntu-latest
@@ -71,3 +76,8 @@ jobs:
             # to tell at a glance what might be going on.  And throw in
             # --exit-code to make this job fail if there is a difference.
             git diff-index --exit-code HEAD --
+      - name: Notify Slack on Failure
+        if: failure()
+        uses: ./.github/actions/notify-slack-failure
+        with:
+          slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}

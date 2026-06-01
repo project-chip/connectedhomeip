@@ -269,7 +269,7 @@ CHIP_ERROR PASESession::Pair(SessionManager & sessionManager, uint32_t peerSetUp
     // When commissioning starts, the peer is assumed to be active.
     mExchangeCtxt.Value()->GetSessionHandle()->AsUnauthenticatedSession()->MarkActiveRx();
 
-    mExchangeCtxt.Value()->UseSuggestedResponseTimeout(kExpectedLowProcessingTime);
+    ReturnErrorOnFailure(mExchangeCtxt.Value()->UseSuggestedResponseTimeout(kExpectedLowProcessingTime));
 
     mLocalMRPConfig = MakeOptional(mrpLocalConfig.ValueOr(GetDefaultMRPConfig()));
 
@@ -865,6 +865,22 @@ CHIP_ERROR PASESession::OnFailureStatusReport(Protocols::SecureChannel::GeneralS
         err = CHIP_ERROR_INVALID_PASE_PARAMETER;
         break;
 
+    case kProtocolCodeNoSharedRoot:
+        // kProtocolCodeNoSharedRoot only has a defined meaning in CASE (where it indicates
+        // the responder lacks a trusted root for the initiator's fabric). PASE has no
+        // shared-root semantics, so a peer sending this status during PASE is misconfigured.
+        // Mapping it to CHIP_ERROR_NO_SHARED_TRUSTED_ROOT is more useful for diagnostics
+        // than collapsing to CHIP_ERROR_INTERNAL.
+        err = CHIP_ERROR_NO_SHARED_TRUSTED_ROOT;
+        break;
+
+    case kProtocolCodeBusy:
+        // Spec doesn't explicitly forbid a peer returning kProtocolCodeBusy during PASE,
+        // even though it's not commonly seen. Distinguishing "device temporarily busy" from
+        // generic INTERNAL helps callers decide whether to retry.
+        err = CHIP_ERROR_BUSY;
+        break;
+
     default:
         err = CHIP_ERROR_INTERNAL;
         break;
@@ -900,7 +916,7 @@ CHIP_ERROR PASESession::ValidateReceivedMessage(ExchangeContext * exchange, cons
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    mExchangeCtxt.Value()->UseSuggestedResponseTimeout(kExpectedHighProcessingTime);
+    ReturnErrorOnFailure(mExchangeCtxt.Value()->UseSuggestedResponseTimeout(kExpectedHighProcessingTime));
 
     VerifyOrReturnError(!msg.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError((mNextExpectedMsg.HasValue() && payloadHeader.HasMessageType(mNextExpectedMsg.Value())) ||

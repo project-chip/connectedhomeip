@@ -1,1 +1,1 @@
-196 : [crosscompile] Don't duplicate minimization done by create_sysroot.py in the Dockerfile
+198 : [chip-build] Add openssl 3.5
