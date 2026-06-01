@@ -26,13 +26,13 @@ import re
 import time
 from enum import IntEnum
 
+from mdns_discovery.mdns_discovery import MdnsDiscovery, MdnsServiceType
+from mdns_discovery.utils.asserts import assert_valid_icd_key
 from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError
 from matter.testing.matter_testing import MatterBaseTest
-from mdns_discovery.mdns_discovery import MdnsDiscovery, MdnsServiceType
-from mdns_discovery.utils.asserts import assert_valid_icd_key
 
 log = logging.getLogger(__name__)
 
@@ -105,6 +105,7 @@ def uat_set_hints(hint_bitmap):
     for bit in hints:
         log.info(f"  - {uat_bit_name(bit)} (0x{bit.value:05X})")
     return hints
+
 
 async def _wait_for_subscription_heartbeat(subscription, max_interval_ceiling_s: float,
                                            buffer_s: float) -> float | None:
