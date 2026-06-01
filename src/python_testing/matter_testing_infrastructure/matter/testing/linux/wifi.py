@@ -23,7 +23,7 @@ from __future__ import annotations
 import asyncio
 import logging
 import threading
-from typing import Any, Union
+from typing import Any, TypeAlias
 
 import sdbus
 
@@ -33,7 +33,8 @@ from .namespace import IsolatedNetworkNamespace
 
 log = logging.getLogger(__name__)
 
-DbusAnyT = Union[bool, int, float, str, bytes, list["DbusAnyT"], tuple["DbusAnyT", ...], dict[str, "DbusAnyT"], "DictVariantT"]
+DbusAnyT: TypeAlias = (bool | int | float | str | bytes | list["DbusAnyT"] | tuple["DbusAnyT", ...] | dict[str, "DbusAnyT"]
+                       | "DictVariantT")
 DictVariantT = dict[str, tuple[str, DbusAnyT]]
 
 
