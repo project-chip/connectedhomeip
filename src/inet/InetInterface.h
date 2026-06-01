@@ -28,7 +28,6 @@
 
 #include <inet/InetConfig.h>
 
-#include <inet/IPAddress.h>
 #include <inet/InetError.h>
 #include <lib/support/DLLUtil.h>
 
@@ -37,6 +36,7 @@
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
+#include <net/if.h>
 struct if_nameindex;
 struct ifaddrs;
 #endif // CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
@@ -95,6 +95,7 @@ public:
     using PlatformType                       = unsigned int;
     static constexpr size_t kMaxIfNameLength = 6;
 #endif
+
 
     ~InterfaceId() = default;
 

@@ -30,7 +30,9 @@
 #include <string.h>
 
 #include <inet/IPAddress.h>
+#include <inet/InetInterface.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/StringBuilder.h>
 
 #if CHIP_SYSTEM_CONFIG_USE_POSIX_SOCKETS
 #include <arpa/inet.h>
@@ -81,6 +83,25 @@ char * IPAddress::ToString(char * buf, uint32_t bufSize) const
     otIp6AddressToString(&addr, buf, static_cast<uint16_t>(bufSize));
 #endif // !CHIP_SYSTEM_CONFIG_USE_LWIP
 
+    return buf;
+}
+
+char * IPAddress::ToString(char * buf, uint32_t bufSize, const class InterfaceId & interfaceId) const
+{
+    char ipStr[IPAddress::kMaxStringLength];
+    ToString(ipStr, sizeof(ipStr));
+
+    StringBuilderBase builder(buf, bufSize);
+    builder.Add(ipStr);
+
+    if (IsIPv6LinkLocal() && interfaceId.IsPresent())
+    {
+        char ifName[InterfaceId::kMaxIfNameLength];
+        if (interfaceId.GetInterfaceName(ifName, sizeof(ifName)) == CHIP_NO_ERROR)
+        {
+            builder.Add("%").Add(ifName);
+        }
+    }
     return buf;
 }
 
