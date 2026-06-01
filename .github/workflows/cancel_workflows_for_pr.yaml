@@ -22,7 +22,7 @@ jobs:
     cancel_workflow:
         name: Cancel CI on failing pull requests
 
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-slim
 
         # Don't run on forked repos
         if: github.repository_owner == 'project-chip'

@@ -18,7 +18,7 @@ jobs:
   detekt:
     name: Static code analysis
     if: false
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
 
     steps:
       - name: "checkout"
@@ -44,7 +44,7 @@ jobs:
           slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}
   ktlint:
     name: "Format check"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
 
     steps:
       - uses: actions/checkout@v6.0.2

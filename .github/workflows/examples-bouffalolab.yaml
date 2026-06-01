@@ -34,7 +34,7 @@ jobs:
   bouffalolab:
     name: Bouffalo Lab
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     if: github.actor != 'restyled-io[bot]'
 
     container:

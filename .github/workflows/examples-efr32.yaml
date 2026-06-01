@@ -37,7 +37,7 @@ jobs:
       SILABS_BOARD: BRD4187C
       BUILD_TYPE: gn_efr32
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     if: github.actor != 'restyled-io[bot]'
 
     container:

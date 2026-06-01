@@ -26,7 +26,7 @@ on:
 jobs:
     check-submodule-update-label:
         name: Check For Submodule Update Label
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-slim
         steps:
             - name: Fail
               if: (github.event.pull_request.user.login != 'dependabot[bot]') && !contains(github.event.pull_request.labels.*.name, 'changing-git-submodules-on-purpose')

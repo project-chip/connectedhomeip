@@ -6,7 +6,7 @@ on:
 
 jobs:
   check_testing_header:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     steps:
       - name: Check for `### Testing` section in PR
         env:

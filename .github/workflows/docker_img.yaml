@@ -37,7 +37,7 @@ on:
 jobs:
     build_images_base:
         name: Build Docker CHIP Build images - base
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-slim
         if: github.actor != 'restyled-io[bot]'
         strategy:
             fail-fast: false
@@ -76,7 +76,7 @@ jobs:
     build_images_stage_1:
         needs: [build_images_base]
         name: Build Docker CHIP Build images - stage 1
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-slim
         if: github.actor != 'restyled-io[bot]' && false
         strategy:
             fail-fast: false
@@ -104,7 +104,7 @@ jobs:
     build_images_stage_2:
         needs: [build_images_base, build_images_stage_1]
         name: Build Docker CHIP Build images - stage 2
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-slim
         if: github.actor != 'restyled-io[bot]' && false
         strategy:
             fail-fast: false
@@ -151,7 +151,7 @@ jobs:
     build_images_stage_3:
         needs: [build_images_base, build_images_stage_1, build_images_stage_2]
         name: Build Docker CHIP Build images - stage 3
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-slim
         if: github.actor != 'restyled-io[bot]' && false
         strategy:
             fail-fast: false
@@ -181,7 +181,7 @@ jobs:
     build_images_vscode:
         needs: [build_images_base, build_images_stage_1, build_images_stage_2, build_images_stage_3]
         name: Build Docker CHIP Build images - vscode
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-slim
         if: github.actor != 'restyled-io[bot]' && false
         strategy:
             fail-fast: false

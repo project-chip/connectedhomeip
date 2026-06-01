@@ -37,7 +37,7 @@ jobs:
         env:
             GITHUB_CACHE_PATH: /tmp/cirque-cache
 
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-slim
         if: github.actor != 'restyled-io[bot]'
 
         # need to run with privilege, which isn't supported by job.XXX.contaner

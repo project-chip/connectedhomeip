@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
 jobs:
   roll_version:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     steps:
       - name: Checkout
         uses: actions/checkout@v6.0.2

@@ -21,7 +21,7 @@ on:
 jobs:
   check_clusters_matter:
     name: Check controller-clusters.matter backwards compatibility
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     if: github.event.pull_request && !(contains(github.event.pull_request.labels.*.name, 'skip-protocol-compatibility'))
 
     steps:
