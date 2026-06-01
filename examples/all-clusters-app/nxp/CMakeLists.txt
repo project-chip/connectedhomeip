@@ -95,6 +95,7 @@ target_sources(app
     ${ALL_CLUSTERS_COMMON_DIR}/src/smco-stub.cpp
     ${ALL_CLUSTERS_COMMON_DIR}/src/static-supported-modes-manager.cpp
     ${ALL_CLUSTERS_COMMON_DIR}/src/bridged-actions-stub.cpp
+    ${ALL_CLUSTERS_COMMON_DIR}/src/all-clusters-energy-mode-stubs.cpp
     ${ALL_CLUSTERS_COMMON_DIR}/src/dishwasher-mode.cpp
     ${ALL_CLUSTERS_COMMON_DIR}/src/laundry-washer-mode.cpp
     ${ALL_CLUSTERS_COMMON_DIR}/src/oven-modes.cpp
