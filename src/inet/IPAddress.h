@@ -372,7 +372,7 @@ public:
      * @return  The argument \c buf if no formatting error, or zero otherwise.
      */
     char * ToString(char * buf, uint32_t bufSize) const;
-    char * ToString(char * buf, uint32_t bufSize, const class InterfaceId & interfaceId) const;
+    char * ToString(char * buf, uint32_t bufSize, const Inet::InterfaceId & interfaceId) const;
 
     /**
      * A version of ToString that writes to a literal and deduces how much space
@@ -385,7 +385,7 @@ public:
     }
 
     template <uint32_t N>
-    inline char * ToString(char (&buf)[N], const class InterfaceId & interfaceId) const
+    inline char * ToString(char (&buf)[N], const Inet::InterfaceId & interfaceId) const
     {
         return ToString(buf, N, interfaceId);
     }
@@ -436,7 +436,7 @@ public:
      * @retval true  The presentation format is valid
      * @retval false Otherwise
      */
-    static bool FromString(const char * str, IPAddress & addrOutput, class InterfaceId & ifaceOutput);
+    static bool FromString(const char * str, IPAddress & addrOutput, Inet::InterfaceId & ifaceOutput);
 
     /**
      * @brief   Emit the IP address in standard network representation.

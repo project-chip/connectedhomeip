@@ -86,23 +86,29 @@ char * IPAddress::ToString(char * buf, uint32_t bufSize) const
     return buf;
 }
 
-char * IPAddress::ToString(char * buf, uint32_t bufSize, const class InterfaceId & interfaceId) const
+char * IPAddress::ToString(char * buf, uint32_t bufSize, const Inet::InterfaceId & interfaceId) const
 {
-    char ipStr[IPAddress::kMaxStringLength];
-    ToString(ipStr, sizeof(ipStr));
-
-    StringBuilderBase builder(buf, bufSize);
-    builder.Add(ipStr);
-
     if (IsIPv6LinkLocal() && interfaceId.IsPresent())
     {
-        char ifName[InterfaceId::kMaxIfNameLength];
+        char ipStr[IPAddress::kMaxStringLength];
+        if (ToString(ipStr, sizeof(ipStr)) == nullptr)
+        {
+            return nullptr;
+        }
+
+        StringBuilderBase builder(buf, bufSize);
+        builder.Add(ipStr);
+
+        char ifName[Inet::InterfaceId::kMaxIfNameLength];
         if (interfaceId.GetInterfaceName(ifName, sizeof(ifName)) == CHIP_NO_ERROR)
         {
             builder.Add("%").Add(ifName);
         }
+
+        return builder.Fit() ? buf : nullptr;
     }
-    return buf;
+
+    return ToString(buf, bufSize);
 }
 
 bool IPAddress::FromString(const char * str, IPAddress & output)
