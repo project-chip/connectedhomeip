@@ -100,6 +100,8 @@
 #include <clusters/ElectricalGridConditions/MetadataProvider.h>
 #include <clusters/ElectricalPowerMeasurement/Ids.h>
 #include <clusters/ElectricalPowerMeasurement/MetadataProvider.h>
+#include <clusters/ElectricalProtectionAlarm/Ids.h>
+#include <clusters/ElectricalProtectionAlarm/MetadataProvider.h>
 #include <clusters/EnergyEvse/Ids.h>
 #include <clusters/EnergyEvse/MetadataProvider.h>
 #include <clusters/EnergyEvseMode/Ids.h>
@@ -548,6 +550,11 @@ std::optional<DataModel::AcceptedCommandEntry> AcceptedCommandEntryFor(ClusterId
     {
         if (id == ElectricalPowerMeasurement::Id)
             return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, ElectricalPowerMeasurement::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == ElectricalProtectionAlarm::Id) || ...))
+    {
+        if (id == ElectricalProtectionAlarm::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, ElectricalProtectionAlarm::Id>::EntryFor(command);
     }
     if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == EnergyEvse::Id) || ...))
     {
