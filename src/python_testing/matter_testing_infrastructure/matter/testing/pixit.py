@@ -35,6 +35,10 @@ Usage example:
             app_path = self.pixit("th_server_app_path")
             timeout = self.pixit("timeout_sec")
             ...
+
+    For standard commissioning flags (discriminator, Wi-Fi, etc.) declared on
+    the test harness, see :mod:`matter.testing.harness_params` and
+    ``MatterBaseTest.harness_param``.
 """
 
 from dataclasses import dataclass

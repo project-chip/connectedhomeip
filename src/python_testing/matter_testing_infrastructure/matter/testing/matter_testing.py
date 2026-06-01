@@ -59,9 +59,14 @@ from matter.testing.commissioning import (CommissioningInfo, CustomCommissioning
                                           get_setup_payload_info_config)
 from matter.testing.decorators import _has_attribute, _has_command, _has_feature
 from matter.testing.global_attribute_ids import GlobalAttributeIds
+from matter.testing.harness_params import (
+    format_declared_parameters_for_failure,
+    format_missing_test_parameters,
+    resolve_harness_value,
+)
 from matter.testing.matter_stack_state import MatterStackState
 from matter.testing.matter_test_config import MatterTestConfig
-from matter.testing.pixit import _PIXIT_NO_DEFAULT, format_pixit_error, get_pixit_definitions, validate_pixits
+from matter.testing.pixit import _PIXIT_NO_DEFAULT, get_pixit_definitions
 from matter.testing.problem_notices import AttributePathLocation, ClusterMapper, ProblemLocation, ProblemNotice, ProblemSeverity
 from matter.testing.runner import TestRunnerHooks, TestStep
 from matter.tlv import uint
@@ -368,7 +373,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             if steps is None:
                 self.step(1)
 
-        self._validate_pixits()
+        self._validate_test_parameters()
 
     def on_fail(self, record):
         """Handle test failure callback from Mobly framework.
@@ -381,6 +386,13 @@ class MatterBaseTest(base_test.BaseTestClass):
             record: TestResultRecord containing failure information.
         """
         self.failed = True
+        if not self.is_commissioning:
+            test_method = getattr(self, self.current_test_info.name, None)
+            param_dump = format_declared_parameters_for_failure(
+                test_method, self.user_params, self.matter_test_config
+            )
+            if param_dump:
+                LOGGER.error(param_dump)
         if self.runner_hook and not self.is_commissioning:
             exception = record.termination_signal.exception
 
@@ -600,25 +612,32 @@ class MatterBaseTest(base_test.BaseTestClass):
                     return default
         return default
 
-    def _validate_pixits(self):
-        """Validate that all required PIXITs declared via @pixit are present.
+    def harness_param(self, name: str) -> Any:
+        """Return a declared harness parameter value from ``matter_test_config``.
 
-        Called automatically by setup_test() before each test method.
-        If required PIXITs are missing, the test fails immediately with a clear
-        error message listing all missing parameters and available optional ones.
+        Args:
+            name: Logical name declared with ``@harness_params`` (registry key).
+
+        Raises:
+            ValueError: If ``name`` is not a registered harness parameter.
+        """
+        return resolve_harness_value(name, self.matter_test_config)
+
+    def _validate_test_parameters(self):
+        """Validate declared PIXITs and harness parameters before each test.
+
+        Called from setup_test(). Fails with a combined message if any required
+        PIXIT or harness parameter is missing.
         """
         test_name = self.current_test_info.name
         test_method = getattr(self, test_name, None)
         if test_method is None:
             return
 
-        pixit_defs = get_pixit_definitions(test_method)
-        if not pixit_defs:
-            return
-
-        missing_required, available_optional = validate_pixits(pixit_defs, self.user_params)
-        if missing_required:
-            error_msg = format_pixit_error(test_name, missing_required, available_optional)
+        error_msg = format_missing_test_parameters(
+            test_name, test_method, self.user_params, self.matter_test_config
+        )
+        if error_msg:
             asserts.fail(error_msg)
 
     def get_endpoint(self) -> int:

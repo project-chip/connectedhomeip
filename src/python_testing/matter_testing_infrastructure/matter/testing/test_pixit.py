@@ -19,6 +19,16 @@
 
 import unittest
 
+from matter.testing.harness_params import (
+    HarnessParamDefinition,
+    format_declared_parameters_for_failure,
+    format_missing_test_parameters,
+    get_harness_param_definitions,
+    harness_params,
+    resolve_harness_value,
+    validate_harness_params,
+)
+from matter.testing.matter_test_config import MatterTestConfig
 from matter.testing.pixit import (_PIXIT_NO_DEFAULT, PixitDefinition, _type_to_arg_flag, format_pixit_error, get_pixit_definitions,
                                   pixit, validate_pixits)
 
@@ -322,6 +332,153 @@ class TestValidatePixitsDeduplication(unittest.TestCase):
         self.assertEqual(missing[0].name, "app_path")
         # First definition (effective one) should be used
         self.assertEqual(missing[0].description, "Path v1")
+
+
+class TestHarnessParamsDecorator(unittest.TestCase):
+    """Tests for @harness_params."""
+
+    def test_unknown_name_raises(self):
+        with self.assertRaises(ValueError) as ctx:
+
+            @harness_params("not_a_real_param")
+            def dummy(self):
+                pass
+
+        self.assertIn("not_a_real_param", str(ctx.exception))
+
+    def test_decorator_attaches_definitions(self):
+        @harness_params("discriminator", "passcode", optional=("endpoint",))
+        def test_method(self):
+            pass
+
+        defs = get_harness_param_definitions(test_method)
+        self.assertEqual(len(defs), 3)
+        by_name = {d.name: d.required for d in defs}
+        self.assertTrue(by_name["discriminator"])
+        self.assertTrue(by_name["passcode"])
+        self.assertFalse(by_name["endpoint"])
+
+    def test_get_harness_param_definitions_none_safe(self):
+        self.assertEqual(get_harness_param_definitions(None), [])
+
+
+class TestValidateHarnessParams(unittest.TestCase):
+    """Tests for validate_harness_params."""
+
+    def test_discriminator_satisfied_with_list(self):
+        cfg = MatterTestConfig()
+        cfg.discriminators = [1234]
+        cfg.setup_passcodes = [20202021]
+        defs = [HarnessParamDefinition("discriminator", True)]
+        missing, optional = validate_harness_params(defs, cfg)
+        self.assertEqual(missing, [])
+        self.assertEqual(optional, [])
+
+    def test_discriminator_satisfied_with_qr(self):
+        cfg = MatterTestConfig()
+        cfg.qr_code_content = ["MT:fake"]
+        defs = [HarnessParamDefinition("discriminator", True)]
+        missing, optional = validate_harness_params(defs, cfg)
+        self.assertEqual(missing, [])
+
+    def test_discriminator_missing(self):
+        cfg = MatterTestConfig()
+        defs = [HarnessParamDefinition("discriminator", True)]
+        missing, optional = validate_harness_params(defs, cfg)
+        self.assertEqual(len(missing), 1)
+        self.assertEqual(missing[0].name, "discriminator")
+
+    def test_optional_not_reported_missing(self):
+        cfg = MatterTestConfig()
+        defs = [HarnessParamDefinition("wifi_ssid", False)]
+        missing, optional = validate_harness_params(defs, cfg)
+        self.assertEqual(missing, [])
+        self.assertEqual(len(optional), 1)
+
+
+class TestFormatMissingTestParameters(unittest.TestCase):
+    """Tests for combined PIXIT + harness missing message."""
+
+    @pixit("app_path", str, "Path", required=True)
+    @harness_params("discriminator")
+    def _combined_method(self):
+        pass
+
+    def test_pixit_only_missing(self):
+        @pixit("key", str, "K", required=True)
+        def m(self):
+            pass
+
+        cfg = MatterTestConfig()
+        msg = format_missing_test_parameters("test_x", m, {}, cfg)
+        self.assertIsNotNone(msg)
+        self.assertIn("PIXIT", msg)
+        self.assertIn("key", msg)
+        self.assertNotIn("harness", msg.lower())
+
+    def test_harness_only_missing(self):
+        @harness_params("discriminator")
+        def m(self):
+            pass
+
+        cfg = MatterTestConfig()
+        msg = format_missing_test_parameters("test_x", m, {}, cfg)
+        self.assertIsNotNone(msg)
+        self.assertIn("harness", msg)
+        self.assertIn("discriminator", msg)
+
+    def test_combined_missing(self):
+        cfg = MatterTestConfig()
+        msg = format_missing_test_parameters("test_x", self._combined_method, {}, cfg)
+        self.assertIsNotNone(msg)
+        self.assertIn("app_path", msg)
+        self.assertIn("discriminator", msg)
+
+    def test_none_missing_returns_none(self):
+        def m(self):
+            pass
+
+        cfg = MatterTestConfig()
+        self.assertIsNone(format_missing_test_parameters("test_x", m, {}, cfg))
+
+
+class TestFormatDeclaredParametersForFailure(unittest.TestCase):
+    """Tests for failure dump of declared parameters."""
+
+    @pixit("app_path", str, "Path", required=True)
+    @harness_params("passcode")
+    def _method(self):
+        pass
+
+    def test_empty_method_returns_empty(self):
+        def m(self):
+            pass
+
+        self.assertEqual(format_declared_parameters_for_failure(m, {}, MatterTestConfig()), "")
+
+    def test_includes_pixit_and_harness_labels(self):
+        cfg = MatterTestConfig()
+        cfg.discriminators = [1]
+        cfg.setup_passcodes = [99]
+        user = {"app_path": "/tmp/app"}
+        out = format_declared_parameters_for_failure(self._method, user, cfg)
+        self.assertIn("[pixit]", out)
+        self.assertIn("[harness]", out)
+        self.assertIn("app_path", out)
+        self.assertIn("***REDACTED***", out)
+
+
+class TestResolveHarnessValue(unittest.TestCase):
+    """Tests for resolve_harness_value."""
+
+    def test_resolve_discriminator(self):
+        cfg = MatterTestConfig()
+        cfg.discriminators = [3840]
+        self.assertEqual(resolve_harness_value("discriminator", cfg), 3840)
+
+    def test_unknown_raises(self):
+        with self.assertRaises(ValueError):
+            resolve_harness_value("nope", MatterTestConfig())
 
 
 if __name__ == "__main__":
