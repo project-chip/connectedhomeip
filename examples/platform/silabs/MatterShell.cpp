@@ -26,6 +26,7 @@
 #include "sl_cli.h"
 #include "sl_cli_config.h"
 #include "sli_cli_io.h"
+#include <lib/support/StringBuilder.h>
 #endif
 
 using namespace ::chip;
@@ -70,35 +71,21 @@ void WaitForShellActivity()
 
 CHIP_ERROR CmdSilabsDispatch(int argc, char ** argv)
 {
-    CHIP_ERROR error = CHIP_NO_ERROR;
+    VerifyOrReturnError(argc > 0, CHIP_ERROR_INVALID_ARGUMENT);
 
-    char buff[SL_CLI_INPUT_BUFFER_SIZE] = { 0 };
-    char * buff_ptr                     = buff;
-    int i                               = 0;
+    chip::StringBuilder<SL_CLI_INPUT_BUFFER_SIZE> builder;
 
-    VerifyOrExit(argc > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
-
-    for (i = 0; i < argc; i++)
+    for (int i = 0; i < argc; i++)
     {
-        size_t arg_len = strlen(argv[i]);
-
-        /* Make sure that the next argument won't overflow the buffer */
-        VerifyOrExit(buff_ptr + arg_len < buff + SL_CLI_INPUT_BUFFER_SIZE, error = CHIP_ERROR_BUFFER_TOO_SMALL);
-
-        strncpy(buff_ptr, argv[i], arg_len);
-        buff_ptr += arg_len;
-
-        /* Make sure that there is enough buffer for a space char */
-        if (buff_ptr + sizeof(char) < buff + SL_CLI_INPUT_BUFFER_SIZE)
-        {
-            strncpy(buff_ptr, " ", sizeof(char));
-            buff_ptr++;
-        }
+        builder.Add(argv[i]);
+        builder.Add(" ");
     }
-    buff_ptr = 0;
-    sl_cli_handle_input(sl_cli_default_handle, buff);
-exit:
-    return error;
+
+    VerifyOrReturnError(builder.Fit(), CHIP_ERROR_BUFFER_TOO_SMALL);
+
+    sl_cli_handle_input(sl_cli_default_handle, builder.c_str());
+
+    return CHIP_NO_ERROR;
 }
 
 static const Shell::shell_command_t cmds_silabs_root = { &CmdSilabsDispatch, "silabs", "Dispatch Silicon Labs CLI command" };

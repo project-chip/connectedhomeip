@@ -115,6 +115,7 @@ static /* constexpr */ const MTRDeviceTypeData knownDeviceTypes[] = {
     { 0x00000512, MTRDeviceTypeClass::Simple, @"Meter Reference Point" },
     { 0x00000513, MTRDeviceTypeClass::Simple, @"Electrical Energy Tariff" },
     { 0x00000514, MTRDeviceTypeClass::Simple, @"Electrical Meter" },
+    { 0x00000517, MTRDeviceTypeClass::Simple, @"Electrical Distribution Enclosure" },
     { 0x00000840, MTRDeviceTypeClass::Simple, @"Control Bridge" },
     { 0x00000850, MTRDeviceTypeClass::Simple, @"On/Off Sensor" },
 };
