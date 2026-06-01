@@ -16,6 +16,7 @@
  */
 
 #include "ThermostatCluster.h"
+#include "app/data-model/Nullable.h"
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/callback.h>
@@ -45,19 +46,7 @@ DataModel::ActionReturnStatus ThermostatCluster::WriteNonAtomicAttribute(const D
 
     switch (request.path.mAttributeId)
     {
-    case OccupiedCoolingSetpoint::Id:
-    case OccupiedHeatingSetpoint::Id:
-    case UnoccupiedCoolingSetpoint::Id:
-    case UnoccupiedHeatingSetpoint::Id:
-    case MinHeatSetpointLimit::Id:
-    case MaxHeatSetpointLimit::Id:
-    case MinCoolSetpointLimit::Id:
-    case MaxCoolSetpointLimit::Id: {
-        temperature setpoint;
-        ReturnErrorOnFailure(decoder.Decode(setpoint));
-
-        return ChangeSetpointAttribute(request.path.mAttributeId, setpoint);
-    }
+   
     case MinSetpointDeadBand::Id: {
 
         int16_t db;
@@ -124,9 +113,9 @@ DataModel::ActionReturnStatus ThermostatCluster::WriteNonAtomicAttribute(const D
         return Status::Success;
     }
     case TemperatureSetpointHoldDuration::Id: {
-        uint16_t requestedTemperatureSetpointHoldDuration;
+        DataModel::Nullable<uint16_t> requestedTemperatureSetpointHoldDuration;
         ReturnErrorOnFailure(decoder.Decode(requestedTemperatureSetpointHoldDuration));
-        if (requestedTemperatureSetpointHoldDuration > 1440)
+        if (!requestedTemperatureSetpointHoldDuration.IsNull() && requestedTemperatureSetpointHoldDuration.Value() > 1440)
         {
             return Status::InvalidValue;
         }
@@ -196,6 +185,23 @@ DataModel::ActionReturnStatus ThermostatCluster::WriteAttribute(const DataModel:
     break;
     case Schedules::Id:
         return CHIP_ERROR_NOT_IMPLEMENTED;
+    case OccupiedCoolingSetpoint::Id:
+    case OccupiedHeatingSetpoint::Id:
+    case UnoccupiedCoolingSetpoint::Id:
+    case UnoccupiedHeatingSetpoint::Id:
+    case MinHeatSetpointLimit::Id:
+    case MaxHeatSetpointLimit::Id:
+    case MinCoolSetpointLimit::Id:
+    case MaxCoolSetpointLimit::Id: {
+        if (mAtomicWriteSession.InAtomicWrite(subjectDescriptor, MakeOptional(attributeId)))
+        {
+            ChipLogError(Zcl, "Can not write to non-atomic attributes during atomic write");
+            return Status::InvalidInState;
+        }
+        temperature setpoint;
+        ReturnErrorOnFailure(decoder.Decode(setpoint));
+        return ChangeSetpointAttribute(request.path.mAttributeId, setpoint);
+    }
     default: {
         if (mAtomicWriteSession.InAtomicWrite(subjectDescriptor, MakeOptional(attributeId)))
         {
