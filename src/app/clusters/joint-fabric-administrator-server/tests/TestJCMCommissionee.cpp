@@ -375,6 +375,7 @@ protected:
     void TestReadAdminCertsPopulatesCommissionerRcac();
     void TestReadAdminNOCsPopulatesCommissionerCerts();
     void TestPerformVendorIdVerificationCompletesOnceOnReadFailure();
+    void TestPerformVendorIdVerificationDoesNotUseFreedCommissioneeOnReadFailure();
 };
 
 TEST_F_FROM_FIXTURE(TestJCMCommissionee, TestNextStageFollowsExpectedOrder)
@@ -739,6 +740,29 @@ TEST_F_FROM_FIXTURE(TestJCMCommissionee, TestPerformVendorIdVerificationComplete
     commissionee.VerifyTrustAgainstCommissionerAdmin();
 
     EXPECT_EQ(commissionee.completionCount, 1);
+}
+
+// Heap-allocates the commissionee and frees it from the completion callback (mirroring
+// production's mActiveCommissionee.reset()). If the read-failure path continues into
+// VerifyVendorId(&mInfo) after completing, it touches freed memory and ASan aborts. There is
+// nothing to assert; in non-ASan builds it is a no-op, so the counting test above is the guard.
+TEST_F_FROM_FIXTURE(TestJCMCommissionee, TestPerformVendorIdVerificationDoesNotUseFreedCommissioneeOnReadFailure)
+{
+    FakeCommandHandler commandHandler;
+    CommandHandler::Handle handle(&commandHandler);
+    Messaging::ExchangeContext * exchangeCtx = NewExchangeToBob(nullptr, false);
+    commandHandler.SetExchangeContext(exchangeCtx);
+
+    // The completion callback owns the teardown and, like production's onComplete, does nothing
+    // after the delete -- so the only post-free access that can occur is the buggy fall-through.
+    ReadFailureJCMCommissionee * commissionee = nullptr;
+    commissionee = new ReadFailureJCMCommissionee(handle, EndpointId{ 41 }, [&commissionee](CHIP_ERROR) { delete commissionee; });
+
+    // Release the session so a continued VerifyVendorId resolves synchronously (dereferencing the
+    // freed commissionee in the regression).
+    commissionee->mSessionHolder.Release();
+
+    commissionee->VerifyTrustAgainstCommissionerAdmin();
 }
 
 } // namespace JointFabricAdministrator
