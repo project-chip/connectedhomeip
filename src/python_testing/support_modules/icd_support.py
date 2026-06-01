@@ -144,9 +144,10 @@ async def assert_subscription_no_heartbeat(subscription, max_interval_ceiling_s:
                                            buffer_s: float = SUBSCRIPTION_REPORT_TIMING_TOLERANCE_S) -> None:
     """Assert that no heartbeat report arrives within `max_interval_ceiling_s + buffer_s` seconds."""
     elapsed = await _wait_for_subscription_heartbeat(subscription, max_interval_ceiling_s, buffer_s)
+    elapsed_str = f"{elapsed:.1f}s" if elapsed is not None else "unknown"
     asserts.assert_is_none(
         elapsed,
-        f"Unexpected subscription heartbeat report received after {elapsed:.1f}s"
+        f"Unexpected subscription heartbeat report received after {elapsed_str}"
     )
 
 
