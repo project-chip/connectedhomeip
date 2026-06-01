@@ -93,7 +93,8 @@ TEST_F(TestSmokeCoAlarmBase, AttributeList_SmokeAndCOFeatures)
         cluster,
         { Attributes::ExpressedState::kMetadataEntry, Attributes::SmokeState::kMetadataEntry, Attributes::COState::kMetadataEntry,
           Attributes::BatteryAlert::kMetadataEntry, Attributes::TestInProgress::kMetadataEntry,
-          Attributes::HardwareFaultAlert::kMetadataEntry, Attributes::EndOfServiceAlert::kMetadataEntry }));
+          Attributes::HardwareFaultAlert::kMetadataEntry, Attributes::EndOfServiceAlert::kMetadataEntry,
+          Attributes::ContaminationState::kMetadataEntry, Attributes::SmokeSensitivityLevel::kMetadataEntry }));
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 

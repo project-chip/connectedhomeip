@@ -388,13 +388,9 @@ DataModel::ActionReturnStatus SmokeCoAlarmCluster::WriteAttribute(const DataMode
 {
     if (request.path.mAttributeId != SmokeSensitivityLevel::Id)
     {
-        return Status::UnsupportedAttribute;
+        return Status::UnsupportedWrite;
     }
 
-    if (!mConfig.optionalAttribs.IsSet(SmokeSensitivityLevel::Id))
-    {
-        return Status::UnsupportedAttribute;
-    }
     SensitivityEnum value;
     ReturnErrorOnFailure(decoder.Decode(value));
     VerifyOrReturnError(SetSmokeSensitivityLevel(value), Status::Failure);
