@@ -254,11 +254,12 @@ bool SmokeCoAlarmServer::SupportsCOAlarm(EndpointId) const
     return SupportsCOAlarm();
 }
 
-bool emberAfSmokeCoAlarmClusterSelfTestRequestCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-                                                       const SmokeCoAlarm::Commands::SelfTestRequest::DecodableType & commandData)
+bool __attribute__((weak))
+emberAfSmokeCoAlarmClusterSelfTestRequestCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                                                  const SmokeCoAlarm::Commands::SelfTestRequest::DecodableType & commandData)
 {
     SmokeCoAlarmServer::Instance().Cluster().HandleRemoteSelfTestRequest(commandObj, commandPath);
     return true;
 }
 
-void MatterSmokeCoAlarmPluginServerInitCallback() {}
+void __attribute__((weak)) MatterSmokeCoAlarmPluginServerInitCallback() {}
