@@ -71,7 +71,7 @@ CHIP_ERROR ReadAndDetermineBootReason(BootReasonEnum & bootReason)
         bool otaDone   = false;
         CHIP_ERROR err = NXPConfig::ReadConfigValue(NXPConfig::kConfigKey_AppOTADone, otaDone);
 
-        if (err != CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
+        if (err != CHIP_NO_ERROR && err != CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
         {
             ReturnErrorAndLogOnFailure(err, DeviceLayer, "Failed to read OTA completion flag");
         }
