@@ -869,7 +869,7 @@ TEST_F(TestInetAddress, TestCheckToStringWithInterface)
         // 5. Test Buffer Too Small
         size_t requiredSize = strlen("fe80::8edc:d4ff:fe3a:ebfb") + 1 + strlen(ifName) + 1;
         std::unique_ptr<char[]> smallBufAlloc(new char[requiredSize - 1]);
-        EXPECT_EQ(llaAddress.ToString(smallBufAlloc.get(), requiredSize - 1, ifaceId), nullptr);
+        EXPECT_EQ(llaAddress.ToString(smallBufAlloc.get(), static_cast<uint32_t>(requiredSize - 1), ifaceId), nullptr);
     }
 }
 
