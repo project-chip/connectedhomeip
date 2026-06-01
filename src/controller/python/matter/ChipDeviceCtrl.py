@@ -209,8 +209,8 @@ def _IssueNOCChainCallbackPythonCallback(devCtrl, status: PyChipError, noc: c_vo
             ipkBytes = string_at(ipk, ipkLen)[:]
         nocChain = NOCChain(nocBytes, icacBytes, rcacBytes, ipkBytes, adminSubject)
     else:
-        status_str = str(status)  # For details why check PyChipError docstring.
-        LOGGER.error("Failure to generate NOC Chain: %s. All NOCChain field will be None and commissioning will fail!", status_str)
+        # We need to eagerly stringify as specified in PyChipError docstring.
+        LOGGER.error("Failure to generate NOC Chain: %s. All NOCChain field will be None and commissioning will fail!", str(status))
     devCtrl.NOCChainCallback(nocChain)
 
 
@@ -530,8 +530,8 @@ class ChipDeviceControllerBase:
             if err.is_success:
                 LOGGER.info("Commissioning complete")
             else:
-                err_str = str(err)  # For details why check PyChipError docstring.
-                LOGGER.warning("Failed to commission: %s", err_str)
+                # We need to eagerly stringify as specified in PyChipError docstring.
+                LOGGER.warning("Failed to commission: %s", str(err))
 
             self._dmLib.pychip_DeviceController_SetIcdRegistrationParameters(False, None)
 
@@ -558,8 +558,8 @@ class ChipDeviceControllerBase:
                 commissioningParameters = CommissioningParameters(
                     setupPinCode=setupPinCode, setupManualCode=setupManualCode.decode(), setupQRCode=setupQRCode.decode())
             else:
-                err_str = str(err)  # For details why check PyChipError docstring.
-                LOGGER.warning("Failed to open commissioning window: %s", err_str)
+                # We need to eagerly stringify as specified in PyChipError docstring.
+                LOGGER.warning("Failed to open commissioning window: %s", str(err))
 
             if self._open_window_context.future is None:
                 LOGGER.exception("HandleOpenWindowComplete called unexpectedly")
@@ -574,8 +574,8 @@ class ChipDeviceControllerBase:
             if err.is_success:
                 LOGGER.info("Successfully unpaired device with node ID 0x%016X", nodeId)
             else:
-                err_str = str(err)  # For details why check PyChipError docstring.
-                LOGGER.warning("Failed to unpair device: %s", err_str)
+                # We need to eagerly stringify as specified in PyChipError docstring.
+                LOGGER.warning("Failed to unpair device: %s", str(err))
 
             if self._unpair_device_context.future is None:
                 LOGGER.exception("HandleUnpairDeviceComplete called unexpectedly")
@@ -588,8 +588,8 @@ class ChipDeviceControllerBase:
 
         def HandlePASEEstablishmentComplete(err: PyChipError):
             if not err.is_success:
-                err_str = str(err)  # For details why check PyChipError docstring.
-                LOGGER.warning("Failed to establish secure session to device: %s", err_str)
+                # We need to eagerly stringify as specified in PyChipError docstring.
+                LOGGER.warning("Failed to establish secure session to device: %s", str(err))
             else:
                 LOGGER.info("Established secure session with Device")
 

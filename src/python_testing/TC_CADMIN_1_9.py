@@ -75,8 +75,9 @@ class TC_CADMIN_1_9(CADMINBaseTest):
                 new_params.commissioningParameters.setupPinCode = self.generate_unique_random_value(
                     params.commissioningParameters.setupPinCode)
                 errcode = await self.CommissionOnNetwork(new_params)
+                # We need to eagerly stringify as specified in PyChipError docstring.
                 log.info('Commissioning complete done. Successful? %s, errorcode = %s, cycle=%s',
-                         errcode.is_success, errcode, (cycle+1))
+                         bool(errcode.is_success), str(errcode), (cycle+1))
                 asserts.assert_false(errcode.is_success, 'Commissioning complete did not error as expected')
                 asserts.assert_true(errcode.sdk_code == expectedErrCode,
                                     'Unexpected error code returned from CommissioningComplete')
@@ -84,7 +85,8 @@ class TC_CADMIN_1_9(CADMINBaseTest):
         elif expectedErrCode == 50:
             log.info("-----------------Attempting connection expecting timeout-------------------------")
             errcode = await self.CommissionOnNetwork(params)
-            log.info('Commissioning complete done. Successful? %s, errorcode = %s', errcode.is_success, errcode)
+            # We need to eagerly stringify as specified in PyChipError docstring.
+            log.info('Commissioning complete done. Successful? %s, errorcode = %s', bool(errcode.is_success), str(errcode))
             asserts.assert_false(errcode.is_success, 'Commissioning complete did not error as expected')
             # TODO: Adding try or except clause here as the errcode code be either 50 for timeout or 3 for incorrect state at this time
             # until issue mentioned in https://github.com/project-chip/connectedhomeip/issues/34383 can be resolved
