@@ -92,12 +92,6 @@ public:
     Protocols::InteractionModel::Status HandleStep(FanControl::StepDirectionEnum aDirection, bool aWrap, bool aLowestOff) override;
 
     /**
-     * @brief After FanControl commits drive attributes, updates PercentCurrent / SpeedCurrent from
-     *        the snapshot. Zeros both when On/Off is off or the drive is idle.
-     */
-    void OnFanDriveStateChanged(const FanControl::FanDriveState & newState) override;
-
-    /**
      * @brief Callback that thermostat manager calls when the heating state changes
      */
     void HeatingCallback();

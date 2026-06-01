@@ -23,29 +23,6 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using Protocols::InteractionModel::Status;
 
-namespace {
-
-bool IsFanDriveActive(const FanControl::FanDriveState & state)
-{
-    using FanControl::FanModeEnum;
-
-    if (state.mode != FanModeEnum::kOff)
-    {
-        return true;
-    }
-    if (!state.percentSetting.IsNull() && state.percentSetting.Value() > 0)
-    {
-        return true;
-    }
-    if (!state.speedSetting.IsNull() && state.speedSetting.Value() > 0)
-    {
-        return true;
-    }
-    return false;
-}
-
-} // namespace
-
 void AirPurifierManager::Init()
 {
     FanControl::SetDefaultDelegate(mEndpointId, this);
@@ -173,48 +150,6 @@ Status AirPurifierManager::HandleStep(FanControl::StepDirectionEnum aDirection, 
     }
 
     return FanControl::Attributes::SpeedSetting::Set(mEndpointId, newSpeedSetting);
-}
-
-void AirPurifierManager::OnFanDriveStateChanged(const FanControl::FanDriveState & newState)
-{
-    uint32_t featureMap   = 0;
-    const bool multiSpeed = FanControl::Attributes::FeatureMap::Get(mEndpointId, &featureMap) == Status::Success &&
-        BitFlags<FanControl::Feature>(featureMap).Has(FanControl::Feature::kMultiSpeed);
-
-    if (!mOnOffClusterOn || !IsFanDriveActive(newState))
-    {
-        Status st = FanControl::Attributes::PercentCurrent::Set(mEndpointId, 0);
-        if (st != Status::Success)
-        {
-            ChipLogError(NotSpecified, "OnFanDriveStateChanged: PercentCurrent=0 failed: %d", to_underlying(st));
-        }
-        if (multiSpeed)
-        {
-            st = FanControl::Attributes::SpeedCurrent::Set(mEndpointId, 0);
-            if (st != Status::Success)
-            {
-                ChipLogError(NotSpecified, "OnFanDriveStateChanged: SpeedCurrent=0 failed: %d", to_underlying(st));
-            }
-        }
-        return;
-    }
-
-    if (!newState.percentSetting.IsNull())
-    {
-        Status st = FanControl::Attributes::PercentCurrent::Set(mEndpointId, newState.percentSetting.Value());
-        if (st != Status::Success)
-        {
-            ChipLogError(NotSpecified, "OnFanDriveStateChanged: PercentCurrent failed: %d", to_underlying(st));
-        }
-    }
-    if (multiSpeed && !newState.speedSetting.IsNull())
-    {
-        Status st = FanControl::Attributes::SpeedCurrent::Set(mEndpointId, newState.speedSetting.Value());
-        if (st != Status::Success)
-        {
-            ChipLogError(NotSpecified, "OnFanDriveStateChanged: SpeedCurrent failed: %d", to_underlying(st));
-        }
-    }
 }
 
 void AirPurifierManager::HandleFanControlAttributeChange(AttributeId attributeId, uint8_t type, uint16_t size, uint8_t * value)

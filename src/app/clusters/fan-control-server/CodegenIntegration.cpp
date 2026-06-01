@@ -21,6 +21,7 @@
 #include <app/clusters/fan-control-server/FanControlCluster.h>
 #include <app/static-cluster-config/FanControl.h>
 #include <app/util/attribute-storage.h>
+#include <app/util/generic-callbacks.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 
@@ -40,9 +41,90 @@ static_assert(kFanControlFixedClusterCount == MATTER_DM_FAN_CONTROL_CLUSTER_SERV
               "FanControl static cluster config must match ZAP server endpoint count");
 static_assert(kFanControlMaxClusterCount <= kEmberInvalidEndpointIndex, "FanControl cluster table size error");
 
+// Wraps the app-supplied delegate so that OnFanDriveStateChanged also emits
+// MatterPostAttributeChangeCallback for FanMode / PercentSetting / SpeedSetting.
+// This preserves backward compatibility for apps that still react to FanControl
+// attribute changes via PostAttributeChangeCallback without requiring any changes
+// to those apps.
+class CompatDelegate : public FanControl::Delegate
+{
+public:
+    CompatDelegate() : FanControl::Delegate(kInvalidEndpointId) {}
+
+    void Init(EndpointId ep, FanControl::Delegate * wrapped)
+    {
+        mEndpoint = ep;
+        mWrapped  = wrapped;
+    }
+
+    // --- pure-virtual requirement ---
+    Status HandleStep(StepDirectionEnum dir, bool wrap, bool lowestOff) override
+    {
+        return mWrapped ? mWrapped->HandleStep(dir, wrap, lowestOff) : Status::Failure;
+    }
+
+    // --- forward all optional delegate callbacks, then emit legacy callbacks ---
+    void OnFanDriveStateChanged(const FanDriveState & state) override
+    {
+        if (mWrapped)
+            mWrapped->OnFanDriveStateChanged(state);
+        EmitLegacyPostAttributeCallbacks(state);
+    }
+
+    void OnRockSettingChanged(BitMask<RockBitmap> v) override
+    {
+        if (mWrapped)
+            mWrapped->OnRockSettingChanged(v);
+    }
+
+    void OnWindSettingChanged(BitMask<WindBitmap> v) override
+    {
+        if (mWrapped)
+            mWrapped->OnWindSettingChanged(v);
+    }
+
+    void OnAirflowDirectionChanged(AirflowDirectionEnum v) override
+    {
+        if (mWrapped)
+            mWrapped->OnAirflowDirectionChanged(v);
+    }
+
+private:
+    FanControl::Delegate * mWrapped = nullptr;
+
+    void EmitLegacyPostAttributeCallbacks(const FanDriveState & state)
+    {
+        ConcreteAttributePath path(mEndpoint, FanControl::Id, FanMode::Id);
+
+        // FanMode (enum8, 1 byte)
+        {
+            uint8_t raw = to_underlying(state.mode);
+            MatterPostAttributeChangeCallback(path, ZCL_ENUM8_ATTRIBUTE_TYPE, 1, &raw);
+        }
+
+        // PercentSetting (nullable int8u, null sentinel = 0xFF)
+        {
+            path.mAttributeId = PercentSetting::Id;
+            uint8_t raw       = state.percentSetting.IsNull() ? 0xFF : state.percentSetting.Value();
+            MatterPostAttributeChangeCallback(path, ZCL_INT8U_ATTRIBUTE_TYPE, 1, &raw);
+        }
+
+        // SpeedSetting (nullable int8u) — only emit when non-null.
+        // Emitting a null (0xFF) value here would cause SpeedSettingWriteCallback
+        // to call FanMode::Set(kOff), corrupting state in kAuto mode.
+        if (!state.speedSetting.IsNull())
+        {
+            path.mAttributeId = SpeedSetting::Id;
+            uint8_t raw       = state.speedSetting.Value();
+            MatterPostAttributeChangeCallback(path, ZCL_INT8U_ATTRIBUTE_TYPE, 1, &raw);
+        }
+    }
+};
+
 struct ClusterWithDelegate
 {
-    Delegate * delegate = nullptr;
+    Delegate *     userDelegate = nullptr;
+    CompatDelegate compatDelegate;
     LazyRegisteredServerCluster<FanControlCluster> server;
 };
 
@@ -56,10 +138,9 @@ public:
     {
         BitFlags<FanControl::Feature> features(featureMap);
 
-        FanControl::Delegate & delegateForConfig = gClusters[clusterInstanceIndex].delegate != nullptr
-            ? *gClusters[clusterInstanceIndex].delegate
-            : FanControlCluster::PlaceholderDelegate();
-        FanControlCluster::Config config(endpointId, delegateForConfig);
+        gClusters[clusterInstanceIndex].compatDelegate.Init(endpointId,
+                                                               gClusters[clusterInstanceIndex].userDelegate);
+        FanControlCluster::Config config(endpointId, gClusters[clusterInstanceIndex].compatDelegate);
 
         // Initialize FanModeSequence from attribute storage if available, otherwise use default.
         FanModeSequenceEnum defaultFanModeSequence =
@@ -181,7 +262,7 @@ Delegate * GetDelegate(EndpointId aEndpoint)
 {
     uint16_t ep =
         emberAfGetClusterServerEndpointIndex(aEndpoint, FanControl::Id, MATTER_DM_FAN_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
-    return (ep >= kFanControlMaxClusterCount ? nullptr : gClusters[ep].delegate);
+    return (ep >= kFanControlMaxClusterCount ? nullptr : gClusters[ep].userDelegate);
 }
 
 void SetDefaultDelegate(EndpointId aEndpoint, Delegate * aDelegate)
@@ -190,12 +271,13 @@ void SetDefaultDelegate(EndpointId aEndpoint, Delegate * aDelegate)
         emberAfGetClusterServerEndpointIndex(aEndpoint, FanControl::Id, MATTER_DM_FAN_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
     if (ep < kFanControlMaxClusterCount)
     {
-        gClusters[ep].delegate = aDelegate;
+        gClusters[ep].userDelegate = aDelegate;
+        gClusters[ep].compatDelegate.Init(aEndpoint, aDelegate);
 
         // Update the cluster instance if it already exists (e.g. app sets delegate in emberAfFanControlClusterInitCallback)
         if (gClusters[ep].server.IsConstructed())
         {
-            gClusters[ep].server.Cluster().SetDelegate(aDelegate);
+            gClusters[ep].server.Cluster().SetDelegate(&gClusters[ep].compatDelegate);
         }
     }
 }
