@@ -1,7 +1,7 @@
 # Matter Silicon Labs Lighting Example (Zephyr)
 
-An example showing the use of CHIP on Silicon Labs SoCs running Zephyr RTOS. The
-same application can be built for either:
+An example showing the use of Matter on Silicon Labs SoCs running Zephyr RTOS.
+The same application can be built for either:
 
 -   **Wi-Fi** transport on the **SiWx917** Wi-Fi SoC (board `siwx917_rb4338a`).
 -   **Thread (OpenThread)** transport on the **EFR32MG24** SoC (board
