@@ -259,6 +259,7 @@ Protocols::InteractionModel::Status ThermostatCluster::SaveSetpoint(Setpoint & o
     }
     GenerateSetpointEvent(oldSetpoint.AttributeId(), oldSetpoint.Temperature(), newSetpoint.Temperature());
     oldSetpoint.SetTemperature(newSetpoint.Temperature());
+    NotifyAttributeChanged(oldSetpoint.AttributeId());
     return Status::Success;
 }
 
