@@ -22,7 +22,7 @@ from thread_meshcop_testing import (assert_common_diagnostic_fields, discriminat
                                     get_setup_code)
 
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest, TestStep
+from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import default_matter_test_main
 
 

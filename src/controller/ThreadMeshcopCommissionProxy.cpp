@@ -253,16 +253,15 @@ std::string ThreadMeshcopCommissionProxy::GetLastDiscoveryDiagnosticJson()
     Json::Value root(Json::objectValue);
     Json::StreamWriterBuilder writerBuilder;
 
-
     char steeringDataHex[ot::commissioner::kMaxSteeringDataLength * 2 + 1];
     char rotatingIdHex[Dnssd::kMaxRotatingIdLen * 2 + 1];
-    if (Encoding::BytesToUppercaseHexBuffer(diagnostic.steeringData.data(), diagnostic.steeringData.size(),
-                                                   steeringDataHex, sizeof(steeringDataHex)) != CHIP_NO_ERROR)
+    if (Encoding::BytesToUppercaseHexBuffer(diagnostic.steeringData.data(), diagnostic.steeringData.size(), steeringDataHex,
+                                            sizeof(steeringDataHex)) != CHIP_NO_ERROR)
     {
         diagnostic.valid = false;
     }
     if (Encoding::BytesToUppercaseHexBuffer(diagnostic.commissionData.rotatingId, diagnostic.commissionData.rotatingIdLen,
-                                                   rotatingIdHex, sizeof(rotatingIdHex)) != CHIP_NO_ERROR)
+                                            rotatingIdHex, sizeof(rotatingIdHex)) != CHIP_NO_ERROR)
     {
         diagnostic.valid = false;
     }
@@ -289,12 +288,11 @@ std::string ThreadMeshcopCommissionProxy::GetLastDiscoveryDiagnosticJson()
     dnsAnnouncement["pairing_hint"]       = static_cast<Json::Value::UInt>(diagnostic.commissionData.pairingHint);
     dnsAnnouncement["service_port"]       = static_cast<Json::Value::UInt>(diagnostic.matterUdpPort);
     dnsAnnouncement["thread_meshcop"]     = diagnostic.commissionData.threadMeshcop;
-    dnsAnnouncement["supports_commissioner_generated_passcode"] =
-        diagnostic.commissionData.supportsCommissionerGeneratedPasscode;
-    dnsAnnouncement["instance_name"]   = diagnostic.commissionData.instanceName;
-    dnsAnnouncement["hostname"]        = diagnostic.commissionData.hostName;
-    dnsAnnouncement["rotating_id_hex"] = rotatingIdHex;
-    root["dns_announcement"]           = dnsAnnouncement;
+    dnsAnnouncement["supports_commissioner_generated_passcode"] = diagnostic.commissionData.supportsCommissionerGeneratedPasscode;
+    dnsAnnouncement["instance_name"]                            = diagnostic.commissionData.instanceName;
+    dnsAnnouncement["hostname"]                                 = diagnostic.commissionData.hostName;
+    dnsAnnouncement["rotating_id_hex"]                          = rotatingIdHex;
+    root["dns_announcement"]                                    = dnsAnnouncement;
 
     return Json::writeString(writerBuilder, root);
 }
