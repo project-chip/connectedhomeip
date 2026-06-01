@@ -121,7 +121,7 @@ public:
     //////////// DefaultOTARequestor public APIs ///////////////
 
     /**
-     * Called to perform some initialization. Note that some states that must be initalized in the CHIP context will be deferred to
+     * Called to perform some initialization. Note that some states that must be initialized in the CHIP context will be deferred to
      * InitState.
      */
     CHIP_ERROR Init(Server & server, OTARequestorStorage & storage, OTARequestorDriver & driver, BDXDownloader & downloader,

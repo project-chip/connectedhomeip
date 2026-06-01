@@ -7283,6 +7283,111 @@ class ChipClusters:
             },
         },
     }
+    _ELECTRICAL_PROTECTION_ALARM_CLUSTER_INFO = {
+        "clusterName": "ElectricalProtectionAlarm",
+        "clusterId": 0x000000A3,
+        "commands": {
+            0x00000001: {
+                "commandId": 0x00000001,
+                "commandName": "ModifyEnabledAlarms",
+                "args": {
+                    "mask": "int",
+                },
+            },
+        },
+        "attributes": {
+            0x00000000: {
+                "attributeName": "Mask",
+                "attributeId": 0x00000000,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000002: {
+                "attributeName": "State",
+                "attributeId": 0x00000002,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000003: {
+                "attributeName": "Supported",
+                "attributeId": 0x00000003,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000080: {
+                "attributeName": "ArcCause",
+                "attributeId": 0x00000080,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000081: {
+                "attributeName": "OverLoadRating",
+                "attributeId": 0x00000081,
+                "type": "",
+                "reportable": True,
+            },
+            0x00000082: {
+                "attributeName": "OverVoltageRating",
+                "attributeId": 0x00000082,
+                "type": "",
+                "reportable": True,
+            },
+            0x00000083: {
+                "attributeName": "SurgeProtectionRating",
+                "attributeId": 0x00000083,
+                "type": "",
+                "reportable": True,
+            },
+            0x00000084: {
+                "attributeName": "ShortCircuitRating",
+                "attributeId": 0x00000084,
+                "type": "",
+                "reportable": True,
+            },
+            0x00000085: {
+                "attributeName": "ResidualCurrentRating",
+                "attributeId": 0x00000085,
+                "type": "",
+                "reportable": True,
+            },
+            0x00000086: {
+                "attributeName": "ArcFaultRating",
+                "attributeId": 0x00000086,
+                "type": "",
+                "reportable": True,
+            },
+            0x0000FFF8: {
+                "attributeName": "GeneratedCommandList",
+                "attributeId": 0x0000FFF8,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFF9: {
+                "attributeName": "AcceptedCommandList",
+                "attributeId": 0x0000FFF9,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFB: {
+                "attributeName": "AttributeList",
+                "attributeId": 0x0000FFFB,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFC: {
+                "attributeName": "FeatureMap",
+                "attributeId": 0x0000FFFC,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFD: {
+                "attributeName": "ClusterRevision",
+                "attributeId": 0x0000FFFD,
+                "type": "int",
+                "reportable": True,
+            },
+        },
+    }
     _DOOR_LOCK_CLUSTER_INFO = {
         "clusterName": "DoorLock",
         "clusterId": 0x00000101,
@@ -16583,6 +16688,7 @@ class ChipClusters:
         0x0000009F: _DEVICE_ENERGY_MANAGEMENT_MODE_CLUSTER_INFO,
         0x000000A0: _ELECTRICAL_GRID_CONDITIONS_CLUSTER_INFO,
         0x000000A2: _ELECTRICAL_DISTRIBUTION_CLUSTER_INFO,
+        0x000000A3: _ELECTRICAL_PROTECTION_ALARM_CLUSTER_INFO,
         0x00000101: _DOOR_LOCK_CLUSTER_INFO,
         0x00000102: _WINDOW_COVERING_CLUSTER_INFO,
         0x00000104: _CLOSURE_CONTROL_CLUSTER_INFO,
@@ -16734,6 +16840,7 @@ class ChipClusters:
         "DeviceEnergyManagementMode": _DEVICE_ENERGY_MANAGEMENT_MODE_CLUSTER_INFO,
         "ElectricalGridConditions": _ELECTRICAL_GRID_CONDITIONS_CLUSTER_INFO,
         "ElectricalDistribution": _ELECTRICAL_DISTRIBUTION_CLUSTER_INFO,
+        "ElectricalProtectionAlarm": _ELECTRICAL_PROTECTION_ALARM_CLUSTER_INFO,
         "DoorLock": _DOOR_LOCK_CLUSTER_INFO,
         "WindowCovering": _WINDOW_COVERING_CLUSTER_INFO,
         "ClosureControl": _CLOSURE_CONTROL_CLUSTER_INFO,

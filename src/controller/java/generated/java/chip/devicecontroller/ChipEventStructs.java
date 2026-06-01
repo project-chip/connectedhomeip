@@ -5002,6 +5002,97 @@ public static class ElectricalGridConditionsClusterCurrentConditionsChangedEvent
     return output.toString();
   }
 }
+public static class ElectricalProtectionAlarmClusterNotifyEvent {
+  public Long active;
+  public Long inactive;
+  public Long state;
+  public Long mask;
+  private static final long ACTIVE_ID = 0L;
+  private static final long INACTIVE_ID = 1L;
+  private static final long STATE_ID = 2L;
+  private static final long MASK_ID = 3L;
+
+  public ElectricalProtectionAlarmClusterNotifyEvent(
+    Long active,
+    Long inactive,
+    Long state,
+    Long mask
+  ) {
+    this.active = active;
+    this.inactive = inactive;
+    this.state = state;
+    this.mask = mask;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(ACTIVE_ID, new UIntType(active)));
+    values.add(new StructElement(INACTIVE_ID, new UIntType(inactive)));
+    values.add(new StructElement(STATE_ID, new UIntType(state)));
+    values.add(new StructElement(MASK_ID, new UIntType(mask)));
+
+    return new StructType(values);
+  }
+
+  public static ElectricalProtectionAlarmClusterNotifyEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Long active = null;
+    Long inactive = null;
+    Long state = null;
+    Long mask = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == ACTIVE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          active = castingValue.value(Long.class);
+        }
+      } else if (element.contextTagNum() == INACTIVE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          inactive = castingValue.value(Long.class);
+        }
+      } else if (element.contextTagNum() == STATE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          state = castingValue.value(Long.class);
+        }
+      } else if (element.contextTagNum() == MASK_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          mask = castingValue.value(Long.class);
+        }
+      }
+    }
+    return new ElectricalProtectionAlarmClusterNotifyEvent(
+      active,
+      inactive,
+      state,
+      mask
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("ElectricalProtectionAlarmClusterNotifyEvent {\n");
+    output.append("\tactive: ");
+    output.append(active);
+    output.append("\n");
+    output.append("\tinactive: ");
+    output.append(inactive);
+    output.append("\n");
+    output.append("\tstate: ");
+    output.append(state);
+    output.append("\n");
+    output.append("\tmask: ");
+    output.append(mask);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class DoorLockClusterDoorLockAlarmEvent {
   public Integer alarmCode;
   private static final long ALARM_CODE_ID = 0L;

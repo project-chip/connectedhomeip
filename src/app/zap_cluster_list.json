@@ -44,6 +44,7 @@
         "DISHWASHER_MODE_CLUSTER": [],
         "ELECTRICAL_DISTRIBUTION_CLUSTER": [],
         "ELECTRICAL_GRID_CONDITIONS_CLUSTER": [],
+        "ELECTRICAL_PROTECTION_ALARM_CLUSTER": [],
         "GROUPCAST_CLUSTER": [],
         "HUMIDISTAT_CLUSTER": [],
         "METER_IDENTIFICATION_CLUSTER": [],
@@ -220,6 +221,7 @@
         "ELECTRICAL_GRID_CONDITIONS_CLUSTER": [
             "electrical-grid-conditions-server"
         ],
+        "ELECTRICAL_PROTECTION_ALARM_CLUSTER": [],
         "GROUPCAST_CLUSTER": ["groupcast"],
         "HUMIDISTAT_CLUSTER": ["humidistat-server"],
         "METER_IDENTIFICATION_CLUSTER": ["meter-identification-server"],

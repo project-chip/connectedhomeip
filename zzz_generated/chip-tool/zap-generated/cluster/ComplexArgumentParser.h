@@ -495,6 +495,42 @@ static CHIP_ERROR Setup(const char * label,
 
 static void Finalize(chip::app::Clusters::ElectricalGridConditions::Structs::ElectricalGridConditionsStruct::Type & request);
 
+static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::ElectricalProtectionAlarm::Structs::ArcFaultRatingsStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::ElectricalProtectionAlarm::Structs::ArcFaultRatingsStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::ElectricalProtectionAlarm::Structs::OverLoadRatingsStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::ElectricalProtectionAlarm::Structs::OverLoadRatingsStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::ElectricalProtectionAlarm::Structs::OverVoltageRatingsStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::ElectricalProtectionAlarm::Structs::OverVoltageRatingsStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::ElectricalProtectionAlarm::Structs::ResidualCurrentFaultRatingsStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::ElectricalProtectionAlarm::Structs::ResidualCurrentFaultRatingsStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::ElectricalProtectionAlarm::Structs::ShortCircuitRatingsStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::ElectricalProtectionAlarm::Structs::ShortCircuitRatingsStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::ElectricalProtectionAlarm::Structs::SurgeProtectionRatingsStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::ElectricalProtectionAlarm::Structs::SurgeProtectionRatingsStruct::Type & request);
+
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::DoorLock::Structs::CredentialStruct::Type & request,
                         Json::Value & value);
 
