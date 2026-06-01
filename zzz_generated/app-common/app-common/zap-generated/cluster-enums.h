@@ -63,6 +63,7 @@
 #include <clusters/DoorLock/Enums.h>
 #include <clusters/DynamicLighting/Enums.h>
 #include <clusters/EcosystemInformation/Enums.h>
+#include <clusters/ElectricalAlarm/Enums.h>
 #include <clusters/ElectricalDistribution/Enums.h>
 #include <clusters/ElectricalEnergyMeasurement/Enums.h>
 #include <clusters/ElectricalGridConditions/Enums.h>

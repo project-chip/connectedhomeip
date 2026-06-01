@@ -719,6 +719,15 @@ static BOOL CommandNeedsTimedInvokeInElectricalGridConditionsCluster(AttributeId
     }
     }
 }
+static BOOL CommandNeedsTimedInvokeInElectricalAlarmCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::ElectricalAlarm;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL CommandNeedsTimedInvokeInElectricalDistributionCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::ElectricalDistribution;
@@ -1676,6 +1685,9 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     }
     case Clusters::ElectricalGridConditions::Id: {
         return CommandNeedsTimedInvokeInElectricalGridConditionsCluster(commandID);
+    }
+    case Clusters::ElectricalAlarm::Id: {
+        return CommandNeedsTimedInvokeInElectricalAlarmCluster(commandID);
     }
     case Clusters::ElectricalDistribution::Id: {
         return CommandNeedsTimedInvokeInElectricalDistributionCluster(commandID);

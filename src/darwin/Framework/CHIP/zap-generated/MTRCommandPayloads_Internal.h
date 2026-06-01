@@ -1285,6 +1285,24 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@interface MTRElectricalAlarmClusterResetParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRElectricalAlarmClusterModifyEnabledAlarmsParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRElectricalAlarmClusterSetElectricalAlarmThresholdsParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
 @interface MTRElectricalProtectionAlarmClusterModifyEnabledAlarmsParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
