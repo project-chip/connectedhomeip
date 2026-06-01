@@ -82,6 +82,7 @@ void DeviceManager::Shutdown()
         StopVideoStreamProcess(pair.first);
     }
     mVideoStreamProcesses.clear();
+    mActiveLiveViewByNode.clear();
 
     // Disconnect WebRTC session
     WebRTCManager::Instance().Disconnect();
@@ -131,6 +132,15 @@ CHIP_ERROR DeviceManager::DeallocateVideoStream(NodeId nodeId, uint16_t videoStr
         // Stop the video stream process and disconnect WebRTC
         StopVideoStreamProcess(videoStreamId);
         WebRTCManager::Instance().Disconnect();
+
+        // Remove this node's active LiveView record only when the deallocated
+        // stream is the one we were tracking; this avoids dropping the record
+        // when the caller explicitly deallocates a different stream id.
+        auto it = mActiveLiveViewByNode.find(nodeId);
+        if (it != mActiveLiveViewByNode.end() && it->second == videoStreamId)
+        {
+            mActiveLiveViewByNode.erase(it);
+        }
     }
 
     return error;
@@ -238,9 +248,20 @@ void DeviceManager::OnWebRTCSessionEstablished(uint16_t streamId)
         if (streamId == mPendingVideoStreamId)
         {
             StartVideoStreamProcess(streamId);
-            mPendingVideoStreamId = 0;
+            mActiveLiveViewByNode[mNodeId] = streamId;
+            mPendingVideoStreamId          = 0;
         }
     }
+}
+
+std::optional<uint16_t> DeviceManager::GetActiveLiveViewStreamId(NodeId nodeId) const
+{
+    auto it = mActiveLiveViewByNode.find(nodeId);
+    if (it == mActiveLiveViewByNode.end())
+    {
+        return std::nullopt;
+    }
+    return it->second;
 }
 
 void DeviceManager::StartVideoStreamProcess(uint16_t streamId)
