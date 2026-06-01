@@ -17,6 +17,7 @@
  */
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/util/config.h>
+#include <chef-rvc-mode-delegate.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -27,8 +28,6 @@ using List              = chip::app::DataModel::List<T>;
 using ModeTagStructType = chip::app::Clusters::detail::Structs::ModeTagStruct::Type;
 
 #ifdef MATTER_DM_PLUGIN_RVC_RUN_MODE_SERVER
-#include <chef-rvc-mode-delegate.h>
-
 #ifdef MATTER_DM_PLUGIN_RVC_OPERATIONAL_STATE_SERVER
 #include <chef-rvc-operational-state-delegate.h>
 #endif // MATTER_DM_PLUGIN_RVC_OPERATIONAL_STATE_SERVER
@@ -158,7 +157,6 @@ void MatterRvcRunModeClusterShutdownCallback(chip::EndpointId endpointId, Matter
 #endif // MATTER_DM_PLUGIN_RVC_RUN_MODE_SERVER
 
 #ifdef MATTER_DM_PLUGIN_RVC_CLEAN_MODE_SERVER
-#include <chef-rvc-mode-delegate.h>
 using namespace chip::app::Clusters::RvcCleanMode;
 static std::unique_ptr<RvcCleanModeDelegate> gRvcCleanModeDelegate;
 static std::unique_ptr<ModeBase::Instance> gRvcCleanModeInstance;
