@@ -19,8 +19,8 @@
 #include <app/clusters/identify-server/IdentifyCluster.h>
 #include <app/clusters/proximity-ranging-server/ProximityRangingCluster.h>
 #include <app/clusters/proximity-ranging-server/ProximityRangingDriver.h>
-#include <app/clusters/proximity-ranging-server/RangingAdapter.h>
 #include <devices/interface/SingleEndpointDevice.h>
+#include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/support/BitMask.h>
 #include <lib/support/TimerDelegate.h>
 
@@ -32,9 +32,10 @@ class ProximityRangerDevice : public SingleEndpointDevice
 public:
     /**
      * Returns the process-wide ProximityRangingDriver shared by every
-     * ProximityRangerDevice instance. The driver is lazily initialized
-     * on the first call with the supplied adapter set; subsequent calls
-     * return the same instance regardless of `adapters`.
+     * ProximityRangerDevice instance. Construction of the first
+     * ProximityRangerDevice initializes the driver with a fixed set of
+     * LoggingRangingAdapters (BLE-RSSI, WiFi USD, BLT-CS); subsequent
+     * constructions reuse the same instance.
      *
      * Sharing a single driver across devices keeps adapter Callback
      * registrations stable when devices are constructed and destroyed
@@ -42,17 +43,12 @@ public:
      * itself as the adapter callback, so per-device drivers would
      * alias and overwrite each other.
      *
-     * The backing array referenced by `adapters` MUST outlive the
-     * process, since the singleton driver lives until program exit.
-     *
-     * The constructor of ProximityRangerDevice triggers initialization;
-     * external callers that just need a reference to the existing
-     * driver may omit `adapters`.
+     * MUST NOT be called before the first ProximityRangerDevice is
+     * constructed.
      */
-    static Clusters::ProximityRanging::ProximityRangingDriver &
-    GetRangingDriver(Span<Clusters::ProximityRanging::RangingAdapter * const> adapters = {});
+    static Clusters::ProximityRanging::ProximityRangingDriver & GetRangingDriver();
 
-    ProximityRangerDevice(TimerDelegate & timerDelegate, Span<Clusters::ProximityRanging::RangingAdapter * const> adapters,
+    ProximityRangerDevice(TimerDelegate & timerDelegate, PersistentStorageDelegate & storage,
                           BitMask<Clusters::ProximityRanging::Feature> features);
     ~ProximityRangerDevice() override = default;
 
