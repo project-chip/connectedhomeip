@@ -40,6 +40,8 @@
  *          subsequent software reset is reported as kSoftwareReset again.
  */
 
+#include <platform/internal/CHIPDeviceLayerInternal.h>
+
 #include <platform/nxp/common/BootReason.h>
 
 #include "NXPConfig.h"
