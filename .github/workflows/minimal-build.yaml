@@ -49,6 +49,11 @@ jobs:
               run: |
                   CC=gcc CXX=g++ scripts/configure --project=examples/all-clusters-app/linux --enable-recommended=no && ./ninja-build
 
+            - name: Notify Slack on Failure
+              if: failure()
+              uses: ./.github/actions/notify-slack-failure
+              with:
+                slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}
     minimal-network-manager:
         name: Linux / configure build of network-manager-app
 
@@ -70,3 +75,8 @@ jobs:
             - name: Configure and build Network Manager App
               run: |
                   CC=gcc CXX=g++ scripts/configure --project=examples/network-manager-app/linux --enable-recommended=no && ./ninja-build
+            - name: Notify Slack on Failure
+              if: failure()
+              uses: ./.github/actions/notify-slack-failure
+              with:
+                slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}

@@ -3222,52 +3222,6 @@ cluster IcdManagement = 70 {
   command StayActiveRequest(StayActiveRequestRequest): StayActiveResponse = 3;
 }
 
-/** This cluster supports creating a simple timer functionality. */
-provisional cluster Timer = 71 {
-  revision 1;
-
-  enum TimerStatusEnum : enum8 {
-    kRunning = 0;
-    kPaused = 1;
-    kExpired = 2;
-    kReady = 3;
-  }
-
-  bitmap Feature : bitmap32 {
-    kReset = 0x1;
-  }
-
-  readonly attribute elapsed_s setTime = 0;
-  readonly attribute elapsed_s timeRemaining = 1;
-  readonly attribute TimerStatusEnum timerState = 2;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-
-  request struct SetTimerRequest {
-    elapsed_s newTime = 0;
-  }
-
-  request struct AddTimeRequest {
-    elapsed_s additionalTime = 0;
-  }
-
-  request struct ReduceTimeRequest {
-    elapsed_s timeReduction = 0;
-  }
-
-  /** This command is used to set the timer. */
-  command SetTimer(SetTimerRequest): DefaultSuccess = 0;
-  /** This command is used to reset the timer to the original value. */
-  command ResetTimer(): DefaultSuccess = 1;
-  /** This command is used to add time to the existing timer. */
-  command AddTime(AddTimeRequest): DefaultSuccess = 2;
-  /** This command is used to reduce time on the existing timer. */
-  command ReduceTime(ReduceTimeRequest): DefaultSuccess = 3;
-}
-
 /** This cluster supports remotely monitoring and, where supported, changing the operational state of an Oven. */
 cluster OvenCavityOperationalState = 72 {
   revision 2;
@@ -5646,7 +5600,7 @@ cluster PowerTopology = 156 {
 
   readonly attribute optional endpoint_no availableEndpoints[] = 0;
   readonly attribute optional endpoint_no activeEndpoints[] = 1;
-  attribute optional CircuitNodeStruct electricalCircuitNodes[] = 2;
+  provisional attribute optional CircuitNodeStruct electricalCircuitNodes[] = 2;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -5859,6 +5813,199 @@ provisional cluster ElectricalGridConditions = 160 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+}
+
+/** This cluster provides an interface for a device which distributes electrical power to other devices, providing information about the capacity of the device as well as whether it has been damaged or has reached the end of its service life. */
+provisional cluster ElectricalDistribution = 162 {
+  revision 1;
+
+  enum EndOfLifeEnum : enum8 {
+    kNone = 0;
+    kDamaged = 1;
+    kDegraded = 2;
+    kExpired = 3;
+  }
+
+  provisional readonly attribute nullable amperage_ma maxContinuousCurrent = 0;
+  provisional readonly attribute nullable voltage_mv maxVoltage = 1;
+  provisional readonly attribute nullable int16u numberOfPoles = 2;
+  provisional readonly attribute nullable EndOfLifeEnum endOfLife = 3;
+  provisional readonly attribute nullable boolean serviceEntranceRated = 4;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
+/** This cluster is a derived cluster of the Alarm Base cluster and provides the alarm definition related to the Electrical Protection device type. */
+provisional cluster ElectricalProtectionAlarm = 163 {
+  revision 1;
+
+  enum CurrentTripCurveEnum : enum8 {
+    kTypeZ = 0;
+    kTypeB = 1;
+    kTypeC = 2;
+    kTypeK = 3;
+    kTypeD = 4;
+  }
+
+  enum CurrentWaveformEnum : enum8 {
+    kAC = 0 [spec_name = "AC"];
+    kA = 1;
+    kF = 2;
+    kB = 3;
+  }
+
+  enum GroundFaultClassEnum : enum8 {
+    kClassA = 0;
+    kClassB = 1;
+    kClassC = 2;
+    kClassD = 3;
+    kClassE = 4;
+  }
+
+  bitmap AlarmBitmap : bitmap32 {
+    kShortCircuitFault = 0x1;
+    kOverLoadFault = 0x2;
+    kOverVoltageFault = 0x4;
+    kVoltageSurgeFault = 0x8;
+    kResidualCurrentFault = 0x10;
+    kArcFault = 0x20;
+    kSelfTest = 0x40;
+  }
+
+  bitmap ArcCauseBitmap : bitmap8 {
+    kSeries = 0x1;
+    kParallelToNeutral = 0x2;
+    kParallelToGround = 0x4;
+  }
+
+  bitmap CurrentTripMechanismBitmap : bitmap8 {
+    kThermal = 0x1;
+    kMagnetic = 0x2;
+    kElectronic = 0x4;
+  }
+
+  bitmap Feature : bitmap32 {
+    kShortCircuit = 0x100000;
+    kOverLoad = 0x200000;
+    kOverVoltage = 0x400000;
+    kSurgeProtection = 0x800000;
+    kResidualCurrent = 0x1000000;
+    kArcFault = 0x2000000;
+    kSelfTest = 0x4000000;
+  }
+
+  bitmap SurgeProtectionClassBitmap : bitmap16 {
+    kClassI = 0x1;
+    kClassII = 0x2;
+    kClassIII = 0x4;
+  }
+
+  bitmap SurgeProtectionTypeBitmap : bitmap16 {
+    kType1 = 0x1;
+    kType2 = 0x2;
+    kType3 = 0x4;
+  }
+
+  bitmap TrippingCharacteristicsBitmap : bitmap16 {
+    kShortDelay = 0x1;
+    kSelective = 0x2;
+    kSuperImmune = 0x4;
+  }
+
+  bitmap VoltageTripMechanismBitmap : bitmap8 {
+    kMOV = 0x1 [spec_name = "MOV"];
+    kSAD = 0x2 [spec_name = "SAD"];
+    kGDT = 0x4 [spec_name = "GDT"];
+  }
+
+  struct ArcFaultRatingsStruct {
+    optional amperage_ma seriesArcCurrentSensitivity = 0;
+    optional amperage_ma parallelArcCurrentSensitivity = 1;
+    optional ArcCauseBitmap supportedArcCauses = 2;
+  }
+
+  struct OverLoadRatingsStruct {
+    optional amperage_ma tripCurrent = 0;
+    optional CurrentTripCurveEnum tripCurve = 1;
+    optional CurrentTripMechanismBitmap tripMechanism = 2;
+    optional amperage_ma ultimateMaxCurrent = 3;
+    optional amperage_ma serviceMaxCurrent = 4;
+  }
+
+  struct OverVoltageRatingsStruct {
+    optional VoltageTripMechanismBitmap tripMechanism = 0;
+    optional voltage_mv tripVoltage = 1;
+    optional voltage_mv maxContinuousOperatingVoltage = 2;
+    optional int64u responseTime = 3;
+  }
+
+  struct ResidualCurrentFaultRatingsStruct {
+    optional amperage_ma currentSensitivity = 0;
+    optional CurrentTripMechanismBitmap tripMechanism = 1;
+    optional boolean voltageDependent = 2;
+    optional GroundFaultClassEnum groundFaultClass = 3;
+    optional CurrentWaveformEnum waveform = 4;
+    optional TrippingCharacteristicsBitmap trippingCharacteristic = 5;
+    optional amperage_ma ultimateMaxCurrent = 6;
+    optional amperage_ma serviceMaxCurrent = 7;
+  }
+
+  struct ShortCircuitRatingsStruct {
+    optional amperage_ma tripCurrent = 0;
+    optional CurrentTripMechanismBitmap tripMechanism = 1;
+    optional CurrentTripCurveEnum tripCurve = 2;
+    optional amperage_ma ultimateMaxCurrent = 3;
+    optional amperage_ma serviceMaxCurrent = 4;
+    optional amperage_ma maxCurrent = 5;
+  }
+
+  struct SurgeProtectionRatingsStruct {
+    optional VoltageTripMechanismBitmap tripMechanism = 0;
+    optional SurgeProtectionClassBitmap protectionClass = 1;
+    optional SurgeProtectionTypeBitmap protectionType = 2;
+    optional voltage_mv maxContinuousOperatingVoltage = 3;
+    optional voltage_mv maxVoltageProtection = 4;
+    optional voltage_mv maxTemporaryVoltage = 5;
+    optional amperage_ma nominalDischargeCurrent = 6;
+    optional amperage_ma maximumDishargeCurrent = 7;
+    optional amperage_ma ratedShortCircuitCurrent = 8;
+    optional amperage_ma ratedShortTimeWithstandCurrent = 9;
+    optional int64u energyAbsorptionCapability = 10;
+    optional int64u responseTime = 11;
+  }
+
+  provisional info event Notify = 0 {
+    AlarmBitmap active = 0;
+    AlarmBitmap inactive = 1;
+    AlarmBitmap state = 2;
+    AlarmBitmap mask = 3;
+  }
+
+  provisional readonly attribute AlarmBitmap mask = 0;
+  provisional readonly attribute AlarmBitmap state = 2;
+  provisional readonly attribute AlarmBitmap supported = 3;
+  provisional readonly attribute optional nullable ArcCauseBitmap arcCause = 128;
+  provisional readonly attribute optional nullable OverLoadRatingsStruct overLoadRating = 129;
+  provisional readonly attribute optional nullable OverVoltageRatingsStruct overVoltageRating = 130;
+  provisional readonly attribute optional nullable SurgeProtectionRatingsStruct surgeProtectionRating = 131;
+  provisional readonly attribute optional nullable ShortCircuitRatingsStruct shortCircuitRating = 132;
+  provisional readonly attribute optional nullable ResidualCurrentFaultRatingsStruct residualCurrentRating = 133;
+  provisional readonly attribute optional nullable ArcFaultRatingsStruct arcFaultRating = 134;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct ModifyEnabledAlarmsRequest {
+    AlarmBitmap mask = 0;
+  }
+
+  /** This command allows a client to request that an alarm be enabled or suppressed at the server. */
+  command ModifyEnabledAlarms(ModifyEnabledAlarmsRequest): DefaultSuccess = 1;
 }
 
 /** An interface to a generic way to secure a door */
@@ -8334,7 +8481,7 @@ cluster OccupancySensing = 1030 {
 
 /** Attributes for reporting carbon monoxide concentration measurements */
 cluster CarbonMonoxideConcentrationMeasurement = 1036 {
-  revision 3;
+  revision 5;
 
   shared enum LevelValueEnum : enum8 {
     kUnknown = 0;
@@ -8359,6 +8506,8 @@ cluster CarbonMonoxideConcentrationMeasurement = 1036 {
     kNGM3 = 5 [spec_name = "NGM3"];
     kPM3 = 6 [spec_name = "PM3"];
     kBQM3 = 7 [spec_name = "BQM3"];
+    kDBPM = 8 [spec_name = "DBPM"];
+    kPCFT = 9 [spec_name = "PCFT"];
   }
 
   bitmap Feature : bitmap32 {
@@ -8390,7 +8539,7 @@ cluster CarbonMonoxideConcentrationMeasurement = 1036 {
 
 /** Attributes for reporting carbon dioxide concentration measurements */
 cluster CarbonDioxideConcentrationMeasurement = 1037 {
-  revision 3;
+  revision 5;
 
   shared enum LevelValueEnum : enum8 {
     kUnknown = 0;
@@ -8415,6 +8564,8 @@ cluster CarbonDioxideConcentrationMeasurement = 1037 {
     kNGM3 = 5 [spec_name = "NGM3"];
     kPM3 = 6 [spec_name = "PM3"];
     kBQM3 = 7 [spec_name = "BQM3"];
+    kDBPM = 8 [spec_name = "DBPM"];
+    kPCFT = 9 [spec_name = "PCFT"];
   }
 
   bitmap Feature : bitmap32 {
@@ -8446,7 +8597,7 @@ cluster CarbonDioxideConcentrationMeasurement = 1037 {
 
 /** Attributes for reporting nitrogen dioxide concentration measurements */
 cluster NitrogenDioxideConcentrationMeasurement = 1043 {
-  revision 3;
+  revision 5;
 
   shared enum LevelValueEnum : enum8 {
     kUnknown = 0;
@@ -8471,6 +8622,8 @@ cluster NitrogenDioxideConcentrationMeasurement = 1043 {
     kNGM3 = 5 [spec_name = "NGM3"];
     kPM3 = 6 [spec_name = "PM3"];
     kBQM3 = 7 [spec_name = "BQM3"];
+    kDBPM = 8 [spec_name = "DBPM"];
+    kPCFT = 9 [spec_name = "PCFT"];
   }
 
   bitmap Feature : bitmap32 {
@@ -8502,7 +8655,7 @@ cluster NitrogenDioxideConcentrationMeasurement = 1043 {
 
 /** Attributes for reporting ozone concentration measurements */
 cluster OzoneConcentrationMeasurement = 1045 {
-  revision 3;
+  revision 5;
 
   shared enum LevelValueEnum : enum8 {
     kUnknown = 0;
@@ -8527,6 +8680,8 @@ cluster OzoneConcentrationMeasurement = 1045 {
     kNGM3 = 5 [spec_name = "NGM3"];
     kPM3 = 6 [spec_name = "PM3"];
     kBQM3 = 7 [spec_name = "BQM3"];
+    kDBPM = 8 [spec_name = "DBPM"];
+    kPCFT = 9 [spec_name = "PCFT"];
   }
 
   bitmap Feature : bitmap32 {
@@ -8558,7 +8713,7 @@ cluster OzoneConcentrationMeasurement = 1045 {
 
 /** Attributes for reporting PM2.5 concentration measurements */
 cluster Pm25ConcentrationMeasurement = 1066 {
-  revision 3;
+  revision 5;
 
   shared enum LevelValueEnum : enum8 {
     kUnknown = 0;
@@ -8583,6 +8738,8 @@ cluster Pm25ConcentrationMeasurement = 1066 {
     kNGM3 = 5 [spec_name = "NGM3"];
     kPM3 = 6 [spec_name = "PM3"];
     kBQM3 = 7 [spec_name = "BQM3"];
+    kDBPM = 8 [spec_name = "DBPM"];
+    kPCFT = 9 [spec_name = "PCFT"];
   }
 
   bitmap Feature : bitmap32 {
@@ -8614,7 +8771,7 @@ cluster Pm25ConcentrationMeasurement = 1066 {
 
 /** Attributes for reporting formaldehyde concentration measurements */
 cluster FormaldehydeConcentrationMeasurement = 1067 {
-  revision 3;
+  revision 5;
 
   shared enum LevelValueEnum : enum8 {
     kUnknown = 0;
@@ -8639,6 +8796,8 @@ cluster FormaldehydeConcentrationMeasurement = 1067 {
     kNGM3 = 5 [spec_name = "NGM3"];
     kPM3 = 6 [spec_name = "PM3"];
     kBQM3 = 7 [spec_name = "BQM3"];
+    kDBPM = 8 [spec_name = "DBPM"];
+    kPCFT = 9 [spec_name = "PCFT"];
   }
 
   bitmap Feature : bitmap32 {
@@ -8670,7 +8829,7 @@ cluster FormaldehydeConcentrationMeasurement = 1067 {
 
 /** Attributes for reporting PM1 concentration measurements */
 cluster Pm1ConcentrationMeasurement = 1068 {
-  revision 3;
+  revision 5;
 
   shared enum LevelValueEnum : enum8 {
     kUnknown = 0;
@@ -8695,6 +8854,8 @@ cluster Pm1ConcentrationMeasurement = 1068 {
     kNGM3 = 5 [spec_name = "NGM3"];
     kPM3 = 6 [spec_name = "PM3"];
     kBQM3 = 7 [spec_name = "BQM3"];
+    kDBPM = 8 [spec_name = "DBPM"];
+    kPCFT = 9 [spec_name = "PCFT"];
   }
 
   bitmap Feature : bitmap32 {
@@ -8726,7 +8887,7 @@ cluster Pm1ConcentrationMeasurement = 1068 {
 
 /** Attributes for reporting PM10 concentration measurements */
 cluster Pm10ConcentrationMeasurement = 1069 {
-  revision 3;
+  revision 5;
 
   shared enum LevelValueEnum : enum8 {
     kUnknown = 0;
@@ -8751,6 +8912,8 @@ cluster Pm10ConcentrationMeasurement = 1069 {
     kNGM3 = 5 [spec_name = "NGM3"];
     kPM3 = 6 [spec_name = "PM3"];
     kBQM3 = 7 [spec_name = "BQM3"];
+    kDBPM = 8 [spec_name = "DBPM"];
+    kPCFT = 9 [spec_name = "PCFT"];
   }
 
   bitmap Feature : bitmap32 {
@@ -8782,7 +8945,7 @@ cluster Pm10ConcentrationMeasurement = 1069 {
 
 /** Attributes for reporting total volatile organic compounds concentration measurements */
 cluster TotalVolatileOrganicCompoundsConcentrationMeasurement = 1070 {
-  revision 3;
+  revision 5;
 
   shared enum LevelValueEnum : enum8 {
     kUnknown = 0;
@@ -8807,6 +8970,8 @@ cluster TotalVolatileOrganicCompoundsConcentrationMeasurement = 1070 {
     kNGM3 = 5 [spec_name = "NGM3"];
     kPM3 = 6 [spec_name = "PM3"];
     kBQM3 = 7 [spec_name = "BQM3"];
+    kDBPM = 8 [spec_name = "DBPM"];
+    kPCFT = 9 [spec_name = "PCFT"];
   }
 
   bitmap Feature : bitmap32 {
@@ -8838,7 +9003,7 @@ cluster TotalVolatileOrganicCompoundsConcentrationMeasurement = 1070 {
 
 /** Attributes for reporting radon concentration measurements */
 cluster RadonConcentrationMeasurement = 1071 {
-  revision 3;
+  revision 5;
 
   shared enum LevelValueEnum : enum8 {
     kUnknown = 0;
@@ -8863,6 +9028,8 @@ cluster RadonConcentrationMeasurement = 1071 {
     kNGM3 = 5 [spec_name = "NGM3"];
     kPM3 = 6 [spec_name = "PM3"];
     kBQM3 = 7 [spec_name = "BQM3"];
+    kDBPM = 8 [spec_name = "DBPM"];
+    kPCFT = 9 [spec_name = "PCFT"];
   }
 
   bitmap Feature : bitmap32 {
@@ -9176,6 +9343,64 @@ provisional cluster ProximityRanging = 1075 {
   command StartRangingRequest(StartRangingRequestRequest): StartRangingResponse = 0;
   /** Upon receipt of a StopRangingRequest command that contains a SessionID that matches an active ranging session, the Server SHALL terminate the corresponding ranging session. */
   command StopRangingRequest(StopRangingRequestRequest): DefaultSuccess = 2;
+}
+
+/** The server cluster provides an interface to concentration measurement functionality. */
+provisional cluster SmokeConcentrationMeasurement = 1076 {
+  revision 5;
+
+  shared enum LevelValueEnum : enum8 {
+    kUnknown = 0;
+    kLow = 1;
+    kMedium = 2;
+    kHigh = 3;
+    kCritical = 4;
+  }
+
+  shared enum MeasurementMediumEnum : enum8 {
+    kAir = 0;
+    kWater = 1;
+    kSoil = 2;
+  }
+
+  shared enum MeasurementUnitEnum : enum8 {
+    kPPM = 0 [spec_name = "PPM"];
+    kPPB = 1 [spec_name = "PPB"];
+    kPPT = 2 [spec_name = "PPT"];
+    kMGM3 = 3 [spec_name = "MGM3"];
+    kUGM3 = 4 [spec_name = "UGM3"];
+    kNGM3 = 5 [spec_name = "NGM3"];
+    kPM3 = 6 [spec_name = "PM3"];
+    kBQM3 = 7 [spec_name = "BQM3"];
+    kDBPM = 8 [spec_name = "DBPM"];
+    kPCFT = 9 [spec_name = "PCFT"];
+  }
+
+  bitmap Feature : bitmap32 {
+    kNumericMeasurement = 0x1;
+    kLevelIndication = 0x2;
+    kMediumLevel = 0x4;
+    kCriticalLevel = 0x8;
+    kPeakMeasurement = 0x10;
+    kAverageMeasurement = 0x20;
+  }
+
+  provisional readonly attribute optional nullable single measuredValue = 0;
+  provisional readonly attribute optional nullable single minMeasuredValue = 1;
+  provisional readonly attribute optional nullable single maxMeasuredValue = 2;
+  provisional readonly attribute optional nullable single peakMeasuredValue = 3;
+  provisional readonly attribute optional elapsed_s peakMeasuredValueWindow = 4;
+  provisional readonly attribute optional nullable single averageMeasuredValue = 5;
+  provisional readonly attribute optional elapsed_s averageMeasuredValueWindow = 6;
+  provisional readonly attribute optional single uncertainty = 7;
+  provisional readonly attribute optional MeasurementUnitEnum measurementUnit = 8;
+  provisional readonly attribute MeasurementMediumEnum measurementMedium = 9;
+  provisional readonly attribute optional LevelValueEnum levelValue = 10;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
 }
 
 /** This cluster manages the identities and credentials of devices that connect to a managed network. */

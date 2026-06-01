@@ -2773,16 +2773,6 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
         }
         break;
     }
-    case app::Clusters::Timer::Id: {
-        using namespace app::Clusters::Timer;
-        switch (aPath.mEventId)
-        {
-        default:
-            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
-            break;
-        }
-        break;
-    }
     case app::Clusters::OvenCavityOperationalState::Id: {
         using namespace app::Clusters::OvenCavityOperationalState;
         switch (aPath.mEventId)
@@ -6896,6 +6886,85 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
         }
         break;
     }
+    case app::Clusters::ElectricalDistribution::Id: {
+        using namespace app::Clusters::ElectricalDistribution;
+        switch (aPath.mEventId)
+        {
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
+    case app::Clusters::ElectricalProtectionAlarm::Id: {
+        using namespace app::Clusters::ElectricalProtectionAlarm;
+        switch (aPath.mEventId)
+        {
+        case Events::Notify::Id: {
+            Events::Notify::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value_active;
+            std::string value_activeClassName     = "java/lang/Long";
+            std::string value_activeCtorSignature = "(J)V";
+            jlong jnivalue_active                 = static_cast<jlong>(cppValue.active.Raw());
+            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                value_activeClassName.c_str(), value_activeCtorSignature.c_str(), jnivalue_active, value_active);
+
+            jobject value_inactive;
+            std::string value_inactiveClassName     = "java/lang/Long";
+            std::string value_inactiveCtorSignature = "(J)V";
+            jlong jnivalue_inactive                 = static_cast<jlong>(cppValue.inactive.Raw());
+            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                value_inactiveClassName.c_str(), value_inactiveCtorSignature.c_str(), jnivalue_inactive, value_inactive);
+
+            jobject value_state;
+            std::string value_stateClassName     = "java/lang/Long";
+            std::string value_stateCtorSignature = "(J)V";
+            jlong jnivalue_state                 = static_cast<jlong>(cppValue.state.Raw());
+            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                value_stateClassName.c_str(), value_stateCtorSignature.c_str(), jnivalue_state, value_state);
+
+            jobject value_mask;
+            std::string value_maskClassName     = "java/lang/Long";
+            std::string value_maskCtorSignature = "(J)V";
+            jlong jnivalue_mask                 = static_cast<jlong>(cppValue.mask.Raw());
+            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                value_maskClassName.c_str(), value_maskCtorSignature.c_str(), jnivalue_mask, value_mask);
+
+            jclass notifyStructClass;
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
+                env, "chip/devicecontroller/ChipEventStructs$ElectricalProtectionAlarmClusterNotifyEvent", notifyStructClass);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl, "Could not find class ChipEventStructs$ElectricalProtectionAlarmClusterNotifyEvent");
+                return nullptr;
+            }
+
+            jmethodID notifyStructCtor;
+            err = chip::JniReferences::GetInstance().FindMethod(
+                env, notifyStructClass, "<init>", "(Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/Long;)V",
+                &notifyStructCtor);
+            if (err != CHIP_NO_ERROR || notifyStructCtor == nullptr)
+            {
+                ChipLogError(Zcl, "Could not find ChipEventStructs$ElectricalProtectionAlarmClusterNotifyEvent constructor");
+                return nullptr;
+            }
+
+            jobject value =
+                env->NewObject(notifyStructClass, notifyStructCtor, value_active, value_inactive, value_state, value_mask);
+
+            return value;
+        }
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
     case app::Clusters::DoorLock::Id: {
         using namespace app::Clusters::DoorLock;
         switch (aPath.mEventId)
@@ -9633,6 +9702,16 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
 
             return value;
         }
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
+    case app::Clusters::SmokeConcentrationMeasurement::Id: {
+        using namespace app::Clusters::SmokeConcentrationMeasurement;
+        switch (aPath.mEventId)
+        {
         default:
             *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
             break;

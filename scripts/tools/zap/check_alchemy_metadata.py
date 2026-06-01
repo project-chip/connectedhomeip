@@ -62,7 +62,7 @@ import re
 import subprocess
 import sys
 from pathlib import Path
-from typing import Dict, List, Optional, Set
+from typing import Optional
 
 import yaml
 
@@ -86,8 +86,8 @@ def _load_allowlists() -> tuple:
     return set(data["MANUAL_ALLOWLIST"]), set(data["INCOMPLETE_METADATA_ALLOWLIST"])
 
 
-MANUAL_ALLOWLIST: Set[str]
-INCOMPLETE_METADATA_ALLOWLIST: Set[str]
+MANUAL_ALLOWLIST: set[str]
+INCOMPLETE_METADATA_ALLOWLIST: set[str]
 MANUAL_ALLOWLIST, INCOMPLETE_METADATA_ALLOWLIST = _load_allowlists()
 
 # ---------------------------------------------------------------------------
@@ -153,8 +153,8 @@ def _get_base_content(git_ref: str, repo_path: str, root: Path) -> Optional[str]
 
 
 def _check_hand_edits(
-    xml_files: List[Path], root: Path, diff_base: str,
-) -> List[str]:
+    xml_files: list[Path], root: Path, diff_base: str,
+) -> list[str]:
     """Flag Alchemy-generated XML files whose content changed but whose
     metadata comment is identical to *diff_base*, indicating a hand-edit."""
     # Build a mapping from repo-relative path string → absolute Path so we can
@@ -162,7 +162,7 @@ def _check_hand_edits(
     # when multiple directories contain files with the same basename.
     # Pass paths relative to root so git diff matches tracked repo paths
     # correctly, regardless of whether --root was supplied as an absolute path.
-    rel_to_abs: Dict[str, Path] = {}
+    rel_to_abs: dict[str, Path] = {}
     for f in xml_files:
         try:
             rel_to_abs[str(f.relative_to(root))] = f
@@ -182,7 +182,7 @@ def _check_hand_edits(
     if not changed_rel_paths:
         return []
 
-    errors: List[str] = []
+    errors: list[str] = []
     for rel_str, xml_file in rel_to_abs.items():
         if rel_str not in changed_rel_paths:
             continue
@@ -218,7 +218,7 @@ def _check_hand_edits(
     return errors
 
 
-def validate_file(filepath: Path) -> List[str]:
+def validate_file(filepath: Path) -> list[str]:
     """
     Validate a single XML file.
 
@@ -257,7 +257,7 @@ def validate_file(filepath: Path) -> List[str]:
     if filename in INCOMPLETE_METADATA_ALLOWLIST:
         return []  # Known legacy file – skip field-level checks
 
-    errors: List[str] = []
+    errors: list[str] = []
 
     alchemy_match = _ALCHEMY_VER_RE.search(comment)
     if not alchemy_match:
@@ -351,7 +351,7 @@ def main() -> int:
     args = parser.parse_args()
 
     root = Path(args.root)
-    xml_files: List[Path] = []
+    xml_files: list[Path] = []
 
     for path_arg in args.paths:
         p = root / path_arg
@@ -369,7 +369,7 @@ def main() -> int:
         return 2
 
     # ── Stale-allowlist checks (optional) ────────────────────────────────────
-    stale_warnings: List[str] = []
+    stale_warnings: list[str] = []
     if args.check_stale_allowlists:
         seen_filenames = {f.name for f in xml_files}
         for name in sorted(MANUAL_ALLOWLIST - seen_filenames):
@@ -412,12 +412,12 @@ def main() -> int:
                 )
 
     # ── Hand-edit detection (optional) ─────────────────────────────────────
-    hand_edit_errors: List[str] = []
+    hand_edit_errors: list[str] = []
     if args.diff_base:
         hand_edit_errors = _check_hand_edits(xml_files, root, args.diff_base)
 
     # ── Primary validation ──────────────────────────────────────────────────
-    failures: Dict[Path, List[str]] = {}
+    failures: dict[Path, list[str]] = {}
     n_manual = 0
     n_incomplete = 0
     for xml_file in xml_files:

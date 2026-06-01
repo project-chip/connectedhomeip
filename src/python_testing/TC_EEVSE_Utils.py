@@ -16,7 +16,6 @@
 
 
 import logging
-import typing
 from datetime import UTC, datetime, timedelta
 
 from mobly import asserts
@@ -186,7 +185,7 @@ class EEVSEBaseTestHelper:
         return get_targets_resp
 
     async def send_set_targets_command(self, endpoint: int = None,
-                                       chargingTargetSchedules: typing.List[
+                                       chargingTargetSchedules: list[
                                            Clusters.EnergyEvse.Structs.ChargingTargetScheduleStruct] = None,
                                        timedRequestTimeoutMs: int = 3000,
                                        expected_status: Status = Status.Success):

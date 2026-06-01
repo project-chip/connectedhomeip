@@ -34,6 +34,7 @@
 #include <platform/ThreadStackManager.h>
 
 #if CHIP_TARGET_STYLE_EMBEDDED
+#include <lib/support/StringBuilder.h>
 #include <openthread/cli.h>
 #include <openthread/instance.h>
 #include <openthread/ip6.h>
@@ -80,41 +81,28 @@ CHIP_ERROR cmd_otcli_help(int argc, char ** argv)
 
 CHIP_ERROR cmd_otcli_dispatch(int argc, char ** argv)
 {
-    CHIP_ERROR error = CHIP_NO_ERROR;
+    VerifyOrReturnError(argc > 0, CHIP_ERROR_INVALID_ARGUMENT);
 
-    char buff[kMaxLineLength] = { 0 };
-    char * buff_ptr           = buff;
-    int i                     = 0;
+    chip::StringBuilder<kMaxLineLength> builder;
 
-    VerifyOrExit(argc > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
-
-    for (i = 0; i < argc; i++)
+    for (int i = 0; i < argc; i++)
     {
-        size_t arg_len = strlen(argv[i]);
-
-        /* Make sure that the next argument won't overflow the buffer */
-        VerifyOrExit(buff_ptr + arg_len < buff + kMaxLineLength, error = CHIP_ERROR_BUFFER_TOO_SMALL);
-
-        strncpy(buff_ptr, argv[i], arg_len);
-        buff_ptr += arg_len;
-
-        /* Make sure that there is enough buffer for a space char */
-        if (buff_ptr + sizeof(char) < buff + kMaxLineLength)
-        {
-            strncpy(buff_ptr, " ", sizeof(char));
-            buff_ptr++;
-        }
+        builder.Add(argv[i]);
+        builder.Add(" ");
     }
-    buff_ptr = 0;
+
+    VerifyOrReturnError(builder.Fit(), CHIP_ERROR_BUFFER_TOO_SMALL);
+
     chip::DeviceLayer::ThreadStackMgr().LockThreadStack();
 #if OPENTHREAD_API_VERSION >= 85
-    otCliInputLine(buff);
+    otCliInputLine(const_cast<char *>(builder.c_str()));
 #else
-    otCliConsoleInputLine(buff, buff_ptr - buff);
+    otCliConsoleInputLine(const_cast<char *>(builder.c_str()), strlen(builder.c_str()));
 #endif
+
     chip::DeviceLayer::ThreadStackMgr().UnlockThreadStack();
-exit:
-    return error;
+
+    return CHIP_NO_ERROR;
 }
 
 #elif CHIP_TARGET_STYLE_UNIX

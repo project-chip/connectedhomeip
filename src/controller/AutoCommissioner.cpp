@@ -800,13 +800,27 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
         }
         else if (report.Is<CommissioningErrorInfo>())
         {
-            completionStatus.commissioningError = MakeOptional(report.Get<CommissioningErrorInfo>().commissioningError);
+            const auto & commissioningInfo          = report.Get<CommissioningErrorInfo>();
+            completionStatus.commissioningError     = MakeOptional(commissioningInfo.commissioningError);
+            completionStatus.commissioningDebugText = commissioningInfo.debugText;
+        }
+        else if (report.Is<OperationalCertErrorInfo>())
+        {
+            // Preserve the NodeOperationalCertStatusEnum from the device's NOCResponse
+            // (kInvalidPublicKey, kInvalidNodeOpId, kInvalidNOC, kFabricConflict, kLabelConflict,
+            // kInvalidFabricIndex, etc.) so callers can distinguish without losing fidelity to a
+            // generic CHIP_ERROR.
+            completionStatus.operationalCertStatus = MakeOptional(report.Get<OperationalCertErrorInfo>().operationalCertStatus);
         }
         else if (report.Is<NetworkCommissioningStatusInfo>())
         {
             // This report type is used when an error happens in either NetworkConfig or ConnectNetwork commands
-            completionStatus.networkCommissioningStatus =
-                MakeOptional(report.Get<NetworkCommissioningStatusInfo>().networkCommissioningStatus);
+            const auto & networkInfo                    = report.Get<NetworkCommissioningStatusInfo>();
+            completionStatus.networkCommissioningStatus = MakeOptional(networkInfo.networkCommissioningStatus);
+            // Preserve the optional ConnectNetworkResponse.errorValue (driver-level detail
+            // distinct from the spec-level networkingStatus). Null for NetworkConfigResponse.
+            completionStatus.connectNetworkErrorValue      = networkInfo.connectNetworkErrorValue;
+            completionStatus.networkCommissioningDebugText = networkInfo.debugText;
 
             // If we are configured to scan networks, then don't error out.
             // Instead, allow the app to try another network.
