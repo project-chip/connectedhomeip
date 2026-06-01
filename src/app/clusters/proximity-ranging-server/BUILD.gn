@@ -24,6 +24,7 @@ source_set("proximity-ranging-server") {
   ]
 
   public_deps = [
+    ":ble-rssi-helpers",
     "${chip_root}/src/app/data-model-provider",
     "${chip_root}/src/app/server",
     "${chip_root}/src/app/server-cluster",
@@ -42,7 +43,6 @@ source_set("ble-rssi-helpers") {
   ]
 
   public_deps = [
-    ":proximity-ranging-server",
     "${chip_root}/src/ble",
     "${chip_root}/src/crypto",
   ]

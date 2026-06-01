@@ -345,7 +345,7 @@ ResultCodeEnum LoggingRangingAdapter::StartSession(uint8_t sessionId, const Comm
     {
         ChipLogProgress(NotSpecified,
                         "[LoggingRangingAdapter:%s] StartSession id=%u tech=%s securityMode=%s "
-                        "startTime=%us endTime=%us interval=%us reporting=%s",
+                        "startTime=%" PRIu32 "s endTime=%" PRIu32 "s interval=%" PRIu32 "s reporting=%s",
                         LogTag(), sessionId, TechName(request.technology), SecurityName(request.securityMode),
                         request.trigger.startTime, request.trigger.endTime, request.trigger.rangingInstanceInterval.Value(),
                         request.reportingCondition.HasValue() ? "present" : "absent");
@@ -354,7 +354,7 @@ ResultCodeEnum LoggingRangingAdapter::StartSession(uint8_t sessionId, const Comm
     {
         ChipLogProgress(NotSpecified,
                         "[LoggingRangingAdapter:%s] StartSession id=%u tech=%s securityMode=%s "
-                        "startTime=%us endTime=%us interval=absent reporting=%s",
+                        "startTime=%" PRIu32 "s endTime=%" PRIu32 "s interval=absent reporting=%s",
                         LogTag(), sessionId, TechName(request.technology), SecurityName(request.securityMode),
                         request.trigger.startTime, request.trigger.endTime,
                         request.reportingCondition.HasValue() ? "present" : "absent");
