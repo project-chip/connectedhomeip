@@ -273,12 +273,11 @@ def generate_usedMcastAddrCount_entry_matcher(expected_count: int) -> AttributeM
 
 @dataclass
 class OperateOnlyCommand:
-    endpoint_id: int
     cluster_object: Clusters.ClusterObjects.Cluster
     command_object: Clusters.ClusterObjects.ClusterCommand
 
 
-async def get_operate_only_commands(dev_ctrl: ChipDeviceController, node_id: int, exclude_ep0: bool = True, endpoint_id_to_search: Optional[int] = None) -> list[OperateOnlyCommand]:
+async def get_operate_only_commands(dev_ctrl: ChipDeviceController, node_id: int, exclude_ep0: bool = True, endpoint_id_to_search: Optional[int] = None) -> dict[int, list[OperateOnlyCommand]]:
     """
     Reads all AcceptedCommandList attributes and the SpecificationVersion to determine all
     commands that only require Operate privilege.
@@ -306,7 +305,7 @@ async def get_operate_only_commands(dev_ctrl: ChipDeviceController, node_id: int
         xml_clusters, _ = build_xml_clusters(dm)
         return xml_clusters
 
-    def find_commands_on_endpoint_and_cluster(endpoint_id, endpoint_data, operate_only_commands):
+    def find_commands_on_endpoint_and_cluster(endpoint_id, endpoint_data, operate_only_commands_dict):
         for cluster, cluster_data in endpoint_data.items():
             if cluster.Attributes.AcceptedCommandList in cluster_data:
                 command_list = cluster_data[cluster.Attributes.AcceptedCommandList]
@@ -321,9 +320,12 @@ async def get_operate_only_commands(dev_ctrl: ChipDeviceController, node_id: int
                             if not command_object.is_client:
                                 continue
 
+                            if endpoint_id not in operate_only_commands_dict:
+                                operate_only_commands_dict[endpoint_id] = []
+
                             # In this codebase, all generated ClusterCommand subclasses have defaults for all fields.
-                            operate_only_commands.append(OperateOnlyCommand(
-                                endpoint_id=endpoint_id, cluster_object=cluster_object, command_object=command_object))
+                            operate_only_commands_dict[endpoint_id].append(OperateOnlyCommand(
+                                cluster_object=cluster_object, command_object=command_object))
 
                     except KeyError:
                         logger.warning(
@@ -332,7 +334,7 @@ async def get_operate_only_commands(dev_ctrl: ChipDeviceController, node_id: int
     # Main logic
     attributes, spec_version = await get_device_composition_and_spec(dev_ctrl, node_id)
     xml_clusters = get_xml_clusters(spec_version)
-    operate_only_commands = []
+    operate_only_commands_dict = {}
 
     if endpoint_id_to_search is not None:
         asserts.assert_false((exclude_ep0 and endpoint_id_to_search == 0),
@@ -340,14 +342,14 @@ async def get_operate_only_commands(dev_ctrl: ChipDeviceController, node_id: int
         endpoint_data = attributes.get(endpoint_id_to_search)
         if endpoint_data is None:
             asserts.fail(f"Endpoint {endpoint_id_to_search} not found on the device.")
-        find_commands_on_endpoint_and_cluster(endpoint_id_to_search, endpoint_data, operate_only_commands)
+        find_commands_on_endpoint_and_cluster(endpoint_id_to_search, endpoint_data, operate_only_commands_dict)
     else:
         for endpoint_id, endpoint_data in attributes.items():
             if exclude_ep0 and endpoint_id == 0:
                 continue
-            find_commands_on_endpoint_and_cluster(endpoint_id, endpoint_data, operate_only_commands)
+            find_commands_on_endpoint_and_cluster(endpoint_id, endpoint_data, operate_only_commands_dict)
 
-    return operate_only_commands
+    return operate_only_commands_dict
 
 
 def get_iana_multicast_address() -> bytes:

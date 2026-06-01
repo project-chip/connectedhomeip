@@ -12407,171 +12407,6 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
         }
         break;
     }
-    case app::Clusters::Timer::Id: {
-        using namespace app::Clusters::Timer;
-        switch (aPath.mAttributeId)
-        {
-        case Attributes::SetTime::Id: {
-            using TypeInfo = Attributes::SetTime::TypeInfo;
-            TypeInfo::DecodableType cppValue;
-            *aError = app::DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR)
-            {
-                return nullptr;
-            }
-            jobject value;
-            std::string valueClassName     = "java/lang/Long";
-            std::string valueCtorSignature = "(J)V";
-            jlong jnivalue                 = static_cast<jlong>(cppValue);
-            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
-                valueClassName.c_str(), valueCtorSignature.c_str(), jnivalue, value);
-            return value;
-        }
-        case Attributes::TimeRemaining::Id: {
-            using TypeInfo = Attributes::TimeRemaining::TypeInfo;
-            TypeInfo::DecodableType cppValue;
-            *aError = app::DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR)
-            {
-                return nullptr;
-            }
-            jobject value;
-            std::string valueClassName     = "java/lang/Long";
-            std::string valueCtorSignature = "(J)V";
-            jlong jnivalue                 = static_cast<jlong>(cppValue);
-            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
-                valueClassName.c_str(), valueCtorSignature.c_str(), jnivalue, value);
-            return value;
-        }
-        case Attributes::TimerState::Id: {
-            using TypeInfo = Attributes::TimerState::TypeInfo;
-            TypeInfo::DecodableType cppValue;
-            *aError = app::DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR)
-            {
-                return nullptr;
-            }
-            jobject value;
-            std::string valueClassName     = "java/lang/Integer";
-            std::string valueCtorSignature = "(I)V";
-            jint jnivalue                  = static_cast<jint>(cppValue);
-            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
-                valueClassName.c_str(), valueCtorSignature.c_str(), jnivalue, value);
-            return value;
-        }
-        case Attributes::GeneratedCommandList::Id: {
-            using TypeInfo = Attributes::GeneratedCommandList::TypeInfo;
-            TypeInfo::DecodableType cppValue;
-            *aError = app::DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR)
-            {
-                return nullptr;
-            }
-            jobject value;
-            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateArrayList(value);
-
-            auto iter_value_0 = cppValue.begin();
-            while (iter_value_0.Next())
-            {
-                auto & entry_0 = iter_value_0.GetValue();
-                jobject newElement_0;
-                std::string newElement_0ClassName     = "java/lang/Long";
-                std::string newElement_0CtorSignature = "(J)V";
-                jlong jninewElement_0                 = static_cast<jlong>(entry_0);
-                TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
-                    newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), jninewElement_0, newElement_0);
-                TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().AddToList(value, newElement_0);
-            }
-            return value;
-        }
-        case Attributes::AcceptedCommandList::Id: {
-            using TypeInfo = Attributes::AcceptedCommandList::TypeInfo;
-            TypeInfo::DecodableType cppValue;
-            *aError = app::DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR)
-            {
-                return nullptr;
-            }
-            jobject value;
-            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateArrayList(value);
-
-            auto iter_value_0 = cppValue.begin();
-            while (iter_value_0.Next())
-            {
-                auto & entry_0 = iter_value_0.GetValue();
-                jobject newElement_0;
-                std::string newElement_0ClassName     = "java/lang/Long";
-                std::string newElement_0CtorSignature = "(J)V";
-                jlong jninewElement_0                 = static_cast<jlong>(entry_0);
-                TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
-                    newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), jninewElement_0, newElement_0);
-                TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().AddToList(value, newElement_0);
-            }
-            return value;
-        }
-        case Attributes::AttributeList::Id: {
-            using TypeInfo = Attributes::AttributeList::TypeInfo;
-            TypeInfo::DecodableType cppValue;
-            *aError = app::DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR)
-            {
-                return nullptr;
-            }
-            jobject value;
-            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateArrayList(value);
-
-            auto iter_value_0 = cppValue.begin();
-            while (iter_value_0.Next())
-            {
-                auto & entry_0 = iter_value_0.GetValue();
-                jobject newElement_0;
-                std::string newElement_0ClassName     = "java/lang/Long";
-                std::string newElement_0CtorSignature = "(J)V";
-                jlong jninewElement_0                 = static_cast<jlong>(entry_0);
-                TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
-                    newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), jninewElement_0, newElement_0);
-                TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().AddToList(value, newElement_0);
-            }
-            return value;
-        }
-        case Attributes::FeatureMap::Id: {
-            using TypeInfo = Attributes::FeatureMap::TypeInfo;
-            TypeInfo::DecodableType cppValue;
-            *aError = app::DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR)
-            {
-                return nullptr;
-            }
-            jobject value;
-            std::string valueClassName     = "java/lang/Long";
-            std::string valueCtorSignature = "(J)V";
-            jlong jnivalue                 = static_cast<jlong>(cppValue);
-            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
-                valueClassName.c_str(), valueCtorSignature.c_str(), jnivalue, value);
-            return value;
-        }
-        case Attributes::ClusterRevision::Id: {
-            using TypeInfo = Attributes::ClusterRevision::TypeInfo;
-            TypeInfo::DecodableType cppValue;
-            *aError = app::DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR)
-            {
-                return nullptr;
-            }
-            jobject value;
-            std::string valueClassName     = "java/lang/Integer";
-            std::string valueCtorSignature = "(I)V";
-            jint jnivalue                  = static_cast<jint>(cppValue);
-            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
-                valueClassName.c_str(), valueCtorSignature.c_str(), jnivalue, value);
-            return value;
-        }
-        default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
-            break;
-        }
-        break;
-    }
     case app::Clusters::OvenCavityOperationalState::Id: {
         using namespace app::Clusters::OvenCavityOperationalState;
         switch (aPath.mAttributeId)
@@ -25581,6 +25416,1414 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                         newElement_0_gridCarbonLevel, newElement_0_localCarbonIntensity, newElement_0_localCarbonLevel);
                 }
                 TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().AddToList(value, newElement_0);
+            }
+            return value;
+        }
+        case Attributes::GeneratedCommandList::Id: {
+            using TypeInfo = Attributes::GeneratedCommandList::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateArrayList(value);
+
+            auto iter_value_0 = cppValue.begin();
+            while (iter_value_0.Next())
+            {
+                auto & entry_0 = iter_value_0.GetValue();
+                jobject newElement_0;
+                std::string newElement_0ClassName     = "java/lang/Long";
+                std::string newElement_0CtorSignature = "(J)V";
+                jlong jninewElement_0                 = static_cast<jlong>(entry_0);
+                TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                    newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), jninewElement_0, newElement_0);
+                TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().AddToList(value, newElement_0);
+            }
+            return value;
+        }
+        case Attributes::AcceptedCommandList::Id: {
+            using TypeInfo = Attributes::AcceptedCommandList::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateArrayList(value);
+
+            auto iter_value_0 = cppValue.begin();
+            while (iter_value_0.Next())
+            {
+                auto & entry_0 = iter_value_0.GetValue();
+                jobject newElement_0;
+                std::string newElement_0ClassName     = "java/lang/Long";
+                std::string newElement_0CtorSignature = "(J)V";
+                jlong jninewElement_0                 = static_cast<jlong>(entry_0);
+                TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                    newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), jninewElement_0, newElement_0);
+                TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().AddToList(value, newElement_0);
+            }
+            return value;
+        }
+        case Attributes::AttributeList::Id: {
+            using TypeInfo = Attributes::AttributeList::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateArrayList(value);
+
+            auto iter_value_0 = cppValue.begin();
+            while (iter_value_0.Next())
+            {
+                auto & entry_0 = iter_value_0.GetValue();
+                jobject newElement_0;
+                std::string newElement_0ClassName     = "java/lang/Long";
+                std::string newElement_0CtorSignature = "(J)V";
+                jlong jninewElement_0                 = static_cast<jlong>(entry_0);
+                TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                    newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), jninewElement_0, newElement_0);
+                TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().AddToList(value, newElement_0);
+            }
+            return value;
+        }
+        case Attributes::FeatureMap::Id: {
+            using TypeInfo = Attributes::FeatureMap::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            std::string valueClassName     = "java/lang/Long";
+            std::string valueCtorSignature = "(J)V";
+            jlong jnivalue                 = static_cast<jlong>(cppValue);
+            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                valueClassName.c_str(), valueCtorSignature.c_str(), jnivalue, value);
+            return value;
+        }
+        case Attributes::ClusterRevision::Id: {
+            using TypeInfo = Attributes::ClusterRevision::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            std::string valueClassName     = "java/lang/Integer";
+            std::string valueCtorSignature = "(I)V";
+            jint jnivalue                  = static_cast<jint>(cppValue);
+            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                valueClassName.c_str(), valueCtorSignature.c_str(), jnivalue, value);
+            return value;
+        }
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
+            break;
+        }
+        break;
+    }
+    case app::Clusters::ElectricalDistribution::Id: {
+        using namespace app::Clusters::ElectricalDistribution;
+        switch (aPath.mAttributeId)
+        {
+        case Attributes::MaxContinuousCurrent::Id: {
+            using TypeInfo = Attributes::MaxContinuousCurrent::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            if (cppValue.IsNull())
+            {
+                value = nullptr;
+            }
+            else
+            {
+                std::string valueClassName     = "java/lang/Long";
+                std::string valueCtorSignature = "(J)V";
+                jlong jnivalue                 = static_cast<jlong>(cppValue.Value());
+                TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                    valueClassName.c_str(), valueCtorSignature.c_str(), jnivalue, value);
+            }
+            return value;
+        }
+        case Attributes::MaxVoltage::Id: {
+            using TypeInfo = Attributes::MaxVoltage::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            if (cppValue.IsNull())
+            {
+                value = nullptr;
+            }
+            else
+            {
+                std::string valueClassName     = "java/lang/Long";
+                std::string valueCtorSignature = "(J)V";
+                jlong jnivalue                 = static_cast<jlong>(cppValue.Value());
+                TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                    valueClassName.c_str(), valueCtorSignature.c_str(), jnivalue, value);
+            }
+            return value;
+        }
+        case Attributes::NumberOfPoles::Id: {
+            using TypeInfo = Attributes::NumberOfPoles::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            if (cppValue.IsNull())
+            {
+                value = nullptr;
+            }
+            else
+            {
+                std::string valueClassName     = "java/lang/Integer";
+                std::string valueCtorSignature = "(I)V";
+                jint jnivalue                  = static_cast<jint>(cppValue.Value());
+                TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                    valueClassName.c_str(), valueCtorSignature.c_str(), jnivalue, value);
+            }
+            return value;
+        }
+        case Attributes::EndOfLife::Id: {
+            using TypeInfo = Attributes::EndOfLife::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            if (cppValue.IsNull())
+            {
+                value = nullptr;
+            }
+            else
+            {
+                std::string valueClassName     = "java/lang/Integer";
+                std::string valueCtorSignature = "(I)V";
+                jint jnivalue                  = static_cast<jint>(cppValue.Value());
+                TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                    valueClassName.c_str(), valueCtorSignature.c_str(), jnivalue, value);
+            }
+            return value;
+        }
+        case Attributes::ServiceEntranceRated::Id: {
+            using TypeInfo = Attributes::ServiceEntranceRated::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            if (cppValue.IsNull())
+            {
+                value = nullptr;
+            }
+            else
+            {
+                std::string valueClassName     = "java/lang/Boolean";
+                std::string valueCtorSignature = "(Z)V";
+                jboolean jnivalue              = static_cast<jboolean>(cppValue.Value());
+                TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jboolean>(
+                    valueClassName.c_str(), valueCtorSignature.c_str(), jnivalue, value);
+            }
+            return value;
+        }
+        case Attributes::GeneratedCommandList::Id: {
+            using TypeInfo = Attributes::GeneratedCommandList::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateArrayList(value);
+
+            auto iter_value_0 = cppValue.begin();
+            while (iter_value_0.Next())
+            {
+                auto & entry_0 = iter_value_0.GetValue();
+                jobject newElement_0;
+                std::string newElement_0ClassName     = "java/lang/Long";
+                std::string newElement_0CtorSignature = "(J)V";
+                jlong jninewElement_0                 = static_cast<jlong>(entry_0);
+                TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                    newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), jninewElement_0, newElement_0);
+                TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().AddToList(value, newElement_0);
+            }
+            return value;
+        }
+        case Attributes::AcceptedCommandList::Id: {
+            using TypeInfo = Attributes::AcceptedCommandList::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateArrayList(value);
+
+            auto iter_value_0 = cppValue.begin();
+            while (iter_value_0.Next())
+            {
+                auto & entry_0 = iter_value_0.GetValue();
+                jobject newElement_0;
+                std::string newElement_0ClassName     = "java/lang/Long";
+                std::string newElement_0CtorSignature = "(J)V";
+                jlong jninewElement_0                 = static_cast<jlong>(entry_0);
+                TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                    newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), jninewElement_0, newElement_0);
+                TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().AddToList(value, newElement_0);
+            }
+            return value;
+        }
+        case Attributes::AttributeList::Id: {
+            using TypeInfo = Attributes::AttributeList::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateArrayList(value);
+
+            auto iter_value_0 = cppValue.begin();
+            while (iter_value_0.Next())
+            {
+                auto & entry_0 = iter_value_0.GetValue();
+                jobject newElement_0;
+                std::string newElement_0ClassName     = "java/lang/Long";
+                std::string newElement_0CtorSignature = "(J)V";
+                jlong jninewElement_0                 = static_cast<jlong>(entry_0);
+                TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                    newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), jninewElement_0, newElement_0);
+                TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().AddToList(value, newElement_0);
+            }
+            return value;
+        }
+        case Attributes::FeatureMap::Id: {
+            using TypeInfo = Attributes::FeatureMap::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            std::string valueClassName     = "java/lang/Long";
+            std::string valueCtorSignature = "(J)V";
+            jlong jnivalue                 = static_cast<jlong>(cppValue);
+            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                valueClassName.c_str(), valueCtorSignature.c_str(), jnivalue, value);
+            return value;
+        }
+        case Attributes::ClusterRevision::Id: {
+            using TypeInfo = Attributes::ClusterRevision::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            std::string valueClassName     = "java/lang/Integer";
+            std::string valueCtorSignature = "(I)V";
+            jint jnivalue                  = static_cast<jint>(cppValue);
+            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                valueClassName.c_str(), valueCtorSignature.c_str(), jnivalue, value);
+            return value;
+        }
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
+            break;
+        }
+        break;
+    }
+    case app::Clusters::ElectricalProtectionAlarm::Id: {
+        using namespace app::Clusters::ElectricalProtectionAlarm;
+        switch (aPath.mAttributeId)
+        {
+        case Attributes::Mask::Id: {
+            using TypeInfo = Attributes::Mask::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            std::string valueClassName     = "java/lang/Long";
+            std::string valueCtorSignature = "(J)V";
+            jlong jnivalue                 = static_cast<jlong>(cppValue.Raw());
+            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                valueClassName.c_str(), valueCtorSignature.c_str(), jnivalue, value);
+            return value;
+        }
+        case Attributes::State::Id: {
+            using TypeInfo = Attributes::State::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            std::string valueClassName     = "java/lang/Long";
+            std::string valueCtorSignature = "(J)V";
+            jlong jnivalue                 = static_cast<jlong>(cppValue.Raw());
+            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                valueClassName.c_str(), valueCtorSignature.c_str(), jnivalue, value);
+            return value;
+        }
+        case Attributes::Supported::Id: {
+            using TypeInfo = Attributes::Supported::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            std::string valueClassName     = "java/lang/Long";
+            std::string valueCtorSignature = "(J)V";
+            jlong jnivalue                 = static_cast<jlong>(cppValue.Raw());
+            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                valueClassName.c_str(), valueCtorSignature.c_str(), jnivalue, value);
+            return value;
+        }
+        case Attributes::ArcCause::Id: {
+            using TypeInfo = Attributes::ArcCause::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            if (cppValue.IsNull())
+            {
+                value = nullptr;
+            }
+            else
+            {
+                std::string valueClassName     = "java/lang/Integer";
+                std::string valueCtorSignature = "(I)V";
+                jint jnivalue                  = static_cast<jint>(cppValue.Value().Raw());
+                TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                    valueClassName.c_str(), valueCtorSignature.c_str(), jnivalue, value);
+            }
+            return value;
+        }
+        case Attributes::OverLoadRating::Id: {
+            using TypeInfo = Attributes::OverLoadRating::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            if (cppValue.IsNull())
+            {
+                value = nullptr;
+            }
+            else
+            {
+                jobject value_tripCurrent;
+                if (!cppValue.Value().tripCurrent.HasValue())
+                {
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(nullptr, value_tripCurrent);
+                }
+                else
+                {
+                    jobject value_tripCurrentInsideOptional;
+                    std::string value_tripCurrentInsideOptionalClassName     = "java/lang/Long";
+                    std::string value_tripCurrentInsideOptionalCtorSignature = "(J)V";
+                    jlong jnivalue_tripCurrentInsideOptional = static_cast<jlong>(cppValue.Value().tripCurrent.Value());
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                        value_tripCurrentInsideOptionalClassName.c_str(), value_tripCurrentInsideOptionalCtorSignature.c_str(),
+                        jnivalue_tripCurrentInsideOptional, value_tripCurrentInsideOptional);
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(value_tripCurrentInsideOptional,
+                                                                                               value_tripCurrent);
+                }
+                jobject value_tripCurve;
+                if (!cppValue.Value().tripCurve.HasValue())
+                {
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(nullptr, value_tripCurve);
+                }
+                else
+                {
+                    jobject value_tripCurveInsideOptional;
+                    std::string value_tripCurveInsideOptionalClassName     = "java/lang/Integer";
+                    std::string value_tripCurveInsideOptionalCtorSignature = "(I)V";
+                    jint jnivalue_tripCurveInsideOptional                  = static_cast<jint>(cppValue.Value().tripCurve.Value());
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                        value_tripCurveInsideOptionalClassName.c_str(), value_tripCurveInsideOptionalCtorSignature.c_str(),
+                        jnivalue_tripCurveInsideOptional, value_tripCurveInsideOptional);
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(value_tripCurveInsideOptional,
+                                                                                               value_tripCurve);
+                }
+                jobject value_tripMechanism;
+                if (!cppValue.Value().tripMechanism.HasValue())
+                {
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(nullptr, value_tripMechanism);
+                }
+                else
+                {
+                    jobject value_tripMechanismInsideOptional;
+                    std::string value_tripMechanismInsideOptionalClassName     = "java/lang/Integer";
+                    std::string value_tripMechanismInsideOptionalCtorSignature = "(I)V";
+                    jint jnivalue_tripMechanismInsideOptional = static_cast<jint>(cppValue.Value().tripMechanism.Value().Raw());
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                        value_tripMechanismInsideOptionalClassName.c_str(), value_tripMechanismInsideOptionalCtorSignature.c_str(),
+                        jnivalue_tripMechanismInsideOptional, value_tripMechanismInsideOptional);
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(value_tripMechanismInsideOptional,
+                                                                                               value_tripMechanism);
+                }
+                jobject value_ultimateMaxCurrent;
+                if (!cppValue.Value().ultimateMaxCurrent.HasValue())
+                {
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(nullptr, value_ultimateMaxCurrent);
+                }
+                else
+                {
+                    jobject value_ultimateMaxCurrentInsideOptional;
+                    std::string value_ultimateMaxCurrentInsideOptionalClassName     = "java/lang/Long";
+                    std::string value_ultimateMaxCurrentInsideOptionalCtorSignature = "(J)V";
+                    jlong jnivalue_ultimateMaxCurrentInsideOptional =
+                        static_cast<jlong>(cppValue.Value().ultimateMaxCurrent.Value());
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                        value_ultimateMaxCurrentInsideOptionalClassName.c_str(),
+                        value_ultimateMaxCurrentInsideOptionalCtorSignature.c_str(), jnivalue_ultimateMaxCurrentInsideOptional,
+                        value_ultimateMaxCurrentInsideOptional);
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(
+                        value_ultimateMaxCurrentInsideOptional, value_ultimateMaxCurrent);
+                }
+                jobject value_serviceMaxCurrent;
+                if (!cppValue.Value().serviceMaxCurrent.HasValue())
+                {
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(nullptr, value_serviceMaxCurrent);
+                }
+                else
+                {
+                    jobject value_serviceMaxCurrentInsideOptional;
+                    std::string value_serviceMaxCurrentInsideOptionalClassName     = "java/lang/Long";
+                    std::string value_serviceMaxCurrentInsideOptionalCtorSignature = "(J)V";
+                    jlong jnivalue_serviceMaxCurrentInsideOptional = static_cast<jlong>(cppValue.Value().serviceMaxCurrent.Value());
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                        value_serviceMaxCurrentInsideOptionalClassName.c_str(),
+                        value_serviceMaxCurrentInsideOptionalCtorSignature.c_str(), jnivalue_serviceMaxCurrentInsideOptional,
+                        value_serviceMaxCurrentInsideOptional);
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(
+                        value_serviceMaxCurrentInsideOptional, value_serviceMaxCurrent);
+                }
+
+                {
+                    jclass overLoadRatingsStructStructClass_1;
+                    err = chip::JniReferences::GetInstance().GetLocalClassRef(
+                        env, "chip/devicecontroller/ChipStructs$ElectricalProtectionAlarmClusterOverLoadRatingsStruct",
+                        overLoadRatingsStructStructClass_1);
+                    if (err != CHIP_NO_ERROR)
+                    {
+                        ChipLogError(Zcl, "Could not find class ChipStructs$ElectricalProtectionAlarmClusterOverLoadRatingsStruct");
+                        return nullptr;
+                    }
+
+                    jmethodID overLoadRatingsStructStructCtor_1;
+                    err = chip::JniReferences::GetInstance().FindMethod(
+                        env, overLoadRatingsStructStructClass_1, "<init>",
+                        "(Ljava/util/Optional;Ljava/util/Optional;Ljava/util/Optional;Ljava/util/Optional;Ljava/util/Optional;)V",
+                        &overLoadRatingsStructStructCtor_1);
+                    if (err != CHIP_NO_ERROR || overLoadRatingsStructStructCtor_1 == nullptr)
+                    {
+                        ChipLogError(
+                            Zcl, "Could not find ChipStructs$ElectricalProtectionAlarmClusterOverLoadRatingsStruct constructor");
+                        return nullptr;
+                    }
+
+                    value = env->NewObject(overLoadRatingsStructStructClass_1, overLoadRatingsStructStructCtor_1, value_tripCurrent,
+                                           value_tripCurve, value_tripMechanism, value_ultimateMaxCurrent, value_serviceMaxCurrent);
+                }
+            }
+            return value;
+        }
+        case Attributes::OverVoltageRating::Id: {
+            using TypeInfo = Attributes::OverVoltageRating::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            if (cppValue.IsNull())
+            {
+                value = nullptr;
+            }
+            else
+            {
+                jobject value_tripMechanism;
+                if (!cppValue.Value().tripMechanism.HasValue())
+                {
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(nullptr, value_tripMechanism);
+                }
+                else
+                {
+                    jobject value_tripMechanismInsideOptional;
+                    std::string value_tripMechanismInsideOptionalClassName     = "java/lang/Integer";
+                    std::string value_tripMechanismInsideOptionalCtorSignature = "(I)V";
+                    jint jnivalue_tripMechanismInsideOptional = static_cast<jint>(cppValue.Value().tripMechanism.Value().Raw());
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                        value_tripMechanismInsideOptionalClassName.c_str(), value_tripMechanismInsideOptionalCtorSignature.c_str(),
+                        jnivalue_tripMechanismInsideOptional, value_tripMechanismInsideOptional);
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(value_tripMechanismInsideOptional,
+                                                                                               value_tripMechanism);
+                }
+                jobject value_tripVoltage;
+                if (!cppValue.Value().tripVoltage.HasValue())
+                {
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(nullptr, value_tripVoltage);
+                }
+                else
+                {
+                    jobject value_tripVoltageInsideOptional;
+                    std::string value_tripVoltageInsideOptionalClassName     = "java/lang/Long";
+                    std::string value_tripVoltageInsideOptionalCtorSignature = "(J)V";
+                    jlong jnivalue_tripVoltageInsideOptional = static_cast<jlong>(cppValue.Value().tripVoltage.Value());
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                        value_tripVoltageInsideOptionalClassName.c_str(), value_tripVoltageInsideOptionalCtorSignature.c_str(),
+                        jnivalue_tripVoltageInsideOptional, value_tripVoltageInsideOptional);
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(value_tripVoltageInsideOptional,
+                                                                                               value_tripVoltage);
+                }
+                jobject value_maxContinuousOperatingVoltage;
+                if (!cppValue.Value().maxContinuousOperatingVoltage.HasValue())
+                {
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(nullptr,
+                                                                                               value_maxContinuousOperatingVoltage);
+                }
+                else
+                {
+                    jobject value_maxContinuousOperatingVoltageInsideOptional;
+                    std::string value_maxContinuousOperatingVoltageInsideOptionalClassName     = "java/lang/Long";
+                    std::string value_maxContinuousOperatingVoltageInsideOptionalCtorSignature = "(J)V";
+                    jlong jnivalue_maxContinuousOperatingVoltageInsideOptional =
+                        static_cast<jlong>(cppValue.Value().maxContinuousOperatingVoltage.Value());
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                        value_maxContinuousOperatingVoltageInsideOptionalClassName.c_str(),
+                        value_maxContinuousOperatingVoltageInsideOptionalCtorSignature.c_str(),
+                        jnivalue_maxContinuousOperatingVoltageInsideOptional, value_maxContinuousOperatingVoltageInsideOptional);
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(
+                        value_maxContinuousOperatingVoltageInsideOptional, value_maxContinuousOperatingVoltage);
+                }
+                jobject value_responseTime;
+                if (!cppValue.Value().responseTime.HasValue())
+                {
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(nullptr, value_responseTime);
+                }
+                else
+                {
+                    jobject value_responseTimeInsideOptional;
+                    std::string value_responseTimeInsideOptionalClassName     = "java/lang/Long";
+                    std::string value_responseTimeInsideOptionalCtorSignature = "(J)V";
+                    jlong jnivalue_responseTimeInsideOptional = static_cast<jlong>(cppValue.Value().responseTime.Value());
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                        value_responseTimeInsideOptionalClassName.c_str(), value_responseTimeInsideOptionalCtorSignature.c_str(),
+                        jnivalue_responseTimeInsideOptional, value_responseTimeInsideOptional);
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(value_responseTimeInsideOptional,
+                                                                                               value_responseTime);
+                }
+
+                {
+                    jclass overVoltageRatingsStructStructClass_1;
+                    err = chip::JniReferences::GetInstance().GetLocalClassRef(
+                        env, "chip/devicecontroller/ChipStructs$ElectricalProtectionAlarmClusterOverVoltageRatingsStruct",
+                        overVoltageRatingsStructStructClass_1);
+                    if (err != CHIP_NO_ERROR)
+                    {
+                        ChipLogError(Zcl,
+                                     "Could not find class ChipStructs$ElectricalProtectionAlarmClusterOverVoltageRatingsStruct");
+                        return nullptr;
+                    }
+
+                    jmethodID overVoltageRatingsStructStructCtor_1;
+                    err = chip::JniReferences::GetInstance().FindMethod(
+                        env, overVoltageRatingsStructStructClass_1, "<init>",
+                        "(Ljava/util/Optional;Ljava/util/Optional;Ljava/util/Optional;Ljava/util/Optional;)V",
+                        &overVoltageRatingsStructStructCtor_1);
+                    if (err != CHIP_NO_ERROR || overVoltageRatingsStructStructCtor_1 == nullptr)
+                    {
+                        ChipLogError(
+                            Zcl, "Could not find ChipStructs$ElectricalProtectionAlarmClusterOverVoltageRatingsStruct constructor");
+                        return nullptr;
+                    }
+
+                    value = env->NewObject(overVoltageRatingsStructStructClass_1, overVoltageRatingsStructStructCtor_1,
+                                           value_tripMechanism, value_tripVoltage, value_maxContinuousOperatingVoltage,
+                                           value_responseTime);
+                }
+            }
+            return value;
+        }
+        case Attributes::SurgeProtectionRating::Id: {
+            using TypeInfo = Attributes::SurgeProtectionRating::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            if (cppValue.IsNull())
+            {
+                value = nullptr;
+            }
+            else
+            {
+                jobject value_tripMechanism;
+                if (!cppValue.Value().tripMechanism.HasValue())
+                {
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(nullptr, value_tripMechanism);
+                }
+                else
+                {
+                    jobject value_tripMechanismInsideOptional;
+                    std::string value_tripMechanismInsideOptionalClassName     = "java/lang/Integer";
+                    std::string value_tripMechanismInsideOptionalCtorSignature = "(I)V";
+                    jint jnivalue_tripMechanismInsideOptional = static_cast<jint>(cppValue.Value().tripMechanism.Value().Raw());
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                        value_tripMechanismInsideOptionalClassName.c_str(), value_tripMechanismInsideOptionalCtorSignature.c_str(),
+                        jnivalue_tripMechanismInsideOptional, value_tripMechanismInsideOptional);
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(value_tripMechanismInsideOptional,
+                                                                                               value_tripMechanism);
+                }
+                jobject value_protectionClass;
+                if (!cppValue.Value().protectionClass.HasValue())
+                {
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(nullptr, value_protectionClass);
+                }
+                else
+                {
+                    jobject value_protectionClassInsideOptional;
+                    std::string value_protectionClassInsideOptionalClassName     = "java/lang/Integer";
+                    std::string value_protectionClassInsideOptionalCtorSignature = "(I)V";
+                    jint jnivalue_protectionClassInsideOptional = static_cast<jint>(cppValue.Value().protectionClass.Value().Raw());
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                        value_protectionClassInsideOptionalClassName.c_str(),
+                        value_protectionClassInsideOptionalCtorSignature.c_str(), jnivalue_protectionClassInsideOptional,
+                        value_protectionClassInsideOptional);
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(value_protectionClassInsideOptional,
+                                                                                               value_protectionClass);
+                }
+                jobject value_protectionType;
+                if (!cppValue.Value().protectionType.HasValue())
+                {
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(nullptr, value_protectionType);
+                }
+                else
+                {
+                    jobject value_protectionTypeInsideOptional;
+                    std::string value_protectionTypeInsideOptionalClassName     = "java/lang/Integer";
+                    std::string value_protectionTypeInsideOptionalCtorSignature = "(I)V";
+                    jint jnivalue_protectionTypeInsideOptional = static_cast<jint>(cppValue.Value().protectionType.Value().Raw());
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                        value_protectionTypeInsideOptionalClassName.c_str(),
+                        value_protectionTypeInsideOptionalCtorSignature.c_str(), jnivalue_protectionTypeInsideOptional,
+                        value_protectionTypeInsideOptional);
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(value_protectionTypeInsideOptional,
+                                                                                               value_protectionType);
+                }
+                jobject value_maxContinuousOperatingVoltage;
+                if (!cppValue.Value().maxContinuousOperatingVoltage.HasValue())
+                {
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(nullptr,
+                                                                                               value_maxContinuousOperatingVoltage);
+                }
+                else
+                {
+                    jobject value_maxContinuousOperatingVoltageInsideOptional;
+                    std::string value_maxContinuousOperatingVoltageInsideOptionalClassName     = "java/lang/Long";
+                    std::string value_maxContinuousOperatingVoltageInsideOptionalCtorSignature = "(J)V";
+                    jlong jnivalue_maxContinuousOperatingVoltageInsideOptional =
+                        static_cast<jlong>(cppValue.Value().maxContinuousOperatingVoltage.Value());
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                        value_maxContinuousOperatingVoltageInsideOptionalClassName.c_str(),
+                        value_maxContinuousOperatingVoltageInsideOptionalCtorSignature.c_str(),
+                        jnivalue_maxContinuousOperatingVoltageInsideOptional, value_maxContinuousOperatingVoltageInsideOptional);
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(
+                        value_maxContinuousOperatingVoltageInsideOptional, value_maxContinuousOperatingVoltage);
+                }
+                jobject value_maxVoltageProtection;
+                if (!cppValue.Value().maxVoltageProtection.HasValue())
+                {
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(nullptr, value_maxVoltageProtection);
+                }
+                else
+                {
+                    jobject value_maxVoltageProtectionInsideOptional;
+                    std::string value_maxVoltageProtectionInsideOptionalClassName     = "java/lang/Long";
+                    std::string value_maxVoltageProtectionInsideOptionalCtorSignature = "(J)V";
+                    jlong jnivalue_maxVoltageProtectionInsideOptional =
+                        static_cast<jlong>(cppValue.Value().maxVoltageProtection.Value());
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                        value_maxVoltageProtectionInsideOptionalClassName.c_str(),
+                        value_maxVoltageProtectionInsideOptionalCtorSignature.c_str(), jnivalue_maxVoltageProtectionInsideOptional,
+                        value_maxVoltageProtectionInsideOptional);
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(
+                        value_maxVoltageProtectionInsideOptional, value_maxVoltageProtection);
+                }
+                jobject value_maxTemporaryVoltage;
+                if (!cppValue.Value().maxTemporaryVoltage.HasValue())
+                {
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(nullptr, value_maxTemporaryVoltage);
+                }
+                else
+                {
+                    jobject value_maxTemporaryVoltageInsideOptional;
+                    std::string value_maxTemporaryVoltageInsideOptionalClassName     = "java/lang/Long";
+                    std::string value_maxTemporaryVoltageInsideOptionalCtorSignature = "(J)V";
+                    jlong jnivalue_maxTemporaryVoltageInsideOptional =
+                        static_cast<jlong>(cppValue.Value().maxTemporaryVoltage.Value());
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                        value_maxTemporaryVoltageInsideOptionalClassName.c_str(),
+                        value_maxTemporaryVoltageInsideOptionalCtorSignature.c_str(), jnivalue_maxTemporaryVoltageInsideOptional,
+                        value_maxTemporaryVoltageInsideOptional);
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(
+                        value_maxTemporaryVoltageInsideOptional, value_maxTemporaryVoltage);
+                }
+                jobject value_nominalDischargeCurrent;
+                if (!cppValue.Value().nominalDischargeCurrent.HasValue())
+                {
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(nullptr,
+                                                                                               value_nominalDischargeCurrent);
+                }
+                else
+                {
+                    jobject value_nominalDischargeCurrentInsideOptional;
+                    std::string value_nominalDischargeCurrentInsideOptionalClassName     = "java/lang/Long";
+                    std::string value_nominalDischargeCurrentInsideOptionalCtorSignature = "(J)V";
+                    jlong jnivalue_nominalDischargeCurrentInsideOptional =
+                        static_cast<jlong>(cppValue.Value().nominalDischargeCurrent.Value());
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                        value_nominalDischargeCurrentInsideOptionalClassName.c_str(),
+                        value_nominalDischargeCurrentInsideOptionalCtorSignature.c_str(),
+                        jnivalue_nominalDischargeCurrentInsideOptional, value_nominalDischargeCurrentInsideOptional);
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(
+                        value_nominalDischargeCurrentInsideOptional, value_nominalDischargeCurrent);
+                }
+                jobject value_maximumDishargeCurrent;
+                if (!cppValue.Value().maximumDishargeCurrent.HasValue())
+                {
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(nullptr,
+                                                                                               value_maximumDishargeCurrent);
+                }
+                else
+                {
+                    jobject value_maximumDishargeCurrentInsideOptional;
+                    std::string value_maximumDishargeCurrentInsideOptionalClassName     = "java/lang/Long";
+                    std::string value_maximumDishargeCurrentInsideOptionalCtorSignature = "(J)V";
+                    jlong jnivalue_maximumDishargeCurrentInsideOptional =
+                        static_cast<jlong>(cppValue.Value().maximumDishargeCurrent.Value());
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                        value_maximumDishargeCurrentInsideOptionalClassName.c_str(),
+                        value_maximumDishargeCurrentInsideOptionalCtorSignature.c_str(),
+                        jnivalue_maximumDishargeCurrentInsideOptional, value_maximumDishargeCurrentInsideOptional);
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(
+                        value_maximumDishargeCurrentInsideOptional, value_maximumDishargeCurrent);
+                }
+                jobject value_ratedShortCircuitCurrent;
+                if (!cppValue.Value().ratedShortCircuitCurrent.HasValue())
+                {
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(nullptr,
+                                                                                               value_ratedShortCircuitCurrent);
+                }
+                else
+                {
+                    jobject value_ratedShortCircuitCurrentInsideOptional;
+                    std::string value_ratedShortCircuitCurrentInsideOptionalClassName     = "java/lang/Long";
+                    std::string value_ratedShortCircuitCurrentInsideOptionalCtorSignature = "(J)V";
+                    jlong jnivalue_ratedShortCircuitCurrentInsideOptional =
+                        static_cast<jlong>(cppValue.Value().ratedShortCircuitCurrent.Value());
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                        value_ratedShortCircuitCurrentInsideOptionalClassName.c_str(),
+                        value_ratedShortCircuitCurrentInsideOptionalCtorSignature.c_str(),
+                        jnivalue_ratedShortCircuitCurrentInsideOptional, value_ratedShortCircuitCurrentInsideOptional);
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(
+                        value_ratedShortCircuitCurrentInsideOptional, value_ratedShortCircuitCurrent);
+                }
+                jobject value_ratedShortTimeWithstandCurrent;
+                if (!cppValue.Value().ratedShortTimeWithstandCurrent.HasValue())
+                {
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(
+                        nullptr, value_ratedShortTimeWithstandCurrent);
+                }
+                else
+                {
+                    jobject value_ratedShortTimeWithstandCurrentInsideOptional;
+                    std::string value_ratedShortTimeWithstandCurrentInsideOptionalClassName     = "java/lang/Long";
+                    std::string value_ratedShortTimeWithstandCurrentInsideOptionalCtorSignature = "(J)V";
+                    jlong jnivalue_ratedShortTimeWithstandCurrentInsideOptional =
+                        static_cast<jlong>(cppValue.Value().ratedShortTimeWithstandCurrent.Value());
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                        value_ratedShortTimeWithstandCurrentInsideOptionalClassName.c_str(),
+                        value_ratedShortTimeWithstandCurrentInsideOptionalCtorSignature.c_str(),
+                        jnivalue_ratedShortTimeWithstandCurrentInsideOptional, value_ratedShortTimeWithstandCurrentInsideOptional);
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(
+                        value_ratedShortTimeWithstandCurrentInsideOptional, value_ratedShortTimeWithstandCurrent);
+                }
+                jobject value_energyAbsorptionCapability;
+                if (!cppValue.Value().energyAbsorptionCapability.HasValue())
+                {
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(nullptr,
+                                                                                               value_energyAbsorptionCapability);
+                }
+                else
+                {
+                    jobject value_energyAbsorptionCapabilityInsideOptional;
+                    std::string value_energyAbsorptionCapabilityInsideOptionalClassName     = "java/lang/Long";
+                    std::string value_energyAbsorptionCapabilityInsideOptionalCtorSignature = "(J)V";
+                    jlong jnivalue_energyAbsorptionCapabilityInsideOptional =
+                        static_cast<jlong>(cppValue.Value().energyAbsorptionCapability.Value());
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                        value_energyAbsorptionCapabilityInsideOptionalClassName.c_str(),
+                        value_energyAbsorptionCapabilityInsideOptionalCtorSignature.c_str(),
+                        jnivalue_energyAbsorptionCapabilityInsideOptional, value_energyAbsorptionCapabilityInsideOptional);
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(
+                        value_energyAbsorptionCapabilityInsideOptional, value_energyAbsorptionCapability);
+                }
+                jobject value_responseTime;
+                if (!cppValue.Value().responseTime.HasValue())
+                {
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(nullptr, value_responseTime);
+                }
+                else
+                {
+                    jobject value_responseTimeInsideOptional;
+                    std::string value_responseTimeInsideOptionalClassName     = "java/lang/Long";
+                    std::string value_responseTimeInsideOptionalCtorSignature = "(J)V";
+                    jlong jnivalue_responseTimeInsideOptional = static_cast<jlong>(cppValue.Value().responseTime.Value());
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                        value_responseTimeInsideOptionalClassName.c_str(), value_responseTimeInsideOptionalCtorSignature.c_str(),
+                        jnivalue_responseTimeInsideOptional, value_responseTimeInsideOptional);
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(value_responseTimeInsideOptional,
+                                                                                               value_responseTime);
+                }
+
+                {
+                    jclass surgeProtectionRatingsStructStructClass_1;
+                    err = chip::JniReferences::GetInstance().GetLocalClassRef(
+                        env, "chip/devicecontroller/ChipStructs$ElectricalProtectionAlarmClusterSurgeProtectionRatingsStruct",
+                        surgeProtectionRatingsStructStructClass_1);
+                    if (err != CHIP_NO_ERROR)
+                    {
+                        ChipLogError(
+                            Zcl, "Could not find class ChipStructs$ElectricalProtectionAlarmClusterSurgeProtectionRatingsStruct");
+                        return nullptr;
+                    }
+
+                    jmethodID surgeProtectionRatingsStructStructCtor_1;
+                    err = chip::JniReferences::GetInstance().FindMethod(
+                        env, surgeProtectionRatingsStructStructClass_1, "<init>",
+                        "(Ljava/util/Optional;Ljava/util/Optional;Ljava/util/Optional;Ljava/util/Optional;Ljava/util/"
+                        "Optional;Ljava/util/Optional;Ljava/util/Optional;Ljava/util/Optional;Ljava/util/Optional;Ljava/util/"
+                        "Optional;Ljava/util/Optional;Ljava/util/Optional;)V",
+                        &surgeProtectionRatingsStructStructCtor_1);
+                    if (err != CHIP_NO_ERROR || surgeProtectionRatingsStructStructCtor_1 == nullptr)
+                    {
+                        ChipLogError(
+                            Zcl,
+                            "Could not find ChipStructs$ElectricalProtectionAlarmClusterSurgeProtectionRatingsStruct constructor");
+                        return nullptr;
+                    }
+
+                    value =
+                        env->NewObject(surgeProtectionRatingsStructStructClass_1, surgeProtectionRatingsStructStructCtor_1,
+                                       value_tripMechanism, value_protectionClass, value_protectionType,
+                                       value_maxContinuousOperatingVoltage, value_maxVoltageProtection, value_maxTemporaryVoltage,
+                                       value_nominalDischargeCurrent, value_maximumDishargeCurrent, value_ratedShortCircuitCurrent,
+                                       value_ratedShortTimeWithstandCurrent, value_energyAbsorptionCapability, value_responseTime);
+                }
+            }
+            return value;
+        }
+        case Attributes::ShortCircuitRating::Id: {
+            using TypeInfo = Attributes::ShortCircuitRating::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            if (cppValue.IsNull())
+            {
+                value = nullptr;
+            }
+            else
+            {
+                jobject value_tripCurrent;
+                if (!cppValue.Value().tripCurrent.HasValue())
+                {
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(nullptr, value_tripCurrent);
+                }
+                else
+                {
+                    jobject value_tripCurrentInsideOptional;
+                    std::string value_tripCurrentInsideOptionalClassName     = "java/lang/Long";
+                    std::string value_tripCurrentInsideOptionalCtorSignature = "(J)V";
+                    jlong jnivalue_tripCurrentInsideOptional = static_cast<jlong>(cppValue.Value().tripCurrent.Value());
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                        value_tripCurrentInsideOptionalClassName.c_str(), value_tripCurrentInsideOptionalCtorSignature.c_str(),
+                        jnivalue_tripCurrentInsideOptional, value_tripCurrentInsideOptional);
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(value_tripCurrentInsideOptional,
+                                                                                               value_tripCurrent);
+                }
+                jobject value_tripMechanism;
+                if (!cppValue.Value().tripMechanism.HasValue())
+                {
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(nullptr, value_tripMechanism);
+                }
+                else
+                {
+                    jobject value_tripMechanismInsideOptional;
+                    std::string value_tripMechanismInsideOptionalClassName     = "java/lang/Integer";
+                    std::string value_tripMechanismInsideOptionalCtorSignature = "(I)V";
+                    jint jnivalue_tripMechanismInsideOptional = static_cast<jint>(cppValue.Value().tripMechanism.Value().Raw());
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                        value_tripMechanismInsideOptionalClassName.c_str(), value_tripMechanismInsideOptionalCtorSignature.c_str(),
+                        jnivalue_tripMechanismInsideOptional, value_tripMechanismInsideOptional);
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(value_tripMechanismInsideOptional,
+                                                                                               value_tripMechanism);
+                }
+                jobject value_tripCurve;
+                if (!cppValue.Value().tripCurve.HasValue())
+                {
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(nullptr, value_tripCurve);
+                }
+                else
+                {
+                    jobject value_tripCurveInsideOptional;
+                    std::string value_tripCurveInsideOptionalClassName     = "java/lang/Integer";
+                    std::string value_tripCurveInsideOptionalCtorSignature = "(I)V";
+                    jint jnivalue_tripCurveInsideOptional                  = static_cast<jint>(cppValue.Value().tripCurve.Value());
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                        value_tripCurveInsideOptionalClassName.c_str(), value_tripCurveInsideOptionalCtorSignature.c_str(),
+                        jnivalue_tripCurveInsideOptional, value_tripCurveInsideOptional);
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(value_tripCurveInsideOptional,
+                                                                                               value_tripCurve);
+                }
+                jobject value_ultimateMaxCurrent;
+                if (!cppValue.Value().ultimateMaxCurrent.HasValue())
+                {
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(nullptr, value_ultimateMaxCurrent);
+                }
+                else
+                {
+                    jobject value_ultimateMaxCurrentInsideOptional;
+                    std::string value_ultimateMaxCurrentInsideOptionalClassName     = "java/lang/Long";
+                    std::string value_ultimateMaxCurrentInsideOptionalCtorSignature = "(J)V";
+                    jlong jnivalue_ultimateMaxCurrentInsideOptional =
+                        static_cast<jlong>(cppValue.Value().ultimateMaxCurrent.Value());
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                        value_ultimateMaxCurrentInsideOptionalClassName.c_str(),
+                        value_ultimateMaxCurrentInsideOptionalCtorSignature.c_str(), jnivalue_ultimateMaxCurrentInsideOptional,
+                        value_ultimateMaxCurrentInsideOptional);
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(
+                        value_ultimateMaxCurrentInsideOptional, value_ultimateMaxCurrent);
+                }
+                jobject value_serviceMaxCurrent;
+                if (!cppValue.Value().serviceMaxCurrent.HasValue())
+                {
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(nullptr, value_serviceMaxCurrent);
+                }
+                else
+                {
+                    jobject value_serviceMaxCurrentInsideOptional;
+                    std::string value_serviceMaxCurrentInsideOptionalClassName     = "java/lang/Long";
+                    std::string value_serviceMaxCurrentInsideOptionalCtorSignature = "(J)V";
+                    jlong jnivalue_serviceMaxCurrentInsideOptional = static_cast<jlong>(cppValue.Value().serviceMaxCurrent.Value());
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                        value_serviceMaxCurrentInsideOptionalClassName.c_str(),
+                        value_serviceMaxCurrentInsideOptionalCtorSignature.c_str(), jnivalue_serviceMaxCurrentInsideOptional,
+                        value_serviceMaxCurrentInsideOptional);
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(
+                        value_serviceMaxCurrentInsideOptional, value_serviceMaxCurrent);
+                }
+                jobject value_maxCurrent;
+                if (!cppValue.Value().maxCurrent.HasValue())
+                {
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(nullptr, value_maxCurrent);
+                }
+                else
+                {
+                    jobject value_maxCurrentInsideOptional;
+                    std::string value_maxCurrentInsideOptionalClassName     = "java/lang/Long";
+                    std::string value_maxCurrentInsideOptionalCtorSignature = "(J)V";
+                    jlong jnivalue_maxCurrentInsideOptional = static_cast<jlong>(cppValue.Value().maxCurrent.Value());
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                        value_maxCurrentInsideOptionalClassName.c_str(), value_maxCurrentInsideOptionalCtorSignature.c_str(),
+                        jnivalue_maxCurrentInsideOptional, value_maxCurrentInsideOptional);
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(value_maxCurrentInsideOptional,
+                                                                                               value_maxCurrent);
+                }
+
+                {
+                    jclass shortCircuitRatingsStructStructClass_1;
+                    err = chip::JniReferences::GetInstance().GetLocalClassRef(
+                        env, "chip/devicecontroller/ChipStructs$ElectricalProtectionAlarmClusterShortCircuitRatingsStruct",
+                        shortCircuitRatingsStructStructClass_1);
+                    if (err != CHIP_NO_ERROR)
+                    {
+                        ChipLogError(Zcl,
+                                     "Could not find class ChipStructs$ElectricalProtectionAlarmClusterShortCircuitRatingsStruct");
+                        return nullptr;
+                    }
+
+                    jmethodID shortCircuitRatingsStructStructCtor_1;
+                    err = chip::JniReferences::GetInstance().FindMethod(
+                        env, shortCircuitRatingsStructStructClass_1, "<init>",
+                        "(Ljava/util/Optional;Ljava/util/Optional;Ljava/util/Optional;Ljava/util/Optional;Ljava/util/"
+                        "Optional;Ljava/util/Optional;)V",
+                        &shortCircuitRatingsStructStructCtor_1);
+                    if (err != CHIP_NO_ERROR || shortCircuitRatingsStructStructCtor_1 == nullptr)
+                    {
+                        ChipLogError(
+                            Zcl,
+                            "Could not find ChipStructs$ElectricalProtectionAlarmClusterShortCircuitRatingsStruct constructor");
+                        return nullptr;
+                    }
+
+                    value = env->NewObject(shortCircuitRatingsStructStructClass_1, shortCircuitRatingsStructStructCtor_1,
+                                           value_tripCurrent, value_tripMechanism, value_tripCurve, value_ultimateMaxCurrent,
+                                           value_serviceMaxCurrent, value_maxCurrent);
+                }
+            }
+            return value;
+        }
+        case Attributes::ResidualCurrentRating::Id: {
+            using TypeInfo = Attributes::ResidualCurrentRating::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            if (cppValue.IsNull())
+            {
+                value = nullptr;
+            }
+            else
+            {
+                jobject value_currentSensitivity;
+                if (!cppValue.Value().currentSensitivity.HasValue())
+                {
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(nullptr, value_currentSensitivity);
+                }
+                else
+                {
+                    jobject value_currentSensitivityInsideOptional;
+                    std::string value_currentSensitivityInsideOptionalClassName     = "java/lang/Long";
+                    std::string value_currentSensitivityInsideOptionalCtorSignature = "(J)V";
+                    jlong jnivalue_currentSensitivityInsideOptional =
+                        static_cast<jlong>(cppValue.Value().currentSensitivity.Value());
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                        value_currentSensitivityInsideOptionalClassName.c_str(),
+                        value_currentSensitivityInsideOptionalCtorSignature.c_str(), jnivalue_currentSensitivityInsideOptional,
+                        value_currentSensitivityInsideOptional);
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(
+                        value_currentSensitivityInsideOptional, value_currentSensitivity);
+                }
+                jobject value_tripMechanism;
+                if (!cppValue.Value().tripMechanism.HasValue())
+                {
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(nullptr, value_tripMechanism);
+                }
+                else
+                {
+                    jobject value_tripMechanismInsideOptional;
+                    std::string value_tripMechanismInsideOptionalClassName     = "java/lang/Integer";
+                    std::string value_tripMechanismInsideOptionalCtorSignature = "(I)V";
+                    jint jnivalue_tripMechanismInsideOptional = static_cast<jint>(cppValue.Value().tripMechanism.Value().Raw());
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                        value_tripMechanismInsideOptionalClassName.c_str(), value_tripMechanismInsideOptionalCtorSignature.c_str(),
+                        jnivalue_tripMechanismInsideOptional, value_tripMechanismInsideOptional);
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(value_tripMechanismInsideOptional,
+                                                                                               value_tripMechanism);
+                }
+                jobject value_voltageDependent;
+                if (!cppValue.Value().voltageDependent.HasValue())
+                {
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(nullptr, value_voltageDependent);
+                }
+                else
+                {
+                    jobject value_voltageDependentInsideOptional;
+                    std::string value_voltageDependentInsideOptionalClassName     = "java/lang/Boolean";
+                    std::string value_voltageDependentInsideOptionalCtorSignature = "(Z)V";
+                    jboolean jnivalue_voltageDependentInsideOptional =
+                        static_cast<jboolean>(cppValue.Value().voltageDependent.Value());
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jboolean>(
+                        value_voltageDependentInsideOptionalClassName.c_str(),
+                        value_voltageDependentInsideOptionalCtorSignature.c_str(), jnivalue_voltageDependentInsideOptional,
+                        value_voltageDependentInsideOptional);
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(value_voltageDependentInsideOptional,
+                                                                                               value_voltageDependent);
+                }
+                jobject value_groundFaultClass;
+                if (!cppValue.Value().groundFaultClass.HasValue())
+                {
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(nullptr, value_groundFaultClass);
+                }
+                else
+                {
+                    jobject value_groundFaultClassInsideOptional;
+                    std::string value_groundFaultClassInsideOptionalClassName     = "java/lang/Integer";
+                    std::string value_groundFaultClassInsideOptionalCtorSignature = "(I)V";
+                    jint jnivalue_groundFaultClassInsideOptional = static_cast<jint>(cppValue.Value().groundFaultClass.Value());
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                        value_groundFaultClassInsideOptionalClassName.c_str(),
+                        value_groundFaultClassInsideOptionalCtorSignature.c_str(), jnivalue_groundFaultClassInsideOptional,
+                        value_groundFaultClassInsideOptional);
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(value_groundFaultClassInsideOptional,
+                                                                                               value_groundFaultClass);
+                }
+                jobject value_waveform;
+                if (!cppValue.Value().waveform.HasValue())
+                {
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(nullptr, value_waveform);
+                }
+                else
+                {
+                    jobject value_waveformInsideOptional;
+                    std::string value_waveformInsideOptionalClassName     = "java/lang/Integer";
+                    std::string value_waveformInsideOptionalCtorSignature = "(I)V";
+                    jint jnivalue_waveformInsideOptional                  = static_cast<jint>(cppValue.Value().waveform.Value());
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                        value_waveformInsideOptionalClassName.c_str(), value_waveformInsideOptionalCtorSignature.c_str(),
+                        jnivalue_waveformInsideOptional, value_waveformInsideOptional);
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(value_waveformInsideOptional,
+                                                                                               value_waveform);
+                }
+                jobject value_trippingCharacteristic;
+                if (!cppValue.Value().trippingCharacteristic.HasValue())
+                {
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(nullptr,
+                                                                                               value_trippingCharacteristic);
+                }
+                else
+                {
+                    jobject value_trippingCharacteristicInsideOptional;
+                    std::string value_trippingCharacteristicInsideOptionalClassName     = "java/lang/Integer";
+                    std::string value_trippingCharacteristicInsideOptionalCtorSignature = "(I)V";
+                    jint jnivalue_trippingCharacteristicInsideOptional =
+                        static_cast<jint>(cppValue.Value().trippingCharacteristic.Value().Raw());
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                        value_trippingCharacteristicInsideOptionalClassName.c_str(),
+                        value_trippingCharacteristicInsideOptionalCtorSignature.c_str(),
+                        jnivalue_trippingCharacteristicInsideOptional, value_trippingCharacteristicInsideOptional);
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(
+                        value_trippingCharacteristicInsideOptional, value_trippingCharacteristic);
+                }
+                jobject value_ultimateMaxCurrent;
+                if (!cppValue.Value().ultimateMaxCurrent.HasValue())
+                {
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(nullptr, value_ultimateMaxCurrent);
+                }
+                else
+                {
+                    jobject value_ultimateMaxCurrentInsideOptional;
+                    std::string value_ultimateMaxCurrentInsideOptionalClassName     = "java/lang/Long";
+                    std::string value_ultimateMaxCurrentInsideOptionalCtorSignature = "(J)V";
+                    jlong jnivalue_ultimateMaxCurrentInsideOptional =
+                        static_cast<jlong>(cppValue.Value().ultimateMaxCurrent.Value());
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                        value_ultimateMaxCurrentInsideOptionalClassName.c_str(),
+                        value_ultimateMaxCurrentInsideOptionalCtorSignature.c_str(), jnivalue_ultimateMaxCurrentInsideOptional,
+                        value_ultimateMaxCurrentInsideOptional);
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(
+                        value_ultimateMaxCurrentInsideOptional, value_ultimateMaxCurrent);
+                }
+                jobject value_serviceMaxCurrent;
+                if (!cppValue.Value().serviceMaxCurrent.HasValue())
+                {
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(nullptr, value_serviceMaxCurrent);
+                }
+                else
+                {
+                    jobject value_serviceMaxCurrentInsideOptional;
+                    std::string value_serviceMaxCurrentInsideOptionalClassName     = "java/lang/Long";
+                    std::string value_serviceMaxCurrentInsideOptionalCtorSignature = "(J)V";
+                    jlong jnivalue_serviceMaxCurrentInsideOptional = static_cast<jlong>(cppValue.Value().serviceMaxCurrent.Value());
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                        value_serviceMaxCurrentInsideOptionalClassName.c_str(),
+                        value_serviceMaxCurrentInsideOptionalCtorSignature.c_str(), jnivalue_serviceMaxCurrentInsideOptional,
+                        value_serviceMaxCurrentInsideOptional);
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(
+                        value_serviceMaxCurrentInsideOptional, value_serviceMaxCurrent);
+                }
+
+                {
+                    jclass residualCurrentFaultRatingsStructStructClass_1;
+                    err = chip::JniReferences::GetInstance().GetLocalClassRef(
+                        env, "chip/devicecontroller/ChipStructs$ElectricalProtectionAlarmClusterResidualCurrentFaultRatingsStruct",
+                        residualCurrentFaultRatingsStructStructClass_1);
+                    if (err != CHIP_NO_ERROR)
+                    {
+                        ChipLogError(
+                            Zcl,
+                            "Could not find class ChipStructs$ElectricalProtectionAlarmClusterResidualCurrentFaultRatingsStruct");
+                        return nullptr;
+                    }
+
+                    jmethodID residualCurrentFaultRatingsStructStructCtor_1;
+                    err = chip::JniReferences::GetInstance().FindMethod(
+                        env, residualCurrentFaultRatingsStructStructClass_1, "<init>",
+                        "(Ljava/util/Optional;Ljava/util/Optional;Ljava/util/Optional;Ljava/util/Optional;Ljava/util/"
+                        "Optional;Ljava/util/Optional;Ljava/util/Optional;Ljava/util/Optional;)V",
+                        &residualCurrentFaultRatingsStructStructCtor_1);
+                    if (err != CHIP_NO_ERROR || residualCurrentFaultRatingsStructStructCtor_1 == nullptr)
+                    {
+                        ChipLogError(Zcl,
+                                     "Could not find ChipStructs$ElectricalProtectionAlarmClusterResidualCurrentFaultRatingsStruct "
+                                     "constructor");
+                        return nullptr;
+                    }
+
+                    value = env->NewObject(residualCurrentFaultRatingsStructStructClass_1,
+                                           residualCurrentFaultRatingsStructStructCtor_1, value_currentSensitivity,
+                                           value_tripMechanism, value_voltageDependent, value_groundFaultClass, value_waveform,
+                                           value_trippingCharacteristic, value_ultimateMaxCurrent, value_serviceMaxCurrent);
+                }
+            }
+            return value;
+        }
+        case Attributes::ArcFaultRating::Id: {
+            using TypeInfo = Attributes::ArcFaultRating::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            if (cppValue.IsNull())
+            {
+                value = nullptr;
+            }
+            else
+            {
+                jobject value_seriesArcCurrentSensitivity;
+                if (!cppValue.Value().seriesArcCurrentSensitivity.HasValue())
+                {
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(nullptr,
+                                                                                               value_seriesArcCurrentSensitivity);
+                }
+                else
+                {
+                    jobject value_seriesArcCurrentSensitivityInsideOptional;
+                    std::string value_seriesArcCurrentSensitivityInsideOptionalClassName     = "java/lang/Long";
+                    std::string value_seriesArcCurrentSensitivityInsideOptionalCtorSignature = "(J)V";
+                    jlong jnivalue_seriesArcCurrentSensitivityInsideOptional =
+                        static_cast<jlong>(cppValue.Value().seriesArcCurrentSensitivity.Value());
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                        value_seriesArcCurrentSensitivityInsideOptionalClassName.c_str(),
+                        value_seriesArcCurrentSensitivityInsideOptionalCtorSignature.c_str(),
+                        jnivalue_seriesArcCurrentSensitivityInsideOptional, value_seriesArcCurrentSensitivityInsideOptional);
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(
+                        value_seriesArcCurrentSensitivityInsideOptional, value_seriesArcCurrentSensitivity);
+                }
+                jobject value_parallelArcCurrentSensitivity;
+                if (!cppValue.Value().parallelArcCurrentSensitivity.HasValue())
+                {
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(nullptr,
+                                                                                               value_parallelArcCurrentSensitivity);
+                }
+                else
+                {
+                    jobject value_parallelArcCurrentSensitivityInsideOptional;
+                    std::string value_parallelArcCurrentSensitivityInsideOptionalClassName     = "java/lang/Long";
+                    std::string value_parallelArcCurrentSensitivityInsideOptionalCtorSignature = "(J)V";
+                    jlong jnivalue_parallelArcCurrentSensitivityInsideOptional =
+                        static_cast<jlong>(cppValue.Value().parallelArcCurrentSensitivity.Value());
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                        value_parallelArcCurrentSensitivityInsideOptionalClassName.c_str(),
+                        value_parallelArcCurrentSensitivityInsideOptionalCtorSignature.c_str(),
+                        jnivalue_parallelArcCurrentSensitivityInsideOptional, value_parallelArcCurrentSensitivityInsideOptional);
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(
+                        value_parallelArcCurrentSensitivityInsideOptional, value_parallelArcCurrentSensitivity);
+                }
+                jobject value_supportedArcCauses;
+                if (!cppValue.Value().supportedArcCauses.HasValue())
+                {
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(nullptr, value_supportedArcCauses);
+                }
+                else
+                {
+                    jobject value_supportedArcCausesInsideOptional;
+                    std::string value_supportedArcCausesInsideOptionalClassName     = "java/lang/Integer";
+                    std::string value_supportedArcCausesInsideOptionalCtorSignature = "(I)V";
+                    jint jnivalue_supportedArcCausesInsideOptional =
+                        static_cast<jint>(cppValue.Value().supportedArcCauses.Value().Raw());
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                        value_supportedArcCausesInsideOptionalClassName.c_str(),
+                        value_supportedArcCausesInsideOptionalCtorSignature.c_str(), jnivalue_supportedArcCausesInsideOptional,
+                        value_supportedArcCausesInsideOptional);
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(
+                        value_supportedArcCausesInsideOptional, value_supportedArcCauses);
+                }
+
+                {
+                    jclass arcFaultRatingsStructStructClass_1;
+                    err = chip::JniReferences::GetInstance().GetLocalClassRef(
+                        env, "chip/devicecontroller/ChipStructs$ElectricalProtectionAlarmClusterArcFaultRatingsStruct",
+                        arcFaultRatingsStructStructClass_1);
+                    if (err != CHIP_NO_ERROR)
+                    {
+                        ChipLogError(Zcl, "Could not find class ChipStructs$ElectricalProtectionAlarmClusterArcFaultRatingsStruct");
+                        return nullptr;
+                    }
+
+                    jmethodID arcFaultRatingsStructStructCtor_1;
+                    err = chip::JniReferences::GetInstance().FindMethod(
+                        env, arcFaultRatingsStructStructClass_1, "<init>",
+                        "(Ljava/util/Optional;Ljava/util/Optional;Ljava/util/Optional;)V", &arcFaultRatingsStructStructCtor_1);
+                    if (err != CHIP_NO_ERROR || arcFaultRatingsStructStructCtor_1 == nullptr)
+                    {
+                        ChipLogError(
+                            Zcl, "Could not find ChipStructs$ElectricalProtectionAlarmClusterArcFaultRatingsStruct constructor");
+                        return nullptr;
+                    }
+
+                    value = env->NewObject(arcFaultRatingsStructStructClass_1, arcFaultRatingsStructStructCtor_1,
+                                           value_seriesArcCurrentSensitivity, value_parallelArcCurrentSensitivity,
+                                           value_supportedArcCauses);
+                }
             }
             return value;
         }
@@ -39783,6 +41026,334 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().AddToList(value, newElement_1);
                 }
             }
+            return value;
+        }
+        case Attributes::GeneratedCommandList::Id: {
+            using TypeInfo = Attributes::GeneratedCommandList::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateArrayList(value);
+
+            auto iter_value_0 = cppValue.begin();
+            while (iter_value_0.Next())
+            {
+                auto & entry_0 = iter_value_0.GetValue();
+                jobject newElement_0;
+                std::string newElement_0ClassName     = "java/lang/Long";
+                std::string newElement_0CtorSignature = "(J)V";
+                jlong jninewElement_0                 = static_cast<jlong>(entry_0);
+                TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                    newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), jninewElement_0, newElement_0);
+                TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().AddToList(value, newElement_0);
+            }
+            return value;
+        }
+        case Attributes::AcceptedCommandList::Id: {
+            using TypeInfo = Attributes::AcceptedCommandList::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateArrayList(value);
+
+            auto iter_value_0 = cppValue.begin();
+            while (iter_value_0.Next())
+            {
+                auto & entry_0 = iter_value_0.GetValue();
+                jobject newElement_0;
+                std::string newElement_0ClassName     = "java/lang/Long";
+                std::string newElement_0CtorSignature = "(J)V";
+                jlong jninewElement_0                 = static_cast<jlong>(entry_0);
+                TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                    newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), jninewElement_0, newElement_0);
+                TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().AddToList(value, newElement_0);
+            }
+            return value;
+        }
+        case Attributes::AttributeList::Id: {
+            using TypeInfo = Attributes::AttributeList::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateArrayList(value);
+
+            auto iter_value_0 = cppValue.begin();
+            while (iter_value_0.Next())
+            {
+                auto & entry_0 = iter_value_0.GetValue();
+                jobject newElement_0;
+                std::string newElement_0ClassName     = "java/lang/Long";
+                std::string newElement_0CtorSignature = "(J)V";
+                jlong jninewElement_0                 = static_cast<jlong>(entry_0);
+                TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                    newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), jninewElement_0, newElement_0);
+                TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().AddToList(value, newElement_0);
+            }
+            return value;
+        }
+        case Attributes::FeatureMap::Id: {
+            using TypeInfo = Attributes::FeatureMap::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            std::string valueClassName     = "java/lang/Long";
+            std::string valueCtorSignature = "(J)V";
+            jlong jnivalue                 = static_cast<jlong>(cppValue);
+            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                valueClassName.c_str(), valueCtorSignature.c_str(), jnivalue, value);
+            return value;
+        }
+        case Attributes::ClusterRevision::Id: {
+            using TypeInfo = Attributes::ClusterRevision::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            std::string valueClassName     = "java/lang/Integer";
+            std::string valueCtorSignature = "(I)V";
+            jint jnivalue                  = static_cast<jint>(cppValue);
+            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                valueClassName.c_str(), valueCtorSignature.c_str(), jnivalue, value);
+            return value;
+        }
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
+            break;
+        }
+        break;
+    }
+    case app::Clusters::SmokeConcentrationMeasurement::Id: {
+        using namespace app::Clusters::SmokeConcentrationMeasurement;
+        switch (aPath.mAttributeId)
+        {
+        case Attributes::MeasuredValue::Id: {
+            using TypeInfo = Attributes::MeasuredValue::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            if (cppValue.IsNull())
+            {
+                value = nullptr;
+            }
+            else
+            {
+                std::string valueClassName     = "java/lang/Float";
+                std::string valueCtorSignature = "(F)V";
+                jfloat jnivalue                = static_cast<jfloat>(cppValue.Value());
+                TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jfloat>(
+                    valueClassName.c_str(), valueCtorSignature.c_str(), jnivalue, value);
+            }
+            return value;
+        }
+        case Attributes::MinMeasuredValue::Id: {
+            using TypeInfo = Attributes::MinMeasuredValue::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            if (cppValue.IsNull())
+            {
+                value = nullptr;
+            }
+            else
+            {
+                std::string valueClassName     = "java/lang/Float";
+                std::string valueCtorSignature = "(F)V";
+                jfloat jnivalue                = static_cast<jfloat>(cppValue.Value());
+                TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jfloat>(
+                    valueClassName.c_str(), valueCtorSignature.c_str(), jnivalue, value);
+            }
+            return value;
+        }
+        case Attributes::MaxMeasuredValue::Id: {
+            using TypeInfo = Attributes::MaxMeasuredValue::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            if (cppValue.IsNull())
+            {
+                value = nullptr;
+            }
+            else
+            {
+                std::string valueClassName     = "java/lang/Float";
+                std::string valueCtorSignature = "(F)V";
+                jfloat jnivalue                = static_cast<jfloat>(cppValue.Value());
+                TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jfloat>(
+                    valueClassName.c_str(), valueCtorSignature.c_str(), jnivalue, value);
+            }
+            return value;
+        }
+        case Attributes::PeakMeasuredValue::Id: {
+            using TypeInfo = Attributes::PeakMeasuredValue::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            if (cppValue.IsNull())
+            {
+                value = nullptr;
+            }
+            else
+            {
+                std::string valueClassName     = "java/lang/Float";
+                std::string valueCtorSignature = "(F)V";
+                jfloat jnivalue                = static_cast<jfloat>(cppValue.Value());
+                TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jfloat>(
+                    valueClassName.c_str(), valueCtorSignature.c_str(), jnivalue, value);
+            }
+            return value;
+        }
+        case Attributes::PeakMeasuredValueWindow::Id: {
+            using TypeInfo = Attributes::PeakMeasuredValueWindow::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            std::string valueClassName     = "java/lang/Long";
+            std::string valueCtorSignature = "(J)V";
+            jlong jnivalue                 = static_cast<jlong>(cppValue);
+            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                valueClassName.c_str(), valueCtorSignature.c_str(), jnivalue, value);
+            return value;
+        }
+        case Attributes::AverageMeasuredValue::Id: {
+            using TypeInfo = Attributes::AverageMeasuredValue::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            if (cppValue.IsNull())
+            {
+                value = nullptr;
+            }
+            else
+            {
+                std::string valueClassName     = "java/lang/Float";
+                std::string valueCtorSignature = "(F)V";
+                jfloat jnivalue                = static_cast<jfloat>(cppValue.Value());
+                TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jfloat>(
+                    valueClassName.c_str(), valueCtorSignature.c_str(), jnivalue, value);
+            }
+            return value;
+        }
+        case Attributes::AverageMeasuredValueWindow::Id: {
+            using TypeInfo = Attributes::AverageMeasuredValueWindow::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            std::string valueClassName     = "java/lang/Long";
+            std::string valueCtorSignature = "(J)V";
+            jlong jnivalue                 = static_cast<jlong>(cppValue);
+            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                valueClassName.c_str(), valueCtorSignature.c_str(), jnivalue, value);
+            return value;
+        }
+        case Attributes::Uncertainty::Id: {
+            using TypeInfo = Attributes::Uncertainty::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            std::string valueClassName     = "java/lang/Float";
+            std::string valueCtorSignature = "(F)V";
+            jfloat jnivalue                = static_cast<jfloat>(cppValue);
+            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jfloat>(
+                valueClassName.c_str(), valueCtorSignature.c_str(), jnivalue, value);
+            return value;
+        }
+        case Attributes::MeasurementUnit::Id: {
+            using TypeInfo = Attributes::MeasurementUnit::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            std::string valueClassName     = "java/lang/Integer";
+            std::string valueCtorSignature = "(I)V";
+            jint jnivalue                  = static_cast<jint>(cppValue);
+            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                valueClassName.c_str(), valueCtorSignature.c_str(), jnivalue, value);
+            return value;
+        }
+        case Attributes::MeasurementMedium::Id: {
+            using TypeInfo = Attributes::MeasurementMedium::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            std::string valueClassName     = "java/lang/Integer";
+            std::string valueCtorSignature = "(I)V";
+            jint jnivalue                  = static_cast<jint>(cppValue);
+            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                valueClassName.c_str(), valueCtorSignature.c_str(), jnivalue, value);
+            return value;
+        }
+        case Attributes::LevelValue::Id: {
+            using TypeInfo = Attributes::LevelValue::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            std::string valueClassName     = "java/lang/Integer";
+            std::string valueCtorSignature = "(I)V";
+            jint jnivalue                  = static_cast<jint>(cppValue);
+            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                valueClassName.c_str(), valueCtorSignature.c_str(), jnivalue, value);
             return value;
         }
         case Attributes::GeneratedCommandList::Id: {
