@@ -2277,7 +2277,7 @@ cluster PowerTopology = 156 {
 
   readonly attribute optional endpoint_no availableEndpoints[] = 0;
   readonly attribute optional endpoint_no activeEndpoints[] = 1;
-  attribute optional CircuitNodeStruct electricalCircuitNodes[] = 2;
+  provisional attribute optional CircuitNodeStruct electricalCircuitNodes[] = 2;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
