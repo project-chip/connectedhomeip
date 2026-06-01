@@ -68,6 +68,7 @@ public:
     bool SetInterconnectCOAlarm(EndpointId, SmokeCoAlarm::AlarmStateEnum v);
     bool SetContaminationState(EndpointId, SmokeCoAlarm::ContaminationStateEnum v);
     bool SetSmokeSensitivityLevel(EndpointId, SmokeCoAlarm::SensitivityEnum v);
+    bool SetExpiryDate(EndpointId, uint32_t v);
     bool SetUnmountedState(EndpointId, bool v);
 
     chip::BitFlags<SmokeCoAlarm::Feature> GetFeatures() const;

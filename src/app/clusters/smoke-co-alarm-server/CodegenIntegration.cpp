@@ -124,6 +124,10 @@ bool SmokeCoAlarmServer::SetSmokeSensitivityLevel(EndpointId, SensitivityEnum v)
 {
     return Cluster().SetSmokeSensitivityLevel(v);
 }
+bool SmokeCoAlarmServer::SetExpiryDate(EndpointId, uint32_t v)
+{
+    return Cluster().SetExpiryDate(v);
+}
 bool SmokeCoAlarmServer::SetUnmountedState(EndpointId, bool v)
 {
     return Cluster().SetUnmountedState(v);

@@ -200,11 +200,19 @@ TEST_F(TestSmokeCoAlarmCluster, RequestSelfTest_SetsTestingState)
     EXPECT_FALSE(cluster.RequestSelfTest()); // blocked while testing
 }
 
-TEST_F(TestSmokeCoAlarmCluster, RequestSelfTest_BlockedBySmokeAlarm)
+TEST_F(TestSmokeCoAlarmCluster, RequestSelfTest_BlockedWhenAlarming)
 {
-    ASSERT_TRUE(cluster.SetSmokeState(AlarmStateEnum::kWarning));
-    cluster.SetExpressedStateByPriority(kDefaultPriority);
-    EXPECT_FALSE(cluster.RequestSelfTest());
+    auto checkBlocked = [&](auto setter, AlarmStateEnum alarm) {
+        ASSERT_TRUE(setter(alarm));
+        cluster.SetExpressedStateByPriority(kDefaultPriority);
+        EXPECT_FALSE(cluster.RequestSelfTest());
+        ASSERT_TRUE(setter(AlarmStateEnum::kNormal));
+        cluster.SetExpressedStateByPriority(kDefaultPriority);
+    };
+    checkBlocked([&](AlarmStateEnum v) { return cluster.SetSmokeState(v); }, AlarmStateEnum::kWarning);
+    checkBlocked([&](AlarmStateEnum v) { return cluster.SetCOState(v); }, AlarmStateEnum::kWarning);
+    checkBlocked([&](AlarmStateEnum v) { return cluster.SetInterconnectSmokeAlarm(v); }, AlarmStateEnum::kWarning);
+    checkBlocked([&](AlarmStateEnum v) { return cluster.SetInterconnectCOAlarm(v); }, AlarmStateEnum::kWarning);
 }
 
 TEST_F(TestSmokeCoAlarmCluster, SetExpressedStateByPriority_PicksFirst)
@@ -254,8 +262,9 @@ TEST_F(TestSmokeCoAlarmCluster, InvokeCommand_SelfTestRequest)
     cluster.SetExpressedStateByPriority(kDefaultPriority);
     auto busy = tester.Invoke(request);
     ASSERT_FALSE(busy.IsSuccess());
-    ASSERT_TRUE(busy.GetStatusCode().has_value());
-    EXPECT_EQ(busy.GetStatusCode()->GetStatus(), Status::Busy);
+    auto busyStatus = busy.GetStatusCode();
+    ASSERT_TRUE(busyStatus.has_value());
+    EXPECT_EQ(busyStatus->GetStatus(), Status::Busy);
 }
 
 TEST_F(TestSmokeCoAlarmCluster, WriteAttribute_SmokeSensitivityLevel)
@@ -312,26 +321,6 @@ TEST_F(TestSmokeCoAlarmCluster, SetAlarmState_CriticalAutoUnmutes_AllSources)
     runCase([&](AlarmStateEnum v) { return cluster.SetBatteryAlert(v); });
     runCase([&](AlarmStateEnum v) { return cluster.SetInterconnectSmokeAlarm(v); });
     runCase([&](AlarmStateEnum v) { return cluster.SetInterconnectCOAlarm(v); });
-}
-
-TEST_F(TestSmokeCoAlarmCluster, RequestSelfTest_BlockedByCOAndInterconnect)
-{
-    // kCOAlarm blocks
-    ASSERT_TRUE(cluster.SetCOState(AlarmStateEnum::kWarning));
-    cluster.SetExpressedStateByPriority(kDefaultPriority);
-    EXPECT_FALSE(cluster.RequestSelfTest());
-    ASSERT_TRUE(cluster.SetCOState(AlarmStateEnum::kNormal));
-
-    // kInterconnectSmoke blocks
-    ASSERT_TRUE(cluster.SetInterconnectSmokeAlarm(AlarmStateEnum::kWarning));
-    cluster.SetExpressedStateByPriority(kDefaultPriority);
-    EXPECT_FALSE(cluster.RequestSelfTest());
-    ASSERT_TRUE(cluster.SetInterconnectSmokeAlarm(AlarmStateEnum::kNormal));
-
-    // kInterconnectCO blocks
-    ASSERT_TRUE(cluster.SetInterconnectCOAlarm(AlarmStateEnum::kWarning));
-    cluster.SetExpressedStateByPriority(kDefaultPriority);
-    EXPECT_FALSE(cluster.RequestSelfTest());
 }
 
 TEST_F(TestSmokeCoAlarmCluster, SetTestInProgress_Completion)

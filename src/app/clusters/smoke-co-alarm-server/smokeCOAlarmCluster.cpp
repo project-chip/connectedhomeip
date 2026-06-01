@@ -226,7 +226,7 @@ bool SmokeCoAlarmCluster::SetInterconnectCOAlarm(AlarmStateEnum newInterconnectC
 
 void SmokeCoAlarmCluster::SetContaminationState(ContaminationStateEnum newContaminationState)
 {
-    VerifyOrReturnValue(mConfig.optionalAttribs.IsSet(ContaminationState::Id), false);
+    VerifyOrReturnValue(SupportsSmokeAlarm(), false);
     SetAttributeValue(mContaminationState, newContaminationState, ContaminationState::Id);
 }
 
@@ -388,12 +388,16 @@ DataModel::ActionReturnStatus SmokeCoAlarmCluster::WriteAttribute(const DataMode
 {
     if (request.path.mAttributeId != SmokeSensitivityLevel::Id)
     {
-        return Status::UnsupportedWrite;
+        return Status::UnsupportedAttribute;
     }
 
+    if (!mConfig.optionalAttribs.IsSet(SmokeSensitivityLevel::Id))
+    {
+        return Status::UnsupportedAttribute;
+    }
     SensitivityEnum value;
     ReturnErrorOnFailure(decoder.Decode(value));
-    SetSmokeSensitivityLevel(value);
+    VerifyOrReturnError(SetSmokeSensitivityLevel(value), Status::Failure);
     return Status::Success;
 }
 

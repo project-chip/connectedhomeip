@@ -63,6 +63,19 @@ struct TestSmokeCoAlarmBackwardsCompatInitialized : public TestSmokeCoAlarmBackw
     SmokeCoAlarmServer server{ kTestEndpointId, MakeFullConfig() };
 };
 
+// Fixture with no optional attributes configured — verifies absent-attribute guards return false.
+struct TestSmokeCoAlarmBackwardsCompatNoOptionals : public TestSmokeCoAlarmBackwardsCompat
+{
+    void SetUp() override { ASSERT_EQ(server.Init(), CHIP_NO_ERROR); }
+
+    SmokeCoAlarmServer server{ kTestEndpointId, [] {
+                                  SmokeCoAlarmCluster::Config cfg;
+                                  cfg.featureMap.Set(Feature::kSmokeAlarm).Set(Feature::kCoAlarm);
+                                  // optionalAttribs left empty
+                                  return cfg;
+                              }() };
+};
+
 } // namespace
 
 TEST_F(TestSmokeCoAlarmBackwardsCompatInitialized, Instance_ReturnsRegisteredServer)
@@ -87,6 +100,10 @@ TEST_F(TestSmokeCoAlarmBackwardsCompatInitialized, Features_ReportedCorrectly)
     EXPECT_TRUE(SmokeCoAlarmServer::Instance().SupportsSmokeAlarm());
     EXPECT_TRUE(SmokeCoAlarmServer::Instance().SupportsCOAlarm());
     EXPECT_TRUE(SmokeCoAlarmServer::Instance().GetFeatures().Has(Feature::kSmokeAlarm));
+    // Verify endpoint-taking overloads delegate correctly.
+    EXPECT_TRUE(SmokeCoAlarmServer::Instance().GetFeatures(kTestEndpointId).Has(Feature::kSmokeAlarm));
+    EXPECT_TRUE(SmokeCoAlarmServer::Instance().SupportsSmokeAlarm(kTestEndpointId));
+    EXPECT_TRUE(SmokeCoAlarmServer::Instance().SupportsCOAlarm(kTestEndpointId));
 }
 
 // Mirrors the pattern used by SmokeCOAlarmManager.cpp: Instance().SetXxx(endpointId, value)
@@ -138,8 +155,24 @@ TEST_F(TestSmokeCoAlarmBackwardsCompatInitialized, SettersViaInstance_RoundTrip)
     EXPECT_EQ(muted, MuteStateEnum::kMuted);
 
     EXPECT_TRUE((SmokeCoAlarmServer::Instance().SetInterconnectSmokeAlarm(kTestEndpointId, AlarmStateEnum::kWarning)));
+    AlarmStateEnum interconnectSmoke{};
+    EXPECT_TRUE(SmokeCoAlarmServer::Instance().GetInterconnectSmokeAlarm(kTestEndpointId, interconnectSmoke));
+    EXPECT_EQ(interconnectSmoke, AlarmStateEnum::kWarning);
+
     EXPECT_TRUE((SmokeCoAlarmServer::Instance().SetInterconnectCOAlarm(kTestEndpointId, AlarmStateEnum::kWarning)));
-    SmokeCoAlarmServer::Instance().SetContaminationState(kTestEndpointId, ContaminationStateEnum::kCritical);
+    AlarmStateEnum interconnectCO{};
+    EXPECT_TRUE(SmokeCoAlarmServer::Instance().GetInterconnectCOAlarm(kTestEndpointId, interconnectCO));
+    EXPECT_EQ(interconnectCO, AlarmStateEnum::kWarning);
+
+    EXPECT_TRUE((SmokeCoAlarmServer::Instance().SetContaminationState(kTestEndpointId, ContaminationStateEnum::kCritical)));
+    ContaminationStateEnum contamination{};
+    EXPECT_TRUE(SmokeCoAlarmServer::Instance().GetContaminationState(kTestEndpointId, contamination));
+    EXPECT_EQ(contamination, ContaminationStateEnum::kCritical);
+
+    EXPECT_TRUE((SmokeCoAlarmServer::Instance().SetExpiryDate(kTestEndpointId, 1234567890)));
+    uint32_t expiry{};
+    EXPECT_TRUE(SmokeCoAlarmServer::Instance().GetExpiryDate(kTestEndpointId, expiry));
+    EXPECT_EQ(expiry, 1234567890u);
 }
 
 TEST_F(TestSmokeCoAlarmBackwardsCompatInitialized, ClearViaInstance_ResetsState)
@@ -163,20 +196,6 @@ TEST_F(TestSmokeCoAlarmBackwardsCompatInitialized, RequestSelfTest_ForwardsToClu
     EXPECT_EQ(expressed, ExpressedStateEnum::kTesting);
 }
 
-TEST_F(TestSmokeCoAlarmBackwardsCompatInitialized, GettersViaEndpointOverloads_Delegate)
-{
-    // Verify endpoint-taking Get* overloads compile and forward to the cluster.
-    SmokeCoAlarmServer::Instance().SetSmokeState(kTestEndpointId, AlarmStateEnum::kWarning);
-
-    AlarmStateEnum smoke{};
-    EXPECT_TRUE(SmokeCoAlarmServer::Instance().GetSmokeState(kTestEndpointId, smoke));
-    EXPECT_EQ(smoke, AlarmStateEnum::kWarning);
-
-    EXPECT_TRUE(SmokeCoAlarmServer::Instance().GetFeatures(kTestEndpointId).Has(Feature::kSmokeAlarm));
-    EXPECT_TRUE(SmokeCoAlarmServer::Instance().SupportsSmokeAlarm(kTestEndpointId));
-    EXPECT_TRUE(SmokeCoAlarmServer::Instance().SupportsCOAlarm(kTestEndpointId));
-}
-
 TEST_F(TestSmokeCoAlarmBackwardsCompatInitialized, SetTestInProgress_ViaInstance)
 {
     EXPECT_TRUE(SmokeCoAlarmServer::Instance().SetTestInProgress(kTestEndpointId, true));
@@ -191,4 +210,40 @@ TEST_F(TestSmokeCoAlarmBackwardsCompatInitialized, SetUnmountedState_ViaInstance
     bool v{};
     EXPECT_TRUE(SmokeCoAlarmServer::Instance().GetUnmountedState(kTestEndpointId, v));
     EXPECT_TRUE(v);
+}
+
+// ---- Tests for absent optional attributes (no optionalAttribs configured) ----
+
+TEST_F(TestSmokeCoAlarmBackwardsCompatNoOptionals, DeviceMuted_AbsentReturnsFalse)
+{
+    EXPECT_FALSE(SmokeCoAlarmServer::Instance().SetDeviceMuted(kTestEndpointId, MuteStateEnum::kMuted));
+    MuteStateEnum v{};
+    EXPECT_FALSE(SmokeCoAlarmServer::Instance().GetDeviceMuted(kTestEndpointId, v));
+}
+
+TEST_F(TestSmokeCoAlarmBackwardsCompatNoOptionals, InterconnectSmokeAlarm_AbsentReturnsFalse)
+{
+    EXPECT_FALSE(SmokeCoAlarmServer::Instance().SetInterconnectSmokeAlarm(kTestEndpointId, AlarmStateEnum::kWarning));
+    AlarmStateEnum v{};
+    EXPECT_FALSE(SmokeCoAlarmServer::Instance().GetInterconnectSmokeAlarm(kTestEndpointId, v));
+}
+
+TEST_F(TestSmokeCoAlarmBackwardsCompatNoOptionals, InterconnectCOAlarm_AbsentReturnsFalse)
+{
+    EXPECT_FALSE(SmokeCoAlarmServer::Instance().SetInterconnectCOAlarm(kTestEndpointId, AlarmStateEnum::kWarning));
+    AlarmStateEnum v{};
+    EXPECT_FALSE(SmokeCoAlarmServer::Instance().GetInterconnectCOAlarm(kTestEndpointId, v));
+}
+
+TEST_F(TestSmokeCoAlarmBackwardsCompatNoOptionals, ExpiryDate_AbsentReturnsFalse)
+{
+    uint32_t v{};
+    EXPECT_FALSE(SmokeCoAlarmServer::Instance().GetExpiryDate(kTestEndpointId, v));
+}
+
+TEST_F(TestSmokeCoAlarmBackwardsCompatNoOptionals, UnmountedState_AbsentReturnsFalse)
+{
+    EXPECT_FALSE(SmokeCoAlarmServer::Instance().SetUnmountedState(kTestEndpointId, true));
+    bool v{};
+    EXPECT_FALSE(SmokeCoAlarmServer::Instance().GetUnmountedState(kTestEndpointId, v));
 }
