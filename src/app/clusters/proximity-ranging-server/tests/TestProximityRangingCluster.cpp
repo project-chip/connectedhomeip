@@ -939,7 +939,10 @@ TEST_F(TestProximityRangingCluster, TestDriverGetWiFiUsdConfigViaNextGenerationA
 
     auto resolved = driver.GetWiFiUsdConfig();
     ASSERT_TRUE(resolved.has_value());
-    EXPECT_EQ(resolved.value().deviceIdentityKey[0], 0x5A);
+    if (resolved.has_value())
+    {
+        EXPECT_EQ(resolved->deviceIdentityKey[0], 0x5A);
+    }
 }
 
 // --- Cluster-level coverage: read paths and validation branches not yet exercised.
