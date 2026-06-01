@@ -34,8 +34,25 @@ namespace app {
 namespace Clusters {
 namespace ProximityRanging {
 
-// TODO document this
-static constexpr size_t kMaxConcurrentSessions = 16;
+/**
+ * Maximum number of ranging sessions that may be active concurrently across
+ * all adapters owned by a single ProximityRangingDriver instance. Sets the
+ * capacity of the driver's internal session pool: a StartRanging request
+ * accepted by its adapter but unable to claim a pool slot is immediately
+ * stopped on the adapter and reported back to the cluster as
+ * ResultCodeEnum::kBusySessionCapacityReached.
+ *
+ * The default of 16 is chosen to comfortably cover
+ * typical multi-peer deployments while keeping the static pool footprint
+ * small. Platforms with stricter memory budgets or higher session demand
+ * may override this by defining the macro in their build configuration
+ * before including this header (e.g. via a `-D` flag or CHIPProjectConfig).
+ */
+#ifndef CHIP_CLUSTER_PROXIMITY_RANGING_MAX_CONCURRENT_SESSIONS
+#define CHIP_CLUSTER_PROXIMITY_RANGING_MAX_CONCURRENT_SESSIONS 16
+#endif
+
+static constexpr size_t kMaxConcurrentSessions = CHIP_CLUSTER_PROXIMITY_RANGING_MAX_CONCURRENT_SESSIONS;
 
 /**
  * Proximity Ranging driver - routes ranging operations between the cluster and

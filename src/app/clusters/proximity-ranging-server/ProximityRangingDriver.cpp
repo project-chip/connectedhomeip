@@ -27,6 +27,8 @@ namespace app {
 namespace Clusters {
 namespace ProximityRanging {
 
+static_assert(kMaxConcurrentSessions >= 1, "ProximityRangingDriver must support at least 1 session");
+
 ProximityRangingDriver::ProximityRangingDriver(Span<RangingAdapter * const> adapters) : mAdapters(adapters)
 {
     // Adapter set is fixed at construction; configuration errors panic here
