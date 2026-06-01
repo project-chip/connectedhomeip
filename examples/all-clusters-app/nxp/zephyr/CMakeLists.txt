@@ -129,6 +129,7 @@ target_sources(app
     ${ALL_CLUSTERS_COMMON_DIR}/src/dishwasher-mode.cpp
     ${ALL_CLUSTERS_COMMON_DIR}/src/fan-stub.cpp
     ${ALL_CLUSTERS_COMMON_DIR}/src/laundry-washer-mode.cpp
+    ${ALL_CLUSTERS_COMMON_DIR}/src/microwave-oven-mode.cpp
     ${ALL_CLUSTERS_COMMON_DIR}/src/oven-modes.cpp
     ${ALL_CLUSTERS_COMMON_DIR}/src/rvc-modes.cpp
     ${ALL_CLUSTERS_COMMON_DIR}/src/rvc-operational-state-delegate-impl.cpp
