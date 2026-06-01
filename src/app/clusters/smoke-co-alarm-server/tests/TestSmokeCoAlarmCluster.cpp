@@ -265,7 +265,10 @@ TEST_F(TestSmokeCoAlarmCluster, InvokeCommand_SelfTestRequest)
     ASSERT_FALSE(busy.IsSuccess());
     auto busyStatus = busy.GetStatusCode();
     ASSERT_TRUE(busyStatus.has_value());
-    EXPECT_EQ(busyStatus->GetStatus(), Status::Busy);
+    if (busyStatus.has_value())
+    {
+        EXPECT_EQ(busyStatus->GetStatus(), Status::Busy);
+    }
 }
 
 TEST_F(TestSmokeCoAlarmCluster, WriteAttribute_SmokeSensitivityLevel)
