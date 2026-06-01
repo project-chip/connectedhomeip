@@ -27,13 +27,12 @@
 #include <app/server-cluster/ServerClusterInterfaceRegistry.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 
-using namespace chip::app::Clusters::SmokeCoAlarm;
 namespace chip {
 namespace app {
 namespace Clusters {
 
 /**
- * @brief Application-facing wrapper for SmokeCoAlarmCluster.
+ * @brief Application-facing wrapper for SmokeCoAlarm::SmokeCoAlarmCluster.
  *
  * Owns the cluster instance and manages its lifetime with the data model provider.
  * The application creates one SmokeCoAlarmServer per endpoint, calls Init() to
@@ -42,7 +41,7 @@ namespace Clusters {
 class SmokeCoAlarmServer
 {
 public:
-    explicit SmokeCoAlarmServer(EndpointId endpointId, const SmokeCoAlarmCluster::Config & config) :
+    explicit SmokeCoAlarmServer(EndpointId endpointId, const SmokeCoAlarm::SmokeCoAlarmCluster::Config & config) :
         mEndpointId(endpointId), mConfig(config)
     {}
 
@@ -71,13 +70,13 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    SmokeCoAlarmCluster & Cluster()
+    SmokeCoAlarm::SmokeCoAlarmCluster & Cluster()
     {
         VerifyOrDie(mCluster.IsConstructed());
         return mCluster.Cluster();
     }
 
-    static constexpr size_t kPriorityOrderLength = SmokeCoAlarmCluster::kPriorityOrderLength;
+    static constexpr size_t kPriorityOrderLength = SmokeCoAlarm::SmokeCoAlarmCluster::kPriorityOrderLength;
 
     static SmokeCoAlarmServer & Instance()
     {
@@ -93,24 +92,24 @@ public:
 
     // Endpoint-taking overloads for backwards compatibility with old call sites.
     // The endpoint param is ignored; Instance() already owns a specific endpoint.
-    void SetExpressedStateByPriority(EndpointId, const std::array<ExpressedStateEnum, kPriorityOrderLength> & o)
+    void SetExpressedStateByPriority(EndpointId, const std::array<SmokeCoAlarm::ExpressedStateEnum, kPriorityOrderLength> & o)
     {
         Cluster().SetExpressedStateByPriority(o);
     }
-    bool SetSmokeState(EndpointId, AlarmStateEnum v) { return Cluster().SetSmokeState(v); }
-    bool SetCOState(EndpointId, AlarmStateEnum v) { return Cluster().SetCOState(v); }
-    bool SetBatteryAlert(EndpointId, AlarmStateEnum v) { return Cluster().SetBatteryAlert(v); }
-    bool SetDeviceMuted(EndpointId, MuteStateEnum v) { return Cluster().SetDeviceMuted(v); }
+    bool SetSmokeState(EndpointId, SmokeCoAlarm::AlarmStateEnum v) { return Cluster().SetSmokeState(v); }
+    bool SetCOState(EndpointId, SmokeCoAlarm::AlarmStateEnum v) { return Cluster().SetCOState(v); }
+    bool SetBatteryAlert(EndpointId, SmokeCoAlarm::AlarmStateEnum v) { return Cluster().SetBatteryAlert(v); }
+    bool SetDeviceMuted(EndpointId, SmokeCoAlarm::MuteStateEnum v) { return Cluster().SetDeviceMuted(v); }
     bool SetTestInProgress(EndpointId, bool v) { return Cluster().SetTestInProgress(v); }
     bool SetHardwareFaultAlert(EndpointId, bool v) { return Cluster().SetHardwareFaultAlert(v); }
-    bool SetEndOfServiceAlert(EndpointId, EndOfServiceEnum v) { return Cluster().SetEndOfServiceAlert(v); }
-    bool SetInterconnectSmokeAlarm(EndpointId, AlarmStateEnum v) { return Cluster().SetInterconnectSmokeAlarm(v); }
-    bool SetInterconnectCOAlarm(EndpointId, AlarmStateEnum v) { return Cluster().SetInterconnectCOAlarm(v); }
-    bool SetContaminationState(EndpointId, ContaminationStateEnum v) { return Cluster().SetContaminationState(v); }
-    bool SetSmokeSensitivityLevel(EndpointId, SensitivityEnum v) { return Cluster().SetSmokeSensitivityLevel(v); }
+    bool SetEndOfServiceAlert(EndpointId, SmokeCoAlarm::EndOfServiceEnum v) { return Cluster().SetEndOfServiceAlert(v); }
+    bool SetInterconnectSmokeAlarm(EndpointId, SmokeCoAlarm::AlarmStateEnum v) { return Cluster().SetInterconnectSmokeAlarm(v); }
+    bool SetInterconnectCOAlarm(EndpointId, SmokeCoAlarm::AlarmStateEnum v) { return Cluster().SetInterconnectCOAlarm(v); }
+    bool SetContaminationState(EndpointId, SmokeCoAlarm::ContaminationStateEnum v) { return Cluster().SetContaminationState(v); }
+    bool SetSmokeSensitivityLevel(EndpointId, SmokeCoAlarm::SensitivityEnum v) { return Cluster().SetSmokeSensitivityLevel(v); }
     bool SetUnmountedState(EndpointId, bool v) { return Cluster().SetUnmountedState(v); }
 
-    chip::BitFlags<Feature> GetFeatures() const
+    chip::BitFlags<SmokeCoAlarm::Feature> GetFeatures() const
     {
         VerifyOrDie(mCluster.IsConstructed());
         return mCluster.Cluster().GetFeatures();
@@ -128,27 +127,27 @@ public:
 
     // Endpoint-taking Get overloads for backwards compatibility with old call sites.
     // The endpoint param is ignored; Instance() already owns a specific endpoint.
-    bool GetExpressedState(EndpointId, ExpressedStateEnum & v) const
+    bool GetExpressedState(EndpointId, SmokeCoAlarm::ExpressedStateEnum & v) const
     {
         VerifyOrDie(mCluster.IsConstructed());
         return mCluster.Cluster().GetExpressedState(v);
     }
-    bool GetSmokeState(EndpointId, AlarmStateEnum & v) const
+    bool GetSmokeState(EndpointId, SmokeCoAlarm::AlarmStateEnum & v) const
     {
         VerifyOrDie(mCluster.IsConstructed());
         return mCluster.Cluster().GetSmokeState(v);
     }
-    bool GetCOState(EndpointId, AlarmStateEnum & v) const
+    bool GetCOState(EndpointId, SmokeCoAlarm::AlarmStateEnum & v) const
     {
         VerifyOrDie(mCluster.IsConstructed());
         return mCluster.Cluster().GetCOState(v);
     }
-    bool GetBatteryAlert(EndpointId, AlarmStateEnum & v) const
+    bool GetBatteryAlert(EndpointId, SmokeCoAlarm::AlarmStateEnum & v) const
     {
         VerifyOrDie(mCluster.IsConstructed());
         return mCluster.Cluster().GetBatteryAlert(v);
     }
-    bool GetDeviceMuted(EndpointId, MuteStateEnum & v) const
+    bool GetDeviceMuted(EndpointId, SmokeCoAlarm::MuteStateEnum & v) const
     {
         VerifyOrDie(mCluster.IsConstructed());
         return mCluster.Cluster().GetDeviceMuted(v);
@@ -163,27 +162,27 @@ public:
         VerifyOrDie(mCluster.IsConstructed());
         return mCluster.Cluster().GetHardwareFaultAlert(v);
     }
-    bool GetEndOfServiceAlert(EndpointId, EndOfServiceEnum & v) const
+    bool GetEndOfServiceAlert(EndpointId, SmokeCoAlarm::EndOfServiceEnum & v) const
     {
         VerifyOrDie(mCluster.IsConstructed());
         return mCluster.Cluster().GetEndOfServiceAlert(v);
     }
-    bool GetInterconnectSmokeAlarm(EndpointId, AlarmStateEnum & v) const
+    bool GetInterconnectSmokeAlarm(EndpointId, SmokeCoAlarm::AlarmStateEnum & v) const
     {
         VerifyOrDie(mCluster.IsConstructed());
         return mCluster.Cluster().GetInterconnectSmokeAlarm(v);
     }
-    bool GetInterconnectCOAlarm(EndpointId, AlarmStateEnum & v) const
+    bool GetInterconnectCOAlarm(EndpointId, SmokeCoAlarm::AlarmStateEnum & v) const
     {
         VerifyOrDie(mCluster.IsConstructed());
         return mCluster.Cluster().GetInterconnectCOAlarm(v);
     }
-    bool GetContaminationState(EndpointId, ContaminationStateEnum & v) const
+    bool GetContaminationState(EndpointId, SmokeCoAlarm::ContaminationStateEnum & v) const
     {
         VerifyOrDie(mCluster.IsConstructed());
         return mCluster.Cluster().GetContaminationState(v);
     }
-    bool GetSmokeSensitivityLevel(EndpointId, SensitivityEnum & v) const
+    bool GetSmokeSensitivityLevel(EndpointId, SmokeCoAlarm::SensitivityEnum & v) const
     {
         VerifyOrDie(mCluster.IsConstructed());
         return mCluster.Cluster().GetSmokeSensitivityLevel(v);
@@ -198,14 +197,14 @@ public:
         VerifyOrDie(mCluster.IsConstructed());
         return mCluster.Cluster().GetUnmountedState(v);
     }
-    chip::BitFlags<Feature> GetFeatures(EndpointId) const { return GetFeatures(); }
+    chip::BitFlags<SmokeCoAlarm::Feature> GetFeatures(EndpointId) const { return GetFeatures(); }
     bool SupportsSmokeAlarm(EndpointId) const { return SupportsSmokeAlarm(); }
     bool SupportsCOAlarm(EndpointId) const { return SupportsCOAlarm(); }
 
 private:
     EndpointId mEndpointId;
-    SmokeCoAlarmCluster::Config mConfig;
-    LazyRegisteredServerCluster<SmokeCoAlarmCluster> mCluster;
+    SmokeCoAlarm::SmokeCoAlarmCluster::Config mConfig;
+    LazyRegisteredServerCluster<SmokeCoAlarm::SmokeCoAlarmCluster> mCluster;
 
     inline static SmokeCoAlarmServer * sInstance = nullptr;
 };
