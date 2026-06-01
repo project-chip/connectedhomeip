@@ -96,7 +96,6 @@ public:
     static constexpr size_t kMaxIfNameLength = 6;
 #endif
 
-
     ~InterfaceId() = default;
 
     constexpr InterfaceId() : mPlatformInterface(kPlatformNull) {}
