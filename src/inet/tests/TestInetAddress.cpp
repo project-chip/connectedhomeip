@@ -861,10 +861,12 @@ TEST_F(TestInetAddress, TestCheckToStringWithInterface)
         EXPECT_STREQ(buf, "fd00::1");
 
         // 4. Test IPv4 Address with Interface ID (should NOT append suffix)
+#if INET_CONFIG_ENABLE_IPV4
         IPAddress ipv4Address;
         EXPECT_TRUE(IPAddress::FromString("1.2.3.4", ipv4Address));
         EXPECT_NE(ipv4Address.ToString(buf, sizeof(buf), ifaceId), nullptr);
         EXPECT_STREQ(buf, "1.2.3.4");
+#endif // INET_CONFIG_ENABLE_IPV4
 
         // 5. Test Buffer Too Small
         size_t requiredSize = strlen("fe80::8edc:d4ff:fe3a:ebfb") + 1 + strlen(ifName) + 1;
