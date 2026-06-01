@@ -46,7 +46,7 @@ DataModel::ActionReturnStatus ThermostatCluster::WriteNonAtomicAttribute(const D
 
     switch (request.path.mAttributeId)
     {
-   
+
     case MinSetpointDeadBand::Id: {
 
         int16_t db;
