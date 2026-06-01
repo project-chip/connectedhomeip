@@ -58,6 +58,7 @@ jobs:
                   rm -rf out/
             - name: Build all ASR582X examples (master)
               if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+              shell: bash
               run: |
                   targets=(
                       asr-asr582x-all-clusters
