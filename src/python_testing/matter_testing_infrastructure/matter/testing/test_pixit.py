@@ -19,15 +19,9 @@
 
 import unittest
 
-from matter.testing.harness_params import (
-    HarnessParamDefinition,
-    format_declared_parameters_for_failure,
-    format_missing_test_parameters,
-    get_harness_param_definitions,
-    harness_params,
-    resolve_harness_value,
-    validate_harness_params,
-)
+from matter.testing.harness_params import (HarnessParamDefinition, format_declared_parameters_for_failure,
+                                           format_missing_test_parameters, get_harness_param_definitions, harness_params,
+                                           resolve_harness_value, validate_harness_params)
 from matter.testing.matter_test_config import MatterTestConfig
 from matter.testing.pixit import (_PIXIT_NO_DEFAULT, PixitDefinition, _type_to_arg_flag, format_pixit_error, get_pixit_definitions,
                                   pixit, validate_pixits)

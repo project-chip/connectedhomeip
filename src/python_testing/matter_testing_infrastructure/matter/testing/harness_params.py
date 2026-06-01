@@ -49,14 +49,8 @@ from dataclasses import dataclass
 from typing import Any
 
 from matter.testing.matter_test_config import MatterTestConfig
-from matter.testing.pixit import (
-    PixitDefinition,
-    _PIXIT_NO_DEFAULT,
-    _type_to_arg_flag,
-    format_pixit_error,
-    get_pixit_definitions,
-    validate_pixits,
-)
+from matter.testing.pixit import (_PIXIT_NO_DEFAULT, PixitDefinition, _type_to_arg_flag, format_pixit_error, get_pixit_definitions,
+                                  validate_pixits)
 
 
 @dataclass(frozen=True)

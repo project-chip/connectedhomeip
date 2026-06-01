@@ -59,11 +59,8 @@ from matter.testing.commissioning import (CommissioningInfo, CustomCommissioning
                                           get_setup_payload_info_config)
 from matter.testing.decorators import _has_attribute, _has_command, _has_feature
 from matter.testing.global_attribute_ids import GlobalAttributeIds
-from matter.testing.harness_params import (
-    format_declared_parameters_for_failure,
-    format_missing_test_parameters,
-    resolve_harness_value,
-)
+from matter.testing.harness_params import (format_declared_parameters_for_failure, format_missing_test_parameters,
+                                           resolve_harness_value)
 from matter.testing.matter_stack_state import MatterStackState
 from matter.testing.matter_test_config import MatterTestConfig
 from matter.testing.pixit import _PIXIT_NO_DEFAULT, get_pixit_definitions
