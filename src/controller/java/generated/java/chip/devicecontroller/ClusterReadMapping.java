@@ -9870,6 +9870,223 @@ public class ClusterReadMapping {
      
        return result;
     }
+    private static Map<String, InteractionInfo> readElectricalDistributionInteractionInfo() {
+       Map<String, InteractionInfo> result = new LinkedHashMap<>();Map<String, CommandParameterInfo> readElectricalDistributionMaxContinuousCurrentCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readElectricalDistributionMaxContinuousCurrentAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ElectricalDistributionCluster) cluster).readMaxContinuousCurrentAttribute(
+              (ChipClusters.ElectricalDistributionCluster.MaxContinuousCurrentAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedElectricalDistributionClusterMaxContinuousCurrentAttributeCallback(),
+          readElectricalDistributionMaxContinuousCurrentCommandParams
+        );
+        result.put("readMaxContinuousCurrentAttribute", readElectricalDistributionMaxContinuousCurrentAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readElectricalDistributionMaxVoltageCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readElectricalDistributionMaxVoltageAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ElectricalDistributionCluster) cluster).readMaxVoltageAttribute(
+              (ChipClusters.ElectricalDistributionCluster.MaxVoltageAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedElectricalDistributionClusterMaxVoltageAttributeCallback(),
+          readElectricalDistributionMaxVoltageCommandParams
+        );
+        result.put("readMaxVoltageAttribute", readElectricalDistributionMaxVoltageAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readElectricalDistributionNumberOfPolesCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readElectricalDistributionNumberOfPolesAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ElectricalDistributionCluster) cluster).readNumberOfPolesAttribute(
+              (ChipClusters.ElectricalDistributionCluster.NumberOfPolesAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedElectricalDistributionClusterNumberOfPolesAttributeCallback(),
+          readElectricalDistributionNumberOfPolesCommandParams
+        );
+        result.put("readNumberOfPolesAttribute", readElectricalDistributionNumberOfPolesAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readElectricalDistributionEndOfLifeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readElectricalDistributionEndOfLifeAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ElectricalDistributionCluster) cluster).readEndOfLifeAttribute(
+              (ChipClusters.ElectricalDistributionCluster.EndOfLifeAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedElectricalDistributionClusterEndOfLifeAttributeCallback(),
+          readElectricalDistributionEndOfLifeCommandParams
+        );
+        result.put("readEndOfLifeAttribute", readElectricalDistributionEndOfLifeAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readElectricalDistributionServiceEntranceRatedCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readElectricalDistributionServiceEntranceRatedAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ElectricalDistributionCluster) cluster).readServiceEntranceRatedAttribute(
+              (ChipClusters.ElectricalDistributionCluster.ServiceEntranceRatedAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedElectricalDistributionClusterServiceEntranceRatedAttributeCallback(),
+          readElectricalDistributionServiceEntranceRatedCommandParams
+        );
+        result.put("readServiceEntranceRatedAttribute", readElectricalDistributionServiceEntranceRatedAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readElectricalDistributionGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readElectricalDistributionGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ElectricalDistributionCluster) cluster).readGeneratedCommandListAttribute(
+              (ChipClusters.ElectricalDistributionCluster.GeneratedCommandListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedElectricalDistributionClusterGeneratedCommandListAttributeCallback(),
+          readElectricalDistributionGeneratedCommandListCommandParams
+        );
+        result.put("readGeneratedCommandListAttribute", readElectricalDistributionGeneratedCommandListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readElectricalDistributionAcceptedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readElectricalDistributionAcceptedCommandListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ElectricalDistributionCluster) cluster).readAcceptedCommandListAttribute(
+              (ChipClusters.ElectricalDistributionCluster.AcceptedCommandListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedElectricalDistributionClusterAcceptedCommandListAttributeCallback(),
+          readElectricalDistributionAcceptedCommandListCommandParams
+        );
+        result.put("readAcceptedCommandListAttribute", readElectricalDistributionAcceptedCommandListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readElectricalDistributionAttributeListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readElectricalDistributionAttributeListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ElectricalDistributionCluster) cluster).readAttributeListAttribute(
+              (ChipClusters.ElectricalDistributionCluster.AttributeListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedElectricalDistributionClusterAttributeListAttributeCallback(),
+          readElectricalDistributionAttributeListCommandParams
+        );
+        result.put("readAttributeListAttribute", readElectricalDistributionAttributeListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readElectricalDistributionFeatureMapCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readElectricalDistributionFeatureMapAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ElectricalDistributionCluster) cluster).readFeatureMapAttribute(
+              (ChipClusters.LongAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+          readElectricalDistributionFeatureMapCommandParams
+        );
+        result.put("readFeatureMapAttribute", readElectricalDistributionFeatureMapAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readElectricalDistributionClusterRevisionCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readElectricalDistributionClusterRevisionAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ElectricalDistributionCluster) cluster).readClusterRevisionAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readElectricalDistributionClusterRevisionCommandParams
+        );
+        result.put("readClusterRevisionAttribute", readElectricalDistributionClusterRevisionAttributeInteractionInfo);
+     
+       return result;
+    }
+    private static Map<String, InteractionInfo> readElectricalProtectionAlarmInteractionInfo() {
+       Map<String, InteractionInfo> result = new LinkedHashMap<>();Map<String, CommandParameterInfo> readElectricalProtectionAlarmMaskCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readElectricalProtectionAlarmMaskAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ElectricalProtectionAlarmCluster) cluster).readMaskAttribute(
+              (ChipClusters.LongAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+          readElectricalProtectionAlarmMaskCommandParams
+        );
+        result.put("readMaskAttribute", readElectricalProtectionAlarmMaskAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readElectricalProtectionAlarmStateCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readElectricalProtectionAlarmStateAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ElectricalProtectionAlarmCluster) cluster).readStateAttribute(
+              (ChipClusters.LongAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+          readElectricalProtectionAlarmStateCommandParams
+        );
+        result.put("readStateAttribute", readElectricalProtectionAlarmStateAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readElectricalProtectionAlarmSupportedCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readElectricalProtectionAlarmSupportedAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ElectricalProtectionAlarmCluster) cluster).readSupportedAttribute(
+              (ChipClusters.LongAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+          readElectricalProtectionAlarmSupportedCommandParams
+        );
+        result.put("readSupportedAttribute", readElectricalProtectionAlarmSupportedAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readElectricalProtectionAlarmArcCauseCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readElectricalProtectionAlarmArcCauseAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ElectricalProtectionAlarmCluster) cluster).readArcCauseAttribute(
+              (ChipClusters.ElectricalProtectionAlarmCluster.ArcCauseAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedElectricalProtectionAlarmClusterArcCauseAttributeCallback(),
+          readElectricalProtectionAlarmArcCauseCommandParams
+        );
+        result.put("readArcCauseAttribute", readElectricalProtectionAlarmArcCauseAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readElectricalProtectionAlarmGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readElectricalProtectionAlarmGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ElectricalProtectionAlarmCluster) cluster).readGeneratedCommandListAttribute(
+              (ChipClusters.ElectricalProtectionAlarmCluster.GeneratedCommandListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedElectricalProtectionAlarmClusterGeneratedCommandListAttributeCallback(),
+          readElectricalProtectionAlarmGeneratedCommandListCommandParams
+        );
+        result.put("readGeneratedCommandListAttribute", readElectricalProtectionAlarmGeneratedCommandListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readElectricalProtectionAlarmAcceptedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readElectricalProtectionAlarmAcceptedCommandListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ElectricalProtectionAlarmCluster) cluster).readAcceptedCommandListAttribute(
+              (ChipClusters.ElectricalProtectionAlarmCluster.AcceptedCommandListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedElectricalProtectionAlarmClusterAcceptedCommandListAttributeCallback(),
+          readElectricalProtectionAlarmAcceptedCommandListCommandParams
+        );
+        result.put("readAcceptedCommandListAttribute", readElectricalProtectionAlarmAcceptedCommandListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readElectricalProtectionAlarmAttributeListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readElectricalProtectionAlarmAttributeListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ElectricalProtectionAlarmCluster) cluster).readAttributeListAttribute(
+              (ChipClusters.ElectricalProtectionAlarmCluster.AttributeListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedElectricalProtectionAlarmClusterAttributeListAttributeCallback(),
+          readElectricalProtectionAlarmAttributeListCommandParams
+        );
+        result.put("readAttributeListAttribute", readElectricalProtectionAlarmAttributeListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readElectricalProtectionAlarmFeatureMapCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readElectricalProtectionAlarmFeatureMapAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ElectricalProtectionAlarmCluster) cluster).readFeatureMapAttribute(
+              (ChipClusters.LongAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+          readElectricalProtectionAlarmFeatureMapCommandParams
+        );
+        result.put("readFeatureMapAttribute", readElectricalProtectionAlarmFeatureMapAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readElectricalProtectionAlarmClusterRevisionCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readElectricalProtectionAlarmClusterRevisionAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ElectricalProtectionAlarmCluster) cluster).readClusterRevisionAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readElectricalProtectionAlarmClusterRevisionCommandParams
+        );
+        result.put("readClusterRevisionAttribute", readElectricalProtectionAlarmClusterRevisionAttributeInteractionInfo);
+     
+       return result;
+    }
     private static Map<String, InteractionInfo> readDoorLockInteractionInfo() {
        Map<String, InteractionInfo> result = new LinkedHashMap<>();Map<String, CommandParameterInfo> readDoorLockLockStateCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readDoorLockLockStateAttributeInteractionInfo = new InteractionInfo(
@@ -21649,6 +21866,8 @@ public class ClusterReadMapping {
             put("waterHeaterMode", readWaterHeaterModeInteractionInfo());
             put("deviceEnergyManagementMode", readDeviceEnergyManagementModeInteractionInfo());
             put("electricalGridConditions", readElectricalGridConditionsInteractionInfo());
+            put("electricalDistribution", readElectricalDistributionInteractionInfo());
+            put("electricalProtectionAlarm", readElectricalProtectionAlarmInteractionInfo());
             put("doorLock", readDoorLockInteractionInfo());
             put("windowCovering", readWindowCoveringInteractionInfo());
             put("closureControl", readClosureControlInteractionInfo());

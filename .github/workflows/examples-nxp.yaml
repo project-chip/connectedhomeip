@@ -116,6 +116,8 @@ jobs:
                       --target nxp-rw61x-freertos-thermostat-wifi-se05x-factory \
                       build \
                   "
+            - name: clean build
+              run: rm -rf ./out
             - name: Build RW61X thermostat ethernet example app
               run: |
                   scripts/run_in_build_env.sh "\

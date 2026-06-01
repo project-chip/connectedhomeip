@@ -3650,6 +3650,64 @@ static id _Nullable DecodeEventPayloadForElectricalGridConditionsCluster(EventId
     *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
     return nil;
 }
+static id _Nullable DecodeEventPayloadForElectricalDistributionCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::ElectricalDistribution;
+    switch (aEventId) {
+    default: {
+        // Not a known ElectricalDistribution event.
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
+static id _Nullable DecodeEventPayloadForElectricalProtectionAlarmCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::ElectricalProtectionAlarm;
+    switch (aEventId) {
+    case Events::Notify::Id: {
+        Events::Notify::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRElectricalProtectionAlarmClusterNotifyEvent new];
+
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedInt:cppValue.active.Raw()];
+            value.active = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedInt:cppValue.inactive.Raw()];
+            value.inactive = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedInt:cppValue.state.Raw()];
+            value.state = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedInt:cppValue.mask.Raw()];
+            value.mask = memberValue;
+        } while (0);
+
+        return value;
+    }
+    default: {
+        // Not a known ElectricalProtectionAlarm event.
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
 static id _Nullable DecodeEventPayloadForDoorLockCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::DoorLock;
@@ -6253,6 +6311,12 @@ id _Nullable MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVRead
     }
     case Clusters::ElectricalGridConditions::Id: {
         return DecodeEventPayloadForElectricalGridConditionsCluster(aPath.mEventId, aReader, aError);
+    }
+    case Clusters::ElectricalDistribution::Id: {
+        return DecodeEventPayloadForElectricalDistributionCluster(aPath.mEventId, aReader, aError);
+    }
+    case Clusters::ElectricalProtectionAlarm::Id: {
+        return DecodeEventPayloadForElectricalProtectionAlarmCluster(aPath.mEventId, aReader, aError);
     }
     case Clusters::DoorLock::Id: {
         return DecodeEventPayloadForDoorLockCluster(aPath.mEventId, aReader, aError);

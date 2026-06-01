@@ -3391,6 +3391,101 @@ static BOOL AttributeIsSpecifiedInElectricalGridConditionsCluster(AttributeId aA
     }
     }
 }
+static BOOL AttributeIsSpecifiedInElectricalDistributionCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::ElectricalDistribution;
+    switch (aAttributeId) {
+    case Attributes::MaxContinuousCurrent::Id: {
+        return YES;
+    }
+    case Attributes::MaxVoltage::Id: {
+        return YES;
+    }
+    case Attributes::NumberOfPoles::Id: {
+        return YES;
+    }
+    case Attributes::EndOfLife::Id: {
+        return YES;
+    }
+    case Attributes::ServiceEntranceRated::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        // Not a known ElectricalDistribution attribute.
+        return NO;
+    }
+    }
+}
+static BOOL AttributeIsSpecifiedInElectricalProtectionAlarmCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::ElectricalProtectionAlarm;
+    switch (aAttributeId) {
+    case Attributes::Mask::Id: {
+        return YES;
+    }
+    case Attributes::State::Id: {
+        return YES;
+    }
+    case Attributes::Supported::Id: {
+        return YES;
+    }
+    case Attributes::ArcCause::Id: {
+        return YES;
+    }
+    case Attributes::OverLoadRating::Id: {
+        return YES;
+    }
+    case Attributes::OverVoltageRating::Id: {
+        return YES;
+    }
+    case Attributes::SurgeProtectionRating::Id: {
+        return YES;
+    }
+    case Attributes::ShortCircuitRating::Id: {
+        return YES;
+    }
+    case Attributes::ResidualCurrentRating::Id: {
+        return YES;
+    }
+    case Attributes::ArcFaultRating::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        // Not a known ElectricalProtectionAlarm attribute.
+        return NO;
+    }
+    }
+}
 static BOOL AttributeIsSpecifiedInDoorLockCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::DoorLock;
@@ -7513,6 +7608,12 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     }
     case Clusters::ElectricalGridConditions::Id: {
         return AttributeIsSpecifiedInElectricalGridConditionsCluster(aAttributeId);
+    }
+    case Clusters::ElectricalDistribution::Id: {
+        return AttributeIsSpecifiedInElectricalDistributionCluster(aAttributeId);
+    }
+    case Clusters::ElectricalProtectionAlarm::Id: {
+        return AttributeIsSpecifiedInElectricalProtectionAlarmCluster(aAttributeId);
     }
     case Clusters::DoorLock::Id: {
         return AttributeIsSpecifiedInDoorLockCluster(aAttributeId);

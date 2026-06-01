@@ -61,9 +61,11 @@
 #include <clusters/DoorLock/AttributeIds.h>
 #include <clusters/DynamicLighting/AttributeIds.h>
 #include <clusters/EcosystemInformation/AttributeIds.h>
+#include <clusters/ElectricalDistribution/AttributeIds.h>
 #include <clusters/ElectricalEnergyMeasurement/AttributeIds.h>
 #include <clusters/ElectricalGridConditions/AttributeIds.h>
 #include <clusters/ElectricalPowerMeasurement/AttributeIds.h>
+#include <clusters/ElectricalProtectionAlarm/AttributeIds.h>
 #include <clusters/EnergyEvse/AttributeIds.h>
 #include <clusters/EnergyEvseMode/AttributeIds.h>
 #include <clusters/EnergyPreference/AttributeIds.h>

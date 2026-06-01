@@ -179,6 +179,10 @@ char const * ClusterIdToText(chip::ClusterId id)
         return "DeviceEnergyManagementMode";
     case chip::app::Clusters::ElectricalGridConditions::Id:
         return "ElectricalGridConditions";
+    case chip::app::Clusters::ElectricalDistribution::Id:
+        return "ElectricalDistribution";
+    case chip::app::Clusters::ElectricalProtectionAlarm::Id:
+        return "ElectricalProtectionAlarm";
     case chip::app::Clusters::DoorLock::Id:
         return "DoorLock";
     case chip::app::Clusters::WindowCovering::Id:
@@ -2644,6 +2648,70 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
         case chip::app::Clusters::ElectricalGridConditions::Attributes::FeatureMap::Id:
             return "FeatureMap";
         case chip::app::Clusters::ElectricalGridConditions::Attributes::ClusterRevision::Id:
+            return "ClusterRevision";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::ElectricalDistribution::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::ElectricalDistribution::Attributes::MaxContinuousCurrent::Id:
+            return "MaxContinuousCurrent";
+        case chip::app::Clusters::ElectricalDistribution::Attributes::MaxVoltage::Id:
+            return "MaxVoltage";
+        case chip::app::Clusters::ElectricalDistribution::Attributes::NumberOfPoles::Id:
+            return "NumberOfPoles";
+        case chip::app::Clusters::ElectricalDistribution::Attributes::EndOfLife::Id:
+            return "EndOfLife";
+        case chip::app::Clusters::ElectricalDistribution::Attributes::ServiceEntranceRated::Id:
+            return "ServiceEntranceRated";
+        case chip::app::Clusters::ElectricalDistribution::Attributes::GeneratedCommandList::Id:
+            return "GeneratedCommandList";
+        case chip::app::Clusters::ElectricalDistribution::Attributes::AcceptedCommandList::Id:
+            return "AcceptedCommandList";
+        case chip::app::Clusters::ElectricalDistribution::Attributes::AttributeList::Id:
+            return "AttributeList";
+        case chip::app::Clusters::ElectricalDistribution::Attributes::FeatureMap::Id:
+            return "FeatureMap";
+        case chip::app::Clusters::ElectricalDistribution::Attributes::ClusterRevision::Id:
+            return "ClusterRevision";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::ElectricalProtectionAlarm::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::ElectricalProtectionAlarm::Attributes::Mask::Id:
+            return "Mask";
+        case chip::app::Clusters::ElectricalProtectionAlarm::Attributes::State::Id:
+            return "State";
+        case chip::app::Clusters::ElectricalProtectionAlarm::Attributes::Supported::Id:
+            return "Supported";
+        case chip::app::Clusters::ElectricalProtectionAlarm::Attributes::ArcCause::Id:
+            return "ArcCause";
+        case chip::app::Clusters::ElectricalProtectionAlarm::Attributes::OverLoadRating::Id:
+            return "OverLoadRating";
+        case chip::app::Clusters::ElectricalProtectionAlarm::Attributes::OverVoltageRating::Id:
+            return "OverVoltageRating";
+        case chip::app::Clusters::ElectricalProtectionAlarm::Attributes::SurgeProtectionRating::Id:
+            return "SurgeProtectionRating";
+        case chip::app::Clusters::ElectricalProtectionAlarm::Attributes::ShortCircuitRating::Id:
+            return "ShortCircuitRating";
+        case chip::app::Clusters::ElectricalProtectionAlarm::Attributes::ResidualCurrentRating::Id:
+            return "ResidualCurrentRating";
+        case chip::app::Clusters::ElectricalProtectionAlarm::Attributes::ArcFaultRating::Id:
+            return "ArcFaultRating";
+        case chip::app::Clusters::ElectricalProtectionAlarm::Attributes::GeneratedCommandList::Id:
+            return "GeneratedCommandList";
+        case chip::app::Clusters::ElectricalProtectionAlarm::Attributes::AcceptedCommandList::Id:
+            return "AcceptedCommandList";
+        case chip::app::Clusters::ElectricalProtectionAlarm::Attributes::AttributeList::Id:
+            return "AttributeList";
+        case chip::app::Clusters::ElectricalProtectionAlarm::Attributes::FeatureMap::Id:
+            return "FeatureMap";
+        case chip::app::Clusters::ElectricalProtectionAlarm::Attributes::ClusterRevision::Id:
             return "ClusterRevision";
         default:
             return "Unknown";
@@ -5964,6 +6032,15 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "Unknown";
         }
     }
+    case chip::app::Clusters::ElectricalProtectionAlarm::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::ElectricalProtectionAlarm::Commands::ModifyEnabledAlarms::Id:
+            return "ModifyEnabledAlarms";
+        default:
+            return "Unknown";
+        }
+    }
     case chip::app::Clusters::DoorLock::Id: {
         switch (id)
         {
@@ -7584,6 +7661,8 @@ char const * DeviceTypeIdToText(chip::DeviceTypeId id)
         return "Electrical Energy Tariff";
     case 0x00000514:
         return "Electrical Meter";
+    case 0x00000517:
+        return "Electrical Distribution Enclosure";
     case 0x00000840:
         return "Control Bridge";
     case 0x00000850:
