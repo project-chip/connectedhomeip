@@ -842,10 +842,10 @@ TEST_F(TestInetAddress, TestCheckToStringWithInterface)
         // 1. Test IPv6 Link-Local Address (LLA) with Interface ID
         IPAddress llaAddress;
         EXPECT_TRUE(IPAddress::FromString("fe80::8edc:d4ff:fe3a:ebfb", llaAddress));
-        
+
         char buf[IPAddress::kMaxAddressWithInterfaceLength];
         EXPECT_NE(llaAddress.ToString(buf, sizeof(buf), ifaceId), nullptr);
-        
+
         char expected[IPAddress::kMaxAddressWithInterfaceLength];
         snprintf(expected, sizeof(expected), "fe80::8edc:d4ff:fe3a:ebfb%%%s", ifName);
         EXPECT_STREQ(buf, expected);
@@ -872,7 +872,6 @@ TEST_F(TestInetAddress, TestCheckToStringWithInterface)
         EXPECT_EQ(llaAddress.ToString(smallBufAlloc.get(), static_cast<uint32_t>(requiredSize - 1), ifaceId), nullptr);
     }
 }
-
 
 /**
  *  Test correct identification of IPv6 ULA addresses.
