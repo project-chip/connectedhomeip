@@ -49,7 +49,6 @@ extern "C" {
 #include "fsl_silicon_id.h"
 #endif
 
-
 namespace chip {
 namespace DeviceLayer {
 
