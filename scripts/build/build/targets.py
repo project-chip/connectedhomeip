@@ -376,8 +376,8 @@ def BuildEfr32Target():
         '-(wifi|use-ot-coap-lib)')
     target.AppendModifier('use-ot-coap-lib', enable_ot_coap_lib=True).ExceptIfRe(
         '-(wifi|use-ot-lib)')
-    target.AppendModifier('no-version', no_version=True)
     target.AppendModifier('skip-rps-generation', use_rps_extension=False)
+    target.AppendModifier('uart-log', uart_log=True)
 
     return target
 
@@ -511,7 +511,6 @@ def BuildAmebaTarget():
         TargetPart('all-clusters-minimal', app=AmebaApp.ALL_CLUSTERS_MINIMAL),
         TargetPart('light', app=AmebaApp.LIGHT),
         TargetPart('light-switch', app=AmebaApp.LIGHT_SWITCH),
-        TargetPart('pigweed', app=AmebaApp.PIGWEED),
     ])
 
     return target

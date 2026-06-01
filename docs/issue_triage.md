@@ -129,7 +129,6 @@ types or functionality) as well as individual examples.
 | `examples/ota-provider-app`                    |                              | UNMAINTAINED |
 | `examples/ota-requestor-app`                   |                              | UNMAINTAINED |
 | `examples/persistent-storage`                  |                              | UNMAINTAINED |
-| `examples/pigweed-app`                         |                              | UNMAINTAINED |
 | `examples/placeholder`                         |                              | UNMAINTAINED |
 | `examples/providers`                           |                              | UNMAINTAINED |
 | `examples/pump-app`                            |                              | UNMAINTAINED |

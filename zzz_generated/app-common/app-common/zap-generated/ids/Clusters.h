@@ -61,9 +61,11 @@
 #include <clusters/DoorLock/ClusterId.h>
 #include <clusters/DynamicLighting/ClusterId.h>
 #include <clusters/EcosystemInformation/ClusterId.h>
+#include <clusters/ElectricalDistribution/ClusterId.h>
 #include <clusters/ElectricalEnergyMeasurement/ClusterId.h>
 #include <clusters/ElectricalGridConditions/ClusterId.h>
 #include <clusters/ElectricalPowerMeasurement/ClusterId.h>
+#include <clusters/ElectricalProtectionAlarm/ClusterId.h>
 #include <clusters/EnergyEvse/ClusterId.h>
 #include <clusters/EnergyEvseMode/ClusterId.h>
 #include <clusters/EnergyPreference/ClusterId.h>
@@ -150,7 +152,6 @@
 #include <clusters/ThreadNetworkDirectory/ClusterId.h>
 #include <clusters/TimeFormatLocalization/ClusterId.h>
 #include <clusters/TimeSynchronization/ClusterId.h>
-#include <clusters/Timer/ClusterId.h>
 #include <clusters/TlsCertificateManagement/ClusterId.h>
 #include <clusters/TlsClientManagement/ClusterId.h>
 #include <clusters/TotalVolatileOrganicCompoundsConcentrationMeasurement/ClusterId.h>

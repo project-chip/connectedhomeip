@@ -187,6 +187,10 @@
 #include <clusters/EcosystemInformation/Commands.h>
 #include <clusters/EcosystemInformation/Events.h>
 #include <clusters/EcosystemInformation/Structs.h>
+#include <clusters/ElectricalDistribution/Attributes.h>
+#include <clusters/ElectricalDistribution/Commands.h>
+#include <clusters/ElectricalDistribution/Events.h>
+#include <clusters/ElectricalDistribution/Structs.h>
 #include <clusters/ElectricalEnergyMeasurement/Attributes.h>
 #include <clusters/ElectricalEnergyMeasurement/Commands.h>
 #include <clusters/ElectricalEnergyMeasurement/Events.h>
@@ -199,6 +203,10 @@
 #include <clusters/ElectricalPowerMeasurement/Commands.h>
 #include <clusters/ElectricalPowerMeasurement/Events.h>
 #include <clusters/ElectricalPowerMeasurement/Structs.h>
+#include <clusters/ElectricalProtectionAlarm/Attributes.h>
+#include <clusters/ElectricalProtectionAlarm/Commands.h>
+#include <clusters/ElectricalProtectionAlarm/Events.h>
+#include <clusters/ElectricalProtectionAlarm/Structs.h>
 #include <clusters/EnergyEvse/Attributes.h>
 #include <clusters/EnergyEvse/Commands.h>
 #include <clusters/EnergyEvse/Events.h>
@@ -543,10 +551,6 @@
 #include <clusters/TimeSynchronization/Commands.h>
 #include <clusters/TimeSynchronization/Events.h>
 #include <clusters/TimeSynchronization/Structs.h>
-#include <clusters/Timer/Attributes.h>
-#include <clusters/Timer/Commands.h>
-#include <clusters/Timer/Events.h>
-#include <clusters/Timer/Structs.h>
 #include <clusters/TlsCertificateManagement/Attributes.h>
 #include <clusters/TlsCertificateManagement/Commands.h>
 #include <clusters/TlsCertificateManagement/Events.h>
