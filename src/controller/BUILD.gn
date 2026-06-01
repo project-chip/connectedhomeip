@@ -131,7 +131,10 @@ static_library("controller") {
       "ThreadMeshcopCommissionProxy.cpp",
       "ThreadMeshcopCommissionProxy.h",
     ]
-    deps += [ "${chip_root}/src/lib/dnssd/minimal_mdns:minimal_mdns" ]
+    deps += [
+      "${chip_root}/src/lib/dnssd/minimal_mdns:minimal_mdns",
+      "${chip_root}/third_party/jsoncpp",
+    ]
     public_deps += [ "${chip_root}/third_party/ot-commissioner" ]
   }
 

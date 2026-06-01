@@ -20,6 +20,8 @@ from mobly import asserts
 from matter import ChipDeviceCtrl, discovery
 from matter.testing.matter_testing import MatterBaseTest, SetupParameters
 
+THREAD_RENDEZVOUS_INFORMATION = 1 << 5
+
 
 def _first_setup_payload_info(test: MatterBaseTest):
     setup_payloads = test.get_setup_payload_info()
@@ -47,7 +49,8 @@ def get_setup_code(test: MatterBaseTest, use_short_discriminator: bool) -> str:
 
     if test.matter_test_config.setup_passcodes and test.matter_test_config.discriminators:
         setup_params = SetupParameters(passcode=test.matter_test_config.setup_passcodes[0],
-                                       discriminator=test.matter_test_config.discriminators[0])
+                                       discriminator=test.matter_test_config.discriminators[0],
+                                       capabilities=THREAD_RENDEZVOUS_INFORMATION)
         return setup_params.manual_code if use_short_discriminator else setup_params.qr_code
 
     setup_payload = _first_setup_payload_info(test)
@@ -56,11 +59,11 @@ def get_setup_code(test: MatterBaseTest, use_short_discriminator: bool) -> str:
                                    "Long-discriminator MeshCoP test steps require --qr-code or --discriminator/--passcode.")
         return setup_payload.setup_code
 
-    if setup_payload.filter_type == discovery.FilterType.LONG_DISCRIMINATOR:
-        short_discriminator = (setup_payload.filter_value >> 8) & 0x0F
+    if setup_payload.filter_type == discovery.FilterType.SHORT_DISCRIMINATOR:
+        manual_code_discriminator = setup_payload.filter_value << 8
     else:
-        short_discriminator = setup_payload.filter_value
-    return test.default_controller.CreateManualCode(short_discriminator, setup_payload.passcode)
+        manual_code_discriminator = setup_payload.filter_value
+    return test.default_controller.CreateManualCode(manual_code_discriminator, setup_payload.passcode)
 
 
 def discriminator_from_config(test: MatterBaseTest, use_short_discriminator: bool) -> int:

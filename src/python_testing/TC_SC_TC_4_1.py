@@ -17,37 +17,21 @@
 
 # N/A - Test requires Thread MeshCoP hardware or simulation and will not run on CI.
 
-import logging
-
-from matter import ChipDeviceCtrl
 from matter.testing.decorators import async_test_body
 from matter.testing.matter_testing import MatterBaseTest, TestStep
 from matter.testing.runner import default_matter_test_main
-
-log = logging.getLogger(__name__)
+from thread_meshcop_testing import establish_pase_over_thread_meshcop, get_setup_code
 
 
 class TC_SC_TC_4_1(MatterBaseTest):
-    def desc_TC_SC_TC_4_1(self) -> str:
-        return "[TC-SC-TC-4.1] Message Framing and PASE Session Establishment [DUT – Commissionee]"
-
-    def steps_TC_SC_TC_4_1(self) -> list[TestStep]:
-        return [
-            TestStep(1, "DUT is ready to be discovered", is_commissioning=False),
-            TestStep(2, "TH establishes PASE session over Thread Meshcop with DUT", is_commissioning=False),
-        ]
 
     @async_test_body
     async def test_TC_SC_TC_4_1(self):
-        self.step(1)
+        """[TC-SC-TC-4.1] Message Framing and PASE Session Establishment [DUT – Commissionee]"""
+        self.step(1, "DUT is ready to be discovered", is_commissioning=False)
         self.wait_for_user_input("Power on the DUT")
-        self.step(2)
-        commissioner: ChipDeviceCtrl.ChipDeviceController = self.default_controller
-        commissioner.SetThreadOperationalDataset(self.matter_test_config.thread_operational_dataset)
-        await commissioner.EstablishPASESessionThreadMeshcop(baAddr=self.matter_test_config.thread_ba_host,
-                                                             setupCode=self.first_setup_code,
-                                                             nodeId=self.matter_test_config.dut_node_ids[0],
-                                                             baPort=self.matter_test_config.thread_ba_port)
+        self.step(2, "TH establishes PASE session over Thread Meshcop with DUT", is_commissioning=False)
+        await establish_pase_over_thread_meshcop(self, get_setup_code(self, use_short_discriminator=False))
 
 
 if __name__ == "__main__":

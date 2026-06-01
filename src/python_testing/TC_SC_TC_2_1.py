@@ -26,28 +26,22 @@ from matter.testing.runner import default_matter_test_main
 
 
 class TC_SC_TC_2_1(MatterBaseTest):
-    def desc_TC_SC_TC_2_1(self) -> str:
-        return "[TC-SC-TC-2.1] Network Discovery and Selection [DUT - Commissionee]"
-
-    def steps_TC_SC_TC_2_1(self) -> list[TestStep]:
-        return [
-            TestStep(1, "TH initiates commissioning with the DUT's long discriminator.",
-                     "DUT provisionally selects the TH's network and sends DNS Announcement."),
-            TestStep(2, "TH initiates commissioning with the DUT's short discriminator.",
-                     "DUT provisionally selects the TH's network and sends DNS Announcement."),
-        ]
 
     @async_test_body
     async def test_TC_SC_TC_2_1(self):
-        self.step(1)
+        """[TC-SC-TC-2.1] Network Discovery and Selection [DUT - Commissionee]"""
+        self.step(1, "TH initiates commissioning with the DUT's long discriminator."
+                     "DUT provisionally selects the TH's network and sends DNS Announcement.")
         self.wait_for_user_input("Power on the factory-fresh DUT.")
         expected_discriminator = discriminator_from_config(self, use_short_discriminator=False)
         diagnostic = await establish_pase_over_thread_meshcop(self, get_setup_code(self, use_short_discriminator=False))
         assert_common_diagnostic_fields(diagnostic, expected_discriminator, use_short_discriminator=False)
 
-        self.step(2)
+        self.step(2, "TH initiates commissioning with the DUT's short discriminator."
+                     "DUT provisionally selects the TH's network and sends DNS Announcement.")
         self.wait_for_user_input("Power cycle or factory reset the DUT so it can be discovered again.")
         expected_discriminator = discriminator_from_config(self, use_short_discriminator=True)
+        print(get_setup_code(self, use_short_discriminator=True))
         diagnostic = await establish_pase_over_thread_meshcop(self, get_setup_code(self, use_short_discriminator=True))
         assert_common_diagnostic_fields(diagnostic, expected_discriminator, use_short_discriminator=True)
 

@@ -27,32 +27,25 @@ from matter.testing.runner import default_matter_test_main
 
 
 class TC_SC_TC_2_2(MatterBaseTest):
-    def desc_TC_SC_TC_2_2(self) -> str:
-        return "[TC-SC-TC-2.2] MAC Extended Address Generation [DUT - Commissionee]"
-
-    def steps_TC_SC_TC_2_2(self) -> list[TestStep]:
-        return [
-            TestStep(1, "TH sets the steering data to match the DUT's full 12-bit discriminator."),
-            TestStep(2, "Power on the DUT.",
-                     "DUT sends a Discovery Request and TH sends a Discovery Response back to the address of DUT."),
-            TestStep(3, "Power cycle the DUT.",
-                     "DUT sends a Discovery Request and TH sends a Discovery Response back to a different address."),
-        ]
 
     @async_test_body
     async def test_TC_SC_TC_2_2(self):
+        """[TC-SC-TC-2.2] MAC Extended Address Generation [DUT - Commissionee]"""
         setup_code = get_setup_code(self, use_short_discriminator=False)
         expected_discriminator = discriminator_from_config(self, use_short_discriminator=False)
 
-        self.step(1)
+        self.step(1, "TH sets the steering data to match the DUT's full 12-bit discriminator."
+                     "DUT sends a Discovery Request and TH sends a Discovery Response back to the address of DUT.")
 
-        self.step(2)
+        self.step(2, "Power on the factory-fresh DUT."
+                     "DUT sends a Discovery Request and TH sends a Discovery Response back to the address of DUT.")
         self.wait_for_user_input("Power on the factory-fresh DUT.")
         first_diagnostic = await establish_pase_over_thread_meshcop(self, setup_code)
         assert_common_diagnostic_fields(first_diagnostic, expected_discriminator, use_short_discriminator=False)
         first_joiner_id = first_diagnostic["joiner_id"]
 
-        self.step(3)
+        self.step(3, "Power cycle the DUT."
+                     "DUT sends a Discovery Request and TH sends a Discovery Response back to a different address.")
         self.wait_for_user_input("Power cycle the DUT.")
         second_diagnostic = await establish_pase_over_thread_meshcop(self, setup_code)
         assert_common_diagnostic_fields(second_diagnostic, expected_discriminator, use_short_discriminator=False)

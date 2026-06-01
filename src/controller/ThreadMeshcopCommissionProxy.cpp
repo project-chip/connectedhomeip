@@ -24,9 +24,10 @@
 #include <lib/support/BytesToHex.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/StringBuilder.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <transport/raw/MessageHeader.h>
+
+#include <json/json.h>
 
 #include <errno.h>
 #include <inttypes.h>
@@ -67,60 +68,6 @@ std::vector<uint8_t> DiscoveryCodeToVector(Thread::DiscoveryCode code)
     return std::vector<uint8_t>(bytes, bytes + sizeof(bytes));
 }
 
-void AddJsonString(StringBuilderBase & builder, const char * value)
-{
-    builder.Add("\"");
-    for (const char * p = value; p != nullptr && *p != '\0'; ++p)
-    {
-        switch (*p)
-        {
-        case '\\':
-            builder.Add("\\\\");
-            break;
-        case '"':
-            builder.Add("\\\"");
-            break;
-        case '\n':
-            builder.Add("\\n");
-            break;
-        case '\r':
-            builder.Add("\\r");
-            break;
-        case '\t':
-            builder.Add("\\t");
-            break;
-        case '\b':
-            builder.Add("\\b");
-            break;
-        case '\f':
-            builder.Add("\\f");
-            break;
-        default:
-            builder.Add(p, 1);
-            break;
-        }
-    }
-    builder.Add("\"");
-}
-
-void BytesToHex(const uint8_t * bytes, size_t size, char * buffer, size_t bufferSize)
-{
-    if (bufferSize == 0)
-    {
-        return;
-    }
-
-    buffer[0] = '\0';
-    if (size == 0)
-    {
-        return;
-    }
-
-    if (Encoding::BytesToUppercaseHexString(bytes, size, buffer, bufferSize) != CHIP_NO_ERROR)
-    {
-        buffer[0] = '\0';
-    }
-}
 } // namespace
 
 namespace chip {
@@ -295,53 +242,61 @@ CHIP_ERROR ThreadMeshcopCommissionProxy::CreateProxySocket(chip::Dnssd::Commissi
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ThreadMeshcopCommissionProxy::GetLastDiscoveryDiagnosticJson(char * buffer, size_t bufferSize)
+std::string ThreadMeshcopCommissionProxy::GetLastDiscoveryDiagnosticJson()
 {
-    VerifyOrReturnError(buffer != nullptr && bufferSize > 0, CHIP_ERROR_INVALID_ARGUMENT);
-
-    std::lock_guard<std::recursive_mutex> lock(mMutex);
-    auto & diagnostic = mLastDiscoveryDiagnostic;
-    StringBuilderBase builder(buffer, bufferSize);
-    if (!diagnostic.valid)
+    DiscoveryDiagnostic diagnostic;
     {
-        builder.Add("{\"valid\":false}");
-        return builder.Fit() ? CHIP_NO_ERROR : CHIP_ERROR_BUFFER_TOO_SMALL;
+        std::lock_guard<std::recursive_mutex> lock(mMutex);
+        diagnostic = mLastDiscoveryDiagnostic;
     }
+
+    Json::Value root(Json::objectValue);
+    Json::StreamWriterBuilder writerBuilder;
+
 
     char steeringDataHex[ot::commissioner::kMaxSteeringDataLength * 2 + 1];
     char rotatingIdHex[Dnssd::kMaxRotatingIdLen * 2 + 1];
-    BytesToHex(diagnostic.steeringData.data(), diagnostic.steeringData.size(), steeringDataHex, sizeof(steeringDataHex));
-    BytesToHex(diagnostic.commissionData.rotatingId, diagnostic.commissionData.rotatingIdLen, rotatingIdHex, sizeof(rotatingIdHex));
+    if (Encoding::BytesToUppercaseHexBuffer(diagnostic.steeringData.data(), diagnostic.steeringData.size(),
+                                                   steeringDataHex, sizeof(steeringDataHex)) != CHIP_NO_ERROR)
+    {
+        diagnostic.valid = false;
+    }
+    if (Encoding::BytesToUppercaseHexBuffer(diagnostic.commissionData.rotatingId, diagnostic.commissionData.rotatingIdLen,
+                                                   rotatingIdHex, sizeof(rotatingIdHex)) != CHIP_NO_ERROR)
+    {
+        diagnostic.valid = false;
+    }
+    root["valid"] = diagnostic.valid;
+    if (!diagnostic.valid)
+    {
+        return Json::writeString(writerBuilder, root);
+    }
 
-    builder.Add("{\"valid\":true");
-    builder.AddFormat(",\"requested_discriminator_type\":\"%s\"", diagnostic.requestedShort ? "short" : "long");
-    builder.AddFormat(",\"requested_discriminator\":%u", diagnostic.requestedValue);
-    builder.AddFormat(",\"expected_long_discriminator\":%u", diagnostic.expectedLongValue);
-    builder.AddFormat(",\"discovery_code\":%" PRIu64, diagnostic.discoveryCode);
-    builder.Add(",\"steering_data_hex\":");
-    AddJsonString(builder, steeringDataHex);
-    builder.AddFormat(",\"joiner_id\":%" PRIu64, diagnostic.joinerId);
-    builder.AddFormat(",\"joiner_udp_port\":%u", diagnostic.joinerUdpPort);
-    builder.Add(",\"dns_announcement\":{");
-    builder.AddFormat("\"long_discriminator\":%u", diagnostic.commissionData.longDiscriminator);
-    builder.AddFormat(",\"commissioning_mode\":%u", diagnostic.commissionData.commissioningMode);
-    builder.AddFormat(",\"device_type\":%" PRIu32, diagnostic.commissionData.deviceType);
-    builder.AddFormat(",\"vendor_id\":%u", diagnostic.commissionData.vendorId);
-    builder.AddFormat(",\"product_id\":%u", diagnostic.commissionData.productId);
-    builder.AddFormat(",\"pairing_hint\":%u", diagnostic.commissionData.pairingHint);
-    builder.AddFormat(",\"service_port\":%u", diagnostic.matterUdpPort);
-    builder.AddFormat(",\"thread_meshcop\":%s", diagnostic.commissionData.threadMeshcop ? "true" : "false");
-    builder.AddFormat(",\"supports_commissioner_generated_passcode\":%s",
-                      diagnostic.commissionData.supportsCommissionerGeneratedPasscode ? "true" : "false");
-    builder.Add(",\"instance_name\":");
-    AddJsonString(builder, diagnostic.commissionData.instanceName);
-    builder.Add(",\"hostname\":");
-    AddJsonString(builder, diagnostic.commissionData.hostName);
-    builder.Add(",\"rotating_id_hex\":");
-    AddJsonString(builder, rotatingIdHex);
-    builder.Add("}}");
+    root["requested_discriminator_type"] = diagnostic.requestedShort ? "short" : "long";
+    root["requested_discriminator"]      = static_cast<Json::Value::UInt>(diagnostic.requestedValue);
+    root["expected_long_discriminator"]  = static_cast<Json::Value::UInt>(diagnostic.expectedLongValue);
+    root["discovery_code"]               = static_cast<Json::Value::UInt64>(diagnostic.discoveryCode);
+    root["steering_data_hex"]            = steeringDataHex;
+    root["joiner_id"]                    = static_cast<Json::Value::UInt64>(diagnostic.joinerId);
+    root["joiner_udp_port"]              = static_cast<Json::Value::UInt>(diagnostic.joinerUdpPort);
 
-    return builder.Fit() ? CHIP_NO_ERROR : CHIP_ERROR_BUFFER_TOO_SMALL;
+    Json::Value dnsAnnouncement(Json::objectValue);
+    dnsAnnouncement["long_discriminator"] = static_cast<Json::Value::UInt>(diagnostic.commissionData.longDiscriminator);
+    dnsAnnouncement["commissioning_mode"] = static_cast<Json::Value::UInt>(diagnostic.commissionData.commissioningMode);
+    dnsAnnouncement["device_type"]        = static_cast<Json::Value::UInt>(diagnostic.commissionData.deviceType);
+    dnsAnnouncement["vendor_id"]          = static_cast<Json::Value::UInt>(diagnostic.commissionData.vendorId);
+    dnsAnnouncement["product_id"]         = static_cast<Json::Value::UInt>(diagnostic.commissionData.productId);
+    dnsAnnouncement["pairing_hint"]       = static_cast<Json::Value::UInt>(diagnostic.commissionData.pairingHint);
+    dnsAnnouncement["service_port"]       = static_cast<Json::Value::UInt>(diagnostic.matterUdpPort);
+    dnsAnnouncement["thread_meshcop"]     = diagnostic.commissionData.threadMeshcop;
+    dnsAnnouncement["supports_commissioner_generated_passcode"] =
+        diagnostic.commissionData.supportsCommissionerGeneratedPasscode;
+    dnsAnnouncement["instance_name"]   = diagnostic.commissionData.instanceName;
+    dnsAnnouncement["hostname"]        = diagnostic.commissionData.hostName;
+    dnsAnnouncement["rotating_id_hex"] = rotatingIdHex;
+    root["dns_announcement"]           = dnsAnnouncement;
+
+    return Json::writeString(writerBuilder, root);
 }
 
 void ThreadMeshcopCommissionProxy::OnRecord(const mdns::Minimal::BytesRange & name, const mdns::Minimal::BytesRange & value)

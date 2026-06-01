@@ -27,20 +27,12 @@ from matter.testing.runner import default_matter_test_main
 
 
 class TC_SC_TC_3_1(MatterBaseTest):
-    def desc_TC_SC_TC_3_1(self) -> str:
-        return "[TC-SC-TC-3.1] Matter Discovery - Advertisement [DUT - Commissionee]"
-
-    def steps_TC_SC_TC_3_1(self) -> list[TestStep]:
-        return [
-            TestStep(1, "DUT successfully selects a Thread network provisionally.",
-                     "DUT sends a DNS Announcement containing commissionable node discovery information."),
-            TestStep(2, "TH sends incoming commissioning messages to establish the secure session.",
-                     "The DUT receives the commissioning messages and starts establishing a secure session with TH."),
-        ]
 
     @async_test_body
     async def test_TC_SC_TC_3_1(self):
-        self.step(1)
+        """[TC-SC-TC-3.1] Matter Discovery - Advertisement [DUT - Commissionee]"""
+        self.step(1, "DUT successfully selects a Thread network provisionally."
+                     "DUT sends a DNS Announcement containing commissionable node discovery information.")
         self.wait_for_user_input("Power on the factory-fresh DUT.")
         expected_discriminator = discriminator_from_config(self, use_short_discriminator=False)
         diagnostic = await establish_pase_over_thread_meshcop(self, get_setup_code(self, use_short_discriminator=False))
@@ -50,7 +42,8 @@ class TC_SC_TC_3_1(MatterBaseTest):
         asserts.assert_greater(announcement["commissioning_mode"], 0,
                                "DNS announcement must indicate that the DUT is commissionable.")
 
-        self.step(2)
+        self.step(2, "TH sends incoming commissioning messages to establish the secure session."
+                     "The DUT receives the commissioning messages and starts establishing a secure session with TH.")
         # Step 1 establishes PASE over the Matter UDP port advertised in the DNS announcement.
         # Returning from EstablishPASESessionThreadMeshcop without an exception verifies this step.
 

@@ -22,6 +22,7 @@
 #include <future>
 #include <memory>
 #include <mutex>
+#include <string>
 #include <thread>
 #include <vector>
 
@@ -68,7 +69,7 @@ public:
      */
     CHIP_ERROR Discover(ByteSpan & pskc, const Transport::PeerAddress & peerAddr, const Thread::DiscoveryCode code,
                         chip::SetupDiscriminator expectedDiscriminator, Dnssd::DiscoveredNodeData & nodeData, uint16_t timeout);
-    CHIP_ERROR GetLastDiscoveryDiagnosticJson(char * buffer, size_t bufferSize);
+    std::string GetLastDiscoveryDiagnosticJson();
 
     // ot::commissioner::CommissionerHandler
     void OnJoinerMessage(const std::vector<uint8_t> & joinerIdBytes, uint16_t joinerPort,
