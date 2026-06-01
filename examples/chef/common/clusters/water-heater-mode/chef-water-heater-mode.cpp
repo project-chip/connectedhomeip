@@ -51,7 +51,6 @@ void MatterWaterHeaterModeClusterShutdownCallback(EndpointId endpointId, MatterC
         gWaterHeaterModeInstance->Shutdown();
         gWaterHeaterModeInstance.reset();
     }
-    WaterHeaterMode::Shutdown();
 }
 
 #endif // MATTER_DM_WATER_HEATER_MODE_CLUSTER_SERVER_ENDPOINT_COUNT > 0
