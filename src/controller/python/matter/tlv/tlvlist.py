@@ -17,6 +17,8 @@
 #   limitations under the License.
 #
 
+from __future__ import annotations
+
 import dataclasses
 import enum
 from typing import Any, Iterator
@@ -77,7 +79,7 @@ class TLVList:
 
     @dataclasses.dataclass
     class TLVListItem:
-        tag: None | int
+        tag: int | None
         value: Any
 
         def as_tuple(self):
@@ -150,7 +152,7 @@ class TLVList:
             return self._get_item_by_tag(access)
         raise ValueError("Invalid access method")
 
-    def append(self, tag: None | int, value: Any) -> None:
+    def append(self, tag: int | None, value: Any) -> None:
         """Appends an item to the list."""
         if (tag is not None) and (not isinstance(tag, int)):
             raise KeyError(f"Tag should be a integer or none for anonymous tag, {type(tag)} got")
@@ -163,7 +165,7 @@ class TLVList:
         for items in self._data:
             yield items.as_rich_repr_tuple()
 
-    def __iter__(self) -> """TLVList.Iterator""":
+    def __iter__(self) -> TLVList.Iterator:
         return TLVList.Iterator(iter(self._data))
 
     def __eq__(self, rhs: object) -> bool:
