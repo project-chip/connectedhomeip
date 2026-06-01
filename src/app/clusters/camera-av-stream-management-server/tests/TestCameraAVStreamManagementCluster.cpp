@@ -1729,8 +1729,6 @@ TEST_F(TestCameraAVStreamManagementCluster, TestUpdateSnapshotStreamRefCount)
 
 TEST_F(TestCameraAVStreamManagementCluster, TestReferenceCountResetOnBoot)
 {
-    chip::app::DefaultAttributePersistenceProvider mAttributePersistence;
-    ASSERT_EQ(mAttributePersistence.Init(&mClusterTester.GetServerClusterContext().storage), CHIP_NO_ERROR);
     // 1. Prepare data with non-zero referenceCount
     VideoStreamStruct stream{};
     stream.videoStreamID  = 1;
@@ -1749,7 +1747,7 @@ TEST_F(TestCameraAVStreamManagementCluster, TestReferenceCountResetOnBoot)
 
     // 2. Write to persistence
     ConcreteAttributePath path(kTestEndpointId, CameraAvStreamManagement::Id, Attributes::AllocatedVideoStreams::Id);
-    ASSERT_EQ(mAttributePersistence.WriteValue(path, ByteSpan(buffer, len)), CHIP_NO_ERROR);
+    ASSERT_EQ(mClusterTester.GetTestContext().AttributePersistenceProvider().WriteValue(path, ByteSpan(buffer, len)), CHIP_NO_ERROR);
 
     // 3. Simulate a reboot: Startup reloads persistent attributes (resetting refCounts),
     //    Init validates feature configuration.
