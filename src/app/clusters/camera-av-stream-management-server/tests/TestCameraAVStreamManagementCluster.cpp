@@ -1747,7 +1747,8 @@ TEST_F(TestCameraAVStreamManagementCluster, TestReferenceCountResetOnBoot)
 
     // 2. Write to persistence
     ConcreteAttributePath path(kTestEndpointId, CameraAvStreamManagement::Id, Attributes::AllocatedVideoStreams::Id);
-    ASSERT_EQ(mClusterTester.GetTestContext().AttributePersistenceProvider().WriteValue(path, ByteSpan(buffer, len)), CHIP_NO_ERROR);
+    ASSERT_EQ(mClusterTester.GetTestContext().AttributePersistenceProvider().WriteValue(path, ByteSpan(buffer, len)),
+              CHIP_NO_ERROR);
 
     // 3. Simulate a reboot: Startup reloads persistent attributes (resetting refCounts),
     //    Init validates feature configuration.
