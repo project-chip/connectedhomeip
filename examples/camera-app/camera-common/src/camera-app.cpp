@@ -278,7 +278,6 @@ void CameraApp::CreateAndInitializeCameraAVStreamMgmt()
 
     // Instantiate the CameraAVStreamMgmt Server
     CameraAVStreamManagementCluster::InitArguments args{
-        .context                      = CameraAVStreamManagementCluster::Context{ *app::GetSafeAttributePersistenceProvider() },
         .delegate                     = mCameraDevice->GetCameraAVStreamMgmtDelegate(),
         .endpointId                   = mEndpoint,
         .features                     = avsmFeatures,

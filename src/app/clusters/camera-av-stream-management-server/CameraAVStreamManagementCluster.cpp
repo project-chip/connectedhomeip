@@ -53,7 +53,7 @@ namespace Clusters {
 namespace CameraAvStreamManagement {
 
 CameraAVStreamManagementCluster::CameraAVStreamManagementCluster(InitArguments && aArgs) :
-    DefaultServerCluster({ aArgs.endpointId, CameraAvStreamManagement::Id }), mContext(aArgs.context), mDelegate(aArgs.delegate),
+    DefaultServerCluster({ aArgs.endpointId, CameraAvStreamManagement::Id }), mDelegate(aArgs.delegate),
     mEnabledFeatures(aArgs.features), mOptionalAttrs(aArgs.optionalAttrs), mMaxConcurrentEncoders(aArgs.maxConcurrentEncoders),
     mMaxEncodedPixelRate(aArgs.maxEncodedPixelRate), mVideoSensorParams(std::move(aArgs.videoSensorParams)),
     mNightVisionUsesInfrared(aArgs.nightVisionUsesInfrared), mMinViewPortResolution(std::move(aArgs.minViewPort)),

@@ -88,11 +88,9 @@ static std::vector<StreamUsageEnum> & GetSupportedStreamUsages()
     return supportedStreamUsage;
 }
 
-static CameraAVStreamManagementCluster::InitArguments MakeInitArguments(CameraAVStreamManagementDelegate & delegate,
-                                                                        SafeAttributePersistenceProvider & persistenceProvider)
+static CameraAVStreamManagementCluster::InitArguments MakeInitArguments(CameraAVStreamManagementDelegate & delegate)
 {
     CameraAVStreamManagementCluster::InitArguments args{
-        .context    = { persistenceProvider },
         .delegate   = delegate,
         .endpointId = kTestEndpointId,
         .features   = chip::BitFlags<CameraAvStreamManagement::Feature>(
@@ -322,7 +320,7 @@ struct TestCameraAVStreamManagementCluster : public ::testing::Test
 
     TestCameraAVStreamManagementCluster() :
         mMockDelegate(&mVideoStreams, &mAudioStreams, &mSnapshotStreams),
-        mServer(MakeInitArguments(mMockDelegate, mPersistenceProvider)), mClusterTester(mServer)
+        mServer(MakeInitArguments(mMockDelegate)), mClusterTester(mServer)
     {}
 
     void SetUp() override
@@ -1797,24 +1795,7 @@ struct TestCodegenCameraAVStreamManagementMigration : public ::testing::Test
 
     TestCodegenCameraAVStreamManagementMigration() :
         mMockDelegate(&mVideoStreams, &mAudioStreams, &mSnapshotStreams),
-        mServer(mMockDelegate, kTestEndpointId,
-                chip::BitFlags<CameraAvStreamManagement::Feature>(
-                    CameraAvStreamManagement::Feature::kVideo, CameraAvStreamManagement::Feature::kAudio,
-                    CameraAvStreamManagement::Feature::kSnapshot, CameraAvStreamManagement::Feature::kSpeaker,
-                    CameraAvStreamManagement::Feature::kImageControl, CameraAvStreamManagement::Feature::kPrivacy,
-                    CameraAvStreamManagement::Feature::kWatermark, CameraAvStreamManagement::Feature::kHighDynamicRange,
-                    CameraAvStreamManagement::Feature::kNightVision),
-                chip::BitFlags<CameraAvStreamManagement::OptionalAttribute>(
-                    CameraAvStreamManagement::OptionalAttribute::kHardPrivacyModeOn,
-                    CameraAvStreamManagement::OptionalAttribute::kMicrophoneAGCEnabled,
-                    CameraAvStreamManagement::OptionalAttribute::kImageRotation,
-                    CameraAvStreamManagement::OptionalAttribute::kImageFlipHorizontal,
-                    CameraAvStreamManagement::OptionalAttribute::kImageFlipVertical,
-                    CameraAvStreamManagement::OptionalAttribute::kStatusLightEnabled,
-                    CameraAvStreamManagement::OptionalAttribute::kStatusLightBrightness),
-                1, 248832000 /*1920*1080*120*/, GetVideoSensorParams(), false, { 640, 480 }, GetRateDistortionTradeOffPoints(),
-                4096, GetAudioCapabilities(), GetAudioCapabilities(), TwoWayTalkSupportTypeEnum::kFullDuplex,
-                GetSnapshotCapabilities(), 128000000, GetSupportedStreamUsages(), GetSupportedStreamUsages()),
+        mServer(MakeInitArguments(mMockDelegate)),
         mClusterTester(mServer)
     {}
 

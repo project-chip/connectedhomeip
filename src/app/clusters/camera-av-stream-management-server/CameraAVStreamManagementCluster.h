@@ -386,19 +386,9 @@ enum class OptionalAttribute : uint32_t
 class CameraAVStreamManagementCluster : public DefaultServerCluster
 {
 public:
-    struct Context
-    {
-        SafeAttributePersistenceProvider & safeAttributePersistenceProvider;
-    };
 
     struct InitArguments
     {
-        /**
-         * Context providing injected dependencies.
-         * Note: the caller must ensure that the SafeAttributePersistenceProvider referenced by the context outlives this instance.
-         */
-        Context context;
-
         /**
          * A reference to the delegate to be used by this server.
          * Note: the caller must ensure that the delegate lives throughout the instance's lifetime.
