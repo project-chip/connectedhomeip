@@ -404,10 +404,11 @@ def main():
             srcDir = f'{cmdLineArgs.outputDir}/{src}'
             if not os.path.exists(srcDir):
                 continue
-            print(f"Moving files from {srcDir} INTO {cmdLineArgs.outputDir}/{dest}")
-            # move all files
+            destDir = os.path.join(cmdLineArgs.outputDir, dest)
+            os.makedirs(destDir, exist_ok=True)
+            print(f"Moving files from {srcDir} INTO {destDir}")
             for name in glob.glob(f'{srcDir}/*'):
-                os.rename(name, f'{cmdLineArgs.outputDir}/{dest}/{os.path.basename(name)}')
+                os.replace(name, os.path.join(destDir, os.path.basename(name)))
             os.rmdir(srcDir)
 
     if cmdLineArgs.prettify_output:

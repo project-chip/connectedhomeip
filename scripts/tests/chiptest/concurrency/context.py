@@ -25,6 +25,11 @@ from pathlib import Path
 from types import TracebackType
 from typing import Iterator, Literal, Self
 
+from python_path import PythonPath
+
+with PythonPath("../../../../src/python_testing/matter_testing_infrastructure", relative_to=__file__):
+    from matter.testing.concurrency.context import TerminablePopen, TerminableResource, TerminableThread
+
 log = logging.getLogger(__name__)
 
 
@@ -103,3 +108,12 @@ def mp_wrapped_spawn_context(wrapper_linux: str | None) -> Iterator[SpawnContext
         source_context.set_executable(old_executable)
         if mp_wrapper_name is not None:
             mp_wrapper_name.unlink()
+
+
+__all__ = [
+    "mp_wrapped_spawn_context",
+    "StartStopContextMixin",
+    "TerminablePopen",
+    "TerminableResource",
+    "TerminableThread",
+]
