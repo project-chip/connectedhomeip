@@ -43,7 +43,9 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.commissioning import ROOT_ENDPOINT_ID
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
@@ -53,11 +55,11 @@ class TC_CGEN_2_9(MatterBaseTest):
     async def remove_commissioner_fabric(self):
         commissioner: ChipDeviceCtrl.ChipDeviceController = self.default_controller
 
-        commissioner_fabric_index_on_dut = await self.read_single_attribute(
+        commissioner_fabric_index_on_dut = await self.read_single_attribute_check_success(
             dev_ctrl=commissioner,
-            node_id=self.dut_node_id,
-            endpoint=ROOT_ENDPOINT_ID,
-            attribute=Clusters.OperationalCredentials.Attributes.CurrentFabricIndex)
+            cluster=Clusters.OperationalCredentials,
+            attribute=Clusters.OperationalCredentials.Attributes.CurrentFabricIndex,
+            endpoint=ROOT_ENDPOINT_ID)
         log.info(f"Commissioner's fabricIndex on DUT: {commissioner_fabric_index_on_dut}")
 
         fabrics: list[Clusters.OperationalCredentials.Structs.FabricDescriptorStruct] = await self.read_single_attribute(

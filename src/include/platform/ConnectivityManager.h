@@ -185,6 +185,8 @@ public:
     CHIP_ERROR GetAndLogWiFiStatsCounters();
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
     struct WiFiPAFAdvertiseParam;
+    void WiFiPAFSetParam(const WiFiPAFAdvertiseParam & pafAdvParam);
+    CHIP_ERROR SetWiFiPAFAdvertisingEnabled(bool enabled, uint32_t & publishId);
     CHIP_ERROR WiFiPAFPublish(WiFiPAFAdvertiseParam & args);
     CHIP_ERROR WiFiPAFCancelPublish(uint32_t PublishId);
     typedef void (*OnConnectionCompleteFunct)(void * appState);
@@ -300,11 +302,8 @@ struct ConnectivityManager::SEDIntervalsConfig
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
 struct ConnectivityManager::WiFiPAFAdvertiseParam
 {
-    /* To enable/disable WiFiPAF Commissioning */
-    bool enable;
-
     /* Frequency list */
-    uint16_t freq_list_len;
+    uint16_t freq_list_len = 0;
     std::unique_ptr<uint16_t[]> freq_list;
     uint32_t publish_id;
 };
@@ -313,7 +312,7 @@ struct ConnectivityManager::WiFiPAFAdvertiseParam
 /**
  * Returns a reference to the public interface of the ConnectivityManager singleton object.
  *
- * chip applications should use this to access features of the ConnectivityManager object
+ * Applications should use this to access features of the ConnectivityManager object
  * that are common to all platforms.
  */
 extern ConnectivityManager & ConnectivityMgr();
@@ -321,7 +320,7 @@ extern ConnectivityManager & ConnectivityMgr();
 /**
  * Returns the platform-specific implementation of the ConnectivityManager singleton object.
  *
- * chip applications can use this to gain access to features of the ConnectivityManager
+ * Applications can use this to gain access to features of the ConnectivityManager
  * that are specific to the selected platform.
  */
 extern ConnectivityManagerImpl & ConnectivityMgrImpl();
@@ -329,7 +328,7 @@ extern ConnectivityManagerImpl & ConnectivityMgrImpl();
 } // namespace DeviceLayer
 } // namespace chip
 
-/* Include a header file containing the implementation of the ConfigurationManager
+/* Include a header file containing the implementation of the ConnectivityManager
  * object for the selected platform.
  */
 #ifdef EXTERNAL_CONNECTIVITYMANAGERIMPL_HEADER
@@ -450,6 +449,16 @@ inline CHIP_ERROR ConnectivityManager::GetAndLogWiFiStatsCounters()
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+inline void ConnectivityManager::WiFiPAFSetParam(const WiFiPAFAdvertiseParam & pafAdvParam)
+{
+    return static_cast<ImplClass *>(this)->_WiFiPAFSetParam(pafAdvParam);
+}
+
+inline CHIP_ERROR ConnectivityManager::SetWiFiPAFAdvertisingEnabled(bool enabled, uint32_t & publishId)
+{
+    return static_cast<ImplClass *>(this)->_SetWiFiPAFAdvertisingEnabled(enabled, publishId);
+}
+
 inline CHIP_ERROR ConnectivityManager::WiFiPAFPublish(WiFiPAFAdvertiseParam & args)
 {
     return static_cast<ImplClass *>(this)->_WiFiPAFPublish(args);

@@ -19,8 +19,8 @@
 #pragma once
 
 #include "push-av-stream-transport-delegate.h"
-#include <app/clusters/tls-certificate-management-server/TlsCertificateManagementCluster.h>
-#include <app/clusters/tls-client-management-server/TlsClientManagementCluster.h>
+#include <app/clusters/tls-certificate-management-server/TLSCertificateManagementCluster.h>
+#include <app/clusters/tls-client-management-server/TLSClientManagementCluster.h>
 
 namespace chip {
 namespace app {
@@ -31,10 +31,10 @@ namespace PushAvStreamTransport {
 void SetDelegate(chip::EndpointId endpointId, PushAvStreamTransportDelegate * delegate);
 
 /// Sets the given TLS Client Management delegate on an endpoint configured via code-generation
-void SetTLSClientManagementDelegate(chip::EndpointId endpointId, TlsClientManagementDelegate * delegate);
+void SetTLSClientManagementDelegate(chip::EndpointId endpointId, TLSClientManagementDelegate * delegate);
 
 /// Sets the given TLS Certificate Management delegate on an endpoint configured via code-generation
-void SetTlsCertificateManagementDelegate(chip::EndpointId endpointId, TlsCertificateManagementDelegate * delegate);
+void SetTLSCertificateManagementDelegate(chip::EndpointId endpointId, TLSCertificateManagementDelegate * delegate);
 
 } // namespace PushAvStreamTransport
 } // namespace Clusters

@@ -42,8 +42,6 @@
 # === END CI TEST ARGUMENTS ===
 
 
-from typing import List
-
 from mobly import asserts
 from TC_SETRF_TestBase import CommodityTariffTestBaseHelper
 
@@ -51,7 +49,8 @@ import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing import matter_asserts
-from matter.testing.matter_testing import TestStep, async_test_body, default_matter_test_main
+from matter.testing.decorators import async_test_body
+from matter.testing.runner import TestStep, default_matter_test_main
 
 cluster = Clusters.CommodityTariff
 
@@ -116,11 +115,11 @@ class TC_SETRF_2_2(CommodityTariffTestBaseHelper):
         endpoint = self.get_endpoint()
 
         # Variables that will be used in the test to store intermediate values
-        tariffComponentIDs: List[int] = []
+        tariffComponentIDs: list[int] = []
         tariffComponentID1: int | None = None
         tariffComponentStruct1: Clusters.CommodityTariff.Structs.TariffComponentStruct | None = None
-        dayEntryIDs: List[int] = []
-        dayEntryIDs1: List[int] = []
+        dayEntryIDs: list[int] = []
+        dayEntryIDs1: list[int] = []
         dayEntryID1: int | None = None
         dayEntryStruct1: Clusters.CommodityTariff.Structs.DayEntryStruct | None = None
 

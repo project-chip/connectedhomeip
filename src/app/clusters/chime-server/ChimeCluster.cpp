@@ -22,10 +22,12 @@
 
 #include "ChimeCluster.h"
 
-#include <app/SafeAttributePersistenceProvider.h>
+#include <app/EventLogging.h>
+#include <app/persistence/AttributePersistence.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <clusters/Chime/Attributes.h>
 #include <clusters/Chime/Commands.h>
+#include <clusters/Chime/Events.h>
 #include <clusters/Chime/Metadata.h>
 #include <clusters/Chime/Structs.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -78,32 +80,23 @@ CHIP_ERROR ChimeCluster::Attributes(const ConcreteClusterPath & path, ReadOnlyBu
     return listBuilder.Append(Span(Chime::Attributes::kMandatoryMetadata), {});
 }
 
-// TODO: Migrate to use context.attributeStorage instead of SafeAttributePersistenceProvider
 void ChimeCluster::LoadPersistentAttributes()
 {
+    AttributePersistence attrPersistence{ mContext->attributeStorage };
+
     // Load Active Chime ID
-    uint8_t storedSelectedChime = 0;
-    CHIP_ERROR err              = GetSafeAttributePersistenceProvider()->ReadScalarValue(
-        ConcreteAttributePath(mPath.mEndpointId, Chime::Id, SelectedChime::Id), storedSelectedChime);
-    if (err == CHIP_NO_ERROR)
-    {
-        mSelectedChime = storedSelectedChime;
-    }
-    else
+    const uint8_t defaultSelectedChime = mSelectedChime;
+    if (!attrPersistence.LoadNativeEndianValue<uint8_t>(ConcreteAttributePath(mPath.mEndpointId, Chime::Id, SelectedChime::Id),
+                                                        mSelectedChime, defaultSelectedChime))
     {
         // otherwise defaults
         ChipLogDetail(Zcl, "Chime: Unable to load the SelectedChime attribute from the KVS. Defaulting to %u", mSelectedChime);
     }
 
     // Load Enabled
-    bool storedEnabled = false;
-    err = GetSafeAttributePersistenceProvider()->ReadScalarValue(ConcreteAttributePath(mPath.mEndpointId, Chime::Id, Enabled::Id),
-                                                                 storedEnabled);
-    if (err == CHIP_NO_ERROR)
-    {
-        mEnabled = storedEnabled;
-    }
-    else
+    const bool defaultEnabled = mEnabled;
+    if (!attrPersistence.LoadNativeEndianValue<bool>(ConcreteAttributePath(mPath.mEndpointId, Chime::Id, Enabled::Id), mEnabled,
+                                                     defaultEnabled))
     {
         // otherwise take the default
         ChipLogDetail(Zcl, "Chime: Unable to load the Enabled attribute from the KVS. Defaulting to %u", mEnabled);
@@ -221,33 +214,26 @@ DataModel::ActionReturnStatus ChimeCluster::WriteAttribute(const DataModel::Writ
 
 Status ChimeCluster::SetSelectedChime(uint8_t chimeID)
 {
-    if (!IsSupportedChimeID(chimeID))
-    {
-        return Protocols::InteractionModel::Status::NotFound;
-    }
-    if (mSelectedChime != chimeID)
-    {
-        mSelectedChime = chimeID;
-        NotifyAttributeChanged(Attributes::SelectedChime::Id);
+    VerifyOrReturnValue(mContext != nullptr, Status::InvalidInState);
+    VerifyOrReturnValue(IsSupportedChimeID(chimeID), Status::NotFound);
+    VerifyOrReturnValue(SetAttributeValue(mSelectedChime, chimeID, Attributes::SelectedChime::Id), Status::Success);
 
-        // TODO: Migrate to use context.attributeStorage
-        TEMPORARY_RETURN_IGNORED GetSafeAttributePersistenceProvider()->WriteScalarValue(
-            { mPath.mEndpointId, Chime::Id, Attributes::SelectedChime::Id }, mSelectedChime);
-    }
+    TEMPORARY_RETURN_IGNORED mContext->attributeStorage.WriteValue(
+        ConcreteAttributePath(mPath.mEndpointId, Chime::Id, Attributes::SelectedChime::Id),
+        { reinterpret_cast<const uint8_t *>(&mSelectedChime), sizeof(mSelectedChime) });
+
     return Protocols::InteractionModel::Status::Success;
 }
 
 Status ChimeCluster::SetEnabled(bool enabled)
 {
-    if (mEnabled != enabled)
-    {
-        mEnabled = enabled;
-        NotifyAttributeChanged(Attributes::Enabled::Id);
+    VerifyOrReturnValue(mContext != nullptr, Status::InvalidInState);
+    VerifyOrReturnValue(SetAttributeValue(mEnabled, enabled, Attributes::Enabled::Id), Status::Success);
 
-        // TODO: Migrate to use context.attributeStorage
-        TEMPORARY_RETURN_IGNORED GetSafeAttributePersistenceProvider()->WriteScalarValue(
-            { mPath.mEndpointId, Chime::Id, Attributes::Enabled::Id }, mEnabled);
-    }
+    TEMPORARY_RETURN_IGNORED mContext->attributeStorage.WriteValue(
+        ConcreteAttributePath(mPath.mEndpointId, Chime::Id, Attributes::Enabled::Id),
+        { reinterpret_cast<const uint8_t *>(&mEnabled), sizeof(mEnabled) });
+
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -259,19 +245,60 @@ std::optional<DataModel::ActionReturnStatus> ChimeCluster::InvokeCommand(const D
     {
     case Commands::PlayChimeSound::Id: {
         ChipLogDetail(Zcl, "Chime: PlayChimeSound");
-        Status status = Status::Success;
 
-        // Only invoke the delegate if enabled, otherwise don't play a sound, and "silently" return
-        if (mEnabled)
-        {
-            // call the delegate to play the chime
-            status = mDelegate.PlayChimeSound();
-        }
-
-        return status;
+        Commands::PlayChimeSound::DecodableType commandData;
+        ReturnErrorOnFailure(commandData.Decode(input_arguments));
+        return HandlePlayChimeSound(*handler, request.path, commandData);
     }
     default:
         return Status::UnsupportedCommand;
+    }
+}
+
+DataModel::ActionReturnStatus ChimeCluster::HandlePlayChimeSound(CommandHandler & aHandler, const ConcreteCommandPath & aPath,
+                                                                 const Commands::PlayChimeSound::DecodableType & commandData)
+{
+    // Immediately return if we're not enabled
+    //
+    if (!mEnabled)
+    {
+        return Status::Success;
+    }
+
+    // If we have a provided Chime ID, ensure it is valid
+    //
+    uint8_t chimeIDToUse = mSelectedChime;
+    if (commandData.chimeID.HasValue())
+    {
+        if (!IsSupportedChimeID(commandData.chimeID.Value()))
+        {
+            ChipLogError(Zcl, "Chime: Unknown Chime ID provided to PlayChimeSound");
+            return Status::NotFound;
+        }
+
+        chimeIDToUse = commandData.chimeID.Value();
+    }
+
+    Status status = mDelegate.PlayChimeSound(chimeIDToUse);
+    if (status == Status::Success)
+    {
+        // Generate the event
+        GenerateChimeStartedPlayingEvent(chimeIDToUse);
+    }
+    return status;
+}
+
+void ChimeCluster::GenerateChimeStartedPlayingEvent(const uint8_t chimeID)
+{
+    Events::ChimeStartedPlaying::Type event;
+    EventNumber eventNumber;
+
+    event.chimeID = chimeID;
+
+    CHIP_ERROR err = LogEvent(event, GetPaths().data()->mEndpointId, eventNumber);
+    if (CHIP_NO_ERROR != err)
+    {
+        ChipLogError(Zcl, "Unable to generate ChimeStartedPlaying event");
     }
 }
 

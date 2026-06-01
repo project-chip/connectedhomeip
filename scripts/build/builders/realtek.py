@@ -15,7 +15,9 @@
 import os
 from enum import Enum, auto
 
-from .builder import Builder, BuilderOutput
+from runner.runner import Runner
+
+from .builder import Builder, BuilderOutput, OutDirLock, lock_output_dir
 
 
 class RtkOsUsed(Enum):
@@ -110,20 +112,22 @@ class RealtekApp(Enum):
 class RealtekBuilder(Builder):
 
     def __init__(self,
-                 root,
-                 runner,
+                 root: str,
+                 runner: Runner,
+                 output_dir_lock: OutDirLock,
                  board: RealtekBoard = RealtekBoard.RTL8777G,
                  app: RealtekApp = RealtekApp.LIGHT,
                  enable_cli: bool = False,
                  enable_rpc: bool = False,
                  enable_shell: bool = False):
-        super(RealtekBuilder, self).__init__(root, runner)
+        super().__init__(root, runner, output_dir_lock)
         self.board = board
         self.app = app
         self.enable_cli = enable_cli
         self.enable_rpc = enable_rpc
         self.enable_shell = enable_shell
-        self.ot_src_dir = os.path.join(os.getcwd(), 'third_party/openthread/ot-realtek')
+        self.ot_src_dir = os.path.join(self.root, 'third_party/openthread/ot-realtek')
+        self.rtk_matter_dir = os.path.join(self.ot_src_dir, 'third_party/Realtek/rtl87x2g_sdk/subsys/matter')
 
         if self.board == RealtekBoard.RTL87X2G:
             self.os_env = RtkOsUsed.ZEPHYR
@@ -135,7 +139,7 @@ class RealtekBuilder(Builder):
     def CmakeBuildFlags(self) -> str:
         flags = [
             "-DCMAKE_BUILD_TYPE=Release",
-            "-DCMAKE_TOOLCHAIN_FILE=src/bee4/arm-none-eabi.cmake",
+            f"-DCMAKE_TOOLCHAIN_FILE={self.ot_src_dir}/src/rtl87x2g/arm-none-eabi.cmake",
             "-DBUILD_TYPE=sdk",
             f"-DBUILD_TARGET={self.board.BoardName}",
             f"-DBUILD_BOARD_TARGET={self.board.BoardName}",
@@ -168,20 +172,22 @@ class RealtekBuilder(Builder):
 
         return cmd
 
+    @lock_output_dir
     def generate(self):
         if self.os_env != RtkOsUsed.FREERTOS:
             # For freertos, app.ld needs to be precompiled with gcc
             return
-        cmd = 'arm-none-eabi-gcc -D BUILD_BANK=0 -E -P -x c {ot_src_dir}/src/bee4/{board_name}/app.ld -o {ot_src_dir}/src/bee4/{board_name}/app.ld.gen'.format(
+        cmd = 'arm-none-eabi-gcc -D BUILD_BANK=0 -E -P -x c {ot_src_dir}/src/rtl87x2g/{board_name}/app.ld -o {ot_src_dir}/src/rtl87x2g/{board_name}/app.ld.gen'.format(
             ot_src_dir=self.ot_src_dir,
             board_name=self.board.BoardName)
         self._Execute(['bash', '-c', cmd])
-        cmd = 'cmake -GNinja -DOT_COMPILE_WARNING_AS_ERROR=ON {build_flags} {example_folder} -B{out_folder}'.format(
+        cmd = 'cmake -GNinja -DOT_COMPILE_WARNING_AS_ERROR=ON {build_flags} -DPython3_EXECUTABLE=$(which python3) {example_folder} -B{out_folder}'.format(
             build_flags=self.CmakeBuildFlags(),
-            example_folder=self.ot_src_dir,
+            example_folder=self.rtk_matter_dir,
             out_folder=self.output_dir)
         self._Execute(['bash', '-c', cmd], title='Generating ' + self.identifier)
 
+    @lock_output_dir
     def _build(self):
         if self.os_env == RtkOsUsed.FREERTOS:
             cmd = ['ninja', '-C', self.output_dir]
@@ -189,7 +195,7 @@ class RealtekBuilder(Builder):
                 cmd.append('-j' + str(self.ninja_jobs))
             cmd.append(self.app.TargetName)
             self._Execute(cmd, title='Building ' + self.identifier)
-            cleanup_cmd = ['rm', '-rf', f"{self.root}/third_party/openthread/ot-realtek/src/bee4/{self.board.BoardName}/*.gen"]
+            cleanup_cmd = ['rm', '-rf', f"{self.root}/third_party/openthread/ot-realtek/src/rtl87x2g/{self.board.BoardName}/*.gen"]
             self._Execute(cleanup_cmd, title='Cleaning up generated files')
         else:
             cmd = self.get_cmd_prefixes()
@@ -199,6 +205,7 @@ class RealtekBuilder(Builder):
                 example_folder=os.path.join(self.root, 'examples', self.app.ExampleName, 'realtek', 'zephyr'))
             self._Execute(['bash', '-c', cmd], title='Building ' + self.identifier)
 
+    @lock_output_dir
     def build_outputs(self):
         if self.os_env == RtkOsUsed.FREERTOS:
             yield BuilderOutput(

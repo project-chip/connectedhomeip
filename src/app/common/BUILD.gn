@@ -52,10 +52,17 @@ static_library("cluster-objects") {
   output_name = "libClusterObjects"
 
   sources = [
-    "${chip_app_zap_dir}/app-common/zap-generated/cluster-objects.cpp",
     "${chip_app_zap_dir}/app-common/zap-generated/cluster-objects.h",
     "CompatClusterObjects.h",
   ]
+
+  if (chip_data_model_overrides_dir != "") {
+    sources +=
+        [ "${chip_data_model_overrides_dir}/cluster-objects-override.cpp" ]
+  } else {
+    sources +=
+        [ "${chip_app_zap_dir}/app-common/zap-generated/cluster-objects.cpp" ]
+  }
 
   public_deps = [
     ":ids",

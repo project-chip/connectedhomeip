@@ -18,7 +18,8 @@
 from mobly import asserts
 
 from matter.clusters.ClusterObjects import Cluster
-from matter.testing.matter_testing import MatterBaseTest, TestStep
+from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.runner import TestStep
 
 
 class ProductAppearanceBase(MatterBaseTest):

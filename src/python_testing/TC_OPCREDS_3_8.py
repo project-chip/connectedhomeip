@@ -52,10 +52,11 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError, Status
+from matter.testing.decorators import has_command, run_if_endpoint_matches
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from matter.testing.matter_testing import (AttributeMatcher, AttributeValue, MatterBaseTest, TestStep, default_matter_test_main,
-                                           has_command, run_if_endpoint_matches)
+from matter.testing.matter_testing import AttributeMatcher, AttributeValue, MatterBaseTest
 from matter.testing.pics import accepted_cmd_pics_str
+from matter.testing.runner import TestStep, default_matter_test_main
 from matter.tlv import TLVReader
 from matter.utils import CommissioningBuildingBlocks
 
@@ -64,9 +65,9 @@ log = logging.getLogger(__name__)
 nest_asyncio.apply()
 
 
-def to_octet_string(input: bytes) -> str:
-    """Takes `input` bytes and convert to a colon-separated hex octet string representation."""
-    return ":".join(["%02x" % b for b in input])
+def to_octet_string(data: bytes) -> str:
+    """Takes `data` bytes and convert to a colon-separated hex octet string representation."""
+    return hexlify(data, ":")
 
 
 class MatterCertParser:
@@ -113,12 +114,12 @@ class MappingsV1(enum.IntEnum):
 
 
 # From Matter spec src/crypto_primitives/crypto_primitives.py
-def bytes_from_hex(hex: str) -> bytes:
-    """Converts any `hex` string representation including `01:ab:cd` to bytes
+def bytes_from_hex(s: str) -> bytes:
+    """Converts any `s` string representation including `01:ab:cd` to bytes
 
     Handles any whitespace including newlines, which are all stripped.
     """
-    return unhexlify(re.sub(r'(\s|:)', "", hex))
+    return unhexlify(re.sub(r'(\s|:)', "", s))
 
 
 # From Matter spec src/crypto_primitives/vid_verify_payload_test_vector.py
@@ -225,7 +226,7 @@ class TestStepBlockPassException(Exception):
     pass
 
 
-class test_step(object):
+class test_step:
     """Context manager for `with test_tesp(...) as step` that allows for aggregating step descriptions automatically.
 
     Use like:
@@ -246,21 +247,21 @@ class test_step(object):
     TODO: Port back to matter_testing.py once this whole test suite is complete.
     """
 
-    def __init__(self, id=None, description="", verification=None, is_commissioning=False):
+    def __init__(self, step_id=None, description="", verification=None, is_commissioning=False):
         caller = inspect.currentframe().f_back.f_locals.get('self', None)
         if isinstance(caller, MatterBaseTest):
             self._test_instance = caller
         else:
             raise RuntimeError("Can only use `test_step` inside a MatterBaseTest-derived class")
 
-        if id is None:
-            id = self._test_instance.current_step_id
+        if step_id is None:
+            step_id = self._test_instance.current_step_id
             next_step_id = self._test_instance.get_next_step_id(self._test_instance.current_step_id)
             self._test_instance.current_step_id = next_step_id
         else:
-            self._test_instance.current_step_id = id
+            self._test_instance.current_step_id = step_id
 
-        self._id = id
+        self._id = step_id
         self._description = description
         self._verification = verification
         self._is_commissioning = is_commissioning

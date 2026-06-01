@@ -143,7 +143,7 @@ CHIP_ERROR AutoCommissioner::SetCommissioningParameters(const CommissioningParam
     else
     {
         ChipLogProgress(Controller, "Setting attestation nonce to random value");
-        TEMPORARY_RETURN_IGNORED Crypto::DRBG_get_bytes(mAttestationNonce, sizeof(mAttestationNonce));
+        ReturnErrorOnFailure(Crypto::DRBG_get_bytes(mAttestationNonce, sizeof(mAttestationNonce)));
     }
     mParams.SetAttestationNonce(ByteSpan(mAttestationNonce, sizeof(mAttestationNonce)));
 
@@ -156,7 +156,7 @@ CHIP_ERROR AutoCommissioner::SetCommissioningParameters(const CommissioningParam
     else
     {
         ChipLogProgress(Controller, "Setting CSR nonce to random value");
-        TEMPORARY_RETURN_IGNORED Crypto::DRBG_get_bytes(mCSRNonce, sizeof(mCSRNonce));
+        ReturnErrorOnFailure(Crypto::DRBG_get_bytes(mCSRNonce, sizeof(mCSRNonce)));
     }
     mParams.SetCSRNonce(ByteSpan(mCSRNonce, sizeof(mCSRNonce)));
 
@@ -382,38 +382,26 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
         {
             return CommissioningStage::kConfigureUTCTime;
         }
-        else
-        {
-            // Time cluster is not supported, move right to DA
-            return CommissioningStage::kSendPAICertificateRequest;
-        }
+        // Time cluster is not supported, move right to DA
+        return CommissioningStage::kSendPAICertificateRequest;
     case CommissioningStage::kConfigureUTCTime:
         if (mDeviceCommissioningInfo.requiresTimeZone && mParams.GetTimeZone().HasValue())
         {
             return kConfigureTimeZone;
         }
-        else
-        {
-            return GetNextCommissioningStageInternal(CommissioningStage::kConfigureTimeZone, lastErr);
-        }
+        return GetNextCommissioningStageInternal(CommissioningStage::kConfigureTimeZone, lastErr);
     case CommissioningStage::kConfigureTimeZone:
         if (mNeedsDST && mParams.GetDSTOffsets().HasValue())
         {
             return CommissioningStage::kConfigureDSTOffset;
         }
-        else
-        {
-            return GetNextCommissioningStageInternal(CommissioningStage::kConfigureDSTOffset, lastErr);
-        }
+        return GetNextCommissioningStageInternal(CommissioningStage::kConfigureDSTOffset, lastErr);
     case CommissioningStage::kConfigureDSTOffset:
         if (mDeviceCommissioningInfo.requiresDefaultNTP && mParams.GetDefaultNTP().HasValue())
         {
             return CommissioningStage::kConfigureDefaultNTP;
         }
-        else
-        {
-            return GetNextCommissioningStageInternal(CommissioningStage::kConfigureDefaultNTP, lastErr);
-        }
+        return GetNextCommissioningStageInternal(CommissioningStage::kConfigureDefaultNTP, lastErr);
     case CommissioningStage::kConfigureDefaultNTP:
         return CommissioningStage::kSendPAICertificateRequest;
     case CommissioningStage::kSendPAICertificateRequest:
@@ -447,10 +435,7 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
         {
             return CommissioningStage::kConfigureTrustedTimeSource;
         }
-        else
-        {
-            return GetNextCommissioningStageInternal(CommissioningStage::kConfigureTrustedTimeSource, lastErr);
-        }
+        return GetNextCommissioningStageInternal(CommissioningStage::kConfigureTrustedTimeSource, lastErr);
     case CommissioningStage::kConfigureTrustedTimeSource:
         if (mNeedIcdRegistration)
         {
@@ -491,15 +476,12 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
 
             return GetNextCommissioningStageNetworkSetup(currentStage, lastErr);
         }
-        else
+        SetCASEFailsafeTimerIfNeeded();
+        if (mParams.GetSkipCommissioningComplete().ValueOr(false))
         {
-            SetCASEFailsafeTimerIfNeeded();
-            if (mParams.GetSkipCommissioningComplete().ValueOr(false))
-            {
-                return CommissioningStage::kCleanup;
-            }
-            return CommissioningStage::kEvictPreviousCaseSessions;
+            return CommissioningStage::kCleanup;
         }
+        return CommissioningStage::kEvictPreviousCaseSessions;
     case CommissioningStage::kScanNetworks:
     case CommissioningStage::kRequestWiFiCredentials:
     case CommissioningStage::kRequestThreadCredentials:
@@ -520,11 +502,8 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
             SetCASEFailsafeTimerIfNeeded();
             return CommissioningStage::kCleanup;
         }
-        else
-        {
-            SetCASEFailsafeTimerIfNeeded();
-            return CommissioningStage::kEvictPreviousCaseSessions;
-        }
+        SetCASEFailsafeTimerIfNeeded();
+        return CommissioningStage::kEvictPreviousCaseSessions;
     case CommissioningStage::kThreadNetworkEnable:
         SetCASEFailsafeTimerIfNeeded();
         if (mParams.GetSkipCommissioningComplete().ValueOr(false))
@@ -557,10 +536,7 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
         {
             return CommissioningStage::kRemoveWiFiNetworkConfig;
         }
-        else
-        {
-            return CommissioningStage::kRemoveThreadNetworkConfig;
-        }
+        return CommissioningStage::kRemoveThreadNetworkConfig;
     case CommissioningStage::kRemoveWiFiNetworkConfig:
     case CommissioningStage::kRemoveThreadNetworkConfig:
         return GetNextCommissioningStageNetworkSetup(currentStage, lastErr);
@@ -673,7 +649,8 @@ CHIP_ERROR AutoCommissioner::StartCommissioning(DeviceCommissioner * commissione
             mCommissioneeDeviceProxy->GetSecureSession().Value()->AsSecureSession()->GetPeerAddress().GetTransportType();
     }
 
-    mNeedsNetworkSetup = (transportType == Transport::Type::kBle);
+    // mNeedsNetworkSetup may be set by SetNetworkSetupNeeded().
+    mNeedsNetworkSetup = mNeedsNetworkSetup || (transportType == Transport::Type::kBle);
 #if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
     mNeedsNetworkSetup = mNeedsNetworkSetup || (transportType == Transport::Type::kNfc);
 #endif
@@ -786,6 +763,11 @@ void AutoCommissioner::CleanupCommissioning()
     mOperationalDeviceProxy  = OperationalDeviceProxy();
     mDeviceCommissioningInfo = ReadCommissioningInfo();
     mNeedsDST                = false;
+    mNeedsNetworkSetup       = false;
+    mNeedIcdRegistration     = false;
+    mStopCommissioning       = false;
+    mAttestationElementsLen  = 0;
+    mAttestationSignatureLen = 0;
 }
 
 CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, CommissioningDelegate::CommissioningReport report)
@@ -818,13 +800,27 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
         }
         else if (report.Is<CommissioningErrorInfo>())
         {
-            completionStatus.commissioningError = MakeOptional(report.Get<CommissioningErrorInfo>().commissioningError);
+            const auto & commissioningInfo          = report.Get<CommissioningErrorInfo>();
+            completionStatus.commissioningError     = MakeOptional(commissioningInfo.commissioningError);
+            completionStatus.commissioningDebugText = commissioningInfo.debugText;
+        }
+        else if (report.Is<OperationalCertErrorInfo>())
+        {
+            // Preserve the NodeOperationalCertStatusEnum from the device's NOCResponse
+            // (kInvalidPublicKey, kInvalidNodeOpId, kInvalidNOC, kFabricConflict, kLabelConflict,
+            // kInvalidFabricIndex, etc.) so callers can distinguish without losing fidelity to a
+            // generic CHIP_ERROR.
+            completionStatus.operationalCertStatus = MakeOptional(report.Get<OperationalCertErrorInfo>().operationalCertStatus);
         }
         else if (report.Is<NetworkCommissioningStatusInfo>())
         {
             // This report type is used when an error happens in either NetworkConfig or ConnectNetwork commands
-            completionStatus.networkCommissioningStatus =
-                MakeOptional(report.Get<NetworkCommissioningStatusInfo>().networkCommissioningStatus);
+            const auto & networkInfo                    = report.Get<NetworkCommissioningStatusInfo>();
+            completionStatus.networkCommissioningStatus = MakeOptional(networkInfo.networkCommissioningStatus);
+            // Preserve the optional ConnectNetworkResponse.errorValue (driver-level detail
+            // distinct from the spec-level networkingStatus). Null for NetworkConfigResponse.
+            completionStatus.connectNetworkErrorValue      = networkInfo.connectNetworkErrorValue;
+            completionStatus.networkCommissioningDebugText = networkInfo.debugText;
 
             // If we are configured to scan networks, then don't error out.
             // Instead, allow the app to try another network.

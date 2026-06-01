@@ -1,5 +1,5 @@
 #
-#    Copyright (c) 2022-2025 Project CHIP Authors
+#    Copyright (c) 2022-2026 Project CHIP Authors
 #    All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,6 +15,8 @@
 #    limitations under the License.
 #
 
+from __future__ import annotations
+
 import asyncio
 import inspect
 import json
@@ -22,20 +24,18 @@ import logging
 import os
 import queue
 import random
+import select
 import shlex
+import subprocess
 import textwrap
 import time
 import typing
-from dataclasses import dataclass
-from datetime import datetime, timedelta, timezone
+from dataclasses import asdict, dataclass
+from datetime import UTC, datetime, timedelta
 from enum import IntFlag
-from typing import Any, Callable, List, Optional, Type, Union
+from typing import Any, Callable, Optional, Union
 
-import matter.testing.conversions as conversions
-import matter.testing.decorators as decorators
 import matter.testing.matchers as matchers
-import matter.testing.runner as runner
-import matter.testing.timeoperations as timeoperations
 
 # isort: off
 
@@ -52,10 +52,12 @@ import matter.logging
 import matter.native
 import matter.testing.global_stash as global_stash
 from matter.clusters import Attribute, ClusterObjects
+from matter.exceptions import ChipStackError
 from matter.interaction_model import InteractionModelError, Status
 from matter.setup_payload import SetupPayload
 from matter.testing.commissioning import (CommissioningInfo, CustomCommissioningParameters, SetupPayloadInfo, commission_devices,
                                           get_setup_payload_info_config)
+from matter.testing.decorators import _has_attribute, _has_command, _has_feature
 from matter.testing.global_attribute_ids import GlobalAttributeIds
 from matter.testing.matter_stack_state import MatterStackState
 from matter.testing.matter_test_config import MatterTestConfig
@@ -74,6 +76,8 @@ LOGGER = logging.getLogger(__name__)
 LOGGER.setLevel(logging.INFO)
 
 DiscoveryFilterType = ChipDeviceCtrl.DiscoveryFilterType
+
+_SUMMARY_MAX_HEX_CHARS = 128
 
 
 class TestError(Exception):
@@ -131,7 +135,7 @@ class AttributeMatcher:
         return self._description
 
     @staticmethod
-    def from_callable(description: str, matcher: Callable[[AttributeValue], bool]) -> "AttributeMatcher":
+    def from_callable(description: str, matcher: Callable[[AttributeValue], bool]) -> AttributeMatcher:
         """Take a single callable and wrap it into an AttributeMatcher object. Useful to wrap closures."""
         class AttributeMatcherFromCallable(AttributeMatcher):
             def __init__(self, description, matcher: Callable[[AttributeValue], bool]):
@@ -172,7 +176,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         # List of accumulated problems across all tests
         self.problems = []
         self.is_commissioning = False
-        self.cached_steps: dict[str, list[TestStep]] = {}
+        self.cached_steps: dict[str, Optional[list[TestStep]]] = {}
 
     #
     # Mobly Test Controller Methods (Framework Interface)
@@ -209,7 +213,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         # TODO: Move to using non-generated code and rather use data model description (.matter or .xml)
         self.cluster_mapper = ClusterMapper(self.default_controller._Cluster)
         self.current_step_index = 0
-        self.step_start_time = datetime.now(timezone.utc)
+        self.step_start_time = datetime.now(UTC)
         self.step_skipped = False
         # self.stored_global_wildcard stores value of self.global_wildcard after first async call.
         # Because setup_class can be called before commissioning, this variable is lazy-initialized
@@ -237,7 +241,66 @@ class MatterBaseTest(base_test.BaseTestClass):
             for problem in self.problems:
                 LOGGER.info(str(problem))
             LOGGER.info("###########################################################")
+        self._log_execution_parameters_summary()
         super().teardown_class()
+
+    def _format_summary_value(self, key: str, value: Any) -> str:
+        """Format values for end-of-test summary logs."""
+        if isinstance(value, bytes):
+            hex_value = value.hex()
+            if len(hex_value) > _SUMMARY_MAX_HEX_CHARS:
+                return f"0x{hex_value[:_SUMMARY_MAX_HEX_CHARS]}... (truncated, {len(value)} bytes)"
+            return f"0x{hex_value}"
+        if isinstance(value, list) and len(value) > 8:
+            head = ", ".join(repr(v) for v in value[:5])
+            return f"[{head}, ...] (len={len(value)})"
+        if key == "pics" and isinstance(value, dict):
+            return "Please request if needed"
+        return repr(value)
+
+    def _log_execution_parameters_summary(self):
+        """Log execution parameters at test end to aid result triage."""
+        try:
+            meta = asdict(self.matter_test_config)
+        except Exception as ex:
+            LOGGER.warning("Unable to collect execution parameter summary: %s", ex)
+            return
+
+        config_fields: dict[str, Any] = {}
+        for key, value in meta.items():
+            if key == "global_test_params":
+                continue
+            if isinstance(value, os.PathLike):
+                value = os.fspath(value)
+            if value in (None, [], {}, ""):
+                continue
+            config_fields[key] = value
+
+        named_args: dict[str, Any] = {}
+        for key, value in self.matter_test_config.global_test_params.items():
+            if key == "meta_config":
+                continue
+            if value in (None, [], {}, ""):
+                continue
+            named_args[key] = value
+
+        LOGGER.info("===== EXECUTION FLAGS SUMMARY BEGIN =====")
+
+        if config_fields:
+            LOGGER.info("Config values:")
+            for key in sorted(config_fields.keys()):
+                LOGGER.info("  - %s: %s", key, self._format_summary_value(key, config_fields[key]))
+
+        if named_args:
+            LOGGER.info("\n\nNamed args:")
+            for key in sorted(named_args.keys()):
+                LOGGER.info("  - %s: %s", key, self._format_summary_value(key, named_args[key]))
+
+        if self.is_pics_sdk_ci_only:
+            test_name = self.__class__.__name__
+            LOGGER.info(f"===== PICS_SDK_CI_ONLY is enabled (True) for test '{test_name}'.")
+
+        LOGGER.info("===== EXECUTION FLAGS SUMMARY END =====")
 
     def _dump_device_attributes_on_failure(self):
         """
@@ -286,8 +349,8 @@ class MatterBaseTest(base_test.BaseTestClass):
         Test authors that implement this method should ensure super().setup_test() is called before any custom setup.
         """
         self.current_step_index = 0
-        self.test_start_time = datetime.now(timezone.utc)
-        self.step_start_time = datetime.now(timezone.utc)
+        self.test_start_time = datetime.now(UTC)
+        self.step_start_time = datetime.now(UTC)
         self.step_skipped = False
         self.failed = False
         if self.runner_hook and not self.is_commissioning:
@@ -319,12 +382,12 @@ class MatterBaseTest(base_test.BaseTestClass):
             exception = record.termination_signal.exception
 
             try:
-                step_duration = (datetime.now(timezone.utc) - self.step_start_time) / timedelta(microseconds=1)
+                step_duration = (datetime.now(UTC) - self.step_start_time) / timedelta(microseconds=1)
             except AttributeError:
                 # If we failed during setup, these may not be populated
                 step_duration = 0
             try:
-                test_duration = (datetime.now(timezone.utc) - self.test_start_time) / timedelta(microseconds=1)
+                test_duration = (datetime.now(UTC) - self.test_start_time) / timedelta(microseconds=1)
             except AttributeError:
                 test_duration = 0
             # TODO: I have no idea what logger, logs, request or received are. Hope None works because I have nothing to give
@@ -412,8 +475,8 @@ class MatterBaseTest(base_test.BaseTestClass):
         if self.runner_hook and not self.is_commissioning:
             # What is request? This seems like an implementation detail for the runner
             # TODO: As with failure, I have no idea what logger, logs or request are meant to be
-            step_duration = (datetime.now(timezone.utc) - self.step_start_time) / timedelta(microseconds=1)
-            test_duration = (datetime.now(timezone.utc) - self.test_start_time) / timedelta(microseconds=1)
+            step_duration = (datetime.now(UTC) - self.step_start_time) / timedelta(microseconds=1)
+            test_duration = (datetime.now(UTC) - self.test_start_time) / timedelta(microseconds=1)
             self.runner_hook.step_success(logger=None, logs=None, duration=step_duration, request=None)
 
         # TODO: this check could easily be annoying when doing dev. flag it somehow? Ditto with the in-order check
@@ -442,7 +505,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             record: TestResultRecord containing skip information.
         """
         if self.runner_hook and not self.is_commissioning:
-            test_duration = (datetime.now(timezone.utc) - self.test_start_time) / timedelta(microseconds=1)
+            test_duration = (datetime.now(UTC) - self.test_start_time) / timedelta(microseconds=1)
             test_name = self.current_test_info.name
             filename = inspect.getfile(self.__class__)
             self.runner_hook.test_skipped(filename, test_name)
@@ -529,7 +592,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         '''
         return self.matter_test_config.wifi_passphrase if self.matter_test_config.wifi_passphrase is not None else default
 
-    def get_setup_payload_info(self) -> List[SetupPayloadInfo]:
+    def get_setup_payload_info(self) -> list[SetupPayloadInfo]:
         """
         Get and builds the payload info provided in the execution.
         Returns:
@@ -557,18 +620,26 @@ class MatterBaseTest(base_test.BaseTestClass):
         return [TestStep(1, "Run entire test")] if steps is None else steps
 
     def get_defined_test_steps(self, test: str) -> Optional[list[TestStep]]:
-        """Retrieves test steps from a 'steps_*' function, using a cache."""
-        steps_name = f'steps_{test.removeprefix("test_")}'
+        """Retrieves test steps from a 'steps_*' function or AST extraction, using a cache.
+
+        Checks for an explicit steps_* method first. If none exists, falls back to
+        extracting steps from self.step() calls in the test method's source code.
+
+        Returns None if no steps are defined by either mechanism.
+        """
         if test in self.cached_steps:
             return self.cached_steps[test]
 
-        try:
-            fn = getattr(self, steps_name)
-            steps = fn()
-            self.cached_steps[test] = steps
-            return fn()
-        except AttributeError:
-            return None
+        steps = None
+        if steps_method := getattr(self, 'steps_' + test.removeprefix('test_'), None):
+            steps = steps_method()
+        else:
+            test_method = getattr(self, test)
+            from matter.testing.step_extractor import extract_steps_from_method
+            steps = extract_steps_from_method(test_method) or None
+
+        self.cached_steps[test] = steps
+        return steps
 
     def get_restart_flag_file(self) -> Optional[str]:
         if self.matter_test_config.restart_flag_file is None:
@@ -588,27 +659,27 @@ class MatterBaseTest(base_test.BaseTestClass):
         return [] if pics is None else pics
 
     def _get_defined_pics(self, test: str) -> Optional[list[str]]:
-        """Retrieve PICS list from a 'pics_*' function if it exists.
+        """Retrieve PICS list from a 'pics_*' function or @pics decorator.
+
+        The pics_* method takes precedence over the @pics decorator.
 
         Args:
             test: Name of the test to get PICS for.
 
         Returns:
-            List of PICS strings if pics function exists, None otherwise.
+            List of PICS strings if pics function or decorator exists, None otherwise.
         """
-        steps_name = f'pics_{test.removeprefix("test_")}'
-        try:
-            fn = getattr(self, steps_name)
-            return fn()
-        except AttributeError:
-            return None
+        if pics_method := getattr(self, 'pics_' + test.removeprefix('test_'), None):
+            return pics_method()
+        test_method = getattr(self, test)
+        return getattr(test_method, '_pics', None)  # set by @pics
 
     def get_test_desc(self, test: str) -> str:
         ''' Returns a description of this test
 
-            Test description is defined in the function called desc_<functionname>.
-            ex for test test_TC_TEST_1_1, the steps are in a function called
-            desc_TC_TEST_1_1.
+            Test description is defined in the function called desc_<functionname>,
+            or as a docstring on the test method itself.
+            The desc_* method takes precedence if both are defined.
 
             Format:
             <Test plan reference> [<test plan number>] <test plan name>
@@ -616,12 +687,12 @@ class MatterBaseTest(base_test.BaseTestClass):
             ex:
             133.1.1. [TC-ACL-1.1] Global attributes
         '''
-        desc_name = f'desc_{test.removeprefix("test_")}'
-        try:
-            fn = getattr(self, desc_name)
-            return fn()
-        except AttributeError:
-            return test
+        if desc_method := getattr(self, 'desc_' + test.removeprefix('test_'), None):
+            return desc_method()
+        test_method = getattr(self, test)
+        if doc := test_method.__doc__:
+            return doc.strip()
+        return test
 
     #
     # Matter Test API - Step Management & Execution
@@ -629,17 +700,30 @@ class MatterBaseTest(base_test.BaseTestClass):
     # These methods are used to mark test progress for the test harness and logs, to help with test
     # debugging, issue creation and log analysis by the test labs.
 
-    def step(self, step: typing.Union[int, str]):
+    def step(self, step: typing.Union[int, str], description: str = "", *,
+             is_commissioning: bool = False, expectation: str = ""):
         """Execute a test step and manage step progression.
 
         Validates step order, prints step information, and notifies runner hooks.
 
         Args:
             step: The step number or identifier to execute.
+            description: Step description for inline step definitions.
+                Should always be provided (not empty) when any keyword arguments
+                (is_commissioning, expectation) are passed.
+            is_commissioning: Mark this step as the commissioning step (keyword-only).
+            expectation: Expected outcome for test plan generation (keyword-only).
+
+            All arguments to step() must be constants for automatic extraction of
+            the test step list to work. If dynamic step() parameters are required
+            an explicit `steps_` method must be defined.
 
         Raises:
             AssertionError: If steps are called out of order or step doesn't exist.
         """
+        # description, is_commissioning, and expectation are not used at runtime.
+        # They exist so the AST step extractor can read them from source code to
+        # build the step list without needing a separate steps_* method.
         test_name = self.current_test_info.name
         steps = self.get_test_steps(test_name)
 
@@ -654,14 +738,14 @@ class MatterBaseTest(base_test.BaseTestClass):
             # If we've reached the next step with no assertion and the step wasn't skipped, it passed
             if not self.step_skipped and self.current_step_index != 0:
                 # TODO: As with failure, I have no idea what loger, logs or request are meant to be
-                step_duration = (datetime.now(timezone.utc) - self.step_start_time) / timedelta(microseconds=1)
+                step_duration = (datetime.now(UTC) - self.step_start_time) / timedelta(microseconds=1)
                 self.runner_hook.step_success(logger=None, logs=None, duration=step_duration, request=None)
 
             # TODO: it seems like the step start should take a number and a name
             name = f'{step} : {current_step.description}'
             self.runner_hook.step_start(name=name)
 
-        self.step_start_time = datetime.now(tz=timezone.utc)
+        self.step_start_time = datetime.now(tz=UTC)
         self.current_step_index = self.current_step_index + 1
         self.step_skipped = False
 
@@ -869,8 +953,8 @@ class MatterBaseTest(base_test.BaseTestClass):
             True if commissioning succeeded, False otherwise.
         """
         dev_ctrl: ChipDeviceCtrl.ChipDeviceController = self.default_controller
-        dut_node_ids: List[int] = self.matter_test_config.dut_node_ids
-        setup_payloads: List[SetupPayloadInfo] = self.get_setup_payload_info()
+        dut_node_ids: list[int] = self.matter_test_config.dut_node_ids
+        setup_payloads: list[SetupPayloadInfo] = self.get_setup_payload_info()
         commissioning_info: CommissioningInfo = CommissioningInfo(
             commissionee_ip_address_just_for_testing=self.matter_test_config.commissionee_ip_address_just_for_testing,
             commissioning_method=self.matter_test_config.commissioning_method,
@@ -879,6 +963,8 @@ class MatterBaseTest(base_test.BaseTestClass):
             wifi_ssid=self.matter_test_config.wifi_ssid,
             tc_version_to_simulate=self.matter_test_config.tc_version_to_simulate,
             tc_user_response_to_simulate=self.matter_test_config.tc_user_response_to_simulate,
+            thread_ba_host=self.matter_test_config.thread_ba_host,
+            thread_ba_port=self.matter_test_config.thread_ba_port,
         )
 
         return await commission_devices(dev_ctrl, dut_node_ids, setup_payloads, commissioning_info)
@@ -912,7 +998,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             raise  # Help mypy understand this never returns
 
     async def read_single_attribute(
-            self, dev_ctrl: ChipDeviceCtrl.ChipDeviceController, node_id: int, endpoint: int, attribute: Type[ClusterObjects.ClusterAttributeDescriptor], fabricFiltered: bool = True) -> object:
+            self, dev_ctrl: ChipDeviceCtrl.ChipDeviceController, node_id: int, endpoint: int, attribute: type[ClusterObjects.ClusterAttributeDescriptor], fabricFiltered: bool = True) -> object:
         """Read a single attribute value from a device.
 
         Args:
@@ -930,7 +1016,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         return list(data.values())[0][attribute]
 
     async def read_single_attribute_all_endpoints(
-            self, cluster: ClusterObjects.Cluster, attribute: Type[ClusterObjects.ClusterAttributeDescriptor],
+            self, cluster: ClusterObjects.Cluster, attribute: type[ClusterObjects.ClusterAttributeDescriptor],
             dev_ctrl: Optional[ChipDeviceCtrl.ChipDeviceController] = None, node_id: Optional[int] = None):
         """Reads a single attribute of a specified cluster across all endpoints.
 
@@ -952,7 +1038,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         return attrs
 
     async def read_single_attribute_check_success(
-            self, cluster: ClusterObjects.Cluster, attribute: Type[ClusterObjects.ClusterAttributeDescriptor],
+            self, cluster: ClusterObjects.Cluster, attribute: type[ClusterObjects.ClusterAttributeDescriptor],
             dev_ctrl: Optional[ChipDeviceCtrl.ChipDeviceController] = None, node_id: Optional[int] = None, endpoint: Optional[int] = None, fabric_filtered: bool = True, assert_on_error: bool = True, test_name: str = "", payloadCapability: int = ChipDeviceCtrl.TransportPayloadCapability.MRP_PAYLOAD) -> object:
         if dev_ctrl is None:
             dev_ctrl = self.default_controller
@@ -981,8 +1067,32 @@ class MatterBaseTest(base_test.BaseTestClass):
                 return None
         return attr_ret
 
+    async def poll_until_attributes_in_range(
+            self, cluster: ClusterObjects.Cluster,
+            attribute_bounds: list[tuple[type[ClusterObjects.ClusterAttributeDescriptor], int, int]],
+            timeout_sec: int = 1) -> None:
+        """Poll attributes until each value falls within [min_value, max_value].
+
+        Args:
+            cluster: Cluster to read attributes from.
+            attribute_bounds: List of (attribute, min_value, max_value) tuples.
+            timeout_sec: Maximum time to wait for each attribute to be in range.
+
+        Raises:
+            TimeoutError: If any attribute does not reach its expected range before timeout.
+        """
+        for attribute, min_value, max_value in attribute_bounds:
+            deadline = time.monotonic() + timeout_sec
+            value = await self.read_single_attribute_check_success(cluster, attribute)
+            while value < min_value or value > max_value:  # type: ignore[operator]
+                if time.monotonic() >= deadline:
+                    raise TimeoutError(
+                        f"Timeout waiting for {attribute} to be in range [{min_value}, {max_value}], last value: {value}")
+                await asyncio.sleep(0.1)
+                value = await self.read_single_attribute_check_success(cluster, attribute)
+
     async def read_single_attribute_expect_error(
-            self, cluster: ClusterObjects.Cluster, attribute: Type[ClusterObjects.ClusterAttributeDescriptor],
+            self, cluster: ClusterObjects.Cluster, attribute: type[ClusterObjects.ClusterAttributeDescriptor],
             error: Status, dev_ctrl: Optional[ChipDeviceCtrl.ChipDeviceController] = None, node_id: Optional[int] = None, endpoint: Optional[int] = None,
             fabric_filtered: bool = True, assert_on_error: bool = True, test_name: str = "") -> object:
         if dev_ctrl is None:
@@ -1027,13 +1137,109 @@ class MatterBaseTest(base_test.BaseTestClass):
                                  f"Expected write success for write to attribute {attribute_value} on endpoint {endpoint_id}")
         return write_result[0].Status
 
-    def write_to_app_pipe(self, command_dict: dict, app_pipe: Optional[str] = None):
+    def read_from_app_pipe(
+        self,
+        app_pipe_out: Optional[str] = None,
+        timeout: float = 2.0,
+        max_bytes: int = 66536,
+        chunk: int = 4096,
+        ip_env_var: Optional[str] = None,
+    ) -> Any:
+        """
+        Read an out-of-band command from a Matter app.
+
+        Args:
+            app_pipe_out: Name of the cluster pipe file (e.g. /tmp/..._out). If None, uses value from config (--app-pipe-out).
+            ip_env_var: Name of the environment variable containing the DUT IP. If not provided (or None), forces local FIFO read.
+
+        Environment variables used when reading remotely:
+            - <ip_env_var> (typically LINUX_DUT_IP): if set, the FIFO is read on the remote DUT via SSH.
+            - LINUX_DUT_USER: required when <ip_env_var> is set.
+        """
+        if app_pipe_out is None:
+            app_pipe_out = self.matter_test_config.pipe_name_out
+
+        if not isinstance(app_pipe_out, str):
+            raise TypeError("The named pipe must be provided as a string value")
+
+        if not os.path.exists(app_pipe_out):
+            LOGGER.error("Named pipe %r does NOT exist", app_pipe_out)
+            raise FileNotFoundError("CANNOT FIND %r" % app_pipe_out)
+
+        dut_ip: Optional[str] = os.getenv(ip_env_var) if ip_env_var else None
+
+        # If no DUT IP is provided, the Matter app is assumed to be local and the command
+        # is read directly from the named pipe. If a DUT IP is present, the pipe is read
+        # remotely via SSH from the target device.
+        if dut_ip is None:
+            # Use manual chunked reads instead of readline(): FIFO is opened non-blocking
+            # and we need explicit timeout handling and a hard size limit for safety. We also
+            # preserve any extra bytes (e.g. multiple queued messages) across calls.
+            if not hasattr(self, "_app_pipe_out_buf"):
+                self._app_pipe_out_buf = bytearray()
+
+            fd = os.open(app_pipe_out, os.O_RDONLY | os.O_NONBLOCK)
+            try:
+                buf: bytearray = self._app_pipe_out_buf
+
+                while True:
+                    if b"\n" in buf:
+                        line, _, rest = buf.partition(b"\n")
+                        self._app_pipe_out_buf = bytearray(rest)
+
+                        line = line.strip()
+                        if not line:
+                            continue
+                        return json.loads(line.decode("utf-8"))
+
+                    if buf:
+                        try:
+                            obj = json.loads(buf.decode("utf-8"))
+                            self._app_pipe_out_buf = bytearray()
+                            return obj
+                        except json.JSONDecodeError:
+                            pass
+
+                    r, _, _ = select.select([fd], [], [], timeout)
+                    if not r:
+                        raise TimeoutError(f"No data within {timeout}")
+
+                    chunk_bytes = os.read(fd, chunk)
+                    if not chunk_bytes:
+                        if buf:
+                            try:
+                                obj = json.loads(buf.decode("utf-8"))
+                                self._app_pipe_out_buf = bytearray()
+                                return obj
+                            except json.JSONDecodeError as ex:
+                                raise EOFError(f"Incomplete JSON response: {ex}") from ex
+                        raise EOFError("Empty command response")
+
+                    buf += chunk_bytes
+                    if len(buf) > max_bytes:
+                        raise ValueError("Command too large")
+            finally:
+                os.close(fd)
+
+        LOGGER.info("Using DUT IP address: %s", dut_ip)
+
+        dut_uname = os.getenv("LINUX_DUT_USER")
+        asserts.assert_true(dut_uname is not None, "The LINUX_DUT_USER environment variable must be set")
+        LOGGER.info("Using DUT user name: %s", dut_uname)
+
+        # `cat` returns the remote FIFO contents. Parse as JSON for consistency with local behavior.
+        out = subprocess.check_output(["ssh", f"{dut_uname}@{dut_ip}", "cat", app_pipe_out])
+        out_str = out.decode("utf-8").strip()
+        return json.loads(out_str)
+
+    def write_to_app_pipe(self, command_dict: dict, app_pipe: Optional[str] = None, ip_env_var: Optional[str] = None):
         """
         Send an out-of-band command to a Matter app.
         Args:
             command_dict (dict): dictionary with the command and data.
             app_pipe (Optional[str], optional): Name of the cluster pipe file  (i.e. /tmp/chip_all_clusters_fifo_55441 or /tmp/chip_rvc_fifo_11111). Raises
             FileNotFoundError if pipe file is not found. If None takes the value from the CI argument --app-pipe,  arg --app-pipe has his own file exists check.
+            ip_env_var: Optional[str]: is an optional argument. Name of the environment variable containing the DUT IP.
 
         This method uses the following environment variables:
 
@@ -1048,24 +1254,26 @@ class MatterBaseTest(base_test.BaseTestClass):
                  + Step 2: Authorize this key on the remote host: run ssh-copy-id user@ip once, using your password
                  + Step 3: From now on ssh user@ip will no longer ask for your password
         """
-        # If is not empty from the args, verify if the fifo file exists.
-        if app_pipe is not None and not os.path.exists(app_pipe):
-            LOGGER.error("Named pipe %r does NOT exist" % app_pipe)
-            raise FileNotFoundError("CANNOT FIND %r" % app_pipe)
-
         if app_pipe is None:
             app_pipe = self.matter_test_config.pipe_name
 
         if not isinstance(app_pipe, str):
             raise TypeError("The named pipe must be provided as a string value")
 
+        if not os.path.exists(app_pipe):
+            LOGGER.error("Named pipe %r does NOT exist", app_pipe)
+            raise FileNotFoundError("CANNOT FIND %r" % app_pipe)
+
         if not isinstance(command_dict, dict):
             raise TypeError("The command must be passed as a dictionary value")
 
         command = json.dumps(command_dict)
-        dut_ip = os.getenv('LINUX_DUT_IP')
 
-        # Checks for concatenate app_pipe and app_pid
+        dut_ip: Optional[str] = os.getenv(ip_env_var) if ip_env_var else None
+
+        # If no DUT IP is provided, the Matter app is assumed to be local and the command
+        # is read directly from the named pipe. If a DUT IP is present, the pipe is read
+        # remotely via SSH from the target device.
         if dut_ip is None:
             with open(app_pipe, "w") as app_pipe_fp:
                 LOGGER.info(f"Sending out-of-band command: {command} to file: {app_pipe}")
@@ -1369,6 +1577,120 @@ class MatterBaseTest(base_test.BaseTestClass):
             error_message='Push AV Stream validation failed'
         )
 
+    def _expire_sessions_on_all_controllers(self):
+        """Helper method to expire sessions on all active controllers via the fabric admin interface.
+
+        This method iterates through all certificate authorities and their fabric admins to expire
+        sessions on all active controllers. This ensures all controllers can reconnect after a device
+        reboot or factory reset.
+        """
+        LOGGER.info("Expiring sessions on all active controllers")
+        for ca in self.matter_stack.certificate_authorities:
+            for fabric_admin in ca.adminList:
+                for controller in fabric_admin._activeControllers:
+                    if controller.isActive:
+                        try:
+                            controller.ExpireSessions(self.dut_node_id)
+                            LOGGER.info(f"Expired sessions on controller with nodeId {controller.nodeId}")
+                        except ChipStackError as e:  # chipstack-ok
+                            LOGGER.warning(f"Failed to expire sessions on controller {controller.nodeId}: {e}")
+
+    async def request_device_reboot(self):
+        """Request a reboot of the Device Under Test (DUT).
+
+        This method handles device reboots in both CI and development environments (via run_python_test.py test runner script)
+        and also manual testing scenarios (via user input). It expires existing sessions to allow for controllers to reconnect
+        to the DUT after the reboot.
+
+        Returns:
+            None
+        """
+        # Check if restart flag file is available (indicates test runner supports app restart)
+        restart_flag_file = self.get_restart_flag_file()
+
+        if not restart_flag_file:
+            # No restart flag file: ask user to manually reboot
+            self.wait_for_user_input(prompt_msg="Reboot the DUT. Press Enter when ready.\n")
+
+            # After manual reboot, expire previous sessions so that we can re-establish connections
+            self._expire_sessions_on_all_controllers()
+            LOGGER.info("Manual device reboot completed")
+
+        else:
+            try:
+                # Create the restart flag file to signal the test runner
+                # Allow for multiple reboots like SW update tests do using the "restart" mode
+                restart_text = "restart"
+                with open(restart_flag_file, "w") as f:
+                    f.write(restart_text)
+                LOGGER.info("Created restart flag file to signal app reboot")
+
+                # Expire sessions before the monitor picks up the flag
+                self._expire_sessions_on_all_controllers()
+
+                await self.wait_for_restart_flag_file_removal(restart_flag_file, restart_text)
+
+                LOGGER.info("App reboot completed successfully")
+
+            except Exception as e:
+                LOGGER.error(f"Failed to reboot app: {e}")
+                asserts.fail(f"App reboot failed: {e}")
+
+    async def request_device_factory_reset(self, reset_ctrl: bool = False) -> None:
+        """Request a factory reset of the Device Under Test (DUT).
+
+        This method handles factory resets in both CI and development environments and also manual
+        testing scenarios (via user input). It expires existing sessions to allow for controllers
+        to reconnect to the DUT after the factory reset.
+
+        Args:
+            reset_ctrl (bool): If True, removes app, REPL configs, and controller config.
+                               If False, removes app and REPL configs but keeps controller config.
+                               Defaults to False.
+
+        Returns:
+            None
+        """
+        # Check if restart flag file is available (indicates test runner supports app factory reset)
+        restart_flag_file = self.get_restart_flag_file()
+
+        if not restart_flag_file:
+            # No restart flag file: ask user to manually factory reset
+            self.wait_for_user_input(prompt_msg="Factory reset the DUT. Press Enter when ready.\n")
+
+            # After manual factory reset, expire previous sessions so that we can re-establish connections
+            self._expire_sessions_on_all_controllers()
+            LOGGER.info("Manual device factory reset completed")
+
+        else:
+            restart_flag_text = "factory reset" if reset_ctrl else "factory reset app only"
+            try:
+                # Create the restart flag file to signal the test runner
+                with open(restart_flag_file, "w") as f:
+                    f.write(restart_flag_text)
+                    LOGGER.info("Created restart flag file to signal %s request", restart_flag_text)
+
+                # Expire sessions and re-establish connections
+                self._expire_sessions_on_all_controllers()
+                LOGGER.info("%s request sent successfully", restart_flag_text.capitalize())
+
+                await self.wait_for_restart_flag_file_removal(restart_flag_file, restart_flag_text)
+
+            except Exception as e:
+                err = f"Failed to {restart_flag_text}: {e}"
+                LOGGER.error(err)
+                asserts.fail(err)
+
+    async def wait_for_restart_flag_file_removal(self, restart_flag_file, restart_flag_text, timeout_sec=30.0):
+        # Wait for the monitor thread to remove the flag file
+        # The monitor deletes the flag file AFTER the restart completes, so this ensures
+        # the app has fully rebooted and is ready before we continue
+        start_time = time.time()
+        while os.path.exists(restart_flag_file):
+            if time.time() - start_time > timeout_sec:
+                asserts.fail(f"App {restart_flag_text} did not complete within timeout (flag file still exists)")
+            await asyncio.sleep(0.1)
+
 
 def _async_runner(body, self: MatterBaseTest, *args, **kwargs):
     """Runs an async function within the test's event loop with a timeout.
@@ -1415,41 +1737,3 @@ async def _get_all_matching_endpoints(self: MatterBaseTest, accept_function: End
     ])
     return [e for e in wildcard.attributes
             if accept_function(wildcard, e)]
-
-
-# TODO(#37537): Remove these temporary aliases after transition period
-utc_time_in_matter_epoch = timeoperations.utc_time_in_matter_epoch
-utc_datetime_from_matter_epoch_us = timeoperations.utc_datetime_from_matter_epoch_us
-utc_datetime_from_posix_time_ms = timeoperations.utc_datetime_from_posix_time_ms
-compare_time = timeoperations.compare_time
-get_wait_seconds_from_set_time = timeoperations.get_wait_seconds_from_set_time
-bytes_from_hex = conversions.bytes_from_hex
-hex_from_bytes = conversions.hex_from_bytes
-id_str = conversions.format_decimal_and_hex
-cluster_id_str = conversions.cluster_id_with_name
-
-async_test_body = decorators.async_test_body
-run_if_endpoint_matches = decorators.run_if_endpoint_matches
-run_on_singleton_matching_endpoint = decorators.run_on_singleton_matching_endpoint
-has_cluster = decorators.has_cluster
-has_attribute = decorators.has_attribute
-has_command = decorators.has_command
-has_feature = decorators.has_feature
-should_run_test_on_endpoint = decorators.should_run_test_on_endpoint
-# autopep8: off
-_get_all_matching_endpoints = decorators._get_all_matching_endpoints  # type: ignore[assignment]
-# autopep8: on
-_has_feature = decorators._has_feature
-_has_command = decorators._has_command
-_has_attribute = decorators._has_attribute
-
-default_matter_test_main = runner.default_matter_test_main
-get_test_info = runner.get_test_info
-run_tests = runner.run_tests
-run_tests_no_exit = runner.run_tests_no_exit
-get_default_paa_trust_store = runner.get_default_paa_trust_store
-
-# Backward compatibility aliases for relocated functions
-parse_matter_test_args = runner.parse_matter_test_args
-
-# isort: off

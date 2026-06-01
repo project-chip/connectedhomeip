@@ -1045,7 +1045,7 @@ ConnectivityManagerImpl::_ConnectWiFiNetworkAsync(GVariant * args,
 
     const char * networkPath = wpa_supplicant_1_interface_get_current_network(mWpaSupplicant.iface.get());
     // wpa_supplicant DBus API: if network path of current network is not "/", means we have already selected some network.
-    if (strcmp(networkPath, "/") != 0)
+    if (networkPath != nullptr && strcmp(networkPath, "/") != 0)
     {
         if (!wpa_supplicant_1_interface_call_remove_network_sync(mWpaSupplicant.iface.get(), networkPath, nullptr,
                                                                  &err.GetReceiver()))
@@ -1271,7 +1271,7 @@ void ConnectivityManagerImpl::OnDiscoveryResult(GVariant * discov_info)
     value = g_variant_lookup_value(discov_info, "peer_addr", G_VARIANT_TYPE_STRING);
     dataValue.reset(value);
     g_variant_get(dataValue.get(), "&s", &paddr);
-    strncpy(addr_str, paddr, sizeof(addr_str));
+    chip::Platform::CopyString(addr_str, paddr);
     sscanf(addr_str, "%02hhx:%02hhx:%02hhx:%02hhx:%02hhx:%02hhx", &peer_addr[0], &peer_addr[1], &peer_addr[2], &peer_addr[3],
            &peer_addr[4], &peer_addr[5]);
 
@@ -1364,7 +1364,7 @@ void ConnectivityManagerImpl::OnReplied(GVariant * reply_info)
     value = g_variant_lookup_value(reply_info, "peer_addr", G_VARIANT_TYPE_STRING);
     dataValue.reset(value);
     g_variant_get(dataValue.get(), "&s", &paddr);
-    strncpy(addr_str, paddr, sizeof(addr_str));
+    chip::Platform::CopyString(addr_str, paddr);
     sscanf(addr_str, "%02hhx:%02hhx:%02hhx:%02hhx:%02hhx:%02hhx", &peer_addr[0], &peer_addr[1], &peer_addr[2], &peer_addr[3],
            &peer_addr[4], &peer_addr[5]);
 
@@ -1443,7 +1443,7 @@ void ConnectivityManagerImpl::OnNanReceive(GVariant * obj)
     value = g_variant_lookup_value(obj, "peer_addr", G_VARIANT_TYPE_STRING);
     dataValue.reset(value);
     g_variant_get(dataValue.get(), "&s", &paddr);
-    strncpy(addr_str, paddr, sizeof(addr_str));
+    chip::Platform::CopyString(addr_str, paddr);
     sscanf(addr_str, "%02hhx:%02hhx:%02hhx:%02hhx:%02hhx:%02hhx", &RxInfo.peer_addr[0], &RxInfo.peer_addr[1], &RxInfo.peer_addr[2],
            &RxInfo.peer_addr[3], &RxInfo.peer_addr[4], &RxInfo.peer_addr[5]);
 
@@ -1484,6 +1484,33 @@ void ConnectivityManagerImpl::OnNanSubscribeTerminated(guint subscribe_id, gchar
     */
     ChipDeviceEvent event{ .Type = DeviceEventType::kCHIPoWiFiPAFCancelConnect };
     PlatformMgr().PostEventOrDie(&event);
+}
+
+void ConnectivityManagerImpl::_WiFiPAFSetParam(const WiFiPAFAdvertiseParam & pafAdvParam)
+{
+    mPafAdvParam.freq_list_len = pafAdvParam.freq_list_len;
+    mPafAdvParam.freq_list     = std::make_unique<uint16_t[]>(mPafAdvParam.freq_list_len);
+    for (size_t i = 0; i < mPafAdvParam.freq_list_len; i++)
+    {
+        mPafAdvParam.freq_list[i] = pafAdvParam.freq_list[i];
+    }
+}
+
+CHIP_ERROR ConnectivityManagerImpl::_SetWiFiPAFAdvertisingEnabled(bool enabled, uint32_t & publishId)
+{
+    if (enabled)
+    {
+        VerifyOrReturnError(mPafAdvParam.freq_list_len > 0, CHIP_ERROR_INCORRECT_STATE);
+        auto res = WiFiPAFPublish(mPafAdvParam);
+        if ((res == CHIP_NO_ERROR) && (mPafAdvParam.publish_id != kUndefinedWiFiPafSessionId))
+        {
+            publishId = mPafAdvParam.publish_id;
+        }
+        return res;
+    }
+    // Cancel paf_publish, publish_id should be valid
+    VerifyOrReturnError((publishId != 0) && (publishId != WiFiPAF::kUndefinedWiFiPafSessionId), CHIP_ERROR_INCORRECT_STATE);
+    return WiFiPAFCancelPublish(publishId);
 }
 
 CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFSubscribe(const uint16_t & connDiscriminator, void * appState,
@@ -1652,6 +1679,7 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFSend(const WiFiPAF::WiFiPAFSession &
 
 CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFShutdown(uint32_t id, WiFiPAF::WiFiPafRole role)
 {
+    VerifyOrReturnError(((id != kUndefinedWiFiPafSessionId) && (id != 0)), CHIP_ERROR_INTERNAL);
     switch (role)
     {
     case WiFiPAF::WiFiPafRole::kWiFiPafRole_Publisher:
@@ -1792,6 +1820,7 @@ CHIP_ERROR ConnectivityManagerImpl::GetWiFiSecurityType(SecurityTypeEnum & secur
 
     const char * mode = wpa_supplicant_1_interface_get_current_auth_mode(mWpaSupplicant.iface.get());
     ChipLogProgress(DeviceLayer, "WPA supplicant: Current Wi-Fi security type: %s", StringOrNullMarker(mode));
+    VerifyOrReturnError(mode != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     if (strncmp(mode, "WPA-PSK", 7) == 0)
     {
@@ -1881,6 +1910,7 @@ CHIP_ERROR ConnectivityManagerImpl::GetConfiguredNetwork(NetworkCommissioning::N
     VerifyOrReturnError(properties != nullptr, CHIP_ERROR_KEY_NOT_FOUND);
 
     GAutoPtr<GVariant> ssid(g_variant_lookup_value(properties, "ssid", nullptr));
+    VerifyOrReturnError(ssid, CHIP_ERROR_KEY_NOT_FOUND);
     gsize length;
     const gchar * ssidStr = g_variant_get_string(ssid.get(), &length);
     // TODO: wpa_supplicant will return ssid with quotes! We should have a better way to get the actual ssid in bytes.
@@ -2186,18 +2216,19 @@ bool ConnectivityManagerImpl::_GetBssInfo(const gchar * bssPath, NetworkCommissi
     VerifyOrReturnError(bssidLen == kWiFiBSSIDLength, false);
     memcpy(result.ssid, ssidStr, ssidLen);
     memcpy(result.bssid, bssidBuf, bssidLen);
-    result.ssidLen = ssidLen;
+    result.ssidLen     = ssidLen;
+    result.signal.type = NetworkCommissioning::WirelessSignalType::kdBm;
     if (signal < INT8_MIN)
     {
-        result.rssi = INT8_MIN;
+        result.signal.strength = INT8_MIN;
     }
     else if (signal > INT8_MAX)
     {
-        result.rssi = INT8_MAX;
+        result.signal.strength = INT8_MAX;
     }
     else
     {
-        result.rssi = static_cast<uint8_t>(signal);
+        result.signal.strength = static_cast<uint8_t>(signal);
     }
 
     auto bandInfo   = GetBandAndChannelFromFrequency(frequency);

@@ -41,7 +41,9 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError, Status
-from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
+from matter.testing.decorators import has_feature, run_if_endpoint_matches
+from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
@@ -195,7 +197,7 @@ class TC_AVSM_VideoStreamsPersistence(MatterBaseTest):
             videoStreamAllocateCmd = commands.VideoStreamAllocate(
                 streamUsage=aStreamUsagePriorities[0],
                 videoCodec=aRateDistortionTradeOffPoints[0].codec,
-                minFrameRate=30,  # An acceptable value for min frame rate
+                minFrameRate=min(15, aVideoSensorParams.maxFPS),
                 maxFrameRate=aVideoSensorParams.maxFPS,
                 minResolution=aMinViewportRes,
                 maxResolution=cluster.Structs.VideoResolutionStruct(
@@ -287,7 +289,10 @@ class TC_AVSM_VideoStreamsPersistence(MatterBaseTest):
         asserts.assert_equal(aAllocatedVideoStreams[0].streamUsage, aStreamUsagePriorities[0], "Stream Usage does not match")
         asserts.assert_equal(aAllocatedVideoStreams[0].videoCodec,
                              aRateDistortionTradeOffPoints[0].codec, "Video codec does not match")
-        asserts.assert_equal(aAllocatedVideoStreams[0].minFrameRate, 30, "MinFrameRate does not match")
+        asserts.assert_equal(aAllocatedVideoStreams[0].minFrameRate,
+                             min(15, aVideoSensorParams.maxFPS),
+                             "MinFrameRate does not match")
+
         asserts.assert_equal(aAllocatedVideoStreams[0].maxFrameRate, aVideoSensorParams.maxFPS, "MaxFrameRate does not match")
         asserts.assert_equal(aAllocatedVideoStreams[0].minResolution, aMinViewportRes, "MinResolution does not match")
         asserts.assert_equal(aAllocatedVideoStreams[0].maxResolution.width,

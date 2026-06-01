@@ -14,7 +14,9 @@
 
 import("//build_overrides/chip.gni")
 import("//build_overrides/efr32_sdk.gni")
+import("${chip_root}/build/config/compiler/compiler.gni")
 import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
+import("${chip_root}/src/app/common_flags.gni")
 import("${chip_root}/src/app/icd/icd.gni")
 import("${chip_root}/src/lib/lib.gni")
 import("${chip_root}/src/platform/device.gni")
@@ -32,14 +34,11 @@ declare_args() {
   ota_periodic_query_timeout_sec = 86400
 }
 
-chip_detail_logging = sl_verbose_mode
-
 import("${silabs_common_plat_dir}/args.gni")
 
 # Sanity check
-assert(!(chip_enable_wifi && chip_enable_openthread))
-assert(!(use_SiWx917 && chip_enable_openthread))
-assert(!(use_wf200 && chip_enable_openthread))
+assert(!(chip_enable_wifi && chip_enable_thread))
+assert(!(use_SiWx917 && chip_enable_thread))
 
 config("chip_examples_project_config") {
   include_dirs = [ "project_include" ]
@@ -60,7 +59,7 @@ config("chip_examples_project_config") {
 }
 
 source_set("openthread_core_config_efr32_chip_examples") {
-  if (chip_enable_openthread) {
+  if (chip_enable_thread) {
     sources = [ "project_include/OpenThreadConfig.h" ]
 
     public_deps = [ "${silabs_sdk_build_root}:silabs_sdk" ]
@@ -112,10 +111,24 @@ config("efr32-common-config") {
     defines += [ "HEAP_MONITORING" ]
   }
 
-  ldflags = [
-    "-Wl,--no-warn-rwx-segment",
-    "-fno-lto",
-  ]
+  if (sl_matter_use_code_driven_dm) {
+    defines += [ "SL_MATTER_USE_CODE_DRIVEN_DATA_MODEL=1" ]
+  } else {
+    defines += [ "SL_MATTER_USE_CODE_DRIVEN_DATA_MODEL=0" ]
+  }
+
+  ldflags = [ "-fno-lto" ]
+  if (!is_clang) {
+    ldflags += [ "-Wl,--no-warn-rwx-segment" ]
+  } else {
+    ldflags += [
+      "-Wl,--allow-multiple-definition",  # to allow our overrides from memory
+                                          # manager
+      "-lc_nano",  # for C stdlib functions (e.g.snprintf)
+      "-lstdc++_nano",  # for C++ stdlib functions (e.g. sprintf)
+      "-lgcc",  # ARM EABI runtime functions (soft-float, 64-bit ops, etc.)
+    ]
+  }
 }
 
 source_set("efr32-common") {
@@ -149,6 +162,7 @@ source_set("efr32-common") {
     "${silabs_common_plat_dir}/LEDWidget.cpp",
     "${silabs_common_plat_dir}/MatterConfig.cpp",
     "${silabs_common_plat_dir}/SoftwareFaultReports.cpp",
+    "${silabs_common_plat_dir}/main.cpp",
     "${silabs_common_plat_dir}/silabs_utils.cpp",
     "${silabs_common_plat_dir}/syscalls_stubs.cpp",
   ]
@@ -177,7 +191,7 @@ source_set("efr32-common") {
   }
 
   # OpenThread Settings
-  if (chip_enable_openthread) {
+  if (chip_enable_thread) {
     deps += [
       "${chip_root}/third_party/openthread:openthread",
       "${chip_root}/third_party/openthread:openthread-platform",
@@ -195,6 +209,9 @@ source_set("efr32-common") {
     if (chip_enable_icd_server) {
       deps += [ "${silabs_common_plat_dir}/shell:icd" ]
     }
+    if (chip_enable_read_client) {
+      deps += [ "${silabs_common_plat_dir}/shell:im" ]
+    }
   }
 
   public_deps += [
@@ -211,9 +228,11 @@ source_set("efr32-common") {
 
   if (sl_enable_si70xx_sensor) {
     sources += [
-      "${silabs_common_plat_dir}/Si70xxSensor.cpp",
       "${silabs_common_plat_dir}/Si70xxSensor.h",
+      "${silabs_common_plat_dir}/Si70xxSensorGsdk.cpp",
     ]
+    public_deps +=
+        [ "${chip_root}/src/platform/silabs/platformAbstraction:common" ]
   }
 
   if (app_data_model != "") {

@@ -41,7 +41,9 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.commissioning import ROOT_ENDPOINT_ID
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.runner import TestStep, default_matter_test_main
 
 
 class TC_CGEN_2_7(MatterBaseTest):
@@ -96,8 +98,10 @@ class TC_CGEN_2_7(MatterBaseTest):
 
         # Step 2: Read TCMinRequiredVersion
         self.step(2)
-        response = await commissioner.ReadAttribute(nodeId=self.dut_node_id, attributes=[(ROOT_ENDPOINT_ID, Clusters.GeneralCommissioning.Attributes.TCMinRequiredVersion)])
-        min_version = response[ROOT_ENDPOINT_ID][Clusters.GeneralCommissioning][Clusters.GeneralCommissioning.Attributes.TCMinRequiredVersion]
+        min_version = await self.read_single_attribute_check_success(
+            cluster=Clusters.GeneralCommissioning,
+            attribute=Clusters.GeneralCommissioning.Attributes.TCMinRequiredVersion,
+            endpoint=ROOT_ENDPOINT_ID)
 
         # Step 3: Send SetTCAcknowledgements with invalid response
         self.step(3)

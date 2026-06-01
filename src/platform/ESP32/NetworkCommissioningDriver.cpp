@@ -117,9 +117,7 @@ CHIP_ERROR ESPWiFiDriver::Init(NetworkStatusChangeCallback * networkStatusChange
     // If the network configuration backup exists, it means that the device has been rebooted with
     // the fail-safe armed. Since ESP-WiFi persists all wifi credentials changes, the backup must
     // be restored on the boot. If there's no backup, the below function is a no-op.
-    TEMPORARY_RETURN_IGNORED RevertConfiguration();
-
-    return CHIP_NO_ERROR;
+    return RevertConfiguration();
 }
 
 void ESPWiFiDriver::Shutdown()
@@ -243,6 +241,10 @@ CHIP_ERROR ESPWiFiDriver::ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen,
     memset(&wifiConfig, 0, sizeof(wifiConfig));
     memcpy(wifiConfig.sta.ssid, ssid, std::min(ssidLen, static_cast<uint8_t>(sizeof(wifiConfig.sta.ssid))));
     memcpy(wifiConfig.sta.password, key, std::min(keyLen, static_cast<uint8_t>(sizeof(wifiConfig.sta.password))));
+#ifdef CONFIG_WIFI_SCAN_ALL_CHANNEL_MODE
+    wifiConfig.sta.scan_method = WIFI_ALL_CHANNEL_SCAN;
+    wifiConfig.sta.sort_method = WIFI_CONNECT_AP_BY_SIGNAL;
+#endif // CONFIG_WIFI_SCAN_ALL_CHANNEL_MODE
 
     // Configure the ESP WiFi interface.
     esp_err_t err = esp_wifi_set_config(WIFI_IF_STA, &wifiConfig);
@@ -269,9 +271,9 @@ CHIP_ERROR ESPWiFiDriver::DisconnectFromNetwork()
 
 void ESPWiFiDriver::OnConnectWiFiNetwork()
 {
+    DeviceLayer::SystemLayer().CancelTimer(OnConnectWiFiNetworkFailed, NULL);
     if (mpConnectCallback)
     {
-        DeviceLayer::SystemLayer().CancelTimer(OnConnectWiFiNetworkFailed, NULL);
         mpConnectCallback->OnResult(Status::kSuccess, CharSpan(), 0);
         mpConnectCallback = nullptr;
     }
@@ -350,7 +352,10 @@ exit:
     {
         ChipLogError(NetworkProvisioning, "Failed to connect to WiFi network: %" CHIP_ERROR_FORMAT, err.Format());
         mpConnectCallback = nullptr;
-        callback->OnResult(networkingStatus, CharSpan(), 0);
+        if (callback)
+        {
+            callback->OnResult(networkingStatus, CharSpan(), 0);
+        }
     }
 }
 

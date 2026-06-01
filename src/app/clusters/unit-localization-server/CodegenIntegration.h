@@ -27,7 +27,22 @@ namespace UnitLocalization {
 class UnitLocalizationServer : public UnitLocalizationCluster
 {
 public:
+    UnitLocalizationServer(EndpointId endpointId, const BitFlags<UnitLocalization::Feature> features) :
+        UnitLocalizationCluster(endpointId, features)
+    {}
     static UnitLocalizationServer & Instance();
+};
+
+/**
+ * A UnitLocalizationServer subclass that performs storage migration during Startup.
+ * This ensures the persistence providers are available when migration runs.
+ */
+class CodegenUnitLocalizationServer : public UnitLocalizationServer
+{
+public:
+    using UnitLocalizationServer::UnitLocalizationServer;
+
+    CHIP_ERROR Startup(ServerClusterContext & context) override;
 };
 
 } // namespace UnitLocalization

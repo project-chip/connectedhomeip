@@ -728,30 +728,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface MTRTimerClusterSetTimerParams (InternalMethods)
-
-- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
-
-@end
-
-@interface MTRTimerClusterResetTimerParams (InternalMethods)
-
-- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
-
-@end
-
-@interface MTRTimerClusterAddTimeParams (InternalMethods)
-
-- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
-
-@end
-
-@interface MTRTimerClusterReduceTimeParams (InternalMethods)
-
-- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
-
-@end
-
 @interface MTROvenCavityOperationalStateClusterStopParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
@@ -1069,13 +1045,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface MTRGroupcastClusterExpireGracePeriodParams (InternalMethods)
+@interface MTRGroupcastClusterConfigureAuxiliaryACLParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
 
 @end
 
-@interface MTRGroupcastClusterConfigureAuxiliaryACLParams (InternalMethods)
+@interface MTRGroupcastClusterGroupcastTestingParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
 
@@ -1306,6 +1282,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::DeviceEnergyManagementMode::Commands::ChangeToModeResponse::DecodableType &)decodableStruct;
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::DeviceEnergyManagementMode::Commands::ChangeToModeResponse::DecodableType &)decodableStruct;
+
+@end
+
+@interface MTRElectricalProtectionAlarmClusterModifyEnabledAlarmsParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
 
 @end
 
@@ -1656,6 +1638,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@interface MTRHumidistatClusterSetSettingsParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
 @interface MTRColorControlClusterMoveToHueParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
@@ -1767,6 +1755,88 @@ NS_ASSUME_NONNULL_BEGIN
 @interface MTRColorControlClusterStepColorTemperatureParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRDynamicLightingClusterStartEffectParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRDynamicLightingClusterStopEffectParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRProximityRangingClusterStartRangingRequestParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRProximityRangingClusterStartRangingResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::ProximityRanging::Commands::StartRangingResponse::DecodableType &)decodableStruct;
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::ProximityRanging::Commands::StartRangingResponse::DecodableType &)decodableStruct;
+
+@end
+
+@interface MTRProximityRangingClusterStopRangingRequestParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRNetworkIdentityManagementClusterAddClientParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRNetworkIdentityManagementClusterAddClientResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::NetworkIdentityManagement::Commands::AddClientResponse::DecodableType &)decodableStruct;
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::NetworkIdentityManagement::Commands::AddClientResponse::DecodableType &)decodableStruct;
+
+@end
+
+@interface MTRNetworkIdentityManagementClusterRemoveClientParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRNetworkIdentityManagementClusterQueryIdentityParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRNetworkIdentityManagementClusterQueryIdentityResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::NetworkIdentityManagement::Commands::QueryIdentityResponse::DecodableType &)decodableStruct;
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::NetworkIdentityManagement::Commands::QueryIdentityResponse::DecodableType &)decodableStruct;
+
+@end
+
+@interface MTRNetworkIdentityManagementClusterImportAdminSecretParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRNetworkIdentityManagementClusterExportAdminSecretParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRNetworkIdentityManagementClusterExportAdminSecretResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::NetworkIdentityManagement::Commands::ExportAdminSecretResponse::DecodableType &)decodableStruct;
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::NetworkIdentityManagement::Commands::ExportAdminSecretResponse::DecodableType &)decodableStruct;
 
 @end
 

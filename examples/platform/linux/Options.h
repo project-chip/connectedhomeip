@@ -57,16 +57,22 @@ struct LinuxDeviceOptions
     uint32_t mBleDevice        = 0;
     bool wifiSupports5g        = false;
     bool mWiFi                 = false;
-    bool mThread               = false;
-    bool cameraDeferredOffer   = false;
-    bool cameraTestVideosrc    = false;
-    bool cameraTestAudiosrc    = false;
-    bool cameraAudioPlayback   = false;
+#if CHIP_ENABLE_OPENTHREAD
+#if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
+    uint16_t mThreadNodeId = 0;
+#else
+    bool mThread = false;
+#endif
+#endif
+    bool cameraDeferredOffer = false;
+    bool cameraTestVideosrc  = false;
+    bool cameraTestAudiosrc  = false;
+    bool cameraAudioPlayback = false;
     chip::Optional<std::string> cameraVideoDevice;
+    chip::Optional<uint16_t> cameraFramerate;
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
     bool mWiFiPAF                = false;
     const char * mWiFiPAFExtCmds = nullptr;
-    uint32_t mPublishId          = 0;
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE || CHIP_DEVICE_ENABLE_PORT_PARAMS
     uint16_t securedDevicePort         = CHIP_PORT;
@@ -80,6 +86,7 @@ struct LinuxDeviceOptions
     const char * PICS                   = nullptr;
     const char * KVS                    = nullptr;
     const char * app_pipe               = "";
+    const char * app_pipe_out           = "";
     chip::Inet::InterfaceId interfaceId = chip::Inet::InterfaceId::Null();
 #if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
     bool traceStreamDecodeEnabled = false;

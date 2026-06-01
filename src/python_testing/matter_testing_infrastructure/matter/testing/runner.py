@@ -29,10 +29,10 @@ import typing
 from binascii import unhexlify
 from dataclasses import asdict as dataclass_asdict
 from dataclasses import dataclass
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from itertools import chain
 from pathlib import Path
-from typing import Any, List, Optional, Tuple
+from typing import Any, Optional
 from unittest.mock import MagicMock
 
 from mobly import signals, utils
@@ -389,22 +389,11 @@ def run_tests_no_exit(
         bool: True if all tests passed, False otherwise
     """
 
-    # Lazy import to avoid circular dependency
-    from typing import TYPE_CHECKING
-
+    from matter.testing.CommissioningPreTest import CommissionDeviceTest
     from matter.testing.matter_stack_state import MatterStackState
-    if TYPE_CHECKING:
-        from matter.testing.commissioning import CommissionDeviceTest
-    else:
-        CommissionDeviceTest = None  # Initial placeholder
 
-    # Actual runtime import
-    if CommissionDeviceTest is None:
-        from matter.testing.commissioning import CommissionDeviceTest
-
-    # NOTE: It's not possible to pass event loop via Mobly TestRunConfig user params, because the
-    #       Mobly deep copies the user params before passing them to the test class and the event
-    #       loop is not serializable. So, we are setting the event loop as a test class member.
+    # Mobly deep-copies user_params, so the asyncio event loop cannot be passed
+    # through TestRunConfig. Attach it directly to the test classes instead.
     CommissionDeviceTest.event_loop = event_loop
     test_class.event_loop = event_loop
 
@@ -480,7 +469,7 @@ def run_tests_no_exit(
                 hooks.start(count=1)
                 # Mobly gives the test run time in seconds, lets be a bit more
                 # precise
-                runner_start_time = datetime.now(timezone.utc)
+                runner_start_time = datetime.now(UTC)
 
             try:
                 runner.run()
@@ -497,8 +486,7 @@ def run_tests_no_exit(
                 ok = False
 
     if hooks:
-        duration = (datetime.now(timezone.utc) -
-                    runner_start_time) / timedelta(microseconds=1)
+        duration = (datetime.now(UTC) - runner_start_time) / timedelta(microseconds=1)
         hooks.stop(duration=duration)
 
     if not external_stack:
@@ -554,10 +542,10 @@ class AsyncMock(MagicMock):
     """
 
     async def __call__(self, *args, **kwargs):
-        return super(AsyncMock, self).__call__(*args, **kwargs)
+        return super().__call__(*args, **kwargs)
 
 
-class MockTestRunner():
+class MockTestRunner:
     """
     Test runner for mocking Matter device interactions.
 
@@ -706,17 +694,17 @@ def populate_commissioning_args(args: argparse.Namespace, config) -> bool:
             print("error: Duplicate values in node id list")
             return False
 
-    wifi_args = ['ble-wifi']
-    thread_args = ['ble-thread', 'nfc-thread']
+    wifi_args = ['ble-wifi', 'nfc-wifi']
+    thread_args = ['ble-thread', 'nfc-thread', 'thread-meshcop']
     if commissioning_method in wifi_args:
         if args.wifi_ssid is None:
             print("error: missing --wifi-ssid <SSID> for --commissioning-method "
-                  "or --in-test-commissioning-method ble-wifi!")
+                  "or --in-test-commissioning-method ble-wifi or nfc-wifi!")
             return False
 
         if args.wifi_passphrase is None:
             print("error: missing --wifi-passphrase <passphrase> for --commissioning-method or "
-                  "--in-test-commissioning-method ble-wifi!")
+                  "--in-test-commissioning-method ble-wifi or nfc-wifi!")
             return False
 
         config.wifi_ssid = args.wifi_ssid
@@ -724,9 +712,15 @@ def populate_commissioning_args(args: argparse.Namespace, config) -> bool:
     elif commissioning_method in thread_args:
         if args.thread_dataset_hex is None:
             print("error: missing --thread-dataset-hex <DATASET_HEX> for --commissioning-method or "
-                  "--in-test-commissioning-method ble-thread or nfc-thread!")
+                  "--in-test-commissioning-method ble-thread, nfc-thread or thread-meshcop!")
             return False
         config.thread_operational_dataset = args.thread_dataset_hex
+        if commissioning_method == 'thread-meshcop':
+            if args.thread_ba_host is None or args.thread_ba_port is None:
+                print("error: missing --thread-ba-host or --thread-ba-port for --commissioning-method thread-meshcop!")
+                return False
+            config.thread_ba_host = args.thread_ba_host
+            config.thread_ba_port = args.thread_ba_port
     elif config.commissioning_method == "on-network-ip":
         if args.ip_addr is None:
             print("error: missing --ip-addr <IP_ADDRESS> for --commissioning-method on-network-ip")
@@ -769,11 +763,13 @@ def convert_args_to_matter_config(args: argparse.Namespace):
 
         if any([args.passcodes, args.discriminators, args.manual_code, args.qr_code]):
             LOGGER.error("Error: Do not provide discriminator, passcode, manual code or qr-code for NFC commissioning. "
-                         "The payload is read directly from the NFC tag.")
+                         "The onboarding data is read directly from the NFC tag.")
             sys.exit(1)
 
-        from matter.testing.matter_nfc_interaction import connect_read_nfc_tag_data
-        nfc_tag_data = connect_read_nfc_tag_data(config.global_test_params.get("NFC_Reader_index", 0))
+        from matter.testing.nfc import NFCReader
+        nfc_reader_index = config.global_test_params.get("NFC_Reader_index", 0)
+        reader = NFCReader(nfc_reader_index)
+        nfc_tag_data = reader.read_nfc_tag_data()
         args.qr_code.append(nfc_tag_data)
 
     # Populate commissioning config if present, exiting on error
@@ -802,6 +798,11 @@ def convert_args_to_matter_config(args: argparse.Namespace):
         LOGGER.error("Named pipe %r does NOT exist" % config.pipe_name)
         raise FileNotFoundError("CANNOT FIND %r" % config.pipe_name)
 
+    config.pipe_name_out = args.app_pipe_out
+    if config.pipe_name_out is not None and not os.path.exists(config.pipe_name_out):
+        LOGGER.error("Named pipe %r does NOT exist" % config.pipe_name_out)
+        raise FileNotFoundError("CANNOT FIND %r" % config.pipe_name_out)
+
     config.fail_on_skipped_tests = args.fail_on_skipped
 
     config.legacy = args.use_legacy_test_event_triggers
@@ -819,7 +820,124 @@ def convert_args_to_matter_config(args: argparse.Namespace):
     return config
 
 
-def parse_matter_test_args(argv: Optional[List[str]] = None):
+def int_decimal_or_hex(s: str) -> int:
+    val = int(s, 0)
+    if val < 0:
+        raise ValueError("Negative values not supported")
+    return val
+
+
+def byte_string_from_hex(s: str) -> bytes:
+    return unhexlify(s.replace(":", "").replace(" ", "").replace("0x", ""))
+
+
+def str_from_manual_code(s: str) -> str:
+    """Enforces legal format for manual codes and removes spaces/dashes."""
+    s = s.replace("-", "").replace(" ", "")
+    regex = r"^([0-9]{11}|[0-9]{21})$"
+    match = re.match(regex, s)
+    if not match:
+        raise ValueError("Invalid manual code format, does not match %s" % regex)
+
+    return s
+
+
+def int_named_arg(s: str) -> tuple[str, int]:
+    regex = r"^(?P<name>[a-zA-Z_0-9_.-]+):((?P<hex_value>0x[0-9a-fA-F_]+)|(?P<decimal_value>-?\d+))$"
+    match = re.match(regex, s)
+    if not match:
+        raise ValueError("Invalid int argument format, does not match %s" % regex)
+
+    name = match.group("name")
+    if match.group("hex_value"):
+        value = int(match.group("hex_value"), 0)
+    else:
+        value = int(match.group("decimal_value"), 10)
+    return (name, value)
+
+
+def str_named_arg(s: str) -> tuple[str, str]:
+    regex = r"^(?P<name>[a-zA-Z_0-9.]+):(?P<value>.*)$"
+    match = re.match(regex, s)
+    if not match:
+        raise ValueError("Invalid string argument format, does not match %s" % regex)
+
+    return (match.group("name"), match.group("value"))
+
+
+def float_named_arg(s: str) -> tuple[str, float]:
+    regex = r"^(?P<name>[a-zA-Z_0-9.]+):(?P<value>.*)$"
+    match = re.match(regex, s)
+    if not match:
+        raise ValueError("Invalid float argument format, does not match %s" % regex)
+
+    name = match.group("name")
+    value = float(match.group("value"))
+
+    return (name, value)
+
+
+def json_named_arg(s: str) -> tuple[str, object]:
+    regex = r"^(?P<name>[a-zA-Z_0-9.]+):(?P<value>.*)$"
+    match = re.match(regex, s)
+    if not match:
+        raise ValueError("Invalid JSON argument format, does not match %s" % regex)
+
+    name = match.group("name")
+    value = json.loads(match.group("value"))
+
+    return (name, value)
+
+
+def bool_named_arg(s: str) -> tuple[str, bool]:
+    regex = r"^(?P<name>[a-zA-Z_0-9.]+):((?P<truth_value>true|false)|(?P<decimal_value>[01]))$"
+    match = re.match(regex, s, re.IGNORECASE)
+    if not match:
+        raise ValueError("Invalid bool argument format, does not match %s" % regex)
+
+    name = match.group("name")
+    if match.group("truth_value"):
+        value = match.group("truth_value").lower() == "true"
+    else:
+        value = int(match.group("decimal_value")) != 0
+
+    return (name, value)
+
+
+def bytes_as_hex_named_arg(s: str) -> tuple[str, bytes]:
+    regex = r"^(?P<name>[a-zA-Z_0-9.]+):(?P<value>[0-9a-fA-F:]+)$"
+    match = re.match(regex, s)
+    if not match:
+        raise ValueError("Invalid bytes as hex argument format, does not match %s" % regex)
+
+    name = match.group("name")
+    value_str = match.group("value")
+    value_str = value_str.replace(":", "")
+    if len(value_str) % 2 != 0:
+        raise ValueError("Byte string argument value needs to be event number of hex chars")
+    value = unhexlify(value_str)
+
+    return (name, value)
+
+
+def root_index(s: str) -> int:
+    CHIP_TOOL_COMPATIBILITY = {
+        "alpha": 1,
+        "beta": 2,
+        "gamma": 3
+    }
+
+    for name, _id in CHIP_TOOL_COMPATIBILITY.items():
+        if s.lower() == name:
+            return _id
+    else:
+        root_index = int(s)
+        if root_index == 0:
+            raise ValueError("Only support root index >= 1")
+        return root_index
+
+
+def parse_matter_test_args(argv: Optional[list[str]] = None):
     parser = argparse.ArgumentParser(description='Matter standalone Python test')
 
     basic_group = parser.add_argument_group(title="Basic arguments", description="Overall test execution arguments")
@@ -849,7 +967,10 @@ def parse_matter_test_args(argv: Optional[List[str]] = None):
                              help='Node ID for primary DUT communication, '
                              'and NodeID to assign if commissioning (default: %d)' % TestingDefaults.DUT_NODE_ID, nargs="+")
     basic_group.add_argument('--endpoint', type=int, default=None, help="Endpoint under test")
-    basic_group.add_argument('--app-pipe', type=str, default=None, help="The full path of the app to send an out-of-band command")
+    basic_group.add_argument('--app-pipe', type=str, default=None,
+                             help="The full path of the app to send an out-of-band command from test to app")
+    basic_group.add_argument('--app-pipe-out', type=str, default=None,
+                             help="The full path of the app to read an out-of-band command from app to test")
     basic_group.add_argument('--restart-flag-file', type=str, default=None,
                              help="The full path of the file to use to signal a restart to the app")
     basic_group.add_argument('--debug', action="store_true", default=False,
@@ -864,11 +985,13 @@ def parse_matter_test_args(argv: Optional[List[str]] = None):
 
     commission_group.add_argument('-m', '--commissioning-method', type=str,
                                   metavar='METHOD_NAME',
-                                  choices=["on-network", "ble-wifi", "ble-thread", "nfc-thread"],
+                                  choices=["on-network", "ble-wifi", "ble-thread", "nfc-thread",
+                                           "nfc-wifi", "nfc-ethernet", "thread-meshcop"],
                                   help='Name of commissioning method to use')
     commission_group.add_argument('--in-test-commissioning-method', type=str,
                                   metavar='METHOD_NAME',
-                                  choices=["on-network", "ble-wifi", "ble-thread", "nfc-thread"],
+                                  choices=["on-network", "ble-wifi", "ble-thread", "nfc-thread",
+                                           "nfc-wifi", "nfc-ethernet", "thread-meshcop"],
                                   help='Name of commissioning method to use, for commissioning tests')
     commission_group.add_argument('-d', '--discriminator', type=int_decimal_or_hex,
                                   metavar='LONG_DISCRIMINATOR',
@@ -898,6 +1021,10 @@ def parse_matter_test_args(argv: Optional[List[str]] = None):
     commission_group.add_argument('--case-admin-subject', action="store", type=int_decimal_or_hex,
                                   metavar="CASE_ADMIN_SUBJECT",
                                   help="Set the CASE admin subject to an explicit value (default to commissioner Node ID)")
+    commission_group.add_argument('--thread-ba-host', action="store", type=str,
+                                  help="Border Agent IP address")
+    commission_group.add_argument('--thread-ba-port', action="store", type=int,
+                                  help="Border Agent port")
 
     commission_group.add_argument('--commission-only', action="store_true", default=False,
                                   help="If true, test exits after commissioning without running subsequent tests")
@@ -946,120 +1073,3 @@ def parse_matter_test_args(argv: Optional[List[str]] = None):
         argv = sys.argv[1:]
 
     return convert_args_to_matter_config(parser.parse_args(argv))
-
-
-def int_decimal_or_hex(s: str) -> int:
-    val = int(s, 0)
-    if val < 0:
-        raise ValueError("Negative values not supported")
-    return val
-
-
-def byte_string_from_hex(s: str) -> bytes:
-    return unhexlify(s.replace(":", "").replace(" ", "").replace("0x", ""))
-
-
-def str_from_manual_code(s: str) -> str:
-    """Enforces legal format for manual codes and removes spaces/dashes."""
-    s = s.replace("-", "").replace(" ", "")
-    regex = r"^([0-9]{11}|[0-9]{21})$"
-    match = re.match(regex, s)
-    if not match:
-        raise ValueError("Invalid manual code format, does not match %s" % regex)
-
-    return s
-
-
-def int_named_arg(s: str) -> Tuple[str, int]:
-    regex = r"^(?P<name>[a-zA-Z_0-9_.-]+):((?P<hex_value>0x[0-9a-fA-F_]+)|(?P<decimal_value>-?\d+))$"
-    match = re.match(regex, s)
-    if not match:
-        raise ValueError("Invalid int argument format, does not match %s" % regex)
-
-    name = match.group("name")
-    if match.group("hex_value"):
-        value = int(match.group("hex_value"), 0)
-    else:
-        value = int(match.group("decimal_value"), 10)
-    return (name, value)
-
-
-def str_named_arg(s: str) -> Tuple[str, str]:
-    regex = r"^(?P<name>[a-zA-Z_0-9.]+):(?P<value>.*)$"
-    match = re.match(regex, s)
-    if not match:
-        raise ValueError("Invalid string argument format, does not match %s" % regex)
-
-    return (match.group("name"), match.group("value"))
-
-
-def float_named_arg(s: str) -> Tuple[str, float]:
-    regex = r"^(?P<name>[a-zA-Z_0-9.]+):(?P<value>.*)$"
-    match = re.match(regex, s)
-    if not match:
-        raise ValueError("Invalid float argument format, does not match %s" % regex)
-
-    name = match.group("name")
-    value = float(match.group("value"))
-
-    return (name, value)
-
-
-def json_named_arg(s: str) -> Tuple[str, object]:
-    regex = r"^(?P<name>[a-zA-Z_0-9.]+):(?P<value>.*)$"
-    match = re.match(regex, s)
-    if not match:
-        raise ValueError("Invalid JSON argument format, does not match %s" % regex)
-
-    name = match.group("name")
-    value = json.loads(match.group("value"))
-
-    return (name, value)
-
-
-def bool_named_arg(s: str) -> Tuple[str, bool]:
-    regex = r"^(?P<name>[a-zA-Z_0-9.]+):((?P<truth_value>true|false)|(?P<decimal_value>[01]))$"
-    match = re.match(regex, s, re.IGNORECASE)
-    if not match:
-        raise ValueError("Invalid bool argument format, does not match %s" % regex)
-
-    name = match.group("name")
-    if match.group("truth_value"):
-        value = match.group("truth_value").lower() == "true"
-    else:
-        value = int(match.group("decimal_value")) != 0
-
-    return (name, value)
-
-
-def bytes_as_hex_named_arg(s: str) -> Tuple[str, bytes]:
-    regex = r"^(?P<name>[a-zA-Z_0-9.]+):(?P<value>[0-9a-fA-F:]+)$"
-    match = re.match(regex, s)
-    if not match:
-        raise ValueError("Invalid bytes as hex argument format, does not match %s" % regex)
-
-    name = match.group("name")
-    value_str = match.group("value")
-    value_str = value_str.replace(":", "")
-    if len(value_str) % 2 != 0:
-        raise ValueError("Byte string argument value needs to be event number of hex chars")
-    value = unhexlify(value_str)
-
-    return (name, value)
-
-
-def root_index(s: str) -> int:
-    CHIP_TOOL_COMPATIBILITY = {
-        "alpha": 1,
-        "beta": 2,
-        "gamma": 3
-    }
-
-    for name, id in CHIP_TOOL_COMPATIBILITY.items():
-        if s.lower() == name:
-            return id
-    else:
-        root_index = int(s)
-        if root_index == 0:
-            raise ValueError("Only support root index >= 1")
-        return root_index

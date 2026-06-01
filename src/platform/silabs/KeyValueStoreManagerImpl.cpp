@@ -24,7 +24,7 @@
 #include "MigrationManager.h"
 #include <cmsis_os2.h>
 #include <crypto/CHIPCryptoPAL.h>
-#include <lib/support/ScopedBuffer.h>
+#include <lib/support/ScopedMemoryBuffer.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/KeyValueStoreManager.h>
 #include <platform/silabs/SilabsConfig.h>
@@ -182,9 +182,13 @@ void KeyValueStoreManagerImpl::ScheduleKeyMapSave(void)
         During commissioning, the key map will be modified multiples times subsequently.
         Commit the key map in nvm once it as stabilized.
     */
+
+    // SL-TEMP: StartTimer requires the chip stack to be locked, since ScheduleKeyMapSave might be called from a non-locked context.
+    PlatformMgr().LockChipStack();
     TEMPORARY_RETURN_IGNORED SystemLayer().StartTimer(
         std::chrono::duration_cast<System::Clock::Timeout>(System::Clock::Seconds32(SL_KVS_SAVE_DELAY_SECONDS)),
         KeyValueStoreManagerImpl::OnScheduledKeyMapSave, NULL);
+    PlatformMgr().UnlockChipStack();
 }
 
 CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t value_size, size_t * read_bytes_size,

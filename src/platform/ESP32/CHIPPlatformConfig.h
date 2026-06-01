@@ -51,6 +51,22 @@
 
 // ==================== Security Adaptations ====================
 
+// For ESP-IDF v6.0 (mbedTLS v4.0) with PSA Crypto backend,
+// psa_hash_operation_t is larger than the default context size
+#include <esp_idf_version.h>
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(6, 0, 0)
+#include <psa/crypto.h>
+
+#ifndef CHIP_CONFIG_SHA256_CONTEXT_SIZE
+#define CHIP_CONFIG_SHA256_CONTEXT_SIZE sizeof(psa_hash_operation_t)
+#endif
+
+#ifndef CHIP_CONFIG_SHA256_CONTEXT_ALIGN
+#define CHIP_CONFIG_SHA256_CONTEXT_ALIGN psa_hash_operation_t
+#endif
+
+#endif // ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(6, 0, 0)
+
 // ==================== Kconfig Overrides ====================
 
 // The following values are configured via the ESP-IDF Kconfig mechanism.
@@ -100,6 +116,12 @@
 #ifndef CHIP_CONFIG_ICD_ACTIVE_MODE_THRESHOLD_MS
 #define CHIP_CONFIG_ICD_ACTIVE_MODE_THRESHOLD_MS CONFIG_ICD_ACTIVE_MODE_THRESHOLD_MS
 #endif // CHIP_CONFIG_ICD_ACTIVE_MODE_THRESHOLD_MS
+
+#ifdef CONFIG_ENABLE_ICD_LIT
+#ifndef CHIP_CONFIG_ICD_SHORT_IDLE_MODE_DURATION_SEC
+#define CHIP_CONFIG_ICD_SHORT_IDLE_MODE_DURATION_SEC CONFIG_ICD_SHORT_IDLE_MODE_DURATION_SEC
+#endif // CHIP_CONFIG_ICD_SHORT_IDLE_MODE_DURATION_SEC
+#endif // CONFIG_ENABLE_ICD_LIT
 
 #ifdef CONFIG_ENABLE_ICD_CIP
 #ifndef CHIP_CONFIG_ICD_CLIENTS_SUPPORTED_PER_FABRIC

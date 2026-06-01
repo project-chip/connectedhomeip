@@ -51,7 +51,7 @@ CHIP_ERROR MockCommandHandler::AddResponseData(const app::ConcreteCommandPath & 
 
     TLV::TLVWriter baseWriter;
     baseWriter.Init(handle->Start(), handle->MaxDataLength());
-    app::DataModel::FabricAwareTLVWriter writer(baseWriter, mFabricIndex);
+    app::DataModel::FabricAwareTLVWriter writer(baseWriter, mSubjectDescriptor.fabricIndex);
     TLV::TLVType ct;
 
     ReturnErrorOnFailure(writer.mTLVWriter.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, ct));

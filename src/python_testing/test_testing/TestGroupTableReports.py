@@ -34,15 +34,16 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-from typing import List
 
 from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.clusters import ClusterObjects as ClusterObjects
 from matter.interaction_model import Status
+from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from matter.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
+from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.runner import default_matter_test_main
 
 
 class TestGroupTableReports(MatterBaseTest):
@@ -59,11 +60,11 @@ class TestGroupTableReports(MatterBaseTest):
         self.groupKey = Clusters.GroupKeyManagement.Structs.GroupKeySetStruct(
             groupKeySetID=self.kGroupKeyset1,
             groupKeySecurityPolicy=Clusters.GroupKeyManagement.Enums.GroupKeySecurityPolicyEnum.kTrustFirst,
-            epochKey0="0123456789abcdef".encode(),
+            epochKey0=b"0123456789abcdef",
             epochStartTime0=1110000,
-            epochKey1="0123456789abcdef".encode(),
+            epochKey1=b"0123456789abcdef",
             epochStartTime1=1110001,
-            epochKey2="0123456789abcdef".encode(),
+            epochKey2=b"0123456789abcdef",
             epochStartTime2=1110002)
 
         await self.TH1.SendCommand(self.dut_node_id, 0, Clusters.GroupKeyManagement.Commands.KeySetWrite(self.groupKey))
@@ -73,7 +74,7 @@ class TestGroupTableReports(MatterBaseTest):
         self.kGroup3 = 0x0103
 
         self.print_step(3, "TH maps Keyset 1 to Group 1, 2 and 3")
-        mapping_structs: List[Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct] = []
+        mapping_structs: list[Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct] = []
 
         mapping_structs.append(Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct(
             groupId=self.kGroup1,

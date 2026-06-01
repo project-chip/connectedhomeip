@@ -39,7 +39,9 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.clusters.Types import Nullable, NullValue
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.runner import TestStep, default_matter_test_main
 from matter.tlv import uint
 
 log = logging.getLogger(__name__)
@@ -91,7 +93,7 @@ class TC_CLCTRL_2_1(MatterBaseTest):
 
         # STEP 2: Read AttributeList attribute to determine supported attributes
         self.step(2)
-        attribute_list: typing.List[uint] = await self.read_closurecontrol_attribute_expect_success(endpoint=endpoint, attribute=attributes.AttributeList)
+        attribute_list: list[uint] = await self.read_closurecontrol_attribute_expect_success(endpoint=endpoint, attribute=attributes.AttributeList)
         log.info(f"AttributeList: {attribute_list}")
 
         # STEP 3: Read FeatureMap attribute to determine supported features
@@ -133,7 +135,7 @@ class TC_CLCTRL_2_1(MatterBaseTest):
 
         # STEP 6: Read CurrentErrorList attribute
         self.step(6)
-        current_error_list: typing.List[Clusters.ClosureControl.Enums.ClosureErrorEnum] = await self.read_closurecontrol_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentErrorList)
+        current_error_list: list[Clusters.ClosureControl.Enums.ClosureErrorEnum] = await self.read_closurecontrol_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentErrorList)
         log.info(f"CurrentErrorList: {current_error_list}")
 
         asserts.assert_less_equal(len(current_error_list), 10, "CurrentErrorList length is out of range")

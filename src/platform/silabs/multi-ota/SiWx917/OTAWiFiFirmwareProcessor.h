@@ -29,6 +29,9 @@ extern "C" {
 #endif
 
 namespace chip {
+namespace DeviceLayer {
+namespace Silabs {
+namespace MultiOTA {
 
 class OTAWiFiFirmwareProcessor : public OTATlvProcessor
 {
@@ -56,4 +59,7 @@ private:
     CHIP_ERROR ProcessDescriptor(ByteSpan & block);
 };
 
+} // namespace MultiOTA
+} // namespace Silabs
+} // namespace DeviceLayer
 } // namespace chip

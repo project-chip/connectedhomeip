@@ -1,0 +1,59 @@
+# Copyright (c) 2026 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/chip.gni")
+import("//build_overrides/openthread.gni")
+
+static_library("simulation") {
+  defines = [
+    "OPENTHREAD_SIMULATION_UART_ENABLE=0",
+    "OPENTHREAD_PLATFORM_USE_PSEUDO_RESET=1",
+  ]
+
+  public = [
+    "${openthread_root}/examples/platforms/openthread-select.h",
+    "${openthread_root}/examples/platforms/openthread-system.h",
+  ]
+
+  sources = [
+    "${openthread_root}/examples/platforms/simulation/alarm.c",
+    "${openthread_root}/examples/platforms/simulation/ble.c",
+    "${openthread_root}/examples/platforms/simulation/crypto.c",
+    "${openthread_root}/examples/platforms/simulation/diag.c",
+    "${openthread_root}/examples/platforms/simulation/dns.c",
+    "${openthread_root}/examples/platforms/simulation/dnssd.c",
+    "${openthread_root}/examples/platforms/simulation/dso_transport.c",
+    "${openthread_root}/examples/platforms/simulation/entropy.c",
+    "${openthread_root}/examples/platforms/simulation/flash.c",
+    "${openthread_root}/examples/platforms/simulation/infra_if.c",
+    "${openthread_root}/examples/platforms/simulation/logging.c",
+    "${openthread_root}/examples/platforms/simulation/mdns_socket.c",
+    "${openthread_root}/examples/platforms/simulation/misc.c",
+    "${openthread_root}/examples/platforms/simulation/multipan.c",
+    "${openthread_root}/examples/platforms/simulation/radio.c",
+    "${openthread_root}/examples/platforms/simulation/simul_utils.c",
+    "${openthread_root}/examples/platforms/simulation/spi-stubs.c",
+    "${openthread_root}/examples/platforms/simulation/system.c",
+    "${openthread_root}/examples/platforms/simulation/trel.c",
+    "${openthread_root}/src/lib/platform/exit_code.c",
+    "${openthread_root}/src/lib/platform/exit_code.h",
+  ]
+
+  deps = [
+    "${openthread_root}/src/core:libopenthread_core_headers",
+    "..:libopenthread-platform-utils",
+  ]
+
+  public_configs = [ "..:libopenthread-platform_config" ]
+}

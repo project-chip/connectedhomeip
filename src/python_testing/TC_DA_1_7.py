@@ -38,7 +38,7 @@
 import logging
 from glob import glob
 from pathlib import Path
-from typing import List, Optional
+from typing import Optional
 
 from cryptography.exceptions import InvalidSignature
 from cryptography.hazmat.primitives import hashes
@@ -49,7 +49,9 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.testing.conversions import bytes_from_hex, hex_from_bytes
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
@@ -84,7 +86,7 @@ def load_all_paa(paa_path: Path) -> dict:
                     if extension.oid == SubjectKeyIdentifier.oid:
                         skid = extension.value.key_identifier
                         paa_by_skid[skid] = (Path(filename).name, paa_cert)
-            except (ValueError, IOError) as e:
+            except (OSError, ValueError) as e:
                 log.error(f"Failed to load {filename}: {str(e)}")
                 if Path(filename).name not in ALLOWED_SKIPPED_FILENAMES:
                     log.error(f"Re-raising error and failing: found new invalid PAA: {filename}")
@@ -139,7 +141,7 @@ class TC_DA_1_7(MatterBaseTest):
     def expected_number_of_DUTs(self) -> int:
         return 1 if (self.allow_sdk_dac or self.post_cert_test) else 2
 
-    def steps_one_dut(self, DUT: int) -> List[TestStep]:
+    def steps_one_dut(self, DUT: int) -> list[TestStep]:
         return [TestStep(f'{DUT}', f'Test DUT{DUT} DAC chain as follows:'),
                 TestStep(f'{DUT}.1', f'TH sends CertificateChainRequest Command to DUT{DUT} with the CertificateType set to PAICertificate',
                          'Verify that the DUT returns a CertificateChainResponse. Save the returned Certificate as `pai_cert`.'),

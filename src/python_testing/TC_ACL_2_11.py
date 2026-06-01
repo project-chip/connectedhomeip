@@ -50,8 +50,10 @@ from matter.clusters.Objects import AccessControl
 from matter.clusters.Types import NullValue
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.basic_composition import arls_populated
+from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import EventSubscriptionHandler
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
@@ -169,13 +171,17 @@ class TC_ACL_2_11(MatterBaseTest):
         # end
 
         self.step(5)
-        root_node_endpoint = 0
-        root_part_list = await dev_ctrl.ReadAttribute(dut_node_id, [(root_node_endpoint, Clusters.Descriptor.Attributes.PartsList)])
-        set_of_endpoints = set(root_part_list[root_node_endpoint]
-                               [Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList])
+        ROOT_NODE_ENDPOINT = 0
+        parts_list = await self.read_single_attribute_check_success(
+            cluster=Clusters.Descriptor,
+            attribute=Clusters.Descriptor.Attributes.PartsList,
+            endpoint=ROOT_NODE_ENDPOINT)
+        set_of_endpoints = set(parts_list)
         for endpoint in set_of_endpoints:
-            ret = await dev_ctrl.ReadAttribute(dut_node_id, [(endpoint, Clusters.Descriptor.Attributes.ServerList)])
-            server_list = ret[endpoint][Clusters.Descriptor][Clusters.Descriptor.Attributes.ServerList]
+            server_list = await self.read_single_attribute_check_success(
+                cluster=Clusters.Descriptor,
+                attribute=Clusters.Descriptor.Attributes.ServerList,
+                endpoint=endpoint)
             for server in server_list:
                 cluster = Clusters.ClusterObjects.ALL_CLUSTERS[server]
                 data = await dev_ctrl.ReadAttribute(dut_node_id, [(endpoint, cluster.Attributes.GeneratedCommandList),

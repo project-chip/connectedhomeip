@@ -15,7 +15,7 @@
 #    limitations under the License.
 
 
-from typing import List, Optional
+from typing import Optional
 
 from mobly import asserts
 
@@ -71,7 +71,7 @@ class CommodityMeteringTestBaseHelper(MatterBaseTest):
         if self.MaximumMeteredQuantities is not NullValue:
             matter_asserts.assert_valid_uint16(self.MaximumMeteredQuantities, 'MaximumMeteredQuantities must be uint16')
 
-    async def check_metered_quantity_attribute(self, endpoint: int, attribute_value: Optional[List[Clusters.CommodityMetering.Structs.MeteredQuantityStruct]] = None) -> None:
+    async def check_metered_quantity_attribute(self, endpoint: int, attribute_value: Optional[list[Clusters.CommodityMetering.Structs.MeteredQuantityStruct]] = None) -> None:
         """Validate the MeteredQuantity attribute.
 
         Args:
@@ -180,7 +180,7 @@ class CommodityMeteringTestBaseHelper(MatterBaseTest):
             return report.attribute == cluster.Attributes.TariffUnit
         return AttributeMatcher.from_callable(description="TariffUnit", matcher=predicate)
 
-    def get_mandatory_matchers(self) -> List[AttributeMatcher]:
+    def get_mandatory_matchers(self) -> list[AttributeMatcher]:
 
         return [
             self._metered_quantity_matcher(),
