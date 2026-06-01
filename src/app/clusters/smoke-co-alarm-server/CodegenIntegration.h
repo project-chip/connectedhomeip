@@ -53,6 +53,8 @@ public:
     static SmokeCoAlarmServer & Instance();
 
     bool RequestSelfTest(EndpointId endpoint);
+    void HandleRemoteSelfTestRequest(EndpointId endpoint, chip::app::CommandHandler * commandObj,
+                                     const chip::app::ConcreteCommandPath & commandPath);
 
     // Endpoint-taking overloads for backwards compatibility with old call sites.
     // The endpoint param is ignored; Instance() already owns a specific endpoint.

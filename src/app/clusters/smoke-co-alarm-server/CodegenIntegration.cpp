@@ -75,6 +75,12 @@ bool SmokeCoAlarmServer::RequestSelfTest(EndpointId endpoint)
     return mCluster.Cluster().RequestSelfTest();
 }
 
+void SmokeCoAlarmServer::HandleRemoteSelfTestRequest(EndpointId, CommandHandler * commandObj,
+                                                     const ConcreteCommandPath & commandPath)
+{
+    Cluster().HandleRemoteSelfTestRequest(commandObj, commandPath);
+}
+
 void SmokeCoAlarmServer::SetExpressedStateByPriority(EndpointId, const std::array<ExpressedStateEnum, kPriorityOrderLength> & o)
 {
     Cluster().SetExpressedStateByPriority(o);
