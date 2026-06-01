@@ -27,8 +27,9 @@ from collections.abc import Callable, Iterable, Mapping
 from dataclasses import dataclass, field, fields, is_dataclass
 from pathlib import Path
 from types import TracebackType
-from typing import Any, ClassVar, TypeAlias
+from typing import Any, TypeAlias
 
+from chiptest.concurrency.context import TerminableThread
 from chiptest.concurrency.work_queue import CancellableQueue, EndOfQueue
 from chiptest.log_config import LogConfig
 
@@ -120,7 +121,7 @@ class TestResult:
                         log.error("%s Failed in %0.2f seconds", symbol, result.duration_seconds,
                                   exc_info=(type(result.exception), result.exception, result.exception.__traceback__))
 
-                return result
+            return result
 
 
 @dataclass
@@ -179,7 +180,7 @@ class RunSummary(RunStats):
     """
     iterations: int
     tests_per_iteration: int
-    run_timestamp: datetime.datetime | str = field(default_factory=lambda: datetime.datetime.now(datetime.timezone.utc))
+    run_timestamp: datetime.datetime | str = field(default_factory=lambda: datetime.datetime.now(datetime.UTC))
     results: list[TestResult] = field(default_factory=list, init=False)
     test_stats: dict[str, RunStats] = field(default_factory=dict, init=False)
     exceptions: defaultdict[int, dict[str, ExceptionInfoT]] = field(default_factory=lambda: defaultdict(dict), init=False)
@@ -395,15 +396,13 @@ ResultQueueT: TypeAlias = CancellableQueue[TestResult]
 
 
 @dataclass(eq=False)
-class ResultProcessingThread(threading.Thread):
+class ResultProcessingThread(TerminableThread):
     """Thread that processes test results from the result queue, keeps track of test run summary and prints it at the end."""
 
     summary: RunSummary
     expected_failures: int
     keep_going: bool
     summary_file: Path | None
-
-    THREAD_TERMINATE_TIMEOUT_S: ClassVar[float] = 5.0
 
     def __post_init__(self) -> None:
         super().__init__(name="Results")
@@ -443,26 +442,22 @@ class ResultProcessingThread(threading.Thread):
                 raise ResultError(
                     f"Iteration {iteration}: expected failure count {self.expected_failures}, but got {observed_failures}")
 
-    def terminate(self) -> None:
+    def resource_terminate(self) -> None:
         """Terminate the result processing thread."""
         try:
             # Close the result queue to unblock the thread if it's waiting for results.
             self.result_queue.close()
 
-            if self.ident is not None:
-                self.join(self.THREAD_TERMINATE_TIMEOUT_S)
-                if self.is_alive():
-                    raise RuntimeError("Result processing thread is still alive, it might be stuck on processing results")
+            if not self.resource_thread_join():
+                raise RuntimeError("Result processing thread is still alive, it might be stuck on processing results")
         except Exception as e:
             # Try to forcefully cancel the result queue to unblock the thread.
             self.result_queue.cancel()
 
             # Wait for the thread to finish processing results if it had been started.
-            if self.ident is not None:
-                self.join(self.THREAD_TERMINATE_TIMEOUT_S)
-                if self.is_alive():
-                    raise RuntimeError(
-                        "Failed to terminate result processing thread. Result summary may be incomplete or corrupted") from e
+            if not self.resource_thread_join():
+                raise RuntimeError(
+                    "Failed to terminate result processing thread. Result summary may be incomplete or corrupted") from e
         finally:
             # We don't take the lock to ensure there is no deadlock in case of the thread being stuck on acquiring the lock. This
             # may lead to incomplete or corrupted summary, but it's better than hanging indefinitely.

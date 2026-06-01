@@ -43,6 +43,10 @@ _all_devices_all_enabled = all_devices_enabled_devices == []
 #   - Update scripts/build/build/targets.py to include the new device
 _available_devices = [
   [
+    "air-quality-sensor",
+    "AIR_QUALITY_SENSOR",
+  ],
+  [
     "chime",
     "CHIME",
   ],
@@ -53,6 +57,10 @@ _available_devices = [
   [
     "dimmable-light",
     "DIMMABLE_LIGHT",
+  ],
+  [
+    "network-infrastructure-manager",
+    "NETWORK_INFRASTRUCTURE_MANAGER",
   ],
   [
     "occupancy-sensor",

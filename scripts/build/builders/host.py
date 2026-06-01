@@ -332,7 +332,7 @@ class HostApp(Enum):
             yield 'chip-ota-requestor-app'
             yield 'chip-ota-requestor-app.map'
         elif self == HostApp.PYTHON_BINDINGS:
-            yield 'controller/python'  # Directory containing WHL files
+            yield 'obj/src/controller/python/matter-controller-wheels'
         elif self == HostApp.EFR32_TEST_RUNNER:
             yield 'chip_pw_test_runner_wheels'
         elif self == HostApp.TV_CASTING:
@@ -490,7 +490,7 @@ class HostBuilder(GnBuilder):
         if not unified:
             root = os.path.join(root, 'examples', app.ExamplePath())
 
-        super(HostBuilder, self).__init__(root=root, runner=runner, output_dir_lock=output_dir_lock)
+        super().__init__(root=root, runner=runner, output_dir_lock=output_dir_lock)
 
         self.app = app
         self.board = board
@@ -650,8 +650,8 @@ class HostBuilder(GnBuilder):
             self.extra_gn_options.append(f'chip_casting_simplified={str(chip_casting_simplified).lower()}')
             if chip_casting_simplified:
                 self.extra_gn_options.append(
-                    'chip_cluster_objects_source_override='
-                    '"${chip_root}/examples/tv-casting-app/tv-casting-common/casting-cluster-objects.cpp"'
+                    'chip_data_model_overrides_dir='
+                    '"${chip_root}/examples/tv-casting-app/tv-casting-common"'
                 )
 
         if enable_webrtc:
@@ -694,7 +694,7 @@ class HostBuilder(GnBuilder):
         elif app == HostApp.PYTHON_BINDINGS:
             self.extra_gn_options.append('enable_rtti=false')
             self.extra_gn_options.append('chip_project_config_include_dirs=["//config/python"]')
-            self.build_command = 'matter-repl'
+            self.build_command = 'python_wheels'
 
         if self.app == HostApp.SIMULATED_APP1:
             self.extra_gn_options.append('chip_tests_zap_config="app1"')
@@ -783,7 +783,7 @@ class HostBuilder(GnBuilder):
 
     @lock_output_dir
     def generate(self):
-        super(HostBuilder, self).generate(dedup=self.unified)
+        super().generate(dedup=self.unified)
         if 'JAVA_HOME' in os.environ:
             self._Execute(
                 ["third_party/java_deps/set_up_java_deps.sh"],

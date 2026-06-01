@@ -1,8 +1,8 @@
 #include "GroupcastCluster.h"
 #include <access/AccessControl.h>
 #include <app/EventManagement.h>
+#include <app/clusters/access-control-server/AccessControlEventHelper.h>
 #include <app/server-cluster/AttributeListBuilder.h>
-#include <clusters/AccessControl/Events.h>
 #include <clusters/Groupcast/AttributeIds.h>
 #include <clusters/Groupcast/Attributes.h>
 #include <clusters/Groupcast/Events.h>
@@ -530,7 +530,7 @@ Status GroupcastCluster::JoinGroup(const ConcreteCommandPath & path, const Group
 
     if (groups.ConsumeAuxAclNotificationNeeded())
     {
-        EmitAuxiliaryAccessUpdated(subjectDescriptor);
+        AccessControl::EmitAuxiliaryAccessUpdated(mContext->interactionContext.eventsGenerator, subjectDescriptor);
     }
 
     return Status::Success;
@@ -622,7 +622,7 @@ Status GroupcastCluster::ConfigureAuxiliaryACL(const Groupcast::Commands::Config
 
     if (groups.ConsumeAuxAclNotificationNeeded())
     {
-        EmitAuxiliaryAccessUpdated(subjectDescriptor);
+        AccessControl::EmitAuxiliaryAccessUpdated(mContext->interactionContext.eventsGenerator, subjectDescriptor);
     }
 
     return Status::Success;
@@ -739,7 +739,7 @@ Status GroupcastCluster::RemoveGroup(GroupId group_id, const Groupcast::Commands
     }
     if (groups.ConsumeAuxAclNotificationNeeded())
     {
-        EmitAuxiliaryAccessUpdated(subjectDescriptor);
+        AccessControl::EmitAuxiliaryAccessUpdated(mContext->interactionContext.eventsGenerator, subjectDescriptor);
     }
 
     return Status::Success;
@@ -835,24 +835,6 @@ void GroupcastCluster::NotifyUsedMcastAddrCountOnChange()
     {
         NotifyAttributeChanged(Groupcast::Attributes::UsedMcastAddrCount::Id);
     }
-}
-
-void GroupcastCluster::EmitAuxiliaryAccessUpdated(const chip::Access::SubjectDescriptor & subjectDescriptor)
-{
-    VerifyOrReturn(mContext != nullptr);
-
-    AccessControl::Events::AuxiliaryAccessUpdated::Type event;
-    event.fabricIndex = subjectDescriptor.fabricIndex;
-    if (subjectDescriptor.subject != kUndefinedNodeId)
-    {
-        event.adminNodeID.SetNonNull(subjectDescriptor.subject);
-    }
-    else
-    {
-        event.adminNodeID.SetNull();
-    }
-
-    (void) mContext->interactionContext.eventsGenerator.GenerateEvent(event, kRootEndpointId);
 }
 
 } // namespace Clusters

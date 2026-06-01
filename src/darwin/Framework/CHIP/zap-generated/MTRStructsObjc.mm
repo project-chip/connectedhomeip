@@ -6955,6 +6955,300 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@implementation MTRElectricalProtectionAlarmClusterArcFaultRatingsStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _seriesArcCurrentSensitivity = nil;
+
+        _parallelArcCurrentSensitivity = nil;
+
+        _supportedArcCauses = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRElectricalProtectionAlarmClusterArcFaultRatingsStruct alloc] init];
+
+    other.seriesArcCurrentSensitivity = self.seriesArcCurrentSensitivity;
+    other.parallelArcCurrentSensitivity = self.parallelArcCurrentSensitivity;
+    other.supportedArcCauses = self.supportedArcCauses;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: seriesArcCurrentSensitivity:%@; parallelArcCurrentSensitivity:%@; supportedArcCauses:%@; >", NSStringFromClass([self class]), _seriesArcCurrentSensitivity, _parallelArcCurrentSensitivity, _supportedArcCauses];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRElectricalProtectionAlarmClusterOverLoadRatingsStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _tripCurrent = nil;
+
+        _tripCurve = nil;
+
+        _tripMechanism = nil;
+
+        _ultimateMaxCurrent = nil;
+
+        _serviceMaxCurrent = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRElectricalProtectionAlarmClusterOverLoadRatingsStruct alloc] init];
+
+    other.tripCurrent = self.tripCurrent;
+    other.tripCurve = self.tripCurve;
+    other.tripMechanism = self.tripMechanism;
+    other.ultimateMaxCurrent = self.ultimateMaxCurrent;
+    other.serviceMaxCurrent = self.serviceMaxCurrent;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: tripCurrent:%@; tripCurve:%@; tripMechanism:%@; ultimateMaxCurrent:%@; serviceMaxCurrent:%@; >", NSStringFromClass([self class]), _tripCurrent, _tripCurve, _tripMechanism, _ultimateMaxCurrent, _serviceMaxCurrent];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRElectricalProtectionAlarmClusterOverVoltageRatingsStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _tripMechanism = nil;
+
+        _tripVoltage = nil;
+
+        _maxContinuousOperatingVoltage = nil;
+
+        _responseTime = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRElectricalProtectionAlarmClusterOverVoltageRatingsStruct alloc] init];
+
+    other.tripMechanism = self.tripMechanism;
+    other.tripVoltage = self.tripVoltage;
+    other.maxContinuousOperatingVoltage = self.maxContinuousOperatingVoltage;
+    other.responseTime = self.responseTime;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: tripMechanism:%@; tripVoltage:%@; maxContinuousOperatingVoltage:%@; responseTime:%@; >", NSStringFromClass([self class]), _tripMechanism, _tripVoltage, _maxContinuousOperatingVoltage, _responseTime];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRElectricalProtectionAlarmClusterResidualCurrentFaultRatingsStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _currentSensitivity = nil;
+
+        _tripMechanism = nil;
+
+        _voltageDependent = nil;
+
+        _groundFaultClass = nil;
+
+        _waveform = nil;
+
+        _trippingCharacteristic = nil;
+
+        _ultimateMaxCurrent = nil;
+
+        _serviceMaxCurrent = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRElectricalProtectionAlarmClusterResidualCurrentFaultRatingsStruct alloc] init];
+
+    other.currentSensitivity = self.currentSensitivity;
+    other.tripMechanism = self.tripMechanism;
+    other.voltageDependent = self.voltageDependent;
+    other.groundFaultClass = self.groundFaultClass;
+    other.waveform = self.waveform;
+    other.trippingCharacteristic = self.trippingCharacteristic;
+    other.ultimateMaxCurrent = self.ultimateMaxCurrent;
+    other.serviceMaxCurrent = self.serviceMaxCurrent;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: currentSensitivity:%@; tripMechanism:%@; voltageDependent:%@; groundFaultClass:%@; waveform:%@; trippingCharacteristic:%@; ultimateMaxCurrent:%@; serviceMaxCurrent:%@; >", NSStringFromClass([self class]), _currentSensitivity, _tripMechanism, _voltageDependent, _groundFaultClass, _waveform, _trippingCharacteristic, _ultimateMaxCurrent, _serviceMaxCurrent];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRElectricalProtectionAlarmClusterShortCircuitRatingsStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _tripCurrent = nil;
+
+        _tripMechanism = nil;
+
+        _tripCurve = nil;
+
+        _ultimateMaxCurrent = nil;
+
+        _serviceMaxCurrent = nil;
+
+        _maxCurrent = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRElectricalProtectionAlarmClusterShortCircuitRatingsStruct alloc] init];
+
+    other.tripCurrent = self.tripCurrent;
+    other.tripMechanism = self.tripMechanism;
+    other.tripCurve = self.tripCurve;
+    other.ultimateMaxCurrent = self.ultimateMaxCurrent;
+    other.serviceMaxCurrent = self.serviceMaxCurrent;
+    other.maxCurrent = self.maxCurrent;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: tripCurrent:%@; tripMechanism:%@; tripCurve:%@; ultimateMaxCurrent:%@; serviceMaxCurrent:%@; maxCurrent:%@; >", NSStringFromClass([self class]), _tripCurrent, _tripMechanism, _tripCurve, _ultimateMaxCurrent, _serviceMaxCurrent, _maxCurrent];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRElectricalProtectionAlarmClusterSurgeProtectionRatingsStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _tripMechanism = nil;
+
+        _protectionClass = nil;
+
+        _protectionType = nil;
+
+        _maxContinuousOperatingVoltage = nil;
+
+        _maxVoltageProtection = nil;
+
+        _maxTemporaryVoltage = nil;
+
+        _nominalDischargeCurrent = nil;
+
+        _maximumDishargeCurrent = nil;
+
+        _ratedShortCircuitCurrent = nil;
+
+        _ratedShortTimeWithstandCurrent = nil;
+
+        _energyAbsorptionCapability = nil;
+
+        _responseTime = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRElectricalProtectionAlarmClusterSurgeProtectionRatingsStruct alloc] init];
+
+    other.tripMechanism = self.tripMechanism;
+    other.protectionClass = self.protectionClass;
+    other.protectionType = self.protectionType;
+    other.maxContinuousOperatingVoltage = self.maxContinuousOperatingVoltage;
+    other.maxVoltageProtection = self.maxVoltageProtection;
+    other.maxTemporaryVoltage = self.maxTemporaryVoltage;
+    other.nominalDischargeCurrent = self.nominalDischargeCurrent;
+    other.maximumDishargeCurrent = self.maximumDishargeCurrent;
+    other.ratedShortCircuitCurrent = self.ratedShortCircuitCurrent;
+    other.ratedShortTimeWithstandCurrent = self.ratedShortTimeWithstandCurrent;
+    other.energyAbsorptionCapability = self.energyAbsorptionCapability;
+    other.responseTime = self.responseTime;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: tripMechanism:%@; protectionClass:%@; protectionType:%@; maxContinuousOperatingVoltage:%@; maxVoltageProtection:%@; maxTemporaryVoltage:%@; nominalDischargeCurrent:%@; maximumDishargeCurrent:%@; ratedShortCircuitCurrent:%@; ratedShortTimeWithstandCurrent:%@; energyAbsorptionCapability:%@; responseTime:%@; >", NSStringFromClass([self class]), _tripMechanism, _protectionClass, _protectionType, _maxContinuousOperatingVoltage, _maxVoltageProtection, _maxTemporaryVoltage, _nominalDischargeCurrent, _maximumDishargeCurrent, _ratedShortCircuitCurrent, _ratedShortTimeWithstandCurrent, _energyAbsorptionCapability, _responseTime];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRElectricalProtectionAlarmClusterNotifyEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _active = @(0);
+
+        _inactive = @(0);
+
+        _state = @(0);
+
+        _mask = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRElectricalProtectionAlarmClusterNotifyEvent alloc] init];
+
+    other.active = self.active;
+    other.inactive = self.inactive;
+    other.state = self.state;
+    other.mask = self.mask;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: active:%@; inactive:%@; state:%@; mask:%@; >", NSStringFromClass([self class]), _active, _inactive, _state, _mask];
+    return descriptionString;
+}
+
+@end
+
 @implementation MTRDoorLockClusterCredentialStruct
 - (instancetype)init
 {

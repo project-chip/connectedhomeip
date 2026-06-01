@@ -17,6 +17,7 @@ TARGET_SOURCES(
   ${APP_TARGET}
   PRIVATE
     "${CLUSTER_DIR}/WaterHeaterManagementTestEventTriggerHandler.h"
-    "${CLUSTER_DIR}/water-heater-management-server.cpp"
+    "${CLUSTER_DIR}/WaterHeaterManagementCluster.cpp"
+    "${CLUSTER_DIR}/WaterHeaterManagementCluster.h"
     "${CLUSTER_DIR}/water-heater-management-server.h"
 )

@@ -18,7 +18,7 @@
 import os
 import time
 import typing
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 from mobly import asserts, signals
 
@@ -46,11 +46,11 @@ def get_raw_type_list():
     double_nested_struct_list = test.Structs.DoubleNestedStructList()
     double_nested_struct_list_type = test.Structs.DoubleNestedStructList
     list_of_uints = [0, 1]
-    list_of_uints_type = typing.List[uint]
+    list_of_uints_type = list[uint]
     list_of_structs = [struct, struct]
-    list_of_structs_type = typing.List[struct_type]
+    list_of_structs_type = list[struct_type]
     list_of_double_nested_struct_list = [double_nested_struct_list, double_nested_struct_list]
-    list_of_double_nested_struct_list_type = typing.List[double_nested_struct_list_type]
+    list_of_double_nested_struct_list_type = list[double_nested_struct_list_type]
 
     # Create a list with all the types and a list of the values that should match for that type
     return {uint: [1],
@@ -111,11 +111,11 @@ class TestMatterTestingSupport(MatterBaseTest):
     @async_test_body
     async def test_matter_epoch_time(self):
         # Matter epoch should return zero
-        ret = utc_time_in_matter_epoch(datetime(2000, 1, 1, 0, 0, 0, 0, timezone.utc))
+        ret = utc_time_in_matter_epoch(datetime(2000, 1, 1, 0, 0, 0, 0, UTC))
         asserts.assert_equal(ret, 0, "UTC epoch returned non-zero value")
 
         # Jan 2 is exactly 1 day after Jan 1
-        ret = utc_time_in_matter_epoch(datetime(2000, 1, 2, 0, 0, 0, 0, timezone.utc))
+        ret = utc_time_in_matter_epoch(datetime(2000, 1, 2, 0, 0, 0, 0, UTC))
         expected_delay = timedelta(days=1)
         actual_delay = timedelta(microseconds=ret)
         asserts.assert_equal(expected_delay, actual_delay, "Calculation for Jan 2 date is incorrect")
@@ -123,7 +123,7 @@ class TestMatterTestingSupport(MatterBaseTest):
         # There's a catch 22 for knowing the current time, but we can check that it's
         # going up, and that it's larger than when I wrote the test
         # Check that the returned value is larger than the test writing date
-        writing_date = utc_time_in_matter_epoch(datetime(2023, 5, 5, 0, 0, 0, 0, timezone.utc))
+        writing_date = utc_time_in_matter_epoch(datetime(2023, 5, 5, 0, 0, 0, 0, UTC))
         current_date = utc_time_in_matter_epoch()
         asserts.assert_greater(current_date, writing_date, "Calculation for current date is smaller than writing date")
 

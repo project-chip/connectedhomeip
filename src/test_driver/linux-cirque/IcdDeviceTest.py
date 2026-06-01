@@ -16,10 +16,12 @@ limitations under the License.
 """
 
 import logging
-import os
+import shlex
 import sys
 
 from helper.CHIPTestBase import CHIPVirtualHome
+from helper.paths import (CHIP_REPO_STR, CONTROLLER_TEST_SCRIPTS_DIR_PATH, LIT_ICD_APP_ESC, MATTER_CONTROLLER_INSTALL_WHEELS,
+                          MATTER_DEVELOPMENT_PAA_ROOT_CERTS_ESC)
 
 logger = logging.getLogger('MobileDeviceTest')
 logger.setLevel(logging.INFO)
@@ -33,8 +35,6 @@ logger.addHandler(sh)
 CHIP_PORT = 5540
 
 CIRQUE_URL = "http://localhost:5000"
-CHIP_REPO = os.path.join(os.path.abspath(
-    os.path.dirname(__file__)), "..", "..", "..")
 TEST_EXTPANID = "fedcba9876543210"
 TEST_DISCRIMINATOR = 3840
 TEST_DISCRIMINATOR2 = 3584
@@ -42,7 +42,7 @@ TEST_DISCRIMINATOR3 = 1203
 TEST_DISCRIMINATOR4 = 2145
 TEST_DISCOVERY_TYPE = [0, 1, 2]
 TEST_PASSCODE = 20202021
-MATTER_DEVELOPMENT_PAA_ROOT_CERTS = "credentials/development/paa-root-certs"
+TEST_SCRIPT_ESC = shlex.quote(str(CONTROLLER_TEST_SCRIPTS_DIR_PATH / "icd_device_test.py"))
 
 TEST_EVENT_KEY_HEX = "00112233445566778899aabbccddeeff"
 
@@ -54,7 +54,7 @@ DEVICE_CONFIG = {
         'rcp_mode': True,
         'docker_network': 'Ipv6',
         'traffic_control': {'latencyMs': 25},
-        "mount_pairs": [[CHIP_REPO, CHIP_REPO]],
+        "mount_pairs": [[CHIP_REPO_STR, CHIP_REPO_STR]],
     },
     'device1': {
         'type': 'CHIPEndDevice',
@@ -63,7 +63,7 @@ DEVICE_CONFIG = {
         'rcp_mode': True,
         'docker_network': 'Ipv6',
         'traffic_control': {'latencyMs': 25},
-        "mount_pairs": [[CHIP_REPO, CHIP_REPO]],
+        "mount_pairs": [[CHIP_REPO_STR, CHIP_REPO_STR]],
     }
 }
 
@@ -88,27 +88,19 @@ class TestCommissioner(CHIPVirtualHome):
         for server in server_ids:
             self.execute_device_cmd(
                 server,
-                ("CHIPCirqueDaemon.py -- run gdb -batch -return-child-result -q -ex \"set pagination off\" "
-                 "-ex run -ex \"thread apply all bt\" --args {} --thread --discriminator {} --enable-key {}").format(
-                    os.path.join(CHIP_REPO, "out/debug/lit_icd/lit-icd-app"), TEST_DISCRIMINATOR, TEST_EVENT_KEY_HEX))
+                f'CHIPCirqueDaemon.py -- run gdb -batch -return-child-result -q -ex "set pagination off" -ex run '
+                f'-ex "thread apply all bt" --args {LIT_ICD_APP_ESC} --thread --discriminator {TEST_DISCRIMINATOR} '
+                f'--enable-key {TEST_EVENT_KEY_HEX}')
 
         self.reset_thread_devices(server_ids)
 
         req_device_id = req_ids[0]
 
-        self.execute_device_cmd(req_device_id, "pip3 install --break-system-packages {}".format(os.path.join(
-            CHIP_REPO, "out/debug/linux_x64_gcc/controller/python/matter_clusters-1.0.0-py3-none-any.whl")))
-        self.execute_device_cmd(req_device_id, "pip3 install --break-system-packages {}".format(os.path.join(
-            CHIP_REPO, "out/debug/linux_x64_gcc/controller/python/matter_core-1.0.0-cp311-abi3-linux_x86_64.whl")))
-        self.execute_device_cmd(req_device_id, "pip3 install --break-system-packages {}".format(os.path.join(
-            CHIP_REPO, "out/debug/linux_x64_gcc/controller/python/matter_repl-1.0.0-py3-none-any.whl")))
+        self.execute_device_cmd(req_device_id, MATTER_CONTROLLER_INSTALL_WHEELS)
 
-        command = ("gdb -batch -return-child-result -q -ex run -ex \"thread apply all bt\" "
-                   "--args python3 {} -t 300 --discriminator {} --passcode {} --paa-trust-store-path {} --test-event-key {}").format(
-            os.path.join(
-                CHIP_REPO, "src/controller/python/tests/scripts/icd_device_test.py"),
-            TEST_DISCRIMINATOR, TEST_PASSCODE,
-            os.path.join(CHIP_REPO, MATTER_DEVELOPMENT_PAA_ROOT_CERTS), TEST_EVENT_KEY_HEX)
+        command = (f'gdb -batch -return-child-result -q -ex run -ex "thread apply all bt" --args python3 {TEST_SCRIPT_ESC} '
+                   f'-t 300 --discriminator {TEST_DISCRIMINATOR} --passcode {TEST_PASSCODE} '
+                   f'--paa-trust-store-path {MATTER_DEVELOPMENT_PAA_ROOT_CERTS_ESC} --test-event-key {TEST_EVENT_KEY_HEX}')
         ret = self.execute_device_cmd(req_device_id, command)
 
         self.assertEqual(ret['return_code'], '0',
