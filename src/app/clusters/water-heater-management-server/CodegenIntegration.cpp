@@ -30,8 +30,12 @@ namespace WaterHeaterManagement {
 
 CHIP_ERROR Instance::Init()
 {
-    mRegistered = true;
-    return CodegenDataModelProvider::Instance().Registry().Register(mCluster.Registration());
+    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(mCluster.Registration());
+    if (err == CHIP_NO_ERROR)
+    {
+        mRegistered = true;
+    }
+    return err;
 }
 
 void Instance::Shutdown()

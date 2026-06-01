@@ -47,6 +47,11 @@ WaterHeaterManagementCluster::WaterHeaterManagementCluster(EndpointId aEndpointI
     mDelegate.SetCluster(this);
 }
 
+WaterHeaterManagementCluster::~WaterHeaterManagementCluster()
+{
+    mDelegate.SetCluster(nullptr);
+}
+
 bool WaterHeaterManagementCluster::HasFeature(Feature aFeature) const
 {
     return mFeature.Has(aFeature);

@@ -129,6 +129,8 @@ class WaterHeaterManagementCluster : public DefaultServerCluster
 public:
     WaterHeaterManagementCluster(EndpointId aEndpointId, Delegate & aDelegate, Feature aFeature);
 
+    ~WaterHeaterManagementCluster();
+
     bool HasFeature(Feature aFeature) const;
 
     CHIP_ERROR GenerateBoostStartedEvent(uint32_t durationSecs, Optional<bool> oneShot, Optional<bool> emergencyBoost,
