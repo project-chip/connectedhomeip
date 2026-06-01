@@ -123,7 +123,7 @@ private:
 
 struct ClusterWithDelegate
 {
-    Delegate *     userDelegate = nullptr;
+    Delegate * userDelegate = nullptr;
     CompatDelegate compatDelegate;
     LazyRegisteredServerCluster<FanControlCluster> server;
 };
@@ -138,8 +138,7 @@ public:
     {
         BitFlags<FanControl::Feature> features(featureMap);
 
-        gClusters[clusterInstanceIndex].compatDelegate.Init(endpointId,
-                                                               gClusters[clusterInstanceIndex].userDelegate);
+        gClusters[clusterInstanceIndex].compatDelegate.Init(endpointId, gClusters[clusterInstanceIndex].userDelegate);
         FanControlCluster::Config config(endpointId, gClusters[clusterInstanceIndex].compatDelegate);
 
         // Initialize FanModeSequence from attribute storage if available, otherwise use default.
