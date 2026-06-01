@@ -260,7 +260,7 @@ std::string ThreadMeshcopCommissionProxy::GetLastDiscoveryDiagnosticJson()
     {
         diagnostic.valid = false;
     }
-    if (Encoding::BytesToUppercaseHexBuffer(diagnostic.commissionData.rotatingId, diagnostic.commissionData.rotatingIdLen,
+    if (Encoding::BytesToUppercaseHexString(diagnostic.commissionData.rotatingId, diagnostic.commissionData.rotatingIdLen,
                                             rotatingIdHex, sizeof(rotatingIdHex)) != CHIP_NO_ERROR)
     {
         diagnostic.valid = false;

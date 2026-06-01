@@ -41,7 +41,6 @@ class TC_SC_TC_2_1(MatterBaseTest):
                      "DUT provisionally selects the TH's network and sends DNS Announcement.")
         self.wait_for_user_input("Power cycle or factory reset the DUT so it can be discovered again.")
         expected_discriminator = discriminator_from_config(self, use_short_discriminator=True)
-        print(get_setup_code(self, use_short_discriminator=True))
         diagnostic = await establish_pase_over_thread_meshcop(self, get_setup_code(self, use_short_discriminator=True))
         assert_common_diagnostic_fields(diagnostic, expected_discriminator, use_short_discriminator=True)
 
