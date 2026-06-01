@@ -37,9 +37,7 @@ namespace WaterHeaterManagement {
 class Instance
 {
 public:
-    Instance(EndpointId aEndpointId, Delegate & aDelegate, Feature aFeature) :
-        mCluster(aEndpointId, aDelegate, aFeature)
-    {}
+    Instance(EndpointId aEndpointId, Delegate & aDelegate, Feature aFeature) : mCluster(aEndpointId, aDelegate, aFeature) {}
 
     ~Instance();
 

@@ -45,23 +45,23 @@ public:
     // Configurable return values for Get* methods
     BitMask<WaterHeaterHeatSourceBitmap> heaterTypes{ WaterHeaterHeatSourceBitmap::kImmersionElement1 };
     BitMask<WaterHeaterHeatSourceBitmap> heatDemand{ WaterHeaterHeatSourceBitmap::kImmersionElement1 };
-    uint16_t tankVolume                = 100;
-    Energy_mWh estimatedHeatRequired   = 5000;
-    Percent tankPercentage             = 80;
-    BoostStateEnum boostState          = BoostStateEnum::kInactive;
+    uint16_t tankVolume              = 100;
+    Energy_mWh estimatedHeatRequired = 5000;
+    Percent tankPercentage           = 80;
+    BoostStateEnum boostState        = BoostStateEnum::kInactive;
 
     // HandleBoost call tracking
-    bool handleBoostCalled                                  = false;
-    uint32_t lastBoostDuration                              = 0;
+    bool handleBoostCalled     = false;
+    uint32_t lastBoostDuration = 0;
     Optional<bool> lastBoostOneShot;
     Optional<bool> lastBoostEmergencyBoost;
     Optional<int16_t> lastBoostTemporarySetpoint;
     Optional<Percent> lastBoostTargetPercentage;
     Optional<Percent> lastBoostTargetReheat;
-    Protocols::InteractionModel::Status handleBoostStatus   = Protocols::InteractionModel::Status::Success;
+    Protocols::InteractionModel::Status handleBoostStatus = Protocols::InteractionModel::Status::Success;
 
     // HandleCancelBoost call tracking
-    bool handleCancelBoostCalled                              = false;
+    bool handleCancelBoostCalled                                = false;
     Protocols::InteractionModel::Status handleCancelBoostStatus = Protocols::InteractionModel::Status::Success;
 
     // Delegate interface
@@ -164,10 +164,11 @@ TEST_F(TestWaterHeaterManagementCluster, TestAttributeListAllFeatures)
 
 TEST_F(TestWaterHeaterManagementCluster, TestAcceptedCommands)
 {
-    EXPECT_TRUE(IsAcceptedCommandsListEqualTo(mCluster, {
-                                                            Commands::Boost::kMetadataEntry,
-                                                            Commands::CancelBoost::kMetadataEntry,
-                                                        }));
+    EXPECT_TRUE(IsAcceptedCommandsListEqualTo(mCluster,
+                                              {
+                                                  Commands::Boost::kMetadataEntry,
+                                                  Commands::CancelBoost::kMetadataEntry,
+                                              }));
 }
 
 // ---------------------------------------------------------------------------

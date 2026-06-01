@@ -16,9 +16,9 @@
 
 #include <app/clusters/water-heater-management-server/WaterHeaterManagementCluster.h>
 
+#include <app/server-cluster/AttributeListBuilder.h>
 #include <clusters/WaterHeaterManagement/Events.h>
 #include <clusters/WaterHeaterManagement/Metadata.h>
-#include <app/server-cluster/AttributeListBuilder.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -74,10 +74,10 @@ CHIP_ERROR Delegate::GenerateBoostEndedEvent()
 }
 
 CHIP_ERROR WaterHeaterManagementCluster::GenerateBoostStartedEvent(uint32_t durationSecs, Optional<bool> oneShot,
-                                                                    Optional<bool> emergencyBoost,
-                                                                    Optional<int16_t> temporarySetpoint,
-                                                                    Optional<Percent> targetPercentage,
-                                                                    Optional<Percent> targetReheat)
+                                                                   Optional<bool> emergencyBoost,
+                                                                   Optional<int16_t> temporarySetpoint,
+                                                                   Optional<Percent> targetPercentage,
+                                                                   Optional<Percent> targetReheat)
 {
     VerifyOrReturnError(mContext != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
@@ -111,7 +111,8 @@ CHIP_ERROR WaterHeaterManagementCluster::GenerateBoostEndedEvent()
 }
 
 // ServerClusterInterface implementation
-DataModel::ActionReturnStatus WaterHeaterManagementCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request, AttributeValueEncoder & encoder)
+DataModel::ActionReturnStatus WaterHeaterManagementCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
+                                                                          AttributeValueEncoder & encoder)
 {
     switch (request.path.mAttributeId)
     {
@@ -138,7 +139,9 @@ DataModel::ActionReturnStatus WaterHeaterManagementCluster::ReadAttribute(const 
     }
 }
 
-std::optional<DataModel::ActionReturnStatus> WaterHeaterManagementCluster::InvokeCommand(const DataModel::InvokeRequest & request, chip::TLV::TLVReader & input_arguments, CommandHandler * handler)
+std::optional<DataModel::ActionReturnStatus> WaterHeaterManagementCluster::InvokeCommand(const DataModel::InvokeRequest & request,
+                                                                                         chip::TLV::TLVReader & input_arguments,
+                                                                                         CommandHandler * handler)
 {
     using namespace Commands;
 
@@ -215,7 +218,8 @@ DataModel::ActionReturnStatus WaterHeaterManagementCluster::HandleBoost(const Co
     return status;
 }
 
-DataModel::ActionReturnStatus WaterHeaterManagementCluster::HandleCancelBoost(const Commands::CancelBoost::DecodableType & commandData)
+DataModel::ActionReturnStatus
+WaterHeaterManagementCluster::HandleCancelBoost(const Commands::CancelBoost::DecodableType & commandData)
 {
     Status status = mDelegate.HandleCancelBoost();
     if (status != Status::Success)
@@ -225,7 +229,8 @@ DataModel::ActionReturnStatus WaterHeaterManagementCluster::HandleCancelBoost(co
     return status;
 }
 
-CHIP_ERROR WaterHeaterManagementCluster::Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
+CHIP_ERROR WaterHeaterManagementCluster::Attributes(const ConcreteClusterPath & path,
+                                                    ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
     // This cluster only has Mandatory attributes
     AttributeListBuilder listBuilder(builder);
@@ -239,7 +244,8 @@ CHIP_ERROR WaterHeaterManagementCluster::Attributes(const ConcreteClusterPath & 
     return listBuilder.Append(Span(WaterHeaterManagement::Attributes::kMandatoryMetadata), Span(optionalAttributes));
 }
 
-CHIP_ERROR WaterHeaterManagementCluster::AcceptedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
+CHIP_ERROR WaterHeaterManagementCluster::AcceptedCommands(const ConcreteClusterPath & path,
+                                                          ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
     static constexpr DataModel::AcceptedCommandEntry kCommands[] = {
         Commands::Boost::kMetadataEntry,
@@ -247,7 +253,6 @@ CHIP_ERROR WaterHeaterManagementCluster::AcceptedCommands(const ConcreteClusterP
     };
     return builder.ReferenceExisting(Span(kCommands));
 }
-
 
 } // namespace WaterHeaterManagement
 } // namespace Clusters

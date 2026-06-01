@@ -107,7 +107,7 @@ public:
     virtual uint16_t GetTankVolume()                              = 0;
     virtual Energy_mWh GetEstimatedHeatRequired()                 = 0;
     virtual Percent GetTankPercentage()                           = 0;
-    virtual BoostStateEnum GetBoostState() = 0;
+    virtual BoostStateEnum GetBoostState()                        = 0;
 
     // ------------------------------------------------------------------
     // Event generation helpers — concrete delegate implementations may call
@@ -120,8 +120,8 @@ public:
     CHIP_ERROR GenerateBoostEndedEvent();
 
 protected:
-    EndpointId mEndpointId                    = 0;
-    WaterHeaterManagementCluster * mCluster   = nullptr;
+    EndpointId mEndpointId                  = 0;
+    WaterHeaterManagementCluster * mCluster = nullptr;
 };
 
 class WaterHeaterManagementCluster : public DefaultServerCluster
@@ -139,7 +139,6 @@ public:
 private:
     Delegate & mDelegate;
     BitMask<Feature> mFeature;
-
 
     // Server cluster implementation
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
