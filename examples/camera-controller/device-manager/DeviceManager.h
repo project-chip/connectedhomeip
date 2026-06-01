@@ -109,9 +109,9 @@ private:
     chip::NodeId mNodeId                                 = chip::kUndefinedNodeId;
     uint8_t mStreamUsage                                 = 0;
     WebRTCOfferType mOfferType                           = WebRTCOfferType::kProvideOffer;
-    std::map<uint16_t, pid_t> mVideoStreamProcesses;            // Stream ID -> Process ID mapping
-    std::map<chip::NodeId, uint16_t> mActiveLiveViewByNode;     // Node ID -> active LiveView stream ID
-    uint16_t mPendingVideoStreamId = 0;                         // Track the stream ID we're setting up
+    std::map<uint16_t, pid_t> mVideoStreamProcesses;        // Stream ID -> Process ID mapping
+    std::map<chip::NodeId, uint16_t> mActiveLiveViewByNode; // Node ID -> active LiveView stream ID
+    uint16_t mPendingVideoStreamId = 0;                     // Track the stream ID we're setting up
 
     AVStreamManagement mAVStreamManagment;
 

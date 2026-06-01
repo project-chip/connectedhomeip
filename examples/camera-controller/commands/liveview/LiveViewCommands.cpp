@@ -55,10 +55,9 @@ CHIP_ERROR LiveViewStopCommand::RunCommand()
         auto activeStreamId = camera::DeviceManager::Instance().GetActiveLiveViewStreamId(mPeerNodeId);
         if (!activeStreamId.has_value())
         {
-            ChipLogError(Camera,
-                         "No active LiveView stream tracked for node 0x" ChipLogFormatX64
-                         "; please pass video-stream-id explicitly",
-                         ChipLogValueX64(mPeerNodeId));
+            ChipLogError(
+                Camera, "No active LiveView stream tracked for node 0x" ChipLogFormatX64 "; please pass video-stream-id explicitly",
+                ChipLogValueX64(mPeerNodeId));
             return CHIP_ERROR_NOT_FOUND;
         }
         effectiveStreamId = activeStreamId.value();
