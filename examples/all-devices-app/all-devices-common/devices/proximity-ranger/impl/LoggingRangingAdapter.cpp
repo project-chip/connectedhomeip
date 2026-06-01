@@ -122,19 +122,6 @@ constexpr const char * RoleName(RangingRoleEnum role)
     }
 }
 
-constexpr const char * SecurityName(RangingSecurityEnum mode)
-{
-    switch (mode)
-    {
-    case RangingSecurityEnum::kSecureRanging:
-        return "SecureRanging";
-    case RangingSecurityEnum::kOpenRanging:
-        return "OpenRanging";
-    default:
-        return "Unknown";
-    }
-}
-
 constexpr const char * TechName(RangingTechEnum tech)
 {
     switch (tech)
@@ -339,43 +326,40 @@ LoggingRangingAdapter::~LoggingRangingAdapter()
 // radio-driver call (set scan filter, configure publisher, arm CS measurement
 // engine, etc.) and arm only the EndTime cutoff timer. Measurement cadence
 // itself is driven by the radio.
-ResultCodeEnum LoggingRangingAdapter::StartSession(uint8_t sessionId, const Commands::StartRangingRequest::DecodableType & request)
+ResultCodeEnum LoggingRangingAdapter::StartSession(uint8_t sessionId, const StartSessionParams & params)
 {
-    if (request.trigger.rangingInstanceInterval.HasValue())
+    if (params.trigger.rangingInstanceInterval.HasValue())
     {
         ChipLogProgress(NotSpecified,
-                        "[LoggingRangingAdapter:%s] StartSession id=%u tech=%s securityMode=%s "
-                        "startTime=%" PRIu32 "s endTime=%" PRIu32 "s interval=%" PRIu32 "s reporting=%s",
-                        LogTag(), sessionId, TechName(request.technology), SecurityName(request.securityMode),
-                        request.trigger.startTime, request.trigger.endTime, request.trigger.rangingInstanceInterval.Value(),
-                        request.reportingCondition.HasValue() ? "present" : "absent");
+                        "[LoggingRangingAdapter:%s] StartSession id=%u tech=%s "
+                        "startTime=%" PRIu32 "s endTime=%" PRIu32 "s interval=%" PRIu32 "s",
+                        LogTag(), sessionId, TechName(params.technology), params.trigger.startTime, params.trigger.endTime,
+                        params.trigger.rangingInstanceInterval.Value());
     }
     else
     {
         ChipLogProgress(NotSpecified,
-                        "[LoggingRangingAdapter:%s] StartSession id=%u tech=%s securityMode=%s "
-                        "startTime=%" PRIu32 "s endTime=%" PRIu32 "s interval=absent reporting=%s",
-                        LogTag(), sessionId, TechName(request.technology), SecurityName(request.securityMode),
-                        request.trigger.startTime, request.trigger.endTime,
-                        request.reportingCondition.HasValue() ? "present" : "absent");
+                        "[LoggingRangingAdapter:%s] StartSession id=%u tech=%s "
+                        "startTime=%" PRIu32 "s endTime=%" PRIu32 "s interval=absent",
+                        LogTag(), sessionId, TechName(params.technology), params.trigger.startTime, params.trigger.endTime);
     }
 
-    if (request.wiFiRangingDeviceRoleConfig.HasValue())
+    if (params.wifiRoleConfig.has_value())
     {
-        const auto & cfg = request.wiFiRangingDeviceRoleConfig.Value();
+        const auto & cfg = *params.wifiRoleConfig;
         ChipLogProgress(NotSpecified, "[LoggingRangingAdapter:%s]   WiFiRoleConfig role=%s peerWiFiDevIK.size=%u pmk=%s", LogTag(),
                         RoleName(cfg.role), static_cast<unsigned>(cfg.peerWiFiDevIK.size()),
                         cfg.pmk.HasValue() ? "present" : "absent");
     }
-    if (request.BLERangingDeviceRoleConfig.HasValue())
+    if (params.bleRoleConfig.has_value())
     {
-        const auto & cfg = request.BLERangingDeviceRoleConfig.Value();
+        const auto & cfg = *params.bleRoleConfig;
         ChipLogProgress(NotSpecified, "[LoggingRangingAdapter:%s]   BLERoleConfig role=%s peerBLEDeviceID=0x%016" PRIx64, LogTag(),
                         RoleName(cfg.role), cfg.peerBLEDeviceID);
     }
-    if (request.BLTChannelSoundingDeviceRoleConfig.HasValue())
+    if (params.bltRoleConfig.has_value())
     {
-        const auto & cfg = request.BLTChannelSoundingDeviceRoleConfig.Value();
+        const auto & cfg = *params.bltRoleConfig;
         ChipLogProgress(NotSpecified,
                         "[LoggingRangingAdapter:%s]   BLTRoleConfig role=%s peerBLTDevIK.size=%u "
                         "BLTCSMode=%s BLTCSSecurityLevel=%s ltk=%s",
@@ -388,7 +372,7 @@ ResultCodeEnum LoggingRangingAdapter::StartSession(uint8_t sessionId, const Comm
     // here keeps the rejection path symmetric with how a real adapter would
     // surface a radio that refuses the request — synchronous, before any
     // async machinery starts.
-    if (request.trigger.endTime <= request.trigger.startTime)
+    if (params.trigger.endTime <= params.trigger.startTime)
     {
         ChipLogError(NotSpecified, "[LoggingRangingAdapter:%s] StartSession rejected: endTime <= startTime", LogTag());
         return ResultCodeEnum::kRejectedInfeasibleRangingTriggers;
@@ -401,29 +385,24 @@ ResultCodeEnum LoggingRangingAdapter::StartSession(uint8_t sessionId, const Comm
     auto session = std::make_unique<Session>(*this, sessionId);
     auto now     = mTimerDelegate.GetCurrentMonotonicTimestamp();
     session->startAt =
-        now + std::chrono::duration_cast<System::Clock::Milliseconds64>(System::Clock::Seconds32(request.trigger.startTime));
+        now + std::chrono::duration_cast<System::Clock::Milliseconds64>(System::Clock::Seconds32(params.trigger.startTime));
     session->endAt =
-        now + std::chrono::duration_cast<System::Clock::Milliseconds64>(System::Clock::Seconds32(request.trigger.endTime));
-    session->interval     = request.trigger.rangingInstanceInterval.HasValue()
-            ? std::chrono::duration_cast<System::Clock::Milliseconds32>(
-              System::Clock::Seconds32(request.trigger.rangingInstanceInterval.Value()))
-            : System::Clock::Milliseconds32(0);
-    session->hasReporting = request.reportingCondition.HasValue();
-    if (session->hasReporting)
-    {
-        session->reporting = request.reportingCondition.Value();
-    }
+        now + std::chrono::duration_cast<System::Clock::Milliseconds64>(System::Clock::Seconds32(params.trigger.endTime));
+    session->interval = params.trigger.rangingInstanceInterval.HasValue()
+        ? std::chrono::duration_cast<System::Clock::Milliseconds32>(
+              System::Clock::Seconds32(params.trigger.rangingInstanceInterval.Value()))
+        : System::Clock::Milliseconds32(0);
 
     // Capture peer identity from the role config matching this adapter's
     // technology; surfaced later in BuildMeasurement so the synthesized
     // RangingResult reflects the peer this SessionID is bound to.
-    if (request.BLERangingDeviceRoleConfig.HasValue())
+    if (params.bleRoleConfig.has_value())
     {
-        session->peerBleDeviceId = request.BLERangingDeviceRoleConfig.Value().peerBLEDeviceID;
+        session->peerBleDeviceId = params.bleRoleConfig->peerBLEDeviceID;
     }
-    if (request.wiFiRangingDeviceRoleConfig.HasValue())
+    if (params.wifiRoleConfig.has_value())
     {
-        const auto & ik = request.wiFiRangingDeviceRoleConfig.Value().peerWiFiDevIK;
+        const auto & ik = params.wifiRoleConfig->peerWiFiDevIK;
         if (ik.size() == kDeviceIdentityKeyLen)
         {
             std::array<uint8_t, kDeviceIdentityKeyLen> key{};
@@ -431,9 +410,9 @@ ResultCodeEnum LoggingRangingAdapter::StartSession(uint8_t sessionId, const Comm
             session->peerWiFiDevIK = key;
         }
     }
-    if (request.BLTChannelSoundingDeviceRoleConfig.HasValue())
+    if (params.bltRoleConfig.has_value())
     {
-        const auto & ik = request.BLTChannelSoundingDeviceRoleConfig.Value().peerBLTDevIK;
+        const auto & ik = params.bltRoleConfig->peerBLTDevIK;
         if (ik.size() == kDeviceIdentityKeyLen)
         {
             std::array<uint8_t, kDeviceIdentityKeyLen> key{};
@@ -444,16 +423,15 @@ ResultCodeEnum LoggingRangingAdapter::StartSession(uint8_t sessionId, const Comm
 
     // One-time peer-identity sentinel check: if the request targets the
     // technology-specific "unknown peer" pattern, mark the session so
-    // TimerFired never emits OnMeasurementData. peerFound stays false and the
-    // EndTime cutoff terminates with kPeerNotFound.
+    // TimerFired never emits OnMeasurementData. peerFound stays false; the
+    // driver's endAt cutoff then maps the session to kPeerNotFound.
     session->isUnknownPeer =
         IsUnknownPeerIdentity(mTechnology, session->peerBleDeviceId, session->peerWiFiDevIK, session->peerBltDevIK);
     if (session->isUnknownPeer)
     {
-        ChipLogProgress(
-            NotSpecified,
-            "[LoggingRangingAdapter:%s] sid=%u peer identity matches kUnknownPeer sentinel; will report kPeerNotFound at endTime",
-            LogTag(), sessionId);
+        ChipLogProgress(NotSpecified,
+                        "[LoggingRangingAdapter:%s] sid=%u peer identity matches kUnknownPeer sentinel; will not emit measurements",
+                        LogTag(), sessionId);
     }
 
     Session * sessionPtr = session.get();
@@ -542,14 +520,14 @@ CHIP_ERROR LoggingRangingAdapter::GetActiveSessionIds(Span<uint8_t> & sessionIds
 
 // Session::TimerFired is the synthesizer's tick. It plays three distinct
 // roles depending on session state:
-//   1. EndTime reached → terminate. Status is kSessionEndTimeReached if at
-//      least one measurement was delivered (peerFound), otherwise
-//      kPeerNotFound — every reporting tick was suppressed by the
-//      ReportingCondition gate, so the peer was never observed.
+//   1. EndTime reached → terminate with kSessionEndTimeReached. The driver
+//      remaps to kPeerNotFound at OnRangingSessionStopped time when no
+//      measurement passed its ReportingCondition filter.
 //   2. Instant ranging post-measurement tick → terminate (the deferred fire
-//      from kInstantRangingTerminateDelay), with the same peerFound-driven
-//      status selection.
-//   3. Otherwise → emit a measurement, advance to the next tick.
+//      from kInstantRangingTerminateDelay) with the same status, again
+//      letting the driver decide kPeerNotFound vs kSessionEndTimeReached.
+//   3. Otherwise → emit a measurement (skipped when the unknown-peer
+//      sentinel is set), advance to the next tick.
 //
 // REAL ADAPTER: this entire function is replaced by callbacks from the
 // radio. The radio reports each measurement directly into
@@ -560,11 +538,9 @@ void LoggingRangingAdapter::Session::TimerFired()
 {
     auto now = owner.mTimerDelegate.GetCurrentMonotonicTimestamp();
 
-    auto terminationStatus = peerFound ? RangingSessionStatusEnum::kSessionEndTimeReached : RangingSessionStatusEnum::kPeerNotFound;
-
     if (now >= endAt)
     {
-        owner.TerminateSession(*this, terminationStatus);
+        owner.TerminateSession(*this, RangingSessionStatusEnum::kSessionEndTimeReached);
         return;
     }
 
@@ -575,25 +551,14 @@ void LoggingRangingAdapter::Session::TimerFired()
     // MarkDirty calls into a single report carrying the final empty state.
     if (firstFired && interval == System::Clock::Milliseconds32(0))
     {
-        owner.TerminateSession(*this, terminationStatus);
+        owner.TerminateSession(*this, RangingSessionStatusEnum::kSessionEndTimeReached);
         return;
     }
 
-    auto measurement = owner.BuildMeasurement(*this);
-    bool emit        = !isUnknownPeer && (!hasReporting || SatisfiesReporting(reporting, measurement));
-    if (emit && owner.mCallback != nullptr)
+    if (!isUnknownPeer && owner.mCallback != nullptr)
     {
+        auto measurement = owner.BuildMeasurement(*this);
         owner.mCallback->OnMeasurementData(sessionId, measurement);
-        peerFound = true;
-    }
-    else if (!emit && !isUnknownPeer)
-    {
-        // ReportingCondition gate suppressed the emission. The unknown-peer
-        // case is intentionally silent at TimerFired time — its log already
-        // fired once at StartSession.
-        ChipLogProgress(NotSpecified,
-                        "[LoggingRangingAdapter:%s] sid=%u suppressing measurement (ReportingCondition not satisfied)",
-                        owner.LogTag(), sessionId);
     }
 
     firstFired = true;
@@ -642,10 +607,10 @@ void LoggingRangingAdapter::ScheduleNextFire(Session & session)
     }
     else if (session.interval == System::Clock::Milliseconds32(0))
     {
-        // Instant ranging: defer the post-measurement terminate by a small but
-        // observable gap so subscriptions to SessionIDList see the session
-        // appear and disappear as two reports rather than coalescing them
-        // into one report carrying the final empty state.
+        // Instant ranging: defer the post-measurement terminate by a small
+        // but observable gap so subscriptions to SessionIDList see the
+        // session appear and disappear as two reports rather than coalescing
+        // them into one report carrying the final empty state.
         nextAt = now + kInstantRangingTerminateDelay;
     }
     else
@@ -661,37 +626,6 @@ void LoggingRangingAdapter::ScheduleNextFire(Session & session)
         (nextAt > now) ? std::chrono::duration_cast<System::Clock::Milliseconds32>(nextAt - now) : System::Clock::Milliseconds32(0);
 
     LogErrorOnFailure(mTimerDelegate.StartTimer(&session, delay));
-}
-
-bool LoggingRangingAdapter::SatisfiesReporting(const Structs::ReportingConditionStruct::Type & reporting,
-                                               const Structs::RangingMeasurementDataStruct::Type & measurement)
-{
-    if (!measurement.distance.IsNull())
-    {
-        uint16_t distance = measurement.distance.Value();
-        if (reporting.minDistanceCondition.HasValue() && distance < reporting.minDistanceCondition.Value())
-        {
-            return false;
-        }
-        if (reporting.maxDistanceCondition.HasValue() && distance > reporting.maxDistanceCondition.Value())
-        {
-            return false;
-        }
-    }
-    else if (reporting.minDistanceCondition.HasValue() || reporting.maxDistanceCondition.HasValue())
-    {
-        // Spec: "If Distance is null, the Server SHOULD still emit the
-        // RangingResult event unless prohibited by a ReportingCondition."
-        // A min/max distance condition cannot be evaluated against a null
-        // distance, so suppress when any distance condition is present.
-        return false;
-    }
-    if (reporting.errorMarginCondition.HasValue() && measurement.errorMargin.HasValue() &&
-        measurement.errorMargin.Value() > reporting.errorMarginCondition.Value())
-    {
-        return false;
-    }
-    return true;
 }
 
 // BuildMeasurement constructs a synthetic RangingMeasurementDataStruct with

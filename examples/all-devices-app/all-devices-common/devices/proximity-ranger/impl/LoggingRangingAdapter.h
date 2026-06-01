@@ -178,7 +178,7 @@ public:
 
     RangingTechEnum GetTechnology() const override { return mTechnology; }
     Structs::RangingCapabilitiesStruct::Type GetCapabilities() const override;
-    ResultCodeEnum StartSession(uint8_t sessionId, const Commands::StartRangingRequest::DecodableType & request) override;
+    ResultCodeEnum StartSession(uint8_t sessionId, const StartSessionParams & params) override;
     CHIP_ERROR StopSession(uint8_t sessionId) override;
     void StopAllSessions() override;
     CHIP_ERROR GetActiveSessionIds(Span<uint8_t> & sessionIds) override;
@@ -219,23 +219,14 @@ private:
         System::Clock::Timestamp startAt = System::Clock::kZero;
         System::Clock::Timestamp endAt   = System::Clock::kZero;
         System::Clock::Milliseconds32 interval{ 0 }; // 0 = single-shot (instant ranging)
-        bool hasReporting = false;
-        Structs::ReportingConditionStruct::Type reporting;
         bool firstFired = false;
-
-        /// Set true the first time OnMeasurementData fires for this session
-        /// (i.e. a measurement passed all reporting filters and was actually
-        /// delivered to the cluster). Drives the termination status: if this
-        /// remains false at session end, terminate with kPeerNotFound instead
-        /// of kSessionEndTimeReached.
-        bool peerFound = false;
 
         /// Set at StartSession when the captured peer identity for this
         /// session's technology matches the "unknown peer" sentinel pattern.
-        /// While true, TimerFired never emits OnMeasurementData, so peerFound
-        /// stays false and the EndTime cutoff terminates with kPeerNotFound —
-        /// the spec-correct outcome when a hardware radio cannot range
-        /// against the requested peer.
+        /// While true, TimerFired never emits OnMeasurementData; the driver
+        /// then sees no measurement pass its filter and remaps the eventual
+        /// kSessionEndTimeReached to kPeerNotFound — the spec-correct outcome
+        /// when a hardware radio cannot range against the requested peer.
         bool isUnknownPeer = false;
 
         /// Per-session peer identity captured from the StartRangingRequest,
@@ -265,22 +256,9 @@ private:
     /// and stop, HardwareError when the radio reports a failure, etc.
     void TerminateSession(Session & session, RangingSessionStatusEnum status);
 
-    /// Returns true if measurement satisfies the captured ReportingCondition.
+    /// Schedules the next synthesized-measurement tick for `session`.
     ///
-    /// REAL ADAPTER: not needed — the cluster server applies ReportingCondition
-    /// filtering before delivering measurements to subscribers. We only
-    /// pre-filter here because synthesized measurements are deterministic and
-    /// we want the cert harness's expected event count to match the
-    /// configured condition.
-    static bool SatisfiesReporting(const Structs::ReportingConditionStruct::Type & reporting,
-                                   const Structs::RangingMeasurementDataStruct::Type & measurement);
-
-    /// Schedules the next timer fire for `session`. Caller has already
-    /// captured (or just refreshed) the session's monotonic deadlines.
-    ///
-    /// REAL ADAPTER: not needed — the radio reports measurements; the adapter
-    /// only needs a single timer for the EndTime cutoff (and even that is
-    /// often handled by the radio firmware itself).
+    /// REAL ADAPTER: not needed — the radio reports measurements on its own.
     void ScheduleNextFire(Session & session);
 
     /// Build the deterministic-default measurement, including the

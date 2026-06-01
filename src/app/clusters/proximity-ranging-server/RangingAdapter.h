@@ -21,7 +21,9 @@
 #include <clusters/ProximityRanging/Structs.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
+#include <lib/support/BitMask.h>
 #include <lib/support/Span.h>
+#include <system/SystemClock.h>
 
 #include <optional>
 
@@ -53,6 +55,27 @@ struct BltcsConfig
     DeviceIdentityKey deviceIdentityKey;
     BLTCSSecurityLevelEnum securityLevel;
     BLTCSModeEnum modeCapability;
+};
+
+/**
+ * Narrowed parameter set passed to RangingAdapter::StartSession.
+ *
+ * The driver filters OnMeasurementData against ReportingCondition itself, so
+ * adapters no longer receive the reportingCondition field. Everything else
+ * the radio needs to bring up a ranging session is here: technology, the
+ * trigger (startTime / endTime / rangingInstanceInterval) for cadence, the
+ * matching role config (peer identity), and the optional radio-tunable
+ * frequency / bandwidth selectors.
+ */
+struct StartSessionParams
+{
+    RangingTechEnum technology;
+    Structs::RangingTriggerConditionStruct::Type trigger;
+    std::optional<Structs::BLERangingDeviceRoleConfigStruct::DecodableType> bleRoleConfig;
+    std::optional<Structs::WiFiRangingDeviceRoleConfigStruct::DecodableType> wifiRoleConfig;
+    std::optional<Structs::BLTChannelSoundingDeviceRoleConfigStruct::DecodableType> bltRoleConfig;
+    std::optional<chip::BitMask<RadioBandBitmap>> frequencyBand;
+    std::optional<chip::BitMask<RangingBandwidthBitmap>> bandwidth;
 };
 
 /**
@@ -119,9 +142,9 @@ public:
     virtual RangingTechEnum GetTechnology() const                            = 0;
     virtual Structs::RangingCapabilitiesStruct::Type GetCapabilities() const = 0;
 
-    virtual ResultCodeEnum StartSession(uint8_t sessionId, const Commands::StartRangingRequest::DecodableType & request) = 0;
-    virtual CHIP_ERROR StopSession(uint8_t sessionId)                                                                    = 0;
-    virtual void StopAllSessions()                                                                                       = 0;
+    virtual ResultCodeEnum StartSession(uint8_t sessionId, const StartSessionParams & params) = 0;
+    virtual CHIP_ERROR StopSession(uint8_t sessionId)                                         = 0;
+    virtual void StopAllSessions()                                                            = 0;
 
     /**
      * Append the adapter's currently-active session IDs to the caller-supplied
