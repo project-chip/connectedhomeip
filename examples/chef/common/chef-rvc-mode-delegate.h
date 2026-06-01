@@ -108,8 +108,6 @@ public:
     ~RvcCleanModeDelegate() override = default;
 };
 
-ModeBase::Instance * Instance();
-
 void Shutdown();
 
 } // namespace RvcCleanMode
@@ -117,3 +115,5 @@ void Shutdown();
 } // namespace Clusters
 } // namespace app
 } // namespace chip
+
+chip::app::Clusters::ModeBase::Instance * getRvcRunModeInstance();
