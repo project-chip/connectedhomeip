@@ -15,6 +15,7 @@
 #    limitations under the License.
 #
 
+import types
 import typing
 from dataclasses import dataclass
 
@@ -147,7 +148,7 @@ def convert_to_data_model_type(field_value, field_type):
     if field_value is None:
         field_value = NullValue
 
-    if (origin == typing.Union or origin == typing.Optional or origin == Nullable):
+    if (origin in (typing.Union, types.UnionType, typing.Optional, Nullable)):
         underlying_field_type = None
 
         if field_value is NullValue:
