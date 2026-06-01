@@ -127,8 +127,11 @@ public:
     std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
                                                                chip::TLV::TLVReader & input_arguments,
                                                                CommandHandler * handler) override;
-    CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,
-                                ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
+    CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
+        override; /**
+                   * @brief Common handler for the SelfTestRequest command
+                   */
+    void HandleRemoteSelfTestRequest(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath);
 
 protected:
     /**
@@ -148,11 +151,6 @@ private:
      *       value should not be Normal.
      */
     void SetExpressedState(ExpressedStateEnum newExpressedState);
-
-    /**
-     * @brief Common handler for the SelfTestRequest command
-     */
-    void HandleRemoteSelfTestRequest(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath);
 
     /**
      * @brief Send generic event

@@ -32,7 +32,7 @@ namespace app {
 namespace Clusters {
 
 /**
- * @brief Application-facing wrapper for SmokeCoAlarm::SmokeCoAlarmCluster.
+ * @brief Application-facing wrapper for SmokeCoAlarmCluster.
  *
  * Owns the cluster instance and manages its lifetime with the data model provider.
  * The application creates one SmokeCoAlarmServer per endpoint, calls Init() to
@@ -41,165 +41,58 @@ namespace Clusters {
 class SmokeCoAlarmServer
 {
 public:
-    explicit SmokeCoAlarmServer(EndpointId endpointId, const SmokeCoAlarm::SmokeCoAlarmCluster::Config & config) :
-        mEndpointId(endpointId), mConfig(config)
-    {}
+    explicit SmokeCoAlarmServer(EndpointId endpointId, const SmokeCoAlarm::SmokeCoAlarmCluster::Config & config);
+    ~SmokeCoAlarmServer();
 
-    ~SmokeCoAlarmServer()
-    {
-        if (mCluster.IsConstructed())
-        {
-            if (sInstance == this)
-                sInstance = nullptr;
-            LogErrorOnFailure(CodegenDataModelProvider::Instance().Registry().Unregister(&mCluster.Cluster()));
-        }
-    }
-    void SetInoperativeWhenUnmounted(bool v) { Cluster().SetInoperativeWhenUnmounted(v); }
-
-    CHIP_ERROR Init()
-    {
-        VerifyOrReturnValue(!mCluster.IsConstructed(), CHIP_NO_ERROR);
-        mCluster.Create(mEndpointId, mConfig);
-        CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(mCluster.Registration());
-        if (err != CHIP_NO_ERROR)
-        {
-            mCluster.Destroy();
-            return err;
-        }
-        sInstance = this;
-        return CHIP_NO_ERROR;
-    }
-
-    SmokeCoAlarm::SmokeCoAlarmCluster & Cluster()
-    {
-        VerifyOrDie(mCluster.IsConstructed());
-        return mCluster.Cluster();
-    }
+    void SetInoperativeWhenUnmounted(bool v);
+    CHIP_ERROR Init();
+    SmokeCoAlarm::SmokeCoAlarmCluster & Cluster();
 
     static constexpr size_t kPriorityOrderLength = SmokeCoAlarm::SmokeCoAlarmCluster::kPriorityOrderLength;
 
-    static SmokeCoAlarmServer & Instance()
-    {
-        VerifyOrDie(sInstance != nullptr);
-        return *sInstance;
-    }
+    static SmokeCoAlarmServer & Instance();
 
-    bool RequestSelfTest(EndpointId endpoint)
-    {
-        VerifyOrDie(mCluster.IsConstructed());
-        return mCluster.Cluster().RequestSelfTest();
-    }
+    bool RequestSelfTest(EndpointId endpoint);
 
     // Endpoint-taking overloads for backwards compatibility with old call sites.
     // The endpoint param is ignored; Instance() already owns a specific endpoint.
-    void SetExpressedStateByPriority(EndpointId, const std::array<SmokeCoAlarm::ExpressedStateEnum, kPriorityOrderLength> & o)
-    {
-        Cluster().SetExpressedStateByPriority(o);
-    }
-    bool SetSmokeState(EndpointId, SmokeCoAlarm::AlarmStateEnum v) { return Cluster().SetSmokeState(v); }
-    bool SetCOState(EndpointId, SmokeCoAlarm::AlarmStateEnum v) { return Cluster().SetCOState(v); }
-    bool SetBatteryAlert(EndpointId, SmokeCoAlarm::AlarmStateEnum v) { return Cluster().SetBatteryAlert(v); }
-    bool SetDeviceMuted(EndpointId, SmokeCoAlarm::MuteStateEnum v) { return Cluster().SetDeviceMuted(v); }
-    bool SetTestInProgress(EndpointId, bool v) { return Cluster().SetTestInProgress(v); }
-    bool SetHardwareFaultAlert(EndpointId, bool v) { return Cluster().SetHardwareFaultAlert(v); }
-    bool SetEndOfServiceAlert(EndpointId, SmokeCoAlarm::EndOfServiceEnum v) { return Cluster().SetEndOfServiceAlert(v); }
-    bool SetInterconnectSmokeAlarm(EndpointId, SmokeCoAlarm::AlarmStateEnum v) { return Cluster().SetInterconnectSmokeAlarm(v); }
-    bool SetInterconnectCOAlarm(EndpointId, SmokeCoAlarm::AlarmStateEnum v) { return Cluster().SetInterconnectCOAlarm(v); }
-    bool SetContaminationState(EndpointId, SmokeCoAlarm::ContaminationStateEnum v) { return Cluster().SetContaminationState(v); }
-    bool SetSmokeSensitivityLevel(EndpointId, SmokeCoAlarm::SensitivityEnum v) { return Cluster().SetSmokeSensitivityLevel(v); }
-    bool SetUnmountedState(EndpointId, bool v) { return Cluster().SetUnmountedState(v); }
+    void SetExpressedStateByPriority(EndpointId, const std::array<SmokeCoAlarm::ExpressedStateEnum, kPriorityOrderLength> & o);
+    bool SetSmokeState(EndpointId, SmokeCoAlarm::AlarmStateEnum v);
+    bool SetCOState(EndpointId, SmokeCoAlarm::AlarmStateEnum v);
+    bool SetBatteryAlert(EndpointId, SmokeCoAlarm::AlarmStateEnum v);
+    bool SetDeviceMuted(EndpointId, SmokeCoAlarm::MuteStateEnum v);
+    bool SetTestInProgress(EndpointId, bool v);
+    bool SetHardwareFaultAlert(EndpointId, bool v);
+    bool SetEndOfServiceAlert(EndpointId, SmokeCoAlarm::EndOfServiceEnum v);
+    bool SetInterconnectSmokeAlarm(EndpointId, SmokeCoAlarm::AlarmStateEnum v);
+    bool SetInterconnectCOAlarm(EndpointId, SmokeCoAlarm::AlarmStateEnum v);
+    bool SetContaminationState(EndpointId, SmokeCoAlarm::ContaminationStateEnum v);
+    bool SetSmokeSensitivityLevel(EndpointId, SmokeCoAlarm::SensitivityEnum v);
+    bool SetUnmountedState(EndpointId, bool v);
 
-    chip::BitFlags<SmokeCoAlarm::Feature> GetFeatures() const
-    {
-        VerifyOrDie(mCluster.IsConstructed());
-        return mCluster.Cluster().GetFeatures();
-    }
-    bool SupportsSmokeAlarm() const
-    {
-        VerifyOrDie(mCluster.IsConstructed());
-        return mCluster.Cluster().SupportsSmokeAlarm();
-    }
-    bool SupportsCOAlarm() const
-    {
-        VerifyOrDie(mCluster.IsConstructed());
-        return mCluster.Cluster().SupportsCOAlarm();
-    }
+    chip::BitFlags<SmokeCoAlarm::Feature> GetFeatures() const;
+    bool SupportsSmokeAlarm() const;
+    bool SupportsCOAlarm() const;
 
     // Endpoint-taking Get overloads for backwards compatibility with old call sites.
     // The endpoint param is ignored; Instance() already owns a specific endpoint.
-    bool GetExpressedState(EndpointId, SmokeCoAlarm::ExpressedStateEnum & v) const
-    {
-        VerifyOrDie(mCluster.IsConstructed());
-        return mCluster.Cluster().GetExpressedState(v);
-    }
-    bool GetSmokeState(EndpointId, SmokeCoAlarm::AlarmStateEnum & v) const
-    {
-        VerifyOrDie(mCluster.IsConstructed());
-        return mCluster.Cluster().GetSmokeState(v);
-    }
-    bool GetCOState(EndpointId, SmokeCoAlarm::AlarmStateEnum & v) const
-    {
-        VerifyOrDie(mCluster.IsConstructed());
-        return mCluster.Cluster().GetCOState(v);
-    }
-    bool GetBatteryAlert(EndpointId, SmokeCoAlarm::AlarmStateEnum & v) const
-    {
-        VerifyOrDie(mCluster.IsConstructed());
-        return mCluster.Cluster().GetBatteryAlert(v);
-    }
-    bool GetDeviceMuted(EndpointId, SmokeCoAlarm::MuteStateEnum & v) const
-    {
-        VerifyOrDie(mCluster.IsConstructed());
-        return mCluster.Cluster().GetDeviceMuted(v);
-    }
-    bool GetTestInProgress(EndpointId, bool & v) const
-    {
-        VerifyOrDie(mCluster.IsConstructed());
-        return mCluster.Cluster().GetTestInProgress(v);
-    }
-    bool GetHardwareFaultAlert(EndpointId, bool & v) const
-    {
-        VerifyOrDie(mCluster.IsConstructed());
-        return mCluster.Cluster().GetHardwareFaultAlert(v);
-    }
-    bool GetEndOfServiceAlert(EndpointId, SmokeCoAlarm::EndOfServiceEnum & v) const
-    {
-        VerifyOrDie(mCluster.IsConstructed());
-        return mCluster.Cluster().GetEndOfServiceAlert(v);
-    }
-    bool GetInterconnectSmokeAlarm(EndpointId, SmokeCoAlarm::AlarmStateEnum & v) const
-    {
-        VerifyOrDie(mCluster.IsConstructed());
-        return mCluster.Cluster().GetInterconnectSmokeAlarm(v);
-    }
-    bool GetInterconnectCOAlarm(EndpointId, SmokeCoAlarm::AlarmStateEnum & v) const
-    {
-        VerifyOrDie(mCluster.IsConstructed());
-        return mCluster.Cluster().GetInterconnectCOAlarm(v);
-    }
-    bool GetContaminationState(EndpointId, SmokeCoAlarm::ContaminationStateEnum & v) const
-    {
-        VerifyOrDie(mCluster.IsConstructed());
-        return mCluster.Cluster().GetContaminationState(v);
-    }
-    bool GetSmokeSensitivityLevel(EndpointId, SmokeCoAlarm::SensitivityEnum & v) const
-    {
-        VerifyOrDie(mCluster.IsConstructed());
-        return mCluster.Cluster().GetSmokeSensitivityLevel(v);
-    }
-    bool GetExpiryDate(EndpointId, uint32_t & v) const
-    {
-        VerifyOrDie(mCluster.IsConstructed());
-        return mCluster.Cluster().GetExpiryDate(v);
-    }
-    bool GetUnmountedState(EndpointId, bool & v) const
-    {
-        VerifyOrDie(mCluster.IsConstructed());
-        return mCluster.Cluster().GetUnmountedState(v);
-    }
-    chip::BitFlags<SmokeCoAlarm::Feature> GetFeatures(EndpointId) const { return GetFeatures(); }
-    bool SupportsSmokeAlarm(EndpointId) const { return SupportsSmokeAlarm(); }
-    bool SupportsCOAlarm(EndpointId) const { return SupportsCOAlarm(); }
+    bool GetExpressedState(EndpointId, SmokeCoAlarm::ExpressedStateEnum & v) const;
+    bool GetSmokeState(EndpointId, SmokeCoAlarm::AlarmStateEnum & v) const;
+    bool GetCOState(EndpointId, SmokeCoAlarm::AlarmStateEnum & v) const;
+    bool GetBatteryAlert(EndpointId, SmokeCoAlarm::AlarmStateEnum & v) const;
+    bool GetDeviceMuted(EndpointId, SmokeCoAlarm::MuteStateEnum & v) const;
+    bool GetTestInProgress(EndpointId, bool & v) const;
+    bool GetHardwareFaultAlert(EndpointId, bool & v) const;
+    bool GetEndOfServiceAlert(EndpointId, SmokeCoAlarm::EndOfServiceEnum & v) const;
+    bool GetInterconnectSmokeAlarm(EndpointId, SmokeCoAlarm::AlarmStateEnum & v) const;
+    bool GetInterconnectCOAlarm(EndpointId, SmokeCoAlarm::AlarmStateEnum & v) const;
+    bool GetContaminationState(EndpointId, SmokeCoAlarm::ContaminationStateEnum & v) const;
+    bool GetSmokeSensitivityLevel(EndpointId, SmokeCoAlarm::SensitivityEnum & v) const;
+    bool GetExpiryDate(EndpointId, uint32_t & v) const;
+    bool GetUnmountedState(EndpointId, bool & v) const;
+    chip::BitFlags<SmokeCoAlarm::Feature> GetFeatures(EndpointId) const;
+    bool SupportsSmokeAlarm(EndpointId) const;
+    bool SupportsCOAlarm(EndpointId) const;
 
 private:
     EndpointId mEndpointId;
