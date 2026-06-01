@@ -255,7 +255,7 @@ std::string ThreadMeshcopCommissionProxy::GetLastDiscoveryDiagnosticJson()
 
     char steeringDataHex[ot::commissioner::kMaxSteeringDataLength * 2 + 1];
     char rotatingIdHex[Dnssd::kMaxRotatingIdLen * 2 + 1];
-    if (Encoding::BytesToUppercaseHexBuffer(diagnostic.steeringData.data(), diagnostic.steeringData.size(), steeringDataHex,
+    if (Encoding::BytesToUppercaseHexString(diagnostic.steeringData.data(), diagnostic.steeringData.size(), steeringDataHex,
                                             sizeof(steeringDataHex)) != CHIP_NO_ERROR)
     {
         diagnostic.valid = false;
