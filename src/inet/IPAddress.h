@@ -170,7 +170,7 @@ public:
 #endif
     static constexpr uint16_t kMaxStringLength = OT_IP6_ADDRESS_STRING_SIZE;
 #endif
-    static constexpr uint16_t kMaxAddressWithInterfaceLength = kMaxStringLength + 1 + InterfaceId::kMaxIfNameLength;
+    static constexpr uint16_t kMaxAddressWithInterfaceLength = kMaxStringLength + 1 + Inet::InterfaceId::kMaxIfNameLength;
 
     IPAddress() = default;
 

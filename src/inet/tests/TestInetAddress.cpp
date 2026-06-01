@@ -29,6 +29,7 @@
 #include <pw_unit_test/framework.h>
 
 #include <inet/IPAddress.h>
+#include <inet/InetInterface.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/StringBuilderAdapters.h>
 
@@ -825,6 +826,53 @@ TEST_F(TestInetAddress, TestCheckToString)
         ++lCurrent;
     }
 }
+
+/**
+ *  Test IP address conversion to a string with interface ID.
+ */
+TEST_F(TestInetAddress, TestCheckToStringWithInterface)
+{
+    InterfaceIterator iter;
+    if (iter.HasCurrent())
+    {
+        InterfaceId ifaceId = iter.GetInterfaceId();
+        char ifName[InterfaceId::kMaxIfNameLength];
+        EXPECT_EQ(ifaceId.GetInterfaceName(ifName, sizeof(ifName)), CHIP_NO_ERROR);
+
+        // 1. Test IPv6 Link-Local Address (LLA) with Interface ID
+        IPAddress llaAddress;
+        EXPECT_TRUE(IPAddress::FromString("fe80::8edc:d4ff:fe3a:ebfb", llaAddress));
+        
+        char buf[IPAddress::kMaxAddressWithInterfaceLength];
+        EXPECT_NE(llaAddress.ToString(buf, sizeof(buf), ifaceId), nullptr);
+        
+        char expected[IPAddress::kMaxAddressWithInterfaceLength];
+        snprintf(expected, sizeof(expected), "fe80::8edc:d4ff:fe3a:ebfb%%%s", ifName);
+        EXPECT_STREQ(buf, expected);
+
+        // 2. Test IPv6 LLA with Null Interface ID (should NOT append suffix)
+        EXPECT_NE(llaAddress.ToString(buf, sizeof(buf), InterfaceId::Null()), nullptr);
+        EXPECT_STREQ(buf, "fe80::8edc:d4ff:fe3a:ebfb");
+
+        // 3. Test Standard IPv6 Address (non-LLA) with Interface ID (should NOT append suffix)
+        IPAddress ulaAddress;
+        EXPECT_TRUE(IPAddress::FromString("fd00::1", ulaAddress));
+        EXPECT_NE(ulaAddress.ToString(buf, sizeof(buf), ifaceId), nullptr);
+        EXPECT_STREQ(buf, "fd00::1");
+
+        // 4. Test IPv4 Address with Interface ID (should NOT append suffix)
+        IPAddress ipv4Address;
+        EXPECT_TRUE(IPAddress::FromString("1.2.3.4", ipv4Address));
+        EXPECT_NE(ipv4Address.ToString(buf, sizeof(buf), ifaceId), nullptr);
+        EXPECT_STREQ(buf, "1.2.3.4");
+
+        // 5. Test Buffer Too Small
+        size_t requiredSize = strlen("fe80::8edc:d4ff:fe3a:ebfb") + 1 + strlen(ifName) + 1;
+        std::unique_ptr<char[]> smallBufAlloc(new char[requiredSize - 1]);
+        EXPECT_EQ(llaAddress.ToString(smallBufAlloc.get(), requiredSize - 1, ifaceId), nullptr);
+    }
+}
+
 
 /**
  *  Test correct identification of IPv6 ULA addresses.
