@@ -680,12 +680,11 @@ TEST_F_FROM_FIXTURE(TestJCMCommissionee, TestValidateAdministratorIdsMatch)
     EXPECT_EQ(commissionee.ValidateAdministratorIdsMatch(kAdminFabricId, matchingKey), TrustVerificationError::kInternalError);
 }
 
-// Harness for PerformVendorIdVerification()'s FetchCommissionerInfo error path. That path
-// must complete the verification once via OnVendorIdVerificationComplete(err) and stop, not
-// continue into VerifyVendorId(&mInfo): OnVendorIdVerificationComplete() destroys *this in
-// production (mOnCompletion -> CleanupAnnounceJFA -> mActiveCommissionee.reset()), so
-// continuing would dereference freed storage. This harness frees the commissionee from
-// mOnCompletion to mirror that teardown, making such a regression observable under ASan.
+// Harness for PerformVendorIdVerification()'s FetchCommissionerInfo error path: it forces the commissioner read
+// to fail and counts how many times the verification completes. The error path must complete exactly once and
+// stop, not continue into VerifyVendorId(&mInfo). In production, continuing would be a use-after-free, since
+// OnVendorIdVerificationComplete() destroys *this (mOnCompletion -> CleanupAnnounceJFA ->
+// mActiveCommissionee.reset()); this test detects the defect by counting completions, without that teardown.
 class ReadFailureJCMCommissionee : public JCMCommissionee
 {
 public:
@@ -712,7 +711,7 @@ protected:
     // Simulate a dispatched read whose response is an error: invoke onError but return
     // CHIP_NO_ERROR (returning an error would make FetchCommissionerInfo complete on its own).
     CHIP_ERROR
-    ReadAdminFabricsAttribute(std::function<void(const ConcreteAttributePath &, const FabricsAttr::DecodableType &)> onSuccess,
+    ReadAdminFabricsAttribute(std::function<void(const ConcreteAttributePath &, const FabricsAttr::DecodableType &)>,
                               ReadErrorHandler onError) override
     {
         onError(nullptr, CHIP_ERROR_INTERNAL);
