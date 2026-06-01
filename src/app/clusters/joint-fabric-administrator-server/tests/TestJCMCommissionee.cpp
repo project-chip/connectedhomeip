@@ -374,6 +374,7 @@ protected:
     void TestReadAdminFabricsPopulatesCommissionerInfo();
     void TestReadAdminCertsPopulatesCommissionerRcac();
     void TestReadAdminNOCsPopulatesCommissionerCerts();
+    void TestPerformVendorIdVerificationCompletesOnceOnReadFailure();
 };
 
 TEST_F_FROM_FIXTURE(TestJCMCommissionee, TestNextStageFollowsExpectedOrder)
@@ -676,6 +677,68 @@ TEST_F_FROM_FIXTURE(TestJCMCommissionee, TestValidateAdministratorIdsMatch)
     commissionee.mInfo.rootPublicKey.CopyFromSpan(ByteSpan(adminRootKey, Crypto::kP256_PublicKey_Length - 1));
     ASSERT_EQ(commissionee.mInfo.rootPublicKey.AllocatedSize(), Crypto::kP256_PublicKey_Length - 1);
     EXPECT_EQ(commissionee.ValidateAdministratorIdsMatch(kAdminFabricId, matchingKey), TrustVerificationError::kInternalError);
+}
+
+// Harness for PerformVendorIdVerification()'s FetchCommissionerInfo error path. That path
+// must complete the verification once via OnVendorIdVerificationComplete(err) and stop, not
+// continue into VerifyVendorId(&mInfo): OnVendorIdVerificationComplete() destroys *this in
+// production (mOnCompletion -> CleanupAnnounceJFA -> mActiveCommissionee.reset()), so
+// continuing would dereference freed storage. This harness frees the commissionee from
+// mOnCompletion to mirror that teardown, making such a regression observable under ASan.
+class ReadFailureJCMCommissionee : public JCMCommissionee
+{
+public:
+    using JCMCommissionee::JCMCommissionee;
+
+    int completionCount = 0;
+
+protected:
+    // Drive StartTrustVerification() straight into kPerformingVendorIDVerification.
+    TrustVerificationStage GetNextTrustVerificationStage(const TrustVerificationStage & currentStage) override
+    {
+        return (currentStage == TrustVerificationStage::kPerformingVendorIDVerification)
+            ? TrustVerificationStage::kComplete
+            : TrustVerificationStage::kPerformingVendorIDVerification;
+    }
+
+    // Counts how many times the verification completes; the error path must complete once.
+    void OnVendorIdVerificationComplete(const CHIP_ERROR & err) override
+    {
+        ++completionCount;
+        JCMCommissionee::OnVendorIdVerificationComplete(err);
+    }
+
+    // Simulate a dispatched read whose response is an error: invoke onError but return
+    // CHIP_NO_ERROR (returning an error would make FetchCommissionerInfo complete on its own).
+    CHIP_ERROR
+    ReadAdminFabricsAttribute(std::function<void(const ConcreteAttributePath &, const FabricsAttr::DecodableType &)> onSuccess,
+                              ReadErrorHandler onError) override
+    {
+        onError(nullptr, CHIP_ERROR_INTERNAL);
+        return CHIP_NO_ERROR;
+    }
+};
+
+// A failed commissioner read must complete the verification exactly once. If the error path
+// continued into VerifyVendorId (session released below), that call would complete a second
+// time and completionCount would exceed 1.
+TEST_F_FROM_FIXTURE(TestJCMCommissionee, TestPerformVendorIdVerificationCompletesOnceOnReadFailure)
+{
+    FakeCommandHandler commandHandler;
+    CommandHandler::Handle handle(&commandHandler);
+    Messaging::ExchangeContext * exchangeCtx = NewExchangeToBob(nullptr, false);
+    commandHandler.SetExchangeContext(exchangeCtx);
+
+    ReadFailureJCMCommissionee commissionee(handle, EndpointId{ 41 }, [](CHIP_ERROR) {});
+
+    // Release the session so that if the error path ever continues into VerifyVendorId, that
+    // call completes synchronously (its "session missing" path) and the extra completion is
+    // caught by the assertion below.
+    commissionee.mSessionHolder.Release();
+
+    commissionee.VerifyTrustAgainstCommissionerAdmin();
+
+    EXPECT_EQ(commissionee.completionCount, 1);
 }
 
 } // namespace JointFabricAdministrator
