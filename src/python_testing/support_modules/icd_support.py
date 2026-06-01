@@ -104,6 +104,7 @@ def uat_set_hints(hint_bitmap):
         log.info(f"  - {uat_bit_name(bit)} (0x{bit.value:05X})")
     return hints
 
+
 async def _wait_for_subscription_heartbeat(subscription, max_interval_ceiling_s: float,
                                            buffer_s: float) -> float | None:
     """Wait up to `max_interval_ceiling_s + buffer_s` for one empty heartbeat report.
