@@ -179,10 +179,18 @@
 #include <clusters/DoorLock/Commands.ipp>
 #include <clusters/DoorLock/Events.ipp>
 #include <clusters/DoorLock/Structs.ipp>
+#include <clusters/DynamicLighting/Attributes.ipp>
+#include <clusters/DynamicLighting/Commands.ipp>
+#include <clusters/DynamicLighting/Events.ipp>
+#include <clusters/DynamicLighting/Structs.ipp>
 #include <clusters/EcosystemInformation/Attributes.ipp>
 #include <clusters/EcosystemInformation/Commands.ipp>
 #include <clusters/EcosystemInformation/Events.ipp>
 #include <clusters/EcosystemInformation/Structs.ipp>
+#include <clusters/ElectricalDistribution/Attributes.ipp>
+#include <clusters/ElectricalDistribution/Commands.ipp>
+#include <clusters/ElectricalDistribution/Events.ipp>
+#include <clusters/ElectricalDistribution/Structs.ipp>
 #include <clusters/ElectricalEnergyMeasurement/Attributes.ipp>
 #include <clusters/ElectricalEnergyMeasurement/Commands.ipp>
 #include <clusters/ElectricalEnergyMeasurement/Events.ipp>
@@ -195,6 +203,10 @@
 #include <clusters/ElectricalPowerMeasurement/Commands.ipp>
 #include <clusters/ElectricalPowerMeasurement/Events.ipp>
 #include <clusters/ElectricalPowerMeasurement/Structs.ipp>
+#include <clusters/ElectricalProtectionAlarm/Attributes.ipp>
+#include <clusters/ElectricalProtectionAlarm/Commands.ipp>
+#include <clusters/ElectricalProtectionAlarm/Events.ipp>
+#include <clusters/ElectricalProtectionAlarm/Structs.ipp>
 #include <clusters/EnergyEvse/Attributes.ipp>
 #include <clusters/EnergyEvse/Commands.ipp>
 #include <clusters/EnergyEvse/Events.ipp>
@@ -483,6 +495,10 @@
 #include <clusters/SmokeCoAlarm/Commands.ipp>
 #include <clusters/SmokeCoAlarm/Events.ipp>
 #include <clusters/SmokeCoAlarm/Structs.ipp>
+#include <clusters/SmokeConcentrationMeasurement/Attributes.ipp>
+#include <clusters/SmokeConcentrationMeasurement/Commands.ipp>
+#include <clusters/SmokeConcentrationMeasurement/Events.ipp>
+#include <clusters/SmokeConcentrationMeasurement/Structs.ipp>
 #include <clusters/SoftwareDiagnostics/Attributes.ipp>
 #include <clusters/SoftwareDiagnostics/Commands.ipp>
 #include <clusters/SoftwareDiagnostics/Events.ipp>
@@ -539,10 +555,6 @@
 #include <clusters/TimeSynchronization/Commands.ipp>
 #include <clusters/TimeSynchronization/Events.ipp>
 #include <clusters/TimeSynchronization/Structs.ipp>
-#include <clusters/Timer/Attributes.ipp>
-#include <clusters/Timer/Commands.ipp>
-#include <clusters/Timer/Events.ipp>
-#include <clusters/Timer/Structs.ipp>
 #include <clusters/TlsCertificateManagement/Attributes.ipp>
 #include <clusters/TlsCertificateManagement/Commands.ipp>
 #include <clusters/TlsCertificateManagement/Events.ipp>
@@ -960,13 +972,6 @@ bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
             return false;
         }
     }
-    case Clusters::Timer::Id: {
-        switch (aCommand)
-        {
-        default:
-            return false;
-        }
-    }
     case Clusters::OvenCavityOperationalState::Id: {
         switch (aCommand)
         {
@@ -1202,6 +1207,13 @@ bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
             return false;
         }
     }
+    case Clusters::ElectricalProtectionAlarm::Id: {
+        switch (aCommand)
+        {
+        default:
+            return false;
+        }
+    }
     case Clusters::DoorLock::Id: {
         switch (aCommand)
         {
@@ -1259,6 +1271,13 @@ bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
         }
     }
     case Clusters::ColorControl::Id: {
+        switch (aCommand)
+        {
+        default:
+            return false;
+        }
+    }
+    case Clusters::DynamicLighting::Id: {
         switch (aCommand)
         {
         default:

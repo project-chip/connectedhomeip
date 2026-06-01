@@ -16,8 +16,7 @@
 
 
 import logging
-import typing
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 from mobly import asserts
 
@@ -186,7 +185,7 @@ class EEVSEBaseTestHelper:
         return get_targets_resp
 
     async def send_set_targets_command(self, endpoint: int = None,
-                                       chargingTargetSchedules: typing.List[
+                                       chargingTargetSchedules: list[
                                            Clusters.EnergyEvse.Structs.ChargingTargetScheduleStruct] = None,
                                        timedRequestTimeoutMs: int = 3000,
                                        expected_status: Status = Status.Success):
@@ -304,7 +303,7 @@ class EEVSEBaseTestHelper:
                 log.info(
                     f"    - [{sub_index}] TargetTime: {sub_entry.targetTimeMinutesPastMidnight} TargetSoC: {sub_entry.targetSoC} AddedEnergy: {sub_entry.addedEnergy}")
 
-    def convert_epoch_s_to_time(self, epoch_s, tz=timezone.utc):
+    def convert_epoch_s_to_time(self, epoch_s, tz=UTC):
         delta_from_epoch = timedelta(seconds=epoch_s)
         # Matter Epoch is 1st Jan 2000
         matter_epoch = datetime(2000, 1, 1, 0, 0, 0, 0, tz)
@@ -329,7 +328,7 @@ class EEVSEBaseTestHelper:
             target_time = target_time + timedelta(days=1)
 
         # Shift to UTC so we can use timezone aware subtraction from Matter epoch in UTC
-        target_time = target_time.astimezone(timezone.utc)
+        target_time = target_time.astimezone(UTC)
 
         log.info(
             f"minutesPastMidnight = {minutes_past_midnight} => "
@@ -337,7 +336,7 @@ class EEVSEBaseTestHelper:
             f" Expected target_time = {target_time}")
 
         # Matter Epoch is 1st Jan 2000
-        matter_base_time = datetime(2000, 1, 1, 0, 0, 0, 0, tzinfo=timezone.utc)
+        matter_base_time = datetime(2000, 1, 1, 0, 0, 0, 0, tzinfo=UTC)
 
         target_time_delta = target_time - matter_base_time
 

@@ -191,7 +191,7 @@ std::optional<DataModel::ActionReturnStatus> ClosureDimensionCluster::InvokeComm
 // At present, QuieterReportingAttribute class does not support Structs.
 //  so each field of current state struct has to be handled independently.
 //  At present, we are using QuieterReportingAttribute class for Position only.
-//  Latch and Speed changes are directly handled by the cluster logic seperately.
+//  Latch and Speed changes are directly handled by the cluster logic separately.
 //  i.e Speed and latch changes are not considered when calculating the at most 5 seconds quiet reportable changes for Position.
 CHIP_ERROR ClosureDimensionCluster::SetCurrentState(const DataModel::Nullable<GenericDimensionStateStruct> & incomingCurrentState)
 {
@@ -290,10 +290,8 @@ CHIP_ERROR ClosureDimensionCluster::SetCurrentState(const DataModel::Nullable<Ge
 
     mCurrentState = incomingCurrentState;
 
-    if (markDirty)
-    {
-        NotifyAttributeChanged(Attributes::CurrentState::Id);
-    }
+    NotifyAttributeChanged(Attributes::CurrentState::Id,
+                           markDirty ? DataModel::AttributeChangeType::kReportable : DataModel::AttributeChangeType::kQuiet);
 
     return CHIP_NO_ERROR;
 }

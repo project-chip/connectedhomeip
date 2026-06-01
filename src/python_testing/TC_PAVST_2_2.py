@@ -105,7 +105,7 @@ class TC_PAVST_2_2(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         self.step("precondition")
         host_ip = self.user_params.get("host_ip", None)
         self.tlsEndpointId, host_ip = await self.precondition_provision_tls_endpoint(server=self.server, host_ip=host_ip)
-        uploadStreamId = self.server.create_stream(SupportedIngestInterface.cmaf.value)
+        uploadStreamId = self.server.create_stream(SupportedIngestInterface.cmaf)
 
         self.step(1)
         status = await self.check_and_delete_all_push_av_transports(endpoint, pvattr)
@@ -118,9 +118,9 @@ class TC_PAVST_2_2(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             endpoint=endpoint, cluster=pvcluster, attribute=pvattr.SupportedFormats
         )
         asserts.assert_greater_equal(len(supported_formats), 1, "SupportedFormats must not be empty!")
-        for format in supported_formats:
-            validContainerformat = format.containerFormat == pvcluster.Enums.ContainerFormatEnum.kCmaf
-            isValidIngestMethod = format.ingestMethod == pvcluster.Enums.IngestMethodsEnum.kCMAFIngest
+        for fmt in supported_formats:
+            validContainerformat = fmt.containerFormat == pvcluster.Enums.ContainerFormatEnum.kCmaf
+            isValidIngestMethod = fmt.ingestMethod == pvcluster.Enums.IngestMethodsEnum.kCMAFIngest
             asserts.assert_true((validContainerformat & isValidIngestMethod),
                                 "(ContainerFormat & IngestMethod) must be defined values!")
 

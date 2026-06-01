@@ -16,7 +16,7 @@
 """Collect information from various sources into Memory Map DataFrames."""
 
 import bisect
-from typing import Callable, Dict, List, Mapping, Optional, Sequence, Tuple
+from typing import Callable, Mapping, Optional, Sequence
 
 import memdf.collector.bloaty
 import memdf.collector.csv
@@ -144,7 +144,7 @@ def fill_holes(config: Config, symbols: SymbolDF, sections: SectionDF) -> DFs:
         extent_columns.append('input')
     columns = ['symbol', *extent_columns, 'type', 'bind']
 
-    def filler(name, address, size, previous, current) -> List:
+    def filler(name, address, size, previous, current) -> list:
         row = [
             name,  # symbol
             address,  # address
@@ -165,7 +165,7 @@ def fill_holes(config: Config, symbols: SymbolDF, sections: SectionDF) -> DFs:
         return row
 
     def fill_gap(previous, current, from_address,
-                 to_address) -> Tuple[str, List]:
+                 to_address) -> tuple[str, list]:
         """Add a row for a unaccounted gap or unused space."""
         size = to_address - from_address
         if (previous is None or previous.symbol in start_unused
@@ -178,7 +178,7 @@ def fill_holes(config: Config, symbols: SymbolDF, sections: SectionDF) -> DFs:
         return (use, filler(name, from_address, size, previous, current))
 
     def fill_overlap(previous, current, from_address,
-                     to_address) -> Tuple[str, List]:
+                     to_address) -> tuple[str, list]:
         """Add a row for overlap."""
         size = to_address - from_address
         return ('overlap',
@@ -199,7 +199,7 @@ def fill_holes(config: Config, symbols: SymbolDF, sections: SectionDF) -> DFs:
             section_starts.append(s.address)
     section_starts.sort()
 
-    new_symbols: Dict[str, List[list]] = {
+    new_symbols: dict[str, list[list]] = {
         'gap': [],
         'unused': [],
         'overlap': []
@@ -291,7 +291,7 @@ def postprocess_collected(config: Config, dfs: DFs) -> None:
 
 FileReader = Callable[[Config, str, str], DFs]
 
-FILE_READERS: Dict[str, FileReader] = {
+FILE_READERS: dict[str, FileReader] = {
     'bloaty': memdf.collector.bloaty.read_file,
     'elftools': memdf.collector.elftools.read_file,
     'readelf': memdf.collector.readelf.read_file,
@@ -302,13 +302,13 @@ FILE_READERS: Dict[str, FileReader] = {
 
 
 def collect_files(config: Config,
-                  files: Optional[List[str]] = None,
+                  files: Optional[list[str]] = None,
                   method: Optional[str] = None) -> DFs:
     """Read a filtered memory map from a set of files."""
     filenames = files if files else config.get('args.inputs', [])
     if method is None:
         method = config.get('collect.method', 'csv')
-    frames: Dict[str, List[DF]] = {}
+    frames: dict[str, list[DF]] = {}
     for filename in filenames:
         dfs: DFs = FILE_READERS[method](config, filename, method)
         postprocess_file(config, dfs)

@@ -9699,6 +9699,762 @@ public static class ElectricalGridConditionsClusterElectricalGridConditionsStruc
     return output.toString();
   }
 }
+public static class ElectricalProtectionAlarmClusterArcFaultRatingsStruct {
+  public Optional<Long> seriesArcCurrentSensitivity;
+  public Optional<Long> parallelArcCurrentSensitivity;
+  public Optional<Integer> supportedArcCauses;
+  private static final long SERIES_ARC_CURRENT_SENSITIVITY_ID = 0L;
+  private static final long PARALLEL_ARC_CURRENT_SENSITIVITY_ID = 1L;
+  private static final long SUPPORTED_ARC_CAUSES_ID = 2L;
+
+  public ElectricalProtectionAlarmClusterArcFaultRatingsStruct(
+    Optional<Long> seriesArcCurrentSensitivity,
+    Optional<Long> parallelArcCurrentSensitivity,
+    Optional<Integer> supportedArcCauses
+  ) {
+    this.seriesArcCurrentSensitivity = seriesArcCurrentSensitivity;
+    this.parallelArcCurrentSensitivity = parallelArcCurrentSensitivity;
+    this.supportedArcCauses = supportedArcCauses;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(SERIES_ARC_CURRENT_SENSITIVITY_ID, seriesArcCurrentSensitivity.<BaseTLVType>map((nonOptionalseriesArcCurrentSensitivity) -> new IntType(nonOptionalseriesArcCurrentSensitivity)).orElse(new EmptyType())));
+    values.add(new StructElement(PARALLEL_ARC_CURRENT_SENSITIVITY_ID, parallelArcCurrentSensitivity.<BaseTLVType>map((nonOptionalparallelArcCurrentSensitivity) -> new IntType(nonOptionalparallelArcCurrentSensitivity)).orElse(new EmptyType())));
+    values.add(new StructElement(SUPPORTED_ARC_CAUSES_ID, supportedArcCauses.<BaseTLVType>map((nonOptionalsupportedArcCauses) -> new UIntType(nonOptionalsupportedArcCauses)).orElse(new EmptyType())));
+
+    return new StructType(values);
+  }
+
+  public static ElectricalProtectionAlarmClusterArcFaultRatingsStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Optional<Long> seriesArcCurrentSensitivity = Optional.empty();
+    Optional<Long> parallelArcCurrentSensitivity = Optional.empty();
+    Optional<Integer> supportedArcCauses = Optional.empty();
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == SERIES_ARC_CURRENT_SENSITIVITY_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Int) {
+          IntType castingValue = element.value(IntType.class);
+          seriesArcCurrentSensitivity = Optional.of(castingValue.value(Long.class));
+        }
+      } else if (element.contextTagNum() == PARALLEL_ARC_CURRENT_SENSITIVITY_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Int) {
+          IntType castingValue = element.value(IntType.class);
+          parallelArcCurrentSensitivity = Optional.of(castingValue.value(Long.class));
+        }
+      } else if (element.contextTagNum() == SUPPORTED_ARC_CAUSES_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          supportedArcCauses = Optional.of(castingValue.value(Integer.class));
+        }
+      }
+    }
+    return new ElectricalProtectionAlarmClusterArcFaultRatingsStruct(
+      seriesArcCurrentSensitivity,
+      parallelArcCurrentSensitivity,
+      supportedArcCauses
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("ElectricalProtectionAlarmClusterArcFaultRatingsStruct {\n");
+    output.append("\tseriesArcCurrentSensitivity: ");
+    output.append(seriesArcCurrentSensitivity);
+    output.append("\n");
+    output.append("\tparallelArcCurrentSensitivity: ");
+    output.append(parallelArcCurrentSensitivity);
+    output.append("\n");
+    output.append("\tsupportedArcCauses: ");
+    output.append(supportedArcCauses);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class ElectricalProtectionAlarmClusterOverLoadRatingsStruct {
+  public Optional<Long> tripCurrent;
+  public Optional<Integer> tripCurve;
+  public Optional<Integer> tripMechanism;
+  public Optional<Long> ultimateMaxCurrent;
+  public Optional<Long> serviceMaxCurrent;
+  private static final long TRIP_CURRENT_ID = 0L;
+  private static final long TRIP_CURVE_ID = 1L;
+  private static final long TRIP_MECHANISM_ID = 2L;
+  private static final long ULTIMATE_MAX_CURRENT_ID = 3L;
+  private static final long SERVICE_MAX_CURRENT_ID = 4L;
+
+  public ElectricalProtectionAlarmClusterOverLoadRatingsStruct(
+    Optional<Long> tripCurrent,
+    Optional<Integer> tripCurve,
+    Optional<Integer> tripMechanism,
+    Optional<Long> ultimateMaxCurrent,
+    Optional<Long> serviceMaxCurrent
+  ) {
+    this.tripCurrent = tripCurrent;
+    this.tripCurve = tripCurve;
+    this.tripMechanism = tripMechanism;
+    this.ultimateMaxCurrent = ultimateMaxCurrent;
+    this.serviceMaxCurrent = serviceMaxCurrent;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(TRIP_CURRENT_ID, tripCurrent.<BaseTLVType>map((nonOptionaltripCurrent) -> new IntType(nonOptionaltripCurrent)).orElse(new EmptyType())));
+    values.add(new StructElement(TRIP_CURVE_ID, tripCurve.<BaseTLVType>map((nonOptionaltripCurve) -> new UIntType(nonOptionaltripCurve)).orElse(new EmptyType())));
+    values.add(new StructElement(TRIP_MECHANISM_ID, tripMechanism.<BaseTLVType>map((nonOptionaltripMechanism) -> new UIntType(nonOptionaltripMechanism)).orElse(new EmptyType())));
+    values.add(new StructElement(ULTIMATE_MAX_CURRENT_ID, ultimateMaxCurrent.<BaseTLVType>map((nonOptionalultimateMaxCurrent) -> new IntType(nonOptionalultimateMaxCurrent)).orElse(new EmptyType())));
+    values.add(new StructElement(SERVICE_MAX_CURRENT_ID, serviceMaxCurrent.<BaseTLVType>map((nonOptionalserviceMaxCurrent) -> new IntType(nonOptionalserviceMaxCurrent)).orElse(new EmptyType())));
+
+    return new StructType(values);
+  }
+
+  public static ElectricalProtectionAlarmClusterOverLoadRatingsStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Optional<Long> tripCurrent = Optional.empty();
+    Optional<Integer> tripCurve = Optional.empty();
+    Optional<Integer> tripMechanism = Optional.empty();
+    Optional<Long> ultimateMaxCurrent = Optional.empty();
+    Optional<Long> serviceMaxCurrent = Optional.empty();
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == TRIP_CURRENT_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Int) {
+          IntType castingValue = element.value(IntType.class);
+          tripCurrent = Optional.of(castingValue.value(Long.class));
+        }
+      } else if (element.contextTagNum() == TRIP_CURVE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          tripCurve = Optional.of(castingValue.value(Integer.class));
+        }
+      } else if (element.contextTagNum() == TRIP_MECHANISM_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          tripMechanism = Optional.of(castingValue.value(Integer.class));
+        }
+      } else if (element.contextTagNum() == ULTIMATE_MAX_CURRENT_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Int) {
+          IntType castingValue = element.value(IntType.class);
+          ultimateMaxCurrent = Optional.of(castingValue.value(Long.class));
+        }
+      } else if (element.contextTagNum() == SERVICE_MAX_CURRENT_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Int) {
+          IntType castingValue = element.value(IntType.class);
+          serviceMaxCurrent = Optional.of(castingValue.value(Long.class));
+        }
+      }
+    }
+    return new ElectricalProtectionAlarmClusterOverLoadRatingsStruct(
+      tripCurrent,
+      tripCurve,
+      tripMechanism,
+      ultimateMaxCurrent,
+      serviceMaxCurrent
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("ElectricalProtectionAlarmClusterOverLoadRatingsStruct {\n");
+    output.append("\ttripCurrent: ");
+    output.append(tripCurrent);
+    output.append("\n");
+    output.append("\ttripCurve: ");
+    output.append(tripCurve);
+    output.append("\n");
+    output.append("\ttripMechanism: ");
+    output.append(tripMechanism);
+    output.append("\n");
+    output.append("\tultimateMaxCurrent: ");
+    output.append(ultimateMaxCurrent);
+    output.append("\n");
+    output.append("\tserviceMaxCurrent: ");
+    output.append(serviceMaxCurrent);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class ElectricalProtectionAlarmClusterOverVoltageRatingsStruct {
+  public Optional<Integer> tripMechanism;
+  public Optional<Long> tripVoltage;
+  public Optional<Long> maxContinuousOperatingVoltage;
+  public Optional<Long> responseTime;
+  private static final long TRIP_MECHANISM_ID = 0L;
+  private static final long TRIP_VOLTAGE_ID = 1L;
+  private static final long MAX_CONTINUOUS_OPERATING_VOLTAGE_ID = 2L;
+  private static final long RESPONSE_TIME_ID = 3L;
+
+  public ElectricalProtectionAlarmClusterOverVoltageRatingsStruct(
+    Optional<Integer> tripMechanism,
+    Optional<Long> tripVoltage,
+    Optional<Long> maxContinuousOperatingVoltage,
+    Optional<Long> responseTime
+  ) {
+    this.tripMechanism = tripMechanism;
+    this.tripVoltage = tripVoltage;
+    this.maxContinuousOperatingVoltage = maxContinuousOperatingVoltage;
+    this.responseTime = responseTime;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(TRIP_MECHANISM_ID, tripMechanism.<BaseTLVType>map((nonOptionaltripMechanism) -> new UIntType(nonOptionaltripMechanism)).orElse(new EmptyType())));
+    values.add(new StructElement(TRIP_VOLTAGE_ID, tripVoltage.<BaseTLVType>map((nonOptionaltripVoltage) -> new IntType(nonOptionaltripVoltage)).orElse(new EmptyType())));
+    values.add(new StructElement(MAX_CONTINUOUS_OPERATING_VOLTAGE_ID, maxContinuousOperatingVoltage.<BaseTLVType>map((nonOptionalmaxContinuousOperatingVoltage) -> new IntType(nonOptionalmaxContinuousOperatingVoltage)).orElse(new EmptyType())));
+    values.add(new StructElement(RESPONSE_TIME_ID, responseTime.<BaseTLVType>map((nonOptionalresponseTime) -> new UIntType(nonOptionalresponseTime)).orElse(new EmptyType())));
+
+    return new StructType(values);
+  }
+
+  public static ElectricalProtectionAlarmClusterOverVoltageRatingsStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Optional<Integer> tripMechanism = Optional.empty();
+    Optional<Long> tripVoltage = Optional.empty();
+    Optional<Long> maxContinuousOperatingVoltage = Optional.empty();
+    Optional<Long> responseTime = Optional.empty();
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == TRIP_MECHANISM_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          tripMechanism = Optional.of(castingValue.value(Integer.class));
+        }
+      } else if (element.contextTagNum() == TRIP_VOLTAGE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Int) {
+          IntType castingValue = element.value(IntType.class);
+          tripVoltage = Optional.of(castingValue.value(Long.class));
+        }
+      } else if (element.contextTagNum() == MAX_CONTINUOUS_OPERATING_VOLTAGE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Int) {
+          IntType castingValue = element.value(IntType.class);
+          maxContinuousOperatingVoltage = Optional.of(castingValue.value(Long.class));
+        }
+      } else if (element.contextTagNum() == RESPONSE_TIME_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          responseTime = Optional.of(castingValue.value(Long.class));
+        }
+      }
+    }
+    return new ElectricalProtectionAlarmClusterOverVoltageRatingsStruct(
+      tripMechanism,
+      tripVoltage,
+      maxContinuousOperatingVoltage,
+      responseTime
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("ElectricalProtectionAlarmClusterOverVoltageRatingsStruct {\n");
+    output.append("\ttripMechanism: ");
+    output.append(tripMechanism);
+    output.append("\n");
+    output.append("\ttripVoltage: ");
+    output.append(tripVoltage);
+    output.append("\n");
+    output.append("\tmaxContinuousOperatingVoltage: ");
+    output.append(maxContinuousOperatingVoltage);
+    output.append("\n");
+    output.append("\tresponseTime: ");
+    output.append(responseTime);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class ElectricalProtectionAlarmClusterResidualCurrentFaultRatingsStruct {
+  public Optional<Long> currentSensitivity;
+  public Optional<Integer> tripMechanism;
+  public Optional<Boolean> voltageDependent;
+  public Optional<Integer> groundFaultClass;
+  public Optional<Integer> waveform;
+  public Optional<Integer> trippingCharacteristic;
+  public Optional<Long> ultimateMaxCurrent;
+  public Optional<Long> serviceMaxCurrent;
+  private static final long CURRENT_SENSITIVITY_ID = 0L;
+  private static final long TRIP_MECHANISM_ID = 1L;
+  private static final long VOLTAGE_DEPENDENT_ID = 2L;
+  private static final long GROUND_FAULT_CLASS_ID = 3L;
+  private static final long WAVEFORM_ID = 4L;
+  private static final long TRIPPING_CHARACTERISTIC_ID = 5L;
+  private static final long ULTIMATE_MAX_CURRENT_ID = 6L;
+  private static final long SERVICE_MAX_CURRENT_ID = 7L;
+
+  public ElectricalProtectionAlarmClusterResidualCurrentFaultRatingsStruct(
+    Optional<Long> currentSensitivity,
+    Optional<Integer> tripMechanism,
+    Optional<Boolean> voltageDependent,
+    Optional<Integer> groundFaultClass,
+    Optional<Integer> waveform,
+    Optional<Integer> trippingCharacteristic,
+    Optional<Long> ultimateMaxCurrent,
+    Optional<Long> serviceMaxCurrent
+  ) {
+    this.currentSensitivity = currentSensitivity;
+    this.tripMechanism = tripMechanism;
+    this.voltageDependent = voltageDependent;
+    this.groundFaultClass = groundFaultClass;
+    this.waveform = waveform;
+    this.trippingCharacteristic = trippingCharacteristic;
+    this.ultimateMaxCurrent = ultimateMaxCurrent;
+    this.serviceMaxCurrent = serviceMaxCurrent;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(CURRENT_SENSITIVITY_ID, currentSensitivity.<BaseTLVType>map((nonOptionalcurrentSensitivity) -> new IntType(nonOptionalcurrentSensitivity)).orElse(new EmptyType())));
+    values.add(new StructElement(TRIP_MECHANISM_ID, tripMechanism.<BaseTLVType>map((nonOptionaltripMechanism) -> new UIntType(nonOptionaltripMechanism)).orElse(new EmptyType())));
+    values.add(new StructElement(VOLTAGE_DEPENDENT_ID, voltageDependent.<BaseTLVType>map((nonOptionalvoltageDependent) -> new BooleanType(nonOptionalvoltageDependent)).orElse(new EmptyType())));
+    values.add(new StructElement(GROUND_FAULT_CLASS_ID, groundFaultClass.<BaseTLVType>map((nonOptionalgroundFaultClass) -> new UIntType(nonOptionalgroundFaultClass)).orElse(new EmptyType())));
+    values.add(new StructElement(WAVEFORM_ID, waveform.<BaseTLVType>map((nonOptionalwaveform) -> new UIntType(nonOptionalwaveform)).orElse(new EmptyType())));
+    values.add(new StructElement(TRIPPING_CHARACTERISTIC_ID, trippingCharacteristic.<BaseTLVType>map((nonOptionaltrippingCharacteristic) -> new UIntType(nonOptionaltrippingCharacteristic)).orElse(new EmptyType())));
+    values.add(new StructElement(ULTIMATE_MAX_CURRENT_ID, ultimateMaxCurrent.<BaseTLVType>map((nonOptionalultimateMaxCurrent) -> new IntType(nonOptionalultimateMaxCurrent)).orElse(new EmptyType())));
+    values.add(new StructElement(SERVICE_MAX_CURRENT_ID, serviceMaxCurrent.<BaseTLVType>map((nonOptionalserviceMaxCurrent) -> new IntType(nonOptionalserviceMaxCurrent)).orElse(new EmptyType())));
+
+    return new StructType(values);
+  }
+
+  public static ElectricalProtectionAlarmClusterResidualCurrentFaultRatingsStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Optional<Long> currentSensitivity = Optional.empty();
+    Optional<Integer> tripMechanism = Optional.empty();
+    Optional<Boolean> voltageDependent = Optional.empty();
+    Optional<Integer> groundFaultClass = Optional.empty();
+    Optional<Integer> waveform = Optional.empty();
+    Optional<Integer> trippingCharacteristic = Optional.empty();
+    Optional<Long> ultimateMaxCurrent = Optional.empty();
+    Optional<Long> serviceMaxCurrent = Optional.empty();
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == CURRENT_SENSITIVITY_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Int) {
+          IntType castingValue = element.value(IntType.class);
+          currentSensitivity = Optional.of(castingValue.value(Long.class));
+        }
+      } else if (element.contextTagNum() == TRIP_MECHANISM_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          tripMechanism = Optional.of(castingValue.value(Integer.class));
+        }
+      } else if (element.contextTagNum() == VOLTAGE_DEPENDENT_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Boolean) {
+          BooleanType castingValue = element.value(BooleanType.class);
+          voltageDependent = Optional.of(castingValue.value(Boolean.class));
+        }
+      } else if (element.contextTagNum() == GROUND_FAULT_CLASS_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          groundFaultClass = Optional.of(castingValue.value(Integer.class));
+        }
+      } else if (element.contextTagNum() == WAVEFORM_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          waveform = Optional.of(castingValue.value(Integer.class));
+        }
+      } else if (element.contextTagNum() == TRIPPING_CHARACTERISTIC_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          trippingCharacteristic = Optional.of(castingValue.value(Integer.class));
+        }
+      } else if (element.contextTagNum() == ULTIMATE_MAX_CURRENT_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Int) {
+          IntType castingValue = element.value(IntType.class);
+          ultimateMaxCurrent = Optional.of(castingValue.value(Long.class));
+        }
+      } else if (element.contextTagNum() == SERVICE_MAX_CURRENT_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Int) {
+          IntType castingValue = element.value(IntType.class);
+          serviceMaxCurrent = Optional.of(castingValue.value(Long.class));
+        }
+      }
+    }
+    return new ElectricalProtectionAlarmClusterResidualCurrentFaultRatingsStruct(
+      currentSensitivity,
+      tripMechanism,
+      voltageDependent,
+      groundFaultClass,
+      waveform,
+      trippingCharacteristic,
+      ultimateMaxCurrent,
+      serviceMaxCurrent
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("ElectricalProtectionAlarmClusterResidualCurrentFaultRatingsStruct {\n");
+    output.append("\tcurrentSensitivity: ");
+    output.append(currentSensitivity);
+    output.append("\n");
+    output.append("\ttripMechanism: ");
+    output.append(tripMechanism);
+    output.append("\n");
+    output.append("\tvoltageDependent: ");
+    output.append(voltageDependent);
+    output.append("\n");
+    output.append("\tgroundFaultClass: ");
+    output.append(groundFaultClass);
+    output.append("\n");
+    output.append("\twaveform: ");
+    output.append(waveform);
+    output.append("\n");
+    output.append("\ttrippingCharacteristic: ");
+    output.append(trippingCharacteristic);
+    output.append("\n");
+    output.append("\tultimateMaxCurrent: ");
+    output.append(ultimateMaxCurrent);
+    output.append("\n");
+    output.append("\tserviceMaxCurrent: ");
+    output.append(serviceMaxCurrent);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class ElectricalProtectionAlarmClusterShortCircuitRatingsStruct {
+  public Optional<Long> tripCurrent;
+  public Optional<Integer> tripMechanism;
+  public Optional<Integer> tripCurve;
+  public Optional<Long> ultimateMaxCurrent;
+  public Optional<Long> serviceMaxCurrent;
+  public Optional<Long> maxCurrent;
+  private static final long TRIP_CURRENT_ID = 0L;
+  private static final long TRIP_MECHANISM_ID = 1L;
+  private static final long TRIP_CURVE_ID = 2L;
+  private static final long ULTIMATE_MAX_CURRENT_ID = 3L;
+  private static final long SERVICE_MAX_CURRENT_ID = 4L;
+  private static final long MAX_CURRENT_ID = 5L;
+
+  public ElectricalProtectionAlarmClusterShortCircuitRatingsStruct(
+    Optional<Long> tripCurrent,
+    Optional<Integer> tripMechanism,
+    Optional<Integer> tripCurve,
+    Optional<Long> ultimateMaxCurrent,
+    Optional<Long> serviceMaxCurrent,
+    Optional<Long> maxCurrent
+  ) {
+    this.tripCurrent = tripCurrent;
+    this.tripMechanism = tripMechanism;
+    this.tripCurve = tripCurve;
+    this.ultimateMaxCurrent = ultimateMaxCurrent;
+    this.serviceMaxCurrent = serviceMaxCurrent;
+    this.maxCurrent = maxCurrent;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(TRIP_CURRENT_ID, tripCurrent.<BaseTLVType>map((nonOptionaltripCurrent) -> new IntType(nonOptionaltripCurrent)).orElse(new EmptyType())));
+    values.add(new StructElement(TRIP_MECHANISM_ID, tripMechanism.<BaseTLVType>map((nonOptionaltripMechanism) -> new UIntType(nonOptionaltripMechanism)).orElse(new EmptyType())));
+    values.add(new StructElement(TRIP_CURVE_ID, tripCurve.<BaseTLVType>map((nonOptionaltripCurve) -> new UIntType(nonOptionaltripCurve)).orElse(new EmptyType())));
+    values.add(new StructElement(ULTIMATE_MAX_CURRENT_ID, ultimateMaxCurrent.<BaseTLVType>map((nonOptionalultimateMaxCurrent) -> new IntType(nonOptionalultimateMaxCurrent)).orElse(new EmptyType())));
+    values.add(new StructElement(SERVICE_MAX_CURRENT_ID, serviceMaxCurrent.<BaseTLVType>map((nonOptionalserviceMaxCurrent) -> new IntType(nonOptionalserviceMaxCurrent)).orElse(new EmptyType())));
+    values.add(new StructElement(MAX_CURRENT_ID, maxCurrent.<BaseTLVType>map((nonOptionalmaxCurrent) -> new IntType(nonOptionalmaxCurrent)).orElse(new EmptyType())));
+
+    return new StructType(values);
+  }
+
+  public static ElectricalProtectionAlarmClusterShortCircuitRatingsStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Optional<Long> tripCurrent = Optional.empty();
+    Optional<Integer> tripMechanism = Optional.empty();
+    Optional<Integer> tripCurve = Optional.empty();
+    Optional<Long> ultimateMaxCurrent = Optional.empty();
+    Optional<Long> serviceMaxCurrent = Optional.empty();
+    Optional<Long> maxCurrent = Optional.empty();
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == TRIP_CURRENT_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Int) {
+          IntType castingValue = element.value(IntType.class);
+          tripCurrent = Optional.of(castingValue.value(Long.class));
+        }
+      } else if (element.contextTagNum() == TRIP_MECHANISM_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          tripMechanism = Optional.of(castingValue.value(Integer.class));
+        }
+      } else if (element.contextTagNum() == TRIP_CURVE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          tripCurve = Optional.of(castingValue.value(Integer.class));
+        }
+      } else if (element.contextTagNum() == ULTIMATE_MAX_CURRENT_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Int) {
+          IntType castingValue = element.value(IntType.class);
+          ultimateMaxCurrent = Optional.of(castingValue.value(Long.class));
+        }
+      } else if (element.contextTagNum() == SERVICE_MAX_CURRENT_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Int) {
+          IntType castingValue = element.value(IntType.class);
+          serviceMaxCurrent = Optional.of(castingValue.value(Long.class));
+        }
+      } else if (element.contextTagNum() == MAX_CURRENT_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Int) {
+          IntType castingValue = element.value(IntType.class);
+          maxCurrent = Optional.of(castingValue.value(Long.class));
+        }
+      }
+    }
+    return new ElectricalProtectionAlarmClusterShortCircuitRatingsStruct(
+      tripCurrent,
+      tripMechanism,
+      tripCurve,
+      ultimateMaxCurrent,
+      serviceMaxCurrent,
+      maxCurrent
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("ElectricalProtectionAlarmClusterShortCircuitRatingsStruct {\n");
+    output.append("\ttripCurrent: ");
+    output.append(tripCurrent);
+    output.append("\n");
+    output.append("\ttripMechanism: ");
+    output.append(tripMechanism);
+    output.append("\n");
+    output.append("\ttripCurve: ");
+    output.append(tripCurve);
+    output.append("\n");
+    output.append("\tultimateMaxCurrent: ");
+    output.append(ultimateMaxCurrent);
+    output.append("\n");
+    output.append("\tserviceMaxCurrent: ");
+    output.append(serviceMaxCurrent);
+    output.append("\n");
+    output.append("\tmaxCurrent: ");
+    output.append(maxCurrent);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class ElectricalProtectionAlarmClusterSurgeProtectionRatingsStruct {
+  public Optional<Integer> tripMechanism;
+  public Optional<Integer> protectionClass;
+  public Optional<Integer> protectionType;
+  public Optional<Long> maxContinuousOperatingVoltage;
+  public Optional<Long> maxVoltageProtection;
+  public Optional<Long> maxTemporaryVoltage;
+  public Optional<Long> nominalDischargeCurrent;
+  public Optional<Long> maximumDishargeCurrent;
+  public Optional<Long> ratedShortCircuitCurrent;
+  public Optional<Long> ratedShortTimeWithstandCurrent;
+  public Optional<Long> energyAbsorptionCapability;
+  public Optional<Long> responseTime;
+  private static final long TRIP_MECHANISM_ID = 0L;
+  private static final long PROTECTION_CLASS_ID = 1L;
+  private static final long PROTECTION_TYPE_ID = 2L;
+  private static final long MAX_CONTINUOUS_OPERATING_VOLTAGE_ID = 3L;
+  private static final long MAX_VOLTAGE_PROTECTION_ID = 4L;
+  private static final long MAX_TEMPORARY_VOLTAGE_ID = 5L;
+  private static final long NOMINAL_DISCHARGE_CURRENT_ID = 6L;
+  private static final long MAXIMUM_DISHARGE_CURRENT_ID = 7L;
+  private static final long RATED_SHORT_CIRCUIT_CURRENT_ID = 8L;
+  private static final long RATED_SHORT_TIME_WITHSTAND_CURRENT_ID = 9L;
+  private static final long ENERGY_ABSORPTION_CAPABILITY_ID = 10L;
+  private static final long RESPONSE_TIME_ID = 11L;
+
+  public ElectricalProtectionAlarmClusterSurgeProtectionRatingsStruct(
+    Optional<Integer> tripMechanism,
+    Optional<Integer> protectionClass,
+    Optional<Integer> protectionType,
+    Optional<Long> maxContinuousOperatingVoltage,
+    Optional<Long> maxVoltageProtection,
+    Optional<Long> maxTemporaryVoltage,
+    Optional<Long> nominalDischargeCurrent,
+    Optional<Long> maximumDishargeCurrent,
+    Optional<Long> ratedShortCircuitCurrent,
+    Optional<Long> ratedShortTimeWithstandCurrent,
+    Optional<Long> energyAbsorptionCapability,
+    Optional<Long> responseTime
+  ) {
+    this.tripMechanism = tripMechanism;
+    this.protectionClass = protectionClass;
+    this.protectionType = protectionType;
+    this.maxContinuousOperatingVoltage = maxContinuousOperatingVoltage;
+    this.maxVoltageProtection = maxVoltageProtection;
+    this.maxTemporaryVoltage = maxTemporaryVoltage;
+    this.nominalDischargeCurrent = nominalDischargeCurrent;
+    this.maximumDishargeCurrent = maximumDishargeCurrent;
+    this.ratedShortCircuitCurrent = ratedShortCircuitCurrent;
+    this.ratedShortTimeWithstandCurrent = ratedShortTimeWithstandCurrent;
+    this.energyAbsorptionCapability = energyAbsorptionCapability;
+    this.responseTime = responseTime;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(TRIP_MECHANISM_ID, tripMechanism.<BaseTLVType>map((nonOptionaltripMechanism) -> new UIntType(nonOptionaltripMechanism)).orElse(new EmptyType())));
+    values.add(new StructElement(PROTECTION_CLASS_ID, protectionClass.<BaseTLVType>map((nonOptionalprotectionClass) -> new UIntType(nonOptionalprotectionClass)).orElse(new EmptyType())));
+    values.add(new StructElement(PROTECTION_TYPE_ID, protectionType.<BaseTLVType>map((nonOptionalprotectionType) -> new UIntType(nonOptionalprotectionType)).orElse(new EmptyType())));
+    values.add(new StructElement(MAX_CONTINUOUS_OPERATING_VOLTAGE_ID, maxContinuousOperatingVoltage.<BaseTLVType>map((nonOptionalmaxContinuousOperatingVoltage) -> new IntType(nonOptionalmaxContinuousOperatingVoltage)).orElse(new EmptyType())));
+    values.add(new StructElement(MAX_VOLTAGE_PROTECTION_ID, maxVoltageProtection.<BaseTLVType>map((nonOptionalmaxVoltageProtection) -> new IntType(nonOptionalmaxVoltageProtection)).orElse(new EmptyType())));
+    values.add(new StructElement(MAX_TEMPORARY_VOLTAGE_ID, maxTemporaryVoltage.<BaseTLVType>map((nonOptionalmaxTemporaryVoltage) -> new IntType(nonOptionalmaxTemporaryVoltage)).orElse(new EmptyType())));
+    values.add(new StructElement(NOMINAL_DISCHARGE_CURRENT_ID, nominalDischargeCurrent.<BaseTLVType>map((nonOptionalnominalDischargeCurrent) -> new IntType(nonOptionalnominalDischargeCurrent)).orElse(new EmptyType())));
+    values.add(new StructElement(MAXIMUM_DISHARGE_CURRENT_ID, maximumDishargeCurrent.<BaseTLVType>map((nonOptionalmaximumDishargeCurrent) -> new IntType(nonOptionalmaximumDishargeCurrent)).orElse(new EmptyType())));
+    values.add(new StructElement(RATED_SHORT_CIRCUIT_CURRENT_ID, ratedShortCircuitCurrent.<BaseTLVType>map((nonOptionalratedShortCircuitCurrent) -> new IntType(nonOptionalratedShortCircuitCurrent)).orElse(new EmptyType())));
+    values.add(new StructElement(RATED_SHORT_TIME_WITHSTAND_CURRENT_ID, ratedShortTimeWithstandCurrent.<BaseTLVType>map((nonOptionalratedShortTimeWithstandCurrent) -> new IntType(nonOptionalratedShortTimeWithstandCurrent)).orElse(new EmptyType())));
+    values.add(new StructElement(ENERGY_ABSORPTION_CAPABILITY_ID, energyAbsorptionCapability.<BaseTLVType>map((nonOptionalenergyAbsorptionCapability) -> new UIntType(nonOptionalenergyAbsorptionCapability)).orElse(new EmptyType())));
+    values.add(new StructElement(RESPONSE_TIME_ID, responseTime.<BaseTLVType>map((nonOptionalresponseTime) -> new UIntType(nonOptionalresponseTime)).orElse(new EmptyType())));
+
+    return new StructType(values);
+  }
+
+  public static ElectricalProtectionAlarmClusterSurgeProtectionRatingsStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Optional<Integer> tripMechanism = Optional.empty();
+    Optional<Integer> protectionClass = Optional.empty();
+    Optional<Integer> protectionType = Optional.empty();
+    Optional<Long> maxContinuousOperatingVoltage = Optional.empty();
+    Optional<Long> maxVoltageProtection = Optional.empty();
+    Optional<Long> maxTemporaryVoltage = Optional.empty();
+    Optional<Long> nominalDischargeCurrent = Optional.empty();
+    Optional<Long> maximumDishargeCurrent = Optional.empty();
+    Optional<Long> ratedShortCircuitCurrent = Optional.empty();
+    Optional<Long> ratedShortTimeWithstandCurrent = Optional.empty();
+    Optional<Long> energyAbsorptionCapability = Optional.empty();
+    Optional<Long> responseTime = Optional.empty();
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == TRIP_MECHANISM_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          tripMechanism = Optional.of(castingValue.value(Integer.class));
+        }
+      } else if (element.contextTagNum() == PROTECTION_CLASS_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          protectionClass = Optional.of(castingValue.value(Integer.class));
+        }
+      } else if (element.contextTagNum() == PROTECTION_TYPE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          protectionType = Optional.of(castingValue.value(Integer.class));
+        }
+      } else if (element.contextTagNum() == MAX_CONTINUOUS_OPERATING_VOLTAGE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Int) {
+          IntType castingValue = element.value(IntType.class);
+          maxContinuousOperatingVoltage = Optional.of(castingValue.value(Long.class));
+        }
+      } else if (element.contextTagNum() == MAX_VOLTAGE_PROTECTION_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Int) {
+          IntType castingValue = element.value(IntType.class);
+          maxVoltageProtection = Optional.of(castingValue.value(Long.class));
+        }
+      } else if (element.contextTagNum() == MAX_TEMPORARY_VOLTAGE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Int) {
+          IntType castingValue = element.value(IntType.class);
+          maxTemporaryVoltage = Optional.of(castingValue.value(Long.class));
+        }
+      } else if (element.contextTagNum() == NOMINAL_DISCHARGE_CURRENT_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Int) {
+          IntType castingValue = element.value(IntType.class);
+          nominalDischargeCurrent = Optional.of(castingValue.value(Long.class));
+        }
+      } else if (element.contextTagNum() == MAXIMUM_DISHARGE_CURRENT_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Int) {
+          IntType castingValue = element.value(IntType.class);
+          maximumDishargeCurrent = Optional.of(castingValue.value(Long.class));
+        }
+      } else if (element.contextTagNum() == RATED_SHORT_CIRCUIT_CURRENT_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Int) {
+          IntType castingValue = element.value(IntType.class);
+          ratedShortCircuitCurrent = Optional.of(castingValue.value(Long.class));
+        }
+      } else if (element.contextTagNum() == RATED_SHORT_TIME_WITHSTAND_CURRENT_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Int) {
+          IntType castingValue = element.value(IntType.class);
+          ratedShortTimeWithstandCurrent = Optional.of(castingValue.value(Long.class));
+        }
+      } else if (element.contextTagNum() == ENERGY_ABSORPTION_CAPABILITY_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          energyAbsorptionCapability = Optional.of(castingValue.value(Long.class));
+        }
+      } else if (element.contextTagNum() == RESPONSE_TIME_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          responseTime = Optional.of(castingValue.value(Long.class));
+        }
+      }
+    }
+    return new ElectricalProtectionAlarmClusterSurgeProtectionRatingsStruct(
+      tripMechanism,
+      protectionClass,
+      protectionType,
+      maxContinuousOperatingVoltage,
+      maxVoltageProtection,
+      maxTemporaryVoltage,
+      nominalDischargeCurrent,
+      maximumDishargeCurrent,
+      ratedShortCircuitCurrent,
+      ratedShortTimeWithstandCurrent,
+      energyAbsorptionCapability,
+      responseTime
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("ElectricalProtectionAlarmClusterSurgeProtectionRatingsStruct {\n");
+    output.append("\ttripMechanism: ");
+    output.append(tripMechanism);
+    output.append("\n");
+    output.append("\tprotectionClass: ");
+    output.append(protectionClass);
+    output.append("\n");
+    output.append("\tprotectionType: ");
+    output.append(protectionType);
+    output.append("\n");
+    output.append("\tmaxContinuousOperatingVoltage: ");
+    output.append(maxContinuousOperatingVoltage);
+    output.append("\n");
+    output.append("\tmaxVoltageProtection: ");
+    output.append(maxVoltageProtection);
+    output.append("\n");
+    output.append("\tmaxTemporaryVoltage: ");
+    output.append(maxTemporaryVoltage);
+    output.append("\n");
+    output.append("\tnominalDischargeCurrent: ");
+    output.append(nominalDischargeCurrent);
+    output.append("\n");
+    output.append("\tmaximumDishargeCurrent: ");
+    output.append(maximumDishargeCurrent);
+    output.append("\n");
+    output.append("\tratedShortCircuitCurrent: ");
+    output.append(ratedShortCircuitCurrent);
+    output.append("\n");
+    output.append("\tratedShortTimeWithstandCurrent: ");
+    output.append(ratedShortTimeWithstandCurrent);
+    output.append("\n");
+    output.append("\tenergyAbsorptionCapability: ");
+    output.append(energyAbsorptionCapability);
+    output.append("\n");
+    output.append("\tresponseTime: ");
+    output.append(responseTime);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class DoorLockClusterCredentialStruct {
   public Integer credentialType;
   public Integer credentialIndex;
@@ -11289,6 +12045,248 @@ public static class ThermostatClusterWeeklyScheduleTransitionStruct {
     output.append("\n");
     output.append("\tcoolSetpoint: ");
     output.append(coolSetpoint);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class DynamicLightingClusterEffectColorStruct {
+  public @Nullable Integer level;
+  public @Nullable Integer x;
+  public @Nullable Integer y;
+  public @Nullable Integer hue;
+  public @Nullable Integer enhancedHue;
+  public @Nullable Integer saturation;
+  private static final long LEVEL_ID = 0L;
+  private static final long X_ID = 1L;
+  private static final long Y_ID = 2L;
+  private static final long HUE_ID = 3L;
+  private static final long ENHANCED_HUE_ID = 4L;
+  private static final long SATURATION_ID = 5L;
+
+  public DynamicLightingClusterEffectColorStruct(
+    @Nullable Integer level,
+    @Nullable Integer x,
+    @Nullable Integer y,
+    @Nullable Integer hue,
+    @Nullable Integer enhancedHue,
+    @Nullable Integer saturation
+  ) {
+    this.level = level;
+    this.x = x;
+    this.y = y;
+    this.hue = hue;
+    this.enhancedHue = enhancedHue;
+    this.saturation = saturation;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(LEVEL_ID, level != null ? new UIntType(level) : new NullType()));
+    values.add(new StructElement(X_ID, x != null ? new UIntType(x) : new NullType()));
+    values.add(new StructElement(Y_ID, y != null ? new UIntType(y) : new NullType()));
+    values.add(new StructElement(HUE_ID, hue != null ? new UIntType(hue) : new NullType()));
+    values.add(new StructElement(ENHANCED_HUE_ID, enhancedHue != null ? new UIntType(enhancedHue) : new NullType()));
+    values.add(new StructElement(SATURATION_ID, saturation != null ? new UIntType(saturation) : new NullType()));
+
+    return new StructType(values);
+  }
+
+  public static DynamicLightingClusterEffectColorStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    @Nullable Integer level = null;
+    @Nullable Integer x = null;
+    @Nullable Integer y = null;
+    @Nullable Integer hue = null;
+    @Nullable Integer enhancedHue = null;
+    @Nullable Integer saturation = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == LEVEL_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          level = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == X_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          x = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == Y_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          y = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == HUE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          hue = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == ENHANCED_HUE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          enhancedHue = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == SATURATION_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          saturation = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new DynamicLightingClusterEffectColorStruct(
+      level,
+      x,
+      y,
+      hue,
+      enhancedHue,
+      saturation
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("DynamicLightingClusterEffectColorStruct {\n");
+    output.append("\tlevel: ");
+    output.append(level);
+    output.append("\n");
+    output.append("\tx: ");
+    output.append(x);
+    output.append("\n");
+    output.append("\ty: ");
+    output.append(y);
+    output.append("\n");
+    output.append("\thue: ");
+    output.append(hue);
+    output.append("\n");
+    output.append("\tenhancedHue: ");
+    output.append(enhancedHue);
+    output.append("\n");
+    output.append("\tsaturation: ");
+    output.append(saturation);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class DynamicLightingClusterEffectStruct {
+  public Integer effectID;
+  public Integer source;
+  public String label;
+  public Integer maxSpeed;
+  public Integer defaultSpeed;
+  public Boolean supportsColorPalette;
+  private static final long EFFECT_ID_ID = 0L;
+  private static final long SOURCE_ID = 1L;
+  private static final long LABEL_ID = 2L;
+  private static final long MAX_SPEED_ID = 3L;
+  private static final long DEFAULT_SPEED_ID = 4L;
+  private static final long SUPPORTS_COLOR_PALETTE_ID = 5L;
+
+  public DynamicLightingClusterEffectStruct(
+    Integer effectID,
+    Integer source,
+    String label,
+    Integer maxSpeed,
+    Integer defaultSpeed,
+    Boolean supportsColorPalette
+  ) {
+    this.effectID = effectID;
+    this.source = source;
+    this.label = label;
+    this.maxSpeed = maxSpeed;
+    this.defaultSpeed = defaultSpeed;
+    this.supportsColorPalette = supportsColorPalette;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(EFFECT_ID_ID, new UIntType(effectID)));
+    values.add(new StructElement(SOURCE_ID, new UIntType(source)));
+    values.add(new StructElement(LABEL_ID, new StringType(label)));
+    values.add(new StructElement(MAX_SPEED_ID, new UIntType(maxSpeed)));
+    values.add(new StructElement(DEFAULT_SPEED_ID, new UIntType(defaultSpeed)));
+    values.add(new StructElement(SUPPORTS_COLOR_PALETTE_ID, new BooleanType(supportsColorPalette)));
+
+    return new StructType(values);
+  }
+
+  public static DynamicLightingClusterEffectStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer effectID = null;
+    Integer source = null;
+    String label = null;
+    Integer maxSpeed = null;
+    Integer defaultSpeed = null;
+    Boolean supportsColorPalette = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == EFFECT_ID_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          effectID = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == SOURCE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          source = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == LABEL_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          label = castingValue.value(String.class);
+        }
+      } else if (element.contextTagNum() == MAX_SPEED_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          maxSpeed = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == DEFAULT_SPEED_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          defaultSpeed = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == SUPPORTS_COLOR_PALETTE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Boolean) {
+          BooleanType castingValue = element.value(BooleanType.class);
+          supportsColorPalette = castingValue.value(Boolean.class);
+        }
+      }
+    }
+    return new DynamicLightingClusterEffectStruct(
+      effectID,
+      source,
+      label,
+      maxSpeed,
+      defaultSpeed,
+      supportsColorPalette
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("DynamicLightingClusterEffectStruct {\n");
+    output.append("\teffectID: ");
+    output.append(effectID);
+    output.append("\n");
+    output.append("\tsource: ");
+    output.append(source);
+    output.append("\n");
+    output.append("\tlabel: ");
+    output.append(label);
+    output.append("\n");
+    output.append("\tmaxSpeed: ");
+    output.append(maxSpeed);
+    output.append("\n");
+    output.append("\tdefaultSpeed: ");
+    output.append(defaultSpeed);
+    output.append("\n");
+    output.append("\tsupportsColorPalette: ");
+    output.append(supportsColorPalette);
     output.append("\n");
     output.append("}\n");
     return output.toString();
@@ -20915,10 +21913,10 @@ public static class JointFabricDatastoreClusterDatastoreBindingTargetStruct {
   public Optional<Integer> group;
   public Optional<Integer> endpoint;
   public Optional<Long> cluster;
-  private static final long NODE_ID = 0L;
-  private static final long GROUP_ID = 1L;
-  private static final long ENDPOINT_ID = 2L;
-  private static final long CLUSTER_ID = 3L;
+  private static final long NODE_ID = 1L;
+  private static final long GROUP_ID = 2L;
+  private static final long ENDPOINT_ID = 3L;
+  private static final long CLUSTER_ID = 4L;
 
   public JointFabricDatastoreClusterDatastoreBindingTargetStruct(
     Optional<Long> node,
@@ -21188,10 +22186,10 @@ public static class JointFabricDatastoreClusterDatastoreAccessControlEntryStruct
   public Integer authMode;
   public @Nullable ArrayList<Long> subjects;
   public @Nullable ArrayList<ChipStructs.JointFabricDatastoreClusterDatastoreAccessControlTargetStruct> targets;
-  private static final long PRIVILEGE_ID = 0L;
-  private static final long AUTH_MODE_ID = 1L;
-  private static final long SUBJECTS_ID = 2L;
-  private static final long TARGETS_ID = 3L;
+  private static final long PRIVILEGE_ID = 1L;
+  private static final long AUTH_MODE_ID = 2L;
+  private static final long SUBJECTS_ID = 3L;
+  private static final long TARGETS_ID = 4L;
 
   public JointFabricDatastoreClusterDatastoreAccessControlEntryStruct(
     Integer privilege,
@@ -21662,7 +22660,6 @@ public static class JointFabricDatastoreClusterDatastoreGroupKeySetStruct {
   public @Nullable Long epochStartTime1;
   public @Nullable byte[] epochKey2;
   public @Nullable Long epochStartTime2;
-  public Integer groupKeyMulticastPolicy;
   private static final long GROUP_KEY_SET_ID_ID = 0L;
   private static final long GROUP_KEY_SECURITY_POLICY_ID = 1L;
   private static final long EPOCH_KEY0_ID = 2L;
@@ -21671,7 +22668,6 @@ public static class JointFabricDatastoreClusterDatastoreGroupKeySetStruct {
   private static final long EPOCH_START_TIME1_ID = 5L;
   private static final long EPOCH_KEY2_ID = 6L;
   private static final long EPOCH_START_TIME2_ID = 7L;
-  private static final long GROUP_KEY_MULTICAST_POLICY_ID = 8L;
 
   public JointFabricDatastoreClusterDatastoreGroupKeySetStruct(
     Integer groupKeySetID,
@@ -21681,8 +22677,7 @@ public static class JointFabricDatastoreClusterDatastoreGroupKeySetStruct {
     @Nullable byte[] epochKey1,
     @Nullable Long epochStartTime1,
     @Nullable byte[] epochKey2,
-    @Nullable Long epochStartTime2,
-    Integer groupKeyMulticastPolicy
+    @Nullable Long epochStartTime2
   ) {
     this.groupKeySetID = groupKeySetID;
     this.groupKeySecurityPolicy = groupKeySecurityPolicy;
@@ -21692,7 +22687,6 @@ public static class JointFabricDatastoreClusterDatastoreGroupKeySetStruct {
     this.epochStartTime1 = epochStartTime1;
     this.epochKey2 = epochKey2;
     this.epochStartTime2 = epochStartTime2;
-    this.groupKeyMulticastPolicy = groupKeyMulticastPolicy;
   }
 
   public StructType encodeTlv() {
@@ -21705,7 +22699,6 @@ public static class JointFabricDatastoreClusterDatastoreGroupKeySetStruct {
     values.add(new StructElement(EPOCH_START_TIME1_ID, epochStartTime1 != null ? new UIntType(epochStartTime1) : new NullType()));
     values.add(new StructElement(EPOCH_KEY2_ID, epochKey2 != null ? new ByteArrayType(epochKey2) : new NullType()));
     values.add(new StructElement(EPOCH_START_TIME2_ID, epochStartTime2 != null ? new UIntType(epochStartTime2) : new NullType()));
-    values.add(new StructElement(GROUP_KEY_MULTICAST_POLICY_ID, new UIntType(groupKeyMulticastPolicy)));
 
     return new StructType(values);
   }
@@ -21722,7 +22715,6 @@ public static class JointFabricDatastoreClusterDatastoreGroupKeySetStruct {
     @Nullable Long epochStartTime1 = null;
     @Nullable byte[] epochKey2 = null;
     @Nullable Long epochStartTime2 = null;
-    Integer groupKeyMulticastPolicy = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == GROUP_KEY_SET_ID_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -21764,11 +22756,6 @@ public static class JointFabricDatastoreClusterDatastoreGroupKeySetStruct {
           UIntType castingValue = element.value(UIntType.class);
           epochStartTime2 = castingValue.value(Long.class);
         }
-      } else if (element.contextTagNum() == GROUP_KEY_MULTICAST_POLICY_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          groupKeyMulticastPolicy = castingValue.value(Integer.class);
-        }
       }
     }
     return new JointFabricDatastoreClusterDatastoreGroupKeySetStruct(
@@ -21779,8 +22766,7 @@ public static class JointFabricDatastoreClusterDatastoreGroupKeySetStruct {
       epochKey1,
       epochStartTime1,
       epochKey2,
-      epochStartTime2,
-      groupKeyMulticastPolicy
+      epochStartTime2
     );
   }
 
@@ -21811,9 +22797,6 @@ public static class JointFabricDatastoreClusterDatastoreGroupKeySetStruct {
     output.append("\n");
     output.append("\tepochStartTime2: ");
     output.append(epochStartTime2);
-    output.append("\n");
-    output.append("\tgroupKeyMulticastPolicy: ");
-    output.append(groupKeyMulticastPolicy);
     output.append("\n");
     output.append("}\n");
     return output.toString();

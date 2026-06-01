@@ -234,7 +234,7 @@ CHIP_ERROR NxpChipDnssdRemoveServices()
 
     mServiceListFreeIndex = 0;
 
-    while (mServiceListFreeIndex <= kServiceListSize)
+    while (mServiceListFreeIndex < kServiceListSize)
     {
         // allocate memory for new entry if the entry is not allready allocated from previous iteration
         if (mServiceList[mServiceListFreeIndex] == nullptr)
@@ -362,6 +362,8 @@ CHIP_ERROR NxpChipDnssdPublishService(const DnssdService * service, DnssdPublish
         {
             otServiceData.mHostName = service->mHostName;
         }
+
+        VerifyOrReturnError(service->mSubTypeSize <= UINT16_MAX, CHIP_ERROR_INVALID_ARGUMENT);
 
         otServiceData.mServiceInstance     = service->mName;
         otServiceData.mServiceType         = serviceType;

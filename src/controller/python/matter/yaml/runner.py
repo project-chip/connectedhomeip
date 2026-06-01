@@ -20,7 +20,7 @@ import queue
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from enum import Enum, IntEnum
-from typing import Any, Optional, Tuple
+from typing import Any, Optional
 
 from matter.idl.generators.filters import to_pascal_case, to_snake_case
 from matter.yamltests.pseudo_clusters.pseudo_clusters import get_default_pseudo_clusters
@@ -673,7 +673,7 @@ class DiscoveryCommandAction(BaseAction):
     """DiscoveryCommand implementation (FindCommissionable* methods)."""
 
     @staticmethod
-    def _filter_for_step(test_step) -> Tuple[discovery.FilterType, Any]:
+    def _filter_for_step(test_step) -> tuple[discovery.FilterType, Any]:
         """Given a test step, figure out the correct filters to give to
            DiscoverCommissionableNodes.
         """
@@ -689,19 +689,19 @@ class DiscoveryCommandAction(BaseAction):
         args = test_step.arguments['values']
         request_data_as_dict = Converter.convert_list_of_name_value_pair_to_dict(args)
 
-        filter = request_data_as_dict['value']
+        flt = request_data_as_dict['value']
 
         if test_step.command == 'FindCommissionableByDeviceType':
-            return discovery.FilterType.DEVICE_TYPE, filter
+            return discovery.FilterType.DEVICE_TYPE, flt
 
         if test_step.command == 'FindCommissionableByLongDiscriminator':
-            return discovery.FilterType.LONG_DISCRIMINATOR, filter
+            return discovery.FilterType.LONG_DISCRIMINATOR, flt
 
         if test_step.command == 'FindCommissionableByShortDiscriminator':
-            return discovery.FilterType.SHORT_DISCRIMINATOR, filter
+            return discovery.FilterType.SHORT_DISCRIMINATOR, flt
 
         if test_step.command == 'FindCommissionableByVendorId':
-            return discovery.FilterType.VENDOR_ID, filter
+            return discovery.FilterType.VENDOR_ID, flt
 
         raise UnexpectedActionCreationError(f'Invalid command: {test_step.command}')
 
@@ -992,8 +992,8 @@ class ReplTestRunner:
 
         return decoded_response
 
-    def _get_fabric_id(self, id):
-        return _TestFabricId[id.upper()].value
+    def _get_fabric_id(self, _id):
+        return _TestFabricId[_id.upper()].value
 
     def _get_dev_ctrl(self, action: BaseAction):
         if action.identity is not None:
