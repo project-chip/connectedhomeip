@@ -119,7 +119,6 @@ class TC_EPALM_2_3(MatterBaseTest):
         }
 
         step_num = 4
-        expected_supported = 0
 
         for feature_bit, alarm_bit in feature_alarm_map.items():
             self.step(step_num)
@@ -129,7 +128,6 @@ class TC_EPALM_2_3(MatterBaseTest):
                     f"Feature {feature_bit.name} is set in FeatureMap but "
                     f"corresponding alarm bit {alarm_bit.name} is NOT set in Supported"
                 )
-                expected_supported |= alarm_bit
                 log.info(f"Feature {feature_bit.name}: present, alarm bit {alarm_bit.name} verified in Supported")
             else:
                 log.info(f"Feature {feature_bit.name}: not present, skipping")
