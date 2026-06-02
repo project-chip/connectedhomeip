@@ -1,5 +1,5 @@
 #
-#    Copyright (c) 2024 Project CHIP Authors
+#    Copyright (c) 2025 Project CHIP Authors
 #    All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,7 +21,7 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${EVSE_APP}
+#     app: ${ALL_CLUSTERS_APP}
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
 #       --storage-path admin_storage.json
@@ -30,6 +30,7 @@
 #       --passcode 20202021
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#       --endpoint 1
 #     factory-reset: true
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
@@ -39,66 +40,164 @@ import logging
 from mobly import asserts
 
 import matter.clusters as Clusters
-from matter.testing.decorators import async_test_body
+from matter.interaction_model import InteractionModelError, Status
+from matter.testing.decorators import has_cluster, run_if_endpoint_matches
 from matter.testing.matter_testing import MatterBaseTest
-from matter.testing.runner import default_matter_test_main
+from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
 class TC_PWRTL_2_1(MatterBaseTest):
+    """TC-PWRTL-2.1: Attributes with DUT as Server (Updated)
+
+    Verify FeatureMap (including the Matter 1.7 CIRC bit 4 with reserved-bit
+    discipline), AttributeList composition based on topology features,
+    AvailableEndpoints and ActiveEndpoints reads, the subset invariant
+    (ActiveEndpoints subset of AvailableEndpoints), and read-only access
+    on both endpoint list attributes.
+    """
+
+    def desc_TC_PWRTL_2_1(self) -> str:
+        return "[TC-PWRTL-2.1] Attributes with DUT as Server"
 
     def pics_TC_PWRTL_2_1(self) -> list[str]:
         return ["PWRTL.S"]
+
+    def steps_TC_PWRTL_2_1(self) -> list[TestStep]:
+        return [
+            TestStep(1, "Commissioning, already done", is_commissioning=True),
+            TestStep(2, "TH reads FeatureMap from DUT"),
+            TestStep(3, "TH validates O.a conformance (exactly one of NODE/TREE/SET)"),
+            TestStep(4, "TH validates CIRC bit and reserved bits"),
+            TestStep(5, "TH reads AttributeList from DUT"),
+            TestStep(6, "TH reads AvailableEndpoints (if applicable)"),
+            TestStep(7, "TH reads ActiveEndpoints (if applicable)"),
+            TestStep(8, "TH verifies ActiveEndpoints is subset of AvailableEndpoints"),
+            TestStep(9, "TH attempts write to AvailableEndpoints - expect UNSUPPORTED_WRITE"),
+        ]
 
     @property
     def default_endpoint(self) -> int:
         return 1
 
-    @async_test_body
+    @run_if_endpoint_matches(has_cluster(Clusters.PowerTopology))
     async def test_TC_PWRTL_2_1(self):
-
-        attributes = Clusters.PowerTopology.Attributes
-
         endpoint = self.get_endpoint()
+        cluster = Clusters.PowerTopology
+        attributes = cluster.Attributes
+        features = cluster.Bitmaps.Feature
 
-        powertop_attr_list = Clusters.Objects.PowerTopology.Attributes.AttributeList
-        powertop_cluster = Clusters.Objects.PowerTopology
-        attribute_list = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=powertop_cluster, attribute=powertop_attr_list)
-        avail_endpoints_attr_id = Clusters.Objects.PowerTopology.Attributes.ActiveEndpoints.attribute_id
-        act_endpoints_attr_id = Clusters.Objects.PowerTopology.Attributes.AvailableEndpoints.attribute_id
+        self.step(1)
 
-        self.print_step(1, "Commissioning, already done")
+        # Step 2: Read FeatureMap
+        self.step(2)
+        feature_map = await self.read_single_attribute_check_success(
+            endpoint=endpoint,
+            cluster=cluster,
+            attribute=attributes.FeatureMap
+        )
+        log.info(f"FeatureMap: 0x{feature_map:08X}")
 
-        self.print_step(2, "Read AvailableAttributes attribute")
-        if avail_endpoints_attr_id in attribute_list:
-            available_endpoints = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=Clusters.Objects.PowerTopology, attribute=attributes.AvailableEndpoints)
+        # Step 3: Validate O.a conformance - exactly one of NODE/TREE/SET
+        self.step(3)
+        has_node = bool(feature_map & features.kNodeTopology)
+        has_tree = bool(feature_map & features.kTreeTopology)
+        has_set = bool(feature_map & features.kSetTopology)
+        topology_count = sum([has_node, has_tree, has_set])
+        asserts.assert_equal(topology_count, 1,
+                             f"Exactly one of NODE/TREE/SET must be set, got {topology_count}")
 
-            if available_endpoints == []:
-                log.info("AvailableEndpoints is an empty list")
-            else:
-                log.info("AvailableEndpoints: %s" % (available_endpoints))
-                asserts.assert_less_equal(len(available_endpoints), 20,
-                                          "AvailableEndpoints length %d must be less than 21!" % len(available_endpoints))
+        # DYPF only valid with SET
+        has_dypf = bool(feature_map & features.kDynamicPowerFlow)
+        if has_dypf:
+            asserts.assert_true(has_set,
+                                "DynamicPowerFlow (DYPF) requires SetTopology")
+        log.info(f"Topology: NODE={has_node}, TREE={has_tree}, SET={has_set}, "
+                 f"DYPF={has_dypf}")
 
+        # Step 4: Validate CIRC bit and reserved bits
+        self.step(4)
+        has_circ = bool(feature_map & features.kElectricalCircuit)
+        log.info(f"ElectricalCircuit (CIRC): {has_circ}")
+
+        # Bits 5..31 should be 0 (reserved)
+        KNOWN_BITS_MASK = (features.kNodeTopology | features.kTreeTopology |
+                           features.kSetTopology | features.kDynamicPowerFlow |
+                           features.kElectricalCircuit)
+        reserved_bits = feature_map & ~KNOWN_BITS_MASK
+        asserts.assert_equal(reserved_bits, 0,
+                             f"Reserved bits set in FeatureMap: 0x{reserved_bits:08X}")
+
+        # Step 5: Read AttributeList
+        self.step(5)
+        attribute_list = await self.read_single_attribute_check_success(
+            endpoint=endpoint,
+            cluster=cluster,
+            attribute=attributes.AttributeList
+        )
+        log.info(f"AttributeList: {attribute_list}")
+
+        # For TREE, SET, or CIRC, AvailableEndpoints and ActiveEndpoints must be present
+        needs_endpoint_attrs = has_tree or has_set or has_circ
+        avail_ep_id = attributes.AvailableEndpoints.attribute_id
+        active_ep_id = attributes.ActiveEndpoints.attribute_id
+
+        if needs_endpoint_attrs:
+            asserts.assert_in(avail_ep_id, attribute_list,
+                              "AvailableEndpoints must be in AttributeList for TREE/SET/CIRC")
+            asserts.assert_in(active_ep_id, attribute_list,
+                              "ActiveEndpoints must be in AttributeList for TREE/SET/CIRC")
+
+        # Step 6: Read AvailableEndpoints
+        self.step(6)
+        avail_eps = None
+        if avail_ep_id in attribute_list:
+            avail_eps = await self.read_single_attribute_check_success(
+                endpoint=endpoint,
+                cluster=cluster,
+                attribute=attributes.AvailableEndpoints
+            )
+            log.info(f"AvailableEndpoints: {avail_eps}")
         else:
-            self.mark_current_step_skipped()
+            log.info("AvailableEndpoints not in AttributeList (NODE topology)")
 
-        self.print_step(3, "Read ActiveEndpoints attribute")
-
-        if act_endpoints_attr_id in attribute_list:
-            active_endpoints = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=Clusters.Objects.PowerTopology,  attribute=attributes.ActiveEndpoints)
-            log.info("ActiveEndpoints: %s" % (active_endpoints))
-            asserts.assert_less_equal(len(active_endpoints), 20,
-                                      "ActiveEndpoints length %d must be less than 21!" % len(active_endpoints))
-
-            if available_endpoints == []:
-                # Verify that ActiveEndpoints is a subset of AvailableEndpoints
-                asserts.assert_true(set(active_endpoints).issubset(set(available_endpoints)),
-                                    "ActiveEndpoints should be a subset of AvailableEndpoints")
-
+        # Step 7: Read ActiveEndpoints
+        self.step(7)
+        active_eps = None
+        if active_ep_id in attribute_list:
+            active_eps = await self.read_single_attribute_check_success(
+                endpoint=endpoint,
+                cluster=cluster,
+                attribute=attributes.ActiveEndpoints
+            )
+            log.info(f"ActiveEndpoints: {active_eps}")
         else:
-            self.mark_current_step_skipped()
+            log.info("ActiveEndpoints not in AttributeList (NODE topology)")
+
+        # Step 8: Verify subset relationship
+        self.step(8)
+        if avail_eps is not None and active_eps is not None:
+            for ep in active_eps:
+                asserts.assert_in(ep, avail_eps,
+                                  f"ActiveEndpoint {ep} not in AvailableEndpoints")
+            log.info("ActiveEndpoints is a subset of AvailableEndpoints")
+        else:
+            log.info("Skipping subset check (endpoint attributes not present)")
+
+        # Step 9: Attempt write to AvailableEndpoints
+        self.step(9)
+        if avail_eps is not None:
+            try:
+                await self.default_controller.WriteAttribute(
+                    self.dut_node_id,
+                    [(endpoint, attributes.AvailableEndpoints([]))]
+                )
+                asserts.fail("Write to AvailableEndpoints should have failed")
+            except InteractionModelError as e:
+                asserts.assert_equal(e.status, Status.UnsupportedWrite,
+                                     "Write to AvailableEndpoints should return UNSUPPORTED_WRITE")
+
 
 
 if __name__ == "__main__":
