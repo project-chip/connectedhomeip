@@ -63,6 +63,10 @@
 #include <clusters/AudioOutput/Commands.h>
 #include <clusters/AudioOutput/Events.h>
 #include <clusters/AudioOutput/Structs.h>
+#include <clusters/AvAnalysis/Attributes.h>
+#include <clusters/AvAnalysis/Commands.h>
+#include <clusters/AvAnalysis/Events.h>
+#include <clusters/AvAnalysis/Structs.h>
 #include <clusters/BallastConfiguration/Attributes.h>
 #include <clusters/BallastConfiguration/Commands.h>
 #include <clusters/BallastConfiguration/Events.h>

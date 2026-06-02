@@ -1044,6 +1044,21 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Chime::Structs:
 
 static void Finalize(chip::app::Clusters::Chime::Structs::ChimeSoundStruct::Type & request);
 
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::AvAnalysis::Structs::AnalysisStreamStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::AvAnalysis::Structs::AnalysisStreamStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::AvAnalysis::Structs::ContextTriggerStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::AvAnalysis::Structs::ContextTriggerStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::AvAnalysis::Structs::TrackedContext::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::AvAnalysis::Structs::TrackedContext::Type & request);
+
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::CommodityTariff::Structs::PeakPeriodStruct::Type & request,
                         Json::Value & value);
 
