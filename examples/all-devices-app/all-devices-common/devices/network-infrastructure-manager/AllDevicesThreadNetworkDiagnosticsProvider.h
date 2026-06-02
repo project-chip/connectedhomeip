@@ -22,19 +22,20 @@
 
 namespace chip::app {
 
-class AllDevicesThreadDiagnosticsProvider : public Clusters::ThreadNetworkDiagnostics::DefaultThreadNetworkDiagnosticsProvider
+class AllDevicesThreadNetworkDiagnosticsProvider : public Clusters::ThreadNetworkDiagnostics::DefaultThreadNetworkDiagnosticsProvider
 {
 public:
     CHIP_ERROR WriteAttributeToTlv(AttributeId attributeId, app::AttributeValueEncoder & encoder) override
     {
         ChipLogProgress(AppServer,
-                        ">>> [Verification] AllDevicesThreadDiagnosticsProvider: Intercepted WriteAttributeToTlv read! <<<");
+                        ">>> [Verification] AllDevicesThreadNetworkDiagnosticsProvider: Intercepted WriteAttributeToTlv read! <<<");
         return DefaultThreadNetworkDiagnosticsProvider::WriteAttributeToTlv(attributeId, encoder);
     }
 
     void ResetCounts() override
     {
-        ChipLogProgress(AppServer, ">>> [Verification] AllDevicesThreadDiagnosticsProvider: Intercepted ResetCounts command! <<<");
+        ChipLogProgress(AppServer,
+                        ">>> [Verification] AllDevicesThreadNetworkDiagnosticsProvider: Intercepted ResetCounts command! <<<");
         DefaultThreadNetworkDiagnosticsProvider::ResetCounts();
     }
 };
