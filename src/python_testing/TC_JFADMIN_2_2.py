@@ -443,7 +443,5 @@ class TC_JFADMIN_2_2(CADMINBaseTest):
         asserts.assert_true(_admin_cat_found, "Administrator CAT not found in Admin App NOC on Ecosystem B")
 
 
-
-
 if __name__ == "__main__":
     default_matter_test_main()
