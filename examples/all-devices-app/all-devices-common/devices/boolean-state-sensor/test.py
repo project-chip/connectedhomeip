@@ -45,6 +45,7 @@ scripts/run_in_python_env.sh out/python_env \
 """
 
 import logging
+
 from attributes_service import attributes_service_pb2
 from mobly import asserts
 from pw_hdlc import rpc
