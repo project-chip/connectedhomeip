@@ -17,12 +17,22 @@
  */
 
 #include "CodegenIntegration.h"
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app/util/attribute-storage.h>
+#include <app/util/endpoint-config-api.h>
+#include <lib/support/CodeUtils.h>
+
+#include <optional>
 
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::SmokeCoAlarm;
+
+namespace {
+std::optional<SmokeCoAlarmServer> gSmokeCoAlarmServer;
+} // namespace
 
 SmokeCoAlarmServer::SmokeCoAlarmServer(EndpointId endpointId, const SmokeCoAlarmCluster::Config & config) :
     mEndpointId(endpointId), mConfig(config)
@@ -262,6 +272,40 @@ emberAfSmokeCoAlarmClusterSelfTestRequestCallback(CommandHandler * commandObj, c
     return true;
 }
 
-void __attribute__((weak)) MatterSmokeCoAlarmPluginServerInitCallback() {}
+void MatterSmokeCoAlarmPluginServerInitCallback()
+{
+    for (uint16_t i = 0; i < emberAfEndpointCount(); i++)
+    {
+        EndpointId endpointId = emberAfEndpointFromIndex(i);
+        if (!emberAfContainsServer(endpointId, SmokeCoAlarm::Id))
+            continue;
 
-void __attribute__((weak)) MatterSmokeCoAlarmPluginServerShutdownCallback() {}
+        uint32_t featureMapValue = 0;
+        Attributes::FeatureMap::Get(endpointId, &featureMapValue);
+
+        uint32_t optionalBits                    = 0;
+        constexpr AttributeId kOptionalAttribs[] = {
+            Attributes::DeviceMuted::Id,        Attributes::InterconnectSmokeAlarm::Id, Attributes::InterconnectCOAlarm::Id,
+            Attributes::ContaminationState::Id, Attributes::SmokeSensitivityLevel::Id,  Attributes::ExpiryDate::Id,
+            Attributes::Unmounted::Id,
+        };
+        for (AttributeId attrId : kOptionalAttribs)
+        {
+            if (emberAfContainsAttribute(endpointId, SmokeCoAlarm::Id, attrId))
+                optionalBits |= (1u << attrId);
+        }
+
+        SmokeCoAlarmCluster::Config config;
+        config.featureMap      = BitFlags<Feature>(featureMapValue);
+        config.optionalAttribs = SmokeCoAlarmCluster::OptionalAttributeSet(optionalBits);
+
+        gSmokeCoAlarmServer.emplace(endpointId, config);
+        LogErrorOnFailure(gSmokeCoAlarmServer->Init());
+        break;
+    }
+}
+
+void MatterSmokeCoAlarmPluginServerShutdownCallback()
+{
+    gSmokeCoAlarmServer.reset();
+}
