@@ -92,6 +92,8 @@
 #include <clusters/DynamicLighting/MetadataProvider.h>
 #include <clusters/EcosystemInformation/Ids.h>
 #include <clusters/EcosystemInformation/MetadataProvider.h>
+#include <clusters/ElectricalAlarm/Ids.h>
+#include <clusters/ElectricalAlarm/MetadataProvider.h>
 #include <clusters/ElectricalDistribution/Ids.h>
 #include <clusters/ElectricalDistribution/MetadataProvider.h>
 #include <clusters/ElectricalEnergyMeasurement/Ids.h>
@@ -530,6 +532,11 @@ std::optional<DataModel::AcceptedCommandEntry> AcceptedCommandEntryFor(ClusterId
     {
         if (id == EcosystemInformation::Id)
             return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, EcosystemInformation::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == ElectricalAlarm::Id) || ...))
+    {
+        if (id == ElectricalAlarm::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, ElectricalAlarm::Id>::EntryFor(command);
     }
     if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == ElectricalDistribution::Id) || ...))
     {

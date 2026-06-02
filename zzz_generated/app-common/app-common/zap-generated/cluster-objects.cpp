@@ -187,6 +187,10 @@
 #include <clusters/EcosystemInformation/Commands.ipp>
 #include <clusters/EcosystemInformation/Events.ipp>
 #include <clusters/EcosystemInformation/Structs.ipp>
+#include <clusters/ElectricalAlarm/Attributes.ipp>
+#include <clusters/ElectricalAlarm/Commands.ipp>
+#include <clusters/ElectricalAlarm/Events.ipp>
+#include <clusters/ElectricalAlarm/Structs.ipp>
 #include <clusters/ElectricalDistribution/Attributes.ipp>
 #include <clusters/ElectricalDistribution/Commands.ipp>
 #include <clusters/ElectricalDistribution/Events.ipp>
@@ -1197,6 +1201,13 @@ bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
         }
     }
     case Clusters::DeviceEnergyManagementMode::Id: {
+        switch (aCommand)
+        {
+        default:
+            return false;
+        }
+    }
+    case Clusters::ElectricalAlarm::Id: {
         switch (aCommand)
         {
         default:
