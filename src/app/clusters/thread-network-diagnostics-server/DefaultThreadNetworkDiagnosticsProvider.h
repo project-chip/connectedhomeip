@@ -24,7 +24,7 @@ namespace app {
 namespace Clusters {
 namespace ThreadNetworkDiagnostics {
 
-class DefaultThreadDiagnosticsProvider : public ThreadDiagnosticsProvider
+class DefaultThreadNetworkDiagnosticsProvider : public ThreadNetworkDiagnosticsProvider
 {
 public:
     CHIP_ERROR WriteAttributeToTlv(AttributeId attributeId, app::AttributeValueEncoder & encoder) override;

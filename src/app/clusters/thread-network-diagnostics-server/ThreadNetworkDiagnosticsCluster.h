@@ -43,7 +43,7 @@ public:
         kFull
     };
 
-    ThreadNetworkDiagnosticsCluster(EndpointId endpointId, ClusterType clusterType, ThreadDiagnosticsProvider & provider);
+    ThreadNetworkDiagnosticsCluster(EndpointId endpointId, ClusterType clusterType, ThreadNetworkDiagnostics::ThreadNetworkDiagnosticsProvider & provider);
 
     // Server cluster implementation
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
@@ -66,7 +66,7 @@ public:
 
 private:
     const ClusterType mClusterType;
-    ThreadDiagnosticsProvider * mProvider;
+    ThreadNetworkDiagnostics::ThreadNetworkDiagnosticsProvider & mProvider;
 };
 
 } // namespace chip::app::Clusters

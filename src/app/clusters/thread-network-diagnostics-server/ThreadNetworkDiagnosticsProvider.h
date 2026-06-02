@@ -22,15 +22,19 @@
 
 namespace chip {
 namespace app {
+namespace Clusters {
+namespace ThreadNetworkDiagnostics {
 
-class ThreadDiagnosticsProvider
+class ThreadNetworkDiagnosticsProvider
 {
 public:
-    virtual ~ThreadDiagnosticsProvider() = default;
+    virtual ~ThreadNetworkDiagnosticsProvider() = default;
 
     virtual CHIP_ERROR WriteAttributeToTlv(AttributeId attributeId, app::AttributeValueEncoder & encoder) = 0;
     virtual void ResetCounts()                                                                            = 0;
 };
 
+} // namespace ThreadNetworkDiagnostics
+} // namespace Clusters
 } // namespace app
 } // namespace chip

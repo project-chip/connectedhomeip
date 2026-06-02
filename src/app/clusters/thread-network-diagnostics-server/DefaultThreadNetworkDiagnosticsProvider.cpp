@@ -56,7 +56,7 @@ namespace chip::app::Clusters::ThreadNetworkDiagnostics {
  *       (2) Otherwise
  *           - Encode a NULL value for nullable attributes or 0 for the others.
  */
-CHIP_ERROR DefaultThreadDiagnosticsProvider::WriteAttributeToTlv(AttributeId attributeId, app::AttributeValueEncoder & encoder)
+CHIP_ERROR DefaultThreadNetworkDiagnosticsProvider::WriteAttributeToTlv(AttributeId attributeId, app::AttributeValueEncoder & encoder)
 {
     CHIP_ERROR err;
 #if (CHIP_DEVICE_CONFIG_ENABLE_THREAD && !CHIP_DEVICE_CONFIG_USES_OTBR_POSIX_DBUS_STACK)
@@ -732,7 +732,7 @@ CHIP_ERROR DefaultThreadDiagnosticsProvider::WriteAttributeToTlv(AttributeId att
     return err;
 }
 
-void DefaultThreadDiagnosticsProvider::ResetCounts()
+void DefaultThreadNetworkDiagnosticsProvider::ResetCounts()
 {
     DeviceLayer::ConnectivityMgr().ResetThreadNetworkDiagnosticsCounts();
 }

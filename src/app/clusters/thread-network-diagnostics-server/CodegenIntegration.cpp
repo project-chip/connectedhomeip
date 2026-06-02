@@ -39,6 +39,8 @@ constexpr size_t kThreadNetworkDiagnosticsMaxClusterCount =
 
 LazyRegisteredServerCluster<ThreadNetworkDiagnosticsCluster> gServers[kThreadNetworkDiagnosticsMaxClusterCount];
 
+DefaultThreadNetworkDiagnosticsProvider gDefaultProvider;
+
 class IntegrationDelegate : public CodegenClusterIntegration::Delegate
 {
 public:
@@ -55,11 +57,10 @@ public:
         //       This also technically means that zap could reduce flash by not including metdata (only featuremap has to be
         //       set and all attributes can be deselected ... it will make not difference here).
 
-        static DefaultThreadDiagnosticsProvider sDefaultProvider;
         gServers[clusterInstanceIndex].Create(endpointId,
                                               rawFeatureMap == 0 ? ThreadNetworkDiagnosticsCluster::ClusterType::kMinimal
                                                                  : ThreadNetworkDiagnosticsCluster::ClusterType::kFull,
-                                              sDefaultProvider);
+                                              gDefaultProvider);
         return gServers[clusterInstanceIndex].Registration();
     }
 

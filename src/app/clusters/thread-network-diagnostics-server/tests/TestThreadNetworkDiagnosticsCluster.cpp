@@ -45,7 +45,7 @@ struct TestThreadNetworkDiagnosticsCluster : public ::testing::Test
     TestThreadNetworkDiagnosticsCluster() {}
 
     TestServerClusterContext testContext;
-    DefaultThreadDiagnosticsProvider mProvider;
+    DefaultThreadNetworkDiagnosticsProvider mProvider;
 };
 
 } // namespace
