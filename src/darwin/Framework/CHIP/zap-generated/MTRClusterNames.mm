@@ -7684,8 +7684,8 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"AmbientContextTypeSupported";
             break;
 
-        case MTRAttributeIDTypeClusterAmbientContextSensingAttributeObjectCountReachedID:
-            result = @"ObjectCountReached";
+        case MTRAttributeIDTypeClusterAmbientContextSensingAttributeObjectCountThresholdReachedID:
+            result = @"ObjectCountThresholdReached";
             break;
 
         case MTRAttributeIDTypeClusterAmbientContextSensingAttributeObjectCountConfigID:
@@ -7710,6 +7710,10 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         case MTRAttributeIDTypeClusterAmbientContextSensingAttributePredictedActivityID:
             result = @"PredictedActivity";
+            break;
+
+        case MTRAttributeIDTypeClusterAmbientContextSensingAttributeSensorFusionSupportedID:
+            result = @"SensorFusionSupported";
             break;
 
         case MTRAttributeIDTypeClusterAmbientContextSensingAttributeGeneratedCommandListID:

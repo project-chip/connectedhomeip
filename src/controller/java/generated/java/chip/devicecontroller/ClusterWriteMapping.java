@@ -2907,28 +2907,6 @@ public class ClusterWriteMapping {
     Map<String, InteractionInfo> writeSoilMeasurementInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("soilMeasurement", writeSoilMeasurementInteractionInfo);
     Map<String, InteractionInfo> writeAmbientContextSensingInteractionInfo = new LinkedHashMap<>();
-    Map<String, CommandParameterInfo> writeAmbientContextSensingSimultaneousDetectionLimitCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo ambientContextSensingsimultaneousDetectionLimitCommandParameterInfo =
-        new CommandParameterInfo(
-            "value", 
-            Integer.class, 
-            Integer.class 
-        );
-    writeAmbientContextSensingSimultaneousDetectionLimitCommandParams.put(
-        "value",
-        ambientContextSensingsimultaneousDetectionLimitCommandParameterInfo
-    );
-    InteractionInfo writeAmbientContextSensingSimultaneousDetectionLimitAttributeInteractionInfo = new InteractionInfo(
-      (cluster, callback, commandArguments) -> {
-        ((ChipClusters.AmbientContextSensingCluster) cluster).writeSimultaneousDetectionLimitAttribute(
-          (DefaultClusterCallback) callback,
-          (Integer) commandArguments.get("value")
-        );
-      },
-      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
-      writeAmbientContextSensingSimultaneousDetectionLimitCommandParams
-    );
-    writeAmbientContextSensingInteractionInfo.put("writeSimultaneousDetectionLimitAttribute", writeAmbientContextSensingSimultaneousDetectionLimitAttributeInteractionInfo);
     Map<String, CommandParameterInfo> writeAmbientContextSensingHoldTimeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo ambientContextSensingholdTimeCommandParameterInfo =
         new CommandParameterInfo(

@@ -9074,7 +9074,7 @@ provisional cluster SoilMeasurement = 1072 {
 
 /** This server cluster provides an interface to ambient context sensing functionality. */
 provisional cluster AmbientContextSensing = 1073 {
-  revision 1;
+  revision 2;
 
   bitmap Feature : bitmap32 {
     kHumanActivity = 0x1;
@@ -9082,11 +9082,12 @@ provisional cluster AmbientContextSensing = 1073 {
     kObjectIdentification = 0x4;
     kSoundIdentification = 0x8;
     kPredictedActivity = 0x10;
+    kSensorFusion = 0x20;
   }
 
   struct AmbientContextTypeStruct {
     SemanticTagStruct ambientContextSensed[] = 0;
-    optional epoch_s detectionStartTime = 1;
+    optional nullable percent detectionConfidence = 1;
   }
 
   struct HoldTimeLimitsStruct {
@@ -9111,12 +9112,13 @@ provisional cluster AmbientContextSensing = 1073 {
 
   provisional info event AmbientContextDetectStarted = 0 {
     optional AmbientContextTypeStruct ambientContextDetected = 0;
-    optional boolean objectCountReached = 1;
+    optional boolean objectCountThresholdReached = 1;
     optional int16u objectCount = 2;
   }
 
   provisional info event AmbientContextDetectEnded = 1 {
-    posix_ms eventStartTime = 0;
+    optional posix_ms eventStartTimePos = 0;
+    optional systime_ms eventStartTimeSys = 1;
   }
 
   provisional readonly attribute optional boolean humanActivityDetected = 0;
@@ -9124,13 +9126,14 @@ provisional cluster AmbientContextSensing = 1073 {
   provisional readonly attribute optional boolean audioContextDetected = 2;
   provisional readonly attribute optional AmbientContextTypeStruct ambientContextType[] = 3;
   provisional readonly attribute optional SemanticTagStruct ambientContextTypeSupported[] = 4;
-  provisional readonly attribute optional boolean objectCountReached = 5;
+  provisional readonly attribute optional boolean objectCountThresholdReached = 5;
   provisional attribute access(write: manage) optional ObjectCountConfigStruct objectCountConfig = 6;
   provisional readonly attribute optional int16u objectCount = 7;
-  provisional attribute int8u simultaneousDetectionLimit = 8;
+  provisional readonly attribute int8u simultaneousDetectionLimit = 8;
   provisional attribute access(write: manage) int16u holdTime = 9;
   provisional readonly attribute HoldTimeLimitsStruct holdTimeLimits = 10;
   provisional readonly attribute optional PredictedActivityStruct predictedActivity[] = 11;
+  provisional readonly attribute optional SemanticTagStruct sensorFusionSupported[] = 12;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
