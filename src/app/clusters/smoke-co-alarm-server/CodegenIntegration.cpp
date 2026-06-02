@@ -257,5 +257,5 @@ emberAfSmokeCoAlarmClusterSelfTestRequestCallback(CommandHandler * commandObj, c
     return true;
 }
 
-void MatterSmokeCoAlarmPluginServerInitCallback() {}
-void MatterSmokeCoAlarmPluginServerShutdownCallback() {}
+void __attribute__((weak)) MatterSmokeCoAlarmPluginServerInitCallback() {}
+void __attribute__((weak)) MatterSmokeCoAlarmPluginServerShutdownCallback() {}
