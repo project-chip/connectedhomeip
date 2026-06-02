@@ -170,6 +170,7 @@ public:
 #endif
     static constexpr uint16_t kMaxStringLength = OT_IP6_ADDRESS_STRING_SIZE;
 #endif
+    static constexpr uint16_t kMaxAddressWithInterfaceLength = kMaxStringLength + 1 + Inet::InterfaceId::kMaxIfNameLength;
 
     IPAddress() = default;
 
@@ -371,6 +372,7 @@ public:
      * @return  The argument \c buf if no formatting error, or zero otherwise.
      */
     char * ToString(char * buf, uint32_t bufSize) const;
+    char * ToString(char * buf, uint32_t bufSize, const Inet::InterfaceId & interfaceId) const;
 
     /**
      * A version of ToString that writes to a literal and deduces how much space
@@ -380,6 +382,12 @@ public:
     inline char * ToString(char (&buf)[N]) const
     {
         return ToString(buf, N);
+    }
+
+    template <uint32_t N>
+    inline char * ToString(char (&buf)[N], const Inet::InterfaceId & interfaceId) const
+    {
+        return ToString(buf, N, interfaceId);
     }
 
     /**
@@ -428,7 +436,7 @@ public:
      * @retval true  The presentation format is valid
      * @retval false Otherwise
      */
-    static bool FromString(const char * str, IPAddress & addrOutput, class InterfaceId & ifaceOutput);
+    static bool FromString(const char * str, IPAddress & addrOutput, Inet::InterfaceId & ifaceOutput);
 
     /**
      * @brief   Emit the IP address in standard network representation.

@@ -29,6 +29,7 @@
 #include <lib/support/CHIPMemString.h>
 #include <platform/DiagnosticDataProvider.h>
 
+#include <inet/IPAddress.h>
 #include <inet/InetInterface.h>
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
