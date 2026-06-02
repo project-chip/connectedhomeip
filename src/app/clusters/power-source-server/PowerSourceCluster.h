@@ -806,7 +806,8 @@ public:
     }
     void SetOrder(uint8_t val)
     {
-        // This attribute is marked as `Persistent` but the cluster will not support the persistence because the attribute is `ReadOnly` to clients.
+        // This attribute is marked as `Persistent` but the cluster will not support the persistence because the attribute is
+        // `ReadOnly` to clients.
 
         SetAttributeValue(this->order, val, PowerSource::Attributes::Order::Id);
     }
