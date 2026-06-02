@@ -94,8 +94,8 @@ jobs:
                 gh-context: ${{ toJson(github) }}
 
             - name: Update Zephyr version 4.1.0 (develop) to specific revision (for developers purpose)
-              run:
-                scripts/run_in_build_env.sh "python3 scripts/tools/telink/update_zephyr.py https://github.com/telink-semi/zephyr.git f243cd36e52a5bb370f0b6accaa1da29a825b842 --sdk-repo https://github.com/telink-semi/tl_ble_sdk_zephyr.git --sdk-hash 200420569e5588abdd0c3d92f9e3e518e1fc8778"
+              run: 
+                scripts/run_in_build_env.sh "python3 scripts/tools/telink/update_zephyr.py https://github.com/telink-semi/zephyr.git 5a8e0e948faa5fbc0edbf1770d9e7a7d27d70999 --sdk-repo https://github.com/telink-semi/tl_ble_sdk_zephyr.git --sdk-hash f50d422d780efb73af939650ef7b8c6bf5a0b99b"
 
             - name: Download Factory Data tools
               uses: actions/download-artifact@v8
