@@ -48,18 +48,19 @@ class MatterStackState:
         if not hasattr(builtins, "chipStack"):
             matter.native.Init(bluetoothAdapter=config.ble_controller)
             if config.chip_tool_common_storage_path is not None and config.chip_tool_fabric_storage_path is not None:
-                self._init_stack(already_initialized=False, persistentStorage=PersistentStorageINI(
+                self._init_stack(already_initialized=False, persistent_storage=PersistentStorageINI(
                     config.chip_tool_common_storage_path, config.chip_tool_fabric_storage_path),
-                    enableServerInteractions=config.enable_server_interactions)
+                    enable_server_interactions=config.enable_server_interactions)
             else:
-                self._init_stack(already_initialized=False, persistentStorage=PersistentStorageJSON(config.storage_path),
-                                 enableServerInteractions=config.enable_server_interactions)
+                self._init_stack(already_initialized=False, persistent_storage=PersistentStorageJSON(config.storage_path),
+                                 enable_server_interactions=config.enable_server_interactions)
             self._we_initialized_the_stack = True
         else:
             self._init_stack(already_initialized=True)
             self._we_initialized_the_stack = False
 
-    def _init_stack(self, already_initialized: bool, **kwargs):
+    def _init_stack(self, already_initialized: bool, persistent_storage: PersistentStorage | None = None,
+                    enable_server_interactions: bool = True):
         if already_initialized:
             self._chip_stack = builtins.chipStack
             LOGGER.warning(
@@ -67,8 +68,8 @@ class MatterStackState:
                 "specified storage will be ignored!"
             )
             # TODO: Warn that storage will not follow what we set in config
-        else:
-            self._chip_stack = ChipStack(**kwargs)
+        elif persistent_storage:
+            self._chip_stack = ChipStack(persistent_storage, enableServerInteractions=enable_server_interactions)
             builtins.chipStack = self._chip_stack
 
         matter.logging.RedirectToPythonLogging()
@@ -80,7 +81,7 @@ class MatterStackState:
         if (len(self._certificate_authority_manager.activeCaList) == 0):
             LOGGER.warning(
                 "Didn't find any CertificateAuthorities in storage -- creating a new CertificateAuthority + FabricAdmin...")
-            ca = self._certificate_authority_manager.NewCertificateAuthority()
+            ca = self._certificate_authority_manager.NewCertificateAuthority(caIndex=self._config.root_of_trust_index)
             ca.maximizeCertChains = self._config.maximize_cert_chains
             ca.certificateValidityPeriodSec = self._config.certificate_validity_period
             ca.NewFabricAdmin(vendorId=0xFFF1, fabricId=self._config.fabric_id)
