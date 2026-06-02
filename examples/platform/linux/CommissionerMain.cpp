@@ -134,6 +134,8 @@ CHIP_ERROR InitCommissioner(uint16_t commissionerPort, uint16_t udcListenPort, F
     factoryParams.fabricIndependentStorage = &gServerStorage;
     factoryParams.fabricTable              = &Server::GetInstance().GetFabricTable();
     factoryParams.sessionKeystore          = &gSessionKeystore;
+    factoryParams.enableServerInteractions = true;
+    factoryParams.preventDnssdPortOverwrite = true;
     // We're running alongside an existing Server, so use the existing DataModelProvider
     // without changing the underlying persistent storage delegate.
     factoryParams.dataModelProvider = chip::app::CodegenDataModelProviderInstance(nullptr);
