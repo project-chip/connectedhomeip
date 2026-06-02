@@ -366,15 +366,14 @@ struct AllModulesExceptEndpointList
 };
 
 using NotifyCallback = std::function<void(AttributeId)>;
-template <class T, AttributeId Id>
 class BatteryTimerContext : public TimerContext
 {
 public:
     constexpr static inline uint16_t kTimerDurationS = 10;
-    BatteryTimerContext(TimerDelegate & timerDelegate, NotifyCallback notifier) :
-        mTimerDelegate(timerDelegate), mNotifier(std::move(notifier))
+    BatteryTimerContext(AttributeId id, TimerDelegate & timerDelegate, NotifyCallback notifier) :
+        mId(id), mTimerDelegate(timerDelegate), mNotifier(std::move(notifier))
     {}
-    CriticalFailure SetValue(T value)
+    CriticalFailure SetValue(uint32_t value)
     {
         mToBeReported = value;
 
@@ -400,14 +399,15 @@ public:
     }
 
 private:
-    T mReported{};
-    T mToBeReported{};
+    const AttributeId mId;
+    uint32_t mReported{};
+    uint32_t mToBeReported{};
     TimerDelegate & mTimerDelegate;
     NotifyCallback mNotifier;
     void NotifyChange()
     {
         mReported = mToBeReported;
-        mNotifier(Id);
+        mNotifier(mId);
     }
 };
 
@@ -418,13 +418,14 @@ struct BatteryTimerContextsModule
 template <>
 struct BatteryTimerContextsModule<true>
 {
-    BatteryTimerContext<uint8_t, PowerSource::Attributes::BatPercentRemaining::Id> batPercentRemainingNotifyTimerContext;
-    BatteryTimerContext<uint32_t, PowerSource::Attributes::BatTimeRemaining::Id> batTimeRemainingNotifyTimerContext;
-    BatteryTimerContext<uint32_t, PowerSource::Attributes::BatTimeToFullCharge::Id> batTimeToFullChargeNotifyTimerContext;
+    BatteryTimerContext batPercentRemainingNotifyTimerContext;
+    BatteryTimerContext batTimeRemainingNotifyTimerContext;
+    BatteryTimerContext batTimeToFullChargeNotifyTimerContext;
 
     BatteryTimerContextsModule(TimerDelegate & timerDelegate, NotifyCallback notifier) :
-        batPercentRemainingNotifyTimerContext(timerDelegate, notifier), batTimeRemainingNotifyTimerContext(timerDelegate, notifier),
-        batTimeToFullChargeNotifyTimerContext(timerDelegate, std::move(notifier))
+        batPercentRemainingNotifyTimerContext(PowerSource::Attributes::BatPercentRemaining::Id, timerDelegate, notifier),
+        batTimeRemainingNotifyTimerContext(PowerSource::Attributes::BatTimeRemaining::Id, timerDelegate, notifier),
+        batTimeToFullChargeNotifyTimerContext(PowerSource::Attributes::BatTimeToFullCharge::Id, timerDelegate, std::move(notifier))
     {}
 };
 
