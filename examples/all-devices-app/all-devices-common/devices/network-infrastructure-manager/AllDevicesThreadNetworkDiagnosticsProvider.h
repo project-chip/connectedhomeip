@@ -22,7 +22,8 @@
 
 namespace chip::app {
 
-class AllDevicesThreadNetworkDiagnosticsProvider : public Clusters::ThreadNetworkDiagnostics::DefaultThreadNetworkDiagnosticsProvider
+class AllDevicesThreadNetworkDiagnosticsProvider
+    : public Clusters::ThreadNetworkDiagnostics::DefaultThreadNetworkDiagnosticsProvider
 {
 public:
     CHIP_ERROR WriteAttributeToTlv(AttributeId attributeId, app::AttributeValueEncoder & encoder) override
