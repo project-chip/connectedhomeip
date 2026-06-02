@@ -61,7 +61,6 @@ void BooleanStateSensorDevice::Unregister(CodeDrivenDataModelProvider & provider
 std::optional<::pw::Status> BooleanStateSensor::AttributeAccessor::Write(const ConcreteDataAttributePath & path,
                                                                          AttributeValueDecoder & decoder)
 {
-    chip::EndpointId endpoint = path.mEndpointId;
     if (!mBooleanStateDevice || path.mEndpointId != mBooleanStateDevice->GetEndpointId())
     {
         return std::nullopt;
