@@ -17,6 +17,12 @@
 
 #include <app/clusters/smoke-co-alarm-server/SmokeCOTestEventTriggerHandler.h>
 #include <app/clusters/smoke-co-alarm-server/smoke-co-alarm-server.h>
+#include <app/util/attribute-storage.h>
+#include <app/util/attribute-table.h>
+#include <app/util/endpoint-config-api.h>
+#include <lib/support/CodeUtils.h>
+
+#include <optional>
 
 #include <platform/CHIPDeviceLayer.h>
 
@@ -29,7 +35,48 @@ namespace {
 
 constexpr const uint16_t kSelfTestingTimeoutSec = 10;
 
+std::optional<SmokeCoAlarmServer> gSmokeCoAlarmServer;
+
 } // namespace
+
+void MatterSmokeCoAlarmPluginServerInitCallback()
+{
+    for (uint16_t i = 0; i < emberAfEndpointCount(); i++)
+    {
+        EndpointId endpointId = emberAfEndpointFromIndex(i);
+        if (!emberAfContainsServer(endpointId, SmokeCoAlarm::Id))
+            continue;
+
+        // Read feature map from the Ember attribute store.
+        uint32_t featureMapValue = 0;
+        {
+            uint8_t * readable = reinterpret_cast<uint8_t *>(&featureMapValue);
+            emberAfReadAttribute(endpointId, SmokeCoAlarm::Id, Globals::Attributes::FeatureMap::Id, readable,
+                                 sizeof(featureMapValue));
+        }
+
+        // Build optional-attribute set from what Ember exposes for this endpoint.
+        uint32_t optionalBits                    = 0;
+        constexpr AttributeId kOptionalAttribs[] = {
+            Attributes::DeviceMuted::Id,        Attributes::InterconnectSmokeAlarm::Id, Attributes::InterconnectCOAlarm::Id,
+            Attributes::ContaminationState::Id, Attributes::SmokeSensitivityLevel::Id,  Attributes::ExpiryDate::Id,
+            Attributes::Unmounted::Id,
+        };
+        for (AttributeId attrId : kOptionalAttribs)
+        {
+            if (emberAfContainsAttribute(endpointId, SmokeCoAlarm::Id, attrId))
+                optionalBits |= (1u << attrId);
+        }
+
+        SmokeCoAlarmCluster::Config config;
+        config.featureMap      = BitFlags<Feature>(featureMapValue);
+        config.optionalAttribs = SmokeCoAlarmCluster::OptionalAttributeSet(optionalBits);
+
+        gSmokeCoAlarmServer.emplace(endpointId, config);
+        LogErrorOnFailure(gSmokeCoAlarmServer->Init());
+        break; // all-clusters-app has one SmokeCoAlarm endpoint; stop after first match
+    }
+}
 
 static std::array<ExpressedStateEnum, SmokeCoAlarmServer::kPriorityOrderLength> sPriorityOrder = {
     ExpressedStateEnum::kInoperative, ExpressedStateEnum::kSmokeAlarm,     ExpressedStateEnum::kInterconnectSmoke,

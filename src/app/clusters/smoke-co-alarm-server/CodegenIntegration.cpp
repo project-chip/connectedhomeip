@@ -263,3 +263,5 @@ emberAfSmokeCoAlarmClusterSelfTestRequestCallback(CommandHandler * commandObj, c
 }
 
 void __attribute__((weak)) MatterSmokeCoAlarmPluginServerInitCallback() {}
+
+void __attribute__((weak)) MatterSmokeCoAlarmPluginServerShutdownCallback() {}
