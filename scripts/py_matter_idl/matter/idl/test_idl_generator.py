@@ -149,11 +149,12 @@ class TestIdlRendering(unittest.TestCase):
                     provisional kProvisionalBit = 0x1;
                 }
 
+                /** Test command description */
                 provisional command ProvisionalCommand(): DefaultSuccess = 0;
             }
         """
-        # Parse and render
-        parser = CreateParser(skip_meta=True, merge_globals=False)
+        # Parse and render (skip_meta must be False for comment parsing to work)
+        parser = CreateParser(skip_meta=False, merge_globals=False)
         idl = parser.parse(idl_content)
         rendered = RenderAsIdlTxt(idl)
 
@@ -165,6 +166,9 @@ class TestIdlRendering(unittest.TestCase):
         self.assertIn("provisional bitmap ProvisionalBitmap", rendered)
         self.assertIn("provisional kProvisionalBit = 0x1;", rendered)
         self.assertIn("provisional command ProvisionalCommand(): DefaultSuccess = 0;", rendered)
+
+        # Verify that doc comment is matched and rendered correctly on the provisional command
+        self.assertIn("/** Test command description */", rendered)
 
         # Also ensure roundtrip parses back to the exact same IDL
         idl2 = parser.parse(rendered)
