@@ -110,7 +110,7 @@ CHIP_ERROR GenericThreadDriver::CommitConfiguration()
     // to OT NVS here so that a later fallback can attach to it. Does not enable the Thread interface.
     ChipLogProgress(NetworkProvisioning, "Thread CommitConfiguration: staged=%d attached=%d", mStagingNetwork.IsCommissioned(),
                     ThreadStackMgrImpl().IsThreadAttached());
-    if (mStagingNetwork.IsCommissioned() && !ThreadStackMgrImpl().IsThreadAttached())
+    if (BackupExists() && mStagingNetwork.IsCommissioned() && !ThreadStackMgrImpl().IsThreadAttached())
     {
         CHIP_ERROR persistErr = ThreadStackMgrImpl().SetThreadProvision(mStagingNetwork.AsByteSpan());
         if (persistErr != CHIP_NO_ERROR)
