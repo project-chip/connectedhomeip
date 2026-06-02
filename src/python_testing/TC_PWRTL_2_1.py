@@ -222,7 +222,7 @@ class TC_PWRTL_2_1(MatterBaseTest):
                 cluster=cluster,
                 attribute=attributes.ActiveEndpoints
             )
-            asserts.assert_equal(active_eps_post, active_eps,
+            asserts.assert_equal(sorted(active_eps_post), sorted(active_eps),
                                  "ActiveEndpoints changed after reboot - violates Non-volatile quality")
             log.info("ActiveEndpoints persisted across reboot (Non-volatile verified)")
 
