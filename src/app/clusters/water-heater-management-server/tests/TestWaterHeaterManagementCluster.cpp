@@ -256,11 +256,13 @@ TEST_F(TestWaterHeaterManagementCluster, TestOptionalAttributesUnsupportedWithou
     EXPECT_EQ(mClusterTester.ReadAttribute(TankVolume::Id, tankVolume), Protocols::InteractionModel::Status::UnsupportedAttribute);
 
     Energy_mWh estimatedHeat = 0;
-    EXPECT_EQ(mClusterTester.ReadAttribute(EstimatedHeatRequired::Id, estimatedHeat), Protocols::InteractionModel::Status::UnsupportedAttribute);
+    EXPECT_EQ(mClusterTester.ReadAttribute(EstimatedHeatRequired::Id, estimatedHeat),
+              Protocols::InteractionModel::Status::UnsupportedAttribute);
 
     // Without kTankPercent, TankPercentage must be absent
     Percent tankPercentage = 0;
-    EXPECT_EQ(mClusterTester.ReadAttribute(TankPercentage::Id, tankPercentage), Protocols::InteractionModel::Status::UnsupportedAttribute);
+    EXPECT_EQ(mClusterTester.ReadAttribute(TankPercentage::Id, tankPercentage),
+              Protocols::InteractionModel::Status::UnsupportedAttribute);
 }
 
 // ---------------------------------------------------------------------------
@@ -282,7 +284,7 @@ TEST_F(TestWaterHeaterManagementCluster, TestBoostValidation_PercentageOutOfRang
     EXPECT_FALSE(result.IsSuccess());
     auto code = result.GetStatusCode();
     // validation to make clang-tidy happy.
-    if(code.has_value())
+    if (code.has_value())
     {
         EXPECT_EQ(code->GetStatus(), Protocols::InteractionModel::Status::InvalidCommand);
     }
@@ -309,14 +311,14 @@ TEST_F(TestWaterHeaterManagementCluster, TestBoostValidation_ReheatOutOfRange)
     EXPECT_FALSE(result.IsSuccess());
     auto code = result.GetStatusCode();
     // validation to make clang-tidy happy.
-    if(code.has_value())
+    if (code.has_value())
     {
         EXPECT_EQ(code->GetStatus(), Protocols::InteractionModel::Status::InvalidCommand);
     }
     else
     {
         FAIL();
-    }    
+    }
     EXPECT_FALSE(delegate.handleBoostCalled);
 }
 
@@ -336,14 +338,14 @@ TEST_F(TestWaterHeaterManagementCluster, TestBoostValidation_ReheatWithoutPercen
     EXPECT_FALSE(result.IsSuccess());
     auto code = result.GetStatusCode();
     // validation to make clang-tidy happy.
-    if(code.has_value())
+    if (code.has_value())
     {
         EXPECT_EQ(code->GetStatus(), Protocols::InteractionModel::Status::InvalidCommand);
     }
     else
     {
         FAIL();
-    }  
+    }
     EXPECT_FALSE(delegate.handleBoostCalled);
 }
 
@@ -364,14 +366,14 @@ TEST_F(TestWaterHeaterManagementCluster, TestBoostValidation_ReheatAndOneShotMut
     EXPECT_FALSE(result.IsSuccess());
     auto code = result.GetStatusCode();
     // validation to make clang-tidy happy.
-    if(code.has_value())
+    if (code.has_value())
     {
         EXPECT_EQ(code->GetStatus(), Protocols::InteractionModel::Status::InvalidCommand);
     }
     else
     {
         FAIL();
-    }  
+    }
     EXPECT_FALSE(delegate.handleBoostCalled);
 }
 
@@ -386,7 +388,7 @@ TEST_F(TestWaterHeaterManagementCluster, TestBoostValidation_PercentFieldsRequir
     EXPECT_FALSE(result.IsSuccess());
     auto code = result.GetStatusCode();
     // validation to make clang-tidy happy.
-    if(code.has_value())
+    if (code.has_value())
     {
         EXPECT_EQ(code->GetStatus(), Protocols::InteractionModel::Status::InvalidCommand);
     }
@@ -461,14 +463,14 @@ TEST_F(TestWaterHeaterManagementCluster, TestCancelBoostCommandDelegateFailure)
     EXPECT_TRUE(mDelegate.handleCancelBoostCalled);
     auto code = result.GetStatusCode();
     // validation to make clang-tidy happy.
-    if(code.has_value())
+    if (code.has_value())
     {
         EXPECT_EQ(code->GetStatus(), Protocols::InteractionModel::Status::Busy);
     }
     else
     {
         FAIL();
-    }  
+    }
 }
 
 // ---------------------------------------------------------------------------
@@ -488,7 +490,7 @@ TEST_F(TestWaterHeaterManagementCluster, TestBoostStartedEvent)
               CHIP_NO_ERROR);
 
     auto evt = mClusterTester.GetNextGeneratedEvent();
-    if(evt.has_value())
+    if (evt.has_value())
     {
         Events::BoostStarted::DecodableType decoded;
         EXPECT_EQ(evt->GetEventData(decoded), CHIP_NO_ERROR);
@@ -516,7 +518,7 @@ TEST_F(TestWaterHeaterManagementCluster, TestBoostEndedEvent)
     EXPECT_EQ(mCluster.GenerateBoostEndedEvent(), CHIP_NO_ERROR);
 
     auto evt = mClusterTester.GetNextGeneratedEvent();
-    if(evt.has_value())
+    if (evt.has_value())
     {
         Events::BoostEnded::DecodableType decoded;
         EXPECT_EQ(evt->GetEventData(decoded), CHIP_NO_ERROR);

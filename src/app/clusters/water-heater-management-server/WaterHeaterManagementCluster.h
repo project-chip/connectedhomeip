@@ -120,7 +120,8 @@ public:
     CHIP_ERROR GenerateBoostEndedEvent();
 
 protected:
-    EndpointId mEndpointId                  = 0;
+    EndpointId mEndpointId = 0;
+
 private:
     WaterHeaterManagementCluster * mCluster = nullptr;
 };
