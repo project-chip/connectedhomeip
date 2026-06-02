@@ -66,9 +66,9 @@ public:
         absoluteCoolLimits(AbsoluteSetpoint(Attributes::AbsMinCoolSetpointLimit::Id, kDefaultAbsMinCoolSetpointLimit),
                            AbsoluteSetpoint(Attributes::AbsMaxCoolSetpointLimit::Id, kDefaultAbsMaxCoolSetpointLimit)),
         userHeatLimits(OptionalSetpoint(Attributes::MinHeatSetpointLimit::Id, absoluteHeatLimits.minimum),
-                       OptionalSetpoint(Attributes::MaxHeatSetpointLimit::Id, absoluteHeatLimits.maximum), absoluteHeatLimits),
+                       OptionalSetpoint(Attributes::MaxHeatSetpointLimit::Id, absoluteHeatLimits.maximum)),
         userCoolLimits(OptionalSetpoint(Attributes::MinCoolSetpointLimit::Id, absoluteCoolLimits.minimum),
-                       OptionalSetpoint(Attributes::MaxCoolSetpointLimit::Id, absoluteCoolLimits.maximum), absoluteCoolLimits),
+                       OptionalSetpoint(Attributes::MaxCoolSetpointLimit::Id, absoluteCoolLimits.maximum)),
         occupied(AbsoluteSetpoint(Attributes::OccupiedHeatingSetpoint::Id, kDefaultHeatingSetpoint),
                  AbsoluteSetpoint(Attributes::OccupiedCoolingSetpoint::Id, kDefaultCoolingSetpoint)),
         unoccupied(AbsoluteSetpoint(Attributes::UnoccupiedHeatingSetpoint::Id, kDefaultHeatingSetpoint),
@@ -80,9 +80,42 @@ public:
         autoSupported(spl.autoSupported), heatSupported(spl.heatSupported), coolSupported(spl.coolSupported),
         occupancySupported(spl.occupancySupported), eventsSupported(spl.eventsSupported),
         absoluteHeatLimits(spl.absoluteHeatLimits), absoluteCoolLimits(spl.absoluteCoolLimits),
-        userHeatLimits(spl.userHeatLimits, absoluteHeatLimits), userCoolLimits(spl.userCoolLimits, absoluteCoolLimits),
+        userHeatLimits(OptionalSetpoint(spl.userHeatLimits.minimum, absoluteHeatLimits.minimum),
+                       OptionalSetpoint(spl.userHeatLimits.maximum, absoluteHeatLimits.maximum)),
+        userCoolLimits(OptionalSetpoint(spl.userCoolLimits.minimum, absoluteCoolLimits.minimum),
+                       OptionalSetpoint(spl.userCoolLimits.maximum, absoluteCoolLimits.maximum)),
         occupied(spl.occupied), unoccupied(spl.unoccupied), deadBand(spl.deadBand)
     {}
+
+    Setpoints & operator=(const Setpoints & other)
+    {
+        if (this == &other)
+        {
+            return *this;
+        }
+
+        autoSupported      = other.autoSupported;
+        heatSupported      = other.heatSupported;
+        coolSupported      = other.coolSupported;
+        occupancySupported = other.occupancySupported;
+        eventsSupported    = other.eventsSupported;
+
+        absoluteHeatLimits = other.absoluteHeatLimits;
+        absoluteCoolLimits = other.absoluteCoolLimits;
+
+        userHeatLimits = UserSetpointLimits(OptionalSetpoint(other.userHeatLimits.minimum, absoluteHeatLimits.minimum),
+                                            OptionalSetpoint(other.userHeatLimits.maximum, absoluteHeatLimits.maximum));
+
+        userCoolLimits = UserSetpointLimits(OptionalSetpoint(other.userCoolLimits.minimum, absoluteCoolLimits.minimum),
+                                            OptionalSetpoint(other.userCoolLimits.maximum, absoluteCoolLimits.maximum));
+
+        occupied   = other.occupied;
+        unoccupied = other.unoccupied;
+        deadBand   = other.deadBand;
+
+        return *this;
+    }
+
 
     /*
     Checks to make sure that the setpoints follow the rules from the Matter spec
@@ -144,8 +177,8 @@ public:
      * @param changedAttributes The set of attributes changed by this operation.
      * @return The status of the operation.
      */
-    Protocols::InteractionModel::Status ChangeLimitMinimum(UserSetpointLimits & limits, temperature min,
-                                                           SetpointAttributes & changedAttributes);
+    Protocols::InteractionModel::Status ChangeLimitMinimum(UserSetpointLimits & limits, AbsoluteSetpointLimits & absoluteLimits,
+                                                     temperature min, SetpointAttributes & changedAttributes);
 
     /**
      * Change the maximum value of a given setpoint limit
@@ -155,8 +188,8 @@ public:
      * @param changedAttributes The set of attributes changed by this operation.
      * @return The status of the operation.
      */
-    Protocols::InteractionModel::Status ChangeLimitMaximum(UserSetpointLimits & limits, temperature max,
-                                                           SetpointAttributes & changedAttributes);
+    Protocols::InteractionModel::Status ChangeLimitMaximum(UserSetpointLimits & limits, AbsoluteSetpointLimits & absoluteLimits,
+                                                     temperature max, SetpointAttributes & changedAttributes);
 
     /**
      * Attempt to fix any violations of the setpoint rules
@@ -175,8 +208,9 @@ private:
     @param changedAttributes The set of attributes changed by this operation.
     @return The status of the operation; Success if the setpoints are now valid, ConstraintError if it was not possible to fix them
     */
-    Protocols::InteractionModel::Status ChangeLimits(UserSetpointLimits & limits, Optional<temperature> min,
-                                                     Optional<temperature> max, SetpointAttributes & changedAttributes);
+    Protocols::InteractionModel::Status ChangeLimits(UserSetpointLimits & limits, AbsoluteSetpointLimits & absoluteLimits,
+                                               Optional<temperature> min, Optional<temperature> max,
+                                               SetpointAttributes & changedAttributes);
 
     /*
     Attempt to fix the user setpoint limits to comply with the deadband

@@ -40,6 +40,8 @@ struct SetpointRange
     SetpointRange(AbsoluteSetpoint heat, AbsoluteSetpoint cool) : heating(heat), cooling(cool) {}
 
     SetpointRange(const SetpointRange & spr) : heating(spr.heating), cooling(spr.cooling) {}
+
+    SetpointRange & operator=(const SetpointRange & other) = default;
 };
 
 } // namespace Thermostat

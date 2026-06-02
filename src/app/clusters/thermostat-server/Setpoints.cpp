@@ -454,18 +454,23 @@ Status Setpoints::ChangeRange(SetpointRange & range, Optional<temperature> heat,
     return Fix(changedAttributes);
 }
 
-Status Setpoints::ChangeLimitMinimum(UserSetpointLimits & userLimits, temperature min, SetpointAttributes & changedAttributes)
+Status Setpoints::Setpoints::ChangeLimitMinimum(UserSetpointLimits & userLimits,
+                                                            AbsoluteSetpointLimits & absoluteLimits, temperature min,
+                                                            SetpointAttributes & changedAttributes)
 {
-    return ChangeLimits(userLimits, MakeOptional(min), Optional<temperature>::Missing(), changedAttributes);
+    return ChangeLimits(userLimits, absoluteLimits, MakeOptional(min), Optional<temperature>::Missing(), changedAttributes);
 }
 
-Status Setpoints::ChangeLimitMaximum(UserSetpointLimits & userLimits, temperature max, SetpointAttributes & changedAttributes)
+Status Setpoints::ChangeLimitMaximum(UserSetpointLimits & userLimits,
+                                                            AbsoluteSetpointLimits & absoluteLimits, temperature max,
+                                                            SetpointAttributes & changedAttributes)
 {
-    return ChangeLimits(userLimits, Optional<temperature>::Missing(), MakeOptional(max), changedAttributes);
+    return ChangeLimits(userLimits, absoluteLimits, Optional<temperature>::Missing(), MakeOptional(max), changedAttributes);
 }
 
-Status Setpoints::ChangeLimits(UserSetpointLimits & userLimits, Optional<temperature> min, Optional<temperature> max,
-                               SetpointAttributes & changedAttributes)
+Status Setpoints::ChangeLimits(UserSetpointLimits & userLimits, AbsoluteSetpointLimits & absoluteLimits,
+                                                      Optional<temperature> min, Optional<temperature> max,
+                                                      SetpointAttributes & changedAttributes)
 {
     bool settingMin = min.HasValue();
     bool settingMax = max.HasValue();
@@ -476,7 +481,7 @@ Status Setpoints::ChangeLimits(UserSetpointLimits & userLimits, Optional<tempera
     }
     if (settingMin)
     {
-        if (!userLimits.absoluteLimits.Valid(min.Value()))
+        if (!absoluteLimits.Valid(min.Value()))
         {
             return Status::ConstraintError;
         }
@@ -487,7 +492,7 @@ Status Setpoints::ChangeLimits(UserSetpointLimits & userLimits, Optional<tempera
     }
     else
     {
-        if (!userLimits.absoluteLimits.Valid(max.Value()))
+        if (!absoluteLimits.Valid(max.Value()))
         {
             return Status::ConstraintError;
         }

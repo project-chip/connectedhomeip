@@ -38,7 +38,7 @@ SetpointLimits provides a maximum and minimum value for a type of setpoint (eith
 template <typename T>
 struct SetpointLimits
 {
-    virtual ~SetpointLimits() = default;
+    ~SetpointLimits() = default;
 
     /*
     Constructor to create a SetpointLimits from a min and max setpoint.
@@ -48,7 +48,8 @@ struct SetpointLimits
     /*
     Copy constructor to create a SetpointLimits from another SetpointLimits.
     */
-    SetpointLimits(const SetpointLimits<T> & al) : minimum(al.minimum), maximum(al.maximum){};
+    SetpointLimits(const SetpointLimits<T> &)             = default;
+    SetpointLimits & operator=(const SetpointLimits<T> &) = default;
 
     /*
     Return the minimum setpoint.
@@ -73,7 +74,7 @@ struct SetpointLimits
     /*
     Check if the setpoint limits are valid
     */
-    virtual bool IsValid() const { return Minimum() <= Maximum(); }
+    bool IsValid() const { return Minimum() <= Maximum(); }
 
     /*
     Check if a temperature is within the setpoint limits
@@ -99,28 +100,7 @@ struct SetpointLimits
 };
 
 typedef SetpointLimits<AbsoluteSetpoint> AbsoluteSetpointLimits;
-
-/*
-UserSetpointLimits is used for optional setpoint limits. It wraps the absolute setpoint limits, which it can fall back on when the
-user limit is not provided.
-*/
-struct UserSetpointLimits : SetpointLimits<OptionalSetpoint>
-{
-
-    const AbsoluteSetpointLimits & absoluteLimits;
-
-    UserSetpointLimits(OptionalSetpoint min, OptionalSetpoint max, const AbsoluteSetpointLimits & absLimits) :
-        SetpointLimits<OptionalSetpoint>(min, max), absoluteLimits(absLimits)
-    {}
-
-    UserSetpointLimits(const UserSetpointLimits & other, const AbsoluteSetpointLimits & absoluteSetpointLimits) :
-        SetpointLimits<OptionalSetpoint>(OptionalSetpoint(other.minimum, absoluteSetpointLimits.minimum),
-                                         OptionalSetpoint(other.maximum, absoluteSetpointLimits.maximum)),
-        absoluteLimits(absoluteSetpointLimits)
-    {}
-
-    bool IsValid() const override;
-};
+typedef SetpointLimits<OptionalSetpoint> UserSetpointLimits;
 
 } // namespace Thermostat
 } // namespace Clusters

@@ -64,19 +64,19 @@ Status ValidateSetpointChange(Setpoints & setpoints, chip::AttributeId attribute
     case MinHeatSetpointLimit::Id:
         if (!setpoints.heatSupported)
             return Status::UnsupportedAttribute;
-        return setpoints.ChangeLimitMinimum(setpoints.userHeatLimits, value, changedAttributes);
+        return setpoints.ChangeLimitMinimum(setpoints.userHeatLimits, setpoints.absoluteHeatLimits, value, changedAttributes);
     case MaxHeatSetpointLimit::Id:
         if (!setpoints.heatSupported)
             return Status::UnsupportedAttribute;
-        return setpoints.ChangeLimitMaximum(setpoints.userHeatLimits, value, changedAttributes);
+        return setpoints.ChangeLimitMaximum(setpoints.userHeatLimits, setpoints.absoluteHeatLimits, value, changedAttributes);
     case MinCoolSetpointLimit::Id:
         if (!setpoints.coolSupported)
             return Status::UnsupportedAttribute;
-        return setpoints.ChangeLimitMinimum(setpoints.userCoolLimits, value, changedAttributes);
+        return setpoints.ChangeLimitMinimum(setpoints.userCoolLimits, setpoints.absoluteCoolLimits, value, changedAttributes);
     case MaxCoolSetpointLimit::Id:
         if (!setpoints.coolSupported)
             return Status::UnsupportedAttribute;
-        return setpoints.ChangeLimitMaximum(setpoints.userCoolLimits, value, changedAttributes);
+        return setpoints.ChangeLimitMaximum(setpoints.userCoolLimits, setpoints.absoluteCoolLimits, value, changedAttributes);
     case MinSetpointDeadBand::Id:
         return Status::Success;
     default:

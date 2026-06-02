@@ -46,7 +46,7 @@ bool OptionalSetpoint::ClearTemperature()
     return changed;
 }
 
-SystemModeEnum BaseSetpoint::Mode() const
+SystemModeEnum Setpoint::Mode() const
 {
     switch (mAttributeId)
     {
@@ -67,6 +67,29 @@ SystemModeEnum BaseSetpoint::Mode() const
     default:
         return SystemModeEnum::kOff;
     }
+}
+
+CHIP_ERROR OptionalSetpoint::Encode(chip::TLV::TLVWriter & writer, chip::TLV::Tag tag) const
+{
+    return writer.Put(tag, mTemperature.Value());
+}
+
+CHIP_ERROR OptionalSetpoint::Decode(chip::TLV::TLVReader & reader)
+{
+    temperature temp;
+    CHIP_ERROR error = reader.Get(temp);
+    if (error == CHIP_NO_ERROR)
+    {
+        mTemperature.SetValue(temp);
+    }
+    return error;
+}
+
+temperature OptionalSetpoint::Temperature() const
+{
+    if (mTemperature.HasValue())
+        return mTemperature.Value();
+    return mAbsoluteSetpoint.Temperature();
 }
 
 } // namespace Thermostat
