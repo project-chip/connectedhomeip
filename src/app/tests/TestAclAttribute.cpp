@@ -709,8 +709,7 @@ namespace {
 // callables that wrap them rather than living on the fixture class itself.
 template <typename SessionFn, typename DrainFn>
 void RunCacheRevokedTwoIBWrite(SessionFn && sessionFn, DrainFn && drainFn, const AttributePathParams & firstPath,
-                               const AttributePathParams & secondPath,
-                               Protocols::InteractionModel::Status expectedSecondStatus)
+                               const AttributePathParams & secondPath, Protocols::InteractionModel::Status expectedSecondStatus)
 {
     using namespace Protocols::InteractionModel;
 
@@ -759,7 +758,7 @@ void RunCacheRevokedTwoIBWrite(SessionFn && sessionFn, DrainFn && drainFn, const
 TEST_F(TestAclAttribute, WriteCacheReusesGrantWhenSamePathRevokedMidMessage)
 {
     AttributePathParams path(kTestEndpointId, kTestClusterId, kTestAttributeId);
-    RunCacheRevokedTwoIBWrite([this]() -> auto { return GetSessionBobToAlice(); }, [this] { DrainAndServiceIO(); }, path, path,
+    RunCacheRevokedTwoIBWrite([this]() -> auto { return GetSessionBobToAlice(); }, [] { DrainAndServiceIO(); }, path, path,
                               Protocols::InteractionModel::Status::Success);
 }
 
@@ -771,7 +770,7 @@ TEST_F(TestAclAttribute, WriteCacheDoesNotLeakAcrossDifferentEndpoint)
 {
     AttributePathParams firstPath(kTestEndpointId, kTestClusterId, kTestAttributeId);
     AttributePathParams secondPath(kTestDeniedEndpointId, kTestClusterId, kTestAttributeId);
-    RunCacheRevokedTwoIBWrite([this]() -> auto { return GetSessionBobToAlice(); }, [this] { DrainAndServiceIO(); }, firstPath,
+    RunCacheRevokedTwoIBWrite([this]() -> auto { return GetSessionBobToAlice(); }, [] { DrainAndServiceIO(); }, firstPath,
                               secondPath, Protocols::InteractionModel::Status::UnsupportedAccess);
 }
 
@@ -782,7 +781,7 @@ TEST_F(TestAclAttribute, WriteCacheDoesNotLeakAcrossDifferentCluster)
 {
     AttributePathParams firstPath(kTestEndpointId, kTestClusterId, kTestAttributeId);
     AttributePathParams secondPath(kTestEndpointId, kTestDeniedClusterId2, kTestAttributeId);
-    RunCacheRevokedTwoIBWrite([this]() -> auto { return GetSessionBobToAlice(); }, [this] { DrainAndServiceIO(); }, firstPath,
+    RunCacheRevokedTwoIBWrite([this]() -> auto { return GetSessionBobToAlice(); }, [] { DrainAndServiceIO(); }, firstPath,
                               secondPath, Protocols::InteractionModel::Status::UnsupportedAccess);
 }
 
@@ -794,7 +793,7 @@ TEST_F(TestAclAttribute, WriteCacheDoesNotLeakAcrossDifferentAttribute)
 {
     AttributePathParams firstPath(kTestEndpointId, kTestClusterId, kTestAttributeId);
     AttributePathParams secondPath(kTestEndpointId, kTestClusterId, static_cast<AttributeId>(1));
-    RunCacheRevokedTwoIBWrite([this]() -> auto { return GetSessionBobToAlice(); }, [this] { DrainAndServiceIO(); }, firstPath,
+    RunCacheRevokedTwoIBWrite([this]() -> auto { return GetSessionBobToAlice(); }, [] { DrainAndServiceIO(); }, firstPath,
                               secondPath, Protocols::InteractionModel::Status::UnsupportedAccess);
 }
 
