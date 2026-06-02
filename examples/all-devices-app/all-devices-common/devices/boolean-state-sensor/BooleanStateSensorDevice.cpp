@@ -56,7 +56,6 @@ void BooleanStateSensorDevice::Unregister(CodeDrivenDataModelProvider & provider
     chip::rpc::PigweedDebugAccessInterceptorRegistry::Instance().Unregister(&mPwAccessor);
 #endif // defined(PW_RPC_ENABLED)
 }
-
 #if defined(PW_RPC_ENABLED) && PW_RPC_ENABLED
 std::optional<::pw::Status> BooleanStateSensor::AttributeAccessor::Write(const ConcreteDataAttributePath & path,
                                                                          AttributeValueDecoder & decoder)
@@ -65,6 +64,10 @@ std::optional<::pw::Status> BooleanStateSensor::AttributeAccessor::Write(const C
     {
         return std::nullopt;
     }
+    ChipLogProgress(Zcl,
+                    "[Pw] Received attribute write request for Cluster: " ChipLogFormatMEI " , Attribute: " ChipLogFormatMEI
+                    " on Endpoint: %d",
+                    ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mAttributeId), path.mEndpointId);
     switch (path.mClusterId)
     {
     case BooleanState::Id:
@@ -75,9 +78,13 @@ std::optional<::pw::Status> BooleanStateSensor::AttributeAccessor::Write(const C
             CHIP_ERROR err = decoder.Decode(stateValue);
             if (err != CHIP_NO_ERROR)
             {
+                ChipLogError(Zcl, "[Pw] Failed to decode stateValue on Endpoint %d: %" CHIP_ERROR_FORMAT, path.mEndpointId,
+                             err.Format());
                 return ::pw::Status::Internal();
             }
             mBooleanStateDevice->BooleanState().SetStateValue(stateValue);
+            ChipLogProgress(Zcl, "[Pw] Successfully set BooleanState stateValue on Endpoint %d to %d", path.mEndpointId,
+                            stateValue);
             return ::pw::OkStatus();
         }
         }
