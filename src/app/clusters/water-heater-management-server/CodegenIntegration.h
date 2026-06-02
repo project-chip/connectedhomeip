@@ -43,7 +43,7 @@ public:
 
     // Delete copy constructor and assignment operator.
     Instance(const Instance &)             = delete;
-    Instance(const Instance &&)            = delete;
+    Instance(Instance &&)                  = delete;
     Instance & operator=(const Instance &) = delete;
 
     CHIP_ERROR Init();

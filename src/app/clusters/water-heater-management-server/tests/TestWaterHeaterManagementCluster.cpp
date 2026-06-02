@@ -253,14 +253,14 @@ TEST_F(TestWaterHeaterManagementCluster, TestOptionalAttributesUnsupportedWithou
 {
     // Without kEnergyManagement, TankVolume and EstimatedHeatRequired must be absent
     uint16_t tankVolume = 0;
-    EXPECT_NE(mClusterTester.ReadAttribute(TankVolume::Id, tankVolume), CHIP_NO_ERROR);
+    EXPECT_EQ(mClusterTester.ReadAttribute(TankVolume::Id, tankVolume), Protocols::InteractionModel::Status::UnsupportedAttribute);
 
     Energy_mWh estimatedHeat = 0;
-    EXPECT_NE(mClusterTester.ReadAttribute(EstimatedHeatRequired::Id, estimatedHeat), CHIP_NO_ERROR);
+    EXPECT_EQ(mClusterTester.ReadAttribute(EstimatedHeatRequired::Id, estimatedHeat), Protocols::InteractionModel::Status::UnsupportedAttribute);
 
     // Without kTankPercent, TankPercentage must be absent
     Percent tankPercentage = 0;
-    EXPECT_NE(mClusterTester.ReadAttribute(TankPercentage::Id, tankPercentage), CHIP_NO_ERROR);
+    EXPECT_EQ(mClusterTester.ReadAttribute(TankPercentage::Id, tankPercentage), Protocols::InteractionModel::Status::UnsupportedAttribute);
 }
 
 // ---------------------------------------------------------------------------
@@ -281,8 +281,15 @@ TEST_F(TestWaterHeaterManagementCluster, TestBoostValidation_PercentageOutOfRang
     auto result = tester.Invoke<Commands::Boost::Type>(req);
     EXPECT_FALSE(result.IsSuccess());
     auto code = result.GetStatusCode();
-    ASSERT_TRUE(code.has_value());
-    EXPECT_EQ(code->GetStatus(), Protocols::InteractionModel::Status::InvalidCommand);
+    // validation to make clang-tidy happy.
+    if(code.has_value())
+    {
+        EXPECT_EQ(code->GetStatus(), Protocols::InteractionModel::Status::InvalidCommand);
+    }
+    else
+    {
+        FAIL();
+    }
     EXPECT_FALSE(delegate.handleBoostCalled);
 }
 
@@ -301,8 +308,15 @@ TEST_F(TestWaterHeaterManagementCluster, TestBoostValidation_ReheatOutOfRange)
     auto result = tester.Invoke<Commands::Boost::Type>(req);
     EXPECT_FALSE(result.IsSuccess());
     auto code = result.GetStatusCode();
-    ASSERT_TRUE(code.has_value());
-    EXPECT_EQ(code->GetStatus(), Protocols::InteractionModel::Status::InvalidCommand);
+    // validation to make clang-tidy happy.
+    if(code.has_value())
+    {
+        EXPECT_EQ(code->GetStatus(), Protocols::InteractionModel::Status::InvalidCommand);
+    }
+    else
+    {
+        FAIL();
+    }    
     EXPECT_FALSE(delegate.handleBoostCalled);
 }
 
@@ -321,8 +335,15 @@ TEST_F(TestWaterHeaterManagementCluster, TestBoostValidation_ReheatWithoutPercen
     auto result = tester.Invoke<Commands::Boost::Type>(req);
     EXPECT_FALSE(result.IsSuccess());
     auto code = result.GetStatusCode();
-    ASSERT_TRUE(code.has_value());
-    EXPECT_EQ(code->GetStatus(), Protocols::InteractionModel::Status::InvalidCommand);
+    // validation to make clang-tidy happy.
+    if(code.has_value())
+    {
+        EXPECT_EQ(code->GetStatus(), Protocols::InteractionModel::Status::InvalidCommand);
+    }
+    else
+    {
+        FAIL();
+    }  
     EXPECT_FALSE(delegate.handleBoostCalled);
 }
 
@@ -342,8 +363,15 @@ TEST_F(TestWaterHeaterManagementCluster, TestBoostValidation_ReheatAndOneShotMut
     auto result = tester.Invoke<Commands::Boost::Type>(req);
     EXPECT_FALSE(result.IsSuccess());
     auto code = result.GetStatusCode();
-    ASSERT_TRUE(code.has_value());
-    EXPECT_EQ(code->GetStatus(), Protocols::InteractionModel::Status::InvalidCommand);
+    // validation to make clang-tidy happy.
+    if(code.has_value())
+    {
+        EXPECT_EQ(code->GetStatus(), Protocols::InteractionModel::Status::InvalidCommand);
+    }
+    else
+    {
+        FAIL();
+    }  
     EXPECT_FALSE(delegate.handleBoostCalled);
 }
 
@@ -357,8 +385,15 @@ TEST_F(TestWaterHeaterManagementCluster, TestBoostValidation_PercentFieldsRequir
     auto result = mClusterTester.Invoke<Commands::Boost::Type>(req);
     EXPECT_FALSE(result.IsSuccess());
     auto code = result.GetStatusCode();
-    ASSERT_TRUE(code.has_value());
-    EXPECT_EQ(code->GetStatus(), Protocols::InteractionModel::Status::InvalidCommand);
+    // validation to make clang-tidy happy.
+    if(code.has_value())
+    {
+        EXPECT_EQ(code->GetStatus(), Protocols::InteractionModel::Status::InvalidCommand);
+    }
+    else
+    {
+        FAIL();
+    }
     EXPECT_FALSE(mDelegate.handleBoostCalled);
 
     // Also test targetReheat alone
@@ -425,8 +460,15 @@ TEST_F(TestWaterHeaterManagementCluster, TestCancelBoostCommandDelegateFailure)
     EXPECT_FALSE(result.IsSuccess());
     EXPECT_TRUE(mDelegate.handleCancelBoostCalled);
     auto code = result.GetStatusCode();
-    ASSERT_TRUE(code.has_value());
-    EXPECT_EQ(code->GetStatus(), Protocols::InteractionModel::Status::Busy);
+    // validation to make clang-tidy happy.
+    if(code.has_value())
+    {
+        EXPECT_EQ(code->GetStatus(), Protocols::InteractionModel::Status::Busy);
+    }
+    else
+    {
+        FAIL();
+    }  
 }
 
 // ---------------------------------------------------------------------------
@@ -446,19 +488,24 @@ TEST_F(TestWaterHeaterManagementCluster, TestBoostStartedEvent)
               CHIP_NO_ERROR);
 
     auto evt = mClusterTester.GetNextGeneratedEvent();
-    ASSERT_TRUE(evt.has_value());
-
-    Events::BoostStarted::DecodableType decoded;
-    EXPECT_EQ(evt->GetEventData(decoded), CHIP_NO_ERROR);
-    EXPECT_EQ(decoded.boostInfo.duration, kDuration);
-    ASSERT_TRUE(decoded.boostInfo.oneShot.HasValue());
-    EXPECT_EQ(decoded.boostInfo.oneShot.Value(), true);
-    ASSERT_TRUE(decoded.boostInfo.emergencyBoost.HasValue());
-    EXPECT_EQ(decoded.boostInfo.emergencyBoost.Value(), false);
-    ASSERT_TRUE(decoded.boostInfo.temporarySetpoint.HasValue());
-    EXPECT_EQ(decoded.boostInfo.temporarySetpoint.Value(), static_cast<int16_t>(6000));
-    EXPECT_FALSE(decoded.boostInfo.targetPercentage.HasValue());
-    EXPECT_FALSE(decoded.boostInfo.targetReheat.HasValue());
+    if(evt.has_value())
+    {
+        Events::BoostStarted::DecodableType decoded;
+        EXPECT_EQ(evt->GetEventData(decoded), CHIP_NO_ERROR);
+        EXPECT_EQ(decoded.boostInfo.duration, kDuration);
+        ASSERT_TRUE(decoded.boostInfo.oneShot.HasValue());
+        EXPECT_EQ(decoded.boostInfo.oneShot.Value(), true);
+        ASSERT_TRUE(decoded.boostInfo.emergencyBoost.HasValue());
+        EXPECT_EQ(decoded.boostInfo.emergencyBoost.Value(), false);
+        ASSERT_TRUE(decoded.boostInfo.temporarySetpoint.HasValue());
+        EXPECT_EQ(decoded.boostInfo.temporarySetpoint.Value(), static_cast<int16_t>(6000));
+        EXPECT_FALSE(decoded.boostInfo.targetPercentage.HasValue());
+        EXPECT_FALSE(decoded.boostInfo.targetReheat.HasValue());
+    }
+    else
+    {
+        FAIL();
+    }
 
     // Queue is now empty
     EXPECT_FALSE(mClusterTester.GetNextGeneratedEvent().has_value());
@@ -469,10 +516,15 @@ TEST_F(TestWaterHeaterManagementCluster, TestBoostEndedEvent)
     EXPECT_EQ(mCluster.GenerateBoostEndedEvent(), CHIP_NO_ERROR);
 
     auto evt = mClusterTester.GetNextGeneratedEvent();
-    ASSERT_TRUE(evt.has_value());
-
-    Events::BoostEnded::DecodableType decoded;
-    EXPECT_EQ(evt->GetEventData(decoded), CHIP_NO_ERROR);
+    if(evt.has_value())
+    {
+        Events::BoostEnded::DecodableType decoded;
+        EXPECT_EQ(evt->GetEventData(decoded), CHIP_NO_ERROR);
+    }
+    else
+    {
+        FAIL();
+    }
 
     // Queue is now empty
     EXPECT_FALSE(mClusterTester.GetNextGeneratedEvent().has_value());

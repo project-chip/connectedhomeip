@@ -19,10 +19,6 @@
 #include <data-model-providers/codegen/ClusterIntegration.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 
-using namespace chip::app;
-using namespace chip::app::Clusters;
-using namespace chip::app::Clusters::WaterHeaterManagement;
-
 namespace chip {
 namespace app {
 namespace Clusters {

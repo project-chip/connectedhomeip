@@ -121,6 +121,7 @@ public:
 
 protected:
     EndpointId mEndpointId                  = 0;
+private:
     WaterHeaterManagementCluster * mCluster = nullptr;
 };
 
