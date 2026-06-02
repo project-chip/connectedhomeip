@@ -40,7 +40,7 @@ import logging
 from mobly import asserts
 
 import matter.clusters as Clusters
-from matter.interaction_model import Status
+from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import TestStep, default_matter_test_main
@@ -158,12 +158,15 @@ class TC_ELDIST_2_1(MatterBaseTest):
 
         # Step 7: Attempt write to read-only attribute
         self.step(7)
-        result = await self.default_controller.WriteAttribute(
-            self.dut_node_id,
-            [(endpoint, attributes.MaxContinuousCurrent(50000))]
-        )
-        asserts.assert_equal(result[0].Status, Status.UnsupportedWrite,
-                             "Write to MaxContinuousCurrent should return UNSUPPORTED_WRITE")
+        try:
+            await self.default_controller.WriteAttribute(
+                self.dut_node_id,
+                [(endpoint, attributes.MaxContinuousCurrent(50000))]
+            )
+            asserts.fail("Write to MaxContinuousCurrent should have failed")
+        except InteractionModelError as e:
+            asserts.assert_equal(e.status, Status.UnsupportedWrite,
+                                 "Write to MaxContinuousCurrent should return UNSUPPORTED_WRITE")
 
 
 if __name__ == "__main__":
