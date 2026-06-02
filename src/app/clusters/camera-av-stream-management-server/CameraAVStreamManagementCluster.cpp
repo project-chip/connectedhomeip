@@ -73,13 +73,6 @@ CameraAVStreamManagementCluster::~CameraAVStreamManagementCluster()
     mDelegate.SetCameraAVStreamManagementCluster(nullptr);
 }
 
-CHIP_ERROR CameraAVStreamManagementCluster::Startup(ServerClusterContext & context)
-{
-    ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
-    LoadPersistentAttributes();
-    return CHIP_NO_ERROR;
-}
-
 CHIP_ERROR CameraAVStreamManagementCluster::Init()
 {
     // Constraint checks for RateDistortionTardeOffPoints vector
@@ -161,6 +154,14 @@ CHIP_ERROR CameraAVStreamManagementCluster::Init()
                          "CameraAVStreamMgmt[ep=%d]: Feature configuration error. if ImageControl feature supported, then "
                          "at least one of the ImageFlip or Rotation attributes shall be supported",
                          mPath.mEndpointId));
+    }
+
+    // Load persisted attributes now that the cluster context is available (set during Startup()).
+    // Init() is expected to be called after Startup(); the IsStarted() guard prevents callers that
+    // invoke Init() without an established context from dereferencing a null context.
+    if (IsStarted())
+    {
+        LoadPersistentAttributes();
     }
 
     return CHIP_NO_ERROR;

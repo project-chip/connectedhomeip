@@ -472,8 +472,6 @@ public:
      */
     CHIP_ERROR Init();
 
-    CHIP_ERROR Startup(ServerClusterContext & context) override;
-
     // Server cluster implementation
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override;

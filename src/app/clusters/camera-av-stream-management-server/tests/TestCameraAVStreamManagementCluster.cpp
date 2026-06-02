@@ -1769,8 +1769,8 @@ TEST_F(TestCameraAVStreamManagementCluster, TestReferenceCountResetOnBoot)
     ASSERT_EQ(mClusterTester.GetTestContext().AttributePersistenceProvider().WriteValue(path, ByteSpan(buffer, len)),
               CHIP_NO_ERROR);
 
-    // 3. Simulate a reboot: Startup reloads persistent attributes (resetting refCounts),
-    //    Init validates feature configuration.
+    // 3. Simulate a reboot: Startup() re-establishes the cluster context, Init() reloads
+    //    persistent attributes (resetting refCounts) and validates feature configuration.
     mServer.Shutdown(ClusterShutdownType::kClusterShutdown);
     ASSERT_EQ(mServer.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
     ASSERT_EQ(mServer.Init(), CHIP_NO_ERROR);

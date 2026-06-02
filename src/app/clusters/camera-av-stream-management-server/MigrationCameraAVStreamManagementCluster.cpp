@@ -29,5 +29,5 @@ chip::app::Clusters::CameraAvStreamManagement::MigrationCameraAVStreamManagement
     {
         LogErrorOnFailure(MigrateCameraAVStreamManagementStorage(mPath.mEndpointId, *srcProvider, context.attributeStorage));
     }
-    return CameraAVStreamManagementCluster::Startup(context);
+    return DefaultServerCluster::Startup(context);
 }
