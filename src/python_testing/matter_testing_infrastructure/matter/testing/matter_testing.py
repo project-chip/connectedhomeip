@@ -645,7 +645,6 @@ class MatterBaseTest(base_test.BaseTestClass):
                 self._allocated_ports.add(port)
                 return port
 
-
     #
     # Matter Test API - Test Definition Helpers (Steps, PICS, Description)
     #
