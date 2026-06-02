@@ -249,22 +249,28 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         pipe_data = self.read_from_app_pipe(self.provider_app_pipe_out)
         logger.info(f"Provider pipe kApplying {pipe_data}")
 
+        # The provider needs to be terminated just before try to send the second ApplyUpdateRequest
+        self.terminate_provider()
+
+        # Assert Applying State
+        update_state_match = AttributeMatcher.from_callable(
+            "Update state is kDelayedOnApply",
+            lambda report: report.value == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kApplying)
+        update_state_attr_handler.await_all_expected_report_matches(
+            [update_state_match], timeout_sec=5)
+
         # Device should stay in ApplyingState During 120 seconds and not Apply the software Update after the 60 seconds.
         software_version_match = AttributeMatcher.from_callable(
             f"Sofware Version should be: {current_sw_version}",
             lambda report: report.value == current_sw_version)
 
         software_version_attr_handler.wait_all_final_values_reported_persisted(
-            expected_matchers=[software_version_match], timeout_sec=spec_wait_time - 2)
-
-        # The provider needs to be terminated just before try to send the second ApplyUpdateRequest
-        self.terminate_provider()
-        # Wait complementary time
-        await asyncio.sleep(2)
+            expected_matchers=[software_version_match], timeout_sec=spec_wait_time)
 
         software_version_attr_handler.reset()
         software_version_attr_handler.cancel()
 
+        # Device did not receive the second ApplyUpdaterequest.
         await self._wait_for_idle_after_softwareaupdate(update_state_handler=update_state_attr_handler)
 
         # Software version should stay the same as the second ApplyUpdateRequest was not sent when the provider was terminated before re-sending the ApplyUpdateRequest
@@ -327,20 +333,28 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
                              Clusters.OtaSoftwareUpdateProvider.Enums.ApplyUpdateActionEnum.kAwaitNextAction, "Action from the provider is not AwaitNextAction")
         asserts.assert_equal(pipe_data['Payload']['ApplyUpdateRequestCount'],
                              1, "Only one request should be sent from the Provider")
+
+        # Kill the provider before it resends the ApplyUpdateRequest
+        self.terminate_provider()
+
+        # Assert Applying State
+        update_state_match = AttributeMatcher.from_callable(
+            "Update state is kDelayedOnApply",
+            lambda report: report.value == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kApplying)
+        update_state_attr_handler.await_all_expected_report_matches(
+            [update_state_match], timeout_sec=5)
+
         # Device should stay in ApplyingState and not apply the update during the 180 seconds.
         software_version_match = AttributeMatcher.from_callable(
             f"Sofware Version should be: {current_sw_version}",
             lambda report: report.value == current_sw_version)
         software_version_attr_handler.wait_all_final_values_reported_persisted(
-            expected_matchers=[software_version_match], timeout_sec=delayed_apply_action_time-2)
-        # Kill the provider before resending the ApplyUpdateRequest
-        self.terminate_provider()
+            expected_matchers=[software_version_match], timeout_sec=delayed_apply_action_time)
+
         software_version_attr_handler.reset()
         software_version_attr_handler.cancel()
 
-        # Wait the complementary time removed
-        await asyncio.sleep(2)
-
+        # Device did not receive the second ApplyUpdaterequest
         await self._wait_for_idle_after_softwareaupdate(update_state_handler=update_state_attr_handler)
 
         # Verify the version is the same as the second ApplyUpdateRequest was not sent.
