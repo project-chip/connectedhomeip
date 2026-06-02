@@ -40,3 +40,8 @@ jobs:
       - name: Run checks
         run: |
           venv/bin/python3 scripts/tests/matter_yaml_linter.py
+      - name: Notify Slack on Failure
+        if: failure()
+        uses: ./.github/actions/notify-slack-failure
+        with:
+          slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}

@@ -34,7 +34,6 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-from typing import List
 
 from mobly import asserts
 
@@ -75,7 +74,7 @@ class TestGroupTableReports(MatterBaseTest):
         self.kGroup3 = 0x0103
 
         self.print_step(3, "TH maps Keyset 1 to Group 1, 2 and 3")
-        mapping_structs: List[Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct] = []
+        mapping_structs: list[Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct] = []
 
         mapping_structs.append(Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct(
             groupId=self.kGroup1,
