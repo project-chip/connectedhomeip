@@ -108,8 +108,8 @@ CHIP_ERROR GenericThreadDriver::CommitConfiguration()
     // When Thread is a secondary transport, commissioning may complete without ConnectNetwork
     // (which is the usual persistence path via AttachToThreadNetwork). Persist the staged dataset
     // to OT NVS here so that a later fallback can attach to it. Does not enable the Thread interface.
-    ChipLogProgress(NetworkProvisioning, "Thread CommitConfiguration: staged=%d attached=%d",
-                    mStagingNetwork.IsCommissioned(), ThreadStackMgrImpl().IsThreadAttached());
+    ChipLogProgress(NetworkProvisioning, "Thread CommitConfiguration: staged=%d attached=%d", mStagingNetwork.IsCommissioned(),
+                    ThreadStackMgrImpl().IsThreadAttached());
     if (mStagingNetwork.IsCommissioned() && !ThreadStackMgrImpl().IsThreadAttached())
     {
         CHIP_ERROR persistErr = ThreadStackMgrImpl().SetThreadProvision(mStagingNetwork.AsByteSpan());
