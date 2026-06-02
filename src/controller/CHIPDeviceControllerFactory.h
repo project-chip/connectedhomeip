@@ -167,7 +167,6 @@ struct FactoryInitParams
     // must be set to true to keep DNS-SD advertising the server's port.
     bool preventDnssdPortOverwrite = false;
 
-
     /* The port used for operational communication to listen for and send messages over UDP/TCP.
      * The default value of `0` will pick any available port. */
     uint16_t listenPort = 0;

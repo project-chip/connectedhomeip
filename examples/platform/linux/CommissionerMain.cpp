@@ -130,11 +130,11 @@ CHIP_ERROR InitCommissioner(uint16_t commissionerPort, uint16_t udcListenPort, F
     Controller::SetupParams params;
 
     // use a different listen port for the commissioner than the default used by chip-tool.
-    factoryParams.listenPort               = commissionerPort;
-    factoryParams.fabricIndependentStorage = &gServerStorage;
-    factoryParams.fabricTable              = &Server::GetInstance().GetFabricTable();
-    factoryParams.sessionKeystore          = &gSessionKeystore;
-    factoryParams.enableServerInteractions = true;
+    factoryParams.listenPort                = commissionerPort;
+    factoryParams.fabricIndependentStorage  = &gServerStorage;
+    factoryParams.fabricTable               = &Server::GetInstance().GetFabricTable();
+    factoryParams.sessionKeystore           = &gSessionKeystore;
+    factoryParams.enableServerInteractions  = true;
     factoryParams.preventDnssdPortOverwrite = true;
     // We're running alongside an existing Server, so use the existing DataModelProvider
     // without changing the underlying persistent storage delegate.
