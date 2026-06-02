@@ -157,6 +157,7 @@ typedef NS_ENUM(uint32_t, MTRClusterIDType) {
     MTRClusterIDTypeWaterHeaterModeID MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x0000009E,
     MTRClusterIDTypeDeviceEnergyManagementModeID MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x0000009F,
     MTRClusterIDTypeElectricalGridConditionsID MTR_PROVISIONALLY_AVAILABLE = 0x000000A0,
+    MTRClusterIDTypeElectricalAlarmID MTR_PROVISIONALLY_AVAILABLE = 0x000000A1,
     MTRClusterIDTypeElectricalDistributionID MTR_PROVISIONALLY_AVAILABLE = 0x000000A2,
     MTRClusterIDTypeElectricalProtectionAlarmID MTR_PROVISIONALLY_AVAILABLE = 0x000000A3,
     MTRClusterIDTypeDoorLockID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000101,
@@ -2232,6 +2233,27 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterElectricalGridConditionsAttributeAttributeListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAttributeListID,
     MTRAttributeIDTypeClusterElectricalGridConditionsAttributeFeatureMapID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
     MTRAttributeIDTypeClusterElectricalGridConditionsAttributeClusterRevisionID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
+
+    // Cluster ElectricalAlarm attributes
+    MTRAttributeIDTypeClusterElectricalAlarmAttributeMaskID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
+    MTRAttributeIDTypeClusterElectricalAlarmAttributeLatchID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
+    MTRAttributeIDTypeClusterElectricalAlarmAttributeStateID MTR_PROVISIONALLY_AVAILABLE = 0x00000002,
+    MTRAttributeIDTypeClusterElectricalAlarmAttributeSupportedID MTR_PROVISIONALLY_AVAILABLE = 0x00000003,
+    MTRAttributeIDTypeClusterElectricalAlarmAttributeOverVoltageThresholdID MTR_PROVISIONALLY_AVAILABLE = 0x00000080,
+    MTRAttributeIDTypeClusterElectricalAlarmAttributeUnderVoltageThresholdID MTR_PROVISIONALLY_AVAILABLE = 0x00000081,
+    MTRAttributeIDTypeClusterElectricalAlarmAttributeOverFrequencyThresholdID MTR_PROVISIONALLY_AVAILABLE = 0x00000082,
+    MTRAttributeIDTypeClusterElectricalAlarmAttributeUnderFrequencyThresholdID MTR_PROVISIONALLY_AVAILABLE = 0x00000083,
+    MTRAttributeIDTypeClusterElectricalAlarmAttributeOverPowerThresholdID MTR_PROVISIONALLY_AVAILABLE = 0x00000084,
+    MTRAttributeIDTypeClusterElectricalAlarmAttributeUnderPowerThresholdID MTR_PROVISIONALLY_AVAILABLE = 0x00000085,
+    MTRAttributeIDTypeClusterElectricalAlarmAttributeOverCurrentThresholdID MTR_PROVISIONALLY_AVAILABLE = 0x00000086,
+    MTRAttributeIDTypeClusterElectricalAlarmAttributeUnderCurrentThresholdID MTR_PROVISIONALLY_AVAILABLE = 0x00000087,
+    MTRAttributeIDTypeClusterElectricalAlarmAttributePowerImportThresholdID MTR_PROVISIONALLY_AVAILABLE = 0x00000088,
+    MTRAttributeIDTypeClusterElectricalAlarmAttributePowerExportThresholdID MTR_PROVISIONALLY_AVAILABLE = 0x00000089,
+    MTRAttributeIDTypeClusterElectricalAlarmAttributeGeneratedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
+    MTRAttributeIDTypeClusterElectricalAlarmAttributeAcceptedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
+    MTRAttributeIDTypeClusterElectricalAlarmAttributeAttributeListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAttributeListID,
+    MTRAttributeIDTypeClusterElectricalAlarmAttributeFeatureMapID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
+    MTRAttributeIDTypeClusterElectricalAlarmAttributeClusterRevisionID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster ElectricalDistribution attributes
     MTRAttributeIDTypeClusterElectricalDistributionAttributeMaxContinuousCurrentID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
@@ -5834,6 +5856,11 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     MTRCommandIDTypeClusterDeviceEnergyManagementModeCommandChangeToModeID MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x00000000,
     MTRCommandIDTypeClusterDeviceEnergyManagementModeCommandChangeToModeResponseID MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x00000001,
 
+    // Cluster ElectricalAlarm commands
+    MTRCommandIDTypeClusterElectricalAlarmCommandResetID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
+    MTRCommandIDTypeClusterElectricalAlarmCommandModifyEnabledAlarmsID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
+    MTRCommandIDTypeClusterElectricalAlarmCommandSetElectricalAlarmThresholdsID MTR_PROVISIONALLY_AVAILABLE = 0x00000080,
+
     // Cluster ElectricalProtectionAlarm commands
     MTRCommandIDTypeClusterElectricalProtectionAlarmCommandModifyEnabledAlarmsID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
 
@@ -6957,6 +6984,9 @@ typedef NS_ENUM(uint32_t, MTREventIDType) {
 
     // Cluster ElectricalGridConditions events
     MTREventIDTypeClusterElectricalGridConditionsEventCurrentConditionsChangedID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
+
+    // Cluster ElectricalAlarm events
+    MTREventIDTypeClusterElectricalAlarmEventNotifyID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
 
     // Cluster ElectricalProtectionAlarm events
     MTREventIDTypeClusterElectricalProtectionAlarmEventNotifyID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
