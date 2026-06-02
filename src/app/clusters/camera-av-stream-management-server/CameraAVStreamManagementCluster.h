@@ -455,8 +455,8 @@ public:
      * to be registered and called by the interaction model at the appropriate times.
      *
      * @param aArgs                             Initialization arguments.
-     *                                          Note: The caller must ensure that resources referenced in aArgs (like the delegate
-     *                                          and the SafeAttributePersistenceProvider in context) outlive this cluster instance.
+     *                                          Note: The caller must ensure that resources referenced in aArgs (like the delegate)
+     *                                          outlive this cluster instance.
      *
      */
     CameraAVStreamManagementCluster(InitArguments && aArgs);
