@@ -45,8 +45,7 @@ import logging
 import os
 
 from mobly import asserts
-from support_modules.icd_support import (ICDBaseTest, ICDTransition, assert_subscription_heartbeat_received,
-                                         assert_subscription_no_heartbeat)
+from support_modules.icd_support import ICDBaseTest, ICDTransition, assert_subscription_heartbeat_received
 
 import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
@@ -151,7 +150,8 @@ class TC_ICDB_2_4(ICDBaseTest):
                      Verify MinIntervalFloor <= MaxInterval <= MAX(SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT, MaxIntervalCeiling) for both TH1 and TH2."""),
             TestStep(5, "Wait for 1 or more MaxInterval.", """
                      No check-in message is sent to TH1 or TH2 while subscriptions are active.
-                     Verify TH1 and TH2 each receive a subscription report within MaxInterval."""),
+                     Verify TH1 and TH2 each receive a subscription report within MaxInterval.
+                     Verify ICDCounter is unchanged, confirming no check-in messages were sent."""),
             TestStep(6, "Deactivate the subscription between DUT and TH1, and wait for 1 full active-idle-active cycle.", """
                      DUT starts sending check-in messages to TH1
                      Verify ICDCounter has incremented for TH1 after subscription shutdown and waiting for 1 full active-idle-active cycle.
@@ -159,8 +159,7 @@ class TC_ICDB_2_4(ICDBaseTest):
             TestStep(7, "Deactivate subscriptions between DUT and TH2, and wait for 1 full active-idle-active cycle.", """
                      DUT starts sending check-in messages both to TH1 and TH2
                      ICDCounter increments once per check-in per client, so expecting at least 2 increments
-                     Verify ICDCounter has incremented by at least 2 after TH1 and TH2 subscriptions are shutdown and waiting for 1 full active-idle-active cycle
-                     Verify DUT stopped sending subscription reports to both TH1 and TH2."""),
+                     Verify ICDCounter has incremented by at least 2 after TH1 and TH2 subscriptions are shutdown and waiting for 1 full active-idle-active cycle."""),
         ]
 
     def pics_TC_ICDB_2_4(self) -> list[str]:
@@ -261,30 +260,47 @@ class TC_ICDB_2_4(ICDBaseTest):
             autoResubscribe=False
         )
 
-        _, th1_max_interval_s = th1_subscription.GetReportingIntervalsSeconds()
-        _, th2_max_interval_s = th2_subscription.GetReportingIntervalsSeconds()
-        log.info(f"TH1 MaxInterval: {th1_max_interval_s}s")
-        log.info(f"TH2 MaxInterval: {th2_max_interval_s}s")
+        th1_min_interval_s, th1_max_interval_s = th1_subscription.GetReportingIntervalsSeconds()
+        th2_min_interval_s, th2_max_interval_s = th2_subscription.GetReportingIntervalsSeconds()
+        log.info(f"TH1 MinInterval: {th1_min_interval_s}s, MaxInterval: {th1_max_interval_s}s")
+        log.info(f"TH2 MinInterval: {th2_min_interval_s}s, MaxInterval: {th2_max_interval_s}s")
 
-        # Verify MinIntervalFloor <= MaxInterval <= MAX(SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT, MaxIntervalCeiling) for TH1
+        # Verify MinIntervalFloor <= MaxInterval for both subscriptions
+        asserts.assert_less_equal(th1_min_interval_s, th1_max_interval_s,
+                                  f"TH1 MinIntervalFloor {th1_min_interval_s}s must be <= MaxInterval {th1_max_interval_s}s")
+        asserts.assert_less_equal(th2_min_interval_s, th2_max_interval_s,
+                                  f"TH2 MinIntervalFloor {th2_min_interval_s}s must be <= MaxInterval {th2_max_interval_s}s")
+
+        # Verify MaxInterval <= MAX(SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT, MaxIntervalCeiling) for TH1
         asserts.assert_less_equal(th1_max_interval_s,
                                   max(subscription_max_interval_publisher_limit_s, idle_mode_duration_s),
                                   f"TH1 MaxInterval {th1_max_interval_s}s exceeds MAX(SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT, MaxIntervalCeiling)")
 
-        # Verify MinIntervalFloor <= MaxInterval <= MAX(SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT, MaxIntervalCeiling) for TH2
+        # Verify MaxInterval <= MAX(SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT, MaxIntervalCeiling) for TH2
         asserts.assert_less_equal(th2_max_interval_s,
                                   max(subscription_max_interval_publisher_limit_s, idle_mode_duration_s),
                                   f"TH2 MaxInterval {th2_max_interval_s}s exceeds MAX(SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT, MaxIntervalCeiling)")
 
         # *** STEP 5 ***
-        # Wait for 1 or more MaxInterval
+        # Wait for 1 or more MaxInterval.
+        # While subscriptions are active, the DUT should be in subscribed state and not send check-ins.
         self.step(5)
         max_interval_s = max(th1_max_interval_s, th2_max_interval_s)
+
+        icd_counter_before_wait = await self.read_icdm_attribute_expect_success(attributes.ICDCounter)
 
         # Verify DUT sent a subscription report to both TH1 and TH2 within MaxInterval
         await asyncio.gather(
             assert_subscription_heartbeat_received(th1_subscription, max_interval_s),
             assert_subscription_heartbeat_received(th2_subscription, max_interval_s)
+        )
+
+        # Verify ICDCounter is unchanged, confirming no check-in messages were sent
+        icd_counter_after_wait = await self.read_icdm_attribute_expect_success(attributes.ICDCounter)
+        asserts.assert_equal(
+            icd_counter_after_wait, icd_counter_before_wait,
+            f"ICDCounter must not change while subscriptions are active. "
+            f"Before: {icd_counter_before_wait}, After: {icd_counter_after_wait}"
         )
 
         # *** STEP 6 ***
@@ -328,15 +344,7 @@ class TC_ICDB_2_4(ICDBaseTest):
                                      f"Before: {icd_counter_before_th2_shutdown}, After: {icd_counter_after_th2_shutdown}, "
                                      f"Increment: {icd_counter_increment}")
 
-        # Verify DUT stopped sending subscription reports to both TH1 and TH2.
-        # Note: Both subscriptions have been Shutdown() at this point (TH1 in step 6, TH2 above),
-        # so these assertions are structurally guaranteed to pass. The ICDCounter >= 2 check above
-        # is the behavioral verification that the DUT transitioned from subscribed to check-in state.
-        await asyncio.gather(
-            assert_subscription_no_heartbeat(th1_subscription, max_interval_s),
-            assert_subscription_no_heartbeat(th2_subscription, max_interval_s)
-        )
-        log.info("TH1 and TH2 subscriptions no longer receiving reports (as expected)")
+        log.info("TH1 and TH2 subscriptions have been shut down; ICDCounter checks above verify transition back to check-in state.")
 
 
 if __name__ == "__main__":

@@ -26,6 +26,8 @@ import re
 import time
 from enum import IntEnum
 
+from mdns_discovery.mdns_discovery import MdnsDiscovery, MdnsServiceType
+from mdns_discovery.utils.asserts import assert_valid_icd_key
 from mobly import asserts
 
 import matter.clusters as Clusters
@@ -104,6 +106,7 @@ def uat_set_hints(hint_bitmap):
         log.info(f"  - {uat_bit_name(bit)} (0x{bit.value:05X})")
     return hints
 
+
 async def _wait_for_subscription_heartbeat(subscription, max_interval_ceiling_s: float,
                                            buffer_s: float) -> float | None:
     """Wait up to `max_interval_ceiling_s + buffer_s` for one empty heartbeat report.
@@ -172,6 +175,27 @@ class ICDBaseTest(MatterBaseTest):
     """Base test class for ICD tests with shared functionality."""
 
     ROOT_NODE_ENDPOINT_ID = 0
+
+    def get_dut_instance_name(self) -> str:
+        compressed_fabric_id = self.default_controller.GetCompressedFabricId()
+        return f'{compressed_fabric_id:016X}-{self.dut_node_id:016X}'
+
+    async def get_icd_txt_key(self) -> int:
+        """Retrieve the ICD DNS-SD TXT key from the DUT's operational service record."""
+        mdns = MdnsDiscovery()
+
+        dut_instance_name = self.get_dut_instance_name()
+        instance_qname = f"{dut_instance_name}.{MdnsServiceType.OPERATIONAL.value}"
+
+        txt_record = await mdns.get_txt_record(
+            service_name=instance_qname,
+            service_type=MdnsServiceType.OPERATIONAL.value,
+            log_output=True
+        )
+
+        icd_value = txt_record.txt['ICD']
+        assert_valid_icd_key(icd_value)
+        return int(icd_value)
 
     async def read_icdm_attribute_expect_success(self, attribute, controller=None, node_id=None):
         return await self.read_single_attribute_check_success(
