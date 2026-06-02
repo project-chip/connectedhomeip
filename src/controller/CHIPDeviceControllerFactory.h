@@ -321,6 +321,7 @@ private:
     SessionResumptionStorage * mSessionResumptionStorage                = nullptr;
     app::DataModel::Provider * mDataModelProvider                       = nullptr;
     bool mEnableServerInteractions                                      = false;
+    bool mPreventDnssdPortOverwrite                                     = false;
 };
 
 } // namespace Controller

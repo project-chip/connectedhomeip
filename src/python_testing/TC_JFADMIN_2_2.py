@@ -123,6 +123,9 @@ class TC_JFADMIN_2_2(CADMINBaseTest):
         if self.dev_ctrl_eco_b is not None:
             self.dev_ctrl_eco_b.Shutdown()
             self.dev_ctrl_eco_b = None
+        if self.joint_fabric_ca_manager is not None:
+            self.joint_fabric_ca_manager.Shutdown()
+            self.joint_fabric_ca_manager = None
         if self.joint_fabric_persistent_storage is not None:
             self.joint_fabric_persistent_storage.Shutdown()
             self.joint_fabric_persistent_storage = None
@@ -354,7 +357,7 @@ class TC_JFADMIN_2_2(CADMINBaseTest):
         for k, v in self.ecoBCtrlStorage['sdk-config'].items():
             self.joint_fabric_persistent_storage.SetSdkKey(k, base64.b64decode(v))
 
-        caList = self.joint_fabric_persistent_storage.GetKey('caList')
+        caList = self.joint_fabric_persistent_storage.GetKey('caList') or {}
         caList["2"] = self.ecoBCtrlStorage['repl-config']['caList']['2']
         self.joint_fabric_persistent_storage.SetKey('caList', caList)
 
@@ -362,8 +365,8 @@ class TC_JFADMIN_2_2(CADMINBaseTest):
         ca2 = self.joint_fabric_ca_manager.NewCertificateAuthority(caIndex=2)
         ca2.LoadFabricAdminsFromStorage()
 
-        # Retrieve active CA list index 1 (which is CA Index 2)
-        self.dev_ctrl_eco_b = self.joint_fabric_ca_manager.activeCaList[1].adminList[0].NewController(
+        # Create Ecosystem B controller using ca2 directly
+        self.dev_ctrl_eco_b = ca2.adminList[0].NewController(
             nodeId=201,
             paaTrustStorePath=str(self.matter_test_config.paa_trust_store_path),
             catTags=[int(self.ecoBCATs, 16)])

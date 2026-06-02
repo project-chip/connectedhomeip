@@ -608,7 +608,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         is assumed fine.
         """
         if not hasattr(self, '_allocated_ports'):
-            self._allocated_ports = set()
+            self._allocated_ports: set[int] = set()
 
         def is_port_available(p: int) -> bool:
             import errno

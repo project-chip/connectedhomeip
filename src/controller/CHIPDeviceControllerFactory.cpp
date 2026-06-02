@@ -69,6 +69,7 @@ CHIP_ERROR DeviceControllerFactory::Init(FactoryInitParams params)
     mCertificateValidityPolicy = params.certificateValidityPolicy;
     mSessionResumptionStorage  = params.sessionResumptionStorage;
     mEnableServerInteractions  = params.enableServerInteractions;
+    mPreventDnssdPortOverwrite = params.preventDnssdPortOverwrite;
     mDataModelProvider         = params.dataModelProvider;
 
     // Initialize the system state. Note that it is left in a somewhat
@@ -96,6 +97,7 @@ CHIP_ERROR DeviceControllerFactory::ReinitSystemStateIfNecessary()
     params.interfaceId               = mInterfaceId;
     params.fabricIndependentStorage  = mFabricIndependentStorage;
     params.enableServerInteractions  = mEnableServerInteractions;
+    params.preventDnssdPortOverwrite = mPreventDnssdPortOverwrite;
     params.groupDataProvider         = mSystemState->GetGroupDataProvider();
     params.sessionKeystore           = mSystemState->GetSessionKeystore();
     params.fabricTable               = mSystemState->Fabrics();
