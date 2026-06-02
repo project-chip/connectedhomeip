@@ -17,20 +17,21 @@
 
 #pragma once
 
-#include <app/AttributeValueEncoder.h>
-#include <lib/core/CHIPError.h>
+#include <app/clusters/thread-network-diagnostics-server/ThreadNetworkDiagnosticsProvider.h>
 
 namespace chip {
 namespace app {
+namespace Clusters {
+namespace ThreadNetworkDiagnostics {
 
-class ThreadDiagnosticsProvider
+class DefaultThreadDiagnosticsProvider : public ThreadDiagnosticsProvider
 {
 public:
-    virtual ~ThreadDiagnosticsProvider() = default;
-
-    virtual CHIP_ERROR WriteAttributeToTlv(AttributeId attributeId, app::AttributeValueEncoder & encoder) = 0;
-    virtual void ResetCounts() = 0;
+    CHIP_ERROR WriteAttributeToTlv(AttributeId attributeId, app::AttributeValueEncoder & encoder) override;
+    void ResetCounts() override;
 };
 
+} // namespace ThreadNetworkDiagnostics
+} // namespace Clusters
 } // namespace app
 } // namespace chip

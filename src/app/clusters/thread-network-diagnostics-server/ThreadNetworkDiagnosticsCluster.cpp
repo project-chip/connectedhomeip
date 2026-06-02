@@ -104,8 +104,8 @@ CHIP_ERROR AppendAllInRange(const AttributeIdRange range, ReadOnlyBufferBuilder<
 
 } // namespace ThreadNetworkDiagnostics
 
-ThreadNetworkDiagnosticsCluster::ThreadNetworkDiagnosticsCluster(EndpointId endpointId, ClusterType clusterType) :
-    DefaultServerCluster({ endpointId, ThreadNetworkDiagnostics::Id }), mClusterType(clusterType)
+ThreadNetworkDiagnosticsCluster::ThreadNetworkDiagnosticsCluster(EndpointId endpointId, ClusterType clusterType, ThreadDiagnosticsProvider & provider) :
+    DefaultServerCluster({ endpointId, ThreadNetworkDiagnostics::Id }), mClusterType(clusterType), mProvider(&provider)
 {}
 
 DataModel::ActionReturnStatus ThreadNetworkDiagnosticsCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
@@ -119,7 +119,7 @@ DataModel::ActionReturnStatus ThreadNetworkDiagnosticsCluster::ReadAttribute(con
         return encoder.Encode(mClusterType == ClusterType::kMinimal ? BitFlags<Feature>() : kFeaturesAll);
     default:
         // Since ReadAttribute() is invoked only for valid attributes this is safe
-        return WriteThreadNetworkDiagnosticAttributeToTlv(request.path.mAttributeId, encoder);
+        return mProvider->WriteAttributeToTlv(request.path.mAttributeId, encoder);
     }
 }
 
@@ -239,7 +239,7 @@ ThreadNetworkDiagnosticsCluster::InvokeCommand(const DataModel::InvokeRequest & 
     switch (request.path.mCommandId)
     {
     case Commands::ResetCounts::Id: {
-        ConnectivityMgr().ResetThreadNetworkDiagnosticsCounts();
+        mProvider->ResetCounts();
         return Protocols::InteractionModel::Status::Success;
     }
     default:

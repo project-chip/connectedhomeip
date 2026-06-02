@@ -17,6 +17,7 @@
  */
 
 #include <app/clusters/thread-network-diagnostics-server/ThreadNetworkDiagnosticsCluster.h>
+#include <app/clusters/thread-network-diagnostics-server/DefaultThreadNetworkDiagnosticsProvider.h>
 #include <app/static-cluster-config/ThreadNetworkDiagnostics.h>
 #include <app/util/endpoint-config-api.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>
@@ -54,9 +55,11 @@ public:
         //       This also technically means that zap could reduce flash by not including metdata (only featuremap has to be
         //       set and all attributes can be deselected ... it will make not difference here).
 
+        static DefaultThreadDiagnosticsProvider sDefaultProvider;
         gServers[clusterInstanceIndex].Create(endpointId,
                                               rawFeatureMap == 0 ? ThreadNetworkDiagnosticsCluster::ClusterType::kMinimal
-                                                                 : ThreadNetworkDiagnosticsCluster::ClusterType::kFull);
+                                                                 : ThreadNetworkDiagnosticsCluster::ClusterType::kFull,
+                                              sDefaultProvider);
         return gServers[clusterInstanceIndex].Registration();
     }
 
