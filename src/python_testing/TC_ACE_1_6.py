@@ -85,6 +85,7 @@ log = logging.getLogger(__name__)
 # implement retries. If the test fails (likely due to timeouts on operations such as receiving events),
 # Try the test again from factory reset a few times.
 
+
 class TC_ACE_1_6(MatterBaseTest):
 
     def desc_TC_ACE_1_6(self) -> str:
@@ -382,7 +383,7 @@ class TC_ACE_1_6(MatterBaseTest):
             self.default_controller.SendGroupCommand(groupID3, Clusters.Groups.Commands.AddGroup(groupID=groupID5, groupName=""))
             await asyncio.sleep(3)
 
-            # Step 12: ViewGroup 0x0105 - expect NOT_FOUND since groupId3 ACL entry 
+            # Step 12: ViewGroup 0x0105 - expect NOT_FOUND since groupId3 ACL entry
             # was removed before adding groupID5 in previous step
             self.step(12)
             resp = await self.send_single_cmd(Clusters.Groups.Commands.ViewGroup(groupID=groupID5), endpoint=pixit_g_endpoint)
@@ -430,7 +431,7 @@ class TC_ACE_1_6(MatterBaseTest):
                 authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kGroup,
                 subjects=[groupID3],
                 targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(endpoint=ep1, cluster=operate_only_command.cluster_object.id)])
-            
+
             acl_groupcast_groupkey_admin = Clusters.AccessControl.Structs.AccessControlEntryStruct(
                 privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister,
                 authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
@@ -512,6 +513,7 @@ class TC_ACE_1_6(MatterBaseTest):
 
             # Step 20g: Verify GroupcastTesting event is emitted (AccessAllowed: true)
             self.step("20g")
+
             def previous_event_filter(data) -> bool:
                 return data.groupcastTestResult == Clusters.Groupcast.Enums.GroupcastTestResultEnum.kNoAvailableKey
 
@@ -631,7 +633,7 @@ class TC_ACE_1_6(MatterBaseTest):
         self.step(32)
         await self.send_single_cmd(endpoint=0, cmd=Clusters.GroupKeyManagement.Commands.KeySetRemove(groupKeySetID=keySetID1))
 
-        # Step 33: Restore full access over CASE. This is done as a precaution as many 
+        # Step 33: Restore full access over CASE. This is done as a precaution as many
         # of the above steps edit ACL entries, and this ensures we get back to the intial state.
         self.step(33)
         acl_admin_full = Clusters.AccessControl.Structs.AccessControlEntryStruct(
