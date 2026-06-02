@@ -34,8 +34,7 @@ public:
 
     void ResetCounts() override
     {
-        ChipLogProgress(AppServer,
-                        ">>> [Verification] AllDevicesThreadDiagnosticsProvider: Intercepted ResetCounts command! <<<");
+        ChipLogProgress(AppServer, ">>> [Verification] AllDevicesThreadDiagnosticsProvider: Intercepted ResetCounts command! <<<");
         DefaultThreadNetworkDiagnosticsProvider::ResetCounts();
     }
 };

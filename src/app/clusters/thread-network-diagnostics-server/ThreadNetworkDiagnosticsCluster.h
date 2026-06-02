@@ -43,7 +43,8 @@ public:
         kFull
     };
 
-    ThreadNetworkDiagnosticsCluster(EndpointId endpointId, ClusterType clusterType, ThreadNetworkDiagnostics::ThreadNetworkDiagnosticsProvider & provider);
+    ThreadNetworkDiagnosticsCluster(EndpointId endpointId, ClusterType clusterType,
+                                    ThreadNetworkDiagnostics::ThreadNetworkDiagnosticsProvider & provider);
 
     // Server cluster implementation
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
