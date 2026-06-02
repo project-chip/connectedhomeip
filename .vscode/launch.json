@@ -229,37 +229,52 @@
             ]
         },
         {
-            "name": "LightingApp (Tizen) [remote]",
+            "name": "LightingApp (Tizen aarch64) [remote] - RUN APPLAUNCHER ON DEVICE FIRST",
             "type": "cppdbg",
             "request": "launch",
-            "cwd": "${workspaceFolder}/out/tizen-arm-light",
-            "program": "${workspaceFolder}/out/tizen-arm-light/chip-lighting-app",
-            "miDebuggerPath": "${env:TIZEN_SDK_ROOT}/tools/arm-linux-gnueabi-gcc-9.2/bin/arm-linux-gnueabi-gdb",
-            "additionalSOLibSearchPath": "${env:TIZEN_ROOTFS}",
-            "preLaunchTask": "Launch LightingApp with gdbserver attached (Tizen)",
+            
+            // =========================================================================
+            // HOW TO RUN ON TARGET DEVICE (Raspberry Pi):
+            // 1. app_launcher --debug --start org.tizen.matter.example.lighting -- wifi true discriminator 1234 passcode 11223344
+            // 2. /opt/bin/aarch64-linux-gnu-gdbserver :9999 --attach <PID>
+            // =========================================================================
+
+            "cwd": "${workspaceFolder}/out/tizen-arm64-light-no-thread-no-ble",
+            "program": "${workspaceFolder}/out/tizen-arm64-light-no-thread-no-ble/chip-lighting-app",
+            "targetArchitecture": "arm64",
+            "miDebuggerPath": "${env:TIZEN_SDK_ROOT}/tools/aarch64-linux-gnu-gdb-15.1/bin/aarch64-linux-gnu-gdb",
             "miDebuggerServerAddress": "localhost:9999",
+            "additionalSOLibSearchPath": "${workspaceFolder}/out/tizen-arm64-light-no-thread-no-ble;${env:TIZEN_SDK_ROOT}/platforms/tizen-10.0/tizen/rootstraps/tizen-10.0-device64.core/lib64;${env:TIZEN_SDK_ROOT}/platforms/tizen-10.0/tizen/rootstraps/tizen-10.0-device64.core/usr/lib64",
             "linux": {
                 "MIMode": "gdb"
             },
             "setupCommands": [
                 {
-                    "description": "Enable pretty-printing for gdb",
-                    "text": "-enable-pretty-printing",
+                    "text": "handle SIGINT nostop noprint pass",
                     "ignoreFailures": true
                 },
                 {
-                    "text": "set solib-absolute-prefix ${env:TIZEN_ROOTFS}"
+                    "text": "handle SIGTERM nostop noprint pass",
+                    "ignoreFailures": true
                 },
                 {
-                    "text": "set sysroot ${env:TIZEN_SDK_SYSROOT}"
+                    "text": "set architecture aarch64",
+                    "ignoreFailures": false
                 },
                 {
-                    "text": "set debug-file-directory {env:TIZEN_SDK_SYSROOT}/usr/lib/debug"
+                    "text": "set sysroot ${env:TIZEN_SDK_ROOT}/platforms/tizen-10.0/tizen/rootstraps/tizen-10.0-device64.core",
+                    "ignoreFailures": false
                 },
                 {
-                    "text": "set solib-search-path ${workspaceFolder}/out/tizen-arm-light"
+                    "text": "set solib-absolute-prefix ${env:TIZEN_SDK_ROOT}/platforms/tizen-10.0/tizen/rootstraps/tizen-10.0-device64.core",
+                    "ignoreFailures": true
+                },
+                {
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
                 }
-            ]
+            ],
+            "stopAtEntry": false
         },
         {
             "name": "CHIP All Clusters App (Linux)",
