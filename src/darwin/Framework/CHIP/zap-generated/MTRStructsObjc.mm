@@ -11873,13 +11873,9 @@ NS_ASSUME_NONNULL_BEGIN
 
         _chunkDuration = @(0);
 
-        _sessionGroup = @(0);
+        _sessionGroup = nil;
 
-        _trackName = @"";
-
-        _cencKey = nil;
-
-        _cencKeyID = nil;
+        _trackName = nil;
 
         _metadataEnabled = nil;
     }
@@ -11895,8 +11891,6 @@ NS_ASSUME_NONNULL_BEGIN
     other.chunkDuration = self.chunkDuration;
     other.sessionGroup = self.sessionGroup;
     other.trackName = self.trackName;
-    other.cencKey = self.cencKey;
-    other.cencKeyID = self.cencKeyID;
     other.metadataEnabled = self.metadataEnabled;
 
     return other;
@@ -11904,7 +11898,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: cmafInterface:%@; segmentDuration:%@; chunkDuration:%@; sessionGroup:%@; trackName:%@; cencKey:%@; cencKeyID:%@; metadataEnabled:%@; >", NSStringFromClass([self class]), _cmafInterface, _segmentDuration, _chunkDuration, _sessionGroup, _trackName, [_cencKey base64EncodedStringWithOptions:0], [_cencKeyID base64EncodedStringWithOptions:0], _metadataEnabled];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: cmafInterface:%@; segmentDuration:%@; chunkDuration:%@; sessionGroup:%@; trackName:%@; metadataEnabled:%@; >", NSStringFromClass([self class]), _cmafInterface, _segmentDuration, _chunkDuration, _sessionGroup, _trackName, _metadataEnabled];
     return descriptionString;
 }
 
@@ -12074,7 +12068,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _activationReason = nil;
 
-        _containerType = @(0);
+        _containerType = nil;
 
         _cmafSessionNumber = nil;
     }
@@ -12109,7 +12103,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _connectionID = @(0);
 
-        _containerType = @(0);
+        _containerType = nil;
 
         _cmafSessionNumber = nil;
     }

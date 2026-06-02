@@ -7589,7 +7589,7 @@ public static class PushAvStreamTransportClusterPushTransportBeginEvent {
   public Integer connectionID;
   public Integer triggerType;
   public Optional<Integer> activationReason;
-  public Integer containerType;
+  public Optional<Integer> containerType;
   public Optional<Long> CMAFSessionNumber;
   private static final long CONNECTION_ID_ID = 0L;
   private static final long TRIGGER_TYPE_ID = 1L;
@@ -7601,7 +7601,7 @@ public static class PushAvStreamTransportClusterPushTransportBeginEvent {
     Integer connectionID,
     Integer triggerType,
     Optional<Integer> activationReason,
-    Integer containerType,
+    Optional<Integer> containerType,
     Optional<Long> CMAFSessionNumber
   ) {
     this.connectionID = connectionID;
@@ -7616,7 +7616,7 @@ public static class PushAvStreamTransportClusterPushTransportBeginEvent {
     values.add(new StructElement(CONNECTION_ID_ID, new UIntType(connectionID)));
     values.add(new StructElement(TRIGGER_TYPE_ID, new UIntType(triggerType)));
     values.add(new StructElement(ACTIVATION_REASON_ID, activationReason.<BaseTLVType>map((nonOptionalactivationReason) -> new UIntType(nonOptionalactivationReason)).orElse(new EmptyType())));
-    values.add(new StructElement(CONTAINER_TYPE_ID, new UIntType(containerType)));
+    values.add(new StructElement(CONTAINER_TYPE_ID, containerType.<BaseTLVType>map((nonOptionalcontainerType) -> new UIntType(nonOptionalcontainerType)).orElse(new EmptyType())));
     values.add(new StructElement(CMAF_SESSION_NUMBER_ID, CMAFSessionNumber.<BaseTLVType>map((nonOptionalCMAFSessionNumber) -> new UIntType(nonOptionalCMAFSessionNumber)).orElse(new EmptyType())));
 
     return new StructType(values);
@@ -7629,7 +7629,7 @@ public static class PushAvStreamTransportClusterPushTransportBeginEvent {
     Integer connectionID = null;
     Integer triggerType = null;
     Optional<Integer> activationReason = Optional.empty();
-    Integer containerType = null;
+    Optional<Integer> containerType = Optional.empty();
     Optional<Long> CMAFSessionNumber = Optional.empty();
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == CONNECTION_ID_ID) {
@@ -7650,7 +7650,7 @@ public static class PushAvStreamTransportClusterPushTransportBeginEvent {
       } else if (element.contextTagNum() == CONTAINER_TYPE_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
-          containerType = castingValue.value(Integer.class);
+          containerType = Optional.of(castingValue.value(Integer.class));
         }
       } else if (element.contextTagNum() == CMAF_SESSION_NUMBER_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -7693,7 +7693,7 @@ public static class PushAvStreamTransportClusterPushTransportBeginEvent {
 }
 public static class PushAvStreamTransportClusterPushTransportEndEvent {
   public Integer connectionID;
-  public Integer containerType;
+  public Optional<Integer> containerType;
   public Optional<Long> CMAFSessionNumber;
   private static final long CONNECTION_ID_ID = 0L;
   private static final long CONTAINER_TYPE_ID = 1L;
@@ -7701,7 +7701,7 @@ public static class PushAvStreamTransportClusterPushTransportEndEvent {
 
   public PushAvStreamTransportClusterPushTransportEndEvent(
     Integer connectionID,
-    Integer containerType,
+    Optional<Integer> containerType,
     Optional<Long> CMAFSessionNumber
   ) {
     this.connectionID = connectionID;
@@ -7712,7 +7712,7 @@ public static class PushAvStreamTransportClusterPushTransportEndEvent {
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
     values.add(new StructElement(CONNECTION_ID_ID, new UIntType(connectionID)));
-    values.add(new StructElement(CONTAINER_TYPE_ID, new UIntType(containerType)));
+    values.add(new StructElement(CONTAINER_TYPE_ID, containerType.<BaseTLVType>map((nonOptionalcontainerType) -> new UIntType(nonOptionalcontainerType)).orElse(new EmptyType())));
     values.add(new StructElement(CMAF_SESSION_NUMBER_ID, CMAFSessionNumber.<BaseTLVType>map((nonOptionalCMAFSessionNumber) -> new UIntType(nonOptionalCMAFSessionNumber)).orElse(new EmptyType())));
 
     return new StructType(values);
@@ -7723,7 +7723,7 @@ public static class PushAvStreamTransportClusterPushTransportEndEvent {
       return null;
     }
     Integer connectionID = null;
-    Integer containerType = null;
+    Optional<Integer> containerType = Optional.empty();
     Optional<Long> CMAFSessionNumber = Optional.empty();
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == CONNECTION_ID_ID) {
@@ -7734,7 +7734,7 @@ public static class PushAvStreamTransportClusterPushTransportEndEvent {
       } else if (element.contextTagNum() == CONTAINER_TYPE_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
-          containerType = castingValue.value(Integer.class);
+          containerType = Optional.of(castingValue.value(Integer.class));
         }
       } else if (element.contextTagNum() == CMAF_SESSION_NUMBER_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
