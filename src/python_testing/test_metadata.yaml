@@ -172,7 +172,6 @@ not_automated:
           Very flaky in CI.
           https://github.com/project-chip/connectedhomeip/issues/71932
 
-
 # This is a list of slow tests (just arbitrarily picked around 20 seconds)
 # used in some script reporting for "be patient" messages as well as potentially
 # to consider improving. May not be exhaustive
