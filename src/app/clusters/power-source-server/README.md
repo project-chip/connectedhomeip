@@ -6,7 +6,7 @@ source. A power source can be either a battery or a wired power source.
 ## Overview
 
 This directory contains an implementation of Matter Power Source cluster. This
-implementation does not handle the persistence of the `Order` attribute. Becuase
+implementation does not handle the persistence of the `Order` attribute. Because
 the `Order` attribute is read-only, only the direct user of the cluster can
 change it, so it is expected of them to handle the persistence of the attribute.
 This implementation notifies the data model when an attribute changes in the way
