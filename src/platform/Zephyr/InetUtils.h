@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 
+#include <inet/IPAddress.h>
 #include <inet/InetInterface.h>
 
 struct in6_addr;
