@@ -227,6 +227,5 @@ class TC_PWRTL_2_1(MatterBaseTest):
             log.info("ActiveEndpoints persisted across reboot (Non-volatile verified)")
 
 
-
 if __name__ == "__main__":
     default_matter_test_main()
