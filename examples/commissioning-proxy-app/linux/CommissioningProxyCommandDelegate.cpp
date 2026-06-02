@@ -33,6 +33,9 @@
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
 #include "CommissioningProxyPafTransport.h"
 #endif
+#if CONFIG_NETWORK_LAYER_BLE
+#include "CommissioningProxyBleTransport.h"
+#endif
 
 using namespace chip;
 using namespace chip::app;
@@ -200,30 +203,22 @@ Protocols::InteractionModel::Status Clusters::CommissioningProxy::MyCPDelegate::
     ChipLogProgress(AppServer, "ProxyConnectRequest transport:%d wiFiBand:%d timeout:%u discriminator:%u", (int) transport,
                     (int) wiFiBand, timeout, discriminator);
 
-    const uint8_t tbits = static_cast<uint8_t>(transport);
-
-    if (tbits == static_cast<uint8_t>(CapabilitiesBitmap::kWiFiPAF))
+    switch (transport)
     {
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    case CapabilitiesBitmap::kWiFiPAF:
         return Paf::Connect(commandObj, request, discriminator, timeout, mServer);
-#else
-        return chip::Protocols::InteractionModel::Status::InvalidTransportType;
 #endif
-    }
 
-    if (tbits == static_cast<uint8_t>(CapabilitiesBitmap::kBle))
-    {
 #if CONFIG_NETWORK_LAYER_BLE
-        // TODO(Phase 2B): forward to Ble::Connect.
-        ChipLogError(AppServer, "ProxyConnectRequest: BLE transport not yet implemented (Phase 2B)");
-        return chip::Protocols::InteractionModel::Status::Failure;
-#else
-        return chip::Protocols::InteractionModel::Status::InvalidTransportType;
+    case CapabilitiesBitmap::kBle:
+        return Ble::Connect(commandObj, request, discriminator, timeout, mServer);
 #endif
-    }
 
-    ChipLogError(AppServer, "ProxyConnectRequest: unsupported transport 0x%x", tbits);
-    return chip::Protocols::InteractionModel::Status::InvalidTransportType;
+    default:
+        ChipLogError(AppServer, "ProxyConnectRequest: unsupported transport 0x%x", static_cast<uint8_t>(transport));
+        return chip::Protocols::InteractionModel::Status::InvalidTransportType;
+    }
 }
 
 Protocols::InteractionModel::Status
@@ -233,30 +228,22 @@ Clusters::CommissioningProxy::MyCPDelegate::ProxyScanRequest(CapabilitiesBitmap 
 {
     ChipLogProgress(AppServer, "ProxyScanRequest: transport:0x%x wiFiBands:0x%x", (int) transport, (int) wiFiBands);
 
-    const uint8_t tbits = static_cast<uint8_t>(transport);
-
-    if (tbits == static_cast<uint8_t>(CapabilitiesBitmap::kWiFiPAF))
+    switch (transport)
     {
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    case CapabilitiesBitmap::kWiFiPAF:
         return Paf::Scan(commandObj, request, GetScanMaxTime());
-#else
-        return chip::Protocols::InteractionModel::Status::InvalidTransportType;
 #endif
-    }
 
-    if (tbits == static_cast<uint8_t>(CapabilitiesBitmap::kBle))
-    {
 #if CONFIG_NETWORK_LAYER_BLE
-        // TODO(Phase 2B): forward to Ble::Scan.
-        ChipLogError(AppServer, "ProxyScanRequest: BLE transport not yet implemented (Phase 2B)");
-        return chip::Protocols::InteractionModel::Status::Failure;
-#else
-        return chip::Protocols::InteractionModel::Status::InvalidTransportType;
+    case CapabilitiesBitmap::kBle:
+        return Ble::Scan(commandObj, request, GetScanMaxTime());
 #endif
-    }
 
-    ChipLogError(AppServer, "ProxyScanRequest: unsupported transport 0x%x", tbits);
-    return chip::Protocols::InteractionModel::Status::InvalidTransportType;
+    default:
+        ChipLogError(AppServer, "ProxyScanRequest: unsupported transport 0x%x", static_cast<uint8_t>(transport));
+        return chip::Protocols::InteractionModel::Status::InvalidTransportType;
+    }
 }
 
 Protocols::InteractionModel::Status
@@ -319,24 +306,26 @@ Clusters::CommissioningProxy::MyCPDelegate::ProxyMessageRequest(uint16_t session
         return chip::Protocols::InteractionModel::Status::Failure;
     }
 
-    const uint8_t sessTransportBits = static_cast<uint8_t>(it->second.transport);
+    const CapabilitiesBitmap sessTransport = it->second.transport;
 
     // Per spec ResponseTimeout=0: forward best-effort; respond immediately.
     if (responseTimeout == 0)
     {
         CHIP_ERROR sendErr = CHIP_ERROR_INCORRECT_STATE;
-        if (sessTransportBits == static_cast<uint8_t>(CapabilitiesBitmap::kWiFiPAF))
+        switch (sessTransport)
         {
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+        case CapabilitiesBitmap::kWiFiPAF:
             sendErr = Paf::SendMessage(sessionId, std::move(buf));
+            break;
 #endif
-        }
-        else if (sessTransportBits == static_cast<uint8_t>(CapabilitiesBitmap::kBle))
-        {
 #if CONFIG_NETWORK_LAYER_BLE
-            // TODO(Phase 2B): sendErr = Ble::SendMessage(sessionId, std::move(buf));
-            sendErr = CHIP_ERROR_NOT_IMPLEMENTED;
+        case CapabilitiesBitmap::kBle:
+            sendErr = Ble::SendMessage(sessionId, std::move(buf));
+            break;
 #endif
+        default:
+            break;
         }
         if (sendErr != CHIP_NO_ERROR)
         {
@@ -360,18 +349,20 @@ Clusters::CommissioningProxy::MyCPDelegate::ProxyMessageRequest(uint16_t session
     }
 
     CHIP_ERROR err = CHIP_ERROR_INCORRECT_STATE;
-    if (sessTransportBits == static_cast<uint8_t>(CapabilitiesBitmap::kWiFiPAF))
+    switch (sessTransport)
     {
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    case CapabilitiesBitmap::kWiFiPAF:
         err = Paf::SendMessage(sessionId, std::move(buf));
+        break;
 #endif
-    }
-    else if (sessTransportBits == static_cast<uint8_t>(CapabilitiesBitmap::kBle))
-    {
 #if CONFIG_NETWORK_LAYER_BLE
-        // TODO(Phase 2B): err = Ble::SendMessage(sessionId, std::move(buf));
-        err = CHIP_ERROR_NOT_IMPLEMENTED;
+    case CapabilitiesBitmap::kBle:
+        err = Ble::SendMessage(sessionId, std::move(buf));
+        break;
 #endif
+    default:
+        break;
     }
 
     if (err != CHIP_NO_ERROR)
@@ -425,23 +416,27 @@ Clusters::CommissioningProxy::MyCPDelegate::ProxyDisconnectRequest(uint16_t sess
         sPendingProxyMsgCtx.erase(pendingIt);
     }
 
-    const uint8_t sessTransportBits = static_cast<uint8_t>(it->second.transport);
+    const CapabilitiesBitmap sessTransport = it->second.transport;
     sProxySessions.erase(it);
 
-    if (sessTransportBits == static_cast<uint8_t>(CapabilitiesBitmap::kWiFiPAF))
+    switch (sessTransport)
     {
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    case CapabilitiesBitmap::kWiFiPAF:
         Paf::Disconnect(sessionId);
         if (sProxySessions.empty())
             Paf::OnAllSessionsClosed();
+        break;
 #endif
-    }
-    else if (sessTransportBits == static_cast<uint8_t>(CapabilitiesBitmap::kBle))
-    {
 #if CONFIG_NETWORK_LAYER_BLE
-        // TODO(Phase 2B): Ble::Disconnect(sessionId).
-        ChipLogError(AppServer, "ProxyDisconnectRequest: BLE disconnect not yet implemented (Phase 2B)");
+    case CapabilitiesBitmap::kBle:
+        Ble::Disconnect(sessionId);
+        if (sProxySessions.empty())
+            Ble::OnAllSessionsClosed();
+        break;
 #endif
+    default:
+        break;
     }
 
     ChipLogProgress(AppServer, "ProxyDisconnectRequest: session %u cleaned up", sessionId);
@@ -451,12 +446,14 @@ Clusters::CommissioningProxy::MyCPDelegate::ProxyDisconnectRequest(uint16_t sess
 Protocols::InteractionModel::Status Clusters::CommissioningProxy::MyCPDelegate::CancelPendingConnect(chip::FabricIndex fabricIndex)
 {
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-    auto s = Paf::CancelPendingConnect(fabricIndex);
-    if (s != chip::Protocols::InteractionModel::Status::InvalidInState)
-        return s;
+    auto pafStatus = Paf::CancelPendingConnect(fabricIndex);
+    if (pafStatus != chip::Protocols::InteractionModel::Status::InvalidInState)
+        return pafStatus;
 #endif
 #if CONFIG_NETWORK_LAYER_BLE
-    // TODO(Phase 2B): Ble::CancelPendingConnect(fabricIndex).
+    auto bleStatus = Ble::CancelPendingConnect(fabricIndex);
+    if (bleStatus != chip::Protocols::InteractionModel::Status::InvalidInState)
+        return bleStatus;
 #endif
     return chip::Protocols::InteractionModel::Status::InvalidInState;
 }
@@ -475,9 +472,7 @@ Protocols::InteractionModel::Status Clusters::CommissioningProxy::MyCPDelegate::
     if (needsBle && !needsPaf)
     {
 #if CONFIG_NETWORK_LAYER_BLE
-        // TODO(Phase 2B): forward to Ble::BgScanStart.
-        ChipLogError(AppServer, "ProxyBackgroundScanStartRequest: BLE transport not yet implemented (Phase 2B)");
-        return chip::Protocols::InteractionModel::Status::Failure;
+        return Ble::BgScanStart(transport, timeout, wiFiBands, fabricIndex, nodeId, mServer);
 #else
         return chip::Protocols::InteractionModel::Status::InvalidTransportType;
 #endif
@@ -504,12 +499,14 @@ Clusters::CommissioningProxy::MyCPDelegate::ProxyBackgroundScanStopRequest(Capab
                     static_cast<uint8_t>(transport), static_cast<uint16_t>(wiFiBands), fabricIndex, ChipLogValueX64(nodeId));
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-    auto s = Paf::BgScanStop(transport, wiFiBands, fabricIndex, nodeId);
-    if (s != chip::Protocols::InteractionModel::Status::NotFound)
-        return s;
+    auto pafStatus = Paf::BgScanStop(transport, wiFiBands, fabricIndex, nodeId);
+    if (pafStatus != chip::Protocols::InteractionModel::Status::NotFound)
+        return pafStatus;
 #endif
 #if CONFIG_NETWORK_LAYER_BLE
-    // TODO(Phase 2B): forward to Ble::BgScanStop.
+    auto bleStatus = Ble::BgScanStop(transport, wiFiBands, fabricIndex, nodeId);
+    if (bleStatus != chip::Protocols::InteractionModel::Status::NotFound)
+        return bleStatus;
 #endif
     return chip::Protocols::InteractionModel::Status::NotFound;
 }
@@ -529,7 +526,8 @@ uint8_t Clusters::CommissioningProxy::MyCPDelegate::GetActiveSessionCount()
         ++count;
 #endif
 #if CONFIG_NETWORK_LAYER_BLE
-    // TODO(Phase 2B): if (Ble::IsConnectPending()) ++count;
+    if (Ble::IsConnectPending())
+        ++count;
 #endif
     return count;
 }

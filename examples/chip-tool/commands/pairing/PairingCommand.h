@@ -158,6 +158,11 @@ public:
                         "Node ID of the commissioning-proxy-app to tunnel packets through");
             AddArgument("proxy-connect-timeout", 0, UINT16_MAX, &mProxyConnectTimeout,
                         "Timeout in seconds for the ProxyConnectRequest");
+            AddArgument("proxy-transport", &mProxyTransport,
+                        "Required: which transport the proxy should use to reach the commissionee. "
+                        "One of: ble | wifipaf");
+            AddArgument("proxy-wifi-band", &mProxyWiFiBand,
+                        "Optional WiFi band hint for proxy-transport=wifipaf. One of: 2g4 | 5g");
             break;
         case PairingMode::OnNetwork:
             AddArgument("skip-commissioning-complete", 0, 1, &mSkipCommissioningComplete);
@@ -400,6 +405,8 @@ private:
     NodeId mProxyNodeId           = chip::kUndefinedNodeId;
     uint16_t mProxySessionId      = 0;
     uint16_t mProxyConnectTimeout = 0;
+    char * mProxyTransport        = nullptr;
+    chip::Optional<char *> mProxyWiFiBand;
 
     // Exchange context to the proxy, kept alive for ProxyMessageRequest invokes.
     chip::Messaging::ExchangeManager * mProxyExchangeMgr = nullptr;

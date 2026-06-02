@@ -885,7 +885,55 @@ void PairingCommand::OnProxyDeviceConnected(void * context, chip::Messaging::Exc
     using namespace chip::app::Clusters::CommissioningProxy;
     Commands::ProxyConnectRequest::Type request;
     request.address.SetNull();
-    request.transport.Set(CapabilitiesBitmap::kWiFiPAF);
+
+    // Parse the required --proxy-transport CLI arg into the CapabilitiesBitmap
+    // sent to the proxy.  Reject unknown values rather than silently picking
+    // a default so misconfiguration surfaces immediately.
+    if (self->mProxyTransport == nullptr)
+    {
+        ChipLogError(chipTool, "PairViaProxy: --proxy-transport is required (one of: ble | wifipaf)");
+        self->SetCommandExitStatus(CHIP_ERROR_INVALID_ARGUMENT);
+        return;
+    }
+    if (strcmp(self->mProxyTransport, "wifipaf") == 0)
+    {
+        request.transport.Set(CapabilitiesBitmap::kWiFiPAF);
+        if (self->mProxyWiFiBand.HasValue())
+        {
+            if (strcmp(self->mProxyWiFiBand.Value(), "2g4") == 0)
+            {
+                request.wiFiBand.SetValue(chip::BitMask<WiFiBandBitmap>(WiFiBandBitmap::k2g4));
+            }
+            else if (strcmp(self->mProxyWiFiBand.Value(), "5g") == 0)
+            {
+                request.wiFiBand.SetValue(chip::BitMask<WiFiBandBitmap>(WiFiBandBitmap::k5g));
+            }
+            else
+            {
+                ChipLogError(chipTool, "PairViaProxy: --proxy-wifi-band must be 2g4 or 5g (got '%s')",
+                             self->mProxyWiFiBand.Value());
+                self->SetCommandExitStatus(CHIP_ERROR_INVALID_ARGUMENT);
+                return;
+            }
+        }
+    }
+    else if (strcmp(self->mProxyTransport, "ble") == 0)
+    {
+        request.transport.Set(CapabilitiesBitmap::kBle);
+        if (self->mProxyWiFiBand.HasValue())
+        {
+            ChipLogError(chipTool, "PairViaProxy: --proxy-wifi-band only valid with --proxy-transport=wifipaf");
+            self->SetCommandExitStatus(CHIP_ERROR_INVALID_ARGUMENT);
+            return;
+        }
+    }
+    else
+    {
+        ChipLogError(chipTool, "PairViaProxy: --proxy-transport must be 'ble' or 'wifipaf' (got '%s')", self->mProxyTransport);
+        self->SetCommandExitStatus(CHIP_ERROR_INVALID_ARGUMENT);
+        return;
+    }
+
     request.discriminator = self->mDiscriminator.value_or(0);
     request.vendorID      = chip::VendorId::Common;
     request.productID     = 0;

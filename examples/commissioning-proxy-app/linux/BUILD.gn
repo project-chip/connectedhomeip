@@ -56,6 +56,12 @@ executable("chip-commissioning-proxy-app") {
       "CommissioningProxyPafTransport.h",
     ]
   }
+  if (chip_config_network_layer_ble) {
+    sources += [
+      "CommissioningProxyBleTransport.cpp",
+      "CommissioningProxyBleTransport.h",
+    ]
+  }
 
   deps = [
     "${chip_root}/examples/commissioning-proxy-app/commissioning-proxy-common",
