@@ -423,8 +423,7 @@ struct BatteryTimerContextsModule<true>
     BatteryTimerContext<uint32_t, PowerSource::Attributes::BatTimeToFullCharge::Id> batTimeToFullChargeNotifyTimerContext;
 
     BatteryTimerContextsModule(TimerDelegate & timerDelegate, NotifyCallback notifier) :
-        batPercentRemainingNotifyTimerContext(timerDelegate, notifier),
-        batTimeRemainingNotifyTimerContext(timerDelegate, notifier),
+        batPercentRemainingNotifyTimerContext(timerDelegate, notifier), batTimeRemainingNotifyTimerContext(timerDelegate, notifier),
         batTimeToFullChargeNotifyTimerContext(timerDelegate, std::move(notifier))
     {}
 };
