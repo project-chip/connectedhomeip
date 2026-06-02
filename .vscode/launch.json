@@ -250,10 +250,6 @@
             },
             "setupCommands": [
                 {
-                    "text": "handle SIGINT nostop noprint pass",
-                    "ignoreFailures": true
-                },
-                {
                     "text": "handle SIGTERM nostop noprint pass",
                     "ignoreFailures": true
                 },
@@ -264,10 +260,6 @@
                 {
                     "text": "set sysroot ${env:TIZEN_SDK_ROOT}/platforms/tizen-10.0/tizen/rootstraps/tizen-10.0-device64.core",
                     "ignoreFailures": false
-                },
-                {
-                    "text": "set solib-absolute-prefix ${env:TIZEN_SDK_ROOT}/platforms/tizen-10.0/tizen/rootstraps/tizen-10.0-device64.core",
-                    "ignoreFailures": true
                 },
                 {
                     "text": "-enable-pretty-printing",
