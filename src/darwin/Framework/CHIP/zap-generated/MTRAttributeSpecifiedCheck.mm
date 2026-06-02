@@ -3391,6 +3391,73 @@ static BOOL AttributeIsSpecifiedInElectricalGridConditionsCluster(AttributeId aA
     }
     }
 }
+static BOOL AttributeIsSpecifiedInElectricalAlarmCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::ElectricalAlarm;
+    switch (aAttributeId) {
+    case Attributes::Mask::Id: {
+        return YES;
+    }
+    case Attributes::Latch::Id: {
+        return YES;
+    }
+    case Attributes::State::Id: {
+        return YES;
+    }
+    case Attributes::Supported::Id: {
+        return YES;
+    }
+    case Attributes::OverVoltageThreshold::Id: {
+        return YES;
+    }
+    case Attributes::UnderVoltageThreshold::Id: {
+        return YES;
+    }
+    case Attributes::OverFrequencyThreshold::Id: {
+        return YES;
+    }
+    case Attributes::UnderFrequencyThreshold::Id: {
+        return YES;
+    }
+    case Attributes::OverPowerThreshold::Id: {
+        return YES;
+    }
+    case Attributes::UnderPowerThreshold::Id: {
+        return YES;
+    }
+    case Attributes::OverCurrentThreshold::Id: {
+        return YES;
+    }
+    case Attributes::UnderCurrentThreshold::Id: {
+        return YES;
+    }
+    case Attributes::PowerImportThreshold::Id: {
+        return YES;
+    }
+    case Attributes::PowerExportThreshold::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        // Not a known ElectricalAlarm attribute.
+        return NO;
+    }
+    }
+}
 static BOOL AttributeIsSpecifiedInElectricalDistributionCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::ElectricalDistribution;
@@ -7608,6 +7675,9 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     }
     case Clusters::ElectricalGridConditions::Id: {
         return AttributeIsSpecifiedInElectricalGridConditionsCluster(aAttributeId);
+    }
+    case Clusters::ElectricalAlarm::Id: {
+        return AttributeIsSpecifiedInElectricalAlarmCluster(aAttributeId);
     }
     case Clusters::ElectricalDistribution::Id: {
         return AttributeIsSpecifiedInElectricalDistributionCluster(aAttributeId);
