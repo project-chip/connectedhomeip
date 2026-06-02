@@ -403,6 +403,10 @@ bool FanControlCluster::IsFanModeSupportedBySequence(FanModeEnum value) const
 
 Status FanControlCluster::SetFanMode(FanModeEnum value)
 {
+    // Ignore writes that re-enter while the cluster is driving its own fan-drive cascade (see
+    // mTemporarilyIgnoreFanDriveDelegateCallbacks): the cluster's computed values are authoritative.
+    VerifyOrReturnValue(!mTemporarilyIgnoreFanDriveDelegateCallbacks, Status::Success);
+
     if (EnsureKnownEnumValue(value) == FanModeEnum::kUnknownEnumValue)
     {
         return Status::ConstraintError;
@@ -442,6 +446,8 @@ Status FanControlCluster::SetFanMode(FanModeEnum value)
 
 Status FanControlCluster::SetPercentSetting(DataModel::Nullable<chip::Percent> value)
 {
+    VerifyOrReturnValue(!mTemporarilyIgnoreFanDriveDelegateCallbacks, Status::Success);
+
     if (value.IsNull())
     {
         if (mFanMode != FanModeEnum::kAuto)
@@ -468,6 +474,8 @@ Status FanControlCluster::SetPercentSetting(DataModel::Nullable<chip::Percent> v
 
 Status FanControlCluster::SetSpeedSetting(DataModel::Nullable<uint8_t> value)
 {
+    VerifyOrReturnValue(!mTemporarilyIgnoreFanDriveDelegateCallbacks, Status::Success);
+
     if (value.IsNull())
     {
         // Null is only valid in Auto mode (same rule as PercentSetting; see TestFanControl.yaml).
@@ -542,6 +550,10 @@ Status FanControlCluster::SetAirflowDirection(AirflowDirectionEnum value)
     return Status::Success;
 }
 
+// PercentCurrent / SpeedCurrent are the actual currently-operating fan speed (spec 4.4.6.4 / 4.4.6.7) and
+// are application-driven: they may legitimately differ from the *Setting values and are written by the
+// delegate (e.g. on ramp or On/Off transitions), including synchronously from a change callback. They are
+// therefore intentionally NOT suppressed during a cluster-driven cascade.
 bool FanControlCluster::SetPercentCurrent(chip::Percent value)
 {
     return SetAttributeValue(mPercentCurrent, value, PercentCurrent::Id);

@@ -119,12 +119,13 @@ private:
             MatterPostAttributeChangeCallback(path, ZCL_INT8U_ATTRIBUTE_TYPE, 1, &raw);
         }
 
-        // FanControlCluster::ApplyNonZeroFanDrive sets PercentCurrent / SpeedCurrent
-        // unconditionally for non-Off modes. Legacy apps (e.g. air-purifier) gate those
-        // writes on the On/Off cluster state — their PercentSettingWriteCallback /
-        // SpeedSettingWriteCallback are no-ops when On/Off is Off, so the cluster's
-        // pre-set value leaks through.  Correct that here: after the legacy callbacks
-        // have run, if On/Off is Off reset *Current back to 0.
+        // PercentCurrent / SpeedCurrent are the *actual* operating fan speed (spec 4.4.6.4 / 4.4.6.7).
+        // FanControlCluster sets them to match the settings (the standalone default), but on a device
+        // whose fan is gated by an On/Off cluster on this endpoint, the fan is not running while On/Off
+        // is Off, so the actual speed must remain 0. The application only refreshes *Current on an
+        // On/Off transition (see HandleOnOff), not when a fan setting is written while already Off, so
+        // enforce it here. Skipped for Off (cluster already zeroed *Current) and for endpoints without
+        // an On/Off cluster (Get fails -> no gating, fan has no On/Off dependency).
         if (state.mode != FanModeEnum::kOff)
         {
             bool onOff = true;

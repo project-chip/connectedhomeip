@@ -759,7 +759,12 @@ TEST_F(TestFanControlDelegateCallbacks, WritePercentSetting_NotifiesDelegate)
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
-TEST_F(TestFanControlDelegateCallbacks, NestedSetPercentFromDelegate_SuppressesNestedFanDriveNotify)
+// A delegate that writes an attribute back from within OnFanDriveStateChanged must not mutate the
+// cluster's state mid-update: the cluster's in-progress cascade is authoritative, so the nested write
+// is ignored (and triggers no second notification). This is what keeps applications that reflexively
+// write attributes from their change callbacks (e.g. air-purifier) from clobbering the values the
+// cluster just computed. See FanControlCluster::SetPercentSetting.
+TEST_F(TestFanControlDelegateCallbacks, NestedSetPercentFromDelegate_IsIgnoredAndSuppressesNotify)
 {
     TestServerClusterContext testContext;
     ReentrantFanDriveDelegate delegate(kTestEndpointId);
@@ -773,9 +778,11 @@ TEST_F(TestFanControlDelegateCallbacks, NestedSetPercentFromDelegate_SuppressesN
     percentSetting.SetNonNull(40);
     ASSERT_EQ(tester.WriteAttribute(FanControl::Attributes::PercentSetting::Id, percentSetting), CHIP_NO_ERROR);
 
+    // The outer write notifies once; the nested SetPercentSetting(50) is suppressed (no second notify).
     EXPECT_EQ(delegate.mFanDriveStateNotifyCount, 1);
     ASSERT_FALSE(cluster.GetPercentSetting().IsNull());
-    EXPECT_EQ(cluster.GetPercentSetting().Value(), static_cast<chip::Percent>(50));
+    // The nested write of 50 is ignored; the controller's value (40) stands.
+    EXPECT_EQ(cluster.GetPercentSetting().Value(), static_cast<chip::Percent>(40));
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }

@@ -177,8 +177,14 @@ private:
 
     void NotifyDelegateFanDriveState();
 
-    // Used to ignore/prevent reentrance of OnFanDriveStateChanged when notifying the delegate while nested cluster updates
-    // run synchronously from that callback (SetPercentSetting / SetFanMode / SetSpeedSetting).
+    // Set while the cluster is notifying its delegate of a fan-drive change. It serves two purposes:
+    //  1. Prevents re-entrant OnFanDriveStateChanged notifications.
+    //  2. Makes the server authoritative over the FanMode <-> PercentSetting <-> SpeedSetting mapping
+    //     (spec 4.4.6.3.1 / 4.4.6.6.1): re-entrant writes to those *Setting* attributes that an
+    //     application makes in reaction to the notification (e.g. via the CodegenIntegration accessor
+    //     forwarders) are ignored so they cannot clobber the values the cluster just derived.
+    //     PercentCurrent / SpeedCurrent are NOT gated by this: they are the actual operating speed and
+    //     remain application-driven (spec 4.4.6.4 / 4.4.6.7).
     bool mTemporarilyIgnoreFanDriveDelegateCallbacks = false;
 
     // Attributes
