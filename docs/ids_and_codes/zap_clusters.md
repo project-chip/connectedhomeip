@@ -89,6 +89,7 @@ Generally regenerate using one of:
 |        158 |       0x9E | WaterHeaterMode                                         |
 |        159 |       0x9F | DeviceEnergyManagementMode                              |
 |        160 |       0xA0 | ElectricalGridConditions                                |
+|        161 |       0xA1 | ElectricalAlarm                                         |
 |        162 |       0xA2 | ElectricalDistribution                                  |
 |        163 |       0xA3 | ElectricalProtectionAlarm                               |
 |        257 |      0x101 | DoorLock                                                |
