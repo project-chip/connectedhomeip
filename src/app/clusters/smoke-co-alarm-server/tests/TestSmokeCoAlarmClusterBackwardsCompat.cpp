@@ -56,35 +56,39 @@ struct TestSmokeCoAlarmBackwardsCompat : public ::testing::Test
     static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
 };
 
-// Fixture that owns a server and exposes it only through Instance() — the old singleton pattern.
+// Fixture that initialises the singleton — the old pattern: call Instance() without holding a pointer.
 struct TestSmokeCoAlarmBackwardsCompatInitialized : public TestSmokeCoAlarmBackwardsCompat
 {
-    void SetUp() override { ASSERT_EQ(server.Init(), CHIP_NO_ERROR); }
-    SmokeCoAlarmServer server{ kTestEndpointId, MakeFullConfig() };
+    void SetUp() override { ASSERT_EQ(SmokeCoAlarmServer::Instance().Init(kTestEndpointId, MakeFullConfig()), CHIP_NO_ERROR); }
+    void TearDown() override
+    {
+        SmokeCoAlarmServer & inst = SmokeCoAlarmServer::Instance();
+        inst.~SmokeCoAlarmServer();
+        new (&inst) SmokeCoAlarmServer{};
+    }
 };
 
 // Fixture with no optional attributes configured — verifies absent-attribute guards return false.
 struct TestSmokeCoAlarmBackwardsCompatNoOptionals : public TestSmokeCoAlarmBackwardsCompat
 {
-    void SetUp() override { ASSERT_EQ(server.Init(), CHIP_NO_ERROR); }
-
-    SmokeCoAlarmServer server{ kTestEndpointId, [] {
-                                  SmokeCoAlarmCluster::Config cfg;
-                                  cfg.featureMap.Set(Feature::kSmokeAlarm).Set(Feature::kCoAlarm);
-                                  // optionalAttribs left empty
-                                  return cfg;
-                              }() };
+    void SetUp() override
+    {
+        SmokeCoAlarmCluster::Config cfg;
+        cfg.featureMap.Set(Feature::kSmokeAlarm).Set(Feature::kCoAlarm);
+        // optionalAttribs left empty
+        ASSERT_EQ(SmokeCoAlarmServer::Instance().Init(kTestEndpointId, cfg), CHIP_NO_ERROR);
+    }
+    void TearDown() override
+    {
+        SmokeCoAlarmServer & inst = SmokeCoAlarmServer::Instance();
+        inst.~SmokeCoAlarmServer();
+        new (&inst) SmokeCoAlarmServer{};
+    }
 };
 
 } // namespace
 
-TEST_F(TestSmokeCoAlarmBackwardsCompatInitialized, Instance_ReturnsRegisteredServer)
-{
-    // Old code calls SmokeCoAlarmServer::Instance() without holding a pointer.
-    EXPECT_EQ(&SmokeCoAlarmServer::Instance(), &server);
-}
-
-TEST_F(TestSmokeCoAlarmBackwardsCompatInitialized, Init_RegistersClusterInRegistry)
+TEST_F(TestSmokeCoAlarmBackwardsCompatInitialized, Instance_ClusterIsRegistered)
 {
     auto * reg = CodegenDataModelProvider::Instance().Registry().Get(ConcreteClusterPath(kTestEndpointId, SmokeCoAlarm::Id));
     EXPECT_NE(reg, nullptr);
@@ -92,7 +96,7 @@ TEST_F(TestSmokeCoAlarmBackwardsCompatInitialized, Init_RegistersClusterInRegist
 
 TEST_F(TestSmokeCoAlarmBackwardsCompatInitialized, DoubleInit_IsNoOp)
 {
-    EXPECT_EQ(server.Init(), CHIP_NO_ERROR);
+    EXPECT_EQ(SmokeCoAlarmServer::Instance().Init(kTestEndpointId, MakeFullConfig()), CHIP_NO_ERROR);
 }
 
 TEST_F(TestSmokeCoAlarmBackwardsCompatInitialized, Features_ReportedCorrectly)

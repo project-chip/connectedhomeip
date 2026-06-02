@@ -41,16 +41,16 @@ namespace Clusters {
 class SmokeCoAlarmServer
 {
 public:
-    explicit SmokeCoAlarmServer(EndpointId endpointId, const SmokeCoAlarm::SmokeCoAlarmCluster::Config & config);
+    SmokeCoAlarmServer() = default;
     ~SmokeCoAlarmServer();
 
     void SetInoperativeWhenUnmounted(bool v);
-    CHIP_ERROR Init();
+    CHIP_ERROR Init(EndpointId endpointId, const SmokeCoAlarm::SmokeCoAlarmCluster::Config & config);
     SmokeCoAlarm::SmokeCoAlarmCluster & Cluster();
 
     static constexpr size_t kPriorityOrderLength = SmokeCoAlarm::SmokeCoAlarmCluster::kPriorityOrderLength;
 
-    static SmokeCoAlarmServer & Instance();
+    static SmokeCoAlarmServer & Instance() { return sInstance; }
 
     bool RequestSelfTest(EndpointId endpoint);
     void HandleRemoteSelfTestRequest(EndpointId endpoint, chip::app::CommandHandler * commandObj,
@@ -102,7 +102,7 @@ private:
     SmokeCoAlarm::SmokeCoAlarmCluster::Config mConfig;
     LazyRegisteredServerCluster<SmokeCoAlarm::SmokeCoAlarmCluster> mCluster;
 
-    inline static SmokeCoAlarmServer * sInstance = nullptr;
+    static SmokeCoAlarmServer sInstance;
 };
 
 } // namespace Clusters
