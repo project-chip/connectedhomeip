@@ -40,7 +40,7 @@ import logging
 from mobly import asserts
 
 import matter.clusters as Clusters
-from matter.interaction_model import InteractionModelError, Status
+from matter.interaction_model import Status
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import TestStep, default_matter_test_main
@@ -117,39 +117,30 @@ class TC_ELDIST_2_2(MatterBaseTest):
 
         # Step 4: Write to MaxVoltage
         self.step(4)
-        try:
-            await self.default_controller.WriteAttribute(
-                self.dut_node_id,
-                [(endpoint, attributes.MaxVoltage(230000))]
-            )
-            asserts.fail("Write to MaxVoltage should have failed")
-        except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.UnsupportedWrite,
-                                 "Write to MaxVoltage should return UNSUPPORTED_WRITE")
+        status = await self.write_single_attribute(
+            attribute_value=attributes.MaxVoltage(230000),
+            endpoint_id=endpoint,
+            expect_success=False)
+        asserts.assert_equal(status, Status.UnsupportedWrite,
+                             "Write to MaxVoltage should return UNSUPPORTED_WRITE")
 
         # Step 5: Write to NumberOfPoles
         self.step(5)
-        try:
-            await self.default_controller.WriteAttribute(
-                self.dut_node_id,
-                [(endpoint, attributes.NumberOfPoles(2))]
-            )
-            asserts.fail("Write to NumberOfPoles should have failed")
-        except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.UnsupportedWrite,
-                                 "Write to NumberOfPoles should return UNSUPPORTED_WRITE")
+        status = await self.write_single_attribute(
+            attribute_value=attributes.NumberOfPoles(2),
+            endpoint_id=endpoint,
+            expect_success=False)
+        asserts.assert_equal(status, Status.UnsupportedWrite,
+                             "Write to NumberOfPoles should return UNSUPPORTED_WRITE")
 
         # Step 6: Write to ServiceEntranceRated
         self.step(6)
-        try:
-            await self.default_controller.WriteAttribute(
-                self.dut_node_id,
-                [(endpoint, attributes.ServiceEntranceRated(False))]
-            )
-            asserts.fail("Write to ServiceEntranceRated should have failed")
-        except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.UnsupportedWrite,
-                                 "Write to ServiceEntranceRated should return UNSUPPORTED_WRITE")
+        status = await self.write_single_attribute(
+            attribute_value=attributes.ServiceEntranceRated(False),
+            endpoint_id=endpoint,
+            expect_success=False)
+        asserts.assert_equal(status, Status.UnsupportedWrite,
+                             "Write to ServiceEntranceRated should return UNSUPPORTED_WRITE")
 
         # Step 7: Reboot DUT
         self.step(7)
