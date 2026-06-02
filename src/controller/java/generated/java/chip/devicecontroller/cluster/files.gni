@@ -298,6 +298,7 @@ eventstructs_sources = [
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/eventstructs/DoorLockClusterLockOperationEvent.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/eventstructs/DoorLockClusterLockOperationErrorEvent.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/eventstructs/DoorLockClusterLockUserChangeEvent.kt",
+  "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/eventstructs/ElectricalAlarmClusterNotifyEvent.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/eventstructs/ElectricalEnergyMeasurementClusterCumulativeEnergyMeasuredEvent.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/eventstructs/ElectricalEnergyMeasurementClusterPeriodicEnergyMeasuredEvent.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/eventstructs/ElectricalGridConditionsClusterCurrentConditionsChangedEvent.kt",
