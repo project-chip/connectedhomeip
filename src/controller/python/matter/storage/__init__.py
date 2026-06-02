@@ -317,6 +317,26 @@ class PersistentStorageINI(PersistentStorageBase):
     This persistent storage is compatible with the chip-tool implementation.
     """
 
+    def _caKeysWithNocaListRewrite(self, data: dict, sdkData: dict):
+        """Creates a caList entry if the keys are present
+
+        This typically occurs when chip-tool is used to commission the device.
+        """
+        caKeys = set()
+        for key in sdkData:
+            if match := _caKeyMatch.fullmatch(key):
+                caKeys.add(int(match.group(2)))
+
+        caListRewritten = data.get('caList', {})
+        if caKeys:
+            for key in caKeys:
+                if key not in caListRewritten:
+                    LOGGER.warning("Keys detected for index %d, creating empty caList entry", key)
+                    caListRewritten[str(key)] = {}
+
+        data['caList'] = caListRewritten
+        return data, sdkData
+
     class ConfigParser(ConfigParser):
         """Parser that preserves key case and does not use interpolation."""
 
@@ -357,6 +377,7 @@ class PersistentStorageINI(PersistentStorageBase):
                 config.read(chipToolFabricStoragePath)
                 for key, value in config.items('Default'):
                     sdkData[key] = value
+            data, sdkData = self._caKeysWithNocaListRewrite(data, sdkData)
         except Exception as ex:
             LOGGER.critical("Could not load configuration from INI file: %s", ex)
         super().__init__(data, sdkData)
