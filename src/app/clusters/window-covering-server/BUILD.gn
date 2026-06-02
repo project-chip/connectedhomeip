@@ -12,8 +12,5 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build_overrides/chip.gni")
-
 group("window-covering-server") {
-  public_deps = [ "${chip_root}/src/app/clusters/scenes-server" ]
 }
