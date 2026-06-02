@@ -17,8 +17,8 @@
 
 #include <app/clusters/smoke-co-alarm-server/SmokeCOTestEventTriggerHandler.h>
 #include <app/clusters/smoke-co-alarm-server/smoke-co-alarm-server.h>
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/util/attribute-storage.h>
-#include <app/util/attribute-table.h>
 #include <app/util/endpoint-config-api.h>
 #include <lib/support/CodeUtils.h>
 
@@ -49,11 +49,7 @@ void MatterSmokeCoAlarmPluginServerInitCallback()
 
         // Read feature map from the Ember attribute store.
         uint32_t featureMapValue = 0;
-        {
-            uint8_t * readable = reinterpret_cast<uint8_t *>(&featureMapValue);
-            emberAfReadAttribute(endpointId, SmokeCoAlarm::Id, Globals::Attributes::FeatureMap::Id, readable,
-                                 sizeof(featureMapValue));
-        }
+        Attributes::FeatureMap::Get(endpointId, &featureMapValue);
 
         // Build optional-attribute set from what Ember exposes for this endpoint.
         uint32_t optionalBits                    = 0;
