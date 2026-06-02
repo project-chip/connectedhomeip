@@ -5706,8 +5706,12 @@ static id _Nullable DecodeEventPayloadForPushAVStreamTransportCluster(EventId aE
             value.activationReason = memberValue;
         } while (0);
         do {
-            NSNumber * _Nonnull memberValue;
-            memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.containerType)];
+            NSNumber * _Nullable memberValue;
+            if (cppValue.containerType.HasValue()) {
+                memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.containerType.Value())];
+            } else {
+                memberValue = nil;
+            }
             value.containerType = memberValue;
         } while (0);
         do {
@@ -5737,8 +5741,12 @@ static id _Nullable DecodeEventPayloadForPushAVStreamTransportCluster(EventId aE
             value.connectionID = memberValue;
         } while (0);
         do {
-            NSNumber * _Nonnull memberValue;
-            memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.containerType)];
+            NSNumber * _Nullable memberValue;
+            if (cppValue.containerType.HasValue()) {
+                memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.containerType.Value())];
+            } else {
+                memberValue = nil;
+            }
             value.containerType = memberValue;
         } while (0);
         do {

@@ -19606,28 +19606,22 @@ public static class PushAvStreamTransportClusterCMAFContainerOptionsStruct {
   public Integer CMAFInterface;
   public Integer segmentDuration;
   public Integer chunkDuration;
-  public Integer sessionGroup;
-  public String trackName;
-  public Optional<byte[]> CENCKey;
-  public Optional<byte[]> CENCKeyID;
+  public Optional<Integer> sessionGroup;
+  public Optional<String> trackName;
   public Optional<Boolean> metadataEnabled;
   private static final long CMAF_INTERFACE_ID = 0L;
   private static final long SEGMENT_DURATION_ID = 1L;
   private static final long CHUNK_DURATION_ID = 2L;
   private static final long SESSION_GROUP_ID = 3L;
   private static final long TRACK_NAME_ID = 4L;
-  private static final long CENC_KEY_ID = 5L;
-  private static final long CENC_KEY_ID_ID = 6L;
   private static final long METADATA_ENABLED_ID = 7L;
 
   public PushAvStreamTransportClusterCMAFContainerOptionsStruct(
     Integer CMAFInterface,
     Integer segmentDuration,
     Integer chunkDuration,
-    Integer sessionGroup,
-    String trackName,
-    Optional<byte[]> CENCKey,
-    Optional<byte[]> CENCKeyID,
+    Optional<Integer> sessionGroup,
+    Optional<String> trackName,
     Optional<Boolean> metadataEnabled
   ) {
     this.CMAFInterface = CMAFInterface;
@@ -19635,8 +19629,6 @@ public static class PushAvStreamTransportClusterCMAFContainerOptionsStruct {
     this.chunkDuration = chunkDuration;
     this.sessionGroup = sessionGroup;
     this.trackName = trackName;
-    this.CENCKey = CENCKey;
-    this.CENCKeyID = CENCKeyID;
     this.metadataEnabled = metadataEnabled;
   }
 
@@ -19645,10 +19637,8 @@ public static class PushAvStreamTransportClusterCMAFContainerOptionsStruct {
     values.add(new StructElement(CMAF_INTERFACE_ID, new UIntType(CMAFInterface)));
     values.add(new StructElement(SEGMENT_DURATION_ID, new UIntType(segmentDuration)));
     values.add(new StructElement(CHUNK_DURATION_ID, new UIntType(chunkDuration)));
-    values.add(new StructElement(SESSION_GROUP_ID, new UIntType(sessionGroup)));
-    values.add(new StructElement(TRACK_NAME_ID, new StringType(trackName)));
-    values.add(new StructElement(CENC_KEY_ID, CENCKey.<BaseTLVType>map((nonOptionalCENCKey) -> new ByteArrayType(nonOptionalCENCKey)).orElse(new EmptyType())));
-    values.add(new StructElement(CENC_KEY_ID_ID, CENCKeyID.<BaseTLVType>map((nonOptionalCENCKeyID) -> new ByteArrayType(nonOptionalCENCKeyID)).orElse(new EmptyType())));
+    values.add(new StructElement(SESSION_GROUP_ID, sessionGroup.<BaseTLVType>map((nonOptionalsessionGroup) -> new UIntType(nonOptionalsessionGroup)).orElse(new EmptyType())));
+    values.add(new StructElement(TRACK_NAME_ID, trackName.<BaseTLVType>map((nonOptionaltrackName) -> new StringType(nonOptionaltrackName)).orElse(new EmptyType())));
     values.add(new StructElement(METADATA_ENABLED_ID, metadataEnabled.<BaseTLVType>map((nonOptionalmetadataEnabled) -> new BooleanType(nonOptionalmetadataEnabled)).orElse(new EmptyType())));
 
     return new StructType(values);
@@ -19661,10 +19651,8 @@ public static class PushAvStreamTransportClusterCMAFContainerOptionsStruct {
     Integer CMAFInterface = null;
     Integer segmentDuration = null;
     Integer chunkDuration = null;
-    Integer sessionGroup = null;
-    String trackName = null;
-    Optional<byte[]> CENCKey = Optional.empty();
-    Optional<byte[]> CENCKeyID = Optional.empty();
+    Optional<Integer> sessionGroup = Optional.empty();
+    Optional<String> trackName = Optional.empty();
     Optional<Boolean> metadataEnabled = Optional.empty();
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == CMAF_INTERFACE_ID) {
@@ -19685,22 +19673,12 @@ public static class PushAvStreamTransportClusterCMAFContainerOptionsStruct {
       } else if (element.contextTagNum() == SESSION_GROUP_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
-          sessionGroup = castingValue.value(Integer.class);
+          sessionGroup = Optional.of(castingValue.value(Integer.class));
         }
       } else if (element.contextTagNum() == TRACK_NAME_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.String) {
           StringType castingValue = element.value(StringType.class);
-          trackName = castingValue.value(String.class);
-        }
-      } else if (element.contextTagNum() == CENC_KEY_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
-          ByteArrayType castingValue = element.value(ByteArrayType.class);
-          CENCKey = Optional.of(castingValue.value(byte[].class));
-        }
-      } else if (element.contextTagNum() == CENC_KEY_ID_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
-          ByteArrayType castingValue = element.value(ByteArrayType.class);
-          CENCKeyID = Optional.of(castingValue.value(byte[].class));
+          trackName = Optional.of(castingValue.value(String.class));
         }
       } else if (element.contextTagNum() == METADATA_ENABLED_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.Boolean) {
@@ -19715,8 +19693,6 @@ public static class PushAvStreamTransportClusterCMAFContainerOptionsStruct {
       chunkDuration,
       sessionGroup,
       trackName,
-      CENCKey,
-      CENCKeyID,
       metadataEnabled
     );
   }
@@ -19739,12 +19715,6 @@ public static class PushAvStreamTransportClusterCMAFContainerOptionsStruct {
     output.append("\n");
     output.append("\ttrackName: ");
     output.append(trackName);
-    output.append("\n");
-    output.append("\tCENCKey: ");
-    output.append(CENCKey.isPresent() ? Arrays.toString(CENCKey.get()) : "");
-    output.append("\n");
-    output.append("\tCENCKeyID: ");
-    output.append(CENCKeyID.isPresent() ? Arrays.toString(CENCKeyID.get()) : "");
     output.append("\n");
     output.append("\tmetadataEnabled: ");
     output.append(metadataEnabled);

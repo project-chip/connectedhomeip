@@ -50478,97 +50478,56 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                             newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_chunkDuration);
                         jobject
                             newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_sessionGroup;
-                        std::string
-                            newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_sessionGroupClassName =
-                                "java/lang/Integer";
-                        std::string
-                            newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_sessionGroupCtorSignature =
-                                "(I)V";
-                        jint
-                            jninewElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_sessionGroup =
-                                static_cast<jint>(
-                                    entry_0.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().sessionGroup);
-                        TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
-                            newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_sessionGroupClassName
-                                .c_str(),
-                            newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_sessionGroupCtorSignature
-                                .c_str(),
-                            jninewElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_sessionGroup,
-                            newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_sessionGroup);
+                        if (!entry_0.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().sessionGroup.HasValue())
+                        {
+                            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(
+                                nullptr,
+                                newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_sessionGroup);
+                        }
+                        else
+                        {
+                            jobject
+                                newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_sessionGroupInsideOptional;
+                            std::string
+                                newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_sessionGroupInsideOptionalClassName =
+                                    "java/lang/Integer";
+                            std::string
+                                newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_sessionGroupInsideOptionalCtorSignature =
+                                    "(I)V";
+                            jint
+                                jninewElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_sessionGroupInsideOptional =
+                                    static_cast<jint>(entry_0.transportOptions.Value()
+                                                          .containerOptions.CMAFContainerOptions.Value()
+                                                          .sessionGroup.Value());
+                            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                                newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_sessionGroupInsideOptionalClassName
+                                    .c_str(),
+                                newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_sessionGroupInsideOptionalCtorSignature
+                                    .c_str(),
+                                jninewElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_sessionGroupInsideOptional,
+                                newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_sessionGroupInsideOptional);
+                            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(
+                                newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_sessionGroupInsideOptional,
+                                newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_sessionGroup);
+                        }
                         jobject
                             newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_trackName;
-                        LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(
-                            entry_0.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().trackName,
-                            newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_trackName));
-                        jobject
-                            newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_CENCKey;
-                        if (!entry_0.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().CENCKey.HasValue())
+                        if (!entry_0.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().trackName.HasValue())
                         {
                             TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(
                                 nullptr,
-                                newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_CENCKey);
+                                newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_trackName);
                         }
                         else
                         {
                             jobject
-                                newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_CENCKeyInsideOptional;
-                            jbyteArray
-                                newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_CENCKeyInsideOptionalByteArray =
-                                    env->NewByteArray(static_cast<jsize>(entry_0.transportOptions.Value()
-                                                                             .containerOptions.CMAFContainerOptions.Value()
-                                                                             .CENCKey.Value()
-                                                                             .size()));
-                            env->SetByteArrayRegion(
-                                newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_CENCKeyInsideOptionalByteArray,
-                                0,
-                                static_cast<jsize>(entry_0.transportOptions.Value()
-                                                       .containerOptions.CMAFContainerOptions.Value()
-                                                       .CENCKey.Value()
-                                                       .size()),
-                                reinterpret_cast<const jbyte *>(entry_0.transportOptions.Value()
-                                                                    .containerOptions.CMAFContainerOptions.Value()
-                                                                    .CENCKey.Value()
-                                                                    .data()));
-                            newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_CENCKeyInsideOptional =
-                                newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_CENCKeyInsideOptionalByteArray;
+                                newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_trackNameInsideOptional;
+                            LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(
+                                entry_0.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().trackName.Value(),
+                                newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_trackNameInsideOptional));
                             TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(
-                                newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_CENCKeyInsideOptional,
-                                newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_CENCKey);
-                        }
-                        jobject
-                            newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_CENCKeyID;
-                        if (!entry_0.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().CENCKeyID.HasValue())
-                        {
-                            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(
-                                nullptr,
-                                newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_CENCKeyID);
-                        }
-                        else
-                        {
-                            jobject
-                                newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_CENCKeyIDInsideOptional;
-                            jbyteArray
-                                newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_CENCKeyIDInsideOptionalByteArray =
-                                    env->NewByteArray(static_cast<jsize>(entry_0.transportOptions.Value()
-                                                                             .containerOptions.CMAFContainerOptions.Value()
-                                                                             .CENCKeyID.Value()
-                                                                             .size()));
-                            env->SetByteArrayRegion(
-                                newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_CENCKeyIDInsideOptionalByteArray,
-                                0,
-                                static_cast<jsize>(entry_0.transportOptions.Value()
-                                                       .containerOptions.CMAFContainerOptions.Value()
-                                                       .CENCKeyID.Value()
-                                                       .size()),
-                                reinterpret_cast<const jbyte *>(entry_0.transportOptions.Value()
-                                                                    .containerOptions.CMAFContainerOptions.Value()
-                                                                    .CENCKeyID.Value()
-                                                                    .data()));
-                            newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_CENCKeyIDInsideOptional =
-                                newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_CENCKeyIDInsideOptionalByteArray;
-                            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(
-                                newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_CENCKeyIDInsideOptional,
-                                newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_CENCKeyID);
+                                newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_trackNameInsideOptional,
+                                newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_trackName);
                         }
                         jobject
                             newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_metadataEnabled;
@@ -50622,8 +50581,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                             jmethodID CMAFContainerOptionsStructStructCtor_6;
                             err = chip::JniReferences::GetInstance().FindMethod(
                                 env, CMAFContainerOptionsStructStructClass_6, "<init>",
-                                "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/"
-                                "String;Ljava/util/Optional;Ljava/util/Optional;Ljava/util/Optional;)V",
+                                "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/util/Optional;Ljava/util/"
+                                "Optional;Ljava/util/Optional;)V",
                                 &CMAFContainerOptionsStructStructCtor_6);
                             if (err != CHIP_NO_ERROR || CMAFContainerOptionsStructStructCtor_6 == nullptr)
                             {
@@ -50640,8 +50599,6 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                 newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_chunkDuration,
                                 newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_sessionGroup,
                                 newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_trackName,
-                                newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_CENCKey,
-                                newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_CENCKeyID,
                                 newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_metadataEnabled);
                         }
                         TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(
