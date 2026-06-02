@@ -41,61 +41,40 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.interaction_model import Status
-from matter.testing.decorators import has_cluster, run_if_endpoint_matches
+from matter.testing.decorators import has_cluster, pics, run_if_endpoint_matches
 from matter.testing.matter_testing import MatterBaseTest
-from matter.testing.runner import TestStep, default_matter_test_main
+from matter.testing.runner import default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
 class TC_PWRTL_2_1(MatterBaseTest):
-    """TC-PWRTL-2.1: Attributes with DUT as Server (Updated)
-
-    Verify FeatureMap (including the Matter 1.7 CIRC bit 4 with reserved-bit
-    discipline), AttributeList composition based on topology features,
-    AvailableEndpoints and ActiveEndpoints reads, the subset invariant
-    (ActiveEndpoints subset of AvailableEndpoints), read-only access on
-    both endpoint list attributes, and Non-volatile persistence of
-    ActiveEndpoints across reboot (manual-mode only; CI skips the reboot
-    steps via the is_pics_sdk_ci_only dispatch).
-    """
-
-    def desc_TC_PWRTL_2_1(self) -> str:
-        return "[TC-PWRTL-2.1] Attributes with DUT as Server"
-
-    def pics_TC_PWRTL_2_1(self) -> list[str]:
-        return ["PWRTL.S"]
-
-    def steps_TC_PWRTL_2_1(self) -> list[TestStep]:
-        return [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
-            TestStep(2, "TH reads FeatureMap from DUT"),
-            TestStep(3, "TH validates O.a conformance (exactly one of NODE/TREE/SET)"),
-            TestStep(4, "TH validates CIRC bit and reserved bits"),
-            TestStep(5, "TH reads AttributeList from DUT"),
-            TestStep(6, "TH reads AvailableEndpoints (if applicable)"),
-            TestStep(7, "TH reads ActiveEndpoints (if applicable)"),
-            TestStep(8, "TH verifies ActiveEndpoints is subset of AvailableEndpoints"),
-            TestStep(9, "TH attempts write to AvailableEndpoints - expect UNSUPPORTED_WRITE"),
-            TestStep(10, "Operator reboots DUT (skipped in CI)"),
-            TestStep(11, "TH verifies ActiveEndpoints persists after reboot - Non-volatile (skipped in CI)"),
-        ]
 
     @property
     def default_endpoint(self) -> int:
         return 1
 
+    @pics('PWRTL.S')
     @run_if_endpoint_matches(has_cluster(Clusters.PowerTopology))
     async def test_TC_PWRTL_2_1(self):
+        """[TC-PWRTL-2.1] Attributes with DUT as Server
+
+        Verify FeatureMap (including the Matter 1.7 CIRC bit 4 with reserved-bit
+        discipline), AttributeList composition based on topology features,
+        AvailableEndpoints and ActiveEndpoints reads, the subset invariant
+        (ActiveEndpoints subset of AvailableEndpoints), read-only access on
+        both endpoint list attributes, and Non-volatile persistence of
+        ActiveEndpoints across reboot (manual-mode only; CI skips the reboot
+        steps via the is_pics_sdk_ci_only dispatch).
+        """
         endpoint = self.get_endpoint()
         cluster = Clusters.PowerTopology
         attributes = cluster.Attributes
         features = cluster.Bitmaps.Feature
 
-        self.step(1)
+        self.step(1, "Commissioning, already done", is_commissioning=True)
 
-        # Step 2: Read FeatureMap
-        self.step(2)
+        self.step(2, "TH reads FeatureMap from DUT")
         feature_map = await self.read_single_attribute_check_success(
             endpoint=endpoint,
             cluster=cluster,
@@ -103,16 +82,13 @@ class TC_PWRTL_2_1(MatterBaseTest):
         )
         log.info(f"FeatureMap: 0x{feature_map:08X}")
 
-        # Step 3: Validate O.a conformance - exactly one of NODE/TREE/SET
-        self.step(3)
+        self.step(3, "TH validates O.a conformance (exactly one of NODE/TREE/SET); DYPF implies SET")
         has_node = bool(feature_map & features.kNodeTopology)
         has_tree = bool(feature_map & features.kTreeTopology)
         has_set = bool(feature_map & features.kSetTopology)
         topology_count = sum([has_node, has_tree, has_set])
         asserts.assert_equal(topology_count, 1,
                              f"Exactly one of NODE/TREE/SET must be set, got {topology_count}")
-
-        # DYPF only valid with SET
         has_dypf = bool(feature_map & features.kDynamicPowerFlow)
         if has_dypf:
             asserts.assert_true(has_set,
@@ -120,12 +96,9 @@ class TC_PWRTL_2_1(MatterBaseTest):
         log.info(f"Topology: NODE={has_node}, TREE={has_tree}, SET={has_set}, "
                  f"DYPF={has_dypf}")
 
-        # Step 4: Validate CIRC bit and reserved bits
-        self.step(4)
+        self.step(4, "TH validates CIRC bit and reserved bits 5..31")
         has_circ = bool(feature_map & features.kElectricalCircuit)
         log.info(f"ElectricalCircuit (CIRC): {has_circ}")
-
-        # Bits 5..31 should be 0 (reserved)
         KNOWN_BITS_MASK = (features.kNodeTopology | features.kTreeTopology |
                            features.kSetTopology | features.kDynamicPowerFlow |
                            features.kElectricalCircuit)
@@ -133,28 +106,23 @@ class TC_PWRTL_2_1(MatterBaseTest):
         asserts.assert_equal(reserved_bits, 0,
                              f"Reserved bits set in FeatureMap: 0x{reserved_bits:08X}")
 
-        # Step 5: Read AttributeList
-        self.step(5)
+        self.step(5, "TH reads AttributeList; verifies AvailableEndpoints/ActiveEndpoints present iff TREE/SET/CIRC")
         attribute_list = await self.read_single_attribute_check_success(
             endpoint=endpoint,
             cluster=cluster,
             attribute=attributes.AttributeList
         )
         log.info(f"AttributeList: {attribute_list}")
-
-        # For TREE, SET, or CIRC, AvailableEndpoints and ActiveEndpoints must be present
         needs_endpoint_attrs = has_tree or has_set or has_circ
         avail_ep_id = attributes.AvailableEndpoints.attribute_id
         active_ep_id = attributes.ActiveEndpoints.attribute_id
-
         if needs_endpoint_attrs:
             asserts.assert_in(avail_ep_id, attribute_list,
                               "AvailableEndpoints must be in AttributeList for TREE/SET/CIRC")
             asserts.assert_in(active_ep_id, attribute_list,
                               "ActiveEndpoints must be in AttributeList for TREE/SET/CIRC")
 
-        # Step 6: Read AvailableEndpoints
-        self.step(6)
+        self.step(6, "TH reads AvailableEndpoints (if present in AttributeList)")
         avail_eps = None
         if avail_ep_id in attribute_list:
             avail_eps = await self.read_single_attribute_check_success(
@@ -166,8 +134,7 @@ class TC_PWRTL_2_1(MatterBaseTest):
         else:
             log.info("AvailableEndpoints not in AttributeList (NODE topology)")
 
-        # Step 7: Read ActiveEndpoints
-        self.step(7)
+        self.step(7, "TH reads ActiveEndpoints (if present in AttributeList)")
         active_eps = None
         if active_ep_id in attribute_list:
             active_eps = await self.read_single_attribute_check_success(
@@ -179,8 +146,7 @@ class TC_PWRTL_2_1(MatterBaseTest):
         else:
             log.info("ActiveEndpoints not in AttributeList (NODE topology)")
 
-        # Step 8: Verify subset relationship
-        self.step(8)
+        self.step(8, "TH verifies ActiveEndpoints is a subset of AvailableEndpoints")
         if avail_eps is not None and active_eps is not None:
             for ep in active_eps:
                 asserts.assert_in(ep, avail_eps,
@@ -189,8 +155,7 @@ class TC_PWRTL_2_1(MatterBaseTest):
         else:
             log.info("Skipping subset check (endpoint attributes not present)")
 
-        # Step 9: Attempt write to AvailableEndpoints
-        self.step(9)
+        self.step(9, "TH attempts write to AvailableEndpoints - expect UNSUPPORTED_WRITE")
         if avail_eps is not None:
             status = await self.write_single_attribute(
                 attribute_value=attributes.AvailableEndpoints([]),
@@ -199,8 +164,7 @@ class TC_PWRTL_2_1(MatterBaseTest):
             asserts.assert_equal(status, Status.UnsupportedWrite,
                                  "Write to AvailableEndpoints should return UNSUPPORTED_WRITE")
 
-        # Step 10: Operator reboots DUT (skipped in CI)
-        self.step(10)
+        self.step(10, "Operator reboots DUT (skipped in CI)")
         if self.is_pics_sdk_ci_only or active_eps is None:
             # CI cannot drive an operator reboot, and there are no ActiveEndpoints
             # to verify Non-volatile persistence against.
@@ -209,8 +173,7 @@ class TC_PWRTL_2_1(MatterBaseTest):
             self.wait_for_user_input(
                 prompt_msg="Reboot the DUT and wait for it to rejoin the fabric. Press Enter.")
 
-        # Step 11: Verify Non-volatile persistence of ActiveEndpoints (skipped in CI)
-        self.step(11)
+        self.step(11, "TH verifies ActiveEndpoints persists after reboot - Non-volatile (skipped in CI)")
         if self.is_pics_sdk_ci_only or active_eps is None:
             self.mark_current_step_skipped()
         else:
