@@ -145,9 +145,21 @@ private:
      */
     void LoadPersistentAttributes();
 
+    /**
+     * Helper function that loads a scalar value from the KVS.
+     * @param path The path to the attribute.
+     * @param func The function to call to load the value.
+     * @param attributeName The name of the attribute.
+     */
     template <typename Func>
     void LoadScalarValue(const ConcreteAttributePath & path, Func func, const char * attributeName);
 
+    /**
+     * Helper function that loads a nullable scalar value from the KVS.
+     * @param path The path to the attribute.
+     * @param func The function to call to load the value.
+     * @param attributeName The name of the attribute.
+     */
     template <typename Func>
     void LoadNullableScalarValue(const ConcreteAttributePath & path, Func func, const char * attributeName);
 
