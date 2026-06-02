@@ -116,6 +116,7 @@ CHIP_ERROR GenericThreadDriver::CommitConfiguration()
         if (persistErr != CHIP_NO_ERROR)
         {
             ChipLogError(NetworkProvisioning, "Failed to persist Thread dataset: %" CHIP_ERROR_FORMAT, persistErr.Format());
+            return persistErr;
         }
         else
         {
