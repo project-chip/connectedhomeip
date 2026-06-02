@@ -10429,6 +10429,173 @@ static id _Nullable DecodeAttributeValueForElectricalGridConditionsCluster(Attri
     *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
     return nil;
 }
+static id _Nullable DecodeAttributeValueForElectricalAlarmCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::ElectricalAlarm;
+    switch (aAttributeId) {
+    case Attributes::Mask::Id: {
+        using TypeInfo = Attributes::Mask::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithUnsignedLongLong:cppValue.Raw()];
+        return value;
+    }
+    case Attributes::Latch::Id: {
+        using TypeInfo = Attributes::Latch::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithUnsignedLongLong:cppValue.Raw()];
+        return value;
+    }
+    case Attributes::State::Id: {
+        using TypeInfo = Attributes::State::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithUnsignedLongLong:cppValue.Raw()];
+        return value;
+    }
+    case Attributes::Supported::Id: {
+        using TypeInfo = Attributes::Supported::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithUnsignedLongLong:cppValue.Raw()];
+        return value;
+    }
+    case Attributes::OverVoltageThreshold::Id: {
+        using TypeInfo = Attributes::OverVoltageThreshold::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithLongLong:cppValue];
+        return value;
+    }
+    case Attributes::UnderVoltageThreshold::Id: {
+        using TypeInfo = Attributes::UnderVoltageThreshold::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithLongLong:cppValue];
+        return value;
+    }
+    case Attributes::OverFrequencyThreshold::Id: {
+        using TypeInfo = Attributes::OverFrequencyThreshold::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithLongLong:cppValue];
+        return value;
+    }
+    case Attributes::UnderFrequencyThreshold::Id: {
+        using TypeInfo = Attributes::UnderFrequencyThreshold::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithLongLong:cppValue];
+        return value;
+    }
+    case Attributes::OverPowerThreshold::Id: {
+        using TypeInfo = Attributes::OverPowerThreshold::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithLongLong:cppValue];
+        return value;
+    }
+    case Attributes::UnderPowerThreshold::Id: {
+        using TypeInfo = Attributes::UnderPowerThreshold::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithLongLong:cppValue];
+        return value;
+    }
+    case Attributes::OverCurrentThreshold::Id: {
+        using TypeInfo = Attributes::OverCurrentThreshold::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithLongLong:cppValue];
+        return value;
+    }
+    case Attributes::UnderCurrentThreshold::Id: {
+        using TypeInfo = Attributes::UnderCurrentThreshold::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithLongLong:cppValue];
+        return value;
+    }
+    case Attributes::PowerImportThreshold::Id: {
+        using TypeInfo = Attributes::PowerImportThreshold::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithLongLong:cppValue];
+        return value;
+    }
+    case Attributes::PowerExportThreshold::Id: {
+        using TypeInfo = Attributes::PowerExportThreshold::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithLongLong:cppValue];
+        return value;
+    }
+    default: {
+        // Not a known ElectricalAlarm attribute.
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
+    return nil;
+}
 static id _Nullable DecodeAttributeValueForElectricalDistributionCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::ElectricalDistribution;
@@ -24842,6 +25009,9 @@ id _Nullable MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::T
     }
     case Clusters::ElectricalGridConditions::Id: {
         return DecodeAttributeValueForElectricalGridConditionsCluster(aPath.mAttributeId, aReader, aError);
+    }
+    case Clusters::ElectricalAlarm::Id: {
+        return DecodeAttributeValueForElectricalAlarmCluster(aPath.mAttributeId, aReader, aError);
     }
     case Clusters::ElectricalDistribution::Id: {
         return DecodeAttributeValueForElectricalDistributionCluster(aPath.mAttributeId, aReader, aError);

@@ -5815,6 +5815,99 @@ provisional cluster ElectricalGridConditions = 160 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
+/** This cluster is a derived cluster of the Alarm Base cluster and provides the alarm definition related to Electrical Sensor device type. */
+provisional cluster ElectricalAlarm = 161 {
+  revision 1;
+
+  bitmap AlarmBitmap : bitmap64 {
+    kOverVoltage = 0x1;
+    kUnderVoltage = 0x2;
+    kSwappedPolarity = 0x400;
+    kLossOfMeasurement = 0x800;
+    kLossOfGridPower = 0x1000;
+    kPowerImported = 0x2000;
+    kPowerExported = 0x4000;
+    kOverFrequency = 0x4;
+    kUnderFrequency = 0x8;
+    kOverPower = 0x10;
+    kUnderPower = 0x20;
+    kOverCurrent = 0x40;
+    kUnderCurrent = 0x80;
+    kFrequencyQuality = 0x100;
+    kVoltageQuality = 0x200;
+  }
+
+  bitmap Feature : bitmap32 {
+    kReset = 0x1;
+    kAdjustableThresholds = 0x100000;
+    kOverVoltage = 0x200000;
+    kUnderVoltage = 0x400000;
+    kOverFrequency = 0x800000;
+    kUnderFrequency = 0x1000000;
+    kOverPower = 0x2000000;
+    kUnderPower = 0x4000000;
+    kOverCurrent = 0x8000000;
+    kUnderCurrent = 0x10000000;
+    kPowerImport = 0x20000000;
+    kPowerExport = 0x40000000;
+  }
+
+  info event Notify = 0 {
+    AlarmBitmap active = 0;
+    AlarmBitmap inactive = 1;
+    AlarmBitmap state = 2;
+    AlarmBitmap mask = 3;
+  }
+
+  readonly attribute AlarmBitmap mask = 0;
+  readonly attribute optional AlarmBitmap latch = 1;
+  readonly attribute AlarmBitmap state = 2;
+  readonly attribute AlarmBitmap supported = 3;
+  readonly attribute optional voltage_mv overVoltageThreshold = 128;
+  readonly attribute optional voltage_mv underVoltageThreshold = 129;
+  readonly attribute optional int64s overFrequencyThreshold = 130;
+  readonly attribute optional int64s underFrequencyThreshold = 131;
+  readonly attribute optional power_mw overPowerThreshold = 132;
+  readonly attribute optional power_mw underPowerThreshold = 133;
+  readonly attribute optional amperage_ma overCurrentThreshold = 134;
+  readonly attribute optional amperage_ma underCurrentThreshold = 135;
+  readonly attribute optional power_mw powerImportThreshold = 136;
+  readonly attribute optional power_mw powerExportThreshold = 137;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct ResetRequest {
+    AlarmBitmap alarms = 0;
+  }
+
+  request struct ModifyEnabledAlarmsRequest {
+    AlarmBitmap mask = 0;
+  }
+
+  request struct SetElectricalAlarmThresholdsRequest {
+    optional voltage_mv overVoltageThreshold = 0;
+    optional voltage_mv underVoltageThreshold = 1;
+    optional int64s overFrequencyThreshold = 2;
+    optional int64s underFrequencyThreshold = 3;
+    optional power_mw overPowerThreshold = 4;
+    optional power_mw underPowerThreshold = 5;
+    optional amperage_ma overCurrentThreshold = 6;
+    optional amperage_ma underCurrentThreshold = 7;
+    optional power_mw powerImportThreshold = 8;
+    optional power_mw powerExportThreshold = 9;
+  }
+
+  /** This command resets active and latched alarms (if possible). */
+  command Reset(ResetRequest): DefaultSuccess = 0;
+  /** This command allows a client to request that an alarm be enabled or suppressed at the server. */
+  command ModifyEnabledAlarms(ModifyEnabledAlarmsRequest): DefaultSuccess = 1;
+  /** This command will set the alarm thresholds for the specified values. */
+  command SetElectricalAlarmThresholds(SetElectricalAlarmThresholdsRequest): DefaultSuccess = 128;
+}
+
 /** This cluster provides an interface for a device which distributes electrical power to other devices, providing information about the capacity of the device as well as whether it has been damaged or has reached the end of its service life. */
 provisional cluster ElectricalDistribution = 162 {
   revision 1;

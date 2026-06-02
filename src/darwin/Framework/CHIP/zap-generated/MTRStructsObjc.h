@@ -1663,6 +1663,14 @@ MTR_PROVISIONALLY_AVAILABLE
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
+@interface MTRElectricalAlarmClusterNotifyEvent : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull active MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull inactive MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull state MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull mask MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
 @interface MTRElectricalProtectionAlarmClusterArcFaultRatingsStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nullable seriesArcCurrentSensitivity MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nullable parallelArcCurrentSensitivity MTR_PROVISIONALLY_AVAILABLE;

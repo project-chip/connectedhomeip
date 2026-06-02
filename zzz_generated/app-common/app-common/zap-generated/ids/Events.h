@@ -61,6 +61,7 @@
 #include <clusters/DoorLock/EventIds.h>
 #include <clusters/DynamicLighting/EventIds.h>
 #include <clusters/EcosystemInformation/EventIds.h>
+#include <clusters/ElectricalAlarm/EventIds.h>
 #include <clusters/ElectricalDistribution/EventIds.h>
 #include <clusters/ElectricalEnergyMeasurement/EventIds.h>
 #include <clusters/ElectricalGridConditions/EventIds.h>

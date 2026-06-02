@@ -47,6 +47,7 @@
         "dishwasher-alarm-cluster.xml",
         "dishwasher-mode-cluster.xml",
         "dynamic-lighting-cluster.xml",
+        "electrical-alarm-cluster.xml",
         "electrical-distribution-cluster.xml",
         "electrical-protection-alarm-cluster.xml",
         "groupcast-cluster.xml",
