@@ -92,8 +92,22 @@ def main(log_level, no_log_timestamps, image, file_image_list, qemu, verbose):
     for path in image:
         logging.info("Executing image %s", path)
 
-        status = subprocess.run([qemu, "-nographic", "-no-reboot", "-machine", "esp32",
-                                 "-drive", "file=%s,if=mtd,format=raw" % path], capture_output=True)
+        try:
+            status = subprocess.run([qemu, "-nographic", "-no-reboot", "-machine", "esp32",
+                                     "-drive", "file=%s,if=mtd,format=raw" % path],
+                                    capture_output=True, timeout=300)
+        except subprocess.TimeoutExpired as timeout_exc:
+            # A test image that never reaches its final reboot/exit would otherwise
+            # block QEMU (and the whole CI job) until the default 6h job timeout.
+            # Surface whatever serial output was captured before the timeout so the
+            # hanging test is visible, then fail this image.
+            print("========== TEST OUTPUT BEGIN (TIMEOUT) ============")
+            if timeout_exc.stdout:
+                print(timeout_exc.stdout.decode('ascii'))
+            if timeout_exc.stderr:
+                print(timeout_exc.stderr.decode('ascii'))
+            print("========== TEST OUTPUT END (TIMEOUT) ============")
+            raise Exception("Execution of %s timed out after 300 seconds" % path)
 
         # Encoding is NOT valid, but want to not try to decode potential
         # invalid UTF-8 sequences. The strings we care about are ascii anyway
