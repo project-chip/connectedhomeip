@@ -49,6 +49,10 @@ public:
      */
     virtual temperature Temperature() const = 0;
 
+    /*
+     * Set the temperature value.
+     * Returns true if the temperature was changed, false otherwise.
+     */
     virtual bool SetTemperature(temperature temp) = 0;
 
     /*

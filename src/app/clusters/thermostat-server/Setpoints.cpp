@@ -429,7 +429,6 @@ DataModel::ActionReturnStatus Setpoints::ChangeRange(SetpointRange & range, Opti
             changedAttributes.Set(range.cooling.AttributeId());
         }
     }
-    ChipLogProgress(Zcl, "Changed setpoint ranges, calling Fix");
     return Fix(changedAttributes);
 }
 
