@@ -15,6 +15,35 @@
 #    limitations under the License.
 #
 
+"""
+# Setup env
+source ./scripts/bootstrap.sh -p linux
+scripts/run_in_build_env.sh './scripts/build_python.sh --install_virtual_env out/python_env -pw true'
+
+# Build app
+cd examples/all-devices-app/posix
+gn gen --add-export-compile-commands="*" out
+ninja -C out
+cd ../../..
+
+# Run test
+scripts/run_in_python_env.sh out/python_env \
+    './scripts/tests/run_python_test.py \
+    --app examples/all-devices-app/posix/out/all-devices-app \
+    --app-args "\
+        --device contact-sensor:1 \
+        --device contact-sensor:2" \
+    --factory-reset \
+    --script examples/all-devices-app/all-devices-common/devices/boolean-state-sensor/test.py \
+    --script-args "\
+        --commissioning-method on-network \
+        --discriminator 3840 \
+        --passcode 20202021\
+        " \
+    --app-stdin-pipe /tmp/app_stdin.txt'
+
+"""
+
 import logging
 import matter.clusters as Clusters
 from matter.testing.decorators import async_test_body
