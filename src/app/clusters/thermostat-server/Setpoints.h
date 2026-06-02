@@ -124,7 +124,10 @@ public:
     /*
     Get the appropriate setpoint range, based on occupancy.
     */
-    SetpointRange & GetRange(chip::app::Clusters::Thermostat::OccupancyBitmap occupancy);
+    SetpointRange & GetRange(chip::app::Clusters::Thermostat::OccupancyBitmap occupancy)
+    {
+        return occupancy == OccupancyBitmap::kOccupied ? occupied : unoccupied;
+    }
 
     /*
     Get the appropriate setpoint limits, based on mode

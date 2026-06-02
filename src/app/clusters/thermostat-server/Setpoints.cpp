@@ -42,15 +42,6 @@ namespace app {
 namespace Clusters {
 namespace Thermostat {
 
-SetpointRange & Setpoints::GetRange(OccupancyBitmap occupancy)
-{
-    if (occupancy == OccupancyBitmap::kOccupied)
-    {
-        return occupied;
-    }
-    return unoccupied;
-}
-
 SetpointLimits<AbsoluteSetpoint> Setpoints::GetLimits(SystemModeEnum mode)
 {
     temperature minHeat = userHeatLimits.Minimum();

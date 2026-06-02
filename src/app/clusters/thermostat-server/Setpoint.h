@@ -145,7 +145,7 @@ public:
     bool SetTemperature(temperature temp) override;
 
     /*
-     * Clear the temperature value.
+     * Clear the temperature override; this will cause Temperature() to return the absolute setpoint's temperature
      * Returns true if the temperature was cleared, false otherwise.
      */
     bool ClearTemperature();

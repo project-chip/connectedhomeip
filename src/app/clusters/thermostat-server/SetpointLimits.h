@@ -86,11 +86,7 @@ struct SetpointLimits
     */
     bool Valid(const Setpoint & setpoint) const
     {
-        if (setpoint.HasTemperature())
-        {
-            return (Minimum() <= setpoint.Temperature() && setpoint.Temperature() <= Maximum());
-        }
-        return false;
+        return setpoint.HasTemperature() && (Minimum() <= setpoint.Temperature() && setpoint.Temperature() <= Maximum());
     };
 
     /*
