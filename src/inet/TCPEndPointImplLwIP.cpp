@@ -930,10 +930,6 @@ err_t TCPEndPointImplLwIP::LwIPHandleIncomingConnection(void * arg, struct tcp_p
             });
             if (err != CHIP_NO_ERROR)
             {
-<<<<<<< HEAD
-                conEP->Release(); // for the Ref in ScheduleLambda
-                listenEP->Release();
-=======
                 // ScheduleLambda failed. The PCB will be torn down via tcp_abort below, so detach
                 // it from conEP first to prevent the err callback fired by tcp_abort from reaching
                 // an endpoint we are about to recycle.
@@ -949,9 +945,8 @@ err_t TCPEndPointImplLwIP::LwIPHandleIncomingConnection(void * arg, struct tcp_p
                 conEP->mLwIPEndPointType         = LwIPEndPointType::Unknown;
                 listenEP->mPreAllocatedConnectEP = conEP;
                 // for the Ref before ScheduleLambda
-                conEP->Unref();
-                listenEP->Unref();
->>>>>>> f6bea49a3a ([Inet] Fix LwIP TCP endpoint against PCB races and recycle listener's conEP (#71708))
+                conEP->Release();
+                listenEP->Release();
                 err = CHIP_ERROR_CONNECTION_ABORTED;
                 conEP->Release(); // for the Retain() above
             }

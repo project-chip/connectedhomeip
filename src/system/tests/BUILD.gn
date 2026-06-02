@@ -16,11 +16,8 @@ import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
 import("${chip_root}/build/chip/chip_test_suite.gni")
-<<<<<<< HEAD
-=======
 import("${chip_root}/src/inet/inet.gni")
 import("../system.gni")
->>>>>>> f6bea49a3a ([Inet] Fix LwIP TCP endpoint against PCB races and recycle listener's conEP (#71708))
 
 chip_test_suite("tests") {
   output_name = "libSystemLayerTests"
@@ -35,10 +32,10 @@ chip_test_suite("tests") {
     "TestTimeSource.cpp",
   ]
 
-<<<<<<< HEAD
   if (chip_device_platform != "fake") {
     test_sources += [ "TestSystemScheduleWork.cpp" ]
-=======
+  }
+
   # ESP32 TCP uses PBUF_RAM packet buffers, which always allocate at the TCP
   # maximum capacity. These tests assume requested sizes control buffer
   # capacity, so leave them out of the TCP-enabled QEMU configuration.
@@ -46,19 +43,11 @@ chip_test_suite("tests") {
     test_sources += [ "TestSystemPacketBuffer.cpp" ]
   }
 
-  # SystemPacketBuffer on nrfconnect/esp32 uses LwIP buffers, which ignore the
-  #  requested allocation size and always allocate at max-size.  So our test,
-  #  which tries to size-limit the buffers, does not work correctly there.
-  if (chip_device_platform != "nrfconnect" && chip_device_platform != "esp32") {
-    test_sources += [ "TestTLVPacketBufferBackingStore.cpp" ]
->>>>>>> f6bea49a3a ([Inet] Fix LwIP TCP endpoint against PCB races and recycle listener's conEP (#71708))
-  }
-
-  # SystemPacketBuffer on nrfconnect and openiotsdk uses LwIP buffers, which ignore the
-  #  requested allocation size and always allocate at max-size.  So our test,
+  # SystemPacketBuffer on nrfconnect/openiotsdk/esp32 uses LwIP buffers, which ignore
+  #  the requested allocation size and always allocate at max-size.  So our test,
   #  which tries to size-limit the buffers, does not work correctly there.
   if (chip_device_platform != "nrfconnect" &&
-      chip_device_platform != "openiotsdk") {
+      chip_device_platform != "openiotsdk" && chip_device_platform != "esp32") {
     test_sources += [ "TestTLVPacketBufferBackingStore.cpp" ]
   }
 
