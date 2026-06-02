@@ -21,8 +21,11 @@
 #include <devices/interface/SingleEndpointDevice.h>
 #include <lib/support/TimerDelegate.h>
 #include <memory>
+
+#if defined(PW_RPC_ENABLED) && PW_RPC_ENABLED
 #include <pigweed/rpc_services/AccessInterceptor.h>
 #include <pigweed/rpc_services/AccessInterceptorRegistry.h>
+#endif // defined(PW_RPC_ENABLED)
 
 namespace chip {
 namespace app {
