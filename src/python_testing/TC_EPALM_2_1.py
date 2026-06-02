@@ -38,18 +38,6 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-'''
-Purpose
-Verify the mandatory and feature-conditional server attributes of the
-Electrical Protection Alarm Cluster (EPALM, 0x00A3): each attribute is
-implemented with the correct data type, satisfies its declared constraint,
-honors the Nullable (X) quality where applicable, and the feature-conditional
-rating attributes are present only when their gating feature is supported.
-
-Test Plan
-https://github.com/CHIP-Specifications/chip-test-plans/blob/master/src/cluster/electrical_protection_alarm.adoc#tc-epalm-2-1
-'''
-
 import logging
 
 from mobly import asserts
@@ -57,9 +45,9 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
 from matter.testing import matter_asserts
-from matter.testing.decorators import has_cluster, run_if_endpoint_matches
+from matter.testing.decorators import has_cluster, pics, run_if_endpoint_matches
 from matter.testing.matter_testing import MatterBaseTest
-from matter.testing.runner import TestStep, default_matter_test_main
+from matter.testing.runner import default_matter_test_main
 
 log = logging.getLogger(__name__)
 
@@ -68,38 +56,28 @@ cluster = Clusters.ElectricalProtectionAlarm
 
 class TC_EPALM_2_1(MatterBaseTest):
 
-    def desc_TC_EPALM_2_1(self) -> str:
-        return "[TC-EPALM-2.1] Attributes with DUT as Server"
-
-    def pics_TC_EPALM_2_1(self) -> list[str]:
-        return ["EPALM.S"]
-
-    def steps_TC_EPALM_2_1(self) -> list[TestStep]:
-        return [
-            TestStep(1, "Commission DUT to TH (already done)", is_commissioning=True),
-            TestStep(2, "TH reads ArcCause attribute"),
-            TestStep(3, "TH reads OverLoadRating attribute"),
-            TestStep(4, "TH reads OverVoltageRating attribute"),
-            TestStep(5, "TH reads SurgeProtectionRating attribute"),
-            TestStep(6, "TH reads ShortCircuitRating attribute"),
-            TestStep(7, "TH reads ResidualCurrentRating attribute"),
-            TestStep(8, "TH reads ArcFaultRating attribute"),
-            TestStep(9, "TH reads Mask attribute (inherited from Alarm Base)"),
-            TestStep(10, "TH reads Latch attribute (inherited from Alarm Base)"),
-            TestStep(11, "TH reads State attribute (inherited from Alarm Base)"),
-            TestStep(12, "TH reads Supported attribute (inherited from Alarm Base)"),
-            TestStep(13, "TH cross-validates Mask and State are subsets of Supported"),
-        ]
-
+    @pics('EPALM.S')
     @run_if_endpoint_matches(has_cluster(Clusters.ElectricalProtectionAlarm))
     async def test_TC_EPALM_2_1(self):
+        """[TC-EPALM-2.1] Attributes with DUT as Server
+
+        Verify the mandatory and feature-conditional server attributes of the
+        Electrical Protection Alarm Cluster (EPALM, 0x00A3): each attribute is
+        implemented with the correct data type, satisfies its declared
+        constraint, honors the Nullable (X) quality where applicable, and the
+        feature-conditional rating attributes are present only when their
+        gating feature is supported. Final step cross-validates Mask and State
+        are subsets of Supported per AlarmBase spec.
+
+        Test Plan:
+        https://github.com/CHIP-Specifications/chip-test-plans/blob/master/src/cluster/electrical_protection_alarm.adoc#tc-epalm-2-1
+        """
         endpoint = self.get_endpoint()
         attributes = cluster.Attributes
 
-        self.step(1)
-        # Commissioning is handled by the test runner.
+        self.step(1, "Commission DUT to TH (already done)", is_commissioning=True)
 
-        self.step(2)
+        self.step(2, "TH reads ArcCause attribute")
         if await self.attribute_guard(endpoint=endpoint, attribute=attributes.ArcCause):
             val = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attributes.ArcCause)
@@ -108,7 +86,7 @@ class TC_EPALM_2_1(MatterBaseTest):
                 # Only spec-defined bits 0 (Series), 1 (ParallelToNeutral), 2 (ParallelToGround) may be set
                 asserts.assert_less_equal(val, 7, 'ArcCause may only set bits 0..2')
 
-        self.step(3)
+        self.step(3, "TH reads OverLoadRating attribute (feature-conditional)")
         if await self.attribute_guard(endpoint=endpoint, attribute=attributes.OverLoadRating):
             val = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attributes.OverLoadRating)
@@ -117,7 +95,7 @@ class TC_EPALM_2_1(MatterBaseTest):
                                     'OverLoadRating must be an OverLoadRatingsStruct')
                 self._check_over_load_ratings_struct(val)
 
-        self.step(4)
+        self.step(4, "TH reads OverVoltageRating attribute (feature-conditional)")
         if await self.attribute_guard(endpoint=endpoint, attribute=attributes.OverVoltageRating):
             val = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attributes.OverVoltageRating)
@@ -126,7 +104,7 @@ class TC_EPALM_2_1(MatterBaseTest):
                                     'OverVoltageRating must be an OverVoltageRatingsStruct')
                 self._check_over_voltage_ratings_struct(val)
 
-        self.step(5)
+        self.step(5, "TH reads SurgeProtectionRating attribute (feature-conditional)")
         if await self.attribute_guard(endpoint=endpoint, attribute=attributes.SurgeProtectionRating):
             val = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attributes.SurgeProtectionRating)
@@ -135,7 +113,7 @@ class TC_EPALM_2_1(MatterBaseTest):
                                     'SurgeProtectionRating must be a SurgeProtectionRatingsStruct')
                 self._check_surge_protection_ratings_struct(val)
 
-        self.step(6)
+        self.step(6, "TH reads ShortCircuitRating attribute (feature-conditional)")
         if await self.attribute_guard(endpoint=endpoint, attribute=attributes.ShortCircuitRating):
             val = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attributes.ShortCircuitRating)
@@ -144,7 +122,7 @@ class TC_EPALM_2_1(MatterBaseTest):
                                     'ShortCircuitRating must be a ShortCircuitRatingsStruct')
                 self._check_short_circuit_ratings_struct(val)
 
-        self.step(7)
+        self.step(7, "TH reads ResidualCurrentRating attribute (feature-conditional)")
         if await self.attribute_guard(endpoint=endpoint, attribute=attributes.ResidualCurrentRating):
             val = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attributes.ResidualCurrentRating)
@@ -153,7 +131,7 @@ class TC_EPALM_2_1(MatterBaseTest):
                                     'ResidualCurrentRating must be a ResidualCurrentFaultRatingsStruct')
                 self._check_residual_current_fault_ratings_struct(val)
 
-        self.step(8)
+        self.step(8, "TH reads ArcFaultRating attribute (feature-conditional)")
         if await self.attribute_guard(endpoint=endpoint, attribute=attributes.ArcFaultRating):
             val = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attributes.ArcFaultRating)
@@ -162,11 +140,10 @@ class TC_EPALM_2_1(MatterBaseTest):
                                     'ArcFaultRating must be an ArcFaultRatingsStruct')
                 self._check_arc_fault_ratings_struct(val)
 
-        # Steps 9-12: inherited Alarm Base attributes; AlarmBitmap (map32) — set bits limited
-        # to the 7 spec-defined fault bits (0..6).
+        # AlarmBitmap (map32) — set bits limited to the 7 spec-defined fault bits (0..6).
         ALARM_BITMAP_MAX = 0x7F  # ShortCircuit | OverLoad | OverVoltage | VoltageSurge | ResidualCurrent | ArcFault | SelfTest
 
-        self.step(9)
+        self.step(9, "TH reads Mask attribute (inherited from Alarm Base)")
         mask_val = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attributes.Mask)
         asserts.assert_true(matter_asserts.is_valid_int_value(mask_val, bit_count=32),
@@ -174,7 +151,7 @@ class TC_EPALM_2_1(MatterBaseTest):
         asserts.assert_less_equal(mask_val, ALARM_BITMAP_MAX,
                                   'Mask may only set the 7 spec-defined AlarmBitmap bits')
 
-        self.step(10)
+        self.step(10, "TH reads Latch attribute (inherited from Alarm Base; optional)")
         if await self.attribute_guard(endpoint=endpoint, attribute=attributes.Latch):
             val = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attributes.Latch)
@@ -183,7 +160,7 @@ class TC_EPALM_2_1(MatterBaseTest):
             asserts.assert_less_equal(val, ALARM_BITMAP_MAX,
                                       'Latch may only set the 7 spec-defined AlarmBitmap bits')
 
-        self.step(11)
+        self.step(11, "TH reads State attribute (inherited from Alarm Base)")
         state_val = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attributes.State)
         asserts.assert_true(matter_asserts.is_valid_int_value(state_val, bit_count=32),
@@ -191,7 +168,7 @@ class TC_EPALM_2_1(MatterBaseTest):
         asserts.assert_less_equal(state_val, ALARM_BITMAP_MAX,
                                   'State may only set the 7 spec-defined AlarmBitmap bits')
 
-        self.step(12)
+        self.step(12, "TH reads Supported attribute (inherited from Alarm Base)")
         supported_val = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attributes.Supported)
         asserts.assert_true(matter_asserts.is_valid_int_value(supported_val, bit_count=32),
@@ -199,8 +176,7 @@ class TC_EPALM_2_1(MatterBaseTest):
         asserts.assert_less_equal(supported_val, ALARM_BITMAP_MAX,
                                   'Supported may only set the 7 spec-defined AlarmBitmap bits')
 
-        # Step 13: Cross-validate Mask and State are subsets of Supported (per AlarmBase spec)
-        self.step(13)
+        self.step(13, "TH cross-validates Mask and State are subsets of Supported (per AlarmBase spec)")
         asserts.assert_equal(mask_val & ~supported_val, 0,
                              'Mask has bits not in Supported')
         asserts.assert_equal(state_val & ~supported_val, 0,
