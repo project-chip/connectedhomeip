@@ -921,12 +921,13 @@ public:
 
             if (this->batPercentRemaining.IsNull() || val.IsNull())
             {
+                this->batPercentRemainingNotifyTimerContext.CancelCurrentTimer();
                 SetAttributeValue(this->batPercentRemaining, val, PowerSource::Attributes::BatPercentRemaining::Id);
                 return CHIP_NO_ERROR;
             }
 
-            LogErrorOnFailure(this->batPercentRemainingNotifyTimerContext.SetValue(val.Value()));
             this->batPercentRemaining = val;
+            LogErrorOnFailure(this->batPercentRemainingNotifyTimerContext.NotifyOrSchedule(val.Value()));
             return CHIP_NO_ERROR;
         }
     }
@@ -941,12 +942,13 @@ public:
 
             if (this->batTimeRemaining.IsNull() || val.IsNull())
             {
+                this->batTimeRemainingNotifyTimerContext.CancelCurrentTimer();
                 SetAttributeValue(this->batTimeRemaining, val, PowerSource::Attributes::BatTimeRemaining::Id);
                 return CHIP_NO_ERROR;
             }
 
-            LogErrorOnFailure(this->batTimeRemainingNotifyTimerContext.SetValue(val.Value()));
             this->batTimeRemaining = val;
+            LogErrorOnFailure(this->batTimeRemainingNotifyTimerContext.NotifyOrSchedule(val.Value()));
             return CHIP_NO_ERROR;
         }
     }
@@ -1047,12 +1049,13 @@ public:
 
             if (this->batTimeToFullCharge.IsNull() || val.IsNull())
             {
+                this->batTimeToFullChargeNotifyTimerContext.CancelCurrentTimer();
                 SetAttributeValue(this->batTimeToFullCharge, val, PowerSource::Attributes::BatTimeToFullCharge::Id);
                 return CHIP_NO_ERROR;
             }
 
-            LogErrorOnFailure(this->batTimeToFullChargeNotifyTimerContext.SetValue(val.Value()));
             this->batTimeToFullCharge = val;
+            LogErrorOnFailure(this->batTimeToFullChargeNotifyTimerContext.NotifyOrSchedule(val.Value()));
             return CHIP_NO_ERROR;
         }
     }

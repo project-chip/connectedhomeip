@@ -373,7 +373,7 @@ public:
     BatteryTimerContext(AttributeId id, TimerDelegate & timerDelegate, NotifyCallback notifier) :
         mId(id), mTimerDelegate(timerDelegate), mNotifier(std::move(notifier))
     {}
-    CriticalFailure SetValue(uint32_t value)
+    CriticalFailure NotifyOrSchedule(uint32_t value)
     {
         mToBeReported = value;
 
@@ -387,6 +387,7 @@ public:
         NotifyChange();
         return mTimerDelegate.StartTimer(this, System::Clock::Seconds16(kTimerDurationS));
     }
+    void CancelCurrentTimer() { mTimerDelegate.CancelTimer(this); }
     void TimerFired() override
     {
         // If at the end of the timer a different value to report has not been set, just return.
