@@ -30,6 +30,10 @@ CHIP_ERROR BooleanStateSensorDevice::Register(chip::EndpointId endpoint, CodeDri
 
     mBooleanStateCluster.Create(endpoint);
     ReturnErrorOnFailure(provider.AddCluster(mBooleanStateCluster.Registration()));
+#if defined(PW_RPC_ENABLED) && PW_RPC_ENABLED
+    mPwAccessor.SetDevice(this);
+    chip::rpc::PigweedDebugAccessInterceptorRegistry::Instance().Register(&mPwAccessor);
+#endif // defined(PW_RPC_ENABLED)
 
     return provider.AddEndpoint(mEndpointRegistration);
 }
@@ -47,6 +51,41 @@ void BooleanStateSensorDevice::Unregister(CodeDrivenDataModelProvider & provider
         LogErrorOnFailure(provider.RemoveCluster(&mIdentifyCluster.Cluster()));
         mIdentifyCluster.Destroy();
     }
+#if defined(PW_RPC_ENABLED) && PW_RPC_ENABLED
+    mPwAccessor.SetDevice(nullptr);
+    chip::rpc::PigweedDebugAccessInterceptorRegistry::Instance().Unregister(&mPwAccessor);
+#endif // defined(PW_RPC_ENABLED)
 }
+
+#if defined(PW_RPC_ENABLED) && PW_RPC_ENABLED
+std::optional<::pw::Status> BooleanStateSensor::AttributeAccessor::Write(const ConcreteDataAttributePath & path,
+                                                                         AttributeValueDecoder & decoder)
+{
+    chip::EndpointId endpoint = path.mEndpointId;
+    if (!mBooleanStateDevice || path.mEndpointId != mBooleanStateDevice->GetEndpointId())
+    {
+        return std::nullopt;
+    }
+    switch (path.mClusterId)
+    {
+    case BooleanState::Id:
+        switch (path.mAttributeId)
+        {
+        case BooleanState::Attributes::StateValue::Id: {
+            bool stateValue;
+            CHIP_ERROR err = decoder.Decode(stateValue);
+            if (err != CHIP_NO_ERROR)
+            {
+                return ::pw::Status::Internal();
+            }
+            mBooleanStateDevice->BooleanState().SetStateValue(stateValue);
+            return ::pw::OkStatus();
+        }
+        }
+        break;
+    }
+    return std::nullopt;
+}
+#endif // defined(PW_RPC_ENABLED)
 
 } // namespace chip::app
