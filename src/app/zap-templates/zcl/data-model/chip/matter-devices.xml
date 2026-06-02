@@ -985,8 +985,10 @@ limitations under the License.
                     </feature>
                 </features>
             </include>
+            <include cluster="Chime" client="true" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="Identify" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="Push AV Stream Transport" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Switch" client="false" server="true" clientLocked="true" serverLocked="true"></include>
             <include cluster="WebRTC Transport Provider" client="false" server="true" clientLocked="false" serverLocked="true"></include>
             <include cluster="WebRTC Transport Requestor" client="true" server="false" clientLocked="true" serverLocked="false"></include>
         </clusters>
@@ -1293,7 +1295,6 @@ limitations under the License.
             <include cluster="Binding" client="false" server="true" clientLocked="true" serverLocked="true"></include>
             <include cluster="Closure Control" client="true" server="false" clientLocked="true" serverLocked="true"></include>
             <include cluster="Closure Dimension" client="false" server="false" clientLocked="false" serverLocked="true"></include>
-            <include cluster="Groups" client="false" server="false" clientLocked="false" serverLocked="true"></include>
             <include cluster="Identify" client="false" server="false" clientLocked="false" serverLocked="true"></include>
         </clusters>
     </deviceType>
@@ -1621,6 +1622,8 @@ limitations under the License.
         <clusters>
             <include cluster="Commodity Metering" client="false" server="true" clientLocked="true" serverLocked="true"></include>
             <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Electrical Energy Measurement" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Electrical Power Measurement" client="false" server="true" clientLocked="true" serverLocked="true"></include>
         </clusters>
     </deviceType>
     <deviceType>
@@ -2440,6 +2443,7 @@ limitations under the License.
             <include cluster="Media Playback" client="false" server="true" clientLocked="false" serverLocked="false"></include>
             <include cluster="Target Navigator" client="false" server="true" clientLocked="false" serverLocked="false"></include>
             <include cluster="Channel" client="false" server="true" clientLocked="false" serverLocked="false"></include>
+            <include cluster="Content App Observer" client="false" server="false" clientLocked="false" serverLocked="false"></include>
         </clusters>
     </deviceType>
     <deviceType>
@@ -2895,6 +2899,7 @@ limitations under the License.
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
             <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Thread Network Diagnostics" client="false" server="true" clientLocked="true" serverLocked="true"></include>
             <include cluster="Thread Network Directory" client="false" server="true" clientLocked="true" serverLocked="true"></include>
             <include cluster="Wi-Fi Network Management" client="false" server="true" clientLocked="true" serverLocked="true"></include>
             <include cluster="Thread Border Router Management" client="false" server="true" clientLocked="true" serverLocked="true"></include>
