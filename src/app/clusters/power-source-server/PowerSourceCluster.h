@@ -806,7 +806,7 @@ public:
     }
     void SetOrder(uint8_t val)
     {
-        // This attribute is marked as `Persistent` but the cluster will not support it becuase the attribute is `ReadOnly`.
+        // This attribute is marked as `Persistent` but the cluster will not support the persistence because the attribute is `ReadOnly` to clients.
 
         SetAttributeValue(this->order, val, PowerSource::Attributes::Order::Id);
     }
@@ -1169,15 +1169,18 @@ private:
 
         if (mContext != nullptr)
         {
-            uint8_t oldBuf[to_underlying(WiredFaultEnum::kUnknownEnumValue)];
-            uint8_t newBuf[to_underlying(WiredFaultEnum::kUnknownEnumValue)];
+            WiredFaultEnum oldBuf[to_underlying(WiredFaultEnum::kUnknownEnumValue)]{};
+            WiredFaultEnum newBuf[to_underlying(WiredFaultEnum::kUnknownEnumValue)]{};
 
-            auto oldSpanNonConverted = Span(oldBuf, to_underlying(WiredFaultEnum::kUnknownEnumValue));
-            PowerSource::detail::BitSetToSpan(this->activeWiredFaultsBitSet, oldSpanNonConverted);
-            auto oldSpan             = PowerSource::detail::ConvertSpanType<WiredFaultEnum>(oldSpanNonConverted);
-            auto newSpanNonConverted = Span(newBuf, to_underlying(WiredFaultEnum::kUnknownEnumValue));
-            PowerSource::detail::BitSetToSpan(newBitSet, newSpanNonConverted);
-            auto newSpan = PowerSource::detail::ConvertSpanType<WiredFaultEnum>(newSpanNonConverted);
+            auto oldSpan      = Span(oldBuf, to_underlying(WiredFaultEnum::kUnknownEnumValue));
+            auto oldSpanBytes = PowerSource::detail::ConvertSpanType<uint8_t>(oldSpan);
+            PowerSource::detail::BitSetToSpan(this->activeWiredFaultsBitSet, oldSpanBytes);
+            oldSpan.reduce_size(oldSpanBytes.size());
+
+            auto newSpan      = Span(newBuf, to_underlying(WiredFaultEnum::kUnknownEnumValue));
+            auto newSpanBytes = PowerSource::detail::ConvertSpanType<uint8_t>(newSpan);
+            PowerSource::detail::BitSetToSpan(newBitSet, newSpanBytes);
+            newSpan.reduce_size(newSpanBytes.size());
 
             PowerSource::Events::WiredFaultChange::Type event_data{ oldSpan, newSpan };
             mContext->interactionContext.eventsGenerator.GenerateEvent(event_data, mPath.mEndpointId);
@@ -1195,15 +1198,18 @@ private:
 
         if (mContext != nullptr)
         {
-            uint8_t oldBuf[to_underlying(BatFaultEnum::kUnknownEnumValue)];
-            uint8_t newBuf[to_underlying(BatFaultEnum::kUnknownEnumValue)];
+            BatFaultEnum oldBuf[to_underlying(BatFaultEnum::kUnknownEnumValue)]{};
+            BatFaultEnum newBuf[to_underlying(BatFaultEnum::kUnknownEnumValue)]{};
 
-            auto oldSpanNonConverted = Span(oldBuf, to_underlying(BatFaultEnum::kUnknownEnumValue));
-            PowerSource::detail::BitSetToSpan(this->activeBatFaultsBitSet, oldSpanNonConverted);
-            auto oldSpan             = PowerSource::detail::ConvertSpanType<BatFaultEnum>(oldSpanNonConverted);
-            auto newSpanNonConverted = Span(newBuf, to_underlying(BatFaultEnum::kUnknownEnumValue));
-            PowerSource::detail::BitSetToSpan(newBitSet, newSpanNonConverted);
-            auto newSpan = PowerSource::detail::ConvertSpanType<BatFaultEnum>(newSpanNonConverted);
+            auto oldSpan      = Span(oldBuf, to_underlying(BatFaultEnum::kUnknownEnumValue));
+            auto oldSpanBytes = PowerSource::detail::ConvertSpanType<uint8_t>(oldSpan);
+            PowerSource::detail::BitSetToSpan(this->activeWiredFaultsBitSet, oldSpanBytes);
+            oldSpan.reduce_size(oldSpanBytes.size());
+
+            auto newSpan      = Span(newBuf, to_underlying(BatFaultEnum::kUnknownEnumValue));
+            auto newSpanBytes = PowerSource::detail::ConvertSpanType<uint8_t>(newSpan);
+            PowerSource::detail::BitSetToSpan(newBitSet, newSpanBytes);
+            newSpan.reduce_size(newSpanBytes.size());
 
             PowerSource::Events::BatFaultChange::Type event_data{ oldSpan, newSpan };
             mContext->interactionContext.eventsGenerator.GenerateEvent(event_data, mPath.mEndpointId);
@@ -1221,15 +1227,18 @@ private:
 
         if (mContext != nullptr)
         {
-            uint8_t oldBuf[to_underlying(BatChargeFaultEnum::kUnknownEnumValue)];
-            uint8_t newBuf[to_underlying(BatChargeFaultEnum::kUnknownEnumValue)];
+            BatChargeFaultEnum oldBuf[to_underlying(BatChargeFaultEnum::kUnknownEnumValue)]{};
+            BatChargeFaultEnum newBuf[to_underlying(BatChargeFaultEnum::kUnknownEnumValue)]{};
 
-            auto oldSpanNonConverted = Span(oldBuf, to_underlying(BatChargeFaultEnum::kUnknownEnumValue));
-            PowerSource::detail::BitSetToSpan(this->activeBatChargeFaultsBitSet, oldSpanNonConverted);
-            auto oldSpan             = PowerSource::detail::ConvertSpanType<BatChargeFaultEnum>(oldSpanNonConverted);
-            auto newSpanNonConverted = Span(newBuf, to_underlying(BatChargeFaultEnum::kUnknownEnumValue));
-            PowerSource::detail::BitSetToSpan(newBitSet, newSpanNonConverted);
-            auto newSpan = PowerSource::detail::ConvertSpanType<BatChargeFaultEnum>(newSpanNonConverted);
+            auto oldSpan      = Span(oldBuf, to_underlying(BatChargeFaultEnum::kUnknownEnumValue));
+            auto oldSpanBytes = PowerSource::detail::ConvertSpanType<uint8_t>(oldSpan);
+            PowerSource::detail::BitSetToSpan(this->activeWiredFaultsBitSet, oldSpanBytes);
+            oldSpan.reduce_size(oldSpanBytes.size());
+
+            auto newSpan      = Span(newBuf, to_underlying(BatChargeFaultEnum::kUnknownEnumValue));
+            auto newSpanBytes = PowerSource::detail::ConvertSpanType<uint8_t>(newSpan);
+            PowerSource::detail::BitSetToSpan(newBitSet, newSpanBytes);
+            newSpan.reduce_size(newSpanBytes.size());
 
             PowerSource::Events::BatChargeFaultChange::Type event_data{ oldSpan, newSpan };
             mContext->interactionContext.eventsGenerator.GenerateEvent(event_data, mPath.mEndpointId);

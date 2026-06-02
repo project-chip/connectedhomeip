@@ -5,9 +5,10 @@ source. A power source can be either a battery or a wired power source.
 
 ## Overview
 
-This directory contains an implementation of Matter Power Source cluster. This
-implementation handles the persistence of the `Order` attribute, and notifies
-the data model when an attribute changes in the way that the spec mandates.
+This directory contains an implementation of Matter Power Source cluster.
+This implementation does not handle the persistence of the `Order` attribute.
+Becuase the `Order` attribute is read-only, only the direct user of the cluster can change it, so it is expected of them to handle the persistence of the attribute.
+This implementation notifies the data model when an attribute changes in the way that the spec mandates.
 
 ## Usage
 
@@ -268,7 +269,7 @@ For simplicity there are 4 already named specializations of the class in the
 -   `FullBatteryPowerSourceCluster` (supports ALL battery optional attributes,
     and is BOTH replaceable and rechargeable)
 
-Instead of `RegisteredServercluster` one can use `LazyRegisteredServerCluster`
+Instead of `RegisteredServerCluster` one can use `LazyRegisteredServerCluster`
 which can defer the creation and overall provides dynamic lifetime management.
 
 Some attributes can be can be set only in the config object, and not after the
