@@ -54,8 +54,10 @@ class TC_PWRTL_2_1(MatterBaseTest):
     Verify FeatureMap (including the Matter 1.7 CIRC bit 4 with reserved-bit
     discipline), AttributeList composition based on topology features,
     AvailableEndpoints and ActiveEndpoints reads, the subset invariant
-    (ActiveEndpoints subset of AvailableEndpoints), and read-only access
-    on both endpoint list attributes.
+    (ActiveEndpoints subset of AvailableEndpoints), read-only access on
+    both endpoint list attributes, and Non-volatile persistence of
+    ActiveEndpoints across reboot (manual-mode only; CI skips the reboot
+    steps via the is_pics_sdk_ci_only dispatch).
     """
 
     def desc_TC_PWRTL_2_1(self) -> str:
@@ -75,6 +77,8 @@ class TC_PWRTL_2_1(MatterBaseTest):
             TestStep(7, "TH reads ActiveEndpoints (if applicable)"),
             TestStep(8, "TH verifies ActiveEndpoints is subset of AvailableEndpoints"),
             TestStep(9, "TH attempts write to AvailableEndpoints - expect UNSUPPORTED_WRITE"),
+            TestStep(10, "Operator reboots DUT (skipped in CI)"),
+            TestStep(11, "TH verifies ActiveEndpoints persists after reboot - Non-volatile (skipped in CI)"),
         ]
 
     @property
@@ -197,6 +201,30 @@ class TC_PWRTL_2_1(MatterBaseTest):
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.UnsupportedWrite,
                                      "Write to AvailableEndpoints should return UNSUPPORTED_WRITE")
+
+        # Step 10: Operator reboots DUT (skipped in CI)
+        self.step(10)
+        if self.is_pics_sdk_ci_only or active_eps is None:
+            # CI cannot drive an operator reboot, and there are no ActiveEndpoints
+            # to verify Non-volatile persistence against.
+            self.mark_current_step_skipped()
+        else:
+            self.wait_for_user_input(
+                prompt_msg="Reboot the DUT and wait for it to rejoin the fabric. Press Enter.")
+
+        # Step 11: Verify Non-volatile persistence of ActiveEndpoints (skipped in CI)
+        self.step(11)
+        if self.is_pics_sdk_ci_only or active_eps is None:
+            self.mark_current_step_skipped()
+        else:
+            active_eps_post = await self.read_single_attribute_check_success(
+                endpoint=endpoint,
+                cluster=cluster,
+                attribute=attributes.ActiveEndpoints
+            )
+            asserts.assert_equal(active_eps_post, active_eps,
+                                 "ActiveEndpoints changed after reboot - violates Non-volatile quality")
+            log.info("ActiveEndpoints persisted across reboot (Non-volatile verified)")
 
 
 
