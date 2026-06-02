@@ -454,23 +454,20 @@ Status Setpoints::ChangeRange(SetpointRange & range, Optional<temperature> heat,
     return Fix(changedAttributes);
 }
 
-Status Setpoints::Setpoints::ChangeLimitMinimum(UserSetpointLimits & userLimits,
-                                                            AbsoluteSetpointLimits & absoluteLimits, temperature min,
-                                                            SetpointAttributes & changedAttributes)
+Status Setpoints::Setpoints::ChangeLimitMinimum(UserSetpointLimits & userLimits, AbsoluteSetpointLimits & absoluteLimits,
+                                                temperature min, SetpointAttributes & changedAttributes)
 {
     return ChangeLimits(userLimits, absoluteLimits, MakeOptional(min), Optional<temperature>::Missing(), changedAttributes);
 }
 
-Status Setpoints::ChangeLimitMaximum(UserSetpointLimits & userLimits,
-                                                            AbsoluteSetpointLimits & absoluteLimits, temperature max,
-                                                            SetpointAttributes & changedAttributes)
+Status Setpoints::ChangeLimitMaximum(UserSetpointLimits & userLimits, AbsoluteSetpointLimits & absoluteLimits, temperature max,
+                                     SetpointAttributes & changedAttributes)
 {
     return ChangeLimits(userLimits, absoluteLimits, Optional<temperature>::Missing(), MakeOptional(max), changedAttributes);
 }
 
-Status Setpoints::ChangeLimits(UserSetpointLimits & userLimits, AbsoluteSetpointLimits & absoluteLimits,
-                                                      Optional<temperature> min, Optional<temperature> max,
-                                                      SetpointAttributes & changedAttributes)
+Status Setpoints::ChangeLimits(UserSetpointLimits & userLimits, AbsoluteSetpointLimits & absoluteLimits, Optional<temperature> min,
+                               Optional<temperature> max, SetpointAttributes & changedAttributes)
 {
     bool settingMin = min.HasValue();
     bool settingMax = max.HasValue();

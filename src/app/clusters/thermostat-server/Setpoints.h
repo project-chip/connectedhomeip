@@ -116,7 +116,6 @@ public:
         return *this;
     }
 
-
     /*
     Checks to make sure that the setpoints follow the rules from the Matter spec
     */
@@ -178,7 +177,7 @@ public:
      * @return The status of the operation.
      */
     Protocols::InteractionModel::Status ChangeLimitMinimum(UserSetpointLimits & limits, AbsoluteSetpointLimits & absoluteLimits,
-                                                     temperature min, SetpointAttributes & changedAttributes);
+                                                           temperature min, SetpointAttributes & changedAttributes);
 
     /**
      * Change the maximum value of a given setpoint limit
@@ -189,7 +188,7 @@ public:
      * @return The status of the operation.
      */
     Protocols::InteractionModel::Status ChangeLimitMaximum(UserSetpointLimits & limits, AbsoluteSetpointLimits & absoluteLimits,
-                                                     temperature max, SetpointAttributes & changedAttributes);
+                                                           temperature max, SetpointAttributes & changedAttributes);
 
     /**
      * Attempt to fix any violations of the setpoint rules
@@ -209,8 +208,8 @@ private:
     @return The status of the operation; Success if the setpoints are now valid, ConstraintError if it was not possible to fix them
     */
     Protocols::InteractionModel::Status ChangeLimits(UserSetpointLimits & limits, AbsoluteSetpointLimits & absoluteLimits,
-                                               Optional<temperature> min, Optional<temperature> max,
-                                               SetpointAttributes & changedAttributes);
+                                                     Optional<temperature> min, Optional<temperature> max,
+                                                     SetpointAttributes & changedAttributes);
 
     /*
     Attempt to fix the user setpoint limits to comply with the deadband
