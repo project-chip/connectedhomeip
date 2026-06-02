@@ -55,6 +55,7 @@ executable("all-devices-app") {
     "${chip_root}/third_party/miniaudio:miniaudio",
     "${chip_root}/zzz_generated/app-common/devices/",
   ]
+  defines = []
 
   if (chip_device_platform == "darwin") {
     deps += [ "${chip_root}/examples/all-devices-app/posix/darwin" ]
