@@ -16,8 +16,8 @@
  */
 #include <pw_unit_test/framework.h>
 
-#include <app/clusters/thread-network-diagnostics-server/ThreadNetworkDiagnosticsCluster.h>
 #include <app/clusters/thread-network-diagnostics-server/DefaultThreadNetworkDiagnosticsProvider.h>
+#include <app/clusters/thread-network-diagnostics-server/ThreadNetworkDiagnosticsCluster.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <app/server-cluster/testing/AttributeTesting.h>
 #include <app/server-cluster/testing/ClusterTester.h>
@@ -76,7 +76,7 @@ TEST_F(TestThreadNetworkDiagnosticsCluster, AttributeTest)
                                                 Attributes::ActiveNetworkFaultsList::kMetadataEntry,
                                                 Attributes::ExtAddress::kMetadataEntry,
                                                 Attributes::Rloc16::kMetadataEntry,
-                                             }));
+                                            }));
     }
 
     {

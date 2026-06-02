@@ -104,8 +104,10 @@ CHIP_ERROR AppendAllInRange(const AttributeIdRange range, ReadOnlyBufferBuilder<
 
 } // namespace ThreadNetworkDiagnostics
 
-ThreadNetworkDiagnosticsCluster::ThreadNetworkDiagnosticsCluster(EndpointId endpointId, ClusterType clusterType, ThreadDiagnosticsProvider & provider) :
-    DefaultServerCluster({ endpointId, ThreadNetworkDiagnostics::Id }), mClusterType(clusterType), mProvider(&provider)
+ThreadNetworkDiagnosticsCluster::ThreadNetworkDiagnosticsCluster(EndpointId endpointId, ClusterType clusterType,
+                                                                 ThreadDiagnosticsProvider & provider) :
+    DefaultServerCluster({ endpointId, ThreadNetworkDiagnostics::Id }),
+    mClusterType(clusterType), mProvider(&provider)
 {}
 
 DataModel::ActionReturnStatus ThreadNetworkDiagnosticsCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,

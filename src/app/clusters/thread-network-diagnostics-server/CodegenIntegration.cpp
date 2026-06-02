@@ -16,8 +16,8 @@
  *    limitations under the License.
  */
 
-#include <app/clusters/thread-network-diagnostics-server/ThreadNetworkDiagnosticsCluster.h>
 #include <app/clusters/thread-network-diagnostics-server/DefaultThreadNetworkDiagnosticsProvider.h>
+#include <app/clusters/thread-network-diagnostics-server/ThreadNetworkDiagnosticsCluster.h>
 #include <app/static-cluster-config/ThreadNetworkDiagnostics.h>
 #include <app/util/endpoint-config-api.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>

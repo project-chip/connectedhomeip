@@ -27,7 +27,8 @@ class AllDevicesThreadDiagnosticsProvider : public Clusters::ThreadNetworkDiagno
 public:
     CHIP_ERROR WriteAttributeToTlv(AttributeId attributeId, app::AttributeValueEncoder & encoder) override
     {
-        ChipLogProgress(AppServer, ">>> [Verification] AllDevicesThreadDiagnosticsProvider: Intercepted WriteAttributeToTlv read! <<<");
+        ChipLogProgress(AppServer,
+                        ">>> [Verification] AllDevicesThreadDiagnosticsProvider: Intercepted WriteAttributeToTlv read! <<<");
         return DefaultThreadDiagnosticsProvider::WriteAttributeToTlv(attributeId, encoder);
     }
 

@@ -29,7 +29,7 @@ public:
     virtual ~ThreadDiagnosticsProvider() = default;
 
     virtual CHIP_ERROR WriteAttributeToTlv(AttributeId attributeId, app::AttributeValueEncoder & encoder) = 0;
-    virtual void ResetCounts() = 0;
+    virtual void ResetCounts()                                                                            = 0;
 };
 
 } // namespace app
