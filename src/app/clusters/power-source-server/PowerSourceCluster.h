@@ -1204,7 +1204,7 @@ private:
 
             auto oldSpan      = Span(oldBuf, to_underlying(BatFaultEnum::kUnknownEnumValue));
             auto oldSpanBytes = PowerSource::detail::ConvertSpanType<uint8_t>(oldSpan);
-            PowerSource::detail::BitSetToSpan(this->activeWiredFaultsBitSet, oldSpanBytes);
+            PowerSource::detail::BitSetToSpan(this->activeBatFaultsBitSet, oldSpanBytes);
             oldSpan.reduce_size(oldSpanBytes.size());
 
             auto newSpan      = Span(newBuf, to_underlying(BatFaultEnum::kUnknownEnumValue));
@@ -1233,7 +1233,7 @@ private:
 
             auto oldSpan      = Span(oldBuf, to_underlying(BatChargeFaultEnum::kUnknownEnumValue));
             auto oldSpanBytes = PowerSource::detail::ConvertSpanType<uint8_t>(oldSpan);
-            PowerSource::detail::BitSetToSpan(this->activeWiredFaultsBitSet, oldSpanBytes);
+            PowerSource::detail::BitSetToSpan(this->activeBatChargeFaultsBitSet, oldSpanBytes);
             oldSpan.reduce_size(oldSpanBytes.size());
 
             auto newSpan      = Span(newBuf, to_underlying(BatChargeFaultEnum::kUnknownEnumValue));
