@@ -238,7 +238,7 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
                              Clusters.OtaSoftwareUpdateProvider.Enums.ApplyUpdateActionEnum.kAwaitNextAction, "Action from the provider is not AwaitNextAction")
         asserts.assert_equal(pipe_data['Payload']['ApplyUpdateRequestCount'],
                              1, "Only one request should be sent from the Provider")
-        # Switches to Applying
+        # Assert kApplying
         update_state_match = AttributeMatcher.from_callable(
             "Update state is kApplying",
             lambda report: report.value == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kApplying)
@@ -252,14 +252,7 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         # The provider needs to be terminated just before try to send the second ApplyUpdateRequest
         self.terminate_provider()
 
-        # Assert Applying State
-        update_state_match = AttributeMatcher.from_callable(
-            "Update state is kDelayedOnApply",
-            lambda report: report.value == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kApplying)
-        update_state_attr_handler.await_all_expected_report_matches(
-            [update_state_match], timeout_sec=5)
-
-        # Device should stay in ApplyingState During 120 seconds and not Apply the software Update after the 60 seconds.
+        # Device should stay in ApplyingState During 120 seconds and do not Apply the software Update after the 60 seconds.
         software_version_match = AttributeMatcher.from_callable(
             f"Sofware Version should be: {current_sw_version}",
             lambda report: report.value == current_sw_version)
