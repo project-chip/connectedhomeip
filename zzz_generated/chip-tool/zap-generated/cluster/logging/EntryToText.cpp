@@ -179,6 +179,8 @@ char const * ClusterIdToText(chip::ClusterId id)
         return "DeviceEnergyManagementMode";
     case chip::app::Clusters::ElectricalGridConditions::Id:
         return "ElectricalGridConditions";
+    case chip::app::Clusters::ElectricalAlarm::Id:
+        return "ElectricalAlarm";
     case chip::app::Clusters::ElectricalDistribution::Id:
         return "ElectricalDistribution";
     case chip::app::Clusters::ElectricalProtectionAlarm::Id:
@@ -2648,6 +2650,51 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
         case chip::app::Clusters::ElectricalGridConditions::Attributes::FeatureMap::Id:
             return "FeatureMap";
         case chip::app::Clusters::ElectricalGridConditions::Attributes::ClusterRevision::Id:
+            return "ClusterRevision";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::ElectricalAlarm::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::ElectricalAlarm::Attributes::Mask::Id:
+            return "Mask";
+        case chip::app::Clusters::ElectricalAlarm::Attributes::Latch::Id:
+            return "Latch";
+        case chip::app::Clusters::ElectricalAlarm::Attributes::State::Id:
+            return "State";
+        case chip::app::Clusters::ElectricalAlarm::Attributes::Supported::Id:
+            return "Supported";
+        case chip::app::Clusters::ElectricalAlarm::Attributes::OverVoltageThreshold::Id:
+            return "OverVoltageThreshold";
+        case chip::app::Clusters::ElectricalAlarm::Attributes::UnderVoltageThreshold::Id:
+            return "UnderVoltageThreshold";
+        case chip::app::Clusters::ElectricalAlarm::Attributes::OverFrequencyThreshold::Id:
+            return "OverFrequencyThreshold";
+        case chip::app::Clusters::ElectricalAlarm::Attributes::UnderFrequencyThreshold::Id:
+            return "UnderFrequencyThreshold";
+        case chip::app::Clusters::ElectricalAlarm::Attributes::OverPowerThreshold::Id:
+            return "OverPowerThreshold";
+        case chip::app::Clusters::ElectricalAlarm::Attributes::UnderPowerThreshold::Id:
+            return "UnderPowerThreshold";
+        case chip::app::Clusters::ElectricalAlarm::Attributes::OverCurrentThreshold::Id:
+            return "OverCurrentThreshold";
+        case chip::app::Clusters::ElectricalAlarm::Attributes::UnderCurrentThreshold::Id:
+            return "UnderCurrentThreshold";
+        case chip::app::Clusters::ElectricalAlarm::Attributes::PowerImportThreshold::Id:
+            return "PowerImportThreshold";
+        case chip::app::Clusters::ElectricalAlarm::Attributes::PowerExportThreshold::Id:
+            return "PowerExportThreshold";
+        case chip::app::Clusters::ElectricalAlarm::Attributes::GeneratedCommandList::Id:
+            return "GeneratedCommandList";
+        case chip::app::Clusters::ElectricalAlarm::Attributes::AcceptedCommandList::Id:
+            return "AcceptedCommandList";
+        case chip::app::Clusters::ElectricalAlarm::Attributes::AttributeList::Id:
+            return "AttributeList";
+        case chip::app::Clusters::ElectricalAlarm::Attributes::FeatureMap::Id:
+            return "FeatureMap";
+        case chip::app::Clusters::ElectricalAlarm::Attributes::ClusterRevision::Id:
             return "ClusterRevision";
         default:
             return "Unknown";
@@ -6028,6 +6075,19 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
         {
         case chip::app::Clusters::DeviceEnergyManagementMode::Commands::ChangeToMode::Id:
             return "ChangeToMode";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::ElectricalAlarm::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::ElectricalAlarm::Commands::Reset::Id:
+            return "Reset";
+        case chip::app::Clusters::ElectricalAlarm::Commands::ModifyEnabledAlarms::Id:
+            return "ModifyEnabledAlarms";
+        case chip::app::Clusters::ElectricalAlarm::Commands::SetElectricalAlarmThresholds::Id:
+            return "SetElectricalAlarmThresholds";
         default:
             return "Unknown";
         }
