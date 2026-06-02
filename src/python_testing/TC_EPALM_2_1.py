@@ -88,6 +88,7 @@ class TC_EPALM_2_1(MatterBaseTest):
             TestStep(10, "TH reads Latch attribute (inherited from Alarm Base)"),
             TestStep(11, "TH reads State attribute (inherited from Alarm Base)"),
             TestStep(12, "TH reads Supported attribute (inherited from Alarm Base)"),
+            TestStep(13, "TH cross-validates Mask and State are subsets of Supported"),
         ]
 
     @run_if_endpoint_matches(has_cluster(Clusters.ElectricalProtectionAlarm))
@@ -166,11 +167,11 @@ class TC_EPALM_2_1(MatterBaseTest):
         ALARM_BITMAP_MAX = 0x7F  # ShortCircuit | OverLoad | OverVoltage | VoltageSurge | ResidualCurrent | ArcFault | SelfTest
 
         self.step(9)
-        val = await self.read_single_attribute_check_success(
+        mask_val = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attributes.Mask)
-        asserts.assert_true(matter_asserts.is_valid_int_value(val, bit_count=32),
+        asserts.assert_true(matter_asserts.is_valid_int_value(mask_val, bit_count=32),
                             'Mask must be a valid uint32 (AlarmBitmap)')
-        asserts.assert_less_equal(val, ALARM_BITMAP_MAX,
+        asserts.assert_less_equal(mask_val, ALARM_BITMAP_MAX,
                                   'Mask may only set the 7 spec-defined AlarmBitmap bits')
 
         self.step(10)
@@ -183,20 +184,28 @@ class TC_EPALM_2_1(MatterBaseTest):
                                       'Latch may only set the 7 spec-defined AlarmBitmap bits')
 
         self.step(11)
-        val = await self.read_single_attribute_check_success(
+        state_val = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attributes.State)
-        asserts.assert_true(matter_asserts.is_valid_int_value(val, bit_count=32),
+        asserts.assert_true(matter_asserts.is_valid_int_value(state_val, bit_count=32),
                             'State must be a valid uint32 (AlarmBitmap)')
-        asserts.assert_less_equal(val, ALARM_BITMAP_MAX,
+        asserts.assert_less_equal(state_val, ALARM_BITMAP_MAX,
                                   'State may only set the 7 spec-defined AlarmBitmap bits')
 
         self.step(12)
-        val = await self.read_single_attribute_check_success(
+        supported_val = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attributes.Supported)
-        asserts.assert_true(matter_asserts.is_valid_int_value(val, bit_count=32),
+        asserts.assert_true(matter_asserts.is_valid_int_value(supported_val, bit_count=32),
                             'Supported must be a valid uint32 (AlarmBitmap)')
-        asserts.assert_less_equal(val, ALARM_BITMAP_MAX,
+        asserts.assert_less_equal(supported_val, ALARM_BITMAP_MAX,
                                   'Supported may only set the 7 spec-defined AlarmBitmap bits')
+
+        # Step 13: Cross-validate Mask and State are subsets of Supported (per AlarmBase spec)
+        self.step(13)
+        asserts.assert_equal(mask_val & ~supported_val, 0,
+                             'Mask has bits not in Supported')
+        asserts.assert_equal(state_val & ~supported_val, 0,
+                             'State has bits not in Supported')
+        log.info('Cross-validation passed: Mask and State are subsets of Supported')
 
     # ------------------------------------------------------------------
     # Rating struct field validators
