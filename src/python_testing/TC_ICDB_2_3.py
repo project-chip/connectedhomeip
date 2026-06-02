@@ -107,11 +107,11 @@ class TC_ICDB_2_3(ICDBaseTest):
         asserts.assert_true(status, f"Failed to commission DUT to TH1's fabric: {status}")
 
         # TH2 commissions DUT on a separate fabric (ICD registration done explicitly via RegisterClient in the test body)
-        th2_ca = self.certificate_authority_manager.NewCertificateAuthority()
-        th2_fabric_admin = th2_ca.NewFabricAdmin(vendorId=0xFFF1, fabricId=self.th1.fabricId + 1)
-        self.th2 = th2_fabric_admin.NewController(nodeId=2, useTestCommissioner=True)
+        self.th2 = self.create_new_controller()
         ecw = await self.open_commissioning_window(dev_ctrl=self.th1, node_id=self.dut_node_id, timeout=600)
         self.th2_dut_node_id = self.dut_node_id + 1
+        if self.th2_dut_node_id == self.th2.nodeId:
+            self.th2_dut_node_id += 1
         await self.th2.CommissionOnNetwork(
             nodeId=self.th2_dut_node_id,
             setupPinCode=ecw.commissioningParameters.setupPinCode,
