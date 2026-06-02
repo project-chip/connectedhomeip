@@ -27,6 +27,7 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/Zephyr/InetUtils.h>
+#include <cassert>
 
 #include <zephyr/kernel.h>
 #include <zephyr/net/net_event.h>
