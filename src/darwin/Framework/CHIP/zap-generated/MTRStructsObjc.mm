@@ -9212,7 +9212,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _addedContributor = [MTRAmbientSensingUnionClusterUnionContributorStruct new];
+        _addedContributor = [NSArray array];
     }
     return self;
 }
@@ -9239,7 +9239,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _removedContributor = [MTRAmbientSensingUnionClusterUnionContributorStruct new];
+        _removedContributor = [NSArray array];
     }
     return self;
 }
@@ -9261,28 +9261,28 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRAmbientSensingUnionClusterUnionContributorHealthChangedEvent
+@implementation MTRAmbientSensingUnionClusterUnionContributorStatusChangedEvent
 - (instancetype)init
 {
     if (self = [super init]) {
 
-        _contributorHealth = [MTRAmbientSensingUnionClusterUnionContributorStruct new];
+        _statusChangedContributor = [NSArray array];
     }
     return self;
 }
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRAmbientSensingUnionClusterUnionContributorHealthChangedEvent alloc] init];
+    auto other = [[MTRAmbientSensingUnionClusterUnionContributorStatusChangedEvent alloc] init];
 
-    other.contributorHealth = self.contributorHealth;
+    other.statusChangedContributor = self.statusChangedContributor;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: contributorHealth:%@; >", NSStringFromClass([self class]), _contributorHealth];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: statusChangedContributor:%@; >", NSStringFromClass([self class]), _statusChangedContributor];
     return descriptionString;
 }
 

@@ -2146,17 +2146,17 @@ MTR_PROVISIONALLY_AVAILABLE
 
 MTR_PROVISIONALLY_AVAILABLE
 @interface MTRAmbientSensingUnionClusterUnionContributorAddedEvent : NSObject <NSCopying>
-@property (nonatomic, copy) MTRAmbientSensingUnionClusterUnionContributorStruct * _Nonnull addedContributor MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSArray * _Nonnull addedContributor MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
 @interface MTRAmbientSensingUnionClusterUnionContributorRemovedEvent : NSObject <NSCopying>
-@property (nonatomic, copy) MTRAmbientSensingUnionClusterUnionContributorStruct * _Nonnull removedContributor MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSArray * _Nonnull removedContributor MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
-@interface MTRAmbientSensingUnionClusterUnionContributorHealthChangedEvent : NSObject <NSCopying>
-@property (nonatomic, copy) MTRAmbientSensingUnionClusterUnionContributorStruct * _Nonnull contributorHealth MTR_PROVISIONALLY_AVAILABLE;
+@interface MTRAmbientSensingUnionClusterUnionContributorStatusChangedEvent : NSObject <NSCopying>
+@property (nonatomic, copy) NSArray * _Nonnull statusChangedContributor MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE

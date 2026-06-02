@@ -92,12 +92,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     }
 }
 } // namespace UnionContributorRemoved
-namespace UnionContributorHealthChanged {
+namespace UnionContributorStatusChanged {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     TLV::TLVType outer;
     ReturnErrorOnFailure(aWriter.StartContainer(aTag, TLV::kTLVType_Structure, outer));
-    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kContributorHealth), contributorHealth));
+    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kStatusChangedContributor), statusChangedContributor));
     return aWriter.EndContainer(outer);
 }
 
@@ -111,9 +111,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
         ReturnErrorOnFailure(err);
 
-        if (__context_tag == to_underlying(Fields::kContributorHealth))
+        if (__context_tag == to_underlying(Fields::kStatusChangedContributor))
         {
-            err = DataModel::Decode(reader, contributorHealth);
+            err = DataModel::Decode(reader, statusChangedContributor);
         }
         else
         {
@@ -122,7 +122,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace UnionContributorHealthChanged
+} // namespace UnionContributorStatusChanged
 } // namespace Events
 } // namespace AmbientSensingUnion
 } // namespace Clusters

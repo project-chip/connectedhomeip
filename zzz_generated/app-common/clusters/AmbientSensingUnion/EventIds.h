@@ -19,9 +19,9 @@ namespace UnionContributorRemoved {
 inline constexpr EventId Id = 0x00000001;
 } // namespace UnionContributorRemoved
 
-namespace UnionContributorHealthChanged {
+namespace UnionContributorStatusChanged {
 inline constexpr EventId Id = 0x00000002;
-} // namespace UnionContributorHealthChanged
+} // namespace UnionContributorStatusChanged
 
 } // namespace Events
 } // namespace AmbientSensingUnion

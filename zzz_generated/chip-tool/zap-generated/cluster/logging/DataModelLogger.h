@@ -1046,7 +1046,7 @@ static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::AmbientSensingUnion::Events::UnionContributorRemoved::DecodableType & value);
 static CHIP_ERROR
 LogValue(const char * label, size_t indent,
-         const chip::app::Clusters::AmbientSensingUnion::Events::UnionContributorHealthChanged::DecodableType & value);
+         const chip::app::Clusters::AmbientSensingUnion::Events::UnionContributorStatusChanged::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::ProximityRanging::Events::RangingResult::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,

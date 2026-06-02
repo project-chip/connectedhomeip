@@ -52,7 +52,7 @@ public:
     DataModel::Nullable<chip::NodeId> contributorNodeID;
     DataModel::Nullable<chip::EndpointId> contributorEndpointID;
     Optional<chip::CharSpan> contributorName;
-    UnionContributorHealthEnum contributorHealth = static_cast<UnionContributorHealthEnum>(0);
+    UnionContributorStatusEnum contributorHealth = static_cast<UnionContributorStatusEnum>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 

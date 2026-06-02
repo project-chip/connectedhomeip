@@ -53,9 +53,9 @@ inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView 
 namespace UnionContributorRemoved {
 inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
 } // namespace UnionContributorRemoved
-namespace UnionContributorHealthChanged {
+namespace UnionContributorStatusChanged {
 inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
-} // namespace UnionContributorHealthChanged
+} // namespace UnionContributorStatusChanged
 
 } // namespace Events
 } // namespace AmbientSensingUnion

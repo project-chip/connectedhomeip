@@ -12636,14 +12636,14 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const AmbientSensingUnion::Events::UnionContributorHealthChanged::DecodableType & value)
+                                     const AmbientSensingUnion::Events::UnionContributorStatusChanged::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
-        CHIP_ERROR err = DataModelLogger::LogValue("ContributorHealth", indent + 1, value.contributorHealth);
+        CHIP_ERROR err = DataModelLogger::LogValue("StatusChangedContributor", indent + 1, value.statusChangedContributor);
         if (err != CHIP_NO_ERROR)
         {
-            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'ContributorHealth'");
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'StatusChangedContributor'");
             return err;
         }
     }
@@ -27230,10 +27230,10 @@ CHIP_ERROR DataModelLogger::LogEvent(const chip::app::EventHeader & header, chip
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("UnionContributorRemoved", 1, value);
         }
-        case AmbientSensingUnion::Events::UnionContributorHealthChanged::Id: {
-            chip::app::Clusters::AmbientSensingUnion::Events::UnionContributorHealthChanged::DecodableType value;
+        case AmbientSensingUnion::Events::UnionContributorStatusChanged::Id: {
+            chip::app::Clusters::AmbientSensingUnion::Events::UnionContributorStatusChanged::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("UnionContributorHealthChanged", 1, value);
+            return DataModelLogger::LogValue("UnionContributorStatusChanged", 1, value);
         }
         }
         break;

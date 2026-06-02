@@ -22766,9 +22766,9 @@ typedef NS_OPTIONS(uint32_t, MTRAmbientContextSensingFeature) {
     MTRAmbientContextSensingFeaturePredictedActivity MTR_PROVISIONALLY_AVAILABLE = 0x10,
 } MTR_PROVISIONALLY_AVAILABLE;
 
-typedef NS_ENUM(uint8_t, MTRAmbientSensingUnionUnionContributorHealth) {
-    MTRAmbientSensingUnionUnionContributorHealthUnionContributorOnline MTR_PROVISIONALLY_AVAILABLE = 0x00,
-    MTRAmbientSensingUnionUnionContributorHealthUnionContributorOffline MTR_PROVISIONALLY_AVAILABLE = 0x01,
+typedef NS_ENUM(uint8_t, MTRAmbientSensingUnionUnionContributorStatus) {
+    MTRAmbientSensingUnionUnionContributorStatusUnionContributorOnline MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRAmbientSensingUnionUnionContributorStatusUnionContributorOffline MTR_PROVISIONALLY_AVAILABLE = 0x01,
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRAmbientSensingUnionUnionHealth) {

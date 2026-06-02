@@ -59,7 +59,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::AmbientSensingUnion::Id; }
     static constexpr bool kIsFabricScoped = false;
 
-    Structs::UnionContributorStruct::Type addedContributor;
+    DataModel::List<const Structs::UnionContributorStruct::Type> addedContributor;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
@@ -71,7 +71,7 @@ public:
     static constexpr EventId GetEventId() { return Events::UnionContributorAdded::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::AmbientSensingUnion::Id; }
 
-    Structs::UnionContributorStruct::DecodableType addedContributor;
+    DataModel::DecodableList<Structs::UnionContributorStruct::DecodableType> addedContributor;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -92,7 +92,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::AmbientSensingUnion::Id; }
     static constexpr bool kIsFabricScoped = false;
 
-    Structs::UnionContributorStruct::Type removedContributor;
+    DataModel::List<const Structs::UnionContributorStruct::Type> removedContributor;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
@@ -104,28 +104,28 @@ public:
     static constexpr EventId GetEventId() { return Events::UnionContributorRemoved::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::AmbientSensingUnion::Id; }
 
-    Structs::UnionContributorStruct::DecodableType removedContributor;
+    DataModel::DecodableList<Structs::UnionContributorStruct::DecodableType> removedContributor;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 } // namespace UnionContributorRemoved
-namespace UnionContributorHealthChanged {
+namespace UnionContributorStatusChanged {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
 
 enum class Fields : uint8_t
 {
-    kContributorHealth = 0,
+    kStatusChangedContributor = 0,
 };
 
 struct Type
 {
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return Events::UnionContributorHealthChanged::Id; }
+    static constexpr EventId GetEventId() { return Events::UnionContributorStatusChanged::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::AmbientSensingUnion::Id; }
     static constexpr bool kIsFabricScoped = false;
 
-    Structs::UnionContributorStruct::Type contributorHealth;
+    DataModel::List<const Structs::UnionContributorStruct::Type> statusChangedContributor;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
@@ -134,14 +134,14 @@ struct DecodableType
 {
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return Events::UnionContributorHealthChanged::Id; }
+    static constexpr EventId GetEventId() { return Events::UnionContributorStatusChanged::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::AmbientSensingUnion::Id; }
 
-    Structs::UnionContributorStruct::DecodableType contributorHealth;
+    DataModel::DecodableList<Structs::UnionContributorStruct::DecodableType> statusChangedContributor;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
-} // namespace UnionContributorHealthChanged
+} // namespace UnionContributorStatusChanged
 } // namespace Events
 } // namespace AmbientSensingUnion
 } // namespace Clusters

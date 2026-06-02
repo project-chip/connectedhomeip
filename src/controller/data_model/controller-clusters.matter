@@ -9142,7 +9142,7 @@ provisional cluster AmbientContextSensing = 1073 {
 provisional cluster AmbientSensingUnion = 1074 {
   revision 1;
 
-  enum UnionContributorHealthEnum : enum8 {
+  enum UnionContributorStatusEnum : enum8 {
     kUnionContributorOnline = 0;
     kUnionContributorOffline = 1;
   }
@@ -9157,19 +9157,19 @@ provisional cluster AmbientSensingUnion = 1074 {
     nullable node_id contributorNodeID = 0;
     nullable endpoint_no contributorEndpointID = 1;
     optional char_string<128> contributorName = 2;
-    UnionContributorHealthEnum contributorHealth = 3;
+    UnionContributorStatusEnum contributorHealth = 3;
   }
 
   provisional info event UnionContributorAdded = 0 {
-    UnionContributorStruct addedContributor = 0;
+    UnionContributorStruct addedContributor[] = 0;
   }
 
   provisional info event UnionContributorRemoved = 1 {
-    UnionContributorStruct removedContributor = 0;
+    UnionContributorStruct removedContributor[] = 0;
   }
 
-  provisional info event UnionContributorHealthChanged = 2 {
-    UnionContributorStruct contributorHealth = 0;
+  provisional info event UnionContributorStatusChanged = 2 {
+    UnionContributorStruct statusChangedContributor[] = 0;
   }
 
   attribute char_string<128> unionName = 0;

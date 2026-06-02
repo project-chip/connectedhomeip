@@ -17,6 +17,7 @@
 package matter.controller.cluster.eventstructs
 
 import matter.controller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -24,7 +25,7 @@ import matter.tlv.TlvWriter
 
 class AmbientSensingUnionClusterUnionContributorRemovedEvent(
   val removedContributor:
-    matter.controller.cluster.structs.AmbientSensingUnionClusterUnionContributorStruct
+    List<matter.controller.cluster.structs.AmbientSensingUnionClusterUnionContributorStruct>
 ) {
   override fun toString(): String = buildString {
     append("AmbientSensingUnionClusterUnionContributorRemovedEvent {\n")
@@ -35,7 +36,11 @@ class AmbientSensingUnionClusterUnionContributorRemovedEvent(
   fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
       startStructure(tlvTag)
-      removedContributor.toTlv(ContextSpecificTag(TAG_REMOVED_CONTRIBUTOR), this)
+      startArray(ContextSpecificTag(TAG_REMOVED_CONTRIBUTOR))
+      for (item in removedContributor.iterator()) {
+        item.toTlv(AnonymousTag, this)
+      }
+      endArray()
       endStructure()
     }
   }
@@ -49,10 +54,18 @@ class AmbientSensingUnionClusterUnionContributorRemovedEvent(
     ): AmbientSensingUnionClusterUnionContributorRemovedEvent {
       tlvReader.enterStructure(tlvTag)
       val removedContributor =
-        matter.controller.cluster.structs.AmbientSensingUnionClusterUnionContributorStruct.fromTlv(
-          ContextSpecificTag(TAG_REMOVED_CONTRIBUTOR),
-          tlvReader,
-        )
+        buildList<
+          matter.controller.cluster.structs.AmbientSensingUnionClusterUnionContributorStruct
+        > {
+          tlvReader.enterArray(ContextSpecificTag(TAG_REMOVED_CONTRIBUTOR))
+          while (!tlvReader.isEndOfContainer()) {
+            this.add(
+              matter.controller.cluster.structs.AmbientSensingUnionClusterUnionContributorStruct
+                .fromTlv(AnonymousTag, tlvReader)
+            )
+          }
+          tlvReader.exitContainer()
+        }
 
       tlvReader.exitContainer()
 

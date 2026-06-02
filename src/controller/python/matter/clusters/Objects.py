@@ -43768,7 +43768,7 @@ class AmbientSensingUnion(Cluster):
     clusterRevision: uint = 0
 
     class Enums:
-        class UnionContributorHealthEnum(MatterIntEnum):
+        class UnionContributorStatusEnum(MatterIntEnum):
             kUnionContributorOnline = 0x00
             kUnionContributorOffline = 0x01
             # All received enum values that are not listed above will be mapped
@@ -43797,13 +43797,13 @@ class AmbientSensingUnion(Cluster):
                         ClusterObjectFieldDescriptor(Label="contributorNodeID", Tag=0, Type=typing.Union[Nullable, uint]),
                         ClusterObjectFieldDescriptor(Label="contributorEndpointID", Tag=1, Type=typing.Union[Nullable, uint]),
                         ClusterObjectFieldDescriptor(Label="contributorName", Tag=2, Type=typing.Optional[str]),
-                        ClusterObjectFieldDescriptor(Label="contributorHealth", Tag=3, Type=AmbientSensingUnion.Enums.UnionContributorHealthEnum),
+                        ClusterObjectFieldDescriptor(Label="contributorHealth", Tag=3, Type=AmbientSensingUnion.Enums.UnionContributorStatusEnum),
                     ])
 
             contributorNodeID: 'typing.Union[Nullable, uint]' = NullValue
             contributorEndpointID: 'typing.Union[Nullable, uint]' = NullValue
             contributorName: 'typing.Optional[str]' = None
-            contributorHealth: 'AmbientSensingUnion.Enums.UnionContributorHealthEnum' = 0
+            contributorHealth: 'AmbientSensingUnion.Enums.UnionContributorStatusEnum' = 0
 
     class Attributes:
         @dataclass
@@ -43949,10 +43949,10 @@ class AmbientSensingUnion(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="addedContributor", Tag=0, Type=AmbientSensingUnion.Structs.UnionContributorStruct),
+                        ClusterObjectFieldDescriptor(Label="addedContributor", Tag=0, Type=typing.List[AmbientSensingUnion.Structs.UnionContributorStruct]),
                     ])
 
-            addedContributor: AmbientSensingUnion.Structs.UnionContributorStruct = field(default_factory=lambda: AmbientSensingUnion.Structs.UnionContributorStruct())
+            addedContributor: typing.List[AmbientSensingUnion.Structs.UnionContributorStruct] = field(default_factory=lambda: [])
 
         @dataclass
         class UnionContributorRemoved(ClusterEvent):
@@ -43968,13 +43968,13 @@ class AmbientSensingUnion(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="removedContributor", Tag=0, Type=AmbientSensingUnion.Structs.UnionContributorStruct),
+                        ClusterObjectFieldDescriptor(Label="removedContributor", Tag=0, Type=typing.List[AmbientSensingUnion.Structs.UnionContributorStruct]),
                     ])
 
-            removedContributor: AmbientSensingUnion.Structs.UnionContributorStruct = field(default_factory=lambda: AmbientSensingUnion.Structs.UnionContributorStruct())
+            removedContributor: typing.List[AmbientSensingUnion.Structs.UnionContributorStruct] = field(default_factory=lambda: [])
 
         @dataclass
-        class UnionContributorHealthChanged(ClusterEvent):
+        class UnionContributorStatusChanged(ClusterEvent):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return 0x00000432
@@ -43987,10 +43987,10 @@ class AmbientSensingUnion(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="contributorHealth", Tag=0, Type=AmbientSensingUnion.Structs.UnionContributorStruct),
+                        ClusterObjectFieldDescriptor(Label="statusChangedContributor", Tag=0, Type=typing.List[AmbientSensingUnion.Structs.UnionContributorStruct]),
                     ])
 
-            contributorHealth: AmbientSensingUnion.Structs.UnionContributorStruct = field(default_factory=lambda: AmbientSensingUnion.Structs.UnionContributorStruct())
+            statusChangedContributor: typing.List[AmbientSensingUnion.Structs.UnionContributorStruct] = field(default_factory=lambda: [])
 
 
 @dataclass

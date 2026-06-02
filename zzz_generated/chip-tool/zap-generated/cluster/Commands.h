@@ -11716,7 +11716,7 @@ private:
 | Events:                                                             |        |
 | * UnionContributorAdded                                             | 0x0000 |
 | * UnionContributorRemoved                                           | 0x0001 |
-| * UnionContributorHealthChanged                                     | 0x0002 |
+| * UnionContributorStatusChanged                                     | 0x0002 |
 \*----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------*\
@@ -30316,12 +30316,12 @@ void registerClusterAmbientSensingUnion(Commands & commands, CredentialIssuerCom
         make_unique<ReadEvent>(Id, credsIssuerConfig),                                                                   //
         make_unique<ReadEvent>(Id, "union-contributor-added", Events::UnionContributorAdded::Id, credsIssuerConfig),     //
         make_unique<ReadEvent>(Id, "union-contributor-removed", Events::UnionContributorRemoved::Id, credsIssuerConfig), //
-        make_unique<ReadEvent>(Id, "union-contributor-health-changed", Events::UnionContributorHealthChanged::Id,
+        make_unique<ReadEvent>(Id, "union-contributor-status-changed", Events::UnionContributorStatusChanged::Id,
                                credsIssuerConfig),                                                                            //
         make_unique<SubscribeEvent>(Id, credsIssuerConfig),                                                                   //
         make_unique<SubscribeEvent>(Id, "union-contributor-added", Events::UnionContributorAdded::Id, credsIssuerConfig),     //
         make_unique<SubscribeEvent>(Id, "union-contributor-removed", Events::UnionContributorRemoved::Id, credsIssuerConfig), //
-        make_unique<SubscribeEvent>(Id, "union-contributor-health-changed", Events::UnionContributorHealthChanged::Id,
+        make_unique<SubscribeEvent>(Id, "union-contributor-status-changed", Events::UnionContributorStatusChanged::Id,
                                     credsIssuerConfig), //
     };
 

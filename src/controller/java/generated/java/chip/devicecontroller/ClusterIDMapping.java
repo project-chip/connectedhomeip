@@ -15703,7 +15703,7 @@ public class ClusterIDMapping {
         public enum Event {
             UnionContributorAdded(0L),
             UnionContributorRemoved(1L),
-            UnionContributorHealthChanged(2L),;
+            UnionContributorStatusChanged(2L),;
             private final long id;
             Event(long id) {
                 this.id = id;

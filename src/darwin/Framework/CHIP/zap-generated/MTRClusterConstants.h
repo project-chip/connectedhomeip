@@ -7098,7 +7098,7 @@ typedef NS_ENUM(uint32_t, MTREventIDType) {
     // Cluster AmbientSensingUnion events
     MTREventIDTypeClusterAmbientSensingUnionEventUnionContributorAddedID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
     MTREventIDTypeClusterAmbientSensingUnionEventUnionContributorRemovedID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
-    MTREventIDTypeClusterAmbientSensingUnionEventUnionContributorHealthChangedID MTR_PROVISIONALLY_AVAILABLE = 0x00000002,
+    MTREventIDTypeClusterAmbientSensingUnionEventUnionContributorStatusChangedID MTR_PROVISIONALLY_AVAILABLE = 0x00000002,
 
     // Cluster ProximityRanging events
     MTREventIDTypeClusterProximityRangingEventRangingResultID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,

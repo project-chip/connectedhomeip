@@ -4997,29 +4997,44 @@ static id _Nullable DecodeEventPayloadForAmbientSensingUnionCluster(EventId aEve
         __auto_type * value = [MTRAmbientSensingUnionClusterUnionContributorAddedEvent new];
 
         do {
-            MTRAmbientSensingUnionClusterUnionContributorStruct * _Nonnull memberValue;
-            memberValue = [MTRAmbientSensingUnionClusterUnionContributorStruct new];
-            if (cppValue.addedContributor.contributorNodeID.IsNull()) {
-                memberValue.contributorNodeID = nil;
-            } else {
-                memberValue.contributorNodeID = [NSNumber numberWithUnsignedLongLong:cppValue.addedContributor.contributorNodeID.Value()];
-            }
-            if (cppValue.addedContributor.contributorEndpointID.IsNull()) {
-                memberValue.contributorEndpointID = nil;
-            } else {
-                memberValue.contributorEndpointID = [NSNumber numberWithUnsignedShort:cppValue.addedContributor.contributorEndpointID.Value()];
-            }
-            if (cppValue.addedContributor.contributorName.HasValue()) {
-                memberValue.contributorName = AsString(cppValue.addedContributor.contributorName.Value());
-                if (memberValue.contributorName == nil) {
-                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+            NSArray * _Nonnull memberValue;
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.addedContributor.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    MTRAmbientSensingUnionClusterUnionContributorStruct * newElement_0;
+                    newElement_0 = [MTRAmbientSensingUnionClusterUnionContributorStruct new];
+                    if (entry_0.contributorNodeID.IsNull()) {
+                        newElement_0.contributorNodeID = nil;
+                    } else {
+                        newElement_0.contributorNodeID = [NSNumber numberWithUnsignedLongLong:entry_0.contributorNodeID.Value()];
+                    }
+                    if (entry_0.contributorEndpointID.IsNull()) {
+                        newElement_0.contributorEndpointID = nil;
+                    } else {
+                        newElement_0.contributorEndpointID = [NSNumber numberWithUnsignedShort:entry_0.contributorEndpointID.Value()];
+                    }
+                    if (entry_0.contributorName.HasValue()) {
+                        newElement_0.contributorName = AsString(entry_0.contributorName.Value());
+                        if (newElement_0.contributorName == nil) {
+                            CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                            *aError = err;
+                            return nil;
+                        }
+                    } else {
+                        newElement_0.contributorName = nil;
+                    }
+                    newElement_0.contributorHealth = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.contributorHealth)];
+                    [array_0 addObject:newElement_0];
+                }
+                CHIP_ERROR err = iter_0.GetStatus();
+                if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
-            } else {
-                memberValue.contributorName = nil;
+                memberValue = array_0;
             }
-            memberValue.contributorHealth = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.addedContributor.contributorHealth)];
             value.addedContributor = memberValue;
         } while (0);
 
@@ -5035,68 +5050,98 @@ static id _Nullable DecodeEventPayloadForAmbientSensingUnionCluster(EventId aEve
         __auto_type * value = [MTRAmbientSensingUnionClusterUnionContributorRemovedEvent new];
 
         do {
-            MTRAmbientSensingUnionClusterUnionContributorStruct * _Nonnull memberValue;
-            memberValue = [MTRAmbientSensingUnionClusterUnionContributorStruct new];
-            if (cppValue.removedContributor.contributorNodeID.IsNull()) {
-                memberValue.contributorNodeID = nil;
-            } else {
-                memberValue.contributorNodeID = [NSNumber numberWithUnsignedLongLong:cppValue.removedContributor.contributorNodeID.Value()];
-            }
-            if (cppValue.removedContributor.contributorEndpointID.IsNull()) {
-                memberValue.contributorEndpointID = nil;
-            } else {
-                memberValue.contributorEndpointID = [NSNumber numberWithUnsignedShort:cppValue.removedContributor.contributorEndpointID.Value()];
-            }
-            if (cppValue.removedContributor.contributorName.HasValue()) {
-                memberValue.contributorName = AsString(cppValue.removedContributor.contributorName.Value());
-                if (memberValue.contributorName == nil) {
-                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+            NSArray * _Nonnull memberValue;
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.removedContributor.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    MTRAmbientSensingUnionClusterUnionContributorStruct * newElement_0;
+                    newElement_0 = [MTRAmbientSensingUnionClusterUnionContributorStruct new];
+                    if (entry_0.contributorNodeID.IsNull()) {
+                        newElement_0.contributorNodeID = nil;
+                    } else {
+                        newElement_0.contributorNodeID = [NSNumber numberWithUnsignedLongLong:entry_0.contributorNodeID.Value()];
+                    }
+                    if (entry_0.contributorEndpointID.IsNull()) {
+                        newElement_0.contributorEndpointID = nil;
+                    } else {
+                        newElement_0.contributorEndpointID = [NSNumber numberWithUnsignedShort:entry_0.contributorEndpointID.Value()];
+                    }
+                    if (entry_0.contributorName.HasValue()) {
+                        newElement_0.contributorName = AsString(entry_0.contributorName.Value());
+                        if (newElement_0.contributorName == nil) {
+                            CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                            *aError = err;
+                            return nil;
+                        }
+                    } else {
+                        newElement_0.contributorName = nil;
+                    }
+                    newElement_0.contributorHealth = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.contributorHealth)];
+                    [array_0 addObject:newElement_0];
+                }
+                CHIP_ERROR err = iter_0.GetStatus();
+                if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
-            } else {
-                memberValue.contributorName = nil;
+                memberValue = array_0;
             }
-            memberValue.contributorHealth = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.removedContributor.contributorHealth)];
             value.removedContributor = memberValue;
         } while (0);
 
         return value;
     }
-    case Events::UnionContributorHealthChanged::Id: {
-        Events::UnionContributorHealthChanged::DecodableType cppValue;
+    case Events::UnionContributorStatusChanged::Id: {
+        Events::UnionContributorStatusChanged::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
 
-        __auto_type * value = [MTRAmbientSensingUnionClusterUnionContributorHealthChangedEvent new];
+        __auto_type * value = [MTRAmbientSensingUnionClusterUnionContributorStatusChangedEvent new];
 
         do {
-            MTRAmbientSensingUnionClusterUnionContributorStruct * _Nonnull memberValue;
-            memberValue = [MTRAmbientSensingUnionClusterUnionContributorStruct new];
-            if (cppValue.contributorHealth.contributorNodeID.IsNull()) {
-                memberValue.contributorNodeID = nil;
-            } else {
-                memberValue.contributorNodeID = [NSNumber numberWithUnsignedLongLong:cppValue.contributorHealth.contributorNodeID.Value()];
-            }
-            if (cppValue.contributorHealth.contributorEndpointID.IsNull()) {
-                memberValue.contributorEndpointID = nil;
-            } else {
-                memberValue.contributorEndpointID = [NSNumber numberWithUnsignedShort:cppValue.contributorHealth.contributorEndpointID.Value()];
-            }
-            if (cppValue.contributorHealth.contributorName.HasValue()) {
-                memberValue.contributorName = AsString(cppValue.contributorHealth.contributorName.Value());
-                if (memberValue.contributorName == nil) {
-                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+            NSArray * _Nonnull memberValue;
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.statusChangedContributor.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    MTRAmbientSensingUnionClusterUnionContributorStruct * newElement_0;
+                    newElement_0 = [MTRAmbientSensingUnionClusterUnionContributorStruct new];
+                    if (entry_0.contributorNodeID.IsNull()) {
+                        newElement_0.contributorNodeID = nil;
+                    } else {
+                        newElement_0.contributorNodeID = [NSNumber numberWithUnsignedLongLong:entry_0.contributorNodeID.Value()];
+                    }
+                    if (entry_0.contributorEndpointID.IsNull()) {
+                        newElement_0.contributorEndpointID = nil;
+                    } else {
+                        newElement_0.contributorEndpointID = [NSNumber numberWithUnsignedShort:entry_0.contributorEndpointID.Value()];
+                    }
+                    if (entry_0.contributorName.HasValue()) {
+                        newElement_0.contributorName = AsString(entry_0.contributorName.Value());
+                        if (newElement_0.contributorName == nil) {
+                            CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                            *aError = err;
+                            return nil;
+                        }
+                    } else {
+                        newElement_0.contributorName = nil;
+                    }
+                    newElement_0.contributorHealth = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.contributorHealth)];
+                    [array_0 addObject:newElement_0];
+                }
+                CHIP_ERROR err = iter_0.GetStatus();
+                if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
-            } else {
-                memberValue.contributorName = nil;
+                memberValue = array_0;
             }
-            memberValue.contributorHealth = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.contributorHealth.contributorHealth)];
-            value.contributorHealth = memberValue;
+            value.statusChangedContributor = memberValue;
         } while (0);
 
         return value;

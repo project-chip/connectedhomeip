@@ -16804,8 +16804,8 @@ NSString * MTREventNameForID(MTRClusterIDType clusterID, MTREventIDType eventID)
             result = @"UnionContributorRemoved";
             break;
 
-        case MTREventIDTypeClusterAmbientSensingUnionEventUnionContributorHealthChangedID:
-            result = @"UnionContributorHealthChanged";
+        case MTREventIDTypeClusterAmbientSensingUnionEventUnionContributorStatusChangedID:
+            result = @"UnionContributorStatusChanged";
             break;
 
         default:
