@@ -612,6 +612,7 @@ class MatterBaseTest(base_test.BaseTestClass):
 
         def is_port_available(p: int) -> bool:
             import errno
+
             # Verify TCP and UDP on all IPv4 interfaces
             for sock_type in (socket.SOCK_STREAM, socket.SOCK_DGRAM):
                 with socket.socket(socket.AF_INET, sock_type) as s:
