@@ -41,52 +41,36 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.interaction_model import Status
-from matter.testing.decorators import has_cluster, run_if_endpoint_matches
+from matter.testing.decorators import has_cluster, pics, run_if_endpoint_matches
 from matter.testing.matter_testing import MatterBaseTest
-from matter.testing.runner import TestStep, default_matter_test_main
+from matter.testing.runner import default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
 class TC_ELDIST_2_2(MatterBaseTest):
-    """TC-ELDIST-2.2: Fixed-by-Manufacturer Quality Verification with Server as DUT
-
-    Verify that all five mandatory attributes of the Electrical Distribution
-    Cluster maintain their values across reboot (Fixed-by-manufacturer quality X).
-    """
-
-    def desc_TC_ELDIST_2_2(self) -> str:
-        return "[TC-ELDIST-2.2] Fixed-by-Manufacturer Quality Verification with Server as DUT"
-
-    def pics_TC_ELDIST_2_2(self) -> list[str]:
-        return ["ELDIST.S"]
-
-    def steps_TC_ELDIST_2_2(self) -> list[TestStep]:
-        return [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
-            TestStep(2, "TH reads all five mandatory attributes and records values"),
-            TestStep(3, "TH re-reads MaxContinuousCurrent to confirm stability within single boot"),
-            TestStep(4, "TH attempts write to MaxVoltage - expect UNSUPPORTED_WRITE"),
-            TestStep(5, "TH attempts write to NumberOfPoles - expect UNSUPPORTED_WRITE"),
-            TestStep(6, "TH attempts write to ServiceEntranceRated - expect UNSUPPORTED_WRITE"),
-            TestStep(7, "Operator reboots DUT"),
-            TestStep(8, "TH re-reads all five attributes and verifies values unchanged"),
-        ]
 
     @property
     def default_endpoint(self) -> int:
         return 1
 
+    @pics('ELDIST.S')
     @run_if_endpoint_matches(has_cluster(Clusters.ElectricalDistribution))
     async def test_TC_ELDIST_2_2(self):
+        """[TC-ELDIST-2.2] Fixed-by-Manufacturer Quality Verification with Server as DUT
+
+        Verify that all five mandatory attributes of the Electrical Distribution
+        Cluster maintain their values across reboot (Fixed-by-manufacturer
+        quality X). The reboot + persistence verification steps are operator-
+        driven and dispatch via is_pics_sdk_ci_only (skipped in CI).
+        """
         endpoint = self.get_endpoint()
         cluster = Clusters.ElectricalDistribution
         attributes = cluster.Attributes
 
-        self.step(1)
+        self.step(1, "Commissioning, already done", is_commissioning=True)
 
-        # Step 2: Read all attributes and record
-        self.step(2)
+        self.step(2, "TH reads all five mandatory attributes and records values as MCC1/MV1/NOP1/EOL1/SER1")
         mcc_1 = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster,
             attribute=attributes.MaxContinuousCurrent)
@@ -102,12 +86,10 @@ class TC_ELDIST_2_2(MatterBaseTest):
         ser_1 = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster,
             attribute=attributes.ServiceEntranceRated)
-
         log.info(f"Pre-reboot values: MCC={mcc_1}, MV={mv_1}, "
                  f"NOP={nop_1}, EOL={eol_1}, SER={ser_1}")
 
-        # Step 3: Re-read MaxContinuousCurrent within same boot
-        self.step(3)
+        self.step(3, "TH re-reads MaxContinuousCurrent to confirm stability within single boot")
         mcc_2 = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster,
             attribute=attributes.MaxContinuousCurrent)
@@ -115,8 +97,7 @@ class TC_ELDIST_2_2(MatterBaseTest):
                              "MaxContinuousCurrent changed within single boot - "
                              "violates Fixed-by-manufacturer quality")
 
-        # Step 4: Write to MaxVoltage
-        self.step(4)
+        self.step(4, "TH attempts write to MaxVoltage - expect UNSUPPORTED_WRITE")
         status = await self.write_single_attribute(
             attribute_value=attributes.MaxVoltage(230000),
             endpoint_id=endpoint,
@@ -124,8 +105,7 @@ class TC_ELDIST_2_2(MatterBaseTest):
         asserts.assert_equal(status, Status.UnsupportedWrite,
                              "Write to MaxVoltage should return UNSUPPORTED_WRITE")
 
-        # Step 5: Write to NumberOfPoles
-        self.step(5)
+        self.step(5, "TH attempts write to NumberOfPoles - expect UNSUPPORTED_WRITE")
         status = await self.write_single_attribute(
             attribute_value=attributes.NumberOfPoles(2),
             endpoint_id=endpoint,
@@ -133,8 +113,7 @@ class TC_ELDIST_2_2(MatterBaseTest):
         asserts.assert_equal(status, Status.UnsupportedWrite,
                              "Write to NumberOfPoles should return UNSUPPORTED_WRITE")
 
-        # Step 6: Write to ServiceEntranceRated
-        self.step(6)
+        self.step(6, "TH attempts write to ServiceEntranceRated - expect UNSUPPORTED_WRITE")
         status = await self.write_single_attribute(
             attribute_value=attributes.ServiceEntranceRated(False),
             endpoint_id=endpoint,
@@ -142,41 +121,44 @@ class TC_ELDIST_2_2(MatterBaseTest):
         asserts.assert_equal(status, Status.UnsupportedWrite,
                              "Write to ServiceEntranceRated should return UNSUPPORTED_WRITE")
 
-        # Step 7: Reboot DUT
-        self.step(7)
-        self.wait_for_user_input(
-            prompt_msg="Reboot the DUT and wait for it to rejoin the fabric. Press Enter.")
+        self.step(7, "Operator reboots DUT (skipped in CI)")
+        if self.is_pics_sdk_ci_only:
+            self.mark_current_step_skipped()
+        else:
+            self.wait_for_user_input(
+                prompt_msg="Reboot the DUT and wait for it to rejoin the fabric. Press Enter.")
 
-        # Step 8: Re-read and verify persistence
-        self.step(8)
-        mcc_post = await self.read_single_attribute_check_success(
-            endpoint=endpoint, cluster=cluster,
-            attribute=attributes.MaxContinuousCurrent)
-        mv_post = await self.read_single_attribute_check_success(
-            endpoint=endpoint, cluster=cluster,
-            attribute=attributes.MaxVoltage)
-        nop_post = await self.read_single_attribute_check_success(
-            endpoint=endpoint, cluster=cluster,
-            attribute=attributes.NumberOfPoles)
-        eol_post = await self.read_single_attribute_check_success(
-            endpoint=endpoint, cluster=cluster,
-            attribute=attributes.EndOfLife)
-        ser_post = await self.read_single_attribute_check_success(
-            endpoint=endpoint, cluster=cluster,
-            attribute=attributes.ServiceEntranceRated)
+        self.step(8, "TH re-reads all five attributes and verifies values unchanged across reboot (skipped in CI)")
+        if self.is_pics_sdk_ci_only:
+            self.mark_current_step_skipped()
+        else:
+            mcc_post = await self.read_single_attribute_check_success(
+                endpoint=endpoint, cluster=cluster,
+                attribute=attributes.MaxContinuousCurrent)
+            mv_post = await self.read_single_attribute_check_success(
+                endpoint=endpoint, cluster=cluster,
+                attribute=attributes.MaxVoltage)
+            nop_post = await self.read_single_attribute_check_success(
+                endpoint=endpoint, cluster=cluster,
+                attribute=attributes.NumberOfPoles)
+            eol_post = await self.read_single_attribute_check_success(
+                endpoint=endpoint, cluster=cluster,
+                attribute=attributes.EndOfLife)
+            ser_post = await self.read_single_attribute_check_success(
+                endpoint=endpoint, cluster=cluster,
+                attribute=attributes.ServiceEntranceRated)
 
-        asserts.assert_equal(mcc_post, mcc_1,
-                             "MaxContinuousCurrent changed after reboot")
-        asserts.assert_equal(mv_post, mv_1,
-                             "MaxVoltage changed after reboot")
-        asserts.assert_equal(nop_post, nop_1,
-                             "NumberOfPoles changed after reboot")
-        asserts.assert_equal(eol_post, eol_1,
-                             "EndOfLife changed after reboot")
-        asserts.assert_equal(ser_post, ser_1,
-                             "ServiceEntranceRated changed after reboot")
-
-        log.info("All Fixed-by-manufacturer attributes verified stable across reboot")
+            asserts.assert_equal(mcc_post, mcc_1,
+                                 "MaxContinuousCurrent changed after reboot")
+            asserts.assert_equal(mv_post, mv_1,
+                                 "MaxVoltage changed after reboot")
+            asserts.assert_equal(nop_post, nop_1,
+                                 "NumberOfPoles changed after reboot")
+            asserts.assert_equal(eol_post, eol_1,
+                                 "EndOfLife changed after reboot")
+            asserts.assert_equal(ser_post, ser_1,
+                                 "ServiceEntranceRated changed after reboot")
+            log.info("All Fixed-by-manufacturer attributes verified stable across reboot")
 
 
 if __name__ == "__main__":
