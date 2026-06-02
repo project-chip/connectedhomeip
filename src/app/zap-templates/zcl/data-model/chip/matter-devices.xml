@@ -1650,6 +1650,42 @@ limitations under the License.
         </clusters>
     </deviceType>
     <deviceType>
+        <name>MA-electrical-circuit-breaker</name>
+        <domain>CHIP</domain>
+        <typeName>Electrical Circuit Breaker</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0516</deviceId>
+        <revision editable="false">1</revision>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters>
+            <!-- TODO: Add Electrical Alarm (Provisional, Optional per spec, with OverCurrent feature mandatory) once https://github.com/project-chip/connectedhomeip/pull/72223 lands -->
+            <include cluster="Electrical Distribution" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Electrical Protection Alarm" client="false" server="false" clientLocked="true" serverLocked="false">
+                <features>
+                    <feature code="SHORT" name="ShortCircuit">
+                        <otherwiseConform>
+                            <provisionalConform></provisionalConform>
+                            <mandatoryConform></mandatoryConform>
+                        </otherwiseConform>
+                    </feature>
+                </features>
+            </include>
+            <include cluster="Identify" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="On/Off" client="false" server="false" clientLocked="true" serverLocked="false">
+                <features>
+                    <feature code="OFFONLY" name="OffOnly"></feature>
+                </features>
+            </include>
+            <include cluster="Power Topology" client="false" server="true" clientLocked="true" serverLocked="true">
+                <features>
+                    <feature code="CIRC" name="ElectricalCircuit"></feature>
+                </features>
+            </include>
+            <include cluster="User Label" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+        </clusters>
+    </deviceType>
+    <deviceType>
         <name>MA-electrical-distribution-enclosure</name>
         <domain>CHIP</domain>
         <typeName>Electrical Distribution Enclosure</typeName>
