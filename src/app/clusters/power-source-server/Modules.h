@@ -371,7 +371,9 @@ class BatteryTimerContext : public TimerContext
 {
 public:
     constexpr static inline uint16_t kTimerDurationS = 10;
-    BatteryTimerContext(TimerDelegate & timerDelegate, NotifyCallback notifier) : mTimerDelegate(timerDelegate), mNotifier(std::move(notifier)) {}
+    BatteryTimerContext(TimerDelegate & timerDelegate, NotifyCallback notifier) :
+        mTimerDelegate(timerDelegate), mNotifier(std::move(notifier))
+    {}
     CriticalFailure SetValue(T value)
     {
         mToBeReported = value;
@@ -396,6 +398,7 @@ public:
         mTimerDelegate.CancelTimer(this);
         LogErrorOnFailure(mTimerDelegate.StartTimer(this, System::Clock::Seconds16(kTimerDurationS)));
     }
+
 private:
     T mReported{};
     T mToBeReported{};

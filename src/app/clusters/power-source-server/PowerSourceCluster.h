@@ -266,14 +266,18 @@ public:
     static_assert(supportedFeatures.Has(PowerSource::Feature::kWired) ^ supportedFeatures.Has(PowerSource::Feature::kBattery),
                   "Exactly one of Wired or Battery features must be set");
 
-    template <bool batteryFeatureNotSupported = !supportedFeatures.Has(PowerSource::Feature::kBattery), std::enable_if_t<batteryFeatureNotSupported, int> = 0>
+    template <bool batteryFeatureNotSupported                   = !supportedFeatures.Has(PowerSource::Feature::kBattery),
+              std::enable_if_t<batteryFeatureNotSupported, int> = 0>
     PowerSourceCluster(const ConfigType & config) :
         ConfigType(config), DefaultServerCluster({ config.mEndpointId, PowerSource::Id })
     {}
 
-    template <bool batteryFeatureSupported = supportedFeatures.Has(PowerSource::Feature::kBattery), std::enable_if_t<batteryFeatureSupported, size_t> = 0>
+    template <bool batteryFeatureSupported                      = supportedFeatures.Has(PowerSource::Feature::kBattery),
+              std::enable_if_t<batteryFeatureSupported, size_t> = 0>
     PowerSourceCluster(const ConfigType & config) :
-        ConfigType(config), DefaultServerCluster({ config.mEndpointId, PowerSource::Id }), PowerSource::detail::BatteryTimerContextsModule<batteryFeatureSupported>(ConfigType::GetTimerDelegate(), [this](AttributeId id) { NotifyAttributeChanged(id); })
+        ConfigType(config), DefaultServerCluster({ config.mEndpointId, PowerSource::Id }),
+        PowerSource::detail::BatteryTimerContextsModule<batteryFeatureSupported>(
+            ConfigType::GetTimerDelegate(), [this](AttributeId id) { NotifyAttributeChanged(id); })
     {}
 
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
