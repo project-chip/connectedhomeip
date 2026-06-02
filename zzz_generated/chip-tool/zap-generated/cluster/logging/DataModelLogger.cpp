@@ -8265,6 +8265,129 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 }
 
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const chip::app::Clusters::AvAnalysis::Structs::AnalysisStreamStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("AnalysisStreamID", indent + 1, value.analysisStreamID);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'AnalysisStreamID'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("WebRTCEndpointID", indent + 1, value.webRTCEndpointID);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'WebRTCEndpointID'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("PushAVEndpointID", indent + 1, value.pushAVEndpointID);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'PushAVEndpointID'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("AnalysisStreamState", indent + 1, value.analysisStreamState);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'AnalysisStreamState'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const chip::app::Clusters::AvAnalysis::Structs::ContextTriggerStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("Context", indent + 1, value.context);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Context'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("ZoneIDs", indent + 1, value.zoneIDs);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ZoneIDs'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const chip::app::Clusters::AvAnalysis::Structs::TrackedContext::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("IdentifiedContextID", indent + 1, value.identifiedContextID);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'IdentifiedContextID'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("IdentifiedContext", indent + 1, value.identifiedContext);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'IdentifiedContext'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("PreviousZone", indent + 1, value.previousZone);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'PreviousZone'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("CurrentZone", indent + 1, value.currentZone);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'CurrentZone'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("StartTime", indent + 1, value.startTime);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'StartTime'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("EndTime", indent + 1, value.endTime);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'EndTime'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const chip::app::Clusters::CommodityTariff::Structs::PeakPeriodStruct::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
@@ -12946,6 +13069,118 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const AvAnalysis::Events::AnalysisSessionStart::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("SessionID", indent + 1, value.sessionID);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'SessionID'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("SourceNodeId", indent + 1, value.sourceNodeId);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'SourceNodeId'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("TriggeredZones", indent + 1, value.triggeredZones);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'TriggeredZones'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const AvAnalysis::Events::AnalysisSessionEnd::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("SessionID", indent + 1, value.sessionID);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'SessionID'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("SourceNodeId", indent + 1, value.sourceNodeId);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'SourceNodeId'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const AvAnalysis::Events::PerceivedContext::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("SessionID", indent + 1, value.sessionID);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'SessionID'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("SourceNodeId", indent + 1, value.sourceNodeId);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'SourceNodeId'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("SourceStartTimestamp", indent + 1, value.sourceStartTimestamp);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'SourceStartTimestamp'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("NewIdentifiedContexts", indent + 1, value.newIdentifiedContexts);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'NewIdentifiedContexts'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("CurrentIdentifiedContexts", indent + 1, value.currentIdentifiedContexts);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'CurrentIdentifiedContexts'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("ExpiredContexts", indent + 1, value.expiredContexts);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'ExpiredContexts'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const CommissionerControl::Events::CommissioningRequestResult::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
@@ -13919,6 +14154,14 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("transportConfigurations", indent + 1, value.transportConfigurations));
+    DataModelLogger::LogString(indent, "}");
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const AvAnalysis::Commands::EstablishAnalysisStreamResponse::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    ReturnErrorOnFailure(DataModelLogger::LogValue("analysisStreamID", indent + 1, value.analysisStreamID));
     DataModelLogger::LogString(indent, "}");
     return CHIP_NO_ERROR;
 }
@@ -24258,6 +24501,69 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         }
         break;
     }
+    case AvAnalysis::Id: {
+        switch (path.mAttributeId)
+        {
+        case AvAnalysis::Attributes::SupportedAmbientContexts::Id: {
+            chip::app::DataModel::DecodableList<chip::app::Clusters::Globals::Structs::SemanticTagStruct::DecodableType> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("SupportedAmbientContexts", 1, value);
+        }
+        case AvAnalysis::Attributes::ActiveAmbientContextTriggers::Id: {
+            chip::app::DataModel::DecodableList<chip::app::Clusters::AvAnalysis::Structs::ContextTriggerStruct::DecodableType>
+                value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ActiveAmbientContextTriggers", 1, value);
+        }
+        case AvAnalysis::Attributes::MaxAnalysisStreamCount::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("MaxAnalysisStreamCount", 1, value);
+        }
+        case AvAnalysis::Attributes::CurrentAnalysisStreamCount::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("CurrentAnalysisStreamCount", 1, value);
+        }
+        case AvAnalysis::Attributes::AnalysisStreams::Id: {
+            chip::app::DataModel::DecodableList<chip::app::Clusters::AvAnalysis::Structs::AnalysisStreamStruct::DecodableType>
+                value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AnalysisStreams", 1, value);
+        }
+        case AvAnalysis::Attributes::TrackingEnabled::Id: {
+            bool value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("TrackingEnabled", 1, value);
+        }
+        case AvAnalysis::Attributes::GeneratedCommandList::Id: {
+            chip::app::DataModel::DecodableList<chip::CommandId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, AvAnalysis::Id);
+        }
+        case AvAnalysis::Attributes::AcceptedCommandList::Id: {
+            chip::app::DataModel::DecodableList<chip::CommandId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, AvAnalysis::Id);
+        }
+        case AvAnalysis::Attributes::AttributeList::Id: {
+            chip::app::DataModel::DecodableList<chip::AttributeId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, AvAnalysis::Id);
+        }
+        case AvAnalysis::Attributes::FeatureMap::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("FeatureMap", 1, value);
+        }
+        case AvAnalysis::Attributes::ClusterRevision::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ClusterRevision", 1, value);
+        }
+        }
+        break;
+    }
     case CommodityTariff::Id: {
         switch (path.mAttributeId)
         {
@@ -26136,6 +26442,17 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
         }
         break;
     }
+    case AvAnalysis::Id: {
+        switch (path.mCommandId)
+        {
+        case AvAnalysis::Commands::EstablishAnalysisStreamResponse::Id: {
+            AvAnalysis::Commands::EstablishAnalysisStreamResponse::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("EstablishAnalysisStreamResponse", 1, value);
+        }
+        }
+        break;
+    }
     case CommodityTariff::Id: {
         switch (path.mCommandId)
         {
@@ -27335,6 +27652,27 @@ CHIP_ERROR DataModelLogger::LogEvent(const chip::app::EventHeader & header, chip
             chip::app::Clusters::Chime::Events::ChimeStartedPlaying::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ChimeStartedPlaying", 1, value);
+        }
+        }
+        break;
+    }
+    case AvAnalysis::Id: {
+        switch (header.mPath.mEventId)
+        {
+        case AvAnalysis::Events::AnalysisSessionStart::Id: {
+            chip::app::Clusters::AvAnalysis::Events::AnalysisSessionStart::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AnalysisSessionStart", 1, value);
+        }
+        case AvAnalysis::Events::AnalysisSessionEnd::Id: {
+            chip::app::Clusters::AvAnalysis::Events::AnalysisSessionEnd::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AnalysisSessionEnd", 1, value);
+        }
+        case AvAnalysis::Events::PerceivedContext::Id: {
+            chip::app::Clusters::AvAnalysis::Events::PerceivedContext::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("PerceivedContext", 1, value);
         }
         }
         break;

@@ -432,6 +432,9 @@ NSString * MTRClusterNameForID(MTRClusterIDType clusterID)
     case MTRClusterIDTypeChimeID:
         result = @"Chime";
         break;
+    case MTRClusterIDTypeAVAnalysisID:
+        result = @"AVAnalysis";
+        break;
     case MTRClusterIDTypeCommodityTariffID:
         result = @"CommodityTariff";
         break;
@@ -9266,6 +9269,62 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
         }
         break;
 
+    case MTRClusterIDTypeAVAnalysisID:
+
+        switch (attributeID) {
+
+            // Cluster AVAnalysis attributes
+        case MTRAttributeIDTypeClusterAVAnalysisAttributeSupportedAmbientContextsID:
+            result = @"SupportedAmbientContexts";
+            break;
+
+        case MTRAttributeIDTypeClusterAVAnalysisAttributeActiveAmbientContextTriggersID:
+            result = @"ActiveAmbientContextTriggers";
+            break;
+
+        case MTRAttributeIDTypeClusterAVAnalysisAttributeMaxAnalysisStreamCountID:
+            result = @"MaxAnalysisStreamCount";
+            break;
+
+        case MTRAttributeIDTypeClusterAVAnalysisAttributeCurrentAnalysisStreamCountID:
+            result = @"CurrentAnalysisStreamCount";
+            break;
+
+        case MTRAttributeIDTypeClusterAVAnalysisAttributeAnalysisStreamsID:
+            result = @"AnalysisStreams";
+            break;
+
+        case MTRAttributeIDTypeClusterAVAnalysisAttributeTrackingEnabledID:
+            result = @"TrackingEnabled";
+            break;
+
+        case MTRAttributeIDTypeClusterAVAnalysisAttributeGeneratedCommandListID:
+            result = @"GeneratedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterAVAnalysisAttributeAcceptedCommandListID:
+            result = @"AcceptedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterAVAnalysisAttributeAttributeListID:
+            result = @"AttributeList";
+            break;
+
+        case MTRAttributeIDTypeClusterAVAnalysisAttributeFeatureMapID:
+            result = @"FeatureMap";
+            break;
+
+        case MTRAttributeIDTypeClusterAVAnalysisAttributeClusterRevisionID:
+            result = @"ClusterRevision";
+            break;
+
+        default:
+            // Not a known AVAnalysis attribute.
+            result = [NSString stringWithFormat:@"<Unknown attributeID %u>", attributeID];
+            break;
+        }
+        break;
+
     case MTRClusterIDTypeCommodityTariffID:
 
         switch (attributeID) {
@@ -12872,6 +12931,40 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
         }
         break;
 
+    case MTRClusterIDTypeAVAnalysisID:
+
+        switch (commandID) {
+
+        case MTRCommandIDTypeClusterAVAnalysisCommandEnableContextTriggersID:
+            result = @"EnableContextTriggers";
+            break;
+
+        case MTRCommandIDTypeClusterAVAnalysisCommandDisableContextTriggersID:
+            result = @"DisableContextTriggers";
+            break;
+
+        case MTRCommandIDTypeClusterAVAnalysisCommandEstablishAnalysisStreamID:
+            result = @"EstablishAnalysisStream";
+            break;
+
+        case MTRCommandIDTypeClusterAVAnalysisCommandActivateAnalysisStreamID:
+            result = @"ActivateAnalysisStream";
+            break;
+
+        case MTRCommandIDTypeClusterAVAnalysisCommandDeactivateAnalysisStreamID:
+            result = @"DeactivateAnalysisStream";
+            break;
+
+        case MTRCommandIDTypeClusterAVAnalysisCommandRemoveAnalysisStreamID:
+            result = @"RemoveAnalysisStream";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
     case MTRClusterIDTypeCommodityTariffID:
 
         switch (commandID) {
@@ -14979,6 +15072,20 @@ NSString * MTRResponseCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDT
     case MTRClusterIDTypeChimeID:
 
         switch (commandID) {
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeAVAnalysisID:
+
+        switch (commandID) {
+
+        case MTRCommandIDTypeClusterAVAnalysisCommandEstablishAnalysisStreamResponseID:
+            result = @"EstablishAnalysisStreamResponse";
+            break;
 
         default:
             result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
@@ -17180,6 +17287,29 @@ NSString * MTREventNameForID(MTRClusterIDType clusterID, MTREventIDType eventID)
             // Cluster Chime events
         case MTREventIDTypeClusterChimeEventChimeStartedPlayingID:
             result = @"ChimeStartedPlaying";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown eventID %u>", eventID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeAVAnalysisID:
+
+        switch (eventID) {
+
+            // Cluster AVAnalysis events
+        case MTREventIDTypeClusterAVAnalysisEventAnalysisSessionStartID:
+            result = @"AnalysisSessionStart";
+            break;
+
+        case MTREventIDTypeClusterAVAnalysisEventAnalysisSessionEndID:
+            result = @"AnalysisSessionEnd";
+            break;
+
+        case MTREventIDTypeClusterAVAnalysisEventPerceivedContextID:
+            result = @"PerceivedContext";
             break;
 
         default:

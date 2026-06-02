@@ -20773,6 +20773,154 @@ public class ClusterInfoMapping {
   }
 
 
+  public static class DelegatedAvAnalysisClusterEstablishAnalysisStreamResponseCallback implements ChipClusters.AvAnalysisCluster.EstablishAnalysisStreamResponseCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(Integer analysisStreamID) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+
+      CommandResponseInfo analysisStreamIDResponseValue = new CommandResponseInfo("analysisStreamID", "Integer");
+      responseValues.put(analysisStreamIDResponseValue, analysisStreamID);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
+  public static class DelegatedAvAnalysisClusterSupportedAmbientContextsAttributeCallback implements ChipClusters.AvAnalysisCluster.SupportedAmbientContextsAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<ChipStructs.AvAnalysisClusterSemanticTagStruct> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.AvAnalysisClusterSemanticTagStruct>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedAvAnalysisClusterActiveAmbientContextTriggersAttributeCallback implements ChipClusters.AvAnalysisCluster.ActiveAmbientContextTriggersAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<ChipStructs.AvAnalysisClusterContextTriggerStruct> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.AvAnalysisClusterContextTriggerStruct>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedAvAnalysisClusterAnalysisStreamsAttributeCallback implements ChipClusters.AvAnalysisCluster.AnalysisStreamsAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<ChipStructs.AvAnalysisClusterAnalysisStreamStruct> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.AvAnalysisClusterAnalysisStreamStruct>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedAvAnalysisClusterGeneratedCommandListAttributeCallback implements ChipClusters.AvAnalysisCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedAvAnalysisClusterAcceptedCommandListAttributeCallback implements ChipClusters.AvAnalysisCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedAvAnalysisClusterAttributeListAttributeCallback implements ChipClusters.AvAnalysisCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+
   public static class DelegatedCommodityTariffClusterGetTariffComponentResponseCallback implements ChipClusters.CommodityTariffCluster.GetTariffComponentResponseCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -24709,6 +24857,10 @@ public class ClusterInfoMapping {
       (ptr, endpointId) -> new ChipClusters.ChimeCluster(ptr, endpointId), new HashMap<>());
     clusterMap.put("chime", chimeClusterInfo);
 
+    ClusterInfo avAnalysisClusterInfo = new ClusterInfo(
+      (ptr, endpointId) -> new ChipClusters.AvAnalysisCluster(ptr, endpointId), new HashMap<>());
+    clusterMap.put("avAnalysis", avAnalysisClusterInfo);
+
     ClusterInfo commodityTariffClusterInfo = new ClusterInfo(
       (ptr, endpointId) -> new ChipClusters.CommodityTariffCluster(ptr, endpointId), new HashMap<>());
     clusterMap.put("commodityTariff", commodityTariffClusterInfo);
@@ -24899,6 +25051,7 @@ public class ClusterInfoMapping {
     destination.get("webRTCTransportRequestor").combineCommands(source.get("webRTCTransportRequestor"));
     destination.get("pushAvStreamTransport").combineCommands(source.get("pushAvStreamTransport"));
     destination.get("chime").combineCommands(source.get("chime"));
+    destination.get("avAnalysis").combineCommands(source.get("avAnalysis"));
     destination.get("commodityTariff").combineCommands(source.get("commodityTariff"));
     destination.get("ecosystemInformation").combineCommands(source.get("ecosystemInformation"));
     destination.get("commissionerControl").combineCommands(source.get("commissionerControl"));
@@ -32844,6 +32997,119 @@ public class ClusterInfoMapping {
     chimeClusterInteractionInfoMap.put("playChimeSound", chimeplayChimeSoundInteractionInfo);
 
     commandMap.put("chime", chimeClusterInteractionInfoMap);
+
+    Map<String, InteractionInfo> avAnalysisClusterInteractionInfoMap = new LinkedHashMap<>();
+
+    Map<String, CommandParameterInfo> avAnalysisenableContextTriggersCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    InteractionInfo avAnalysisenableContextTriggersInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.AvAnalysisCluster) cluster)
+        .enableContextTriggers((DefaultClusterCallback) callback
+        , (ArrayList<ChipStructs.AvAnalysisClusterContextTriggerStruct>)
+        commandArguments.get("contextTriggers")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        avAnalysisenableContextTriggersCommandParams
+    );
+    avAnalysisClusterInteractionInfoMap.put("enableContextTriggers", avAnalysisenableContextTriggersInteractionInfo);
+
+    Map<String, CommandParameterInfo> avAnalysisdisableContextTriggersCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    InteractionInfo avAnalysisdisableContextTriggersInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.AvAnalysisCluster) cluster)
+        .disableContextTriggers((DefaultClusterCallback) callback
+        , (ArrayList<ChipStructs.AvAnalysisClusterContextTriggerStruct>)
+        commandArguments.get("contextTriggers")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        avAnalysisdisableContextTriggersCommandParams
+    );
+    avAnalysisClusterInteractionInfoMap.put("disableContextTriggers", avAnalysisdisableContextTriggersInteractionInfo);
+
+    Map<String, CommandParameterInfo> avAnalysisestablishAnalysisStreamCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo avAnalysisestablishAnalysisStreamnodeIDCommandParameterInfo = new CommandParameterInfo("nodeID", Long.class, Long.class);
+    avAnalysisestablishAnalysisStreamCommandParams.put("nodeID",avAnalysisestablishAnalysisStreamnodeIDCommandParameterInfo);
+    InteractionInfo avAnalysisestablishAnalysisStreamInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.AvAnalysisCluster) cluster)
+          .establishAnalysisStream((ChipClusters.AvAnalysisCluster.EstablishAnalysisStreamResponseCallback) callback
+           , (Long)
+             commandArguments.get("nodeID")
+
+            );
+        },
+        () -> new DelegatedAvAnalysisClusterEstablishAnalysisStreamResponseCallback(),
+        avAnalysisestablishAnalysisStreamCommandParams
+      );
+    avAnalysisClusterInteractionInfoMap.put("establishAnalysisStream", avAnalysisestablishAnalysisStreamInteractionInfo);
+
+    Map<String, CommandParameterInfo> avAnalysisactivateAnalysisStreamCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo avAnalysisactivateAnalysisStreamanalysisStreamIDCommandParameterInfo = new CommandParameterInfo("analysisStreamID", Integer.class, Integer.class);
+    avAnalysisactivateAnalysisStreamCommandParams.put("analysisStreamID",avAnalysisactivateAnalysisStreamanalysisStreamIDCommandParameterInfo);
+
+    CommandParameterInfo avAnalysisactivateAnalysisStreamwebRTCEndpointIDCommandParameterInfo = new CommandParameterInfo("webRTCEndpointID", Optional.class, Integer.class);
+    avAnalysisactivateAnalysisStreamCommandParams.put("webRTCEndpointID",avAnalysisactivateAnalysisStreamwebRTCEndpointIDCommandParameterInfo);
+
+    CommandParameterInfo avAnalysisactivateAnalysisStreampushAVEndpointIDCommandParameterInfo = new CommandParameterInfo("pushAVEndpointID", Optional.class, Integer.class);
+    avAnalysisactivateAnalysisStreamCommandParams.put("pushAVEndpointID",avAnalysisactivateAnalysisStreampushAVEndpointIDCommandParameterInfo);
+    InteractionInfo avAnalysisactivateAnalysisStreamInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.AvAnalysisCluster) cluster)
+        .activateAnalysisStream((DefaultClusterCallback) callback
+        , (Integer)
+        commandArguments.get("analysisStreamID")
+        , (Optional<Integer>)
+        commandArguments.get("webRTCEndpointID")
+        , (Optional<Integer>)
+        commandArguments.get("pushAVEndpointID")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        avAnalysisactivateAnalysisStreamCommandParams
+    );
+    avAnalysisClusterInteractionInfoMap.put("activateAnalysisStream", avAnalysisactivateAnalysisStreamInteractionInfo);
+
+    Map<String, CommandParameterInfo> avAnalysisdeactivateAnalysisStreamCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo avAnalysisdeactivateAnalysisStreamanalysisStreamIDCommandParameterInfo = new CommandParameterInfo("analysisStreamID", Integer.class, Integer.class);
+    avAnalysisdeactivateAnalysisStreamCommandParams.put("analysisStreamID",avAnalysisdeactivateAnalysisStreamanalysisStreamIDCommandParameterInfo);
+    InteractionInfo avAnalysisdeactivateAnalysisStreamInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.AvAnalysisCluster) cluster)
+        .deactivateAnalysisStream((DefaultClusterCallback) callback
+        , (Integer)
+        commandArguments.get("analysisStreamID")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        avAnalysisdeactivateAnalysisStreamCommandParams
+    );
+    avAnalysisClusterInteractionInfoMap.put("deactivateAnalysisStream", avAnalysisdeactivateAnalysisStreamInteractionInfo);
+
+    Map<String, CommandParameterInfo> avAnalysisremoveAnalysisStreamCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo avAnalysisremoveAnalysisStreamanalysisStreamIDCommandParameterInfo = new CommandParameterInfo("analysisStreamID", Integer.class, Integer.class);
+    avAnalysisremoveAnalysisStreamCommandParams.put("analysisStreamID",avAnalysisremoveAnalysisStreamanalysisStreamIDCommandParameterInfo);
+    InteractionInfo avAnalysisremoveAnalysisStreamInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.AvAnalysisCluster) cluster)
+        .removeAnalysisStream((DefaultClusterCallback) callback
+        , (Integer)
+        commandArguments.get("analysisStreamID")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        avAnalysisremoveAnalysisStreamCommandParams
+    );
+    avAnalysisClusterInteractionInfoMap.put("removeAnalysisStream", avAnalysisremoveAnalysisStreamInteractionInfo);
+
+    commandMap.put("avAnalysis", avAnalysisClusterInteractionInfoMap);
 
     Map<String, InteractionInfo> commodityTariffClusterInteractionInfoMap = new LinkedHashMap<>();
 
