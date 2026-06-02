@@ -40,57 +40,40 @@ import logging
 from mobly import asserts
 
 import matter.clusters as Clusters
-from matter.testing.decorators import has_cluster, run_if_endpoint_matches
+from matter.testing.decorators import has_cluster, pics, run_if_endpoint_matches
 from matter.testing.matter_testing import MatterBaseTest
-from matter.testing.runner import TestStep, default_matter_test_main
+from matter.testing.runner import default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
 class TC_EPALM_2_3(MatterBaseTest):
-    """TC-EPALM-2.3: FeatureMap and Supported Attribute Consistency with DUT as Server
-
-    Verify that the bits set in the Supported attribute are consistent with the
-    alarm-condition feature bits declared in the FeatureMap.
-    """
-
-    def desc_TC_EPALM_2_3(self) -> str:
-        return "[TC-EPALM-2.3] FeatureMap and Supported Attribute Consistency with DUT as Server"
-
-    def pics_TC_EPALM_2_3(self) -> list[str]:
-        return ["EPALM.S"]
-
-    def steps_TC_EPALM_2_3(self) -> list[TestStep]:
-        return [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
-            TestStep(2, "TH reads the FeatureMap attribute from DUT"),
-            TestStep(3, "TH reads the Supported attribute from DUT"),
-            TestStep(4, "TH verifies ShortCircuit feature/supported consistency"),
-            TestStep(5, "TH verifies OverLoad feature/supported consistency"),
-            TestStep(6, "TH verifies OverVoltage feature/supported consistency"),
-            TestStep(7, "TH verifies SurgeProtection feature/supported consistency"),
-            TestStep(8, "TH verifies ResidualCurrent feature/supported consistency"),
-            TestStep(9, "TH verifies ArcFault feature/supported consistency"),
-            TestStep(10, "TH verifies SelfTest feature/supported consistency"),
-            TestStep(11, "TH verifies no orphan bits in Supported"),
-        ]
 
     @property
     def default_endpoint(self) -> int:
         return 1
 
+    @pics('EPALM.S')
     @run_if_endpoint_matches(has_cluster(Clusters.ElectricalProtectionAlarm))
     async def test_TC_EPALM_2_3(self):
+        """[TC-EPALM-2.3] FeatureMap and Supported Attribute Consistency with DUT as Server
+
+        Verify bidirectional consistency between the EPALM FeatureMap (bits 20-26
+        for SHORT / OL / OV / SP / RC / ARC / SELFTEST) and the inherited Alarm
+        Base Supported attribute (AlarmBitmap bits 0-6): every feature bit set
+        in FeatureMap MUST have its corresponding bit set in Supported, and
+        every bit set in Supported MUST correspond to a feature bit set in
+        FeatureMap (no orphan bits).
+        """
         endpoint = self.get_endpoint()
         cluster = Clusters.ElectricalProtectionAlarm
         attributes = cluster.Attributes
         features = cluster.Bitmaps.Feature
         alarm_bits = cluster.Bitmaps.AlarmBitmap
 
-        self.step(1)
+        self.step(1, "Commissioning, already done", is_commissioning=True)
 
-        # Step 2: Read FeatureMap
-        self.step(2)
+        self.step(2, "TH reads the FeatureMap attribute from DUT")
         feature_map = await self.read_single_attribute_check_success(
             endpoint=endpoint,
             cluster=cluster,
@@ -98,8 +81,7 @@ class TC_EPALM_2_3(MatterBaseTest):
         )
         log.info(f"FeatureMap: 0x{feature_map:08X}")
 
-        # Step 3: Read Supported
-        self.step(3)
+        self.step(3, "TH reads the Supported attribute from DUT")
         supported_val = await self.read_single_attribute_check_success(
             endpoint=endpoint,
             cluster=cluster,
@@ -108,20 +90,19 @@ class TC_EPALM_2_3(MatterBaseTest):
         log.info(f"Supported: 0x{supported_val:08X}")
 
         # Feature-to-AlarmBitmap mapping
-        feature_alarm_map = {
-            features.kShortCircuit: alarm_bits.kShortCircuitFault,
-            features.kOverLoad: alarm_bits.kOverLoadFault,
-            features.kOverVoltage: alarm_bits.kOverVoltageFault,
-            features.kSurgeProtection: alarm_bits.kVoltageSurgeFault,
-            features.kResidualCurrent: alarm_bits.kResidualCurrentFault,
-            features.kArcFault: alarm_bits.kArcFault,
-            features.kSelfTest: alarm_bits.kSelfTest,
-        }
+        feature_alarm_map = [
+            (features.kShortCircuit, alarm_bits.kShortCircuitFault, "ShortCircuit"),
+            (features.kOverLoad, alarm_bits.kOverLoadFault, "OverLoad"),
+            (features.kOverVoltage, alarm_bits.kOverVoltageFault, "OverVoltage"),
+            (features.kSurgeProtection, alarm_bits.kVoltageSurgeFault, "SurgeProtection"),
+            (features.kResidualCurrent, alarm_bits.kResidualCurrentFault, "ResidualCurrent"),
+            (features.kArcFault, alarm_bits.kArcFault, "ArcFault"),
+            (features.kSelfTest, alarm_bits.kSelfTest, "SelfTest"),
+        ]
 
         step_num = 4
-
-        for feature_bit, alarm_bit in feature_alarm_map.items():
-            self.step(step_num)
+        for feature_bit, alarm_bit, feature_name in feature_alarm_map:
+            self.step(step_num, f"TH verifies {feature_name} feature/supported consistency")
             if feature_map & feature_bit:
                 asserts.assert_true(
                     bool(supported_val & alarm_bit),
@@ -133,8 +114,7 @@ class TC_EPALM_2_3(MatterBaseTest):
                 log.info(f"Feature {feature_bit.name}: not present, skipping")
             step_num += 1
 
-        # Step 11: Verify no orphan supported bits
-        self.step(11)
+        self.step(11, "TH verifies no orphan bits in Supported and no Supported bit without its feature")
         all_alarm_bits = (alarm_bits.kShortCircuitFault | alarm_bits.kOverLoadFault |
                           alarm_bits.kOverVoltageFault | alarm_bits.kVoltageSurgeFault |
                           alarm_bits.kResidualCurrentFault | alarm_bits.kArcFault |
@@ -143,8 +123,7 @@ class TC_EPALM_2_3(MatterBaseTest):
         asserts.assert_equal(orphan_bits, 0,
                              f"Supported has bits 0x{orphan_bits:08X} not mapped to any known alarm")
 
-        # Also verify no alarm bit in Supported without its feature
-        for feature_bit, alarm_bit in feature_alarm_map.items():
+        for feature_bit, alarm_bit, _ in feature_alarm_map:
             if (supported_val & alarm_bit) and not (feature_map & feature_bit):
                 asserts.fail(
                     f"Alarm bit {alarm_bit.name} is set in Supported but "
