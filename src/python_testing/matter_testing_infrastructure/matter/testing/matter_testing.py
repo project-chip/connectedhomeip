@@ -200,6 +200,17 @@ class TestCleanupConfig:
 
 
 class MatterBaseTest(base_test.BaseTestClass):
+    def __init_subclass__(cls, **kwargs):
+        super().__init_subclass__(**kwargs)
+        if 'teardown_test' in cls.__dict__:
+            original = cls.__dict__['teardown_test']
+
+            def _wrapped_teardown(self, _original=original):
+                _original(self)
+                MatterBaseTest.teardown_test(self)
+
+            cls.teardown_test = _wrapped_teardown
+
     def __init__(self, *args):
         super().__init__(*args)
 
@@ -886,13 +897,14 @@ class MatterBaseTest(base_test.BaseTestClass):
 
         Framework cleanup (DUT state restoration, extra controller shutdown) runs
         once at class end in teardown_class, not here. Override this method to add
-        custom per-test teardown. Call super().teardown_test() so Mobly's base
-        teardown runs.
+        custom per-test teardown.
 
-        Idempotency: _teardown_ran guards against double-execution when a subclass
-        decorates teardown_test with @async_test_body and calls super().teardown_test()
-        from within the coroutine — the @async_test_body decorator also calls this
-        method after the coroutine completes to cover overrides that skip super().
+        Subclasses do not need to call super().teardown_test() — __init_subclass__
+        wraps every override so this base method always runs after the override
+        completes, regardless of whether super() was called.
+
+        Idempotency: _teardown_ran prevents double-execution if super() was called
+        explicitly from the override.
         """
         if not self._teardown_ran:
             self._teardown_ran = True

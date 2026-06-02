@@ -260,11 +260,11 @@ def async_test_body(body):
     synchronously, we need a mechanism to allow an `async def` to be converted to
     a asyncio-run synchronous method. This decorator does the wrapping.
 
-    For teardown_test overrides: the base teardown_test only runs when the override
-    calls super(). The decorator is the only place that always runs after the async
-    body finishes, so it calls the base teardown_test there to make sure base cleanup
-    still happens. The _teardown_ran guard prevents duplicate work, if super() was
-    already called, the decorator's base teardown call is skipped.
+    For teardown_test overrides: MatterBaseTest.__init_subclass__ wraps every
+    teardown_test override so the base always runs after the override completes.
+    For async overrides, the decorator additionally calls the base teardown_test
+    after the async body finishes. The _teardown_ran guard makes this a no-op if
+    the base already ran via the __init_subclass__ wrapper.
     """
     is_teardown = body.__name__ == 'teardown_test'
 
