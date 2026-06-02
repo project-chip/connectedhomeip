@@ -152,15 +152,15 @@ class TC_JFADMIN_2_2(CADMINBaseTest):
         self.jfadmin_fabric_a_discriminator = random.randint(0, 4095)
         self.jfctrl_fabric_a_vid = random.randint(0x0001, 0xFFF0)
 
-        # Start Fabric A JF-Administrator App
+        fabric_a_rpc_port = self.get_random_port()
         self.fabric_a_admin = JFAdministratorSubprocess(
             self.jfa_server_app,
             prefix="JFA-A",
             storage_dir=self.storage_fabric_a,
-            port=random.randint(5001, 5999),
+            port=self.get_random_port(),
             discriminator=self.jfadmin_fabric_a_discriminator,
             passcode=self.jfadmin_fabric_a_passcode,
-            extra_args=["--capabilities", "0x04", "--rpc-server-port", "33033"])
+            extra_args=["--capabilities", "0x04", "--rpc-server-port", str(fabric_a_rpc_port), "--secured-commissioner-port", str(self.get_random_port())])
         self.fabric_a_admin.start(
             expected_output="Updating services using commissioning mode 1",
             timeout=30)
@@ -169,7 +169,7 @@ class TC_JFADMIN_2_2(CADMINBaseTest):
         self.fabric_a_ctrl = JFControllerSubprocess(
             self.jfc_server_app,
             prefix="JFC-A",
-            rpc_server_port=33033,
+            rpc_server_port=fabric_a_rpc_port,
             storage_dir=self.storage_fabric_a,
             vendor_id=self.jfctrl_fabric_a_vid)
         self.fabric_a_ctrl.start(
@@ -211,7 +211,7 @@ class TC_JFADMIN_2_2(CADMINBaseTest):
         self.fabric_a_server_app = AppServerSubprocess(
             self.th_server_app,
             storage_dir=self.storage_fabric_a,
-            port=random.randint(5001, 5999),
+            port=self.get_random_port(),
             discriminator=self.thserver_fabric_a_discriminator,
             passcode=self.thserver_fabric_a_passcode,
             extra_args=["--capabilities", "0x04"])
@@ -249,16 +249,16 @@ class TC_JFADMIN_2_2(CADMINBaseTest):
             dut_rpc_server_ip = "127.0.0.1"
             jfadmin_fabric_b_passcode = random.randint(20202021, 20202099)
             jfadmin_fabric_b_discriminator = random.randint(0, 4095)
-            dut_rpc_server_port = "33055"
+            dut_rpc_server_port = str(self.get_random_port())
             # Start Fabric B JF-Administrator App
             self.fabric_b_admin = JFAdministratorSubprocess(
                 self.jfa_server_app,
                 prefix="JFA-B",
                 storage_dir=self.storage_fabric_b,
-                port=random.randint(5001, 5999),
+                port=self.get_random_port(),
                 discriminator=jfadmin_fabric_b_discriminator,
                 passcode=jfadmin_fabric_b_passcode,
-                extra_args=["--capabilities", "0x04", "--rpc-server-port", dut_rpc_server_port])
+                extra_args=["--capabilities", "0x04", "--rpc-server-port", dut_rpc_server_port, "--secured-commissioner-port", str(self.get_random_port())])
             self.fabric_b_admin.start(
                 expected_output="Updating services using commissioning mode 1",
                 timeout=30)
@@ -326,7 +326,7 @@ class TC_JFADMIN_2_2(CADMINBaseTest):
         self.fabric_b_server_app = AppServerSubprocess(
             self.th_server_app,
             storage_dir=self.storage_fabric_b,
-            port=random.randint(5001, 5999),
+            port=self.get_random_port(),
             discriminator=self.thserver_fabric_b_discriminator,
             passcode=self.thserver_fabric_b_passcode,
             extra_args=["--capabilities", "0x04"])

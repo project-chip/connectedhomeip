@@ -145,16 +145,16 @@ class TC_JFADMIN_2_1(MatterBaseTest):
         if self.is_pics_sdk_ci_only:
             dut_rpc_server_ip = "127.0.0.1"
             jfadmin_fabric_a_passcode = random.randint(110220011, 110220999)
-            dut_rpc_server_port = "33033"
+            dut_rpc_server_port = str(self.get_random_port())
             # Start Fabric A JF-Administrator App (DUT)
             self.fabric_a_admin = JFAdministratorSubprocess(
                 self.jfa_server_app,
                 prefix="JFA-A",
                 storage_dir=self.storage_fabric_a,
-                port=random.randint(5001, 5999),
+                port=self.get_random_port(),
                 discriminator=random.randint(0, 4095),
                 passcode=jfadmin_fabric_a_passcode,
-                extra_args=["--capabilities", "0x04", "--rpc-server-port", dut_rpc_server_port])
+                extra_args=["--capabilities", "0x04", "--rpc-server-port", dut_rpc_server_port, "--secured-commissioner-port", str(self.get_random_port())])
             self.fabric_a_admin.start(
                 expected_output="Server initialization complete",
                 timeout=20)
@@ -217,7 +217,7 @@ class TC_JFADMIN_2_1(MatterBaseTest):
         self.fabric_a_server_app = AppServerSubprocess(
             self.th_server_app,
             storage_dir=self.storage_fabric_a,
-            port=random.randint(5001, 5999),
+            port=self.get_random_port(),
             discriminator=random.randint(0, 4095),
             passcode=self.thserver_fabric_a_passcode,
             extra_args=["--capabilities", "0x04"])
@@ -292,14 +292,15 @@ class TC_JFADMIN_2_1(MatterBaseTest):
         self.jfctrl_fabric_b_vid = random.randint(0x0001, 0xFFF0)
 
         # Start Fabric B JF-Administrator App
+        fabric_b_rpc_port = self.get_random_port()
         self.fabric_b_admin = JFAdministratorSubprocess(
             self.jfa_server_app,
             prefix="JFA-B",
             storage_dir=self.storage_fabric_b,
-            port=random.randint(5001, 5999),
+            port=self.get_random_port(),
             discriminator=random.randint(0, 4095),
             passcode=self.jfadmin_fabric_b_passcode,
-            extra_args=["--capabilities", "0x04", "--rpc-server-port", "33055"])
+            extra_args=["--capabilities", "0x04", "--rpc-server-port", str(fabric_b_rpc_port), "--secured-commissioner-port", str(self.get_random_port())])
         self.fabric_b_admin.start(
             expected_output="Server initialization complete",
             timeout=20)
@@ -308,7 +309,7 @@ class TC_JFADMIN_2_1(MatterBaseTest):
         self.fabric_b_ctrl = JFControllerSubprocess(
             self.jfc_server_app,
             prefix="JFC-B",
-            rpc_server_port=33055,
+            rpc_server_port=fabric_b_rpc_port,
             storage_dir=self.storage_fabric_b,
             vendor_id=self.jfctrl_fabric_b_vid)
         self.fabric_b_ctrl.start(
@@ -349,7 +350,7 @@ class TC_JFADMIN_2_1(MatterBaseTest):
         self.fabric_b_server_app = AppServerSubprocess(
             self.th_server_app,
             storage_dir=self.storage_fabric_b,
-            port=random.randint(5001, 5999),
+            port=self.get_random_port(),
             discriminator=random.randint(0, 4095),
             passcode=self.thserver_fabric_b_passcode,
             extra_args=["--capabilities", "0x04"])
