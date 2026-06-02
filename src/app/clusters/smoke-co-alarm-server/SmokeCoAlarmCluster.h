@@ -33,6 +33,8 @@ namespace app {
 namespace Clusters {
 namespace SmokeCoAlarm {
 
+class SmokeCoAlarmDelegate;
+
 class SmokeCoAlarmCluster : public DefaultServerCluster
 {
 public:
@@ -98,6 +100,7 @@ public:
     bool SetUnmountedState(bool isUnmounted);
 
     void SetInoperativeWhenUnmounted(bool v) { mInoperativeWhenUnmounted = v; }
+    void SetDelegate(SmokeCoAlarmDelegate * delegate) { mDelegate = delegate; }
 
     bool GetExpressedState(ExpressedStateEnum & expressedState) const;
     bool GetSmokeState(AlarmStateEnum & smokeState) const;
@@ -133,16 +136,6 @@ public:
                    */
     void HandleRemoteSelfTestRequest(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath);
 
-protected:
-    /**
-     * @brief Called when a self-test is initiated (locally or via the SelfTestRequest command).
-     *
-     * Override in a subclass to trigger device-specific self-test logic.
-     * The cluster has already set TestInProgress=true and ExpressedState=Testing
-     * before this is called.
-     */
-    virtual void OnSelfTestRequested() {}
-
 private:
     /**
      * @brief Updates the expressed state with new value
@@ -161,7 +154,8 @@ private:
     void SendEvent(T & event);
 
     const Config mConfig;
-    bool mInoperativeWhenUnmounted = false;
+    bool mInoperativeWhenUnmounted   = false;
+    SmokeCoAlarmDelegate * mDelegate = nullptr;
 
     // Runtime attribute storage
     ExpressedStateEnum mExpressedState         = ExpressedStateEnum::kNormal;
@@ -178,6 +172,31 @@ private:
     SensitivityEnum mSmokeSensitivityLevel     = SensitivityEnum::kHigh;
     uint32_t mExpiryDate                       = 0;
     bool mUnmounted                            = false;
+};
+
+/**
+ * @brief Application delegate for SmokeCoAlarmCluster.
+ *
+ * Implement this to provide device-specific self-test behaviour. Pass the
+ * concrete instance to SmokeCoAlarmServer::Init() or
+ * SmokeCoAlarmCluster::SetDelegate().
+ */
+class SmokeCoAlarmDelegate
+{
+public:
+    virtual ~SmokeCoAlarmDelegate() = default;
+
+    /**
+     * @brief Called when a self-test is initiated (locally or via the
+     *        SelfTestRequest command).  The cluster has already set
+     *        TestInProgress=true and ExpressedState=Testing before this
+     *        is invoked.
+     */
+    virtual void OnSelfTestRequested() = 0;
+
+protected:
+    friend class SmokeCoAlarmCluster;
+    SmokeCoAlarmCluster * mCluster = nullptr;
 };
 
 } // namespace SmokeCoAlarm

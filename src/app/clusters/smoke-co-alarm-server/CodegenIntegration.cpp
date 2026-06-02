@@ -17,10 +17,7 @@
  */
 
 #include "CodegenIntegration.h"
-#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app/util/attribute-storage.h>
-#include <app/util/endpoint-config-api.h>
 #include <lib/support/CodeUtils.h>
 
 using namespace chip;
@@ -44,12 +41,14 @@ void SmokeCoAlarmServer::SetInoperativeWhenUnmounted(bool v)
     Cluster().SetInoperativeWhenUnmounted(v);
 }
 
-CHIP_ERROR SmokeCoAlarmServer::Init(EndpointId endpointId, const SmokeCoAlarmCluster::Config & config)
+CHIP_ERROR SmokeCoAlarmServer::Init(EndpointId endpointId, const SmokeCoAlarmCluster::Config & config,
+                                    SmokeCoAlarmDelegate * delegate)
 {
     VerifyOrReturnValue(!mCluster.IsConstructed(), CHIP_NO_ERROR);
     mEndpointId = endpointId;
     mConfig     = config;
     mCluster.Create(mEndpointId, mConfig);
+    mCluster.Cluster().SetDelegate(delegate);
     CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(mCluster.Registration());
     if (err != CHIP_NO_ERROR)
     {
@@ -258,41 +257,5 @@ emberAfSmokeCoAlarmClusterSelfTestRequestCallback(CommandHandler * commandObj, c
     return true;
 }
 
-void MatterSmokeCoAlarmPluginServerInitCallback()
-{
-    for (uint16_t i = 0; i < emberAfEndpointCount(); i++)
-    {
-        EndpointId endpointId = emberAfEndpointFromIndex(i);
-        if (!emberAfContainsServer(endpointId, SmokeCoAlarm::Id))
-            continue;
-
-        uint32_t featureMapValue = 0;
-        Attributes::FeatureMap::Get(endpointId, &featureMapValue);
-
-        uint32_t optionalBits                    = 0;
-        constexpr AttributeId kOptionalAttribs[] = {
-            Attributes::DeviceMuted::Id,        Attributes::InterconnectSmokeAlarm::Id, Attributes::InterconnectCOAlarm::Id,
-            Attributes::ContaminationState::Id, Attributes::SmokeSensitivityLevel::Id,  Attributes::ExpiryDate::Id,
-            Attributes::Unmounted::Id,
-        };
-        for (AttributeId attrId : kOptionalAttribs)
-        {
-            if (emberAfContainsAttribute(endpointId, SmokeCoAlarm::Id, attrId))
-                optionalBits |= (1u << attrId);
-        }
-
-        SmokeCoAlarmCluster::Config config;
-        config.featureMap      = BitFlags<Feature>(featureMapValue);
-        config.optionalAttribs = SmokeCoAlarmCluster::OptionalAttributeSet(optionalBits);
-
-        LogErrorOnFailure(SmokeCoAlarmServer::Instance().Init(endpointId, config));
-        break;
-    }
-}
-
-void MatterSmokeCoAlarmPluginServerShutdownCallback()
-{
-    SmokeCoAlarmServer & inst = SmokeCoAlarmServer::Instance();
-    inst.~SmokeCoAlarmServer();
-    new (&inst) SmokeCoAlarmServer{};
-}
+void MatterSmokeCoAlarmPluginServerInitCallback() {}
+void MatterSmokeCoAlarmPluginServerShutdownCallback() {}

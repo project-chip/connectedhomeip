@@ -44,13 +44,14 @@ public:
     SmokeCoAlarmServer() = default;
     ~SmokeCoAlarmServer();
 
+    static SmokeCoAlarmServer & Instance() { return sInstance; }
+
     void SetInoperativeWhenUnmounted(bool v);
-    CHIP_ERROR Init(EndpointId endpointId, const SmokeCoAlarm::SmokeCoAlarmCluster::Config & config);
+    CHIP_ERROR Init(EndpointId endpointId, const SmokeCoAlarm::SmokeCoAlarmCluster::Config & config,
+                    SmokeCoAlarm::SmokeCoAlarmDelegate * delegate = nullptr);
     SmokeCoAlarm::SmokeCoAlarmCluster & Cluster();
 
     static constexpr size_t kPriorityOrderLength = SmokeCoAlarm::SmokeCoAlarmCluster::kPriorityOrderLength;
-
-    static SmokeCoAlarmServer & Instance() { return sInstance; }
 
     bool RequestSelfTest(EndpointId endpoint);
     void HandleRemoteSelfTestRequest(EndpointId endpoint, chip::app::CommandHandler * commandObj,

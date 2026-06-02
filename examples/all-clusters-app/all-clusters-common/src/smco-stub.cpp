@@ -30,29 +30,42 @@ namespace {
 
 constexpr const uint16_t kSelfTestingTimeoutSec = 10;
 
-} // namespace
-
 static std::array<ExpressedStateEnum, SmokeCoAlarmServer::kPriorityOrderLength> sPriorityOrder = {
     ExpressedStateEnum::kInoperative, ExpressedStateEnum::kSmokeAlarm,     ExpressedStateEnum::kInterconnectSmoke,
     ExpressedStateEnum::kCOAlarm,     ExpressedStateEnum::kInterconnectCO, ExpressedStateEnum::kHardwareFault,
     ExpressedStateEnum::kTesting,     ExpressedStateEnum::kEndOfService,   ExpressedStateEnum::kBatteryAlert
 };
 
-void EndSelfTestingEventHandler(System::Layer * systemLayer, void * appState)
+void EndSelfTestingEventHandler(System::Layer *, void *)
 {
     SmokeCoAlarmServer::Instance().SetTestInProgress(1, false);
     SmokeCoAlarmServer::Instance().SetExpressedStateByPriority(1, sPriorityOrder);
-
     ChipLogProgress(Support, "[Smoke-CO-Alarm] => Self test complete");
 }
 
-void emberAfPluginSmokeCoAlarmSelfTestRequestCommand(EndpointId endpointId)
+class AllClustersSmokeCODelegate : public SmokeCoAlarmDelegate
 {
-    ChipLogProgress(Support, "[Smoke-CO-Alarm] => Self test running");
+public:
+    void OnSelfTestRequested() override
+    {
+        ChipLogProgress(Support, "[Smoke-CO-Alarm] => Self test running");
+        TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(kSelfTestingTimeoutSec),
+                                                                       EndSelfTestingEventHandler, nullptr);
+    }
+} sSmokeCODelegate;
 
-    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(kSelfTestingTimeoutSec),
-                                                                   EndSelfTestingEventHandler, nullptr);
-}
+struct SmokeCORegistrar
+{
+    SmokeCORegistrar()
+    {
+        SmokeCoAlarmCluster::Config config;
+        config.featureMap.Set(Feature::kSmokeAlarm).Set(Feature::kCoAlarm);
+        config.optionalAttribs = SmokeCoAlarmCluster::OptionalAttributeSet(SmokeCoAlarmCluster::OptionalAttributeSet::All());
+        LogErrorOnFailure(SmokeCoAlarmServer::Instance().Init(1, config, &sSmokeCODelegate));
+    }
+} sSmokeCORegistrar;
+
+} // namespace
 
 bool HandleSmokeCOTestEventTrigger(uint64_t eventTrigger)
 {
