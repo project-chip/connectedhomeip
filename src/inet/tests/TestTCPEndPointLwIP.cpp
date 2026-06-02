@@ -55,9 +55,9 @@ public:
     // mState is still kConnected (so IsConnected() passes the gate at the top
     // of every affected method) but mTCP has already been cleared by
     // LwIPHandleError running on the LwIP TCP/IP task.
-    static void SimulatePCBClearedWhileConnected(const TCPEndPointHandle & ep)
+    static void SimulatePCBClearedWhileConnected(TCPEndPoint * ep)
     {
-        auto * impl  = static_cast<TCPEndPointImplLwIP *>(ep.operator->());
+        auto * impl  = static_cast<TCPEndPointImplLwIP *>(ep);
         impl->mState = TCPEndPoint::State::kConnected;
         impl->mTCP   = nullptr;
     }
@@ -66,18 +66,18 @@ public:
     // straightforward kReady->kClosed transition. mTCP is still nullptr, so
     // DoCloseImpl() is a no-op either way; this just makes teardown intent
     // explicit.
-    static void ResetToReadyForTeardown(const TCPEndPointHandle & ep)
+    static void ResetToReadyForTeardown(TCPEndPoint * ep)
     {
-        auto * impl  = static_cast<TCPEndPointImplLwIP *>(ep.operator->());
+        auto * impl  = static_cast<TCPEndPointImplLwIP *>(ep);
         impl->mState = TCPEndPoint::State::kReady;
     }
 
     // DriveSendingImpl() is private on TCPEndPointImplLwIP; expose it through
     // the friend so the test can invoke it directly without the surrounding
     // DriveSending() wrapper that would otherwise call DoClose() on error.
-    static CHIP_ERROR CallDriveSendingImpl(const TCPEndPointHandle & ep)
+    static CHIP_ERROR CallDriveSendingImpl(TCPEndPoint * ep)
     {
-        auto * impl = static_cast<TCPEndPointImplLwIP *>(ep.operator->());
+        auto * impl = static_cast<TCPEndPointImplLwIP *>(ep);
         return impl->DriveSendingImpl();
     }
 };
@@ -138,9 +138,9 @@ TEST_F(TestTCPEndPointLwIP, AbortedAccessReturnsConnectionAborted)
 {
     DeviceLayer::StackLock lock;
 
-    TCPEndPointHandle ep;
-    ASSERT_EQ(DeviceLayer::TCPEndPointManager()->NewEndPoint(ep), CHIP_NO_ERROR);
-    ASSERT_FALSE(ep.IsNull());
+    TCPEndPoint * ep = nullptr;
+    ASSERT_EQ(DeviceLayer::TCPEndPointManager()->NewEndPoint(&ep), CHIP_NO_ERROR);
+    ASSERT_NE(ep, nullptr);
 
     TCPTest::SimulatePCBClearedWhileConnected(ep);
     ASSERT_TRUE(ep->IsConnected());
@@ -167,7 +167,7 @@ TEST_F(TestTCPEndPointLwIP, AbortedAccessReturnsConnectionAborted)
     EXPECT_EQ(TCPTest::CallDriveSendingImpl(ep), CHIP_ERROR_CONNECTION_ABORTED);
 
     TCPTest::ResetToReadyForTeardown(ep);
-    ep.Release();
+    ep->Free();
 }
 
 } // namespace
