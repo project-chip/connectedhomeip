@@ -27,6 +27,7 @@
 
 #include <atomic>
 #include <bitset>
+#include <functional>
 #include <type_traits>
 
 namespace chip::app::Clusters::PowerSource::detail {
@@ -364,11 +365,47 @@ struct AllModulesExceptEndpointList
 {
 };
 
-struct BatteryTimerContext : public TimerContext
+using NotifyCallback = std::function<void(AttributeId)>;
+template <class T, AttributeId Id>
+class BatteryTimerContext : public TimerContext
 {
-    std::atomic_bool timerExpired{ true };
+public:
+    constexpr static inline uint16_t kTimerDurationS = 10;
+    BatteryTimerContext(TimerDelegate & timerDelegate, NotifyCallback notifier) : mTimerDelegate(timerDelegate), mNotifier(std::move(notifier)) {}
+    CriticalFailure SetValue(T value)
+    {
+        mToBeReported = value;
 
-    void TimerFired() override { timerExpired = true; }
+        // If same value as last reported, just return.
+        VerifyOrReturnValue(mToBeReported != mReported, CHIP_NO_ERROR);
+
+        // If currently there is a timer running, last report was less than kTimerDurationS seconds ago, so just return.
+        VerifyOrReturnValue(mTimerDelegate.IsTimerActive(this) == false, CHIP_NO_ERROR);
+
+        // Else, report the change and start the timer
+        NotifyChange();
+        return mTimerDelegate.StartTimer(this, System::Clock::Seconds16(kTimerDurationS));
+    }
+    void TimerFired() override
+    {
+        // If at the end of the timer a different value to report has not been set, just return.
+        VerifyOrReturn(mToBeReported != mReported);
+
+        // Else, report the change and restart the timer.
+        NotifyChange();
+        mTimerDelegate.CancelTimer(this);
+        LogErrorOnFailure(mTimerDelegate.StartTimer(this, System::Clock::Seconds16(kTimerDurationS)));
+    }
+private:
+    T mReported{};
+    T mToBeReported{};
+    TimerDelegate & mTimerDelegate;
+    NotifyCallback mNotifier;
+    void NotifyChange()
+    {
+        mReported = mToBeReported;
+        mNotifier(Id);
+    }
 };
 
 template <bool used>
@@ -378,9 +415,15 @@ struct BatteryTimerContextsModule
 template <>
 struct BatteryTimerContextsModule<true>
 {
-    BatteryTimerContext batPercentRemainingNotifyTimerContext{};
-    BatteryTimerContext batTimeRemainingNotifyTimerContext{};
-    BatteryTimerContext batTimeToFullChargeNotifyTimerContext{};
+    BatteryTimerContext<uint8_t, PowerSource::Attributes::BatPercentRemaining::Id> batPercentRemainingNotifyTimerContext;
+    BatteryTimerContext<uint32_t, PowerSource::Attributes::BatTimeRemaining::Id> batTimeRemainingNotifyTimerContext;
+    BatteryTimerContext<uint32_t, PowerSource::Attributes::BatTimeToFullCharge::Id> batTimeToFullChargeNotifyTimerContext;
+
+    BatteryTimerContextsModule(TimerDelegate & timerDelegate, NotifyCallback notifier) :
+        batPercentRemainingNotifyTimerContext(timerDelegate, std::move(notifier)),
+        batTimeRemainingNotifyTimerContext(timerDelegate, std::move(notifier)),
+        batTimeToFullChargeNotifyTimerContext(timerDelegate, std::move(notifier))
+    {}
 };
 
 } // namespace chip::app::Clusters::PowerSource::detail

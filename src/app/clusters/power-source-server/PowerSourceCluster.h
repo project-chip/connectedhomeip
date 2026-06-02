@@ -209,6 +209,13 @@ struct PowerSourceClusterConfig
         this->mTimerDelegate    = &timerDelegate;
     }
 
+    TimerDelegate & GetTimerDelegate()
+    {
+        static_assert(supportedFeatures.Has(PowerSource::Feature::kBattery),
+                      "TimerDelegate is only relevant for a Battery power source configuration");
+        return *this->mTimerDelegate;
+    }
+
     PowerSourceClusterConfig & MakeReplaceable(CharSpan replDesc, uint8_t quan)
     {
         static_assert(supportedFeatures.Has(PowerSource::Feature::kReplaceable),
@@ -234,10 +241,10 @@ struct PowerSourceClusterConfig
 
 template <std::underlying_type_t<PowerSource::Feature> supportedFeatureBits, uint32_t supportedOptionalAttributeBits>
 class PowerSourceCluster : protected PowerSourceClusterConfig<supportedFeatureBits, supportedOptionalAttributeBits>,
-                           protected PowerSource::detail::BatteryTimerContextsModule<
-                               BitFlags<PowerSource::Feature>(supportedFeatureBits).Has(PowerSource::Feature::kBattery)>,
                            protected PowerSource::detail::EndpointListModule,
-                           public DefaultServerCluster
+                           public DefaultServerCluster,
+                           protected PowerSource::detail::BatteryTimerContextsModule<
+                               BitFlags<PowerSource::Feature>(supportedFeatureBits).Has(PowerSource::Feature::kBattery)>
 {
 public:
     using ConfigType = PowerSourceClusterConfig<supportedFeatureBits, supportedOptionalAttributeBits>;
@@ -259,8 +266,14 @@ public:
     static_assert(supportedFeatures.Has(PowerSource::Feature::kWired) ^ supportedFeatures.Has(PowerSource::Feature::kBattery),
                   "Exactly one of Wired or Battery features must be set");
 
+    template <bool batteryFeatureNotSupported = !supportedFeatures.Has(PowerSource::Feature::kBattery), std::enable_if_t<batteryFeatureNotSupported, int> = 0>
     PowerSourceCluster(const ConfigType & config) :
         ConfigType(config), DefaultServerCluster({ config.mEndpointId, PowerSource::Id })
+    {}
+
+    template <bool batteryFeatureSupported = supportedFeatures.Has(PowerSource::Feature::kBattery), std::enable_if_t<batteryFeatureSupported, size_t> = 0>
+    PowerSourceCluster(const ConfigType & config) :
+        ConfigType(config), DefaultServerCluster({ config.mEndpointId, PowerSource::Id }), PowerSource::detail::BatteryTimerContextsModule<batteryFeatureSupported>(ConfigType::GetTimerDelegate(), [this](AttributeId id) { NotifyAttributeChanged(id); })
     {}
 
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
@@ -907,17 +920,7 @@ public:
                 return CHIP_NO_ERROR;
             }
 
-            if (this->batPercentRemainingNotifyTimerContext.timerExpired)
-            {
-                // there should be no normal way to get to this point without setting the timer delegate
-                VerifyOrDie(this->mTimerDelegate != nullptr);
-                SetAttributeValue(this->batPercentRemaining, val, PowerSource::Attributes::BatPercentRemaining::Id);
-                ReturnErrorOnFailure(
-                    this->mTimerDelegate->StartTimer(&this->batPercentRemainingNotifyTimerContext, kNotifyTimerDuration));
-                this->batPercentRemainingNotifyTimerContext.timerExpired = false;
-                return CHIP_NO_ERROR;
-            }
-
+            LogErrorOnFailure(this->batPercentRemainingNotifyTimerContext.SetValue(val.Value()));
             this->batPercentRemaining = val;
             return CHIP_NO_ERROR;
         }
@@ -937,17 +940,7 @@ public:
                 return CHIP_NO_ERROR;
             }
 
-            if (this->batTimeRemainingNotifyTimerContext.timerExpired)
-            {
-                // there should be no normal way to get to this point without setting the timer delegate
-                VerifyOrDie(this->mTimerDelegate != nullptr);
-                SetAttributeValue(this->batTimeRemaining, val, PowerSource::Attributes::BatTimeRemaining::Id);
-                ReturnErrorOnFailure(
-                    this->mTimerDelegate->StartTimer(&this->batTimeRemainingNotifyTimerContext, kNotifyTimerDuration));
-                this->batTimeRemainingNotifyTimerContext.timerExpired = false;
-                return CHIP_NO_ERROR;
-            }
-
+            LogErrorOnFailure(this->batTimeRemainingNotifyTimerContext.SetValue(val.Value()));
             this->batTimeRemaining = val;
             return CHIP_NO_ERROR;
         }
@@ -1053,17 +1046,7 @@ public:
                 return CHIP_NO_ERROR;
             }
 
-            if (this->batTimeToFullChargeNotifyTimerContext.timerExpired)
-            {
-                // there should be no normal way to get to this point without setting the timer delegate
-                VerifyOrDie(this->mTimerDelegate != nullptr);
-                SetAttributeValue(this->batTimeToFullCharge, val, PowerSource::Attributes::BatTimeToFullCharge::Id);
-                ReturnErrorOnFailure(
-                    this->mTimerDelegate->StartTimer(&this->batTimeToFullChargeNotifyTimerContext, kNotifyTimerDuration));
-                this->batTimeToFullChargeNotifyTimerContext.timerExpired = false;
-                return CHIP_NO_ERROR;
-            }
-
+            LogErrorOnFailure(this->batTimeToFullChargeNotifyTimerContext.SetValue(val.Value()));
             this->batTimeToFullCharge = val;
             return CHIP_NO_ERROR;
         }
