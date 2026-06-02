@@ -104,6 +104,26 @@ CHIP_ERROR GenericThreadDriver::CommitConfiguration()
     // the backup, so that it cannot be restored. If no backup could be found, it means that the
     // configuration has not been modified since the fail-safe was armed, so return with no error.
 
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+    // When Thread is a secondary transport, commissioning may complete without ConnectNetwork
+    // (which is the usual persistence path via AttachToThreadNetwork). Persist the staged dataset
+    // to OT NVS here so that a later fallback can attach to it. Does not enable the Thread interface.
+    ChipLogProgress(NetworkProvisioning, "Thread CommitConfiguration: staged=%d attached=%d",
+                    mStagingNetwork.IsCommissioned(), ThreadStackMgrImpl().IsThreadAttached());
+    if (mStagingNetwork.IsCommissioned() && !ThreadStackMgrImpl().IsThreadAttached())
+    {
+        CHIP_ERROR persistErr = ThreadStackMgrImpl().SetThreadProvision(mStagingNetwork.AsByteSpan());
+        if (persistErr != CHIP_NO_ERROR)
+        {
+            ChipLogError(NetworkProvisioning, "Failed to persist Thread dataset: %" CHIP_ERROR_FORMAT, persistErr.Format());
+        }
+        else
+        {
+            ChipLogProgress(NetworkProvisioning, "Thread dataset persisted to OT NVS");
+        }
+    }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
+
     CHIP_ERROR error = KeyValueStoreMgr().Delete(DefaultStorageKeyAllocator::FailSafeNetworkConfig().KeyName());
 
     return error == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND ? CHIP_NO_ERROR : error;
