@@ -62,6 +62,9 @@ class TC_JFADMIN_1_1(MatterBaseTest):
         self.fabric_a_ctrl = None
         self.fabric_a_admin = None
         self.storage_fabric_a = self.user_params.get("fabric_a_storage", None)
+        self.fabric_a_persistent_storage = None
+        self.cert_authority_manager_a = None
+        self.dev_ctrl_eco_a = None
 
         self.jfc_server_app = self.user_params.get("jfc_server_app", None)
         if not self.jfc_server_app:
@@ -87,6 +90,16 @@ class TC_JFADMIN_1_1(MatterBaseTest):
             self.fabric_a_admin.terminate()
         if self.fabric_a_ctrl is not None:
             self.fabric_a_ctrl.terminate()
+
+        if self.dev_ctrl_eco_a is not None:
+            self.dev_ctrl_eco_a.Shutdown()
+            self.dev_ctrl_eco_a = None
+        if self.cert_authority_manager_a is not None:
+            self.cert_authority_manager_a.Shutdown()
+            self.cert_authority_manager_a = None
+        if self.fabric_a_persistent_storage is not None:
+            self.fabric_a_persistent_storage.Shutdown()
+            self.fabric_a_persistent_storage = None
 
         super().teardown_class()
 
@@ -182,29 +195,29 @@ class TC_JFADMIN_1_1(MatterBaseTest):
         self.ecoACATs = base64.b64decode(jfcStorage.get("Default", "CommissionerCATs"))[::-1].hex().strip('0')
 
         # Creating a Controller for Ecosystem A
-        _fabric_a_persistent_storage = VolatileTemporaryPersistentStorage(
+        self.fabric_a_persistent_storage = VolatileTemporaryPersistentStorage(
             self.ecoACtrlStorage['repl-config'], self.ecoACtrlStorage['sdk-config'])
-        _certAuthorityManagerA = CertificateAuthority.CertificateAuthorityManager(
+        self.cert_authority_manager_a = CertificateAuthority.CertificateAuthorityManager(
             chipStack=self.matter_stack._chip_stack,
-            persistentStorage=_fabric_a_persistent_storage)
-        _certAuthorityManagerA.LoadAuthoritiesFromStorage()
-        devCtrlEcoA = _certAuthorityManagerA.activeCaList[0].adminList[0].NewController(
+            persistentStorage=self.fabric_a_persistent_storage)
+        self.cert_authority_manager_a.LoadAuthoritiesFromStorage()
+        self.dev_ctrl_eco_a = self.cert_authority_manager_a.activeCaList[0].adminList[0].NewController(
             nodeId=101,
             paaTrustStorePath=str(self.matter_test_config.paa_trust_store_path),
             catTags=[int(self.ecoACATs, 16)])
 
         if self.pics_guard(self.check_pics("JFADMIN.S.A0000")):
             self.step("2")
-            response = await devCtrlEcoA.ReadAttribute(
+            response = await self.dev_ctrl_eco_a.ReadAttribute(
                 nodeId=1, attributes=[(1, Clusters.JointFabricAdministrator.Attributes.AdministratorFabricIndex)],
                 returnClusterObject=True)
             attributeAdminFabricIndex = response[1][Clusters.JointFabricAdministrator].administratorFabricIndex
             asserts.assert_true(attributeAdminFabricIndex in range(1, 255),
-                                f"AdministratorFabricIndex={attributeAdminFabricIndex} not in expected range [1..254]")
+                                 f"AdministratorFabricIndex={attributeAdminFabricIndex} not in expected range [1..254]")
 
             # Step 3 is under same PICS guard as Step 2 becasue it relies on attributeAdminFabricIndex
             self.step("3")
-            response = await devCtrlEcoA.ReadAttribute(
+            response = await self.dev_ctrl_eco_a.ReadAttribute(
                 nodeId=1, attributes=[(0, Clusters.OperationalCredentials.Attributes.Fabrics)],
                 returnClusterObject=True)
             fabricid_found = False
@@ -216,9 +229,6 @@ class TC_JFADMIN_1_1(MatterBaseTest):
                     break
             asserts.assert_true(fabricid_found,
                                 "No FabricDescriptorStruct with fabricIndex = AdministratorFabricIndex found in Operational Cluster Fabrics attribute on EP0")
-
-        # Shutdown the Python Controllers started at the beginning of this script
-        devCtrlEcoA.Shutdown()
 
 
 if __name__ == "__main__":

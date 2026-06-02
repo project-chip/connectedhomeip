@@ -117,12 +117,16 @@ class TC_JFADMIN_2_1(MatterBaseTest):
 
         if self.dev_ctrl_eco_a is not None:
             self.dev_ctrl_eco_a.Shutdown()
+            self.dev_ctrl_eco_a = None
         if self.dev_ctrl_eco_b is not None:
             self.dev_ctrl_eco_b.Shutdown()
+            self.dev_ctrl_eco_b = None
         if self.joint_fabric_ca_manager is not None:
             self.joint_fabric_ca_manager.Shutdown()
+            self.joint_fabric_ca_manager = None
         if self.joint_fabric_persistent_storage is not None:
             self.joint_fabric_persistent_storage.Shutdown()
+            self.joint_fabric_persistent_storage = None
 
         super().teardown_class()
 
