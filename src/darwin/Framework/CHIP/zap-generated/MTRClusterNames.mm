@@ -249,6 +249,15 @@ NSString * MTRClusterNameForID(MTRClusterIDType clusterID)
     case MTRClusterIDTypeElectricalGridConditionsID:
         result = @"ElectricalGridConditions";
         break;
+    case MTRClusterIDTypeElectricalAlarmID:
+        result = @"ElectricalAlarm";
+        break;
+    case MTRClusterIDTypeElectricalDistributionID:
+        result = @"ElectricalDistribution";
+        break;
+    case MTRClusterIDTypeElectricalProtectionAlarmID:
+        result = @"ElectricalProtectionAlarm";
+        break;
     case MTRClusterIDTypeDoorLockID:
         result = @"DoorLock";
         break;
@@ -4860,6 +4869,218 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         default:
             // Not a known ElectricalGridConditions attribute.
+            result = [NSString stringWithFormat:@"<Unknown attributeID %u>", attributeID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeElectricalAlarmID:
+
+        switch (attributeID) {
+
+            // Cluster ElectricalAlarm attributes
+        case MTRAttributeIDTypeClusterElectricalAlarmAttributeMaskID:
+            result = @"Mask";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalAlarmAttributeLatchID:
+            result = @"Latch";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalAlarmAttributeStateID:
+            result = @"State";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalAlarmAttributeSupportedID:
+            result = @"Supported";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalAlarmAttributeOverVoltageThresholdID:
+            result = @"OverVoltageThreshold";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalAlarmAttributeUnderVoltageThresholdID:
+            result = @"UnderVoltageThreshold";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalAlarmAttributeOverFrequencyThresholdID:
+            result = @"OverFrequencyThreshold";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalAlarmAttributeUnderFrequencyThresholdID:
+            result = @"UnderFrequencyThreshold";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalAlarmAttributeOverPowerThresholdID:
+            result = @"OverPowerThreshold";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalAlarmAttributeUnderPowerThresholdID:
+            result = @"UnderPowerThreshold";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalAlarmAttributeOverCurrentThresholdID:
+            result = @"OverCurrentThreshold";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalAlarmAttributeUnderCurrentThresholdID:
+            result = @"UnderCurrentThreshold";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalAlarmAttributePowerImportThresholdID:
+            result = @"PowerImportThreshold";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalAlarmAttributePowerExportThresholdID:
+            result = @"PowerExportThreshold";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalAlarmAttributeGeneratedCommandListID:
+            result = @"GeneratedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalAlarmAttributeAcceptedCommandListID:
+            result = @"AcceptedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalAlarmAttributeAttributeListID:
+            result = @"AttributeList";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalAlarmAttributeFeatureMapID:
+            result = @"FeatureMap";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalAlarmAttributeClusterRevisionID:
+            result = @"ClusterRevision";
+            break;
+
+        default:
+            // Not a known ElectricalAlarm attribute.
+            result = [NSString stringWithFormat:@"<Unknown attributeID %u>", attributeID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeElectricalDistributionID:
+
+        switch (attributeID) {
+
+            // Cluster ElectricalDistribution attributes
+        case MTRAttributeIDTypeClusterElectricalDistributionAttributeMaxContinuousCurrentID:
+            result = @"MaxContinuousCurrent";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalDistributionAttributeMaxVoltageID:
+            result = @"MaxVoltage";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalDistributionAttributeNumberOfPolesID:
+            result = @"NumberOfPoles";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalDistributionAttributeEndOfLifeID:
+            result = @"EndOfLife";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalDistributionAttributeServiceEntranceRatedID:
+            result = @"ServiceEntranceRated";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalDistributionAttributeGeneratedCommandListID:
+            result = @"GeneratedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalDistributionAttributeAcceptedCommandListID:
+            result = @"AcceptedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalDistributionAttributeAttributeListID:
+            result = @"AttributeList";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalDistributionAttributeFeatureMapID:
+            result = @"FeatureMap";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalDistributionAttributeClusterRevisionID:
+            result = @"ClusterRevision";
+            break;
+
+        default:
+            // Not a known ElectricalDistribution attribute.
+            result = [NSString stringWithFormat:@"<Unknown attributeID %u>", attributeID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeElectricalProtectionAlarmID:
+
+        switch (attributeID) {
+
+            // Cluster ElectricalProtectionAlarm attributes
+        case MTRAttributeIDTypeClusterElectricalProtectionAlarmAttributeMaskID:
+            result = @"Mask";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalProtectionAlarmAttributeStateID:
+            result = @"State";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalProtectionAlarmAttributeSupportedID:
+            result = @"Supported";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalProtectionAlarmAttributeArcCauseID:
+            result = @"ArcCause";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalProtectionAlarmAttributeOverLoadRatingID:
+            result = @"OverLoadRating";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalProtectionAlarmAttributeOverVoltageRatingID:
+            result = @"OverVoltageRating";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalProtectionAlarmAttributeSurgeProtectionRatingID:
+            result = @"SurgeProtectionRating";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalProtectionAlarmAttributeShortCircuitRatingID:
+            result = @"ShortCircuitRating";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalProtectionAlarmAttributeResidualCurrentRatingID:
+            result = @"ResidualCurrentRating";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalProtectionAlarmAttributeArcFaultRatingID:
+            result = @"ArcFaultRating";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalProtectionAlarmAttributeGeneratedCommandListID:
+            result = @"GeneratedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalProtectionAlarmAttributeAcceptedCommandListID:
+            result = @"AcceptedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalProtectionAlarmAttributeAttributeListID:
+            result = @"AttributeList";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalProtectionAlarmAttributeFeatureMapID:
+            result = @"FeatureMap";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalProtectionAlarmAttributeClusterRevisionID:
+            result = @"ClusterRevision";
+            break;
+
+        default:
+            // Not a known ElectricalProtectionAlarm attribute.
             result = [NSString stringWithFormat:@"<Unknown attributeID %u>", attributeID];
             break;
         }
@@ -11329,6 +11550,52 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
         }
         break;
 
+    case MTRClusterIDTypeElectricalAlarmID:
+
+        switch (commandID) {
+
+        case MTRCommandIDTypeClusterElectricalAlarmCommandResetID:
+            result = @"Reset";
+            break;
+
+        case MTRCommandIDTypeClusterElectricalAlarmCommandModifyEnabledAlarmsID:
+            result = @"ModifyEnabledAlarms";
+            break;
+
+        case MTRCommandIDTypeClusterElectricalAlarmCommandSetElectricalAlarmThresholdsID:
+            result = @"SetElectricalAlarmThresholds";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeElectricalDistributionID:
+
+        switch (commandID) {
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeElectricalProtectionAlarmID:
+
+        switch (commandID) {
+
+        case MTRCommandIDTypeClusterElectricalProtectionAlarmCommandModifyEnabledAlarmsID:
+            result = @"ModifyEnabledAlarms";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
     case MTRClusterIDTypeDoorLockID:
 
         switch (commandID) {
@@ -13961,6 +14228,36 @@ NSString * MTRResponseCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDT
         }
         break;
 
+    case MTRClusterIDTypeElectricalAlarmID:
+
+        switch (commandID) {
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeElectricalDistributionID:
+
+        switch (commandID) {
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeElectricalProtectionAlarmID:
+
+        switch (commandID) {
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
     case MTRClusterIDTypeDoorLockID:
 
         switch (commandID) {
@@ -16053,6 +16350,46 @@ NSString * MTREventNameForID(MTRClusterIDType clusterID, MTREventIDType eventID)
             // Cluster ElectricalGridConditions events
         case MTREventIDTypeClusterElectricalGridConditionsEventCurrentConditionsChangedID:
             result = @"CurrentConditionsChanged";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown eventID %u>", eventID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeElectricalAlarmID:
+
+        switch (eventID) {
+
+            // Cluster ElectricalAlarm events
+        case MTREventIDTypeClusterElectricalAlarmEventNotifyID:
+            result = @"Notify";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown eventID %u>", eventID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeElectricalDistributionID:
+
+        switch (eventID) {
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown eventID %u>", eventID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeElectricalProtectionAlarmID:
+
+        switch (eventID) {
+
+            // Cluster ElectricalProtectionAlarm events
+        case MTREventIDTypeClusterElectricalProtectionAlarmEventNotifyID:
+            result = @"Notify";
             break;
 
         default:

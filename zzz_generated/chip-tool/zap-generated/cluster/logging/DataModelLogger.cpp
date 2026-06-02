@@ -4074,6 +4074,370 @@ CHIP_ERROR DataModelLogger::LogValue(
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR DataModelLogger::LogValue(
+    const char * label, size_t indent,
+    const chip::app::Clusters::ElectricalProtectionAlarm::Structs::ArcFaultRatingsStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("SeriesArcCurrentSensitivity", indent + 1, value.seriesArcCurrentSensitivity);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'SeriesArcCurrentSensitivity'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("ParallelArcCurrentSensitivity", indent + 1, value.parallelArcCurrentSensitivity);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ParallelArcCurrentSensitivity'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("SupportedArcCauses", indent + 1, value.supportedArcCauses);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'SupportedArcCauses'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DataModelLogger::LogValue(
+    const char * label, size_t indent,
+    const chip::app::Clusters::ElectricalProtectionAlarm::Structs::OverLoadRatingsStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("TripCurrent", indent + 1, value.tripCurrent);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'TripCurrent'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("TripCurve", indent + 1, value.tripCurve);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'TripCurve'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("TripMechanism", indent + 1, value.tripMechanism);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'TripMechanism'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("UltimateMaxCurrent", indent + 1, value.ultimateMaxCurrent);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'UltimateMaxCurrent'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("ServiceMaxCurrent", indent + 1, value.serviceMaxCurrent);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ServiceMaxCurrent'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DataModelLogger::LogValue(
+    const char * label, size_t indent,
+    const chip::app::Clusters::ElectricalProtectionAlarm::Structs::OverVoltageRatingsStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("TripMechanism", indent + 1, value.tripMechanism);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'TripMechanism'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("TripVoltage", indent + 1, value.tripVoltage);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'TripVoltage'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("MaxContinuousOperatingVoltage", indent + 1, value.maxContinuousOperatingVoltage);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'MaxContinuousOperatingVoltage'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("ResponseTime", indent + 1, value.responseTime);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ResponseTime'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DataModelLogger::LogValue(
+    const char * label, size_t indent,
+    const chip::app::Clusters::ElectricalProtectionAlarm::Structs::ResidualCurrentFaultRatingsStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("CurrentSensitivity", indent + 1, value.currentSensitivity);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'CurrentSensitivity'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("TripMechanism", indent + 1, value.tripMechanism);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'TripMechanism'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("VoltageDependent", indent + 1, value.voltageDependent);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'VoltageDependent'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("GroundFaultClass", indent + 1, value.groundFaultClass);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'GroundFaultClass'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("Waveform", indent + 1, value.waveform);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Waveform'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("TrippingCharacteristic", indent + 1, value.trippingCharacteristic);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'TrippingCharacteristic'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("UltimateMaxCurrent", indent + 1, value.ultimateMaxCurrent);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'UltimateMaxCurrent'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("ServiceMaxCurrent", indent + 1, value.serviceMaxCurrent);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ServiceMaxCurrent'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DataModelLogger::LogValue(
+    const char * label, size_t indent,
+    const chip::app::Clusters::ElectricalProtectionAlarm::Structs::ShortCircuitRatingsStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("TripCurrent", indent + 1, value.tripCurrent);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'TripCurrent'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("TripMechanism", indent + 1, value.tripMechanism);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'TripMechanism'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("TripCurve", indent + 1, value.tripCurve);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'TripCurve'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("UltimateMaxCurrent", indent + 1, value.ultimateMaxCurrent);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'UltimateMaxCurrent'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("ServiceMaxCurrent", indent + 1, value.serviceMaxCurrent);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ServiceMaxCurrent'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("MaxCurrent", indent + 1, value.maxCurrent);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'MaxCurrent'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DataModelLogger::LogValue(
+    const char * label, size_t indent,
+    const chip::app::Clusters::ElectricalProtectionAlarm::Structs::SurgeProtectionRatingsStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("TripMechanism", indent + 1, value.tripMechanism);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'TripMechanism'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("ProtectionClass", indent + 1, value.protectionClass);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ProtectionClass'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("ProtectionType", indent + 1, value.protectionType);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ProtectionType'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("MaxContinuousOperatingVoltage", indent + 1, value.maxContinuousOperatingVoltage);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'MaxContinuousOperatingVoltage'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("MaxVoltageProtection", indent + 1, value.maxVoltageProtection);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'MaxVoltageProtection'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("MaxTemporaryVoltage", indent + 1, value.maxTemporaryVoltage);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'MaxTemporaryVoltage'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("NominalDischargeCurrent", indent + 1, value.nominalDischargeCurrent);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'NominalDischargeCurrent'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("MaximumDishargeCurrent", indent + 1, value.maximumDishargeCurrent);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'MaximumDishargeCurrent'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("RatedShortCircuitCurrent", indent + 1, value.ratedShortCircuitCurrent);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'RatedShortCircuitCurrent'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("RatedShortTimeWithstandCurrent", indent + 1, value.ratedShortTimeWithstandCurrent);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'RatedShortTimeWithstandCurrent'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("EnergyAbsorptionCapability", indent + 1, value.energyAbsorptionCapability);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'EnergyAbsorptionCapability'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("ResponseTime", indent + 1, value.responseTime);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ResponseTime'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const chip::app::Clusters::DoorLock::Structs::CredentialStruct::DecodableType & value)
 {
@@ -11486,6 +11850,86 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const ElectricalAlarm::Events::Notify::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("Active", indent + 1, value.active);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'Active'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("Inactive", indent + 1, value.inactive);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'Inactive'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("State", indent + 1, value.state);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'State'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("Mask", indent + 1, value.mask);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'Mask'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const ElectricalProtectionAlarm::Events::Notify::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("Active", indent + 1, value.active);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'Active'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("Inactive", indent + 1, value.inactive);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'Inactive'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("State", indent + 1, value.state);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'State'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("Mask", indent + 1, value.mask);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'Mask'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const DoorLock::Events::DoorLockAlarm::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
@@ -18788,6 +19232,256 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("FeatureMap", 1, value);
         }
         case ElectricalGridConditions::Attributes::ClusterRevision::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ClusterRevision", 1, value);
+        }
+        }
+        break;
+    }
+    case ElectricalAlarm::Id: {
+        switch (path.mAttributeId)
+        {
+        case ElectricalAlarm::Attributes::Mask::Id: {
+            chip::BitMask<chip::app::Clusters::ElectricalAlarm::AlarmBitmap> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("Mask", 1, value);
+        }
+        case ElectricalAlarm::Attributes::Latch::Id: {
+            chip::BitMask<chip::app::Clusters::ElectricalAlarm::AlarmBitmap> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("Latch", 1, value);
+        }
+        case ElectricalAlarm::Attributes::State::Id: {
+            chip::BitMask<chip::app::Clusters::ElectricalAlarm::AlarmBitmap> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("State", 1, value);
+        }
+        case ElectricalAlarm::Attributes::Supported::Id: {
+            chip::BitMask<chip::app::Clusters::ElectricalAlarm::AlarmBitmap> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("Supported", 1, value);
+        }
+        case ElectricalAlarm::Attributes::OverVoltageThreshold::Id: {
+            int64_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("OverVoltageThreshold", 1, value);
+        }
+        case ElectricalAlarm::Attributes::UnderVoltageThreshold::Id: {
+            int64_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("UnderVoltageThreshold", 1, value);
+        }
+        case ElectricalAlarm::Attributes::OverFrequencyThreshold::Id: {
+            int64_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("OverFrequencyThreshold", 1, value);
+        }
+        case ElectricalAlarm::Attributes::UnderFrequencyThreshold::Id: {
+            int64_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("UnderFrequencyThreshold", 1, value);
+        }
+        case ElectricalAlarm::Attributes::OverPowerThreshold::Id: {
+            int64_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("OverPowerThreshold", 1, value);
+        }
+        case ElectricalAlarm::Attributes::UnderPowerThreshold::Id: {
+            int64_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("UnderPowerThreshold", 1, value);
+        }
+        case ElectricalAlarm::Attributes::OverCurrentThreshold::Id: {
+            int64_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("OverCurrentThreshold", 1, value);
+        }
+        case ElectricalAlarm::Attributes::UnderCurrentThreshold::Id: {
+            int64_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("UnderCurrentThreshold", 1, value);
+        }
+        case ElectricalAlarm::Attributes::PowerImportThreshold::Id: {
+            int64_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("PowerImportThreshold", 1, value);
+        }
+        case ElectricalAlarm::Attributes::PowerExportThreshold::Id: {
+            int64_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("PowerExportThreshold", 1, value);
+        }
+        case ElectricalAlarm::Attributes::GeneratedCommandList::Id: {
+            chip::app::DataModel::DecodableList<chip::CommandId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, ElectricalAlarm::Id);
+        }
+        case ElectricalAlarm::Attributes::AcceptedCommandList::Id: {
+            chip::app::DataModel::DecodableList<chip::CommandId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, ElectricalAlarm::Id);
+        }
+        case ElectricalAlarm::Attributes::AttributeList::Id: {
+            chip::app::DataModel::DecodableList<chip::AttributeId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, ElectricalAlarm::Id);
+        }
+        case ElectricalAlarm::Attributes::FeatureMap::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("FeatureMap", 1, value);
+        }
+        case ElectricalAlarm::Attributes::ClusterRevision::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ClusterRevision", 1, value);
+        }
+        }
+        break;
+    }
+    case ElectricalDistribution::Id: {
+        switch (path.mAttributeId)
+        {
+        case ElectricalDistribution::Attributes::MaxContinuousCurrent::Id: {
+            chip::app::DataModel::Nullable<int64_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("MaxContinuousCurrent", 1, value);
+        }
+        case ElectricalDistribution::Attributes::MaxVoltage::Id: {
+            chip::app::DataModel::Nullable<int64_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("MaxVoltage", 1, value);
+        }
+        case ElectricalDistribution::Attributes::NumberOfPoles::Id: {
+            chip::app::DataModel::Nullable<uint16_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("NumberOfPoles", 1, value);
+        }
+        case ElectricalDistribution::Attributes::EndOfLife::Id: {
+            chip::app::DataModel::Nullable<chip::app::Clusters::ElectricalDistribution::EndOfLifeEnum> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("EndOfLife", 1, value);
+        }
+        case ElectricalDistribution::Attributes::ServiceEntranceRated::Id: {
+            chip::app::DataModel::Nullable<bool> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ServiceEntranceRated", 1, value);
+        }
+        case ElectricalDistribution::Attributes::GeneratedCommandList::Id: {
+            chip::app::DataModel::DecodableList<chip::CommandId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, ElectricalDistribution::Id);
+        }
+        case ElectricalDistribution::Attributes::AcceptedCommandList::Id: {
+            chip::app::DataModel::DecodableList<chip::CommandId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, ElectricalDistribution::Id);
+        }
+        case ElectricalDistribution::Attributes::AttributeList::Id: {
+            chip::app::DataModel::DecodableList<chip::AttributeId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, ElectricalDistribution::Id);
+        }
+        case ElectricalDistribution::Attributes::FeatureMap::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("FeatureMap", 1, value);
+        }
+        case ElectricalDistribution::Attributes::ClusterRevision::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ClusterRevision", 1, value);
+        }
+        }
+        break;
+    }
+    case ElectricalProtectionAlarm::Id: {
+        switch (path.mAttributeId)
+        {
+        case ElectricalProtectionAlarm::Attributes::Mask::Id: {
+            chip::BitMask<chip::app::Clusters::ElectricalProtectionAlarm::AlarmBitmap> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("Mask", 1, value);
+        }
+        case ElectricalProtectionAlarm::Attributes::State::Id: {
+            chip::BitMask<chip::app::Clusters::ElectricalProtectionAlarm::AlarmBitmap> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("State", 1, value);
+        }
+        case ElectricalProtectionAlarm::Attributes::Supported::Id: {
+            chip::BitMask<chip::app::Clusters::ElectricalProtectionAlarm::AlarmBitmap> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("Supported", 1, value);
+        }
+        case ElectricalProtectionAlarm::Attributes::ArcCause::Id: {
+            chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::ElectricalProtectionAlarm::ArcCauseBitmap>> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ArcCause", 1, value);
+        }
+        case ElectricalProtectionAlarm::Attributes::OverLoadRating::Id: {
+            chip::app::DataModel::Nullable<
+                chip::app::Clusters::ElectricalProtectionAlarm::Structs::OverLoadRatingsStruct::DecodableType>
+                value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("OverLoadRating", 1, value);
+        }
+        case ElectricalProtectionAlarm::Attributes::OverVoltageRating::Id: {
+            chip::app::DataModel::Nullable<
+                chip::app::Clusters::ElectricalProtectionAlarm::Structs::OverVoltageRatingsStruct::DecodableType>
+                value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("OverVoltageRating", 1, value);
+        }
+        case ElectricalProtectionAlarm::Attributes::SurgeProtectionRating::Id: {
+            chip::app::DataModel::Nullable<
+                chip::app::Clusters::ElectricalProtectionAlarm::Structs::SurgeProtectionRatingsStruct::DecodableType>
+                value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("SurgeProtectionRating", 1, value);
+        }
+        case ElectricalProtectionAlarm::Attributes::ShortCircuitRating::Id: {
+            chip::app::DataModel::Nullable<
+                chip::app::Clusters::ElectricalProtectionAlarm::Structs::ShortCircuitRatingsStruct::DecodableType>
+                value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ShortCircuitRating", 1, value);
+        }
+        case ElectricalProtectionAlarm::Attributes::ResidualCurrentRating::Id: {
+            chip::app::DataModel::Nullable<
+                chip::app::Clusters::ElectricalProtectionAlarm::Structs::ResidualCurrentFaultRatingsStruct::DecodableType>
+                value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ResidualCurrentRating", 1, value);
+        }
+        case ElectricalProtectionAlarm::Attributes::ArcFaultRating::Id: {
+            chip::app::DataModel::Nullable<
+                chip::app::Clusters::ElectricalProtectionAlarm::Structs::ArcFaultRatingsStruct::DecodableType>
+                value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ArcFaultRating", 1, value);
+        }
+        case ElectricalProtectionAlarm::Attributes::GeneratedCommandList::Id: {
+            chip::app::DataModel::DecodableList<chip::CommandId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, ElectricalProtectionAlarm::Id);
+        }
+        case ElectricalProtectionAlarm::Attributes::AcceptedCommandList::Id: {
+            chip::app::DataModel::DecodableList<chip::CommandId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, ElectricalProtectionAlarm::Id);
+        }
+        case ElectricalProtectionAlarm::Attributes::AttributeList::Id: {
+            chip::app::DataModel::DecodableList<chip::AttributeId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, ElectricalProtectionAlarm::Id);
+        }
+        case ElectricalProtectionAlarm::Attributes::FeatureMap::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("FeatureMap", 1, value);
+        }
+        case ElectricalProtectionAlarm::Attributes::ClusterRevision::Id: {
             uint16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ClusterRevision", 1, value);
@@ -26290,6 +26984,28 @@ CHIP_ERROR DataModelLogger::LogEvent(const chip::app::EventHeader & header, chip
             chip::app::Clusters::ElectricalGridConditions::Events::CurrentConditionsChanged::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("CurrentConditionsChanged", 1, value);
+        }
+        }
+        break;
+    }
+    case ElectricalAlarm::Id: {
+        switch (header.mPath.mEventId)
+        {
+        case ElectricalAlarm::Events::Notify::Id: {
+            chip::app::Clusters::ElectricalAlarm::Events::Notify::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("Notify", 1, value);
+        }
+        }
+        break;
+    }
+    case ElectricalProtectionAlarm::Id: {
+        switch (header.mPath.mEventId)
+        {
+        case ElectricalProtectionAlarm::Events::Notify::Id: {
+            chip::app::Clusters::ElectricalProtectionAlarm::Events::Notify::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("Notify", 1, value);
         }
         }
         break;

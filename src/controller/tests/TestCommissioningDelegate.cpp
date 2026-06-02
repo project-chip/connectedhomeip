@@ -1,6 +1,7 @@
 #include <pw_unit_test/framework.h>
 
 #include <controller/CommissioningDelegate.h>
+#include <controller/DevicePairingDelegate.h>
 #include <cstring>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/Span.h>
@@ -362,6 +363,10 @@ TEST_F(CommissioningDelegateTest, CompletionStatus_DefaultAndRoundTrip)
     EXPECT_FALSE(def.attestationResult.HasValue());
     EXPECT_FALSE(def.commissioningError.HasValue());
     EXPECT_FALSE(def.networkCommissioningStatus.HasValue());
+    EXPECT_FALSE(def.connectNetworkErrorValue.HasValue());
+    EXPECT_FALSE(def.operationalCertStatus.HasValue());
+    EXPECT_TRUE(def.commissioningDebugText.empty());
+    EXPECT_TRUE(def.networkCommissioningDebugText.empty());
 
     // Populate and set
     CompletionStatus cs;
@@ -371,6 +376,10 @@ TEST_F(CommissioningDelegateTest, CompletionStatus_DefaultAndRoundTrip)
     cs.commissioningError = MakeOptional(app::Clusters::GeneralCommissioning::CommissioningErrorEnum::kValueOutsideRange);
     cs.networkCommissioningStatus =
         MakeOptional(app::Clusters::NetworkCommissioning::NetworkCommissioningStatusEnum::kBoundsExceeded);
+    cs.connectNetworkErrorValue = MakeOptional<int32_t>(-42);
+    cs.operationalCertStatus    = MakeOptional(app::Clusters::OperationalCredentials::NodeOperationalCertStatusEnum::kInvalidNOC);
+    cs.commissioningDebugText   = "commissioning-error-text";
+    cs.networkCommissioningDebugText = "network-commissioning-error-text";
 
     p.SetCompletionStatus(cs);
     const CompletionStatus & got = p.GetCompletionStatus();
@@ -385,6 +394,138 @@ TEST_F(CommissioningDelegateTest, CompletionStatus_DefaultAndRoundTrip)
     ASSERT_TRUE(got.networkCommissioningStatus.HasValue());
     EXPECT_EQ(got.networkCommissioningStatus.Value(),
               app::Clusters::NetworkCommissioning::NetworkCommissioningStatusEnum::kBoundsExceeded);
+    ASSERT_TRUE(got.connectNetworkErrorValue.HasValue());
+    EXPECT_EQ(got.connectNetworkErrorValue.Value(), -42);
+    ASSERT_TRUE(got.operationalCertStatus.HasValue());
+    EXPECT_EQ(got.operationalCertStatus.Value(), app::Clusters::OperationalCredentials::NodeOperationalCertStatusEnum::kInvalidNOC);
+    EXPECT_EQ(got.commissioningDebugText, "commissioning-error-text");
+    EXPECT_EQ(got.networkCommissioningDebugText, "network-commissioning-error-text");
+}
+
+TEST_F(CommissioningDelegateTest, CommissioningErrorInfo_CharSpanCtorHandlesEmptyAndNull)
+{
+    using app::Clusters::GeneralCommissioning::CommissioningErrorEnum;
+
+    // 1-arg ctor leaves debugText empty.
+    CommissioningErrorInfo info1(CommissioningErrorEnum::kValueOutsideRange);
+    EXPECT_EQ(info1.commissioningError, CommissioningErrorEnum::kValueOutsideRange);
+    EXPECT_TRUE(info1.debugText.empty());
+
+    // 2-arg ctor with a populated CharSpan copies the bytes.
+    const char kText[] = "device-supplied";
+    CommissioningErrorInfo info2(CommissioningErrorEnum::kBusyWithOtherAdmin, CharSpan(kText, sizeof(kText) - 1));
+    EXPECT_EQ(info2.debugText, kText);
+
+    // 2-arg ctor with an empty (default) CharSpan whose data() is nullptr must yield empty
+    // debugText without invoking std::string(nullptr, 0) UB.
+    CommissioningErrorInfo info3(CommissioningErrorEnum::kRequiredTCNotAccepted, CharSpan{});
+    EXPECT_TRUE(info3.debugText.empty());
+}
+
+TEST_F(CommissioningDelegateTest, NetworkCommissioningStatusInfo_CharSpanCtorHandlesEmptyAndNull)
+{
+    using app::Clusters::NetworkCommissioning::NetworkCommissioningStatusEnum;
+
+    NetworkCommissioningStatusInfo info1(NetworkCommissioningStatusEnum::kBoundsExceeded);
+    EXPECT_EQ(info1.networkCommissioningStatus, NetworkCommissioningStatusEnum::kBoundsExceeded);
+    EXPECT_TRUE(info1.debugText.empty());
+    EXPECT_FALSE(info1.connectNetworkErrorValue.HasValue());
+
+    const char kText[] = "wifi-status-text";
+    NetworkCommissioningStatusInfo info2(NetworkCommissioningStatusEnum::kAuthFailure, CharSpan(kText, sizeof(kText) - 1));
+    EXPECT_EQ(info2.debugText, kText);
+    EXPECT_FALSE(info2.connectNetworkErrorValue.HasValue());
+
+    // 3-arg ctor with a populated CharSpan + errorValue.
+    NetworkCommissioningStatusInfo info3(NetworkCommissioningStatusEnum::kRegulatoryError, CharSpan(kText, sizeof(kText) - 1),
+                                         MakeOptional<int32_t>(7));
+    EXPECT_EQ(info3.debugText, kText);
+    ASSERT_TRUE(info3.connectNetworkErrorValue.HasValue());
+    EXPECT_EQ(info3.connectNetworkErrorValue.Value(), 7);
+
+    // 2-arg and 3-arg ctors must accept a default CharSpan (data()==nullptr) without UB.
+    NetworkCommissioningStatusInfo info4(NetworkCommissioningStatusEnum::kIPV6Failed, CharSpan{});
+    EXPECT_TRUE(info4.debugText.empty());
+
+    NetworkCommissioningStatusInfo info5(NetworkCommissioningStatusEnum::kIPBindFailed, CharSpan{}, MakeOptional<int32_t>(-1));
+    EXPECT_TRUE(info5.debugText.empty());
+    ASSERT_TRUE(info5.connectNetworkErrorValue.HasValue());
+    EXPECT_EQ(info5.connectNetworkErrorValue.Value(), -1);
+}
+
+TEST_F(CommissioningDelegateTest, OperationalCertErrorInfo_RoundTrip)
+{
+    using app::Clusters::OperationalCredentials::NodeOperationalCertStatusEnum;
+
+    OperationalCertErrorInfo info(NodeOperationalCertStatusEnum::kFabricConflict);
+    EXPECT_EQ(info.operationalCertStatus, NodeOperationalCertStatusEnum::kFabricConflict);
+}
+
+// Capture the args the legacy 4-arg OnCommissioningFailure receives, so we can prove the new
+// 2-arg overload's default implementation forwards into it for delegates that haven't been
+// updated yet.
+struct LegacyForwardingPairingDelegate : public DevicePairingDelegate
+{
+    // Bring the structured 2-arg overload into scope so we can invoke it on a derived-type
+    // reference. Without this `using`, our override of the 4-arg form below hides the base's
+    // 2-arg overload via C++ name hiding, and the test calls below would fail to compile.
+    // Production callers don't hit this because they invoke through `DevicePairingDelegate *`.
+    using DevicePairingDelegate::OnCommissioningFailure;
+
+    int callCount = 0;
+    PeerId capturedPeerId;
+    CHIP_ERROR capturedError         = CHIP_NO_ERROR;
+    CommissioningStage capturedStage = CommissioningStage::kError;
+    Optional<Credentials::AttestationVerificationResult> capturedAttestation;
+
+    void OnCommissioningFailure(PeerId peerId, CHIP_ERROR error, CommissioningStage stageFailed,
+                                Optional<Credentials::AttestationVerificationResult> additionalErrorInfo) override
+    {
+        ++callCount;
+        capturedPeerId      = peerId;
+        capturedError       = error;
+        capturedStage       = stageFailed;
+        capturedAttestation = additionalErrorInfo;
+    }
+};
+
+TEST_F(CommissioningDelegateTest, DevicePairingDelegate_StructuredOverloadForwardsToLegacy)
+{
+    LegacyForwardingPairingDelegate delegate;
+    const PeerId kPeerId(/*compressedFabricId=*/0x1122334455667788ULL, /*nodeId=*/0xCAFEBABEULL);
+
+    CompletionStatus status;
+    status.err                = CHIP_ERROR_INTERNAL;
+    status.failedStage        = MakeOptional(CommissioningStage::kAttestationVerification);
+    status.attestationResult  = MakeOptional(Credentials::AttestationVerificationResult::kPaiAuthorityNotFound);
+    status.commissioningError = MakeOptional(app::Clusters::GeneralCommissioning::CommissioningErrorEnum::kValueOutsideRange);
+
+    delegate.OnCommissioningFailure(kPeerId, status);
+
+    EXPECT_EQ(delegate.callCount, 1);
+    EXPECT_EQ(delegate.capturedPeerId.GetCompressedFabricId(), kPeerId.GetCompressedFabricId());
+    EXPECT_EQ(delegate.capturedPeerId.GetNodeId(), kPeerId.GetNodeId());
+    EXPECT_EQ(delegate.capturedError, CHIP_ERROR_INTERNAL);
+    EXPECT_EQ(delegate.capturedStage, CommissioningStage::kAttestationVerification);
+    ASSERT_TRUE(delegate.capturedAttestation.HasValue());
+    EXPECT_EQ(delegate.capturedAttestation.Value(), Credentials::AttestationVerificationResult::kPaiAuthorityNotFound);
+}
+
+TEST_F(CommissioningDelegateTest, DevicePairingDelegate_StructuredOverloadDefaultsForEmptyCompletionStatus)
+{
+    // Empty CompletionStatus: no failedStage / no attestationResult. Default forwarder should
+    // substitute kError for failedStage and pass through the NullOptional attestation.
+    LegacyForwardingPairingDelegate delegate;
+    const PeerId kPeerId{};
+    CompletionStatus status;
+    status.err = CHIP_ERROR_TIMEOUT;
+
+    delegate.OnCommissioningFailure(kPeerId, status);
+
+    EXPECT_EQ(delegate.callCount, 1);
+    EXPECT_EQ(delegate.capturedError, CHIP_ERROR_TIMEOUT);
+    EXPECT_EQ(delegate.capturedStage, CommissioningStage::kError);
+    EXPECT_FALSE(delegate.capturedAttestation.HasValue());
 }
 
 } // namespace

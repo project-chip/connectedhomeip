@@ -187,6 +187,14 @@
 #include <clusters/EcosystemInformation/Commands.ipp>
 #include <clusters/EcosystemInformation/Events.ipp>
 #include <clusters/EcosystemInformation/Structs.ipp>
+#include <clusters/ElectricalAlarm/Attributes.ipp>
+#include <clusters/ElectricalAlarm/Commands.ipp>
+#include <clusters/ElectricalAlarm/Events.ipp>
+#include <clusters/ElectricalAlarm/Structs.ipp>
+#include <clusters/ElectricalDistribution/Attributes.ipp>
+#include <clusters/ElectricalDistribution/Commands.ipp>
+#include <clusters/ElectricalDistribution/Events.ipp>
+#include <clusters/ElectricalDistribution/Structs.ipp>
 #include <clusters/ElectricalEnergyMeasurement/Attributes.ipp>
 #include <clusters/ElectricalEnergyMeasurement/Commands.ipp>
 #include <clusters/ElectricalEnergyMeasurement/Events.ipp>
@@ -199,6 +207,10 @@
 #include <clusters/ElectricalPowerMeasurement/Commands.ipp>
 #include <clusters/ElectricalPowerMeasurement/Events.ipp>
 #include <clusters/ElectricalPowerMeasurement/Structs.ipp>
+#include <clusters/ElectricalProtectionAlarm/Attributes.ipp>
+#include <clusters/ElectricalProtectionAlarm/Commands.ipp>
+#include <clusters/ElectricalProtectionAlarm/Events.ipp>
+#include <clusters/ElectricalProtectionAlarm/Structs.ipp>
 #include <clusters/EnergyEvse/Attributes.ipp>
 #include <clusters/EnergyEvse/Commands.ipp>
 #include <clusters/EnergyEvse/Events.ipp>
@@ -1189,6 +1201,20 @@ bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
         }
     }
     case Clusters::DeviceEnergyManagementMode::Id: {
+        switch (aCommand)
+        {
+        default:
+            return false;
+        }
+    }
+    case Clusters::ElectricalAlarm::Id: {
+        switch (aCommand)
+        {
+        default:
+            return false;
+        }
+    }
+    case Clusters::ElectricalProtectionAlarm::Id: {
         switch (aCommand)
         {
         default:

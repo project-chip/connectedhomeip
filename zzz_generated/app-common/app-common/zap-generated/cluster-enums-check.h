@@ -63,9 +63,12 @@
 #include <clusters/DoorLock/EnumsCheck.h>
 #include <clusters/DynamicLighting/EnumsCheck.h>
 #include <clusters/EcosystemInformation/EnumsCheck.h>
+#include <clusters/ElectricalAlarm/EnumsCheck.h>
+#include <clusters/ElectricalDistribution/EnumsCheck.h>
 #include <clusters/ElectricalEnergyMeasurement/EnumsCheck.h>
 #include <clusters/ElectricalGridConditions/EnumsCheck.h>
 #include <clusters/ElectricalPowerMeasurement/EnumsCheck.h>
+#include <clusters/ElectricalProtectionAlarm/EnumsCheck.h>
 #include <clusters/EnergyEvse/EnumsCheck.h>
 #include <clusters/EnergyEvseMode/EnumsCheck.h>
 #include <clusters/EnergyPreference/EnumsCheck.h>
