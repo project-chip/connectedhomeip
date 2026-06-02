@@ -19,10 +19,7 @@
 
 #include <app/clusters/thread-network-diagnostics-server/ThreadNetworkDiagnosticsProvider.h>
 
-namespace chip {
-namespace app {
-namespace Clusters {
-namespace ThreadNetworkDiagnostics {
+namespace chip::app::Clusters::ThreadNetworkDiagnostics {
 
 class DefaultThreadNetworkDiagnosticsProvider : public ThreadNetworkDiagnosticsProvider
 {
@@ -31,7 +28,4 @@ public:
     void ResetCounts() override;
 };
 
-} // namespace ThreadNetworkDiagnostics
-} // namespace Clusters
-} // namespace app
-} // namespace chip
+} // namespace chip::app::Clusters::ThreadNetworkDiagnostics

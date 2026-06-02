@@ -20,10 +20,7 @@
 #include <app/AttributeValueEncoder.h>
 #include <lib/core/CHIPError.h>
 
-namespace chip {
-namespace app {
-namespace Clusters {
-namespace ThreadNetworkDiagnostics {
+namespace chip::app::Clusters::ThreadNetworkDiagnostics {
 
 class ThreadNetworkDiagnosticsProvider
 {
@@ -34,7 +31,4 @@ public:
     virtual void ResetCounts()                                                                            = 0;
 };
 
-} // namespace ThreadNetworkDiagnostics
-} // namespace Clusters
-} // namespace app
-} // namespace chip
+} // namespace chip::app::Clusters::ThreadNetworkDiagnostics
