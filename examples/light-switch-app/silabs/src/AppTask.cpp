@@ -84,7 +84,7 @@ using namespace chip::TLV;
 
 namespace {
 
-CustomerAppTask & appInstance()
+CustomerAppTask & AppInstance()
 {
     return CustomerAppTask::GetAppTask();
 }
@@ -110,7 +110,7 @@ void PostLevelControlActionEvent(void * /* context */)
     {
         sActionButtonSuppressed = true;
         event.Type              = AppEvent::kEventType_TriggerLevelControlAction;
-        appInstance().PostEvent(&event);
+        AppInstance().PostEvent(&event);
     }
 }
 
@@ -131,7 +131,7 @@ CHIP_ERROR AppTask::AppInit()
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::DeviceLayer::Silabs::GetPlatform().SetButtonsCb(&CustomerAppTask::ButtonEventHandler);
 
-    err = appInstance().InitLightSwitch(kLightSwitchEndpoint, kGenericSwitchEndpoint);
+    err = AppInstance().InitLightSwitch(kLightSwitchEndpoint, kGenericSwitchEndpoint);
     if (err != CHIP_NO_ERROR)
     {
         SILABS_LOG("InitLightSwitch failed!");
@@ -158,7 +158,7 @@ void AppTask::AppTaskMain(void * pvParameter)
     AppEvent event;
     osMessageQueueId_t sAppEventQueue = *(static_cast<osMessageQueueId_t *>(pvParameter));
 
-    CHIP_ERROR err = appInstance().Init();
+    CHIP_ERROR err = AppInstance().Init();
     if (err != CHIP_NO_ERROR)
     {
         SILABS_LOG("AppTask.Init() failed");
@@ -166,7 +166,7 @@ void AppTask::AppTaskMain(void * pvParameter)
     }
 
 #if !(defined(CHIP_CONFIG_ENABLE_ICD_SERVER) && CHIP_CONFIG_ENABLE_ICD_SERVER)
-    appInstance().StartStatusLEDTimer();
+    AppInstance().StartStatusLEDTimer();
 #endif
 
     SILABS_LOG("App Task started");
@@ -175,7 +175,7 @@ void AppTask::AppTaskMain(void * pvParameter)
         osStatus_t eventReceived = osMessageQueueGet(sAppEventQueue, &event, NULL, osWaitForever);
         while (eventReceived == osOK)
         {
-            appInstance().DispatchEvent(&event);
+            AppInstance().DispatchEvent(&event);
             eventReceived = osMessageQueueGet(sAppEventQueue, &event, NULL, 0);
         }
     }
@@ -193,7 +193,7 @@ void AppTask::ButtonEventHandler(uint8_t button, uint8_t btnAction)
     {
         event.Type = (button ? AppEvent::kEventType_ActionButtonReleased : AppEvent::kEventType_FunctionButtonReleased);
     }
-    appInstance().PostEvent(&event);
+    AppInstance().PostEvent(&event);
 }
 
 void AppTask::AppEventHandler(AppEvent * aEvent)
@@ -217,7 +217,7 @@ void AppTask::AppEventHandler(AppEvent * aEvent)
             button_event.Type               = AppEvent::kEventType_Button;
             button_event.ButtonEvent.Action = static_cast<uint8_t>(SilabsPlatform::ButtonAction::ButtonPressed);
             button_event.Handler            = BaseApplication::ButtonHandler;
-            appInstance().PostEvent(&button_event);
+            AppInstance().PostEvent(&button_event);
         }
         break;
 
@@ -231,7 +231,7 @@ void AppTask::AppEventHandler(AppEvent * aEvent)
             button_event.Type               = AppEvent::kEventType_Button;
             button_event.ButtonEvent.Action = static_cast<uint8_t>(SilabsPlatform::ButtonAction::ButtonReleased);
             button_event.Handler            = BaseApplication::ButtonHandler;
-            appInstance().PostEvent(&button_event);
+            AppInstance().PostEvent(&button_event);
         }
         break;
 
