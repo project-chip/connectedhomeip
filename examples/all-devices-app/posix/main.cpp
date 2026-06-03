@@ -376,7 +376,8 @@ CHIP_ERROR Initialize(int argc, char * argv[])
     ChipLogProgress(AppServer, "Initializing...");
     ReturnErrorOnFailure(Platform::MemoryInit());
 
-    static OptionSet * sAppOptionSets[] = { AppOptions::GetOptions(), nullptr };
+    static HelpOptions sHelpOptions(argv[0], "Usage: all-devices-app [options]", "1.0");
+    static OptionSet * sAppOptionSets[] = { AppOptions::GetOptions(), &sHelpOptions, nullptr };
     if (!ArgParser::ParseArgs(argv[0], argc, argv, sAppOptionSets))
     {
         return CHIP_ERROR_INVALID_ARGUMENT;

@@ -489,6 +489,16 @@ constexpr DataModel::DeviceTypeEntry kElectricalMeter = {
     .deviceTypeRevision = kElectricalMeterDeviceTypeRevision,
 };
 
+constexpr DataModel::DeviceTypeEntry kElectricalCircuitBreaker = {
+    .deviceTypeId       = kElectricalCircuitBreakerDeviceTypeId,
+    .deviceTypeRevision = kElectricalCircuitBreakerDeviceTypeRevision,
+};
+
+constexpr DataModel::DeviceTypeEntry kElectricalDistributionEnclosure = {
+    .deviceTypeId       = kElectricalDistributionEnclosureDeviceTypeId,
+    .deviceTypeRevision = kElectricalDistributionEnclosureDeviceTypeRevision,
+};
+
 constexpr DataModel::DeviceTypeEntry kControlBridge = {
     .deviceTypeId       = kControlBridgeDeviceTypeId,
     .deviceTypeRevision = kControlBridgeDeviceTypeRevision,

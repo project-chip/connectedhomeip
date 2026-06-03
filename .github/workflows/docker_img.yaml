@@ -59,6 +59,11 @@ jobs:
                   cd integrations/docker/images/base/chip-build${{ matrix.img }}
                   ./build.sh --latest
 
+            - name: Notify Slack on Failure
+              if: failure()
+              uses: ./.github/actions/notify-slack-failure
+              with:
+                slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}
     # NOTE: docker images builds are disabled for all beyond base image because
     #       underlying image builds fail either due to size restrictions (we only
     #       have a few GB in github: 14GB for everything) or dependencies which
@@ -91,6 +96,11 @@ jobs:
               run: |
                   cd integrations/docker/images/stage-1/chip-build${{ matrix.img }}
                   ./build.sh --latest
+            - name: Notify Slack on Failure
+              if: failure()
+              uses: ./.github/actions/notify-slack-failure
+              with:
+                slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}
     build_images_stage_2:
         needs: [build_images_base, build_images_stage_1]
         name: Build Docker CHIP Build images - stage 2
@@ -133,6 +143,11 @@ jobs:
                   cd integrations/docker/images/stage-2/chip-build${{ matrix.img }}
                   ./build.sh --latest
 
+            - name: Notify Slack on Failure
+              if: failure()
+              uses: ./.github/actions/notify-slack-failure
+              with:
+                slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}
     build_images_stage_3:
         needs: [build_images_base, build_images_stage_1, build_images_stage_2]
         name: Build Docker CHIP Build images - stage 3
@@ -158,6 +173,11 @@ jobs:
               run: |
                   cd integrations/docker/images/stage-3/chip-build${{ matrix.img }}
                   ./build.sh --latest
+            - name: Notify Slack on Failure
+              if: failure()
+              uses: ./.github/actions/notify-slack-failure
+              with:
+                slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}
     build_images_vscode:
         needs: [build_images_base, build_images_stage_1, build_images_stage_2, build_images_stage_3]
         name: Build Docker CHIP Build images - vscode
@@ -181,3 +201,8 @@ jobs:
               run: |
                   cd integrations/docker/images/vscode-3/chip-build${{ matrix.img }}
                   ./build.sh --latest
+            - name: Notify Slack on Failure
+              if: failure()
+              uses: ./.github/actions/notify-slack-failure
+              with:
+                slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}

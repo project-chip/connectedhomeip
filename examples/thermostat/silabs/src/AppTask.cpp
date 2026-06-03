@@ -62,7 +62,7 @@ namespace ThermAttr = chip::app::Clusters::Thermostat::Attributes;
 
 namespace {
 
-CustomerAppTask & appInstance()
+CustomerAppTask & AppInstance()
 {
     return CustomerAppTask::GetAppTask();
 }
@@ -102,7 +102,7 @@ CHIP_ERROR AppTask::AppInit()
     GetLCD().SetCustomUI(ThermostatUI::DrawUI);
 #endif
 
-    err = appInstance().InitThermostat();
+    err = AppInstance().InitThermostat();
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(AppServer, "InitThermostat() failed: %" CHIP_ERROR_FORMAT, err.Format());
@@ -121,7 +121,7 @@ CHIP_ERROR AppTask::InitThermostat()
         return APP_ERROR_CREATE_TIMER_FAILED;
     }
 
-    CHIP_ERROR err = appInstance().InitSensor();
+    CHIP_ERROR err = AppInstance().InitSensor();
     VerifyOrReturnError(err == CHIP_NO_ERROR, err,
                         ChipLogError(AppServer, "InitSensor() failed: %" CHIP_ERROR_FORMAT, err.Format()));
 
@@ -222,7 +222,7 @@ void AppTask::ButtonEventHandler(uint8_t button, uint8_t btnAction)
     if (button == APP_FUNCTION_BUTTON)
     {
         aEvent.Handler = BaseApplication::ButtonHandler;
-        appInstance().PostEvent(&aEvent);
+        AppInstance().PostEvent(&aEvent);
     }
 }
 
@@ -231,7 +231,7 @@ void AppTask::SensorTimerEventHandler(void * /* arg */)
     AppEvent event;
     event.Type    = AppEvent::kEventType_Timer;
     event.Handler = &CustomerAppTask::TemperatureUpdateEventHandler;
-    appInstance().PostEvent(&event);
+    AppInstance().PostEvent(&event);
 }
 
 void AppTask::TemperatureUpdateEventHandler(AppEvent * /* aEvent */)
@@ -241,7 +241,7 @@ void AppTask::TemperatureUpdateEventHandler(AppEvent * /* aEvent */)
     static int16_t sLastTemperature = 0;
 
     int16_t temperature = 0;
-    CHIP_ERROR err      = appInstance().GetTemperature(temperature);
+    CHIP_ERROR err      = AppInstance().GetTemperature(temperature);
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         ChipLogError(AppServer, "GetTemperature() failed: %" CHIP_ERROR_FORMAT ", skipping LocalTemperature::Set", err.Format()));

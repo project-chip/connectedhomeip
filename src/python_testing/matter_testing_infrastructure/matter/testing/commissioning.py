@@ -23,8 +23,8 @@ import asyncio
 import contextlib
 import logging
 from dataclasses import dataclass
-from enum import Enum
-from typing import Any, List, Optional
+from enum import StrEnum
+from typing import Any, Optional
 
 from mobly import asserts
 
@@ -245,8 +245,8 @@ async def commission_device(
 
 async def commission_devices(
     dev_ctrl: ChipDeviceCtrl.ChipDeviceController,
-    dut_node_ids: List[int],
-    setup_payloads: List[SetupPayloadInfo],
+    dut_node_ids: list[int],
+    setup_payloads: list[SetupPayloadInfo],
     commissioning_info: CommissioningInfo,
 ) -> bool:
     """
@@ -271,7 +271,7 @@ async def commission_devices(
     return all(commissioned)
 
 
-def get_setup_payload_info_config(matter_test_config: Any) -> List[SetupPayloadInfo]:
+def get_setup_payload_info_config(matter_test_config: Any) -> list[SetupPayloadInfo]:
     """
     Get and builds the payload info provided in the execution.
 
@@ -281,7 +281,7 @@ def get_setup_payload_info_config(matter_test_config: Any) -> List[SetupPayloadI
     Returns:
          List[SetupPayloadInfo]: List of Payload used by the test case
     """
-    infos: List[SetupPayloadInfo] = []
+    infos: list[SetupPayloadInfo] = []
 
     manual_code_equivalents = []
 
@@ -387,7 +387,7 @@ class SetupParameters:
 DNSSD_DISCOVERY_TIMEOUT_SEC = 3
 
 
-class EstablishedSessionKind(str, Enum):
+class EstablishedSessionKind(StrEnum):
     """Session type that succeeded when establishing PASE and CASE in parallel."""
 
     PASE = "pase"

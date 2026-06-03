@@ -14,7 +14,7 @@
 
 import os
 from dataclasses import dataclass
-from typing import List, Mapping, Optional
+from typing import Mapping, Optional
 
 from matter.idl.generators import CodeGenerator
 from matter.idl.generators.cluster_selection import server_side_clusters
@@ -69,7 +69,7 @@ class ServerClusterConfig:
 
 @dataclass
 class ClusterConfiguration:
-    endpoint_configs: List[ServerClusterConfig]
+    endpoint_configs: list[ServerClusterConfig]
     feature_bitmap_type: Optional[Bitmap]
 
 

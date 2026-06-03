@@ -255,27 +255,16 @@ class CoreBluetoothManager(ChipBleBase):
                 if not self.scan_quiet:
                     LOGGER.info("adding to scan list:")
                     LOGGER.info("")
-                    LOGGER.info(
-                        "{0:<16}= {1:<80}".format(
-                            "Name", str(peripheral._.name))
-                    )
-                    LOGGER.info(
-                        "{0:<16}= {1:<80}".format(
-                            "ID", str(peripheral._.identifier.UUIDString())
-                        )
-                    )
-                    LOGGER.info("{0:<16}= {1:<80}".format("RSSI", rssi))
+                    LOGGER.info("{:<16}= {:<80}".format("Name", str(peripheral._.name)))
+                    LOGGER.info("{:<16}= {:<80}".format("ID", str(peripheral._.identifier.UUIDString())))
+                    LOGGER.info("{:<16}= {:<80}".format("RSSI", rssi))
                     devIdInfo = BlePeripheral(
                         peripheral, data).getPeripheralDevIdInfo()
                     if devIdInfo:
-                        LOGGER.info("{0:<16}= {1}".format(
-                            "Pairing State", devIdInfo.pairingState))
-                        LOGGER.info("{0:<16}= {1}".format(
-                            "Discriminator", devIdInfo.discriminator))
-                        LOGGER.info("{0:<16}= {1}".format(
-                            "Vendor Id", devIdInfo.vendorId))
-                        LOGGER.info("{0:<16}= {1}".format(
-                            "Product Id", devIdInfo.productId))
+                        LOGGER.info("{:<16}= {}".format("Pairing State", devIdInfo.pairingState))
+                        LOGGER.info("{:<16}= {}".format("Discriminator", devIdInfo.discriminator))
+                        LOGGER.info("{:<16}= {}".format("Vendor Id", devIdInfo.vendorId))
+                        LOGGER.info("{:<16}= {}".format("Product Id", devIdInfo.productId))
                     LOGGER.info("ADV data: " + repr(data))
                     LOGGER.info("")
 

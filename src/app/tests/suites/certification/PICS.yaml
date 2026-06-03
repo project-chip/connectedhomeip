@@ -355,6 +355,9 @@ PICS:
     - label: "Does the device implement the ICD Management cluster as a server?"
       id: ICDM.S
 
+    - label: "Does the device implement the ICD Behavior cluster as a server?"
+      id: ICDB.S
+
     - label: "Is the device a Server"
       id: MCORE.IDM.S
 
@@ -8948,6 +8951,9 @@ PICS:
 
     - label: "Does the device support this specific cluster feature?"
       id: ICDM.S.F02
+
+    - label: "Does the device support this specific cluster feature?"
+      id: ICDM.S.F03
 
     #
     #Commands:

@@ -430,7 +430,7 @@ class TestConfig:
         shutil.rmtree(self.cd_path)
 
 
-def run_test(test_class: MatterBaseTest, tests: typing.List[str], test_config: TestConfig) -> list[str]:
+def run_test(test_class: MatterBaseTest, tests: list[str], test_config: TestConfig) -> list[str]:
     hooks = Hooks()
     stack = test_config.get_stack()
     controller = test_config.get_controller()
