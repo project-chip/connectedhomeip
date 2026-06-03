@@ -35,6 +35,11 @@
 #include <system/SystemError.h>
 #include <system/SystemLayer.h>
 
+#include <crypto/CryptoBuildConfig.h>
+#if CHIP_CRYPTO_PSA
+#include <psa/crypto.h>
+#endif
+
 #include <assert.h>
 #include <errno.h>
 #include <fcntl.h>
@@ -60,6 +65,11 @@ CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_InitChipStack()
 {
     // Call up to the base class _InitChipStack() to perform the bulk of the initialization.
     ReturnErrorOnFailure(GenericPlatformManagerImpl<ImplClass>::_InitChipStack());
+
+#if CHIP_CRYPTO_PSA
+    // Initialize the PSA crypto backend.
+    VerifyOrReturnError(psa_crypto_init() == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
+#endif
 
 #if !CHIP_SYSTEM_CONFIG_USE_LIBEV
 

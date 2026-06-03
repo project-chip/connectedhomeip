@@ -46,6 +46,21 @@ using CHIP_CONFIG_PERSISTED_STORAGE_KEY_TYPE = const char *;
 #define CHIP_CONFIG_SLOW_CRYPTO 0
 #endif // CHIP_CONFIG_SLOW_CRYPTO
 
+#if CHIP_HAVE_CONFIG_H
+#include <crypto/CryptoBuildConfig.h>
+#endif
+
+#if CHIP_CRYPTO_PSA
+// The PSA crypto backend stores a psa_hash_operation_t in the opaque SHA-256
+// stream context (Crypto::HashSHA256OpaqueContext), which is larger than the raw
+// mbedTLS sha256 context the generic default in CHIPConfig.h is sized for.
+// Derive the size from the actual type, as the nrfconnect/silabs configs do.
+#include <psa/crypto.h>
+#ifndef CHIP_CONFIG_SHA256_CONTEXT_SIZE
+#define CHIP_CONFIG_SHA256_CONTEXT_SIZE sizeof(psa_hash_operation_t)
+#endif // CHIP_CONFIG_SHA256_CONTEXT_SIZE
+#endif // CHIP_CRYPTO_PSA
+
 // ==================== General Configuration Overrides ====================
 
 #ifndef CHIP_CONFIG_MAX_UNSOLICITED_MESSAGE_HANDLERS
