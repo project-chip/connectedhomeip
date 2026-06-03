@@ -113,7 +113,24 @@ jobs:
               with:
                 platform: linux unit_tests
                 bootstrap-log-name: bootstrap-logs-unittest-psa
+            - name: Detect changed paths
+              uses: dorny/paths-filter@fbd0ab8f3e69293af611ebaee6363fc25e6d187d # v4
+              id: changed_paths
+              with:
+                  filters: |
+                      credentials:
+                        - 'src/credentials/**'
+                      crypto:
+                        - 'src/crypto/**'
+                      pigweed:
+                        - 'src/pw_backends/**'
+                        - 'third_party/pigweed/**'
             - name: Build and run PSA unit tests (ASan)
+              if: >
+                github.event_name == 'push' ||
+                steps.changed_paths.outputs.credentials == 'true' ||
+                steps.changed_paths.outputs.crypto == 'true' ||
+                steps.changed_paths.outputs.pigweed == 'true' 
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py --target linux-x64-tests-psa-asan-clang build"
