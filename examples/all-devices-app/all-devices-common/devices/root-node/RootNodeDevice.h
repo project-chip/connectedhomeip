@@ -83,7 +83,7 @@ protected:
     LazyRegisteredServerCluster<Clusters::GeneralCommissioningCluster> mGeneralCommissioningCluster;
 
 private:
-    LazyRegisteredServerCluster<Clusters::BasicInformationCluster> mBasicInformationCluster;
+    LazyRegisteredServerCluster<Clusters::BasicInformationClusterWithDeviceLocation> mBasicInformationCluster;
     LazyRegisteredServerCluster<Clusters::AdministratorCommissioningWithBasicCommissioningWindowCluster>
         mAdministratorCommissioningCluster;
     LazyRegisteredServerCluster<Clusters::GeneralDiagnosticsCluster> mGeneralDiagnosticsCluster;
