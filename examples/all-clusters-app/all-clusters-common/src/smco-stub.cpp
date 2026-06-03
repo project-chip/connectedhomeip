@@ -51,12 +51,13 @@ public:
         TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(kSelfTestingTimeoutSec),
                                                                        EndSelfTestingEventHandler, nullptr);
     }
-} sSmokeCODelegate;
+};
 
 } // namespace
 
 void MatterSmokeCoAlarmPluginServerInitCallback()
 {
+    static AllClustersSmokeCODelegate sSmokeCODelegate;
     SmokeCoAlarmCluster::Config config;
     config.featureMap.Set(Feature::kSmokeAlarm).Set(Feature::kCoAlarm);
     config.optionalAttribs = SmokeCoAlarmCluster::OptionalAttributeSet(SmokeCoAlarmCluster::OptionalAttributeSet::All());
