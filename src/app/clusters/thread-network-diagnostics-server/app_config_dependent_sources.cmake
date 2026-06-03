@@ -25,9 +25,7 @@ TARGET_SOURCES(
   PRIVATE
     "${CLUSTER_DIR}/ThreadNetworkDiagnosticsCluster.cpp"
     "${CLUSTER_DIR}/ThreadNetworkDiagnosticsCluster.h"
-    "${CLUSTER_DIR}/NullThreadDiagnosticsProvider.cpp"
-    "${CLUSTER_DIR}/NullThreadDiagnosticsProvider.h"
-    "${CLUSTER_DIR}/OpenThreadDiagnosticsProvider.cpp"
-    "${CLUSTER_DIR}/OpenThreadDiagnosticsProvider.h"
+    "${CLUSTER_DIR}/DefaultThreadNetworkDiagnosticsProvider.cpp"
+    "${CLUSTER_DIR}/DefaultThreadNetworkDiagnosticsProvider.h"
     "${CLUSTER_DIR}/ThreadNetworkDiagnosticsProvider.h"
 )

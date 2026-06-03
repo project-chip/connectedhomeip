@@ -1,5 +1,5 @@
 /*
- *    Copyright (c) 2026 Project CHIP Authors
+ *    Copyright (c) 2024-2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#include <app/clusters/thread-network-diagnostics-server/OpenThreadDiagnosticsProvider.h>
+#include <app/clusters/thread-network-diagnostics-server/DefaultThreadNetworkDiagnosticsProvider.h>
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/data-model/Encode.h>
@@ -29,15 +29,38 @@
 #if CHIP_DEVICE_CONFIG_THREAD_FTD
 #include <openthread/thread_ftd.h>
 #endif // CHIP_DEVICE_CONFIG_THREAD_FTD
+#endif // (CHIP_DEVICE_CONFIG_ENABLE_THREAD && !CHIP_DEVICE_CONFIG_USES_OTBR_POSIX_DBUS_STACK)
 
 using namespace chip::DeviceLayer;
 
 namespace chip::app::Clusters::ThreadNetworkDiagnostics {
 
-CHIP_ERROR OpenThreadDiagnosticsProvider::WriteAttributeToTlv(AttributeId attributeId,
-                                                              app::AttributeValueEncoder & encoder)
+/*
+ * @brief Get runtime value from the thread network based on the given attribute ID.
+ *        The info is encoded via the AttributeValueEncoder.
+ *
+ * @param attributeId Id of the attribute for the requested info.
+ * @param aEncoder Encoder to encode the attribute value.
+ *
+ * @return CHIP_NO_ERROR = Succes.
+ *         CHIP_ERROR_NOT_IMPLEMENTED = Runtime value for this attribute not yet available to send as reply
+ *                                      Use standard read.
+ *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE = Is not a Runtime readable attribute. Use standard read
+ *         All other errors should be treated as a read error and reported as such.
+ *
+ * @note This function currently builds in two different variants:
+ *       (1) CHIP_DEVICE_CONFIG_ENABLE_THREAD && !CHIP_DEVICE_CONFIG_USES_OTBR_POSIX_DBUS_STACK:
+ *           - Generic implementation fetching the valid thread network data from the thread stack
+ *             (via ThreadStackMgrImpl().OTInstance()) and encoding it respectively to the attributeID
+ *             received. This relies on an in-process OpenThread stack.
+ *       (2) Otherwise
+ *           - Encode a NULL value for nullable attributes or 0 for the others.
+ */
+CHIP_ERROR DefaultThreadNetworkDiagnosticsProvider::WriteAttributeToTlv(AttributeId attributeId,
+                                                                        app::AttributeValueEncoder & encoder)
 {
     CHIP_ERROR err;
+#if (CHIP_DEVICE_CONFIG_ENABLE_THREAD && !CHIP_DEVICE_CONFIG_USES_OTBR_POSIX_DBUS_STACK)
     otInstance * otInst = ThreadStackMgrImpl().OTInstance();
 
     if (!otDatasetIsCommissioned(otInst))
@@ -671,14 +694,48 @@ CHIP_ERROR OpenThreadDiagnosticsProvider::WriteAttributeToTlv(AttributeId attrib
     break;
     }
 
+#else
+    switch (attributeId)
+    {
+    case Attributes::NeighborTable::Id:
+    case Attributes::RouteTable::Id:
+    case Attributes::ActiveNetworkFaultsList::Id:
+        err = encoder.EncodeEmptyList();
+        break;
+    case Attributes::Channel::Id:
+    case Attributes::RoutingRole::Id:
+    case Attributes::NetworkName::Id:
+    case Attributes::PanId::Id:
+    case Attributes::ExtendedPanId::Id:
+    case Attributes::MeshLocalPrefix::Id:
+    case Attributes::PartitionId::Id:
+    case Attributes::Weighting::Id:
+    case Attributes::DataVersion::Id:
+    case Attributes::StableDataVersion::Id:
+    case Attributes::LeaderRouterId::Id:
+    case Attributes::ActiveTimestamp::Id:
+    case Attributes::PendingTimestamp::Id:
+    case Attributes::Delay::Id:
+    case Attributes::ChannelPage0Mask::Id:
+    case Attributes::SecurityPolicy::Id:
+    case Attributes::OperationalDatasetComponents::Id:
+    case Attributes::ExtAddress::Id:
+    case Attributes::Rloc16::Id:
+        err = encoder.EncodeNull();
+        break;
+    default:
+        // The remaining attributes are generally unsigned integers.
+        // We rely here on TLV encoding 0 of any type to a the same numeric 0
+        err = encoder.Encode<uint32_t>(0u);
+        break;
+    }
+#endif // (CHIP_DEVICE_CONFIG_ENABLE_THREAD && !CHIP_DEVICE_CONFIG_USES_OTBR_POSIX_DBUS_STACK)
     return err;
 }
 
-void OpenThreadDiagnosticsProvider::ResetCounts()
+void DefaultThreadNetworkDiagnosticsProvider::ResetCounts()
 {
     DeviceLayer::ConnectivityMgr().ResetThreadNetworkDiagnosticsCounts();
 }
 
 } // namespace chip::app::Clusters::ThreadNetworkDiagnostics
-
-#endif // (CHIP_DEVICE_CONFIG_ENABLE_THREAD && !CHIP_DEVICE_CONFIG_USES_OTBR_POSIX_DBUS_STACK)
