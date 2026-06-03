@@ -123,7 +123,7 @@ public:
 namespace chip {
 namespace app {
 
-class TestSessionRelease : public chip::Testing::AppContext
+class TestSessionRelease : public chip::Test::AppContext
 {
 public:
     // Declarations for tests that access private members of ReadHandler,
@@ -147,7 +147,7 @@ public:
 // pointer.  The EC remains alive (refcount unchanged by DoClose); callers must
 // check HasSessionHandle() before attempting any send.
 // ---------------------------------------------------------------------------
-static ExchangeContext * MakeRawExchangeWillSend(chip::Testing::AppContext & ctx, DoNothingExchangeDelegate & delegate)
+static ExchangeContext * MakeRawExchangeWillSend(chip::Test::AppContext & ctx, DoNothingExchangeDelegate & delegate)
 {
     ExchangeContext * ec = ctx.NewExchangeToBob(&delegate);
     VerifyOrDieWithMsg(ec != nullptr, Test, "NewExchangeToBob returned null");
