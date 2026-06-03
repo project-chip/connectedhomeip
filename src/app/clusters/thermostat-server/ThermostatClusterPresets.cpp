@@ -309,6 +309,8 @@ Status ThermostatAttrAccess::SetActivePreset(EndpointId endpoint, DataModel::Nul
         return Status::InvalidCommand;
     }
 
+    // Delegate centralizes ActivePresetHandle subscription reporting to ensure
+    // all update paths (command and suggestion-driven) emit reports consistently.
     CHIP_ERROR err = delegate->SetActivePresetHandle(presetHandle);
 
     if (err != CHIP_NO_ERROR)
@@ -316,10 +318,6 @@ Status ThermostatAttrAccess::SetActivePreset(EndpointId endpoint, DataModel::Nul
         ChipLogError(Zcl, "Failed to set ActivePresetHandle with error %" CHIP_ERROR_FORMAT, err.Format());
         return StatusIB(err).mStatus;
     }
-
-    // Notify subscribers that ActivePresetHandle has changed so that they
-    // receive a subscription report with the new value.
-    MatterReportingAttributeChangeCallback(endpoint, Thermostat::Id, ActivePresetHandle::Id);
 
     return Status::Success;
 }
