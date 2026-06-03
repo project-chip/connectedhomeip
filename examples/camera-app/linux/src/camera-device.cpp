@@ -301,7 +301,7 @@ GstElement * CreateSnapshotPipelineV4l2(const SnapshotPipelineConfig & config, C
     GstElement * videorate      = gst_element_factory_make("videorate", "videorate");
     GstElement * videorate_caps = gst_element_factory_make("capsfilter", "timelapse_framerate");
     GstElement * queue          = gst_element_factory_make("queue", "queue");
-    GstElement * filesink       = gst_element_factory_make("multifilesink", "sink");
+    GstElement * appsink        = gst_element_factory_make("appsink", "sink");
 
     // Check for any nullptr among the created elements
     const std::vector<std::pair<GstElement *, const char *>> elements = {
@@ -311,7 +311,7 @@ GstElement * CreateSnapshotPipelineV4l2(const SnapshotPipelineConfig & config, C
         { videorate, "videorate" },           //
         { videorate_caps, "videorate_caps" }, //
         { queue, "queue" },                   //
-        { filesink, "filesink" }              //
+        { appsink, "appsink" }              //
     };
     bool isElementFactoryMakeFailed = GstreamerPipepline::isGstElementsNull(elements);
 
@@ -319,7 +319,7 @@ GstElement * CreateSnapshotPipelineV4l2(const SnapshotPipelineConfig & config, C
     if (isElementFactoryMakeFailed)
     {
         // Unreference the elements that were created
-        GstreamerPipepline::unrefGstElements(pipeline, source, jpeg_caps, videorate, videorate_caps, queue, filesink);
+        GstreamerPipepline::unrefGstElements(pipeline, source, jpeg_caps, videorate, videorate_caps, queue, appsink);
 
         error = CameraError::ERROR_INIT_FAILED;
         return nullptr;
@@ -339,14 +339,14 @@ GstElement * CreateSnapshotPipelineV4l2(const SnapshotPipelineConfig & config, C
     g_object_set(jpeg_caps, "caps", caps, nullptr);
     gst_caps_unref(caps);
 
-    // Set the output file location
-    g_object_set(filesink, "location", config.filename.c_str(), nullptr);
+    // Configure appsink
+    g_object_set(appsink, "emit-signals", FALSE, "sync", FALSE, nullptr);
 
     // Add elements to the pipeline
-    gst_bin_add_many(GST_BIN(pipeline), source, jpeg_caps, videorate, videorate_caps, queue, filesink, nullptr);
+    gst_bin_add_many(GST_BIN(pipeline), source, jpeg_caps, videorate, videorate_caps, queue, appsink, nullptr);
 
     // Link the elements
-    if (gst_element_link_many(source, jpeg_caps, videorate, videorate_caps, queue, filesink, nullptr) != TRUE)
+    if (gst_element_link_many(source, jpeg_caps, videorate, videorate_caps, queue, appsink, nullptr) != TRUE)
     {
         ChipLogError(Camera, "Elements could not be linked.");
 
@@ -367,7 +367,7 @@ GstElement * CreateSnapshotPipelineLibcamerasrc(const SnapshotPipelineConfig & c
     GstElement * capsfilter = gst_element_factory_make("capsfilter", "capsfilter");
     GstElement * jpegenc    = gst_element_factory_make("jpegenc", "jpegenc");
     GstElement * queue      = gst_element_factory_make("queue", "queue");
-    GstElement * filesink   = gst_element_factory_make("multifilesink", "sink");
+    GstElement * appsink     = gst_element_factory_make("appsink", "sink");
 
     // Check for any nullptr among the created elements
     const std::vector<std::pair<GstElement *, const char *>> elements = {
@@ -376,7 +376,7 @@ GstElement * CreateSnapshotPipelineLibcamerasrc(const SnapshotPipelineConfig & c
         { capsfilter, "capsfilter" }, //
         { jpegenc, "jpegenc" },       //
         { queue, "queue" },           //
-        { filesink, "filesink" }      //
+        { appsink, "appsink" }        //
     };
     const bool isElementFactoryMakeFailed = GstreamerPipepline::isGstElementsNull(elements);
 
@@ -384,7 +384,7 @@ GstElement * CreateSnapshotPipelineLibcamerasrc(const SnapshotPipelineConfig & c
     if (isElementFactoryMakeFailed)
     {
         // Unreference the elements that were created
-        GstreamerPipepline::unrefGstElements(pipeline, source, capsfilter, jpegenc, filesink);
+        GstreamerPipepline::unrefGstElements(pipeline, source, capsfilter, jpegenc, queue, appsink);
         error = CameraError::ERROR_INIT_FAILED;
         return nullptr;
     }
@@ -403,12 +403,12 @@ GstElement * CreateSnapshotPipelineLibcamerasrc(const SnapshotPipelineConfig & c
     // Set JPEG quality
     g_object_set(jpegenc, "quality", config.quality, nullptr);
 
-    // Set multifilesink to write only one file
-    g_object_set(filesink, "location", config.filename.c_str(), nullptr);
+    // Configure appsink
+    g_object_set(appsink, "emit-signals", FALSE, "sync", FALSE, nullptr);
 
     // Add and link elements
-    gst_bin_add_many(GST_BIN(pipeline), source, capsfilter, jpegenc, queue, filesink, nullptr);
-    if (!gst_element_link_many(source, capsfilter, jpegenc, queue, filesink, nullptr))
+    gst_bin_add_many(GST_BIN(pipeline), source, capsfilter, jpegenc, queue, appsink, nullptr);
+    if (!gst_element_link_many(source, capsfilter, jpegenc, queue, appsink, nullptr))
     {
         ChipLogError(Camera, "Elements could not be linked.");
         gst_object_unref(pipeline);
@@ -832,6 +832,8 @@ CameraError CameraDevice::CaptureSnapshot(const chip::app::DataModel::Nullable<u
 {
     VideoResolutionStruct matchedRes;
     ImageCodecEnum matchedCodec;
+    uint16_t streamId = 0;
+    SnapshotStream * snapshotStream = nullptr;
 
     if (streamID.IsNull())
     {
@@ -841,10 +843,22 @@ CameraError CameraDevice::CaptureSnapshot(const chip::app::DataModel::Nullable<u
                          resolution.height);
             return CameraError::ERROR_CAPTURE_SNAPSHOT_FAILED;
         }
+        // Find the stream that matched
+        for (auto & s : mSnapshotStreams)
+        {
+            if (s.snapshotStreamParams.minResolution.width == matchedRes.width &&
+                s.snapshotStreamParams.minResolution.height == matchedRes.height &&
+                s.snapshotStreamParams.imageCodec == matchedCodec)
+            {
+                snapshotStream = &s;
+                streamId = s.snapshotStreamParams.snapshotStreamID;
+                break;
+            }
+        }
     }
     else
     {
-        uint16_t streamId = streamID.Value();
+        streamId = streamID.Value();
         auto it           = std::find_if(mSnapshotStreams.begin(), mSnapshotStreams.end(), [streamId](const SnapshotStream & s) {
             return s.snapshotStreamParams.snapshotStreamID == streamId;
         });
@@ -853,32 +867,93 @@ CameraError CameraDevice::CaptureSnapshot(const chip::app::DataModel::Nullable<u
             ChipLogError(Camera, "Snapshot stream not found for stream ID %u", streamId);
             return CameraError::ERROR_CAPTURE_SNAPSHOT_FAILED;
         }
+        snapshotStream = &(*it);
         matchedRes   = it->snapshotStreamParams.minResolution;
         matchedCodec = it->snapshotStreamParams.imageCodec;
     }
 
-    // Read from image file stored from snapshot stream.
-    std::ifstream file(SNAPSHOT_FILE_PATH, std::ios::binary | std::ios::ate);
-    if (!file.is_open())
+    if (snapshotStream == nullptr)
     {
-        ChipLogError(Camera, "Error opening snapshot image file: ");
+        ChipLogError(Camera, "Failed to determine snapshot stream");
         return CameraError::ERROR_CAPTURE_SNAPSHOT_FAILED;
     }
 
-    std::streamsize size = file.tellg();
-    file.seekg(0, std::ios::beg);
+    GstElement * snapshotPipeline = reinterpret_cast<GstElement *>(snapshotStream->snapshotContext);
+    bool startedOnDemand = false;
 
-    // Ensure space for image snapshot data in outImageSnapshot
-    outImageSnapshot.data.resize(static_cast<size_t>(size));
-
-    if (!file.read(reinterpret_cast<char *>(outImageSnapshot.data.data()), size))
+    if (snapshotPipeline == nullptr)
     {
-        ChipLogError(Camera, "Error reading image file: ");
-        file.close();
+        // Stream is not running, start it temporarily
+        ChipLogProgress(Camera, "Snapshot stream not running, starting on demand");
+        if (StartSnapshotStream(streamId) != CameraError::SUCCESS)
+        {
+            ChipLogError(Camera, "Failed to start snapshot stream on demand");
+            return CameraError::ERROR_CAPTURE_SNAPSHOT_FAILED;
+        }
+        snapshotPipeline = reinterpret_cast<GstElement *>(snapshotStream->snapshotContext);
+        startedOnDemand = true;
+    }
+
+    if (snapshotPipeline == nullptr)
+    {
+        ChipLogError(Camera, "Snapshot pipeline is still null after trying to start");
         return CameraError::ERROR_CAPTURE_SNAPSHOT_FAILED;
     }
 
-    file.close();
+    // Get the appsink
+    GstElement * appsink = gst_bin_get_by_name(GST_BIN(snapshotPipeline), "sink");
+    if (!appsink)
+    {
+        ChipLogError(Camera, "Failed to get appsink from snapshot pipeline");
+        if (startedOnDemand)
+        {
+            StopSnapshotStream(streamId);
+        }
+        return CameraError::ERROR_CAPTURE_SNAPSHOT_FAILED;
+    }
+
+    // Pull sample from appsink
+    ChipLogProgress(Camera, "Pulling sample from appsink...");
+    GstSample * sample = gst_app_sink_pull_sample(GST_APP_SINK(appsink));
+    gst_object_unref(appsink);
+
+    if (!sample)
+    {
+        ChipLogError(Camera, "Failed to pull sample from appsink");
+        if (startedOnDemand)
+        {
+            StopSnapshotStream(streamId);
+        }
+        return CameraError::ERROR_CAPTURE_SNAPSHOT_FAILED;
+    }
+
+    GstBuffer * buffer = gst_sample_get_buffer(sample);
+    GstMapInfo map;
+
+    if (gst_buffer_map(buffer, &map, GST_MAP_READ))
+    {
+        outImageSnapshot.data.resize(map.size);
+        memcpy(outImageSnapshot.data.data(), map.data, map.size);
+        gst_buffer_unmap(buffer, &map);
+    }
+    else
+    {
+        ChipLogError(Camera, "Failed to map buffer");
+        gst_sample_unref(sample);
+        if (startedOnDemand)
+        {
+            StopSnapshotStream(streamId);
+        }
+        return CameraError::ERROR_CAPTURE_SNAPSHOT_FAILED;
+    }
+
+    gst_sample_unref(sample);
+
+    if (startedOnDemand)
+    {
+        ChipLogProgress(Camera, "Stopping snapshot stream that was started on demand");
+        StopSnapshotStream(streamId);
+    }
 
     outImageSnapshot.imageRes   = matchedRes;
     outImageSnapshot.imageCodec = matchedCodec;
@@ -1292,13 +1367,7 @@ CameraError CameraDevice::StopSnapshotStream(uint16_t streamID)
         it->snapshotContext = nullptr;
     }
 
-    // Remove the snapshot file
-    std::string fileName = SNAPSHOT_FILE_PATH;
-    if (unlink(fileName.c_str()) == -1)
-    {
-        ChipLogError(Camera, "Failed to remove snapshot file after stopping stream (err = %s).", strerror(errno));
-        return CameraError::ERROR_SNAPSHOT_STREAM_STOP_FAILED;
-    }
+
 
     return CameraError::SUCCESS;
 }
