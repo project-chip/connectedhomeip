@@ -20,12 +20,12 @@
 #include <app/clusters/general-commissioning-server/BreadCrumbTracker.h>
 #include <app/clusters/thread-border-router-management-server/ThreadBorderRouterManagementCluster.h>
 #include <app/clusters/thread-border-router-management-server/ThreadBorderRouterManagementDelegate.h>
+#include <app/clusters/thread-network-diagnostics-server/DefaultThreadNetworkDiagnosticsProvider.h>
 #include <app/clusters/thread-network-diagnostics-server/ThreadNetworkDiagnosticsCluster.h>
 #include <app/clusters/thread-network-directory-server/DefaultThreadNetworkDirectoryStorage.h>
 #include <app/clusters/thread-network-directory-server/ThreadNetworkDirectoryCluster.h>
 #include <app/clusters/wifi-network-management-server/WiFiNetworkManagementCluster.h>
 #include <devices/interface/SingleEndpointDevice.h>
-#include <app/clusters/thread-network-diagnostics-server/DefaultThreadNetworkDiagnosticsProvider.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 
 namespace chip {
