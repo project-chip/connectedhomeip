@@ -12809,22 +12809,22 @@ public static class AmbientContextSensingClusterSemanticTagStruct {
 }
 public static class AmbientContextSensingClusterAmbientContextTypeStruct {
   public ArrayList<ChipStructs.AmbientContextSensingClusterSemanticTagStruct> ambientContextSensed;
-  public Optional<Long> detectionStartTime;
+  public @Nullable Optional<Integer> detectionConfidence;
   private static final long AMBIENT_CONTEXT_SENSED_ID = 0L;
-  private static final long DETECTION_START_TIME_ID = 1L;
+  private static final long DETECTION_CONFIDENCE_ID = 1L;
 
   public AmbientContextSensingClusterAmbientContextTypeStruct(
     ArrayList<ChipStructs.AmbientContextSensingClusterSemanticTagStruct> ambientContextSensed,
-    Optional<Long> detectionStartTime
+    @Nullable Optional<Integer> detectionConfidence
   ) {
     this.ambientContextSensed = ambientContextSensed;
-    this.detectionStartTime = detectionStartTime;
+    this.detectionConfidence = detectionConfidence;
   }
 
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
     values.add(new StructElement(AMBIENT_CONTEXT_SENSED_ID, ArrayType.generateArrayType(ambientContextSensed, (elementambientContextSensed) -> elementambientContextSensed.encodeTlv())));
-    values.add(new StructElement(DETECTION_START_TIME_ID, detectionStartTime.<BaseTLVType>map((nonOptionaldetectionStartTime) -> new UIntType(nonOptionaldetectionStartTime)).orElse(new EmptyType())));
+    values.add(new StructElement(DETECTION_CONFIDENCE_ID, detectionConfidence != null ? detectionConfidence.<BaseTLVType>map((nonOptionaldetectionConfidence) -> new UIntType(nonOptionaldetectionConfidence)).orElse(new EmptyType()) : new NullType()));
 
     return new StructType(values);
   }
@@ -12834,23 +12834,23 @@ public static class AmbientContextSensingClusterAmbientContextTypeStruct {
       return null;
     }
     ArrayList<ChipStructs.AmbientContextSensingClusterSemanticTagStruct> ambientContextSensed = null;
-    Optional<Long> detectionStartTime = Optional.empty();
+    @Nullable Optional<Integer> detectionConfidence = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == AMBIENT_CONTEXT_SENSED_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.Array) {
           ArrayType castingValue = element.value(ArrayType.class);
           ambientContextSensed = castingValue.map((elementcastingValue) -> ChipStructs.AmbientContextSensingClusterSemanticTagStruct.decodeTlv(elementcastingValue));
         }
-      } else if (element.contextTagNum() == DETECTION_START_TIME_ID) {
+      } else if (element.contextTagNum() == DETECTION_CONFIDENCE_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
-          detectionStartTime = Optional.of(castingValue.value(Long.class));
+          detectionConfidence = Optional.of(castingValue.value(Integer.class));
         }
       }
     }
     return new AmbientContextSensingClusterAmbientContextTypeStruct(
       ambientContextSensed,
-      detectionStartTime
+      detectionConfidence
     );
   }
 
@@ -12861,8 +12861,8 @@ public static class AmbientContextSensingClusterAmbientContextTypeStruct {
     output.append("\tambientContextSensed: ");
     output.append(ambientContextSensed);
     output.append("\n");
-    output.append("\tdetectionStartTime: ");
-    output.append(detectionStartTime);
+    output.append("\tdetectionConfidence: ");
+    output.append(detectionConfidence);
     output.append("\n");
     output.append("}\n");
     return output.toString();

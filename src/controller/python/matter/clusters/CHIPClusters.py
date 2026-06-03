@@ -11946,7 +11946,7 @@ class ChipClusters:
                 "reportable": True,
             },
             0x00000005: {
-                "attributeName": "ObjectCountReached",
+                "attributeName": "ObjectCountThresholdReached",
                 "attributeId": 0x00000005,
                 "type": "bool",
                 "reportable": True,
@@ -11969,7 +11969,6 @@ class ChipClusters:
                 "attributeId": 0x00000008,
                 "type": "int",
                 "reportable": True,
-                "writable": True,
             },
             0x00000009: {
                 "attributeName": "HoldTime",
@@ -11987,6 +11986,12 @@ class ChipClusters:
             0x0000000B: {
                 "attributeName": "PredictedActivity",
                 "attributeId": 0x0000000B,
+                "type": "",
+                "reportable": True,
+            },
+            0x0000000C: {
+                "attributeName": "SensorFusionSupported",
+                "attributeId": 0x0000000C,
                 "type": "",
                 "reportable": True,
             },

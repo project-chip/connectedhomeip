@@ -4141,8 +4141,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "AmbientContextType";
         case chip::app::Clusters::AmbientContextSensing::Attributes::AmbientContextTypeSupported::Id:
             return "AmbientContextTypeSupported";
-        case chip::app::Clusters::AmbientContextSensing::Attributes::ObjectCountReached::Id:
-            return "ObjectCountReached";
+        case chip::app::Clusters::AmbientContextSensing::Attributes::ObjectCountThresholdReached::Id:
+            return "ObjectCountThresholdReached";
         case chip::app::Clusters::AmbientContextSensing::Attributes::ObjectCountConfig::Id:
             return "ObjectCountConfig";
         case chip::app::Clusters::AmbientContextSensing::Attributes::ObjectCount::Id:
@@ -4155,6 +4155,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "HoldTimeLimits";
         case chip::app::Clusters::AmbientContextSensing::Attributes::PredictedActivity::Id:
             return "PredictedActivity";
+        case chip::app::Clusters::AmbientContextSensing::Attributes::SensorFusionSupported::Id:
+            return "SensorFusionSupported";
         case chip::app::Clusters::AmbientContextSensing::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::AmbientContextSensing::Attributes::AcceptedCommandList::Id:

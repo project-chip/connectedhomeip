@@ -17354,10 +17354,14 @@ static id _Nullable DecodeAttributeValueForAmbientContextSensingCluster(Attribut
                     }
                     newElement_0.ambientContextSensed = array_2;
                 }
-                if (entry_0.detectionStartTime.HasValue()) {
-                    newElement_0.detectionStartTime = [NSNumber numberWithUnsignedInt:entry_0.detectionStartTime.Value()];
+                if (entry_0.detectionConfidence.HasValue()) {
+                    if (entry_0.detectionConfidence.Value().IsNull()) {
+                        newElement_0.detectionConfidence = nil;
+                    } else {
+                        newElement_0.detectionConfidence = [NSNumber numberWithUnsignedChar:entry_0.detectionConfidence.Value().Value()];
+                    }
                 } else {
-                    newElement_0.detectionStartTime = nil;
+                    newElement_0.detectionConfidence = nil;
                 }
                 [array_0 addObject:newElement_0];
             }
@@ -17417,8 +17421,8 @@ static id _Nullable DecodeAttributeValueForAmbientContextSensingCluster(Attribut
         }
         return value;
     }
-    case Attributes::ObjectCountReached::Id: {
-        using TypeInfo = Attributes::ObjectCountReached::TypeInfo;
+    case Attributes::ObjectCountThresholdReached::Id: {
+        using TypeInfo = Attributes::ObjectCountThresholdReached::TypeInfo;
         TypeInfo::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
         if (*aError != CHIP_NO_ERROR) {
@@ -17578,6 +17582,53 @@ static id _Nullable DecodeAttributeValueForAmbientContextSensingCluster(Attribut
                     newElement_0.crowdCount = nil;
                 }
                 newElement_0.confidence = [NSNumber numberWithUnsignedChar:entry_0.confidence];
+                [array_0 addObject:newElement_0];
+            }
+            CHIP_ERROR err = iter_0.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                *aError = err;
+                return nil;
+            }
+            value = array_0;
+        }
+        return value;
+    }
+    case Attributes::SensorFusionSupported::Id: {
+        using TypeInfo = Attributes::SensorFusionSupported::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSArray * _Nonnull value;
+        { // Scope for our temporary variables
+            auto * array_0 = [NSMutableArray new];
+            auto iter_0 = cppValue.begin();
+            while (iter_0.Next()) {
+                auto & entry_0 = iter_0.GetValue();
+                MTRDataTypeSemanticTagStruct * newElement_0;
+                newElement_0 = [MTRDataTypeSemanticTagStruct new];
+                if (entry_0.mfgCode.IsNull()) {
+                    newElement_0.mfgCode = nil;
+                } else {
+                    newElement_0.mfgCode = [NSNumber numberWithUnsignedShort:chip::to_underlying(entry_0.mfgCode.Value())];
+                }
+                newElement_0.namespaceID = [NSNumber numberWithUnsignedChar:entry_0.namespaceID];
+                newElement_0.tag = [NSNumber numberWithUnsignedChar:entry_0.tag];
+                if (entry_0.label.HasValue()) {
+                    if (entry_0.label.Value().IsNull()) {
+                        newElement_0.label = nil;
+                    } else {
+                        newElement_0.label = AsString(entry_0.label.Value().Value());
+                        if (newElement_0.label == nil) {
+                            CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                            *aError = err;
+                            return nil;
+                        }
+                    }
+                } else {
+                    newElement_0.label = nil;
+                }
                 [array_0 addObject:newElement_0];
             }
             CHIP_ERROR err = iter_0.GetStatus();

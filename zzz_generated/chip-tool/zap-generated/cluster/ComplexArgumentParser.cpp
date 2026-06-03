@@ -5959,13 +5959,13 @@ ComplexArgumentParser::Setup(const char * label,
         ComplexArgumentParser::Setup(labelWithMember, request.ambientContextSensed, value["ambientContextSensed"]));
     valueCopy.removeMember("ambientContextSensed");
 
-    if (value.isMember("detectionStartTime"))
+    if (value.isMember("detectionConfidence"))
     {
-        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "detectionStartTime");
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "detectionConfidence");
         ReturnErrorOnFailure(
-            ComplexArgumentParser::Setup(labelWithMember, request.detectionStartTime, value["detectionStartTime"]));
+            ComplexArgumentParser::Setup(labelWithMember, request.detectionConfidence, value["detectionConfidence"]));
     }
-    valueCopy.removeMember("detectionStartTime");
+    valueCopy.removeMember("detectionConfidence");
 
     return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
 }
@@ -5973,7 +5973,7 @@ ComplexArgumentParser::Setup(const char * label,
 void ComplexArgumentParser::Finalize(chip::app::Clusters::AmbientContextSensing::Structs::AmbientContextTypeStruct::Type & request)
 {
     ComplexArgumentParser::Finalize(request.ambientContextSensed);
-    ComplexArgumentParser::Finalize(request.detectionStartTime);
+    ComplexArgumentParser::Finalize(request.detectionConfidence);
 }
 
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,

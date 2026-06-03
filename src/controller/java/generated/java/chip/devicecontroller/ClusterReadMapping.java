@@ -16713,17 +16713,17 @@ public class ClusterReadMapping {
           readAmbientContextSensingAmbientContextTypeSupportedCommandParams
         );
         result.put("readAmbientContextTypeSupportedAttribute", readAmbientContextSensingAmbientContextTypeSupportedAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readAmbientContextSensingObjectCountReachedCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readAmbientContextSensingObjectCountReachedAttributeInteractionInfo = new InteractionInfo(
+     Map<String, CommandParameterInfo> readAmbientContextSensingObjectCountThresholdReachedCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readAmbientContextSensingObjectCountThresholdReachedAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
-            ((ChipClusters.AmbientContextSensingCluster) cluster).readObjectCountReachedAttribute(
+            ((ChipClusters.AmbientContextSensingCluster) cluster).readObjectCountThresholdReachedAttribute(
               (ChipClusters.BooleanAttributeCallback) callback
             );
           },
           () -> new ClusterInfoMapping.DelegatedBooleanAttributeCallback(),
-          readAmbientContextSensingObjectCountReachedCommandParams
+          readAmbientContextSensingObjectCountThresholdReachedCommandParams
         );
-        result.put("readObjectCountReachedAttribute", readAmbientContextSensingObjectCountReachedAttributeInteractionInfo);
+        result.put("readObjectCountThresholdReachedAttribute", readAmbientContextSensingObjectCountThresholdReachedAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readAmbientContextSensingObjectCountCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readAmbientContextSensingObjectCountAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
@@ -16768,6 +16768,17 @@ public class ClusterReadMapping {
           readAmbientContextSensingPredictedActivityCommandParams
         );
         result.put("readPredictedActivityAttribute", readAmbientContextSensingPredictedActivityAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readAmbientContextSensingSensorFusionSupportedCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readAmbientContextSensingSensorFusionSupportedAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.AmbientContextSensingCluster) cluster).readSensorFusionSupportedAttribute(
+              (ChipClusters.AmbientContextSensingCluster.SensorFusionSupportedAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedAmbientContextSensingClusterSensorFusionSupportedAttributeCallback(),
+          readAmbientContextSensingSensorFusionSupportedCommandParams
+        );
+        result.put("readSensorFusionSupportedAttribute", readAmbientContextSensingSensorFusionSupportedAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readAmbientContextSensingGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readAmbientContextSensingGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
