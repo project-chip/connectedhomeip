@@ -42,6 +42,8 @@ _AGGREGATOR_DEVICE_TYPE_ID = 0x000E
 _ROOT_NODE_DEVICE_TYPE_ID = 0x0016
 
 _ENDPOINT_DIR_PATTERN = re.compile(r'^(?:endpoint|ep)?[\s_-]*(\d+)$', re.IGNORECASE)
+
+
 def _find_endpoint_subdir(root_dir: str, endpoint: int) -> str | None:
     """
     Find the subdirectory under root_dir whose name resolves to `endpoint`.
@@ -56,6 +58,7 @@ def _find_endpoint_subdir(root_dir: str, endpoint: int) -> str | None:
         if match and int(match.group(1)) == endpoint:
             return full
     return None
+
 
 def event_pics_str(pics_base: str, eid: int) -> str:
     return f'{pics_base}.S.E{eid:02x}'

@@ -15,9 +15,10 @@
 #    limitations under the License.
 #
 
-from mobly import asserts
 import os
 import tempfile
+
+from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.clusters.Attribute import AsyncReadTransaction
@@ -330,6 +331,7 @@ class TestPicsHelpers(MatterBaseTest):
                     f.write(test_xml)
                 pics = read_pics_from_file(d, endpoint=0)
                 asserts.assert_true(pics.get('TEST.S'), f'Failed for subdir name: {subdir_name}')
+
 
 if __name__ == "__main__":
     default_matter_test_main()
