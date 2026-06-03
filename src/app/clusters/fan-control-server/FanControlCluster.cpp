@@ -188,12 +188,6 @@ void FanControlCluster::ApplyNonZeroFanDrive(chip::Percent percent)
     {
         StoreFanModePersistence();
     }
-    SetAttributeValue(mPercentCurrent, percent, PercentCurrent::Id);
-    if (SupportsMultiSpeed())
-    {
-        const uint8_t speedCurrent = static_cast<uint8_t>((mSpeedMax * percent + 99) / 100);
-        SetAttributeValue(mSpeedCurrent, speedCurrent, SpeedCurrent::Id);
-    }
 }
 
 void FanControlCluster::ApplyPercentSettingChanged()

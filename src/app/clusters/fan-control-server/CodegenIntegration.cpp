@@ -118,26 +118,6 @@ private:
             uint8_t raw       = state.speedSetting.Value();
             MatterPostAttributeChangeCallback(path, ZCL_INT8U_ATTRIBUTE_TYPE, 1, &raw);
         }
-
-        // PercentCurrent / SpeedCurrent are the *actual* operating fan speed (spec 4.4.6.4 / 4.4.6.7).
-        // FanControlCluster sets them to match the settings (the standalone default), but on a device
-        // whose fan is gated by an On/Off cluster on this endpoint, the fan is not running while On/Off
-        // is Off, so the actual speed must remain 0. The application only refreshes *Current on an
-        // On/Off transition (see HandleOnOff), not when a fan setting is written while already Off, so
-        // enforce it here. Skipped for Off (cluster already zeroed *Current) and for endpoints without
-        // an On/Off cluster (Get fails -> no gating, fan has no On/Off dependency).
-        if (state.mode != FanModeEnum::kOff)
-        {
-            bool onOff = true;
-            if (chip::app::Clusters::OnOff::Attributes::OnOff::Get(mEndpoint, &onOff) == Status::Success && !onOff)
-            {
-                FanControl::Attributes::PercentCurrent::Set(mEndpoint, static_cast<chip::Percent>(0));
-                if (!state.speedSetting.IsNull())
-                {
-                    FanControl::Attributes::SpeedCurrent::Set(mEndpoint, static_cast<uint8_t>(0));
-                }
-            }
-        }
     }
 };
 

@@ -494,11 +494,11 @@ TEST_F(TestFanControlClusterWithMultiSpeedAndAuto, FanModeAuto_NullsPercentSetti
 
     chip::Percent percentCurrent;
     ASSERT_EQ(tester.ReadAttribute(FanControl::Attributes::PercentCurrent::Id, percentCurrent), CHIP_NO_ERROR);
-    EXPECT_EQ(percentCurrent, 50);
+    EXPECT_EQ(percentCurrent, 0);
 
     uint8_t speedCurrent;
     ASSERT_EQ(tester.ReadAttribute(FanControl::Attributes::SpeedCurrent::Id, speedCurrent), CHIP_NO_ERROR);
-    EXPECT_EQ(speedCurrent, 5); // 50% of SpeedMax=10
+    EXPECT_EQ(speedCurrent, 0);
 }
 
 TEST_F(TestFanControlCluster, PercentSettingZero_SetsFanModeOff)
