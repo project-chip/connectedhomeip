@@ -76,7 +76,7 @@ LAUNCH_OUT=$($SDB_CMD shell "app_launcher --debug --start $APP_NAME -- $APP_ARGS
 echo "$LAUNCH_OUT"
 
 # 2. Parse the PID from the app_launcher output
-PID=$(echo "$LAUNCH_OUT" | grep -oP 'pid = \K[0-9]+')
+PID=$(echo "$LAUNCH_OUT" | sed -n 's/.*pid = \([0-9][0-9]*\).*/\1/p')
 
 if [ -z "$PID" ]; then
     echo "ERROR: Failed to capture application PID from app_launcher output."
