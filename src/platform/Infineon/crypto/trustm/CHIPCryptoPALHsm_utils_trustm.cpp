@@ -787,8 +787,7 @@ CHIP_ERROR trustmGetCertificate(uint16_t optiga_oid, uint8_t * buf, uint16_t * b
         }
         if (ifx_cert_hex_len > buffer_capacity)
         {
-            ChipLogError(Crypto, "trustmGetCertificate: buffer too small (have %u, need %u)", buffer_capacity,
-                         ifx_cert_hex_len);
+            ChipLogError(Crypto, "trustmGetCertificate: buffer too small (have %u, need %u)", buffer_capacity, ifx_cert_hex_len);
             return CHIP_ERROR_BUFFER_TOO_SMALL;
         }
         memcpy(buf, ifx_cert_hex, ifx_cert_hex_len);
