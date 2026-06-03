@@ -159,6 +159,12 @@ protected:
 
     Delegate * GetDelegate() { return mDelegate; }
 
+    // Builds the standard OperationalCommandResponse carrying `err` and adds it to `handler`.
+    // Shared by every command handler (base + derived) to avoid duplicating the response-encoding
+    // setup at each call site. Always returns std::nullopt (the response has already been added).
+    static std::optional<DataModel::ActionReturnStatus>
+    AddCommandResponse(const DataModel::InvokeRequest & request, CommandHandler * handler, const GenericOperationalError & err);
+
 private:
     Delegate * mDelegate;
     const uint32_t mRevision;
@@ -168,8 +174,6 @@ private:
     uint8_t mOperationalState                 = 0;
     GenericOperationalError mOperationalError = to_underlying(ErrorStateEnum::kNoError);
     QuieterReportingAttribute<uint32_t> mCountdownTime{ DataModel::NullNullable };
-
-    static bool CountdownTimePredicate(const QuieterReportingAttribute<uint32_t>::SufficientChangePredicateCandidate & candidate);
 
     std::optional<DataModel::ActionReturnStatus> HandlePauseOrResumeState(const DataModel::InvokeRequest & request,
                                                                           chip::TLV::TLVReader & input, CommandHandler * handler,

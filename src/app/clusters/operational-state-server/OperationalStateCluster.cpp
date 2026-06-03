@@ -16,7 +16,6 @@
  */
 
 #include "OperationalStateCluster.h"
-#include <app/data-model/Decode.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <clusters/OperationalState/Metadata.h>
 #include <clusters/OvenCavityOperationalState/Metadata.h>
@@ -345,11 +344,21 @@ std::optional<DataModel::ActionReturnStatus> OperationalStateCluster::InvokeComm
 // ---------------------------------------------------------------------------
 
 std::optional<DataModel::ActionReturnStatus>
+OperationalStateCluster::AddCommandResponse(const DataModel::InvokeRequest & request, CommandHandler * handler,
+                                            const GenericOperationalError & err)
+{
+    OperationalState::Commands::OperationalCommandResponse::Type response;
+    response.commandResponseState = err;
+    handler->AddResponse(request.path, response);
+    return std::nullopt;
+}
+
+std::optional<DataModel::ActionReturnStatus>
 OperationalStateCluster::HandlePauseOrResumeState(const DataModel::InvokeRequest & request, chip::TLV::TLVReader & input,
                                                   CommandHandler * handler, bool isPause)
 {
-    OperationalState::Commands::Pause::DecodableType req;
-    if (DataModel::Decode(input, req) != CHIP_NO_ERROR)
+    // Pause/Resume are fieldless commands; just confirm there is no trailing payload.
+    if (input.VerifyEndOfContainer() != CHIP_NO_ERROR)
     {
         return Protocols::InteractionModel::Status::InvalidCommand;
     }
@@ -379,18 +388,15 @@ OperationalStateCluster::HandlePauseOrResumeState(const DataModel::InvokeRequest
             mDelegate->HandleResumeStateCallback(err);
     }
 
-    OperationalState::Commands::OperationalCommandResponse::Type response;
-    response.commandResponseState = err;
-    handler->AddResponse(request.path, response);
-    return std::nullopt;
+    return AddCommandResponse(request, handler, err);
 }
 
 std::optional<DataModel::ActionReturnStatus>
 OperationalStateCluster::HandleStartOrStopState(const DataModel::InvokeRequest & request, chip::TLV::TLVReader & input,
                                                 CommandHandler * handler, bool isStart)
 {
-    OperationalState::Commands::Stop::DecodableType req;
-    if (DataModel::Decode(input, req) != CHIP_NO_ERROR)
+    // Start/Stop are fieldless commands; just confirm there is no trailing payload.
+    if (input.VerifyEndOfContainer() != CHIP_NO_ERROR)
     {
         return Protocols::InteractionModel::Status::InvalidCommand;
     }
@@ -406,10 +412,7 @@ OperationalStateCluster::HandleStartOrStopState(const DataModel::InvokeRequest &
             mDelegate->HandleStopStateCallback(err);
     }
 
-    OperationalState::Commands::OperationalCommandResponse::Type response;
-    response.commandResponseState = err;
-    handler->AddResponse(request.path, response);
-    return std::nullopt;
+    return AddCommandResponse(request, handler, err);
 }
 
 // ---------------------------------------------------------------------------
@@ -481,10 +484,7 @@ RvcOperationalState::RvcOperationalStateCluster::HandleGoHomeCommand(const DataM
         GetDelegate()->HandleGoHomeCommandCallback(err);
     }
 
-    OperationalState::Commands::OperationalCommandResponse::Type response;
-    response.commandResponseState = err;
-    handler->AddResponse(request.path, response);
-    return std::nullopt;
+    return AddCommandResponse(request, handler, err);
 }
 
 // ---------------------------------------------------------------------------
