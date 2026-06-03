@@ -5061,12 +5061,16 @@ TEST_F(TestTLV, CheckValidateCharStringRejectsMalformedUtf8)
     const uint8_t loneCont[]      = { 0x80 };                   // lone continuation byte
     const uint8_t aboveMax[]      = { 0xF4, 0x90, 0x80, 0x80 }; // U+110000, beyond U+10FFFF
 
-    EXPECT_EQ(ValidateCharStringForTest(CharSpan(reinterpret_cast<const char *>(overlongA), sizeof(overlongA))), CHIP_ERROR_INVALID_UTF8);
+    EXPECT_EQ(ValidateCharStringForTest(CharSpan(reinterpret_cast<const char *>(overlongA), sizeof(overlongA))),
+              CHIP_ERROR_INVALID_UTF8);
     EXPECT_EQ(ValidateCharStringForTest(CharSpan(reinterpret_cast<const char *>(highSurrogate), sizeof(highSurrogate))),
               CHIP_ERROR_INVALID_UTF8);
-    EXPECT_EQ(ValidateCharStringForTest(CharSpan(reinterpret_cast<const char *>(truncated), sizeof(truncated))), CHIP_ERROR_INVALID_UTF8);
-    EXPECT_EQ(ValidateCharStringForTest(CharSpan(reinterpret_cast<const char *>(loneCont), sizeof(loneCont))), CHIP_ERROR_INVALID_UTF8);
-    EXPECT_EQ(ValidateCharStringForTest(CharSpan(reinterpret_cast<const char *>(aboveMax), sizeof(aboveMax))), CHIP_ERROR_INVALID_UTF8);
+    EXPECT_EQ(ValidateCharStringForTest(CharSpan(reinterpret_cast<const char *>(truncated), sizeof(truncated))),
+              CHIP_ERROR_INVALID_UTF8);
+    EXPECT_EQ(ValidateCharStringForTest(CharSpan(reinterpret_cast<const char *>(loneCont), sizeof(loneCont))),
+              CHIP_ERROR_INVALID_UTF8);
+    EXPECT_EQ(ValidateCharStringForTest(CharSpan(reinterpret_cast<const char *>(aboveMax), sizeof(aboveMax))),
+              CHIP_ERROR_INVALID_UTF8);
 }
 
 TEST_F(TestTLV, CheckValidateCharStringRejectsNulBytes)
@@ -5105,7 +5109,8 @@ TEST_F(TestTLV, CheckValidateCharStringAcceptsConformantStrings)
     const uint8_t grinningFace[] = { 0xF0, 0x9F, 0x98, 0x80 };     // U+1F600, valid 4-byte
     const uint8_t bomPrefixed[]  = { 0xEF, 0xBB, 0xBF, 'h', 'i' }; // leading BOM is fine
 
-    EXPECT_EQ(ValidateCharStringForTest(CharSpan(reinterpret_cast<const char *>(grinningFace), sizeof(grinningFace))), CHIP_NO_ERROR);
+    EXPECT_EQ(ValidateCharStringForTest(CharSpan(reinterpret_cast<const char *>(grinningFace), sizeof(grinningFace))),
+              CHIP_NO_ERROR);
     EXPECT_EQ(ValidateCharStringForTest(CharSpan(reinterpret_cast<const char *>(bomPrefixed), sizeof(bomPrefixed))), CHIP_NO_ERROR);
     EXPECT_EQ(ValidateCharStringForTest(CharSpan()), CHIP_NO_ERROR); // empty string is conformant
 }
