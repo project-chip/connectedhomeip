@@ -68,7 +68,7 @@ if [ -n "$TARGET_DEVICE" ]; then
     SDB_CMD="sdb -s $TARGET_DEVICE"
 fi
 
-$SDB_CMD root on
+"$SDB_CMD" root on
 
 # 1. Launch the application in native Tizen suspension debug mode
 echo "Launching $APP_NAME in suspended debug mode..."
@@ -76,7 +76,7 @@ LAUNCH_CMD="app_launcher --debug --start $APP_NAME"
 if [ -n "$APP_ARGS" ]; then
     LAUNCH_CMD="$LAUNCH_CMD -- $APP_ARGS"
 fi
-LAUNCH_OUT=$($SDB_CMD shell "$LAUNCH_CMD")
+LAUNCH_OUT=$("$SDB_CMD" shell "$LAUNCH_CMD")
 echo "$LAUNCH_OUT"
 
 # 2. Parse the PID from the app_launcher output
@@ -91,8 +91,8 @@ echo "Captured App PID: $PID"
 
 # 3. Setup port forwarding from host to target device
 echo "Setting up SDB port forward (TCP $GDBSERVER_PORT)..."
-$SDB_CMD forward tcp:"$GDBSERVER_PORT" tcp:"$GDBSERVER_PORT"
+"$SDB_CMD" forward tcp:"$GDBSERVER_PORT" tcp:"$GDBSERVER_PORT"
 
 # 4. Attach gdbserver manually to the frozen process
 echo "Attaching gdbserver to PID $PID on port $GDBSERVER_PORT..."
-$SDB_CMD shell "$GDBSERVER_TARGET_PATH :$GDBSERVER_PORT --attach $PID"
+"$SDB_CMD" shell "$GDBSERVER_TARGET_PATH :$GDBSERVER_PORT --attach $PID"
