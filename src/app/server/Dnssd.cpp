@@ -494,6 +494,13 @@ void DnssdServer::StartServer(Dnssd::CommissioningMode mode)
         return;
     }
 
+    if ( !Dnssd::ServiceAdvertiser::Instance().IsInitialized())
+    {
+        // Somehow Init can succeed without being initialized...
+        ChipLogError(Discovery, "Advertiser not initialized");
+        return;
+    }
+
     ChipLogProgress(Discovery, "Updating services using commissioning mode %d", static_cast<int>(mode));
 
     SuccessOrLog(Dnssd::ServiceAdvertiser::Instance().RemoveServices(), Discovery, "Failed to remove advertised services");
