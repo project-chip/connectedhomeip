@@ -401,11 +401,13 @@ public:
                 CHIP_ERROR err = decoder.Decode(value);
                 if (err != CHIP_NO_ERROR)
                 {
+                    ChipLogError(Zcl, "[Pw] Failed to decode MeasuredValue: %" CHIP_ERROR_FORMAT, err.Format());
                     return ::pw::Status::Internal();
                 }
                 err = cluster->SetMeasuredValue(value);
                 if (err != CHIP_NO_ERROR)
                 {
+                    ChipLogError(Zcl, "[Pw] Failed to set MeasuredValue: %" CHIP_ERROR_FORMAT, err.Format());
                     return ::pw::Status::Internal();
                 }
                 return ::pw::OkStatus();
@@ -415,11 +417,13 @@ public:
                 CHIP_ERROR err = decoder.Decode(value);
                 if (err != CHIP_NO_ERROR)
                 {
+                    ChipLogError(Zcl, "[Pw] Failed to decode PeakMeasuredValue: %" CHIP_ERROR_FORMAT, err.Format());
                     return ::pw::Status::Internal();
                 }
                 err = cluster->SetPeakMeasuredValue(value);
                 if (err != CHIP_NO_ERROR)
                 {
+                    ChipLogError(Zcl, "[Pw] Failed to set PeakMeasuredValue: %" CHIP_ERROR_FORMAT, err.Format());
                     return ::pw::Status::Internal();
                 }
                 return ::pw::OkStatus();
@@ -429,11 +433,13 @@ public:
                 CHIP_ERROR err = decoder.Decode(value);
                 if (err != CHIP_NO_ERROR)
                 {
+                    ChipLogError(Zcl, "[Pw] Failed to decode PeakMeasuredValueWindow: %" CHIP_ERROR_FORMAT, err.Format());
                     return ::pw::Status::Internal();
                 }
                 err = cluster->SetPeakMeasuredValueWindow(value);
                 if (err != CHIP_NO_ERROR)
                 {
+                    ChipLogError(Zcl, "[Pw] Failed to set PeakMeasuredValueWindow: %" CHIP_ERROR_FORMAT, err.Format());
                     return ::pw::Status::Internal();
                 }
                 return ::pw::OkStatus();
@@ -443,11 +449,13 @@ public:
                 CHIP_ERROR err = decoder.Decode(value);
                 if (err != CHIP_NO_ERROR)
                 {
+                    ChipLogError(Zcl, "[Pw] Failed to decode AverageMeasuredValue: %" CHIP_ERROR_FORMAT, err.Format());
                     return ::pw::Status::Internal();
                 }
                 err = cluster->SetAverageMeasuredValue(value);
                 if (err != CHIP_NO_ERROR)
                 {
+                    ChipLogError(Zcl, "[Pw] Failed to set AverageMeasuredValue: %" CHIP_ERROR_FORMAT, err.Format());
                     return ::pw::Status::Internal();
                 }
                 return ::pw::OkStatus();
@@ -457,11 +465,13 @@ public:
                 CHIP_ERROR err = decoder.Decode(value);
                 if (err != CHIP_NO_ERROR)
                 {
+                    ChipLogError(Zcl, "[Pw] Failed to decode AverageMeasuredValueWindow: %" CHIP_ERROR_FORMAT, err.Format());
                     return ::pw::Status::Internal();
                 }
                 err = cluster->SetAverageMeasuredValueWindow(value);
                 if (err != CHIP_NO_ERROR)
                 {
+                    ChipLogError(Zcl, "[Pw] Failed to set AverageMeasuredValueWindow: %" CHIP_ERROR_FORMAT, err.Format());
                     return ::pw::Status::Internal();
                 }
                 return ::pw::OkStatus();
@@ -471,11 +481,13 @@ public:
                 CHIP_ERROR err = decoder.Decode(value);
                 if (err != CHIP_NO_ERROR)
                 {
+                    ChipLogError(Zcl, "[Pw] Failed to decode LevelValue: %" CHIP_ERROR_FORMAT, err.Format());
                     return ::pw::Status::Internal();
                 }
                 err = cluster->SetLevelValue(value);
                 if (err != CHIP_NO_ERROR)
                 {
+                    ChipLogError(Zcl, "[Pw] Failed to set LevelValue: %" CHIP_ERROR_FORMAT, err.Format());
                     return ::pw::Status::Internal();
                 }
                 return ::pw::OkStatus();
