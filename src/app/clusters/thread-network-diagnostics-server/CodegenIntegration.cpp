@@ -39,7 +39,11 @@ constexpr size_t kThreadNetworkDiagnosticsMaxClusterCount =
 
 LazyRegisteredServerCluster<ThreadNetworkDiagnosticsCluster> gServers[kThreadNetworkDiagnosticsMaxClusterCount];
 
-DefaultThreadNetworkDiagnosticsProvider gDefaultProvider;
+DefaultThreadNetworkDiagnosticsProvider & GetDefaultProvider()
+{
+    static DefaultThreadNetworkDiagnosticsProvider sDefaultProvider;
+    return sDefaultProvider;
+}
 
 class IntegrationDelegate : public CodegenClusterIntegration::Delegate
 {
@@ -60,7 +64,7 @@ public:
         gServers[clusterInstanceIndex].Create(endpointId,
                                               rawFeatureMap == 0 ? ThreadNetworkDiagnosticsCluster::ClusterType::kMinimal
                                                                  : ThreadNetworkDiagnosticsCluster::ClusterType::kFull,
-                                              gDefaultProvider);
+                                              GetDefaultProvider());
         return gServers[clusterInstanceIndex].Registration();
     }
 
