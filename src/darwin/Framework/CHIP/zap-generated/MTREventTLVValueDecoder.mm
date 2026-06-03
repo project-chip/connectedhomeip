@@ -4971,10 +4971,14 @@ static id _Nullable DecodeEventPayloadForAmbientContextSensingCluster(EventId aE
                     }
                     memberValue.ambientContextSensed = array_2;
                 }
-                if (cppValue.ambientContextDetected.Value().detectionStartTime.HasValue()) {
-                    memberValue.detectionStartTime = [NSNumber numberWithUnsignedInt:cppValue.ambientContextDetected.Value().detectionStartTime.Value()];
+                if (cppValue.ambientContextDetected.Value().detectionConfidence.HasValue()) {
+                    if (cppValue.ambientContextDetected.Value().detectionConfidence.Value().IsNull()) {
+                        memberValue.detectionConfidence = nil;
+                    } else {
+                        memberValue.detectionConfidence = [NSNumber numberWithUnsignedChar:cppValue.ambientContextDetected.Value().detectionConfidence.Value().Value()];
+                    }
                 } else {
-                    memberValue.detectionStartTime = nil;
+                    memberValue.detectionConfidence = nil;
                 }
             } else {
                 memberValue = nil;
@@ -4983,12 +4987,12 @@ static id _Nullable DecodeEventPayloadForAmbientContextSensingCluster(EventId aE
         } while (0);
         do {
             NSNumber * _Nullable memberValue;
-            if (cppValue.objectCountReached.HasValue()) {
-                memberValue = [NSNumber numberWithBool:cppValue.objectCountReached.Value()];
+            if (cppValue.objectCountThresholdReached.HasValue()) {
+                memberValue = [NSNumber numberWithBool:cppValue.objectCountThresholdReached.Value()];
             } else {
                 memberValue = nil;
             }
-            value.objectCountReached = memberValue;
+            value.objectCountThresholdReached = memberValue;
         } while (0);
         do {
             NSNumber * _Nullable memberValue;
@@ -5012,9 +5016,22 @@ static id _Nullable DecodeEventPayloadForAmbientContextSensingCluster(EventId aE
         __auto_type * value = [MTRAmbientContextSensingClusterAmbientContextDetectEndedEvent new];
 
         do {
-            NSNumber * _Nonnull memberValue;
-            memberValue = [NSNumber numberWithUnsignedLongLong:cppValue.eventStartTime];
-            value.eventStartTime = memberValue;
+            NSNumber * _Nullable memberValue;
+            if (cppValue.eventStartTimePos.HasValue()) {
+                memberValue = [NSNumber numberWithUnsignedLongLong:cppValue.eventStartTimePos.Value()];
+            } else {
+                memberValue = nil;
+            }
+            value.eventStartTimePos = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nullable memberValue;
+            if (cppValue.eventStartTimeSys.HasValue()) {
+                memberValue = [NSNumber numberWithUnsignedLongLong:cppValue.eventStartTimeSys.Value()];
+            } else {
+                memberValue = nil;
+            }
+            value.eventStartTimeSys = memberValue;
         } while (0);
 
         return value;

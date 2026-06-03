@@ -9019,7 +9019,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _ambientContextSensed = [NSArray array];
 
-        _detectionStartTime = nil;
+        _detectionConfidence = nil;
     }
     return self;
 }
@@ -9029,14 +9029,14 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRAmbientContextSensingClusterAmbientContextTypeStruct alloc] init];
 
     other.ambientContextSensed = self.ambientContextSensed;
-    other.detectionStartTime = self.detectionStartTime;
+    other.detectionConfidence = self.detectionConfidence;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: ambientContextSensed:%@; detectionStartTime:%@; >", NSStringFromClass([self class]), _ambientContextSensed, _detectionStartTime];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: ambientContextSensed:%@; detectionConfidence:%@; >", NSStringFromClass([self class]), _ambientContextSensed, _detectionConfidence];
     return descriptionString;
 }
 
@@ -9154,7 +9154,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _ambientContextDetected = nil;
 
-        _objectCountReached = nil;
+        _objectCountThresholdReached = nil;
 
         _objectCount = nil;
     }
@@ -9166,7 +9166,7 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRAmbientContextSensingClusterAmbientContextDetectStartedEvent alloc] init];
 
     other.ambientContextDetected = self.ambientContextDetected;
-    other.objectCountReached = self.objectCountReached;
+    other.objectCountThresholdReached = self.objectCountThresholdReached;
     other.objectCount = self.objectCount;
 
     return other;
@@ -9174,7 +9174,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: ambientContextDetected:%@; objectCountReached:%@; objectCount:%@; >", NSStringFromClass([self class]), _ambientContextDetected, _objectCountReached, _objectCount];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: ambientContextDetected:%@; objectCountThresholdReached:%@; objectCount:%@; >", NSStringFromClass([self class]), _ambientContextDetected, _objectCountThresholdReached, _objectCount];
     return descriptionString;
 }
 
@@ -9185,7 +9185,9 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _eventStartTime = @(0);
+        _eventStartTimePos = nil;
+
+        _eventStartTimeSys = nil;
     }
     return self;
 }
@@ -9194,14 +9196,15 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTRAmbientContextSensingClusterAmbientContextDetectEndedEvent alloc] init];
 
-    other.eventStartTime = self.eventStartTime;
+    other.eventStartTimePos = self.eventStartTimePos;
+    other.eventStartTimeSys = self.eventStartTimeSys;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: eventStartTime:%@; >", NSStringFromClass([self class]), _eventStartTime];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: eventStartTimePos:%@; eventStartTimeSys:%@; >", NSStringFromClass([self class]), _eventStartTimePos, _eventStartTimeSys];
     return descriptionString;
 }
 

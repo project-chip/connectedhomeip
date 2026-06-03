@@ -5291,10 +5291,10 @@ CHIP_ERROR DataModelLogger::LogValue(
         }
     }
     {
-        CHIP_ERROR err = LogValue("DetectionStartTime", indent + 1, value.detectionStartTime);
+        CHIP_ERROR err = LogValue("DetectionConfidence", indent + 1, value.detectionConfidence);
         if (err != CHIP_NO_ERROR)
         {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'DetectionStartTime'");
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'DetectionConfidence'");
             return err;
         }
     }
@@ -12673,10 +12673,10 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
         }
     }
     {
-        CHIP_ERROR err = DataModelLogger::LogValue("ObjectCountReached", indent + 1, value.objectCountReached);
+        CHIP_ERROR err = DataModelLogger::LogValue("ObjectCountThresholdReached", indent + 1, value.objectCountThresholdReached);
         if (err != CHIP_NO_ERROR)
         {
-            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'ObjectCountReached'");
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'ObjectCountThresholdReached'");
             return err;
         }
     }
@@ -12697,10 +12697,18 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 {
     DataModelLogger::LogString(label, indent, "{");
     {
-        CHIP_ERROR err = DataModelLogger::LogValue("EventStartTime", indent + 1, value.eventStartTime);
+        CHIP_ERROR err = DataModelLogger::LogValue("EventStartTimePos", indent + 1, value.eventStartTimePos);
         if (err != CHIP_NO_ERROR)
         {
-            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'EventStartTime'");
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'EventStartTimePos'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("EventStartTimeSys", indent + 1, value.eventStartTimeSys);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'EventStartTimeSys'");
             return err;
         }
     }
@@ -22827,10 +22835,10 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("AmbientContextTypeSupported", 1, value);
         }
-        case AmbientContextSensing::Attributes::ObjectCountReached::Id: {
+        case AmbientContextSensing::Attributes::ObjectCountThresholdReached::Id: {
             bool value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("ObjectCountReached", 1, value);
+            return DataModelLogger::LogValue("ObjectCountThresholdReached", 1, value);
         }
         case AmbientContextSensing::Attributes::ObjectCountConfig::Id: {
             chip::app::Clusters::AmbientContextSensing::Structs::ObjectCountConfigStruct::DecodableType value;
@@ -22863,6 +22871,11 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
                 value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("PredictedActivity", 1, value);
+        }
+        case AmbientContextSensing::Attributes::SensorFusionSupported::Id: {
+            chip::app::DataModel::DecodableList<chip::app::Clusters::Globals::Structs::SemanticTagStruct::DecodableType> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("SensorFusionSupported", 1, value);
         }
         case AmbientContextSensing::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;

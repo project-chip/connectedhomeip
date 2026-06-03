@@ -5600,7 +5600,7 @@ static BOOL AttributeIsSpecifiedInAmbientContextSensingCluster(AttributeId aAttr
     case Attributes::AmbientContextTypeSupported::Id: {
         return YES;
     }
-    case Attributes::ObjectCountReached::Id: {
+    case Attributes::ObjectCountThresholdReached::Id: {
         return YES;
     }
     case Attributes::ObjectCountConfig::Id: {
@@ -5619,6 +5619,9 @@ static BOOL AttributeIsSpecifiedInAmbientContextSensingCluster(AttributeId aAttr
         return YES;
     }
     case Attributes::PredictedActivity::Id: {
+        return YES;
+    }
+    case Attributes::SensorFusionSupported::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {
