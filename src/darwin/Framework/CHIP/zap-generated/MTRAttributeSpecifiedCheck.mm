@@ -6746,6 +6746,49 @@ static BOOL AttributeIsSpecifiedInChimeCluster(AttributeId aAttributeId)
     }
     }
 }
+static BOOL AttributeIsSpecifiedInAVAnalysisCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::AvAnalysis;
+    switch (aAttributeId) {
+    case Attributes::SupportedAmbientContexts::Id: {
+        return YES;
+    }
+    case Attributes::ActiveAmbientContextTriggers::Id: {
+        return YES;
+    }
+    case Attributes::MaxAnalysisStreamCount::Id: {
+        return YES;
+    }
+    case Attributes::CurrentAnalysisStreamCount::Id: {
+        return YES;
+    }
+    case Attributes::AnalysisStreams::Id: {
+        return YES;
+    }
+    case Attributes::TrackingEnabled::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        // Not a known AVAnalysis attribute.
+        return NO;
+    }
+    }
+}
 static BOOL AttributeIsSpecifiedInCommodityTariffCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::CommodityTariff;
@@ -7858,6 +7901,9 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     }
     case Clusters::Chime::Id: {
         return AttributeIsSpecifiedInChimeCluster(aAttributeId);
+    }
+    case Clusters::AvAnalysis::Id: {
+        return AttributeIsSpecifiedInAVAnalysisCluster(aAttributeId);
     }
     case Clusters::CommodityTariff::Id: {
         return AttributeIsSpecifiedInCommodityTariffCluster(aAttributeId);

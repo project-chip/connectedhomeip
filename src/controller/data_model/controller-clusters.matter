@@ -11435,7 +11435,7 @@ cluster WebRTCTransportRequestor = 1364 {
 
 /** This cluster implements the upload of Audio and Video streams from the Push AV Stream Transport Cluster using suitable push-based transports. */
 cluster PushAvStreamTransport = 1365 {
-  revision 2;
+  revision 3;
 
   enum CMAFInterfaceEnum : enum8 {
     kInterface1 = 0;
@@ -11475,6 +11475,7 @@ cluster PushAvStreamTransport = 1365 {
     kCommand = 0;
     kMotion = 1;
     kContinuous = 2;
+    kAmbientContext = 3;
   }
 
   enum TriggerActivationReasonEnum : enum8 {
@@ -11523,10 +11524,8 @@ cluster PushAvStreamTransport = 1365 {
     CMAFInterfaceEnum CMAFInterface = 0;
     int16u segmentDuration = 1;
     int16u chunkDuration = 2;
-    int8u sessionGroup = 3;
-    char_string<16> trackName = 4;
-    optional octet_string<16> CENCKey = 5;
-    optional octet_string<16> CENCKeyID = 6;
+    optional int8u sessionGroup = 3;
+    optional char_string<16> trackName = 4;
     optional boolean metadataEnabled = 7;
   }
 
@@ -11565,13 +11564,13 @@ cluster PushAvStreamTransport = 1365 {
     int16u connectionID = 0;
     TransportTriggerTypeEnum triggerType = 1;
     optional TriggerActivationReasonEnum activationReason = 2;
-    ContainerFormatEnum containerType = 3;
+    optional ContainerFormatEnum containerType = 3;
     optional int64u CMAFSessionNumber = 4;
   }
 
   info event PushTransportEnd = 1 {
     int16u connectionID = 0;
-    ContainerFormatEnum containerType = 1;
+    optional ContainerFormatEnum containerType = 1;
     optional int64u CMAFSessionNumber = 2;
   }
 
@@ -11662,6 +11661,124 @@ cluster Chime = 1366 {
 
   /** This command will play the currently selected chime or the chime passed in. */
   command PlayChimeSound(PlayChimeSoundRequest): DefaultSuccess = 0;
+}
+
+/** This server cluster provides an interface for controlling events pertaining to AV analysis. */
+provisional cluster AvAnalysis = 1367 {
+  revision 1;
+
+  enum AnalysisStreamStateEnum : enum8 {
+    kPendingInitiation = 0;
+    kFailure = 1;
+    kWebRTCInitiated = 2;
+    kPushAVAllocated = 3;
+    kWebRTCActive = 4;
+    kPushAVActive = 5;
+    kPushAVPendingDeactivation = 6;
+    kWebRTCPendingDeactivation = 7;
+  }
+
+  bitmap Feature : bitmap32 {
+    kLocalContextDetection = 0x1;
+    kRemoteContextDetection = 0x2;
+    kPerZoneContextDetection = 0x4;
+  }
+
+  struct AnalysisStreamStruct {
+    int16u analysisStreamID = 0;
+    optional nullable endpoint_no webRTCEndpointID = 1;
+    optional nullable endpoint_no pushAVEndpointID = 2;
+    AnalysisStreamStateEnum analysisStreamState = 3;
+  }
+
+  struct ContextTriggerStruct {
+    SemanticTagStruct context = 0;
+    optional nullable int16u zoneIDs[] = 1;
+  }
+
+  struct TrackedContext {
+    int16u identifiedContextID = 0;
+    SemanticTagStruct identifiedContext = 1;
+    optional nullable int16u previousZone = 2;
+    optional nullable int16u currentZone = 3;
+    epoch_s startTime = 4;
+    nullable epoch_s endTime = 5;
+  }
+
+  provisional info event AnalysisSessionStart = 0 {
+    int16u sessionID = 0;
+    optional node_id sourceNodeId = 1;
+    nullable int16u triggeredZones[] = 2;
+  }
+
+  provisional info event AnalysisSessionEnd = 1 {
+    int16u sessionID = 0;
+    optional node_id sourceNodeId = 1;
+  }
+
+  provisional info event PerceivedContext = 2 {
+    int16u sessionID = 0;
+    optional node_id sourceNodeId = 1;
+    optional epoch_us sourceStartTimestamp = 2;
+    optional TrackedContext newIdentifiedContexts[] = 3;
+    optional TrackedContext currentIdentifiedContexts[] = 4;
+    optional TrackedContext expiredContexts[] = 5;
+  }
+
+  readonly attribute SemanticTagStruct supportedAmbientContexts[] = 0;
+  readonly attribute ContextTriggerStruct activeAmbientContextTriggers[] = 1;
+  readonly attribute optional int8u maxAnalysisStreamCount = 2;
+  readonly attribute optional int8u currentAnalysisStreamCount = 3;
+  readonly attribute optional AnalysisStreamStruct analysisStreams[] = 4;
+  attribute access(read: manage, write: manage) boolean trackingEnabled = 5;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct EnableContextTriggersRequest {
+    nullable ContextTriggerStruct contextTriggers[] = 0;
+  }
+
+  request struct DisableContextTriggersRequest {
+    nullable ContextTriggerStruct contextTriggers[] = 0;
+  }
+
+  request struct EstablishAnalysisStreamRequest {
+    node_id nodeID = 0;
+  }
+
+  response struct EstablishAnalysisStreamResponse = 3 {
+    int16u analysisStreamID = 0;
+  }
+
+  request struct ActivateAnalysisStreamRequest {
+    int16u analysisStreamID = 0;
+    optional endpoint_no webRTCEndpointID = 1;
+    optional endpoint_no pushAVEndpointID = 2;
+  }
+
+  request struct DeactivateAnalysisStreamRequest {
+    int16u analysisStreamID = 0;
+  }
+
+  request struct RemoveAnalysisStreamRequest {
+    int16u analysisStreamID = 0;
+  }
+
+  /** This command SHALL enable the generation of PerceivedContext events for the set of ambient context triggers that are provided, should they be detected. */
+  command EnableContextTriggers(EnableContextTriggersRequest): DefaultSuccess = 0;
+  /** This command will disable the generation of PerceivedContext events for the set of ambient context triggers that are provided, should they be detected. */
+  command DisableContextTriggers(DisableContextTriggersRequest): DefaultSuccess = 1;
+  /** This command will cause the Analysis Node to establish a video stream with a StreamUsage of Analysis Value with the identified camera. */
+  command EstablishAnalysisStream(EstablishAnalysisStreamRequest): EstablishAnalysisStreamResponse = 2;
+  /** This command will cause the Analysis Node to activate either a WebRTC livestream or PushAV recording stream with a StreamUsage of Analysis Value with the identified camera. */
+  command ActivateAnalysisStream(ActivateAnalysisStreamRequest): DefaultSuccess = 4;
+  /** This command will cause the Analysis Node to deactivate either a WebRTC livestream or PushAV recording stream with a StreamUsage of Analysis Value with the identified camera. */
+  command DeactivateAnalysisStream(DeactivateAnalysisStreamRequest): DefaultSuccess = 5;
+  /** This command will cause the Analysis Node to remove a previously allocated video stream. */
+  command RemoveAnalysisStream(RemoveAnalysisStreamRequest): DefaultSuccess = 6;
 }
 
 /** The CommodityTariffCluster provides the mechanism for communicating Commodity Tariff information within the premises. */

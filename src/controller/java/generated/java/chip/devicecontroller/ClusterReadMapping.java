@@ -19838,6 +19838,131 @@ public class ClusterReadMapping {
      
        return result;
     }
+    private static Map<String, InteractionInfo> readAvAnalysisInteractionInfo() {
+       Map<String, InteractionInfo> result = new LinkedHashMap<>();Map<String, CommandParameterInfo> readAvAnalysisSupportedAmbientContextsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readAvAnalysisSupportedAmbientContextsAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.AvAnalysisCluster) cluster).readSupportedAmbientContextsAttribute(
+              (ChipClusters.AvAnalysisCluster.SupportedAmbientContextsAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedAvAnalysisClusterSupportedAmbientContextsAttributeCallback(),
+          readAvAnalysisSupportedAmbientContextsCommandParams
+        );
+        result.put("readSupportedAmbientContextsAttribute", readAvAnalysisSupportedAmbientContextsAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readAvAnalysisActiveAmbientContextTriggersCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readAvAnalysisActiveAmbientContextTriggersAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.AvAnalysisCluster) cluster).readActiveAmbientContextTriggersAttribute(
+              (ChipClusters.AvAnalysisCluster.ActiveAmbientContextTriggersAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedAvAnalysisClusterActiveAmbientContextTriggersAttributeCallback(),
+          readAvAnalysisActiveAmbientContextTriggersCommandParams
+        );
+        result.put("readActiveAmbientContextTriggersAttribute", readAvAnalysisActiveAmbientContextTriggersAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readAvAnalysisMaxAnalysisStreamCountCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readAvAnalysisMaxAnalysisStreamCountAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.AvAnalysisCluster) cluster).readMaxAnalysisStreamCountAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readAvAnalysisMaxAnalysisStreamCountCommandParams
+        );
+        result.put("readMaxAnalysisStreamCountAttribute", readAvAnalysisMaxAnalysisStreamCountAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readAvAnalysisCurrentAnalysisStreamCountCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readAvAnalysisCurrentAnalysisStreamCountAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.AvAnalysisCluster) cluster).readCurrentAnalysisStreamCountAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readAvAnalysisCurrentAnalysisStreamCountCommandParams
+        );
+        result.put("readCurrentAnalysisStreamCountAttribute", readAvAnalysisCurrentAnalysisStreamCountAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readAvAnalysisAnalysisStreamsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readAvAnalysisAnalysisStreamsAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.AvAnalysisCluster) cluster).readAnalysisStreamsAttribute(
+              (ChipClusters.AvAnalysisCluster.AnalysisStreamsAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedAvAnalysisClusterAnalysisStreamsAttributeCallback(),
+          readAvAnalysisAnalysisStreamsCommandParams
+        );
+        result.put("readAnalysisStreamsAttribute", readAvAnalysisAnalysisStreamsAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readAvAnalysisTrackingEnabledCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readAvAnalysisTrackingEnabledAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.AvAnalysisCluster) cluster).readTrackingEnabledAttribute(
+              (ChipClusters.BooleanAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedBooleanAttributeCallback(),
+          readAvAnalysisTrackingEnabledCommandParams
+        );
+        result.put("readTrackingEnabledAttribute", readAvAnalysisTrackingEnabledAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readAvAnalysisGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readAvAnalysisGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.AvAnalysisCluster) cluster).readGeneratedCommandListAttribute(
+              (ChipClusters.AvAnalysisCluster.GeneratedCommandListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedAvAnalysisClusterGeneratedCommandListAttributeCallback(),
+          readAvAnalysisGeneratedCommandListCommandParams
+        );
+        result.put("readGeneratedCommandListAttribute", readAvAnalysisGeneratedCommandListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readAvAnalysisAcceptedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readAvAnalysisAcceptedCommandListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.AvAnalysisCluster) cluster).readAcceptedCommandListAttribute(
+              (ChipClusters.AvAnalysisCluster.AcceptedCommandListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedAvAnalysisClusterAcceptedCommandListAttributeCallback(),
+          readAvAnalysisAcceptedCommandListCommandParams
+        );
+        result.put("readAcceptedCommandListAttribute", readAvAnalysisAcceptedCommandListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readAvAnalysisAttributeListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readAvAnalysisAttributeListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.AvAnalysisCluster) cluster).readAttributeListAttribute(
+              (ChipClusters.AvAnalysisCluster.AttributeListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedAvAnalysisClusterAttributeListAttributeCallback(),
+          readAvAnalysisAttributeListCommandParams
+        );
+        result.put("readAttributeListAttribute", readAvAnalysisAttributeListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readAvAnalysisFeatureMapCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readAvAnalysisFeatureMapAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.AvAnalysisCluster) cluster).readFeatureMapAttribute(
+              (ChipClusters.LongAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+          readAvAnalysisFeatureMapCommandParams
+        );
+        result.put("readFeatureMapAttribute", readAvAnalysisFeatureMapAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readAvAnalysisClusterRevisionCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readAvAnalysisClusterRevisionAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.AvAnalysisCluster) cluster).readClusterRevisionAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readAvAnalysisClusterRevisionCommandParams
+        );
+        result.put("readClusterRevisionAttribute", readAvAnalysisClusterRevisionAttributeInteractionInfo);
+     
+       return result;
+    }
     private static Map<String, InteractionInfo> readCommodityTariffInteractionInfo() {
        Map<String, InteractionInfo> result = new LinkedHashMap<>();Map<String, CommandParameterInfo> readCommodityTariffTariffUnitCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readCommodityTariffTariffUnitAttributeInteractionInfo = new InteractionInfo(
@@ -22140,6 +22265,7 @@ public class ClusterReadMapping {
             put("webRTCTransportRequestor", readWebRTCTransportRequestorInteractionInfo());
             put("pushAvStreamTransport", readPushAvStreamTransportInteractionInfo());
             put("chime", readChimeInteractionInfo());
+            put("avAnalysis", readAvAnalysisInteractionInfo());
             put("commodityTariff", readCommodityTariffInteractionInfo());
             put("ecosystemInformation", readEcosystemInformationInteractionInfo());
             put("commissionerControl", readCommissionerControlInteractionInfo());
