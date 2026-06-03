@@ -343,9 +343,9 @@ std::optional<DataModel::ActionReturnStatus> OperationalStateCluster::InvokeComm
 // Command handlers
 // ---------------------------------------------------------------------------
 
-std::optional<DataModel::ActionReturnStatus>
-OperationalStateCluster::AddCommandResponse(const DataModel::InvokeRequest & request, CommandHandler * handler,
-                                            const GenericOperationalError & err)
+std::optional<DataModel::ActionReturnStatus> OperationalStateCluster::AddCommandResponse(const DataModel::InvokeRequest & request,
+                                                                                         CommandHandler * handler,
+                                                                                         const GenericOperationalError & err)
 {
     OperationalState::Commands::OperationalCommandResponse::Type response;
     response.commandResponseState = err;
