@@ -26764,7 +26764,7 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value)
 
 } // namespace AudioContextDetected
 
-namespace ObjectCountReached {
+namespace ObjectCountThresholdReached {
 
 Protocols::InteractionModel::Status Get(EndpointId endpoint, bool * value)
 {
@@ -26809,7 +26809,7 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value)
     return emberAfWriteAttribute(endpoint, Clusters::AmbientContextSensing::Id, Id, writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
 }
 
-} // namespace ObjectCountReached
+} // namespace ObjectCountThresholdReached
 
 namespace ObjectCount {
 
