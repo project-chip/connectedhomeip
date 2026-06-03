@@ -757,4 +757,36 @@ TEST_F(TestTCP, CheckProcessReceivedBuffer)
     EXPECT_EQ(TestAccess::GetEndpoint(state), nullptr);
 }
 
+TEST_F(TestTCP, CheckMaxTCPMessageSizeBoundary)
+{
+    TCPImpl tcp;
+
+    IPAddress addr;
+    IPAddress::FromString("::1", addr);
+
+    uint16_t port = GetRandomPort();
+    MockTransportMgrDelegate gMockTransportMgrDelegate(mIOContext);
+    gMockTransportMgrDelegate.InitializeMessageTest(tcp, addr, port);
+
+    gMockTransportMgrDelegate.SingleMessageTest(tcp, addr, port);
+
+    Transport::PeerAddress lPeerAddress = Transport::PeerAddress::TCP(addr, port);
+    void * state                        = TestAccess::FindActiveConnection(tcp, lPeerAddress);
+    ASSERT_NE(state, nullptr);
+    TCPEndPoint * lEndPoint = TestAccess::GetEndpoint(state);
+    ASSERT_NE(lEndPoint, nullptr);
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    TestData testData[1];
+
+    // A message of exactly kMaxTCPMessageSize (kLargeBufMaxSizeWithoutReserve - 4)
+    // should be accepted, not rejected.
+    constexpr uint32_t kMaxValidSize = static_cast<uint32_t>(System::PacketBuffer::kLargeBufMaxSizeWithoutReserve - 4);
+    gMockTransportMgrDelegate.mReceiveHandlerCallCount = 0;
+    EXPECT_TRUE(testData[0].Init((const uint32_t[]){ kMaxValidSize, 0 }));
+    err = TestAccess::ProcessReceivedBuffer(tcp, lEndPoint, lPeerAddress, std::move(testData[0].mHandle));
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(gMockTransportMgrDelegate.mReceiveHandlerCallCount, 1);
+}
+
 } // namespace
