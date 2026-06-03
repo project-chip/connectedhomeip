@@ -106,21 +106,34 @@ class TC_PWRTL_2_1(MatterBaseTest):
         asserts.assert_equal(reserved_bits, 0,
                              f"Reserved bits set in FeatureMap: 0x{reserved_bits:08X}")
 
-        self.step(5, "TH reads AttributeList; verifies AvailableEndpoints/ActiveEndpoints present iff TREE/SET/CIRC")
+        self.step(5, "TH reads AttributeList; verifies AvailableEndpoints present iff SET, ActiveEndpoints present iff DYPF")
         attribute_list = await self.read_single_attribute_check_success(
             endpoint=endpoint,
             cluster=cluster,
             attribute=attributes.AttributeList
         )
         log.info(f"AttributeList: {attribute_list}")
-        needs_endpoint_attrs = has_tree or has_set or has_circ
         avail_ep_id = attributes.AvailableEndpoints.attribute_id
         active_ep_id = attributes.ActiveEndpoints.attribute_id
-        if needs_endpoint_attrs:
+
+        # AvailableEndpoints (0x0000): conformance "SET" — mandatory iff SET feature,
+        # disallowed otherwise (bare-symbol form, not bracketed).
+        if has_set:
             asserts.assert_in(avail_ep_id, attribute_list,
-                              "AvailableEndpoints must be in AttributeList for TREE/SET/CIRC")
+                              "AvailableEndpoints must be in AttributeList when SET feature is set")
+        else:
+            asserts.assert_not_in(avail_ep_id, attribute_list,
+                                  "AvailableEndpoints must NOT be in AttributeList when SET feature is not set")
+
+        # ActiveEndpoints (0x0001): conformance "DYPF" — mandatory iff DYPF feature,
+        # disallowed otherwise. DYPF itself requires SET ([SET]), so DYPF implies
+        # AvailableEndpoints is also present.
+        if has_dypf:
             asserts.assert_in(active_ep_id, attribute_list,
-                              "ActiveEndpoints must be in AttributeList for TREE/SET/CIRC")
+                              "ActiveEndpoints must be in AttributeList when DYPF feature is set")
+        else:
+            asserts.assert_not_in(active_ep_id, attribute_list,
+                                  "ActiveEndpoints must NOT be in AttributeList when DYPF feature is not set")
 
         self.step(6, "TH reads AvailableEndpoints (if present in AttributeList)")
         avail_eps = None
@@ -132,7 +145,7 @@ class TC_PWRTL_2_1(MatterBaseTest):
             )
             log.info(f"AvailableEndpoints: {avail_eps}")
         else:
-            log.info("AvailableEndpoints not in AttributeList (NODE topology)")
+            log.info("AvailableEndpoints not in AttributeList (SET feature not set)")
 
         self.step(7, "TH reads ActiveEndpoints (if present in AttributeList)")
         active_eps = None
@@ -144,7 +157,7 @@ class TC_PWRTL_2_1(MatterBaseTest):
             )
             log.info(f"ActiveEndpoints: {active_eps}")
         else:
-            log.info("ActiveEndpoints not in AttributeList (NODE topology)")
+            log.info("ActiveEndpoints not in AttributeList (DYPF feature not set)")
 
         self.step(8, "TH verifies ActiveEndpoints is a subset of AvailableEndpoints")
         if avail_eps is not None and active_eps is not None:
