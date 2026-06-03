@@ -134,6 +134,7 @@ class TC_COMPRO_2_8(COMPROBaseTest):
     @async_test_body
     async def test_TC_COMPRO_2_8(self):
         cp = self.cp
+        params = getattr(self, 'user_params', {}) or {}
 
         # ----------------------------------------------------------------
         # Step 1 — Commission DUT to Fabric A (TH1) and Fabric B (TH2)
@@ -190,31 +191,35 @@ class TC_COMPRO_2_8(COMPROBaseTest):
         scan_max_time = await self.read_scan_max_time()
         logger.info("Step 5: scan_max_time = %d s", scan_max_time)
 
-        single_transport = self.pick_single_transport_bit(valid_transports)
-        single_band = self.pick_single_transport_bit(valid_bands) if has_wi else None
+        # Use pick_proxy_transport so wiFiBand is not sent alongside a non-WiFiPAF
+        # transport (which causes INVALID_COMMAND — same bug as TC_COMPRO_2_6/2_7).
+        ed_transport_type = params.get('ed_transport', 'wifipaf')
+        proxy_transport = self.pick_proxy_transport(valid_transports, ed_transport_type)
+        proxy_wifi_band = (self.pick_single_transport_bit(valid_bands)
+                           if has_wi and proxy_transport == int(cp.Bitmaps.CapabilitiesBitmap.kWiFiPAF)
+                           else None)
         wifi_bands_arg = valid_bands if has_wi else None
 
         # ----------------------------------------------------------------
         # Step 6 — TH1 ProxyConnectRequest → fabric_a_session
         # ----------------------------------------------------------------
         self.step(6)
-        params = getattr(self, 'user_params', {}) or {}
         ed_discriminator = int(params.get('ed_discriminator', 3841))
         proxy_connect_timeout = int(params.get('proxy_connect_timeout', CONNECT_TIMEOUT_S))
 
         logger.info("Step 6: ProxyConnectRequest (transport=0x%02x, discriminator=%d)",
-                    single_transport, ed_discriminator)
+                    proxy_transport, ed_discriminator)
         connect_response = await self.default_controller.SendCommand(
             nodeId=self.dut_node_id,
             endpoint=self.cp_endpoint,
             payload=cp.Commands.ProxyConnectRequest(
                 address=NullValue,
-                transport=single_transport,
+                transport=proxy_transport,
                 discriminator=ed_discriminator,
                 vendorId=0,
                 productId=0,
                 timeout=proxy_connect_timeout,
-                wiFiBand=single_band,
+                wiFiBand=proxy_wifi_band,
             ),
             interactionTimeoutMs=None,
         )
@@ -236,7 +241,7 @@ class TC_COMPRO_2_8(COMPROBaseTest):
                 payload=cp.Commands.ProxyMessageRequest(
                     sessionId=fabric_a_session,
                     responseTimeout=10,
-                    message=NullValue,
+                    message=bytes(8),
                 ),
             )
             asserts.fail("Expected NOT_FOUND but TH2 ProxyMessageRequest succeeded")

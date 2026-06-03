@@ -173,6 +173,17 @@ class TC_COMPRO_2_6(COMPROBaseTest):
         single_transport = self.pick_single_transport_bit(valid_transports)
         single_band = self.pick_single_transport_bit(valid_bands) if has_wi else None
 
+        # For step 10 (valid session), select the transport that matches the
+        # actual ED transport type.  pick_single_transport_bit() returns the
+        # lowest set bit (kBle=0x02 when both are advertised), which would cause
+        # the server to reject a wiFiBand argument with INVALID_COMMAND.
+        ed_transport_type = (ed.ed_transport if ed is not None
+                             else params.get('ed_transport', 'wifipaf'))
+        proxy_transport = self.pick_proxy_transport(valid_transports, ed_transport_type)
+        proxy_wifi_band = (single_band
+                           if proxy_transport == int(cp.Bitmaps.CapabilitiesBitmap.kWiFiPAF)
+                           else None)
+
         # ----------------------------------------------------------------
         # Open a commissioning window on the DUT to obtain a PASE session.
         # This PASE node ID is used for steps 5, 7, and 9.
@@ -312,18 +323,18 @@ class TC_COMPRO_2_6(COMPROBaseTest):
         # ----------------------------------------------------------------
         self.step(10)
         logger.info("Step 10: ProxyConnectRequest (transport=0x%02x discriminator=%d)",
-                    single_transport, ed_discriminator)
+                    proxy_transport, ed_discriminator)
         connect_response = await self.default_controller.SendCommand(
             nodeId=self.dut_node_id,
             endpoint=self.cp_endpoint,
             payload=cp.Commands.ProxyConnectRequest(
                 address=NullValue,
-                transport=single_transport,
+                transport=proxy_transport,
                 discriminator=ed_discriminator,
                 vendorId=0,
                 productId=0,
                 timeout=proxy_connect_timeout,
-                wiFiBand=single_band,
+                wiFiBand=proxy_wifi_band,
             ),
             interactionTimeoutMs=None,
         )

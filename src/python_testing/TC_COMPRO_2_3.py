@@ -287,9 +287,13 @@ class TC_COMPRO_2_3(COMPROBaseTest):
                                  "CachedResult entry Transport must be non-zero")
         asserts.assert_less_equal(result.discriminator, 4095,
                                   "CachedResult entry Discriminator must be <= 4095")
-        if has_wi:
+        # WiFiBand is populated only for PAFTP results (CommissioningProxy.adoc
+        # WiFiBand Field of ScanResultStruct).  A BLE-discovered entry leaves it
+        # null even when the WI feature is supported.
+        wifipaf_bit = int(cp.Bitmaps.CapabilitiesBitmap.kWiFiPAF)
+        if has_wi and (result.transport & wifipaf_bit):
             asserts.assert_is_not_none(result.wiFiBand,
-                                       "CachedResult entry WiFiBand must be present when WI feature active")
+                                       "CachedResult entry WiFiBand must be populated for PAFTP results when WI is supported")
 
         # Step 10 — read CacheTimeout
         self.step(10)

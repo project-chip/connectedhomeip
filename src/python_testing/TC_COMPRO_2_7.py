@@ -140,6 +140,7 @@ class TC_COMPRO_2_7(COMPROBaseTest):
             ssh_host=params.get(f'{prefix}_ssh_host'),
             ssh_user=params.get(f'{prefix}_ssh_user', 'ubuntu'),
             extra_args=params.get(f'{prefix}_extra_args', ''),
+            ed_transport=params.get(f'{prefix}_transport', params.get('ed_transport', 'wifipaf')),
         )
 
     def _discriminator_for_index(self, n: int) -> int:
@@ -179,8 +180,14 @@ class TC_COMPRO_2_7(COMPROBaseTest):
         else:
             self.skip_step(4)
 
-        single_transport = self.pick_single_transport_bit(valid_transports)
-        single_band = self.pick_single_transport_bit(valid_bands) if has_wi else None
+        # For ProxyConnectRequest commands, select the transport that matches the
+        # actual ED transport type so wiFiBand is not sent with a non-WiFiPAF
+        # transport (which would cause INVALID_COMMAND).
+        ed_transport_type = params.get('ed_transport', 'wifipaf')
+        proxy_transport = self.pick_proxy_transport(valid_transports, ed_transport_type)
+        proxy_wifi_band = (self.pick_single_transport_bit(valid_bands)
+                           if has_wi and proxy_transport == int(cp.Bitmaps.CapabilitiesBitmap.kWiFiPAF)
+                           else None)
 
         # Step 5 — ensure max_sessions EDs commissionable simultaneously
         self.step(5)
@@ -211,12 +218,12 @@ class TC_COMPRO_2_7(COMPROBaseTest):
                 endpoint=self.cp_endpoint,
                 payload=cp.Commands.ProxyConnectRequest(
                     address=NullValue,
-                    transport=single_transport,
+                    transport=proxy_transport,
                     discriminator=disc_n,
                     vendorId=0,
                     productId=0,
                     timeout=proxy_connect_timeout,
-                    wiFiBand=single_band,
+                    wiFiBand=proxy_wifi_band,
                 ),
                 interactionTimeoutMs=None,
             )
@@ -242,12 +249,12 @@ class TC_COMPRO_2_7(COMPROBaseTest):
                 endpoint=self.cp_endpoint,
                 payload=cp.Commands.ProxyConnectRequest(
                     address=NullValue,
-                    transport=single_transport,
+                    transport=proxy_transport,
                     discriminator=overflow_disc,
                     vendorId=0,
                     productId=0,
                     timeout=30,
-                    wiFiBand=single_band,
+                    wiFiBand=proxy_wifi_band,
                 ),
                 interactionTimeoutMs=10000,
             )

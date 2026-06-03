@@ -41,7 +41,7 @@ and returns a populated result list (with correct fields) when an ED is commissi
 
 Test plan reference: TC-COMPRO-2.2
 
-Example usage:
+Example usage (WiFi-PAF ED):
     ```bash
     python3 TC_COMPRO_2_2.py \\
         --commissioning-method on-network \\
@@ -52,10 +52,15 @@ Example usage:
         --endpoint 1 \\
         --string-arg ed_app_path:/path/to/ed-app ed_ssh_host:192.168.1.10 \\
         --string-arg 'ed_extra_args:--wifi --wifipaf freq_list=2437' \\
+        --string-arg ed_transport:wifipaf \\
         --int-arg ed_discriminator:3841 ed_passcode:20202021
     ```
-    If ``ed_app_path`` is omitted the test pauses and prompts the operator to
-    make the ED commissionable/not commissionable at each relevant step.
+
+For a BLE ED, set ``ed_transport:ble`` and ``ed_extra_args:--wifi`` (no
+``--wifipaf`` flag).  ``ed_transport`` defaults to ``wifipaf`` when omitted.
+
+If ``ed_app_path`` is omitted the test pauses and prompts the operator to
+make the ED commissionable/not commissionable at each relevant step.
 """
 
 import asyncio
@@ -123,6 +128,7 @@ class TC_COMPRO_2_2(COMPROBaseTest):
 
         # Optional: if the operator knows the ED discriminator, we verify it
         expected_discriminator = int(params.get('ed_discriminator', 0))
+        ed_transport = params.get('ed_transport', 'wifipaf')
 
         # Step 1 — commissioning done by framework
         self.step(1)
@@ -165,7 +171,14 @@ class TC_COMPRO_2_2(COMPROBaseTest):
 
         # Step 7 — make ED commissionable
         self.step(7)
-        await self.ensure_ed_commissionable(ed)
+        ed_transport_name = "BLE" if ed_transport == "ble" else "WiFiPAF/NAN"
+        await self.ensure_ed_commissionable(
+            ed,
+            manual_prompt=(
+                f"Make the End Device commissionable (actively advertising via "
+                f"{ed_transport_name}), then press Enter to continue."
+            ),
+        )
 
         # Step 8 — scan with ED present
         self.step(8)
@@ -194,10 +207,13 @@ class TC_COMPRO_2_2(COMPROBaseTest):
         # Discriminator range: 0-4095
         asserts.assert_less_equal(result.discriminator, 4095,
                                   "ScanResultStruct.Discriminator must be <= 4095")
-        # WiFiBand field must be present if WI feature is supported
-        if has_wi:
+        # WiFiBand is populated only when the result's transport is PAFTP
+        # (CommissioningProxy.adoc WiFiBand Field of ScanResultStruct).  For
+        # BLE-discovered entries it is null even when the WI feature is on.
+        wifipaf_bit = int(cp.Bitmaps.CapabilitiesBitmap.kWiFiPAF)
+        if has_wi and (result.transport & wifipaf_bit):
             asserts.assert_is_not_none(result.wiFiBand,
-                                       "ScanResultStruct.WiFiBand must be present when WI feature is supported")
+                                       "ScanResultStruct.WiFiBand must be populated for PAFTP results when WI is supported")
 
         # Step 9 — defined but unsupported transport → INVALID_TRANSPORT_TYPE
         # The spec returns INVALID_TRANSPORT_TYPE for defined transport bits not supported
@@ -230,7 +246,10 @@ class TC_COMPRO_2_2(COMPROBaseTest):
                 logger.info("Got expected INVALID_TRANSPORT_TYPE for unsupported transport")
 
         # Step 10 — valid WiFiPAF transport + band not in valid_bands → INVALID_TRANSPORT_TYPE
-        if not has_wi:
+        # Test is meaningful only when the DUT actually advertises kWiFiPAF
+        # (otherwise the request would be rejected for the wrong reason).
+        wifipaf_supported = bool(valid_transports & int(cp.Bitmaps.CapabilitiesBitmap.kWiFiPAF))
+        if not has_wi or not wifipaf_supported:
             self.skip_step(10)
         else:
             # Find a defined WiFiBand bit absent from valid_bands.

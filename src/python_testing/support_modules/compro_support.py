@@ -25,9 +25,23 @@ pauses and prompts the operator at the relevant steps.
 
 Pass arguments on the command line with ``--string-arg`` / ``--int-arg``, e.g.:
 
+WiFi-PAF ED::
+
   --string-arg ed_app_path:/path/to/ed-app ed_ssh_host:192.168.1.10
   --string-arg ed_ssh_user:ubuntu 'ed_extra_args:--wifi --wifipaf freq_list=2437'
+  --string-arg ed_transport:wifipaf
   --int-arg ed_discriminator:3841 ed_passcode:20202021
+
+BLE ED (note: ``--wifi`` is required so the ED can complete
+AddOrUpdateWifiNetwork + ConnectNetwork after the BLE channel comes up;
+``--wifipaf`` must be absent)::
+
+  --string-arg ed_app_path:/path/to/ed-app ed_ssh_host:192.168.1.10
+  --string-arg ed_ssh_user:ubuntu ed_extra_args:--wifi
+  --string-arg ed_transport:ble
+  --int-arg ed_discriminator:3841 ed_passcode:20202021
+
+``ed_transport`` defaults to ``wifipaf`` when omitted.
 
 For physical hardware that communicates only via WiFiPAF (not Ethernet), omit
 ``ed_app_path`` entirely; the test will prompt the operator at each relevant step.
@@ -43,6 +57,7 @@ import typing
 
 import matter.clusters as Clusters
 from matter.testing.matter_testing import MatterBaseTest
+from mobly import asserts
 
 logger = logging.getLogger(__name__)
 
@@ -154,6 +169,7 @@ class EDFixture:
         ssh_host: typing.Optional[str] = None,
         ssh_user: str = "ubuntu",
         extra_args: str = "",
+        ed_transport: str = "wifipaf",
     ):
         self._app_path = app_path
         self._discriminator = discriminator
@@ -161,8 +177,34 @@ class EDFixture:
         self._ssh_host = ssh_host
         self._ssh_user = ssh_user
         self._extra_args = extra_args
+        self._ed_transport = ed_transport
         self._process: typing.Optional[asyncio.subprocess.Process] = None
         self._remote_pid: typing.Optional[int] = None
+        self._validate_extra_args_for_transport()
+
+    @property
+    def ed_transport(self) -> str:
+        return self._ed_transport
+
+    def _validate_extra_args_for_transport(self):
+        """Catch ed_transport/extra_args mismatches early so tests fail at setup,
+        not 15 stages into AutoCommissioner with an opaque 'Incorrect state'."""
+        args = self._extra_args.split()
+        if self._ed_transport == "ble":
+            if "--wifi" not in args:
+                raise ValueError(
+                    "ed_transport=ble requires '--wifi' in ed_extra_args so the ED "
+                    "can complete AddOrUpdateWifiNetwork after the BLE channel is up.")
+            if "--wifipaf" in args:
+                raise ValueError(
+                    "ed_transport=ble must not include '--wifipaf' in ed_extra_args.")
+        elif self._ed_transport == "wifipaf":
+            if "--wifipaf" not in args:
+                raise ValueError(
+                    "ed_transport=wifipaf requires '--wifipaf' in ed_extra_args.")
+        else:
+            raise ValueError(
+                f"Unknown ed_transport '{self._ed_transport}'; expected 'ble' or 'wifipaf'.")
 
     async def start(self):
         """Start the ED app so it is commissionable."""
@@ -414,6 +456,9 @@ class COMPROBaseTest(MatterBaseTest):
           ed_ssh_user        — SSH username (default: ubuntu)
           ed_extra_args      — extra CLI args forwarded to the ED app
                                (e.g. "--wifi --wifipaf freq_list=2437")
+          ed_transport       — 'wifipaf' (default) or 'ble'.  Selects which
+                               proxy transport tests should use, and triggers
+                               validation of ed_extra_args.
         """
         params = getattr(self, 'user_params', {}) or {}
         app_path = params.get('ed_app_path')
@@ -426,6 +471,7 @@ class COMPROBaseTest(MatterBaseTest):
             ssh_host=params.get('ed_ssh_host'),
             ssh_user=params.get('ed_ssh_user', 'ubuntu'),
             extra_args=params.get('ed_extra_args', ''),
+            ed_transport=params.get('ed_transport', 'wifipaf'),
         )
 
     async def ensure_ed_commissionable(
@@ -475,3 +521,25 @@ class COMPROBaseTest(MatterBaseTest):
     def pick_single_transport_bit(self, transport_bitmap: int) -> int:
         """Return the lowest set bit from a transport bitmap (for use in connect requests)."""
         return transport_bitmap & (-transport_bitmap)
+
+    def pick_proxy_transport(self, valid_transports: int, ed_transport: str) -> int:
+        """Pick the CapabilitiesBitmap bit matching the ED's actual transport.
+
+        ``pick_single_transport_bit`` returns the lowest bit, which gives kBle
+        (0x02) when both kBle and kWiFiPAF are advertised — wrong if the ED is
+        configured for WiFi-PAF.  This helper uses the test's ``ed_transport``
+        parameter to disambiguate.  Fails the step if the DUT does not
+        advertise the requested transport — rig misconfig, not a DUT defect.
+        """
+        cp = Clusters.CommissioningProxy
+        if ed_transport == "ble":
+            bit = int(cp.Bitmaps.CapabilitiesBitmap.kBle)
+        elif ed_transport == "wifipaf":
+            bit = int(cp.Bitmaps.CapabilitiesBitmap.kWiFiPAF)
+        else:
+            raise ValueError(f"Unknown ed_transport '{ed_transport}'; expected 'ble' or 'wifipaf'.")
+        asserts.assert_true(
+            bool(valid_transports & bit),
+            f"ed_transport={ed_transport} but the DUT does not advertise that transport "
+            f"(valid_transports=0x{valid_transports:02x}).")
+        return bit
