@@ -186,6 +186,7 @@ limitations under the License.
                 <requireAttribute>PARTS_LIST</requireAttribute>
             </include>
             <include cluster="Actions" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Commissioner Control" client="false" server="false" clientLocked="true" serverLocked="false"></include>
         </clusters>
     </deviceType>
     <deviceType>
@@ -209,6 +210,7 @@ limitations under the License.
             </include>
             <include cluster="Power Source Configuration" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="Power Source" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Administrator Commissioning" client="false" server="false" clientLocked="true" serverLocked="false"></include>
         </clusters>
     </deviceType>
     <deviceType>
