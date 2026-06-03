@@ -31,6 +31,7 @@
 #include <clusters/ApplicationBasic/EventIds.h>
 #include <clusters/ApplicationLauncher/EventIds.h>
 #include <clusters/AudioOutput/EventIds.h>
+#include <clusters/AvAnalysis/EventIds.h>
 #include <clusters/BallastConfiguration/EventIds.h>
 #include <clusters/BasicInformation/EventIds.h>
 #include <clusters/Binding/EventIds.h>
@@ -62,6 +63,7 @@
 #include <clusters/DoorLock/EventIds.h>
 #include <clusters/DynamicLighting/EventIds.h>
 #include <clusters/EcosystemInformation/EventIds.h>
+#include <clusters/ElectricalAlarm/EventIds.h>
 #include <clusters/ElectricalDistribution/EventIds.h>
 #include <clusters/ElectricalEnergyMeasurement/EventIds.h>
 #include <clusters/ElectricalGridConditions/EventIds.h>

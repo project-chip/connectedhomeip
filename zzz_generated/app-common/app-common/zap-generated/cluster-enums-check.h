@@ -33,6 +33,7 @@
 #include <clusters/ApplicationBasic/EnumsCheck.h>
 #include <clusters/ApplicationLauncher/EnumsCheck.h>
 #include <clusters/AudioOutput/EnumsCheck.h>
+#include <clusters/AvAnalysis/EnumsCheck.h>
 #include <clusters/BallastConfiguration/EnumsCheck.h>
 #include <clusters/BasicInformation/EnumsCheck.h>
 #include <clusters/Binding/EnumsCheck.h>
@@ -64,6 +65,7 @@
 #include <clusters/DoorLock/EnumsCheck.h>
 #include <clusters/DynamicLighting/EnumsCheck.h>
 #include <clusters/EcosystemInformation/EnumsCheck.h>
+#include <clusters/ElectricalAlarm/EnumsCheck.h>
 #include <clusters/ElectricalDistribution/EnumsCheck.h>
 #include <clusters/ElectricalEnergyMeasurement/EnumsCheck.h>
 #include <clusters/ElectricalGridConditions/EnumsCheck.h>

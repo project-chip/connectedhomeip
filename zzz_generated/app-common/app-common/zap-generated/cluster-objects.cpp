@@ -67,6 +67,10 @@
 #include <clusters/AudioOutput/Commands.ipp>
 #include <clusters/AudioOutput/Events.ipp>
 #include <clusters/AudioOutput/Structs.ipp>
+#include <clusters/AvAnalysis/Attributes.ipp>
+#include <clusters/AvAnalysis/Commands.ipp>
+#include <clusters/AvAnalysis/Events.ipp>
+#include <clusters/AvAnalysis/Structs.ipp>
 #include <clusters/BallastConfiguration/Attributes.ipp>
 #include <clusters/BallastConfiguration/Commands.ipp>
 #include <clusters/BallastConfiguration/Events.ipp>
@@ -191,6 +195,10 @@
 #include <clusters/EcosystemInformation/Commands.ipp>
 #include <clusters/EcosystemInformation/Events.ipp>
 #include <clusters/EcosystemInformation/Structs.ipp>
+#include <clusters/ElectricalAlarm/Attributes.ipp>
+#include <clusters/ElectricalAlarm/Commands.ipp>
+#include <clusters/ElectricalAlarm/Events.ipp>
+#include <clusters/ElectricalAlarm/Structs.ipp>
 #include <clusters/ElectricalDistribution/Attributes.ipp>
 #include <clusters/ElectricalDistribution/Commands.ipp>
 #include <clusters/ElectricalDistribution/Events.ipp>
@@ -1207,6 +1215,13 @@ bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
             return false;
         }
     }
+    case Clusters::ElectricalAlarm::Id: {
+        switch (aCommand)
+        {
+        default:
+            return false;
+        }
+    }
     case Clusters::ElectricalProtectionAlarm::Id: {
         switch (aCommand)
         {
@@ -1476,6 +1491,13 @@ bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
         }
     }
     case Clusters::Chime::Id: {
+        switch (aCommand)
+        {
+        default:
+            return false;
+        }
+    }
+    case Clusters::AvAnalysis::Id: {
         switch (aCommand)
         {
         default:
