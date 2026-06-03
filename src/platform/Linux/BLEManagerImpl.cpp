@@ -879,8 +879,8 @@ CHIP_ERROR BLEManagerImpl::StartProxyScan(BleScanResultCallback cb, void * conte
         // If this re-Init fails the scanner still holds the soon-to-be-freed
         // forwarder as its delegate, so abort rather than risk a use-after-free.
         CHIP_ERROR restoreErr = mDeviceScanner.Init(mAdapter.get(), this);
-        VerifyOrDieWithMsg(restoreErr == CHIP_NO_ERROR, DeviceLayer,
-                           "ProxyScan rollback: scanner Init failed: %" CHIP_ERROR_FORMAT, restoreErr.Format());
+        VerifyOrDieWithMsg(restoreErr == CHIP_NO_ERROR, DeviceLayer, "ProxyScan rollback: scanner Init failed: %" CHIP_ERROR_FORMAT,
+                           restoreErr.Format());
         delete sProxyScanForwarder;
         sProxyScanForwarder = nullptr;
     }
@@ -899,8 +899,8 @@ CHIP_ERROR BLEManagerImpl::StopProxyScan()
     // live object (BLEManagerImpl) rather than freed memory.  Re-Init must
     // succeed with the same adapter that just worked; treat failure as fatal.
     CHIP_ERROR restoreErr = mDeviceScanner.Init(mAdapter.get(), this);
-    VerifyOrDieWithMsg(restoreErr == CHIP_NO_ERROR, DeviceLayer,
-                       "StopProxyScan: scanner Init failed: %" CHIP_ERROR_FORMAT, restoreErr.Format());
+    VerifyOrDieWithMsg(restoreErr == CHIP_NO_ERROR, DeviceLayer, "StopProxyScan: scanner Init failed: %" CHIP_ERROR_FORMAT,
+                       restoreErr.Format());
     delete sProxyScanForwarder;
     sProxyScanForwarder = nullptr;
     return err;

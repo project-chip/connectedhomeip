@@ -90,8 +90,8 @@ void OnSweep(chip::System::Layer * /*layer*/, void * /*appState*/)
 {
     sSweepArmed = false;
 
-    auto now      = chip::System::SystemClock().GetMonotonicTimestamp();
-    bool removed  = false;
+    auto now     = chip::System::SystemClock().GetMonotonicTimestamp();
+    bool removed = false;
     for (auto it = sCache.begin(); it != sCache.end();)
     {
         if (it->second.expiresAt <= now)

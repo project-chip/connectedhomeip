@@ -184,7 +184,7 @@ public:
 
     // ------------------------------------------------------------------
     // Get attribute methods
-    virtual uint8_t GetMaxSessions()                                                                       = 0;
+    virtual uint8_t GetMaxSessions() = 0;
     /**
      * @brief Return the number of proxy sessions currently active (open or
      *        pending-connect) for the spec MaxSessions check.

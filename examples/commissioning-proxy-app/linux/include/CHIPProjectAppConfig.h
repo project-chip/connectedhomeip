@@ -99,7 +99,6 @@
  */
 #define CHIP_CONFIG_MM_SUBSCRIBE_REBOOT_MAX 5
 
-
 // Commissioning Proxy transports follow their own existing compile flags:
 //   WiFi-PAF: CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF (set in build args)
 //   BLE:      CONFIG_NETWORK_LAYER_BLE (BLE-wide GN arg

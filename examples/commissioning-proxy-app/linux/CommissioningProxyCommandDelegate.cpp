@@ -661,8 +661,7 @@ Protocols::InteractionModel::Status Clusters::CommissioningProxy::MyCPDelegate::
 #if CONFIG_NETWORK_LAYER_BLE
         anyHandled = true;
         auto s     = Ble::BgScanStart(CapabilitiesBitmap::kBle, timeout, wiFiBands, fabricIndex, nodeId, mServer);
-        if (s != chip::Protocols::InteractionModel::Status::Success &&
-            result == chip::Protocols::InteractionModel::Status::Success)
+        if (s != chip::Protocols::InteractionModel::Status::Success && result == chip::Protocols::InteractionModel::Status::Success)
             result = s;
 #else
         return chip::Protocols::InteractionModel::Status::InvalidTransportType;

@@ -55,9 +55,10 @@ import os
 import sys
 import typing
 
+from mobly import asserts
+
 import matter.clusters as Clusters
 from matter.testing.matter_testing import MatterBaseTest
-from mobly import asserts
 
 logger = logging.getLogger(__name__)
 

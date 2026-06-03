@@ -102,7 +102,7 @@ struct FabricScanRecord
 };
 
 static std::map<FabricKey, FabricScanRecord> sBgScanFabrics;
-static bool sBgScanPaused = false;
+static bool sBgScanPaused                                                                  = false;
 static chip::app::Clusters::CommissioningProxy::CommissioningProxyCluster * sBgScanCluster = nullptr;
 
 static ScanResultT NanPeerToScanResult(const chip::DeviceLayer::NanPeerInfo & p)
@@ -320,7 +320,7 @@ static void OnPafConnectSuccess(void * /*context*/)
         return;
     }
 
-    uint16_t sessionId    = ProxyDispatcher::AllocSessionId();
+    uint16_t sessionId      = ProxyDispatcher::AllocSessionId();
     sPafSessions[sessionId] = *pPafInfo;
     ProxyDispatcher::RegisterSession(sessionId, CapabilitiesBitmap::kWiFiPAF, ctx->fabricIndex);
 
@@ -329,8 +329,8 @@ static void OnPafConnectSuccess(void * /*context*/)
 
     if (ctx->cluster)
     {
-        CHIP_ERROR stateErr = ctx->cluster->SetCPState(
-            chip::app::Clusters::CommissioningProxy::CommissioningProxyCluster::kState_CPConnected);
+        CHIP_ERROR stateErr =
+            ctx->cluster->SetCPState(chip::app::Clusters::CommissioningProxy::CommissioningProxyCluster::kState_CPConnected);
         if (stateErr != CHIP_NO_ERROR)
         {
             ChipLogError(AppServer, "OnPafConnectSuccess: SetCPState failed: %" CHIP_ERROR_FORMAT, stateErr.Format());
@@ -456,8 +456,8 @@ chip::Protocols::InteractionModel::Status Connect(chip::app::CommandHandler * co
     pafSessionInfo.role          = chip::WiFiPAF::kWiFiPafRole_Subscriber;
     pafSessionInfo.nodeId        = static_cast<chip::NodeId>(discriminator);
     pafSessionInfo.discriminator = discriminator;
-    CHIP_ERROR addErr            = chip::WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer().AddPafSession(
-        chip::WiFiPAF::PafInfoAccess::kAccNodeInfo, pafSessionInfo);
+    CHIP_ERROR addErr =
+        chip::WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer().AddPafSession(chip::WiFiPAF::PafInfoAccess::kAccNodeInfo, pafSessionInfo);
     if (addErr != CHIP_NO_ERROR)
     {
         ChipLogError(AppServer, "ProxyConnectRequest: AddPafSession failed: %" CHIP_ERROR_FORMAT, addErr.Format());
@@ -492,8 +492,8 @@ chip::Protocols::InteractionModel::Status Connect(chip::app::CommandHandler * co
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(AppServer, "ProxyConnectRequest: WiFiPAFSubscribe failed: %" CHIP_ERROR_FORMAT, err.Format());
-        CHIP_ERROR rmErr = chip::WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer().RmPafSession(
-            chip::WiFiPAF::PafInfoAccess::kAccNodeInfo, pafSessionInfo);
+        CHIP_ERROR rmErr =
+            chip::WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer().RmPafSession(chip::WiFiPAF::PafInfoAccess::kAccNodeInfo, pafSessionInfo);
         if (rmErr != CHIP_NO_ERROR)
         {
             ChipLogDetail(AppServer, "ProxyConnectRequest cleanup: RmPafSession: %" CHIP_ERROR_FORMAT, rmErr.Format());
@@ -510,8 +510,8 @@ chip::Protocols::InteractionModel::Status Connect(chip::app::CommandHandler * co
     if (timerErr != CHIP_NO_ERROR)
     {
         ChipLogError(AppServer, "ProxyConnectRequest: StartTimer failed: %" CHIP_ERROR_FORMAT, timerErr.Format());
-        CHIP_ERROR rmErr2 = chip::WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer().RmPafSession(
-            chip::WiFiPAF::PafInfoAccess::kAccNodeInfo, pafSessionInfo);
+        CHIP_ERROR rmErr2 =
+            chip::WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer().RmPafSession(chip::WiFiPAF::PafInfoAccess::kAccNodeInfo, pafSessionInfo);
         if (rmErr2 != CHIP_NO_ERROR)
         {
             ChipLogDetail(AppServer, "ProxyConnectRequest cleanup: RmPafSession: %" CHIP_ERROR_FORMAT, rmErr2.Format());

@@ -157,8 +157,8 @@ static void OnBleBgDiscovery(void * /*context*/, const uint8_t bdAddr[6], uint16
 
 static void OnBleBgLifetimeExpiry(chip::System::Layer * /*layer*/, void * appState)
 {
-    auto * ctx       = static_cast<BgFabricLifetimeCtx *>(appState);
-    BgFabricKey key  = ctx->key;
+    auto * ctx      = static_cast<BgFabricLifetimeCtx *>(appState);
+    BgFabricKey key = ctx->key;
     delete ctx;
 
     auto it = sBleBgFabrics.find(key);
@@ -749,8 +749,8 @@ chip::Protocols::InteractionModel::Status Scan(uint8_t scanMaxTime)
     }
     sScanInProgress = true;
 
-    CHIP_ERROR timerErr = chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds16(scanMaxTime), OnBleScanTimer,
-                                                                      nullptr);
+    CHIP_ERROR timerErr =
+        chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds16(scanMaxTime), OnBleScanTimer, nullptr);
     if (timerErr != CHIP_NO_ERROR)
     {
         ChipLogError(AppServer, "Ble::Scan: StartTimer failed: %" CHIP_ERROR_FORMAT, timerErr.Format());
@@ -816,7 +816,8 @@ chip::Protocols::InteractionModel::Status BgScanStart(CapabilitiesBitmap /*trans
     }
     else
     {
-        ChipLogProgress(AppServer, "ProxyBackgroundScanStartRequest: BLE hardware scan already running, registering fabric (%zu total)",
+        ChipLogProgress(AppServer,
+                        "ProxyBackgroundScanStartRequest: BLE hardware scan already running, registering fabric (%zu total)",
                         sBleBgFabrics.size());
     }
 
