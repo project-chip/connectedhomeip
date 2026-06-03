@@ -487,7 +487,7 @@ void DnssdServer::StartServer(Dnssd::CommissioningMode mode)
 {
     TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().AddEventHandler(OnPlatformEventWrapper, 0);
 
-    if(Dnssd::ServiceAdvertiser::Instance().Init(chip::DeviceLayer::UDPEndPointManager()) != CHIP_NO_ERROR)
+    if (Dnssd::ServiceAdvertiser::Instance().Init(chip::DeviceLayer::UDPEndPointManager()) != CHIP_NO_ERROR)
     {
         // No need to do anything if init failed device is probably not commissionned/not on network
         ChipLogError(Discovery, "Failed to initialize advertiser");
@@ -532,7 +532,6 @@ void DnssdServer::StartServer(Dnssd::CommissioningMode mode)
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 
     SuccessOrLog(Dnssd::ServiceAdvertiser::Instance().FinalizeServiceUpdate(), Discovery, "Failed to finalize service update");
-
 }
 
 #if CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID)
