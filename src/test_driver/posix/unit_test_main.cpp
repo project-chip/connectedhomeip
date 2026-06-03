@@ -26,7 +26,9 @@
 #include "pw_unit_test/event_handler.h"
 #include "pw_unit_test/framework.h"
 
+#if CHIP_HAVE_CONFIG_H
 #include <crypto/CryptoBuildConfig.h>
+#endif
 #if CHIP_CRYPTO_PSA
 #include <psa/crypto.h>
 #endif

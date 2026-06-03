@@ -35,7 +35,9 @@
 #include <system/SystemError.h>
 #include <system/SystemLayer.h>
 
+#if CHIP_HAVE_CONFIG_H
 #include <crypto/CryptoBuildConfig.h>
+#endif
 #if CHIP_CRYPTO_PSA
 #include <psa/crypto.h>
 #endif
