@@ -41,7 +41,7 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.interaction_model import Status
-from matter.testing.decorators import has_cluster, pics, run_if_endpoint_matches
+from matter.testing.decorators import async_test_body, pics
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import default_matter_test_main
 
@@ -55,7 +55,7 @@ class TC_ELDIST_2_2(MatterBaseTest):
         return 1
 
     @pics('ELDIST.S')
-    @run_if_endpoint_matches(has_cluster(Clusters.ElectricalDistribution))
+    @async_test_body
     async def test_TC_ELDIST_2_2(self):
         """[TC-ELDIST-2.2] Fixed-by-Manufacturer Quality Verification with Server as DUT
 
