@@ -100,8 +100,8 @@ class TC_PICS_Checker(BasicCompositionTests):
                          "PICS is set if root node is present"),
                 TestStep(9, "If the device has any onboarding payload (MCORE.DD.QR or MCORE.DD.NFC), it has the manual pairing code PICS set (MCORE.DD.MANUAL_PC)",
                          "Manual pairing code PICS is set if QR or NFC is set"),
-                TestStep(10, "For every Base/MCORE PICS code derivable from the wildcard read (bridge role, OTA requestor/provider, multi-endpoint groups, MCORE.ROLE.COMMISSIONEE, MCORE.IDM.S), ensure each code's value in the PICS file matches what the device protocol reports. Codes the device reports false for must not be set in the PICS file; codes the device reports true for must be set.",
-                         "Base/MCORE PICS exactly match the device for derivable items."),
+                TestStep(10, "When --endpoint is 0: for every Base/MCORE PICS code derivable from the wildcard read (bridge role, OTA requestor/provider, multi-endpoint groups, MCORE.ROLE.COMMISSIONEE, MCORE.IDM.S), ensure each code's value in the PICS file matches what the device protocol reports. Skipped on other endpoints since Base/MCORE codes are conventionally declared only in EP0's PICS slice.",
+                         "Base/MCORE PICS exactly match the device on EP0; skipped elsewhere."),
                 TestStep(11, "If --bool-arg assert_mandatory_events is set: for every event the spec marks MANDATORY for clusters on this endpoint (excluding OTA clusters, which appear to have no PICS codes today), ensure the corresponding event PICS code (cluster.S.E<id>) is marked in the PICS file. Skipped by default.",
                          "Event PICS match spec conformance for clusters on this endpoint."),
                 TestStep(12, "If any of the checks failed, fail the test")]
@@ -217,23 +217,27 @@ class TC_PICS_Checker(BasicCompositionTests):
                               problem="Devices that support onboarding payloads must support a manual code")
             self.success = False
 
-        self.step(10)
-        # Build a ReadResponse from the wildcard already cached by
-        # BasicCompositionTests so the shared helper can derive the same
-        # MCORE codes PICSGenerator writes into Base.xml.
+        # Derive base facts once for Steps 10 and 11. Helper is wildcard-only,
+        # so it's safe to run regardless of --endpoint.
         wildcard = AsyncReadTransaction.ReadResponse(
             attributes=self.endpoints, events=[], tlvAttributes=self.endpoints_tlv)
         base_facts, base_problems = derive_base_pics_facts_from_device_wildcard(wildcard, self.xml_clusters)
         for problem in base_problems:
             self.problems.append(problem)
         derived_codes = base_pics_facts_to_pics_codes(base_facts)
-        # Two halves of the consistency check: codes the device reports
-        # must be set in the PICS file, codes the device does not report
-        # must not be set. Both halves drain through _check_and_record_errors
-        # so failures surface in the standard PICS-mismatch summary.
-        for code in BASE_PICS_CODES_DERIVED:
-            location = UnknownProblemLocation()
-            self._check_and_record_errors(location, code in derived_codes, code)
+
+        self.step(10)
+        # Base/MCORE codes are device-wide but conventionally only declared
+        # in EP0's PICS slice (per Cecille's review). Skip on other endpoints
+        # so we don't false-positive on PICS files that correctly omit MCORE
+        # from non-EP0 endpoint slices.
+        if self.endpoint_id == 0:
+            derived_codes = base_pics_facts_to_pics_codes(base_facts)
+            for code in BASE_PICS_CODES_DERIVED:
+                location = UnknownProblemLocation()
+                self._check_and_record_errors(location, code in derived_codes, code)
+        else:
+            self.mark_current_step_skipped()
 
         self.step(11)
         # Default off: enabling this turns the spec-conformance event rules
