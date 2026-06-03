@@ -72,7 +72,11 @@ $SDB_CMD root on
 
 # 1. Launch the application in native Tizen suspension debug mode
 echo "Launching $APP_NAME in suspended debug mode..."
-LAUNCH_OUT=$($SDB_CMD shell "app_launcher --debug --start $APP_NAME -- $APP_ARGS")
+LAUNCH_CMD="app_launcher --debug --start $APP_NAME"
+if [ -n "$APP_ARGS" ]; then
+    LAUNCH_CMD="$LAUNCH_CMD -- $APP_ARGS"
+fi
+LAUNCH_OUT=$($SDB_CMD shell "$LAUNCH_CMD")
 echo "$LAUNCH_OUT"
 
 # 2. Parse the PID from the app_launcher output
