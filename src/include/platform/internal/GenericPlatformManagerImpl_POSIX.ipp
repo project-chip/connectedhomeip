@@ -63,13 +63,14 @@ System::LayerSelectLoop & SystemLayerSelectLoop()
 template <class ImplClass>
 CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_InitChipStack()
 {
-    // Call up to the base class _InitChipStack() to perform the bulk of the initialization.
-    ReturnErrorOnFailure(GenericPlatformManagerImpl<ImplClass>::_InitChipStack());
-
 #if CHIP_CRYPTO_PSA
-    // Initialize the PSA crypto backend.
+    // Initialize the PSA crypto backend before the base class, which sets up
+    // entropy/DRBG that already require PSA. Mirrors the Zephyr platform managers.
     VerifyOrReturnError(psa_crypto_init() == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
 #endif
+
+    // Call up to the base class _InitChipStack() to perform the bulk of the initialization.
+    ReturnErrorOnFailure(GenericPlatformManagerImpl<ImplClass>::_InitChipStack());
 
 #if !CHIP_SYSTEM_CONFIG_USE_LIBEV
 
