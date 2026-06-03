@@ -30,34 +30,21 @@ logger = logging.getLogger(__name__)
 class TC_CONTACTSENSOR(MatterBaseTest):
     """Tests for chef contact sensor device."""
 
-    _CONTACTSENSOR_ENDPOINT = 1
+    @async_test_body
+    async def test_TC_CONTACTSENSOR(self):
+        """[TC_CONTACTSENSOR] chef contact sensor functionality test."""
 
-    async def _read_state_value(self):
-        return await self.read_single_attribute_check_success(
-            endpoint=self._CONTACTSENSOR_ENDPOINT,
+        self.step(1, "[TC_CONTACTSENSOR] Commissioning already done.", is_commissioning=True)
+        # Commissioning already done.
+
+        self.step(2, "[TC_CONTACTSENSOR] Test boolean state value.")
+        # Read the StateValue attribute from the Boolean State cluster
+        endpoint = self.get_endpoint()
+        state_value = await self.read_single_attribute_check_success(
+            endpoint=endpoint,
             cluster=Clusters.Objects.BooleanState,
             attribute=Clusters.Objects.BooleanState.Attributes.StateValue
         )
-
-    def desc_TC_CONTACTSENSOR(self) -> str:
-        return "[TC_CONTACTSENSOR] chef contact sensor functionality test."
-
-    def steps_TC_CONTACTSENSOR(self):
-        return [
-            TestStep(1, "[TC_CONTACTSENSOR] Commissioning already done.", is_commissioning=True),
-            TestStep(2, "[TC_CONTACTSENSOR] Test boolean state value.")
-        ]
-
-    @async_test_body
-    async def test_TC_CONTACTSENSOR(self):
-        """Run all steps."""
-
-        self.step(1)
-        # Commissioning already done.
-
-        self.step(2)
-        # Read the StateValue attribute from the Boolean State cluster
-        state_value = await self._read_state_value()
 
         # Verify that it returns a boolean value
         asserts.assert_true(isinstance(state_value, bool), "StateValue must be a boolean.")
