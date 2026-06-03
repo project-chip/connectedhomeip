@@ -45,7 +45,7 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
 from matter.testing import matter_asserts
-from matter.testing.decorators import has_cluster, pics, run_if_endpoint_matches
+from matter.testing.decorators import async_test_body, pics
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import default_matter_test_main
 
@@ -57,7 +57,7 @@ cluster = Clusters.ElectricalProtectionAlarm
 class TC_EPALM_2_1(MatterBaseTest):
 
     @pics('EPALM.S')
-    @run_if_endpoint_matches(has_cluster(Clusters.ElectricalProtectionAlarm))
+    @async_test_body
     async def test_TC_EPALM_2_1(self):
         """[TC-EPALM-2.1] Attributes with DUT as Server
 
