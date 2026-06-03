@@ -81,7 +81,6 @@ inline constexpr uint16_t kProtocolCodeNoSharedRoot    = 0x0001;
 inline constexpr uint16_t kProtocolCodeInvalidParam    = 0x0002;
 inline constexpr uint16_t kProtocolCodeCloseSession    = 0x0003;
 inline constexpr uint16_t kProtocolCodeBusy            = 0x0004;
-inline constexpr uint16_t kProtocolCodeSessionNotFound = 0x0005;
 
 // Placeholder value for the ProtocolCode field when there is no additional protocol-specific code to provide more information.
 inline constexpr uint16_t kProtocolCodeGeneralFailure = 0xFFFF;
