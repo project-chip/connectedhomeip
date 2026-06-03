@@ -259,7 +259,7 @@ class TC_AVSM_2_7(MatterBaseTest):
             videoStreamAllocateCmd = commands.VideoStreamAllocate(
                 streamUsage=aStreamUsagePriorities[0],
                 videoCodec=aRateDistortionTradeOffPoints[0].codec,
-                minFrameRate=min(15, aVideoSensorParams.maxFPS),
+                minFrameRate=min(self.matter_test_config.min_frame_rate, aVideoSensorParams.maxFPS),
                 maxFrameRate=aVideoSensorParams.maxFPS,
                 minResolution=aMinViewportRes,
                 maxResolution=cluster.Structs.VideoResolutionStruct(
@@ -293,7 +293,7 @@ class TC_AVSM_2_7(MatterBaseTest):
             videoStreamAllocateCmd = commands.VideoStreamAllocate(
                 streamUsage=aStreamUsagePriorities[0],
                 videoCodec=aRateDistortionTradeOffPoints[0].codec,
-                minFrameRate=min(15, aVideoSensorParams.maxFPS),
+                minFrameRate=min(self.matter_test_config.min_frame_rate, aVideoSensorParams.maxFPS),
                 maxFrameRate=aVideoSensorParams.maxFPS,
                 minResolution=aMinViewportRes,
                 maxResolution=cluster.Structs.VideoResolutionStruct(
@@ -370,7 +370,7 @@ class TC_AVSM_2_7(MatterBaseTest):
             videoStreamAllocateCmd = commands.VideoStreamAllocate(
                 streamUsage=outOfConstraintStreamUsage,
                 videoCodec=aRateDistortionTradeOffPoints[0].codec,
-                minFrameRate=min(15, aVideoSensorParams.maxFPS),
+                minFrameRate=min(self.matter_test_config.min_frame_rate, aVideoSensorParams.maxFPS),
                 maxFrameRate=aVideoSensorParams.maxFPS,
                 minResolution=aMinViewportRes,
                 maxResolution=cluster.Structs.VideoResolutionStruct(
@@ -403,7 +403,7 @@ class TC_AVSM_2_7(MatterBaseTest):
             videoStreamAllocateCmd = commands.VideoStreamAllocate(
                 streamUsage=notSupportedStreamUsage,
                 videoCodec=aRateDistortionTradeOffPoints[0].codec,
-                minFrameRate=min(15, aVideoSensorParams.maxFPS),
+                minFrameRate=min(self.matter_test_config.min_frame_rate, aVideoSensorParams.maxFPS),
                 maxFrameRate=aVideoSensorParams.maxFPS,
                 minResolution=aMinViewportRes,
                 maxResolution=cluster.Structs.VideoResolutionStruct(
@@ -486,7 +486,7 @@ class TC_AVSM_2_7(MatterBaseTest):
             videoStreamAllocateCmd = commands.VideoStreamAllocate(
                 streamUsage=aStreamUsagePriorities[0],
                 videoCodec=aRateDistortionTradeOffPoints[0].codec,
-                minFrameRate=min(15, aVideoSensorParams.maxFPS),
+                minFrameRate=min(self.matter_test_config.min_frame_rate, aVideoSensorParams.maxFPS),
                 maxFrameRate=aVideoSensorParams.maxFPS,
                 minResolution=aMinViewportRes,
                 maxResolution=cluster.Structs.VideoResolutionStruct(
@@ -513,7 +513,7 @@ class TC_AVSM_2_7(MatterBaseTest):
             videoStreamAllocateCmd = commands.VideoStreamAllocate(
                 streamUsage=aStreamUsagePriorities[0],
                 videoCodec=aRateDistortionTradeOffPoints[0].codec,
-                minFrameRate=min(15, aVideoSensorParams.maxFPS),
+                minFrameRate=min(self.matter_test_config.min_frame_rate, aVideoSensorParams.maxFPS),
                 maxFrameRate=aVideoSensorParams.maxFPS,
                 minResolution=aMinViewportRes,
                 maxResolution=cluster.Structs.VideoResolutionStruct(
@@ -540,7 +540,7 @@ class TC_AVSM_2_7(MatterBaseTest):
             videoStreamAllocateCmd = commands.VideoStreamAllocate(
                 streamUsage=aStreamUsagePriorities[0],
                 videoCodec=aRateDistortionTradeOffPoints[0].codec,
-                minFrameRate=min(15, aVideoSensorParams.maxFPS),
+                minFrameRate=min(self.matter_test_config.min_frame_rate, aVideoSensorParams.maxFPS),
                 maxFrameRate=aVideoSensorParams.maxFPS,
                 minResolution=aMinViewportRes,
                 maxResolution=cluster.Structs.VideoResolutionStruct(
@@ -567,7 +567,7 @@ class TC_AVSM_2_7(MatterBaseTest):
             videoStreamAllocateCmd = commands.VideoStreamAllocate(
                 streamUsage=aStreamUsagePriorities[0],
                 videoCodec=10,
-                minFrameRate=min(15, aVideoSensorParams.maxFPS),
+                minFrameRate=min(self.matter_test_config.min_frame_rate, aVideoSensorParams.maxFPS),
                 maxFrameRate=aVideoSensorParams.maxFPS,
                 minResolution=aMinViewportRes,
                 maxResolution=cluster.Structs.VideoResolutionStruct(
@@ -594,7 +594,7 @@ class TC_AVSM_2_7(MatterBaseTest):
             videoStreamAllocateCmd = commands.VideoStreamAllocate(
                 streamUsage=aStreamUsagePriorities[0],
                 videoCodec=aRateDistortionTradeOffPoints[0].codec,
-                minFrameRate=min(15, aVideoSensorParams.maxFPS),
+                minFrameRate=min(self.matter_test_config.min_frame_rate, aVideoSensorParams.maxFPS),
                 maxFrameRate=aVideoSensorParams.maxFPS + 10,
                 minResolution=aMinViewportRes,
                 maxResolution=cluster.Structs.VideoResolutionStruct(

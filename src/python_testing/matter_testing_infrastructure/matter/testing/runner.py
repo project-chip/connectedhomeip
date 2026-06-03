@@ -789,6 +789,7 @@ def convert_args_to_matter_config(args: argparse.Namespace):
     config.endpoint = args.endpoint  # This can be None, the get_endpoint function allows the tests to supply a default
     config.restart_flag_file = args.restart_flag_file
     config.debug = args.debug
+    config.min_frame_rate = args.min_frame_rate
 
     # Map CLI arg to the current config field name used by tests
     config.pipe_name = args.app_pipe
@@ -975,6 +976,8 @@ def parse_matter_test_args(argv: Optional[list[str]] = None):
                              help="The full path of the file to use to signal a restart to the app")
     basic_group.add_argument('--debug', action="store_true", default=False,
                              help="Run the script in debug mode. This is needed to capture attribute dump at end of test modules if there are problems found during testing.")
+    basic_group.add_argument('--min-frame-rate', type=int, default=30,
+                             help='Minimum frame rate for video stream allocation (default: 30)')
     basic_group.add_argument('--timeout', type=int, help="Test timeout in seconds")
     basic_group.add_argument("--PICS", help="PICS file path", type=str)
 
