@@ -130,11 +130,11 @@ CHIP_ERROR InitCommissioner(uint16_t commissionerPort, uint16_t udcListenPort, F
     Controller::SetupParams params;
 
     // use a different listen port for the commissioner than the default used by chip-tool.
-    factoryParams.listenPort                = commissionerPort;
-    factoryParams.fabricIndependentStorage  = &gServerStorage;
-    factoryParams.fabricTable               = &Server::GetInstance().GetFabricTable();
-    factoryParams.sessionKeystore           = &gSessionKeystore;
-    factoryParams.enableServerInteractions  = true;
+    factoryParams.listenPort               = commissionerPort;
+    factoryParams.fabricIndependentStorage = &gServerStorage;
+    factoryParams.fabricTable              = &Server::GetInstance().GetFabricTable();
+    factoryParams.sessionKeystore          = &gSessionKeystore;
+    factoryParams.enableServerInteractions = true;
     // Since CommissionerMain is used in combined server/commissioner applications,
     // we must prevent the commissioner from overwriting the server's DNS-SD port.
     factoryParams.preventDnssdPortOverwrite = true;
