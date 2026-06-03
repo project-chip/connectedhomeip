@@ -30,6 +30,8 @@
 #include <clusters/ApplicationLauncher/MetadataProvider.h>
 #include <clusters/AudioOutput/Ids.h>
 #include <clusters/AudioOutput/MetadataProvider.h>
+#include <clusters/AvAnalysis/Ids.h>
+#include <clusters/AvAnalysis/MetadataProvider.h>
 #include <clusters/BallastConfiguration/Ids.h>
 #include <clusters/BallastConfiguration/MetadataProvider.h>
 #include <clusters/BasicInformation/Ids.h>
@@ -92,12 +94,18 @@
 #include <clusters/DynamicLighting/MetadataProvider.h>
 #include <clusters/EcosystemInformation/Ids.h>
 #include <clusters/EcosystemInformation/MetadataProvider.h>
+#include <clusters/ElectricalAlarm/Ids.h>
+#include <clusters/ElectricalAlarm/MetadataProvider.h>
+#include <clusters/ElectricalDistribution/Ids.h>
+#include <clusters/ElectricalDistribution/MetadataProvider.h>
 #include <clusters/ElectricalEnergyMeasurement/Ids.h>
 #include <clusters/ElectricalEnergyMeasurement/MetadataProvider.h>
 #include <clusters/ElectricalGridConditions/Ids.h>
 #include <clusters/ElectricalGridConditions/MetadataProvider.h>
 #include <clusters/ElectricalPowerMeasurement/Ids.h>
 #include <clusters/ElectricalPowerMeasurement/MetadataProvider.h>
+#include <clusters/ElectricalProtectionAlarm/Ids.h>
+#include <clusters/ElectricalProtectionAlarm/MetadataProvider.h>
 #include <clusters/EnergyEvse/Ids.h>
 #include <clusters/EnergyEvse/MetadataProvider.h>
 #include <clusters/EnergyEvseMode/Ids.h>
@@ -369,6 +377,11 @@ std::optional<DataModel::AcceptedCommandEntry> AcceptedCommandEntryFor(ClusterId
         if (id == AudioOutput::Id)
             return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, AudioOutput::Id>::EntryFor(command);
     }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == AvAnalysis::Id) || ...))
+    {
+        if (id == AvAnalysis::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, AvAnalysis::Id>::EntryFor(command);
+    }
     if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == BallastConfiguration::Id) || ...))
     {
         if (id == BallastConfiguration::Id)
@@ -527,6 +540,16 @@ std::optional<DataModel::AcceptedCommandEntry> AcceptedCommandEntryFor(ClusterId
         if (id == EcosystemInformation::Id)
             return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, EcosystemInformation::Id>::EntryFor(command);
     }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == ElectricalAlarm::Id) || ...))
+    {
+        if (id == ElectricalAlarm::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, ElectricalAlarm::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == ElectricalDistribution::Id) || ...))
+    {
+        if (id == ElectricalDistribution::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, ElectricalDistribution::Id>::EntryFor(command);
+    }
     if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == ElectricalEnergyMeasurement::Id) || ...))
     {
         if (id == ElectricalEnergyMeasurement::Id)
@@ -541,6 +564,11 @@ std::optional<DataModel::AcceptedCommandEntry> AcceptedCommandEntryFor(ClusterId
     {
         if (id == ElectricalPowerMeasurement::Id)
             return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, ElectricalPowerMeasurement::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == ElectricalProtectionAlarm::Id) || ...))
+    {
+        if (id == ElectricalProtectionAlarm::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, ElectricalProtectionAlarm::Id>::EntryFor(command);
     }
     if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == EnergyEvse::Id) || ...))
     {

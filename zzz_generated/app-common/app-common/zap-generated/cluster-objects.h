@@ -63,6 +63,10 @@
 #include <clusters/AudioOutput/Commands.h>
 #include <clusters/AudioOutput/Events.h>
 #include <clusters/AudioOutput/Structs.h>
+#include <clusters/AvAnalysis/Attributes.h>
+#include <clusters/AvAnalysis/Commands.h>
+#include <clusters/AvAnalysis/Events.h>
+#include <clusters/AvAnalysis/Structs.h>
 #include <clusters/BallastConfiguration/Attributes.h>
 #include <clusters/BallastConfiguration/Commands.h>
 #include <clusters/BallastConfiguration/Events.h>
@@ -187,6 +191,14 @@
 #include <clusters/EcosystemInformation/Commands.h>
 #include <clusters/EcosystemInformation/Events.h>
 #include <clusters/EcosystemInformation/Structs.h>
+#include <clusters/ElectricalAlarm/Attributes.h>
+#include <clusters/ElectricalAlarm/Commands.h>
+#include <clusters/ElectricalAlarm/Events.h>
+#include <clusters/ElectricalAlarm/Structs.h>
+#include <clusters/ElectricalDistribution/Attributes.h>
+#include <clusters/ElectricalDistribution/Commands.h>
+#include <clusters/ElectricalDistribution/Events.h>
+#include <clusters/ElectricalDistribution/Structs.h>
 #include <clusters/ElectricalEnergyMeasurement/Attributes.h>
 #include <clusters/ElectricalEnergyMeasurement/Commands.h>
 #include <clusters/ElectricalEnergyMeasurement/Events.h>
@@ -199,6 +211,10 @@
 #include <clusters/ElectricalPowerMeasurement/Commands.h>
 #include <clusters/ElectricalPowerMeasurement/Events.h>
 #include <clusters/ElectricalPowerMeasurement/Structs.h>
+#include <clusters/ElectricalProtectionAlarm/Attributes.h>
+#include <clusters/ElectricalProtectionAlarm/Commands.h>
+#include <clusters/ElectricalProtectionAlarm/Events.h>
+#include <clusters/ElectricalProtectionAlarm/Structs.h>
 #include <clusters/EnergyEvse/Attributes.h>
 #include <clusters/EnergyEvse/Commands.h>
 #include <clusters/EnergyEvse/Events.h>
