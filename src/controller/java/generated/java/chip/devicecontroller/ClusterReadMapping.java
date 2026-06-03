@@ -16713,17 +16713,17 @@ public class ClusterReadMapping {
           readAmbientContextSensingAmbientContextTypeSupportedCommandParams
         );
         result.put("readAmbientContextTypeSupportedAttribute", readAmbientContextSensingAmbientContextTypeSupportedAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readAmbientContextSensingObjectCountReachedCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readAmbientContextSensingObjectCountReachedAttributeInteractionInfo = new InteractionInfo(
+     Map<String, CommandParameterInfo> readAmbientContextSensingObjectCountThresholdReachedCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readAmbientContextSensingObjectCountThresholdReachedAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
-            ((ChipClusters.AmbientContextSensingCluster) cluster).readObjectCountReachedAttribute(
+            ((ChipClusters.AmbientContextSensingCluster) cluster).readObjectCountThresholdReachedAttribute(
               (ChipClusters.BooleanAttributeCallback) callback
             );
           },
           () -> new ClusterInfoMapping.DelegatedBooleanAttributeCallback(),
-          readAmbientContextSensingObjectCountReachedCommandParams
+          readAmbientContextSensingObjectCountThresholdReachedCommandParams
         );
-        result.put("readObjectCountReachedAttribute", readAmbientContextSensingObjectCountReachedAttributeInteractionInfo);
+        result.put("readObjectCountThresholdReachedAttribute", readAmbientContextSensingObjectCountThresholdReachedAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readAmbientContextSensingObjectCountCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readAmbientContextSensingObjectCountAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
@@ -16768,6 +16768,17 @@ public class ClusterReadMapping {
           readAmbientContextSensingPredictedActivityCommandParams
         );
         result.put("readPredictedActivityAttribute", readAmbientContextSensingPredictedActivityAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readAmbientContextSensingSensorFusionSupportedCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readAmbientContextSensingSensorFusionSupportedAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.AmbientContextSensingCluster) cluster).readSensorFusionSupportedAttribute(
+              (ChipClusters.AmbientContextSensingCluster.SensorFusionSupportedAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedAmbientContextSensingClusterSensorFusionSupportedAttributeCallback(),
+          readAmbientContextSensingSensorFusionSupportedCommandParams
+        );
+        result.put("readSensorFusionSupportedAttribute", readAmbientContextSensingSensorFusionSupportedAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readAmbientContextSensingGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readAmbientContextSensingGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
@@ -16823,6 +16834,98 @@ public class ClusterReadMapping {
           readAmbientContextSensingClusterRevisionCommandParams
         );
         result.put("readClusterRevisionAttribute", readAmbientContextSensingClusterRevisionAttributeInteractionInfo);
+     
+       return result;
+    }
+    private static Map<String, InteractionInfo> readAmbientSensingUnionInteractionInfo() {
+       Map<String, InteractionInfo> result = new LinkedHashMap<>();Map<String, CommandParameterInfo> readAmbientSensingUnionUnionNameCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readAmbientSensingUnionUnionNameAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.AmbientSensingUnionCluster) cluster).readUnionNameAttribute(
+              (ChipClusters.CharStringAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedCharStringAttributeCallback(),
+          readAmbientSensingUnionUnionNameCommandParams
+        );
+        result.put("readUnionNameAttribute", readAmbientSensingUnionUnionNameAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readAmbientSensingUnionUnionHealthCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readAmbientSensingUnionUnionHealthAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.AmbientSensingUnionCluster) cluster).readUnionHealthAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readAmbientSensingUnionUnionHealthCommandParams
+        );
+        result.put("readUnionHealthAttribute", readAmbientSensingUnionUnionHealthAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readAmbientSensingUnionUnionContributorListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readAmbientSensingUnionUnionContributorListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.AmbientSensingUnionCluster) cluster).readUnionContributorListAttribute(
+              (ChipClusters.AmbientSensingUnionCluster.UnionContributorListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedAmbientSensingUnionClusterUnionContributorListAttributeCallback(),
+          readAmbientSensingUnionUnionContributorListCommandParams
+        );
+        result.put("readUnionContributorListAttribute", readAmbientSensingUnionUnionContributorListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readAmbientSensingUnionGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readAmbientSensingUnionGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.AmbientSensingUnionCluster) cluster).readGeneratedCommandListAttribute(
+              (ChipClusters.AmbientSensingUnionCluster.GeneratedCommandListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedAmbientSensingUnionClusterGeneratedCommandListAttributeCallback(),
+          readAmbientSensingUnionGeneratedCommandListCommandParams
+        );
+        result.put("readGeneratedCommandListAttribute", readAmbientSensingUnionGeneratedCommandListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readAmbientSensingUnionAcceptedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readAmbientSensingUnionAcceptedCommandListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.AmbientSensingUnionCluster) cluster).readAcceptedCommandListAttribute(
+              (ChipClusters.AmbientSensingUnionCluster.AcceptedCommandListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedAmbientSensingUnionClusterAcceptedCommandListAttributeCallback(),
+          readAmbientSensingUnionAcceptedCommandListCommandParams
+        );
+        result.put("readAcceptedCommandListAttribute", readAmbientSensingUnionAcceptedCommandListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readAmbientSensingUnionAttributeListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readAmbientSensingUnionAttributeListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.AmbientSensingUnionCluster) cluster).readAttributeListAttribute(
+              (ChipClusters.AmbientSensingUnionCluster.AttributeListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedAmbientSensingUnionClusterAttributeListAttributeCallback(),
+          readAmbientSensingUnionAttributeListCommandParams
+        );
+        result.put("readAttributeListAttribute", readAmbientSensingUnionAttributeListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readAmbientSensingUnionFeatureMapCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readAmbientSensingUnionFeatureMapAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.AmbientSensingUnionCluster) cluster).readFeatureMapAttribute(
+              (ChipClusters.LongAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+          readAmbientSensingUnionFeatureMapCommandParams
+        );
+        result.put("readFeatureMapAttribute", readAmbientSensingUnionFeatureMapAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readAmbientSensingUnionClusterRevisionCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readAmbientSensingUnionClusterRevisionAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.AmbientSensingUnionCluster) cluster).readClusterRevisionAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readAmbientSensingUnionClusterRevisionCommandParams
+        );
+        result.put("readClusterRevisionAttribute", readAmbientSensingUnionClusterRevisionAttributeInteractionInfo);
      
        return result;
     }
@@ -22238,6 +22341,7 @@ public class ClusterReadMapping {
             put("radonConcentrationMeasurement", readRadonConcentrationMeasurementInteractionInfo());
             put("soilMeasurement", readSoilMeasurementInteractionInfo());
             put("ambientContextSensing", readAmbientContextSensingInteractionInfo());
+            put("ambientSensingUnion", readAmbientSensingUnionInteractionInfo());
             put("proximityRanging", readProximityRangingInteractionInfo());
             put("smokeConcentrationMeasurement", readSmokeConcentrationMeasurementInteractionInfo());
             put("networkIdentityManagement", readNetworkIdentityManagementInteractionInfo());

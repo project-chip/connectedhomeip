@@ -2909,28 +2909,6 @@ public class ClusterWriteMapping {
     Map<String, InteractionInfo> writeSoilMeasurementInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("soilMeasurement", writeSoilMeasurementInteractionInfo);
     Map<String, InteractionInfo> writeAmbientContextSensingInteractionInfo = new LinkedHashMap<>();
-    Map<String, CommandParameterInfo> writeAmbientContextSensingSimultaneousDetectionLimitCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo ambientContextSensingsimultaneousDetectionLimitCommandParameterInfo =
-        new CommandParameterInfo(
-            "value", 
-            Integer.class, 
-            Integer.class 
-        );
-    writeAmbientContextSensingSimultaneousDetectionLimitCommandParams.put(
-        "value",
-        ambientContextSensingsimultaneousDetectionLimitCommandParameterInfo
-    );
-    InteractionInfo writeAmbientContextSensingSimultaneousDetectionLimitAttributeInteractionInfo = new InteractionInfo(
-      (cluster, callback, commandArguments) -> {
-        ((ChipClusters.AmbientContextSensingCluster) cluster).writeSimultaneousDetectionLimitAttribute(
-          (DefaultClusterCallback) callback,
-          (Integer) commandArguments.get("value")
-        );
-      },
-      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
-      writeAmbientContextSensingSimultaneousDetectionLimitCommandParams
-    );
-    writeAmbientContextSensingInteractionInfo.put("writeSimultaneousDetectionLimitAttribute", writeAmbientContextSensingSimultaneousDetectionLimitAttributeInteractionInfo);
     Map<String, CommandParameterInfo> writeAmbientContextSensingHoldTimeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo ambientContextSensingholdTimeCommandParameterInfo =
         new CommandParameterInfo(
@@ -2954,6 +2932,30 @@ public class ClusterWriteMapping {
     );
     writeAmbientContextSensingInteractionInfo.put("writeHoldTimeAttribute", writeAmbientContextSensingHoldTimeAttributeInteractionInfo);
     writeAttributeMap.put("ambientContextSensing", writeAmbientContextSensingInteractionInfo);
+    Map<String, InteractionInfo> writeAmbientSensingUnionInteractionInfo = new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> writeAmbientSensingUnionUnionNameCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo ambientSensingUnionunionNameCommandParameterInfo =
+        new CommandParameterInfo(
+            "value", 
+            String.class, 
+            String.class 
+        );
+    writeAmbientSensingUnionUnionNameCommandParams.put(
+        "value",
+        ambientSensingUnionunionNameCommandParameterInfo
+    );
+    InteractionInfo writeAmbientSensingUnionUnionNameAttributeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.AmbientSensingUnionCluster) cluster).writeUnionNameAttribute(
+          (DefaultClusterCallback) callback,
+          (String) commandArguments.get("value")
+        );
+      },
+      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+      writeAmbientSensingUnionUnionNameCommandParams
+    );
+    writeAmbientSensingUnionInteractionInfo.put("writeUnionNameAttribute", writeAmbientSensingUnionUnionNameAttributeInteractionInfo);
+    writeAttributeMap.put("ambientSensingUnion", writeAmbientSensingUnionInteractionInfo);
     Map<String, InteractionInfo> writeProximityRangingInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("proximityRanging", writeProximityRangingInteractionInfo);
     Map<String, InteractionInfo> writeSmokeConcentrationMeasurementInteractionInfo = new LinkedHashMap<>();
