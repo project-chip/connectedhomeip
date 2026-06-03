@@ -81,10 +81,9 @@ class TC_ACS_2_1(MatterBaseTest):
                      "Verify that the DUT response contains SemanticTag struct data field including namespace ID and tag ID from IdentifiedObject or IdentifiedHumanActivity or IdentifiedSound namespaces.",
                      "Verify that the list size is less than equal to 50."),
             TestStep("6", "If DUT supports HumanActivity or ObjectIdentification or SoundIdentification, TH reads the AmbientContextType attribute.",
-                     "Verify that DUT response contains namespace ID and tag ID scoped within the AmbientContextTypeSupported attribute.",
-                     "Verify that DUT DetectionStartTime has epoch-s data type if DUT supports DetectedStartTime field."),
-            TestStep("7", "If DUT supports ObjectCounting and ObjectIdentification feature, then TH reads the ObjectCountReached attribute.",
-                     "TH reads the ObjectCountReached containing Boolean True or False."),
+                     "Verify that DUT response contains namespace ID and tag ID scoped within the AmbientContextTypeSupported attribute."),
+            TestStep("7", "If DUT supports ObjectCounting and ObjectIdentification feature, then TH reads the ObjectCountThresholdReached attribute.",
+                     "TH reads the ObjectCountThresholdReached containing Boolean True or False."),
             TestStep("8", "If DUT supports ObjectCounting and ObjectIdentification feature, then TH reads the ObjectCountConfig attribute.",
                      "Verify that DUT response contains the list of ObjectCountDataStruct entries and its CountingObject field is SemanticTagStruct data type containing namespace ID and tag ID from IdentifiedObject.",
                      "Verify that the ObjectCountThreshold field is an uint16 value."),
@@ -225,12 +224,6 @@ class TC_ACS_2_1(MatterBaseTest):
 
                     asserts.assert_greater(num_support, 0, "Ambient Context is not scoped within AmbientContextSupport list.")
 
-                    if "detectionStartTime" in context:
-                        asserts.assert_less_equal(min_value_uint32, context.detectionStartTime,
-                                                  "DetectionStartTime is not within the range of uint32.")
-                        asserts.assert_less_equal(context.detectionStartTime, max_value_uint32,
-                                                  "DetectionStartTime is not within the range of uint32.")
-
         else:
             log.info("HumanActivity, ObjectIdentification, SoundIdentification Feature not supported. Test steps skipped")
             self.skip_step("5")
@@ -238,11 +231,11 @@ class TC_ACS_2_1(MatterBaseTest):
 
         if self.ObjectCountingSupported and self.ObjectIdentificationSupported:
             self.step("7")
-            objectCountReached = await self.read_single_attribute_check_success(
-                endpoint=endpoint, cluster=cluster, attribute=attr.ObjectCountReached
+            objectCountThresholdReached = await self.read_single_attribute_check_success(
+                endpoint=endpoint, cluster=cluster, attribute=attr.ObjectCountThresholdReached
             )
-            log.info(f"Rx'd ObjectCountReached: {objectCountReached}")
-            asserts.assert_true(objectCountReached in [True, False],
+            log.info(f"Rx'd ObjectCountThresholdReached: {objectCountThresholdReached}")
+            asserts.assert_true(ObjectCountThresholdReached in [True, False],
                                 "Expected True or False Boolean value.")
 
             self.step("8")
