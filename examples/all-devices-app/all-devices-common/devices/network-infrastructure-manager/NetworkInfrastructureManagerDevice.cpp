@@ -36,10 +36,10 @@ namespace {
 constexpr uint16_t kThreadVersionForThread_1_3_1 = 5;
 } // namespace
 
-NetworkInfrastructureManagerDevice::NetworkInfrastructureManagerDevice(
-    PersistentStorageDelegate & storage, Clusters::ThreadNetworkDiagnostics::ThreadNetworkDiagnosticsProvider & provider) :
+NetworkInfrastructureManagerDevice::NetworkInfrastructureManagerDevice(PersistentStorageDelegate & storage, Clusters::ThreadNetworkDiagnostics::ThreadNetworkDiagnosticsProvider & provider) :
     SingleEndpointDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kNetworkInfrastructureManager, 1)),
-    mThreadNetworkDirectoryStorage(storage), mThreadDiagnosticsProvider(provider)
+    mThreadNetworkDirectoryStorage(storage),
+    mThreadDiagnosticsProvider(provider)
 {}
 
 NetworkInfrastructureManagerDevice::~NetworkInfrastructureManagerDevice()

@@ -34,7 +34,8 @@ using namespace chip::DeviceLayer;
 
 namespace chip::app::Clusters::ThreadNetworkDiagnostics {
 
-CHIP_ERROR OpenThreadDiagnosticsProvider::WriteAttributeToTlv(AttributeId attributeId, app::AttributeValueEncoder & encoder)
+CHIP_ERROR OpenThreadDiagnosticsProvider::WriteAttributeToTlv(AttributeId attributeId,
+                                                              app::AttributeValueEncoder & encoder)
 {
     CHIP_ERROR err;
     otInstance * otInst = ThreadStackMgrImpl().OTInstance();
