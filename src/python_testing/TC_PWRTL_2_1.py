@@ -146,6 +146,7 @@ class TC_PWRTL_2_1(MatterBaseTest):
             log.info(f"AvailableEndpoints: {avail_eps}")
         else:
             log.info("AvailableEndpoints not in AttributeList (SET feature not set)")
+            self.mark_current_step_skipped()
 
         self.step(7, "TH reads ActiveEndpoints (if present in AttributeList)")
         active_eps = None
@@ -158,6 +159,7 @@ class TC_PWRTL_2_1(MatterBaseTest):
             log.info(f"ActiveEndpoints: {active_eps}")
         else:
             log.info("ActiveEndpoints not in AttributeList (DYPF feature not set)")
+            self.mark_current_step_skipped()
 
         self.step(8, "TH verifies ActiveEndpoints is a subset of AvailableEndpoints")
         if avail_eps is not None and active_eps is not None:
@@ -167,6 +169,7 @@ class TC_PWRTL_2_1(MatterBaseTest):
             log.info("ActiveEndpoints is a subset of AvailableEndpoints")
         else:
             log.info("Skipping subset check (endpoint attributes not present)")
+            self.mark_current_step_skipped()
 
         self.step(9, "TH attempts write to AvailableEndpoints - expect UNSUPPORTED_WRITE")
         if avail_eps is not None:
@@ -176,6 +179,8 @@ class TC_PWRTL_2_1(MatterBaseTest):
                 expect_success=False)
             asserts.assert_equal(status, Status.UnsupportedWrite,
                                  "Write to AvailableEndpoints should return UNSUPPORTED_WRITE")
+        else:
+            self.mark_current_step_skipped()
 
         self.step(10, "Operator reboots DUT (skipped in CI)")
         if self.is_pics_sdk_ci_only or active_eps is None:
