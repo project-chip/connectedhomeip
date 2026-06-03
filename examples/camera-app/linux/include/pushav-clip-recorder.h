@@ -329,6 +329,17 @@ private:
     void UpdateMPDParams(const std::string & mpdPath);
 
     /**
+     * @brief Converts the MPD from dynamic to static for final upload.
+     *
+     * Per the Push AV spec, when the final Segment completes uploading, the manifest
+     * SHALL be uploaded again with type="static" and a SegmentTimeline element that
+     * accurately describes the duration of all uploaded segments.
+     *
+     * @param mpdPath Path to the MPD file to convert
+     */
+    void FinalizeMPD(const std::string & mpdPath);
+
+    /**
      * @brief Determines if H.264 data contains an I-frame (IDR frame).
      * @param data Pointer to the H.264 NALU data.
      * @param length Length of the data in bytes.
