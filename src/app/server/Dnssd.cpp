@@ -494,7 +494,7 @@ void DnssdServer::StartServer(Dnssd::CommissioningMode mode)
         return;
     }
 
-    if ( !Dnssd::ServiceAdvertiser::Instance().IsInitialized())
+    if (!Dnssd::ServiceAdvertiser::Instance().IsInitialized())
     {
         // Somehow Init can succeed without being initialized...
         ChipLogError(Discovery, "Advertiser not initialized");
