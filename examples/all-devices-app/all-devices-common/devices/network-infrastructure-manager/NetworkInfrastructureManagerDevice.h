@@ -25,7 +25,7 @@
 #include <app/clusters/thread-network-directory-server/ThreadNetworkDirectoryCluster.h>
 #include <app/clusters/wifi-network-management-server/WiFiNetworkManagementCluster.h>
 #include <devices/interface/SingleEndpointDevice.h>
-#include <devices/network-infrastructure-manager/AllDevicesThreadNetworkDiagnosticsProvider.h>
+#include <app/clusters/thread-network-diagnostics-server/DefaultThreadNetworkDiagnosticsProvider.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 
 namespace chip {
@@ -68,7 +68,7 @@ public:
 protected:
     SimpleBreadCrumbTracker mBreadCrumbTracker;
     DefaultThreadNetworkDirectoryStorage mThreadNetworkDirectoryStorage;
-    AllDevicesThreadNetworkDiagnosticsProvider mThreadDiagnosticsProvider;
+    Clusters::ThreadNetworkDiagnostics::DefaultThreadNetworkDiagnosticsProvider mThreadDiagnosticsProvider;
 
     LazyRegisteredServerCluster<Clusters::ThreadBorderRouterManagementCluster> mThreadBorderRouterManagementCluster;
     LazyRegisteredServerCluster<Clusters::WiFiNetworkManagementCluster> mWiFiNetworkManagementCluster;
