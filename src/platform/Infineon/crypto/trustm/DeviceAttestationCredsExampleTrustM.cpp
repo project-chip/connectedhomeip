@@ -149,15 +149,22 @@ DeviceAttestationCredentialsProvider * GetExampleTrustMDACProvider()
 
 CHIP_ERROR PreloadTrustMAttestationCerts()
 {
+    gPAICertLen = 0;
+    gDACCertLen = 0;
+    gCDLen      = 0;
+
     // Read PAI, DAC, and CD from TrustM into RAM before BLE advertising starts.
-    gPAICertLen = sizeof(gPAICertBuf);
-    ReturnErrorOnFailure(trustmGetCertificate(PAI_CERT_ID, gPAICertBuf, &gPAICertLen));
+    uint16_t len = sizeof(gPAICertBuf);
+    ReturnErrorOnFailure(trustmGetCertificate(PAI_CERT_ID, gPAICertBuf, &len));
+    gPAICertLen = len;
 
-    gDACCertLen = sizeof(gDACCertBuf);
-    ReturnErrorOnFailure(trustmGetCertificate(DEV_ATTESTATION_CERT_ID, gDACCertBuf, &gDACCertLen));
+    len = sizeof(gDACCertBuf);
+    ReturnErrorOnFailure(trustmGetCertificate(DEV_ATTESTATION_CERT_ID, gDACCertBuf, &len));
+    gDACCertLen = len;
 
-    gCDLen = sizeof(gCDBuf);
-    ReturnErrorOnFailure(trustmGetCertificate(CERT_DECLARATION_ID, gCDBuf, &gCDLen));
+    len = sizeof(gCDBuf);
+    ReturnErrorOnFailure(trustmGetCertificate(CERT_DECLARATION_ID, gCDBuf, &len));
+    gCDLen = len;
 
     ChipLogProgress(Crypto, "TrustM attestation certs preloaded (PAI=%u DAC=%u CD=%u bytes)", gPAICertLen, gDACCertLen, gCDLen);
     return CHIP_NO_ERROR;

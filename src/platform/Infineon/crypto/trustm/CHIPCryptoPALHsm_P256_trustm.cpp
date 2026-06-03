@@ -235,6 +235,7 @@ CHIP_ERROR P256Keypair::ECDH_derive_secret(const P256PublicKey & remote_public_k
 
     VerifyOrExit(rem_pubKeyLen <= (sizeof(remote_key) - sizeof(header)), error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(secret_length <= UINT8_MAX, error = CHIP_ERROR_BUFFER_TOO_SMALL);
+    VerifyOrExit(secret_length <= out_secret.Capacity(), error = CHIP_ERROR_BUFFER_TOO_SMALL);
 
     memcpy(remote_key, &header, sizeof(header));
     memcpy(remote_key + sizeof(header), rem_pubKey, rem_pubKeyLen);

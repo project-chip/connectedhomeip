@@ -413,9 +413,16 @@ static EntropyContext * get_entropy_context()
         // TRNG) because MBEDTLS_ENTROPY_HARDWARE_ALT is defined globally.
         gsEntropyContext.mEntropy.source_count = 0;
 
-        // Register TrustM as the only strong entropy source for CHIP's DRBG.
-        (void) mbedtls_entropy_add_source(&gsEntropyContext.mEntropy, trustm_entropy_source, nullptr, MBEDTLS_CTR_DRBG_ENTROPY_LEN,
-                                          MBEDTLS_ENTROPY_SOURCE_STRONG);
+        // Register TrustM as a strong entropy source for CHIP's DRBG.
+        const int entropy_err = mbedtls_entropy_add_source(&gsEntropyContext.mEntropy, trustm_entropy_source, nullptr,
+                                                           MBEDTLS_CTR_DRBG_ENTROPY_LEN, MBEDTLS_ENTROPY_SOURCE_STRONG);
+        if (entropy_err != 0)
+        {
+            ChipLogError(Crypto, "Failed to register TrustM entropy source: %d", entropy_err);
+            mbedtls_entropy_free(&gsEntropyContext.mEntropy);
+            mbedtls_ctr_drbg_free(&gsEntropyContext.mDRBGCtxt);
+            return nullptr;
+        }
 #endif
 
         gsEntropyContext.mInitialized = true;
