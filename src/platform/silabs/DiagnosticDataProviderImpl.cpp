@@ -31,6 +31,7 @@
 #endif
 #include "sl_memory_manager.h"
 #include <cmsis_os2.h>
+#include <inet/IPAddress.h>
 #include <inet/InetInterface.h>
 #include <lib/support/CHIPMemString.h>
 #include <sl_cmsis_os2_common.h>

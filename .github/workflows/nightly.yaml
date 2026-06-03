@@ -355,7 +355,7 @@ jobs:
                   path: gh-pages
 
             - name: Generate Allure Report
-              uses: simple-elf/allure-report-action@v1.13
+              uses: simple-elf/allure-report-action@v1.14
               with:
                   allure_results: junit-results
                   allure_report: allure-report

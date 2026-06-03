@@ -38,7 +38,6 @@ fi
 
 USE_WIFI=false
 USE_DOCKER=false
-USE_GIT_SHA_FOR_VERSION=true
 GN_PATH="$PW_PATH/gn"
 USE_BOOTLOADER=false
 DOTFILE=".gn"
@@ -282,11 +281,6 @@ else
                 shift
                 shift
                 ;;
-            *"sl_matter_version_str="*)
-                optArgs+="$1 "
-                USE_GIT_SHA_FOR_VERSION=false
-                shift
-                ;;
             *)
                 if [[ "$1" == *use_SiWx917=true* ]]; then
                     USE_WIFI=true
@@ -309,14 +303,6 @@ else
     if [[ " ${WIFI_SOC_BOARDS[@]} " =~ " ${SILABS_BOARD} " ]]; then
         echo "Compiling for 917 WiFi SOC"
         USE_WIFI=true
-    fi
-
-    if [ "$USE_GIT_SHA_FOR_VERSION" == true ]; then
-        {
-            ShortCommitSha=$(git describe --always --dirty --exclude '*')
-            branchName=$(git rev-parse --abbrev-ref HEAD)
-            optArgs+="sl_matter_version_str=\"v1.3-$branchName-$ShortCommitSha\" "
-        } &>/dev/null
     fi
 
     # After a completed local install (.install-packages-done), run the Silabs package install step to check for updates. Docker never runs it (SDK is in the image).

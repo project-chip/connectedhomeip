@@ -30,6 +30,7 @@
 #include <clusters/ApplicationBasic/ClusterId.h>
 #include <clusters/ApplicationLauncher/ClusterId.h>
 #include <clusters/AudioOutput/ClusterId.h>
+#include <clusters/AvAnalysis/ClusterId.h>
 #include <clusters/BallastConfiguration/ClusterId.h>
 #include <clusters/BasicInformation/ClusterId.h>
 #include <clusters/Binding/ClusterId.h>
@@ -61,9 +62,12 @@
 #include <clusters/DoorLock/ClusterId.h>
 #include <clusters/DynamicLighting/ClusterId.h>
 #include <clusters/EcosystemInformation/ClusterId.h>
+#include <clusters/ElectricalAlarm/ClusterId.h>
+#include <clusters/ElectricalDistribution/ClusterId.h>
 #include <clusters/ElectricalEnergyMeasurement/ClusterId.h>
 #include <clusters/ElectricalGridConditions/ClusterId.h>
 #include <clusters/ElectricalPowerMeasurement/ClusterId.h>
+#include <clusters/ElectricalProtectionAlarm/ClusterId.h>
 #include <clusters/EnergyEvse/ClusterId.h>
 #include <clusters/EnergyEvseMode/ClusterId.h>
 #include <clusters/EnergyPreference/ClusterId.h>
@@ -136,6 +140,7 @@
 #include <clusters/ScenesManagement/ClusterId.h>
 #include <clusters/ServiceArea/ClusterId.h>
 #include <clusters/SmokeCoAlarm/ClusterId.h>
+#include <clusters/SmokeConcentrationMeasurement/ClusterId.h>
 #include <clusters/SoftwareDiagnostics/ClusterId.h>
 #include <clusters/SoilMeasurement/ClusterId.h>
 #include <clusters/Switch/ClusterId.h>
@@ -149,7 +154,6 @@
 #include <clusters/ThreadNetworkDirectory/ClusterId.h>
 #include <clusters/TimeFormatLocalization/ClusterId.h>
 #include <clusters/TimeSynchronization/ClusterId.h>
-#include <clusters/Timer/ClusterId.h>
 #include <clusters/TlsCertificateManagement/ClusterId.h>
 #include <clusters/TlsClientManagement/ClusterId.h>
 #include <clusters/TotalVolatileOrganicCompoundsConcentrationMeasurement/ClusterId.h>
