@@ -21,7 +21,7 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${ALL_CLUSTERS_APP}
+#     app: ${EVSE_APP}
 #     app-args: >
 #       --discriminator 1234
 #       --KVS kvs1
@@ -44,7 +44,7 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.interaction_model import Status
-from matter.testing.decorators import has_feature, pics, run_if_endpoint_matches
+from matter.testing.decorators import async_test_body, pics
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import default_matter_test_main
 
@@ -56,8 +56,7 @@ cluster = Clusters.PowerTopology
 class TC_PWRTL_2_2(MatterBaseTest):
 
     @pics('PWRTL.S', 'PWRTL.S.F04')
-    @run_if_endpoint_matches(
-        has_feature(Clusters.PowerTopology, Clusters.PowerTopology.Bitmaps.Feature.kElectricalCircuit))
+    @async_test_body
     async def test_TC_PWRTL_2_2(self):
         """[TC-PWRTL-2.2] ElectricalCircuitNodes (CIRC feature) with DUT as Server
 
