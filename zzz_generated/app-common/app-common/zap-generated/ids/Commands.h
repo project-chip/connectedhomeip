@@ -30,6 +30,7 @@
 #include <clusters/ApplicationBasic/CommandIds.h>
 #include <clusters/ApplicationLauncher/CommandIds.h>
 #include <clusters/AudioOutput/CommandIds.h>
+#include <clusters/AvAnalysis/CommandIds.h>
 #include <clusters/BallastConfiguration/CommandIds.h>
 #include <clusters/BasicInformation/CommandIds.h>
 #include <clusters/Binding/CommandIds.h>

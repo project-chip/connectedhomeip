@@ -22,6 +22,7 @@
 #include <future>
 #include <memory>
 #include <mutex>
+#include <string>
 #include <thread>
 #include <vector>
 
@@ -68,6 +69,7 @@ public:
      */
     CHIP_ERROR Discover(ByteSpan & pskc, const Transport::PeerAddress & peerAddr, const Thread::DiscoveryCode code,
                         chip::SetupDiscriminator expectedDiscriminator, Dnssd::DiscoveredNodeData & nodeData, uint16_t timeout);
+    std::string GetLastDiscoveryDiagnosticJson();
 
     // ot::commissioner::CommissionerHandler
     void OnJoinerMessage(const std::vector<uint8_t> & joinerIdBytes, uint16_t joinerPort,
@@ -86,9 +88,24 @@ private:
     CHIP_ERROR InitializeCommissioner(ByteSpan & pskc);
     CHIP_ERROR CreateProxySocket(Dnssd::CommissionNodeData & commissionData);
     void ProcessAnnouncement(const std::vector<uint8_t> & joinerIdBytes, uint16_t joinerPort, const std::vector<uint8_t> & payload);
+    void ResetCommissionerForDiscovery();
     void SetState(State state);
 
     ot::commissioner::CommissionerDataset MakeCommissionerDataset(Thread::DiscoveryCode code);
+
+    struct DiscoveryDiagnostic
+    {
+        bool valid                 = false;
+        bool requestedShort        = false;
+        uint16_t requestedValue    = 0;
+        uint16_t expectedLongValue = 0;
+        uint64_t discoveryCode     = 0;
+        uint64_t joinerId          = 0;
+        uint16_t joinerUdpPort     = 0;
+        uint16_t matterUdpPort     = 0;
+        std::vector<uint8_t> steeringData;
+        Dnssd::CommissionNodeData commissionData{};
+    };
 
     // Member Variables
     chip::Dnssd::DiscoveredNodeData mNodeData;
@@ -107,6 +124,7 @@ private:
 
     std::shared_ptr<ot::commissioner::Commissioner> mCommissioner;
     std::thread mProxyThread;
+    DiscoveryDiagnostic mLastDiscoveryDiagnostic;
 };
 
 } // namespace Controller

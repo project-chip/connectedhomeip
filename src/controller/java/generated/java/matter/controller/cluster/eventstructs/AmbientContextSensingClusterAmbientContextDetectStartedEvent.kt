@@ -28,13 +28,13 @@ class AmbientContextSensingClusterAmbientContextDetectStartedEvent(
     Optional<
       matter.controller.cluster.structs.AmbientContextSensingClusterAmbientContextTypeStruct
     >,
-  val objectCountReached: Optional<Boolean>,
+  val objectCountThresholdReached: Optional<Boolean>,
   val objectCount: Optional<UShort>,
 ) {
   override fun toString(): String = buildString {
     append("AmbientContextSensingClusterAmbientContextDetectStartedEvent {\n")
     append("\tambientContextDetected : $ambientContextDetected\n")
-    append("\tobjectCountReached : $objectCountReached\n")
+    append("\tobjectCountThresholdReached : $objectCountThresholdReached\n")
     append("\tobjectCount : $objectCount\n")
     append("}\n")
   }
@@ -46,9 +46,9 @@ class AmbientContextSensingClusterAmbientContextDetectStartedEvent(
         val optambientContextDetected = ambientContextDetected.get()
         optambientContextDetected.toTlv(ContextSpecificTag(TAG_AMBIENT_CONTEXT_DETECTED), this)
       }
-      if (objectCountReached.isPresent) {
-        val optobjectCountReached = objectCountReached.get()
-        put(ContextSpecificTag(TAG_OBJECT_COUNT_REACHED), optobjectCountReached)
+      if (objectCountThresholdReached.isPresent) {
+        val optobjectCountThresholdReached = objectCountThresholdReached.get()
+        put(ContextSpecificTag(TAG_OBJECT_COUNT_THRESHOLD_REACHED), optobjectCountThresholdReached)
       }
       if (objectCount.isPresent) {
         val optobjectCount = objectCount.get()
@@ -60,7 +60,7 @@ class AmbientContextSensingClusterAmbientContextDetectStartedEvent(
 
   companion object {
     private const val TAG_AMBIENT_CONTEXT_DETECTED = 0
-    private const val TAG_OBJECT_COUNT_REACHED = 1
+    private const val TAG_OBJECT_COUNT_THRESHOLD_REACHED = 1
     private const val TAG_OBJECT_COUNT = 2
 
     fun fromTlv(
@@ -77,9 +77,9 @@ class AmbientContextSensingClusterAmbientContextDetectStartedEvent(
         } else {
           Optional.empty()
         }
-      val objectCountReached =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_OBJECT_COUNT_REACHED))) {
-          Optional.of(tlvReader.getBoolean(ContextSpecificTag(TAG_OBJECT_COUNT_REACHED)))
+      val objectCountThresholdReached =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_OBJECT_COUNT_THRESHOLD_REACHED))) {
+          Optional.of(tlvReader.getBoolean(ContextSpecificTag(TAG_OBJECT_COUNT_THRESHOLD_REACHED)))
         } else {
           Optional.empty()
         }
@@ -94,7 +94,7 @@ class AmbientContextSensingClusterAmbientContextDetectStartedEvent(
 
       return AmbientContextSensingClusterAmbientContextDetectStartedEvent(
         ambientContextDetected,
-        objectCountReached,
+        objectCountThresholdReached,
         objectCount,
       )
     }
