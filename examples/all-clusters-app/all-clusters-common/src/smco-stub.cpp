@@ -15,7 +15,6 @@
  *    limitations under the License.
  */
 
-#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/clusters/smoke-co-alarm-server/SmokeCOTestEventTriggerHandler.h>
 #include <app/clusters/smoke-co-alarm-server/smoke-co-alarm-server.h>
 
@@ -54,18 +53,15 @@ public:
     }
 } sSmokeCODelegate;
 
-struct SmokeCORegistrar
-{
-    SmokeCORegistrar()
-    {
-        SmokeCoAlarmCluster::Config config;
-        config.featureMap.Set(Feature::kSmokeAlarm).Set(Feature::kCoAlarm);
-        config.optionalAttribs = SmokeCoAlarmCluster::OptionalAttributeSet(SmokeCoAlarmCluster::OptionalAttributeSet::All());
-        LogErrorOnFailure(SmokeCoAlarmServer::Instance().Init(1, config, &sSmokeCODelegate));
-    }
-} sSmokeCORegistrar;
-
 } // namespace
+
+void MatterSmokeCoAlarmPluginServerInitCallback()
+{
+    SmokeCoAlarmCluster::Config config;
+    config.featureMap.Set(Feature::kSmokeAlarm).Set(Feature::kCoAlarm);
+    config.optionalAttribs = SmokeCoAlarmCluster::OptionalAttributeSet(SmokeCoAlarmCluster::OptionalAttributeSet::All());
+    LogErrorOnFailure(SmokeCoAlarmServer::Instance().Init(1, config, &sSmokeCODelegate));
+}
 
 bool HandleSmokeCOTestEventTrigger(uint64_t eventTrigger)
 {
