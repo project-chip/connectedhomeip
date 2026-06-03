@@ -147,9 +147,12 @@ CHIP_ERROR ThermostatDelegate::GetActivePresetHandle(DataModel::Nullable<Mutable
 
 CHIP_ERROR ThermostatDelegate::SetActivePresetHandle(const DataModel::Nullable<ByteSpan> & newActivePresetHandle)
 {
-    if (!newActivePresetHandle.IsNull())
+    const bool isNewActivePresetHandleNull = newActivePresetHandle.IsNull();
+    size_t newActivePresetHandleSize       = 0;
+
+    if (!isNewActivePresetHandleNull)
     {
-        size_t newActivePresetHandleSize = newActivePresetHandle.Value().size();
+        newActivePresetHandleSize = newActivePresetHandle.Value().size();
         if (newActivePresetHandleSize > sizeof(mActivePresetHandleData))
         {
             ChipLogError(NotSpecified,
@@ -157,6 +160,23 @@ CHIP_ERROR ThermostatDelegate::SetActivePresetHandle(const DataModel::Nullable<B
                          static_cast<uint8_t>(newActivePresetHandleSize), static_cast<uint8_t>(kPresetHandleSize));
             return CHIP_ERROR_NO_MEMORY;
         }
+    }
+
+    bool activePresetHandleChanged = (mActivePresetHandleDataSize != newActivePresetHandleSize);
+    if (!isNewActivePresetHandleNull && !activePresetHandleChanged)
+    {
+        activePresetHandleChanged =
+            !ByteSpan(mActivePresetHandleData, mActivePresetHandleDataSize).data_equal(newActivePresetHandle.Value());
+    }
+
+    if (!activePresetHandleChanged)
+    {
+        ChipLogDetail(NotSpecified, "ActivePresetHandle unchanged");
+        return CHIP_NO_ERROR;
+    }
+
+    if (!isNewActivePresetHandleNull)
+    {
         memcpy(mActivePresetHandleData, newActivePresetHandle.Value().data(), newActivePresetHandleSize);
         mActivePresetHandleDataSize = newActivePresetHandleSize;
         ChipLogDetail(NotSpecified, "Set ActivePresetHandle to ");
@@ -169,8 +189,7 @@ CHIP_ERROR ThermostatDelegate::SetActivePresetHandle(const DataModel::Nullable<B
         ChipLogDetail(NotSpecified, "Clear ActivePresetHandle");
     }
 
-    // Centralize ActivePresetHandle reporting here so all update paths
-    // calling SetActivePresetHandle trigger a consistent subscription report.
+    // Centralize reporting here and only notify when ActivePresetHandle changes.
     MatterReportingAttributeChangeCallback(mEndpointId, Thermostat::Id, Attributes::ActivePresetHandle::Id);
 
     return CHIP_NO_ERROR;
