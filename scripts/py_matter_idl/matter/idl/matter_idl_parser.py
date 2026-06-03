@@ -337,6 +337,10 @@ class MatterIdlTransformer(Transformer):
             args.insert(2, None)
 
         qualities_set = args[0] or set()
+        allowed = {"fabric", "timed", "optional"}
+        if not qualities_set.issubset(allowed):
+            raise ValueError(f"Unsupported command qualities: {qualities_set - allowed}")
+
         qualities = CommandQuality.NONE
         if "fabric" in qualities_set:
             qualities |= CommandQuality.FABRIC_SCOPED
@@ -376,6 +380,10 @@ class MatterIdlTransformer(Transformer):
     @v_args(meta=True)
     def event(self, meta, args):
         qualities_set = args[0] or set()
+        allowed = {"fabric_sensitive", "optional"}
+        if not qualities_set.issubset(allowed):
+            raise ValueError(f"Unsupported event qualities: {qualities_set - allowed}")
+
         qualities = EventQuality.NONE
         if "fabric_sensitive" in qualities_set:
             qualities |= EventQuality.FABRIC_SENSITIVE

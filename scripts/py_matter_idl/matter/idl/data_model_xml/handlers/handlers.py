@@ -18,7 +18,7 @@ from typing import Optional
 from xml.sax.xmlreader import AttributesImpl
 
 from matter.idl.matter_idl_types import (ApiMaturity, Attribute, AttributeQuality, Bitmap, Cluster, Command, CommandQuality,
-                                         ConstantEntry, DataType, Enum, Field, FieldQuality, Idl, Struct, StructTag)
+                                         ConstantEntry, DataType, Enum, EventQuality, Field, FieldQuality, Idl, Struct, StructTag)
 
 from .base import BaseHandler, HandledDepth
 from .context import Context
@@ -508,7 +508,7 @@ class CommandHandler(BaseHandler):
                 self._command.qualities |= CommandQuality.OPTIONAL
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
         if name in {"mandatoryConform", "disallowConform"}:
-            # Unclear how commands may be optional or mandatory
+            # Conformance other than optional is not recorded in IDL
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
         if name == "access":
             # <access invokePrivilege="admin" timed="true"/>
