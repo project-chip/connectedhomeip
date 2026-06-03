@@ -40,7 +40,7 @@ import logging
 from mobly import asserts
 
 import matter.clusters as Clusters
-from matter.testing.decorators import has_cluster, pics, run_if_endpoint_matches
+from matter.testing.decorators import async_test_body, pics
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import default_matter_test_main
 
@@ -54,7 +54,7 @@ class TC_EPALM_2_3(MatterBaseTest):
         return 1
 
     @pics('EPALM.S')
-    @run_if_endpoint_matches(has_cluster(Clusters.ElectricalProtectionAlarm))
+    @async_test_body
     async def test_TC_EPALM_2_3(self):
         """[TC-EPALM-2.3] FeatureMap and Supported Attribute Consistency with DUT as Server
 
