@@ -15,6 +15,10 @@
  *    limitations under the License.
  */
 
+#include <app/util/config.h>
+
+#ifdef ZCL_USING_SMOKE_CO_ALARM_CLUSTER_SERVER
+
 #include <app/clusters/smoke-co-alarm-server/SmokeCOTestEventTriggerHandler.h>
 #include <app/clusters/smoke-co-alarm-server/smoke-co-alarm-server.h>
 
@@ -204,3 +208,5 @@ bool HandleSmokeCOTestEventTrigger(uint64_t eventTrigger)
 
     return true;
 }
+
+#endif // ZCL_USING_SMOKE_CO_ALARM_CLUSTER_SERVER
