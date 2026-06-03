@@ -18,7 +18,6 @@
 #include "ThermostatClusterPresets.h"
 #include "ThermostatCluster.h"
 
-#include <app/reporting/reporting.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 using namespace chip;
