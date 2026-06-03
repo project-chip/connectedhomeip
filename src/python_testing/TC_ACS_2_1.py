@@ -235,7 +235,7 @@ class TC_ACS_2_1(MatterBaseTest):
                 endpoint=endpoint, cluster=cluster, attribute=attr.ObjectCountThresholdReached
             )
             log.info(f"Rx'd ObjectCountThresholdReached: {objectCountThresholdReached}")
-            asserts.assert_true(ObjectCountThresholdReached in [True, False],
+            asserts.assert_true(objectCountThresholdReached in [True, False],
                                 "Expected True or False Boolean value.")
 
             self.step("8")
