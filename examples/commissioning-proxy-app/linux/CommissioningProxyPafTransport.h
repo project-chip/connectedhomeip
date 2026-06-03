@@ -24,6 +24,8 @@
 #include <protocols/interaction_model/StatusCode.h>
 #include <system/SystemPacketBuffer.h>
 
+#include <vector>
+
 namespace chip {
 namespace app {
 namespace Clusters {
@@ -55,10 +57,12 @@ chip::Protocols::InteractionModel::Status Disconnect(uint16_t sessionId);
 // routed back through the dispatcher.
 CHIP_ERROR SendMessage(uint16_t sessionId, chip::System::PacketBufferHandle && buf);
 
-// Foreground ProxyScanRequest path for WiFi-PAF.  The response is sent
-// asynchronously by the PAF module via the supplied command handler.
-chip::Protocols::InteractionModel::Status Scan(chip::app::CommandHandler * commandObj,
-                                               const chip::app::DataModel::InvokeRequest & request, uint8_t scanMaxTime);
+// Foreground ProxyScanRequest path for WiFi-PAF.  Starts an async NAN scan and,
+// when it completes, reports its results to the dispatcher's aggregator via
+// ProxyDispatcher::ContributeScanResults (the dispatcher owns the command
+// handle and sends the combined ProxyScanResponse).  Returns Success once the
+// scan is under way, or an error status if it could not be started.
+chip::Protocols::InteractionModel::Status Scan(uint8_t scanMaxTime);
 
 // ProxyBackgroundScanStartRequest path for WiFi-PAF.
 chip::Protocols::InteractionModel::Status BgScanStart(CapabilitiesBitmap transport, uint16_t timeout, WiFiBandBitmap wiFiBands,
@@ -77,10 +81,6 @@ void OnAllSessionsClosed();
 // success / error / timeout).  Used by the dispatcher's GetActiveSessionCount
 // to combine pending connects across transports against MaxSessions.
 bool IsConnectPending();
-
-// CachedResults accessors.
-uint8_t GetNumCachedResults();
-CHIP_ERROR EncodeCachedResults(chip::app::AttributeValueEncoder & encoder);
 
 } // namespace Paf
 } // namespace CommissioningProxy

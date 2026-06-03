@@ -86,7 +86,15 @@ public:
         for (int i = 0; i < 6; ++i)
             bdAddr[i] = static_cast<uint8_t>(b[i]);
         if (mCb != nullptr)
+        {
+            // This runs on the BlueZ/GLib thread.  Hold the CHIP stack lock around
+            // the consumer callback so it can safely touch SystemLayer timers, the
+            // data model, etc. — every StartProxyScan consumer is covered here
+            // rather than each having to know it is off the Matter thread.
+            DeviceLayer::PlatformMgr().LockChipStack();
             mCb(mCtx, bdAddr, info.GetDeviceDiscriminator(), info.GetVendorId(), info.GetProductId());
+            DeviceLayer::PlatformMgr().UnlockChipStack();
+        }
     }
     void OnScanComplete() override {}
     void OnScanError(CHIP_ERROR) override {}

@@ -24,6 +24,8 @@
 #include <protocols/interaction_model/StatusCode.h>
 #include <system/SystemPacketBuffer.h>
 
+#include <vector>
+
 namespace chip {
 namespace app {
 namespace Clusters {
@@ -57,10 +59,12 @@ chip::Protocols::InteractionModel::Status Disconnect(uint16_t sessionId);
 // back through the dispatcher.
 CHIP_ERROR SendMessage(uint16_t sessionId, chip::System::PacketBufferHandle && buf);
 
-// Foreground ProxyScanRequest path for BLE.  Phase 2B-2: BLE scan via a
-// dedicated ChipDeviceScanner instance is not yet implemented.
-chip::Protocols::InteractionModel::Status Scan(chip::app::CommandHandler * commandObj,
-                                               const chip::app::DataModel::InvokeRequest & request, uint8_t scanMaxTime);
+// Foreground ProxyScanRequest path for BLE.  Starts an async BLE scan and, when
+// the scan window elapses, reports its results to the dispatcher's aggregator
+// via ProxyDispatcher::ContributeScanResults (the dispatcher owns the command
+// handle and sends the combined ProxyScanResponse).  Returns Success once the
+// scan is under way, or an error status if it could not be started.
+chip::Protocols::InteractionModel::Status Scan(uint8_t scanMaxTime);
 
 // ProxyBackgroundScanStartRequest / Stop paths for BLE.  Phase 2B-2.
 chip::Protocols::InteractionModel::Status BgScanStart(CapabilitiesBitmap transport, uint16_t timeout, WiFiBandBitmap wiFiBands,
@@ -78,10 +82,6 @@ void OnAllSessionsClosed();
 // GetActiveSessionCount to combine pending connects across transports against
 // MaxSessions.
 bool IsConnectPending();
-
-// CachedResults accessors (Phase 2B-2).
-uint8_t GetNumCachedResults();
-CHIP_ERROR EncodeCachedResults(chip::app::AttributeValueEncoder & encoder);
 
 } // namespace Ble
 } // namespace CommissioningProxy

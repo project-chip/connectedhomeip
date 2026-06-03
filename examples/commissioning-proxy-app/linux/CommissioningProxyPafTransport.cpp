@@ -17,6 +17,7 @@
  */
 #include "CommissioningProxyPafTransport.h"
 
+#include "CommissioningProxyBgScanCache.h"
 #include "CommissioningProxyDispatcher.h"
 
 #include <app-common/zap-generated/cluster-objects.h>
@@ -72,49 +73,9 @@ static PafConnectCtx * sPafPendingConnect = nullptr;
 // True while a ProxyScanRequest is in progress; used to return Busy for concurrent requests.
 static bool sScanInProgress = false;
 
-// Context that keeps the IM command alive until scan completes.
-struct PafScanCtx
-{
-    chip::app::CommandHandler::Handle handle;
-    chip::app::ConcreteCommandPath path;
-    uint8_t scanMaxTime = 0;
-};
-
 // ------------------------------------------------------------------
 // Background scan state — PAF only for now.
 // ------------------------------------------------------------------
-
-struct CacheKey
-{
-    uint16_t discriminator;
-    uint16_t vid;
-    uint16_t pid;
-    chip::app::Clusters::CommissioningProxy::CapabilitiesBitmap transport;
-
-    bool operator<(const CacheKey & o) const
-    {
-        if (discriminator != o.discriminator)
-            return discriminator < o.discriminator;
-        if (vid != o.vid)
-            return vid < o.vid;
-        if (pid != o.pid)
-            return pid < o.pid;
-        return static_cast<uint8_t>(transport) < static_cast<uint8_t>(o.transport);
-    }
-};
-
-struct TTLTimerCtx;
-
-struct BgScanEntry
-{
-    chip::DeviceLayer::NanPeerInfo peer;
-    TTLTimerCtx * ttlCtx = nullptr; // heap-allocated; owned by the active SystemLayer timer
-};
-
-struct TTLTimerCtx
-{
-    CacheKey key;
-};
 
 struct FabricKey
 {
@@ -142,42 +103,7 @@ struct FabricScanRecord
 
 static std::map<FabricKey, FabricScanRecord> sBgScanFabrics;
 static bool sBgScanPaused = false;
-static std::map<CacheKey, BgScanEntry> sBgScanCache;
 static chip::app::Clusters::CommissioningProxy::CommissioningProxyCluster * sBgScanCluster = nullptr;
-
-static void OnBgScanTTLExpiry(chip::System::Layer * layer, void * appState);
-
-static void ClearBgScanCache()
-{
-    for (auto & [key, entry] : sBgScanCache)
-    {
-        if (entry.ttlCtx != nullptr)
-        {
-            chip::DeviceLayer::SystemLayer().CancelTimer(OnBgScanTTLExpiry, entry.ttlCtx);
-            delete entry.ttlCtx;
-            entry.ttlCtx = nullptr;
-        }
-    }
-    sBgScanCache.clear();
-}
-
-static void OnBgScanTTLExpiry(chip::System::Layer * /*layer*/, void * appState)
-{
-    auto * ctx   = static_cast<TTLTimerCtx *>(appState);
-    CacheKey key = ctx->key;
-    delete ctx;
-
-    auto it = sBgScanCache.find(key);
-    if (it != sBgScanCache.end())
-    {
-        it->second.ttlCtx = nullptr;
-        sBgScanCache.erase(it);
-        ChipLogProgress(AppServer, "BgScan: TTL expired for discriminator %u; cache size=%zu", key.discriminator,
-                        sBgScanCache.size());
-        if (sBgScanCluster != nullptr)
-            sBgScanCluster->MarkCachedResultsDirty();
-    }
-}
 
 static ScanResultT NanPeerToScanResult(const chip::DeviceLayer::NanPeerInfo & p)
 {
@@ -201,51 +127,9 @@ static ScanResultT NanPeerToScanResult(const chip::DeviceLayer::NanPeerInfo & p)
 
 static void OnBgScanDiscovery(void * /*ctx*/, const chip::DeviceLayer::NanPeerInfo & peer)
 {
-    CacheKey key{ peer.discriminator, peer.vid, peer.pid, chip::app::Clusters::CommissioningProxy::CapabilitiesBitmap::kWiFiPAF };
-
-    auto it    = sBgScanCache.find(key);
-    bool isNew = (it == sBgScanCache.end());
-
-    if (!isNew && it->second.ttlCtx != nullptr)
-    {
-        chip::DeviceLayer::SystemLayer().CancelTimer(OnBgScanTTLExpiry, it->second.ttlCtx);
-        delete it->second.ttlCtx;
-        it->second.ttlCtx = nullptr;
-    }
-
-    if (isNew)
-    {
-        uint8_t maxResults = (sBgScanCluster != nullptr) ? sBgScanCluster->GetDelegate().GetMaxCachedResults() : 10;
-        if (sBgScanCache.size() >= static_cast<size_t>(maxResults))
-        {
-            ChipLogDetail(AppServer, "BgScan: cache full (%u entries), dropping discriminator %u", maxResults, key.discriminator);
-            return;
-        }
-    }
-
-    uint16_t cacheTimeout =
-        (sBgScanCluster != nullptr) ? static_cast<uint16_t>(sBgScanCluster->GetDelegate().GetCacheTimeout()) : 30;
-
-    auto * tCtx = new TTLTimerCtx{ key };
-    CHIP_ERROR ttlErr =
-        chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds16(cacheTimeout), OnBgScanTTLExpiry, tCtx);
-    if (ttlErr != CHIP_NO_ERROR)
-    {
-        ChipLogError(AppServer, "BgScan: StartTimer failed for discriminator %u: %" CHIP_ERROR_FORMAT, key.discriminator,
-                     ttlErr.Format());
-        delete tCtx;
-        if (!isNew)
-            sBgScanCache.erase(key);
-        return;
-    }
-
-    sBgScanCache[key] = BgScanEntry{ peer, tCtx };
-
-    ChipLogProgress(AppServer, "BgScan: %s discriminator %u (cache size=%zu, TTL=%us)", isNew ? "cached" : "refreshed TTL for",
-                    key.discriminator, sBgScanCache.size(), cacheTimeout);
-
-    if (isNew && sBgScanCluster != nullptr)
-        sBgScanCluster->MarkCachedResultsDirty();
+    // Runs on the Matter event loop (wpa_supplicant NAN callbacks are dispatched
+    // there), so the shared cache may be touched directly.
+    BgScanCache::Report(NanPeerToScanResult(peer), sBgScanCluster);
 }
 
 static void OnBgScanLifetimeExpiry(chip::System::Layer * /*layer*/, void * appState)
@@ -267,12 +151,8 @@ static void OnBgScanLifetimeExpiry(chip::System::Layer * /*layer*/, void * appSt
     {
         chip::DeviceLayer::ConnectivityMgrImpl().WiFiPAFStopBackgroundScan();
         sBgScanPaused = false;
-        ClearBgScanCache();
-        if (sBgScanCluster != nullptr)
-        {
-            sBgScanCluster->MarkCachedResultsDirty();
-            sBgScanCluster = nullptr;
-        }
+        BgScanCache::ClearTransport(chip::app::Clusters::CommissioningProxy::CapabilitiesBitmap::kWiFiPAF, sBgScanCluster);
+        sBgScanCluster = nullptr;
     }
 }
 
@@ -505,19 +385,10 @@ static void OnPafConnectError(void * /*context*/, CHIP_ERROR err)
     delete ctx;
 }
 
-static void OnPafScanDone(void * context, const std::vector<chip::DeviceLayer::NanPeerInfo> & peers)
+static void OnPafScanDone(void * /*context*/, const std::vector<chip::DeviceLayer::NanPeerInfo> & peers)
 {
-    auto * ctx                      = static_cast<PafScanCtx *>(context);
-    chip::app::CommandHandler * cmd = ctx->handle.Get();
+    sScanInProgress = false;
 
-    if (cmd == nullptr)
-    {
-        sScanInProgress = false;
-        delete ctx;
-        return;
-    }
-
-    chip::app::Clusters::CommissioningProxy::Commands::ProxyScanResponse::Type response;
     std::vector<ScanResultT> out;
     out.reserve(peers.size());
 
@@ -541,14 +412,10 @@ static void OnPafScanDone(void * context, const std::vector<chip::DeviceLayer::N
         out.push_back(r);
     }
 
-    chip::app::DataModel::List<const ScanResultT> list{ chip::Span<const ScanResultT>(out.data(), out.size()) };
-    response.proxyScanResult = list;
-    response.numberOfResults = static_cast<uint8_t>(out.size());
-
-    cmd->AddResponse(ctx->path, response);
-
-    sScanInProgress = false;
-    delete ctx;
+    // Hand the results to the dispatcher's aggregator; it owns the command
+    // handle and emits the combined ProxyScanResponse once every transport's
+    // sub-scan has reported.
+    ProxyDispatcher::ContributeScanResults(chip::Span<const ScanResultT>(out.data(), out.size()));
 }
 
 } // namespace
@@ -752,8 +619,7 @@ CHIP_ERROR SendMessage(uint16_t sessionId, chip::System::PacketBufferHandle && b
     return chip::WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer().SendMessage(it->second, std::move(buf));
 }
 
-chip::Protocols::InteractionModel::Status Scan(chip::app::CommandHandler * commandObj,
-                                               const chip::app::DataModel::InvokeRequest & request, uint8_t scanMaxTime)
+chip::Protocols::InteractionModel::Status Scan(uint8_t scanMaxTime)
 {
     if (sScanInProgress)
     {
@@ -770,19 +636,11 @@ chip::Protocols::InteractionModel::Status Scan(chip::app::CommandHandler * comma
 
     sScanInProgress = true;
 
-    auto * ctx = new PafScanCtx{ chip::app::CommandHandler::Handle(commandObj), request.path, scanMaxTime };
-
-    err = chip::DeviceLayer::ConnectivityMgrImpl().WiFiPAFScan(scanMaxTime, &OnPafScanDone, ctx);
+    err = chip::DeviceLayer::ConnectivityMgrImpl().WiFiPAFScan(scanMaxTime, &OnPafScanDone, nullptr);
     if (err != CHIP_NO_ERROR)
     {
         sScanInProgress = false;
-        delete ctx;
         return chip::Protocols::InteractionModel::Status::Failure;
-    }
-
-    if (auto * exchange = commandObj->GetExchangeContext())
-    {
-        exchange->SetResponseTimeout(chip::System::Clock::Seconds16(scanMaxTime + 5));
     }
 
     return chip::Protocols::InteractionModel::Status::Success;
@@ -933,12 +791,8 @@ chip::Protocols::InteractionModel::Status BgScanStop(CapabilitiesBitmap transpor
         if (sBgScanFabrics.empty())
         {
             chip::DeviceLayer::ConnectivityMgrImpl().WiFiPAFStopBackgroundScan();
-            ClearBgScanCache();
-            if (sBgScanCluster != nullptr)
-            {
-                sBgScanCluster->MarkCachedResultsDirty();
-                sBgScanCluster = nullptr;
-            }
+            BgScanCache::ClearTransport(chip::app::Clusters::CommissioningProxy::CapabilitiesBitmap::kWiFiPAF, sBgScanCluster);
+            sBgScanCluster = nullptr;
             ChipLogProgress(AppServer, "ProxyBackgroundScanStopRequest: last fabric stopped, hardware scan stopped");
         }
         else
@@ -977,28 +831,6 @@ void OnAllSessionsClosed()
 bool IsConnectPending()
 {
     return sPafPendingConnect != nullptr;
-}
-
-uint8_t GetNumCachedResults()
-{
-    return static_cast<uint8_t>(sBgScanCache.size());
-}
-
-CHIP_ERROR EncodeCachedResults(chip::app::AttributeValueEncoder & encoder)
-{
-    if (sBgScanFabrics.empty() || sBgScanCache.empty())
-    {
-        chip::app::DataModel::Nullable<chip::app::DataModel::List<const ScanResultT>> nullValue;
-        return encoder.Encode(nullValue);
-    }
-
-    return encoder.EncodeList([](const auto & listEncoder) -> CHIP_ERROR {
-        for (const auto & [key, entry] : sBgScanCache)
-        {
-            ReturnErrorOnFailure(listEncoder.Encode(NanPeerToScanResult(entry.peer)));
-        }
-        return CHIP_NO_ERROR;
-    });
 }
 
 } // namespace Paf

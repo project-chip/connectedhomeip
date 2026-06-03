@@ -18,6 +18,7 @@
 #pragma once
 
 #include <app-common/zap-generated/cluster-objects.h>
+#include <lib/support/Span.h>
 #include <protocols/interaction_model/StatusCode.h>
 
 namespace chip {
@@ -52,6 +53,24 @@ void DispatchMessageResponse(uint16_t sessionId, const uint8_t * data, size_t le
 // Fail a pending ProxyMessageRequest with the given status (e.g. transport
 // dropped the session mid-message).  No-op if nothing is pending.
 void DispatchMessageFailure(uint16_t sessionId, chip::Protocols::InteractionModel::Status status);
+
+// ------------------------------------------------------------------
+// Multi-transport ProxyScanRequest aggregation
+//
+// A ProxyScanRequest MAY select more than one transport (CommissioningProxy
+// cluster spec, ProxyScanRequest Transport field: "Multiple transports MAY be
+// selected for the scan").  The dispatcher starts each requested transport's
+// scan in parallel, owns the single command handle, and emits one combined
+// ProxyScanResponse once every started sub-scan has reported its results here.
+// ------------------------------------------------------------------
+
+using ScanResultEntry = Structs::ScanResultStruct::Type;
+
+// Reported once by each transport module when its sub-scan finishes (pass an
+// empty span if it found nothing).  The dispatcher deep-copies the entries, so
+// the caller's backing storage need not outlive the call.  When the last
+// outstanding sub-scan reports, the combined ProxyScanResponse is sent.
+void ContributeScanResults(chip::Span<const ScanResultEntry> results);
 
 } // namespace ProxyDispatcher
 } // namespace CommissioningProxy

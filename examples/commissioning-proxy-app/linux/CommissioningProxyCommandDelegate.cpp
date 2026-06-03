@@ -28,7 +28,14 @@
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/PlatformManager.h>
 
+#include "CommissioningProxyBgScanCache.h"
+
+#include <algorithm>
+#include <array>
+#include <cstring>
+#include <deque>
 #include <map>
+#include <vector>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
 #include "CommissioningProxyPafTransport.h"
@@ -103,6 +110,72 @@ static void CancelProxyMessageResponseTimer(uint16_t sessionId)
 {
     chip::DeviceLayer::SystemLayer().CancelTimer(ProxyMessageResponseTimeoutCallback,
                                                  reinterpret_cast<void *>(static_cast<uintptr_t>(sessionId)));
+}
+
+// ------------------------------------------------------------------
+// ProxyScanRequest aggregation across transports
+//
+// A single ProxyScanRequest may target multiple transports.  Each transport
+// module scans independently and reports its results via
+// ProxyDispatcher::ContributeScanResults; this aggregator owns the command
+// handle and emits one combined ProxyScanResponse once the last started
+// sub-scan reports.  Only one aggregate scan runs at a time.
+// ------------------------------------------------------------------
+
+using ScanResultEntry = Structs::ScanResultStruct::Type;
+
+// The per-transport modules build transient ScanResultStruct values whose
+// ByteSpans dangle after ContributeScanResults returns, so the aggregator owns
+// the backing bytes.  std::deque keeps element addresses stable across growth,
+// so the ScanResultStruct values in `results` can hold spans straight into
+// macStore/extStore — no second rebuild at emit time.
+struct ScanAggregator
+{
+    chip::app::CommandHandler::Handle handle;
+    chip::app::ConcreteCommandPath path;
+    uint8_t pending = 0;
+    std::deque<std::array<uint8_t, 6>> macStore;
+    std::deque<std::vector<uint8_t>> extStore;
+    std::vector<ScanResultEntry> results;
+};
+
+static ScanAggregator * sScanAgg = nullptr;
+
+// Fallback so a sub-scan whose completion callback never fires cannot wedge the
+// aggregator (and thus every future ProxyScanRequest) permanently.
+constexpr uint16_t kScanWatchdogMarginSecs = 5;
+static void OnScanWatchdog(chip::System::Layer *, void *);
+
+static void EmitCombinedScanResponse()
+{
+    chip::DeviceLayer::SystemLayer().CancelTimer(OnScanWatchdog, nullptr);
+
+    auto * agg = sScanAgg;
+    sScanAgg   = nullptr;
+    if (agg == nullptr)
+        return;
+
+    chip::app::CommandHandler * cmd = agg->handle.Get();
+    if (cmd != nullptr)
+    {
+        Commands::ProxyScanResponse::Type response;
+        response.proxyScanResult = chip::app::DataModel::List<const ScanResultEntry>(
+            chip::Span<const ScanResultEntry>(agg->results.data(), agg->results.size()));
+        response.numberOfResults = static_cast<uint8_t>(agg->results.size());
+        cmd->AddResponse(agg->path, response);
+        ChipLogProgress(AppServer, "ProxyScanRequest: combined scan complete, %u result(s)",
+                        static_cast<unsigned>(agg->results.size()));
+    }
+    delete agg;
+}
+
+static void OnScanWatchdog(chip::System::Layer *, void *)
+{
+    if (sScanAgg != nullptr)
+    {
+        ChipLogError(AppServer, "ProxyScanRequest: watchdog fired (a sub-scan never completed); emitting partial results");
+        EmitCombinedScanResponse();
+    }
 }
 
 } // namespace
@@ -185,6 +258,46 @@ void DispatchMessageFailure(uint16_t sessionId, chip::Protocols::InteractionMode
     delete ctx;
 }
 
+void ContributeScanResults(chip::Span<const ScanResultEntry> results)
+{
+    if (sScanAgg == nullptr)
+    {
+        ChipLogError(AppServer, "ContributeScanResults: no aggregate scan active; dropping %u result(s)",
+                     static_cast<unsigned>(results.size()));
+        return;
+    }
+
+    for (const auto & e : results)
+    {
+        // Copy scalar fields and (transient) spans, then rebind the address /
+        // extendedData spans to point into the aggregator's stable storage so
+        // they survive until the combined AddResponse.
+        ScanResultEntry r = e;
+        if (!e.address.IsNull())
+        {
+            auto span = e.address.Value();
+            sScanAgg->macStore.emplace_back();
+            auto & mac = sScanAgg->macStore.back();
+            size_t n   = std::min(span.size(), mac.size());
+            memcpy(mac.data(), span.data(), n);
+            r.address.SetNonNull(chip::ByteSpan(mac.data(), n));
+        }
+        if (!e.extendedData.IsNull())
+        {
+            auto span = e.extendedData.Value();
+            sScanAgg->extStore.emplace_back(span.data(), span.data() + span.size());
+            auto & ext = sScanAgg->extStore.back();
+            r.extendedData.SetNonNull(chip::ByteSpan(ext.data(), ext.size()));
+        }
+        sScanAgg->results.push_back(r);
+    }
+
+    if (sScanAgg->pending > 0 && --sScanAgg->pending == 0)
+    {
+        EmitCombinedScanResponse();
+    }
+}
+
 } // namespace ProxyDispatcher
 } // namespace CommissioningProxy
 } // namespace Clusters
@@ -228,22 +341,76 @@ Clusters::CommissioningProxy::MyCPDelegate::ProxyScanRequest(CapabilitiesBitmap 
 {
     ChipLogProgress(AppServer, "ProxyScanRequest: transport:0x%x wiFiBands:0x%x", (int) transport, (int) wiFiBands);
 
-    switch (transport)
+    // A ProxyScanRequest MAY select multiple transports (CommissioningProxy
+    // cluster spec, ProxyScanRequest Transport field).  Scan every requested
+    // transport in parallel and aggregate the results into a single
+    // ProxyScanResponse.  The cluster has already verified the request is
+    // non-empty and that every requested bit is supported by this instance.
+    if (sScanAgg != nullptr)
     {
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-    case CapabilitiesBitmap::kWiFiPAF:
-        return Paf::Scan(commandObj, request, GetScanMaxTime());
-#endif
-
-#if CONFIG_NETWORK_LAYER_BLE
-    case CapabilitiesBitmap::kBle:
-        return Ble::Scan(commandObj, request, GetScanMaxTime());
-#endif
-
-    default:
-        ChipLogError(AppServer, "ProxyScanRequest: unsupported transport 0x%x", static_cast<uint8_t>(transport));
-        return chip::Protocols::InteractionModel::Status::InvalidTransportType;
+        ChipLogProgress(AppServer, "ProxyScanRequest: an aggregate scan is already in progress — returning Busy");
+        return chip::Protocols::InteractionModel::Status::Busy;
     }
+
+    const chip::BitMask<CapabilitiesBitmap> requested(transport);
+    const uint8_t scanMaxTime = GetScanMaxTime();
+
+    auto * agg   = new ScanAggregator();
+    agg->handle  = chip::app::CommandHandler::Handle(commandObj);
+    agg->path    = request.path;
+    agg->pending = 0;
+    sScanAgg     = agg;
+
+    // First non-success status from a sub-scan that could not be started; only
+    // returned to the caller if no sub-scan starts at all.  Initialised to
+    // Success so the first real failure (from either branch) is recorded.
+    auto firstError = chip::Protocols::InteractionModel::Status::Success;
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    if (requested.Has(CapabilitiesBitmap::kWiFiPAF))
+    {
+        auto s = Paf::Scan(scanMaxTime);
+        if (s == chip::Protocols::InteractionModel::Status::Success)
+            agg->pending++;
+        else if (firstError == chip::Protocols::InteractionModel::Status::Success)
+            firstError = s;
+    }
+#endif
+#if CONFIG_NETWORK_LAYER_BLE
+    if (requested.Has(CapabilitiesBitmap::kBle))
+    {
+        auto s = Ble::Scan(scanMaxTime);
+        if (s == chip::Protocols::InteractionModel::Status::Success)
+            agg->pending++;
+        else if (firstError == chip::Protocols::InteractionModel::Status::Success)
+            firstError = s;
+    }
+#endif
+
+    if (agg->pending == 0)
+    {
+        ChipLogError(AppServer, "ProxyScanRequest: no requested transport scan could be started");
+        sScanAgg = nullptr;
+        delete agg;
+        return (firstError == chip::Protocols::InteractionModel::Status::Success)
+            ? chip::Protocols::InteractionModel::Status::Failure
+            : firstError;
+    }
+
+    // The dispatcher owns the exchange now; keep it alive for the full scan window.
+    if (auto * exchange = commandObj->GetExchangeContext())
+    {
+        exchange->SetResponseTimeout(chip::System::Clock::Seconds16(static_cast<uint16_t>(scanMaxTime) + 5));
+    }
+
+    // Watchdog: force-emit if some started sub-scan never reports, so a stalled
+    // transport cannot wedge sScanAgg (and every future ProxyScanRequest).
+    CHIP_ERROR wdErr = chip::DeviceLayer::SystemLayer().StartTimer(
+        chip::System::Clock::Seconds16(static_cast<uint16_t>(scanMaxTime) + kScanWatchdogMarginSecs), OnScanWatchdog, nullptr);
+    if (wdErr != CHIP_NO_ERROR)
+        ChipLogError(AppServer, "ProxyScanRequest: failed to arm scan watchdog: %" CHIP_ERROR_FORMAT, wdErr.Format());
+
+    return chip::Protocols::InteractionModel::Status::Success;
 }
 
 Protocols::InteractionModel::Status
@@ -469,25 +636,42 @@ Protocols::InteractionModel::Status Clusters::CommissioningProxy::MyCPDelegate::
     const bool needsPaf = (tbits & static_cast<uint8_t>(CapabilitiesBitmap::kWiFiPAF)) != 0;
     const bool needsBle = (tbits & static_cast<uint8_t>(CapabilitiesBitmap::kBle)) != 0;
 
-    if (needsBle && !needsPaf)
-    {
-#if CONFIG_NETWORK_LAYER_BLE
-        return Ble::BgScanStart(transport, timeout, wiFiBands, fabricIndex, nodeId, mServer);
-#else
-        return chip::Protocols::InteractionModel::Status::InvalidTransportType;
-#endif
-    }
+    // A background scan may select multiple transports (spec: "Multiple
+    // transports can be selected for the scan").  Start each requested transport
+    // independently — each gets only its own transport bit so its per-fabric
+    // record and stop-overlap accounting stay transport-local.  The cluster has
+    // already verified every requested bit is supported.
+    bool anyHandled = false;
+    auto result     = chip::Protocols::InteractionModel::Status::Success;
 
     if (needsPaf)
     {
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-        return Paf::BgScanStart(transport, timeout, wiFiBands, fabricIndex, nodeId, mServer);
+        anyHandled = true;
+        auto s     = Paf::BgScanStart(CapabilitiesBitmap::kWiFiPAF, timeout, wiFiBands, fabricIndex, nodeId, mServer);
+        if (s != chip::Protocols::InteractionModel::Status::Success)
+            result = s;
 #else
         return chip::Protocols::InteractionModel::Status::InvalidTransportType;
 #endif
     }
 
-    return chip::Protocols::InteractionModel::Status::InvalidTransportType;
+    if (needsBle)
+    {
+#if CONFIG_NETWORK_LAYER_BLE
+        anyHandled = true;
+        auto s     = Ble::BgScanStart(CapabilitiesBitmap::kBle, timeout, wiFiBands, fabricIndex, nodeId, mServer);
+        if (s != chip::Protocols::InteractionModel::Status::Success &&
+            result == chip::Protocols::InteractionModel::Status::Success)
+            result = s;
+#else
+        return chip::Protocols::InteractionModel::Status::InvalidTransportType;
+#endif
+    }
+
+    if (!anyHandled)
+        return chip::Protocols::InteractionModel::Status::InvalidTransportType;
+    return result;
 }
 
 Protocols::InteractionModel::Status
@@ -498,17 +682,35 @@ Clusters::CommissioningProxy::MyCPDelegate::ProxyBackgroundScanStopRequest(Capab
                     "ProxyBackgroundScanStopRequest transport:0x%x wiFiBands:0x%x fabricIndex:%u nodeId:0x" ChipLogFormatX64,
                     static_cast<uint8_t>(transport), static_cast<uint16_t>(wiFiBands), fabricIndex, ChipLogValueX64(nodeId));
 
+    // Fan the stop out to every transport; each matches the request against its
+    // own per-fabric record.  NotFound is returned only if no transport had a
+    // matching fabric record at all.
+    bool matched = false;
+    auto err     = chip::Protocols::InteractionModel::Status::Success;
+
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-    auto pafStatus = Paf::BgScanStop(transport, wiFiBands, fabricIndex, nodeId);
-    if (pafStatus != chip::Protocols::InteractionModel::Status::NotFound)
-        return pafStatus;
+    {
+        auto pafStatus = Paf::BgScanStop(transport, wiFiBands, fabricIndex, nodeId);
+        if (pafStatus != chip::Protocols::InteractionModel::Status::NotFound)
+        {
+            matched = true;
+            if (pafStatus != chip::Protocols::InteractionModel::Status::Success)
+                err = pafStatus;
+        }
+    }
 #endif
 #if CONFIG_NETWORK_LAYER_BLE
-    auto bleStatus = Ble::BgScanStop(transport, wiFiBands, fabricIndex, nodeId);
-    if (bleStatus != chip::Protocols::InteractionModel::Status::NotFound)
-        return bleStatus;
+    {
+        auto bleStatus = Ble::BgScanStop(transport, wiFiBands, fabricIndex, nodeId);
+        if (bleStatus != chip::Protocols::InteractionModel::Status::NotFound)
+        {
+            matched = true;
+            if (bleStatus != chip::Protocols::InteractionModel::Status::Success)
+                err = bleStatus;
+        }
+    }
 #endif
-    return chip::Protocols::InteractionModel::Status::NotFound;
+    return matched ? err : chip::Protocols::InteractionModel::Status::NotFound;
 }
 
 uint8_t Clusters::CommissioningProxy::MyCPDelegate::GetMaxSessions()
@@ -534,21 +736,28 @@ uint8_t Clusters::CommissioningProxy::MyCPDelegate::GetActiveSessionCount()
 
 uint8_t Clusters::CommissioningProxy::MyCPDelegate::GetNumCachedResults()
 {
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-    return Paf::GetNumCachedResults();
-#else
-    return 0;
-#endif
+    // CachedResults is a single cluster-wide list; the shared cache holds the
+    // combined view across transports (and enforces the combined MaxCachedResults cap).
+    return BgScanCache::Count();
 }
 
 CHIP_ERROR Clusters::CommissioningProxy::MyCPDelegate::EncodeCachedResults(app::AttributeValueEncoder & encoder)
 {
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-    return Paf::EncodeCachedResults(encoder);
-#else
-    chip::app::DataModel::Nullable<chip::app::DataModel::List<
-        const chip::app::Clusters::CommissioningProxy::Structs::ScanResultStruct::Type>>
-        nullValue;
-    return encoder.Encode(nullValue);
-#endif
+    using ScanResultT = chip::app::Clusters::CommissioningProxy::Structs::ScanResultStruct::Type;
+    std::vector<ScanResultT> all;
+    BgScanCache::Collect(all);
+
+    if (all.empty())
+    {
+        chip::app::DataModel::Nullable<chip::app::DataModel::List<const ScanResultT>> nullValue;
+        return encoder.Encode(nullValue);
+    }
+
+    return encoder.EncodeList([&all](const auto & listEncoder) -> CHIP_ERROR {
+        for (const auto & r : all)
+        {
+            ReturnErrorOnFailure(listEncoder.Encode(r));
+        }
+        return CHIP_NO_ERROR;
+    });
 }

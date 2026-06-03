@@ -17,6 +17,7 @@
  */
 #include "CommissioningProxyBleTransport.h"
 
+#include "CommissioningProxyBgScanCache.h"
 #include "CommissioningProxyDispatcher.h"
 
 #include <app-common/zap-generated/cluster-objects.h>
@@ -78,19 +79,146 @@ struct BleScanResult
     uint16_t pid;
 };
 
-struct BleScanCtx
-{
-    chip::app::CommandHandler::Handle handle;
-    chip::app::ConcreteCommandPath path;
-};
-
-static BleScanCtx * sBleScanCtx = nullptr;
 static std::vector<BleScanResult> sBleScanResults;
 static bool sScanInProgress = false;
 
 static BleLayer * GetBleLayer()
 {
     return chip::DeviceLayer::ConnectivityMgr().GetBleLayer();
+}
+
+// ------------------------------------------------------------------
+// Background scan state (ProxyBackGroundScanStartRequest path)
+//
+// Mirrors the PAF transport's background-scan bookkeeping: a per-fabric record
+// of the requested transport (kBle only here) plus a per-device result cache
+// with TTL.  BLE has a single ChipDeviceScanner shared with the foreground scan
+// and with connect (NewBleConnectionByDiscriminator), so the background scan is
+// paused (StopProxyScan) whenever one of those needs the scanner and resumed
+// afterwards — see PauseBleBgScan / ResumeBleBgScanIfNeeded.
+// ------------------------------------------------------------------
+
+using ScanResultT = chip::app::Clusters::CommissioningProxy::Structs::ScanResultStruct::Type;
+
+// Build a kBle ScanResultStruct from a discovered device.  Shared by the
+// foreground scan and the background-scan discovery callback so the field set
+// stays identical across both paths.
+static ScanResultT MakeBleScanResult(const uint8_t bdAddr[6], uint16_t discriminator, uint16_t vendorId, uint16_t productId)
+{
+    ScanResultT r{};
+    r.address.SetNonNull(chip::ByteSpan(bdAddr, 6));
+    r.transport = chip::BitMask<chip::app::Clusters::CommissioningProxy::CapabilitiesBitmap>(
+        chip::app::Clusters::CommissioningProxy::CapabilitiesBitmap::kBle);
+    r.discriminator = discriminator;
+    r.vendorID      = static_cast<chip::VendorId>(vendorId);
+    r.productID     = productId;
+    r.extendedData.SetNull();
+    r.wiFiBand.ClearValue();
+    return r;
+}
+
+struct BgFabricKey
+{
+    chip::FabricIndex fabricIndex;
+    chip::NodeId nodeId;
+    bool operator<(const BgFabricKey & o) const
+    {
+        if (fabricIndex != o.fabricIndex)
+            return fabricIndex < o.fabricIndex;
+        return nodeId < o.nodeId;
+    }
+};
+
+struct BgFabricLifetimeCtx
+{
+    BgFabricKey key;
+};
+
+struct BleBgFabricRecord
+{
+    BgFabricLifetimeCtx * lifetimeCtx = nullptr;
+};
+
+static std::map<BgFabricKey, BleBgFabricRecord> sBleBgFabrics;
+// True when fabrics are registered but the hardware scan is suspended because a
+// connect or foreground scan currently owns the single BLE scanner.
+static bool sBleBgPaused                                                                  = false;
+static chip::app::Clusters::CommissioningProxy::CommissioningProxyCluster * sBleBgCluster = nullptr;
+
+// Result cache, TTL, and combined MaxCachedResults cap live in the shared
+// BgScanCache module; this callback just builds the kBle result and reports it.
+// Runs with the CHIP stack lock held (the platform ProxyScanForwarder locks
+// before invoking scan-result callbacks).
+static void OnBleBgDiscovery(void * /*context*/, const uint8_t bdAddr[6], uint16_t discriminator, uint16_t vendorId,
+                             uint16_t productId)
+{
+    BgScanCache::Report(MakeBleScanResult(bdAddr, discriminator, vendorId, productId), sBleBgCluster);
+}
+
+static void OnBleBgLifetimeExpiry(chip::System::Layer * /*layer*/, void * appState)
+{
+    auto * ctx       = static_cast<BgFabricLifetimeCtx *>(appState);
+    BgFabricKey key  = ctx->key;
+    delete ctx;
+
+    auto it = sBleBgFabrics.find(key);
+    if (it == sBleBgFabrics.end())
+        return;
+    it->second.lifetimeCtx = nullptr;
+    sBleBgFabrics.erase(it);
+
+    ChipLogProgress(AppServer, "BLE BgScan: lifetime expired for fabricIndex=%u nodeId=0x" ChipLogFormatX64, key.fabricIndex,
+                    ChipLogValueX64(key.nodeId));
+
+    if (sBleBgFabrics.empty())
+    {
+        if (!sBleBgPaused)
+            (void) chip::DeviceLayer::Internal::BLEMgrImpl().StopProxyScan();
+        sBleBgPaused = false;
+        BgScanCache::ClearTransport(CapabilitiesBitmap::kBle, sBleBgCluster);
+        sBleBgCluster = nullptr;
+    }
+}
+
+// Start (or resume) the hardware background scan if it is not already running.
+// Returns CHIP_ERROR_BUSY if the BLE scanner is currently held by a connect or
+// foreground scan — the caller keeps the fabric registered and the scan resumes
+// later via ResumeBleBgScanIfNeeded.
+static CHIP_ERROR StartBleBgHardwareScan()
+{
+    CHIP_ERROR err = chip::DeviceLayer::Internal::BLEMgrImpl().StartProxyScan(OnBleBgDiscovery, nullptr);
+    if (err == CHIP_NO_ERROR)
+        sBleBgPaused = false;
+    return err;
+}
+
+// Suspend the hardware background scan so a connect or foreground scan can use
+// the single BLE scanner.  Idempotent; no-op when no fabrics are registered.
+static void PauseBleBgScan()
+{
+    if (!sBleBgFabrics.empty() && !sBleBgPaused)
+    {
+        (void) chip::DeviceLayer::Internal::BLEMgrImpl().StopProxyScan();
+        sBleBgPaused = true;
+        ChipLogProgress(AppServer, "BLE BgScan: paused (scanner needed for connect/foreground scan)");
+    }
+}
+
+// Resume a previously paused hardware background scan when the scanner frees up.
+static void ResumeBleBgScanIfNeeded()
+{
+    if (sBleBgPaused && !sBleBgFabrics.empty())
+    {
+        CHIP_ERROR err = StartBleBgHardwareScan();
+        if (err == CHIP_NO_ERROR)
+        {
+            ChipLogProgress(AppServer, "BLE BgScan: resumed");
+        }
+        else
+        {
+            ChipLogError(AppServer, "BLE BgScan: resume failed: %" CHIP_ERROR_FORMAT, err.Format());
+        }
+    }
 }
 
 // Look up the sessionId for an endpoint already promoted to sBleEndpoints.
@@ -289,6 +417,7 @@ static void FailPendingConnect(chip::Protocols::InteractionModel::Status status)
     if (cmd != nullptr)
         cmd->AddStatus(ctx->path, status);
     delete ctx;
+    ResumeBleBgScanIfNeeded();
 }
 
 static void OnBleConnect_Found(void * /*appState*/, BLE_CONNECTION_OBJECT connObj)
@@ -344,6 +473,7 @@ static void OnBleConnect_Error(void * /*appState*/, CHIP_ERROR err)
     if (cmd != nullptr)
         cmd->AddStatus(ctx->path, chip::Protocols::InteractionModel::Status::Failure);
     delete ctx;
+    ResumeBleBgScanIfNeeded();
 }
 
 static void OnBleConnect_Timeout(chip::System::Layer * /*layer*/, void * /*appState*/)
@@ -376,6 +506,7 @@ static void OnBleConnect_Timeout(chip::System::Layer * /*layer*/, void * /*appSt
     if (cmd != nullptr)
         cmd->AddStatus(ctx->path, chip::Protocols::InteractionModel::Status::Timeout);
     delete ctx;
+    ResumeBleBgScanIfNeeded();
 }
 
 // Free-function callback fired by BLEManagerImpl::StartProxyScan once per
@@ -384,6 +515,9 @@ static void OnBleConnect_Timeout(chip::System::Layer * /*layer*/, void * /*appSt
 static void OnBleScanResult(void * /*context*/, const uint8_t bdAddr[6], uint16_t discriminator, uint16_t vendorId,
                             uint16_t productId)
 {
+    // Fires on the BlueZ/GLib thread; the platform ProxyScanForwarder holds the
+    // CHIP stack lock around this call, so access to sBleScanResults (also touched
+    // by OnBleScanTimer on the Matter thread) is serialized.
     // ProxyScanResponse spec rule (CommissioningProxy.adoc, ProxyScanResult field):
     // "Each found device SHALL be reported once based on discriminator/VendorID/
     // ProductID per transport."  Transport is fixed to kBle here so we dedupe on
@@ -409,47 +543,22 @@ static void OnBleScanTimer(chip::System::Layer * /*layer*/, void * /*appState*/)
     (void) chip::DeviceLayer::Internal::BLEMgrImpl().StopProxyScan();
     sScanInProgress = false;
 
-    auto * ctx  = sBleScanCtx;
-    sBleScanCtx = nullptr;
-    if (ctx == nullptr)
-    {
-        sBleScanResults.clear();
-        return;
-    }
-
-    chip::app::CommandHandler * cmd = ctx->handle.Get();
-    if (cmd == nullptr)
-    {
-        delete ctx;
-        sBleScanResults.clear();
-        return;
-    }
-
-    using ScanResultT = chip::app::Clusters::CommissioningProxy::Structs::ScanResultStruct::Type;
     std::vector<ScanResultT> out;
     out.reserve(sBleScanResults.size());
     for (const auto & d : sBleScanResults)
     {
-        ScanResultT r{};
-        r.address.SetNonNull(chip::ByteSpan(d.mac, sizeof(d.mac)));
-        r.transport = chip::BitMask<chip::app::Clusters::CommissioningProxy::CapabilitiesBitmap>(
-            chip::app::Clusters::CommissioningProxy::CapabilitiesBitmap::kBle);
-        r.discriminator = d.discriminator;
-        r.vendorID      = static_cast<chip::VendorId>(d.vid);
-        r.productID     = d.pid;
-        r.extendedData.SetNull();
-        r.wiFiBand.ClearValue();
-        out.push_back(r);
+        out.push_back(MakeBleScanResult(d.mac, d.discriminator, d.vid, d.pid));
     }
 
-    chip::app::Clusters::CommissioningProxy::Commands::ProxyScanResponse::Type response;
-    chip::app::DataModel::List<const ScanResultT> list{ chip::Span<const ScanResultT>(out.data(), out.size()) };
-    response.proxyScanResult = list;
-    response.numberOfResults = static_cast<uint8_t>(out.size());
-
-    cmd->AddResponse(ctx->path, response);
-    delete ctx;
+    // Hand the results to the dispatcher's aggregator; it owns the command
+    // handle and emits the combined ProxyScanResponse once every transport's
+    // sub-scan has reported.
+    ProxyDispatcher::ContributeScanResults(chip::Span<const ScanResultT>(out.data(), out.size()));
     sBleScanResults.clear();
+
+    // The foreground scan has released the BLE scanner; resume a background scan
+    // that was paused to make room for it.
+    ResumeBleBgScanIfNeeded();
 }
 
 } // namespace
@@ -496,6 +605,12 @@ chip::Protocols::InteractionModel::Status Connect(chip::app::CommandHandler * co
     // Install our BleLayerDelegate wrapper (idempotent).
     sBleProxyDelegate.Install();
 
+    // The connect's NewBleConnectionByDiscriminator uses the single BLE scanner.
+    // Pause any running background scan so it does not contend for the scanner;
+    // it resumes once the session closes (OnAllSessionsClosed) or the connect
+    // fails below.
+    PauseBleBgScan();
+
     uint16_t effectiveTimeout = timeout > 0 ? timeout : kProxyConnectDefaultTimeoutSecs;
 
     auto * ctx         = new BleConnectCtx{};
@@ -520,6 +635,7 @@ chip::Protocols::InteractionModel::Status Connect(chip::app::CommandHandler * co
         ChipLogError(AppServer, "ProxyConnectRequest: NewBleConnectionByDiscriminator failed: %" CHIP_ERROR_FORMAT, err.Format());
         sBlePendingConnect = nullptr;
         delete ctx;
+        ResumeBleBgScanIfNeeded();
         return chip::Protocols::InteractionModel::Status::Failure;
     }
 
@@ -532,6 +648,7 @@ chip::Protocols::InteractionModel::Status Connect(chip::app::CommandHandler * co
         (void) layer->CancelBleIncompleteConnection();
         sBlePendingConnect = nullptr;
         delete ctx;
+        ResumeBleBgScanIfNeeded();
         return chip::Protocols::InteractionModel::Status::Failure;
     }
 
@@ -574,6 +691,8 @@ chip::Protocols::InteractionModel::Status CancelPendingConnect(chip::FabricIndex
         cmd->AddStatus(ctx->path, chip::Protocols::InteractionModel::Status::Failure);
     delete ctx;
 
+    ResumeBleBgScanIfNeeded();
+
     return chip::Protocols::InteractionModel::Status::Success;
 }
 
@@ -607,8 +726,7 @@ CHIP_ERROR SendMessage(uint16_t sessionId, chip::System::PacketBufferHandle && b
     return it->second->Send(std::move(buf));
 }
 
-chip::Protocols::InteractionModel::Status Scan(chip::app::CommandHandler * commandObj,
-                                               const chip::app::DataModel::InvokeRequest & request, uint8_t scanMaxTime)
+chip::Protocols::InteractionModel::Status Scan(uint8_t scanMaxTime)
 {
     if (sScanInProgress)
     {
@@ -616,16 +734,20 @@ chip::Protocols::InteractionModel::Status Scan(chip::app::CommandHandler * comma
         return chip::Protocols::InteractionModel::Status::Busy;
     }
 
+    // The foreground scan and the background scan share the single BLE scanner.
+    // Pause any running background scan so StartProxyScan below does not fail
+    // with BUSY; OnBleScanTimer resumes it when the foreground scan completes.
+    PauseBleBgScan();
+
     sBleScanResults.clear();
     CHIP_ERROR err = chip::DeviceLayer::Internal::BLEMgrImpl().StartProxyScan(OnBleScanResult, nullptr);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(AppServer, "Ble::Scan: StartProxyScan failed: %" CHIP_ERROR_FORMAT, err.Format());
+        ResumeBleBgScanIfNeeded();
         return chip::Protocols::InteractionModel::Status::Failure;
     }
     sScanInProgress = true;
-
-    sBleScanCtx = new BleScanCtx{ chip::app::CommandHandler::Handle(commandObj), request.path };
 
     CHIP_ERROR timerErr = chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds16(scanMaxTime), OnBleScanTimer,
                                                                       nullptr);
@@ -634,59 +756,148 @@ chip::Protocols::InteractionModel::Status Scan(chip::app::CommandHandler * comma
         ChipLogError(AppServer, "Ble::Scan: StartTimer failed: %" CHIP_ERROR_FORMAT, timerErr.Format());
         (void) chip::DeviceLayer::Internal::BLEMgrImpl().StopProxyScan();
         sScanInProgress = false;
-        delete sBleScanCtx;
-        sBleScanCtx = nullptr;
+        ResumeBleBgScanIfNeeded();
         return chip::Protocols::InteractionModel::Status::Failure;
-    }
-
-    if (auto * exchange = commandObj->GetExchangeContext())
-    {
-        exchange->SetResponseTimeout(chip::System::Clock::Seconds16(scanMaxTime + 5));
     }
 
     ChipLogProgress(AppServer, "Ble::Scan: started, scanMaxTime=%us", scanMaxTime);
     return chip::Protocols::InteractionModel::Status::Success;
 }
 
-chip::Protocols::InteractionModel::Status BgScanStart(CapabilitiesBitmap /*transport*/, uint16_t /*timeout*/,
-                                                      WiFiBandBitmap /*wiFiBands*/, chip::FabricIndex /*fabricIndex*/,
-                                                      chip::NodeId /*nodeId*/, CommissioningProxyCluster * /*cluster*/)
+chip::Protocols::InteractionModel::Status BgScanStart(CapabilitiesBitmap /*transport*/, uint16_t timeout,
+                                                      WiFiBandBitmap /*wiFiBands*/, chip::FabricIndex fabricIndex,
+                                                      chip::NodeId nodeId, CommissioningProxyCluster * cluster)
 {
-    ChipLogError(AppServer, "ProxyBackgroundScanStartRequest: BLE not yet implemented (Phase 2B-2)");
-    return chip::Protocols::InteractionModel::Status::Failure;
+    // The dispatcher passes only kBle here; BLE has no Wi-Fi bands, so the
+    // WiFiBands field is meaningless and ignored.
+    BgFabricKey fabricKey{ fabricIndex, nodeId };
+    bool wasEmpty      = sBleBgFabrics.empty();
+    bool alreadyExists = (sBleBgFabrics.count(fabricKey) > 0);
+
+    if (alreadyExists)
+    {
+        auto & rec = sBleBgFabrics[fabricKey];
+        if (rec.lifetimeCtx != nullptr)
+        {
+            chip::DeviceLayer::SystemLayer().CancelTimer(OnBleBgLifetimeExpiry, rec.lifetimeCtx);
+            delete rec.lifetimeCtx;
+            rec.lifetimeCtx = nullptr;
+        }
+        ChipLogProgress(AppServer, "BLE BgScan: updating timeout for existing fabric");
+    }
+
+    sBleBgFabrics[fabricKey] = BleBgFabricRecord{ nullptr };
+    if (sBleBgCluster == nullptr)
+        sBleBgCluster = cluster;
+
+    if (wasEmpty || sBleBgPaused)
+    {
+        CHIP_ERROR err = StartBleBgHardwareScan();
+        if (err == CHIP_ERROR_BUSY)
+        {
+            // The scanner is busy with a connect or foreground scan.  Keep the
+            // fabric registered and defer; ResumeBleBgScanIfNeeded restarts the
+            // hardware scan once the scanner frees up.
+            sBleBgPaused = true;
+            ChipLogProgress(AppServer, "BLE BgScan: scanner busy, deferring hardware scan (will resume when free)");
+        }
+        else if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(AppServer, "ProxyBackgroundScanStartRequest: StartProxyScan failed: %" CHIP_ERROR_FORMAT, err.Format());
+            sBleBgFabrics.erase(fabricKey);
+            if (sBleBgFabrics.empty())
+                sBleBgCluster = nullptr;
+            return chip::Protocols::InteractionModel::Status::Failure;
+        }
+        else
+        {
+            ChipLogProgress(AppServer, "ProxyBackgroundScanStartRequest: BLE hardware scan started");
+        }
+    }
+    else
+    {
+        ChipLogProgress(AppServer, "ProxyBackgroundScanStartRequest: BLE hardware scan already running, registering fabric (%zu total)",
+                        sBleBgFabrics.size());
+    }
+
+    if (timeout > 0)
+    {
+        auto * lCtx = new BgFabricLifetimeCtx{ fabricKey };
+        CHIP_ERROR timerErr =
+            chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds16(timeout), OnBleBgLifetimeExpiry, lCtx);
+        if (timerErr != CHIP_NO_ERROR)
+        {
+            ChipLogError(AppServer, "ProxyBackgroundScanStartRequest: StartTimer failed: %" CHIP_ERROR_FORMAT, timerErr.Format());
+            delete lCtx;
+        }
+        else
+        {
+            sBleBgFabrics[fabricKey].lifetimeCtx = lCtx;
+        }
+    }
+
+    return chip::Protocols::InteractionModel::Status::Success;
 }
 
-chip::Protocols::InteractionModel::Status BgScanStop(CapabilitiesBitmap /*transport*/, WiFiBandBitmap /*wiFiBands*/,
-                                                     chip::FabricIndex /*fabricIndex*/, chip::NodeId /*nodeId*/)
+chip::Protocols::InteractionModel::Status BgScanStop(CapabilitiesBitmap transport, WiFiBandBitmap /*wiFiBands*/,
+                                                     chip::FabricIndex fabricIndex, chip::NodeId nodeId)
 {
-    return chip::Protocols::InteractionModel::Status::NotFound;
+    BgFabricKey fabricKey{ fabricIndex, nodeId };
+    auto it = sBleBgFabrics.find(fabricKey);
+    if (it == sBleBgFabrics.end())
+    {
+        ChipLogProgress(AppServer, "ProxyBackgroundScanStopRequest: no matching BLE fabric record");
+        return chip::Protocols::InteractionModel::Status::NotFound;
+    }
+
+    // BLE has no bands; only the kBle transport bit is meaningful.  A request
+    // that does not name kBle does not stop BLE scanning (spec: valid but not
+    // originally requested transports/bands return SUCCESS).
+    uint8_t stopBle = static_cast<uint8_t>(transport) & static_cast<uint8_t>(CapabilitiesBitmap::kBle);
+    if (stopBle == 0)
+    {
+        ChipLogProgress(AppServer, "ProxyBackgroundScanStopRequest: request does not target BLE, returning SUCCESS");
+        return chip::Protocols::InteractionModel::Status::Success;
+    }
+
+    if (it->second.lifetimeCtx != nullptr)
+    {
+        chip::DeviceLayer::SystemLayer().CancelTimer(OnBleBgLifetimeExpiry, it->second.lifetimeCtx);
+        delete it->second.lifetimeCtx;
+        it->second.lifetimeCtx = nullptr;
+    }
+    sBleBgFabrics.erase(it);
+    ChipLogProgress(AppServer, "ProxyBackgroundScanStopRequest: BLE fabric stopped (%zu remaining)", sBleBgFabrics.size());
+
+    if (sBleBgFabrics.empty())
+    {
+        // Only touch the scanner if the background scan actually owns it; if it
+        // was paused, a connect or foreground scan owns the scanner and must not
+        // be disturbed.
+        if (!sBleBgPaused)
+            (void) chip::DeviceLayer::Internal::BLEMgrImpl().StopProxyScan();
+        sBleBgPaused = false;
+        BgScanCache::ClearTransport(CapabilitiesBitmap::kBle, sBleBgCluster);
+        sBleBgCluster = nullptr;
+        ChipLogProgress(AppServer, "ProxyBackgroundScanStopRequest: last BLE fabric stopped, hardware scan stopped");
+    }
+
+    return chip::Protocols::InteractionModel::Status::Success;
 }
 
 void OnAllSessionsClosed()
 {
-    // Intentional no-op for BLE: the proxy uses a one-way peripheral→central
-    // role switch (BLEManagerImpl::SwitchToCentralMode) on the first
-    // ProxyConnectRequest(kBle).  Once switched, advertising stays off — there
-    // is no peripheral state to resume here.  The entry point is kept for
-    // symmetry with the PAF transport.
+    // The proxy uses a one-way peripheral→central role switch
+    // (BLEManagerImpl::SwitchToCentralMode) on the first ProxyConnectRequest(kBle),
+    // so there is no peripheral advertising state to resume.  But a background
+    // scan paused for the connect must be resumed now that the session has closed
+    // and the scanner is free again.
+    ResumeBleBgScanIfNeeded();
 }
 
 bool IsConnectPending()
 {
     return sBlePendingConnect != nullptr;
-}
-
-uint8_t GetNumCachedResults()
-{
-    return 0;
-}
-
-CHIP_ERROR EncodeCachedResults(chip::app::AttributeValueEncoder & encoder)
-{
-    chip::app::DataModel::Nullable<chip::app::DataModel::List<
-        const chip::app::Clusters::CommissioningProxy::Structs::ScanResultStruct::Type>>
-        nullValue;
-    return encoder.Encode(nullValue);
 }
 
 } // namespace Ble

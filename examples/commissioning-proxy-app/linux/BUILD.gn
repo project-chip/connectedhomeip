@@ -40,6 +40,8 @@ executable("chip-commissioning-proxy-app") {
   sources = [
     "CPAppCommandDelegate.cpp",
     "CPAppCommandDelegate.h",
+    "CommissioningProxyBgScanCache.cpp",
+    "CommissioningProxyBgScanCache.h",
     "CommissioningProxyCommandDelegate.cpp",
     "CommissioningProxyDispatcher.h",
     "include/CHIPProjectAppConfig.h",
