@@ -659,7 +659,6 @@ CHIP_ERROR CASESession::DeriveSecureSession(CryptoContext & session)
 CHIP_ERROR CASESession::RecoverInitiatorIpk()
 {
     Credentials::GroupDataProvider::KeySet ipkKeySet;
-    auto ipkKeySetWiperOnScopeExit = ScopeExit([&] { ipkKeySet.ClearKeys(); });
 
     CHIP_ERROR err = mGroupDataProvider->GetIpkKeySet(mFabricIndex, ipkKeySet);
 
@@ -1000,8 +999,7 @@ CHIP_ERROR CASESession::FindLocalNodeFromDestinationId(const ByteSpan & destinat
 
         // Get IPK operational group key set for current candidate fabric
         GroupDataProvider::KeySet ipkKeySet;
-        auto ipkKeySetWiperOnScopeExit = ScopeExit([&] { ipkKeySet.ClearKeys(); });
-        CHIP_ERROR err                 = mGroupDataProvider->GetIpkKeySet(fabricInfo.GetFabricIndex(), ipkKeySet);
+        CHIP_ERROR err = mGroupDataProvider->GetIpkKeySet(fabricInfo.GetFabricIndex(), ipkKeySet);
         if ((err != CHIP_NO_ERROR) ||
             ((ipkKeySet.num_keys_used == 0) || (ipkKeySet.num_keys_used > Credentials::GroupDataProvider::KeySet::kEpochKeysMax)))
         {
