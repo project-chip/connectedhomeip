@@ -24,8 +24,7 @@
 
 namespace chip::app::Clusters::ThreadNetworkDiagnostics {
 
-CHIP_ERROR NullThreadDiagnosticsProvider::WriteAttributeToTlv(AttributeId attributeId,
-                                                              app::AttributeValueEncoder & encoder)
+CHIP_ERROR NullThreadDiagnosticsProvider::WriteAttributeToTlv(AttributeId attributeId, app::AttributeValueEncoder & encoder)
 {
     CHIP_ERROR err;
     switch (attributeId)

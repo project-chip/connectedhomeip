@@ -44,7 +44,8 @@ private:
 class NetworkInfrastructureManagerDevice : public SingleEndpointDevice, public Clusters::ThreadBorderRouterManagementDelegate
 {
 public:
-    NetworkInfrastructureManagerDevice(PersistentStorageDelegate & storage, Clusters::ThreadNetworkDiagnostics::ThreadNetworkDiagnosticsProvider & provider);
+    NetworkInfrastructureManagerDevice(PersistentStorageDelegate & storage,
+                                       Clusters::ThreadNetworkDiagnostics::ThreadNetworkDiagnosticsProvider & provider);
     ~NetworkInfrastructureManagerDevice() override;
 
     CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
