@@ -9,6 +9,16 @@ not_automated:
       reason:
           NFC-Thread hardware setup needed for running this test-case and CI
           does not support it
+    - name: TC_SC_TC_2_1.py
+      reason: Test requires Thread MeshCoP hardware or simulation.
+    - name: TC_SC_TC_2_2.py
+      reason: Test requires Thread MeshCoP hardware or simulation.
+    - name: TC_SC_TC_3_1.py
+      reason: Test requires Thread MeshCoP hardware or simulation.
+    - name: TC_SC_TC_4_1.py
+      reason: Test requires Thread MeshCoP hardware or simulation.
+    - name: thread_meshcop_testing.py
+      reason: Shared code for Thread MeshCoP tests, not a standalone test.
     - name: MinimalRepresentation.py
       reason: Code/Test not being used or not shared code for any other tests
     - name: TC_AVSMTestBase.py

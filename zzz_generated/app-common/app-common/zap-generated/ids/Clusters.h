@@ -30,6 +30,7 @@
 #include <clusters/ApplicationBasic/ClusterId.h>
 #include <clusters/ApplicationLauncher/ClusterId.h>
 #include <clusters/AudioOutput/ClusterId.h>
+#include <clusters/AvAnalysis/ClusterId.h>
 #include <clusters/BallastConfiguration/ClusterId.h>
 #include <clusters/BasicInformation/ClusterId.h>
 #include <clusters/Binding/ClusterId.h>

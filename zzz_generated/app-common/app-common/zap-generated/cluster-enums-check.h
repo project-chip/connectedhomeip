@@ -32,6 +32,7 @@
 #include <clusters/ApplicationBasic/EnumsCheck.h>
 #include <clusters/ApplicationLauncher/EnumsCheck.h>
 #include <clusters/AudioOutput/EnumsCheck.h>
+#include <clusters/AvAnalysis/EnumsCheck.h>
 #include <clusters/BallastConfiguration/EnumsCheck.h>
 #include <clusters/BasicInformation/EnumsCheck.h>
 #include <clusters/Binding/EnumsCheck.h>

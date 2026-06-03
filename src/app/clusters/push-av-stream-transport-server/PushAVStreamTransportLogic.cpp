@@ -607,51 +607,12 @@ Status PushAvStreamTransportServerLogic::ValidateIncomingTransportOptions(
                                          "Duration field not within allowed range",
                                          mEndpointId));
 
-        if (containerOptions.CMAFContainerOptions.Value().CENCKey.HasValue())
-        {
-            VerifyOrReturnValue(
-                containerOptions.CMAFContainerOptions.Value().CENCKey.Value().size() == kMaxCENCKeyLength, Status::ConstraintError,
-                ChipLogError(Zcl,
-                             "Transport Options verification from command data[ep=%d]: CMAF Container Options CENC Key constraint "
-                             "Error, actual length: %" PRIu32 " not "
-                             "equal to expected length of 16",
-                             mEndpointId,
-                             static_cast<uint32_t>(containerOptions.CMAFContainerOptions.Value().CENCKey.Value().size())));
-        }
-
         if (!mFeatures.Has(Feature::kMetadata))
         {
             VerifyOrReturnValue(!containerOptions.CMAFContainerOptions.Value().metadataEnabled.HasValue(), Status::InvalidCommand,
                                 ChipLogError(Zcl,
                                              "Transport Options verification from command data[ep=%d]: Found CMAF Container "
                                              "Options MetadataEnabled which is not expected.",
-                                             mEndpointId));
-        }
-
-        if (containerOptions.CMAFContainerOptions.Value().CENCKey.HasValue())
-        {
-            VerifyOrReturnValue(
-                containerOptions.CMAFContainerOptions.Value().CENCKeyID.HasValue(), Status::InvalidCommand,
-                ChipLogError(Zcl,
-                             "Transport Options verification from command data[ep=%d]: Missing CMAF Container Options CENC Key ID ",
-                             mEndpointId));
-
-            VerifyOrReturnValue(
-                containerOptions.CMAFContainerOptions.Value().CENCKeyID.Value().size() == kMaxCENCKeyIDLength,
-                Status::ConstraintError,
-                ChipLogError(Zcl,
-                             "Transport Options verification from command data[ep=%d]: CMAF Container Options CENC Key ID "
-                             "constraint Error, actual "
-                             "length: %" PRIu32 " not equal to expected length of 16",
-                             mEndpointId,
-                             static_cast<uint32_t>(containerOptions.CMAFContainerOptions.Value().CENCKeyID.Value().size())));
-        }
-        else
-        {
-            VerifyOrReturnValue(!containerOptions.CMAFContainerOptions.Value().CENCKeyID.HasValue(), Status::InvalidCommand,
-                                ChipLogError(Zcl,
-                                             "Transport Options verification from command data[ep=%d]: Found CMAF Container "
-                                             "Options CENC Key ID which is not expected",
                                              mEndpointId));
         }
     }
@@ -1661,10 +1622,10 @@ Status PushAvStreamTransportServerLogic::GeneratePushTransportBeginEvent(
     Events::PushTransportBegin::Type event;
     EventNumber eventNumber;
 
-    event.connectionID      = connectionID;
-    event.triggerType       = triggerType;
-    event.activationReason  = activationReason;
-    event.containerType     = containerType;
+    event.connectionID     = connectionID;
+    event.triggerType      = triggerType;
+    event.activationReason = activationReason;
+    event.containerType.SetValue(containerType);
     event.CMAFSessionNumber = cmafSessionNumber;
 
     CHIP_ERROR err = LogEvent(event, mEndpointId, eventNumber);
@@ -1688,7 +1649,7 @@ Status PushAvStreamTransportServerLogic::GeneratePushTransportEndEvent(const uin
     TransportConfigurationStorage * transportConfig = FindStreamTransportConnection(connectionID);
     if (transportConfig != nullptr)
     {
-        event.containerType = transportConfig->transportOptions.Value().containerOptions.containerType;
+        event.containerType.SetValue(transportConfig->transportOptions.Value().containerOptions.containerType);
 
         // For CMAF container type, we need to provide CMAF session number
         if (event.containerType == ContainerFormatEnum::kCmaf)
@@ -1714,7 +1675,7 @@ Status PushAvStreamTransportServerLogic::GeneratePushTransportEndEvent(const uin
     else
     {
         // Fallback values if transport config not found
-        event.containerType     = ContainerFormatEnum::kCmaf; // Default fallback
+        event.containerType.SetValue(ContainerFormatEnum::kCmaf); // Default fallback
         event.CMAFSessionNumber = Optional<uint64_t>();
     }
 
