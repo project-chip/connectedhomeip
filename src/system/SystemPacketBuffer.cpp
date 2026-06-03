@@ -589,10 +589,35 @@ PacketBufferHandle PacketBufferHandle::New(size_t aAvailableSize, uint16_t aRese
     }
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_PACKETBUFFER_LWIP_PBUF_RAM
+    // Allocate buffer using kMaxAllocSize instead of the requested size (lAllocSize).
+    //
+    // Rationale:
+    // 1. PBUF_RAM provides a contiguous payload buffer, ensuring consistent behavior
+    //    with PBUF_POOL (non-chained) operations regardless of actual data size.
+    // 2. The standard lwIP pbuf structure lacks a field to store the actual allocated
+    //    size. By always allocating kMaxAllocSize, AllocSize() can return a constant
+    //    value (kMaxAllocSize) without needing to track the original allocation size.
+    //
+    // kMaxAllocSize configuration:
+    // - TCP: Configurable via CHIP_SYSTEM_CONFIG_MAX_LARGE_BUFFER_SIZE_BYTES to support
+    //        larger packets exceeding IPv6 MTU. Note: This may result in unused buffer
+    //        space; configure based on the maximum packet size requirements.
+    // - UDP: Fixed to LWIP_MEM_ALIGN_SIZE(PBUF_POOL_BUFSIZE)
+    //
+    // Despite allocating kMaxAllocSize, we still keep the validation for lAllocSize
+    // to fail early if the requested size exceeds the maximum capacity.
+    //
+    // This cast is safe because kLargeBufMaxSizeWithoutReserve has been statically
+    // asserted to fit in uint16_t.
+    lPacket = static_cast<PacketBuffer *>(
+        pbuf_alloc(PBUF_RAW, static_cast<uint16_t>(PacketBuffer::kMaxAllocSize), CHIP_SYSTEM_PACKETBUFFER_LWIP_PBUF_TYPE));
+#else
     // This cast is safe because lAllocSize is no larger than
     // kMaxSizeWithoutReserve, which fits in uint16_t.
     lPacket = static_cast<PacketBuffer *>(
         pbuf_alloc(PBUF_RAW, static_cast<uint16_t>(lAllocSize), CHIP_SYSTEM_PACKETBUFFER_LWIP_PBUF_TYPE));
+#endif
 
     SYSTEM_STATS_UPDATE_LWIP_PBUF_COUNTS();
 
