@@ -586,32 +586,37 @@ class IDMBaseTest(MatterBaseTest):
     # Write-to-unsupported-target helpers
     # ========================================================================
     #
-    # Background: passing a `ClusterAttributeDescriptor` *class* (not an
-    # instance) to write_single_attribute serializes the class-level default
-    # `value=None` for Optional attributes, producing an empty TLV. The
-    # controller then fails locally in TLVWriter::CopyElement with
-    # CHIP_ERROR_INCORRECT_STATE before the WriteRequest leaves the host, so
-    # the DUT never sees the request and the test fails with a confusing
-    # "Incorrect state" error instead of the expected UNSUPPORTED_* status.
+    # These helpers underpin TC-IDM-3.2 steps 2 and 3, which exercise the
+    # DUT's error responses by deliberately writing to a cluster or
+    # attribute the DUT does not host. The target is intentionally absent
+    # from the device. The *value* on the wire is irrelevant; the helper
+    # only needs to put any valid TLV on the wire so the WriteRequest
+    # leaves the host and the DUT gets a chance to reply with
+    # UNSUPPORTED_CLUSTER / UNSUPPORTED_ATTRIBUTE.
     #
-    # The helpers below always instantiate the attribute class with a real
-    # value, falling back across (NullValue, 0, "", b""):
-    #   - NullValue covers spec-nullable attributes (Union[Nullable, T]),
-    #     producing a proper Null TLV element.
-    #   - 0 / "" / b"" cover non-nullable scalar shapes (uint, int,
-    #     char-string, octet-string), including conformance-optional
-    #     attributes that are typed Optional[T] in Python but NOT spec-
-    #     nullable (e.g. BooleanStateConfiguration.CurrentSensitivityLevel,
-    #     which is Optional[uint] because it's feature-gated on SENSLVL).
-    # Attribute types we still can't encode (lists, structs, enums without
-    # a zero member, etc.) raise ValueError/TypeError and are skipped,
-    # since the *value* on the wire doesn't matter for these tests; only
-    # the path does.
-    # Fallback values that cover the common attribute shapes. NullValue is
-    # tried first for spec-nullable attributes; the scalar values cover
-    # non-nullable Optional[T] and plain T attributes. Skipped shapes
-    # (lists, structs, etc.) raise ValueError/TypeError and are caught
-    # in _try_write_with_fallback_values.
+    # That last part is where the original bug bit: an earlier version of
+    # the helper passed the bare ClusterAttributeDescriptor *class* to
+    # write_single_attribute. For Optional[T] attributes, that meant the
+    # controller serialized the class-level dataclass default value=None,
+    # which produced an empty TLV. The C++ TLVWriter::CopyElement then
+    # rejected the empty reader with CHIP_ERROR_INCORRECT_STATE locally,
+    # before the WriteRequest ever reached the DUT. Tests then failed with
+    # a misleading "Incorrect state" error instead of the UNSUPPORTED_*
+    # status the spec requires the DUT to return.
+    #
+    # _try_write_with_fallback_values fixes that by always instantiating
+    # the attribute with a real value, trying (NullValue, 0, "", b"") in
+    # order:
+    #   - NullValue covers spec-nullable attributes (Union[Nullable, T]);
+    #     the encoder writes a proper Null TLV element.
+    #   - 0 / "" / b"" cover plain scalar shapes (uint, int, char-string,
+    #     octet-string), including conformance-optional attributes that
+    #     are Optional[T] in Python but NOT spec-nullable (e.g.
+    #     BooleanStateConfiguration.CurrentSensitivityLevel, which is
+    #     Optional[uint] because it's feature-gated on SENSLVL).
+    # Shapes we still can't encode with these dummies (lists, structs,
+    # enums without a zero member, etc.) raise ValueError/TypeError and
+    # are skipped; the caller moves on to the next candidate.
     _WRITE_FALLBACK_VALUES = (NullValue, 0, "", b"")
 
     async def _try_write_with_fallback_values(
