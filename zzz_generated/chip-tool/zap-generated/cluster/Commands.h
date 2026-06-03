@@ -112,6 +112,7 @@
 | WaterHeaterMode                                                     | 0x009E |
 | DeviceEnergyManagementMode                                          | 0x009F |
 | ElectricalGridConditions                                            | 0x00A0 |
+| ElectricalAlarm                                                     | 0x00A1 |
 | ElectricalDistribution                                              | 0x00A2 |
 | ElectricalProtectionAlarm                                           | 0x00A3 |
 | DoorLock                                                            | 0x0101 |
@@ -172,6 +173,7 @@
 | WebRTCTransportRequestor                                            | 0x0554 |
 | PushAvStreamTransport                                               | 0x0555 |
 | Chime                                                               | 0x0556 |
+| AvAnalysis                                                          | 0x0557 |
 | CommodityTariff                                                     | 0x0700 |
 | EcosystemInformation                                                | 0x0750 |
 | CommissionerControl                                                 | 0x0751 |
@@ -7954,6 +7956,161 @@ private:
 | Events:                                                             |        |
 | * CurrentConditionsChanged                                          | 0x0000 |
 \*----------------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------------*\
+| Cluster ElectricalAlarm                                             | 0x00A1 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+| * Reset                                                             |   0x00 |
+| * ModifyEnabledAlarms                                               |   0x01 |
+| * SetElectricalAlarmThresholds                                      |   0x80 |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * Mask                                                              | 0x0000 |
+| * Latch                                                             | 0x0001 |
+| * State                                                             | 0x0002 |
+| * Supported                                                         | 0x0003 |
+| * OverVoltageThreshold                                              | 0x0080 |
+| * UnderVoltageThreshold                                             | 0x0081 |
+| * OverFrequencyThreshold                                            | 0x0082 |
+| * UnderFrequencyThreshold                                           | 0x0083 |
+| * OverPowerThreshold                                                | 0x0084 |
+| * UnderPowerThreshold                                               | 0x0085 |
+| * OverCurrentThreshold                                              | 0x0086 |
+| * UnderCurrentThreshold                                             | 0x0087 |
+| * PowerImportThreshold                                              | 0x0088 |
+| * PowerExportThreshold                                              | 0x0089 |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
+| * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
+| * ClusterRevision                                                   | 0xFFFD |
+|------------------------------------------------------------------------------|
+| Events:                                                             |        |
+| * Notify                                                            | 0x0000 |
+\*----------------------------------------------------------------------------*/
+
+/*
+ * Command Reset
+ */
+class ElectricalAlarmReset : public ClusterCommand
+{
+public:
+    ElectricalAlarmReset(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("reset", credsIssuerConfig)
+    {
+        AddArgument("Alarms", 0, UINT32_MAX, &mRequest.alarms);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::ElectricalAlarm::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::ElectricalAlarm::Commands::Reset::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::ElectricalAlarm::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::ElectricalAlarm::Commands::Reset::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::ElectricalAlarm::Commands::Reset::Type mRequest;
+};
+
+/*
+ * Command ModifyEnabledAlarms
+ */
+class ElectricalAlarmModifyEnabledAlarms : public ClusterCommand
+{
+public:
+    ElectricalAlarmModifyEnabledAlarms(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("modify-enabled-alarms", credsIssuerConfig)
+    {
+        AddArgument("Mask", 0, UINT32_MAX, &mRequest.mask);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::ElectricalAlarm::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::ElectricalAlarm::Commands::ModifyEnabledAlarms::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::ElectricalAlarm::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::ElectricalAlarm::Commands::ModifyEnabledAlarms::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::ElectricalAlarm::Commands::ModifyEnabledAlarms::Type mRequest;
+};
+
+/*
+ * Command SetElectricalAlarmThresholds
+ */
+class ElectricalAlarmSetElectricalAlarmThresholds : public ClusterCommand
+{
+public:
+    ElectricalAlarmSetElectricalAlarmThresholds(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("set-electrical-alarm-thresholds", credsIssuerConfig)
+    {
+        AddArgument("OverVoltageThreshold", INT64_MIN, INT64_MAX, &mRequest.overVoltageThreshold);
+        AddArgument("UnderVoltageThreshold", INT64_MIN, INT64_MAX, &mRequest.underVoltageThreshold);
+        AddArgument("OverFrequencyThreshold", INT64_MIN, INT64_MAX, &mRequest.overFrequencyThreshold);
+        AddArgument("UnderFrequencyThreshold", INT64_MIN, INT64_MAX, &mRequest.underFrequencyThreshold);
+        AddArgument("OverPowerThreshold", INT64_MIN, INT64_MAX, &mRequest.overPowerThreshold);
+        AddArgument("UnderPowerThreshold", INT64_MIN, INT64_MAX, &mRequest.underPowerThreshold);
+        AddArgument("OverCurrentThreshold", INT64_MIN, INT64_MAX, &mRequest.overCurrentThreshold);
+        AddArgument("UnderCurrentThreshold", INT64_MIN, INT64_MAX, &mRequest.underCurrentThreshold);
+        AddArgument("PowerImportThreshold", INT64_MIN, INT64_MAX, &mRequest.powerImportThreshold);
+        AddArgument("PowerExportThreshold", INT64_MIN, INT64_MAX, &mRequest.powerExportThreshold);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::ElectricalAlarm::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::ElectricalAlarm::Commands::SetElectricalAlarmThresholds::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::ElectricalAlarm::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::ElectricalAlarm::Commands::SetElectricalAlarmThresholds::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::ElectricalAlarm::Commands::SetElectricalAlarmThresholds::Type mRequest;
+};
 
 /*----------------------------------------------------------------------------*\
 | Cluster ElectricalDistribution                                      | 0x00A2 |
@@ -16605,6 +16762,272 @@ public:
 
 private:
     chip::app::Clusters::Chime::Commands::PlayChimeSound::Type mRequest;
+};
+
+/*----------------------------------------------------------------------------*\
+| Cluster AvAnalysis                                                  | 0x0557 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+| * EnableContextTriggers                                             |   0x00 |
+| * DisableContextTriggers                                            |   0x01 |
+| * EstablishAnalysisStream                                           |   0x02 |
+| * ActivateAnalysisStream                                            |   0x04 |
+| * DeactivateAnalysisStream                                          |   0x05 |
+| * RemoveAnalysisStream                                              |   0x06 |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * SupportedAmbientContexts                                          | 0x0000 |
+| * ActiveAmbientContextTriggers                                      | 0x0001 |
+| * MaxAnalysisStreamCount                                            | 0x0002 |
+| * CurrentAnalysisStreamCount                                        | 0x0003 |
+| * AnalysisStreams                                                   | 0x0004 |
+| * TrackingEnabled                                                   | 0x0005 |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
+| * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
+| * ClusterRevision                                                   | 0xFFFD |
+|------------------------------------------------------------------------------|
+| Events:                                                             |        |
+| * AnalysisSessionStart                                              | 0x0000 |
+| * AnalysisSessionEnd                                                | 0x0001 |
+| * PerceivedContext                                                  | 0x0002 |
+\*----------------------------------------------------------------------------*/
+
+/*
+ * Command EnableContextTriggers
+ */
+class AvAnalysisEnableContextTriggers : public ClusterCommand
+{
+public:
+    AvAnalysisEnableContextTriggers(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("enable-context-triggers", credsIssuerConfig), mComplex_ContextTriggers(&mRequest.contextTriggers)
+    {
+        AddArgument("ContextTriggers", &mComplex_ContextTriggers);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::AvAnalysis::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::AvAnalysis::Commands::EnableContextTriggers::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::AvAnalysis::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::AvAnalysis::Commands::EnableContextTriggers::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::AvAnalysis::Commands::EnableContextTriggers::Type mRequest;
+    TypedComplexArgument<chip::app::DataModel::Nullable<
+        chip::app::DataModel::List<const chip::app::Clusters::AvAnalysis::Structs::ContextTriggerStruct::Type>>>
+        mComplex_ContextTriggers;
+};
+
+/*
+ * Command DisableContextTriggers
+ */
+class AvAnalysisDisableContextTriggers : public ClusterCommand
+{
+public:
+    AvAnalysisDisableContextTriggers(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("disable-context-triggers", credsIssuerConfig), mComplex_ContextTriggers(&mRequest.contextTriggers)
+    {
+        AddArgument("ContextTriggers", &mComplex_ContextTriggers);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::AvAnalysis::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::AvAnalysis::Commands::DisableContextTriggers::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::AvAnalysis::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::AvAnalysis::Commands::DisableContextTriggers::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::AvAnalysis::Commands::DisableContextTriggers::Type mRequest;
+    TypedComplexArgument<chip::app::DataModel::Nullable<
+        chip::app::DataModel::List<const chip::app::Clusters::AvAnalysis::Structs::ContextTriggerStruct::Type>>>
+        mComplex_ContextTriggers;
+};
+
+/*
+ * Command EstablishAnalysisStream
+ */
+class AvAnalysisEstablishAnalysisStream : public ClusterCommand
+{
+public:
+    AvAnalysisEstablishAnalysisStream(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("establish-analysis-stream", credsIssuerConfig)
+    {
+        AddArgument("NodeID", 0, UINT64_MAX, &mRequest.nodeID);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::AvAnalysis::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::AvAnalysis::Commands::EstablishAnalysisStream::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::AvAnalysis::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::AvAnalysis::Commands::EstablishAnalysisStream::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::AvAnalysis::Commands::EstablishAnalysisStream::Type mRequest;
+};
+
+/*
+ * Command ActivateAnalysisStream
+ */
+class AvAnalysisActivateAnalysisStream : public ClusterCommand
+{
+public:
+    AvAnalysisActivateAnalysisStream(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("activate-analysis-stream", credsIssuerConfig)
+    {
+        AddArgument("AnalysisStreamID", 0, UINT16_MAX, &mRequest.analysisStreamID);
+        AddArgument("WebRTCEndpointID", 0, UINT16_MAX, &mRequest.webRTCEndpointID);
+        AddArgument("PushAVEndpointID", 0, UINT16_MAX, &mRequest.pushAVEndpointID);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::AvAnalysis::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::AvAnalysis::Commands::ActivateAnalysisStream::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::AvAnalysis::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::AvAnalysis::Commands::ActivateAnalysisStream::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::AvAnalysis::Commands::ActivateAnalysisStream::Type mRequest;
+};
+
+/*
+ * Command DeactivateAnalysisStream
+ */
+class AvAnalysisDeactivateAnalysisStream : public ClusterCommand
+{
+public:
+    AvAnalysisDeactivateAnalysisStream(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("deactivate-analysis-stream", credsIssuerConfig)
+    {
+        AddArgument("AnalysisStreamID", 0, UINT16_MAX, &mRequest.analysisStreamID);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::AvAnalysis::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::AvAnalysis::Commands::DeactivateAnalysisStream::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::AvAnalysis::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::AvAnalysis::Commands::DeactivateAnalysisStream::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::AvAnalysis::Commands::DeactivateAnalysisStream::Type mRequest;
+};
+
+/*
+ * Command RemoveAnalysisStream
+ */
+class AvAnalysisRemoveAnalysisStream : public ClusterCommand
+{
+public:
+    AvAnalysisRemoveAnalysisStream(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("remove-analysis-stream", credsIssuerConfig)
+    {
+        AddArgument("AnalysisStreamID", 0, UINT16_MAX, &mRequest.analysisStreamID);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::AvAnalysis::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::AvAnalysis::Commands::RemoveAnalysisStream::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::AvAnalysis::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::AvAnalysis::Commands::RemoveAnalysisStream::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::AvAnalysis::Commands::RemoveAnalysisStream::Type mRequest;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -26238,6 +26661,124 @@ void registerClusterElectricalGridConditions(Commands & commands, CredentialIssu
 
     commands.RegisterCluster(clusterName, clusterCommands);
 }
+void registerClusterElectricalAlarm(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+{
+    using namespace chip::app::Clusters::ElectricalAlarm;
+
+    const char * clusterName = "ElectricalAlarm";
+
+    commands_list clusterCommands = {
+        //
+        // Commands
+        //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig),                          //
+        make_unique<ElectricalAlarmReset>(credsIssuerConfig),                        //
+        make_unique<ElectricalAlarmModifyEnabledAlarms>(credsIssuerConfig),          //
+        make_unique<ElectricalAlarmSetElectricalAlarmThresholds>(credsIssuerConfig), //
+        //
+        // Attributes
+        //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                       //
+        make_unique<ReadAttribute>(Id, "mask", Attributes::Mask::Id, credsIssuerConfig),                                         //
+        make_unique<ReadAttribute>(Id, "latch", Attributes::Latch::Id, credsIssuerConfig),                                       //
+        make_unique<ReadAttribute>(Id, "state", Attributes::State::Id, credsIssuerConfig),                                       //
+        make_unique<ReadAttribute>(Id, "supported", Attributes::Supported::Id, credsIssuerConfig),                               //
+        make_unique<ReadAttribute>(Id, "over-voltage-threshold", Attributes::OverVoltageThreshold::Id, credsIssuerConfig),       //
+        make_unique<ReadAttribute>(Id, "under-voltage-threshold", Attributes::UnderVoltageThreshold::Id, credsIssuerConfig),     //
+        make_unique<ReadAttribute>(Id, "over-frequency-threshold", Attributes::OverFrequencyThreshold::Id, credsIssuerConfig),   //
+        make_unique<ReadAttribute>(Id, "under-frequency-threshold", Attributes::UnderFrequencyThreshold::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "over-power-threshold", Attributes::OverPowerThreshold::Id, credsIssuerConfig),           //
+        make_unique<ReadAttribute>(Id, "under-power-threshold", Attributes::UnderPowerThreshold::Id, credsIssuerConfig),         //
+        make_unique<ReadAttribute>(Id, "over-current-threshold", Attributes::OverCurrentThreshold::Id, credsIssuerConfig),       //
+        make_unique<ReadAttribute>(Id, "under-current-threshold", Attributes::UnderCurrentThreshold::Id, credsIssuerConfig),     //
+        make_unique<ReadAttribute>(Id, "power-import-threshold", Attributes::PowerImportThreshold::Id, credsIssuerConfig),       //
+        make_unique<ReadAttribute>(Id, "power-export-threshold", Attributes::PowerExportThreshold::Id, credsIssuerConfig),       //
+        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig),       //
+        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),         //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                            //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),                  //
+        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                                    //
+        make_unique<WriteAttribute<chip::BitMask<chip::app::Clusters::ElectricalAlarm::AlarmBitmap>>>(
+            Id, "mask", 0, UINT32_MAX, Attributes::Mask::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::BitMask<chip::app::Clusters::ElectricalAlarm::AlarmBitmap>>>(
+            Id, "latch", 0, UINT32_MAX, Attributes::Latch::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::BitMask<chip::app::Clusters::ElectricalAlarm::AlarmBitmap>>>(
+            Id, "state", 0, UINT32_MAX, Attributes::State::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::BitMask<chip::app::Clusters::ElectricalAlarm::AlarmBitmap>>>(
+            Id, "supported", 0, UINT32_MAX, Attributes::Supported::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<int64_t>>(Id, "over-voltage-threshold", INT64_MIN, INT64_MAX,
+                                             Attributes::OverVoltageThreshold::Id, WriteCommandType::kForceWrite,
+                                             credsIssuerConfig), //
+        make_unique<WriteAttribute<int64_t>>(Id, "under-voltage-threshold", INT64_MIN, INT64_MAX,
+                                             Attributes::UnderVoltageThreshold::Id, WriteCommandType::kForceWrite,
+                                             credsIssuerConfig), //
+        make_unique<WriteAttribute<int64_t>>(Id, "over-frequency-threshold", INT64_MIN, INT64_MAX,
+                                             Attributes::OverFrequencyThreshold::Id, WriteCommandType::kForceWrite,
+                                             credsIssuerConfig), //
+        make_unique<WriteAttribute<int64_t>>(Id, "under-frequency-threshold", INT64_MIN, INT64_MAX,
+                                             Attributes::UnderFrequencyThreshold::Id, WriteCommandType::kForceWrite,
+                                             credsIssuerConfig), //
+        make_unique<WriteAttribute<int64_t>>(Id, "over-power-threshold", INT64_MIN, INT64_MAX, Attributes::OverPowerThreshold::Id,
+                                             WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<int64_t>>(Id, "under-power-threshold", INT64_MIN, INT64_MAX, Attributes::UnderPowerThreshold::Id,
+                                             WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<int64_t>>(Id, "over-current-threshold", INT64_MIN, INT64_MAX,
+                                             Attributes::OverCurrentThreshold::Id, WriteCommandType::kForceWrite,
+                                             credsIssuerConfig), //
+        make_unique<WriteAttribute<int64_t>>(Id, "under-current-threshold", INT64_MIN, INT64_MAX,
+                                             Attributes::UnderCurrentThreshold::Id, WriteCommandType::kForceWrite,
+                                             credsIssuerConfig), //
+        make_unique<WriteAttribute<int64_t>>(Id, "power-import-threshold", INT64_MIN, INT64_MAX,
+                                             Attributes::PowerImportThreshold::Id, WriteCommandType::kForceWrite,
+                                             credsIssuerConfig), //
+        make_unique<WriteAttribute<int64_t>>(Id, "power-export-threshold", INT64_MIN, INT64_MAX,
+                                             Attributes::PowerExportThreshold::Id, WriteCommandType::kForceWrite,
+                                             credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::AttributeId>>>(
+            Id, "attribute-list", Attributes::AttributeList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "feature-map", 0, UINT32_MAX, Attributes::FeatureMap::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig),                                  //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                   //
+        make_unique<SubscribeAttribute>(Id, "mask", Attributes::Mask::Id, credsIssuerConfig),                                     //
+        make_unique<SubscribeAttribute>(Id, "latch", Attributes::Latch::Id, credsIssuerConfig),                                   //
+        make_unique<SubscribeAttribute>(Id, "state", Attributes::State::Id, credsIssuerConfig),                                   //
+        make_unique<SubscribeAttribute>(Id, "supported", Attributes::Supported::Id, credsIssuerConfig),                           //
+        make_unique<SubscribeAttribute>(Id, "over-voltage-threshold", Attributes::OverVoltageThreshold::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "under-voltage-threshold", Attributes::UnderVoltageThreshold::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "over-frequency-threshold", Attributes::OverFrequencyThreshold::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "under-frequency-threshold", Attributes::UnderFrequencyThreshold::Id,
+                                        credsIssuerConfig),                                                                       //
+        make_unique<SubscribeAttribute>(Id, "over-power-threshold", Attributes::OverPowerThreshold::Id, credsIssuerConfig),       //
+        make_unique<SubscribeAttribute>(Id, "under-power-threshold", Attributes::UnderPowerThreshold::Id, credsIssuerConfig),     //
+        make_unique<SubscribeAttribute>(Id, "over-current-threshold", Attributes::OverCurrentThreshold::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "under-current-threshold", Attributes::UnderCurrentThreshold::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "power-import-threshold", Attributes::PowerImportThreshold::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "power-export-threshold", Attributes::PowerExportThreshold::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),     //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                  //
+        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                        //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),              //
+        //
+        // Events
+        //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),                                    //
+        make_unique<ReadEvent>(Id, "notify", Events::Notify::Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig),                               //
+        make_unique<SubscribeEvent>(Id, "notify", Events::Notify::Id, credsIssuerConfig), //
+    };
+
+    commands.RegisterCluster(clusterName, clusterCommands);
+}
 void registerClusterElectricalDistribution(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
     using namespace chip::app::Clusters::ElectricalDistribution;
@@ -32318,6 +32859,102 @@ void registerClusterChime(Commands & commands, CredentialIssuerCommands * credsI
 
     commands.RegisterCluster(clusterName, clusterCommands);
 }
+void registerClusterAvAnalysis(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+{
+    using namespace chip::app::Clusters::AvAnalysis;
+
+    const char * clusterName = "AvAnalysis";
+
+    commands_list clusterCommands = {
+        //
+        // Commands
+        //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig),                 //
+        make_unique<AvAnalysisEnableContextTriggers>(credsIssuerConfig),    //
+        make_unique<AvAnalysisDisableContextTriggers>(credsIssuerConfig),   //
+        make_unique<AvAnalysisEstablishAnalysisStream>(credsIssuerConfig),  //
+        make_unique<AvAnalysisActivateAnalysisStream>(credsIssuerConfig),   //
+        make_unique<AvAnalysisDeactivateAnalysisStream>(credsIssuerConfig), //
+        make_unique<AvAnalysisRemoveAnalysisStream>(credsIssuerConfig),     //
+        //
+        // Attributes
+        //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "supported-ambient-contexts", Attributes::SupportedAmbientContexts::Id,
+                                   credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "active-ambient-context-triggers", Attributes::ActiveAmbientContextTriggers::Id,
+                                   credsIssuerConfig),                                                                          //
+        make_unique<ReadAttribute>(Id, "max-analysis-stream-count", Attributes::MaxAnalysisStreamCount::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "current-analysis-stream-count", Attributes::CurrentAnalysisStreamCount::Id,
+                                   credsIssuerConfig),                                                                     //
+        make_unique<ReadAttribute>(Id, "analysis-streams", Attributes::AnalysisStreams::Id, credsIssuerConfig),            //
+        make_unique<ReadAttribute>(Id, "tracking-enabled", Attributes::TrackingEnabled::Id, credsIssuerConfig),            //
+        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
+        make_unique<WriteAttributeAsComplex<
+            chip::app::DataModel::List<const chip::app::Clusters::Globals::Structs::SemanticTagStruct::Type>>>(
+            Id, "supported-ambient-contexts", Attributes::SupportedAmbientContexts::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<
+            chip::app::DataModel::List<const chip::app::Clusters::AvAnalysis::Structs::ContextTriggerStruct::Type>>>(
+            Id, "active-ambient-context-triggers", Attributes::ActiveAmbientContextTriggers::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<uint8_t>>(Id, "max-analysis-stream-count", 0, UINT8_MAX, Attributes::MaxAnalysisStreamCount::Id,
+                                             WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint8_t>>(Id, "current-analysis-stream-count", 0, UINT8_MAX,
+                                             Attributes::CurrentAnalysisStreamCount::Id, WriteCommandType::kForceWrite,
+                                             credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<
+            chip::app::DataModel::List<const chip::app::Clusters::AvAnalysis::Structs::AnalysisStreamStruct::Type>>>(
+            Id, "analysis-streams", Attributes::AnalysisStreams::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<bool>>(Id, "tracking-enabled", 0, 1, Attributes::TrackingEnabled::Id, WriteCommandType::kWrite,
+                                          credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::AttributeId>>>(
+            Id, "attribute-list", Attributes::AttributeList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "feature-map", 0, UINT32_MAX, Attributes::FeatureMap::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                  //
+        make_unique<SubscribeAttribute>(Id, "supported-ambient-contexts", Attributes::SupportedAmbientContexts::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "active-ambient-context-triggers", Attributes::ActiveAmbientContextTriggers::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "max-analysis-stream-count", Attributes::MaxAnalysisStreamCount::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "current-analysis-stream-count", Attributes::CurrentAnalysisStreamCount::Id,
+                                        credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "analysis-streams", Attributes::AnalysisStreams::Id, credsIssuerConfig),            //
+        make_unique<SubscribeAttribute>(Id, "tracking-enabled", Attributes::TrackingEnabled::Id, credsIssuerConfig),            //
+        make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        //
+        // Events
+        //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),                                                                  //
+        make_unique<ReadEvent>(Id, "analysis-session-start", Events::AnalysisSessionStart::Id, credsIssuerConfig),      //
+        make_unique<ReadEvent>(Id, "analysis-session-end", Events::AnalysisSessionEnd::Id, credsIssuerConfig),          //
+        make_unique<ReadEvent>(Id, "perceived-context", Events::PerceivedContext::Id, credsIssuerConfig),               //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig),                                                             //
+        make_unique<SubscribeEvent>(Id, "analysis-session-start", Events::AnalysisSessionStart::Id, credsIssuerConfig), //
+        make_unique<SubscribeEvent>(Id, "analysis-session-end", Events::AnalysisSessionEnd::Id, credsIssuerConfig),     //
+        make_unique<SubscribeEvent>(Id, "perceived-context", Events::PerceivedContext::Id, credsIssuerConfig),          //
+    };
+
+    commands.RegisterCluster(clusterName, clusterCommands);
+}
 void registerClusterCommodityTariff(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
     using namespace chip::app::Clusters::CommodityTariff;
@@ -33747,6 +34384,7 @@ void registerClusters(Commands & commands, CredentialIssuerCommands * credsIssue
     registerClusterWaterHeaterMode(commands, credsIssuerConfig);
     registerClusterDeviceEnergyManagementMode(commands, credsIssuerConfig);
     registerClusterElectricalGridConditions(commands, credsIssuerConfig);
+    registerClusterElectricalAlarm(commands, credsIssuerConfig);
     registerClusterElectricalDistribution(commands, credsIssuerConfig);
     registerClusterElectricalProtectionAlarm(commands, credsIssuerConfig);
     registerClusterDoorLock(commands, credsIssuerConfig);
@@ -33807,6 +34445,7 @@ void registerClusters(Commands & commands, CredentialIssuerCommands * credsIssue
     registerClusterWebRTCTransportRequestor(commands, credsIssuerConfig);
     registerClusterPushAvStreamTransport(commands, credsIssuerConfig);
     registerClusterChime(commands, credsIssuerConfig);
+    registerClusterAvAnalysis(commands, credsIssuerConfig);
     registerClusterCommodityTariff(commands, credsIssuerConfig);
     registerClusterEcosystemInformation(commands, credsIssuerConfig);
     registerClusterCommissionerControl(commands, credsIssuerConfig);

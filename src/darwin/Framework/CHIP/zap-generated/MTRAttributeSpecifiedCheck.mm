@@ -3391,6 +3391,73 @@ static BOOL AttributeIsSpecifiedInElectricalGridConditionsCluster(AttributeId aA
     }
     }
 }
+static BOOL AttributeIsSpecifiedInElectricalAlarmCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::ElectricalAlarm;
+    switch (aAttributeId) {
+    case Attributes::Mask::Id: {
+        return YES;
+    }
+    case Attributes::Latch::Id: {
+        return YES;
+    }
+    case Attributes::State::Id: {
+        return YES;
+    }
+    case Attributes::Supported::Id: {
+        return YES;
+    }
+    case Attributes::OverVoltageThreshold::Id: {
+        return YES;
+    }
+    case Attributes::UnderVoltageThreshold::Id: {
+        return YES;
+    }
+    case Attributes::OverFrequencyThreshold::Id: {
+        return YES;
+    }
+    case Attributes::UnderFrequencyThreshold::Id: {
+        return YES;
+    }
+    case Attributes::OverPowerThreshold::Id: {
+        return YES;
+    }
+    case Attributes::UnderPowerThreshold::Id: {
+        return YES;
+    }
+    case Attributes::OverCurrentThreshold::Id: {
+        return YES;
+    }
+    case Attributes::UnderCurrentThreshold::Id: {
+        return YES;
+    }
+    case Attributes::PowerImportThreshold::Id: {
+        return YES;
+    }
+    case Attributes::PowerExportThreshold::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        // Not a known ElectricalAlarm attribute.
+        return NO;
+    }
+    }
+}
 static BOOL AttributeIsSpecifiedInElectricalDistributionCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::ElectricalDistribution;
@@ -6679,6 +6746,49 @@ static BOOL AttributeIsSpecifiedInChimeCluster(AttributeId aAttributeId)
     }
     }
 }
+static BOOL AttributeIsSpecifiedInAVAnalysisCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::AvAnalysis;
+    switch (aAttributeId) {
+    case Attributes::SupportedAmbientContexts::Id: {
+        return YES;
+    }
+    case Attributes::ActiveAmbientContextTriggers::Id: {
+        return YES;
+    }
+    case Attributes::MaxAnalysisStreamCount::Id: {
+        return YES;
+    }
+    case Attributes::CurrentAnalysisStreamCount::Id: {
+        return YES;
+    }
+    case Attributes::AnalysisStreams::Id: {
+        return YES;
+    }
+    case Attributes::TrackingEnabled::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        // Not a known AVAnalysis attribute.
+        return NO;
+    }
+    }
+}
 static BOOL AttributeIsSpecifiedInCommodityTariffCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::CommodityTariff;
@@ -7609,6 +7719,9 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     case Clusters::ElectricalGridConditions::Id: {
         return AttributeIsSpecifiedInElectricalGridConditionsCluster(aAttributeId);
     }
+    case Clusters::ElectricalAlarm::Id: {
+        return AttributeIsSpecifiedInElectricalAlarmCluster(aAttributeId);
+    }
     case Clusters::ElectricalDistribution::Id: {
         return AttributeIsSpecifiedInElectricalDistributionCluster(aAttributeId);
     }
@@ -7788,6 +7901,9 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     }
     case Clusters::Chime::Id: {
         return AttributeIsSpecifiedInChimeCluster(aAttributeId);
+    }
+    case Clusters::AvAnalysis::Id: {
+        return AttributeIsSpecifiedInAVAnalysisCluster(aAttributeId);
     }
     case Clusters::CommodityTariff::Id: {
         return AttributeIsSpecifiedInCommodityTariffCluster(aAttributeId);

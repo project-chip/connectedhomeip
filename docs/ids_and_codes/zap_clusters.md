@@ -89,6 +89,7 @@ Generally regenerate using one of:
 |        158 |       0x9E | WaterHeaterMode                                         |
 |        159 |       0x9F | DeviceEnergyManagementMode                              |
 |        160 |       0xA0 | ElectricalGridConditions                                |
+|        161 |       0xA1 | ElectricalAlarm                                         |
 |        162 |       0xA2 | ElectricalDistribution                                  |
 |        163 |       0xA3 | ElectricalProtectionAlarm                               |
 |        257 |      0x101 | DoorLock                                                |
@@ -149,6 +150,7 @@ Generally regenerate using one of:
 |       1364 |      0x554 | WebRTCTransportRequestor                                |
 |       1365 |      0x555 | PushAvStreamTransport                                   |
 |       1366 |      0x556 | Chime                                                   |
+|       1367 |      0x557 | AvAnalysis                                              |
 |       1792 |      0x700 | CommodityTariff                                         |
 |       1872 |      0x750 | EcosystemInformation                                    |
 |       1873 |      0x751 | CommissionerControl                                     |

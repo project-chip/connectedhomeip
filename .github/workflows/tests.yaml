@@ -124,6 +124,7 @@ jobs:
                       --log-level info \
                       src/app/zap-templates/zcl/data-model/chip/global-attributes.xml \
                       src/app/zap-templates/zcl/data-model/chip/ambient-context-sensing-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/av-analysis-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/boolean-state-configuration-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/bridged-device-basic-information-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/chime-cluster.xml \
@@ -1347,7 +1348,7 @@ jobs:
                 path: gh-pages
 
           - name: Generate Allure Report
-            uses: simple-elf/allure-report-action@v1.13
+            uses: simple-elf/allure-report-action@v1.14
             with:
                 allure_results: junit-results
                 allure_report: allure-report

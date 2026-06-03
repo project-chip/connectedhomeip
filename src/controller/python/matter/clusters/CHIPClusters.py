@@ -7215,6 +7215,158 @@ class ChipClusters:
             },
         },
     }
+    _ELECTRICAL_ALARM_CLUSTER_INFO = {
+        "clusterName": "ElectricalAlarm",
+        "clusterId": 0x000000A1,
+        "commands": {
+            0x00000000: {
+                "commandId": 0x00000000,
+                "commandName": "Reset",
+                "args": {
+                    "alarms": "int",
+                },
+            },
+            0x00000001: {
+                "commandId": 0x00000001,
+                "commandName": "ModifyEnabledAlarms",
+                "args": {
+                    "mask": "int",
+                },
+            },
+            0x00000080: {
+                "commandId": 0x00000080,
+                "commandName": "SetElectricalAlarmThresholds",
+                "args": {
+                    "overVoltageThreshold": "int",
+                    "underVoltageThreshold": "int",
+                    "overFrequencyThreshold": "int",
+                    "underFrequencyThreshold": "int",
+                    "overPowerThreshold": "int",
+                    "underPowerThreshold": "int",
+                    "overCurrentThreshold": "int",
+                    "underCurrentThreshold": "int",
+                    "powerImportThreshold": "int",
+                    "powerExportThreshold": "int",
+                },
+            },
+        },
+        "attributes": {
+            0x00000000: {
+                "attributeName": "Mask",
+                "attributeId": 0x00000000,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000001: {
+                "attributeName": "Latch",
+                "attributeId": 0x00000001,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000002: {
+                "attributeName": "State",
+                "attributeId": 0x00000002,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000003: {
+                "attributeName": "Supported",
+                "attributeId": 0x00000003,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000080: {
+                "attributeName": "OverVoltageThreshold",
+                "attributeId": 0x00000080,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000081: {
+                "attributeName": "UnderVoltageThreshold",
+                "attributeId": 0x00000081,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000082: {
+                "attributeName": "OverFrequencyThreshold",
+                "attributeId": 0x00000082,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000083: {
+                "attributeName": "UnderFrequencyThreshold",
+                "attributeId": 0x00000083,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000084: {
+                "attributeName": "OverPowerThreshold",
+                "attributeId": 0x00000084,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000085: {
+                "attributeName": "UnderPowerThreshold",
+                "attributeId": 0x00000085,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000086: {
+                "attributeName": "OverCurrentThreshold",
+                "attributeId": 0x00000086,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000087: {
+                "attributeName": "UnderCurrentThreshold",
+                "attributeId": 0x00000087,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000088: {
+                "attributeName": "PowerImportThreshold",
+                "attributeId": 0x00000088,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000089: {
+                "attributeName": "PowerExportThreshold",
+                "attributeId": 0x00000089,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFF8: {
+                "attributeName": "GeneratedCommandList",
+                "attributeId": 0x0000FFF8,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFF9: {
+                "attributeName": "AcceptedCommandList",
+                "attributeId": 0x0000FFF9,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFB: {
+                "attributeName": "AttributeList",
+                "attributeId": 0x0000FFFB,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFC: {
+                "attributeName": "FeatureMap",
+                "attributeId": 0x0000FFFC,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFD: {
+                "attributeName": "ClusterRevision",
+                "attributeId": 0x0000FFFD,
+                "type": "int",
+                "reportable": True,
+            },
+        },
+    }
     _ELECTRICAL_DISTRIBUTION_CLUSTER_INFO = {
         "clusterName": "ElectricalDistribution",
         "clusterId": 0x000000A2,
@@ -14618,6 +14770,125 @@ class ChipClusters:
             },
         },
     }
+    _AV_ANALYSIS_CLUSTER_INFO = {
+        "clusterName": "AvAnalysis",
+        "clusterId": 0x00000557,
+        "commands": {
+            0x00000000: {
+                "commandId": 0x00000000,
+                "commandName": "EnableContextTriggers",
+                "args": {
+                    "contextTriggers": "ContextTriggerStruct",
+                },
+            },
+            0x00000001: {
+                "commandId": 0x00000001,
+                "commandName": "DisableContextTriggers",
+                "args": {
+                    "contextTriggers": "ContextTriggerStruct",
+                },
+            },
+            0x00000002: {
+                "commandId": 0x00000002,
+                "commandName": "EstablishAnalysisStream",
+                "args": {
+                    "nodeID": "int",
+                },
+            },
+            0x00000004: {
+                "commandId": 0x00000004,
+                "commandName": "ActivateAnalysisStream",
+                "args": {
+                    "analysisStreamID": "int",
+                    "webRTCEndpointID": "int",
+                    "pushAVEndpointID": "int",
+                },
+            },
+            0x00000005: {
+                "commandId": 0x00000005,
+                "commandName": "DeactivateAnalysisStream",
+                "args": {
+                    "analysisStreamID": "int",
+                },
+            },
+            0x00000006: {
+                "commandId": 0x00000006,
+                "commandName": "RemoveAnalysisStream",
+                "args": {
+                    "analysisStreamID": "int",
+                },
+            },
+        },
+        "attributes": {
+            0x00000000: {
+                "attributeName": "SupportedAmbientContexts",
+                "attributeId": 0x00000000,
+                "type": "",
+                "reportable": True,
+            },
+            0x00000001: {
+                "attributeName": "ActiveAmbientContextTriggers",
+                "attributeId": 0x00000001,
+                "type": "",
+                "reportable": True,
+            },
+            0x00000002: {
+                "attributeName": "MaxAnalysisStreamCount",
+                "attributeId": 0x00000002,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000003: {
+                "attributeName": "CurrentAnalysisStreamCount",
+                "attributeId": 0x00000003,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000004: {
+                "attributeName": "AnalysisStreams",
+                "attributeId": 0x00000004,
+                "type": "",
+                "reportable": True,
+            },
+            0x00000005: {
+                "attributeName": "TrackingEnabled",
+                "attributeId": 0x00000005,
+                "type": "bool",
+                "reportable": True,
+                "writable": True,
+            },
+            0x0000FFF8: {
+                "attributeName": "GeneratedCommandList",
+                "attributeId": 0x0000FFF8,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFF9: {
+                "attributeName": "AcceptedCommandList",
+                "attributeId": 0x0000FFF9,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFB: {
+                "attributeName": "AttributeList",
+                "attributeId": 0x0000FFFB,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFC: {
+                "attributeName": "FeatureMap",
+                "attributeId": 0x0000FFFC,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFD: {
+                "attributeName": "ClusterRevision",
+                "attributeId": 0x0000FFFD,
+                "type": "int",
+                "reportable": True,
+            },
+        },
+    }
     _COMMODITY_TARIFF_CLUSTER_INFO = {
         "clusterName": "CommodityTariff",
         "clusterId": 0x00000700,
@@ -16687,6 +16958,7 @@ class ChipClusters:
         0x0000009E: _WATER_HEATER_MODE_CLUSTER_INFO,
         0x0000009F: _DEVICE_ENERGY_MANAGEMENT_MODE_CLUSTER_INFO,
         0x000000A0: _ELECTRICAL_GRID_CONDITIONS_CLUSTER_INFO,
+        0x000000A1: _ELECTRICAL_ALARM_CLUSTER_INFO,
         0x000000A2: _ELECTRICAL_DISTRIBUTION_CLUSTER_INFO,
         0x000000A3: _ELECTRICAL_PROTECTION_ALARM_CLUSTER_INFO,
         0x00000101: _DOOR_LOCK_CLUSTER_INFO,
@@ -16747,6 +17019,7 @@ class ChipClusters:
         0x00000554: _WEB_RTC_TRANSPORT_REQUESTOR_CLUSTER_INFO,
         0x00000555: _PUSH_AV_STREAM_TRANSPORT_CLUSTER_INFO,
         0x00000556: _CHIME_CLUSTER_INFO,
+        0x00000557: _AV_ANALYSIS_CLUSTER_INFO,
         0x00000700: _COMMODITY_TARIFF_CLUSTER_INFO,
         0x00000750: _ECOSYSTEM_INFORMATION_CLUSTER_INFO,
         0x00000751: _COMMISSIONER_CONTROL_CLUSTER_INFO,
@@ -16839,6 +17112,7 @@ class ChipClusters:
         "WaterHeaterMode": _WATER_HEATER_MODE_CLUSTER_INFO,
         "DeviceEnergyManagementMode": _DEVICE_ENERGY_MANAGEMENT_MODE_CLUSTER_INFO,
         "ElectricalGridConditions": _ELECTRICAL_GRID_CONDITIONS_CLUSTER_INFO,
+        "ElectricalAlarm": _ELECTRICAL_ALARM_CLUSTER_INFO,
         "ElectricalDistribution": _ELECTRICAL_DISTRIBUTION_CLUSTER_INFO,
         "ElectricalProtectionAlarm": _ELECTRICAL_PROTECTION_ALARM_CLUSTER_INFO,
         "DoorLock": _DOOR_LOCK_CLUSTER_INFO,
@@ -16899,6 +17173,7 @@ class ChipClusters:
         "WebRTCTransportRequestor": _WEB_RTC_TRANSPORT_REQUESTOR_CLUSTER_INFO,
         "PushAvStreamTransport": _PUSH_AV_STREAM_TRANSPORT_CLUSTER_INFO,
         "Chime": _CHIME_CLUSTER_INFO,
+        "AvAnalysis": _AV_ANALYSIS_CLUSTER_INFO,
         "CommodityTariff": _COMMODITY_TARIFF_CLUSTER_INFO,
         "EcosystemInformation": _ECOSYSTEM_INFORMATION_CLUSTER_INFO,
         "CommissionerControl": _COMMISSIONER_CONTROL_CLUSTER_INFO,
