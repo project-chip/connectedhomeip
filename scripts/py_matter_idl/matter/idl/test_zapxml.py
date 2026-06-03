@@ -25,7 +25,7 @@ except ImportError:
     sys.path.append(str(Path(__file__).resolve().parent / ".." / ".."))
     from matter.idl.zapxml import ParseSource, ParseXmls
 
-from matter.idl.matter_idl_types import (AccessPrivilege, Attribute, AttributeQuality, Bitmap, Cluster, Command, ConstantEntry,
+from matter.idl.matter_idl_types import (AccessPrivilege, Attribute, AttributeQuality, Bitmap, Cluster, Command, CommandQuality, ConstantEntry,
                                          DataType, Enum, Event, EventPriority, EventQuality, Field, FieldQuality, Idl, Struct,
                                          StructQuality, StructTag)
 
@@ -153,7 +153,8 @@ class TestXmlParser(unittest.TestCase):
                                      Command(name='GetSomeData', code=33,
                                              input_param='GetSomeDataRequest', output_param='GetSomeDataResponse',
                                              description='This is just a test: client to server',
-                                             invokeacl=AccessPrivilege.ADMINISTER)
+                                             invokeacl=AccessPrivilege.ADMINISTER,
+                                             qualities=CommandQuality.OPTIONAL)
                                  ])
                          ]))
 

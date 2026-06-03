@@ -274,6 +274,9 @@ class EventHandler(BaseHandler):
             field = AttributesToField(attrs)
             self._event.fields.append(field)
             return FieldHandler(self.context, field)
+        if name == "optionalConform":
+            self._event.qualities |= EventQuality.OPTIONAL
+            return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
         if name == "mandatoryConform":
             # assume handled (we do not record conformance in IDL)
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
@@ -500,7 +503,11 @@ class CommandHandler(BaseHandler):
             self._cluster.commands.append(self._command)
 
     def GetNextProcessor(self, name: str, attrs: AttributesImpl):
-        if name in {"mandatoryConform", "optionalConform", "disallowConform"}:
+        if name == "optionalConform":
+            if self._command:
+                self._command.qualities |= CommandQuality.OPTIONAL
+            return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
+        if name in {"mandatoryConform", "disallowConform"}:
             # Unclear how commands may be optional or mandatory
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
         if name == "access":

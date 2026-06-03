@@ -57,6 +57,8 @@ def human_text_string(value: Union[StructTag, StructQuality, EventPriority, Even
         result = ""
         if EventQuality.FABRIC_SENSITIVE in value:
             result += "fabric_sensitive "
+        if EventQuality.OPTIONAL in value:
+            result += "optional "
         return result.strip()
     elif type(value) is AccessPrivilege:
         if value == AccessPrivilege.VIEW:
@@ -84,6 +86,8 @@ def human_text_string(value: Union[StructTag, StructQuality, EventPriority, Even
             result += "fabric "
         if CommandQuality.TIMED_INVOKE in value:
             result += "timed "
+        if CommandQuality.OPTIONAL in value:
+            result += "optional "
         return result
     elif type(value) is ApiMaturity:
         if value == ApiMaturity.STABLE:

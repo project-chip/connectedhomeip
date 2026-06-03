@@ -38,6 +38,8 @@ def UnionOfAllFlags(flags_list):
     return functools.reduce(lambda a, b: a | b, flags_list)
 
 
+
+
 class PrefixCppDocComment:
     def __init__(self, token):
         self.start_pos = token.start_pos
@@ -284,20 +286,20 @@ class MatterIdlTransformer(Transformer):
     def debug_priority(self, _):
         return EventPriority.DEBUG
 
-    def event_fabric_sensitive(self, _):
-        return EventQuality.FABRIC_SENSITIVE
+    def prefix_fabric_sensitive(self, _):
+        return "fabric_sensitive"
 
-    def event_qualities(selt, qualities):
-        return UnionOfAllFlags(qualities) or EventQuality.NONE
+    def prefix_fabric_scoped(self, _):
+        return "fabric"
 
-    def timed_command(self, _):
-        return CommandQuality.TIMED_INVOKE
+    def prefix_timed(self, _):
+        return "timed"
 
-    def fabric_scoped_command(self, _):
-        return CommandQuality.FABRIC_SCOPED
+    def prefix_optional(self, _):
+        return "optional"
 
-    def command_qualities(self, attrs):
-        return UnionOfAllFlags(attrs) or CommandQuality.NONE
+    def prefix_qualities(self, qualities):
+        return set(qualities)
 
     @v_args(meta=True)
     def struct_field(self, meta, args):
@@ -336,11 +338,20 @@ class MatterIdlTransformer(Transformer):
         if len(args) != 5:
             args.insert(2, None)
 
+        qualities_set = args[0] or set()
+        qualities = CommandQuality.NONE
+        if "fabric" in qualities_set:
+            qualities |= CommandQuality.FABRIC_SCOPED
+        if "timed" in qualities_set:
+            qualities |= CommandQuality.TIMED_INVOKE
+        if "optional" in qualities_set:
+            qualities |= CommandQuality.OPTIONAL
+
         meta = None if self.skip_meta else ParseMetaData(meta)
 
         return Command(
             parse_meta=meta,
-            qualities=args[0],
+            qualities=qualities,
             input_param=args[2], output_param=args[3], code=args[4],
             **args[1],
         )
@@ -366,8 +377,15 @@ class MatterIdlTransformer(Transformer):
 
     @v_args(meta=True)
     def event(self, meta, args):
+        qualities_set = args[0] or set()
+        qualities = EventQuality.NONE
+        if "fabric_sensitive" in qualities_set:
+            qualities |= EventQuality.FABRIC_SENSITIVE
+        if "optional" in qualities_set:
+            qualities |= EventQuality.OPTIONAL
+
         meta = None if self.skip_meta else ParseMetaData(meta)
-        return Event(qualities=args[0], priority=args[1], code=args[3], fields=args[4:], parse_meta=meta, **args[2])
+        return Event(qualities=qualities, priority=args[1], code=args[3], fields=args[4:], parse_meta=meta, **args[2])
 
     def view_privilege(self, args):
         return AccessPrivilege.VIEW
