@@ -92,7 +92,6 @@ jobs:
                 slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}
 
     # Builds and runs the host unit-test suite with the PSA crypto backend.
-    # Kept separate from the matrix above because it uses build_examples to build
     psa_crypto_unit_tests:
         name: PSA Crypto Unit Tests
         if: github.actor != 'restyled-io[bot]'
