@@ -57,27 +57,6 @@ bool WaterHeaterManagementCluster::HasFeature(Feature aFeature) const
     return mFeature.Has(aFeature);
 }
 
-/***************************************************************************
- *
- * Delegate event forwarding
- *
- ***************************************************************************/
-
-CHIP_ERROR Delegate::GenerateBoostStartedEvent(uint32_t durationSecs, Optional<bool> oneShot, Optional<bool> emergencyBoost,
-                                               Optional<int16_t> temporarySetpoint, Optional<Percent> targetPercentage,
-                                               Optional<Percent> targetReheat)
-{
-    VerifyOrReturnError(mCluster != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    return mCluster->GenerateBoostStartedEvent(durationSecs, oneShot, emergencyBoost, temporarySetpoint, targetPercentage,
-                                               targetReheat);
-}
-
-CHIP_ERROR Delegate::GenerateBoostEndedEvent()
-{
-    VerifyOrReturnError(mCluster != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    return mCluster->GenerateBoostEndedEvent();
-}
-
 CHIP_ERROR WaterHeaterManagementCluster::GenerateBoostStartedEvent(uint32_t durationSecs, Optional<bool> oneShot,
                                                                    Optional<bool> emergencyBoost,
                                                                    Optional<int16_t> temporarySetpoint,
