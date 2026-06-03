@@ -1208,12 +1208,16 @@ server cluster A = 1 { /* Test comment */ }
                             data_type=DataType(name="int8u"), code=3, name="optNullAttr", qualities=FieldQuality.OPTIONAL | FieldQuality.NULLABLE)),
                     ],
                     events=[
-                        Event(priority=EventPriority.INFO, name="OptionalEvent", code=1, fields=[], qualities=EventQuality.OPTIONAL),
-                        Event(priority=EventPriority.CRITICAL, name="OptionalCriticalEvent", code=2, fields=[], qualities=EventQuality.OPTIONAL),
+                        Event(priority=EventPriority.INFO, name="OptionalEvent",
+                              code=1, fields=[], qualities=EventQuality.OPTIONAL),
+                        Event(priority=EventPriority.CRITICAL, name="OptionalCriticalEvent",
+                              code=2, fields=[], qualities=EventQuality.OPTIONAL),
                     ],
                     commands=[
-                        Command(name="OptionalCommand", code=10, input_param=None, output_param="DefaultSuccess", qualities=CommandQuality.OPTIONAL),
-                        Command(name="OptionalTimedCommand", code=11, input_param=None, output_param="DefaultSuccess", qualities=CommandQuality.TIMED_INVOKE | CommandQuality.OPTIONAL),
+                        Command(name="OptionalCommand", code=10, input_param=None,
+                                output_param="DefaultSuccess", qualities=CommandQuality.OPTIONAL),
+                        Command(name="OptionalTimedCommand", code=11, input_param=None, output_param="DefaultSuccess",
+                                qualities=CommandQuality.TIMED_INVOKE | CommandQuality.OPTIONAL),
                     ]
                     )])
 

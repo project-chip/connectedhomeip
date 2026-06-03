@@ -38,8 +38,6 @@ def UnionOfAllFlags(flags_list):
     return functools.reduce(lambda a, b: a | b, flags_list)
 
 
-
-
 class PrefixCppDocComment:
     def __init__(self, token):
         self.start_pos = token.start_pos
