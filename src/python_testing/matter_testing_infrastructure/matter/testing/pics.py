@@ -18,6 +18,7 @@ import glob
 import json
 import logging
 import os
+import re
 import xml.etree.ElementTree as ET
 from dataclasses import dataclass, field
 
@@ -40,6 +41,21 @@ _AGGREGATOR_DEVICE_TYPE_ID = 0x000E
 # device. Used to derive MCORE.ROLE.COMMISSIONEE.
 _ROOT_NODE_DEVICE_TYPE_ID = 0x0016
 
+_ENDPOINT_DIR_PATTERN = re.compile(r'^(?:endpoint|ep)?[\s_-]*(\d+)$', re.IGNORECASE)
+def _find_endpoint_subdir(root_dir: str, endpoint: int) -> str | None:
+    """
+    Find the subdirectory under root_dir whose name resolves to `endpoint`.
+    Tolerates common conventions: endpoint0, Endpoint_0, EP0, ep 0, 0, etc.
+    Case-insensitive. Returns None if no match.
+    """
+    for name in os.listdir(root_dir):
+        full = os.path.join(root_dir, name)
+        if not os.path.isdir(full):
+            continue
+        match = _ENDPOINT_DIR_PATTERN.match(name)
+        if match and int(match.group(1)) == endpoint:
+            return full
+    return None
 
 def event_pics_str(pics_base: str, eid: int) -> str:
     return f'{pics_base}.S.E{eid:02x}'
@@ -113,11 +129,14 @@ def parse_pics_xml(contents: str) -> dict[str, bool]:
 
 
 def read_pics_from_file(path: str, endpoint: int | None = None) -> dict[str, bool]:
-    """Reads PICS from a CI-format text file or a PICSGenerator-shaped directory.
+    """
+    Reads PICS from a CI-format text file or a directory of PICS XML files.
     For directory inputs, top-level *.xml files are always loaded (device-wide
-    codes like MCORE.*). If `endpoint` is supplied and `<path>/endpoint<N>/`
-    exists, that subdirectory's *.xml files are loaded too. Other endpoint
-    subdirs are skipped so per-endpoint test checks don't see foreign clusters.
+    codes like MCORE.*). If `endpoint` is supplied, the matching per-endpoint
+    subdirectory's *.xml files are loaded too. Common naming conventions are
+    accepted: `endpoint0`, `Endpoint_0`, `EP0`, `ep 0`, `0`, etc. (case-
+    insensitive). Other endpoint subdirs are skipped so per-endpoint test
+    checks don't see foreign clusters.
     """
     if os.path.isdir(os.path.abspath(path)):
         pics_dict: dict[str, bool] = {}
@@ -125,8 +144,8 @@ def read_pics_from_file(path: str, endpoint: int | None = None) -> dict[str, boo
             with open(filename) as f:
                 pics_dict.update(parse_pics_xml(f.read()))
         if endpoint is not None:
-            ep_dir = os.path.join(path, f'endpoint{endpoint}')
-            if os.path.isdir(ep_dir):
+            ep_dir = _find_endpoint_subdir(path, endpoint)
+            if ep_dir is not None:
                 for filename in glob.glob(f'{ep_dir}/*.xml'):
                     with open(filename) as f:
                         pics_dict.update(parse_pics_xml(f.read()))
