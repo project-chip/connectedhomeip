@@ -19,9 +19,9 @@
 
 #include <access/examples/PermissiveAccessControlDelegate.h>
 #include <app/AttributeValueEncoder.h>
+#include <app/ClusterStateCache.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/InteractionModelEngine.h>
-#include <app/ClusterStateCache.h>
 #include <app/InteractionModelHelper.h>
 #include <app/MessageDef/AttributeReportIBs.h>
 #include <app/MessageDef/EventDataIB.h>
