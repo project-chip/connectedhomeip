@@ -14,4 +14,5 @@
 app_config_dependent_sources = [
   "CodegenIntegration.cpp",
   "CodegenIntegration.h",
+  "water-heater-management-server.h",
 ]
