@@ -102,4 +102,3 @@ class MatterTestConfig:
 
     # Debug mode to capture attribute dump at end of test modules
     debug: bool = False
-    min_frame_rate: int = 30

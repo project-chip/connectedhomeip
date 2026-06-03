@@ -138,7 +138,7 @@ class WEBRTCPTestBase:
             videoStreamAllocateCmd = commands.VideoStreamAllocate(
                 streamUsage=Globals.Enums.StreamUsageEnum.kLiveView,
                 videoCodec=aRateDistortionTradeOffPoints[0].codec,
-                minFrameRate=min(self.matter_test_config.min_frame_rate, aVideoSensorParams.maxFPS),
+                minFrameRate=min(self.user_params.get("minFrameRate", 30), aVideoSensorParams.maxFPS),
                 maxFrameRate=aVideoSensorParams.maxFPS,
                 minResolution=aMinViewportRes,
                 maxResolution=cluster.Structs.VideoResolutionStruct(
