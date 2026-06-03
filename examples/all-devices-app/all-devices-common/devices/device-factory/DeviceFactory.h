@@ -24,6 +24,7 @@
 #include <devices/chime/ChimeDevice.h>
 #include <devices/dimmable-light/impl/LoggingDimmableLightDevice.h>
 #include <devices/network-infrastructure-manager/NetworkInfrastructureManagerDevice.h>
+#include <app/clusters/thread-network-diagnostics-server/NullThreadDiagnosticsProvider.h>
 #include <devices/occupancy-sensor/impl/TogglingOccupancySensorDevice.h>
 #include <devices/on-off-light/LoggingOnOffLightDevice.h>
 #include <devices/proximity-ranger/ProximityRangerDevice.h>
@@ -107,6 +108,7 @@ private:
     std::map<std::string, DeviceCreator> mRegistry;
     std::optional<Context> mContext;
     std::string mDefaultDevice;
+    Clusters::ThreadNetworkDiagnostics::NullThreadDiagnosticsProvider mNullThreadDiagnosticsProvider;
 
     DeviceFactory()
     {
@@ -181,7 +183,7 @@ private:
         {
             RegisterCreator("network-infrastructure-manager", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return std::make_unique<NetworkInfrastructureManagerDevice>(mContext->storageDelegate);
+                return std::make_unique<NetworkInfrastructureManagerDevice>(mContext->storageDelegate, mNullThreadDiagnosticsProvider);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_ON_OFF_LIGHT)

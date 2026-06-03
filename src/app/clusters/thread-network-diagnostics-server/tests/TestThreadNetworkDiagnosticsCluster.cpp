@@ -16,7 +16,7 @@
  */
 #include <pw_unit_test/framework.h>
 
-#include <app/clusters/thread-network-diagnostics-server/DefaultThreadNetworkDiagnosticsProvider.h>
+#include <app/clusters/thread-network-diagnostics-server/NullThreadDiagnosticsProvider.h>
 #include <app/clusters/thread-network-diagnostics-server/ThreadNetworkDiagnosticsCluster.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <app/server-cluster/testing/AttributeTesting.h>
@@ -45,7 +45,7 @@ struct TestThreadNetworkDiagnosticsCluster : public ::testing::Test
     TestThreadNetworkDiagnosticsCluster() {}
 
     TestServerClusterContext testContext;
-    DefaultThreadNetworkDiagnosticsProvider mProvider;
+    NullThreadDiagnosticsProvider mProvider;
 };
 
 } // namespace

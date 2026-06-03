@@ -16,7 +16,10 @@
  *    limitations under the License.
  */
 
-#include <app/clusters/thread-network-diagnostics-server/DefaultThreadNetworkDiagnosticsProvider.h>
+#include <app/clusters/thread-network-diagnostics-server/NullThreadDiagnosticsProvider.h>
+#if (CHIP_DEVICE_CONFIG_ENABLE_THREAD && !CHIP_DEVICE_CONFIG_USES_OTBR_POSIX_DBUS_STACK)
+#include <app/clusters/thread-network-diagnostics-server/OpenThreadDiagnosticsProvider.h>
+#endif
 #include <app/clusters/thread-network-diagnostics-server/ThreadNetworkDiagnosticsCluster.h>
 #include <app/static-cluster-config/ThreadNetworkDiagnostics.h>
 #include <app/util/endpoint-config-api.h>
@@ -39,9 +42,13 @@ constexpr size_t kThreadNetworkDiagnosticsMaxClusterCount =
 
 LazyRegisteredServerCluster<ThreadNetworkDiagnosticsCluster> gServers[kThreadNetworkDiagnosticsMaxClusterCount];
 
-DefaultThreadNetworkDiagnosticsProvider & GetDefaultProvider()
+ThreadNetworkDiagnosticsProvider & GetDefaultProvider()
 {
-    static DefaultThreadNetworkDiagnosticsProvider sDefaultProvider;
+#if (CHIP_DEVICE_CONFIG_ENABLE_THREAD && !CHIP_DEVICE_CONFIG_USES_OTBR_POSIX_DBUS_STACK)
+    static OpenThreadDiagnosticsProvider sDefaultProvider;
+#else
+    static NullThreadDiagnosticsProvider sDefaultProvider;
+#endif
     return sDefaultProvider;
 }
 

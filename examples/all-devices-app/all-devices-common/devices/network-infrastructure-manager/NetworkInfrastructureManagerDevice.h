@@ -20,8 +20,8 @@
 #include <app/clusters/general-commissioning-server/BreadCrumbTracker.h>
 #include <app/clusters/thread-border-router-management-server/ThreadBorderRouterManagementCluster.h>
 #include <app/clusters/thread-border-router-management-server/ThreadBorderRouterManagementDelegate.h>
-#include <app/clusters/thread-network-diagnostics-server/DefaultThreadNetworkDiagnosticsProvider.h>
 #include <app/clusters/thread-network-diagnostics-server/ThreadNetworkDiagnosticsCluster.h>
+#include <app/clusters/thread-network-diagnostics-server/ThreadNetworkDiagnosticsProvider.h>
 #include <app/clusters/thread-network-directory-server/DefaultThreadNetworkDirectoryStorage.h>
 #include <app/clusters/thread-network-directory-server/ThreadNetworkDirectoryCluster.h>
 #include <app/clusters/wifi-network-management-server/WiFiNetworkManagementCluster.h>
@@ -44,7 +44,7 @@ private:
 class NetworkInfrastructureManagerDevice : public SingleEndpointDevice, public Clusters::ThreadBorderRouterManagementDelegate
 {
 public:
-    NetworkInfrastructureManagerDevice(PersistentStorageDelegate & storage);
+    NetworkInfrastructureManagerDevice(PersistentStorageDelegate & storage, Clusters::ThreadNetworkDiagnostics::ThreadNetworkDiagnosticsProvider & provider);
     ~NetworkInfrastructureManagerDevice() override;
 
     CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
@@ -68,7 +68,7 @@ public:
 protected:
     SimpleBreadCrumbTracker mBreadCrumbTracker;
     DefaultThreadNetworkDirectoryStorage mThreadNetworkDirectoryStorage;
-    Clusters::ThreadNetworkDiagnostics::DefaultThreadNetworkDiagnosticsProvider mThreadDiagnosticsProvider;
+    Clusters::ThreadNetworkDiagnostics::ThreadNetworkDiagnosticsProvider & mThreadDiagnosticsProvider;
 
     LazyRegisteredServerCluster<Clusters::ThreadBorderRouterManagementCluster> mThreadBorderRouterManagementCluster;
     LazyRegisteredServerCluster<Clusters::WiFiNetworkManagementCluster> mWiFiNetworkManagementCluster;
