@@ -75,7 +75,7 @@ This will be made more clear using examples
     ```cpp
 
     // the config
-    MyWiredPowerSourceCluster::ConfigType config(powerSourceEndpointId, "Wired Power Source (description)"_span, PowerSource::WiredCurrentTypeEnum::kDc);
+    MyWiredPowerSourceCluster::Config config(powerSourceEndpointId, "Wired Power Source (description)"_span, PowerSource::WiredCurrentTypeEnum::kDc);
     config.wiredNominalVoltage = 23000; // 23V
 
     // the cluster
@@ -172,18 +172,18 @@ This will be made more clear using examples
     attrSet3.Set<PowerSource::Attributes::BatCapacity::Id>();
 
     // the configs
-    MyBatteryPowerSourceCluster::ConfigType config1(powerSourceEndpointId1, "Simple battery cluster"_span, PowerSource::BatReplaceabilityEnum::kUnspecified, timerDelegate);
+    MyBatteryPowerSourceCluster::Config config1(powerSourceEndpointId1, "Simple battery cluster"_span, PowerSource::BatReplaceabilityEnum::kUnspecified, timerDelegate);
     config1.batPercentRemaining = 200; // 100%, doubled percentage
     config1.usedOptionalAttributes = attrSet1;
 
-    MyBatteryPowerSourceCluster::ConfigType config2(powerSourceEndpointId1, "Rechargeable battery cluster"_span, PowerSource::BatReplaceabilityEnum::kNotReplaceable, timerDelegate);
+    MyBatteryPowerSourceCluster::Config config2(powerSourceEndpointId1, "Rechargeable battery cluster"_span, PowerSource::BatReplaceabilityEnum::kNotReplaceable, timerDelegate);
     // this will make the cluster report itself as rechargeable, otherwise it would be like a simple cluster to the data model
     config2.MakeRechargeable();
     config2.batPercentRemaining = 200;
     config2.batChargingCurrent = 5000; // 5A
     config2.usedOptionalAttributes = attrSet2;
 
-    MyBatteryPowerSourceCluster::ConfigType config3(powerSourceEndpointId1, "Replaceable battery cluster"_span, PowerSource::BatReplaceabilityEnum::kUserReplaceable, timerDelegate);
+    MyBatteryPowerSourceCluster::Config config3(powerSourceEndpointId1, "Replaceable battery cluster"_span, PowerSource::BatReplaceabilityEnum::kUserReplaceable, timerDelegate);
     // make it replaceable
     config3.MakeReplaceable("Description for replacement"_span, /* quantity */ 1);
     config3.batTimeRemaining = 3600; // 1h estimated uptime
@@ -243,10 +243,10 @@ This will be made more clear using examples
     ```cpp
 
     // the configs
-    MyWiredPowerSourceCluster::ConfigType config1(powerSourceEndpointId1, "Wired cluster"_span, PowerSource::WiredCurrentTypeEnum::kAc);
+    MyWiredPowerSourceCluster::Config config1(powerSourceEndpointId1, "Wired cluster"_span, PowerSource::WiredCurrentTypeEnum::kAc);
     config1.status = PowerSource::PowerSourceStatusEnum::kUnavailable;
 
-    MyBatteryPowerSourceCluster::ConfigType config2(powerSourceEndpointId1, "Simple battery cluster"_span, PowerSource::BatReplaceabilityEnum::kNotReplaceable, timerDelegate);
+    MyBatteryPowerSourceCluster::Config config2(powerSourceEndpointId1, "Simple battery cluster"_span, PowerSource::BatReplaceabilityEnum::kNotReplaceable, timerDelegate);
 
     // the clusters
     RegisteredServerCluster<MyWiredPowerSourceCluster> wiredInstance(config1);
