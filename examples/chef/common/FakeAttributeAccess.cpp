@@ -366,7 +366,7 @@ public:
             }
             break;
 #endif // MATTER_DM_BOOLEAN_STATE_CONFIGURATION_CLUSTER_SERVER_ENDPOINT_COUNT > 0
-#if MATTER_DM_CONCENTRATION_MEASUREMENT_WANTED
+#if defined(MATTER_DM_CONCENTRATION_MEASUREMENT_WANTED)
         case CarbonDioxideConcentrationMeasurement::Id:
         case CarbonMonoxideConcentrationMeasurement::Id:
         case NitrogenDioxideConcentrationMeasurement::Id:
