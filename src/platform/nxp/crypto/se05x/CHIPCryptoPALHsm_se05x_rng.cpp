@@ -24,13 +24,8 @@
 
 #include "CHIPCryptoPALHsm_se05x_utils.h"
 #include <lib/core/CHIPEncoding.h>
-
-#if MBEDTLS_VERSION_NUMBER < 0x04000000
-#if ENABLE_SE05X_RND_GEN
 #include <mbedtls/ctr_drbg.h>
 #include <mbedtls/entropy.h>
-#endif
-#endif
 
 namespace chip {
 namespace Crypto {
