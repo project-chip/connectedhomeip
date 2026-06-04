@@ -131,7 +131,7 @@ TEST_F(TestSmokeCoAlarmCluster, ReadAttributes_FeatureMapRevisionAndDefaults)
 
     uint8_t sensitivity{};
     ASSERT_EQ(tester.ReadAttribute(Attributes::SmokeSensitivityLevel::Id, sensitivity), CHIP_NO_ERROR);
-    EXPECT_EQ(sensitivity, to_underlying(SensitivityEnum::kHigh));
+    EXPECT_EQ(sensitivity, to_underlying(SensitivityEnum::kStandard));
 }
 
 TEST_F(TestSmokeCoAlarmCluster, SetSmokeState_ReadBack)
