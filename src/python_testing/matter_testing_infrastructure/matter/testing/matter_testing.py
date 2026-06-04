@@ -226,8 +226,8 @@ class MatterBaseTest(base_test.BaseTestClass):
         # Set to True by commission_devices() on success; gates the per-test ACL read in
         # setup_test so unit tests (which never commission) incur zero network overhead.
         self._dut_confirmed_available = False
-        # Set to True by teardown_test so the decorator does not call the base teardown
-        # again when the override already called super().teardown_test().
+        # Prevents double-execution when the override calls super().teardown_test()
+        # and __init_subclass__ also calls it afterward.
         self._teardown_ran = False
 
     #
