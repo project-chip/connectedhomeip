@@ -16,11 +16,11 @@
 #
 
 
-from DeviceConformanceTests import DeviceConformanceTests
 from mobly import asserts, signals
 
 import matter.clusters as Clusters
 from matter.testing.conformance import ConformanceAssessmentData, ConformanceDecision, ConformanceException
+from matter.testing.device_conformance_tests import DeviceConformanceTests
 from matter.testing.global_attribute_ids import is_standard_attribute_id
 from matter.testing.runner import default_matter_test_main
 from matter.testing.spec_parsing import PrebuiltDataModelDirectory, build_xml_clusters, dm_from_spec_version
@@ -102,11 +102,11 @@ class TestSpecParsingSelection(DeviceConformanceTests):
             spec_generated_commands = xml_clusters[cluster.id].generated_commands
             info = ConformanceAssessmentData(feature_map=feature_map, attribute_list=[], all_command_list=[], cluster_revision=1)
             # Build just the lists - basic composition checks the wildcard against the lists, conformance just uses lists
-            attributes = [id for id, a in spec_attributes.items() if a.conformance(
+            attributes = [_id for _id, a in spec_attributes.items() if a.conformance(
                 info).decision == ConformanceDecision.MANDATORY]
-            accepted_commands = [id for id, c in spec_accepted_commands.items() if c.conformance(
+            accepted_commands = [_id for _id, c in spec_accepted_commands.items() if c.conformance(
                 info).decision == ConformanceDecision.MANDATORY]
-            generated_commands = [id for id, c in spec_generated_commands.items() if c.conformance(
+            generated_commands = [_id for _id, c in spec_generated_commands.items() if c.conformance(
                 info).decision == ConformanceDecision.MANDATORY]
             attr = cluster.Attributes
 
@@ -143,14 +143,15 @@ class TestSpecParsingSelection(DeviceConformanceTests):
         self._create_device(spec_version, tc_enabled)
         # build the spec XMLs for the stated version
         self.build_spec_xmls()
-        success, problems = self.check_conformance(ignore_in_progress=False, is_ci=False, allow_provisional=False)
+        success, problems = self.check_conformance(ignore_in_progress_test_event_only_disallowed_for_certification=False,
+                                                   is_ci=False, allow_provisional_test_event_only_disallowed_for_certification=False)
         problem_strs = [str(p) for p in problems]
         problem_str = "\n".join(problem_strs)
         spec_version_str = f'{spec_version:08X}' if spec_version is not None else "None (1.2)"
         asserts.assert_equal(success, expect_success_conformance,
                              f"Improper conformance result for spec version {spec_version_str}, TC: {tc_enabled} problems: {problem_str}")
 
-        success, problems = self.check_revisions(ignore_in_progress=False)
+        success, problems = self.check_revisions(ignore_in_progress_test_event_only_disallowed_for_certification=False)
         asserts.assert_equal(success, expect_success_revisions,
                              f"Improper revision result for spec version {spec_version_str}, TC: {tc_enabled} problems: {problems}")
 

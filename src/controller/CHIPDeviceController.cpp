@@ -48,10 +48,11 @@
 #include <lib/core/NodeId.h>
 #include <lib/support/Base64.h>
 #include <lib/support/CHIPMem.h>
+#include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/PersistentStorageMacros.h>
 #include <lib/support/SafeInt.h>
-#include <lib/support/ScopedBuffer.h>
+#include <lib/support/ScopedMemoryBuffer.h>
 #include <lib/support/ThreadOperationalDataset.h>
 #include <lib/support/TimeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -580,9 +581,7 @@ void DeviceCommissioner::Shutdown()
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-    WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer().Shutdown([](uint32_t id, WiFiPAF::WiFiPafRole role) {
-        TEMPORARY_RETURN_IGNORED DeviceLayer::ConnectivityMgr().WiFiPAFShutdown(id, role);
-    });
+    WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer().Shutdown();
 #endif
 
     // Release everything from the commissionee device pool here.
@@ -676,14 +675,34 @@ CHIP_ERROR DeviceCommissioner::GetDeviceBeingCommissioned(NodeId deviceId, Commi
 }
 
 CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, const char * setUpCode, const CommissioningParameters & params,
-                                          DiscoveryType discoveryType, Optional<Dnssd::CommonResolutionData> resolutionData)
+                                          DiscoveryType discoveryType, Optional<Dnssd::CommonResolutionData> resolutionData,
+                                          Optional<SetUpCodePairer::ThreadMeshcopCommissionParameters> meshcopCommissionParams)
 {
     MATTER_TRACE_SCOPE("PairDevice", "DeviceCommissioner");
-
+#if CHIP_SUPPORT_THREAD_MESHCOP
+    if (meshcopCommissionParams.HasValue())
+    {
+        mSetUpCodePairer.SetThreadMeshcopCommissionParamsAndProxy(meshcopCommissionParams.Value(), &mThreadMeshcopCommissionProxy);
+    }
+#endif
     ReturnErrorOnFailure(mDefaultCommissioner->SetCommissioningParameters(params));
 
     return mSetUpCodePairer.PairDevice(remoteDeviceId, setUpCode, SetupCodePairerBehaviour::kCommission, discoveryType,
                                        resolutionData);
+}
+
+CHIP_ERROR DeviceCommissioner::GetLastThreadMeshcopDiscoveryDiagnosticJson(char * buffer, size_t bufferSize)
+{
+#if CHIP_SUPPORT_THREAD_MESHCOP
+    VerifyOrReturnError(buffer != nullptr && bufferSize > 0, CHIP_ERROR_INVALID_ARGUMENT);
+
+    const std::string json = mThreadMeshcopCommissionProxy.GetLastDiscoveryDiagnosticJson();
+    VerifyOrReturnError(json.size() < bufferSize, CHIP_ERROR_BUFFER_TOO_SMALL);
+    Platform::CopyString(buffer, bufferSize, json.c_str());
+    return CHIP_NO_ERROR;
+#else
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+#endif // CHIP_SUPPORT_THREAD_MESHCOP
 }
 
 CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, const char * setUpCode, DiscoveryType discoveryType,
@@ -759,10 +778,18 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParam
     return errorCode;
 }
 
-CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, const char * setUpCode, DiscoveryType discoveryType,
-                                                       Optional<Dnssd::CommonResolutionData> resolutionData)
+CHIP_ERROR
+DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, const char * setUpCode, DiscoveryType discoveryType,
+                                            Optional<Dnssd::CommonResolutionData> resolutionData,
+                                            Optional<SetUpCodePairer::ThreadMeshcopCommissionParameters> meshcopCommissionParams)
 {
     MATTER_TRACE_SCOPE("EstablishPASEConnection", "DeviceCommissioner");
+#if CHIP_SUPPORT_THREAD_MESHCOP
+    if (meshcopCommissionParams.HasValue())
+    {
+        mSetUpCodePairer.SetThreadMeshcopCommissionParamsAndProxy(meshcopCommissionParams.Value(), &mThreadMeshcopCommissionProxy);
+    }
+#endif
     return mSetUpCodePairer.PairDevice(remoteDeviceId, setUpCode, SetupCodePairerBehaviour::kPaseOnly, discoveryType,
                                        resolutionData);
 }
@@ -867,15 +894,15 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
             ExitNow(err = mSystemState->BleLayer()->NewBleConnectionByObject(
                         params.GetDiscoveredObject(), this, OnDiscoveredDeviceOverBleSuccess, OnDiscoveredDeviceOverBleError));
         }
-        else if (params.HasDiscriminator())
+        else if (params.GetSetupDiscriminator().has_value())
         {
             // The RendezvousParameters argument needs to be recovered if the search succeed, so save them
             // for later.
             mRendezvousParametersForDeviceDiscoveredOverBle = params;
-
-            ExitNow(err = mSystemState->BleLayer()->NewBleConnectionByDiscriminator(params.GetSetupDiscriminator().value(), this,
-                                                                                    OnDiscoveredDeviceOverBleSuccess,
-                                                                                    OnDiscoveredDeviceOverBleError));
+            auto setupDiscriminator                         = params.GetSetupDiscriminator();
+            VerifyOrExit(setupDiscriminator.has_value(), err = CHIP_ERROR_INVALID_ARGUMENT);
+            ExitNow(err = mSystemState->BleLayer()->NewBleConnectionByDiscriminator(
+                        setupDiscriminator.value(), this, OnDiscoveredDeviceOverBleSuccess, OnDiscoveredDeviceOverBleError));
         }
         else
         {
@@ -1860,7 +1887,22 @@ exit:
     if (err != CHIP_NO_ERROR)
     {
         ChipLogProgress(Controller, "Add NOC failed with error: %" CHIP_ERROR_FORMAT, err.Format());
-        commissioner->CommissioningStageComplete(err);
+        // Preserve the device-reported NodeOperationalCertStatusEnum (kInvalidPublicKey,
+        // kInvalidNodeOpId, kInvalidNOC, kFabricConflict, kLabelConflict, kInvalidFabricIndex,
+        // kTableFull, etc.) in the report so OnCommissioningFailure consumers can distinguish
+        // these without losing fidelity to the generic CHIP_ERROR returned by
+        // ConvertFromOperationalCertStatus.
+        CommissioningDelegate::CommissioningReport report;
+        // ConvertFromOperationalCertStatus succeeds on kOk and returns a non-success CHIP_ERROR
+        // for any other value, but `err` at this point can also be a downstream local failure
+        // (e.g. from OnOperationalCredentialsProvisioningCompletion) while data.statusCode is
+        // still kOk. Guard so we never publish a "success enum" alongside a non-success err to
+        // OnCommissioningFailure consumers.
+        if (data.statusCode != OperationalCredentials::NodeOperationalCertStatusEnum::kOk)
+        {
+            report.Set<OperationalCertErrorInfo>(data.statusCode);
+        }
+        commissioner->CommissioningStageComplete(err, report);
     }
 }
 
@@ -1963,7 +2005,7 @@ CHIP_ERROR DeviceCommissioner::SetUdcListenPort(uint16_t listenPort)
     return CHIP_NO_ERROR;
 }
 
-void DeviceCommissioner::FindCommissionableNode(char * instanceName)
+void DeviceCommissioner::FindCommissionableNode(const char * instanceName)
 {
     Dnssd::DiscoveryFilter filter(Dnssd::DiscoveryFilterType::kInstanceName, instanceName);
     TEMPORARY_RETURN_IGNORED DiscoverCommissionableNodes(filter);
@@ -2160,10 +2202,7 @@ void DeviceCommissioner::SendCommissioningCompleteCallbacks(NodeId nodeId, const
     }
     else
     {
-        // TODO: We should propogate detailed error information (commissioningError, networkCommissioningStatus) from
-        // completionStatus.
-        mPairingDelegate->OnCommissioningFailure(peerId, completionStatus.err, completionStatus.failedStage.ValueOr(kError),
-                                                 completionStatus.attestationResult);
+        mPairingDelegate->OnCommissioningFailure(peerId, completionStatus);
     }
 }
 
@@ -2446,17 +2485,19 @@ void DeviceCommissioner::ContinueReadingCommissioningInfo(const CommissioningPar
         {
             VerifyOrReturn(builder.AddAttributePath(kRootEndpointId, Clusters::IcdManagement::Id,
                                                     Clusters::IcdManagement::Attributes::FeatureMap::Id));
+            VerifyOrReturn(builder.AddAttributePath(kRootEndpointId, Clusters::IcdManagement::Id,
+                                                    Clusters::IcdManagement::Attributes::UserActiveModeTriggerHint::Id));
+            VerifyOrReturn(builder.AddAttributePath(kRootEndpointId, Clusters::IcdManagement::Id,
+                                                    Clusters::IcdManagement::Attributes::UserActiveModeTriggerInstruction::Id));
+            VerifyOrReturn(builder.AddAttributePath(kRootEndpointId, Clusters::IcdManagement::Id,
+                                                    Clusters::IcdManagement::Attributes::IdleModeDuration::Id));
+            VerifyOrReturn(builder.AddAttributePath(kRootEndpointId, Clusters::IcdManagement::Id,
+                                                    Clusters::IcdManagement::Attributes::ActiveModeDuration::Id));
+            VerifyOrReturn(builder.AddAttributePath(kRootEndpointId, Clusters::IcdManagement::Id,
+                                                    Clusters::IcdManagement::Attributes::ActiveModeThreshold::Id));
+            VerifyOrReturn(builder.AddAttributePath(kRootEndpointId, Clusters::IcdManagement::Id,
+                                                    Clusters::IcdManagement::Attributes::ClusterRevision::Id));
         }
-        VerifyOrReturn(builder.AddAttributePath(kRootEndpointId, Clusters::IcdManagement::Id,
-                                                Clusters::IcdManagement::Attributes::UserActiveModeTriggerHint::Id));
-        VerifyOrReturn(builder.AddAttributePath(kRootEndpointId, Clusters::IcdManagement::Id,
-                                                Clusters::IcdManagement::Attributes::UserActiveModeTriggerInstruction::Id));
-        VerifyOrReturn(builder.AddAttributePath(kRootEndpointId, Clusters::IcdManagement::Id,
-                                                Clusters::IcdManagement::Attributes::IdleModeDuration::Id));
-        VerifyOrReturn(builder.AddAttributePath(kRootEndpointId, Clusters::IcdManagement::Id,
-                                                Clusters::IcdManagement::Attributes::ActiveModeDuration::Id));
-        VerifyOrReturn(builder.AddAttributePath(kRootEndpointId, Clusters::IcdManagement::Id,
-                                                Clusters::IcdManagement::Attributes::ActiveModeThreshold::Id));
 
         // Extra paths requested via CommissioningParameters
         for (auto const & path : params.GetExtraReadPaths())
@@ -2568,8 +2609,8 @@ CHIP_ERROR DeviceCommissioner::ParseGeneralCommissioningInfo(ReadCommissioningIn
     err = mAttributeCache->Get<IsCommissioningWithoutPower::TypeInfo>(kRootEndpointId, info.general.isCommissioningWithoutPower);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Controller, "Ignoring failure to read IsCommissioningWithoutPower: %" CHIP_ERROR_FORMAT, err.Format());
-        info.general.isCommissioningWithoutPower = false; // default to false, not a fatal error
+        // 'IsCommissioningWithoutPower' is optional. Any failures (likely not present) means default to assuming false.
+        info.general.isCommissioningWithoutPower = false;
     }
 
     return return_err;
@@ -2827,6 +2868,33 @@ CHIP_ERROR DeviceCommissioner::ParseICDInfo(ReadCommissioningInfo & info)
         info.icd.checkInProtocolSupport = featureMap.Has(IcdManagement::Feature::kCheckInProtocolSupport);
         hasUserActiveModeTrigger        = featureMap.Has(IcdManagement::Feature::kUserActiveModeTrigger);
         isICD                           = true;
+
+        // LIT support was introduced but broken in ICD Management cluster revision 2 (Matter 1.3).
+        // Only treat a device as LIT for cluster revisions after 1.3 (i.e., revision > 2).
+        if (info.icd.isLIT)
+        {
+            uint16_t clusterRevision = 0;
+            CHIP_ERROR revErr        = mAttributeCache->Get<ClusterRevision::TypeInfo>(kRootEndpointId, clusterRevision);
+            if (revErr != CHIP_NO_ERROR || clusterRevision <= 2)
+            {
+                if (revErr == CHIP_NO_ERROR)
+                {
+                    ChipLogProgress(Controller,
+                                    "IcdManagement: Device claims LIT support but cluster revision is %" PRIu16
+                                    " (Matter 1.3). Disabling LIT due to known Matter 1.3 LIT issues.",
+                                    clusterRevision);
+                }
+                else
+                {
+                    ChipLogProgress(Controller,
+                                    "IcdManagement: Device claims LIT support but ClusterRevision attribute is "
+                                    "missing or unreadable (err=%" CHIP_ERROR_FORMAT
+                                    "). Treating as revision <= 2 and disabling LIT.",
+                                    revErr.Format());
+                }
+                info.icd.isLIT = false;
+            }
+        }
     }
     else if (err == CHIP_ERROR_KEY_NOT_FOUND)
     {
@@ -2934,7 +3002,9 @@ void DeviceCommissioner::OnArmFailSafe(void * context,
     if (data.errorCode != GeneralCommissioning::CommissioningErrorEnum::kOk)
     {
         err = CHIP_ERROR_INTERNAL;
-        report.Set<CommissioningErrorInfo>(data.errorCode);
+        // Preserve the device-supplied debugText so failure consumers can disambiguate
+        // ambiguous error codes (e.g. kBusyWithOtherAdmin specifics).
+        report.Set<CommissioningErrorInfo>(data.errorCode, data.debugText);
     }
 
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
@@ -2951,7 +3021,7 @@ void DeviceCommissioner::OnSetRegulatoryConfigResponse(
     if (data.errorCode != GeneralCommissioning::CommissioningErrorEnum::kOk)
     {
         err = CHIP_ERROR_INTERNAL;
-        report.Set<CommissioningErrorInfo>(data.errorCode);
+        report.Set<CommissioningErrorInfo>(data.errorCode, data.debugText);
     }
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
     commissioner->CommissioningStageComplete(err, report);
@@ -2967,6 +3037,7 @@ void DeviceCommissioner::OnSetTCAcknowledgementsResponse(
     if (data.errorCode != GeneralCommissioning::CommissioningErrorEnum::kOk)
     {
         err = CHIP_ERROR_INTERNAL;
+        // SetTCAcknowledgementsResponse has no debugText field per spec.
         report.Set<CommissioningErrorInfo>(data.errorCode);
     }
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
@@ -3058,7 +3129,9 @@ void DeviceCommissioner::OnNetworkConfigResponse(void * context,
     if (data.networkingStatus != NetworkCommissioning::NetworkCommissioningStatusEnum::kSuccess)
     {
         err = CHIP_ERROR_INTERNAL;
-        report.Set<NetworkCommissioningStatusInfo>(data.networkingStatus);
+        // Preserve debugText alongside the status enum so callers can distinguish
+        // ambiguous statuses (e.g. kAuthFailure: "wrong password" vs "regulatory restriction").
+        report.Set<NetworkCommissioningStatusInfo>(data.networkingStatus, data.debugText.ValueOr(CharSpan{}));
     }
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
     commissioner->CommissioningStageComplete(err, report);
@@ -3074,7 +3147,12 @@ void DeviceCommissioner::OnConnectNetworkResponse(
     if (data.networkingStatus != NetworkCommissioning::NetworkCommissioningStatusEnum::kSuccess)
     {
         err = CHIP_ERROR_INTERNAL;
-        report.Set<NetworkCommissioningStatusInfo>(data.networkingStatus);
+        // Preserve debugText alongside the status enum (see OnNetworkConfigResponse). Also
+        // surface the device-specific errorValue which carries driver-level failure detail
+        // (TX-power-limited / interference / association-failure code) distinct from the
+        // spec-level networkingStatus enum.
+        Optional<int32_t> errorValue = data.errorValue.IsNull() ? NullOptional : MakeOptional(data.errorValue.Value());
+        report.Set<NetworkCommissioningStatusInfo>(data.networkingStatus, data.debugText.ValueOr(CharSpan{}), errorValue);
     }
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
     commissioner->CommissioningStageComplete(err, report);
@@ -3090,7 +3168,7 @@ void DeviceCommissioner::OnCommissioningCompleteResponse(
     if (data.errorCode != GeneralCommissioning::CommissioningErrorEnum::kOk)
     {
         err = CHIP_ERROR_INTERNAL;
-        report.Set<CommissioningErrorInfo>(data.errorCode);
+        report.Set<CommissioningErrorInfo>(data.errorCode, data.debugText);
     }
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
     commissioner->CommissioningStageComplete(err, report);

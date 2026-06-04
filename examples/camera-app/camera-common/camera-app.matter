@@ -415,7 +415,7 @@ cluster Identify = 3 {
 
 /** Attributes and commands for group configuration and manipulation. */
 cluster Groups = 4 {
-  revision 5;
+  revision 4;
 
   bitmap Feature : bitmap32 {
     kGroupNames = 0x1;
@@ -507,7 +507,7 @@ cluster Descriptor = 29 {
   readonly attribute cluster_id clientList[] = 2;
   readonly attribute endpoint_no partsList[] = 3;
   readonly attribute optional SemanticTagStruct tagList[] = 4;
-  readonly attribute optional char_string<32> endpointUniqueID = 5;
+  provisional readonly attribute optional char_string<32> endpointUniqueID = 5;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -641,7 +641,7 @@ cluster AccessControl = 31 {
     fabric_idx fabricIndex = 254;
   }
 
-  fabric_sensitive info event access(read: administer) AuxiliaryAccessUpdated = 3 {
+  provisional fabric_sensitive info event access(read: administer) AuxiliaryAccessUpdated = 3 {
     nullable node_id adminNodeID = 0;
     fabric_idx fabricIndex = 254;
   }
@@ -653,7 +653,7 @@ cluster AccessControl = 31 {
   readonly attribute int16u accessControlEntriesPerFabric = 4;
   readonly attribute optional CommissioningAccessRestrictionEntryStruct commissioningARL[] = 5;
   readonly attribute optional AccessRestrictionEntryStruct arl[] = 6;
-  readonly attribute access(read: administer) optional AccessControlEntryStruct auxiliaryACL[] = 7;
+  provisional readonly attribute access(read: administer) optional AccessControlEntryStruct auxiliaryACL[] = 7;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -763,7 +763,8 @@ cluster BasicInformation = 40 {
   readonly attribute optional ProductAppearanceStruct productAppearance = 20;
   readonly attribute optional int32u specificationVersion = 21;
   readonly attribute optional int16u maxPathsPerInvoke = 22;
-  readonly attribute optional int32u configurationVersion = 24;
+  provisional attribute access(write: administer) optional nullable LocationDescriptorStruct deviceLocation = 23;
+  provisional readonly attribute optional int32u configurationVersion = 24;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -2213,9 +2214,9 @@ cluster OperationalCredentials = 62 {
   }
 
   fabric_scoped struct NOCStruct {
-    octet_string<400> noc = 1;
-    nullable octet_string<400> icac = 2;
-    optional octet_string<400> vvsc = 3;
+    long_octet_string<400> noc = 1;
+    nullable long_octet_string<400> icac = 2;
+    optional long_octet_string<400> vvsc = 3;
     fabric_idx fabricIndex = 254;
   }
 
@@ -2236,7 +2237,7 @@ cluster OperationalCredentials = 62 {
   }
 
   response struct AttestationResponse = 1 {
-    octet_string attestationElements = 0;
+    long_octet_string<900> attestationElements = 0;
     octet_string<64> attestationSignature = 1;
   }
 
@@ -2245,7 +2246,7 @@ cluster OperationalCredentials = 62 {
   }
 
   response struct CertificateChainResponse = 3 {
-    octet_string<600> certificate = 0;
+    long_octet_string<600> certificate = 0;
   }
 
   request struct CSRRequestRequest {
@@ -2254,21 +2255,21 @@ cluster OperationalCredentials = 62 {
   }
 
   response struct CSRResponse = 5 {
-    octet_string NOCSRElements = 0;
+    long_octet_string<900> NOCSRElements = 0;
     octet_string<64> attestationSignature = 1;
   }
 
   request struct AddNOCRequest {
-    octet_string<400> NOCValue = 0;
-    optional octet_string<400> ICACValue = 1;
+    long_octet_string<400> NOCValue = 0;
+    optional long_octet_string<400> ICACValue = 1;
     octet_string<16> IPKValue = 2;
     int64u caseAdminSubject = 3;
     vendor_id adminVendorId = 4;
   }
 
   request struct UpdateNOCRequest {
-    octet_string<400> NOCValue = 0;
-    optional octet_string<400> ICACValue = 1;
+    long_octet_string<400> NOCValue = 0;
+    optional long_octet_string<400> ICACValue = 1;
   }
 
   response struct NOCResponse = 8 {
@@ -2286,13 +2287,13 @@ cluster OperationalCredentials = 62 {
   }
 
   request struct AddTrustedRootCertificateRequest {
-    octet_string<400> rootCACertificate = 0;
+    long_octet_string<400> rootCACertificate = 0;
   }
 
   request struct SetVIDVerificationStatementRequest {
     optional vendor_id vendorID = 0;
     optional octet_string<85> VIDVerificationStatement = 1;
-    optional octet_string<400> vvsc = 2;
+    optional long_octet_string<400> vvsc = 2;
   }
 
   request struct SignVIDVerificationRequestRequest {
@@ -2306,25 +2307,25 @@ cluster OperationalCredentials = 62 {
     octet_string signature = 2;
   }
 
-  /** Sender is requesting attestation information from the receiver. */
+  /** This command is used to perform an attestation request. */
   command access(invoke: administer) AttestationRequest(AttestationRequestRequest): AttestationResponse = 0;
-  /** Sender is requesting a device attestation certificate from the receiver. */
+  /** This command is used to request a certificate from the device attestation certificate chain. */
   command access(invoke: administer) CertificateChainRequest(CertificateChainRequestRequest): CertificateChainResponse = 2;
-  /** Sender is requesting a certificate signing request (CSR) from the receiver. */
+  /** This command is used to perform a CSR request. */
   command access(invoke: administer) CSRRequest(CSRRequestRequest): CSRResponse = 4;
-  /** Sender is requesting to add the new node operational certificates. */
+  /** This command is used to add a new NOC to the device. */
   command access(invoke: administer) AddNOC(AddNOCRequest): NOCResponse = 6;
-  /** This command SHALL replace the NOC and optional associated ICAC (if present) scoped under the accessing fabric upon successful validation of all arguments and preconditions. */
+  /** This command is used to update an existing NOC on the device. */
   fabric command access(invoke: administer) UpdateNOC(UpdateNOCRequest): NOCResponse = 7;
-  /** This command SHALL be used by an Administrative Node to set the user-visible Label field for a given Fabric, as reflected by entries in the Fabrics attribute. */
+  /** This command is used to set the user-visible fabric label for a given Fabric. */
   fabric command access(invoke: administer) UpdateFabricLabel(UpdateFabricLabelRequest): NOCResponse = 9;
-  /** This command is used by Administrative Nodes to remove a given fabric index and delete all associated fabric-scoped data. */
+  /** This command is used to remove a Fabric from the device. */
   command access(invoke: administer) RemoveFabric(RemoveFabricRequest): NOCResponse = 10;
-  /** This command SHALL add a Trusted Root CA Certificate, provided as its CHIP Certificate representation. */
+  /** This command is used to add a trusted root certificate to the device. */
   command access(invoke: administer) AddTrustedRootCertificate(AddTrustedRootCertificateRequest): DefaultSuccess = 11;
-  /** This command SHALL be used to update any of the accessing fabric's associated VendorID, VidVerificatioNStatement or VVSC (Vendor Verification Signing Certificate). */
+  /** This command is used to manage the VendorID and VIDVerificationStatement fields of the Fabrics attribute, and the VVSC field of an entry in the NOCs attribute. */
   fabric command access(invoke: administer) SetVIDVerificationStatement(SetVIDVerificationStatementRequest): DefaultSuccess = 12;
-  /** This command SHALL be used to request that the server authenticate the fabric associated with the FabricIndex given. */
+  /** This command is used to authenticate the fabric associated with the FabricIndex. */
   command access(invoke: administer) SignVIDVerificationRequest(SignVIDVerificationRequestRequest): SignVIDVerificationResponse = 13;
 }
 
@@ -2381,7 +2382,7 @@ cluster GroupKeyManagement = 63 {
   readonly attribute GroupInfoMapStruct groupTable[] = 1;
   readonly attribute int16u maxGroupsPerFabric = 2;
   readonly attribute int16u maxGroupKeysPerFabric = 3;
-  attribute access(read: administer, write: administer) optional GroupcastAdoptionStruct groupcastAdoption[] = 4;
+  provisional attribute access(read: administer, write: administer) optional GroupcastAdoptionStruct groupcastAdoption[] = 4;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -2565,7 +2566,7 @@ cluster ZoneManagement = 1360 {
 
 /** This cluster implements the upload of Audio and Video streams from the Push AV Stream Transport Cluster using suitable push-based transports. */
 cluster PushAvStreamTransport = 1365 {
-  revision 2;
+  revision 3;
 
   enum CMAFInterfaceEnum : enum8 {
     kInterface1 = 0;
@@ -2605,6 +2606,7 @@ cluster PushAvStreamTransport = 1365 {
     kCommand = 0;
     kMotion = 1;
     kContinuous = 2;
+    kAmbientContext = 3;
   }
 
   enum TriggerActivationReasonEnum : enum8 {
@@ -2653,10 +2655,8 @@ cluster PushAvStreamTransport = 1365 {
     CMAFInterfaceEnum CMAFInterface = 0;
     int16u segmentDuration = 1;
     int16u chunkDuration = 2;
-    int8u sessionGroup = 3;
-    char_string<16> trackName = 4;
-    optional octet_string<16> CENCKey = 5;
-    optional octet_string<16> CENCKeyID = 6;
+    optional int8u sessionGroup = 3;
+    optional char_string<16> trackName = 4;
     optional boolean metadataEnabled = 7;
   }
 
@@ -2695,13 +2695,13 @@ cluster PushAvStreamTransport = 1365 {
     int16u connectionID = 0;
     TransportTriggerTypeEnum triggerType = 1;
     optional TriggerActivationReasonEnum activationReason = 2;
-    ContainerFormatEnum containerType = 3;
+    optional ContainerFormatEnum containerType = 3;
     optional int64u CMAFSessionNumber = 4;
   }
 
   info event PushTransportEnd = 1 {
     int16u connectionID = 0;
-    ContainerFormatEnum containerType = 1;
+    optional ContainerFormatEnum containerType = 1;
     optional int64u CMAFSessionNumber = 2;
   }
 
@@ -2773,7 +2773,7 @@ cluster Chime = 1366 {
     char_string<48> name = 1;
   }
 
-  info event ChimeStartedPlaying = 0 {
+  provisional info event ChimeStartedPlaying = 0 {
     int8u chimeID = 0;
   }
 
@@ -3009,7 +3009,7 @@ internal cluster FaultInjection = 4294048774 {
 }
 
 endpoint 0 {
-  device type ma_rootdevice = 22, version 5;
+  device type ma_rootdevice = 22, version 4;
   device type ma_otarequestor = 18, version 1;
 
   binding cluster OtaSoftwareUpdateProvider;
@@ -3083,14 +3083,14 @@ endpoint 0 {
     emits event VersionApplied;
     emits event DownloadError;
     callback attribute defaultOTAProviders;
-    ram      attribute updatePossible default = 1;
-    ram      attribute updateState default = 0;
-    ram      attribute updateStateProgress default = 0;
+    callback attribute updatePossible;
+    callback attribute updateState;
+    callback attribute updateStateProgress;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
 
     handle command AnnounceOTAProvider;
   }
@@ -3102,6 +3102,18 @@ endpoint 0 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap default = 0;
+    callback attribute clusterRevision;
+  }
+
+  server cluster PowerSource {
+    ram      attribute status;
+    ram      attribute order;
+    ram      attribute description;
+    callback attribute endpointList;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 2;
     callback attribute clusterRevision;
   }
 
@@ -3376,6 +3388,42 @@ endpoint 0 {
     callback attribute clusterRevision;
   }
 
+  server cluster TlsCertificateManagement {
+    callback attribute maxRootCertificates;
+    callback attribute provisionedRootCertificates;
+    callback attribute maxClientCertificates;
+    callback attribute provisionedClientCertificates;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 0;
+    callback attribute clusterRevision;
+
+    handle command ProvisionRootCertificate;
+    handle command FindRootCertificate;
+    handle command LookupRootCertificate;
+    handle command RemoveRootCertificate;
+    handle command ClientCSR;
+    handle command ProvisionClientCertificate;
+    handle command FindClientCertificate;
+    handle command LookupClientCertificate;
+    handle command RemoveClientCertificate;
+  }
+
+  server cluster TlsClientManagement {
+    callback attribute maxProvisioned;
+    callback attribute provisionedEndpoints;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 0;
+    callback attribute clusterRevision;
+
+    handle command ProvisionEndpoint;
+    handle command FindEndpoint;
+    handle command RemoveEndpoint;
+  }
+
   server cluster FaultInjection {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
@@ -3488,42 +3536,6 @@ endpoint 1 {
     ram      attribute clusterRevision default = 1;
 
     handle command PlayChimeSound;
-  }
-
-  server cluster TlsCertificateManagement {
-    callback attribute maxRootCertificates;
-    callback attribute provisionedRootCertificates;
-    callback attribute maxClientCertificates;
-    callback attribute provisionedClientCertificates;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    callback attribute clusterRevision;
-
-    handle command ProvisionRootCertificate;
-    handle command FindRootCertificate;
-    handle command LookupRootCertificate;
-    handle command RemoveRootCertificate;
-    handle command ClientCSR;
-    handle command ProvisionClientCertificate;
-    handle command FindClientCertificate;
-    handle command LookupClientCertificate;
-    handle command RemoveClientCertificate;
-  }
-
-  server cluster TlsClientManagement {
-    callback attribute maxProvisioned;
-    callback attribute provisionedEndpoints;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    callback attribute clusterRevision;
-
-    handle command ProvisionEndpoint;
-    handle command FindEndpoint;
-    handle command RemoveEndpoint;
   }
 }
 

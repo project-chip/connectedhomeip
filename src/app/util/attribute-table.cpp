@@ -167,35 +167,19 @@ Status emAfWriteAttribute(const ConcreteAttributePath & path, const EmberAfWrite
 Protocols::InteractionModel::Status emAfWriteAttributeExternal(const ConcreteAttributePath & path,
                                                                const EmberAfWriteDataInput & input)
 {
-    EmberAfWriteDataInput completeInput = input;
-
-    if (completeInput.changeListener == nullptr)
-    {
-        completeInput.SetChangeListener(emberAfGlobalInteractionModelAttributesChangedListener());
-    }
-
-    return emAfWriteAttribute(path, completeInput, false /* overrideReadOnlyAndDataType */);
+    return emAfWriteAttribute(path, input, false /* overrideReadOnlyAndDataType */);
 }
 
 Status emberAfWriteAttribute(EndpointId endpoint, ClusterId cluster, AttributeId attributeID, uint8_t * dataPtr,
                              EmberAfAttributeType dataType)
 {
 
-    return emberAfWriteAttribute(
-        ConcreteAttributePath(endpoint, cluster, attributeID),
-        EmberAfWriteDataInput(dataPtr, dataType).SetChangeListener(emberAfGlobalInteractionModelAttributesChangedListener()));
+    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, cluster, attributeID), EmberAfWriteDataInput(dataPtr, dataType));
 }
 
 Status emberAfWriteAttribute(const ConcreteAttributePath & path, const EmberAfWriteDataInput & input)
 {
-    EmberAfWriteDataInput completeInput = input;
-
-    if (completeInput.changeListener == nullptr)
-    {
-        completeInput.SetChangeListener(emberAfGlobalInteractionModelAttributesChangedListener());
-    }
-
-    return emAfWriteAttribute(path, completeInput, true /* overrideReadOnlyAndDataType */);
+    return emAfWriteAttribute(path, input, true /* overrideReadOnlyAndDataType */);
 }
 
 //------------------------------------------------------------------------------
@@ -419,7 +403,7 @@ Status emAfWriteAttribute(const ConcreteAttributePath & path, const EmberAfWrite
         // Just do nothing, except triggering reporting if forced.
         if (input.markDirty == MarkAttributeDirty::kYes)
         {
-            emberAfAttributeChanged(path.mEndpointId, path.mClusterId, path.mAttributeId, input.changeListener);
+            emberAfAttributeChanged(path.mEndpointId, path.mClusterId, path.mAttributeId);
         }
 
         return Status::Success;
@@ -468,7 +452,7 @@ Status emAfWriteAttribute(const ConcreteAttributePath & path, const EmberAfWrite
 
     if (input.markDirty != MarkAttributeDirty::kNo)
     {
-        emberAfAttributeChanged(path.mEndpointId, path.mClusterId, path.mAttributeId, input.changeListener);
+        emberAfAttributeChanged(path.mEndpointId, path.mClusterId, path.mAttributeId);
     }
 
     // Post write attribute callback for all attributes changes, regardless

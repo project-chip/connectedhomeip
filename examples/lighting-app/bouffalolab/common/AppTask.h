@@ -122,7 +122,7 @@ private:
     static void ScheduleInit(intptr_t arg);
     static void AppTaskMain(void * pvParameter);
 
-    static CHIP_ERROR StartAppShellTask();
+    static void StartAppShellTask();
     static void AppShellTask(void * args);
 
     EndpointId mEndpointId = (EndpointId) 1;

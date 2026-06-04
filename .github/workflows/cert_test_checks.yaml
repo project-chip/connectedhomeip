@@ -29,10 +29,19 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
         with:
           # Clone more than one commit because we need HEAD^..HEAD diff
           fetch-depth: 2
+      - name: Install Python dependencies (just the basics)
+        run: |
+          python3 -m venv --system-site-packages venv
+          venv/bin/pip install -r scripts/setup/requirements.build.txt
       - name: Run checks
         run: |
-          python3 scripts/tests/matter_yaml_linter.py
+          venv/bin/python3 scripts/tests/matter_yaml_linter.py
+      - name: Notify Slack on Failure
+        if: failure()
+        uses: ./.github/actions/notify-slack-failure
+        with:
+          slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}

@@ -138,7 +138,7 @@ class WEBRTCPTestBase:
             videoStreamAllocateCmd = commands.VideoStreamAllocate(
                 streamUsage=Globals.Enums.StreamUsageEnum.kLiveView,
                 videoCodec=aRateDistortionTradeOffPoints[0].codec,
-                minFrameRate=30,  # An acceptable value for min frame rate
+                minFrameRate=min(self.user_params.get("minFrameRate", 30), aVideoSensorParams.maxFPS),
                 maxFrameRate=aVideoSensorParams.maxFPS,
                 minResolution=aMinViewportRes,
                 maxResolution=cluster.Structs.VideoResolutionStruct(
@@ -186,3 +186,11 @@ class WEBRTCPTestBase:
 
         if not any(stream.audioStreamID == audioStreamID for stream in aAllocatedAudioStreams):
             asserts.fail(f"Audio Stream with ID {audioStreamID} not found as expected")
+
+    async def is_battery_powered(self):
+        # Check if battery feature is supported, Power Source has to be on the Root Node
+        aFeatureMap = await self.read_single_attribute_check_success(
+            endpoint=0, cluster=Clusters.PowerSource, attribute=Clusters.PowerSource.Attributes.FeatureMap
+        )
+
+        return aFeatureMap & Clusters.PowerSource.Bitmaps.Feature.kBattery

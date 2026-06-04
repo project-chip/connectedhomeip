@@ -17,47 +17,46 @@
 import logging
 import os
 import re
-import shlex
 import subprocess
 import threading
-from typing import Optional, Pattern
+from re import Pattern
+
+from matter.testing.concurrency.context import TerminablePopen
+from matter.testing.tasks import SubprocessKind
 
 from .namespace import IsolatedNetworkNamespace
 
 log = logging.getLogger(__name__)
 
 
-class ThreadBorderRouter:
+class ThreadBorderRouter(TerminablePopen[str]):
 
     # The Thread radio simulation node id, choose other if there is a conflict.
     NODE_ID = 9
 
     def __init__(self, dataset: str, ns: IsolatedNetworkNamespace):
         self._event = threading.Event()
-        self._pattern: Optional[Pattern[str]] = None
         self._event.set()
-        self._netns_app = f'app-{ns.index}'
-        self._netns_tool = f'tool-{ns.index}'
-        self._link_name_app = f'{ns.app_link_name}-{ns.index}'
-        self._link_name_tool = f'{ns.tool_link_name}-{ns.index}'
+        self._pattern: Pattern[str] | None = None
+        self._netns_app = ns.netns_for_subprocess_kind(SubprocessKind.APP)
+        self._link_name_app = ns.app_link.name
+        self._dataset = dataset
 
         radio_url = f'spinel+hdlc+forkpty:///usr/bin/env?forkpty-arg=ot-rcp&forkpty-arg={self.NODE_ID}'
-        args = [
-            'ip', 'netns', 'exec', self._netns_app, 'otbr-agent', '-d7', '-v', f'-B{self._link_name_app}', radio_url
-        ]
+        cmd = self._netns_app.wrap_cmd(['otbr-agent', '-d7', '-v', f'-B{self._link_name_app}', radio_url])
+        super().__init__(lambda: subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, encoding='UTF-8'))
 
-        self._otbr = subprocess.Popen(args,
-                                      stdout=subprocess.PIPE,
-                                      stderr=subprocess.STDOUT,
-                                      text=True,
-                                      encoding='UTF-8')
+    def resource_start(self) -> subprocess.Popen[str]:
+        process = super().resource_start()
 
-        threading.Thread(target=self._otbr_read_stdout, daemon=True).start()
+        threading.Thread(name="OTBRReadStdout", target=self._otbr_read_stdout, args=(process,), daemon=True).start()
 
         self.expect(r'Co-processor version:', timeout=20)
-        self.join_network(dataset)
+        self.join_network(self._dataset)
 
-    def join_network(self, dataset):
+        return process
+
+    def join_network(self, dataset: str) -> None:
         status = os.system(
             f'ot-ctl dataset init tlvs {dataset} &&'
             'ot-ctl dataset commit active &&'
@@ -76,16 +75,16 @@ class ThreadBorderRouter:
 
         self.expect(r'Sent RA on infra netif', timeout=15)
 
-    def expect(self, pattern: str, timeout=10):
+    def expect(self, pattern: str, timeout: float | None = 10) -> None:
         self._pattern = re.compile(pattern)
         self._event.clear()
         if not self._event.wait(timeout):
             raise TimeoutError(f'Failed to expect: {pattern}')
 
-    def _otbr_read_stdout(self):
-        assert self._otbr.stdout is not None
-        while (line := self._otbr.stdout.readline()):
-            log.info(line)
+    def _otbr_read_stdout(self, otbr: subprocess.Popen[str]) -> None:
+        assert otbr.stdout is not None, "stdout must be set to subprocess.PIPE"
+        while (line := otbr.stdout.readline()):
+            log.info(line.strip())
             if self._event.is_set():
                 continue
             if not self._pattern:
@@ -94,8 +93,8 @@ class ThreadBorderRouter:
                 self._event.set()
 
     def get_border_agent_port(self) -> int:
-        cmd = f'ip netns exec {self._netns_app} ot-ctl ba port'
-        output = subprocess.check_output(shlex.split(cmd), text=True)
+        cmd = self._netns_app.wrap_cmd('ot-ctl ba port')
+        output = subprocess.check_output(cmd, text=True)
         # ot-ctl output includes the port number followed by "Done"
         # Using regex to find the first number in the output
         match = re.search(r'(\d+)', output)
@@ -105,8 +104,3 @@ class ThreadBorderRouter:
 
     def get_border_agent_host(self) -> str:
         return '10.10.10.1'
-
-    def terminate(self):
-        if self._otbr:
-            self._otbr.terminate()
-            self._otbr.wait()

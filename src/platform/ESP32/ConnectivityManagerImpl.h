@@ -118,6 +118,7 @@ private:
     CHIP_ERROR _GetAndLogWiFiStatsCounters(void);
     void _OnWiFiScanDone();
     void _OnWiFiStationProvisionChange();
+    CHIP_ERROR _DisconnectNetwork(void);
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     CHIP_ERROR _SetPollingInterval(System::Clock::Milliseconds32 pollingInterval);

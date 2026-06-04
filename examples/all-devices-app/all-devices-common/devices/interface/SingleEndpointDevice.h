@@ -51,8 +51,8 @@ protected:
     CHIP_ERROR SingleEndpointRegistration(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointId parentId);
 
     /// Internal function to unregister a single endpoint device. This will destroy the clusters part of
-    /// this class, and must be called in a subclass' device-specific UnRegister() function. This allows
-    /// for the destruction of the general SingleEndpointDevice clusters and device-specifc clusters from
+    /// this class, and must be called in a subclass' device-specific Unregister() function. This allows
+    /// for the destruction of the general SingleEndpointDevice clusters and device-specific clusters from
     /// the subclass, as well as removal of the device endpoint from the provider to happen together.
     void SingleEndpointUnregistration(CodeDrivenDataModelProvider & provider);
 

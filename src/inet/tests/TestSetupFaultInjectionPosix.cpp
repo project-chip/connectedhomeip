@@ -31,7 +31,7 @@
 #include <inet/InetFaultInjection.h>
 #include <lib/support/CHIPFaultInjection.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/ScopedBuffer.h>
+#include <lib/support/ScopedMemoryBuffer.h>
 #include <system/SystemFaultInjection.h>
 
 #include <stdio.h>

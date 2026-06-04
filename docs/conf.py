@@ -12,7 +12,7 @@ sys.path.insert(0, str(MATTER_BASE / "docs" / "_extensions"))
 # -- Project information -----------------------------------------------------
 
 project = "Matter"
-copyright = "2020-2025, Matter Contributors"
+project_copyright = "2020-2025, Matter Contributors"
 author = "Matter Contributors"
 version = "1.0.0"
 
@@ -36,6 +36,8 @@ exclude_patterns = [
     "examples/common/m5stack-tft/repo",
     "docs/guides/README.md",
     "**/tests/*.md",
+    "examples/tv-casting-app/APK_SIZE_ANALYSIS.md",
+    "examples/tv-casting-app/DARWIN_SIZE_ANALYSIS.md",
 ]
 
 

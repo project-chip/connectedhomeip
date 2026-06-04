@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-cmake_minimum_required(VERSION 3.13.1)
+cmake_minimum_required(VERSION 3.20)
 
 get_filename_component(CHIP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/third_party/connectedhomeip REALPATH)
 get_filename_component(GEN_DIR ${CHIP_ROOT}/zzz_generated/ REALPATH)
@@ -28,6 +28,10 @@ get_filename_component(EXAMPLE_PLATFORM_NXP_ZEPHYR_DIR ${CHIP_ROOT}/examples/pla
 include(${CHIP_ROOT}/config/nxp/app/pre-zephyr.cmake)
 
 list(APPEND ZEPHYR_EXTRA_MODULES ${CHIP_ROOT}/config/zephyr/chip-module)
+
+# Add secure element lib as an external module
+list(APPEND ZEPHYR_EXTRA_MODULES ${CHIP_ROOT}/third_party/simw-top-mini/repo/matter)
+
 find_package(Zephyr HINTS $ENV{ZEPHYR_BASE})
 
 # -Wmaybe-uninitialized has too many false positives, including on std::optional
@@ -41,6 +45,7 @@ project(chip-nxp-all-clusters-app-example)
 
 include(${CHIP_ROOT}/config/nxp/app/enable-gnu-std.cmake)
 include(${CHIP_ROOT}/src/app/chip_data_model.cmake)
+include(${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/app_se05x.cmake)
 
 target_include_directories(app
     PRIVATE

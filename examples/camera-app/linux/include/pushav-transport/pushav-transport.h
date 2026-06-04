@@ -33,6 +33,7 @@
 #include <app/clusters/push-av-stream-transport-server/constants.h>
 #include <functional>
 #include <memory>
+#include <mutex>
 #include <protocols/interaction_model/StatusCode.h>
 #include <thread>
 #include <vector>
@@ -88,7 +89,7 @@ public:
     void SetTransportStatus(chip::app::Clusters::PushAvStreamTransport::TransportStatusEnum status);
 
     void TriggerTransport(chip::app::Clusters::PushAvStreamTransport::TriggerActivationReasonEnum activationReason,
-                          int zoneId = kInvalidZoneId, int sensitivity = kDefaultSensitivity);
+                          const std::vector<int> & zoneIds = { kInvalidZoneId }, int sensitivity = kDefaultSensitivity);
     // Get Transport status
     bool GetTransportStatus()
     {
@@ -191,4 +192,7 @@ private:
     uint32_t mCurrentlyUsedBandwidthbps     = 0;
     bool mCurrentActivationByManualTrigger  = false;
     bool mPreviousActivationByManualTrigger = false;
+
+    // Mutex for synchronizing recorder access
+    std::mutex mRecorderMutex;
 };

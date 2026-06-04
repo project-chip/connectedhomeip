@@ -18,19 +18,22 @@
 Handles linux-specific functionality for running test cases
 """
 
+import logging
 import os
-from typing import IO, Any
+from typing import BinaryIO
 
 from chiptest.runner import Executor, LogPipe, SubprocessInfo
 from python_path import PythonPath
+
+log = logging.getLogger(__name__)
 
 root_dir = os.path.dirname(
     os.path.dirname(
         os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
-with PythonPath(os.path.join(root_dir, 'src/python_testing/matter_testing_infrastructure/matter'), relative_to=__file__):
-    from testing.linux import (BluetoothMock, DBusTestSystemBus, IsolatedNetworkNamespace, ThreadBorderRouter, WpaSupplicantMock,
-                               ensure_network_namespace_availability, ensure_private_state)
+with PythonPath(os.path.join(root_dir, 'src/python_testing/matter_testing_infrastructure'), relative_to=__file__):
+    from matter.testing.linux import (BluetoothMock, DBusTestSystemBus, IsolatedNetworkNamespace, ThreadBorderRouter,
+                                      WpaSupplicantMock, ensure_network_namespace_availability, ensure_private_state)
 
 __all__ = [
     "ensure_network_namespace_availability",
@@ -49,7 +52,12 @@ class LinuxNamespacedExecutor(Executor):
         super().__init__()
         self.ns = ns
 
-    def run(self, subproc: SubprocessInfo, stdin: IO[Any] | None = None, stdout: IO[Any] | LogPipe | None = None,
-            stderr: IO[Any] | LogPipe | None = None):
-        wrapped = subproc.wrap_with("ip", "netns", "exec", self.ns.netns_for_subprocess_kind(subproc.kind))
+    def run(self, subproc: SubprocessInfo, stdin: BinaryIO | None = None, stdout: BinaryIO | LogPipe | None = None,
+            stderr: BinaryIO | LogPipe | None = None):
+        try:
+            subprocess_ns = self.ns.netns_for_subprocess_kind(subproc.kind)
+            wrapped = subproc.wrap_with(*subprocess_ns.netns_cmd_wrapper)
+        except ValueError as e:
+            log.warning("%s", e)
+            wrapped = subproc
         return super().run(wrapped, stdin=stdin, stdout=stdout, stderr=stderr)

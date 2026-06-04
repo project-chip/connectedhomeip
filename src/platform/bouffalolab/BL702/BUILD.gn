@@ -1,4 +1,4 @@
-# Copyright (c) 2022 Project CHIP Authors
+# Copyright (c) 2022-2026 Project CHIP Authors
 # All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -59,9 +59,9 @@ static_library("BL702") {
   }
 
   if (bouffalo_sdk_component_easyflash_enabled) {
-    sources += [ "../common/BLConfig.cpp" ]
+    sources += [ "../common/BflbConfig.cpp" ]
   } else {
-    sources += [ "../common/BLConfig_littlefs.cpp" ]
+    sources += [ "../common/BflbConfig_littlefs.cpp" ]
   }
 
   deps = [
@@ -76,6 +76,7 @@ static_library("BL702") {
       "../common/OTAImageProcessorImpl.cpp",
       "../common/OTAImageProcessorImpl.h",
     ]
+    deps += [ "${chip_root}/src/app/clusters/ota-requestor:interface" ]
   }
 
   if (chip_enable_wifi) {
@@ -101,7 +102,7 @@ static_library("BL702") {
 
     sources += [
       "../../OpenThread/OpenThreadUtils.cpp",
-      "ThreadStackManagerImpl.cpp",
+      "../common/ThreadStackManagerImpl.cpp",
     ]
 
     if (chip_mdns == "platform") {
@@ -118,7 +119,7 @@ static_library("BL702") {
     sources += [
       "ConfigurationManagerImpl.cpp",
       "ConnectivityManagerImpl.cpp",
-      "EthernetInterface.c",
+      "NetworkCommissioningEthernetDriver.cpp",
     ]
 
     deps += [

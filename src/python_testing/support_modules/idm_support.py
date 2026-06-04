@@ -18,9 +18,12 @@
 Support module for IDM (Interaction Data Model) test modules containing shared functionality.
 """
 
+import asyncio
 import copy
 import inspect
 import logging
+import time
+from dataclasses import dataclass
 from typing import Any, Optional
 
 from mobly import asserts
@@ -28,13 +31,46 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.clusters import ClusterObjects as ClusterObjects
-from matter.clusters.Attribute import AttributePath, TypedAttributePath
+from matter.clusters.Attribute import AttributePath, TypedAttributePath, ValueDecodeFailure
 from matter.exceptions import ChipStackError
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing import global_attribute_ids
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.basic_composition import BasicCompositionTests
+from matter.testing.event_attribute_reporting import WildcardAttributeSubscriptionHandler
+from matter.testing.global_attribute_ids import GlobalAttributeIds, is_standard_attribute_id
+from matter.testing.spec_parsing import ConstraintReference, Constraints
+from matter.tlv import uint
 
 log = logging.getLogger(__name__)
+
+
+@dataclass
+class WritableAttributeInfo:
+    """Describes a single writable attribute discovered on the DUT.
+
+    Aggregates the cluster/attribute identity, the generated Python classes
+    used to read/write it, and the spec-parsed constraint metadata needed to
+    synthesize out-of-bounds test values.
+    """
+    endpoint_id: int
+    cluster_id: int
+    cluster_name: str
+    attribute_id: int
+    attribute_name: str
+    attribute: type[ClusterObjects.ClusterAttributeDescriptor]
+    cluster_class: type[ClusterObjects.Cluster]
+    datatype: str
+    constraints: Optional[Constraints]
+
+
+@dataclass
+class ChangedAttribute:
+    """Record of an attribute write performed by IDM tests for later verification."""
+    endpoint: int
+    cluster: Any
+    attribute: Any
+    old_value: Any
+    new_value: Any
 
 # ============================================================================
 # Module-Level Utility Functions
@@ -83,7 +119,7 @@ def client_cmd(cmd_class):
 # IDMBaseTest - Main Base Class
 # ============================================================================
 
-class IDMBaseTest(MatterBaseTest):
+class IDMBaseTest(BasicCompositionTests):
     """Base test class for IDM tests with shared functionality."""
 
     ROOT_NODE_ENDPOINT_ID = 0
@@ -370,6 +406,139 @@ class IDMBaseTest(MatterBaseTest):
                     ClusterObjects.ALL_CLUSTERS[cluster].Attributes.AttributeList.attribute_id])
                 asserts.assert_equal(returned_attrs, attr_list,
                                      f"Mismatch for {cluster} at endpoint {endpoint}")
+
+    async def resolve_dynamic_constraint(self, cluster_class, endpoint_id: int, ref: ConstraintReference) -> Optional[int]:
+        """Resolve a dynamic constraint reference by reading the attribute value."""
+        ref_attr = getattr(cluster_class.Attributes, ref.attribute, None)
+        if not ref_attr:
+            return None
+
+        ref_value = await self.read_single_attribute_check_success(
+            endpoint=endpoint_id,
+            cluster=cluster_class,
+            attribute=ref_attr
+        )
+
+        if ref.field:
+            python_field_name = ref.field[0].lower() + ref.field[1:]
+            if hasattr(ref_value, python_field_name):
+                return getattr(ref_value, python_field_name)
+            return None
+
+        return ref_value if isinstance(ref_value, (int, float)) else None
+
+    def generate_constraint_violation(self, attr_info: WritableAttributeInfo, constraints: Constraints):
+        """Generate a test value that violates the given constraints."""
+        datatype = attr_info.datatype
+
+        # String constraints
+        if 'string' in datatype or 'octstr' in datatype:
+            if constraints.max_length is not None:
+                return 'x' * (constraints.max_length + 1)
+            if constraints.min_length is not None:
+                return 'x' * max(0, constraints.min_length - 1)
+
+        # List constraints
+        if 'list' in datatype:
+            if constraints.max_count is not None:
+                return [{}] * (constraints.max_count + 1)
+            if constraints.min_count is not None:
+                count = max(0, constraints.min_count - 1)
+                return [{}] * count if count > 0 else []
+
+        # Numeric-like constraints (int, uint, percent, elapsed-s, temperature, etc.)
+        if constraints.max_value is not None:
+            return constraints.max_value + 1
+        if constraints.min_value is not None:
+            return max(0, constraints.min_value - 1)
+
+        return None
+
+    async def check_attribute_constraint(self, attr_info: WritableAttributeInfo, constraints: Constraints) -> bool:
+        """Test a single attribute's constraint. Returns True if test passed, False otherwise."""
+        # Resolve dynamic constraints if present
+        if constraints.min_value_ref or constraints.max_value_ref or constraints.min_count_ref or constraints.max_count_ref:
+            cluster_class = attr_info.cluster_class
+
+            if constraints.min_value_ref:
+                constraints.min_value = await self.resolve_dynamic_constraint(
+                    cluster_class, attr_info.endpoint_id, constraints.min_value_ref
+                )
+
+            if constraints.max_value_ref:
+                constraints.max_value = await self.resolve_dynamic_constraint(
+                    cluster_class, attr_info.endpoint_id, constraints.max_value_ref
+                )
+
+            if constraints.min_count_ref:
+                constraints.min_count = await self.resolve_dynamic_constraint(
+                    cluster_class, attr_info.endpoint_id, constraints.min_count_ref
+                )
+
+            if constraints.max_count_ref:
+                constraints.max_count = await self.resolve_dynamic_constraint(
+                    cluster_class, attr_info.endpoint_id, constraints.max_count_ref
+                )
+
+        # Generate constraint violation
+        test_value = self.generate_constraint_violation(attr_info, constraints)
+        if test_value is None:
+            return None  # Unsupported constraint type
+
+        # Read original value
+        original_value = await self.read_single_attribute_check_success(
+            endpoint=attr_info.endpoint_id,
+            cluster=attr_info.cluster_class,
+            attribute=attr_info.attribute
+        )
+
+        # Attempt to write violating value
+        attr_obj = attr_info.attribute(test_value)
+        write_result = await self.default_controller.WriteAttribute(
+            nodeId=self.dut_node_id,
+            attributes=[(attr_info.endpoint_id, attr_obj)]
+        )
+        result_status = write_result[0].Status
+
+        if result_status == Status.ConstraintError:
+            # Verify value wasn't set to the violating value
+            new_value = await self.read_single_attribute_check_success(
+                endpoint=attr_info.endpoint_id,
+                cluster=attr_info.cluster_class,
+                attribute=attr_info.attribute
+            )
+
+            if new_value == test_value:
+                log.error(f"FAIL: {attr_info.cluster_name}.{attr_info.attribute_name} "
+                          f"was set to invalid value {test_value} despite CONSTRAINT_ERROR")
+                return False
+
+            log.info(f"PASS: {attr_info.cluster_name}.{attr_info.attribute_name} "
+                     f"constraint properly enforced (original={original_value}, rejected={test_value})")
+            return True
+
+        log.error(f"FAIL: {attr_info.cluster_name}.{attr_info.attribute_name} "
+                  f"got {result_status} instead of CONSTRAINT_ERROR for value {test_value}")
+        return False
+
+    def checkable_attributes(self, cluster_id, cluster, xml_cluster) -> list[uint]:
+        """Get list of attributes that exist on the DUT and have spec/codegen data available."""
+        all_attrs = cluster[GlobalAttributeIds.ATTRIBUTE_LIST_ID]
+
+        checkable_attrs = []
+        for attr_id in all_attrs:
+            if not is_standard_attribute_id(attr_id):
+                continue
+
+            if attr_id not in xml_cluster.attributes:
+                continue
+
+            if attr_id not in Clusters.ClusterObjects.ALL_ATTRIBUTES[cluster_id]:
+                continue
+
+            checkable_attrs.append(attr_id)
+
+        return checkable_attrs
 
     # ========================================================================
     # Attribute Reading Helper Functions
@@ -831,3 +1000,289 @@ class IDMBaseTest(MatterBaseTest):
 
         # Verify all endpoints and clusters
         self.verify_all_endpoints_clusters(read_request)
+
+    # ========================================================================
+    # Subscription Report Helpers
+    # ========================================================================
+
+    def get_mrp_retransmission_timeout_sec(self, dev_ctrl: ChipDeviceCtrl) -> float:
+        """Compute worst-case MRP retransmission time (s) using negotiated intervals; fall back conservatively."""
+        session_params = dev_ctrl.GetRemoteSessionParameters(self.dut_node_id)
+        # Default local MRP intervals from ReliableMessageProtocolConfig.h for Linux controller builds:
+        # idle=500ms, active=300ms.
+        negotiated_idle_interval_ms = session_params.sessionIdleInterval if session_params else 500
+        negotiated_active_interval_ms = session_params.sessionActiveInterval if session_params else 300
+
+        # Defaults: 500ms idle (IP) / 2000ms (Thread) / 4000ms (fallback).
+        base_interval_ms = max(negotiated_idle_interval_ms, negotiated_active_interval_ms, 4000)
+
+        # interval * (1 + 1.6 + 1.6^2 + 1.6^3) * jitter (1.25) * margin (1.1) ms to s
+        backoff_sum = 1 + 1.6 + 2.56 + 4.096
+        return base_interval_ms * backoff_sum * 1.375 / 1000.0
+
+    def get_writable_attributes_for_cluster(self, cluster_id: uint, cluster_data: dict) -> list[uint]:
+        """Get list of writable attribute IDs for a cluster.
+
+        Similar to TC_AccessChecker's checkable_attributes(), but filters for writable attributes.
+        Uses XML spec data to identify which attributes support write operations.
+
+        Args:
+            cluster_id: The cluster ID
+            cluster_data: The cluster data from endpoints_tlv containing ATTRIBUTE_LIST_ID
+
+        Returns:
+            List of attribute IDs that are writable
+        """
+        if cluster_id not in self.xml_clusters:
+            return []
+
+        if cluster_id not in Clusters.ClusterObjects.ALL_ATTRIBUTES:
+            return []
+
+        xml_cluster = self.xml_clusters[cluster_id]
+        all_attrs = cluster_data.get(GlobalAttributeIds.ATTRIBUTE_LIST_ID, [])
+
+        writable_attrs = []
+        for attribute_id in all_attrs:
+            if not is_standard_attribute_id(attribute_id):
+                continue
+
+            if attribute_id not in xml_cluster.attributes:
+                continue
+
+            if attribute_id not in Clusters.ClusterObjects.ALL_ATTRIBUTES[cluster_id]:
+                continue
+
+            xml_attr = xml_cluster.attributes[attribute_id]
+            write_access = xml_attr.write_access
+
+            if write_access != Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kUnknownEnumValue:
+                writable_attrs.append(attribute_id)
+
+        return writable_attrs
+
+    async def change_writable_attributes_and_verify_reports(
+        self,
+        handler: WildcardAttributeSubscriptionHandler,
+        priming_data,
+        test_step: str,
+    ) -> int:
+        """Change writable attributes and verify subscription reports are received.
+
+        Based on TC_AccessChecker.py's _run_write_access_test_for_cluster_privilege() approach.
+        This dynamically identifies writable attributes using XML spec data, then writes ACTUAL
+        VALUE CHANGES to trigger subscription change reports per Matter specification.
+
+        This function ensures actual value changes for all attribute types:
+        - Strings: Write unique timestamped values
+        - Lists: Write empty list
+        - Booleans: Flip the value
+        - Integers and Floats: Increment the value
+
+        This function verifies that change reports are received for each changed attribute
+        by using the handler's queue-based tracking mechanism to confirm reports were received.
+
+        Args:
+            handler: WildcardAttributeSubscriptionHandler tracking the subscription
+            priming_data: Priming report data from GetAttributes()
+            test_step: Step name for logging
+
+        Returns:
+            Number of attributes successfully changed and verified
+        """
+        changed_count = 0
+        changed_attributes: list[ChangedAttribute] = []
+
+        for endpoint_id, clusters in priming_data.items():
+            for cluster_class, attributes in clusters.items():
+                cluster_id = cluster_class.id
+                # Subscription priming data should never reference endpoints/clusters that
+                # the wildcard composition read didn't see; a mismatch indicates the DUT is
+                # reporting inconsistent composition and the test should fail.
+                asserts.assert_in(
+                    endpoint_id, self.endpoints_tlv,
+                    f"{test_step}: Endpoint {endpoint_id} appeared in subscription priming data "
+                    f"but is not present in the wildcard composition read of the DUT")
+                asserts.assert_in(
+                    cluster_id, self.endpoints_tlv[endpoint_id],
+                    f"{test_step}: Cluster 0x{cluster_id:04X} on endpoint {endpoint_id} appeared in "
+                    f"subscription priming data but is not present in the wildcard composition read of the DUT")
+
+                cluster_data = self.endpoints_tlv[endpoint_id][cluster_id]
+                writable_attr_ids = self.get_writable_attributes_for_cluster(cluster_id, cluster_data)
+                log.info(f'Writable attributes for cluster {cluster_id}: {writable_attr_ids}')
+
+                if not writable_attr_ids:
+                    continue
+
+                # Try to write to each writable attribute
+                for attribute_id in writable_attr_ids:
+                    # Get the attribute object
+                    if attribute_id not in Clusters.ClusterObjects.ALL_ATTRIBUTES[cluster_id]:
+                        continue
+
+                    attribute = Clusters.ClusterObjects.ALL_ATTRIBUTES[cluster_id][attribute_id]
+
+                    # Check if we have this attribute in the priming data
+                    if attribute not in attributes:
+                        continue
+
+                    # Skip attributes known to have write constraints
+                    ATTRIBUTES_WITH_WRITE_CONSTRAINTS = [
+                        # If ACL attribute is written to a blank list in below logic, then unable to recover needed permissions to read it afterwards, as known from working on the ACL tests.
+                        Clusters.AccessControl.Attributes.Acl,
+                        # InterfaceEnabled only writeable attribute and returns error status 1. Writing to it would cause the DUT to disconnect if successful, spec 11.9.6.5 shows this could attribute could be protected and will return a INVALID_ACTION error if attempted to be written too.
+                        Clusters.NetworkCommissioning.Attributes.InterfaceEnabled,
+                        # Location attribute of BasicInformation cluster default value is "XX", requires value to be max length of 2 uppercase letters.
+                        Clusters.BasicInformation.Attributes.Location,
+                    ]
+                    if attribute in ATTRIBUTES_WITH_WRITE_CONSTRAINTS:
+                        log.debug(f"{test_step}: Skipping {attribute.__name__} - known to have write constraints")
+                        continue
+
+                    # Get current value from priming data
+                    cached_val = attributes[attribute]
+
+                    # A ValueDecodeFailure here means the DUT returned an undecodable value
+                    # for an attribute it itself claimed to support in AttributeList; that's
+                    # a DUT bug, not something to skip past. Fail the test loudly.
+                    asserts.assert_false(
+                        isinstance(cached_val, ValueDecodeFailure),
+                        f"{test_step}: Attribute {attribute.__name__} on EP{endpoint_id} "
+                        f"(cluster 0x{cluster_id:04X}) returned a ValueDecodeFailure in subscription "
+                        f"priming data: {cached_val}")
+
+                    # Determine new value based on type
+                    if isinstance(cached_val, str):
+                        # Normal strings - use unique timestamped value
+                        new_val = f"{test_step}_T{int(time.time())}_{changed_count}"
+
+                    elif isinstance(cached_val, list):
+                        # List attribute - toggle between empty and non-empty to ensure actual change
+                        if len(cached_val) == 0:
+                            # Skip empty lists - writing a valid non-empty list requires XML spec knowledge to write valid data, this is outside the bounds of the IDM tests, and is covered by ACE tests
+                            log.info(
+                                f"{test_step}: Skipping {attribute.__name__} - empty list")
+                            continue
+                        # Non-empty list -> write empty list (safe change)
+                        new_val = []
+                    elif isinstance(cached_val, bool):
+                        # Boolean attribute - flip the value to trigger actual change
+                        new_val = not cached_val
+                    elif isinstance(cached_val, (int, float)):
+                        # increment to trigger actual change
+                        # Try incrementing first, but respect reasonable upper bounds
+                        if cached_val < 100:
+                            # For values 0-99, safe to increment (handles percentages, small enums)
+                            new_val = cached_val + 1
+                        elif cached_val < 1000000:
+                            # For larger values, decrement to ensure change without hitting constraints
+                            # Example: DefaultOpenLevel is 0-100, so we can decrement to 99 to trigger a change, if we incremented to 101 then it hits a constraint error..
+                            new_val = cached_val - 1
+                        else:
+                            # For very large values, use a safe 0 value
+                            new_val = 0
+                    else:
+                        # For other types, skip to avoid writing same value
+                        # Writing the same value should NOT trigger a report
+                        log.info(f"{test_step}: Skipping {attribute.__name__} - unsupported type for change")
+                        continue
+
+                    # Write the attribute
+                    log.info(f"{test_step}: Writing {attribute.__name__} on EP{endpoint_id}: {cached_val} -> {new_val}")
+                    resp = await self.default_controller.WriteAttribute(
+                        nodeId=self.dut_node_id,
+                        attributes=[(endpoint_id, attribute(new_val))]
+                    )
+
+                    if resp[0].Status == Status.Success:
+                        changed_count += 1
+                        log.info(
+                            f"{test_step}: [{changed_count}] Changed {attribute.__name__} (0x{attribute_id:04X}) on endpoint {endpoint_id}, cluster 0x{cluster_id:04X}: {cached_val} -> {new_val}")
+
+                        # Track this change for verification
+                        changed_attributes.append(ChangedAttribute(
+                            endpoint=endpoint_id,
+                            cluster=cluster_class,
+                            attribute=attribute,
+                            old_value=cached_val,
+                            new_value=new_val
+                        ))
+
+                    elif resp[0].Status == Status.UnsupportedAccess:
+                        asserts.fail(f"{test_step}: Write to {attribute.__name__} returned UnsupportedAccess")
+
+                    else:
+                        # Other errors are acceptable per TC_AccessChecker pattern
+                        # (e.g., InvalidValue, ConstraintError - as long as it's not UnsupportedAccess)
+                        log.info(f"{test_step}: Write to {attribute.__name__} returned {resp[0].Status}")
+
+        # Wait for change reports to arrive
+        # Wait in small increments, checking periodically
+        count = 0
+        last_report_count = len(handler.get_all_reported_attributes())
+        max_wait_time = 30
+        while count < max_wait_time:
+            await asyncio.sleep(1)
+            count += 1
+            # Log progress every interval
+            current_reports = len(handler.get_all_reported_attributes())
+            if current_reports != last_report_count:
+                last_report_count = current_reports
+            elif current_reports == changed_count:
+                break
+            else:
+                log.debug(f"{test_step}: {count}s elapsed, {current_reports} unique attributes reported (no change)")
+
+        # Verify that we received reports for all the changed attributes we wrote to
+        verified_count = 0
+        missing_reports = []
+
+        for change in changed_attributes:
+            ep = change.endpoint
+            cluster = change.cluster
+            attr = change.attribute
+
+            # Check if handler received a report for this attribute
+            if handler.was_attribute_reported(ep, cluster, attr):
+                verified_count += 1
+                reports_count = handler.get_attribute_report_count(ep, cluster, attr)
+                log.info(f"Reports count for {cluster.__name__} on endpoint {ep}: {reports_count}")
+            else:
+                missing_reports.append(f"{attr.__name__} on endpoint {ep}")
+
+        log.info(
+            f"{test_step}: Verified {verified_count}/{len(changed_attributes)} attribute change reports received")
+
+        # Report summary of all attributes that received reports
+        all_reported = handler.get_all_reported_attributes()
+        log.info(f"{test_step}: Total unique attributes with reports: {len(all_reported)}")
+
+        asserts.assert_less_equal(
+            len(missing_reports), 0,
+            f"{test_step}: Missing reports for {len(missing_reports)} attribute(s): {', '.join(missing_reports)}")
+        asserts.assert_greater(
+            verified_count, 0,
+            f"{test_step}: No change reports verified, expected {changed_count} reports")
+
+        # Revert the attributes to their original values
+        if changed_attributes:
+            for change in changed_attributes:
+                ep = change.endpoint
+                attr = change.attribute
+                old_value = change.old_value
+
+                resp = await self.default_controller.WriteAttribute(
+                    nodeId=self.dut_node_id,
+                    attributes=[(ep, attr(old_value))]
+                )
+                if resp[0].Status == Status.Success:
+                    revert_success = True
+                    break
+
+                asserts.assert_equal(
+                    revert_success, True,
+                    f"Failed to revert {attr.__name__} on endpoint {ep}: {resp[0].Status}"
+                )
+
+        return verified_count

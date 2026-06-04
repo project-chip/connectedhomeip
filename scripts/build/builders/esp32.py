@@ -18,7 +18,11 @@ import shlex
 from enum import Enum, auto
 from typing import Optional
 
-from .builder import Builder, BuilderOutput
+from runner.runner import Runner
+
+from .builder import Builder, BuilderOutput, OutDirLock, lock_output_dir
+
+log = logging.getLogger(__name__)
 
 
 class Esp32Board(Enum):
@@ -109,10 +113,12 @@ class Esp32App(Enum):
             return None
         raise Exception('Unknown app type: %r' % self)
 
-    @property
-    def FlashBundleName(self):
+    def FlashBundleName(self, is_all_devices_selective):
         if not self.AppNamePrefix:
             return None
+
+        if self == Esp32App.ALL_DEVICES and is_all_devices_selective:
+            return 'example-device-app.flashbundle.txt'
 
         return self.AppNamePrefix + '.flashbundle.txt'
 
@@ -159,20 +165,23 @@ def DefaultsFileName(board: Esp32Board, app: Esp32App, enable_rpcs: bool):
 class Esp32Builder(Builder):
 
     def __init__(self,
-                 root,
-                 runner,
+                 root: str,
+                 runner: Runner,
+                 output_dir_lock: OutDirLock,
                  board: Esp32Board = Esp32Board.M5Stack,
                  app: Esp32App = Esp32App.ALL_CLUSTERS,
                  enable_rpcs: bool = False,
                  enable_ipv4: bool = True,
                  enable_insights_trace: bool = False,
+                 all_devices_enabled_devices=None,
                  ):
-        super(Esp32Builder, self).__init__(root, runner)
+        super().__init__(root, runner, output_dir_lock)
         self.board = board
         self.app = app
         self.enable_rpcs = enable_rpcs
         self.enable_ipv4 = enable_ipv4
         self.enable_insights_trace = enable_insights_trace
+        self.all_devices_enabled_devices = all_devices_enabled_devices or []
 
         if not app.IsCompatible(board):
             raise Exception(
@@ -204,6 +213,7 @@ class Esp32Builder(Builder):
     def ExamplePath(self):
         return os.path.join(self.app.ExamplePath, 'esp32')
 
+    @lock_output_dir
     def generate(self):
         if os.path.exists(os.path.join(self.output_dir, 'build.ninja')):
             return
@@ -240,13 +250,17 @@ class Esp32Builder(Builder):
 
         # pre-requisite
         self._Execute(
-            ['bash', '-c', 'echo -e "\\nCONFIG_ESP_INSIGHTS_ENABLED=%s\\nCONFIG_ENABLE_ESP_INSIGHTS_TRACE=%s\\n" >>%s' % (insights_flag, insights_flag, shlex.quote(defaults_out))])
+            ['bash', '-c', 'echo -e "\\nCONFIG_ESP_INSIGHTS_ENABLED=%s\\nCONFIG_CHIP_ENABLE_ESP_DIAGNOSTICS=%s\\n" >>%s' % (insights_flag, insights_flag, shlex.quote(defaults_out))])
 
         cmake_flags = []
 
         if self.options.pregen_dir:
             cmake_flags.append(
                 f"-DCHIP_CODEGEN_PREGEN_DIR={shlex.quote(self.options.pregen_dir)}")
+
+        if self.all_devices_enabled_devices:
+            cmake_flags.append(
+                f"-DALL_DEVICES_ENABLED_DEVICES={shlex.quote(';'.join(self.all_devices_enabled_devices))}")
 
         cmake_args = ['-C', self.ExamplePath, '-B',
                       shlex.quote(self.output_dir)] + cmake_flags
@@ -260,8 +274,9 @@ class Esp32Builder(Builder):
         # This will do a 'cmake reconfigure' which will create ninja files without rebuilding
         self._IdfEnvExecute(cmd)
 
+    @lock_output_dir
     def _build(self):
-        logging.info('Compiling Esp32 at %s', self.output_dir)
+        log.info('Compiling Esp32 at %s', self.output_dir)
 
         # Unfortunately sdkconfig is sticky and needs reset on every build
         self._Execute(
@@ -281,6 +296,14 @@ class Esp32Builder(Builder):
 
         self._IdfEnvExecute(cmd, title='Building ' + self.identifier)
 
+    def _AllDevicesOutputName(self):
+        """Return the binary base name produced by the all-devices-app build."""
+        if self.all_devices_enabled_devices:
+            # this builder does not support altering the name
+            return 'example-device-app'
+        return 'all-devices-app'
+
+    @lock_output_dir
     def build_outputs(self):
         if self.app == Esp32App.TESTS:
             # Include the runnable image names as artifacts
@@ -292,13 +315,16 @@ class Esp32Builder(Builder):
         extensions = ["elf"]
         if self.options.enable_link_map_file:
             extensions.append("map")
+        app_name = self._AllDevicesOutputName() if self.app == Esp32App.ALL_DEVICES else self.app.AppNamePrefix
         for ext in extensions:
-            name = f"{self.app.AppNamePrefix}.{ext}"
+            name = f"{app_name}.{ext}"
             yield BuilderOutput(os.path.join(self.output_dir, name), name)
 
+    @lock_output_dir
     def bundle_outputs(self):
-        if not self.app.FlashBundleName:
+        flash_bundle_name = self.app.FlashBundleName(self.all_devices_enabled_devices)
+        if not flash_bundle_name:
             return
-        with open(os.path.join(self.output_dir, self.app.FlashBundleName)) as f:
+        with open(os.path.join(self.output_dir, flash_bundle_name)) as f:
             for line in filter(None, [x.strip() for x in f.readlines()]):
                 yield BuilderOutput(os.path.join(self.output_dir, line), line)

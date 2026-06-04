@@ -132,9 +132,6 @@ NSString * MTRClusterNameForID(MTRClusterIDType clusterID)
     case MTRClusterIDTypeICDManagementID:
         result = @"ICDManagement";
         break;
-    case MTRClusterIDTypeTimerID:
-        result = @"Timer";
-        break;
     case MTRClusterIDTypeOvenCavityOperationalStateID:
         result = @"OvenCavityOperationalState";
         break;
@@ -252,6 +249,15 @@ NSString * MTRClusterNameForID(MTRClusterIDType clusterID)
     case MTRClusterIDTypeElectricalGridConditionsID:
         result = @"ElectricalGridConditions";
         break;
+    case MTRClusterIDTypeElectricalAlarmID:
+        result = @"ElectricalAlarm";
+        break;
+    case MTRClusterIDTypeElectricalDistributionID:
+        result = @"ElectricalDistribution";
+        break;
+    case MTRClusterIDTypeElectricalProtectionAlarmID:
+        result = @"ElectricalProtectionAlarm";
+        break;
     case MTRClusterIDTypeDoorLockID:
         result = @"DoorLock";
         break;
@@ -279,11 +285,17 @@ NSString * MTRClusterNameForID(MTRClusterIDType clusterID)
     case MTRClusterIDTypeThermostatUserInterfaceConfigurationID:
         result = @"ThermostatUserInterfaceConfiguration";
         break;
+    case MTRClusterIDTypeHumidistatID:
+        result = @"Humidistat";
+        break;
     case MTRClusterIDTypeColorControlID:
         result = @"ColorControl";
         break;
     case MTRClusterIDTypeBallastConfigurationID:
         result = @"BallastConfiguration";
+        break;
+    case MTRClusterIDTypeDynamicLightingID:
+        result = @"DynamicLighting";
         break;
     case MTRClusterIDTypeIlluminanceMeasurementID:
         result = @"IlluminanceMeasurement";
@@ -338,6 +350,18 @@ NSString * MTRClusterNameForID(MTRClusterIDType clusterID)
         break;
     case MTRClusterIDTypeAmbientContextSensingID:
         result = @"AmbientContextSensing";
+        break;
+    case MTRClusterIDTypeAmbientSensingUnionID:
+        result = @"AmbientSensingUnion";
+        break;
+    case MTRClusterIDTypeProximityRangingID:
+        result = @"ProximityRanging";
+        break;
+    case MTRClusterIDTypeSmokeConcentrationMeasurementID:
+        result = @"SmokeConcentrationMeasurement";
+        break;
+    case MTRClusterIDTypeNetworkIdentityManagementID:
+        result = @"NetworkIdentityManagement";
         break;
     case MTRClusterIDTypeWiFiNetworkManagementID:
         result = @"WiFiNetworkManagement";
@@ -410,6 +434,9 @@ NSString * MTRClusterNameForID(MTRClusterIDType clusterID)
         break;
     case MTRClusterIDTypeChimeID:
         result = @"Chime";
+        break;
+    case MTRClusterIDTypeAVAnalysisID:
+        result = @"AVAnalysis";
         break;
     case MTRClusterIDTypeCommodityTariffID:
         result = @"CommodityTariff";
@@ -1004,6 +1031,10 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         case MTRAttributeIDTypeClusterBasicInformationAttributeMaxPathsPerInvokeID:
             result = @"MaxPathsPerInvoke";
+            break;
+
+        case MTRAttributeIDTypeClusterBasicInformationAttributeDeviceLocationID:
+            result = @"DeviceLocation";
             break;
 
         case MTRAttributeIDTypeClusterBasicInformationAttributeConfigurationVersionID:
@@ -2350,6 +2381,10 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"ProductAppearance";
             break;
 
+        case MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeDeviceLocationID:
+            result = @"DeviceLocation";
+            break;
+
         case MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeConfigurationVersionID:
             result = @"ConfigurationVersion";
             break;
@@ -2752,50 +2787,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         default:
             // Not a known ICDManagement attribute.
-            result = [NSString stringWithFormat:@"<Unknown attributeID %u>", attributeID];
-            break;
-        }
-        break;
-
-    case MTRClusterIDTypeTimerID:
-
-        switch (attributeID) {
-
-            // Cluster Timer attributes
-        case MTRAttributeIDTypeClusterTimerAttributeSetTimeID:
-            result = @"SetTime";
-            break;
-
-        case MTRAttributeIDTypeClusterTimerAttributeTimeRemainingID:
-            result = @"TimeRemaining";
-            break;
-
-        case MTRAttributeIDTypeClusterTimerAttributeTimerStateID:
-            result = @"TimerState";
-            break;
-
-        case MTRAttributeIDTypeClusterTimerAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
-
-        case MTRAttributeIDTypeClusterTimerAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
-
-        case MTRAttributeIDTypeClusterTimerAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
-
-        case MTRAttributeIDTypeClusterTimerAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
-
-        case MTRAttributeIDTypeClusterTimerAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
-
-        default:
-            // Not a known Timer attribute.
             result = [NSString stringWithFormat:@"<Unknown attributeID %u>", attributeID];
             break;
         }
@@ -4889,6 +4880,218 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
         }
         break;
 
+    case MTRClusterIDTypeElectricalAlarmID:
+
+        switch (attributeID) {
+
+            // Cluster ElectricalAlarm attributes
+        case MTRAttributeIDTypeClusterElectricalAlarmAttributeMaskID:
+            result = @"Mask";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalAlarmAttributeLatchID:
+            result = @"Latch";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalAlarmAttributeStateID:
+            result = @"State";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalAlarmAttributeSupportedID:
+            result = @"Supported";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalAlarmAttributeOverVoltageThresholdID:
+            result = @"OverVoltageThreshold";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalAlarmAttributeUnderVoltageThresholdID:
+            result = @"UnderVoltageThreshold";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalAlarmAttributeOverFrequencyThresholdID:
+            result = @"OverFrequencyThreshold";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalAlarmAttributeUnderFrequencyThresholdID:
+            result = @"UnderFrequencyThreshold";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalAlarmAttributeOverPowerThresholdID:
+            result = @"OverPowerThreshold";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalAlarmAttributeUnderPowerThresholdID:
+            result = @"UnderPowerThreshold";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalAlarmAttributeOverCurrentThresholdID:
+            result = @"OverCurrentThreshold";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalAlarmAttributeUnderCurrentThresholdID:
+            result = @"UnderCurrentThreshold";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalAlarmAttributePowerImportThresholdID:
+            result = @"PowerImportThreshold";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalAlarmAttributePowerExportThresholdID:
+            result = @"PowerExportThreshold";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalAlarmAttributeGeneratedCommandListID:
+            result = @"GeneratedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalAlarmAttributeAcceptedCommandListID:
+            result = @"AcceptedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalAlarmAttributeAttributeListID:
+            result = @"AttributeList";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalAlarmAttributeFeatureMapID:
+            result = @"FeatureMap";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalAlarmAttributeClusterRevisionID:
+            result = @"ClusterRevision";
+            break;
+
+        default:
+            // Not a known ElectricalAlarm attribute.
+            result = [NSString stringWithFormat:@"<Unknown attributeID %u>", attributeID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeElectricalDistributionID:
+
+        switch (attributeID) {
+
+            // Cluster ElectricalDistribution attributes
+        case MTRAttributeIDTypeClusterElectricalDistributionAttributeMaxContinuousCurrentID:
+            result = @"MaxContinuousCurrent";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalDistributionAttributeMaxVoltageID:
+            result = @"MaxVoltage";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalDistributionAttributeNumberOfPolesID:
+            result = @"NumberOfPoles";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalDistributionAttributeEndOfLifeID:
+            result = @"EndOfLife";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalDistributionAttributeServiceEntranceRatedID:
+            result = @"ServiceEntranceRated";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalDistributionAttributeGeneratedCommandListID:
+            result = @"GeneratedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalDistributionAttributeAcceptedCommandListID:
+            result = @"AcceptedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalDistributionAttributeAttributeListID:
+            result = @"AttributeList";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalDistributionAttributeFeatureMapID:
+            result = @"FeatureMap";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalDistributionAttributeClusterRevisionID:
+            result = @"ClusterRevision";
+            break;
+
+        default:
+            // Not a known ElectricalDistribution attribute.
+            result = [NSString stringWithFormat:@"<Unknown attributeID %u>", attributeID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeElectricalProtectionAlarmID:
+
+        switch (attributeID) {
+
+            // Cluster ElectricalProtectionAlarm attributes
+        case MTRAttributeIDTypeClusterElectricalProtectionAlarmAttributeMaskID:
+            result = @"Mask";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalProtectionAlarmAttributeStateID:
+            result = @"State";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalProtectionAlarmAttributeSupportedID:
+            result = @"Supported";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalProtectionAlarmAttributeArcCauseID:
+            result = @"ArcCause";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalProtectionAlarmAttributeOverLoadRatingID:
+            result = @"OverLoadRating";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalProtectionAlarmAttributeOverVoltageRatingID:
+            result = @"OverVoltageRating";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalProtectionAlarmAttributeSurgeProtectionRatingID:
+            result = @"SurgeProtectionRating";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalProtectionAlarmAttributeShortCircuitRatingID:
+            result = @"ShortCircuitRating";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalProtectionAlarmAttributeResidualCurrentRatingID:
+            result = @"ResidualCurrentRating";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalProtectionAlarmAttributeArcFaultRatingID:
+            result = @"ArcFaultRating";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalProtectionAlarmAttributeGeneratedCommandListID:
+            result = @"GeneratedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalProtectionAlarmAttributeAcceptedCommandListID:
+            result = @"AcceptedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalProtectionAlarmAttributeAttributeListID:
+            result = @"AttributeList";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalProtectionAlarmAttributeFeatureMapID:
+            result = @"FeatureMap";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalProtectionAlarmAttributeClusterRevisionID:
+            result = @"ClusterRevision";
+            break;
+
+        default:
+            // Not a known ElectricalProtectionAlarm attribute.
+            result = [NSString stringWithFormat:@"<Unknown attributeID %u>", attributeID];
+            break;
+        }
+        break;
+
     case MTRClusterIDTypeDoorLockID:
 
         switch (attributeID) {
@@ -5949,6 +6152,82 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
         }
         break;
 
+    case MTRClusterIDTypeHumidistatID:
+
+        switch (attributeID) {
+
+            // Cluster Humidistat attributes
+        case MTRAttributeIDTypeClusterHumidistatAttributeModeID:
+            result = @"Mode";
+            break;
+
+        case MTRAttributeIDTypeClusterHumidistatAttributeSystemStateID:
+            result = @"SystemState";
+            break;
+
+        case MTRAttributeIDTypeClusterHumidistatAttributeUserSetpointID:
+            result = @"UserSetpoint";
+            break;
+
+        case MTRAttributeIDTypeClusterHumidistatAttributeMinSetpointID:
+            result = @"MinSetpoint";
+            break;
+
+        case MTRAttributeIDTypeClusterHumidistatAttributeMaxSetpointID:
+            result = @"MaxSetpoint";
+            break;
+
+        case MTRAttributeIDTypeClusterHumidistatAttributeStepID:
+            result = @"Step";
+            break;
+
+        case MTRAttributeIDTypeClusterHumidistatAttributeTargetSetpointID:
+            result = @"TargetSetpoint";
+            break;
+
+        case MTRAttributeIDTypeClusterHumidistatAttributeMistTypeID:
+            result = @"MistType";
+            break;
+
+        case MTRAttributeIDTypeClusterHumidistatAttributeContinuousID:
+            result = @"Continuous";
+            break;
+
+        case MTRAttributeIDTypeClusterHumidistatAttributeSleepID:
+            result = @"Sleep";
+            break;
+
+        case MTRAttributeIDTypeClusterHumidistatAttributeOptimalID:
+            result = @"Optimal";
+            break;
+
+        case MTRAttributeIDTypeClusterHumidistatAttributeGeneratedCommandListID:
+            result = @"GeneratedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterHumidistatAttributeAcceptedCommandListID:
+            result = @"AcceptedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterHumidistatAttributeAttributeListID:
+            result = @"AttributeList";
+            break;
+
+        case MTRAttributeIDTypeClusterHumidistatAttributeFeatureMapID:
+            result = @"FeatureMap";
+            break;
+
+        case MTRAttributeIDTypeClusterHumidistatAttributeClusterRevisionID:
+            result = @"ClusterRevision";
+            break;
+
+        default:
+            // Not a known Humidistat attribute.
+            result = [NSString stringWithFormat:@"<Unknown attributeID %u>", attributeID];
+            break;
+        }
+        break;
+
     case MTRClusterIDTypeColorControlID:
 
         switch (attributeID) {
@@ -6272,6 +6551,50 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         default:
             // Not a known BallastConfiguration attribute.
+            result = [NSString stringWithFormat:@"<Unknown attributeID %u>", attributeID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeDynamicLightingID:
+
+        switch (attributeID) {
+
+            // Cluster DynamicLighting attributes
+        case MTRAttributeIDTypeClusterDynamicLightingAttributeAvailableEffectsID:
+            result = @"AvailableEffects";
+            break;
+
+        case MTRAttributeIDTypeClusterDynamicLightingAttributeCurrentEffectIDID:
+            result = @"CurrentEffectID";
+            break;
+
+        case MTRAttributeIDTypeClusterDynamicLightingAttributeCurrentSpeedID:
+            result = @"CurrentSpeed";
+            break;
+
+        case MTRAttributeIDTypeClusterDynamicLightingAttributeGeneratedCommandListID:
+            result = @"GeneratedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterDynamicLightingAttributeAcceptedCommandListID:
+            result = @"AcceptedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterDynamicLightingAttributeAttributeListID:
+            result = @"AttributeList";
+            break;
+
+        case MTRAttributeIDTypeClusterDynamicLightingAttributeFeatureMapID:
+            result = @"FeatureMap";
+            break;
+
+        case MTRAttributeIDTypeClusterDynamicLightingAttributeClusterRevisionID:
+            result = @"ClusterRevision";
+            break;
+
+        default:
+            // Not a known DynamicLighting attribute.
             result = [NSString stringWithFormat:@"<Unknown attributeID %u>", attributeID];
             break;
         }
@@ -7458,8 +7781,8 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"AmbientContextTypeSupported";
             break;
 
-        case MTRAttributeIDTypeClusterAmbientContextSensingAttributeObjectCountReachedID:
-            result = @"ObjectCountReached";
+        case MTRAttributeIDTypeClusterAmbientContextSensingAttributeObjectCountThresholdReachedID:
+            result = @"ObjectCountThresholdReached";
             break;
 
         case MTRAttributeIDTypeClusterAmbientContextSensingAttributeObjectCountConfigID:
@@ -7486,6 +7809,10 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"PredictedActivity";
             break;
 
+        case MTRAttributeIDTypeClusterAmbientContextSensingAttributeSensorFusionSupportedID:
+            result = @"SensorFusionSupported";
+            break;
+
         case MTRAttributeIDTypeClusterAmbientContextSensingAttributeGeneratedCommandListID:
             result = @"GeneratedCommandList";
             break;
@@ -7508,6 +7835,230 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         default:
             // Not a known AmbientContextSensing attribute.
+            result = [NSString stringWithFormat:@"<Unknown attributeID %u>", attributeID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeAmbientSensingUnionID:
+
+        switch (attributeID) {
+
+            // Cluster AmbientSensingUnion attributes
+        case MTRAttributeIDTypeClusterAmbientSensingUnionAttributeUnionNameID:
+            result = @"UnionName";
+            break;
+
+        case MTRAttributeIDTypeClusterAmbientSensingUnionAttributeUnionHealthID:
+            result = @"UnionHealth";
+            break;
+
+        case MTRAttributeIDTypeClusterAmbientSensingUnionAttributeUnionContributorListID:
+            result = @"UnionContributorList";
+            break;
+
+        case MTRAttributeIDTypeClusterAmbientSensingUnionAttributeGeneratedCommandListID:
+            result = @"GeneratedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterAmbientSensingUnionAttributeAcceptedCommandListID:
+            result = @"AcceptedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterAmbientSensingUnionAttributeAttributeListID:
+            result = @"AttributeList";
+            break;
+
+        case MTRAttributeIDTypeClusterAmbientSensingUnionAttributeFeatureMapID:
+            result = @"FeatureMap";
+            break;
+
+        case MTRAttributeIDTypeClusterAmbientSensingUnionAttributeClusterRevisionID:
+            result = @"ClusterRevision";
+            break;
+
+        default:
+            // Not a known AmbientSensingUnion attribute.
+            result = [NSString stringWithFormat:@"<Unknown attributeID %u>", attributeID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeProximityRangingID:
+
+        switch (attributeID) {
+
+            // Cluster ProximityRanging attributes
+        case MTRAttributeIDTypeClusterProximityRangingAttributeRangingCapabilitiesID:
+            result = @"RangingCapabilities";
+            break;
+
+        case MTRAttributeIDTypeClusterProximityRangingAttributeWiFiDevIKID:
+            result = @"WiFiDevIK";
+            break;
+
+        case MTRAttributeIDTypeClusterProximityRangingAttributeBLEDeviceIDID:
+            result = @"BLEDeviceID";
+            break;
+
+        case MTRAttributeIDTypeClusterProximityRangingAttributeBLTDevIKID:
+            result = @"BLTDevIK";
+            break;
+
+        case MTRAttributeIDTypeClusterProximityRangingAttributeBLTCSSecurityLevelID:
+            result = @"BLTCSSecurityLevel";
+            break;
+
+        case MTRAttributeIDTypeClusterProximityRangingAttributeBLTCSModeCapabilityID:
+            result = @"BLTCSModeCapability";
+            break;
+
+        case MTRAttributeIDTypeClusterProximityRangingAttributeSessionIDListID:
+            result = @"SessionIDList";
+            break;
+
+        case MTRAttributeIDTypeClusterProximityRangingAttributeGeneratedCommandListID:
+            result = @"GeneratedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterProximityRangingAttributeAcceptedCommandListID:
+            result = @"AcceptedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterProximityRangingAttributeAttributeListID:
+            result = @"AttributeList";
+            break;
+
+        case MTRAttributeIDTypeClusterProximityRangingAttributeFeatureMapID:
+            result = @"FeatureMap";
+            break;
+
+        case MTRAttributeIDTypeClusterProximityRangingAttributeClusterRevisionID:
+            result = @"ClusterRevision";
+            break;
+
+        default:
+            // Not a known ProximityRanging attribute.
+            result = [NSString stringWithFormat:@"<Unknown attributeID %u>", attributeID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeSmokeConcentrationMeasurementID:
+
+        switch (attributeID) {
+
+            // Cluster SmokeConcentrationMeasurement attributes
+        case MTRAttributeIDTypeClusterSmokeConcentrationMeasurementAttributeMeasuredValueID:
+            result = @"MeasuredValue";
+            break;
+
+        case MTRAttributeIDTypeClusterSmokeConcentrationMeasurementAttributeMinMeasuredValueID:
+            result = @"MinMeasuredValue";
+            break;
+
+        case MTRAttributeIDTypeClusterSmokeConcentrationMeasurementAttributeMaxMeasuredValueID:
+            result = @"MaxMeasuredValue";
+            break;
+
+        case MTRAttributeIDTypeClusterSmokeConcentrationMeasurementAttributePeakMeasuredValueID:
+            result = @"PeakMeasuredValue";
+            break;
+
+        case MTRAttributeIDTypeClusterSmokeConcentrationMeasurementAttributePeakMeasuredValueWindowID:
+            result = @"PeakMeasuredValueWindow";
+            break;
+
+        case MTRAttributeIDTypeClusterSmokeConcentrationMeasurementAttributeAverageMeasuredValueID:
+            result = @"AverageMeasuredValue";
+            break;
+
+        case MTRAttributeIDTypeClusterSmokeConcentrationMeasurementAttributeAverageMeasuredValueWindowID:
+            result = @"AverageMeasuredValueWindow";
+            break;
+
+        case MTRAttributeIDTypeClusterSmokeConcentrationMeasurementAttributeUncertaintyID:
+            result = @"Uncertainty";
+            break;
+
+        case MTRAttributeIDTypeClusterSmokeConcentrationMeasurementAttributeMeasurementUnitID:
+            result = @"MeasurementUnit";
+            break;
+
+        case MTRAttributeIDTypeClusterSmokeConcentrationMeasurementAttributeMeasurementMediumID:
+            result = @"MeasurementMedium";
+            break;
+
+        case MTRAttributeIDTypeClusterSmokeConcentrationMeasurementAttributeLevelValueID:
+            result = @"LevelValue";
+            break;
+
+        case MTRAttributeIDTypeClusterSmokeConcentrationMeasurementAttributeGeneratedCommandListID:
+            result = @"GeneratedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterSmokeConcentrationMeasurementAttributeAcceptedCommandListID:
+            result = @"AcceptedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterSmokeConcentrationMeasurementAttributeAttributeListID:
+            result = @"AttributeList";
+            break;
+
+        case MTRAttributeIDTypeClusterSmokeConcentrationMeasurementAttributeFeatureMapID:
+            result = @"FeatureMap";
+            break;
+
+        case MTRAttributeIDTypeClusterSmokeConcentrationMeasurementAttributeClusterRevisionID:
+            result = @"ClusterRevision";
+            break;
+
+        default:
+            // Not a known SmokeConcentrationMeasurement attribute.
+            result = [NSString stringWithFormat:@"<Unknown attributeID %u>", attributeID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeNetworkIdentityManagementID:
+
+        switch (attributeID) {
+
+            // Cluster NetworkIdentityManagement attributes
+        case MTRAttributeIDTypeClusterNetworkIdentityManagementAttributeActiveNetworkIdentitiesID:
+            result = @"ActiveNetworkIdentities";
+            break;
+
+        case MTRAttributeIDTypeClusterNetworkIdentityManagementAttributeClientsID:
+            result = @"Clients";
+            break;
+
+        case MTRAttributeIDTypeClusterNetworkIdentityManagementAttributeClientTableSizeID:
+            result = @"ClientTableSize";
+            break;
+
+        case MTRAttributeIDTypeClusterNetworkIdentityManagementAttributeGeneratedCommandListID:
+            result = @"GeneratedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterNetworkIdentityManagementAttributeAcceptedCommandListID:
+            result = @"AcceptedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterNetworkIdentityManagementAttributeAttributeListID:
+            result = @"AttributeList";
+            break;
+
+        case MTRAttributeIDTypeClusterNetworkIdentityManagementAttributeFeatureMapID:
+            result = @"FeatureMap";
+            break;
+
+        case MTRAttributeIDTypeClusterNetworkIdentityManagementAttributeClusterRevisionID:
+            result = @"ClusterRevision";
+            break;
+
+        default:
+            // Not a known NetworkIdentityManagement attribute.
             result = [NSString stringWithFormat:@"<Unknown attributeID %u>", attributeID];
             break;
         }
@@ -8510,6 +9061,10 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"StatusLightBrightness";
             break;
 
+        case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeImageRotationDiscreteAnglesID:
+            result = @"ImageRotationDiscreteAngles";
+            break;
+
         case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeGeneratedCommandListID:
             result = @"GeneratedCommandList";
             break;
@@ -8760,6 +9315,62 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         default:
             // Not a known Chime attribute.
+            result = [NSString stringWithFormat:@"<Unknown attributeID %u>", attributeID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeAVAnalysisID:
+
+        switch (attributeID) {
+
+            // Cluster AVAnalysis attributes
+        case MTRAttributeIDTypeClusterAVAnalysisAttributeSupportedAmbientContextsID:
+            result = @"SupportedAmbientContexts";
+            break;
+
+        case MTRAttributeIDTypeClusterAVAnalysisAttributeActiveAmbientContextTriggersID:
+            result = @"ActiveAmbientContextTriggers";
+            break;
+
+        case MTRAttributeIDTypeClusterAVAnalysisAttributeMaxAnalysisStreamCountID:
+            result = @"MaxAnalysisStreamCount";
+            break;
+
+        case MTRAttributeIDTypeClusterAVAnalysisAttributeCurrentAnalysisStreamCountID:
+            result = @"CurrentAnalysisStreamCount";
+            break;
+
+        case MTRAttributeIDTypeClusterAVAnalysisAttributeAnalysisStreamsID:
+            result = @"AnalysisStreams";
+            break;
+
+        case MTRAttributeIDTypeClusterAVAnalysisAttributeTrackingEnabledID:
+            result = @"TrackingEnabled";
+            break;
+
+        case MTRAttributeIDTypeClusterAVAnalysisAttributeGeneratedCommandListID:
+            result = @"GeneratedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterAVAnalysisAttributeAcceptedCommandListID:
+            result = @"AcceptedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterAVAnalysisAttributeAttributeListID:
+            result = @"AttributeList";
+            break;
+
+        case MTRAttributeIDTypeClusterAVAnalysisAttributeFeatureMapID:
+            result = @"FeatureMap";
+            break;
+
+        case MTRAttributeIDTypeClusterAVAnalysisAttributeClusterRevisionID:
+            result = @"ClusterRevision";
+            break;
+
+        default:
+            // Not a known AVAnalysis attribute.
             result = [NSString stringWithFormat:@"<Unknown attributeID %u>", attributeID];
             break;
         }
@@ -10395,32 +11006,6 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
         }
         break;
 
-    case MTRClusterIDTypeTimerID:
-
-        switch (commandID) {
-
-        case MTRCommandIDTypeClusterTimerCommandSetTimerID:
-            result = @"SetTimer";
-            break;
-
-        case MTRCommandIDTypeClusterTimerCommandResetTimerID:
-            result = @"ResetTimer";
-            break;
-
-        case MTRCommandIDTypeClusterTimerCommandAddTimeID:
-            result = @"AddTime";
-            break;
-
-        case MTRCommandIDTypeClusterTimerCommandReduceTimeID:
-            result = @"ReduceTime";
-            break;
-
-        default:
-            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
-            break;
-        }
-        break;
-
     case MTRClusterIDTypeOvenCavityOperationalStateID:
 
         switch (commandID) {
@@ -11075,6 +11660,52 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
         }
         break;
 
+    case MTRClusterIDTypeElectricalAlarmID:
+
+        switch (commandID) {
+
+        case MTRCommandIDTypeClusterElectricalAlarmCommandResetID:
+            result = @"Reset";
+            break;
+
+        case MTRCommandIDTypeClusterElectricalAlarmCommandModifyEnabledAlarmsID:
+            result = @"ModifyEnabledAlarms";
+            break;
+
+        case MTRCommandIDTypeClusterElectricalAlarmCommandSetElectricalAlarmThresholdsID:
+            result = @"SetElectricalAlarmThresholds";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeElectricalDistributionID:
+
+        switch (commandID) {
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeElectricalProtectionAlarmID:
+
+        switch (commandID) {
+
+        case MTRCommandIDTypeClusterElectricalProtectionAlarmCommandModifyEnabledAlarmsID:
+            result = @"ModifyEnabledAlarms";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
     case MTRClusterIDTypeDoorLockID:
 
         switch (commandID) {
@@ -11345,6 +11976,20 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
         }
         break;
 
+    case MTRClusterIDTypeHumidistatID:
+
+        switch (commandID) {
+
+        case MTRCommandIDTypeClusterHumidistatCommandSetSettingsID:
+            result = @"SetSettings";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
     case MTRClusterIDTypeColorControlID:
 
         switch (commandID) {
@@ -11434,6 +12079,24 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
     case MTRClusterIDTypeBallastConfigurationID:
 
         switch (commandID) {
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeDynamicLightingID:
+
+        switch (commandID) {
+
+        case MTRCommandIDTypeClusterDynamicLightingCommandStartEffectID:
+            result = @"StartEffect";
+            break;
+
+        case MTRCommandIDTypeClusterDynamicLightingCommandStopEffectID:
+            result = @"StopEffect";
+            break;
 
         default:
             result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
@@ -11614,6 +12277,74 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
     case MTRClusterIDTypeAmbientContextSensingID:
 
         switch (commandID) {
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeAmbientSensingUnionID:
+
+        switch (commandID) {
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeProximityRangingID:
+
+        switch (commandID) {
+
+        case MTRCommandIDTypeClusterProximityRangingCommandStartRangingRequestID:
+            result = @"StartRangingRequest";
+            break;
+
+        case MTRCommandIDTypeClusterProximityRangingCommandStopRangingRequestID:
+            result = @"StopRangingRequest";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeSmokeConcentrationMeasurementID:
+
+        switch (commandID) {
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeNetworkIdentityManagementID:
+
+        switch (commandID) {
+
+        case MTRCommandIDTypeClusterNetworkIdentityManagementCommandAddClientID:
+            result = @"AddClient";
+            break;
+
+        case MTRCommandIDTypeClusterNetworkIdentityManagementCommandRemoveClientID:
+            result = @"RemoveClient";
+            break;
+
+        case MTRCommandIDTypeClusterNetworkIdentityManagementCommandQueryIdentityID:
+            result = @"QueryIdentity";
+            break;
+
+        case MTRCommandIDTypeClusterNetworkIdentityManagementCommandImportAdminSecretID:
+            result = @"ImportAdminSecret";
+            break;
+
+        case MTRCommandIDTypeClusterNetworkIdentityManagementCommandExportAdminSecretID:
+            result = @"ExportAdminSecret";
+            break;
 
         default:
             result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
@@ -12253,6 +12984,40 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
 
         case MTRCommandIDTypeClusterChimeCommandPlayChimeSoundID:
             result = @"PlayChimeSound";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeAVAnalysisID:
+
+        switch (commandID) {
+
+        case MTRCommandIDTypeClusterAVAnalysisCommandEnableContextTriggersID:
+            result = @"EnableContextTriggers";
+            break;
+
+        case MTRCommandIDTypeClusterAVAnalysisCommandDisableContextTriggersID:
+            result = @"DisableContextTriggers";
+            break;
+
+        case MTRCommandIDTypeClusterAVAnalysisCommandEstablishAnalysisStreamID:
+            result = @"EstablishAnalysisStream";
+            break;
+
+        case MTRCommandIDTypeClusterAVAnalysisCommandActivateAnalysisStreamID:
+            result = @"ActivateAnalysisStream";
+            break;
+
+        case MTRCommandIDTypeClusterAVAnalysisCommandDeactivateAnalysisStreamID:
+            result = @"DeactivateAnalysisStream";
+            break;
+
+        case MTRCommandIDTypeClusterAVAnalysisCommandRemoveAnalysisStreamID:
+            result = @"RemoveAnalysisStream";
             break;
 
         default:
@@ -13135,16 +13900,6 @@ NSString * MTRResponseCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDT
         }
         break;
 
-    case MTRClusterIDTypeTimerID:
-
-        switch (commandID) {
-
-        default:
-            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
-            break;
-        }
-        break;
-
     case MTRClusterIDTypeOvenCavityOperationalStateID:
 
         switch (commandID) {
@@ -13627,6 +14382,36 @@ NSString * MTRResponseCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDT
         }
         break;
 
+    case MTRClusterIDTypeElectricalAlarmID:
+
+        switch (commandID) {
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeElectricalDistributionID:
+
+        switch (commandID) {
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeElectricalProtectionAlarmID:
+
+        switch (commandID) {
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
     case MTRClusterIDTypeDoorLockID:
 
         switch (commandID) {
@@ -13761,6 +14546,16 @@ NSString * MTRResponseCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDT
         }
         break;
 
+    case MTRClusterIDTypeHumidistatID:
+
+        switch (commandID) {
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
     case MTRClusterIDTypeColorControlID:
 
         switch (commandID) {
@@ -13772,6 +14567,16 @@ NSString * MTRResponseCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDT
         break;
 
     case MTRClusterIDTypeBallastConfigurationID:
+
+        switch (commandID) {
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeDynamicLightingID:
 
         switch (commandID) {
 
@@ -13954,6 +14759,62 @@ NSString * MTRResponseCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDT
     case MTRClusterIDTypeAmbientContextSensingID:
 
         switch (commandID) {
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeAmbientSensingUnionID:
+
+        switch (commandID) {
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeProximityRangingID:
+
+        switch (commandID) {
+
+        case MTRCommandIDTypeClusterProximityRangingCommandStartRangingResponseID:
+            result = @"StartRangingResponse";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeSmokeConcentrationMeasurementID:
+
+        switch (commandID) {
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeNetworkIdentityManagementID:
+
+        switch (commandID) {
+
+        case MTRCommandIDTypeClusterNetworkIdentityManagementCommandAddClientResponseID:
+            result = @"AddClientResponse";
+            break;
+
+        case MTRCommandIDTypeClusterNetworkIdentityManagementCommandQueryIdentityResponseID:
+            result = @"QueryIdentityResponse";
+            break;
+
+        case MTRCommandIDTypeClusterNetworkIdentityManagementCommandExportAdminSecretResponseID:
+            result = @"ExportAdminSecretResponse";
+            break;
 
         default:
             result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
@@ -14282,6 +15143,20 @@ NSString * MTRResponseCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDT
     case MTRClusterIDTypeChimeID:
 
         switch (commandID) {
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeAVAnalysisID:
+
+        switch (commandID) {
+
+        case MTRCommandIDTypeClusterAVAnalysisCommandEstablishAnalysisStreamResponseID:
+            result = @"EstablishAnalysisStreamResponse";
+            break;
 
         default:
             result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
@@ -15078,16 +15953,6 @@ NSString * MTREventNameForID(MTRClusterIDType clusterID, MTREventIDType eventID)
         }
         break;
 
-    case MTRClusterIDTypeTimerID:
-
-        switch (eventID) {
-
-        default:
-            result = [NSString stringWithFormat:@"<Unknown eventID %u>", eventID];
-            break;
-        }
-        break;
-
     case MTRClusterIDTypeOvenCavityOperationalStateID:
 
         switch (eventID) {
@@ -15671,6 +16536,46 @@ NSString * MTREventNameForID(MTRClusterIDType clusterID, MTREventIDType eventID)
         }
         break;
 
+    case MTRClusterIDTypeElectricalAlarmID:
+
+        switch (eventID) {
+
+            // Cluster ElectricalAlarm events
+        case MTREventIDTypeClusterElectricalAlarmEventNotifyID:
+            result = @"Notify";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown eventID %u>", eventID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeElectricalDistributionID:
+
+        switch (eventID) {
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown eventID %u>", eventID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeElectricalProtectionAlarmID:
+
+        switch (eventID) {
+
+            // Cluster ElectricalProtectionAlarm events
+        case MTREventIDTypeClusterElectricalProtectionAlarmEventNotifyID:
+            result = @"Notify";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown eventID %u>", eventID];
+            break;
+        }
+        break;
+
     case MTRClusterIDTypeDoorLockID:
 
         switch (eventID) {
@@ -15901,6 +16806,16 @@ NSString * MTREventNameForID(MTRClusterIDType clusterID, MTREventIDType eventID)
         }
         break;
 
+    case MTRClusterIDTypeHumidistatID:
+
+        switch (eventID) {
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown eventID %u>", eventID];
+            break;
+        }
+        break;
+
     case MTRClusterIDTypeColorControlID:
 
         switch (eventID) {
@@ -15912,6 +16827,16 @@ NSString * MTREventNameForID(MTRClusterIDType clusterID, MTREventIDType eventID)
         break;
 
     case MTRClusterIDTypeBallastConfigurationID:
+
+        switch (eventID) {
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown eventID %u>", eventID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeDynamicLightingID:
 
         switch (eventID) {
 
@@ -16108,6 +17033,68 @@ NSString * MTREventNameForID(MTRClusterIDType clusterID, MTREventIDType eventID)
         case MTREventIDTypeClusterAmbientContextSensingEventAmbientContextDetectEndedID:
             result = @"AmbientContextDetectEnded";
             break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown eventID %u>", eventID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeAmbientSensingUnionID:
+
+        switch (eventID) {
+
+            // Cluster AmbientSensingUnion events
+        case MTREventIDTypeClusterAmbientSensingUnionEventUnionContributorAddedID:
+            result = @"UnionContributorAdded";
+            break;
+
+        case MTREventIDTypeClusterAmbientSensingUnionEventUnionContributorRemovedID:
+            result = @"UnionContributorRemoved";
+            break;
+
+        case MTREventIDTypeClusterAmbientSensingUnionEventUnionContributorStatusChangedID:
+            result = @"UnionContributorStatusChanged";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown eventID %u>", eventID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeProximityRangingID:
+
+        switch (eventID) {
+
+            // Cluster ProximityRanging events
+        case MTREventIDTypeClusterProximityRangingEventRangingResultID:
+            result = @"RangingResult";
+            break;
+
+        case MTREventIDTypeClusterProximityRangingEventRangingSessionStatusID:
+            result = @"RangingSessionStatus";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown eventID %u>", eventID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeSmokeConcentrationMeasurementID:
+
+        switch (eventID) {
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown eventID %u>", eventID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeNetworkIdentityManagementID:
+
+        switch (eventID) {
 
         default:
             result = [NSString stringWithFormat:@"<Unknown eventID %u>", eventID];
@@ -16394,6 +17381,29 @@ NSString * MTREventNameForID(MTRClusterIDType clusterID, MTREventIDType eventID)
             // Cluster Chime events
         case MTREventIDTypeClusterChimeEventChimeStartedPlayingID:
             result = @"ChimeStartedPlaying";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown eventID %u>", eventID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeAVAnalysisID:
+
+        switch (eventID) {
+
+            // Cluster AVAnalysis events
+        case MTREventIDTypeClusterAVAnalysisEventAnalysisSessionStartID:
+            result = @"AnalysisSessionStart";
+            break;
+
+        case MTREventIDTypeClusterAVAnalysisEventAnalysisSessionEndID:
+            result = @"AnalysisSessionEnd";
+            break;
+
+        case MTREventIDTypeClusterAVAnalysisEventPerceivedContextID:
+            result = @"PerceivedContext";
             break;
 
         default:

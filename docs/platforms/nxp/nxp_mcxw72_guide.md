@@ -25,10 +25,8 @@ The examples support:
 
 ### Supported build systems
 
-MCXW72 platform supports two different build systems to generate the application
-:
+MCXW72 platform supports only one build system to generate the application:
 
--   `GN` (_contact-sensor_ application only)
 -   `CMake`
 
 <a name="building"></a>
@@ -40,8 +38,6 @@ Make sure to follow shared build instructions from
 to set-up your environment.
 
 > In the following steps, the "lighting-app" is used as an example.
-
-### CMake Build System
 
 The examples support configuration and build using the CMake build system. You
 can find more information in
@@ -65,25 +61,6 @@ Note that the MCXW72 examples support various configurations that can be
 provided to the `CONF_FILE_NAME` variable, you can refer to the
 [table of available project configuration files and platform compatibility](./nxp_examples_freertos_platforms.md#build-config-files)
 to check all the supported configurations.
-
-### GN Build System
-
-#### Building with Matter over Thread configuration on MCXW72
-
--   Build Matter-over-Thread configuration with BLE commissioning.
-
-```
-user@ubuntu:~/Desktop/git/connectedhomeip/examples/contact-sensor-app/nxp/mcxw72$ gn gen out/debug
-user@ubuntu:~/Desktop/git/connectedhomeip/examples/contact-sensor-app/nxp/mcxw72$ ninja -C out/debug
-```
-
-#### General information
-
-The resulting application can be found in out/debug/chip-mcxw72-contact-example.
-
-Additional GN options can be added when building the application. You can check
-[Common GN options to FreeRTOS platforms](./nxp_examples_freertos_platforms.md#general-information)
-for the full list.
 
 <a name="manufacturing-data"></a>
 
@@ -216,3 +193,31 @@ Over-The-Air software updates are supported with the MCXW72 examples. The
 process to follow in order to perform a software update is described in the
 dedicated guide
 ['Matter Over-The-Air Software Update with NXP MCXW example applications'](./nxp_mcxw_ota_guide.md).
+
+## Enabling SE05x Secure Element with MCXW72
+
+### Hardware connections
+
+Connect OM-SE051ARD board on the arduino connector of MCXW72 board.
+
+### Build options
+
+-   Build the example with below options to offload crypto operations to SE05x
+    using CMAKE configuration :
+
+```
+-DCONFIG_CHIP_SE05X=y
+```
+
+Example :
+
+```
+west build -d bin/lighting-app/ftd -b frdmmcxw72 examples/lighting-app/nxp -Dcore_id=cm33_core0 -DCONF_FILE_NAME=prj_thread_ftd.conf -DCONFIG_MCUX_COMPONENT_middleware.freertos-kernel.config=n -DCONFIG_CHIP_SE05X=y
+```
+
+**NOTE** To control secure element using enable pin, ensure to connect jumper
+J14 on OM-SE051ARD board to 3-4 pins. Also build the example with
+-DCONFIG_SE05X_HOST_GPIO=y option to allow rt1060 gpio to control the enable pin
+as required.
+
+Refer [SE05x](nxp_se05x_guide.md) for more details on configurations of SE05x.

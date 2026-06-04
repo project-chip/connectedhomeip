@@ -14,10 +14,33 @@ custom implementation may be used to replace the default implementation.
 This is an interface for processing the core requestor logic. This includes
 sending commands to the OTA Provider cluster as well as handling the responses
 for those commands. This component also maintains the server attributes for the
-OTA Requestor cluster.
+OTA Requestor cluster as well as emitting events.
 
 `DefaultOTARequestor` class is the default implementation of this interface. Any
 custom implementation should reside under `examples/platform/<platform-name>`.
+
+### OTARequestorAttributes
+
+This is a class to maintain the attributes of the cluster in memory. It is used
+by `DefaultOTARequestor`, and custom implementations of `OTARequestorInterface`
+can also use this.
+
+When using code-generated clusters an instance of this will be automatically
+created and can be accessed through `GetOTARequestorAttributes` in
+`CodegenIntegration.h`. When using code-driven clusters this must be created by
+the app.
+
+### OTARequestorCluster
+
+This implements the interface the data model provider uses to handle attributes,
+commands, and events. It relies on an instance of OTARequestorInterface as the
+backing for commands, and an instance of OTARequestorAttributes as the backing
+for attributes. The endpoint with an OTA Software Update Requestor cluster
+requires an instance of this class registered with the data model provider.
+
+When using code-generated clusters these will be automatically created,
+registered, and maintained by `CodegenIntegration.cpp`. When using code-driven
+clusters these must be created, maintained, and registered by the app.
 
 ### OTARequestorDriver
 
@@ -134,3 +157,16 @@ interface. Any custom implementation should reside under
         `BDXDownloader` through `OTADownloader::SetImageProcessorDelegate`
 -   See `examples/ota-requestor-app/linux/main.cpp` for an example of the
     initialization code above
+-   If the code driven data model provider is in use, the following additional
+    steps are needed:
+    -   Create an instance of the `OTARequestorAttribute` class per endpoint and
+        provide it to the instance of `DefaultOTARequestor`
+    -   Create an instance of the `OTARequestorCluster` class per endpoint,
+        providing the `OTARequestorInterface` and corresponding
+        `OTARequestorAttribute` instances
+    -   Create an instance of the `ServerClusterRegistration` class per
+        `OTARequestorCluster` class
+    -   Register the `ServerClusterRegistration` instances through
+        `ServerClusterInterfaceRegistry::Register`
+-   Enable the build flag `chip_enable_ota_requestor`. For example:
+    `examples/ota-requestor-app/linux/args.gni`

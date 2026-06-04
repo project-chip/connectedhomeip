@@ -461,7 +461,7 @@ public:
      * @param instanceName DNS-SD instance name for the client requesting commissioning
      *
      */
-    virtual void FindCommissionableNode(char * instanceName) = 0;
+    virtual void FindCommissionableNode(const char * instanceName) = 0;
 
     virtual ~InstanceNameResolver() = default;
 };
