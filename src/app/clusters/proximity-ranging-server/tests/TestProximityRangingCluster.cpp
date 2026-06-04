@@ -14,6 +14,7 @@
  *    limitations under the License.
  */
 
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <pw_unit_test/framework.h>
 
 #include <app/clusters/proximity-ranging-server/ProximityRangingCluster.h>
