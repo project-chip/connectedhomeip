@@ -351,12 +351,11 @@ protected:
 };
 
 template <std::underlying_type_t<Feature> featureBits, uint32_t optionalAttributeBits>
-struct AllModules
-    : public MandatoryModule,
-      public WiredModule<BitFlags<Feature>(featureBits).Has(Feature::kWired), optionalAttributeBits>,
-      public BatteryModule<BitFlags<Feature>(featureBits).Has(Feature::kBattery),
-                           BitFlags<Feature>(featureBits).Has(Feature::kReplaceable),
-                           BitFlags<Feature>(featureBits).Has(Feature::kRechargeable), optionalAttributeBits>
+struct AllModules : public MandatoryModule,
+                    public WiredModule<BitFlags<Feature>(featureBits).Has(Feature::kWired), optionalAttributeBits>,
+                    public BatteryModule<BitFlags<Feature>(featureBits).Has(Feature::kBattery),
+                                         BitFlags<Feature>(featureBits).Has(Feature::kReplaceable),
+                                         BitFlags<Feature>(featureBits).Has(Feature::kRechargeable), optionalAttributeBits>
 {
 };
 

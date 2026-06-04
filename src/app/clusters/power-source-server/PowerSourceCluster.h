@@ -179,8 +179,7 @@ using PowerSourceOptionalAttributeSet =
                               PowerSource::Attributes::BatCapacity::Id, PowerSource::Attributes::BatTimeToFullCharge::Id,
                               PowerSource::Attributes::BatChargingCurrent::Id, PowerSource::Attributes::ActiveBatChargeFaults::Id>;
 template <std::underlying_type_t<PowerSource::Feature> supportedFeatureBits, uint32_t supportedOptionalAttributeBits>
-struct PowerSourceClusterConfig
-    : public PowerSource::detail::AllModules<supportedFeatureBits, supportedOptionalAttributeBits>
+struct PowerSourceClusterConfig : public PowerSource::detail::AllModules<supportedFeatureBits, supportedOptionalAttributeBits>
 {
     constexpr static BitFlags<PowerSource::Feature> supportedFeatures{ supportedFeatureBits };
     static_assert(supportedFeatures.Has(PowerSource::Feature::kWired) ^ supportedFeatures.Has(PowerSource::Feature::kBattery),
