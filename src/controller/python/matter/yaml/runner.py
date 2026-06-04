@@ -757,9 +757,7 @@ class WaitForAttributeValueAction(BaseAction):
 
         self._fabric_filtered = True  # default
 
-        self._extra_duration_ms = test_step.get_config_value('valueWaitExtraDurationMs')
-        if self._extra_duration_ms is None:
-            self._extra_duration_ms = 250
+        self._extra_duration_ms = test_step.get_config_value('valueWaitExtraDurationMs', 250)
 
         self._cluster_object = context.data_model_lookup.get_cluster(self._cluster)
         if self._cluster_object is None:

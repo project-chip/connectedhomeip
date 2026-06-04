@@ -17,38 +17,50 @@ import asyncio
 import sys
 import time
 
+from dataclasses import dataclass
+from typing import Any, Optional
+
 from ..pseudo_cluster import PseudoCluster
 from .accessory_server_bridge import AccessoryServerBridge
 
 
+@dataclass
 class MockTestStep:
+    """Mock of TestStep used to execute read attribute actions dynamically.
 
-    def __init__(self, cluster, command, attribute, endpoint, node_id):
-        self.cluster = cluster
-        self.command = command
-        self.attribute = attribute
-        self.endpoint = endpoint
-        self.node_id = node_id
+    This lightweight class simulates a parsed YAML test step. It is passed to
+    `runner.run_step` during WaitForAttributeValue polling to execute standard
+    attribute reads without needing to parse a full YAML structure.
 
-        self.group_id = None
-        self.is_attribute = True
-        self.is_event = False
-        self.arguments = None
-        self.responses = None
-        self.event = None
+    Properties are initialized to defaults that match typical read steps. New
+    properties should be added to this mock if they are accessed by runner
+    adapters (e.g., in their `encode` methods) during action compilation.
+    """
+    cluster: str
+    command: str
+    attribute: str
+    endpoint: int
+    node_id: int
 
-        self.min_interval = None
-        self.max_interval = None
-        self.keep_subscriptions = None
-        self.timed_interaction_timeout_ms = None
-        self.timeout = None
-        self.event_number = None
-        self.busy_wait_ms = None
-        self.identity = None
-        self.fabric_filtered = True
-        self.data_version = None
-        self.label = "MockTestStep"
-        self.is_pics_enabled = True
+    group_id: Optional[int] = None
+    is_attribute: bool = True
+    is_event: bool = False
+    arguments: Optional[Any] = None
+    responses: Optional[Any] = None
+    event: Optional[str] = None
+
+    min_interval: Optional[int] = None
+    max_interval: Optional[int] = None
+    keep_subscriptions: Optional[bool] = None
+    timed_interaction_timeout_ms: Optional[int] = None
+    timeout: Optional[int] = None
+    event_number: Optional[int] = None
+    busy_wait_ms: Optional[int] = None
+    identity: Optional[str] = None
+    fabric_filtered: bool = True
+    data_version: Optional[int] = None
+    label: str = "MockTestStep"
+    is_pics_enabled: bool = True
 
 
 _DEFINITION = '''<?xml version="1.0"?>
@@ -105,6 +117,27 @@ class DelayCommands(PseudoCluster):
         AccessoryServerBridge.waitForMessage(request)
 
     async def WaitForAttributeValue(self, request, runner=None, config=None):
+        """Polls an attribute until it reaches the expected value or times out.
+
+        This method dynamically constructs a read attribute step and executes it
+        repeatedly every 100ms. It ignores intermediate network or device errors
+        during polling, as the device might recover before the timeout.
+
+        Args:
+            request: The TestStep containing arguments:
+                - attribute: Name of the attribute to read.
+                - expectedValue: The target value to wait for.
+                - expectedDurationMs: Nominal transition time in milliseconds.
+                - cluster: Name of the cluster.
+                - endpoint: Endpoint ID.
+            runner: The TestRunner instance to execute the read step.
+            config: The TestRunnerConfig configuration.
+
+        Raises:
+            ValueError: If runner or config are not provided.
+            TimeoutError: If the expected value is not reached within the timeout
+                (expectedDurationMs + valueWaitExtraDurationMs).
+        """
         if runner is None or config is None:
             raise ValueError("Runner and config are required for WaitForAttributeValue")
 
@@ -115,9 +148,7 @@ class DelayCommands(PseudoCluster):
         cluster_name = args['cluster']
         endpoint = args['endpoint']
 
-        extra_duration_ms = request.get_config_value('valueWaitExtraDurationMs')
-        if extra_duration_ms is None:
-            extra_duration_ms = 250
+        extra_duration_ms = request.get_config_value('valueWaitExtraDurationMs', 250)
 
         timeout_s = (expected_duration_ms + extra_duration_ms) / 1000.0
         poll_interval_s = 0.1
@@ -136,7 +167,7 @@ class DelayCommands(PseudoCluster):
 
         while True:
             try:
-                responses, logs = await runner.run_step(mock_step, config)
+                responses, _ = await runner.run_step(mock_step, config)
                 response = responses[0] if isinstance(responses, list) and responses else None
                 if response is None:
                     history.append("empty response")
@@ -170,4 +201,4 @@ class DelayCommands(PseudoCluster):
 
         history_str = "\n".join(f"  Attempt -{len(history)-i}: {attempt}" for i, attempt in enumerate(history))
         raise TimeoutError(f"Timeout waiting for attribute {cluster_name}.{attribute_name} to become {expected_value}.\n"
-                           f"Recent history of attempts:\n{history_str}")
+                            f"Recent history of attempts:\n{history_str}")

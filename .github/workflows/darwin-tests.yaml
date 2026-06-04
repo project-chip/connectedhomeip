@@ -30,6 +30,7 @@ concurrency:
 
 env:
   CHIP_LOG_TIMESTAMPS: false
+  VALUE_WAIT_EXTRA_DURATION_MS: 2000
 
 jobs:
   test_suites_chip_tool_darwin:

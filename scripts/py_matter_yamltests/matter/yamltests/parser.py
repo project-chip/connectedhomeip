@@ -760,8 +760,8 @@ class TestStep:
     def step_index(self):
         return self._step_index
 
-    def get_config_value(self, key):
-        return self._runtime_config_variable_storage.get(key)
+    def get_config_value(self, key, default=None):
+        return self._runtime_config_variable_storage.get(key, default)
 
     @property
     def is_enabled(self):

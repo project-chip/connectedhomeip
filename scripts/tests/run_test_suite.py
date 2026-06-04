@@ -358,6 +358,7 @@ class CommissioningMethod(enum.StrEnum):
 @click.option(
     '--value-wait-extra-duration-ms',
     default=None,
+    envvar='VALUE_WAIT_EXTRA_DURATION_MS',
     type=int,
     help='Extra duration in milliseconds to wait for attribute value changes')
 @click.option(
