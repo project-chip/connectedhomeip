@@ -20,6 +20,7 @@
 #include <lib/support/TypeTraits.h>
 
 using namespace chip;
+using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::SmokeCoAlarm;
 using namespace chip::DeviceLayer;
 
