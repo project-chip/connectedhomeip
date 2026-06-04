@@ -86,10 +86,11 @@ use the following sub-headings:
 
 -   Explain the proposed solution and _why_ it fixes the problem.
 -   **Holistic & High-Level**: Focus on the new capabilities, public APIs, or
-    architectural changes. Do **NOT** list individual files, classes, or internal
-    implementation details (e.g., "Refactored MockX to use dataclass") unless they
-    are critically important to the architecture. The diff itself shows the
-    file-level changes; the PR description should show the big picture.
+    architectural changes. Do **NOT** list individual files, classes, or
+    internal implementation details (e.g., "Refactored MockX to use dataclass")
+    unless they are critically important to the architecture. The diff itself
+    shows the file-level changes; the PR description should show the big
+    picture.
 
 ##### Caveats (Optional)
 
@@ -164,34 +165,50 @@ Fixes #72327
 
 ### Example 2: Structured Breakdown & Holistic Solution
 
-Here is an example using a structured breakdown with bold highlights for the problem, and a high-level solution summary:
+Here is an example using a structured breakdown with bold highlights for the
+problem, and a high-level solution summary:
 
 ```markdown
 #### Summary
 
-Implemented `WaitForAttributeValue` command in YAML runner to allow tests to wait for an attribute to reach a specific value, improving test robustness and reducing execution time. Supported in all Python-based runners.
+Implemented `WaitForAttributeValue` command in YAML runner to allow tests to
+wait for an attribute to reach a specific value, improving test robustness and
+reducing execution time. Supported in all Python-based runners.
 
 ##### Problem
 
--   YAML tests lacked polling, requiring a fragile **"trigger transition → sleep → verify"** pattern.
+-   YAML tests lacked polling, requiring a fragile **"trigger transition → sleep
+    → verify"** pattern.
 -   This fixed-delay pattern is:
-    -   **Racy**: Leads to flakiness in slow environments (like CI) if transitions take longer than the sleep duration.
-    -   **Inefficient**: Forces fast runs to wait for the maximum padded duration even if the transition finishes early.
+    -   **Racy**: Leads to flakiness in slow environments (like CI) if
+        transitions take longer than the sleep duration.
+    -   **Inefficient**: Forces fast runs to wait for the maximum padded
+        duration even if the transition finishes early.
 
 ##### Solution
 
--   Added support for the `WaitForAttributeValue` command to wait for an attribute to reach a target value within a timeout, avoiding fixed sleeps.
--   Added the underlying infrastructure to support this across all Python-based runners (`chip-tool`, `darwin-framework-tool`, and the REPL runner).
--   Made the extra timeout buffer (slop) configurable (defaults to 250ms locally, but configured to 2000ms in GitHub Actions workflows to prevent flakiness on slow CI runners).
--   Included a polling history (last 10 attempts with values/errors) in the timeout exception message to improve debuggability when a wait fails.
+-   Added support for the `WaitForAttributeValue` command to wait for an
+    attribute to reach a target value within a timeout, avoiding fixed sleeps.
+-   Added the underlying infrastructure to support this across all Python-based
+    runners (`chip-tool`, `darwin-framework-tool`, and the REPL runner).
+-   Made the extra timeout buffer (slop) configurable (defaults to 250ms
+    locally, but configured to 2000ms in GitHub Actions workflows to prevent
+    flakiness on slow CI runners).
+-   Included a polling history (last 10 attempts with values/errors) in the
+    timeout exception message to improve debuggability when a wait fails.
 
 ##### Caveats
 
--   The command uses active polling (100ms interval) to check the attribute value.
+-   The command uses active polling (100ms interval) to check the attribute
+    value.
 
 #### Testing
 
--   Added integration test `src/app/tests/suites/Test_WaitForAttributeValue.yaml` to verify the command's timeout behavior.
--   Registered the new test in `src/app/tests/suites/ciTests.json` to enable it in CI.
--   Migrated Step 5b of `src/app/tests/suites/certification/Test_TC_S_2_3.yaml` to use `WaitForAttributeValue` and verified it passes successfully.
+-   Added integration test
+    `src/app/tests/suites/Test_WaitForAttributeValue.yaml` to verify the
+    command's timeout behavior.
+-   Registered the new test in `src/app/tests/suites/ciTests.json` to enable it
+    in CI.
+-   Migrated Step 5b of `src/app/tests/suites/certification/Test_TC_S_2_3.yaml`
+    to use `WaitForAttributeValue` and verified it passes successfully.
 ```
