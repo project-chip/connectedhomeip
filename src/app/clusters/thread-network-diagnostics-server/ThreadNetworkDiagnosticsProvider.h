@@ -28,7 +28,7 @@ public:
     virtual ~ThreadNetworkDiagnosticsProvider() = default;
 
     virtual CHIP_ERROR ReadAttribute(AttributeId attributeId, app::AttributeValueEncoder & encoder) = 0;
-    virtual void ResetCounts()                                                                            = 0;
+    virtual void ResetCounts()                                                                      = 0;
 };
 
 } // namespace chip::app::Clusters::ThreadNetworkDiagnostics
