@@ -16,8 +16,8 @@ import("//build_overrides/chip.gni")
 
 source_set("thread-network-diagnostics-server") {
   sources = [
-    "DefaultThreadNetworkDiagnosticsProvider.cpp",
-    "DefaultThreadNetworkDiagnosticsProvider.h",
+    "DirectThreadNetworkDiagnosticsProvider.cpp",
+    "DirectThreadNetworkDiagnosticsProvider.h",
     "ThreadNetworkDiagnosticsCluster.cpp",
     "ThreadNetworkDiagnosticsCluster.h",
     "ThreadNetworkDiagnosticsProvider.h",

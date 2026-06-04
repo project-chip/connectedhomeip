@@ -121,7 +121,7 @@ DataModel::ActionReturnStatus ThreadNetworkDiagnosticsCluster::ReadAttribute(con
         return encoder.Encode(mClusterType == ClusterType::kMinimal ? BitFlags<Feature>() : kFeaturesAll);
     default:
         // Since ReadAttribute() is invoked only for valid attributes this is safe
-        return mProvider.WriteAttributeToTlv(request.path.mAttributeId, encoder);
+        return mProvider.ReadAttribute(request.path.mAttributeId, encoder);
     }
 }
 

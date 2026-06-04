@@ -21,10 +21,10 @@
 
 namespace chip::app::Clusters::ThreadNetworkDiagnostics {
 
-class DefaultThreadNetworkDiagnosticsProvider : public ThreadNetworkDiagnosticsProvider
+class DirectThreadNetworkDiagnosticsProvider : public ThreadNetworkDiagnosticsProvider
 {
 public:
-    CHIP_ERROR WriteAttributeToTlv(AttributeId attributeId, app::AttributeValueEncoder & encoder) override;
+    CHIP_ERROR ReadAttribute(AttributeId attributeId, app::AttributeValueEncoder & encoder) override;
     void ResetCounts() override;
 };
 

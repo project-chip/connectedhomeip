@@ -27,7 +27,7 @@ class ThreadNetworkDiagnosticsProvider
 public:
     virtual ~ThreadNetworkDiagnosticsProvider() = default;
 
-    virtual CHIP_ERROR WriteAttributeToTlv(AttributeId attributeId, app::AttributeValueEncoder & encoder) = 0;
+    virtual CHIP_ERROR ReadAttribute(AttributeId attributeId, app::AttributeValueEncoder & encoder) = 0;
     virtual void ResetCounts()                                                                            = 0;
 };
 
