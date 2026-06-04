@@ -797,6 +797,8 @@ class WaitForAttributeValueAction(BaseAction):
                         LOGGER.info(f"Attribute reached expected value {self._expected_value} "
                                     f"after {time.time() - start_time:.2f}s")
                         return _ActionResult(status=_ActionStatus.SUCCESS, response=None)
+            except (AttributeError, NameError, TypeError):
+                raise
             except Exception as e:
                 LOGGER.debug(f"ReadAttribute failed during wait: {e}")
 

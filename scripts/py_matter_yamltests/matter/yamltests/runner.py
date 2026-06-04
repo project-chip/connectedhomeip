@@ -183,7 +183,7 @@ class TestRunner(TestRunnerBase):
 
     async def run_step(self, request, config: TestRunnerConfig):
         if config.adapter is None:
-            raise Exception("Adapter is not configured")
+            raise RuntimeError("Adapter is not configured")
         encoded_request = config.adapter.encode(request)
         encoded_response = await self.execute(encoded_request)
         return config.adapter.decode(encoded_response)

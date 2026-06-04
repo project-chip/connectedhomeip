@@ -47,6 +47,8 @@ class MockTestStep:
         self.identity = None
         self.fabric_filtered = True
         self.data_version = None
+        self.label = "MockTestStep"
+        self.is_pics_enabled = True
 
 
 _DEFINITION = '''<?xml version="1.0"?>
@@ -104,7 +106,7 @@ class DelayCommands(PseudoCluster):
 
     async def WaitForAttributeValue(self, request, runner=None, config=None):
         if runner is None or config is None:
-            raise Exception("Runner and config are required for WaitForAttributeValue")
+            raise ValueError("Runner and config are required for WaitForAttributeValue")
 
         args = {arg['name']: arg['value'] for arg in request.arguments['values']}
         attribute_name = args['attribute']
@@ -145,6 +147,8 @@ class DelayCommands(PseudoCluster):
                     history.append(f"value: {value}")
                     if value == expected_value:
                         return
+            except (AttributeError, NameError, TypeError):
+                raise
             except Exception as e:
                 # We ignore intermediate errors during polling (e.g., node
                 # temporarily unreachable, packet loss, or busy device) because
@@ -163,5 +167,5 @@ class DelayCommands(PseudoCluster):
             await asyncio.sleep(poll_interval_s)
 
         history_str = "\n".join(f"  Attempt -{len(history)-i}: {attempt}" for i, attempt in enumerate(history))
-        raise Exception(f"Timeout waiting for attribute {cluster_name}.{attribute_name} to become {expected_value}.\n"
-                        f"Recent history of attempts:\n{history_str}")
+        raise TimeoutError(f"Timeout waiting for attribute {cluster_name}.{attribute_name} to become {expected_value}.\n"
+                            f"Recent history of attempts:\n{history_str}")
