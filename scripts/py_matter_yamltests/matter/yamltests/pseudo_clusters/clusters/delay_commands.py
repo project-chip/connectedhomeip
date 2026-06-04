@@ -139,7 +139,11 @@ class DelayCommands(PseudoCluster):
                         if value == expected_value:
                             return
             except Exception:
-                # Ignore errors during polling
+                # We ignore intermediate errors during polling (e.g., node
+                # temporarily unreachable, packet loss, or busy device) because
+                # the device might recover and report the expected value before
+                # the timeout expires. If the error persists, the command will
+                # eventually fail with a timeout exception.
                 pass
 
             if time.time() - start_time >= timeout_s:
