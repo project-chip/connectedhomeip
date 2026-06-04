@@ -65,11 +65,7 @@ CHIP_ERROR GetPeerAddress(Inet::TCPEndPoint & endPoint, PeerAddress & outAddr)
 
 } // namespace
 
-TCPBase::~TCPBase()
-{
-    // Call Close to free the listening socket and close all active connections.
-    Close();
-}
+TCPBase::~TCPBase() = default;
 
 void TCPBase::CloseActiveConnections()
 {
