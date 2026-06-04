@@ -9,8 +9,9 @@ This directory contains an implementation of Matter Power Source cluster. This
 implementation does not handle the persistence of the `Order` attribute. Because
 the `Order` attribute is read-only, only the direct user of the cluster can
 change it, so it is expected of them to handle the persistence of the attribute.
-This implementation notifies the data model when an attribute changes in the way
-that the spec mandates.
+This implementation also doesn't handle the storage of fixed string attributes
+and the attribute `endpointList`. This implementation notifies the data model
+when an attribute changes in the way that the spec mandates.
 
 ## Usage
 

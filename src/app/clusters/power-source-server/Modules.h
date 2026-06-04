@@ -35,12 +35,14 @@ using DataModel::Nullable;
 constexpr size_t kBitSetSize = 16;
 using BitSetType             = std::bitset<kBitSetSize>;
 
-// without EndpointList
 struct MandatoryModule
 {
     PowerSourceStatusEnum status{};
     uint8_t order{};
     CharSpan description{};
+
+protected:
+    Span<const EndpointId> endpointList{};
 };
 
 struct WiredMandatoryModule
@@ -270,13 +272,6 @@ protected:
     BitSetType activeBatChargeFaultsBitSet{};
 };
 
-struct EndpointListModule
-{
-protected:
-    Platform::ScopedMemoryBuffer<EndpointId> endpointList{};
-    uint16_t endpointListCount = 0;
-};
-
 template <bool used, uint32_t optionalAttributeBits>
 struct WiredModule
 {
@@ -356,7 +351,7 @@ protected:
 };
 
 template <std::underlying_type_t<Feature> featureBits, uint32_t optionalAttributeBits>
-struct AllModulesExceptEndpointList
+struct AllModules
     : public MandatoryModule,
       public WiredModule<BitFlags<Feature>(featureBits).Has(Feature::kWired), optionalAttributeBits>,
       public BatteryModule<BitFlags<Feature>(featureBits).Has(Feature::kBattery),

@@ -180,7 +180,7 @@ using PowerSourceOptionalAttributeSet =
                               PowerSource::Attributes::BatChargingCurrent::Id, PowerSource::Attributes::ActiveBatChargeFaults::Id>;
 template <std::underlying_type_t<PowerSource::Feature> supportedFeatureBits, uint32_t supportedOptionalAttributeBits>
 struct PowerSourceClusterConfig
-    : public PowerSource::detail::AllModulesExceptEndpointList<supportedFeatureBits, supportedOptionalAttributeBits>
+    : public PowerSource::detail::AllModules<supportedFeatureBits, supportedOptionalAttributeBits>
 {
     constexpr static BitFlags<PowerSource::Feature> supportedFeatures{ supportedFeatureBits };
     static_assert(supportedFeatures.Has(PowerSource::Feature::kWired) ^ supportedFeatures.Has(PowerSource::Feature::kBattery),
@@ -241,7 +241,6 @@ struct PowerSourceClusterConfig
 
 template <std::underlying_type_t<PowerSource::Feature> supportedFeatureBits, uint32_t supportedOptionalAttributeBits>
 class PowerSourceCluster : protected PowerSourceClusterConfig<supportedFeatureBits, supportedOptionalAttributeBits>,
-                           protected PowerSource::detail::EndpointListModule,
                            public DefaultServerCluster,
                            protected PowerSource::detail::BatteryTimerContextsModule<
                                BitFlags<PowerSource::Feature>(supportedFeatureBits).Has(PowerSource::Feature::kBattery)>
@@ -788,7 +787,7 @@ public:
             buffer = PowerSource::detail::ConvertSpanType<BatChargeFaultEnum>(span);
         }
     }
-    Span<const EndpointId> GetEndpointList() const { return Span(this->endpointList.Get(), this->endpointListCount); }
+    Span<const EndpointId> GetEndpointList() const { return this->endpointList; }
 
     // Setters
 
@@ -1135,13 +1134,12 @@ public:
             return CHIP_NO_ERROR;
         }
 
-        if (!this->endpointList.Alloc(val.size()))
+        for (const auto & endpointId : val)
         {
-            return CHIP_ERROR_NO_MEMORY;
+            VerifyOrReturnError(endpointId != kInvalidEndpointId, CHIP_ERROR_INVALID_ARGUMENT);
         }
 
-        std::copy(val.begin(), val.end(), this->endpointList.Get());
-        this->endpointListCount = static_cast<uint16_t>(val.size());
+        this->endpointList = val;
         NotifyAttributeChanged(PowerSource::Attributes::EndpointList::Id);
         return CHIP_NO_ERROR;
     }

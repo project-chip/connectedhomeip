@@ -49,6 +49,7 @@ protected:
     TimerDelegate & mTimerDelegate;
     CharSpan mDescription;
     Clusters::PowerSource::BatReplaceabilityEnum mReplaceability;
+    EndpointId mEndpointList[1] = { kInvalidEndpointId };
 
     LazyRegisteredServerCluster<SimpleBatteryPowerSourceCluster> mBatteryPowerSourceCluster;
 };

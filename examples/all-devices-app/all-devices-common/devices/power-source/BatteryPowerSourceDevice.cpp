@@ -43,7 +43,7 @@ CHIP_ERROR BatteryPowerSourceDevice::Register(chip::EndpointId endpoint, CodeDri
     config.order  = 0;
 
     mBatteryPowerSourceCluster.Create(config);
-    ReturnErrorOnFailure(mBatteryPowerSourceCluster.Cluster().SetEndpointList(Span<const EndpointId>(&endpoint, 1)));
+    ReturnErrorOnFailure(mBatteryPowerSourceCluster.Cluster().SetEndpointList(Span<const EndpointId>(mEndpointList)));
     ReturnErrorOnFailure(provider.AddCluster(mBatteryPowerSourceCluster.Registration()));
 
     return provider.AddEndpoint(mEndpointRegistration);
