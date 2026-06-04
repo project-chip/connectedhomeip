@@ -381,11 +381,11 @@ def get_setup_code() -> (str, bool):
 
 
 class TestConfig:
-    def __init__(self, code: str, code_type: SetupCodeType, use_paa_cache: bool = False):
+    def __init__(self, code: str, code_type: SetupCodeType, use_cert_cache: bool = False, force_fetch: bool = False):
         tmp_uuid = str(uuid.uuid4())
 
-        # Determine PAA and CD paths based on use_paa_cache flag
-        if use_paa_cache:
+        # Determine PAA certs and CD paths based on use_cert_cache flag
+        if use_cert_cache:
             self.paa_path = os.environ.get('PATH_TO_PAA_ROOTS', '/tmp/paa_roots')
             self.cd_path = os.environ.get('PATH_TO_CD_STORE', '/tmp/cd_store')
             os.makedirs(self.paa_path, exist_ok=True)
@@ -400,9 +400,15 @@ class TestConfig:
             os.mkdir(self.cd_path)
             self.use_cache = False
 
-        fetch_paa_certs_from_dcl.fetch_paa_certs(use_main_net_dcld='', use_test_net_dcld='',
-                                                 use_main_net_http=True, use_test_net_http=False, paa_trust_store_path=self.paa_path)
-        fetch_paa_certs_from_dcl.fetch_cd_signing_certs(self.cd_path)
+        # Fetch certificates only if:
+        # 1. Not using cache (always fetch for temp directories), OR
+        # 2. Using cache and (cache is empty OR force_fetch is True)
+        should_fetch = not use_cert_cache or force_fetch or self._is_cache_empty()
+
+        if should_fetch:
+            fetch_paa_certs_from_dcl.fetch_paa_certs(use_main_net_dcld='', use_test_net_dcld='',
+                                                     use_main_net_http=True, use_test_net_http=False, paa_trust_store_path=self.paa_path)
+            fetch_paa_certs_from_dcl.fetch_cd_signing_certs(self.cd_path)
         self.admin_storage = f'admin_storage_{tmp_uuid}.json'
         global_test_params = {'use_pase_only': True, 'post_cert_test': True}
         self.config = MatterTestConfig(endpoint=0, dut_node_ids=[
@@ -419,6 +425,20 @@ class TestConfig:
             nodeId=112233,
             paaTrustStorePath=str(self.config.paa_trust_store_path)
         )
+
+    def _is_cache_empty(self):
+        """Check if the cache directories are empty (no certificate files)."""
+        # Check for common certificate file extensions
+        cert_extensions = ('.pem', '.crt', '.der', '.cer', '.p7b', '.p7c')
+
+        # Check PAA directory
+        paa_files = [f for f in os.listdir(self.paa_path) if f.endswith(cert_extensions)]
+        if not paa_files:
+            return True
+
+        # Check CD directory
+        cd_files = [f for f in os.listdir(self.cd_path) if f.endswith(cert_extensions)]
+        return not cd_files
 
     def get_stack(self):
         return self.stack
