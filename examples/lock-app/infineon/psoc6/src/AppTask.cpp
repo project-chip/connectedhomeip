@@ -48,10 +48,7 @@
 
 #if ENABLE_DEVICE_ATTESTATION
 #include <DeviceAttestationCredsExampleTrustM.h>
-#endif
-
-#if !ENABLE_TRUSTM_RANDOM
-#include <crypto/CHIPCryptoPAL.h>
+#include <CHIPCryptoPALHsm_config_trustm.h>
 #endif
 
 /* OTA related includes */
