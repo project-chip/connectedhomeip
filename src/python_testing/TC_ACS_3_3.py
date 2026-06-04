@@ -282,7 +282,7 @@ class TC_ACS_3_3(MatterBaseTest):
             asserts.assert_equal(event.Data.ambientContextDetected.ambientContextSensed[0].tag, tag1, "Wrong Tag")
             event_start_time = event.Header.Timestamp
             log.info(f"event time from AmbientContextDetectStarted : {event_start_time}")
-            # event_number = event.event_id         
+            # event_number = event.event_id
 
             self.step("3e")
             # Let HoldTime pass by
