@@ -33,7 +33,8 @@ AmbientContextSensingCluster::AmbientContextSensingCluster(const Config & config
     mHoldTimeDelegate(config.mHoldTimeDelegate)
 {
     assert(mFeatureMap.Has(Feature::kHumanActivity) || mFeatureMap.Has(Feature::kObjectIdentification) ||
-           mFeatureMap.Has(Feature::kSoundIdentification) || mFeatureMap.Has(Feature::kObjectCounting));
+           mFeatureMap.Has(Feature::kSoundIdentification) || mFeatureMap.Has(Feature::kObjectCounting) ||
+           mFeatureMap.Has(Feature::kSensorFusion));
     SetHoldTimeLimits(config.mHoldTimeLimits);
     mHoldTime = std::clamp(config.mHoldTime, mHoldTimeLimits.holdTimeMin, mHoldTimeLimits.holdTimeMax);
 }
@@ -88,8 +89,8 @@ DataModel::ActionReturnStatus AmbientContextSensingCluster::ReadAttribute(const 
         return ReadAmbientContextType(encoder);
     case AmbientContextTypeSupported::Id:
         return ReadAmbientContextTypeSupported(encoder);
-    case ObjectCountReached::Id:
-        return encoder.Encode(GetObjectCountReached());
+    case ObjectCountThresholdReached::Id:
+        return encoder.Encode(GetObjectCountThresholdReached());
     case ObjectCountConfig::Id:
         return encoder.Encode(GetObjectCountConfig());
     case ObjectCount::Id:
@@ -121,11 +122,6 @@ DataModel::ActionReturnStatus AmbientContextSensingCluster::WriteAttribute(const
         ReturnErrorOnFailure(decoder.Decode(newObjCountConfig));
         return SetObjectCountConfig(newObjCountConfig);
     }
-    case SimultaneousDetectionLimit::Id: {
-        uint8_t newSimultaneousDetectionLimit;
-        ReturnErrorOnFailure(decoder.Decode(newSimultaneousDetectionLimit));
-        return SetSimultaneousDetectionLimit(newSimultaneousDetectionLimit);
-    }
     case HoldTime::Id: {
         uint16_t newHoldTime;
         ReturnErrorOnFailure(decoder.Decode(newHoldTime));
@@ -153,13 +149,14 @@ CHIP_ERROR AmbientContextSensingCluster::Attributes(const ConcreteClusterPath & 
               mFeatureMap.Has(Feature::kSoundIdentification),
           Attributes::AmbientContextTypeSupported::kMetadataEntry },
         { mFeatureMap.Has(Feature::kObjectCounting) && mFeatureMap.Has(Feature::kObjectIdentification),
-          Attributes::ObjectCountReached::kMetadataEntry },
+          Attributes::ObjectCountThresholdReached::kMetadataEntry },
         { mFeatureMap.Has(Feature::kObjectCounting) && mFeatureMap.Has(Feature::kObjectIdentification),
           Attributes::ObjectCountConfig::kMetadataEntry },
         { mOptionalAttributeSet.IsSet(ObjectCount::Id) &&
               (mFeatureMap.Has(Feature::kObjectCounting) && mFeatureMap.Has(Feature::kObjectIdentification)),
           Attributes::ObjectCount::kMetadataEntry },
         { mFeatureMap.Has(Feature::kPredictedActivity), Attributes::PredictedActivity::kMetadataEntry },
+        { mFeatureMap.Has(Feature::kSensorFusion), Attributes::SensorFusionSupported::kMetadataEntry },
     };
 
     return listBuilder.Append(Span(AmbientContextSensing::Attributes::kMandatoryMetadata), Span(optionalAttributes));
@@ -340,7 +337,7 @@ CHIP_ERROR AmbientContextSensingCluster::SetObjectCount(uint16_t objectCount)
     mObjectCountStartEpoch = mACSDelegate.GetEpochNow();
     UpdateDetectionAttributes();
     UpdateEventTimeout();
-    SendDetectStartEvent(mObjectCountReached, mObjectCount);
+    SendDetectStartEvent(mObjectCountThresholdReached, mObjectCount);
 
     return CHIP_NO_ERROR;
 }
@@ -503,7 +500,6 @@ void AmbientContextSensingCluster::SendDetectStartEvent(const AmbientContextSens
     VerifyOrReturn(mContext != nullptr);
     Events::AmbientContextDetectStarted::Type event;
     event.ambientContextDetected.SetValue(ACSItem.mInfo);
-    event.ambientContextDetected.Value().detectionStartTime.SetValue(static_cast<uint32_t>(ACSItem.mStartEpoch / 1000));
     mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
 }
 
@@ -520,17 +516,17 @@ void AmbientContextSensingCluster::SendDetectStartEvent(const bool objectCountRe
     chip::app::DataModel::List<const SemanticTagType> tagList(&tag, 1);
     AmbientContextSensingType countACS = { .ambientContextSensed = tagList };
     event.ambientContextDetected.SetValue(countACS);
-    event.ambientContextDetected.Value().detectionStartTime.SetValue(static_cast<uint32_t>(mObjectCountStartEpoch / 1000));
-    event.objectCountReached.SetValue(objectCountReached);
+    event.objectCountThresholdReached.SetValue(objectCountReached);
     event.objectCount.SetValue(objectCount);
     mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
 }
 
-void AmbientContextSensingCluster::SendDetectEndEvent(const uint64_t eventStartTime)
+void AmbientContextSensingCluster::SendDetectEndEvent(const uint64_t eventStartTimePos, const uint64_t eventStartTimeSys)
 {
     VerifyOrReturn(mContext != nullptr);
     Events::AmbientContextDetectEnded::Type event;
-    event.eventStartTime = eventStartTime;
+    event.eventStartTimePos.SetValue(eventStartTimePos);
+    event.eventStartTimeSys.SetValue(eventStartTimeSys);
     mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
 }
 
@@ -539,11 +535,11 @@ void AmbientContextSensingCluster::SendDetectEndEvent(const uint64_t eventStartT
     - HumanActivityDetected
     - ObjectIdentified
     - AudioContextDetected
-    - ObjectCountReached
+    - ObjectCountThresholdReached
 */
 void AmbientContextSensingCluster::UpdateDetectionAttributes()
 {
-    // We need to detect HumanActivity, ObjectIdentified, Audio and ObjectCountReached.
+    // We need to detect HumanActivity, ObjectIdentified, Audio and ObjectCountThresholdReached.
     // => Reuse the existing definition of feature to avoid duplicate logic
     BitFlags<Feature> bDetect(0);
 
@@ -576,7 +572,7 @@ void AmbientContextSensingCluster::UpdateDetectionAttributes()
         }
     }
 
-    // Check if ObjectCountReached should be set or not
+    // Check if ObjectCountThresholdReached should be set or not
     if (mObjectCount >= mObjectCountConfig.objectCountThreshold)
     {
         bDetect.Set(Feature::kObjectCounting);
@@ -597,10 +593,10 @@ void AmbientContextSensingCluster::UpdateDetectionAttributes()
         mAudioContextDetected = bDetect.Has(Feature::kSoundIdentification);
         NotifyAttributeChanged(Attributes::AudioContextDetected::Id);
     }
-    if (bDetect.Has(Feature::kObjectCounting) != mObjectCountReached)
+    if (bDetect.Has(Feature::kObjectCounting) != mObjectCountThresholdReached)
     {
-        mObjectCountReached = bDetect.Has(Feature::kObjectCounting);
-        NotifyAttributeChanged(Attributes::ObjectCountReached::Id);
+        mObjectCountThresholdReached = bDetect.Has(Feature::kObjectCounting);
+        NotifyAttributeChanged(Attributes::ObjectCountThresholdReached::Id);
     }
 }
 
@@ -762,7 +758,7 @@ void AmbientContextSensingCluster::RemoveExpiredItems(IntrusiveList<AmbientConte
         {
             eventList.Remove(pitem);
             listSize--;
-            SendDetectEndEvent(pitem->mStartEpoch);
+            SendDetectEndEvent(pitem->mStartEpoch, pitem->mStartTimestamp.count());
             LogErrorOnFailure(mACSDelegate.DelDetection(pitem->id));
             NotifyAttributeChanged(Attributes::AmbientContextType::Id);
         }
@@ -773,7 +769,7 @@ void AmbientContextSensingCluster::RemoveExpiredItems(IntrusiveList<AmbientConte
         mObjectCount        = 0;
         NotifyAttributeChanged(Attributes::ObjectCount::Id);
         // Send the DetectEndEvent
-        SendDetectEndEvent(mObjectCountStartEpoch);
+        SendDetectEndEvent(mObjectCountStartEpoch, mObjectCountStartTime.count());
         mObjectCountStartTime = System::Clock::Timestamp(0);
     }
 }

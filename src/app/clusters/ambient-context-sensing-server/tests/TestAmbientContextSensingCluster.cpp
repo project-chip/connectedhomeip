@@ -290,7 +290,7 @@ TEST_F(TestAmbientContextSensingCluster, TestAttributes)
                                                      Attributes::AudioContextDetected::kMetadataEntry,
                                                      Attributes::AmbientContextType::kMetadataEntry,
                                                      Attributes::AmbientContextTypeSupported::kMetadataEntry,
-                                                     Attributes::ObjectCountReached::kMetadataEntry,
+                                                     Attributes::ObjectCountThresholdReached::kMetadataEntry,
                                                      Attributes::ObjectCountConfig::kMetadataEntry,
                                                      Attributes::SimultaneousDetectionLimit::kMetadataEntry,
                                                      Attributes::HoldTime::kMetadataEntry,
@@ -307,7 +307,7 @@ TEST_F(TestAmbientContextSensingCluster, TestAttributes)
     }
 
     bool objectCountReached;
-    EXPECT_EQ(tester.ReadAttribute(Attributes::ObjectCountReached::Id, objectCountReached), CHIP_NO_ERROR);
+    EXPECT_EQ(tester.ReadAttribute(Attributes::ObjectCountThresholdReached::Id, objectCountReached), CHIP_NO_ERROR);
     EXPECT_FALSE(objectCountReached);
 
     uint16_t objectCount;
@@ -668,7 +668,7 @@ TEST_F(TestAmbientContextSensingCluster, TestSimultaneousDetectLimit)
 
     // Write a bigger SimultaneousDetectionLimit
     uint8_t newSDL = simultaneousDetectLimit + 1;
-    EXPECT_EQ(tester.WriteAttribute(Attributes::SimultaneousDetectionLimit::Id, newSDL), CHIP_NO_ERROR);
+    EXPECT_EQ(cluster.SetSimultaneousDetectionLimit(newSDL), CHIP_NO_ERROR);
 
     // Add Detection
     EXPECT_EQ(cluster.AddDetection(g_kACTDetectArray[0]), CHIP_NO_ERROR);
@@ -684,9 +684,10 @@ TEST_F(TestAmbientContextSensingCluster, TestSimultaneousDetectLimit)
 
     constexpr uint8_t kTestSimultaneousDetectionLimit = 2;
     // Reduce the simultaneous detection limitation to the value which is less than the current detection number
-    EXPECT_EQ(tester.WriteAttribute(Attributes::SimultaneousDetectionLimit::Id, kTestSimultaneousDetectionLimit), CHIP_NO_ERROR);
+    EXPECT_EQ(cluster.SetSimultaneousDetectionLimit(kTestSimultaneousDetectionLimit), CHIP_NO_ERROR);
+
     // Re-write it again. Exp: kWriteSuccessNoOp
-    EXPECT_EQ(tester.WriteAttribute(Attributes::SimultaneousDetectionLimit::Id, kTestSimultaneousDetectionLimit),
+    EXPECT_EQ(cluster.SetSimultaneousDetectionLimit(kTestSimultaneousDetectionLimit),
               DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp);
 
     // Read back the simultaneous detection limitation, exp: kTestSimultaneousDetectionLimit
@@ -741,16 +742,16 @@ TEST_F(TestAmbientContextSensingCluster, TestObjectCount)
 
     bool objCntReached;
     uint16_t objCount;
-    // Read ObjectCountReached attribute, exp: false
-    EXPECT_EQ(tester.ReadAttribute(Attributes::ObjectCountReached::Id, objCntReached),
+    // Read ObjectCountThresholdReached attribute, exp: false
+    EXPECT_EQ(tester.ReadAttribute(Attributes::ObjectCountThresholdReached::Id, objCntReached),
               Protocols::InteractionModel::Status::Success);
     EXPECT_FALSE(objCntReached);
 
     // Set ObjectCount attribute which is smaller than ObjectCountThreshold
     EXPECT_EQ(cluster.SetObjectCount(kMinObjectCount), CHIP_NO_ERROR);
 
-    // Read ObjectCountReached attribute, exp: false
-    EXPECT_EQ(tester.ReadAttribute(Attributes::ObjectCountReached::Id, objCntReached),
+    // Read ObjectCountThresholdReached attribute, exp: false
+    EXPECT_EQ(tester.ReadAttribute(Attributes::ObjectCountThresholdReached::Id, objCntReached),
               Protocols::InteractionModel::Status::Success);
     EXPECT_FALSE(objCntReached);
 
@@ -758,8 +759,8 @@ TEST_F(TestAmbientContextSensingCluster, TestObjectCount)
     EXPECT_EQ(cluster.SetObjectCount(kTestObjectCount), CHIP_NO_ERROR);
     EXPECT_TRUE(mMockTimerDelegate.IsTimerActive(&cluster));
 
-    // Read ObjectCountReached attribute, exp: true
-    EXPECT_EQ(tester.ReadAttribute(Attributes::ObjectCountReached::Id, objCntReached),
+    // Read ObjectCountThresholdReached attribute, exp: true
+    EXPECT_EQ(tester.ReadAttribute(Attributes::ObjectCountThresholdReached::Id, objCntReached),
               Protocols::InteractionModel::Status::Success);
     EXPECT_TRUE(objCntReached);
 
@@ -770,8 +771,8 @@ TEST_F(TestAmbientContextSensingCluster, TestObjectCount)
     // Advance clock by more than the hold time
     mMockTimerDelegate.AdvanceClock(System::Clock::Seconds16(kDefaultHoldTimeDefault + 1));
 
-    // Read ObjectCountReached attribute, exp: false
-    EXPECT_EQ(tester.ReadAttribute(Attributes::ObjectCountReached::Id, objCntReached),
+    // Read ObjectCountThresholdReached attribute, exp: false
+    EXPECT_EQ(tester.ReadAttribute(Attributes::ObjectCountThresholdReached::Id, objCntReached),
               Protocols::InteractionModel::Status::Success);
     EXPECT_FALSE(objCntReached);
 

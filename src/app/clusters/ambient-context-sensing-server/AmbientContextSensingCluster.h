@@ -99,7 +99,7 @@ public:
     bool GetHumanActivityDetected() { return mHumanActivityDetected; }
     bool GetObjectIdentified() { return mObjectIdentified; }
     bool GetAudioContextDetected() { return mAudioContextDetected; }
-    bool GetObjectCountReached() { return mObjectCountReached; }
+    bool GetObjectCountThresholdReached() { return mObjectCountThresholdReached; }
     CHIP_ERROR SetAmbientContextTypeSupported(const Span<AmbientContextSensing::SemanticTagType> & ACTypeList);
     CHIP_ERROR AddDetection(const AmbientContextSensing::AmbientContextSensingType & sensedEvent);
     DataModel::ActionReturnStatus SetObjectCountConfig(const AmbientContextSensing::ObjectCountConfigType & objectCountConfig);
@@ -122,7 +122,7 @@ private:
     CHIP_ERROR ReadAmbientContextType(AttributeValueEncoder & encoder);
     void SendDetectStartEvent(const AmbientContextSensing::AmbientContextSensed & ACSItem);
     void SendDetectStartEvent(const bool objectCountReached, const uint16_t objectCount);
-    void SendDetectEndEvent(const uint64_t eventStartTime);
+    void SendDetectEndEvent(const uint64_t eventStartTimePos, const uint64_t eventStartTimeSys);
     void UpdateDetectionAttributes();
     void UpdateEventTimeout();
     CHIP_ERROR CheckInputSupportedType(const Span<AmbientContextSensing::SemanticTagType> & ACTSupportedList);
@@ -147,7 +147,7 @@ private:
     uint8_t mAmbientContextTypeListSize = 0;
 
     uint8_t mSimultaneousDetectionLimit = AmbientContextSensing::kDefaultSimultaneousDetectionLimit;
-    bool mObjectCountReached            = false;
+    bool mObjectCountThresholdReached   = false;
     AmbientContextSensing::ObjectCountConfigType mObjectCountConfig = {
             .countingObject  = {
                 .namespaceID = kNamespaceIdentifiedObject,

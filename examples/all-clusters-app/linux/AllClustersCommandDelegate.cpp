@@ -399,7 +399,7 @@ static bool GetAmbientContextType(const Json::Value & actArray,
  *
  * Usage example:
  *   echo '{"Name":"AddAmbientContextDetect","EndpointId":1,"AmbientContextType":[{"TypeId":75, "TagId":2},{"TypeId":73,
- * "TagId":2}],"DetectionStartTime":1769138873}'> /tmp/acs_fifo
+ * "TagId":2}],"DetectionConfidence":100}'> /tmp/acs_fifo
  *
  * JSON Arguments:
  *   - "Name": Must be "AddAmbientContextDetect"
@@ -452,10 +452,16 @@ void SetAmbientContextDetect(Json::Value & jsonValue)
     auto tagList =
         chip::app::DataModel::List<const Globals::Structs::SemanticTagStruct::Type>(semanticTags.data(), semanticTags.size());
     AmbientContextSensing::Structs::AmbientContextTypeStruct::Type ACSType = { .ambientContextSensed = tagList };
-    // Add DetectionStartTime
-    if (HasNumericField(jsonValue, "DetectionStartTime"))
+    // Add DetectionConfidence
+    if (HasNumericField(jsonValue, "DetectionConfidence"))
     {
-        ACSType.detectionStartTime.SetValue(jsonValue["DetectionStartTime"].asUInt());
+        auto confidenceValue = jsonValue["DetectionConfidence"].asUInt();
+        if ((confidenceValue == 0) || (confidenceValue > 100))
+        {
+            ChipLogError(NotSpecified, "Incorrect or unsupported confidence value");
+            return;
+        }
+        ACSType.detectionConfidence.SetValue(static_cast<chip::Percent>(confidenceValue));
     }
 
     TEMPORARY_RETURN_IGNORED cluster->AddDetection(ACSType);
