@@ -1,0 +1,43 @@
+# Test for WaitForAttributeValue command (Timeout Failure Case)
+
+config:
+    nodeId: 0x12344321
+    cluster: "On/Off"
+    endpoint: 1
+
+tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Set OnOff to Off (initial state)"
+      command: "Off"
+
+    - label: "Verify OnOff is Off"
+      command: "readAttribute"
+      attribute: "OnOff"
+      response:
+          value: 0
+
+    - label: "Turn On the light (immediate)"
+      command: "On"
+
+    - label: "Wait for OnOff to become False (will timeout)"
+      cluster: "DelayCommands"
+      command: "WaitForAttributeValue"
+      arguments:
+          values:
+              - name: "attribute"
+                value: "OnOff"
+              - name: "expectedValue"
+                value: false
+              - name: "expectedDurationMs"
+                value: 2000
+              - name: "cluster"
+                value: "On/Off"
+              - name: "endpoint"
+                value: 1

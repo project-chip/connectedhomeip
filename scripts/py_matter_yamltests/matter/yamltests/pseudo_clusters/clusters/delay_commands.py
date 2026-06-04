@@ -42,6 +42,14 @@ _DEFINITION = '''<?xml version="1.0"?>
       <arg name="message" type="char_string"/>
       <arg name="timeoutInSeconds" type="int16u" optional="true"/>
     </command>
+
+    <command source="client" code="4" name="WaitForAttributeValue">
+      <arg name="attribute" type="char_string"/>
+      <arg name="expectedValue" type="any"/>
+      <arg name="expectedDurationMs" type="int32u"/>
+      <arg name="cluster" type="char_string"/>
+      <arg name="endpoint" type="int16u"/>
+    </command>
 </cluster>
 </configurator>
 '''

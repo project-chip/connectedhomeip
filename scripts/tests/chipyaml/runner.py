@@ -75,6 +75,8 @@ def test_parser_options(f):
                      help='Stop parsing on first error.')(f)
     f = click.option('--use_default_pseudo_clusters', type=bool, show_default=True, default=True,
                      help='If enable this option use the set of default clusters provided by the matter_yamltests package.')(f)
+    f = click.option('--value-wait-extra-duration-ms', 'valueWaitExtraDurationMs', type=int, default=250, show_default=True,
+                     help='Extra timeout duration in milliseconds for WaitForAttributeValue.')(f)
     return click.option('--additional_pseudo_clusters_directory', type=click.Path(), show_default=True, default=None,
                         help='Path to a directory containing additional pseudo clusters.')(f)
 
