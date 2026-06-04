@@ -2492,6 +2492,15 @@ void TestReadInteraction::TestSubscribeWithCache()
 
         DrainAndServiceIO();
 
+        auto * engine = chip::app::InteractionModelEngine::GetInstance();
+        EXPECT_EQ(engine->GetNumActiveReadHandlers(), 1u);
+        ASSERT_NE(engine->ActiveHandlerAt(0), nullptr);
+        auto & readHandler = *engine->ActiveHandlerAt(0);
+
+        uint16_t minInterval;
+        uint16_t maxInterval;
+        readHandler.GetReportingIntervals(minInterval, maxInterval);
+
         // Priming report should have been received.
         EXPECT_EQ(cacheCallback.mOnReportBeginCalledCount, 1);
         EXPECT_EQ(cacheCallback.mOnReportEndCalledCount, 1);
@@ -2507,7 +2516,7 @@ void TestReadInteraction::TestSubscribeWithCache()
 
         // Case 1: NON-EMPTY report (data update)
         // Trigger report after subscription established -> should call NotifySubscriptionStillActive
-        System::Clock::Timeout delta1 = System::Clock::Seconds16(readPrepareParams.mMinIntervalFloorSeconds);
+        System::Clock::Timeout delta1 = System::Clock::Seconds16(minInterval);
         gMockClock.AdvanceMonotonic(delta1);
 
         chip::app::AttributePathParams dirtyPath;
@@ -2527,7 +2536,7 @@ void TestReadInteraction::TestSubscribeWithCache()
 
         // Case 2: EMPTY report (keep-alive)
         // Advance clock by MaxInterval without making anything dirty -> should trigger keep-alive
-        System::Clock::Timeout delta2 = System::Clock::Seconds16(readPrepareParams.mMaxIntervalCeilingSeconds);
+        System::Clock::Timeout delta2 = System::Clock::Seconds16(maxInterval);
         gMockClock.AdvanceMonotonic(delta2);
         cacheCallback.Reset();
         GetIOContext().DriveIO(); // Trigger timer and schedule run
@@ -2541,7 +2550,7 @@ void TestReadInteraction::TestSubscribeWithCache()
         EXPECT_EQ(cacheCallback.GetSubscriptionUptime(), delta1 + delta2);
 
         // Case 3: Another NON-EMPTY report
-        System::Clock::Timeout delta3 = System::Clock::Seconds16(readPrepareParams.mMinIntervalFloorSeconds);
+        System::Clock::Timeout delta3 = System::Clock::Seconds16(minInterval);
         gMockClock.AdvanceMonotonic(delta3);
         EXPECT_EQ(chip::app::InteractionModelEngine::GetInstance()->GetReportingEngine().SetDirty(dirtyPath), CHIP_NO_ERROR);
 
