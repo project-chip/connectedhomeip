@@ -15,9 +15,9 @@
 #    limitations under the License.
 #
 
+import asyncio
 import logging
 import queue
-import asyncio
 import time
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
@@ -755,7 +755,7 @@ class WaitForAttributeValueAction(BaseAction):
         self._expected_duration_ms = args_dict['expectedDurationMs']
         self._node_id = test_step.node_id
 
-        self._fabric_filtered = True # default
+        self._fabric_filtered = True  # default
 
         self._extra_duration_ms = test_step.get_config_value('valueWaitExtraDurationMs')
         if self._extra_duration_ms is None:
@@ -775,7 +775,7 @@ class WaitForAttributeValueAction(BaseAction):
 
         if self._request_object.attribute_type is None:
             raise UnexpectedActionCreationError(
-                f'WaitForAttributeValue attribute doesn\'t have valid attribute_type')
+                'WaitForAttributeValue attribute doesn\'t have valid attribute_type')
 
     async def run_action(self, dev_ctrl: ChipDeviceController) -> _ActionResult:
         start_time = time.time()

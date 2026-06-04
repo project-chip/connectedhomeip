@@ -154,7 +154,8 @@ async def main(setup_code, yaml_path, node_id, pics_file, value_wait_extra_durat
             ])
 
             # Parsing YAML test and setting up matter-repl yamltests runner.
-            parser_config = TestParserConfig(pics_file, clusters_definitions, {'valueWaitExtraDurationMs': value_wait_extra_duration_ms})
+            parser_config = TestParserConfig(pics_file, clusters_definitions, {
+                                             'valueWaitExtraDurationMs': value_wait_extra_duration_ms})
             yaml = TestParser(yaml_path, parser_config)
             runner = ReplTestRunner(
                 clusters_definitions, certificate_authority_manager, dev_ctrl)
