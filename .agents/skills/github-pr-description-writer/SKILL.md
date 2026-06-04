@@ -46,6 +46,8 @@ use the following sub-headings:
 -   **Say Nothing if Nothing to Say**: Do not include sections or bullet points
     with "None" or "N/A". If a section (like `Caveats` or `#### Related issues`)
     has no content, omit the heading and content entirely to reduce noise.
+    *Exception*: The `#### Testing` section must always be present; you may use
+    `N/A` there for trivial changes if accompanied by a brief justification.
 
 #### Keeping in Sync Rule
 
@@ -118,7 +120,7 @@ Fixes a crash in the DNS-SD client when processing malformed SRV responses.
 
 ##### Caveats
 
--   This change discards malformed records silently, logging a warning.
+-   This change discards malformed records and logs a warning.
 
 #### Related issues
 
