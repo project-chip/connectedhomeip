@@ -228,11 +228,7 @@ class TC_CLCTRL_7_4(MatterBaseTest):
                 else:
                     self.step("2j")
                     log.info("LatchControlModes Bit 1 is 1, sending GroupedMoveTo command with Latch = False")
-
-                    try:
-                        await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(latch=False))
-                    except InteractionModelError as e:
-                        asserts.assert_equal(e.status, Status.Success, f"GroupedMoveTo command with Latch = False failed: {e}")
+                    await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(latch=False))
 
                     self.step("2k")
                     self.skip_step("2l")
@@ -299,10 +295,7 @@ class TC_CLCTRL_7_4(MatterBaseTest):
                     position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyClosed))
             else:
                 log.info("Sending GroupedMoveTo command with Position = FullyClosed by unicast")
-                try:
-                    await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyClosed))
-                except InteractionModelError as e:
-                    asserts.assert_equal(e.status, Status.Success, f"GroupedMoveTo command to FullyClosed position failed: {e}")
+                await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyClosed))
 
             self.step("4d")
             sub_handler.await_all_expected_report_matches(expected_matchers=[current_position_matcher(
@@ -316,10 +309,7 @@ class TC_CLCTRL_7_4(MatterBaseTest):
                 position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyOpen))
         else:
             log.info("Sending GroupedMoveTo command with Position = FullyOpen by unicast")
-            try:
-                await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyOpen))
-            except InteractionModelError as e:
-                asserts.assert_equal(e.status, Status.Success, f"GroupedMoveTo command to FullyOpen position failed: {e}")
+            await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyOpen))
 
         self.step("4f")
         sub_handler.await_all_expected_report_matches(expected_matchers=[main_state_matcher(
@@ -360,10 +350,7 @@ class TC_CLCTRL_7_4(MatterBaseTest):
                     position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyClosed))
             else:
                 log.info("Sending GroupedMoveTo command with Position = FullyClosed by unicast")
-                try:
-                    await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyClosed))
-                except InteractionModelError as e:
-                    asserts.assert_equal(e.status, Status.Success, f"GroupedMoveTo command to FullyClosed position failed: {e}")
+                await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyClosed))
 
             self.step("5c")
             countdown_time_before_interruption: uint = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.CountdownTime)
@@ -372,10 +359,7 @@ class TC_CLCTRL_7_4(MatterBaseTest):
             log.info(f"CountdownTime before interruption: {countdown_time_before_interruption}")
 
             self.step("5d")
-            try:
-                await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.Stop())
-            except InteractionModelError as e:
-                asserts.assert_equal(e.status, Status.Success, "Stop command failed: {e}")
+            await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.Stop())
             log.info("Stop command sent, waiting for MainState to become Stopped")
 
             self.step("5e")

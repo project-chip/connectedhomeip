@@ -200,13 +200,10 @@ class TC_CLDIM_5_3(MatterBaseTest):
             else:
                 # STEP 2j: Send GroupedSetTarget command with Latch=False
                 self.step("2j")
-                try:
-                    await self.send_single_cmd(
-                        cmd=Clusters.Objects.ClosureDimension.Commands.GroupedSetTarget(latch=False),
-                        endpoint=endpoint
-                    )
-                except InteractionModelError as e:
-                    asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
+                await self.send_single_cmd(
+                    cmd=Clusters.Objects.ClosureDimension.Commands.GroupedSetTarget(latch=False),
+                    endpoint=endpoint
+                )
 
             # STEP 2k: If LatchControlModes is remote unlatching, skip step 2l
             self.step("2k")
@@ -245,24 +242,18 @@ class TC_CLDIM_5_3(MatterBaseTest):
             # STEP 4b: Send GroupedSetTarget command with Position MaxPosition
             self.step("4b")
 
-            try:
-                await self.send_single_cmd(
-                    cmd=Clusters.Objects.ClosureDimension.Commands.GroupedSetTarget(position=max_position),
-                    endpoint=endpoint
-                )
-            except InteractionModelError as e:
-                asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
+            await self.send_single_cmd(
+                cmd=Clusters.Objects.ClosureDimension.Commands.GroupedSetTarget(position=max_position),
+                endpoint=endpoint
+            )
 
             # STEP 4c: Send GroupedSetTarget command with Position below MinPosition
             self.step("4c")
             if min_position > 0:
-                try:
-                    await self.send_single_cmd(
-                        cmd=Clusters.Objects.ClosureDimension.Commands.GroupedSetTarget(position=min_position - 1),
-                        endpoint=endpoint
-                    )
-                except InteractionModelError as e:
-                    asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
+                await self.send_single_cmd(
+                    cmd=Clusters.Objects.ClosureDimension.Commands.GroupedSetTarget(position=min_position - 1),
+                    endpoint=endpoint
+                )
             else:
                 log.info("MinPosition not > 0. Skipping step 4c.")
                 self.mark_current_step_skipped()
@@ -270,26 +261,20 @@ class TC_CLDIM_5_3(MatterBaseTest):
             # STEP 4d: Send GroupedSetTarget command with Position above MaxPosition
             self.step("4d")
             if max_position < 10000:
-                try:
-                    await self.send_single_cmd(
-                        cmd=Clusters.Objects.ClosureDimension.Commands.GroupedSetTarget(position=max_position + 1),
-                        endpoint=endpoint
-                    )
-                except InteractionModelError as e:
-                    asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
+                await self.send_single_cmd(
+                    cmd=Clusters.Objects.ClosureDimension.Commands.GroupedSetTarget(position=max_position + 1),
+                    endpoint=endpoint
+                )
             else:
                 log.info("MaxPosition not < 10000. Skipping step 4d.")
                 self.mark_current_step_skipped()
 
             # STEP 4e: Send GroupedSetTarget command with Position exceeding 100%
             self.step("4e")
-            try:
-                await self.send_single_cmd(
-                    cmd=Clusters.Objects.ClosureDimension.Commands.GroupedSetTarget(position=10001),
-                    endpoint=endpoint
-                )
-            except InteractionModelError as e:
-                asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
+            await self.send_single_cmd(
+                cmd=Clusters.Objects.ClosureDimension.Commands.GroupedSetTarget(position=10001),
+                endpoint=endpoint
+            )
 
         # STEP 5a: If LimitRange is unsupported, skip step 5b to 5g
         self.step("5a")
@@ -300,13 +285,10 @@ class TC_CLDIM_5_3(MatterBaseTest):
             # STEP 5b: Send GroupedSetTarget command with Position 0%
             self.step("5b")
             sub_handler.reset()
-            try:
-                await self.send_single_cmd(
-                    cmd=Clusters.Objects.ClosureDimension.Commands.GroupedSetTarget(position=0),
-                    endpoint=endpoint
-                )
-            except InteractionModelError as e:
-                asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
+            await self.send_single_cmd(
+                cmd=Clusters.Objects.ClosureDimension.Commands.GroupedSetTarget(position=0),
+                endpoint=endpoint
+            )
 
             # STEP 5c: Verify TargetState attribute is updated
             self.step("5c")
@@ -325,13 +307,11 @@ class TC_CLDIM_5_3(MatterBaseTest):
             # STEP 5e: Send GroupedSetTarget command with Position 100%
             self.step("5e")
             sub_handler.reset()
-            try:
-                await self.send_single_cmd(
-                    cmd=Clusters.Objects.ClosureDimension.Commands.GroupedSetTarget(position=10000),
-                    endpoint=endpoint
-                )
-            except InteractionModelError as e:
-                asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
+
+            await self.send_single_cmd(
+                cmd=Clusters.Objects.ClosureDimension.Commands.GroupedSetTarget(position=10000),
+                endpoint=endpoint
+            )
 
             # STEP 5f: Verify TargetState attribute is updated
             self.step("5f")
@@ -376,13 +356,10 @@ class TC_CLDIM_5_3(MatterBaseTest):
             # STEP 7c: Send GroupedSetTarget command with Position not a multiple of Resolution
             self.step("7c")
             sub_handler.reset()
-            try:
-                await self.send_single_cmd(
-                    cmd=Clusters.Objects.ClosureDimension.Commands.GroupedSetTarget(position=min_position + resolution - 1),
-                    endpoint=endpoint
-                )
-            except InteractionModelError as e:
-                asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
+            await self.send_single_cmd(
+                cmd=Clusters.Objects.ClosureDimension.Commands.GroupedSetTarget(position=min_position + resolution - 1),
+                endpoint=endpoint
+            )
 
             # STEP 7d: Verify TargetState attribute is updated
             self.step("7d")
@@ -415,13 +392,10 @@ class TC_CLDIM_5_3(MatterBaseTest):
             # STEP 7g: Send GroupedSetTarget command with Position not a multiple of Resolution
             self.step("7g")
             sub_handler.reset()
-            try:
-                await self.send_single_cmd(
-                    cmd=Clusters.Objects.ClosureDimension.Commands.GroupedSetTarget(position=(max_position - resolution) + 1),
-                    endpoint=endpoint
-                )
-            except InteractionModelError as e:
-                asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
+            await self.send_single_cmd(
+                cmd=Clusters.Objects.ClosureDimension.Commands.GroupedSetTarget(position=(max_position - resolution) + 1),
+                endpoint=endpoint
+            )
 
             # STEP 7h: Verify TargetState attribute is updated
             self.step("7h")
@@ -452,13 +426,10 @@ class TC_CLDIM_5_3(MatterBaseTest):
         # STEP 8: Send GroupedSetTarget command with Latch field when MotionLatching is unsupported
         self.step(8)
         if not is_latching_supported:
-            try:
-                await self.send_single_cmd(
-                    cmd=Clusters.Objects.ClosureDimension.Commands.GroupedSetTarget(latch=True),
-                    endpoint=endpoint
-                )
-            except InteractionModelError as e:
-                asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
+            await self.send_single_cmd(
+                cmd=Clusters.Objects.ClosureDimension.Commands.GroupedSetTarget(latch=True),
+                endpoint=endpoint
+            )
         else:
             log.info("Latching feature is supported. Skipping step 8.")
             self.mark_current_step_skipped()
@@ -466,14 +437,11 @@ class TC_CLDIM_5_3(MatterBaseTest):
         # STEP 9: Send GroupedSetTarget command with Speed field when Speed is unsupported
         self.step(9)
         if not is_speed_supported:
-            try:
-                await self.send_single_cmd(
-                    cmd=Clusters.Objects.ClosureDimension.Commands.GroupedSetTarget(
-                        speed=Globals.Enums.ThreeLevelAutoEnum.kHigh),
-                    endpoint=endpoint
-                )
-            except InteractionModelError as e:
-                asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
+            await self.send_single_cmd(
+                cmd=Clusters.Objects.ClosureDimension.Commands.GroupedSetTarget(
+                    speed=Globals.Enums.ThreeLevelAutoEnum.kHigh),
+                endpoint=endpoint
+            )
         else:
             log.info("Speed feature is supported. Skipping step 9.")
             self.mark_current_step_skipped()
@@ -481,13 +449,10 @@ class TC_CLDIM_5_3(MatterBaseTest):
         # STEP 10: Send GroupedSetTarget command with invalid Speed when Speed is unsupported
         self.step(10)
         if not is_speed_supported:
-            try:
-                await self.send_single_cmd(
-                    cmd=Clusters.Objects.ClosureDimension.Commands.GroupedSetTarget(speed=4),  # Invalid speed
-                    endpoint=endpoint
-                )
-            except InteractionModelError as e:
-                asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
+            await self.send_single_cmd(
+                cmd=Clusters.Objects.ClosureDimension.Commands.GroupedSetTarget(speed=4),  # Invalid speed
+                endpoint=endpoint
+            )
         else:
             log.info("Speed feature is supported. Skipping step 10.")
             self.mark_current_step_skipped()
