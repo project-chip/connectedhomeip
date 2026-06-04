@@ -138,7 +138,7 @@ class DelayCommands(PseudoCluster):
                         value = response.get('value')
                         if value == expected_value:
                             return
-            except Exception as e:
+            except Exception:
                 # Ignore errors during polling
                 pass
 
