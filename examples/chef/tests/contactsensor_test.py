@@ -30,6 +30,11 @@ logger = logging.getLogger(__name__)
 class TC_CONTACTSENSOR(MatterBaseTest):
     """Tests for chef contact sensor device."""
 
+    @property
+    def default_endpoint(self) -> int:
+        return 1
+
+
     @async_test_body
     async def test_TC_CONTACTSENSOR(self):
         """[TC_CONTACTSENSOR] chef contact sensor functionality test."""
