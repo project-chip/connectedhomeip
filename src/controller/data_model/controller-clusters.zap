@@ -54,7 +54,7 @@
         }
       ],
       "deviceVersions": [
-        5
+        4
       ],
       "deviceIdentifiers": [
         22
@@ -2487,6 +2487,15 @@
           "apiMaturity": "provisional"
         },
         {
+          "name": "Ambient Sensing Union",
+          "code": 1074,
+          "mfgCode": null,
+          "define": "AMBIENT_SENSING_UNION_CLUSTER",
+          "side": "client",
+          "enabled": 1,
+          "apiMaturity": "provisional"
+        },
+        {
           "name": "Network Identity Management",
           "code": 1104,
           "mfgCode": null,
@@ -3090,7 +3099,6 @@
           "define": "CHIME_CLUSTER",
           "side": "client",
           "enabled": 1,
-          "apiMaturity": "provisional",
           "commands": [
             {
               "name": "PlayChimeSound",

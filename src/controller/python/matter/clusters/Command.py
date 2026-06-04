@@ -22,7 +22,7 @@ import logging
 from asyncio.futures import Future
 from ctypes import CFUNCTYPE, POINTER, c_bool, c_char_p, c_size_t, c_uint8, c_uint16, c_uint32, c_void_p, cast, py_object
 from dataclasses import dataclass
-from typing import List, Optional, Type, Union
+from typing import Optional, Union
 
 from ..interaction_model import InteractionModelError, PyInvokeRequestData
 from ..interaction_model import Status as InteractionModelStatus
@@ -46,7 +46,7 @@ class CommandPath:
 class InvokeRequestInfo:
     EndpointId: int
     Command: ClusterCommand
-    ResponseType: Optional[Type] = None
+    ResponseType: Optional[type] = None
 
 
 @dataclass
@@ -308,8 +308,8 @@ async def SendCommand(future: Future, eventLoop, responseType: type[ClusterComma
         ))
 
 
-def _BuildPyInvokeRequestData(commands: List[InvokeRequestInfo], timedRequestTimeoutMs: Optional[int],
-                              responseTypes: list[type[ClusterCommand] | None], suppressTimedRequestMessage: bool = False) -> List[PyInvokeRequestData]:
+def _BuildPyInvokeRequestData(commands: list[InvokeRequestInfo], timedRequestTimeoutMs: Optional[int],
+                              responseTypes: list[type[ClusterCommand] | None], suppressTimedRequestMessage: bool = False) -> list[PyInvokeRequestData]:
     numberOfCommands = len(commands)
     pyBatchCommandsDataArrayType = PyInvokeRequestData * numberOfCommands
     pyBatchCommandsData = pyBatchCommandsDataArrayType()
@@ -335,7 +335,7 @@ def _BuildPyInvokeRequestData(commands: List[InvokeRequestInfo], timedRequestTim
     return pyBatchCommandsData
 
 
-async def SendBatchCommands(future: Future, eventLoop, device, commands: List[InvokeRequestInfo],
+async def SendBatchCommands(future: Future, eventLoop, device, commands: list[InvokeRequestInfo],
                             timedRequestTimeoutMs: Optional[int] = None, interactionTimeoutMs: Optional[int] = None,
                             busyWaitMs: Optional[int] = None, suppressResponse: Optional[bool] = None) -> PyChipError:
     ''' Initiates an InvokeInteraction with the batch commands provided.
@@ -381,10 +381,10 @@ async def SendBatchCommands(future: Future, eventLoop, device, commands: List[In
     )
 
 
-def TestOnlySendBatchCommands(future: Future, eventLoop, device, commands: List[InvokeRequestInfo],
+def TestOnlySendBatchCommands(future: Future, eventLoop, device, commands: list[InvokeRequestInfo],
                               timedRequestTimeoutMs: Optional[int] = None, interactionTimeoutMs: Optional[int] = None, busyWaitMs: Optional[int] = None,
                               suppressResponse: Optional[bool] = None, remoteMaxPathsPerInvoke: Optional[int] = None,
-                              suppressTimedRequestMessage: bool = False, commandRefsOverride: Optional[List[int]] = None) -> PyChipError:
+                              suppressTimedRequestMessage: bool = False, commandRefsOverride: Optional[list[int]] = None) -> PyChipError:
     ''' ONLY TO BE USED FOR TEST: Send batch commands using various overrides.
     '''
     if suppressTimedRequestMessage and timedRequestTimeoutMs is not None:

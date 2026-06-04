@@ -495,6 +495,42 @@ static CHIP_ERROR Setup(const char * label,
 
 static void Finalize(chip::app::Clusters::ElectricalGridConditions::Structs::ElectricalGridConditionsStruct::Type & request);
 
+static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::ElectricalProtectionAlarm::Structs::ArcFaultRatingsStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::ElectricalProtectionAlarm::Structs::ArcFaultRatingsStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::ElectricalProtectionAlarm::Structs::OverLoadRatingsStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::ElectricalProtectionAlarm::Structs::OverLoadRatingsStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::ElectricalProtectionAlarm::Structs::OverVoltageRatingsStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::ElectricalProtectionAlarm::Structs::OverVoltageRatingsStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::ElectricalProtectionAlarm::Structs::ResidualCurrentFaultRatingsStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::ElectricalProtectionAlarm::Structs::ResidualCurrentFaultRatingsStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::ElectricalProtectionAlarm::Structs::ShortCircuitRatingsStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::ElectricalProtectionAlarm::Structs::ShortCircuitRatingsStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::ElectricalProtectionAlarm::Structs::SurgeProtectionRatingsStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::ElectricalProtectionAlarm::Structs::SurgeProtectionRatingsStruct::Type & request);
+
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::DoorLock::Structs::CredentialStruct::Type & request,
                         Json::Value & value);
 
@@ -587,6 +623,16 @@ static CHIP_ERROR Setup(const char * label,
 
 static void Finalize(chip::app::Clusters::Thermostat::Structs::WeeklyScheduleTransitionStruct::Type & request);
 
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::DynamicLighting::Structs::EffectColorStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::DynamicLighting::Structs::EffectColorStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::DynamicLighting::Structs::EffectStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::DynamicLighting::Structs::EffectStruct::Type & request);
+
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::OccupancySensing::Structs::HoldTimeLimitsStruct::Type & request,
                         Json::Value & value);
 
@@ -621,6 +667,12 @@ static CHIP_ERROR Setup(const char * label,
                         Json::Value & value);
 
 static void Finalize(chip::app::Clusters::AmbientContextSensing::Structs::PredictedActivityStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::AmbientSensingUnion::Structs::UnionContributorStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::AmbientSensingUnion::Structs::UnionContributorStruct::Type & request);
 
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ProximityRanging::Structs::RDRStruct::Type & request,
                         Json::Value & value);
@@ -997,6 +1049,21 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Chime::Structs:
                         Json::Value & value);
 
 static void Finalize(chip::app::Clusters::Chime::Structs::ChimeSoundStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::AvAnalysis::Structs::AnalysisStreamStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::AvAnalysis::Structs::AnalysisStreamStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::AvAnalysis::Structs::ContextTriggerStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::AvAnalysis::Structs::ContextTriggerStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::AvAnalysis::Structs::TrackedContext::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::AvAnalysis::Structs::TrackedContext::Type & request);
 
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::CommodityTariff::Structs::PeakPeriodStruct::Type & request,
                         Json::Value & value);

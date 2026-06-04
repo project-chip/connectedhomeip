@@ -18,9 +18,11 @@
 import argparse
 import os
 import pathlib
+import re
 import sys
 import xml.etree.ElementTree as ET
 from pathlib import Path
+from typing import Optional
 
 from pics_generator_support import map_cluster_name_to_pics_xml, pics_xml_file_list_loader
 from rich.console import Console
@@ -28,17 +30,38 @@ from rich.console import Console
 import matter.clusters as Clusters
 from matter.testing.decorators import async_test_body
 from matter.testing.runner import default_matter_test_main
+from matter.tlv import uint
 
 # Add the path to python_testing folder, in order to be able to import from matter.testing.matter_testing
 sys.path.append(os.path.abspath(sys.path[0] + "/../../python_testing"))
+from matter.testing.conformance import ConformanceAssessmentData, ConformanceException  # noqa: E402
 from matter.testing.matter_testing import MatterBaseTest  # noqa: E402
-from matter.testing.spec_parsing import PrebuiltDataModelDirectory, build_xml_clusters  # noqa: E402
+from matter.testing.spec_parsing import PrebuiltDataModelDirectory, XmlEvent, build_xml_clusters  # noqa: E402
 
 console = None
 xml_clusters = None
 
+# Matches the trailing ".E<hex>" event-id suffix in a PICS itemNumber like "ACL.S.E01".
+_EVENT_ID_RE = re.compile(r'\.E([0-9A-Fa-f]+)$')
 
-def GenerateDevicePicsXmlFiles(clusterName, clusterPicsCode, featurePicsList, attributePicsList, acceptedCommandPicsList, generatedCommandPicsList, outputPathStr):
+
+def _extract_event_id(item_number: Optional[str]) -> Optional[int]:
+    """Parse the event id from a PICS itemNumber like 'ACL.S.E01'.
+
+    Returns None if item_number is missing or doesn't end in '.E<hex>'.
+    """
+    if not item_number:
+        return None
+    match = _EVENT_ID_RE.search(item_number)
+    if match is None:
+        return None
+    return int(match.group(1), 16)
+
+
+def GenerateDevicePicsXmlFiles(clusterName, clusterPicsCode, featurePicsList, attributePicsList,
+                               acceptedCommandPicsList, generatedCommandPicsList, outputPathStr,
+                               xml_events: Optional[dict[uint, XmlEvent]] = None,
+                               assessment_data: Optional[ConformanceAssessmentData] = None):
 
     xmlPath = xmlTemplatePathStr
     fileName = ""
@@ -151,44 +174,43 @@ def GenerateDevicePicsXmlFiles(clusterName, clusterPicsCode, featurePicsList, at
                 supportElement = picsItem.find('support')
                 supportElement.text = "true"
 
-    # Event PICS (Work in progress)
-    # The ability to set event PICS is fairly limited, due to EventList not being supported,
-    # as well as no way to check for event support in the current Matter SDK.
-
-    # This implementation marks an event as supported if:
-    # 1) Event is mandatody
-    # 2) The event is mandatory based on a feature that is supported (Cross check against feature list) (Not supported yet)
+    # Event PICS.
+    # EventList (0xFFFA) is deprecated and the SDK no longer implements it, so
+    # we can't read supported events back from the device. Use the parsed
+    # cluster conformance instead and auto-mark events that come back
+    # MANDATORY for this DUT's feature set. Handles AND/OR/NOT and parens
+    # that the previous string equality check missed (e.g. "ACL.S AND ACL.S.F00").
     serverEventsNode = root.find("./clusterSide[@type='Server']/events")
     if serverEventsNode is not None:
         for picsItem in serverEventsNode:
             itemNumberElement = picsItem.find('itemNumber')
             statusElement = picsItem.find('status')
 
-            try:
-                condition = statusElement.attrib['cond']
+            condition = statusElement.attrib.get('cond', '')
+            if condition:
                 console.print(f"Checking {itemNumberElement.text} with conformance {statusElement.text} and condition {condition}")
-            except ET.ParseError:
-                condition = ""
+            else:
                 console.print(f"Checking {itemNumberElement.text} with conformance {statusElement.text}")
 
-            if statusElement.text == "M":
+            event_id = _extract_event_id(itemNumberElement.text)
+            if event_id is None or xml_events is None or assessment_data is None or event_id not in xml_events:
+                # No parsed conformance for this item (template references an event
+                # the DM XML scrape doesn't have, or itemNumber isn't .E<hex>).
+                # Leave support=false for the reviewer.
+                continue
 
-                # Is event mandated by the server
-                if condition == clusterPicsCode:
-                    console.print("Found event mandated by server ✅")
-                    supportElement = picsItem.find('support')
-                    supportElement.text = "true"
-                    continue
+            try:
+                decision = xml_events[event_id].conformance(assessment_data)
+            except ConformanceException as e:
+                console.print(f"[yellow]  → conformance evaluation failed for {itemNumberElement.text}: {e}; leaving support=false")
+                continue
 
-                if condition in featurePicsList:
-                    console.print("Found event mandated by feature ✅")
-                    supportElement = picsItem.find('support')
-                    supportElement.text = "true"
-                    continue
-
-                if condition == "":
-                    console.print("Event is mandated without a condition ✅")
-                    continue
+            if decision.is_mandatory():
+                console.print(f"Event {itemNumberElement.text} is mandatory by spec conformance ✅")
+                supportElement = picsItem.find('support')
+                supportElement.text = "true"
+            else:
+                console.print(f"  → not mandatory for this device (decision={decision.decision.name})")
 
     # Grabbing the header from the XML templates
     with (open(f"{xmlPath}{fileName}") as inputFile,
@@ -329,9 +351,25 @@ async def DeviceMapping(devCtrl, nodeID, outputPathStr):
             console.print("Collected generated command PICS:")
             console.print(generatedCommandListPicsList)
 
+            # Read ClusterRevision (needed by ConformanceAssessmentData for
+            # revision-gated conformance, which is rare but possible).
+            clusterRevisionResponse = await devCtrl.ReadAttribute(nodeID, [(endpoint, clusterClass.Attributes.ClusterRevision)])
+            clusterRevision = clusterRevisionResponse[endpoint][clusterClass][clusterClass.Attributes.ClusterRevision]
+
+            # Inputs the conformance evaluator needs to decide which events
+            # are mandatory on this DUT.
+            assessment_data = ConformanceAssessmentData(
+                feature_map=uint(featureMapValue),
+                attribute_list=list(attributeList),
+                all_command_list=list(acceptedCommandList) + list(generatedCommandList),
+                cluster_revision=uint(clusterRevision),
+            )
+
             # Write the collected PICS to a PICS XML file
             GenerateDevicePicsXmlFiles(clusterName, clusterPICS, featurePicsList, attributePicsList,
-                                       acceptedCommandListPicsList, generatedCommandListPicsList, endpointOutputPathStr)
+                                       acceptedCommandListPicsList, generatedCommandListPicsList, endpointOutputPathStr,
+                                       xml_events=xml_clusters[server].events,
+                                       assessment_data=assessment_data)
 
         # Read client list
         clientListResponse = await devCtrl.ReadAttribute(nodeID, [(endpoint, Clusters.Descriptor.Attributes.ClientList)])
@@ -389,8 +427,9 @@ commandTag = ".C"
 acceptedCommandTag = ".Rsp"
 generatedCommandTag = ".Tx"
 
-# List of globale attributes (server)
-# Does not read ClusterRevision [0xFFFD] (not relevant), EventList [0xFFFA] (Provisional)
+# List of global attributes (server).
+# Does not read ClusterRevision [0xFFFD] (not relevant) or EventList [0xFFFA]
+# (deprecated, not implemented by the SDK).
 featureMapAttributeId = "0xFFFC"
 attributeListAttributeId = "0xFFFB"
 acceptedCommandListAttributeId = "0xFFF9"

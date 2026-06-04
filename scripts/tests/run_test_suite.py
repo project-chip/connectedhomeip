@@ -14,28 +14,32 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import contextlib
 import enum
 import functools
 import logging
+import multiprocessing
 import os
 import random
+import shlex
+import subprocess
 import sys
 import time
 import warnings
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Protocol
+from typing import Any
 
 import chiptest
 import click
 from chiptest.accessories import AppsRegister
+from chiptest.concurrency.work_queue import CancellableQueue
 from chiptest.glob_matcher import GlobMatcher
-from chiptest.log_config import LOG_LEVELS, LogConfig
-from chiptest.results import ResultError, ResultProcessingThread, RunSummary, TestResult
+from chiptest.log_config import LOG_LEVELS, LogConfig, LogMessageCounter
+from chiptest.results import ResultError, ResultProcessingThread, RunSummary, TestResult, TestStatus
 from chiptest.runner import Executor, SubprocessKind
 from chiptest.status import PeriodicStatusThread
 from chiptest.test_definition import TEST_THREAD_DATASET, SubprocessInfoRepo, TestDefinition, TestRunTime, TestTag
-from chiptest.work_queue import CancellableQueue
 from chiptest.worker import TaskQueueT, WorkerThread
 from chipyaml.paths_finder import PathsFinder
 
@@ -113,6 +117,10 @@ ExistingFilePath = click.Path(exists=True, dir_okay=False, path_type=Path)
     type=click.Choice(LOG_LEVELS, case_sensitive=False),
     help='Set the verbosity of logger during test execution. Use --log-level if not defined')
 @click.option(
+    '--log-level-rpc',
+    type=click.Choice(LOG_LEVELS, case_sensitive=False),
+    help='Set the verbosity of logger for RPC-related logging. Use --log-level if not defined')
+@click.option(
     '--target',
     default=['all'],
     multiple=True,
@@ -179,13 +187,13 @@ ExistingFilePath = click.Path(exists=True, dir_okay=False, path_type=Path)
     '--chip-tool', type=ExistingFilePath, cls=DeprecatedOption, replacement='--tool-path chip-tool:<path>',
     help='Binary path of chip tool app to use to run the test')
 @click.pass_context
-def main(context: click.Context, log_level: str, log_level_tests: str | None, target: str, target_glob: str, target_skip_glob: str,
-         log_timestamps: bool, root: str, internal_inside_unshare: bool, include_tags: tuple[TestTag, ...],
-         exclude_tags: tuple[TestTag, ...], test_order_seed: str | None, find_path: list[str], runner: TestRunTime,
-         chip_tool: Path | None) -> None:
+def main(context: click.Context, log_level: str, log_level_tests: str | None, log_level_rpc: str | None, target: str,
+         target_glob: str, target_skip_glob: str, log_timestamps: bool, root: str, internal_inside_unshare: bool,
+         include_tags: tuple[TestTag, ...], exclude_tags: tuple[TestTag, ...], test_order_seed: str | None, find_path: list[str],
+         runner: TestRunTime, chip_tool: Path | None) -> None:
 
     # Ensures somewhat pretty logging of what is going on
-    log_config = LogConfig(log_level, log_level_tests if log_level_tests is not None else log_level, log_timestamps)
+    log_config = LogConfig(log_level, log_level_tests or log_level, log_level_rpc or log_level, log_timestamps)
     log_config.set_fmt()
 
     if sys.platform == "linux":
@@ -284,16 +292,6 @@ def cmd_list(context: click.Context) -> None:
             tags = f" ({tags})"
 
         print("%s%s" % (test.name, tags))
-
-
-class Terminable(Protocol):
-    """Protocol for resources that can be explicitly terminated or cleaned up.
-
-    Implement this protocol for any class that manages external resources (such as subprocesses, network connections, or files) that
-    require explicit cleanup. The `terminate` method should perform any necessary actions to release or clean up the resource.
-    """
-
-    def terminate(self) -> None: ...
 
 
 class CommissioningMethod(enum.StrEnum):
@@ -529,138 +527,113 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int, app_path: li
     ble_controller_tool = None
     thread_ba_host = None
     thread_ba_port = None
-    to_terminate: list[Terminable] = []
     task_queue: TaskQueueT = CancellableQueue()
-    errors: list[BaseException] = []
 
     try:
-        # Initialize result thread first so that it's closed last.
-        to_terminate.append(result_thread := ResultProcessingThread(run_summary, expected_failures, keep_going, summary_file))
+        with (multiprocessing.Manager() as mp_manager,
+                LogMessageCounter(mp_manager) as log_msg_counter,
+                context.obj.log_config.filter.msg_counter_ctx(log_msg_counter),
+                ResultProcessingThread(run_summary, expected_failures, keep_going, summary_file) as result_thread,
+                contextlib.ExitStack() as stack):
+            mgmt_ns_wrapper: str | None = None
+            if sys.platform == 'linux':
+                app_name = 'wlx-app' if wifi_required else 'eth-app'
+                tool_name = 'wlx-tool' if commissioning_method == 'wifipaf-wifi' else 'eth-tool'
 
-        if sys.platform == 'linux':
-            app_name = 'wlx-app' if wifi_required else 'eth-app'
-            tool_name = 'wlx-tool' if commissioning_method == 'wifipaf-wifi' else 'eth-tool'
+                ns: chiptest.linux.IsolatedNetworkNamespace = stack.enter_context(chiptest.linux.IsolatedNetworkNamespace(
+                    index=0,
+                    # Do not bring up the app interface link automatically when doing BLE-WiFi commissioning.
+                    app_link_up=not wifi_required,
+                    add_ula=not thread_required,
+                    # Change the app link name so the interface will be recognized as WiFi or Ethernet
+                    # depending on the commissioning method used.
+                    app_link_name=app_name, tool_link_name=tool_name))
+                mgmt_ns_wrapper = shlex.join(ns.mgmt_ns.netns_cmd_wrapper)
 
-            to_terminate.append(ns := chiptest.linux.IsolatedNetworkNamespace(
-                index=0,
-                # Do not bring up the app interface link automatically when doing BLE-WiFi commissioning.
-                app_link_up=not wifi_required,
-                add_ula=not thread_required,
-                # Change the app link name so the interface will be recognized as WiFi or Ethernet
-                # depending on the commissioning method used.
-                app_link_name=app_name, tool_link_name=tool_name))
+                match commissioning_method:
+                    case CommissioningMethod.BLE_WIFI:
+                        stack.enter_context(chiptest.linux.DBusTestSystemBus())
+                        stack.enter_context(chiptest.linux.BluetoothMock())
+                        stack.enter_context(chiptest.linux.WpaSupplicantMock([app_name], "MatterAP", "MatterAPPassword", ns))
+                        ble_controller_app = 0   # Bind app to the first BLE controller
+                        ble_controller_tool = 1  # Bind tool to the second BLE controller
+                    case CommissioningMethod.BLE_THREAD:
+                        stack.enter_context(chiptest.linux.DBusTestSystemBus())
+                        stack.enter_context(chiptest.linux.BluetoothMock())
+                        stack.enter_context(chiptest.linux.ThreadBorderRouter(TEST_THREAD_DATASET, ns))
+                        ble_controller_app = 0   # Bind app to the first BLE controller
+                        ble_controller_tool = 1  # Bind tool to the second BLE controller
+                    case CommissioningMethod.THREAD_MESHCOP:
+                        stack.enter_context(tbr := chiptest.linux.ThreadBorderRouter(TEST_THREAD_DATASET, ns))
+                        thread_ba_host = tbr.get_border_agent_host()
+                        thread_ba_port = tbr.get_border_agent_port()
+                    case CommissioningMethod.WIFIPAF_WIFI:
+                        stack.enter_context(chiptest.linux.DBusTestSystemBus())
+                        stack.enter_context(chiptest.linux.WpaSupplicantMock(
+                            [app_name, tool_name], "MatterAP", "MatterAPPassword", ns))
 
-            match commissioning_method:
-                case CommissioningMethod.BLE_WIFI:
-                    to_terminate.append(chiptest.linux.DBusTestSystemBus())
-                    to_terminate.append(chiptest.linux.BluetoothMock())
-                    to_terminate.append(chiptest.linux.WpaSupplicantMock([app_name], "MatterAP", "MatterAPPassword", ns))
-                    ble_controller_app = 0   # Bind app to the first BLE controller
-                    ble_controller_tool = 1  # Bind tool to the second BLE controller
-                case CommissioningMethod.BLE_THREAD:
-                    to_terminate.append(chiptest.linux.DBusTestSystemBus())
-                    to_terminate.append(chiptest.linux.BluetoothMock())
-                    to_terminate.append(chiptest.linux.ThreadBorderRouter(TEST_THREAD_DATASET, ns))
-                    ble_controller_app = 0   # Bind app to the first BLE controller
-                    ble_controller_tool = 1  # Bind tool to the second BLE controller
-                case CommissioningMethod.THREAD_MESHCOP:
-                    to_terminate.append(tbr := chiptest.linux.ThreadBorderRouter(TEST_THREAD_DATASET, ns))
-                    thread_ba_host = tbr.get_border_agent_host()
-                    thread_ba_port = tbr.get_border_agent_port()
-                case CommissioningMethod.WIFIPAF_WIFI:
-                    to_terminate.append(chiptest.linux.DBusTestSystemBus())
-                    to_terminate.append(chiptest.linux.WpaSupplicantMock([app_name, tool_name], "MatterAP", "MatterAPPassword", ns))
+                executor: chiptest.linux.LinuxNamespacedExecutor = stack.enter_context(chiptest.linux.LinuxNamespacedExecutor(ns))
+            elif sys.platform == 'darwin':
+                executor: chiptest.darwin.DarwinExecutor = stack.enter_context(chiptest.darwin.DarwinExecutor())
+            else:
+                log.warning("No platform-specific executor for '%s'", sys.platform)
+                executor: Executor = stack.enter_context(Executor())
 
-            to_terminate.append(executor := chiptest.linux.LinuxNamespacedExecutor(ns))
-        elif sys.platform == 'darwin':
-            to_terminate.append(executor := chiptest.darwin.DarwinExecutor())
-        else:
-            log.warning("No platform-specific executor for '%s'", sys.platform)
-            to_terminate.append(executor := Executor())
+            runner = chiptest.runner.Runner(executor=executor)
 
-        runner = chiptest.runner.Runner(executor=executor)
+            apps_register: AppsRegister = stack.enter_context(AppsRegister(mgmt_ns_wrapper, context.obj.log_config))
 
-        to_terminate.append(apps_register := AppsRegister())
-        apps_register.init()
+            status_thread = PeriodicStatusThread(run_summary, log_msg_counter, periodicity=periodic_status)
+            status_thread.start()
 
-        to_terminate.append(status_thread := PeriodicStatusThread(run_summary, context.obj.log_config.filter.msg_counter,
-                                                                  periodicity=periodic_status))
-        status_thread.start()
+            # Initialize and start the worker thread last, to ensure it's terminated first.
+            worker_thread: WorkerThread = stack.enter_context(WorkerThread(task_queue, result_thread.result_queue))
 
-        # Initialize the worker thread last, to ensure it's terminated first.
-        to_terminate.append(worker_thread := WorkerThread(task_queue, result_thread.result_queue))
+            # Schedule all tests.
+            log.info("Each test will be executed %d times", iterations)
+            for i in range(1, iterations + 1):
+                log.info("Scheduling iteration %d", i)
+                for test in context.obj.tests:
+                    log.debug("Enqueuing test %s", test.name)
+                    task_queue.put(functools.partial(
+                        TestResult.run_test, test.name, i, dry_run, context.obj.log_config, functools.partial(
+                            test.Run, runner, apps_register, subproc_info_repo, pics_file, test_timeout_seconds, dry_run,
+                            test_runtime=context.obj.runtime,
+                            ble_controller_app=ble_controller_app,
+                            ble_controller_tool=ble_controller_tool,
+                            op_network='Thread' if thread_required else 'WiFi',
+                            thread_ba_host=thread_ba_host,
+                            thread_ba_port=thread_ba_port,
+                            wifipaf_wifi=commissioning_method == CommissioningMethod.WIFIPAF_WIFI)))
 
-        # Schedule all tests.
-        log.info("Each test will be executed %d times", iterations)
-        for i in range(1, iterations + 1):
-            log.info("Scheduling iteration %d", i)
-            for test in context.obj.tests:
-                log.debug("Enqueuing test %s", test.name)
-                task_queue.put(functools.partial(
-                    TestResult.run_test, test.name, i, dry_run, context.obj.log_config, functools.partial(
-                        test.Run, runner, apps_register, subproc_info_repo, pics_file, test_timeout_seconds, dry_run,
-                        test_runtime=context.obj.runtime,
-                        ble_controller_app=ble_controller_app,
-                        ble_controller_tool=ble_controller_tool,
-                        op_network='Thread' if thread_required else 'WiFi',
-                        thread_ba_host=thread_ba_host,
-                        thread_ba_port=thread_ba_port,
-                        wifipaf_wifi=commissioning_method == CommissioningMethod.WIFIPAF_WIFI)))
+                # If this is the last iteration schedule finalization event by closing the task queue.
+                if i == iterations:
+                    task_queue.close()
 
-            # If this is the last iteration schedule finalization event by closing the task queue.
-            if i == iterations:
-                task_queue.close()
+            log.info("All jobs scheduled")
 
-        log.info("All jobs scheduled")
+            # Wait for exception or completion.
+            while True:
+                # First check if there is an exception first in result thread, then in worker and propagate it to the main thread.
+                if (exception := result_thread.exception or worker_thread.exception) is not None:
+                    raise exception
 
-        # Start worker and result threads.
-        result_thread.start()
-        worker_thread.start()
+                # If the worker thread has finished processing all tasks, finalize the result processing.
+                if not worker_thread.is_alive():
+                    result_thread.result_queue.close()
 
-        # Wait for exception or completion.
-        while True:
-            # First check if there is an exception first in result thread, then in worker and propagate it to the main thread.
-            if (exception := result_thread.exception or worker_thread.exception) is not None:
-                raise exception
+                # Wait for the result thread to finish after closing the result queue to capture any exceptions.
+                if not result_thread.is_alive():
+                    break
 
-            # If the worker thread has finished processing all tasks, finalize the result processing.
-            if not worker_thread.is_alive():
-                result_thread.result_queue.close()
-
-            # Wait for the result thread to finish after closing the result queue to capture any exceptions.
-            if not result_thread.is_alive():
-                break
-
-            time.sleep(0.5)
-    except BaseException as e:
-        errors.append(e)
-    finally:
-        for item in reversed(to_terminate):
-            item_name = item.__class__.__name__
-            try:
-                log.info("Cleaning up %s", item_name)
-                item.terminate()
-            except Exception as e:
-                log.warning("Encountered exception during cleanup of %s: %r", item_name, e)
-                errors.append(e)
-
-    # If there is only one error, we handle some special cases. Otherwise, we raise an exception group with all the errors
-    # encountered during execution and cleanup.
-    if len(errors) == 1:
-        match error := errors[0]:
-            case KeyboardInterrupt():
-                log.info("Interrupting execution on user request")
-                raise error
-            case ResultError():
-                # We just print the message, as the actual test failure with stack trace has already been logged.
-                log.error("%s", error)
-                raise SystemExit(2)
-            case _:
-                # Reraise the single exception with its original traceback preserved.
-                raise error.with_traceback(error.__traceback__)
-
-    if errors:
-        raise BaseExceptionGroup("Encountered exceptions during test execution or cleanup", errors)
+                time.sleep(0.5)
+    except KeyboardInterrupt:
+        log.info("Interrupting execution on user request")
+        raise
+    except ResultError as error:
+        # We just print the message, as the actual test failure with stack trace has already been logged.
+        log.error("%s", error)
+        raise SystemExit(2) from None
 
 
 @main.command(
@@ -681,8 +654,28 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int, app_path: li
     '--show-all',
     is_flag=True,
     help='Show statistics of all tests for all iterations.')
-def cmd_summarize(summary_file: Path, top_slowest: int, show_all: bool) -> None:
-    RunSummary.from_json(summary_file).print_summary(top_slowest=top_slowest, show_all=show_all)
+@click.option(
+    '--compact-failures-file',
+    type=click.Path(dir_okay=False, path_type=Path),
+    default=None,
+    help='Path to output a compact, comma-separated list of failed test names.',
+)
+def cmd_summarize(summary_file: Path, top_slowest: int, show_all: bool, compact_failures_file: Path | None) -> None:
+    summary = RunSummary.from_json(summary_file)
+    summary.print_summary(top_slowest=top_slowest, show_all=show_all)
+
+    if compact_failures_file:
+        failed_results = tuple(r for r in summary.results if r.status == TestStatus.FAILED)
+        if failed_results:
+            existing = set()
+            if compact_failures_file.exists():
+                content = compact_failures_file.read_text().strip()
+                if content:
+                    existing = {n.strip() for n in content.split(",") if n.strip()}
+            new_names = [r.name for r in failed_results]
+            all_names = sorted(existing.union(new_names))
+            compact_failures_file.parent.mkdir(parents=True, exist_ok=True)
+            compact_failures_file.write_text(", ".join(all_names) + "\n")
 
 
 # On Linux, allow an execution shell to be prepared
@@ -697,10 +690,8 @@ if sys.platform == 'linux':
         help='Index of Linux network namespace'
     )
     def cmd_shell(ns_index: int) -> None:
-        chiptest.linux.IsolatedNetworkNamespace(ns_index)
-
-        shell = os.environ.get("SHELL", "bash")
-        os.execvpe(shell, [shell], os.environ.copy())
+        with chiptest.linux.IsolatedNetworkNamespace(ns_index):
+            subprocess.run(os.environ.get("SHELL", "bash"))
 
 
 if __name__ == '__main__':

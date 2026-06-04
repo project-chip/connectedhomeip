@@ -192,6 +192,8 @@ PyChipError pychip_DeviceController_ThreadMeshcopCommission(chip::Controller::De
                                                             chip::Controller::ScriptDevicePairingDelegate * pairingDelegate,
                                                             uint64_t nodeId, uint32_t setupPasscode, uint16_t discriminator,
                                                             const char * borderAgentIPAddr, uint16_t borderAgentPort);
+PyChipError pychip_DeviceController_GetLastThreadMeshcopDiscoveryDiagnosticJson(chip::Controller::DeviceCommissioner * devCtrl,
+                                                                                char * outJson, uint32_t outJsonLen);
 
 PyChipError pychip_DeviceController_PostTaskOnChipThread(ChipThreadTaskRunnerFunct callback, void * pythonContext);
 
@@ -386,6 +388,12 @@ PyChipError pychip_DeviceController_GetAddressAndPort(chip::Controller::DeviceCo
                         ToPyChipError(CHIP_ERROR_BUFFER_TOO_SMALL));
 
     return ToPyChipError(CHIP_NO_ERROR);
+}
+
+PyChipError pychip_DeviceController_GetLastThreadMeshcopDiscoveryDiagnosticJson(chip::Controller::DeviceCommissioner * devCtrl,
+                                                                                char * outJson, uint32_t outJsonLen)
+{
+    return ToPyChipError(devCtrl->GetLastThreadMeshcopDiscoveryDiagnosticJson(outJson, outJsonLen));
 }
 
 PyChipError pychip_DeviceController_GetCompressedFabricId(chip::Controller::DeviceCommissioner * devCtrl, uint64_t * outFabricId)
@@ -895,7 +903,7 @@ PyChipError pychip_DeviceController_EstablishPASESession(chip::Controller::Devic
 
 PyChipError pychip_DeviceController_Commission(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeid)
 {
-    CommissioningParameters params;
+    CommissioningParameters params = sCommissioningParameters;
     return ToPyChipError(devCtrl->Commission(nodeid, params));
 }
 

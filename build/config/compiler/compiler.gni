@@ -43,7 +43,11 @@ declare_args() {
   c_standard = "gnu11"
 
   # C++ standard level (value for -std flag).
-  cpp_standard = "gnu++17"
+  if (current_os == "linux" || current_os == "tizen") {
+    cpp_standard = "gnu++20"
+  } else {
+    cpp_standard = "gnu++17"
+  }
 
   # enable libfuzzer
   is_libfuzzer = false

@@ -135,3 +135,8 @@ jobs:
               with:
                   name: cirque_log-${{steps.outsuffix.outputs.value}}-logs
                   path: /tmp/cirque_test_output/
+            - name: Notify Slack on Failure
+              if: failure()
+              uses: ./.github/actions/notify-slack-failure
+              with:
+                slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}

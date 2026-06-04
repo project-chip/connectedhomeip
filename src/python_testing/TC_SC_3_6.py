@@ -39,7 +39,6 @@ import logging
 import queue
 import time
 from threading import Event
-from typing import List
 
 from mobly import asserts
 
@@ -122,7 +121,7 @@ class TC_SC_3_6(MatterBaseTest):
         # 10 minutes max reporting interval --> We don't care about keep-alives per-se and
         # want to avoid resubscriptions
         max_report_interval_sec = self.user_params.get("max_report_interval_sec", 10 * 60)
-        # Time to wait after changing NodeLabel for subscriptions to all hit. This is dependant
+        # Time to wait after changing NodeLabel for subscriptions to all hit. This is dependent
         # on MRP params of subscriber and on actual min_report_interval.
         # TODO: Determine the correct max value depending on target. Test plan doesn't say!
         timeout_delay_sec = self.user_params.get("timeout_delay_sec", max_report_interval_sec * 2)
@@ -154,7 +153,7 @@ class TC_SC_3_6(MatterBaseTest):
             endpoint=0, attribute=Clusters.OperationalCredentials.Attributes.CommissionedFabrics)
 
         if commissioned_fabric_count > 1:
-            fabrics: List[Clusters.OperationalCredentials.Structs.FabricDescriptorStruct] = await self.read_single_attribute(
+            fabrics: list[Clusters.OperationalCredentials.Structs.FabricDescriptorStruct] = await self.read_single_attribute(
                 dev_ctrl, node_id=self.dut_node_id, endpoint=0,
                 attribute=Clusters.OperationalCredentials.Attributes.Fabrics, fabricFiltered=False)
             current_fabric_index = await self.read_single_attribute_check_success(cluster=Clusters.OperationalCredentials, attribute=Clusters.OperationalCredentials.Attributes.CurrentFabricIndex)
