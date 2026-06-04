@@ -11993,7 +11993,8 @@ public class ClusterIDMapping {
         public enum Command {
             Stop(0L),
             MoveTo(1L),
-            Calibrate(2L),;
+            Calibrate(2L),
+            GroupedMoveTo(3L),;
             private final long id;
             Command(long id) {
                 this.id = id;
@@ -12022,6 +12023,23 @@ public class ClusterIDMapping {
                     }
                     public static MoveToCommandField value(int id) throws NoSuchFieldError {
                         for (MoveToCommandField field : MoveToCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum GroupedMoveToCommandField {Position(0),Latch(1),Speed(2),;
+                    private final int id;
+                    GroupedMoveToCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static GroupedMoveToCommandField value(int id) throws NoSuchFieldError {
+                        for (GroupedMoveToCommandField field : GroupedMoveToCommandField.values()) {
                         if (field.getID() == id) {
                             return field;
                         }
@@ -12123,7 +12141,9 @@ public class ClusterIDMapping {
 
         public enum Command {
             SetTarget(0L),
-            Step(1L),;
+            Step(1L),
+            GroupedSetTarget(2L),
+            GroupedStep(3L),;
             private final long id;
             Command(long id) {
                 this.id = id;
@@ -12169,6 +12189,40 @@ public class ClusterIDMapping {
                     }
                     public static StepCommandField value(int id) throws NoSuchFieldError {
                         for (StepCommandField field : StepCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum GroupedSetTargetCommandField {Position(0),Latch(1),Speed(2),;
+                    private final int id;
+                    GroupedSetTargetCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static GroupedSetTargetCommandField value(int id) throws NoSuchFieldError {
+                        for (GroupedSetTargetCommandField field : GroupedSetTargetCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum GroupedStepCommandField {Direction(0),NumberOfSteps(1),Speed(2),;
+                    private final int id;
+                    GroupedStepCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static GroupedStepCommandField value(int id) throws NoSuchFieldError {
+                        for (GroupedStepCommandField field : GroupedStepCommandField.values()) {
                         if (field.getID() == id) {
                             return field;
                         }
