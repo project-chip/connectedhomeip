@@ -381,17 +381,28 @@ def get_setup_code() -> (str, bool):
 
 
 class TestConfig:
-    def __init__(self, code: str, code_type: SetupCodeType):
+    def __init__(self, code: str, code_type: SetupCodeType, use_paa_cache: bool = False):
         tmp_uuid = str(uuid.uuid4())
-        tmpdir_paa = f'paas_{tmp_uuid}'
-        tmpdir_cd = f'cd_{tmp_uuid}'
-        self.paa_path = os.path.join('.', tmpdir_paa)
-        self.cd_path = os.path.join('.', tmpdir_cd)
-        os.mkdir(self.paa_path)
-        os.mkdir(self.cd_path)
+
+        # Determine PAA and CD paths based on use_paa_cache flag
+        if use_paa_cache:
+            self.paa_path = os.environ.get('PATH_TO_PAA_ROOTS', '/tmp/paa_roots')
+            self.cd_path = os.environ.get('PATH_TO_CD_STORE', '/tmp/cd_store')
+            os.makedirs(self.paa_path, exist_ok=True)
+            os.makedirs(self.cd_path, exist_ok=True)
+            self.use_cache = True
+        else:
+            tmpdir_paa = f'paas_{tmp_uuid}'
+            tmpdir_cd = f'cd_{tmp_uuid}'
+            self.paa_path = os.path.join('.', tmpdir_paa)
+            self.cd_path = os.path.join('.', tmpdir_cd)
+            os.mkdir(self.paa_path)
+            os.mkdir(self.cd_path)
+            self.use_cache = False
+
         fetch_paa_certs_from_dcl.fetch_paa_certs(use_main_net_dcld='', use_test_net_dcld='',
-                                                 use_main_net_http=True, use_test_net_http=False, paa_trust_store_path=tmpdir_paa)
-        fetch_paa_certs_from_dcl.fetch_cd_signing_certs(tmpdir_cd)
+                                                 use_main_net_http=True, use_test_net_http=False, paa_trust_store_path=self.paa_path)
+        fetch_paa_certs_from_dcl.fetch_cd_signing_certs(self.cd_path)
         self.admin_storage = f'admin_storage_{tmp_uuid}.json'
         global_test_params = {'use_pase_only': True, 'post_cert_test': True}
         self.config = MatterTestConfig(endpoint=0, dut_node_ids=[
@@ -402,7 +413,7 @@ class TestConfig:
             self.config.manual_code = [code]
         self.config.paa_trust_store_path = Path(self.paa_path)
         # Set for DA-1.2, which uses the CD signing certs for verification. This test is now set to use the production CD signing certs from the DCL.
-        self.config.global_test_params['cd_cert_dir'] = tmpdir_cd
+        self.config.global_test_params['cd_cert_dir'] = self.cd_path
         self.stack = MatterStackState(self.config)
         self.default_controller = self.stack.certificate_authorities[0].adminList[0].NewController(
             nodeId=112233,
@@ -426,8 +437,10 @@ class TestConfig:
         self.default_controller.Shutdown()
         self.stack.Shutdown()
         os.remove(self.admin_storage)
-        shutil.rmtree(self.paa_path)
-        shutil.rmtree(self.cd_path)
+        # Only clean up directories if not using cache
+        if not self.use_cache:
+            shutil.rmtree(self.paa_path)
+            shutil.rmtree(self.cd_path)
 
 
 def run_test(test_class: MatterBaseTest, tests: list[str], test_config: TestConfig) -> list[str]:
