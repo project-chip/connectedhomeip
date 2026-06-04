@@ -53,11 +53,7 @@ constexpr int kListenBacklogSize = 2;
 
 } // namespace
 
-TCPBase::~TCPBase()
-{
-    // Call Close to free the listening socket and close all active connections.
-    Close();
-}
+TCPBase::~TCPBase() = default;
 
 void TCPBase::CloseActiveConnections()
 {
