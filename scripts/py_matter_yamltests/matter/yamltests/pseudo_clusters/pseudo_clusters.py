@@ -49,13 +49,10 @@ class PseudoClusters:
 
         command = self.__get_command(request)
         if command:
-            params = inspect.signature(command).parameters
-            call_kwargs = {}
-            if 'definitions' in params:
+            sig = inspect.signature(command)
+            call_kwargs = {k: v for k, v in kwargs.items() if k in sig.parameters}
+            if 'definitions' in sig.parameters:
                 call_kwargs['definitions'] = definitions
-            for key in ['runner', 'config']:
-                if key in params:
-                    call_kwargs[key] = kwargs.get(key)
 
             status = await command(request, **call_kwargs)
 

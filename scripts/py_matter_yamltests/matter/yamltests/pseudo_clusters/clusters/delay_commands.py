@@ -129,26 +129,39 @@ class DelayCommands(PseudoCluster):
             node_id=request.node_id
         )
 
+        history = []
+        max_history = 10
+
         while True:
             try:
                 responses, logs = await runner.run_step(mock_step, config)
-                if responses and isinstance(responses, list) and len(responses) > 0:
-                    response = responses[0]
-                    if 'error' not in response:
-                        value = response.get('value')
-                        if value == expected_value:
-                            return
-            except Exception:
+                response = responses[0] if isinstance(responses, list) and responses else None
+                if response is None:
+                    history.append("empty response")
+                elif 'error' in response:
+                    history.append(f"error: {response['error']}")
+                else:
+                    value = response.get('value')
+                    history.append(f"value: {value}")
+                    if value == expected_value:
+                        return
+            except Exception as e:
                 # We ignore intermediate errors during polling (e.g., node
                 # temporarily unreachable, packet loss, or busy device) because
                 # the device might recover and report the expected value before
                 # the timeout expires. If the error persists, the command will
-                # eventually fail with a timeout exception.
-                pass
+                # eventually fail with a timeout exception. We keep a history of
+                # these failures to help with debugging.
+                history.append(f"exception: {str(e)}")
+
+            if len(history) > max_history:
+                history.pop(0)
 
             if time.time() - start_time >= timeout_s:
                 break
 
             await asyncio.sleep(poll_interval_s)
 
-        raise Exception(f"Timeout waiting for attribute {cluster_name}.{attribute_name} to become {expected_value}")
+        history_str = "\n".join(f"  Attempt -{len(history)-i}: {attempt}" for i, attempt in enumerate(history))
+        raise Exception(f"Timeout waiting for attribute {cluster_name}.{attribute_name} to become {expected_value}.\n"
+                        f"Recent history of attempts:\n{history_str}")
