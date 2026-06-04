@@ -53456,6 +53456,20 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                         TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(
                             newElement_1_predictedInsideOptional, newElement_1_predicted);
                     }
+                    jobject newElement_1_externalID;
+                    if (!entry_1.externalID.HasValue())
+                    {
+                        TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(nullptr,
+                                                                                                   newElement_1_externalID);
+                    }
+                    else
+                    {
+                        jobject newElement_1_externalIDInsideOptional;
+                        LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(
+                            entry_1.externalID.Value(), newElement_1_externalIDInsideOptional));
+                        TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(
+                            newElement_1_externalIDInsideOptional, newElement_1_externalID);
+                    }
 
                     {
                         jclass tariffComponentStructStructClass_2;
@@ -53472,7 +53486,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                         err = chip::JniReferences::GetInstance().FindMethod(
                             env, tariffComponentStructStructClass_2, "<init>",
                             "(Ljava/lang/Long;Ljava/util/Optional;Ljava/util/Optional;Ljava/util/Optional;Ljava/util/"
-                            "Optional;Ljava/util/Optional;Ljava/lang/Long;Ljava/util/Optional;Ljava/util/Optional;)V",
+                            "Optional;Ljava/util/Optional;Ljava/lang/Long;Ljava/util/Optional;Ljava/util/Optional;Ljava/util/"
+                            "Optional;)V",
                             &tariffComponentStructStructCtor_2);
                         if (err != CHIP_NO_ERROR || tariffComponentStructStructCtor_2 == nullptr)
                         {
@@ -53480,10 +53495,11 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                             return nullptr;
                         }
 
-                        newElement_1 = env->NewObject(
-                            tariffComponentStructStructClass_2, tariffComponentStructStructCtor_2, newElement_1_tariffComponentID,
-                            newElement_1_price, newElement_1_friendlyCredit, newElement_1_auxiliaryLoad, newElement_1_peakPeriod,
-                            newElement_1_powerThreshold, newElement_1_threshold, newElement_1_label, newElement_1_predicted);
+                        newElement_1 = env->NewObject(tariffComponentStructStructClass_2, tariffComponentStructStructCtor_2,
+                                                      newElement_1_tariffComponentID, newElement_1_price,
+                                                      newElement_1_friendlyCredit, newElement_1_auxiliaryLoad,
+                                                      newElement_1_peakPeriod, newElement_1_powerThreshold, newElement_1_threshold,
+                                                      newElement_1_label, newElement_1_predicted, newElement_1_externalID);
                     }
                     TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().AddToList(value, newElement_1);
                 }
@@ -54013,6 +54029,20 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                         TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(
                             newElement_1_predictedInsideOptional, newElement_1_predicted);
                     }
+                    jobject newElement_1_externalID;
+                    if (!entry_1.externalID.HasValue())
+                    {
+                        TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(nullptr,
+                                                                                                   newElement_1_externalID);
+                    }
+                    else
+                    {
+                        jobject newElement_1_externalIDInsideOptional;
+                        LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(
+                            entry_1.externalID.Value(), newElement_1_externalIDInsideOptional));
+                        TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(
+                            newElement_1_externalIDInsideOptional, newElement_1_externalID);
+                    }
 
                     {
                         jclass tariffComponentStructStructClass_2;
@@ -54029,7 +54059,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                         err = chip::JniReferences::GetInstance().FindMethod(
                             env, tariffComponentStructStructClass_2, "<init>",
                             "(Ljava/lang/Long;Ljava/util/Optional;Ljava/util/Optional;Ljava/util/Optional;Ljava/util/"
-                            "Optional;Ljava/util/Optional;Ljava/lang/Long;Ljava/util/Optional;Ljava/util/Optional;)V",
+                            "Optional;Ljava/util/Optional;Ljava/lang/Long;Ljava/util/Optional;Ljava/util/Optional;Ljava/util/"
+                            "Optional;)V",
                             &tariffComponentStructStructCtor_2);
                         if (err != CHIP_NO_ERROR || tariffComponentStructStructCtor_2 == nullptr)
                         {
@@ -54037,10 +54068,11 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                             return nullptr;
                         }
 
-                        newElement_1 = env->NewObject(
-                            tariffComponentStructStructClass_2, tariffComponentStructStructCtor_2, newElement_1_tariffComponentID,
-                            newElement_1_price, newElement_1_friendlyCredit, newElement_1_auxiliaryLoad, newElement_1_peakPeriod,
-                            newElement_1_powerThreshold, newElement_1_threshold, newElement_1_label, newElement_1_predicted);
+                        newElement_1 = env->NewObject(tariffComponentStructStructClass_2, tariffComponentStructStructCtor_2,
+                                                      newElement_1_tariffComponentID, newElement_1_price,
+                                                      newElement_1_friendlyCredit, newElement_1_auxiliaryLoad,
+                                                      newElement_1_peakPeriod, newElement_1_powerThreshold, newElement_1_threshold,
+                                                      newElement_1_label, newElement_1_predicted, newElement_1_externalID);
                     }
                     TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().AddToList(value, newElement_1);
                 }
@@ -54475,6 +54507,20 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                         TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(
                             newElement_1_predictedInsideOptional, newElement_1_predicted);
                     }
+                    jobject newElement_1_externalID;
+                    if (!entry_1.externalID.HasValue())
+                    {
+                        TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(nullptr,
+                                                                                                   newElement_1_externalID);
+                    }
+                    else
+                    {
+                        jobject newElement_1_externalIDInsideOptional;
+                        LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(
+                            entry_1.externalID.Value(), newElement_1_externalIDInsideOptional));
+                        TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(
+                            newElement_1_externalIDInsideOptional, newElement_1_externalID);
+                    }
 
                     {
                         jclass tariffComponentStructStructClass_2;
@@ -54491,7 +54537,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                         err = chip::JniReferences::GetInstance().FindMethod(
                             env, tariffComponentStructStructClass_2, "<init>",
                             "(Ljava/lang/Long;Ljava/util/Optional;Ljava/util/Optional;Ljava/util/Optional;Ljava/util/"
-                            "Optional;Ljava/util/Optional;Ljava/lang/Long;Ljava/util/Optional;Ljava/util/Optional;)V",
+                            "Optional;Ljava/util/Optional;Ljava/lang/Long;Ljava/util/Optional;Ljava/util/Optional;Ljava/util/"
+                            "Optional;)V",
                             &tariffComponentStructStructCtor_2);
                         if (err != CHIP_NO_ERROR || tariffComponentStructStructCtor_2 == nullptr)
                         {
@@ -54499,10 +54546,11 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                             return nullptr;
                         }
 
-                        newElement_1 = env->NewObject(
-                            tariffComponentStructStructClass_2, tariffComponentStructStructCtor_2, newElement_1_tariffComponentID,
-                            newElement_1_price, newElement_1_friendlyCredit, newElement_1_auxiliaryLoad, newElement_1_peakPeriod,
-                            newElement_1_powerThreshold, newElement_1_threshold, newElement_1_label, newElement_1_predicted);
+                        newElement_1 = env->NewObject(tariffComponentStructStructClass_2, tariffComponentStructStructCtor_2,
+                                                      newElement_1_tariffComponentID, newElement_1_price,
+                                                      newElement_1_friendlyCredit, newElement_1_auxiliaryLoad,
+                                                      newElement_1_peakPeriod, newElement_1_powerThreshold, newElement_1_threshold,
+                                                      newElement_1_label, newElement_1_predicted, newElement_1_externalID);
                     }
                     TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().AddToList(value, newElement_1);
                 }

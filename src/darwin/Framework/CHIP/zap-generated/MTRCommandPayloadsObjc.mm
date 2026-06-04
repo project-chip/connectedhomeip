@@ -42290,6 +42290,15 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         } else {
             self.tariffComponent.predicted = nil;
         }
+        if (decodableStruct.tariffComponent.externalID.HasValue()) {
+            self.tariffComponent.externalID = AsString(decodableStruct.tariffComponent.externalID.Value());
+            if (self.tariffComponent.externalID == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                return err;
+            }
+        } else {
+            self.tariffComponent.externalID = nil;
+        }
     }
     return CHIP_NO_ERROR;
 }
