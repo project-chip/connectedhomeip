@@ -29,6 +29,12 @@ using namespace chip::app::Clusters::OperationalState;
 
 using Status = Protocols::InteractionModel::Status;
 
+namespace {
+// operationalStateID is a uint8_t, so there can be at most 256 distinct states. This bound also
+// guards the delegate-iteration loops against a buggy delegate that never returns CHIP_ERROR_NOT_FOUND.
+constexpr size_t kMaxOperationalStateCount = 256;
+} // namespace
+
 // ---------------------------------------------------------------------------
 // OperationalStateCluster — constructors
 // ---------------------------------------------------------------------------
@@ -200,7 +206,7 @@ bool OperationalStateCluster::IsSupportedPhase(uint8_t aPhase)
 bool OperationalStateCluster::IsSupportedOperationalState(uint8_t aState)
 {
     GenericOperationalState opState;
-    for (uint8_t i = 0; mDelegate->GetOperationalStateAtIndex(i, opState) == CHIP_NO_ERROR; i++)
+    for (size_t i = 0; i < kMaxOperationalStateCount && mDelegate->GetOperationalStateAtIndex(i, opState) == CHIP_NO_ERROR; i++)
     {
         if (opState.operationalStateID == aState)
         {
@@ -256,7 +262,7 @@ DataModel::ActionReturnStatus OperationalStateCluster::ReadAttribute(const DataM
     case OperationalStateList::Id:
         return encoder.EncodeList([this](const auto & listEncoder) -> CHIP_ERROR {
             GenericOperationalState opState;
-            for (size_t i = 0;; i++)
+            for (size_t i = 0; i < kMaxOperationalStateCount; i++)
             {
                 CHIP_ERROR err = mDelegate->GetOperationalStateAtIndex(i, opState);
                 if (err == CHIP_ERROR_NOT_FOUND)
@@ -266,6 +272,7 @@ DataModel::ActionReturnStatus OperationalStateCluster::ReadAttribute(const DataM
                 ReturnErrorOnFailure(err);
                 ReturnErrorOnFailure(listEncoder.Encode(opState));
             }
+            return CHIP_NO_ERROR;
         });
     case Attributes::OperationalState::Id:
         return encoder.Encode(mOperationalState);
