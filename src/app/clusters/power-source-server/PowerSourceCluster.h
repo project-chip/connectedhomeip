@@ -266,8 +266,7 @@ public:
 
     template <bool batteryFeatureNotSupported                   = !supportedFeatures.Has(PowerSource::Feature::kBattery),
               std::enable_if_t<batteryFeatureNotSupported, int> = 0>
-    PowerSourceCluster(const Config & config) :
-        Config(config), DefaultServerCluster({ config.mEndpointId, PowerSource::Id })
+    PowerSourceCluster(const Config & config) : Config(config), DefaultServerCluster({ config.mEndpointId, PowerSource::Id })
     {}
 
     template <bool batteryFeatureSupported                      = supportedFeatures.Has(PowerSource::Feature::kBattery),
@@ -1263,7 +1262,7 @@ using FullBatteryPowerSourceCluster =
 using FullBatteryPowerSourceConfig = FullBatteryPowerSourceCluster::Config;
 
 using MinimalWiredPowerSourceCluster = PowerSourceCluster<BitFlags<PowerSource::Feature>(PowerSource::Feature::kWired).Raw(), 0>;
-using MinimalWiredPowerSourceConfig = MinimalWiredPowerSourceCluster::Config;
+using MinimalWiredPowerSourceConfig  = MinimalWiredPowerSourceCluster::Config;
 
 using MinimalBatteryPowerSourceCluster =
     PowerSourceCluster<BitFlags<PowerSource::Feature>(PowerSource::Feature::kBattery).Raw(), 0>;
