@@ -22,24 +22,38 @@ The summary should explain the "what", "why", and "how" of the changes. It must
 use the following sub-headings:
 
 ##### Problem
-*   Explain the underlying issue that this PR addresses. What is broken, missing, or needs improvement?
+
+-   Explain the underlying issue that this PR addresses. What is broken,
+    missing, or needs improvement?
 
 ##### Impact
-*   Explain _why_ this is a problem if it is not immediately obvious. What are the consequences of not fixing it?
+
+-   Explain _why_ this is a problem if it is not immediately obvious. What are
+    the consequences of not fixing it?
 
 ##### Solution
-*   Explain the proposed solution and _why_ it fixes the problem.
+
+-   Explain the proposed solution and _why_ it fixes the problem.
 
 ##### Caveats (Optional)
-*   Document any limitations, side effects, performance/memory impacts, or specific concerns that reviewers should be aware of. Omit this section entirely if there are no caveats.
+
+-   Document any limitations, side effects, performance/memory impacts, or
+    specific concerns that reviewers should be aware of. Omit this section
+    entirely if there are no caveats.
 
 #### Noise Reduction Rule
 
-*   **Say Nothing if Nothing to Say**: Do not include sections or bullet points with "None" or "N/A". If a section (like `Caveats` or `#### Related issues`) has no content, omit the heading and content entirely to reduce noise.
+-   **Say Nothing if Nothing to Say**: Do not include sections or bullet points
+    with "None" or "N/A". If a section (like `Caveats` or `#### Related issues`)
+    has no content, omit the heading and content entirely to reduce noise.
 
 #### Keeping in Sync Rule
 
-*   **Update on Change**: The PR description MUST be updated after every commit if the content of the PR materially changes. For example, if you remove a test or change the implementation details, immediately update the PR description on GitHub to reflect the current state of the code. Do not leave stale information in the description.
+-   **Update on Change**: The PR description MUST be updated after every commit
+    if the content of the PR materially changes. For example, if you remove a
+    test or change the implementation details, immediately update the PR
+    description on GitHub to reflect the current state of the code. Do not leave
+    stale information in the description.
 
 #### Style and Tone
 
@@ -87,17 +101,24 @@ Here is an example of a good PR description:
 Fixes a crash in the DNS-SD client when processing malformed SRV responses.
 
 ##### Problem
-*   The DNS-SD client does not validate the target host name length in incoming SRV records before copying it to a fixed-size buffer.
+
+-   The DNS-SD client does not validate the target host name length in incoming
+    SRV records before copying it to a fixed-size buffer.
 
 ##### Impact
-*   A malformed SRV record with a target host name longer than 63 characters causes a buffer overflow, leading to a crash.
+
+-   A malformed SRV record with a target host name longer than 63 characters
+    causes a buffer overflow, leading to a crash.
 
 ##### Solution
-*   Added validation to ensure the host name length does not exceed `kMaxHostNameLength` before copying.
-*   Malformed records are now safely discarded and a warning is logged.
+
+-   Added validation to ensure the host name length does not exceed
+    `kMaxHostNameLength` before copying.
+-   Malformed records are now safely discarded and a warning is logged.
 
 ##### Caveats
-*   This change discards malformed records silently, logging a warning.
+
+-   This change discards malformed records silently, logging a warning.
 
 #### Related issues
 
@@ -105,5 +126,7 @@ Fixes #72327
 
 #### Testing
 
--   Added unit test `TestDnssdClient_MalformedSrvRecord` in `src/lib/dnssd/tests/TestDnssdImpl.cpp` to verify that malformed records are discarded and do not cause a crash.
+-   Added unit test `TestDnssdClient_MalformedSrvRecord` in
+    `src/lib/dnssd/tests/TestDnssdImpl.cpp` to verify that malformed records are
+    discarded and do not cause a crash.
 ```
