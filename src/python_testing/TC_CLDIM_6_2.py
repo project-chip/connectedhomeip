@@ -151,13 +151,10 @@ class TC_CLDIM_6_2(MatterBaseTest):
             else:
                 # STEP 2h: Send GroupedSetTarget command with Latch=False
                 self.step("2h")
-                try:
-                    await self.send_single_cmd(
-                        cmd=Clusters.Objects.ClosureDimension.Commands.GroupedSetTarget(latch=False),
-                        endpoint=endpoint
-                    )
-                except InteractionModelError as e:
-                    asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
+                await self.send_single_cmd(
+                    cmd=Clusters.Objects.ClosureDimension.Commands.GroupedSetTarget(latch=False),
+                    endpoint=endpoint
+                )
 
             # STEP 2i: If LatchControlModes is remote unlatching, skip step 2j
             self.step("2i")

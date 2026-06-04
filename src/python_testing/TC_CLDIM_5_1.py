@@ -210,13 +210,10 @@ class TC_CLDIM_5_1(MatterBaseTest):
             else:
                 # STEP 2i: Send GroupedSetTarget command with Latch=False
                 self.step("2i")
-                try:
-                    await self.send_single_cmd(
-                        cmd=Clusters.Objects.ClosureDimension.Commands.GroupedSetTarget(latch=False),
-                        endpoint=endpoint
-                    )
-                except InteractionModelError as e:
-                    asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
+                await self.send_single_cmd(
+                    cmd=Clusters.Objects.ClosureDimension.Commands.GroupedSetTarget(latch=False),
+                    endpoint=endpoint
+                )
 
             # STEP 2j: If LatchControlModes is remote unlatching, skip step 2k
             self.step("2j")
@@ -271,13 +268,10 @@ class TC_CLDIM_5_1(MatterBaseTest):
                 self.default_controller.SendGroupCommand(
                     self.kGroupId, Clusters.Objects.ClosureDimension.Commands.GroupedSetTarget(position=max_position))
             else:
-                try:
-                    await self.send_single_cmd(
-                        cmd=Clusters.Objects.ClosureDimension.Commands.GroupedSetTarget(position=max_position),
-                        endpoint=endpoint
-                    )
-                except InteractionModelError as e:
-                    asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
+                await self.send_single_cmd(
+                    cmd=Clusters.Objects.ClosureDimension.Commands.GroupedSetTarget(position=max_position),
+                    endpoint=endpoint
+                )
 
             # STEP 3c: Verify TargetState attribute is updated
             self.step("3c")
@@ -302,14 +296,11 @@ class TC_CLDIM_5_1(MatterBaseTest):
                 self.default_controller.SendGroupCommand(
                     self.kGroupId, Clusters.Objects.ClosureDimension.Commands.GroupedSetTarget(speed=Globals.Enums.ThreeLevelAutoEnum.kMedium))
             else:
-                try:
-                    await self.send_single_cmd(
-                        cmd=Clusters.Objects.ClosureDimension.Commands.GroupedSetTarget(
-                            speed=Globals.Enums.ThreeLevelAutoEnum.kMedium),
-                        endpoint=endpoint
-                    )
-                except InteractionModelError as e:
-                    asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
+                await self.send_single_cmd(
+                    cmd=Clusters.Objects.ClosureDimension.Commands.GroupedSetTarget(
+                        speed=Globals.Enums.ThreeLevelAutoEnum.kMedium),
+                    endpoint=endpoint
+                )
 
             # STEP 4c: Verify TargetState attribute is updated
             self.step("4c")
@@ -329,13 +320,10 @@ class TC_CLDIM_5_1(MatterBaseTest):
             self.default_controller.SendGroupCommand(
                 self.kGroupId, Clusters.Objects.ClosureDimension.Commands.GroupedSetTarget(position=min_position))
         else:
-            try:
-                await self.send_single_cmd(
-                    cmd=Clusters.Objects.ClosureDimension.Commands.GroupedSetTarget(position=min_position),
-                    endpoint=endpoint
-                )
-            except InteractionModelError as e:
-                asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
+            await self.send_single_cmd(
+                cmd=Clusters.Objects.ClosureDimension.Commands.GroupedSetTarget(position=min_position),
+                endpoint=endpoint
+            )
 
         # STEP 5b: Verify TargetState attribute is updated
         self.step("5b")
@@ -360,14 +348,11 @@ class TC_CLDIM_5_1(MatterBaseTest):
                 self.default_controller.SendGroupCommand(
                     self.kGroupId, Clusters.Objects.ClosureDimension.Commands.GroupedSetTarget(position=max_position, speed=Globals.Enums.ThreeLevelAutoEnum.kHigh))
             else:
-                try:
-                    await self.send_single_cmd(
-                        cmd=Clusters.Objects.ClosureDimension.Commands.GroupedSetTarget(
-                            position=max_position, speed=Globals.Enums.ThreeLevelAutoEnum.kHigh),
-                        endpoint=endpoint
-                    )
-                except InteractionModelError as e:
-                    asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
+                await self.send_single_cmd(
+                    cmd=Clusters.Objects.ClosureDimension.Commands.GroupedSetTarget(
+                        position=max_position, speed=Globals.Enums.ThreeLevelAutoEnum.kHigh),
+                    endpoint=endpoint
+                )
 
             # STEP 6c: Verify TargetState attribute is updated
             self.step("6c")
