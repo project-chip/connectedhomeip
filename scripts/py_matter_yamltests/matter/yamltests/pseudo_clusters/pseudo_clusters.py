@@ -44,15 +44,20 @@ class PseudoClusters:
                 return cluster
         return None
 
-    async def execute(self, request, definitions=None):
+    async def execute(self, request, definitions=None, **kwargs):
         status = {'error': 'FAILURE'}
 
         command = self.__get_command(request)
         if command:
-            if 'definitions' in inspect.signature(command).parameters:
-                status = await command(request, definitions)
-            else:
-                status = await command(request)
+            params = inspect.signature(command).parameters
+            call_kwargs = {}
+            if 'definitions' in params:
+                call_kwargs['definitions'] = definitions
+            for key in ['runner', 'config']:
+                if key in params:
+                    call_kwargs[key] = kwargs.get(key)
+
+            status = await command(request, **call_kwargs)
 
             # If the command does not returns an error, it is considered a success.
             if status is None:

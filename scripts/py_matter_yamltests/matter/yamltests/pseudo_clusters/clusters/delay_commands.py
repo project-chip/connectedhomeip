@@ -15,9 +15,39 @@
 
 import asyncio
 import sys
+import time
 
 from ..pseudo_cluster import PseudoCluster
 from .accessory_server_bridge import AccessoryServerBridge
+
+
+class MockTestStep:
+
+    def __init__(self, cluster, command, attribute, endpoint, node_id):
+        self.cluster = cluster
+        self.command = command
+        self.attribute = attribute
+        self.endpoint = endpoint
+        self.node_id = node_id
+
+        self.group_id = None
+        self.is_attribute = True
+        self.is_event = False
+        self.arguments = None
+        self.responses = None
+        self.event = None
+
+        self.min_interval = None
+        self.max_interval = None
+        self.keep_subscriptions = None
+        self.timed_interaction_timeout_ms = None
+        self.timeout = None
+        self.event_number = None
+        self.busy_wait_ms = None
+        self.identity = None
+        self.fabric_filtered = True
+        self.data_version = None
+
 
 _DEFINITION = '''<?xml version="1.0"?>
 <configurator>
@@ -71,3 +101,50 @@ class DelayCommands(PseudoCluster):
 
     async def WaitForMessage(self, request):
         AccessoryServerBridge.waitForMessage(request)
+
+    async def WaitForAttributeValue(self, request, runner=None, config=None):
+        if runner is None or config is None:
+            raise Exception("Runner and config are required for WaitForAttributeValue")
+
+        args = {arg['name']: arg['value'] for arg in request.arguments['values']}
+        attribute_name = args['attribute']
+        expected_value = args['expectedValue']
+        expected_duration_ms = args['expectedDurationMs']
+        cluster_name = args['cluster']
+        endpoint = args['endpoint']
+
+        extra_duration_ms = request.get_config_value('valueWaitExtraDurationMs')
+        if extra_duration_ms is None:
+            extra_duration_ms = 250
+
+        timeout_s = (expected_duration_ms + extra_duration_ms) / 1000.0
+        poll_interval_s = 0.1
+        start_time = time.time()
+
+        mock_step = MockTestStep(
+            cluster=cluster_name,
+            command='readAttribute',
+            attribute=attribute_name,
+            endpoint=endpoint,
+            node_id=request.node_id
+        )
+
+        while True:
+            try:
+                responses, logs = await runner.run_step(mock_step, config)
+                if responses and isinstance(responses, list) and len(responses) > 0:
+                    response = responses[0]
+                    if 'error' not in response:
+                        value = response.get('value')
+                        if value == expected_value:
+                            return
+            except Exception as e:
+                # Ignore errors during polling
+                pass
+
+            if time.time() - start_time >= timeout_s:
+                break
+
+            await asyncio.sleep(poll_interval_s)
+
+        raise Exception(f"Timeout waiting for attribute {cluster_name}.{attribute_name} to become {expected_value}")
