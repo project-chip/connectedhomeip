@@ -22,7 +22,6 @@
 
 #include "WiFiManager.h"
 
-#include <cassert>
 #include <crypto/RandUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
@@ -74,7 +73,7 @@ NetworkCommissioning::WiFiScanResponse ToScanResponse(const wifi_scan_result * r
     if (result != nullptr)
     {
         static_assert(sizeof(response.bssid) == sizeof(result->mac), "BSSID length mismatch");
-        assert(sizeof(response.ssid) >= result->ssid_length);
+        VerifyOrDie(sizeof(response.ssid) >= result->ssid_length);
         // TODO: Distinguish WPA versions
         response.security.Set(result->security == WIFI_SECURITY_TYPE_PSK ? NetworkCommissioning::WiFiSecurity::kWpaPersonal
                                                                          : NetworkCommissioning::WiFiSecurity::kUnencrypted);
