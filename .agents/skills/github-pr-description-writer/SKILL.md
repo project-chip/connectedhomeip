@@ -80,7 +80,7 @@ use the following sub-headings:
 
 -   Explain _why_ this is a problem if it is not immediately obvious. What are
     the consequences of not fixing it? Omit if already covered in the structured
-    `##### Problem` section.
+    breakdown of the `##### Problem` section.
 
 ##### Solution
 
@@ -91,6 +91,9 @@ use the following sub-headings:
     unless they are critically important to the architecture. The diff itself
     shows the file-level changes; the PR description should show the big
     picture.
+-   **ASCII Diagrams**: If the solution introduces a new workflow, state
+    machine, or architecture, consider including a brief ASCII diagram to
+    visualize the new flow.
 
 ##### Caveats (Optional)
 
