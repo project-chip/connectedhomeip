@@ -58,7 +58,7 @@ template, focusing on: **Summary**, **Related Issues**, and **Testing**.
 ### 1. Summary Section (`#### Summary`)
 
 The summary should explain the "what", "why", and "how" of the changes. It must
-use the following sub-headings:
+use the following sub-headings (where `##### Impact` is optional):
 
 ##### Problem
 
