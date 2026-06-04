@@ -348,7 +348,7 @@ class TC_ACS_3_2(MatterBaseTest):
             log.info(f"Rx'd audioContextDetected: {audioContextDetected}")
             asserts.assert_true(not audioContextDetected, "Failed to get audioContextDetected being False.")
 
-            attrib_listener.reset()
+        attrib_listener.reset()
 
 
 if __name__ == "__main__":
