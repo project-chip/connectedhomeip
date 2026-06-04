@@ -16,7 +16,7 @@ import json
 import logging
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Optional
 
 log = logging.getLogger(__name__)
 
@@ -24,13 +24,13 @@ log = logging.getLogger(__name__)
 @dataclass
 class RouteResponse:
     status: int
-    headers: Dict[str, str]
+    headers: dict[str, str]
     body: Any  # Dict for inline JSON, or bytes for $ref content (raw file bytes)
 
 
 @dataclass
 class QueryConfig:
-    params: Dict[str, Any]
+    params: dict[str, Any]
 
 
 @dataclass
@@ -44,7 +44,7 @@ class Route:
 
 @dataclass
 class Configuration:
-    routing: List[Route] = field(default_factory=list)
+    routing: list[Route] = field(default_factory=list)
 
 
 def load_configurations(config_path: Path, routing_config_dir: Path) -> Configuration:
@@ -68,13 +68,13 @@ def load_configurations(config_path: Path, routing_config_dir: Path) -> Configur
         raise ValueError(f"'{routing_config_dir}' is not a directory")
 
     # Load routing configuration
-    routing_config: List[Route] = load_routing_configuration_dir(routing_config_dir)
+    routing_config: list[Route] = load_routing_configuration_dir(routing_config_dir)
 
     # Create and return the Configuration object
     return Configuration(routing=routing_config)
 
 
-def load_routing_configuration_dir(directory: Path) -> List[Route]:
+def load_routing_configuration_dir(directory: Path) -> list[Route]:
     """
     Load and merge all routing configuration files from a specified directory.
 
@@ -94,7 +94,7 @@ def load_routing_configuration_dir(directory: Path) -> List[Route]:
     if not directory.is_dir():
         raise ValueError(f"'{directory}' is not a directory")
 
-    all_routes: List[Route] = []
+    all_routes: list[Route] = []
 
     # Process all JSON files in the directory
     for file_path in directory.glob("*.json"):
@@ -108,7 +108,7 @@ def load_routing_configuration_dir(directory: Path) -> List[Route]:
     return all_routes
 
 
-def resolve_ref(body: Dict[str, Any], base_path: Path) -> bytes:
+def resolve_ref(body: dict[str, Any], base_path: Path) -> bytes:
     """
     Resolve $ref reference and return raw file content.
 
@@ -145,7 +145,7 @@ def resolve_ref(body: Dict[str, Any], base_path: Path) -> bytes:
         raise
 
 
-def load_routing_configuration_file(file_path: Path) -> List[Route]:
+def load_routing_configuration_file(file_path: Path) -> list[Route]:
     """
     Load and parse a single routing configuration JSON file.
 
@@ -185,7 +185,7 @@ def load_routing_configuration_file(file_path: Path) -> List[Route]:
         that can be hosted independently (e.g., on GitHub for DCL references).
     """
     try:
-        with open(file_path, "r") as file:
+        with open(file_path) as file:
             config = json.load(file)
         if "routes" not in config:
             log.error("Missing required 'routes' key in configuration file: %s", file_path)

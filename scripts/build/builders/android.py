@@ -125,7 +125,7 @@ class AndroidBuilder(Builder):
                  runner: Runner,
                  output_dir_lock: OutDirLock, board: AndroidBoard, app: AndroidApp,
                  optimize_size: bool = False):
-        super(AndroidBuilder, self).__init__(root, runner, output_dir_lock)
+        super().__init__(root, runner, output_dir_lock)
         self.board = board
         self.app = app
         self.optimize_size = optimize_size
@@ -443,33 +443,24 @@ class AndroidBuilder(Builder):
                 gn_args["matter_enable_tracing_support"] = False
                 gn_args["use_static_libcxx"] = True
 
-                # TV Casting App size optimizations: compile only the
-                # ~36 casting-relevant clusters instead of the full
-                # generated cluster-objects.cpp, and use slim TLV
-                # decoder source overrides covering only the 18
-                # casting clusters so that ChipClusters.java
-                # read/subscribe APIs remain functional at runtime.
-                # These must be passed as explicit GN build args
+                # TV Casting App size optimizations: point the build at
+                # the override directory containing slim source files
+                # (cluster-objects, TLV decoders, accessors, cluster
+                # servers) covering only the ~36 casting-relevant
+                # clusters.  The build system resolves well-known
+                # filenames inside this directory automatically.
+                # This must be passed as an explicit GN build arg
                 # because args.gni is evaluated inside default_args
                 # (before args.gn is applied), so the
                 # if (optimize_apk_size) conditional there cannot see
                 # the args.gn value.
                 if self.app == AndroidApp.TV_CASTING_APP:
-                    gn_args["chip_cluster_objects_source_override"] = (
+                    gn_args["chip_data_model_overrides_dir"] = (
                         "//third_party/connectedhomeip/examples/"
-                        "tv-casting-app/tv-casting-common/"
-                        "casting-cluster-objects.cpp"
+                        "tv-casting-app/tv-casting-common"
                     )
-                    gn_args["chip_tlv_decoder_attribute_source_override"] = (
-                        "//third_party/connectedhomeip/examples/"
-                        "tv-casting-app/tv-casting-common/"
-                        "casting-CHIPAttributeTLVValueDecoder.cpp"
-                    )
-                    gn_args["chip_tlv_decoder_event_source_override"] = (
-                        "//third_party/connectedhomeip/examples/"
-                        "tv-casting-app/tv-casting-common/"
-                        "casting-CHIPEventTLVValueDecoder.cpp"
-                    )
+                    gn_args["chip_data_model_extra_logging"] = False
+                    gn_args["enable_rtti"] = False
             gn_args.update(self.app.AppGnArgs())
 
             args_str = ""

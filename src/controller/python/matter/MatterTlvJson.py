@@ -26,7 +26,7 @@ from .clusters.Attribute import AttributeCache, AttributePath, ValueDecodeFailur
 from .tlv import TLVReader
 
 
-class TLVJsonConverter():
+class TLVJsonConverter:
     ''' Converter class used to convert MatterJsonTlv attribute wildcard dump files into an AttributeCache.
 
         Attribute wildcard dump files can be generated as a side effect of basic composition tests, or

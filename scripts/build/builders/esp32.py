@@ -175,7 +175,7 @@ class Esp32Builder(Builder):
                  enable_insights_trace: bool = False,
                  all_devices_enabled_devices=None,
                  ):
-        super(Esp32Builder, self).__init__(root, runner, output_dir_lock)
+        super().__init__(root, runner, output_dir_lock)
         self.board = board
         self.app = app
         self.enable_rpcs = enable_rpcs

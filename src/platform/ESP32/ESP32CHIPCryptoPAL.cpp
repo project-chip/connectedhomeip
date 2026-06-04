@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2023-2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -19,6 +19,125 @@
 #include <lib/core/CHIPSafeCasts.h>
 #include <platform/ESP32/ESP32CHIPCryptoPAL.h>
 
+#include <esp_idf_version.h>
+
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(6, 0, 0)
+
+// ESP-IDF v6.0+ uses PSA Crypto for hardware ECDSA operations
+#include <psa/crypto.h>
+#include <psa_crypto_driver_esp_ecdsa.h>
+#include <rom/efuse.h>
+
+namespace {
+
+struct PsaEcdsaContext
+{
+    psa_key_id_t key_id;
+};
+
+static_assert(sizeof(PsaEcdsaContext) <= chip::Crypto::kMAX_P256Keypair_Context_Size,
+              "PsaEcdsaContext exceeds P256KeypairContext size");
+
+static inline PsaEcdsaContext * to_psa_ctx(chip::Crypto::P256KeypairContext * context)
+{
+    return chip::SafePointerCast<PsaEcdsaContext *>(context);
+}
+
+static inline const PsaEcdsaContext * to_const_psa_ctx(const chip::Crypto::P256KeypairContext * context)
+{
+    return chip::SafePointerCast<const PsaEcdsaContext *>(context);
+}
+
+} // anonymous namespace
+
+namespace chip {
+namespace Crypto {
+
+ESP32P256Keypair::~ESP32P256Keypair()
+{
+    // Destroy PSA key handle before base destructor runs P256Keypair::Clear().
+    // Base Clear() checks mInitialized and skips mbedTLS free once we set it false.
+    if (mInitialized)
+    {
+        PsaEcdsaContext * ctx = to_psa_ctx(&mKeypair);
+        psa_destroy_key(ctx->key_id);
+        mInitialized = false;
+    }
+}
+
+CHIP_ERROR ESP32P256Keypair::Initialize(ECPKeyTarget keyTarget, int efuseBlock)
+{
+    VerifyOrReturnError(efuseBlock >= 0 && efuseBlock < ETS_EFUSE_BLOCK_MAX, CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Destroy existing PSA key handle if re-initializing
+    if (mInitialized)
+    {
+        PsaEcdsaContext * ctx = to_psa_ctx(&mKeypair);
+        psa_destroy_key(ctx->key_id);
+        mInitialized = false;
+    }
+
+    psa_status_t status     = PSA_SUCCESS;
+    size_t key_size_in_bits = 256;
+
+    // opaque reference for the efuse-stored ec key
+    esp_ecdsa_opaque_key_t opaque_key = {};
+    opaque_key.curve                  = ESP_ECDSA_CURVE_SECP256R1;
+    opaque_key.efuse_block            = static_cast<uint8_t>(efuseBlock);
+
+    psa_key_attributes_t key_attr = PSA_KEY_ATTRIBUTES_INIT;
+    psa_set_key_type(&key_attr, PSA_KEY_TYPE_ECC_KEY_PAIR(PSA_ECC_FAMILY_SECP_R1));
+    psa_set_key_bits(&key_attr, key_size_in_bits);
+    psa_set_key_usage_flags(&key_attr, PSA_KEY_USAGE_SIGN_HASH);
+    psa_set_key_algorithm(&key_attr, PSA_ALG_ECDSA(PSA_ALG_SHA_256));
+    psa_set_key_lifetime(&key_attr, PSA_KEY_LIFETIME_ESP_ECDSA_VOLATILE);
+
+    // validate efuse block exists and has correct key purpose
+    psa_key_id_t key_id = PSA_KEY_ID_NULL;
+    status              = psa_import_key(&key_attr, reinterpret_cast<const uint8_t *>(&opaque_key), sizeof(opaque_key), &key_id);
+    psa_reset_key_attributes(&key_attr);
+
+    VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL,
+                        ChipLogError(Crypto, "psa_import_key failed, status:%d", static_cast<int>(status)));
+
+    // store key id in the keypair context
+    PsaEcdsaContext * ctx = to_psa_ctx(&mKeypair);
+    ctx->key_id           = key_id;
+
+    mInitialized = true;
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ESP32P256Keypair::ECDSA_sign_msg(const uint8_t * msg, const size_t msg_length, P256ECDSASignature & out_signature) const
+{
+    VerifyOrReturnError(mInitialized, CHIP_ERROR_UNINITIALIZED);
+    VerifyOrReturnError((msg != nullptr) && (msg_length > 0), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Compute SHA256 hash
+    uint8_t digest[kSHA256_Hash_Length];
+    ReturnErrorOnFailure(Hash_SHA256(msg, msg_length, digest));
+
+    const PsaEcdsaContext * ctx = to_const_psa_ctx(&mKeypair);
+    uint8_t signature[kP256_ECDSA_Signature_Length_Raw];
+    size_t sig_len = 0;
+
+    psa_status_t status =
+        psa_sign_hash(ctx->key_id, PSA_ALG_ECDSA(PSA_ALG_SHA_256), digest, sizeof(digest), signature, sizeof(signature), &sig_len);
+
+    VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL,
+                        ChipLogError(Crypto, "psa_sign_hash failed, status:%d", static_cast<int>(status)));
+    VerifyOrReturnError(sig_len == kP256_ECDSA_Signature_Length_Raw, CHIP_ERROR_INTERNAL);
+
+    memcpy(out_signature.Bytes(), signature, sig_len);
+    return out_signature.SetLength(kP256_ECDSA_Signature_Length_Raw);
+}
+
+} // namespace Crypto
+} // namespace chip
+
+#else // ESP_IDF_VERSION < 6.0.0
+
+// Legacy implementation using mbedTLS ECDSA alt for IDF < 6.0
 #include <ecdsa/ecdsa_alt.h>
 #include <mbedtls/bignum.h>
 #include <mbedtls/ctr_drbg.h>
@@ -67,6 +186,11 @@ static void _log_mbedTLS_error(int error_code)
 
 namespace chip {
 namespace Crypto {
+
+ESP32P256Keypair::~ESP32P256Keypair()
+{
+    // Base class destructor calls Clear() which handles mbedtls_ecp_keypair_free
+}
 
 CHIP_ERROR ESP32P256Keypair::Initialize(ECPKeyTarget keyTarget, int efuseBlock)
 {
@@ -145,3 +269,5 @@ exit:
 
 } // namespace Crypto
 } // namespace chip
+
+#endif // ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(6, 0, 0)

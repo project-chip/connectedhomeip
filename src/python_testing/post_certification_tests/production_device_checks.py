@@ -68,7 +68,7 @@ try:
     from matter.testing.matter_stack_state import MatterStackState
     from matter.testing.matter_test_config import MatterTestConfig
     from matter.testing.matter_testing import MatterBaseTest
-    from matter.testing.runner import run_tests_no_exit
+    from matter.testing.runner import TestStep, run_tests_no_exit
 except ImportError:
     sys.path.append(os.path.abspath(
         os.path.join(os.path.dirname(__file__), '..')))
@@ -94,7 +94,7 @@ class Failure:
     exception: typing.Optional[Exception]
 
 
-class Hooks():
+class Hooks:
     def __init__(self):
         self.failures = {}
         self.current_step = 'unknown'
@@ -380,7 +380,7 @@ def get_setup_code() -> (str, bool):
             print("Invalid manual code - please try again")
 
 
-class TestConfig(object):
+class TestConfig:
     def __init__(self, code: str, code_type: SetupCodeType):
         tmp_uuid = str(uuid.uuid4())
         tmpdir_paa = f'paas_{tmp_uuid}'
@@ -430,7 +430,7 @@ class TestConfig(object):
         shutil.rmtree(self.cd_path)
 
 
-def run_test(test_class: MatterBaseTest, tests: typing.List[str], test_config: TestConfig) -> list[str]:
+def run_test(test_class: MatterBaseTest, tests: list[str], test_config: TestConfig) -> list[str]:
     hooks = Hooks()
     stack = test_config.get_stack()
     controller = test_config.get_controller()
