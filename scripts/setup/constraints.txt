@@ -164,7 +164,7 @@ pygments==2.14.0
     # via ipython
 pykwalify==1.8.0
     # via west
-pyparsing==3.0.9
+pyparsing==3.2.5
     # via bluezoo
 python-dateutil==2.8.2
     # via

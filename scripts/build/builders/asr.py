@@ -117,7 +117,7 @@ class ASRBuilder(GnBuilder):
                  enable_rotating_device_id: bool = False,
                  enable_ota_requestor: bool = False,
                  enable_lwip_ip6_hook: bool = False):
-        super(ASRBuilder, self).__init__(
+        super().__init__(
             root=app.BuildRoot(root),
             runner=runner,
             output_dir_lock=output_dir_lock)

@@ -76,7 +76,7 @@ class Cyw30739Builder(GnBuilder):
         board: Cyw30739Board = Cyw30739Board.CYW30739B2_P5_EVK_01,
         release: bool = False,
     ):
-        super(Cyw30739Builder, self).__init__(root=app.BuildRoot(root), runner=runner, output_dir_lock=output_dir_lock)
+        super().__init__(root=app.BuildRoot(root), runner=runner, output_dir_lock=output_dir_lock)
         self.app = app
         self.board = board
         self.release = release

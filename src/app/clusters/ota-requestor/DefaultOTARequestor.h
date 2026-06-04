@@ -87,6 +87,9 @@ public:
     // cleared, UpdateState is reset to Idle
     void CancelImageUpdate() override;
 
+    // Aborts an in-flight OTA bound to the removed fabric and clears its persisted state.
+    void OnFabricRemoved(FabricIndex fabricIndex) override;
+
     // Clear all entries with the specified fabric index in the default OTA provider list
     CHIP_ERROR ClearDefaultOtaProviderList(FabricIndex fabricIndex) override;
 
@@ -118,7 +121,7 @@ public:
     //////////// DefaultOTARequestor public APIs ///////////////
 
     /**
-     * Called to perform some initialization. Note that some states that must be initalized in the CHIP context will be deferred to
+     * Called to perform some initialization. Note that some states that must be initialized in the CHIP context will be deferred to
      * InitState.
      */
     CHIP_ERROR Init(Server & server, OTARequestorStorage & storage, OTARequestorDriver & driver, BDXDownloader & downloader,

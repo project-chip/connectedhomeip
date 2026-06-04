@@ -142,7 +142,7 @@ class NrfConnectBuilder(Builder):
                  board: NrfBoard = NrfBoard.NRF52840DK,
                  enable_rpcs: bool = False,
                  ):
-        super(NrfConnectBuilder, self).__init__(root, runner, output_dir_lock)
+        super().__init__(root, runner, output_dir_lock)
         self.app = app
         self.board = board
         self.enable_rpcs = enable_rpcs

@@ -60,7 +60,7 @@ class NuttXBuilder(Builder):
 
         nuttx_chip = 'nuttx'
 
-        super(NuttXBuilder, self).__init__(
+        super().__init__(
             root=os.path.join(root, 'examples',
                               app.ExampleName(), nuttx_chip),
             runner=runner,
