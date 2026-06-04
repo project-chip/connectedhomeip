@@ -34,3 +34,5 @@ dependencies:
 
     tee_sec_storage:
         path: ${IDF_PATH}/components/esp_tee/subproject/components/tee_sec_storage
+        rules:
+            - if: "idf_version >=5.5 && idf_version <6.0 && target in [esp32c6]"

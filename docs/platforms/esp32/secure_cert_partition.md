@@ -230,20 +230,21 @@ esptool.py -p (PORT) write_flash 0xd000 path/to/secure_cert_partition.bin
 esptool.py -p (PORT) write_flash 0x3E0000 path/to/factory_partition.bin
 ```
 
-## 1.7 Signing the DAC in TEE
+## 1.7 Signing with the DAC private key in TEE
 
 ### 1.7.1 What is ESP-TEE
 
 ESP-TEE (Trusted Execution Environment) is a hardware-isolated secure
 environment available on SoCs such as the ESP32-C6. It splits the firmware into
-a secure world (TEE) and a non-secure world (REE, where the Matter application
-runs), so that secrets and sensitive operations stay isolated from the
-application.
+a secure world (TEE) and the application world (REE, where the Matter
+application runs), so that secrets and sensitive operations stay isolated from
+the application.
 
-Using the TEE secure storage service, the DAC private key can be stored inside
-the TEE and all ECDSA signing with that key is performed within the secure
-world. The private key is therefore never exposed to the non-secure Matter
-application.
+Using the TEE secure storage service, the Device Attestation Certificate (DAC)
+private key can be stored inside the TEE. Operations that use the DAC private
+key — such as signing the attestation challenge during commissioning — are then
+performed within the secure world via ECDSA, so the private key is never exposed
+to the Matter application.
 
 For a detailed introduction to the architecture, services, and APIs, refer to
 the
@@ -251,8 +252,9 @@ the
 
 ### 1.7.2 TEE support in the lighting-app
 
-The lighting-app is already configured to sign the DAC from TEE secure storage
-on the ESP32-C6, with the required partition table and sdkconfig defaults:
+The lighting-app is already configured to sign using the DAC private key stored
+in TEE secure storage on the ESP32-C6, with the required partition table and
+sdkconfig defaults:
 
 -   [`partitions_tee.csv`](../../../examples/lighting-app/esp32/partitions_tee.csv)
     — partition table that reserves the TEE app (`tee_0`/`tee_1`) and the TEE
@@ -264,6 +266,13 @@ on the ESP32-C6, with the required partition table and sdkconfig defaults:
 `CONFIG_USE_ESP32_TEE_SECURE_STORAGE` is selected automatically when
 `SEC_CERT_DAC_PROVIDER` and `SECURE_ENABLE_TEE` are enabled while
 `ESP_SECURE_CERT_DS_PERIPHERAL` is disabled.
+
+Build the lighting-app with the TEE configuration (the base `sdkconfig.defaults`
+is sequenced first):
+
+```
+idf.py -DSDKCONFIG_DEFAULTS="sdkconfig.defaults;sdkconfig.defaults.esp32c6_tee" set-target esp32c6 build
+```
 
 ### 1.7.3 Generating the provisioned partitions with the mfg tool
 
@@ -280,6 +289,42 @@ Install it with:
 pip install esp-matter-mfg-tool
 ```
 
-See the
-[esp-matter-mfg-tool documentation](https://docs.espressif.com/projects/esp-matter/en/latest/esp32/production.html)
-for the full set of options and the TEE-specific flags.
+Pass `--tee` to generate the TEE artifacts in addition to the usual
+`esp_secure_cert` and factory (`fctry`) partitions. In the default development
+mode (`--tee-mode dev`) no eFuse burn is needed, which is convenient for
+development boards and CI:
+
+```
+esp-matter-mfg-tool --paa -c /path/to/Chip-Test-PAA-NoVID-Cert.pem \
+    -k /path/to/Chip-Test-PAA-NoVID-Key.pem -cd /path/to/cd.der \
+    -v 0xFFF2 -p 0x8001 --target esp32c6 --tee
+```
+
+This produces a `secure_storage` image (`<uuid>-tee_sec_stg_nvs.bin`) holding
+the DAC private key in the TEE secure-storage blob format, under NVS key
+`dac-key` — which must match `ESP32Config::kConfigKey_DACPrivateKey.Name`.
+
+> **NOTE:** For production use `--tee-mode release` with an HMAC key
+> (`--tee-hmac-key`) burned into the device eFuse. See the
+> [esp-matter-mfg-tool documentation](https://docs.espressif.com/projects/esp-matter/en/latest/esp32/production.html)
+> for the full set of `--tee` flags.
+
+### 1.7.4 Flashing the firmware and partitions
+
+Build and flash the firmware (the TEE app is flashed together with the
+lighting-app), then write the three generated data partitions to their offsets
+using `parttool.py` (no manual offsets required):
+
+```
+idf.py -p (PORT) flash
+
+PT="python $IDF_PATH/components/partition_table/parttool.py -p (PORT) write_partition --partition-name"
+
+$PT secure_storage  --input out/<vid_pid>/<uuid>/<uuid>-tee_sec_stg_nvs.bin
+$PT esp_secure_cert --input out/<vid_pid>/<uuid>/<uuid>_esp_secure_cert.bin
+$PT fctry           --input out/<vid_pid>/<uuid>/<uuid>-partition.bin
+```
+
+The `<uuid>-nvs_keys.bin` artifact is **not** flashed — in development mode the
+TEE firmware uses a hardcoded XTS-AES key, and in release mode it derives the
+key from the eFuse HMAC key at runtime.

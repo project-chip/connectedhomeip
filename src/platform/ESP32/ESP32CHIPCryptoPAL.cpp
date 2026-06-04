@@ -228,6 +228,8 @@ exit:
 CHIP_ERROR ESP32P256Keypair::InitializeFromTEE(ECPKeyTarget keyTarget, const char * key_id)
 {
 #ifdef CONFIG_USE_ESP32_TEE_SECURE_STORAGE
+    VerifyOrReturnError(key_id != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
     Clear();
 
     CHIP_ERROR error = CHIP_NO_ERROR;
@@ -249,7 +251,13 @@ CHIP_ERROR ESP32P256Keypair::InitializeFromTEE(ECPKeyTarget keyTarget, const cha
         };
 
         status = esp_ecdsa_tee_set_pk_context(&key_ctx, &conf);
-        VerifyOrExit(status == 0, error = CHIP_ERROR_INTERNAL);
+        if (status != 0)
+        {
+            // key_ctx owns resources allocated by mbedtls_pk_init(); free before jumping to exit.
+            mbedtls_pk_free(&key_ctx);
+            error = CHIP_ERROR_INTERNAL;
+            goto exit;
+        }
 
         mbedtls_ecp_keypair * keypair = mbedtls_pk_ec(key_ctx);
 
