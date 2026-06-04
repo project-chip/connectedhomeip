@@ -147,6 +147,9 @@ declare_args() {
   chip_device_config_enable_thread_meshcop =
       chip_device_platform == "linux" &&
       chip_system_config_use_openthread_inet_endpoints
+
+  # The interval in milliseconds between two Thread discovery attempts in Thread Rendezvous.
+  chip_device_config_thread_discovery_interval_ms = 0
 }
 
 declare_args() {
