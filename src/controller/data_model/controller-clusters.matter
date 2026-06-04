@@ -11830,7 +11830,7 @@ provisional cluster AvAnalysis = 1367 {
 
 /** The CommodityTariffCluster provides the mechanism for communicating Commodity Tariff information within the premises. */
 provisional cluster CommodityTariff = 1792 {
-  revision 1;
+  revision 2;
 
   enum AuxiliaryLoadSettingEnum : enum8 {
     kOff = 0;
@@ -11911,6 +11911,7 @@ provisional cluster CommodityTariff = 1792 {
     nullable int64s threshold = 6;
     optional nullable char_string<128> label = 7;
     optional boolean predicted = 8;
+    optional char_string<36> externalID = 9;
   }
 
   struct CalendarPeriodStruct {
