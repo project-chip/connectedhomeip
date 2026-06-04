@@ -446,14 +446,15 @@ TEST_F(TestValveConfigurationAndControlCluster, UpdateAutoCloseTimeNoIntegerOver
     const uint32_t rd = remaining.Value();
     ASSERT_GT(rd, 4294u); // ensure a 32-bit product would overflow
 
-    constexpr uint64_t kEpochMicros = 1000000;
+    // Arbitrary chip-epoch timestamp (microseconds) standing in for "now"; not a unit conversion.
+    constexpr uint64_t kEpochMicros = 1700000000000000ULL;
     valveCluster.UpdateAutoCloseTime(kEpochMicros);
 
     AutoCloseTime::TypeInfo::DecodableType autoCloseTime;
     ASSERT_EQ(tester.ReadAttribute(AutoCloseTime::Id, autoCloseTime), CHIP_NO_ERROR);
     ASSERT_FALSE(autoCloseTime.IsNull());
 
-    const uint64_t expected = static_cast<uint64_t>(rd) * 1000000u + kEpochMicros;
+    const uint64_t expected = static_cast<uint64_t>(rd) * kMicrosecondsPerSecond + kEpochMicros;
     EXPECT_EQ(autoCloseTime.Value(), expected);
 
     valveCluster.Shutdown(ClusterShutdownType::kClusterShutdown);
@@ -499,7 +500,7 @@ TEST_F(TestValveConfigurationAndControlCluster, SetAutoCloseTimeNoIntegerOverflo
     ASSERT_EQ(tester.ReadAttribute(AutoCloseTime::Id, autoCloseTime), CHIP_NO_ERROR);
     ASSERT_FALSE(autoCloseTime.IsNull());
 
-    const uint64_t expected = static_cast<uint64_t>(kOpenDurationSeconds) * 1000000u + chipEpochMicros;
+    const uint64_t expected = static_cast<uint64_t>(kOpenDurationSeconds) * kMicrosecondsPerSecond + chipEpochMicros;
     EXPECT_EQ(autoCloseTime.Value(), expected);
 
     valveCluster.Shutdown(ClusterShutdownType::kClusterShutdown);
