@@ -42,7 +42,6 @@ from TC_GC_common import is_groupcast_on_root_node
 
 import matter.clusters as Clusters
 from matter.clusters import Globals
-from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
 from matter.testing.matter_testing import AttributeMatcher, AttributeValue, MatterBaseTest
