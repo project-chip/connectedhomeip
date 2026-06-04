@@ -134,6 +134,46 @@ class TestIdlRendering(unittest.TestCase):
             # checks that data types and content is the same
             self.assertEqual(idl, idl2)
 
+    def test_maturity_rendering(self):
+        idl_content = """
+            client cluster ProvisionalCluster = 1 {
+                provisional struct ProvisionalStruct {
+                    provisional int16u provisionalField = 1;
+                }
+
+                provisional enum ProvisionalEnum : ENUM16 {
+                    provisional kProvisionalValue = 0;
+                }
+
+                provisional bitmap ProvisionalBitmap : BITMAP32 {
+                    provisional kProvisionalBit = 0x1;
+                }
+
+                /** Test command description */
+                provisional command ProvisionalCommand(): DefaultSuccess = 0;
+            }
+        """
+        # Parse and render (skip_meta must be False for comment parsing to work)
+        parser = CreateParser(skip_meta=False, merge_globals=False)
+        idl = parser.parse(idl_content)
+        rendered = RenderAsIdlTxt(idl)
+
+        # Verify that maturity words are preserved in the rendered IDL
+        self.assertIn("provisional struct ProvisionalStruct", rendered)
+        self.assertIn("provisional int16u provisionalField = 1;", rendered)
+        self.assertIn("provisional enum ProvisionalEnum", rendered)
+        self.assertIn("provisional kProvisionalValue = 0;", rendered)
+        self.assertIn("provisional bitmap ProvisionalBitmap", rendered)
+        self.assertIn("provisional kProvisionalBit = 0x1;", rendered)
+        self.assertIn("provisional command ProvisionalCommand(): DefaultSuccess = 0;", rendered)
+
+        # Verify that doc comment is matched and rendered correctly on the provisional command
+        self.assertIn("/** Test command description */", rendered)
+
+        # Also ensure roundtrip parses back to the exact same IDL
+        idl2 = parser.parse(rendered)
+        self.assertEqual(idl, idl2)
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -66,11 +66,6 @@
 	path = third_party/openthread/ot-qorvo
 	url = https://github.com/openthread/ot-qorvo.git
 	platforms = qpg
-[submodule "third_party/openthread/ot-efr32"]
-	path = third_party/openthread/ot-efr32
-	url = https://github.com/SiliconLabs/ot-efr32.git
-	branch  = matter_sve
-	platforms = silabs,silabs_docker
 [submodule "ot-stm32"]
 	path = third_party/openthread/ot-stm32
 	url = https://github.com/openthread/openthread

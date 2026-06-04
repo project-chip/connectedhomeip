@@ -124,6 +124,8 @@ jobs:
                       --log-level info \
                       src/app/zap-templates/zcl/data-model/chip/global-attributes.xml \
                       src/app/zap-templates/zcl/data-model/chip/ambient-context-sensing-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/ambient-sensing-union-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/av-analysis-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/boolean-state-configuration-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/bridged-device-basic-information-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/chime-cluster.xml \
@@ -132,6 +134,8 @@ jobs:
                       src/app/zap-templates/zcl/data-model/chip/commodity-metering-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/commodity-price-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/commodity-tariff-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/electrical-distribution-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/electrical-protection-alarm-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/global-bitmaps.xml \
                       src/app/zap-templates/zcl/data-model/chip/global-enums.xml \
                       src/app/zap-templates/zcl/data-model/chip/global-structs.xml \
@@ -246,7 +250,6 @@ jobs:
                       src/app/zap-templates/zcl/data-model/chip/thread-network-directory-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/time-format-localization-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/time-synchronization-cluster.xml \
-                      src/app/zap-templates/zcl/data-model/chip/timer-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/tls-certificate-management-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/tls-client-management-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/user-label-cluster.xml \
@@ -1346,7 +1349,7 @@ jobs:
                 path: gh-pages
 
           - name: Generate Allure Report
-            uses: simple-elf/allure-report-action@v1.13
+            uses: simple-elf/allure-report-action@v1.14
             with:
                 allure_results: junit-results
                 allure_report: allure-report
