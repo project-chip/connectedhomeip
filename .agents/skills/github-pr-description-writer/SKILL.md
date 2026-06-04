@@ -27,9 +27,8 @@ address the following points:
     obvious. What are the consequences of not fixing it?
 -   **The Solution**: Explain the proposed solution and _why_ it fixes the
     problem.
--   **Caveats**: Document any limitations, side effects,
-    performance/memory impacts, or specific concerns that reviewers should be
-    aware of.
+-   **Caveats**: Document any limitations, side effects, performance/memory
+    impacts, or specific concerns that reviewers should be aware of.
 
 #### Style and Tone
 
