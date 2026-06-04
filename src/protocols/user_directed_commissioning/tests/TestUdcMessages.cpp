@@ -47,7 +47,7 @@ public:
 
     void OnCommissionerPasscodeReady(UDCClientState state) {}
 
-    void FindCommissionableNode(char * instanceName)
+    void FindCommissionableNode(const char * instanceName)
     {
         mFindCommissionableNodeCalled = true;
         mInstanceName                 = instanceName;
@@ -55,7 +55,7 @@ public:
 
     // virtual ~UserConfirmationProvider() = default;
     UDCClientState mState;
-    char * mInstanceName;
+    const char * mInstanceName = nullptr;
 
     bool mOnUserDirectedCommissioningRequestCalled = false;
     bool mFindCommissionableNodeCalled             = false;
