@@ -2529,9 +2529,9 @@ void TestReadInteraction::TestSubscribeWithCache()
         // Advance clock by MaxInterval without making anything dirty -> should trigger keep-alive
         System::Clock::Timeout delta2 = System::Clock::Seconds16(readPrepareParams.mMaxIntervalCeilingSeconds);
         gMockClock.AdvanceMonotonic(delta2);
+        cacheCallback.Reset();
         GetIOContext().DriveIO(); // Trigger timer and schedule run
 
-        cacheCallback.Reset();
         DrainAndServiceIO();
 
         EXPECT_EQ(cacheCallback.mNotifySubscriptionStillActiveCalledCount, 1);
