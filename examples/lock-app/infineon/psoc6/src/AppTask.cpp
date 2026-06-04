@@ -47,8 +47,8 @@
 #include <app/clusters/identify-server/identify-server.h>
 
 #if ENABLE_DEVICE_ATTESTATION
-#include <DeviceAttestationCredsExampleTrustM.h>
 #include <CHIPCryptoPALHsm_config_trustm.h>
+#include <DeviceAttestationCredsExampleTrustM.h>
 #endif
 
 /* OTA related includes */
