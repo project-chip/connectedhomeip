@@ -170,4 +170,4 @@ class DelayCommands(PseudoCluster):
 
         history_str = "\n".join(f"  Attempt -{len(history)-i}: {attempt}" for i, attempt in enumerate(history))
         raise TimeoutError(f"Timeout waiting for attribute {cluster_name}.{attribute_name} to become {expected_value}.\n"
-                            f"Recent history of attempts:\n{history_str}")
+                           f"Recent history of attempts:\n{history_str}")
