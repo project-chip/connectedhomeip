@@ -522,7 +522,7 @@ class TC_CLCTRL_7_3(MatterBaseTest):
                 try:
                     await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(latch=current_latch))
                     log.error("GroupedMoveTo command with Latch = CurrentLatch should have failed but succeeded")
-                    asserts.assert_fail("GroupedMoveTo command with Latch = CurrentLatch should have failed but succeeded")
+                    asserts.fail("GroupedMoveTo command with Latch = CurrentLatch should have failed but succeeded")
                 except InteractionModelError as e:
                     log.info(f"Exception caught for GroupedMoveTo with Latch = CurrentLatch: {e}")
                     asserts.assert_equal(e.status, Status.InvalidInState,

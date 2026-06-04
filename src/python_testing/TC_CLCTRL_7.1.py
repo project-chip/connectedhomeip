@@ -302,7 +302,7 @@ class TC_CLCTRL_7_1(MatterBaseTest):
         log.info(f"OverallCurrentState: {overall_current_state}")
 
         if overall_current_state is NullValue:
-            asserts.assert_fail("OverallCurrentState is NullValue.")
+            asserts.fail("OverallCurrentState is NullValue.")
 
         CurrentPosition = overall_current_state.position
         asserts.assert_in(CurrentPosition, Clusters.ClosureControl.Enums.CurrentPositionEnum,
@@ -351,7 +351,7 @@ class TC_CLCTRL_7_1(MatterBaseTest):
             overall_current_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallCurrentState)
             log.info(f"OverallCurrentState: {overall_current_state}")
             if overall_current_state is NullValue:
-                asserts.assert_fail("OverallCurrentState is NullValue.")
+                asserts.fail("OverallCurrentState is NullValue.")
 
             CurrentLatch = overall_current_state.latch
 
@@ -363,9 +363,9 @@ class TC_CLCTRL_7_1(MatterBaseTest):
                 log.info(f"LatchControlModes: {LatchControlModes}")
 
                 if LatchControlModes is NullValue:
-                    asserts.assert_fail("LatchControlModes is NullValue.")
+                    asserts.fail("LatchControlModes is NullValue.")
             else:
-                asserts.assert_fail("LatchControlModes attribute is not supported.")
+                asserts.fail("LatchControlModes attribute is not supported.")
 
             # STEP 3h: If CurrentLatch = True, skip steps 3i to 3m
             self.step("3h")
@@ -511,7 +511,7 @@ class TC_CLCTRL_7_1(MatterBaseTest):
             overall_current_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallCurrentState)
             log.info(f"OverallCurrentState: {overall_current_state}")
             if overall_current_state is NullValue:
-                asserts.assert_fail("OverallCurrentState is NullValue.")
+                asserts.fail("OverallCurrentState is NullValue.")
 
             CurrentSpeed = overall_current_state.speed
             asserts.assert_in(CurrentSpeed, Clusters.Globals.Enums.ThreeLevelAutoEnum,
@@ -601,7 +601,7 @@ class TC_CLCTRL_7_1(MatterBaseTest):
             overall_current_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallCurrentState)
             log.info(f"OverallCurrentState: {overall_current_state}")
             if overall_current_state is NullValue:
-                asserts.assert_fail("OverallCurrentState is NullValue.")
+                asserts.fail("OverallCurrentState is NullValue.")
             CurrentPosition = overall_current_state.position
 
             # STEP 8c: If CurrentPosition = FullyClosed, skip steps 8d to 8e
@@ -688,7 +688,7 @@ class TC_CLCTRL_7_1(MatterBaseTest):
             overall_current_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallCurrentState)
             log.info(f"OverallCurrentState: {overall_current_state}")
             if overall_current_state is NullValue:
-                asserts.assert_fail("OverallCurrentState is NullValue.")
+                asserts.fail("OverallCurrentState is NullValue.")
 
             CurrentPosition = overall_current_state.position
 
@@ -766,7 +766,7 @@ class TC_CLCTRL_7_1(MatterBaseTest):
         overall_current_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallCurrentState)
         log.info(f"OverallCurrentState: {overall_current_state}")
         if overall_current_state is NullValue:
-            asserts.assert_fail("OverallCurrentState is NullValue.")
+            asserts.fail("OverallCurrentState is NullValue.")
 
         CurrentPosition = overall_current_state.position
 
@@ -1068,7 +1068,7 @@ class TC_CLCTRL_7_1(MatterBaseTest):
             log.info(f"OverallCurrentState: {overall_current_state}")
 
             if overall_current_state is NullValue:
-                asserts.assert_fail("OverallCurrentState is NullValue.")
+                asserts.fail("OverallCurrentState is NullValue.")
 
             log.info(f"OverallCurrentState: {overall_current_state}")
             asserts.assert_equal(overall_current_state.position, Clusters.ClosureControl.Enums.CurrentPositionEnum.kFullyOpened,
@@ -1111,7 +1111,7 @@ class TC_CLCTRL_7_1(MatterBaseTest):
             log.info(f"OverallCurrentState: {overall_current_state}")
 
             if overall_current_state is NullValue:
-                asserts.assert_fail("OverallCurrentState is NullValue.")
+                asserts.fail("OverallCurrentState is NullValue.")
 
             log.info(f"OverallCurrentState: {overall_current_state}")
             asserts.assert_equal(overall_current_state.position, Clusters.ClosureControl.Enums.CurrentPositionEnum.kFullyClosed,
