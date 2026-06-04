@@ -798,6 +798,8 @@ class WaitForAttributeValueAction(BaseAction):
                                     f"after {time.time() - start_time:.2f}s")
                         return _ActionResult(status=_ActionStatus.SUCCESS, response=None)
             except (AttributeError, NameError, TypeError):
+                # Let programming errors (bugs in our code or test definition)
+                # propagate immediately instead of timing out.
                 raise
             except Exception as e:
                 LOGGER.debug(f"ReadAttribute failed during wait: {e}")

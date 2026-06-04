@@ -148,6 +148,8 @@ class DelayCommands(PseudoCluster):
                     if value == expected_value:
                         return
             except (AttributeError, NameError, TypeError):
+                # Let programming errors (bugs in our code or test definition)
+                # propagate immediately instead of timing out.
                 raise
             except Exception as e:
                 # We ignore intermediate errors during polling (e.g., node
