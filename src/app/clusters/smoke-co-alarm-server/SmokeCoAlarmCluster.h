@@ -169,7 +169,7 @@ private:
     AlarmStateEnum mInterconnectSmokeAlarm     = AlarmStateEnum::kNormal;
     AlarmStateEnum mInterconnectCOAlarm        = AlarmStateEnum::kNormal;
     ContaminationStateEnum mContaminationState = ContaminationStateEnum::kNormal;
-    SensitivityEnum mSmokeSensitivityLevel     = SensitivityEnum::kHigh;
+    SensitivityEnum mSmokeSensitivityLevel     = SensitivityEnum::kStandard;
     uint32_t mExpiryDate                       = 0;
     bool mUnmounted                            = false;
 };
