@@ -168,6 +168,7 @@ chip_test_suite("tests") {
     "TestAttributeValueEncoder.cpp",
     "TestBasicCommandPathRegistry.cpp",
     "TestBuilderParser.cpp",
+    "TestCASESessionManagerReleaseSession.cpp",
     "TestCheckInHandler.cpp",
     "TestCommandHandlerInterfaceRegistry.cpp",
     "TestCommandInteraction.cpp",
@@ -203,6 +204,8 @@ chip_test_suite("tests") {
     "TestTimedHandler.cpp",
     "TestWriteInteraction.cpp",
   ]
+
+  sources = [ "CASESessionManagerTestAccess.h" ]
 
   cflags = [ "-Wconversion" ]
 

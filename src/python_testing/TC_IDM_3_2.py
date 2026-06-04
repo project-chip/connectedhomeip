@@ -43,6 +43,7 @@ from support_modules.idm_support import IDMBaseTest
 
 import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError, Status
+from matter.testing import global_attribute_ids
 from matter.testing.basic_composition import BasicCompositionTests
 from matter.testing.decorators import async_test_body
 from matter.testing.runner import TestStep, default_matter_test_main
@@ -50,7 +51,7 @@ from matter.testing.runner import TestStep, default_matter_test_main
 log = logging.getLogger(__name__)
 
 
-class TC_IDM_3_2(IDMBaseTest, BasicCompositionTests):
+class TC_IDM_3_2(IDMBaseTest):
     """Test case for IDM-3.2: Write Response Action from DUT to TH. [{DUT_Server}]"""
 
     def __init__(self, *args, **kwargs):

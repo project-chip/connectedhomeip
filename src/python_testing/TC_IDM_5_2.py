@@ -43,7 +43,6 @@ from support_modules.idm_support import IDMBaseTest
 
 import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError, Status
-from matter.testing.basic_composition import BasicCompositionTests
 from matter.testing.conformance import ConformanceException
 from matter.testing.decorators import async_test_body
 from matter.testing.runner import TestStep, default_matter_test_main
@@ -52,7 +51,7 @@ from matter.testing.spec_parsing import dm_from_spec_version
 log = logging.getLogger(__name__)
 
 
-class TC_IDM_5_2(IDMBaseTest, BasicCompositionTests):
+class TC_IDM_5_2(IDMBaseTest):
     def steps_TC_IDM_5_2(self) -> list[TestStep]:
         return [
             TestStep(0, "Commissioning, already done", is_commissioning=True),

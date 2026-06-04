@@ -29,9 +29,11 @@
 #include <clusters/AdministratorCommissioning/Enums.h>
 #include <clusters/AirQuality/Enums.h>
 #include <clusters/AmbientContextSensing/Enums.h>
+#include <clusters/AmbientSensingUnion/Enums.h>
 #include <clusters/ApplicationBasic/Enums.h>
 #include <clusters/ApplicationLauncher/Enums.h>
 #include <clusters/AudioOutput/Enums.h>
+#include <clusters/AvAnalysis/Enums.h>
 #include <clusters/BallastConfiguration/Enums.h>
 #include <clusters/BasicInformation/Enums.h>
 #include <clusters/Binding/Enums.h>
@@ -63,6 +65,7 @@
 #include <clusters/DoorLock/Enums.h>
 #include <clusters/DynamicLighting/Enums.h>
 #include <clusters/EcosystemInformation/Enums.h>
+#include <clusters/ElectricalAlarm/Enums.h>
 #include <clusters/ElectricalDistribution/Enums.h>
 #include <clusters/ElectricalEnergyMeasurement/Enums.h>
 #include <clusters/ElectricalGridConditions/Enums.h>
