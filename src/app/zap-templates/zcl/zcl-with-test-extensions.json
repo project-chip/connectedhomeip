@@ -190,6 +190,7 @@
             "AdminVendorId"
         ],
         "Ambient Context Sensing": ["HoldTimeLimits", "ObjectCountConfig"],
+        "Ambient Sensing Union": ["UnionName", "UnionHealth", "UnionContributorList"],
         "Basic Information": [
             "FeatureMap",
             "ClusterRevision",

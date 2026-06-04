@@ -18,8 +18,10 @@
 
 #include "AllClustersCommandDelegate.h"
 
+#include <ambient-sensing-union-delegate-impl.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/EventLogging.h>
+#include <app/clusters/ambient-sensing-union-server/CodegenIntegration.h>
 #include <app/clusters/basic-information/CodegenIntegration.h>
 #include <app/clusters/boolean-state-configuration-server/CodegenIntegration.h>
 #include <app/clusters/boolean-state-server/CodegenIntegration.h>
@@ -363,6 +365,405 @@ void HandleSimulateSwitchIdle(Json::Value & jsonValue)
     LogErrorOnFailure(switchCluster->SetCurrentPosition(0));
 }
 
+/**
+ * Named pipe handler for adding a Matter contributor to AmbientSensingUnion.
+ *
+ * Usage example:
+ *   echo '{"Name": "AddAmbientSensingContributor", "EndpointId": 1, "NodeId": "0x1234567890ABCDEF", 
+ *          "ContributorEndpointId": 2, "Status": 0}' > /tmp/chip_all_clusters_fifo_1146610
+ *
+ * JSON Arguments:
+ *   - "Name": Must be "AddAmbientSensingContributor"
+ *   - "EndpointId": ID of endpoint having the AmbientSensingUnion cluster
+ *   - "NodeId": Node ID of the Matter contributor (hex string or number)
+ *   - "ContributorEndpointId": Endpoint ID of the contributor
+ *   - "Status": 0 for Online, 1 for Offline
+ */
+void HandleAddAmbientSensingContributor(Json::Value & jsonValue)
+{
+    bool hasEndpointId            = HasNumericField(jsonValue, "EndpointId");
+    bool hasContributorEndpointId = HasNumericField(jsonValue, "ContributorEndpointId");
+    bool hasStatus                = HasNumericField(jsonValue, "Status");
+
+    if (!hasEndpointId || !hasContributorEndpointId || !hasStatus)
+    {
+        ChipLogError(NotSpecified, "Missing required fields for AddAmbientSensingContributor");
+        return;
+    }
+
+    // Parse NodeId - can be hex string or number
+    NodeId nodeId = kUndefinedNodeId;
+    if (jsonValue.isMember("NodeId"))
+    {
+        if (jsonValue["NodeId"].isString())
+        {
+            std::string nodeIdStr = jsonValue["NodeId"].asString();
+            nodeId = static_cast<NodeId>(strtoull(nodeIdStr.c_str(), nullptr, 0));
+        }
+        else if (jsonValue["NodeId"].isNumeric())
+        {
+            nodeId = static_cast<NodeId>(jsonValue["NodeId"].asUInt64());
+        }
+    }
+
+    if (nodeId == kUndefinedNodeId)
+    {
+        ChipLogError(NotSpecified, "Invalid or missing NodeId for AddAmbientSensingContributor");
+        return;
+    }
+
+    EndpointId endpointId            = static_cast<EndpointId>(jsonValue["EndpointId"].asUInt());
+    EndpointId contributorEndpointId = static_cast<EndpointId>(jsonValue["ContributorEndpointId"].asUInt());
+    auto status = static_cast<AmbientSensingUnion::UnionContributorStatusEnum>(jsonValue["Status"].asUInt());
+
+    auto cluster = AmbientSensingUnion::FindClusterOnEndpoint(endpointId);
+    if (cluster == nullptr)
+    {
+        ChipLogError(NotSpecified, "AmbientSensingUnion cluster not found on endpoint %u", endpointId);
+        return;
+    }
+
+    CHIP_ERROR err = cluster->AddMatterContributor(nodeId, contributorEndpointId, status);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "Failed to add Matter contributor: %" CHIP_ERROR_FORMAT, err.Format());
+    }
+    else
+    {
+        ChipLogProgress(NotSpecified, "Added Matter contributor NodeId: 0x" ChipLogFormatX64 ", Endpoint: %u",
+                        ChipLogValueX64(nodeId), contributorEndpointId);
+    }
+}
+
+/**
+ * Named pipe handler for removing a Matter contributor from AmbientSensingUnion.
+ *
+ * Usage example:
+ *   echo '{"Name": "RemoveAmbientSensingContributor", "EndpointId": 1, "NodeId": "0x1234567890ABCDEF",
+ *          "ContributorEndpointId": 1}' > /tmp/chip_all_clusters_fifo_1146610
+ */
+void HandleRemoveAmbientSensingContributor(Json::Value & jsonValue)
+{
+    bool hasEndpointId            = HasNumericField(jsonValue, "EndpointId");
+    bool hasContributorEndpointId = HasNumericField(jsonValue, "ContributorEndpointId");
+
+    if (!hasEndpointId || !hasContributorEndpointId)
+    {
+        ChipLogError(NotSpecified, "Missing required fields for RemoveAmbientSensingContributor");
+        return;
+    }
+
+    NodeId nodeId = kUndefinedNodeId;
+    if (jsonValue.isMember("NodeId"))
+    {
+        if (jsonValue["NodeId"].isString())
+        {
+            std::string nodeIdStr = jsonValue["NodeId"].asString();
+            nodeId = static_cast<NodeId>(strtoull(nodeIdStr.c_str(), nullptr, 0));
+        }
+        else if (jsonValue["NodeId"].isNumeric())
+        {
+            nodeId = static_cast<NodeId>(jsonValue["NodeId"].asUInt64());
+        }
+    }
+
+    if (nodeId == kUndefinedNodeId)
+    {
+        ChipLogError(NotSpecified, "Invalid or missing NodeId for RemoveAmbientSensingContributor");
+        return;
+    }
+
+    EndpointId endpointId            = static_cast<EndpointId>(jsonValue["EndpointId"].asUInt());
+    EndpointId contributorEndpointId = static_cast<EndpointId>(jsonValue["ContributorEndpointId"].asUInt());
+
+    auto cluster = AmbientSensingUnion::FindClusterOnEndpoint(endpointId);
+    if (cluster == nullptr)
+    {
+        ChipLogError(NotSpecified, "AmbientSensingUnion cluster not found on endpoint %u", endpointId);
+        return;
+    }
+
+    CHIP_ERROR err = cluster->RemoveMatterContributor(nodeId, contributorEndpointId);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "Failed to remove Matter contributor: %" CHIP_ERROR_FORMAT, err.Format());
+    }
+    else
+    {
+        ChipLogProgress(NotSpecified, "Removed Matter contributor NodeId: 0x" ChipLogFormatX64, ChipLogValueX64(nodeId));
+    }
+}
+
+/**
+ * Named pipe handler for adding a non-Matter contributor to AmbientSensingUnion.
+ *
+ * Usage example:
+ *   echo '{"Name": "AddAmbientSensingNonMatterContributor", "EndpointId": 1, 
+ *          "ContributorName": "NonMatterSensor1", "Status": 0}' > /tmp/chip_all_clusters_fifo_1146610
+ */
+void HandleAddAmbientSensingNonMatterContributor(Json::Value & jsonValue)
+{
+    bool hasEndpointId       = HasNumericField(jsonValue, "EndpointId");
+    bool hasContributorName  = jsonValue.isMember("ContributorName") && jsonValue["ContributorName"].isString();
+    bool hasStatus           = HasNumericField(jsonValue, "Status");
+
+    if (!hasEndpointId || !hasContributorName || !hasStatus)
+    {
+        ChipLogError(NotSpecified, "Missing required fields for AddAmbientSensingNonMatterContributor");
+        return;
+    }
+
+    EndpointId endpointId       = static_cast<EndpointId>(jsonValue["EndpointId"].asUInt());
+    std::string contributorName = jsonValue["ContributorName"].asString();
+    auto status = static_cast<AmbientSensingUnion::UnionContributorStatusEnum>(jsonValue["Status"].asUInt());
+
+    auto cluster = AmbientSensingUnion::FindClusterOnEndpoint(endpointId);
+    if (cluster == nullptr)
+    {
+        ChipLogError(NotSpecified, "AmbientSensingUnion cluster not found on endpoint %u", endpointId);
+        return;
+    }
+
+    CHIP_ERROR err = cluster->AddNonMatterContributor(CharSpan::fromCharString(contributorName.c_str()), status);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "Failed to add non-Matter contributor: %" CHIP_ERROR_FORMAT, err.Format());
+    }
+    else
+    {
+        ChipLogProgress(NotSpecified, "Added non-Matter contributor: %s", contributorName.c_str());
+    }
+}
+
+/**
+ * Named pipe handler for removing a non-Matter contributor from AmbientSensingUnion.
+ *
+ * Usage example:
+ *   echo '{"Name": "RemoveAmbientSensingNonMatterContributor", "EndpointId": 1,
+ *          "ContributorName": "ZigbeeSensor1"}' > /tmp/chip_all_clusters_fifo_1146610
+ */
+void HandleRemoveAmbientSensingNonMatterContributor(Json::Value & jsonValue)
+{
+    bool hasEndpointId      = HasNumericField(jsonValue, "EndpointId");
+    bool hasContributorName = jsonValue.isMember("ContributorName") && jsonValue["ContributorName"].isString();
+
+    if (!hasEndpointId || !hasContributorName)
+    {
+        ChipLogError(NotSpecified, "Missing required fields for RemoveAmbientSensingNonMatterContributor");
+        return;
+    }
+
+    EndpointId endpointId       = static_cast<EndpointId>(jsonValue["EndpointId"].asUInt());
+    std::string contributorName = jsonValue["ContributorName"].asString();
+
+    auto cluster = AmbientSensingUnion::FindClusterOnEndpoint(endpointId);
+    if (cluster == nullptr)
+    {
+        ChipLogError(NotSpecified, "AmbientSensingUnion cluster not found on endpoint %u", endpointId);
+        return;
+    }
+
+    CHIP_ERROR err = cluster->RemoveNonMatterContributor(CharSpan::fromCharString(contributorName.c_str()));
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "Failed to remove non-Matter contributor: %" CHIP_ERROR_FORMAT, err.Format());
+    }
+    else
+    {
+        ChipLogProgress(NotSpecified, "Removed non-Matter contributor: %s", contributorName.c_str());
+    }
+}
+
+/**
+ * Named pipe handler for updating contributor status.
+ *
+ * Usage example (Matter contributor):
+ *   echo '{"Name": "UpdateAmbientSensingContributorStatus", "EndpointId": 1, "NodeId": "0x1234567890ABCDEF",
+ *          "ContributorEndpointId": 1, "Status": 1}' > /tmp/chip_all_clusters_fifo_1146610
+ *
+ * Usage example (non-Matter contributor):
+ *   echo '{"Name": "UpdateAmbientSensingContributorStatus", "EndpointId": 1,
+ *          "ContributorName": "ZigbeeSensor1", "Status": 1}' > /tmp/chip_all_clusters_fifo_1146610
+ */
+void HandleUpdateAmbientSensingContributorStatus(Json::Value & jsonValue)
+{
+    bool hasEndpointId = HasNumericField(jsonValue, "EndpointId");
+    bool hasStatus     = HasNumericField(jsonValue, "Status");
+
+    if (!hasEndpointId || !hasStatus)
+    {
+        std::string inputJson = jsonValue.toStyledString();
+        ChipLogError(NotSpecified, "Missing required fields for UpdateAmbientSensingContributorStatus in %s", inputJson.c_str());
+        return;
+    }
+
+    EndpointId endpointId = static_cast<EndpointId>(jsonValue["EndpointId"].asUInt());
+    uint32_t statusValue = jsonValue["Status"].asUInt();
+    
+    // Validate status enum value
+    if (statusValue > static_cast<uint32_t>(AmbientSensingUnion::UnionContributorStatusEnum::kUnionContributorOffline))
+    {
+        ChipLogError(NotSpecified, "Invalid Status value: %u", statusValue);
+        return;
+    }
+    
+    auto status = static_cast<AmbientSensingUnion::UnionContributorStatusEnum>(statusValue);
+
+    auto cluster = AmbientSensingUnion::FindClusterOnEndpoint(endpointId);
+    if (cluster == nullptr)
+    {
+        ChipLogError(NotSpecified, "AmbientSensingUnion cluster not found on endpoint %u", endpointId);
+        return;
+    }
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    // Check if this is a Matter or non-Matter contributor
+    if (jsonValue.isMember("NodeId"))
+    {
+        // Matter contributor path
+        NodeId nodeId = kUndefinedNodeId;
+        if (jsonValue["NodeId"].isString())
+        {
+            std::string nodeIdStr = jsonValue["NodeId"].asString();
+            nodeId = static_cast<NodeId>(strtoull(nodeIdStr.c_str(), nullptr, 0));
+        }
+        else if (jsonValue["NodeId"].isNumeric())
+        {
+            nodeId = static_cast<NodeId>(jsonValue["NodeId"].asUInt64());
+        }
+
+        if (nodeId == kUndefinedNodeId)
+        {
+            ChipLogError(NotSpecified, "Invalid NodeId for UpdateAmbientSensingContributorStatus");
+            return;
+        }
+
+        if (!HasNumericField(jsonValue, "ContributorEndpointId"))
+        {
+            ChipLogError(NotSpecified, "Missing ContributorEndpointId for Matter contributor status update");
+            return;
+        }
+
+        EndpointId contributorEndpointId = static_cast<EndpointId>(jsonValue["ContributorEndpointId"].asUInt());
+        err = cluster->UpdateMatterContributorStatus(nodeId, contributorEndpointId, status);
+        
+        if (err == CHIP_NO_ERROR)
+        {
+            ChipLogProgress(NotSpecified, "Updated Matter contributor (NodeId: 0x" ChipLogFormatX64 ", Endpoint: %u) status to %s",
+                            ChipLogValueX64(nodeId), contributorEndpointId,
+                            status == AmbientSensingUnion::UnionContributorStatusEnum::kUnionContributorOnline ? "Online" : "Offline");
+        }
+    }
+    else if (jsonValue.isMember("ContributorName") && jsonValue["ContributorName"].isString())
+    {
+        // Non-Matter contributor path
+        std::string contributorNameStr = jsonValue["ContributorName"].asString();
+        
+        if (contributorNameStr.empty())
+        {
+            ChipLogError(NotSpecified, "ContributorName cannot be empty");
+            return;
+        }
+        
+        // Validate length against maximum allowed
+        constexpr size_t kMaxNameLength = AmbientSensingUnionCluster::kMaxContributorNameLength;
+        if (contributorNameStr.size() > kMaxNameLength)
+        {
+            ChipLogError(NotSpecified, "ContributorName too long: %u > %u",
+                         static_cast<unsigned>(contributorNameStr.size()),
+                         static_cast<unsigned>(kMaxNameLength));
+            return;
+        }
+
+        static char contributorNameBuffer[kMaxNameLength + 1];
+        memcpy(contributorNameBuffer, contributorNameStr.data(), contributorNameStr.size());
+        contributorNameBuffer[contributorNameStr.size()] = '\0';
+
+        err = cluster->UpdateNonMatterContributorStatus(CharSpan(contributorNameBuffer, contributorNameStr.size()), status);
+        
+        if (err == CHIP_NO_ERROR)
+        {
+            ChipLogProgress(NotSpecified, "Updated non-Matter contributor '%s' status to %s",
+                            contributorNameBuffer,
+                            status == AmbientSensingUnion::UnionContributorStatusEnum::kUnionContributorOnline ? "Online" : "Offline");
+        }
+    }
+    else
+    {
+        ChipLogError(NotSpecified, "Must specify either NodeId or ContributorName for UpdateAmbientSensingContributorStatus");
+        return;
+    }
+
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "Failed to update contributor status on endpoint %u: %" CHIP_ERROR_FORMAT, 
+                     endpointId, err.Format());
+    }
+}
+
+/**
+ * Named pipe handler for setting the union name.
+ *
+ * Usage example:
+ *   echo '{"Name": "SetAmbientSensingUnionName", "EndpointId": 1, "UnionName": "LivingRoomUnion"}' 
+ *        > /tmp/chip_all_clusters_fifo_1146610
+ */
+void HandleSetAmbientSensingUnionName(Json::Value & jsonValue)
+{
+    bool hasEndpointId = HasNumericField(jsonValue, "EndpointId");
+    bool hasUnionName  = jsonValue.isMember("UnionName") && jsonValue["UnionName"].isString();
+
+    if (!hasEndpointId || !hasUnionName)
+    {
+        std::string inputJson = jsonValue.toStyledString();
+        ChipLogError(NotSpecified, "Missing required fields for SetAmbientSensingUnionName in %s", inputJson.c_str());
+        return;
+    }
+
+    EndpointId endpointId = static_cast<EndpointId>(jsonValue["EndpointId"].asUInt());
+    
+    // Get the union name and validate length before processing
+    std::string unionNameStr = jsonValue["UnionName"].asString();
+    
+    if (unionNameStr.empty())
+    {
+        ChipLogError(NotSpecified, "UnionName cannot be empty");
+        return;
+    }
+    
+    // Validate length against cluster maximum
+    constexpr size_t kMaxUnionNameLength = AmbientSensingUnionCluster::kMaxUnionNameLength;
+    if (unionNameStr.size() > kMaxUnionNameLength)
+    {
+        ChipLogError(NotSpecified, "UnionName too long: %u > %u", 
+                     static_cast<unsigned>(unionNameStr.size()), 
+                     static_cast<unsigned>(kMaxUnionNameLength));
+        return;
+    }
+
+    auto cluster = AmbientSensingUnion::FindClusterOnEndpoint(endpointId);
+    if (cluster == nullptr)
+    {
+        ChipLogError(NotSpecified, "AmbientSensingUnion cluster not found on endpoint %u", endpointId);
+        return;
+    }
+
+    static char unionNameBuffer[kMaxUnionNameLength + 1];
+    memcpy(unionNameBuffer, unionNameStr.data(), unionNameStr.size());
+    unionNameBuffer[unionNameStr.size()] = '\0';
+
+    CHIP_ERROR err = cluster->SetUnionName(CharSpan(unionNameBuffer, unionNameStr.size()));
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "Failed to set union name on endpoint %u: %" CHIP_ERROR_FORMAT, endpointId, err.Format());
+    }
+    else
+    {
+        ChipLogProgress(NotSpecified, "Set union name to: %s on endpoint %u", unionNameBuffer, endpointId);
+    }
+}
+
 } // namespace
 
 AllClustersAppCommandHandler * AllClustersAppCommandHandler::FromJSON(const char * json)
@@ -640,6 +1041,30 @@ void AllClustersAppCommandHandler::HandleCommand(intptr_t context)
         {
             ChipLogError(NotSpecified, "Invalid Unmounted state to set.");
         }
+    }
+    else if (name == "AddAmbientSensingContributor")
+    {
+        HandleAddAmbientSensingContributor(self->mJsonValue);
+    }
+    else if (name == "RemoveAmbientSensingContributor")
+    {
+        HandleRemoveAmbientSensingContributor(self->mJsonValue);
+    }
+    else if (name == "AddAmbientSensingNonMatterContributor")
+    {
+        HandleAddAmbientSensingNonMatterContributor(self->mJsonValue);
+    }
+    else if (name == "RemoveAmbientSensingNonMatterContributor")
+    {
+        HandleRemoveAmbientSensingNonMatterContributor(self->mJsonValue);
+    }
+    else if (name == "UpdateAmbientSensingContributorStatus")
+    {
+        HandleUpdateAmbientSensingContributorStatus(self->mJsonValue);
+    }
+    else if (name == "SetAmbientSensingUnionName")
+    {
+        HandleSetAmbientSensingUnionName(self->mJsonValue);
     }
     else
     {
