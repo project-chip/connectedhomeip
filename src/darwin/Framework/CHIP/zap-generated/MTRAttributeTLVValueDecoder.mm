@@ -22067,6 +22067,16 @@ static id _Nullable DecodeAttributeValueForCommodityTariffCluster(AttributeId aA
                     } else {
                         newElement_1.predicted = nil;
                     }
+                    if (entry_1.externalID.HasValue()) {
+                        newElement_1.externalID = AsString(entry_1.externalID.Value());
+                        if (newElement_1.externalID == nil) {
+                            CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                            *aError = err;
+                            return nil;
+                        }
+                    } else {
+                        newElement_1.externalID = nil;
+                    }
                     [array_1 addObject:newElement_1];
                 }
                 CHIP_ERROR err = iter_1.GetStatus();
@@ -22253,6 +22263,16 @@ static id _Nullable DecodeAttributeValueForCommodityTariffCluster(AttributeId aA
                     } else {
                         newElement_1.predicted = nil;
                     }
+                    if (entry_1.externalID.HasValue()) {
+                        newElement_1.externalID = AsString(entry_1.externalID.Value());
+                        if (newElement_1.externalID == nil) {
+                            CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                            *aError = err;
+                            return nil;
+                        }
+                    } else {
+                        newElement_1.externalID = nil;
+                    }
                     [array_1 addObject:newElement_1];
                 }
                 CHIP_ERROR err = iter_1.GetStatus();
@@ -22366,6 +22386,16 @@ static id _Nullable DecodeAttributeValueForCommodityTariffCluster(AttributeId aA
                         newElement_1.predicted = [NSNumber numberWithBool:entry_1.predicted.Value()];
                     } else {
                         newElement_1.predicted = nil;
+                    }
+                    if (entry_1.externalID.HasValue()) {
+                        newElement_1.externalID = AsString(entry_1.externalID.Value());
+                        if (newElement_1.externalID == nil) {
+                            CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                            *aError = err;
+                            return nil;
+                        }
+                    } else {
+                        newElement_1.externalID = nil;
                     }
                     [array_1 addObject:newElement_1];
                 }
