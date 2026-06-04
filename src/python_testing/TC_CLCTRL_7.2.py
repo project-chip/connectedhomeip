@@ -193,7 +193,7 @@ class TC_CLCTRL_7_2(MatterBaseTest):
         self.groupcast_enabled = await is_groupcast_on_root_node(self)
 
         self.step(1)
-        attributes: typing.List[uint] = Clusters.ClosureControl.Attributes
+        attributes: list[uint] = Clusters.ClosureControl.Attributes
 
         self.step("2a")
         feature_map: uint = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.FeatureMap)

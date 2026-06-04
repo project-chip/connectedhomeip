@@ -40,7 +40,6 @@ from TC_GC_common import is_groupcast_on_root_node
 
 import matter.clusters as Clusters
 from matter.clusters.Types import Nullable, NullValue
-from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
 from matter.testing.matter_testing import AttributeMatcher, AttributeValue, MatterBaseTest
@@ -165,7 +164,7 @@ class TC_CLCTRL_7_4(MatterBaseTest):
         self.groupcast_enabled = await is_groupcast_on_root_node(self)
 
         self.step(1)
-        attributes: typing.List[uint] = Clusters.ClosureControl.Attributes
+        attributes: list[uint] = Clusters.ClosureControl.Attributes
 
         self.step("2a")
         feature_map: uint = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.FeatureMap)
@@ -174,7 +173,7 @@ class TC_CLCTRL_7_4(MatterBaseTest):
         log.info(f"FeatureMap: {feature_map}")
 
         self.step("2b")
-        attribute_list: typing.List[uint] = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.AttributeList)
+        attribute_list: list[uint] = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.AttributeList)
         is_countdown_time_supported: bool = attributes.CountdownTime.attribute_id in attribute_list
         log.info(f"AttributeList: {attribute_list}")
 
