@@ -93,7 +93,6 @@ public:
     WiFiPAFLayer * EpGetWiFiPafLayer() { return mEndPoint->mWiFiPafLayer; }
 
 private:
-
     WiFiPAFEndPoint * mEndPoint;
 };
 
@@ -447,12 +446,9 @@ TEST_F(TestWiFiPAFLayer, ReceiveConnectionTimerTimeout)
 
     // Verify timer expired, flag cleared, and endpoint closed successfully.
 
-
     EXPECT_FALSE(EpHasReceiveConnectionTimer());
     EXPECT_EQ(EpGetWiFiPafLayer(), nullptr);
 }
 
-
 }; // namespace WiFiPAF
 }; // namespace chip
-
