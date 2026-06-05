@@ -418,6 +418,13 @@ TEST_F(TestWiFiPAFLayer, CheckRunAsCommissionee)
     EpDoClose(kWiFiPAFCloseFlag_AbortTransmission, WIFIPAF_ERROR_APP_CLOSED_CONNECTION);
 }
 
+// TODO: Currently, chip::System::Layer lacks a unified virtual test abstraction
+// (such as `ServiceScheduledTimers()` or `StepEventLoop()`) allowing standalone unit
+// test runners to synchronously dispatch expired timer callbacks across diverse platform
+// implementations (POSIX Sockets, LwIP, FreeRTOS).
+// Consequently, this test directly downcasts to `System::LayerSelectLoop` internals to manually
+// extract and run pending timer entries, restricting execution exclusively to Sockets builds.
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 TEST_F(TestWiFiPAFLayer, ReceiveConnectionTimerTimeout)
 {
     System::Clock::Internal::RAIIMockClock clock;
@@ -441,14 +448,18 @@ TEST_F(TestWiFiPAFLayer, ReceiveConnectionTimerTimeout)
 
     // Advance mock clock past connection timeout deadline (5 seconds).
     clock.AdvanceMonotonic(System::Clock::Milliseconds64(PAFTP_CONN_RSP_TIMEOUT_MS + 100));
+
+    // Directly drive the underlying POSIX select loop to dispatch the expired timer.
     static_cast<System::LayerSelectLoop &>(DeviceLayer::SystemLayer()).PrepareEvents();
     static_cast<System::LayerSelectLoop &>(DeviceLayer::SystemLayer()).HandleEvents();
 
     // Verify timer expired, flag cleared, and endpoint closed successfully.
-
     EXPECT_FALSE(EpHasReceiveConnectionTimer());
+
     EXPECT_EQ(EpGetWiFiPafLayer(), nullptr);
 }
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
+
 
 }; // namespace WiFiPAF
 }; // namespace chip
