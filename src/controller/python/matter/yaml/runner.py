@@ -776,7 +776,7 @@ class WaitForAttributeValueAction(BaseAction):
                 'WaitForAttributeValue attribute doesn\'t have valid attribute_type')
 
     async def run_action(self, dev_ctrl: ChipDeviceController) -> _ActionResult:
-        start_time = time.time()
+        start_time = time.monotonic()
         timeout_s = (self._expected_duration_ms + self._extra_duration_ms) / 1000.0
         poll_interval_s = 0.1
 
@@ -793,16 +793,16 @@ class WaitForAttributeValueAction(BaseAction):
                 if not isinstance(resp, ValueDecodeFailure):
                     if resp == self._expected_value:
                         LOGGER.info(f"Attribute reached expected value {self._expected_value} "
-                                    f"after {time.time() - start_time:.2f}s")
+                                    f"after {time.monotonic() - start_time:.2f}s")
                         return _ActionResult(status=_ActionStatus.SUCCESS, response=None)
             except (AttributeError, NameError, TypeError):
                 # Let programming errors (bugs in our code or test definition)
                 # propagate immediately instead of timing out.
                 raise
-            except Exception as e:
+            except (MatterInteractionModel.InteractionModelError, ChipStackError, TimeoutError) as e:
                 LOGGER.debug(f"ReadAttribute failed during wait: {e}")
 
-            if time.time() - start_time >= timeout_s:
+            if time.monotonic() - start_time >= timeout_s:
                 break
 
             await asyncio.sleep(poll_interval_s)
