@@ -28,6 +28,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
 
+#include <mbedtls/ecp.h>
 #include <mbedtls/oid.h>
 #include <mbedtls/pk.h>
 #include <mbedtls/version.h>
@@ -35,8 +36,6 @@
 
 #if (MBEDTLS_VERSION_NUMBER >= 0x04000000)
 #include <psa/crypto.h>
-#else
-#include <mbedtls/ecp.h>
 #endif // (MBEDTLS_VERSION_NUMBER >= 0x04000000)
 
 #include <mbedtls/x509_csr.h>
