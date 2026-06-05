@@ -114,15 +114,65 @@ private:
         kOperationInFlight        = 0x20  // Operation in flight,
     };
 
+    // clang-format off
+    /*
+     * +--------------------------------------------------------------------------------+
+     * |                   PHASE 1: CONNECTION SETUP SUPERVISION                        |
+
+     * +--------------------------------------------------------------------------------+
+     *         [Subscriber Role]                              [Publisher Role]
+     *    HandleTransportConnect()                   HandleTransportConnectionInitiated()
+     *       --> StartConnect()                                       |
+     *               |                                                |
+     *               v                                                v
+     *    +----------------------+                         +----------------------+
+     *    | kConnectTimerRunning |                         |kReceiveConnectionTimer
+     *    |       (5000ms)       |                         |       (5000ms)       |
+     *    +----------------------+                         +----------------------+
+     *         |            |                                   |            |
+     *   (Handshake     (Timeout)                         (Handshake     (Timeout)
+     *    Complete)         |                              Complete)         |
+     *         |            v                                   |            v
+     *         |      [DoClose w/                               |      [DoClose w/
+     *         |    CONNECT_TIMED_OUT]                          |   RECEIVE_TIMED_OUT]
+     *         |                                                |
+     *         +-----------------------+------------------------+
+     *                                 |
+     *                                 v
+     *                    +--------------------------+
+     *                    |     kState_Connected     |
+     *                    +--------------------------+
+     *
+     * +--------------------------------------------------------------------------------+
+     * |                    PHASE 2: DATA & ACK TRANSMISSION                            |
+     * +--------------------------------------------------------------------------------+
+     *
+     *         [Transmit Payload]                     [Receive Fragment w/ Ack Req]
+     *                  |                                           |
+     *                  v                                           v
+     *      +--------------------------+                +--------------------------+
+     *      | kAckReceivedTimerRunning |                |   kSendAckTimerRunning   |
+     *      |        (5000ms)          |                |         (200ms)          |
+     *      +--------------------------+                +--------------------------+
+     *          |                  |                        |                  |
+     *     (Ack Arrives)       (Timeout)                (Timeout)         (Piggybacked
+     *          |                  |                        |                on Tx)
+     *          v                  v                        v                  |
+     *    [StopAckTimer]    [Resend/Close]        [DriveStandAloneAck]         v
+     *                                                                  [StopSendAckTimer]
+     */
+    // clang-format on
     enum class TimerStateFlag : uint8_t
     {
+
         kConnectTimerRunning     = 0x01, // PAFTP connect completion timer running.
         kWaitResTimerRunning     = 0x02, // Wait for resource to be available
         kAckReceivedTimerRunning = 0x04, // Ack received timer running due to unacked sent fragment.
         kSendAckTimerRunning     = 0x08, // Send ack timer running; indicates pending ack to send.
         kReceiveConnectionTimerRunning = 0x10, // Receive connection timer running.
-
     };
+
+
 
     // Queue of outgoing messages to send when current PAFTPEngine transmission completes.
     // Re-used during connection setup to cache capabilities request and response payloads; payloads are freed when
@@ -178,16 +228,16 @@ private:
     void StopConnectTimer();              // Stop connect timer.
     void StopReceiveConnectionTimer();    // Stop receive connection timer.
     void StopAckReceivedTimer();          // Stop ack-received timer.
-
     void StopSendAckTimer();              // Stop send-ack timer.
+
     void StopWaitResourceTimer();         // Stop wait-resource timer
 
     // Timer expired callbacks:
     static void HandleConnectTimeout(chip::System::Layer * systemLayer, void * appState);
     static void HandleReceiveConnectionTimeout(chip::System::Layer * systemLayer, void * appState);
     static void HandleAckReceivedTimeout(chip::System::Layer * systemLayer, void * appState);
-
     static void HandleSendAckTimeout(chip::System::Layer * systemLayer, void * appState);
+
     static void HandleWaitResourceTimeout(chip::System::Layer * systemLayer, void * appState);
 
     // Close functions:
