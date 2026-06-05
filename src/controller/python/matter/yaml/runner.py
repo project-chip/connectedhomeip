@@ -791,7 +791,8 @@ class WaitForAttributeValueAction(BaseAction):
 
                 resp = raw_resp[self._endpoint][self._cluster_object][self._request_object]
                 if not isinstance(resp, ValueDecodeFailure):
-                    if resp == self._expected_value:
+                    return_val = self._request_object(resp)
+                    if return_val.get('value') == self._expected_value:
                         LOGGER.info(f"Attribute reached expected value {self._expected_value} "
                                     f"after {time.monotonic() - start_time:.2f}s")
                         return _ActionResult(status=_ActionStatus.SUCCESS, response=None)
