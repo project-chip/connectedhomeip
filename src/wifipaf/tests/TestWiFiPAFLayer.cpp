@@ -460,6 +460,5 @@ TEST_F(TestWiFiPAFLayer, ReceiveConnectionTimerTimeout)
 }
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
-
 }; // namespace WiFiPAF
 }; // namespace chip
