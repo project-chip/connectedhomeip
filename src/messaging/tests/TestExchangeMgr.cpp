@@ -121,7 +121,10 @@ TEST_F(TestExchangeMgr, CheckNewContextTest)
 
     ExchangeContext * ec2 = NewExchangeToAlice(&mockAppDelegate);
     ASSERT_NE(ec2, nullptr);
-    EXPECT_GT(ec2->GetExchangeId(), ec1->GetExchangeId());
+    // Exchange IDs are a 16-bit counter seeded randomly at init, so check that the
+    // second exchange got the next ID rather than a strictly larger one: the counter
+    // wraps (e.g. 0xFFFF -> 0x0000) and a `>` check is flaky across that boundary.
+    EXPECT_EQ(ec2->GetExchangeId(), static_cast<uint16_t>(ec1->GetExchangeId() + 1));
     EXPECT_EQ(ec2->GetSessionHandle(), GetSessionBobToAlice());
 
     ec1->Close();
