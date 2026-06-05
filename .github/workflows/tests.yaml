@@ -41,7 +41,6 @@ concurrency:
 
 env:
     CHIP_LOG_TIMESTAMPS: false
-    VALUE_WAIT_EXTRA_DURATION_MS: 5000
 
 jobs:
     test_suites_linux:
@@ -377,6 +376,7 @@ jobs:
                      --target TestOperationalState \
                      --test-order random \
                      run \
+                     --value-wait-extra-duration-ms 5000 \
                      --iterations 1 \
                      --test-timeout-seconds 120 \
                      --tool-path chip-tool:./objdir-clone/linux-x64-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT}/chip-tool \
@@ -397,6 +397,7 @@ jobs:
                      --runner chip_tool_python \
                      --target TestOperationalState \
                      run \
+                     --value-wait-extra-duration-ms 5000 \
                      --iterations 1 \
                      --test-timeout-seconds 120 \
                      --tool-path chip-tool:./objdir-clone/linux-x64-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT}/chip-tool \
@@ -415,6 +416,7 @@ jobs:
                      --runner chip_tool_python \
                      --test-order random \
                      run \
+                     --value-wait-extra-duration-ms 5000 \
                      --iterations 1 \
                      --test-timeout-seconds 120 \
                      --tool-path chip-tool:./objdir-clone/linux-x64-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT}/chip-tool \
@@ -445,6 +447,7 @@ jobs:
                      --include-tags PURPOSEFUL_FAILURE \
                      --test-order random \
                      run \
+                     --value-wait-extra-duration-ms 5000 \
                      --iterations 1 \
                      --expected-failures 3 \
                      --keep-going \
@@ -469,6 +472,7 @@ jobs:
                      --target TestOperationalState \
                      --test-order random \
                      run \
+                     --value-wait-extra-duration-ms 5000 \
                      --iterations 1 \
                      --test-timeout-seconds 120 \
                      --tool-path chip-tool:./objdir-clone/linux-x64-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT}/chip-tool \
@@ -492,6 +496,7 @@ jobs:
                      --target TestOperationalState \
                      --test-order random \
                      run \
+                     --value-wait-extra-duration-ms 5000 \
                      --iterations 1 \
                      --test-timeout-seconds 120 \
                      --tool-path chip-tool:./objdir-clone/linux-x64-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT}/chip-tool \
@@ -515,6 +520,7 @@ jobs:
                      --exclude-tags PURPOSEFUL_FAILURE \
                      --test-order random \
                      run \
+                     --value-wait-extra-duration-ms 5000 \
                      --iterations 1 \
                      --test-timeout-seconds 120 \
                      --app-path all-clusters:./objdir-clone/linux-x64-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
@@ -543,6 +549,7 @@ jobs:
                      --runner matter_repl_python \
                      --test-order random \
                      run \
+                     --value-wait-extra-duration-ms 5000 \
                      --iterations 1 \
                      --test-timeout-seconds 120 \
                      --app-path all-clusters:./objdir-clone/linux-x64-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
@@ -724,6 +731,7 @@ jobs:
                      --target-skip-glob '{Test_TC_DGTHREAD_2_1,Test_TC_DGTHREAD_2_2,Test_TC_DGTHREAD_2_3,Test_TC_DGTHREAD_2_4}' \
                      --test-order random \
                      run \
+                     --value-wait-extra-duration-ms 5000 \
                      --iterations 1 \
                      --test-timeout-seconds 120 \
                      --tool-path chip-tool:./objdir-clone/darwin-${{matrix.arch}}-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT}/chip-tool \
@@ -756,6 +764,7 @@ jobs:
                      --include-tags PURPOSEFUL_FAILURE \
                      --test-order random \
                      run \
+                     --value-wait-extra-duration-ms 5000 \
                      --iterations 1 \
                      --expected-failures 3 \
                      --keep-going \
