@@ -179,6 +179,7 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
 {
     MATTER_TRACE_SCOPE("PrepareMessage", "SessionManager");
 
+    bool headerEncoded = false;
     PacketHeader packetHeader;
     bool isControlMsg = IsControlMessage(payloadHeader);
     if (isControlMsg)
@@ -217,6 +218,7 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
         packetHeader.SetMessageCounter(mGroupClientCounter.GetCounter(isControlMsg));
         TEMPORARY_RETURN_IGNORED mGroupClientCounter.IncrementCounter(isControlMsg);
         packetHeader.SetSessionType(Header::SessionType::kGroupSession);
+        packetHeader.SetFlags(Header::SecFlagValues::kPrivacyFlag);
         sourceNodeId = fabric->GetNodeId();
         packetHeader.SetSourceNodeId(sourceNodeId);
 
@@ -234,6 +236,8 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
         Crypto::SymmetricKeyContext * keyContext =
             groups->GetKeyContext(groupSession->GetFabricIndex(), groupSession->GetGroupId());
         VerifyOrReturnError(nullptr != keyContext, CHIP_ERROR_INTERNAL);
+        AutoRelease<Crypto::SymmetricKeyContext> keyContextOwner(keyContext);
+
         packetHeader.SetSessionId(keyContext->GetKeyHash());
         CryptoContext cryptoContext(keyContext);
 
@@ -249,8 +253,44 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
         ReturnErrorOnFailure(
             CryptoContext::BuildNonce(nonce, packetHeader.GetSecurityFlags(), packetHeader.GetMessageCounter(), sourceNodeId));
         CHIP_ERROR err = SecureMessageCodec::Encrypt(cryptoContext, nonce, payloadHeader, packetHeader, message);
-        keyContext->Release();
         ReturnErrorOnFailure(err);
+
+        // Encode header now so we can privacy encrypt it
+        ReturnErrorOnFailure(packetHeader.EncodeBeforeData(message));
+        headerEncoded = true;
+
+        // Privacy Encrypt
+        uint8_t * data     = message->Start();
+        size_t len         = message->DataLength();
+        uint16_t footerLen = packetHeader.MICTagLength();
+        VerifyOrReturnError(footerLen <= len, CHIP_ERROR_INTERNAL);
+
+        uint16_t taglen = 0;
+        MessageAuthenticationCode mac;
+        ReturnErrorOnFailure(mac.Decode(packetHeader, &data[len - footerLen], footerLen, &taglen));
+        VerifyOrReturnError(taglen == footerLen, CHIP_ERROR_INTERNAL);
+
+        // Pointer to the start of the privacy header within the message buffer.
+        // The privacy header contains fields that need to be privacy-encrypted (e.g. Session ID, Message Counter).
+        uint8_t * privacyHeader = packetHeader.PrivacyHeader(message->Start());
+        size_t privacyLength    = packetHeader.PrivacyHeaderLength();
+
+        // We must ensure that:
+        // 1. The privacy header starts within the message buffer.
+        // 2. The privacy header lies entirely within the encoded packet header bounds (to prevent encrypting payload).
+        // 3. The packet header lies entirely within the valid message buffer bounds.
+        //
+        // (privacyHeader + privacyLength): Pointer to the end of the privacy header.
+        // (message->Start() + packetHeader.EncodeSizeBytes()): Pointer to the end of the packet header.
+        // (message->Start() + message->DataLength()): Pointer to the end of the valid message data in the buffer.
+        uint8_t * privacyHeaderEnd = (privacyHeader + privacyLength);
+        uint8_t * headerEnd        = (message->Start() + packetHeader.EncodeSizeBytes());
+        uint8_t * messageEnd       = (message->Start() + message->DataLength());
+
+        VerifyOrReturnError(privacyHeader >= message->Start(), CHIP_ERROR_INTERNAL);
+        VerifyOrReturnError(privacyHeaderEnd <= headerEnd, CHIP_ERROR_INTERNAL);
+        VerifyOrReturnError(headerEnd <= messageEnd, CHIP_ERROR_INTERNAL);
+        ReturnErrorOnFailure(cryptoContext.PrivacyEncrypt(privacyHeader, privacyLength, privacyHeader, packetHeader, mac));
 
 #if CHIP_PROGRESS_LOGGING
         destination = NodeIdFromGroupId(groupSession->GetGroupId());
@@ -342,7 +382,10 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
         return CHIP_ERROR_INTERNAL;
     }
 
-    ReturnErrorOnFailure(packetHeader.EncodeBeforeData(message));
+    if (!headerEncoded)
+    {
+        ReturnErrorOnFailure(packetHeader.EncodeBeforeData(message));
+    }
 
 #if CHIP_PROGRESS_LOGGING
     CompressedFabricId compressedFabricId = kUndefinedCompressedFabricId;
