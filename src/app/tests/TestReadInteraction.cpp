@@ -584,6 +584,7 @@ public:
     void TestSubscribeUrgentWildcardEvent();
     void TestSubscribeWildcard();
     void TestSubscriptionReportWithDefunctSession();
+    void TestOnUnsolicitedReportDataSafeListIteration();
 
     enum class ReportType : uint8_t
     {
@@ -5385,6 +5386,124 @@ void TestReadInteraction::TestSubscriptionReportWithDefunctSession()
     // Get rid of our defunct session.
     ExpireSessionAliceToBob();
     EXPECT_SUCCESS(CreateSessionAliceToBob());
+}
+
+} // namespace app
+} // namespace chip
+
+// Regression test: OnUnsolicitedReportData must safely iterate mpActiveReadClientList when a ReadClient
+// removes itself during the callback (via TriggerResubscribeIfScheduled -> Close -> destructor -> RemoveReadClient).
+// Before the fix, the loop used readClient->GetNextClient() after the callback, dereferencing freed memory.
+namespace chip {
+namespace app {
+
+// Callback that destroys the ReadClient in OnDone, simulating real app behavior.
+class SelfDestructingCallback : public ReadClient::Callback
+{
+public:
+    void OnError(CHIP_ERROR) override { mGotError = true; }
+    void OnDone(ReadClient * apReadClient) override
+    {
+        mOnDoneCalled = true;
+        // Real apps destroy the ReadClient here, which triggers RemoveReadClient.
+        // We use the pointer stashed by the test.
+        if (mDestroyClient)
+        {
+            chip::Platform::Delete(apReadClient);
+        }
+    }
+    void OnDeallocatePaths(ReadPrepareParams && aReadPrepareParams) override {}
+
+    bool mOnDoneCalled  = false;
+    bool mGotError      = false;
+    bool mDestroyClient = false;
+};
+
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestOnUnsolicitedReportDataSafeListIteration)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteractionSync, TestOnUnsolicitedReportDataSafeListIteration)
+void TestReadInteraction::TestOnUnsolicitedReportDataSafeListIteration()
+{
+    auto * engine = chip::app::InteractionModelEngine::GetInstance();
+    EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), gReportScheduler), CHIP_NO_ERROR);
+
+    // Set up two subscriptions from the same peer so both are visited during OnUnsolicitedReportData iteration.
+    SelfDestructingCallback delegateA;
+    SelfDestructingCallback delegateB;
+
+    ReadPrepareParams readPrepareParams(GetSessionBobToAlice());
+    chip::app::AttributePathParams attributePathParams[1];
+    attributePathParams[0].mEndpointId             = kTestEndpointId;
+    attributePathParams[0].mClusterId              = kTestClusterId;
+    attributePathParams[0].mAttributeId            = 1;
+    readPrepareParams.mpAttributePathParamsList    = attributePathParams;
+    readPrepareParams.mAttributePathParamsListSize = 1;
+    readPrepareParams.mMinIntervalFloorSeconds     = 2;
+    readPrepareParams.mMaxIntervalCeilingSeconds   = 5;
+
+    // Create two subscribe ReadClients.
+    // Use heap allocation so SelfDestructingCallback can delete them in OnDone.
+    auto * readClientA =
+        chip::Platform::New<ReadClient>(engine, &GetExchangeManager(), delegateA, ReadClient::InteractionType::Subscribe);
+    auto * readClientB =
+        chip::Platform::New<ReadClient>(engine, &GetExchangeManager(), delegateB, ReadClient::InteractionType::Subscribe);
+
+    EXPECT_EQ(readClientA->SendRequest(readPrepareParams), CHIP_NO_ERROR);
+    DrainAndServiceIO();
+    EXPECT_EQ(readClientB->SendRequest(readPrepareParams), CHIP_NO_ERROR);
+    DrainAndServiceIO();
+
+    EXPECT_EQ(engine->GetNumActiveReadClients(), 2u);
+
+    // Put readClientA into resubscription-scheduled state so that OnUnsolicitedMessageFromPublisher()
+    // will trigger TriggerResubscribeIfScheduled() -> OnResubscribeTimerCallback() -> Close().
+    // First, mark the session defunct so OnResubscribeTimerCallback will fail to send and call Close().
+    readClientA->mReadPrepareParams.mSessionHolder->AsSecureSession()->MarkAsDefunct();
+    readClientA->MoveToState(ReadClient::ClientState::Idle);
+    readClientA->mIsResubscriptionScheduled = true;
+    readClientA->mForceCaseOnNextResub      = true; // Forces Close with allowResubscription=false
+
+    // Tell delegateA to destroy the ReadClient in OnDone (simulating real app behavior).
+    delegateA.mDestroyClient = true;
+
+    // Build an unsolicited report with readClientB's subscription ID so the iteration visits both clients.
+    System::PacketBufferHandle msgBuf = System::PacketBufferHandle::New(kMaxSecureSduLengthBytes);
+    ASSERT_FALSE(msgBuf.IsNull());
+    System::PacketBufferTLVWriter writer;
+    writer.Init(std::move(msgBuf));
+    ReportDataMessage::Builder response;
+    EXPECT_SUCCESS(response.Init(&writer));
+    response.SubscriptionId(readClientB->mSubscriptionId);
+    EXPECT_SUCCESS(response.EndOfReportDataMessage());
+    EXPECT_EQ(writer.Finalize(&msgBuf), CHIP_NO_ERROR);
+
+    // Send the unsolicited report. This exercises OnUnsolicitedReportData which iterates
+    // mpActiveReadClientList. readClientA will self-destruct during iteration.
+    // Without the safe-iteration fix, this would crash with use-after-free.
+    ASSERT_NE(engine->ActiveHandlerAt(0), nullptr);
+    auto * readHandler = engine->ActiveHandlerAt(0);
+
+    GetLoopback().mSentMessageCount = 0;
+    auto exchange = engine->GetExchangeManager()->NewContext(readHandler->mSessionHandle.Get().Value(), readHandler);
+    readHandler->mExchangeCtx.Grab(exchange);
+
+    EXPECT_EQ(readHandler->mExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::ReportData, std::move(msgBuf),
+                                                     Messaging::SendMessageFlags::kExpectResponse),
+              CHIP_NO_ERROR);
+    DrainAndServiceIO();
+
+    // readClientA should have been destroyed via OnDone.
+    EXPECT_TRUE(delegateA.mOnDoneCalled);
+
+    // The iteration should have continued safely to readClientB (no crash = test passes).
+    // readClientB is still alive.
+    EXPECT_GE(engine->GetNumActiveReadClients(), 1u);
+
+    // Cleanup: destroy readClientB.
+    delegateB.mDestroyClient = true;
+    chip::Platform::Delete(readClientB);
+
+    engine->Shutdown();
+    EXPECT_EQ(engine->GetNumActiveReadClients(), 0u);
 }
 
 } // namespace app
