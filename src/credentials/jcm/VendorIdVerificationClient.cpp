@@ -129,9 +129,11 @@ CHIP_ERROR VendorIdVerificationClient::VerifyVendorId(Messaging::ExchangeManager
 {
     ChipLogProgress(Controller, "Performing vendor ID verification for vendor ID: %u", info->adminVendorId);
 
-    // Generate a 32-octet random challenge
-    uint8_t kClientChallenge[32];
-    TEMPORARY_RETURN_IGNORED Crypto::DRBG_get_bytes(kClientChallenge, sizeof(kClientChallenge));
+    // Generate a 32-octet random challenge. On entropy/DRBG failure the buffer is left untouched, so
+    // propagate the error rather than sending an indeterminate challenge that is folded into the
+    // signed TBS. The caller maps a non-NO_ERROR return to verification failure.
+    uint8_t kClientChallenge[32] = {};
+    ReturnLogErrorOnFailure(Crypto::DRBG_get_bytes(kClientChallenge, sizeof(kClientChallenge)));
     ByteSpan clientChallengeSpan{ kClientChallenge };
     chip::app::Clusters::OperationalCredentials::Commands::SignVIDVerificationRequest::Type request;
 
