@@ -460,7 +460,7 @@ tests:
                 value: 0x01
 
     - label: "Wait for the DUT to reach AC1 (CurrentLevel -> 100)"
-      PICS: PICS_SDK_CI_ONLY && S.S.C05.Rsp
+      PICS: PICS_SDK_CI_ONLY
       cluster: "DelayCommands"
       command: "WaitForAttributeValue"
       arguments:
