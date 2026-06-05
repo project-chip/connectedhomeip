@@ -97,6 +97,7 @@ public:
      * @param response A reference to a response that will be sent to the client. The contents of which con be modified by the
      * application.
      *
+     * @return Returns a void since any errors are to be reported in the response.status value.
      */
     virtual void HandleChangeToMode(uint8_t NewMode, ModeBase::Commands::ChangeToModeResponse::Type & response) = 0;
 };

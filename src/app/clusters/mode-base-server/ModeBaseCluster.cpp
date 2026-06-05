@@ -374,11 +374,25 @@ void ModeBaseCluster::LoadNullableScalarValue(const ConcreteAttributePath & path
         Status status = func(value);
         if (status == Status::Success)
         {
-            ChipLogDetail(Zcl, "ModeBase: Loaded %s as %u", attributeName, value.Value());
+            if (!value.IsNull())
+            {
+                ChipLogDetail(Zcl, "ModeBase: Loaded %s as %u", attributeName, value.Value());
+            }
+            else
+            {
+                ChipLogDetail(Zcl, "ModeBase: Loaded %s as null", attributeName);
+            }
         }
         else
         {
-            ChipLogError(Zcl, "ModeBase: Could not update %s to %u: %u", attributeName, value.Value(), to_underlying(status));
+            if (!value.IsNull())
+            {
+                ChipLogError(Zcl, "ModeBase: Could not update %s to %u: %u", attributeName, value.Value(), to_underlying(status));
+            }
+            else
+            {
+                ChipLogError(Zcl, "ModeBase: Could not update %s to null: %u", attributeName, to_underlying(status));
+            }
         }
     }
     else

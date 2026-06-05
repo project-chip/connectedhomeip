@@ -61,12 +61,8 @@ Instance::Instance(Delegate * aDelegate, EndpointId aEndpointId, ClusterId aClus
 
 Instance::~Instance()
 {
-    // Call Deinit() to clean up and unregister the cluster if it is constructed.
-    // Return value is safely ignored because we are in the destructor and this is just
-    // a cleanup and we do not want to Log the error because Deinit() is part of the API
-    // and could be called directly by the app.
-    // If the cluster is not constructed, Deinit() will return CHIP_ERROR_INCORRECT_STATE.
-    RETURN_SAFELY_IGNORED Deinit();
+    // Call Shutdown() to clean up and unregister the cluster if it is constructed.
+    Shutdown();
 }
 
 CHIP_ERROR Instance::Init()
@@ -111,13 +107,9 @@ CHIP_ERROR Instance::Init()
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    if (emberAfContainsAttribute(mClusterPath.mEndpointId, mClusterPath.mClusterId, StartUpMode::Id))
-    {
-        mOptionalAttributeSet.Set<StartUpMode::Id>();
-    }
-
     // Although StartUpMode attribute is optional, spec says that none of the aliased clusters supports it.
-    VerifyOrReturnError(!mOptionalAttributeSet.IsSet(StartUpMode::Id), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(!emberAfContainsAttribute(mClusterPath.mEndpointId, mClusterPath.mClusterId, StartUpMode::Id),
+                        CHIP_ERROR_INCORRECT_STATE);
 
     bool onOffValueForStartUp = false;
 
@@ -162,15 +154,6 @@ CHIP_ERROR Instance::Init()
     mCluster.Create(mClusterPath.mEndpointId, mClusterPath.mClusterId, config);
     RegisterThisInstance();
     return CodegenDataModelProvider::Instance().Registry().Register(mCluster.Registration());
-}
-
-CHIP_ERROR Instance::Deinit()
-{
-    VerifyOrReturnError(mDelegate != nullptr, CHIP_NO_ERROR);
-    mDelegate->SetInstance(nullptr);
-    UnregisterThisInstance();
-    VerifyOrReturnError(mCluster.IsConstructed(), CHIP_ERROR_INCORRECT_STATE);
-    return CodegenDataModelProvider::Instance().Registry().Unregister(&(mCluster.Cluster()));
 }
 
 Status Instance::UpdateCurrentMode(uint8_t aNewMode)
@@ -242,8 +225,17 @@ void Instance::UnregisterThisInstance()
 
 void Instance::Shutdown()
 {
-    RETURN_SAFELY_IGNORED Deinit();
-    mDelegate = nullptr;
+    if (mDelegate != nullptr)
+    {
+        mDelegate->SetInstance(nullptr);
+        mDelegate = nullptr;
+    }
+    UnregisterThisInstance();
+    if (mCluster.IsConstructed())
+    {
+        LogErrorOnFailure(CodegenDataModelProvider::Instance().Registry().Unregister(&(mCluster.Cluster())));
+        mCluster.Destroy();
+    }
 }
 
 } // namespace chip::app::Clusters::ModeBase

@@ -53,12 +53,6 @@ public:
      */
     CHIP_ERROR Init();
 
-    /**
-     * @brief Uninitialise the ModeBase cluster instance.
-     * @return Returns an error if the CommandHandler unregistration fails, else returns CHIP_NO_ERROR.
-     */
-    CHIP_ERROR Deinit();
-
     // Attribute setters
     /**
      * Sets the Current-Mode attribute. Note, this also handles writing the new value into non-volatile storage.
