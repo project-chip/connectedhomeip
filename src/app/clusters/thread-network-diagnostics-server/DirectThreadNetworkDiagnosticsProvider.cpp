@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#include <app/clusters/thread-network-diagnostics-server/ThreadNetworkDiagnosticsProvider.h>
+#include <app/clusters/thread-network-diagnostics-server/DirectThreadNetworkDiagnosticsProvider.h>
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/data-model/Encode.h>
@@ -56,7 +56,7 @@ namespace chip::app::Clusters::ThreadNetworkDiagnostics {
  *       (2) Otherwise
  *           - Encode a NULL value for nullable attributes or 0 for the others.
  */
-CHIP_ERROR WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId, app::AttributeValueEncoder & encoder)
+CHIP_ERROR DirectThreadNetworkDiagnosticsProvider::ReadAttribute(AttributeId attributeId, app::AttributeValueEncoder & encoder)
 {
     CHIP_ERROR err;
 #if (CHIP_DEVICE_CONFIG_ENABLE_THREAD && !CHIP_DEVICE_CONFIG_USES_OTBR_POSIX_DBUS_STACK)
@@ -730,6 +730,11 @@ CHIP_ERROR WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId, a
     }
 #endif // (CHIP_DEVICE_CONFIG_ENABLE_THREAD && !CHIP_DEVICE_CONFIG_USES_OTBR_POSIX_DBUS_STACK)
     return err;
+}
+
+void DirectThreadNetworkDiagnosticsProvider::ResetCounts()
+{
+    DeviceLayer::ConnectivityMgr().ResetThreadNetworkDiagnosticsCounts();
 }
 
 } // namespace chip::app::Clusters::ThreadNetworkDiagnostics

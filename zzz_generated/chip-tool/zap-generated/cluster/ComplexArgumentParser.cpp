@@ -9706,6 +9706,13 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     }
     valueCopy.removeMember("predicted");
 
+    if (value.isMember("externalID"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "externalID");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.externalID, value["externalID"]));
+    }
+    valueCopy.removeMember("externalID");
+
     return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
 }
 
@@ -9720,6 +9727,7 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::CommodityTariff::Struc
     ComplexArgumentParser::Finalize(request.threshold);
     ComplexArgumentParser::Finalize(request.label);
     ComplexArgumentParser::Finalize(request.predicted);
+    ComplexArgumentParser::Finalize(request.externalID);
 }
 
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
