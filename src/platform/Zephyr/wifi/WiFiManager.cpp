@@ -606,7 +606,7 @@ void WiFiManager::DisconnectHandler(Platform::UniquePtr<uint8_t> data, size_t le
             break;
         }
 #else
-        reason = status->disconn_reason;
+        reason               = status->disconn_reason;
 #endif
         Instance().SetLastDisconnectReason(reason);
 
