@@ -228,7 +228,6 @@ void Instance::Shutdown()
     if (mDelegate != nullptr)
     {
         mDelegate->SetInstance(nullptr);
-        mDelegate = nullptr;
     }
     UnregisterThisInstance();
     if (mCluster.IsConstructed())
