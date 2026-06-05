@@ -167,6 +167,9 @@ protected:
 
 private:
     Delegate * mDelegate;
+    // ClusterRevision is not a fixed constant for this class: it varies by the concrete (derived)
+    // cluster. OperationalState and RvcOperationalState are at revision 3, while OvenCavityOperationalState
+    // is at revision 2, so each derived class passes its own value through the protected constructor.
     const uint32_t mRevision;
     const Config mConfig;
 

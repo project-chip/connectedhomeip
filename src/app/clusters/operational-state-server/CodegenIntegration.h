@@ -24,6 +24,7 @@
 
 #include "OperationalStateDelegate.h"
 #include <app/server-cluster/ServerClusterInterfaceRegistry.h>
+#include <lib/support/CHIPMem.h>
 
 namespace chip {
 namespace app {
@@ -101,8 +102,9 @@ protected:
 private:
     Delegate * mDelegate;
     // mOwnedStorage declared before mCluster so it is initialized first in the standalone constructor,
-    // allowing mCluster to be bound to the storage's cluster object.
-    detail::OperationalInstanceBase * mOwnedStorage = nullptr;
+    // allowing mCluster to be bound to the storage's cluster object. Held by Platform::UniquePtr so the
+    // storage lifetime is managed automatically (no manual delete) and the type is non-copyable.
+    Platform::UniquePtr<detail::OperationalInstanceBase> mOwnedStorage;
     OperationalStateCluster & mCluster;
     ServerClusterRegistration * mRegPtr;
 };
