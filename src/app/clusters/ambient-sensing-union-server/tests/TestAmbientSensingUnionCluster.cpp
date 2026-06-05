@@ -153,8 +153,8 @@ TEST_F(TestAmbientSensingUnionCluster, TestReadUnionName)
     chip::Testing::TestServerClusterContext context;
     constexpr char kTestName[] = "LivingRoomUnion";
 
-    AmbientSensingUnionCluster cluster{
-        AmbientSensingUnionCluster::Config{ kTestEndpointId }.WithUnionName(CharSpan::fromCharString(kTestName)) };
+    AmbientSensingUnionCluster cluster{ AmbientSensingUnionCluster::Config{ kTestEndpointId }.WithUnionName(
+        CharSpan::fromCharString(kTestName)) };
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
     chip::Testing::ClusterTester tester(cluster);
 
@@ -230,8 +230,7 @@ TEST_F(TestAmbientSensingUnionCluster, TestReadEmptyContributorList)
 TEST_F(TestAmbientSensingUnionCluster, TestWriteUnionName)
 {
     chip::Testing::TestServerClusterContext context;
-    AmbientSensingUnionCluster cluster{
-        AmbientSensingUnionCluster::Config{ kTestEndpointId }.WithDelegate(&mDelegate) };
+    AmbientSensingUnionCluster cluster{ AmbientSensingUnionCluster::Config{ kTestEndpointId }.WithDelegate(&mDelegate) };
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
     chip::Testing::ClusterTester tester(cluster);
 
@@ -250,8 +249,7 @@ TEST_F(TestAmbientSensingUnionCluster, TestWriteUnionName)
 TEST_F(TestAmbientSensingUnionCluster, TestWriteUnionNameViaSetMethod)
 {
     chip::Testing::TestServerClusterContext context;
-    AmbientSensingUnionCluster cluster{
-        AmbientSensingUnionCluster::Config{ kTestEndpointId }.WithDelegate(&mDelegate) };
+    AmbientSensingUnionCluster cluster{ AmbientSensingUnionCluster::Config{ kTestEndpointId }.WithDelegate(&mDelegate) };
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
     constexpr char kNewName[] = "KitchenUnion";
@@ -307,15 +305,14 @@ TEST_F(TestAmbientSensingUnionCluster, TestWriteUnionNameTooLong)
     memset(tooLongName, 'A', 129);
     tooLongName[129] = '\0';
 
-    EXPECT_EQ(tester.WriteAttribute(Attributes::UnionName::Id, CharSpan(tooLongName, 129)),
-              CHIP_IM_GLOBAL_STATUS(ConstraintError));
+    EXPECT_EQ(tester.WriteAttribute(Attributes::UnionName::Id, CharSpan(tooLongName, 129)), CHIP_IM_GLOBAL_STATUS(ConstraintError));
 }
 
 TEST_F(TestAmbientSensingUnionCluster, TestWriteUnionNameEmptyString)
 {
     chip::Testing::TestServerClusterContext context;
-    AmbientSensingUnionCluster cluster{
-        AmbientSensingUnionCluster::Config{ kTestEndpointId }.WithUnionName(CharSpan::fromCharString("InitialName")) };
+    AmbientSensingUnionCluster cluster{ AmbientSensingUnionCluster::Config{ kTestEndpointId }.WithUnionName(
+        CharSpan::fromCharString("InitialName")) };
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
     chip::Testing::ClusterTester tester(cluster);
 
@@ -334,8 +331,7 @@ TEST_F(TestAmbientSensingUnionCluster, TestWriteUnionNameEmptyString)
 TEST_F(TestAmbientSensingUnionCluster, TestAddMatterContributor)
 {
     chip::Testing::TestServerClusterContext context;
-    AmbientSensingUnionCluster cluster{
-        AmbientSensingUnionCluster::Config{ kTestEndpointId }.WithDelegate(&mDelegate) };
+    AmbientSensingUnionCluster cluster{ AmbientSensingUnionCluster::Config{ kTestEndpointId }.WithDelegate(&mDelegate) };
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
     EXPECT_EQ(cluster.AddMatterContributor(kTestNodeId1, kContributorEp1, UnionContributorStatusEnum::kUnionContributorOnline),
@@ -373,8 +369,7 @@ TEST_F(TestAmbientSensingUnionCluster, TestAddMultipleMatterContributors)
 TEST_F(TestAmbientSensingUnionCluster, TestRemoveMatterContributor)
 {
     chip::Testing::TestServerClusterContext context;
-    AmbientSensingUnionCluster cluster{
-        AmbientSensingUnionCluster::Config{ kTestEndpointId }.WithDelegate(&mDelegate) };
+    AmbientSensingUnionCluster cluster{ AmbientSensingUnionCluster::Config{ kTestEndpointId }.WithDelegate(&mDelegate) };
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
     EXPECT_EQ(cluster.AddMatterContributor(kTestNodeId1, kContributorEp1), CHIP_NO_ERROR);
@@ -399,8 +394,7 @@ TEST_F(TestAmbientSensingUnionCluster, TestRemoveMatterContributorNotFound)
 TEST_F(TestAmbientSensingUnionCluster, TestUpdateMatterContributorStatus)
 {
     chip::Testing::TestServerClusterContext context;
-    AmbientSensingUnionCluster cluster{
-        AmbientSensingUnionCluster::Config{ kTestEndpointId }.WithDelegate(&mDelegate) };
+    AmbientSensingUnionCluster cluster{ AmbientSensingUnionCluster::Config{ kTestEndpointId }.WithDelegate(&mDelegate) };
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
     EXPECT_EQ(cluster.AddMatterContributor(kTestNodeId1, kContributorEp1, UnionContributorStatusEnum::kUnionContributorOnline),
@@ -419,8 +413,7 @@ TEST_F(TestAmbientSensingUnionCluster, TestUpdateMatterContributorStatus)
 TEST_F(TestAmbientSensingUnionCluster, TestUpdateMatterContributorStatusSameValue)
 {
     chip::Testing::TestServerClusterContext context;
-    AmbientSensingUnionCluster cluster{
-        AmbientSensingUnionCluster::Config{ kTestEndpointId }.WithDelegate(&mDelegate) };
+    AmbientSensingUnionCluster cluster{ AmbientSensingUnionCluster::Config{ kTestEndpointId }.WithDelegate(&mDelegate) };
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
     EXPECT_EQ(cluster.AddMatterContributor(kTestNodeId1, kContributorEp1, UnionContributorStatusEnum::kUnionContributorOnline),
@@ -454,15 +447,14 @@ TEST_F(TestAmbientSensingUnionCluster, TestUpdateMatterContributorStatusNotFound
 TEST_F(TestAmbientSensingUnionCluster, TestAddNonMatterContributor)
 {
     chip::Testing::TestServerClusterContext context;
-    AmbientSensingUnionCluster cluster{
-        AmbientSensingUnionCluster::Config{ kTestEndpointId }.WithDelegate(&mDelegate) };
+    AmbientSensingUnionCluster cluster{ AmbientSensingUnionCluster::Config{ kTestEndpointId }.WithDelegate(&mDelegate) };
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
     constexpr char kContributorName[] = "ZigbeeSensor1";
 
-    EXPECT_EQ(
-        cluster.AddNonMatterContributor(CharSpan::fromCharString(kContributorName), UnionContributorStatusEnum::kUnionContributorOnline),
-        CHIP_NO_ERROR);
+    EXPECT_EQ(cluster.AddNonMatterContributor(CharSpan::fromCharString(kContributorName),
+                                              UnionContributorStatusEnum::kUnionContributorOnline),
+              CHIP_NO_ERROR);
 
     EXPECT_EQ(cluster.GetContributorCount(), 1u);
     EXPECT_TRUE(mDelegate.mUnionHealthChangedCalled);
@@ -498,8 +490,7 @@ TEST_F(TestAmbientSensingUnionCluster, TestAddNonMatterContributorDuplicate)
 TEST_F(TestAmbientSensingUnionCluster, TestRemoveNonMatterContributor)
 {
     chip::Testing::TestServerClusterContext context;
-    AmbientSensingUnionCluster cluster{
-        AmbientSensingUnionCluster::Config{ kTestEndpointId }.WithDelegate(&mDelegate) };
+    AmbientSensingUnionCluster cluster{ AmbientSensingUnionCluster::Config{ kTestEndpointId }.WithDelegate(&mDelegate) };
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
     constexpr char kContributorName[] = "BluetoothSensor";
@@ -520,19 +511,18 @@ TEST_F(TestAmbientSensingUnionCluster, TestRemoveNonMatterContributor)
 TEST_F(TestAmbientSensingUnionCluster, TestUpdateNonMatterContributorStatus)
 {
     chip::Testing::TestServerClusterContext context;
-    AmbientSensingUnionCluster cluster{
-        AmbientSensingUnionCluster::Config{ kTestEndpointId }.WithDelegate(&mDelegate) };
+    AmbientSensingUnionCluster cluster{ AmbientSensingUnionCluster::Config{ kTestEndpointId }.WithDelegate(&mDelegate) };
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
     constexpr char kContributorName[] = "WifiSensor";
 
     EXPECT_EQ(cluster.AddNonMatterContributor(CharSpan::fromCharString(kContributorName),
-                                               UnionContributorStatusEnum::kUnionContributorOnline),
+                                              UnionContributorStatusEnum::kUnionContributorOnline),
               CHIP_NO_ERROR);
     mDelegate.Reset();
 
     EXPECT_EQ(cluster.UpdateNonMatterContributorStatus(CharSpan::fromCharString(kContributorName),
-                                                        UnionContributorStatusEnum::kUnionContributorOffline),
+                                                       UnionContributorStatusEnum::kUnionContributorOffline),
               CHIP_NO_ERROR);
 
     EXPECT_TRUE(mDelegate.mUnionHealthChangedCalled);
@@ -591,8 +581,9 @@ TEST_F(TestAmbientSensingUnionCluster, TestMaxContributorsBoundary)
     {
         char name[32];
         snprintf(name, sizeof(name), "Sensor%u", i);
-        ASSERT_EQ(cluster.AddNonMatterContributor(CharSpan::fromCharString(name), UnionContributorStatusEnum::kUnionContributorOnline),
-                  CHIP_NO_ERROR)
+        ASSERT_EQ(
+            cluster.AddNonMatterContributor(CharSpan::fromCharString(name), UnionContributorStatusEnum::kUnionContributorOnline),
+            CHIP_NO_ERROR)
             << "Failed to add non-Matter contributor " << static_cast<int>(i);
     }
 
@@ -644,8 +635,7 @@ TEST_F(TestAmbientSensingUnionCluster, TestContributorSlotReuse)
 TEST_F(TestAmbientSensingUnionCluster, TestUnionHealthAllOnline)
 {
     chip::Testing::TestServerClusterContext context;
-    AmbientSensingUnionCluster cluster{
-        AmbientSensingUnionCluster::Config{ kTestEndpointId }.WithDelegate(&mDelegate) };
+    AmbientSensingUnionCluster cluster{ AmbientSensingUnionCluster::Config{ kTestEndpointId }.WithDelegate(&mDelegate) };
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
     EXPECT_EQ(cluster.AddMatterContributor(kTestNodeId1, kContributorEp1, UnionContributorStatusEnum::kUnionContributorOnline),
@@ -659,8 +649,7 @@ TEST_F(TestAmbientSensingUnionCluster, TestUnionHealthAllOnline)
 TEST_F(TestAmbientSensingUnionCluster, TestUnionHealthAllOffline)
 {
     chip::Testing::TestServerClusterContext context;
-    AmbientSensingUnionCluster cluster{
-        AmbientSensingUnionCluster::Config{ kTestEndpointId }.WithDelegate(&mDelegate) };
+    AmbientSensingUnionCluster cluster{ AmbientSensingUnionCluster::Config{ kTestEndpointId }.WithDelegate(&mDelegate) };
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
     EXPECT_EQ(cluster.AddMatterContributor(kTestNodeId1, kContributorEp1, UnionContributorStatusEnum::kUnionContributorOffline),
@@ -674,8 +663,7 @@ TEST_F(TestAmbientSensingUnionCluster, TestUnionHealthAllOffline)
 TEST_F(TestAmbientSensingUnionCluster, TestUnionHealthPartialOffline)
 {
     chip::Testing::TestServerClusterContext context;
-    AmbientSensingUnionCluster cluster{
-        AmbientSensingUnionCluster::Config{ kTestEndpointId }.WithDelegate(&mDelegate) };
+    AmbientSensingUnionCluster cluster{ AmbientSensingUnionCluster::Config{ kTestEndpointId }.WithDelegate(&mDelegate) };
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
     EXPECT_EQ(cluster.AddMatterContributor(kTestNodeId1, kContributorEp1, UnionContributorStatusEnum::kUnionContributorOnline),
@@ -689,8 +677,7 @@ TEST_F(TestAmbientSensingUnionCluster, TestUnionHealthPartialOffline)
 TEST_F(TestAmbientSensingUnionCluster, TestUnionHealthNoContributors)
 {
     chip::Testing::TestServerClusterContext context;
-    AmbientSensingUnionCluster cluster{
-        AmbientSensingUnionCluster::Config{ kTestEndpointId }.WithDelegate(&mDelegate) };
+    AmbientSensingUnionCluster cluster{ AmbientSensingUnionCluster::Config{ kTestEndpointId }.WithDelegate(&mDelegate) };
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
     EXPECT_EQ(cluster.AddMatterContributor(kTestNodeId1, kContributorEp1), CHIP_NO_ERROR);
@@ -702,8 +689,7 @@ TEST_F(TestAmbientSensingUnionCluster, TestUnionHealthNoContributors)
 TEST_F(TestAmbientSensingUnionCluster, TestUnionHealthTransitions)
 {
     chip::Testing::TestServerClusterContext context;
-    AmbientSensingUnionCluster cluster{
-        AmbientSensingUnionCluster::Config{ kTestEndpointId }.WithDelegate(&mDelegate) };
+    AmbientSensingUnionCluster cluster{ AmbientSensingUnionCluster::Config{ kTestEndpointId }.WithDelegate(&mDelegate) };
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
     // Start with one online contributor
@@ -739,8 +725,7 @@ TEST_F(TestAmbientSensingUnionCluster, TestUnionHealthTransitions)
 TEST_F(TestAmbientSensingUnionCluster, TestUnionContributorAddedEvent)
 {
     chip::Testing::TestServerClusterContext context;
-    AmbientSensingUnionCluster cluster{
-        AmbientSensingUnionCluster::Config{ kTestEndpointId }.WithDelegate(&mDelegate) };
+    AmbientSensingUnionCluster cluster{ AmbientSensingUnionCluster::Config{ kTestEndpointId }.WithDelegate(&mDelegate) };
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
     EXPECT_EQ(cluster.AddMatterContributor(kTestNodeId1, kContributorEp1, UnionContributorStatusEnum::kUnionContributorOnline),
@@ -762,8 +747,7 @@ TEST_F(TestAmbientSensingUnionCluster, TestUnionContributorAddedEvent)
 TEST_F(TestAmbientSensingUnionCluster, TestUnionContributorRemovedEvent)
 {
     chip::Testing::TestServerClusterContext context;
-    AmbientSensingUnionCluster cluster{
-        AmbientSensingUnionCluster::Config{ kTestEndpointId }.WithDelegate(&mDelegate) };
+    AmbientSensingUnionCluster cluster{ AmbientSensingUnionCluster::Config{ kTestEndpointId }.WithDelegate(&mDelegate) };
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
     EXPECT_EQ(cluster.AddMatterContributor(kTestNodeId1, kContributorEp1), CHIP_NO_ERROR);
@@ -787,8 +771,7 @@ TEST_F(TestAmbientSensingUnionCluster, TestUnionContributorRemovedEvent)
 TEST_F(TestAmbientSensingUnionCluster, TestUnionContributorStatusChangedEvent)
 {
     chip::Testing::TestServerClusterContext context;
-    AmbientSensingUnionCluster cluster{
-        AmbientSensingUnionCluster::Config{ kTestEndpointId }.WithDelegate(&mDelegate) };
+    AmbientSensingUnionCluster cluster{ AmbientSensingUnionCluster::Config{ kTestEndpointId }.WithDelegate(&mDelegate) };
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
     EXPECT_EQ(cluster.AddMatterContributor(kTestNodeId1, kContributorEp1, UnionContributorStatusEnum::kUnionContributorOnline),
@@ -851,8 +834,8 @@ TEST_F(TestAmbientSensingUnionCluster, TestUnionNameNoPersistence)
 
     constexpr char kTestName[] = "TestUnion";
 
-    AmbientSensingUnionCluster cluster{
-        AmbientSensingUnionCluster::Config{ kTestEndpointId }.WithUnionName(CharSpan::fromCharString(kTestName)) };
+    AmbientSensingUnionCluster cluster{ AmbientSensingUnionCluster::Config{ kTestEndpointId }.WithUnionName(
+        CharSpan::fromCharString(kTestName)) };
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
     EXPECT_EQ(cluster.SetUnionName(CharSpan::fromCharString("NewName")), CHIP_NO_ERROR);
@@ -951,9 +934,9 @@ TEST_F(TestAmbientSensingUnionCluster, TestWriteReadOnlyContributorList)
 
     app::DataModel::List<Structs::UnionContributorStruct::Type> contributorList(&contributor, 1);
 
-    EXPECT_EQ(tester.WriteAttribute(Attributes::UnionContributorList::Id, contributorList,
-                                    chip::Testing::ListWritingPattern::ReplaceAll),
-              CHIP_IM_GLOBAL_STATUS(UnsupportedWrite));
+    EXPECT_EQ(
+        tester.WriteAttribute(Attributes::UnionContributorList::Id, contributorList, chip::Testing::ListWritingPattern::ReplaceAll),
+        CHIP_IM_GLOBAL_STATUS(UnsupportedWrite));
 }
 
 // =============================================================================
@@ -1061,7 +1044,7 @@ TEST_F(TestAmbientSensingUnionCluster, TestFullWorkflow)
 
     // 4. Add non-Matter contributor (online)
     EXPECT_EQ(cluster.AddNonMatterContributor(CharSpan::fromCharString("ZigbeeSensor"),
-                                               UnionContributorStatusEnum::kUnionContributorOnline),
+                                              UnionContributorStatusEnum::kUnionContributorOnline),
               CHIP_NO_ERROR);
     EXPECT_EQ(cluster.GetContributorCount(), 3u);
     EXPECT_EQ(cluster.GetUnionHealth(), UnionHealthEnum::kLimitedDegraded);
@@ -1124,7 +1107,8 @@ TEST_F(TestAmbientSensingUnionCluster, TestGetContributorsArray)
     // Add some contributors
     EXPECT_EQ(cluster.AddMatterContributor(kTestNodeId1, kContributorEp1, UnionContributorStatusEnum::kUnionContributorOnline),
               CHIP_NO_ERROR);
-    EXPECT_EQ(cluster.AddNonMatterContributor(CharSpan::fromCharString("TestSensor"), UnionContributorStatusEnum::kUnionContributorOnline),
+    EXPECT_EQ(cluster.AddNonMatterContributor(CharSpan::fromCharString("TestSensor"),
+                                              UnionContributorStatusEnum::kUnionContributorOnline),
               CHIP_NO_ERROR);
 
     // Access contributor array directly
@@ -1144,4 +1128,3 @@ TEST_F(TestAmbientSensingUnionCluster, TestGetContributorsArray)
 }
 
 } // namespace
-

@@ -96,11 +96,10 @@ public:
 class AmbientSensingUnionCluster : public DefaultServerCluster
 {
 public:
-
-    static constexpr size_t kMaxUnionNameLength       = 128;  // UnionName max length
-    static constexpr size_t kMaxContributorNameLength = 128;  // ContributorName max length
-    static constexpr size_t kMaxContributors          = 128;  // UnionContributorList max entries
-    static constexpr size_t kMinContributors          = 1;    // UnionContributorList min entries
+    static constexpr size_t kMaxUnionNameLength       = 128; // UnionName max length
+    static constexpr size_t kMaxContributorNameLength = 128; // ContributorName max length
+    static constexpr size_t kMaxContributors          = 128; // UnionContributorList max entries
+    static constexpr size_t kMinContributors          = 1;   // UnionContributorList min entries
 
     /**
      * @brief Unified contributor entry supporting both Matter and non-Matter contributors.
@@ -108,14 +107,14 @@ public:
      */
     struct ContributorEntry
     {
-        NodeId nodeId       = kUndefinedNodeId;
+        NodeId nodeId         = kUndefinedNodeId;
         EndpointId endpointId = kInvalidEndpointId;
         AmbientSensingUnion::UnionContributorStatusEnum status =
             AmbientSensingUnion::UnionContributorStatusEnum::kUnionContributorOffline;
         bool active = false;
 
-        char name[kMaxContributorNameLength + 1] = {0};
-        size_t nameLength = 0;
+        char name[kMaxContributorNameLength + 1] = { 0 };
+        size_t nameLength                        = 0;
 
         bool IsMatter() const { return nodeId != kUndefinedNodeId; }
 
@@ -190,7 +189,6 @@ public:
         AmbientSensingUnionPersistenceDelegate * mPersistence = nullptr;
     };
 
-
     /**
      * @brief Constructs an AmbientSensingUnionCluster with the given configuration.
      * @param config The configuration for the cluster.
@@ -240,8 +238,7 @@ public:
                                        AmbientSensingUnion::UnionContributorStatusEnum status =
                                            AmbientSensingUnion::UnionContributorStatusEnum::kUnionContributorOnline);
     CHIP_ERROR RemoveNonMatterContributor(const CharSpan & name);
-    CHIP_ERROR UpdateNonMatterContributorStatus(const CharSpan & name,
-                                                AmbientSensingUnion::UnionContributorStatusEnum status);
+    CHIP_ERROR UpdateNonMatterContributorStatus(const CharSpan & name, AmbientSensingUnion::UnionContributorStatusEnum status);
 
 private:
     // Find contributor by criteria
@@ -284,4 +281,3 @@ private:
 } // namespace Clusters
 } // namespace app
 } // namespace chip
-

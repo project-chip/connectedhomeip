@@ -42,7 +42,8 @@ namespace {
  * depends on kAmbientSensingUnionMaxClusterCount.
  */
 constexpr size_t kAmbientSensingUnionFixedClusterCount = AmbientSensingUnion::StaticApplicationConfig::kFixedClusterConfig.size();
-constexpr size_t kAmbientSensingUnionMaxClusterCount   = kAmbientSensingUnionFixedClusterCount + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+constexpr size_t kAmbientSensingUnionMaxClusterCount =
+    kAmbientSensingUnionFixedClusterCount + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 
 LazyRegisteredServerCluster<AmbientSensingUnionCluster> gServers[kAmbientSensingUnionMaxClusterCount];
 
@@ -94,15 +95,12 @@ public:
     }
 
 private:
-    static constexpr size_t kKeyPrefixLength = 6;  // "g/asu/"
-    static constexpr size_t kKeySuffixLength = 3;  // "/un"
-    static constexpr size_t kMaxEndpointHexLength = 4;  // 0xFFFF
-    static constexpr size_t kMaxKeyLength = kKeyPrefixLength + kMaxEndpointHexLength + kKeySuffixLength + 1;
+    static constexpr size_t kKeyPrefixLength      = 6; // "g/asu/"
+    static constexpr size_t kKeySuffixLength      = 3; // "/un"
+    static constexpr size_t kMaxEndpointHexLength = 4; // 0xFFFF
+    static constexpr size_t kMaxKeyLength         = kKeyPrefixLength + kMaxEndpointHexLength + kKeySuffixLength + 1;
 
-    void BuildUnionNameKey(char * buffer, size_t bufferSize) const
-    {
-        snprintf(buffer, bufferSize, "g/asu/%x/un", mEndpointId);
-    }
+    void BuildUnionNameKey(char * buffer, size_t bufferSize) const { snprintf(buffer, bufferSize, "g/asu/%x/un", mEndpointId); }
 
     EndpointId mEndpointId = kInvalidEndpointId;
 };
@@ -118,8 +116,7 @@ public:
         gPersistenceDelegate[clusterInstanceIndex].SetEndpointId(endpointId);
 
         AmbientSensingUnionCluster::Config config(endpointId);
-        config.WithUnionName(CharSpan::fromCharString(""))
-              .WithPersistence(&gPersistenceDelegate[clusterInstanceIndex]);
+        config.WithUnionName(CharSpan::fromCharString("")).WithPersistence(&gPersistenceDelegate[clusterInstanceIndex]);
 
         gServers[clusterInstanceIndex].Create(config);
         return gServers[clusterInstanceIndex].Registration();
@@ -131,10 +128,7 @@ public:
         return &gServers[clusterInstanceIndex].Cluster();
     }
 
-    void ReleaseRegistration(unsigned clusterInstanceIndex) override
-    {
-        gServers[clusterInstanceIndex].Destroy();
-    }
+    void ReleaseRegistration(unsigned clusterInstanceIndex) override { gServers[clusterInstanceIndex].Destroy(); }
 };
 
 } // namespace
@@ -191,4 +185,3 @@ AmbientSensingUnionCluster * FindClusterOnEndpoint(EndpointId endpointId)
 
 void MatterAmbientSensingUnionPluginServerInitCallback() {}
 void MatterAmbientSensingUnionPluginServerShutdownCallback() {}
-

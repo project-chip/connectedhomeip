@@ -369,7 +369,7 @@ void HandleSimulateSwitchIdle(Json::Value & jsonValue)
  * Named pipe handler for adding a Matter contributor to AmbientSensingUnion.
  *
  * Usage example:
- *   echo '{"Name": "AddAmbientSensingContributor", "EndpointId": 1, "NodeId": "0x1234567890ABCDEF", 
+ *   echo '{"Name": "AddAmbientSensingContributor", "EndpointId": 1, "NodeId": "0x1234567890ABCDEF",
  *          "ContributorEndpointId": 2, "Status": 0}' > /tmp/chip_all_clusters_fifo_1146610
  *
  * JSON Arguments:
@@ -398,7 +398,7 @@ void HandleAddAmbientSensingContributor(Json::Value & jsonValue)
         if (jsonValue["NodeId"].isString())
         {
             std::string nodeIdStr = jsonValue["NodeId"].asString();
-            nodeId = static_cast<NodeId>(strtoull(nodeIdStr.c_str(), nullptr, 0));
+            nodeId                = static_cast<NodeId>(strtoull(nodeIdStr.c_str(), nullptr, 0));
         }
         else if (jsonValue["NodeId"].isNumeric())
         {
@@ -414,7 +414,7 @@ void HandleAddAmbientSensingContributor(Json::Value & jsonValue)
 
     EndpointId endpointId            = static_cast<EndpointId>(jsonValue["EndpointId"].asUInt());
     EndpointId contributorEndpointId = static_cast<EndpointId>(jsonValue["ContributorEndpointId"].asUInt());
-    auto status = static_cast<AmbientSensingUnion::UnionContributorStatusEnum>(jsonValue["Status"].asUInt());
+    auto status                      = static_cast<AmbientSensingUnion::UnionContributorStatusEnum>(jsonValue["Status"].asUInt());
 
     auto cluster = AmbientSensingUnion::FindClusterOnEndpoint(endpointId);
     if (cluster == nullptr)
@@ -459,7 +459,7 @@ void HandleRemoveAmbientSensingContributor(Json::Value & jsonValue)
         if (jsonValue["NodeId"].isString())
         {
             std::string nodeIdStr = jsonValue["NodeId"].asString();
-            nodeId = static_cast<NodeId>(strtoull(nodeIdStr.c_str(), nullptr, 0));
+            nodeId                = static_cast<NodeId>(strtoull(nodeIdStr.c_str(), nullptr, 0));
         }
         else if (jsonValue["NodeId"].isNumeric())
         {
@@ -498,14 +498,14 @@ void HandleRemoveAmbientSensingContributor(Json::Value & jsonValue)
  * Named pipe handler for adding a non-Matter contributor to AmbientSensingUnion.
  *
  * Usage example:
- *   echo '{"Name": "AddAmbientSensingNonMatterContributor", "EndpointId": 1, 
+ *   echo '{"Name": "AddAmbientSensingNonMatterContributor", "EndpointId": 1,
  *          "ContributorName": "NonMatterSensor1", "Status": 0}' > /tmp/chip_all_clusters_fifo_1146610
  */
 void HandleAddAmbientSensingNonMatterContributor(Json::Value & jsonValue)
 {
-    bool hasEndpointId       = HasNumericField(jsonValue, "EndpointId");
-    bool hasContributorName  = jsonValue.isMember("ContributorName") && jsonValue["ContributorName"].isString();
-    bool hasStatus           = HasNumericField(jsonValue, "Status");
+    bool hasEndpointId      = HasNumericField(jsonValue, "EndpointId");
+    bool hasContributorName = jsonValue.isMember("ContributorName") && jsonValue["ContributorName"].isString();
+    bool hasStatus          = HasNumericField(jsonValue, "Status");
 
     if (!hasEndpointId || !hasContributorName || !hasStatus)
     {
@@ -515,7 +515,7 @@ void HandleAddAmbientSensingNonMatterContributor(Json::Value & jsonValue)
 
     EndpointId endpointId       = static_cast<EndpointId>(jsonValue["EndpointId"].asUInt());
     std::string contributorName = jsonValue["ContributorName"].asString();
-    auto status = static_cast<AmbientSensingUnion::UnionContributorStatusEnum>(jsonValue["Status"].asUInt());
+    auto status                 = static_cast<AmbientSensingUnion::UnionContributorStatusEnum>(jsonValue["Status"].asUInt());
 
     auto cluster = AmbientSensingUnion::FindClusterOnEndpoint(endpointId);
     if (cluster == nullptr)
@@ -598,15 +598,15 @@ void HandleUpdateAmbientSensingContributorStatus(Json::Value & jsonValue)
     }
 
     EndpointId endpointId = static_cast<EndpointId>(jsonValue["EndpointId"].asUInt());
-    uint32_t statusValue = jsonValue["Status"].asUInt();
-    
+    uint32_t statusValue  = jsonValue["Status"].asUInt();
+
     // Validate status enum value
     if (statusValue > static_cast<uint32_t>(AmbientSensingUnion::UnionContributorStatusEnum::kUnionContributorOffline))
     {
         ChipLogError(NotSpecified, "Invalid Status value: %u", statusValue);
         return;
     }
-    
+
     auto status = static_cast<AmbientSensingUnion::UnionContributorStatusEnum>(statusValue);
 
     auto cluster = AmbientSensingUnion::FindClusterOnEndpoint(endpointId);
@@ -626,7 +626,7 @@ void HandleUpdateAmbientSensingContributorStatus(Json::Value & jsonValue)
         if (jsonValue["NodeId"].isString())
         {
             std::string nodeIdStr = jsonValue["NodeId"].asString();
-            nodeId = static_cast<NodeId>(strtoull(nodeIdStr.c_str(), nullptr, 0));
+            nodeId                = static_cast<NodeId>(strtoull(nodeIdStr.c_str(), nullptr, 0));
         }
         else if (jsonValue["NodeId"].isNumeric())
         {
@@ -646,32 +646,32 @@ void HandleUpdateAmbientSensingContributorStatus(Json::Value & jsonValue)
         }
 
         EndpointId contributorEndpointId = static_cast<EndpointId>(jsonValue["ContributorEndpointId"].asUInt());
-        err = cluster->UpdateMatterContributorStatus(nodeId, contributorEndpointId, status);
-        
+        err                              = cluster->UpdateMatterContributorStatus(nodeId, contributorEndpointId, status);
+
         if (err == CHIP_NO_ERROR)
         {
             ChipLogProgress(NotSpecified, "Updated Matter contributor (NodeId: 0x" ChipLogFormatX64 ", Endpoint: %u) status to %s",
                             ChipLogValueX64(nodeId), contributorEndpointId,
-                            status == AmbientSensingUnion::UnionContributorStatusEnum::kUnionContributorOnline ? "Online" : "Offline");
+                            status == AmbientSensingUnion::UnionContributorStatusEnum::kUnionContributorOnline ? "Online"
+                                                                                                               : "Offline");
         }
     }
     else if (jsonValue.isMember("ContributorName") && jsonValue["ContributorName"].isString())
     {
         // Non-Matter contributor path
         std::string contributorNameStr = jsonValue["ContributorName"].asString();
-        
+
         if (contributorNameStr.empty())
         {
             ChipLogError(NotSpecified, "ContributorName cannot be empty");
             return;
         }
-        
+
         // Validate length against maximum allowed
         constexpr size_t kMaxNameLength = AmbientSensingUnionCluster::kMaxContributorNameLength;
         if (contributorNameStr.size() > kMaxNameLength)
         {
-            ChipLogError(NotSpecified, "ContributorName too long: %u > %u",
-                         static_cast<unsigned>(contributorNameStr.size()),
+            ChipLogError(NotSpecified, "ContributorName too long: %u > %u", static_cast<unsigned>(contributorNameStr.size()),
                          static_cast<unsigned>(kMaxNameLength));
             return;
         }
@@ -681,12 +681,12 @@ void HandleUpdateAmbientSensingContributorStatus(Json::Value & jsonValue)
         contributorNameBuffer[contributorNameStr.size()] = '\0';
 
         err = cluster->UpdateNonMatterContributorStatus(CharSpan(contributorNameBuffer, contributorNameStr.size()), status);
-        
+
         if (err == CHIP_NO_ERROR)
         {
-            ChipLogProgress(NotSpecified, "Updated non-Matter contributor '%s' status to %s",
-                            contributorNameBuffer,
-                            status == AmbientSensingUnion::UnionContributorStatusEnum::kUnionContributorOnline ? "Online" : "Offline");
+            ChipLogProgress(NotSpecified, "Updated non-Matter contributor '%s' status to %s", contributorNameBuffer,
+                            status == AmbientSensingUnion::UnionContributorStatusEnum::kUnionContributorOnline ? "Online"
+                                                                                                               : "Offline");
         }
     }
     else
@@ -697,8 +697,8 @@ void HandleUpdateAmbientSensingContributorStatus(Json::Value & jsonValue)
 
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(NotSpecified, "Failed to update contributor status on endpoint %u: %" CHIP_ERROR_FORMAT, 
-                     endpointId, err.Format());
+        ChipLogError(NotSpecified, "Failed to update contributor status on endpoint %u: %" CHIP_ERROR_FORMAT, endpointId,
+                     err.Format());
     }
 }
 
@@ -706,7 +706,7 @@ void HandleUpdateAmbientSensingContributorStatus(Json::Value & jsonValue)
  * Named pipe handler for setting the union name.
  *
  * Usage example:
- *   echo '{"Name": "SetAmbientSensingUnionName", "EndpointId": 1, "UnionName": "LivingRoomUnion"}' 
+ *   echo '{"Name": "SetAmbientSensingUnionName", "EndpointId": 1, "UnionName": "LivingRoomUnion"}'
  *        > /tmp/chip_all_clusters_fifo_1146610
  */
 void HandleSetAmbientSensingUnionName(Json::Value & jsonValue)
@@ -722,22 +722,21 @@ void HandleSetAmbientSensingUnionName(Json::Value & jsonValue)
     }
 
     EndpointId endpointId = static_cast<EndpointId>(jsonValue["EndpointId"].asUInt());
-    
+
     // Get the union name and validate length before processing
     std::string unionNameStr = jsonValue["UnionName"].asString();
-    
+
     if (unionNameStr.empty())
     {
         ChipLogError(NotSpecified, "UnionName cannot be empty");
         return;
     }
-    
+
     // Validate length against cluster maximum
     constexpr size_t kMaxUnionNameLength = AmbientSensingUnionCluster::kMaxUnionNameLength;
     if (unionNameStr.size() > kMaxUnionNameLength)
     {
-        ChipLogError(NotSpecified, "UnionName too long: %u > %u", 
-                     static_cast<unsigned>(unionNameStr.size()), 
+        ChipLogError(NotSpecified, "UnionName too long: %u > %u", static_cast<unsigned>(unionNameStr.size()),
                      static_cast<unsigned>(kMaxUnionNameLength));
         return;
     }

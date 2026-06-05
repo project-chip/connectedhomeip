@@ -36,8 +36,8 @@ class AllClustersAmbientSensingUnionDelegate : public AmbientSensingUnionDelegat
 public:
     void OnUnionNameChanged(const CharSpan & unionName) override
     {
-        ChipLogProgress(NotSpecified, "AmbientSensingUnion: Union name changed to '%.*s'",
-                        static_cast<int>(unionName.size()), unionName.data());
+        ChipLogProgress(NotSpecified, "AmbientSensingUnion: Union name changed to '%.*s'", static_cast<int>(unionName.size()),
+                        unionName.data());
     }
 
     void OnUnionHealthChanged(UnionHealthEnum unionHealth) override
@@ -59,7 +59,6 @@ public:
         }
         ChipLogProgress(NotSpecified, "AmbientSensingUnion: Union health changed to %s", healthStr);
     }
-
 };
 
 AllClustersAmbientSensingUnionDelegate gDelegate;
