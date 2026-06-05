@@ -19,7 +19,6 @@ source_set("mode-base-server") {
     "AppDelegate.h",
     "ModeBaseCluster.cpp",
     "ModeBaseCluster.h",
-    "mode-base-cluster-objects.cpp",
     "mode-base-cluster-objects.h",
   ]
 
