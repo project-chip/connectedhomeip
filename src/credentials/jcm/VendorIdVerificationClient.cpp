@@ -172,8 +172,11 @@ CHIP_ERROR VendorIdVerificationClient::VerifyVendorId(Messaging::ExchangeManager
         OnVendorIdVerificationComplete(err);
         return err;
     }
-    CHIP_ERROR err =
-        Controller::InvokeCommandRequest(exchangeMgr, session.Value(), kRootEndpointId, request, onSuccessCb, onFailureCb);
+    // Guard the response callbacks: a FailSafe teardown can destroy this object while the invoke is in
+    // flight, and the CommandSender-owned callback would otherwise fire OnVendorIdVerificationComplete()
+    // through a freed `this`.
+    CHIP_ERROR err = Controller::InvokeCommandRequest(exchangeMgr, session.Value(), kRootEndpointId, request,
+                                                      GuardWithLiveness(onSuccessCb), GuardWithLiveness(onFailureCb));
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "Failed to send SignVIDVerificationRequest: %s", ErrorStr(err));

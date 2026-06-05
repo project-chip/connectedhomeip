@@ -32,6 +32,8 @@
 #include <messaging/ExchangeMgr.h>
 
 #include <functional>
+#include <memory>
+#include <utility>
 
 namespace chip {
 namespace Credentials {
@@ -57,12 +59,34 @@ protected:
                                                       ByteSpan & globallyTrustedRootSpan) = 0;
     virtual void OnVendorIdVerificationComplete(const CHIP_ERROR & err)                   = 0;
 
+    // Liveness guard for async callbacks. The attribute reads and the SignVIDVerification invoke issued
+    // during JCM trust verification are fire-and-forget: the underlying ReadClient/CommandSender owns
+    // its own callback and outlives this object. A FailSafe teardown can destroy this object while one
+    // of those exchanges is still in flight; the late callback would then run through a freed `this`.
+    // GuardWithLiveness() wraps a callback so it captures a weak reference to a
+    // control block that dies with this object, and the wrapped callback becomes a no-op once the object
+    // is gone. The in-flight exchange is not cancelled — it simply self-reaps when it completes.
+    template <typename F>
+    auto GuardWithLiveness(F && f)
+    {
+        std::weak_ptr<int> weak = mLivenessToken;
+        return [weak, f = std::forward<F>(f)](auto &&... args) {
+            if (auto strong = weak.lock())
+            {
+                f(std::forward<decltype(args)>(args)...);
+            }
+        };
+    }
+
 private:
     CHIP_ERROR VerifyNOCCertificateChain(const ByteSpan & nocSpan, const ByteSpan & icacSpan, const ByteSpan & rcacSpan);
 
     CHIP_ERROR
     Verify(TrustVerificationInfo * info, const ByteSpan clientChallengeSpan, ByteSpan attestationChallengeSpan,
            const app::Clusters::OperationalCredentials::Commands::SignVIDVerificationResponse::DecodableType responseData);
+
+    // Control block whose lifetime tracks this object; see GuardWithLiveness().
+    std::shared_ptr<int> mLivenessToken = std::make_shared<int>(0);
 };
 
 } // namespace JCM
