@@ -255,8 +255,6 @@ void WiFiPAFLayer::Shutdown()
     }
 }
 
-
-
 bool WiFiPAFLayer::OnWiFiPAFMessageReceived(WiFiPAFSession & RxInfo, System::PacketBufferHandle && msg)
 {
     WiFiPAFEndPoint * endPoint = sWiFiPAFEndPointPool.Find(reinterpret_cast<WIFIPAF_CONNECTION_OBJECT>(&RxInfo));
@@ -344,7 +342,6 @@ CHIP_ERROR WiFiPAFLayer::HandleTransportConnectionInitiated(WiFiPAF::WiFiPAFSess
     {
         err = newEndPoint->StartReceiveConnectionTimer();
     }
-
 
     return err;
 }

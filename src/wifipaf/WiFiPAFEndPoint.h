@@ -165,14 +165,12 @@ private:
     enum class TimerStateFlag : uint8_t
     {
 
-        kConnectTimerRunning     = 0x01, // PAFTP connect completion timer running.
-        kWaitResTimerRunning     = 0x02, // Wait for resource to be available
-        kAckReceivedTimerRunning = 0x04, // Ack received timer running due to unacked sent fragment.
-        kSendAckTimerRunning     = 0x08, // Send ack timer running; indicates pending ack to send.
+        kConnectTimerRunning           = 0x01, // PAFTP connect completion timer running.
+        kWaitResTimerRunning           = 0x02, // Wait for resource to be available
+        kAckReceivedTimerRunning       = 0x04, // Ack received timer running due to unacked sent fragment.
+        kSendAckTimerRunning           = 0x08, // Send ack timer running; indicates pending ack to send.
         kReceiveConnectionTimerRunning = 0x10, // Receive connection timer running.
     };
-
-
 
     // Queue of outgoing messages to send when current PAFTPEngine transmission completes.
     // Re-used during connection setup to cache capabilities request and response payloads; payloads are freed when
@@ -219,18 +217,18 @@ private:
                                                SequenceNumber_t newestUnackedSentSeqNum);
 
     // Timer control functions:
-    CHIP_ERROR StartConnectTimer();       // Start connect timer.
-    CHIP_ERROR StartAckReceivedTimer();   // Start ack-received timer if it's not already running.
-    CHIP_ERROR RestartAckReceivedTimer(); // Restart ack-received timer.
-    CHIP_ERROR StartSendAckTimer();       // Start send-ack timer if it's not already running.
-    CHIP_ERROR StartWaitResourceTimer();  // Start wait-resource timer if it's not already running.
+    CHIP_ERROR StartConnectTimer();           // Start connect timer.
+    CHIP_ERROR StartAckReceivedTimer();       // Start ack-received timer if it's not already running.
+    CHIP_ERROR RestartAckReceivedTimer();     // Restart ack-received timer.
+    CHIP_ERROR StartSendAckTimer();           // Start send-ack timer if it's not already running.
+    CHIP_ERROR StartWaitResourceTimer();      // Start wait-resource timer if it's not already running.
     CHIP_ERROR StartReceiveConnectionTimer(); // Start receive connection timer.
-    void StopConnectTimer();              // Stop connect timer.
-    void StopReceiveConnectionTimer();    // Stop receive connection timer.
-    void StopAckReceivedTimer();          // Stop ack-received timer.
-    void StopSendAckTimer();              // Stop send-ack timer.
+    void StopConnectTimer();                  // Stop connect timer.
+    void StopReceiveConnectionTimer();        // Stop receive connection timer.
+    void StopAckReceivedTimer();              // Stop ack-received timer.
+    void StopSendAckTimer();                  // Stop send-ack timer.
 
-    void StopWaitResourceTimer();         // Stop wait-resource timer
+    void StopWaitResourceTimer(); // Stop wait-resource timer
 
     // Timer expired callbacks:
     static void HandleConnectTimeout(chip::System::Layer * systemLayer, void * appState);

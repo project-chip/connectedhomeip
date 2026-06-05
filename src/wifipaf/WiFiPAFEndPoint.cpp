@@ -157,7 +157,6 @@ CHIP_ERROR WiFiPAFEndPoint::HandleConnectComplete()
         StopReceiveConnectionTimer();
     }
 
-
     // We've successfully completed the PAF transport protocol handshake, so let the application know we're open for business.
     if (mWiFiPafLayer != nullptr)
     {
@@ -195,7 +194,6 @@ void WiFiPAFEndPoint::DoClose(uint8_t flags, CHIP_ERROR err)
         {
             StopReceiveConnectionTimer();
         }
-
 
         // Free the packets in re-order queue if ones exist
         for (uint8_t qidx = 0; qidx < PAFTP_REORDER_QUEUE_SIZE; qidx++)
@@ -1184,7 +1182,6 @@ CHIP_ERROR WiFiPAFEndPoint::StartReceiveConnectionTimer()
     return CHIP_NO_ERROR;
 }
 
-
 CHIP_ERROR WiFiPAFEndPoint::StartAckReceivedTimer()
 {
     if (!mTimerStateFlags.Has(TimerStateFlag::kAckReceivedTimerRunning))
@@ -1258,7 +1255,6 @@ void WiFiPAFEndPoint::StopReceiveConnectionTimer()
     mTimerStateFlags.Clear(TimerStateFlag::kReceiveConnectionTimerRunning);
 }
 
-
 void WiFiPAFEndPoint::StopAckReceivedTimer()
 {
     // Cancel any existing ack-received timer.
@@ -1305,7 +1301,6 @@ void WiFiPAFEndPoint::HandleReceiveConnectionTimeout(chip::System::Layer * syste
         ep->DoClose(kWiFiPAFCloseFlag_SuppressCallback | kWiFiPAFCloseFlag_AbortTransmission, WIFIPAF_ERROR_RECEIVE_TIMED_OUT);
     }
 }
-
 
 void WiFiPAFEndPoint::HandleAckReceivedTimeout(chip::System::Layer * systemLayer, void * appState)
 {
