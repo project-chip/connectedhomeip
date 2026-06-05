@@ -26,6 +26,7 @@ import queue
 import random
 import select
 import shlex
+import socket
 import subprocess
 import textwrap
 import threading
@@ -1175,6 +1176,50 @@ class MatterBaseTest(base_test.BaseTestClass):
             List[SetupPayloadInfo]: List of Payload used by the test case
         """
         return get_setup_payload_info_config(self.matter_test_config)
+
+    def get_random_port(self) -> int:
+        """Selects a random port and checks that it is not yet in use.
+
+        Note that this check can be racy, but the way this function is generally used
+        is assumed fine.
+        """
+        if not hasattr(self, '_allocated_ports'):
+            self._allocated_ports: set[int] = set()
+
+        def is_port_available(p: int) -> bool:
+            import errno
+
+            # Verify TCP and UDP on all IPv4 interfaces
+            for sock_type in (socket.SOCK_STREAM, socket.SOCK_DGRAM):
+                with socket.socket(socket.AF_INET, sock_type) as s:
+                    try:
+                        s.bind(('', p))
+                    except OSError as e:
+                        if e.errno == errno.EADDRINUSE:
+                            return False
+                        raise
+
+            # Verify TCP and UDP on all IPv6 interfaces if available
+            if socket.has_ipv6:
+                for sock_type in (socket.SOCK_STREAM, socket.SOCK_DGRAM):
+                    with socket.socket(socket.AF_INET6, sock_type) as s:
+                        try:
+                            s.bind(('::', p))
+                        except OSError as e:
+                            if e.errno == errno.EADDRINUSE:
+                                return False
+                            raise
+            return True
+
+        while True:
+            # The chosen safe range (35000-45000) naturally avoids well-known bad/conflicting
+            # ports like 5353 (mDNS) and 5550-5555 (Matter standard ports).
+            port = random.randint(35000, 45000)
+            if port in self._allocated_ports:
+                continue
+            if is_port_available(port):
+                self._allocated_ports.add(port)
+                return port
 
     #
     # Matter Test API - Test Definition Helpers (Steps, PICS, Description)
