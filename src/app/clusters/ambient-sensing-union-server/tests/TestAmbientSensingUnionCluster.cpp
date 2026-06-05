@@ -150,7 +150,7 @@ TEST_F(TestAmbientSensingUnionCluster, TestReadFeatureMap)
 
 TEST_F(TestAmbientSensingUnionCluster, TestReadUnionName)
 {
-    auto context = std::make_unique<chip::Testing::TestServerClusterContext>();
+    auto context               = std::make_unique<chip::Testing::TestServerClusterContext>();
     constexpr char kTestName[] = "LivingRoomUnion";
 
     AmbientSensingUnionCluster cluster{ AmbientSensingUnionCluster::Config{ kTestEndpointId }.WithUnionName(
@@ -261,7 +261,7 @@ TEST_F(TestAmbientSensingUnionCluster, TestWriteUnionNameViaSetMethod)
 
 TEST_F(TestAmbientSensingUnionCluster, TestWriteUnionNameSameValueNoOp)
 {
-    auto context = std::make_unique<chip::Testing::TestServerClusterContext>();
+    auto context               = std::make_unique<chip::Testing::TestServerClusterContext>();
     constexpr char kTestName[] = "TestUnion";
 
     AmbientSensingUnionCluster cluster{ AmbientSensingUnionCluster::Config{ kTestEndpointId }
