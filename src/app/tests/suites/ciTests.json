@@ -41,8 +41,6 @@
     ],
     "DeviceManagement": [
         "Test_TC_OPCREDS_3_7",
-        "Test_TC_BINFO_2_1",
-        "Test_TC_BINFO_2_2",
         "Test_TC_CNET_1_3"
     ],
     "Descriptor": [],
