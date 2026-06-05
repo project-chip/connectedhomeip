@@ -14852,7 +14852,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 /**
  * Cluster Audio Output
  *
- * This cluster provides an interface for controlling the Output on a media device such as a TV.
+ * This cluster provides an interface for controlling the Output on a Video Player device such as a TV.
  */
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRBaseClusterAudioOutput : MTRGenericBaseCluster
@@ -14932,7 +14932,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 /**
  * Cluster Application Launcher
  *
- * This cluster provides an interface for launching content on a media player device such as a TV or Speaker.
+ * This cluster provides an interface for launching applications on a Video Player device such as a TV.
  */
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRBaseClusterApplicationLauncher : MTRGenericBaseCluster
@@ -15026,7 +15026,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 /**
  * Cluster Application Basic
  *
- * This cluster provides information about an application running on a TV or media player device which is represented as an endpoint.
+ * This cluster provides information about a Content App running on a Video Player device which is represented as an endpoint (see Device Type Library document).
  */
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRBaseClusterApplicationBasic : MTRGenericBaseCluster
