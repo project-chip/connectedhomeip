@@ -127,24 +127,6 @@ class TC_ICDB_2_5(ICDBaseTest):
     def desc_TC_ICDB_2_5(self) -> str:
         return "[TC-ICDB-2.5] ICD State Machine - With 1 client registration with subscription and 1 unregistered client with subscription - Multiple Fabrics [DUT as Server]"
 
-    def steps_TC_ICDB_2_5(self) -> list[TestStep]:
-        return [
-            TestStep("precondition", "Commission DUT to TH1 and TH2."),
-            TestStep(1, "TH1 sends the RegisterClient command to the DUT with TH1's node ID as checkInNodeID and monitoredSubject. TH1 reads the RegisteredClients attribute.", """
-                     TH1 is registered as an ICD client on the DUT.
-                     Verify exactly one RegisteredClients entry is present.
-                     Verify that the RegisteredClients entry's checkInNodeID and monitoredSubject match TH1's node ID."""),
-            TestStep(2, "TH2 reads from the DUT the RegisteredClients attribute.", """
-                     Verify RegisteredClients is empty (TH2 intentionally did not register as an ICD client)."""),
-            TestStep(3, "TH1 reads from the DUT the IdleModeDuration attribute.",
-                     "Save value as idle_mode_duration_s, with it calculate: SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT = MAX(idle_mode_duration_s, 3600s). Store value for later use."),
-            TestStep(4, "TH1 and TH2 each subscribe to the ICDCounter attribute, with MinIntervalFloor and MaxIntervalCeiling.", """
-                     Verify MinIntervalFloor <= MaxInterval <= MAX(SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT, MaxIntervalCeiling) for both TH1 and TH2."""),
-            TestStep(5, "Wait for 1 or more MaxInterval.", """
-                     Verify DUT sent a subscription report to both TH1 and TH2 within MaxInterval.
-                     Verify ICDCounter is unchanged."""),
-        ]
-
     def pics_TC_ICDB_2_5(self) -> list[str]:
         return [
             "ICDB.S",
@@ -155,12 +137,14 @@ class TC_ICDB_2_5(ICDBaseTest):
     async def test_TC_ICDB_2_5(self):
 
         # *** PRECONDITION ***
-        # Commission DUT to TH1 and TH2.
-        self.step("precondition")
+        self.step("precondition", "Commission DUT to TH1 and TH2.")
 
         # *** STEP 1 ***
-        # TH1 sends the RegisterClient command to the DUT with TH1's node ID as checkInNodeID and monitoredSubject.
-        self.step(1)
+        self.step(1, """TH1 sends the RegisterClient command to the DUT with TH1's node ID as checkInNodeID and monitoredSubject.
+                        TH1 reads the RegisteredClients attribute.""", expectation="""
+                            TH1 is registered as an ICD client on the DUT.
+                            Verify exactly one RegisteredClients entry is present.
+                            Verify that the RegisteredClients entry's checkInNodeID and monitoredSubject match TH1's node ID.""")
         th1_checkin_key = os.urandom(16)
         th1_check_in_node_id = self.th1.nodeId
         await self.send_single_icdm_command(commands.RegisterClient(
@@ -186,9 +170,8 @@ class TC_ICDB_2_5(ICDBaseTest):
                              f"monitoredSubject ({rc_th1.monitoredSubject}) must match TH1's node ID ({th1_check_in_node_id})")
 
         # *** STEP 2 ***
-        # TH2 reads from the DUT the RegisteredClients attribute.
-        # TH2 intentionally did not register as an ICD client.
-        self.step(2)
+        self.step(2, """TH2 reads from the DUT the RegisteredClients attribute.""", expectation="""
+                            Verify RegisteredClients is empty (TH2 intentionally did not register as an ICD client)."""),
         th2_registered_clients = await self.read_icdm_attribute_expect_success(
             attributes.RegisteredClients, controller=self.th2, node_id=self.th2_dut_node_id
         )
@@ -198,16 +181,16 @@ class TC_ICDB_2_5(ICDBaseTest):
                              f"Expected 0 RegisteredClients entries for TH2 (intentionally unregistered), got {len(th2_registered_clients)}")
 
         # *** STEP 3 ***
-        # TH1 reads from the DUT the IdleModeDuration attribute
-        # Calculate SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT
-        self.step(3)
+        self.step(3, """TH1 reads from the DUT the IdleModeDuration attribute.""", expectation="""
+                            Save value as idle_mode_duration_s, with it calculate: SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT = MAX(idle_mode_duration_s, 3600s).
+                            Store value for later use."""),
         idle_mode_duration_s = await self.read_icdm_attribute_expect_success(attributes.IdleModeDuration)
         log.info(f"IdleModeDuration: {idle_mode_duration_s}s")
         subscription_max_interval_publisher_limit_s = max(idle_mode_duration_s, ONE_HOUR_S)
 
         # *** STEP 4 ***
-        # TH1 and TH2 each subscribe to the ICDCounter attribute with MinIntervalFloor and MaxIntervalCeiling
-        self.step(4)
+        self.step(4, """TH1 and TH2 each subscribe to the ICDCounter attribute, with MinIntervalFloor and MaxIntervalCeiling.""", expectation="""
+                            Verify MinIntervalFloor <= MaxInterval <= MAX(SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT, MaxIntervalCeiling) for both TH1 and TH2."""),
         th1_subscription = await self.default_controller.ReadAttribute(
             nodeId=self.dut_node_id,
             attributes=[(self.ROOT_NODE_ENDPOINT_ID, attributes.ICDCounter)],
@@ -238,8 +221,9 @@ class TC_ICDB_2_5(ICDBaseTest):
                                   f"TH2 MaxInterval {th2_max_interval_s}s exceeds MAX(SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT, MaxIntervalCeiling)")
 
         # *** STEP 5 ***
-        # Wait for 1 or more MaxInterval.
-        self.step(5)
+        self.step(5, """Wait for 1 or more MaxInterval.""", expectation="""
+                            Verify DUT sent a subscription report to both TH1 and TH2 within MaxInterval.
+                            Verify ICDCounter is unchanged."""),
         max_interval_s = max(th1_max_interval_s, th2_max_interval_s)
 
         # Read ICDCounter before the subscription wait to detect any check-in activity
