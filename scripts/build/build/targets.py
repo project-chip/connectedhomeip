@@ -86,9 +86,11 @@ def BuildHostFakeTarget():
     ])
 
     target.AppendModifier(
-        "mbedtls", crypto_library=HostCryptoLibrary.MBEDTLS).ExceptIfRe('-boringssl')
+        "mbedtls", crypto_library=HostCryptoLibrary.MBEDTLS).ExceptIfRe('-(boringssl|psa)')
     target.AppendModifier(
-        "boringssl", crypto_library=HostCryptoLibrary.BORINGSSL).ExceptIfRe('-mbedtls')
+        "boringssl", crypto_library=HostCryptoLibrary.BORINGSSL).ExceptIfRe('-(mbedtls|psa)')
+    target.AppendModifier(
+        "psa", crypto_library=HostCryptoLibrary.PSA).ExceptIfRe('-(boringssl|mbedtls)')
     target.AppendModifier("asan", use_asan=True).ExceptIfRe("-tsan")
     target.AppendModifier("tsan", use_tsan=True).ExceptIfRe("-asan")
     target.AppendModifier("ubsan", use_ubsan=True)
@@ -212,9 +214,11 @@ def BuildHostTarget():
     target.AppendModifier('nfc-commission', chip_enable_nfc_based_commissioning=True)
     target.AppendModifier('no-shell', disable_shell=True)
     target.AppendModifier(
-        "mbedtls", crypto_library=HostCryptoLibrary.MBEDTLS).ExceptIfRe('-boringssl')
+        "mbedtls", crypto_library=HostCryptoLibrary.MBEDTLS).ExceptIfRe('-(boringssl|psa)')
     target.AppendModifier(
-        "boringssl", crypto_library=HostCryptoLibrary.BORINGSSL).ExceptIfRe('-mbedtls')
+        "boringssl", crypto_library=HostCryptoLibrary.BORINGSSL).ExceptIfRe('-(mbedtls|psa)')
+    target.AppendModifier(
+        "psa", crypto_library=HostCryptoLibrary.PSA).ExceptIfRe('-(boringssl|mbedtls)')
     target.AppendModifier("asan", use_asan=True).ExceptIfRe("-tsan")
     target.AppendModifier("tsan", use_tsan=True).ExceptIfRe("-asan")
     target.AppendModifier("ubsan", use_ubsan=True)

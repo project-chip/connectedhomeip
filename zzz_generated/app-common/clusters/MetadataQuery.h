@@ -24,12 +24,16 @@
 #include <clusters/AirQuality/MetadataProvider.h>
 #include <clusters/AmbientContextSensing/Ids.h>
 #include <clusters/AmbientContextSensing/MetadataProvider.h>
+#include <clusters/AmbientSensingUnion/Ids.h>
+#include <clusters/AmbientSensingUnion/MetadataProvider.h>
 #include <clusters/ApplicationBasic/Ids.h>
 #include <clusters/ApplicationBasic/MetadataProvider.h>
 #include <clusters/ApplicationLauncher/Ids.h>
 #include <clusters/ApplicationLauncher/MetadataProvider.h>
 #include <clusters/AudioOutput/Ids.h>
 #include <clusters/AudioOutput/MetadataProvider.h>
+#include <clusters/AvAnalysis/Ids.h>
+#include <clusters/AvAnalysis/MetadataProvider.h>
 #include <clusters/BallastConfiguration/Ids.h>
 #include <clusters/BallastConfiguration/MetadataProvider.h>
 #include <clusters/BasicInformation/Ids.h>
@@ -92,6 +96,8 @@
 #include <clusters/DynamicLighting/MetadataProvider.h>
 #include <clusters/EcosystemInformation/Ids.h>
 #include <clusters/EcosystemInformation/MetadataProvider.h>
+#include <clusters/ElectricalAlarm/Ids.h>
+#include <clusters/ElectricalAlarm/MetadataProvider.h>
 #include <clusters/ElectricalDistribution/Ids.h>
 #include <clusters/ElectricalDistribution/MetadataProvider.h>
 #include <clusters/ElectricalEnergyMeasurement/Ids.h>
@@ -358,6 +364,11 @@ std::optional<DataModel::AcceptedCommandEntry> AcceptedCommandEntryFor(ClusterId
         if (id == AmbientContextSensing::Id)
             return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, AmbientContextSensing::Id>::EntryFor(command);
     }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == AmbientSensingUnion::Id) || ...))
+    {
+        if (id == AmbientSensingUnion::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, AmbientSensingUnion::Id>::EntryFor(command);
+    }
     if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == ApplicationBasic::Id) || ...))
     {
         if (id == ApplicationBasic::Id)
@@ -372,6 +383,11 @@ std::optional<DataModel::AcceptedCommandEntry> AcceptedCommandEntryFor(ClusterId
     {
         if (id == AudioOutput::Id)
             return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, AudioOutput::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == AvAnalysis::Id) || ...))
+    {
+        if (id == AvAnalysis::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, AvAnalysis::Id>::EntryFor(command);
     }
     if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == BallastConfiguration::Id) || ...))
     {
@@ -530,6 +546,11 @@ std::optional<DataModel::AcceptedCommandEntry> AcceptedCommandEntryFor(ClusterId
     {
         if (id == EcosystemInformation::Id)
             return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, EcosystemInformation::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == ElectricalAlarm::Id) || ...))
+    {
+        if (id == ElectricalAlarm::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, ElectricalAlarm::Id>::EntryFor(command);
     }
     if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == ElectricalDistribution::Id) || ...))
     {
