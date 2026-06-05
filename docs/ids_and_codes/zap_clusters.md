@@ -123,6 +123,7 @@ Generally regenerate using one of:
 |       1071 |      0x42F | RadonConcentrationMeasurement                           |
 |       1072 |      0x430 | SoilMeasurement                                         |
 |       1073 |      0x431 | AmbientContextSensing                                   |
+|       1074 |      0x432 | AmbientSensingUnion                                     |
 |       1075 |      0x433 | ProximityRanging                                        |
 |       1076 |      0x434 | SmokeConcentrationMeasurement                           |
 |       1104 |      0x450 | NetworkIdentityManagement                               |
@@ -150,6 +151,7 @@ Generally regenerate using one of:
 |       1364 |      0x554 | WebRTCTransportRequestor                                |
 |       1365 |      0x555 | PushAvStreamTransport                                   |
 |       1366 |      0x556 | Chime                                                   |
+|       1367 |      0x557 | AvAnalysis                                              |
 |       1792 |      0x700 | CommodityTariff                                         |
 |       1872 |      0x750 | EcosystemInformation                                    |
 |       1873 |      0x751 | CommissionerControl                                     |

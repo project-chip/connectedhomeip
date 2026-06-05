@@ -69,7 +69,8 @@ CHIP_ERROR NetworkInfrastructureManagerDevice::Register(chip::EndpointId endpoin
     ReturnErrorOnFailure(provider.AddCluster(mThreadNetworkDirectoryCluster.Registration()));
 
     // 4. Thread Network Diagnostics
-    mThreadNetworkDiagnosticsCluster.Create(endpoint, ThreadNetworkDiagnosticsCluster::ClusterType::kFull);
+    mThreadNetworkDiagnosticsCluster.Create(endpoint, ThreadNetworkDiagnosticsCluster::ClusterType::kFull,
+                                            mThreadDiagnosticsProvider);
     ReturnErrorOnFailure(provider.AddCluster(mThreadNetworkDiagnosticsCluster.Registration()));
 
     return provider.AddEndpoint(mEndpointRegistration);

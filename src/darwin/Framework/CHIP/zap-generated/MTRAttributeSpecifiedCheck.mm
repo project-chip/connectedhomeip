@@ -5600,7 +5600,7 @@ static BOOL AttributeIsSpecifiedInAmbientContextSensingCluster(AttributeId aAttr
     case Attributes::AmbientContextTypeSupported::Id: {
         return YES;
     }
-    case Attributes::ObjectCountReached::Id: {
+    case Attributes::ObjectCountThresholdReached::Id: {
         return YES;
     }
     case Attributes::ObjectCountConfig::Id: {
@@ -5621,6 +5621,9 @@ static BOOL AttributeIsSpecifiedInAmbientContextSensingCluster(AttributeId aAttr
     case Attributes::PredictedActivity::Id: {
         return YES;
     }
+    case Attributes::SensorFusionSupported::Id: {
+        return YES;
+    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }
@@ -5638,6 +5641,40 @@ static BOOL AttributeIsSpecifiedInAmbientContextSensingCluster(AttributeId aAttr
     }
     default: {
         // Not a known AmbientContextSensing attribute.
+        return NO;
+    }
+    }
+}
+static BOOL AttributeIsSpecifiedInAmbientSensingUnionCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::AmbientSensingUnion;
+    switch (aAttributeId) {
+    case Attributes::UnionName::Id: {
+        return YES;
+    }
+    case Attributes::UnionHealth::Id: {
+        return YES;
+    }
+    case Attributes::UnionContributorList::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        // Not a known AmbientSensingUnion attribute.
         return NO;
     }
     }
@@ -6746,6 +6783,49 @@ static BOOL AttributeIsSpecifiedInChimeCluster(AttributeId aAttributeId)
     }
     }
 }
+static BOOL AttributeIsSpecifiedInAVAnalysisCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::AvAnalysis;
+    switch (aAttributeId) {
+    case Attributes::SupportedAmbientContexts::Id: {
+        return YES;
+    }
+    case Attributes::ActiveAmbientContextTriggers::Id: {
+        return YES;
+    }
+    case Attributes::MaxAnalysisStreamCount::Id: {
+        return YES;
+    }
+    case Attributes::CurrentAnalysisStreamCount::Id: {
+        return YES;
+    }
+    case Attributes::AnalysisStreams::Id: {
+        return YES;
+    }
+    case Attributes::TrackingEnabled::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        // Not a known AVAnalysis attribute.
+        return NO;
+    }
+    }
+}
 static BOOL AttributeIsSpecifiedInCommodityTariffCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::CommodityTariff;
@@ -7778,6 +7858,9 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     case Clusters::AmbientContextSensing::Id: {
         return AttributeIsSpecifiedInAmbientContextSensingCluster(aAttributeId);
     }
+    case Clusters::AmbientSensingUnion::Id: {
+        return AttributeIsSpecifiedInAmbientSensingUnionCluster(aAttributeId);
+    }
     case Clusters::ProximityRanging::Id: {
         return AttributeIsSpecifiedInProximityRangingCluster(aAttributeId);
     }
@@ -7858,6 +7941,9 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     }
     case Clusters::Chime::Id: {
         return AttributeIsSpecifiedInChimeCluster(aAttributeId);
+    }
+    case Clusters::AvAnalysis::Id: {
+        return AttributeIsSpecifiedInAVAnalysisCluster(aAttributeId);
     }
     case Clusters::CommodityTariff::Id: {
         return AttributeIsSpecifiedInCommodityTariffCluster(aAttributeId);
