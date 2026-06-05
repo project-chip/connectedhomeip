@@ -73,7 +73,7 @@ CHIP_ERROR WaterHeaterManagementCluster::GenerateBoostStartedEvent(uint32_t dura
     event.boostInfo.targetPercentage  = targetPercentage;
     event.boostInfo.targetReheat      = targetReheat;
 
-    VerifyOrReturnError(!mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId).has_value(),
+    VerifyOrReturnError(mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId).has_value(),
                         CHIP_ERROR_INTERNAL);
 
     return CHIP_NO_ERROR;
@@ -84,7 +84,7 @@ CHIP_ERROR WaterHeaterManagementCluster::GenerateBoostEndedEvent()
     VerifyOrReturnError(mContext != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     Events::BoostEnded::Type event;
-    VerifyOrReturnError(!mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId).has_value(),
+    VerifyOrReturnError(mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId).has_value(),
                         CHIP_ERROR_INTERNAL);
 
     return CHIP_NO_ERROR;
