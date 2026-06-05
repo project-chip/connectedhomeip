@@ -598,6 +598,8 @@ class TestDefinition:
                     pairing_cmd = pairing_cmd.with_args('--icd-registration', 'true')
 
                 test_cmd = subproc_info_repo['chip-tool-with-python'].with_args('tests', self.run_name, '--PICS', str(pics_file))
+                if value_wait_extra_duration_ms is not None:
+                    test_cmd = test_cmd.with_args('--value-wait-extra-duration-ms', str(value_wait_extra_duration_ms))
 
                 interactive_server_args = ['interactive server'] + tool_storage_args + pairing_server_args
 
