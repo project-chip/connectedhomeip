@@ -90,3 +90,52 @@ jobs:
               uses: ./.github/actions/notify-slack-failure
               with:
                 slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}
+
+    # Builds and runs the host unit-test suite with the PSA crypto backend.
+    psa_crypto_unit_tests:
+        name: PSA Crypto Unit Tests
+        if: github.actor != 'restyled-io[bot]'
+
+        runs-on: ubuntu-latest
+
+        container:
+            image: ghcr.io/project-chip/chip-build:194
+            volumes:
+                - "/:/runner-root-volume"
+                - "/tmp/log_output:/tmp/test_logs"
+            options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+            - name: Checkout submodules & Bootstrap
+              uses: ./.github/actions/checkout-submodules-and-bootstrap
+              with:
+                platform: linux unit_tests
+                bootstrap-log-name: bootstrap-logs-unittest-psa
+            - name: Detect changed paths
+              uses: dorny/paths-filter@fbd0ab8f3e69293af611ebaee6363fc25e6d187d # v4
+              id: changed_paths
+              with:
+                  filters: |
+                      credentials:
+                        - 'src/credentials/**'
+                      crypto:
+                        - 'src/crypto/**'
+                      pigweed:
+                        - 'src/pw_backends/**'
+                        - 'third_party/pigweed/**'
+            - name: Build and run PSA unit tests (ASan)
+              if: >
+                github.event_name == 'push' ||
+                steps.changed_paths.outputs.credentials == 'true' ||
+                steps.changed_paths.outputs.crypto == 'true' ||
+                steps.changed_paths.outputs.pigweed == 'true' 
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                    "./scripts/build/build_examples.py --target linux-x64-tests-psa-asan-clang build"
+            - name: Notify Slack on Failure
+              if: failure()
+              uses: ./.github/actions/notify-slack-failure
+              with:
+                slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}
