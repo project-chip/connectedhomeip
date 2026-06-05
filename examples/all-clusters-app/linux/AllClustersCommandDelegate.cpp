@@ -676,7 +676,7 @@ void HandleUpdateAmbientSensingContributorStatus(Json::Value & jsonValue)
             return;
         }
 
-        static char contributorNameBuffer[kMaxNameLength + 1];
+        char contributorNameBuffer[kMaxNameLength + 1];
         memcpy(contributorNameBuffer, contributorNameStr.data(), contributorNameStr.size());
         contributorNameBuffer[contributorNameStr.size()] = '\0';
 
@@ -748,7 +748,7 @@ void HandleSetAmbientSensingUnionName(Json::Value & jsonValue)
         return;
     }
 
-    static char unionNameBuffer[kMaxUnionNameLength + 1];
+    char unionNameBuffer[kMaxUnionNameLength + 1];
     memcpy(unionNameBuffer, unionNameStr.data(), unionNameStr.size());
     unionNameBuffer[unionNameStr.size()] = '\0';
 

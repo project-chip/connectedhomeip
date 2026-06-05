@@ -42,7 +42,7 @@ AmbientSensingUnionCluster::AmbientSensingUnionCluster(const Config & config) :
         mContributors[i].Clear();
     }
 
-    if (!config.mUnionName.empty())
+    if (config.mUnionName.data() != nullptr && !config.mUnionName.empty())
     {
         size_t len = std::min(config.mUnionName.size(), kMaxUnionNameLength);
         memcpy(mUnionNameBuffer, config.mUnionName.data(), len);
@@ -146,11 +146,16 @@ CHIP_ERROR AmbientSensingUnionCluster::SetUnionName(const CharSpan & unionName)
         return CHIP_NO_ERROR;
     }
 
-    mUnionNameLength = unionName.size();
-    if (mUnionNameLength > 0 && unionName.data() != nullptr)
+    if (unionName.data() != nullptr && unionName.size() > 0)
     {
+        mUnionNameLength = unionName.size();
         memcpy(mUnionNameBuffer, unionName.data(), mUnionNameLength);
     }
+    else
+    {
+        mUnionNameLength = 0;
+    }
+
     mUnionNameBuffer[mUnionNameLength] = '\0';
 
     NotifyAttributeChanged(UnionName::Id);
@@ -509,8 +514,8 @@ CHIP_ERROR AmbientSensingUnionCluster::LoadPersistedAttributes()
 
     if (err == CHIP_NO_ERROR)
     {
-        mUnionNameLength               = loadedLength;
-        mUnionNameBuffer[loadedLength] = '\0';
+        mUnionNameLength               = std::min(loadedLength, kMaxUnionNameLength);
+        mUnionNameBuffer[mUnionNameLength] = '\0';
         ChipLogProgress(Zcl, "AmbientSensingUnion: Loaded persisted UnionName: %.*s", static_cast<int>(mUnionNameLength),
                         mUnionNameBuffer);
     }

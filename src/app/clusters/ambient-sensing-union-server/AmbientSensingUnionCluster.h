@@ -120,10 +120,14 @@ public:
 
         void SetName(const CharSpan & contributorName)
         {
-            nameLength = std::min(contributorName.size(), kMaxContributorNameLength);
-            if (nameLength > 0 && contributorName.data() != nullptr)
+            if (contributorName.data() != nullptr && contributorName.size() > 0)
             {
+                nameLength = std::min(contributorName.size(), kMaxContributorNameLength);
                 memcpy(name, contributorName.data(), nameLength);
+            }
+            else
+            {
+                nameLength = 0;
             }
             name[nameLength] = '\0';
         }
@@ -250,9 +254,6 @@ private:
     void EmitContributorAddedEvent(const ContributorEntry & entry);
     void EmitContributorRemovedEvent(const ContributorEntry & entry);
     void EmitContributorStatusChangedEvent(const ContributorEntry & entry);
-    // Bulk event emission helper (used by ClearAllContributors)
-    void EmitContributorsBulkRemovedEvent(
-        const DataModel::List<const AmbientSensingUnion::Structs::UnionContributorStruct::Type> & contributors);
 
     // Attribute encoding
     CHIP_ERROR EncodeContributorList(AttributeValueEncoder & encoder);
