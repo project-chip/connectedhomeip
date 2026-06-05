@@ -35,25 +35,32 @@ template <typename Derived>
 class AppTaskImpl : public AppTask
 {
 public:
+    // Common AppTask bring up
     CHIP_ERROR AppInit() override { CRTP_OPTIONAL_DISPATCH(AppTaskImpl, Derived, AppInitImpl); }
 
+    // Air quality sensor specific initialization
     CHIP_ERROR InitAirQualitySensor() { CRTP_OPTIONAL_DISPATCH(AppTaskImpl, Derived, InitAirQualitySensorImpl); }
 
+    // Reads the current air quality measurement from the sensor
+    // Override to get value from custom hardware
     CHIP_ERROR GetAirQualityValue(int32_t & air_quality)
     {
         CRTP_OPTIONAL_DISPATCH_ARGS(AppTaskImpl, Derived, GetAirQualityValueImpl, air_quality);
     }
 
+    // Handle button press
     static void ButtonEventHandler(uint8_t button, uint8_t btnAction)
     {
         CRTP_OPTIONAL_STATIC_DISPATCH(AppTaskImpl, Derived, ButtonEventHandlerImpl, button, btnAction);
     }
 
+    // Timer expiry callback that periodically samples the sensor
     static void SensorTimerEventHandler(void * arg)
     {
         CRTP_OPTIONAL_STATIC_DISPATCH(AppTaskImpl, Derived, SensorTimerEventHandlerImpl, arg);
     }
 
+    // Data model hook invoked when a cluster attribute changes
     void DMPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
                                        uint8_t * value)
     {
@@ -62,6 +69,9 @@ public:
 
 private:
     friend Derived;
+
+    // Default *Impl() hooks, each forwards to the matching AppTask method
+    // Override the corresponding hook in CustomerAppTask to customize behavior
 
     CHIP_ERROR AppInitImpl() { return AppTask::AppInit(); }
 
