@@ -15,6 +15,7 @@
 #    limitations under the License.
 
 
+import asyncio
 import logging
 import subprocess
 import tempfile
@@ -27,6 +28,7 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.clusters.Types import NullValue
+from matter.exceptions import ChipStackError
 from matter.interaction_model import Status
 from matter.testing.apps import OtaImagePath, OTAProviderSubprocess
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
@@ -392,7 +394,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
         subprocess.run(['rm', '-rf', f'{real_kvs_path_prefix}*'])
         log.info(f"Removed all KVS files/folders with prefix: {real_kvs_path_prefix}")
 
-    async def track_download_progress(self, controller: ChipDeviceCtrl.ChipDeviceController, requestor_node_id: int, max_progress: int = 99):
+    async def track_download_progress(self, controller: ChipDeviceCtrl.ChipDeviceController, requestor_node_id:  int, max_progress: int = 99):
         """Track the progress of the download using AttributeSubscription.
         Verify that we have download progress. Fails if there is no progress during the timeout.
         If no progress is seen, the test will fail as no report received in the timeout.
@@ -407,7 +409,8 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
         # the Downloading State
 
         # Max timeout seconds
-        max_timeout = 120
+        max_timeout = 180
+        progress_step = 10
 
         download_progress_attr_handler = AttributeSubscriptionHandler(
             expected_cluster=Clusters.OtaSoftwareUpdateRequestor,
@@ -426,7 +429,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             current_progress = 0
 
         progress_seen = False
-        current_max_progress = int(current_progress) + 1
+        current_max_progress = int(current_progress) + progress_step
 
         # Verify every second the progress
         await download_progress_attr_handler.start(dev_ctrl=controller, node_id=requestor_node_id, endpoint=0,
@@ -445,7 +448,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
 
                 if not progress_seen:
                     progress_seen = True
-            # Exit when the progress is under the
+            # Exit when the progress is on the expected value and progress was seen
             current_progress = value
             return bool(value == current_max_progress and progress_seen) or value >= current_max_progress
 
@@ -458,28 +461,56 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
 
             # Handle subscribe issues
             if current_progress > current_max_progress:
-                current_max_progress = current_progress + 1
+                current_max_progress = current_progress + progress_step
 
             # warn no fail added so waiting for status
             attr_report_status = download_progress_attr_handler.await_all_expected_report_matches(
                 [download_progress_attr_matcher_obj], timeout_sec=max_timeout, warn_no_fail=True)
             log.info(f"Report status: {attr_report_status}")
+
             if not attr_report_status:
-                response = self.wait_for_user_input(
-                    f"Report not received, would you like to wait {max_timeout} seconds for next report?",
+                download_progress_attr_handler.reset()
+                user_response = self.wait_for_user_input(
+                    f"Report not received in the timeout {max_timeout}, would you like retry and  wait {max_timeout} seconds for next report?",
                     prompt_msg_placeholder="Enter 'y' or 'n'")
-                if response.strip().lower() in ("y", "yes"):
-                    # no argment with warn_no_fail
+                if user_response.lower() in ("y", "yes"):
+                    # This will retry one more time if needed to avoid cancel the test by a timeout
                     attr_report_status = download_progress_attr_handler.await_all_expected_report_matches(
                         [download_progress_attr_matcher_obj], timeout_sec=max_timeout)
+                    # If the user took more time than expected to say Yes/Y the new value is set
+                    update_state_progress = await self.read_single_attribute_check_success(Clusters.OtaSoftwareUpdateRequestor, Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState, controller)
+                    current_progress = update_state_progress
+                    current_max_progress = int(current_progress) + progress_step
+                    continue
 
             # Increase the progress
-            current_max_progress += 2
+            current_max_progress += progress_step
             if current_max_progress > max_progress:
                 current_max_progress = max_progress
             progress_seen = False
             log.info(f"Current OTA Image download progress is {current_progress}%")
             download_progress_attr_handler.reset()
 
-        # cancel the AttributeReportHandler
+        # cancel the AttributeReportHandler for Download
         download_progress_attr_handler.cancel()
+
+    async def get_connected_device_after_reboot(self, controller: ChipDeviceCtrl.ChipDeviceController, requestor_node_id: int, extra_message: str = ""):
+
+        reboot_timeout_sec = 120
+        poll_interval_sec = 5
+        reconnect_timeout_ms = 5000
+        reconnected = False
+        for attempt in range(reboot_timeout_sec // poll_interval_sec):
+            await asyncio.sleep(poll_interval_sec)
+            try:
+                await controller.GetConnectedDevice(
+                    requestor_node_id, allowPASE=False, timeoutMs=reconnect_timeout_ms)
+                reconnected = True
+                log.info(f'{extra_message} - DUT reconnected after OTA reboot (attempt {attempt + 1}).')
+                break
+            except (TimeoutError, ChipStackError):
+                log.info(
+                    f'{extra_message} - Waiting for DUT to come back online (attempt {attempt + 1}/{reboot_timeout_sec // poll_interval_sec})...')
+
+        asserts.assert_true(
+            reconnected, f'{extra_message}: DUT did not come back online within {reboot_timeout_sec}s after OTA reboot.')

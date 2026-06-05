@@ -391,7 +391,8 @@ class AttributeSubscriptionHandler:
                     for report in reports:
                         # if one the report does not match, terminate the check.
                         if not matcher.matches(report) and report_matches[expected_idx]:
-                            asserts.fail(f"Unexpected report value {report.value} found within the timeframe {timeout_sec}")
+                            asserts.fail(
+                                f"Unexpected report value {report.value} found at second: {timeout_sec-time_remaining} from a total wait of: {timeout_sec} seconds")
                         if matcher.matches(report) and report_matches[expected_idx]:
                             report_matches[expected_idx] = True
                             # LOGGER.info(f"  --> Expected value still the same. : {matcher.description}")
