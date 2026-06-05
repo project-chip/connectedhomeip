@@ -262,10 +262,10 @@ void se05x_delete_key(uint32_t keyid)
 
 /* Set key in se05x */
 CHIP_ERROR se05x_set_key_for_spake(uint32_t keyid, const uint8_t * key, size_t keylen, sss_key_part_t keyPart,
-                                   sss_cipher_type_t cipherType)
+                                   se_sss_cipher_type_t cipherType)
 {
     sss_status_t status       = kStatus_SSS_Success;
-    sss_object_t keyObject    = { 0 };
+    se_sss_object_t keyObject    = { 0 };
     const uint8_t keyBuf[128] = {
         0,
     };
@@ -293,7 +293,7 @@ CHIP_ERROR se05x_set_key_for_spake(uint32_t keyid, const uint8_t * key, size_t k
     policy_for_hmac_key.policies[0] = &hmac_withPol;
     policy_for_hmac_key.policies[1] = &commonPol;
 
-    if (cipherType == kSSS_CipherType_EC_NIST_P)
+    if (cipherType == kSE_SSS_CipherType_EC_NIST_P)
     {
         VerifyOrReturnError(keylen < (sizeof(keyBuf) - sizeof(header1)), CHIP_ERROR_INTERNAL);
 
@@ -314,13 +314,13 @@ CHIP_ERROR se05x_set_key_for_spake(uint32_t keyid, const uint8_t * key, size_t k
         bitlen    = (size_t) keylen * 8;
     }
 
-    status = sss_key_object_init(&keyObject, &gex_sss_chip_ctx.ks);
+    status = se_sss_key_object_init(&keyObject, &gex_sss_chip_ctx.ks);
     VerifyOrReturnError(status == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
 
-    status = sss_key_object_allocate_handle(&keyObject, keyid, keyPart, cipherType, keyBufLen, kKeyObject_Mode_Persistent);
+    status = se_sss_key_object_allocate_handle(&keyObject, keyid, keyPart, cipherType, keyBufLen, kKeyObject_Mode_Persistent);
     VerifyOrReturnError(status == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
 
-    status = sss_key_store_set_key(&gex_sss_chip_ctx.ks, &keyObject, keyBuf, keyBufLen, bitlen, &policy_for_hmac_key,
+    status = se_sss_key_store_set_key(&gex_sss_chip_ctx.ks, &keyObject, keyBuf, keyBufLen, bitlen, &policy_for_hmac_key,
                                    sizeof(policy_for_hmac_key));
     VerifyOrReturnError(status == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
 
@@ -330,7 +330,7 @@ CHIP_ERROR se05x_set_key_for_spake(uint32_t keyid, const uint8_t * key, size_t k
 /* Get certificate from se05x */
 CHIP_ERROR se05x_get_certificate(uint32_t keyId, uint8_t * buf, size_t * buflen)
 {
-    sss_object_t keyObject = { 0 };
+    se_sss_object_t keyObject = { 0 };
     sss_status_t status    = kStatus_SSS_Fail;
     size_t certBitLen      = 0;
 
@@ -342,13 +342,13 @@ CHIP_ERROR se05x_get_certificate(uint32_t keyId, uint8_t * buf, size_t * buflen)
 
     VerifyOrReturnError(se05x_session_open() == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
 
-    status = sss_key_object_init(&keyObject, &gex_sss_chip_ctx.ks);
+    status = se_sss_key_object_init(&keyObject, &gex_sss_chip_ctx.ks);
     VerifyOrReturnError(status == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
 
-    status = sss_key_object_get_handle(&keyObject, keyId);
+    status = se_sss_key_object_get_handle(&keyObject, keyId);
     VerifyOrReturnError(status == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
 
-    status = sss_key_store_get_key(&gex_sss_chip_ctx.ks, &keyObject, buf, buflen, &certBitLen);
+    status = se_sss_key_store_get_key(&gex_sss_chip_ctx.ks, &keyObject, buf, buflen, &certBitLen);
     VerifyOrReturnError(status == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
 
     return CHIP_NO_ERROR;
@@ -357,17 +357,17 @@ CHIP_ERROR se05x_get_certificate(uint32_t keyId, uint8_t * buf, size_t * buflen)
 /* Set certificate in se05x */
 CHIP_ERROR se05x_set_certificate(uint32_t keyId, const uint8_t * buf, size_t buflen)
 {
-    sss_object_t keyObject = { 0 };
+    se_sss_object_t keyObject = { 0 };
     sss_status_t status    = kStatus_SSS_Fail;
 
-    status = sss_key_object_init(&keyObject, &gex_sss_chip_ctx.ks);
+    status = se_sss_key_object_init(&keyObject, &gex_sss_chip_ctx.ks);
     VerifyOrReturnError(status == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
 
-    status = sss_key_object_allocate_handle(&keyObject, keyId, kSSS_KeyPart_Default, kSSS_CipherType_Certificate, buflen,
+    status = se_sss_key_object_allocate_handle(&keyObject, keyId, kSSS_KeyPart_Default, kSE_SSS_CipherType_Certificate, buflen,
                                             kKeyObject_Mode_Transient);
     VerifyOrReturnError(status == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
 
-    status = sss_key_store_set_key(&gex_sss_chip_ctx.ks, &keyObject, buf, buflen, buflen * 8, NULL, 0);
+    status = se_sss_key_store_set_key(&gex_sss_chip_ctx.ks, &keyObject, buf, buflen, buflen * 8, NULL, 0);
     VerifyOrReturnError(status == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
 
     return CHIP_NO_ERROR;
@@ -376,17 +376,17 @@ CHIP_ERROR se05x_set_certificate(uint32_t keyId, const uint8_t * buf, size_t buf
 /* Set Binary data in se05x */
 CHIP_ERROR se05x_set_binary_data(uint32_t keyId, const uint8_t * buf, size_t buflen)
 {
-    sss_object_t keyObject = { 0 };
+    se_sss_object_t keyObject = { 0 };
     sss_status_t status    = kStatus_SSS_Fail;
 
-    status = sss_key_object_init(&keyObject, &gex_sss_chip_ctx.ks);
+    status = se_sss_key_object_init(&keyObject, &gex_sss_chip_ctx.ks);
     VerifyOrReturnError(status == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
 
-    status = sss_key_object_allocate_handle(&keyObject, keyId, kSSS_KeyPart_Default, kSSS_CipherType_Binary, buflen,
+    status = se_sss_key_object_allocate_handle(&keyObject, keyId, kSSS_KeyPart_Default, kSE_SSS_CipherType_Binary, buflen,
                                             kKeyObject_Mode_Persistent);
     VerifyOrReturnError(status == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
 
-    status = sss_key_store_set_key(&gex_sss_chip_ctx.ks, &keyObject, buf, buflen, buflen * 8, NULL, 0);
+    status = se_sss_key_store_set_key(&gex_sss_chip_ctx.ks, &keyObject, buf, buflen, buflen * 8, NULL, 0);
     VerifyOrReturnError(status == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
 
     return CHIP_NO_ERROR;
