@@ -200,6 +200,10 @@ void JointFabricAdministratorGlobalInstance::HandleOJCW(HandlerContext & ctx,
                  globalStatus = Status::Failure);
     VerifyOrExit(!administratorFabricIndex.IsNull() && administratorFabricIndex.Value() != 0,
                  status.Emplace(ICACCSRResponseStatusCodeEnum::kInvalidAdministratorFabricIndex));
+    // The Joint Fabric Anchor identity must match the fabric making the request; otherwise an admin on a
+    // different fabric could drive this flow.
+    VerifyOrExit(administratorFabricIndex.Value() == fabricIndex,
+                 status.Emplace(ICACCSRResponseStatusCodeEnum::kInvalidAdministratorFabricIndex));
     VerifyOrExit(failSafeContext.IsFailSafeFullyDisarmed(), status.Emplace(ICACCSRResponseStatusCodeEnum::kBusy));
 
     VerifyOrExit(!commissionMgr.IsCommissioningWindowOpen(), status.Emplace(ICACCSRResponseStatusCodeEnum::kBusy));
@@ -334,6 +338,10 @@ void JointFabricAdministratorGlobalInstance::HandleICACCSRRequest(HandlerContext
                      Status::Success,
                  nonDefaultStatus = Status::Failure);
     VerifyOrExit(!administratorFabricIndex.IsNull(),
+                 status.Emplace(ICACCSRResponseStatusCodeEnum::kInvalidAdministratorFabricIndex));
+    // The Joint Fabric Anchor identity must match the fabric making the request; otherwise an admin on a
+    // different fabric could request an ICAC CSR.
+    VerifyOrExit(administratorFabricIndex.Value() == ctx.mCommandHandler.GetAccessingFabricIndex(),
                  status.Emplace(ICACCSRResponseStatusCodeEnum::kInvalidAdministratorFabricIndex));
 
     VerifyOrExit(jointFabricAdministrator.GetDelegate() != nullptr, nonDefaultStatus = Status::Failure);
