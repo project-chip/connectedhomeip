@@ -17,6 +17,8 @@
 
 #include <app/server/JointFabricDatastore.h>
 
+#include <crypto/CHIPCryptoPAL.h>
+
 #include <algorithm>
 #include <unordered_set>
 
@@ -36,6 +38,16 @@ void MarkEntryCommittedIfFound(Vec & vec, Pred pred)
     if (it != vec.end())
     {
         it->statusEntry.state = Clusters::JointFabricDatastore::DatastoreStateEnum::kCommitted;
+    }
+}
+
+// Zeroize cryptographic material before the backing storage is freed, so raw epoch HMAC keys and
+// ICAC DER bytes do not linger in freed heap.
+void ScrubSecretBytes(std::vector<uint8_t> & secret)
+{
+    if (!secret.empty())
+    {
+        Crypto::ClearSecretData(secret.data(), secret.size());
     }
 }
 } // namespace
@@ -60,7 +72,14 @@ void JointFabricDatastore::CopyGroupKeySetWithOwnedSpans(
 
 void JointFabricDatastore::RemoveGroupKeySetStorage(uint16_t groupKeySetId)
 {
-    mGroupKeySetStorage.erase(groupKeySetId);
+    auto it = mGroupKeySetStorage.find(groupKeySetId);
+    if (it != mGroupKeySetStorage.end())
+    {
+        ScrubSecretBytes(it->second.epochKey0);
+        ScrubSecretBytes(it->second.epochKey1);
+        ScrubSecretBytes(it->second.epochKey2);
+        mGroupKeySetStorage.erase(it);
+    }
 }
 
 void JointFabricDatastore::SetGroupInformationFriendlyNameWithOwnedStorage(
@@ -94,7 +113,12 @@ CHIP_ERROR JointFabricDatastore::SetAdminEntryWithOwnedStorage(
 
 void JointFabricDatastore::RemoveAdminEntryStorage(NodeId nodeId)
 {
-    mAdminEntryStorage.erase(nodeId);
+    auto it = mAdminEntryStorage.find(nodeId);
+    if (it != mAdminEntryStorage.end())
+    {
+        ScrubSecretBytes(it->second.icac);
+        mAdminEntryStorage.erase(it);
+    }
 }
 
 void JointFabricDatastore::SetEndpointFriendlyNameWithOwnedStorage(
