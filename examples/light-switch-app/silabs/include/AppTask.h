@@ -104,34 +104,60 @@ class AppTask : public BaseApplication
 public:
     AppTask() = default;
 
+    /** @brief Returns the active app instance */
     static AppTask & GetAppTask();
 
+    /**
+     * @brief AppTask task main loop function
+     *
+     * @param pvParameter FreeRTOS task parameter
+     */
     static void AppTaskMain(void * pvParameter);
+
+    /** @brief Creates and starts the AppTask thread */
     CHIP_ERROR StartAppTask();
 
+    /**
+     * @brief Event handler when a button is pressed
+     *
+     * @param button    APP_FUNCTION_BUTTON or the action button
+     * @param btnAction SL_SIMPLE_BUTTON_PRESSED, SL_SIMPLE_BUTTON_RELEASED or SL_SIMPLE_BUTTON_DISABLED
+     */
     static void ButtonEventHandler(uint8_t button, uint8_t btnAction);
+
+    /** @brief AppTask thread event handler for queued button events */
     static void AppEventHandler(AppEvent * aEvent);
 
+    /** @brief Matter-thread work item: notifies the binding manager that a bound cluster changed to drive the outgoing switch command */
     static void SwitchWorkerFunction(intptr_t context);
+
+    /** @brief Matter-thread work item: emits a Generic Switch cluster event for the queued switch action */
     static void GenericSwitchWorkerFunction(intptr_t context);
 
+    /** @brief Sends an OnOff cluster command to the bound peer device for the given binding entry */
     static void ProcessOnOffBindingCommand(chip::CommandId commandId, const chip::app::Clusters::Binding::TableEntry & binding,
                                            chip::OperationalDeviceProxy * peer_device);
 
+    /** @brief Sends a LevelControl cluster command to the bound peer device for the given binding entry */
     static void ProcessLevelControlBindingCommand(BindingCommandData * data,
                                                   const chip::app::Clusters::Binding::TableEntry & binding,
                                                   chip::OperationalDeviceProxy * peer_device);
 
+    /** @brief Data model hook invoked when a cluster attribute changes */
     void DMPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
                                        uint8_t * value);
 
+    /** @brief Binding manager callback invoked per bound device to send a switch command to the target light */
     static void LightSwitchChangedHandler(const chip::app::Clusters::Binding::TableEntry & binding,
                                           chip::OperationalDeviceProxy * peer_device, void * context);
 
 protected:
+    /** @brief Override of `BaseApplication::AppInit()` */
     CHIP_ERROR AppInit() override;
 
+    /** @brief Light switch specific initialization */
     CHIP_ERROR InitLightSwitch(chip::EndpointId lightSwitchEndpoint, chip::EndpointId genericSwitchEndpoint);
 
+    /** @brief Handler scheduled on the Matter thread to set up the binding table */
     static void InitBindingHandler(intptr_t arg);
 };

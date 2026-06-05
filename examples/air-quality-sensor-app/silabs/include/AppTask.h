@@ -59,6 +59,7 @@ class AppTask : public BaseApplication
 public:
     AppTask() = default;
 
+    /** @brief Returns the active app instance */
     static AppTask & GetAppTask();
 
     /**
@@ -68,6 +69,7 @@ public:
      */
     static void AppTaskMain(void * pvParameter);
 
+    /** @brief Creates and starts the AppTask thread */
     CHIP_ERROR StartAppTask();
 
     /**
@@ -90,6 +92,7 @@ public:
      */
     static void ButtonEventHandler(uint8_t button, uint8_t btnAction);
 
+    /** @brief Data model hook invoked when a cluster attribute changes */
     void DMPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
                                        uint8_t * value);
 
@@ -102,13 +105,13 @@ public:
      */
     CHIP_ERROR GetAirQualityValue(int32_t & air_quality);
 
-    // Reads new generated sensor value, stores it, and updates local Air Quality attribute
+    /** @brief Reads new generated sensor value, stores it, and updates local Air Quality attribute */
     static void SensorTimerEventHandler(void * arg);
 
 protected:
-    /** Override of `BaseApplication::AppInit()`. */
+    /** @brief Override of `BaseApplication::AppInit()` */
     CHIP_ERROR AppInit() override;
 
-    /** Bring up the air quality sensor app: Matter manager, sensor timer, sensor driver, first reading. */
+    /** @brief Bring up the air quality sensor app: Matter manager, sensor timer, sensor driver, first reading. */
     CHIP_ERROR InitAirQualitySensor();
 };
