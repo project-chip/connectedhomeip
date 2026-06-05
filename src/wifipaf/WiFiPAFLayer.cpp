@@ -250,7 +250,6 @@ void WiFiPAFLayer::Shutdown()
             continue;
         }
 
-
         ChipLogProgress(WiFiPAF, "WiFiPAF: Canceling id: %u", endPoint->mSessionInfo.id);
         endPoint->DoClose(kWiFiPAFCloseFlag_AbortTransmission, WIFIPAF_ERROR_APP_CLOSED_CONNECTION);
     }
