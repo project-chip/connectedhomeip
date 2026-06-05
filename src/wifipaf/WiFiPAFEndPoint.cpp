@@ -147,8 +147,16 @@ CHIP_ERROR WiFiPAFEndPoint::HandleConnectComplete()
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     mState = kState_Connected;
-    // Cancel the connect timer.
-    StopConnectTimer();
+    // Cancel connect and receive-connection timers.
+    if (mRole == kWiFiPafRole_Subscriber)
+    {
+        StopConnectTimer();
+    }
+    else
+    {
+        StopReceiveConnectionTimer();
+    }
+
 
     // We've successfully completed the PAF transport protocol handshake, so let the application know we're open for business.
     if (mWiFiPafLayer != nullptr)
@@ -183,6 +191,11 @@ void WiFiPAFEndPoint::DoClose(uint8_t flags, CHIP_ERROR err)
         {
             StopConnectTimer();
         }
+        else
+        {
+            StopReceiveConnectionTimer();
+        }
+
 
         // Free the packets in re-order queue if ones exist
         for (uint8_t qidx = 0; qidx < PAFTP_REORDER_QUEUE_SIZE; qidx++)
@@ -277,7 +290,9 @@ void WiFiPAFEndPoint::Free()
 
     // Cancel all timers.
     StopConnectTimer();
+    StopReceiveConnectionTimer();
     StopAckReceivedTimer();
+
     StopSendAckTimer();
     StopWaitResourceTimer();
 
@@ -1159,6 +1174,17 @@ CHIP_ERROR WiFiPAFEndPoint::StartConnectTimer()
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR WiFiPAFEndPoint::StartReceiveConnectionTimer()
+{
+    const CHIP_ERROR timerErr = mWiFiPafLayer->mSystemLayer->StartTimer(System::Clock::Milliseconds32(PAFTP_CONN_RSP_TIMEOUT_MS),
+                                                                        HandleReceiveConnectionTimeout, this);
+    ReturnErrorOnFailure(timerErr);
+    mTimerStateFlags.Set(TimerStateFlag::kReceiveConnectionTimerRunning);
+
+    return CHIP_NO_ERROR;
+}
+
+
 CHIP_ERROR WiFiPAFEndPoint::StartAckReceivedTimer()
 {
     if (!mTimerStateFlags.Has(TimerStateFlag::kAckReceivedTimerRunning))
@@ -1225,6 +1251,14 @@ void WiFiPAFEndPoint::StopConnectTimer()
     mTimerStateFlags.Clear(TimerStateFlag::kConnectTimerRunning);
 }
 
+void WiFiPAFEndPoint::StopReceiveConnectionTimer()
+{
+    // Cancel any existing receive-connection timer.
+    mWiFiPafLayer->mSystemLayer->CancelTimer(HandleReceiveConnectionTimeout, this);
+    mTimerStateFlags.Clear(TimerStateFlag::kReceiveConnectionTimerRunning);
+}
+
+
 void WiFiPAFEndPoint::StopAckReceivedTimer()
 {
     // Cancel any existing ack-received timer.
@@ -1258,6 +1292,20 @@ void WiFiPAFEndPoint::HandleConnectTimeout(chip::System::Layer * systemLayer, vo
         ep->DoClose(kWiFiPAFCloseFlag_AbortTransmission, WIFIPAF_ERROR_CONNECT_TIMED_OUT);
     }
 }
+
+void WiFiPAFEndPoint::HandleReceiveConnectionTimeout(chip::System::Layer * systemLayer, void * appState)
+{
+    WiFiPAFEndPoint * ep = static_cast<WiFiPAFEndPoint *>(appState);
+
+    // Check for event-based timer race condition.
+    if (ep->mTimerStateFlags.Has(TimerStateFlag::kReceiveConnectionTimerRunning))
+    {
+        ChipLogError(WiFiPAF, "receive handshake timed out, closing ep %p", ep);
+        ep->mTimerStateFlags.Clear(TimerStateFlag::kReceiveConnectionTimerRunning);
+        ep->DoClose(kWiFiPAFCloseFlag_SuppressCallback | kWiFiPAFCloseFlag_AbortTransmission, WIFIPAF_ERROR_RECEIVE_TIMED_OUT);
+    }
+}
+
 
 void WiFiPAFEndPoint::HandleAckReceivedTimeout(chip::System::Layer * systemLayer, void * appState)
 {
