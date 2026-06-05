@@ -245,10 +245,11 @@ void WiFiPAFLayer::Shutdown()
     for (uint8_t i = 0; i < WIFIPAF_LAYER_NUM_PAF_ENDPOINTS; i++)
     {
         WiFiPAFEndPoint * endPoint = sWiFiPAFEndPointPool.Get(i);
-        if ((endPoint == nullptr) || (endPoint->mWiFiPafLayer == nullptr))
+        if ((endPoint == nullptr) || (endPoint->mWiFiPafLayer != this))
         {
             continue;
         }
+
 
         ChipLogProgress(WiFiPAF, "WiFiPAF: Canceling id: %u", endPoint->mSessionInfo.id);
         endPoint->DoClose(kWiFiPAFCloseFlag_AbortTransmission, WIFIPAF_ERROR_APP_CLOSED_CONNECTION);
