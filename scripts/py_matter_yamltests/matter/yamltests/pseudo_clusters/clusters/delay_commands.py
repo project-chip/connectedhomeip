@@ -165,6 +165,7 @@ class DelayCommands(PseudoCluster):
         max_history = 10
 
         while True:
+            elapsed_s = time.monotonic() - start_time
             try:
                 responses, _ = await runner.run_step(mock_step, config)
                 if isinstance(responses, list) and responses:
@@ -175,12 +176,12 @@ class DelayCommands(PseudoCluster):
                     response = None
 
                 if response is None:
-                    history.append("empty response")
+                    history.append(f"[{elapsed_s:.2f}s] empty response")
                 elif 'error' in response:
-                    history.append(f"error: {response['error']}")
+                    history.append(f"[{elapsed_s:.2f}s] error: {response['error']}")
                 else:
                     value = response.get('value')
-                    history.append(f"value: {value}")
+                    history.append(f"[{elapsed_s:.2f}s] value: {value}")
                     if value == expected_value:
                         return
             except (AttributeError, NameError, TypeError):
@@ -194,7 +195,7 @@ class DelayCommands(PseudoCluster):
                 # the timeout expires. If the error persists, the command will
                 # eventually fail with a timeout exception. We keep a history of
                 # these failures to help with debugging.
-                history.append(f"exception: {str(e)}")
+                history.append(f"[{elapsed_s:.2f}s] exception: {str(e)}")
 
             if len(history) > max_history:
                 history.pop(0)
@@ -204,6 +205,6 @@ class DelayCommands(PseudoCluster):
 
             await asyncio.sleep(poll_interval_s)
 
-        history_str = "\n".join(f"  Attempt {len(history)-i}: {attempt}" for i, attempt in enumerate(history))
+        history_str = "\n".join(f"  {attempt}" for attempt in history)
         raise TimeoutError(f"Timeout waiting for attribute {cluster_name}.{attribute_name} to become {expected_value}.\n"
                            f"Recent history of attempts:\n{history_str}")
