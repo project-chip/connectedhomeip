@@ -126,9 +126,10 @@ private:
      *               |                                                |
      *               v                                                v
      *    +----------------------+                         +----------------------+
-     *    | kConnectTimerRunning |                         |kReceiveConnectionTimer
-     *    |       (5000ms)       |                         |       (5000ms)       |
+     *    | kConnectTimerRunning |                         |kReceiveConnectionTim-|
+     *    |       (5000ms)       |                         |  erRunning (5000ms)  |
      *    +----------------------+                         +----------------------+
+
      *         |            |                                   |            |
      *   (Handshake     (Timeout)                         (Handshake     (Timeout)
      *    Complete)         |                              Complete)         |

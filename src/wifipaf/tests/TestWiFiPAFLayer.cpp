@@ -85,8 +85,15 @@ public:
     bool mResourceAvailable = true;
     bool isSendQueueNull() { return mEndPoint->mSendQueue.IsNull(); }
     uint8_t GetResourceWaitCount() { return mEndPoint->mResourceWaitCount; }
+    CHIP_ERROR EpStartReceiveConnectionTimer() { return mEndPoint->StartReceiveConnectionTimer(); }
+    bool EpHasReceiveConnectionTimer()
+    {
+        return mEndPoint->mTimerStateFlags.Has(WiFiPAFEndPoint::TimerStateFlag::kReceiveConnectionTimerRunning);
+    }
+    WiFiPAFLayer * EpGetWiFiPafLayer() { return mEndPoint->mWiFiPafLayer; }
 
 private:
+
     WiFiPAFEndPoint * mEndPoint;
 };
 
@@ -411,5 +418,41 @@ TEST_F(TestWiFiPAFLayer, CheckRunAsCommissionee)
     EXPECT_EQ(RmPafSession(PafInfoAccess::kAccSessionId, sessionInfo), CHIP_NO_ERROR);
     EpDoClose(kWiFiPAFCloseFlag_AbortTransmission, WIFIPAF_ERROR_APP_CLOSED_CONNECTION);
 }
+
+TEST_F(TestWiFiPAFLayer, ReceiveConnectionTimerTimeout)
+{
+    System::Clock::Internal::RAIIMockClock clock;
+
+    WiFiPAFSession sessionInfo = {
+        .role          = kWiFiPafRole_Publisher,
+        .id            = 1,
+        .peer_id       = 1,
+        .peer_addr     = { 0xd0, 0x17, 0x69, 0xee, 0x7f, 0x3c },
+        .nodeId        = 1,
+        .discriminator = 0xF00,
+    };
+
+    WiFiPAFEndPoint * newEndPoint = nullptr;
+    EXPECT_EQ(NewEndPoint(&newEndPoint, sessionInfo, sessionInfo.role), CHIP_NO_ERROR);
+    ASSERT_NE(newEndPoint, nullptr);
+    SetEndPoint(newEndPoint);
+
+    EXPECT_EQ(EpStartReceiveConnectionTimer(), CHIP_NO_ERROR);
+    EXPECT_TRUE(EpHasReceiveConnectionTimer());
+
+    // Advance mock clock past connection timeout deadline (5 seconds).
+    clock.AdvanceMonotonic(System::Clock::Milliseconds64(PAFTP_CONN_RSP_TIMEOUT_MS + 100));
+    static_cast<System::LayerSelectLoop &>(DeviceLayer::SystemLayer()).PrepareEvents();
+    static_cast<System::LayerSelectLoop &>(DeviceLayer::SystemLayer()).HandleEvents();
+
+    // Verify timer expired, flag cleared, and endpoint closed successfully.
+
+
+    EXPECT_FALSE(EpHasReceiveConnectionTimer());
+    EXPECT_EQ(EpGetWiFiPafLayer(), nullptr);
+}
+
+
 }; // namespace WiFiPAF
 }; // namespace chip
+
