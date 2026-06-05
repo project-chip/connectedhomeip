@@ -27,9 +27,11 @@
 #include <clusters/AdministratorCommissioning/CommandIds.h>
 #include <clusters/AirQuality/CommandIds.h>
 #include <clusters/AmbientContextSensing/CommandIds.h>
+#include <clusters/AmbientSensingUnion/CommandIds.h>
 #include <clusters/ApplicationBasic/CommandIds.h>
 #include <clusters/ApplicationLauncher/CommandIds.h>
 #include <clusters/AudioOutput/CommandIds.h>
+#include <clusters/AvAnalysis/CommandIds.h>
 #include <clusters/BallastConfiguration/CommandIds.h>
 #include <clusters/BasicInformation/CommandIds.h>
 #include <clusters/Binding/CommandIds.h>
@@ -61,6 +63,7 @@
 #include <clusters/DoorLock/CommandIds.h>
 #include <clusters/DynamicLighting/CommandIds.h>
 #include <clusters/EcosystemInformation/CommandIds.h>
+#include <clusters/ElectricalAlarm/CommandIds.h>
 #include <clusters/ElectricalDistribution/CommandIds.h>
 #include <clusters/ElectricalEnergyMeasurement/CommandIds.h>
 #include <clusters/ElectricalGridConditions/CommandIds.h>
