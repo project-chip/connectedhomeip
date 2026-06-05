@@ -73,11 +73,8 @@ CHIP_ERROR WaterHeaterManagementCluster::GenerateBoostStartedEvent(uint32_t dura
     event.boostInfo.targetPercentage  = targetPercentage;
     event.boostInfo.targetReheat      = targetReheat;
 
-    if (!mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId).has_value())
-    {
-        ChipLogError(AppServer, "Unable to generate BoostStarted event");
-        return CHIP_ERROR_INTERNAL;
-    }
+    VerifyOrReturnError(!mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId).has_value(), CHIP_ERROR_INTERNAL);
+
     return CHIP_NO_ERROR;
 }
 
@@ -86,11 +83,8 @@ CHIP_ERROR WaterHeaterManagementCluster::GenerateBoostEndedEvent()
     VerifyOrReturnError(mContext != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     Events::BoostEnded::Type event;
-    if (!mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId).has_value())
-    {
-        ChipLogError(AppServer, "Unable to generate BoostEnded event");
-        return CHIP_ERROR_INTERNAL;
-    }
+    VerifyOrReturnError(!mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId).has_value(), CHIP_ERROR_INTERNAL);
+
     return CHIP_NO_ERROR;
 }
 
@@ -112,8 +106,6 @@ DataModel::ActionReturnStatus WaterHeaterManagementCluster::ReadAttribute(const 
         return encoder.Encode(mDelegate.GetTankPercentage());
     case BoostState::Id:
         return encoder.Encode(mDelegate.GetBoostState());
-
-    /* FeatureMap - is held locally */
     case FeatureMap::Id:
         return encoder.Encode(mFeature);
     case ClusterRevision::Id:
@@ -146,7 +138,7 @@ std::optional<DataModel::ActionReturnStatus> WaterHeaterManagementCluster::Invok
     }
 }
 
-DataModel::ActionReturnStatus WaterHeaterManagementCluster::HandleBoost(const Commands::Boost::DecodableType & commandData)
+Status WaterHeaterManagementCluster::HandleBoost(const Commands::Boost::DecodableType & commandData)
 {
     uint32_t duration                   = commandData.boostInfo.duration;
     Optional<bool> oneShot              = commandData.boostInfo.oneShot;
@@ -202,8 +194,7 @@ DataModel::ActionReturnStatus WaterHeaterManagementCluster::HandleBoost(const Co
     return status;
 }
 
-DataModel::ActionReturnStatus
-WaterHeaterManagementCluster::HandleCancelBoost(const Commands::CancelBoost::DecodableType & commandData)
+Status WaterHeaterManagementCluster::HandleCancelBoost(const Commands::CancelBoost::DecodableType & commandData)
 {
     Status status = mDelegate.HandleCancelBoost();
     if (status != Status::Success)

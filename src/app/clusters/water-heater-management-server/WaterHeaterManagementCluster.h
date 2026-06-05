@@ -30,7 +30,6 @@ namespace app {
 namespace Clusters {
 namespace WaterHeaterManagement {
 
-class WaterHeaterManagementCluster; // forward declaration for Delegate back-pointer
 class WaterHeaterManagementCluster : public DefaultServerCluster
 {
 public:
@@ -59,8 +58,8 @@ private:
     CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,
                                 ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
 
-    DataModel::ActionReturnStatus HandleBoost(const Commands::Boost::DecodableType & commandData);
-    DataModel::ActionReturnStatus HandleCancelBoost(const Commands::CancelBoost::DecodableType & commandData);
+    Protocols::InteractionModel::Status HandleBoost(const Commands::Boost::DecodableType & commandData);
+    Protocols::InteractionModel::Status HandleCancelBoost(const Commands::CancelBoost::DecodableType & commandData);
 };
 
 } // namespace WaterHeaterManagement
