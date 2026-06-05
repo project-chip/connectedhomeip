@@ -151,7 +151,7 @@ class DelayCommands(PseudoCluster):
 
         timeout_s = (expected_duration_ms + extra_duration_ms) / 1000.0
         poll_interval_s = 0.1
-        start_time = time.time()
+        start_time = time.monotonic()
 
         mock_step = MockTestStep(
             cluster=cluster_name,
@@ -167,7 +167,13 @@ class DelayCommands(PseudoCluster):
         while True:
             try:
                 responses, _ = await runner.run_step(mock_step, config)
-                response = responses[0] if isinstance(responses, list) and responses else None
+                if isinstance(responses, list) and responses:
+                    response = responses[0]
+                elif isinstance(responses, dict):
+                    response = responses
+                else:
+                    response = None
+
                 if response is None:
                     history.append("empty response")
                 elif 'error' in response:
@@ -193,7 +199,7 @@ class DelayCommands(PseudoCluster):
             if len(history) > max_history:
                 history.pop(0)
 
-            if time.time() - start_time >= timeout_s:
+            if time.monotonic() - start_time >= timeout_s:
                 break
 
             await asyncio.sleep(poll_interval_s)
