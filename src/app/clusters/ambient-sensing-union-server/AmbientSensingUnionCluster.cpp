@@ -514,7 +514,7 @@ CHIP_ERROR AmbientSensingUnionCluster::LoadPersistedAttributes()
 
     if (err == CHIP_NO_ERROR)
     {
-        mUnionNameLength               = std::min(loadedLength, kMaxUnionNameLength);
+        mUnionNameLength                   = std::min(loadedLength, kMaxUnionNameLength);
         mUnionNameBuffer[mUnionNameLength] = '\0';
         ChipLogProgress(Zcl, "AmbientSensingUnion: Loaded persisted UnionName: %.*s", static_cast<int>(mUnionNameLength),
                         mUnionNameBuffer);
