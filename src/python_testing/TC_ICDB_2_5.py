@@ -171,7 +171,7 @@ class TC_ICDB_2_5(ICDBaseTest):
 
         # *** STEP 2 ***
         self.step(2, """TH2 reads from the DUT the RegisteredClients attribute.""", expectation="""
-                            Verify RegisteredClients is empty (TH2 intentionally did not register as an ICD client)."""),
+                            Verify RegisteredClients is empty (TH2 intentionally did not register as an ICD client).""")
         th2_registered_clients = await self.read_icdm_attribute_expect_success(
             attributes.RegisteredClients, controller=self.th2, node_id=self.th2_dut_node_id
         )
@@ -183,14 +183,14 @@ class TC_ICDB_2_5(ICDBaseTest):
         # *** STEP 3 ***
         self.step(3, """TH1 reads from the DUT the IdleModeDuration attribute.""", expectation="""
                             Save value as idle_mode_duration_s, with it calculate: SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT = MAX(idle_mode_duration_s, 3600s).
-                            Store value for later use."""),
+                            Store value for later use.""")
         idle_mode_duration_s = await self.read_icdm_attribute_expect_success(attributes.IdleModeDuration)
         log.info(f"IdleModeDuration: {idle_mode_duration_s}s")
         subscription_max_interval_publisher_limit_s = max(idle_mode_duration_s, ONE_HOUR_S)
 
         # *** STEP 4 ***
         self.step(4, """TH1 and TH2 each subscribe to the ICDCounter attribute, with MinIntervalFloor and MaxIntervalCeiling.""", expectation="""
-                            Verify MinIntervalFloor <= MaxInterval <= MAX(SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT, MaxIntervalCeiling) for both TH1 and TH2."""),
+                            Verify MinIntervalFloor <= MaxInterval <= MAX(SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT, MaxIntervalCeiling) for both TH1 and TH2.""")
         th1_subscription = await self.default_controller.ReadAttribute(
             nodeId=self.dut_node_id,
             attributes=[(self.ROOT_NODE_ENDPOINT_ID, attributes.ICDCounter)],
@@ -223,7 +223,7 @@ class TC_ICDB_2_5(ICDBaseTest):
         # *** STEP 5 ***
         self.step(5, """Wait for 1 or more MaxInterval.""", expectation="""
                             Verify DUT sent a subscription report to both TH1 and TH2 within MaxInterval.
-                            Verify ICDCounter is unchanged."""),
+                            Verify ICDCounter is unchanged.""")
         max_interval_s = max(th1_max_interval_s, th2_max_interval_s)
 
         # Read ICDCounter before the subscription wait to detect any check-in activity
