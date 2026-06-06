@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+    <xs:include schemaLocation="access.xsd" />
+    <xs:include schemaLocation="conformance.xsd" />
+    <xs:include schemaLocation="constraint.xsd" />
+    <xs:include schemaLocation="quality.xsd" />
+
+    <xs:complexType name="DefaultType">
+        <xs:group ref="LimitGroup" minOccurs="0" maxOccurs="1" />
+        <xs:attribute name="value" type="xs:string" use="optional" />
+    </xs:complexType>
+
+    <xs:group name="FieldParametersGroup">
+        <xs:choice>
+            <xs:element name="entry" type="FieldType" minOccurs="0" maxOccurs="1"></xs:element>
+            <xs:element name="default" type="DefaultType" minOccurs="0" maxOccurs="1"></xs:element>
+            <xs:element name="access" type="AccessType" minOccurs="0" maxOccurs="1"></xs:element>
+            <xs:element name="quality" type="QualityType" minOccurs="0" maxOccurs="1" />
+            <xs:group ref="ConformanceSetGroup" minOccurs="0" maxOccurs="1" />
+            <xs:element name="constraint" type="ConstraintType" minOccurs="0" maxOccurs="1" />
+        </xs:choice>
+    </xs:group>
+
+    <xs:complexType name="FieldType">
+        <xs:choice>
+            <xs:sequence>
+                <xs:element name="entry" minOccurs="0" maxOccurs="1">
+                    <xs:complexType>
+                        <xs:group ref="FieldParametersGroup" minOccurs="0" maxOccurs="unbounded" />
+                        <xs:attribute name="type" type="xs:string" use="required" />
+                    </xs:complexType>
+                </xs:element>
+            </xs:sequence>
+            <xs:group ref="FieldParametersGroup" minOccurs="0" maxOccurs="unbounded" />
+        </xs:choice>
+        <xs:attribute name="id" type="xs:string" use="required" />
+        <xs:attribute name="name" type="xs:string" use="required" />
+        <xs:attribute name="type" type="xs:string" use="optional" />
+        <xs:attribute name="default" type="xs:string" use="optional" />
+    </xs:complexType>
+
+</xs:schema>
+  

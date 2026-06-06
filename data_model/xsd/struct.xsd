@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+    <xs:include schemaLocation="access.xsd" />
+    <xs:include schemaLocation="field.xsd" />
+
+    <xs:complexType name="StructType">
+        <xs:sequence>
+            <xs:element name="field" type="FieldType" minOccurs="0" maxOccurs="unbounded" />
+            <xs:element name="access" type="AccessType" minOccurs="0" maxOccurs="1"></xs:element>
+        </xs:sequence>
+        <xs:attribute name="name" type="xs:string" use="required" />
+    </xs:complexType>
+
+</xs:schema>
