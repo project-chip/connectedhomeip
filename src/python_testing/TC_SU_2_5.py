@@ -48,7 +48,6 @@
 # === END CI TEST ARGUMENTS ===
 
 import logging
-import asyncio
 
 from mobly import asserts
 from TC_SUTestBase import SoftwareUpdateBaseTest
