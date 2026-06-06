@@ -446,8 +446,9 @@ TEST_F(TestWiFiPAFLayer, ReceiveConnectionTimerTimeout)
     EXPECT_EQ(EpStartReceiveConnectionTimer(), CHIP_NO_ERROR);
     EXPECT_TRUE(EpHasReceiveConnectionTimer());
 
-    // Advance mock clock past connection timeout deadline (5 seconds).
+    // Advance mock clock past connection timeout deadline (15 seconds).
     clock.AdvanceMonotonic(System::Clock::Milliseconds64(PAFTP_CONN_RSP_TIMEOUT_MS + 100));
+
 
     // Directly drive the underlying POSIX select loop to dispatch the expired timer.
     static_cast<System::LayerSelectLoop &>(DeviceLayer::SystemLayer()).PrepareEvents();
