@@ -449,8 +449,6 @@ TEST_F(TestWiFiPAFLayer, ReceiveConnectionTimerTimeout)
     // Advance mock clock past connection timeout deadline.
     clock.AdvanceMonotonic(System::Clock::Milliseconds64(PAFTP_CONN_RSP_TIMEOUT_MS + 100));
 
-
-
     // Directly drive the underlying POSIX select loop to dispatch the expired timer.
     static_cast<System::LayerSelectLoop &>(DeviceLayer::SystemLayer()).PrepareEvents();
     static_cast<System::LayerSelectLoop &>(DeviceLayer::SystemLayer()).HandleEvents();

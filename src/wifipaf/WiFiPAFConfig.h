@@ -122,7 +122,6 @@ static_assert(
 #define PAFTP_CONN_RSP_TIMEOUT_MS 15000
 #endif // PAFTP_CONN_RSP_TIMEOUT_MS
 
-
 /**
  * @def PAFTP_ACK_TIMEOUT_MS
  *
