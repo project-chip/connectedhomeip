@@ -17,7 +17,7 @@
 #pragma once
 
 #include <accessors/common/SingleEndpointDeviceAccessor.h>
-#include "BooleanStateSensorDevice.h"
+#include <devices/boolean-state-sensor/BooleanStateSensorDevice.h>
 
 namespace chip::app {
 

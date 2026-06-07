@@ -14,15 +14,13 @@
  *    limitations under the License.
  */
 
-#include "BooleanStateSensorAccessor.h"
+#include <devices/boolean-state-sensor/BooleanStateSensorAccessor.h>
 
 using namespace chip::app::Clusters;
 
 namespace chip::app {
 
-BooleanStateSensorAccessor::BooleanStateSensorAccessor(BooleanStateSensorDevice * device) :
-    SingleEndpointDeviceAccessor(device)
-{}
+BooleanStateSensorAccessor::BooleanStateSensorAccessor(BooleanStateSensorDevice * device) : SingleEndpointDeviceAccessor(device) {}
 
 CHIP_ERROR BooleanStateSensorAccessor::SetAttribute(const ConcreteDataAttributePath & path, AttributeValueDecoder & decoder)
 {
