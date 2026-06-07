@@ -36,7 +36,7 @@
 #include <app_options/AppOptions.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <devices/device-factory/DeviceFactory.h>
-#if CHIP_ALL_DEVICES_APP_ENABLE_OOB_ACCESSORS
+#if defined(CHIP_ALL_DEVICES_APP_ENABLE_OOB_ACCESSORS) && CHIP_ALL_DEVICES_APP_ENABLE_OOB_ACCESSORS
 #include <accessors/common/AccessorRegistry.h>
 #include <accessors/common/OOBAccessor.h>
 #if PW_RPC_ENABLED
@@ -172,7 +172,7 @@ public:
             ChipLogProgress(AppServer, "Registering device %s on endpoint %u with parent 0x%04X", entry.type.c_str(),
                             entry.endpoint, entry.parentId);
             ReturnErrorOnFailure(device->Register(entry.endpoint, mDataModelProvider, entry.parentId));
-#if CHIP_ALL_DEVICES_APP_ENABLE_OOB_ACCESSORS
+#if defined(CHIP_ALL_DEVICES_APP_ENABLE_OOB_ACCESSORS) && CHIP_ALL_DEVICES_APP_ENABLE_OOB_ACCESSORS
             auto accessor = DeviceFactory::GetInstance().CreateAccessor(entry.type, device.get());
             if (accessor)
             {
@@ -187,7 +187,7 @@ public:
 
     void Shutdown()
     {
-#if CHIP_ALL_DEVICES_APP_ENABLE_OOB_ACCESSORS
+#if defined(CHIP_ALL_DEVICES_APP_ENABLE_OOB_ACCESSORS) && CHIP_ALL_DEVICES_APP_ENABLE_OOB_ACCESSORS
         mConstructedAccessors.clear();
 #endif // CHIP_ALL_DEVICES_APP_ENABLE_OOB_ACCESSORS
         for (auto & device : mConstructedDevices)
@@ -209,7 +209,7 @@ private:
     AppRootNode mRootNode;
     std::vector<std::unique_ptr<DeviceInterface>> mConstructedDevices;
 
-#if CHIP_ALL_DEVICES_APP_ENABLE_OOB_ACCESSORS
+#if defined(CHIP_ALL_DEVICES_APP_ENABLE_OOB_ACCESSORS) && CHIP_ALL_DEVICES_APP_ENABLE_OOB_ACCESSORS
     std::vector<std::unique_ptr<SingleEndpointDeviceAccessor>> mConstructedAccessors;
 #endif // CHIP_ALL_DEVICES_APP_ENABLE_OOB_ACCESSORS
 };
