@@ -29,9 +29,15 @@ classDiagram
         +SetAttribute(path, decoder)*
         +InvokeAction(actionName, arguments)*
     }
-    class BooleanStateSensorAccessor {
-        +SetAttribute(path, decoder)
+
+    namespace BooleanStateSensorExample {
+        class BooleanStateSensorAccessor {
+            +SetAttribute(path, decoder)
+        }
+        class BooleanStateSensorDevice {
+        }
     }
+
     class PigweedAttributeAccessor {
         <<Pigweed Interceptor>>
         -registry: AccessorRegistry
@@ -44,6 +50,7 @@ classDiagram
 
     AccessorRegistry "1" *-- "many" SingleEndpointDeviceAccessor
     BooleanStateSensorAccessor --|> SingleEndpointDeviceAccessor
+    BooleanStateSensorAccessor "1" --> "1" BooleanStateSensorDevice : references
     PigweedAttributeAccessor --> AccessorRegistry : uses
     ShellCommandHandler --> AccessorRegistry : uses
 ```
