@@ -13,10 +13,11 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
+import(
+    "${chip_root}/examples/all-devices-app/all-devices-common/accessors/accessors.gni")
 import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
 import("${chip_root}/src/app/common_flags.gni")
 import("${chip_root}/src/platform/device.gni")
-import("${chip_root}/examples/all-devices-app/all-devices-common/accessors/accessors.gni")
 
 if (chip_enable_pw_rpc) {
   import("//build_overrides/pigweed.gni")
