@@ -41,8 +41,9 @@
 #include <devices/boolean-state-sensor/BooleanStateSensorAccessor.h>
 #if defined(PW_RPC_ENABLED)
 #include <accessors/pigweed/PigweedAttributeAccessor.h>
-#endif
-#endif
+#include <pigweed/rpc_services/AccessInterceptorRegistry.h>
+#endif // PW_RPC_ENABLED
+#endif // CHIP_ALL_DEVICES_APP_ENABLE_OOB_ACCESSORS
 #include <devices/device-type-parser/DeviceTypeParser.h>
 #include <platform/CommissionableDataProvider.h>
 #include <platform/DeviceInstanceInfoProvider.h>
@@ -134,7 +135,7 @@ public:
         mContext(context), mDataModelProvider(mContext.storageDelegate, mAttributePersistence),
         mRootNode(
             {
-                .commissioningWindowManager           = mContext.commissioningWindowManager,       //
+                .commissioningWindowManager       = mContext.commissioningWindowManager,       //
                 .configurationManager             = mContext.configurationManager,             //
                 .deviceControlServer              = mContext.deviceControlServer,              //
                 .fabricTable                      = mContext.fabricTable,                      //
@@ -264,29 +265,29 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
     SetDeviceAttestationCredentialsProvider(Credentials::Examples::GetExampleDACProvider());
 
     static CodeDrivenDataModelDevices devices({
-        .storageDelegate                      = *initParams.persistentStorageDelegate,                   //
-            .commissioningWindowManager       = Server::GetInstance().GetCommissioningWindowManager(),   //
-            .configurationManager             = DeviceLayer::ConfigurationMgr(),                         //
-            .deviceControlServer              = DeviceLayer::DeviceControlServer::DeviceControlSvr(),    //
-            .fabricTable                      = Server::GetInstance().GetFabricTable(),                  //
-            .accessControl                    = Server::GetInstance().GetAccessControl(),                //
-            .persistentStorage                = Server::GetInstance().GetPersistentStorage(),            //
-            .failSafeContext                  = Server::GetInstance().GetFailSafeContext(),              //
-            .deviceInstanceInfoProvider       = *provider,                                               //
-            .platformManager                  = DeviceLayer::PlatformMgr(),                              //
-            .groupDataProvider                = gGroupDataProvider,                                      //
-            .sessionManager                   = Server::GetInstance().GetSecureSessionManager(),         //
-            .dnssdServer                      = DnssdServer::Instance(),                                 //
-            .deviceLoadStatusProvider         = *InteractionModelEngine::GetInstance(),                  //
-            .diagnosticDataProvider           = DeviceLayer::GetDiagnosticDataProvider(),                //
-            .testEventTriggerDelegate         = initParams.testEventTriggerDelegate,                     //
-            .dacProvider                      = *Credentials::GetDeviceAttestationCredentialsProvider(), //
-            .eventManagement                  = EventManagement::GetInstance(),                          //
-            .safeAttributePersistenceProvider = gSafeAttributePersistenceProvider,                       //
-            .timerDelegate                    = gTimerDelegate,                                          //
+        .storageDelegate                  = *initParams.persistentStorageDelegate,                   //
+        .commissioningWindowManager       = Server::GetInstance().GetCommissioningWindowManager(),   //
+        .configurationManager             = DeviceLayer::ConfigurationMgr(),                         //
+        .deviceControlServer              = DeviceLayer::DeviceControlServer::DeviceControlSvr(),    //
+        .fabricTable                      = Server::GetInstance().GetFabricTable(),                  //
+        .accessControl                    = Server::GetInstance().GetAccessControl(),                //
+        .persistentStorage                = Server::GetInstance().GetPersistentStorage(),            //
+        .failSafeContext                  = Server::GetInstance().GetFailSafeContext(),              //
+        .deviceInstanceInfoProvider       = *provider,                                               //
+        .platformManager                  = DeviceLayer::PlatformMgr(),                              //
+        .groupDataProvider                = gGroupDataProvider,                                      //
+        .sessionManager                   = Server::GetInstance().GetSecureSessionManager(),         //
+        .dnssdServer                      = DnssdServer::Instance(),                                 //
+        .deviceLoadStatusProvider         = *InteractionModelEngine::GetInstance(),                  //
+        .diagnosticDataProvider           = DeviceLayer::GetDiagnosticDataProvider(),                //
+        .testEventTriggerDelegate         = initParams.testEventTriggerDelegate,                     //
+        .dacProvider                      = *Credentials::GetDeviceAttestationCredentialsProvider(), //
+        .eventManagement                  = EventManagement::GetInstance(),                          //
+        .safeAttributePersistenceProvider = gSafeAttributePersistenceProvider,                       //
+        .timerDelegate                    = gTimerDelegate,                                          //
 
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
-            .termsAndConditionsProvider = TermsAndConditionsManager::GetInstance(),
+        .termsAndConditionsProvider = TermsAndConditionsManager::GetInstance(),
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
     });
 
