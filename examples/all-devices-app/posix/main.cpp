@@ -92,15 +92,6 @@ void StopSignalHandler(int /* signal */)
     }
 }
 
-std::unique_ptr<SingleEndpointDeviceAccessor> CreateAccessor(const std::string & type, DeviceInterface * device)
-{
-    if (type == "contact-sensor" || type == "water-leak-detector")
-    {
-        return std::make_unique<BooleanStateSensorAccessor>(static_cast<BooleanStateSensorDevice *>(device));
-    }
-    return nullptr;
-}
-
 class CodeDrivenDataModelDevices
 {
 public:
@@ -136,26 +127,26 @@ public:
         mRootNode(
             {
                 .commissioningWindowManager           = mContext.commissioningWindowManager,       //
-                    .configurationManager             = mContext.configurationManager,             //
-                    .deviceControlServer              = mContext.deviceControlServer,              //
-                    .fabricTable                      = mContext.fabricTable,                      //
-                    .accessControl                    = mContext.accessControl,                    //
-                    .persistentStorage                = mContext.persistentStorage,                //
-                    .failSafeContext                  = mContext.failSafeContext,                  //
-                    .deviceInstanceInfoProvider       = mContext.deviceInstanceInfoProvider,       //
-                    .platformManager                  = mContext.platformManager,                  //
-                    .groupDataProvider                = mContext.groupDataProvider,                //
-                    .sessionManager                   = mContext.sessionManager,                   //
-                    .dnssdServer                      = mContext.dnssdServer,                      //
-                    .deviceLoadStatusProvider         = mContext.deviceLoadStatusProvider,         //
-                    .diagnosticDataProvider           = mContext.diagnosticDataProvider,           //
-                    .testEventTriggerDelegate         = mContext.testEventTriggerDelegate,         //
-                    .dacProvider                      = mContext.dacProvider,                      //
-                    .eventManagement                  = mContext.eventManagement,                  //
-                    .safeAttributePersistenceProvider = mContext.safeAttributePersistenceProvider, //
-                    .timerDelegate                    = mContext.timerDelegate,                    //
+                .configurationManager             = mContext.configurationManager,             //
+                .deviceControlServer              = mContext.deviceControlServer,              //
+                .fabricTable                      = mContext.fabricTable,                      //
+                .accessControl                    = mContext.accessControl,                    //
+                .persistentStorage                = mContext.persistentStorage,                //
+                .failSafeContext                  = mContext.failSafeContext,                  //
+                .deviceInstanceInfoProvider       = mContext.deviceInstanceInfoProvider,       //
+                .platformManager                  = mContext.platformManager,                  //
+                .groupDataProvider                = mContext.groupDataProvider,                //
+                .sessionManager                   = mContext.sessionManager,                   //
+                .dnssdServer                      = mContext.dnssdServer,                      //
+                .deviceLoadStatusProvider         = mContext.deviceLoadStatusProvider,         //
+                .diagnosticDataProvider           = mContext.diagnosticDataProvider,           //
+                .testEventTriggerDelegate         = mContext.testEventTriggerDelegate,         //
+                .dacProvider                      = mContext.dacProvider,                      //
+                .eventManagement                  = mContext.eventManagement,                  //
+                .safeAttributePersistenceProvider = mContext.safeAttributePersistenceProvider, //
+                .timerDelegate                    = mContext.timerDelegate,                    //
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
-                    .termsAndConditionsProvider = mContext.termsAndConditionsProvider,
+                .termsAndConditionsProvider = mContext.termsAndConditionsProvider,
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
             },
             []() {
@@ -179,23 +170,24 @@ public:
             ChipLogProgress(AppServer, "Registering device %s on endpoint %u with parent 0x%04X", entry.type.c_str(),
                             entry.endpoint, entry.parentId);
             ReturnErrorOnFailure(device->Register(entry.endpoint, mDataModelProvider, entry.parentId));
-
-            auto accessor = CreateAccessor(entry.type, device.get());
+#if CHIP_ALL_DEVICES_APP_ENABLE_OOB_ACCESSORS
+            auto accessor = DeviceFactory::GetInstance().CreateAccessor(entry.type, device.get());
             if (accessor)
             {
                 ReturnErrorOnFailure(AccessorRegistry::Instance().Register(accessor.get()));
                 mConstructedAccessors.push_back(std::move(accessor));
             }
-
-            mConstructedDevices.push_back(std::move(device));
         }
-
+#endif // CHIP_ALL_DEVICES_APP_ENABLE_OOB_ACCESSORS
+        mConstructedDevices.push_back(std::move(device));
         return CHIP_NO_ERROR;
     }
 
     void Shutdown()
     {
+#if CHIP_ALL_DEVICES_APP_ENABLE_OOB_ACCESSORS
         mConstructedAccessors.clear();
+#endif // CHIP_ALL_DEVICES_APP_ENABLE_OOB_ACCESSORS
         for (auto & device : mConstructedDevices)
         {
             device->Unregister(mDataModelProvider);
@@ -214,7 +206,10 @@ private:
 
     AppRootNode mRootNode;
     std::vector<std::unique_ptr<DeviceInterface>> mConstructedDevices;
+
+#if CHIP_ALL_DEVICES_APP_ENABLE_OOB_ACCESSORS
     std::vector<std::unique_ptr<SingleEndpointDeviceAccessor>> mConstructedAccessors;
+#endif // CHIP_ALL_DEVICES_APP_ENABLE_OOB_ACCESSORS
 };
 
 void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
@@ -266,28 +261,28 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
 
     static CodeDrivenDataModelDevices devices({
         .storageDelegate                      = *initParams.persistentStorageDelegate,                   //
-            .commissioningWindowManager       = Server::GetInstance().GetCommissioningWindowManager(),   //
-            .configurationManager             = DeviceLayer::ConfigurationMgr(),                         //
-            .deviceControlServer              = DeviceLayer::DeviceControlServer::DeviceControlSvr(),    //
-            .fabricTable                      = Server::GetInstance().GetFabricTable(),                  //
-            .accessControl                    = Server::GetInstance().GetAccessControl(),                //
-            .persistentStorage                = Server::GetInstance().GetPersistentStorage(),            //
-            .failSafeContext                  = Server::GetInstance().GetFailSafeContext(),              //
-            .deviceInstanceInfoProvider       = *provider,                                               //
-            .platformManager                  = DeviceLayer::PlatformMgr(),                              //
-            .groupDataProvider                = gGroupDataProvider,                                      //
-            .sessionManager                   = Server::GetInstance().GetSecureSessionManager(),         //
-            .dnssdServer                      = DnssdServer::Instance(),                                 //
-            .deviceLoadStatusProvider         = *InteractionModelEngine::GetInstance(),                  //
-            .diagnosticDataProvider           = DeviceLayer::GetDiagnosticDataProvider(),                //
-            .testEventTriggerDelegate         = initParams.testEventTriggerDelegate,                     //
-            .dacProvider                      = *Credentials::GetDeviceAttestationCredentialsProvider(), //
-            .eventManagement                  = EventManagement::GetInstance(),                          //
-            .safeAttributePersistenceProvider = gSafeAttributePersistenceProvider,                       //
-            .timerDelegate                    = gTimerDelegate,                                          //
+        .commissioningWindowManager       = Server::GetInstance().GetCommissioningWindowManager(),   //
+        .configurationManager             = DeviceLayer::ConfigurationMgr(),                         //
+        .deviceControlServer              = DeviceLayer::DeviceControlServer::DeviceControlSvr(),    //
+        .fabricTable                      = Server::GetInstance().GetFabricTable(),                  //
+        .accessControl                    = Server::GetInstance().GetAccessControl(),                //
+        .persistentStorage                = Server::GetInstance().GetPersistentStorage(),            //
+        .failSafeContext                  = Server::GetInstance().GetFailSafeContext(),              //
+        .deviceInstanceInfoProvider       = *provider,                                               //
+        .platformManager                  = DeviceLayer::PlatformMgr(),                              //
+        .groupDataProvider                = gGroupDataProvider,                                      //
+        .sessionManager                   = Server::GetInstance().GetSecureSessionManager(),         //
+        .dnssdServer                      = DnssdServer::Instance(),                                 //
+        .deviceLoadStatusProvider         = *InteractionModelEngine::GetInstance(),                  //
+        .diagnosticDataProvider           = DeviceLayer::GetDiagnosticDataProvider(),                //
+        .testEventTriggerDelegate         = initParams.testEventTriggerDelegate,                     //
+        .dacProvider                      = *Credentials::GetDeviceAttestationCredentialsProvider(), //
+        .eventManagement                  = EventManagement::GetInstance(),                          //
+        .safeAttributePersistenceProvider = gSafeAttributePersistenceProvider,                       //
+        .timerDelegate                    = gTimerDelegate,                                          //
 
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
-            .termsAndConditionsProvider = TermsAndConditionsManager::GetInstance(),
+        .termsAndConditionsProvider = TermsAndConditionsManager::GetInstance(),
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
     });
 
@@ -312,13 +307,15 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
     chip::CommandLineApp::TracingSetup tracing_setup;
     tracing_setup.EnableTracingFor("json:log");
 
+#if CHIP_ALL_DEVICES_APP_ENABLE_OOB_ACCESSORS
 #if defined(PW_RPC_ENABLED)
     static chip::app::PigweedAttributeAccessor sPwOobAccessor;
     chip::rpc::PigweedDebugAccessInterceptorRegistry::Instance().Register(&sPwOobAccessor);
 
-    chip::rpc::Init(33000);
+    chip::rpc::Init(33000); // TODO: Add an arg for Pw port.
     ChipLogProgress(AppServer, "PW_RPC initialized.");
 #endif // defined(PW_RPC_ENABLED)
+#endif // CHIP_ALL_DEVICES_APP_ENABLE_OOB_ACCESSORS
 
     // Init ZCL Data Model and CHIP App Server
     CHIP_ERROR err = Server::GetInstance().Init(initParams);
