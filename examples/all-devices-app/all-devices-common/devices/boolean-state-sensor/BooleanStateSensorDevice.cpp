@@ -31,7 +31,6 @@ CHIP_ERROR BooleanStateSensorDevice::Register(chip::EndpointId endpoint, CodeDri
     mBooleanStateCluster.Create(endpoint);
     ReturnErrorOnFailure(provider.AddCluster(mBooleanStateCluster.Registration()));
 
-
     return provider.AddEndpoint(mEndpointRegistration);
 }
 
@@ -48,8 +47,6 @@ void BooleanStateSensorDevice::Unregister(CodeDrivenDataModelProvider & provider
         LogErrorOnFailure(provider.RemoveCluster(&mIdentifyCluster.Cluster()));
         mIdentifyCluster.Destroy();
     }
-
 }
-
 
 } // namespace chip::app
