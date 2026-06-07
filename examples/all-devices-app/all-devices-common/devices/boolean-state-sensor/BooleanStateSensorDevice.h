@@ -22,14 +22,10 @@
 #include <lib/support/TimerDelegate.h>
 #include <memory>
 
-
-
 namespace chip {
 namespace app {
 
 class BooleanStateSensorDevice;
-
-
 
 class BooleanStateSensorDevice : public SingleEndpointDevice
 {
@@ -54,7 +50,6 @@ private:
     TimerDelegate * mTimerDelegate;
     LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;
     LazyRegisteredServerCluster<Clusters::BooleanStateCluster> mBooleanStateCluster;
-
 };
 
 } // namespace app
