@@ -1,6 +1,7 @@
 ---
 Checks: >
   bugprone-*,
+  cppcoreguidelines-virtual-class-destructor,
   modernize-redundant-void-arg,
   modernize-use-bool-literals,
   modernize-use-nullptr,
@@ -40,7 +41,6 @@ Checks: >
   -clang-analyzer-nullability.NullablePassedToNonnull,
   -clang-analyzer-optin.core.EnumCastOutOfRange,
   -clang-analyzer-optin.cplusplus.UninitializedObject,
-  -clang-analyzer-optin.cplusplus.VirtualCall,
   -clang-analyzer-optin.osx.cocoa.localizability.EmptyLocalizationContextChecker,
   -clang-analyzer-optin.performance,
   -clang-analyzer-optin.performance.Padding,

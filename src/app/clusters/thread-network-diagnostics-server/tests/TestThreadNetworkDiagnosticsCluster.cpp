@@ -16,6 +16,7 @@
  */
 #include <pw_unit_test/framework.h>
 
+#include <app/clusters/thread-network-diagnostics-server/DirectThreadNetworkDiagnosticsProvider.h>
 #include <app/clusters/thread-network-diagnostics-server/ThreadNetworkDiagnosticsCluster.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <app/server-cluster/testing/AttributeTesting.h>
@@ -44,6 +45,7 @@ struct TestThreadNetworkDiagnosticsCluster : public ::testing::Test
     TestThreadNetworkDiagnosticsCluster() {}
 
     TestServerClusterContext testContext;
+    DirectThreadNetworkDiagnosticsProvider mProvider;
 };
 
 } // namespace
@@ -51,7 +53,7 @@ struct TestThreadNetworkDiagnosticsCluster : public ::testing::Test
 TEST_F(TestThreadNetworkDiagnosticsCluster, AttributeTest)
 {
     {
-        ThreadNetworkDiagnosticsCluster threadNetworkDiagnostics(kRootEndpointId, ClusterType::kMinimal);
+        ThreadNetworkDiagnosticsCluster threadNetworkDiagnostics(kRootEndpointId, ClusterType::kMinimal, mProvider);
 
         EXPECT_TRUE(IsAttributesListEqualTo(threadNetworkDiagnostics,
                                             {
@@ -78,7 +80,7 @@ TEST_F(TestThreadNetworkDiagnosticsCluster, AttributeTest)
     }
 
     {
-        ThreadNetworkDiagnosticsCluster threadNetworkDiagnostics(kRootEndpointId, ClusterType::kFull);
+        ThreadNetworkDiagnosticsCluster threadNetworkDiagnostics(kRootEndpointId, ClusterType::kFull, mProvider);
 
         EXPECT_TRUE(IsAttributesListEqualTo(threadNetworkDiagnostics,
                                             {
@@ -220,7 +222,7 @@ void TestMandatoryAttributes(ClusterTester & tester)
 TEST_F(TestThreadNetworkDiagnosticsCluster, ReadAttributeTest)
 {
     {
-        ThreadNetworkDiagnosticsCluster threadNetworkDiagnostics(kRootEndpointId, ClusterType::kMinimal);
+        ThreadNetworkDiagnosticsCluster threadNetworkDiagnostics(kRootEndpointId, ClusterType::kMinimal, mProvider);
         ASSERT_EQ(threadNetworkDiagnostics.Startup(testContext.Get()), CHIP_NO_ERROR);
 
         ClusterTester tester(threadNetworkDiagnostics);
@@ -231,7 +233,7 @@ TEST_F(TestThreadNetworkDiagnosticsCluster, ReadAttributeTest)
     }
 
     {
-        ThreadNetworkDiagnosticsCluster threadNetworkDiagnostics(kRootEndpointId, ClusterType::kFull);
+        ThreadNetworkDiagnosticsCluster threadNetworkDiagnostics(kRootEndpointId, ClusterType::kFull, mProvider);
         ASSERT_EQ(threadNetworkDiagnostics.Startup(testContext.Get()), CHIP_NO_ERROR);
 
         ClusterTester tester(threadNetworkDiagnostics);
@@ -382,7 +384,7 @@ TEST_F(TestThreadNetworkDiagnosticsCluster, ReadAttributeTest)
 
 TEST_F(TestThreadNetworkDiagnosticsCluster, FaultAndConnectionStatusChangeTest)
 {
-    ThreadNetworkDiagnosticsCluster threadNetworkDiagnostics(kRootEndpointId, ClusterType::kFull);
+    ThreadNetworkDiagnosticsCluster threadNetworkDiagnostics(kRootEndpointId, ClusterType::kFull, mProvider);
     ASSERT_EQ(threadNetworkDiagnostics.Startup(testContext.Get()), CHIP_NO_ERROR);
 
     // Call OnConnectionStatusChanged to ensure the logging path executes safely in tests

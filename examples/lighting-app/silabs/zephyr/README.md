@@ -1,12 +1,17 @@
-# Matter SiWx917 Lighting Example
+# Matter Silicon Labs Lighting Example (Zephyr)
 
-An example showing the use of CHIP on the Silicon Labs SiWx917 WiFi SoC running
-Zephyr RTOS.
+An example showing the use of Matter on Silicon Labs SoCs running Zephyr RTOS.
+The same application can be built for either:
+
+-   **Wi-Fi** transport on the **SiWx917** Wi-Fi SoC (board `siwx917_rb4338a`).
+-   **Thread (OpenThread)** transport on the **EFR32MG24** SoC (board
+    `xg24_rb4187c`).
 
 <hr>
 
--   [Matter SiWx917 Lighting Example](#matter-siwx917-lighting-example)
+-   [Matter Silicon Labs Lighting Example (Zephyr)](#matter-silicon-labs-lighting-example-zephyr)
     -   [Introduction](#introduction)
+    -   [Supported Hardware](#supported-hardware)
     -   [Building](#building)
     -   [Flashing the Application](#flashing-the-application)
     -   [Running the Complete Example](#running-the-complete-example)
@@ -23,22 +28,28 @@ Zephyr RTOS.
 
 ## Introduction
 
-The SiWx917 lighting example provides a baseline demonstration of a Light
-control device, built using Matter and the Silicon Labs SiWx917 WiFi SoC running
-Zephyr RTOS. It can be controlled by a Matter controller over a WiFi network.
+The Silicon Labs lighting example provides a baseline demonstration of a Light
+control device, built using Matter on Silicon Labs SoCs running Zephyr RTOS.
+Depending on the selected board, it can be controlled by a Matter controller
+over either a Wi-Fi network (SiWx917) or a Thread network (EFR32MG24).
 
-The SiWx917 device can be commissioned over Bluetooth Low Energy where the
-device and the Matter controller will exchange security information with the
-Rendez-vous procedure. WiFi Network credentials are then provided to the SiWx917
-device which will then join the WiFi network.
+In both cases, the device is commissioned over Bluetooth Low Energy: the device
+and the Matter controller exchange security information through the Rendez-vous
+procedure, and the controller then provisions the operational network
+credentials:
+
+-   On **SiWx917 (Wi-Fi)**, Wi-Fi SSID and passphrase are sent and the device
+    joins the Wi-Fi network.
+-   On **EFR32MG24 (Thread)**, the Thread operational dataset is sent and the
+    device joins the Thread network.
 
 This example implements a software-only lighting device without GPIO control,
-suitable for testing Matter protocol functionality and WiFi connectivity on the
-SiWx917 platform.
+suitable for testing Matter protocol functionality and network connectivity on
+the supported Silicon Labs platforms.
 
 The lighting example is intended to serve both as a means to explore the
-workings of Matter as well as a template for creating real products based on the
-Silicon Labs SiWx917 platform.
+workings of Matter as well as a template for creating real products based on
+Silicon Labs platforms.
 
 ### Configuring the application
 
@@ -48,11 +59,27 @@ configuration options such as logging levels, networking settings, memory
 allocation, and Matter-specific features.
 
 ```bash
+# Wi-Fi (SiWx917)
 west build -b siwx917_rb4338a examples/lighting-app/silabs/zephyr -t menuconfig
+
+# Thread (EFR32MG24)
+west build -b xg24_rb4187c examples/lighting-app/silabs/zephyr -t menuconfig
 ```
 
 This will open an interactive configuration menu where you can browse and modify
 settings. Changes are automatically saved to the build configuration.
+
+## Supported Hardware
+
+The example can be built for any of the following Silicon Labs boards:
+
+| Board             | SoC       | Transport           |
+| ----------------- | --------- | ------------------- |
+| `siwx917_rb4338a` | SiWx917   | Wi-Fi (2.4 GHz)     |
+| `xg24_rb4187c`    | EFR32MG24 | Thread (OpenThread) |
+
+The board name selected with `west build -b <board>` determines both the target
+SoC and the network transport used by Matter.
 
 ## Building
 
@@ -65,16 +92,16 @@ settings. Changes are automatically saved to the build configuration.
     -   Follow the
         [Silicon Labs Zephyr Repo](https://github.com/SiliconLabsSoftware/zephyr-silabs)
 
--   Supported hardware:
-
-    -   **SiWx917 SoC boards:**
-        -   BRD4338A (SiWx917 Radio Board with 2.4GHz WiFi)
-
--   Build the example application:
+-   Build the example application for your target:
 
     ```bash
     cd silabs_zephyr
+
+    # Wi-Fi build (SiWx917)
     west build -b siwx917_rb4338a connectedhomeip/examples/lighting-app/silabs/zephyr
+
+    # Thread build (EFR32MG24)
+    west build -b xg24_rb4187c connectedhomeip/examples/lighting-app/silabs/zephyr
     ```
 
 -   To clean the build:
@@ -92,13 +119,16 @@ settings. Changes are automatically saved to the build configuration.
     OR
 
     ```bash
-    west build -p always  -b siwx917_rb4338a connectedhomeip/examples/lighting-app/silabs/zephyr
+    west build -p always -b <board> connectedhomeip/examples/lighting-app/silabs/zephyr
     ```
+
+    where `<board>` is `siwx917_rb4338a` or `xg24_rb4187c`.
 
 ## Flashing the Application
 
--   **SiWx917 SoC device support is available in the latest Simplicity
-    Commander.** The SiWx917 SOC board will support `.hex` files for flashing.
+-   Both SiWx917 and EFR32MG24 SoC devices are supported by the latest
+    Simplicity Commander. The build produces a `.hex` file that can be flashed
+    to either platform.
 
 -   Flash using west:
 
@@ -112,46 +142,66 @@ settings. Changes are automatically saved to the build configuration.
     commander flash build/zephyr/zephyr.hex
     ```
 
--   **Bootloader and Connectivity Firmware:** All SiWx917 boards require
-    connectivity firmware. See Silicon Labs documentation for more info.
-    Pre-built bootloader binaries are available in the Assets section of the
-    Releases page on
-    [Wiseconnect](https://github.com/SiliconLabs/wiseconnect/tree/v3.5.0/connectivity_firmware/standard).
+-   **Bootloader and connectivity firmware:**
+
+    -   The **SiWx917** boards require connectivity firmware in addition to the
+        application image. Pre-built bootloader and connectivity firmware
+        binaries are available in the Assets section of the Releases page on
+        [Wiseconnect](https://github.com/SiliconLabs/wiseconnect/tree/v3.5.0/connectivity_firmware/standard).
+    -   The **EFR32MG24** boards require a Gecko bootloader. Refer to the
+        Silicon Labs documentation for the appropriate bootloader image for your
+        board.
 
 ## Running the Complete Example
 
 ### Commissioning over BLE
 
-To run a Matter over WiFi application, you must first commission the device
-using a Matter controller over BLE, then provide WiFi credentials.
+To run the Matter application, you must first commission the device using a
+Matter controller over BLE. The controller will then provision the operational
+network credentials:
+
+-   On **SiWx917**, Wi-Fi SSID and passphrase.
+-   On **EFR32MG24**, the Thread operational dataset.
 
 **Creating the Matter Network**
 
 This procedure uses the chip-tool installed on the Matter Hub. The commissioning
 procedure does the following:
 
--   Chip-tool scans BLE and locates the Silicon Labs device that uses the
+-   chip-tool scans BLE and locates the Silicon Labs device that uses the
     specified discriminator
 -   Establishes operational certificates
--   Sends the WiFi SSID and Passkey
--   The Silicon Labs device will join the WiFi network and get an IP address
--   It then starts providing mDNS records on IPv4 and IPv6
--   Future communications (tests) will then happen over WiFi
+-   Sends the operational network credentials (Wi-Fi credentials or Thread
+    dataset, depending on the platform)
+-   The Silicon Labs device joins the operational network and obtains an IPv6
+    (and IPv4 for Wi-Fi) address
+-   It then starts providing mDNS records on the operational network
+-   Future communications happen over the operational network (Wi-Fi or Thread)
 
 ### Testing with chip-tool
 
-You can provision and control the CHIP device using the python controller, Chip
-tool standalone, Android or iOS app.
+You can provision and control the CHIP device using the python controller, the
+chip-tool standalone, or the Android or iOS app.
 
 [CHIPTool](https://github.com/project-chip/connectedhomeip/blob/master/examples/chip-tool/README.md)
 
-Here is an example with the chip-tool:
+Here are examples using chip-tool:
 
-#### Commission the device over BLE-WiFi:
+#### Commission the device over BLE-Wi-Fi (SiWx917):
 
 ```bash
 ./out/linux-x64-chip-tool/chip-tool pairing ble-wifi ${NODE_ID} ${SSID} ${PASSWORD} 20202021 3840
 ```
+
+#### Commission the device over BLE-Thread (EFR32MG24):
+
+```bash
+./out/linux-x64-chip-tool/chip-tool pairing ble-thread ${NODE_ID} hex:${THREAD_DATASET} 20202021 3840
+```
+
+`${THREAD_DATASET}` is the active Thread operational dataset in TLV hexadecimal
+format (for example as returned by `ot-ctl dataset active -x` on an OpenThread
+border router).
 
 #### Control the device (turn on/off):
 
@@ -181,16 +231,20 @@ Where:
 -   `${NODE_ID}` is the node ID assigned to the device
 -   `20202021` is the setup PIN code
 -   `3840` is the discriminator
--   `${SSID}` and `${PASSWORD}` are your WiFi network credentials
+-   `${SSID}` and `${PASSWORD}` are your Wi-Fi network credentials (SiWx917)
+-   `${THREAD_DATASET}` is the Thread operational dataset (EFR32MG24)
 
 ## Building Options
+
+The build options below apply to both supported boards. Replace `<board>` with
+either `siwx917_rb4338a` or `xg24_rb4187c`.
 
 ### Debug build / release build
 
 By default, the application is built in debug mode. To build in release mode:
 
 ```bash
-west build -b siwx917_rb4338a examples/lighting-app/silabs/zephyr -- -DFILE_SUFFIX=release
+west build -b <board> examples/lighting-app/silabs/zephyr -- -DFILE_SUFFIX=release
 ```
 
 ### Disabling logging
@@ -198,7 +252,7 @@ west build -b siwx917_rb4338a examples/lighting-app/silabs/zephyr -- -DFILE_SUFF
 To reduce code size and improve performance, logging can be minimized:
 
 ```bash
-west build -b siwx917_rb4338a examples/lighting-app/silabs/zephyr -- -DCONFIG_LOG_MODE_MINIMAL=y
+west build -b <board> examples/lighting-app/silabs/zephyr -- -DCONFIG_LOG_MODE_MINIMAL=y
 ```
 
 ### KVS maximum entry count
@@ -215,13 +269,13 @@ CONFIG_NVS_LOOKUP_CACHE_SIZE=1024
 
 ## OTA Software Update
 
-The SiWx917 platform supports Over-The-Air (OTA) software updates. To enable
-OTA:
+The supported Silicon Labs platforms support Over-The-Air (OTA) software
+updates. To enable OTA:
 
 1. Build with OTA support:
 
     ```bash
-    west build -b siwx917_rb4338a examples/lighting-app/silabs/zephyr -- -DCONFIG_CHIP_OTA_REQUESTOR=y
+    west build -b <board> examples/lighting-app/silabs/zephyr -- -DCONFIG_CHIP_OTA_REQUESTOR=y
     ```
 
 2. The device will advertise OTA capability and can receive firmware updates
@@ -233,25 +287,24 @@ OTA:
 
 ## Limitations
 
-This example has the following limitations specific to the SiWx917 platform:
+This example has the following limitations:
 
 1. **No GPIO Support:** This implementation does not include GPIO control for
    physical LEDs or buttons. All lighting operations are software-only.
 
-2. **WiFi Only:** The SiWx917 supports only WiFi connectivity. Thread and
-   Ethernet are not supported on this platform.
+2. **Single Transport per Build:** A given build targets a single transport.
+   Wi-Fi is supported on the SiWx917 boards and Thread is supported on the
+   EFR32MG24 boards; the two cannot be combined in a single image.
 
-3. **Single Radio:** The device operates as a WiFi station only. WiFi AP mode is
-   not supported in this configuration.
+3. **Memory Constraints:** Both SoCs have limited RAM and flash memory. Complex
+   applications may require memory optimization.
 
-4. **Memory Constraints:** The SiWx917 has limited RAM and flash memory. Complex
-   applications may need memory optimization.
+4. **Power Management:** Advanced power management features available in other
+   Silicon Labs SDKs may not yet be exposed in this Zephyr-based example.
 
-5. **Power Management:** Advanced power management features are limited compared
-   to other Silicon Labs platforms.
-
-For production applications requiring GPIO control, consider using the EFR32
-platform with the standard Silicon Labs lighting example.
+For production applications requiring GPIO control or features not yet available
+here, consider using the standard Silicon Labs lighting example on the EFR32
+platform.
 
 ---
 
@@ -259,5 +312,6 @@ platform with the standard Silicon Labs lighting example.
 
 -   [Silicon Labs Matter Documentation](https://github.com/SiliconLabsSoftware/matter_sdk)
 -   [SiWx917 Development Kit User Guide](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-development-kit)
+-   [EFR32xG24 Dev Kit User Guide](https://www.silabs.com/development-tools/wireless/efr32xg24-dev-kit)
 -   [Matter Specification](https://csa-iot.org/all-solutions/matter/)
 -   [Zephyr RTOS Documentation](https://docs.zephyrproject.org/)
