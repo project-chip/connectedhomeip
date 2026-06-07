@@ -32,15 +32,22 @@ source_set("boolean-state-sensor") {
     "${chip_root}/src/lib/support",
   ]
 
-  if (chip_enable_pw_rpc) {
-    defines = [
-      "PW_RPC_ENABLED",
-      "PW_RPC_ATTRIBUTE_SERVICE=1",
-    ]
-    include_dirs = [ "${chip_root}/examples/common" ]
-    public_deps += [
-      "${chip_root}/config/linux/lib/pw_rpc:pw_rpc",
-      dir_pw_status,
-    ]
-  }
+}
+
+source_set("boolean-state-sensor-accessor") {
+  sources = [
+    "BooleanStateSensorAccessor.cpp",
+    "BooleanStateSensorAccessor.h",
+  ]
+
+  public_deps = [
+    ":boolean-state-sensor",
+    "${chip_root}/examples/all-devices-app/all-devices-common/accessors:common",
+    "${chip_root}/src/lib/core:error",
+    "${chip_root}/src/lib/support",
+  ]
+
+  public_configs = [
+    "${chip_root}/examples/all-devices-app/all-devices-common/devices/:includes",
+  ]
 }
