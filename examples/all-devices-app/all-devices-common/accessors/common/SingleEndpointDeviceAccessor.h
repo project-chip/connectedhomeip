@@ -31,7 +31,7 @@ class SingleEndpointDeviceAccessor : public chip::IntrusiveListNodeBase<chip::In
 {
 public:
     SingleEndpointDeviceAccessor() = delete;
-    SingleEndpointDeviceAccessor(SingleEndpointDevice * device) : mDevice(device) {}
+    SingleEndpointDeviceAccessor(SingleEndpointDevice * device) : mDevice(device) { VerifyOrDie(device != nullptr); }
     virtual ~SingleEndpointDeviceAccessor() = default;
 
     EndpointId GetEndpointId() const { return mDevice->GetEndpointId(); }

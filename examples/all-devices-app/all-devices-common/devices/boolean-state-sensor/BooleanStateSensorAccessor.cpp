@@ -25,6 +25,10 @@ BooleanStateSensorAccessor::BooleanStateSensorAccessor(BooleanStateSensorDevice 
 CHIP_ERROR BooleanStateSensorAccessor::SetAttribute(const ConcreteDataAttributePath & path, AttributeValueDecoder & decoder)
 {
     auto * device = static_cast<BooleanStateSensorDevice *>(mDevice);
+    if (device == nullptr)
+    {
+        return CHIP_ERROR_INTERNAL;
+    }
 
     if (path.mClusterId == BooleanState::Id)
     {

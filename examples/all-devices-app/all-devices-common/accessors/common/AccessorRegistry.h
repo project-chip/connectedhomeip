@@ -48,6 +48,10 @@ public:
      */
     CHIP_ERROR Register(SingleEndpointDeviceAccessor * accessor)
     {
+        if (accessor == nullptr)
+        {
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
         EndpointId endpointId = accessor->GetEndpointId();
         for (auto & existing : mAccessors)
         {
@@ -66,7 +70,13 @@ public:
      *
      * @param accessor The accessor to unregister.
      */
-    void Unregister(SingleEndpointDeviceAccessor * accessor) { mAccessors.Remove(accessor); }
+    void Unregister(SingleEndpointDeviceAccessor * accessor)
+    {
+        if (accessor != nullptr)
+        {
+            mAccessors.Remove(accessor);
+        }
+    }
 
     /**
      * @brief Finds the registered accessor for a given endpoint.
@@ -84,7 +94,7 @@ public:
                 return &accessor;
             }
         }
-        ChipLogError(Support, "No single endpoint device accessor found for endpoint %d", endpointId);
+        ChipLogProgress(Support, "No single endpoint device accessor found for endpoint %d", endpointId);
         return nullptr;
     }
 
