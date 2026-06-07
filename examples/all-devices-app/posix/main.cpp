@@ -46,6 +46,14 @@
 #endif // PW_RPC_ENABLED
 #endif // CHIP_ALL_DEVICES_APP_ENABLE_OOB_ACCESSORS
 #include <device-factory/DeviceFactory.h>
+#include <devices/device-factory/DeviceFactory.h>
+#if CHIP_ALL_DEVICES_APP_ENABLE_OOB_ACCESSORS
+#include <accessors/common/AccessorRegistry.h>
+#include <devices/boolean-state-sensor/BooleanStateSensorAccessor.h>
+#if defined(PW_RPC_ENABLED)
+#include <accessors/pigweed/PigweedAttributeAccessor.h>
+#endif
+#endif
 #include <devices/device-type-parser/DeviceTypeParser.h>
 #include <platform/CommissionableDataProvider.h>
 #include <platform/DeviceInstanceInfoProvider.h>
