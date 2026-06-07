@@ -36,7 +36,7 @@
 #include <map>
 #include <platform/DefaultTimerDelegate.h>
 
-#if CHIP_ALL_DEVICES_APP_ENABLE_OOB_ACCESSORS
+#if defined(CHIP_ALL_DEVICES_APP_ENABLE_OOB_ACCESSORS) && CHIP_ALL_DEVICES_APP_ENABLE_OOB_ACCESSORS
 #include <accessors/common/SingleEndpointDeviceAccessor.h>
 #include <devices/boolean-state-sensor/BooleanStateSensorAccessor.h>
 #endif // CHIP_ALL_DEVICES_APP_ENABLE_OOB_ACCESSORS
@@ -56,7 +56,7 @@ class DeviceFactory
 public:
     using DeviceCreator = std::function<std::unique_ptr<DeviceInterface>()>;
 
-#if CHIP_ALL_DEVICES_APP_ENABLE_OOB_ACCESSORS
+#if defined(CHIP_ALL_DEVICES_APP_ENABLE_OOB_ACCESSORS) && CHIP_ALL_DEVICES_APP_ENABLE_OOB_ACCESSORS
     using DeviceAccessorCreator = std::function<std::unique_ptr<SingleEndpointDeviceAccessor>(DeviceInterface *)>;
 #endif // CHIP_ALL_DEVICES_APP_ENABLE_OOB_ACCESSORS
 
@@ -85,7 +85,7 @@ public:
         mRegistry[deviceTypeArg] = std::move(creator);
     }
 
-#if CHIP_ALL_DEVICES_APP_ENABLE_OOB_ACCESSORS
+#if defined(CHIP_ALL_DEVICES_APP_ENABLE_OOB_ACCESSORS) && CHIP_ALL_DEVICES_APP_ENABLE_OOB_ACCESSORS
     void RegisterAccessorCreator(const std::string & deviceTypeArg, DeviceAccessorCreator && creator)
     {
         mAccessorRegistry[deviceTypeArg] = std::move(creator);
@@ -109,7 +109,7 @@ public:
         return nullptr;
     }
 
-#if CHIP_ALL_DEVICES_APP_ENABLE_OOB_ACCESSORS
+#if defined(CHIP_ALL_DEVICES_APP_ENABLE_OOB_ACCESSORS) && CHIP_ALL_DEVICES_APP_ENABLE_OOB_ACCESSORS
     std::unique_ptr<SingleEndpointDeviceAccessor> CreateAccessor(const std::string & deviceTypeArg, DeviceInterface * device)
     {
         if (IsValidDevice(deviceTypeArg))
@@ -136,7 +136,7 @@ private:
     std::optional<Context> mContext;
     std::string mDefaultDevice;
 
-#if CHIP_ALL_DEVICES_APP_ENABLE_OOB_ACCESSORS
+#if defined(CHIP_ALL_DEVICES_APP_ENABLE_OOB_ACCESSORS) && CHIP_ALL_DEVICES_APP_ENABLE_OOB_ACCESSORS
     std::map<std::string, DeviceAccessorCreator> mAccessorRegistry;
 #endif // CHIP_ALL_DEVICES_APP_ENABLE_OOB_ACCESSOR
 
@@ -174,7 +174,7 @@ private:
                 return std::make_unique<BooleanStateSensorDevice>(
                     &mContext->timerDelegate, Span<const DataModel::DeviceTypeEntry>(&Device::Type::kContactSensor, 1));
             });
-#if CHIP_ALL_DEVICES_APP_ENABLE_OOB_ACCESSORS
+#if defined(CHIP_ALL_DEVICES_APP_ENABLE_OOB_ACCESSORS) && CHIP_ALL_DEVICES_APP_ENABLE_OOB_ACCESSORS
             RegisterAccessorCreator("contact-sensor", [this](DeviceInterface * device) {
                 return std::make_unique<BooleanStateSensorAccessor>(static_cast<BooleanStateSensorDevice *>(device));
             });
@@ -187,7 +187,7 @@ private:
                 return std::make_unique<BooleanStateSensorDevice>(
                     &mContext->timerDelegate, Span<const DataModel::DeviceTypeEntry>(&Device::Type::kWaterLeakDetector, 1));
             });
-#if CHIP_ALL_DEVICES_APP_ENABLE_OOB_ACCESSORS
+#if defined(CHIP_ALL_DEVICES_APP_ENABLE_OOB_ACCESSORS) && CHIP_ALL_DEVICES_APP_ENABLE_OOB_ACCESSORS
             RegisterAccessorCreator("water-leak-detector", [this](DeviceInterface * device) {
                 return std::make_unique<BooleanStateSensorAccessor>(static_cast<BooleanStateSensorDevice *>(device));
             });
