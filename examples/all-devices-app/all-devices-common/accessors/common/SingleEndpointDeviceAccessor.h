@@ -17,7 +17,7 @@
 #pragma once
 
 #include <app/AttributeValueDecoder.h>
-#include <app/ConcreteDataAttributePath.h>
+#include <app/ConcreteAttributePath.h>
 #include <devices/interface/SingleEndpointDevice.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
