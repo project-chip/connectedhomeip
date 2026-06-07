@@ -248,8 +248,11 @@ void DeviceManager::OnWebRTCSessionEstablished(uint16_t streamId)
         if (streamId == mPendingVideoStreamId)
         {
             StartVideoStreamProcess(streamId);
-            mActiveLiveViewByNode[mNodeId] = streamId;
-            mPendingVideoStreamId          = 0;
+            if (mNodeId != chip::kUndefinedNodeId)
+            {
+                mActiveLiveViewByNode[mNodeId] = streamId;
+            }
+            mPendingVideoStreamId = 0;
         }
     }
 }
