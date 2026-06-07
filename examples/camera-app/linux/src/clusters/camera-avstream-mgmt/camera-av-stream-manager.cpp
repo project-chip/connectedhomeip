@@ -735,13 +735,12 @@ CameraAVStreamManager::AllocatedVideoStreamsLoaded()
 
         if (it != persistedStreams.end())
         {
-            // Found in persisted streams, mark as allocated in HAL
+            // Found in persisted streams, mark as allocated in HAL. The underlying HAL pipeline is started lazily when the
+            // first transport acquires the stream (see OnTransportAcquireAudioVideoStreams), so that a reboot with no active
+            // consumer does not leave encoder pipelines running idle.
             halStream.isAllocated = true;
             ChipLogProgress(Camera, "HAL Video Stream ID %u marked as allocated from persisted state.",
                             halStream.videoStreamParams.videoStreamID);
-
-            // Signal for starting the video stream
-            OnVideoStreamAllocated(*it, StreamAllocationAction::kNewAllocation);
         }
     }
 
@@ -762,18 +761,12 @@ CameraAVStreamManager::AllocatedAudioStreamsLoaded()
 
         if (it != persistedStreams.end())
         {
-            // Found in persisted streams, mark as allocated in HAL
+            // Found in persisted streams, mark as allocated in HAL. The underlying HAL pipeline is started lazily when the
+            // first transport acquires the stream (see OnTransportAcquireAudioVideoStreams), so that a reboot with no active
+            // consumer does not leave audio pipelines running idle.
             halStream.isAllocated = true;
             ChipLogProgress(Camera, "HAL Audio Stream ID %u marked as allocated from persisted state.",
                             halStream.audioStreamParams.audioStreamID);
-
-            // Start the audio stream from HAL for serving.
-            if (mCameraDeviceHAL->GetCameraHALInterface().StartAudioStream(halStream.audioStreamParams.audioStreamID) !=
-                CameraError::SUCCESS)
-            {
-                ChipLogError(Camera, "Failed to start HAL Audio Stream for persisted ID %u.",
-                             halStream.audioStreamParams.audioStreamID);
-            }
         }
     }
 
@@ -899,6 +892,15 @@ CameraAVStreamManager::OnTransportAcquireAudioVideoStreams(uint16_t audioStreamI
         {
             if (stream.audioStreamParams.referenceCount < UINT8_MAX)
             {
+                // Lazily start the HAL pipeline on the first consumer (0 -> 1 transition).
+                if (stream.audioStreamParams.referenceCount == 0)
+                {
+                    ChipLogProgress(Camera, "Starting audio stream with ID: %u on first acquire", audioStreamID);
+                    if (mCameraDeviceHAL->GetCameraHALInterface().StartAudioStream(audioStreamID) != CameraError::SUCCESS)
+                    {
+                        ChipLogError(Camera, "Failed to start HAL Audio Stream for ID %u on acquire.", audioStreamID);
+                    }
+                }
                 stream.audioStreamParams.referenceCount++;
             }
             else
@@ -915,6 +917,16 @@ CameraAVStreamManager::OnTransportAcquireAudioVideoStreams(uint16_t audioStreamI
         {
             if (stream.videoStreamParams.referenceCount < UINT8_MAX)
             {
+                // Lazily start the HAL pipeline on the first consumer (0 -> 1 transition).
+                if (stream.videoStreamParams.referenceCount == 0)
+                {
+                    ChipLogProgress(Camera, "Starting video stream with ID: %u on first acquire", videoStreamID);
+                    if (mCameraDeviceHAL->GetCameraHALInterface().StartVideoStream(stream.videoStreamParams) !=
+                        CameraError::SUCCESS)
+                    {
+                        ChipLogError(Camera, "Failed to start HAL Video Stream for ID %u on acquire.", videoStreamID);
+                    }
+                }
                 stream.videoStreamParams.referenceCount++;
             }
             else
@@ -951,6 +963,15 @@ CameraAVStreamManager::OnTransportReleaseAudioVideoStreams(uint16_t audioStreamI
             if (stream.audioStreamParams.referenceCount > 0)
             {
                 stream.audioStreamParams.referenceCount--;
+                // Stop the HAL pipeline once the last consumer releases (1 -> 0 transition).
+                if (stream.audioStreamParams.referenceCount == 0)
+                {
+                    ChipLogProgress(Camera, "Stopping audio stream with ID: %u on last release", audioStreamID);
+                    if (mCameraDeviceHAL->GetCameraHALInterface().StopAudioStream(audioStreamID) != CameraError::SUCCESS)
+                    {
+                        ChipLogError(Camera, "Failed to stop HAL Audio Stream for ID %u on release.", audioStreamID);
+                    }
+                }
             }
             else
             {
@@ -967,6 +988,15 @@ CameraAVStreamManager::OnTransportReleaseAudioVideoStreams(uint16_t audioStreamI
             if (stream.videoStreamParams.referenceCount > 0)
             {
                 stream.videoStreamParams.referenceCount--;
+                // Stop the HAL pipeline once the last consumer releases (1 -> 0 transition).
+                if (stream.videoStreamParams.referenceCount == 0)
+                {
+                    ChipLogProgress(Camera, "Stopping video stream with ID: %u on last release", videoStreamID);
+                    if (mCameraDeviceHAL->GetCameraHALInterface().StopVideoStream(videoStreamID) != CameraError::SUCCESS)
+                    {
+                        ChipLogError(Camera, "Failed to stop HAL Video Stream for ID %u on release.", videoStreamID);
+                    }
+                }
             }
             else
             {

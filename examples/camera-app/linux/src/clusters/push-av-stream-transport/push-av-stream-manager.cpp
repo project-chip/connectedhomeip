@@ -43,6 +43,8 @@ PushAvStreamTransportManager::~PushAvStreamTransportManager()
         for (auto & kv : mTransportMap)
         {
             mMediaController->UnregisterTransport(kv.second.get());
+            // Release the referenced streams so the HAL pipelines are stopped when no consumer remains.
+            ReleaseStreamsForConnection(kv.first);
         }
     }
     mTransportMap.clear();
@@ -135,6 +137,11 @@ PushAvStreamTransportManager::AllocatePushTransport(const TransportOptionsStruct
     mMediaController->RegisterTransport(mTransportMap[connectionID].get(), videoStreamID, audioStreamID);
     mMediaController->SetPreRollLength(mTransportMap[connectionID].get(), mTransportMap[connectionID].get()->GetPreRollLength());
 
+    // Acquire the referenced audio/video streams so the HAL pipelines are started for this consumer. Stream pipelines are
+    // started lazily on the first acquire and stopped on the last release.
+    TEMPORARY_RETURN_IGNORED mCameraDevice->GetCameraAVStreamMgmtDelegate().OnTransportAcquireAudioVideoStreams(audioStreamID,
+                                                                                                               videoStreamID);
+
     uint32_t newTransportBandwidthbps = 0;
     GetBandwidthForStreams(transportOptions.videoStreamID, transportOptions.audioStreamID, newTransportBandwidthbps);
 
@@ -182,6 +189,38 @@ PushAvStreamTransportManager::AllocatePushTransport(const TransportOptionsStruct
     return Status::Success;
 }
 
+void PushAvStreamTransportManager::ReleaseStreamsForConnection(uint16_t connectionID)
+{
+    if (mCameraDevice == nullptr)
+    {
+        return;
+    }
+
+    auto optsIt = mTransportOptionsMap.find(connectionID);
+    if (optsIt == mTransportOptionsMap.end())
+    {
+        return;
+    }
+
+    const TransportOptionsStruct & transportOptions = optsIt->second;
+
+    uint16_t videoStreamID = -1;
+    uint16_t audioStreamID = -1;
+
+    if (transportOptions.videoStreamID.HasValue() && !transportOptions.videoStreamID.Value().IsNull())
+    {
+        videoStreamID = transportOptions.videoStreamID.Value().Value();
+    }
+
+    if (transportOptions.audioStreamID.HasValue() && !transportOptions.audioStreamID.Value().IsNull())
+    {
+        audioStreamID = transportOptions.audioStreamID.Value().Value();
+    }
+
+    TEMPORARY_RETURN_IGNORED mCameraDevice->GetCameraAVStreamMgmtDelegate().OnTransportReleaseAudioVideoStreams(audioStreamID,
+                                                                                                               videoStreamID);
+}
+
 Protocols::InteractionModel::Status PushAvStreamTransportManager::DeallocatePushTransport(const uint16_t connectionID)
 {
     if (mTransportMap.find(connectionID) == mTransportMap.end())
@@ -191,6 +230,10 @@ Protocols::InteractionModel::Status PushAvStreamTransportManager::DeallocatePush
     }
     mTotalUsedBandwidthbps -= mTransportMap[connectionID].get()->GetCurrentlyUsedBandwidthbps();
     mMediaController->UnregisterTransport(mTransportMap[connectionID].get());
+
+    // Release the referenced audio/video streams so the HAL pipelines can be stopped once no consumer remains.
+    ReleaseStreamsForConnection(connectionID);
+
     mTransportMap.erase(connectionID);
     mTransportOptionsMap.erase(connectionID);
 
