@@ -926,6 +926,12 @@ CameraAVStreamManager::OnTransportAcquireAudioVideoStreams(uint16_t audioStreamI
                     {
                         ChipLogError(Camera, "Failed to start HAL Video Stream for ID %u on acquire.", videoStreamID);
                     }
+                    else
+                    {
+                        // Reflect the frame rate reported by the HAL once the stream has started.
+                        TEMPORARY_RETURN_IGNORED GetCameraAVStreamManagementCluster()->SetCurrentFrameRate(
+                            mCameraDeviceHAL->GetCameraHALInterface().GetCurrentFrameRate());
+                    }
                 }
                 stream.videoStreamParams.referenceCount++;
             }
@@ -936,15 +942,18 @@ CameraAVStreamManager::OnTransportAcquireAudioVideoStreams(uint16_t audioStreamI
         }
     }
 
-    // Update the counts in the SDK allocated stream attributes
-    if (GetCameraAVStreamManagementCluster()->UpdateAudioStreamRefCount(audioStreamID, /* shouldIncrement = */ true) !=
-        CHIP_NO_ERROR)
+    // Update the counts in the SDK allocated stream attributes. A transport may reference only one of the two stream types, in
+    // which case the absent stream ID is UINT16_MAX and must be skipped.
+    if (audioStreamID != UINT16_MAX &&
+        GetCameraAVStreamManagementCluster()->UpdateAudioStreamRefCount(audioStreamID, /* shouldIncrement = */ true) !=
+            CHIP_NO_ERROR)
     {
         ChipLogError(Camera, "Failed to increment audio stream %u ref count in SDK", audioStreamID);
     }
 
-    if (GetCameraAVStreamManagementCluster()->UpdateVideoStreamRefCount(videoStreamID, /* shouldIncrement = */ true) !=
-        CHIP_NO_ERROR)
+    if (videoStreamID != UINT16_MAX &&
+        GetCameraAVStreamManagementCluster()->UpdateVideoStreamRefCount(videoStreamID, /* shouldIncrement = */ true) !=
+            CHIP_NO_ERROR)
     {
         ChipLogError(Camera, "Failed to increment video stream %u ref count in SDK", videoStreamID);
     }
@@ -1005,15 +1014,18 @@ CameraAVStreamManager::OnTransportReleaseAudioVideoStreams(uint16_t audioStreamI
         }
     }
 
-    // Update the counts in the SDK allocated stream attributes
-    if (GetCameraAVStreamManagementCluster()->UpdateAudioStreamRefCount(audioStreamID, /* shouldIncrement = */ false) !=
-        CHIP_NO_ERROR)
+    // Update the counts in the SDK allocated stream attributes. A transport may reference only one of the two stream types, in
+    // which case the absent stream ID is UINT16_MAX and must be skipped.
+    if (audioStreamID != UINT16_MAX &&
+        GetCameraAVStreamManagementCluster()->UpdateAudioStreamRefCount(audioStreamID, /* shouldIncrement = */ false) !=
+            CHIP_NO_ERROR)
     {
         ChipLogError(Camera, "Failed to decrement audio stream %u ref count in SDK", audioStreamID);
     }
 
-    if (GetCameraAVStreamManagementCluster()->UpdateVideoStreamRefCount(videoStreamID, /* shouldIncrement = */ false) !=
-        CHIP_NO_ERROR)
+    if (videoStreamID != UINT16_MAX &&
+        GetCameraAVStreamManagementCluster()->UpdateVideoStreamRefCount(videoStreamID, /* shouldIncrement = */ false) !=
+            CHIP_NO_ERROR)
     {
         ChipLogError(Camera, "Failed to decrement video stream %u ref count in SDK", videoStreamID);
     }
