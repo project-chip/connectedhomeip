@@ -36,6 +36,13 @@
 #include <app_options/AppOptions.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <devices/device-factory/DeviceFactory.h>
+#if CHIP_ALL_DEVICES_APP_ENABLE_OOB_ACCESSORS
+#include <accessors/common/AccessorRegistry.h>
+#include <devices/boolean-state-sensor/BooleanStateSensorAccessor.h>
+#if defined(PW_RPC_ENABLED)
+#include <accessors/pigweed/PigweedAttributeAccessor.h>
+#endif
+#endif
 #include <devices/device-type-parser/DeviceTypeParser.h>
 #include <platform/CommissionableDataProvider.h>
 #include <platform/DeviceInstanceInfoProvider.h>
@@ -84,6 +91,15 @@ void StopSignalHandler(int /* signal */)
     }
 }
 
+std::unique_ptr<SingleEndpointDeviceAccessor> CreateAccessor(const std::string & type, DeviceInterface * device)
+{
+    if (type == "contact-sensor" || type == "water-leak-detector")
+    {
+        return std::make_unique<BooleanStateSensorAccessor>(static_cast<BooleanStateSensorDevice *>(device));
+    }
+    return nullptr;
+}
+
 class CodeDrivenDataModelDevices
 {
 public:
@@ -119,26 +135,26 @@ public:
         mRootNode(
             {
                 .commissioningWindowManager           = mContext.commissioningWindowManager,       //
-                    .configurationManager             = mContext.configurationManager,             //
-                    .deviceControlServer              = mContext.deviceControlServer,              //
-                    .fabricTable                      = mContext.fabricTable,                      //
-                    .accessControl                    = mContext.accessControl,                    //
-                    .persistentStorage                = mContext.persistentStorage,                //
-                    .failSafeContext                  = mContext.failSafeContext,                  //
-                    .deviceInstanceInfoProvider       = mContext.deviceInstanceInfoProvider,       //
-                    .platformManager                  = mContext.platformManager,                  //
-                    .groupDataProvider                = mContext.groupDataProvider,                //
-                    .sessionManager                   = mContext.sessionManager,                   //
-                    .dnssdServer                      = mContext.dnssdServer,                      //
-                    .deviceLoadStatusProvider         = mContext.deviceLoadStatusProvider,         //
-                    .diagnosticDataProvider           = mContext.diagnosticDataProvider,           //
-                    .testEventTriggerDelegate         = mContext.testEventTriggerDelegate,         //
-                    .dacProvider                      = mContext.dacProvider,                      //
-                    .eventManagement                  = mContext.eventManagement,                  //
-                    .safeAttributePersistenceProvider = mContext.safeAttributePersistenceProvider, //
-                    .timerDelegate                    = mContext.timerDelegate,                    //
+                .configurationManager             = mContext.configurationManager,             //
+                .deviceControlServer              = mContext.deviceControlServer,              //
+                .fabricTable                      = mContext.fabricTable,                      //
+                .accessControl                    = mContext.accessControl,                    //
+                .persistentStorage                = mContext.persistentStorage,                //
+                .failSafeContext                  = mContext.failSafeContext,                  //
+                .deviceInstanceInfoProvider       = mContext.deviceInstanceInfoProvider,       //
+                .platformManager                  = mContext.platformManager,                  //
+                .groupDataProvider                = mContext.groupDataProvider,                //
+                .sessionManager                   = mContext.sessionManager,                   //
+                .dnssdServer                      = mContext.dnssdServer,                      //
+                .deviceLoadStatusProvider         = mContext.deviceLoadStatusProvider,         //
+                .diagnosticDataProvider           = mContext.diagnosticDataProvider,           //
+                .testEventTriggerDelegate         = mContext.testEventTriggerDelegate,         //
+                .dacProvider                      = mContext.dacProvider,                      //
+                .eventManagement                  = mContext.eventManagement,                  //
+                .safeAttributePersistenceProvider = mContext.safeAttributePersistenceProvider, //
+                .timerDelegate                    = mContext.timerDelegate,                    //
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
-                    .termsAndConditionsProvider = mContext.termsAndConditionsProvider,
+                .termsAndConditionsProvider = mContext.termsAndConditionsProvider,
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
             },
             []() {
@@ -162,6 +178,14 @@ public:
             ChipLogProgress(AppServer, "Registering device %s on endpoint %u with parent 0x%04X", entry.type.c_str(),
                             entry.endpoint, entry.parentId);
             ReturnErrorOnFailure(device->Register(entry.endpoint, mDataModelProvider, entry.parentId));
+
+            auto accessor = CreateAccessor(entry.type, device.get());
+            if (accessor)
+            {
+                ReturnErrorOnFailure(AccessorRegistry::Instance().Register(accessor.get()));
+                mConstructedAccessors.push_back(std::move(accessor));
+            }
+
             mConstructedDevices.push_back(std::move(device));
         }
 
@@ -170,6 +194,7 @@ public:
 
     void Shutdown()
     {
+        mConstructedAccessors.clear();
         for (auto & device : mConstructedDevices)
         {
             device->Unregister(mDataModelProvider);
@@ -188,6 +213,7 @@ private:
 
     AppRootNode mRootNode;
     std::vector<std::unique_ptr<DeviceInterface>> mConstructedDevices;
+    std::vector<std::unique_ptr<SingleEndpointDeviceAccessor>> mConstructedAccessors;
 };
 
 void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
@@ -286,6 +312,9 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
     tracing_setup.EnableTracingFor("json:log");
 
 #if defined(PW_RPC_ENABLED)
+    static chip::app::PigweedAttributeAccessor sPwOobAccessor;
+    chip::rpc::PigweedDebugAccessInterceptorRegistry::Instance().Register(&sPwOobAccessor);
+
     chip::rpc::Init(33000);
     ChipLogProgress(AppServer, "PW_RPC initialized.");
 #endif // defined(PW_RPC_ENABLED)

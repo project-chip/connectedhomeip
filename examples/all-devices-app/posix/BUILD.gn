@@ -16,6 +16,7 @@ import("//build_overrides/chip.gni")
 import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
 import("${chip_root}/src/app/common_flags.gni")
 import("${chip_root}/src/platform/device.gni")
+import("${chip_root}/examples/all-devices-app/all-devices-common/accessors/accessors.gni")
 
 if (chip_enable_pw_rpc) {
   import("//build_overrides/pigweed.gni")
@@ -56,6 +57,14 @@ executable("all-devices-app") {
     "${chip_root}/zzz_generated/app-common/devices/",
   ]
   defines = []
+
+  if (chip_all_devices_app_enable_oob_accessors) {
+    deps += [
+      "${chip_root}/examples/all-devices-app/all-devices-common/accessors:common",
+      "${chip_root}/examples/all-devices-app/all-devices-common/devices/boolean-state-sensor:boolean-state-sensor-accessor",
+    ]
+    defines += [ "CHIP_ALL_DEVICES_APP_ENABLE_OOB_ACCESSORS=1" ]
+  }
 
   if (chip_device_platform == "darwin") {
     deps += [ "${chip_root}/examples/all-devices-app/posix/darwin" ]
