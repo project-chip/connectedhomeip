@@ -52,8 +52,9 @@
 #include <devices/boolean-state-sensor/BooleanStateSensorAccessor.h>
 #if defined(PW_RPC_ENABLED)
 #include <accessors/pigweed/PigweedAttributeAccessor.h>
-#endif
-#endif
+#include <pigweed/rpc_services/AccessInterceptorRegistry.h>
+#endif // PW_RPC_ENABLED
+#endif // CHIP_ALL_DEVICES_APP_ENABLE_OOB_ACCESSORS
 #include <devices/device-type-parser/DeviceTypeParser.h>
 #include <platform/CommissionableDataProvider.h>
 #include <platform/DeviceInstanceInfoProvider.h>
