@@ -199,11 +199,10 @@ CHIP_ERROR CommandSender::SendInvokeRequest()
     using namespace Protocols::InteractionModel;
     using namespace Messaging;
 
-    ChipLogError(DataManagement, "************************mSuppressResponse:%s", mSuppressResponse ? "true" : "false");
     if (mSuppressResponse)
     {
         ReturnErrorOnFailure(mExchangeCtx->SendMessage(MsgType::InvokeCommandRequest, std::move(mPendingInvokeData),
-                                                       SendMessageFlags::kNoAutoRequestAck));
+                                                       SendMessageFlags::kNone));
         Close();
     }
     else
@@ -220,8 +219,6 @@ CHIP_ERROR CommandSender::OnMessageReceived(Messaging::ExchangeContext * apExcha
                                             System::PacketBufferHandle && aPayload)
 {
     using namespace Protocols::InteractionModel;
-
-    ChipLogError(DataManagement, "************************OnMessageReceived");
 
     if (mState == State::AwaitingResponse)
     {

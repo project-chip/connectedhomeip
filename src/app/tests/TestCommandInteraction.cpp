@@ -1702,7 +1702,7 @@ TEST_F(TestCommandInteraction, TestCommandSenderSuppressResponseFlow)
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 }
 
-TEST_F(TestCommandInteraction, TestCommandSenderSuppressResponseFlowNoImpactOnStatusResponse)
+TEST_F(TestCommandInteraction, TestCommandSenderSuppressResponseSuppressStatusResponse)
 {
 
     mockCommandSenderDelegate.ResetCounter();

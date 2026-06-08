@@ -72,6 +72,7 @@ void ReadClient::ClearActiveSubscriptionState()
     mMaxInterval                  = 0;
     mSubscriptionId               = 0;
     mIsResubscriptionScheduled    = false;
+    mSuppressResponse             = false;
 
     MoveToState(ClientState::Idle);
 }
@@ -536,6 +537,7 @@ CHIP_ERROR ReadClient::OnMessageReceived(Messaging::ExchangeContext * apExchange
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     Status status  = Status::InvalidAction;
+    mSuppressResponse = false;
     VerifyOrExit(!IsIdle() && !IsInactiveICDSubscription(), err = CHIP_ERROR_INCORRECT_STATE);
 
     if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::ReportData))
@@ -569,7 +571,10 @@ exit:
         {
             status = Status::InvalidSubscription;
         }
-        TEMPORARY_RETURN_IGNORED StatusResponse::Send(status, apExchangeContext, false /*aExpectResponse*/);
+        if (!mSuppressResponse)
+        {
+            TEMPORARY_RETURN_IGNORED StatusResponse::Send(status, apExchangeContext, false /*aExpectResponse*/);
+        }
     }
 
     if ((!IsSubscriptionType() && !mPendingMoreChunks) || err != CHIP_NO_ERROR)
@@ -595,6 +600,8 @@ void ReadClient::OnUnsolicitedReportData(Messaging::ExchangeContext * apExchange
     //
     mReadPrepareParams.mSessionHolder.Grab(mExchange->GetSessionHandle());
 
+    mSuppressResponse = false;
+
     CHIP_ERROR err = ProcessReportData(std::move(aPayload), ReportType::kUnsolicited);
     if (err != CHIP_NO_ERROR)
     {
@@ -607,7 +614,10 @@ void ReadClient::OnUnsolicitedReportData(Messaging::ExchangeContext * apExchange
             status = Status::InvalidAction;
         }
 
-        TEMPORARY_RETURN_IGNORED StatusResponse::Send(status, mExchange.Get(), false /*aExpectResponse*/);
+        if (!mSuppressResponse)
+        {
+            TEMPORARY_RETURN_IGNORED StatusResponse::Send(status, mExchange.Get(), false /*aExpectResponse*/);
+        }
         Close(err);
     }
 }
@@ -616,7 +626,6 @@ CHIP_ERROR ReadClient::ProcessReportData(System::PacketBufferHandle && aPayload,
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     ReportDataMessage::Parser report;
-    bool suppressResponse         = true;
     SubscriptionId subscriptionId = 0;
     EventReportIBs::Parser eventReportIBs;
     AttributeReportIBs::Parser attributeReportIBs;
@@ -632,10 +641,10 @@ CHIP_ERROR ReadClient::ProcessReportData(System::PacketBufferHandle && aPayload,
     }
 #endif
 
-    err = report.GetSuppressResponse(&suppressResponse);
+    err = report.GetSuppressResponse(&mSuppressResponse);
     if (CHIP_END_OF_TLV == err)
     {
-        suppressResponse = false;
+        mSuppressResponse = false;
         err              = CHIP_NO_ERROR;
     }
     SuccessOrExit(err);
@@ -727,7 +736,7 @@ exit:
         }
     }
 
-    if (!suppressResponse && err == CHIP_NO_ERROR)
+    if (!mSuppressResponse && err == CHIP_NO_ERROR)
     {
         bool noResponseExpected = IsSubscriptionActive() && !mPendingMoreChunks;
         err                     = StatusResponse::Send(Status::Success, mExchange.Get(), !noResponseExpected);

@@ -172,6 +172,11 @@ Status WriteHandler::OnWriteRequest(Messaging::ExchangeContext * apExchangeConte
     if (!(status == Status::Success && mStateFlags.Has(StateBits::kHasMoreChunks)))
     {
         Close();
+        // Return Success if SuppressResponse is set to avoid sending StatusResponse when error is catched in InteractionModelEngine.
+        if (mStateFlags.Has(StateBits::kSuppressResponse))
+        {
+            return Status::Success;
+        }
     }
 
     return status;
@@ -212,7 +217,10 @@ CHIP_ERROR WriteHandler::OnMessageReceived(Messaging::ExchangeContext * apExchan
     }
     else
     {
-        err = StatusResponse::Send(status, apExchangeContext, false /*aExpectResponse*/);
+        if (!mStateFlags.Has(StateBits::kSuppressResponse))
+        {
+            err = StatusResponse::Send(status, apExchangeContext, false /*aExpectResponse*/);
+        }
         Close();
     }
     return err;

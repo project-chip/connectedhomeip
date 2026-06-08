@@ -542,7 +542,7 @@ CHIP_ERROR WriteClient::SendWriteRequest()
     if (mSuppressResponse)
     {
         ReturnErrorOnFailure(
-            mExchangeCtx->SendMessage(MsgType::WriteRequest, std::move(data), SendMessageFlags::kNoAutoRequestAck));
+            mExchangeCtx->SendMessage(MsgType::WriteRequest, std::move(data), SendMessageFlags::kNone));
     }
     else
     {
