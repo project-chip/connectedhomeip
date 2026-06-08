@@ -149,6 +149,7 @@ __all__ = [
     "RadonConcentrationMeasurement",
     "SoilMeasurement",
     "AmbientContextSensing",
+    "AmbientSensingUnion",
     "ProximityRanging",
     "SmokeConcentrationMeasurement",
     "NetworkIdentityManagement",
@@ -43801,13 +43802,14 @@ class AmbientContextSensing(Cluster):
                 ClusterObjectFieldDescriptor(Label="audioContextDetected", Tag=0x00000002, Type=typing.Optional[bool]),
                 ClusterObjectFieldDescriptor(Label="ambientContextType", Tag=0x00000003, Type=typing.Optional[typing.List[AmbientContextSensing.Structs.AmbientContextTypeStruct]]),
                 ClusterObjectFieldDescriptor(Label="ambientContextTypeSupported", Tag=0x00000004, Type=typing.Optional[typing.List[Globals.Structs.SemanticTagStruct]]),
-                ClusterObjectFieldDescriptor(Label="objectCountReached", Tag=0x00000005, Type=typing.Optional[bool]),
+                ClusterObjectFieldDescriptor(Label="objectCountThresholdReached", Tag=0x00000005, Type=typing.Optional[bool]),
                 ClusterObjectFieldDescriptor(Label="objectCountConfig", Tag=0x00000006, Type=typing.Optional[AmbientContextSensing.Structs.ObjectCountConfigStruct]),
                 ClusterObjectFieldDescriptor(Label="objectCount", Tag=0x00000007, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="simultaneousDetectionLimit", Tag=0x00000008, Type=uint),
                 ClusterObjectFieldDescriptor(Label="holdTime", Tag=0x00000009, Type=uint),
                 ClusterObjectFieldDescriptor(Label="holdTimeLimits", Tag=0x0000000A, Type=AmbientContextSensing.Structs.HoldTimeLimitsStruct),
                 ClusterObjectFieldDescriptor(Label="predictedActivity", Tag=0x0000000B, Type=typing.Optional[typing.List[AmbientContextSensing.Structs.PredictedActivityStruct]]),
+                ClusterObjectFieldDescriptor(Label="sensorFusionSupported", Tag=0x0000000C, Type=typing.Optional[typing.List[Globals.Structs.SemanticTagStruct]]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
@@ -43820,13 +43822,14 @@ class AmbientContextSensing(Cluster):
     audioContextDetected: typing.Optional[bool] = None
     ambientContextType: typing.Optional[typing.List[AmbientContextSensing.Structs.AmbientContextTypeStruct]] = None
     ambientContextTypeSupported: typing.Optional[typing.List[Globals.Structs.SemanticTagStruct]] = None
-    objectCountReached: typing.Optional[bool] = None
+    objectCountThresholdReached: typing.Optional[bool] = None
     objectCountConfig: typing.Optional[AmbientContextSensing.Structs.ObjectCountConfigStruct] = None
     objectCount: typing.Optional[uint] = None
     simultaneousDetectionLimit: uint = 0
     holdTime: uint = 0
     holdTimeLimits: AmbientContextSensing.Structs.HoldTimeLimitsStruct = field(default_factory=lambda: AmbientContextSensing.Structs.HoldTimeLimitsStruct())
     predictedActivity: typing.Optional[typing.List[AmbientContextSensing.Structs.PredictedActivityStruct]] = None
+    sensorFusionSupported: typing.Optional[typing.List[Globals.Structs.SemanticTagStruct]] = None
     generatedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     acceptedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     attributeList: typing.List[uint] = field(default_factory=lambda: [])
@@ -43840,6 +43843,7 @@ class AmbientContextSensing(Cluster):
             kObjectIdentification = 0x4
             kSoundIdentification = 0x8
             kPredictedActivity = 0x10
+            kSensorFusion = 0x20
 
     class Structs:
         @dataclass
@@ -43849,11 +43853,11 @@ class AmbientContextSensing(Cluster):
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="ambientContextSensed", Tag=0, Type=typing.List[Globals.Structs.SemanticTagStruct]),
-                        ClusterObjectFieldDescriptor(Label="detectionStartTime", Tag=1, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="detectionConfidence", Tag=1, Type=typing.Union[None, Nullable, uint]),
                     ])
 
             ambientContextSensed: 'typing.List[Globals.Structs.SemanticTagStruct]' = field(default_factory=lambda: [])
-            detectionStartTime: 'typing.Optional[uint]' = None
+            detectionConfidence: 'typing.Union[None, Nullable, uint]' = None
 
         @dataclass
         class HoldTimeLimitsStruct(ClusterObject):
@@ -43986,7 +43990,7 @@ class AmbientContextSensing(Cluster):
             value: typing.Optional[typing.List[Globals.Structs.SemanticTagStruct]] = None
 
         @dataclass
-        class ObjectCountReached(ClusterAttributeDescriptor):
+        class ObjectCountThresholdReached(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return 0x00000431
@@ -44098,6 +44102,22 @@ class AmbientContextSensing(Cluster):
             value: typing.Optional[typing.List[AmbientContextSensing.Structs.PredictedActivityStruct]] = None
 
         @dataclass
+        class SensorFusionSupported(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000431
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000000C
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[Globals.Structs.SemanticTagStruct]])
+
+            value: typing.Optional[typing.List[Globals.Structs.SemanticTagStruct]] = None
+
+        @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
@@ -44193,12 +44213,12 @@ class AmbientContextSensing(Cluster):
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="ambientContextDetected", Tag=0, Type=typing.Optional[AmbientContextSensing.Structs.AmbientContextTypeStruct]),
-                        ClusterObjectFieldDescriptor(Label="objectCountReached", Tag=1, Type=typing.Optional[bool]),
+                        ClusterObjectFieldDescriptor(Label="objectCountThresholdReached", Tag=1, Type=typing.Optional[bool]),
                         ClusterObjectFieldDescriptor(Label="objectCount", Tag=2, Type=typing.Optional[uint]),
                     ])
 
             ambientContextDetected: typing.Optional[AmbientContextSensing.Structs.AmbientContextTypeStruct] = None
-            objectCountReached: typing.Optional[bool] = None
+            objectCountThresholdReached: typing.Optional[bool] = None
             objectCount: typing.Optional[uint] = None
 
         @dataclass
@@ -44215,10 +44235,265 @@ class AmbientContextSensing(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="eventStartTime", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="eventStartTimePos", Tag=0, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="eventStartTimeSys", Tag=1, Type=typing.Optional[uint]),
                     ])
 
-            eventStartTime: uint = 0
+            eventStartTimePos: typing.Optional[uint] = None
+            eventStartTimeSys: typing.Optional[uint] = None
+
+
+@dataclass
+class AmbientSensingUnion(Cluster):
+    id: typing.ClassVar[int] = 0x00000432
+
+    @ChipUtility.classproperty
+    def descriptor(cls) -> ClusterObjectDescriptor:
+        return ClusterObjectDescriptor(
+            Fields=[
+                ClusterObjectFieldDescriptor(Label="unionName", Tag=0x00000000, Type=str),
+                ClusterObjectFieldDescriptor(Label="unionHealth", Tag=0x00000001, Type=AmbientSensingUnion.Enums.UnionHealthEnum),
+                ClusterObjectFieldDescriptor(Label="unionContributorList", Tag=0x00000002, Type=typing.List[AmbientSensingUnion.Structs.UnionContributorStruct]),
+                ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
+                ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
+                ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
+                ClusterObjectFieldDescriptor(Label="featureMap", Tag=0x0000FFFC, Type=uint),
+                ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
+            ])
+
+    unionName: str = ""
+    unionHealth: AmbientSensingUnion.Enums.UnionHealthEnum = 0
+    unionContributorList: typing.List[AmbientSensingUnion.Structs.UnionContributorStruct] = field(default_factory=lambda: [])
+    generatedCommandList: typing.List[uint] = field(default_factory=lambda: [])
+    acceptedCommandList: typing.List[uint] = field(default_factory=lambda: [])
+    attributeList: typing.List[uint] = field(default_factory=lambda: [])
+    featureMap: uint = 0
+    clusterRevision: uint = 0
+
+    class Enums:
+        class UnionContributorStatusEnum(MatterIntEnum):
+            kUnionContributorOnline = 0x00
+            kUnionContributorOffline = 0x01
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 2
+
+        class UnionHealthEnum(MatterIntEnum):
+            kFullyFunctional = 0x00
+            kLimitedDegraded = 0x01
+            kNonFunctional = 0x02
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 3
+
+    class Structs:
+        @dataclass
+        class UnionContributorStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="contributorNodeID", Tag=0, Type=typing.Union[Nullable, uint]),
+                        ClusterObjectFieldDescriptor(Label="contributorEndpointID", Tag=1, Type=typing.Union[Nullable, uint]),
+                        ClusterObjectFieldDescriptor(Label="contributorName", Tag=2, Type=typing.Optional[str]),
+                        ClusterObjectFieldDescriptor(Label="contributorHealth", Tag=3, Type=AmbientSensingUnion.Enums.UnionContributorStatusEnum),
+                    ])
+
+            contributorNodeID: 'typing.Union[Nullable, uint]' = NullValue
+            contributorEndpointID: 'typing.Union[Nullable, uint]' = NullValue
+            contributorName: 'typing.Optional[str]' = None
+            contributorHealth: 'AmbientSensingUnion.Enums.UnionContributorStatusEnum' = 0
+
+    class Attributes:
+        @dataclass
+        class UnionName(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000432
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000000
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=str)
+
+            value: str = ""
+
+        @dataclass
+        class UnionHealth(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000432
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000001
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=AmbientSensingUnion.Enums.UnionHealthEnum)
+
+            value: AmbientSensingUnion.Enums.UnionHealthEnum = 0
+
+        @dataclass
+        class UnionContributorList(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000432
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000002
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[AmbientSensingUnion.Structs.UnionContributorStruct])
+
+            value: typing.List[AmbientSensingUnion.Structs.UnionContributorStruct] = field(default_factory=lambda: [])
+
+        @dataclass
+        class GeneratedCommandList(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000432
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFF8
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[uint])
+
+            value: typing.List[uint] = field(default_factory=lambda: [])
+
+        @dataclass
+        class AcceptedCommandList(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000432
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFF9
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[uint])
+
+            value: typing.List[uint] = field(default_factory=lambda: [])
+
+        @dataclass
+        class AttributeList(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000432
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFFB
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[uint])
+
+            value: typing.List[uint] = field(default_factory=lambda: [])
+
+        @dataclass
+        class FeatureMap(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000432
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFFC
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+            value: uint = 0
+
+        @dataclass
+        class ClusterRevision(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000432
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFFD
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+            value: uint = 0
+
+    class Events:
+        @dataclass
+        class UnionContributorAdded(ClusterEvent):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000432
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000000
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="addedContributor", Tag=0, Type=typing.List[AmbientSensingUnion.Structs.UnionContributorStruct]),
+                    ])
+
+            addedContributor: typing.List[AmbientSensingUnion.Structs.UnionContributorStruct] = field(default_factory=lambda: [])
+
+        @dataclass
+        class UnionContributorRemoved(ClusterEvent):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000432
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000001
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="removedContributor", Tag=0, Type=typing.List[AmbientSensingUnion.Structs.UnionContributorStruct]),
+                    ])
+
+            removedContributor: typing.List[AmbientSensingUnion.Structs.UnionContributorStruct] = field(default_factory=lambda: [])
+
+        @dataclass
+        class UnionContributorStatusChanged(ClusterEvent):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000432
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000002
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="statusChangedContributor", Tag=0, Type=typing.List[AmbientSensingUnion.Structs.UnionContributorStruct]),
+                    ])
+
+            statusChangedContributor: typing.List[AmbientSensingUnion.Structs.UnionContributorStruct] = field(default_factory=lambda: [])
 
 
 @dataclass
@@ -54941,6 +55216,7 @@ class CommodityTariff(Cluster):
                         ClusterObjectFieldDescriptor(Label="threshold", Tag=6, Type=typing.Union[Nullable, int]),
                         ClusterObjectFieldDescriptor(Label="label", Tag=7, Type=typing.Union[None, Nullable, str]),
                         ClusterObjectFieldDescriptor(Label="predicted", Tag=8, Type=typing.Optional[bool]),
+                        ClusterObjectFieldDescriptor(Label="externalID", Tag=9, Type=typing.Optional[str]),
                     ])
 
             tariffComponentID: 'uint' = 0
@@ -54952,6 +55228,7 @@ class CommodityTariff(Cluster):
             threshold: 'typing.Union[Nullable, int]' = NullValue
             label: 'typing.Union[None, Nullable, str]' = None
             predicted: 'typing.Optional[bool]' = None
+            externalID: 'typing.Optional[str]' = None
 
         @dataclass
         class CalendarPeriodStruct(ClusterObject):

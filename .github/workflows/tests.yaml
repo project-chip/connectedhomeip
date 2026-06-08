@@ -124,6 +124,7 @@ jobs:
                       --log-level info \
                       src/app/zap-templates/zcl/data-model/chip/global-attributes.xml \
                       src/app/zap-templates/zcl/data-model/chip/ambient-context-sensing-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/ambient-sensing-union-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/av-analysis-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/boolean-state-configuration-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/bridged-device-basic-information-cluster.xml \
@@ -1316,7 +1317,7 @@ jobs:
 
       runs-on: ubuntu-latest
       concurrency:
-          group: gh-pages-deploy
+          group: ${{ github.event_name == 'pull_request' && format('gh-pages-report-{0}', github.run_id) || 'gh-pages-deploy' }}
           cancel-in-progress: false
       permissions:
           contents: write

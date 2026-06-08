@@ -4384,11 +4384,11 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value);
 Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value, MarkAttributeDirty markDirty);
 } // namespace AudioContextDetected
 
-namespace ObjectCountReached {
+namespace ObjectCountThresholdReached {
 Protocols::InteractionModel::Status Get(EndpointId endpoint, bool * value); // boolean
 Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value);
 Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value, MarkAttributeDirty markDirty);
-} // namespace ObjectCountReached
+} // namespace ObjectCountThresholdReached
 
 namespace ObjectCount {
 Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value); // int16u
@@ -4422,6 +4422,38 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, Mar
 
 } // namespace Attributes
 } // namespace AmbientContextSensing
+
+namespace AmbientSensingUnion {
+namespace Attributes {
+
+namespace UnionName {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::MutableCharSpan & value); // char_string
+Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::CharSpan value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::CharSpan value, MarkAttributeDirty markDirty);
+} // namespace UnionName
+
+namespace UnionHealth {
+Protocols::InteractionModel::Status Get(EndpointId endpoint,
+                                        chip::app::Clusters::AmbientSensingUnion::UnionHealthEnum * value); // UnionHealthEnum
+Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::AmbientSensingUnion::UnionHealthEnum value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::AmbientSensingUnion::UnionHealthEnum value,
+                                        MarkAttributeDirty markDirty);
+} // namespace UnionHealth
+
+namespace FeatureMap {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, uint32_t * value); // bitmap32
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, MarkAttributeDirty markDirty);
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value); // int16u
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty);
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace AmbientSensingUnion
 
 namespace ProximityRanging {
 namespace Attributes {

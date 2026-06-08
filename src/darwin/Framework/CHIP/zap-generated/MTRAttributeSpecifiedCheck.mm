@@ -5600,7 +5600,7 @@ static BOOL AttributeIsSpecifiedInAmbientContextSensingCluster(AttributeId aAttr
     case Attributes::AmbientContextTypeSupported::Id: {
         return YES;
     }
-    case Attributes::ObjectCountReached::Id: {
+    case Attributes::ObjectCountThresholdReached::Id: {
         return YES;
     }
     case Attributes::ObjectCountConfig::Id: {
@@ -5621,6 +5621,9 @@ static BOOL AttributeIsSpecifiedInAmbientContextSensingCluster(AttributeId aAttr
     case Attributes::PredictedActivity::Id: {
         return YES;
     }
+    case Attributes::SensorFusionSupported::Id: {
+        return YES;
+    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }
@@ -5638,6 +5641,40 @@ static BOOL AttributeIsSpecifiedInAmbientContextSensingCluster(AttributeId aAttr
     }
     default: {
         // Not a known AmbientContextSensing attribute.
+        return NO;
+    }
+    }
+}
+static BOOL AttributeIsSpecifiedInAmbientSensingUnionCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::AmbientSensingUnion;
+    switch (aAttributeId) {
+    case Attributes::UnionName::Id: {
+        return YES;
+    }
+    case Attributes::UnionHealth::Id: {
+        return YES;
+    }
+    case Attributes::UnionContributorList::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        // Not a known AmbientSensingUnion attribute.
         return NO;
     }
     }
@@ -7820,6 +7857,9 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     }
     case Clusters::AmbientContextSensing::Id: {
         return AttributeIsSpecifiedInAmbientContextSensingCluster(aAttributeId);
+    }
+    case Clusters::AmbientSensingUnion::Id: {
+        return AttributeIsSpecifiedInAmbientSensingUnionCluster(aAttributeId);
     }
     case Clusters::ProximityRanging::Id: {
         return AttributeIsSpecifiedInProximityRangingCluster(aAttributeId);
