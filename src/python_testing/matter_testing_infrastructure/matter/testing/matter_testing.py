@@ -1464,18 +1464,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             self.mark_current_step_skipped()
         return pics_condition
 
-<<<<<<< global-wildcard-pics
     def attribute_guard(self, endpoint: int, attribute: ClusterObjects.ClusterAttributeDescriptor):
-=======
-    async def _populate_wildcard(self):
-        """ Populates self.stored_global_wildcard if not already filled. """
-        if not hasattr(self, 'stored_global_wildcard') or self.stored_global_wildcard is None:
-            global_wildcard = asyncio.wait_for(self.default_controller.Read(self.dut_node_id, [(Clusters.Descriptor), Attribute.AttributePath(None, None, GlobalAttributeIds.ATTRIBUTE_LIST_ID), Attribute.AttributePath(
-                None, None, GlobalAttributeIds.FEATURE_MAP_ID), Attribute.AttributePath(None, None, GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID)]), timeout=60)
-            self.stored_global_wildcard = await global_wildcard
-
-    async def attribute_guard(self, endpoint: int, attribute: ClusterObjects.ClusterAttributeDescriptor):
->>>>>>> master
         """Similar to pics_guard above, except checks a condition and if False marks the test step as skipped and
            returns False using attributes against attributes_list, otherwise returns True.
            For example can be used to check if a test step should be run:
