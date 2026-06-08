@@ -26,6 +26,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Pool.h>
 #include <lib/support/Span.h>
+#include <lib/support/TimerDelegate.h>
 
 #include <optional>
 
@@ -61,10 +62,36 @@ static constexpr size_t kMaxConcurrentSessions = CHIP_CLUSTER_PROXIMITY_RANGING_
  * The application:
  *   1. Implements one RangingAdapter per supported technology.
  *   2. Constructs a ProximityRangingDriver with a Span over its adapter
- *      pointers. The adapter set is fixed for the driver's lifetime - it
- *      reflects the device's physical radio configuration, which does not
- *      change at runtime.
+ *      pointers and a TimerDelegate. The adapter set is fixed for the
+ *      driver's lifetime - it reflects the device's physical radio
+ *      configuration, which does not change at runtime. The TimerDelegate
+ *      drives the driver-owned StartTime / EndTime gating described below
+ *      and must outlive the driver.
  *   3. Passes the driver as a reference to ProximityRangingCluster::Config.
+ *
+ * StartTime / EndTime ownership
+ * -----------------------------
+ * The driver owns wall-clock scheduling. On HandleStartRanging:
+ *
+ *   - It calls adapter->PrepareSession(sid, params) synchronously. Non-Accepted
+ *     return values are surfaced verbatim to the caller and no session record
+ *     is committed.
+ *   - When PrepareSession returns kAccepted, the driver allocates a Session
+ *     pool slot, marks SessionIDList dirty (so the sid is visible from
+ *     acceptance), and then either:
+ *       * if startTime == 0, calls adapter->StartSession(sid) synchronously,
+ *         skipping the pre-start timer entirely; or
+ *       * arms a one-shot start timer for startTime seconds, after which the
+ *         driver invokes adapter->StartSession(sid).
+ *   - In both cases the driver also arms an end-time timer for endTime
+ *     seconds (measured from HandleStartRanging time, matching the spec). On
+ *     fire it invokes adapter->StopSession(sid); the adapter's
+ *     OnRangingSessionStopped callback then drives session retirement and
+ *     the existing kPeerNotFound remap.
+ *
+ * Adapters therefore never see startTime / endTime — only the cadence
+ * (rangingInstanceInterval) and the role / band selectors. See
+ * RangingAdapter.h for the full two-phase contract.
  *
  * The driver owns the session→adapter table and forwards async results
  * (measurements, terminations, attribute changes) from adapters to the cluster
@@ -90,14 +117,16 @@ public:
     };
 
     /**
-     * Construct a driver bound to a fixed adapter set.
+     * Construct a driver bound to a fixed adapter set and a TimerDelegate.
      *
      * The backing array must outlive the driver. Each pointer must be non-null
      * and each adapter's GetTechnology() must be unique within the set;
      * violations terminate via VerifyOrDie because the adapter set is
-     * statically composed and any error is a configuration bug.
+     * statically composed and any error is a configuration bug. The
+     * TimerDelegate must outlive the driver as well; it is used for the
+     * per-session StartTime / EndTime timers described in the class comment.
      */
-    ProximityRangingDriver(Span<RangingAdapter * const> adapters);
+    ProximityRangingDriver(Span<RangingAdapter * const> adapters, TimerDelegate & timerDelegate);
 
     ~ProximityRangingDriver() override;
 
@@ -149,10 +178,43 @@ public:
     void OnAttributeChanged(AttributeId attributeId) override;
 
 private:
+    struct Session;
+
+    /// Per-Session TimerContext that fires when the StartTime delay elapses
+    /// and the driver must call adapter->StartSession(sid). Holds a back-pointer
+    /// to its owning Session so the driver can reach the session record from
+    /// the timer callback without a separate lookup.
+    class StartTimer : public TimerContext
+    {
+    public:
+        explicit StartTimer(Session & session) : mSession(session) {}
+        void TimerFired() override;
+
+    private:
+        Session & mSession;
+    };
+
+    /// Per-Session TimerContext that fires when the EndTime cutoff elapses
+    /// and the driver must call adapter->StopSession(sid).
+    class EndTimer : public TimerContext
+    {
+    public:
+        explicit EndTimer(Session & session) : mSession(session) {}
+        void TimerFired() override;
+
+    private:
+        Session & mSession;
+    };
+
     struct Session
     {
-        uint8_t id               = 0;
-        RangingAdapter * adapter = nullptr;
+        Session(uint8_t sid, RangingAdapter & rangingAdapter, ProximityRangingDriver & ownerDriver) :
+            id(sid), adapter(&rangingAdapter), owner(&ownerDriver), startTimer(*this), endTimer(*this)
+        {}
+
+        uint8_t id;
+        RangingAdapter * adapter;
+        ProximityRangingDriver * owner;
 
         /// ReportingCondition captured at HandleStartRanging time so the
         /// driver can apply min/max distance and errorMargin filtering on
@@ -165,10 +227,16 @@ private:
         /// adapter-supplied kSessionEndTimeReached status to kPeerNotFound
         /// when this stays false through the session's lifetime.
         bool peerFound = false;
+
+        StartTimer startTimer;
+        EndTimer endTimer;
     };
 
     RangingAdapter * FindAdapter(RangingTechEnum technology) const;
     Session * FindSession(uint8_t sessionId);
+    /// Cancel any per-session timers that may still be armed. Safe to call
+    /// even when no timer is active.
+    void CancelSessionTimers(Session & session);
     /// Release the pool slot for @e sessionId and notify the cluster that
     /// SessionIDList has changed. Returns false if no session matched.
     bool RetireSession(uint8_t sessionId);
@@ -180,7 +248,15 @@ private:
     static bool SatisfiesReporting(const Structs::ReportingConditionStruct::Type & reporting,
                                    const Structs::RangingMeasurementDataStruct::Type & measurement);
 
+    /// Called when a session's StartTime delay has elapsed; forwards
+    /// adapter->StartSession to the owning adapter.
+    void OnStartTimerFired(Session & session);
+    /// Called when a session's EndTime cutoff has elapsed; forwards
+    /// adapter->StopSession to the owning adapter.
+    void OnEndTimerFired(Session & session);
+
     Span<RangingAdapter * const> mAdapters;
+    TimerDelegate & mTimerDelegate;
 
     ObjectPool<Session, kMaxConcurrentSessions> mSessions;
 

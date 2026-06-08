@@ -21,6 +21,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Iterators.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <system/SystemClock.h>
 
 namespace chip {
 namespace app {
@@ -32,14 +33,18 @@ static_assert(kMaxConcurrentSessions >= 1, "ProximityRangingDriver must support 
 namespace {
 
 /// Translate a decoded StartRangingRequest into the narrowed parameter set
-/// that adapters consume. ReportingCondition is intentionally excluded — the
-/// driver applies it on every OnMeasurementData callback so adapters never
-/// need to evaluate it themselves.
+/// that adapters consume. ReportingCondition and trigger.startTime /
+/// trigger.endTime are intentionally excluded — the driver applies
+/// ReportingCondition on every OnMeasurementData callback and owns the
+/// StartTime / EndTime wall-clock gating itself.
 StartSessionParams BuildStartParams(const Commands::StartRangingRequest::DecodableType & request)
 {
     StartSessionParams params;
     params.technology = request.technology;
-    params.trigger    = request.trigger;
+    if (request.trigger.rangingInstanceInterval.HasValue())
+    {
+        params.rangingInstanceInterval = request.trigger.rangingInstanceInterval.Value();
+    }
     if (request.BLERangingDeviceRoleConfig.HasValue())
     {
         params.bleRoleConfig = request.BLERangingDeviceRoleConfig.Value();
@@ -63,9 +68,25 @@ StartSessionParams BuildStartParams(const Commands::StartRangingRequest::Decodab
     return params;
 }
 
+System::Clock::Milliseconds32 SecondsToMilliseconds32(uint32_t seconds)
+{
+    return std::chrono::duration_cast<System::Clock::Milliseconds32>(System::Clock::Seconds32(seconds));
+}
+
 } // namespace
 
-ProximityRangingDriver::ProximityRangingDriver(Span<RangingAdapter * const> adapters) : mAdapters(adapters)
+void ProximityRangingDriver::StartTimer::TimerFired()
+{
+    mSession.owner->OnStartTimerFired(mSession);
+}
+
+void ProximityRangingDriver::EndTimer::TimerFired()
+{
+    mSession.owner->OnEndTimerFired(mSession);
+}
+
+ProximityRangingDriver::ProximityRangingDriver(Span<RangingAdapter * const> adapters, TimerDelegate & timerDelegate) :
+    mAdapters(adapters), mTimerDelegate(timerDelegate)
 {
     // Adapter set is fixed at construction; configuration errors panic here
     // rather than surfacing as runtime registration failures the cluster would
@@ -87,6 +108,10 @@ ProximityRangingDriver::~ProximityRangingDriver()
     // Drop cluster callback first to avoid possibly-already-destroyed cluster, then
     // detach adapters so they cannot deliver callbacks.
     mClusterCallback = nullptr;
+    mSessions.ForEachActiveObject([this](Session * s) {
+        CancelSessionTimers(*s);
+        return Loop::Continue;
+    });
     for (size_t i = 0; i < mAdapters.size(); i++)
     {
         mAdapters[i]->SetCallback(nullptr);
@@ -107,7 +132,8 @@ void ProximityRangingDriver::Shutdown()
     // ObjectPool::ForEachActiveObject permits ReleaseObject (via the adapter's
     // synchronous OnRangingSessionStopped → RetireSession path) on the current
     // element during iteration.
-    mSessions.ForEachActiveObject([](Session * s) {
+    mSessions.ForEachActiveObject([this](Session * s) {
+        CancelSessionTimers(*s);
         LogErrorOnFailure(s->adapter->StopSession(s->id));
         return Loop::Continue;
     });
@@ -124,17 +150,19 @@ ResultCodeEnum ProximityRangingDriver::HandleStartRanging(uint8_t sessionId,
     RangingAdapter * adapter = FindAdapter(request.technology);
     VerifyOrReturnValue(adapter != nullptr, ResultCodeEnum::kRejectedInfeasibleRanging);
 
-    // Adapters are required (see RangingAdapter.h) to defer any termination
-    // callback until after StartSession has returned, so the session record
-    // can safely be committed only after a successful start.
-    ResultCodeEnum result = adapter->StartSession(sessionId, BuildStartParams(request));
+    // Phase 1: ask the adapter to validate and stage the session. Adapters are
+    // required (see RangingAdapter.h) to defer any termination callback until
+    // after a kAccepted return, so the session record can safely be committed
+    // only after PrepareSession reports kAccepted.
+    ResultCodeEnum result = adapter->PrepareSession(sessionId, BuildStartParams(request));
     VerifyOrReturnValue(result == ResultCodeEnum::kAccepted, result);
 
-    Session * session = mSessions.CreateObject(Session{ sessionId, adapter });
+    Session * session = mSessions.CreateObject(sessionId, *adapter, *this);
     if (session == nullptr)
     {
-        // Pool exhausted after the adapter already accepted: stop the adapter
-        // session so its bookkeeping does not diverge from the driver's.
+        // Pool exhausted after the adapter already accepted: roll back the
+        // adapter-side reservation so its bookkeeping does not diverge from
+        // the driver's.
         LogErrorOnFailure(adapter->StopSession(sessionId));
         return ResultCodeEnum::kBusySessionCapacityReached;
     }
@@ -144,10 +172,37 @@ ResultCodeEnum ProximityRangingDriver::HandleStartRanging(uint8_t sessionId,
         session->reporting = request.reportingCondition.Value();
     }
 
+    // The sessionId becomes visible in SessionIDList from acceptance even if
+    // its StartTime delay has not yet elapsed — the client received kAccepted
+    // and is entitled to see the ID.
     if (mClusterCallback != nullptr)
     {
         mClusterCallback->OnAttributeChanged(Attributes::SessionIDList::Id);
     }
+
+    // Phase 2: arm StartTime / EndTime timers. trigger.endTime > trigger.startTime
+    // is enforced by the cluster's preflight (see ProximityRangingCluster::
+    // ValidateStartRangingRequest), so endTime is always strictly positive.
+    LogErrorOnFailure(mTimerDelegate.StartTimer(&session->endTimer, SecondsToMilliseconds32(request.trigger.endTime)));
+
+    if (request.trigger.startTime == 0)
+    {
+        // Skip the pre-start timer entirely for the common case. Adapters see
+        // an immediate Prepare → Start sequence on the calling thread.
+        CHIP_ERROR err = adapter->StartSession(sessionId);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "[ProximityRangingDriver] sid=%u StartSession returned %" CHIP_ERROR_FORMAT, sessionId, err.Format());
+            // Adapters that synchronously fail StartSession SHOULD also have
+            // delivered OnRangingSessionStopped via the standard path; nothing
+            // to do here beyond logging.
+        }
+    }
+    else
+    {
+        LogErrorOnFailure(mTimerDelegate.StartTimer(&session->startTimer, SecondsToMilliseconds32(request.trigger.startTime)));
+    }
+
     return result;
 }
 
@@ -156,8 +211,11 @@ CHIP_ERROR ProximityRangingDriver::HandleStopRanging(uint8_t sessionId)
     Session * session = FindSession(sessionId);
     VerifyOrReturnError(session != nullptr, CHIP_ERROR_NOT_FOUND);
 
-    // Bookkeeping happens in OnRangingSessionStopped, which adapters MUST
-    // invoke for any session removal - including success of this call.
+    // Cancel pending start/end timers so they cannot fire after the adapter
+    // has already torn the session down. Bookkeeping otherwise happens in
+    // OnRangingSessionStopped, which adapters MUST invoke for any session
+    // removal - including success of this call.
+    CancelSessionTimers(*session);
     return session->adapter->StopSession(sessionId);
 }
 
@@ -236,9 +294,15 @@ void ProximityRangingDriver::OnRangingSessionStopped(uint8_t sessionId, RangingS
     // (kHardwareError, kSecurityFailure, etc.) carry adapter-only context
     // and pass through verbatim.
     Session * s = FindSession(sessionId);
-    if (s != nullptr && status == RangingSessionStatusEnum::kSessionEndTimeReached && !s->peerFound)
+    if (s != nullptr)
     {
-        status = RangingSessionStatusEnum::kPeerNotFound;
+        if (status == RangingSessionStatusEnum::kSessionEndTimeReached && !s->peerFound)
+        {
+            status = RangingSessionStatusEnum::kPeerNotFound;
+        }
+        // Cancel both timers; the session is going away and we must not let
+        // a pending start/end timer fire against a freed pool slot.
+        CancelSessionTimers(*s);
     }
 
     // Drop spurious or stale adapter notifications for sessions the driver no
@@ -333,6 +397,12 @@ ProximityRangingDriver::Session * ProximityRangingDriver::FindSession(uint8_t se
     return found;
 }
 
+void ProximityRangingDriver::CancelSessionTimers(Session & session)
+{
+    mTimerDelegate.CancelTimer(&session.startTimer);
+    mTimerDelegate.CancelTimer(&session.endTimer);
+}
+
 bool ProximityRangingDriver::RetireSession(uint8_t sessionId)
 {
     Session * s = FindSession(sessionId);
@@ -346,6 +416,33 @@ bool ProximityRangingDriver::RetireSession(uint8_t sessionId)
         mClusterCallback->OnAttributeChanged(Attributes::SessionIDList::Id);
     }
     return true;
+}
+
+void ProximityRangingDriver::OnStartTimerFired(Session & session)
+{
+    // The TimerDelegate guarantees the timer cannot fire after CancelTimer
+    // returns, so reaching here means the session is still live and the
+    // adapter is expected to begin ranging now.
+    CHIP_ERROR err = session.adapter->StartSession(session.id);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "[ProximityRangingDriver] sid=%u deferred StartSession returned %" CHIP_ERROR_FORMAT, session.id,
+                     err.Format());
+    }
+}
+
+void ProximityRangingDriver::OnEndTimerFired(Session & session)
+{
+    // Capture the id before invoking StopSession, since the adapter's
+    // OnRangingSessionStopped path may release the session pool slot before
+    // StopSession returns.
+    const uint8_t sessionId = session.id;
+    CHIP_ERROR err          = session.adapter->StopSession(sessionId);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "[ProximityRangingDriver] sid=%u end-time StopSession returned %" CHIP_ERROR_FORMAT, sessionId,
+                     err.Format());
+    }
 }
 
 } // namespace ProximityRanging

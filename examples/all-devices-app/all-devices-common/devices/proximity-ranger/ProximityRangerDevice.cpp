@@ -49,7 +49,7 @@ ProximityRangerDevice::ProximityRangerDevice(TimerDelegate & timerDelegate, Pers
     // thereafter. The driver lives until process exit, so the adapters
     // (also static) outlive it.
     static ProximityRanging::LoggingRangingAdapter sLoggingBleAdapter(ProximityRanging::RangingTechEnum::kBLEBeaconRSSIRanging,
-                                                                      timerDelegate, &storage);
+                                                                      timerDelegate, &storage, true);
     static ProximityRanging::LoggingRangingAdapter sLoggingWiFiAdapter(ProximityRanging::RangingTechEnum::kWiFiRoundTripTimeRanging,
                                                                        timerDelegate);
     static ProximityRanging::LoggingRangingAdapter sLoggingBltcsAdapter(
@@ -59,7 +59,8 @@ ProximityRangerDevice::ProximityRangerDevice(TimerDelegate & timerDelegate, Pers
         &sLoggingWiFiAdapter,
         &sLoggingBltcsAdapter,
     };
-    static ProximityRanging::ProximityRangingDriver sDriver{ Span<ProximityRanging::RangingAdapter * const>(sAdapters) };
+    static ProximityRanging::ProximityRangingDriver sDriver{ Span<ProximityRanging::RangingAdapter * const>(sAdapters),
+                                                             timerDelegate };
     if (gDriver == nullptr)
     {
         gDriver = &sDriver;
