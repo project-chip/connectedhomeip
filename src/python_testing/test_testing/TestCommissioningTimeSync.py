@@ -56,10 +56,9 @@ class TestCommissioningTimeSync(MatterBaseTest):
         self.commissioner = None
         self.commissioned = False
 
-    @async_test_body
-    async def teardown_test(self):
-        await self.destroy_current_commissioner()
-        return super().teardown_test()
+    def teardown_test(self):
+        self.event_loop.run_until_complete(self.destroy_current_commissioner())
+        super().teardown_test()
 
     async def commission_and_base_checks(self):
         params = await self.default_controller.OpenCommissioningWindow(
