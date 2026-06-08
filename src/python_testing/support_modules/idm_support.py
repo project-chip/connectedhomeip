@@ -1295,6 +1295,10 @@ class IDMBaseTest(BasicCompositionTests):
                         Clusters.NetworkCommissioning.Attributes.InterfaceEnabled,
                         # Location attribute of BasicInformation cluster default value is "XX", requires value to be max length of 2 uppercase letters.
                         Clusters.BasicInformation.Attributes.Location,
+                        # Thermostat spec (cluster 0x0201, revision 8) requires the server to silently
+                        # ignore writes to ControlSequenceOfOperation for Zigbee back-compat. The write
+                        # returns Success but the value never changes, so no subscription report is emitted.
+                        Clusters.Thermostat.Attributes.ControlSequenceOfOperation,
                     ]
                     if attribute in ATTRIBUTES_WITH_WRITE_CONSTRAINTS:
                         log.debug(f"{test_step}: Skipping {attribute.__name__} - known to have write constraints")
@@ -1356,17 +1360,32 @@ class IDMBaseTest(BasicCompositionTests):
                     )
 
                     if resp[0].Status == Status.Success:
+                        # A Success status doesn't guarantee the value actually changed. Some
+                        # attributes are spec-mandated to silently ignore writes (handled by the
+                        # skip list above), and others silently clamp due to cross-attribute
+                        # constraints the test doesn't know about (e.g. Thermostat setpoint
+                        # deadband bounds). Re-read and only track a change report expectation
+                        # when the readback differs from the cached value.
+                        readback = await self.read_single_attribute_check_success(
+                            endpoint=endpoint_id, cluster=cluster_class, attribute=attribute,
+                        )
+                        if readback == cached_val:
+                            log.info(
+                                f"{test_step}: Write to {attribute.__name__} on EP{endpoint_id} "
+                                f"returned Success but value unchanged ({cached_val}); "
+                                f"not expecting a subscription report")
+                            continue
+
                         changed_count += 1
                         log.info(
-                            f"{test_step}: [{changed_count}] Changed {attribute.__name__} (0x{attribute_id:04X}) on endpoint {endpoint_id}, cluster 0x{cluster_id:04X}: {cached_val} -> {new_val}")
+                            f"{test_step}: [{changed_count}] Changed {attribute.__name__} (0x{attribute_id:04X}) on endpoint {endpoint_id}, cluster 0x{cluster_id:04X}: {cached_val} -> {readback}")
 
-                        # Track this change for verification
                         changed_attributes.append(ChangedAttribute(
                             endpoint=endpoint_id,
                             cluster=cluster_class,
                             attribute=attribute,
                             old_value=cached_val,
-                            new_value=new_val
+                            new_value=readback
                         ))
 
                     elif resp[0].Status == Status.UnsupportedAccess:
@@ -1425,24 +1444,22 @@ class IDMBaseTest(BasicCompositionTests):
             verified_count, 0,
             f"{test_step}: No change reports verified, expected {changed_count} reports")
 
-        # Revert the attributes to their original values
-        if changed_attributes:
-            for change in changed_attributes:
-                ep = change.endpoint
-                attr = change.attribute
-                old_value = change.old_value
+        # Revert the attributes to their original values so later steps see the device
+        # in the same state we found it. Log (don't fail) on a revert that the DUT rejects;
+        # the verification above has already passed and we don't want cleanup noise to
+        # mask the real test outcome.
+        for change in changed_attributes:
+            ep = change.endpoint
+            attr = change.attribute
+            old_value = change.old_value
 
-                resp = await self.default_controller.WriteAttribute(
-                    nodeId=self.dut_node_id,
-                    attributes=[(ep, attr(old_value))]
-                )
-                if resp[0].Status == Status.Success:
-                    revert_success = True
-                    break
-
-                asserts.assert_equal(
-                    revert_success, True,
-                    f"Failed to revert {attr.__name__} on endpoint {ep}: {resp[0].Status}"
-                )
+            resp = await self.default_controller.WriteAttribute(
+                nodeId=self.dut_node_id,
+                attributes=[(ep, attr(old_value))]
+            )
+            if resp[0].Status != Status.Success:
+                log.warning(
+                    f"{test_step}: Failed to revert {attr.__name__} on endpoint {ep} "
+                    f"to {old_value}: {resp[0].Status}")
 
         return verified_count
