@@ -61,6 +61,8 @@ log = logging.getLogger(__name__)
 
 DEFAULT_CHIP_ROOT = os.path.abspath(
     os.path.join(os.path.dirname(__file__), '..', '..', '..'))
+PAA_CACHE_DIR = os.getenv('PATH_TO_PAA_ROOTS', '/tmp/paa_roots')
+CD_CACHE_DIR = os.getenv('PATH_TO_CD_STORE', '/tmp/cd_store')
 
 try:
     from matter.testing.basic_composition import BasicCompositionTests
@@ -386,11 +388,11 @@ class TestConfig:
 
         # Determine PAA certs and CD paths based on use_cert_cache flag
         if use_cert_cache:
-            self.paa_path = os.environ.get('PATH_TO_PAA_ROOTS', '/tmp/paa_roots')
-            self.cd_path = os.environ.get('PATH_TO_CD_STORE', '/tmp/cd_store')
+            self.paa_path = PAA_CACHE_DIR
+            self.cd_path = CD_CACHE_DIR
             os.makedirs(self.paa_path, exist_ok=True)
             os.makedirs(self.cd_path, exist_ok=True)
-            self.use_cache = True
+            self.use_cert_cache = True
         else:
             tmpdir_paa = f'paas_{tmp_uuid}'
             tmpdir_cd = f'cd_{tmp_uuid}'
@@ -398,7 +400,7 @@ class TestConfig:
             self.cd_path = os.path.join('.', tmpdir_cd)
             os.mkdir(self.paa_path)
             os.mkdir(self.cd_path)
-            self.use_cache = False
+            self.use_cert_cache = False
 
         # Fetch certificates only if:
         # 1. Not using cache (always fetch for temp directories), OR
@@ -458,7 +460,7 @@ class TestConfig:
         self.stack.Shutdown()
         os.remove(self.admin_storage)
         # Only clean up directories if not using cache
-        if not self.use_cache:
+        if not self.use_cert_cache:
             shutil.rmtree(self.paa_path)
             shutil.rmtree(self.cd_path)
 
