@@ -23,7 +23,7 @@ from __future__ import annotations
 import asyncio
 import logging
 import threading
-from typing import Any, TypeAlias
+from typing import TYPE_CHECKING, Any, TypeAlias
 
 import sdbus
 
@@ -33,9 +33,13 @@ from .namespace import IsolatedNetworkNamespace
 
 log = logging.getLogger(__name__)
 
-DictVariantT = dict[str, tuple[str, "DbusAnyT"]]
-DbusAnyT: TypeAlias = (bool | int | float | str | bytes | list["DbusAnyT"] | tuple["DbusAnyT", ...] | dict[str, "DbusAnyT"]
-                       | "DictVariantT")
+if TYPE_CHECKING:
+    DbusAnyT: TypeAlias = (bool | int | float | str | bytes | list["DbusAnyT"] | tuple["DbusAnyT", ...] | dict[str, "DbusAnyT"]
+                           | "DictVariantT")
+    DictVariantT: TypeAlias = dict[str, tuple[str, DbusAnyT]]
+else:
+    DbusAnyT = Any
+    DictVariantT = Any
 
 
 class NANSimulator:
