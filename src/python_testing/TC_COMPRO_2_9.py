@@ -39,7 +39,8 @@ are met:
 
   Step 2:  DeviceTypeList on the cluster endpoint SHALL contain device type
            0x0092 (Commissioning By Proxy).
-  Step 3:  Transport attribute SHALL have at least one bit set.
+  Step 3:  Transport attribute SHALL have at least one defined transport bit
+           (BLE bit 1, WiFiPAF bit 3 or NTL bit 4) set and no reserved bits.
   Step 4:  The three commands for which the spec explicitly requires a CASE
            session SHALL be rejected with UNSUPPORTED_ACCESS when sent over
            a PASE session: ProxyConnectRequest, ProxyDisconnectRequest, and
@@ -89,7 +90,8 @@ class TC_COMPRO_2_9(COMPROBaseTest):
             TestStep(2, "TH reads DeviceTypeList attribute on the endpoint under test",
                      "List SHALL contain an entry with DeviceType 0x0092 (Commissioning By Proxy)"),
             TestStep(3, "TH reads Transport attribute",
-                     "Value is a CapabilitiesBitmap with at least one bit set"),
+                     "Value is a CapabilitiesBitmap with at least one of the BLE (bit 1), "
+                     "WiFiPAF (bit 3) or NTL (bit 4) bits set and no reserved bits set"),
             TestStep(4, "TH opens a commissioning window, establishes a PASE session, "
                      "and sends ProxyConnectRequest, ProxyDisconnectRequest, and "
                      "ProxyMessageRequest over that PASE session",
@@ -124,15 +126,13 @@ class TC_COMPRO_2_9(COMPROBaseTest):
         )
 
         # ----------------------------------------------------------------
-        # Step 3 — read Transport; verify at least one bit set
+        # Step 3 — read Transport; verify at least one defined transport bit
+        # (BLE/WiFiPAF/NTL) is set and no reserved bits are set.
         # ----------------------------------------------------------------
         self.step(3)
         valid_transports = await self.read_transport()
         logger.info("Step 3: Transport = 0x%02x", valid_transports)
-        asserts.assert_not_equal(
-            valid_transports, 0,
-            "Transport attribute has no bits set; at least one transport SHALL be implemented",
-        )
+        self.assert_transport_value_valid(valid_transports)
         single_transport = self.pick_single_transport_bit(valid_transports)
 
         # ----------------------------------------------------------------

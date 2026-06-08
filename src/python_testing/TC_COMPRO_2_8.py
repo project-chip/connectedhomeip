@@ -46,9 +46,12 @@ by a different fabric.
   Steps 7-8:   TH2 (Fabric B) attempts to use that session and SHALL be rejected
                with NOT_FOUND.
   Step 9:      TH1 cleanly disconnects.
-  Steps 10-12 (BGS feature only): TH1 starts a background scan; TH2 cannot stop
-               it (NOT_FOUND); TH1 can stop it (SUCCESS).
-  Step 13:     TH1 and TH2 fire concurrent ProxyScanRequests; DUT must use one of
+  Steps 10-16 (BGS feature only): TH1 starts a background scan; TH2 cannot stop
+               it (NOT_FOUND); TH2 starts its own background scan (SUCCESS, the
+               proxy allows simultaneous scans from different fabrics); both
+               fabrics independently see the ED in their cache; TH2 stops its
+               own scan without affecting TH1's; TH1 stops its scan.
+  Step 17:     TH1 and TH2 fire concurrent ProxyScanRequests; DUT must use one of
                three valid mechanisms and SHALL NOT cross-deliver responses.
 
 Test plan reference: TC-COMPRO-2.8
@@ -121,11 +124,25 @@ class TC_COMPRO_2_8(COMPROBaseTest):
                      "DUT returns SUCCESS"),
             TestStep(10, "TH1 (Fabric A) sends ProxyBackGroundScanStartRequest",
                      "DUT returns SUCCESS"),
-            TestStep(11, "TH2 (Fabric B) sends ProxyBackGroundScanStopRequest",
+            TestStep(11, "TH2 (Fabric B) sends ProxyBackGroundScanStopRequest "
+                     "(Fabric B has not started a scan)",
                      "DUT returns NOT_FOUND (background scan belongs to Fabric A)"),
-            TestStep(12, "TH1 (Fabric A) sends ProxyBackGroundScanStopRequest",
+            TestStep(12, "TH2 (Fabric B) sends ProxyBackGroundScanStartRequest with the same "
+                     "transports/bands as Fabric A",
+                     "DUT returns SUCCESS (the proxy allows background scans from different "
+                     "fabrics simultaneously)"),
+            TestStep(13, "TH1 (Fabric A) and TH2 (Fabric B) each read NumCachedResults and "
+                     "CachedResults over up to 40 s",
+                     "Each fabric independently reports NumCachedResults >= 1 and the ED present "
+                     "in CachedResults; each fabric receives only its own response"),
+            TestStep(14, "TH2 (Fabric B) sends ProxyBackGroundScanStopRequest",
+                     "DUT returns SUCCESS (Fabric B stops its own background scan)"),
+            TestStep(15, "TH1 (Fabric A) reads NumCachedResults and CachedResults",
+                     "NumCachedResults >= 1 and the ED still present (Fabric B's stop SHALL NOT "
+                     "affect Fabric A's ongoing background scan)"),
+            TestStep(16, "TH1 (Fabric A) sends ProxyBackGroundScanStopRequest",
                      "DUT returns SUCCESS"),
-            TestStep(13, "TH1 (Fabric A) and TH2 (Fabric B) send concurrent ProxyScanRequests",
+            TestStep(17, "TH1 (Fabric A) and TH2 (Fabric B) send concurrent ProxyScanRequests",
                      "DUT implements exactly one valid mechanism: BUSY (one requester), "
                      "premature termination, or parallel scans. Each TH receives only its "
                      "own response."),
@@ -282,12 +299,37 @@ class TC_COMPRO_2_8(COMPROBaseTest):
         logger.info("Step 9: ProxyDisconnectRequest succeeded")
 
         # ----------------------------------------------------------------
-        # Steps 10-12 — BGS fabric isolation (conditional on BGS feature)
+        # Steps 10-16 — BGS fabric isolation (conditional on BGS feature)
         # ----------------------------------------------------------------
+        async def _poll_num_cached_ge1(controller, name, timeout_sec=40):
+            """Poll NumCachedResults on `controller` until >= 1, up to timeout_sec."""
+            deadline = asyncio.get_event_loop().time() + timeout_sec
+            num = 0
+            while asyncio.get_event_loop().time() < deadline:
+                num = await self.read_single_attribute(
+                    dev_ctrl=controller,
+                    node_id=self.dut_node_id,
+                    endpoint=self.cp_endpoint,
+                    attribute=cp.Attributes.NumCachedResults,
+                )
+                if num >= 1:
+                    break
+                await asyncio.sleep(2)
+            asserts.assert_greater_equal(
+                num, 1, f"{name}: NumCachedResults must reach >= 1 within {timeout_sec} s")
+            cached = await self.read_single_attribute(
+                dev_ctrl=controller,
+                node_id=self.dut_node_id,
+                endpoint=self.cp_endpoint,
+                attribute=cp.Attributes.CachedResults,
+            )
+            asserts.assert_not_equal(cached, NullValue, f"{name}: CachedResults must not be null")
+            asserts.assert_greater_equal(len(cached), 1, f"{name}: CachedResults must have an entry")
+            logger.info("%s: NumCachedResults=%d, CachedResults entries=%d", name, num, len(cached))
+            return num
+
         if not has_bgs:
-            self.skip_step(10)
-            self.skip_step(11)
-            self.skip_step(12)
+            self.mark_step_range_skipped(10, 16)
         else:
             # Step 10 — TH1 ProxyBackGroundScanStartRequest → SUCCESS
             self.step(10)
@@ -304,6 +346,7 @@ class TC_COMPRO_2_8(COMPROBaseTest):
             logger.info("Step 10: ProxyBackGroundScanStartRequest succeeded")
 
             # Step 11 — TH2 ProxyBackGroundScanStopRequest → NOT_FOUND
+            # (Fabric B has not started a background scan.)
             self.step(11)
             logger.info("Step 11: TH2 ProxyBackGroundScanStopRequest (expect NOT_FOUND)")
             try:
@@ -322,9 +365,65 @@ class TC_COMPRO_2_8(COMPROBaseTest):
                     f"Expected NOT_FOUND for Fabric B ProxyBackGroundScanStopRequest, got {e.status}")
                 logger.info("Step 11: TH2 ProxyBackGroundScanStopRequest correctly got NOT_FOUND")
 
-            # Step 12 — TH1 ProxyBackGroundScanStopRequest → SUCCESS
+            # Step 12 — TH2 starts its own background scan → SUCCESS.
+            # The proxy SHALL allow background scans from different fabrics simultaneously.
             self.step(12)
-            logger.info("Step 12: TH1 ProxyBackGroundScanStopRequest (transport=0x%02x)", valid_transports)
+            logger.info("Step 12: TH2 ProxyBackGroundScanStartRequest (transport=0x%02x)", valid_transports)
+            await th2.SendCommand(
+                nodeId=self.dut_node_id,
+                endpoint=self.cp_endpoint,
+                payload=cp.Commands.ProxyBackGroundScanStartRequest(
+                    transport=valid_transports,
+                    timeout=0,
+                    wiFiBands=wifi_bands_arg,
+                ),
+            )
+            logger.info("Step 12: TH2 ProxyBackGroundScanStartRequest succeeded")
+
+            # Step 13 — Both fabrics independently see the ED in their cache.
+            self.step(13)
+            logger.info("Step 13: polling NumCachedResults on both fabrics (up to 40 s each)")
+            await _poll_num_cached_ge1(self.default_controller, "TH1 (Fabric A)")
+            await _poll_num_cached_ge1(th2, "TH2 (Fabric B)")
+
+            # Step 14 — TH2 stops its own background scan → SUCCESS.
+            self.step(14)
+            logger.info("Step 14: TH2 ProxyBackGroundScanStopRequest")
+            await th2.SendCommand(
+                nodeId=self.dut_node_id,
+                endpoint=self.cp_endpoint,
+                payload=cp.Commands.ProxyBackGroundScanStopRequest(
+                    transport=valid_transports,
+                    wiFiBands=wifi_bands_arg,
+                ),
+            )
+            logger.info("Step 14: TH2 ProxyBackGroundScanStopRequest succeeded")
+
+            # Step 15 — Fabric A's scan is unaffected by Fabric B's stop.
+            self.step(15)
+            num_cached_a = await self.read_single_attribute(
+                dev_ctrl=self.default_controller,
+                node_id=self.dut_node_id,
+                endpoint=self.cp_endpoint,
+                attribute=cp.Attributes.NumCachedResults,
+            )
+            cached_a = await self.read_single_attribute(
+                dev_ctrl=self.default_controller,
+                node_id=self.dut_node_id,
+                endpoint=self.cp_endpoint,
+                attribute=cp.Attributes.CachedResults,
+            )
+            asserts.assert_greater_equal(
+                num_cached_a, 1,
+                "Fabric A NumCachedResults must remain >= 1 after Fabric B stops its scan")
+            asserts.assert_not_equal(
+                cached_a, NullValue,
+                "Fabric A CachedResults must remain populated after Fabric B stops its scan")
+            logger.info("Step 15: Fabric A NumCachedResults=%d (unaffected by Fabric B stop)", num_cached_a)
+
+            # Step 16 — TH1 stops its background scan → SUCCESS
+            self.step(16)
+            logger.info("Step 16: TH1 ProxyBackGroundScanStopRequest (transport=0x%02x)", valid_transports)
             await self.default_controller.SendCommand(
                 nodeId=self.dut_node_id,
                 endpoint=self.cp_endpoint,
@@ -333,10 +432,10 @@ class TC_COMPRO_2_8(COMPROBaseTest):
                     wiFiBands=wifi_bands_arg,
                 ),
             )
-            logger.info("Step 12: ProxyBackGroundScanStopRequest succeeded")
+            logger.info("Step 16: ProxyBackGroundScanStopRequest succeeded")
 
         # ----------------------------------------------------------------
-        # Step 13 — Concurrent ProxyScanRequest from TH1 (Fabric A) and
+        # Step 17 — Concurrent ProxyScanRequest from TH1 (Fabric A) and
         #           TH2 (Fabric B).  The DUT may use any one of:
         #   Mechanism 3 — BUSY: one requester gets BUSY, the other succeeds.
         #   Mechanism 1 — Premature termination: TH1 gets early results,
@@ -344,7 +443,7 @@ class TC_COMPRO_2_8(COMPROBaseTest):
         #   Mechanism 2 — Parallel: both get their own results independently.
         # In all cases each TH receives only its own response.
         # ----------------------------------------------------------------
-        self.step(13)
+        self.step(17)
         concurrent_timeout_ms = int(scan_max_time * SCAN_TIMEOUT_MARGIN * 1000) + 2000
 
         async def _scan(controller, name):
@@ -361,7 +460,7 @@ class TC_COMPRO_2_8(COMPROBaseTest):
             except InteractionModelError as e:
                 return e
 
-        logger.info("Step 13: firing concurrent ProxyScanRequests from TH1 and TH2")
+        logger.info("Step 17: firing concurrent ProxyScanRequests from TH1 and TH2")
         th1_result, th2_result = await asyncio.gather(
             _scan(self.default_controller, "TH1"),
             _scan(th2, "TH2"),
@@ -372,25 +471,25 @@ class TC_COMPRO_2_8(COMPROBaseTest):
 
         if busy_count == 1:
             # Mechanism 3 — exactly one BUSY, one ProxyScanResponse.
-            logger.info("Step 13: DUT used Mechanism 3 (BUSY)")
+            logger.info("Step 17: DUT used Mechanism 3 (BUSY)")
             for name, r in results.items():
                 if isinstance(r, InteractionModelError):
                     asserts.assert_equal(
                         r.status, Status.Busy,
-                        f"Step 13: {name} expected BUSY, got {r.status}")
-                    logger.info("Step 13: %s correctly got BUSY", name)
+                        f"Step 17: {name} expected BUSY, got {r.status}")
+                    logger.info("Step 17: %s correctly got BUSY", name)
                 else:
-                    logger.info("Step 13: %s got ProxyScanResponse (numberOfResults=%d)",
+                    logger.info("Step 17: %s got ProxyScanResponse (numberOfResults=%d)",
                                 name, r.numberOfResults)
         elif busy_count == 0:
             # Mechanism 1 or 2 — both got ProxyScanResponse.
-            logger.info("Step 13: DUT used Mechanism 1 or 2 (both responses received)")
+            logger.info("Step 17: DUT used Mechanism 1 or 2 (both responses received)")
             for name, r in results.items():
-                logger.info("Step 13: %s got ProxyScanResponse (numberOfResults=%d)",
+                logger.info("Step 17: %s got ProxyScanResponse (numberOfResults=%d)",
                             name, r.numberOfResults)
         else:
             asserts.fail(
-                f"Step 13: both TH1 and TH2 returned errors — at most one BUSY is valid "
+                f"Step 17: both TH1 and TH2 returned errors — at most one BUSY is valid "
                 f"(TH1={th1_result}, TH2={th2_result})")
 
         # Remove TH2 (Fabric B) from the DUT so re-runs without factory-reset succeed.

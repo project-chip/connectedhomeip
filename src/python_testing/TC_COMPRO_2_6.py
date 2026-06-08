@@ -108,7 +108,9 @@ class TC_COMPRO_2_6(COMPROBaseTest):
         return [
             TestStep(1, "Commission DUT (proxy) to TH", is_commissioning=True),
             TestStep(2, "Ensure ED is commissionable (advertising via WiFiPAF)"),
-            TestStep(3, "TH reads Transport attribute", "Store as valid_transports"),
+            TestStep(3, "TH reads Transport attribute",
+                     "Store as valid_transports; value has at least one of the BLE (bit 1), "
+                     "WiFiPAF (bit 3) or NTL (bit 4) bits set and no reserved bits set"),
             TestStep(4, "TH reads WiFiBand attribute (if WI supported)", "Store as valid_bands"),
             TestStep(5, "TH sends ProxyConnectRequest over a non-CASE (PASE) session",
                      "DUT returns UNSUPPORTED_ACCESS"),
@@ -154,10 +156,12 @@ class TC_COMPRO_2_6(COMPROBaseTest):
             ),
         )
 
-        # Step 3 — read Transport
+        # Step 3 — read Transport; verify at least one defined transport bit
+        # (BLE/WiFiPAF/NTL) is set and no reserved bits are set.
         self.step(3)
         valid_transports = await self.read_transport()
         logger.info("valid_transports = 0x%02x", valid_transports)
+        self.assert_transport_value_valid(valid_transports)
 
         # Step 4 — read WiFiBand (conditional on WI feature)
         feature_map = await self.read_feature_map()

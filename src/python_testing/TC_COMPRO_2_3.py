@@ -109,8 +109,9 @@ class TC_COMPRO_2_3(COMPROBaseTest):
                      "NumCachedResults == 0; CachedResults is null"),
             TestStep(8, "Ensure ED IS commissionable"),
             TestStep(9, "TH monitors until NumCachedResults >= 1 (up to 40 s)",
-                     "NumCachedResults >= 1; CachedResults has at least one entry with "
-                     "non-zero Transport, valid Discriminator, VendorID, ProductID"),
+                     "NumCachedResults >= 1; NumCachedResults equals the number of CachedResults "
+                     "entries; CachedResults has at least one entry with non-zero Transport, "
+                     "valid Discriminator, VendorID, ProductID"),
             TestStep(10, "TH reads CacheTimeout attribute",
                      "Store as cache_timeout"),
             TestStep(11, "Ensure ED is NOT commissionable"),
@@ -124,9 +125,11 @@ class TC_COMPRO_2_3(COMPROBaseTest):
                      "DUT responds with SUCCESS"),
             TestStep(16, "TH reads NumCachedResults and CachedResults immediately after stop",
                      "NumCachedResults == 0; CachedResults is null (proxy clears cache on stop)"),
-            TestStep(17, "TH sends ProxyBackGroundScanStopRequest with a transport not in the "
-                     "original start request (if a valid alternative transport is available)",
-                     "DUT returns SUCCESS (stopping a transport with no active scan is not an error)"),
+            TestStep(17, "If two or more transports are supported: TH starts a scan on one "
+                     "transport, then sends ProxyBackGroundScanStopRequest for a different "
+                     "supported transport not covered by that scan",
+                     "DUT returns SUCCESS (stopping a supported transport with no overlapping "
+                     "active scan is not an error)"),
             TestStep(18, "TH terminates subscriptions"),
             TestStep(19, "TH sends ProxyBackGroundScanStartRequest with an unsupported Transport bit",
                      "DUT returns INVALID_TRANSPORT_TYPE"),
@@ -282,6 +285,8 @@ class TC_COMPRO_2_3(COMPROBaseTest):
                                  "CachedResults must not be null after ED becomes commissionable")
         asserts.assert_greater_equal(len(cached_results), 1,
                                      "CachedResults must have at least one entry")
+        asserts.assert_equal(num_cached, len(cached_results),
+                             "NumCachedResults must equal the number of CachedResults entries")
         result = cached_results[0]
         asserts.assert_not_equal(result.transport, 0,
                                  "CachedResult entry Transport must be non-zero")
@@ -351,12 +356,48 @@ class TC_COMPRO_2_3(COMPROBaseTest):
             (cached_results is NullValue) or (cached_results == []),
             "CachedResults must be null immediately after stop")
 
-        # Step 17 — stop with a transport not in the original start request.
-        # Requires a valid (supported) transport that was absent from the step-6 start.
-        # Since the start used all of valid_transports, this step is only exercisable
-        # when multiple transport types are supported simultaneously (e.g., both kWiFiPAF
-        # and kBle appear in valid_transports).  Skip until that is the case.
-        self.skip_step(17)
+        # Step 17 — a ProxyBackGroundScanStopRequest for a supported transport that
+        # is NOT part of an active background scan SHALL return SUCCESS.  Step 15
+        # fully stopped (and the proxy erased) this fabric's scan record, and the
+        # proxy returns NOT_FOUND when no record exists.  So we first start a scan
+        # on one transport, then stop a *different* supported transport (no overlap
+        # with the active scan) — the case the spec/test plan covers.  Transport-
+        # agnostic: every bit set in valid_transports is a supported transport, so
+        # we pick the first two.  Only exercisable when two or more are supported.
+        kWiFiPAF_bit = int(cp.Bitmaps.CapabilitiesBitmap.kWiFiPAF)
+        supported_bits = [bit for bit in (1 << i for i in range(8)) if valid_transports & bit]
+        if len(supported_bits) < 2:
+            self.skip_step(17)
+            logger.info("Step 17 skipped: DUT supports a single transport (valid_transports=0x%02x)",
+                        valid_transports)
+        else:
+            self.step(17)
+            start_transport, stop_transport = supported_bits[0], supported_bits[1]
+            # WiFiBands are only meaningful for the WiFiPAF transport.
+            start_bands = valid_bands if has_wi and start_transport == kWiFiPAF_bit else None
+            logger.info("Step 17: start BGS on transport 0x%02x, then stop non-overlapping "
+                        "transport 0x%02x", start_transport, stop_transport)
+            await self.default_controller.SendCommand(
+                nodeId=self.dut_node_id,
+                endpoint=self.cp_endpoint,
+                payload=cp.Commands.ProxyBackGroundScanStartRequest(
+                    transport=start_transport, timeout=0, wiFiBands=start_bands),
+            )
+            # Stopping a different, non-overlapping supported transport returns SUCCESS.
+            await self.default_controller.SendCommand(
+                nodeId=self.dut_node_id,
+                endpoint=self.cp_endpoint,
+                payload=cp.Commands.ProxyBackGroundScanStopRequest(
+                    transport=stop_transport, wiFiBands=None),
+            )
+            logger.info("Step 17: stop of a non-active transport returned SUCCESS")
+            # Clean up the scan started for this sub-test so later steps start fresh.
+            await self.default_controller.SendCommand(
+                nodeId=self.dut_node_id,
+                endpoint=self.cp_endpoint,
+                payload=cp.Commands.ProxyBackGroundScanStopRequest(
+                    transport=start_transport, wiFiBands=start_bands),
+            )
 
         # Step 18 — terminate subscription
         self.step(18)

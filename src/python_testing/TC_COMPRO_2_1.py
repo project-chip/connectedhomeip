@@ -77,7 +77,9 @@ class TC_COMPRO_2_1(COMPROBaseTest):
             TestStep(2, "TH reads FeatureMap attribute",
                      "DUT returns a valid FeatureMap bitmap"),
             TestStep(3, "TH reads Transport attribute",
-                     "DUT returns a CapabilitiesBitmap value with at least one bit set"),
+                     "DUT returns a CapabilitiesBitmap value with at least one of the BLE "
+                     "(bit 1), WiFiPAF (bit 3) or NTL (bit 4) bits set and no reserved bits "
+                     "(bits 0, 2 or 5-7) set"),
             TestStep(4, "TH reads ScanMaxTime attribute",
                      "DUT returns a uint8 value >= 1"),
             TestStep(5, "TH reads MaxSessions attribute",
@@ -92,12 +94,24 @@ class TC_COMPRO_2_1(COMPROBaseTest):
                      "DUT returns null (no cached results when background scan is not running)"),
             TestStep(10, "TH reads WiFiBand attribute (if WI supported)",
                      "DUT returns a WiFiBandBitmap with only valid bits set"),
-            TestStep(11, "TH reads Transport attribute a second time",
-                     "DUT returns the same value as step 3 (Fixed quality verified)"),
-            TestStep(12, "TH reads MaxSessions attribute a second time",
-                     "DUT returns the same value as step 5 (Fixed quality verified)"),
-            TestStep(13, "TH reads WiFiBand attribute a second time (if WI supported)",
-                     "DUT returns the same value as step 10 (Fixed quality verified)"),
+            TestStep(11, "TH writes Transport attribute with a value different from step 3",
+                     "DUT returns UNSUPPORTED_WRITE (read-only Fixed attribute)"),
+            TestStep(12, "TH reads Transport attribute",
+                     "DUT returns the same value as step 3 (value unchanged)"),
+            TestStep(13, "TH writes MaxSessions attribute with a value different from step 5",
+                     "DUT returns UNSUPPORTED_WRITE (read-only Fixed attribute)"),
+            TestStep(14, "TH reads MaxSessions attribute",
+                     "DUT returns the same value as step 5 (value unchanged)"),
+            TestStep(15, "TH writes MaxCachedResults attribute with a value different from step 6 "
+                     "(if BGS supported)",
+                     "DUT returns UNSUPPORTED_WRITE (read-only Fixed attribute)"),
+            TestStep(16, "TH reads MaxCachedResults attribute (if BGS supported)",
+                     "DUT returns the same value as step 6 (value unchanged)"),
+            TestStep(17, "TH writes WiFiBand attribute with a value different from step 10 "
+                     "(if WI supported)",
+                     "DUT returns UNSUPPORTED_WRITE (read-only Fixed attribute)"),
+            TestStep(18, "TH reads WiFiBand attribute (if WI supported)",
+                     "DUT returns the same value as step 10 (value unchanged)"),
         ]
 
     @async_test_body
@@ -114,17 +128,13 @@ class TC_COMPRO_2_1(COMPROBaseTest):
         has_wi = self.has_feature_wi(feature_map)
         has_bgs = self.has_feature_bgs(feature_map)
 
-        # Step 3 — Transport (mandatory)
+        # Step 3 — Transport (mandatory).  Defined transport bits per spec are
+        # BLE (bit 1), WiFiPAF (bit 3) and NTL (bit 4); bits 0, 2 and 5-7 are
+        # reserved.  At least one defined bit must be set and no reserved bits.
         self.step(3)
         transport = await self.read_transport()
         logger.info("Transport = 0x%02x", transport)
-        asserts.assert_not_equal(transport, 0,
-                                 "Transport attribute must have at least one capability bit set")
-        # Only defined bits: kBle=0x02, kWiFiPAF=0x08; verify no undefined bits
-        valid_transport_mask = (cp.Bitmaps.CapabilitiesBitmap.kBle |
-                                cp.Bitmaps.CapabilitiesBitmap.kWiFiPAF)
-        asserts.assert_equal(transport & ~valid_transport_mask, 0,
-                             f"Transport 0x{transport:02x} contains undefined capability bits")
+        self.assert_transport_value_valid(transport)
 
         # Step 4 — ScanMaxTime (mandatory, uint8, >= 1)
         self.step(4)
@@ -144,6 +154,7 @@ class TC_COMPRO_2_1(COMPROBaseTest):
         asserts.assert_less_equal(max_sessions, 0xFF,
                                   "MaxSessions must fit in uint8")
 
+        max_cached = None
         if has_bgs:
             # Step 6 — MaxCachedResults (BGS feature, uint8, >= 1)
             self.step(6)
@@ -200,29 +211,72 @@ class TC_COMPRO_2_1(COMPROBaseTest):
         else:
             self.skip_step(10)
 
-        # Step 11 — Transport fixed quality (re-read, verify same value)
+        # ------------------------------------------------------------------
+        # Steps 11-18 — Transport, MaxSessions, MaxCachedResults and WiFiBand
+        # all carry the Fixed (F) quality and are read-only (R access).  A write
+        # SHALL be rejected with UNSUPPORTED_WRITE and SHALL NOT change the value;
+        # the following read confirms the stored value is unchanged.
+        # ------------------------------------------------------------------
+
+        # Step 11 — Transport: write a different value → UNSUPPORTED_WRITE
         self.step(11)
+        await self.expect_write_rejected(
+            cp.Attributes.Transport(transport ^ int(cp.Bitmaps.CapabilitiesBitmap.kBle)),
+            "Transport")
+
+        # Step 12 — Transport unchanged after the rejected write
+        self.step(12)
         transport2 = await self.read_transport()
         logger.info("Transport (re-read) = 0x%02x", transport2)
         asserts.assert_equal(transport2, transport,
-                             "Transport attribute (Fixed quality) value changed between reads")
+                             "Transport attribute (Fixed quality) value changed after a rejected write")
 
-        # Step 12 — MaxSessions fixed quality (re-read, verify same value)
-        self.step(12)
+        # Step 13 — MaxSessions: write a different value → UNSUPPORTED_WRITE
+        self.step(13)
+        await self.expect_write_rejected(
+            cp.Attributes.MaxSessions((max_sessions % 0xFF) + 1),
+            "MaxSessions")
+
+        # Step 14 — MaxSessions unchanged after the rejected write
+        self.step(14)
         max_sessions2 = await self.read_cp_attribute(cp.Attributes.MaxSessions)
         logger.info("MaxSessions (re-read) = %d", max_sessions2)
         asserts.assert_equal(max_sessions2, max_sessions,
-                             "MaxSessions attribute (Fixed quality) value changed between reads")
+                             "MaxSessions attribute (Fixed quality) value changed after a rejected write")
 
-        # Step 13 — WiFiBand fixed quality (re-read, WI feature only)
+        # Steps 15-16 — MaxCachedResults (BGS feature only)
+        if has_bgs:
+            # Step 15 — write a different value → UNSUPPORTED_WRITE
+            self.step(15)
+            await self.expect_write_rejected(
+                cp.Attributes.MaxCachedResults((max_cached % 0xFF) + 1),
+                "MaxCachedResults")
+
+            # Step 16 — MaxCachedResults unchanged after the rejected write
+            self.step(16)
+            max_cached2 = await self.read_cp_attribute(cp.Attributes.MaxCachedResults)
+            logger.info("MaxCachedResults (re-read) = %d", max_cached2)
+            asserts.assert_equal(max_cached2, max_cached,
+                                 "MaxCachedResults attribute (Fixed quality) value changed after a rejected write")
+        else:
+            self.mark_step_range_skipped(15, 16)
+
+        # Steps 17-18 — WiFiBand (WI feature only)
         if has_wi:
-            self.step(13)
+            # Step 17 — write a different value → UNSUPPORTED_WRITE
+            self.step(17)
+            await self.expect_write_rejected(
+                cp.Attributes.WiFiBand(wifi_band ^ int(cp.Bitmaps.WiFiBandBitmap.k2g4)),
+                "WiFiBand")
+
+            # Step 18 — WiFiBand unchanged after the rejected write
+            self.step(18)
             wifi_band2 = await self.read_wifi_band()
             logger.info("WiFiBand (re-read) = 0x%04x", wifi_band2)
             asserts.assert_equal(wifi_band2, wifi_band,
-                                 "WiFiBand attribute (Fixed quality) value changed between reads")
+                                 "WiFiBand attribute (Fixed quality) value changed after a rejected write")
         else:
-            self.skip_step(13)
+            self.mark_step_range_skipped(17, 18)
 
 
 if __name__ == "__main__":

@@ -109,8 +109,9 @@ class TC_COMPRO_2_2(COMPROBaseTest):
             TestStep(7, "Ensure ED IS commissionable"),
             TestStep(8, "TH sends ProxyScanRequest with valid_transports (and valid_bands if WI)",
                      "DUT sends ProxyScanResponse within scan_max_time * 1.1 s; "
-                     "Status SUCCESS; NumberOfResults >= 1; "
-                     "At least one result has matching Transport, Discriminator, VendorID, ProductID"),
+                     "Status SUCCESS; NumberOfResults >= 1; NumberOfResults equals the number "
+                     "of ProxyScanResult entries; at least one result has matching Transport, "
+                     "Discriminator, VendorID, ProductID"),
             TestStep(9, "TH sends ProxyScanRequest with an unsupported Transport bit",
                      "DUT returns INVALID_TRANSPORT_TYPE"),
             TestStep(10, "TH sends ProxyScanRequest with WiFiPAF transport and a WiFiBand not in valid_bands "
@@ -118,6 +119,13 @@ class TC_COMPRO_2_2(COMPROBaseTest):
                      "DUT returns INVALID_TRANSPORT_TYPE"),
             TestStep(11, "TH sends two concurrent ProxyScanRequests with valid parameters",
                      "DUT responds to both; each response is SUCCESS or BUSY"),
+            TestStep(12, "TH reads MaxCachedResults attribute (if BGS supported)",
+                     "DUT returns a uint8 value >= 1"),
+            TestStep(13, "If valid_transports has two or more transport bits set: with the ED "
+                     "commissionable, TH sends ProxyScanRequest with all supported transport bits set",
+                     "The ED appears as two separate ProxyScanResult entries (same "
+                     "Discriminator/VendorId/ProductId), each with exactly one — and a "
+                     "different — Transport bit set; the entries are not merged"),
         ]
 
     @async_test_body
@@ -146,6 +154,7 @@ class TC_COMPRO_2_2(COMPROBaseTest):
         # Read FeatureMap first so we know whether to run or skip step 4.
         feature_map = await self.read_feature_map()
         has_wi = self.has_feature_wi(feature_map)
+        has_bgs = self.has_feature_bgs(feature_map)
         valid_bands: int = 0
         if has_wi:
             self.step(4)
@@ -188,6 +197,8 @@ class TC_COMPRO_2_2(COMPROBaseTest):
                                      "Expected NumberOfResults >= 1 when ED is commissionable")
         asserts.assert_greater_equal(len(response.proxyScanResult), 1,
                                      "Expected at least one entry in ProxyScanResult")
+        asserts.assert_equal(response.numberOfResults, len(response.proxyScanResult),
+                             "NumberOfResults must equal the number of ProxyScanResult entries")
 
         # Validate the first (or matching) result entry
         result = response.proxyScanResult[0]
@@ -316,6 +327,60 @@ class TC_COMPRO_2_2(COMPROBaseTest):
             else:
                 logger.info("Concurrent scan %d returned SUCCESS (NumberOfResults=%d)",
                             i + 1, r.numberOfResults)
+
+        # Step 12 — MaxCachedResults (BGS feature only).
+        if has_bgs:
+            self.step(12)
+            max_cached = await self.read_cp_attribute(cp.Attributes.MaxCachedResults)
+            logger.info("MaxCachedResults = %d", max_cached)
+            asserts.assert_greater_equal(max_cached, 1, "MaxCachedResults must be >= 1")
+        else:
+            self.skip_step(12)
+
+        # Step 13 — an ED advertising on two transports SHALL be reported once per
+        # transport (one ProxyScanResult entry per transport bit), not merged.
+        # Only applicable when the DUT supports two or more transports.  A standard
+        # Matter ED advertises CHIPoBLE alongside its other configured transport
+        # (e.g. WiFiPAF/NAN), so the ED already made commissionable in step 7 is
+        # discoverable on each supported transport; no special dual-transport rig
+        # is required.
+        defined_transport_bits = bin(valid_transports & self.valid_transport_mask()).count("1")
+        if defined_transport_bits < 2:
+            self.skip_step(13)
+            logger.info("Step 13 skipped: DUT supports a single transport (valid_transports=0x%02x)",
+                        valid_transports)
+        else:
+            self.step(13)
+            # The ED is still commissionable from step 7; ensure it (idempotent for
+            # the automated fixture, prompts the operator in manual mode).
+            await self.ensure_ed_commissionable(
+                ed,
+                manual_prompt=(
+                    "Make the SAME End Device commissionable over two supported transports "
+                    "simultaneously (e.g. BLE and WiFiPAF), then press Enter to continue."))
+            response = await self._send_scan_request(valid_transports, valid_bands if has_wi else None,
+                                                     timeout_sec=response_deadline)
+            if expected_discriminator:
+                ed_entries = [r for r in response.proxyScanResult
+                              if r.discriminator == expected_discriminator]
+            else:
+                ed_entries = list(response.proxyScanResult)
+            logger.info("Step 13: %d ProxyScanResult entries for the ED: %s",
+                        len(ed_entries),
+                        [f"disc={e.discriminator} transport=0x{e.transport:02x}" for e in ed_entries])
+            asserts.assert_greater_equal(
+                len(ed_entries), 2,
+                "Expected the dual-transport ED to appear as at least two ProxyScanResult entries")
+            transports_seen = set()
+            for entry in ed_entries:
+                # Each entry must report exactly one transport bit.
+                asserts.assert_equal(
+                    entry.transport & (entry.transport - 1), 0,
+                    f"ProxyScanResult entry Transport 0x{entry.transport:02x} must have exactly one bit set")
+                transports_seen.add(entry.transport)
+            asserts.assert_greater_equal(
+                len(transports_seen), 2,
+                "Dual-transport ED entries must report different Transport bits (one per transport), not merged")
 
         # Cleanup
         await self.ensure_ed_not_commissionable(ed)
