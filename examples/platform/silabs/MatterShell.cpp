@@ -83,7 +83,7 @@ CHIP_ERROR CmdSilabsDispatch(int argc, char ** argv)
 
     VerifyOrReturnError(builder.Fit(), CHIP_ERROR_BUFFER_TOO_SMALL);
 
-    sl_cli_handle_input(sl_cli_default_handle, builder.c_str());
+    sl_cli_handle_input(sl_cli_default_handle, const_cast<char *>(builder.c_str()));
 
     return CHIP_NO_ERROR;
 }

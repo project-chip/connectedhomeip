@@ -44,7 +44,6 @@ from support_modules.idm_support import IDMBaseTest
 import matter.clusters as Clusters
 from matter.ChipDeviceCtrl import ChipDeviceController
 from matter.clusters.Attribute import AttributePath
-from matter.testing.basic_composition import BasicCompositionTests
 from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import (AttributeSubscriptionHandler, EventSubscriptionHandler,
                                                       WildcardAttributeSubscriptionHandler)
@@ -68,7 +67,7 @@ https://github.com/CHIP-Specifications/chip-test-plans/blob/master/src/interacti
 '''
 
 
-class TC_IDM_4_3(IDMBaseTest, BasicCompositionTests):
+class TC_IDM_4_3(IDMBaseTest):
     @property
     def default_timeout(self) -> int:
         return 600

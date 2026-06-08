@@ -51,26 +51,16 @@ namespace app {
 namespace Clusters {
 namespace CameraAvStreamManagement {
 
-CameraAVStreamManagementCluster::CameraAVStreamManagementCluster(
-    const Context & aContext, CameraAVStreamManagementDelegate & aDelegate, EndpointId aEndpointId,
-    const BitFlags<Feature> aFeatures, const BitFlags<OptionalAttribute> aOptionalAttrs, uint8_t aMaxConcurrentEncoders,
-    uint32_t aMaxEncodedPixelRate, const VideoSensorParamsStruct & aVideoSensorParams, bool aNightVisionUsesInfrared,
-    const VideoResolutionStruct & aMinViewPortRes,
-    const std::vector<Structs::RateDistortionTradeOffPointsStruct::Type> & aRateDistortionTradeOffPoints,
-    uint32_t aMaxContentBufferSize, const AudioCapabilitiesStruct & aMicrophoneCapabilities,
-    const AudioCapabilitiesStruct & aSpeakerCapabilities, TwoWayTalkSupportTypeEnum aTwoWayTalkSupport,
-    const std::vector<Structs::SnapshotCapabilitiesStruct::Type> & aSnapshotCapabilities, uint32_t aMaxNetworkBandwidth,
-    const std::vector<Globals::StreamUsageEnum> & aSupportedStreamUsages,
-    const std::vector<Globals::StreamUsageEnum> & aStreamUsagePriorities) :
-    DefaultServerCluster({ aEndpointId, CameraAvStreamManagement::Id }),
-    mContext(aContext), mDelegate(aDelegate), mEnabledFeatures(aFeatures), mOptionalAttrs(aOptionalAttrs),
-    mMaxConcurrentEncoders(aMaxConcurrentEncoders), mMaxEncodedPixelRate(aMaxEncodedPixelRate),
-    mVideoSensorParams(aVideoSensorParams), mNightVisionUsesInfrared(aNightVisionUsesInfrared),
-    mMinViewPortResolution(aMinViewPortRes), mRateDistortionTradeOffPointsList(aRateDistortionTradeOffPoints),
-    mMaxContentBufferSize(aMaxContentBufferSize), mMicrophoneCapabilities(aMicrophoneCapabilities),
-    mSpeakerCapabilities(aSpeakerCapabilities), mTwoWayTalkSupport(aTwoWayTalkSupport),
-    mSnapshotCapabilitiesList(aSnapshotCapabilities), mMaxNetworkBandwidth(aMaxNetworkBandwidth),
-    mSupportedStreamUsages(aSupportedStreamUsages), mStreamUsagePriorities(aStreamUsagePriorities)
+CameraAVStreamManagementCluster::CameraAVStreamManagementCluster(InitArguments && aArgs) :
+    DefaultServerCluster({ aArgs.endpointId, CameraAvStreamManagement::Id }), mContext(aArgs.context), mDelegate(aArgs.delegate),
+    mEnabledFeatures(aArgs.features), mOptionalAttrs(aArgs.optionalAttrs), mMaxConcurrentEncoders(aArgs.maxConcurrentEncoders),
+    mMaxEncodedPixelRate(aArgs.maxEncodedPixelRate), mVideoSensorParams(std::move(aArgs.videoSensorParams)),
+    mNightVisionUsesInfrared(aArgs.nightVisionUsesInfrared), mMinViewPortResolution(std::move(aArgs.minViewPort)),
+    mRateDistortionTradeOffPointsList(std::move(aArgs.rateDistortionTradeOffPoints)),
+    mMaxContentBufferSize(aArgs.maxContentBufferSize), mMicrophoneCapabilities(std::move(aArgs.microphoneCapabilities)),
+    mSpeakerCapabilities(std::move(aArgs.spkrCapabilities)), mTwoWayTalkSupport(aArgs.twoWayTalkSupport),
+    mSnapshotCapabilitiesList(std::move(aArgs.snapshotCapabilities)), mMaxNetworkBandwidth(aArgs.maxNetworkBandwidth),
+    mSupportedStreamUsages(std::move(aArgs.supportedStreamUsages)), mStreamUsagePriorities(std::move(aArgs.streamUsagePriorities))
 {
     mDelegate.SetCameraAVStreamManagementCluster(this);
 }

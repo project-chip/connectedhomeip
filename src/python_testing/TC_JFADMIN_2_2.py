@@ -69,6 +69,10 @@ class TC_JFADMIN_2_2(CADMINBaseTest):
         self.fabric_b_server_app = None
         self.fabric_a_admin = None
         self.fabric_b_admin = None
+        self.dev_ctrl_eco_a = None
+        self.dev_ctrl_eco_b = None
+        self.joint_fabric_persistent_storage = None
+        self.joint_fabric_ca_manager = None
 
         self.jfc_server_app = self.user_params.get("jfc_server_app", None)
         if not self.jfc_server_app:
@@ -113,6 +117,19 @@ class TC_JFADMIN_2_2(CADMINBaseTest):
         if self.fabric_b_server_app is not None:
             self.fabric_b_server_app.terminate()
 
+        if self.dev_ctrl_eco_a is not None:
+            self.dev_ctrl_eco_a.Shutdown()
+            self.dev_ctrl_eco_a = None
+        if self.dev_ctrl_eco_b is not None:
+            self.dev_ctrl_eco_b.Shutdown()
+            self.dev_ctrl_eco_b = None
+        if self.joint_fabric_ca_manager is not None:
+            self.joint_fabric_ca_manager.Shutdown()
+            self.joint_fabric_ca_manager = None
+        if self.joint_fabric_persistent_storage is not None:
+            self.joint_fabric_persistent_storage.Shutdown()
+            self.joint_fabric_persistent_storage = None
+
         super().teardown_class()
 
     def steps_TC_JFADMIN_2_2(self) -> list[TestStep]:
@@ -137,30 +154,27 @@ class TC_JFADMIN_2_2(CADMINBaseTest):
 
     @async_test_body
     async def test_TC_JFADMIN_2_2(self):
-        _devCtrlEcoA = None
-        _devCtrlEcoB = None
-        _fabric_a_persistent_storage = None
-        _fabric_b_persistent_storage = None
-
-        _devCtrlEcoA = None
-        _devCtrlEcoB = None
-        _fabric_a_persistent_storage = None
-        _fabric_b_persistent_storage = None
+        self.dev_ctrl_eco_a = None
+        self.dev_ctrl_eco_b = None
+        self.joint_fabric_persistent_storage = None
+        self.joint_fabric_ca_manager = None
 
         self.step("1")
         self.jfadmin_fabric_a_passcode = random.randint(20202021, 20202099)
         self.jfadmin_fabric_a_discriminator = random.randint(0, 4095)
         self.jfctrl_fabric_a_vid = random.randint(0x0001, 0xFFF0)
 
+        fabric_a_rpc_port = self.get_random_port()
+
         # Start Fabric A JF-Administrator App
         self.fabric_a_admin = JFAdministratorSubprocess(
             self.jfa_server_app,
             prefix="JFA-A",
             storage_dir=self.storage_fabric_a,
-            port=random.randint(5001, 5999),
+            port=self.get_random_port(),
             discriminator=self.jfadmin_fabric_a_discriminator,
             passcode=self.jfadmin_fabric_a_passcode,
-            extra_args=["--capabilities", "0x04", "--rpc-server-port", "33033"])
+            extra_args=["--capabilities", "0x04", "--rpc-server-port", str(fabric_a_rpc_port), "--secured-commissioner-port", str(self.get_random_port())])
         self.fabric_a_admin.start(
             expected_output="Updating services using commissioning mode 1",
             timeout=30)
@@ -169,7 +183,7 @@ class TC_JFADMIN_2_2(CADMINBaseTest):
         self.fabric_a_ctrl = JFControllerSubprocess(
             self.jfc_server_app,
             prefix="JFC-A",
-            rpc_server_port=33033,
+            rpc_server_port=fabric_a_rpc_port,
             storage_dir=self.storage_fabric_a,
             vendor_id=self.jfctrl_fabric_a_vid)
         self.fabric_a_ctrl.start(
@@ -211,7 +225,7 @@ class TC_JFADMIN_2_2(CADMINBaseTest):
         self.fabric_a_server_app = AppServerSubprocess(
             self.th_server_app,
             storage_dir=self.storage_fabric_a,
-            port=random.randint(5001, 5999),
+            port=self.get_random_port(),
             discriminator=self.thserver_fabric_a_discriminator,
             passcode=self.thserver_fabric_a_passcode,
             extra_args=["--capabilities", "0x04"])
@@ -220,18 +234,18 @@ class TC_JFADMIN_2_2(CADMINBaseTest):
             timeout=30)
 
         self.fabric_a_ctrl.send(
-            message=f"pairing onnetwork-long 2 {self.thserver_fabric_a_passcode} {self.thserver_fabric_a_discriminator}",
+            message=f"pairing onnetwork-long 2 {self.thserver_fabric_a_passcode} {self.thserver_fabric_a_discriminator} --regular true",
             expected_output="[CTL] Commissioning complete for node ID 0x0000000000000002: success",
             timeout=30)
 
-        # Creating a Controller for Ecosystem A
-        _fabric_a_persistent_storage = VolatileTemporaryPersistentStorage(
+        # Creating a unified Controller Manager for both ecosystems
+        self.joint_fabric_persistent_storage = VolatileTemporaryPersistentStorage(
             self.ecoACtrlStorage['repl-config'], self.ecoACtrlStorage['sdk-config'])
-        _certAuthorityManagerA = CertificateAuthority.CertificateAuthorityManager(
+        self.joint_fabric_ca_manager = CertificateAuthority.CertificateAuthorityManager(
             chipStack=self.matter_stack._chip_stack,
-            persistentStorage=_fabric_a_persistent_storage)
-        _certAuthorityManagerA.LoadAuthoritiesFromStorage()
-        _devCtrlEcoA = _certAuthorityManagerA.activeCaList[0].adminList[0].NewController(
+            persistentStorage=self.joint_fabric_persistent_storage)
+        self.joint_fabric_ca_manager.LoadAuthoritiesFromStorage()
+        self.dev_ctrl_eco_a = self.joint_fabric_ca_manager.activeCaList[0].adminList[0].NewController(
             nodeId=101,
             paaTrustStorePath=str(self.matter_test_config.paa_trust_store_path),
             catTags=[int(self.ecoACATs, 16), int('fffe0001', 16)])
@@ -249,16 +263,16 @@ class TC_JFADMIN_2_2(CADMINBaseTest):
             dut_rpc_server_ip = "127.0.0.1"
             jfadmin_fabric_b_passcode = random.randint(20202021, 20202099)
             jfadmin_fabric_b_discriminator = random.randint(0, 4095)
-            dut_rpc_server_port = "33055"
+            dut_rpc_server_port = str(self.get_random_port())
             # Start Fabric B JF-Administrator App
             self.fabric_b_admin = JFAdministratorSubprocess(
                 self.jfa_server_app,
                 prefix="JFA-B",
                 storage_dir=self.storage_fabric_b,
-                port=random.randint(5001, 5999),
+                port=self.get_random_port(),
                 discriminator=jfadmin_fabric_b_discriminator,
                 passcode=jfadmin_fabric_b_passcode,
-                extra_args=["--capabilities", "0x04", "--rpc-server-port", dut_rpc_server_port])
+                extra_args=["--capabilities", "0x04", "--rpc-server-port", dut_rpc_server_port, "--secured-commissioner-port", str(self.get_random_port())])
             self.fabric_b_admin.start(
                 expected_output="Updating services using commissioning mode 1",
                 timeout=30)
@@ -293,25 +307,25 @@ class TC_JFADMIN_2_2(CADMINBaseTest):
 
         # Commission JF-ADMIN app with JF-Controller on Fabric B
         self.fabric_b_ctrl.send(
-            message=f"pairing onnetwork-long 11 {jfadmin_fabric_b_passcode} {jfadmin_fabric_b_discriminator} --anchor true",
+            message=f"pairing onnetwork-long 11 {jfadmin_fabric_b_passcode} {jfadmin_fabric_b_discriminator} --anchor true --commissioner-name beta",
             expected_output="[JF] Anchor Administrator (nodeId=11) commissioned with success",
             timeout=60)
 
         # Extract the Ecosystem B certificates and inject them in the storage that will be provided to a new Python Controller later
         jfcStorage = ConfigParser()
-        jfcStorage.read(self.storage_fabric_b+'/chip_tool_config.alpha.ini')
+        jfcStorage.read(self.storage_fabric_b+'/chip_tool_config.beta.ini')
         self.ecoBCtrlStorage = {
             "sdk-config": {
-                "ExampleOpCredsCAKey1": jfcStorage.get("Default", "ExampleOpCredsCAKey0"),
-                "ExampleOpCredsICAKey1": jfcStorage.get("Default", "ExampleOpCredsICAKey0"),
-                "ExampleCARootCert1": jfcStorage.get("Default", "ExampleCARootCert0"),
-                "ExampleCAIntermediateCert1": jfcStorage.get("Default", "ExampleCAIntermediateCert0"),
+                "ExampleOpCredsCAKey2": jfcStorage.get("Default", "ExampleOpCredsCAKey0"),
+                "ExampleOpCredsICAKey2": jfcStorage.get("Default", "ExampleOpCredsICAKey0"),
+                "ExampleCARootCert2": jfcStorage.get("Default", "ExampleCARootCert0"),
+                "ExampleCAIntermediateCert2": jfcStorage.get("Default", "ExampleCAIntermediateCert0"),
             },
             "repl-config": {
                 "caList": {
-                    "1": [
+                    "2": [
                         {
-                            "fabricId": 1,
+                            "fabricId": 2,
                             "vendorId": self.jfctrl_fabric_b_vid
                         }
                     ]
@@ -326,7 +340,7 @@ class TC_JFADMIN_2_2(CADMINBaseTest):
         self.fabric_b_server_app = AppServerSubprocess(
             self.th_server_app,
             storage_dir=self.storage_fabric_b,
-            port=random.randint(5001, 5999),
+            port=self.get_random_port(),
             discriminator=self.thserver_fabric_b_discriminator,
             passcode=self.thserver_fabric_b_passcode,
             extra_args=["--capabilities", "0x04"])
@@ -335,18 +349,24 @@ class TC_JFADMIN_2_2(CADMINBaseTest):
             timeout=30)
 
         self.fabric_b_ctrl.send(
-            message=f"pairing onnetwork-long 22 {self.thserver_fabric_b_passcode} {self.thserver_fabric_b_discriminator}",
+            message=f"pairing onnetwork-long 22 {self.thserver_fabric_b_passcode} {self.thserver_fabric_b_discriminator} --commissioner-name beta --regular true",
             expected_output="[CTL] Commissioning complete for node ID 0x0000000000000016: success",
             timeout=30)
 
-        # Creating a Controller for Ecosystem B
-        _fabric_b_persistent_storage = VolatileTemporaryPersistentStorage(
-            self.ecoBCtrlStorage['repl-config'], self.ecoBCtrlStorage['sdk-config'])
-        _certAuthorityManagerB = CertificateAuthority.CertificateAuthorityManager(
-            chipStack=self.matter_stack._chip_stack,
-            persistentStorage=_fabric_b_persistent_storage)
-        _certAuthorityManagerB.LoadAuthoritiesFromStorage()
-        _devCtrlEcoB = _certAuthorityManagerB.activeCaList[0].adminList[0].NewController(
+        # Merge Ecosystem B config into the unified storage
+        for k, v in self.ecoBCtrlStorage['sdk-config'].items():
+            self.joint_fabric_persistent_storage.SetSdkKey(k, base64.b64decode(v))
+
+        caList = self.joint_fabric_persistent_storage.GetKey('caList') or {}
+        caList["2"] = self.ecoBCtrlStorage['repl-config']['caList']['2']
+        self.joint_fabric_persistent_storage.SetKey('caList', caList)
+
+        # Create and load CA Index 2 explicitly in the unified manager
+        ca2 = self.joint_fabric_ca_manager.NewCertificateAuthority(caIndex=2)
+        ca2.LoadFabricAdminsFromStorage()
+
+        # Create Ecosystem B controller using ca2 directly
+        self.dev_ctrl_eco_b = ca2.adminList[0].NewController(
             nodeId=201,
             paaTrustStorePath=str(self.matter_test_config.paa_trust_store_path),
             catTags=[int(self.ecoBCATs, 16)])
@@ -356,7 +376,7 @@ class TC_JFADMIN_2_2(CADMINBaseTest):
         discriminator = random.randint(0, 4095)
 
         try:
-            response = await _devCtrlEcoB.OpenJointCommissioningWindow(
+            response = await self.dev_ctrl_eco_b.OpenJointCommissioningWindow(
                 nodeId=11,
                 endpointId=1,
                 timeout=400,
@@ -397,12 +417,12 @@ class TC_JFADMIN_2_2(CADMINBaseTest):
 
         self.step("6")
         # nodeId=11 is the JF-Admin app's node ID on Fabric B (commissioned by fabric_b_ctrl)
-        response_b = await _devCtrlEcoB.ReadAttribute(
+        response_b = await self.dev_ctrl_eco_b.ReadAttribute(
             nodeId=11, attributes=[(0, Clusters.OperationalCredentials.Attributes.CurrentFabricIndex)], fabricFiltered=True,
             returnClusterObject=True)
         joint_fabric_index = response_b[0][Clusters.OperationalCredentials].currentFabricIndex
 
-        response = await _devCtrlEcoA.ReadAttribute(
+        response = await self.dev_ctrl_eco_a.ReadAttribute(
             nodeId=1, attributes=[(0, Clusters.OperationalCredentials.Attributes.NOCs)], fabricFiltered=False,
             returnClusterObject=True)
 
@@ -424,15 +444,6 @@ class TC_JFADMIN_2_2(CADMINBaseTest):
                 _admin_cat_found = True
                 break
         asserts.assert_true(_admin_cat_found, "Administrator CAT not found in Admin App NOC on Ecosystem B")
-
-        if _devCtrlEcoA is not None:
-            _devCtrlEcoA.Shutdown()
-        if _devCtrlEcoB is not None:
-            _devCtrlEcoB.Shutdown()
-        if _fabric_a_persistent_storage is not None:
-            _fabric_a_persistent_storage.Shutdown()
-        if _fabric_b_persistent_storage is not None:
-            _fabric_b_persistent_storage.Shutdown()
 
 
 if __name__ == "__main__":
