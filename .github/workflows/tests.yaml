@@ -144,6 +144,8 @@ jobs:
                       src/app/zap-templates/zcl/data-model/chip/icd-management-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/meter-identification-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/network-identity-management-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/ota-provider-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/ota-requestor-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/proximity-ranging-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/push-av-stream-transport-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/semantic-tag-namespace-enums.xml \
@@ -162,7 +164,6 @@ jobs:
                       src/app/zap-templates/zcl/data-model/chip/actions-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/camera-av-settings-user-level-management-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/camera-av-stream-management-cluster.xml \
-                      src/app/zap-templates/zcl/data-model/chip/chip-ota.xml \
                       src/app/zap-templates/zcl/data-model/chip/chip-types.xml \
                       src/app/zap-templates/zcl/data-model/chip/channel-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/clusters-extensions.xml \
