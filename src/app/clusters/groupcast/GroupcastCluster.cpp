@@ -57,7 +57,7 @@ GroupcastCluster::~GroupcastCluster()
     // Shutdown() to ensure proper cleanup if the cluster was started.
     if (mContext != nullptr)
     {
-        Shutdown(ClusterShutdownType::kPermanentRemove);
+        GroupcastCluster::Shutdown(ClusterShutdownType::kPermanentRemove);
     }
 }
 

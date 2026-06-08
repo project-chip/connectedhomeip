@@ -34,12 +34,9 @@ namespace PushAvStreamTransport {
 // chunkDuration: 2 bytes
 // sessionGroup: 1 byte
 // mTrackNameBuffer: 16 bytes
-// mCENCKeyBuffer: 16 bytes
-// mCENCKeyIDBuffer: 16 bytes
 // metadataEnabled: ~2 bytes (EstimateStructOverhead)
-static constexpr size_t kCMAFContainerStorageSize =
-    TLV::EstimateStructOverhead(sizeof(uint8_t), sizeof(uint16_t), sizeof(uint16_t), sizeof(uint8_t), kMaxTrackNameLength,
-                                kMaxCENCKeyLength, kMaxCENCKeyIDLength, sizeof(bool));
+static constexpr size_t kCMAFContainerStorageSize = TLV::EstimateStructOverhead(sizeof(uint8_t), sizeof(uint16_t), sizeof(uint16_t),
+                                                                                sizeof(uint8_t), kMaxTrackNameLength, sizeof(bool));
 
 // Size calculation for ContainerOptionsStorage
 // containerType: 1 byte
@@ -186,7 +183,6 @@ private:
 
 /**
  * @brief Storage implementation for CMAF container options.
- * Manages fixed-size buffers for CENC keys and IDs with bounds checking.
  * Must be used when CMAF container configurations need persistent key storage.
  */
 struct CMAFContainerOptionsStorage : public CMAFContainerOptionsStruct
@@ -217,40 +213,16 @@ struct CMAFContainerOptionsStorage : public CMAFContainerOptionsStruct
         chunkDuration   = aCMAFContainerOptions.chunkDuration;
         sessionGroup    = aCMAFContainerOptions.sessionGroup;
 
-        MutableCharSpan trackNameBuffer(mTrackNameBuffer);
-        // ValidateIncomingTransportOptions() function already checked the trackName length
-        CopyCharSpanToMutableCharSpanWithTruncation(aCMAFContainerOptions.trackName, trackNameBuffer);
-        trackName = trackNameBuffer;
-
-        CENCKey = aCMAFContainerOptions.CENCKey;
-
-        CENCKeyID = aCMAFContainerOptions.CENCKeyID;
-
-        if (CENCKey.HasValue())
+        if (aCMAFContainerOptions.trackName.HasValue())
         {
-            MutableByteSpan CENCKeyBuffer(mCENCKeyBuffer);
-            // ValidateIncomingTransportOptions() function already checked the CENCKey length
-            TEMPORARY_RETURN_IGNORED CopySpanToMutableSpan(aCMAFContainerOptions.CENCKey.Value(), CENCKeyBuffer);
-            CENCKey.SetValue(CENCKeyBuffer);
-        }
-        else
-        {
-            CENCKey.ClearValue();
+
+            MutableCharSpan trackNameBuffer(mTrackNameBuffer);
+            // ValidateIncomingTransportOptions() function already checked the trackName length
+            CopyCharSpanToMutableCharSpanWithTruncation(aCMAFContainerOptions.trackName.Value(), trackNameBuffer);
+            trackName.SetValue(trackNameBuffer);
         }
 
         metadataEnabled = aCMAFContainerOptions.metadataEnabled;
-
-        if (CENCKeyID.HasValue())
-        {
-            MutableByteSpan CENCKeyIDBuffer(mCENCKeyIDBuffer);
-            // ValidateIncomingTransportOptions() function already checked the CENCKeyID length
-            TEMPORARY_RETURN_IGNORED CopySpanToMutableSpan(aCMAFContainerOptions.CENCKeyID.Value(), CENCKeyIDBuffer);
-            CENCKeyID.SetValue(CENCKeyIDBuffer);
-        }
-        else
-        {
-            CENCKeyID.ClearValue();
-        }
 
         return *this;
     }
@@ -262,8 +234,6 @@ struct CMAFContainerOptionsStorage : public CMAFContainerOptionsStruct
 
 private:
     char mTrackNameBuffer[kMaxTrackNameLength];
-    uint8_t mCENCKeyBuffer[kMaxCENCKeyLength];
-    uint8_t mCENCKeyIDBuffer[kMaxCENCKeyIDLength];
 };
 
 /**
