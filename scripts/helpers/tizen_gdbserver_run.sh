@@ -61,16 +61,14 @@ if [ -z "$GDBSERVER_PORT" ]; then
     GDBSERVER_PORT=$GDBSERVER_DEFAULT_PORT
 fi
 
-# Configure SDB command array
 SDB_CMD=("sdb")
 if [ -n "$TARGET_DEVICE" ]; then
     SDB_CMD=("sdb" "-s" "$TARGET_DEVICE")
 fi
 
-# Switch to root mode
 CNX_STATUS=$("${SDB_CMD[@]}" root on 2>&1 || true)
 
-# --- GDBSERVER AUTO-DETECTION AND INJECTION ---
+# --- GDBSERVER DETECTION AND DEPLOYMENT ---
 GDBSERVER_TARGET_PATH="/opt/bin/gdbserver"
 KNOWN_TARGET_PATHS=(
     "/opt/bin/gdbserver"
@@ -80,7 +78,7 @@ KNOWN_TARGET_PATHS=(
 
 GDBSERVER_FOUND_ON_DEVICE=false
 
-# 1. Check known paths using explicit string verification to avoid SDB exit code bugs
+# Check standard installation paths
 for path in "${KNOWN_TARGET_PATHS[@]}"; do
     IS_EXECUTABLE=$("${SDB_CMD[@]}" shell "test -x $path && echo 'OK'" | tr -d '\r' | tr -d ' ')
     if [ "$IS_EXECUTABLE" = "OK" ]; then
@@ -91,7 +89,7 @@ for path in "${KNOWN_TARGET_PATHS[@]}"; do
     fi
 done
 
-# 2. Standardization step: If not found, look for prefixed binaries specifically in /opt/bin/
+# Standardize toolchain-prefixed binaries in /opt/bin
 if [ "$GDBSERVER_FOUND_ON_DEVICE" = false ]; then
     RENAME_ON_DEVICE=$("${SDB_CMD[@]}" shell "if [ -d /opt/bin ]; then PREFIXED=\$(find /opt/bin -type f -name '*gdbserver*' | head -n 1 | tr -d '\r'); if [ -n \"\$PREFIXED\" ]; then mv \"\$PREFIXED\" /opt/bin/gdbserver && echo 'RENAMED'; fi; fi" | tr -d '\r' | tr -d ' ')
     if [ "$RENAME_ON_DEVICE" = "RENAMED" ]; then
@@ -101,7 +99,7 @@ if [ "$GDBSERVER_FOUND_ON_DEVICE" = false ]; then
     fi
 fi
 
-# 3. If completely missing from target, discover in local SDK and deploy
+# Fallback: Locate binary inside local Tizen SDK and deploy
 if [ "$GDBSERVER_FOUND_ON_DEVICE" = false ]; then
     echo "gdbserver missing from standard paths. Searching local SDK..."
 
@@ -110,7 +108,6 @@ if [ "$GDBSERVER_FOUND_ON_DEVICE" = false ]; then
         exit 1
     fi
 
-    # Detect target architecture
     REMOTE_ARCH=$("${SDB_CMD[@]}" shell "uname -m" | tr -d '\r' | tr -d ' ')
     echo "Detected target architecture: $REMOTE_ARCH"
 
@@ -125,7 +122,6 @@ if [ "$GDBSERVER_FOUND_ON_DEVICE" = false ]; then
             ;;
     esac
 
-    # Find the local cross-compiled host binary inside SDK bin layout
     LOCAL_GDBSERVER=$(find "$TIZEN_SDK_ROOT" -type f -path "*/bin/*gdbserver*" -name "*$LOCAL_ARCH_PATTERN*" 2>/dev/null | head -n 1)
 
     if [ -z "$LOCAL_GDBSERVER" ] || [ ! -f "$LOCAL_GDBSERVER" ]; then
@@ -141,9 +137,9 @@ if [ "$GDBSERVER_FOUND_ON_DEVICE" = false ]; then
     "${SDB_CMD[@]}" shell "chmod +x $GDBSERVER_TARGET_PATH"
     echo "gdbserver successfully deployed."
 fi
-# ----------------------------------------------
+# ------------------------------------------
 
-# Launch application in suspended debug mode
+# Launch target application in suspended mode
 echo "Launching $APP_NAME in suspended debug mode..."
 LAUNCH_CMD="app_launcher --debug --start $APP_NAME"
 if [ -n "$APP_ARGS" ]; then
@@ -152,7 +148,6 @@ fi
 LAUNCH_OUT=$("${SDB_CMD[@]}" shell "$LAUNCH_CMD")
 echo "$LAUNCH_OUT"
 
-# Parse the application PID
 PID=$(echo "$LAUNCH_OUT" | sed -n 's/.*pid = \([0-9][0-9]*\).*/\1/p')
 
 if [ -z "$PID" ]; then
@@ -162,7 +157,7 @@ fi
 
 echo "Captured App PID: $PID"
 
-# Define cleanup trap to kill the suspended app if subsequent steps fail or get interrupted
+# Signal cleanup layout for exit, interrupt, and termination
 cleanup_on_error() {
     local exit_code=$?
     if [ -n "$1" ] || [ $exit_code -ne 0 ]; then
@@ -177,18 +172,14 @@ trap 'cleanup_on_error' EXIT
 trap 'cleanup_on_error INT' INT
 trap 'cleanup_on_error TERM' TERM
 
-# Setup SDB port forwarding
 echo "Setting up SDB port forward (TCP $GDBSERVER_PORT)..."
 "${SDB_CMD[@]}" forward tcp:"$GDBSERVER_PORT" tcp:"$GDBSERVER_PORT"
 
-# 5. Attach gdbserver in foreground but catch signals properly
+# Run gdbserver in foreground and capture background job descriptor for trap handling
 echo "Attaching gdbserver to PID $PID on port $GDBSERVER_PORT..."
-
-# Run gdbserver in foreground so it has full network/system privileges
 "${SDB_CMD[@]}" shell "$GDBSERVER_TARGET_PATH --once --attach :$GDBSERVER_PORT $PID" &
 SDB_PID=$!
 
-# Use wait to allow Bash trap to safely intercept Ctrl+C while sdb is running
 set +e
 wait $SDB_PID
 set -e
