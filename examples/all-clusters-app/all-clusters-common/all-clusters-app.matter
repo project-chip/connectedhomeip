@@ -6400,50 +6400,6 @@ provisional cluster SoilMeasurement = 1072 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
-/** This cluster provides data modeling and protocol implementation of multi-node ambient sensing system. */
-provisional cluster AmbientSensingUnion = 1074 {
-  revision 1;
-
-  enum UnionContributorStatusEnum : enum8 {
-    kUnionContributorOnline = 0;
-    kUnionContributorOffline = 1;
-  }
-
-  enum UnionHealthEnum : enum8 {
-    kFullyFunctional = 0;
-    kLimitedDegraded = 1;
-    kNonFunctional = 2;
-  }
-
-  struct UnionContributorStruct {
-    nullable node_id contributorNodeID = 0;
-    nullable endpoint_no contributorEndpointID = 1;
-    optional char_string<128> contributorName = 2;
-    UnionContributorStatusEnum contributorHealth = 3;
-  }
-
-  provisional info event UnionContributorAdded = 0 {
-    UnionContributorStruct addedContributor[] = 0;
-  }
-
-  provisional info event UnionContributorRemoved = 1 {
-    UnionContributorStruct removedContributor[] = 0;
-  }
-
-  provisional info event UnionContributorStatusChanged = 2 {
-    UnionContributorStruct statusChangedContributor[] = 0;
-  }
-
-  attribute char_string<128> unionName = 0;
-  readonly attribute UnionHealthEnum unionHealth = 1;
-  readonly attribute UnionContributorStruct unionContributorList[] = 2;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-}
-
 /** This cluster provides an interface for managing low power mode on a device that supports the Wake On LAN protocol. */
 cluster WakeOnLan = 1283 {
   revision 1;
@@ -8793,20 +8749,6 @@ endpoint 1 {
     callback attribute attributeList;
     callback attribute featureMap;
     callback attribute clusterRevision;
-  }
-
-  server cluster AmbientSensingUnion {
-    emits event UnionContributorAdded;
-    emits event UnionContributorRemoved;
-    emits event UnionContributorStatusChanged;
-    callback attribute unionName;
-    callback attribute unionHealth;
-    callback attribute unionContributorList;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
   }
 
   server cluster WakeOnLan {
