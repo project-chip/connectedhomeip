@@ -1036,7 +1036,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         try:
             commissioning_params = await dev_ctrl.OpenCommissioningWindow(nodeId=node_id, timeout=timeout, iteration=1000,
                                                                           discriminator=rnd_discriminator, option=dev_ctrl.CommissioningWindowPasscode.kTokenWithRandomPin)
-            return CustomCommissioningParameters(commissioning_params, rnd_discriminator)
+            return CustomCommissioningParameters(commissioningParameters=commissioning_params, randomDiscriminator=rnd_discriminator)
 
         except InteractionModelError as e:
             asserts.fail(e.status, 'Failed to open commissioning window')

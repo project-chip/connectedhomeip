@@ -41,6 +41,14 @@ Integration tests for commissioning status detection functions.
 
 These tests verify that the commissioning status detection functions work correctly
 with a real Matter application server.
+
+Logs and artifacts:
+    Lines prefixed with ``[SERVER]`` come from the ``chip-all-clusters-app`` child
+    process. On a shared LAN, MINMDNS may also show unrelated operational devices;
+    that is normal. When the run finishes, MatterTest prints where it saved the
+    summary (typically under ``/tmp/matter_testing/logs/MatterTest/<timestamp>/``).
+    Mobly may occasionally log a nonsensical "Finished test in … ms" duration; that
+    comes from the test harness timer, not from assertion failures in this file.
 """
 
 import asyncio
@@ -53,7 +61,7 @@ from python_path import PythonPath
 
 from matter import ChipDeviceCtrl
 from matter.testing.apps import AppServerSubprocess
-from matter.testing.commissioning import _is_device_operational_via_dnssd, is_commissioned
+from matter.testing.commissioning import _is_device_operational_via_dnssd, get_commissioned_fabric_count, is_commissioned
 from matter.testing.decorators import async_test_body
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import default_matter_test_main
@@ -190,23 +198,72 @@ class TestCommissioningStatusDetectionIntegration(MatterBaseTest):
 
         LOGGER.info("Checking DNS-SD for commissioned device")
 
-        # Retry a few times for flaky mDNS
-        is_operational = False
-        for attempt in range(3):
-            is_operational = await _is_device_operational_via_dnssd(
-                self.default_controller,
-                self.th_server_local_nodeid
-            )
-            if is_operational:
-                break
-            LOGGER.info(f"DNS-SD check attempt {attempt + 1} returned False, retrying...")
-            await asyncio.sleep(2)
+        # Retries are handled internally by _is_device_operational_via_dnssd
+        is_operational = await _is_device_operational_via_dnssd(
+            self.default_controller,
+            self.th_server_local_nodeid
+        )
 
         asserts.assert_true(
             is_operational,
             "Commissioned device SHOULD be found operational via DNS-SD"
         )
         LOGGER.info("PASS: Commissioned device found operational via DNS-SD")
+
+    @async_test_body
+    async def test_TC_COMMISSION_DETECT_1_4_commissioned_is_commissioned(self):
+        """
+        After on-network commissioning, is_commissioned() should report True once
+        the device is operational on the controller fabric (DNS-SD operational path).
+        """
+        LOGGER.info("=== Test: Commissioned Device - is_commissioned() ===")
+        self.start_th_server()
+
+        LOGGER.info("Commissioning TH server to TH fabric")
+        await self.default_controller.CommissionOnNetwork(
+            nodeId=self.th_server_local_nodeid,
+            setupPinCode=self.th_server_passcode,
+            filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
+            filter=self.th_server_discriminator
+        )
+        await asyncio.sleep(2)
+
+        commissioned = await is_commissioned(
+            self.default_controller,
+            self.th_server_local_nodeid
+        )
+        asserts.assert_true(
+            commissioned,
+            "Commissioned device should report is_commissioned=True on this fabric"
+        )
+        LOGGER.info("PASS: Commissioned device reports is_commissioned=True")
+
+    @async_test_body
+    async def test_TC_COMMISSION_DETECT_1_5_commissioned_fabric_count(self):
+        """
+        After commissioning, get_commissioned_fabric_count() should see at least one
+        trusted root (passive read over CASE after DNS-SD operational short-circuit).
+        """
+        LOGGER.info("=== Test: Commissioned Device - get_commissioned_fabric_count() ===")
+        self.start_th_server()
+
+        await self.default_controller.CommissionOnNetwork(
+            nodeId=self.th_server_local_nodeid,
+            setupPinCode=self.th_server_passcode,
+            filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
+            filter=self.th_server_discriminator
+        )
+        await asyncio.sleep(2)
+
+        count = await get_commissioned_fabric_count(
+            self.default_controller,
+            self.th_server_local_nodeid
+        )
+        asserts.assert_true(
+            count >= 1,
+            f"Expected at least 1 commissioned fabric on DUT, got {count}"
+        )
+        LOGGER.info("PASS: get_commissioned_fabric_count >= 1 after commissioning")
 
 
 if __name__ == "__main__":
