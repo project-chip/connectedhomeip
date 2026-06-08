@@ -18,6 +18,9 @@
 #include <app/clusters/ambient-sensing-union-server/AmbientSensingUnionCluster.h>
 
 #include <algorithm>
+#include <app/persistence/AttributePersistence.h>
+#include <app/persistence/AttributePersistenceProvider.h>
+#include <app/persistence/String.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <clusters/AmbientSensingUnion/Attributes.h>
 #include <clusters/AmbientSensingUnion/Events.h>
@@ -33,7 +36,7 @@ using namespace AmbientSensingUnion::Attributes;
 
 AmbientSensingUnionCluster::AmbientSensingUnionCluster(const Config & config) :
     DefaultServerCluster({ config.mEndpointId, AmbientSensingUnion::Id }), mDelegate(config.mDelegate),
-    mPersistence(config.mPersistence), mUnionNameLength(0), mUnionHealth(UnionHealthEnum::kNonFunctional), mContributorCount(0)
+    mUnionNameLength(0), mUnionHealth(UnionHealthEnum::kNonFunctional), mContributorCount(0)
 {
     mUnionNameBuffer[0] = '\0';
 
@@ -55,13 +58,33 @@ CHIP_ERROR AmbientSensingUnionCluster::Startup(ServerClusterContext & context)
 {
     ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
 
-    // Load persisted attributes if persistence delegate is provided
-    if (mPersistence != nullptr)
+    // Load persisted UnionName from attributeStorage if available,
+    // otherwise store the Config default so it survives future reboots.
+    AttributePersistence persistence(context.attributeStorage);
+    Storage::String<kMaxUnionNameLength> storedName;
+
+    if (persistence.LoadString({ mPath.mEndpointId, AmbientSensingUnion::Id, Attributes::UnionName::Id }, storedName))
     {
-        CHIP_ERROR err = LoadPersistedAttributes();
-        if (err != CHIP_NO_ERROR && err != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+        CharSpan loaded = storedName.Content();
+        mUnionNameLength = loaded.size();
+        memcpy(mUnionNameBuffer, loaded.data(), mUnionNameLength);
+        mUnionNameBuffer[mUnionNameLength] = '\0';
+        ChipLogProgress(Zcl, "AmbientSensingUnion: Loaded persisted UnionName: %.*s",
+                        static_cast<int>(mUnionNameLength), mUnionNameBuffer);
+    }
+    else
+    {
+        // First boot — store the Config default into persistence
+        Storage::String<kMaxUnionNameLength> defaultName;
+        if (defaultName.SetContent(GetUnionName()))
         {
-            ChipLogError(Zcl, "AmbientSensingUnion: Failed to load persisted attributes: %" CHIP_ERROR_FORMAT, err.Format());
+            CHIP_ERROR err = persistence.StoreString(
+                { mPath.mEndpointId, AmbientSensingUnion::Id, Attributes::UnionName::Id }, defaultName);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl, "AmbientSensingUnion: Failed to store default UnionName: %" CHIP_ERROR_FORMAT,
+                             err.Format());
+            }
         }
     }
 
@@ -69,11 +92,6 @@ CHIP_ERROR AmbientSensingUnionCluster::Startup(ServerClusterContext & context)
     RecalculateUnionHealth();
 
     return CHIP_NO_ERROR;
-}
-
-void AmbientSensingUnionCluster::Shutdown(ClusterShutdownType shutdownType)
-{
-    DefaultServerCluster::Shutdown(shutdownType);
 }
 
 DataModel::ActionReturnStatus AmbientSensingUnionCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
@@ -160,14 +178,7 @@ CHIP_ERROR AmbientSensingUnionCluster::SetUnionName(const CharSpan & unionName)
 
     NotifyAttributeChanged(UnionName::Id);
 
-    if (mPersistence != nullptr)
-    {
-        CHIP_ERROR err = PersistUnionName();
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(Zcl, "AmbientSensingUnion: Failed to persist UnionName: %" CHIP_ERROR_FORMAT, err.Format());
-        }
-    }
+    PersistUnionName();
 
     if (mDelegate != nullptr)
     {
@@ -504,39 +515,28 @@ void AmbientSensingUnionCluster::RecalculateUnionHealth()
 // Persistence
 // =============================================================================
 
-CHIP_ERROR AmbientSensingUnionCluster::LoadPersistedAttributes()
+void AmbientSensingUnionCluster::PersistUnionName()
 {
-    if (mPersistence == nullptr)
+    if (mContext == nullptr)
     {
-        return CHIP_ERROR_INCORRECT_STATE;
+        return;
     }
 
-    size_t loadedLength = 0;
-    CHIP_ERROR err      = mPersistence->LoadUnionName(mUnionNameBuffer, kMaxUnionNameLength, loadedLength);
-
-    if (err == CHIP_NO_ERROR)
+    Storage::String<kMaxUnionNameLength> nameToStore;
+    if (!nameToStore.SetContent(GetUnionName()))
     {
-        mUnionNameLength                   = std::min(loadedLength, kMaxUnionNameLength);
-        mUnionNameBuffer[mUnionNameLength] = '\0';
-        ChipLogProgress(Zcl, "AmbientSensingUnion: Loaded persisted UnionName: %.*s", static_cast<int>(mUnionNameLength),
-                        mUnionNameBuffer);
-    }
-    else if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
-    {
-        ChipLogProgress(Zcl, "AmbientSensingUnion: No persisted UnionName found");
+        ChipLogError(Zcl, "AmbientSensingUnion: UnionName too long to persist");
+        return;
     }
 
-    return err;
-}
+    AttributePersistence persistence(mContext->attributeStorage);
+    CHIP_ERROR err = persistence.StoreString(
+        { mPath.mEndpointId, AmbientSensingUnion::Id, Attributes::UnionName::Id }, nameToStore);
 
-CHIP_ERROR AmbientSensingUnionCluster::PersistUnionName()
-{
-    if (mPersistence == nullptr)
+    if (err != CHIP_NO_ERROR)
     {
-        return CHIP_ERROR_INCORRECT_STATE;
+        ChipLogError(Zcl, "AmbientSensingUnion: Failed to persist UnionName: %" CHIP_ERROR_FORMAT, err.Format());
     }
-
-    return mPersistence->SaveUnionName(GetUnionName());
 }
 
 } // namespace Clusters
