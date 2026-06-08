@@ -187,7 +187,7 @@ def format_pixit_error(test_name: str, missing_required: list[PixitDefinition], 
 
     if available_optional:
         lines.append("")
-        lines.append("Available optional PIXITs (with defaults):")
+        lines.append("Available optional PIXITs:")
         for pixit_def in available_optional:
             type_name = pixit_def.type.__name__
             lines.append(f"  - {pixit_def.name} ({type_name}): {pixit_def.description}")

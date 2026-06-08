@@ -584,9 +584,10 @@ class MatterBaseTest(base_test.BaseTestClass):
     def pixit(self, name: str, default: Any = None) -> Any:
         """Get a declared PIXIT value by name.
 
-        Retrieves the value from user_params. If not found, falls back to the
-        default specified in the @pixit decorator, or the default
-        argument provided to this method.
+        Retrieves the value from user_params. If not found, optional PIXITs may
+        fall back to the default specified in the @pixit decorator; required
+        PIXITs do not use decorator defaults (setup validation must supply them).
+        Otherwise falls back to the ``default`` argument of this method.
 
         Args:
             name: The PIXIT parameter name (as declared in @pixit).
@@ -604,7 +605,8 @@ class MatterBaseTest(base_test.BaseTestClass):
         if test_method:
             for pixit_def in get_pixit_definitions(test_method):
                 if pixit_def.name == name:
-                    if pixit_def.default is not _PIXIT_NO_DEFAULT:
+                    if (not pixit_def.required
+                            and pixit_def.default is not _PIXIT_NO_DEFAULT):
                         return pixit_def.default
                     return default
         return default
