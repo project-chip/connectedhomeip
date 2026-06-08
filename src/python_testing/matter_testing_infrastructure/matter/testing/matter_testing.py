@@ -525,7 +525,6 @@ class MatterBaseTest(base_test.BaseTestClass):
         return global_stash.unstash_globally(self.user_params.get("hooks"))
 
     @property
-    def stored_global_wildcard(self) -> TestRunnerHooks:
     def stored_global_wildcard(self) -> Optional[Attribute.AsyncReadTransaction.ReadResponse]:
         """Accesses the cached global wildcard read populated by the test runner."""
         return global_stash.unstash_globally(self.user_params.get("stored_global_wildcard"))
