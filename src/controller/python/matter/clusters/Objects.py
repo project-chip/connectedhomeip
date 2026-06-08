@@ -55216,6 +55216,7 @@ class CommodityTariff(Cluster):
                         ClusterObjectFieldDescriptor(Label="threshold", Tag=6, Type=typing.Union[Nullable, int]),
                         ClusterObjectFieldDescriptor(Label="label", Tag=7, Type=typing.Union[None, Nullable, str]),
                         ClusterObjectFieldDescriptor(Label="predicted", Tag=8, Type=typing.Optional[bool]),
+                        ClusterObjectFieldDescriptor(Label="externalID", Tag=9, Type=typing.Optional[str]),
                     ])
 
             tariffComponentID: 'uint' = 0
@@ -55227,6 +55228,7 @@ class CommodityTariff(Cluster):
             threshold: 'typing.Union[Nullable, int]' = NullValue
             label: 'typing.Union[None, Nullable, str]' = None
             predicted: 'typing.Optional[bool]' = None
+            externalID: 'typing.Optional[str]' = None
 
         @dataclass
         class CalendarPeriodStruct(ClusterObject):

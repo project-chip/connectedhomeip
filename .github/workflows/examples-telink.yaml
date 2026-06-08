@@ -1,4 +1,4 @@
-# Copyright (c) 2022-2025 Project CHIP Authors
+# Copyright (c) 2022-2026 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -30,8 +30,43 @@ env:
     CHIP_LOG_TIMESTAMPS: false
 
 jobs:
+    build_factory_tools:
+        name: Build Factory Data tools
+        runs-on: ubuntu-latest
+        if: github.actor != 'restyled-io[bot]'
+
+        env:
+            BUILD_TYPE: telink
+
+        container:
+            image: ghcr.io/project-chip/chip-build:194
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
+
+            - name: Checkout submodules
+              run: |
+                  ./scripts/checkout_submodules.py --allow-changing-global-git-config --shallow --platform linux
+
+            - name: Build tools required for Factory Data
+              run: |
+                  ./scripts/build/gn_gen.sh
+                  ./scripts/run_in_build_env.sh "ninja -C ./out/$BUILD_TYPE chip-cert chip-tool spake2p"
+
+            - name: Upload Factory Data tools
+              uses: actions/upload-artifact@v7
+              with:
+                  name: factory-data-tools
+                  path: |
+                    ./out/${{ env.BUILD_TYPE }}/chip-cert
+                    ./out/${{ env.BUILD_TYPE }}/chip-tool
+                    ./out/${{ env.BUILD_TYPE }}/spake2p
+                  retention-days: 1
+
     zephyr_latest:
         name: Telink
+        needs: build_factory_tools
         env:
             BUILD_TYPE: telink
 
@@ -45,7 +80,7 @@ jobs:
 
         steps:
             - name: Checkout
-              uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+              uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
@@ -60,16 +95,14 @@ jobs:
             # - name: Update Zephyr version 4.1.0 (develop) to specific revision (for developers purpose)
             #   run: scripts/run_in_build_env.sh "python3 scripts/tools/telink/update_zephyr.py 1f4804a19fe7ba792bfc315948043d5515e74cd2"
 
-            - name: Build tools required for Factory Data
-              # Run test for master and all PRs
-              run: |
-                  ./scripts/checkout_submodules.py --allow-changing-global-git-config --shallow --platform linux
-                  ./scripts/build/gn_gen.sh
-                  ./scripts/run_in_build_env.sh "ninja -C ./out/$BUILD_TYPE chip-cert chip-tool spake2p"
-                  mv ./out/$BUILD_TYPE/chip-cert ./out/$BUILD_TYPE/chip-tool ./out/$BUILD_TYPE/spake2p ./out
+            - name: Download Factory Data tools
+              uses: actions/download-artifact@v8
+              with:
+                  name: factory-data-tools
+                  path: ./out
 
-            - name: clean out build output (keep tools)
-              run: rm -rf ./out/telink*
+            - name: Make Factory Data tools executable
+              run: chmod +x ./out/chip-cert ./out/chip-tool ./out/spake2p
 
             - name: Build example Telink (B92 retention) Air Quality Sensor App
               # Run test for master and s07641069 PRs
@@ -417,6 +450,7 @@ jobs:
                 slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}
     zephyr_3_3:
         name: Telink (Zephyr 3.3)
+        needs: build_factory_tools
         env:
             BUILD_TYPE: telink
 
@@ -430,7 +464,7 @@ jobs:
 
         steps:
             - name: Checkout
-              uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+              uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
@@ -445,16 +479,14 @@ jobs:
             # - name: Update Zephyr version 3.3.0 (develop_3.3) to specific revision (for developers purpose)
             #   run: scripts/run_in_build_env.sh "python3 scripts/tools/telink/update_zephyr.py a5be7391771c64062e0cbd7fd6f7ef6e05d27a8b"
 
-            - name: Build tools required for Factory Data
-              # Run test for master and all PRs
-              run: |
-                  ./scripts/checkout_submodules.py --allow-changing-global-git-config --shallow --platform linux
-                  ./scripts/build/gn_gen.sh
-                  ./scripts/run_in_build_env.sh "ninja -C ./out/$BUILD_TYPE chip-cert chip-tool spake2p"
-                  mv ./out/$BUILD_TYPE/chip-cert ./out/$BUILD_TYPE/chip-tool ./out/$BUILD_TYPE/spake2p ./out
+            - name: Download Factory Data tools
+              uses: actions/download-artifact@v8
+              with:
+                  name: factory-data-tools
+                  path: ./out
 
-            - name: clean out build output (keep tools)
-              run: rm -rf ./out/telink*
+            - name: Make Factory Data tools executable
+              run: chmod +x ./out/chip-cert ./out/chip-tool ./out/spake2p
 
             - name: Build example Telink (B92 retention) Air Quality Sensor App
               # Run test for master and s07641069 PRs
