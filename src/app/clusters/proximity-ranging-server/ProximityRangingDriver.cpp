@@ -363,14 +363,12 @@ void ProximityRangingDriver::OnMeasurementData(uint8_t sessionId, const Structs:
     {
         ChipLogProgress(Zcl, "[ProximityRangingDriver] sid=%u suppressing measurement (ReportingCondition not satisfied)",
                         sessionId);
-        // Instant ranging: a filtered measurement should not terminate the
-        // session. Re-issue StartSession so the radio tries another single
-        // shot until either one passes the filter or EndTime fires (which
-        // surfaces as kPeerNotFound via the existing remap).
-        if (isInstantRanging)
-        {
-            IssueStartSession(*s);
-        }
+        // Per the spec, instant ranging performs "a single ranging attempt
+        // ... after which the ranging session is terminated." A filtered
+        // measurement is the radio's one shot — the driver does NOT re-issue
+        // StartSession. The session simply lingers until EndTime fires; the
+        // existing peerFound=false -> kPeerNotFound remap surfaces the
+        // spec-correct outcome to the client.
         return;
     }
 
