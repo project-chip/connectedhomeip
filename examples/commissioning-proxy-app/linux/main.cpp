@@ -199,9 +199,13 @@ CPAppCommandDelegate sCPAppCommandDelegate;
 // CommissioningProxyManager gCommissioningProxyManager;
 chip::app::Clusters::CommissioningProxy::MyCPDelegate gMyCPDelegate;
 
-chip::BitMask<chip::app::Clusters::CommissioningProxy::Feature>
-    gFeatures(chip::app::Clusters::CommissioningProxy::Feature::kBackgroundScan,
-              chip::app::Clusters::CommissioningProxy::Feature::kWiFiNetworkInterface);
+chip::BitMask<chip::app::Clusters::CommissioningProxy::Feature> gFeatures(
+    chip::app::Clusters::CommissioningProxy::Feature::kBackgroundScan
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    ,
+    chip::app::Clusters::CommissioningProxy::Feature::kWiFiNetworkInterface
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+);
 
 chip::app::RegisteredServerCluster<chip::app::Clusters::CommissioningProxy::CommissioningProxyCluster>
     gCPCluster(chip::app::Clusters::CommissioningProxy::CommissioningProxyCluster::Config(CommissioningProxyEndpoint, gFeatures,

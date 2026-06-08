@@ -179,7 +179,11 @@ class TC_COMPRO_2_1(COMPROBaseTest):
         else:
             self.mark_step_range_skipped(6, 9)
 
-        # Step 10 — WiFiBand (WI feature, WiFiBandBitmap)
+        # Step 10 — WiFiBand (WI feature, WiFiBandBitmap).  The spec constraint is
+        # "desc": WiFiBand indicates the bands supported for PAFTP.  WI does not
+        # require the WiFiPAF transport bit, so a value of 0 is valid when WI is
+        # advertised without WiFiPAF.  Only require at least one band when the
+        # WiFiPAF transport is advertised; always reject undefined bits.
         wifi_band = None
         if has_wi:
             self.step(10)
@@ -187,10 +191,12 @@ class TC_COMPRO_2_1(COMPROBaseTest):
             logger.info("WiFiBand = 0x%04x", wifi_band)
             valid_band_mask = (cp.Bitmaps.WiFiBandBitmap.k2g4 |
                                cp.Bitmaps.WiFiBandBitmap.k5g)
-            asserts.assert_not_equal(wifi_band, 0,
-                                     "WiFiBand must have at least one band bit set")
             asserts.assert_equal(wifi_band & ~valid_band_mask, 0,
                                  f"WiFiBand 0x{wifi_band:04x} contains undefined band bits")
+            if transport & cp.Bitmaps.CapabilitiesBitmap.kWiFiPAF:
+                asserts.assert_not_equal(
+                    wifi_band, 0,
+                    "WiFiBand must have at least one band bit set when WiFiPAF transport is supported")
         else:
             self.skip_step(10)
 
