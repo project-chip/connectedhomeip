@@ -229,7 +229,7 @@
             ]
         },
         {
-            "name": "LightingApp (Tizen aarch64) [remote] - RUN APPLAUNCHER ON DEVICE FIRST",
+            "name": "LightingApp (Tizen aarch64) [remote]",
             "type": "cppdbg",
             "request": "launch",
 
@@ -255,7 +255,7 @@
                 },
                 {
                     "text": "set architecture aarch64",
-                    "ignoreFailures": false
+                    "ignoreFailures": true
                 },
                 {
                     "text": "set sysroot ${env:TIZEN_SDK_ROOT}/platforms/tizen-10.0/tizen/rootstraps/tizen-10.0-device64.core",
@@ -265,8 +265,7 @@
                     "text": "-enable-pretty-printing",
                     "ignoreFailures": true
                 }
-            ],
-            "stopAtEntry": false
+            ]
         },
         {
             "name": "CHIP All Clusters App (Linux)",
