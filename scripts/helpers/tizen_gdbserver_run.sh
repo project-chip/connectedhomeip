@@ -16,6 +16,14 @@ Options:
     --target SDB_ID       - SDB identifier, if not specified first connected will be used
     --help                - print help
     APP_ARGUMENTS         - arguments to pass to debugged app
+
+Example:
+$0 \\
+  --target 192.168.0.118:26101 \\
+  --gdbserver-port 9999 \\
+  --app-name "org.tizen.matter.example.lighting" \\
+  -- \\
+  wifi true discriminator 1234 passcode 11223344
 EOF
 }
 
