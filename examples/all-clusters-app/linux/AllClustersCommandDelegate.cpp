@@ -726,12 +726,6 @@ void HandleSetAmbientSensingUnionName(Json::Value & jsonValue)
     // Get the union name and validate length before processing
     std::string unionNameStr = jsonValue["UnionName"].asString();
 
-    if (unionNameStr.empty())
-    {
-        ChipLogError(NotSpecified, "UnionName cannot be empty");
-        return;
-    }
-
     // Validate length against cluster maximum
     constexpr size_t kMaxUnionNameLength = AmbientSensingUnionCluster::kMaxUnionNameLength;
     if (unionNameStr.size() > kMaxUnionNameLength)

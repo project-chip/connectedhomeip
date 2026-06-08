@@ -81,18 +81,9 @@ public:
         char key[kMaxKeyLength];
         BuildUnionNameKey(key, sizeof(key));
 
-        if (unionName.empty())
-        {
-            CHIP_ERROR err = chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr().Delete(key);
-            if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
-            {
-                return CHIP_NO_ERROR;
-            }
-            return err;
-        }
-
+        // Persist empty string as a valid non-volatile value.
+        // (Deleting the key would make the attribute fall back to the configured default on reboot.)
         return chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr().Put(key, unionName.data(), unionName.size());
-    }
 
 private:
     static constexpr size_t kKeyPrefixLength      = 6; // "g/asu/"

@@ -17,13 +17,18 @@
 #include <app/clusters/ambient-sensing-union-server/AmbientSensingUnionCluster.h>
 #include <pw_unit_test/framework.h>
 
+#include <algorithm>
+#include <cstdio>
+#include <cstring>
+#include <memory>
+#include <string>
+
 #include <app/server-cluster/testing/AttributeTesting.h>
 #include <app/server-cluster/testing/ClusterTester.h>
 #include <app/server-cluster/testing/TestEventGenerator.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <app/server-cluster/testing/ValidateGlobalAttributes.h>
 #include <clusters/AmbientSensingUnion/Metadata.h>
-
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;

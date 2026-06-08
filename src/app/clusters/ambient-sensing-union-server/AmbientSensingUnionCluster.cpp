@@ -231,14 +231,15 @@ AmbientSensingUnionCluster::ContributorEntry * AmbientSensingUnionCluster::FindF
 static bool IsValidContributorStatus(UnionContributorStatusEnum status)
 {
     return status == UnionContributorStatusEnum::kUnionContributorOnline ||
-        status == UnionContributorStatusEnum::kUnionContributorOffline || status == UnionContributorStatusEnum::kUnknownEnumValue;
+        status == UnionContributorStatusEnum::kUnionContributorOffline;
 }
 
 CHIP_ERROR AmbientSensingUnionCluster::AddMatterContributor(NodeId nodeId, EndpointId endpointId,
                                                             AmbientSensingUnion::UnionContributorStatusEnum status)
 {
+    VerifyOrReturnError(nodeId != kUndefinedNodeId, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(endpointId != kInvalidEndpointId, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(IsValidContributorStatus(status), CHIP_ERROR_INVALID_ARGUMENT);
-
     // Check for duplicate
     if (FindMatterContributor(nodeId, endpointId) != nullptr)
     {
@@ -286,6 +287,7 @@ CHIP_ERROR AmbientSensingUnionCluster::RemoveMatterContributor(NodeId nodeId, En
 CHIP_ERROR AmbientSensingUnionCluster::UpdateMatterContributorStatus(NodeId nodeId, EndpointId endpointId,
                                                                      AmbientSensingUnion::UnionContributorStatusEnum status)
 {
+    VerifyOrReturnError(IsValidContributorStatus(status), CHIP_ERROR_INVALID_ARGUMENT);
     ContributorEntry * entry = FindMatterContributor(nodeId, endpointId);
     VerifyOrReturnError(entry != nullptr, CHIP_ERROR_NOT_FOUND);
 
@@ -310,10 +312,10 @@ CHIP_ERROR AmbientSensingUnionCluster::UpdateMatterContributorStatus(NodeId node
 CHIP_ERROR AmbientSensingUnionCluster::AddNonMatterContributor(const CharSpan & name,
                                                                AmbientSensingUnion::UnionContributorStatusEnum status)
 {
+    VerifyOrReturnError(IsValidContributorStatus(status), CHIP_ERROR_INVALID_ARGUMENT);
     // ContributorName is mandatory when NodeID is NULL
     VerifyOrReturnError(!name.empty(), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(name.size() <= kMaxContributorNameLength, CHIP_ERROR_INVALID_ARGUMENT);
-
     // Check for duplicate
     if (FindNonMatterContributor(name) != nullptr)
     {
@@ -360,9 +362,9 @@ CHIP_ERROR AmbientSensingUnionCluster::RemoveNonMatterContributor(const CharSpan
 CHIP_ERROR AmbientSensingUnionCluster::UpdateNonMatterContributorStatus(const CharSpan & name,
                                                                         AmbientSensingUnion::UnionContributorStatusEnum status)
 {
+    VerifyOrReturnError(IsValidContributorStatus(status), CHIP_ERROR_INVALID_ARGUMENT);
     ContributorEntry * entry = FindNonMatterContributor(name);
     VerifyOrReturnError(entry != nullptr, CHIP_ERROR_NOT_FOUND);
-
     if (entry->status == status)
     {
         return CHIP_NO_ERROR;
