@@ -107,9 +107,9 @@ class TC_SC_5_2(MatterBaseTest):
             TestStep("12", "If Groupcast NOT enabled or Listener disabled, skip to step 17. TH sends LeaveGroup(groupID=0)."),
             TestStep("13", "TH sends JoinGroup command with GroupID 0x0103."),
             TestStep("14", "TH reads Membership attribute from Groupcast cluster."),
-            TestStep("15a", "TH subscribes to GroupcastTesting events and sends GroupcastTesting command with EnableListenerTesting."),
-            TestStep("15b", "TH discovers a command requiring Operate privilege on the current endpoint to use as a group command."),
-            TestStep("15c", "TH sends the discovered Operate-privilege command as a group command using GroupID 0x0103."),
+            TestStep("15a", "TH subscribes to the Groupcast cluster's GroupcastTesting event on the RootNode endpoint."),
+            TestStep("15b", "TH sends GroupcastTesting command with TestOperation=EnableListenerTesting and DurationSeconds=120."),
+            TestStep("15c", "TH sends a command requiring Operate privilege available on the endpoint provided in step 13 as a group command using GroupID 0x0103."),
             TestStep("16a", "TH validates the group message was received by checking the GroupcastTesting event from DUT (AccessAllowed: true)."),
             TestStep("16b", "TH sends GroupcastTesting command with DisableTesting to restore normal operation."),
             TestStep("17", "TH sends KeySetRemove with GroupKeySetID 0x01a3."),
@@ -269,18 +269,20 @@ class TC_SC_5_2(MatterBaseTest):
             group_ids = [entry.groupID for entry in membership]
             asserts.assert_in(0x0103, group_ids, "GroupID 0x0103 not found in Membership")
 
-            # Step 15a: Subscribe to GroupcastTesting events and enable listener testing on the DUT.
+            # Step 15a: Subscribe to GroupcastTesting events on the RootNode.
             self.step("15a")
             event_sub = EventSubscriptionHandler(
                 expected_cluster=Clusters.Groupcast,
                 expected_event_id=Clusters.Groupcast.Events.GroupcastTesting.event_id)
             await event_sub.start(dev_ctrl, node_id, endpoint=0, min_interval_sec=0, max_interval_sec=30)
+
+            # Step 15b: Enable listener testing on the DUT.
+            self.step("15b")
             await dev_ctrl.SendCommand(node_id, 0, Clusters.Groupcast.Commands.GroupcastTesting(
                 testOperation=Clusters.Groupcast.Enums.GroupcastTestingEnum.kEnableListenerTesting,
                 durationSeconds=120))
 
-            # Step 15b: Discover any command requiring Operate privilege on the DUT's tested endpoint.
-            self.step("15b")
+            # Discover an Operate-privilege command on the tested endpoint.
             operate_only_commands_dict = await get_operate_only_commands(
                 dev_ctrl, node_id, exclude_ep0=True, endpoint_id_to_search=groups_endpoint)
             asserts.assert_in(groups_endpoint, operate_only_commands_dict,
