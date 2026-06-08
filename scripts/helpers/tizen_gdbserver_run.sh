@@ -185,5 +185,3 @@ SDB_PID=$!
 set +e
 wait $SDB_PID
 set -e
-
-
