@@ -1422,7 +1422,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         """Per-test teardown called by the Mobly framework after every test_ method.
 
 
-        Shuts down the background wildcard subscription.         
+        Shuts down the background wildcard subscription.
 
         Framework cleanup (DUT state restoration, extra controller shutdown) runs
         once at class end in teardown_class, not here. Override this method to add
