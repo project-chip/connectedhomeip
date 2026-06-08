@@ -155,17 +155,17 @@ SHELL ["/bin/bash", "-c"]
 RUN git rev-parse HEAD > /root/.sdk-sha-version
 
 #setup ccache
-ARG CCACHE_NOHASHDIR=1 
-ARG CCACHE_BASEDIR=/root/connectedhomeip/ 
-ARG CCACHE_NODIRECT=1 
-ARG CCACHE_PREFIX_CPP=/root/connectedhomeip/scripts/helpers/ccache-prefix-cpp.sh 
-ARG CCACHE_SLOPPINESS=time_macros 
-ARG CCACHE_DIR=/root/connectedhomeip/.ccache 
-ARG CCACHE_COMPILERCHECK=content 
-ARG CCACHE_MAXSIZE=5G 
-ARG CCACHE_COMPRESS=1 
-ARG CCACHE_COMPRESSLEVEL=6 
-ARG CHIP_PW_COMMAND_LAUNCHER=ccache 
+ARG CCACHE_NOHASHDIR=1
+ARG CCACHE_BASEDIR=/root/connectedhomeip/
+ARG CCACHE_NODIRECT=1
+ARG CCACHE_PREFIX_CPP=/root/connectedhomeip/scripts/helpers/ccache-prefix-cpp.sh
+ARG CCACHE_SLOPPINESS=time_macros
+ARG CCACHE_DIR=/root/connectedhomeip/.ccache
+ARG CCACHE_COMPILERCHECK=content
+ARG CCACHE_MAXSIZE=5G
+ARG CCACHE_COMPRESS=1
+ARG CCACHE_COMPRESSLEVEL=6
+ARG CHIP_PW_COMMAND_LAUNCHER=ccache
 
 # Target suffixes shared across all supported architectures.
 # The arch prefix (linux-x64 / linux-arm64) is prepended at build time.
@@ -177,7 +177,7 @@ RUN case ${TARGETPLATFORM} in \
             && exit 1 \
         ;; \
     esac \
-    && echo "ARCH=${ARCH}" > /tmp/arch.env 
+    && echo "ARCH=${ARCH}" > /tmp/arch.env
 
 ARG BUILD_EXAMPLES_ARGS="--pw-command-launcher=ccache --build-profile=release-size --pregen-dir ./zzz_pregenerated"
 
@@ -187,7 +187,7 @@ RUN printf '%s\n' \
     shell-ipv6only-platform-mdns \
     fabric-admin-rpc-ipv6only \
     fabric-bridge-rpc-ipv6only \
-    > /tmp/targets.txt    
+    > /tmp/targets.txt
 RUN --mount=type=cache,target=/root/connectedhomeip/.ccache \
     TARGET_ARGS=() \
     && source /tmp/arch.env \
@@ -200,13 +200,13 @@ RUN --mount=type=cache,target=/root/connectedhomeip/.ccache \
     && while IFS= read -r suffix; do \
         find out/${ARCH}-${suffix}-release-size -maxdepth 1 -type f -executable -exec mv {} out/ \; \
         && rm -rf out/${ARCH}-${suffix}-release-size; \
-    done < /tmp/targets.txt 
+    done < /tmp/targets.txt
 
 RUN printf '%s\n' \
     all-clusters-ipv6only \
     all-clusters-ipv6only-nlfaultinject \
     all-clusters-minimal-ipv6only \
-    > /tmp/targets.txt    
+    > /tmp/targets.txt
 RUN --mount=type=cache,target=/root/connectedhomeip/.ccache \
     TARGET_ARGS=() \
     && source /tmp/arch.env \
@@ -219,7 +219,7 @@ RUN --mount=type=cache,target=/root/connectedhomeip/.ccache \
     && while IFS= read -r suffix; do \
         find out/${ARCH}-${suffix}-release-size -maxdepth 1 -type f -executable -exec mv {} out/ \; \
         && rm -rf out/${ARCH}-${suffix}-release-size; \
-    done < /tmp/targets.txt 
+    done < /tmp/targets.txt
 
 RUN printf '%s\n' \
     light-ipv6only \
@@ -227,12 +227,12 @@ RUN printf '%s\n' \
     lock-ipv6only \
     air-purifier-ipv6only \
     bridge-ipv6only \
-    > /tmp/targets.txt    
+    > /tmp/targets.txt
 RUN --mount=type=cache,target=/root/connectedhomeip/.ccache \
     TARGET_ARGS=() \
     && source /tmp/arch.env \
     && set -x \
-    && source scripts/activate.sh \    
+    && source scripts/activate.sh \
     && while IFS= read -r suffix; do TARGET_ARGS+=("--target" "${ARCH}-${suffix}"); done < /tmp/targets.txt \
     && scripts/build/build_examples.py ${BUILD_EXAMPLES_ARGS}\
     "${TARGET_ARGS[@]}" \
@@ -240,19 +240,19 @@ RUN --mount=type=cache,target=/root/connectedhomeip/.ccache \
     && while IFS= read -r suffix; do \
         find out/${ARCH}-${suffix}-release-size -maxdepth 1 -type f -executable -exec mv {} out/ \; \
         && rm -rf out/${ARCH}-${suffix}-release-size; \
-    done < /tmp/targets.txt 
+    done < /tmp/targets.txt
 
 RUN printf '%s\n' \
     tv-app-ipv6only \
     tv-casting-app-ipv6only \
     camera-clang-ipv6only \
     camera-controller-ipv6only \
-    > /tmp/targets.txt    
+    > /tmp/targets.txt
 RUN --mount=type=cache,target=/root/connectedhomeip/.ccache \
     TARGET_ARGS=() \
     && source /tmp/arch.env \
     && set -x \
-    && source scripts/activate.sh \    
+    && source scripts/activate.sh \
     && while IFS= read -r suffix; do TARGET_ARGS+=("--target" "${ARCH}-${suffix}"); done < /tmp/targets.txt \
     && scripts/build/build_examples.py ${BUILD_EXAMPLES_ARGS} \
     "${TARGET_ARGS[@]}" \
@@ -260,7 +260,7 @@ RUN --mount=type=cache,target=/root/connectedhomeip/.ccache \
     && while IFS= read -r suffix; do \
         find out/${ARCH}-${suffix}-release-size -maxdepth 1 -type f -executable -exec mv {} out/ \; \
         && rm -rf out/${ARCH}-${suffix}-release-size; \
-    done < /tmp/targets.txt 
+    done < /tmp/targets.txt
 
 RUN printf '%s\n' \
     microwave-oven-ipv6only \
@@ -268,12 +268,12 @@ RUN printf '%s\n' \
     water-heater-ipv6only \
     water-leak-detector-ipv6only \
     rvc-ipv6only \
-    > /tmp/targets.txt    
+    > /tmp/targets.txt
 RUN --mount=type=cache,target=/root/connectedhomeip/.ccache \
     TARGET_ARGS=() \
     && source /tmp/arch.env \
     && set -x \
-    && source scripts/activate.sh \    
+    && source scripts/activate.sh \
     && while IFS= read -r suffix; do TARGET_ARGS+=("--target" "${ARCH}-${suffix}"); done < /tmp/targets.txt \
     && scripts/build/build_examples.py ${BUILD_EXAMPLES_ARGS} \
     "${TARGET_ARGS[@]}" \
@@ -281,19 +281,19 @@ RUN --mount=type=cache,target=/root/connectedhomeip/.ccache \
     && while IFS= read -r suffix; do \
         find out/${ARCH}-${suffix}-release-size -maxdepth 1 -type f -executable -exec mv {} out/ \; \
         && rm -rf out/${ARCH}-${suffix}-release-size; \
-    done < /tmp/targets.txt 
+    done < /tmp/targets.txt
 
 RUN printf '%s\n' \
     simulated-app1-ipv6only \
     lit-icd-ipv6only \
     energy-gateway-ipv6only \
     closure-ipv6only \
-    > /tmp/targets.txt    
+    > /tmp/targets.txt
 RUN --mount=type=cache,target=/root/connectedhomeip/.ccache \
     TARGET_ARGS=() \
     && source /tmp/arch.env \
     && set -x \
-    && source scripts/activate.sh \    
+    && source scripts/activate.sh \
     && while IFS= read -r suffix; do TARGET_ARGS+=("--target" "${ARCH}-${suffix}"); done < /tmp/targets.txt \
     && scripts/build/build_examples.py ${BUILD_EXAMPLES_ARGS}\
     "${TARGET_ARGS[@]}" \
@@ -301,17 +301,17 @@ RUN --mount=type=cache,target=/root/connectedhomeip/.ccache \
     && while IFS= read -r suffix; do \
         find out/${ARCH}-${suffix}-release-size -maxdepth 1 -type f -executable -exec mv {} out/ \; \
         && rm -rf out/${ARCH}-${suffix}-release-size; \
-    done < /tmp/targets.txt 
+    done < /tmp/targets.txt
 
 RUN printf '%s\n' \
     jf-control-app-ipv6only \
     jf-admin-app-ipv6only \
-    > /tmp/targets.txt    
+    > /tmp/targets.txt
 RUN --mount=type=cache,target=/root/connectedhomeip/.ccache \
     TARGET_ARGS=() \
     && source /tmp/arch.env \
     && set -x \
-    && source scripts/activate.sh \    
+    && source scripts/activate.sh \
     && while IFS= read -r suffix; do TARGET_ARGS+=("--target" "${ARCH}-${suffix}"); done < /tmp/targets.txt \
     && scripts/build/build_examples.py ${BUILD_EXAMPLES_ARGS}\
     "${TARGET_ARGS[@]}" \
@@ -319,17 +319,17 @@ RUN --mount=type=cache,target=/root/connectedhomeip/.ccache \
     && while IFS= read -r suffix; do \
         find out/${ARCH}-${suffix}-release-size -maxdepth 1 -type f -executable -exec mv {} out/ \; \
         && rm -rf out/${ARCH}-${suffix}-release-size; \
-    done < /tmp/targets.txt 
+    done < /tmp/targets.txt
 
 RUN printf '%s\n' \
     ota-provider-ipv6only \
     ota-requestor-ipv6only \
-    > /tmp/targets.txt    
+    > /tmp/targets.txt
 RUN --mount=type=cache,target=/root/connectedhomeip/.ccache \
     TARGET_ARGS=() \
     && source /tmp/arch.env \
     && set -x \
-    && source scripts/activate.sh \    
+    && source scripts/activate.sh \
     && while IFS= read -r suffix; do TARGET_ARGS+=("--target" "${ARCH}-${suffix}"); done < /tmp/targets.txt \
     && scripts/build/build_examples.py ${BUILD_EXAMPLES_ARGS} \
     "${TARGET_ARGS[@]}" \
@@ -337,7 +337,7 @@ RUN --mount=type=cache,target=/root/connectedhomeip/.ccache \
     && while IFS= read -r suffix; do \
         find out/${ARCH}-${suffix}-release-size -maxdepth 1 -type f -executable -exec mv {} out/ \; \
         && rm -rf out/${ARCH}-${suffix}-release-size; \
-    done < /tmp/targets.txt 
+    done < /tmp/targets.txt
 
 RUN --mount=type=cache,target=/root/connectedhomeip/.ccache \
     source scripts/activate.sh \
@@ -345,8 +345,8 @@ RUN --mount=type=cache,target=/root/connectedhomeip/.ccache \
         -m platform \
         -d true \
         --enable_nfc true \
-        --enable-ccache        
-       
+        --enable-ccache
+
 # Generate OTA image from the built OTA requestor app
 # This creates ota-requestor-app.ota for OTA testing
 RUN case ${TARGETPLATFORM} in \
@@ -440,7 +440,7 @@ COPY --from=chip-build-cert-bins /root/connectedhomeip/credentials/test/revoked-
 COPY --from=chip-build-cert-bins /root/connectedhomeip/credentials/test/revoked-attestation-certificates/revocation-sets credentials/test/revoked-attestation-certificates/revocation-sets
 
 RUN apt-get remove -y \
-    meson 
+    meson
 
-RUN apt-get autoremove -y 
+RUN apt-get autoremove -y
 RUN apt-get clean
