@@ -40,7 +40,7 @@ namespace ProximityRanging {
 
 /**
  * Hardware-free RangingAdapter that logs every API call and synthesizes
- * measurement events from the StartRangingRequest's timing fields.
+ * measurement events from the StartRangingRequest's rangingInstanceInterval.
  *
  * Read `RangingAdapter.h` first for the full platform-integration contract
  * (registration lifecycle, threading, callback semantics, optional
@@ -83,35 +83,28 @@ namespace ProximityRanging {
  *
  * Synthesized measurement timing (per Proximity Ranging spec)
  * ----------------------------------------------------------
- *   - First RangingResult emitted StartTime seconds after StartSession.
+ *   - The driver gates StartSession on the request's StartTime, so the
+ *     adapter's first synthesized RangingResult is emitted as soon as
+ *     StartSession is invoked.
  *   - If RangingInstanceInterval is present, subsequent RangingResults are
- *     emitted every interval until EndTime.
+ *     emitted every interval until the driver invokes StopSession at EndTime.
  *   - If RangingInstanceInterval is absent, exactly one RangingResult is
- *     emitted (instant ranging).
- *   - At EndTime, a RangingSessionStatus(SessionEndTimeReached) event is
- *     emitted and the session terminates.
+ *     emitted (instant ranging). The session then idles until the driver
+ *     calls StopSession at EndTime.
  *
- * REAL ADAPTER: a hardware adapter does not synthesize a timer chain. The
- * radio firmware (or its host driver) emits measurement callbacks at the
+ * REAL ADAPTER: a hardware adapter does not synthesize a measurement timer.
+ * The radio firmware (or its host driver) emits measurement callbacks at the
  * cadence the StartRangingRequest's trigger negotiated with the peer; the
- * adapter forwards each callback into OnMeasurementData and only schedules
- * its own timer for the EndTime cutoff and any safety / liveness checks.
+ * adapter forwards each callback into OnMeasurementData. There is no need
+ * for an adapter-side EndTime cutoff timer either — the driver invokes
+ * StopSession when EndTime elapses.
  *
  * ReportingCondition handling
  * ---------------------------
- * Synthesized measurements are evaluated against the captured
- * ReportingCondition before emission. Measurements that do not satisfy the
- * condition are silently dropped — this lets cert tests exercise both the
- * satisfied and unsatisfiable code paths by choosing a condition relative to
- * the fixed default distance baked into BuildMeasurement.
- *
- * REAL ADAPTER: ReportingCondition is a *transport-level* filter that the
- * cluster server already applies before invoking OnMeasurementData consumers.
- * A production adapter does NOT need to evaluate it — it simply delivers
- * every raw measurement from the radio. We only re-evaluate it here because
- * we are synthesizing measurements rather than receiving them, and applying
- * the filter at synthesis time keeps the cert harness's expected event count
- * deterministic.
+ * Synthesized measurements are NOT evaluated against ReportingCondition by
+ * this adapter — the driver applies that filter on every OnMeasurementData
+ * callback. The adapter just emits its default measurement and lets the
+ * driver suppress it when appropriate.
  *
  * Synthetic defaults are deterministic so cert tests can assert exact values.
  */
@@ -163,7 +156,7 @@ public:
     /// Destructor MUST end every session it has started — see StopAllSessions
     /// in the .cpp for the cleanup order. RangingAdapter's contract requires
     /// OnRangingSessionStopped to fire for every session the adapter has
-    /// accepted via StartSession, so a real adapter's destructor must drain
+    /// accepted via PrepareSession, so a real adapter's destructor must drain
     /// any in-flight radio sessions and notify the cluster, not just free
     /// memory.
     ~LoggingRangingAdapter() override;
@@ -178,7 +171,8 @@ public:
 
     RangingTechEnum GetTechnology() const override { return mTechnology; }
     Structs::RangingCapabilitiesStruct::Type GetCapabilities() const override;
-    ResultCodeEnum StartSession(uint8_t sessionId, const StartSessionParams & params) override;
+    ResultCodeEnum PrepareSession(uint8_t sessionId, const StartSessionParams & params) override;
+    CHIP_ERROR StartSession(uint8_t sessionId) override;
     CHIP_ERROR StopSession(uint8_t sessionId) override;
     void StopAllSessions() override;
     CHIP_ERROR GetActiveSessionIds(Span<uint8_t> & sessionIds) override;
@@ -199,29 +193,34 @@ private:
     /// Per-session state owned by the adapter.
     ///
     /// REAL ADAPTER: a hardware adapter typically still keeps a Session-like
-    /// record here, but the fields look quite different — instead of timer
-    /// deadlines and synthesized measurement plumbing, it holds the radio /
-    /// firmware handle for the in-flight ranging session, any cached crypto
-    /// material, and reservation state for shared radio resources. The
-    /// session ID is still the 1-byte value the cluster allocated, since
-    /// that is what gets surfaced over the wire and what StopSession is
-    /// keyed by.
+    /// record here, but the fields look quite different — instead of an
+    /// interval timer and synthesized measurement plumbing, it holds the
+    /// radio / firmware handle for the in-flight ranging session, any
+    /// cached crypto material, and reservation state for shared radio
+    /// resources. The session ID is still the 1-byte value the cluster
+    /// allocated, since that is what gets surfaced over the wire and what
+    /// StopSession is keyed by.
     struct Session : public TimerContext
     {
         Session(LoggingRangingAdapter & adapter, uint8_t id) : owner(adapter), sessionId(id) {}
         void TimerFired() override;
 
+        enum class State
+        {
+            kPrepared, ///< PrepareSession returned kAccepted; StartSession not yet invoked.
+            kActive,   ///< StartSession invoked; measurement cadence is running (or already emitted, for instant ranging).
+        };
+
         LoggingRangingAdapter & owner;
         uint8_t sessionId;
-        // Stub-only timing: deadlines and cadence used to synthesize
-        // OnMeasurementData callbacks. Real adapters do not need these — the
-        // radio reports measurements asynchronously on its own schedule.
-        System::Clock::Timestamp startAt = System::Clock::kZero;
-        System::Clock::Timestamp endAt   = System::Clock::kZero;
-        System::Clock::Milliseconds32 interval{ 0 }; // 0 = single-shot (instant ranging)
-        bool firstFired = false;
+        State state = State::kPrepared;
+        // Stub-only timing: cadence used to synthesize OnMeasurementData
+        // callbacks. 0 = single-shot (instant ranging). Real adapters do not
+        // need this — the radio reports measurements asynchronously on its
+        // own schedule.
+        System::Clock::Milliseconds32 interval{ 0 };
 
-        /// Set at StartSession when the captured peer identity for this
+        /// Set at PrepareSession when the captured peer identity for this
         /// session's technology matches the "unknown peer" sentinel pattern.
         /// While true, TimerFired never emits OnMeasurementData; the driver
         /// then sees no measurement pass its filter and remaps the eventual
@@ -234,29 +233,35 @@ private:
         /// the result matches the SessionID's peer.
         ///
         /// REAL ADAPTER: the cluster server already passes the peer's
-        /// identity into StartSession via the role-config field that matches
-        /// this technology — a real adapter forwards that value directly to
-        /// the radio (e.g. as the BLE scan filter target or the Wi-Fi USD
-        /// publisher key). It does not need to surface the peer in
-        /// RangingMeasurementDataStruct because the radio's measurement
-        /// already carries it.
+        /// identity into PrepareSession via the role-config field that
+        /// matches this technology — a real adapter forwards that value
+        /// directly to the radio (e.g. as the BLE scan filter target or
+        /// the Wi-Fi USD publisher key). It does not need to surface the
+        /// peer in RangingMeasurementDataStruct because the radio's
+        /// measurement already carries it.
         std::optional<uint64_t> peerBleDeviceId;
         std::optional<std::array<uint8_t, kDeviceIdentityKeyLen>> peerWiFiDevIK;
         std::optional<std::array<uint8_t, kDeviceIdentityKeyLen>> peerBltDevIK;
     };
 
-    /// Removes a session from the active list and notifies the cluster via the
-    /// callback. Safe to call from inside Session::TimerFired (vector erase
-    /// happens after the synchronous OnRangingSessionStopped notification, so
-    /// the driver's bookkeeping observes a consistent state).
+    /// Removes a session from the active list and notifies the cluster via
+    /// the callback. Safe to call from inside Session::TimerFired (vector
+    /// erase happens after the synchronous OnRangingSessionStopped
+    /// notification, so the driver's bookkeeping observes a consistent
+    /// state).
     ///
-    /// REAL ADAPTER: same callback contract — every session that StartSession
-    /// returned kAccepted for MUST be terminated via OnRangingSessionStopped.
-    /// `status` carries the reason: SessionEndTimeReached for normal expiry
-    /// and stop, HardwareError when the radio reports a failure, etc.
+    /// REAL ADAPTER: same callback contract — every session that
+    /// PrepareSession returned kAccepted for MUST be terminated via
+    /// OnRangingSessionStopped. `status` carries the reason:
+    /// SessionEndTimeReached for natural expiry and stop, HardwareError
+    /// when the radio reports a failure, etc.
     void TerminateSession(Session & session, RangingSessionStatusEnum status);
 
-    /// Schedules the next synthesized-measurement tick for `session`.
+    /// Schedules the next synthesized-measurement tick for `session`. Only
+    /// used while the session is in the kActive state. For instant ranging
+    /// (interval == 0) this is called once to fire the single measurement,
+    /// after which the session sits idle until the driver invokes
+    /// StopSession at EndTime.
     ///
     /// REAL ADAPTER: not needed — the radio reports measurements on its own.
     void ScheduleNextFire(Session & session);

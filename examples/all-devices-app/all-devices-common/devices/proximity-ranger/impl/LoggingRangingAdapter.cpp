@@ -45,19 +45,6 @@ constexpr uint16_t kDefaultErrorMarginCm = 10;
 constexpr int8_t kDefaultRssiDbm         = -50;
 constexpr int8_t kDefaultTxPowerDbm      = 0;
 
-/// Gap between the measurement fire and the terminate fire for instant
-/// ranging. Simulates a realistic measurement duration (BLE scan, WiFi RTT
-/// round trip, etc.) and gives the subscription engine time to flush a
-/// SessionIDList "session added" report before the "session removed"
-/// report — without it the two MarkDirty calls collapse into a single
-/// report carrying the final empty state, and one-shot reads from
-/// chip-tool race past the active window.
-///
-/// REAL ADAPTER: this delay is purely a stub artifact. A real instant
-/// ranging session terminates when the radio reports the single
-/// measurement, with no need to space it out from a synthesized fire.
-constexpr System::Clock::Milliseconds32 kInstantRangingTerminateDelay{ 3000 };
-
 /// Sentinel "unknown peer" identity values used by cert tests to exercise
 /// the kPeerNotFound termination path. When a StartRangingRequest arrives
 /// carrying one of these as the peer identity for the matching technology,
@@ -284,8 +271,8 @@ std::optional<BltcsConfig> LoggingRangingAdapter::GetBltcsConfig()
 }
 
 // Destruction must terminate every active session — see RangingAdapter.h's
-// "every session the adapter has accepted MUST be reported via
-// OnRangingSessionStopped" contract. StopAllSessions() walks the list and
+// "every session the adapter has accepted via PrepareSession MUST be reported
+// via OnRangingSessionStopped" contract. StopAllSessions() walks the list and
 // notifies the cluster for each entry; without it, the cluster server's
 // SessionIDList would retain stale IDs after the adapter disappeared.
 LoggingRangingAdapter::~LoggingRangingAdapter()
@@ -293,55 +280,44 @@ LoggingRangingAdapter::~LoggingRangingAdapter()
     StopAllSessions();
 }
 
-// StartSession is the synchronous entry point invoked by the cluster server
-// when it has accepted a StartRangingRequest command. The adapter must:
-//   - Determine whether the request is compatible with what the radio can
-//     do and synchronously return kRejectedInfeasibleRanging (or, for
-//     out-of-range trigger timing specifically,
-//     kRejectedInfeasibleRangingTriggers) when it is not. Capability
-//     checks belong to the adapter, not the cluster, because only the
-//     adapter knows the radio's true capabilities.
-//   - Return kAccepted as soon as the adapter has committed to the
-//     session. If the radio's start handshake takes too long to wait on
-//     synchronously, returning kAccepted here is acceptable; the adapter
-//     is then responsible for emitting OnRangingSessionStopped with an
-//     appropriate RangingSessionStatusEnum (e.g. kHardwareError) if the
-//     session subsequently fails to come up.
-//   - Track every accepted session by its 1-byte sessionId so the
-//     matching StopSession call (and any radio-driven termination) can
-//     map back to the correct in-flight session. The adapter is
-//     responsible for delivering OnRangingSessionStopped exactly once
-//     per accepted session — whether termination is client-initiated,
-//     EndTime expiry, or hardware failure — so the cluster's
-//     SessionIDList stays consistent.
-//   - Forward every measurement received from the radio into the
-//     callback's OnMeasurementData with a fully populated
-//     RangingMeasurementDataStruct, deriving each field from the radio's
-//     measurement output (distance, error margin, RSSI / Tx power for
-//     BLE Beacon RSSI, peer identity field for the bound technology, …).
+// PrepareSession is the synchronous entry point invoked by the driver when
+// the cluster server has accepted a StartRangingRequest command. The adapter
+// must:
+//   - Determine whether the request is compatible with what the radio can do
+//     and synchronously return kRejectedInfeasibleRanging (or an
+//     adapter-specific ResultCodeEnum) when it is not. Capability checks
+//     belong to the adapter, not the cluster, because only the adapter knows
+//     the radio's true capabilities.
+//   - Stage all per-session bookkeeping needed for the eventual StartSession
+//     call. PrepareSession MUST NOT yet drive the radio — measurement
+//     activity is gated on the driver-owned StartTime delay.
+//   - Track every accepted session by its 1-byte sessionId so the matching
+//     StartSession / StopSession calls (and any radio-driven termination)
+//     can map back to the correct in-flight session. The adapter is
+//     responsible for delivering OnRangingSessionStopped exactly once per
+//     accepted session — whether termination is client-initiated, EndTime
+//     expiry, or hardware failure — so the cluster's SessionIDList stays
+//     consistent.
 //   - NOT deliver OnRangingSessionStopped synchronously from inside this
 //     function — the cluster's bookkeeping isn't ready for it yet.
 //
-// REAL ADAPTER: the bulk of this function would translate `request` into a
-// radio-driver call (set scan filter, configure publisher, arm CS measurement
-// engine, etc.) and arm only the EndTime cutoff timer. Measurement cadence
-// itself is driven by the radio.
-ResultCodeEnum LoggingRangingAdapter::StartSession(uint8_t sessionId, const StartSessionParams & params)
+// REAL ADAPTER: most of this function would translate `params` into the
+// radio driver's session-staging API (allocate a session handle, configure
+// the scan filter / publisher / CS engine without yet starting it, ...).
+// Asynchronous validation that requires talking to the radio MAY return
+// kAccepted here and reject in StartSession or via OnRangingSessionStopped,
+// but doing the work synchronously is preferred where the radio supports it.
+ResultCodeEnum LoggingRangingAdapter::PrepareSession(uint8_t sessionId, const StartSessionParams & params)
 {
-    if (params.trigger.rangingInstanceInterval.HasValue())
+    if (params.rangingInstanceInterval.has_value())
     {
-        ChipLogProgress(NotSpecified,
-                        "[LoggingRangingAdapter:%s] StartSession id=%u tech=%s "
-                        "startTime=%" PRIu32 "s endTime=%" PRIu32 "s interval=%" PRIu32 "s",
-                        LogTag(), sessionId, TechName(params.technology), params.trigger.startTime, params.trigger.endTime,
-                        params.trigger.rangingInstanceInterval.Value());
+        ChipLogProgress(NotSpecified, "[LoggingRangingAdapter:%s] PrepareSession id=%u tech=%s interval=%" PRIu32 "s", LogTag(),
+                        sessionId, TechName(params.technology), params.rangingInstanceInterval.value());
     }
     else
     {
-        ChipLogProgress(NotSpecified,
-                        "[LoggingRangingAdapter:%s] StartSession id=%u tech=%s "
-                        "startTime=%" PRIu32 "s endTime=%" PRIu32 "s interval=absent",
-                        LogTag(), sessionId, TechName(params.technology), params.trigger.startTime, params.trigger.endTime);
+        ChipLogProgress(NotSpecified, "[LoggingRangingAdapter:%s] PrepareSession id=%u tech=%s interval=absent", LogTag(),
+                        sessionId, TechName(params.technology));
     }
 
     if (params.wifiRoleConfig.has_value())
@@ -368,29 +344,15 @@ ResultCodeEnum LoggingRangingAdapter::StartSession(uint8_t sessionId, const Star
                         cfg.ltk.HasValue() ? "present" : "absent");
     }
 
-    // Spec: endTime MUST be strictly greater than startTime. Detecting this
-    // here keeps the rejection path symmetric with how a real adapter would
-    // surface a radio that refuses the request — synchronous, before any
-    // async machinery starts.
-    if (params.trigger.endTime <= params.trigger.startTime)
-    {
-        ChipLogError(NotSpecified, "[LoggingRangingAdapter:%s] StartSession rejected: endTime <= startTime", LogTag());
-        return ResultCodeEnum::kRejectedInfeasibleRangingTriggers;
-    }
-
-    // REAL ADAPTER: a hardware adapter should also reject here on conditions
-    // its radio cannot satisfy — e.g. kRejectedInUse if a conflicting session
-    // already holds the radio, kRejectedSecurityNotSupported if the requested
-    // securityMode isn't available, kRejectedNoMemory on resource exhaustion.
-    auto session = std::make_unique<Session>(*this, sessionId);
-    auto now     = mTimerDelegate.GetCurrentMonotonicTimestamp();
-    session->startAt =
-        now + std::chrono::duration_cast<System::Clock::Milliseconds64>(System::Clock::Seconds32(params.trigger.startTime));
-    session->endAt =
-        now + std::chrono::duration_cast<System::Clock::Milliseconds64>(System::Clock::Seconds32(params.trigger.endTime));
-    session->interval = params.trigger.rangingInstanceInterval.HasValue()
+    // REAL ADAPTER: a hardware adapter should reject here on conditions its
+    // radio cannot satisfy — e.g. kRejectedInUse if a conflicting session
+    // already holds the radio, kRejectedSecurityNotSupported if the
+    // requested securityMode isn't available, kRejectedNoMemory on resource
+    // exhaustion.
+    auto session      = std::make_unique<Session>(*this, sessionId);
+    session->interval = params.rangingInstanceInterval.has_value()
         ? std::chrono::duration_cast<System::Clock::Milliseconds32>(
-              System::Clock::Seconds32(params.trigger.rangingInstanceInterval.Value()))
+              System::Clock::Seconds32(params.rangingInstanceInterval.value()))
         : System::Clock::Milliseconds32(0);
 
     // Capture peer identity from the role config matching this adapter's
@@ -423,8 +385,9 @@ ResultCodeEnum LoggingRangingAdapter::StartSession(uint8_t sessionId, const Star
 
     // One-time peer-identity sentinel check: if the request targets the
     // technology-specific "unknown peer" pattern, mark the session so
-    // TimerFired never emits OnMeasurementData. peerFound stays false; the
-    // driver's endAt cutoff then maps the session to kPeerNotFound.
+    // TimerFired never emits OnMeasurementData. peerFound stays false on the
+    // driver side; the driver's EndTime cutoff then maps the session to
+    // kPeerNotFound.
     session->isUnknownPeer =
         IsUnknownPeerIdentity(mTechnology, session->peerBleDeviceId, session->peerWiFiDevIK, session->peerBltDevIK);
     if (session->isUnknownPeer)
@@ -434,22 +397,51 @@ ResultCodeEnum LoggingRangingAdapter::StartSession(uint8_t sessionId, const Star
                         LogTag(), sessionId);
     }
 
-    Session * sessionPtr = session.get();
     mSessions.push_back(std::move(session));
-    ScheduleNextFire(*sessionPtr);
     return ResultCodeEnum::kAccepted;
 }
 
-// StopSession is invoked by the cluster when a client issues StopRanging.
-// Returns CHIP_ERROR_NOT_FOUND if the ID is not active so the cluster can
-// reflect that to the client. The adapter is required to deliver
-// OnRangingSessionStopped for every session it accepted via StartSession,
-// even when the termination is client-initiated.
+// StartSession is the second-phase entry point invoked by the driver after
+// the StartTime delay has elapsed (or immediately when StartTime == 0). The
+// adapter MUST:
+//   - Begin radio activity using whatever it stashed in PrepareSession.
+//   - Forward every measurement received from the radio into the callback's
+//     OnMeasurementData with a fully populated RangingMeasurementDataStruct.
+//   - Report any asynchronous failure via OnRangingSessionStopped — typically
+//     with kHardwareError.
 //
-// REAL ADAPTER: tear down the radio session here (cancel scan, release
-// publisher, abort CS measurement, etc.). If the radio's stop is async,
-// return CHIP_NO_ERROR and emit OnRangingSessionStopped only once the radio
-// has confirmed teardown.
+// REAL ADAPTER: this function calls the radio driver's "go" entry point —
+// arm the scan, fire the publisher, kick the CS measurement engine, etc.
+// The radio reports measurements asynchronously from this point on.
+CHIP_ERROR LoggingRangingAdapter::StartSession(uint8_t sessionId)
+{
+    ChipLogProgress(NotSpecified, "[LoggingRangingAdapter:%s] StartSession id=%u", LogTag(), sessionId);
+    auto it = std::find_if(mSessions.begin(), mSessions.end(),
+                           [sessionId](const std::unique_ptr<Session> & s) { return s->sessionId == sessionId; });
+    VerifyOrReturnError(it != mSessions.end(), CHIP_ERROR_NOT_FOUND);
+    Session & session = **it;
+    VerifyOrReturnError(session.state == Session::State::kPrepared, CHIP_ERROR_INCORRECT_STATE);
+
+    // Schedule the first measurement tick at 0ms so that periodic ranging
+    // emits a measurement right at start-time (matching what real radios do
+    // — the first sample arrives as soon as the radio's ranging engine has
+    // converged, not one cadence-interval later). Subsequent ticks fire on
+    // `interval` cadence via TimerFired → ScheduleNextFire.
+    session.state = Session::State::kActive;
+    LogErrorOnFailure(mTimerDelegate.StartTimer(&session, System::Clock::Milliseconds32(0)));
+    return CHIP_NO_ERROR;
+}
+
+// StopSession is invoked by the driver when a client issues StopRanging or
+// when the EndTime cutoff fires. It MUST work uniformly on both kPrepared
+// (StartSession not yet called) and kActive sessions. Returns
+// CHIP_ERROR_NOT_FOUND if the ID is not active so the cluster can reflect
+// that to the client.
+//
+// REAL ADAPTER: tear down whatever was staged or armed for this session
+// (cancel scan, release publisher, abort CS measurement, etc.). If the
+// radio's stop is async, return CHIP_NO_ERROR and emit
+// OnRangingSessionStopped only once the radio has confirmed teardown.
 CHIP_ERROR LoggingRangingAdapter::StopSession(uint8_t sessionId)
 {
     ChipLogProgress(NotSpecified, "[LoggingRangingAdapter:%s] StopSession id=%u", LogTag(), sessionId);
@@ -457,6 +449,8 @@ CHIP_ERROR LoggingRangingAdapter::StopSession(uint8_t sessionId)
                            [sessionId](const std::unique_ptr<Session> & s) { return s->sessionId == sessionId; });
     VerifyOrReturnError(it != mSessions.end(), CHIP_ERROR_NOT_FOUND);
 
+    // Cancel the measurement timer regardless of state — it was only ever
+    // armed in kActive, but CancelTimer is safe when nothing is pending.
     mTimerDelegate.CancelTimer(it->get());
 
     // Erase the session before invoking the callback so any synchronous
@@ -464,8 +458,10 @@ CHIP_ERROR LoggingRangingAdapter::StopSession(uint8_t sessionId)
     // consistent state (the stopped session is no longer reported active).
     mSessions.erase(it);
 
-    // Adapters are required to deliver OnRangingSessionStopped for every session
-    // termination. Client-initiated stop is reported as SessionEndTimeReached.
+    // Adapters are required to deliver OnRangingSessionStopped for every
+    // session termination. Client-initiated stop is reported as
+    // SessionEndTimeReached (the driver remaps to kPeerNotFound when no
+    // measurement passed its filter).
     if (mCallback != nullptr)
     {
         mCallback->OnRangingSessionStopped(sessionId, RangingSessionStatusEnum::kSessionEndTimeReached);
@@ -518,40 +514,21 @@ CHIP_ERROR LoggingRangingAdapter::GetActiveSessionIds(Span<uint8_t> & sessionIds
     return CHIP_NO_ERROR;
 }
 
-// Session::TimerFired is the synthesizer's tick. It plays three distinct
-// roles depending on session state:
-//   1. EndTime reached → terminate with kSessionEndTimeReached. The driver
-//      remaps to kPeerNotFound at OnRangingSessionStopped time when no
-//      measurement passed its ReportingCondition filter.
-//   2. Instant ranging post-measurement tick → terminate (the deferred fire
-//      from kInstantRangingTerminateDelay) with the same status, again
-//      letting the driver decide kPeerNotFound vs kSessionEndTimeReached.
-//   3. Otherwise → emit a measurement (skipped when the unknown-peer
-//      sentinel is set), advance to the next tick.
+// Session::TimerFired is the synthesizer's measurement tick. The session
+// must be kActive to reach here (StartSession is what arms the first fire).
+// Fires a measurement (skipped when the unknown-peer sentinel is set), then
+// reschedules if the cadence is periodic; for instant ranging (interval == 0)
+// the session sits idle after the single measurement until the driver
+// invokes StopSession at EndTime.
 //
-// REAL ADAPTER: this entire function is replaced by callbacks from the
-// radio. The radio reports each measurement directly into
-// OnMeasurementData(sessionId, measurement); the adapter only needs a
-// timer-driven path for the EndTime cutoff (case 1) and even that often
-// folds into the radio's own session-management layer.
+// REAL ADAPTER: this entire function is replaced by callbacks from the radio.
+// The radio reports each measurement directly into OnMeasurementData; the
+// adapter does not need a measurement-cadence timer. The driver-owned
+// EndTime cutoff likewise removes any need for an adapter-side end timer.
 void LoggingRangingAdapter::Session::TimerFired()
 {
-    auto now = owner.mTimerDelegate.GetCurrentMonotonicTimestamp();
-
-    if (now >= endAt)
+    if (state != State::kActive)
     {
-        owner.TerminateSession(*this, RangingSessionStatusEnum::kSessionEndTimeReached);
-        return;
-    }
-
-    // For instant ranging, the post-measurement fire is the deferred terminate.
-    // Splitting termination into a separate timer event lets the SessionIDList
-    // "session added" notification reach subscribers before the "session
-    // removed" notification — otherwise the report engine coalesces both
-    // MarkDirty calls into a single report carrying the final empty state.
-    if (firstFired && interval == System::Clock::Milliseconds32(0))
-    {
-        owner.TerminateSession(*this, RangingSessionStatusEnum::kSessionEndTimeReached);
         return;
     }
 
@@ -561,13 +538,16 @@ void LoggingRangingAdapter::Session::TimerFired()
         owner.mCallback->OnMeasurementData(sessionId, measurement);
     }
 
-    firstFired = true;
-    owner.ScheduleNextFire(*this);
+    if (interval != System::Clock::Milliseconds32(0))
+    {
+        owner.ScheduleNextFire(*this);
+    }
 }
 
-// Common termination path used by EndTime expiry, instant-ranging deferred
-// terminate, and any internal "stop this session now" reason. Cancels the
-// outstanding timer, notifies the cluster, and removes the session record.
+// Common termination path used by any internal "stop this session now"
+// reason that does not arrive via StopSession (e.g. simulated hardware
+// failure). Cancels the outstanding timer, notifies the cluster, and
+// removes the session record.
 //
 // REAL ADAPTER: keep the same shape but replace the timer-cancel with the
 // radio's per-session teardown call. `status` should reflect the actual
@@ -598,39 +578,17 @@ void LoggingRangingAdapter::TerminateSession(Session & session, RangingSessionSt
 
 void LoggingRangingAdapter::ScheduleNextFire(Session & session)
 {
-    auto now = mTimerDelegate.GetCurrentMonotonicTimestamp();
-
-    System::Clock::Timestamp nextAt;
-    if (!session.firstFired)
-    {
-        nextAt = session.startAt;
-    }
-    else if (session.interval == System::Clock::Milliseconds32(0))
-    {
-        // Instant ranging: defer the post-measurement terminate by a small
-        // but observable gap so subscriptions to SessionIDList see the
-        // session appear and disappear as two reports rather than coalescing
-        // them into one report carrying the final empty state.
-        nextAt = now + kInstantRangingTerminateDelay;
-    }
-    else
-    {
-        nextAt = now + session.interval;
-    }
-    if (nextAt > session.endAt)
-    {
-        nextAt = session.endAt;
-    }
-
+    // For instant ranging (interval == 0), schedule a 0ms tick so the single
+    // measurement still goes through the timer path. For periodic ranging,
+    // schedule the next interval.
     System::Clock::Milliseconds32 delay =
-        (nextAt > now) ? std::chrono::duration_cast<System::Clock::Milliseconds32>(nextAt - now) : System::Clock::Milliseconds32(0);
-
+        (session.interval != System::Clock::Milliseconds32(0)) ? session.interval : System::Clock::Milliseconds32(0);
     LogErrorOnFailure(mTimerDelegate.StartTimer(&session, delay));
 }
 
 // BuildMeasurement constructs a synthetic RangingMeasurementDataStruct with
 // deterministic defaults plus the technology-specific peer identity captured
-// at StartSession time.
+// at PrepareSession time.
 //
 // REAL ADAPTER: this function is replaced entirely. A hardware adapter
 // translates the radio's measurement output into RangingMeasurementDataStruct:

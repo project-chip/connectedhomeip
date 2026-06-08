@@ -16,11 +16,10 @@
 
 // Driver-direct unit tests covering the responsibilities the driver owns
 // independently of the cluster: ReportingCondition filtering on
-// OnMeasurementData, and remapping of the adapter-supplied
-// kSessionEndTimeReached terminal status to kPeerNotFound when no measurement
-// passed the filter. Timer-driven scheduling is intentionally NOT a driver
-// responsibility — adapters drive their own measurement cadence and end-time
-// cutoff.
+// OnMeasurementData, remapping of the adapter-supplied
+// kSessionEndTimeReached terminal status to kPeerNotFound when no
+// measurement passed the filter, and the driver-owned StartTime / EndTime
+// scheduling that gates adapter->PrepareSession → StartSession → StopSession.
 
 #include <pw_unit_test/framework.h>
 
@@ -30,7 +29,9 @@
 #include <clusters/ProximityRanging/Enums.h>
 #include <clusters/ProximityRanging/Structs.h>
 #include <lib/core/CHIPError.h>
+#include <lib/support/TimerDelegateMock.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <system/SystemClock.h>
 
 #include <vector>
 
@@ -41,8 +42,9 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::ProximityRanging;
 
-/// Records every StartSession/StopSession call and exposes its Callback so
-/// tests can drive OnMeasurementData / OnRangingSessionStopped directly.
+/// Records every PrepareSession/StartSession/StopSession call and exposes
+/// its Callback so tests can drive OnMeasurementData /
+/// OnRangingSessionStopped directly.
 class MockRangingAdapter : public RangingAdapter
 {
 public:
@@ -56,26 +58,57 @@ public:
         return cap;
     }
 
-    ResultCodeEnum StartSession(uint8_t sessionId, const StartSessionParams & params) override
+    ResultCodeEnum PrepareSession(uint8_t sessionId, const StartSessionParams & params) override
+    {
+        mLastPrepareSessionId = sessionId;
+        mLastPrepareParams    = params;
+        mPrepareCalls++;
+        if (mPrepareResult == ResultCodeEnum::kAccepted)
+        {
+            mPreparedIds.push_back(sessionId);
+        }
+        return mPrepareResult;
+    }
+
+    CHIP_ERROR StartSession(uint8_t sessionId) override
     {
         mLastStartSessionId = sessionId;
-        mLastStartParams    = params;
         mStartCalls++;
-        if (mStartResult == ResultCodeEnum::kAccepted)
+        for (auto it = mPreparedIds.begin(); it != mPreparedIds.end(); ++it)
         {
-            mActiveIds.push_back(sessionId);
+            if (*it == sessionId)
+            {
+                mPreparedIds.erase(it);
+                mActiveIds.push_back(sessionId);
+                return mStartError;
+            }
         }
-        return mStartResult;
+        return CHIP_ERROR_NOT_FOUND;
     }
 
     CHIP_ERROR StopSession(uint8_t sessionId) override
     {
+        mLastStopSessionId = sessionId;
         mStopCalls++;
+        // Active sessions are torn down with a callback.
         for (auto it = mActiveIds.begin(); it != mActiveIds.end(); ++it)
         {
             if (*it == sessionId)
             {
                 mActiveIds.erase(it);
+                if (mCallback != nullptr)
+                {
+                    mCallback->OnRangingSessionStopped(sessionId, RangingSessionStatusEnum::kSessionEndTimeReached);
+                }
+                return CHIP_NO_ERROR;
+            }
+        }
+        // Prepared-but-not-started sessions are also released and acked.
+        for (auto it = mPreparedIds.begin(); it != mPreparedIds.end(); ++it)
+        {
+            if (*it == sessionId)
+            {
+                mPreparedIds.erase(it);
                 if (mCallback != nullptr)
                 {
                     mCallback->OnRangingSessionStopped(sessionId, RangingSessionStatusEnum::kSessionEndTimeReached);
@@ -97,6 +130,15 @@ public:
                 mCallback->OnRangingSessionStopped(id, RangingSessionStatusEnum::kSessionEndTimeReached);
             }
         }
+        while (!mPreparedIds.empty())
+        {
+            uint8_t id = mPreparedIds.back();
+            mPreparedIds.pop_back();
+            if (mCallback != nullptr)
+            {
+                mCallback->OnRangingSessionStopped(id, RangingSessionStatusEnum::kSessionEndTimeReached);
+            }
+        }
     }
 
     CHIP_ERROR GetActiveSessionIds(Span<uint8_t> & out) override
@@ -112,11 +154,16 @@ public:
 
     Callback * GetCallback() const { return mCallback; }
 
-    ResultCodeEnum mStartResult = ResultCodeEnum::kAccepted;
-    int mStartCalls             = 0;
-    int mStopCalls              = 0;
-    uint8_t mLastStartSessionId = 0;
-    StartSessionParams mLastStartParams{};
+    ResultCodeEnum mPrepareResult = ResultCodeEnum::kAccepted;
+    CHIP_ERROR mStartError        = CHIP_NO_ERROR;
+    int mPrepareCalls             = 0;
+    int mStartCalls               = 0;
+    int mStopCalls                = 0;
+    uint8_t mLastPrepareSessionId = 0;
+    uint8_t mLastStartSessionId   = 0;
+    uint8_t mLastStopSessionId    = 0;
+    StartSessionParams mLastPrepareParams{};
+    std::vector<uint8_t> mPreparedIds;
     std::vector<uint8_t> mActiveIds;
 
 private:
@@ -144,10 +191,11 @@ public:
         measurements.push_back({ sessionId, measurement });
     }
     void OnSessionStopped(uint8_t sessionId, RangingSessionStatusEnum status) override { stops.push_back({ sessionId, status }); }
-    void OnAttributeChanged(AttributeId) override {}
+    void OnAttributeChanged(AttributeId attrId) override { attributeChanges.push_back(attrId); }
 
     std::vector<Measurement> measurements;
     std::vector<Stopped> stops;
+    std::vector<AttributeId> attributeChanges;
 };
 
 constexpr uint8_t kSessionId = 7;
@@ -175,9 +223,10 @@ public:
 // 1. min distance filter: measurement below min is dropped, peerFound stays false.
 TEST_F(TestProximityRangingDriver, OnMeasurementDataDistanceFilterMin)
 {
+    TimerDelegateMock timer;
     MockRangingAdapter ble(RangingTechEnum::kBLEBeaconRSSIRanging);
     RangingAdapter * adapters[] = { &ble };
-    ProximityRangingDriver driver{ Span<RangingAdapter * const>(adapters) };
+    ProximityRangingDriver driver{ Span<RangingAdapter * const>(adapters), timer };
     RecordingClusterCallback cb;
     ASSERT_EQ(driver.Init(cb), CHIP_NO_ERROR);
 
@@ -203,9 +252,10 @@ TEST_F(TestProximityRangingDriver, OnMeasurementDataDistanceFilterMin)
 // 2. max distance filter: measurement above max is dropped.
 TEST_F(TestProximityRangingDriver, OnMeasurementDataDistanceFilterMax)
 {
+    TimerDelegateMock timer;
     MockRangingAdapter ble(RangingTechEnum::kBLEBeaconRSSIRanging);
     RangingAdapter * adapters[] = { &ble };
-    ProximityRangingDriver driver{ Span<RangingAdapter * const>(adapters) };
+    ProximityRangingDriver driver{ Span<RangingAdapter * const>(adapters), timer };
     RecordingClusterCallback cb;
     ASSERT_EQ(driver.Init(cb), CHIP_NO_ERROR);
 
@@ -231,9 +281,10 @@ TEST_F(TestProximityRangingDriver, OnMeasurementDataDistanceFilterMax)
 // 3. distance is null + a min/max condition is present → drop.
 TEST_F(TestProximityRangingDriver, OnMeasurementDataDistanceNullWithCondition)
 {
+    TimerDelegateMock timer;
     MockRangingAdapter ble(RangingTechEnum::kBLEBeaconRSSIRanging);
     RangingAdapter * adapters[] = { &ble };
-    ProximityRangingDriver driver{ Span<RangingAdapter * const>(adapters) };
+    ProximityRangingDriver driver{ Span<RangingAdapter * const>(adapters), timer };
     RecordingClusterCallback cb;
     ASSERT_EQ(driver.Init(cb), CHIP_NO_ERROR);
 
@@ -254,9 +305,10 @@ TEST_F(TestProximityRangingDriver, OnMeasurementDataDistanceNullWithCondition)
 // 4. distance is null + no distance condition → forward.
 TEST_F(TestProximityRangingDriver, OnMeasurementDataDistanceNullNoCondition)
 {
+    TimerDelegateMock timer;
     MockRangingAdapter ble(RangingTechEnum::kBLEBeaconRSSIRanging);
     RangingAdapter * adapters[] = { &ble };
-    ProximityRangingDriver driver{ Span<RangingAdapter * const>(adapters) };
+    ProximityRangingDriver driver{ Span<RangingAdapter * const>(adapters), timer };
     RecordingClusterCallback cb;
     ASSERT_EQ(driver.Init(cb), CHIP_NO_ERROR);
 
@@ -273,9 +325,10 @@ TEST_F(TestProximityRangingDriver, OnMeasurementDataDistanceNullNoCondition)
 // 5. errorMargin filter: measurement with errorMargin > condition is dropped.
 TEST_F(TestProximityRangingDriver, OnMeasurementDataErrorMarginFilter)
 {
+    TimerDelegateMock timer;
     MockRangingAdapter ble(RangingTechEnum::kBLEBeaconRSSIRanging);
     RangingAdapter * adapters[] = { &ble };
-    ProximityRangingDriver driver{ Span<RangingAdapter * const>(adapters) };
+    ProximityRangingDriver driver{ Span<RangingAdapter * const>(adapters), timer };
     RecordingClusterCallback cb;
     ASSERT_EQ(driver.Init(cb), CHIP_NO_ERROR);
 
@@ -303,9 +356,10 @@ TEST_F(TestProximityRangingDriver, OnMeasurementDataErrorMarginFilter)
 // 6. No reportingCondition → all measurements forwarded.
 TEST_F(TestProximityRangingDriver, OnMeasurementDataNoReportingCondition)
 {
+    TimerDelegateMock timer;
     MockRangingAdapter ble(RangingTechEnum::kBLEBeaconRSSIRanging);
     RangingAdapter * adapters[] = { &ble };
-    ProximityRangingDriver driver{ Span<RangingAdapter * const>(adapters) };
+    ProximityRangingDriver driver{ Span<RangingAdapter * const>(adapters), timer };
     RecordingClusterCallback cb;
     ASSERT_EQ(driver.Init(cb), CHIP_NO_ERROR);
 
@@ -324,9 +378,10 @@ TEST_F(TestProximityRangingDriver, OnMeasurementDataNoReportingCondition)
 //    passed the filter → driver remaps to kPeerNotFound.
 TEST_F(TestProximityRangingDriver, TerminationStatusPeerNotFoundWhenNoMeasurementPassedFilter)
 {
+    TimerDelegateMock timer;
     MockRangingAdapter ble(RangingTechEnum::kBLEBeaconRSSIRanging);
     RangingAdapter * adapters[] = { &ble };
-    ProximityRangingDriver driver{ Span<RangingAdapter * const>(adapters) };
+    ProximityRangingDriver driver{ Span<RangingAdapter * const>(adapters), timer };
     RecordingClusterCallback cb;
     ASSERT_EQ(driver.Init(cb), CHIP_NO_ERROR);
 
@@ -351,9 +406,10 @@ TEST_F(TestProximityRangingDriver, TerminationStatusPeerNotFoundWhenNoMeasuremen
 // 8. At least one passing measurement → cluster sees kSessionEndTimeReached.
 TEST_F(TestProximityRangingDriver, TerminationStatusEndTimeReached)
 {
+    TimerDelegateMock timer;
     MockRangingAdapter ble(RangingTechEnum::kBLEBeaconRSSIRanging);
     RangingAdapter * adapters[] = { &ble };
-    ProximityRangingDriver driver{ Span<RangingAdapter * const>(adapters) };
+    ProximityRangingDriver driver{ Span<RangingAdapter * const>(adapters), timer };
     RecordingClusterCallback cb;
     ASSERT_EQ(driver.Init(cb), CHIP_NO_ERROR);
 
@@ -375,9 +431,10 @@ TEST_F(TestProximityRangingDriver, TerminationStatusEndTimeReached)
 //    peerFound state.
 TEST_F(TestProximityRangingDriver, AdapterDrivenHardwareErrorPassthrough)
 {
+    TimerDelegateMock timer;
     MockRangingAdapter ble(RangingTechEnum::kBLEBeaconRSSIRanging);
     RangingAdapter * adapters[] = { &ble };
-    ProximityRangingDriver driver{ Span<RangingAdapter * const>(adapters) };
+    ProximityRangingDriver driver{ Span<RangingAdapter * const>(adapters), timer };
     RecordingClusterCallback cb;
     ASSERT_EQ(driver.Init(cb), CHIP_NO_ERROR);
 
@@ -390,19 +447,20 @@ TEST_F(TestProximityRangingDriver, AdapterDrivenHardwareErrorPassthrough)
     driver.Shutdown();
 }
 
-// 10. Driver passes the trigger field through to the adapter (used to be the
-//     full request, now it's the narrowed StartSessionParams). reportingCondition
-//     must NOT appear on the adapter side.
-TEST_F(TestProximityRangingDriver, StartSessionParamsForwardsTriggerNotReporting)
+// 10. Driver translates the request's trigger.rangingInstanceInterval into
+//     StartSessionParams::rangingInstanceInterval; startTime / endTime stay
+//     out of the adapter-facing params.
+TEST_F(TestProximityRangingDriver, StartSessionParamsForwardsIntervalNotStartEnd)
 {
+    TimerDelegateMock timer;
     MockRangingAdapter ble(RangingTechEnum::kBLEBeaconRSSIRanging);
     RangingAdapter * adapters[] = { &ble };
-    ProximityRangingDriver driver{ Span<RangingAdapter * const>(adapters) };
+    ProximityRangingDriver driver{ Span<RangingAdapter * const>(adapters), timer };
     RecordingClusterCallback cb;
     ASSERT_EQ(driver.Init(cb), CHIP_NO_ERROR);
 
     auto request              = MakeBleRequest();
-    request.trigger.startTime = 5;
+    request.trigger.startTime = 0;
     request.trigger.endTime   = 25;
     request.trigger.rangingInstanceInterval.SetValue(3);
     Structs::ReportingConditionStruct::Type rc;
@@ -410,12 +468,140 @@ TEST_F(TestProximityRangingDriver, StartSessionParamsForwardsTriggerNotReporting
     request.reportingCondition.SetValue(rc);
     ASSERT_EQ(driver.HandleStartRanging(kSessionId, request), ResultCodeEnum::kAccepted);
 
-    EXPECT_EQ(ble.mLastStartParams.trigger.startTime, 5u);
-    EXPECT_EQ(ble.mLastStartParams.trigger.endTime, 25u);
-    ASSERT_TRUE(ble.mLastStartParams.trigger.rangingInstanceInterval.HasValue());
-    EXPECT_EQ(ble.mLastStartParams.trigger.rangingInstanceInterval.Value(), 3u);
+    ASSERT_TRUE(ble.mLastPrepareParams.rangingInstanceInterval.has_value());
+    EXPECT_EQ(ble.mLastPrepareParams.rangingInstanceInterval.value_or(0), 3u);
 
     driver.Shutdown();
+}
+
+// 11. startTime == 0 → driver invokes PrepareSession then StartSession
+//     synchronously, no timer fire required.
+TEST_F(TestProximityRangingDriver, ZeroStartTimeFiresPrepareThenStartSynchronously)
+{
+    TimerDelegateMock timer;
+    MockRangingAdapter ble(RangingTechEnum::kBLEBeaconRSSIRanging);
+    RangingAdapter * adapters[] = { &ble };
+    ProximityRangingDriver driver{ Span<RangingAdapter * const>(adapters), timer };
+    RecordingClusterCallback cb;
+    ASSERT_EQ(driver.Init(cb), CHIP_NO_ERROR);
+
+    auto request              = MakeBleRequest();
+    request.trigger.startTime = 0;
+    ASSERT_EQ(driver.HandleStartRanging(kSessionId, request), ResultCodeEnum::kAccepted);
+
+    EXPECT_EQ(ble.mPrepareCalls, 1);
+    EXPECT_EQ(ble.mStartCalls, 1);
+    EXPECT_EQ(ble.mLastPrepareSessionId, kSessionId);
+    EXPECT_EQ(ble.mLastStartSessionId, kSessionId);
+
+    driver.Shutdown();
+}
+
+// 12. startTime > 0 → driver invokes PrepareSession immediately but defers
+//     StartSession until the start timer fires. SessionIDList is dirty
+//     immediately because the sessionId is acceptance-visible.
+TEST_F(TestProximityRangingDriver, NonZeroStartTimeDefersStartUntilTimerFires)
+{
+    TimerDelegateMock timer;
+    MockRangingAdapter ble(RangingTechEnum::kBLEBeaconRSSIRanging);
+    RangingAdapter * adapters[] = { &ble };
+    ProximityRangingDriver driver{ Span<RangingAdapter * const>(adapters), timer };
+    RecordingClusterCallback cb;
+    ASSERT_EQ(driver.Init(cb), CHIP_NO_ERROR);
+
+    auto request              = MakeBleRequest();
+    request.trigger.startTime = 5;
+    request.trigger.endTime   = 60;
+    ASSERT_EQ(driver.HandleStartRanging(kSessionId, request), ResultCodeEnum::kAccepted);
+
+    EXPECT_EQ(ble.mPrepareCalls, 1);
+    EXPECT_EQ(ble.mStartCalls, 0);
+    EXPECT_EQ(driver.GetNumActiveSessionIds(), 1u);
+    EXPECT_FALSE(cb.attributeChanges.empty());
+
+    // Advance just shy of the start deadline; StartSession must still not
+    // have been invoked.
+    timer.AdvanceClock(System::Clock::Milliseconds32(4'000));
+    EXPECT_EQ(ble.mStartCalls, 0);
+
+    // Cross the 5s threshold; the driver must invoke StartSession exactly once.
+    timer.AdvanceClock(System::Clock::Milliseconds32(2'000));
+    EXPECT_EQ(ble.mStartCalls, 1);
+
+    driver.Shutdown();
+}
+
+// 13. End timer fires while session is active → driver invokes StopSession.
+//     Uses startTime == 0 so only the end timer is armed (TimerDelegateMock
+//     tracks only one timer at a time, so testing both start and end timers
+//     simultaneously requires a richer mock; the more interesting scenario
+//     for the driver is the end-time cutoff itself, exercised here).
+TEST_F(TestProximityRangingDriver, EndTimeFiresWhileSessionActive)
+{
+    TimerDelegateMock timer;
+    MockRangingAdapter ble(RangingTechEnum::kBLEBeaconRSSIRanging);
+    RangingAdapter * adapters[] = { &ble };
+    ProximityRangingDriver driver{ Span<RangingAdapter * const>(adapters), timer };
+    RecordingClusterCallback cb;
+    ASSERT_EQ(driver.Init(cb), CHIP_NO_ERROR);
+
+    auto request              = MakeBleRequest();
+    request.trigger.startTime = 0;
+    request.trigger.endTime   = 10;
+    ASSERT_EQ(driver.HandleStartRanging(kSessionId, request), ResultCodeEnum::kAccepted);
+    EXPECT_EQ(ble.mStartCalls, 1);
+
+    timer.AdvanceClock(System::Clock::Milliseconds32(11'000));
+    EXPECT_EQ(ble.mStopCalls, 1);
+    EXPECT_EQ(ble.mLastStopSessionId, kSessionId);
+    EXPECT_EQ(driver.GetNumActiveSessionIds(), 0u);
+
+    driver.Shutdown();
+}
+
+// 14. Adapter rejects in PrepareSession → no session record committed,
+//     SessionIDList is not made dirty, no timers armed.
+TEST_F(TestProximityRangingDriver, PrepareSessionRejectedByAdapter)
+{
+    TimerDelegateMock timer;
+    MockRangingAdapter ble(RangingTechEnum::kBLEBeaconRSSIRanging);
+    ble.mPrepareResult          = ResultCodeEnum::kRejectedInfeasibleRanging;
+    RangingAdapter * adapters[] = { &ble };
+    ProximityRangingDriver driver{ Span<RangingAdapter * const>(adapters), timer };
+    RecordingClusterCallback cb;
+    ASSERT_EQ(driver.Init(cb), CHIP_NO_ERROR);
+
+    EXPECT_EQ(driver.HandleStartRanging(kSessionId, MakeBleRequest()), ResultCodeEnum::kRejectedInfeasibleRanging);
+    EXPECT_EQ(ble.mPrepareCalls, 1);
+    EXPECT_EQ(ble.mStartCalls, 0);
+    EXPECT_EQ(ble.mStopCalls, 0);
+    EXPECT_EQ(driver.GetNumActiveSessionIds(), 0u);
+    EXPECT_TRUE(cb.attributeChanges.empty());
+
+    driver.Shutdown();
+}
+
+// 15. Shutdown cancels per-session timers so they cannot fire post-shutdown.
+TEST_F(TestProximityRangingDriver, ShutdownCancelsPendingTimers)
+{
+    TimerDelegateMock timer;
+    MockRangingAdapter ble(RangingTechEnum::kBLEBeaconRSSIRanging);
+    RangingAdapter * adapters[] = { &ble };
+    ProximityRangingDriver driver{ Span<RangingAdapter * const>(adapters), timer };
+    RecordingClusterCallback cb;
+    ASSERT_EQ(driver.Init(cb), CHIP_NO_ERROR);
+
+    auto request              = MakeBleRequest();
+    request.trigger.startTime = 5;
+    ASSERT_EQ(driver.HandleStartRanging(kSessionId, request), ResultCodeEnum::kAccepted);
+
+    driver.Shutdown();
+
+    // After Shutdown, advancing past the start deadline must not produce a
+    // late StartSession invocation.
+    const int startCallsAtShutdown = ble.mStartCalls;
+    timer.AdvanceClock(System::Clock::Milliseconds32(60'000));
+    EXPECT_EQ(ble.mStartCalls, startCallsAtShutdown);
 }
 
 } // namespace
