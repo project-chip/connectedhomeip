@@ -74,8 +74,8 @@ CNX_STATUS=$("${SDB_CMD[@]}" root on 2>&1 || true)
 GDBSERVER_TARGET_PATH="/opt/bin/gdbserver"
 KNOWN_TARGET_PATHS=(
     "/opt/bin/gdbserver"
-    "/opt/usr/home/owner/share/tmp/sdk_tools/gdbserver/gdbserver.xxx"
-    "/usr/bin/gdbserver.xxx"
+    "/opt/usr/home/owner/share/tmp/sdk_tools/gdbserver/gdbserver"
+    "/usr/bin/gdbserver"
 )
 
 GDBSERVER_FOUND_ON_DEVICE=false
