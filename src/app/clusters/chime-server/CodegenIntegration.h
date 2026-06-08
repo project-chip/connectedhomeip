@@ -89,6 +89,9 @@ public:
      */
     CodegenChimeCluster & Cluster() { return mCluster.Cluster(); }
 
+    // Cluster constants from the spec
+    static constexpr uint8_t kMaxChimeSoundNameSize = CodegenChimeCluster::kMaxChimeSoundNameSize;
+
 private:
     EndpointId mEndpointId;
     ChimeDelegate * mDelegate;
