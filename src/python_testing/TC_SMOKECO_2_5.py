@@ -190,7 +190,7 @@ class TC_SMOKECO_2_5(SmokeCoBaseTest):
 
         # InterconnectedSmokeAlarmHandler is optional
         self.step(2)
-        if await self.attribute_guard(endpoint=self.get_endpoint(), attribute=self.smokeco_cluster.Attributes.InterconnectSmokeAlarm):
+        if self.attribute_guard(endpoint=self.get_endpoint(), attribute=self.smokeco_cluster.Attributes.InterconnectSmokeAlarm):
             interconnected_smoke_alarm_handler = AttributeSubscriptionHandler(
                 expected_cluster=self.smokeco_cluster, expected_attribute=self.smokeco_cluster.Attributes.InterconnectSmokeAlarm)
             await interconnected_smoke_alarm_handler.start(dev_ctrl=self.default_controller, node_id=self.dut_node_id, endpoint=self.get_endpoint(), max_interval_sec=30)
@@ -233,7 +233,7 @@ class TC_SMOKECO_2_5(SmokeCoBaseTest):
 
         # InterconnectedCOAlarmHandler is Optional
         self.step(13)
-        if await self.attribute_guard(endpoint=self.get_endpoint(), attribute=self.smokeco_cluster.Attributes.InterconnectCOAlarm):
+        if self.attribute_guard(endpoint=self.get_endpoint(), attribute=self.smokeco_cluster.Attributes.InterconnectCOAlarm):
 
             interconnected_co_alarm_handler = AttributeSubscriptionHandler(
                 expected_cluster=self.smokeco_cluster, expected_attribute=self.smokeco_cluster.Attributes.InterconnectCOAlarm)
@@ -272,7 +272,7 @@ class TC_SMOKECO_2_5(SmokeCoBaseTest):
 
         # Contamination State depends on SMOKE
         self.step(23)
-        if await self.feature_guard(endpoint=self.get_endpoint(), cluster=self.smokeco_cluster, feature_int=self.smokeco_cluster.Bitmaps.Feature.kSmokeAlarm):
+        if self.feature_guard(endpoint=self.get_endpoint(), cluster=self.smokeco_cluster, feature_int=self.smokeco_cluster.Bitmaps.Feature.kSmokeAlarm):
             contamination_state_handler = AttributeSubscriptionHandler(
                 expected_cluster=self.smokeco_cluster, expected_attribute=self.smokeco_cluster.Attributes.ContaminationState)
             await contamination_state_handler.start(dev_ctrl=self.default_controller, node_id=self.dut_node_id, endpoint=self.get_endpoint(), max_interval_sec=30)
@@ -315,7 +315,7 @@ class TC_SMOKECO_2_5(SmokeCoBaseTest):
 
         # SmokeSensitivity depends on SMOKE
         self.step(32)
-        if await self.feature_guard(endpoint=self.get_endpoint(), cluster=self.smokeco_cluster, feature_int=self.smokeco_cluster.Bitmaps.Feature.kSmokeAlarm):
+        if self.feature_guard(endpoint=self.get_endpoint(), cluster=self.smokeco_cluster, feature_int=self.smokeco_cluster.Bitmaps.Feature.kSmokeAlarm):
             smokesensitivity_handler = AttributeSubscriptionHandler(
                 expected_cluster=self.smokeco_cluster, expected_attribute=self.smokeco_cluster.Attributes.SmokeSensitivityLevel)
             await smokesensitivity_handler.start(dev_ctrl=self.default_controller, node_id=self.dut_node_id, endpoint=self.get_endpoint(), max_interval_sec=30)
@@ -365,7 +365,7 @@ class TC_SMOKECO_2_5(SmokeCoBaseTest):
 
         # From step 41 to step 57 is SmokeAlarm and check if feature is enabled.
         self.step(42)
-        if await self.feature_guard(endpoint=self.get_endpoint(), cluster=self.smokeco_cluster, feature_int=self.smokeco_cluster.Bitmaps.Feature.kSmokeAlarm):
+        if self.feature_guard(endpoint=self.get_endpoint(), cluster=self.smokeco_cluster, feature_int=self.smokeco_cluster.Bitmaps.Feature.kSmokeAlarm):
             self.step(43)
             smoke_state_handler = AttributeSubscriptionHandler(
                 expected_cluster=self.smokeco_cluster, expected_attribute=self.smokeco_cluster.Attributes.SmokeState)
@@ -426,7 +426,7 @@ class TC_SMOKECO_2_5(SmokeCoBaseTest):
 
         self.step(58)
         # From step 58 to step 73 is COAlarm and check if Feature is enabled.
-        if await self.feature_guard(endpoint=self.get_endpoint(), cluster=self.smokeco_cluster, feature_int=self.smokeco_cluster.Bitmaps.Feature.kCoAlarm):
+        if self.feature_guard(endpoint=self.get_endpoint(), cluster=self.smokeco_cluster, feature_int=self.smokeco_cluster.Bitmaps.Feature.kCoAlarm):
             self.step(59)
             co_state_handler = AttributeSubscriptionHandler(
                 expected_cluster=self.smokeco_cluster, expected_attribute=self.smokeco_cluster.Attributes.COState)

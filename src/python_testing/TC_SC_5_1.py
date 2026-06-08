@@ -119,7 +119,6 @@ class TC_SC_5_1(MatterBaseTest):
 
         self.step("0b")
         endpoints = []
-        await self._populate_wildcard()
         # TODO: there's something weird with the groups cluster on EP0 of all clusters. Also, that shouldn't be there.
         # https://github.com/project-chip/matter-test-scripts/issues/770
         endpoints = [endpoint for endpoint in self.stored_global_wildcard.attributes if endpoint !=

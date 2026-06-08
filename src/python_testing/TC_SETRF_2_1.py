@@ -396,7 +396,7 @@ class TC_SETRF_2_1(CommodityTariffTestBaseHelper):
         # TH reads NextTariffComponents attribute, expects a list of TariffComponentStruct
         await self.check_next_tariff_components_attribute(endpoint)
 
-        if await self.attribute_guard(endpoint=endpoint, attribute=cluster.Attributes.DefaultRandomizationType):
+        if self.attribute_guard(endpoint=endpoint, attribute=cluster.Attributes.DefaultRandomizationType):
 
             self.step("19")
 
@@ -414,7 +414,7 @@ class TC_SETRF_2_1(CommodityTariffTestBaseHelper):
             else:  # attribute is not supported at all
                 self.skip_step("19")
 
-        if await self.attribute_guard(endpoint=endpoint, attribute=cluster.Attributes.DefaultRandomizationOffset):
+        if self.attribute_guard(endpoint=endpoint, attribute=cluster.Attributes.DefaultRandomizationOffset):
 
             self.step("20")
 

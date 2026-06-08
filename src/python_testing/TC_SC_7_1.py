@@ -35,6 +35,7 @@
 
 # Note that in the CI we are using the post-cert test as we can only start one app from the current script.
 # This should still be fine as this test has unit tests for other conditions. See test_TC_SC_7_1.py
+import asyncio
 import logging
 
 from mobly import asserts
@@ -106,6 +107,10 @@ class TC_SC_7_1(MatterBaseTest):
             else:
                 msg = "This test requires two devices for use at certification. Specify two device discriminators or QR codes ex. --discriminator 1234 5678"
             asserts.fail(msg)
+
+        # Close any existing session first so the device goes back to advertising
+        self.default_controller.ExpireSessions(nodeId=self.matter_test_config.dut_node_ids[0])
+        await asyncio.sleep(60)
 
         # Make sure these are no fabrics on the device so we know we're looking at the factory discriminator. This also ensures that the provided codes are correct.
         for i, setup_code in enumerate(self.matter_test_config.qr_code_content + self.matter_test_config.manual_code):

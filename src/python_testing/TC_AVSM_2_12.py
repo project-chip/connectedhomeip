@@ -278,7 +278,7 @@ class TC_AVSM_2_12(MatterBaseTest):
             asserts.assert_equal(nightVisionNew, nightVisionToWrite, "Value does not match what was written in step 12")
 
             # NightVisionIllum is optional, so ensure it is present
-            if await self.attribute_guard(endpoint=endpoint, attribute=attr.NightVisionIllum):
+            if self.attribute_guard(endpoint=endpoint, attribute=attr.NightVisionIllum):
                 self.step(14)
                 nightVisionIllum = await self.read_single_attribute_check_success(
                     endpoint=endpoint, cluster=cluster, attribute=attr.NightVisionIllum)
@@ -458,7 +458,7 @@ class TC_AVSM_2_12(MatterBaseTest):
                 self.skip_step(31)
 
             # MicrophoneAGCEnabled is optional so ensure it is present
-            if await self.attribute_guard(endpoint=endpoint, attribute=attr.MicrophoneAGCEnabled):
+            if self.attribute_guard(endpoint=endpoint, attribute=attr.MicrophoneAGCEnabled):
                 self.step(32)
                 micAGCEnabled = await self.read_single_attribute_check_success(
                     endpoint=endpoint, cluster=cluster, attribute=attr.MicrophoneAGCEnabled)
@@ -493,7 +493,7 @@ class TC_AVSM_2_12(MatterBaseTest):
 
         if self.imagecControlSupported:
             # Attributes are all optional, one must be present, attribute guard for each
-            if await self.attribute_guard(endpoint=endpoint, attribute=attr.ImageRotation):
+            if self.attribute_guard(endpoint=endpoint, attribute=attr.ImageRotation):
                 self.step(35)
                 imageRotation = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.ImageRotation)
                 log.info(f"Rx'd ImageRotation: {imageRotation}")
@@ -521,7 +521,7 @@ class TC_AVSM_2_12(MatterBaseTest):
                 self.skip_step(36)
                 self.skip_step(37)
 
-            if await self.attribute_guard(endpoint=endpoint, attribute=attr.ImageFlipHorizontal):
+            if self.attribute_guard(endpoint=endpoint, attribute=attr.ImageFlipHorizontal):
                 self.step(38)
                 imageFlipHorizontal = await self.read_single_attribute_check_success(
                     endpoint=endpoint, cluster=cluster, attribute=attr.ImageFlipHorizontal)
@@ -544,7 +544,7 @@ class TC_AVSM_2_12(MatterBaseTest):
                 self.skip_step(39)
                 self.skip_step(40)
 
-            if await self.attribute_guard(endpoint=endpoint, attribute=attr.ImageFlipVertical):
+            if self.attribute_guard(endpoint=endpoint, attribute=attr.ImageFlipVertical):
                 self.step(41)
                 imageFlipVertical = await self.read_single_attribute_check_success(
                     endpoint=endpoint, cluster=cluster, attribute=attr.ImageFlipVertical)
@@ -627,7 +627,7 @@ class TC_AVSM_2_12(MatterBaseTest):
             self.skip_step(48)
             self.skip_step(49)
 
-        if await self.attribute_guard(endpoint=endpoint, attribute=attr.StatusLightEnabled):
+        if self.attribute_guard(endpoint=endpoint, attribute=attr.StatusLightEnabled):
             self.step(50)
             statusLightEnabled = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.StatusLightEnabled)
@@ -650,7 +650,7 @@ class TC_AVSM_2_12(MatterBaseTest):
             self.skip_step(51)
             self.skip_step(52)
 
-        if await self.attribute_guard(endpoint=endpoint, attribute=attr.StatusLightBrightness):
+        if self.attribute_guard(endpoint=endpoint, attribute=attr.StatusLightBrightness):
             self.step(53)
             statusLightBrightness = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.StatusLightBrightness)
