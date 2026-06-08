@@ -346,12 +346,12 @@ void ConnectivityManagerImpl::OnReplied(GVariant * reply_info)
     pPafInfo->id      = publish_id;
     pPafInfo->peer_id = peer_subscribe_id;
     memcpy(pPafInfo->peer_addr, peer_addr, sizeof(uint8_t) * 6);
-    LogErrorOnFailure(PlatformMgr().ScheduleWork(
-        [](intptr_t arg) {
-            WiFiPAF::WiFiPAFSession * pInfo = reinterpret_cast<WiFiPAF::WiFiPAFSession *>(arg);
-            LogErrorOnFailure(WiFiPAFLayer::GetWiFiPAFLayer().HandleTransportConnectionInitiated(*pInfo));
-        },
-        reinterpret_cast<intptr_t>(pPafInfo)));
+    auto handleInitiated = [](intptr_t arg) {
+        WiFiPAF::WiFiPAFSession * pInfo = reinterpret_cast<WiFiPAF::WiFiPAFSession *>(arg);
+        LogErrorOnFailure(WiFiPAFLayer::GetWiFiPAFLayer().HandleTransportConnectionInitiated(*pInfo));
+    };
+    LogErrorOnFailure(PlatformMgr().ScheduleWork(handleInitiated, reinterpret_cast<intptr_t>(pPafInfo)));
+
 }
 
 void ConnectivityManagerImpl::OnNanReceive(GVariant * obj)
