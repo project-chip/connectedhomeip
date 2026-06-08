@@ -157,7 +157,9 @@ struct TransportTriggerOptionsStorage : public TransportTriggerOptionsStruct
             }
             else
             {
-                motionZones.Value().SetNull();
+                // The incoming motionZones field is present and explicitly null; SetValue()
+                // makes the stored Optional present with a null Nullable.
+                motionZones.SetValue(DataModel::NullNullable);
             }
         }
         else
