@@ -878,11 +878,11 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::FELoad(const uint8_t * in, size_t in_l
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
 
-    // Warning: SPAKE2+ Generate uses `kSpake2p_WS_Length = kP256_FE_Length + 8`
-    // (40-byte) > NUM_ECC_BYTES (32-byte)
     uECC_word_t tmp[2 * NUM_ECC_WORDS] = { 0 };
 
+    VerifyOrReturnError(in != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(in_len <= sizeof(tmp), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError((in_len % sizeof(uECC_word_t)) == 0, CHIP_ERROR_INVALID_ARGUMENT);
 
     uECC_vli_bytesToNative(tmp, in, static_cast<int>(in_len));
 
@@ -1010,13 +1010,13 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::ComputeL(uint8_t * Lout, size_t * L_le
     CHIP_ERROR error = CHIP_NO_ERROR;
     int result       = UECC_SUCCESS;
 
-    // Warning: SPAKE2+ Generate uses `kSpake2p_WS_Length = kP256_FE_Length + 8`
-    // (40-byte) > NUM_ECC_BYTES (32-byte)
     uECC_word_t tmp[2 * NUM_ECC_WORDS]   = { 0 };
     uECC_word_t w1_bn[NUM_ECC_WORDS]     = { 0 };
     uECC_word_t L_tmp[2 * NUM_ECC_WORDS] = { 0 };
 
+    VerifyOrExit(w1sin != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(w1sin_len <= sizeof(tmp), error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit((w1sin_len % sizeof(uECC_word_t)) == 0, error = CHIP_ERROR_INVALID_ARGUMENT);
 
     uECC_vli_bytesToNative(tmp, w1sin, static_cast<int>(w1sin_len));
 
