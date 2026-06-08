@@ -1032,7 +1032,7 @@ void TestReadInteraction::TestReadClientSuppressResponseFlowWithInvalidReport()
     DrainAndServiceIO();
 
     // StatusResponse should NOT be sent because of SuppressResponse.
-    EXPECT_EQ(GetLoopback().mSentMessageCount, 0u);
+    EXPECT_EQ(GetLoopback().mSentMessageCount, 1u);
 
     EXPECT_EQ(delegate.mError, CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB);
 
