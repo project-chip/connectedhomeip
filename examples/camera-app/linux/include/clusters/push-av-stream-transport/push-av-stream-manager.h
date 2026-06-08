@@ -186,6 +186,14 @@ private:
      */
     void ReleaseStreamsForConnection(uint16_t connectionID);
 
+    /**
+     * @brief Extracts the referenced audio/video stream IDs from the given transport options.
+     *        An absent or null stream ID is reported as UINT16_MAX, which the AV Stream Management delegate treats as
+     *        "no stream" and skips.
+     */
+    static void GetReferencedStreamIds(const TransportOptionsStruct & transportOptions, uint16_t & audioStreamID,
+                                       uint16_t & videoStreamID);
+
     void StartSessionMonitor();
     void StopSessionMonitor();
     void SessionMonitor();

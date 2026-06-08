@@ -117,20 +117,12 @@ PushAvStreamTransportManager::AllocatePushTransport(const TransportOptionsStruct
     /*
     Initialize video, audio stream ids with default invalid value (UINT16_MAX = 65535)
     This is necessary because the MediaController API expects these values to be set.
-    If any of video/audio stream id is absent in the transport options,UINT16_MAX max is used as default value.
+    If any of video/audio stream id is absent in the transport options, UINT16_MAX is used as default value.
     */
-    uint16_t videoStreamID = -1;
-    uint16_t audioStreamID = -1;
+    uint16_t videoStreamID = UINT16_MAX;
+    uint16_t audioStreamID = UINT16_MAX;
+    GetReferencedStreamIds(transportOptions, audioStreamID, videoStreamID);
 
-    if (transportOptions.videoStreamID.HasValue() && !transportOptions.videoStreamID.Value().IsNull())
-    {
-        videoStreamID = transportOptions.videoStreamID.Value().Value();
-    }
-
-    if (transportOptions.audioStreamID.HasValue() && !transportOptions.audioStreamID.Value().IsNull())
-    {
-        audioStreamID = transportOptions.audioStreamID.Value().Value();
-    }
     ChipLogProgress(
         Camera, "PushAvStreamTransportManager, RegisterTransport for connectionID: [%u], videoStreamID: [%u], audioStreamID: [%u]",
         connectionID, videoStreamID, audioStreamID);
@@ -202,10 +194,19 @@ void PushAvStreamTransportManager::ReleaseStreamsForConnection(uint16_t connecti
         return;
     }
 
-    const TransportOptionsStruct & transportOptions = optsIt->second;
+    uint16_t videoStreamID = UINT16_MAX;
+    uint16_t audioStreamID = UINT16_MAX;
+    GetReferencedStreamIds(optsIt->second, audioStreamID, videoStreamID);
 
-    uint16_t videoStreamID = -1;
-    uint16_t audioStreamID = -1;
+    TEMPORARY_RETURN_IGNORED mCameraDevice->GetCameraAVStreamMgmtDelegate().OnTransportReleaseAudioVideoStreams(audioStreamID,
+                                                                                                               videoStreamID);
+}
+
+void PushAvStreamTransportManager::GetReferencedStreamIds(const TransportOptionsStruct & transportOptions,
+                                                          uint16_t & audioStreamID, uint16_t & videoStreamID)
+{
+    videoStreamID = UINT16_MAX;
+    audioStreamID = UINT16_MAX;
 
     if (transportOptions.videoStreamID.HasValue() && !transportOptions.videoStreamID.Value().IsNull())
     {
@@ -216,9 +217,6 @@ void PushAvStreamTransportManager::ReleaseStreamsForConnection(uint16_t connecti
     {
         audioStreamID = transportOptions.audioStreamID.Value().Value();
     }
-
-    TEMPORARY_RETURN_IGNORED mCameraDevice->GetCameraAVStreamMgmtDelegate().OnTransportReleaseAudioVideoStreams(audioStreamID,
-                                                                                                               videoStreamID);
 }
 
 Protocols::InteractionModel::Status PushAvStreamTransportManager::DeallocatePushTransport(const uint16_t connectionID)
@@ -262,8 +260,38 @@ PushAvStreamTransportManager::ModifyPushTransport(const uint16_t connectionID, c
                   "New transport bandwidth: %u bps. Total used bandwidth: %u bps.",
                   connectionID, newTransportBandwidthbps, mTotalUsedBandwidthbps);
 
+    // Capture the streams referenced before the modification so the HAL pipeline acquire/release stays balanced if the
+    // modification changes which streams the connection references.
+    uint16_t oldAudioStreamID = UINT16_MAX;
+    uint16_t oldVideoStreamID = UINT16_MAX;
+    auto optsIt               = mTransportOptionsMap.find(connectionID);
+    if (optsIt != mTransportOptionsMap.end())
+    {
+        GetReferencedStreamIds(optsIt->second, oldAudioStreamID, oldVideoStreamID);
+    }
+
     mTransportOptionsMap[connectionID] = transportOptions;
     mTransportMap[connectionID].get()->ModifyPushTransport(transportOptions);
+
+    uint16_t newAudioStreamID = UINT16_MAX;
+    uint16_t newVideoStreamID = UINT16_MAX;
+    GetReferencedStreamIds(mTransportOptionsMap[connectionID], newAudioStreamID, newVideoStreamID);
+
+    // Release the streams that are no longer referenced and acquire the newly referenced ones. Streams that are unchanged
+    // are passed as UINT16_MAX so the delegate skips them, avoiding an unnecessary HAL pipeline stop/start.
+    if (mCameraDevice != nullptr && (oldAudioStreamID != newAudioStreamID || oldVideoStreamID != newVideoStreamID))
+    {
+        uint16_t audioToRelease = (oldAudioStreamID != newAudioStreamID) ? oldAudioStreamID : UINT16_MAX;
+        uint16_t videoToRelease = (oldVideoStreamID != newVideoStreamID) ? oldVideoStreamID : UINT16_MAX;
+        TEMPORARY_RETURN_IGNORED mCameraDevice->GetCameraAVStreamMgmtDelegate().OnTransportReleaseAudioVideoStreams(
+            audioToRelease, videoToRelease);
+
+        uint16_t audioToAcquire = (newAudioStreamID != oldAudioStreamID) ? newAudioStreamID : UINT16_MAX;
+        uint16_t videoToAcquire = (newVideoStreamID != oldVideoStreamID) ? newVideoStreamID : UINT16_MAX;
+        TEMPORARY_RETURN_IGNORED mCameraDevice->GetCameraAVStreamMgmtDelegate().OnTransportAcquireAudioVideoStreams(
+            audioToAcquire, videoToAcquire);
+    }
+
     ChipLogProgress(Camera, "PushAvStreamTransportManager, success to modify Connection :[%u]", connectionID);
 
     return Status::Success;
@@ -625,6 +653,10 @@ CHIP_ERROR PushAvStreamTransportManager::LoadCurrentConnections(std::vector<Tran
 {
     ChipLogProgress(Zcl, "Push AV Current Connections loaded");
 
+    // TODO: This is currently a no-op, so persisted Push AV connections are not restored after a reboot. When restoring
+    // connections here, each restored connection that should resume streaming must also re-acquire its referenced streams via
+    // GetCameraAVStreamMgmtDelegate().OnTransportAcquireAudioVideoStreams(); otherwise the HAL pipelines will not restart (and
+    // the destructor's ReleaseStreamsForConnection would underflow the reference count on streams that were never acquired).
     return CHIP_NO_ERROR;
 }
 
