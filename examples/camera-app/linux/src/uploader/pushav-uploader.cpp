@@ -345,13 +345,25 @@ std::string ProcessM4SUploadPath(std::string path, const std::vector<std::string
                 }
                 if (valid)
                 {
-                    int segNum = std::atoi(numStr.c_str());
+                    char * endPtr = nullptr;
+                    long segNum   = std::strtol(numStr.c_str(), &endPtr, 10);
+                    if (endPtr == numStr.c_str() || segNum < 0 || segNum > INT_MAX - 1000)
+                    {
+                        ChipLogError(Camera, "Segment number out of range: %s", numStr.c_str());
+                        return path;
+                    }
                     segNum += 1000; // Offset: 1 -> 1001, 2 -> 1002, etc.
+                    if (segNum > 9999)
+                    {
+                        ChipLogError(Camera, "Segment number overflow: %ld", segNum);
+                        segNum = 0;
+                    }
                     result.replace(numStart, numEnd - numStart, std::to_string(segNum));
                 }
                 else
                 {
                     ChipLogError(Camera, "Failed to parse segment number from path: %s", result.c_str());
+                    return path;
                 }
             }
         }
@@ -416,7 +428,8 @@ void PushAVUploader::UploadData(std::pair<std::string, std::string> data)
         {
             contentType = "application/dash+xml";
             // Strip .upload suffix so remote URL uses .mpd extension
-            fullPath = fullPath.substr(0, fullPath.size() - 7); // remove ".upload"
+            static constexpr size_t kUploadSuffixLen = 7; // strlen(".upload")
+            fullPath = fullPath.substr(0, fullPath.size() - kUploadSuffixLen);
         }
     }
     else if (extension == ".mpd")

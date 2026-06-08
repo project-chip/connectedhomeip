@@ -114,10 +114,7 @@ PushAVClipRecorder::~PushAVClipRecorder()
     if (IsFileReadyForUpload(mpdPath))
     {
         UpdateMPDParams(mpdPath.string());
-        // Use the .upload file created by UpdateMPDParams for the static MPD.
-        // The uploader strips .upload suffix when constructing the remote URL.
-        std::string uploadMpdPath = mpdPath.string() + ".upload";
-        std::string finalMpdPath  = std::filesystem::exists(uploadMpdPath) ? uploadMpdPath : mpdPath.string();
+        std::string finalMpdPath = GetUploadMpdPath(mpdPath);
         // Add SegmentTimeline to the MPD per spec
         FinalizeMPD(finalMpdPath);
         ChipLogProgress(Camera, "Uploading final MPD: %s for track: %s, sessionID: %" PRIu64 ", connectionID: %u", finalMpdPath.c_str(),
@@ -962,7 +959,13 @@ void PushAVClipRecorder::FinalizeMPD(const std::string & mpdPath)
             size_t valEnd   = lines[i].find("\"", valStart);
             if (valEnd != std::string::npos)
             {
-                timescale = std::stoll(lines[i].substr(valStart, valEnd - valStart));
+                std::string valStr = lines[i].substr(valStart, valEnd - valStart);
+                char * endPtr      = nullptr;
+                long val           = std::strtol(valStr.c_str(), &endPtr, 10);
+                if (endPtr != valStr.c_str() && *endPtr == '\0' && val >= 0)
+                {
+                    timescale = val;
+                }
             }
         }
 
@@ -973,7 +976,13 @@ void PushAVClipRecorder::FinalizeMPD(const std::string & mpdPath)
             size_t valEnd   = lines[i].find("\"", valStart);
             if (valEnd != std::string::npos)
             {
-                segDurationTs = std::stoll(lines[i].substr(valStart, valEnd - valStart));
+                std::string valStr = lines[i].substr(valStart, valEnd - valStart);
+                char * endPtr      = nullptr;
+                long val           = std::strtol(valStr.c_str(), &endPtr, 10);
+                if (endPtr != valStr.c_str() && *endPtr == '\0' && val >= 0)
+                {
+                    segDurationTs = val;
+                }
             }
         }
 
@@ -990,8 +999,19 @@ void PushAVClipRecorder::FinalizeMPD(const std::string & mpdPath)
             continue;
         }
 
-        // Build SegmentTimeline XML
-        std::string indent       = "                    "; // Match MPD indentation
+        // Build SegmentTimeline XML - derive indentation from the SegmentTemplate line
+        std::string indent;
+        for (char c : lines[i])
+        {
+            if (c == ' ' || c == '\t')
+            {
+                indent += c;
+            }
+            else
+            {
+                break;
+            }
+        }
         std::string timelineOpen   = indent + "<SegmentTimeline>";
         // Use r attribute for repeat count: r="N" means the S element repeats N additional times (total N+1)
         std::string timelineEntry;
@@ -1070,6 +1090,12 @@ void PushAVClipRecorder::FinalizeMPD(const std::string & mpdPath)
 bool PushAVClipRecorder::IsFileReadyForUpload(const std::filesystem::path & path) const
 {
     return std::filesystem::exists(path) && !std::filesystem::exists(path.string() + ".tmp");
+}
+
+std::string PushAVClipRecorder::GetUploadMpdPath(const std::filesystem::path & mpdPath) const
+{
+    std::string uploadMpdPath = mpdPath.string() + ".upload";
+    return std::filesystem::exists(uploadMpdPath) ? uploadMpdPath : mpdPath.string();
 }
 
 /**
@@ -1167,17 +1193,7 @@ void PushAVClipRecorder::FinalizeCurrentClip(ClipFinalizationReason reason)
         if (IsFileReadyForUpload(mpdPath))
         {
             UpdateMPDParams(mpdPath.string());
-            // Upload the .upload file (modified snapshot) instead of the original
-            // which FFmpeg may overwrite. The uploader strips .upload for the remote URL.
-            std::string uploadMpdPath = mpdPath.string() + ".upload";
-            if (std::filesystem::exists(uploadMpdPath))
-            {
-                CheckAndUploadFile(uploadMpdPath);
-            }
-            else
-            {
-                CheckAndUploadFile(mpdPath.string());
-            }
+            CheckAndUploadFile(GetUploadMpdPath(mpdPath));
             mUploadMPD = false; // Reset flag after successful upload
         }
         else
