@@ -45,6 +45,17 @@ constexpr uint16_t kDefaultErrorMarginCm = 10;
 constexpr int8_t kDefaultRssiDbm         = -50;
 constexpr int8_t kDefaultTxPowerDbm      = 0;
 
+/// Simulated radio measurement latency. Each StartSession call schedules a
+/// timer of this duration; when the timer fires the adapter emits exactly
+/// one OnMeasurementData. Three seconds approximates a realistic ranging
+/// operation (BLE scan window, Wi-Fi RTT round trip, BLT-CS ranging
+/// instance) and gives cert tests a stable cadence to assert against.
+///
+/// REAL ADAPTER: this delay does not exist in production. The radio reports
+/// measurements on its own schedule; the adapter forwards them as they
+/// arrive without any synthetic latency.
+constexpr System::Clock::Milliseconds32 kSimulatedRangingDuration{ 3000 };
+
 /// Sentinel "unknown peer" identity values used by cert tests to exercise
 /// the kPeerNotFound termination path. When a StartRangingRequest arrives
 /// carrying one of these as the peer identity for the matching technology,
@@ -106,6 +117,29 @@ constexpr const char * RoleName(RangingRoleEnum role)
         return "BLTReflector";
     default:
         return "Unknown";
+    }
+}
+
+/// Returns true for roles that act as a passive responder — the device that
+/// the active initiator/scanner ranges *against* (BLE beacon, Wi-Fi
+/// publisher, BLT-CS reflector). Real radios in passive-responder roles do
+/// not produce ranging measurements; only the active initiator does.
+///
+/// REAL ADAPTER: this helper does not exist in production. Whether the
+/// radio produces measurements is a property of the radio mode, not a
+/// runtime check. We need it here because the stub's StartSession would
+/// otherwise emit a synthesized measurement on the responder side too,
+/// which doesn't match what cert tests expect from a real responder.
+bool IsPassiveResponderRole(RangingRoleEnum role)
+{
+    switch (role)
+    {
+    case RangingRoleEnum::kBLEBeaconRole:
+    case RangingRoleEnum::kWiFiPublisherRole:
+    case RangingRoleEnum::kBLTReflectorRole:
+        return true;
+    default:
+        return false;
     }
 }
 
@@ -309,16 +343,8 @@ LoggingRangingAdapter::~LoggingRangingAdapter()
 // but doing the work synchronously is preferred where the radio supports it.
 ResultCodeEnum LoggingRangingAdapter::PrepareSession(uint8_t sessionId, const StartSessionParams & params)
 {
-    if (params.rangingInstanceInterval.has_value())
-    {
-        ChipLogProgress(NotSpecified, "[LoggingRangingAdapter:%s] PrepareSession id=%u tech=%s interval=%" PRIu32 "s", LogTag(),
-                        sessionId, TechName(params.technology), params.rangingInstanceInterval.value());
-    }
-    else
-    {
-        ChipLogProgress(NotSpecified, "[LoggingRangingAdapter:%s] PrepareSession id=%u tech=%s interval=absent", LogTag(),
-                        sessionId, TechName(params.technology));
-    }
+    ChipLogProgress(NotSpecified, "[LoggingRangingAdapter:%s] PrepareSession id=%u tech=%s", LogTag(), sessionId,
+                    TechName(params.technology));
 
     if (params.wifiRoleConfig.has_value())
     {
@@ -349,18 +375,19 @@ ResultCodeEnum LoggingRangingAdapter::PrepareSession(uint8_t sessionId, const St
     // already holds the radio, kRejectedSecurityNotSupported if the
     // requested securityMode isn't available, kRejectedNoMemory on resource
     // exhaustion.
-    auto session      = std::make_unique<Session>(*this, sessionId);
-    session->interval = params.rangingInstanceInterval.has_value()
-        ? std::chrono::duration_cast<System::Clock::Milliseconds32>(
-              System::Clock::Seconds32(params.rangingInstanceInterval.value()))
-        : System::Clock::Milliseconds32(0);
+    auto session = std::make_unique<Session>(*this, sessionId);
 
     // Capture peer identity from the role config matching this adapter's
     // technology; surfaced later in BuildMeasurement so the synthesized
-    // RangingResult reflects the peer this SessionID is bound to.
+    // RangingResult reflects the peer this SessionID is bound to. Also
+    // detect passive-responder roles so the stub does not synthesize
+    // measurements on the responder side (real radios in BLE-beacon /
+    // Wi-Fi-publisher / BLT-reflector mode never produce ranging
+    // measurements; only the active initiator does).
     if (params.bleRoleConfig.has_value())
     {
-        session->peerBleDeviceId = params.bleRoleConfig->peerBLEDeviceID;
+        session->peerBleDeviceId    = params.bleRoleConfig->peerBLEDeviceID;
+        session->isPassiveResponder = IsPassiveResponderRole(params.bleRoleConfig->role);
     }
     if (params.wifiRoleConfig.has_value())
     {
@@ -371,6 +398,7 @@ ResultCodeEnum LoggingRangingAdapter::PrepareSession(uint8_t sessionId, const St
             memcpy(key.data(), ik.data(), kDeviceIdentityKeyLen);
             session->peerWiFiDevIK = key;
         }
+        session->isPassiveResponder = IsPassiveResponderRole(params.wifiRoleConfig->role);
     }
     if (params.bltRoleConfig.has_value())
     {
@@ -381,6 +409,12 @@ ResultCodeEnum LoggingRangingAdapter::PrepareSession(uint8_t sessionId, const St
             memcpy(key.data(), ik.data(), kDeviceIdentityKeyLen);
             session->peerBltDevIK = key;
         }
+        session->isPassiveResponder = IsPassiveResponderRole(params.bltRoleConfig->role);
+    }
+    if (session->isPassiveResponder)
+    {
+        ChipLogProgress(NotSpecified, "[LoggingRangingAdapter:%s] sid=%u passive responder role; will not emit measurements",
+                        LogTag(), sessionId);
     }
 
     // One-time peer-identity sentinel check: if the request targets the
@@ -401,12 +435,14 @@ ResultCodeEnum LoggingRangingAdapter::PrepareSession(uint8_t sessionId, const St
     return ResultCodeEnum::kAccepted;
 }
 
-// StartSession is the second-phase entry point invoked by the driver after
-// the StartTime delay has elapsed (or immediately when StartTime == 0). The
+// StartSession triggers a single ranging instance. The driver invokes this
+// the first time after the StartTime delay (immediately when StartTime == 0)
+// and again on every rangingInstanceInterval tick for periodic ranging. The
 // adapter MUST:
 //   - Begin radio activity using whatever it stashed in PrepareSession.
 //   - Forward every measurement received from the radio into the callback's
 //     OnMeasurementData with a fully populated RangingMeasurementDataStruct.
+//   - Return CHIP_ERROR_BUSY if a previous measurement is still in flight.
 //   - Report any asynchronous failure via OnRangingSessionStopped — typically
 //     with kHardwareError.
 //
@@ -420,15 +456,17 @@ CHIP_ERROR LoggingRangingAdapter::StartSession(uint8_t sessionId)
                            [sessionId](const std::unique_ptr<Session> & s) { return s->sessionId == sessionId; });
     VerifyOrReturnError(it != mSessions.end(), CHIP_ERROR_NOT_FOUND);
     Session & session = **it;
-    VerifyOrReturnError(session.state == Session::State::kPrepared, CHIP_ERROR_INCORRECT_STATE);
+    // The driver may issue StartSession again on the next periodic tick
+    // before the previous simulated-measurement timer has fired. Surface
+    // CHIP_ERROR_BUSY so the driver can skip this tick and try again on
+    // the following one (the previous measurement will land normally).
+    VerifyOrReturnError(session.state == Session::State::kPrepared, CHIP_ERROR_BUSY);
 
-    // Schedule the first measurement tick at 0ms so that periodic ranging
-    // emits a measurement right at start-time (matching what real radios do
-    // — the first sample arrives as soon as the radio's ranging engine has
-    // converged, not one cadence-interval later). Subsequent ticks fire on
-    // `interval` cadence via TimerFired → ScheduleNextFire.
-    session.state = Session::State::kActive;
-    LogErrorOnFailure(mTimerDelegate.StartTimer(&session, System::Clock::Milliseconds32(0)));
+    // Simulate radio measurement latency. When the timer fires the adapter
+    // emits exactly one OnMeasurementData callback and returns to kPrepared
+    // so the next driver-issued StartSession can proceed.
+    session.state = Session::State::kMeasuring;
+    LogErrorOnFailure(mTimerDelegate.StartTimer(&session, kSimulatedRangingDuration));
     return CHIP_NO_ERROR;
 }
 
@@ -514,76 +552,34 @@ CHIP_ERROR LoggingRangingAdapter::GetActiveSessionIds(Span<uint8_t> & sessionIds
     return CHIP_NO_ERROR;
 }
 
-// Session::TimerFired is the synthesizer's measurement tick. The session
-// must be kActive to reach here (StartSession is what arms the first fire).
-// Fires a measurement (skipped when the unknown-peer sentinel is set), then
-// reschedules if the cadence is periodic; for instant ranging (interval == 0)
-// the session sits idle after the single measurement until the driver
-// invokes StopSession at EndTime.
+// Session::TimerFired is the simulated-radio "measurement complete" callback.
+// Emits exactly one OnMeasurementData (skipped when the unknown-peer sentinel
+// is set) and returns to kPrepared so the next driver-issued StartSession
+// can arm the next measurement. The driver owns the cadence — this adapter
+// does NOT reschedule on its own.
 //
 // REAL ADAPTER: this entire function is replaced by callbacks from the radio.
-// The radio reports each measurement directly into OnMeasurementData; the
-// adapter does not need a measurement-cadence timer. The driver-owned
-// EndTime cutoff likewise removes any need for an adapter-side end timer.
+// The radio reports each measurement directly into OnMeasurementData when
+// the ranging engine has a result; the adapter does not need a
+// measurement-cadence timer. The driver-owned EndTime cutoff likewise
+// removes any need for an adapter-side end timer.
 void LoggingRangingAdapter::Session::TimerFired()
 {
-    if (state != State::kActive)
+    if (state != State::kMeasuring)
     {
         return;
     }
 
-    if (!isUnknownPeer && owner.mCallback != nullptr)
+    state = State::kPrepared;
+    // Skip the measurement emission when the role is a passive responder
+    // (BLE-beacon / Wi-Fi-publisher / BLT-reflector) or the peer matches
+    // the kUnknownPeer sentinel — both correspond to scenarios where a real
+    // radio would not produce a ranging measurement.
+    if (!isUnknownPeer && !isPassiveResponder && owner.mCallback != nullptr)
     {
         auto measurement = owner.BuildMeasurement(*this);
         owner.mCallback->OnMeasurementData(sessionId, measurement);
     }
-
-    if (interval != System::Clock::Milliseconds32(0))
-    {
-        owner.ScheduleNextFire(*this);
-    }
-}
-
-// Common termination path used by any internal "stop this session now"
-// reason that does not arrive via StopSession (e.g. simulated hardware
-// failure). Cancels the outstanding timer, notifies the cluster, and
-// removes the session record.
-//
-// REAL ADAPTER: keep the same shape but replace the timer-cancel with the
-// radio's per-session teardown call. `status` should reflect the actual
-// reason the session ended — SessionEndTimeReached for natural expiry,
-// HardwareError for radio failure, etc.
-void LoggingRangingAdapter::TerminateSession(Session & session, RangingSessionStatusEnum status)
-{
-    uint8_t sessionId = session.sessionId;
-    mTimerDelegate.CancelTimer(&session);
-
-    auto it = std::find_if(mSessions.begin(), mSessions.end(),
-                           [sessionId](const std::unique_ptr<Session> & s) { return s->sessionId == sessionId; });
-
-    // Erase the session before invoking the callback so any synchronous
-    // query of the active session list during the callback observes a
-    // consistent state. After erase, the `session` reference is dangling
-    // and MUST NOT be used; sessionId was captured as a local above.
-    if (it != mSessions.end())
-    {
-        mSessions.erase(it);
-    }
-
-    if (mCallback != nullptr)
-    {
-        mCallback->OnRangingSessionStopped(sessionId, status);
-    }
-}
-
-void LoggingRangingAdapter::ScheduleNextFire(Session & session)
-{
-    // For instant ranging (interval == 0), schedule a 0ms tick so the single
-    // measurement still goes through the timer path. For periodic ranging,
-    // schedule the next interval.
-    System::Clock::Milliseconds32 delay =
-        (session.interval != System::Clock::Milliseconds32(0)) ? session.interval : System::Clock::Milliseconds32(0);
-    LogErrorOnFailure(mTimerDelegate.StartTimer(&session, delay));
 }
 
 // BuildMeasurement constructs a synthetic RangingMeasurementDataStruct with

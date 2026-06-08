@@ -39,8 +39,8 @@ namespace Clusters {
 namespace ProximityRanging {
 
 /**
- * Hardware-free RangingAdapter that logs every API call and synthesizes
- * measurement events from the StartRangingRequest's rangingInstanceInterval.
+ * Hardware-free RangingAdapter that logs every API call and synthesizes a
+ * single measurement per StartSession invocation.
  *
  * Read `RangingAdapter.h` first for the full platform-integration contract
  * (registration lifecycle, threading, callback semantics, optional
@@ -81,23 +81,23 @@ namespace ProximityRanging {
  *   - kWiFiRoundTripTimeRanging   (PROXR feature: WFUSDPD)
  *   - kWiFiNextGenerationRanging  (PROXR feature: WFUSDPD)
  *
- * Synthesized measurement timing (per Proximity Ranging spec)
- * ----------------------------------------------------------
- *   - The driver gates StartSession on the request's StartTime, so the
- *     adapter's first synthesized RangingResult is emitted as soon as
- *     StartSession is invoked.
- *   - If RangingInstanceInterval is present, subsequent RangingResults are
- *     emitted every interval until the driver invokes StopSession at EndTime.
- *   - If RangingInstanceInterval is absent, exactly one RangingResult is
- *     emitted (instant ranging). The session then idles until the driver
- *     calls StopSession at EndTime.
+ * Single-shot measurement model
+ * ----------------------------
+ *   - On every StartSession call, the adapter schedules a kSimulatedRangingDuration
+ *     timer (3 seconds) to simulate radio measurement latency.
+ *   - When the timer fires, the adapter emits exactly ONE OnMeasurementData
+ *     callback and returns to the kPrepared state.
+ *   - The driver owns the cadence: for periodic ranging, it calls StartSession
+ *     again on each rangingInstanceInterval tick; for instant ranging, it
+ *     calls StopSession after the first passing measurement.
+ *   - If the driver issues StartSession while a measurement is still in
+ *     flight (kMeasuring), the adapter returns CHIP_ERROR_BUSY and the driver
+ *     skips that tick.
  *
  * REAL ADAPTER: a hardware adapter does not synthesize a measurement timer.
- * The radio firmware (or its host driver) emits measurement callbacks at the
- * cadence the StartRangingRequest's trigger negotiated with the peer; the
- * adapter forwards each callback into OnMeasurementData. There is no need
- * for an adapter-side EndTime cutoff timer either — the driver invokes
- * StopSession when EndTime elapses.
+ * Its StartSession kicks off the radio's ranging engine; the radio reports a
+ * measurement asynchronously when ready. The adapter does NOT need to handle
+ * cadence or end-time — those are entirely driver-owned.
  *
  * ReportingCondition handling
  * ---------------------------
@@ -117,9 +117,9 @@ public:
     /// kWiFiNextGenerationRanging.
     ///
     /// `timerDelegate` is borrowed and must outlive this adapter; the stub
-    /// uses it to simulate measurement cadence. A hardware adapter typically
-    /// would not need a TimerDelegate at construction — it instead binds to
-    /// its radio driver here.
+    /// uses it to simulate radio measurement latency. A hardware adapter
+    /// typically would not need a TimerDelegate at construction — it instead
+    /// binds to its radio driver here.
     ///
     /// `storage` is REQUIRED only when `technology` is kBLEBeaconRSSIRanging
     /// (in which case the BLEDeviceID must be persisted across reboots so
@@ -193,13 +193,12 @@ private:
     /// Per-session state owned by the adapter.
     ///
     /// REAL ADAPTER: a hardware adapter typically still keeps a Session-like
-    /// record here, but the fields look quite different — instead of an
-    /// interval timer and synthesized measurement plumbing, it holds the
-    /// radio / firmware handle for the in-flight ranging session, any
-    /// cached crypto material, and reservation state for shared radio
-    /// resources. The session ID is still the 1-byte value the cluster
-    /// allocated, since that is what gets surfaced over the wire and what
-    /// StopSession is keyed by.
+    /// record here, but the fields look quite different — instead of a
+    /// simulated-latency timer, it holds the radio / firmware handle for
+    /// the in-flight ranging session, any cached crypto material, and
+    /// reservation state for shared radio resources. The session ID is
+    /// still the 1-byte value the cluster allocated, since that is what
+    /// gets surfaced over the wire and what StopSession is keyed by.
     struct Session : public TimerContext
     {
         Session(LoggingRangingAdapter & adapter, uint8_t id) : owner(adapter), sessionId(id) {}
@@ -207,18 +206,13 @@ private:
 
         enum class State
         {
-            kPrepared, ///< PrepareSession returned kAccepted; StartSession not yet invoked.
-            kActive,   ///< StartSession invoked; measurement cadence is running (or already emitted, for instant ranging).
+            kPrepared,  ///< PrepareSession returned kAccepted (or a measurement just completed); ready for the next StartSession.
+            kMeasuring, ///< StartSession invoked; simulated measurement timer is in flight.
         };
 
         LoggingRangingAdapter & owner;
         uint8_t sessionId;
         State state = State::kPrepared;
-        // Stub-only timing: cadence used to synthesize OnMeasurementData
-        // callbacks. 0 = single-shot (instant ranging). Real adapters do not
-        // need this — the radio reports measurements asynchronously on its
-        // own schedule.
-        System::Clock::Milliseconds32 interval{ 0 };
 
         /// Set at PrepareSession when the captured peer identity for this
         /// session's technology matches the "unknown peer" sentinel pattern.
@@ -227,6 +221,15 @@ private:
         /// kSessionEndTimeReached to kPeerNotFound — the spec-correct outcome
         /// when a hardware radio cannot range against the requested peer.
         bool isUnknownPeer = false;
+
+        /// True when the StartRangingRequest's role for this session is one
+        /// of the passive-responder roles (BLEBeacon / WiFiPublisher /
+        /// BLTReflector). Real radios in passive-responder mode do not
+        /// produce ranging measurements; only the active initiator does.
+        /// While true, TimerFired never emits OnMeasurementData — the
+        /// session simply runs until the driver explicitly stops it (either
+        /// via end-time or a StopRangingRequest from the controller).
+        bool isPassiveResponder = false;
 
         /// Per-session peer identity captured from the StartRangingRequest,
         /// surfaced in the synthesized measurement so cert tests can verify
@@ -243,28 +246,6 @@ private:
         std::optional<std::array<uint8_t, kDeviceIdentityKeyLen>> peerWiFiDevIK;
         std::optional<std::array<uint8_t, kDeviceIdentityKeyLen>> peerBltDevIK;
     };
-
-    /// Removes a session from the active list and notifies the cluster via
-    /// the callback. Safe to call from inside Session::TimerFired (vector
-    /// erase happens after the synchronous OnRangingSessionStopped
-    /// notification, so the driver's bookkeeping observes a consistent
-    /// state).
-    ///
-    /// REAL ADAPTER: same callback contract — every session that
-    /// PrepareSession returned kAccepted for MUST be terminated via
-    /// OnRangingSessionStopped. `status` carries the reason:
-    /// SessionEndTimeReached for natural expiry and stop, HardwareError
-    /// when the radio reports a failure, etc.
-    void TerminateSession(Session & session, RangingSessionStatusEnum status);
-
-    /// Schedules the next synthesized-measurement tick for `session`. Only
-    /// used while the session is in the kActive state. For instant ranging
-    /// (interval == 0) this is called once to fire the single measurement,
-    /// after which the session sits idle until the driver invokes
-    /// StopSession at EndTime.
-    ///
-    /// REAL ADAPTER: not needed — the radio reports measurements on its own.
-    void ScheduleNextFire(Session & session);
 
     /// Build the deterministic-default measurement, including the
     /// technology-specific fields populated from the session's captured peer

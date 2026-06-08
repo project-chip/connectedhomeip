@@ -75,12 +75,10 @@ public:
     {
         mLastStartSessionId = sessionId;
         mStartCalls++;
-        for (auto it = mPreparedIds.begin(); it != mPreparedIds.end(); ++it)
+        for (auto id : mPreparedIds)
         {
-            if (*it == sessionId)
+            if (id == sessionId)
             {
-                mPreparedIds.erase(it);
-                mActiveIds.push_back(sessionId);
                 return mStartError;
             }
         }
@@ -91,18 +89,6 @@ public:
     {
         mLastStopSessionId = sessionId;
         VerifyOrReturnError(mStopError == CHIP_NO_ERROR, mStopError);
-        for (auto it = mActiveIds.begin(); it != mActiveIds.end(); ++it)
-        {
-            if (*it == sessionId)
-            {
-                mActiveIds.erase(it);
-                if (mCallback != nullptr)
-                {
-                    mCallback->OnRangingSessionStopped(sessionId, RangingSessionStatusEnum::kSessionEndTimeReached);
-                }
-                return CHIP_NO_ERROR;
-            }
-        }
         for (auto it = mPreparedIds.begin(); it != mPreparedIds.end(); ++it)
         {
             if (*it == sessionId)
@@ -120,15 +106,6 @@ public:
 
     void StopAllSessions() override
     {
-        while (!mActiveIds.empty())
-        {
-            uint8_t id = mActiveIds.back();
-            mActiveIds.pop_back();
-            if (mCallback != nullptr)
-            {
-                mCallback->OnRangingSessionStopped(id, RangingSessionStatusEnum::kSessionEndTimeReached);
-            }
-        }
         while (!mPreparedIds.empty())
         {
             uint8_t id = mPreparedIds.back();
@@ -142,12 +119,12 @@ public:
 
     CHIP_ERROR GetActiveSessionIds(Span<uint8_t> & out) override
     {
-        VerifyOrReturnError(out.size() >= mActiveIds.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
-        for (size_t i = 0; i < mActiveIds.size(); i++)
+        VerifyOrReturnError(out.size() >= mPreparedIds.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
+        for (size_t i = 0; i < mPreparedIds.size(); i++)
         {
-            out[i] = mActiveIds[i];
+            out[i] = mPreparedIds[i];
         }
-        out.reduce_size(mActiveIds.size());
+        out.reduce_size(mPreparedIds.size());
         return CHIP_NO_ERROR;
     }
 
@@ -167,8 +144,9 @@ public:
     int mPrepareCalls             = 0;
     int mStartCalls               = 0;
     StartSessionParams mLastPrepareParams{};
+    /// Sessions for which PrepareSession returned kAccepted and StopSession
+    /// has not yet been invoked.
     std::vector<uint8_t> mPreparedIds;
-    std::vector<uint8_t> mActiveIds;
     std::optional<uint64_t> mDeviceId;
     std::optional<WiFiUsdConfig> mWiFiUsdConfig;
     std::optional<BltcsConfig> mBltcsConfig;

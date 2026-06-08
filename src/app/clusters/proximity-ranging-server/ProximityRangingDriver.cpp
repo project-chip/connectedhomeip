@@ -33,18 +33,14 @@ static_assert(kMaxConcurrentSessions >= 1, "ProximityRangingDriver must support 
 namespace {
 
 /// Translate a decoded StartRangingRequest into the narrowed parameter set
-/// that adapters consume. ReportingCondition and trigger.startTime /
-/// trigger.endTime are intentionally excluded — the driver applies
-/// ReportingCondition on every OnMeasurementData callback and owns the
-/// StartTime / EndTime wall-clock gating itself.
+/// that adapters consume. ReportingCondition, trigger.startTime,
+/// trigger.endTime, and trigger.rangingInstanceInterval are intentionally
+/// excluded — the driver applies ReportingCondition itself and owns all
+/// wall-clock scheduling (StartTime delay, EndTime cutoff, periodic ticks).
 StartSessionParams BuildStartParams(const Commands::StartRangingRequest::DecodableType & request)
 {
     StartSessionParams params;
     params.technology = request.technology;
-    if (request.trigger.rangingInstanceInterval.HasValue())
-    {
-        params.rangingInstanceInterval = request.trigger.rangingInstanceInterval.Value();
-    }
     if (request.BLERangingDeviceRoleConfig.HasValue())
     {
         params.bleRoleConfig = request.BLERangingDeviceRoleConfig.Value();
@@ -73,11 +69,46 @@ System::Clock::Milliseconds32 SecondsToMilliseconds32(uint32_t seconds)
     return std::chrono::duration_cast<System::Clock::Milliseconds32>(System::Clock::Seconds32(seconds));
 }
 
+/// Returns true for the responder side of a ranging pair. Real radios in
+/// these roles never produce ranging measurements; only the active
+/// initiator does. The driver uses this to suppress its kPeerNotFound remap
+/// for responder sessions, where the absence of measurements is the
+/// expected outcome rather than a peer-not-found condition.
+bool IsPassiveResponderRole(RangingRoleEnum role)
+{
+    switch (role)
+    {
+    case RangingRoleEnum::kBLEBeaconRole:
+    case RangingRoleEnum::kWiFiPublisherRole:
+    case RangingRoleEnum::kBLTReflectorRole:
+        return true;
+    default:
+        return false;
+    }
+}
+
+bool RequestIsPassiveResponder(const Commands::StartRangingRequest::DecodableType & request)
+{
+    if (request.BLERangingDeviceRoleConfig.HasValue())
+    {
+        return IsPassiveResponderRole(request.BLERangingDeviceRoleConfig.Value().role);
+    }
+    if (request.wiFiRangingDeviceRoleConfig.HasValue())
+    {
+        return IsPassiveResponderRole(request.wiFiRangingDeviceRoleConfig.Value().role);
+    }
+    if (request.BLTChannelSoundingDeviceRoleConfig.HasValue())
+    {
+        return IsPassiveResponderRole(request.BLTChannelSoundingDeviceRoleConfig.Value().role);
+    }
+    return false;
+}
+
 } // namespace
 
-void ProximityRangingDriver::StartTimer::TimerFired()
+void ProximityRangingDriver::NextTriggerTimer::TimerFired()
 {
-    mSession.owner->OnStartTimerFired(mSession);
+    mSession.owner->OnNextTriggerFired(mSession);
 }
 
 void ProximityRangingDriver::EndTimer::TimerFired()
@@ -171,6 +202,11 @@ ResultCodeEnum ProximityRangingDriver::HandleStartRanging(uint8_t sessionId,
     {
         session->reporting = request.reportingCondition.Value();
     }
+    if (request.trigger.rangingInstanceInterval.HasValue())
+    {
+        session->interval = SecondsToMilliseconds32(request.trigger.rangingInstanceInterval.Value());
+    }
+    session->isPassiveResponder = RequestIsPassiveResponder(request);
 
     // The sessionId becomes visible in SessionIDList from acceptance even if
     // its StartTime delay has not yet elapsed — the client received kAccepted
@@ -180,27 +216,21 @@ ResultCodeEnum ProximityRangingDriver::HandleStartRanging(uint8_t sessionId,
         mClusterCallback->OnAttributeChanged(Attributes::SessionIDList::Id);
     }
 
-    // Phase 2: arm StartTime / EndTime timers. trigger.endTime > trigger.startTime
-    // is enforced by the cluster's preflight (see ProximityRangingCluster::
+    // Phase 2: arm EndTime cutoff. trigger.endTime > trigger.startTime is
+    // enforced by the cluster's preflight (see ProximityRangingCluster::
     // ValidateStartRangingRequest), so endTime is always strictly positive.
     LogErrorOnFailure(mTimerDelegate.StartTimer(&session->endTimer, SecondsToMilliseconds32(request.trigger.endTime)));
 
+    // Phase 3: kick off the first measurement. With startTime == 0 we issue
+    // it synchronously on the calling thread; otherwise we arm NextTrigger
+    // for the StartTime delay and the timer's fire path will issue it.
     if (request.trigger.startTime == 0)
     {
-        // Skip the pre-start timer entirely for the common case. Adapters see
-        // an immediate Prepare → Start sequence on the calling thread.
-        CHIP_ERROR err = adapter->StartSession(sessionId);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(Zcl, "[ProximityRangingDriver] sid=%u StartSession returned %" CHIP_ERROR_FORMAT, sessionId, err.Format());
-            // Adapters that synchronously fail StartSession SHOULD also have
-            // delivered OnRangingSessionStopped via the standard path; nothing
-            // to do here beyond logging.
-        }
+        IssueStartSession(*session);
     }
     else
     {
-        LogErrorOnFailure(mTimerDelegate.StartTimer(&session->startTimer, SecondsToMilliseconds32(request.trigger.startTime)));
+        LogErrorOnFailure(mTimerDelegate.StartTimer(&session->nextTrigger, SecondsToMilliseconds32(request.trigger.startTime)));
     }
 
     return result;
@@ -211,10 +241,10 @@ CHIP_ERROR ProximityRangingDriver::HandleStopRanging(uint8_t sessionId)
     Session * session = FindSession(sessionId);
     VerifyOrReturnError(session != nullptr, CHIP_ERROR_NOT_FOUND);
 
-    // Cancel pending start/end timers so they cannot fire after the adapter
-    // has already torn the session down. Bookkeeping otherwise happens in
-    // OnRangingSessionStopped, which adapters MUST invoke for any session
-    // removal - including success of this call.
+    // Cancel pending start/periodic/end timers so they cannot fire after the
+    // adapter has already torn the session down. Bookkeeping otherwise
+    // happens in OnRangingSessionStopped, which adapters MUST invoke for any
+    // session removal — including success of this call.
     CancelSessionTimers(*session);
     return session->adapter->StopSession(sessionId);
 }
@@ -293,10 +323,15 @@ void ProximityRangingDriver::OnRangingSessionStopped(uint8_t sessionId, RangingS
     // filter. If none did, remap to kPeerNotFound. Other terminal statuses
     // (kHardwareError, kSecurityFailure, etc.) carry adapter-only context
     // and pass through verbatim.
+    //
+    // The remap is suppressed for passive-responder sessions (BLE beacon,
+    // Wi-Fi publisher, BLT-CS reflector): real radios in these roles never
+    // produce measurements, so the absence of a measurement is the expected
+    // outcome rather than a peer-not-found condition.
     Session * s = FindSession(sessionId);
     if (s != nullptr)
     {
-        if (status == RangingSessionStatusEnum::kSessionEndTimeReached && !s->peerFound)
+        if (status == RangingSessionStatusEnum::kSessionEndTimeReached && !s->peerFound && !s->isPassiveResponder)
         {
             status = RangingSessionStatusEnum::kPeerNotFound;
         }
@@ -322,16 +357,38 @@ void ProximityRangingDriver::OnMeasurementData(uint8_t sessionId, const Structs:
     Session * s = FindSession(sessionId);
     VerifyOrReturn(s != nullptr);
 
+    const bool isInstantRanging = !s->interval.has_value();
+
     if (s->reporting.has_value() && !SatisfiesReporting(*s->reporting, measurement))
     {
         ChipLogProgress(Zcl, "[ProximityRangingDriver] sid=%u suppressing measurement (ReportingCondition not satisfied)",
                         sessionId);
+        // Instant ranging: a filtered measurement should not terminate the
+        // session. Re-issue StartSession so the radio tries another single
+        // shot until either one passes the filter or EndTime fires (which
+        // surfaces as kPeerNotFound via the existing remap).
+        if (isInstantRanging)
+        {
+            IssueStartSession(*s);
+        }
         return;
     }
 
     s->peerFound = true;
-    VerifyOrReturn(mClusterCallback != nullptr);
-    mClusterCallback->OnMeasurementData(sessionId, measurement);
+    if (mClusterCallback != nullptr)
+    {
+        mClusterCallback->OnMeasurementData(sessionId, measurement);
+    }
+
+    // Instant ranging terminates after the first measurement passes the
+    // reporting filter. Cancel timers eagerly and ask the adapter to tear
+    // down — the OnRangingSessionStopped callback will retire the session
+    // and surface the RangingSessionStatus(SessionEndTimeReached) event.
+    if (isInstantRanging)
+    {
+        CancelSessionTimers(*s);
+        LogErrorOnFailure(s->adapter->StopSession(sessionId));
+    }
 }
 
 bool ProximityRangingDriver::SatisfiesReporting(const Structs::ReportingConditionStruct::Type & reporting,
@@ -399,7 +456,7 @@ ProximityRangingDriver::Session * ProximityRangingDriver::FindSession(uint8_t se
 
 void ProximityRangingDriver::CancelSessionTimers(Session & session)
 {
-    mTimerDelegate.CancelTimer(&session.startTimer);
+    mTimerDelegate.CancelTimer(&session.nextTrigger);
     mTimerDelegate.CancelTimer(&session.endTimer);
 }
 
@@ -418,17 +475,37 @@ bool ProximityRangingDriver::RetireSession(uint8_t sessionId)
     return true;
 }
 
-void ProximityRangingDriver::OnStartTimerFired(Session & session)
+void ProximityRangingDriver::IssueStartSession(Session & session)
+{
+    // CHIP_ERROR_BUSY signals the previous tick's measurement is still in
+    // flight; the next periodic tick (or instant-ranging filter retry) will
+    // call again. Other errors are logged but do not stop the session — the
+    // adapter is contractually required to surface terminal failures via
+    // OnRangingSessionStopped(kHardwareError).
+    CHIP_ERROR err = session.adapter->StartSession(session.id);
+    if (err != CHIP_NO_ERROR && err != CHIP_ERROR_BUSY)
+    {
+        ChipLogError(Zcl, "[ProximityRangingDriver] sid=%u StartSession returned %" CHIP_ERROR_FORMAT, session.id, err.Format());
+    }
+    if (err == CHIP_ERROR_BUSY)
+    {
+        ChipLogProgress(Zcl, "[ProximityRangingDriver] sid=%u StartSession busy; skipping this tick", session.id);
+    }
+
+    // Re-arm NextTrigger for the next periodic tick. Cadence is anchored
+    // from the moment we issued StartSession so the spacing between ticks
+    // is exactly `interval` regardless of measurement latency.
+    if (session.interval.has_value())
+    {
+        LogErrorOnFailure(mTimerDelegate.StartTimer(&session.nextTrigger, *session.interval));
+    }
+}
+
+void ProximityRangingDriver::OnNextTriggerFired(Session & session)
 {
     // The TimerDelegate guarantees the timer cannot fire after CancelTimer
-    // returns, so reaching here means the session is still live and the
-    // adapter is expected to begin ranging now.
-    CHIP_ERROR err = session.adapter->StartSession(session.id);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(Zcl, "[ProximityRangingDriver] sid=%u deferred StartSession returned %" CHIP_ERROR_FORMAT, session.id,
-                     err.Format());
-    }
+    // returns, so reaching here means the session is still live.
+    IssueStartSession(session);
 }
 
 void ProximityRangingDriver::OnEndTimerFired(Session & session)
@@ -437,7 +514,10 @@ void ProximityRangingDriver::OnEndTimerFired(Session & session)
     // OnRangingSessionStopped path may release the session pool slot before
     // StopSession returns.
     const uint8_t sessionId = session.id;
-    CHIP_ERROR err          = session.adapter->StopSession(sessionId);
+    // Cancel NextTrigger first so a pending periodic tick cannot fire after
+    // the adapter has acknowledged the stop.
+    mTimerDelegate.CancelTimer(&session.nextTrigger);
+    CHIP_ERROR err = session.adapter->StopSession(sessionId);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "[ProximityRangingDriver] sid=%u end-time StopSession returned %" CHIP_ERROR_FORMAT, sessionId,

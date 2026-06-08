@@ -61,21 +61,18 @@ struct BltcsConfig
 /**
  * Narrowed parameter set passed to RangingAdapter::PrepareSession.
  *
- * The driver owns wall-clock scheduling: it gates the StartTime delay before
- * calling StartSession and applies the EndTime cutoff via StopSession. Adapters
- * therefore never see the request's startTime / endTime fields — only the
- * cadence (rangingInstanceInterval, in seconds; std::nullopt means single-shot
- * "instant" ranging) and the role / band selectors the radio needs to bring
- * up the session. The driver also filters OnMeasurementData against
- * ReportingCondition itself, so adapters do not receive that field either.
+ * The driver owns ALL wall-clock scheduling for a session: it gates the
+ * StartTime delay before invoking StartSession, drives subsequent periodic
+ * ranging instances by re-invoking StartSession on each rangingInstanceInterval
+ * tick, and applies the EndTime cutoff via StopSession. Adapters therefore
+ * never see the request's startTime / endTime / rangingInstanceInterval
+ * fields — only the role / band selectors the radio needs to range with the
+ * peer. The driver also filters OnMeasurementData against ReportingCondition
+ * itself, so adapters do not receive that field either.
  */
 struct StartSessionParams
 {
     RangingTechEnum technology;
-    /// Periodic measurement interval in seconds. std::nullopt means single-shot
-    /// (instant) ranging — the adapter emits exactly one measurement and then
-    /// waits for the driver-owned end-time cutoff to terminate the session.
-    std::optional<uint32_t> rangingInstanceInterval;
     std::optional<Structs::BLERangingDeviceRoleConfigStruct::DecodableType> bleRoleConfig;
     std::optional<Structs::WiFiRangingDeviceRoleConfigStruct::DecodableType> wifiRoleConfig;
     std::optional<Structs::BLTChannelSoundingDeviceRoleConfigStruct::DecodableType> bltRoleConfig;
@@ -91,11 +88,11 @@ struct StartSessionParams
  * cluster is initialised. Adapters must outlive the driver, or be
  * unregistered before destruction.
  *
- * Two-phase session model
- * -----------------------
+ * Single-shot session model
+ * -------------------------
  * Each ranging session is brought up in two steps so the driver can centralise
- * StartTime / EndTime scheduling that would otherwise be duplicated in every
- * adapter:
+ * StartTime / EndTime / RangingInstanceInterval scheduling that would
+ * otherwise be duplicated in every adapter:
  *
  *   1. PrepareSession(sessionId, params) — synchronous. The adapter validates
  *      that the radio can satisfy the request (peer compatibility, security
@@ -106,29 +103,37 @@ struct StartSessionParams
  *      and stashed resources, those resources MUST be released on a subsequent
  *      StopSession call (see "Stop semantics" below).
  *
- *   2. StartSession(sessionId) — synchronous. Invoked by the driver after the
- *      StartTime delay (immediately when StartTime == 0). The adapter kicks
- *      off the radio activity using the parameters it stashed in
- *      PrepareSession. Returns CHIP_NO_ERROR when ranging has been kicked off;
- *      asynchronous failures are reported via OnRangingSessionStopped with an
- *      appropriate RangingSessionStatusEnum value (typically kHardwareError).
- *      Returning a non-NO_ERROR error is permitted for "could not even
- *      attempt" cases, but adapters SHOULD prefer the asynchronous failure
- *      path so the cluster's event stream is uniform.
+ *   2. StartSession(sessionId) — synchronous. Triggers ONE ranging instance.
+ *      The driver invokes StartSession the first time after the StartTime
+ *      delay (immediately when StartTime == 0); for periodic ranging, it
+ *      invokes StartSession again on each rangingInstanceInterval tick. The
+ *      adapter performs a single ranging measurement using the parameters
+ *      stashed in PrepareSession, emits exactly one OnMeasurementData
+ *      callback per accepted StartSession invocation, and then waits for
+ *      either another StartSession (next periodic tick) or StopSession
+ *      (terminal teardown). The session record is NOT released between
+ *      StartSession invocations; only StopSession releases it.
+ *
+ *      StartSession returns CHIP_NO_ERROR when the radio has been kicked off
+ *      successfully. If the adapter is busy completing a previous ranging
+ *      instance (the radio cannot satisfy a new request yet), it MAY return
+ *      CHIP_ERROR_BUSY; the driver continues with its periodic schedule and
+ *      will retry on the next tick. Asynchronous radio failures MUST be
+ *      reported via OnRangingSessionStopped with kHardwareError.
  *
  * Session IDs are 1-byte values allocated by the driver and passed verbatim
  * into both calls. The adapter is responsible for tracking which IDs are
- * currently in flight (whether prepared or actively ranging) and reporting
- * termination of every session it has accepted via PrepareSession through
- * OnRangingSessionStopped.
+ * currently in flight (whether prepared, in flight, or idle between ticks)
+ * and reporting termination of every session it has accepted via
+ * PrepareSession through OnRangingSessionStopped.
  *
  * Stop semantics
  * --------------
- * StopSession(sessionId) MUST work uniformly on both states — a session that
- * was prepared but for which StartSession has not yet been called, AND a
- * session that is actively ranging. In both cases the adapter releases its
- * per-session resources, performs any radio teardown that applies to the
- * current state, and emits OnRangingSessionStopped exactly once.
+ * StopSession(sessionId) MUST work uniformly regardless of the session's
+ * internal state — prepared-but-never-started, currently measuring, or
+ * idle-between-ticks. In every case the adapter releases its per-session
+ * resources, performs any radio teardown that applies to the current state,
+ * and emits OnRangingSessionStopped exactly once.
  *
  * Adapters MUST NOT deliver OnRangingSessionStopped synchronously from inside
  * PrepareSession; if the start is already known to have failed at preparation
@@ -137,9 +142,10 @@ struct StartSessionParams
  * kAccepted.
  *
  * Async events:
- *   - OnMeasurementData: emitted per the session's rangingInstanceInterval
- *     for the lifetime of the session (driver-owned StartTime / EndTime gates
- *     do not need to be applied by the adapter).
+ *   - OnMeasurementData: emitted exactly once per accepted StartSession
+ *     invocation, when the radio has produced a measurement. The driver
+ *     forwards the measurement to the cluster immediately and, for periodic
+ *     ranging, schedules the next StartSession on its own timer.
  *   - OnAttributeChanged: called when a runtime configuration value the
  *     adapter exposes as an attribute changes, so the cluster can mark it
  *     dirty.
@@ -190,15 +196,27 @@ public:
     virtual ResultCodeEnum PrepareSession(uint8_t sessionId, const StartSessionParams & params) = 0;
 
     /**
-     * Kick off ranging for a previously prepared session. Invoked after the
-     * driver-owned StartTime delay (immediately when StartTime == 0). Returns
-     * CHIP_NO_ERROR when ranging has been started; asynchronous failures
-     * MUST be reported via OnRangingSessionStopped.
+     * Trigger one ranging instance for a previously prepared session. The
+     * driver invokes this after the StartTime delay for the first measurement
+     * and again on each rangingInstanceInterval tick for periodic ranging.
+     *
+     * Returns:
+     *   - CHIP_NO_ERROR  : the radio has been kicked off; the adapter will
+     *                      emit exactly one OnMeasurementData callback when
+     *                      the measurement completes.
+     *   - CHIP_ERROR_BUSY: the previous measurement has not yet completed and
+     *                      a new one cannot start. The driver will not retry
+     *                      this tick; the next periodic tick (if any) will
+     *                      attempt again.
+     *   - other errors   : terminal failure that the adapter SHOULD also
+     *                      surface via OnRangingSessionStopped(kHardwareError);
+     *                      the driver logs and continues until StopSession is
+     *                      invoked.
      */
     virtual CHIP_ERROR StartSession(uint8_t sessionId) = 0;
 
-    /// Stop a session that has been prepared and possibly started. Works on
-    /// both not-yet-started and active sessions. The adapter MUST emit
+    /// Stop a session in any internal state (prepared-but-never-started,
+    /// measuring, or idle-between-ticks). The adapter MUST emit
     /// OnRangingSessionStopped for the session as a result of this call.
     virtual CHIP_ERROR StopSession(uint8_t sessionId) = 0;
 
