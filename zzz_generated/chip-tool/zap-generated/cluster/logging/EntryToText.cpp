@@ -2446,6 +2446,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "Forecast";
         case chip::app::Clusters::DeviceEnergyManagement::Attributes::OptOutState::Id:
             return "OptOutState";
+        case chip::app::Clusters::DeviceEnergyManagement::Attributes::PowerRangeAdjustment::Id:
+            return "PowerRangeAdjustment";
         case chip::app::Clusters::DeviceEnergyManagement::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::DeviceEnergyManagement::Attributes::AcceptedCommandList::Id:
@@ -6085,6 +6087,10 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "RequestConstraintBasedForecast";
         case chip::app::Clusters::DeviceEnergyManagement::Commands::CancelRequest::Id:
             return "CancelRequest";
+        case chip::app::Clusters::DeviceEnergyManagement::Commands::PowerRangeAdjustRequest::Id:
+            return "PowerRangeAdjustRequest";
+        case chip::app::Clusters::DeviceEnergyManagement::Commands::CancelPowerRangeAdjustRequest::Id:
+            return "CancelPowerRangeAdjustRequest";
         default:
             return "Unknown";
         }
