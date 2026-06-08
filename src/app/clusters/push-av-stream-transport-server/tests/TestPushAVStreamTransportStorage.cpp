@@ -196,7 +196,7 @@ TEST_F(TestPushAVStreamTransportStorage, TestTransportTriggerOptionsStorageMotio
     triggerOptions.triggerType = TransportTriggerTypeEnum::kMotion;
     // present (HasValue) but explicitly null (IsNull)
     triggerOptions.motionZones.SetValue(DataModel::NullNullable);
-    triggerOptions.motionSensitivity.SetValue(DataModel::MakeNullable((uint8_t) 5));
+    triggerOptions.motionSensitivity.SetValue(DataModel::MakeNullable<uint8_t>(5));
     triggerOptions.motionTimeControl.SetValue(motionTimeControl);
     triggerOptions.maxPreRollLen.SetValue(1000);
 
