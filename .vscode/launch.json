@@ -236,7 +236,7 @@
             // =========================================================================
             // HOW TO RUN ON TARGET DEVICE (Raspberry Pi):
             // 1. app_launcher --debug --start org.tizen.matter.example.lighting -- wifi true discriminator 1234 passcode 11223344
-            // 2. /opt/bin/aarch64-linux-gnu-gdbserver :9999 --attach <PID>
+            // 2. gdbserver :9999 --attach <PID>
             // =========================================================================
 
             "cwd": "${workspaceFolder}/out/tizen-arm64-light-no-thread-no-ble",
