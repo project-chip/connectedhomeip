@@ -732,6 +732,12 @@ class TC_DeviceBasicComposition(BasicCompositionTests):
                 if cluster_id not in matter.clusters.ClusterObjects.ALL_CLUSTERS:
                     continue
                 feature_map = cluster[GlobalAttributeIds.FEATURE_MAP_ID]
+                if isinstance(feature_map, ValueDecodeFailure):
+                    location = AttributePathLocation(endpoint_id, cluster_id, GlobalAttributeIds.FEATURE_MAP_ID)
+                    self.record_error(self.get_test_name(), location=location,
+                                      problem=f"Found a failure to read/decode FEATURE_MAP on {location.as_cluster_string(self.cluster_mapper)}")
+                    success = False
+                    continue
                 feature_mask = 0
                 try:
                     feature_map_enum = matter.clusters.ClusterObjects.ALL_CLUSTERS[cluster_id].Bitmaps.Feature

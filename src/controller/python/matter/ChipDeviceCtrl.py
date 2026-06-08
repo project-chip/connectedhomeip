@@ -1193,6 +1193,23 @@ class ChipDeviceControllerBase:
         # Intentionally return None instead of raising exceptions on error
         return (address.value.decode(), port.value) if error == 0 else None
 
+    def GetLastThreadMeshcopDiscoveryDiagnostic(self) -> dict[str, typing.Any]:
+        '''
+        Get diagnostic data captured during the most recent Thread MeshCoP discovery.
+
+        Returns:
+            dict: Parsed JSON diagnostic data from the native Thread MeshCoP proxy.
+        '''
+        self.CheckIsActive()
+
+        diagnostic = create_string_buffer(2048)
+        self._ChipStack.Call(
+            lambda: self._dmLib.pychip_DeviceController_GetLastThreadMeshcopDiscoveryDiagnosticJson(
+                self.devCtrl, diagnostic, len(diagnostic))
+        ).raise_on_error()
+
+        return json.loads(diagnostic.value.decode())
+
     async def DiscoverCommissionableNodes(self,
                                             filterType: discovery.FilterType = discovery.FilterType.NONE,
                                             filter: typing.Any = None,  # noqa: A002
@@ -2695,6 +2712,10 @@ class ChipDeviceControllerBase:
             self._dmLib.pychip_DeviceController_EstablishPASESessionThreadMeshcop.argtypes = [
                 c_void_p, c_char_p, c_uint16, c_char_p, c_uint64]
             self._dmLib.pychip_DeviceController_EstablishPASESessionThreadMeshcop.restype = PyChipError
+
+            self._dmLib.pychip_DeviceController_GetLastThreadMeshcopDiscoveryDiagnosticJson.argtypes = [
+                c_void_p, c_char_p, c_uint32]
+            self._dmLib.pychip_DeviceController_GetLastThreadMeshcopDiscoveryDiagnosticJson.restype = PyChipError
 
             self._dmLib.pychip_DeviceController_EstablishPASESessionBLE.argtypes = [
                 c_void_p, c_uint32, c_uint16, c_uint64]
