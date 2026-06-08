@@ -260,7 +260,7 @@ esp_err_t OTAImageProcessorImpl::DeltaOTAWriteCallback(const uint8_t * buf, size
             memcpy(headerData + headerDataRead, buf, index);
 
             esp_image_header_t * header = (esp_image_header_t *) headerData;
-            headerDataRead               = 0;
+            headerDataRead              = 0;
             if (!VerifyChipId(header->chip_id))
             {
                 return ESP_ERR_INVALID_VERSION;
