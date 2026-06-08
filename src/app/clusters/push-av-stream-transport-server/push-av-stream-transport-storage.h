@@ -136,6 +136,9 @@ struct TransportTriggerOptionsStorage : public TransportTriggerOptionsStruct
 
         triggerType = aTransportTriggerOptions.triggerType;
 
+        // Reset before repopulating, as done for video/audio streams.
+        mTransportZoneOptions.clear();
+
         auto & motionZonesList = aTransportTriggerOptions.motionZones;
 
         if (triggerType == TransportTriggerTypeEnum::kMotion && motionZonesList.HasValue())
