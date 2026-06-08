@@ -35,8 +35,8 @@ using namespace AmbientSensingUnion;
 using namespace AmbientSensingUnion::Attributes;
 
 AmbientSensingUnionCluster::AmbientSensingUnionCluster(const Config & config) :
-    DefaultServerCluster({ config.mEndpointId, AmbientSensingUnion::Id }), mDelegate(config.mDelegate),
-    mUnionNameLength(0), mUnionHealth(UnionHealthEnum::kNonFunctional), mContributorCount(0)
+    DefaultServerCluster({ config.mEndpointId, AmbientSensingUnion::Id }), mDelegate(config.mDelegate), mUnionNameLength(0),
+    mUnionHealth(UnionHealthEnum::kNonFunctional), mContributorCount(0)
 {
     mUnionNameBuffer[0] = '\0';
 
@@ -65,12 +65,12 @@ CHIP_ERROR AmbientSensingUnionCluster::Startup(ServerClusterContext & context)
 
     if (persistence.LoadString({ mPath.mEndpointId, AmbientSensingUnion::Id, Attributes::UnionName::Id }, storedName))
     {
-        CharSpan loaded = storedName.Content();
+        CharSpan loaded  = storedName.Content();
         mUnionNameLength = loaded.size();
         memcpy(mUnionNameBuffer, loaded.data(), mUnionNameLength);
         mUnionNameBuffer[mUnionNameLength] = '\0';
-        ChipLogProgress(Zcl, "AmbientSensingUnion: Loaded persisted UnionName: %.*s",
-                        static_cast<int>(mUnionNameLength), mUnionNameBuffer);
+        ChipLogProgress(Zcl, "AmbientSensingUnion: Loaded persisted UnionName: %.*s", static_cast<int>(mUnionNameLength),
+                        mUnionNameBuffer);
     }
     else
     {
@@ -78,12 +78,11 @@ CHIP_ERROR AmbientSensingUnionCluster::Startup(ServerClusterContext & context)
         Storage::String<kMaxUnionNameLength> defaultName;
         if (defaultName.SetContent(GetUnionName()))
         {
-            CHIP_ERROR err = persistence.StoreString(
-                { mPath.mEndpointId, AmbientSensingUnion::Id, Attributes::UnionName::Id }, defaultName);
+            CHIP_ERROR err =
+                persistence.StoreString({ mPath.mEndpointId, AmbientSensingUnion::Id, Attributes::UnionName::Id }, defaultName);
             if (err != CHIP_NO_ERROR)
             {
-                ChipLogError(Zcl, "AmbientSensingUnion: Failed to store default UnionName: %" CHIP_ERROR_FORMAT,
-                             err.Format());
+                ChipLogError(Zcl, "AmbientSensingUnion: Failed to store default UnionName: %" CHIP_ERROR_FORMAT, err.Format());
             }
         }
     }
@@ -530,8 +529,8 @@ void AmbientSensingUnionCluster::PersistUnionName()
     }
 
     AttributePersistence persistence(mContext->attributeStorage);
-    CHIP_ERROR err = persistence.StoreString(
-        { mPath.mEndpointId, AmbientSensingUnion::Id, Attributes::UnionName::Id }, nameToStore);
+    CHIP_ERROR err =
+        persistence.StoreString({ mPath.mEndpointId, AmbientSensingUnion::Id, Attributes::UnionName::Id }, nameToStore);
 
     if (err != CHIP_NO_ERROR)
     {
