@@ -196,8 +196,7 @@ struct PowerSourceClusterConfig : public PowerSource::detail::AllModules<support
         this->wiredCurrentType = currType;
     }
 
-    PowerSourceClusterConfig(CharSpan desc, PowerSource::BatReplaceabilityEnum replability,
-                             TimerDelegate & timerDelegate)
+    PowerSourceClusterConfig(CharSpan desc, PowerSource::BatReplaceabilityEnum replability, TimerDelegate & timerDelegate)
     {
         static_assert(supportedFeatures.Has(PowerSource::Feature::kBattery),
                       "This constructor should only be used for a Battery power source configuration");
