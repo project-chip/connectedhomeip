@@ -460,6 +460,7 @@ class BackgroundWildcardSubscriptionCache:
         if self._subscription:
             self._subscription.Shutdown()
 
+
 @dataclass
 class TestCleanupConfig:
     """
@@ -505,6 +506,7 @@ class MatterBaseTest(base_test.BaseTestClass):
       or the class sets default_verify_wildcard_subscription = False.
     """
     requires_dut: bool = True
+
     def __init_subclass__(cls, **kwargs):
         super().__init_subclass__(**kwargs)
         if 'teardown_test' in cls.__dict__:
@@ -815,6 +817,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             subjects=[sub_node_id],
             targets=NullValue,
         )
+
     async def async_teardown_test(self) -> None:
         """Override to add async class-level teardown without @async_test_body boilerplate.
 
@@ -1420,7 +1423,7 @@ class MatterBaseTest(base_test.BaseTestClass):
 
 
         Shuts down the background wildcard subscription.         
-        
+
         Framework cleanup (DUT state restoration, extra controller shutdown) runs
         once at class end in teardown_class, not here. Override this method to add
         custom per-test teardown.
