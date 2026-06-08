@@ -162,10 +162,33 @@ fi
 
 echo "Captured App PID: $PID"
 
+# Define cleanup trap to kill the suspended app if subsequent steps fail or get interrupted
+cleanup_on_error() {
+    local exit_code=$?
+    if [ -n "$1" ] || [ $exit_code -ne 0 ]; then
+        echo "Cleaning up suspended PID: $PID from target device..."
+        kill $SDB_PID >/dev/null 2>&1 || true
+        "${SDB_CMD[@]}" shell "kill -9 $PID 2>/dev/null; killall -9 gdbserver 2>/dev/null" >/dev/null 2>&1 || true
+        if [ "$1" = "INT" ]; then exit 130; fi
+    fi
+}
+
+trap 'cleanup_on_error' EXIT
+trap 'cleanup_on_error INT' INT
+trap 'cleanup_on_error TERM' TERM
+
 # Setup SDB port forwarding
 echo "Setting up SDB port forward (TCP $GDBSERVER_PORT)..."
 "${SDB_CMD[@]}" forward tcp:"$GDBSERVER_PORT" tcp:"$GDBSERVER_PORT"
 
-# Attach gdbserver manually to the frozen process using target-safe argument layout
+# 5. Attach gdbserver in foreground but catch signals properly
 echo "Attaching gdbserver to PID $PID on port $GDBSERVER_PORT..."
-"${SDB_CMD[@]}" shell "$GDBSERVER_TARGET_PATH --once --attach :$GDBSERVER_PORT $PID"
+
+# Run gdbserver in foreground so it has full network/system privileges
+"${SDB_CMD[@]}" shell "$GDBSERVER_TARGET_PATH --once --attach :$GDBSERVER_PORT $PID" &
+SDB_PID=$!
+
+# Use wait to allow Bash trap to safely intercept Ctrl+C while sdb is running
+set +e
+wait $SDB_PID
+set -e
