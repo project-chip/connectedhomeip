@@ -535,8 +535,8 @@ void ReadClient::OnPeerTypeChange(PeerType aType)
 CHIP_ERROR ReadClient::OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
                                          System::PacketBufferHandle && aPayload)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    Status status  = Status::InvalidAction;
+    CHIP_ERROR err    = CHIP_NO_ERROR;
+    Status status     = Status::InvalidAction;
     mSuppressResponse = false;
     VerifyOrExit(!IsIdle() && !IsInactiveICDSubscription(), err = CHIP_ERROR_INCORRECT_STATE);
 
@@ -645,7 +645,7 @@ CHIP_ERROR ReadClient::ProcessReportData(System::PacketBufferHandle && aPayload,
     if (CHIP_END_OF_TLV == err)
     {
         mSuppressResponse = false;
-        err              = CHIP_NO_ERROR;
+        err               = CHIP_NO_ERROR;
     }
     SuccessOrExit(err);
 

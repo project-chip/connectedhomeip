@@ -172,7 +172,8 @@ Status WriteHandler::OnWriteRequest(Messaging::ExchangeContext * apExchangeConte
     if (!(status == Status::Success && mStateFlags.Has(StateBits::kHasMoreChunks)))
     {
         Close();
-        // Return Success if SuppressResponse is set to avoid sending StatusResponse when error is catched in InteractionModelEngine.
+        // Return Success if SuppressResponse is set to avoid sending StatusResponse when error is catched in
+        // InteractionModelEngine.
         if (mStateFlags.Has(StateBits::kSuppressResponse))
         {
             return Status::Success;

@@ -56,15 +56,17 @@ CHIP_ERROR GetRef(ParserT aParser, Optional<uint16_t> & aRef, bool commandRefReq
 
 CommandSender::CommandSender(Callback * apCallback, Messaging::ExchangeManager * apExchangeMgr, bool aIsTimedRequest,
                              bool aSuppressResponse, bool aAllowLargePayload) :
-    mExchangeCtx(*this), mCallbackHandle(apCallback), mpExchangeMgr(apExchangeMgr), mSuppressResponse(aSuppressResponse),
-    mTimedRequest(aIsTimedRequest), mAllowLargePayload(aAllowLargePayload)
+    mExchangeCtx(*this),
+    mCallbackHandle(apCallback), mpExchangeMgr(apExchangeMgr), mSuppressResponse(aSuppressResponse), mTimedRequest(aIsTimedRequest),
+    mAllowLargePayload(aAllowLargePayload)
 {
     assertChipStackLockedByCurrentThread();
 }
 
 CommandSender::CommandSender(ExtendableCallback * apExtendableCallback, Messaging::ExchangeManager * apExchangeMgr,
                              bool aIsTimedRequest, bool aSuppressResponse, bool aAllowLargePayload) :
-    mExchangeCtx(*this), mCallbackHandle(apExtendableCallback), mpExchangeMgr(apExchangeMgr), mSuppressResponse(aSuppressResponse),
+    mExchangeCtx(*this),
+    mCallbackHandle(apExtendableCallback), mpExchangeMgr(apExchangeMgr), mSuppressResponse(aSuppressResponse),
     mTimedRequest(aIsTimedRequest), mUseExtendableCallback(true), mAllowLargePayload(aAllowLargePayload)
 {
     assertChipStackLockedByCurrentThread();
@@ -201,8 +203,8 @@ CHIP_ERROR CommandSender::SendInvokeRequest()
 
     if (mSuppressResponse)
     {
-        ReturnErrorOnFailure(mExchangeCtx->SendMessage(MsgType::InvokeCommandRequest, std::move(mPendingInvokeData),
-                                                       SendMessageFlags::kNone));
+        ReturnErrorOnFailure(
+            mExchangeCtx->SendMessage(MsgType::InvokeCommandRequest, std::move(mPendingInvokeData), SendMessageFlags::kNone));
         Close();
     }
     else
