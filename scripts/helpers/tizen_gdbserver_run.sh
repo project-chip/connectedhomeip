@@ -111,9 +111,9 @@ if [ "$GDBSERVER_FOUND_ON_DEVICE" = false ]; then
 
     LOCAL_ARCH_PATTERN=""
     case "$REMOTE_ARCH" in
-        aarch64)     LOCAL_ARCH_PATTERN="aarch64-linux-gnu" ;;
-        arm*|armel)  LOCAL_ARCH_PATTERN="arm-linux-gnueabi" ;;
-        x86_64)      LOCAL_ARCH_PATTERN="x86_64-linux-gnu" ;;
+        aarch64) LOCAL_ARCH_PATTERN="aarch64-linux-gnu" ;;
+        arm* | armel) LOCAL_ARCH_PATTERN="arm-linux-gnueabi" ;;
+        x86_64) LOCAL_ARCH_PATTERN="x86_64-linux-gnu" ;;
         *)
             echo "ERROR: Unsupported remote architecture: $REMOTE_ARCH"
             exit 1
