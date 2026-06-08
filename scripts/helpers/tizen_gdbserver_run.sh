@@ -158,11 +158,11 @@ echo "Captured App PID: $PID"
 # Signal cleanup layout for exit, interrupt, and termination
 cleanup_on_error() {
     local exit_code=$?
-    if [ -n "$1" ] || [ $exit_code -ne 0 ]; then
+    if [ -n "$1" ] || [ "$exit_code" -ne 0 ]; then
         echo "Cleaning up suspended PID: $PID from target device..."
 
         if [ -n "$SDB_PID" ]; then
-            kill $SDB_PID >/dev/null 2>&1 || true
+            kill "$SDB_PID" >/dev/null 2>&1 || true
         fi
 
         "${SDB_CMD[@]}" shell "kill -9 $PID 2>/dev/null; killall -9 gdbserver 2>/dev/null" >/dev/null 2>&1 || true
@@ -183,5 +183,5 @@ echo "Attaching gdbserver to PID $PID on port $GDBSERVER_PORT..."
 SDB_PID=$!
 
 set +e
-wait $SDB_PID
+wait "$SDB_PID"
 set -e
