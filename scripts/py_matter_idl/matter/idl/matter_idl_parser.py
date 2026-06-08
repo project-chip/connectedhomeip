@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import dataclasses
-import enum
 import functools
 import logging
 import pprint
