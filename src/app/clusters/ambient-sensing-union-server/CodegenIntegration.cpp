@@ -85,42 +85,45 @@ public:
         // (Deleting the key would make the attribute fall back to the configured default on reboot.)
         return chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr().Put(key, unionName.data(), unionName.size());
 
-private:
-    static constexpr size_t kKeyPrefixLength      = 6; // "g/asu/"
-    static constexpr size_t kKeySuffixLength      = 3; // "/un"
-    static constexpr size_t kMaxEndpointHexLength = 4; // 0xFFFF
-    static constexpr size_t kMaxKeyLength         = kKeyPrefixLength + kMaxEndpointHexLength + kKeySuffixLength + 1;
+    private:
+        static constexpr size_t kKeyPrefixLength      = 6; // "g/asu/"
+        static constexpr size_t kKeySuffixLength      = 3; // "/un"
+        static constexpr size_t kMaxEndpointHexLength = 4; // 0xFFFF
+        static constexpr size_t kMaxKeyLength         = kKeyPrefixLength + kMaxEndpointHexLength + kKeySuffixLength + 1;
 
-    void BuildUnionNameKey(char * buffer, size_t bufferSize) const { snprintf(buffer, bufferSize, "g/asu/%x/un", mEndpointId); }
+        void BuildUnionNameKey(char * buffer, size_t bufferSize) const
+        {
+            snprintf(buffer, bufferSize, "g/asu/%x/un", mEndpointId);
+        }
 
-    EndpointId mEndpointId = kInvalidEndpointId;
-};
+        EndpointId mEndpointId = kInvalidEndpointId;
+    };
 
-KvsPersistenceDelegate gPersistenceDelegate[kAmbientSensingUnionMaxClusterCount];
+    KvsPersistenceDelegate gPersistenceDelegate[kAmbientSensingUnionMaxClusterCount];
 
-class IntegrationDelegate : public CodegenClusterIntegration::Delegate
-{
-public:
-    ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned clusterInstanceIndex,
-                                                   uint32_t optionalAttributeBits, uint32_t featureMap) override
+    class IntegrationDelegate : public CodegenClusterIntegration::Delegate
     {
-        gPersistenceDelegate[clusterInstanceIndex].SetEndpointId(endpointId);
+    public:
+        ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned clusterInstanceIndex,
+                                                       uint32_t optionalAttributeBits, uint32_t featureMap) override
+        {
+            gPersistenceDelegate[clusterInstanceIndex].SetEndpointId(endpointId);
 
-        AmbientSensingUnionCluster::Config config(endpointId);
-        config.WithUnionName(CharSpan::fromCharString("")).WithPersistence(&gPersistenceDelegate[clusterInstanceIndex]);
+            AmbientSensingUnionCluster::Config config(endpointId);
+            config.WithUnionName(CharSpan::fromCharString("")).WithPersistence(&gPersistenceDelegate[clusterInstanceIndex]);
 
-        gServers[clusterInstanceIndex].Create(config);
-        return gServers[clusterInstanceIndex].Registration();
-    }
+            gServers[clusterInstanceIndex].Create(config);
+            return gServers[clusterInstanceIndex].Registration();
+        }
 
-    ServerClusterInterface * FindRegistration(unsigned clusterInstanceIndex) override
-    {
-        VerifyOrReturnValue(gServers[clusterInstanceIndex].IsConstructed(), nullptr);
-        return &gServers[clusterInstanceIndex].Cluster();
-    }
+        ServerClusterInterface * FindRegistration(unsigned clusterInstanceIndex) override
+        {
+            VerifyOrReturnValue(gServers[clusterInstanceIndex].IsConstructed(), nullptr);
+            return &gServers[clusterInstanceIndex].Cluster();
+        }
 
-    void ReleaseRegistration(unsigned clusterInstanceIndex) override { gServers[clusterInstanceIndex].Destroy(); }
-};
+        void ReleaseRegistration(unsigned clusterInstanceIndex) override { gServers[clusterInstanceIndex].Destroy(); }
+    };
 
 } // namespace
 
