@@ -24,6 +24,7 @@ from time import sleep
 from typing import Optional
 
 from mobly import asserts
+from mobly import signals
 
 import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
@@ -463,27 +464,33 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             if current_progress > current_max_progress:
                 current_max_progress = current_progress + progress_step
 
-            # warn no fail added so waiting for status
-            attr_report_status = download_progress_attr_handler.await_all_expected_report_matches(
-                [download_progress_attr_matcher_obj], timeout_sec=max_timeout, warn_no_fail=True)
-            log.info(f"Report status: {attr_report_status}")
+            retry = False
+            try:
+                download_progress_attr_handler.await_all_expected_report_matches(
+                    [download_progress_attr_matcher_obj], timeout_sec=max_timeout)
+            except signals.TestFailure as e:
+                # Cancel this to avoid having reports in the command line
+                download_progress_attr_handler.cancel()
+                retry = True
 
-            if not attr_report_status:
-                download_progress_attr_handler.reset()
+            if retry:
                 user_response = self.wait_for_user_input(
-                    f"Report not received in the timeout {max_timeout}, would you like retry and  wait {max_timeout} seconds for next report?",
+                    f"Download progress not reached the total of {current_max_progress}% the timeframe of: {max_timeout} seconds, would you like retry and  wait {max_timeout} seconds for next report?",
                     prompt_msg_placeholder="Enter 'y' or 'n'")
-                if user_response.lower() in ("y", "yes"):
+                if user_response.lower() in ["y", "yes"]:
                     # This will retry one more time if needed to avoid cancel the test by a timeout
-                    attr_report_status = download_progress_attr_handler.await_all_expected_report_matches(
-                        [download_progress_attr_matcher_obj], timeout_sec=max_timeout)
-                    # If the user took more time than expected to say Yes/Y the new value is set
+                    # Read the current progress
                     update_state_progress = await self.read_single_attribute_check_success(Clusters.OtaSoftwareUpdateRequestor, Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState, controller)
+                    # Start the handler for the second time
+                    await download_progress_attr_handler.start(dev_ctrl=controller, node_id=requestor_node_id, endpoint=0,
+                                                               fabric_filtered=False, min_interval_sec=0, max_interval_sec=1)
+                    # Update nonlocalvalues
                     current_progress = update_state_progress
-                    current_max_progress = int(current_progress) + progress_step
                     continue
+                else:
+                    asserts.fail("Test terminated by user.")
 
-            # Increase the progress
+            # Did not fail and the Download Track Continues
             current_max_progress += progress_step
             if current_max_progress > max_progress:
                 current_max_progress = max_progress
@@ -491,7 +498,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             log.info(f"Current OTA Image download progress is {current_progress}%")
             download_progress_attr_handler.reset()
 
-        # cancel the AttributeReportHandler for Download
+        # After completing the Download cancel the AttributeReportHandler for Download
         download_progress_attr_handler.cancel()
 
     async def get_connected_device_after_reboot(self, controller: ChipDeviceCtrl.ChipDeviceController, requestor_node_id: int, extra_message: str = ""):

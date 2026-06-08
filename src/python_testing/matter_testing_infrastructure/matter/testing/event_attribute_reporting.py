@@ -451,7 +451,7 @@ class AttributeSubscriptionHandler:
             LOGGER.info(f"  -> {expected_element} found: {last_report_matches.get(expected_idx)}")
         asserts.fail("Did not find all expected last report values before time-out")
 
-    def await_all_expected_report_matches(self, expected_matchers: Iterable[AttributeMatcher], timeout_sec: float = 1.0, warn_no_fail: bool = False):
+    def await_all_expected_report_matches(self, expected_matchers: Iterable[AttributeMatcher], timeout_sec: float = 1.0):
         """Expect that every predicate in `expected_matchers`, when run against all the incoming reports, reaches true by the end, ignoring timestamps.
 
         Waits for at least `timeout_sec` seconds.
@@ -487,7 +487,6 @@ class AttributeSubscriptionHandler:
             # Determine if all were met
             if all(report_matches.values()):
                 LOGGER.info("Found all expected matchers did match.")
-                return True
 
             elapsed = time.time() - start_time
             time_remaining = timeout_sec - elapsed
@@ -497,12 +496,7 @@ class AttributeSubscriptionHandler:
         LOGGER.error("Reached time-out without finding all expected report values.")
         for expected_idx, expected_matcher in enumerate(expected_matchers):
             LOGGER.info(f"  -> {expected_matcher.description}: {report_matches.get(expected_idx)}")
-
-        if warn_no_fail:
-            LOGGER.warning("Did not find all expected reports before time-out but no fail agurment set, returning")
-            return False
         asserts.fail("Did not find all expected reports before time-out")
-        return False
 
     def await_sequence_of_reports(self, attribute: TypedAttributePath, sequence: list[Any], timeout_sec: float) -> None:
         """Await a given expected sequence of attribute reports in the accumulator for the endpoint associated.
