@@ -33,9 +33,9 @@ from .namespace import IsolatedNetworkNamespace
 
 log = logging.getLogger(__name__)
 
+DictVariantT = dict[str, tuple[str, "DbusAnyT"]]
 DbusAnyT: TypeAlias = (bool | int | float | str | bytes | list["DbusAnyT"] | tuple["DbusAnyT", ...] | dict[str, "DbusAnyT"]
                        | "DictVariantT")
-DictVariantT = dict[str, tuple[str, DbusAnyT]]
 
 
 class NANSimulator:
