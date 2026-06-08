@@ -76,7 +76,7 @@ fi
 
 CNX_STATUS=$("${SDB_CMD[@]}" root on 2>&1 || true)
 
-# --- GDBSERVER DETECTION AND DEPLOYMENT ---
+# --- GDBSERVER DETECTION ---
 GDBSERVER_TARGET_PATH="/opt/bin/gdbserver"
 KNOWN_TARGET_PATHS=(
     "/opt/bin/gdbserver"
@@ -86,7 +86,7 @@ KNOWN_TARGET_PATHS=(
 
 GDBSERVER_FOUND_ON_DEVICE=false
 
-# Check standard installation paths
+# 1. Check strict known paths first
 for path in "${KNOWN_TARGET_PATHS[@]}"; do
     IS_EXECUTABLE=$("${SDB_CMD[@]}" shell "test -x $path && echo 'OK'" | tr -d '\r' | tr -d ' ')
     if [ "$IS_EXECUTABLE" = "OK" ]; then
@@ -97,19 +97,9 @@ for path in "${KNOWN_TARGET_PATHS[@]}"; do
     fi
 done
 
-# Standardize toolchain-prefixed binaries in /opt/bin
+# 2. Fallback: Deploy only if missing from the target
 if [ "$GDBSERVER_FOUND_ON_DEVICE" = false ]; then
-    RENAME_ON_DEVICE=$("${SDB_CMD[@]}" shell "if [ -d /opt/bin ]; then PREFIXED=\$(find /opt/bin -type f -name '*gdbserver*' | head -n 1 | tr -d '\r'); if [ -n \"\$PREFIXED\" ]; then mv \"\$PREFIXED\" /opt/bin/gdbserver && echo 'RENAMED'; fi; fi" | tr -d '\r' | tr -d ' ')
-    if [ "$RENAME_ON_DEVICE" = "RENAMED" ]; then
-        GDBSERVER_TARGET_PATH="/opt/bin/gdbserver"
-        GDBSERVER_FOUND_ON_DEVICE=true
-        echo "Found and standardized prefixed binary in /opt/bin to: $GDBSERVER_TARGET_PATH"
-    fi
-fi
-
-# Fallback: Locate binary inside local Tizen SDK and deploy
-if [ "$GDBSERVER_FOUND_ON_DEVICE" = false ]; then
-    echo "gdbserver missing from standard paths. Searching local SDK..."
+    echo "gdbserver missing from device. Searching local SDK..."
 
     if [ -z "$TIZEN_SDK_ROOT" ]; then
         echo "ERROR: TIZEN_SDK_ROOT environment variable is not set."
@@ -145,7 +135,7 @@ if [ "$GDBSERVER_FOUND_ON_DEVICE" = false ]; then
     "${SDB_CMD[@]}" shell "chmod +x $GDBSERVER_TARGET_PATH"
     echo "gdbserver successfully deployed."
 fi
-# ------------------------------------------
+# ----------------------------------------
 
 # Launch target application in suspended mode
 echo "Launching $APP_NAME in suspended debug mode..."
@@ -170,7 +160,11 @@ cleanup_on_error() {
     local exit_code=$?
     if [ -n "$1" ] || [ $exit_code -ne 0 ]; then
         echo "Cleaning up suspended PID: $PID from target device..."
-        kill $SDB_PID >/dev/null 2>&1 || true
+
+        if [ -n "$SDB_PID" ]; then
+            kill $SDB_PID >/dev/null 2>&1 || true
+        fi
+
         "${SDB_CMD[@]}" shell "kill -9 $PID 2>/dev/null; killall -9 gdbserver 2>/dev/null" >/dev/null 2>&1 || true
         if [ "$1" = "INT" ]; then exit 130; fi
     fi
@@ -191,3 +185,5 @@ SDB_PID=$!
 set +e
 wait $SDB_PID
 set -e
+
+
