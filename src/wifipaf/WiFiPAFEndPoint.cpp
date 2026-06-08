@@ -157,7 +157,12 @@ CHIP_ERROR WiFiPAFEndPoint::HandleConnectComplete()
         StopReceiveConnectionTimer();
     }
 
+    // Arm ongoing idle session supervision to ensure upper-layer commissioning
+    // (Phase 2 PASE handshake) initiates within a reasonable deadline.
+    LogErrorOnFailure(StartAckReceivedTimer());
+
     // We've successfully completed the PAF transport protocol handshake, so let the application know we're open for business.
+
     if (mWiFiPafLayer != nullptr)
     {
         // Indicate connect complete to next-higher layer.

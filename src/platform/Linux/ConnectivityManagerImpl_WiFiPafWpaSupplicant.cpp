@@ -351,7 +351,6 @@ void ConnectivityManagerImpl::OnReplied(GVariant * reply_info)
         LogErrorOnFailure(WiFiPAFLayer::GetWiFiPAFLayer().HandleTransportConnectionInitiated(*pInfo));
     };
     LogErrorOnFailure(PlatformMgr().ScheduleWork(handleInitiated, reinterpret_cast<intptr_t>(pPafInfo)));
-
 }
 
 void ConnectivityManagerImpl::OnNanReceive(GVariant * obj)
