@@ -464,7 +464,11 @@ See
 ## PICS and PIXITS
 
 -   PICS
-    -   use --PICS on the command line to specify the PICS file
+    -   use `--PICS` on the command line to specify PICS input: CI `KEY=0|1`
+        text file, a directory of cluster XML for one endpoint, a directory with
+        **per-endpoint** XML subdirectories, or a `.zip` with that layout (see
+        [PICS and PIXITs](./pics_and_pixit.md), including
+        [directory / zip layout](./pics_and_pixit.md#pics-input-layout))
     -   use check_pics to gate steps in a file
 -   have_whatever = check_pics(“PICS.S.WHATEVER”)
 -   PIXITs
@@ -919,7 +923,7 @@ Example:
 
 ```python
 self.step(<STEP_NUMBER>)
-if await self.attribute_guard(endpoint=self.endpoint, attribute=attributes.OperationalState):
+if self.attribute_guard(endpoint=self.endpoint, attribute=attributes.OperationalState):
     # If attribute exists then test step continues, else test step is skipped.
 ```
 
@@ -932,7 +936,7 @@ Example:
 
 ```python
 self.step(<STEP_NUMBER>)
-if await self.feature_guard(endpoint=self.endpoint, cluster=Clusters.BooleanStateConfiguration, feature_int=Clusters.BooleanStateConfiguration.Bitmaps.Feature.kAudible):
+if self.feature_guard(endpoint=self.endpoint, cluster=Clusters.BooleanStateConfiguration, feature_int=Clusters.BooleanStateConfiguration.Bitmaps.Feature.kAudible):
     # IF feature available then do test step, else test step is skipped.
 ```
 
@@ -945,7 +949,7 @@ Example:
 
 ```python
 self.step(<STEP_NUMBER>)
-if await self.command_guard(endpoint=self.endpoint, command=commands.Resume):
+if self.command_guard(endpoint=self.endpoint, command=commands.Resume):
     # If command available, then do test step here, else test step is skipped
 ```
 

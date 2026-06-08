@@ -14,46 +14,23 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
+from __future__ import annotations
+
 import glob
 import json
 import os
+import typing
 import xml.etree.ElementTree as ET
+import zipfile
 
-import matter.clusters as Clusters
-from matter.clusters.Attribute import AsyncReadTransaction
 from matter.testing.global_attribute_ids import (AttributeIdType, GlobalAttributeIds, attribute_id_type, is_standard_cluster_id,
                                                  is_standard_command_id)
-from matter.testing.problem_notices import ClusterPathLocation, ProblemNotice, ProblemSeverity
-from matter.testing.spec_parsing import XmlCluster
-from matter.tlv import uint
 
-
-def event_pics_str(pics_base: str, eid: int) -> str:
-    return f'{pics_base}.S.E{eid:02x}'
-
-
-def attribute_pics_str(pics_base: str, aid: int) -> str:
-    return f'{pics_base}.S.A{aid:04x}'
-
-
-def accepted_cmd_pics_str(pics_base: str, cid: int) -> str:
-    return f'{pics_base}.S.C{cid:02x}.Rsp'
-
-
-def generated_cmd_pics_str(pics_base: str, cid: int) -> str:
-    return f'{pics_base}.S.C{cid:02x}.Tx'
-
-
-def feature_pics_str(pics_base: str, bit: int) -> str:
-    return f'{pics_base}.S.F{bit:02x}'
-
-
-def server_pics_str(pics_base: str) -> str:
-    return f'{pics_base}.S'
-
-
-def client_pics_str(pics_base: str) -> str:
-    return f'{pics_base}.C'
+if typing.TYPE_CHECKING:
+    from matter.clusters.Attribute import AsyncReadTransaction
+    from matter.testing.problem_notices import ProblemNotice
+    from matter.testing.spec_parsing import XmlCluster
+    from matter.tlv import uint
 
 
 def parse_pics(lines: list[str]) -> dict[str, bool]:
@@ -99,24 +76,129 @@ def parse_pics_xml(contents: str) -> dict[str, bool]:
     return pics
 
 
-def read_pics_from_file(path: str) -> dict[str, bool]:
-    """ Reads a dictionary of PICS from a file (ci format) or directory (xml format). """
-    if os.path.isdir(os.path.abspath(path)):
-        pics_dict = {}
-        for filename in glob.glob(f'{path}/*.xml'):
-            with open(filename) as f:
-                contents = f.read()
-                pics_dict.update(parse_pics_xml(contents))
-        return pics_dict
+def _sorted_endpoint_subdirs(dir_path: str) -> list[str]:
+    """Immediate subdirectories that may each hold PICS XML for one endpoint."""
+    entries: list[str] = []
+    for name in os.listdir(dir_path):
+        if name.startswith('.') or name == '__MACOSX':
+            continue
+        full = os.path.join(dir_path, name)
+        if os.path.isdir(full):
+            entries.append(full)
 
-    with open(path) as f:
+    def sort_key(p: str) -> tuple[int, typing.Union[int, str]]:
+        base = os.path.basename(p)
+        if base.isdigit():
+            return (0, int(base))
+        return (1, base.lower())
+
+    return sorted(entries, key=sort_key)
+
+
+def _iter_pics_xml_under_endpoint_dirs(root_dir: str) -> typing.Iterator[str]:
+    for sub in _sorted_endpoint_subdirs(root_dir):
+        for dirpath, _, filenames in os.walk(sub):
+            for fn in sorted(filenames):
+                if fn.lower().endswith('.xml'):
+                    yield os.path.join(dirpath, fn)
+
+
+def _read_pics_from_zip(zip_path: str) -> dict[str, bool]:
+    pics_dict: dict[str, bool] = {}
+    with zipfile.ZipFile(zip_path) as zf:
+        for name in sorted(zf.namelist()):
+            normalized = name.replace('\\', '/')
+            if normalized.startswith('__MACOSX/') or normalized == '__MACOSX':
+                continue
+            if normalized.endswith('/'):
+                continue
+            if not name.lower().endswith('.xml'):
+                continue
+            with zf.open(name) as member:
+                data = member.read().decode('utf-8')
+                pics_dict.update(parse_pics_xml(data))
+    return pics_dict
+
+
+def _read_pics_from_directory(dir_path: str) -> dict[str, bool]:
+    pics_dict: dict[str, bool] = {}
+    top_level = sorted(glob.glob(os.path.join(dir_path, '*.xml')))
+    for filename in top_level:
+        with open(filename, encoding='utf-8') as f:
+            pics_dict.update(parse_pics_xml(f.read()))
+    for xml_path in _iter_pics_xml_under_endpoint_dirs(dir_path):
+        with open(xml_path, encoding='utf-8') as f:
+            pics_dict.update(parse_pics_xml(f.read()))
+    return pics_dict
+
+
+def read_pics_from_file(path: str) -> dict[str, bool]:
+    """Load PICS definitions from a path.
+
+    Supported inputs:
+
+    * A text file in CI format (``KEY=0`` or ``KEY=1`` per line), as used by
+      ``ci-pics-values``.
+    * A directory of PICS XML files for a single endpoint (``*.xml`` in the
+      directory).
+    * A directory whose immediate subdirectories each hold XML files for a
+      distinct device endpoint (numeric names such as ``0``, ``1`` are sorted in
+      numeric order; other names sort case-insensitively). XML files may appear
+      at any depth under each subdirectory.
+    * A ``.zip`` archive with the same layout as that directory (any ``*.xml``
+      members are merged; ``__MACOSX`` is ignored).
+
+    When the same PICS item appears in multiple XML sources, the last read
+    definition wins.
+    """
+    expanded = os.path.expanduser(path)
+    ap = os.path.abspath(expanded)
+
+    if os.path.isdir(ap):
+        return _read_pics_from_directory(ap)
+
+    if os.path.isfile(ap) and zipfile.is_zipfile(ap):
+        return _read_pics_from_zip(ap)
+
+    with open(ap, encoding='utf-8') as f:
         lines = f.readlines()
-        return parse_pics(lines)
+    return parse_pics(lines)
+
+
+def event_pics_str(pics_base: str, eid: int) -> str:
+    return f'{pics_base}.S.E{eid:02x}'
+
+
+def attribute_pics_str(pics_base: str, aid: int) -> str:
+    return f'{pics_base}.S.A{aid:04x}'
+
+
+def accepted_cmd_pics_str(pics_base: str, cid: int) -> str:
+    return f'{pics_base}.S.C{cid:02x}.Rsp'
+
+
+def generated_cmd_pics_str(pics_base: str, cid: int) -> str:
+    return f'{pics_base}.S.C{cid:02x}.Tx'
+
+
+def feature_pics_str(pics_base: str, bit: int) -> str:
+    return f'{pics_base}.S.F{bit:02x}'
+
+
+def server_pics_str(pics_base: str) -> str:
+    return f'{pics_base}.S'
+
+
+def client_pics_str(pics_base: str) -> str:
+    return f'{pics_base}.C'
 
 
 def generate_device_element_pics_from_device_wildcard(wildcard: AsyncReadTransaction.ReadResponse, xml_clusters: dict[uint, XmlCluster]) -> tuple[dict[int, list[str]], list[ProblemNotice]]:
     ''' Returns a list of device element PICS and problems from each device wildcard.
     '''
+    import matter.clusters as Clusters
+    from matter.testing.problem_notices import ClusterPathLocation, ProblemNotice, ProblemSeverity
+
     # Endpoint to list of device element PICS
     device_pics: dict[int, list[str]] = {}
     problems = []

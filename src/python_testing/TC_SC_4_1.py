@@ -743,7 +743,7 @@ class TC_SC_4_1(MatterBaseTest):
         # *** STEP 7 ***
         # Check if the Open Basic Commissioning Window command is supported
         self.step(7)
-        supports_obcw = await self.feature_guard(
+        supports_obcw = self.feature_guard(
             endpoint=ROOT_NODE_ENDPOINT_ID,
             cluster=Clusters.AdministratorCommissioning,
             feature_int=Clusters.AdministratorCommissioning.Bitmaps.Feature.kBasic)

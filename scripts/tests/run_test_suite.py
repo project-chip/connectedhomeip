@@ -104,6 +104,7 @@ def validate_test_order(ctx: click.Context, param: click.Parameter, value: Any) 
 
 
 ExistingFilePath = click.Path(exists=True, dir_okay=False, path_type=Path)
+ExistingPicsPath = click.Path(exists=True, file_okay=True, dir_okay=True, path_type=Path)
 
 
 @click.group(chain=True)
@@ -340,10 +341,11 @@ class CommissioningMethod(enum.StrEnum):
     help="Print keys for known application and controller paths")
 @click.option(
     '--pics-file',
-    type=ExistingFilePath,
+    type=ExistingPicsPath,
     default="src/app/tests/suites/certification/ci-pics-values",
     show_default=True,
-    help='PICS file to use for test runs.')
+    help=('PICS input for test runs: CI key=value file, directory of PICS XML (single endpoint '
+          'or per-endpoint subdirectories of XML), or a .zip of that directory layout.'))
 @click.option(
     '--keep-going',
     is_flag=True,
