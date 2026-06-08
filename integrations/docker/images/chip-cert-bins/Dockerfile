@@ -131,7 +131,7 @@ RUN set -x \
 ARG COMMITHASH=c1ec2d777456924dcaa59b53351b00d73caf378f
 # This does a shallower checkout of the repo
 RUN echo "Cloning at commit: ${COMMITHASH}" \
-    mkdir /root/connectedhomeip \
+    && mkdir /root/connectedhomeip \
     && git init /root/connectedhomeip \
     && cd /root/connectedhomeip \
     && git init . \
