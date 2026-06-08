@@ -74,7 +74,7 @@ use the following sub-headings (where `##### Impact` is optional):
     -   **ASCII Diagrams**: If the problem involves a workflow, state machine,
         or timing sequence, include a brief ASCII diagram to visualize it.
     -   If the consequences/impact are clearly explained within this structured
-        breakdown, the `##### Impact` section may be omitted to reduce noise.
+        breakdown, the `##### Impact` section should be omitted to reduce noise.
 
 ##### Impact
 
