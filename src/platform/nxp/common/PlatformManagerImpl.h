@@ -46,13 +46,6 @@ class PlatformManagerImpl final : public PlatformManager, public Internal::Gener
 #endif
 
 public:
-    enum OTAStorageState : int
-    {
-        OTAStorageDisabled,
-        OTAStorageEnabled,
-        OTAStorageSuspended
-    };
-
     // ===== Platform-specific members that may be accessed directly by the application.
 
     void Reset();
@@ -63,11 +56,6 @@ public:
     static void SaveSettings(void);
     void StopBLEConnectivity(void);
     CHIP_ERROR ServiceInit(void);
-#if CONFIG_NXP_USE_LOW_POWER
-    CHIP_ERROR EnableOTAStorage(void);
-    CHIP_ERROR DisableOTAStorage(void);
-#endif
-    OTAStorageState GetOTAStorageState(void);
 
     System::Clock::Timestamp GetStartTime() { return mStartTime; }
 
@@ -90,7 +78,6 @@ private:
 
     bool resetInIdle = false;
     static PlatformManagerImpl sInstance;
-    OTAStorageState otaStorageState = OTAStorageDisabled;
 
     using Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::PostEventFromISR;
 };
@@ -115,11 +102,6 @@ inline PlatformManager & PlatformMgr(void)
 inline PlatformManagerImpl & PlatformMgrImpl(void)
 {
     return PlatformManagerImpl::sInstance;
-}
-
-inline PlatformManagerImpl::OTAStorageState PlatformManagerImpl::GetOTAStorageState(void)
-{
-    return otaStorageState;
 }
 
 } // namespace DeviceLayer
