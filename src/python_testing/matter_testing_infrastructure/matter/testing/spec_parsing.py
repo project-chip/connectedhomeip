@@ -69,7 +69,7 @@ def get_access_privilege_or_unknown(access_value: Optional[int]) -> int:
     return ACCESS_CONTROL_PRIVILEGE_ENUM.kUnknownEnumValue
 
 
-def _parse_numeric_constraint_value(value_str: str) -> Optional[Union[int, float]]:
+def _parse_numeric_constraint_value(value_str: str) -> Optional[int | float]:
     """Parse a numeric constraint value, handling integers, floats, and hex strings.
 
     Returns None if the value is not purely numeric (e.g., 'MaxMeasuredValue - 1'),
@@ -110,8 +110,8 @@ class ConstraintReference:
 @dataclass
 class Constraints:
     """Constraint information for attributes, commands, and device types."""
-    min_value: Optional[Union[int, float]] = None
-    max_value: Optional[Union[int, float]] = None
+    min_value: Optional[int | float] = None
+    max_value: Optional[int | float] = None
     min_length: Optional[int] = None
     max_length: Optional[int] = None
     min_count: Optional[int] = None
