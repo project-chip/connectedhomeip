@@ -38,8 +38,8 @@ struct TestMinimalWiredPowerSourceCluster : public TestBase
 
 TEST_F(TestMinimalWiredPowerSourceCluster, AttributeTest)
 {
-    MinimalWiredPowerSourceConfig config(kTestEndpointId, CharSpan{}, WiredCurrentTypeEnum::kAc);
-    MinimalWiredPowerSourceCluster cluster(config);
+    MinimalWiredPowerSourceConfig config(CharSpan{}, WiredCurrentTypeEnum::kAc);
+    MinimalWiredPowerSourceCluster cluster(kTestEndpointId, config);
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
 
     EXPECT_TRUE(IsAttributesListEqualTo(cluster,
@@ -51,8 +51,8 @@ TEST_F(TestMinimalWiredPowerSourceCluster, AttributeTest)
 
 TEST_F(TestMinimalWiredPowerSourceCluster, ReadAttributeTest)
 {
-    MinimalWiredPowerSourceConfig config(kTestEndpointId, CharSpan{}, WiredCurrentTypeEnum::kAc);
-    MinimalWiredPowerSourceCluster cluster(config);
+    MinimalWiredPowerSourceConfig config(CharSpan{}, WiredCurrentTypeEnum::kAc);
+    MinimalWiredPowerSourceCluster cluster(kTestEndpointId, config);
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
 
     ClusterTester tester(cluster);
@@ -67,8 +67,8 @@ TEST_F(TestMinimalWiredPowerSourceCluster, ReadAttributeTest)
 
 TEST_F(TestMinimalWiredPowerSourceCluster, TestGetters)
 {
-    MinimalWiredPowerSourceConfig config(kTestEndpointId, CharSpan{}, WiredCurrentTypeEnum::kAc);
-    MinimalWiredPowerSourceCluster cluster(config);
+    MinimalWiredPowerSourceConfig config(CharSpan{}, WiredCurrentTypeEnum::kAc);
+    MinimalWiredPowerSourceCluster cluster(kTestEndpointId, config);
 
     cluster.GetStatus();
     cluster.GetOrder();
@@ -79,8 +79,8 @@ TEST_F(TestMinimalWiredPowerSourceCluster, TestGetters)
 
 TEST_F(TestMinimalWiredPowerSourceCluster, TestSetters)
 {
-    MinimalWiredPowerSourceConfig config(kTestEndpointId, CharSpan{}, WiredCurrentTypeEnum::kAc);
-    MinimalWiredPowerSourceCluster cluster(config);
+    MinimalWiredPowerSourceConfig config(CharSpan{}, WiredCurrentTypeEnum::kAc);
+    MinimalWiredPowerSourceCluster cluster(kTestEndpointId, config);
 
     EXPECT_EQ(cluster.SetStatus({}), CHIP_NO_ERROR);
     cluster.SetOrder({});
@@ -92,8 +92,8 @@ TEST_F(TestMinimalWiredPowerSourceCluster, TestBounds)
     CharSpan longTestText =
         "Very very long text used for descriptions and designations, totally longer than one hundred bytes. For testing purposes"_span;
 
-    MinimalWiredPowerSourceConfig config(kTestEndpointId, longTestText, WiredCurrentTypeEnum::kAc);
-    MinimalWiredPowerSourceCluster cluster(config);
+    MinimalWiredPowerSourceConfig config(longTestText, WiredCurrentTypeEnum::kAc);
+    MinimalWiredPowerSourceCluster cluster(kTestEndpointId, config);
     ClusterTester tester(cluster);
     TestStringAttributeReadLength<Description::TypeInfo>(tester);
 }

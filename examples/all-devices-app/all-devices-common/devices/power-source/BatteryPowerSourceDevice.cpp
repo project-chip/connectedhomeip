@@ -37,12 +37,12 @@ CHIP_ERROR BatteryPowerSourceDevice::Register(chip::EndpointId endpoint, CodeDri
     ReturnErrorOnFailure(SingleEndpointRegistration(endpoint, provider, parentId));
 
     // Power Source (some arbitrary configuration)
-    SimpleBatteryPowerSourceCluster::Config config(endpoint, mDescription, mReplaceability, mTimerDelegate);
+    SimpleBatteryPowerSourceCluster::Config config(mDescription, mReplaceability, mTimerDelegate);
     config.usedOptionalAttributes.Set<BatPercentRemainingId>();
     config.status = Clusters::PowerSource::PowerSourceStatusEnum::kActive;
     config.order  = 0;
 
-    mBatteryPowerSourceCluster.Create(config);
+    mBatteryPowerSourceCluster.Create(endpoint, config);
     ReturnErrorOnFailure(mBatteryPowerSourceCluster.Cluster().SetEndpointList(Span<const EndpointId>(mEndpointList)));
     ReturnErrorOnFailure(provider.AddCluster(mBatteryPowerSourceCluster.Registration()));
 

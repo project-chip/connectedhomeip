@@ -38,8 +38,8 @@ struct TestMinimalBatteryPowerSourceCluster : public TestBase
 
 TEST_F(TestMinimalBatteryPowerSourceCluster, AttributeTest)
 {
-    MinimalBatteryPowerSourceConfig config(kTestEndpointId, CharSpan{}, BatReplaceabilityEnum::kUnspecified, timerDelegate);
-    MinimalBatteryPowerSourceCluster cluster(config);
+    MinimalBatteryPowerSourceConfig config(CharSpan{}, BatReplaceabilityEnum::kUnspecified, timerDelegate);
+    MinimalBatteryPowerSourceCluster cluster(kTestEndpointId, config);
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
 
     EXPECT_TRUE(IsAttributesListEqualTo(cluster,
@@ -52,8 +52,8 @@ TEST_F(TestMinimalBatteryPowerSourceCluster, AttributeTest)
 
 TEST_F(TestMinimalBatteryPowerSourceCluster, ReadAttributeTest)
 {
-    MinimalBatteryPowerSourceConfig config(kTestEndpointId, CharSpan{}, BatReplaceabilityEnum::kUnspecified, timerDelegate);
-    MinimalBatteryPowerSourceCluster cluster(config);
+    MinimalBatteryPowerSourceConfig config(CharSpan{}, BatReplaceabilityEnum::kUnspecified, timerDelegate);
+    MinimalBatteryPowerSourceCluster cluster(kTestEndpointId, config);
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
 
     ClusterTester tester(cluster);
@@ -70,8 +70,8 @@ TEST_F(TestMinimalBatteryPowerSourceCluster, ReadAttributeTest)
 
 TEST_F(TestMinimalBatteryPowerSourceCluster, TestGetters)
 {
-    MinimalBatteryPowerSourceConfig config(kTestEndpointId, CharSpan{}, BatReplaceabilityEnum::kUnspecified, timerDelegate);
-    MinimalBatteryPowerSourceCluster cluster(config);
+    MinimalBatteryPowerSourceConfig config(CharSpan{}, BatReplaceabilityEnum::kUnspecified, timerDelegate);
+    MinimalBatteryPowerSourceCluster cluster(kTestEndpointId, config);
 
     cluster.GetStatus();
     cluster.GetOrder();
@@ -84,8 +84,8 @@ TEST_F(TestMinimalBatteryPowerSourceCluster, TestGetters)
 
 TEST_F(TestMinimalBatteryPowerSourceCluster, TestSetters)
 {
-    MinimalBatteryPowerSourceConfig config(kTestEndpointId, CharSpan{}, BatReplaceabilityEnum::kUnspecified, timerDelegate);
-    MinimalBatteryPowerSourceCluster cluster(config);
+    MinimalBatteryPowerSourceConfig config(CharSpan{}, BatReplaceabilityEnum::kUnspecified, timerDelegate);
+    MinimalBatteryPowerSourceCluster cluster(kTestEndpointId, config);
 
     EXPECT_EQ(cluster.SetStatus({}), CHIP_NO_ERROR);
     cluster.SetOrder({});
@@ -99,8 +99,8 @@ TEST_F(TestMinimalBatteryPowerSourceCluster, TestBounds)
     CharSpan longTestText =
         "Very very long text used for descriptions and designations, totally longer than one hundred bytes. For testing purposes"_span;
 
-    MinimalBatteryPowerSourceConfig config(kTestEndpointId, longTestText, BatReplaceabilityEnum::kUnspecified, timerDelegate);
-    MinimalBatteryPowerSourceCluster cluster(config);
+    MinimalBatteryPowerSourceConfig config(longTestText, BatReplaceabilityEnum::kUnspecified, timerDelegate);
+    MinimalBatteryPowerSourceCluster cluster(kTestEndpointId, config);
     ClusterTester tester(cluster);
     TestStringAttributeReadLength<Description::TypeInfo>(tester);
 }

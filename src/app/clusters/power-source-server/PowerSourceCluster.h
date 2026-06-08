@@ -188,21 +188,19 @@ struct PowerSourceClusterConfig : public PowerSource::detail::AllModules<support
     constexpr static AttributeSet supportedOptionalAttributeSet =
         PowerSource::detail::GetValidOptionalAttributeSet(AttributeSet(supportedOptionalAttributeBits), supportedFeatures);
 
-    PowerSourceClusterConfig(EndpointId endpointId, CharSpan desc, PowerSource::WiredCurrentTypeEnum currType)
+    PowerSourceClusterConfig(CharSpan desc, PowerSource::WiredCurrentTypeEnum currType)
     {
         static_assert(supportedFeatures.Has(PowerSource::Feature::kWired),
                       "This constructor should only be used for a Wired power source configuration");
-        mEndpointId            = endpointId;
         this->description      = desc;
         this->wiredCurrentType = currType;
     }
 
-    PowerSourceClusterConfig(EndpointId endpointId, CharSpan desc, PowerSource::BatReplaceabilityEnum replability,
+    PowerSourceClusterConfig(CharSpan desc, PowerSource::BatReplaceabilityEnum replability,
                              TimerDelegate & timerDelegate)
     {
         static_assert(supportedFeatures.Has(PowerSource::Feature::kBattery),
                       "This constructor should only be used for a Battery power source configuration");
-        mEndpointId             = endpointId;
         this->description       = desc;
         this->batReplaceability = replability;
         this->mTimerDelegate    = &timerDelegate;
@@ -235,7 +233,6 @@ struct PowerSourceClusterConfig : public PowerSource::detail::AllModules<support
     }
 
     PowerSourceOptionalAttributeSet usedOptionalAttributes{ UINT32_MAX }; // all supported attributes are marked as used by default.
-    EndpointId mEndpointId{};
 };
 
 template <std::underlying_type_t<PowerSource::Feature> supportedFeatureBits, uint32_t supportedOptionalAttributeBits>
@@ -266,13 +263,14 @@ public:
 
     template <bool batteryFeatureNotSupported                   = !supportedFeatures.Has(PowerSource::Feature::kBattery),
               std::enable_if_t<batteryFeatureNotSupported, int> = 0>
-    PowerSourceCluster(const Config & config) : Config(config), DefaultServerCluster({ config.mEndpointId, PowerSource::Id })
+    PowerSourceCluster(EndpointId endpointId, const Config & config) :
+        Config(config), DefaultServerCluster({ endpointId, PowerSource::Id })
     {}
 
     template <bool batteryFeatureSupported                      = supportedFeatures.Has(PowerSource::Feature::kBattery),
               std::enable_if_t<batteryFeatureSupported, size_t> = 0>
-    PowerSourceCluster(const Config & config) :
-        Config(config), DefaultServerCluster({ config.mEndpointId, PowerSource::Id }),
+    PowerSourceCluster(EndpointId endpointId, const Config & config) :
+        Config(config), DefaultServerCluster({ endpointId, PowerSource::Id }),
         PowerSource::detail::BatteryTimerContextsModule<batteryFeatureSupported>(
             Config::GetTimerDelegate(), [this](AttributeId id) { NotifyAttributeChanged(id); })
     {}

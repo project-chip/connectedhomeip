@@ -38,8 +38,8 @@ struct TestFullWiredPowerSourceCluster : public TestBase
 
 TEST_F(TestFullWiredPowerSourceCluster, AttributeTest)
 {
-    FullWiredPowerSourceConfig config(kTestEndpointId, CharSpan{}, WiredCurrentTypeEnum::kAc);
-    FullWiredPowerSourceCluster cluster(config);
+    FullWiredPowerSourceConfig config(CharSpan{}, WiredCurrentTypeEnum::kAc);
+    FullWiredPowerSourceCluster cluster(kTestEndpointId, config);
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
 
     EXPECT_TRUE(IsAttributesListEqualTo(
@@ -54,8 +54,8 @@ TEST_F(TestFullWiredPowerSourceCluster, AttributeTest)
 
 TEST_F(TestFullWiredPowerSourceCluster, ReadAttributeTest)
 {
-    FullWiredPowerSourceConfig config(kTestEndpointId, CharSpan{}, WiredCurrentTypeEnum::kAc);
-    FullWiredPowerSourceCluster cluster(config);
+    FullWiredPowerSourceConfig config(CharSpan{}, WiredCurrentTypeEnum::kAc);
+    FullWiredPowerSourceCluster cluster(kTestEndpointId, config);
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
 
     ClusterTester tester(cluster);
@@ -77,8 +77,8 @@ TEST_F(TestFullWiredPowerSourceCluster, ReadAttributeTest)
 
 TEST_F(TestFullWiredPowerSourceCluster, TestGetters)
 {
-    FullWiredPowerSourceConfig config(kTestEndpointId, CharSpan{}, WiredCurrentTypeEnum::kAc);
-    FullWiredPowerSourceCluster cluster(config);
+    FullWiredPowerSourceConfig config(CharSpan{}, WiredCurrentTypeEnum::kAc);
+    FullWiredPowerSourceCluster cluster(kTestEndpointId, config);
 
     cluster.GetStatus();
     cluster.GetOrder();
@@ -98,8 +98,8 @@ TEST_F(TestFullWiredPowerSourceCluster, TestGetters)
 
 TEST_F(TestFullWiredPowerSourceCluster, TestSetters)
 {
-    FullWiredPowerSourceConfig config(kTestEndpointId, CharSpan{}, WiredCurrentTypeEnum::kAc);
-    FullWiredPowerSourceCluster cluster(config);
+    FullWiredPowerSourceConfig config(CharSpan{}, WiredCurrentTypeEnum::kAc);
+    FullWiredPowerSourceCluster cluster(kTestEndpointId, config);
 
     EXPECT_EQ(cluster.SetStatus({}), CHIP_NO_ERROR);
     cluster.SetOrder({});
@@ -116,8 +116,8 @@ TEST_F(TestFullWiredPowerSourceCluster, TestBounds)
     CharSpan longTestText =
         "Very very long text used for descriptions and designations, totally longer than one hundred bytes. For testing purposes"_span;
 
-    FullWiredPowerSourceConfig config(kTestEndpointId, longTestText, WiredCurrentTypeEnum::kAc);
-    FullWiredPowerSourceCluster cluster(config);
+    FullWiredPowerSourceConfig config(longTestText, WiredCurrentTypeEnum::kAc);
+    FullWiredPowerSourceCluster cluster(kTestEndpointId, config);
     ClusterTester tester(cluster);
     TestStringAttributeReadLength<Description::TypeInfo>(tester);
 }

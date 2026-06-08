@@ -38,10 +38,10 @@ struct TestFullBatteryPowerSourceCluster : public TestBase
 
 TEST_F(TestFullBatteryPowerSourceCluster, AttributeTest)
 {
-    FullBatteryPowerSourceConfig config(kTestEndpointId, CharSpan{}, BatReplaceabilityEnum::kUnspecified, timerDelegate);
+    FullBatteryPowerSourceConfig config(CharSpan{}, BatReplaceabilityEnum::kUnspecified, timerDelegate);
     config.MakeReplaceable(CharSpan{}, 0);
     config.MakeRechargeable();
-    FullBatteryPowerSourceCluster cluster(config);
+    FullBatteryPowerSourceCluster cluster(kTestEndpointId, config);
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
 
     EXPECT_TRUE(IsAttributesListEqualTo(cluster,
@@ -75,10 +75,10 @@ TEST_F(TestFullBatteryPowerSourceCluster, AttributeTest)
 
 TEST_F(TestFullBatteryPowerSourceCluster, ReadAttributeTest)
 {
-    FullBatteryPowerSourceConfig config(kTestEndpointId, CharSpan{}, BatReplaceabilityEnum::kUnspecified, timerDelegate);
+    FullBatteryPowerSourceConfig config(CharSpan{}, BatReplaceabilityEnum::kUnspecified, timerDelegate);
     config.MakeReplaceable(CharSpan{}, 0);
     config.MakeRechargeable();
-    FullBatteryPowerSourceCluster cluster(config);
+    FullBatteryPowerSourceCluster cluster(kTestEndpointId, config);
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
 
     ClusterTester tester(cluster);
@@ -112,10 +112,10 @@ TEST_F(TestFullBatteryPowerSourceCluster, ReadAttributeTest)
 
 TEST_F(TestFullBatteryPowerSourceCluster, TestGetters)
 {
-    FullBatteryPowerSourceConfig config(kTestEndpointId, CharSpan{}, BatReplaceabilityEnum::kUnspecified, timerDelegate);
+    FullBatteryPowerSourceConfig config(CharSpan{}, BatReplaceabilityEnum::kUnspecified, timerDelegate);
     config.MakeReplaceable(CharSpan{}, 0);
     config.MakeRechargeable();
-    FullBatteryPowerSourceCluster cluster(config);
+    FullBatteryPowerSourceCluster cluster(kTestEndpointId, config);
 
     cluster.GetStatus();
     cluster.GetOrder();
@@ -149,10 +149,10 @@ TEST_F(TestFullBatteryPowerSourceCluster, TestGetters)
 
 TEST_F(TestFullBatteryPowerSourceCluster, TestSetters)
 {
-    FullBatteryPowerSourceConfig config(kTestEndpointId, CharSpan{}, BatReplaceabilityEnum::kUnspecified, timerDelegate);
+    FullBatteryPowerSourceConfig config(CharSpan{}, BatReplaceabilityEnum::kUnspecified, timerDelegate);
     config.MakeReplaceable(CharSpan{}, 0);
     config.MakeRechargeable();
-    FullBatteryPowerSourceCluster cluster(config);
+    FullBatteryPowerSourceCluster cluster(kTestEndpointId, config);
 
     EXPECT_EQ(cluster.SetStatus({}), CHIP_NO_ERROR);
     cluster.SetOrder({});
@@ -176,13 +176,13 @@ TEST_F(TestFullBatteryPowerSourceCluster, TestBounds)
     CharSpan longTestText =
         "Very very long text used for descriptions and designations, totally longer than one hundred bytes. For testing purposes"_span;
 
-    FullBatteryPowerSourceConfig config(kTestEndpointId, longTestText, BatReplaceabilityEnum::kUnspecified, timerDelegate);
+    FullBatteryPowerSourceConfig config(longTestText, BatReplaceabilityEnum::kUnspecified, timerDelegate);
     config.MakeReplaceable(longTestText, 0);
     config.MakeRechargeable();
     config.batANSIDesignation = longTestText;
     config.batIECDesignation  = longTestText;
 
-    FullBatteryPowerSourceCluster cluster(config);
+    FullBatteryPowerSourceCluster cluster(kTestEndpointId, config);
     ClusterTester tester(cluster);
     TestStringAttributeReadLength<Description::TypeInfo>(tester);
     TestStringAttributeReadLength<BatReplacementDescription::TypeInfo>(tester);
