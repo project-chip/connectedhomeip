@@ -522,7 +522,7 @@ def run_tests_no_exit(
                             stored_global_wildcard = read_global_wildcard(event_loop, default_controller, node_id)
                             test_config.user_params["stored_global_wildcard"] = global_stash.stash_globally(stored_global_wildcard)
                     except Exception:
-                        LOGGER.warning("Could not pre-populate global wildcard via PASE")
+                        LOGGER.warning("Could not pre-populate global wildcard via PASE", exc_info=True)
 
                 else:
                     # Path 3: CASE (already commissioned, no setup code)
@@ -530,7 +530,7 @@ def run_tests_no_exit(
                         stored_global_wildcard = read_global_wildcard(event_loop, default_controller, node_id)
                         test_config.user_params["stored_global_wildcard"] = global_stash.stash_globally(stored_global_wildcard)
                     except Exception:
-                        LOGGER.warning("Could not pre-populate global wildcard via CASE")
+                        LOGGER.warning("Could not pre-populate global wildcard via CASE", exc_info=True)
 
             # Add the tests selected unless we have a commission-only request
             if not matter_test_config.commission_only:
