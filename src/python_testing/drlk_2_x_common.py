@@ -191,7 +191,7 @@ class DRLK_COMMON:
             self.print_step("4c", "TH reads MaxPINCodeLength attribute and saves the value")
             max_pin_code_length = await self.read_and_verify_pincode_length(
                 attribute=Clusters.DoorLock.Attributes.MaxPINCodeLength,
-                failure_message="MinPINCodeLength attribute must be between 0 to 255"
+                failure_message="MaxPINCodeLength attribute must be between 0 to 255"
             )
             self.print_step("4d", "Generate credential data and store as pin_code,Th sends SetCredential command"
                                   "using pin_code")
@@ -230,12 +230,13 @@ class DRLK_COMMON:
                     self.print_step("6a", "TH verifies that RequirePINforRemoteOperation is TRUE")
                     asserts.assert_true(requirePinForRemoteOperation_dut, "RequirePINforRemoteOperation is expected to be TRUE")
         # generate InvalidPincode
-        while True:
-            invalidPincodeString = await self.generate_pincode(max_pin_code_length, min_pin_code_length)
-            invalidPincode = bytes(invalidPincodeString, "ascii")
-            if invalidPincodeString != pin_code:
-                break
-        log.info(" pin_code=%s, Invalid PinCode=%s" % (pin_code, invalidPincodeString))
+        if self.check_pics("DRLK.S.F00"):
+            while True:
+                invalidPincodeString = await self.generate_pincode(max_pin_code_length, min_pin_code_length)
+                invalidPincode = bytes(invalidPincodeString, "ascii")
+                if invalidPincodeString != pin_code:
+                    break
+            log.info(" pin_code=%s, Invalid PinCode=%s" % (pin_code, invalidPincodeString))
         if self.check_pics("DRLK.S.F00") and self.check_pics(lockUnlockCmdRspPICS) and self.check_pics("DRLK.S.A0033"):
             self.print_step("7", "TH sends %s Command to the DUT with an invalid PINCode" % lockUnlockText)
             command = lockUnlockCommand(PINCode=invalidPincode)

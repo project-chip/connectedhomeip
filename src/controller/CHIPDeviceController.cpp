@@ -48,6 +48,7 @@
 #include <lib/core/NodeId.h>
 #include <lib/support/Base64.h>
 #include <lib/support/CHIPMem.h>
+#include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/PersistentStorageMacros.h>
 #include <lib/support/SafeInt.h>
@@ -688,6 +689,20 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, const char * se
 
     return mSetUpCodePairer.PairDevice(remoteDeviceId, setUpCode, SetupCodePairerBehaviour::kCommission, discoveryType,
                                        resolutionData);
+}
+
+CHIP_ERROR DeviceCommissioner::GetLastThreadMeshcopDiscoveryDiagnosticJson(char * buffer, size_t bufferSize)
+{
+#if CHIP_SUPPORT_THREAD_MESHCOP
+    VerifyOrReturnError(buffer != nullptr && bufferSize > 0, CHIP_ERROR_INVALID_ARGUMENT);
+
+    const std::string json = mThreadMeshcopCommissionProxy.GetLastDiscoveryDiagnosticJson();
+    VerifyOrReturnError(json.size() < bufferSize, CHIP_ERROR_BUFFER_TOO_SMALL);
+    Platform::CopyString(buffer, bufferSize, json.c_str());
+    return CHIP_NO_ERROR;
+#else
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+#endif // CHIP_SUPPORT_THREAD_MESHCOP
 }
 
 CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, const char * setUpCode, DiscoveryType discoveryType,
