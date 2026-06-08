@@ -47,6 +47,7 @@ config CHIP_TASK_PRIORITY
 	default 5
 
 config CHIP_TASK_STACK_SIZE
+	default 13312 if CHIP_SE05X  # Increase is due to the additional middle-ware APDU buffers and Zephyr
 	default 10240
 
 config MAX_EVENT_QUEUE_SIZE
@@ -178,13 +179,6 @@ config MAIN_STACK_SIZE
 	default 16384 if CHIP_SE05X  # Increase is due to the additional middle-ware APDU buffers and Zephyr
 	default 6144 if NET_L2_OPENTHREAD
 	default 3072
-
-config CHIP_TASK_STACK_SIZE
-	int "Matter task stack size"
-	default 13312 if CHIP_SE05X  # Increase is due to the additional middle-ware APDU buffers and Zephyr
-	default 8192
-	help
-	  Set the stack size (in bytes) for the chip task (CHIP event loop).
 	  
 # AEAD ITS transform module encryption key provider
 choice SECURE_STORAGE_ITS_TRANSFORM_AEAD_KEY_PROVIDER
@@ -704,17 +698,9 @@ choice POSIX_AEP_CHOICE
 endchoice
 
 config CHIP_SE05X
-	bool "Enable SE05X secure element support"
 	select SE05X_LIB
 	select I2C
 	select PINCTRL
-	help
-		Enable support for NXP SE05X secure element.
-		The SE05X provides hardware-based cryptographic operations,
-		secure key storage, and device attestation capabilities.
-		When enabled, cryptographic operations (ECDSA, ECDH, etc.)
-		will be offloaded to the SE05X hardware instead of using
-		software implementations.
 
 endif # CHIP
 
