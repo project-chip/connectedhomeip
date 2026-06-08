@@ -79,6 +79,7 @@ class HostCryptoLibrary(Enum):
     OPENSSL = auto()
     MBEDTLS = auto()
     BORINGSSL = auto()
+    PSA = auto()
 
     @property
     def gn_argument(self):
@@ -88,6 +89,10 @@ class HostCryptoLibrary(Enum):
             return 'chip_crypto="mbedtls"'
         if self == HostCryptoLibrary.BORINGSSL:
             return 'chip_crypto="boringssl"'
+        if self == HostCryptoLibrary.PSA:
+            # The vendored mbedTLS (2.28) has no multi-part PSA AEAD, so use the
+            # one-shot implementation (as ESP32 does).
+            return 'chip_crypto="psa" chip_crypto_psa_aead_single_part=true'
         raise ValueError("Unknown host crypto library: %r" % self)
 
 

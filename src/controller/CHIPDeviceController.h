@@ -539,6 +539,8 @@ public:
                           Optional<Dnssd::CommonResolutionData> resolutionData = NullOptional,
                           Optional<SetUpCodePairer::ThreadMeshcopCommissionParameters> meshcopCommissionParams = NullOptional);
 
+    CHIP_ERROR GetLastThreadMeshcopDiscoveryDiagnosticJson(char * buffer, size_t bufferSize);
+
     /**
      * @brief
      *   Pair a CHIP device with the provided Rendezvous connection parameters.

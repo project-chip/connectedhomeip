@@ -13126,6 +13126,97 @@ public static class AmbientContextSensingClusterPredictedActivityStruct {
     return output.toString();
   }
 }
+public static class AmbientSensingUnionClusterUnionContributorStruct {
+  public @Nullable Long contributorNodeID;
+  public @Nullable Integer contributorEndpointID;
+  public Optional<String> contributorName;
+  public Integer contributorHealth;
+  private static final long CONTRIBUTOR_NODE_ID_ID = 0L;
+  private static final long CONTRIBUTOR_ENDPOINT_ID_ID = 1L;
+  private static final long CONTRIBUTOR_NAME_ID = 2L;
+  private static final long CONTRIBUTOR_HEALTH_ID = 3L;
+
+  public AmbientSensingUnionClusterUnionContributorStruct(
+    @Nullable Long contributorNodeID,
+    @Nullable Integer contributorEndpointID,
+    Optional<String> contributorName,
+    Integer contributorHealth
+  ) {
+    this.contributorNodeID = contributorNodeID;
+    this.contributorEndpointID = contributorEndpointID;
+    this.contributorName = contributorName;
+    this.contributorHealth = contributorHealth;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(CONTRIBUTOR_NODE_ID_ID, contributorNodeID != null ? new UIntType(contributorNodeID) : new NullType()));
+    values.add(new StructElement(CONTRIBUTOR_ENDPOINT_ID_ID, contributorEndpointID != null ? new UIntType(contributorEndpointID) : new NullType()));
+    values.add(new StructElement(CONTRIBUTOR_NAME_ID, contributorName.<BaseTLVType>map((nonOptionalcontributorName) -> new StringType(nonOptionalcontributorName)).orElse(new EmptyType())));
+    values.add(new StructElement(CONTRIBUTOR_HEALTH_ID, new UIntType(contributorHealth)));
+
+    return new StructType(values);
+  }
+
+  public static AmbientSensingUnionClusterUnionContributorStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    @Nullable Long contributorNodeID = null;
+    @Nullable Integer contributorEndpointID = null;
+    Optional<String> contributorName = Optional.empty();
+    Integer contributorHealth = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == CONTRIBUTOR_NODE_ID_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          contributorNodeID = castingValue.value(Long.class);
+        }
+      } else if (element.contextTagNum() == CONTRIBUTOR_ENDPOINT_ID_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          contributorEndpointID = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == CONTRIBUTOR_NAME_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          contributorName = Optional.of(castingValue.value(String.class));
+        }
+      } else if (element.contextTagNum() == CONTRIBUTOR_HEALTH_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          contributorHealth = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new AmbientSensingUnionClusterUnionContributorStruct(
+      contributorNodeID,
+      contributorEndpointID,
+      contributorName,
+      contributorHealth
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("AmbientSensingUnionClusterUnionContributorStruct {\n");
+    output.append("\tcontributorNodeID: ");
+    output.append(contributorNodeID);
+    output.append("\n");
+    output.append("\tcontributorEndpointID: ");
+    output.append(contributorEndpointID);
+    output.append("\n");
+    output.append("\tcontributorName: ");
+    output.append(contributorName);
+    output.append("\n");
+    output.append("\tcontributorHealth: ");
+    output.append(contributorHealth);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class ProximityRangingClusterRDRStruct {
   public Integer azimuth;
   public Integer elevation;
@@ -20902,6 +20993,7 @@ public static class CommodityTariffClusterTariffComponentStruct {
   public @Nullable Long threshold;
   public @Nullable Optional<String> label;
   public Optional<Boolean> predicted;
+  public Optional<String> externalID;
   private static final long TARIFF_COMPONENT_ID_ID = 0L;
   private static final long PRICE_ID = 1L;
   private static final long FRIENDLY_CREDIT_ID = 2L;
@@ -20911,6 +21003,7 @@ public static class CommodityTariffClusterTariffComponentStruct {
   private static final long THRESHOLD_ID = 6L;
   private static final long LABEL_ID = 7L;
   private static final long PREDICTED_ID = 8L;
+  private static final long EXTERNAL_ID_ID = 9L;
 
   public CommodityTariffClusterTariffComponentStruct(
     Long tariffComponentID,
@@ -20921,7 +21014,8 @@ public static class CommodityTariffClusterTariffComponentStruct {
     Optional<ChipStructs.CommodityTariffClusterPowerThresholdStruct> powerThreshold,
     @Nullable Long threshold,
     @Nullable Optional<String> label,
-    Optional<Boolean> predicted
+    Optional<Boolean> predicted,
+    Optional<String> externalID
   ) {
     this.tariffComponentID = tariffComponentID;
     this.price = price;
@@ -20932,6 +21026,7 @@ public static class CommodityTariffClusterTariffComponentStruct {
     this.threshold = threshold;
     this.label = label;
     this.predicted = predicted;
+    this.externalID = externalID;
   }
 
   public StructType encodeTlv() {
@@ -20945,6 +21040,7 @@ public static class CommodityTariffClusterTariffComponentStruct {
     values.add(new StructElement(THRESHOLD_ID, threshold != null ? new IntType(threshold) : new NullType()));
     values.add(new StructElement(LABEL_ID, label != null ? label.<BaseTLVType>map((nonOptionallabel) -> new StringType(nonOptionallabel)).orElse(new EmptyType()) : new NullType()));
     values.add(new StructElement(PREDICTED_ID, predicted.<BaseTLVType>map((nonOptionalpredicted) -> new BooleanType(nonOptionalpredicted)).orElse(new EmptyType())));
+    values.add(new StructElement(EXTERNAL_ID_ID, externalID.<BaseTLVType>map((nonOptionalexternalID) -> new StringType(nonOptionalexternalID)).orElse(new EmptyType())));
 
     return new StructType(values);
   }
@@ -20962,6 +21058,7 @@ public static class CommodityTariffClusterTariffComponentStruct {
     @Nullable Long threshold = null;
     @Nullable Optional<String> label = null;
     Optional<Boolean> predicted = Optional.empty();
+    Optional<String> externalID = Optional.empty();
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == TARIFF_COMPONENT_ID_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -21008,6 +21105,11 @@ public static class CommodityTariffClusterTariffComponentStruct {
           BooleanType castingValue = element.value(BooleanType.class);
           predicted = Optional.of(castingValue.value(Boolean.class));
         }
+      } else if (element.contextTagNum() == EXTERNAL_ID_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          externalID = Optional.of(castingValue.value(String.class));
+        }
       }
     }
     return new CommodityTariffClusterTariffComponentStruct(
@@ -21019,7 +21121,8 @@ public static class CommodityTariffClusterTariffComponentStruct {
       powerThreshold,
       threshold,
       label,
-      predicted
+      predicted,
+      externalID
     );
   }
 
@@ -21053,6 +21156,9 @@ public static class CommodityTariffClusterTariffComponentStruct {
     output.append("\n");
     output.append("\tpredicted: ");
     output.append(predicted);
+    output.append("\n");
+    output.append("\texternalID: ");
+    output.append(externalID);
     output.append("\n");
     output.append("}\n");
     return output.toString();
