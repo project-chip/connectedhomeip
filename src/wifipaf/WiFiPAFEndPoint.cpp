@@ -784,7 +784,7 @@ CHIP_ERROR WiFiPAFEndPoint::HandleCapabilitiesResponseReceived(PacketBufferHandl
     }
     mRemoteReceiveWindowSize = mLocalReceiveWindowSize = mReceiveWindowMaxSize =
         std::min(resp.mWindowSize, static_cast<uint8_t>(PAF_MAX_RECEIVE_WINDOW_SIZE));
-    ChipLogProgress(WiFiPAF, "local and remote recv window size = %u", resp.mWindowSize);
+    ChipLogProgress(WiFiPAF, "local and remote recv window size = %u", mReceiveWindowMaxSize);
 
     // Shrink local receive window counter by 1, since connect handshake indication requires acknowledgement.
     mLocalReceiveWindowSize = static_cast<SequenceNumber_t>(mLocalReceiveWindowSize - 1);
