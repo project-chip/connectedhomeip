@@ -1141,9 +1141,17 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & partialPack
     ReturnOnFailure(mac.Decode(partialPacketHeader, &data[len - footerLen], footerLen, &taglen));
     VerifyOrReturn(taglen == footerLen);
 
+    // Groupcast Testing
+    auto & testing = chip::Groupcast::GetTesting();
+
     bool decrypted = false;
+    bool hasAnyKeysForFabricUnderTest = false;
     while (!decrypted && iter->Next(groupContext))
     {
+        if (testing.IsEnabled() && testing.IsFabricUnderTest(groupContext.fabric_index))
+        {
+            hasAnyKeysForFabricUnderTest = true;
+        }
         CryptoContext context(groupContext.keyContext);
         msgCopy = msg.CloneData();
         if (msgCopy.IsNull())
@@ -1172,8 +1180,6 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & partialPack
 #endif // CHIP_CONFIG_PRIVACY_ACCEPT_NONSPEC_SVE2
     }
     iter.Release();
-    // Groupcast Testing
-    auto & testing = chip::Groupcast::GetTesting();
 
     if (testing.IsEnabled())
     {
@@ -1188,11 +1194,10 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & partialPack
         else
         {
             // FAILURE CASE: No valid groupContext or decryption failed. This can happen
-            // when there is an empty group key map. This means GroupSessions cannot be
-            // iterated over to populate groupContext, and the fabric index cannot be
+            // for example, when there is an empty group key map. This means GroupSessions 
+            // cannot be iterated over to populate groupContext, and the fabric index cannot be
             // explicitly checked here.
-
-            testing.SetTestResult(chip::Groupcast::Testing::Result::kNoAvailableKey);
+            testing.SetTestResult(hasAnyKeysForFabricUnderTest ? chip::Groupcast::Testing::Result::kFailedAuth : chip::Groupcast::Testing::Result::kNoAvailableKey);
             testing.NotifyDelegate();
         }
     }
@@ -1250,6 +1255,18 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & partialPack
 
         if (err != CHIP_NO_ERROR)
         {
+            if (testing.IsEnabled() && testing.IsFabricUnderTest(groupContext.fabric_index))
+            {
+                if (err == CHIP_ERROR_DUPLICATE_MESSAGE_RECEIVED)
+                {
+                    testing.SetTestResult(chip::Groupcast::Testing::Result::kMessageReplay);
+                }
+                else
+                {
+                    testing.SetTestResult(chip::Groupcast::Testing::Result::kGeneralError);
+                }
+                testing.NotifyDelegate();
+            }
             // Exit now, since Group Messages don't have acks or responses of any kind.
             ChipLogError(Inet, "Message counter verify failed, err = %" CHIP_ERROR_FORMAT, err.Format());
             return;
@@ -1257,6 +1274,11 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & partialPack
     }
     else
     {
+        if (testing.IsEnabled() && testing.IsFabricUnderTest(groupContext.fabric_index))
+        {
+            testing.SetTestResult(chip::Groupcast::Testing::Result::kGeneralError);
+            testing.NotifyDelegate();
+        }
         ChipLogError(Inet,
                      "Group Counter Tables full or invalid NodeId/FabricIndex after decryption of message, dropping everything");
         return;
