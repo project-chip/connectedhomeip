@@ -60,7 +60,7 @@ jobs:
                   CONCURRENCY_CONTEXT: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
               run: echo "$CONCURRENCY_CONTEXT"
             - name: Checkout
-              uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+              uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
             - name: Try to ensure the directories for core dumping exist and we
                   can write them.
               run: |
@@ -179,7 +179,7 @@ jobs:
                   CONCURRENCY_CONTEXT: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
               run: echo "$CONCURRENCY_CONTEXT"
             - name: Checkout
-              uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+              uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
               with:
                   fetch-depth: 2
                   persist-credentials: true
@@ -367,7 +367,7 @@ jobs:
                   CONCURRENCY_CONTEXT: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
               run: echo "$CONCURRENCY_CONTEXT"
             - name: Checkout
-              uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+              uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
@@ -435,7 +435,7 @@ jobs:
                   CONCURRENCY_CONTEXT: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
               run: echo "$CONCURRENCY_CONTEXT"
             - name: Checkout
-              uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+              uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
@@ -457,7 +457,7 @@ jobs:
 
         steps:
             - name: Checkout
-              uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+              uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
               with:
                   fetch-depth: 2
                   persist-credentials: true
@@ -563,7 +563,7 @@ jobs:
 
         steps:
             - name: Checkout
-              uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+              uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
