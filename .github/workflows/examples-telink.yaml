@@ -96,7 +96,7 @@ jobs:
             #   run: scripts/run_in_build_env.sh "python3 scripts/tools/telink/update_zephyr.py 1f4804a19fe7ba792bfc315948043d5515e74cd2"
 
             - name: Download Factory Data tools
-              uses: actions/download-artifact@v4
+              uses: actions/download-artifact@v8
               with:
                   name: factory-data-tools
                   path: ./out
@@ -480,7 +480,7 @@ jobs:
             #   run: scripts/run_in_build_env.sh "python3 scripts/tools/telink/update_zephyr.py a5be7391771c64062e0cbd7fd6f7ef6e05d27a8b"
 
             - name: Download Factory Data tools
-              uses: actions/download-artifact@v4
+              uses: actions/download-artifact@v8
               with:
                   name: factory-data-tools
                   path: ./out
