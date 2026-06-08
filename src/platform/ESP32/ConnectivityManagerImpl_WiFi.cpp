@@ -71,18 +71,14 @@ bool ConnectivityManagerImpl::_IsWiFiStationEnabled(void)
 
 CHIP_ERROR ConnectivityManagerImpl::_SetWiFiStationMode(WiFiStationMode val)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    VerifyOrExit(val != kWiFiStationMode_NotSupported, err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(val != kWiFiStationMode_NotSupported, CHIP_ERROR_INVALID_ARGUMENT);
 
     if (val != kWiFiStationMode_ApplicationControlled)
     {
         /* Remain consistent with the previous logic to enable STA mode here.
            TODO: Set STA mode according to `val`. */
-        err = Internal::ESP32Utils::EnableStationMode();
-        SuccessOrExit(err);
-
-        DeviceLayer::SystemLayer().ScheduleWork(DriveStationState, NULL);
+        ReturnErrorOnFailure(Internal::ESP32Utils::EnableStationMode());
+        ReturnErrorOnFailure(DeviceLayer::SystemLayer().ScheduleWork(DriveStationState, NULL));
     }
 
     if (mWiFiStationMode != val)
@@ -93,8 +89,7 @@ CHIP_ERROR ConnectivityManagerImpl::_SetWiFiStationMode(WiFiStationMode val)
 
     mWiFiStationMode = val;
 
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 bool ConnectivityManagerImpl::_IsWiFiStationProvisioned(void)
@@ -112,8 +107,21 @@ void ConnectivityManagerImpl::_ClearWiFiStationProvision(void)
             ChipLogError(DeviceLayer, "ClearWiFiStationProvision failed: %" CHIP_ERROR_FORMAT, error.Format());
             return;
         }
-        DeviceLayer::SystemLayer().ScheduleWork(DriveStationState, NULL);
+        LogErrorOnFailure(DeviceLayer::SystemLayer().ScheduleWork(DriveStationState, NULL));
     }
+}
+
+CHIP_ERROR ConnectivityManagerImpl::_DisconnectNetwork(void)
+{
+    return DeviceLayer::SystemLayer().ScheduleLambda([this]() {
+        if (IsWiFiStationConnected())
+        {
+            /* Set the Wi-Fi station mode to application-controlled to prevent automatic reconnection,
+            instead of clearing the Wi-Fi station provisioning */
+            ReturnOnFailure(_SetWiFiStationMode(kWiFiStationMode_ApplicationControlled));
+            esp_wifi_disconnect();
+        }
+    });
 }
 
 #define WIFI_BAND_2_4GHZ 2400
@@ -356,9 +364,11 @@ CHIP_ERROR ConnectivityManagerImpl::InitWiFi()
                    std::min(sizeof(wifiConfig.sta.ssid), strlen(CONFIG_DEFAULT_WIFI_SSID)));
             memcpy(wifiConfig.sta.password, CONFIG_DEFAULT_WIFI_PASSWORD,
                    std::min(sizeof(wifiConfig.sta.password), strlen(CONFIG_DEFAULT_WIFI_PASSWORD)));
+#ifdef CONFIG_WIFI_SCAN_ALL_CHANNEL_MODE
             wifiConfig.sta.scan_method = WIFI_ALL_CHANNEL_SCAN;
             wifiConfig.sta.sort_method = WIFI_CONNECT_AP_BY_SIGNAL;
-            esp_err_t err              = esp_wifi_set_config(WIFI_IF_STA, &wifiConfig);
+#endif // CONFIG_WIFI_SCAN_ALL_CHANNEL_MODE
+            esp_err_t err = esp_wifi_set_config(WIFI_IF_STA, &wifiConfig);
             if (err != ESP_OK)
             {
                 ChipLogError(DeviceLayer, "esp_wifi_set_config() failed: %s", esp_err_to_name(err));
@@ -408,7 +418,7 @@ void ConnectivityManagerImpl::OnWiFiPlatformEvent(const ChipDeviceEvent * event)
                 break;
             case WIFI_EVENT_STA_DISCONNECTED:
                 ChipLogProgress(DeviceLayer, "WIFI_EVENT_STA_DISCONNECTED");
-                NetworkCommissioning::ESPWiFiDriver::GetInstance().SetLastDisconnectReason(event);
+                LogErrorOnFailure(NetworkCommissioning::ESPWiFiDriver::GetInstance().SetLastDisconnectReason(event));
                 if (mWiFiStationState == kWiFiStationState_Connecting)
                 {
                     ChangeWiFiStationState(kWiFiStationState_Connecting_Failed);
@@ -455,13 +465,13 @@ void ConnectivityManagerImpl::_OnWiFiScanDone()
 {
     // Schedule a call to DriveStationState method in case a station connect attempt was
     // deferred because the scan was in progress.
-    DeviceLayer::SystemLayer().ScheduleWork(DriveStationState, NULL);
+    LogErrorOnFailure(DeviceLayer::SystemLayer().ScheduleWork(DriveStationState, NULL));
 }
 
 void ConnectivityManagerImpl::_OnWiFiStationProvisionChange()
 {
     // Schedule a call to the DriveStationState method to adjust the station state as needed.
-    DeviceLayer::SystemLayer().ScheduleWork(DriveStationState, NULL);
+    LogErrorOnFailure(DeviceLayer::SystemLayer().ScheduleWork(DriveStationState, NULL));
 }
 
 void ConnectivityManagerImpl::DriveStationState()
@@ -625,7 +635,11 @@ void ConnectivityManagerImpl::OnStationDisconnected()
     switch (reason)
     {
     case WIFI_REASON_ASSOC_TOOMANY:
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(6, 0, 0)
+    case WIFI_REASON_CLASS3_FRAME_FROM_NONASSOC_STA:
+#else
     case WIFI_REASON_NOT_ASSOCED:
+#endif
     case WIFI_REASON_ASSOC_NOT_AUTHED:
     case WIFI_REASON_4WAY_HANDSHAKE_TIMEOUT:
     case WIFI_REASON_GROUP_CIPHER_INVALID:
@@ -640,7 +654,11 @@ void ConnectivityManagerImpl::OnStationDisconnected()
             delegate->OnAssociationFailureDetected(associationFailureCause, reason);
         }
         break;
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(6, 0, 0)
+    case WIFI_REASON_CLASS2_FRAME_FROM_NONAUTH_STA:
+#else
     case WIFI_REASON_NOT_AUTHED:
+#endif
     case WIFI_REASON_MIC_FAILURE:
     case WIFI_REASON_IE_IN_4WAY_DIFFERS:
     case WIFI_REASON_INVALID_RSN_IE_CAP:
@@ -664,7 +682,9 @@ void ConnectivityManagerImpl::OnStationDisconnected()
     case WIFI_REASON_AUTH_EXPIRE:
     case WIFI_REASON_AUTH_LEAVE:
     case WIFI_REASON_ASSOC_LEAVE:
+#if !(ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(6, 0, 0))
     case WIFI_REASON_ASSOC_EXPIRE:
+#endif
         break;
 
     default:

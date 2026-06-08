@@ -26,9 +26,12 @@
 #include <clusters/ActivatedCarbonFilterMonitoring/ClusterId.h>
 #include <clusters/AdministratorCommissioning/ClusterId.h>
 #include <clusters/AirQuality/ClusterId.h>
+#include <clusters/AmbientContextSensing/ClusterId.h>
+#include <clusters/AmbientSensingUnion/ClusterId.h>
 #include <clusters/ApplicationBasic/ClusterId.h>
 #include <clusters/ApplicationLauncher/ClusterId.h>
 #include <clusters/AudioOutput/ClusterId.h>
+#include <clusters/AvAnalysis/ClusterId.h>
 #include <clusters/BallastConfiguration/ClusterId.h>
 #include <clusters/BasicInformation/ClusterId.h>
 #include <clusters/Binding/ClusterId.h>
@@ -58,10 +61,14 @@
 #include <clusters/DishwasherAlarm/ClusterId.h>
 #include <clusters/DishwasherMode/ClusterId.h>
 #include <clusters/DoorLock/ClusterId.h>
+#include <clusters/DynamicLighting/ClusterId.h>
 #include <clusters/EcosystemInformation/ClusterId.h>
+#include <clusters/ElectricalAlarm/ClusterId.h>
+#include <clusters/ElectricalDistribution/ClusterId.h>
 #include <clusters/ElectricalEnergyMeasurement/ClusterId.h>
 #include <clusters/ElectricalGridConditions/ClusterId.h>
 #include <clusters/ElectricalPowerMeasurement/ClusterId.h>
+#include <clusters/ElectricalProtectionAlarm/ClusterId.h>
 #include <clusters/EnergyEvse/ClusterId.h>
 #include <clusters/EnergyEvseMode/ClusterId.h>
 #include <clusters/EnergyPreference/ClusterId.h>
@@ -74,8 +81,10 @@
 #include <clusters/GeneralCommissioning/ClusterId.h>
 #include <clusters/GeneralDiagnostics/ClusterId.h>
 #include <clusters/GroupKeyManagement/ClusterId.h>
+#include <clusters/Groupcast/ClusterId.h>
 #include <clusters/Groups/ClusterId.h>
 #include <clusters/HepaFilterMonitoring/ClusterId.h>
+#include <clusters/Humidistat/ClusterId.h>
 #include <clusters/IcdManagement/ClusterId.h>
 #include <clusters/Identify/ClusterId.h>
 #include <clusters/IlluminanceMeasurement/ClusterId.h>
@@ -96,6 +105,7 @@
 #include <clusters/MicrowaveOvenMode/ClusterId.h>
 #include <clusters/ModeSelect/ClusterId.h>
 #include <clusters/NetworkCommissioning/ClusterId.h>
+#include <clusters/NetworkIdentityManagement/ClusterId.h>
 #include <clusters/NitrogenDioxideConcentrationMeasurement/ClusterId.h>
 #include <clusters/OccupancySensing/ClusterId.h>
 #include <clusters/OnOff/ClusterId.h>
@@ -113,6 +123,7 @@
 #include <clusters/PowerSourceConfiguration/ClusterId.h>
 #include <clusters/PowerTopology/ClusterId.h>
 #include <clusters/PressureMeasurement/ClusterId.h>
+#include <clusters/ProximityRanging/ClusterId.h>
 #include <clusters/ProxyConfiguration/ClusterId.h>
 #include <clusters/ProxyDiscovery/ClusterId.h>
 #include <clusters/ProxyValid/ClusterId.h>
@@ -130,6 +141,7 @@
 #include <clusters/ScenesManagement/ClusterId.h>
 #include <clusters/ServiceArea/ClusterId.h>
 #include <clusters/SmokeCoAlarm/ClusterId.h>
+#include <clusters/SmokeConcentrationMeasurement/ClusterId.h>
 #include <clusters/SoftwareDiagnostics/ClusterId.h>
 #include <clusters/SoilMeasurement/ClusterId.h>
 #include <clusters/Switch/ClusterId.h>
@@ -143,7 +155,6 @@
 #include <clusters/ThreadNetworkDirectory/ClusterId.h>
 #include <clusters/TimeFormatLocalization/ClusterId.h>
 #include <clusters/TimeSynchronization/ClusterId.h>
-#include <clusters/Timer/ClusterId.h>
 #include <clusters/TlsCertificateManagement/ClusterId.h>
 #include <clusters/TlsClientManagement/ClusterId.h>
 #include <clusters/TotalVolatileOrganicCompoundsConcentrationMeasurement/ClusterId.h>
@@ -154,6 +165,7 @@
 #include <clusters/WakeOnLan/ClusterId.h>
 #include <clusters/WaterHeaterManagement/ClusterId.h>
 #include <clusters/WaterHeaterMode/ClusterId.h>
+#include <clusters/WaterTankLevelMonitoring/ClusterId.h>
 #include <clusters/WebRTCTransportProvider/ClusterId.h>
 #include <clusters/WebRTCTransportRequestor/ClusterId.h>
 #include <clusters/WiFiNetworkDiagnostics/ClusterId.h>

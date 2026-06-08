@@ -13,7 +13,6 @@
 #    limitations under the License.
 
 import inspect
-from typing import List
 
 from .clusters.commissioner_commands import CommissionerCommands
 from .clusters.delay_commands import DelayCommands
@@ -26,11 +25,11 @@ from .pseudo_cluster import PseudoCluster
 
 
 class PseudoClusters:
-    def __init__(self, clusters: List[PseudoCluster]):
+    def __init__(self, clusters: list[PseudoCluster]):
         self.clusters = clusters
 
     def supports(self, request) -> bool:
-        return False if self.__get_command(request) is None else True
+        return self.__get_command(request) is not None
 
     def is_manual_step(self, request):
         return ((request.cluster == LogCommands().name and
@@ -43,6 +42,7 @@ class PseudoClusters:
         for cluster in self.clusters:
             if request.cluster == cluster.name:
                 return cluster
+        return None
 
     async def execute(self, request, definitions=None):
         status = {'error': 'FAILURE'}

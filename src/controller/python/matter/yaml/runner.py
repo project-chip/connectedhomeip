@@ -20,7 +20,7 @@ import queue
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from enum import Enum, IntEnum
-from typing import Any, Optional, Tuple
+from typing import Any, Optional
 
 from matter.idl.generators.filters import to_pascal_case, to_snake_case
 from matter.yamltests.pseudo_clusters.pseudo_clusters import get_default_pseudo_clusters
@@ -35,17 +35,17 @@ from .data_model_lookup import DataModelLookup, PreDefinedDataModelLookup
 from .errors import ActionCreationError, UnexpectedActionCreationError
 
 _PSEUDO_CLUSTERS = get_default_pseudo_clusters()
-logger = logging.getLogger('YamlParser')
+LOGGER = logging.getLogger(__name__)
 
 
 class _ActionStatus(Enum):
-    SUCCESS = 'success',
+    SUCCESS = 'success'
     ERROR = 'error'
 
 
 class _TestFabricId(IntEnum):
-    ALPHA = 1,
-    BETA = 2,
+    ALPHA = 1
+    BETA = 2
     GAMMA = 3
 
 
@@ -379,7 +379,7 @@ class AttributeChangeAccumulator:
             result = _ActionResult(status=_ActionStatus.SUCCESS, response=path.AttributeType(data))
 
             item = _AttributeSubscriptionCallbackResult(self._name, path, result)
-            logging.debug(
+            LOGGER.debug(
                 f'Got subscription report on client {self.name} for {path.AttributeType}: {data}')
             self._output_queue.put(item)
 
@@ -401,7 +401,7 @@ class EventChangeAccumulator:
             result = _ActionResult(status=_ActionStatus.SUCCESS, response=event_response)
 
             item = _EventSubscriptionCallbackResult(self._name, result)
-            logging.debug(f'Got subscription report on client {self.name}')
+            LOGGER.debug(f'Got subscription report on client {self.name}')
             self._output_queue.put(item)
 
     @property
@@ -585,8 +585,7 @@ class WriteAttributeAction(BaseAction):
         if len(resp) == 1 and isinstance(resp[0], AttributeStatus):
             if resp[0].Status == MatterInteractionModel.Status.Success:
                 return _ActionResult(status=_ActionStatus.SUCCESS, response=None)
-            else:
-                return _ActionResult(status=_ActionStatus.ERROR, response=resp[0].Status)
+            return _ActionResult(status=_ActionStatus.ERROR, response=resp[0].Status)
 
         # We always expecte the response to be a list of length 1, for that reason we return error
         # here.
@@ -674,7 +673,7 @@ class DiscoveryCommandAction(BaseAction):
     """DiscoveryCommand implementation (FindCommissionable* methods)."""
 
     @staticmethod
-    def _filter_for_step(test_step) -> Tuple[discovery.FilterType, Any]:
+    def _filter_for_step(test_step) -> tuple[discovery.FilterType, Any]:
         """Given a test step, figure out the correct filters to give to
            DiscoverCommissionableNodes.
         """
@@ -690,19 +689,19 @@ class DiscoveryCommandAction(BaseAction):
         args = test_step.arguments['values']
         request_data_as_dict = Converter.convert_list_of_name_value_pair_to_dict(args)
 
-        filter = request_data_as_dict['value']
+        flt = request_data_as_dict['value']
 
         if test_step.command == 'FindCommissionableByDeviceType':
-            return discovery.FilterType.DEVICE_TYPE, filter
+            return discovery.FilterType.DEVICE_TYPE, flt
 
         if test_step.command == 'FindCommissionableByLongDiscriminator':
-            return discovery.FilterType.LONG_DISCRIMINATOR, filter
+            return discovery.FilterType.LONG_DISCRIMINATOR, flt
 
         if test_step.command == 'FindCommissionableByShortDiscriminator':
-            return discovery.FilterType.SHORT_DISCRIMINATOR, filter
+            return discovery.FilterType.SHORT_DISCRIMINATOR, flt
 
         if test_step.command == 'FindCommissionableByVendorId':
-            return discovery.FilterType.VENDOR_ID, filter
+            return discovery.FilterType.VENDOR_ID, flt
 
         raise UnexpectedActionCreationError(f'Invalid command: {test_step.command}')
 
@@ -715,13 +714,13 @@ class DiscoveryCommandAction(BaseAction):
             filterType=self.filterType, filter=self.filter, stopOnFirst=True, timeoutSecond=5)
 
         # Devices will be a list: [CommissionableNode(), ...]
-        logging.info("Discovered devices: %r" % devices)
+        LOGGER.info("Discovered devices: %r" % devices)
 
         if not devices:
-            logging.error("No devices found")
+            LOGGER.error("No devices found")
             return _ActionResult(status=_ActionStatus.ERROR, response="NO DEVICES FOUND")
-        elif len(devices) > 1:
-            logging.warning("Commissionable discovery found multiple results!")
+        if len(devices) > 1:
+            LOGGER.warning("Commissionable discovery found multiple results!")
 
         return _ActionResult(status=_ActionStatus.SUCCESS, response=devices[0])
 
@@ -741,7 +740,7 @@ class NotImplementedAction(BaseAction):
 class ReplTestRunner:
     '''Test runner to encode/decode values from YAML test Parser for executing the TestStep.
 
-    Uses ChipDeviceController from chip-repl to execute parsed YAML TestSteps.
+    Uses ChipDeviceController from matter-repl to execute parsed YAML TestSteps.
     '''
 
     def __init__(self, test_spec_definition, certificate_authority_manager, alpha_dev_ctrl):
@@ -834,7 +833,7 @@ class ReplTestRunner:
         try:
             return DefaultPseudoCluster(test_step)
         except ActionCreationError as e:
-            logger.warn(f"Failed create default pseudo cluster: {e}")
+            LOGGER.warning(f"Failed to create default pseudo cluster: {e}")
             return None
 
     def encode(self, request) -> Optional[BaseAction]:
@@ -846,9 +845,9 @@ class ReplTestRunner:
         # Some of the tests contain 'cluster over-rides' that refer to a different
         # cluster than that specified in 'config'.
 
-        elif cluster == 'DiscoveryCommands':
+        if cluster == 'DiscoveryCommands':
             return DiscoveryCommandAction(request)
-        elif cluster == 'DelayCommands' and command == 'WaitForCommissionee':
+        if cluster == 'DelayCommands' and command == 'WaitForCommissionee':
             action = self._wait_for_commissionee_action_factory(request)
         elif command == 'writeAttribute':
             action = self._attribute_write_action_factory(request, cluster)
@@ -870,7 +869,7 @@ class ReplTestRunner:
             action = self._default_pseudo_cluster(request)
 
         if action is None:
-            logger.warn(f"Failed to parse {request.label}")
+            LOGGER.warning(f"Failed to parse {request.label}")
         return action
 
     def decode(self, result: _ActionResult):
@@ -933,8 +932,7 @@ class ReplTestRunner:
             if not response.event_result_list:
                 # This means that the event result we got back was empty, below is how we
                 # represent this.
-                decoded_response = [{}]
-                return decoded_response
+                return [{}]
             decoded_response = []
             for event in response.event_result_list:
                 if event.Status != MatterInteractionModel.Status.Success:
@@ -994,8 +992,8 @@ class ReplTestRunner:
 
         return decoded_response
 
-    def _get_fabric_id(self, id):
-        return _TestFabricId[id.upper()].value
+    def _get_fabric_id(self, _id):
+        return _TestFabricId[_id.upper()].value
 
     def _get_dev_ctrl(self, action: BaseAction):
         if action.identity is not None:

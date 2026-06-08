@@ -71,7 +71,7 @@ matter_add_flags(-DMBEDTLS_USER_CONFIG_FILE=<${CONFIG_MBEDTLS_CFG_FILE}>)
 
 if (CONFIG_OPENTHREAD_TELINK_LIBRARY)
     set(ZEPHYR_OPENTHREAD_MODULE_DIR ${ZEPHYR_BASE}/../modules/lib/openthread_telink_lib CACHE STRING INTERNAL)
-	message(STATUS "OpenThread used as precompiled Telink library, path: ${ZEPHYR_OPENTHREAD_MODULE_DIR}")
+    message(STATUS "OpenThread used as precompiled Telink library, path: ${ZEPHYR_OPENTHREAD_MODULE_DIR}")
 endif()
 
 if (CONFIG_CHIP_OPENTHREAD_CONFIG)
@@ -98,7 +98,7 @@ matter_add_gn_arg_string("zephyr_ar"                              ${CMAKE_AR})
 matter_add_gn_arg_string("zephyr_cc"                              ${CMAKE_C_COMPILER})
 matter_add_gn_arg_string("zephyr_cxx"                             ${CMAKE_CXX_COMPILER})
 matter_add_gn_arg_bool  ("chip_logging"                           CONFIG_LOG)
-matter_add_gn_arg_bool  ("chip_enable_openthread"                 CONFIG_NET_L2_OPENTHREAD)
+matter_add_gn_arg_bool  ("chip_enable_thread"                     CONFIG_NET_L2_OPENTHREAD)
 matter_add_gn_arg_bool  ("chip_openthread_ftd"                    CONFIG_OPENTHREAD_FTD)
 matter_add_gn_arg_bool  ("chip_config_network_layer_ble"          CONFIG_BT)
 matter_add_gn_arg_bool  ("chip_inet_config_enable_ipv4"           CONFIG_CHIP_IPV4)
@@ -114,6 +114,8 @@ matter_add_gn_arg_bool  ("chip_enable_icd_server"                 CONFIG_CHIP_EN
 matter_add_gn_arg_bool  ("chip_enable_factory_data"               CONFIG_CHIP_FACTORY_DATA)
 matter_add_gn_arg_bool  ("chip_mdns_minimal"                      CONFIG_WIFI_W91)
 matter_add_gn_arg_bool  ("chip_mdns_platform"                     CONFIG_NET_L2_OPENTHREAD)
+matter_add_gn_arg_bool  ("chip_persist_subscriptions"             CONFIG_CHIP_PERSISTENT_SUBSCRIPTIONS)
+matter_add_gn_arg_bool  ("chip_config_enable_groupcast"                  CONFIG_CHIP_ENABLE_GROUPCAST)
 
 if (CONFIG_CHIP_ENABLE_ICD_SUPPORT)
     matter_add_gn_arg_bool  ("chip_enable_icd_lit"                       CONFIG_CHIP_ICD_LIT_SUPPORT)
@@ -130,6 +132,29 @@ if (CONFIG_CHIP_ROTATING_DEVICE_ID)
     matter_add_gn_arg_bool("chip_enable_rotating_device_id"          TRUE)
     matter_add_gn_arg_bool("chip_enable_additional_data_advertising" TRUE)
 endif()
+
+if(${TLNK_LOG_LEVEL} MATCHES all)
+  matter_add_gn_arg_bool("chip_logging"            TRUE)
+  matter_add_gn_arg_bool("chip_error_logging"      TRUE)
+  matter_add_gn_arg_bool("chip_progress_logging"   TRUE)
+  matter_add_gn_arg_bool("chip_detail_logging"     TRUE)
+  matter_add_gn_arg_bool("chip_automation_logging" TRUE)
+elseif(${TLNK_LOG_LEVEL} MATCHES progress)
+  matter_add_gn_arg_bool("chip_logging"            TRUE)
+  matter_add_gn_arg_bool("chip_error_logging"      TRUE)
+  matter_add_gn_arg_bool("chip_progress_logging"   TRUE)
+  matter_add_gn_arg_bool("chip_detail_logging"     FALSE)
+  matter_add_gn_arg_bool("chip_automation_logging" FALSE)
+elseif(${TLNK_LOG_LEVEL} MATCHES error)
+  matter_add_gn_arg_bool("chip_logging"            TRUE)
+  matter_add_gn_arg_bool("chip_error_logging"      TRUE)
+  matter_add_gn_arg_bool("chip_progress_logging"   FALSE)
+  matter_add_gn_arg_bool("chip_detail_logging"     FALSE)
+  matter_add_gn_arg_bool("chip_automation_logging" FALSE)
+elseif(${TLNK_LOG_LEVEL} MATCHES none)
+  matter_add_gn_arg_bool("chip_logging" FALSE)
+endif()
+
 
 if (CONFIG_WIFI_W91)
     matter_add_gn_arg_string("chip_mdns" "minimal")
@@ -209,6 +234,19 @@ if (CONFIG_CHIP_OTA_IMAGE_BUILD)
         OUTPUT_FILE ${PROJECT_BINARY_DIR}/${CONFIG_CHIP_OTA_IMAGE_FILE_NAME}
     )
     add_dependencies(chip-ota-image process_binaries)
+endif()
+
+# ==============================================================================
+# Define 'dfu-smp-image' target for building DFU over BT SMP image
+# ==============================================================================
+
+if (CONFIG_CHIP_DFU_OVER_BT_SMP_BUILD)
+    file(WRITE "${PROJECT_BINARY_DIR}/empty.txt" "")
+    chip_ota_image(dfu-smp-image
+        INPUT_FILES ${PROJECT_BINARY_DIR}/empty.txt
+        OUTPUT_FILE ${PROJECT_BINARY_DIR}/dfu.data
+    )
+    add_dependencies(process_binaries dfu-smp-image)
 endif()
 
 # ==============================================================================

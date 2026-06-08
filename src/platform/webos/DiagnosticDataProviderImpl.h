@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2025 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -39,10 +39,12 @@ public:
 
     // ===== Methods that implement the DiagnosticDataProvider abstract interface.
 
+    bool SupportsWatermarks() override { return true; }
     CHIP_ERROR GetCurrentHeapFree(uint64_t & currentHeapFree) override;
     CHIP_ERROR GetCurrentHeapUsed(uint64_t & currentHeapUsed) override;
     CHIP_ERROR GetCurrentHeapHighWatermark(uint64_t & currentHeapHighWatermark) override;
     CHIP_ERROR GetThreadMetrics(ThreadMetrics ** threadMetricsOut) override;
+    CHIP_ERROR ResetWatermarks() override;
     void ReleaseThreadMetrics(ThreadMetrics * threadMetrics) override;
 
     CHIP_ERROR GetRebootCount(uint16_t & rebootCount) override;
@@ -71,6 +73,7 @@ public:
     CHIP_ERROR GetWiFiChannelNumber(uint16_t & channelNumber) override;
     CHIP_ERROR GetWiFiRssi(int8_t & rssi) override;
     CHIP_ERROR GetWiFiBeaconLostCount(uint32_t & beaconLostCount) override;
+    CHIP_ERROR GetWiFiBeaconRxCount(uint32_t & beaconRxCount) override;
     CHIP_ERROR GetWiFiPacketMulticastRxCount(uint32_t & packetMulticastRxCount) override;
     CHIP_ERROR GetWiFiPacketMulticastTxCount(uint32_t & packetMulticastTxCount) override;
     CHIP_ERROR GetWiFiPacketUnicastRxCount(uint32_t & packetUnicastRxCount) override;
@@ -95,6 +98,7 @@ private:
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     uint32_t mBeaconLostCount        = 0;
+    uint32_t mBeaconRxCount          = 0;
     uint32_t mPacketMulticastRxCount = 0;
     uint32_t mPacketMulticastTxCount = 0;
     uint32_t mPacketUnicastRxCount   = 0;

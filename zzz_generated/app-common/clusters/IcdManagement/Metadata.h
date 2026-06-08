@@ -89,7 +89,7 @@ inline constexpr DataModel::AcceptedCommandEntry
 } // namespace UnregisterClient
 namespace StayActiveRequest {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(StayActiveRequest::Id, BitFlags<DataModel::CommandQualityFlags>(),
-                                                                Access::Privilege::kManage);
+                                                                Access::Privilege::kOperate);
 } // namespace StayActiveRequest
 
 } // namespace Commands

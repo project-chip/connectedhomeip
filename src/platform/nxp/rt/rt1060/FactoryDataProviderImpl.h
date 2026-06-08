@@ -49,8 +49,6 @@ namespace DeviceLayer {
 class FactoryDataProviderImpl : public FactoryDataProvider
 {
 public:
-    static FactoryDataProviderImpl sInstance;
-
     CHIP_ERROR SearchForId(uint8_t searchedType, uint8_t * pBuf, size_t bufLength, uint16_t & length,
                            uint32_t * contentAddr = NULL);
     ~FactoryDataProviderImpl(){};
@@ -75,7 +73,6 @@ private:
     void SetDCP_OTPKeySelect(void);
     CHIP_ERROR ReadEncryptedData(uint8_t * desBuff, uint8_t * sourceAddr, uint16_t sizeToRead);
     CHIP_ERROR Hash256(const uint8_t * input, size_t inputSize, uint8_t * output, size_t * outputSize);
-    CHIP_ERROR LoadKeypairFromRaw(ByteSpan privateKey, ByteSpan publicKey, Crypto::P256Keypair & keypair);
 };
 
 FactoryDataProvider & FactoryDataPrvdImpl();

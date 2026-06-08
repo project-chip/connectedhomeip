@@ -36,7 +36,7 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
-#include <lib/support/ScopedBuffer.h>
+#include <lib/support/ScopedMemoryBuffer.h>
 #include <lib/support/TypeTraits.h>
 #include <messaging/SessionParameters.h>
 #include <platform/PlatformManager.h>
@@ -317,7 +317,7 @@ private:
         if (auto * session = helper->mSession.load())
         {
             // Execute callback in Matter thread; session should be OK with this
-            (session->*(helper->mAfterWorkCallback))(helper->mData, helper->mStatus);
+            TEMPORARY_RETURN_IGNORED(session->*(helper->mAfterWorkCallback))(helper->mData, helper->mStatus);
         }
     }
 
@@ -360,9 +360,17 @@ CASESession::~CASESession()
 
 void CASESession::OnSessionReleased()
 {
-    // Call into our super-class before we clear our state.
-    PairingSession::OnSessionReleased();
+    // Clear our own state first, then call the base class.
+    //
+    // PairingSession::OnSessionReleased() may destroy this object, so we have to do any cleanup
+    // that involves our state before calling it.
+    //
+    // Historically the order was reversed because PairingSession::OnSessionReleased
+    // used mSessionManager->SystemLayer() to schedule work, and Clear() nulls
+    // mSessionManager.  That dependency has been removed: the base class now uses
+    // DeviceLayer::SystemLayer(), which is a global and survives Clear().
     Clear();
+    PairingSession::OnSessionReleased();
 }
 
 void CASESession::Clear()
@@ -401,26 +409,13 @@ void CASESession::Clear()
     mFabricsTable = nullptr;
     mFabricIndex  = kUndefinedFabricIndex;
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
-    // Clear the context object.
-    mTCPConnCbCtxt.appContext     = nullptr;
-    mTCPConnCbCtxt.connCompleteCb = nullptr;
-    mTCPConnCbCtxt.connClosedCb   = nullptr;
-    mTCPConnCbCtxt.connReceivedCb = nullptr;
-
-    if (mPeerConnState)
+    if (!mPeerConnState.IsNull())
     {
         // Set the app state callback object in the Connection state to null
         // to prevent any dangling pointer to memory(mTCPConnCbCtxt) owned
         // by the CASESession object, that is now getting cleared.
         mPeerConnState->mAppState = nullptr;
-
-        if (mPeerConnState->mConnectionState != Transport::TCPState::kConnected)
-        {
-            // Abort the connection if the CASESession is being destroyed and the
-            // connection is in the middle of being set up.
-            mSessionManager->TCPDisconnect(mPeerConnState, /* shouldAbort = */ true);
-            mPeerConnState = nullptr;
-        }
+        mPeerConnState.Release();
     }
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 }
@@ -460,11 +455,6 @@ CHIP_ERROR CASESession::Init(SessionManager & sessionManager, Credentials::Certi
     mValidContext.mRequiredKeyPurposes.Set(KeyPurposeFlags::kServerAuth);
     mValidContext.mValidityPolicy = policy;
 
-#if INET_CONFIG_ENABLE_TCP_ENDPOINT
-    mTCPConnCbCtxt.appContext     = this;
-    mTCPConnCbCtxt.connCompleteCb = HandleConnectionAttemptComplete;
-    mTCPConnCbCtxt.connClosedCb   = HandleConnectionClosed;
-#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
     return CHIP_NO_ERROR;
 }
 
@@ -547,7 +537,7 @@ CHIP_ERROR CASESession::EstablishSession(SessionManager & sessionManager, Fabric
     mSessionResumptionStorage = sessionResumptionStorage;
     mLocalMRPConfig           = MakeOptional(mrpLocalConfig.ValueOr(GetDefaultMRPConfig()));
 
-    mExchangeCtxt.Value()->UseSuggestedResponseTimeout(kExpectedSigma1ProcessingTime);
+    ReturnErrorOnFailure(mExchangeCtxt.Value()->UseSuggestedResponseTimeout(kExpectedSigma1ProcessingTime));
     mPeerNodeId  = peerScopedNodeId.GetNodeId();
     mLocalNodeId = fabricInfo->GetNodeId();
 
@@ -557,8 +547,10 @@ CHIP_ERROR CASESession::EstablishSession(SessionManager & sessionManager, Fabric
     if (peerAddress.GetTransportType() == Transport::Type::kTcp)
     {
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
-        err = sessionManager.TCPConnect(peerAddress, &mTCPConnCbCtxt, &mPeerConnState);
+        err = sessionManager.TCPConnect(peerAddress, nullptr, mPeerConnState);
         SuccessOrExit(err);
+#else
+        err = CHIP_ERROR_NOT_IMPLEMENTED;
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
     }
     else
@@ -610,10 +602,10 @@ CHIP_ERROR CASESession::DeriveSecureSession(CryptoContext & session)
     switch (mState)
     {
     case State::kFinished: {
-        std::array<uint8_t, sizeof(mIPK) + kSHA256_Hash_Length> msg_salt;
+        SensitiveDataFixedBuffer<sizeof(mIPK) + kSHA256_Hash_Length> msg_salt;
 
         {
-            Encoding::LittleEndian::BufferWriter bbuf(msg_salt);
+            Encoding::LittleEndian::BufferWriter bbuf(msg_salt.Bytes(), msg_salt.Capacity());
             bbuf.Put(mIPK, sizeof(mIPK));
             bbuf.Put(mMessageDigest, sizeof(mMessageDigest));
 
@@ -621,16 +613,16 @@ CHIP_ERROR CASESession::DeriveSecureSession(CryptoContext & session)
         }
 
         ReturnErrorOnFailure(session.InitFromSecret(*mSessionManager->GetSessionKeystore(), mSharedSecret.Span(),
-                                                    ByteSpan(msg_salt), CryptoContext::SessionInfoType::kSessionEstablishment,
-                                                    mRole));
+                                                    ByteSpan(msg_salt.ConstBytes(), msg_salt.Capacity()),
+                                                    CryptoContext::SessionInfoType::kSessionEstablishment, mRole));
 
         return CHIP_NO_ERROR;
     }
     case State::kFinishedViaResume: {
-        std::array<uint8_t, sizeof(mInitiatorRandom) + decltype(mResumeResumptionId)().size()> msg_salt;
+        SensitiveDataFixedBuffer<sizeof(mInitiatorRandom) + decltype(mResumeResumptionId)().size()> msg_salt;
 
         {
-            Encoding::LittleEndian::BufferWriter bbuf(msg_salt);
+            Encoding::LittleEndian::BufferWriter bbuf(msg_salt.Bytes(), msg_salt.Capacity());
             bbuf.Put(mInitiatorRandom, sizeof(mInitiatorRandom));
             bbuf.Put(mResumeResumptionId.data(), mResumeResumptionId.size());
 
@@ -638,7 +630,8 @@ CHIP_ERROR CASESession::DeriveSecureSession(CryptoContext & session)
         }
 
         ReturnErrorOnFailure(session.InitFromSecret(*mSessionManager->GetSessionKeystore(), mSharedSecret.Span(),
-                                                    ByteSpan(msg_salt), CryptoContext::SessionInfoType::kSessionResumption, mRole));
+                                                    ByteSpan(msg_salt.ConstBytes(), msg_salt.Capacity()),
+                                                    CryptoContext::SessionInfoType::kSessionResumption, mRole));
 
         return CHIP_NO_ERROR;
     }
@@ -650,6 +643,7 @@ CHIP_ERROR CASESession::DeriveSecureSession(CryptoContext & session)
 CHIP_ERROR CASESession::RecoverInitiatorIpk()
 {
     Credentials::GroupDataProvider::KeySet ipkKeySet;
+    auto ipkKeySetWiperOnScopeExit = ScopeExit([&] { ipkKeySet.ClearKeys(); });
 
     CHIP_ERROR err = mGroupDataProvider->GetIpkKeySet(mFabricIndex, ipkKeySet);
 
@@ -683,64 +677,42 @@ CHIP_ERROR CASESession::RecoverInitiatorIpk()
 }
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
-void CASESession::HandleConnectionAttemptComplete(Transport::ActiveTCPConnectionState * conn, CHIP_ERROR err)
+void CASESession::HandleConnectionAttemptComplete(const Transport::ActiveTCPConnectionHandle & conn, CHIP_ERROR err)
 {
-    VerifyOrReturn(conn != nullptr);
-    // conn->mAppState should not be NULL. SessionManager has already checked
-    // before calling this callback.
-    VerifyOrDie(conn->mAppState != nullptr);
+    VerifyOrReturn(conn == mPeerConnState);
 
     char peerAddrBuf[chip::Transport::PeerAddress::kMaxToStringSize];
     conn->mPeerAddr.ToString(peerAddrBuf);
 
-    CASESession * caseSession = reinterpret_cast<CASESession *>(conn->mAppState->appContext);
-    VerifyOrReturn(caseSession != nullptr);
+    auto connectionCleanup = ScopeExit([&, this]() {
+        mExchangeCtxt.Value()->GetSessionHandle()->AsUnauthenticatedSession()->ReleaseTCPConnection();
+        mSecureSessionHolder.Get().Value()->AsSecureSession()->ReleaseTCPConnection();
+        AbortPendingEstablish(err);
+    });
 
-    // Exit and disconnect if connection setup encountered an error.
-    SuccessOrExit(err);
+    // Bail if connection setup encountered an error.
+    ReturnAndLogOnFailure(err, SecureChannel, "Connection establishment failed with peer at %s", peerAddrBuf);
 
     ChipLogDetail(SecureChannel, "TCP Connection established with %s before session establishment", peerAddrBuf);
 
     // Associate the connection with the current unauthenticated session for the
     // CASE exchange.
-    caseSession->mExchangeCtxt.Value()->GetSessionHandle()->AsUnauthenticatedSession()->SetTCPConnection(conn);
+    mExchangeCtxt.Value()->GetSessionHandle()->AsUnauthenticatedSession()->SetTCPConnection(conn);
 
     // Associate the connection with the current secure session that is being
     // set up.
-    caseSession->mSecureSessionHolder.Get().Value()->AsSecureSession()->SetTCPConnection(conn);
+    mSecureSessionHolder.Get().Value()->AsSecureSession()->SetTCPConnection(conn);
 
     // Send Sigma1 after connection is established for sessions over TCP
-    err = caseSession->SendSigma1();
-    SuccessOrExit(err);
+    err = SendSigma1();
+    ReturnAndLogOnFailure(err, SecureChannel, "Sigma1 failed to peer %s", peerAddrBuf);
 
-exit:
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(SecureChannel, "Connection establishment failed with peer at %s: %" CHIP_ERROR_FORMAT, peerAddrBuf,
-                     err.Format());
-
-        // Close the underlying connection and ensure that the CASESession is
-        // not holding on to a stale ActiveTCPConnectionState. We call
-        // TCPDisconnect() here explicitly in order to abort the connection
-        // even after it establishes successfully, but SendSigma1() fails for
-        // some reason.
-        caseSession->mSessionManager->TCPDisconnect(conn, /* shouldAbort = */ true);
-        caseSession->mPeerConnState = nullptr;
-
-        caseSession->Clear();
-    }
+    connectionCleanup.release();
 }
 
-void CASESession::HandleConnectionClosed(Transport::ActiveTCPConnectionState * conn, CHIP_ERROR conErr)
+void CASESession::HandleConnectionClosed(const Transport::ActiveTCPConnectionState & conn, CHIP_ERROR conErr)
 {
-    VerifyOrReturn(conn != nullptr);
-    // conn->mAppState should not be NULL. SessionManager has already checked
-    // before calling this callback.
-    VerifyOrDie(conn->mAppState != nullptr);
-
-    CASESession * caseSession = reinterpret_cast<CASESession *>(conn->mAppState->appContext);
-    VerifyOrReturn(caseSession != nullptr);
-
+    VerifyOrReturn(conn == mPeerConnState);
     // Drop our pointer to the now-invalid connection state.
     //
     // Since the connection is closed, message sends over the ExchangeContext
@@ -749,7 +721,7 @@ void CASESession::HandleConnectionClosed(Transport::ActiveTCPConnectionState * c
     // Additionally, SessionManager notifies (via ExchangeMgr) all ExchangeContexts on the
     // connection closures for the attached sessions and the ExchangeContexts
     // can close proactively if that's appropriate.
-    caseSession->mPeerConnState = nullptr;
+    mPeerConnState.Release();
     ChipLogDetail(SecureChannel, "TCP Connection for this session has closed");
 }
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
@@ -990,7 +962,8 @@ CHIP_ERROR CASESession::FindLocalNodeFromDestinationId(const ByteSpan & destinat
 
         // Get IPK operational group key set for current candidate fabric
         GroupDataProvider::KeySet ipkKeySet;
-        CHIP_ERROR err = mGroupDataProvider->GetIpkKeySet(fabricInfo.GetFabricIndex(), ipkKeySet);
+        auto ipkKeySetWiperOnScopeExit = ScopeExit([&] { ipkKeySet.ClearKeys(); });
+        CHIP_ERROR err                 = mGroupDataProvider->GetIpkKeySet(fabricInfo.GetFabricIndex(), ipkKeySet);
         if ((err != CHIP_NO_ERROR) ||
             ((ipkKeySet.num_keys_used == 0) || (ipkKeySet.num_keys_used > Credentials::GroupDataProvider::KeySet::kEpochKeysMax)))
         {
@@ -1011,7 +984,7 @@ CHIP_ERROR CASESession::FindLocalNodeFromDestinationId(const ByteSpan & destinat
                 // Found a match, stop working, cache IPK, update local fabric context
                 found = true;
                 MutableByteSpan ipkSpan(mIPK);
-                CopySpanToMutableSpan(candidateIpkSpan, ipkSpan);
+                TEMPORARY_RETURN_IGNORED CopySpanToMutableSpan(candidateIpkSpan, ipkSpan);
                 mFabricIndex = fabricInfo.GetFabricIndex();
                 mLocalNodeId = nodeId;
                 break;
@@ -1227,9 +1200,9 @@ CHIP_ERROR CASESession::PrepareSigma2(EncodeSigma2Inputs & outSigma2Data)
     // Generate a Shared Secret
     ReturnErrorOnFailure(mEphemeralKey->ECDH_derive_secret(mRemotePubKey, mSharedSecret));
 
-    uint8_t msgSalt[kIPKSize + kSigmaParamRandomNumberSize + kP256_PublicKey_Length + kSHA256_Hash_Length];
+    SensitiveDataFixedBuffer<kIPKSize + kSigmaParamRandomNumberSize + kP256_PublicKey_Length + kSHA256_Hash_Length> msgSalt;
 
-    MutableByteSpan saltSpan(msgSalt);
+    MutableByteSpan saltSpan(msgSalt.Bytes(), msgSalt.Capacity());
     ReturnErrorOnFailure(
         ConstructSaltSigma2(ByteSpan(outSigma2Data.responderRandom), mEphemeralKey->Pubkey(), ByteSpan(mIPK), saltSpan));
 
@@ -1528,8 +1501,8 @@ CHIP_ERROR CASESession::HandleSigma2(System::PacketBufferHandle && msg)
     // Generate the S2K key
     AutoReleaseSessionKey sr2k(*mSessionManager->GetSessionKeystore());
     {
-        uint8_t msg_salt[kIPKSize + kSigmaParamRandomNumberSize + kP256_PublicKey_Length + kSHA256_Hash_Length];
-        MutableByteSpan saltSpan(msg_salt);
+        SensitiveDataFixedBuffer<kIPKSize + kSigmaParamRandomNumberSize + kP256_PublicKey_Length + kSHA256_Hash_Length> msg_salt;
+        MutableByteSpan saltSpan(msg_salt.Bytes(), msg_salt.Capacity());
         ReturnErrorOnFailure(ConstructSaltSigma2(parsedSigma2.responderRandom, mRemotePubKey, ByteSpan(mIPK), saltSpan));
         ReturnErrorOnFailure(DeriveSigmaKey(saltSpan, ByteSpan(kKDFSR2Info), sr2k));
     }
@@ -1696,7 +1669,8 @@ CHIP_ERROR CASESession::ParseSigma2TBEData(ContiguousBufferTLVReader & decrypted
     // tbsData2Signature's length should equal kMax_ECDSA_Signature_Length as per the Specification
     size_t signatureLen = decryptedDataTlvReader.GetLength();
     VerifyOrReturnError(outParsedSigma2TBE.tbsData2Signature.Capacity() == signatureLen, CHIP_ERROR_INVALID_TLV_ELEMENT);
-    outParsedSigma2TBE.tbsData2Signature.SetLength(signatureLen);
+    // Size checked above
+    RETURN_SAFELY_IGNORED outParsedSigma2TBE.tbsData2Signature.SetLength(signatureLen);
     ReturnErrorOnFailure(decryptedDataTlvReader.GetBytes(outParsedSigma2TBE.tbsData2Signature.Bytes(),
                                                          outParsedSigma2TBE.tbsData2Signature.Length()));
 
@@ -1855,7 +1829,7 @@ CHIP_ERROR CASESession::SendSigma3c(SendSigma3Data & data, CHIP_ERROR status)
     System::PacketBufferHandle msg_R3;
     size_t data_len;
 
-    uint8_t msg_salt[kIPKSize + kSHA256_Hash_Length];
+    SensitiveDataFixedBuffer<kIPKSize + kSHA256_Hash_Length> msg_salt;
 
     AutoReleaseSessionKey sr3k(*mSessionManager->GetSessionKeystore());
 
@@ -1865,7 +1839,7 @@ CHIP_ERROR CASESession::SendSigma3c(SendSigma3Data & data, CHIP_ERROR status)
 
     // Generate S3K key
     {
-        MutableByteSpan saltSpan(msg_salt);
+        MutableByteSpan saltSpan(msg_salt.Bytes(), msg_salt.Capacity());
         SuccessOrExit(err = ConstructSaltSigma3(ByteSpan(mIPK), saltSpan));
         SuccessOrExit(err = DeriveSigmaKey(saltSpan, ByteSpan(kKDFSR3Info), sr3k));
     }
@@ -1944,7 +1918,7 @@ CHIP_ERROR CASESession::HandleSigma3a(System::PacketBufferHandle && msg)
 
     AutoReleaseSessionKey sr3k(*mSessionManager->GetSessionKeystore());
 
-    uint8_t msg_salt[kIPKSize + kSHA256_Hash_Length];
+    SensitiveDataFixedBuffer<kIPKSize + kSHA256_Hash_Length> msg_salt;
 
     ChipLogProgress(SecureChannel, "Received Sigma3 msg");
     MATTER_TRACE_COUNTER("Sigma3");
@@ -1976,7 +1950,7 @@ CHIP_ERROR CASESession::HandleSigma3a(System::PacketBufferHandle && msg)
             SuccessOrExit(err = ParseSigma3(tlvReader, msgR3Encrypted, msgR3EncryptedPayload, msgR3MIC));
 
             // Generate the S3K key
-            MutableByteSpan saltSpan(msg_salt);
+            MutableByteSpan saltSpan(msg_salt.Bytes(), msg_salt.Capacity());
             SuccessOrExit(err = ConstructSaltSigma3(ByteSpan(mIPK), saltSpan));
             SuccessOrExit(err = DeriveSigmaKey(saltSpan, ByteSpan(kKDFSR3Info), sr3k));
 
@@ -2111,7 +2085,8 @@ CHIP_ERROR CASESession::ParseSigma3TBEData(ContiguousBufferTLVReader & decrypted
     VerifyOrReturnError(decryptedDataTlvReader.GetTag() == AsTlvContextTag(TBEDataTags::kSignature), CHIP_ERROR_INVALID_TLV_TAG);
     size_t signatureLen = decryptedDataTlvReader.GetLength();
     VerifyOrReturnError(outHandleSigma3TBEData.tbsData3Signature.Capacity() == signatureLen, CHIP_ERROR_INVALID_TLV_ELEMENT);
-    outHandleSigma3TBEData.tbsData3Signature.SetLength(signatureLen);
+    // Size checked above
+    RETURN_SAFELY_IGNORED outHandleSigma3TBEData.tbsData3Signature.SetLength(signatureLen);
     ReturnErrorOnFailure(decryptedDataTlvReader.GetBytes(outHandleSigma3TBEData.tbsData3Signature.Bytes(),
                                                          outHandleSigma3TBEData.tbsData3Signature.Length()));
 
@@ -2495,7 +2470,7 @@ CHIP_ERROR CASESession::ValidateReceivedMessage(ExchangeContext * ec, const Payl
     {
         mExchangeCtxt.Emplace(*ec);
     }
-    mExchangeCtxt.Value()->UseSuggestedResponseTimeout(kExpectedHighProcessingTime);
+    ReturnErrorOnFailure(mExchangeCtxt.Value()->UseSuggestedResponseTimeout(kExpectedHighProcessingTime));
 
     VerifyOrReturnError(!msg.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
     return CHIP_NO_ERROR;

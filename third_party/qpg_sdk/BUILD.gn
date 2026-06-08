@@ -32,6 +32,7 @@ config("qpg_include_paths_config") {
     "${qpg_sdk_root}/Components/Qorvo/BaseUtils/gpNvm/inc",
     "${qpg_sdk_root}/Components/Qorvo/HAL_PLATFORM/inc",
     "${qpg_sdk_root}/Components/Qorvo/HAL_PLATFORM/inc/compiler/ARMGCCEMB",
+    "${qpg_sdk_root}/Components/Qorvo/Bootloader/qvMultiProtocolOta/inc",
     "${qpg_sdk_root}/Components/Qorvo/Matter/qvCHIP/inc",
     "${qpg_sdk_root}/Components/Qorvo/Matter/qvIO/inc",
     "${qpg_sdk_root}/Components/Qorvo/OS/gpAssert/inc",

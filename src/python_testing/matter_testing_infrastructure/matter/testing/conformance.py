@@ -15,6 +15,25 @@
 #    limitations under the License.
 #
 
+"""
+Matter Specification Conformance Engine
+
+This module implements the conformance checking system for Matter clusters, attributes,
+commands, and device types. It provides:
+
+- Conformance decision types (mandatory, optional, disallowed, etc.)
+- Boolean operations on conformance (AND, OR, NOT)
+- Feature, attribute, and command-based conformance evaluation
+- Choice conformance handling for mutually exclusive options
+- XML parsing for conformance specifications
+- Support for complex conditional conformance expressions
+
+The conformance system evaluates whether a particular element (attribute, command, feature)
+should be present on a device based on the device's implemented features, attributes, and
+commands.
+"""
+
+import operator
 import xml.etree.ElementTree as ElementTree
 from dataclasses import dataclass
 from enum import Enum, auto
@@ -34,11 +53,13 @@ AND_TERM = 'andTerm'
 OR_TERM = 'orTerm'
 NOT_TERM = 'notTerm'
 GREATER_TERM = 'greaterTerm'
+GREATER_EQUAL_TERM = 'greaterOrEqualTerm'
 FEATURE_TAG = 'feature'
 ATTRIBUTE_TAG = 'attribute'
 COMMAND_TAG = 'command'
 CONDITION_TAG = 'condition'
 LITERAL_TAG = 'literal'
+REVISION_TAG = 'revision'
 ZIGBEE_CONDITION = 'zigbee'
 
 
@@ -103,22 +124,46 @@ class ConformanceParseParameters:
     command_map: dict[str, uint]
 
 
-def conformance_allowed(conformance_decision: ConformanceDecisionWithChoice, allow_provisional: bool):
+@dataclass
+class ConformanceAssessmentData:
+    feature_map: uint
+    attribute_list: list[uint]
+    all_command_list: list[uint]
+    cluster_revision: uint
+
+
+@dataclass
+class EmptyClusterGlobalAttributes(ConformanceAssessmentData):
+    def __init__(self):
+        self.feature_map = uint(0)
+        self.attribute_list = []
+        self.all_command_list = []
+        self.cluster_revision = uint(1)
+
+
+EMPTY_CLUSTER_GLOBAL_ATTRIBUTES = EmptyClusterGlobalAttributes()
+
+
+def conformance_allowed(conformance_decision: ConformanceDecisionWithChoice, allow_provisional_test_event_only_disallowed_for_certification: bool):
     if conformance_decision.decision in [ConformanceDecision.NOT_APPLICABLE, ConformanceDecision.DISALLOWED]:
         return False
     if conformance_decision.decision == ConformanceDecision.PROVISIONAL:
-        return allow_provisional
+        return allow_provisional_test_event_only_disallowed_for_certification
     return True
 
 
 def is_disallowed(conformance: Callable):
     # Deprecated and disallowed conformances will come back as disallowed regardless of the implemented features / attributes / etc.
-    return conformance(0, [], []).decision == ConformanceDecision.DISALLOWED
+    return conformance(EMPTY_CLUSTER_GLOBAL_ATTRIBUTES).decision == ConformanceDecision.DISALLOWED
+
+
+def is_provisional(conformance: Callable):
+    return conformance(EMPTY_CLUSTER_GLOBAL_ATTRIBUTES).decision == ConformanceDecision.PROVISIONAL
 
 
 @dataclass
-class Conformance(Callable):
-    def __call__(self, feature_map: uint, attribute_list: list[uint], all_command_list: list[uint]) -> ConformanceDecisionWithChoice:
+class Conformance:
+    def __call__(self, conformance_assessment_data: ConformanceAssessmentData) -> ConformanceDecisionWithChoice:
         ''' Evaluates the conformance of a specific cluster or device type element.
 
             feature_map: The feature_map for the given cluster for which this conformance applies. Used to evaluate feature conformances
@@ -133,7 +178,7 @@ class Conformance(Callable):
 
 
 class zigbee(Conformance):
-    def __call__(self, feature_map: uint, attribute_list: list[uint], all_command_list: list[uint]) -> ConformanceDecisionWithChoice:
+    def __call__(self, conformance_assessment_data: ConformanceAssessmentData) -> ConformanceDecisionWithChoice:
         return ConformanceDecisionWithChoice(ConformanceDecision.NOT_APPLICABLE)
 
     def __str__(self):
@@ -141,7 +186,7 @@ class zigbee(Conformance):
 
 
 class mandatory(Conformance):
-    def __call__(self, feature_map: uint, attribute_list: list[uint], all_command_list: list[uint]) -> ConformanceDecisionWithChoice:
+    def __call__(self, conformance_assessment_data: ConformanceAssessmentData) -> ConformanceDecisionWithChoice:
         return ConformanceDecisionWithChoice(ConformanceDecision.MANDATORY)
 
     def __str__(self):
@@ -152,7 +197,7 @@ class optional(Conformance):
     def __init__(self, choice: Optional[Choice] = None):
         self.choice = choice
 
-    def __call__(self, feature_map: uint, attribute_list: list[uint], all_command_list: list[uint]) -> ConformanceDecisionWithChoice:
+    def __call__(self, conformance_assessment_data: ConformanceAssessmentData) -> ConformanceDecisionWithChoice:
         return ConformanceDecisionWithChoice(ConformanceDecision.OPTIONAL, self.choice)
 
     def __str__(self):
@@ -160,7 +205,7 @@ class optional(Conformance):
 
 
 class deprecated(Conformance):
-    def __call__(self, feature_map: uint, attribute_list: list[uint], all_command_list: list[uint]) -> ConformanceDecisionWithChoice:
+    def __call__(self, conformance_assessment_data: ConformanceAssessmentData) -> ConformanceDecisionWithChoice:
         return ConformanceDecisionWithChoice(ConformanceDecision.DISALLOWED)
 
     def __str__(self):
@@ -168,7 +213,7 @@ class deprecated(Conformance):
 
 
 class disallowed(Conformance):
-    def __call__(self, feature_map: uint, attribute_list: list[uint], all_command_list: list[uint]) -> ConformanceDecisionWithChoice:
+    def __call__(self, conformance_assessment_data: ConformanceAssessmentData) -> ConformanceDecisionWithChoice:
         return ConformanceDecisionWithChoice(ConformanceDecision.DISALLOWED)
 
     def __str__(self):
@@ -176,27 +221,57 @@ class disallowed(Conformance):
 
 
 class provisional(Conformance):
-    def __call__(self, feature_map: uint, attribute_list: list[uint], all_command_list: list[uint]) -> ConformanceDecisionWithChoice:
+    def __call__(self, conformance_assessment_data: ConformanceAssessmentData) -> ConformanceDecisionWithChoice:
         return ConformanceDecisionWithChoice(ConformanceDecision.PROVISIONAL)
 
     def __str__(self):
         return 'P'
 
 
-class literal(Conformance):
-    def __init__(self, value: str):
-        self.value = int(value)
-
-    def __call__(self):
+class ValueConformance(Conformance):
+    def __call__(self, conformance_assessment_data: ConformanceAssessmentData):
         # This should never be called
-        raise ConformanceException('Literal conformance function should not be called - this is simply a value holder')
+        raise ConformanceException('Value conformance function should not be called - this is simply a value holder')
+
+    def get_value(self, conformance_assessment_data: ConformanceAssessmentData) -> int:
+        raise ConformanceException('Base get_value function should not be called directly')
+
+
+class literal(ValueConformance):
+    def __init__(self, value: str):
+        # base=0 allows automatic detection of number format from string prefix:
+        # "10" -> 10 (decimal), "0x10" -> 16 (hex), "0o10" -> 8 (octal), "0b10" -> 2 (binary)
+        # This is needed because XML literal values can be in different formats
+        self.value = int(value, 0)
 
     def __str__(self):
         return str(self.value)
 
+    def get_value(self, conformance_assessment_data: ConformanceAssessmentData) -> int:
+        return self.value
+
+
+class revision(ValueConformance):
+    def __init__(self, value: str):
+        self.value: Optional[int]
+        if value.lower() == 'current':
+            self.value = None
+        else:
+            self.value = int(value, 0)
+
+    def __str__(self):
+        if self.value is None:
+            return "Rev"
+        return f'v{str(self.value)}'
+
+    def get_value(self, conformance_assessment_data: ConformanceAssessmentData) -> int:
+        if self.value is None:
+            return conformance_assessment_data.cluster_revision
+        return self.value
+
 
 # Conformance options that apply regardless of the element set of the cluster or device
-BASIC_CONFORMANCE: dict[str, Callable] = {
+BASIC_CONFORMANCE: dict[str, Conformance] = {
     MANDATORY_CONFORM: mandatory(),
     OPTIONAL_CONFORM: optional(),
     PROVISIONAL_CONFORM: provisional(),
@@ -210,8 +285,8 @@ class feature(Conformance):
         self.requiredFeature = requiredFeature
         self.code = code
 
-    def __call__(self, feature_map: uint, attribute_list: list[uint], all_command_list: list[uint]) -> ConformanceDecisionWithChoice:
-        if self.requiredFeature & feature_map != 0:
+    def __call__(self, conformance_assessment_data: ConformanceAssessmentData) -> ConformanceDecisionWithChoice:
+        if self.requiredFeature & conformance_assessment_data.feature_map != 0:
             return ConformanceDecisionWithChoice(ConformanceDecision.MANDATORY)
         return ConformanceDecisionWithChoice(ConformanceDecision.NOT_APPLICABLE)
 
@@ -225,13 +300,12 @@ class device_feature(Conformance):
     def __init__(self, feature: str):
         self.feature = feature
 
-    def __call__(self, feature_map: uint = 0, attribute_list: list[uint] = [], all_command_list: list[uint] = []) -> ConformanceDecisionWithChoice:
+    def __call__(self, conformance_assessment_data: ConformanceAssessmentData) -> ConformanceDecisionWithChoice:
         if (self.feature.lower() == "matter"):
             return ConformanceDecisionWithChoice(ConformanceDecision.MANDATORY)
-        elif (self.feature.lower() == 'zigbee'):
+        if (self.feature.lower() == 'zigbee'):
             return ConformanceDecisionWithChoice(ConformanceDecision.DISALLOWED)
-        else:
-            return ConformanceDecisionWithChoice(ConformanceDecision.OPTIONAL)
+        return ConformanceDecisionWithChoice(ConformanceDecision.OPTIONAL)
 
     def __str__(self):
         return self.feature
@@ -242,8 +316,8 @@ class attribute(Conformance):
         self.requiredAttribute = requiredAttribute
         self.name = name
 
-    def __call__(self, feature_map: uint, attribute_list: list[uint], all_command_list: list[uint]) -> ConformanceDecisionWithChoice:
-        if self.requiredAttribute in attribute_list:
+    def __call__(self, conformance_assessment_data: ConformanceAssessmentData) -> ConformanceDecisionWithChoice:
+        if self.requiredAttribute in conformance_assessment_data.attribute_list:
             return ConformanceDecisionWithChoice(ConformanceDecision.MANDATORY)
         return ConformanceDecisionWithChoice(ConformanceDecision.NOT_APPLICABLE)
 
@@ -256,8 +330,8 @@ class command(Conformance):
         self.requiredCommand = requiredCommand
         self.name = name
 
-    def __call__(self, feature_map: uint, attribute_list: list[uint], all_command_list: list[uint]) -> ConformanceDecisionWithChoice:
-        if self.requiredCommand in all_command_list:
+    def __call__(self, conformance_assessment_data: ConformanceAssessmentData) -> ConformanceDecisionWithChoice:
+        if self.requiredCommand in conformance_assessment_data.all_command_list:
             return ConformanceDecisionWithChoice(ConformanceDecision.MANDATORY)
         return ConformanceDecisionWithChoice(ConformanceDecision.NOT_APPLICABLE)
 
@@ -272,83 +346,80 @@ def strip_outer_parentheses(inner: str) -> str:
 
 
 class optional_wrapper(Conformance):
-    def __init__(self, op: Callable, choice: Optional[Choice] = None):
+    def __init__(self, op: Conformance, choice: Optional[Choice] = None):
         self.op = op
         self.choice = choice
 
-    def __call__(self, feature_map: uint, attribute_list: list[uint], all_command_list: list[uint]) -> ConformanceDecisionWithChoice:
-        decision_with_choice = self.op(feature_map, attribute_list, all_command_list)
+    def __call__(self, conformance_assessment_data: ConformanceAssessmentData) -> ConformanceDecisionWithChoice:
+        decision_with_choice = self.op(conformance_assessment_data)
 
         if decision_with_choice.decision in [ConformanceDecision.MANDATORY, ConformanceDecision.OPTIONAL]:
             return ConformanceDecisionWithChoice(ConformanceDecision.OPTIONAL, self.choice)
-        elif decision_with_choice.decision == ConformanceDecision.NOT_APPLICABLE:
+        if decision_with_choice.decision == ConformanceDecision.NOT_APPLICABLE:
             return decision_with_choice
-        else:
-            raise ConformanceException(f'Optional wrapping invalid op {decision_with_choice}')
+        raise ConformanceException(f'Optional wrapping invalid op {decision_with_choice}')
 
     def __str__(self):
         return f'[{strip_outer_parentheses(str(self.op))}]' + (str(self.choice) if self.choice else '')
 
 
 class mandatory_wrapper(Conformance):
-    def __init__(self, op: Callable):
+    def __init__(self, op: Conformance):
         self.op = op
 
-    def __call__(self, feature_map: uint, attribute_list: list[uint], all_command_list: list[uint]) -> ConformanceDecisionWithChoice:
-        return self.op(feature_map, attribute_list, all_command_list)
+    def __call__(self, conformance_assessment_data: ConformanceAssessmentData) -> ConformanceDecisionWithChoice:
+        return self.op(conformance_assessment_data)
 
     def __str__(self):
         return strip_outer_parentheses(str(self.op))
 
 
 class not_operation(Conformance):
-    def __init__(self, op: Callable):
+    def __init__(self, op: Conformance):
         if op.choice:
             raise ChoiceConformanceException('NOT operation called on choice conformance')
         self.op = op
 
-    def __call__(self, feature_map: uint, attribute_list: list[uint], all_command_list: list[uint]) -> ConformanceDecisionWithChoice:
+    def __call__(self, conformance_assessment_data: ConformanceAssessmentData) -> ConformanceDecisionWithChoice:
         # not operations can't be used with anything that returns DISALLOWED
         # not operations also can't be used with things that are optional
         # ie, ![AB] doesn't make sense, nor does !O
-        decision_with_choice = self.op(feature_map, attribute_list, all_command_list)
+        decision_with_choice = self.op(conformance_assessment_data)
         if decision_with_choice.decision in [ConformanceDecision.DISALLOWED, ConformanceDecision.PROVISIONAL]:
             raise ConformanceException('NOT operation on optional or disallowed item')
         # Features in device types degrade to optional so a not operation here is still optional because we don't have any way to verify the features since they're not exposed anywhere
-        elif decision_with_choice.decision == ConformanceDecision.OPTIONAL:
+        if decision_with_choice.decision == ConformanceDecision.OPTIONAL:
             return decision_with_choice
-        elif decision_with_choice.decision == ConformanceDecision.NOT_APPLICABLE:
+        if decision_with_choice.decision == ConformanceDecision.NOT_APPLICABLE:
             return ConformanceDecisionWithChoice(ConformanceDecision.MANDATORY)
-        elif decision_with_choice.decision == ConformanceDecision.MANDATORY:
+        if decision_with_choice.decision == ConformanceDecision.MANDATORY:
             return ConformanceDecisionWithChoice(ConformanceDecision.NOT_APPLICABLE)
-        else:
-            raise ConformanceException('NOT called on item with non-conformance value')
+        raise ConformanceException('NOT called on item with non-conformance value')
 
     def __str__(self):
         return f'!{str(self.op)}'
 
 
 class and_operation(Conformance):
-    def __init__(self, op_list: list[Callable]):
+    def __init__(self, op_list: list[Conformance]):
         for op in op_list:
             if op.choice:
                 raise ChoiceConformanceException('AND operation with internal choice conformance')
         self.op_list = op_list
 
-    def __call__(self, feature_map: uint, attribute_list: list[uint], all_command_list: list[uint]) -> ConformanceDecisionWithChoice:
+    def __call__(self, conformance_assessment_data: ConformanceAssessmentData) -> ConformanceDecisionWithChoice:
         for op in self.op_list:
-            decision_with_choice = op(feature_map, attribute_list, all_command_list)
+            decision_with_choice = op(conformance_assessment_data)
             # and operations can't happen on optional or disallowed
-            if decision_with_choice.decision == ConformanceDecision.OPTIONAL and all([type(op) == device_feature for op in self.op_list]):
+            if decision_with_choice.decision == ConformanceDecision.OPTIONAL and all(type(op) == device_feature for op in self.op_list):
                 return decision_with_choice
-            elif decision_with_choice.decision in [ConformanceDecision.OPTIONAL, ConformanceDecision.DISALLOWED, ConformanceDecision.PROVISIONAL]:
+            if decision_with_choice.decision in [ConformanceDecision.OPTIONAL, ConformanceDecision.DISALLOWED, ConformanceDecision.PROVISIONAL]:
                 raise ConformanceException('AND operation on optional or disallowed item')
-            elif decision_with_choice.decision == ConformanceDecision.NOT_APPLICABLE:
+            if decision_with_choice.decision == ConformanceDecision.NOT_APPLICABLE:
                 return decision_with_choice
-            elif decision_with_choice.decision == ConformanceDecision.MANDATORY:
+            if decision_with_choice.decision == ConformanceDecision.MANDATORY:
                 continue
-            else:
-                raise ConformanceException('Oplist item returned non-conformance value')
+            raise ConformanceException('Oplist item returned non-conformance value')
         return ConformanceDecisionWithChoice(ConformanceDecision.MANDATORY)
 
     def __str__(self):
@@ -357,23 +428,22 @@ class and_operation(Conformance):
 
 
 class or_operation(Conformance):
-    def __init__(self, op_list: list[Callable]):
+    def __init__(self, op_list: list[Conformance]):
         for op in op_list:
             if op.choice:
-                raise ChoiceConformanceException('AND operation with internal choice conformance')
+                raise ChoiceConformanceException('OR operation with internal choice conformance')
         self.op_list = op_list
 
-    def __call__(self, feature_map: uint, attribute_list: list[uint], all_command_list: list[uint]) -> ConformanceDecisionWithChoice:
+    def __call__(self, conformance_assessment_data: ConformanceAssessmentData) -> ConformanceDecisionWithChoice:
         for op in self.op_list:
-            decision_with_choice = op(feature_map, attribute_list, all_command_list)
+            decision_with_choice = op(conformance_assessment_data)
             if decision_with_choice.decision in [ConformanceDecision.DISALLOWED, ConformanceDecision.PROVISIONAL]:
                 raise ConformanceException('OR operation on optional or disallowed item')
-            elif decision_with_choice.decision == ConformanceDecision.NOT_APPLICABLE:
+            if decision_with_choice.decision == ConformanceDecision.NOT_APPLICABLE:
                 continue
-            elif decision_with_choice.decision in [ConformanceDecision.MANDATORY, ConformanceDecision.OPTIONAL]:
+            if decision_with_choice.decision in [ConformanceDecision.MANDATORY, ConformanceDecision.OPTIONAL]:
                 return decision_with_choice
-            else:
-                raise ConformanceException('Oplist item returned non-conformance value')
+            raise ConformanceException('Oplist item returned non-conformance value')
         return ConformanceDecisionWithChoice(ConformanceDecision.NOT_APPLICABLE)
 
     def __str__(self):
@@ -381,31 +451,57 @@ class or_operation(Conformance):
         return f'({" | ".join(op_strs)})'
 
 
-class greater_operation(Conformance):
-    def _type_ok(self, op: Callable):
-        return type(op) == attribute or type(op) == literal
+class ArithmeticConformance(Conformance):
+    ''' Base class for arithmetic operations - do not use directly.'''
 
-    def __init__(self, op1: Callable, op2: Callable):
-        if not self._type_ok(op1) or not self._type_ok(op2):
-            raise ConformanceException('Arithmetic operations can only have attribute or literal value children')
+    def _type_ok(self, op1: Conformance, op2: Conformance):
+        def _is_valid_operand(op: Conformance) -> bool:
+            return issubclass(type(op), ValueConformance) or type(op) == attribute
+        return _is_valid_operand(op1) and _is_valid_operand(op2)
+
+    def __init__(self, op1: Conformance, op2: Conformance):
+        if not self._type_ok(op1, op2):
+            raise ConformanceException('Arithmetic operations can only have attribute + literal or revision children')
         self.op1 = op1
         self.op2 = op2
+        self.operator = operator.gt
+        self.opstr = "???"
 
-    def __call__(self, feature_map: uint, attribute_list: list[uint], all_command_list: list[uint]) -> ConformanceDecisionWithChoice:
+    def __call__(self, conformance_assessment_data: ConformanceAssessmentData) -> ConformanceDecisionWithChoice:
+        # If there are any non-value ops, return optional, as it represents an attribute comparison and we don't have the data
+        # for that currently.
         # For now, this is fully optional, need to implement this properly later, but it requires access to the actual attribute values
         # We need to reach into the attribute, but can't use it directly because the attribute callable is an EXISTENCE check and
         # the arithmetic functions require a value.
+        if hasattr(self.op1, 'get_value') and hasattr(self.op2, 'get_value'):
+            if self.operator(self.op1.get_value(conformance_assessment_data), self.op2.get_value(conformance_assessment_data)):
+                return ConformanceDecisionWithChoice(ConformanceDecision.MANDATORY)
+            return ConformanceDecisionWithChoice(ConformanceDecision.NOT_APPLICABLE)
         return ConformanceDecisionWithChoice(ConformanceDecision.OPTIONAL)
 
     def __str__(self):
-        return f'{str(self.op1)} > {str(self.op2)}'
+        return f'{str(self.op1)} {self.opstr} {str(self.op2)}'
+
+
+class greater_operation(ArithmeticConformance):
+    def __init__(self, op1: Conformance, op2: Conformance):
+        super().__init__(op1, op2)
+        self.operator = operator.gt
+        self.opstr = '>'
+
+
+class greater_equal_operation(ArithmeticConformance):
+    def __init__(self, op1: Conformance, op2: Conformance):
+        super().__init__(op1, op2)
+        self.operator = operator.ge
+        self.opstr = '>='
 
 
 class otherwise(Conformance):
-    def __init__(self, op_list: list[Callable]):
+    def __init__(self, op_list: list[Conformance]):
         self.op_list = op_list
 
-    def __call__(self, feature_map: uint, attribute_list: list[uint], all_command_list: list[uint]) -> ConformanceDecisionWithChoice:
+    def __call__(self, conformance_assessment_data: ConformanceAssessmentData) -> ConformanceDecisionWithChoice:
         # Otherwise operations apply from left to right. If any of them
         # has a definite decision (optional, mandatory or disallowed), that is the one that applies
         # Provisional items are meant to be marked as the first item in the list
@@ -413,7 +509,7 @@ class otherwise(Conformance):
         # For O,D, optional applies (leftmost), but we should consider some way to warn here as well,
         # possibly in another function
         for op in self.op_list:
-            decision_with_choice = op(feature_map, attribute_list, all_command_list)
+            decision_with_choice = op(conformance_assessment_data)
             if decision_with_choice.decision == ConformanceDecision.NOT_APPLICABLE:
                 continue
             return decision_with_choice
@@ -424,7 +520,33 @@ class otherwise(Conformance):
         return ', '.join(op_strs)
 
 
-def parse_basic_callable_from_xml(element: ElementTree.Element) -> Callable:
+def parse_basic_callable_from_xml(element: ElementTree.Element) -> Conformance:
+    """
+    Parse simple, leaf-node conformance elements from XML.
+
+    Basic conformance elements are XML elements without children that represent
+    simple conformance decisions such as:
+    - mandatoryConform (M)
+    - optionalConform (O)
+    - disallowConform (X)
+    - deprecateConform (D)
+    - provisionalConform (P)
+    - zigbee conditions
+    - literal values
+
+    This is in contrast to complex conformance expressions that involve
+    boolean operations (AND, OR, NOT) or wrapper operations.
+
+    Args:
+        element: XML element representing a basic conformance rule
+
+    Returns:
+        Callable conformance object for the basic conformance type
+
+    Raises:
+        BasicConformanceException: If element has children or is not a recognized basic type
+        ConformanceException: If a basic element is malformed (e.g. missing required attributes)
+    """
     if list(element):
         raise BasicConformanceException("parse_basic_callable_from_xml called for XML element with children")
     # This will throw a key error if this is not a basic element key.
@@ -434,16 +556,50 @@ def parse_basic_callable_from_xml(element: ElementTree.Element) -> Callable:
             return optional(choice)
         return BASIC_CONFORMANCE[element.tag]
     except KeyError:
-        if element.tag == CONDITION_TAG and element.get('name').lower() == ZIGBEE_CONDITION:
+        condition_name = element.get('name')
+        if element.tag == CONDITION_TAG and condition_name and condition_name.lower() == ZIGBEE_CONDITION:
             return zigbee()
-        elif element.tag == LITERAL_TAG:
-            return literal(element.get('value'))
-        else:
-            raise BasicConformanceException(
-                f'parse_basic_callable_from_xml called for unknown element {str(element.tag)} {str(element.attrib)}')
+        if element.tag == LITERAL_TAG:
+            literal_value = element.get('value')
+            if literal_value is None:
+                raise ConformanceException(
+                    f"Literal tag missing 'value' attribute: {ElementTree.tostring(element, encoding='unicode').strip()}")
+            return literal(literal_value)
+        if element.tag == REVISION_TAG:
+            value = element.get('value')
+            if value is None:
+                raise ConformanceException(
+                    f"Revision tag missing 'value' attribute: {ElementTree.tostring(element, encoding='unicode').strip()}")
+            return revision(value)
+        raise BasicConformanceException(
+            f'parse_basic_callable_from_xml called for unknown element {str(element.tag)} {str(element.attrib)}')
 
 
-def parse_wrapper_callable_from_xml(element: ElementTree.Element, ops: list[Callable]) -> Callable:
+def parse_wrapper_callable_from_xml(element: ElementTree.Element, ops: list[Conformance]) -> Conformance:
+    """
+    Parse complex conformance expressions that wrap or operate on other conformance elements.
+
+    Wrapper conformance elements are XML elements with children that represent
+    composite conformance operations such as:
+    - Boolean operations: AND, OR, NOT
+    - Wrapper operations: optional[...], mandatory[...]
+    - Control flow: otherwise (comma-separated alternatives)
+    - Comparison operations: greater than
+
+    These contrast with basic conformance elements which are simple leaf nodes.
+    Wrapper conformances combine multiple sub-conformances using logical operations
+    to create complex conditional requirements.
+
+    Args:
+        element: XML element representing a wrapper conformance operation
+        ops: List of parsed child conformance callables to be combined
+
+    Returns:
+        Callable conformance object that wraps/operates on the child conformances
+
+    Raises:
+        ConformanceException: If element tag is unrecognized or has wrong number of children
+    """
     # optional can be a wrapper as well as a standalone
     # This can be any of the boolean operations, optional or otherwise
     choice = parse_choice(element)
@@ -451,29 +607,51 @@ def parse_wrapper_callable_from_xml(element: ElementTree.Element, ops: list[Call
         if len(ops) > 1:
             raise ConformanceException(f'OPTIONAL term found with more than one subelement {list(element)}')
         return optional_wrapper(ops[0], choice)
-    elif element.tag == MANDATORY_CONFORM:
+    if element.tag == MANDATORY_CONFORM:
         if len(ops) > 1:
             raise ConformanceException(f'MANDATORY term found with more than one subelement {list(element)}')
         return mandatory_wrapper(ops[0])
-    elif element.tag == AND_TERM:
+    if element.tag == AND_TERM:
         return and_operation(ops)
-    elif element.tag == OR_TERM:
+    if element.tag == OR_TERM:
         return or_operation(ops)
-    elif element.tag == NOT_TERM:
+    if element.tag == NOT_TERM:
         if len(ops) > 1:
             raise ConformanceException(f'NOT term found with more than one subelement {list(element)}')
         return not_operation(ops[0])
-    elif element.tag == OTHERWISE_CONFORM:
+    if element.tag == OTHERWISE_CONFORM:
         return otherwise(ops)
-    elif element.tag == GREATER_TERM:
+    if element.tag == GREATER_TERM:
         if len(ops) != 2:
             raise ConformanceException(f'Greater than term found with more than two subelements {list(element)}')
         return greater_operation(ops[0], ops[1])
-    else:
-        raise ConformanceException(f'Unexpected conformance tag with children {element}')
+    if element.tag == GREATER_EQUAL_TERM:
+        if len(ops) != 2:
+            raise ConformanceException(f'Greater than term found with more than two subelements {list(element)}')
+        return greater_equal_operation(ops[0], ops[1])
+    raise ConformanceException(f'Unexpected conformance tag with children {element}')
 
 
-def parse_callable_from_xml(element: ElementTree.Element, params: ConformanceParseParameters) -> Callable:
+def parse_device_type_callable_from_xml(element: ElementTree.Element) -> Conformance:
+    ''' Only allows basic, or wrappers over things that degrade to basic.'''
+    if not list(element):
+        try:
+            return parse_basic_callable_from_xml(element)
+        # For device types ONLY, there are conformances called "attributes" that are essentially just placeholders for conditions in the device library.
+        # For example, temperature controlled cabinet has conditions called "heating" and "cooling". The cluster conditions are dependent on them, but they're not
+        # actually exposed anywhere ON the device other than through the presence of the cluster. So for now, treat any attribute conditions that are cluster conditions
+        # as just optional, because it's optional to implement any device type feature.
+        # Device types also have some marked as "condition" that are similarly optional
+        except BasicConformanceException:
+            if element.tag == ATTRIBUTE_TAG or element.tag == CONDITION_TAG or element.tag == FEATURE_TAG:
+                return device_feature(element.attrib['name'])
+            raise
+
+    ops = [parse_device_type_callable_from_xml(sub) for sub in element]
+    return parse_wrapper_callable_from_xml(element, ops)
+
+
+def parse_callable_from_xml(element: ElementTree.Element, params: ConformanceParseParameters) -> Conformance:
     if not list(element):
         try:
             return parse_basic_callable_from_xml(element)
@@ -482,20 +660,35 @@ def parse_callable_from_xml(element: ElementTree.Element, params: ConformancePar
             # something else.
             pass
         if element.tag == FEATURE_TAG:
+            feature_name = element.get('name')
+            if feature_name is None:
+                raise ConformanceException(
+                    f"Feature tag missing 'name' attribute for element: {ElementTree.tostring(element, encoding='unicode').strip()}")
             try:
-                return feature(params.feature_map[element.get('name')], element.get('name'))
+                return feature(params.feature_map[feature_name], feature_name)
             except KeyError:
-                raise ConformanceException(f'Conformance specifies feature not in feature table: {element.get("name")}')
+                raise ConformanceException(f'Conformance specifies feature "{feature_name}" not in feature table.')
         elif element.tag == ATTRIBUTE_TAG:
             # Some command conformance tags are marked as attribute, so if this key isn't in attribute, try command
             name = element.get('name')
+            if name is None:
+                raise ConformanceException(
+                    f"Attribute tag missing 'name' attribute for element: {ElementTree.tostring(element, encoding='unicode').strip()}")
+
             if name in params.attribute_map:
                 return attribute(params.attribute_map[name], name)
-            elif name in params.command_map:
+            if name in params.command_map:
                 return command(params.command_map[name], name)
-            else:
-                raise ConformanceException(f'Conformance specifies attribute or command not in table: {name}')
+            raise ConformanceException(f'Conformance specifies attribute or command "{name}" not in table.')
         elif element.tag == COMMAND_TAG:
+            command_name = element.get('name')
+            if command_name is None:
+                raise ConformanceException(
+                    f"Command tag missing 'name' attribute for element: {ElementTree.tostring(element, encoding='unicode').strip()}")
+            try:
+                return command(params.command_map[command_name], command_name)
+            except KeyError:
+                raise ConformanceException(f'Conformance specifies command "{command_name}" not in command table.')
             return command(params.command_map[element.get('name')], element.get('name'))
         elif element.tag == CONDITION_TAG:
             return device_feature(element.attrib['name'])

@@ -244,6 +244,10 @@ CHIP_ERROR Type::DoEncode(TLV::TLVWriter & aWriter, TLV::Tag aTag, const Optiona
     {
         encoder.Encode(to_underlying(Fields::kTargets), targets);
     }
+    if (includeSensitive)
+    {
+        encoder.Encode(to_underlying(Fields::kAuxiliaryType), auxiliaryType);
+    }
     if (aAccessingFabricIndex.HasValue())
     {
         encoder.Encode(to_underlying(Fields::kFabricIndex), fabricIndex);
@@ -277,6 +281,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kTargets))
         {
             err = DataModel::Decode(reader, targets);
+        }
+        else if (__context_tag == to_underlying(Fields::kAuxiliaryType))
+        {
+            err = DataModel::Decode(reader, auxiliaryType);
         }
         else if (__context_tag == to_underlying(Fields::kFabricIndex))
         {

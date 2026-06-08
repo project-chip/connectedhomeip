@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -89,13 +89,14 @@ void OTAConfig::Init()
     SetRequestorInstance(&gRequestorCore);
 
     gRequestorStorage.Init(chip::Server::GetInstance().GetPersistentStorage());
-    gRequestorCore.Init(chip::Server::GetInstance(), gRequestorStorage, gRequestorUser, gDownloader);
+    TEMPORARY_RETURN_IGNORED gRequestorCore.Init(chip::Server::GetInstance(), gRequestorStorage, gRequestorUser, gDownloader,
+                                                 chip::GetOTARequestorAttributes(), chip::GetDefaultOTARequestorEventGenerator());
 
     // Periodic query timeout must be set prior to requestor being initialized
     gRequestorUser.SetPeriodicQueryTimeout(OTA_PERIODIC_TIMEOUT);
 
-#if CHIP_DEVICE_CONFIG_ENABLE_MULTI_OTA_REQUESTOR
-    auto & imageProcessor = chip::OTAMultiImageProcessorImpl::GetDefaultInstance();
+#if defined(SL_MATTER_ENABLE_MULTI_OTA_REQUESTOR) && SL_MATTER_ENABLE_MULTI_OTA_REQUESTOR
+    auto & imageProcessor = chip::DeviceLayer::Silabs::MultiOTA::OTAMultiImageProcessorImpl::GetDefaultInstance();
 #else
     auto & imageProcessor = chip::OTAImageProcessorImpl::GetDefaultInstance();
 #endif

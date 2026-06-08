@@ -63,11 +63,11 @@ void InitChefMicrowaveOvenModeCluster()
             continue;
 
         gDelegateTable[epIndex] = std::make_unique<MicrowaveOvenMode::ChefDelegate>();
-        gDelegateTable[epIndex]->Init();
+        TEMPORARY_RETURN_IGNORED gDelegateTable[epIndex]->Init();
 
         gInstanceTable[epIndex] = std::make_unique<ModeBase::Instance>(gDelegateTable[epIndex].get(), endpointId,
                                                                        MicrowaveOvenMode::Id, kMicrowaveOvenFeatureMap);
-        gInstanceTable[epIndex]->Init();
+        TEMPORARY_RETURN_IGNORED gInstanceTable[epIndex]->Init();
 
         ChipLogProgress(DeviceLayer, "Endpoint %d MicrowaveOvenMode Initialized.", endpointId);
     }
@@ -92,14 +92,14 @@ CHIP_ERROR MicrowaveOvenMode::ChefDelegate::Init()
 
 void MicrowaveOvenMode::ChefDelegate::HandleChangeToMode(uint8_t NewMode, ModeBase::Commands::ChangeToModeResponse::Type & response)
 {
-    EndpointId endpointId = mInstance->GetEndpointId();
+    EndpointId endpointId = GetInstance()->GetEndpointId();
     ChipLogDetail(DeviceLayer, "HandleChangeToMode: Endpoint %d", endpointId);
     response.status = to_underlying(ModeBase::StatusCode::kSuccess);
 }
 
 CHIP_ERROR MicrowaveOvenMode::ChefDelegate::GetModeLabelByIndex(uint8_t modeIndex, chip::MutableCharSpan & label)
 {
-    EndpointId endpointId = mInstance->GetEndpointId();
+    EndpointId endpointId = GetInstance()->GetEndpointId();
     ChipLogDetail(DeviceLayer, "GetModeLabelByIndex: Endpoint %d", endpointId);
     if (modeIndex >= MATTER_ARRAY_SIZE(kModeOptions))
     {
@@ -110,7 +110,7 @@ CHIP_ERROR MicrowaveOvenMode::ChefDelegate::GetModeLabelByIndex(uint8_t modeInde
 
 CHIP_ERROR MicrowaveOvenMode::ChefDelegate::GetModeValueByIndex(uint8_t modeIndex, uint8_t & value)
 {
-    EndpointId endpointId = mInstance->GetEndpointId();
+    EndpointId endpointId = GetInstance()->GetEndpointId();
     ChipLogDetail(DeviceLayer, "GetModeValueByIndex: Endpoint %d", endpointId);
     if (modeIndex >= MATTER_ARRAY_SIZE(kModeOptions))
     {
@@ -122,7 +122,7 @@ CHIP_ERROR MicrowaveOvenMode::ChefDelegate::GetModeValueByIndex(uint8_t modeInde
 
 CHIP_ERROR MicrowaveOvenMode::ChefDelegate::GetModeTagsByIndex(uint8_t modeIndex, List<ModeTagStructType> & tags)
 {
-    EndpointId endpointId = mInstance->GetEndpointId();
+    EndpointId endpointId = GetInstance()->GetEndpointId();
     ChipLogDetail(DeviceLayer, "GetModeTagsByIndex: Endpoint %d", endpointId);
     if (modeIndex >= MATTER_ARRAY_SIZE(kModeOptions))
     {

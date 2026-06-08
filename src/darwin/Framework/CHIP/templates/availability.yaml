@@ -11633,6 +11633,8 @@
           # In-progress for Joint Fabric feature
           - JointFabricDatastore
           - JointFabricAdministrator
+          # In-progress for new groups setup
+          - Groupcast
       attributes:
           BasicInformation:
               # In-progress for maybe Matter 1.5
@@ -11647,6 +11649,8 @@
               # In-progress for network recovery feature
               - NetworkRecoveryReason
               - RecoveryIdentifier
+              # In-progress for NFC commissioning feature
+              - IsCommissioningWithoutPower
           Thermostat:
               # In-progress for Matter 1.5: Thermostat Suggestions feature
               - CurrentThermostatSuggestion
@@ -11660,6 +11664,10 @@
           UnitLocalization:
               # In-progress for maybe Matter 1.5
               - SupportedTemperatureUnits
+          UnitTesting:
+              # Ideally none of UnitTesting would be exposed as public API, but
+              # for now just start doing that for new additions to it.
+              - UnsupportedAttributeRequiringAdminPrivilege
       commands:
           OperationalCredentials:
               # In-progress for Matter 1.5: VID Verification feature
@@ -11691,6 +11699,8 @@
               - ICEServerStruct
               - ViewportStruct
               - WebRTCSessionStruct
+              # Waiting to see whether any compat issues arise from making this global
+              - SemanticTagStruct
       struct fields:
           ElectricalEnergyMeasurement:
               EnergyMeasurementStruct:
@@ -11703,6 +11713,17 @@
                   - vidVerificationStatement
               NOCStruct:
                   - vvsc
+      events:
+          Thermostat:
+              # Thermostat Events is in-progress for Matter 1.6
+              - ActivePresetChange
+              - ActiveScheduleChange
+              - LocalTemperatureChange
+              - OccupancyChange
+              - RunningModeChange
+              - RunningStateChange
+              - SetpointChange
+              - SystemModeChange
       event fields:
           AccountLogin:
               LoggedOut:
@@ -11755,7 +11776,7 @@
                   - UpdatingMaps
       bitmaps:
           Thermostat:
-              # In-progress for Matter 1.5: Thermostat Suggestions feature
+              # In-progress for Matter 1.6: Thermostat Suggestions feature
               - ThermostatSuggestionNotFollowingReasonBitmap
       bitmap values:
           ElectricalEnergyMeasurement:
@@ -11763,6 +11784,12 @@
                   # In-progress for Matter 1.5
                   - ApparentEnergy
                   - ReactiveEnergy
+          Thermostat:
+              Feature:
+                  # Thermostat Events is in-progress for Matter 1.6
+                  - Events
+                  # Thermostat Suggestions is in-progress for Matter 1.6
+                  - ThermostatSuggestions
       device types:
           # In-progress for maybe Matter 1.5
           - AudioDoorbell

@@ -30,6 +30,10 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/clusters/network-commissioning/network-commissioning.h>
+#include <app/clusters/pressure-measurement-server/CodegenIntegration.h>
+#include <app/clusters/relative-humidity-measurement-server/CodegenIntegration.h>
+#include <app/clusters/temperature-control-server/temperature-control-server.h>
+#include <app/clusters/temperature-measurement-server/CodegenIntegration.h>
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
@@ -74,7 +78,7 @@ AppTask AppTask::sAppTask;
 
 void NetWorkCommissioningInstInit()
 {
-    sWiFiNetworkCommissioningInstance.Init();
+    TEMPORARY_RETURN_IGNORED sWiFiNetworkCommissioningInstance.Init();
 
     // We only have network commissioning on endpoint 0.
     emberAfEndpointEnableDisable(kNetworkCommissioningEndpointSecondary, false);
@@ -132,7 +136,7 @@ CHIP_ERROR AppTask::Init()
     PrintOnboardingCodes(chip::RendezvousInformationFlag(chip::RendezvousInformationFlag::kOnNetwork));
 #endif /* CONFIG_NETWORK_LAYER_BLE */
 
-    app::Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
+    app::Clusters::TemperatureControl::SetDelegate(&sAppSupportedTemperatureLevelsDelegate);
     app::Clusters::ModeSelect::setSupportedModesManager(&sStaticSupportedModesManager);
 
     return CHIP_NO_ERROR;
@@ -181,14 +185,14 @@ void AppTask::AppEventHandler(AppEvent * aEvent)
     switch (aEvent->Type)
     {
     case AppEvent::kEventType_Timer: {
-        chip::app::Clusters::TemperatureMeasurement::Attributes::MeasuredValue::Set(
-            /* endpoint ID */ 1, /* temperature in 0.01*C */ int16_t(temperature));
+        LogErrorOnFailure(chip::app::Clusters::TemperatureMeasurement::SetMeasuredValue(/* endpoint ID */ 1,
+                                                                                        /* temperature in 0.01*C */ temperature));
 
-        chip::app::Clusters::RelativeHumidityMeasurement::Attributes::MeasuredValue::Set(
-            /* endpoint ID */ 1, /* humidity in 0.01% */ int16_t(humidity));
+        LogErrorOnFailure(chip::app::Clusters::RelativeHumidityMeasurement::SetMeasuredValue(
+            /* endpoint ID */ 1, chip::app::DataModel::MakeNullable(static_cast<uint16_t>(humidity))));
 
-        chip::app::Clusters::PressureMeasurement::Attributes::MeasuredValue::Set(
-            /* endpoint ID */ 1, /* pressure in 0.01 */ int16_t(pressure));
+        LogErrorOnFailure(chip::app::Clusters::PressureMeasurement::SetMeasuredValue(
+            /* endpoint ID */ 1, chip::app::DataModel::MakeNullable(static_cast<int16_t>(pressure))));
 
         break;
     }

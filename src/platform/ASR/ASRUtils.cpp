@@ -75,7 +75,7 @@ bool ASRUtils::IsStationProvisioned(void)
 {
     lega_wlan_wifi_conf stationConfig;
     bool stationConnected;
-    Internal::ASRUtils::IsStationConnected(stationConnected);
+    TEMPORARY_RETURN_IGNORED Internal::ASRUtils::IsStationConnected(stationConnected);
     return (asr_wifi_get_config(&stationConfig) == CHIP_NO_ERROR && stationConfig.ssid_len != 0) || stationConnected;
 }
 
@@ -284,11 +284,21 @@ CHIP_ERROR ASRUtils::asr_wifi_connect(void)
     memset(&conf, 0, sizeof(lega_wlan_init_type_t));
     conf.wifi_mode = STA;
     conf.dhcp_mode = WLAN_DHCP_CLIENT;
-    asr_wifi_get_config(&stationConfig);
+    TEMPORARY_RETURN_IGNORED asr_wifi_get_config(&stationConfig);
 
-    strncpy((char *) conf.wifi_ssid, (char *) stationConfig.wifi_ssid, stationConfig.ssid_len);
+    // Bounds check added to prevent buffer overflow vulnerabilities.
+    VerifyOrReturnError(stationConfig.ssid_len <= sizeof(conf.wifi_ssid), CHIP_ERROR_BUFFER_TOO_SMALL);
 
-    strncpy((char *) conf.wifi_key, (char *) stationConfig.wifi_key, stationConfig.key_len);
+    // Keep old behaviour due to compatibility with SDK
+    strncpy((char *) conf.wifi_ssid, (char *) stationConfig.wifi_ssid, stationConfig.ssid_len); // NOLINT(bugprone-unsafe-functions)
+
+    // Bounds check added to prevent buffer overflow vulnerabilities.
+    VerifyOrReturnError(stationConfig.key_len <= sizeof(conf.wifi_key), CHIP_ERROR_BUFFER_TOO_SMALL);
+
+    // Keep old behaviour due to compatibility with SDK
+    strncpy((char *) conf.wifi_key, (char *) stationConfig.wifi_key, stationConfig.key_len); // NOLINT(bugprone-unsafe-functions)
+    conf.key_len = stationConfig.key_len;
+
     conf.security = stationConfig.security;
 
     ChipLogProgress(DeviceLayer, "Connecting to AP : [%s]\r\n", StringOrNullMarker(conf.wifi_ssid));

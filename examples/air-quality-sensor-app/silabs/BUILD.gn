@@ -56,16 +56,17 @@ declare_args() {
 if (wifi_soc) {
   siwx917_sdk("sdk") {
     sources = [
-      "${examples_common_plat_dir}/FreeRTOSConfig.h",
+      "${examples_common_plat_dir}/freertos_config/FreeRTOSConfig.h",
       "${silabs_project_dir}/include/CHIPProjectConfig.h",
     ]
 
     include_dirs = [
-      "${chip_root}/src/platform/silabs/SiWx917",
+      "${chip_root}/src/platform/silabs/SiWx",
       "${silabs_project_dir}/include",
       "${examples_plat_dir}",
       "${chip_root}/src/lib",
       "${examples_common_plat_dir}",
+      "${examples_common_plat_dir}/freertos_config",
     ]
 
     defines = []
@@ -79,7 +80,7 @@ if (wifi_soc) {
 } else {
   efr32_sdk("sdk") {
     sources = [
-      "${examples_common_plat_dir}/FreeRTOSConfig.h",
+      "${examples_common_plat_dir}/freertos_config/FreeRTOSConfig.h",
       "${silabs_project_dir}/include/CHIPProjectConfig.h",
     ]
 
@@ -89,6 +90,7 @@ if (wifi_soc) {
       "${examples_plat_dir}",
       "${chip_root}/src/lib",
       "${examples_common_plat_dir}",
+      "${examples_common_plat_dir}/freertos_config",
     ]
 
     defines = []
@@ -102,7 +104,7 @@ if (wifi_soc) {
     #TODO: This is a placeholder for the actual implementation
     if (use_air_quality_sensor) {
       include_dirs +=
-          [ "${efr32_sdk_root}/examples/platform/silabs/sensors/AirQuality" ]
+          [ "${chip_root}/examples/platform/silabs/sensors/AirQuality" ]
 
       defines += [ "USE_AIR_QUALITY_SENSOR" ]
     }
@@ -121,15 +123,14 @@ silabs_executable("air_quality_sensor_app") {
 
   sources = [
     "${chip_root}/examples/air-quality-sensor-app/air-quality-sensor-common/src/air-quality-sensor-manager.cpp",
-    "${examples_common_plat_dir}/main.cpp",
     "src/AppTask.cpp",
+    "src/DataModelCallbacks.cpp",
     "src/SensorManager.cpp",
-    "src/ZclCallbacks.cpp",
   ]
 
   #TODO: This is a placeholder for the actual implementation
   if (use_air_quality_sensor) {
-    sources += [ "${efr32_sdk_root}/examples/platform/silabs/sensors/AirQuality/AirQualitySensor.cpp" ]
+    sources += [ "${chip_root}/examples/platform/silabs/sensors/AirQuality/AirQualitySensor.cpp" ]
   }
 
   #ENDTODO
@@ -192,8 +193,11 @@ silabs_executable("air_quality_sensor_app") {
       "${chip_root}/examples/common/pigweed/efr32",
     ]
   }
-
-  ldscript = "${examples_common_plat_dir}/ldscripts/${silabs_family}.ld"
+  if (is_clang) {
+    ldscript = "${examples_common_plat_dir}/ldscripts/${silabs_family}-clang.ld"
+  } else {
+    ldscript = "${examples_common_plat_dir}/ldscripts/${silabs_family}.ld"
+  }
 
   inputs = [ ldscript ]
 

@@ -19,11 +19,14 @@
 #pragma once
 
 #include <atomic>
+#include <condition_variable>
 #include <curl/curl.h>
+#include <filesystem>
 #include <mutex>
 #include <queue>
 #include <string>
 #include <thread>
+#include <unordered_map>
 
 typedef struct UploadDataInfo
 {
@@ -35,31 +38,45 @@ typedef struct UploadDataInfo
 class PushAVUploader
 {
 public:
-    typedef struct CertificatesInfo
+    typedef struct CertificatesPathInfo
     {
         std::string mRootCert;
         std::string mDevCert;
         std::string mDevKey;
     } PushAVCertPath;
 
-    PushAVUploader(PushAVCertPath certPath);
+    typedef struct CertificatesInfo
+    {
+        std::vector<uint8_t> mRootCertBuffer;
+        std::vector<uint8_t> mClientCertBuffer;
+        std::vector<uint8_t> mClientKeyBuffer;
+        std::vector<std::vector<uint8_t>> mIntermediateCertBuffer;
+    } PushAVCertBuffer;
+
+    PushAVUploader();
     ~PushAVUploader();
 
     void Start();
     void Stop();
-    void AddUploadData(std::string & filename, std::string & url);
+    void AddUploadData(const std::string & filename, const std::string & url);
     size_t GetUploadQueueSize()
     {
         std::lock_guard<std::mutex> lock(mQueueMutex);
         return mAvData.size();
     }
 
+    void setCertificateBuffer(const PushAVCertBuffer & certBuffer) { mCertBuffer = certBuffer; }
+    void setCertificatePath(const PushAVCertPath & certPath) { mCertPath = certPath; }
+    void setStreamIdNameMap(const std::vector<std::string> & streamIdNameMap) { mStreamIdNameMap = streamIdNameMap; }
+
 private:
     void ProcessQueue();
     void UploadData(std::pair<std::string, std::string> data);
     PushAVCertPath mCertPath;
+    PushAVCertBuffer mCertBuffer;
     std::queue<std::pair<std::string, std::string>> mAvData;
     std::mutex mQueueMutex;
     std::atomic<bool> mIsRunning;
     std::thread mUploaderThread;
+    std::vector<std::string> mStreamIdNameMap;
 };

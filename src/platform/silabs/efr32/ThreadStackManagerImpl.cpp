@@ -24,17 +24,17 @@
  *
  */
 /* this file behaves like a config.h, comes first */
-#include <platform/internal/CHIPDeviceLayerInternal.h>
-
-#include <app/clusters/network-commissioning/network-commissioning.h>
 #include <platform/NetworkCommissioning.h>
 #include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.hpp>
 #include <platform/OpenThread/OpenThreadUtils.h>
 #include <platform/ThreadStackManager.h>
+#include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <openthread/platform/entropy.h>
 
 #include <lib/support/CHIPPlatformMemory.h>
+
+#include <openthread-core-config.h>
 
 #include <lib/support/CodeUtils.h>
 #include <mbedtls/platform.h>
@@ -46,6 +46,11 @@ otInstance * otGetInstance(void);
 void otAppCliInit(otInstance * aInstance);
 #endif // CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI
 }
+
+// for compatibility with SLCP
+#ifndef SL_MATTER_OPENTHREAD_NCP_ENABLE
+#define SL_MATTER_OPENTHREAD_NCP_ENABLE 0
+#endif
 
 namespace chip {
 namespace DeviceLayer {
@@ -114,6 +119,12 @@ CHIP_ERROR ThreadStackManagerImpl::InitThreadStack(otInstance * otInst)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     err            = GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>::ConfigureThreadStack(otInst);
+    if (err == CHIP_NO_ERROR)
+    {
+        // To make sure that timeout is set with OT libraries
+        otThreadSetChildTimeout(otInst, OPENTHREAD_CONFIG_MLE_CHILD_TIMEOUT_DEFAULT);
+    }
+
     return err;
 }
 
@@ -156,16 +167,6 @@ extern "C" __WEAK void sl_openthread_init(void)
 #include "uart.h"
 #endif
 
-extern "C" otError otPlatUartEnable(void)
-{
-#ifdef PW_RPC_ENABLED
-    return OT_ERROR_NOT_IMPLEMENTED;
-#else
-    // Uart Init is handled in init_efrPlatform.cpp
-    return OT_ERROR_NONE;
-#endif
-}
-
 extern "C" otInstance * otGetInstance(void)
 {
     return sOTInstance;
@@ -173,9 +174,16 @@ extern "C" otInstance * otGetInstance(void)
 
 extern "C" void sl_ot_create_instance(void)
 {
-    VerifyOrDie(chip::Platform::MemoryInit() == CHIP_NO_ERROR);
+    SuccessOrDie(chip::Platform::MemoryInit());
     mbedtls_platform_set_calloc_free(CHIPPlatformMemoryCalloc, CHIPPlatformMemoryFree);
+#if SL_OPENTHREAD_MULTI_PAN_ENABLE
+    // Initialize multiple OT instances for Multi-PAN support
+    // Instance 0: Matter protocol stack
+    sOTInstance = otInstanceInitMultiple(0);
+#else
+    // Standard single instance initialization
     sOTInstance = otInstanceInitSingle();
+#endif // SL_OPENTHREAD_MULTI_PAN_ENABLE
 }
 
 extern "C" void sl_ot_cli_init(void)
@@ -186,7 +194,17 @@ extern "C" void sl_ot_cli_init(void)
 #endif
 }
 
-#if CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI
+#if CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI && !SL_MATTER_OPENTHREAD_NCP_ENABLE
+
+extern "C" otError otPlatUartEnable(void)
+{
+#ifdef PW_RPC_ENABLED
+    return OT_ERROR_NOT_IMPLEMENTED;
+#else
+    // Uart Init is handled in init_efrPlatform.cpp
+    return OT_ERROR_NONE;
+#endif
+}
 
 extern "C" otError otPlatUartSend(const uint8_t * aBuf, uint16_t aBufLength)
 {
@@ -226,4 +244,4 @@ extern "C" __WEAK otError otPlatUartDisable(void)
     return OT_ERROR_NOT_IMPLEMENTED;
 }
 
-#endif // CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI
+#endif // CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI && !SL_MATTER_OPENTHREAD_NCP_ENABLE

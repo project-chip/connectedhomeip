@@ -60,7 +60,7 @@ LogProvider::~LogProvider()
         auto rv = fclose(f.second);
         if (rv != 0)
         {
-            ChipLogError(NotSpecified, "Error when closing file pointer: %p (%d)", f.second, errno);
+            ChipLogError(NotSpecified, "Error when closing file pointer: %d", errno);
         }
     }
     mFiles.clear();
@@ -94,8 +94,15 @@ CHIP_ERROR LogProvider::StartLogCollection(IntentEnum intent, LogSessionHandle &
     VerifyOrReturnValue(filePath.HasValue(), CHIP_ERROR_NOT_FOUND);
 
     auto fp = fopen(filePath.Value().c_str(), "rb");
-    VerifyOrReturnValue(!(nullptr == fp && errno == ENOENT), CHIP_ERROR_NOT_FOUND);
-    VerifyOrReturnValue(nullptr != fp, CHIP_ERROR_INTERNAL);
+    if (fp == nullptr)
+    {
+        int err = (errno == 0) ? EIO : errno;
+        if (err == ENOENT)
+        {
+            return CHIP_ERROR_NOT_FOUND;
+        }
+        return CHIP_ERROR_POSIX(err);
+    }
 
     mLogSessionHandle++;
     // If the session handle rolls over to UINT16_MAX which is invalid, reset to 0.

@@ -13,6 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import argparse
+import contextlib
 import glob
 import os
 import platform
@@ -27,6 +28,7 @@ def get_file_from_pigweed(name):
     for filename in glob.glob(pattern, recursive=True):
         if os.path.isfile(filename):
             return filename
+    return None
 
 
 def run_command(command):
@@ -49,10 +51,8 @@ def run_command(command):
     if returncode != 0:
         # command_log is binary, so decoding as utf-8 might technically fail.  We don't want
         # to throw on that.
-        try:
+        with contextlib.suppress(Exception):
             print("Failure log: {}".format(command_log.decode()))
-        except Exception:
-            pass
 
     return returncode
 

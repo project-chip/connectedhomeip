@@ -101,7 +101,7 @@ void emberAfMicrowaveOvenModeClusterInitCallback(chip::EndpointId endpointId)
     VerifyOrDie(gMicrowaveOvenModeDelegate == nullptr && gMicrowaveOvenModeInstance == nullptr);
     gMicrowaveOvenModeDelegate = new MicrowaveOvenMode::ExampleMicrowaveOvenModeDelegate;
     gMicrowaveOvenModeInstance = new ModeBase::Instance(gMicrowaveOvenModeDelegate, endpointId, MicrowaveOvenMode::Id, 0);
-    gMicrowaveOvenModeInstance->Init();
+    TEMPORARY_RETURN_IGNORED gMicrowaveOvenModeInstance->Init();
 }
 
 void emberAfMicrowaveOvenModeClusterShutdownCallback(chip::EndpointId endpointId)

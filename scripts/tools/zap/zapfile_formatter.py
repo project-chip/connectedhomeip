@@ -17,7 +17,6 @@
 
 import argparse
 import json
-from typing import List
 
 _DEFAULT_CLUSTER_REVISION_ATTRIBUTE = {
     "entry": {
@@ -157,10 +156,7 @@ class ValidateMandatoryClusterParam(Mutator):
         if (self._param_key != "commands") and (not candidate.get("enabled")):
             return False
 
-        if self._cluster_specific_code is not None and self._cluster_specific_code != candidate["code"]:
-            return False
-
-        return True
+        return not (self._cluster_specific_code is not None and self._cluster_specific_code != candidate["code"])
 
     def _attributeSpecificChecks(self, param: object, cluster_name):
         if not param["included"]:
@@ -216,16 +212,16 @@ class ValidateMandatoryClusterParam(Mutator):
 
 
 def loadZapfile(filename: str):
-    with open(filename, "rt") as infile:
+    with open(filename) as infile:
         return json.load(infile)
 
 
 def saveZapfile(body: object, filename: str):
-    with open(filename, "wt+") as outfile:
+    with open(filename, "w+") as outfile:
         return json.dump(body, outfile, indent=2)
 
 
-def mutateZapbody(body: object, mutators: List[Mutator]):
+def mutateZapbody(body: object, mutators: list[Mutator]):
     work_list = [body]
     while len(work_list):
         current_item = work_list.pop()

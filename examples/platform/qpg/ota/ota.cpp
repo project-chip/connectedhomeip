@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -28,6 +28,7 @@
 #include <platform/CHIPDeviceLayer.h>
 
 #include <app/clusters/ota-requestor/BDXDownloader.h>
+#include <app/clusters/ota-requestor/CodegenIntegration.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestor.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorDriver.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
@@ -53,7 +54,7 @@ OTAImageProcessorImpl gImageProcessor;
  *                    Application Function Definitions
  *****************************************************************************/
 
-bool OtaHeaderValidationCb(qvCHIP_Ota_ImageHeader_t imageHeader)
+bool OtaHeaderValidationCb(qvOta_ImageHeader_t imageHeader)
 {
 
     uint16_t vendorId  = 0;
@@ -88,7 +89,8 @@ void InitializeOTARequestor(void)
     gRequestorUser.SetPeriodicQueryTimeout(OTA_PERIODIC_TIMEOUT_SEC);
 
     gRequestorStorage.Init(chip::Server::GetInstance().GetPersistentStorage());
-    gRequestorCore.Init(chip::Server::GetInstance(), gRequestorStorage, gRequestorUser, gDownloader);
+    TEMPORARY_RETURN_IGNORED gRequestorCore.Init(chip::Server::GetInstance(), gRequestorStorage, gRequestorUser, gDownloader,
+                                                 GetOTARequestorAttributes(), GetDefaultOTARequestorEventGenerator());
     gImageProcessor.SetOTADownloader(&gDownloader);
     gDownloader.SetImageProcessorDelegate(&gImageProcessor);
 
@@ -96,12 +98,12 @@ void InitializeOTARequestor(void)
     gRequestorUser.Init(&gRequestorCore, &gImageProcessor);
 
     // If we are in the middle of an upgrade, execute ResumeDownload first
-    if (true == qvCHIP_OtaImageDownloadInProgress())
+    if (true == qvOta_ImageDownloadInProgress())
     {
         ChipLogProgress(DeviceLayer, "Resuming OTA download");
         using ProviderLocation = chip::OTARequestorInterface::ProviderLocationType;
         ProviderLocation lastUsedProvider;
-        qvCHIP_OtaGetLastProvider(&lastUsedProvider.providerNodeID, &lastUsedProvider.endpoint, &lastUsedProvider.fabricIndex);
+        qvOta_GetLastProvider(&lastUsedProvider.providerNodeID, &lastUsedProvider.endpoint, &lastUsedProvider.fabricIndex);
         gRequestorCore.SetCurrentProviderLocation(lastUsedProvider);
 
         CHIP_ERROR error;
@@ -109,13 +111,13 @@ void InitializeOTARequestor(void)
         // If there is any error in triggering an immediate query, we need to abort the download
         if (error != CHIP_NO_ERROR)
         {
-            qvCHIP_OtaResetProgressInfo();
+            qvOta_ResetProgressInfo();
             ChipLogError(DeviceLayer, "Aborting OTA download");
         }
     }
 
     // Initialize OTA image validation callback
-    qvCHIP_OtaSetHeaderValidationCb(OtaHeaderValidationCb);
+    qvOta_SetHeaderValidationCb(OtaHeaderValidationCb);
 }
 
 void TriggerOTAQuery(void)

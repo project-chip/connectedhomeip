@@ -83,7 +83,7 @@ void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
     if (event->Type == DeviceEventType::kWFXSystemEvent)
     {
 
-        switch (event->Platform.WFXSystemEvent.data.genericMsgEvent.header.id)
+        switch (event->Platform.event.WFXSystemEvent.data.genericMsgEvent.header.id)
         {
         case to_underlying(WifiInterface::WifiEvent::kStartUp):
             ChipLogProgress(DeviceLayer, "WIFI_EVENT_STA_START");
@@ -93,7 +93,7 @@ void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
             ChipLogProgress(DeviceLayer, "WIFI_EVENT_STA_CONNECTED");
             if (mWiFiStationState == kWiFiStationState_Connecting)
             {
-                if (event->Platform.WFXSystemEvent.data.connectEvent.body.status == 0)
+                if (event->Platform.event.WFXSystemEvent.data.connectEvent.body.status == 0)
                 {
                     ChangeWiFiStationState(kWiFiStationState_Connecting_Succeeded);
                 }
@@ -154,7 +154,7 @@ bool ConnectivityManagerImpl::_IsWiFiStationEnabled(void)
 
 CHIP_ERROR ConnectivityManagerImpl::_SetWiFiStationMode(ConnectivityManager::WiFiStationMode val)
 {
-    DeviceLayer::SystemLayer().ScheduleWork(DriveStationState, NULL);
+    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleWork(DriveStationState, NULL);
 
     if (mWiFiStationMode != val)
     {
@@ -179,7 +179,7 @@ void ConnectivityManagerImpl::_ClearWiFiStationProvision(void)
     {
         WifiInterface::GetInstance().ClearWifiCredentials();
 
-        DeviceLayer::SystemLayer().ScheduleWork(DriveStationState, NULL);
+        TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleWork(DriveStationState, NULL);
     }
 }
 
@@ -197,16 +197,16 @@ void ConnectivityManagerImpl::_OnWiFiStationProvisionChange()
 {
     // Schedule a call to the DriveStationState method to adjust the station state as needed.
     ChipLogProgress(DeviceLayer, "_ON WIFI PROVISION CHANGE");
-    DeviceLayer::SystemLayer().ScheduleWork(DriveStationState, NULL);
+    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleWork(DriveStationState, NULL);
 }
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
 CHIP_ERROR ConnectivityManagerImpl::_SetPollingInterval(System::Clock::Milliseconds32 pollingInterval)
 {
-    // TODO ICD
+    // TODO: The polling interval feature is not implemented on this platform. Return success to prevent spurious error logs from
+    // ICDManager. Revisit this once we complete the ICD integration
     (void) pollingInterval;
-    ChipLogError(DeviceLayer, "Set ICD Fast Polling on Silabs Wifi platform");
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    return CHIP_NO_ERROR;
 }
 #endif /* CHIP_CONFIG_ENABLE_ICD_SERVER */
 
@@ -257,10 +257,7 @@ void ConnectivityManagerImpl::DriveStationState()
         {
             ChipLogProgress(DeviceLayer, "Disconnecting WiFi station interface");
 
-            CHIP_ERROR error = WifiInterface::GetInstance().TriggerDisconnection();
-            SuccessOrExitAction(error,
-                                ChipLogError(DeviceLayer, "TriggerDisconnection() failed: %" CHIP_ERROR_FORMAT, error.Format()));
-
+            WifiInterface::GetInstance().TriggerDisconnection();
             ChangeWiFiStationState(kWiFiStationState_Disconnecting);
         }
 #endif

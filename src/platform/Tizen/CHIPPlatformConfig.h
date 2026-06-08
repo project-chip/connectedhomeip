@@ -28,6 +28,9 @@
 
 #define CHIP_CONFIG_ABORT() abort()
 
+#define CHIP_CONFIG_ERROR_FORMAT_AS_STRING 1
+#define CHIP_CONFIG_ERROR_SOURCE 1
+
 // ==================== Security Adaptations ====================
 
 // ==================== General Configuration Overrides ====================

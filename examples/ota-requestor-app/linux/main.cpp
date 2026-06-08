@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,6 +18,7 @@
 
 #include "AppMain.h"
 #include <app/clusters/ota-requestor/BDXDownloader.h>
+#include <app/clusters/ota-requestor/CodegenIntegration.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestor.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorUserConsent.h>
@@ -217,7 +218,8 @@ static void InitOTARequestor(void)
     gRequestorUser.SetSendNotifyUpdateApplied(gSendNotifyUpdateApplied);
 
     gRequestorStorage.Init(chip::Server::GetInstance().GetPersistentStorage());
-    gRequestorCore.Init(chip::Server::GetInstance(), gRequestorStorage, gRequestorUser, gDownloader);
+    SuccessOrDie(gRequestorCore.Init(chip::Server::GetInstance(), gRequestorStorage, gRequestorUser, gDownloader,
+                                     GetOTARequestorAttributes(), GetDefaultOTARequestorEventGenerator()));
     gRequestorUser.Init(&gRequestorCore, &gImageProcessor);
 
     gImageProcessor.SetOTAImageFile(gOtaDownloadPath);
@@ -349,7 +351,8 @@ int main(int argc, char * argv[])
             ChipLogError(SoftwareUpdate, "Failed to store boot reason - SoftwareUpdateCompleted");
         }
 
-        argv[0] = kImageExecPath;
+        std::string imageExecPath(kImageExecPath);
+        argv[0] = imageExecPath.data();
         execv(argv[0], argv);
 
         // If successfully executing the new image, execv should not return

@@ -118,6 +118,8 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(detail::MeasurementUnit
     case EnumType::kNgm3:
     case EnumType::kPm3:
     case EnumType::kBqm3:
+    case EnumType::kDbpm:
+    case EnumType::kPcft:
         return val;
     default:
         return EnumType::kUnknownEnumValue;
@@ -399,6 +401,20 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::RelativePositi
     case EnumType::kAbove:
     case EnumType::kFrontOf:
     case EnumType::kBehind:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::SoftwareVersionCertificationStatusEnum val)
+{
+    using EnumType = Globals::SoftwareVersionCertificationStatusEnum;
+    switch (val)
+    {
+    case EnumType::kDevTest:
+    case EnumType::kProvisional:
+    case EnumType::kCertified:
+    case EnumType::kRevoked:
         return val;
     default:
         return EnumType::kUnknownEnumValue;

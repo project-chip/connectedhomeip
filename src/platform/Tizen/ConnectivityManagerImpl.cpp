@@ -167,7 +167,7 @@ bool ConnectivityManagerImpl::_IsWiFiStationEnabled()
 {
     bool isWiFiStationEnabled = false;
 
-    Internal::WiFiMgr().IsActivated(&isWiFiStationEnabled);
+    TEMPORARY_RETURN_IGNORED Internal::WiFiMgr().IsActivated(&isWiFiStationEnabled);
 
     return isWiFiStationEnabled;
 }
@@ -204,7 +204,7 @@ bool ConnectivityManagerImpl::_IsWiFiStationProvisioned()
 
 void ConnectivityManagerImpl::_ClearWiFiStationProvision()
 {
-    Internal::WiFiMgr().RemoveAllConfigs();
+    TEMPORARY_RETURN_IGNORED Internal::WiFiMgr().RemoveAllConfigs();
 }
 
 ConnectivityManager::WiFiAPMode ConnectivityManagerImpl::_GetWiFiAPMode()
@@ -232,18 +232,18 @@ void ConnectivityManagerImpl::_SetWiFiAPIdleTimeout(System::Clock::Timeout val) 
 
 void ConnectivityManagerImpl::StartWiFiManagement()
 {
-    Internal::WiFiMgr().Activate();
+    TEMPORARY_RETURN_IGNORED Internal::WiFiMgr().Activate();
 }
 
 void ConnectivityManagerImpl::StopWiFiManagement()
 {
-    Internal::WiFiMgr().Deactivate();
+    TEMPORARY_RETURN_IGNORED Internal::WiFiMgr().Deactivate();
 }
 
 bool ConnectivityManagerImpl::IsWiFiManagementStarted()
 {
     bool isActivated = false;
-    Internal::WiFiMgr().IsActivated(&isActivated);
+    TEMPORARY_RETURN_IGNORED Internal::WiFiMgr().IsActivated(&isActivated);
     return isActivated;
 }
 

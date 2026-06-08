@@ -29,6 +29,7 @@
 #include <lib/support/CHIPMemString.h>
 #include <platform/DiagnosticDataProvider.h>
 
+#include <inet/IPAddress.h>
 #include <inet/InetInterface.h>
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
@@ -233,12 +234,12 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
     ifp->offPremiseServicesReachableIPv4.SetNull();
     ifp->offPremiseServicesReachableIPv6.SetNull();
     ifp->type = app::Clusters::GeneralDiagnostics::InterfaceTypeEnum::kThread;
-    ConfigurationMgr().GetPrimary802154MACAddress(ifp->MacAddress);
+    TEMPORARY_RETURN_IGNORED ConfigurationMgr().GetPrimary802154MACAddress(ifp->MacAddress);
     ifp->hardwareAddress = ByteSpan(ifp->MacAddress, kMaxHardwareAddrSize);
 #elif CHIP_DEVICE_CONFIG_ENABLE_WPA
     struct netif * netif = nullptr;
     netif                = static_cast<struct netif *>(net_get_mlan_handle());
-    strncpy(ifp->Name, "wlan0", Inet::InterfaceId::kMaxIfNameLength);
+    chip::Platform::CopyString(ifp->Name, "wlan0");
     ifp->name          = CharSpan(ifp->Name, strlen(ifp->Name));
     ifp->isOperational = true;
     ifp->offPremiseServicesReachableIPv4.SetNull();
@@ -478,6 +479,54 @@ CHIP_ERROR DiagnosticDataProviderImpl::ResetWiFiNetworkDiagnosticsCounts(void)
     }
 #endif /* CONFIG_WIFI_GET_LOG */
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiCurrentMaxRate(uint64_t & currentMaxRate)
+{
+#if CONFIG_WIFI_GET_LOG
+    wlan_ds_rate ds_rate;
+    mlan_bss_type bss_type = MLAN_BSS_TYPE_STA;
+
+    (void) memset(&ds_rate, 0, sizeof(wlan_ds_rate));
+    ds_rate.sub_command = WIFI_DS_GET_DATA_RATE;
+
+    int ret = wlan_get_data_rate(&ds_rate, bss_type);
+    if (ret != WM_SUCCESS)
+    {
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    wifi_data_rate_t * datarate = (wifi_data_rate_t *) &ds_rate.param.data_rate;
+
+    /* Legacy rates in Mbps (index 2 is 5.5 Mbps) */
+    static const uint32_t lg_rate_kbps[12] = {
+        1000,  2000,  5500,  11000, /* 11b: 1, 2, 5.5, 11 Mbps */
+        6000,  9000,  12000, 18000, /* 11a/g: 6, 9, 12, 18 Mbps */
+        24000, 36000, 48000, 54000  /* 11a/g: 24, 36, 48, 54 Mbps */
+    };
+
+    if (datarate->tx_rate_format == MLAN_RATE_FORMAT_LG &&
+        datarate->tx_data_rate < (sizeof(lg_rate_kbps) / sizeof(lg_rate_kbps[0])))
+    {
+        /* Legacy rates (in bps) */
+        currentMaxRate = lg_rate_kbps[datarate->tx_data_rate] * 1000U;
+    }
+    else if (datarate->tx_rate_format <=
+             3 /* MLAN_RATE_FORMAT_HE=3 but use hardcoded value as in some condition MLAN_RATE_FORMAT_HE may not be defined  */)
+    {
+        /* HT, VHT, HE rates - tx_data_rate is in 0.5 Mbps units transform it in bps */
+        currentMaxRate = static_cast<uint64_t>(datarate->tx_data_rate) * 500000ULL;
+    }
+    else
+    {
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    return CHIP_NO_ERROR;
+
+#else /* CONFIG_WIFI_GET_LOG */
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+#endif
 }
 
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_WPA */

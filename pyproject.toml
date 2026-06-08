@@ -1,3 +1,6 @@
+[project]
+requires-python = ">=3.11"
+
 [tool.autopep8]
 max_line_length = 132
 
@@ -7,22 +10,72 @@ known_first_party = "matter"
 
 [tool.ruff]
 line-length = 132
-target-version = "py310"
+target-version = "py311"
 exclude = [
-    ".environment",
-    ".git",
-    ".github",
     ".*",
-    "build",
     "out",
+    "scripts/py_matter_yamltests/build",
+    "scripts/py_matter_idl/build",
+    "src/python_testing/matter_testing_infrastructure/build",
+    # Exclude submodules since we do not maintain them
+    # TODO: Use exact paths once we will have a way to sync and validate them in CI
+    "examples/common/QRCode/repo",
+    "examples/common/m5stack-tft/repo",
     "third_party",
-    "examples/common/QRCode/",
+    "examples/tv-casting-app/tests/",
     # TODO(#37698)
-    "docs/development_controllers/chip-repl/*.ipynb",
+    "docs/development_controllers/matter-repl/*.ipynb",
+    # Generated files
+    "src/controller/python/matter/clusters/CHIPClusters.py",
+    "src/controller/python/matter/clusters/Objects.py",
 ]
 
+[tool.pyright]
+reportMissingTypeStubs = "warning"
+extraPaths = ["./src/python_testing/matter_testing_infrastructure"]
+
 [tool.ruff.lint]
-select = ["E4", "E7", "E9", "F"]
+select = [
+    # Standard errors and warnings
+    "E", "PLE", "W", "F",
+    # Ensure that async is used properly
+    "ASYNC",
+    # Consistent commas
+    "COM",
+    # Simplify the code if possible
+    "C4", "RET", "SIM",
+    # Ensure that scripts are executable
+    "EXE",
+    # Check for common exception issues
+    "RSE",
+    # Check for common logging issues
+    "LOG",
+    # Check for common optimization issues
+    "SLOT",
+    # Check for builtin symbols aliasing
+    "A",
+    # pyupgrade rules to update syntax to the new preferred variant
+    "UP001", "UP003", "UP004", "UP005", "UP006", "UP008", "UP009", "UP010", "UP011", "UP012", "UP013", "UP014", "UP015", "UP017",
+    "UP018", "UP019", "UP020", "UP021", "UP022", "UP023", "UP024", "UP025", "UP026", "UP028", "UP029", "UP030", "UP033", "UP034",
+    "UP036", "UP037", "UP039", "UP040", "UP041", "UP042",
+]
 ignore = [
+    "ASYNC109", # Sometimes we use "timeout" argument in async functions
+    "ASYNC230", # Allow open() calls in async functions
+    "ASYNC240", # Do not force 3rd party library to handle os.path.exists()
+    "ASYNC250", # TODO: Refactor the usage of input() in async functions
+    "COM812", # Do not enforce trailing commas in multi-line collections for now
+    "SIM102", # Nested if statements can be more readable in some cases
+    "SIM108", # Do not enforce ternary operator in place of if/else blocks
+    "SIM114", # Separate if statements can be more readable in some cases
+    "SIM905", # Sometimes using "command arg1 arg2".split() is more readable
+    "E501", # Do not report line length issues (formatter should handle this)
     "E721", # We use it for good reasons
 ]
+
+[tool.mypy]
+mypy_path = ["matter/typings"]
+namespace_packages = true
+warn_unused_configs = true
+ignore_missing_imports = true
+explicit_package_bases = true

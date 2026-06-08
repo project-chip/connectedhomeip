@@ -47,8 +47,8 @@ CHIP_ERROR ConfigurationManagerImpl::ClearWiFiNetworkInformations()
 {
 #if !CHIP_DISABLE_PLATFORM_KVS
     auto & kvs = PersistedStorage::KeyValueStoreMgr();
-    kvs.Delete(kWiFiSSIDKeyName);
-    kvs.Delete(kWiFiCredentialsKeyName);
+    TEMPORARY_RETURN_IGNORED kvs.Delete(kWiFiSSIDKeyName);
+    TEMPORARY_RETURN_IGNORED kvs.Delete(kWiFiCredentialsKeyName);
     return CHIP_NO_ERROR;
 #endif
     return CHIP_ERROR_NOT_IMPLEMENTED;
@@ -58,23 +58,12 @@ CHIP_ERROR ConfigurationManagerImpl::GetWiFiNetworkInformations(WiFiNetworkInfos
 {
 #if !CHIP_DISABLE_PLATFORM_KVS
     auto & kvs = PersistedStorage::KeyValueStoreMgr();
-    CHIP_ERROR err;
 
-    err = kvs.Get(kWiFiCredentialsKeyName, infos.credentials, sizeof(infos.credentials), &infos.credentialsLen);
-    if (CHIP_ERROR_KEY_NOT_FOUND == err)
-    {
-        err = CHIP_NO_ERROR;
-    }
-    ReturnErrorOnFailure(err);
+    ReturnErrorOnFailure(kvs.Get(kWiFiCredentialsKeyName, infos.credentials, sizeof(infos.credentials), &infos.credentialsLen)
+                             .NoErrorIf(CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND));
 
-    err = kvs.Get(kWiFiSSIDKeyName, infos.ssid, sizeof(infos.ssid), &infos.ssidLen);
-    if (CHIP_ERROR_KEY_NOT_FOUND == err)
-    {
-        err = CHIP_NO_ERROR;
-    }
-    ReturnErrorOnFailure(err);
-
-    return CHIP_NO_ERROR;
+    return kvs.Get(kWiFiSSIDKeyName, infos.ssid, sizeof(infos.ssid), &infos.ssidLen)
+        .NoErrorIf(CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
 #endif
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }

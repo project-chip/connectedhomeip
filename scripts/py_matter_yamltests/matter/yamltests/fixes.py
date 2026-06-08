@@ -14,6 +14,7 @@
 #    limitations under the License.
 
 import binascii
+import contextlib
 import re
 
 '''Fixes certain value formats known to exist in YAML tests
@@ -58,10 +59,8 @@ def try_apply_yaml_unrepresentable_integer_for_javascript_fixes(value):
     and we would fail at runtime.
     '''
     if type(value) is str:
-        try:
+        with contextlib.suppress(ValueError):
             value = int(value)
-        except ValueError:
-            pass
     return value
 
 
@@ -96,7 +95,7 @@ def convert_yaml_octet_string_to_bytes(s: str) -> bytes:
     #   * Any character greater than 0xFF has the upper bytes chopped off.
     as_bytes = [ord(c) for c in s]
 
-    if any([value > 0x200 for value in as_bytes]):
+    if any(value > 0x200 for value in as_bytes):
         raise ValueError('Unsupported char in octet string %r' % as_bytes)
     accumulated_hex = ''.join([f"{(v & 0xFF):02x}" for v in as_bytes])
     return binascii.unhexlify(accumulated_hex)
@@ -125,7 +124,7 @@ def fix_typed_yaml_value(value):
 
 
 def add_yaml_support_for_scientific_notation_without_dot(loader):
-    regular_expression = re.compile(u'''^(?:
+    regular_expression = re.compile('''^(?:
      [-+]?(?:[0-9][0-9_]*)\\.[0-9_]*(?:[eE][-+]?[0-9]+)?
     |[-+]?(?:[0-9][0-9_]*)(?:[eE][-+]?[0-9]+)
     |\\.[0-9_]+(?:[eE][-+][0-9]+)?
@@ -134,9 +133,9 @@ def add_yaml_support_for_scientific_notation_without_dot(loader):
     |\\.(?:nan|NaN|NAN))$''', re.X)
 
     loader.add_implicit_resolver(
-        u'tag:yaml.org,2002:float',
+        'tag:yaml.org,2002:float',
         regular_expression,
-        list(u'-+0123456789.'))
+        list('-+0123456789.'))
 
 
 # This is a gross hack. The previous runner has a some internal states where an identity match one
@@ -145,7 +144,7 @@ def add_yaml_support_for_scientific_notation_without_dot(loader):
 def try_update_yaml_node_id_test_runner_state(tests, config):
     default_identity = 'alpha'
     identities = {
-        default_identity: None if 'nodeId' not in config else config['nodeId']}
+        default_identity: config.get('nodeId', None)}
 
     for test in tests:
         if not test.is_enabled:

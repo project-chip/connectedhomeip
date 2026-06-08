@@ -22,7 +22,7 @@ from .context import Context
 from .handlers import ClusterHandler
 from .parsing import NormalizeName
 
-LOGGER = logging.getLogger('data-model-xml-data-parsing')
+LOGGER = logging.getLogger(__name__)
 
 
 def contains_valid_cluster_id(attrs: AttributesImpl) -> bool:
@@ -47,5 +47,4 @@ class DataModelXmlHandler(BaseHandler):
                 "Found an abstract base cluster (no id): '%s'", attrs['name'])
 
             return ClusterHandler.IntoCluster(self.context, self._idl, self.context.AddAbstractBaseCluster(NormalizeName(attrs['name']), self.context.GetCurrentLocationMeta()))
-        else:
-            return BaseHandler(self.context)
+        return BaseHandler(self.context)

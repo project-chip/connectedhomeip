@@ -90,6 +90,9 @@
 #define OPENTHREAD_CONFIG_JOINER_ENABLE 0
 #define OPENTHREAD_CONFIG_COMMISSIONER_ENABLE 0
 #define OPENTHREAD_CONFIG_UDP_FORWARD_ENABLE 0
+#ifndef CHIP_DEVICE_CONFIG_THREAD_BORDER_ROUTER
+#define CHIP_DEVICE_CONFIG_THREAD_BORDER_ROUTER 0
+#endif
 #define OPENTHREAD_CONFIG_BORDER_ROUTER_ENABLE CHIP_DEVICE_CONFIG_THREAD_BORDER_ROUTER
 #define OPENTHREAD_CONFIG_DHCP6_CLIENT_ENABLE 0
 #define OPENTHREAD_CONFIG_DHCP6_SERVER_ENABLE 0
@@ -98,13 +101,14 @@
 // Support udp multicast by enabling Multicast Listener Registration (MLR)
 #define OPENTHREAD_CONFIG_MLR_ENABLE 1
 
-// Define as 1 to stay awake between fragments while transmitting a large packet,
-// and to stay awake after receiving a packet with frame pending set to true.
-#define OPENTHREAD_CONFIG_MAC_STAY_AWAKE_BETWEEN_FRAGMENTS 1
-
 #define OPENTHREAD_CONFIG_ENABLE_BUILTIN_MBEDTLS 0
 
 #define OPENTHREAD_CONFIG_DETERMINISTIC_ECDSA_ENABLE 0
+
+// Multi-PAN support for Matter over Thread devices
+#ifndef SL_OPENTHREAD_MULTI_PAN_ENABLE
+#define SL_OPENTHREAD_MULTI_PAN_ENABLE 0
+#endif
 
 // Use the SiLabs-supplied default platform configuration for remainder
 // of OpenThread config options.
@@ -113,3 +117,19 @@
 // it cannot use "openthread" in the path to the included file.
 //
 #include "openthread-core-efr32-config.h"
+
+#ifndef OPENTHREAD_RADIO
+#define OPENTHREAD_RADIO 0
+#endif
+
+#ifndef SL_OPENTHREAD_COEX_COUNTER_ENABLE
+#define SL_OPENTHREAD_COEX_COUNTER_ENABLE 0
+#endif
+
+#ifndef RADIO_CONFIG_SUBGHZ_SUPPORT
+#define RADIO_CONFIG_SUBGHZ_SUPPORT 0
+#endif
+
+#ifndef TESTING
+#define TESTING 0
+#endif

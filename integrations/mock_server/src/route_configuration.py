@@ -16,19 +16,21 @@ import json
 import logging
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Optional
+
+log = logging.getLogger(__name__)
 
 
 @dataclass
 class RouteResponse:
     status: int
-    headers: Dict[str, str]
-    body: Dict[str, Any]
+    headers: dict[str, str]
+    body: Any  # Dict for inline JSON, or bytes for $ref content (raw file bytes)
 
 
 @dataclass
 class QueryConfig:
-    params: Dict[str, Any]
+    params: dict[str, Any]
 
 
 @dataclass
@@ -42,7 +44,7 @@ class Route:
 
 @dataclass
 class Configuration:
-    routing: List[Route] = field(default_factory=list)
+    routing: list[Route] = field(default_factory=list)
 
 
 def load_configurations(config_path: Path, routing_config_dir: Path) -> Configuration:
@@ -66,13 +68,13 @@ def load_configurations(config_path: Path, routing_config_dir: Path) -> Configur
         raise ValueError(f"'{routing_config_dir}' is not a directory")
 
     # Load routing configuration
-    routing_config: List[Route] = load_routing_configuration_dir(routing_config_dir)
+    routing_config: list[Route] = load_routing_configuration_dir(routing_config_dir)
 
     # Create and return the Configuration object
     return Configuration(routing=routing_config)
 
 
-def load_routing_configuration_dir(directory: Path) -> List[Route]:
+def load_routing_configuration_dir(directory: Path) -> list[Route]:
     """
     Load and merge all routing configuration files from a specified directory.
 
@@ -92,7 +94,7 @@ def load_routing_configuration_dir(directory: Path) -> List[Route]:
     if not directory.is_dir():
         raise ValueError(f"'{directory}' is not a directory")
 
-    all_routes: List[Route] = []
+    all_routes: list[Route] = []
 
     # Process all JSON files in the directory
     for file_path in directory.glob("*.json"):
@@ -106,7 +108,44 @@ def load_routing_configuration_dir(directory: Path) -> List[Route]:
     return all_routes
 
 
-def load_routing_configuration_file(file_path: Path) -> List[Route]:
+def resolve_ref(body: dict[str, Any], base_path: Path) -> bytes:
+    """
+    Resolve $ref reference and return raw file content.
+
+    Args:
+        body (Dict[str, Any]): The body object containing a $ref key.
+        base_path (Path): The directory path to resolve relative references from.
+
+    Returns:
+        bytes: The raw file content as bytes.
+
+    Example:
+        body = {"$ref": "../static/tc-65521-32769-v1.json"}
+        content = resolve_ref(body, Path("configurations/fake_product_server"))
+        # Returns raw contents of configurations/static/tc-65521-32769-v1.json
+    """
+    ref_path_str = body["$ref"]
+    ref_path = (base_path / ref_path_str).resolve()
+
+    # To prevent path traversal, ensure the resolved path is within the parent directory of the config file.
+    config_root = base_path.parent.resolve()
+    try:
+        ref_path.relative_to(config_root)
+    except ValueError:
+        log.error("Path traversal attempt in $ref: '%s' resolves to a path outside of '%s'", ref_path_str, config_root)
+        raise ValueError("Invalid $ref path: path traversal is not allowed.")
+
+    log.debug("Resolving $ref: %s -> %s", ref_path_str, ref_path)
+
+    try:
+        with open(ref_path, "rb") as ref_file:
+            return ref_file.read()
+    except FileNotFoundError:
+        log.error("Referenced file not found: %s", ref_path)
+        raise
+
+
+def load_routing_configuration_file(file_path: Path) -> list[Route]:
     """
     Load and parse a single routing configuration JSON file.
 
@@ -131,29 +170,46 @@ def load_routing_configuration_file(file_path: Path) -> List[Route]:
                     "response": {
                         "status": int,
                         "headers": dict[str, str],
-                        "body": dict[str, Any]
+                        "body": dict[str, Any] | {"$ref": "path/to/file.json"}
                     },
                     "body": Any,  # Optional
                     "query": dict[str, Any]  # Optional
                 }
             ]
         }
+
+    Note:
+        The "body" field in "response" can contain a "$ref" key pointing to an
+        external JSON file. The reference is resolved relative to the config file's
+        directory. This allows response bodies to be stored as separate static files
+        that can be hosted independently (e.g., on GitHub for DCL references).
     """
     try:
-        with open(file_path, "r") as file:
+        with open(file_path) as file:
             config = json.load(file)
         if "routes" not in config:
-            logging.error("Missing required 'routes' key in configuration file: %s", file_path)
+            log.error("Missing required 'routes' key in configuration file: %s", file_path)
             raise KeyError("Configuration file must contain 'routes' key")
 
-        logging.debug("Routes configuration loaded successfully from %s", file_path)
+        log.debug("Routes configuration loaded successfully from %s", file_path)
         routes = []
+        base_path = file_path.parent
+
         for route_config in config["routes"]:
+            # Get the body, resolving $ref if present
+            body = route_config["response"].get("body", {})
+            if isinstance(body, dict) and "$ref" in body:
+                # $ref: load raw file content as bytes (preserves exact bytes for hash verification)
+                resolved_body = resolve_ref(body, base_path)
+            else:
+                # Inline body: keep as-is (dict or other)
+                resolved_body = body
+
             # Create RouteResponse object
             response = RouteResponse(
                 status=route_config["response"]["status"],
                 headers=route_config["response"].get("headers", {}),
-                body=route_config["response"].get("body", {}),
+                body=resolved_body,
             )
 
             # Create QueryConfig if query params exist
@@ -174,8 +230,8 @@ def load_routing_configuration_file(file_path: Path) -> List[Route]:
         return routes
 
     except FileNotFoundError:
-        logging.error("Configuration file not found: %s", file_path)
+        log.error("Configuration file not found: %s", file_path)
         raise
     except json.JSONDecodeError as e:
-        logging.error("Invalid JSON in configuration file: %s", file_path)
+        log.error("Invalid JSON in configuration file: %s", file_path)
         raise e

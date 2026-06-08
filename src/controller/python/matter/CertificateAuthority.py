@@ -22,7 +22,7 @@ import ctypes
 import logging
 from ctypes import c_void_p
 from datetime import timedelta
-from typing import List, Optional
+from typing import Optional
 
 from . import ChipStack, FabricAdmin
 from .native import GetLibraryHandle, PyChipError
@@ -31,7 +31,7 @@ from .storage import PersistentStorage
 LOGGER = logging.getLogger(__name__)
 
 # By default, let's set certificate validity to 10 years.
-CERTIFICATE_VALIDITY_PERIOD_SEC = int(timedelta(days=10*365).total_seconds())
+CERTIFICATE_VALIDITY_PERIOD_SEC = int(timedelta(days=10 * 365).total_seconds())
 
 
 class CertificateAuthority:
@@ -103,7 +103,7 @@ class CertificateAuthority:
             raise ValueError("Encountered error initializing OpCreds adapter")
 
         self._isActive = True
-        self._activeAdmins: List[FabricAdmin.FabricAdmin] = []
+        self._activeAdmins: list[FabricAdmin.FabricAdmin] = []
 
     def LoadFabricAdminsFromStorage(self):
         ''' If FabricAdmins had been setup previously, this re-creates them using information from persistent storage.
@@ -200,14 +200,6 @@ class CertificateAuthority:
     def maximizeCertChains(self) -> bool:
         return self._maximizeCertChains
 
-    @property
-    def alwaysOmitIcac(self) -> bool:
-        return self._alwaysOmitIcac
-
-    @property
-    def certificateValidityPeriodSec(self) -> int:
-        return self._certificateValidityPeriodSec
-
     @maximizeCertChains.setter
     def maximizeCertChains(self, enabled: bool):
         self._chipStack.Call(
@@ -216,6 +208,10 @@ class CertificateAuthority:
 
         self._maximizeCertChains = enabled
 
+    @property
+    def alwaysOmitIcac(self) -> bool:
+        return self._alwaysOmitIcac
+
     @alwaysOmitIcac.setter
     def alwaysOmitIcac(self, enabled: bool):
         self._chipStack.Call(
@@ -223,6 +219,10 @@ class CertificateAuthority:
         ).raise_on_error()
 
         self._alwaysOmitIcac = enabled
+
+    @property
+    def certificateValidityPeriodSec(self) -> int:
+        return self._certificateValidityPeriodSec
 
     @certificateValidityPeriodSec.setter
     def certificateValidityPeriodSec(self, validity: int):
@@ -256,7 +256,8 @@ class CertificateAuthorityManager:
             chipStack:          Reference to a matter.ChipStack object that is used to initialize
                                 CertificateAuthority instances.
 
-            persistentStorage:  If provided, over-rides the default instance in the provided chipStack
+            persistentStorage:  An optional reference to persistentStorage, if provided,
+                                over-rides the default instance in the provided chipStack
                                 when initializing CertificateAuthority instances.
         '''
         self._chipStack = chipStack
@@ -265,7 +266,7 @@ class CertificateAuthorityManager:
             persistentStorage = self._chipStack.GetStorageManager()
 
         self._persistentStorage = persistentStorage
-        self._activeCaList: List[CertificateAuthority] = []
+        self._activeCaList: list[CertificateAuthority] = []
         self._isActive = True
 
     def _AllocateNextCaIndex(self):
@@ -327,6 +328,23 @@ class CertificateAuthorityManager:
 
         return ca
 
+    def new_fabric_admin(self, vendorId: int, fabricId: int):
+        """
+        Create a new certificate authority with a new fabric admin.
+
+        This is a convenience method that creates a new CertificateAuthority
+        and initializes it with a FabricAdmin with the specified vendorId and fabricId.
+
+        Arguments:
+            vendorId: The vendor ID for the fabric admin
+            fabricId: The fabric ID for the fabric admin
+
+        Returns:
+            FabricAdmin: The newly created fabric admin instance
+        """
+        new_cert_auth = self.NewCertificateAuthority()
+        return new_cert_auth.NewFabricAdmin(vendorId=vendorId, fabricId=fabricId)
+
     def Shutdown(self):
         ''' Shuts down all active CertificateAuthority instances tracked by this manager, before shutting itself down.
 
@@ -339,7 +357,7 @@ class CertificateAuthorityManager:
         self._isActive = False
 
     @property
-    def activeCaList(self) -> List[CertificateAuthority]:
+    def activeCaList(self) -> list[CertificateAuthority]:
         return self._activeCaList
 
     def __del__(self):

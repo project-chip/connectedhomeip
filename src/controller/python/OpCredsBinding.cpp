@@ -34,7 +34,7 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DLLUtil.h>
-#include <lib/support/ScopedBuffer.h>
+#include <lib/support/ScopedMemoryBuffer.h>
 #include <lib/support/TestGroupData.h>
 #include <lib/support/logging/CHIPLogging.h>
 
@@ -73,7 +73,7 @@ Credentials::DeviceAttestationRevocationDelegate * GetTestAttestationRevocationD
     }
 
     static Credentials::TestDACRevocationDelegateImpl testDacRevocationDelegate;
-    testDacRevocationDelegate.SetDeviceAttestationRevocationSetPath(dacRevocationSetPath);
+    TEMPORARY_RETURN_IGNORED testDacRevocationDelegate.SetDeviceAttestationRevocationSetPath(dacRevocationSetPath);
     return &testDacRevocationDelegate;
 }
 
@@ -180,7 +180,7 @@ public:
                 // Convert RCAC to CHIP cert format to be deciphered by TLV later in python3
                 std::vector<uint8_t> chipRcac(Credentials::kMaxCHIPCertLength);
                 MutableByteSpan chipRcacSpan(chipRcac.data(), chipRcac.size());
-                chip::Credentials::ConvertX509CertToChipCert(nocChain, chipRcacSpan);
+                TEMPORARY_RETURN_IGNORED chip::Credentials::ConvertX509CertToChipCert(nocChain, chipRcacSpan);
 
                 mCHIPRCACData.assign(chipRcacSpan.data(), chipRcacSpan.data() + chipRcacSpan.size());
 
@@ -335,9 +335,13 @@ public:
             auto proxy        = chip::Controller::AutoCommissioner::GetCommissioneeDeviceProxy();
             if (proxy != nullptr)
             {
-                commissioner->StopPairing(proxy->GetDeviceId());
+                TEMPORARY_RETURN_IGNORED commissioner->StopPairing(proxy->GetDeviceId());
             }
         }
+    }
+    void OnCommissioningStageStart(chip::NodeId nodeId, const char * stage)
+    {
+        ChipLogProgress(Controller, "OpCredsBinding OnCommissioningStageStart %s", stage);
     }
 
     CHIP_ERROR GetCompletionError() { return mCompletionError; }
@@ -454,6 +458,11 @@ void pychip_OnCommissioningFailure(chip::PeerId peerId, CHIP_ERROR error, chip::
 void pychip_OnCommissioningStatusUpdate(chip::PeerId peerId, chip::Controller::CommissioningStage stageCompleted, CHIP_ERROR err)
 {
     return sTestCommissioner.OnCommissioningStatusUpdate(peerId, stageCompleted, err);
+}
+
+void pychip_OnCommissioningStageStart(chip::NodeId nodeId, const char * stage)
+{
+    return sTestCommissioner.OnCommissioningStageStart(nodeId, stage);
 }
 
 /**
@@ -613,6 +622,7 @@ PyChipError pychip_OpCreds_AllocateController(OpCredsContext * context, chip::Co
         pairingDelegate->SetCommissioningSuccessCallback(pychip_OnCommissioningSuccess);
         pairingDelegate->SetCommissioningFailureCallback(pychip_OnCommissioningFailure);
         pairingDelegate->SetCommissioningStatusUpdateCallback(pychip_OnCommissioningStatusUpdate);
+        pairingDelegate->SetCommissioningStageStartCallback(pychip_OnCommissioningStageStart);
     }
 
     err = Controller::DeviceControllerFactory::GetInstance().SetupCommissioner(initParams, *devCtrl);
@@ -634,7 +644,7 @@ PyChipError pychip_OpCreds_AllocateController(OpCredsContext * context, chip::Co
         chip::Credentials::SetSingleIpkEpochKey(&sGroupDataProvider, devCtrl->GetFabricIndex(), defaultIpk, compressedFabricIdSpan);
     VerifyOrReturnError(err == CHIP_NO_ERROR, ToPyChipError(err));
 
-    sICDClientStorage.UpdateFabricList(devCtrl->GetFabricIndex());
+    TEMPORARY_RETURN_IGNORED sICDClientStorage.UpdateFabricList(devCtrl->GetFabricIndex());
     pairingDelegate->SetFabricIndex(devCtrl->GetFabricIndex());
 
     *outDevCtrl         = devCtrl.release();
@@ -655,6 +665,64 @@ PyChipError pychip_OpCreds_InitGroupTestingData(chip::Controller::DeviceCommissi
 
     err = chip::GroupTesting::InitData(&sGroupDataProvider, devCtrl->GetFabricIndex(), compressedFabricIdSpan);
 
+    return ToPyChipError(err);
+}
+
+PyChipError pychip_OpCreds_SetKeySet(chip::Controller::DeviceCommissioner * devCtrl, uint16_t keysetId, uint8_t securityPolicy,
+                                     uint8_t numKeysUsed, const uint8_t * epochKey0, uint64_t startTime0, const uint8_t * epochKey1,
+                                     uint64_t startTime1, const uint8_t * epochKey2, uint64_t startTime2)
+{
+    VerifyOrReturnError(devCtrl != nullptr, ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT));
+    VerifyOrReturnError(numKeysUsed >= 1 && numKeysUsed <= 3, ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT));
+
+    const uint8_t * keys[] = { epochKey0, epochKey1, epochKey2 };
+    for (uint8_t i = 0; i < numKeysUsed; i++)
+    {
+        VerifyOrReturnError(keys[i] != nullptr, ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT));
+    }
+
+    uint8_t compressedFabricId[sizeof(uint64_t)] = { 0 };
+    chip::MutableByteSpan compressedFabricIdSpan(compressedFabricId);
+    CHIP_ERROR err = devCtrl->GetCompressedFabricIdBytes(compressedFabricIdSpan);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, ToPyChipError(err));
+
+    auto policy = static_cast<chip::Credentials::GroupDataProvider::SecurityPolicy>(securityPolicy);
+    chip::Credentials::GroupDataProvider::KeySet keyset(keysetId, policy, numKeysUsed);
+
+    const uint64_t startTimes[] = { startTime0, startTime1, startTime2 };
+    for (uint8_t i = 0; i < numKeysUsed; i++)
+    {
+        keyset.epoch_keys[i].start_time = startTimes[i];
+        memcpy(keyset.epoch_keys[i].key, keys[i], chip::Credentials::GroupDataProvider::EpochKey::kLengthBytes);
+    }
+
+    err = sGroupDataProvider.SetKeySet(devCtrl->GetFabricIndex(), compressedFabricIdSpan, keyset);
+    return ToPyChipError(err);
+}
+
+PyChipError pychip_OpCreds_SetGroupInfo(chip::Controller::DeviceCommissioner * devCtrl, uint16_t groupId, const char * groupName,
+                                        uint8_t flags)
+{
+    VerifyOrReturnError(devCtrl != nullptr, ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT));
+
+    chip::Credentials::GroupDataProvider::GroupInfo groupInfo(groupId, groupName ? groupName : "", flags);
+    CHIP_ERROR err = sGroupDataProvider.SetGroupInfo(devCtrl->GetFabricIndex(), groupInfo);
+    return ToPyChipError(err);
+}
+
+PyChipError pychip_OpCreds_AddGroupEndpoint(chip::Controller::DeviceCommissioner * devCtrl, uint16_t groupId, uint16_t endpointId)
+{
+    VerifyOrReturnError(devCtrl != nullptr, ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT));
+
+    CHIP_ERROR err = sGroupDataProvider.AddEndpoint(devCtrl->GetFabricIndex(), groupId, endpointId);
+    return ToPyChipError(err);
+}
+
+PyChipError pychip_OpCreds_SetGroupKey(chip::Controller::DeviceCommissioner * devCtrl, uint16_t groupId, uint16_t keysetId)
+{
+    VerifyOrReturnError(devCtrl != nullptr, ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT));
+
+    CHIP_ERROR err = sGroupDataProvider.SetGroupKey(devCtrl->GetFabricIndex(), groupId, keysetId);
     return ToPyChipError(err);
 }
 

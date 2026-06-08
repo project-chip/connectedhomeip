@@ -41,7 +41,7 @@
 #include <lib/support/BitMask.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DLLUtil.h>
-#include <lib/support/ScopedBuffer.h>
+#include <lib/support/ScopedMemoryBuffer.h>
 #include <lib/support/Span.h>
 
 /**
@@ -84,6 +84,13 @@ class DLL_EXPORT TLVReader
 {
     friend class TLVWriter;
     friend class TLVUpdater;
+
+#if CHIP_CONFIG_TEST
+    // Test seam: lets unit tests drive GetLocalizedStringIdentifierImpl with the strict
+    // UTF-8 check forced on, independent of CHIP_CONFIG_TLV_VALIDATE_CHAR_STRING_ON_READ.
+    friend CHIP_ERROR GetLocalizedStringIdentifierForTest(TLVReader & reader, Optional<LocalizedStringIdentifier> & lsid,
+                                                          bool validateCharString);
+#endif // CHIP_CONFIG_TEST
 
 public:
     TLVReader();
@@ -504,6 +511,17 @@ public:
      */
     CHIP_ERROR Get(Optional<LocalizedStringIdentifier> & lsid);
 
+private:
+    // Shared implementation of Get(Optional<LocalizedStringIdentifier>&). When
+    // validateCharString is true, the entire on-wire char string is run through the
+    // shared conformance predicate (see ValidateCharString in TLVReader.cpp) so this
+    // overload's verdict matches Get(CharSpan&)'s on the same bytes; when false, the
+    // string is decoded leniently. Decoupling the check from
+    // CHIP_CONFIG_TLV_VALIDATE_CHAR_STRING_ON_READ lets unit tests exercise the strict
+    // path at runtime via GetLocalizedStringIdentifierForTest below.
+    CHIP_ERROR GetLocalizedStringIdentifierImpl(Optional<LocalizedStringIdentifier> & lsid, bool validateCharString);
+
+public:
     /**
      * Get the value of the current element as an enum value, if it's an integer
      * value that fits in the enum type.
@@ -1087,6 +1105,24 @@ public:
      */
     CHIP_ERROR GetByteView(ByteSpan & data);
 };
+
+#if CHIP_CONFIG_TEST
+/**
+ * Test-only shim around the file-scope ValidateCharString predicate in TLVReader.cpp.
+ * Lets unit tests pin the predicate's verdict on hand-built byte sequences without
+ * routing through a TLVReader. See ValidateCharString in TLVReader.cpp for semantics.
+ */
+CHIP_ERROR ValidateCharStringForTest(const CharSpan & str);
+
+/**
+ * Test-only entry point that runs TLVReader::Get(Optional<LocalizedStringIdentifier>&)'s
+ * shared implementation with UTF-8 conformance forced on or off, independent of
+ * CHIP_CONFIG_TLV_VALIDATE_CHAR_STRING_ON_READ. Lets unit tests exercise the strict
+ * path at runtime without a flag-on build of the SDK.
+ */
+CHIP_ERROR GetLocalizedStringIdentifierForTest(TLVReader & reader, Optional<LocalizedStringIdentifier> & lsid,
+                                               bool validateCharString);
+#endif // CHIP_CONFIG_TEST
 
 } // namespace TLV
 } // namespace chip

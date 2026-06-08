@@ -30,6 +30,7 @@
 #include <lib/support/TypeTraits.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <system/RAIIMockClock.h>
 #include <system/SystemLayer.h>
 #include <system/SystemPacketBuffer.h>
 
@@ -64,8 +65,8 @@ public:
 
     void TearDown() override
     {
+        Shutdown();
         mWiFiPAFTransport = nullptr;
-        Shutdown([](uint32_t id, WiFiPAF::WiFiPafRole role) {});
     }
 
     CHIP_ERROR WiFiPAFMessageReceived(WiFiPAFSession & RxInfo, System::PacketBufferHandle && msg) override { return CHIP_NO_ERROR; }
@@ -180,6 +181,37 @@ TEST_F(TestWiFiPAFLayer, CheckPafSession)
 
     EXPECT_EQ(RmPafSession(PafInfoAccess::kAccNodeInfo, sessionInfo), CHIP_ERROR_NOT_IMPLEMENTED);
     EXPECT_EQ(RmPafSession(PafInfoAccess::kAccSessionId, sessionInfo), CHIP_ERROR_NOT_FOUND);
+}
+
+// Run under ASan to catch regressions of the heap-buffer-overflow read.
+TEST_F(TestWiFiPAFLayer, GetPktSnRejectsShortFragment)
+{
+    WiFiPAFSession sessionInfo = {
+        .role          = kWiFiPafRole_Publisher,
+        .id            = 1,
+        .peer_id       = 1,
+        .peer_addr     = { 0xd0, 0x17, 0x69, 0xee, 0x7f, 0x3c },
+        .nodeId        = 1,
+        .discriminator = 0xF00,
+    };
+
+    WiFiPAFEndPoint * newEndPoint = nullptr;
+    ASSERT_EQ(NewEndPoint(&newEndPoint, sessionInfo, sessionInfo.role), CHIP_NO_ERROR);
+    ASSERT_NE(newEndPoint, nullptr);
+    SetEndPoint(newEndPoint);
+    EXPECT_EQ(AddPafSession(PafInfoAccess::kAccSessionId, sessionInfo), CHIP_NO_ERROR);
+    newEndPoint->mState = WiFiPAFEndPoint::kState_Ready;
+
+    // Flag byte 0x2B sets kFragmentAck and kManagementOpcode, pushing SnOffset
+    // to 3 (header + mgmt-op + ack). With a 3-byte buffer, dereferencing
+    // pHead + 3 is a heap-buffer-overflow read.
+    constexpr uint8_t kShortFragmentWithMaxFlags[] = { 0x2B, 0x8F, 0x2B };
+    auto packet = System::PacketBufferHandle::NewWithData(kShortFragmentWithMaxFlags, sizeof(kShortFragmentWithMaxFlags));
+    ASSERT_FALSE(packet.IsNull());
+
+    EXPECT_EQ(newEndPoint->Receive(std::move(packet)), CHIP_ERROR_MESSAGE_INCOMPLETE);
+
+    EXPECT_EQ(RmPafSession(PafInfoAccess::kAccSessionId, sessionInfo), CHIP_NO_ERROR);
 }
 
 TEST_F(TestWiFiPAFLayer, CheckRunAsCommissioner)
@@ -364,12 +396,12 @@ TEST_F(TestWiFiPAFLayer, CheckRunAsCommissionee)
     EXPECT_GT(GetResourceWaitCount(), 0);
     // Resource is available now
     mResourceAvailable = true;
-    // PAF packets shoudl be sent within a second
-    System::Clock::Internal::MockClock clock;
-    System::Clock::ClockBase * realClock        = &System::SystemClock();
+    // PAF packets should be sent within a second
+
+    System::Clock::Internal::RAIIMockClock clock;
+
     constexpr System::Clock::Seconds64 pauseSec = System::Clock::Seconds64(2);
     clock.SetMonotonic(pauseSec);
-    System::Clock::Internal::SetSystemClockForTesting(&clock);
     EXPECT_EQ(HandleWriteConfirmed(sessionInfo, true), CHIP_NO_ERROR);
     // PAF packet has been sent
     EXPECT_EQ(isSendQueueNull(), true);
@@ -378,8 +410,6 @@ TEST_F(TestWiFiPAFLayer, CheckRunAsCommissionee)
     // Close the session
     EXPECT_EQ(RmPafSession(PafInfoAccess::kAccSessionId, sessionInfo), CHIP_NO_ERROR);
     EpDoClose(kWiFiPAFCloseFlag_AbortTransmission, WIFIPAF_ERROR_APP_CLOSED_CONNECTION);
-
-    System::Clock::Internal::SetSystemClockForTesting(realClock);
 }
 }; // namespace WiFiPAF
 }; // namespace chip

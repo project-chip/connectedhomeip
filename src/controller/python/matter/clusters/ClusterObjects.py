@@ -18,7 +18,7 @@
 import enum
 import typing
 from dataclasses import asdict, dataclass, field, make_dataclass
-from typing import Any, ClassVar, Dict, List, Mapping, Union
+from typing import Any, ClassVar, Mapping, Union
 
 from dacite import from_dict  # type: ignore
 
@@ -33,7 +33,7 @@ def GetUnionUnderlyingType(typeToCheck, matchingType=None):
         If that is 'None' (not to be confused with NoneType), then it will retrieve
         the 'real' type behind the union, i.e not Nullable && not None
     '''
-    if (not (typing.get_origin(typeToCheck) == typing.Union)):
+    if typing.get_origin(typeToCheck) != typing.Union:
         return None
 
     for t in typing.get_args(typeToCheck):
@@ -93,7 +93,7 @@ class ClusterObjectFieldDescriptor:
             if (elementType is None):
                 elementType = self.Type
 
-            if not isinstance(val, List):
+            if not isinstance(val, list):
                 self._PutSingleElementToTLV(
                     tag, val, elementType, writer, debugPath)
                 return
@@ -102,7 +102,12 @@ class ClusterObjectFieldDescriptor:
 
             # Get the type of the list. This is a generic, which has its sub-type information of the list element
             # inside its type argument.
-            (elementType, ) = typing.get_args(elementType)
+            try:
+                (listGenericArg, ) = typing.get_args(elementType)
+            except ValueError:
+                raise ValueError(
+                    f"Failed to decode field {debugPath} of type {self.Type}: Failed to find type of elements in {elementType}")
+            elementType = listGenericArg
 
             for i, v in enumerate(val):
                 self._PutSingleElementToTLV(
@@ -112,7 +117,7 @@ class ClusterObjectFieldDescriptor:
 
 @dataclass
 class ClusterObjectDescriptor:
-    Fields: List[ClusterObjectFieldDescriptor]
+    Fields: list[ClusterObjectFieldDescriptor]
 
     def GetFieldByTag(self, tag: int) -> typing.Optional[ClusterObjectFieldDescriptor]:
         for _field in self.Fields:
@@ -140,8 +145,8 @@ class ClusterObjectDescriptor:
                 f"Failed to decode field {debugPath}, struct expected.")
         return elementType.descriptor.TagDictToLabelDict(debugPath, value)
 
-    def TagDictToLabelDict(self, debugPath: str, tlvData: Dict[int, Any]) -> Dict[str, Any]:
-        ret: typing.Dict[Any, Any] = {}
+    def TagDictToLabelDict(self, debugPath: str, tlvData: dict[int, Any]) -> dict[str, Any]:
+        ret: dict[Any, Any] = {}
         for tag, value in tlvData.items():
             descriptor = self.GetFieldByTag(tag)
             if not descriptor:
@@ -174,7 +179,7 @@ class ClusterObjectDescriptor:
                 f'{debugPath}.{descriptor.Label}', valueType, value)
         return ret
 
-    def TLVToDict(self, tlvBuf: bytes) -> Dict[str, Any]:
+    def TLVToDict(self, tlvBuf: bytes) -> dict[str, Any]:
         tlvData = tlv.TLVReader(tlvBuf).get().get('Any', {})
         return self.TagDictToLabelDict('', tlvData)
 
@@ -205,17 +210,17 @@ class ClusterObject:
 
     @ChipUtility.classproperty
     def descriptor(cls):
-        raise NotImplementedError()
+        raise NotImplementedError
 
 
 # The below dictionaries will be filled dynamically
 # and are used for quick lookup/mapping from cluster/attribute id to the correct class
-ALL_CLUSTERS: typing.Dict = {}
-ALL_ATTRIBUTES: typing.Dict = {}
+ALL_CLUSTERS: dict = {}
+ALL_ATTRIBUTES: dict = {}
 # These need to be separate because there can be overlap in command ids for commands and responses.
-ALL_ACCEPTED_COMMANDS: typing.Dict = {}
-ALL_GENERATED_COMMANDS: typing.Dict = {}
-ALL_EVENTS: typing.Dict = {}
+ALL_ACCEPTED_COMMANDS: dict = {}
+ALL_GENERATED_COMMANDS: dict = {}
+ALL_EVENTS: dict = {}
 
 
 class ClusterCommand(ClusterObject):
@@ -238,11 +243,15 @@ class ClusterCommand(ClusterObject):
 
     @ChipUtility.classproperty
     def cluster_id(self) -> int:
-        raise NotImplementedError()
+        raise NotImplementedError
 
     @ChipUtility.classproperty
     def command_id(self) -> int:
-        raise NotImplementedError()
+        raise NotImplementedError
+
+    @ChipUtility.classproperty
+    def is_client(self) -> bool:
+        raise NotImplementedError
 
     @ChipUtility.classproperty
     def must_use_timed_invoke(cls) -> bool:
@@ -276,7 +285,7 @@ class Cluster(ClusterObject):
         '''
         if self._data_version is not None:
             yield "(data version)", self.data_version
-        for k in self.__dataclass_fields__.keys():
+        for k in self.__dataclass_fields__:
             if k in self.__dict__:
                 yield k, self.__dict__[k]
 
@@ -325,15 +334,15 @@ class ClusterAttributeDescriptor:
 
     @ChipUtility.classproperty
     def cluster_id(self) -> int:
-        raise NotImplementedError()
+        raise NotImplementedError
 
     @ChipUtility.classproperty
     def attribute_id(self) -> int:
-        raise NotImplementedError()
+        raise NotImplementedError
 
     @ChipUtility.classproperty
     def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-        raise NotImplementedError()
+        raise NotImplementedError
 
     @ChipUtility.classproperty
     def must_use_timed_write(cls) -> bool:
@@ -373,8 +382,8 @@ class ClusterEvent(ClusterObject):
 
     @ChipUtility.classproperty
     def cluster_id(self) -> int:
-        raise NotImplementedError()
+        raise NotImplementedError
 
     @ChipUtility.classproperty
     def event_id(self) -> int:
-        raise NotImplementedError()
+        raise NotImplementedError

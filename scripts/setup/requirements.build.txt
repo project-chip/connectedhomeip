@@ -11,3 +11,4 @@ coloredlogs
 jinja2
 lark
 python-path
+lxml

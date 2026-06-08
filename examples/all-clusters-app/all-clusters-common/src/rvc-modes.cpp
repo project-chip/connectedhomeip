@@ -40,7 +40,7 @@ CHIP_ERROR RvcRunModeDelegate::Init()
 
 void RvcRunModeDelegate::HandleChangeToMode(uint8_t NewMode, ModeBase::Commands::ChangeToModeResponse::Type & response)
 {
-    uint8_t currentMode = mInstance->GetCurrentMode();
+    uint8_t currentMode = GetInstance()->GetCurrentMode();
 
     if (!gRvcRunModeInstance->HasFeature(static_cast<ModeBase::Feature>(RvcRunMode::Feature::kDirectModeChange)))
     {
@@ -48,7 +48,7 @@ void RvcRunModeDelegate::HandleChangeToMode(uint8_t NewMode, ModeBase::Commands:
         if (NewMode != RvcRunMode::ModeIdle && currentMode != RvcRunMode::ModeIdle)
         {
             response.status = to_underlying(ModeBase::StatusCode::kInvalidInMode);
-            response.statusText.SetValue(chip::CharSpan::fromCharString("Change to a running mode is only allowed from idle"));
+            response.statusText.SetValue("Change to a running mode is only allowed from idle"_span);
             return;
         }
     }
@@ -56,11 +56,13 @@ void RvcRunModeDelegate::HandleChangeToMode(uint8_t NewMode, ModeBase::Commands:
     auto rvcOpStateInstance = RvcOperationalState::GetRvcOperationalStateInstance();
     if (NewMode == RvcRunMode::ModeIdle)
     {
-        rvcOpStateInstance->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kStopped));
+        TEMPORARY_RETURN_IGNORED rvcOpStateInstance->SetOperationalState(
+            to_underlying(OperationalState::OperationalStateEnum::kStopped));
     }
     else
     {
-        rvcOpStateInstance->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kRunning));
+        TEMPORARY_RETURN_IGNORED rvcOpStateInstance->SetOperationalState(
+            to_underlying(OperationalState::OperationalStateEnum::kRunning));
     }
 
     response.status = to_underlying(ModeBase::StatusCode::kSuccess);
@@ -129,7 +131,7 @@ void emberAfRvcRunModeClusterInitCallback(chip::EndpointId endpointId)
     gRvcRunModeDelegate = new RvcRunMode::RvcRunModeDelegate;
     gRvcRunModeInstance = new ModeBase::Instance(gRvcRunModeDelegate, 0x1, RvcRunMode::Id,
                                                  chip::to_underlying(RvcRunMode::Feature::kDirectModeChange));
-    gRvcRunModeInstance->Init();
+    TEMPORARY_RETURN_IGNORED gRvcRunModeInstance->Init();
 }
 
 void emberAfRvcRunModeClusterShutdownCallback(chip::EndpointId endpointId)
@@ -159,8 +161,7 @@ void RvcCleanModeDelegate::HandleChangeToMode(uint8_t NewMode, ModeBase::Command
         if (rvcRunCurrentMode != RvcRunMode::ModeIdle)
         {
             response.status = to_underlying(ModeBase::StatusCode::kInvalidInMode);
-            response.statusText.SetValue(
-                chip::CharSpan::fromCharString("Cannot change the cleaning mode when the device is not in idle"));
+            response.statusText.SetValue("Cannot change the cleaning mode when the device is not in idle"_span);
             return;
         }
     }
@@ -231,7 +232,7 @@ void emberAfRvcCleanModeClusterInitCallback(chip::EndpointId endpointId)
     gRvcCleanModeDelegate = new RvcCleanMode::RvcCleanModeDelegate;
     gRvcCleanModeInstance = new ModeBase::Instance(gRvcCleanModeDelegate, 0x1, RvcCleanMode::Id,
                                                    chip::to_underlying(RvcCleanMode::Feature::kDirectModeChange));
-    gRvcCleanModeInstance->Init();
+    TEMPORARY_RETURN_IGNORED gRvcCleanModeInstance->Init();
 }
 
 void emberAfRvcCleanModeClusterShutdownCallback(chip::EndpointId endpointId)

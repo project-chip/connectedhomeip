@@ -6,7 +6,7 @@ structured as follows :
 
 | File/Folder         | Contents                                                                                                                                                                      |
 | ------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| chip-gn             | GN project used to build selected CHIP libraries with the _nxp_zephyr_ platform integration layer                                                                             |
+| chip-gn             | GN project used to build selected CHIP libraries with the _zephyr_ platform integration layer                                                                                 |
 | chip-module         | CMake wrapper for the GN project defined in `chip-gn` directory, and other components that allow one to use CHIP as a Zephyr module                                           |
 | app                 | Common and optional Kconfig configuration files that can be used in NXP Zephyr applications                                                                                   |
 | chip-gn-freertos    | GN project used to build selected CHIP libraries with the NXP FreeRTOS platform integration layer                                                                             |

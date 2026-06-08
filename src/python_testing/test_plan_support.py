@@ -21,16 +21,14 @@ def read_attribute(attribute: str, cluster: typing.Optional[str] = None):
     attr = f'reads the {attribute} attribute'
     if cluster:
         return f'{attr} from {cluster}'
-    else:
-        return attr
+    return attr
 
 
 def send_command(command: str, cluster: typing.Optional[str] = None):
     cmd = f"sends the {command} command"
     if cluster:
         return f'{cmd} from {cluster}'
-    else:
-        return cmd
+    return cmd
 
 
 def save_as(val: str) -> str:

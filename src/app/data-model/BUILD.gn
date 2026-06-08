@@ -20,10 +20,10 @@ source_set("nullable") {
   ]
 
   public_deps = [
-    "${chip_root}/src/app/util:nullable-primitives",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/core:error",
     "${chip_root}/src/lib/support",
+    "${chip_root}/src/lib/support:numeric-primitives",
   ]
 }
 
@@ -47,6 +47,7 @@ source_set("data-model") {
     "${chip_root}/src/app/common:enums",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
+    "${chip_root}/src/lib/support:numeric-primitives",
     "${chip_root}/src/protocols/interaction_model",
   ]
 

@@ -30,6 +30,7 @@
 #include <lib/dnssd/Resolver.h>
 #include <lib/support/CodeUtils.h>
 #include <memory>
+#include <platform/internal/NFCCommissioningManager.h>
 #include <system/SystemClock.h>
 #include <tracing/metric_event.h>
 #include <vector>
@@ -126,6 +127,39 @@ CHIP_ERROR SetUpCodePairer::Connect()
             else if (err != CHIP_NO_ERROR)
             {
                 ChipLogError(Controller, "Failed to start commissionable node discovery over Wi-Fi PAF: %" CHIP_ERROR_FORMAT,
+                             err.Format());
+            }
+        }
+        if (ShouldDiscoverUsing(RendezvousInformationFlag::kNFC))
+        {
+            CHIP_ERROR err = StartDiscoveryOverNFC();
+            if ((CHIP_ERROR_NOT_IMPLEMENTED == err) || (CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE == err))
+            {
+                ChipLogProgress(Controller,
+                                "Skipping commissionable node discovery over NFC since not supported by the controller!");
+            }
+            else if (err == CHIP_ERROR_NOT_FOUND)
+            {
+                ChipLogProgress(Controller,
+                                "Skipping commissionable node discovery over NFC since no NFC Reader Transport is present");
+            }
+            else if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Controller, "Failed to start commissionable node discovery over NFC: %" CHIP_ERROR_FORMAT,
+                             err.Format());
+            }
+        }
+        if (ShouldDiscoverUsing(RendezvousInformationFlag::kThread))
+        {
+            CHIP_ERROR err = StartDiscoveryOverThreadMeshcop();
+            if ((CHIP_ERROR_NOT_IMPLEMENTED == err) || (CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE == err))
+            {
+                ChipLogProgress(Controller,
+                                "Skipping commissionable node discovery over ThreadMeshcop since not supported by the controller!");
+            }
+            else if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Controller, "Failed to start commissionable node discovery over ThreadMeshcop: %" CHIP_ERROR_FORMAT,
                              err.Format());
             }
         }
@@ -249,8 +283,7 @@ CHIP_ERROR SetUpCodePairer::StopDiscoveryOverDNSSD()
 
     mWaitingForDiscovery[kIPTransport] = false;
 
-    mCommissioner->StopCommissionableDiscovery();
-    return CHIP_NO_ERROR;
+    return mCommissioner->StopCommissionableDiscovery();
 }
 
 CHIP_ERROR SetUpCodePairer::StartDiscoveryOverWiFiPAF()
@@ -295,8 +328,134 @@ CHIP_ERROR SetUpCodePairer::StopDiscoveryOverWiFiPAF()
 {
     mWaitingForDiscovery[kWiFiPAFTransport] = false;
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-    DeviceLayer::ConnectivityMgr().WiFiPAFCancelIncompleteSubscribe();
+    return DeviceLayer::ConnectivityMgr().WiFiPAFCancelIncompleteSubscribe();
+#else
+    return CHIP_NO_ERROR;
 #endif
+}
+
+CHIP_ERROR SetUpCodePairer::StartDiscoveryOverNFC()
+{
+#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
+    if (mSetupPayloads.size() != 1)
+    {
+        ChipLogError(Controller, "NFC commissioning does not support concatenated QR codes yet.");
+        return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    }
+
+    auto & payload = mSetupPayloads[0];
+
+    ChipLogProgress(Controller, "Starting commissionable node discovery over NFC");
+    VerifyOrReturnError(mCommissioner != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    const SetupDiscriminator connDiscriminator(payload.discriminator);
+    VerifyOrReturnValue(!connDiscriminator.IsShortDiscriminator(), CHIP_ERROR_INVALID_ARGUMENT,
+                        ChipLogError(Controller, "Error, Long discriminator is required"));
+    chip::Nfc::NFCTag::Identifier identifier  = { .discriminator = payload.discriminator.GetLongValue() };
+    Nfc::NFCReaderTransport * readerTransport = DeviceLayer::Internal::NFCCommissioningMgr().GetNFCReaderTransport();
+    if (!readerTransport)
+    {
+        // No valid NFC reader transport
+        return CHIP_ERROR_NOT_FOUND;
+    }
+
+    readerTransport->SetDelegate(this);
+    CHIP_ERROR err = readerTransport->StartDiscoveringTagMatchingAddress(identifier);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "Commissionable node discovery over NFC failed, err = %" CHIP_ERROR_FORMAT, err.Format());
+    }
+    else
+    {
+        mWaitingForDiscovery[kNFCTransport] = true;
+    }
+    return err;
+#else
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
+}
+
+CHIP_ERROR SetUpCodePairer::StopDiscoveryOverNFC()
+{
+#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
+    mWaitingForDiscovery[kNFCTransport] = false;
+
+    Nfc::NFCReaderTransport * readerTransport = DeviceLayer::Internal::NFCCommissioningMgr().GetNFCReaderTransport();
+    if (!readerTransport)
+    {
+        // No valid NFC reader transport.
+        return CHIP_ERROR_NOT_FOUND;
+    }
+
+    ChipLogProgress(Controller, "Stopping commissionable node discovery over NFC by removing delegate");
+    readerTransport->SetDelegate(nullptr);
+#endif
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR SetUpCodePairer::StartDiscoveryOverThreadMeshcop()
+{
+#if CHIP_SUPPORT_THREAD_MESHCOP
+    if (mSetupPayloads.size() != 1)
+    {
+        ChipLogError(Controller, "Thread Meshcop commissioning does not support concatenated QR codes yet.");
+        return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    }
+
+    if (!mThreadMeshcopCommissionProxy)
+    {
+        ChipLogError(Controller, "The meshcopCommissioningProxy is not set");
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    if (!mThreadMeshcopCommissionParams.HasValue() ||
+        mThreadMeshcopCommissionParams.Value().mBorderAgentAddress.GetTransportType() != Transport::Type::kThreadMeshcop)
+    {
+        ChipLogError(Controller, "The meshcopCommissioningParams is not set");
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    auto & payload = mSetupPayloads[0];
+
+    ChipLogProgress(Controller, "Starting commissionable node discovery over Thread Meshcop");
+    VerifyOrReturnError(mCommissioner != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    const SetupDiscriminator connDiscriminator(payload.discriminator);
+    Thread::DiscoveryCode code;
+    if (connDiscriminator.IsShortDiscriminator())
+    {
+        code = Thread::DiscoveryCode(connDiscriminator.GetShortValue());
+        ChipLogProgress(Controller, "Discovery code from short discriminator: 0x%" PRIx64, code.AsUInt64());
+    }
+    else
+    {
+        code = Thread::DiscoveryCode(connDiscriminator.GetLongValue());
+        ChipLogProgress(Controller, "Discovery code from long discriminator: 0x%" PRIx64, code.AsUInt64());
+    }
+
+    ByteSpan pskc(mThreadMeshcopCommissionParams.Value().mPSKcBuffer);
+    {
+        mWaitingForDiscovery[kThreadMeshcopTransport] = true;
+        Dnssd::DiscoveredNodeData discoveredNodeData;
+
+        CHIP_ERROR err = mThreadMeshcopCommissionProxy->Discover(pskc, mThreadMeshcopCommissionParams.Value().mBorderAgentAddress,
+                                                                 code, connDiscriminator, discoveredNodeData, 30);
+
+        mWaitingForDiscovery[kThreadMeshcopTransport] = false;
+        ReturnErrorOnFailure(err);
+        mCommissioner->OnNodeDiscovered(discoveredNodeData);
+        ChipLogProgress(Controller, "Joiner discovered");
+    }
+    return CHIP_NO_ERROR;
+#else
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+#endif // CHIP_SUPPORT_THREAD_MESHCOP
+}
+
+CHIP_ERROR SetUpCodePairer::StopDiscoveryOverThreadMeshcop()
+{
+    // Currently we don't have any methods to stop discovery Over Thread Meshcop.
+    // Still return no error here to prevent error logs.
     return CHIP_NO_ERROR;
 }
 
@@ -311,6 +470,8 @@ bool SetUpCodePairer::ConnectToDiscoveredDevice()
 
     while (!mDiscoveredParameters.empty())
     {
+        mCurrentPASEPayload.reset();
+
         // Grab the first element from the queue and try connecting to it.
         // Remove it from the queue before we try to connect, in case the
         // connection attempt fails and calls right back into us to try the next
@@ -322,17 +483,17 @@ bool SetUpCodePairer::ConnectToDiscoveredDevice()
         {
             auto longDiscriminator = *params.mLongDiscriminator;
             // Look for a matching setup passcode.
-            bool found = false;
             for (auto & payload : mSetupPayloads)
             {
                 if (payload.discriminator.MatchesLongDiscriminator(longDiscriminator))
                 {
                     params.SetSetupPINCode(payload.setUpPINCode);
-                    found = true;
+                    params.SetSetupDiscriminator(payload.discriminator);
+                    mCurrentPASEPayload = payload;
                     break;
                 }
             }
-            if (!found)
+            if (!mCurrentPASEPayload)
             {
                 ChipLogError(Controller, "SetUpCodePairer: Discovered discriminator %u does not match any of our setup payloads",
                              longDiscriminator);
@@ -347,6 +508,8 @@ bool SetUpCodePairer::ConnectToDiscoveredDevice()
             if (mSetupPayloads.size() == 1)
             {
                 params.SetSetupPINCode(mSetupPayloads[0].setUpPINCode);
+                params.SetSetupDiscriminator(mSetupPayloads[0].discriminator);
+                mCurrentPASEPayload = mSetupPayloads[0];
             }
             else
             {
@@ -389,6 +552,8 @@ bool SetUpCodePairer::ConnectToDiscoveredDevice()
         }
 
         // Failed to start establishing PASE.  Move on to the next item.
+        mCurrentPASEParameters.ClearValue();
+        mCurrentPASEPayload.reset();
         PASEEstablishmentComplete();
     }
 
@@ -440,13 +605,14 @@ void SetUpCodePairer::OnBLEDiscoveryError(CHIP_ERROR err)
     ChipLogError(Controller, "Commissionable node discovery over BLE failed: %" CHIP_ERROR_FORMAT, err.Format());
     mWaitingForDiscovery[kBLETransport] = false;
     LogErrorOnFailure(err);
+    StopPairingIfTransportsExhausted(err);
 }
 #endif // CONFIG_NETWORK_LAYER_BLE
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
 void SetUpCodePairer::OnDiscoveredDeviceOverWifiPAF()
 {
-    ChipLogProgress(Controller, "Discovered device to be commissioned over Wi-Fi PAF, RemoteId: %lu", mRemoteId);
+    ChipLogProgress(Controller, "Discovered device to be commissioned over Wi-Fi PAF, RemoteId: %" PRIu64, mRemoteId);
 
     mWaitingForDiscovery[kWiFiPAFTransport] = false;
     auto param                              = SetUpCodePairerParameters();
@@ -463,6 +629,7 @@ void SetUpCodePairer::OnWifiPAFDiscoveryError(CHIP_ERROR err)
 {
     ChipLogError(Controller, "Commissionable node discovery over Wi-Fi PAF failed: %" CHIP_ERROR_FORMAT, err.Format());
     mWaitingForDiscovery[kWiFiPAFTransport] = false;
+    StopPairingIfTransportsExhausted(err);
 }
 
 void SetUpCodePairer::OnWiFiPAFSubscribeComplete(void * appState)
@@ -475,6 +642,30 @@ void SetUpCodePairer::OnWiFiPAFSubscribeError(void * appState, CHIP_ERROR err)
 {
     auto self = reinterpret_cast<SetUpCodePairer *>(appState);
     self->OnWifiPAFDiscoveryError(err);
+}
+#endif
+
+#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
+void SetUpCodePairer::OnTagDiscovered(const chip::Nfc::NFCTag::Identifier & identifier)
+{
+    ChipLogProgress(Controller, "Discovered device to be commissioned over NFC, Identifier: %u", identifier.discriminator);
+
+    mWaitingForDiscovery[kNFCTransport] = false;
+    auto param                          = SetUpCodePairerParameters();
+    param.SetPeerAddress(Transport::PeerAddress(Transport::PeerAddress::NFC(identifier.discriminator)));
+    // TODO: This needs to support concatenated QR codes and set the relevant
+    // long discriminator on param.
+    //
+    // See https://github.com/project-chip/connectedhomeip/issues/39134
+    mDiscoveredParameters.emplace_back(param);
+    ConnectToDiscoveredDevice();
+}
+
+void SetUpCodePairer::OnTagDiscoveryFailed(CHIP_ERROR error)
+{
+    ChipLogError(Controller, "Commissionable node discovery over NFC failed: %" CHIP_ERROR_FORMAT, error.Format());
+    mWaitingForDiscovery[kNFCTransport] = false;
+    StopPairingIfTransportsExhausted(error);
 }
 #endif
 
@@ -550,7 +741,7 @@ void SetUpCodePairer::NotifyCommissionableDeviceDiscovered(const Dnssd::CommonRe
     {
         // If the discovery type does not want the PASE auto retry mechanism, we will just store
         // a single IP. So the discovery process is stopped as it won't be of any help anymore.
-        StopDiscoveryOverDNSSD();
+        TEMPORARY_RETURN_IGNORED StopDiscoveryOverDNSSD();
         mDiscoveredParameters.emplace_back(resolutionData, matchedLongDiscriminator, 0);
     }
     else
@@ -609,11 +800,27 @@ bool SetUpCodePairer::DiscoveryInProgress() const
     return false;
 }
 
+void SetUpCodePairer::StopPairingIfTransportsExhausted(CHIP_ERROR err)
+{
+    if (mWaitingForPASE || !mDiscoveredParameters.empty() || DiscoveryInProgress() || mRemoteId == kUndefinedNodeId)
+    {
+        return;
+    }
+    // Clear mRemoteId first to guard against re-entrant calls (e.g. from an async
+    // cancel callback fired after StopAllDiscoveryAttempts already cleared the flags).
+    mRemoteId          = kUndefinedNodeId;
+    CHIP_ERROR failErr = mLastPASEError != CHIP_NO_ERROR ? mLastPASEError : err;
+    MATTER_LOG_METRIC_END(kMetricSetupCodePairerPairDevice, failErr);
+    mCommissioner->OnSessionEstablishmentError(failErr);
+}
+
 void SetUpCodePairer::StopAllDiscoveryAttempts()
 {
     LogErrorOnFailure(StopDiscoveryOverBLE());
     LogErrorOnFailure(StopDiscoveryOverDNSSD());
     LogErrorOnFailure(StopDiscoveryOverWiFiPAF());
+    LogErrorOnFailure(StopDiscoveryOverNFC().NoErrorIf(CHIP_ERROR_NOT_FOUND));
+    LogErrorOnFailure(StopDiscoveryOverThreadMeshcop());
 
     // Just in case any of those failed to reset the waiting state properly.
     for (auto & waiting : mWaitingForDiscovery)
@@ -683,7 +890,8 @@ void SetUpCodePairer::OnStatusUpdate(DevicePairingDelegate::Status status)
     }
 }
 
-void SetUpCodePairer::OnPairingComplete(CHIP_ERROR error)
+void SetUpCodePairer::OnPairingComplete(CHIP_ERROR error, const std::optional<RendezvousParameters> & rendezvousParameters,
+                                        const std::optional<SetupPayload> & setupPayload)
 {
     // Save the pairing delegate so we can notify it.  We want to notify it
     // _after_ we restore the state on the commissioner, in case the delegate
@@ -691,6 +899,10 @@ void SetUpCodePairer::OnPairingComplete(CHIP_ERROR error)
     // notified.
     auto * pairingDelegate = mPairingDelegate;
     PASEEstablishmentComplete();
+
+    // Make sure to clear out mCurrentPASEPayload whether we succeeded or failed.
+    std::optional<SetupPayload> pasePayload;
+    pasePayload.swap(mCurrentPASEPayload);
 
     if (CHIP_NO_ERROR == error)
     {
@@ -700,7 +912,13 @@ void SetUpCodePairer::OnPairingComplete(CHIP_ERROR error)
         MATTER_LOG_METRIC_END(kMetricSetupCodePairerPairDevice, error);
         if (pairingDelegate != nullptr)
         {
-            pairingDelegate->OnPairingComplete(error);
+            // We don't expect to have a setupPayload passed in here.
+            if (setupPayload)
+            {
+                ChipLogError(Controller,
+                             "Unexpected setupPayload passed to SetUpCodePairer::OnPairingComplete.  Where did it come from?");
+            }
+            pairingDelegate->OnPairingComplete(error, rendezvousParameters, pasePayload);
         }
         return;
     }
@@ -733,7 +951,7 @@ void SetUpCodePairer::OnPairingComplete(CHIP_ERROR error)
     MATTER_LOG_METRIC_END(kMetricSetupCodePairerPairDevice, error);
     if (pairingDelegate != nullptr)
     {
-        pairingDelegate->OnPairingComplete(error);
+        pairingDelegate->OnPairingComplete(error, rendezvousParameters, pasePayload);
     }
 }
 
@@ -758,20 +976,20 @@ void SetUpCodePairer::OnDeviceDiscoveredTimeoutCallback(System::Layer * layer, v
 {
     ChipLogError(Controller, "Discovery timed out");
     auto * pairer = static_cast<SetUpCodePairer *>(context);
-    pairer->StopAllDiscoveryAttempts();
-    if (!pairer->mWaitingForPASE && pairer->mDiscoveredParameters.empty())
+
+    // If a PASE attempt is in progress, do not stop physical-proximity
+    // transports (BLE, Wi-Fi PAF, NFC) — they have their own completion/timeout
+    // mechanisms.  DNS-SD, however, runs indefinitely, so stop it now to
+    // prevent DiscoveryInProgress() from being true forever.
+    if (pairer->mWaitingForPASE)
     {
-        // We're not waiting on any more PASE attempts, and we're not going to
-        // discover anything at this point, so we should just notify our
-        // listener.
-        CHIP_ERROR err = pairer->mLastPASEError;
-        if (err == CHIP_NO_ERROR)
-        {
-            err = CHIP_ERROR_TIMEOUT;
-        }
-        MATTER_LOG_METRIC_END(kMetricSetupCodePairerPairDevice, err);
-        pairer->mCommissioner->OnSessionEstablishmentError(err);
+        LogErrorOnFailure(pairer->StopDiscoveryOverDNSSD());
+        return;
     }
+
+    // No PASE in progress — stop all remaining discovery and fail if nothing is left to try.
+    pairer->StopAllDiscoveryAttempts();
+    pairer->StopPairingIfTransportsExhausted(CHIP_ERROR_TIMEOUT);
 }
 
 bool SetUpCodePairer::ShouldDiscoverUsing(RendezvousInformationFlag commissioningChannel) const

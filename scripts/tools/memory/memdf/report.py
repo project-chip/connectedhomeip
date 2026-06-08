@@ -20,7 +20,7 @@ import io
 import json
 import pathlib
 import sys
-from typing import IO, Any, Callable, Dict, List, Mapping, Optional, Protocol, Sequence, Union
+from typing import IO, Any, Callable, Mapping, Optional, Protocol, Sequence, Union
 
 import cxxfilt  # type: ignore
 import memdf.df
@@ -69,7 +69,7 @@ def postprocess_report_by(config: Config, key: str, info: Mapping) -> None:
     """For --report-by=region, select all sections."""
     assert key == 'report.by'
     if config.get(key) == 'region':
-        config.put('section.select-all', True),
+        config.put('section.select-all', True)
 
 
 REPORT_BY_CONFIG: ConfigDescription = {
@@ -87,14 +87,12 @@ REPORT_BY_CONFIG: ConfigDescription = {
 
 
 def demangle(symbol: str):
-    try:
+    with contextlib.suppress(cxxfilt.InvalidName):
         symbol = cxxfilt.demangle(symbol, external_only=False)
-    except cxxfilt.InvalidName:
-        pass
     return symbol
 
 
-def hierify_rows(table: Sequence[Sequence[Any]]) -> List[List[Any]]:
+def hierify_rows(table: Sequence[Sequence[Any]]) -> list[list[Any]]:
     if not table:
         return table
     persist = None
@@ -176,9 +174,8 @@ def open_output(config: Config,
             return
     if suffix:
         filename += suffix
-    f = open(filename, 'w')
-    yield f
-    f.close()
+    with open(filename, 'w') as f:
+        yield f
 
 
 # Single-table writers.
@@ -330,7 +327,7 @@ def kwgetset(k: str, *args):
     return r
 
 
-def prep(config: Config, df: pd.DataFrame, kw: Dict) -> pd.DataFrame:
+def prep(config: Config, df: pd.DataFrame, kw: dict) -> pd.DataFrame:
     """Preprocess a table for output."""
     def each_column(k: str):
         for column in set(df.attrs.get(k, set()) | kw.get(k, set())):
@@ -363,8 +360,8 @@ class Writer:
     def __init__(self,
                  group: Callable,
                  single: Callable,
-                 defaults: Optional[Dict] = None,
-                 overrides: Optional[Dict] = None):
+                 defaults: Optional[dict] = None,
+                 overrides: Optional[dict] = None):
         self.group = group
         self.single = single
         self.defaults = defaults or {}
@@ -389,7 +386,7 @@ class Writer:
         frames = {k: prep(config, df, args) for k, df in frames.items()}
         self.group(config, frames, output, self.single, **args)
 
-    def _args(self, kw: Mapping) -> Dict:
+    def _args(self, kw: Mapping) -> dict:
         r = self.defaults.copy()
         r.update(kw)
         r.update(self.overrides)
@@ -398,8 +395,8 @@ class Writer:
 
 class MarkdownWriter(Writer):
     def __init__(self,
-                 defaults: Optional[Dict] = None,
-                 overrides: Optional[Dict] = None):
+                 defaults: Optional[dict] = None,
+                 overrides: Optional[dict] = None):
         d = {'index': False}
         d.update(defaults or {})
         super().__init__(write_one, write_markdown, d, overrides)
@@ -407,23 +404,23 @@ class MarkdownWriter(Writer):
 
 class JsonWriter(Writer):
     def __init__(self,
-                 defaults: Optional[Dict] = None,
-                 overrides: Optional[Dict] = None):
+                 defaults: Optional[dict] = None,
+                 overrides: Optional[dict] = None):
         super().__init__(write_jsons, write_json, defaults, overrides)
         self.overrides['hierify'] = False
 
 
 class CsvWriter(Writer):
     def __init__(self,
-                 defaults: Optional[Dict] = None,
-                 overrides: Optional[Dict] = None):
+                 defaults: Optional[dict] = None,
+                 overrides: Optional[dict] = None):
         d = {'index': False}
         d.update(defaults or {})
         super().__init__(write_many, write_csv, d, overrides)
         self.overrides['hierify'] = False
 
 
-WRITERS: Dict[str, Writer] = {
+WRITERS: dict[str, Writer] = {
     'none': Writer(write_none, write_nothing),
     'text': Writer(write_one, write_text, {'titlefmt': '\n{}\n'}),
     'json_split': JsonWriter(),

@@ -48,17 +48,6 @@ using namespace chip::app::DataModel;
 using namespace chip::app::Compatibility::Internal;
 using Protocols::InteractionModel::Status;
 
-class ContextAttributesChangeListener : public AttributesChangedListener
-{
-public:
-    ContextAttributesChangeListener(const DataModel::InteractionModelContext & context) : mListener(context.dataModelChangeListener)
-    {}
-    void MarkDirty(const AttributePathParams & path) override { mListener.MarkDirty(path); }
-
-private:
-    DataModel::ProviderChangeListener & mListener;
-};
-
 /// Attempts to read via an attribute access interface (AAI)
 ///
 /// If it returns a CHIP_ERROR, then this is a FINAL result (i.e. either failure or success).
@@ -181,7 +170,7 @@ CHIP_ERROR ServerClusterShim::Startup(ServerClusterContext & context)
     return CHIP_NO_ERROR;
 }
 
-void ServerClusterShim::Shutdown()
+void ServerClusterShim::Shutdown(ClusterShutdownType)
 {
     mContext = nullptr;
 }
@@ -330,8 +319,6 @@ ActionReturnStatus ServerClusterShim::WriteAttribute(const WriteAttributeRequest
         }
     }
 
-    ContextAttributesChangeListener changeListener(mContext->interactionContext);
-
     AttributeAccessInterface * aai =
         AttributeAccessInterfaceRegistry::Instance().Get(request.path.mEndpointId, request.path.mClusterId);
     std::optional<CHIP_ERROR> aai_result = TryWriteViaAccessInterface(request.path, aai, decoder);
@@ -339,9 +326,8 @@ ActionReturnStatus ServerClusterShim::WriteAttribute(const WriteAttributeRequest
     {
         if (*aai_result == CHIP_NO_ERROR)
         {
-            // TODO: this is awkward since it provides AAI no control over this, specifically
-            //       AAI may not want to increase versions for some attributes that are Q
-            emberAfAttributeChanged(request.path.mEndpointId, request.path.mClusterId, request.path.mAttributeId, &changeListener);
+            // AAI write was successful. We still need to bump the version and notify our listeners.
+            emberAfAttributeChanged(request.path.mEndpointId, request.path.mClusterId, request.path.mAttributeId);
         }
         return *aai_result;
     }
@@ -360,10 +346,9 @@ ActionReturnStatus ServerClusterShim::WriteAttribute(const WriteAttributeRequest
 
     Protocols::InteractionModel::Status status;
     EmberAfWriteDataInput dataInput(dataBuffer.data(), attributeMetadata->attributeType);
-    dataInput.SetChangeListener(&changeListener);
-    // TODO: dataInput.SetMarkDirty() should be according to `ChangesOmmited`
+    // TODO: dataInput.SetMarkDirty() should be according to `ChangesOmitted`
 
-    if (request.operationFlags.Has(DataModel::OperationFlags::kInternal))
+    if (request.subjectDescriptor.authMode == Access::AuthMode::kInternalDeviceAccess)
     {
         // Internal requests use the non-External interface that has less enforcement
         // than the external version (e.g. does not check/enforce writable settings, does not
@@ -493,7 +478,8 @@ CHIP_ERROR ServerClusterShim::GeneratedCommands(const ConcreteClusterPath & path
     return builder.ReferenceExisting({ serverCluster->generatedCommandList, commandCount });
 }
 
-void ServerClusterShim::ListAttributeWriteNotification(const ConcreteAttributePath & aPath, DataModel::ListWriteOperation opType)
+void ServerClusterShim::ListAttributeWriteNotification(const ConcreteAttributePath & aPath, DataModel::ListWriteOperation opType,
+                                                       FabricIndex accessingFabric)
 {
     AttributeAccessInterface * aai = AttributeAccessInterfaceRegistry::Instance().Get(aPath.mEndpointId, aPath.mClusterId);
 

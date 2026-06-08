@@ -47,6 +47,14 @@
 #include <clusters/AirQuality/Commands.ipp>
 #include <clusters/AirQuality/Events.ipp>
 #include <clusters/AirQuality/Structs.ipp>
+#include <clusters/AmbientContextSensing/Attributes.ipp>
+#include <clusters/AmbientContextSensing/Commands.ipp>
+#include <clusters/AmbientContextSensing/Events.ipp>
+#include <clusters/AmbientContextSensing/Structs.ipp>
+#include <clusters/AmbientSensingUnion/Attributes.ipp>
+#include <clusters/AmbientSensingUnion/Commands.ipp>
+#include <clusters/AmbientSensingUnion/Events.ipp>
+#include <clusters/AmbientSensingUnion/Structs.ipp>
 #include <clusters/ApplicationBasic/Attributes.ipp>
 #include <clusters/ApplicationBasic/Commands.ipp>
 #include <clusters/ApplicationBasic/Events.ipp>
@@ -59,6 +67,10 @@
 #include <clusters/AudioOutput/Commands.ipp>
 #include <clusters/AudioOutput/Events.ipp>
 #include <clusters/AudioOutput/Structs.ipp>
+#include <clusters/AvAnalysis/Attributes.ipp>
+#include <clusters/AvAnalysis/Commands.ipp>
+#include <clusters/AvAnalysis/Events.ipp>
+#include <clusters/AvAnalysis/Structs.ipp>
 #include <clusters/BallastConfiguration/Attributes.ipp>
 #include <clusters/BallastConfiguration/Commands.ipp>
 #include <clusters/BallastConfiguration/Events.ipp>
@@ -175,10 +187,22 @@
 #include <clusters/DoorLock/Commands.ipp>
 #include <clusters/DoorLock/Events.ipp>
 #include <clusters/DoorLock/Structs.ipp>
+#include <clusters/DynamicLighting/Attributes.ipp>
+#include <clusters/DynamicLighting/Commands.ipp>
+#include <clusters/DynamicLighting/Events.ipp>
+#include <clusters/DynamicLighting/Structs.ipp>
 #include <clusters/EcosystemInformation/Attributes.ipp>
 #include <clusters/EcosystemInformation/Commands.ipp>
 #include <clusters/EcosystemInformation/Events.ipp>
 #include <clusters/EcosystemInformation/Structs.ipp>
+#include <clusters/ElectricalAlarm/Attributes.ipp>
+#include <clusters/ElectricalAlarm/Commands.ipp>
+#include <clusters/ElectricalAlarm/Events.ipp>
+#include <clusters/ElectricalAlarm/Structs.ipp>
+#include <clusters/ElectricalDistribution/Attributes.ipp>
+#include <clusters/ElectricalDistribution/Commands.ipp>
+#include <clusters/ElectricalDistribution/Events.ipp>
+#include <clusters/ElectricalDistribution/Structs.ipp>
 #include <clusters/ElectricalEnergyMeasurement/Attributes.ipp>
 #include <clusters/ElectricalEnergyMeasurement/Commands.ipp>
 #include <clusters/ElectricalEnergyMeasurement/Events.ipp>
@@ -191,6 +215,10 @@
 #include <clusters/ElectricalPowerMeasurement/Commands.ipp>
 #include <clusters/ElectricalPowerMeasurement/Events.ipp>
 #include <clusters/ElectricalPowerMeasurement/Structs.ipp>
+#include <clusters/ElectricalProtectionAlarm/Attributes.ipp>
+#include <clusters/ElectricalProtectionAlarm/Commands.ipp>
+#include <clusters/ElectricalProtectionAlarm/Events.ipp>
+#include <clusters/ElectricalProtectionAlarm/Structs.ipp>
 #include <clusters/EnergyEvse/Attributes.ipp>
 #include <clusters/EnergyEvse/Commands.ipp>
 #include <clusters/EnergyEvse/Events.ipp>
@@ -239,6 +267,10 @@
 #include <clusters/GroupKeyManagement/Commands.ipp>
 #include <clusters/GroupKeyManagement/Events.ipp>
 #include <clusters/GroupKeyManagement/Structs.ipp>
+#include <clusters/Groupcast/Attributes.ipp>
+#include <clusters/Groupcast/Commands.ipp>
+#include <clusters/Groupcast/Events.ipp>
+#include <clusters/Groupcast/Structs.ipp>
 #include <clusters/Groups/Attributes.ipp>
 #include <clusters/Groups/Commands.ipp>
 #include <clusters/Groups/Events.ipp>
@@ -247,6 +279,10 @@
 #include <clusters/HepaFilterMonitoring/Commands.ipp>
 #include <clusters/HepaFilterMonitoring/Events.ipp>
 #include <clusters/HepaFilterMonitoring/Structs.ipp>
+#include <clusters/Humidistat/Attributes.ipp>
+#include <clusters/Humidistat/Commands.ipp>
+#include <clusters/Humidistat/Events.ipp>
+#include <clusters/Humidistat/Structs.ipp>
 #include <clusters/IcdManagement/Attributes.ipp>
 #include <clusters/IcdManagement/Commands.ipp>
 #include <clusters/IcdManagement/Events.ipp>
@@ -327,6 +363,10 @@
 #include <clusters/NetworkCommissioning/Commands.ipp>
 #include <clusters/NetworkCommissioning/Events.ipp>
 #include <clusters/NetworkCommissioning/Structs.ipp>
+#include <clusters/NetworkIdentityManagement/Attributes.ipp>
+#include <clusters/NetworkIdentityManagement/Commands.ipp>
+#include <clusters/NetworkIdentityManagement/Events.ipp>
+#include <clusters/NetworkIdentityManagement/Structs.ipp>
 #include <clusters/NitrogenDioxideConcentrationMeasurement/Attributes.ipp>
 #include <clusters/NitrogenDioxideConcentrationMeasurement/Commands.ipp>
 #include <clusters/NitrogenDioxideConcentrationMeasurement/Events.ipp>
@@ -395,6 +435,10 @@
 #include <clusters/PressureMeasurement/Commands.ipp>
 #include <clusters/PressureMeasurement/Events.ipp>
 #include <clusters/PressureMeasurement/Structs.ipp>
+#include <clusters/ProximityRanging/Attributes.ipp>
+#include <clusters/ProximityRanging/Commands.ipp>
+#include <clusters/ProximityRanging/Events.ipp>
+#include <clusters/ProximityRanging/Structs.ipp>
 #include <clusters/ProxyConfiguration/Attributes.ipp>
 #include <clusters/ProxyConfiguration/Commands.ipp>
 #include <clusters/ProxyConfiguration/Events.ipp>
@@ -463,6 +507,10 @@
 #include <clusters/SmokeCoAlarm/Commands.ipp>
 #include <clusters/SmokeCoAlarm/Events.ipp>
 #include <clusters/SmokeCoAlarm/Structs.ipp>
+#include <clusters/SmokeConcentrationMeasurement/Attributes.ipp>
+#include <clusters/SmokeConcentrationMeasurement/Commands.ipp>
+#include <clusters/SmokeConcentrationMeasurement/Events.ipp>
+#include <clusters/SmokeConcentrationMeasurement/Structs.ipp>
 #include <clusters/SoftwareDiagnostics/Attributes.ipp>
 #include <clusters/SoftwareDiagnostics/Commands.ipp>
 #include <clusters/SoftwareDiagnostics/Events.ipp>
@@ -515,10 +563,6 @@
 #include <clusters/TimeSynchronization/Commands.ipp>
 #include <clusters/TimeSynchronization/Events.ipp>
 #include <clusters/TimeSynchronization/Structs.ipp>
-#include <clusters/Timer/Attributes.ipp>
-#include <clusters/Timer/Commands.ipp>
-#include <clusters/Timer/Events.ipp>
-#include <clusters/Timer/Structs.ipp>
 #include <clusters/TlsCertificateManagement/Attributes.ipp>
 #include <clusters/TlsCertificateManagement/Commands.ipp>
 #include <clusters/TlsCertificateManagement/Events.ipp>
@@ -559,6 +603,10 @@
 #include <clusters/WaterHeaterMode/Commands.ipp>
 #include <clusters/WaterHeaterMode/Events.ipp>
 #include <clusters/WaterHeaterMode/Structs.ipp>
+#include <clusters/WaterTankLevelMonitoring/Attributes.ipp>
+#include <clusters/WaterTankLevelMonitoring/Commands.ipp>
+#include <clusters/WaterTankLevelMonitoring/Events.ipp>
+#include <clusters/WaterTankLevelMonitoring/Structs.ipp>
 #include <clusters/WebRTCTransportProvider/Attributes.ipp>
 #include <clusters/WebRTCTransportProvider/Commands.ipp>
 #include <clusters/WebRTCTransportProvider/Events.ipp>
@@ -658,6 +706,17 @@ bool CommandNeedsTimedInvoke(ClusterId aCluster, CommandId aCommand)
             return false;
         }
     }
+    case Clusters::NetworkIdentityManagement::Id: {
+        switch (aCommand)
+        {
+        case Clusters::NetworkIdentityManagement::Commands::AddClient::Id:
+        case Clusters::NetworkIdentityManagement::Commands::RemoveClient::Id:
+        case Clusters::NetworkIdentityManagement::Commands::ImportAdminSecret::Id:
+            return true;
+        default:
+            return false;
+        }
+    }
     case Clusters::ThreadBorderRouterManagement::Id: {
         switch (aCommand)
         {
@@ -684,6 +743,18 @@ bool CommandNeedsTimedInvoke(ClusterId aCluster, CommandId aCommand)
         case Clusters::AccountLogin::Commands::GetSetupPIN::Id:
         case Clusters::AccountLogin::Commands::Login::Id:
         case Clusters::AccountLogin::Commands::Logout::Id:
+            return true;
+        default:
+            return false;
+        }
+    }
+    case Clusters::ContentControl::Id: {
+        switch (aCommand)
+        {
+        case Clusters::ContentControl::Commands::UpdatePIN::Id:
+        case Clusters::ContentControl::Commands::ResetPIN::Id:
+        case Clusters::ContentControl::Commands::Enable::Id:
+        case Clusters::ContentControl::Commands::Disable::Id:
             return true;
         default:
             return false;
@@ -909,13 +980,6 @@ bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
             return false;
         }
     }
-    case Clusters::Timer::Id: {
-        switch (aCommand)
-        {
-        default:
-            return false;
-        }
-    }
     case Clusters::OvenCavityOperationalState::Id: {
         switch (aCommand)
         {
@@ -1037,6 +1101,25 @@ bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
             return false;
         }
     }
+    case Clusters::Groupcast::Id: {
+        switch (aCommand)
+        {
+        case Clusters::Groupcast::Commands::JoinGroup::Id:
+            return true;
+        case Clusters::Groupcast::Commands::LeaveGroup::Id:
+            return true;
+        case Clusters::Groupcast::Commands::LeaveGroupResponse::Id:
+            return true;
+        case Clusters::Groupcast::Commands::UpdateGroupKey::Id:
+            return true;
+        case Clusters::Groupcast::Commands::ConfigureAuxiliaryACL::Id:
+            return true;
+        case Clusters::Groupcast::Commands::GroupcastTesting::Id:
+            return true;
+        default:
+            return false;
+        }
+    }
     case Clusters::HepaFilterMonitoring::Id: {
         switch (aCommand)
         {
@@ -1045,6 +1128,13 @@ bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
         }
     }
     case Clusters::ActivatedCarbonFilterMonitoring::Id: {
+        switch (aCommand)
+        {
+        default:
+            return false;
+        }
+    }
+    case Clusters::WaterTankLevelMonitoring::Id: {
         switch (aCommand)
         {
         default:
@@ -1125,6 +1215,20 @@ bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
             return false;
         }
     }
+    case Clusters::ElectricalAlarm::Id: {
+        switch (aCommand)
+        {
+        default:
+            return false;
+        }
+    }
+    case Clusters::ElectricalProtectionAlarm::Id: {
+        switch (aCommand)
+        {
+        default:
+            return false;
+        }
+    }
     case Clusters::DoorLock::Id: {
         switch (aCommand)
         {
@@ -1174,7 +1278,35 @@ bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
             return false;
         }
     }
+    case Clusters::Humidistat::Id: {
+        switch (aCommand)
+        {
+        default:
+            return false;
+        }
+    }
     case Clusters::ColorControl::Id: {
+        switch (aCommand)
+        {
+        default:
+            return false;
+        }
+    }
+    case Clusters::DynamicLighting::Id: {
+        switch (aCommand)
+        {
+        default:
+            return false;
+        }
+    }
+    case Clusters::ProximityRanging::Id: {
+        switch (aCommand)
+        {
+        default:
+            return false;
+        }
+    }
+    case Clusters::NetworkIdentityManagement::Id: {
         switch (aCommand)
         {
         default:
@@ -1365,6 +1497,13 @@ bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
             return false;
         }
     }
+    case Clusters::AvAnalysis::Id: {
+        switch (aCommand)
+        {
+        default:
+            return false;
+        }
+    }
     case Clusters::CommodityTariff::Id: {
         switch (aCommand)
         {
@@ -1404,7 +1543,7 @@ bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
             return true;
         case Clusters::TlsCertificateManagement::Commands::RemoveRootCertificate::Id:
             return true;
-        case Clusters::TlsCertificateManagement::Commands::TLSClientCSR::Id:
+        case Clusters::TlsCertificateManagement::Commands::ClientCSR::Id:
             return true;
         case Clusters::TlsCertificateManagement::Commands::ProvisionClientCertificate::Id:
             return true;
@@ -1590,12 +1729,12 @@ bool CommandHasLargePayload(ClusterId aCluster, CommandId aCommand)
         return true;
     }
     if ((aCluster == Clusters::TlsCertificateManagement::Id) &&
-        (aCommand == Clusters::TlsCertificateManagement::Commands::TLSClientCSR::Id))
+        (aCommand == Clusters::TlsCertificateManagement::Commands::ClientCSR::Id))
     {
         return true;
     }
     if ((aCluster == Clusters::TlsCertificateManagement::Id) &&
-        (aCommand == Clusters::TlsCertificateManagement::Commands::TLSClientCSRResponse::Id))
+        (aCommand == Clusters::TlsCertificateManagement::Commands::ClientCSRResponse::Id))
     {
         return true;
     }

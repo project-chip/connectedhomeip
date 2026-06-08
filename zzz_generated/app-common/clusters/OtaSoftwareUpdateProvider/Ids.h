@@ -1,6 +1,6 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Identifier constant values for cluster OtaSoftwareUpdateProvider (cluster code: 41/0x0429)
+// Identifier constant values for cluster OtaSoftwareUpdateProvider (cluster code: 41/0x0029)
 // based on src/controller/data_model/controller-clusters.matter
 #pragma once
 

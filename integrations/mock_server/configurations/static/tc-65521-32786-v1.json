@@ -1,0 +1,91 @@
+{
+    "schemaVersion": 1,
+    "esfRevision": 1,
+    "defaultCountry": "US",
+    "countryEntries": {
+        "US": {
+            "defaultLanguage": "en",
+            "languageEntries": {
+                "en": [
+                    {
+                        "ordinal": 0,
+                        "required": true,
+                        "title": "Terms and Conditions",
+                        "text": "<p><b>Feature 1 Text</b><br><br>Please accept these.</p>"
+                    },
+                    {
+                        "ordinal": 1,
+                        "required": false,
+                        "title": "Privacy Policy",
+                        "text": "<p>Feature 2 Text</p>"
+                    }
+                ],
+                "es": [
+                    {
+                        "ordinal": 0,
+                        "required": true,
+                        "title": "T\u00e9rminos y condiciones",
+                        "text": "<p><b>Caracter\u00edstica 1 Texto</b><br><br>Por favor ac\u00e9ptelos.</p>"
+                    },
+                    {
+                        "ordinal": 1,
+                        "required": false,
+                        "title": "Pol\u00edtica de privacidad",
+                        "text": "<p>Caracter\u00edstica 2 Texto</p>"
+                    }
+                ]
+            }
+        },
+        "MX": {
+            "defaultLanguage": "es",
+            "languageEntries": {
+                "es": [
+                    {
+                        "ordinal": 0,
+                        "required": true,
+                        "title": "T\u00e9rminos y condiciones",
+                        "text": "<p><b>Caracter\u00edstica 1 Texto</b><br><br>Por favor ac\u00e9ptelos.</p>"
+                    }
+                ]
+            }
+        },
+        "CN": {
+            "defaultLanguage": "zh",
+            "languageEntries": {
+                "zh": [
+                    {
+                        "ordinal": 0,
+                        "required": true,
+                        "title": "\u6761\u6b3e\u548c\u6761\u4ef6",
+                        "text": "<p><b>\u4ea7\u54c11\u6587\u5b57</b></p>"
+                    },
+                    {
+                        "ordinal": 1,
+                        "required": false,
+                        "title": "\u9690\u79c1\u6761\u6b3e",
+                        "text": "<p><b>\u4ea7\u54c12\u6587\u5b57</b></p>"
+                    }
+                ]
+            }
+        },
+        "RU": {
+            "defaultLanguage": "ru",
+            "languageEntries": {
+                "ru": [
+                    {
+                        "ordinal": 0,
+                        "required": true,
+                        "title": "\u0423\u0441\u043b\u043e\u0432\u0438\u044f \u0438 \u043f\u043e\u043b\u043e\u0436\u0435\u043d\u0438\u044f",
+                        "text": "<p><b>\u0422\u0435\u043a\u0441\u0442 \u0444\u0443\u043d\u043a\u0446\u0438\u0438 1</b><br><br>\u041f\u043e\u0436\u0430\u043b\u0443\u0439\u0441\u0442\u0430, \u043f\u0440\u0438\u043c\u0438\u0442\u0435 \u044d\u0442\u0438 \u0443\u0441\u043b\u043e\u0432\u0438\u044f \u043f\u043e\u043b\u044c\u0437\u043e\u0432\u0430\u043d\u0438\u044f.</p>"
+                    },
+                    {
+                        "ordinal": 1,
+                        "required": false,
+                        "title": "\u043e\u043b\u043e\u0436\u0435\u043d\u0438\u0435 \u043e \u043a\u043e\u043d\u0444\u0438\u0434\u0435\u043d\u0446\u0438\u0430\u043b\u044c\u043d\u043e\u0441\u0442\u0438",
+                        "text": "<p>\u0422\u0435\u043a\u0441\u0442 \u0444\u0443\u043d\u043a\u0446\u0438\u0438 2</p>"
+                    }
+                ]
+            }
+        }
+    }
+}

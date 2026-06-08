@@ -228,6 +228,12 @@ CHIP_ERROR ClusterStateCacheT<CanEnableDataCaching>::UpdateEventCache(const Even
 }
 
 template <bool CanEnableDataCaching>
+void ClusterStateCacheT<CanEnableDataCaching>::NotifySubscriptionStillActive(const ReadClient & aReadClient)
+{
+    mCallback.NotifySubscriptionStillActive(aReadClient);
+}
+
+template <bool CanEnableDataCaching>
 void ClusterStateCacheT<CanEnableDataCaching>::OnReportBegin()
 {
     mLastReportDataPath = ConcreteClusterPath(kInvalidEndpointId, kInvalidClusterId);
@@ -426,7 +432,7 @@ void ClusterStateCacheT<CanEnableDataCaching>::OnAttributeData(const ConcreteDat
         dataSnapshot.Init(*apData);
     }
 
-    UpdateCache(aPath, apData, aStatus);
+    TEMPORARY_RETURN_IGNORED UpdateCache(aPath, apData, aStatus);
 
     //
     // Forward the call through.
@@ -458,7 +464,7 @@ void ClusterStateCacheT<CanEnableDataCaching>::OnEventData(const EventHeader & a
         dataSnapshot.Init(*apData);
     }
 
-    UpdateEventCache(aEventHeader, apData, apStatus);
+    TEMPORARY_RETURN_IGNORED UpdateEventCache(aEventHeader, apData, apStatus);
     mCallback.OnEventData(aEventHeader, apData ? &dataSnapshot : nullptr, apStatus);
 }
 

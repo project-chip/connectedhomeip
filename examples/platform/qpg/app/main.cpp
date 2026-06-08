@@ -235,7 +235,7 @@ CHIP_ERROR CHIP_Init(void)
         goto exit;
     }
 
-    sThreadNetworkDriver.Init();
+    TEMPORARY_RETURN_IGNORED sThreadNetworkDriver.Init();
 
     ChipLogProgress(NotSpecified, "Starting OpenThread task");
     ret = ThreadStackMgrImpl().StartThreadTask();
@@ -247,7 +247,7 @@ CHIP_ERROR CHIP_Init(void)
 #endif // CHIP_ENABLE_OPENTHREAD
 
     ChipLogProgress(NotSpecified, "Starting Platform Manager Event Loop");
-    PlatformMgr().AddEventHandler(ChipEventHandler, 0);
+    TEMPORARY_RETURN_IGNORED PlatformMgr().AddEventHandler(ChipEventHandler, 0);
     ret = PlatformMgr().StartEventLoopTask();
     if (ret != CHIP_NO_ERROR)
     {

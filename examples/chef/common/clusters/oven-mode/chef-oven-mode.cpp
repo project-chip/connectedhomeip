@@ -63,14 +63,14 @@ void InitChefOvenModeCluster()
             continue;
 
         gDelegateTable[epIndex] = std::make_unique<OvenMode::ChefDelegate>();
-        gDelegateTable[epIndex]->Init();
+        TEMPORARY_RETURN_IGNORED gDelegateTable[epIndex]->Init();
 
         uint32_t featureMap = 0;
         VerifyOrDieWithMsg(OvenMode::Attributes::FeatureMap::Get(endpointId, &featureMap) == Status::Success, DeviceLayer,
                            "Failed to read OvenMode feature map for endpoint %d", endpointId);
         gInstanceTable[epIndex] =
             std::make_unique<ModeBase::Instance>(gDelegateTable[epIndex].get(), endpointId, OvenMode::Id, featureMap);
-        gInstanceTable[epIndex]->Init();
+        TEMPORARY_RETURN_IGNORED gInstanceTable[epIndex]->Init();
 
         ChipLogProgress(DeviceLayer, "Endpoint %d OvenMode Initialized.", endpointId);
     }
@@ -84,14 +84,14 @@ CHIP_ERROR OvenMode::ChefDelegate::Init()
 
 void OvenMode::ChefDelegate::HandleChangeToMode(uint8_t NewMode, ModeBase::Commands::ChangeToModeResponse::Type & response)
 {
-    EndpointId endpointId = mInstance->GetEndpointId();
+    EndpointId endpointId = GetInstance()->GetEndpointId();
     ChipLogDetail(DeviceLayer, "HandleChangeToMode: Endpoint %d", endpointId);
     response.status = to_underlying(ModeBase::StatusCode::kSuccess);
 }
 
 CHIP_ERROR OvenMode::ChefDelegate::GetModeLabelByIndex(uint8_t modeIndex, chip::MutableCharSpan & label)
 {
-    EndpointId endpointId = mInstance->GetEndpointId();
+    EndpointId endpointId = GetInstance()->GetEndpointId();
     ChipLogDetail(DeviceLayer, "GetModeLabelByIndex: Endpoint %d", endpointId);
     if (modeIndex >= MATTER_ARRAY_SIZE(kModeOptions))
     {
@@ -102,7 +102,7 @@ CHIP_ERROR OvenMode::ChefDelegate::GetModeLabelByIndex(uint8_t modeIndex, chip::
 
 CHIP_ERROR OvenMode::ChefDelegate::GetModeValueByIndex(uint8_t modeIndex, uint8_t & value)
 {
-    EndpointId endpointId = mInstance->GetEndpointId();
+    EndpointId endpointId = GetInstance()->GetEndpointId();
     ChipLogDetail(DeviceLayer, "GetModeValueByIndex: Endpoint %d", endpointId);
     if (modeIndex >= MATTER_ARRAY_SIZE(kModeOptions))
     {
@@ -114,7 +114,7 @@ CHIP_ERROR OvenMode::ChefDelegate::GetModeValueByIndex(uint8_t modeIndex, uint8_
 
 CHIP_ERROR OvenMode::ChefDelegate::GetModeTagsByIndex(uint8_t modeIndex, List<ModeTagStructType> & tags)
 {
-    EndpointId endpointId = mInstance->GetEndpointId();
+    EndpointId endpointId = GetInstance()->GetEndpointId();
     ChipLogDetail(DeviceLayer, "GetModeTagsByIndex: Endpoint %d", endpointId);
     if (modeIndex >= MATTER_ARRAY_SIZE(kModeOptions))
     {

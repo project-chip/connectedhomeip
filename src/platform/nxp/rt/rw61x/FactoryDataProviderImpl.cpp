@@ -25,10 +25,6 @@ extern "C" {
 #include "ELSFactoryData.h"
 #include "mflash_drv.h"
 
-#if defined(MBEDTLS_THREADING_C) && defined(MBEDTLS_THREADING_ALT)
-#include "els_pkc_mbedtls.h"
-#endif /* defined(MBEDTLS_THREADING_C) && defined(MBEDTLS_THREADING_ALT) */
-
 #include "fsl_adapter_flash.h"
 
 /* mbedtls */
@@ -67,8 +63,6 @@ using namespace ::chip::Crypto;
 namespace chip {
 namespace DeviceLayer {
 
-FactoryDataProviderImpl FactoryDataProviderImpl::sInstance;
-
 static constexpr size_t kPrivateKeyBlobLength = Crypto::kP256_PrivateKey_Length + ELS_BLOB_METADATA_SIZE + ELS_WRAP_OVERHEAD;
 
 CHIP_ERROR FactoryDataProviderImpl::DecryptAesEcb(uint8_t * dest, uint8_t * source)
@@ -94,12 +88,12 @@ CHIP_ERROR FactoryDataProviderImpl::SearchForId(uint8_t searchedType, uint8_t * 
     CHIP_ERROR err               = CHIP_ERROR_NOT_FOUND;
     uint8_t type                 = 0;
     uint32_t index               = 0;
-    uint8_t * addrContent        = NULL;
     uint8_t * factoryDataAddress = &factoryDataRamBuffer[0];
     uint32_t factoryDataSize     = sizeof(factoryDataRamBuffer);
     uint16_t currentLen          = 0;
 
-    while (index < factoryDataSize)
+    /* index will be incremented later, we have to be sure we have enough space for a new TLV entry */
+    while (index + sizeof(type) + sizeof(currentLen) < factoryDataSize)
     {
         /* Read the type */
         memcpy((uint8_t *) &type, factoryDataAddress + index, sizeof(type));
@@ -182,9 +176,6 @@ CHIP_ERROR FactoryDataProviderImpl::SignWithDacKey(const ByteSpan & digestToSign
 
     PLOG_DEBUG_BUFFER("digestToSign", digestToSign.data(), digestToSign.size());
 
-#if defined(MBEDTLS_THREADING_C) && defined(MBEDTLS_THREADING_ALT)
-    (void) mcux_els_mutex_lock();
-#endif
     /* Import blob DAC key into SE50 (reserved key slot) */
     status = import_die_int_wrapped_key_into_els(els_key_blob, els_key_blob_size, plain_key_properties, &key_index);
     STATUS_SUCCESS_OR_EXIT_MSG("import_die_int_wrapped_key_into_els failed: 0x%08x", status);
@@ -206,16 +197,10 @@ CHIP_ERROR FactoryDataProviderImpl::SignWithDacKey(const ByteSpan & digestToSign
     els_delete_key(key_index);
 
     /* Generate MutableByteSpan with ECC signature and ECC signature size */
-#if defined(MBEDTLS_THREADING_C) && defined(MBEDTLS_THREADING_ALT)
-    (void) mcux_els_mutex_unlock();
-#endif
     return CopySpanToMutableSpan(ByteSpan{ ecc_signature, MCUXCLELS_ECC_SIGNATURE_SIZE }, outSignBuffer);
 
 exit:
     els_delete_key(key_index);
-#if defined(MBEDTLS_THREADING_C) && defined(MBEDTLS_THREADING_ALT)
-    (void) mcux_els_mutex_unlock();
-#endif
     return CHIP_ERROR_INVALID_SIGNATURE;
 }
 
@@ -224,7 +209,6 @@ CHIP_ERROR FactoryDataProviderImpl::ReadAndCheckFactoryDataInFlash(void)
     status_t status;
     uint32_t factoryDataAddress = (uint32_t) __FACTORY_DATA_START_OFFSET;
     uint32_t factoryDataSize    = (uint32_t) __FACTORY_DATA_SIZE;
-    uint32_t hashId;
     uint8_t calculatedHash[SHA256_OUTPUT_SIZE];
     CHIP_ERROR res;
     uint8_t currentBlock[16];
@@ -305,8 +289,6 @@ CHIP_ERROR FactoryDataProviderImpl::SetEncryptionMode(EncryptionMode mode)
 
 CHIP_ERROR FactoryDataProviderImpl::Init(void)
 {
-    uint16_t len;
-    uint8_t type;
     uint16_t keySize = 0;
 
     ReturnLogErrorOnFailure(ReadAndCheckFactoryDataInFlash());
@@ -435,10 +417,13 @@ CHIP_ERROR FactoryDataProviderImpl::ReplaceWithBlob(uint8_t * data, uint8_t * bl
     return CHIP_NO_ERROR;
 }
 
+#ifndef CONFIG_CHIP_FACTORY_DATA_PROVIDER_CUSTOM_SINGLETON_IMPL
 FactoryDataProvider & FactoryDataPrvdImpl()
 {
-    return FactoryDataProviderImpl::sInstance;
+    static FactoryDataProviderImpl sInstance;
+    return sInstance;
 }
+#endif
 
 } // namespace DeviceLayer
 } // namespace chip

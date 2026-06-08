@@ -36,6 +36,13 @@ CHIP_ERROR DishwasherModeDelegate::Init()
 // todo refactor code by making a parent class for all ModeInstance classes to reduce flash usage.
 void DishwasherModeDelegate::HandleChangeToMode(uint8_t NewMode, ModeBase::Commands::ChangeToModeResponse::Type & response)
 {
+    if (gDishwasherModeInstance->GetFailTransition())
+    {
+        response.status = to_underlying(ModeBase::StatusCode::kInvalidInMode);
+        response.statusText.SetValue("Mode change not allowed due to device state"_span);
+        return;
+    }
+
     response.status = to_underlying(ModeBase::StatusCode::kSuccess);
 }
 
@@ -101,7 +108,7 @@ void emberAfDishwasherModeClusterInitCallback(chip::EndpointId endpointId)
     VerifyOrDie(gDishwasherModeDelegate == nullptr && gDishwasherModeInstance == nullptr);
     gDishwasherModeDelegate = new DishwasherMode::DishwasherModeDelegate;
     gDishwasherModeInstance = new ModeBase::Instance(gDishwasherModeDelegate, 0x1, DishwasherMode::Id, 0);
-    gDishwasherModeInstance->Init();
+    TEMPORARY_RETURN_IGNORED gDishwasherModeInstance->Init();
 }
 
 void emberAfDishwasherModeClusterShutdownCallback(chip::EndpointId endpointId)

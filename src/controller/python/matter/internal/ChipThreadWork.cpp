@@ -64,7 +64,7 @@ void ChipMainThreadScheduleAndWait(WorkCallback callback)
     WorkData workdata;
     workdata.callback = callback;
 
-    chip::DeviceLayer::PlatformMgr().ScheduleWork(PerformWork, reinterpret_cast<intptr_t>(&workdata));
+    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().ScheduleWork(PerformWork, reinterpret_cast<intptr_t>(&workdata));
 
     workdata.Wait();
 }

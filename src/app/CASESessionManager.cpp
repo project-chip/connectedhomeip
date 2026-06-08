@@ -39,13 +39,14 @@ void CASESessionManager::FindOrEstablishSession(const ScopedNodeId & peerId, Cal
 #if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
                                                 uint8_t attemptCount, Callback::Callback<OnDeviceConnectionRetry> * onRetry,
 #endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
-                                                TransportPayloadCapability transportPayloadCapability)
+                                                TransportPayloadCapability transportPayloadCapability,
+                                                const Optional<AddressResolve::ResolveResult> & fallbackResolveResult)
 {
     FindOrEstablishSessionHelper(peerId, onConnection, onFailure, nullptr,
 #if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
                                  attemptCount, onRetry,
 #endif
-                                 transportPayloadCapability);
+                                 transportPayloadCapability, fallbackResolveResult);
 }
 
 void CASESessionManager::FindOrEstablishSession(const ScopedNodeId & peerId, Callback::Callback<OnDeviceConnected> * onConnection,
@@ -94,7 +95,8 @@ void CASESessionManager::FindOrEstablishSessionHelper(const ScopedNodeId & peerI
 #if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
                                                       uint8_t attemptCount, Callback::Callback<OnDeviceConnectionRetry> * onRetry,
 #endif
-                                                      TransportPayloadCapability transportPayloadCapability)
+                                                      TransportPayloadCapability transportPayloadCapability,
+                                                      const Optional<AddressResolve::ResolveResult> & fallbackResolveResult)
 {
     ChipLogDetail(CASESessionManager, "FindOrEstablishSession: PeerId = [%d:" ChipLogFormatX64 "]", peerId.GetFabricIndex(),
                   ChipLogValueX64(peerId.GetNodeId()));
@@ -131,6 +133,14 @@ void CASESessionManager::FindOrEstablishSessionHelper(const ScopedNodeId & peerI
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
 
+#if CHIP_CONFIG_ENABLE_ADDRESS_RESOLVE_FALLBACK
+    // Set fallback resolve result if provided
+    if (fallbackResolveResult.HasValue())
+    {
+        session->SetFallbackResolveResult(fallbackResolveResult.Value());
+    }
+#endif // CHIP_CONFIG_ENABLE_ADDRESS_RESOLVE_FALLBACK
+
     if (onFailure != nullptr)
     {
         session->Connect(onConnection, onFailure, transportPayloadCapability);
@@ -144,11 +154,19 @@ void CASESessionManager::FindOrEstablishSessionHelper(const ScopedNodeId & peerI
 
 void CASESessionManager::ReleaseSessionsForFabric(FabricIndex fabricIndex)
 {
+    // Intentionally bypasses the IsEstablishingSession() in-flight guard used by
+    // ReleaseSession(peerId). Fabric removal is irreversible; all setups for the fabric
+    // -- including mid-handshake ones -- must be torn down unconditionally to avoid
+    // dangling references to a removed fabric.
     mConfig.sessionSetupPool->ReleaseAllSessionSetupsForFabric(fabricIndex);
 }
 
 void CASESessionManager::ReleaseAllSessions()
 {
+    // Intentionally bypasses the IsEstablishingSession() in-flight guard used by
+    // ReleaseSession(peerId). Shutdown is terminal; every setup must be destroyed
+    // regardless of handshake state. Safe because the caller is tearing down the entire
+    // stack, not trimming individual peers.
     mConfig.sessionSetupPool->ReleaseAllSessionSetup();
 }
 
@@ -202,11 +220,33 @@ Optional<SessionHandle> CASESessionManager::FindExistingSession(const ScopedNode
 void CASESessionManager::ReleaseSession(const ScopedNodeId & peerId)
 {
     auto * session = mConfig.sessionSetupPool->FindSessionSetup(peerId, false);
+    if (session != nullptr && session->IsEstablishingSession())
+    {
+        // Don't tear down a setup that's actively trying to establish.
+        // The OperationalSessionSetup owns retry state (mAttemptsDone,
+        // mRequestedBusyDelay, exponential backoff); destroying it resets
+        // that state and produces a churn of fresh Sigma1 attempts against
+        // a slow/busy accessory each time a higher layer
+        // calls ReleaseSession during cold-start.
+        // Let the in-flight attempt complete or hit its own retry cycle
+        // naturally.
+        ChipLogDetail(Discovery,
+                      "CASESessionManager::ReleaseSession for " ChipLogFormatScopedNodeId
+                      ": setup is establishing a session, skipping release",
+                      ChipLogValueScopedNodeId(peerId));
+        return;
+    }
     ReleaseSession(session);
 }
 
 void CASESessionManager::ReleaseSession(OperationalSessionSetup * session)
 {
+    // OperationalSessionReleaseDelegate override. No IsEstablishingSession() guard here:
+    // this overload's only callers are (1) OperationalSessionSetup itself, requesting
+    // self-destruction after its handshake has finished (success or terminal failure)
+    // -- by which point the setup is no longer "establishing" -- and (2) the peerId
+    // overload above, which has already applied the guard. A check here would be
+    // redundant with (2) and incorrect for (1), since (1) needs the release to happen.
     if (session != nullptr)
     {
         mConfig.sessionSetupPool->Release(session);

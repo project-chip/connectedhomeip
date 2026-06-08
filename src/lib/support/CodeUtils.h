@@ -29,110 +29,13 @@
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/ErrorStr.h>
+#include <lib/support/Assertions.h>
 #include <lib/support/ObjectDump.h>
-#include <lib/support/VerificationMacrosNoLogging.h>
 #include <lib/support/logging/TextOnlyLogging.h>
+#include <memory>
 
 /**
- * Base-level abnormal termination.
- *
- * Terminate the program immediately, without invoking destructors, atexit callbacks, etc.
- * Used to implement the default `chipDie()`.
- *
- * @note
- *  This should never be invoked directly by code outside this file.
- */
-#if !defined(CHIP_CONFIG_ABORT)
-#define CHIP_CONFIG_ABORT() abort()
-#endif
-
-/**
- *  @name chip-specific nlassert.h Overrides
- *
- *  @{
- *
- */
-
-/**
- *  @def NL_ASSERT_ABORT()
- *
- *  @brief
- *    This implements a chip-specific override for #NL_ASSERT_ABORT *
- *    from nlassert.h.
- *
- */
-#if !defined(NL_ASSERT_ABORT)
-#define NL_ASSERT_ABORT() chipAbort()
-#endif
-
-/**
- *  @def NL_ASSERT_LOG(aPrefix, aName, aCondition, aLabel, aFile, aLine, aMessage)
- *
- *  @brief
- *    This implements a chip-specific override for \c NL_ASSERT_LOG
- *    from nlassert.h.
- *
- *  @param[in]  aPrefix     A pointer to a NULL-terminated C string printed
- *                          at the beginning of the logged assertion
- *                          message. Typically this is and should be
- *                          \c NL_ASSERT_PREFIX_STRING.
- *  @param[in]  aName       A pointer to a NULL-terminated C string printed
- *                          following @a aPrefix that indicates what
- *                          module, program, application or subsystem
- *                          the assertion occurred in Typically this
- *                          is and should be
- *                          \c NL_ASSERT_COMPONENT_STRING.
- *  @param[in]  aCondition  A pointer to a NULL-terminated C string indicating
- *                          the expression that evaluated to false in
- *                          the assertion. Typically this is a
- *                          stringified version of the actual
- *                          assertion expression.
- *  @param[in]  aLabel      An optional pointer to a NULL-terminated C string
- *                          indicating, for exception-style
- *                          assertions, the label that will be
- *                          branched to when the assertion expression
- *                          evaluates to false.
- *  @param[in]  aFile       A pointer to a NULL-terminated C string indicating
- *                          the file in which the exception
- *                          occurred. Typically this is and should be
- *                          \_\_FILE\_\_ from the C preprocessor.
- *  @param[in]  aLine       The line number in @a aFile on which the assertion
- *                          expression evaluated to false. Typically
- *                          this is and should be \_\_LINE\_\_ from the C
- *                          preprocessor.
- *  @param[in]  aMessage    An optional pointer to a NULL-terminated C string
- *                          containing a caller-specified message
- *                          further describing the assertion failure.
- *
- */
-// clang-format off
-#if !defined(NL_ASSERT_LOG)
-#define NL_ASSERT_LOG(aPrefix, aName, aCondition, aLabel, aFile, aLine, aMessage)         \
-    do                                                                                    \
-    {                                                                                     \
-        ChipLogError(NotSpecified,                                                       \
-                      NL_ASSERT_LOG_FORMAT_DEFAULT,                                       \
-                      aPrefix,                                                            \
-                      (((aName) == 0) || (*(aName) == '\0')) ? "" : aName,                \
-                      (((aName) == 0) || (*(aName) == '\0')) ? "" : ": ",                 \
-                      aCondition,                                                         \
-                      (((aMessage) == 0) ? "" : aMessage),                                \
-                      (((aMessage) == 0) ? "" : ", "),                                    \
-                      aFile,                                                              \
-                      aLine);                                                             \
-    } while (0)
-#endif
-// clang-format on
-
-/**
- *  @} chip-specific nlassert.h Overrides
- *
- */
-
-#include <nlassert.h>
-
-/**
- *  @def ReturnErrorOnFailure(expr)
+ *  @def ReturnErrorOnFailure(expr, ...)
  *
  *  @brief
  *    Returns the error code if the expression returns an error. For a CHIP_ERROR expression, this means any value other
@@ -141,17 +44,19 @@
  *  Example usage:
  *
  *  @code
- *    ReturnErrorOnFailure(channel->SendMsg(msg));
+ *    ReturnErrorOnFailure(channel->SendMsg(msg), mState = Uninitialized);
  *  @endcode
  *
  *  @param[in]  expr        An expression to be tested.
+ *  @param[in]  ...         Statements to execute before returning. Optional.
  */
-#define ReturnErrorOnFailure(expr)                                                                                                 \
+#define ReturnErrorOnFailure(expr, ...)                                                                                            \
     do                                                                                                                             \
     {                                                                                                                              \
         auto __err = (expr);                                                                                                       \
         if (!::chip::ChipError::IsSuccess(__err))                                                                                  \
         {                                                                                                                          \
+            __VA_ARGS__;                                                                                                           \
             return __err;                                                                                                          \
         }                                                                                                                          \
     } while (false)
@@ -171,14 +76,15 @@
  *
  *  @param[in]  variantType   The Variant type that the calling function returns.
  *  @param[in]  expr          An expression to be tested.
-
+ *  @param[in]  ...         Statements to execute before returning. Optional.
  */
-#define ReturnErrorVariantOnFailure(variantType, expr)                                                                             \
+#define ReturnErrorVariantOnFailure(variantType, expr, ...)                                                                        \
     do                                                                                                                             \
     {                                                                                                                              \
         auto __err = (expr);                                                                                                       \
         if (!::chip::ChipError::IsSuccess(__err))                                                                                  \
         {                                                                                                                          \
+            __VA_ARGS__;                                                                                                           \
             return variantType::Create<CHIP_ERROR>(__err);                                                                         \
         }                                                                                                                          \
     } while (false)
@@ -210,7 +116,123 @@
     } while (false)
 
 /**
- *  @def ReturnOnFailure(expr)
+ *  @def SuccessOrLog(expr, MOD, MSG, ...)
+ *
+ *  @brief
+ *    If expr returns something other than CHIP_NO_ERROR, log a message for the specified module
+ *    in the 'Error' category.
+ *
+ *  Example usage:
+ *
+ *  @code
+ *    SuccessOrLog(channel->SendMsg(msg), Module, "Failure message: %s", param);
+ *  @endcode
+ *
+ *  @param[in]  expr        A scalar expression to be evaluated against CHIP_NO_ERROR.
+ *  @param[in]  MOD         The log module to use.
+ *  @param[in]  MSG         The log message format string.
+ *  @param[in]  ...         Optional arguments for the log message.
+ */
+#define SuccessOrLog(expr, MOD, MSG, ...)                                                                                          \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        CHIP_ERROR __lerr = (expr);                                                                                                \
+        if (!::chip::ChipError::IsSuccess(__lerr))                                                                                 \
+        {                                                                                                                          \
+            ChipLogFailure(__lerr, MOD, MSG, ##__VA_ARGS__);                                                                       \
+        }                                                                                                                          \
+    } while (false)
+
+/**
+ *  @def ReturnAndLogOnFailure(expr, MOD, MSG, ...)
+ *
+ *  @brief
+ *    If expr returns something than CHIP_NO_ERROR, log a chip message for the specified module
+ *    in the 'Error' category and return.
+ *
+ *  Example usage:
+ *
+ *  @code
+ *    ReturnAndLogOnFailure(channel->SendMsg(msg), Module, "Failure message: %s", param);
+ *  @endcode
+ *
+ *  @param[in]  expr        A scalar expression to be evaluated against CHIP_NO_ERROR.
+ *  @param[in]  MOD         The log module to use.
+ *  @param[in]  MSG         The log message format string.
+ *  @param[in]  ...         Optional arguments for the log message.
+ */
+#define ReturnAndLogOnFailure(expr, MOD, MSG, ...)                                                                                 \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        CHIP_ERROR __err = (expr);                                                                                                 \
+        if (!::chip::ChipError::IsSuccess(__err))                                                                                  \
+        {                                                                                                                          \
+            ChipLogFailure(__err, MOD, MSG, ##__VA_ARGS__);                                                                        \
+            return;                                                                                                                \
+        }                                                                                                                          \
+    } while (false)
+
+/**
+ *  @def ReturnErrorAndLogOnFailure(expr, MOD, MSG, ...)
+ *
+ *  @brief
+ *    If expr returns something than CHIP_NO_ERROR, log a chip message for the specified module
+ *    in the 'Error' category and return the error.
+ *
+ *  Example usage:
+ *
+ *  @code
+ *    ReturnErrorAndLogOnFailure(channel->SendMsg(msg), Module, "Failure message: %s", param);
+ *  @endcode
+ *
+ *  @param[in]  expr        A scalar expression to be evaluated against CHIP_NO_ERROR.
+ *  @param[in]  MOD         The log module to use.
+ *  @param[in]  MSG         The log message format string.
+ *  @param[in]  ...         Optional arguments for the log message.
+ */
+#define ReturnErrorAndLogOnFailure(expr, MOD, MSG, ...)                                                                            \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        CHIP_ERROR __err = (expr);                                                                                                 \
+        if (!::chip::ChipError::IsSuccess(__err))                                                                                  \
+        {                                                                                                                          \
+            ChipLogFailure(__err, MOD, MSG, ##__VA_ARGS__);                                                                        \
+            return __err;                                                                                                          \
+        }                                                                                                                          \
+    } while (false)
+
+/**
+ *  @def ReturnValueAndLogOnFailure(expr, value, MOD, MSG, ...)
+ *
+ *  @brief
+ *    If expr returns something other than CHIP_NO_ERROR, log a message for the specified module
+ *    in the 'Error' category and return the error.
+ *
+ *  Example usage:
+ *
+ *  @code
+ *    ReturnValueAndLogOnFailure(channel->SendMsg(msg), false, Module, "Failure message: %s", param);
+ *  @endcode
+ *
+ *  @param[in]  expr        A scalar expression to be evaluated against CHIP_NO_ERROR.
+ *  @param[in]  value       A value to return if @a expr is an error.
+ *  @param[in]  MOD         The log module to use.
+ *  @param[in]  MSG         The log message format string.
+ *  @param[in]  ...         Optional arguments for the log message.
+ */
+#define ReturnValueAndLogOnFailure(expr, value, MOD, MSG, ...)                                                                     \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        CHIP_ERROR __err = (expr);                                                                                                 \
+        if (!::chip::ChipError::IsSuccess(__err))                                                                                  \
+        {                                                                                                                          \
+            ChipLogFailure(__err, MOD, MSG, ##__VA_ARGS__);                                                                        \
+            return value;                                                                                                          \
+        }                                                                                                                          \
+    } while (false)
+
+/**
+ *  @def ReturnOnFailure(expr, ...)
  *
  *  @brief
  *    Returns if the expression returns an error. For a CHIP_ERROR expression, this means any value other
@@ -219,23 +241,25 @@
  *  Example usage:
  *
  *  @code
- *    ReturnOnFailure(channel->SendMsg(msg));
+ *    ReturnOnFailure(channel->SendMsg(msg), mState = Uninitialized);
  *  @endcode
  *
  *  @param[in]  expr        An expression to be tested.
+ *  @param[in]  ...         Statements to execute before returning. Optional.
  */
-#define ReturnOnFailure(expr)                                                                                                      \
+#define ReturnOnFailure(expr, ...)                                                                                                 \
     do                                                                                                                             \
     {                                                                                                                              \
         auto __err = (expr);                                                                                                       \
         if (!::chip::ChipError::IsSuccess(__err))                                                                                  \
         {                                                                                                                          \
+            __VA_ARGS__;                                                                                                           \
             return;                                                                                                                \
         }                                                                                                                          \
     } while (false)
 
 /**
- *  @def ReturnValueOnFailure(expr)
+ *  @def ReturnValueOnFailure(expr, value, ...)
  *
  *  @brief
  *    Returns value if the expression returns an error. For a CHIP_ERROR expression, this means any value other
@@ -244,7 +268,7 @@
  *  Example usage:
  *
  *  @code
- *    ReturnValueOnFailure(channel->SendMsg(msg), Status::Failure);
+ *    ReturnValueOnFailure(channel->SendMsg(msg), Status::Failure, mState = Uninitialized);
  *  @endcode
  *
  *  @param[in]  expr        An expression to be tested.
@@ -257,76 +281,8 @@
         auto __err = (expr);                                                                                                       \
         if (!::chip::ChipError::IsSuccess(__err))                                                                                  \
         {                                                                                                                          \
+            __VA_ARGS__;                                                                                                           \
             return value;                                                                                                          \
-        }                                                                                                                          \
-    } while (false)
-
-/**
- *  @def VerifyOrReturn(expr, ...)
- *
- *  @brief
- *    Returns from the void function if expression evaluates to false
- *
- *  Example usage:
- *
- *  @code
- *    VerifyOrReturn(param != nullptr, LogError("param is nullptr"));
- *  @endcode
- *
- *  @param[in]  expr        A Boolean expression to be evaluated.
- *  @param[in]  ...         Statements to execute before returning. Optional.
- */
-#define VerifyOrReturn(expr, ...)                                                                                                  \
-    do                                                                                                                             \
-    {                                                                                                                              \
-        if (!(expr))                                                                                                               \
-        {                                                                                                                          \
-            __VA_ARGS__;                                                                                                           \
-            return;                                                                                                                \
-        }                                                                                                                          \
-    } while (false)
-
-/**
- *  @def VerifyOrReturnError(expr, code, ...)
- *
- *  @brief
- *    Returns a specified error code if expression evaluates to false
- *
- *  Example usage:
- *
- *  @code
- *    VerifyOrReturnError(param != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
- *  @endcode
- *
- *  @param[in]  expr        A Boolean expression to be evaluated.
- *  @param[in]  code        A value to return if @a expr is false.
- *  @param[in]  ...         Statements to execute before returning. Optional.
- */
-#define VerifyOrReturnError(expr, code, ...) VerifyOrReturnValue(expr, code, ##__VA_ARGS__)
-
-/**
- *  @def VerifyOrReturnValue(expr, value, ...)
- *
- *  @brief
- *    Returns a specified value if expression evaluates to false
- *
- *  Example usage:
- *
- *  @code
- *    VerifyOrReturnError(param != nullptr, Foo());
- *  @endcode
- *
- *  @param[in]  expr        A Boolean expression to be evaluated.
- *  @param[in]  value       A value to return if @a expr is false.
- *  @param[in]  ...         Statements to execute before returning. Optional.
- */
-#define VerifyOrReturnValue(expr, value, ...)                                                                                      \
-    do                                                                                                                             \
-    {                                                                                                                              \
-        if (!(expr))                                                                                                               \
-        {                                                                                                                          \
-            __VA_ARGS__;                                                                                                           \
-            return (value);                                                                                                        \
         }                                                                                                                          \
     } while (false)
 
@@ -351,8 +307,9 @@
     {                                                                                                                              \
         if (!(expr))                                                                                                               \
         {                                                                                                                          \
-            ChipLogError(NotSpecified, "%s at %s:%d", ErrorStr(code), __FILE__, __LINE__);                                         \
-            return code;                                                                                                           \
+            auto __code = (code);                                                                                                  \
+            ChipLogError(NotSpecified, "%s at %s:%d", ErrorStr(__code), __FILE__, __LINE__);                                       \
+            return __code;                                                                                                         \
         }                                                                                                                          \
     } while (false)
 #else // CHIP_CONFIG_ERROR_SOURCE
@@ -361,11 +318,37 @@
     {                                                                                                                              \
         if (!(expr))                                                                                                               \
         {                                                                                                                          \
-            ChipLogError(NotSpecified, "%s:%d false: %" CHIP_ERROR_FORMAT, #expr, __LINE__, code.Format());                        \
-            return code;                                                                                                           \
+            auto __code = (code);                                                                                                  \
+            ChipLogError(NotSpecified, "%s:%d false: %" CHIP_ERROR_FORMAT, #expr, __LINE__, __code.Format());                      \
+            return __code;                                                                                                         \
         }                                                                                                                          \
     } while (false)
 #endif // CHIP_CONFIG_ERROR_SOURCE
+
+/**
+ *  @def SuccessOrShutdown(expr, ...)
+ *
+ *  @brief
+ *    This is expected to be called from within a class that implements a Shutdown method.
+ *    It checks for the specified error, which is expected to commonly be successful (CHIP_NO_ERROR),
+ *    on failure, it calls the statements to be executed before shutdown if provided,
+ *    then calls the Shutdown method of the class and returns the error.
+ *
+ *  @param[in]  expr  A ChipError object to be evaluated against success (CHIP_NO_ERROR).
+ *  @param[in]  ...     Statements to execute before shutdown. Optional.
+ *
+ */
+#define SuccessOrShutdown(expr, ...)                                                                                               \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        auto __err = (expr);                                                                                                       \
+        if (!::chip::ChipError::IsSuccess(__err))                                                                                  \
+        {                                                                                                                          \
+            __VA_ARGS__;                                                                                                           \
+            this->Shutdown();                                                                                                      \
+            return __err;                                                                                                          \
+        }                                                                                                                          \
+    } while (false)
 
 /**
  *  @def SuccessOrExit(error)
@@ -396,7 +379,7 @@
  *  @param[in]  error  A ChipError object to be evaluated against success (CHIP_NO_ERROR).
  *
  */
-#define SuccessOrExit(error) nlEXPECT(::chip::ChipError::IsSuccess((error)), exit)
+#define SuccessOrExit(error) VerifyOrExit(::chip::ChipError::IsSuccess((error)), {})
 
 /**
  *  @def SuccessOrExitAction(error, anAction)
@@ -409,109 +392,8 @@
  *
  *  @param[in]  error  A ChipError object to be evaluated against success (CHIP_NO_ERROR).
  */
-#define SuccessOrExitAction(error, action) nlEXPECT_ACTION(::chip::ChipError::IsSuccess((error)), exit, action)
+#define SuccessOrExitAction(error, action) VerifyOrExit(::chip::ChipError::IsSuccess((error)), action)
 
-/**
- *  @def VerifyOrExit(aCondition, anAction)
- *
- *  @brief
- *    This checks for the specified condition, which is expected to
- *    commonly be true, and both executes @a anAction and branches to
- *    the local label 'exit' if the condition is false.
- *
- *  Example Usage:
- *
- *  @code
- *  CHIP_ERROR MakeBuffer(const uint8_t *& buf)
- *  {
- *      CHIP_ERROR err = CHIP_NO_ERROR;
- *
- *      buf = (uint8_t *)malloc(1024);
- *      VerifyOrExit(buf != NULL, err = CHIP_ERROR_NO_MEMORY);
- *
- *      memset(buf, 0, 1024);
- *
- *  exit:
- *      return err;
- *  }
- *  @endcode
- *
- *  @param[in]  aCondition  A Boolean expression to be evaluated.
- *  @param[in]  anAction    An expression or block to execute when the
- *                          assertion fails.
- *
- */
-#define VerifyOrExit(aCondition, anAction) nlEXPECT_ACTION(aCondition, exit, anAction)
-
-/**
- *  @def ExitNow(...)
- *
- *  @brief
- *    This unconditionally executes @a ... and branches to the local
- *    label 'exit'.
- *
- *  @note The use of this interface implies neither success nor
- *        failure for the overall exit status of the enclosing function
- *        body.
- *
- *  Example Usage:
- *
- *  @code
- *  CHIP_ERROR ReadAll(Reader& reader)
- *  {
- *      CHIP_ERROR err;
- *
- *      while (true)
- *      {
- *          err = reader.ReadNext();
- *          if (err == CHIP_ERROR_AT_END)
- *              ExitNow(err = CHIP_NO_ERROR);
- *          SuccessOrExit(err);
- *          DoSomething();
- *      }
- *
- *  exit:
- *      return err;
- *  }
- *  @endcode
- *
- *  @param[in]  ...         Statements to execute. Optional.
- */
-// clang-format off
-#define ExitNow(...)                                                   \
-    do {                                                               \
-        __VA_ARGS__;                                                   \
-        goto exit;                                                     \
-    } while (0)
-// clang-format on
-
-/**
- *  @brief
- *    This is invoked when a #VerifyOrDie or #VerifyOrDieWithMsg
- *    assertion expression evaluates to false.
- *
- *    Developers may override and customize this by defining #chipDie
- *    before CodeUtils.h is included by the preprocessor.
- *
- *  Example Usage:
- *
- *  @code
- *  chipDie();
- *  @endcode
- *
- */
-#ifndef chipAbort
-extern "C" void chipAbort(void) __attribute((noreturn));
-
-inline void chipAbort(void)
-{
-    while (true)
-    {
-        // NL_ASSERT_ABORT is redefined to be chipAbort, so not useful here.
-        CHIP_CONFIG_ABORT();
-    }
-}
-#endif // chipAbort
 #ifndef chipDie
 extern "C" void chipDie(void) __attribute((noreturn));
 
@@ -548,10 +430,10 @@ inline void chipDie(void)
  */
 #if CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE && CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE_NO_COND
 #define VerifyOrDie(aCondition)                                                                                                    \
-    nlABORT_ACTION(aCondition, ChipLogError(Support, "VerifyOrDie failure at %s:%d", __FILE__, __LINE__))
+    VerifyOrDo(aCondition, ChipLogError(Support, "VerifyOrDie failure at %s:%d", __FILE__, __LINE__); chipAbort())
 #elif CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE
 #define VerifyOrDie(aCondition)                                                                                                    \
-    nlABORT_ACTION(aCondition, ChipLogError(Support, "VerifyOrDie failure at %s:%d: %s", __FILE__, __LINE__, #aCondition))
+    VerifyOrDo(aCondition, ChipLogError(Support, "VerifyOrDie failure at %s:%d: %s", __FILE__, __LINE__, #aCondition); chipAbort())
 #else // CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE
 #define VerifyOrDie(aCondition) VerifyOrDieWithoutLogging(aCondition)
 #endif // CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE
@@ -581,12 +463,22 @@ inline void chipDie(void)
  */
 #if CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE && CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE_NO_COND
 #define SuccessOrDie(error)                                                                                                        \
-    nlABORT_ACTION(::chip::ChipError::IsSuccess((error)),                                                                          \
-                   ChipLogError(Support, "SuccessOrDie failure %s at %s:%d", ErrorStr((error)), __FILE__, __LINE__))
+    do                                                                                                                             \
+    {                                                                                                                              \
+        auto __err = (error);                                                                                                      \
+        VerifyOrDo(::chip::ChipError::IsSuccess(__err),                                                                            \
+                   ChipLogError(Support, "SuccessOrDie failure %s at %s:%d", ErrorStr(__err), __FILE__, __LINE__);                 \
+                   chipAbort());                                                                                                   \
+    } while (false)
 #elif CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE
 #define SuccessOrDie(error)                                                                                                        \
-    nlABORT_ACTION(::chip::ChipError::IsSuccess((error)),                                                                          \
-                   ChipLogError(Support, "SuccessOrDie failure %s at %s:%d: %s", ErrorStr((error)), __FILE__, __LINE__, #error))
+    do                                                                                                                             \
+    {                                                                                                                              \
+        auto __err = (error);                                                                                                      \
+        VerifyOrDo(::chip::ChipError::IsSuccess(__err),                                                                            \
+                   ChipLogError(Support, "SuccessOrDie failure %s at %s:%d: %s", ErrorStr(__err), __FILE__, __LINE__, #error);     \
+                   chipAbort());                                                                                                   \
+    } while (false)
 #else // CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE
 #define SuccessOrDie(error) VerifyOrDieWithoutLogging(::chip::ChipError::IsSuccess((error)))
 #endif // CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE
@@ -600,8 +492,8 @@ inline void chipDie(void)
  */
 #if CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE
 #define VerifyOrDieWithObject(aCondition, aObject)                                                                                 \
-    nlABORT_ACTION(aCondition, ::chip::DumpObjectToLog(aObject);                                                                   \
-                   ChipLogError(Support, "VerifyOrDie failure at %s:%d: %s", __FILE__, __LINE__, #aCondition))
+    VerifyOrDo(aCondition, ::chip::DumpObjectToLog(aObject);                                                                       \
+               ChipLogError(Support, "VerifyOrDie failure at %s:%d: %s", __FILE__, __LINE__, #aCondition); chipAbort())
 #else // CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE
 #define VerifyOrDieWithObject(aCondition, aObject) VerifyOrDieWithoutLogging(aCondition)
 #endif // CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE
@@ -641,7 +533,7 @@ inline void chipDie(void)
  *
  */
 #define VerifyOrDieWithMsg(aCondition, aModule, aMessage, ...)                                                                     \
-    nlABORT_ACTION(aCondition, ChipLogError(aModule, aMessage, ##__VA_ARGS__))
+    VerifyOrDo(aCondition, ChipLogError(aModule, aMessage, ##__VA_ARGS__); chipAbort())
 
 /**
  *  @def LogErrorOnFailure(expr)
@@ -664,30 +556,6 @@ inline void chipDie(void)
         if (__err != CHIP_NO_ERROR)                                                                                                \
         {                                                                                                                          \
             ChipLogError(NotSpecified, "%s at %s:%d", ErrorStr(__err), __FILE__, __LINE__);                                        \
-        }                                                                                                                          \
-    } while (false)
-
-/**
- *  @def VerifyOrDo(expr, ...)
- *
- *  @brief
- *    do something if expression evaluates to false
- *
- *  Example usage:
- *
- * @code
- *    VerifyOrDo(param != nullptr, LogError("param is nullptr"));
- *  @endcode
- *
- *  @param[in]  expr        A Boolean expression to be evaluated.
- *  @param[in]  ...         Statements to execute.
- */
-#define VerifyOrDo(expr, ...)                                                                                                      \
-    do                                                                                                                             \
-    {                                                                                                                              \
-        if (!(expr))                                                                                                               \
-        {                                                                                                                          \
-            __VA_ARGS__;                                                                                                           \
         }                                                                                                                          \
     } while (false)
 
@@ -791,7 +659,6 @@ namespace chip {
  * Utility for checking, at compile time if the array is constexpr, whether an
  * array is sorted.  Can be used for static_asserts.
  */
-
 template <typename T>
 constexpr bool ArrayIsSorted(const T * aArray, size_t aLength)
 {
@@ -812,6 +679,32 @@ template <typename T, size_t N>
 constexpr bool ArrayIsSorted(const T (&aArray)[N])
 {
     return ArrayIsSorted(aArray, N);
+}
+
+/**
+ *  @def ScopeExit(fn)
+ *
+ *  @brief
+ *    RAII to automatically release resources on scope exit (instead of depending on goto exit)
+ *    See https://en.cppreference.com/w/cpp/experimental/scope_exit.html
+ *    Use with ReturnOnFailure, ReturnLogErrorOnFailure, ReturnAndLogOnFailure and other such methods
+ *    to return an error code result from a method call without needing to store in a local var
+ *
+ *  Example usage:
+ *
+ *  @code
+ *  Resource * resource = GetResource();
+ *  auto resourceHolder = ScopeExit([&] { resource->Release() });
+ *  // If the call below fails, logs, returns the error code, and calls resourceHolder
+ *  ReturnAndLogOnFailure(ProcessAndSaveResource(resource), Module, "Failure message: %s", param);
+ *  resourceHolder->release(); // Cancel clean-up at end of successful method
+ *  @endcode
+ */
+template <class F>
+__attribute__((always_inline)) inline auto ScopeExit(F && fn)
+{
+    auto deleter = [f = std::forward<F>(fn)](void *) mutable { f(); };
+    return std::unique_ptr<void, decltype(deleter)>(reinterpret_cast<void *>(1), std::move(deleter));
 }
 
 } // namespace chip

@@ -44,19 +44,14 @@
 #include "silabs_utils.h"
 #include "sl_si91x_ncp_utility.h"
 
-#if SL_MX25CTRL_MUX
-sl_status_t sl_wfx_host_spiflash_cs_assert(void);
-sl_status_t sl_wfx_host_spiflash_cs_deassert(void);
-#endif
-
 #if SL_BTLCTRL_MUX
 #include "btl_interface.h"
 #endif // SL_BTLCTRL_MUX
-#if SL_LCDCTRL_MUX
+#if defined(SL_LCDCTRL_MUX) && SL_LCDCTRL_MUX
 #include "sl_memlcd.h"
 #include "sl_memlcd_display.h"
 #define SL_SPIDRV_LCD_BITRATE SL_MEMLCD_SCLK_FREQ
-#endif // SL_LCDCTRL_MUX
+#endif // defined(SL_LCDCTRL_MUX) && SL_LCDCTRL_MUX
 #if SL_MX25CTRL_MUX
 #include "sl_mx25_flash_shutdown_usart_config.h"
 #endif // SL_MX25CTRL_MUX
@@ -66,7 +61,7 @@ StaticSemaphore_t spi_sem_peripheral;
 SemaphoreHandle_t spi_sem_sync_hdl;
 #endif // SL_SPICTRL_MUX
 
-#if SL_LCDCTRL_MUX
+#if defined(SL_LCDCTRL_MUX) && SL_LCDCTRL_MUX
 
 /********************************************************
  * @fn   sl_wfx_host_pre_lcd_spi_transfer(void)
@@ -103,7 +98,7 @@ sl_status_t sl_wfx_host_post_lcd_spi_transfer(void)
 #endif // SL_SPICTRL_MUX
     return status;
 }
-#endif // SL_LCDCTRL_MUX
+#endif // defined(SL_LCDCTRL_MUX) && SL_LCDCTRL_MUX
 
 #if SL_SPICTRL_MUX
 void SPIDRV_SetBaudrate(uint32_t baudrate)

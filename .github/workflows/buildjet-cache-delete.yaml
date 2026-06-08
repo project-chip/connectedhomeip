@@ -8,10 +8,10 @@ on:
         type: string
 jobs:
   manually-delete-buildjet-cache:
-    runs-on: buildjet-2vcpu-ubuntu-2204
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
-      - uses: buildjet/cache-delete@v1
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
+      - uses: buildjet/cache-delete@7184288b8396c4492a56728c47dd286fbd1e96ae # v1
         with:
           cache_key: ${{ inputs.cache_key }}

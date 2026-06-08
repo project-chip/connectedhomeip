@@ -18,10 +18,11 @@
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/clusters/tls-certificate-management-server/CertificateTableImpl.h>
-#include <app/clusters/tls-certificate-management-server/tls-certificate-management-server.h>
+#include <app/clusters/tls-certificate-management-server/CodegenIntegration.h>
 #include <clusters/TlsCertificateManagement/Commands.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <tls-certificate-management-instance.h>
+#include <tls-client-management-instance.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -39,13 +40,13 @@ static constexpr uint16_t kMaxIntermediateCerts = 10;
 
 struct InlineBufferedRootCert : CertificateTable::BufferedRootCert
 {
-    PersistentStore<CHIP_CONFIG_TLS_PERSISTED_ROOT_CERT_BYTES> buffer;
+    PersistenceBuffer<CHIP_CONFIG_TLS_PERSISTED_ROOT_CERT_BYTES> buffer;
     InlineBufferedRootCert() : CertificateTable::BufferedRootCert(buffer) {}
 };
 
 struct InlineBufferedClientCert : CertificateTable::BufferedClientCert
 {
-    PersistentStore<CHIP_CONFIG_TLS_PERSISTED_CLIENT_CERT_BYTES> buffer;
+    PersistenceBuffer<CHIP_CONFIG_TLS_PERSISTED_CLIENT_CERT_BYTES> buffer;
     InlineBufferedClientCert() : CertificateTable::BufferedClientCert(buffer) {}
 };
 
@@ -92,8 +93,16 @@ struct RefEncodableClientCert
     {
         VerifyOrReturnError(certificate != nullptr, CHIP_ERROR_INTERNAL);
 
-        MutableByteSpan targetBytes(certBytes);
-        ReturnErrorOnFailure(CopySpanToMutableSpan(src.clientCertificate.Value(), targetBytes));
+        if (!src.clientCertificate.Value().IsNull())
+        {
+            MutableByteSpan targetBytes(certBytes);
+            ReturnErrorOnFailure(CopySpanToMutableSpan(src.clientCertificate.Value().Value(), targetBytes));
+            certificate->clientCertificate.SetValue(Nullable<ByteSpan>(targetBytes));
+        }
+        else
+        {
+            certificate->clientCertificate.SetValue(Nullable<ByteSpan>());
+        }
 
         if (src.intermediateCertificates.HasValue())
         {
@@ -111,12 +120,11 @@ struct RefEncodableClientCert
         }
         else
         {
-            certificate->intermediateCertificates.ClearValue();
+            certificate->intermediateCertificates.SetValue(List<ByteSpan>());
         }
 
         certificate->fabricIndex = fabric;
         certificate->ccdid       = src.ccdid;
-        certificate->clientCertificate.SetValue(targetBytes);
         return CHIP_NO_ERROR;
     }
 };
@@ -128,37 +136,34 @@ struct InlineEncodableClientCert : RefEncodableClientCert
     InlineEncodableClientCert() : RefEncodableClientCert(inlineCertificate) {}
 };
 
-static constexpr uint8_t kMaxRootCerts   = 254;
-static constexpr uint8_t kMaxClientCerts = 254;
-
 CHIP_ERROR FingerprintMatch(const ByteSpan & fingerprint, const ByteSpan & cert, bool & outMatch)
 {
-    std::array<uint8_t, chip::Crypto::kSHA1_Hash_Length> fingerprintPayload = { 0 };
+    std::array<uint8_t, chip::Crypto::kSHA256_Hash_Length> fingerprintPayload = { 0 };
     MutableByteSpan calculatedFingerprint(fingerprintPayload);
-    ReturnErrorOnFailure(Hash_SHA1(cert.data(), cert.size(), fingerprintPayload.data()));
+    ReturnErrorOnFailure(Hash_SHA256(cert.data(), cert.size(), fingerprintPayload.data()));
     outMatch = fingerprint.data_equal(calculatedFingerprint);
     return CHIP_NO_ERROR;
 }
 
-ClusterStatusCode TlsCertificateManagementCommandDelegate::ProvisionRootCert(EndpointId matterEndpoint, FabricIndex fabric,
-                                                                             const ProvisionRootCertificateType & provisionReq,
-                                                                             Tls::TLSCAID & outCaid)
+Status TlsCertificateManagementCommandDelegate::ProvisionRootCert(EndpointId matterEndpoint, FabricIndex fabric,
+                                                                  const ProvisionRootCertificateType & provisionReq,
+                                                                  Tls::TLSCAID & outCaid)
 {
     auto localId = provisionReq.caid.IsNull() ? Optional<Tls::TLSCAID>() : Optional<Tls::TLSCAID>(provisionReq.caid.Value());
     UniquePtr<InlineBufferedRootCert> certBuffer(New<InlineBufferedRootCert>());
-    VerifyOrReturnError(certBuffer, ClusterStatusCode(CHIP_ERROR_NO_MEMORY));
+    VerifyOrReturnError(certBuffer, Status::ResourceExhausted);
 
     auto result = mCertificateTable.UpsertRootCertificateEntry(fabric, localId, certBuffer->buffer, provisionReq.certificate);
 
-    VerifyOrReturnValue(result == CHIP_NO_ERROR, ClusterStatusCode(Status::Failure));
+    VerifyOrReturnValue(result == CHIP_NO_ERROR, Status::Failure);
     outCaid = localId.Value();
-    return ClusterStatusCode(Status::Success);
+    return Status::Success;
 }
 
 CHIP_ERROR TlsCertificateManagementCommandDelegate::LoadedRootCerts(EndpointId matterEndpoint, FabricIndex fabric,
                                                                     LoadedRootCertificateCallback loadedCallback) const
 {
-    VerifyOrReturnError(matterEndpoint == EndpointId(1), CHIP_IM_GLOBAL_STATUS(ConstraintError));
+    VerifyOrReturnError(matterEndpoint == EndpointId(kRootEndpointId), CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
     UniquePtr<InlineBufferedRootCert> certBuffer(New<InlineBufferedRootCert>());
     UniquePtr<InlineEncodableRootCert> callbackCert(New<InlineEncodableRootCert>());
@@ -177,10 +182,10 @@ CHIP_ERROR TlsCertificateManagementCommandDelegate::LoadedRootCerts(EndpointId m
 CHIP_ERROR TlsCertificateManagementCommandDelegate::RootCertsForFabric(EndpointId matterEndpoint, FabricIndex fabric,
                                                                        RootCertificateListCallback loadedCallback) const
 {
-    VerifyOrReturnError(matterEndpoint == EndpointId(1), CHIP_IM_GLOBAL_STATUS(ConstraintError));
+    VerifyOrReturnError(matterEndpoint == EndpointId(kRootEndpointId), CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
     uint8_t numRootCerts;
-    mCertificateTable.GetRootCertificateCount(fabric, numRootCerts);
+    ReturnErrorOnFailure(mCertificateTable.GetRootCertificateCount(fabric, numRootCerts));
     ScopedMemoryBuffer<InlineEncodableRootCert> rootCertificatePayloads;
     ScopedMemoryBuffer<RootCertStructType> rootCertificates;
     rootCertificatePayloads.Alloc(numRootCerts);
@@ -206,7 +211,7 @@ CHIP_ERROR TlsCertificateManagementCommandDelegate::RootCertsForFabric(EndpointI
 CHIP_ERROR TlsCertificateManagementCommandDelegate::FindRootCert(EndpointId matterEndpoint, FabricIndex fabric, Tls::TLSCAID id,
                                                                  LoadedRootCertificateCallback loadedCallback) const
 {
-    VerifyOrReturnError(matterEndpoint == EndpointId(1), CHIP_IM_GLOBAL_STATUS(ConstraintError));
+    VerifyOrReturnError(matterEndpoint == EndpointId(kRootEndpointId), CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
     UniquePtr<InlineEncodableRootCert> callbackCert(New<InlineEncodableRootCert>());
     UniquePtr<InlineBufferedRootCert> certBuffer(New<InlineBufferedRootCert>());
@@ -219,7 +224,7 @@ CHIP_ERROR TlsCertificateManagementCommandDelegate::LookupRootCertByFingerprint(
                                                                                 const ByteSpan & fingerprint,
                                                                                 LoadedRootCertificateCallback loadedCallback) const
 {
-    VerifyOrReturnError(matterEndpoint == EndpointId(1), CHIP_IM_GLOBAL_STATUS(ConstraintError));
+    VerifyOrReturnError(matterEndpoint == EndpointId(kRootEndpointId), CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
     UniquePtr<InlineBufferedRootCert> certBuffer(New<InlineBufferedRootCert>());
     VerifyOrReturnError(certBuffer, CHIP_ERROR_NO_MEMORY);
@@ -245,15 +250,15 @@ CHIP_ERROR TlsCertificateManagementCommandDelegate::LookupRootCert(EndpointId ma
                                                                    const ByteSpan & certificate,
                                                                    LoadedRootCertificateCallback loadedCallback) const
 {
-    std::array<uint8_t, chip::Crypto::kSHA1_Hash_Length> fingerprintPayload = { 0 };
+    std::array<uint8_t, Crypto::kSHA256_Hash_Length> fingerprintPayload = { 0 };
     MutableByteSpan calculatedFingerprint(fingerprintPayload);
-    ReturnErrorOnFailure(Hash_SHA1(certificate.data(), certificate.size(), fingerprintPayload.data()));
+    ReturnErrorOnFailure(Hash_SHA256(certificate.data(), certificate.size(), fingerprintPayload.data()));
     return LookupRootCertByFingerprint(matterEndpoint, fabric, calculatedFingerprint, loadedCallback);
 }
 
 Status TlsCertificateManagementCommandDelegate::RemoveRootCert(EndpointId matterEndpoint, FabricIndex fabric, Tls::TLSCAID id)
 {
-    VerifyOrReturnValue(matterEndpoint == EndpointId(1), Status::ConstraintError);
+    VerifyOrReturnValue(matterEndpoint == EndpointId(kRootEndpointId), Status::ConstraintError);
 
     auto result = mCertificateTable.RemoveRootCertificate(fabric, id);
     if (result == CHIP_ERROR_NOT_FOUND)
@@ -270,7 +275,7 @@ Status TlsCertificateManagementCommandDelegate::GenerateClientCsr(EndpointId mat
                                                                   const ClientCsrType & request,
                                                                   GeneratedCsrCallback loadedCallback) const
 {
-    VerifyOrReturnValue(matterEndpoint == EndpointId(1), Status::ConstraintError);
+    VerifyOrReturnValue(matterEndpoint == EndpointId(kRootEndpointId), Status::ConstraintError);
 
     ScopedMemoryBuffer<uint8_t> csrData;
     csrData.Alloc(kSpecMaxCertBytes);
@@ -280,36 +285,46 @@ Status TlsCertificateManagementCommandDelegate::GenerateClientCsr(EndpointId mat
     std::array<uint8_t, 128> nonceData;
     MutableByteSpan nonceSignature(nonceData);
 
-    ScopedMemoryBuffer<uint8_t> nocsrElementsData;
-    size_t nocsrElementsSize = kSpecMaxCertBytes + 128 + /*tlvPadding=*/100;
-    nocsrElementsData.Alloc(nocsrElementsSize);
-    MutableByteSpan nocsrElementsBuffer(nocsrElementsData.Get(), nocsrElementsSize);
-
     ClientCsrResponseType csrResponse;
     UniquePtr<InlineBufferedClientCert> certBuffer(New<InlineBufferedClientCert>());
-    auto result = mCertificateTable.PrepareClientCertificate(fabric, request.nonce, certBuffer->buffer, nocsrElementsBuffer,
-                                                             csrResponse.ccdid, csr, nonceSignature);
-    VerifyOrReturnValue(result == CHIP_NO_ERROR, Status::Failure);
-    csrResponse.csr   = csr;
-    csrResponse.nonce = nonceSignature;
+    Optional<TLSCCDID> id;
+    if (!request.ccdid.IsNull())
+    {
+        id.SetValue(request.ccdid.Value());
+    }
+    auto result = mCertificateTable.PrepareClientCertificate(fabric, request.nonce, certBuffer->buffer, id, csr, nonceSignature);
+    ReturnValueOnFailure(result, Status::Failure);
+    csrResponse.ccdid          = id.Value();
+    csrResponse.csr            = csr;
+    csrResponse.nonceSignature = nonceSignature;
     return loadedCallback(csrResponse);
 }
 
-ClusterStatusCode TlsCertificateManagementCommandDelegate::ProvisionClientCert(EndpointId matterEndpoint, FabricIndex fabric,
-                                                                               const ProvisionClientCertificateType & provisionReq)
+Status TlsCertificateManagementCommandDelegate::ProvisionClientCert(EndpointId matterEndpoint, FabricIndex fabric,
+                                                                    const ProvisionClientCertificateType & provisionReq)
 {
     UniquePtr<InlineBufferedClientCert> certBuffer(New<InlineBufferedClientCert>());
-    VerifyOrReturnError(certBuffer, ClusterStatusCode(CHIP_ERROR_NO_MEMORY));
-    auto result = mCertificateTable.UpdateClientCertificateEntry(fabric, provisionReq.ccdid, certBuffer->buffer,
-                                                                 provisionReq.clientCertificateDetails);
-    VerifyOrReturnValue(result == CHIP_NO_ERROR, ClusterStatusCode(Status::Failure));
-    return ClusterStatusCode(Status::Success);
+    VerifyOrReturnError(certBuffer, Status::ResourceExhausted);
+
+    TLSClientCertificateDetailStruct::DecodableType details;
+    details.ccdid = provisionReq.ccdid;
+    details.clientCertificate.SetValue(provisionReq.clientCertificate);
+    details.intermediateCertificates.SetValue(provisionReq.intermediateCertificates);
+    details.SetFabricIndex(fabric);
+
+    auto result = mCertificateTable.UpdateClientCertificateEntry(fabric, provisionReq.ccdid, certBuffer->buffer, details);
+    if (result == CHIP_ERROR_INVALID_ARGUMENT)
+    {
+        return Status::DynamicConstraintError;
+    }
+    ReturnValueOnFailure(result, Status::Failure);
+    return Status::Success;
 }
 
 CHIP_ERROR TlsCertificateManagementCommandDelegate::LoadedClientCerts(EndpointId matterEndpoint, FabricIndex fabric,
                                                                       LoadedClientCertificateCallback loadedCallback) const
 {
-    VerifyOrReturnError(matterEndpoint == EndpointId(1), CHIP_IM_GLOBAL_STATUS(ConstraintError));
+    VerifyOrReturnError(matterEndpoint == EndpointId(kRootEndpointId), CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
     UniquePtr<InlineBufferedClientCert> certBuffer(New<InlineBufferedClientCert>());
     UniquePtr<InlineEncodableClientCert> callbackCert(New<InlineEncodableClientCert>());
@@ -329,10 +344,10 @@ CHIP_ERROR TlsCertificateManagementCommandDelegate::ClientCertsForFabric(Endpoin
                                                                          ClientCertificateListCallback loadedCallback) const
 {
 
-    VerifyOrReturnError(matterEndpoint == EndpointId(1), CHIP_IM_GLOBAL_STATUS(ConstraintError));
+    VerifyOrReturnError(matterEndpoint == EndpointId(kRootEndpointId), CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
     uint8_t numClientCerts;
-    mCertificateTable.GetClientCertificateCount(fabric, numClientCerts);
+    ReturnErrorOnFailure(mCertificateTable.GetClientCertificateCount(fabric, numClientCerts));
     UniquePtr<InlineBufferedClientCert> certBuffer(New<InlineBufferedClientCert>());
     ScopedMemoryBuffer<RefEncodableClientCert> clientCertificatePayloads;
     ScopedMemoryBuffer<ClientCertStructType> clientCertificates;
@@ -358,7 +373,7 @@ CHIP_ERROR TlsCertificateManagementCommandDelegate::ClientCertsForFabric(Endpoin
 CHIP_ERROR TlsCertificateManagementCommandDelegate::FindClientCert(EndpointId matterEndpoint, FabricIndex fabric, TLSCCDID id,
                                                                    LoadedClientCertificateCallback loadedCallback) const
 {
-    VerifyOrReturnError(matterEndpoint == EndpointId(1), CHIP_IM_GLOBAL_STATUS(ConstraintError));
+    VerifyOrReturnError(matterEndpoint == EndpointId(kRootEndpointId), CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
     UniquePtr<InlineBufferedClientCert> certBuffer(New<InlineBufferedClientCert>());
     UniquePtr<InlineEncodableClientCert> callbackCert(New<InlineEncodableClientCert>());
@@ -372,19 +387,19 @@ TlsCertificateManagementCommandDelegate::LookupClientCertByFingerprint(EndpointI
                                                                        const ByteSpan & fingerprint,
                                                                        LoadedClientCertificateCallback loadedCallback) const
 {
-    VerifyOrReturnError(matterEndpoint == EndpointId(1), CHIP_IM_GLOBAL_STATUS(ConstraintError));
+    VerifyOrReturnError(matterEndpoint == EndpointId(kRootEndpointId), CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
     UniquePtr<InlineBufferedClientCert> certBuffer(New<InlineBufferedClientCert>());
     return mCertificateTable.IterateClientCertificates(fabric, *certBuffer, [&](auto & iterator) -> CHIP_ERROR {
         while (iterator.Next(certBuffer->mCertWithKey))
         {
             const auto & cert = certBuffer->GetCert();
-            if (!cert.clientCertificate.HasValue())
+            if (cert.clientCertificate.Value().IsNull())
             {
                 continue;
             }
             bool match = false;
-            ReturnErrorOnFailure(FingerprintMatch(fingerprint, cert.clientCertificate.Value(), match));
+            ReturnErrorOnFailure(FingerprintMatch(fingerprint, cert.clientCertificate.Value().Value(), match));
             if (match)
             {
                 UniquePtr<InlineEncodableClientCert> callbackCert(New<InlineEncodableClientCert>());
@@ -402,15 +417,15 @@ CHIP_ERROR TlsCertificateManagementCommandDelegate::LookupClientCert(EndpointId 
                                                                      const ByteSpan & certificate,
                                                                      LoadedClientCertificateCallback loadedCallback) const
 {
-    std::array<uint8_t, chip::Crypto::kSHA1_Hash_Length> fingerprintPayload = { 0 };
+    std::array<uint8_t, Crypto::kSHA256_Hash_Length> fingerprintPayload = { 0 };
     MutableByteSpan calculatedFingerprint(fingerprintPayload);
-    ReturnErrorOnFailure(Hash_SHA1(certificate.data(), certificate.size(), fingerprintPayload.data()));
+    ReturnErrorOnFailure(Hash_SHA256(certificate.data(), certificate.size(), fingerprintPayload.data()));
     return LookupClientCertByFingerprint(matterEndpoint, fabric, calculatedFingerprint, loadedCallback);
 }
 
-Status TlsCertificateManagementCommandDelegate::RemoveClientCert(EndpointId matterEndpoint, FabricIndex fabric, Tls::TLSCAID id)
+Status TlsCertificateManagementCommandDelegate::RemoveClientCert(EndpointId matterEndpoint, FabricIndex fabric, Tls::TLSCCDID id)
 {
-    VerifyOrReturnValue(matterEndpoint == EndpointId(1), Status::ConstraintError);
+    VerifyOrReturnValue(matterEndpoint == EndpointId(kRootEndpointId), Status::ConstraintError);
 
     auto result = mCertificateTable.RemoveClientCertificate(fabric, id);
     if (result == CHIP_ERROR_NOT_FOUND)
@@ -425,17 +440,18 @@ Status TlsCertificateManagementCommandDelegate::RemoveClientCert(EndpointId matt
 
 static CertificateTableImpl gCertificateTableInstance;
 TlsCertificateManagementCommandDelegate TlsCertificateManagementCommandDelegate::instance(gCertificateTableInstance);
-static TlsCertificateManagementServer gTlsCertificateManagementClusterServerInstance =
-    TlsCertificateManagementServer(EndpointId(1), TlsCertificateManagementCommandDelegate::getInstance(), gCertificateTableInstance,
-                                   kMaxRootCerts, kMaxClientCerts);
 
-void emberAfTlsCertificateManagementClusterInitCallback(EndpointId matterEndpoint)
+namespace chip {
+namespace app {
+namespace Clusters {
+
+void InitializeTlsCertificateManagement()
 {
-    gCertificateTableInstance.SetEndpoint(EndpointId(1));
-    gTlsCertificateManagementClusterServerInstance.Init();
+    MatterTlsCertificateManagementSetDelegate(TlsCertificateManagementCommandDelegate::GetInstance());
+    MatterTlsCertificateManagementSetDependencyChecker(TlsClientManagementCommandDelegate::GetInstance());
+    MatterTlsCertificateManagementSetCertificateTable(gCertificateTableInstance);
 }
 
-void emberAfTlsCertificateManagementClusterShutdownCallback(EndpointId matterEndpoint)
-{
-    gTlsCertificateManagementClusterServerInstance.Finish();
-}
+} // namespace Clusters
+} // namespace app
+} // namespace chip

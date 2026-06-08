@@ -483,6 +483,6 @@ void emberAfRvcOperationalStateClusterInitCallback(chip::EndpointId endpointId)
 
     gRvcOperationalStateDelegate = std::make_unique<RvcOperationalStateDelegate>();
     gRvcOperationalStateInstance = std::make_unique<RvcOperationalState::Instance>(gRvcOperationalStateDelegate.get(), endpointId);
-    gRvcOperationalStateInstance->Init();
+    TEMPORARY_RETURN_IGNORED gRvcOperationalStateInstance->Init();
 }
 #endif // MATTER_DM_PLUGIN_RVC_OPERATIONAL_STATE_SERVER

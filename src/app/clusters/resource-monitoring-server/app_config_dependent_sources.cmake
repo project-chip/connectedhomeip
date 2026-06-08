@@ -12,13 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# This is the equivalent to app_config_dependent_sources.gni
+# app_config_dependent_sources.cmake
+# This block adds the codegen integration sources, similar to app_config_dependent_sources.gni
 TARGET_SOURCES(
   ${APP_TARGET}
   PRIVATE
-    "${CLUSTER_DIR}/replacement-product-list-manager.h"
-    "${CLUSTER_DIR}/resource-monitoring-cluster-objects.cpp"
-    "${CLUSTER_DIR}/resource-monitoring-cluster-objects.h"
-    "${CLUSTER_DIR}/resource-monitoring-server.cpp"
+    "${CLUSTER_DIR}/CodegenIntegration.h"
+    "${CLUSTER_DIR}/CodegenIntegration.cpp"
+    "${CLUSTER_DIR}/CodegenResourceMonitoringCluster.cpp"
+    "${CLUSTER_DIR}/CodegenResourceMonitoringCluster.h"
     "${CLUSTER_DIR}/resource-monitoring-server.h"
 )

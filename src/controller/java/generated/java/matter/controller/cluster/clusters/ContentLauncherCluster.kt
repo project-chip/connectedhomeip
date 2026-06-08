@@ -141,9 +141,7 @@ class ContentLauncherCluster(
 
       if (tag == ContextSpecificTag(TAG_STATUS)) {
         status_decoded = tlvReader.getUByte(tag)
-      }
-
-      if (tag == ContextSpecificTag(TAG_DATA)) {
+      } else if (tag == ContextSpecificTag(TAG_DATA)) {
         data_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -215,9 +213,7 @@ class ContentLauncherCluster(
 
       if (tag == ContextSpecificTag(TAG_STATUS)) {
         status_decoded = tlvReader.getUByte(tag)
-      }
-
-      if (tag == ContextSpecificTag(TAG_DATA)) {
+      } else if (tag == ContextSpecificTag(TAG_DATA)) {
         data_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)

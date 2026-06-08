@@ -35,6 +35,7 @@
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/Span.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 
 #include "CHIPAttCert_test_vectors.h"
 
@@ -137,7 +138,7 @@ TEST_F(TestDeviceAttestationCredentials, TestDACProvidersExample_Signature)
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
     EXPECT_EQ(out_sig_span.size(), kP256_ECDSA_Signature_Length_Raw);
-    da_signature.SetLength(out_sig_span.size());
+    EXPECT_SUCCESS(da_signature.SetLength(out_sig_span.size()));
 
     // Get DAC from the provider
     uint8_t dac_cert_buf[kMaxDERCertLength];
@@ -466,7 +467,7 @@ TEST_F(TestDeviceAttestationCredentials, TestDACRevocationDelegateImpl)
     EXPECT_EQ(attestationResult, AttestationVerificationResult::kSuccess);
 
     // Test empty json
-    revocationDelegateImpl.SetDeviceAttestationRevocationData("");
+    EXPECT_SUCCESS(revocationDelegateImpl.SetDeviceAttestationRevocationData(""));
     revocationDelegateImpl.CheckForRevokedDACChain(info, &attestationInformationVerificationCallback);
     revocationDelegateImpl.ClearDeviceAttestationRevocationData();
     EXPECT_EQ(attestationResult, AttestationVerificationResult::kSuccess);
@@ -481,7 +482,7 @@ TEST_F(TestDeviceAttestationCredentials, TestDACRevocationDelegateImpl)
         "revoked_serial_numbers": ["0C694F7F866067B2"]
     }]
     )";
-    revocationDelegateImpl.SetDeviceAttestationRevocationData(jsonData);
+    EXPECT_SUCCESS(revocationDelegateImpl.SetDeviceAttestationRevocationData(jsonData));
     revocationDelegateImpl.CheckForRevokedDACChain(info, &attestationInformationVerificationCallback);
     revocationDelegateImpl.ClearDeviceAttestationRevocationData();
     EXPECT_EQ(attestationResult, AttestationVerificationResult::kDacRevoked);
@@ -496,7 +497,7 @@ TEST_F(TestDeviceAttestationCredentials, TestDACRevocationDelegateImpl)
         "revoked_serial_numbers": ["3E6CE6509AD840CD"]
     }]
     )";
-    revocationDelegateImpl.SetDeviceAttestationRevocationData(jsonData);
+    EXPECT_SUCCESS(revocationDelegateImpl.SetDeviceAttestationRevocationData(jsonData));
     revocationDelegateImpl.CheckForRevokedDACChain(info, &attestationInformationVerificationCallback);
     revocationDelegateImpl.ClearDeviceAttestationRevocationData();
     EXPECT_EQ(attestationResult, AttestationVerificationResult::kPaiRevoked);
@@ -518,7 +519,7 @@ TEST_F(TestDeviceAttestationCredentials, TestDACRevocationDelegateImpl)
         "revoked_serial_numbers": ["3E6CE6509AD840CD"]
     }]
     )";
-    revocationDelegateImpl.SetDeviceAttestationRevocationData(jsonData);
+    EXPECT_SUCCESS(revocationDelegateImpl.SetDeviceAttestationRevocationData(jsonData));
     revocationDelegateImpl.CheckForRevokedDACChain(info, &attestationInformationVerificationCallback);
     EXPECT_EQ(attestationResult, AttestationVerificationResult::kPaiAndDacRevoked);
 
@@ -527,6 +528,7 @@ TEST_F(TestDeviceAttestationCredentials, TestDACRevocationDelegateImpl)
         ByteSpan(attestationElementsTestVector), ByteSpan(attestationChallengeTestVector), ByteSpan(attestationSignatureTestVector),
         TestCerts::sTestCert_PAI_FFF2_8001_Cert, TestCerts::sTestCert_DAC_FFF2_8001_0008_Cert, ByteSpan(attestationNonceTestVector),
         static_cast<VendorId>(0xFFF2), 0x8001);
+    EXPECT_SUCCESS(revocationDelegateImpl.SetDeviceAttestationRevocationData(jsonData));
     revocationDelegateImpl.CheckForRevokedDACChain(FFF2_8001_info, &attestationInformationVerificationCallback);
     revocationDelegateImpl.ClearDeviceAttestationRevocationData();
     EXPECT_EQ(attestationResult, AttestationVerificationResult::kSuccess);
@@ -542,7 +544,7 @@ TEST_F(TestDeviceAttestationCredentials, TestDACRevocationDelegateImpl)
         "revoked_serial_numbers": ["0C694F7F866067B2"]
     }]
     )";
-    revocationDelegateImpl.SetDeviceAttestationRevocationData(jsonData);
+    EXPECT_SUCCESS(revocationDelegateImpl.SetDeviceAttestationRevocationData(jsonData));
     revocationDelegateImpl.CheckForRevokedDACChain(info, &attestationInformationVerificationCallback);
     revocationDelegateImpl.ClearDeviceAttestationRevocationData();
     EXPECT_EQ(attestationResult, AttestationVerificationResult::kSuccess);
@@ -558,7 +560,7 @@ TEST_F(TestDeviceAttestationCredentials, TestDACRevocationDelegateImpl)
         "revoked_serial_numbers": ["0C694F7F866067B2"]
     }]
     )";
-    revocationDelegateImpl.SetDeviceAttestationRevocationData(jsonData);
+    EXPECT_SUCCESS(revocationDelegateImpl.SetDeviceAttestationRevocationData(jsonData));
     revocationDelegateImpl.CheckForRevokedDACChain(info, &attestationInformationVerificationCallback);
     revocationDelegateImpl.ClearDeviceAttestationRevocationData();
     EXPECT_EQ(attestationResult, AttestationVerificationResult::kSuccess);
@@ -574,7 +576,7 @@ TEST_F(TestDeviceAttestationCredentials, TestDACRevocationDelegateImpl)
         "revoked_serial_numbers": ["3E6CE6509AD840CD1", "BC694F7F866067B1"]
     }]
     )";
-    revocationDelegateImpl.SetDeviceAttestationRevocationData(jsonData);
+    EXPECT_SUCCESS(revocationDelegateImpl.SetDeviceAttestationRevocationData(jsonData));
     revocationDelegateImpl.CheckForRevokedDACChain(info, &attestationInformationVerificationCallback);
     revocationDelegateImpl.ClearDeviceAttestationRevocationData();
     EXPECT_EQ(attestationResult, AttestationVerificationResult::kSuccess);
@@ -590,7 +592,7 @@ TEST_F(TestDeviceAttestationCredentials, TestDACRevocationDelegateImpl)
         "revoked_serial_numbers": ["0C694F7F866067B21234"]
     }]
     )";
-    revocationDelegateImpl.SetDeviceAttestationRevocationData(jsonData);
+    EXPECT_SUCCESS(revocationDelegateImpl.SetDeviceAttestationRevocationData(jsonData));
     revocationDelegateImpl.CheckForRevokedDACChain(info, &attestationInformationVerificationCallback);
     revocationDelegateImpl.ClearDeviceAttestationRevocationData();
     EXPECT_EQ(attestationResult, AttestationVerificationResult::kSuccess);
@@ -607,7 +609,7 @@ TEST_F(TestDeviceAttestationCredentials, TestDACRevocationDelegateImpl)
         "revoked_serial_numbers": ["0C694F7F866067B2"]
     }]
     )";
-    revocationDelegateImpl.SetDeviceAttestationRevocationData(jsonData);
+    EXPECT_SUCCESS(revocationDelegateImpl.SetDeviceAttestationRevocationData(jsonData));
     revocationDelegateImpl.CheckForRevokedDACChain(info, &attestationInformationVerificationCallback);
     revocationDelegateImpl.ClearDeviceAttestationRevocationData();
     EXPECT_EQ(attestationResult, AttestationVerificationResult::kDacRevoked);
@@ -623,7 +625,7 @@ TEST_F(TestDeviceAttestationCredentials, TestDACRevocationDelegateImpl)
     }]
     )";
 
-    revocationDelegateImpl.SetDeviceAttestationRevocationData(jsonData);
+    EXPECT_SUCCESS(revocationDelegateImpl.SetDeviceAttestationRevocationData(jsonData));
     revocationDelegateImpl.CheckForRevokedDACChain(info, &attestationInformationVerificationCallback);
     revocationDelegateImpl.ClearDeviceAttestationRevocationData();
     EXPECT_EQ(attestationResult, AttestationVerificationResult::kSuccess);
@@ -639,7 +641,7 @@ TEST_F(TestDeviceAttestationCredentials, TestDACRevocationDelegateImpl)
     }]
     )";
 
-    revocationDelegateImpl.SetDeviceAttestationRevocationData(jsonData);
+    EXPECT_SUCCESS(revocationDelegateImpl.SetDeviceAttestationRevocationData(jsonData));
     revocationDelegateImpl.CheckForRevokedDACChain(info, &attestationInformationVerificationCallback);
     revocationDelegateImpl.ClearDeviceAttestationRevocationData();
     EXPECT_EQ(attestationResult, AttestationVerificationResult::kSuccess);
@@ -657,7 +659,7 @@ TEST_F(TestDeviceAttestationCredentials, TestDACRevocationDelegateImpl)
     }]
     )";
 
-    revocationDelegateImpl.SetDeviceAttestationRevocationData(jsonData);
+    EXPECT_SUCCESS(revocationDelegateImpl.SetDeviceAttestationRevocationData(jsonData));
     revocationDelegateImpl.CheckForRevokedDACChain(info, &attestationInformationVerificationCallback);
     revocationDelegateImpl.ClearDeviceAttestationRevocationData();
     EXPECT_EQ(attestationResult, AttestationVerificationResult::kSuccess);

@@ -20,12 +20,74 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/clusters/push-av-stream-transport-server/constants.h>
+#include <lib/core/TLVTags.h>
 #include <vector>
 
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace PushAvStreamTransport {
+
+// Size calculation for CMAFContainerStorage
+// CMAFInterface: 1 byte
+// segmentDuration: 2 bytes
+// chunkDuration: 2 bytes
+// sessionGroup: 1 byte
+// mTrackNameBuffer: 16 bytes
+// metadataEnabled: ~2 bytes (EstimateStructOverhead)
+static constexpr size_t kCMAFContainerStorageSize = TLV::EstimateStructOverhead(sizeof(uint8_t), sizeof(uint16_t), sizeof(uint16_t),
+                                                                                sizeof(uint8_t), kMaxTrackNameLength, sizeof(bool));
+
+// Size calculation for ContainerOptionsStorage
+// containerType: 1 byte
+// mCMAFContainerStorage: kCMAFContainerStorageSize
+static constexpr size_t kContainerOptionsStorageSize = TLV::EstimateStructOverhead(sizeof(uint8_t), kCMAFContainerStorageSize);
+
+// Size of MotionTimeControl struct
+static constexpr size_t kMotionTimeControlSize =
+    TLV::EstimateStructOverhead(sizeof(uint16_t), sizeof(uint16_t), sizeof(uint32_t), sizeof(uint16_t));
+
+// Size calculation for TransportZoneOptions
+// Depends on CHIP_CONFIG_MAX_NUM_ZONES
+static constexpr size_t kTransportZoneOptionsSize =
+    2 /* Array Overhead */ + (CHIP_CONFIG_MAX_NUM_ZONES * TLV::EstimateStructOverhead(sizeof(uint16_t), sizeof(uint8_t)));
+
+// Size calculation for TriggerOptionsStorage
+// triggerType: 1 byte
+// mTransportZoneOptions: kTransportZoneOptionsSize
+// motionSensitivity: 1 byte
+// motionTimeControl: kMotionTimeControlSize
+// maxPreRollLen: 2 bytes
+static constexpr size_t kTriggerOptionsStorageSize = TLV::EstimateStructOverhead(
+    sizeof(uint8_t), kTransportZoneOptionsSize, sizeof(uint8_t), kMotionTimeControlSize, sizeof(uint16_t));
+
+static constexpr size_t kTransportOptionsStorageSize =
+    TLV::EstimateStructOverhead(sizeof(uint8_t),              // streamUsage
+                                sizeof(uint16_t),             // videoStreamID
+                                sizeof(uint16_t),             // audioStreamID
+                                sizeof(uint16_t),             // TLSEndpointID
+                                kMaxUrlLength,                // max url
+                                sizeof(uint8_t),              // ingestMethod
+                                sizeof(uint32_t),             // expiryTime
+                                kTriggerOptionsStorageSize,   // triggerOptions
+                                kContainerOptionsStorageSize, // containerOptions
+                                2u /* Array Overhead */ +
+                                    CHIP_CONFIG_MAX_NUM_CAMERA_VIDEO_STREAMS *
+                                        TLV::EstimateStructOverhead(kMaxStreamNameLength /* stream name */, sizeof(uint16_t)),
+                                2u /* Array Overhead */ +
+                                    CHIP_CONFIG_MAX_NUM_CAMERA_AUDIO_STREAMS *
+                                        TLV::EstimateStructOverhead(kMaxStreamNameLength /* stream name */, sizeof(uint16_t)));
+
+static constexpr size_t kMaxOneCurrentConnectionSerializedSize =
+    TLV::EstimateStructOverhead(sizeof(uint16_t),             // connectionID
+                                sizeof(uint8_t),              // transportStatus
+                                kTransportOptionsStorageSize, // estimated transportOptions
+                                sizeof(FabricIndex)           // fabricIndex
+    );
+
+// Max size for the TLV-encoded array of CurrentConnection structs
+static constexpr size_t kMaxCurrentConnectionsSerializedSize = 2 /* ArrayTlvOverhead */ +
+    (CHIP_CONFIG_MAX_FABRICS * CHIP_CONFIG_MAX_NUM_PUSH_TRANSPORTS * kMaxOneCurrentConnectionSerializedSize);
 
 /**
  * @brief Storage implementation for transport trigger options.
@@ -74,6 +136,9 @@ struct TransportTriggerOptionsStorage : public TransportTriggerOptionsStruct
 
         triggerType = aTransportTriggerOptions.triggerType;
 
+        // Reset before repopulating, as done for video/audio streams.
+        mTransportZoneOptions.clear();
+
         auto & motionZonesList = aTransportTriggerOptions.motionZones;
 
         if (triggerType == TransportTriggerTypeEnum::kMotion && motionZonesList.HasValue())
@@ -95,7 +160,9 @@ struct TransportTriggerOptionsStorage : public TransportTriggerOptionsStruct
             }
             else
             {
-                motionZones.Value().SetNull();
+                // The incoming motionZones field is present and explicitly null; SetValue()
+                // makes the stored Optional present with a null Nullable.
+                motionZones.SetValue(DataModel::NullNullable);
             }
         }
         else
@@ -121,7 +188,6 @@ private:
 
 /**
  * @brief Storage implementation for CMAF container options.
- * Manages fixed-size buffers for CENC keys and IDs with bounds checking.
  * Must be used when CMAF container configurations need persistent key storage.
  */
 struct CMAFContainerOptionsStorage : public CMAFContainerOptionsStruct
@@ -147,37 +213,21 @@ struct CMAFContainerOptionsStorage : public CMAFContainerOptionsStruct
 
     CMAFContainerOptionsStorage & operator=(const Structs::CMAFContainerOptionsStruct::Type & aCMAFContainerOptions)
     {
-        chunkDuration = aCMAFContainerOptions.chunkDuration;
+        CMAFInterface   = aCMAFContainerOptions.CMAFInterface;
+        segmentDuration = aCMAFContainerOptions.segmentDuration;
+        chunkDuration   = aCMAFContainerOptions.chunkDuration;
+        sessionGroup    = aCMAFContainerOptions.sessionGroup;
 
-        CENCKey = aCMAFContainerOptions.CENCKey;
-
-        CENCKeyID = aCMAFContainerOptions.CENCKeyID;
-
-        if (CENCKey.HasValue())
+        if (aCMAFContainerOptions.trackName.HasValue())
         {
-            MutableByteSpan CENCKeyBuffer(mCENCKeyBuffer);
-            // ValidateIncomingTransportOptions() function already checked the CENCKey length
-            CopySpanToMutableSpan(aCMAFContainerOptions.CENCKey.Value(), CENCKeyBuffer);
-            CENCKey.SetValue(CENCKeyBuffer);
-        }
-        else
-        {
-            CENCKey.ClearValue();
+
+            MutableCharSpan trackNameBuffer(mTrackNameBuffer);
+            // ValidateIncomingTransportOptions() function already checked the trackName length
+            CopyCharSpanToMutableCharSpanWithTruncation(aCMAFContainerOptions.trackName.Value(), trackNameBuffer);
+            trackName.SetValue(trackNameBuffer);
         }
 
         metadataEnabled = aCMAFContainerOptions.metadataEnabled;
-
-        if (CENCKeyID.HasValue())
-        {
-            MutableByteSpan CENCKeyIDBuffer(mCENCKeyIDBuffer);
-            // ValidateIncomingTransportOptions() function already checked the CENCKeyID length
-            CopySpanToMutableSpan(aCMAFContainerOptions.CENCKeyID.Value(), CENCKeyIDBuffer);
-            CENCKeyID.SetValue(CENCKeyIDBuffer);
-        }
-        else
-        {
-            CENCKeyID.ClearValue();
-        }
 
         return *this;
     }
@@ -188,8 +238,7 @@ struct CMAFContainerOptionsStorage : public CMAFContainerOptionsStruct
     }
 
 private:
-    uint8_t mCENCKeyBuffer[kMaxCENCKeyLength];
-    uint8_t mCENCKeyIDBuffer[kMaxCENCKeyIDLength];
+    char mTrackNameBuffer[kMaxTrackNameLength];
 };
 
 /**
@@ -258,7 +307,7 @@ struct TransportOptionsStorage : public TransportOptionsStruct
         streamUsage   = aTransportOptionsStorage.streamUsage;
         videoStreamID = aTransportOptionsStorage.videoStreamID;
         audioStreamID = aTransportOptionsStorage.audioStreamID;
-        endpointID    = aTransportOptionsStorage.endpointID;
+        TLSEndpointID = aTransportOptionsStorage.TLSEndpointID;
 
         // Deep copy the URL buffer
         std::memcpy(mUrlBuffer, aTransportOptionsStorage.mUrlBuffer, kMaxUrlLength);
@@ -275,6 +324,42 @@ struct TransportOptionsStorage : public TransportOptionsStruct
 
         expiryTime = aTransportOptionsStorage.expiryTime;
 
+        // Deep copy flat stream name buffers
+        std::memcpy(mVideoStreamNameBuffer.data(), aTransportOptionsStorage.mVideoStreamNameBuffer.data(),
+                    aTransportOptionsStorage.mVideoStreamNameBufferUsed);
+        std::memcpy(mAudioStreamNameBuffer.data(), aTransportOptionsStorage.mAudioStreamNameBuffer.data(),
+                    aTransportOptionsStorage.mAudioStreamNameBufferUsed);
+        mVideoStreamNameBufferUsed = aTransportOptionsStorage.mVideoStreamNameBufferUsed;
+        mAudioStreamNameBufferUsed = aTransportOptionsStorage.mAudioStreamNameBufferUsed;
+
+        // Copy video streams storage (base types only)
+        mVideoStreamsStorage = aTransportOptionsStorage.mVideoStreamsStorage;
+
+        // Rebind videoStreams list view to point to our storage
+        if (!mVideoStreamsStorage.empty())
+        {
+            videoStreams.SetValue(
+                DataModel::List<const Structs::VideoStreamStruct::Type>(mVideoStreamsStorage.data(), mVideoStreamsStorage.size()));
+        }
+        else
+        {
+            videoStreams.ClearValue();
+        }
+
+        // Copy audio streams storage (base types only)
+        mAudioStreamsStorage = aTransportOptionsStorage.mAudioStreamsStorage;
+
+        // Rebind audioStreams list view to point to our storage
+        if (!mAudioStreamsStorage.empty())
+        {
+            audioStreams.SetValue(
+                DataModel::List<const Structs::AudioStreamStruct::Type>(mAudioStreamsStorage.data(), mAudioStreamsStorage.size()));
+        }
+        else
+        {
+            audioStreams.ClearValue();
+        }
+
         return *this;
     }
 
@@ -283,7 +368,7 @@ struct TransportOptionsStorage : public TransportOptionsStruct
         streamUsage   = transportOptions.streamUsage;
         videoStreamID = transportOptions.videoStreamID;
         audioStreamID = transportOptions.audioStreamID;
-        endpointID    = transportOptions.endpointID;
+        TLSEndpointID = transportOptions.TLSEndpointID;
 
         MutableCharSpan urlBuffer(mUrlBuffer);
         // ValidateIncomingTransportOptions() function already checked the url length
@@ -300,15 +385,166 @@ struct TransportOptionsStorage : public TransportOptionsStruct
 
         expiryTime = transportOptions.expiryTime;
 
+        // Handle videoStreams from decodable type - perform deep copy into flat buffer
+        if (transportOptions.videoStreams.HasValue())
+        {
+            mVideoStreamsStorage.clear();
+            mVideoStreamNameBufferUsed = 0;
+            auto iter                  = transportOptions.videoStreams.Value().begin();
+            while (iter.Next())
+            {
+                auto & videoStream = iter.GetValue();
+                Structs::VideoStreamStruct::Type newStream;
+                newStream.videoStreamID = videoStream.videoStreamID;
+
+                // Deep copy stream name into flat buffer
+                size_t offset = mVideoStreamNameBufferUsed;
+                MutableCharSpan nameBuffer(mVideoStreamNameBuffer.data() + offset, kMaxStreamNameLength);
+                CopyCharSpanToMutableCharSpanWithTruncation(videoStream.videoStreamName, nameBuffer);
+                newStream.videoStreamName = nameBuffer;
+
+                mVideoStreamsStorage.push_back(newStream);
+                mVideoStreamNameBufferUsed += kMaxStreamNameLength;
+            }
+            videoStreams.SetValue(
+                DataModel::List<const Structs::VideoStreamStruct::Type>(mVideoStreamsStorage.data(), mVideoStreamsStorage.size()));
+        }
+        else
+        {
+            mVideoStreamsStorage.clear();
+            mVideoStreamNameBufferUsed = 0;
+            videoStreams.ClearValue();
+        }
+
+        // Handle audioStreams from decodable type - perform deep copy into flat buffer
+        if (transportOptions.audioStreams.HasValue())
+        {
+            mAudioStreamsStorage.clear();
+            mAudioStreamNameBufferUsed = 0;
+            auto iter                  = transportOptions.audioStreams.Value().begin();
+            while (iter.Next())
+            {
+                auto & audioStream = iter.GetValue();
+                Structs::AudioStreamStruct::Type newStream;
+                newStream.audioStreamID = audioStream.audioStreamID;
+
+                // Deep copy stream name into flat buffer
+                size_t offset = mAudioStreamNameBufferUsed;
+                MutableCharSpan nameBuffer(mAudioStreamNameBuffer.data() + offset, kMaxStreamNameLength);
+                CopyCharSpanToMutableCharSpanWithTruncation(audioStream.audioStreamName, nameBuffer);
+                newStream.audioStreamName = nameBuffer;
+
+                mAudioStreamsStorage.push_back(newStream);
+                mAudioStreamNameBufferUsed += kMaxStreamNameLength;
+            }
+            audioStreams.SetValue(
+                DataModel::List<const Structs::AudioStreamStruct::Type>(mAudioStreamsStorage.data(), mAudioStreamsStorage.size()));
+        }
+        else
+        {
+            mAudioStreamsStorage.clear();
+            mAudioStreamNameBufferUsed = 0;
+            audioStreams.ClearValue();
+        }
+
         return *this;
     }
 
     TransportOptionsStorage(const Structs::TransportOptionsStruct::DecodableType & transportOptions) { *this = transportOptions; }
 
+    // Public methods to manage video streams without exposing internal storage
+    void ClearVideoStreams()
+    {
+        mVideoStreamsStorage.clear();
+        mVideoStreamNameBufferUsed = 0;
+        videoStreams.ClearValue();
+    }
+
+    void AddVideoStream(const Structs::VideoStreamStruct::Type & videoStream)
+    {
+        // Deep copy stream name into flat buffer
+        size_t offset = mVideoStreamNameBufferUsed;
+        MutableCharSpan nameBuffer(mVideoStreamNameBuffer.data() + offset, kMaxStreamNameLength);
+        CopyCharSpanToMutableCharSpanWithTruncation(videoStream.videoStreamName, nameBuffer);
+
+        Structs::VideoStreamStruct::Type newStream;
+        newStream.videoStreamID   = videoStream.videoStreamID;
+        newStream.videoStreamName = nameBuffer;
+
+        mVideoStreamsStorage.push_back(newStream);
+        mVideoStreamNameBufferUsed += kMaxStreamNameLength;
+
+        videoStreams.SetValue(
+            DataModel::List<const Structs::VideoStreamStruct::Type>(mVideoStreamsStorage.data(), mVideoStreamsStorage.size()));
+    }
+
+    void UpdateVideoStreamsList()
+    {
+        if (!mVideoStreamsStorage.empty())
+        {
+            videoStreams.SetValue(
+                DataModel::List<const Structs::VideoStreamStruct::Type>(mVideoStreamsStorage.data(), mVideoStreamsStorage.size()));
+        }
+        else
+        {
+            videoStreams.ClearValue();
+        }
+    }
+
+    // Public methods to manage audio streams without exposing internal storage
+    void ClearAudioStreams()
+    {
+        mAudioStreamsStorage.clear();
+        mAudioStreamNameBufferUsed = 0;
+        audioStreams.ClearValue();
+    }
+
+    void AddAudioStream(const Structs::AudioStreamStruct::Type & audioStream)
+    {
+        // Deep copy stream name into flat buffer
+        size_t offset = mAudioStreamNameBufferUsed;
+        MutableCharSpan nameBuffer(mAudioStreamNameBuffer.data() + offset, kMaxStreamNameLength);
+        CopyCharSpanToMutableCharSpanWithTruncation(audioStream.audioStreamName, nameBuffer);
+
+        Structs::AudioStreamStruct::Type newStream;
+        newStream.audioStreamID   = audioStream.audioStreamID;
+        newStream.audioStreamName = nameBuffer;
+
+        mAudioStreamsStorage.push_back(newStream);
+        mAudioStreamNameBufferUsed += kMaxStreamNameLength;
+
+        audioStreams.SetValue(
+            DataModel::List<const Structs::AudioStreamStruct::Type>(mAudioStreamsStorage.data(), mAudioStreamsStorage.size()));
+    }
+
+    void UpdateAudioStreamsList()
+    {
+        if (!mAudioStreamsStorage.empty())
+        {
+            audioStreams.SetValue(
+                DataModel::List<const Structs::AudioStreamStruct::Type>(mAudioStreamsStorage.data(), mAudioStreamsStorage.size()));
+        }
+        else
+        {
+            audioStreams.ClearValue();
+        }
+    }
+
 private:
     char mUrlBuffer[kMaxUrlLength];
     TransportTriggerOptionsStorage mTriggerOptionsStorage;
     ContainerOptionsStorage mContainerOptionsStorage;
+
+    // Use base types for DataModel::List compatibility (correct memory layout)
+    std::vector<Structs::VideoStreamStruct::Type> mVideoStreamsStorage;
+    std::vector<Structs::AudioStreamStruct::Type> mAudioStreamsStorage;
+
+    // Separate flat storage for stream names (deep copy buffers)
+    std::array<char, 16 * kMaxStreamNameLength> mVideoStreamNameBuffer;
+    std::array<char, 16 * kMaxStreamNameLength> mAudioStreamNameBuffer;
+
+    size_t mVideoStreamNameBufferUsed = 0;
+    size_t mAudioStreamNameBufferUsed = 0;
 };
 
 /**

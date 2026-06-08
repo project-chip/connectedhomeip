@@ -1,5 +1,5 @@
 #
-#    Copyright (c) 2022-2025 Project CHIP Authors
+#    Copyright (c) 2022-2026 Project CHIP Authors
 #    All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,6 +15,8 @@
 #    limitations under the License.
 #
 
+from __future__ import annotations
+
 import asyncio
 import inspect
 import json
@@ -22,20 +24,19 @@ import logging
 import os
 import queue
 import random
+import select
 import shlex
+import socket
+import subprocess
 import textwrap
 import time
 import typing
-from dataclasses import dataclass
-from datetime import datetime, timedelta, timezone
+from dataclasses import asdict, dataclass, fields
+from datetime import UTC, datetime, timedelta
 from enum import IntFlag
-from typing import Any, Callable, List, Optional, Type, Union
+from typing import Any, Callable, Optional, Union
 
-import matter.testing.conversions as conversions
-import matter.testing.decorators as decorators
 import matter.testing.matchers as matchers
-import matter.testing.runner as runner
-import matter.testing.timeoperations as timeoperations
 
 # isort: off
 
@@ -52,10 +53,13 @@ import matter.logging
 import matter.native
 import matter.testing.global_stash as global_stash
 from matter.clusters import Attribute, ClusterObjects
+from matter.clusters.Types import NullValue
+from matter.exceptions import ChipStackError
 from matter.interaction_model import InteractionModelError, Status
 from matter.setup_payload import SetupPayload
 from matter.testing.commissioning import (CommissioningInfo, CustomCommissioningParameters, SetupPayloadInfo, commission_devices,
                                           get_setup_payload_info_config)
+from matter.testing.decorators import _has_attribute, _has_cluster, _has_command, _has_feature
 from matter.testing.global_attribute_ids import GlobalAttributeIds
 from matter.testing.matter_stack_state import MatterStackState
 from matter.testing.matter_test_config import MatterTestConfig
@@ -70,10 +74,12 @@ from matter.tlv import uint
 StepNumber = Union[int, str]  # Test step numbers can be integers or strings
 OptionalTimeout = Optional[int]  # Optional timeout values
 
-logger = logging.getLogger("matter.python_testing")
-logger.setLevel(logging.INFO)
+LOGGER = logging.getLogger(__name__)
+LOGGER.setLevel(logging.INFO)
 
 DiscoveryFilterType = ChipDeviceCtrl.DiscoveryFilterType
+
+_SUMMARY_MAX_HEX_CHARS = 128
 
 
 class TestError(Exception):
@@ -87,6 +93,17 @@ def clear_queue(report_queue: queue.Queue):
             report_queue.get(block=False)
         except queue.Empty:
             break
+
+
+def get_first_setup_code(dev_ctrl: ChipDeviceCtrl.ChipDeviceControllerBase, matter_test_config: MatterTestConfig) -> Optional[str]:
+    created_codes = []
+    for idx, discriminator in enumerate(matter_test_config.discriminators):
+        created_codes.append(dev_ctrl.CreateManualCode(discriminator, matter_test_config.setup_passcodes[idx]))
+
+    setup_codes = matter_test_config.qr_code_content + matter_test_config.manual_code + created_codes
+    if not setup_codes:
+        return None
+    return setup_codes[0]
 
 
 @dataclass
@@ -120,7 +137,7 @@ class AttributeMatcher:
         return self._description
 
     @staticmethod
-    def from_callable(description: str, matcher: Callable[[AttributeValue], bool]) -> "AttributeMatcher":
+    def from_callable(description: str, matcher: Callable[[AttributeValue], bool]) -> AttributeMatcher:
         """Take a single callable and wrap it into an AttributeMatcher object. Useful to wrap closures."""
         class AttributeMatcherFromCallable(AttributeMatcher):
             def __init__(self, description, matcher: Callable[[AttributeValue], bool]):
@@ -133,6 +150,7 @@ class AttributeMatcher:
         return AttributeMatcherFromCallable(description, matcher)
 
 
+@dataclass
 class SetupParameters:
     passcode: int
     vendor_id: int = 0xFFF1
@@ -153,14 +171,1027 @@ class SetupParameters:
                                                         self.custom_flow, self.capabilities, self.version)
 
 
+@dataclass
+class TestCleanupConfig:
+    """
+    A class to keep track of which cleanup steps should be performed.
+    Default behavior: all cleanup steps are enabled. Test classes can disable individual steps by
+    setting flags in setup_test or in the test method body, after calling super().
+    """
+
+    # DUT clean-up items
+    disarm_failsafes: bool = True              # sends ArmFailSafe(expiryLengthSeconds=0) on GeneralCommissioning
+    reset_acls_to_default: bool = True         # restores ACL on endpoint 0 to the state captured before the test ran
+    close_commissioning_windows: bool = True   # sends RevokeCommissioning on AdministratorCommissioning
+    remove_extra_fabrics: bool = True          # removes all fabrics on the DUT except TH1's via RemoveFabric
+    purge_scenes: bool = True                  # calls RemoveAllScenes per group on every ScenesManagement endpoint
+    purge_groups: bool = True                  # removes all non-IPK group key sets and clears GroupKeyMap
+    purge_group_memberships: bool = True       # calls RemoveAllGroups on every Groups endpoint
+    purge_doorlock: bool = True                # clears all DoorLock credentials and users
+    purge_tls_endpoints: bool = True           # removes all provisioned endpoints via TlsClientManagement
+    unregister_icd_clients: bool = True        # unregisters all entries from IcdManagement.RegisteredClients
+
+    # Controller clean-up items
+    shutdown_extra_controllers: bool = True    # shuts down extra controllers and removes their CAs from storage
+
+    @classmethod
+    def disabled(cls) -> TestCleanupConfig:
+        """Returns a config with all cleanup steps disabled."""
+        return cls(**{f.name: False for f in fields(cls)})
+
+
 class MatterBaseTest(base_test.BaseTestClass):
+    def __init_subclass__(cls, **kwargs):
+        super().__init_subclass__(**kwargs)
+        if 'teardown_test' in cls.__dict__:
+            original = cls.__dict__['teardown_test']
+
+            def _wrapped_teardown(self, _original=original):
+                _original(self)
+                MatterBaseTest.teardown_test(self)
+
+            cls.teardown_test = _wrapped_teardown
+
     def __init__(self, *args):
         super().__init__(*args)
 
         # List of accumulated problems across all tests
         self.problems = []
         self.is_commissioning = False
-        self.cached_steps: dict[str, list[TestStep]] = {}
+        self.cached_steps: dict[str, Optional[list[TestStep]]] = {}
+        self.cleanup_config = TestCleanupConfig()
+        self._extra_controllers: list[ChipDeviceCtrl.ChipDeviceController] = []
+        self._extra_cas: list[matter.CertificateAuthority.CertificateAuthority] = []
+        self._original_acl = None
+        self._framework_cleanup_done = False
+        # Set to True by commission_devices() on success; gates the per-test ACL read in
+        # setup_test so unit tests (which never commission) incur zero network overhead.
+        self._dut_confirmed_available = False
+        # Prevents double-execution when the override calls super().teardown_test()
+        # and __init_subclass__ also calls it afterward.
+        self._teardown_ran = False
+
+    #
+    # Mobly Test Controller Methods (Framework Interface)
+    #
+    # The test framework defines a set of named methods that can be used to set up or tear down tests.
+    # setup_class is called once after class initialization, once per class, before any test_ methods are run.
+    # setup_test is called once before each test_ function is run
+    # teardown_test is called once after each test_
+    # teardown_class is called after the last test_ function in the class is run
+    #
+    # Test authors may overwrite these methods to assist in performing setup and tear down.
+    # Test classes that overwrite these functions should ensure the base functions are called as appropriate.
+    # setup_ methods  should call the super() method at the start
+    # teardown_ methods should call the super() method at the end
+    #
+
+    def setup_class(self):
+        """Set up the test class before running any tests.
+
+        Initializes cluster mapping, step tracking, and global test state.
+        Called once per test class by the Mobly framework.
+
+        Test authors may overwrite this method in the derived class to perform setup that is common for all tests.
+        This function is called only once for the class. To perform setup before each test, use setup_test.
+        Test authors that implement steps in this function need to be careful of step handling if there is
+        more than one test in the class.
+        Test authors that implement this method should ensure super().setup_class() is called before any
+        custom setup.
+
+        """
+        super().setup_class()
+
+        # Set a hook on FabricAdmin so every NewController() call during this test automatically
+        # populates self._extra_controllers. This is used during cleanup in teardown_class.
+        matter.FabricAdmin.FabricAdmin._new_controller_hook = self._on_new_controller_created
+
+        # Mappings of cluster IDs to names and metadata.
+        # TODO: Move to using non-generated code and rather use data model description (.matter or .xml)
+        self.cluster_mapper = ClusterMapper(self.default_controller._Cluster)
+        self.current_step_index = 0
+        self.step_start_time = datetime.now(UTC)
+        self.step_skipped = False
+        # self.stored_global_wildcard stores value of self.global_wildcard after first async call.
+        # Because setup_class can be called before commissioning, this variable is lazy-initialized
+        # where the read is deferred until the first guard function call that requires global attributes.
+        self.stored_global_wildcard = None
+
+    def teardown_class(self):
+        """Final teardown after all tests: run framework cleanup, log problems, dump attributes.
+
+        Runs _run_framework_cleanup() once after all test methods in the class have
+        completed. Framework cleanup is class-scoped rather than per-test because
+        multi-test classes run sequentially — between-test cleanup is not required
+        and would interfere with intentional class-scoped DUT state.
+
+        Test authors may overwrite this method in the derived class to perform teardown
+        that is common for all tests. This function is called only once per class.
+        Test authors that implement this method should ensure super().teardown_class()
+        is called after any custom teardown code.
+        """
+        self.event_loop.run_until_complete(self._run_framework_cleanup())
+
+        # Clear the hook set in setup_class; self._extra_controllers, if any, is fully populated by now.
+        matter.FabricAdmin.FabricAdmin._new_controller_hook = None
+
+        if len(self.problems) > 0:
+            # Attempt to dump device attribute data for debugging when problems are found during Confirmation Tests
+            if self.matter_test_config.debug:
+                self._dump_device_attributes_on_failure()
+
+            LOGGER.info("###########################################################")
+            LOGGER.info("Problems found:")
+            LOGGER.info("===============")
+            for problem in self.problems:
+                LOGGER.info(str(problem))
+            LOGGER.info("###########################################################")
+        self._log_execution_parameters_summary()
+        super().teardown_class()
+
+    async def async_teardown_test(self) -> None:
+        """Override to add async class-level teardown without @async_test_body boilerplate.
+
+        Called once from _run_framework_cleanup (which runs in teardown_class) before
+        any framework cleanup steps run, so the DUT and all controllers are still
+        fully available.
+
+        For per-test async teardown, override teardown_test with @async_test_body instead.
+        """
+        pass
+
+    async def _run_framework_cleanup(self) -> None:
+        """Runs all enabled cleanup steps once at class teardown.
+
+        Called from teardown_class after all test methods have run. DUT-side cleanup
+        runs first (while the default controller is still active), followed by
+        controller-side cleanup. Each step is gated by TestCleanupConfig so individual
+        steps can be disabled by test authors when needed.
+
+        Wildcard attributes are pre-fetched once so all cluster-presence checks within
+        a single cleanup pass share the same read.
+        """
+
+        # If a teardown_test override already called this (per-test cleanup
+        # opt-in), teardown_class will skip it to avoid running cleanup twice.
+        if self._framework_cleanup_done:
+            return
+        self._framework_cleanup_done = True
+        await self.async_teardown_test()
+
+        # If setup_test could not read the ACL, the DUT was unreachable at test
+        # start, skip DUT cleanup to avoid a slow network discovery attempt.
+        dut_reachable = self._original_acl is not None
+        if dut_reachable:
+            try:
+                # Lightweight reachability check, confirm the DUT is still alive before attempting cleanup.
+                await self.default_controller.Read(
+                    self.dut_node_id,
+                    [(0, Clusters.BasicInformation.Attributes.VendorID)]
+                )
+            except Exception as e:  # DUT may be unreachable or mid-reboot; skip all DUT cleanup rather than failing the test
+                LOGGER.warning(f"[CLN] DUT is unreachable, skipping all DUT cleanup: {e}")
+                dut_reachable = False
+
+        if dut_reachable:
+            await self._populate_wildcard()
+            # DUT cleanup (run first as controller must still be alive to send commands)
+            # - Scenes must be removed before group memberships: RemoveAllScenes requires the target
+            #   group to still exist on the DUT, so group memberships cannot be cleared first.
+            if self.cleanup_config.disarm_failsafes:
+                await self._disarm_failsafes()
+            if self.cleanup_config.reset_acls_to_default:
+                await self._reset_acls_to_default()
+            if self.cleanup_config.close_commissioning_windows:
+                await self._close_commissioning_windows()
+            if self.cleanup_config.remove_extra_fabrics:
+                await self._remove_extra_fabrics()
+            if self.cleanup_config.purge_scenes:
+                await self._purge_scenes()
+            if self.cleanup_config.purge_groups:
+                await self._purge_groups()
+            if self.cleanup_config.purge_group_memberships:
+                await self._purge_group_memberships()
+            if self.cleanup_config.purge_doorlock:
+                await self._purge_doorlock()
+            if self.cleanup_config.purge_tls_endpoints:
+                await self._purge_tls_endpoints()
+            if self.cleanup_config.unregister_icd_clients:
+                await self._unregister_icd_clients()
+
+        # Controller cleanup (runs regardless, no DUT connection needed)
+        if self.cleanup_config.shutdown_extra_controllers:
+            self._shutdown_extra_controllers()
+
+    def _on_new_controller_created(self, controller: ChipDeviceCtrl.ChipDeviceController) -> None:
+        """Hook set and fired by FabricAdmin for every NewController() call.
+
+        Skips the default controller and any controller that opts out of per-test
+        cleanup tracking by setting _skip_cleanup_tracking = True. Use the opt-out
+        for class-scoped controllers that must outlive individual tests.
+
+        Args:
+            controller: The controller that was created.
+        """
+        if not getattr(controller, '_is_default_controller', False) and not getattr(controller, '_skip_cleanup_tracking', False):
+
+            # Track controller for shutdown in teardown_class
+            self._extra_controllers.append(controller)
+
+            # Track the controller's CA so it can be removed from
+            # persistent storage after controller shutdown
+            fa = controller.fabricAdmin
+            if fa is not None:
+                ca = fa.certificateAuthority
+                if ca not in self._extra_cas:
+                    self._extra_cas.append(ca)
+
+    def _shutdown_extra_controllers(self) -> None:
+        """Shuts down all extra controllers created during the test run and
+        removes their CAs from persistent storage (admin_storage.json).
+        """
+        for ctrl in self._extra_controllers:
+            try:
+                LOGGER.info(f"[CLN] shutting down controller nodeId={ctrl.nodeId:#x}")
+                ctrl.Shutdown()
+                LOGGER.info(f"[CLN] controller nodeId={ctrl.nodeId:#x} shut down successfully")
+            except Exception as e:  # Shutdown can fail if the controller is already stopped or the stack is in a bad state
+                LOGGER.warning(f"[CLN] controller shutdown failed: {e}")
+        self._extra_controllers.clear()
+
+        # Shut down each CA and remove it from the manager's active list and from
+        # persistent storage (caList in admin_storage.json) directly.
+        mgr = self.certificate_authority_manager
+        for ca in self._extra_cas:
+            try:
+                LOGGER.info(f"[CLN] shutting down CA index {ca.caIndex}")
+                ca.Shutdown()
+                if ca in mgr._activeCaList:
+                    mgr._activeCaList.remove(ca)
+                ca_list = mgr._persistentStorage.GetKey('caList') or {}
+                if str(ca.caIndex) in ca_list:
+                    del ca_list[str(ca.caIndex)]
+                    mgr._persistentStorage.SetKey('caList', ca_list)
+                LOGGER.info(f"[CLN] CA index {ca.caIndex} removed successfully")
+            except Exception as e:  # Storage may be inconsistent if the controller was shut down in a bad state
+                LOGGER.warning(f"[CLN] CA removal failed: {e}")
+        self._extra_cas.clear()
+
+    async def _disarm_failsafes(self) -> None:
+        """Sends ArmFailSafe(expiryLengthSeconds=0) to disarm any active failsafe on the DUT."""
+        LOGGER.info("[CLN] sending ArmFailSafe(0) to disarm any active failsafe")
+        try:
+            resp = typing.cast(
+                Clusters.GeneralCommissioning.Commands.ArmFailSafeResponse,
+                await self.send_single_cmd(
+                    cmd=Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=uint(0)),
+                    endpoint=0
+                )
+            )
+            if resp.errorCode != Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kOk:
+                LOGGER.warning(f"[CLN] disarm failsafe returned errorCode {resp.errorCode}")
+            else:
+                LOGGER.info("[CLN] failsafe disarmed successfully")
+        except Exception as e:  # DUT may be unreachable or session may have expired; log and continue cleanup
+            LOGGER.warning(f"[CLN] disarm failsafe failed: {e}")
+
+    async def _reset_acls_to_default(self) -> None:
+        """Restores the ACL on endpoint 0 to the state captured before the test ran.
+
+        Uses the ACL saved in setup_test (_original_acl).
+        """
+        if self._original_acl is None:
+            LOGGER.warning("[CLN] no pre-test ACL captured, skipping ACL restore")
+            return
+        LOGGER.info("[CLN] restoring ACL to pre-test state")
+        try:
+            result = await self.default_controller.WriteAttribute(
+                self.dut_node_id,
+                [(0, Clusters.AccessControl.Attributes.Acl(self._original_acl))]
+            )
+            if result[0].Status != Status.Success:
+                LOGGER.warning(f"[CLN] ACL reset returned status {result[0].Status}")
+            else:
+                LOGGER.info("[CLN] ACL restored successfully")
+        except Exception as e:  # Session may have expired or DUT ACL may be in a state that rejects the write
+            LOGGER.warning(f"[CLN] ACL reset failed: {e}")
+
+    async def _remove_extra_fabrics(self) -> None:
+        """Removes any fabric on the DUT that is not the default controller's fabric."""
+        try:
+            # Read TH1's fabric index on the DUT via the default controller
+            th1_fabric_index = await self.read_single_attribute_check_success(
+                cluster=Clusters.OperationalCredentials,  # type: ignore[arg-type]
+                attribute=Clusters.OperationalCredentials.Attributes.CurrentFabricIndex,
+                endpoint=0
+            )
+
+            # Read all fabrics unfiltered so we see every fabric, not just TH1's
+            fabrics = typing.cast(
+                list[Clusters.OperationalCredentials.Structs.FabricDescriptorStruct],
+                await self.read_single_attribute_check_success(
+                    cluster=Clusters.OperationalCredentials,  # type: ignore[arg-type]
+                    attribute=Clusters.OperationalCredentials.Attributes.Fabrics,
+                    endpoint=0,
+                    fabric_filtered=False
+                )
+            )
+        except Exception as e:  # DUT may be unreachable or session may have expired after a multi-fabric test
+            LOGGER.warning(
+                f"[CLN] could not read fabric list (DUT unreachable, session expired, or attribute read error), skipping fabric removal: {e}")
+            return
+
+        extra_fabric_indices = [f.fabricIndex for f in fabrics if f.fabricIndex != th1_fabric_index]
+
+        if not extra_fabric_indices:
+            LOGGER.info("[CLN] no extra fabrics to remove")
+            return
+
+        LOGGER.info(f"[CLN] removing {len(extra_fabric_indices)} extra fabric(s) from DUT")
+        for fabric_index in extra_fabric_indices:
+            LOGGER.info(f"[CLN] sending RemoveFabric(fabricIndex={fabric_index})")
+            try:
+                await self.send_single_cmd(
+                    cmd=Clusters.OperationalCredentials.Commands.RemoveFabric(fabricIndex=fabric_index),
+                    endpoint=0
+                )
+                LOGGER.info(f"[CLN] fabric index {fabric_index} removed successfully")
+            except Exception as e:  # RemoveFabric may fail if the fabric was already removed by the test or a prior cleanup
+                LOGGER.warning(f"[CLN] RemoveFabric({fabric_index}) failed: {e}")
+
+    async def _purge_groups(self) -> None:
+        """Removes all non-IPK group key sets and clears the group key map on the DUT.
+
+        Key set 0 (IPK) is skipped as it cannot be removed.
+        """
+        LOGGER.info("[CLN] purging group key sets and key map")
+        try:
+            resp = typing.cast(
+                Clusters.GroupKeyManagement.Commands.KeySetReadAllIndicesResponse,
+                await self.send_single_cmd(
+                    cmd=Clusters.GroupKeyManagement.Commands.KeySetReadAllIndices(),
+                    endpoint=0
+                )
+            )
+
+            # Remove all non-IPK key sets, key set 0 (IPK) cannot be removed
+            for key_set_id in resp.groupKeySetIDs:
+                if key_set_id != 0:
+                    LOGGER.info(f"[CLN] removing group key set {key_set_id}")
+                    await self.send_single_cmd(
+                        cmd=Clusters.GroupKeyManagement.Commands.KeySetRemove(groupKeySetID=key_set_id),
+                        endpoint=0
+                    )
+        except Exception as e:  # DUT may be unreachable, or key sets may already be absent; skip rather than aborting cleanup
+            LOGGER.warning(f"[CLN] key set removal failed: {e}")
+
+        # Clear all group key mappings
+        try:
+            result = await self.default_controller.WriteAttribute(
+                self.dut_node_id,
+                [(0, Clusters.GroupKeyManagement.Attributes.GroupKeyMap([]))]
+            )
+            if result[0].Status != Status.Success:
+                LOGGER.warning(f"[CLN] GroupKeyMap clear returned status {result[0].Status}")
+            else:
+                LOGGER.info("[CLN] group key map cleared successfully")
+        except Exception as e:  # Write may fail if session expired or the DUT rejected the empty map
+            LOGGER.warning(f"[CLN] GroupKeyMap clear failed: {e}")
+
+    async def _purge_scenes(self) -> None:
+        """Removes all scenes from all groups on every endpoint that has ScenesManagement.
+
+        Must run before _purge_group_memberships since RemoveAllScenes needs the group to
+        still exist on the DUT.
+        """
+        if self.stored_global_wildcard is None:
+            LOGGER.info("[CLN] wildcard not available, skipping scene cleanup")
+            return
+
+        for endpoint_id in self.stored_global_wildcard.attributes:
+            if not _has_cluster(wildcard=self.stored_global_wildcard, endpoint=endpoint_id,
+                                cluster=Clusters.ScenesManagement):  # type: ignore[arg-type]
+                continue
+            if not _has_cluster(wildcard=self.stored_global_wildcard, endpoint=endpoint_id,
+                                cluster=Clusters.Groups):  # type: ignore[arg-type]
+                continue
+            try:
+                resp = typing.cast(
+                    Clusters.Groups.Commands.GetGroupMembershipResponse,
+                    await self.send_single_cmd(
+                        cmd=Clusters.Groups.Commands.GetGroupMembership(groupList=[]),
+                        endpoint=endpoint_id
+                    )
+                )
+                group_ids = resp.groupList
+                if not group_ids:
+                    continue
+                LOGGER.info(f"[CLN] removing scenes for groups {group_ids} on endpoint {endpoint_id}")
+                for gid in group_ids:
+                    await self.send_single_cmd(
+                        cmd=Clusters.ScenesManagement.Commands.RemoveAllScenes(groupID=gid),
+                        endpoint=endpoint_id
+                    )
+                LOGGER.info(f"[CLN] scenes cleared on endpoint {endpoint_id}")
+            except Exception as e:  # DUT may be unreachable or the group may have been removed by the test
+                LOGGER.warning(f"[CLN] scene removal failed on endpoint {endpoint_id}: {e}")
+
+    async def _purge_group_memberships(self) -> None:
+        """Removes all group memberships from the DUT's group table.
+
+        Must run after _purge_scenes since scenes need their groups to still exist for RemoveAllScenes.
+        """
+        if self.stored_global_wildcard is None:
+            LOGGER.info("[CLN] wildcard not available, skipping group membership cleanup")
+            return
+
+        found_any = False
+        for endpoint_id in self.stored_global_wildcard.attributes:
+            if not _has_cluster(wildcard=self.stored_global_wildcard, endpoint=endpoint_id,
+                                cluster=Clusters.Groups):  # type: ignore[arg-type]
+                continue
+            found_any = True
+            LOGGER.info(f"[CLN] sending RemoveAllGroups on endpoint {endpoint_id}")
+            try:
+                await self.send_single_cmd(
+                    cmd=Clusters.Groups.Commands.RemoveAllGroups(),
+                    endpoint=endpoint_id
+                )
+                LOGGER.info(f"[CLN] group memberships cleared on endpoint {endpoint_id}")
+            except Exception as e:  # DUT may be unreachable or session may have expired after a multi-fabric test
+                LOGGER.warning(f"[CLN] RemoveAllGroups failed on endpoint {endpoint_id}: {e}")
+        if not found_any:
+            LOGGER.info("[CLN] Groups cluster not present on any endpoint, skipping group membership cleanup")
+
+    async def _purge_doorlock(self) -> None:
+        """Clears all DoorLock users and credentials on every endpoint with the DoorLock cluster."""
+        if self.stored_global_wildcard is None:
+            LOGGER.info("[CLN] wildcard not available, skipping DoorLock cleanup")
+            return
+
+        found_any = False
+        for endpoint_id in self.stored_global_wildcard.attributes:
+            if not _has_cluster(wildcard=self.stored_global_wildcard, endpoint=endpoint_id,
+                                cluster=Clusters.DoorLock):  # type: ignore[arg-type]
+                continue
+            found_any = True
+            LOGGER.info(f"[CLN] clearing DoorLock users and credentials on endpoint {endpoint_id}")
+            try:
+                await self.send_single_cmd(
+                    cmd=Clusters.DoorLock.Commands.ClearCredential(credential=NullValue),
+                    endpoint=endpoint_id,
+                    timedRequestTimeoutMs=1000
+                )
+                await self.send_single_cmd(
+                    cmd=Clusters.DoorLock.Commands.ClearUser(userIndex=uint(0xFFFE)),
+                    endpoint=endpoint_id,
+                    timedRequestTimeoutMs=1000
+                )
+                LOGGER.info(f"[CLN] DoorLock users and credentials cleared on endpoint {endpoint_id}")
+            except Exception as e:  # DUT may be unreachable or DoorLock may be in a state that rejects the clear
+                LOGGER.warning(f"[CLN] DoorLock cleanup failed on endpoint {endpoint_id}: {e}")
+        if not found_any:
+            LOGGER.info("[CLN] DoorLock cluster not present on any endpoint, skipping DoorLock cleanup")
+
+    async def _purge_tls_endpoints(self) -> None:
+        """Removes all provisioned TLS endpoints on every endpoint with TlsClientManagement.
+
+        Uses stored_global_wildcard (pre-populated by _run_framework_cleanup) to locate
+        TlsClientManagement via ServerList, no extra network read needed.
+        """
+        tls_cluster_id = Clusters.TlsClientManagement.id
+        found_any = False
+        for endpoint_id, clusters in self.stored_global_wildcard.attributes.items():
+            server_list = clusters.get(Clusters.Descriptor, {}).get(Clusters.Descriptor.Attributes.ServerList)
+            if server_list is None or tls_cluster_id not in server_list:
+                continue
+            found_any = True
+            try:
+                provisioned = typing.cast(
+                    list[Clusters.TlsClientManagement.Structs.TLSEndpointStruct],
+                    await self.read_single_attribute_check_success(
+                        cluster=Clusters.TlsClientManagement,  # type: ignore[arg-type]
+                        attribute=Clusters.TlsClientManagement.Attributes.ProvisionedEndpoints,
+                        endpoint=endpoint_id
+                    )
+                )
+                if not provisioned:
+                    LOGGER.info(f"[CLN] no TLS endpoints provisioned on endpoint {endpoint_id}")
+                    continue
+                LOGGER.info(f"[CLN] removing {len(provisioned)} TLS endpoint(s) on endpoint {endpoint_id}")
+                for tls_ep in provisioned:
+                    await self.send_single_cmd(
+                        cmd=Clusters.TlsClientManagement.Commands.RemoveEndpoint(endpointID=tls_ep.endpointID),
+                        endpoint=endpoint_id,
+                        payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD
+                    )
+                LOGGER.info(f"[CLN] TLS endpoints removed on endpoint {endpoint_id}")
+            except Exception as e:  # DUT may be unreachable or TLS endpoint may have already been removed
+                LOGGER.warning(f"[CLN] TLS endpoint cleanup failed on endpoint {endpoint_id}: {e}")
+        if not found_any:
+            LOGGER.info("[CLN] TlsClientManagement cluster not present on any endpoint, skipping TLS endpoint cleanup")
+
+    async def _close_commissioning_windows(self) -> None:
+        """Sends RevokeCommissioning to close any open commissioning window on the DUT.
+
+        If no window is open the DUT returns an error, which is expected and logged as info.
+        """
+        LOGGER.info("[CLN] revoking any open commissioning window")
+        try:
+            await self.send_single_cmd(
+                cmd=Clusters.AdministratorCommissioning.Commands.RevokeCommissioning(),
+                endpoint=0,
+                timedRequestTimeoutMs=6000
+            )
+            LOGGER.info("[CLN] commissioning window revoked successfully")
+        except Exception as e:  # Expected when no commissioning window is open; the DUT returns an error in that case
+            LOGGER.info(f"[CLN] RevokeCommissioning skipped (likely no window open): {e}")
+
+    async def _unregister_icd_clients(self) -> None:
+        """Unregisters all ICD clients registered on the DUT via the default controller"""
+        # Check if the ICD Management cluster is present on the DUT.
+        # Wildcard is pre-populated by _run_framework_cleanup; guard for standalone calls.
+        if self.stored_global_wildcard is None:
+            LOGGER.info("[CLN] wildcard not available, skipping ICD client cleanup")
+            return
+        if not _has_attribute(wildcard=self.stored_global_wildcard, endpoint=0,
+                              attribute=Clusters.IcdManagement.Attributes.RegisteredClients):  # type: ignore[arg-type]
+            LOGGER.info("[CLN] ICD Management cluster not present, skipping ICD client cleanup")
+            return
+
+        registered_clients = self.stored_global_wildcard.attributes.get(0, {}).get(
+            Clusters.IcdManagement, {}).get(Clusters.IcdManagement.Attributes.RegisteredClients)
+
+        if not registered_clients:
+            LOGGER.info("[CLN] no ICD clients registered, skipping")
+            return
+
+        LOGGER.info(f"[CLN] unregistering {len(registered_clients)} ICD client(s)")
+        for entry in registered_clients:
+            try:
+                await self.send_single_cmd(
+                    cmd=Clusters.IcdManagement.Commands.UnregisterClient(
+                        checkInNodeID=entry.checkInNodeID
+                    ),
+                    endpoint=0
+                )
+                LOGGER.info(f"[CLN] unregistered ICD client {entry.checkInNodeID:#x}")
+            except Exception as e:  # DUT may be unreachable or the client may have already been unregistered
+                LOGGER.warning(f"[CLN] UnregisterClient({entry.checkInNodeID:#x}) failed: {e}")
+
+    def _format_summary_value(self, key: str, value: Any) -> str:
+        """Format values for end-of-test summary logs."""
+        if isinstance(value, bytes):
+            hex_value = value.hex()
+            if len(hex_value) > _SUMMARY_MAX_HEX_CHARS:
+                return f"0x{hex_value[:_SUMMARY_MAX_HEX_CHARS]}... (truncated, {len(value)} bytes)"
+            return f"0x{hex_value}"
+        if isinstance(value, list) and len(value) > 8:
+            head = ", ".join(repr(v) for v in value[:5])
+            return f"[{head}, ...] (len={len(value)})"
+        if key == "pics" and isinstance(value, dict):
+            return "Please request if needed"
+        return repr(value)
+
+    def _log_execution_parameters_summary(self):
+        """Log execution parameters at test end to aid result triage."""
+        try:
+            meta = asdict(self.matter_test_config)
+        except Exception as ex:
+            LOGGER.warning("Unable to collect execution parameter summary: %s", ex)
+            return
+
+        config_fields: dict[str, Any] = {}
+        for key, value in meta.items():
+            if key == "global_test_params":
+                continue
+            if isinstance(value, os.PathLike):
+                value = os.fspath(value)
+            if value in (None, [], {}, ""):
+                continue
+            config_fields[key] = value
+
+        named_args: dict[str, Any] = {}
+        for key, value in self.matter_test_config.global_test_params.items():
+            if key == "meta_config":
+                continue
+            if value in (None, [], {}, ""):
+                continue
+            named_args[key] = value
+
+        LOGGER.info("===== EXECUTION FLAGS SUMMARY BEGIN =====")
+
+        if config_fields:
+            LOGGER.info("Config values:")
+            for key in sorted(config_fields.keys()):
+                LOGGER.info("  - %s: %s", key, self._format_summary_value(key, config_fields[key]))
+
+        if named_args:
+            LOGGER.info("\n\nNamed args:")
+            for key in sorted(named_args.keys()):
+                LOGGER.info("  - %s: %s", key, self._format_summary_value(key, named_args[key]))
+
+        if self.is_pics_sdk_ci_only:
+            test_name = self.__class__.__name__
+            LOGGER.info(f"===== PICS_SDK_CI_ONLY is enabled (True) for test '{test_name}'.")
+
+        LOGGER.info("===== EXECUTION FLAGS SUMMARY END =====")
+
+    def _dump_device_attributes_on_failure(self):
+        """
+        Dump device attribute data when problems are found for debugging purposes.
+
+        This method attempts to generate a device attribute dump if the test has
+        collected endpoint data.
+        """
+        try:
+            # Check if we have endpoints_tlv data (from BasicCompositionTests or similar)
+            if hasattr(self, 'endpoints_tlv') and self.endpoints_tlv:
+                # Check if we have the dump_wildcard method (from BasicCompositionTests)
+                if hasattr(self, 'dump_wildcard'):
+                    _, txt_str = self.dump_wildcard(None)
+                    # Only dump the text format - it's more readable for debugging
+                    self.log_structured_data('==== FAILURE_DUMP_txt: ', txt_str)
+        except (AttributeError, KeyError, ValueError, TypeError):
+            # Don't let data access or serialization errors interfere with the original test failure
+            pass
+
+    def log_structured_data(self, start_tag: str, dump_string: str):
+        """Log structured data with a clear start and end marker.
+
+        This function is used to output device attribute dumps and other structured
+        data to logs in a format that can be easily extracted for debugging.
+
+        Args:
+            start_tag: A prefix tag to identify the type of data being logged
+            dump_string: The data to be logged
+        """
+        lines = dump_string.splitlines()
+        LOGGER.info(f'{start_tag}BEGIN ({len(lines)} lines)====')
+        for line in lines:
+            LOGGER.info(f'{start_tag}{line}')
+        LOGGER.info(f'{start_tag}END ====')
+
+    def setup_test(self):
+        """Set up for each individual test execution.
+
+        Resets test state, starts timers, and notifies runner hooks.
+        Called before each test method by the Mobly framework.
+
+        Test authors may overwrite this method in the derived class to perform setup that is common for all tests.
+        This is called once before each test_ in the class.
+
+        Test authors that implement this method should ensure super().setup_test() is called before any custom setup.
+        """
+        self.current_step_index = 0
+        self.test_start_time = datetime.now(UTC)
+        self.step_start_time = datetime.now(UTC)
+        self.step_skipped = False
+        self.failed = False
+        self._teardown_ran = False
+        self._framework_cleanup_done = False
+        self.cleanup_config = TestCleanupConfig()
+        if self.runner_hook and not self.is_commissioning:
+            test_name = self.current_test_info.name
+            steps = self.get_defined_test_steps(test_name)
+            num_steps = 1 if steps is None else len(steps)
+            filename = inspect.getfile(self.__class__)
+            desc = self.get_test_desc(test_name)
+            steps_descriptions = [] if steps is None else [step.description for step in steps]
+            self.runner_hook.test_start(filename=filename, name=desc, count=num_steps, steps=steps_descriptions)
+            # If we don't have defined steps, we're going to start the one and only step now
+            # if there are steps defined by the test, rely on the test calling the step() function
+            # to indicates how it is proceeding
+            if steps is None:
+                self.step(1)
+
+        # Capture the ACL before the test runs so _reset_acls_to_default can restore it
+        # in teardown_class. Skip when the DUT is not known to be available: unit tests
+        # never commission a device so _dut_confirmed_available stays False, and
+        # commissioning_method is None, eliminating any network overhead for them.
+        # For runner-commissioned tests commissioning_method is set; for in-test
+        # commissioning the flag is set by commission_devices() on success.
+        # is_commissioning is True for CommissionDeviceTest, where the DUT is not yet
+        # on the fabric, an operational read there would send CASE Sigma1 to an
+        # uncommissioned device, triggering unexpected DUT behaviour.
+        dut_expected = (
+            not self.is_commissioning
+            and (
+                self._dut_confirmed_available
+                or self.matter_test_config.commissioning_method is not None
+            )
+        )
+        if dut_expected:
+            try:
+                self._original_acl = self.event_loop.run_until_complete(
+                    self.read_single_attribute_check_success(
+                        cluster=Clusters.AccessControl,
+                        attribute=Clusters.AccessControl.Attributes.Acl,
+                        endpoint=0
+                    )
+                )
+            except Exception:
+                self._original_acl = None
+
+    def teardown_test(self):
+        """Per-test teardown called by the Mobly framework after every test_ method.
+
+        Framework cleanup (DUT state restoration, extra controller shutdown) runs
+        once at class end in teardown_class, not here. Override this method to add
+        custom per-test teardown.
+
+        Subclasses do not need to call super().teardown_test() — __init_subclass__
+        wraps every override so this base method always runs after the override
+        completes, regardless of whether super() was called.
+
+        Idempotency: _teardown_ran prevents double-execution if super() was called
+        explicitly from the override.
+        """
+        if not self._teardown_ran:
+            self._teardown_ran = True
+            super().teardown_test()
+
+    def on_fail(self, record):
+        """Handle test failure callback from Mobly framework.
+
+            This is called by the base framework.
+            Tests should not call this directly.
+            Tests should not overwrite this method.
+
+        Args:
+            record: TestResultRecord containing failure information.
+        """
+        self.failed = True
+        if self.runner_hook and not self.is_commissioning:
+            exception = record.termination_signal.exception
+
+            try:
+                step_duration = (datetime.now(UTC) - self.step_start_time) / timedelta(microseconds=1)
+            except AttributeError:
+                # If we failed during setup, these may not be populated
+                step_duration = 0
+            try:
+                test_duration = (datetime.now(UTC) - self.test_start_time) / timedelta(microseconds=1)
+            except AttributeError:
+                test_duration = 0
+            # TODO: I have no idea what logger, logs, request or received are. Hope None works because I have nothing to give
+            self.runner_hook.step_failure(logger=None, logs=None, duration=step_duration, request=None, received=None)
+            self.runner_hook.test_stop(exception=exception, duration=test_duration)
+
+            def extract_error_text() -> tuple[str, str]:
+                """Extract meaningful error information from test failure stack traces.
+
+                This function parses stack trace information to identify the most relevant
+                error line and associated file location for test failure reporting.
+
+                Returns:
+                    tuple[str, str]: A tuple containing:
+                        - probable_error (str): The most likely line containing the actual error.
+                            For Mobly framework exceptions (TestError/TestFailure), this finds
+                            the last assertion line. For other exceptions, uses the last line
+                            of the stack trace.
+                        - probable_file (str): The file path where the error occurred,
+                            extracted from the stack trace "File" markers.
+
+                Note:
+                    - Returns ("Stack Trace Unavailable", "") if no stack trace is available
+                    - Returns ("Unknown error, please see stack trace above", "") if no
+                        assertion candidates are found for Mobly exceptions
+                    - Returns (probable_error, "Unknown file") if no file information
+                        can be extracted from the stack trace
+                """
+                no_stack_trace = ("Stack Trace Unavailable", "")
+                if not record.termination_signal.stacktrace:
+                    return no_stack_trace
+                trace = record.termination_signal.stacktrace.splitlines()
+                if not trace:
+                    return no_stack_trace
+
+                if isinstance(exception, (signals.TestError, signals.TestFailure)):
+                    # Exception gets raised by the mobly framework, so the proximal error is one line back in the stack trace
+                    assert_candidates = [idx for idx, line in enumerate(trace) if "asserts" in line and "asserts.py" not in line]
+                    if not assert_candidates:
+                        return "Unknown error, please see stack trace above", ""
+                    assert_candidate_idx = assert_candidates[-1]
+                else:
+                    # Normal assert is on the Last line
+                    assert_candidate_idx = -1
+                probable_error = trace[assert_candidate_idx]
+
+                # Find the file marker immediately above the probable error
+                file_candidates = [idx for idx, line in enumerate(trace[:assert_candidate_idx]) if "File" in line]
+                if not file_candidates:
+                    return probable_error, "Unknown file"
+                return probable_error.strip(), trace[file_candidates[-1]].strip()
+
+            probable_error, probable_file = extract_error_text()
+            test_steps = self.get_defined_test_steps(self.current_test_info.name)
+            test_step = str(test_steps[self.current_step_index-1]
+                            ) if test_steps is not None else 'UNKNOWN - no test steps provided in test script'
+            LOGGER.error(textwrap.dedent(f"""
+
+                                          ******************************************************************
+                                          *
+                                          * Test {self.current_test_info.name} failed for the following reason:
+                                          * {exception}
+                                          *
+                                          * {probable_file}
+                                          * {probable_error}
+                                          *
+                                          * Test step:
+                                          *     {test_step}
+                                          *
+                                          * Endpoint: {self.matter_test_config.endpoint}
+                                          *
+                                          *******************************************************************
+                                          """))
+
+    def on_pass(self, record):
+        """Handle test success callback from Mobly framework.
+
+            This is called by the base framework.
+            Tests should not call this directly.
+            Tests should not overwrite this method.
+
+        Args:
+            record: TestResultRecord containing test results.
+        """
+        if self.runner_hook and not self.is_commissioning:
+            # What is request? This seems like an implementation detail for the runner
+            # TODO: As with failure, I have no idea what logger, logs or request are meant to be
+            step_duration = (datetime.now(UTC) - self.step_start_time) / timedelta(microseconds=1)
+            test_duration = (datetime.now(UTC) - self.test_start_time) / timedelta(microseconds=1)
+            self.runner_hook.step_success(logger=None, logs=None, duration=step_duration, request=None)
+
+        # TODO: this check could easily be annoying when doing dev. flag it somehow? Ditto with the in-order check
+        steps = self.get_defined_test_steps(record.test_name)
+        if steps is None:
+            # if we don't have a list of steps, assume they were all run
+            all_steps_run = True
+        else:
+            all_steps_run = len(steps) == self.current_step_index
+
+        if not all_steps_run:
+            # The test is done, but we didn't execute all the steps
+            asserts.fail("Test script error: Not all required steps were run")
+
+        if self.runner_hook and not self.is_commissioning:
+            self.runner_hook.test_stop(exception=None, duration=test_duration)
+
+    def on_skip(self, record):
+        """Handle test skip callback from Mobly framework.
+
+            This is called by the base framework.
+            Tests should not call this directly.
+            Tests should not overwrite this method.
+
+        Args:
+            record: TestResultRecord containing skip information.
+        """
+        if self.runner_hook and not self.is_commissioning:
+            test_duration = (datetime.now(UTC) - self.test_start_time) / timedelta(microseconds=1)
+            test_name = self.current_test_info.name
+            filename = inspect.getfile(self.__class__)
+            self.runner_hook.test_skipped(filename, test_name)
+            self.runner_hook.test_stop(exception=None, duration=test_duration)
+
+    #
+    # Matter Test API - Core Properties
+    #
+
+    # Override this if the test requires a different default timeout.
+    # This value will be overridden if a timeout is supplied on the command line.
+    @property
+    def default_timeout(self) -> int:
+        """The default timeout in seconds for async operations in a test."""
+        return 90
+
+    @property
+    def runner_hook(self) -> TestRunnerHooks:
+        """Accesses the Test Runner Hooks for external reporting."""
+        return global_stash.unstash_globally(self.user_params.get("hooks"))
+
+    @property
+    def matter_test_config(self) -> MatterTestConfig:
+        """Accesses the global Matter test configuration object."""
+        return global_stash.unstash_globally(self.user_params.get("matter_test_config"))
+
+    @property
+    def default_controller(self) -> ChipDeviceCtrl.ChipDeviceController:
+        """Accesses the default device controller instance for the test."""
+        return global_stash.unstash_globally(self.user_params.get("default_controller"))
+
+    @property
+    def matter_stack(self) -> MatterStackState:
+        """Accesses the Matter stack state object."""
+        return global_stash.unstash_globally(self.user_params.get("matter_stack"))
+
+    @property
+    def certificate_authority_manager(self) -> matter.CertificateAuthority.CertificateAuthorityManager:
+        """Accesses the Certificate Authority Manager."""
+        return global_stash.unstash_globally(self.user_params.get("certificate_authority_manager"))
+
+    @property
+    def dut_node_id(self) -> int:
+        """Returns the primary DUT (Device Under Test) node ID."""
+        return self.matter_test_config.dut_node_ids[0]
+
+    @property
+    def first_setup_code(self) -> Optional[str]:
+        return get_first_setup_code(self.default_controller, self.matter_test_config)
+
+    @property
+    def is_pics_sdk_ci_only(self) -> bool:
+        """Checks if the 'PICS_SDK_CI_ONLY' PICS flag is enabled."""
+        return self.check_pics('PICS_SDK_CI_ONLY')
+
+    @property
+    def default_endpoint(self) -> int:
+        return 0
+
+    #
+    # Matter Test API - Parameter Getters
+    #
+
+    def get_endpoint(self) -> int:
+        """Gets the target endpoint ID from config, with a fallback default."""
+        endpoint = self.matter_test_config.endpoint
+        if endpoint is not None:
+            return endpoint
+        return self.default_endpoint
+
+    def get_wifi_ssid(self, default: str = "") -> str:
+        ''' Get WiFi SSID
+
+            Get the WiFi networks name provided with flags
+
+        '''
+        return self.matter_test_config.wifi_ssid if self.matter_test_config.wifi_ssid is not None else default
+
+    def get_credentials(self, default: str = "") -> str:
+        ''' Get WiFi passphrase
+
+            Get the WiFi credentials provided with flags
+
+        '''
+        return self.matter_test_config.wifi_passphrase if self.matter_test_config.wifi_passphrase is not None else default
+
+    def get_setup_payload_info(self) -> list[SetupPayloadInfo]:
+        """
+        Get and builds the payload info provided in the execution.
+        Returns:
+            List[SetupPayloadInfo]: List of Payload used by the test case
+        """
+        return get_setup_payload_info_config(self.matter_test_config)
+
+    def get_random_port(self) -> int:
+        """Selects a random port and checks that it is not yet in use.
+
+        Note that this check can be racy, but the way this function is generally used
+        is assumed fine.
+        """
+        if not hasattr(self, '_allocated_ports'):
+            self._allocated_ports: set[int] = set()
+
+        def is_port_available(p: int) -> bool:
+            import errno
+
+            # Verify TCP and UDP on all IPv4 interfaces
+            for sock_type in (socket.SOCK_STREAM, socket.SOCK_DGRAM):
+                with socket.socket(socket.AF_INET, sock_type) as s:
+                    try:
+                        s.bind(('', p))
+                    except OSError as e:
+                        if e.errno == errno.EADDRINUSE:
+                            return False
+                        raise
+
+            # Verify TCP and UDP on all IPv6 interfaces if available
+            if socket.has_ipv6:
+                for sock_type in (socket.SOCK_STREAM, socket.SOCK_DGRAM):
+                    with socket.socket(socket.AF_INET6, sock_type) as s:
+                        try:
+                            s.bind(('::', p))
+                        except OSError as e:
+                            if e.errno == errno.EADDRINUSE:
+                                return False
+                            raise
+            return True
+
+        while True:
+            # The chosen safe range (35000-45000) naturally avoids well-known bad/conflicting
+            # ports like 5353 (mDNS) and 5550-5555 (Matter standard ports).
+            port = random.randint(35000, 45000)
+            if port in self._allocated_ports:
+                continue
+            if is_port_available(port):
+                self._allocated_ports.add(port)
+                return port
+
+    #
+    # Matter Test API - Test Definition Helpers (Steps, PICS, Description)
+    #
+    #  These helper methods are used by the test harness and should not be called tests.
 
     def get_test_steps(self, test: str) -> list[TestStep]:
         ''' Retrieves the test step list for the given test
@@ -177,17 +1208,31 @@ class MatterBaseTest(base_test.BaseTestClass):
         return [TestStep(1, "Run entire test")] if steps is None else steps
 
     def get_defined_test_steps(self, test: str) -> Optional[list[TestStep]]:
-        steps_name = f'steps_{test.removeprefix("test_")}'
+        """Retrieves test steps from a 'steps_*' function or AST extraction, using a cache.
+
+        Checks for an explicit steps_* method first. If none exists, falls back to
+        extracting steps from self.step() calls in the test method's source code.
+
+        Returns None if no steps are defined by either mechanism.
+        """
         if test in self.cached_steps:
             return self.cached_steps[test]
 
-        try:
-            fn = getattr(self, steps_name)
-            steps = fn()
-            self.cached_steps[test] = steps
-            return fn()
-        except AttributeError:
+        steps = None
+        if steps_method := getattr(self, 'steps_' + test.removeprefix('test_'), None):
+            steps = steps_method()
+        else:
+            test_method = getattr(self, test)
+            from matter.testing.step_extractor import extract_steps_from_method
+            steps = extract_steps_from_method(test_method) or None
+
+        self.cached_steps[test] = steps
+        return steps
+
+    def get_restart_flag_file(self) -> Optional[str]:
+        if self.matter_test_config.restart_flag_file is None:
             return None
+        return str(self.matter_test_config.restart_flag_file)
 
     def get_test_pics(self, test: str) -> list[str]:
         ''' Retrieves a list of top-level PICS that should be checked before running this test
@@ -202,19 +1247,27 @@ class MatterBaseTest(base_test.BaseTestClass):
         return [] if pics is None else pics
 
     def _get_defined_pics(self, test: str) -> Optional[list[str]]:
-        steps_name = f'pics_{test.removeprefix("test_")}'
-        try:
-            fn = getattr(self, steps_name)
-            return fn()
-        except AttributeError:
-            return None
+        """Retrieve PICS list from a 'pics_*' function or @pics decorator.
+
+        The pics_* method takes precedence over the @pics decorator.
+
+        Args:
+            test: Name of the test to get PICS for.
+
+        Returns:
+            List of PICS strings if pics function or decorator exists, None otherwise.
+        """
+        if pics_method := getattr(self, 'pics_' + test.removeprefix('test_'), None):
+            return pics_method()
+        test_method = getattr(self, test)
+        return getattr(test_method, '_pics', None)  # set by @pics
 
     def get_test_desc(self, test: str) -> str:
         ''' Returns a description of this test
 
-            Test description is defined in the function called desc_<functionname>.
-            ex for test test_TC_TEST_1_1, the steps are in a function called
-            desc_TC_TEST_1_1.
+            Test description is defined in the function called desc_<functionname>,
+            or as a docstring on the test method itself.
+            The desc_* method takes precedence if both are defined.
 
             Format:
             <Test plan reference> [<test plan number>] <test plan name>
@@ -222,196 +1275,274 @@ class MatterBaseTest(base_test.BaseTestClass):
             ex:
             133.1.1. [TC-ACL-1.1] Global attributes
         '''
-        desc_name = f'desc_{test.removeprefix("test_")}'
-        try:
-            fn = getattr(self, desc_name)
-            return fn()
-        except AttributeError:
-            return test
+        if desc_method := getattr(self, 'desc_' + test.removeprefix('test_'), None):
+            return desc_method()
+        test_method = getattr(self, test)
+        if doc := test_method.__doc__:
+            return doc.strip()
+        return test
 
-    def write_to_app_pipe(self, command_dict: dict, app_pipe: Optional[str] = None):
-        """
-        Send an out-of-band command to a Matter app.
+    #
+    # Matter Test API - Step Management & Execution
+    #
+    # These methods are used to mark test progress for the test harness and logs, to help with test
+    # debugging, issue creation and log analysis by the test labs.
+
+    def step(self, step: typing.Union[int, str], description: str = "", *,
+             is_commissioning: bool = False, expectation: str = ""):
+        """Execute a test step and manage step progression.
+
+        Validates step order, prints step information, and notifies runner hooks.
+
         Args:
-            command_dict (dict): dictionary with the command and data.
-            app_pipe (Optional[str], optional): Name of the cluster pipe file  (i.e. /tmp/chip_all_clusters_fifo_55441 or /tmp/chip_rvc_fifo_11111). Raises
-            FileNotFoundError if pipe file is not found. If None takes the value from the CI argument --app-pipe,  arg --app-pipe has his own file exists check.
+            step: The step number or identifier to execute.
+            description: Step description for inline step definitions.
+                Should always be provided (not empty) when any keyword arguments
+                (is_commissioning, expectation) are passed.
+            is_commissioning: Mark this step as the commissioning step (keyword-only).
+            expectation: Expected outcome for test plan generation (keyword-only).
 
-        This method uses the following environment variables:
+            All arguments to step() must be constants for automatic extraction of
+            the test step list to work. If dynamic step() parameters are required
+            an explicit `steps_` method must be defined.
 
-         - LINUX_DUT_IP
-            * if not provided, the Matter app is assumed to run on the same machine as the test,
-              such as during CI, and the commands are sent to it using a local named pipe
-            * if provided, the commands for writing to the named pipe are forwarded to the DUT
-        - LINUX_DUT_USER
-            * if LINUX_DUT_IP is provided, use this for the DUT user name
-            * If a remote password is needed, set up ssh keys to ensure that this script can log in to the DUT without a password:
-                 + Step 1: If you do not have a key, create one using ssh-keygen
-                 + Step 2: Authorize this key on the remote host: run ssh-copy-id user@ip once, using your password
-                 + Step 3: From now on ssh user@ip will no longer ask for your password
+        Raises:
+            AssertionError: If steps are called out of order or step doesn't exist.
         """
-        # If is not empty from the args, verify if the fifo file exists.
-        if app_pipe is not None and not os.path.exists(app_pipe):
-            logging.error("Named pipe %r does NOT exist" % app_pipe)
-            raise FileNotFoundError("CANNOT FIND %r" % app_pipe)
+        # description, is_commissioning, and expectation are not used at runtime.
+        # They exist so the AST step extractor can read them from source code to
+        # build the step list without needing a separate steps_* method.
+        test_name = self.current_test_info.name
+        steps = self.get_test_steps(test_name)
 
-        if app_pipe is None:
-            # Align with config naming used by the runner
-            app_pipe = self.matter_test_config.pipe_name
+        # TODO: this might be annoying during dev. Remove? Flag?
+        if len(steps) <= self.current_step_index or steps[self.current_step_index].test_plan_number != step:
+            asserts.fail(f'Unexpected test step: {step} - steps not called in order, or step does not exist')
 
-        if not isinstance(app_pipe, str):
-            raise TypeError("The named pipe must be provided as a string value")
+        current_step = steps[self.current_step_index]
+        self.print_step(step, current_step.description)
 
-        if not isinstance(command_dict, dict):
-            raise TypeError("The command must be passed as a dictionary value")
+        if self.runner_hook:
+            # If we've reached the next step with no assertion and the step wasn't skipped, it passed
+            if not self.step_skipped and self.current_step_index != 0:
+                # TODO: As with failure, I have no idea what loger, logs or request are meant to be
+                step_duration = (datetime.now(UTC) - self.step_start_time) / timedelta(microseconds=1)
+                self.runner_hook.step_success(logger=None, logs=None, duration=step_duration, request=None)
 
-        command = json.dumps(command_dict)
-        dut_ip = os.getenv('LINUX_DUT_IP')
+            # TODO: it seems like the step start should take a number and a name
+            name = f'{step} : {current_step.description}'
+            self.runner_hook.step_start(name=name)
 
-        # Checks for concatenate app_pipe and app_pid
-        if dut_ip is None:
-            with open(app_pipe, "w") as app_pipe_fp:
-                logger.info(f"Sending out-of-band command: {command} to file: {app_pipe}")
-                app_pipe_fp.write(json.dumps(command_dict) + "\n")
-            # TODO(#31239): remove the need for sleep
-            # This was tested with matter.js as being reliable enough
-            time.sleep(0.05)
+        self.step_start_time = datetime.now(tz=UTC)
+        self.current_step_index = self.current_step_index + 1
+        self.step_skipped = False
+
+    def print_step(self, stepnum: typing.Union[int, str], title: str) -> None:
+        """Print test step information to logs.
+
+        Args:
+            stepnum: The step number or identifier.
+            title: The descriptive title of the step.
+        """
+        LOGGER.info(f'***** Test Step {stepnum} : {title}')
+
+    def skip_step(self, step):
+        """Execute and immediately mark a step as skipped.
+
+        Args:
+            step: The step number or identifier to skip.
+        """
+        self.step(step)
+        self.mark_current_step_skipped()
+
+    def mark_current_step_skipped(self):
+        """Mark the current step as skipped and log the skip."""
+        try:
+            steps = self.get_test_steps(self.current_test_info.name)
+            if self.current_step_index == 0:
+                asserts.fail("Script error: mark_current_step_skipped cannot be called before step()")
+            num = steps[self.current_step_index - 1].test_plan_number
+        except KeyError:
+            num = self.current_step_index
+
+        if self.runner_hook:
+            # TODO: what does name represent here? The wordy test name? The test plan number? The number and name?
+            # TODO: I very much do not want to have people passing in strings here. Do we really need the expression
+            #       as a string? Does it get used by the TH?
+            self.runner_hook.step_skipped(name=str(num), expression="")
+        LOGGER.info(f'**** Skipping: {num}')
+        self.step_skipped = True
+
+    def mark_all_remaining_steps_skipped(self, starting_step_number: typing.Union[int, str]) -> None:
+        """Mark all remaining test steps starting with provided starting step
+            starting_step_number gives the first step to be skipped, as defined in the TestStep.test_plan_number
+            starting_step_number must be provided, and is not derived intentionally.
+            By providing argument test is more deliberately identifying where test skips are starting from,
+            making it easier to validate against the test plan for correctness.
+        Args:
+            starting_step_number (int,str): Number of name of the step to start skipping the steps.
+
+        Returns nothing on success so the test can go on.
+        """
+        self.mark_step_range_skipped(starting_step_number, None)
+
+    def mark_step_range_skipped(self, starting_step_number: typing.Union[int, str], ending_step_number: typing.Union[int, str, None]) -> None:
+        """Mark a range of remaining test steps starting with provided starting step
+            starting_step_number gives the first step to be skipped, as defined in the TestStep.test_plan_number
+            starting_step_number must be provided, and is not derived intentionally.
+
+            If ending_step_number is provided, it gives the last step to be skipped, as defined in the TestStep.test_plan_number.
+            If ending_step_number is None, all steps until the end of the test will be skipped
+            ending_step_number is optional, and if not provided, all steps until the end of the test will be skipped.
+
+            By providing argument test is more deliberately identifying where test skips are starting from,
+            making it easier to validate against the test plan for correctness.
+        Args:
+            starting_step_number (int,str): Number of name of the step to start skipping the steps.
+            ending_step_number (int,str,None): Number of name of the step to stop skipping the steps (inclusive).
+
+        Returns nothing on success so the test can go on.
+        """
+        steps = self.get_test_steps(self.current_test_info.name)
+        starting_step_idx = None
+        for idx, step in enumerate(steps):
+            if step.test_plan_number == starting_step_number:
+                starting_step_idx = idx
+                break
+        asserts.assert_is_not_none(starting_step_idx, "mark_step_ranges_skipped was provided with invalid starting_step_num")
+        starting_index: int = typing.cast(int, starting_step_idx)
+
+        ending_step_idx = None
+        # If ending_step_number is None, we skip all steps until the end of the test
+        if ending_step_number is not None:
+            for idx, step in enumerate(steps):
+                if step.test_plan_number == ending_step_number:
+                    ending_step_idx = idx
+                    break
+
+            asserts.assert_is_not_none(ending_step_idx, "mark_step_ranges_skipped was provided with invalid ending_step_num")
+            ending_index: int = typing.cast(int, ending_step_idx)
+            asserts.assert_greater(ending_index, starting_index,
+                                   "mark_step_ranges_skipped was provided with ending_step_num that is before starting_step_num")
+            skipping_steps = steps[starting_index:ending_index+1]
         else:
-            logging.info(f"Using DUT IP address: {dut_ip}")
+            skipping_steps = steps[starting_index:]
 
-            dut_uname = os.getenv('LINUX_DUT_USER')
-            asserts.assert_true(dut_uname is not None, "The LINUX_DUT_USER environment variable must be set")
-            logging.info(f"Using DUT user name: {dut_uname}")
-            command_fixed = shlex.quote(json.dumps(command_dict))
-            cmd = "echo \"%s\" | ssh %s@%s \'cat > %s\'" % (command_fixed, dut_uname, dut_ip, app_pipe)
-            os.system(cmd)
+        for step in skipping_steps:
+            self.skip_step(step.test_plan_number)
 
-    # Override this if the test requires a different default timeout.
-    # This value will be overridden if a timeout is supplied on the command line.
-    @property
-    def default_timeout(self) -> int:
-        return 90
-
-    @property
-    def runner_hook(self) -> TestRunnerHooks:
-        return global_stash.unstash_globally(self.user_params.get("hooks"))
-
-    @property
-    def matter_test_config(self) -> MatterTestConfig:
-        return global_stash.unstash_globally(self.user_params.get("matter_test_config"))
-
-    @property
-    def default_controller(self) -> ChipDeviceCtrl.ChipDeviceController:
-        return global_stash.unstash_globally(self.user_params.get("default_controller"))
-
-    @property
-    def matter_stack(self) -> MatterStackState:
-        return global_stash.unstash_globally(self.user_params.get("matter_stack"))
-
-    @property
-    def certificate_authority_manager(self) -> matter.CertificateAuthority.CertificateAuthorityManager:
-        return global_stash.unstash_globally(self.user_params.get("certificate_authority_manager"))
-
-    @property
-    def dut_node_id(self) -> int:
-        return self.matter_test_config.dut_node_ids[0]
-
-    def get_endpoint(self, default: int = 0) -> int:
-        return self.matter_test_config.endpoint if self.matter_test_config.endpoint is not None else default
-
-    def get_wifi_ssid(self, default: Optional[str] = None) -> Optional[str]:
-        ''' Get WiFi SSID
-
-            Get the WiFi networks name provided with flags
-
-        '''
-        return self.matter_test_config.wifi_ssid if self.matter_test_config.wifi_ssid is not None else default
-
-    def get_credentials(self, default: Optional[str] = None) -> Optional[str]:
-        ''' Get WiFi passphrase
-
-            Get the WiFi credentials provided with flags
-
-        '''
-        return self.matter_test_config.wifi_passphrase if self.matter_test_config.wifi_passphrase is not None else default
-
-    def setup_class(self):
-        super().setup_class()
-
-        # Mappings of cluster IDs to names and metadata.
-        # TODO: Move to using non-generated code and rather use data model description (.matter or .xml)
-        self.cluster_mapper = ClusterMapper(self.default_controller._Cluster)
-        self.current_step_index = 0
-        self.step_start_time = datetime.now(timezone.utc)
-        self.step_skipped = False
-        # self.stored_global_wildcard stores value of self.global_wildcard after first async call.
-        # Because setup_class can be called before commissioning, this variable is lazy-initialized
-        # where the read is deferred until the first guard function call that requires global attributes.
-        self.stored_global_wildcard = None
-
-    def setup_test(self):
-        self.current_step_index = 0
-        self.test_start_time = datetime.now(timezone.utc)
-        self.step_start_time = datetime.now(timezone.utc)
-        self.step_skipped = False
-        self.failed = False
-        if self.runner_hook and not self.is_commissioning:
-            test_name = self.current_test_info.name
-            steps = self.get_defined_test_steps(test_name)
-            num_steps = 1 if steps is None else len(steps)
-            filename = inspect.getfile(self.__class__)
-            desc = self.get_test_desc(test_name)
-            steps_descriptions = [] if steps is None else [step.description for step in steps]
-            self.runner_hook.test_start(filename=filename, name=desc, count=num_steps, steps=steps_descriptions)
-            # If we don't have defined steps, we're going to start the one and only step now
-            # if there are steps defined by the test, rely on the test calling the step() function
-            # to indicates how it is proceeding
-            if steps is None:
-                self.step(1)
-
-    def teardown_class(self):
-        """Final teardown after all tests: log all problems."""
-        if len(self.problems) > 0:
-            logging.info("###########################################################")
-            logging.info("Problems found:")
-            logging.info("===============")
-            for problem in self.problems:
-                logging.info(str(problem))
-            logging.info("###########################################################")
-        super().teardown_class()
+    #
+    # Matter Test API - Guard/Condition Helpers (PICS, Attribute, etc.)
+    #
 
     def check_pics(self, pics_key: str) -> bool:
+        """Check if a PICS (Protocol Implementation Conformance Statement) key is enabled.
+
+        Args:
+            pics_key: The PICS key to check.
+
+        Returns:
+            True if the PICS key is enabled, False otherwise.
+        """
         return self.matter_test_config.pics.get(pics_key.strip(), False)
 
-    @property
-    def is_pics_sdk_ci_only(self) -> bool:
-        return self.check_pics('PICS_SDK_CI_ONLY')
+    def pics_guard(self, pics_condition: bool):
+        """Checks a condition and if False marks the test step as skipped and
+           returns False, otherwise returns True.
+           For example can be used to check if a test step should be run:
 
-    def _update_legacy_test_event_triggers(self, eventTrigger: int) -> int:
-        """ This function updates eventTriged if legacy flag is activated. """
-        target_endpoint = 0
+              self.step("4")
+              if self.pics_guard(condition_needs_to_be_true_to_execute):
+                  # do the test for step 4
 
-        if self.matter_test_config.legacy:
-            logger.info("Legacy test event trigger activated")
-        else:
-            logger.info("Legacy test event trigger deactivated")
-            target_endpoint = self.get_endpoint()
+              self.step("5")
+              if self.pics_guard(condition2_needs_to_be_true_to_execute):
+                  # do the test for step 5
+           """
+        if not pics_condition:
+            self.mark_current_step_skipped()
+        return pics_condition
 
-        if not (0 <= target_endpoint <= 0xFFFF):
-            raise ValueError("Target endpoint should be between 0 and 0xFFFF")
+    async def _populate_wildcard(self):
+        """ Populates self.stored_global_wildcard if not already filled. """
+        if not hasattr(self, 'stored_global_wildcard') or self.stored_global_wildcard is None:
+            global_wildcard = asyncio.wait_for(self.default_controller.Read(self.dut_node_id, [(Clusters.Descriptor), Attribute.AttributePath(None, None, GlobalAttributeIds.ATTRIBUTE_LIST_ID), Attribute.AttributePath(
+                None, None, GlobalAttributeIds.FEATURE_MAP_ID), Attribute.AttributePath(None, None, GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID)]), timeout=60)
+            self.stored_global_wildcard = await global_wildcard
 
-        # Clean endpoint target
-        eventTrigger = eventTrigger & ~ (0xFFFF << 32)
+    async def attribute_guard(self, endpoint: int, attribute: ClusterObjects.ClusterAttributeDescriptor):
+        """Similar to pics_guard above, except checks a condition and if False marks the test step as skipped and
+           returns False using attributes against attributes_list, otherwise returns True.
+           For example can be used to check if a test step should be run:
 
-        # Sets endpoint in eventTrigger
-        eventTrigger |= (target_endpoint & 0xFFFF) << 32
+              self.step("1")
+              if self.attribute_guard(condition1_needs_to_be_true_to_execute):
+                  # do the test for step 1
 
-        return eventTrigger
+              self.step("2")
+              if self.attribute_guard(condition2_needs_to_be_false_to_skip_step):
+                  # skip step 2 if condition not met
+           """
+        await self._populate_wildcard()
+        attr_condition = _has_attribute(wildcard=self.stored_global_wildcard, endpoint=endpoint, attribute=attribute)
+        if not attr_condition:
+            self.mark_current_step_skipped()
+        return attr_condition
+
+    async def command_guard(self, endpoint: int, command: ClusterObjects.ClusterCommand):
+        """Similar to attribute_guard above, except checks a condition and if False marks the test step as skipped and
+           returns False using command id against AcceptedCmdsList, otherwise returns True.
+           For example can be used to check if a test step should be run:
+
+              self.step("1")
+              if self.command_guard(condition1_needs_to_be_true_to_execute):
+                  # do the test for step 1
+
+              self.step("2")
+              if self.command_guard(condition2_needs_to_be_false_to_skip_step):
+                  # skip step 2 if condition not met
+           """
+        await self._populate_wildcard()
+        cmd_condition = _has_command(wildcard=self.stored_global_wildcard, endpoint=endpoint, command=command)
+        if not cmd_condition:
+            self.mark_current_step_skipped()
+        return cmd_condition
+
+    async def feature_guard(self, endpoint: int, cluster: ClusterObjects.ClusterObjectDescriptor, feature_int: IntFlag):
+        """Similar to command_guard and attribute_guard above, except checks a condition and if False marks the test step as skipped and
+           returns False using feature id against feature_map, otherwise returns True.
+           For example can be used to check if a test step should be run:
+
+              self.step("1")
+              if self.feature_guard(condition1_needs_to_be_true_to_execute):
+                  # do the test for step 1
+
+              self.step("2")
+              if self.feature_guard(condition2_needs_to_be_false_to_skip_step):
+                  # skip step 2 if condition not met
+           """
+        await self._populate_wildcard()
+        feat_condition = _has_feature(wildcard=self.stored_global_wildcard, endpoint=endpoint, cluster=cluster, feature=feature_int)
+        if not feat_condition:
+            self.mark_current_step_skipped()
+        return feat_condition
+
+    #
+    # Matter Test API - Asynchronous Device Interaction Helpers
+    #
 
     async def commission_devices(self) -> bool:
+        """Commission all configured DUT devices.
+
+        Uses the default controller to commission devices based on setup payloads
+        and commissioning configuration.
+
+        Returns:
+            True if commissioning succeeded, False otherwise.
+        """
         dev_ctrl: ChipDeviceCtrl.ChipDeviceController = self.default_controller
-        dut_node_ids: List[int] = self.matter_test_config.dut_node_ids
-        setup_payloads: List[SetupPayloadInfo] = self.get_setup_payload_info()
+        dut_node_ids: list[int] = self.matter_test_config.dut_node_ids
+        setup_payloads: list[SetupPayloadInfo] = self.get_setup_payload_info()
         commissioning_info: CommissioningInfo = CommissioningInfo(
             commissionee_ip_address_just_for_testing=self.matter_test_config.commissionee_ip_address_just_for_testing,
             commissioning_method=self.matter_test_config.commissioning_method,
@@ -420,34 +1551,63 @@ class MatterBaseTest(base_test.BaseTestClass):
             wifi_ssid=self.matter_test_config.wifi_ssid,
             tc_version_to_simulate=self.matter_test_config.tc_version_to_simulate,
             tc_user_response_to_simulate=self.matter_test_config.tc_user_response_to_simulate,
+            thread_ba_host=self.matter_test_config.thread_ba_host,
+            thread_ba_port=self.matter_test_config.thread_ba_port,
         )
 
-        return await commission_devices(dev_ctrl, dut_node_ids, setup_payloads, commissioning_info)
+        result = await commission_devices(dev_ctrl, dut_node_ids, setup_payloads, commissioning_info)
+        if result:
+            self._dut_confirmed_available = True
+        return result
 
     async def open_commissioning_window(self, dev_ctrl: Optional[ChipDeviceCtrl.ChipDeviceController] = None, node_id: Optional[int] = None, timeout: int = 900) -> CustomCommissioningParameters:
+        """Open a commissioning window on the target device.
+
+        Args:
+            dev_ctrl: Device controller to use, defaults to default_controller.
+            node_id: Node ID of target device, defaults to dut_node_id.
+            timeout: Commissioning window timeout in seconds.
+
+        Returns:
+            Custom commissioning parameters for the opened window.
+
+        Raises:
+            AssertionError: If opening the commissioning window fails.
+        """
         rnd_discriminator = random.randint(0, 4095)
         if dev_ctrl is None:
             dev_ctrl = self.default_controller
         if node_id is None:
             node_id = self.dut_node_id
         try:
-            commissioning_params = await dev_ctrl.OpenCommissioningWindow(nodeid=node_id, timeout=timeout, iteration=1000,
+            commissioning_params = await dev_ctrl.OpenCommissioningWindow(nodeId=node_id, timeout=timeout, iteration=1000,
                                                                           discriminator=rnd_discriminator, option=dev_ctrl.CommissioningWindowPasscode.kTokenWithRandomPin)
-            params = CustomCommissioningParameters(commissioning_params, rnd_discriminator)
-            return params
+            return CustomCommissioningParameters(commissioning_params, rnd_discriminator)
 
         except InteractionModelError as e:
             asserts.fail(e.status, 'Failed to open commissioning window')
             raise  # Help mypy understand this never returns
 
     async def read_single_attribute(
-            self, dev_ctrl: ChipDeviceCtrl.ChipDeviceController, node_id: int, endpoint: int, attribute: Type[ClusterObjects.ClusterAttributeDescriptor], fabricFiltered: bool = True) -> object:
+            self, dev_ctrl: ChipDeviceCtrl.ChipDeviceController, node_id: int, endpoint: int, attribute: type[ClusterObjects.ClusterAttributeDescriptor], fabricFiltered: bool = True) -> object:
+        """Read a single attribute value from a device.
+
+        Args:
+            dev_ctrl: Device controller to use for the read operation.
+            node_id: Node ID of the target device.
+            endpoint: Endpoint ID where the attribute resides.
+            attribute: The attribute to read.
+            fabricFiltered: Whether to apply fabric filtering.
+
+        Returns:
+            The attribute value.
+        """
         result = await dev_ctrl.ReadAttribute(node_id, [(endpoint, attribute)], fabricFiltered=fabricFiltered)
         data = result[endpoint]
         return list(data.values())[0][attribute]
 
     async def read_single_attribute_all_endpoints(
-            self, cluster: ClusterObjects.Cluster, attribute: Type[ClusterObjects.ClusterAttributeDescriptor],
+            self, cluster: ClusterObjects.Cluster, attribute: type[ClusterObjects.ClusterAttributeDescriptor],
             dev_ctrl: Optional[ChipDeviceCtrl.ChipDeviceController] = None, node_id: Optional[int] = None):
         """Reads a single attribute of a specified cluster across all endpoints.
 
@@ -469,21 +1629,21 @@ class MatterBaseTest(base_test.BaseTestClass):
         return attrs
 
     async def read_single_attribute_check_success(
-            self, cluster: ClusterObjects.Cluster, attribute: Type[ClusterObjects.ClusterAttributeDescriptor],
-            dev_ctrl: Optional[ChipDeviceCtrl.ChipDeviceController] = None, node_id: Optional[int] = None, endpoint: Optional[int] = None, fabric_filtered: bool = True, assert_on_error: bool = True, test_name: str = "") -> object:
+            self, cluster: ClusterObjects.Cluster, attribute: type[ClusterObjects.ClusterAttributeDescriptor],
+            dev_ctrl: Optional[ChipDeviceCtrl.ChipDeviceController] = None, node_id: Optional[int] = None, endpoint: Optional[int] = None, fabric_filtered: bool = True, assert_on_error: bool = True, test_name: str = "", payloadCapability: int = ChipDeviceCtrl.TransportPayloadCapability.MRP_PAYLOAD) -> object:
         if dev_ctrl is None:
             dev_ctrl = self.default_controller
         if node_id is None:
             node_id = self.dut_node_id
         if endpoint is None:
             endpoint = self.get_endpoint()
-        result = await dev_ctrl.ReadAttribute(node_id, [(endpoint, attribute)], fabricFiltered=fabric_filtered)
+        result = await dev_ctrl.ReadAttribute(node_id, [(endpoint, attribute)], fabricFiltered=fabric_filtered, payloadCapability=payloadCapability)
         attr_ret = result[endpoint][cluster][attribute]
         read_err_msg = f"Error reading {str(cluster)}:{str(attribute)} = {attr_ret}"
         desired_type = attribute.attribute_type.Type
         type_err_msg = f'Returned attribute {attribute} is wrong type expected {desired_type}, got {type(attr_ret)}'
         read_ok = attr_ret is not None and not isinstance(attr_ret, Clusters.Attribute.ValueDecodeFailure)
-        type_ok = type_matches(attr_ret, desired_type)
+        type_ok = matchers.is_type(attr_ret, desired_type)
         if assert_on_error:
             asserts.assert_true(read_ok, read_err_msg)
             asserts.assert_true(type_ok, type_err_msg)
@@ -493,13 +1653,37 @@ class MatterBaseTest(base_test.BaseTestClass):
             if not read_ok:
                 self.record_error(test_name=test_name, location=location, problem=read_err_msg)
                 return None
-            elif not type_ok:
+            if not type_ok:
                 self.record_error(test_name=test_name, location=location, problem=type_err_msg)
                 return None
         return attr_ret
 
+    async def poll_until_attributes_in_range(
+            self, cluster: ClusterObjects.Cluster,
+            attribute_bounds: list[tuple[type[ClusterObjects.ClusterAttributeDescriptor], int, int]],
+            timeout_sec: int = 1) -> None:
+        """Poll attributes until each value falls within [min_value, max_value].
+
+        Args:
+            cluster: Cluster to read attributes from.
+            attribute_bounds: List of (attribute, min_value, max_value) tuples.
+            timeout_sec: Maximum time to wait for each attribute to be in range.
+
+        Raises:
+            TimeoutError: If any attribute does not reach its expected range before timeout.
+        """
+        for attribute, min_value, max_value in attribute_bounds:
+            deadline = time.monotonic() + timeout_sec
+            value = await self.read_single_attribute_check_success(cluster, attribute)
+            while value < min_value or value > max_value:  # type: ignore[operator]
+                if time.monotonic() >= deadline:
+                    raise TimeoutError(
+                        f"Timeout waiting for {attribute} to be in range [{min_value}, {max_value}], last value: {value}")
+                await asyncio.sleep(0.1)
+                value = await self.read_single_attribute_check_success(cluster, attribute)
+
     async def read_single_attribute_expect_error(
-            self, cluster: ClusterObjects.Cluster, attribute: Type[ClusterObjects.ClusterAttributeDescriptor],
+            self, cluster: ClusterObjects.Cluster, attribute: type[ClusterObjects.ClusterAttributeDescriptor],
             error: Status, dev_ctrl: Optional[ChipDeviceCtrl.ChipDeviceController] = None, node_id: Optional[int] = None, endpoint: Optional[int] = None,
             fabric_filtered: bool = True, assert_on_error: bool = True, test_name: str = "") -> object:
         if dev_ctrl is None:
@@ -544,11 +1728,178 @@ class MatterBaseTest(base_test.BaseTestClass):
                                  f"Expected write success for write to attribute {attribute_value} on endpoint {endpoint_id}")
         return write_result[0].Status
 
+    def read_from_app_pipe(
+        self,
+        app_pipe_out: Optional[str] = None,
+        timeout: float = 2.0,
+        max_bytes: int = 66536,
+        chunk: int = 4096,
+        ip_env_var: Optional[str] = None,
+    ) -> Any:
+        """
+        Read an out-of-band command from a Matter app.
+
+        Args:
+            app_pipe_out: Name of the cluster pipe file (e.g. /tmp/..._out). If None, uses value from config (--app-pipe-out).
+            ip_env_var: Name of the environment variable containing the DUT IP. If not provided (or None), forces local FIFO read.
+
+        Environment variables used when reading remotely:
+            - <ip_env_var> (typically LINUX_DUT_IP): if set, the FIFO is read on the remote DUT via SSH.
+            - LINUX_DUT_USER: required when <ip_env_var> is set.
+        """
+        if app_pipe_out is None:
+            app_pipe_out = self.matter_test_config.pipe_name_out
+
+        if not isinstance(app_pipe_out, str):
+            raise TypeError("The named pipe must be provided as a string value")
+
+        if not os.path.exists(app_pipe_out):
+            LOGGER.error("Named pipe %r does NOT exist", app_pipe_out)
+            raise FileNotFoundError("CANNOT FIND %r" % app_pipe_out)
+
+        dut_ip: Optional[str] = os.getenv(ip_env_var) if ip_env_var else None
+
+        # If no DUT IP is provided, the Matter app is assumed to be local and the command
+        # is read directly from the named pipe. If a DUT IP is present, the pipe is read
+        # remotely via SSH from the target device.
+        if dut_ip is None:
+            # Use manual chunked reads instead of readline(): FIFO is opened non-blocking
+            # and we need explicit timeout handling and a hard size limit for safety. We also
+            # preserve any extra bytes (e.g. multiple queued messages) across calls.
+            if not hasattr(self, "_app_pipe_out_buf"):
+                self._app_pipe_out_buf = bytearray()
+
+            fd = os.open(app_pipe_out, os.O_RDONLY | os.O_NONBLOCK)
+            try:
+                buf: bytearray = self._app_pipe_out_buf
+
+                while True:
+                    if b"\n" in buf:
+                        line, _, rest = buf.partition(b"\n")
+                        self._app_pipe_out_buf = bytearray(rest)
+
+                        line = line.strip()
+                        if not line:
+                            continue
+                        return json.loads(line.decode("utf-8"))
+
+                    if buf:
+                        try:
+                            obj = json.loads(buf.decode("utf-8"))
+                            self._app_pipe_out_buf = bytearray()
+                            return obj
+                        except json.JSONDecodeError:
+                            pass
+
+                    r, _, _ = select.select([fd], [], [], timeout)
+                    if not r:
+                        raise TimeoutError(f"No data within {timeout}")
+
+                    chunk_bytes = os.read(fd, chunk)
+                    if not chunk_bytes:
+                        if buf:
+                            try:
+                                obj = json.loads(buf.decode("utf-8"))
+                                self._app_pipe_out_buf = bytearray()
+                                return obj
+                            except json.JSONDecodeError as ex:
+                                raise EOFError(f"Incomplete JSON response: {ex}") from ex
+                        raise EOFError("Empty command response")
+
+                    buf += chunk_bytes
+                    if len(buf) > max_bytes:
+                        raise ValueError("Command too large")
+            finally:
+                os.close(fd)
+
+        LOGGER.info("Using DUT IP address: %s", dut_ip)
+
+        dut_uname = os.getenv("LINUX_DUT_USER")
+        asserts.assert_true(dut_uname is not None, "The LINUX_DUT_USER environment variable must be set")
+        LOGGER.info("Using DUT user name: %s", dut_uname)
+
+        # `cat` returns the remote FIFO contents. Parse as JSON for consistency with local behavior.
+        out = subprocess.check_output(["ssh", f"{dut_uname}@{dut_ip}", "cat", app_pipe_out])
+        out_str = out.decode("utf-8").strip()
+        return json.loads(out_str)
+
+    def write_to_app_pipe(self, command_dict: dict, app_pipe: Optional[str] = None, ip_env_var: Optional[str] = None):
+        """
+        Send an out-of-band command to a Matter app.
+        Args:
+            command_dict (dict): dictionary with the command and data.
+            app_pipe (Optional[str], optional): Name of the cluster pipe file  (i.e. /tmp/chip_all_clusters_fifo_55441 or /tmp/chip_rvc_fifo_11111). Raises
+            FileNotFoundError if pipe file is not found. If None takes the value from the CI argument --app-pipe,  arg --app-pipe has his own file exists check.
+            ip_env_var: Optional[str]: is an optional argument. Name of the environment variable containing the DUT IP.
+
+        This method uses the following environment variables:
+
+         - LINUX_DUT_IP
+            * if not provided, the Matter app is assumed to run on the same machine as the test,
+              such as during CI, and the commands are sent to it using a local named pipe
+            * if provided, the commands for writing to the named pipe are forwarded to the DUT
+        - LINUX_DUT_USER
+            * if LINUX_DUT_IP is provided, use this for the DUT user name
+            * If a remote password is needed, set up ssh keys to ensure that this script can log in to the DUT without a password:
+                 + Step 1: If you do not have a key, create one using ssh-keygen
+                 + Step 2: Authorize this key on the remote host: run ssh-copy-id user@ip once, using your password
+                 + Step 3: From now on ssh user@ip will no longer ask for your password
+        """
+        if app_pipe is None:
+            app_pipe = self.matter_test_config.pipe_name
+
+        if not isinstance(app_pipe, str):
+            raise TypeError("The named pipe must be provided as a string value")
+
+        if not os.path.exists(app_pipe):
+            LOGGER.error("Named pipe %r does NOT exist", app_pipe)
+            raise FileNotFoundError("CANNOT FIND %r" % app_pipe)
+
+        if not isinstance(command_dict, dict):
+            raise TypeError("The command must be passed as a dictionary value")
+
+        command = json.dumps(command_dict)
+
+        dut_ip: Optional[str] = os.getenv(ip_env_var) if ip_env_var else None
+
+        # If no DUT IP is provided, the Matter app is assumed to be local and the command
+        # is read directly from the named pipe. If a DUT IP is present, the pipe is read
+        # remotely via SSH from the target device.
+        if dut_ip is None:
+            with open(app_pipe, "w") as app_pipe_fp:
+                LOGGER.info(f"Sending out-of-band command: {command} to file: {app_pipe}")
+                app_pipe_fp.write(json.dumps(command_dict) + "\n")
+            # TODO(#31239): remove the need for sleep
+            # This was tested with matter.js as being reliable enough
+            time.sleep(0.05)
+        else:
+            LOGGER.info(f"Using DUT IP address: {dut_ip}")
+
+            dut_uname = os.getenv('LINUX_DUT_USER')
+            asserts.assert_true(dut_uname is not None, "The LINUX_DUT_USER environment variable must be set")
+            LOGGER.info(f"Using DUT user name: {dut_uname}")
+            command_fixed = shlex.quote(json.dumps(command_dict))
+            cmd = "echo \"%s\" | ssh %s@%s \'cat > %s\'" % (command_fixed, dut_uname, dut_ip, app_pipe)
+            os.system(cmd)
+
     async def send_single_cmd(
             self, cmd: Clusters.ClusterObjects.ClusterCommand,
             dev_ctrl: Optional[ChipDeviceCtrl.ChipDeviceController] = None, node_id: Optional[int] = None, endpoint: Optional[int] = None,
             timedRequestTimeoutMs: OptionalTimeout = None,
             payloadCapability: int = ChipDeviceCtrl.TransportPayloadCapability.MRP_PAYLOAD) -> object:
+        """Send a single command to a Matter device.
+
+        Args:
+            cmd: The cluster command to send.
+            dev_ctrl: Device controller, defaults to default_controller.
+            node_id: Target node ID, defaults to dut_node_id.
+            endpoint: Target endpoint, defaults to configured endpoint.
+            timedRequestTimeoutMs: Timeout for timed requests in milliseconds.
+            payloadCapability: Transport payload capability setting.
+
+        Returns:
+            Command response object.
+        """
         if dev_ctrl is None:
             dev_ctrl = self.default_controller
         if node_id is None:
@@ -556,9 +1907,8 @@ class MatterBaseTest(base_test.BaseTestClass):
         if endpoint is None:
             endpoint = self.get_endpoint()
 
-        result = await dev_ctrl.SendCommand(nodeid=node_id, endpoint=endpoint, payload=cmd, timedRequestTimeoutMs=timedRequestTimeoutMs,
-                                            payloadCapability=payloadCapability)
-        return result
+        return await dev_ctrl.SendCommand(nodeId=node_id, endpoint=endpoint, payload=cmd, timedRequestTimeoutMs=timedRequestTimeoutMs,
+                                          payloadCapability=payloadCapability)
 
     async def send_test_event_triggers(self, eventTrigger: int, enableKey: Optional[bytes] = None):
         """This helper function sends a test event trigger to the General Diagnostics cluster on endpoint 0
@@ -572,7 +1922,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         #    --hex-arg enableKey:000102030405060708090a0b0c0d0e0f
         if enableKey is None:
             if 'enableKey' not in self.matter_test_config.global_test_params:
-                enableKey = bytes([b for b in range(16)])
+                enableKey = bytes(list(range(16)))
             else:
                 enableKey = self.matter_test_config.global_test_params['enableKey']
 
@@ -595,321 +1945,73 @@ class MatterBaseTest(base_test.BaseTestClass):
         test_event_enabled = await self.read_single_attribute_check_success(endpoint=0, cluster=cluster, attribute=full_attr)
         asserts.assert_equal(test_event_enabled, True, "TestEventTriggersEnabled is False")
 
-    def print_step(self, stepnum: StepNumber, title: str) -> None:
-        logging.info(f'***** Test Step {stepnum} : {title}')
+    def _update_legacy_test_event_triggers(self, eventTrigger: int) -> int:
+        """Update event trigger if legacy flag is set.
+
+        Args:
+            eventTrigger: The base event trigger value.
+
+        Returns:
+            Updated event trigger with endpoint information.
+
+        Raises:
+            ValueError: If target endpoint is out of valid range.
+        """
+        target_endpoint = 0
+
+        if self.matter_test_config.legacy:
+            LOGGER.info("Legacy test event trigger activated")
+        else:
+            LOGGER.info("Legacy test event trigger deactivated")
+            target_endpoint = self.get_endpoint()
+
+        if not (0 <= target_endpoint <= 0xFFFF):
+            raise ValueError("Target endpoint should be between 0 and 0xFFFF")
+
+        # Clean endpoint target
+        eventTrigger = eventTrigger & ~ (0xFFFF << 32)
+
+        # Sets endpoint in eventTrigger
+        eventTrigger |= (target_endpoint & 0xFFFF) << 32
+
+        return eventTrigger
+
+    #
+    # Matter Test API - Utility Helpers (Problem Recording, User Input)
+    #
 
     def record_error(self, test_name: str, location: ProblemLocation, problem: str, spec_location: str = ""):
+        """Record an error-level problem during test execution.
+
+        Args:
+            test_name: Name of the test where the problem occurred.
+            location: Location information for the problem.
+            problem: Description of the problem.
+            spec_location: Specification reference (optional).
+        """
         self.problems.append(ProblemNotice(test_name, location, ProblemSeverity.ERROR, problem, spec_location))
 
     def record_warning(self, test_name: str, location: ProblemLocation, problem: str, spec_location: str = ""):
+        """Record a warning-level problem during test execution.
+
+        Args:
+            test_name: Name of the test where the problem occurred.
+            location: Location information for the problem.
+            problem: Description of the problem.
+            spec_location: Specification reference (optional).
+        """
         self.problems.append(ProblemNotice(test_name, location, ProblemSeverity.WARNING, problem, spec_location))
 
     def record_note(self, test_name: str, location: ProblemLocation, problem: str, spec_location: str = ""):
+        """Record a note-level problem during test execution.
+
+        Args:
+            test_name: Name of the test where the problem occurred.
+            location: Location information for the problem.
+            problem: Description of the problem.
+            spec_location: Specification reference (optional).
+        """
         self.problems.append(ProblemNotice(test_name, location, ProblemSeverity.NOTE, problem, spec_location))
-
-    def on_fail(self, record):
-        ''' Called by Mobly on test failure
-
-            record is of type TestResultRecord
-        '''
-        self.failed = True
-        if self.runner_hook and not self.is_commissioning:
-            exception = record.termination_signal.exception
-
-            try:
-                step_duration = (datetime.now(timezone.utc) - self.step_start_time) / timedelta(microseconds=1)
-            except AttributeError:
-                # If we failed during setup, these may not be populated
-                step_duration = 0
-            try:
-                test_duration = (datetime.now(timezone.utc) - self.test_start_time) / timedelta(microseconds=1)
-            except AttributeError:
-                test_duration = 0
-            # TODO: I have no idea what logger, logs, request or received are. Hope None works because I have nothing to give
-            self.runner_hook.step_failure(logger=None, logs=None, duration=step_duration, request=None, received=None)
-            self.runner_hook.test_stop(exception=exception, duration=test_duration)
-
-            def extract_error_text() -> tuple[str, str]:
-                no_stack_trace = ("Stack Trace Unavailable", "")
-                if not record.termination_signal.stacktrace:
-                    return no_stack_trace
-                trace = record.termination_signal.stacktrace.splitlines()
-                if not trace:
-                    return no_stack_trace
-
-                if isinstance(exception, signals.TestError) or isinstance(exception, signals.TestFailure):
-                    # Exception gets raised by the mobly framework, so the proximal error is one line back in the stack trace
-                    assert_candidates = [idx for idx, line in enumerate(trace) if "asserts" in line and "asserts.py" not in line]
-                    if not assert_candidates:
-                        return "Unknown error, please see stack trace above", ""
-                    assert_candidate_idx = assert_candidates[-1]
-                else:
-                    # Normal assert is on the Last line
-                    assert_candidate_idx = -1
-                probable_error = trace[assert_candidate_idx]
-
-                # Find the file marker immediately above the probable error
-                file_candidates = [idx for idx, line in enumerate(trace[:assert_candidate_idx]) if "File" in line]
-                if not file_candidates:
-                    return probable_error, "Unknown file"
-                return probable_error.strip(), trace[file_candidates[-1]].strip()
-
-            probable_error, probable_file = extract_error_text()
-            test_steps = self.get_defined_test_steps(self.current_test_info.name)
-            test_step = str(test_steps[self.current_step_index-1]
-                            ) if test_steps is not None else 'UNKNOWN - no test steps provided in test script'
-            logging.error(textwrap.dedent(f"""
-
-                                          ******************************************************************
-                                          *
-                                          * Test {self.current_test_info.name} failed for the following reason:
-                                          * {exception}
-                                          *
-                                          * {probable_file}
-                                          * {probable_error}
-                                          *
-                                          * Test step:
-                                          *     {test_step}
-                                          *
-                                          * Endpoint: {self.matter_test_config.endpoint}
-                                          *
-                                          *******************************************************************
-                                          """))
-
-    def on_pass(self, record):
-        ''' Called by Mobly on test pass
-
-            record is of type TestResultRecord
-        '''
-        if self.runner_hook and not self.is_commissioning:
-            # What is request? This seems like an implementation detail for the runner
-            # TODO: As with failure, I have no idea what logger, logs or request are meant to be
-            step_duration = (datetime.now(timezone.utc) - self.step_start_time) / timedelta(microseconds=1)
-            test_duration = (datetime.now(timezone.utc) - self.test_start_time) / timedelta(microseconds=1)
-            self.runner_hook.step_success(logger=None, logs=None, duration=step_duration, request=None)
-
-        # TODO: this check could easily be annoying when doing dev. flag it somehow? Ditto with the in-order check
-        steps = self.get_defined_test_steps(record.test_name)
-        if steps is None:
-            # if we don't have a list of steps, assume they were all run
-            all_steps_run = True
-        else:
-            all_steps_run = len(steps) == self.current_step_index
-
-        if not all_steps_run:
-            # The test is done, but we didn't execute all the steps
-            asserts.fail("Test script error: Not all required steps were run")
-
-        if self.runner_hook and not self.is_commissioning:
-            self.runner_hook.test_stop(exception=None, duration=test_duration)
-
-    def on_skip(self, record):
-        ''' Called by Mobly on test skip
-
-            record is of type TestResultRecord
-        '''
-        if self.runner_hook and not self.is_commissioning:
-            test_duration = (datetime.now(timezone.utc) - self.test_start_time) / timedelta(microseconds=1)
-            test_name = self.current_test_info.name
-            filename = inspect.getfile(self.__class__)
-            self.runner_hook.test_skipped(filename, test_name)
-            self.runner_hook.test_stop(exception=None, duration=test_duration)
-
-    def pics_guard(self, pics_condition: bool):
-        """Checks a condition and if False marks the test step as skipped and
-           returns False, otherwise returns True.
-           For example can be used to check if a test step should be run:
-
-              self.step("4")
-              if self.pics_guard(condition_needs_to_be_true_to_execute):
-                  # do the test for step 4
-
-              self.step("5")
-              if self.pics_guard(condition2_needs_to_be_true_to_execute):
-                  # do the test for step 5
-           """
-        if not pics_condition:
-            self.mark_current_step_skipped()
-        return pics_condition
-
-    async def _populate_wildcard(self):
-        """ Populates self.stored_global_wildcard if not already filled. """
-        if self.stored_global_wildcard is None:
-            global_wildcard = asyncio.wait_for(self.default_controller.Read(self.dut_node_id, [(Clusters.Descriptor), Attribute.AttributePath(None, None, GlobalAttributeIds.ATTRIBUTE_LIST_ID), Attribute.AttributePath(
-                None, None, GlobalAttributeIds.FEATURE_MAP_ID), Attribute.AttributePath(None, None, GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID)]), timeout=60)
-            self.stored_global_wildcard = await global_wildcard
-
-    async def attribute_guard(self, endpoint: int, attribute: ClusterObjects.ClusterAttributeDescriptor) -> bool:
-        """Similar to pics_guard above, except checks a condition and if False marks the test step as skipped and
-           returns False using attributes against attributes_list, otherwise returns True.
-           For example can be used to check if a test step should be run:
-
-              self.step("1")
-              if self.attribute_guard(condition1_needs_to_be_true_to_execute):
-                  # do the test for step 1
-
-              self.step("2")
-              if self.attribute_guard(condition2_needs_to_be_false_to_skip_step):
-                  # skip step 2 if condition not met
-           """
-        await self._populate_wildcard()
-        attr_condition = _has_attribute(wildcard=self.stored_global_wildcard, endpoint=endpoint, attribute=attribute)
-        if not attr_condition:
-            self.mark_current_step_skipped()
-        return attr_condition
-
-    async def command_guard(self, endpoint: int, command: ClusterObjects.ClusterCommand) -> bool:
-        """Similar to attribute_guard above, except checks a condition and if False marks the test step as skipped and
-           returns False using command id against AcceptedCmdsList, otherwise returns True.
-           For example can be used to check if a test step should be run:
-
-              self.step("1")
-              if self.command_guard(condition1_needs_to_be_true_to_execute):
-                  # do the test for step 1
-
-              self.step("2")
-              if self.command_guard(condition2_needs_to_be_false_to_skip_step):
-                  # skip step 2 if condition not met
-           """
-        await self._populate_wildcard()
-        cmd_condition = _has_command(wildcard=self.stored_global_wildcard, endpoint=endpoint, command=command)
-        if not cmd_condition:
-            self.mark_current_step_skipped()
-        return cmd_condition
-
-    async def feature_guard(self, endpoint: int, cluster: ClusterObjects.ClusterObjectDescriptor, feature_int: IntFlag) -> bool:
-        """Similar to command_guard and attribute_guard above, except checks a condition and if False marks the test step as skipped and
-           returns False using feature id against feature_map, otherwise returns True.
-           For example can be used to check if a test step should be run:
-
-              self.step("1")
-              if self.feature_guard(condition1_needs_to_be_true_to_execute):
-                  # do the test for step 1
-
-              self.step("2")
-              if self.feature_guard(condition2_needs_to_be_false_to_skip_step):
-                  # skip step 2 if condition not met
-           """
-        await self._populate_wildcard()
-        feat_condition = _has_feature(wildcard=self.stored_global_wildcard, endpoint=endpoint, cluster=cluster, feature=feature_int)
-        if not feat_condition:
-            self.mark_current_step_skipped()
-        return feat_condition
-
-    def mark_current_step_skipped(self):
-        try:
-            steps = self.get_test_steps(self.current_test_info.name)
-            if self.current_step_index == 0:
-                asserts.fail("Script error: mark_current_step_skipped cannot be called before step()")
-            num = steps[self.current_step_index - 1].test_plan_number
-        except KeyError:
-            num = self.current_step_index
-
-        if self.runner_hook:
-            # TODO: what does name represent here? The wordy test name? The test plan number? The number and name?
-            # TODO: I very much do not want to have people passing in strings here. Do we really need the expression
-            #       as a string? Does it get used by the TH?
-            self.runner_hook.step_skipped(name=str(num), expression="")
-        logging.info(f'**** Skipping: {num}')
-        self.step_skipped = True
-
-    def skip_step(self, step):
-        self.step(step)
-        self.mark_current_step_skipped()
-
-    def mark_all_remaining_steps_skipped(self, starting_step_number: StepNumber) -> None:
-        """Mark all remaining test steps starting with provided starting step
-            starting_step_number gives the first step to be skipped, as defined in the TestStep.test_plan_number
-            starting_step_number must be provided, and is not derived intentionally.
-            By providing argument test is more deliberately identifying where test skips are starting from,
-            making it easier to validate against the test plan for correctness.
-        Args:
-            starting_step_number (int,str): Number of name of the step to start skipping the steps.
-
-        Returns nothing on success so the test can go on.
-        """
-        self.mark_step_range_skipped(starting_step_number, None)
-
-    def mark_step_range_skipped(self, starting_step_number: typing.Union[int, str], ending_step_number: typing.Union[int, str, None]) -> None:
-        """Mark a range of remaining test steps starting with provided starting step
-            starting_step_number gives the first step to be skipped, as defined in the TestStep.test_plan_number
-            starting_step_number must be provided, and is not derived intentionally.
-
-            If ending_step_number is provided, it gives the last step to be skipped, as defined in the TestStep.test_plan_number.
-            If ending_step_number is None, all steps until the end of the test will be skipped
-            ending_step_number is optional, and if not provided, all steps until the end of the test will be skipped.
-
-            By providing argument test is more deliberately identifying where test skips are starting from,
-            making it easier to validate against the test plan for correctness.
-        Args:
-            starting_step_number (int,str): Number of name of the step to start skipping the steps.
-            ending_step_number (int,str,None): Number of name of the step to stop skipping the steps (inclusive).
-
-        Returns nothing on success so the test can go on.
-        """
-        steps = self.get_test_steps(self.current_test_info.name)
-        starting_step_idx = None
-        for idx, step in enumerate(steps):
-            if step.test_plan_number == starting_step_number:
-                starting_step_idx = idx
-                break
-        asserts.assert_is_not_none(starting_step_idx, "mark_step_ranges_skipped was provided with invalid starting_step_num")
-        # Help mypy understand starting_step_idx is not None after the assert
-        assert starting_step_idx is not None
-
-        ending_step_idx = None
-        # If ending_step_number is None, we skip all steps until the end of the test
-        if ending_step_number is not None:
-            for idx, step in enumerate(steps):
-                if step.test_plan_number == ending_step_number:
-                    ending_step_idx = idx
-                    break
-
-            asserts.assert_is_not_none(ending_step_idx, "mark_step_ranges_skipped was provided with invalid ending_step_num")
-            # Help mypy understand ending_step_idx is not None after the assert
-            assert ending_step_idx is not None
-            asserts.assert_greater(ending_step_idx, starting_step_idx,
-                                   "mark_step_ranges_skipped was provided with ending_step_num that is before starting_step_num")
-            skipping_steps = steps[starting_step_idx:ending_step_idx+1]
-        else:
-            skipping_steps = steps[starting_step_idx:]
-
-        for step in skipping_steps:
-            self.skip_step(step.test_plan_number)
-
-    def step(self, step: StepNumber):
-        test_name = self.current_test_info.name
-        steps = self.get_test_steps(test_name)
-
-        # TODO: this might be annoying during dev. Remove? Flag?
-        if len(steps) <= self.current_step_index or steps[self.current_step_index].test_plan_number != step:
-            asserts.fail(f'Unexpected test step: {step} - steps not called in order, or step does not exist')
-
-        current_step = steps[self.current_step_index]
-        self.print_step(step, current_step.description)
-
-        if self.runner_hook:
-            # If we've reached the next step with no assertion and the step wasn't skipped, it passed
-            if not self.step_skipped and self.current_step_index != 0:
-                # TODO: As with failure, I have no idea what loger, logs or request are meant to be
-                step_duration = (datetime.now(timezone.utc) - self.step_start_time) / timedelta(microseconds=1)
-                self.runner_hook.step_success(logger=None, logs=None, duration=step_duration, request=None)
-
-            # TODO: it seems like the step start should take a number and a name
-            name = f'{step} : {current_step.description}'
-            self.runner_hook.step_start(name=name)
-
-        self.step_start_time = datetime.now(tz=timezone.utc)
-        self.current_step_index = self.current_step_index + 1
-        self.step_skipped = False
-
-    def get_setup_payload_info(self) -> List[SetupPayloadInfo]:
-        """
-        Get and builds the payload info provided in the execution.
-        Returns:
-            List[SetupPayloadInfo]: List of Payload used by the test case
-        """
-        return get_setup_payload_info_config(self.matter_test_config)
 
     def wait_for_user_input(self,
                             prompt_msg: str,
@@ -939,12 +2041,12 @@ class MatterBaseTest(base_test.BaseTestClass):
                                          placeholder=prompt_msg_placeholder,
                                          default_value=default_value)
 
-        logging.info(f"========= USER PROMPT for Endpoint {endpoint_id} =========")
-        logging.info(f">>> {prompt_msg.rstrip()} (press enter to confirm)")
+        LOGGER.info(f"========= USER PROMPT for Endpoint {endpoint_id} =========")
+        LOGGER.info(f">>> {prompt_msg.rstrip()} (press enter to confirm)")
         try:
             return input()
         except EOFError:
-            logging.info("========= EOF on STDIN =========")
+            LOGGER.info("========= EOF on STDIN =========")
             return None
 
     def user_verify_snap_shot(self,
@@ -973,15 +2075,33 @@ class MatterBaseTest(base_test.BaseTestClass):
                 img_hex_str=hex_string
             )
 
-            logging.info("========= USER PROMPT for Image Validation =========")
+            LOGGER.info("========= USER PROMPT for Image Validation =========")
 
             try:
                 result = input()
                 if result != '1':  # User did not select 'PASS'
                     raise TestError("Image validation failed")
             except EOFError:
-                logging.info("========= EOF on STDIN =========")
-                return None
+                LOGGER.info("========= EOF on STDIN =========")
+                return
+
+    def _user_verify_prompt(self, prompt_msg: str, hook_method_name: str, validation_name: str, error_message: str) -> bool:
+        """Helper to show a prompt and wait for user validation in TH."""
+        # Only run when TC is being executed in TH
+        if self.runner_hook and hasattr(self.runner_hook, hook_method_name):
+            hook_method = getattr(self.runner_hook, hook_method_name)
+            hook_method(msg=prompt_msg)
+
+            LOGGER.info(f"========= USER PROMPT for {validation_name} =========")
+
+            try:
+                result = input()
+                if result != '1':  # User did not select 'PASS'
+                    raise TestError(error_message)
+            except EOFError:
+                LOGGER.info("========= EOF on STDIN =========")
+            return False
+        return True  # Indicating skipped
 
     def user_verify_video_stream(self,
                                  prompt_msg: str) -> None:
@@ -998,19 +2118,169 @@ class MatterBaseTest(base_test.BaseTestClass):
         Raises:
             TestError: Indicating video validation step failed.
         """
-        # Only run when TC is being executed in TH
-        if self.runner_hook and hasattr(self.runner_hook, 'show_video_prompt'):
-            self.runner_hook.show_video_prompt(msg=prompt_msg)
+        self._user_verify_prompt(
+            prompt_msg=prompt_msg,
+            hook_method_name='show_video_prompt',
+            validation_name='Video Stream Validation',
+            error_message='Video stream validation failed'
+        )
 
-            logging.info("========= USER PROMPT for Video Stream Validation =========")
+    def user_verify_two_way_talk(self,
+                                 prompt_msg: str) -> None:
+        """Show Two Way Talk Verification Prompt and wait for user validation.
+           This method will be executed only when TC is running in TH.
 
+        Args:
+            prompt_msg (str): Message for TH UI prompt and input function.
+            Indicates what is expected from the user.
+
+        Returns:
+            Returns nothing indicating success so the test can go on.
+
+        Raises:
+            TestError: Indicating Two Way Talk validation step failed.
+        """
+        self._user_verify_prompt(
+            prompt_msg=prompt_msg,
+            hook_method_name='show_two_way_talk_prompt',
+            validation_name='Two Way Talk Validation',
+            error_message='Two way talk validation failed'
+        )
+
+    def user_verify_push_av_stream(self, prompt_msg: str) -> bool:
+        """Show Push AV Stream Verification Prompt and wait for user validation.
+           This method will be executed only when TC is running in TH.
+
+        Args:
+            prompt_msg (str): Message for TH UI prompt and input function.
+            Indicates what is expected from the user.
+
+        Returns:
+            True if validation was skipped, False otherwise.
+
+        Raises:
+            TestError: Indicating Push AV Stream validation step failed.
+        """
+        return self._user_verify_prompt(
+            prompt_msg=prompt_msg,
+            hook_method_name='show_push_av_stream_prompt',
+            validation_name='Push AV Stream Validation',
+            error_message='Push AV Stream validation failed'
+        )
+
+    def _expire_sessions_on_all_controllers(self):
+        """Helper method to expire sessions on all active controllers via the fabric admin interface.
+
+        This method iterates through all certificate authorities and their fabric admins to expire
+        sessions on all active controllers. This ensures all controllers can reconnect after a device
+        reboot or factory reset.
+        """
+        LOGGER.info("Expiring sessions on all active controllers")
+        for ca in self.matter_stack.certificate_authorities:
+            for fabric_admin in ca.adminList:
+                for controller in fabric_admin._activeControllers:
+                    if controller.isActive:
+                        try:
+                            controller.ExpireSessions(self.dut_node_id)
+                            LOGGER.info(f"Expired sessions on controller with nodeId {controller.nodeId}")
+                        except ChipStackError as e:  # chipstack-ok
+                            LOGGER.warning(f"Failed to expire sessions on controller {controller.nodeId}: {e}")
+
+    async def request_device_reboot(self):
+        """Request a reboot of the Device Under Test (DUT).
+
+        This method handles device reboots in both CI and development environments (via run_python_test.py test runner script)
+        and also manual testing scenarios (via user input). It expires existing sessions to allow for controllers to reconnect
+        to the DUT after the reboot.
+
+        Returns:
+            None
+        """
+        # Check if restart flag file is available (indicates test runner supports app restart)
+        restart_flag_file = self.get_restart_flag_file()
+
+        if not restart_flag_file:
+            # No restart flag file: ask user to manually reboot
+            self.wait_for_user_input(prompt_msg="Reboot the DUT. Press Enter when ready.\n")
+
+            # After manual reboot, expire previous sessions so that we can re-establish connections
+            self._expire_sessions_on_all_controllers()
+            LOGGER.info("Manual device reboot completed")
+
+        else:
             try:
-                result = input()
-                if result != '1':  # User did not select 'PASS'
-                    raise TestError("Video stream validation failed")
-            except EOFError:
-                logging.info("========= EOF on STDIN =========")
-                return None
+                # Create the restart flag file to signal the test runner
+                # Allow for multiple reboots like SW update tests do using the "restart" mode
+                restart_text = "restart"
+                with open(restart_flag_file, "w") as f:
+                    f.write(restart_text)
+                LOGGER.info("Created restart flag file to signal app reboot")
+
+                # Expire sessions before the monitor picks up the flag
+                self._expire_sessions_on_all_controllers()
+
+                await self.wait_for_restart_flag_file_removal(restart_flag_file, restart_text)
+
+                LOGGER.info("App reboot completed successfully")
+
+            except Exception as e:
+                LOGGER.error(f"Failed to reboot app: {e}")
+                asserts.fail(f"App reboot failed: {e}")
+
+    async def request_device_factory_reset(self, reset_ctrl: bool = False) -> None:
+        """Request a factory reset of the Device Under Test (DUT).
+
+        This method handles factory resets in both CI and development environments and also manual
+        testing scenarios (via user input). It expires existing sessions to allow for controllers
+        to reconnect to the DUT after the factory reset.
+
+        Args:
+            reset_ctrl (bool): If True, removes app, REPL configs, and controller config.
+                               If False, removes app and REPL configs but keeps controller config.
+                               Defaults to False.
+
+        Returns:
+            None
+        """
+        # Check if restart flag file is available (indicates test runner supports app factory reset)
+        restart_flag_file = self.get_restart_flag_file()
+
+        if not restart_flag_file:
+            # No restart flag file: ask user to manually factory reset
+            self.wait_for_user_input(prompt_msg="Factory reset the DUT. Press Enter when ready.\n")
+
+            # After manual factory reset, expire previous sessions so that we can re-establish connections
+            self._expire_sessions_on_all_controllers()
+            LOGGER.info("Manual device factory reset completed")
+
+        else:
+            restart_flag_text = "factory reset" if reset_ctrl else "factory reset app only"
+            try:
+                # Create the restart flag file to signal the test runner
+                with open(restart_flag_file, "w") as f:
+                    f.write(restart_flag_text)
+                    LOGGER.info("Created restart flag file to signal %s request", restart_flag_text)
+
+                # Expire sessions and re-establish connections
+                self._expire_sessions_on_all_controllers()
+                LOGGER.info("%s request sent successfully", restart_flag_text.capitalize())
+
+                await self.wait_for_restart_flag_file_removal(restart_flag_file, restart_flag_text)
+
+            except Exception as e:
+                err = f"Failed to {restart_flag_text}: {e}"
+                LOGGER.error(err)
+                asserts.fail(err)
+
+    async def wait_for_restart_flag_file_removal(self, restart_flag_file, restart_flag_text, timeout_sec=30.0):
+        # Wait for the monitor thread to remove the flag file
+        # The monitor deletes the flag file AFTER the restart completes, so this ensures
+        # the app has fully rebooted and is ready before we continue
+        start_time = time.time()
+        while os.path.exists(restart_flag_file):
+            if time.time() - start_time > timeout_sec:
+                asserts.fail(f"App {restart_flag_text} did not complete within timeout (flag file still exists)")
+            await asyncio.sleep(0.1)
 
 
 def _async_runner(body, self: MatterBaseTest, *args, **kwargs):
@@ -1056,45 +2326,5 @@ async def _get_all_matching_endpoints(self: MatterBaseTest, accept_function: End
         Attribute.AttributePath(None, None, GlobalAttributeIds.FEATURE_MAP_ID),
         Attribute.AttributePath(None, None, GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID)
     ])
-    matching = [e for e in wildcard.attributes.keys()
-                if accept_function(wildcard, e)]
-    return matching
-
-
-# TODO(#37537): Remove these temporary aliases after transition period
-type_matches = matchers.is_type
-utc_time_in_matter_epoch = timeoperations.utc_time_in_matter_epoch
-utc_datetime_from_matter_epoch_us = timeoperations.utc_datetime_from_matter_epoch_us
-utc_datetime_from_posix_time_ms = timeoperations.utc_datetime_from_posix_time_ms
-compare_time = timeoperations.compare_time
-get_wait_seconds_from_set_time = timeoperations.get_wait_seconds_from_set_time
-bytes_from_hex = conversions.bytes_from_hex
-hex_from_bytes = conversions.hex_from_bytes
-id_str = conversions.format_decimal_and_hex
-cluster_id_str = conversions.cluster_id_with_name
-
-async_test_body = decorators.async_test_body
-run_if_endpoint_matches = decorators.run_if_endpoint_matches
-run_on_singleton_matching_endpoint = decorators.run_on_singleton_matching_endpoint
-has_cluster = decorators.has_cluster
-has_attribute = decorators.has_attribute
-has_command = decorators.has_command
-has_feature = decorators.has_feature
-should_run_test_on_endpoint = decorators.should_run_test_on_endpoint
-# autopep8: off
-_get_all_matching_endpoints = decorators._get_all_matching_endpoints  # type: ignore[assignment]
-# autopep8: on
-_has_feature = decorators._has_feature
-_has_command = decorators._has_command
-_has_attribute = decorators._has_attribute
-
-default_matter_test_main = runner.default_matter_test_main
-get_test_info = runner.get_test_info
-run_tests = runner.run_tests
-run_tests_no_exit = runner.run_tests_no_exit
-get_default_paa_trust_store = runner.get_default_paa_trust_store
-
-# Backward compatibility aliases for relocated functions
-parse_matter_test_args = runner.parse_matter_test_args
-
-# isort: off
+    return [e for e in wildcard.attributes
+            if accept_function(wildcard, e)]

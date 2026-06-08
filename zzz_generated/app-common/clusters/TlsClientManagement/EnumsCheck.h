@@ -34,18 +34,7 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(TlsClientManagement::St
     case EnumType::kRootCertificateNotFound:
     case EnumType::kClientCertificateNotFound:
     case EnumType::kEndpointInUse:
-        return val;
-    default:
-        return EnumType::kUnknownEnumValue;
-    }
-}
-static auto __attribute__((unused)) EnsureKnownEnumValue(TlsClientManagement::TLSEndpointStatusEnum val)
-{
-    using EnumType = TlsClientManagement::TLSEndpointStatusEnum;
-    switch (val)
-    {
-    case EnumType::kProvisioned:
-    case EnumType::kInUse:
+    case EnumType::kInvalidTime:
         return val;
     default:
         return EnumType::kUnknownEnumValue;

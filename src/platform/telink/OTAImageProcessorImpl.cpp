@@ -21,9 +21,9 @@
 
 #include <app/clusters/ota-requestor/OTADownloader.h>
 #include <app/clusters/ota-requestor/OTARequestorInterface.h>
-#include <platform/CHIPDeviceLayer.h>
 #include <platform/DeviceInstanceInfoProvider.h>
 #include <platform/KeyValueStoreManager.h>
+#include <system/SystemError.h>
 
 #include <zephyr/dfu/mcuboot.h>
 #include <zephyr/storage/flash_map.h>
@@ -57,7 +57,13 @@ CHIP_ERROR OTAImageProcessorImpl::PrepareDownload()
 {
     VerifyOrReturnError(mDownloader != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    return DeviceLayer::SystemLayer().ScheduleLambda([this] { mDownloader->OnPreparedForDownload(PrepareDownloadImpl()); });
+    return DeviceLayer::SystemLayer().ScheduleLambda([this] {
+        CHIP_ERROR err = mDownloader->OnPreparedForDownload(PrepareDownloadImpl());
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(SoftwareUpdate, "OTA prep cb err: %" CHIP_ERROR_FORMAT, err.Format());
+        }
+    });
 }
 const struct device * flash_dev;
 
@@ -140,6 +146,16 @@ CHIP_ERROR OTAImageProcessorImpl::Apply()
 #endif
 }
 
+void OTAImageProcessorImpl::ResumeWatchdogHandler(System::Layer * systemLayer, void * context)
+{
+    auto * self = static_cast<chip::DeviceLayer::OTAImageProcessorImpl *>(context);
+    ChipLogError(SoftwareUpdate, "Resume not supported by OTA provider");
+
+    LogErrorOnFailure(KeyValueStoreMgr().Delete(kDownloadedBytes));
+    LogErrorOnFailure(KeyValueStoreMgr().Delete(kImageDigest));
+    self->mDownloader->EndDownload(CHIP_ERROR_NOT_IMPLEMENTED);
+}
+
 CHIP_ERROR OTAImageProcessorImpl::ProcessBlock(ByteSpan & aBlock)
 {
     VerifyOrReturnError(mDownloader != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -168,12 +184,22 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessBlock(ByteSpan & aBlock)
                           static_cast<unsigned>(mParams.totalFileBytes));
             if (downloadedBytesRestored)
             {
-                mDownloader->SkipData(downloadedBytesRestored - aBlock.size());
+                CHIP_ERROR err = mDownloader->SkipData(downloadedBytesRestored - aBlock.size());
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(SoftwareUpdate, "OTA skip err: %" CHIP_ERROR_FORMAT, err.Format());
+                }
                 downloadedBytesRestored = 0;
+                SystemLayer().StartTimer(System::Clock::Milliseconds32(kResumeWatchdogTimeoutMs), ResumeWatchdogHandler, this);
             }
             else
             {
-                mDownloader->FetchNextData();
+                DeviceLayer::SystemLayer().CancelTimer(ResumeWatchdogHandler, this);
+                CHIP_ERROR err = mDownloader->FetchNextData();
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(SoftwareUpdate, "OTA fetch err: %" CHIP_ERROR_FORMAT, err.Format());
+                }
             }
         }
         else
@@ -214,10 +240,10 @@ CHIP_ERROR OTAImageProcessorImpl::RestoreBytes(ByteSpan & aBlock)
         // Align to the nearest lower multiple of sector size (4 KB) for Flash erase/write
         downloadedBytesRestored = ROUND_DOWN(downloadedBytesRestored, 0x1000);
         ChipLogDetail(SoftwareUpdate, "Restored %u/%u bytes", static_cast<unsigned>(downloadedBytesRestored),
-                      static_cast<unsigned>(mParams.totalFileBytes))
+                      static_cast<unsigned>(mParams.totalFileBytes));
 
-            // Reinit Flash Stream with offset
-            ReturnErrorOnFailure(System::MapErrorZephyr(stream_flash_buffered_write(&stream, NULL, 0, true)));
+        // Reinit Flash Stream with offset
+        ReturnErrorOnFailure(System::MapErrorZephyr(stream_flash_buffered_write(&stream, NULL, 0, true)));
         ReturnErrorOnFailure(InitFlashStream(downloadedBytesRestored));
     }
     else
@@ -265,7 +291,11 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessHeader(ByteSpan & aBlock)
         mParams.totalFileBytes = header.mPayloadSize;
 
         // Restore interrupted OTA process
-        RestoreBytes(header.mImageDigest);
+        error = RestoreBytes(header.mImageDigest);
+        if (error != CHIP_NO_ERROR)
+        {
+            ChipLogError(SoftwareUpdate, "OTA restore err: %" CHIP_ERROR_FORMAT, error.Format());
+        }
 
         mHeaderParser.Clear();
     }

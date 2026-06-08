@@ -17,7 +17,7 @@ import io
 import sys
 import unittest
 from pathlib import Path
-from typing import List, Union
+from typing import Union
 
 try:
     from matter.idl.zapxml import ParseSource, ParseXmls
@@ -30,7 +30,7 @@ from matter.idl.matter_idl_types import (AccessPrivilege, Attribute, AttributeQu
                                          StructQuality, StructTag)
 
 
-def XmlToIdl(what: Union[str, List[str]]) -> Idl:
+def XmlToIdl(what: Union[str, list[str]]) -> Idl:
     if not isinstance(what, list):
         what = [what]
 
@@ -68,8 +68,8 @@ class TestXmlParser(unittest.TestCase):
                     <description>AttributeWithAccess</description>
                     <access op="read" role="operate" />
                     <access op="write" role="manage" />
-                </attribute> 
-                
+                </attribute>
+
                 <attribute side="server" code="33" type="INT8U" min="0" max="10" \
                    reportable="true" default="0" writable="true" readable="false" optional="true">
                    <description>WriteOnlyAttribute</description>
@@ -347,7 +347,7 @@ class TestXmlParser(unittest.TestCase):
                          Idl(clusters=[
                              Cluster(name='TestFeatures',
                                      code=20, bitmaps=[bitmap])
-                         ])),
+                         ]))
 
     def testGlobalStruct(self):
         idl = XmlToIdl('''<?xml version="1.0"?>
@@ -447,7 +447,7 @@ class TestXmlParser(unittest.TestCase):
                                              ),
                                              qualities=AttributeQuality.READABLE,
                                              readacl=AccessPrivilege.VIEW,
-                                             writeacl=AccessPrivilege.OPERATE)]), ]))
+                                             writeacl=AccessPrivilege.OPERATE)])]))
 
     def testSkipsNotProcessedFields(self):
         # Zap has extra fields that are generally not processed
@@ -497,7 +497,7 @@ Some copyright here... testing that we skip over comments
                                              ),
                                              qualities=AttributeQuality.READABLE,
                                              readacl=AccessPrivilege.VIEW,
-                                             writeacl=AccessPrivilege.OPERATE)]), ]))
+                                             writeacl=AccessPrivilege.OPERATE)])]))
 
 
 if __name__ == '__main__':

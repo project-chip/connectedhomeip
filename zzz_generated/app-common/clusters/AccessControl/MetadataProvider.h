@@ -37,6 +37,8 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::AccessContro
             return CommissioningARL::kMetadataEntry;
         case Arl::Id:
             return Arl::kMetadataEntry;
+        case AuxiliaryACL::Id:
+            return AuxiliaryACL::kMetadataEntry;
         default:
             return std::nullopt;
         }

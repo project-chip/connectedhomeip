@@ -34,6 +34,7 @@ limitations under the License.
         <typeName>Root Node</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0016</deviceId>
+        <revision editable="false">4</revision>
         <class>Node</class>
         <scope>Node</scope>
         <clusters lockOthers="true">
@@ -99,6 +100,7 @@ limitations under the License.
         <typeName>Power Source</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0011</deviceId>
+        <revision editable="false">1</revision>
         <class>Utility</class>
         <scope>Node</scope>
         <clusters lockOthers="true">
@@ -117,6 +119,7 @@ limitations under the License.
         <typeName>Electrical Sensor</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0510</deviceId>
+        <revision editable="false">1</revision>
         <class>Utility</class>
         <scope>Node</scope>
         <clusters lockOthers="true">
@@ -132,6 +135,7 @@ limitations under the License.
         <typeName>OTA Requestor</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0012</deviceId>
+        <revision editable="false">1</revision>
         <class>Utility</class>
         <scope>Node</scope>
         <clusters lockOthers="true">
@@ -151,6 +155,7 @@ limitations under the License.
         <typeName>OTA Provider</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0014</deviceId>
+        <revision editable="false">1</revision>
         <class>Utility</class>
         <scope>Node</scope>
         <clusters lockOthers="true">
@@ -170,6 +175,7 @@ limitations under the License.
         <typeName>Aggregator</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x000e</deviceId>
+        <revision editable="false">2</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
@@ -188,6 +194,7 @@ limitations under the License.
         <typeName>Bridged Node</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0013</deviceId>
+        <revision editable="false">3</revision>
         <class>Utility</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
@@ -205,11 +212,29 @@ limitations under the License.
         </clusters>
     </deviceType>
     <deviceType>
+        <name>MA-humidifierdehumidifier</name>
+        <domain>CHIP</domain>
+        <typeName>Humidifier/Dehumidifier</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x007D</deviceId>
+        <revision editable="false">1</revision>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters>
+            <include cluster="Fan Control" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Humidistat" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Identify" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Relative Humidity Measurement" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Water Tank Level Monitoring" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+        </clusters>
+    </deviceType>
+    <deviceType>
         <name>MA-onofflight</name>
         <domain>CHIP</domain>
         <typeName>On/Off Light</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0100</deviceId>
+        <revision editable="false">3</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
@@ -306,6 +331,7 @@ limitations under the License.
         <typeName>Dimmable Light</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0101</deviceId>
+        <revision editable="false">3</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <superset>On/Off Light</superset>
@@ -406,6 +432,7 @@ limitations under the License.
         <typeName>Color Temperature Light</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x010C</deviceId>
+        <revision editable="false">4</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <superset>Dimmable Light</superset>
@@ -524,6 +551,7 @@ limitations under the License.
         <typeName>Extended Color Light</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x010D</deviceId>
+        <revision editable="false">4</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <superset>Color Temperature Light</superset>
@@ -659,6 +687,7 @@ limitations under the License.
         <typeName>On/Off Plug-in Unit</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x010A</deviceId>
+        <revision editable="false">3</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
@@ -754,6 +783,7 @@ limitations under the License.
         <typeName>Dimmable Plug-in Unit</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x010B</deviceId>
+        <revision editable="false">4</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
@@ -849,6 +879,7 @@ limitations under the License.
         <typeName>Mounted On/Off Control</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x010F</deviceId>
+        <revision editable="false">1</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <superset>On/Off Plug-in Unit</superset>
@@ -880,6 +911,7 @@ limitations under the License.
         <typeName>Mounted Dimmable Load Control</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0110</deviceId>
+        <revision editable="false">1</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <superset>Dimmable Plug-in Unit</superset>
@@ -911,6 +943,7 @@ limitations under the License.
         <typeName>Intercom</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0140</deviceId>
+        <revision editable="false">1</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters>
@@ -940,6 +973,7 @@ limitations under the License.
         <typeName>Audio Doorbell</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0141</deviceId>
+        <revision editable="false">1</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters>
@@ -970,6 +1004,7 @@ limitations under the License.
         <typeName>Camera</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0142</deviceId>
+        <revision editable="false">1</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <endpointComposition>
@@ -1011,6 +1046,7 @@ limitations under the License.
         <typeName>Video Doorbell</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0143</deviceId>
+        <revision editable="false">1</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <endpointComposition>
@@ -1059,6 +1095,7 @@ limitations under the License.
         <typeName>Floodlight Camera</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0144</deviceId>
+        <revision editable="false">1</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <endpointComposition>
@@ -1121,6 +1158,7 @@ limitations under the License.
         <typeName>Snapshot Camera</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0145</deviceId>
+        <revision editable="false">1</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <endpointComposition>
@@ -1161,6 +1199,7 @@ limitations under the License.
         <typeName>Chime</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0146</deviceId>
+        <revision editable="false">1</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters>
@@ -1174,6 +1213,7 @@ limitations under the License.
         <typeName>Camera Controller</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0147</deviceId>
+        <revision editable="false">1</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters>
@@ -1192,11 +1232,48 @@ limitations under the License.
         </clusters>
     </deviceType>
     <deviceType>
+        <name>MA-doorbell</name>
+        <domain>CHIP</domain>
+        <typeName>Doorbell</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0148</deviceId>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters>
+            <include cluster="Binding" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Chime" client="true" server="false" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Switch" client="false" server="true" clientLocked="true" serverLocked="true">
+                <features>
+                    <feature code="MS" name="MomentarySwitch"></feature>
+                </features>
+            </include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-ambient-context-sensor</name>
+        <domain>CHIP</domain>
+        <typeName>Ambient Context Sensor</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0150</deviceId>
+        <revision editable="false">1</revision>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters>
+            <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Service Area" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Ambient Context Sensing" client="false" server="true" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Occupancy Sensing" client="false" server="true" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Boolean State Configuration" client="false" server="true" clientLocked="true" serverLocked="false"></include>
+        </clusters>
+    </deviceType>
+    <deviceType>
         <name>MA-closure</name>
         <domain>CHIP</domain>
         <typeName>Closure</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0230</deviceId>
+        <revision editable="false">1</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters>
@@ -1215,6 +1292,7 @@ limitations under the License.
         <typeName>Closure Panel</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0231</deviceId>
+        <revision editable="false">1</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters>
@@ -1232,6 +1310,7 @@ limitations under the License.
         <typeName>Closure Controller</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x023E</deviceId>
+        <revision editable="false">1</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters>
@@ -1248,6 +1327,7 @@ limitations under the License.
         <typeName>Pump</typeName>
         <profileId editable="false">0x0999</profileId>
         <deviceId editable="false">0x0303</deviceId>
+        <revision editable="false">3</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
@@ -1328,6 +1408,7 @@ limitations under the License.
         <typeName>On/Off Light Switch</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0103</deviceId>
+        <revision editable="false">3</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
@@ -1388,6 +1469,7 @@ limitations under the License.
         <typeName>Dimmer Switch</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0104</deviceId>
+        <revision editable="false">3</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <superset>On/Off Light Switch</superset>
@@ -1450,6 +1532,7 @@ limitations under the License.
         <typeName>Color Dimmer Switch</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0105</deviceId>
+        <revision editable="false">3</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <superset>Dimmer Switch</superset>
@@ -1509,6 +1592,7 @@ limitations under the License.
         <typeName>Electrical Utility Meter</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0511</deviceId>
+        <revision editable="false">1</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters>
@@ -1522,6 +1606,7 @@ limitations under the License.
         <typeName>Meter Reference Point</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0512</deviceId>
+        <revision editable="false">1</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters>
@@ -1536,6 +1621,7 @@ limitations under the License.
         <typeName>Electrical Energy Tariff</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0513</deviceId>
+        <revision editable="false">1</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters>
@@ -1555,6 +1641,7 @@ limitations under the License.
         <typeName>Electrical Meter</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0514</deviceId>
+        <revision editable="false">1</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters>
@@ -1563,11 +1650,65 @@ limitations under the License.
         </clusters>
     </deviceType>
     <deviceType>
+        <name>MA-electrical-circuit-breaker</name>
+        <domain>CHIP</domain>
+        <typeName>Electrical Circuit Breaker</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0516</deviceId>
+        <revision editable="false">1</revision>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters>
+            <!-- TODO: Add Electrical Alarm (Provisional, Optional per spec, with OverCurrent feature mandatory) once https://github.com/project-chip/connectedhomeip/pull/72223 lands -->
+            <include cluster="Electrical Distribution" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Electrical Protection Alarm" client="false" server="false" clientLocked="true" serverLocked="false">
+                <features>
+                    <feature code="SHORT" name="ShortCircuit">
+                        <otherwiseConform>
+                            <provisionalConform></provisionalConform>
+                            <mandatoryConform></mandatoryConform>
+                        </otherwiseConform>
+                    </feature>
+                </features>
+            </include>
+            <include cluster="Identify" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="On/Off" client="false" server="false" clientLocked="true" serverLocked="false">
+                <features>
+                    <feature code="OFFONLY" name="OffOnly"></feature>
+                </features>
+            </include>
+            <include cluster="Power Topology" client="false" server="true" clientLocked="true" serverLocked="true">
+                <features>
+                    <feature code="CIRC" name="ElectricalCircuit"></feature>
+                </features>
+            </include>
+            <include cluster="User Label" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-electrical-distribution-enclosure</name>
+        <domain>CHIP</domain>
+        <typeName>Electrical Distribution Enclosure</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0517</deviceId>
+        <revision editable="false">1</revision>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters>
+            <include cluster="Electrical Distribution" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Electrical Protection Alarm" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Identify" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="On/Off" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Power Topology" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+        </clusters>
+    </deviceType>
+    <deviceType>
         <name>MA-control-bridge</name>
         <domain>CHIP</domain>
         <typeName>Control Bridge</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0840</deviceId>
+        <revision editable="false">3</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
@@ -1602,6 +1743,7 @@ limitations under the License.
         <typeName>Pump Controller</typeName>
         <profileId editable="false">0x0999</profileId>
         <deviceId editable="false">0x0304</deviceId>
+        <revision editable="false">4</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
@@ -1668,6 +1810,7 @@ limitations under the License.
         <typeName>Generic Switch</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x000f</deviceId>
+        <revision editable="false">3</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
@@ -1695,6 +1838,7 @@ limitations under the License.
         <typeName>Contact Sensor</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0015</deviceId>
+        <revision editable="false">2</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
@@ -1722,6 +1866,7 @@ limitations under the License.
         <typeName>Light Sensor</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0106</deviceId>
+        <revision editable="false">3</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
@@ -1755,6 +1900,7 @@ limitations under the License.
         <typeName>Occupancy Sensor</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0107</deviceId>
+        <revision editable="false">4</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
@@ -1787,6 +1933,7 @@ limitations under the License.
         <typeName>Temperature Sensor</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0302</deviceId>
+        <revision editable="false">3</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
@@ -1812,6 +1959,7 @@ limitations under the License.
         <typeName>Pressure Sensor</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0305</deviceId>
+        <revision editable="false">2</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
@@ -1837,6 +1985,7 @@ limitations under the License.
         <typeName>Flow Sensor</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0306</deviceId>
+        <revision editable="false">2</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
@@ -1862,6 +2011,7 @@ limitations under the License.
         <typeName>Humidity Sensor</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0307</deviceId>
+        <revision editable="false">2</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
@@ -1887,6 +2037,7 @@ limitations under the License.
         <typeName>On/Off Sensor</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0850</deviceId>
+        <revision editable="false">3</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
@@ -1919,6 +2070,7 @@ limitations under the License.
         <typeName>Door Lock</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x000A</deviceId>
+        <revision editable="false">3</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
@@ -1967,6 +2119,7 @@ limitations under the License.
         <typeName>Door Lock Controller</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x000B</deviceId>
+        <revision editable="false">3</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
@@ -1989,6 +2142,7 @@ limitations under the License.
         <typeName>Window Covering</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0202</deviceId>
+        <revision editable="false">4</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
@@ -2054,6 +2208,7 @@ limitations under the License.
         <typeName>Window Covering Controller</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0203</deviceId>
+        <revision editable="false">4</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
@@ -2091,6 +2246,7 @@ limitations under the License.
         <typeName>Thermostat</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0301</deviceId>
+        <revision editable="false">4</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
@@ -2158,6 +2314,7 @@ limitations under the License.
         <typeName>Fan</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x002B</deviceId>
+        <revision editable="false">3</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
@@ -2195,6 +2352,7 @@ limitations under the License.
         <typeName>Casting Video Player</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0023</deviceId>
+        <revision editable="false">2</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
@@ -2230,6 +2388,7 @@ limitations under the License.
         <typeName>Basic Video Player</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0028</deviceId>
+        <revision editable="false">2</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
@@ -2256,6 +2415,7 @@ limitations under the License.
         <typeName>Casting Video Client</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0029</deviceId>
+        <revision editable="false">2</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
@@ -2290,6 +2450,7 @@ limitations under the License.
         <typeName>Video Remote Control</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x002A</deviceId>
+        <revision editable="false">2</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
@@ -2323,6 +2484,7 @@ limitations under the License.
         <typeName>Speaker</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0022</deviceId>
+        <revision editable="false">1</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
@@ -2349,6 +2511,7 @@ limitations under the License.
         <typeName>Content App</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0024</deviceId>
+        <revision editable="false">2</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
@@ -2387,6 +2550,7 @@ limitations under the License.
         <typeName>Mode Select</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0027</deviceId>
+        <revision editable="false">1</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
@@ -2412,6 +2576,7 @@ limitations under the License.
         <typeName>Room Air Conditioner</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0072</deviceId>
+        <revision editable="false">2</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
@@ -2447,6 +2612,7 @@ limitations under the License.
         <typeName>Smoke CO Alarm</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0076</deviceId>
+        <revision editable="false">1</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
@@ -2470,6 +2636,7 @@ limitations under the License.
         <typeName>Air Purifier</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x002D</deviceId>
+        <revision editable="false">2</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
@@ -2491,6 +2658,7 @@ limitations under the License.
         <typeName>Air Quality Sensor</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x002C</deviceId>
+        <revision editable="false">1</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
@@ -2521,6 +2689,7 @@ limitations under the License.
         <typeName>Dishwasher</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0075</deviceId>
+        <revision editable="false">2</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
@@ -2551,6 +2720,7 @@ limitations under the License.
         <typeName>Oven</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x007B</deviceId>
+        <revision editable="false">2</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <endpointComposition>
@@ -2573,6 +2743,7 @@ limitations under the License.
         <typeName>Microwave Oven</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0079</deviceId>
+        <revision editable="false">2</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
@@ -2599,6 +2770,7 @@ limitations under the License.
         <typeName>Refrigerator</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0070</deviceId>
+        <revision editable="false">2</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <endpointComposition>
@@ -2626,6 +2798,7 @@ limitations under the License.
         <typeName>Laundry Washer</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0073</deviceId>
+        <revision editable="false">2</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
@@ -2656,6 +2829,7 @@ limitations under the License.
         <typeName>Laundry Dryer</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x007C</deviceId>
+        <revision editable="false">2</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
@@ -2686,6 +2860,7 @@ limitations under the License.
         <typeName>Extractor Hood</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x007A</deviceId>
+        <revision editable="false">1</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
@@ -2714,6 +2889,7 @@ limitations under the License.
         <typeName>Robotic Vacuum Cleaner</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0074</deviceId>
+        <revision editable="false">4</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
@@ -2731,6 +2907,7 @@ limitations under the License.
         <typeName>Temperature Controlled Cabinet</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0071</deviceId>
+        <revision editable="false">5</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
@@ -2760,6 +2937,7 @@ limitations under the License.
         <typeName>Water Freeze Detector</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0041</deviceId>
+        <revision editable="false">2</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
@@ -2775,6 +2953,7 @@ limitations under the License.
         <typeName>Water Valve</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0042</deviceId>
+        <revision editable="false">1</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
@@ -2789,6 +2968,7 @@ limitations under the License.
         <typeName>Water Leak Detector</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0043</deviceId>
+        <revision editable="false">2</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
@@ -2804,6 +2984,7 @@ limitations under the License.
         <typeName>Rain Sensor</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0044</deviceId>
+        <revision editable="false">2</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
@@ -2819,6 +3000,7 @@ limitations under the License.
         <typeName>Network Infrastructure Manager</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0090</deviceId>
+        <revision editable="false">2</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
@@ -2834,6 +3016,7 @@ limitations under the License.
         <typeName>Thread Border Router</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0091</deviceId>
+        <revision editable="false">1</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
@@ -3005,6 +3188,7 @@ limitations under the License.
         <typeName>Secondary Network Interface</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0019</deviceId>
+        <revision editable="false">1</revision>
         <class>Utility</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
@@ -3026,6 +3210,7 @@ limitations under the License.
         <typeName>Joint Fabric Administrator</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0130</deviceId>
+        <revision editable="false">1</revision>
         <class>Utility</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
@@ -3040,6 +3225,7 @@ limitations under the License.
         <class>Simple</class>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0078</deviceId>
+        <revision editable="false">1</revision>
         <clusters lockOthers="true">
             <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true"></include>
             <include cluster="Identify" client="false" server="false" clientLocked="true" serverLocked="false"></include>
@@ -3059,6 +3245,7 @@ limitations under the License.
         <class>Simple</class>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0077</deviceId>
+        <revision editable="false">2</revision>
         <clusters lockOthers="true">
             <include cluster="On/Off" client="false" server="true" clientLocked="true" serverLocked="false">
                 <features>
@@ -3079,6 +3266,7 @@ limitations under the License.
         <class>Simple</class>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x050C</deviceId>
+        <revision editable="false">2</revision>
         <clusters lockOthers="true">
             <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true"></include>
             <include cluster="Identify" client="false" server="false" clientLocked="true" serverLocked="false"></include>
@@ -3094,6 +3282,7 @@ limitations under the License.
         <class>Utility</class>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x050D</deviceId>
+        <revision editable="false">2</revision>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
             <include cluster="Device Energy Management" client="false" server="true" clientLocked="true" serverLocked="true"></include>
@@ -3106,6 +3295,7 @@ limitations under the License.
         <typeName>Water Heater</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x050F</deviceId>
+        <revision editable="false">1</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters>
@@ -3149,6 +3339,7 @@ limitations under the License.
         <typeName>Heat Pump</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0309</deviceId>
+        <revision editable="false">1</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters>
@@ -3177,6 +3368,7 @@ limitations under the License.
         <typeName>Solar Power</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0017</deviceId>
+        <revision editable="false">1</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters>
@@ -3199,6 +3391,7 @@ limitations under the License.
         <typeName>Battery Storage</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0018</deviceId>
+        <revision editable="false">1</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters>
@@ -3221,6 +3414,7 @@ limitations under the License.
         <typeName>Thermostat Controller</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x030A</deviceId>
+        <revision editable="false">1</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
@@ -3238,6 +3432,7 @@ limitations under the License.
         <typeName>Soil Sensor</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0045</deviceId>
+        <revision editable="false">1</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
@@ -3245,6 +3440,28 @@ limitations under the License.
             <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true"></include>
             <include cluster="Temperature Measurement" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="Soil Measurement" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-proximityranger</name>
+        <domain>CHIP</domain>
+        <typeName>Proximity Ranger</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0152</deviceId>
+        <revision editable="false">1</revision>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters lockOthers="true">
+            <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Proximity Ranging" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>RANGING_CAPABILITIES</requireAttribute>
+                <requireAttribute>SESSION_IDS</requireAttribute>
+                <requireCommand>StartRangingRequest</requireCommand>
+                <requireCommand>StopRangingRequest</requireCommand>
+                <requireEvent>RangingResult</requireEvent>
+                <requireEvent>RangingSessionStatus</requireEvent>
+            </include>
         </clusters>
     </deviceType>
 </configurator>

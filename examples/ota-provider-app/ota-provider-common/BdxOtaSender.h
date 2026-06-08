@@ -18,6 +18,9 @@
 #include <protocols/bdx/BdxTransferSession.h>
 #include <protocols/bdx/TransferFacilitator.h>
 
+#include <string>
+#include <unordered_map>
+
 #pragma once
 
 class BdxOtaSender : public chip::bdx::Responder
@@ -28,6 +31,10 @@ public:
     // Initializes BDX transfer-related metadata. Should always be called first.
     CHIP_ERROR InitializeTransfer(chip::FabricIndex fabricIndex, chip::NodeId nodeId);
 
+    void AbortTransfer();
+
+    void SetFileDesignatorMap(const std::unordered_map<std::string, std::string> & map) { mFileDesignatorMap = map; }
+
 private:
     // Inherited from bdx::TransferFacilitator
     void HandleTransferSessionOutput(chip::bdx::TransferSession::OutputEvent & event) override;
@@ -36,7 +43,7 @@ private:
 
     // Null-terminated string representing file designator
     char mFileDesignator[chip::bdx::kMaxFileDesignatorLen];
-
+    std::unordered_map<std::string, std::string> mFileDesignatorMap;
     uint32_t mNumBytesSent = 0;
 
     bool mInitialized = false;

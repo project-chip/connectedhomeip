@@ -41,12 +41,10 @@ private:
     ModeTagStructType ModeTagsDefrost[1] = { { .value = to_underlying(ModeTag::kDefrost) } };
 
     const detail::Structs::ModeOptionStruct::Type kModeOptions[2] = {
-        detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Normal"),
-                                                 .mode     = ModeNormal,
-                                                 .modeTags = DataModel::List<const ModeTagStructType>(ModeTagsNormal) },
-        detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Defrost"),
-                                                 .mode     = ModeDefrost,
-                                                 .modeTags = DataModel::List<const ModeTagStructType>(ModeTagsDefrost) },
+        detail::Structs::ModeOptionStruct::Type{
+            .label = "Normal"_span, .mode = ModeNormal, .modeTags = DataModel::List<const ModeTagStructType>(ModeTagsNormal) },
+        detail::Structs::ModeOptionStruct::Type{
+            .label = "Defrost"_span, .mode = ModeDefrost, .modeTags = DataModel::List<const ModeTagStructType>(ModeTagsDefrost) },
     };
 
 public:

@@ -23,7 +23,6 @@
 
 #pragma once
 
-#include <platform/AttributeList.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/CHIPDeviceEvent.h>
 #include <system/PlatformEventSupport.h>

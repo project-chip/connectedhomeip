@@ -16,6 +16,7 @@ import("//build_overrides/chip.gni")
 import("//build_overrides/efr32_sdk.gni")
 import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
 import("${chip_root}/examples/platform/silabs/args.gni")
+import("${chip_root}/src/app/common_flags.gni")
 import("${chip_root}/src/lib/lib.gni")
 import("${chip_root}/src/platform/device.gni")
 import("${chip_root}/src/platform/silabs/wifi/args.gni")
@@ -34,23 +35,18 @@ declare_args() {
   ota_periodic_query_timeout_sec = 86400
 }
 
+chip_detail_logging = sl_verbose_mode
+
 # Sanity check
 assert(chip_enable_wifi)
 silabs_plat_dir = "${chip_root}/src/platform/silabs"
-silabs_plat_si91x_wifi_dir = "${chip_root}/src/platform/silabs/SiWx917/wifi"
+silabs_plat_si91x_wifi_dir = "${chip_root}/src/platform/silabs/wifi"
 
 config("chip_examples_project_config") {
   # Link options that provide a replacement for dynamic memory operations in standard
   # library with the sl_memory_manager in platform code.
   ldflags = [
     "-Wl,--wrap=MemoryAlloc",
-
-    # Wrap these in case internal newlib call them (e.g. strdup will)
-    # directly call _malloc_r)
-    "-Wl,--wrap=_malloc_r",
-    "-Wl,--wrap=_realloc_r",
-    "-Wl,--wrap=_free_r",
-    "-Wl,--wrap=_calloc_r",
     "-Wl,--wrap=main",
   ]
 }
@@ -92,6 +88,12 @@ config("siwx917-common-config") {
     defines += [ "HEAP_MONITORING" ]
   }
 
+  if (sl_matter_use_code_driven_dm) {
+    defines += [ "SL_MATTER_USE_CODE_DRIVEN_DATA_MODEL=1" ]
+  } else {
+    defines += [ "SL_MATTER_USE_CODE_DRIVEN_DATA_MODEL=0" ]
+  }
+
   ldflags = [ "-Wl,--no-warn-rwx-segment" ]
 }
 
@@ -123,6 +125,7 @@ source_set("siwx917-common") {
     "${silabs_common_plat_dir}/LEDWidget.cpp",
     "${silabs_common_plat_dir}/MatterConfig.cpp",
     "${silabs_common_plat_dir}/SoftwareFaultReports.cpp",
+    "${silabs_common_plat_dir}/main.cpp",
     "${silabs_common_plat_dir}/silabs_utils.cpp",
     "${silabs_common_plat_dir}/syscalls_stubs.cpp",
   ]
@@ -160,19 +163,19 @@ source_set("siwx917-common") {
     if (chip_enable_icd_server) {
       deps += [ "${silabs_common_plat_dir}/shell:icd" ]
     }
+    if (chip_enable_read_client) {
+      deps += [ "${silabs_common_plat_dir}/shell:im" ]
+    }
   }
 
-  # DIC
-  if (enable_dic) {
-    public_deps +=
-        [ "${silabs_common_plat_dir}/DIC/matter_abs_interface:silabs-dic" ]
+  # MATTER_AWS
+  if (enable_matter_aws) {
+    public_deps += [ "${silabs_common_plat_dir}/matter_aws/matter_aws_interface:silabs-matter-aws" ]
   }
 
   # AWS SDK OTA
   if (aws_sdk_ota) {
-    public_deps += [
-      "${silabs_common_plat_dir}/DIC/matter_abs_interface:silabs-aws-sdk-ota",
-    ]
+    public_deps += [ "${silabs_common_plat_dir}/matter_aws/matter_aws_interface:silabs-matter-aws-sdk-ota" ]
   }
 
   public_deps += [
@@ -188,9 +191,11 @@ source_set("siwx917-common") {
 
   if (sl_enable_si70xx_sensor) {
     sources += [
-      "${silabs_common_plat_dir}/Si70xxSensor.cpp",
       "${silabs_common_plat_dir}/Si70xxSensor.h",
+      "${silabs_common_plat_dir}/Si70xxSensorWiseMcu.cpp",
     ]
+    public_deps +=
+        [ "${chip_root}/src/platform/silabs/platformAbstraction:common" ]
   }
 
   if (app_data_model != "") {

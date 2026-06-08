@@ -20,6 +20,7 @@
 #include <lib/shell/SubShellCommand.h>
 #include <lib/shell/commands/WiFi.h>
 #include <lib/shell/streamer.h>
+#include <lib/support/AutoRelease.h>
 #include <lib/support/Span.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/ConnectivityManager.h>
@@ -29,8 +30,36 @@ using chip::DeviceLayer::ConnectivityManager;
 using chip::DeviceLayer::ConnectivityMgr;
 using namespace chip::DeviceLayer::NetworkCommissioning;
 
+/// Convenience macro to auto-create a variable for you to release the given name at
+/// the exit of the current scope.
+#define DEFER_AUTO_RELEASE(name) AutoRelease autoRelease##__COUNTER__(name)
+
 namespace chip {
 namespace Shell {
+
+class ShellScanCallback : public WiFiDriver::ScanCallback
+{
+public:
+    void OnFinished(Status status, CharSpan debugText, WiFiScanResponseIterator * networks) override
+    {
+        DEFER_AUTO_RELEASE(networks);
+        VerifyOrReturn(status == Status::kSuccess,
+                       ChipLogError(Shell, "WiFi scan failed with status: %d", static_cast<int>(status)));
+
+        ChipLogProgress(Shell, "WiFi scan completed");
+
+        if (networks != nullptr)
+        {
+            WiFiScanResponse scanResponse;
+            while (networks->Next(scanResponse))
+            {
+                ChipLogProgress(Shell, "SSID: %.*s", static_cast<int>(scanResponse.ssidLen), scanResponse.ssid);
+            }
+        }
+    }
+};
+
+static ShellScanCallback sScanCallback;
 
 static DeviceLayer::NetworkCommissioning::WiFiDriver * sDriver;
 
@@ -109,13 +138,22 @@ static CHIP_ERROR WiFiConnectHandler(int argc, char ** argv)
 
     VerifyOrReturnError(GetWiFiDriver() != nullptr, CHIP_ERROR_NOT_IMPLEMENTED);
 
-    /* Command accepts running with SSID and password as parameters */
-    VerifyOrReturnError((argc == 2), CHIP_ERROR_INVALID_ARGUMENT);
+    /* Command accepts running with SSID and password (optional) as parameters */
+    VerifyOrReturnError((argc == 1 || argc == 2), CHIP_ERROR_INVALID_ARGUMENT);
 
-    ByteSpan ssidSpan     = ByteSpan(Uint8::from_const_char(argv[0]), strlen(argv[0]));
-    ByteSpan passwordSpan = ByteSpan(Uint8::from_const_char(argv[1]), strlen(argv[1]));
-
-    VerifyOrReturnError(IsSpanUsable(ssidSpan) && IsSpanUsable(passwordSpan), CHIP_ERROR_INVALID_ARGUMENT);
+    ByteSpan ssidSpan = ByteSpan(Uint8::from_const_char(argv[0]), strlen(argv[0]));
+    VerifyOrReturnError(!ssidSpan.empty(), CHIP_ERROR_INVALID_ARGUMENT);
+    ByteSpan passwordSpan;
+    if (argc == 2)
+    {
+        passwordSpan = ByteSpan(Uint8::from_const_char(argv[1]), strlen(argv[1]));
+        VerifyOrReturnError(!passwordSpan.empty(), CHIP_ERROR_INVALID_ARGUMENT);
+    }
+    else
+    {
+        // If no password is provided, use an empty password
+        passwordSpan = ByteSpan();
+    }
 
     ChipLogProgress(Shell, "Adding/Updating network %s", argv[0]);
 
@@ -128,7 +166,16 @@ static CHIP_ERROR WiFiConnectHandler(int argc, char ** argv)
 
     return error;
 }
+static CHIP_ERROR WiFiScanHandler(int argc, char ** argv)
+{
+    VerifyOrReturnError((argc == 0), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(GetWiFiDriver() != nullptr, CHIP_ERROR_NOT_IMPLEMENTED);
 
+    ByteSpan ssidSpan;
+    GetWiFiDriver()->ScanNetworks(ssidSpan, &sScanCallback);
+
+    return CHIP_NO_ERROR;
+}
 static CHIP_ERROR WiFiDisconnectHandler(int argc, char ** argv)
 {
     VerifyOrReturnError((argc == 0), CHIP_ERROR_INVALID_ARGUMENT);
@@ -150,8 +197,9 @@ void RegisterWiFiCommands()
 {
     static constexpr Command subCommands[] = {
         { &WiFiModeHandler, "mode", "Get/Set wifi mode. Usage: wifi mode [disable|ap|sta]" },
-        { &WiFiConnectHandler, "connect", "Connect to AP. Usage: wifi connect <ssid> <psk>" },
+        { &WiFiConnectHandler, "connect", "Connect to AP. Usage: wifi connect <ssid> [<psk>]" },
         { &WiFiDisconnectHandler, "disconnect", "Disconnect device from AP. Usage: wifi disconnect" },
+        { &WiFiScanHandler, "scan", "Scan networks (concurrent scans are not suported). Usage: wifi scan" },
     };
 
     static constexpr Command wifiCommand = { &SubShellCommand<MATTER_ARRAY_SIZE(subCommands), subCommands>, "wifi",

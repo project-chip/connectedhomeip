@@ -564,8 +564,6 @@ public class ClusterWriteMapping {
     writeAttributeMap.put("booleanState", writeBooleanStateInteractionInfo);
     Map<String, InteractionInfo> writeIcdManagementInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("icdManagement", writeIcdManagementInteractionInfo);
-    Map<String, InteractionInfo> writeTimerInteractionInfo = new LinkedHashMap<>();
-    writeAttributeMap.put("timer", writeTimerInteractionInfo);
     Map<String, InteractionInfo> writeOvenCavityOperationalStateInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("ovenCavityOperationalState", writeOvenCavityOperationalStateInteractionInfo);
     Map<String, InteractionInfo> writeOvenModeInteractionInfo = new LinkedHashMap<>();
@@ -738,6 +736,8 @@ public class ClusterWriteMapping {
     writeAttributeMap.put("rvcOperationalState", writeRvcOperationalStateInteractionInfo);
     Map<String, InteractionInfo> writeScenesManagementInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("scenesManagement", writeScenesManagementInteractionInfo);
+    Map<String, InteractionInfo> writeGroupcastInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("groupcast", writeGroupcastInteractionInfo);
     Map<String, InteractionInfo> writeHepaFilterMonitoringInteractionInfo = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> writeHepaFilterMonitoringLastChangedTimeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo hepaFilterMonitoringlastChangedTimeCommandParameterInfo =
@@ -786,6 +786,30 @@ public class ClusterWriteMapping {
     );
     writeActivatedCarbonFilterMonitoringInteractionInfo.put("writeLastChangedTimeAttribute", writeActivatedCarbonFilterMonitoringLastChangedTimeAttributeInteractionInfo);
     writeAttributeMap.put("activatedCarbonFilterMonitoring", writeActivatedCarbonFilterMonitoringInteractionInfo);
+    Map<String, InteractionInfo> writeWaterTankLevelMonitoringInteractionInfo = new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> writeWaterTankLevelMonitoringLastChangedTimeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo waterTankLevelMonitoringlastChangedTimeCommandParameterInfo =
+        new CommandParameterInfo(
+            "value", 
+            Long.class, 
+            Long.class 
+        );
+    writeWaterTankLevelMonitoringLastChangedTimeCommandParams.put(
+        "value",
+        waterTankLevelMonitoringlastChangedTimeCommandParameterInfo
+    );
+    InteractionInfo writeWaterTankLevelMonitoringLastChangedTimeAttributeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.WaterTankLevelMonitoringCluster) cluster).writeLastChangedTimeAttribute(
+          (DefaultClusterCallback) callback,
+          (Long) commandArguments.get("value")
+        );
+      },
+      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+      writeWaterTankLevelMonitoringLastChangedTimeCommandParams
+    );
+    writeWaterTankLevelMonitoringInteractionInfo.put("writeLastChangedTimeAttribute", writeWaterTankLevelMonitoringLastChangedTimeAttributeInteractionInfo);
+    writeAttributeMap.put("waterTankLevelMonitoring", writeWaterTankLevelMonitoringInteractionInfo);
     Map<String, InteractionInfo> writeBooleanStateConfigurationInteractionInfo = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> writeBooleanStateConfigurationCurrentSensitivityLevelCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo booleanStateConfigurationcurrentSensitivityLevelCommandParameterInfo =
@@ -1014,6 +1038,12 @@ public class ClusterWriteMapping {
     );
     writeElectricalGridConditionsInteractionInfo.put("writeLocalGenerationAvailableAttribute", writeElectricalGridConditionsLocalGenerationAvailableAttributeInteractionInfo);
     writeAttributeMap.put("electricalGridConditions", writeElectricalGridConditionsInteractionInfo);
+    Map<String, InteractionInfo> writeElectricalAlarmInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("electricalAlarm", writeElectricalAlarmInteractionInfo);
+    Map<String, InteractionInfo> writeElectricalDistributionInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("electricalDistribution", writeElectricalDistributionInteractionInfo);
+    Map<String, InteractionInfo> writeElectricalProtectionAlarmInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("electricalProtectionAlarm", writeElectricalProtectionAlarmInteractionInfo);
     Map<String, InteractionInfo> writeDoorLockInteractionInfo = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> writeDoorLockDoorOpenEventsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo doorLockdoorOpenEventsCommandParameterInfo =
@@ -2330,6 +2360,8 @@ public class ClusterWriteMapping {
     );
     writeThermostatUserInterfaceConfigurationInteractionInfo.put("writeScheduleProgrammingVisibilityAttribute", writeThermostatUserInterfaceConfigurationScheduleProgrammingVisibilityAttributeInteractionInfo);
     writeAttributeMap.put("thermostatUserInterfaceConfiguration", writeThermostatUserInterfaceConfigurationInteractionInfo);
+    Map<String, InteractionInfo> writeHumidistatInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("humidistat", writeHumidistatInteractionInfo);
     Map<String, InteractionInfo> writeColorControlInteractionInfo = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> writeColorControlOptionsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo colorControloptionsCommandParameterInfo =
@@ -2598,6 +2630,30 @@ public class ClusterWriteMapping {
     );
     writeBallastConfigurationInteractionInfo.put("writeLampBurnHoursTripPointAttribute", writeBallastConfigurationLampBurnHoursTripPointAttributeInteractionInfo);
     writeAttributeMap.put("ballastConfiguration", writeBallastConfigurationInteractionInfo);
+    Map<String, InteractionInfo> writeDynamicLightingInteractionInfo = new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> writeDynamicLightingCurrentSpeedCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo dynamicLightingcurrentSpeedCommandParameterInfo =
+        new CommandParameterInfo(
+            "value", 
+            Integer.class, 
+            Integer.class 
+        );
+    writeDynamicLightingCurrentSpeedCommandParams.put(
+        "value",
+        dynamicLightingcurrentSpeedCommandParameterInfo
+    );
+    InteractionInfo writeDynamicLightingCurrentSpeedAttributeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.DynamicLightingCluster) cluster).writeCurrentSpeedAttribute(
+          (DefaultClusterCallback) callback,
+          (Integer) commandArguments.get("value")
+        );
+      },
+      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+      writeDynamicLightingCurrentSpeedCommandParams
+    );
+    writeDynamicLightingInteractionInfo.put("writeCurrentSpeedAttribute", writeDynamicLightingCurrentSpeedAttributeInteractionInfo);
+    writeAttributeMap.put("dynamicLighting", writeDynamicLightingInteractionInfo);
     Map<String, InteractionInfo> writeIlluminanceMeasurementInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("illuminanceMeasurement", writeIlluminanceMeasurementInteractionInfo);
     Map<String, InteractionInfo> writeTemperatureMeasurementInteractionInfo = new LinkedHashMap<>();
@@ -2852,6 +2908,60 @@ public class ClusterWriteMapping {
     writeAttributeMap.put("radonConcentrationMeasurement", writeRadonConcentrationMeasurementInteractionInfo);
     Map<String, InteractionInfo> writeSoilMeasurementInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("soilMeasurement", writeSoilMeasurementInteractionInfo);
+    Map<String, InteractionInfo> writeAmbientContextSensingInteractionInfo = new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> writeAmbientContextSensingHoldTimeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo ambientContextSensingholdTimeCommandParameterInfo =
+        new CommandParameterInfo(
+            "value", 
+            Integer.class, 
+            Integer.class 
+        );
+    writeAmbientContextSensingHoldTimeCommandParams.put(
+        "value",
+        ambientContextSensingholdTimeCommandParameterInfo
+    );
+    InteractionInfo writeAmbientContextSensingHoldTimeAttributeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.AmbientContextSensingCluster) cluster).writeHoldTimeAttribute(
+          (DefaultClusterCallback) callback,
+          (Integer) commandArguments.get("value")
+        );
+      },
+      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+      writeAmbientContextSensingHoldTimeCommandParams
+    );
+    writeAmbientContextSensingInteractionInfo.put("writeHoldTimeAttribute", writeAmbientContextSensingHoldTimeAttributeInteractionInfo);
+    writeAttributeMap.put("ambientContextSensing", writeAmbientContextSensingInteractionInfo);
+    Map<String, InteractionInfo> writeAmbientSensingUnionInteractionInfo = new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> writeAmbientSensingUnionUnionNameCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo ambientSensingUnionunionNameCommandParameterInfo =
+        new CommandParameterInfo(
+            "value", 
+            String.class, 
+            String.class 
+        );
+    writeAmbientSensingUnionUnionNameCommandParams.put(
+        "value",
+        ambientSensingUnionunionNameCommandParameterInfo
+    );
+    InteractionInfo writeAmbientSensingUnionUnionNameAttributeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.AmbientSensingUnionCluster) cluster).writeUnionNameAttribute(
+          (DefaultClusterCallback) callback,
+          (String) commandArguments.get("value")
+        );
+      },
+      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+      writeAmbientSensingUnionUnionNameCommandParams
+    );
+    writeAmbientSensingUnionInteractionInfo.put("writeUnionNameAttribute", writeAmbientSensingUnionUnionNameAttributeInteractionInfo);
+    writeAttributeMap.put("ambientSensingUnion", writeAmbientSensingUnionInteractionInfo);
+    Map<String, InteractionInfo> writeProximityRangingInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("proximityRanging", writeProximityRangingInteractionInfo);
+    Map<String, InteractionInfo> writeSmokeConcentrationMeasurementInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("smokeConcentrationMeasurement", writeSmokeConcentrationMeasurementInteractionInfo);
+    Map<String, InteractionInfo> writeNetworkIdentityManagementInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("networkIdentityManagement", writeNetworkIdentityManagementInteractionInfo);
     Map<String, InteractionInfo> writeWiFiNetworkManagementInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("wiFiNetworkManagement", writeWiFiNetworkManagementInteractionInfo);
     Map<String, InteractionInfo> writeThreadBorderRouterManagementInteractionInfo = new LinkedHashMap<>();
@@ -3307,6 +3417,28 @@ public class ClusterWriteMapping {
       writeCameraAvStreamManagementStatusLightBrightnessCommandParams
     );
     writeCameraAvStreamManagementInteractionInfo.put("writeStatusLightBrightnessAttribute", writeCameraAvStreamManagementStatusLightBrightnessAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeCameraAvStreamManagementImageRotationDiscreteAnglesCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo cameraAvStreamManagementimageRotationDiscreteAnglesCommandParameterInfo =
+        new CommandParameterInfo(
+            "value", 
+            Integer.class, 
+            Integer.class 
+        );
+    writeCameraAvStreamManagementImageRotationDiscreteAnglesCommandParams.put(
+        "value",
+        cameraAvStreamManagementimageRotationDiscreteAnglesCommandParameterInfo
+    );
+    InteractionInfo writeCameraAvStreamManagementImageRotationDiscreteAnglesAttributeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.CameraAvStreamManagementCluster) cluster).writeImageRotationDiscreteAnglesAttribute(
+          (DefaultClusterCallback) callback,
+          (Integer) commandArguments.get("value")
+        );
+      },
+      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+      writeCameraAvStreamManagementImageRotationDiscreteAnglesCommandParams
+    );
+    writeCameraAvStreamManagementInteractionInfo.put("writeImageRotationDiscreteAnglesAttribute", writeCameraAvStreamManagementImageRotationDiscreteAnglesAttributeInteractionInfo);
     writeAttributeMap.put("cameraAvStreamManagement", writeCameraAvStreamManagementInteractionInfo);
     Map<String, InteractionInfo> writeCameraAvSettingsUserLevelManagementInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("cameraAvSettingsUserLevelManagement", writeCameraAvSettingsUserLevelManagementInteractionInfo);
@@ -3362,6 +3494,30 @@ public class ClusterWriteMapping {
     );
     writeChimeInteractionInfo.put("writeEnabledAttribute", writeChimeEnabledAttributeInteractionInfo);
     writeAttributeMap.put("chime", writeChimeInteractionInfo);
+    Map<String, InteractionInfo> writeAvAnalysisInteractionInfo = new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> writeAvAnalysisTrackingEnabledCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo avAnalysistrackingEnabledCommandParameterInfo =
+        new CommandParameterInfo(
+            "value", 
+            Boolean.class, 
+            Boolean.class 
+        );
+    writeAvAnalysisTrackingEnabledCommandParams.put(
+        "value",
+        avAnalysistrackingEnabledCommandParameterInfo
+    );
+    InteractionInfo writeAvAnalysisTrackingEnabledAttributeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.AvAnalysisCluster) cluster).writeTrackingEnabledAttribute(
+          (DefaultClusterCallback) callback,
+          (Boolean) commandArguments.get("value")
+        );
+      },
+      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+      writeAvAnalysisTrackingEnabledCommandParams
+    );
+    writeAvAnalysisInteractionInfo.put("writeTrackingEnabledAttribute", writeAvAnalysisTrackingEnabledAttributeInteractionInfo);
+    writeAttributeMap.put("avAnalysis", writeAvAnalysisInteractionInfo);
     Map<String, InteractionInfo> writeCommodityTariffInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("commodityTariff", writeCommodityTariffInteractionInfo);
     Map<String, InteractionInfo> writeEcosystemInformationInteractionInfo = new LinkedHashMap<>();

@@ -21,6 +21,14 @@
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 
+// TODO: Ideally we should not depend on the codegen integration
+// It would be best if we could use generic cluster API instead
+#include <app/clusters/boolean-state-server/CodegenIntegration.h>
+#include <app/clusters/illuminance-measurement-server/CodegenIntegration.h>
+#include <app/clusters/occupancy-sensor-server/CodegenIntegration.h>
+#include <app/clusters/relative-humidity-measurement-server/CodegenIntegration.h>
+#include <app/clusters/temperature-measurement-server/CodegenIntegration.h>
+
 #include <string>
 #include <tuple>
 
@@ -155,7 +163,7 @@ public:
             if (name == "Temperature")
             {
                 // update the temp attribute here for hardcoded endpoint 1
-                chip::app::Clusters::TemperatureMeasurement::Attributes::MeasuredValue::Set(1, static_cast<int16_t>(n * 100));
+                LogErrorOnFailure(chip::app::Clusters::TemperatureMeasurement::SetMeasuredValue(1, static_cast<int16_t>(n * 100)));
             }
             else if (name == "Color Current Level")
             {
@@ -178,14 +186,22 @@ public:
             else if (name == "Illuminance")
             {
                 // update the current illuminance here for hardcoded endpoint 1
-                ESP_LOGI(TAG, "Illuminance changed to : %d", n);
-                app::Clusters::IlluminanceMeasurement::Attributes::MeasuredValue::Set(1, static_cast<int16_t>(n));
+                CHIP_ERROR err = app::Clusters::IlluminanceMeasurement::SetMeasuredValue(1, static_cast<uint16_t>(n));
+                if (err == CHIP_NO_ERROR)
+                {
+                    ESP_LOGI(TAG, "Illuminance changed to : %d", n);
+                }
+                else
+                {
+                    ESP_LOGE(TAG, "Failed to set illuminance: %" CHIP_ERROR_FORMAT, err.Format());
+                }
             }
             else if (name == "Humidity")
             {
                 // update the current humidity here for hardcoded endpoint 1
                 ESP_LOGI(TAG, "Humidity changed to : %d", n);
-                app::Clusters::RelativeHumidityMeasurement::Attributes::MeasuredValue::Set(1, static_cast<int16_t>(n * 100));
+                LogErrorOnFailure(app::Clusters::RelativeHumidityMeasurement::SetMeasuredValue(
+                    1, app::DataModel::MakeNullable(static_cast<uint16_t>(n * 100))));
             }
             else if (name == "OccupiedCoolingSetpoint")
             {
@@ -244,9 +260,17 @@ public:
             {
                 value               = (value == "Yes") ? "No" : "Yes";
                 bool attributeValue = (value == "Yes");
-                ESP_LOGI(TAG, "Occupancy changed to : %s", value.c_str());
                 // update the current occupancy here for hardcoded endpoint 1
-                app::Clusters::OccupancySensing::Attributes::Occupancy::Set(1, attributeValue);
+                auto occupancy = app::Clusters::OccupancySensing::FindClusterOnEndpoint(1);
+                if (occupancy != nullptr)
+                {
+                    ESP_LOGI(TAG, "Occupancy changed to : %s", value.c_str());
+                    occupancy->SetOccupancy(attributeValue);
+                }
+                else
+                {
+                    ESP_LOGE(TAG, "Unable to change occupancy: no cluster");
+                }
             }
         }
         else
@@ -500,8 +524,8 @@ void SetupPretendDevices()
     AddEndpoint("External");
     AddCluster("Thermometer");
     AddAttribute("Temperature", "21");
-    // write the temp attribute
-    chip::app::Clusters::TemperatureMeasurement::Attributes::MeasuredValue::Set(1, static_cast<int16_t>(21 * 100));
+
+    LogErrorOnFailure(chip::app::Clusters::TemperatureMeasurement::SetMeasuredValue(1, static_cast<int16_t>(21 * 100)));
 
     AddDevice("Door Lock");
     AddEndpoint("Default");
@@ -533,18 +557,26 @@ void SetupPretendDevices()
     AddEndpoint("External");
     AddCluster("Occupancy Sensor");
     AddAttribute("Occupancy", "Yes");
-    app::Clusters::OccupancySensing::Attributes::Occupancy::Set(1, 1);
+
+    auto occupancy = app::Clusters::OccupancySensing::FindClusterOnEndpoint(1);
+    if (occupancy != nullptr)
+    {
+        occupancy->SetOccupancy(true);
+    }
 
     AddDevice("Contact Sensor");
     AddEndpoint("External");
     AddCluster("Contact Sensor");
     AddAttribute("Contact", "true");
-    app::Clusters::BooleanState::Attributes::StateValue::Set(1, true);
+    auto booleanState = app::Clusters::BooleanState::FindClusterOnEndpoint(1);
+    if (booleanState != nullptr)
+    {
+        booleanState->SetStateValue(true);
+    }
 
     AddDevice("Thermostat");
     AddEndpoint("1");
     AddCluster("Thermostat");
-    app::Clusters::TemperatureMeasurement::Attributes::MeasuredValue::Set(1, static_cast<int16_t>(21 * 100));
     app::Clusters::Thermostat::Attributes::LocalTemperature::Set(1, static_cast<int16_t>(21 * 100));
     AddAttribute("SystemMode", "4");
     app::Clusters::Thermostat::Attributes::SystemMode::Set(1, app::Clusters::Thermostat::SystemModeEnum::kHeat);
@@ -557,13 +589,15 @@ void SetupPretendDevices()
     AddEndpoint("External");
     AddCluster("Humidity Sensor");
     AddAttribute("Humidity", "30");
-    app::Clusters::RelativeHumidityMeasurement::Attributes::MeasuredValue::Set(1, static_cast<int16_t>(30 * 100));
+    LogErrorOnFailure(
+        app::Clusters::RelativeHumidityMeasurement::SetMeasuredValue(1, app::DataModel::MakeNullable<uint16_t>(30 * 100)));
 
     AddDevice("Light Sensor");
     AddEndpoint("External");
     AddCluster("Illuminance Measurement");
     AddAttribute("Illuminance", "1000");
-    app::Clusters::IlluminanceMeasurement::Attributes::MeasuredValue::Set(1, static_cast<int16_t>(1000));
+
+    LogErrorOnFailure(app::Clusters::IlluminanceMeasurement::SetMeasuredValue(1, static_cast<uint16_t>(1000)));
 
     AddDevice("Color Light");
     AddEndpoint("1");
@@ -674,14 +708,11 @@ void InitDeviceDisplay()
     // Initialize the screen manager
     ScreenManager::Init();
 
-    // Connect the status LED to VLEDs.
-    int vled1 = ScreenManager::AddVLED(TFT_GREEN);
-    int vled2 = ScreenManager::AddVLED(TFT_RED);
-    statusLED1.SetVLED(vled1, vled2);
-
-    int vled3 = ScreenManager::AddVLED(TFT_CYAN);
-    int vled4 = ScreenManager::AddVLED(TFT_ORANGE);
-    statusLED2.SetVLED(vled3, vled4);
+    // Wire status LEDs to virtual LEDs on display
+    static int sStatusLED1_VLED = ScreenManager::AddVLED(TFT_GREEN);
+    static int sStatusLED2_VLED = ScreenManager::AddVLED(TFT_CYAN);
+    statusLED1.SetStateChangeCallback([](LEDWidget *, bool state) { ScreenManager::SetVLED(sStatusLED1_VLED, state); });
+    statusLED2.SetStateChangeCallback([](LEDWidget *, bool state) { ScreenManager::SetVLED(sStatusLED2_VLED, state); });
 
     bluetoothLED.SetVLED(ScreenManager::AddVLED(TFT_BLUE));
     wifiLED.SetVLED(ScreenManager::AddVLED(TFT_YELLOW));

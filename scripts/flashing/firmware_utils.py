@@ -180,7 +180,7 @@ class Flasher:
 
     def actions(self):
         """Perform actions on the device according to self.option."""
-        raise NotImplementedError()
+        raise NotImplementedError
 
     def log(self, level, *args):
         """Optionally log a message to stderr."""
@@ -267,7 +267,7 @@ class Flasher:
             note = tool_info.get('error', 'Unable to execute {tool}.')
             note = textwrap.dedent(note).format(tool=tool, **vars(self.option))
             # textwrap.fill only handles single paragraphs:
-            note = '\n\n'.join((textwrap.fill(p) for p in note.split('\n\n')))
+            note = '\n\n'.join(textwrap.fill(p) for p in note.split('\n\n'))
             print(note, file=sys.stderr)
             return False
         return True
@@ -331,7 +331,7 @@ class Flasher:
                         ↦ ρᵢ if opt[name]==σᵢ
                           ρ otherwise
         """
-        if isinstance(template, str) or isinstance(template, pathlib.Path):
+        if isinstance(template, (str, pathlib.Path)):
             result = [str(template).format_map(opt)]
         elif isinstance(template, list):
             result = []

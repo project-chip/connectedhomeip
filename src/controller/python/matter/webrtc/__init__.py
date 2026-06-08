@@ -15,7 +15,9 @@
 #  limitations under the License.
 #
 
-from .peer_connection import IceCandiate, IceCandidateList, PeerConnection
+from .browser_peer_connection import BrowserPeerConnection
+from .libdatachannel_peer_connection import LibdatachannelPeerConnection
+from .types import IceCandidate, IceCandidateList
 from .webrtc_manager import WebRTCManager
 
-__all__ = ["PeerConnection", "WebRTCManager", "IceCandiate", "IceCandidateList"]
+__all__ = ["BrowserPeerConnection", "LibdatachannelPeerConnection", "WebRTCManager", "IceCandidate", "IceCandidateList"]

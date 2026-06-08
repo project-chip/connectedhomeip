@@ -30,7 +30,7 @@ CHIP_ERROR AmebaOTAImageProcessor::PrepareDownload()
 {
     ChipLogProgress(SoftwareUpdate, "Prepare download");
 
-    DeviceLayer::PlatformMgr().ScheduleWork(HandlePrepareDownload, reinterpret_cast<intptr_t>(this));
+    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(HandlePrepareDownload, reinterpret_cast<intptr_t>(this));
     return CHIP_NO_ERROR;
 }
 
@@ -38,7 +38,7 @@ CHIP_ERROR AmebaOTAImageProcessor::Finalize()
 {
     ChipLogProgress(SoftwareUpdate, "Finalize");
 
-    DeviceLayer::PlatformMgr().ScheduleWork(HandleFinalize, reinterpret_cast<intptr_t>(this));
+    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(HandleFinalize, reinterpret_cast<intptr_t>(this));
     return CHIP_NO_ERROR;
 }
 
@@ -46,7 +46,7 @@ CHIP_ERROR AmebaOTAImageProcessor::Apply()
 {
     ChipLogProgress(SoftwareUpdate, "Apply");
 
-    DeviceLayer::PlatformMgr().ScheduleWork(HandleApply, reinterpret_cast<intptr_t>(this));
+    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(HandleApply, reinterpret_cast<intptr_t>(this));
     return CHIP_NO_ERROR;
 }
 
@@ -54,7 +54,7 @@ CHIP_ERROR AmebaOTAImageProcessor::Abort()
 {
     ChipLogProgress(SoftwareUpdate, "Abort");
 
-    DeviceLayer::PlatformMgr().ScheduleWork(HandleAbort, reinterpret_cast<intptr_t>(this));
+    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(HandleAbort, reinterpret_cast<intptr_t>(this));
     return CHIP_NO_ERROR;
 }
 
@@ -73,7 +73,7 @@ CHIP_ERROR AmebaOTAImageProcessor::ProcessBlock(ByteSpan & block)
         return err;
     }
 
-    DeviceLayer::PlatformMgr().ScheduleWork(HandleProcessBlock, reinterpret_cast<intptr_t>(this));
+    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(HandleProcessBlock, reinterpret_cast<intptr_t>(this));
     return CHIP_NO_ERROR;
 }
 
@@ -127,7 +127,7 @@ void AmebaOTAImageProcessor::HandlePrepareDownload(intptr_t context)
 
     // prepare OTA update partition
     matter_ota_prepare_partition();
-    imageProcessor->mDownloader->OnPreparedForDownload(CHIP_NO_ERROR);
+    TEMPORARY_RETURN_IGNORED imageProcessor->mDownloader->OnPreparedForDownload(CHIP_NO_ERROR);
 }
 
 void AmebaOTAImageProcessor::HandleFinalize(intptr_t context)
@@ -145,7 +145,7 @@ void AmebaOTAImageProcessor::HandleFinalize(intptr_t context)
         return;
     }
 
-    imageProcessor->ReleaseBlock();
+    TEMPORARY_RETURN_IGNORED imageProcessor->ReleaseBlock();
 
     ChipLogProgress(SoftwareUpdate, "OTA image downloaded and written to flash");
 }
@@ -162,7 +162,7 @@ void AmebaOTAImageProcessor::HandleAbort(intptr_t context)
     // to make flash erase non-blocking, create background task to cleanup flash, will self-delete upon completion
     matter_ota_create_abort_task();
 
-    imageProcessor->ReleaseBlock();
+    TEMPORARY_RETURN_IGNORED imageProcessor->ReleaseBlock();
 }
 
 void AmebaOTAImageProcessor::HandleProcessBlock(intptr_t context)
@@ -221,7 +221,7 @@ void AmebaOTAImageProcessor::HandleProcessBlock(intptr_t context)
 
     // 3. Fetch next data block
     imageProcessor->mParams.downloadedBytes += block.size();
-    imageProcessor->mDownloader->FetchNextData();
+    TEMPORARY_RETURN_IGNORED imageProcessor->mDownloader->FetchNextData();
 }
 
 void AmebaOTAImageProcessor::HandleApply(intptr_t context)
@@ -245,7 +245,8 @@ void AmebaOTAImageProcessor::HandleApply(intptr_t context)
     ChipLogProgress(SoftwareUpdate, "Rebooting in 10 seconds...");
 
     // Delay action time before calling HandleRestart
-    chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(10 * 1000), HandleRestart, nullptr);
+    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(10 * 1000),
+                                                                         HandleRestart, nullptr);
 }
 
 void AmebaOTAImageProcessor::HandleRestart(chip::System::Layer * systemLayer, void * appState)
@@ -276,7 +277,7 @@ CHIP_ERROR AmebaOTAImageProcessor::SetBlock(ByteSpan & block)
 {
     if (block.empty())
     {
-        ReleaseBlock();
+        TEMPORARY_RETURN_IGNORED ReleaseBlock();
         return CHIP_NO_ERROR;
     }
 
@@ -284,7 +285,7 @@ CHIP_ERROR AmebaOTAImageProcessor::SetBlock(ByteSpan & block)
     {
         if (!mBlock.empty())
         {
-            ReleaseBlock();
+            TEMPORARY_RETURN_IGNORED ReleaseBlock();
         }
         uint8_t * mBlock_ptr = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(block.size()));
         if (mBlock_ptr == nullptr)
@@ -298,7 +299,7 @@ CHIP_ERROR AmebaOTAImageProcessor::SetBlock(ByteSpan & block)
     {
         if (!mBlock.empty())
         {
-            ReleaseBlock();
+            TEMPORARY_RETURN_IGNORED ReleaseBlock();
         }
 
         uint8_t * mBlock_ptr = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(block.size()));

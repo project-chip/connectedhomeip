@@ -73,13 +73,13 @@ public:
                 (elem->mSessionInfo.peer_id == pInInfo->peer_id) &&
                 !memcmp(elem->mSessionInfo.peer_addr, pInInfo->peer_addr, sizeof(uint8_t) * 6))
             {
-                ChipLogProgress(WiFiPAF, "Find: Found WiFiPAFEndPoint[%lu]", i);
+                ChipLogProgress(WiFiPAF, "Find: Found WiFiPAFEndPoint[%zu]", i);
                 return elem;
             }
 #ifdef CHIP_WIFIPAF_LAYER_DEBUG_LOGGING_ENABLED
             {
                 const WiFiPAFSession * pElmInfo = &elem->mSessionInfo;
-                ChipLogError(WiFiPAF, "EndPoint[%lu]", i);
+                ChipLogError(WiFiPAF, "EndPoint[%zu]", i);
                 ChipLogError(WiFiPAF, "Role: [%d, %d]", pElmInfo->role, pInInfo->role);
                 ChipLogError(WiFiPAF, "id: [%u, %u]", pElmInfo->id, pInInfo->id);
                 ChipLogError(WiFiPAF, "peer_id: [%d, %d]", pElmInfo->peer_id, pInInfo->peer_id);
@@ -87,7 +87,7 @@ public:
                              pElmInfo->peer_addr[2], pElmInfo->peer_addr[3], pElmInfo->peer_addr[4], pElmInfo->peer_addr[5]);
                 ChipLogError(WiFiPAF, "InMac: [%02x:%02x:%02x:%02x:%02x:%02x]", pInInfo->peer_addr[0], pInInfo->peer_addr[1],
                              pInInfo->peer_addr[2], pInInfo->peer_addr[3], pInInfo->peer_addr[4], pInInfo->peer_addr[5]);
-                ChipLogError(WiFiPAF, "nodeId: [%lu, %lu]", pElmInfo->nodeId, pInInfo->nodeId);
+                ChipLogError(WiFiPAF, "nodeId: [%" PRIu64 ", %" PRIu64 "]", pElmInfo->nodeId, pInInfo->nodeId);
                 ChipLogError(WiFiPAF, "discriminator: [%d, %d]", pElmInfo->discriminator, pInInfo->discriminator);
             }
 #endif
@@ -240,22 +240,20 @@ CHIP_ERROR WiFiPAFLayer::Init(chip::System::Layer * systemLayer)
     return CHIP_NO_ERROR;
 }
 
-void WiFiPAFLayer::Shutdown(OnCancelDeviceHandle OnCancelDevice)
+void WiFiPAFLayer::Shutdown()
 {
-    ChipLogProgress(WiFiPAF, "WiFiPAF: Closing all WiFiPAF sessions to shutdown");
     uint8_t i;
     WiFiPAFSession * pPafSession;
 
     for (i = 0; i < WIFIPAF_LAYER_NUM_PAF_ENDPOINTS; i++)
     {
         pPafSession = &mPafInfoVect[i];
-        if (pPafSession->id == UINT32_MAX)
+        if ((pPafSession->id == kUndefinedWiFiPafSessionId) || (pPafSession->id == 0))
         {
             // Unused session
             continue;
         }
         ChipLogProgress(WiFiPAF, "WiFiPAF: Canceling id: %u", pPafSession->id);
-        OnCancelDevice(pPafSession->id, pPafSession->role);
         WiFiPAFEndPoint * endPoint = sWiFiPAFEndPointPool.Find(reinterpret_cast<WIFIPAF_CONNECTION_OBJECT>(pPafSession));
         if (endPoint != nullptr)
         {
@@ -328,9 +326,7 @@ CHIP_ERROR WiFiPAFLayer::NewEndPoint(WiFiPAFEndPoint ** retEndPoint, WiFiPAFSess
         ChipLogError(WiFiPAF, "endpoint pool FULL");
         return CHIP_ERROR_ENDPOINT_POOL_FULL;
     }
-    (*retEndPoint)->Init(this, SessionInfo);
-
-    return CHIP_NO_ERROR;
+    return (*retEndPoint)->Init(this, SessionInfo);
 }
 
 CHIP_ERROR WiFiPAFLayer::HandleTransportConnectionInitiated(WiFiPAF::WiFiPAFSession & SessionInfo,
@@ -456,7 +452,7 @@ CHIP_ERROR WiFiPAFLayer::AddPafSession(PafInfoAccess accType, WiFiPAFSession & S
         case PafInfoAccess::kAccNodeInfo:
             pPafSession->nodeId        = SessionInfo.nodeId;
             pPafSession->discriminator = SessionInfo.discriminator;
-            ChipLogProgress(WiFiPAF, "WiFiPAF: Add session with nodeId: %lu, disc: %x, sessions", SessionInfo.nodeId,
+            ChipLogProgress(WiFiPAF, "WiFiPAF: Add session with nodeId: %" PRIu64 ", disc: %x, sessions", SessionInfo.nodeId,
                             SessionInfo.discriminator);
             return CHIP_NO_ERROR;
         case PafInfoAccess::kAccSessionId:

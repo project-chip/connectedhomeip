@@ -24,11 +24,12 @@
 
 #pragma once
 
+#include "app/data-model-provider/AttributeChangeListener.h"
 #include <access/AccessControl.h>
 #include <app/EventReporter.h>
 #include <app/MessageDef/ReportDataMessage.h>
 #include <app/ReadHandler.h>
-#include <app/data-model-provider/ProviderChangeListener.h>
+#include <app/reporting/Generations.h>
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/support/CodeUtils.h>
@@ -46,6 +47,7 @@ class InteractionModelEngine;
 class TestReadInteraction;
 
 namespace reporting {
+
 /*
  *  @class Engine
  *
@@ -56,7 +58,7 @@ namespace reporting {
  *         At its core, it  tries to gather and pack as much relevant attributes changes and/or events as possible into a report
  * message before sending that to the reader. It continues to do so until it has no more work to do.
  */
-class Engine : public DataModel::ProviderChangeListener, public EventReporter
+class Engine : public EventReporter, public DataModel::AttributeChangeListener
 {
 public:
     /**
@@ -123,14 +125,15 @@ public:
 
     uint32_t GetNumReportsInFlight() const { return mNumReportsInFlight; }
 
-    uint64_t GetDirtySetGeneration() const { return mDirtyGeneration; }
+    AttributeGeneration GetDirtySetGeneration() const { return mDirtyGeneration; }
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     size_t GetGlobalDirtySetSize() { return mGlobalDirtySet.Allocated(); }
 #endif
 
-    /* ProviderChangeListener implementation */
-    void MarkDirty(const AttributePathParams & path) override;
+    // DataModel::AttributeChangeListener implementation
+    void OnAttributeChanged(const ConcreteAttributePath & path, DataModel::AttributeChangeType type) override;
+    void OnEndpointChanged(EndpointId endpointId, DataModel::EndpointChangeType type) override;
 
 private:
     /**
@@ -145,9 +148,10 @@ private:
 
     struct AttributePathParamsWithGeneration : public AttributePathParams
     {
-        AttributePathParamsWithGeneration() {}
+        AttributePathParamsWithGeneration() = default;
         AttributePathParamsWithGeneration(const AttributePathParams aPath) : AttributePathParams(aPath) {}
-        uint64_t mGeneration = 0;
+
+        AttributeGeneration mGeneration;
     };
 
     /**
@@ -233,7 +237,7 @@ private:
 
     CHIP_ERROR InsertPathIntoDirtySet(const AttributePathParams & aAttributePath);
 
-    inline void BumpDirtySetGeneration() { mDirtyGeneration++; }
+    inline void BumpDirtySetGeneration() { mDirtyGeneration.Increment(); }
 
     /**
      * Boolean to indicate if ScheduleRun is pending. This flag is used to prevent calling ScheduleRun multiple times
@@ -282,7 +286,7 @@ private:
      * Count it from 1, so 0 can be used in ReadHandler to indicate "the read handler has never
      * completed a report".
      */
-    uint64_t mDirtyGeneration = 1;
+    AttributeGeneration mDirtyGeneration{ 1 };
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     uint32_t mReservedSize          = 0;

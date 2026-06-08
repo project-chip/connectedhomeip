@@ -39,6 +39,12 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::ContentContr
             return RemainingScreenTime::kMetadataEntry;
         case BlockUnrated::Id:
             return BlockUnrated::kMetadataEntry;
+        case BlockChannelList::Id:
+            return BlockChannelList::kMetadataEntry;
+        case BlockApplicationList::Id:
+            return BlockApplicationList::kMetadataEntry;
+        case BlockContentTimeWindow::Id:
+            return BlockContentTimeWindow::kMetadataEntry;
         default:
             return std::nullopt;
         }
@@ -73,6 +79,18 @@ struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::Conten
             return SetOnDemandRatingThreshold::kMetadataEntry;
         case SetScheduledContentRatingThreshold::Id:
             return SetScheduledContentRatingThreshold::kMetadataEntry;
+        case AddBlockChannels::Id:
+            return AddBlockChannels::kMetadataEntry;
+        case RemoveBlockChannels::Id:
+            return RemoveBlockChannels::kMetadataEntry;
+        case AddBlockApplications::Id:
+            return AddBlockApplications::kMetadataEntry;
+        case RemoveBlockApplications::Id:
+            return RemoveBlockApplications::kMetadataEntry;
+        case SetBlockContentTimeWindow::Id:
+            return SetBlockContentTimeWindow::kMetadataEntry;
+        case RemoveBlockContentTimeWindow::Id:
+            return RemoveBlockContentTimeWindow::kMetadataEntry;
 
         default:
             return std::nullopt;

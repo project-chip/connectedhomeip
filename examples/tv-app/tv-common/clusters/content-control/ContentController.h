@@ -40,11 +40,11 @@ public:
     bool HandleGetBlockUnrated() override;
 
     // Command Delegates
-    void HandleUpdatePIN(chip::Optional<chip::CharSpan> oldPIN, chip::CharSpan newPIN) override;
+    void HandleUpdatePIN(chip::CharSpan oldPIN, chip::CharSpan newPIN) override;
     void HandleResetPIN(chip::app::CommandResponseHelper<ResetPINResponseType> & helper) override;
     void HandleEnable() override;
     void HandleDisable() override;
-    void HandleAddBonusTime(chip::Optional<chip::CharSpan> PINCode, chip::Optional<uint32_t> bonusTime) override;
+    void HandleAddBonusTime(chip::Optional<chip::CharSpan> PINCode, uint32_t bonusTime) override;
     void HandleSetScreenDailyTime(uint32_t screenDailyTime) override;
     void HandleBlockUnratedContent() override;
     void HandleUnblockUnratedContent() override;
