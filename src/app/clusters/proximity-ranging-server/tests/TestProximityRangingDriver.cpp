@@ -666,11 +666,12 @@ TEST_F(TestProximityRangingDriver, InstantRangingTerminatesOnFirstPassingMeasure
     driver.Shutdown();
 }
 
-// 18. Instant ranging + filtered measurement: the driver re-invokes
-//     StartSession to give the adapter another shot, rather than terminating.
-//     The session stays open until either a passing measurement arrives or
-//     EndTime fires.
-TEST_F(TestProximityRangingDriver, InstantRangingFilteredMeasurementRetriesStartSession)
+// 18. Instant ranging + filtered measurement: the driver drops the
+//     measurement and does NOT re-issue StartSession. Per spec, instant
+//     ranging is a single ranging attempt; the session lingers until
+//     EndTime fires, at which point the kPeerNotFound remap produces the
+//     spec-correct outcome.
+TEST_F(TestProximityRangingDriver, InstantRangingFilteredMeasurementDoesNotRetry)
 {
     TimerDelegateMock timer;
     MockRangingAdapter ble(RangingTechEnum::kBLEBeaconRSSIRanging);
@@ -692,11 +693,11 @@ TEST_F(TestProximityRangingDriver, InstantRangingFilteredMeasurementRetriesStart
     tooClose.distance.SetNonNull(static_cast<uint16_t>(100));
     ble.GetCallback()->OnMeasurementData(kSessionId, tooClose);
 
-    // Measurement was filtered: not forwarded, no StopSession, but driver
-    // re-invoked StartSession to ask the adapter to try another single-shot.
+    // Measurement was filtered: not forwarded; driver did NOT re-issue
+    // StartSession; session stays alive until EndTime.
     EXPECT_TRUE(cb.measurements.empty());
     EXPECT_EQ(ble.mStopCalls, 0);
-    EXPECT_EQ(ble.mStartCalls, 2);
+    EXPECT_EQ(ble.mStartCalls, 1);
     EXPECT_EQ(driver.GetNumActiveSessionIds(), 1u);
 
     driver.Shutdown();
