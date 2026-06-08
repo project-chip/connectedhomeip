@@ -373,7 +373,6 @@ def read_global_wildcard(event_loop, default_controller, node_id):
                 node_id,
                 [
                     (Clusters.Descriptor),
-                    (Clusters.BasicInformation),
                     Attribute.AttributePath(None, None, GlobalAttributeIds.ATTRIBUTE_LIST_ID),
                     Attribute.AttributePath(None, None, GlobalAttributeIds.FEATURE_MAP_ID),
                     Attribute.AttributePath(None, None, GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID),
@@ -494,17 +493,22 @@ def run_tests_no_exit(
                 node_id = matter_test_config.dut_node_ids[0]
 
                 if matter_test_config.commissioning_method is not None and setup_code is not None:
-                    # Path 1: PASE + commissioning
-                    commissionee = event_loop.run_until_complete(
-                        default_controller.FindOrEstablishPASESession(
-                            setupCode=setup_code, nodeId=node_id
+                    # Path 1: PASE + commissioning — CommissionDeviceTest will open PASE again, so close
+                    # the pre-commissioning session after the wildcard read to avoid competing sessions.
+                    try:
+                        commissionee = event_loop.run_until_complete(
+                            default_controller.FindOrEstablishPASESession(
+                                setupCode=setup_code, nodeId=node_id
+                            )
                         )
-                    )
-                    if commissionee is not None:
-                        stored_global_wildcard = read_global_wildcard(event_loop, default_controller, node_id)
-                        test_config.user_params["stored_global_wildcard"] = global_stash.stash_globally(stored_global_wildcard)
-                    else:
-                        LOGGER.error("FindOrEstablishPASESession returned None")
+                        if commissionee is not None:
+                            stored_global_wildcard = read_global_wildcard(event_loop, default_controller, node_id)
+                            test_config.user_params["stored_global_wildcard"] = global_stash.stash_globally(stored_global_wildcard)
+                            default_controller.ExpireSessions(nodeId=node_id)
+                        else:
+                            LOGGER.error("FindOrEstablishPASESession returned None")
+                    except Exception:
+                        LOGGER.warning("Could not pre-populate global wildcard before commissioning")
 
                 elif setup_code is not None:
                     # Path 2: PASE without commissioning (e.g., manual-code only)
