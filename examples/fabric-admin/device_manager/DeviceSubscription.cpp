@@ -33,7 +33,12 @@ using namespace ::chip;
 using namespace ::chip::app;
 using chip::app::ReadClient;
 
+namespace admin {
+
 namespace {
+
+constexpr uint16_t kSubscribeMinInterval = 0;
+constexpr uint16_t kSubscribeMaxInterval = 10;
 
 void OnDeviceConnectedWrapper(void * context, Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle)
 {
@@ -107,7 +112,7 @@ void DeviceSubscription::OnReportEnd()
     if (mChangeDetected)
     {
 #if defined(PW_RPC_ENABLED)
-        AdminCommissioningAttributeChanged(mCurrentAdministratorCommissioningAttributes);
+        TEMPORARY_RETURN_IGNORED AdminCommissioningAttributeChanged(mCurrentAdministratorCommissioningAttributes);
 #else
         ChipLogError(NotSpecified, "Cannot forward Administrator Commissioning Attribute to fabric bridge: RPC not enabled");
 #endif
@@ -132,7 +137,7 @@ void DeviceSubscription::OnError(CHIP_ERROR error)
         reachabilityChanged.has_id       = true;
         reachabilityChanged.id           = mCurrentAdministratorCommissioningAttributes.id;
         reachabilityChanged.reachability = false;
-        DeviceReachableChanged(reachabilityChanged);
+        TEMPORARY_RETURN_IGNORED DeviceReachableChanged(reachabilityChanged);
     }
 #endif
     ChipLogProgress(NotSpecified, "Error subscribing: %" CHIP_ERROR_FORMAT, error.Format());
@@ -160,7 +165,9 @@ void DeviceSubscription::OnDeviceConnected(Messaging::ExchangeManager & exchange
 
     readParams.mpAttributePathParamsList    = readPaths;
     readParams.mAttributePathParamsListSize = 1;
-    readParams.mMaxIntervalCeilingSeconds   = 5 * 60;
+    readParams.mMinIntervalFloorSeconds     = kSubscribeMinInterval;
+    readParams.mMaxIntervalCeilingSeconds   = kSubscribeMaxInterval;
+    readParams.mKeepSubscriptions           = true;
 
     CHIP_ERROR err = mClient->SendRequest(readParams);
 
@@ -215,7 +222,7 @@ void DeviceSubscription::OnDeviceConnectionFailure(const ScopedNodeId & peerId, 
         reachabilityChanged.has_id       = true;
         reachabilityChanged.id           = mCurrentAdministratorCommissioningAttributes.id;
         reachabilityChanged.reachability = false;
-        DeviceReachableChanged(reachabilityChanged);
+        TEMPORARY_RETURN_IGNORED DeviceReachableChanged(reachabilityChanged);
     }
 #endif
 
@@ -281,3 +288,5 @@ void DeviceSubscription::StopSubscription()
     MoveToState(State::AwaitingDestruction);
     mOnDoneCallback(mScopedNodeId);
 }
+
+} // namespace admin

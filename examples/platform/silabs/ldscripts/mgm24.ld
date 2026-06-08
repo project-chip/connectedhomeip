@@ -30,7 +30,8 @@
  MEMORY
  {
    FLASH      (rx)  : ORIGIN = 0x8006000, LENGTH = 0x178000
-   RAM        (rwx) : ORIGIN = 0x20000000, LENGTH = 0x40000
+   RAM        (rwx) : ORIGIN = 0x20000004, LENGTH = 0x3fffc
+   BOOTLOADER_RESET_REGION (rwx) : ORIGIN = 0x20000000, LENGTH = 0x4
  }
 
 ENTRY(Reset_Handler)
@@ -48,6 +49,13 @@ SECTIONS
     __Vectors_Size = __Vectors_End - __Vectors;
     __lma_ramfuncs_start__ = .;
   } > FLASH
+.bootloader_reset_section (NOLOAD):
+  {
+    __ResetReasonStart__ = .;
+    . = . + 4;
+    . = ALIGN(4);
+    __ResetReasonEnd__ = .;
+  } > BOOTLOADER_RESET_REGION
 
   .stack (NOLOAD):
   {
@@ -59,31 +67,33 @@ SECTIONS
     PROVIDE(__stack = __StackTop);
   } > RAM
 
-
-  .noinit (NOLOAD):
-  {
-    *(.noinit*);
-  } > RAM
-
   .bss :
   {
     . = ALIGN(4);
     __bss_start__ = .;
     *(SORT_BY_ALIGNMENT(.bss*))
     *(COMMON)
-    . = ALIGN(4);
+    . = ALIGN(32);
     __bss_end__ = .;
   } > RAM
 
+
+  .noinit (NOLOAD):
+  {
+    *(.noinit*);
+    . = ALIGN(32);
+  } > RAM
+
+
   text_application_ram :
   {
-    . = ALIGN(4);
+    . = ALIGN(32);
     __vma_ramfuncs_start__ = .;
     __text_application_ram_start__ = .;
 
     *(text_application_ram)
 
-    . = ALIGN(4);
+    . = ALIGN(32);
     __vma_ramfuncs_end__ = .;
     __text_application_ram_end__ = .;
   } > RAM AT > FLASH
@@ -196,16 +206,24 @@ SECTIONS
     KEEP(*(SORT(.fini_array.*)))
     KEEP(*(.fini_array))
     PROVIDE_HIDDEN (__fini_array_end = .);
+    . = ALIGN(4);
+    *(SEGGER_RTT)
 
     . = ALIGN(4);
     /* All data end */
     __data_end__ = .;
 
   } > RAM AT > FLASH
+
+
+/* Calculate heap size based on RAM limits. */
+heap_limit = ORIGIN(RAM) + LENGTH(RAM);  /* End of RAM */
+heap_size = heap_limit - __HeapBase;
   .memory_manager_heap (NOLOAD):
   {
     . = ALIGN(8);
     __HeapBase = .;
+. += heap_size;
     __end__ = .;
     end = __end__;
     _end = __end__;
@@ -214,7 +232,7 @@ SECTIONS
   } > RAM
 
   __heap_size = __HeapLimit - __HeapBase;
-  __ram_end__ = 0x20000000 + 0x40000;
+  __ram_end__ = 0x20000004 + 0x3fffc;
   __main_flash_end__ = 0x8006000 + 0x178000;
 
    /* This is where we handle flash storage blocks. We use dummy sections for finding the configured

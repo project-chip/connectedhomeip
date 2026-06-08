@@ -24,7 +24,7 @@
 
 #define APP_TASK_NAME "Lit"
 
-#define BLE_DEV_NAME "SiLabs-LIT-ICD"
+#define BLE_DEV_NAME "SL-" APP_TASK_NAME
 
 // APP Logo, boolean only. must be 64x64
 #define ON_DEMO_BITMAP                                                                                                             \

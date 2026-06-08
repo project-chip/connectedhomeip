@@ -27,17 +27,21 @@
 #       --passcode 20202021
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#       --endpoint 1
 #     factory-reset: true
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import time
+import asyncio
 
-import chip.clusters as Clusters
-from chip.clusters.Types import NullValue
-from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.clusters.Types import NullValue
+from matter.interaction_model import InteractionModelError, Status
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.runner import TestStep, default_matter_test_main
 
 
 class TC_VALCC_4_1(MatterBaseTest):
@@ -49,7 +53,7 @@ class TC_VALCC_4_1(MatterBaseTest):
         return "[TC-VALCC-4.1] Duration functionality with DUT as Server"
 
     def steps_TC_VALCC_4_1(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(2, "Send Open command with duration set to 60"),
             TestStep(3, "Read OpenDuration attribute"),
@@ -60,18 +64,20 @@ class TC_VALCC_4_1(MatterBaseTest):
             TestStep(8, "Read OpenDuration attribute"),
             TestStep(9, "Read RemainingDuration attribute"),
         ]
-        return steps
 
     def pics_TC_VALCC_4_1(self) -> list[str]:
-        pics = [
+        return [
             "VALCC.S",
         ]
-        return pics
+
+    @property
+    def default_endpoint(self) -> int:
+        return 1
 
     @async_test_body
     async def test_TC_VALCC_4_1(self):
 
-        endpoint = self.user_params.get("endpoint", 1)
+        endpoint = self.get_endpoint()
 
         self.step(1)
         attributes = Clusters.ValveConfigurationAndControl.Attributes
@@ -95,7 +101,7 @@ class TC_VALCC_4_1(MatterBaseTest):
         asserts.assert_less_equal(remaining_duration_dut, 60, "RemainingDuration is not in the expected range")
 
         self.step(5)
-        time.sleep(5)
+        await asyncio.sleep(5)
 
         self.step(6)
         remaining_duration_dut = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.RemainingDuration)

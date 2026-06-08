@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020, 2025 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -34,6 +34,115 @@ const uint32_t Lin_id_v  = 0x7D200002;
 #if ENABLE_SE05X_SPAKE_PROVER
 const uint32_t w0in_id_p = 0x7D200003;
 const uint32_t w1in_id_p = 0x7D200004;
+#endif
+
+#if ENABLE_SE05X_SPAKE_VERIFIER_USE_TP_VALUES
+static CHIP_ERROR get_trust_provisioned_w0L_ids(uint32_t * tp_w0in_id_v, uint32_t * tp_Lin_id_v)
+{
+
+    switch (SE05X_SPAKE_VERIFIER_TP_SET_NO)
+    {
+    case 1: {
+        if (SE05X_SPAKE_VERIFIER_TP_ITER_CNT == 1000)
+        {
+            *tp_w0in_id_v = 0x7FFF2011;
+            *tp_Lin_id_v  = 0x7FFF2021;
+        }
+        else if (SE05X_SPAKE_VERIFIER_TP_ITER_CNT == 5000)
+        {
+            *tp_w0in_id_v = 0x7FFF2012;
+            *tp_Lin_id_v  = 0x7FFF2022;
+        }
+        else if (SE05X_SPAKE_VERIFIER_TP_ITER_CNT == 10000)
+        {
+            *tp_w0in_id_v = 0x7FFF2013;
+            *tp_Lin_id_v  = 0x7FFF2023;
+        }
+        else if (SE05X_SPAKE_VERIFIER_TP_ITER_CNT == 50000)
+        {
+            *tp_w0in_id_v = 0x7FFF2014;
+            *tp_Lin_id_v  = 0x7FFF2024;
+        }
+        else if (SE05X_SPAKE_VERIFIER_TP_ITER_CNT == 100000)
+        {
+            *tp_w0in_id_v = 0x7FFF2015;
+            *tp_Lin_id_v  = 0x7FFF2025;
+        }
+        else
+        {
+            return CHIP_ERROR_INTERNAL;
+        }
+    }
+    break;
+    case 2: {
+        if (SE05X_SPAKE_VERIFIER_TP_ITER_CNT == 1000)
+        {
+            *tp_w0in_id_v = 0x7FFF2016;
+            *tp_Lin_id_v  = 0x7FFF2026;
+        }
+        else if (SE05X_SPAKE_VERIFIER_TP_ITER_CNT == 5000)
+        {
+            *tp_w0in_id_v = 0x7FFF2017;
+            *tp_Lin_id_v  = 0x7FFF2027;
+        }
+        else if (SE05X_SPAKE_VERIFIER_TP_ITER_CNT == 10000)
+        {
+            *tp_w0in_id_v = 0x7FFF2018;
+            *tp_Lin_id_v  = 0x7FFF2028;
+        }
+        else if (SE05X_SPAKE_VERIFIER_TP_ITER_CNT == 50000)
+        {
+            *tp_w0in_id_v = 0x7FFF2019;
+            *tp_Lin_id_v  = 0x7FFF2029;
+        }
+        else if (SE05X_SPAKE_VERIFIER_TP_ITER_CNT == 100000)
+        {
+            *tp_w0in_id_v = 0x7FFF201A;
+            *tp_Lin_id_v  = 0x7FFF202A;
+        }
+        else
+        {
+            return CHIP_ERROR_INTERNAL;
+        }
+    }
+    break;
+    case 3: {
+        if (SE05X_SPAKE_VERIFIER_TP_ITER_CNT == 1000)
+        {
+            *tp_w0in_id_v = 0x7FFF201B;
+            *tp_Lin_id_v  = 0x7FFF202B;
+        }
+        else if (SE05X_SPAKE_VERIFIER_TP_ITER_CNT == 5000)
+        {
+            *tp_w0in_id_v = 0x7FFF201C;
+            *tp_Lin_id_v  = 0x7FFF202C;
+        }
+        else if (SE05X_SPAKE_VERIFIER_TP_ITER_CNT == 10000)
+        {
+            *tp_w0in_id_v = 0x7FFF201D;
+            *tp_Lin_id_v  = 0x7FFF202D;
+        }
+        else if (SE05X_SPAKE_VERIFIER_TP_ITER_CNT == 50000)
+        {
+            *tp_w0in_id_v = 0x7FFF201E;
+            *tp_Lin_id_v  = 0x7FFF202E;
+        }
+        else if (SE05X_SPAKE_VERIFIER_TP_ITER_CNT == 100000)
+        {
+            *tp_w0in_id_v = 0x7FFF201F;
+            *tp_Lin_id_v  = 0x7FFF202F;
+        }
+        else
+        {
+            return CHIP_ERROR_INTERNAL;
+        }
+    }
+    break;
+    default:
+        return CHIP_ERROR_INTERNAL;
+    }
+    return CHIP_NO_ERROR;
+}
 #endif
 
 void Spake2p_Finish_HSM(hsm_pake_context_t * phsm_pake_context)
@@ -82,7 +191,7 @@ CHIP_ERROR create_init_crypto_obj(chip::Crypto::CHIP_SPAKE2P_ROLE role, hsm_pake
         return CHIP_ERROR_INTERNAL;
     }
 
-    VerifyOrReturnError(se05x_sessionOpen() == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(se05x_session_open() == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
     VerifyOrReturnError(gex_sss_chip_ctx.ks.session != NULL, CHIP_ERROR_INTERNAL);
 
     subtype.pakeMode = kSE05x_SPAKE2PLUS_P256_SHA256_HKDF_HMAC;
@@ -122,7 +231,7 @@ CHIP_ERROR create_init_crypto_obj(chip::Crypto::CHIP_SPAKE2P_ROLE role, hsm_pake
 CHIP_ERROR Spake2p_ComputeRoundOne_HSM(hsm_pake_context_t * phsm_pake_context, chip::Crypto::CHIP_SPAKE2P_ROLE role,
                                        const uint8_t * pab, size_t pab_len, uint8_t * out, size_t * out_len)
 {
-    SE05x_CryptoObjectID_t spakeObjectId = phsm_pake_context->spake_objId;
+    SE05x_CryptoObjectID_t spakeObjectId = static_cast<SE05x_CryptoObjectID_t>(phsm_pake_context->spake_objId);
 
     ChipLogProgress(Crypto, "SE05x: Using HSM for spake2p ComputeRoundOne");
 
@@ -163,7 +272,7 @@ CHIP_ERROR Spake2p_ComputeRoundTwo_HSM(hsm_pake_context_t * phsm_pake_context, c
 
     VerifyOrReturnError(gex_sss_chip_ctx.ks.session != NULL, CHIP_ERROR_INTERNAL);
 
-    const SE05x_CryptoObjectID_t spakeObjectId = phsm_pake_context->spake_objId;
+    const SE05x_CryptoObjectID_t spakeObjectId = static_cast<SE05x_CryptoObjectID_t>(phsm_pake_context->spake_objId);
     const smStatus_t smstatus =
         Se05x_API_PAKEComputeSessionKeys(&((sss_se05x_session_t *) &gex_sss_chip_ctx.session)->s_ctx, spakeObjectId,
                                          (uint8_t *) pab, pab_len, pKeyKe, pkeyKeLen, out, out_len);
@@ -181,7 +290,7 @@ CHIP_ERROR Spake2p_KeyConfirm_HSM(hsm_pake_context_t * phsm_pake_context, chip::
     ChipLogProgress(Crypto, "SE05x: Using HSM for spake2p KeyConfirm");
 
     uint8_t presult                            = 0;
-    const SE05x_CryptoObjectID_t spakeObjectId = phsm_pake_context->spake_objId;
+    const SE05x_CryptoObjectID_t spakeObjectId = static_cast<SE05x_CryptoObjectID_t>(phsm_pake_context->spake_objId);
     const smStatus_t smstatus = Se05x_API_PAKEVerifySessionKeys(&((sss_se05x_session_t *) &gex_sss_chip_ctx.session)->s_ctx,
                                                                 spakeObjectId, (uint8_t *) in, in_len, &presult);
     VerifyOrReturnError(smstatus == SM_OK, CHIP_ERROR_INTERNAL);
@@ -223,6 +332,7 @@ CHIP_ERROR Spake2pHSM_P256_SHA256_HKDF_HMAC::Init(const uint8_t * context, size_
     {
         state = CHIP_SPAKE2P_STATE::INIT;
     }
+    usingSE05x = true;
 
     return error;
 }
@@ -233,10 +343,12 @@ CHIP_ERROR Spake2pHSM_P256_SHA256_HKDF_HMAC::BeginVerifier(const uint8_t * my_id
                                                            const uint8_t * w0in, size_t w0in_len, const uint8_t * Lin,
                                                            size_t Lin_len)
 {
+#if !ENABLE_SE05X_SPAKE_VERIFIER_USE_TP_VALUES
     uint8_t w0in_mod[32] = {
         0,
     };
     size_t w0in_mod_len = 32;
+#endif
     smStatus_t smstatus = SM_NOT_OK;
 
     VerifyOrReturnError(w0in != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
@@ -253,25 +365,59 @@ CHIP_ERROR Spake2pHSM_P256_SHA256_HKDF_HMAC::BeginVerifier(const uint8_t * my_id
 
     ChipLogProgress(Crypto, "SE05x: HSM - BeginVerifier");
 
+#if ENABLE_SE05X_SPAKE_VERIFIER_USE_TP_VALUES
+    uint8_t zero_w0[32] = { 0 };
+
+    // If w0in contains any non-zero bytes, it means the verifiers are calculated on host using
+    // pass-code generated for enhanced commissioning. So we use the host spake2p implementation.
+    if (w0in_len != sizeof(zero_w0) || memcmp(w0in, zero_w0, sizeof(zero_w0)) != 0)
+    {
+        ChipLogProgress(Crypto, "SE05x: Verifiers are on host. Using software SPAKE2+");
+        usingSE05x = false;
+        return Spake2p::BeginVerifier(my_identity, my_identity_len, peer_identity, peer_identity_len, w0in, w0in_len, Lin, Lin_len);
+    }
+#else
     ReturnErrorOnFailure(FELoad(w0in, w0in_len, w0));
     ReturnErrorOnFailure(FEWrite(w0, w0in_mod, w0in_mod_len));
+#endif
     ReturnErrorOnFailure(create_init_crypto_obj(chip::Crypto::CHIP_SPAKE2P_ROLE::VERIFIER, &hsm_pake_context));
 
-    smstatus = Se05x_API_PAKEConfigDevice(&((sss_se05x_session_t *) &gex_sss_chip_ctx.session)->s_ctx, hsm_pake_context.spake_objId,
+    smstatus = Se05x_API_PAKEConfigDevice(&((sss_se05x_session_t *) &gex_sss_chip_ctx.session)->s_ctx,
+                                          static_cast<SE05x_CryptoObjectID_t>(hsm_pake_context.spake_objId),
                                           SE05x_SPAKE2PLUS_DEVICE_TYPE_B);
     VerifyOrReturnError(smstatus == SM_OK, CHIP_ERROR(chip::ChipError::Range::kPlatform, smstatus));
 
+#if !ENABLE_SE05X_SPAKE_VERIFIER_USE_TP_VALUES
     ReturnErrorOnFailure(se05x_set_key_for_spake(w0in_id_v, w0in_mod, w0in_mod_len, kSSS_KeyPart_Default, kSSS_CipherType_HMAC));
     ReturnErrorOnFailure(se05x_set_key_for_spake(Lin_id_v, Lin, Lin_len, kSSS_KeyPart_Default, kSSS_CipherType_HMAC));
+#endif
 
-    smstatus = Se05x_API_PAKEInitDevice(&((sss_se05x_session_t *) &gex_sss_chip_ctx.session)->s_ctx, hsm_pake_context.spake_objId,
+    smstatus = Se05x_API_PAKEInitDevice(&((sss_se05x_session_t *) &gex_sss_chip_ctx.session)->s_ctx,
+                                        static_cast<SE05x_CryptoObjectID_t>(hsm_pake_context.spake_objId),
                                         (uint8_t *) hsm_pake_context.spake_context, hsm_pake_context.spake_context_len,
                                         (uint8_t *) peer_identity, peer_identity_len, (uint8_t *) my_identity, my_identity_len);
     VerifyOrReturnError(smstatus == SM_OK, CHIP_ERROR(chip::ChipError::Range::kPlatform, smstatus));
 
+#if ENABLE_SE05X_SPAKE_VERIFIER_USE_TP_VALUES
+    /* Using TP values.*/
+    uint32_t tp_w0in_id_v = 0;
+    uint32_t tp_Lin_id_v  = 0;
+    CHIP_ERROR err        = get_trust_provisioned_w0L_ids(&tp_w0in_id_v, &tp_Lin_id_v);
+    if (CHIP_NO_ERROR != err)
+    {
+        ChipLogProgress(Crypto, "SE05x: Error in getting W0 and L TP ids");
+        return err;
+    }
+
     smstatus = Se05x_API_PAKEInitCredentials(&((sss_se05x_session_t *) &gex_sss_chip_ctx.session)->s_ctx,
-                                             hsm_pake_context.spake_objId, w0in_id_v, 0, Lin_id_v);
+                                             static_cast<SE05x_CryptoObjectID_t>(hsm_pake_context.spake_objId), tp_w0in_id_v, 0,
+                                             tp_Lin_id_v);
+#else
+    smstatus =
+        Se05x_API_PAKEInitCredentials(&((sss_se05x_session_t *) &gex_sss_chip_ctx.session)->s_ctx,
+                                      static_cast<SE05x_CryptoObjectID_t>(hsm_pake_context.spake_objId), w0in_id_v, 0, Lin_id_v);
     VerifyOrReturnError(smstatus == SM_OK, CHIP_ERROR(chip::ChipError::Range::kPlatform, smstatus));
+#endif
 
     state = CHIP_SPAKE2P_STATE::STARTED;
     role  = CHIP_SPAKE2P_ROLE::VERIFIER;
@@ -283,8 +429,8 @@ CHIP_ERROR Spake2pHSM_P256_SHA256_HKDF_HMAC::BeginVerifier(const uint8_t * my_id
 #if ENABLE_SE05X_SPAKE_PROVER
 CHIP_ERROR Spake2pHSM_P256_SHA256_HKDF_HMAC::BeginProver(const uint8_t * my_identity, size_t my_identity_len,
                                                          const uint8_t * peer_identity, size_t peer_identity_len,
-                                                         const uint8_t * w0in, size_t w0in_len, const uint8_t * w1in,
-                                                         size_t w1in_len)
+                                                         const uint8_t * w0sin, size_t w0sin_len, const uint8_t * w1sin,
+                                                         size_t w1sin_len)
 {
     smStatus_t smstatus  = SM_NOT_OK;
     uint8_t w0in_mod[32] = {
@@ -296,8 +442,8 @@ CHIP_ERROR Spake2pHSM_P256_SHA256_HKDF_HMAC::BeginProver(const uint8_t * my_iden
     };
     size_t w1in_mod_len = 32;
 
-    VerifyOrReturnError(w0in != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(w1in != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(w0sin != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(w1sin != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     if (my_identity_len > 0)
     {
         VerifyOrReturnError(my_identity != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
@@ -311,26 +457,29 @@ CHIP_ERROR Spake2pHSM_P256_SHA256_HKDF_HMAC::BeginProver(const uint8_t * my_iden
 
     ChipLogProgress(Crypto, "SE05x: HSM - BeginProver");
 
-    ReturnErrorOnFailure(FELoad(w0in, w0in_len, w0));
+    ReturnErrorOnFailure(FELoad(w0sin, w0sin_len, w0));
     ReturnErrorOnFailure(FEWrite(w0, w0in_mod, w0in_mod_len));
-    ReturnErrorOnFailure(FELoad(w1in, w1in_len, w1));
+    ReturnErrorOnFailure(FELoad(w1sin, w1sin_len, w1));
     ReturnErrorOnFailure(FEWrite(w1, w1in_mod, w1in_mod_len));
     ReturnErrorOnFailure(create_init_crypto_obj(chip::Crypto::CHIP_SPAKE2P_ROLE::PROVER, &hsm_pake_context));
 
-    smstatus = Se05x_API_PAKEConfigDevice(&((sss_se05x_session_t *) &gex_sss_chip_ctx.session)->s_ctx, hsm_pake_context.spake_objId,
+    smstatus = Se05x_API_PAKEConfigDevice(&((sss_se05x_session_t *) &gex_sss_chip_ctx.session)->s_ctx,
+                                          static_cast<SE05x_CryptoObjectID_t>(hsm_pake_context.spake_objId),
                                           SE05x_SPAKE2PLUS_DEVICE_TYPE_A);
     VerifyOrReturnError(smstatus == SM_OK, CHIP_ERROR(chip::ChipError::Range::kPlatform, smstatus));
 
     ReturnErrorOnFailure(se05x_set_key_for_spake(w0in_id_p, w0in_mod, w0in_mod_len, kSSS_KeyPart_Default, kSSS_CipherType_HMAC));
     ReturnErrorOnFailure(se05x_set_key_for_spake(w1in_id_p, w1in_mod, w1in_mod_len, kSSS_KeyPart_Default, kSSS_CipherType_HMAC));
 
-    smstatus = Se05x_API_PAKEInitDevice(&((sss_se05x_session_t *) &gex_sss_chip_ctx.session)->s_ctx, hsm_pake_context.spake_objId,
+    smstatus = Se05x_API_PAKEInitDevice(&((sss_se05x_session_t *) &gex_sss_chip_ctx.session)->s_ctx,
+                                        static_cast<SE05x_CryptoObjectID_t>(hsm_pake_context.spake_objId),
                                         (uint8_t *) hsm_pake_context.spake_context, hsm_pake_context.spake_context_len,
                                         (uint8_t *) my_identity, my_identity_len, (uint8_t *) peer_identity, peer_identity_len);
     VerifyOrReturnError(smstatus == SM_OK, CHIP_ERROR(chip::ChipError::Range::kPlatform, smstatus));
 
-    smstatus = Se05x_API_PAKEInitCredentials(&((sss_se05x_session_t *) &gex_sss_chip_ctx.session)->s_ctx,
-                                             hsm_pake_context.spake_objId, w0in_id_p, w1in_id_p, 0);
+    smstatus =
+        Se05x_API_PAKEInitCredentials(&((sss_se05x_session_t *) &gex_sss_chip_ctx.session)->s_ctx,
+                                      static_cast<SE05x_CryptoObjectID_t>(hsm_pake_context.spake_objId), w0in_id_p, w1in_id_p, 0);
     VerifyOrReturnError(smstatus == SM_OK, CHIP_ERROR(chip::ChipError::Range::kPlatform, smstatus));
 
     state = CHIP_SPAKE2P_STATE::STARTED;
@@ -345,23 +494,13 @@ CHIP_ERROR Spake2pHSM_P256_SHA256_HKDF_HMAC::ComputeRoundOne(const uint8_t * pab
     VerifyOrReturnError(state == CHIP_SPAKE2P_STATE::STARTED, CHIP_ERROR_INTERNAL);
     VerifyOrReturnError(*out_len >= point_size, CHIP_ERROR_INTERNAL);
 
-#if !ENABLE_SE05X_SPAKE_VERIFIER
-    const bool sw_rollback_verifier = (role == chip::Crypto::CHIP_SPAKE2P_ROLE::VERIFIER);
-#else
-    constexpr bool sw_rollback_verifier = false;
-#endif
-
-#if !ENABLE_SE05X_SPAKE_PROVER
-    const bool sw_rollback_prover = (role == chip::Crypto::CHIP_SPAKE2P_ROLE::PROVER);
-#else
-    constexpr bool sw_rollback_prover   = false;
-#endif
-
-    if (sw_rollback_verifier || sw_rollback_prover)
+    // Use software if HSM was not selected during Begin
+    if (!usingSE05x)
     {
         return Spake2p::ComputeRoundOne(pab, pab_len, out, out_len);
     }
 
+    // Use HSM implementation
     CHIP_ERROR error = Spake2p_ComputeRoundOne_HSM(&hsm_pake_context, role, pab, pab_len, out, out_len);
     if (CHIP_NO_ERROR == error)
     {
@@ -376,23 +515,13 @@ CHIP_ERROR Spake2pHSM_P256_SHA256_HKDF_HMAC::ComputeRoundTwo(const uint8_t * in,
     VerifyOrReturnError(state == CHIP_SPAKE2P_STATE::R1, CHIP_ERROR_INTERNAL);
     VerifyOrReturnError(in_len == point_size, CHIP_ERROR_INTERNAL);
 
-#if !ENABLE_SE05X_SPAKE_VERIFIER
-    const bool sw_rollback_verifier = (role == chip::Crypto::CHIP_SPAKE2P_ROLE::VERIFIER);
-#else
-    constexpr bool sw_rollback_verifier = false;
-#endif
-
-#if !ENABLE_SE05X_SPAKE_PROVER
-    const bool sw_rollback_prover = (role == chip::Crypto::CHIP_SPAKE2P_ROLE::PROVER);
-#else
-    constexpr bool sw_rollback_prover   = false;
-#endif
-
-    if (sw_rollback_verifier || sw_rollback_prover)
+    // Use software if HSM was not selected during Begin
+    if (!usingSE05x)
     {
         return Spake2p::ComputeRoundTwo(in, in_len, out, out_len);
     }
 
+    // Use HSM implementation
     uint8_t pKeyKe[16] = {
         0,
     };
@@ -411,22 +540,13 @@ CHIP_ERROR Spake2pHSM_P256_SHA256_HKDF_HMAC::KeyConfirm(const uint8_t * in, size
 {
     VerifyOrReturnError(state == CHIP_SPAKE2P_STATE::R2, CHIP_ERROR_INTERNAL);
 
-#if !ENABLE_SE05X_SPAKE_VERIFIER
-    const bool sw_rollback_verifier = (role == chip::Crypto::CHIP_SPAKE2P_ROLE::VERIFIER);
-#else
-    constexpr bool sw_rollback_verifier = false;
-#endif
-
-#if !ENABLE_SE05X_SPAKE_PROVER
-    const bool sw_rollback_prover = (role == chip::Crypto::CHIP_SPAKE2P_ROLE::PROVER);
-#else
-    constexpr bool sw_rollback_prover   = false;
-#endif
-
-    if (sw_rollback_verifier || sw_rollback_prover)
+    // Use software if HSM was not selected during Begin
+    if (!usingSE05x)
     {
         return Spake2p::KeyConfirm(in, in_len);
     }
+
+    // Use HSM implementation
     const CHIP_ERROR error = Spake2p_KeyConfirm_HSM(&hsm_pake_context, role, in, in_len);
     if (CHIP_NO_ERROR == error)
     {
@@ -434,7 +554,10 @@ CHIP_ERROR Spake2pHSM_P256_SHA256_HKDF_HMAC::KeyConfirm(const uint8_t * in, size
     }
 
     Spake2p_Finish_HSM(&hsm_pake_context);
-
+    if (se05x_close_session() != CHIP_NO_ERROR)
+    {
+        ChipLogError(Crypto, "se05x::Error in se05x_close_session.");
+    }
     return error;
 }
 

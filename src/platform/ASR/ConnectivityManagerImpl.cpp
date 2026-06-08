@@ -83,7 +83,7 @@ CHIP_ERROR ConnectivityManagerImpl::_SetWiFiStationMode(WiFiStationMode val)
         /* Schedule work for disabled case causes station mode not getting enabled */
         if (mWiFiStationMode != kWiFiStationMode_Disabled)
         {
-            DeviceLayer::SystemLayer().ScheduleWork(DriveStationState, NULL);
+            TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleWork(DriveStationState, NULL);
         }
         else
         {
@@ -113,10 +113,10 @@ void ConnectivityManagerImpl::_ClearWiFiStationProvision(void)
         lega_wlan_wifi_conf stationConfig;
 
         memset(&stationConfig, 0, sizeof(stationConfig));
-        Internal::ASRUtils::asr_wifi_set_config(&stationConfig);
+        TEMPORARY_RETURN_IGNORED Internal::ASRUtils::asr_wifi_set_config(&stationConfig);
 
-        DeviceLayer::SystemLayer().ScheduleWork(DriveStationState, NULL);
-        DeviceLayer::SystemLayer().ScheduleWork(DriveAPState, NULL);
+        TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleWork(DriveStationState, NULL);
+        TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleWork(DriveAPState, NULL);
     }
 }
 
@@ -131,7 +131,7 @@ CHIP_ERROR ConnectivityManagerImpl::_SetWiFiAPMode(WiFiAPMode val)
         ChipLogProgress(DeviceLayer, "WiFi AP mode change: %s -> %s", WiFiAPModeToStr(mWiFiAPMode), WiFiAPModeToStr(val));
     }
     mWiFiAPMode = val;
-    DeviceLayer::SystemLayer().ScheduleWork(DriveAPState, NULL);
+    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleWork(DriveAPState, NULL);
 exit:
     return err;
 }
@@ -141,7 +141,7 @@ void ConnectivityManagerImpl::_DemandStartWiFiAP(void)
     if (mWiFiAPMode == kWiFiAPMode_OnDemand || mWiFiAPMode == kWiFiAPMode_OnDemand_NoStationProvision)
     {
         mLastAPDemandTime = System::SystemClock().GetMonotonicTimestamp();
-        DeviceLayer::SystemLayer().ScheduleWork(DriveAPState, NULL);
+        TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleWork(DriveAPState, NULL);
     }
 }
 
@@ -150,7 +150,7 @@ void ConnectivityManagerImpl::_StopOnDemandWiFiAP(void)
     if (mWiFiAPMode == kWiFiAPMode_OnDemand || mWiFiAPMode == kWiFiAPMode_OnDemand_NoStationProvision)
     {
         mLastAPDemandTime = System::Clock::kZero;
-        DeviceLayer::SystemLayer().ScheduleWork(DriveAPState, NULL);
+        TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleWork(DriveAPState, NULL);
     }
 }
 
@@ -168,7 +168,7 @@ void ConnectivityManagerImpl::_MaintainOnDemandWiFiAP(void)
 void ConnectivityManagerImpl::_SetWiFiAPIdleTimeout(System::Clock::Timeout val)
 {
     mWiFiAPIdleTimeout = val;
-    DeviceLayer::SystemLayer().ScheduleWork(DriveAPState, NULL);
+    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleWork(DriveAPState, NULL);
 }
 
 CHIP_ERROR ConnectivityManagerImpl::_GetAndLogWifiStatsCounters(void)
@@ -218,12 +218,12 @@ void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event) {}
 
 void ConnectivityManagerImpl::_OnWiFiScanDone()
 {
-    DeviceLayer::SystemLayer().ScheduleWork(DriveStationState, NULL);
+    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleWork(DriveStationState, NULL);
 }
 
 void ConnectivityManagerImpl::_OnWiFiStationProvisionChange()
 {
-    DeviceLayer::SystemLayer().ScheduleWork(DriveStationState, NULL);
+    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleWork(DriveStationState, NULL);
 }
 
 void ConnectivityManagerImpl::DriveStationState(::chip::System::Layer * aLayer, void * aAppState)
@@ -243,7 +243,8 @@ void ConnectivityManagerImpl::ChangeWiFiStationState(WiFiStationState newState)
         ChipLogProgress(DeviceLayer, "WiFi station state change: %s -> %s", WiFiStationStateToStr(mWiFiStationState),
                         WiFiStationStateToStr(newState));
         mWiFiStationState = newState;
-        SystemLayer().ScheduleLambda([]() { NetworkCommissioning::ASRWiFiDriver::GetInstance().OnNetworkStatusChange(); });
+        TEMPORARY_RETURN_IGNORED SystemLayer().ScheduleLambda(
+            []() { NetworkCommissioning::ASRWiFiDriver::GetInstance().OnNetworkStatusChange(); });
     }
 }
 
@@ -305,7 +306,7 @@ void ConnectivityManagerImpl::DriveStationState()
             err = Internal::ASRUtils::asr_wifi_disconnect();
             if (err != CHIP_NO_ERROR)
             {
-                ChipLogError(DeviceLayer, "asr_wifi_disconnect() failed: %s", chip::ErrorStr(err));
+                ChipLogError(DeviceLayer, "asr_wifi_disconnect() failed: %" CHIP_ERROR_FORMAT, err.Format());
             }
             SuccessOrExit(err);
 
@@ -351,7 +352,7 @@ void ConnectivityManagerImpl::DriveStationState()
                     err = Internal::ASRUtils::asr_wifi_connect();
                     if (err != CHIP_NO_ERROR)
                     {
-                        ChipLogError(DeviceLayer, "asr_wifi_connect() failed: %s", chip::ErrorStr(err));
+                        ChipLogError(DeviceLayer, "asr_wifi_connect() failed: %" CHIP_ERROR_FORMAT, err.Format());
                     }
                     SuccessOrExit(err);
                     ChangeWiFiStationState(kWiFiStationState_Connecting);
@@ -536,7 +537,7 @@ void ConnectivityManagerImpl::lega_wifi_connect_state(lega_wifi_event_e stat)
     {
     case EVENT_STATION_UP:
         ChipLogProgress(DeviceLayer, "wifi_connect_done");
-        Internal::ASRUtils::SetStationConnected(true);
+        TEMPORARY_RETURN_IGNORED Internal::ASRUtils::SetStationConnected(true);
         if (ConnectivityMgrImpl().mWiFiStationState == kWiFiStationState_Connecting)
         {
             ConnectivityMgrImpl().ChangeWiFiStationState(kWiFiStationState_Connecting_Succeeded);
@@ -545,7 +546,7 @@ void ConnectivityManagerImpl::lega_wifi_connect_state(lega_wifi_event_e stat)
         break;
     case EVENT_STATION_DOWN:
         ChipLogProgress(DeviceLayer, "wifi_disconnect_done");
-        Internal::ASRUtils::SetStationConnected(false);
+        TEMPORARY_RETURN_IGNORED Internal::ASRUtils::SetStationConnected(false);
         if (ConnectivityMgrImpl().mWiFiStationState == kWiFiStationState_Connecting)
         {
             ConnectivityMgrImpl().ChangeWiFiStationState(kWiFiStationState_Connecting_Failed);
@@ -560,9 +561,9 @@ void ConnectivityManagerImpl::lega_wifi_connect_state(lega_wifi_event_e stat)
         break;
     case EVENT_STA_CLOSE:
         ChipLogProgress(DeviceLayer, "wifi_sta_close_done");
-        Internal::ASRUtils::SetStationConnected(false);
+        TEMPORARY_RETURN_IGNORED Internal::ASRUtils::SetStationConnected(false);
         ConnectivityMgrImpl().ChangeWiFiStationState(kWiFiStationState_NotConnected);
-        NetworkCommissioning::ASRWiFiDriver::GetInstance().SetLastDisconnectReason(0);
+        TEMPORARY_RETURN_IGNORED NetworkCommissioning::ASRWiFiDriver::GetInstance().SetLastDisconnectReason(0);
         ConnectivityMgrImpl().DriveStationState();
         break;
     default:
@@ -615,7 +616,7 @@ void ConnectivityManagerImpl::lega_wlan_err_stat_handler(lega_wlan_err_status_e 
     {
         ConnectivityMgrImpl().ChangeWiFiStationState(kWiFiStationState_Connecting_Failed);
     }
-    NetworkCommissioning::ASRWiFiDriver::GetInstance().SetLastDisconnectReason(err_info);
+    TEMPORARY_RETURN_IGNORED NetworkCommissioning::ASRWiFiDriver::GetInstance().SetLastDisconnectReason(err_info);
     ConnectivityMgrImpl().DriveStationState();
 }
 

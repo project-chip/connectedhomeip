@@ -102,8 +102,6 @@ enum class TestCommandResult : uint8_t
     kFailure
 };
 
-TestCommandResult gLastCommandResult = TestCommandResult::kUndefined;
-
 void HandleReadComplete()
 {
     auto respTime                                   = chip::System::SystemClock().GetMonotonicTimestamp();
@@ -175,7 +173,6 @@ public:
         printf("Command Response Success with EndpointId %d, ClusterId %d, CommandId %d", aPath.mEndpointId, aPath.mClusterId,
                aPath.mCommandId);
 
-        gLastCommandResult                              = TestCommandResult::kSuccess;
         auto respTime                                   = chip::System::SystemClock().GetMonotonicTimestamp();
         chip::System::Clock::Milliseconds64 transitTime = respTime - gLastMessageTime;
 
@@ -188,7 +185,6 @@ public:
     void OnError(const chip::app::CommandSender * apCommandSender, CHIP_ERROR aError) override
     {
         gCommandRespCount += (aError.IsIMStatus());
-        gLastCommandResult = TestCommandResult::kFailure;
         printf("CommandResponseError happens with %" CHIP_ERROR_FORMAT, aError.Format());
     }
     void OnDone(chip::app::CommandSender * apCommandSender) override { delete apCommandSender; }
@@ -486,7 +482,7 @@ void CommandRequestTimerHandler(chip::System::Layer * systemLayer, void * appSta
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
+        SuccessOrDie(chip::DeviceLayer::PlatformMgr().StopEventLoopTask());
     }
 }
 
@@ -506,7 +502,7 @@ void BadCommandRequestTimerHandler(chip::System::Layer * systemLayer, void * app
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
+        SuccessOrDie(chip::DeviceLayer::PlatformMgr().StopEventLoopTask());
     }
 }
 
@@ -539,7 +535,7 @@ void ReadRequestTimerHandler(chip::System::Layer * systemLayer, void * appState)
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
+        SuccessOrDie(chip::DeviceLayer::PlatformMgr().StopEventLoopTask());
     }
 }
 
@@ -576,7 +572,7 @@ void WriteRequestTimerHandler(chip::System::Layer * systemLayer, void * appState
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
+        SuccessOrDie(chip::DeviceLayer::PlatformMgr().StopEventLoopTask());
     }
 }
 
@@ -604,91 +600,24 @@ void SubscribeRequestTimerHandler(chip::System::Layer * systemLayer, void * appS
     else
     {
         // Complete all tests.
-        chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
+        SuccessOrDie(chip::DeviceLayer::PlatformMgr().StopEventLoopTask());
     }
 
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
+        SuccessOrDie(chip::DeviceLayer::PlatformMgr().StopEventLoopTask());
     }
 }
 } // namespace
 
 namespace chip {
 namespace app {
-Protocols::InteractionModel::Status ServerClusterCommandExists(const ConcreteCommandPath & aCommandPath)
-{
-    // Always return success in test.
-    return Protocols::InteractionModel::Status::Success;
-}
 
 void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, chip::TLV::TLVReader & aReader,
                                   CommandHandler * apCommandObj)
 {
     // Nothing todo.
-}
-
-CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescriptor, bool aIsFabricFiltered,
-                                 const ConcreteReadAttributePath & aPath, AttributeReportIBs::Builder & aAttributeReports,
-                                 AttributeEncodeState * apEncoderState)
-{
-    AttributeReportIB::Builder & attributeReport = aAttributeReports.CreateAttributeReport();
-    ReturnErrorOnFailure(aAttributeReports.GetError());
-    AttributeStatusIB::Builder & attributeStatus = attributeReport.CreateAttributeStatus();
-    ReturnErrorOnFailure(attributeReport.GetError());
-    AttributePathIB::Builder & attributePath = attributeStatus.CreatePath();
-    ReturnErrorOnFailure(attributeStatus.GetError());
-    attributePath.Endpoint(aPath.mEndpointId).Cluster(aPath.mClusterId).Attribute(aPath.mAttributeId).EndOfAttributePathIB();
-    ReturnErrorOnFailure(attributePath.GetError());
-    StatusIB::Builder & errorStatus = attributeStatus.CreateErrorStatus();
-    errorStatus.EncodeStatusIB(StatusIB(Protocols::InteractionModel::Status::UnsupportedAttribute));
-    ReturnErrorOnFailure(errorStatus.GetError());
-    attributeStatus.EndOfAttributeStatusIB();
-    ReturnErrorOnFailure(attributeStatus.GetError());
-    return attributeReport.EndOfAttributeReportIB();
-}
-
-const EmberAfAttributeMetadata * GetAttributeMetadata(const ConcreteAttributePath & aConcreteClusterPath)
-{
-    // Note: This test does not make use of the real attribute metadata.
-    static EmberAfAttributeMetadata stub = { .defaultValue = EmberAfDefaultOrMinMaxAttributeValue(uint32_t(0)) };
-    return &stub;
-}
-
-bool ConcreteAttributePathExists(const ConcreteAttributePath & aPath)
-{
-    return true;
-}
-
-Protocols::InteractionModel::Status CheckEventSupportStatus(const ConcreteEventPath & aPath)
-{
-    return Protocols::InteractionModel::Status::Success;
-}
-
-CHIP_ERROR WriteSingleClusterData(const Access::SubjectDescriptor & aSubjectDescriptor, const ConcreteDataAttributePath & aPath,
-                                  TLV::TLVReader & aReader, WriteHandler *)
-{
-    if (aPath.mClusterId != kTestClusterId || aPath.mEndpointId != kTestEndpointId)
-    {
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
-
-    if (aReader.GetLength() != 0)
-    {
-        chip::TLV::Debug::Dump(aReader, TLVPrettyPrinter);
-    }
-    return CHIP_NO_ERROR;
-}
-
-bool IsClusterDataVersionEqual(const ConcreteClusterPath & aConcreteClusterPath, DataVersion aRequiredVersion)
-{
-    return true;
-}
-
-bool IsDeviceTypeOnEndpoint(DeviceTypeId deviceType, EndpointId endpoint)
-{
-    return false;
 }
 
 } // namespace app

@@ -16,28 +16,34 @@
  *    limitations under the License.
  */
 
+#include <string>
+
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/PlatformManager.h>
 
 #include <app/InteractionModelEngine.h>
 #include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/server/Dnssd.h>
-#include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 #include <app/util/endpoint-config-api.h>
 #include <crypto/CHIPCryptoPAL.h>
+#include <data-model-providers/codegen/Instance.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/NodeId.h>
 #include <lib/core/Optional.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <setup_payload/OnboardingCodesUtil.h>
 
 #include <credentials/DeviceAttestationCredsProvider.h>
-#include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
-#include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 
 #include <lib/support/CHIPMem.h>
-#include <lib/support/ScopedBuffer.h>
+#include <lib/support/CHIPMemString.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/ScopedMemoryBuffer.h>
 #include <lib/support/TestGroupData.h>
+#include <platform/CHIPDeviceEvent.h>
+#include <platform/ConnectivityManager.h>
+#include <platform/OpenThread/GenericNetworkCommissioningThreadDriver.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
 
@@ -45,16 +51,17 @@
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/RuntimeOptionsProvider.h>
 
+#include <AllClustersExampleDeviceInfoProviderImpl.h>
 #include <DeviceInfoProviderImpl.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 #include "CommissionerMain.h"
 #include <ControllerShellCommands.h>
-#include <controller/CHIPDeviceControllerFactory.h>
-#include <controller/ExampleOperationalCredentialsIssuer.h>
-#include <lib/core/CHIPPersistentStorageDelegate.h>
-#include <platform/KeyValueStoreManager.h>
 #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+
+#ifndef CHIP_LINUX_APP_START_COMMISSIONER_AT_BOOT
+#define CHIP_LINUX_APP_START_COMMISSIONER_AT_BOOT 1
+#endif
 
 #if defined(ENABLE_CHIP_SHELL)
 #include <CommissioneeShellCommands.h>
@@ -75,6 +82,12 @@
 #include <TracingCommandLineArgument.h> // nogncheck
 #endif
 
+#if CHIP_DEVICE_CONFIG_ENABLE_SOFTWARE_DIAGNOSTIC_TRIGGER
+#include <app/clusters/software-diagnostics-server/SoftwareDiagnosticsTestEventTriggerHandler.h>
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_DIAGNOSTIC_TRIGGER
+#include <app/clusters/wifi-network-diagnostics-server/WiFiDiagnosticsTestEventTriggerHandler.h>
+#endif
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
 #include <app/clusters/ota-requestor/OTATestEventTriggerHandler.h>
 #endif
@@ -84,17 +97,35 @@
 #if CHIP_DEVICE_CONFIG_ENABLE_BOOLEAN_STATE_CONFIGURATION_TRIGGER
 #include <app/clusters/boolean-state-configuration-server/BooleanStateConfigurationTestEventTriggerHandler.h>
 #endif
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMODITY_PRICE_TRIGGER
+#include <app/clusters/commodity-price-server/CommodityPriceTestEventTriggerHandler.h>
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_ELECTRICAL_GRID_CONDITIONS_TRIGGER
+#include <app/clusters/electrical-grid-conditions-server/ElectricalGridConditionsTestEventTriggerHandler.h>
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMODITY_TARIFF_TRIGGER
+#include <app/clusters/commodity-tariff-server/CommodityTariffTestEventTriggerHandler.h>
+#endif
 #if CHIP_DEVICE_CONFIG_ENABLE_ENERGY_EVSE_TRIGGER
 #include <app/clusters/energy-evse-server/EnergyEvseTestEventTriggerHandler.h>
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_ENERGY_REPORTING_TRIGGER
 #include <app/clusters/electrical-energy-measurement-server/EnergyReportingTestEventTriggerHandler.h>
 #endif
+#if CHIP_DEVICE_CONFIG_ENABLE_METER_IDENTIFICATION_TRIGGER
+#include <app/clusters/meter-identification-server/MeterIdentificationTestEventTriggerHandler.h>
+#endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WATER_HEATER_MANAGEMENT_TRIGGER
 #include <app/clusters/water-heater-management-server/WaterHeaterManagementTestEventTriggerHandler.h>
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_DEVICE_ENERGY_MANAGEMENT_TRIGGER
 #include <app/clusters/device-energy-management-server/DeviceEnergyManagementTestEventTriggerHandler.h>
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMODITY_METERING_TRIGGER
+#include <app/clusters/commodity-metering-server/CommodityMeteringTestEventTriggerHandler.h>
+#endif
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+#include <app/icd/server/ICDManager.h> // nogncheck
 #endif
 #include <app/TestEventTriggerDelegate.h>
 
@@ -105,6 +136,10 @@
 
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
 #include "ExampleAccessRestrictionProvider.h"
+#endif
+
+#if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
+#include <app/server/TermsAndConditionsManager.h> // nogncheck
 #endif
 
 #if CHIP_DEVICE_LAYER_TARGET_DARWIN
@@ -118,6 +153,12 @@
 #include <platform/Linux/NetworkCommissioningDriver.h>
 #endif // CHIP_DEVICE_LAYER_TARGET_LINUX
 
+#if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
+#include <inet/EndPointStateOpenThread.h>
+#include <openthread-system.h>
+#include <openthread/instance.h>
+#endif
+
 using namespace chip;
 using namespace chip::ArgParser;
 using namespace chip::Credentials;
@@ -126,6 +167,7 @@ using namespace chip::Inet;
 using namespace chip::Transport;
 using namespace chip::app::Clusters;
 using namespace chip::Access;
+using namespace chip::Platform;
 
 // Network comissioning implementation
 namespace {
@@ -137,7 +179,11 @@ Optional<EndpointId> sSecondaryNetworkCommissioningEndpoint;
 #if CHIP_DEVICE_LAYER_TARGET_LINUX
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #define CHIP_APP_MAIN_HAS_THREAD_DRIVER 1
+#if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
+DeviceLayer::NetworkCommissioning::GenericThreadDriver sThreadDriver;
+#else
 DeviceLayer::NetworkCommissioning::LinuxThreadDriver sThreadDriver;
+#endif
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
@@ -192,7 +238,7 @@ auto exampleAccessRestrictionProvider = std::make_unique<ExampleAccessRestrictio
 void EnableThreadNetworkCommissioning()
 {
 #if CHIP_APP_MAIN_HAS_THREAD_DRIVER
-    sThreadNetworkCommissioningInstance.Init();
+    SuccessOrDie(sThreadNetworkCommissioningInstance.Init());
 #endif // CHIP_APP_MAIN_HAS_THREAD_DRIVER
 }
 
@@ -200,7 +246,7 @@ void EnableWiFiNetworkCommissioning(EndpointId endpoint)
 {
 #if CHIP_APP_MAIN_HAS_WIFI_DRIVER
     sWiFiNetworkCommissioningInstance.Emplace(endpoint, &sWiFiDriver);
-    sWiFiNetworkCommissioningInstance.Value().Init();
+    SuccessOrDie(sWiFiNetworkCommissioningInstance.Value().Init());
 #endif // CHIP_APP_MAIN_HAS_WIFI_DRIVER
 }
 
@@ -214,7 +260,11 @@ void InitNetworkCommissioning()
 
     bool isThreadEnabled = false;
 #if CHIP_APP_MAIN_HAS_THREAD_DRIVER
+#if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
+    isThreadEnabled = LinuxDeviceOptions::GetInstance().mThreadNodeId > 0;
+#else
     isThreadEnabled = LinuxDeviceOptions::GetInstance().mThread;
+#endif
 #endif // CHIP_APP_MAIN_HAS_THREAD_DRIVER
 
     bool isWiFiEnabled = false;
@@ -255,10 +305,14 @@ void InitNetworkCommissioning()
     else
     {
 #if CHIP_APP_MAIN_HAS_ETHERNET_DRIVER
-        sEthernetNetworkCommissioningInstance.Init();
+        TEMPORARY_RETURN_IGNORED sEthernetNetworkCommissioningInstance.Init();
+#if CHIP_DEVICE_LAYER_TARGET_LINUX
+        DeviceLayer::ConnectivityMgrImpl().UpdateEthernetNetworkingStatus();
+#endif // CHIP_DEVICE_LAYER_TARGET_LINUX
 #endif // CHIP_APP_MAIN_HAS_ETHERNET_DRIVER
     }
 }
+
 } // anonymous namespace
 
 #if defined(ENABLE_CHIP_SHELL)
@@ -283,6 +337,7 @@ AppMainLoopImplementation * gMainLoopImplementation = nullptr;
 LinuxCommissionableDataProvider gCommissionableDataProvider;
 
 chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
+chip::DeviceLayer::AllClustersExampleDeviceInfoProviderImpl gAllClustersExampleDeviceInfoProvider;
 
 void EventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
 {
@@ -298,6 +353,19 @@ void EventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
     }
 }
 
+void StopMainEventLoop()
+{
+    if (gMainLoopImplementation != nullptr)
+    {
+        gMainLoopImplementation->SignalSafeStopMainLoop();
+    }
+    else
+    {
+        Server::GetInstance().GenerateShutDownEvent();
+        TEMPORARY_RETURN_IGNORED SystemLayer().ScheduleLambda([]() { TEMPORARY_RETURN_IGNORED PlatformMgr().StopEventLoopTask(); });
+    }
+}
+
 void Cleanup()
 {
 #if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
@@ -307,26 +375,13 @@ void Cleanup()
     // TODO(16968): Lifecycle management of storage-using components like GroupDataProvider, etc
 }
 
-// TODO(#20664) REPL test will fail if signal SIGINT is not caught, temporarily keep following logic.
-
-// when the shell is enabled, don't intercept signals since it prevents the user from
-// using expected commands like CTRL-C to quit the application. (see issue #17845)
-// We should stop using signals for those faults, and move to a different notification
-// means, like a pipe. (see issue #19114)
-#if !defined(ENABLE_CHIP_SHELL)
-void StopSignalHandler(int signal)
+void StopSignalHandler(int /* signal */)
 {
-    if (gMainLoopImplementation != nullptr)
-    {
-        gMainLoopImplementation->SignalSafeStopMainLoop();
-    }
-    else
-    {
-        Server::GetInstance().GenerateShutDownEvent();
-        PlatformMgr().ScheduleWork([](intptr_t) { PlatformMgr().StopEventLoopTask(); });
-    }
+#if defined(ENABLE_CHIP_SHELL)
+    Engine::Root().StopMainLoop();
+#endif
+    StopMainEventLoop();
 }
-#endif // !defined(ENABLE_CHIP_SHELL)
 
 } // namespace
 
@@ -369,10 +424,170 @@ public:
     }
 };
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF && CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+/*
+    Get the freq_list from args.
+    Format:
+        "freq_list=[freq#1],[freq#2]...[freq#n]"
+            [freq#1] - [freq#n]: frequence number, separated by ','
+*/
+static uint16_t WiFiPAFGet_FreqList(const char * args, std::unique_ptr<uint16_t[]> & freq_list)
+{
+    const char hdstr[] = "freq_list=";
+    std::vector<uint16_t> freq_vect;
+    const std::string argstrn(args);
+    auto pos = argstrn.find(hdstr);
+    if (pos == std::string::npos)
+    {
+        return 0;
+    }
+    std::string nums = argstrn.substr(pos + strlen(hdstr));
+    std::stringstream ss(nums);
+    std::string item;
+    while (std::getline(ss, item, ','))
+    {
+        freq_vect.push_back(std::stoi(item));
+    }
+    uint16_t freq_size = freq_vect.size();
+    freq_list          = std::make_unique<uint16_t[]>(freq_size);
+    for (int i = 0; i < freq_size; i++)
+    {
+        freq_list.get()[i] = freq_vect[i];
+    }
+    return freq_size;
+}
+#endif
+
+// Wrapper for DeviceInstanceInfoProvider that allows the example app to set
+// attribute values from the command-line, provide hardcoded values, or fall
+// back to the default DeviceInstanceInfoProvider.
+class ExampleDeviceInstanceInfoProvider : public DeviceInstanceInfoProvider
+{
+public:
+    void Init(DeviceInstanceInfoProvider * defaultProvider) { mDefaultProvider = defaultProvider; }
+
+    CHIP_ERROR GetVendorName(char * buf, size_t bufSize) override
+    {
+        // Check if it was set from the command line or fall back to default provider.
+        if (mVendorName.has_value())
+        {
+            VerifyOrReturnError(CanFitInNullTerminatedString(mVendorName.value(), bufSize), CHIP_ERROR_BUFFER_TOO_SMALL);
+            CopyString(buf, bufSize, mVendorName.value().c_str());
+            return CHIP_NO_ERROR;
+        }
+
+        return mDefaultProvider->GetVendorName(buf, bufSize);
+    }
+
+    CHIP_ERROR GetVendorId(uint16_t & vendorId) override { return mDefaultProvider->GetVendorId(vendorId); }
+
+    CHIP_ERROR GetProductName(char * buf, size_t bufSize) override
+    {
+        // Check if it was set from the command line or fall back to default provider.
+        if (mProductName.has_value())
+        {
+            VerifyOrReturnError(CanFitInNullTerminatedString(mProductName.value(), bufSize), CHIP_ERROR_BUFFER_TOO_SMALL);
+            CopyString(buf, bufSize, mProductName.value().c_str());
+            return CHIP_NO_ERROR;
+        }
+
+        return mDefaultProvider->GetProductName(buf, bufSize);
+    }
+
+    CHIP_ERROR GetProductId(uint16_t & productId) override { return mDefaultProvider->GetProductId(productId); }
+    CHIP_ERROR GetPartNumber(char * buf, size_t bufSize) override { return mDefaultProvider->GetPartNumber(buf, bufSize); }
+    CHIP_ERROR GetProductURL(char * buf, size_t bufSize) override { return mDefaultProvider->GetProductURL(buf, bufSize); }
+    CHIP_ERROR GetProductLabel(char * buf, size_t bufSize) override { return mDefaultProvider->GetProductLabel(buf, bufSize); }
+
+    CHIP_ERROR GetSerialNumber(char * buf, size_t bufSize) override
+    {
+        // Check if it was set from the command line or fall back to default provider.
+        if (mSerialNumber.has_value())
+        {
+            VerifyOrReturnError(CanFitInNullTerminatedString(mSerialNumber.value(), bufSize), CHIP_ERROR_BUFFER_TOO_SMALL);
+            CopyString(buf, bufSize, mSerialNumber.value().c_str());
+            return CHIP_NO_ERROR;
+        }
+
+        return mDefaultProvider->GetSerialNumber(buf, bufSize);
+    }
+
+    CHIP_ERROR GetManufacturingDate(uint16_t & year, uint8_t & month, uint8_t & day) override
+    {
+        return mDefaultProvider->GetManufacturingDate(year, month, day);
+    }
+    CHIP_ERROR GetHardwareVersion(uint16_t & hardwareVersion) override
+    {
+        return mDefaultProvider->GetHardwareVersion(hardwareVersion);
+    }
+    CHIP_ERROR GetHardwareVersionString(char * buf, size_t bufSize) override
+    {
+        // Check if it was set from the command line or fall back to default provider.
+        if (mHardwareVersionString.has_value())
+        {
+            VerifyOrReturnError(CanFitInNullTerminatedString(mHardwareVersionString.value(), bufSize), CHIP_ERROR_BUFFER_TOO_SMALL);
+            CopyString(buf, bufSize, mHardwareVersionString.value().c_str());
+            return CHIP_NO_ERROR;
+        }
+
+        return mDefaultProvider->GetHardwareVersionString(buf, bufSize);
+    }
+
+    CHIP_ERROR GetRotatingDeviceIdUniqueId(MutableByteSpan & uniqueIdSpan) override
+    {
+        return mDefaultProvider->GetRotatingDeviceIdUniqueId(uniqueIdSpan);
+    }
+
+    CHIP_ERROR GetProductFinish(chip::app::Clusters::BasicInformation::ProductFinishEnum * finish) override
+    {
+        // Our example device claims to have a Satin finish for now.  We can make
+        // this configurable as needed.
+        *finish = chip::app::Clusters::BasicInformation::ProductFinishEnum::kSatin;
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR GetProductPrimaryColor(chip::app::Clusters::BasicInformation::ColorEnum * primaryColor) override
+    {
+        // Our example device claims to have a nice purple color for now.  We can
+        // make this configurable as needed.
+        *primaryColor = chip::app::Clusters::BasicInformation::ColorEnum::kPurple;
+        return CHIP_NO_ERROR;
+    }
+
+    // Once an attribute has been set with one of these Set methods, the
+    // corresponding Get method will return the stored value instead of getting
+    // the value from the default provider.
+    void SetVendorName(const std::string & buf) { mVendorName = buf; }
+    void SetProductName(const std::string & buf) { mProductName = buf; }
+    void SetSerialNumber(const std::string & buf) { mSerialNumber = buf; }
+    void SetHardwareVersionString(const std::string & buf) { mHardwareVersionString = buf; }
+
+private:
+    DeviceInstanceInfoProvider * mDefaultProvider;
+
+    // Values of basic information cluster attributes that may be set from the command-line.
+    // When GetX is called, if this has a value it will be returned instead of getting the
+    // value from the default provider.
+    std::optional<std::string> mVendorName;
+    std::optional<std::string> mProductName;
+    std::optional<std::string> mSerialNumber;
+    std::optional<std::string> mHardwareVersionString;
+
+    static inline bool CanFitInNullTerminatedString(const std::string & candidate, size_t bufSizeIncludingNull)
+    {
+        return bufSizeIncludingNull >= (candidate.size() + 1);
+    }
+};
+
+ExampleDeviceInstanceInfoProvider gExampleDeviceInstanceInfoProvider;
+
 int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
                      const Optional<EndpointId> secondaryNetworkCommissioningEndpoint)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err            = CHIP_NO_ERROR;
+    bool isAllClustersVariant = (std::string(argv[0]).find("all-clusters") != std::string::npos);
+    DeviceInstanceInfoProvider * defaultDeviceInstanceInfoProvider = nullptr;
+
 #if CONFIG_NETWORK_LAYER_BLE
     RendezvousInformationFlags rendezvousFlags = RendezvousInformationFlag::kBLE;
 #else  // CONFIG_NETWORK_LAYER_BLE
@@ -382,15 +597,19 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
 #ifdef CONFIG_RENDEZVOUS_MODE
     rendezvousFlags = static_cast<RendezvousInformationFlags>(CONFIG_RENDEZVOUS_MODE);
 #endif
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-    rendezvousFlags.Set(RendezvousInformationFlag::kWiFiPAF);
-#endif
 
     err = Platform::MemoryInit();
     SuccessOrExit(err);
 
     err = ParseArguments(argc, argv, customOptions);
     SuccessOrExit(err);
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    if (LinuxDeviceOptions::GetInstance().mWiFiPAF)
+    {
+        rendezvousFlags.Set(RendezvousInformationFlag::kWiFiPAF);
+    }
+#endif
 
     sSecondaryNetworkCommissioningEndpoint = secondaryNetworkCommissioningEndpoint;
 
@@ -404,6 +623,18 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
         err = DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init(LinuxDeviceOptions::GetInstance().KVS);
     }
     SuccessOrExit(err);
+#endif
+
+#if defined(ENABLE_CHIP_SHELL)
+    /* Block SIGINT and SIGTERM. Other threads created by the main thread
+     * will inherit the signal mask. Then we can explicitly unblock signals
+     * in the shell thread to handle them, so the read(stdin) call can be
+     * interrupted by a signal. */
+    sigset_t set;
+    sigemptyset(&set);
+    sigaddset(&set, SIGINT);
+    sigaddset(&set, SIGTERM);
+    pthread_sigmask(SIG_BLOCK, &set, nullptr);
 #endif
 
     err = DeviceLayer::PlatformMgr().InitChipStack();
@@ -427,6 +658,16 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
     err = GetPayloadContents(LinuxDeviceOptions::GetInstance().payload, rendezvousFlags);
     SuccessOrExit(err);
 
+    // We need to set DeviceInfoProvider before Server::Init to set up the storage of DeviceInfoProvider properly.
+    if (isAllClustersVariant)
+    {
+        DeviceLayer::SetDeviceInfoProvider(&gAllClustersExampleDeviceInfoProvider);
+    }
+    else
+    {
+        DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
+    }
+
     ConfigurationMgr().LogDeviceConfig();
 
     {
@@ -439,7 +680,7 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
     ChipLogProgress(NotSpecified, "PW_RPC initialized.");
 #endif // defined(PW_RPC_ENABLED)
 
-    DeviceLayer::PlatformMgrImpl().AddEventHandler(EventHandler, 0);
+    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgrImpl().AddEventHandler(EventHandler, 0);
 
 #if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
     if (LinuxDeviceOptions::GetInstance().traceStreamFilename.HasValue())
@@ -467,9 +708,9 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
 #endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
 
 #if CONFIG_NETWORK_LAYER_BLE
-    DeviceLayer::ConnectivityMgr().SetBLEDeviceName(nullptr); // Use default device name (CHIP-XXXX)
-    DeviceLayer::Internal::BLEMgrImpl().ConfigureBle(LinuxDeviceOptions::GetInstance().mBleDevice, false);
-    DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(true);
+    TEMPORARY_RETURN_IGNORED DeviceLayer::ConnectivityMgr().SetBLEDeviceName(nullptr); // Use default device name (CHIP-XXXX)
+    TEMPORARY_RETURN_IGNORED DeviceLayer::Internal::BLEMgrImpl().ConfigureBle(LinuxDeviceOptions::GetInstance().mBleDevice, false);
+    TEMPORARY_RETURN_IGNORED DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(true);
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA && CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
@@ -483,28 +724,88 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
         }
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
-#if CHIP_DEVICE_CONFIG_ENABLE_WPA && CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-    ChipLogProgress(NotSpecified, "WiFi-PAF: initialzing");
-    if (LinuxDeviceOptions::GetInstance().mWiFi)
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA && CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF && CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+    if (LinuxDeviceOptions::GetInstance().mWiFi && LinuxDeviceOptions::GetInstance().mWiFiPAF)
     {
+        ChipLogProgress(WiFiPAF, "WiFi-PAF: initialzing");
         if (EnsureWiFiIsStarted())
         {
-            ChipLogProgress(NotSpecified, "Wi-Fi Management started");
+            ChipLogProgress(WiFiPAF, "Wi-Fi Management started");
             DeviceLayer::ConnectivityManager::WiFiPAFAdvertiseParam args;
-            args.enable  = LinuxDeviceOptions::GetInstance().mWiFiPAF;
-            args.ExtCmds = LinuxDeviceOptions::GetInstance().mWiFiPAFExtCmds;
-            DeviceLayer::ConnectivityMgr().SetWiFiPAFAdvertisingEnabled(args);
+
+            args.freq_list_len = WiFiPAFGet_FreqList(LinuxDeviceOptions::GetInstance().mWiFiPAFExtCmds, args.freq_list);
+            DeviceLayer::ConnectivityMgr().WiFiPAFSetParam(args);
         }
     }
 #endif
 
 #if CHIP_ENABLE_OPENTHREAD
+#if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
+    if (LinuxDeviceOptions::GetInstance().mThreadNodeId)
+    {
+        std::string nodeid  = std::to_string(LinuxDeviceOptions::GetInstance().mThreadNodeId);
+        std::string logfile = "--log-file=thread.log";
+        char * args[]       = { argv[0], logfile.data(), nodeid.data() };
+
+        otSysInit(MATTER_ARRAY_SIZE(args), args);
+        SuccessOrExit(err = DeviceLayer::ThreadStackMgrImpl().InitThreadStack());
+        SuccessOrExit(err = DeviceLayer::ThreadStackMgrImpl().StartThreadTask());
+        ChipLogProgress(NotSpecified, "Thread initialized.");
+    }
+#else
     if (LinuxDeviceOptions::GetInstance().mThread)
     {
         SuccessOrExit(err = DeviceLayer::ThreadStackMgrImpl().InitThreadStack());
+        SuccessOrExit(err = DeviceLayer::ThreadStackMgrImpl().StartThreadTask());
         ChipLogProgress(NotSpecified, "Thread initialized.");
     }
-#endif // CHIP_ENABLE_OPENTHREAD
+#endif
+#endif
+
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    if (LinuxDeviceOptions::GetInstance().icdActiveModeDurationMs.HasValue() ||
+        LinuxDeviceOptions::GetInstance().icdIdleModeDurationMs.HasValue() ||
+        LinuxDeviceOptions::GetInstance().shortIdleModeDurationS.has_value())
+    {
+        // Convert icdIdleModeDurationMs to seconds for SetModeDurations api
+        std::optional<System::Clock::Seconds32> tmpIdleModeDuration = std::nullopt;
+        if (LinuxDeviceOptions::GetInstance().icdIdleModeDurationMs.HasValue())
+            tmpIdleModeDuration = std::chrono::duration_cast<System::Clock::Seconds32>(
+                LinuxDeviceOptions::GetInstance().icdIdleModeDurationMs.Value());
+
+        err = Server::GetInstance().GetICDManager().SetModeDurations(
+            LinuxDeviceOptions::GetInstance().icdActiveModeDurationMs.std_optional(), tmpIdleModeDuration,
+            LinuxDeviceOptions::GetInstance().shortIdleModeDurationS);
+
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(NotSpecified, "Invalid arguments to set ICD mode durations");
+            SuccessOrExit(err);
+        }
+    }
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
+
+    // Initialize the ExampleDeviceInstanceInfoProvider.
+    defaultDeviceInstanceInfoProvider = GetDeviceInstanceInfoProvider();
+    if (defaultDeviceInstanceInfoProvider != &gExampleDeviceInstanceInfoProvider)
+    {
+        gExampleDeviceInstanceInfoProvider.Init(defaultDeviceInstanceInfoProvider);
+        SetDeviceInstanceInfoProvider(&gExampleDeviceInstanceInfoProvider);
+    }
+
+    // Command line arguments to set attributes of the basic information cluster.
+    if (LinuxDeviceOptions::GetInstance().vendorName.HasValue())
+        gExampleDeviceInstanceInfoProvider.SetVendorName(LinuxDeviceOptions::GetInstance().vendorName.Value());
+
+    if (LinuxDeviceOptions::GetInstance().productName.HasValue())
+        gExampleDeviceInstanceInfoProvider.SetProductName(LinuxDeviceOptions::GetInstance().productName.Value());
+
+    if (LinuxDeviceOptions::GetInstance().serialNumber.HasValue())
+        gExampleDeviceInstanceInfoProvider.SetSerialNumber(LinuxDeviceOptions::GetInstance().serialNumber.Value());
+
+    if (LinuxDeviceOptions::GetInstance().hardwareVersionString.HasValue())
+        gExampleDeviceInstanceInfoProvider.SetHardwareVersionString(
+            LinuxDeviceOptions::GetInstance().hardwareVersionString.Value());
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -518,17 +819,50 @@ exit:
     return 0;
 }
 
-void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
+struct LinuxCommonCaseDeviceServerInitParams final : public chip::CommonCaseDeviceServerInitParams
+{
+    LinuxCommonCaseDeviceServerInitParams()
+    {
+        SuccessOrDie(InitializeStaticResourcesBeforeServerInit());
+        dataModelProvider = app::CodegenDataModelProviderInstance(persistentStorageDelegate);
+    }
+};
+
+chip::CommonCaseDeviceServerInitParams & ChipLinuxDefaultServerInitParams()
+{
+    static LinuxCommonCaseDeviceServerInitParams sInitParams;
+    return sInitParams;
+}
+
+void ChipLinuxAppMainLoop(chip::ServerInitParams & initParams, AppMainLoopImplementation * impl)
 {
     gMainLoopImplementation = impl;
 
-    static chip::CommonCaseDeviceServerInitParams initParams;
-    VerifyOrDie(initParams.InitializeStaticResourcesBeforeServerInit() == CHIP_NO_ERROR);
+#if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
+    if (LinuxDeviceOptions::GetInstance().tcVersion.HasValue() && LinuxDeviceOptions::GetInstance().tcRequired.HasValue())
+    {
+        uint16_t version  = LinuxDeviceOptions::GetInstance().tcVersion.Value();
+        uint16_t required = LinuxDeviceOptions::GetInstance().tcRequired.Value();
+        Optional<app::TermsAndConditions> requiredAcknowledgements(app::TermsAndConditions(required, version));
+        SuccessOrDie(
+            app::TermsAndConditionsManager::GetInstance().Init(initParams.persistentStorageDelegate, requiredAcknowledgements));
+    }
+#endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
 
 #if defined(ENABLE_CHIP_SHELL)
     Engine::Root().Init();
-    std::thread shellThread([]() { Engine::Root().RunMainLoop(); });
     Shell::RegisterCommissioneeCommands();
+    std::thread shellThread([]() {
+        sigset_t set;
+        sigemptyset(&set);
+        sigaddset(&set, SIGINT);
+        sigaddset(&set, SIGTERM);
+        // Unblock SIGINT and SIGTERM, so that the shell thread can handle
+        // them - we need read() call to be interrupted.
+        pthread_sigmask(SIG_UNBLOCK, &set, nullptr);
+        Engine::Root().RunMainLoop();
+        StopMainEventLoop();
+    });
 #endif
     initParams.operationalServicePort        = CHIP_PORT;
     initParams.userDirectedCommissioningPort = CHIP_UDC_PORT;
@@ -538,6 +872,11 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
     initParams.operationalServicePort        = LinuxDeviceOptions::GetInstance().securedDevicePort;
     initParams.userDirectedCommissioningPort = LinuxDeviceOptions::GetInstance().unsecuredCommissionerPort;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+
+#if CHIP_DEVICE_CONFIG_ENABLE_PORT_RETRY
+    // Enable automatic port retry to handle port conflicts
+    initParams.portRetryCount = CHIP_DEVICE_CONFIG_PORT_RETRY_COUNT;
+#endif
 
 #if ENABLE_TRACING
     chip::CommandLineApp::TracingSetup tracing_setup;
@@ -552,8 +891,8 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
 
     if (LinuxDeviceOptions::GetInstance().mCSRResponseOptions.csrExistingKeyPair)
     {
-        LinuxDeviceOptions::GetInstance().mCSRResponseOptions.badCsrOperationalKeyStoreForTest.Init(
-            initParams.persistentStorageDelegate);
+        SuccessOrDie(LinuxDeviceOptions::GetInstance().mCSRResponseOptions.badCsrOperationalKeyStoreForTest.Init(
+            initParams.persistentStorageDelegate));
         initParams.operationalKeystore = &LinuxDeviceOptions::GetInstance().mCSRResponseOptions.badCsrOperationalKeyStoreForTest;
     }
 
@@ -564,40 +903,68 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
                 CHIP_NO_ERROR);
     VerifyOrDie(sTestEventTriggerDelegate.AddHandler(&sTestEventTriggerHandler) == CHIP_NO_ERROR);
 
+#if CHIP_DEVICE_CONFIG_ENABLE_SOFTWARE_DIAGNOSTIC_TRIGGER
+    static SoftwareDiagnosticsTestEventTriggerHandler sSoftwareDiagnosticsTestEventTriggerHandler;
+    SuccessOrDie(sTestEventTriggerDelegate.AddHandler(&sSoftwareDiagnosticsTestEventTriggerHandler));
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_DIAGNOSTIC_TRIGGER
+    static WiFiDiagnosticsTestEventTriggerHandler sWiFiDiagnosticsTestEventTriggerHandler;
+    SuccessOrDie(sTestEventTriggerDelegate.AddHandler(&sWiFiDiagnosticsTestEventTriggerHandler));
+#endif
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
     // We want to allow triggering OTA queries if OTA requestor is enabled
     static OTATestEventTriggerHandler sOtaTestEventTriggerHandler;
-    sTestEventTriggerDelegate.AddHandler(&sOtaTestEventTriggerHandler);
+    SuccessOrDie(sTestEventTriggerDelegate.AddHandler(&sOtaTestEventTriggerHandler));
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_SMOKE_CO_TRIGGER
     static SmokeCOTestEventTriggerHandler sSmokeCOTestEventTriggerHandler;
-    sTestEventTriggerDelegate.AddHandler(&sSmokeCOTestEventTriggerHandler);
+    SuccessOrDie(sTestEventTriggerDelegate.AddHandler(&sSmokeCOTestEventTriggerHandler));
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_BOOLEAN_STATE_CONFIGURATION_TRIGGER
     static BooleanStateConfigurationTestEventTriggerHandler sBooleanStateConfigurationTestEventTriggerHandler;
-    sTestEventTriggerDelegate.AddHandler(&sBooleanStateConfigurationTestEventTriggerHandler);
+    SuccessOrDie(sTestEventTriggerDelegate.AddHandler(&sBooleanStateConfigurationTestEventTriggerHandler));
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMODITY_PRICE_TRIGGER
+    static CommodityPriceTestEventTriggerHandler sCommodityPriceTestEventTriggerHandler;
+    SuccessOrDie(sTestEventTriggerDelegate.AddHandler(&sCommodityPriceTestEventTriggerHandler));
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_ELECTRICAL_GRID_CONDITIONS_TRIGGER
+    static ElectricalGridConditionsTestEventTriggerHandler sElectricalGridConditionsTestEventTriggerHandler;
+    SuccessOrDie(sTestEventTriggerDelegate.AddHandler(&sElectricalGridConditionsTestEventTriggerHandler));
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMODITY_TARIFF_TRIGGER
+    static CommodityTariffTestEventTriggerHandler sCommodityTariffTestEventTriggerHandler;
+    SuccessOrDie(sTestEventTriggerDelegate.AddHandler(&sCommodityTariffTestEventTriggerHandler));
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_ENERGY_EVSE_TRIGGER
     static EnergyEvseTestEventTriggerHandler sEnergyEvseTestEventTriggerHandler;
-    sTestEventTriggerDelegate.AddHandler(&sEnergyEvseTestEventTriggerHandler);
+    SuccessOrDie(sTestEventTriggerDelegate.AddHandler(&sEnergyEvseTestEventTriggerHandler));
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_ENERGY_REPORTING_TRIGGER
     static EnergyReportingTestEventTriggerHandler sEnergyReportingTestEventTriggerHandler;
-    sTestEventTriggerDelegate.AddHandler(&sEnergyReportingTestEventTriggerHandler);
+    SuccessOrDie(sTestEventTriggerDelegate.AddHandler(&sEnergyReportingTestEventTriggerHandler));
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_METER_IDENTIFICATION_TRIGGER
+    static MeterIdentificationTestEventTriggerHandler sMeterIdentificationTestEventTriggerHandler;
+    SuccessOrDie(sTestEventTriggerDelegate.AddHandler(&sMeterIdentificationTestEventTriggerHandler));
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WATER_HEATER_MANAGEMENT_TRIGGER
     static WaterHeaterManagementTestEventTriggerHandler sWaterHeaterManagementTestEventTriggerHandler;
-    sTestEventTriggerDelegate.AddHandler(&sWaterHeaterManagementTestEventTriggerHandler);
+    SuccessOrDie(sTestEventTriggerDelegate.AddHandler(&sWaterHeaterManagementTestEventTriggerHandler));
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_DEVICE_ENERGY_MANAGEMENT_TRIGGER
     static DeviceEnergyManagementTestEventTriggerHandler sDeviceEnergyManagementTestEventTriggerHandler;
-    sTestEventTriggerDelegate.AddHandler(&sDeviceEnergyManagementTestEventTriggerHandler);
+    SuccessOrDie(sTestEventTriggerDelegate.AddHandler(&sDeviceEnergyManagementTestEventTriggerHandler));
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMODITY_METERING_TRIGGER
+    static CommodityMeteringTestEventTriggerHandler CommodityMeteringTestEventTriggerHandler;
+    SuccessOrDie(sTestEventTriggerDelegate.AddHandler(&CommodityMeteringTestEventTriggerHandler));
+#endif
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    SuccessOrDie(sTestEventTriggerDelegate.AddHandler(&Server::GetInstance().GetICDManager()));
 #endif
 
     initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
-
-    // We need to set DeviceInfoProvider before Server::Init to setup the storage of DeviceInfoProvider properly.
-    DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
 
     chip::app::RuntimeOptionsProvider::Instance().SetSimulateNoInternalTime(
         LinuxDeviceOptions::GetInstance().mSimulateNoInternalTime);
@@ -606,20 +973,41 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
     initParams.accessRestrictionProvider = exampleAccessRestrictionProvider.get();
 #endif
 
+#if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
+    chip::Inet::EndPointStateOpenThread::OpenThreadEndpointInitParam nativeParams;
+    nativeParams.lockCb                = []() { chip::DeviceLayer::ThreadStackMgr().LockThreadStack(); };
+    nativeParams.unlockCb              = []() { chip::DeviceLayer::ThreadStackMgr().UnlockThreadStack(); };
+    nativeParams.openThreadInstancePtr = chip::DeviceLayer::ThreadStackMgrImpl().OTInstance();
+    initParams.endpointNativeParams    = static_cast<void *>(&nativeParams);
+#endif
+    if (LinuxDeviceOptions::GetInstance().payload.commissioningFlow == CommissioningFlow::kUserActionRequired)
+    {
+        initParams.advertiseCommissionableIfNoFabrics = false;
+    }
+
+    // Set DAC provider before server init because Operational Credentials may snapshot
+    // the provider during cluster construction.
+    SetDeviceAttestationCredentialsProvider(LinuxDeviceOptions::GetInstance().dacProvider);
+
     // Init ZCL Data Model and CHIP App Server
-    Server::GetInstance().Init(initParams);
+    CHIP_ERROR err = Server::GetInstance().Init(initParams);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "Server init failed: %" CHIP_ERROR_FORMAT, err.Format());
+        chipDie();
+    }
 
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
     if (LinuxDeviceOptions::GetInstance().commissioningArlEntries.HasValue())
     {
-        exampleAccessRestrictionProvider->SetCommissioningEntries(
-            LinuxDeviceOptions::GetInstance().commissioningArlEntries.Value());
+        SuccessOrDie(exampleAccessRestrictionProvider->SetCommissioningEntries(
+            LinuxDeviceOptions::GetInstance().commissioningArlEntries.Value()));
     }
 
     if (LinuxDeviceOptions::GetInstance().arlEntries.HasValue())
     {
         // This example use of the ARL feature proactively installs the provided entries on fabric index 1
-        exampleAccessRestrictionProvider->SetEntries(1, LinuxDeviceOptions::GetInstance().arlEntries.Value());
+        SuccessOrDie(exampleAccessRestrictionProvider->SetEntries(1, LinuxDeviceOptions::GetInstance().arlEntries.Value()));
     }
 #endif
 
@@ -642,15 +1030,14 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
 
     PrintOnboardingCodes(LinuxDeviceOptions::GetInstance().payload);
 
-    // Initialize device attestation config
-    SetDeviceAttestationCredentialsProvider(LinuxDeviceOptions::GetInstance().dacProvider);
-
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+#if CHIP_LINUX_APP_START_COMMISSIONER_AT_BOOT
     ChipLogProgress(AppServer, "Starting commissioner");
     VerifyOrReturn(InitCommissioner(LinuxDeviceOptions::GetInstance().securedCommissionerPort,
                                     LinuxDeviceOptions::GetInstance().unsecuredCommissionerPort,
                                     LinuxDeviceOptions::GetInstance().commissionerFabricId) == CHIP_NO_ERROR);
     ChipLogProgress(AppServer, "Started commissioner");
+#endif // CHIP_LINUX_APP_START_COMMISSIONER_AT_BOOT
 #if defined(ENABLE_CHIP_SHELL)
     Shell::RegisterControllerCommands();
 #endif // defined(ENABLE_CHIP_SHELL)
@@ -660,13 +1047,40 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
 
     ApplicationInit();
 
-#if !defined(ENABLE_CHIP_SHELL)
+#if CHIP_DEVICE_LAYER_TARGET_DARWIN
+#if CHIP_SYSTEM_CONFIG_USE_DISPATCH
+    auto & platformMgr = chip::DeviceLayer::PlatformMgrImpl();
+    platformMgr.RegisterSignalHandler(SIGINT, ^{
+        StopSignalHandler(SIGINT);
+    });
+
+    platformMgr.RegisterSignalHandler(SIGTERM, ^{
+        StopSignalHandler(SIGTERM);
+    });
+#else
+    // NOTE: For some reason, on Darwin, the signal handler is not called if the signal is
+    //       registered with sigaction() call and TSAN is enabled. The problem seems to be
+    //       related with the dispatch_semaphore_wait() function in the RunEventLoop() method.
+    //       If this call is commented out, the signal handler is called as expected...
     // NOLINTBEGIN(bugprone-signal-handler)
     signal(SIGINT, StopSignalHandler);
     signal(SIGTERM, StopSignalHandler);
     // NOLINTEND(bugprone-signal-handler)
-#endif // !defined(ENABLE_CHIP_SHELL)
+#endif
+#else
+    struct sigaction sa                        = {};
+    sa.sa_handler                              = StopSignalHandler;
+    sa.sa_flags                                = SA_RESETHAND;
+    sigaction(SIGINT, &sa, nullptr);
+    sigaction(SIGTERM, &sa, nullptr);
+#endif
 
+    // This message is used as a marker for when the application process has started.
+    // See: scripts/tests/chiptest/test_definition.py
+    // TODO: A cleaner and more generic mechanism needs to be developed as a follow-up.
+    // Currently other places (OTA, TV) also scrape logs for information and a better way should be
+    // possible.
+    ChipLogProgress(DeviceLayer, "===== APP STATUS: Starting event loop =====");
     if (impl != nullptr)
     {
         impl->RunMainLoop();
@@ -683,17 +1097,21 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
     shellThread.join();
 #endif
 
+#if CHIP_DEVICE_LAYER_TARGET_DARWIN && CHIP_SYSTEM_CONFIG_USE_DISPATCH
+    platformMgr.UnregisterAllSignalHandlers();
+#endif
+
     Server::GetInstance().Shutdown();
 
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
     ShutdownCommissioner();
 #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 
+    DeviceLayer::PlatformMgr().Shutdown();
+
 #if ENABLE_TRACING
     tracing_setup.StopTracing();
 #endif
-
-    DeviceLayer::PlatformMgr().Shutdown();
 
     Cleanup();
 }

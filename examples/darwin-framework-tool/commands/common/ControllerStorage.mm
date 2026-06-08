@@ -19,7 +19,9 @@
 #import "ControllerStorage.h"
 #import "PreferencesStorage.h"
 
+#ifdef LOG_DEBUG_CONTROLLER_STORAGE
 #include <lib/support/logging/CHIPLogging.h>
+#endif // LOG_DEBUG_CONTROLLER_STORAGE
 
 NSString * const kDarwinFrameworkToolControllerDomain = @"com.apple.darwin-framework-tool.controller";
 
@@ -141,6 +143,20 @@ NSString * const kDarwinFrameworkToolControllerDomain = @"com.apple.darwin-frame
 {
     __auto_type * controllerKey = [self _keyToControllerScopedKey:key];
     self.storage[controllerKey] = value;
+}
+
+- (void)print
+{
+    NSLog(@"%@ (%@)", kDarwinFrameworkToolControllerDomain, _keyScopingPrefix);
+    for (NSString * controllerKey in self.storage) {
+        if (![self _isControllerScopedKey:controllerKey]) {
+            continue;
+        }
+
+        __auto_type * key = [self _controllerScopedKeyToKey:controllerKey];
+        __auto_type * data = self.storage[controllerKey];
+        NSLog(@" * %@: %@", key, data);
+    }
 }
 
 - (NSString *)_keyToControllerScopedKey:(NSString *)key

@@ -50,7 +50,7 @@
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
-#include <platform/Linux/dbus/bluez/DbusBluez.h>
+#include <platform/Linux/dbus/bluez/DBusBluez.h>
 
 namespace chip {
 
@@ -99,25 +99,8 @@ struct GAutoPtrDeleter<BluezLEAdvertisingManager1>
 namespace DeviceLayer {
 namespace Internal {
 
-#define BLUEZ_ADDRESS_SIZE 6 ///< BLE address size (in bytes)
+#define BLUEZ_SERVICE "org.bluez"
 #define BLUEZ_PATH "/org/bluez"
-#define BLUEZ_INTERFACE "org.bluez"
-#define ADAPTER_INTERFACE BLUEZ_INTERFACE ".Adapter1"
-#define PROFILE_INTERFACE BLUEZ_INTERFACE ".GattManager1"
-#define ADVERTISING_MANAGER_INTERFACE BLUEZ_INTERFACE ".LEAdvertisingManager1"
-#define SERVICE_INTERFACE BLUEZ_INTERFACE ".GattService1"
-#define CHARACTERISTIC_INTERFACE BLUEZ_INTERFACE ".GattCharacteristic1"
-#define ADVERTISING_INTERFACE BLUEZ_INTERFACE ".LEAdvertisement1"
-#define DEVICE_INTERFACE BLUEZ_INTERFACE ".Device1"
-
-#define BLUEZ_ADV_TYPE_FLAGS 0x01
-#define BLUEZ_ADV_TYPE_SERVICE_DATA 0x16
-
-#define BLUEZ_ADV_FLAGS_LE_LIMITED (1 << 0)
-#define BLUEZ_ADV_FLAGS_LE_DISCOVERABLE (1 << 1)
-#define BLUEZ_ADV_FLAGS_EDR_UNSUPPORTED (1 << 2)
-#define BLUEZ_ADV_FLAGS_LE_EDR_CONTROLLER (1 << 3)
-#define BLUEZ_ADV_FLAGS_LE_EDR_HOST (1 << 4)
 
 } // namespace Internal
 } // namespace DeviceLayer

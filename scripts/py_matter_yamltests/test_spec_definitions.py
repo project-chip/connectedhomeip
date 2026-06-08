@@ -17,7 +17,7 @@
 import io
 import unittest
 
-from matter_yamltests.definitions import Attribute, Bitmap, Command, Enum, Event, ParseSource, SpecDefinitions, Struct
+from matter.yamltests.definitions import Attribute, Bitmap, Command, Enum, Event, ParseSource, SpecDefinitions, Struct
 
 source_cluster = '''<?xml version="1.0"?>
   <configurator>

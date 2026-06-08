@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include "sl_component_catalog.h"
 #include <platform/silabs/platformAbstraction/SilabsPlatformBase.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -49,16 +50,53 @@ public:
 #endif
 
     // Buttons
+#if defined(SL_CATALOG_SIMPLE_BUTTON_PRESENT)
     inline void SetButtonsCb(SilabsButtonCb callback) override { mButtonCallback = callback; }
-    inline uint32_t GetRebootCause() { return mRebootCause; }
-
     static SilabsButtonCb mButtonCallback;
     uint8_t GetButtonState(uint8_t button) override;
+#if defined(SL_ICD_ENABLED) && SL_ICD_ENABLED == 1
+    void SleepButtonActionHandler(void) override;
+#endif // defined(SL_ICD_ENABLED) && SL_ICD_ENABLED == 1
+#endif // defined(SL_CATALOG_SIMPLE_BUTTON_PRESENT)
 
+#if defined(SL_CATALOG_CUSTOM_MAIN_PRESENT)
     void StartScheduler(void) override;
+#endif // SL_CATALOG_CUSTOM_MAIN_PRESENT
+
+#if (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
+    // RGB LEDs
+    bool GetRGBLedState(uint8_t led) override;
+
+    CHIP_ERROR SetLedColor(uint8_t led, uint8_t r, uint8_t g, uint8_t b) override;
+    CHIP_ERROR GetLedColor(uint8_t led, uint16_t & r, uint16_t & g, uint16_t & b) override;
+#endif // (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED)
+
+    CHIP_ERROR FlashInit() override;
+    CHIP_ERROR FlashErasePage(uint32_t addr) override;
+    CHIP_ERROR FlashWritePage(uint32_t addr, const uint8_t * data, size_t size) override;
+
+    // Reboot
+    void SoftwareReset(void) override;
+    inline uint32_t GetRebootCause() override { return mRebootCause; }
+
+    /** VerifyIfUpdated
+     * @brief Verify if the device has been updated by OTA.
+     *  This check requires the NVM3 to be initialized so it is not called during the platform init.
+     *  It is common to both WiseMCU and GSDK platforms so we have it in a separate cpp file.
+     */
+    CHIP_ERROR VerifyIfUpdated();
+
+    /**
+     * @brief Initialize the nvm driver (e.g., NVM3), and execute any needed migrations.
+     */
+    CHIP_ERROR NvmInit();
 
 private:
     friend SilabsPlatform & GetPlatform(void);
+
+#if defined(SL_MATTER_USE_SI70XX_SENSOR) && SL_MATTER_USE_SI70XX_SENSOR
+    sl_status_t EnableSi70xxSensorGpio() override;
+#endif // defined(SL_MATTER_USE_SI70XX_SENSOR) && SL_MATTER_USE_SI70XX_SENSOR
 
     // To make underlying SDK thread safe
     void SilabsPlatformLock(void);

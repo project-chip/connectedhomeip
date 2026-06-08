@@ -1,0 +1,7 @@
+{
+    "pw": {
+        "pw_cli_analytics": {
+            "enabled": false
+        }
+    }
+}

@@ -23,6 +23,7 @@
 #include <cstdio>
 #include <inttypes.h>
 #include <limits>
+#include <optional>
 #include <stdlib.h>
 #include <string.h>
 
@@ -110,12 +111,11 @@ bool MakeBoolFromAsciiDecimal(const ByteSpan & val)
 
 std::optional<bool> MakeOptionalBoolFromAsciiDecimal(const ByteSpan & val)
 {
+    VerifyOrReturnValue(val.size() == 1, std::nullopt); // need to be a valid boolean (single char)
+
     char character = static_cast<char>(*val.data());
-    if (val.size() == 1 && ((character == '1') || (character == '0')))
-    {
-        return std::make_optional(character == '1');
-    }
-    return std::nullopt;
+    VerifyOrReturnValue((character == '1') || (character == '0'), std::nullopt); // need to be a valid boolean (single char)
+    return std::make_optional(character == '1');
 }
 
 size_t GetPlusSignIdx(const ByteSpan & value)
@@ -160,6 +160,13 @@ uint8_t GetCommissioningMode(const ByteSpan & value)
 {
     return MakeU8FromAsciiDecimal(value);
 }
+
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+BitFlags<JointFabricMode> GetJointFabricMode(const ByteSpan & value)
+{
+    return BitFlags<JointFabricMode>(MakeU8FromAsciiDecimal(value));
+}
+#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
 
 uint32_t GetDeviceType(const ByteSpan & value)
 {
@@ -261,6 +268,11 @@ void FillNodeDataFromTxt(const ByteSpan & key, const ByteSpan & val, CommissionN
     case TxtFieldKey::kCommissionerPasscode:
         nodeData.supportsCommissionerGeneratedPasscode = Internal::GetCommissionerPasscode(val);
         break;
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+    case TxtFieldKey::kJointFabricMode:
+        nodeData.jointFabricMode = Internal::GetJointFabricMode(val);
+        break;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
     default:
         FillNodeDataFromTxt(key, val, static_cast<CommonResolutionData &>(nodeData));
         break;

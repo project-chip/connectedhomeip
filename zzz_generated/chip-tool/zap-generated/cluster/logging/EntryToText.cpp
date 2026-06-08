@@ -101,8 +101,6 @@ char const * ClusterIdToText(chip::ClusterId id)
         return "BooleanState";
     case chip::app::Clusters::IcdManagement::Id:
         return "IcdManagement";
-    case chip::app::Clusters::Timer::Id:
-        return "Timer";
     case chip::app::Clusters::OvenCavityOperationalState::Id:
         return "OvenCavityOperationalState";
     case chip::app::Clusters::OvenMode::Id:
@@ -143,10 +141,14 @@ char const * ClusterIdToText(chip::ClusterId id)
         return "RvcOperationalState";
     case chip::app::Clusters::ScenesManagement::Id:
         return "ScenesManagement";
+    case chip::app::Clusters::Groupcast::Id:
+        return "Groupcast";
     case chip::app::Clusters::HepaFilterMonitoring::Id:
         return "HepaFilterMonitoring";
     case chip::app::Clusters::ActivatedCarbonFilterMonitoring::Id:
         return "ActivatedCarbonFilterMonitoring";
+    case chip::app::Clusters::WaterTankLevelMonitoring::Id:
+        return "WaterTankLevelMonitoring";
     case chip::app::Clusters::BooleanStateConfiguration::Id:
         return "BooleanStateConfiguration";
     case chip::app::Clusters::ValveConfigurationAndControl::Id:
@@ -157,8 +159,8 @@ char const * ClusterIdToText(chip::ClusterId id)
         return "ElectricalEnergyMeasurement";
     case chip::app::Clusters::WaterHeaterManagement::Id:
         return "WaterHeaterManagement";
-    case chip::app::Clusters::DemandResponseLoadControl::Id:
-        return "DemandResponseLoadControl";
+    case chip::app::Clusters::CommodityPrice::Id:
+        return "CommodityPrice";
     case chip::app::Clusters::Messages::Id:
         return "Messages";
     case chip::app::Clusters::DeviceEnergyManagement::Id:
@@ -175,10 +177,22 @@ char const * ClusterIdToText(chip::ClusterId id)
         return "WaterHeaterMode";
     case chip::app::Clusters::DeviceEnergyManagementMode::Id:
         return "DeviceEnergyManagementMode";
+    case chip::app::Clusters::ElectricalGridConditions::Id:
+        return "ElectricalGridConditions";
+    case chip::app::Clusters::ElectricalAlarm::Id:
+        return "ElectricalAlarm";
+    case chip::app::Clusters::ElectricalDistribution::Id:
+        return "ElectricalDistribution";
+    case chip::app::Clusters::ElectricalProtectionAlarm::Id:
+        return "ElectricalProtectionAlarm";
     case chip::app::Clusters::DoorLock::Id:
         return "DoorLock";
     case chip::app::Clusters::WindowCovering::Id:
         return "WindowCovering";
+    case chip::app::Clusters::ClosureControl::Id:
+        return "ClosureControl";
+    case chip::app::Clusters::ClosureDimension::Id:
+        return "ClosureDimension";
     case chip::app::Clusters::ServiceArea::Id:
         return "ServiceArea";
     case chip::app::Clusters::PumpConfigurationAndControl::Id:
@@ -189,10 +203,14 @@ char const * ClusterIdToText(chip::ClusterId id)
         return "FanControl";
     case chip::app::Clusters::ThermostatUserInterfaceConfiguration::Id:
         return "ThermostatUserInterfaceConfiguration";
+    case chip::app::Clusters::Humidistat::Id:
+        return "Humidistat";
     case chip::app::Clusters::ColorControl::Id:
         return "ColorControl";
     case chip::app::Clusters::BallastConfiguration::Id:
         return "BallastConfiguration";
+    case chip::app::Clusters::DynamicLighting::Id:
+        return "DynamicLighting";
     case chip::app::Clusters::IlluminanceMeasurement::Id:
         return "IlluminanceMeasurement";
     case chip::app::Clusters::TemperatureMeasurement::Id:
@@ -225,6 +243,18 @@ char const * ClusterIdToText(chip::ClusterId id)
         return "TotalVolatileOrganicCompoundsConcentrationMeasurement";
     case chip::app::Clusters::RadonConcentrationMeasurement::Id:
         return "RadonConcentrationMeasurement";
+    case chip::app::Clusters::SoilMeasurement::Id:
+        return "SoilMeasurement";
+    case chip::app::Clusters::AmbientContextSensing::Id:
+        return "AmbientContextSensing";
+    case chip::app::Clusters::AmbientSensingUnion::Id:
+        return "AmbientSensingUnion";
+    case chip::app::Clusters::ProximityRanging::Id:
+        return "ProximityRanging";
+    case chip::app::Clusters::SmokeConcentrationMeasurement::Id:
+        return "SmokeConcentrationMeasurement";
+    case chip::app::Clusters::NetworkIdentityManagement::Id:
+        return "NetworkIdentityManagement";
     case chip::app::Clusters::WiFiNetworkManagement::Id:
         return "WiFiNetworkManagement";
     case chip::app::Clusters::ThreadBorderRouterManagement::Id:
@@ -263,16 +293,36 @@ char const * ClusterIdToText(chip::ClusterId id)
         return "ZoneManagement";
     case chip::app::Clusters::CameraAvStreamManagement::Id:
         return "CameraAvStreamManagement";
+    case chip::app::Clusters::CameraAvSettingsUserLevelManagement::Id:
+        return "CameraAvSettingsUserLevelManagement";
     case chip::app::Clusters::WebRTCTransportProvider::Id:
         return "WebRTCTransportProvider";
     case chip::app::Clusters::WebRTCTransportRequestor::Id:
         return "WebRTCTransportRequestor";
+    case chip::app::Clusters::PushAvStreamTransport::Id:
+        return "PushAvStreamTransport";
     case chip::app::Clusters::Chime::Id:
         return "Chime";
+    case chip::app::Clusters::AvAnalysis::Id:
+        return "AvAnalysis";
+    case chip::app::Clusters::CommodityTariff::Id:
+        return "CommodityTariff";
     case chip::app::Clusters::EcosystemInformation::Id:
         return "EcosystemInformation";
     case chip::app::Clusters::CommissionerControl::Id:
         return "CommissionerControl";
+    case chip::app::Clusters::JointFabricDatastore::Id:
+        return "JointFabricDatastore";
+    case chip::app::Clusters::JointFabricAdministrator::Id:
+        return "JointFabricAdministrator";
+    case chip::app::Clusters::TlsCertificateManagement::Id:
+        return "TlsCertificateManagement";
+    case chip::app::Clusters::TlsClientManagement::Id:
+        return "TlsClientManagement";
+    case chip::app::Clusters::MeterIdentification::Id:
+        return "MeterIdentification";
+    case chip::app::Clusters::CommodityMetering::Id:
+        return "CommodityMetering";
     case chip::app::Clusters::UnitTesting::Id:
         return "UnitTesting";
     case chip::app::Clusters::FaultInjection::Id:
@@ -430,6 +480,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "PartsList";
         case chip::app::Clusters::Descriptor::Attributes::TagList::Id:
             return "TagList";
+        case chip::app::Clusters::Descriptor::Attributes::EndpointUniqueID::Id:
+            return "EndpointUniqueID";
         case chip::app::Clusters::Descriptor::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::Descriptor::Attributes::AcceptedCommandList::Id:
@@ -480,6 +532,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "CommissioningARL";
         case chip::app::Clusters::AccessControl::Attributes::Arl::Id:
             return "Arl";
+        case chip::app::Clusters::AccessControl::Attributes::AuxiliaryACL::Id:
+            return "AuxiliaryACL";
         case chip::app::Clusters::AccessControl::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::AccessControl::Attributes::AcceptedCommandList::Id:
@@ -566,6 +620,10 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "SpecificationVersion";
         case chip::app::Clusters::BasicInformation::Attributes::MaxPathsPerInvoke::Id:
             return "MaxPathsPerInvoke";
+        case chip::app::Clusters::BasicInformation::Attributes::DeviceLocation::Id:
+            return "DeviceLocation";
+        case chip::app::Clusters::BasicInformation::Attributes::ConfigurationVersion::Id:
+            return "ConfigurationVersion";
         case chip::app::Clusters::BasicInformation::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::BasicInformation::Attributes::AcceptedCommandList::Id:
@@ -671,6 +729,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
         {
         case chip::app::Clusters::UnitLocalization::Attributes::TemperatureUnit::Id:
             return "TemperatureUnit";
+        case chip::app::Clusters::UnitLocalization::Attributes::SupportedTemperatureUnits::Id:
+            return "SupportedTemperatureUnits";
         case chip::app::Clusters::UnitLocalization::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::UnitLocalization::Attributes::AcceptedCommandList::Id:
@@ -808,6 +868,12 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "TCAcknowledgementsRequired";
         case chip::app::Clusters::GeneralCommissioning::Attributes::TCUpdateDeadline::Id:
             return "TCUpdateDeadline";
+        case chip::app::Clusters::GeneralCommissioning::Attributes::RecoveryIdentifier::Id:
+            return "RecoveryIdentifier";
+        case chip::app::Clusters::GeneralCommissioning::Attributes::NetworkRecoveryReason::Id:
+            return "NetworkRecoveryReason";
+        case chip::app::Clusters::GeneralCommissioning::Attributes::IsCommissioningWithoutPower::Id:
+            return "IsCommissioningWithoutPower";
         case chip::app::Clusters::GeneralCommissioning::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::GeneralCommissioning::Attributes::AcceptedCommandList::Id:
@@ -899,6 +965,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "ActiveNetworkFaults";
         case chip::app::Clusters::GeneralDiagnostics::Attributes::TestEventTriggersEnabled::Id:
             return "TestEventTriggersEnabled";
+        case chip::app::Clusters::GeneralDiagnostics::Attributes::DeviceLoadStatus::Id:
+            return "DeviceLoadStatus";
         case chip::app::Clusters::GeneralDiagnostics::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::GeneralDiagnostics::Attributes::AcceptedCommandList::Id:
@@ -1067,6 +1135,10 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "OperationalDatasetComponents";
         case chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::ActiveNetworkFaultsList::Id:
             return "ActiveNetworkFaultsList";
+        case chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::ExtAddress::Id:
+            return "ExtAddress";
+        case chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::Rloc16::Id:
+            return "Rloc16";
         case chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::AcceptedCommandList::Id:
@@ -1239,6 +1311,10 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "UniqueID";
         case chip::app::Clusters::BridgedDeviceBasicInformation::Attributes::ProductAppearance::Id:
             return "ProductAppearance";
+        case chip::app::Clusters::BridgedDeviceBasicInformation::Attributes::DeviceLocation::Id:
+            return "DeviceLocation";
+        case chip::app::Clusters::BridgedDeviceBasicInformation::Attributes::ConfigurationVersion::Id:
+            return "ConfigurationVersion";
         case chip::app::Clusters::BridgedDeviceBasicInformation::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::BridgedDeviceBasicInformation::Attributes::AcceptedCommandList::Id:
@@ -1339,6 +1415,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "MaxGroupsPerFabric";
         case chip::app::Clusters::GroupKeyManagement::Attributes::MaxGroupKeysPerFabric::Id:
             return "MaxGroupKeysPerFabric";
+        case chip::app::Clusters::GroupKeyManagement::Attributes::GroupcastAdoption::Id:
+            return "GroupcastAdoption";
         case chip::app::Clusters::GroupKeyManagement::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::GroupKeyManagement::Attributes::AcceptedCommandList::Id:
@@ -1498,29 +1576,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "Unknown";
         }
     }
-    case chip::app::Clusters::Timer::Id: {
-        switch (id)
-        {
-        case chip::app::Clusters::Timer::Attributes::SetTime::Id:
-            return "SetTime";
-        case chip::app::Clusters::Timer::Attributes::TimeRemaining::Id:
-            return "TimeRemaining";
-        case chip::app::Clusters::Timer::Attributes::TimerState::Id:
-            return "TimerState";
-        case chip::app::Clusters::Timer::Attributes::GeneratedCommandList::Id:
-            return "GeneratedCommandList";
-        case chip::app::Clusters::Timer::Attributes::AcceptedCommandList::Id:
-            return "AcceptedCommandList";
-        case chip::app::Clusters::Timer::Attributes::AttributeList::Id:
-            return "AttributeList";
-        case chip::app::Clusters::Timer::Attributes::FeatureMap::Id:
-            return "FeatureMap";
-        case chip::app::Clusters::Timer::Attributes::ClusterRevision::Id:
-            return "ClusterRevision";
-        default:
-            return "Unknown";
-        }
-    }
     case chip::app::Clusters::OvenCavityOperationalState::Id: {
         switch (id)
         {
@@ -1557,10 +1612,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "SupportedModes";
         case chip::app::Clusters::OvenMode::Attributes::CurrentMode::Id:
             return "CurrentMode";
-        case chip::app::Clusters::OvenMode::Attributes::StartUpMode::Id:
-            return "StartUpMode";
-        case chip::app::Clusters::OvenMode::Attributes::OnMode::Id:
-            return "OnMode";
         case chip::app::Clusters::OvenMode::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::OvenMode::Attributes::AcceptedCommandList::Id:
@@ -1632,10 +1683,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "SupportedModes";
         case chip::app::Clusters::LaundryWasherMode::Attributes::CurrentMode::Id:
             return "CurrentMode";
-        case chip::app::Clusters::LaundryWasherMode::Attributes::StartUpMode::Id:
-            return "StartUpMode";
-        case chip::app::Clusters::LaundryWasherMode::Attributes::OnMode::Id:
-            return "OnMode";
         case chip::app::Clusters::LaundryWasherMode::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::LaundryWasherMode::Attributes::AcceptedCommandList::Id:
@@ -1657,10 +1704,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "SupportedModes";
         case chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Attributes::CurrentMode::Id:
             return "CurrentMode";
-        case chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Attributes::StartUpMode::Id:
-            return "StartUpMode";
-        case chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Attributes::OnMode::Id:
-            return "OnMode";
         case chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Attributes::AcceptedCommandList::Id:
@@ -1801,10 +1844,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "SupportedModes";
         case chip::app::Clusters::DishwasherMode::Attributes::CurrentMode::Id:
             return "CurrentMode";
-        case chip::app::Clusters::DishwasherMode::Attributes::StartUpMode::Id:
-            return "StartUpMode";
-        case chip::app::Clusters::DishwasherMode::Attributes::OnMode::Id:
-            return "OnMode";
         case chip::app::Clusters::DishwasherMode::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::DishwasherMode::Attributes::AcceptedCommandList::Id:
@@ -1867,6 +1906,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "SmokeSensitivityLevel";
         case chip::app::Clusters::SmokeCoAlarm::Attributes::ExpiryDate::Id:
             return "ExpiryDate";
+        case chip::app::Clusters::SmokeCoAlarm::Attributes::Unmounted::Id:
+            return "Unmounted";
         case chip::app::Clusters::SmokeCoAlarm::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::SmokeCoAlarm::Attributes::AcceptedCommandList::Id:
@@ -2023,8 +2064,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
     case chip::app::Clusters::ScenesManagement::Id: {
         switch (id)
         {
-        case chip::app::Clusters::ScenesManagement::Attributes::LastConfiguredBy::Id:
-            return "LastConfiguredBy";
         case chip::app::Clusters::ScenesManagement::Attributes::SceneTableSize::Id:
             return "SceneTableSize";
         case chip::app::Clusters::ScenesManagement::Attributes::FabricSceneInfo::Id:
@@ -2038,6 +2077,33 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
         case chip::app::Clusters::ScenesManagement::Attributes::FeatureMap::Id:
             return "FeatureMap";
         case chip::app::Clusters::ScenesManagement::Attributes::ClusterRevision::Id:
+            return "ClusterRevision";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::Groupcast::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::Groupcast::Attributes::Membership::Id:
+            return "Membership";
+        case chip::app::Clusters::Groupcast::Attributes::MaxMembershipCount::Id:
+            return "MaxMembershipCount";
+        case chip::app::Clusters::Groupcast::Attributes::MaxMcastAddrCount::Id:
+            return "MaxMcastAddrCount";
+        case chip::app::Clusters::Groupcast::Attributes::UsedMcastAddrCount::Id:
+            return "UsedMcastAddrCount";
+        case chip::app::Clusters::Groupcast::Attributes::FabricUnderTest::Id:
+            return "FabricUnderTest";
+        case chip::app::Clusters::Groupcast::Attributes::GeneratedCommandList::Id:
+            return "GeneratedCommandList";
+        case chip::app::Clusters::Groupcast::Attributes::AcceptedCommandList::Id:
+            return "AcceptedCommandList";
+        case chip::app::Clusters::Groupcast::Attributes::AttributeList::Id:
+            return "AttributeList";
+        case chip::app::Clusters::Groupcast::Attributes::FeatureMap::Id:
+            return "FeatureMap";
+        case chip::app::Clusters::Groupcast::Attributes::ClusterRevision::Id:
             return "ClusterRevision";
         default:
             return "Unknown";
@@ -2096,6 +2162,35 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
         case chip::app::Clusters::ActivatedCarbonFilterMonitoring::Attributes::FeatureMap::Id:
             return "FeatureMap";
         case chip::app::Clusters::ActivatedCarbonFilterMonitoring::Attributes::ClusterRevision::Id:
+            return "ClusterRevision";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::WaterTankLevelMonitoring::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::WaterTankLevelMonitoring::Attributes::Condition::Id:
+            return "Condition";
+        case chip::app::Clusters::WaterTankLevelMonitoring::Attributes::DegradationDirection::Id:
+            return "DegradationDirection";
+        case chip::app::Clusters::WaterTankLevelMonitoring::Attributes::ChangeIndication::Id:
+            return "ChangeIndication";
+        case chip::app::Clusters::WaterTankLevelMonitoring::Attributes::InPlaceIndicator::Id:
+            return "InPlaceIndicator";
+        case chip::app::Clusters::WaterTankLevelMonitoring::Attributes::LastChangedTime::Id:
+            return "LastChangedTime";
+        case chip::app::Clusters::WaterTankLevelMonitoring::Attributes::ReplacementProductList::Id:
+            return "ReplacementProductList";
+        case chip::app::Clusters::WaterTankLevelMonitoring::Attributes::GeneratedCommandList::Id:
+            return "GeneratedCommandList";
+        case chip::app::Clusters::WaterTankLevelMonitoring::Attributes::AcceptedCommandList::Id:
+            return "AcceptedCommandList";
+        case chip::app::Clusters::WaterTankLevelMonitoring::Attributes::AttributeList::Id:
+            return "AttributeList";
+        case chip::app::Clusters::WaterTankLevelMonitoring::Attributes::FeatureMap::Id:
+            return "FeatureMap";
+        case chip::app::Clusters::WaterTankLevelMonitoring::Attributes::ClusterRevision::Id:
             return "ClusterRevision";
         default:
             return "Unknown";
@@ -2286,34 +2381,26 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "Unknown";
         }
     }
-    case chip::app::Clusters::DemandResponseLoadControl::Id: {
+    case chip::app::Clusters::CommodityPrice::Id: {
         switch (id)
         {
-        case chip::app::Clusters::DemandResponseLoadControl::Attributes::LoadControlPrograms::Id:
-            return "LoadControlPrograms";
-        case chip::app::Clusters::DemandResponseLoadControl::Attributes::NumberOfLoadControlPrograms::Id:
-            return "NumberOfLoadControlPrograms";
-        case chip::app::Clusters::DemandResponseLoadControl::Attributes::Events::Id:
-            return "Events";
-        case chip::app::Clusters::DemandResponseLoadControl::Attributes::ActiveEvents::Id:
-            return "ActiveEvents";
-        case chip::app::Clusters::DemandResponseLoadControl::Attributes::NumberOfEventsPerProgram::Id:
-            return "NumberOfEventsPerProgram";
-        case chip::app::Clusters::DemandResponseLoadControl::Attributes::NumberOfTransitions::Id:
-            return "NumberOfTransitions";
-        case chip::app::Clusters::DemandResponseLoadControl::Attributes::DefaultRandomStart::Id:
-            return "DefaultRandomStart";
-        case chip::app::Clusters::DemandResponseLoadControl::Attributes::DefaultRandomDuration::Id:
-            return "DefaultRandomDuration";
-        case chip::app::Clusters::DemandResponseLoadControl::Attributes::GeneratedCommandList::Id:
+        case chip::app::Clusters::CommodityPrice::Attributes::TariffUnit::Id:
+            return "TariffUnit";
+        case chip::app::Clusters::CommodityPrice::Attributes::Currency::Id:
+            return "Currency";
+        case chip::app::Clusters::CommodityPrice::Attributes::CurrentPrice::Id:
+            return "CurrentPrice";
+        case chip::app::Clusters::CommodityPrice::Attributes::PriceForecast::Id:
+            return "PriceForecast";
+        case chip::app::Clusters::CommodityPrice::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
-        case chip::app::Clusters::DemandResponseLoadControl::Attributes::AcceptedCommandList::Id:
+        case chip::app::Clusters::CommodityPrice::Attributes::AcceptedCommandList::Id:
             return "AcceptedCommandList";
-        case chip::app::Clusters::DemandResponseLoadControl::Attributes::AttributeList::Id:
+        case chip::app::Clusters::CommodityPrice::Attributes::AttributeList::Id:
             return "AttributeList";
-        case chip::app::Clusters::DemandResponseLoadControl::Attributes::FeatureMap::Id:
+        case chip::app::Clusters::CommodityPrice::Attributes::FeatureMap::Id:
             return "FeatureMap";
-        case chip::app::Clusters::DemandResponseLoadControl::Attributes::ClusterRevision::Id:
+        case chip::app::Clusters::CommodityPrice::Attributes::ClusterRevision::Id:
             return "ClusterRevision";
         default:
             return "Unknown";
@@ -2470,6 +2557,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "AvailableEndpoints";
         case chip::app::Clusters::PowerTopology::Attributes::ActiveEndpoints::Id:
             return "ActiveEndpoints";
+        case chip::app::Clusters::PowerTopology::Attributes::ElectricalCircuitNodes::Id:
+            return "ElectricalCircuitNodes";
         case chip::app::Clusters::PowerTopology::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::PowerTopology::Attributes::AcceptedCommandList::Id:
@@ -2542,6 +2631,138 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
         case chip::app::Clusters::DeviceEnergyManagementMode::Attributes::FeatureMap::Id:
             return "FeatureMap";
         case chip::app::Clusters::DeviceEnergyManagementMode::Attributes::ClusterRevision::Id:
+            return "ClusterRevision";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::ElectricalGridConditions::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::ElectricalGridConditions::Attributes::LocalGenerationAvailable::Id:
+            return "LocalGenerationAvailable";
+        case chip::app::Clusters::ElectricalGridConditions::Attributes::CurrentConditions::Id:
+            return "CurrentConditions";
+        case chip::app::Clusters::ElectricalGridConditions::Attributes::ForecastConditions::Id:
+            return "ForecastConditions";
+        case chip::app::Clusters::ElectricalGridConditions::Attributes::GeneratedCommandList::Id:
+            return "GeneratedCommandList";
+        case chip::app::Clusters::ElectricalGridConditions::Attributes::AcceptedCommandList::Id:
+            return "AcceptedCommandList";
+        case chip::app::Clusters::ElectricalGridConditions::Attributes::AttributeList::Id:
+            return "AttributeList";
+        case chip::app::Clusters::ElectricalGridConditions::Attributes::FeatureMap::Id:
+            return "FeatureMap";
+        case chip::app::Clusters::ElectricalGridConditions::Attributes::ClusterRevision::Id:
+            return "ClusterRevision";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::ElectricalAlarm::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::ElectricalAlarm::Attributes::Mask::Id:
+            return "Mask";
+        case chip::app::Clusters::ElectricalAlarm::Attributes::Latch::Id:
+            return "Latch";
+        case chip::app::Clusters::ElectricalAlarm::Attributes::State::Id:
+            return "State";
+        case chip::app::Clusters::ElectricalAlarm::Attributes::Supported::Id:
+            return "Supported";
+        case chip::app::Clusters::ElectricalAlarm::Attributes::OverVoltageThreshold::Id:
+            return "OverVoltageThreshold";
+        case chip::app::Clusters::ElectricalAlarm::Attributes::UnderVoltageThreshold::Id:
+            return "UnderVoltageThreshold";
+        case chip::app::Clusters::ElectricalAlarm::Attributes::OverFrequencyThreshold::Id:
+            return "OverFrequencyThreshold";
+        case chip::app::Clusters::ElectricalAlarm::Attributes::UnderFrequencyThreshold::Id:
+            return "UnderFrequencyThreshold";
+        case chip::app::Clusters::ElectricalAlarm::Attributes::OverPowerThreshold::Id:
+            return "OverPowerThreshold";
+        case chip::app::Clusters::ElectricalAlarm::Attributes::UnderPowerThreshold::Id:
+            return "UnderPowerThreshold";
+        case chip::app::Clusters::ElectricalAlarm::Attributes::OverCurrentThreshold::Id:
+            return "OverCurrentThreshold";
+        case chip::app::Clusters::ElectricalAlarm::Attributes::UnderCurrentThreshold::Id:
+            return "UnderCurrentThreshold";
+        case chip::app::Clusters::ElectricalAlarm::Attributes::PowerImportThreshold::Id:
+            return "PowerImportThreshold";
+        case chip::app::Clusters::ElectricalAlarm::Attributes::PowerExportThreshold::Id:
+            return "PowerExportThreshold";
+        case chip::app::Clusters::ElectricalAlarm::Attributes::GeneratedCommandList::Id:
+            return "GeneratedCommandList";
+        case chip::app::Clusters::ElectricalAlarm::Attributes::AcceptedCommandList::Id:
+            return "AcceptedCommandList";
+        case chip::app::Clusters::ElectricalAlarm::Attributes::AttributeList::Id:
+            return "AttributeList";
+        case chip::app::Clusters::ElectricalAlarm::Attributes::FeatureMap::Id:
+            return "FeatureMap";
+        case chip::app::Clusters::ElectricalAlarm::Attributes::ClusterRevision::Id:
+            return "ClusterRevision";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::ElectricalDistribution::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::ElectricalDistribution::Attributes::MaxContinuousCurrent::Id:
+            return "MaxContinuousCurrent";
+        case chip::app::Clusters::ElectricalDistribution::Attributes::MaxVoltage::Id:
+            return "MaxVoltage";
+        case chip::app::Clusters::ElectricalDistribution::Attributes::NumberOfPoles::Id:
+            return "NumberOfPoles";
+        case chip::app::Clusters::ElectricalDistribution::Attributes::EndOfLife::Id:
+            return "EndOfLife";
+        case chip::app::Clusters::ElectricalDistribution::Attributes::ServiceEntranceRated::Id:
+            return "ServiceEntranceRated";
+        case chip::app::Clusters::ElectricalDistribution::Attributes::GeneratedCommandList::Id:
+            return "GeneratedCommandList";
+        case chip::app::Clusters::ElectricalDistribution::Attributes::AcceptedCommandList::Id:
+            return "AcceptedCommandList";
+        case chip::app::Clusters::ElectricalDistribution::Attributes::AttributeList::Id:
+            return "AttributeList";
+        case chip::app::Clusters::ElectricalDistribution::Attributes::FeatureMap::Id:
+            return "FeatureMap";
+        case chip::app::Clusters::ElectricalDistribution::Attributes::ClusterRevision::Id:
+            return "ClusterRevision";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::ElectricalProtectionAlarm::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::ElectricalProtectionAlarm::Attributes::Mask::Id:
+            return "Mask";
+        case chip::app::Clusters::ElectricalProtectionAlarm::Attributes::State::Id:
+            return "State";
+        case chip::app::Clusters::ElectricalProtectionAlarm::Attributes::Supported::Id:
+            return "Supported";
+        case chip::app::Clusters::ElectricalProtectionAlarm::Attributes::ArcCause::Id:
+            return "ArcCause";
+        case chip::app::Clusters::ElectricalProtectionAlarm::Attributes::OverLoadRating::Id:
+            return "OverLoadRating";
+        case chip::app::Clusters::ElectricalProtectionAlarm::Attributes::OverVoltageRating::Id:
+            return "OverVoltageRating";
+        case chip::app::Clusters::ElectricalProtectionAlarm::Attributes::SurgeProtectionRating::Id:
+            return "SurgeProtectionRating";
+        case chip::app::Clusters::ElectricalProtectionAlarm::Attributes::ShortCircuitRating::Id:
+            return "ShortCircuitRating";
+        case chip::app::Clusters::ElectricalProtectionAlarm::Attributes::ResidualCurrentRating::Id:
+            return "ResidualCurrentRating";
+        case chip::app::Clusters::ElectricalProtectionAlarm::Attributes::ArcFaultRating::Id:
+            return "ArcFaultRating";
+        case chip::app::Clusters::ElectricalProtectionAlarm::Attributes::GeneratedCommandList::Id:
+            return "GeneratedCommandList";
+        case chip::app::Clusters::ElectricalProtectionAlarm::Attributes::AcceptedCommandList::Id:
+            return "AcceptedCommandList";
+        case chip::app::Clusters::ElectricalProtectionAlarm::Attributes::AttributeList::Id:
+            return "AttributeList";
+        case chip::app::Clusters::ElectricalProtectionAlarm::Attributes::FeatureMap::Id:
+            return "FeatureMap";
+        case chip::app::Clusters::ElectricalProtectionAlarm::Attributes::ClusterRevision::Id:
             return "ClusterRevision";
         default:
             return "Unknown";
@@ -2710,6 +2931,76 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
         case chip::app::Clusters::WindowCovering::Attributes::FeatureMap::Id:
             return "FeatureMap";
         case chip::app::Clusters::WindowCovering::Attributes::ClusterRevision::Id:
+            return "ClusterRevision";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::ClosureControl::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::ClosureControl::Attributes::CountdownTime::Id:
+            return "CountdownTime";
+        case chip::app::Clusters::ClosureControl::Attributes::MainState::Id:
+            return "MainState";
+        case chip::app::Clusters::ClosureControl::Attributes::CurrentErrorList::Id:
+            return "CurrentErrorList";
+        case chip::app::Clusters::ClosureControl::Attributes::OverallCurrentState::Id:
+            return "OverallCurrentState";
+        case chip::app::Clusters::ClosureControl::Attributes::OverallTargetState::Id:
+            return "OverallTargetState";
+        case chip::app::Clusters::ClosureControl::Attributes::LatchControlModes::Id:
+            return "LatchControlModes";
+        case chip::app::Clusters::ClosureControl::Attributes::GeneratedCommandList::Id:
+            return "GeneratedCommandList";
+        case chip::app::Clusters::ClosureControl::Attributes::AcceptedCommandList::Id:
+            return "AcceptedCommandList";
+        case chip::app::Clusters::ClosureControl::Attributes::AttributeList::Id:
+            return "AttributeList";
+        case chip::app::Clusters::ClosureControl::Attributes::FeatureMap::Id:
+            return "FeatureMap";
+        case chip::app::Clusters::ClosureControl::Attributes::ClusterRevision::Id:
+            return "ClusterRevision";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::ClosureDimension::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::ClosureDimension::Attributes::CurrentState::Id:
+            return "CurrentState";
+        case chip::app::Clusters::ClosureDimension::Attributes::TargetState::Id:
+            return "TargetState";
+        case chip::app::Clusters::ClosureDimension::Attributes::Resolution::Id:
+            return "Resolution";
+        case chip::app::Clusters::ClosureDimension::Attributes::StepValue::Id:
+            return "StepValue";
+        case chip::app::Clusters::ClosureDimension::Attributes::Unit::Id:
+            return "Unit";
+        case chip::app::Clusters::ClosureDimension::Attributes::UnitRange::Id:
+            return "UnitRange";
+        case chip::app::Clusters::ClosureDimension::Attributes::LimitRange::Id:
+            return "LimitRange";
+        case chip::app::Clusters::ClosureDimension::Attributes::TranslationDirection::Id:
+            return "TranslationDirection";
+        case chip::app::Clusters::ClosureDimension::Attributes::RotationAxis::Id:
+            return "RotationAxis";
+        case chip::app::Clusters::ClosureDimension::Attributes::Overflow::Id:
+            return "Overflow";
+        case chip::app::Clusters::ClosureDimension::Attributes::ModulationType::Id:
+            return "ModulationType";
+        case chip::app::Clusters::ClosureDimension::Attributes::LatchControlModes::Id:
+            return "LatchControlModes";
+        case chip::app::Clusters::ClosureDimension::Attributes::GeneratedCommandList::Id:
+            return "GeneratedCommandList";
+        case chip::app::Clusters::ClosureDimension::Attributes::AcceptedCommandList::Id:
+            return "AcceptedCommandList";
+        case chip::app::Clusters::ClosureDimension::Attributes::AttributeList::Id:
+            return "AttributeList";
+        case chip::app::Clusters::ClosureDimension::Attributes::FeatureMap::Id:
+            return "FeatureMap";
+        case chip::app::Clusters::ClosureDimension::Attributes::ClusterRevision::Id:
             return "ClusterRevision";
         default:
             return "Unknown";
@@ -2930,6 +3221,14 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "Schedules";
         case chip::app::Clusters::Thermostat::Attributes::SetpointHoldExpiryTimestamp::Id:
             return "SetpointHoldExpiryTimestamp";
+        case chip::app::Clusters::Thermostat::Attributes::MaxThermostatSuggestions::Id:
+            return "MaxThermostatSuggestions";
+        case chip::app::Clusters::Thermostat::Attributes::ThermostatSuggestions::Id:
+            return "ThermostatSuggestions";
+        case chip::app::Clusters::Thermostat::Attributes::CurrentThermostatSuggestion::Id:
+            return "CurrentThermostatSuggestion";
+        case chip::app::Clusters::Thermostat::Attributes::ThermostatSuggestionNotFollowingReason::Id:
+            return "ThermostatSuggestionNotFollowingReason";
         case chip::app::Clusters::Thermostat::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::Thermostat::Attributes::AcceptedCommandList::Id:
@@ -3003,6 +3302,45 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
         case chip::app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::FeatureMap::Id:
             return "FeatureMap";
         case chip::app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::ClusterRevision::Id:
+            return "ClusterRevision";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::Humidistat::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::Humidistat::Attributes::Mode::Id:
+            return "Mode";
+        case chip::app::Clusters::Humidistat::Attributes::SystemState::Id:
+            return "SystemState";
+        case chip::app::Clusters::Humidistat::Attributes::UserSetpoint::Id:
+            return "UserSetpoint";
+        case chip::app::Clusters::Humidistat::Attributes::MinSetpoint::Id:
+            return "MinSetpoint";
+        case chip::app::Clusters::Humidistat::Attributes::MaxSetpoint::Id:
+            return "MaxSetpoint";
+        case chip::app::Clusters::Humidistat::Attributes::Step::Id:
+            return "Step";
+        case chip::app::Clusters::Humidistat::Attributes::TargetSetpoint::Id:
+            return "TargetSetpoint";
+        case chip::app::Clusters::Humidistat::Attributes::MistType::Id:
+            return "MistType";
+        case chip::app::Clusters::Humidistat::Attributes::Continuous::Id:
+            return "Continuous";
+        case chip::app::Clusters::Humidistat::Attributes::Sleep::Id:
+            return "Sleep";
+        case chip::app::Clusters::Humidistat::Attributes::Optimal::Id:
+            return "Optimal";
+        case chip::app::Clusters::Humidistat::Attributes::GeneratedCommandList::Id:
+            return "GeneratedCommandList";
+        case chip::app::Clusters::Humidistat::Attributes::AcceptedCommandList::Id:
+            return "AcceptedCommandList";
+        case chip::app::Clusters::Humidistat::Attributes::AttributeList::Id:
+            return "AttributeList";
+        case chip::app::Clusters::Humidistat::Attributes::FeatureMap::Id:
+            return "FeatureMap";
+        case chip::app::Clusters::Humidistat::Attributes::ClusterRevision::Id:
             return "ClusterRevision";
         default:
             return "Unknown";
@@ -3174,6 +3512,29 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "Unknown";
         }
     }
+    case chip::app::Clusters::DynamicLighting::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::DynamicLighting::Attributes::AvailableEffects::Id:
+            return "AvailableEffects";
+        case chip::app::Clusters::DynamicLighting::Attributes::CurrentEffectID::Id:
+            return "CurrentEffectID";
+        case chip::app::Clusters::DynamicLighting::Attributes::CurrentSpeed::Id:
+            return "CurrentSpeed";
+        case chip::app::Clusters::DynamicLighting::Attributes::GeneratedCommandList::Id:
+            return "GeneratedCommandList";
+        case chip::app::Clusters::DynamicLighting::Attributes::AcceptedCommandList::Id:
+            return "AcceptedCommandList";
+        case chip::app::Clusters::DynamicLighting::Attributes::AttributeList::Id:
+            return "AttributeList";
+        case chip::app::Clusters::DynamicLighting::Attributes::FeatureMap::Id:
+            return "FeatureMap";
+        case chip::app::Clusters::DynamicLighting::Attributes::ClusterRevision::Id:
+            return "ClusterRevision";
+        default:
+            return "Unknown";
+        }
+    }
     case chip::app::Clusters::IlluminanceMeasurement::Id: {
         switch (id)
         {
@@ -3324,6 +3685,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "HoldTime";
         case chip::app::Clusters::OccupancySensing::Attributes::HoldTimeLimits::Id:
             return "HoldTimeLimits";
+        case chip::app::Clusters::OccupancySensing::Attributes::PredictedOccupancy::Id:
+            return "PredictedOccupancy";
         case chip::app::Clusters::OccupancySensing::Attributes::PIROccupiedToUnoccupiedDelay::Id:
             return "PIROccupiedToUnoccupiedDelay";
         case chip::app::Clusters::OccupancySensing::Attributes::PIRUnoccupiedToOccupiedDelay::Id:
@@ -3746,6 +4109,186 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "Unknown";
         }
     }
+    case chip::app::Clusters::SoilMeasurement::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::SoilMeasurement::Attributes::SoilMoistureMeasurementLimits::Id:
+            return "SoilMoistureMeasurementLimits";
+        case chip::app::Clusters::SoilMeasurement::Attributes::SoilMoistureMeasuredValue::Id:
+            return "SoilMoistureMeasuredValue";
+        case chip::app::Clusters::SoilMeasurement::Attributes::GeneratedCommandList::Id:
+            return "GeneratedCommandList";
+        case chip::app::Clusters::SoilMeasurement::Attributes::AcceptedCommandList::Id:
+            return "AcceptedCommandList";
+        case chip::app::Clusters::SoilMeasurement::Attributes::AttributeList::Id:
+            return "AttributeList";
+        case chip::app::Clusters::SoilMeasurement::Attributes::FeatureMap::Id:
+            return "FeatureMap";
+        case chip::app::Clusters::SoilMeasurement::Attributes::ClusterRevision::Id:
+            return "ClusterRevision";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::AmbientContextSensing::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::AmbientContextSensing::Attributes::HumanActivityDetected::Id:
+            return "HumanActivityDetected";
+        case chip::app::Clusters::AmbientContextSensing::Attributes::ObjectIdentified::Id:
+            return "ObjectIdentified";
+        case chip::app::Clusters::AmbientContextSensing::Attributes::AudioContextDetected::Id:
+            return "AudioContextDetected";
+        case chip::app::Clusters::AmbientContextSensing::Attributes::AmbientContextType::Id:
+            return "AmbientContextType";
+        case chip::app::Clusters::AmbientContextSensing::Attributes::AmbientContextTypeSupported::Id:
+            return "AmbientContextTypeSupported";
+        case chip::app::Clusters::AmbientContextSensing::Attributes::ObjectCountThresholdReached::Id:
+            return "ObjectCountThresholdReached";
+        case chip::app::Clusters::AmbientContextSensing::Attributes::ObjectCountConfig::Id:
+            return "ObjectCountConfig";
+        case chip::app::Clusters::AmbientContextSensing::Attributes::ObjectCount::Id:
+            return "ObjectCount";
+        case chip::app::Clusters::AmbientContextSensing::Attributes::SimultaneousDetectionLimit::Id:
+            return "SimultaneousDetectionLimit";
+        case chip::app::Clusters::AmbientContextSensing::Attributes::HoldTime::Id:
+            return "HoldTime";
+        case chip::app::Clusters::AmbientContextSensing::Attributes::HoldTimeLimits::Id:
+            return "HoldTimeLimits";
+        case chip::app::Clusters::AmbientContextSensing::Attributes::PredictedActivity::Id:
+            return "PredictedActivity";
+        case chip::app::Clusters::AmbientContextSensing::Attributes::SensorFusionSupported::Id:
+            return "SensorFusionSupported";
+        case chip::app::Clusters::AmbientContextSensing::Attributes::GeneratedCommandList::Id:
+            return "GeneratedCommandList";
+        case chip::app::Clusters::AmbientContextSensing::Attributes::AcceptedCommandList::Id:
+            return "AcceptedCommandList";
+        case chip::app::Clusters::AmbientContextSensing::Attributes::AttributeList::Id:
+            return "AttributeList";
+        case chip::app::Clusters::AmbientContextSensing::Attributes::FeatureMap::Id:
+            return "FeatureMap";
+        case chip::app::Clusters::AmbientContextSensing::Attributes::ClusterRevision::Id:
+            return "ClusterRevision";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::AmbientSensingUnion::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::AmbientSensingUnion::Attributes::UnionName::Id:
+            return "UnionName";
+        case chip::app::Clusters::AmbientSensingUnion::Attributes::UnionHealth::Id:
+            return "UnionHealth";
+        case chip::app::Clusters::AmbientSensingUnion::Attributes::UnionContributorList::Id:
+            return "UnionContributorList";
+        case chip::app::Clusters::AmbientSensingUnion::Attributes::GeneratedCommandList::Id:
+            return "GeneratedCommandList";
+        case chip::app::Clusters::AmbientSensingUnion::Attributes::AcceptedCommandList::Id:
+            return "AcceptedCommandList";
+        case chip::app::Clusters::AmbientSensingUnion::Attributes::AttributeList::Id:
+            return "AttributeList";
+        case chip::app::Clusters::AmbientSensingUnion::Attributes::FeatureMap::Id:
+            return "FeatureMap";
+        case chip::app::Clusters::AmbientSensingUnion::Attributes::ClusterRevision::Id:
+            return "ClusterRevision";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::ProximityRanging::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::ProximityRanging::Attributes::RangingCapabilities::Id:
+            return "RangingCapabilities";
+        case chip::app::Clusters::ProximityRanging::Attributes::WiFiDevIK::Id:
+            return "WiFiDevIK";
+        case chip::app::Clusters::ProximityRanging::Attributes::BLEDeviceID::Id:
+            return "BLEDeviceID";
+        case chip::app::Clusters::ProximityRanging::Attributes::BLTDevIK::Id:
+            return "BLTDevIK";
+        case chip::app::Clusters::ProximityRanging::Attributes::BLTCSSecurityLevel::Id:
+            return "BLTCSSecurityLevel";
+        case chip::app::Clusters::ProximityRanging::Attributes::BLTCSModeCapability::Id:
+            return "BLTCSModeCapability";
+        case chip::app::Clusters::ProximityRanging::Attributes::SessionIDList::Id:
+            return "SessionIDList";
+        case chip::app::Clusters::ProximityRanging::Attributes::GeneratedCommandList::Id:
+            return "GeneratedCommandList";
+        case chip::app::Clusters::ProximityRanging::Attributes::AcceptedCommandList::Id:
+            return "AcceptedCommandList";
+        case chip::app::Clusters::ProximityRanging::Attributes::AttributeList::Id:
+            return "AttributeList";
+        case chip::app::Clusters::ProximityRanging::Attributes::FeatureMap::Id:
+            return "FeatureMap";
+        case chip::app::Clusters::ProximityRanging::Attributes::ClusterRevision::Id:
+            return "ClusterRevision";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::SmokeConcentrationMeasurement::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::SmokeConcentrationMeasurement::Attributes::MeasuredValue::Id:
+            return "MeasuredValue";
+        case chip::app::Clusters::SmokeConcentrationMeasurement::Attributes::MinMeasuredValue::Id:
+            return "MinMeasuredValue";
+        case chip::app::Clusters::SmokeConcentrationMeasurement::Attributes::MaxMeasuredValue::Id:
+            return "MaxMeasuredValue";
+        case chip::app::Clusters::SmokeConcentrationMeasurement::Attributes::PeakMeasuredValue::Id:
+            return "PeakMeasuredValue";
+        case chip::app::Clusters::SmokeConcentrationMeasurement::Attributes::PeakMeasuredValueWindow::Id:
+            return "PeakMeasuredValueWindow";
+        case chip::app::Clusters::SmokeConcentrationMeasurement::Attributes::AverageMeasuredValue::Id:
+            return "AverageMeasuredValue";
+        case chip::app::Clusters::SmokeConcentrationMeasurement::Attributes::AverageMeasuredValueWindow::Id:
+            return "AverageMeasuredValueWindow";
+        case chip::app::Clusters::SmokeConcentrationMeasurement::Attributes::Uncertainty::Id:
+            return "Uncertainty";
+        case chip::app::Clusters::SmokeConcentrationMeasurement::Attributes::MeasurementUnit::Id:
+            return "MeasurementUnit";
+        case chip::app::Clusters::SmokeConcentrationMeasurement::Attributes::MeasurementMedium::Id:
+            return "MeasurementMedium";
+        case chip::app::Clusters::SmokeConcentrationMeasurement::Attributes::LevelValue::Id:
+            return "LevelValue";
+        case chip::app::Clusters::SmokeConcentrationMeasurement::Attributes::GeneratedCommandList::Id:
+            return "GeneratedCommandList";
+        case chip::app::Clusters::SmokeConcentrationMeasurement::Attributes::AcceptedCommandList::Id:
+            return "AcceptedCommandList";
+        case chip::app::Clusters::SmokeConcentrationMeasurement::Attributes::AttributeList::Id:
+            return "AttributeList";
+        case chip::app::Clusters::SmokeConcentrationMeasurement::Attributes::FeatureMap::Id:
+            return "FeatureMap";
+        case chip::app::Clusters::SmokeConcentrationMeasurement::Attributes::ClusterRevision::Id:
+            return "ClusterRevision";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::NetworkIdentityManagement::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::NetworkIdentityManagement::Attributes::ActiveNetworkIdentities::Id:
+            return "ActiveNetworkIdentities";
+        case chip::app::Clusters::NetworkIdentityManagement::Attributes::Clients::Id:
+            return "Clients";
+        case chip::app::Clusters::NetworkIdentityManagement::Attributes::ClientTableSize::Id:
+            return "ClientTableSize";
+        case chip::app::Clusters::NetworkIdentityManagement::Attributes::GeneratedCommandList::Id:
+            return "GeneratedCommandList";
+        case chip::app::Clusters::NetworkIdentityManagement::Attributes::AcceptedCommandList::Id:
+            return "AcceptedCommandList";
+        case chip::app::Clusters::NetworkIdentityManagement::Attributes::AttributeList::Id:
+            return "AttributeList";
+        case chip::app::Clusters::NetworkIdentityManagement::Attributes::FeatureMap::Id:
+            return "FeatureMap";
+        case chip::app::Clusters::NetworkIdentityManagement::Attributes::ClusterRevision::Id:
+            return "ClusterRevision";
+        default:
+            return "Unknown";
+        }
+    }
     case chip::app::Clusters::WiFiNetworkManagement::Id: {
         switch (id)
         {
@@ -4110,6 +4653,12 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "RemainingScreenTime";
         case chip::app::Clusters::ContentControl::Attributes::BlockUnrated::Id:
             return "BlockUnrated";
+        case chip::app::Clusters::ContentControl::Attributes::BlockChannelList::Id:
+            return "BlockChannelList";
+        case chip::app::Clusters::ContentControl::Attributes::BlockApplicationList::Id:
+            return "BlockApplicationList";
+        case chip::app::Clusters::ContentControl::Attributes::BlockContentTimeWindow::Id:
+            return "BlockContentTimeWindow";
         case chip::app::Clusters::ContentControl::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::ContentControl::Attributes::AcceptedCommandList::Id:
@@ -4144,14 +4693,20 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
     case chip::app::Clusters::ZoneManagement::Id: {
         switch (id)
         {
-        case chip::app::Clusters::ZoneManagement::Attributes::SupportedZoneSources::Id:
-            return "SupportedZoneSources";
+        case chip::app::Clusters::ZoneManagement::Attributes::MaxUserDefinedZones::Id:
+            return "MaxUserDefinedZones";
+        case chip::app::Clusters::ZoneManagement::Attributes::MaxZones::Id:
+            return "MaxZones";
         case chip::app::Clusters::ZoneManagement::Attributes::Zones::Id:
             return "Zones";
-        case chip::app::Clusters::ZoneManagement::Attributes::TimeControl::Id:
-            return "TimeControl";
+        case chip::app::Clusters::ZoneManagement::Attributes::Triggers::Id:
+            return "Triggers";
+        case chip::app::Clusters::ZoneManagement::Attributes::SensitivityMax::Id:
+            return "SensitivityMax";
         case chip::app::Clusters::ZoneManagement::Attributes::Sensitivity::Id:
             return "Sensitivity";
+        case chip::app::Clusters::ZoneManagement::Attributes::TwoDCartesianMax::Id:
+            return "TwoDCartesianMax";
         case chip::app::Clusters::ZoneManagement::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::ZoneManagement::Attributes::AcceptedCommandList::Id:
@@ -4169,16 +4724,16 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
     case chip::app::Clusters::CameraAvStreamManagement::Id: {
         switch (id)
         {
-        case chip::app::Clusters::CameraAvStreamManagement::Attributes::MaxConcurrentVideoEncoders::Id:
-            return "MaxConcurrentVideoEncoders";
+        case chip::app::Clusters::CameraAvStreamManagement::Attributes::MaxConcurrentEncoders::Id:
+            return "MaxConcurrentEncoders";
         case chip::app::Clusters::CameraAvStreamManagement::Attributes::MaxEncodedPixelRate::Id:
             return "MaxEncodedPixelRate";
         case chip::app::Clusters::CameraAvStreamManagement::Attributes::VideoSensorParams::Id:
             return "VideoSensorParams";
-        case chip::app::Clusters::CameraAvStreamManagement::Attributes::NightVisionCapable::Id:
-            return "NightVisionCapable";
-        case chip::app::Clusters::CameraAvStreamManagement::Attributes::MinViewport::Id:
-            return "MinViewport";
+        case chip::app::Clusters::CameraAvStreamManagement::Attributes::NightVisionUsesInfrared::Id:
+            return "NightVisionUsesInfrared";
+        case chip::app::Clusters::CameraAvStreamManagement::Attributes::MinViewportResolution::Id:
+            return "MinViewportResolution";
         case chip::app::Clusters::CameraAvStreamManagement::Attributes::RateDistortionTradeOffPoints::Id:
             return "RateDistortionTradeOffPoints";
         case chip::app::Clusters::CameraAvStreamManagement::Attributes::MaxContentBufferSize::Id:
@@ -4189,28 +4744,24 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "SpeakerCapabilities";
         case chip::app::Clusters::CameraAvStreamManagement::Attributes::TwoWayTalkSupport::Id:
             return "TwoWayTalkSupport";
-        case chip::app::Clusters::CameraAvStreamManagement::Attributes::SupportedSnapshotParams::Id:
-            return "SupportedSnapshotParams";
+        case chip::app::Clusters::CameraAvStreamManagement::Attributes::SnapshotCapabilities::Id:
+            return "SnapshotCapabilities";
         case chip::app::Clusters::CameraAvStreamManagement::Attributes::MaxNetworkBandwidth::Id:
             return "MaxNetworkBandwidth";
         case chip::app::Clusters::CameraAvStreamManagement::Attributes::CurrentFrameRate::Id:
             return "CurrentFrameRate";
         case chip::app::Clusters::CameraAvStreamManagement::Attributes::HDRModeEnabled::Id:
             return "HDRModeEnabled";
-        case chip::app::Clusters::CameraAvStreamManagement::Attributes::CurrentVideoCodecs::Id:
-            return "CurrentVideoCodecs";
-        case chip::app::Clusters::CameraAvStreamManagement::Attributes::CurrentSnapshotConfig::Id:
-            return "CurrentSnapshotConfig";
-        case chip::app::Clusters::CameraAvStreamManagement::Attributes::FabricsUsingCamera::Id:
-            return "FabricsUsingCamera";
+        case chip::app::Clusters::CameraAvStreamManagement::Attributes::SupportedStreamUsages::Id:
+            return "SupportedStreamUsages";
         case chip::app::Clusters::CameraAvStreamManagement::Attributes::AllocatedVideoStreams::Id:
             return "AllocatedVideoStreams";
         case chip::app::Clusters::CameraAvStreamManagement::Attributes::AllocatedAudioStreams::Id:
             return "AllocatedAudioStreams";
         case chip::app::Clusters::CameraAvStreamManagement::Attributes::AllocatedSnapshotStreams::Id:
             return "AllocatedSnapshotStreams";
-        case chip::app::Clusters::CameraAvStreamManagement::Attributes::RankedVideoStreamPrioritiesList::Id:
-            return "RankedVideoStreamPrioritiesList";
+        case chip::app::Clusters::CameraAvStreamManagement::Attributes::StreamUsagePriorities::Id:
+            return "StreamUsagePriorities";
         case chip::app::Clusters::CameraAvStreamManagement::Attributes::SoftRecordingPrivacyModeEnabled::Id:
             return "SoftRecordingPrivacyModeEnabled";
         case chip::app::Clusters::CameraAvStreamManagement::Attributes::SoftLivestreamPrivacyModeEnabled::Id:
@@ -4221,12 +4772,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "NightVision";
         case chip::app::Clusters::CameraAvStreamManagement::Attributes::NightVisionIllum::Id:
             return "NightVisionIllum";
-        case chip::app::Clusters::CameraAvStreamManagement::Attributes::AWBEnabled::Id:
-            return "AWBEnabled";
-        case chip::app::Clusters::CameraAvStreamManagement::Attributes::AutoShutterSpeedEnabled::Id:
-            return "AutoShutterSpeedEnabled";
-        case chip::app::Clusters::CameraAvStreamManagement::Attributes::AutoISOEnabled::Id:
-            return "AutoISOEnabled";
         case chip::app::Clusters::CameraAvStreamManagement::Attributes::Viewport::Id:
             return "Viewport";
         case chip::app::Clusters::CameraAvStreamManagement::Attributes::SpeakerMuted::Id:
@@ -4261,8 +4806,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "StatusLightEnabled";
         case chip::app::Clusters::CameraAvStreamManagement::Attributes::StatusLightBrightness::Id:
             return "StatusLightBrightness";
-        case chip::app::Clusters::CameraAvStreamManagement::Attributes::DepthSensorStatus::Id:
-            return "DepthSensorStatus";
+        case chip::app::Clusters::CameraAvStreamManagement::Attributes::ImageRotationDiscreteAngles::Id:
+            return "ImageRotationDiscreteAngles";
         case chip::app::Clusters::CameraAvStreamManagement::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::CameraAvStreamManagement::Attributes::AcceptedCommandList::Id:
@@ -4272,6 +4817,43 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
         case chip::app::Clusters::CameraAvStreamManagement::Attributes::FeatureMap::Id:
             return "FeatureMap";
         case chip::app::Clusters::CameraAvStreamManagement::Attributes::ClusterRevision::Id:
+            return "ClusterRevision";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::CameraAvSettingsUserLevelManagement::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::CameraAvSettingsUserLevelManagement::Attributes::MPTZPosition::Id:
+            return "MPTZPosition";
+        case chip::app::Clusters::CameraAvSettingsUserLevelManagement::Attributes::MaxPresets::Id:
+            return "MaxPresets";
+        case chip::app::Clusters::CameraAvSettingsUserLevelManagement::Attributes::MPTZPresets::Id:
+            return "MPTZPresets";
+        case chip::app::Clusters::CameraAvSettingsUserLevelManagement::Attributes::DPTZStreams::Id:
+            return "DPTZStreams";
+        case chip::app::Clusters::CameraAvSettingsUserLevelManagement::Attributes::ZoomMax::Id:
+            return "ZoomMax";
+        case chip::app::Clusters::CameraAvSettingsUserLevelManagement::Attributes::TiltMin::Id:
+            return "TiltMin";
+        case chip::app::Clusters::CameraAvSettingsUserLevelManagement::Attributes::TiltMax::Id:
+            return "TiltMax";
+        case chip::app::Clusters::CameraAvSettingsUserLevelManagement::Attributes::PanMin::Id:
+            return "PanMin";
+        case chip::app::Clusters::CameraAvSettingsUserLevelManagement::Attributes::PanMax::Id:
+            return "PanMax";
+        case chip::app::Clusters::CameraAvSettingsUserLevelManagement::Attributes::MovementState::Id:
+            return "MovementState";
+        case chip::app::Clusters::CameraAvSettingsUserLevelManagement::Attributes::GeneratedCommandList::Id:
+            return "GeneratedCommandList";
+        case chip::app::Clusters::CameraAvSettingsUserLevelManagement::Attributes::AcceptedCommandList::Id:
+            return "AcceptedCommandList";
+        case chip::app::Clusters::CameraAvSettingsUserLevelManagement::Attributes::AttributeList::Id:
+            return "AttributeList";
+        case chip::app::Clusters::CameraAvSettingsUserLevelManagement::Attributes::FeatureMap::Id:
+            return "FeatureMap";
+        case chip::app::Clusters::CameraAvSettingsUserLevelManagement::Attributes::ClusterRevision::Id:
             return "ClusterRevision";
         default:
             return "Unknown";
@@ -4315,13 +4897,34 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "Unknown";
         }
     }
+    case chip::app::Clusters::PushAvStreamTransport::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::PushAvStreamTransport::Attributes::SupportedFormats::Id:
+            return "SupportedFormats";
+        case chip::app::Clusters::PushAvStreamTransport::Attributes::CurrentConnections::Id:
+            return "CurrentConnections";
+        case chip::app::Clusters::PushAvStreamTransport::Attributes::GeneratedCommandList::Id:
+            return "GeneratedCommandList";
+        case chip::app::Clusters::PushAvStreamTransport::Attributes::AcceptedCommandList::Id:
+            return "AcceptedCommandList";
+        case chip::app::Clusters::PushAvStreamTransport::Attributes::AttributeList::Id:
+            return "AttributeList";
+        case chip::app::Clusters::PushAvStreamTransport::Attributes::FeatureMap::Id:
+            return "FeatureMap";
+        case chip::app::Clusters::PushAvStreamTransport::Attributes::ClusterRevision::Id:
+            return "ClusterRevision";
+        default:
+            return "Unknown";
+        }
+    }
     case chip::app::Clusters::Chime::Id: {
         switch (id)
         {
         case chip::app::Clusters::Chime::Attributes::InstalledChimeSounds::Id:
             return "InstalledChimeSounds";
-        case chip::app::Clusters::Chime::Attributes::ActiveChimeID::Id:
-            return "ActiveChimeID";
+        case chip::app::Clusters::Chime::Attributes::SelectedChime::Id:
+            return "SelectedChime";
         case chip::app::Clusters::Chime::Attributes::Enabled::Id:
             return "Enabled";
         case chip::app::Clusters::Chime::Attributes::GeneratedCommandList::Id:
@@ -4333,6 +4936,90 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
         case chip::app::Clusters::Chime::Attributes::FeatureMap::Id:
             return "FeatureMap";
         case chip::app::Clusters::Chime::Attributes::ClusterRevision::Id:
+            return "ClusterRevision";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::AvAnalysis::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::AvAnalysis::Attributes::SupportedAmbientContexts::Id:
+            return "SupportedAmbientContexts";
+        case chip::app::Clusters::AvAnalysis::Attributes::ActiveAmbientContextTriggers::Id:
+            return "ActiveAmbientContextTriggers";
+        case chip::app::Clusters::AvAnalysis::Attributes::MaxAnalysisStreamCount::Id:
+            return "MaxAnalysisStreamCount";
+        case chip::app::Clusters::AvAnalysis::Attributes::CurrentAnalysisStreamCount::Id:
+            return "CurrentAnalysisStreamCount";
+        case chip::app::Clusters::AvAnalysis::Attributes::AnalysisStreams::Id:
+            return "AnalysisStreams";
+        case chip::app::Clusters::AvAnalysis::Attributes::TrackingEnabled::Id:
+            return "TrackingEnabled";
+        case chip::app::Clusters::AvAnalysis::Attributes::GeneratedCommandList::Id:
+            return "GeneratedCommandList";
+        case chip::app::Clusters::AvAnalysis::Attributes::AcceptedCommandList::Id:
+            return "AcceptedCommandList";
+        case chip::app::Clusters::AvAnalysis::Attributes::AttributeList::Id:
+            return "AttributeList";
+        case chip::app::Clusters::AvAnalysis::Attributes::FeatureMap::Id:
+            return "FeatureMap";
+        case chip::app::Clusters::AvAnalysis::Attributes::ClusterRevision::Id:
+            return "ClusterRevision";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::CommodityTariff::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::CommodityTariff::Attributes::TariffInfo::Id:
+            return "TariffInfo";
+        case chip::app::Clusters::CommodityTariff::Attributes::TariffUnit::Id:
+            return "TariffUnit";
+        case chip::app::Clusters::CommodityTariff::Attributes::StartDate::Id:
+            return "StartDate";
+        case chip::app::Clusters::CommodityTariff::Attributes::DayEntries::Id:
+            return "DayEntries";
+        case chip::app::Clusters::CommodityTariff::Attributes::DayPatterns::Id:
+            return "DayPatterns";
+        case chip::app::Clusters::CommodityTariff::Attributes::CalendarPeriods::Id:
+            return "CalendarPeriods";
+        case chip::app::Clusters::CommodityTariff::Attributes::IndividualDays::Id:
+            return "IndividualDays";
+        case chip::app::Clusters::CommodityTariff::Attributes::CurrentDay::Id:
+            return "CurrentDay";
+        case chip::app::Clusters::CommodityTariff::Attributes::NextDay::Id:
+            return "NextDay";
+        case chip::app::Clusters::CommodityTariff::Attributes::CurrentDayEntry::Id:
+            return "CurrentDayEntry";
+        case chip::app::Clusters::CommodityTariff::Attributes::CurrentDayEntryDate::Id:
+            return "CurrentDayEntryDate";
+        case chip::app::Clusters::CommodityTariff::Attributes::NextDayEntry::Id:
+            return "NextDayEntry";
+        case chip::app::Clusters::CommodityTariff::Attributes::NextDayEntryDate::Id:
+            return "NextDayEntryDate";
+        case chip::app::Clusters::CommodityTariff::Attributes::TariffComponents::Id:
+            return "TariffComponents";
+        case chip::app::Clusters::CommodityTariff::Attributes::TariffPeriods::Id:
+            return "TariffPeriods";
+        case chip::app::Clusters::CommodityTariff::Attributes::CurrentTariffComponents::Id:
+            return "CurrentTariffComponents";
+        case chip::app::Clusters::CommodityTariff::Attributes::NextTariffComponents::Id:
+            return "NextTariffComponents";
+        case chip::app::Clusters::CommodityTariff::Attributes::DefaultRandomizationOffset::Id:
+            return "DefaultRandomizationOffset";
+        case chip::app::Clusters::CommodityTariff::Attributes::DefaultRandomizationType::Id:
+            return "DefaultRandomizationType";
+        case chip::app::Clusters::CommodityTariff::Attributes::GeneratedCommandList::Id:
+            return "GeneratedCommandList";
+        case chip::app::Clusters::CommodityTariff::Attributes::AcceptedCommandList::Id:
+            return "AcceptedCommandList";
+        case chip::app::Clusters::CommodityTariff::Attributes::AttributeList::Id:
+            return "AttributeList";
+        case chip::app::Clusters::CommodityTariff::Attributes::FeatureMap::Id:
+            return "FeatureMap";
+        case chip::app::Clusters::CommodityTariff::Attributes::ClusterRevision::Id:
             return "ClusterRevision";
         default:
             return "Unknown";
@@ -4373,6 +5060,168 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
         case chip::app::Clusters::CommissionerControl::Attributes::FeatureMap::Id:
             return "FeatureMap";
         case chip::app::Clusters::CommissionerControl::Attributes::ClusterRevision::Id:
+            return "ClusterRevision";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::JointFabricDatastore::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::JointFabricDatastore::Attributes::AnchorRootCA::Id:
+            return "AnchorRootCA";
+        case chip::app::Clusters::JointFabricDatastore::Attributes::AnchorNodeID::Id:
+            return "AnchorNodeID";
+        case chip::app::Clusters::JointFabricDatastore::Attributes::AnchorVendorID::Id:
+            return "AnchorVendorID";
+        case chip::app::Clusters::JointFabricDatastore::Attributes::FriendlyName::Id:
+            return "FriendlyName";
+        case chip::app::Clusters::JointFabricDatastore::Attributes::GroupKeySetList::Id:
+            return "GroupKeySetList";
+        case chip::app::Clusters::JointFabricDatastore::Attributes::GroupList::Id:
+            return "GroupList";
+        case chip::app::Clusters::JointFabricDatastore::Attributes::NodeList::Id:
+            return "NodeList";
+        case chip::app::Clusters::JointFabricDatastore::Attributes::AdminList::Id:
+            return "AdminList";
+        case chip::app::Clusters::JointFabricDatastore::Attributes::Status::Id:
+            return "Status";
+        case chip::app::Clusters::JointFabricDatastore::Attributes::EndpointGroupIDList::Id:
+            return "EndpointGroupIDList";
+        case chip::app::Clusters::JointFabricDatastore::Attributes::EndpointBindingList::Id:
+            return "EndpointBindingList";
+        case chip::app::Clusters::JointFabricDatastore::Attributes::NodeKeySetList::Id:
+            return "NodeKeySetList";
+        case chip::app::Clusters::JointFabricDatastore::Attributes::NodeACLList::Id:
+            return "NodeACLList";
+        case chip::app::Clusters::JointFabricDatastore::Attributes::NodeEndpointList::Id:
+            return "NodeEndpointList";
+        case chip::app::Clusters::JointFabricDatastore::Attributes::GeneratedCommandList::Id:
+            return "GeneratedCommandList";
+        case chip::app::Clusters::JointFabricDatastore::Attributes::AcceptedCommandList::Id:
+            return "AcceptedCommandList";
+        case chip::app::Clusters::JointFabricDatastore::Attributes::AttributeList::Id:
+            return "AttributeList";
+        case chip::app::Clusters::JointFabricDatastore::Attributes::FeatureMap::Id:
+            return "FeatureMap";
+        case chip::app::Clusters::JointFabricDatastore::Attributes::ClusterRevision::Id:
+            return "ClusterRevision";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::JointFabricAdministrator::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::JointFabricAdministrator::Attributes::AdministratorFabricIndex::Id:
+            return "AdministratorFabricIndex";
+        case chip::app::Clusters::JointFabricAdministrator::Attributes::GeneratedCommandList::Id:
+            return "GeneratedCommandList";
+        case chip::app::Clusters::JointFabricAdministrator::Attributes::AcceptedCommandList::Id:
+            return "AcceptedCommandList";
+        case chip::app::Clusters::JointFabricAdministrator::Attributes::AttributeList::Id:
+            return "AttributeList";
+        case chip::app::Clusters::JointFabricAdministrator::Attributes::FeatureMap::Id:
+            return "FeatureMap";
+        case chip::app::Clusters::JointFabricAdministrator::Attributes::ClusterRevision::Id:
+            return "ClusterRevision";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::TlsCertificateManagement::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::TlsCertificateManagement::Attributes::MaxRootCertificates::Id:
+            return "MaxRootCertificates";
+        case chip::app::Clusters::TlsCertificateManagement::Attributes::ProvisionedRootCertificates::Id:
+            return "ProvisionedRootCertificates";
+        case chip::app::Clusters::TlsCertificateManagement::Attributes::MaxClientCertificates::Id:
+            return "MaxClientCertificates";
+        case chip::app::Clusters::TlsCertificateManagement::Attributes::ProvisionedClientCertificates::Id:
+            return "ProvisionedClientCertificates";
+        case chip::app::Clusters::TlsCertificateManagement::Attributes::GeneratedCommandList::Id:
+            return "GeneratedCommandList";
+        case chip::app::Clusters::TlsCertificateManagement::Attributes::AcceptedCommandList::Id:
+            return "AcceptedCommandList";
+        case chip::app::Clusters::TlsCertificateManagement::Attributes::AttributeList::Id:
+            return "AttributeList";
+        case chip::app::Clusters::TlsCertificateManagement::Attributes::FeatureMap::Id:
+            return "FeatureMap";
+        case chip::app::Clusters::TlsCertificateManagement::Attributes::ClusterRevision::Id:
+            return "ClusterRevision";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::TlsClientManagement::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::TlsClientManagement::Attributes::MaxProvisioned::Id:
+            return "MaxProvisioned";
+        case chip::app::Clusters::TlsClientManagement::Attributes::ProvisionedEndpoints::Id:
+            return "ProvisionedEndpoints";
+        case chip::app::Clusters::TlsClientManagement::Attributes::GeneratedCommandList::Id:
+            return "GeneratedCommandList";
+        case chip::app::Clusters::TlsClientManagement::Attributes::AcceptedCommandList::Id:
+            return "AcceptedCommandList";
+        case chip::app::Clusters::TlsClientManagement::Attributes::AttributeList::Id:
+            return "AttributeList";
+        case chip::app::Clusters::TlsClientManagement::Attributes::FeatureMap::Id:
+            return "FeatureMap";
+        case chip::app::Clusters::TlsClientManagement::Attributes::ClusterRevision::Id:
+            return "ClusterRevision";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::MeterIdentification::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::MeterIdentification::Attributes::MeterType::Id:
+            return "MeterType";
+        case chip::app::Clusters::MeterIdentification::Attributes::PointOfDelivery::Id:
+            return "PointOfDelivery";
+        case chip::app::Clusters::MeterIdentification::Attributes::MeterSerialNumber::Id:
+            return "MeterSerialNumber";
+        case chip::app::Clusters::MeterIdentification::Attributes::ProtocolVersion::Id:
+            return "ProtocolVersion";
+        case chip::app::Clusters::MeterIdentification::Attributes::PowerThreshold::Id:
+            return "PowerThreshold";
+        case chip::app::Clusters::MeterIdentification::Attributes::GeneratedCommandList::Id:
+            return "GeneratedCommandList";
+        case chip::app::Clusters::MeterIdentification::Attributes::AcceptedCommandList::Id:
+            return "AcceptedCommandList";
+        case chip::app::Clusters::MeterIdentification::Attributes::AttributeList::Id:
+            return "AttributeList";
+        case chip::app::Clusters::MeterIdentification::Attributes::FeatureMap::Id:
+            return "FeatureMap";
+        case chip::app::Clusters::MeterIdentification::Attributes::ClusterRevision::Id:
+            return "ClusterRevision";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::CommodityMetering::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::CommodityMetering::Attributes::MeteredQuantity::Id:
+            return "MeteredQuantity";
+        case chip::app::Clusters::CommodityMetering::Attributes::MeteredQuantityTimestamp::Id:
+            return "MeteredQuantityTimestamp";
+        case chip::app::Clusters::CommodityMetering::Attributes::TariffUnit::Id:
+            return "TariffUnit";
+        case chip::app::Clusters::CommodityMetering::Attributes::MaximumMeteredQuantities::Id:
+            return "MaximumMeteredQuantities";
+        case chip::app::Clusters::CommodityMetering::Attributes::GeneratedCommandList::Id:
+            return "GeneratedCommandList";
+        case chip::app::Clusters::CommodityMetering::Attributes::AcceptedCommandList::Id:
+            return "AcceptedCommandList";
+        case chip::app::Clusters::CommodityMetering::Attributes::AttributeList::Id:
+            return "AttributeList";
+        case chip::app::Clusters::CommodityMetering::Attributes::FeatureMap::Id:
+            return "FeatureMap";
+        case chip::app::Clusters::CommodityMetering::Attributes::ClusterRevision::Id:
             return "ClusterRevision";
         default:
             return "Unknown";
@@ -4479,6 +5328,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GlobalEnum";
         case chip::app::Clusters::UnitTesting::Attributes::GlobalStruct::Id:
             return "GlobalStruct";
+        case chip::app::Clusters::UnitTesting::Attributes::UnsupportedAttributeRequiringAdminPrivilege::Id:
+            return "UnsupportedAttributeRequiringAdminPrivilege";
         case chip::app::Clusters::UnitTesting::Attributes::Unsupported::Id:
             return "Unsupported";
         case chip::app::Clusters::UnitTesting::Attributes::ReadFailureCode::Id:
@@ -4915,6 +5766,10 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "RemoveFabric";
         case chip::app::Clusters::OperationalCredentials::Commands::AddTrustedRootCertificate::Id:
             return "AddTrustedRootCertificate";
+        case chip::app::Clusters::OperationalCredentials::Commands::SetVIDVerificationStatement::Id:
+            return "SetVIDVerificationStatement";
+        case chip::app::Clusters::OperationalCredentials::Commands::SignVIDVerificationRequest::Id:
+            return "SignVIDVerificationRequest";
         default:
             return "Unknown";
         }
@@ -4947,32 +5802,13 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "Unknown";
         }
     }
-    case chip::app::Clusters::Timer::Id: {
-        switch (id)
-        {
-        case chip::app::Clusters::Timer::Commands::SetTimer::Id:
-            return "SetTimer";
-        case chip::app::Clusters::Timer::Commands::ResetTimer::Id:
-            return "ResetTimer";
-        case chip::app::Clusters::Timer::Commands::AddTime::Id:
-            return "AddTime";
-        case chip::app::Clusters::Timer::Commands::ReduceTime::Id:
-            return "ReduceTime";
-        default:
-            return "Unknown";
-        }
-    }
     case chip::app::Clusters::OvenCavityOperationalState::Id: {
         switch (id)
         {
-        case chip::app::Clusters::OvenCavityOperationalState::Commands::Pause::Id:
-            return "Pause";
         case chip::app::Clusters::OvenCavityOperationalState::Commands::Stop::Id:
             return "Stop";
         case chip::app::Clusters::OvenCavityOperationalState::Commands::Start::Id:
             return "Start";
-        case chip::app::Clusters::OvenCavityOperationalState::Commands::Resume::Id:
-            return "Resume";
         default:
             return "Unknown";
         }
@@ -5131,6 +5967,23 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "Unknown";
         }
     }
+    case chip::app::Clusters::Groupcast::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::Groupcast::Commands::JoinGroup::Id:
+            return "JoinGroup";
+        case chip::app::Clusters::Groupcast::Commands::LeaveGroup::Id:
+            return "LeaveGroup";
+        case chip::app::Clusters::Groupcast::Commands::UpdateGroupKey::Id:
+            return "UpdateGroupKey";
+        case chip::app::Clusters::Groupcast::Commands::ConfigureAuxiliaryACL::Id:
+            return "ConfigureAuxiliaryACL";
+        case chip::app::Clusters::Groupcast::Commands::GroupcastTesting::Id:
+            return "GroupcastTesting";
+        default:
+            return "Unknown";
+        }
+    }
     case chip::app::Clusters::HepaFilterMonitoring::Id: {
         switch (id)
         {
@@ -5144,6 +5997,15 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
         switch (id)
         {
         case chip::app::Clusters::ActivatedCarbonFilterMonitoring::Commands::ResetCondition::Id:
+            return "ResetCondition";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::WaterTankLevelMonitoring::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::WaterTankLevelMonitoring::Commands::ResetCondition::Id:
             return "ResetCondition";
         default:
             return "Unknown";
@@ -5182,19 +6044,13 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "Unknown";
         }
     }
-    case chip::app::Clusters::DemandResponseLoadControl::Id: {
+    case chip::app::Clusters::CommodityPrice::Id: {
         switch (id)
         {
-        case chip::app::Clusters::DemandResponseLoadControl::Commands::RegisterLoadControlProgramRequest::Id:
-            return "RegisterLoadControlProgramRequest";
-        case chip::app::Clusters::DemandResponseLoadControl::Commands::UnregisterLoadControlProgramRequest::Id:
-            return "UnregisterLoadControlProgramRequest";
-        case chip::app::Clusters::DemandResponseLoadControl::Commands::AddLoadControlEventRequest::Id:
-            return "AddLoadControlEventRequest";
-        case chip::app::Clusters::DemandResponseLoadControl::Commands::RemoveLoadControlEventRequest::Id:
-            return "RemoveLoadControlEventRequest";
-        case chip::app::Clusters::DemandResponseLoadControl::Commands::ClearLoadControlEventsRequest::Id:
-            return "ClearLoadControlEventsRequest";
+        case chip::app::Clusters::CommodityPrice::Commands::GetDetailedPriceRequest::Id:
+            return "GetDetailedPriceRequest";
+        case chip::app::Clusters::CommodityPrice::Commands::GetDetailedForecastRequest::Id:
+            return "GetDetailedForecastRequest";
         default:
             return "Unknown";
         }
@@ -5281,6 +6137,28 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "Unknown";
         }
     }
+    case chip::app::Clusters::ElectricalAlarm::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::ElectricalAlarm::Commands::Reset::Id:
+            return "Reset";
+        case chip::app::Clusters::ElectricalAlarm::Commands::ModifyEnabledAlarms::Id:
+            return "ModifyEnabledAlarms";
+        case chip::app::Clusters::ElectricalAlarm::Commands::SetElectricalAlarmThresholds::Id:
+            return "SetElectricalAlarmThresholds";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::ElectricalProtectionAlarm::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::ElectricalProtectionAlarm::Commands::ModifyEnabledAlarms::Id:
+            return "ModifyEnabledAlarms";
+        default:
+            return "Unknown";
+        }
+    }
     case chip::app::Clusters::DoorLock::Id: {
         switch (id)
         {
@@ -5351,6 +6229,30 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "Unknown";
         }
     }
+    case chip::app::Clusters::ClosureControl::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::ClosureControl::Commands::Stop::Id:
+            return "Stop";
+        case chip::app::Clusters::ClosureControl::Commands::MoveTo::Id:
+            return "MoveTo";
+        case chip::app::Clusters::ClosureControl::Commands::Calibrate::Id:
+            return "Calibrate";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::ClosureDimension::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::ClosureDimension::Commands::SetTarget::Id:
+            return "SetTarget";
+        case chip::app::Clusters::ClosureDimension::Commands::Step::Id:
+            return "Step";
+        default:
+            return "Unknown";
+        }
+    }
     case chip::app::Clusters::ServiceArea::Id: {
         switch (id)
         {
@@ -5377,6 +6279,10 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "SetActiveScheduleRequest";
         case chip::app::Clusters::Thermostat::Commands::SetActivePresetRequest::Id:
             return "SetActivePresetRequest";
+        case chip::app::Clusters::Thermostat::Commands::AddThermostatSuggestion::Id:
+            return "AddThermostatSuggestion";
+        case chip::app::Clusters::Thermostat::Commands::RemoveThermostatSuggestion::Id:
+            return "RemoveThermostatSuggestion";
         case chip::app::Clusters::Thermostat::Commands::AtomicRequest::Id:
             return "AtomicRequest";
         default:
@@ -5388,6 +6294,15 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
         {
         case chip::app::Clusters::FanControl::Commands::Step::Id:
             return "Step";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::Humidistat::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::Humidistat::Commands::SetSettings::Id:
+            return "SetSettings";
         default:
             return "Unknown";
         }
@@ -5433,6 +6348,45 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "MoveColorTemperature";
         case chip::app::Clusters::ColorControl::Commands::StepColorTemperature::Id:
             return "StepColorTemperature";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::DynamicLighting::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::DynamicLighting::Commands::StartEffect::Id:
+            return "StartEffect";
+        case chip::app::Clusters::DynamicLighting::Commands::StopEffect::Id:
+            return "StopEffect";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::ProximityRanging::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::ProximityRanging::Commands::StartRangingRequest::Id:
+            return "StartRangingRequest";
+        case chip::app::Clusters::ProximityRanging::Commands::StopRangingRequest::Id:
+            return "StopRangingRequest";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::NetworkIdentityManagement::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::NetworkIdentityManagement::Commands::AddClient::Id:
+            return "AddClient";
+        case chip::app::Clusters::NetworkIdentityManagement::Commands::RemoveClient::Id:
+            return "RemoveClient";
+        case chip::app::Clusters::NetworkIdentityManagement::Commands::QueryIdentity::Id:
+            return "QueryIdentity";
+        case chip::app::Clusters::NetworkIdentityManagement::Commands::ImportAdminSecret::Id:
+            return "ImportAdminSecret";
+        case chip::app::Clusters::NetworkIdentityManagement::Commands::ExportAdminSecret::Id:
+            return "ExportAdminSecret";
         default:
             return "Unknown";
         }
@@ -5641,6 +6595,18 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "SetOnDemandRatingThreshold";
         case chip::app::Clusters::ContentControl::Commands::SetScheduledContentRatingThreshold::Id:
             return "SetScheduledContentRatingThreshold";
+        case chip::app::Clusters::ContentControl::Commands::AddBlockChannels::Id:
+            return "AddBlockChannels";
+        case chip::app::Clusters::ContentControl::Commands::RemoveBlockChannels::Id:
+            return "RemoveBlockChannels";
+        case chip::app::Clusters::ContentControl::Commands::AddBlockApplications::Id:
+            return "AddBlockApplications";
+        case chip::app::Clusters::ContentControl::Commands::RemoveBlockApplications::Id:
+            return "RemoveBlockApplications";
+        case chip::app::Clusters::ContentControl::Commands::SetBlockContentTimeWindow::Id:
+            return "SetBlockContentTimeWindow";
+        case chip::app::Clusters::ContentControl::Commands::RemoveBlockContentTimeWindow::Id:
+            return "RemoveBlockContentTimeWindow";
         default:
             return "Unknown";
         }
@@ -5661,10 +6627,12 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "CreateTwoDCartesianZone";
         case chip::app::Clusters::ZoneManagement::Commands::UpdateTwoDCartesianZone::Id:
             return "UpdateTwoDCartesianZone";
-        case chip::app::Clusters::ZoneManagement::Commands::GetTwoDCartesianZone::Id:
-            return "GetTwoDCartesianZone";
         case chip::app::Clusters::ZoneManagement::Commands::RemoveZone::Id:
             return "RemoveZone";
+        case chip::app::Clusters::ZoneManagement::Commands::CreateOrUpdateTrigger::Id:
+            return "CreateOrUpdateTrigger";
+        case chip::app::Clusters::ZoneManagement::Commands::RemoveTrigger::Id:
+            return "RemoveTrigger";
         default:
             return "Unknown";
         }
@@ -5684,20 +6652,35 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "VideoStreamDeallocate";
         case chip::app::Clusters::CameraAvStreamManagement::Commands::SnapshotStreamAllocate::Id:
             return "SnapshotStreamAllocate";
+        case chip::app::Clusters::CameraAvStreamManagement::Commands::SnapshotStreamModify::Id:
+            return "SnapshotStreamModify";
         case chip::app::Clusters::CameraAvStreamManagement::Commands::SnapshotStreamDeallocate::Id:
             return "SnapshotStreamDeallocate";
         case chip::app::Clusters::CameraAvStreamManagement::Commands::SetStreamPriorities::Id:
             return "SetStreamPriorities";
         case chip::app::Clusters::CameraAvStreamManagement::Commands::CaptureSnapshot::Id:
             return "CaptureSnapshot";
-        case chip::app::Clusters::CameraAvStreamManagement::Commands::SetViewport::Id:
-            return "SetViewport";
-        case chip::app::Clusters::CameraAvStreamManagement::Commands::SetImageRotation::Id:
-            return "SetImageRotation";
-        case chip::app::Clusters::CameraAvStreamManagement::Commands::SetImageFlipHorizontal::Id:
-            return "SetImageFlipHorizontal";
-        case chip::app::Clusters::CameraAvStreamManagement::Commands::SetImageFlipVertical::Id:
-            return "SetImageFlipVertical";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::CameraAvSettingsUserLevelManagement::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::CameraAvSettingsUserLevelManagement::Commands::MPTZSetPosition::Id:
+            return "MPTZSetPosition";
+        case chip::app::Clusters::CameraAvSettingsUserLevelManagement::Commands::MPTZRelativeMove::Id:
+            return "MPTZRelativeMove";
+        case chip::app::Clusters::CameraAvSettingsUserLevelManagement::Commands::MPTZMoveToPreset::Id:
+            return "MPTZMoveToPreset";
+        case chip::app::Clusters::CameraAvSettingsUserLevelManagement::Commands::MPTZSavePreset::Id:
+            return "MPTZSavePreset";
+        case chip::app::Clusters::CameraAvSettingsUserLevelManagement::Commands::MPTZRemovePreset::Id:
+            return "MPTZRemovePreset";
+        case chip::app::Clusters::CameraAvSettingsUserLevelManagement::Commands::DPTZSetViewport::Id:
+            return "DPTZSetViewport";
+        case chip::app::Clusters::CameraAvSettingsUserLevelManagement::Commands::DPTZRelativeMove::Id:
+            return "DPTZRelativeMove";
         default:
             return "Unknown";
         }
@@ -5711,8 +6694,8 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "ProvideOffer";
         case chip::app::Clusters::WebRTCTransportProvider::Commands::ProvideAnswer::Id:
             return "ProvideAnswer";
-        case chip::app::Clusters::WebRTCTransportProvider::Commands::ProvideICECandidate::Id:
-            return "ProvideICECandidate";
+        case chip::app::Clusters::WebRTCTransportProvider::Commands::ProvideICECandidates::Id:
+            return "ProvideICECandidates";
         case chip::app::Clusters::WebRTCTransportProvider::Commands::EndSession::Id:
             return "EndSession";
         default:
@@ -5726,10 +6709,29 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "Offer";
         case chip::app::Clusters::WebRTCTransportRequestor::Commands::Answer::Id:
             return "Answer";
-        case chip::app::Clusters::WebRTCTransportRequestor::Commands::ICECandidate::Id:
-            return "ICECandidate";
+        case chip::app::Clusters::WebRTCTransportRequestor::Commands::ICECandidates::Id:
+            return "ICECandidates";
         case chip::app::Clusters::WebRTCTransportRequestor::Commands::End::Id:
             return "End";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::PushAvStreamTransport::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::PushAvStreamTransport::Commands::AllocatePushTransport::Id:
+            return "AllocatePushTransport";
+        case chip::app::Clusters::PushAvStreamTransport::Commands::DeallocatePushTransport::Id:
+            return "DeallocatePushTransport";
+        case chip::app::Clusters::PushAvStreamTransport::Commands::ModifyPushTransport::Id:
+            return "ModifyPushTransport";
+        case chip::app::Clusters::PushAvStreamTransport::Commands::SetTransportStatus::Id:
+            return "SetTransportStatus";
+        case chip::app::Clusters::PushAvStreamTransport::Commands::ManuallyTriggerTransport::Id:
+            return "ManuallyTriggerTransport";
+        case chip::app::Clusters::PushAvStreamTransport::Commands::FindTransport::Id:
+            return "FindTransport";
         default:
             return "Unknown";
         }
@@ -5743,6 +6745,36 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "Unknown";
         }
     }
+    case chip::app::Clusters::AvAnalysis::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::AvAnalysis::Commands::EnableContextTriggers::Id:
+            return "EnableContextTriggers";
+        case chip::app::Clusters::AvAnalysis::Commands::DisableContextTriggers::Id:
+            return "DisableContextTriggers";
+        case chip::app::Clusters::AvAnalysis::Commands::EstablishAnalysisStream::Id:
+            return "EstablishAnalysisStream";
+        case chip::app::Clusters::AvAnalysis::Commands::ActivateAnalysisStream::Id:
+            return "ActivateAnalysisStream";
+        case chip::app::Clusters::AvAnalysis::Commands::DeactivateAnalysisStream::Id:
+            return "DeactivateAnalysisStream";
+        case chip::app::Clusters::AvAnalysis::Commands::RemoveAnalysisStream::Id:
+            return "RemoveAnalysisStream";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::CommodityTariff::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::CommodityTariff::Commands::GetTariffComponent::Id:
+            return "GetTariffComponent";
+        case chip::app::Clusters::CommodityTariff::Commands::GetDayEntry::Id:
+            return "GetDayEntry";
+        default:
+            return "Unknown";
+        }
+    }
     case chip::app::Clusters::CommissionerControl::Id: {
         switch (id)
         {
@@ -5750,6 +6782,110 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "RequestCommissioningApproval";
         case chip::app::Clusters::CommissionerControl::Commands::CommissionNode::Id:
             return "CommissionNode";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::JointFabricDatastore::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::JointFabricDatastore::Commands::AddKeySet::Id:
+            return "AddKeySet";
+        case chip::app::Clusters::JointFabricDatastore::Commands::UpdateKeySet::Id:
+            return "UpdateKeySet";
+        case chip::app::Clusters::JointFabricDatastore::Commands::RemoveKeySet::Id:
+            return "RemoveKeySet";
+        case chip::app::Clusters::JointFabricDatastore::Commands::AddGroup::Id:
+            return "AddGroup";
+        case chip::app::Clusters::JointFabricDatastore::Commands::UpdateGroup::Id:
+            return "UpdateGroup";
+        case chip::app::Clusters::JointFabricDatastore::Commands::RemoveGroup::Id:
+            return "RemoveGroup";
+        case chip::app::Clusters::JointFabricDatastore::Commands::AddAdmin::Id:
+            return "AddAdmin";
+        case chip::app::Clusters::JointFabricDatastore::Commands::UpdateAdmin::Id:
+            return "UpdateAdmin";
+        case chip::app::Clusters::JointFabricDatastore::Commands::RemoveAdmin::Id:
+            return "RemoveAdmin";
+        case chip::app::Clusters::JointFabricDatastore::Commands::AddPendingNode::Id:
+            return "AddPendingNode";
+        case chip::app::Clusters::JointFabricDatastore::Commands::RefreshNode::Id:
+            return "RefreshNode";
+        case chip::app::Clusters::JointFabricDatastore::Commands::UpdateNode::Id:
+            return "UpdateNode";
+        case chip::app::Clusters::JointFabricDatastore::Commands::RemoveNode::Id:
+            return "RemoveNode";
+        case chip::app::Clusters::JointFabricDatastore::Commands::UpdateEndpointForNode::Id:
+            return "UpdateEndpointForNode";
+        case chip::app::Clusters::JointFabricDatastore::Commands::AddGroupIDToEndpointForNode::Id:
+            return "AddGroupIDToEndpointForNode";
+        case chip::app::Clusters::JointFabricDatastore::Commands::RemoveGroupIDFromEndpointForNode::Id:
+            return "RemoveGroupIDFromEndpointForNode";
+        case chip::app::Clusters::JointFabricDatastore::Commands::AddBindingToEndpointForNode::Id:
+            return "AddBindingToEndpointForNode";
+        case chip::app::Clusters::JointFabricDatastore::Commands::RemoveBindingFromEndpointForNode::Id:
+            return "RemoveBindingFromEndpointForNode";
+        case chip::app::Clusters::JointFabricDatastore::Commands::AddACLToNode::Id:
+            return "AddACLToNode";
+        case chip::app::Clusters::JointFabricDatastore::Commands::RemoveACLFromNode::Id:
+            return "RemoveACLFromNode";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::JointFabricAdministrator::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::JointFabricAdministrator::Commands::ICACCSRRequest::Id:
+            return "ICACCSRRequest";
+        case chip::app::Clusters::JointFabricAdministrator::Commands::AddICAC::Id:
+            return "AddICAC";
+        case chip::app::Clusters::JointFabricAdministrator::Commands::OpenJointCommissioningWindow::Id:
+            return "OpenJointCommissioningWindow";
+        case chip::app::Clusters::JointFabricAdministrator::Commands::TransferAnchorRequest::Id:
+            return "TransferAnchorRequest";
+        case chip::app::Clusters::JointFabricAdministrator::Commands::TransferAnchorComplete::Id:
+            return "TransferAnchorComplete";
+        case chip::app::Clusters::JointFabricAdministrator::Commands::AnnounceJointFabricAdministrator::Id:
+            return "AnnounceJointFabricAdministrator";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::TlsCertificateManagement::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::TlsCertificateManagement::Commands::ProvisionRootCertificate::Id:
+            return "ProvisionRootCertificate";
+        case chip::app::Clusters::TlsCertificateManagement::Commands::FindRootCertificate::Id:
+            return "FindRootCertificate";
+        case chip::app::Clusters::TlsCertificateManagement::Commands::LookupRootCertificate::Id:
+            return "LookupRootCertificate";
+        case chip::app::Clusters::TlsCertificateManagement::Commands::RemoveRootCertificate::Id:
+            return "RemoveRootCertificate";
+        case chip::app::Clusters::TlsCertificateManagement::Commands::ClientCSR::Id:
+            return "ClientCSR";
+        case chip::app::Clusters::TlsCertificateManagement::Commands::ProvisionClientCertificate::Id:
+            return "ProvisionClientCertificate";
+        case chip::app::Clusters::TlsCertificateManagement::Commands::FindClientCertificate::Id:
+            return "FindClientCertificate";
+        case chip::app::Clusters::TlsCertificateManagement::Commands::LookupClientCertificate::Id:
+            return "LookupClientCertificate";
+        case chip::app::Clusters::TlsCertificateManagement::Commands::RemoveClientCertificate::Id:
+            return "RemoveClientCertificate";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::TlsClientManagement::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::TlsClientManagement::Commands::ProvisionEndpoint::Id:
+            return "ProvisionEndpoint";
+        case chip::app::Clusters::TlsClientManagement::Commands::FindEndpoint::Id:
+            return "FindEndpoint";
+        case chip::app::Clusters::TlsClientManagement::Commands::RemoveEndpoint::Id:
+            return "RemoveEndpoint";
         default:
             return "Unknown";
         }
@@ -5809,6 +6945,8 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "StringEchoRequest";
         case chip::app::Clusters::UnitTesting::Commands::GlobalEchoRequest::Id:
             return "GlobalEchoRequest";
+        case chip::app::Clusters::UnitTesting::Commands::TestCheckCommandFlags::Id:
+            return "TestCheckCommandFlags";
         case chip::app::Clusters::UnitTesting::Commands::TestDifferentVendorMeiRequest::Id:
             return "TestDifferentVendorMeiRequest";
         default:
@@ -5951,6 +7089,8 @@ char const * GeneratedCommandIdToText(chip::ClusterId cluster, chip::CommandId i
             return "CSRResponse";
         case chip::app::Clusters::OperationalCredentials::Commands::NOCResponse::Id:
             return "NOCResponse";
+        case chip::app::Clusters::OperationalCredentials::Commands::SignVIDVerificationResponse::Id:
+            return "SignVIDVerificationResponse";
         default:
             return "Unknown";
         }
@@ -6079,6 +7219,26 @@ char const * GeneratedCommandIdToText(chip::ClusterId cluster, chip::CommandId i
             return "Unknown";
         }
     }
+    case chip::app::Clusters::Groupcast::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::Groupcast::Commands::LeaveGroupResponse::Id:
+            return "LeaveGroupResponse";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::CommodityPrice::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::CommodityPrice::Commands::GetDetailedPriceResponse::Id:
+            return "GetDetailedPriceResponse";
+        case chip::app::Clusters::CommodityPrice::Commands::GetDetailedForecastResponse::Id:
+            return "GetDetailedForecastResponse";
+        default:
+            return "Unknown";
+        }
+    }
     case chip::app::Clusters::EnergyEvse::Id: {
         switch (id)
         {
@@ -6150,8 +7310,32 @@ char const * GeneratedCommandIdToText(chip::ClusterId cluster, chip::CommandId i
         {
         case chip::app::Clusters::Thermostat::Commands::GetWeeklyScheduleResponse::Id:
             return "GetWeeklyScheduleResponse";
+        case chip::app::Clusters::Thermostat::Commands::AddThermostatSuggestionResponse::Id:
+            return "AddThermostatSuggestionResponse";
         case chip::app::Clusters::Thermostat::Commands::AtomicResponse::Id:
             return "AtomicResponse";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::ProximityRanging::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::ProximityRanging::Commands::StartRangingResponse::Id:
+            return "StartRangingResponse";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::NetworkIdentityManagement::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::NetworkIdentityManagement::Commands::AddClientResponse::Id:
+            return "AddClientResponse";
+        case chip::app::Clusters::NetworkIdentityManagement::Commands::QueryIdentityResponse::Id:
+            return "QueryIdentityResponse";
+        case chip::app::Clusters::NetworkIdentityManagement::Commands::ExportAdminSecretResponse::Id:
+            return "ExportAdminSecretResponse";
         default:
             return "Unknown";
         }
@@ -6271,8 +7455,6 @@ char const * GeneratedCommandIdToText(chip::ClusterId cluster, chip::CommandId i
         {
         case chip::app::Clusters::ZoneManagement::Commands::CreateTwoDCartesianZoneResponse::Id:
             return "CreateTwoDCartesianZoneResponse";
-        case chip::app::Clusters::ZoneManagement::Commands::GetTwoDCartesianZoneResponse::Id:
-            return "GetTwoDCartesianZoneResponse";
         default:
             return "Unknown";
         }
@@ -6303,11 +7485,85 @@ char const * GeneratedCommandIdToText(chip::ClusterId cluster, chip::CommandId i
             return "Unknown";
         }
     }
+    case chip::app::Clusters::PushAvStreamTransport::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::PushAvStreamTransport::Commands::AllocatePushTransportResponse::Id:
+            return "AllocatePushTransportResponse";
+        case chip::app::Clusters::PushAvStreamTransport::Commands::FindTransportResponse::Id:
+            return "FindTransportResponse";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::AvAnalysis::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::AvAnalysis::Commands::EstablishAnalysisStreamResponse::Id:
+            return "EstablishAnalysisStreamResponse";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::CommodityTariff::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::CommodityTariff::Commands::GetTariffComponentResponse::Id:
+            return "GetTariffComponentResponse";
+        case chip::app::Clusters::CommodityTariff::Commands::GetDayEntryResponse::Id:
+            return "GetDayEntryResponse";
+        default:
+            return "Unknown";
+        }
+    }
     case chip::app::Clusters::CommissionerControl::Id: {
         switch (id)
         {
         case chip::app::Clusters::CommissionerControl::Commands::ReverseOpenCommissioningWindow::Id:
             return "ReverseOpenCommissioningWindow";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::JointFabricAdministrator::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::JointFabricAdministrator::Commands::ICACCSRResponse::Id:
+            return "ICACCSRResponse";
+        case chip::app::Clusters::JointFabricAdministrator::Commands::ICACResponse::Id:
+            return "ICACResponse";
+        case chip::app::Clusters::JointFabricAdministrator::Commands::TransferAnchorResponse::Id:
+            return "TransferAnchorResponse";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::TlsCertificateManagement::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::TlsCertificateManagement::Commands::ProvisionRootCertificateResponse::Id:
+            return "ProvisionRootCertificateResponse";
+        case chip::app::Clusters::TlsCertificateManagement::Commands::FindRootCertificateResponse::Id:
+            return "FindRootCertificateResponse";
+        case chip::app::Clusters::TlsCertificateManagement::Commands::LookupRootCertificateResponse::Id:
+            return "LookupRootCertificateResponse";
+        case chip::app::Clusters::TlsCertificateManagement::Commands::ClientCSRResponse::Id:
+            return "ClientCSRResponse";
+        case chip::app::Clusters::TlsCertificateManagement::Commands::FindClientCertificateResponse::Id:
+            return "FindClientCertificateResponse";
+        case chip::app::Clusters::TlsCertificateManagement::Commands::LookupClientCertificateResponse::Id:
+            return "LookupClientCertificateResponse";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::TlsClientManagement::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::TlsClientManagement::Commands::ProvisionEndpointResponse::Id:
+            return "ProvisionEndpointResponse";
+        case chip::app::Clusters::TlsClientManagement::Commands::FindEndpointResponse::Id:
+            return "FindEndpointResponse";
         default:
             return "Unknown";
         }
@@ -6423,6 +7679,8 @@ char const * DeviceTypeIdToText(chip::DeviceTypeId id)
         return "Water Leak Detector";
     case 0x00000044:
         return "Rain Sensor";
+    case 0x00000045:
+        return "Soil Sensor";
     case 0x00000070:
         return "Refrigerator";
     case 0x00000071:
@@ -6449,6 +7707,8 @@ char const * DeviceTypeIdToText(chip::DeviceTypeId id)
         return "Oven";
     case 0x0000007C:
         return "Laundry Dryer";
+    case 0x0000007D:
+        return "Humidifier/Dehumidifier";
     case 0x00000090:
         return "Network Infrastructure Manager";
     case 0x00000091:
@@ -6475,12 +7735,44 @@ char const * DeviceTypeIdToText(chip::DeviceTypeId id)
         return "Color Temperature Light";
     case 0x0000010D:
         return "Extended Color Light";
+    case 0x0000010F:
+        return "Mounted On/Off Control";
+    case 0x00000110:
+        return "Mounted Dimmable Load Control";
+    case 0x00000130:
+        return "Joint Fabric Administrator";
+    case 0x00000140:
+        return "Intercom";
+    case 0x00000141:
+        return "Audio Doorbell";
+    case 0x00000142:
+        return "Camera";
+    case 0x00000143:
+        return "Video Doorbell";
+    case 0x00000144:
+        return "Floodlight Camera";
+    case 0x00000145:
+        return "Snapshot Camera";
+    case 0x00000146:
+        return "Chime";
+    case 0x00000147:
+        return "Camera Controller";
+    case 0x00000148:
+        return "Doorbell";
+    case 0x00000150:
+        return "Ambient Context Sensor";
+    case 0x00000152:
+        return "Proximity Ranger";
     case 0x00000202:
         return "Window Covering";
     case 0x00000203:
         return "Window Covering Controller";
-    case 0x00000300:
-        return "Heating/Cooling Unit";
+    case 0x00000230:
+        return "Closure";
+    case 0x00000231:
+        return "Closure Panel";
+    case 0x0000023E:
+        return "Closure Controller";
     case 0x00000301:
         return "Thermostat";
     case 0x00000302:
@@ -6497,6 +7789,8 @@ char const * DeviceTypeIdToText(chip::DeviceTypeId id)
         return "Humidity Sensor";
     case 0x00000309:
         return "Heat Pump";
+    case 0x0000030A:
+        return "Thermostat Controller";
     case 0x0000050C:
         return "EVSE";
     case 0x0000050D:
@@ -6505,6 +7799,18 @@ char const * DeviceTypeIdToText(chip::DeviceTypeId id)
         return "Water Heater";
     case 0x00000510:
         return "Electrical Sensor";
+    case 0x00000511:
+        return "Electrical Utility Meter";
+    case 0x00000512:
+        return "Meter Reference Point";
+    case 0x00000513:
+        return "Electrical Energy Tariff";
+    case 0x00000514:
+        return "Electrical Meter";
+    case 0x00000516:
+        return "Electrical Circuit Breaker";
+    case 0x00000517:
+        return "Electrical Distribution Enclosure";
     case 0x00000840:
         return "Control Bridge";
     case 0x00000850:

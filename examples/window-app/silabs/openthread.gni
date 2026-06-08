@@ -17,10 +17,11 @@ import("${chip_root}/config/standalone/args.gni")
 import("${chip_root}/src/platform/silabs/efr32/args.gni")
 
 silabs_sdk_target = get_label_info(":sdk", "label_no_toolchain")
+chip_build_libshell = true
 
 app_data_model = "${chip_root}/examples/window-app/common:window-common"
 chip_enable_ota_requestor = true
-chip_enable_openthread = true
+chip_enable_thread = true
 sl_enable_test_event_trigger = true
 
 openthread_external_platform =
@@ -33,8 +34,8 @@ chip_subscription_timeout_resumption = false
 sl_use_subscription_syncing = true
 
 # Openthread Configuration flags
-sl_ot_idle_interval_ms = 1000  # 1s Idle Intervals
-sl_ot_active_interval_ms = 500  # 500ms Active Intervals
+sl_transport_idle_interval_ms = 1000  # 1s Idle Intervals
+sl_transport_active_interval_ms = 500  # 500ms Active Intervals
 
 # ICD Matter Configuration flags
 sl_idle_mode_duration_s = 600  # 10min Idle Mode Duration

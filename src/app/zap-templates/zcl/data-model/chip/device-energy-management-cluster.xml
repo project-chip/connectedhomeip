@@ -74,41 +74,87 @@ Git: 1.4-prerelease-ipr-69-ge15ff5700
       </feature>
     </features>
     <!--Attributes-->
-    <attribute code="0x0000" side="server" type="ESATypeEnum" define="ESA_TYPE" min="0x00" max="0xFF" default="0xFF">ESAType</attribute>
-    <attribute code="0x0001" side="server" type="boolean" define="ESA_CAN_GENERATE" default="0">ESACanGenerate</attribute>
-    <attribute code="0x0002" side="server" type="ESAStateEnum" define="ESA_STATE" default="0x00" min="0x00" max="0x04">ESAState</attribute>
-    <attribute code="0x0003" side="server" type="power_mw" define="ABS_MIN_POWER" default="0">AbsMinPower</attribute>
-    <attribute code="0x0004" side="server" type="power_mw" define="ABS_MAX_POWER" default="0">AbsMaxPower</attribute>
+    <attribute code="0x0000" side="server" name="ESAType" type="ESATypeEnum" define="ESA_TYPE" min="0x00" max="0xFF" default="0xFF">
+      <mandatoryConform/>
+    </attribute>
+    <attribute code="0x0001" side="server" name="ESACanGenerate" type="boolean" define="ESA_CAN_GENERATE" default="0">
+      <mandatoryConform/>
+    </attribute>
+    <attribute code="0x0002" side="server" name="ESAState" type="ESAStateEnum" define="ESA_STATE" default="0x00" min="0x00" max="0x04">
+      <mandatoryConform/>
+    </attribute>
+    <attribute code="0x0003" side="server" name="AbsMinPower" type="power_mw" define="ABS_MIN_POWER" default="0">
+      <mandatoryConform/>
+    </attribute>
+    <attribute code="0x0004" side="server" name="AbsMaxPower" type="power_mw" define="ABS_MAX_POWER" default="0">
+      <mandatoryConform/>
+    </attribute>
     <!--Conformance feature PA - for now optional-->
-    <attribute code="0x0005" side="server" type="PowerAdjustCapabilityStruct" define="POWER_ADJUSTMENT_CAPABILITY" isNullable="true" optional="true">PowerAdjustmentCapability</attribute>
+    <attribute code="0x0005" side="server" name="PowerAdjustmentCapability" type="PowerAdjustCapabilityStruct" define="POWER_ADJUSTMENT_CAPABILITY" isNullable="true" optional="true">
+      <mandatoryConform>
+        <feature name="PA"/>
+      </mandatoryConform>
+    </attribute>
     <!--Conformance feature PFR \| SFR - for now optional-->
-    <attribute code="0x0006" side="server" type="ForecastStruct" define="FORECAST" isNullable="true" optional="true">Forecast</attribute>
-    <attribute code="0x0007" side="server" type="OptOutStateEnum" define="OPT_OUT_STATE" min="0x00" max="0x03" default="0x00" optional="true">OptOutState</attribute>
+    <attribute code="0x0006" side="server" name="Forecast" type="ForecastStruct" define="FORECAST" isNullable="true" optional="true">
+      <mandatoryConform>
+        <orTerm>
+          <feature name="PFR"/>
+          <feature name="SFR"/>
+        </orTerm>
+      </mandatoryConform>
+    </attribute>
+    <attribute code="0x0007" side="server" name="OptOutState" type="OptOutStateEnum" define="OPT_OUT_STATE" min="0x00" max="0x03" default="0x00" optional="true">
+      <mandatoryConform>
+        <orTerm>
+          <feature name="PA"/>
+          <feature name="STA"/>
+          <feature name="PAU"/>
+          <feature name="FA"/>
+          <feature name="CON"/>
+        </orTerm>
+      </mandatoryConform>
+    </attribute>
     <command source="client" code="0x00" name="PowerAdjustRequest" optional="true" apiMaturity="provisional">
       <description>Allows a client to request an adjustment in the power consumption of an ESA for a specified duration.</description>
       <arg id="0" name="Power" type="power_mw"/>
       <arg id="1" name="Duration" type="elapsed_s"/>
       <arg id="2" name="Cause" type="AdjustmentCauseEnum" min="0x00" max="0x01"/>
+      <mandatoryConform>
+        <feature name="PA"/>
+      </mandatoryConform>
     </command>
 
     <command source="client" code="0x01" name="CancelPowerAdjustRequest" optional="true" apiMaturity="provisional">
       <description>Allows a client to cancel an ongoing PowerAdjustmentRequest operation.</description>
+      <mandatoryConform>
+        <feature name="PA"/>
+      </mandatoryConform>
     </command>
 
     <command source="client" code="0x02" name="StartTimeAdjustRequest" optional="true" apiMaturity="provisional">
       <description>Allows a client to adjust the start time of a Forecast sequence that has not yet started operation (i.e. where the current Forecast StartTime is in the future).</description>
       <arg id="0" name="RequestedStartTime" type="epoch_s"/>
       <arg id="1" name="Cause" type="AdjustmentCauseEnum" min="0x00" max="0x01"/>
+      <mandatoryConform>
+        <feature name="STA"/>
+      </mandatoryConform>
     </command>
 
     <command source="client" code="0x03" name="PauseRequest" optional="true" apiMaturity="provisional">
       <description>Allows a client to temporarily pause an operation and reduce the ESAs energy demand.</description>
       <arg id="0" name="Duration" type="elapsed_s"/>
       <arg id="1" name="Cause" type="AdjustmentCauseEnum" min="0x00" max="0x01"/>
+      <mandatoryConform>
+        <feature name="PAU"/>
+      </mandatoryConform>
     </command>
 
     <command source="client" code="0x04" name="ResumeRequest" optional="true" apiMaturity="provisional">
       <description>Allows a client to cancel the PauseRequest command and enable earlier resumption of operation.</description>
+      <mandatoryConform>
+        <feature name="PAU"/>
+      </mandatoryConform>
     </command>
 
     <command source="client" code="0x05" name="ModifyForecastRequest" optional="true" apiMaturity="provisional">
@@ -116,20 +162,36 @@ Git: 1.4-prerelease-ipr-69-ge15ff5700
       <arg id="0" name="ForecastID" type="int32u"/>
       <arg id="1" name="SlotAdjustments" array="true" type="SlotAdjustmentStruct" length="10"/>
       <arg id="2" name="Cause" type="AdjustmentCauseEnum" min="0x00" max="0x01"/>
+      <mandatoryConform>
+        <feature name="FA"/>
+      </mandatoryConform>
     </command>
 
     <command source="client" code="0x06" name="RequestConstraintBasedForecast" optional="true" apiMaturity="provisional">
       <description>Allows a client to ask the ESA to recompute its Forecast based on power and time constraints.</description>
       <arg id="0" name="Constraints" array="true" type="ConstraintsStruct" length="10"/>
       <arg id="1" name="Cause" type="AdjustmentCauseEnum" min="0x00" max="0x01"/>
+      <mandatoryConform>
+        <feature name="CON"/>
+      </mandatoryConform>
     </command>
 
     <command source="client" code="0x07" name="CancelRequest" optional="true">
       <description>Allows a client to request cancellation of a previous adjustment request in a StartTimeAdjustRequest, ModifyForecastRequest or RequestConstraintBasedForecast command.</description>
+      <mandatoryConform>
+        <orTerm>
+          <feature name="STA"/>
+          <feature name="FA"/>
+          <feature name="CON"/>
+        </orTerm>
+      </mandatoryConform>
     </command>
 
     <event code="0x00" name="PowerAdjustStart" priority="info" side="server" apiMaturity="provisional" optional="true">
       <description>This event SHALL be generated when the Power Adjustment session is started.</description>
+      <mandatoryConform>
+        <feature name="PA"/>
+      </mandatoryConform>
     </event>
 
     <event code="0x01" name="PowerAdjustEnd" priority="info" side="server" apiMaturity="provisional" optional="true">
@@ -137,15 +199,24 @@ Git: 1.4-prerelease-ipr-69-ge15ff5700
       <field id="0" name="Cause" type="CauseEnum" apiMaturity="provisional" default="0x00" min="0x00" max="0x04"/>
       <field id="1" name="Duration" type="elapsed_s" apiMaturity="provisional"/>
       <field id="2" name="EnergyUse" type="energy_mwh" apiMaturity="provisional"/>
+      <mandatoryConform>
+        <feature name="PA"/>
+      </mandatoryConform>
     </event>
 
     <event code="0x02" name="Paused" priority="info" side="server" apiMaturity="provisional" optional="true">
       <description>This event SHALL be generated when the ESA enters the Paused state.</description>
+      <mandatoryConform>
+        <feature name="PAU"/>
+      </mandatoryConform>
     </event>
 
     <event code="0x03" name="Resumed" priority="info" side="server" apiMaturity="provisional" optional="true">
       <description>This event SHALL be generated when the ESA leaves the Paused state and resumes operation.</description>
       <field id="0" name="Cause" type="CauseEnum" apiMaturity="provisional" default="0x00" min="0x00" max="0x04"/>
+      <mandatoryConform>
+        <feature name="PAU"/>
+      </mandatoryConform>
     </event>
 
   </cluster>

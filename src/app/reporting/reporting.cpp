@@ -18,7 +18,8 @@
 
 #include <app/AttributePathParams.h>
 #include <app/InteractionModelEngine.h>
-#include <app/util/attribute-storage.h>
+#include <app/data-model-provider/Provider.h>
+#include <lib/support/CodeUtils.h>
 #include <platform/LockTracker.h>
 
 using namespace chip;
@@ -30,7 +31,10 @@ void MatterReportingAttributeChangeCallback(EndpointId endpoint, ClusterId clust
     // applications notifying about changes from their end.
     assertChipStackLockedByCurrentThread();
 
-    emberAfAttributeChanged(endpoint, clusterId, attributeId, emberAfGlobalInteractionModelAttributesChangedListener());
+    DataModel::Provider * provider = InteractionModelEngine::GetInstance()->GetDataModelProvider();
+    VerifyOrReturn(provider != nullptr);
+
+    provider->NotifyAttributeChanged({ endpoint, clusterId, attributeId }, DataModel::AttributeChangeType::kReportable);
 }
 
 void MatterReportingAttributeChangeCallback(const ConcreteAttributePath & aPath)
@@ -39,15 +43,19 @@ void MatterReportingAttributeChangeCallback(const ConcreteAttributePath & aPath)
     // applications notifying about changes from their end.
     assertChipStackLockedByCurrentThread();
 
-    emberAfAttributeChanged(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId,
-                            emberAfGlobalInteractionModelAttributesChangedListener());
+    DataModel::Provider * provider = InteractionModelEngine::GetInstance()->GetDataModelProvider();
+    VerifyOrReturn(provider != nullptr);
+
+    provider->NotifyAttributeChanged(aPath, DataModel::AttributeChangeType::kReportable);
 }
 
-void MatterReportingAttributeChangeCallback(EndpointId endpoint)
+void MatterReportingAttributeChangeCallback(EndpointId endpoint, DataModel::EndpointChangeType type)
 {
     // Attribute writes have asserted this already, but this assert should catch
     // applications notifying about changes from their end.
     assertChipStackLockedByCurrentThread();
 
-    emberAfEndpointChanged(endpoint, emberAfGlobalInteractionModelAttributesChangedListener());
+    DataModel::Provider * provider = InteractionModelEngine::GetInstance()->GetDataModelProvider();
+    VerifyOrReturn(provider != nullptr);
+    provider->NotifyEndpointChanged(endpoint, type);
 }

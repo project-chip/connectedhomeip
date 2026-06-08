@@ -28,14 +28,18 @@
 
 #include <lib/core/CHIPCore.h>
 #include <lib/core/StringBuilderAdapters.h>
+#include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <messaging/ReliableMessageProtocolConfig.h>
+#include <platform/CHIPDeviceLayer.h>
 #include <protocols/secure_channel/PairingSession.h>
 #include <system/SystemClock.h>
 #include <system/TLVPacketBufferBackingStore.h>
 
 using namespace chip;
 using namespace chip::System::Clock;
+using namespace TLV;
 
 class TestPairingSession : public PairingSession, public ::testing::Test
 {
@@ -54,43 +58,41 @@ public:
 
     void OnSessionReleased() override {}
 
+    // NOLINTNEXTLINE(bugprone-derived-method-shadowing-base-method)
     const ReliableMessageProtocolConfig & GetRemoteMRPConfig() const { return PairingSession::GetRemoteMRPConfig(); }
 
     CHIP_ERROR DeriveSecureSession(CryptoContext & session) override { return CHIP_NO_ERROR; }
 
-    CHIP_ERROR DecodeMRPParametersIfPresent(TLV::Tag expectedTag, System::PacketBufferTLVReader & tlvReader)
-    {
-        return PairingSession::DecodeMRPParametersIfPresent(expectedTag, tlvReader);
-    }
+    using PairingSession::DecodeSessionParametersIfPresent;
 };
 
 TEST_F(TestPairingSession, PairingSessionEncodeDecodeMRPParams)
 {
-    ReliableMessageProtocolConfig config(Milliseconds32(100), Milliseconds32(200), Milliseconds16(4000));
+    ReliableMessageProtocolConfig mrpConfig(Milliseconds32(100), Milliseconds32(200), Milliseconds16(4000));
 
     System::PacketBufferHandle buf = System::PacketBufferHandle::New(64, 0);
     System::PacketBufferTLVWriter writer;
     writer.Init(buf.Retain());
 
-    TLV::TLVType outerContainerType = TLV::kTLVType_NotSpecified;
-    EXPECT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerContainerType), CHIP_NO_ERROR);
+    TLVType outerContainerType = kTLVType_NotSpecified;
+    EXPECT_EQ(writer.StartContainer(AnonymousTag(), kTLVType_Structure, outerContainerType), CHIP_NO_ERROR);
 
-    EXPECT_EQ(PairingSession::EncodeSessionParameters(TLV::ContextTag(1), config, writer), CHIP_NO_ERROR);
+    EXPECT_EQ(PairingSession::EncodeSessionParameters(ContextTag(1), mrpConfig, writer), CHIP_NO_ERROR);
 
     EXPECT_EQ(writer.EndContainer(outerContainerType), CHIP_NO_ERROR);
     EXPECT_EQ(writer.Finalize(&buf), CHIP_NO_ERROR);
 
     System::PacketBufferTLVReader reader;
-    TLV::TLVType containerType = TLV::kTLVType_Structure;
+    TLVType containerType = kTLVType_Structure;
 
     reader.Init(std::move(buf));
-    EXPECT_EQ(reader.Next(containerType, TLV::AnonymousTag()), CHIP_NO_ERROR);
+    EXPECT_EQ(reader.Next(containerType, AnonymousTag()), CHIP_NO_ERROR);
     EXPECT_EQ(reader.EnterContainer(containerType), CHIP_NO_ERROR);
 
     EXPECT_EQ(reader.Next(), CHIP_NO_ERROR);
-    EXPECT_EQ(DecodeMRPParametersIfPresent(TLV::ContextTag(1), reader), CHIP_NO_ERROR);
+    EXPECT_EQ(DecodeSessionParametersIfPresent(ContextTag(1), reader, mRemoteSessionParams), CHIP_NO_ERROR);
 
-    EXPECT_EQ(GetRemoteMRPConfig(), config);
+    EXPECT_EQ(GetRemoteMRPConfig(), mrpConfig);
 }
 
 TEST_F(TestPairingSession, PairingSessionTryDecodeMissingMRPParams)
@@ -99,22 +101,477 @@ TEST_F(TestPairingSession, PairingSessionTryDecodeMissingMRPParams)
     System::PacketBufferTLVWriter writer;
     writer.Init(buf.Retain());
 
-    TLV::TLVType outerContainerType = TLV::kTLVType_NotSpecified;
-    EXPECT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerContainerType), CHIP_NO_ERROR);
-    EXPECT_EQ(writer.Put(TLV::ContextTag(1), static_cast<uint16_t>(0x1234)), CHIP_NO_ERROR);
+    TLVType outerContainerType = kTLVType_NotSpecified;
+    EXPECT_EQ(writer.StartContainer(AnonymousTag(), kTLVType_Structure, outerContainerType), CHIP_NO_ERROR);
+    EXPECT_EQ(writer.Put(ContextTag(1), static_cast<uint16_t>(0x1234)), CHIP_NO_ERROR);
     EXPECT_EQ(writer.EndContainer(outerContainerType), CHIP_NO_ERROR);
     EXPECT_EQ(writer.Finalize(&buf), CHIP_NO_ERROR);
 
     System::PacketBufferTLVReader reader;
-    TLV::TLVType containerType = TLV::kTLVType_Structure;
+    TLVType containerType = kTLVType_Structure;
 
     reader.Init(std::move(buf));
-    EXPECT_EQ(reader.Next(containerType, TLV::AnonymousTag()), CHIP_NO_ERROR);
+    EXPECT_EQ(reader.Next(containerType, AnonymousTag()), CHIP_NO_ERROR);
     EXPECT_EQ(reader.EnterContainer(containerType), CHIP_NO_ERROR);
     EXPECT_EQ(reader.Next(), CHIP_NO_ERROR);
-    EXPECT_EQ(DecodeMRPParametersIfPresent(TLV::ContextTag(2), reader), CHIP_NO_ERROR);
+    EXPECT_EQ(DecodeSessionParametersIfPresent(ContextTag(2), reader, mRemoteSessionParams), CHIP_NO_ERROR);
 
     EXPECT_EQ(GetRemoteMRPConfig(), GetDefaultMRPConfig());
 }
 
-// Test Suite
+struct DecodeSessionParamsTestCase
+{
+    std::string testCaseName;
+    ReliableMessageProtocolConfig mrpConfig;
+    bool includeVersionInfo;
+    uint16_t dataModelRev;
+    uint16_t interactionModelRev;
+    uint32_t specVersion;
+    uint16_t maxPaths;
+    CHIP_ERROR expectedErrorDecodeParams; // Expected Error from DecodeSessionParameters
+    CHIP_ERROR expectedErrorOuterExitContainer = CHIP_NO_ERROR;
+    bool testFutureProofing                    = false;
+    bool includeEndContainer                   = true;
+};
+
+constexpr uint8_t kSessionParamsStructTag = 1;
+
+void EncodeSessionParamsHelper(const DecodeSessionParamsTestCase & testCase, TLV::TLVWriter & writer)
+{
+
+    TLVType sessionParamsContainer = kTLVType_NotSpecified;
+    EXPECT_EQ(writer.StartContainer(ContextTag(kSessionParamsStructTag), kTLVType_Structure, sessionParamsContainer),
+              CHIP_NO_ERROR);
+
+    EXPECT_SUCCESS(
+        writer.Put(ContextTag(SessionParameters::Tag::kSessionIdleInterval), testCase.mrpConfig.mIdleRetransTimeout.count()));
+    EXPECT_SUCCESS(
+        writer.Put(ContextTag(SessionParameters::Tag::kSessionActiveInterval), testCase.mrpConfig.mActiveRetransTimeout.count()));
+    EXPECT_SUCCESS(
+        writer.Put(ContextTag(SessionParameters::Tag::kSessionActiveThreshold), testCase.mrpConfig.mActiveThresholdTime.count()));
+
+    if (testCase.includeVersionInfo)
+    {
+        EXPECT_SUCCESS(writer.Put(ContextTag(SessionParameters::Tag::kDataModelRevision), testCase.dataModelRev));
+        EXPECT_SUCCESS(writer.Put(ContextTag(SessionParameters::Tag::kInteractionModelRevision), testCase.interactionModelRev));
+        EXPECT_SUCCESS(writer.Put(ContextTag(SessionParameters::Tag::kSpecificationVersion), testCase.specVersion));
+        EXPECT_SUCCESS(writer.Put(ContextTag(SessionParameters::Tag::kMaxPathsPerInvoke), testCase.maxPaths));
+    }
+
+    if (testCase.testFutureProofing)
+    {
+        // Choosing a tag that is much higher than the current highest tag value in the Specification
+        constexpr uint8_t kFutureProofTlvElementTag = 17;
+
+        uint32_t futureProofTlvElement = 0x777666;
+        EXPECT_SUCCESS(writer.Put(ContextTag(kFutureProofTlvElementTag), futureProofTlvElement));
+    }
+
+    if (testCase.includeEndContainer)
+    {
+        EXPECT_EQ(writer.EndContainer(sessionParamsContainer), CHIP_NO_ERROR);
+    }
+}
+
+bool VerifyDecodedParameters(const DecodeSessionParamsTestCase & testCase, const SessionParameters & params)
+{
+    if (testCase.mrpConfig.mIdleRetransTimeout.count() > 0)
+    {
+        if ((params.GetMRPConfig().mIdleRetransTimeout.count()) != testCase.mrpConfig.mIdleRetransTimeout.count())
+        {
+            printf("Idle retrans timeout mismatch: expected %" PRIu32 "ms, got %" PRIu32 "ms\n",
+                   testCase.mrpConfig.mIdleRetransTimeout.count(), params.GetMRPConfig().mIdleRetransTimeout.count());
+            return false;
+        }
+    }
+
+    if (testCase.mrpConfig.mActiveRetransTimeout.count() > 0)
+    {
+        if (params.GetMRPConfig().mActiveRetransTimeout.count() != testCase.mrpConfig.mActiveRetransTimeout.count())
+        {
+            printf("Active retrans timeout mismatch: expected %" PRIu32 "ms, got %" PRIu32 "ms\n",
+                   testCase.mrpConfig.mActiveRetransTimeout.count(), params.GetMRPConfig().mActiveRetransTimeout.count());
+            return false;
+        }
+    }
+
+    if (testCase.mrpConfig.mActiveThresholdTime.count() > 0)
+    {
+        if (params.GetMRPConfig().mActiveThresholdTime.count() != testCase.mrpConfig.mActiveThresholdTime.count())
+        {
+            printf("Active threshold time mismatch: expected %u, got %u\n", testCase.mrpConfig.mActiveThresholdTime.count(),
+                   params.GetMRPConfig().mActiveThresholdTime.count());
+            return false;
+        }
+    }
+
+    if (testCase.includeVersionInfo)
+    {
+        if (params.GetDataModelRevision() != testCase.dataModelRev)
+        {
+            printf("Data model revision mismatch: expected %u, got %u\n", testCase.dataModelRev,
+                   params.GetDataModelRevision().Value());
+            return false;
+        }
+        if (params.GetInteractionModelRevision() != testCase.interactionModelRev)
+        {
+            printf("Interaction model revision mismatch: expected %u, got %u\n", testCase.interactionModelRev,
+                   params.GetInteractionModelRevision().Value());
+            return false;
+        }
+        if (params.GetSpecificationVersion() != testCase.specVersion)
+        {
+            printf("Specification version mismatch: expected %" PRIu32 ", got %" PRIu32 "\n", testCase.specVersion,
+                   params.GetSpecificationVersion().Value());
+            return false;
+        }
+        if (params.GetMaxPathsPerInvoke() != testCase.maxPaths)
+        {
+            printf("Max paths mismatch: expected %u, got %u\n", testCase.maxPaths, params.GetMaxPathsPerInvoke());
+            return false;
+        }
+    }
+
+    return true;
+}
+
+TEST_F(TestPairingSession, TestDecodeSessionParameters)
+{
+    const DecodeSessionParamsTestCase testCases[] = {
+        { .testCaseName       = "1. Empty parameters",
+          .mrpConfig          = ReliableMessageProtocolConfig(System::Clock::Milliseconds32(0), System::Clock::Milliseconds32(0),
+                                                              System::Clock::Milliseconds16(0)),
+          .includeVersionInfo = false,
+          .expectedErrorDecodeParams = CHIP_NO_ERROR },
+
+        { .testCaseName = "2. Only MRP parameters",
+          .mrpConfig    = ReliableMessageProtocolConfig(System::Clock::Milliseconds32(1200), System::Clock::Milliseconds32(2200),
+                                                        System::Clock::Milliseconds16(450)),
+          .includeVersionInfo        = false,
+          .expectedErrorDecodeParams = CHIP_NO_ERROR },
+
+        { .testCaseName = "3. All parameters",
+          .mrpConfig    = ReliableMessageProtocolConfig(System::Clock::Milliseconds32(1600), System::Clock::Milliseconds32(2100),
+                                                        System::Clock::Milliseconds16(1300)),
+          .includeVersionInfo        = true,
+          .dataModelRev              = 1,
+          .interactionModelRev       = 2,
+          .specVersion               = 1,
+          .maxPaths                  = 10,
+          .expectedErrorDecodeParams = CHIP_NO_ERROR },
+
+        { .testCaseName = "4. Maximum Value of All parameters",
+          .mrpConfig =
+              ReliableMessageProtocolConfig(System::Clock::Milliseconds32(UINT32_MAX), // Test max value
+                                            System::Clock::Milliseconds32(UINT32_MAX), System::Clock::Milliseconds16(UINT16_MAX)),
+          .includeVersionInfo        = true,
+          .dataModelRev              = UINT16_MAX,
+          .interactionModelRev       = UINT16_MAX,
+          .specVersion               = UINT32_MAX,
+          .maxPaths                  = UINT16_MAX,
+          .expectedErrorDecodeParams = CHIP_NO_ERROR },
+
+        // Future-proofing: Ensure that TLV elements being added to the specification in the future do not trigger an error in
+        // DecodeSessionParametersIfPresent.
+        { .testCaseName = "5. All parameters AND Test for Future Proofing",
+          .mrpConfig    = ReliableMessageProtocolConfig(System::Clock::Milliseconds32(1600), System::Clock::Milliseconds32(2100),
+                                                        System::Clock::Milliseconds16(1300)),
+          .includeVersionInfo              = true,
+          .dataModelRev                    = 1,
+          .interactionModelRev             = 2,
+          .specVersion                     = 1,
+          .maxPaths                        = 10,
+          .expectedErrorDecodeParams       = CHIP_NO_ERROR,
+          .expectedErrorOuterExitContainer = CHIP_NO_ERROR,
+          .testFutureProofing              = true },
+
+        // test case is expected to fail since the nested end container is not included in the encoded TLV packet. However, The
+        // failure will occur at the outer ExitContainer since the inner ExitContainer will SkipToEndOfContainer
+        { .testCaseName = "6. All parameters AND Exclude End Container",
+          .mrpConfig    = ReliableMessageProtocolConfig(System::Clock::Milliseconds32(1500), System::Clock::Milliseconds32(2500),
+                                                        System::Clock::Milliseconds16(1500)),
+          .includeVersionInfo              = true,
+          .dataModelRev                    = 1,
+          .interactionModelRev             = 2,
+          .specVersion                     = 1,
+          .maxPaths                        = 10,
+          .expectedErrorDecodeParams       = CHIP_NO_ERROR,
+          .expectedErrorOuterExitContainer = CHIP_END_OF_TLV,
+          .includeEndContainer             = false },
+
+        { .testCaseName = "7. Only MRP Params AND Exclude End Container",
+          .mrpConfig    = ReliableMessageProtocolConfig(System::Clock::Milliseconds32(1500), System::Clock::Milliseconds32(2500),
+                                                        System::Clock::Milliseconds16(1500)),
+          .includeVersionInfo              = false,
+          .expectedErrorDecodeParams       = CHIP_NO_ERROR,
+          .expectedErrorOuterExitContainer = CHIP_END_OF_TLV,
+          .includeEndContainer             = false },
+
+        // Testing the corner case where a TLV element is added to the specification in the future, yet no EndContainer is
+        // included in the nested session-parameter-struct
+        { .testCaseName = "8. All parameters AND Test Future Proofing AND Exclude End Container",
+          .mrpConfig    = ReliableMessageProtocolConfig(System::Clock::Milliseconds32(1500), System::Clock::Milliseconds32(2500),
+                                                        System::Clock::Milliseconds16(1500)),
+          .includeVersionInfo              = true,
+          .dataModelRev                    = 1,
+          .interactionModelRev             = 2,
+          .specVersion                     = 1,
+          .maxPaths                        = 10,
+          .expectedErrorDecodeParams       = CHIP_NO_ERROR,
+          .expectedErrorOuterExitContainer = CHIP_END_OF_TLV,
+          .testFutureProofing              = true,
+          .includeEndContainer             = false },
+
+    };
+
+    bool testFailed = false;
+
+    for (const auto & testCase : testCases)
+    {
+        System::PacketBufferHandle msg = System::PacketBufferHandle::New(64, 0);
+        System::PacketBufferTLVWriter writer;
+        writer.Init(msg.Retain());
+        TLVType outerContainerType = kTLVType_NotSpecified;
+
+        EXPECT_EQ(writer.StartContainer(AnonymousTag(), kTLVType_Structure, outerContainerType), CHIP_NO_ERROR);
+        EncodeSessionParamsHelper(testCase, writer);
+        EXPECT_EQ(writer.EndContainer(outerContainerType), CHIP_NO_ERROR);
+        EXPECT_EQ(writer.Finalize(&msg), CHIP_NO_ERROR);
+
+        SessionParameters decodedParams;
+        System::PacketBufferTLVReader reader;
+        TLVType containerType = kTLVType_Structure;
+        reader.Init(std::move(msg));
+        EXPECT_EQ(reader.Next(containerType, AnonymousTag()), CHIP_NO_ERROR);
+        EXPECT_EQ(reader.EnterContainer(containerType), CHIP_NO_ERROR);
+        EXPECT_EQ(reader.Next(), CHIP_NO_ERROR);
+
+        bool testCaseFailed = false;
+        CHIP_ERROR err      = CHIP_NO_ERROR;
+
+        err = DecodeSessionParametersIfPresent(ContextTag(kSessionParamsStructTag), reader, decodedParams);
+        if (err != testCase.expectedErrorDecodeParams)
+        {
+            printf("\nDecodeSessionParametersIfPresent returned Unexpected error code: %" CHIP_ERROR_FORMAT, err.Format());
+            printf("\nExpected Error Code: %" CHIP_ERROR_FORMAT "\n", testCase.expectedErrorDecodeParams.Format());
+
+            testCaseFailed = true;
+        }
+        err = reader.Next();
+        EXPECT_TRUE(err == CHIP_NO_ERROR || err == CHIP_END_OF_TLV);
+        if (reader.ExitContainer(containerType) != testCase.expectedErrorOuterExitContainer)
+        {
+            printf("\nOuter ExitContainer() returned Unexpected error code: %" CHIP_ERROR_FORMAT, err.Format());
+            printf("\nExpected Error Code: %" CHIP_ERROR_FORMAT "\n", testCase.expectedErrorOuterExitContainer.Format());
+            testCaseFailed = true;
+        }
+
+        if (!testCaseFailed)
+        {
+            bool verifyResult = VerifyDecodedParameters(testCase, decodedParams);
+            if (!verifyResult)
+            {
+                testCaseFailed = true;
+            }
+        }
+
+        if (!testCaseFailed)
+        {
+            printf("\n[PASSED] TestCaseName%s\n\n", testCase.testCaseName.c_str());
+        }
+        else
+        {
+            printf("\n[FAILED] TestCaseName: %s\n\n", testCase.testCaseName.c_str());
+            testFailed = true;
+        }
+    }
+    EXPECT_FALSE(testFailed);
+}
+
+// =============================================================================
+// Tests for PairingSession::OnSessionReleased
+// =============================================================================
+//
+// These tests target two properties of PairingSession::OnSessionReleased():
+//
+//   1. Ordering: the delegate is notified *after* the session's own state has
+//      been cleared (verified via the initiator's synchronous path).
+//
+//   2. Lifetime safety (responder path): the scheduled lambda captures the
+//      delegate pointer by value and never touches 'this', so the callback is
+//      safe even if the PairingSession object is freed before the event loop
+//      drains the queued work.
+//
+// The responder tests require the DeviceLayer system layer to dispatch the
+// scheduled lambda, so this fixture initialises the chip stack.
+
+namespace {
+
+// Minimal concrete PairingSession that exposes the protected role and delegate
+// fields so tests can configure them directly, without the overhead of a full
+// CASE or PASE session.
+class FakePairingSession : public PairingSession
+{
+public:
+    Transport::SecureSession::Type GetSecureSessionType() const override { return Transport::SecureSession::Type::kPASE; }
+    ScopedNodeId GetPeer() const override { return ScopedNodeId(); }
+    ScopedNodeId GetLocalScopedNodeId() const override { return ScopedNodeId(); }
+    CATValues GetPeerCATs() const override { return CATValues(); }
+    CHIP_ERROR DeriveSecureSession(CryptoContext &) override { return CHIP_NO_ERROR; }
+
+    void SetAsInitiator() { mRole = CryptoContext::SessionRole::kInitiator; }
+    void SetAsResponder() { mRole = CryptoContext::SessionRole::kResponder; }
+    void SetDelegate(SessionEstablishmentDelegate * delegate) { mDelegate = delegate; }
+    bool HasDelegate() const { return mDelegate != nullptr; }
+
+    // In production, mSystemLayer is set by AllocateSecureSession().  Tests that
+    // exercise the responder async path must supply a system layer directly since
+    // they bypass full session allocation.
+    void SetSystemLayer(System::Layer & layer) { mSystemLayer = &layer; }
+};
+
+class MockDelegate : public SessionEstablishmentDelegate
+{
+public:
+    int callCount        = 0;
+    CHIP_ERROR lastError = CHIP_NO_ERROR;
+
+    void OnSessionEstablishmentError(CHIP_ERROR error, SessionEstablishmentStage) override
+    {
+        ++callCount;
+        lastError = error;
+    }
+};
+
+} // namespace
+
+class TestPairingSessionOnSessionReleased : public ::testing::Test
+{
+public:
+    static void SetUpTestSuite()
+    {
+        ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR);
+        ASSERT_EQ(chip::DeviceLayer::PlatformMgr().InitChipStack(), CHIP_NO_ERROR);
+    }
+    static void TearDownTestSuite()
+    {
+        chip::DeviceLayer::PlatformMgr().Shutdown();
+        chip::Platform::MemoryShutdown();
+    }
+
+    // Drain all work items already queued on the system layer by scheduling a
+    // stop item immediately after them and running the event loop until it fires.
+    // Both ScheduleLambda and ScheduleWork post to the same FIFO queue, so the
+    // stop is guaranteed to execute after any previously queued lambdas.
+    static void DrainSystemLayer()
+    {
+        EXPECT_SUCCESS(chip::DeviceLayer::PlatformMgr().ScheduleWork(
+            [](intptr_t) -> void { RETURN_SAFELY_IGNORED chip::DeviceLayer::PlatformMgr().StopEventLoopTask(); }, 0));
+        chip::DeviceLayer::PlatformMgr().RunEventLoop();
+    }
+};
+
+// --- Initiator path (synchronous notification) ---
+
+// The delegate must be called exactly once, synchronously, with CONNECTION_ABORTED.
+// mDelegate is nulled before the call so that re-entrant or repeated invocations
+// of OnSessionReleased cannot produce a second notification.
+TEST_F(TestPairingSessionOnSessionReleased, InitiatorDelegateCalledSynchronously)
+{
+    FakePairingSession session;
+    MockDelegate delegate;
+    session.SetAsInitiator();
+    session.SetDelegate(&delegate);
+
+    session.OnSessionReleased();
+
+    EXPECT_EQ(delegate.callCount, 1);
+    EXPECT_EQ(delegate.lastError, CHIP_ERROR_CONNECTION_ABORTED);
+    // mDelegate must already be null — it is cleared before the callback fires.
+    EXPECT_FALSE(session.HasDelegate());
+}
+
+TEST_F(TestPairingSessionOnSessionReleased, InitiatorNoDoubleNotification)
+{
+    FakePairingSession session;
+    MockDelegate delegate;
+    session.SetAsInitiator();
+    session.SetDelegate(&delegate);
+
+    session.OnSessionReleased();
+    session.OnSessionReleased(); // mDelegate is already null — must be a no-op
+
+    EXPECT_EQ(delegate.callCount, 1);
+}
+
+// --- Responder path (asynchronous notification via ScheduleLambda) ---
+
+// The delegate must not be called until the event loop drains the queued lambda.
+// mDelegate must already be null immediately after OnSessionReleased() returns,
+// proving the delegate was extracted by value before the lambda was queued.
+TEST_F(TestPairingSessionOnSessionReleased, ResponderDelegateCalledAsync)
+{
+    FakePairingSession session;
+    MockDelegate delegate;
+    session.SetAsResponder();
+    session.SetDelegate(&delegate);
+    session.SetSystemLayer(chip::DeviceLayer::SystemLayer());
+
+    session.OnSessionReleased();
+
+    EXPECT_EQ(delegate.callCount, 0);    // not yet fired
+    EXPECT_FALSE(session.HasDelegate()); // already extracted and nulled
+
+    DrainSystemLayer();
+
+    EXPECT_EQ(delegate.callCount, 1);
+    EXPECT_EQ(delegate.lastError, CHIP_ERROR_CONNECTION_ABORTED);
+}
+
+// A second call to OnSessionReleased() before the event loop drains must not
+// queue a second lambda (mDelegate was already nulled by the first call).
+TEST_F(TestPairingSessionOnSessionReleased, ResponderNoDoubleNotification)
+{
+    FakePairingSession session;
+    MockDelegate delegate;
+    session.SetAsResponder();
+    session.SetDelegate(&delegate);
+    session.SetSystemLayer(chip::DeviceLayer::SystemLayer());
+
+    session.OnSessionReleased();
+    session.OnSessionReleased();
+
+    DrainSystemLayer();
+
+    EXPECT_EQ(delegate.callCount, 1);
+}
+
+// Regression test for use-after-free: the old implementation captured 'this'
+// in the responder-path lambda.  PairingSession objects live in a pool and can
+// be recycled immediately after OnSessionReleased() returns, so that lambda
+// would read freed (and potentially reused) memory when the event loop fired.
+//
+// The fix captures only the delegate pointer by value; 'this' is never accessed
+// inside the lambda.  Destroying the session object before DrainSystemLayer()
+// verifies this: under AddressSanitizer the freed memory is poisoned, turning
+// any stale 'this' access into a hard failure rather than silent corruption.
+TEST_F(TestPairingSessionOnSessionReleased, ResponderSafeAfterSessionObjectFreed)
+{
+    MockDelegate delegate;
+
+    auto * session = chip::Platform::New<FakePairingSession>();
+    ASSERT_NE(session, nullptr);
+    session->SetAsResponder();
+    session->SetDelegate(&delegate);
+    session->SetSystemLayer(chip::DeviceLayer::SystemLayer());
+
+    session->OnSessionReleased();
+
+    // Free the session object before the queued lambda has a chance to fire.
+    chip::Platform::Delete(session);
+
+    DrainSystemLayer();
+
+    EXPECT_EQ(delegate.callCount, 1);
+    EXPECT_EQ(delegate.lastError, CHIP_ERROR_CONNECTION_ABORTED);
+}

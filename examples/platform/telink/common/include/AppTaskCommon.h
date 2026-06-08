@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2022-2024 Project CHIP Authors
+ *    Copyright (c) 2022-2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -67,6 +67,15 @@ public:
     CHIP_ERROR StartApp();
     void PostEvent(AppEvent * event);
 
+    static bool sIsCommissioningFailed;
+    static bool IsCommissioningFailed(void) { return sIsCommissioningFailed; }
+
+#ifdef CONFIG_TFLM_FEATURE
+    void SetThreadStateChangedEventCapturedFlag(void) { mThreadStateChangedEventCaptured = true; }
+
+    bool GetThreadStateChangedEventCapturedFlag(void) { return mThreadStateChangedEventCaptured; }
+#endif
+
     static void IdentifyEffectHandler(Clusters::Identify::EffectIdentifierEnum aEffect);
     static void IdentifyStartHandler(Identify *);
     static void IdentifyStopHandler(Identify *);
@@ -76,14 +85,23 @@ public:
     {
         kButtonId_ExampleAction = 1,
         kButtonId_FactoryReset,
-        kButtonId_StartWiFi,
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
         kButtonId_StartThread,
+#elif CHIP_DEVICE_CONFIG_ENABLE_WIFI
+        kButtonId_StartWiFi,
+#endif
         kButtonId_StartBleAdv
     } ButtonId;
 #endif
 
+#ifdef CONFIG_TFLM_FEATURE
+    static void TriggerMicroSpeechCallback();
+    static void TriggerMicroSpeechEventHandler(AppEvent * aEvent);
+#endif
+
 protected:
     CHIP_ERROR InitCommonParts(void);
+    void PrintFirmwareInfo(void);
 
     void DispatchEvent(AppEvent * event);
     void GetEvent(AppEvent * aEvent);
@@ -111,6 +129,11 @@ protected:
     static void StartWiFiHandler(AppEvent * aEvent);
 #endif
 
+#if CONFIG_TELINK_OTA_BUTTON_TEST
+    static void TestOTAButtonEventHandler(void);
+    static void TestOTAHandler(AppEvent * aEvent);
+#endif
+
     static void ExampleActionButtonEventHandler(void);
 
     void SetExampleButtonCallbacks(EventHandler aAction_CB);
@@ -127,5 +150,9 @@ protected:
 #ifdef CONFIG_CHIP_PW_RPC
     friend class chip::rpc::TelinkButton;
     static void ButtonEventHandler(ButtonId_t btnId, bool btnPressed);
+#endif
+
+#ifdef CONFIG_TFLM_FEATURE
+    bool mThreadStateChangedEventCaptured;
 #endif
 };

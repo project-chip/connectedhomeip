@@ -24,11 +24,16 @@
 
 #pragma once
 
+#include <lib/core/CHIPError.h>
 #include <platform/internal/GenericPlatformManagerImpl_CMSISOS.h>
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
-#include "wfx_host_events.h"
+#include <platform/silabs/wifi/WifiInterface.h> // nogncheck
 #endif
 #include <cmsis_os2.h>
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
+void HandleWFXSystemEvent(sl_wfx_generic_message_t * eventData);
+#endif
 
 namespace chip {
 namespace DeviceLayer {
@@ -62,9 +67,6 @@ class PlatformManagerImpl final : public PlatformManager, public Internal::Gener
 
 public:
     // ===== Platform-specific members that may be accessed directly by the application.
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
-    void HandleWFXSystemEvent(wfx_event_base_t eventBase, sl_wfx_generic_message_t * eventData);
-#endif
 
     System::Clock::Timestamp GetStartTime() { return mStartTime; }
 
@@ -72,6 +74,27 @@ private:
     // ===== Members for internal use
 
     static void UpdateOperationalHours(System::Layer * systemLayer, void * appState);
+
+    // ===== Platform error formatting support
+
+    /**
+     * Register a text error formatter for Silabs platform errors.
+     */
+    static void RegisterSilabsPlatformErrorFormatter();
+
+    /**
+     * Given a CHIP error value that represents a Silabs platform error, returns a
+     * human-readable NULL-terminated C string describing the error.
+     *
+     * @param[in] buf                   Buffer into which the error string will be placed.
+     * @param[in] bufSize               Size of the supplied buffer in bytes.
+     * @param[in] err                   The error to be described.
+     *
+     * @return true                     If a description string was written into the supplied buffer.
+     * @return false                    If the supplied error was not a Silabs platform error.
+     *
+     */
+    static bool FormatError(char * buf, uint16_t bufSize, CHIP_ERROR err);
 
     // ===== Methods that implement the PlatformManager abstract interface.
 

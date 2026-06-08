@@ -255,27 +255,6 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedIdentifyClusterEventListAttributeCallback implements ChipClusters.IdentifyCluster.EventListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
   public static class DelegatedIdentifyClusterAttributeListAttributeCallback implements ChipClusters.IdentifyCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -438,27 +417,6 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedGroupsClusterEventListAttributeCallback implements ChipClusters.GroupsCluster.EventListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
   public static class DelegatedGroupsClusterAttributeListAttributeCallback implements ChipClusters.GroupsCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -523,27 +481,6 @@ public class ClusterInfoMapping {
   }
 
   public static class DelegatedOnOffClusterAcceptedCommandListAttributeCallback implements ChipClusters.OnOffCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
-  public static class DelegatedOnOffClusterEventListAttributeCallback implements ChipClusters.OnOffCluster.EventListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -753,27 +690,6 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedLevelControlClusterEventListAttributeCallback implements ChipClusters.LevelControlCluster.EventListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
   public static class DelegatedLevelControlClusterAttributeListAttributeCallback implements ChipClusters.LevelControlCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -817,27 +733,6 @@ public class ClusterInfoMapping {
   }
 
   public static class DelegatedPulseWidthModulationClusterAcceptedCommandListAttributeCallback implements ChipClusters.PulseWidthModulationCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
-  public static class DelegatedPulseWidthModulationClusterEventListAttributeCallback implements ChipClusters.PulseWidthModulationCluster.EventListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -1026,27 +921,6 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedDescriptorClusterEventListAttributeCallback implements ChipClusters.DescriptorCluster.EventListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
   public static class DelegatedDescriptorClusterAttributeListAttributeCallback implements ChipClusters.DescriptorCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -1111,27 +985,6 @@ public class ClusterInfoMapping {
   }
 
   public static class DelegatedBindingClusterAcceptedCommandListAttributeCallback implements ChipClusters.BindingCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
-  public static class DelegatedBindingClusterEventListAttributeCallback implements ChipClusters.BindingCluster.EventListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -1279,6 +1132,27 @@ public class ClusterInfoMapping {
     }
   }
 
+  public static class DelegatedAccessControlClusterAuxiliaryACLAttributeCallback implements ChipClusters.AccessControlCluster.AuxiliaryACLAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<ChipStructs.AccessControlClusterAccessControlEntryStruct> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.AccessControlClusterAccessControlEntryStruct>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
   public static class DelegatedAccessControlClusterGeneratedCommandListAttributeCallback implements ChipClusters.AccessControlCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -1301,27 +1175,6 @@ public class ClusterInfoMapping {
   }
 
   public static class DelegatedAccessControlClusterAcceptedCommandListAttributeCallback implements ChipClusters.AccessControlCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
-  public static class DelegatedAccessControlClusterEventListAttributeCallback implements ChipClusters.AccessControlCluster.EventListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -1447,27 +1300,6 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedActionsClusterEventListAttributeCallback implements ChipClusters.ActionsCluster.EventListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
   public static class DelegatedActionsClusterAttributeListAttributeCallback implements ChipClusters.ActionsCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -1531,6 +1363,27 @@ public class ClusterInfoMapping {
     }
   }
 
+  public static class DelegatedBasicInformationClusterDeviceLocationAttributeCallback implements ChipClusters.BasicInformationCluster.DeviceLocationAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable ChipStructs.BasicInformationClusterLocationDescriptorStruct value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "ChipStructs.BasicInformationClusterLocationDescriptorStruct");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
   public static class DelegatedBasicInformationClusterGeneratedCommandListAttributeCallback implements ChipClusters.BasicInformationCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -1553,27 +1406,6 @@ public class ClusterInfoMapping {
   }
 
   public static class DelegatedBasicInformationClusterAcceptedCommandListAttributeCallback implements ChipClusters.BasicInformationCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
-  public static class DelegatedBasicInformationClusterEventListAttributeCallback implements ChipClusters.BasicInformationCluster.EventListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -1717,27 +1549,6 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedOtaSoftwareUpdateProviderClusterEventListAttributeCallback implements ChipClusters.OtaSoftwareUpdateProviderCluster.EventListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
   public static class DelegatedOtaSoftwareUpdateProviderClusterAttributeListAttributeCallback implements ChipClusters.OtaSoftwareUpdateProviderCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -1843,27 +1654,6 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedOtaSoftwareUpdateRequestorClusterEventListAttributeCallback implements ChipClusters.OtaSoftwareUpdateRequestorCluster.EventListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
   public static class DelegatedOtaSoftwareUpdateRequestorClusterAttributeListAttributeCallback implements ChipClusters.OtaSoftwareUpdateRequestorCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -1928,27 +1718,6 @@ public class ClusterInfoMapping {
   }
 
   public static class DelegatedLocalizationConfigurationClusterAcceptedCommandListAttributeCallback implements ChipClusters.LocalizationConfigurationCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
-  public static class DelegatedLocalizationConfigurationClusterEventListAttributeCallback implements ChipClusters.LocalizationConfigurationCluster.EventListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -2053,7 +1822,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedTimeFormatLocalizationClusterEventListAttributeCallback implements ChipClusters.TimeFormatLocalizationCluster.EventListAttributeCallback, DelegatedClusterCallback {
+  public static class DelegatedTimeFormatLocalizationClusterAttributeListAttributeCallback implements ChipClusters.TimeFormatLocalizationCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -2074,7 +1843,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedTimeFormatLocalizationClusterAttributeListAttributeCallback implements ChipClusters.TimeFormatLocalizationCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
+  public static class DelegatedUnitLocalizationClusterSupportedTemperatureUnitsAttributeCallback implements ChipClusters.UnitLocalizationCluster.SupportedTemperatureUnitsAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -2082,9 +1851,9 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(List<Long> valueList) {
+    public void onSuccess(List<Integer> valueList) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Integer>");
       responseValues.put(commandResponseInfo, valueList);
       callback.onSuccess(responseValues);
     }
@@ -2117,27 +1886,6 @@ public class ClusterInfoMapping {
   }
 
   public static class DelegatedUnitLocalizationClusterAcceptedCommandListAttributeCallback implements ChipClusters.UnitLocalizationCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
-  public static class DelegatedUnitLocalizationClusterEventListAttributeCallback implements ChipClusters.UnitLocalizationCluster.EventListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -2222,27 +1970,6 @@ public class ClusterInfoMapping {
   }
 
   public static class DelegatedPowerSourceConfigurationClusterAcceptedCommandListAttributeCallback implements ChipClusters.PowerSourceConfigurationCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
-  public static class DelegatedPowerSourceConfigurationClusterEventListAttributeCallback implements ChipClusters.PowerSourceConfigurationCluster.EventListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -2578,27 +2305,6 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedPowerSourceClusterEventListAttributeCallback implements ChipClusters.PowerSourceCluster.EventListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
   public static class DelegatedPowerSourceClusterAttributeListAttributeCallback implements ChipClusters.PowerSourceCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -2735,6 +2441,48 @@ public class ClusterInfoMapping {
     }
   }
 
+  public static class DelegatedGeneralCommissioningClusterTCUpdateDeadlineAttributeCallback implements ChipClusters.GeneralCommissioningCluster.TCUpdateDeadlineAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable Long value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "Long");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedGeneralCommissioningClusterNetworkRecoveryReasonAttributeCallback implements ChipClusters.GeneralCommissioningCluster.NetworkRecoveryReasonAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable Integer value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "Integer");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
   public static class DelegatedGeneralCommissioningClusterGeneratedCommandListAttributeCallback implements ChipClusters.GeneralCommissioningCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -2757,27 +2505,6 @@ public class ClusterInfoMapping {
   }
 
   public static class DelegatedGeneralCommissioningClusterAcceptedCommandListAttributeCallback implements ChipClusters.GeneralCommissioningCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
-  public static class DelegatedGeneralCommissioningClusterEventListAttributeCallback implements ChipClusters.GeneralCommissioningCluster.EventListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -3076,27 +2803,6 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedNetworkCommissioningClusterEventListAttributeCallback implements ChipClusters.NetworkCommissioningCluster.EventListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
   public static class DelegatedNetworkCommissioningClusterAttributeListAttributeCallback implements ChipClusters.NetworkCommissioningCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -3168,27 +2874,6 @@ public class ClusterInfoMapping {
   }
 
   public static class DelegatedDiagnosticLogsClusterAcceptedCommandListAttributeCallback implements ChipClusters.DiagnosticLogsCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
-  public static class DelegatedDiagnosticLogsClusterEventListAttributeCallback implements ChipClusters.DiagnosticLogsCluster.EventListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -3360,6 +3045,27 @@ public class ClusterInfoMapping {
     }
   }
 
+  public static class DelegatedGeneralDiagnosticsClusterDeviceLoadStatusAttributeCallback implements ChipClusters.GeneralDiagnosticsCluster.DeviceLoadStatusAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(ChipStructs.GeneralDiagnosticsClusterDeviceLoadStruct value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "ChipStructs.GeneralDiagnosticsClusterDeviceLoadStruct");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
   public static class DelegatedGeneralDiagnosticsClusterGeneratedCommandListAttributeCallback implements ChipClusters.GeneralDiagnosticsCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -3382,27 +3088,6 @@ public class ClusterInfoMapping {
   }
 
   public static class DelegatedGeneralDiagnosticsClusterAcceptedCommandListAttributeCallback implements ChipClusters.GeneralDiagnosticsCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
-  public static class DelegatedGeneralDiagnosticsClusterEventListAttributeCallback implements ChipClusters.GeneralDiagnosticsCluster.EventListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -3487,27 +3172,6 @@ public class ClusterInfoMapping {
   }
 
   public static class DelegatedSoftwareDiagnosticsClusterAcceptedCommandListAttributeCallback implements ChipClusters.SoftwareDiagnosticsCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
-  public static class DelegatedSoftwareDiagnosticsClusterEventListAttributeCallback implements ChipClusters.SoftwareDiagnosticsCluster.EventListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -3969,6 +3633,48 @@ public class ClusterInfoMapping {
     }
   }
 
+  public static class DelegatedThreadNetworkDiagnosticsClusterExtAddressAttributeCallback implements ChipClusters.ThreadNetworkDiagnosticsCluster.ExtAddressAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable Long value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "Long");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedThreadNetworkDiagnosticsClusterRloc16AttributeCallback implements ChipClusters.ThreadNetworkDiagnosticsCluster.Rloc16AttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable Integer value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "Integer");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
   public static class DelegatedThreadNetworkDiagnosticsClusterGeneratedCommandListAttributeCallback implements ChipClusters.ThreadNetworkDiagnosticsCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -3991,27 +3697,6 @@ public class ClusterInfoMapping {
   }
 
   public static class DelegatedThreadNetworkDiagnosticsClusterAcceptedCommandListAttributeCallback implements ChipClusters.ThreadNetworkDiagnosticsCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
-  public static class DelegatedThreadNetworkDiagnosticsClusterEventListAttributeCallback implements ChipClusters.ThreadNetworkDiagnosticsCluster.EventListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -4368,27 +4053,6 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedWiFiNetworkDiagnosticsClusterEventListAttributeCallback implements ChipClusters.WiFiNetworkDiagnosticsCluster.EventListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
   public static class DelegatedWiFiNetworkDiagnosticsClusterAttributeListAttributeCallback implements ChipClusters.WiFiNetworkDiagnosticsCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -4495,27 +4159,6 @@ public class ClusterInfoMapping {
   }
 
   public static class DelegatedEthernetNetworkDiagnosticsClusterAcceptedCommandListAttributeCallback implements ChipClusters.EthernetNetworkDiagnosticsCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
-  public static class DelegatedEthernetNetworkDiagnosticsClusterEventListAttributeCallback implements ChipClusters.EthernetNetworkDiagnosticsCluster.EventListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -4747,27 +4390,6 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedTimeSynchronizationClusterEventListAttributeCallback implements ChipClusters.TimeSynchronizationCluster.EventListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
   public static class DelegatedTimeSynchronizationClusterAttributeListAttributeCallback implements ChipClusters.TimeSynchronizationCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -4810,6 +4432,27 @@ public class ClusterInfoMapping {
     }
   }
 
+  public static class DelegatedBridgedDeviceBasicInformationClusterDeviceLocationAttributeCallback implements ChipClusters.BridgedDeviceBasicInformationCluster.DeviceLocationAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable ChipStructs.BridgedDeviceBasicInformationClusterLocationDescriptorStruct value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "ChipStructs.BridgedDeviceBasicInformationClusterLocationDescriptorStruct");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
   public static class DelegatedBridgedDeviceBasicInformationClusterGeneratedCommandListAttributeCallback implements ChipClusters.BridgedDeviceBasicInformationCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -4832,27 +4475,6 @@ public class ClusterInfoMapping {
   }
 
   public static class DelegatedBridgedDeviceBasicInformationClusterAcceptedCommandListAttributeCallback implements ChipClusters.BridgedDeviceBasicInformationCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
-  public static class DelegatedBridgedDeviceBasicInformationClusterEventListAttributeCallback implements ChipClusters.BridgedDeviceBasicInformationCluster.EventListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -4916,27 +4538,6 @@ public class ClusterInfoMapping {
   }
 
   public static class DelegatedSwitchClusterAcceptedCommandListAttributeCallback implements ChipClusters.SwitchCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
-  public static class DelegatedSwitchClusterEventListAttributeCallback implements ChipClusters.SwitchCluster.EventListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -5042,27 +4643,6 @@ public class ClusterInfoMapping {
   }
 
   public static class DelegatedAdministratorCommissioningClusterAcceptedCommandListAttributeCallback implements ChipClusters.AdministratorCommissioningCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
-  public static class DelegatedAdministratorCommissioningClusterEventListAttributeCallback implements ChipClusters.AdministratorCommissioningCluster.EventListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -5200,6 +4780,32 @@ public class ClusterInfoMapping {
       callback.onFailure(error);
     }
   }
+
+  public static class DelegatedOperationalCredentialsClusterSignVIDVerificationResponseCallback implements ChipClusters.OperationalCredentialsCluster.SignVIDVerificationResponseCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(Integer fabricIndex, Integer fabricBindingVersion, byte[] signature) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+
+      CommandResponseInfo fabricIndexResponseValue = new CommandResponseInfo("fabricIndex", "Integer");
+      responseValues.put(fabricIndexResponseValue, fabricIndex);
+      CommandResponseInfo fabricBindingVersionResponseValue = new CommandResponseInfo("fabricBindingVersion", "Integer");
+      responseValues.put(fabricBindingVersionResponseValue, fabricBindingVersion);
+      CommandResponseInfo signatureResponseValue = new CommandResponseInfo("signature", "byte[]");
+      responseValues.put(signatureResponseValue, signature);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
   public static class DelegatedOperationalCredentialsClusterNOCsAttributeCallback implements ChipClusters.OperationalCredentialsCluster.NOCsAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -5285,27 +4891,6 @@ public class ClusterInfoMapping {
   }
 
   public static class DelegatedOperationalCredentialsClusterAcceptedCommandListAttributeCallback implements ChipClusters.OperationalCredentialsCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
-  public static class DelegatedOperationalCredentialsClusterEventListAttributeCallback implements ChipClusters.OperationalCredentialsCluster.EventListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -5434,6 +5019,27 @@ public class ClusterInfoMapping {
     }
   }
 
+  public static class DelegatedGroupKeyManagementClusterGroupcastAdoptionAttributeCallback implements ChipClusters.GroupKeyManagementCluster.GroupcastAdoptionAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<ChipStructs.GroupKeyManagementClusterGroupcastAdoptionStruct> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.GroupKeyManagementClusterGroupcastAdoptionStruct>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
   public static class DelegatedGroupKeyManagementClusterGeneratedCommandListAttributeCallback implements ChipClusters.GroupKeyManagementCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -5456,27 +5062,6 @@ public class ClusterInfoMapping {
   }
 
   public static class DelegatedGroupKeyManagementClusterAcceptedCommandListAttributeCallback implements ChipClusters.GroupKeyManagementCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
-  public static class DelegatedGroupKeyManagementClusterEventListAttributeCallback implements ChipClusters.GroupKeyManagementCluster.EventListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -5581,27 +5166,6 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedFixedLabelClusterEventListAttributeCallback implements ChipClusters.FixedLabelCluster.EventListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
   public static class DelegatedFixedLabelClusterAttributeListAttributeCallback implements ChipClusters.FixedLabelCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -5686,27 +5250,6 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedUserLabelClusterEventListAttributeCallback implements ChipClusters.UserLabelCluster.EventListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
   public static class DelegatedUserLabelClusterAttributeListAttributeCallback implements ChipClusters.UserLabelCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -5750,27 +5293,6 @@ public class ClusterInfoMapping {
   }
 
   public static class DelegatedProxyConfigurationClusterAcceptedCommandListAttributeCallback implements ChipClusters.ProxyConfigurationCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
-  public static class DelegatedProxyConfigurationClusterEventListAttributeCallback implements ChipClusters.ProxyConfigurationCluster.EventListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -5854,27 +5376,6 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedProxyDiscoveryClusterEventListAttributeCallback implements ChipClusters.ProxyDiscoveryCluster.EventListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
   public static class DelegatedProxyDiscoveryClusterAttributeListAttributeCallback implements ChipClusters.ProxyDiscoveryCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -5938,27 +5439,6 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedProxyValidClusterEventListAttributeCallback implements ChipClusters.ProxyValidCluster.EventListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
   public static class DelegatedProxyValidClusterAttributeListAttributeCallback implements ChipClusters.ProxyValidCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -6002,27 +5482,6 @@ public class ClusterInfoMapping {
   }
 
   public static class DelegatedBooleanStateClusterAcceptedCommandListAttributeCallback implements ChipClusters.BooleanStateCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
-  public static class DelegatedBooleanStateClusterEventListAttributeCallback implements ChipClusters.BooleanStateCluster.EventListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -6171,112 +5630,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedIcdManagementClusterEventListAttributeCallback implements ChipClusters.IcdManagementCluster.EventListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
   public static class DelegatedIcdManagementClusterAttributeListAttributeCallback implements ChipClusters.IcdManagementCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
-  public static class DelegatedTimerClusterGeneratedCommandListAttributeCallback implements ChipClusters.TimerCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
-  public static class DelegatedTimerClusterAcceptedCommandListAttributeCallback implements ChipClusters.TimerCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
-  public static class DelegatedTimerClusterEventListAttributeCallback implements ChipClusters.TimerCluster.EventListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
-  public static class DelegatedTimerClusterAttributeListAttributeCallback implements ChipClusters.TimerCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -6466,27 +5820,6 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedOvenCavityOperationalStateClusterEventListAttributeCallback implements ChipClusters.OvenCavityOperationalStateCluster.EventListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
   public static class DelegatedOvenCavityOperationalStateClusterAttributeListAttributeCallback implements ChipClusters.OvenCavityOperationalStateCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -6553,48 +5886,6 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedOvenModeClusterStartUpModeAttributeCallback implements ChipClusters.OvenModeCluster.StartUpModeAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(@Nullable Integer value) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "Integer");
-      responseValues.put(commandResponseInfo, value);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
-  public static class DelegatedOvenModeClusterOnModeAttributeCallback implements ChipClusters.OvenModeCluster.OnModeAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(@Nullable Integer value) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "Integer");
-      responseValues.put(commandResponseInfo, value);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
   public static class DelegatedOvenModeClusterGeneratedCommandListAttributeCallback implements ChipClusters.OvenModeCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -6617,27 +5908,6 @@ public class ClusterInfoMapping {
   }
 
   public static class DelegatedOvenModeClusterAcceptedCommandListAttributeCallback implements ChipClusters.OvenModeCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
-  public static class DelegatedOvenModeClusterEventListAttributeCallback implements ChipClusters.OvenModeCluster.EventListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -6743,27 +6013,6 @@ public class ClusterInfoMapping {
   }
 
   public static class DelegatedLaundryDryerControlsClusterAcceptedCommandListAttributeCallback implements ChipClusters.LaundryDryerControlsCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
-  public static class DelegatedLaundryDryerControlsClusterEventListAttributeCallback implements ChipClusters.LaundryDryerControlsCluster.EventListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -6931,27 +6180,6 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedModeSelectClusterEventListAttributeCallback implements ChipClusters.ModeSelectCluster.EventListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
   public static class DelegatedModeSelectClusterAttributeListAttributeCallback implements ChipClusters.ModeSelectCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -7018,48 +6246,6 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedLaundryWasherModeClusterStartUpModeAttributeCallback implements ChipClusters.LaundryWasherModeCluster.StartUpModeAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(@Nullable Integer value) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "Integer");
-      responseValues.put(commandResponseInfo, value);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
-  public static class DelegatedLaundryWasherModeClusterOnModeAttributeCallback implements ChipClusters.LaundryWasherModeCluster.OnModeAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(@Nullable Integer value) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "Integer");
-      responseValues.put(commandResponseInfo, value);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
   public static class DelegatedLaundryWasherModeClusterGeneratedCommandListAttributeCallback implements ChipClusters.LaundryWasherModeCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -7082,27 +6268,6 @@ public class ClusterInfoMapping {
   }
 
   public static class DelegatedLaundryWasherModeClusterAcceptedCommandListAttributeCallback implements ChipClusters.LaundryWasherModeCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
-  public static class DelegatedLaundryWasherModeClusterEventListAttributeCallback implements ChipClusters.LaundryWasherModeCluster.EventListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -7189,48 +6354,6 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedRefrigeratorAndTemperatureControlledCabinetModeClusterStartUpModeAttributeCallback implements ChipClusters.RefrigeratorAndTemperatureControlledCabinetModeCluster.StartUpModeAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(@Nullable Integer value) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "Integer");
-      responseValues.put(commandResponseInfo, value);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
-  public static class DelegatedRefrigeratorAndTemperatureControlledCabinetModeClusterOnModeAttributeCallback implements ChipClusters.RefrigeratorAndTemperatureControlledCabinetModeCluster.OnModeAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(@Nullable Integer value) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "Integer");
-      responseValues.put(commandResponseInfo, value);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
   public static class DelegatedRefrigeratorAndTemperatureControlledCabinetModeClusterGeneratedCommandListAttributeCallback implements ChipClusters.RefrigeratorAndTemperatureControlledCabinetModeCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -7253,27 +6376,6 @@ public class ClusterInfoMapping {
   }
 
   public static class DelegatedRefrigeratorAndTemperatureControlledCabinetModeClusterAcceptedCommandListAttributeCallback implements ChipClusters.RefrigeratorAndTemperatureControlledCabinetModeCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
-  public static class DelegatedRefrigeratorAndTemperatureControlledCabinetModeClusterEventListAttributeCallback implements ChipClusters.RefrigeratorAndTemperatureControlledCabinetModeCluster.EventListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -7420,27 +6522,6 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedLaundryWasherControlsClusterEventListAttributeCallback implements ChipClusters.LaundryWasherControlsCluster.EventListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
   public static class DelegatedLaundryWasherControlsClusterAttributeListAttributeCallback implements ChipClusters.LaundryWasherControlsCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -7529,27 +6610,6 @@ public class ClusterInfoMapping {
   }
 
   public static class DelegatedRvcRunModeClusterAcceptedCommandListAttributeCallback implements ChipClusters.RvcRunModeCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
-  public static class DelegatedRvcRunModeClusterEventListAttributeCallback implements ChipClusters.RvcRunModeCluster.EventListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -7678,27 +6738,6 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedRvcCleanModeClusterEventListAttributeCallback implements ChipClusters.RvcCleanModeCluster.EventListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
   public static class DelegatedRvcCleanModeClusterAttributeListAttributeCallback implements ChipClusters.RvcCleanModeCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -7783,27 +6822,6 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedTemperatureControlClusterEventListAttributeCallback implements ChipClusters.TemperatureControlCluster.EventListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
   public static class DelegatedTemperatureControlClusterAttributeListAttributeCallback implements ChipClusters.TemperatureControlCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -7847,27 +6865,6 @@ public class ClusterInfoMapping {
   }
 
   public static class DelegatedRefrigeratorAlarmClusterAcceptedCommandListAttributeCallback implements ChipClusters.RefrigeratorAlarmCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
-  public static class DelegatedRefrigeratorAlarmClusterEventListAttributeCallback implements ChipClusters.RefrigeratorAlarmCluster.EventListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -7954,48 +6951,6 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedDishwasherModeClusterStartUpModeAttributeCallback implements ChipClusters.DishwasherModeCluster.StartUpModeAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(@Nullable Integer value) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "Integer");
-      responseValues.put(commandResponseInfo, value);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
-  public static class DelegatedDishwasherModeClusterOnModeAttributeCallback implements ChipClusters.DishwasherModeCluster.OnModeAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(@Nullable Integer value) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "Integer");
-      responseValues.put(commandResponseInfo, value);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
   public static class DelegatedDishwasherModeClusterGeneratedCommandListAttributeCallback implements ChipClusters.DishwasherModeCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -8018,27 +6973,6 @@ public class ClusterInfoMapping {
   }
 
   public static class DelegatedDishwasherModeClusterAcceptedCommandListAttributeCallback implements ChipClusters.DishwasherModeCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
-  public static class DelegatedDishwasherModeClusterEventListAttributeCallback implements ChipClusters.DishwasherModeCluster.EventListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -8122,27 +7056,6 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedAirQualityClusterEventListAttributeCallback implements ChipClusters.AirQualityCluster.EventListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
   public static class DelegatedAirQualityClusterAttributeListAttributeCallback implements ChipClusters.AirQualityCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -8206,27 +7119,6 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedSmokeCoAlarmClusterEventListAttributeCallback implements ChipClusters.SmokeCoAlarmCluster.EventListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
   public static class DelegatedSmokeCoAlarmClusterAttributeListAttributeCallback implements ChipClusters.SmokeCoAlarmCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -8270,27 +7162,6 @@ public class ClusterInfoMapping {
   }
 
   public static class DelegatedDishwasherAlarmClusterAcceptedCommandListAttributeCallback implements ChipClusters.DishwasherAlarmCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
-  public static class DelegatedDishwasherAlarmClusterEventListAttributeCallback implements ChipClusters.DishwasherAlarmCluster.EventListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -8395,27 +7266,6 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedMicrowaveOvenModeClusterEventListAttributeCallback implements ChipClusters.MicrowaveOvenModeCluster.EventListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
   public static class DelegatedMicrowaveOvenModeClusterAttributeListAttributeCallback implements ChipClusters.MicrowaveOvenModeCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -8480,27 +7330,6 @@ public class ClusterInfoMapping {
   }
 
   public static class DelegatedMicrowaveOvenControlClusterAcceptedCommandListAttributeCallback implements ChipClusters.MicrowaveOvenControlCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
-  public static class DelegatedMicrowaveOvenControlClusterEventListAttributeCallback implements ChipClusters.MicrowaveOvenControlCluster.EventListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -8711,27 +7540,6 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedOperationalStateClusterEventListAttributeCallback implements ChipClusters.OperationalStateCluster.EventListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
   public static class DelegatedOperationalStateClusterAttributeListAttributeCallback implements ChipClusters.OperationalStateCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -8922,27 +7730,6 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedRvcOperationalStateClusterEventListAttributeCallback implements ChipClusters.RvcOperationalStateCluster.EventListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
   public static class DelegatedRvcOperationalStateClusterAttributeListAttributeCallback implements ChipClusters.RvcOperationalStateCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -8999,7 +7786,7 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(Integer status, Integer groupID, Integer sceneID, Optional<Long> transitionTime, Optional<String> sceneName, Optional<ArrayList<ChipStructs.ScenesManagementClusterExtensionFieldSet>> extensionFieldSets) {
+    public void onSuccess(Integer status, Integer groupID, Integer sceneID, Optional<Long> transitionTime, Optional<String> sceneName, Optional<ArrayList<ChipStructs.ScenesManagementClusterExtensionFieldSetStruct>> extensionFieldSetStructs) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 
       CommandResponseInfo statusResponseValue = new CommandResponseInfo("status", "Integer");
@@ -9012,7 +7799,7 @@ public class ClusterInfoMapping {
       responseValues.put(transitionTimeResponseValue, transitionTime);
       CommandResponseInfo sceneNameResponseValue = new CommandResponseInfo("sceneName", "Optional<String>");
       responseValues.put(sceneNameResponseValue, sceneName);
-      // extensionFieldSets: ExtensionFieldSet
+      // extensionFieldSetStructs: ExtensionFieldSetStruct
       // Conversion from this type to Java is not properly implemented yet
 
       callback.onSuccess(responseValues);
@@ -9154,27 +7941,6 @@ public class ClusterInfoMapping {
       callback.onFailure(error);
     }
   }
-  public static class DelegatedScenesManagementClusterLastConfiguredByAttributeCallback implements ChipClusters.ScenesManagementCluster.LastConfiguredByAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(@Nullable Long value) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "Long");
-      responseValues.put(commandResponseInfo, value);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
   public static class DelegatedScenesManagementClusterFabricSceneInfoAttributeCallback implements ChipClusters.ScenesManagementCluster.FabricSceneInfoAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -9238,7 +8004,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedScenesManagementClusterEventListAttributeCallback implements ChipClusters.ScenesManagementCluster.EventListAttributeCallback, DelegatedClusterCallback {
+  public static class DelegatedScenesManagementClusterAttributeListAttributeCallback implements ChipClusters.ScenesManagementCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -9259,7 +8025,95 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedScenesManagementClusterAttributeListAttributeCallback implements ChipClusters.ScenesManagementCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
+
+  public static class DelegatedGroupcastClusterLeaveGroupResponseCallback implements ChipClusters.GroupcastCluster.LeaveGroupResponseCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(Integer groupID, ArrayList<Integer> endpoints) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+
+      CommandResponseInfo groupIDResponseValue = new CommandResponseInfo("groupID", "Integer");
+      responseValues.put(groupIDResponseValue, groupID);
+      // endpoints: endpoint_no
+      // Conversion from this type to Java is not properly implemented yet
+
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
+  public static class DelegatedGroupcastClusterMembershipAttributeCallback implements ChipClusters.GroupcastCluster.MembershipAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<ChipStructs.GroupcastClusterMembershipStruct> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.GroupcastClusterMembershipStruct>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedGroupcastClusterGeneratedCommandListAttributeCallback implements ChipClusters.GroupcastCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedGroupcastClusterAcceptedCommandListAttributeCallback implements ChipClusters.GroupcastCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedGroupcastClusterAttributeListAttributeCallback implements ChipClusters.GroupcastCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -9344,27 +8198,6 @@ public class ClusterInfoMapping {
   }
 
   public static class DelegatedHepaFilterMonitoringClusterAcceptedCommandListAttributeCallback implements ChipClusters.HepaFilterMonitoringCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
-  public static class DelegatedHepaFilterMonitoringClusterEventListAttributeCallback implements ChipClusters.HepaFilterMonitoringCluster.EventListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -9490,7 +8323,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedActivatedCarbonFilterMonitoringClusterEventListAttributeCallback implements ChipClusters.ActivatedCarbonFilterMonitoringCluster.EventListAttributeCallback, DelegatedClusterCallback {
+  public static class DelegatedActivatedCarbonFilterMonitoringClusterAttributeListAttributeCallback implements ChipClusters.ActivatedCarbonFilterMonitoringCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -9511,7 +8344,91 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedActivatedCarbonFilterMonitoringClusterAttributeListAttributeCallback implements ChipClusters.ActivatedCarbonFilterMonitoringCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
+  public static class DelegatedWaterTankLevelMonitoringClusterLastChangedTimeAttributeCallback implements ChipClusters.WaterTankLevelMonitoringCluster.LastChangedTimeAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable Long value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "Long");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedWaterTankLevelMonitoringClusterReplacementProductListAttributeCallback implements ChipClusters.WaterTankLevelMonitoringCluster.ReplacementProductListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<ChipStructs.WaterTankLevelMonitoringClusterReplacementProductStruct> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.WaterTankLevelMonitoringClusterReplacementProductStruct>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedWaterTankLevelMonitoringClusterGeneratedCommandListAttributeCallback implements ChipClusters.WaterTankLevelMonitoringCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedWaterTankLevelMonitoringClusterAcceptedCommandListAttributeCallback implements ChipClusters.WaterTankLevelMonitoringCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedWaterTankLevelMonitoringClusterAttributeListAttributeCallback implements ChipClusters.WaterTankLevelMonitoringCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -9554,27 +8471,6 @@ public class ClusterInfoMapping {
   }
 
   public static class DelegatedBooleanStateConfigurationClusterAcceptedCommandListAttributeCallback implements ChipClusters.BooleanStateConfigurationCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
-  public static class DelegatedBooleanStateConfigurationClusterEventListAttributeCallback implements ChipClusters.BooleanStateConfigurationCluster.EventListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -9806,27 +8702,6 @@ public class ClusterInfoMapping {
   }
 
   public static class DelegatedValveConfigurationAndControlClusterAcceptedCommandListAttributeCallback implements ChipClusters.ValveConfigurationAndControlCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
-  public static class DelegatedValveConfigurationAndControlClusterEventListAttributeCallback implements ChipClusters.ValveConfigurationAndControlCluster.EventListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -10267,27 +9142,6 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedElectricalPowerMeasurementClusterEventListAttributeCallback implements ChipClusters.ElectricalPowerMeasurementCluster.EventListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
   public static class DelegatedElectricalPowerMeasurementClusterAttributeListAttributeCallback implements ChipClusters.ElectricalPowerMeasurementCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -10477,27 +9331,6 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedElectricalEnergyMeasurementClusterEventListAttributeCallback implements ChipClusters.ElectricalEnergyMeasurementCluster.EventListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
   public static class DelegatedElectricalEnergyMeasurementClusterAttributeListAttributeCallback implements ChipClusters.ElectricalEnergyMeasurementCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -10561,27 +9394,6 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedWaterHeaterManagementClusterEventListAttributeCallback implements ChipClusters.WaterHeaterManagementCluster.EventListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
   public static class DelegatedWaterHeaterManagementClusterAttributeListAttributeCallback implements ChipClusters.WaterHeaterManagementCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -10603,7 +9415,8 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedDemandResponseLoadControlClusterLoadControlProgramsAttributeCallback implements ChipClusters.DemandResponseLoadControlCluster.LoadControlProgramsAttributeCallback, DelegatedClusterCallback {
+
+  public static class DelegatedCommodityPriceClusterGetDetailedPriceResponseCallback implements ChipClusters.CommodityPriceCluster.GetDetailedPriceResponseCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -10611,9 +9424,95 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(List<ChipStructs.DemandResponseLoadControlClusterLoadControlProgramStruct> valueList) {
+    public void onSuccess(@Nullable ChipStructs.CommodityPriceClusterCommodityPriceStruct currentPrice) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.DemandResponseLoadControlClusterLoadControlProgramStruct>");
+
+      // currentPrice: Struct CommodityPriceStruct
+      // Conversion from this type to Java is not properly implemented yet
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
+
+  public static class DelegatedCommodityPriceClusterGetDetailedForecastResponseCallback implements ChipClusters.CommodityPriceCluster.GetDetailedForecastResponseCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(ArrayList<ChipStructs.CommodityPriceClusterCommodityPriceStruct> priceForecast) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+
+      // priceForecast: CommodityPriceStruct
+      // Conversion from this type to Java is not properly implemented yet
+
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
+  public static class DelegatedCommodityPriceClusterCurrencyAttributeCallback implements ChipClusters.CommodityPriceCluster.CurrencyAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable ChipStructs.CommodityPriceClusterCurrencyStruct value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "ChipStructs.CommodityPriceClusterCurrencyStruct");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedCommodityPriceClusterCurrentPriceAttributeCallback implements ChipClusters.CommodityPriceCluster.CurrentPriceAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable ChipStructs.CommodityPriceClusterCommodityPriceStruct value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "ChipStructs.CommodityPriceClusterCommodityPriceStruct");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedCommodityPriceClusterPriceForecastAttributeCallback implements ChipClusters.CommodityPriceCluster.PriceForecastAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<ChipStructs.CommodityPriceClusterCommodityPriceStruct> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.CommodityPriceClusterCommodityPriceStruct>");
       responseValues.put(commandResponseInfo, valueList);
       callback.onSuccess(responseValues);
     }
@@ -10624,49 +9523,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedDemandResponseLoadControlClusterEventsAttributeCallback implements ChipClusters.DemandResponseLoadControlCluster.EventsAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<ChipStructs.DemandResponseLoadControlClusterLoadControlEventStruct> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.DemandResponseLoadControlClusterLoadControlEventStruct>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
-  public static class DelegatedDemandResponseLoadControlClusterActiveEventsAttributeCallback implements ChipClusters.DemandResponseLoadControlCluster.ActiveEventsAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<ChipStructs.DemandResponseLoadControlClusterLoadControlEventStruct> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.DemandResponseLoadControlClusterLoadControlEventStruct>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
-  public static class DelegatedDemandResponseLoadControlClusterGeneratedCommandListAttributeCallback implements ChipClusters.DemandResponseLoadControlCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
+  public static class DelegatedCommodityPriceClusterGeneratedCommandListAttributeCallback implements ChipClusters.CommodityPriceCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -10687,7 +9544,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedDemandResponseLoadControlClusterAcceptedCommandListAttributeCallback implements ChipClusters.DemandResponseLoadControlCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
+  public static class DelegatedCommodityPriceClusterAcceptedCommandListAttributeCallback implements ChipClusters.CommodityPriceCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -10708,28 +9565,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedDemandResponseLoadControlClusterEventListAttributeCallback implements ChipClusters.DemandResponseLoadControlCluster.EventListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
-  public static class DelegatedDemandResponseLoadControlClusterAttributeListAttributeCallback implements ChipClusters.DemandResponseLoadControlCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
+  public static class DelegatedCommodityPriceClusterAttributeListAttributeCallback implements ChipClusters.CommodityPriceCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -10814,27 +9650,6 @@ public class ClusterInfoMapping {
   }
 
   public static class DelegatedMessagesClusterAcceptedCommandListAttributeCallback implements ChipClusters.MessagesCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
-  public static class DelegatedMessagesClusterEventListAttributeCallback implements ChipClusters.MessagesCluster.EventListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -10940,27 +9755,6 @@ public class ClusterInfoMapping {
   }
 
   public static class DelegatedDeviceEnergyManagementClusterAcceptedCommandListAttributeCallback implements ChipClusters.DeviceEnergyManagementCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
-  public static class DelegatedDeviceEnergyManagementClusterEventListAttributeCallback implements ChipClusters.DeviceEnergyManagementCluster.EventListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -11382,27 +10176,6 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedEnergyEvseClusterEventListAttributeCallback implements ChipClusters.EnergyEvseCluster.EventListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
   public static class DelegatedEnergyEvseClusterAttributeListAttributeCallback implements ChipClusters.EnergyEvseCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -11529,27 +10302,6 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedEnergyPreferenceClusterEventListAttributeCallback implements ChipClusters.EnergyPreferenceCluster.EventListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
   public static class DelegatedEnergyPreferenceClusterAttributeListAttributeCallback implements ChipClusters.EnergyPreferenceCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -11613,6 +10365,27 @@ public class ClusterInfoMapping {
     }
   }
 
+  public static class DelegatedPowerTopologyClusterElectricalCircuitNodesAttributeCallback implements ChipClusters.PowerTopologyCluster.ElectricalCircuitNodesAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<ChipStructs.PowerTopologyClusterCircuitNodeStruct> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.PowerTopologyClusterCircuitNodeStruct>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
   public static class DelegatedPowerTopologyClusterGeneratedCommandListAttributeCallback implements ChipClusters.PowerTopologyCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -11635,27 +10408,6 @@ public class ClusterInfoMapping {
   }
 
   public static class DelegatedPowerTopologyClusterAcceptedCommandListAttributeCallback implements ChipClusters.PowerTopologyCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
-  public static class DelegatedPowerTopologyClusterEventListAttributeCallback implements ChipClusters.PowerTopologyCluster.EventListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -11784,27 +10536,6 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedEnergyEvseModeClusterEventListAttributeCallback implements ChipClusters.EnergyEvseModeCluster.EventListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
   public static class DelegatedEnergyEvseModeClusterAttributeListAttributeCallback implements ChipClusters.EnergyEvseModeCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -11893,27 +10624,6 @@ public class ClusterInfoMapping {
   }
 
   public static class DelegatedWaterHeaterModeClusterAcceptedCommandListAttributeCallback implements ChipClusters.WaterHeaterModeCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
-  public static class DelegatedWaterHeaterModeClusterEventListAttributeCallback implements ChipClusters.WaterHeaterModeCluster.EventListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -12042,7 +10752,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedDeviceEnergyManagementModeClusterEventListAttributeCallback implements ChipClusters.DeviceEnergyManagementModeCluster.EventListAttributeCallback, DelegatedClusterCallback {
+  public static class DelegatedDeviceEnergyManagementModeClusterAttributeListAttributeCallback implements ChipClusters.DeviceEnergyManagementModeCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -12063,7 +10773,553 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedDeviceEnergyManagementModeClusterAttributeListAttributeCallback implements ChipClusters.DeviceEnergyManagementModeCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
+  public static class DelegatedElectricalGridConditionsClusterLocalGenerationAvailableAttributeCallback implements ChipClusters.ElectricalGridConditionsCluster.LocalGenerationAvailableAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable Boolean value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "Boolean");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedElectricalGridConditionsClusterCurrentConditionsAttributeCallback implements ChipClusters.ElectricalGridConditionsCluster.CurrentConditionsAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable ChipStructs.ElectricalGridConditionsClusterElectricalGridConditionsStruct value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "ChipStructs.ElectricalGridConditionsClusterElectricalGridConditionsStruct");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedElectricalGridConditionsClusterForecastConditionsAttributeCallback implements ChipClusters.ElectricalGridConditionsCluster.ForecastConditionsAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<ChipStructs.ElectricalGridConditionsClusterElectricalGridConditionsStruct> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.ElectricalGridConditionsClusterElectricalGridConditionsStruct>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedElectricalGridConditionsClusterGeneratedCommandListAttributeCallback implements ChipClusters.ElectricalGridConditionsCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedElectricalGridConditionsClusterAcceptedCommandListAttributeCallback implements ChipClusters.ElectricalGridConditionsCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedElectricalGridConditionsClusterAttributeListAttributeCallback implements ChipClusters.ElectricalGridConditionsCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedElectricalAlarmClusterGeneratedCommandListAttributeCallback implements ChipClusters.ElectricalAlarmCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedElectricalAlarmClusterAcceptedCommandListAttributeCallback implements ChipClusters.ElectricalAlarmCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedElectricalAlarmClusterAttributeListAttributeCallback implements ChipClusters.ElectricalAlarmCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedElectricalDistributionClusterMaxContinuousCurrentAttributeCallback implements ChipClusters.ElectricalDistributionCluster.MaxContinuousCurrentAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable Long value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "Long");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedElectricalDistributionClusterMaxVoltageAttributeCallback implements ChipClusters.ElectricalDistributionCluster.MaxVoltageAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable Long value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "Long");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedElectricalDistributionClusterNumberOfPolesAttributeCallback implements ChipClusters.ElectricalDistributionCluster.NumberOfPolesAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable Integer value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "Integer");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedElectricalDistributionClusterEndOfLifeAttributeCallback implements ChipClusters.ElectricalDistributionCluster.EndOfLifeAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable Integer value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "Integer");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedElectricalDistributionClusterServiceEntranceRatedAttributeCallback implements ChipClusters.ElectricalDistributionCluster.ServiceEntranceRatedAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable Boolean value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "Boolean");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedElectricalDistributionClusterGeneratedCommandListAttributeCallback implements ChipClusters.ElectricalDistributionCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedElectricalDistributionClusterAcceptedCommandListAttributeCallback implements ChipClusters.ElectricalDistributionCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedElectricalDistributionClusterAttributeListAttributeCallback implements ChipClusters.ElectricalDistributionCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedElectricalProtectionAlarmClusterArcCauseAttributeCallback implements ChipClusters.ElectricalProtectionAlarmCluster.ArcCauseAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable Integer value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "Integer");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedElectricalProtectionAlarmClusterOverLoadRatingAttributeCallback implements ChipClusters.ElectricalProtectionAlarmCluster.OverLoadRatingAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable ChipStructs.ElectricalProtectionAlarmClusterOverLoadRatingsStruct value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "ChipStructs.ElectricalProtectionAlarmClusterOverLoadRatingsStruct");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedElectricalProtectionAlarmClusterOverVoltageRatingAttributeCallback implements ChipClusters.ElectricalProtectionAlarmCluster.OverVoltageRatingAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable ChipStructs.ElectricalProtectionAlarmClusterOverVoltageRatingsStruct value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "ChipStructs.ElectricalProtectionAlarmClusterOverVoltageRatingsStruct");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedElectricalProtectionAlarmClusterSurgeProtectionRatingAttributeCallback implements ChipClusters.ElectricalProtectionAlarmCluster.SurgeProtectionRatingAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable ChipStructs.ElectricalProtectionAlarmClusterSurgeProtectionRatingsStruct value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "ChipStructs.ElectricalProtectionAlarmClusterSurgeProtectionRatingsStruct");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedElectricalProtectionAlarmClusterShortCircuitRatingAttributeCallback implements ChipClusters.ElectricalProtectionAlarmCluster.ShortCircuitRatingAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable ChipStructs.ElectricalProtectionAlarmClusterShortCircuitRatingsStruct value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "ChipStructs.ElectricalProtectionAlarmClusterShortCircuitRatingsStruct");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedElectricalProtectionAlarmClusterResidualCurrentRatingAttributeCallback implements ChipClusters.ElectricalProtectionAlarmCluster.ResidualCurrentRatingAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable ChipStructs.ElectricalProtectionAlarmClusterResidualCurrentFaultRatingsStruct value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "ChipStructs.ElectricalProtectionAlarmClusterResidualCurrentFaultRatingsStruct");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedElectricalProtectionAlarmClusterArcFaultRatingAttributeCallback implements ChipClusters.ElectricalProtectionAlarmCluster.ArcFaultRatingAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable ChipStructs.ElectricalProtectionAlarmClusterArcFaultRatingsStruct value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "ChipStructs.ElectricalProtectionAlarmClusterArcFaultRatingsStruct");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedElectricalProtectionAlarmClusterGeneratedCommandListAttributeCallback implements ChipClusters.ElectricalProtectionAlarmCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedElectricalProtectionAlarmClusterAcceptedCommandListAttributeCallback implements ChipClusters.ElectricalProtectionAlarmCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedElectricalProtectionAlarmClusterAttributeListAttributeCallback implements ChipClusters.ElectricalProtectionAlarmCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -12468,27 +11724,6 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedDoorLockClusterEventListAttributeCallback implements ChipClusters.DoorLockCluster.EventListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
   public static class DelegatedDoorLockClusterAttributeListAttributeCallback implements ChipClusters.DoorLockCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -12720,7 +11955,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedWindowCoveringClusterEventListAttributeCallback implements ChipClusters.WindowCoveringCluster.EventListAttributeCallback, DelegatedClusterCallback {
+  public static class DelegatedWindowCoveringClusterAttributeListAttributeCallback implements ChipClusters.WindowCoveringCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -12741,7 +11976,280 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedWindowCoveringClusterAttributeListAttributeCallback implements ChipClusters.WindowCoveringCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
+  public static class DelegatedClosureControlClusterCountdownTimeAttributeCallback implements ChipClusters.ClosureControlCluster.CountdownTimeAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable Long value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "Long");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedClosureControlClusterCurrentErrorListAttributeCallback implements ChipClusters.ClosureControlCluster.CurrentErrorListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Integer> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Integer>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedClosureControlClusterOverallCurrentStateAttributeCallback implements ChipClusters.ClosureControlCluster.OverallCurrentStateAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable ChipStructs.ClosureControlClusterOverallCurrentStateStruct value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "ChipStructs.ClosureControlClusterOverallCurrentStateStruct");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedClosureControlClusterOverallTargetStateAttributeCallback implements ChipClusters.ClosureControlCluster.OverallTargetStateAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable ChipStructs.ClosureControlClusterOverallTargetStateStruct value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "ChipStructs.ClosureControlClusterOverallTargetStateStruct");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedClosureControlClusterGeneratedCommandListAttributeCallback implements ChipClusters.ClosureControlCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedClosureControlClusterAcceptedCommandListAttributeCallback implements ChipClusters.ClosureControlCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedClosureControlClusterAttributeListAttributeCallback implements ChipClusters.ClosureControlCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedClosureDimensionClusterCurrentStateAttributeCallback implements ChipClusters.ClosureDimensionCluster.CurrentStateAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable ChipStructs.ClosureDimensionClusterDimensionStateStruct value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "ChipStructs.ClosureDimensionClusterDimensionStateStruct");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedClosureDimensionClusterTargetStateAttributeCallback implements ChipClusters.ClosureDimensionCluster.TargetStateAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable ChipStructs.ClosureDimensionClusterDimensionStateStruct value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "ChipStructs.ClosureDimensionClusterDimensionStateStruct");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedClosureDimensionClusterUnitRangeAttributeCallback implements ChipClusters.ClosureDimensionCluster.UnitRangeAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable ChipStructs.ClosureDimensionClusterUnitRangeStruct value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "ChipStructs.ClosureDimensionClusterUnitRangeStruct");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedClosureDimensionClusterLimitRangeAttributeCallback implements ChipClusters.ClosureDimensionCluster.LimitRangeAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(ChipStructs.ClosureDimensionClusterRangePercent100thsStruct value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "ChipStructs.ClosureDimensionClusterRangePercent100thsStruct");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedClosureDimensionClusterGeneratedCommandListAttributeCallback implements ChipClusters.ClosureDimensionCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedClosureDimensionClusterAcceptedCommandListAttributeCallback implements ChipClusters.ClosureDimensionCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedClosureDimensionClusterAttributeListAttributeCallback implements ChipClusters.ClosureDimensionCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -12958,27 +12466,6 @@ public class ClusterInfoMapping {
   }
 
   public static class DelegatedServiceAreaClusterAcceptedCommandListAttributeCallback implements ChipClusters.ServiceAreaCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
-  public static class DelegatedServiceAreaClusterEventListAttributeCallback implements ChipClusters.ServiceAreaCluster.EventListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -13440,27 +12927,6 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedPumpConfigurationAndControlClusterEventListAttributeCallback implements ChipClusters.PumpConfigurationAndControlCluster.EventListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
   public static class DelegatedPumpConfigurationAndControlClusterAttributeListAttributeCallback implements ChipClusters.PumpConfigurationAndControlCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -13503,6 +12969,28 @@ public class ClusterInfoMapping {
       // transitions: WeeklyScheduleTransitionStruct
       // Conversion from this type to Java is not properly implemented yet
 
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
+
+  public static class DelegatedThermostatClusterAddThermostatSuggestionResponseCallback implements ChipClusters.ThermostatCluster.AddThermostatSuggestionResponseCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(Integer uniqueID) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+
+      CommandResponseInfo uniqueIDResponseValue = new CommandResponseInfo("uniqueID", "Integer");
+      responseValues.put(uniqueIDResponseValue, uniqueID);
       callback.onSuccess(responseValues);
     }
 
@@ -13937,6 +13425,69 @@ public class ClusterInfoMapping {
     }
   }
 
+  public static class DelegatedThermostatClusterThermostatSuggestionsAttributeCallback implements ChipClusters.ThermostatCluster.ThermostatSuggestionsAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<ChipStructs.ThermostatClusterThermostatSuggestionStruct> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.ThermostatClusterThermostatSuggestionStruct>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedThermostatClusterCurrentThermostatSuggestionAttributeCallback implements ChipClusters.ThermostatCluster.CurrentThermostatSuggestionAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable ChipStructs.ThermostatClusterThermostatSuggestionStruct value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "ChipStructs.ThermostatClusterThermostatSuggestionStruct");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedThermostatClusterThermostatSuggestionNotFollowingReasonAttributeCallback implements ChipClusters.ThermostatCluster.ThermostatSuggestionNotFollowingReasonAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable Integer value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "Integer");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
   public static class DelegatedThermostatClusterGeneratedCommandListAttributeCallback implements ChipClusters.ThermostatCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -13959,27 +13510,6 @@ public class ClusterInfoMapping {
   }
 
   public static class DelegatedThermostatClusterAcceptedCommandListAttributeCallback implements ChipClusters.ThermostatCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
-  public static class DelegatedThermostatClusterEventListAttributeCallback implements ChipClusters.ThermostatCluster.EventListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -14105,27 +13635,6 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedFanControlClusterEventListAttributeCallback implements ChipClusters.FanControlCluster.EventListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
   public static class DelegatedFanControlClusterAttributeListAttributeCallback implements ChipClusters.FanControlCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -14189,7 +13698,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedThermostatUserInterfaceConfigurationClusterEventListAttributeCallback implements ChipClusters.ThermostatUserInterfaceConfigurationCluster.EventListAttributeCallback, DelegatedClusterCallback {
+  public static class DelegatedThermostatUserInterfaceConfigurationClusterAttributeListAttributeCallback implements ChipClusters.ThermostatUserInterfaceConfigurationCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -14210,7 +13719,49 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedThermostatUserInterfaceConfigurationClusterAttributeListAttributeCallback implements ChipClusters.ThermostatUserInterfaceConfigurationCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
+  public static class DelegatedHumidistatClusterGeneratedCommandListAttributeCallback implements ChipClusters.HumidistatCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedHumidistatClusterAcceptedCommandListAttributeCallback implements ChipClusters.HumidistatCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedHumidistatClusterAttributeListAttributeCallback implements ChipClusters.HumidistatCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -14504,27 +14055,6 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedColorControlClusterEventListAttributeCallback implements ChipClusters.ColorControlCluster.EventListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
   public static class DelegatedColorControlClusterAttributeListAttributeCallback implements ChipClusters.ColorControlCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -14693,7 +14223,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedBallastConfigurationClusterEventListAttributeCallback implements ChipClusters.BallastConfigurationCluster.EventListAttributeCallback, DelegatedClusterCallback {
+  public static class DelegatedBallastConfigurationClusterAttributeListAttributeCallback implements ChipClusters.BallastConfigurationCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -14714,7 +14244,112 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedBallastConfigurationClusterAttributeListAttributeCallback implements ChipClusters.BallastConfigurationCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
+  public static class DelegatedDynamicLightingClusterAvailableEffectsAttributeCallback implements ChipClusters.DynamicLightingCluster.AvailableEffectsAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<ChipStructs.DynamicLightingClusterEffectStruct> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.DynamicLightingClusterEffectStruct>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedDynamicLightingClusterCurrentEffectIDAttributeCallback implements ChipClusters.DynamicLightingCluster.CurrentEffectIDAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable Integer value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "Integer");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedDynamicLightingClusterCurrentSpeedAttributeCallback implements ChipClusters.DynamicLightingCluster.CurrentSpeedAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable Integer value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "Integer");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedDynamicLightingClusterGeneratedCommandListAttributeCallback implements ChipClusters.DynamicLightingCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedDynamicLightingClusterAcceptedCommandListAttributeCallback implements ChipClusters.DynamicLightingCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedDynamicLightingClusterAttributeListAttributeCallback implements ChipClusters.DynamicLightingCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -14861,27 +14496,6 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedIlluminanceMeasurementClusterEventListAttributeCallback implements ChipClusters.IlluminanceMeasurementCluster.EventListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
   public static class DelegatedIlluminanceMeasurementClusterAttributeListAttributeCallback implements ChipClusters.IlluminanceMeasurementCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -14988,27 +14602,6 @@ public class ClusterInfoMapping {
   }
 
   public static class DelegatedTemperatureMeasurementClusterAcceptedCommandListAttributeCallback implements ChipClusters.TemperatureMeasurementCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
-  public static class DelegatedTemperatureMeasurementClusterEventListAttributeCallback implements ChipClusters.TemperatureMeasurementCluster.EventListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -15218,27 +14811,6 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedPressureMeasurementClusterEventListAttributeCallback implements ChipClusters.PressureMeasurementCluster.EventListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
   public static class DelegatedPressureMeasurementClusterAttributeListAttributeCallback implements ChipClusters.PressureMeasurementCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -15345,27 +14917,6 @@ public class ClusterInfoMapping {
   }
 
   public static class DelegatedFlowMeasurementClusterAcceptedCommandListAttributeCallback implements ChipClusters.FlowMeasurementCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
-  public static class DelegatedFlowMeasurementClusterEventListAttributeCallback implements ChipClusters.FlowMeasurementCluster.EventListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -15512,27 +15063,6 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedRelativeHumidityMeasurementClusterEventListAttributeCallback implements ChipClusters.RelativeHumidityMeasurementCluster.EventListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
   public static class DelegatedRelativeHumidityMeasurementClusterAttributeListAttributeCallback implements ChipClusters.RelativeHumidityMeasurementCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -15575,6 +15105,27 @@ public class ClusterInfoMapping {
     }
   }
 
+  public static class DelegatedOccupancySensingClusterPredictedOccupancyAttributeCallback implements ChipClusters.OccupancySensingCluster.PredictedOccupancyAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<ChipStructs.OccupancySensingClusterPredictedOccupancyStruct> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.OccupancySensingClusterPredictedOccupancyStruct>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
   public static class DelegatedOccupancySensingClusterGeneratedCommandListAttributeCallback implements ChipClusters.OccupancySensingCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -15597,27 +15148,6 @@ public class ClusterInfoMapping {
   }
 
   public static class DelegatedOccupancySensingClusterAcceptedCommandListAttributeCallback implements ChipClusters.OccupancySensingCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
-  public static class DelegatedOccupancySensingClusterEventListAttributeCallback implements ChipClusters.OccupancySensingCluster.EventListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -15806,27 +15336,6 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedCarbonMonoxideConcentrationMeasurementClusterEventListAttributeCallback implements ChipClusters.CarbonMonoxideConcentrationMeasurementCluster.EventListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
   public static class DelegatedCarbonMonoxideConcentrationMeasurementClusterAttributeListAttributeCallback implements ChipClusters.CarbonMonoxideConcentrationMeasurementCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -15975,27 +15484,6 @@ public class ClusterInfoMapping {
   }
 
   public static class DelegatedCarbonDioxideConcentrationMeasurementClusterAcceptedCommandListAttributeCallback implements ChipClusters.CarbonDioxideConcentrationMeasurementCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
-  public static class DelegatedCarbonDioxideConcentrationMeasurementClusterEventListAttributeCallback implements ChipClusters.CarbonDioxideConcentrationMeasurementCluster.EventListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -16184,27 +15672,6 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedNitrogenDioxideConcentrationMeasurementClusterEventListAttributeCallback implements ChipClusters.NitrogenDioxideConcentrationMeasurementCluster.EventListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
   public static class DelegatedNitrogenDioxideConcentrationMeasurementClusterAttributeListAttributeCallback implements ChipClusters.NitrogenDioxideConcentrationMeasurementCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -16353,27 +15820,6 @@ public class ClusterInfoMapping {
   }
 
   public static class DelegatedOzoneConcentrationMeasurementClusterAcceptedCommandListAttributeCallback implements ChipClusters.OzoneConcentrationMeasurementCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
-  public static class DelegatedOzoneConcentrationMeasurementClusterEventListAttributeCallback implements ChipClusters.OzoneConcentrationMeasurementCluster.EventListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -16562,27 +16008,6 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedPm25ConcentrationMeasurementClusterEventListAttributeCallback implements ChipClusters.Pm25ConcentrationMeasurementCluster.EventListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
   public static class DelegatedPm25ConcentrationMeasurementClusterAttributeListAttributeCallback implements ChipClusters.Pm25ConcentrationMeasurementCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -16731,27 +16156,6 @@ public class ClusterInfoMapping {
   }
 
   public static class DelegatedFormaldehydeConcentrationMeasurementClusterAcceptedCommandListAttributeCallback implements ChipClusters.FormaldehydeConcentrationMeasurementCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
-  public static class DelegatedFormaldehydeConcentrationMeasurementClusterEventListAttributeCallback implements ChipClusters.FormaldehydeConcentrationMeasurementCluster.EventListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -16940,27 +16344,6 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedPm1ConcentrationMeasurementClusterEventListAttributeCallback implements ChipClusters.Pm1ConcentrationMeasurementCluster.EventListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
   public static class DelegatedPm1ConcentrationMeasurementClusterAttributeListAttributeCallback implements ChipClusters.Pm1ConcentrationMeasurementCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -17109,27 +16492,6 @@ public class ClusterInfoMapping {
   }
 
   public static class DelegatedPm10ConcentrationMeasurementClusterAcceptedCommandListAttributeCallback implements ChipClusters.Pm10ConcentrationMeasurementCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
-  public static class DelegatedPm10ConcentrationMeasurementClusterEventListAttributeCallback implements ChipClusters.Pm10ConcentrationMeasurementCluster.EventListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -17318,27 +16680,6 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedTotalVolatileOrganicCompoundsConcentrationMeasurementClusterEventListAttributeCallback implements ChipClusters.TotalVolatileOrganicCompoundsConcentrationMeasurementCluster.EventListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
   public static class DelegatedTotalVolatileOrganicCompoundsConcentrationMeasurementClusterAttributeListAttributeCallback implements ChipClusters.TotalVolatileOrganicCompoundsConcentrationMeasurementCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -17507,7 +16848,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedRadonConcentrationMeasurementClusterEventListAttributeCallback implements ChipClusters.RadonConcentrationMeasurementCluster.EventListAttributeCallback, DelegatedClusterCallback {
+  public static class DelegatedRadonConcentrationMeasurementClusterAttributeListAttributeCallback implements ChipClusters.RadonConcentrationMeasurementCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -17528,7 +16869,832 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedRadonConcentrationMeasurementClusterAttributeListAttributeCallback implements ChipClusters.RadonConcentrationMeasurementCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
+  public static class DelegatedSoilMeasurementClusterSoilMoistureMeasurementLimitsAttributeCallback implements ChipClusters.SoilMeasurementCluster.SoilMoistureMeasurementLimitsAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(ChipStructs.SoilMeasurementClusterMeasurementAccuracyStruct value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "ChipStructs.SoilMeasurementClusterMeasurementAccuracyStruct");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedSoilMeasurementClusterSoilMoistureMeasuredValueAttributeCallback implements ChipClusters.SoilMeasurementCluster.SoilMoistureMeasuredValueAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable Integer value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "Integer");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedSoilMeasurementClusterGeneratedCommandListAttributeCallback implements ChipClusters.SoilMeasurementCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedSoilMeasurementClusterAcceptedCommandListAttributeCallback implements ChipClusters.SoilMeasurementCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedSoilMeasurementClusterAttributeListAttributeCallback implements ChipClusters.SoilMeasurementCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedAmbientContextSensingClusterAmbientContextTypeAttributeCallback implements ChipClusters.AmbientContextSensingCluster.AmbientContextTypeAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<ChipStructs.AmbientContextSensingClusterAmbientContextTypeStruct> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.AmbientContextSensingClusterAmbientContextTypeStruct>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedAmbientContextSensingClusterAmbientContextTypeSupportedAttributeCallback implements ChipClusters.AmbientContextSensingCluster.AmbientContextTypeSupportedAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<ChipStructs.AmbientContextSensingClusterSemanticTagStruct> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.AmbientContextSensingClusterSemanticTagStruct>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedAmbientContextSensingClusterObjectCountConfigAttributeCallback implements ChipClusters.AmbientContextSensingCluster.ObjectCountConfigAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(ChipStructs.AmbientContextSensingClusterObjectCountConfigStruct value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "ChipStructs.AmbientContextSensingClusterObjectCountConfigStruct");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedAmbientContextSensingClusterHoldTimeLimitsAttributeCallback implements ChipClusters.AmbientContextSensingCluster.HoldTimeLimitsAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(ChipStructs.AmbientContextSensingClusterHoldTimeLimitsStruct value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "ChipStructs.AmbientContextSensingClusterHoldTimeLimitsStruct");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedAmbientContextSensingClusterPredictedActivityAttributeCallback implements ChipClusters.AmbientContextSensingCluster.PredictedActivityAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<ChipStructs.AmbientContextSensingClusterPredictedActivityStruct> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.AmbientContextSensingClusterPredictedActivityStruct>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedAmbientContextSensingClusterSensorFusionSupportedAttributeCallback implements ChipClusters.AmbientContextSensingCluster.SensorFusionSupportedAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<ChipStructs.AmbientContextSensingClusterSemanticTagStruct> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.AmbientContextSensingClusterSemanticTagStruct>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedAmbientContextSensingClusterGeneratedCommandListAttributeCallback implements ChipClusters.AmbientContextSensingCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedAmbientContextSensingClusterAcceptedCommandListAttributeCallback implements ChipClusters.AmbientContextSensingCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedAmbientContextSensingClusterAttributeListAttributeCallback implements ChipClusters.AmbientContextSensingCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedAmbientSensingUnionClusterUnionContributorListAttributeCallback implements ChipClusters.AmbientSensingUnionCluster.UnionContributorListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<ChipStructs.AmbientSensingUnionClusterUnionContributorStruct> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.AmbientSensingUnionClusterUnionContributorStruct>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedAmbientSensingUnionClusterGeneratedCommandListAttributeCallback implements ChipClusters.AmbientSensingUnionCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedAmbientSensingUnionClusterAcceptedCommandListAttributeCallback implements ChipClusters.AmbientSensingUnionCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedAmbientSensingUnionClusterAttributeListAttributeCallback implements ChipClusters.AmbientSensingUnionCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+
+  public static class DelegatedProximityRangingClusterStartRangingResponseCallback implements ChipClusters.ProximityRangingCluster.StartRangingResponseCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(Integer resultCode, @Nullable Integer sessionID) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+
+      CommandResponseInfo resultCodeResponseValue = new CommandResponseInfo("resultCode", "Integer");
+      responseValues.put(resultCodeResponseValue, resultCode);
+      CommandResponseInfo sessionIDResponseValue = new CommandResponseInfo("sessionID", "Integer");
+      responseValues.put(sessionIDResponseValue, sessionID);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
+  public static class DelegatedProximityRangingClusterRangingCapabilitiesAttributeCallback implements ChipClusters.ProximityRangingCluster.RangingCapabilitiesAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<ChipStructs.ProximityRangingClusterRangingCapabilitiesStruct> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.ProximityRangingClusterRangingCapabilitiesStruct>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedProximityRangingClusterSessionIDListAttributeCallback implements ChipClusters.ProximityRangingCluster.SessionIDListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable List<Integer> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Integer>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedProximityRangingClusterGeneratedCommandListAttributeCallback implements ChipClusters.ProximityRangingCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedProximityRangingClusterAcceptedCommandListAttributeCallback implements ChipClusters.ProximityRangingCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedProximityRangingClusterAttributeListAttributeCallback implements ChipClusters.ProximityRangingCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedSmokeConcentrationMeasurementClusterMeasuredValueAttributeCallback implements ChipClusters.SmokeConcentrationMeasurementCluster.MeasuredValueAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable Float value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "Float");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedSmokeConcentrationMeasurementClusterMinMeasuredValueAttributeCallback implements ChipClusters.SmokeConcentrationMeasurementCluster.MinMeasuredValueAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable Float value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "Float");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedSmokeConcentrationMeasurementClusterMaxMeasuredValueAttributeCallback implements ChipClusters.SmokeConcentrationMeasurementCluster.MaxMeasuredValueAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable Float value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "Float");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedSmokeConcentrationMeasurementClusterPeakMeasuredValueAttributeCallback implements ChipClusters.SmokeConcentrationMeasurementCluster.PeakMeasuredValueAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable Float value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "Float");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedSmokeConcentrationMeasurementClusterAverageMeasuredValueAttributeCallback implements ChipClusters.SmokeConcentrationMeasurementCluster.AverageMeasuredValueAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable Float value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "Float");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedSmokeConcentrationMeasurementClusterGeneratedCommandListAttributeCallback implements ChipClusters.SmokeConcentrationMeasurementCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedSmokeConcentrationMeasurementClusterAcceptedCommandListAttributeCallback implements ChipClusters.SmokeConcentrationMeasurementCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedSmokeConcentrationMeasurementClusterAttributeListAttributeCallback implements ChipClusters.SmokeConcentrationMeasurementCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+
+  public static class DelegatedNetworkIdentityManagementClusterAddClientResponseCallback implements ChipClusters.NetworkIdentityManagementCluster.AddClientResponseCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(Integer clientIndex) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+
+      CommandResponseInfo clientIndexResponseValue = new CommandResponseInfo("clientIndex", "Integer");
+      responseValues.put(clientIndexResponseValue, clientIndex);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
+
+  public static class DelegatedNetworkIdentityManagementClusterQueryIdentityResponseCallback implements ChipClusters.NetworkIdentityManagementCluster.QueryIdentityResponseCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(byte[] identity) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+
+      CommandResponseInfo identityResponseValue = new CommandResponseInfo("identity", "byte[]");
+      responseValues.put(identityResponseValue, identity);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
+
+  public static class DelegatedNetworkIdentityManagementClusterExportAdminSecretResponseCallback implements ChipClusters.NetworkIdentityManagementCluster.ExportAdminSecretResponseCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(byte[] networkAdministratorSharedSecret) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+
+      CommandResponseInfo networkAdministratorSharedSecretResponseValue = new CommandResponseInfo("networkAdministratorSharedSecret", "byte[]");
+      responseValues.put(networkAdministratorSharedSecretResponseValue, networkAdministratorSharedSecret);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
+  public static class DelegatedNetworkIdentityManagementClusterActiveNetworkIdentitiesAttributeCallback implements ChipClusters.NetworkIdentityManagementCluster.ActiveNetworkIdentitiesAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<ChipStructs.NetworkIdentityManagementClusterActiveNetworkIdentityStruct> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.NetworkIdentityManagementClusterActiveNetworkIdentityStruct>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedNetworkIdentityManagementClusterClientsAttributeCallback implements ChipClusters.NetworkIdentityManagementCluster.ClientsAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<ChipStructs.NetworkIdentityManagementClusterClientStruct> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.NetworkIdentityManagementClusterClientStruct>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedNetworkIdentityManagementClusterGeneratedCommandListAttributeCallback implements ChipClusters.NetworkIdentityManagementCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedNetworkIdentityManagementClusterAcceptedCommandListAttributeCallback implements ChipClusters.NetworkIdentityManagementCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedNetworkIdentityManagementClusterAttributeListAttributeCallback implements ChipClusters.NetworkIdentityManagementCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -17635,27 +17801,6 @@ public class ClusterInfoMapping {
   }
 
   public static class DelegatedWiFiNetworkManagementClusterAcceptedCommandListAttributeCallback implements ChipClusters.WiFiNetworkManagementCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
-  public static class DelegatedWiFiNetworkManagementClusterEventListAttributeCallback implements ChipClusters.WiFiNetworkManagementCluster.EventListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -17803,27 +17948,6 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedThreadBorderRouterManagementClusterEventListAttributeCallback implements ChipClusters.ThreadBorderRouterManagementCluster.EventListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
   public static class DelegatedThreadBorderRouterManagementClusterAttributeListAttributeCallback implements ChipClusters.ThreadBorderRouterManagementCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -17951,27 +18075,6 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedThreadNetworkDirectoryClusterEventListAttributeCallback implements ChipClusters.ThreadNetworkDirectoryCluster.EventListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
   public static class DelegatedThreadNetworkDirectoryClusterAttributeListAttributeCallback implements ChipClusters.ThreadNetworkDirectoryCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -18015,27 +18118,6 @@ public class ClusterInfoMapping {
   }
 
   public static class DelegatedWakeOnLanClusterAcceptedCommandListAttributeCallback implements ChipClusters.WakeOnLanCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
-  public static class DelegatedWakeOnLanClusterEventListAttributeCallback implements ChipClusters.WakeOnLanCluster.EventListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -18231,27 +18313,6 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedChannelClusterEventListAttributeCallback implements ChipClusters.ChannelCluster.EventListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
   public static class DelegatedChannelClusterAttributeListAttributeCallback implements ChipClusters.ChannelCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -18340,27 +18401,6 @@ public class ClusterInfoMapping {
   }
 
   public static class DelegatedTargetNavigatorClusterAcceptedCommandListAttributeCallback implements ChipClusters.TargetNavigatorCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
-  public static class DelegatedTargetNavigatorClusterEventListAttributeCallback implements ChipClusters.TargetNavigatorCluster.EventListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -18657,27 +18697,6 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedMediaPlaybackClusterEventListAttributeCallback implements ChipClusters.MediaPlaybackCluster.EventListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
   public static class DelegatedMediaPlaybackClusterAttributeListAttributeCallback implements ChipClusters.MediaPlaybackCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -18762,27 +18781,6 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedMediaInputClusterEventListAttributeCallback implements ChipClusters.MediaInputCluster.EventListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
   public static class DelegatedMediaInputClusterAttributeListAttributeCallback implements ChipClusters.MediaInputCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -18826,27 +18824,6 @@ public class ClusterInfoMapping {
   }
 
   public static class DelegatedLowPowerClusterAcceptedCommandListAttributeCallback implements ChipClusters.LowPowerCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
-  public static class DelegatedLowPowerClusterEventListAttributeCallback implements ChipClusters.LowPowerCluster.EventListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -18932,27 +18909,6 @@ public class ClusterInfoMapping {
   }
 
   public static class DelegatedKeypadInputClusterAcceptedCommandListAttributeCallback implements ChipClusters.KeypadInputCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
-  public static class DelegatedKeypadInputClusterEventListAttributeCallback implements ChipClusters.KeypadInputCluster.EventListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -19081,27 +19037,6 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedContentLauncherClusterEventListAttributeCallback implements ChipClusters.ContentLauncherCluster.EventListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
   public static class DelegatedContentLauncherClusterAttributeListAttributeCallback implements ChipClusters.ContentLauncherCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -19166,27 +19101,6 @@ public class ClusterInfoMapping {
   }
 
   public static class DelegatedAudioOutputClusterAcceptedCommandListAttributeCallback implements ChipClusters.AudioOutputCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
-  public static class DelegatedAudioOutputClusterEventListAttributeCallback implements ChipClusters.AudioOutputCluster.EventListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -19336,27 +19250,6 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedApplicationLauncherClusterEventListAttributeCallback implements ChipClusters.ApplicationLauncherCluster.EventListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
   public static class DelegatedApplicationLauncherClusterAttributeListAttributeCallback implements ChipClusters.ApplicationLauncherCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -19462,27 +19355,6 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedApplicationBasicClusterEventListAttributeCallback implements ChipClusters.ApplicationBasicCluster.EventListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
   public static class DelegatedApplicationBasicClusterAttributeListAttributeCallback implements ChipClusters.ApplicationBasicCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -19548,27 +19420,6 @@ public class ClusterInfoMapping {
   }
 
   public static class DelegatedAccountLoginClusterAcceptedCommandListAttributeCallback implements ChipClusters.AccountLoginCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
-  public static class DelegatedAccountLoginClusterEventListAttributeCallback implements ChipClusters.AccountLoginCluster.EventListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -19674,6 +19525,69 @@ public class ClusterInfoMapping {
     }
   }
 
+  public static class DelegatedContentControlClusterBlockChannelListAttributeCallback implements ChipClusters.ContentControlCluster.BlockChannelListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<ChipStructs.ContentControlClusterBlockChannelStruct> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.ContentControlClusterBlockChannelStruct>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedContentControlClusterBlockApplicationListAttributeCallback implements ChipClusters.ContentControlCluster.BlockApplicationListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<ChipStructs.ContentControlClusterAppInfoStruct> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.ContentControlClusterAppInfoStruct>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedContentControlClusterBlockContentTimeWindowAttributeCallback implements ChipClusters.ContentControlCluster.BlockContentTimeWindowAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<ChipStructs.ContentControlClusterTimeWindowStruct> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.ContentControlClusterTimeWindowStruct>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
   public static class DelegatedContentControlClusterGeneratedCommandListAttributeCallback implements ChipClusters.ContentControlCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -19696,27 +19610,6 @@ public class ClusterInfoMapping {
   }
 
   public static class DelegatedContentControlClusterAcceptedCommandListAttributeCallback implements ChipClusters.ContentControlCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
-  public static class DelegatedContentControlClusterEventListAttributeCallback implements ChipClusters.ContentControlCluster.EventListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -19826,27 +19719,6 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedContentAppObserverClusterEventListAttributeCallback implements ChipClusters.ContentAppObserverCluster.EventListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
   public static class DelegatedContentAppObserverClusterAttributeListAttributeCallback implements ChipClusters.ContentAppObserverCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -19890,50 +19762,6 @@ public class ClusterInfoMapping {
       callback.onFailure(error);
     }
   }
-
-  public static class DelegatedZoneManagementClusterGetTwoDCartesianZoneResponseCallback implements ChipClusters.ZoneManagementCluster.GetTwoDCartesianZoneResponseCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(ArrayList<ChipStructs.ZoneManagementClusterTwoDCartesianZoneStruct> zones) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-
-      // zones: TwoDCartesianZoneStruct
-      // Conversion from this type to Java is not properly implemented yet
-
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception error) {
-      callback.onFailure(error);
-    }
-  }
-  public static class DelegatedZoneManagementClusterSupportedZoneSourcesAttributeCallback implements ChipClusters.ZoneManagementCluster.SupportedZoneSourcesAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Integer> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Integer>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
   public static class DelegatedZoneManagementClusterZonesAttributeCallback implements ChipClusters.ZoneManagementCluster.ZonesAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -19955,7 +19783,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedZoneManagementClusterTimeControlAttributeCallback implements ChipClusters.ZoneManagementCluster.TimeControlAttributeCallback, DelegatedClusterCallback {
+  public static class DelegatedZoneManagementClusterTriggersAttributeCallback implements ChipClusters.ZoneManagementCluster.TriggersAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -19963,10 +19791,31 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(List<ChipStructs.ZoneManagementClusterZoneTriggeringTimeControlStruct> valueList) {
+    public void onSuccess(List<ChipStructs.ZoneManagementClusterZoneTriggerControlStruct> valueList) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.ZoneManagementClusterZoneTriggeringTimeControlStruct>");
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.ZoneManagementClusterZoneTriggerControlStruct>");
       responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedZoneManagementClusterTwoDCartesianMaxAttributeCallback implements ChipClusters.ZoneManagementCluster.TwoDCartesianMaxAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(ChipStructs.ZoneManagementClusterTwoDCartesianVertexStruct value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "ChipStructs.ZoneManagementClusterTwoDCartesianVertexStruct");
+      responseValues.put(commandResponseInfo, value);
       callback.onSuccess(responseValues);
     }
 
@@ -19998,27 +19847,6 @@ public class ClusterInfoMapping {
   }
 
   public static class DelegatedZoneManagementClusterAcceptedCommandListAttributeCallback implements ChipClusters.ZoneManagementCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
-  public static class DelegatedZoneManagementClusterEventListAttributeCallback implements ChipClusters.ZoneManagementCluster.EventListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -20126,6 +19954,32 @@ public class ClusterInfoMapping {
       callback.onFailure(error);
     }
   }
+
+  public static class DelegatedCameraAvStreamManagementClusterCaptureSnapshotResponseCallback implements ChipClusters.CameraAvStreamManagementCluster.CaptureSnapshotResponseCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(byte[] data, Integer imageCodec, ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct resolution) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+
+      CommandResponseInfo dataResponseValue = new CommandResponseInfo("data", "byte[]");
+      responseValues.put(dataResponseValue, data);
+      CommandResponseInfo imageCodecResponseValue = new CommandResponseInfo("imageCodec", "Integer");
+      responseValues.put(imageCodecResponseValue, imageCodec);
+      // resolution: Struct VideoResolutionStruct
+      // Conversion from this type to Java is not properly implemented yet
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
   public static class DelegatedCameraAvStreamManagementClusterVideoSensorParamsAttributeCallback implements ChipClusters.CameraAvStreamManagementCluster.VideoSensorParamsAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -20147,7 +20001,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedCameraAvStreamManagementClusterMinViewportAttributeCallback implements ChipClusters.CameraAvStreamManagementCluster.MinViewportAttributeCallback, DelegatedClusterCallback {
+  public static class DelegatedCameraAvStreamManagementClusterMinViewportResolutionAttributeCallback implements ChipClusters.CameraAvStreamManagementCluster.MinViewportResolutionAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -20231,7 +20085,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedCameraAvStreamManagementClusterSupportedSnapshotParamsAttributeCallback implements ChipClusters.CameraAvStreamManagementCluster.SupportedSnapshotParamsAttributeCallback, DelegatedClusterCallback {
+  public static class DelegatedCameraAvStreamManagementClusterSnapshotCapabilitiesAttributeCallback implements ChipClusters.CameraAvStreamManagementCluster.SnapshotCapabilitiesAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -20239,9 +20093,9 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(List<ChipStructs.CameraAvStreamManagementClusterSnapshotParamsStruct> valueList) {
+    public void onSuccess(List<ChipStructs.CameraAvStreamManagementClusterSnapshotCapabilitiesStruct> valueList) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.CameraAvStreamManagementClusterSnapshotParamsStruct>");
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.CameraAvStreamManagementClusterSnapshotCapabilitiesStruct>");
       responseValues.put(commandResponseInfo, valueList);
       callback.onSuccess(responseValues);
     }
@@ -20252,49 +20106,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedCameraAvStreamManagementClusterCurrentVideoCodecsAttributeCallback implements ChipClusters.CameraAvStreamManagementCluster.CurrentVideoCodecsAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Integer> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Integer>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
-  public static class DelegatedCameraAvStreamManagementClusterCurrentSnapshotConfigAttributeCallback implements ChipClusters.CameraAvStreamManagementCluster.CurrentSnapshotConfigAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(ChipStructs.CameraAvStreamManagementClusterSnapshotParamsStruct value) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "ChipStructs.CameraAvStreamManagementClusterSnapshotParamsStruct");
-      responseValues.put(commandResponseInfo, value);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
-  public static class DelegatedCameraAvStreamManagementClusterFabricsUsingCameraAttributeCallback implements ChipClusters.CameraAvStreamManagementCluster.FabricsUsingCameraAttributeCallback, DelegatedClusterCallback {
+  public static class DelegatedCameraAvStreamManagementClusterSupportedStreamUsagesAttributeCallback implements ChipClusters.CameraAvStreamManagementCluster.SupportedStreamUsagesAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -20378,7 +20190,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedCameraAvStreamManagementClusterRankedVideoStreamPrioritiesListAttributeCallback implements ChipClusters.CameraAvStreamManagementCluster.RankedVideoStreamPrioritiesListAttributeCallback, DelegatedClusterCallback {
+  public static class DelegatedCameraAvStreamManagementClusterStreamUsagePrioritiesAttributeCallback implements ChipClusters.CameraAvStreamManagementCluster.StreamUsagePrioritiesAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -20462,7 +20274,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedCameraAvStreamManagementClusterEventListAttributeCallback implements ChipClusters.CameraAvStreamManagementCluster.EventListAttributeCallback, DelegatedClusterCallback {
+  public static class DelegatedCameraAvStreamManagementClusterAttributeListAttributeCallback implements ChipClusters.CameraAvStreamManagementCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -20483,7 +20295,112 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedCameraAvStreamManagementClusterAttributeListAttributeCallback implements ChipClusters.CameraAvStreamManagementCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
+  public static class DelegatedCameraAvSettingsUserLevelManagementClusterMPTZPositionAttributeCallback implements ChipClusters.CameraAvSettingsUserLevelManagementCluster.MPTZPositionAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(ChipStructs.CameraAvSettingsUserLevelManagementClusterMPTZStruct value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "ChipStructs.CameraAvSettingsUserLevelManagementClusterMPTZStruct");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedCameraAvSettingsUserLevelManagementClusterMPTZPresetsAttributeCallback implements ChipClusters.CameraAvSettingsUserLevelManagementCluster.MPTZPresetsAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<ChipStructs.CameraAvSettingsUserLevelManagementClusterMPTZPresetStruct> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.CameraAvSettingsUserLevelManagementClusterMPTZPresetStruct>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedCameraAvSettingsUserLevelManagementClusterDPTZStreamsAttributeCallback implements ChipClusters.CameraAvSettingsUserLevelManagementCluster.DPTZStreamsAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<ChipStructs.CameraAvSettingsUserLevelManagementClusterDPTZStruct> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.CameraAvSettingsUserLevelManagementClusterDPTZStruct>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedCameraAvSettingsUserLevelManagementClusterGeneratedCommandListAttributeCallback implements ChipClusters.CameraAvSettingsUserLevelManagementCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedCameraAvSettingsUserLevelManagementClusterAcceptedCommandListAttributeCallback implements ChipClusters.CameraAvSettingsUserLevelManagementCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedCameraAvSettingsUserLevelManagementClusterAttributeListAttributeCallback implements ChipClusters.CameraAvSettingsUserLevelManagementCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -20541,14 +20458,14 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(Integer webRTCSessionID, Integer videoStreamID, Integer audioStreamID) {
+    public void onSuccess(Integer webRTCSessionID, @Nullable Optional<Integer> videoStreamID, @Nullable Optional<Integer> audioStreamID) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 
       CommandResponseInfo webRTCSessionIDResponseValue = new CommandResponseInfo("webRTCSessionID", "Integer");
       responseValues.put(webRTCSessionIDResponseValue, webRTCSessionID);
-      CommandResponseInfo videoStreamIDResponseValue = new CommandResponseInfo("videoStreamID", "Integer");
+      CommandResponseInfo videoStreamIDResponseValue = new CommandResponseInfo("videoStreamID", "Optional<Integer>");
       responseValues.put(videoStreamIDResponseValue, videoStreamID);
-      CommandResponseInfo audioStreamIDResponseValue = new CommandResponseInfo("audioStreamID", "Integer");
+      CommandResponseInfo audioStreamIDResponseValue = new CommandResponseInfo("audioStreamID", "Optional<Integer>");
       responseValues.put(audioStreamIDResponseValue, audioStreamID);
       callback.onSuccess(responseValues);
     }
@@ -20601,27 +20518,6 @@ public class ClusterInfoMapping {
   }
 
   public static class DelegatedWebRTCTransportProviderClusterAcceptedCommandListAttributeCallback implements ChipClusters.WebRTCTransportProviderCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
-  public static class DelegatedWebRTCTransportProviderClusterEventListAttributeCallback implements ChipClusters.WebRTCTransportProviderCluster.EventListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -20726,7 +20622,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedWebRTCTransportRequestorClusterEventListAttributeCallback implements ChipClusters.WebRTCTransportRequestorCluster.EventListAttributeCallback, DelegatedClusterCallback {
+  public static class DelegatedWebRTCTransportRequestorClusterAttributeListAttributeCallback implements ChipClusters.WebRTCTransportRequestorCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -20747,7 +20643,136 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedWebRTCTransportRequestorClusterAttributeListAttributeCallback implements ChipClusters.WebRTCTransportRequestorCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
+
+  public static class DelegatedPushAvStreamTransportClusterAllocatePushTransportResponseCallback implements ChipClusters.PushAvStreamTransportCluster.AllocatePushTransportResponseCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(ChipStructs.PushAvStreamTransportClusterTransportConfigurationStruct transportConfiguration) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+
+      // transportConfiguration: Struct TransportConfigurationStruct
+      // Conversion from this type to Java is not properly implemented yet
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
+
+  public static class DelegatedPushAvStreamTransportClusterFindTransportResponseCallback implements ChipClusters.PushAvStreamTransportCluster.FindTransportResponseCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(ArrayList<ChipStructs.PushAvStreamTransportClusterTransportConfigurationStruct> transportConfigurations) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+
+      // transportConfigurations: TransportConfigurationStruct
+      // Conversion from this type to Java is not properly implemented yet
+
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
+  public static class DelegatedPushAvStreamTransportClusterSupportedFormatsAttributeCallback implements ChipClusters.PushAvStreamTransportCluster.SupportedFormatsAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<ChipStructs.PushAvStreamTransportClusterSupportedFormatStruct> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.PushAvStreamTransportClusterSupportedFormatStruct>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedPushAvStreamTransportClusterCurrentConnectionsAttributeCallback implements ChipClusters.PushAvStreamTransportCluster.CurrentConnectionsAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<ChipStructs.PushAvStreamTransportClusterTransportConfigurationStruct> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.PushAvStreamTransportClusterTransportConfigurationStruct>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedPushAvStreamTransportClusterGeneratedCommandListAttributeCallback implements ChipClusters.PushAvStreamTransportCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedPushAvStreamTransportClusterAcceptedCommandListAttributeCallback implements ChipClusters.PushAvStreamTransportCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedPushAvStreamTransportClusterAttributeListAttributeCallback implements ChipClusters.PushAvStreamTransportCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -20831,7 +20856,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedChimeClusterEventListAttributeCallback implements ChipClusters.ChimeCluster.EventListAttributeCallback, DelegatedClusterCallback {
+  public static class DelegatedChimeClusterAttributeListAttributeCallback implements ChipClusters.ChimeCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -20852,7 +20877,645 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedChimeClusterAttributeListAttributeCallback implements ChipClusters.ChimeCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
+
+  public static class DelegatedAvAnalysisClusterEstablishAnalysisStreamResponseCallback implements ChipClusters.AvAnalysisCluster.EstablishAnalysisStreamResponseCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(Integer analysisStreamID) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+
+      CommandResponseInfo analysisStreamIDResponseValue = new CommandResponseInfo("analysisStreamID", "Integer");
+      responseValues.put(analysisStreamIDResponseValue, analysisStreamID);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
+  public static class DelegatedAvAnalysisClusterSupportedAmbientContextsAttributeCallback implements ChipClusters.AvAnalysisCluster.SupportedAmbientContextsAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<ChipStructs.AvAnalysisClusterSemanticTagStruct> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.AvAnalysisClusterSemanticTagStruct>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedAvAnalysisClusterActiveAmbientContextTriggersAttributeCallback implements ChipClusters.AvAnalysisCluster.ActiveAmbientContextTriggersAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<ChipStructs.AvAnalysisClusterContextTriggerStruct> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.AvAnalysisClusterContextTriggerStruct>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedAvAnalysisClusterAnalysisStreamsAttributeCallback implements ChipClusters.AvAnalysisCluster.AnalysisStreamsAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<ChipStructs.AvAnalysisClusterAnalysisStreamStruct> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.AvAnalysisClusterAnalysisStreamStruct>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedAvAnalysisClusterGeneratedCommandListAttributeCallback implements ChipClusters.AvAnalysisCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedAvAnalysisClusterAcceptedCommandListAttributeCallback implements ChipClusters.AvAnalysisCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedAvAnalysisClusterAttributeListAttributeCallback implements ChipClusters.AvAnalysisCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+
+  public static class DelegatedCommodityTariffClusterGetTariffComponentResponseCallback implements ChipClusters.CommodityTariffCluster.GetTariffComponentResponseCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable String label, ArrayList<Long> dayEntryIDs, ChipStructs.CommodityTariffClusterTariffComponentStruct tariffComponent) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+
+      CommandResponseInfo labelResponseValue = new CommandResponseInfo("label", "String");
+      responseValues.put(labelResponseValue, label);
+      // dayEntryIDs: int32u
+      // Conversion from this type to Java is not properly implemented yet
+
+      // tariffComponent: Struct TariffComponentStruct
+      // Conversion from this type to Java is not properly implemented yet
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
+
+  public static class DelegatedCommodityTariffClusterGetDayEntryResponseCallback implements ChipClusters.CommodityTariffCluster.GetDayEntryResponseCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(ChipStructs.CommodityTariffClusterDayEntryStruct dayEntry) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+
+      // dayEntry: Struct DayEntryStruct
+      // Conversion from this type to Java is not properly implemented yet
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
+  public static class DelegatedCommodityTariffClusterTariffInfoAttributeCallback implements ChipClusters.CommodityTariffCluster.TariffInfoAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable ChipStructs.CommodityTariffClusterTariffInformationStruct value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "ChipStructs.CommodityTariffClusterTariffInformationStruct");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedCommodityTariffClusterTariffUnitAttributeCallback implements ChipClusters.CommodityTariffCluster.TariffUnitAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable Integer value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "Integer");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedCommodityTariffClusterStartDateAttributeCallback implements ChipClusters.CommodityTariffCluster.StartDateAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable Long value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "Long");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedCommodityTariffClusterDayEntriesAttributeCallback implements ChipClusters.CommodityTariffCluster.DayEntriesAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable List<ChipStructs.CommodityTariffClusterDayEntryStruct> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.CommodityTariffClusterDayEntryStruct>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedCommodityTariffClusterDayPatternsAttributeCallback implements ChipClusters.CommodityTariffCluster.DayPatternsAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable List<ChipStructs.CommodityTariffClusterDayPatternStruct> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.CommodityTariffClusterDayPatternStruct>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedCommodityTariffClusterCalendarPeriodsAttributeCallback implements ChipClusters.CommodityTariffCluster.CalendarPeriodsAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable List<ChipStructs.CommodityTariffClusterCalendarPeriodStruct> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.CommodityTariffClusterCalendarPeriodStruct>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedCommodityTariffClusterIndividualDaysAttributeCallback implements ChipClusters.CommodityTariffCluster.IndividualDaysAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable List<ChipStructs.CommodityTariffClusterDayStruct> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.CommodityTariffClusterDayStruct>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedCommodityTariffClusterCurrentDayAttributeCallback implements ChipClusters.CommodityTariffCluster.CurrentDayAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable ChipStructs.CommodityTariffClusterDayStruct value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "ChipStructs.CommodityTariffClusterDayStruct");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedCommodityTariffClusterNextDayAttributeCallback implements ChipClusters.CommodityTariffCluster.NextDayAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable ChipStructs.CommodityTariffClusterDayStruct value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "ChipStructs.CommodityTariffClusterDayStruct");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedCommodityTariffClusterCurrentDayEntryAttributeCallback implements ChipClusters.CommodityTariffCluster.CurrentDayEntryAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable ChipStructs.CommodityTariffClusterDayEntryStruct value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "ChipStructs.CommodityTariffClusterDayEntryStruct");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedCommodityTariffClusterCurrentDayEntryDateAttributeCallback implements ChipClusters.CommodityTariffCluster.CurrentDayEntryDateAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable Long value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "Long");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedCommodityTariffClusterNextDayEntryAttributeCallback implements ChipClusters.CommodityTariffCluster.NextDayEntryAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable ChipStructs.CommodityTariffClusterDayEntryStruct value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "ChipStructs.CommodityTariffClusterDayEntryStruct");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedCommodityTariffClusterNextDayEntryDateAttributeCallback implements ChipClusters.CommodityTariffCluster.NextDayEntryDateAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable Long value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "Long");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedCommodityTariffClusterTariffComponentsAttributeCallback implements ChipClusters.CommodityTariffCluster.TariffComponentsAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable List<ChipStructs.CommodityTariffClusterTariffComponentStruct> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.CommodityTariffClusterTariffComponentStruct>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedCommodityTariffClusterTariffPeriodsAttributeCallback implements ChipClusters.CommodityTariffCluster.TariffPeriodsAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable List<ChipStructs.CommodityTariffClusterTariffPeriodStruct> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.CommodityTariffClusterTariffPeriodStruct>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedCommodityTariffClusterCurrentTariffComponentsAttributeCallback implements ChipClusters.CommodityTariffCluster.CurrentTariffComponentsAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable List<ChipStructs.CommodityTariffClusterTariffComponentStruct> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.CommodityTariffClusterTariffComponentStruct>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedCommodityTariffClusterNextTariffComponentsAttributeCallback implements ChipClusters.CommodityTariffCluster.NextTariffComponentsAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable List<ChipStructs.CommodityTariffClusterTariffComponentStruct> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.CommodityTariffClusterTariffComponentStruct>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedCommodityTariffClusterDefaultRandomizationOffsetAttributeCallback implements ChipClusters.CommodityTariffCluster.DefaultRandomizationOffsetAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable Integer value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "Integer");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedCommodityTariffClusterDefaultRandomizationTypeAttributeCallback implements ChipClusters.CommodityTariffCluster.DefaultRandomizationTypeAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable Integer value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "Integer");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedCommodityTariffClusterGeneratedCommandListAttributeCallback implements ChipClusters.CommodityTariffCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedCommodityTariffClusterAcceptedCommandListAttributeCallback implements ChipClusters.CommodityTariffCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedCommodityTariffClusterAttributeListAttributeCallback implements ChipClusters.CommodityTariffCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -20937,27 +21600,6 @@ public class ClusterInfoMapping {
   }
 
   public static class DelegatedEcosystemInformationClusterAcceptedCommandListAttributeCallback implements ChipClusters.EcosystemInformationCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
-  public static class DelegatedEcosystemInformationClusterEventListAttributeCallback implements ChipClusters.EcosystemInformationCluster.EventListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -21071,7 +21713,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedCommissionerControlClusterEventListAttributeCallback implements ChipClusters.CommissionerControlCluster.EventListAttributeCallback, DelegatedClusterCallback {
+  public static class DelegatedCommissionerControlClusterAttributeListAttributeCallback implements ChipClusters.CommissionerControlCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -21092,7 +21734,1097 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedCommissionerControlClusterAttributeListAttributeCallback implements ChipClusters.CommissionerControlCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
+  public static class DelegatedJointFabricDatastoreClusterGroupKeySetListAttributeCallback implements ChipClusters.JointFabricDatastoreCluster.GroupKeySetListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<ChipStructs.JointFabricDatastoreClusterDatastoreGroupKeySetStruct> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.JointFabricDatastoreClusterDatastoreGroupKeySetStruct>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedJointFabricDatastoreClusterGroupListAttributeCallback implements ChipClusters.JointFabricDatastoreCluster.GroupListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<ChipStructs.JointFabricDatastoreClusterDatastoreGroupInformationEntryStruct> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.JointFabricDatastoreClusterDatastoreGroupInformationEntryStruct>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedJointFabricDatastoreClusterNodeListAttributeCallback implements ChipClusters.JointFabricDatastoreCluster.NodeListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<ChipStructs.JointFabricDatastoreClusterDatastoreNodeInformationEntryStruct> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.JointFabricDatastoreClusterDatastoreNodeInformationEntryStruct>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedJointFabricDatastoreClusterAdminListAttributeCallback implements ChipClusters.JointFabricDatastoreCluster.AdminListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<ChipStructs.JointFabricDatastoreClusterDatastoreAdministratorInformationEntryStruct> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.JointFabricDatastoreClusterDatastoreAdministratorInformationEntryStruct>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedJointFabricDatastoreClusterStatusAttributeCallback implements ChipClusters.JointFabricDatastoreCluster.StatusAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(ChipStructs.JointFabricDatastoreClusterDatastoreStatusEntryStruct value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "ChipStructs.JointFabricDatastoreClusterDatastoreStatusEntryStruct");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedJointFabricDatastoreClusterEndpointGroupIDListAttributeCallback implements ChipClusters.JointFabricDatastoreCluster.EndpointGroupIDListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<ChipStructs.JointFabricDatastoreClusterDatastoreEndpointGroupIDEntryStruct> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.JointFabricDatastoreClusterDatastoreEndpointGroupIDEntryStruct>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedJointFabricDatastoreClusterEndpointBindingListAttributeCallback implements ChipClusters.JointFabricDatastoreCluster.EndpointBindingListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<ChipStructs.JointFabricDatastoreClusterDatastoreEndpointBindingEntryStruct> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.JointFabricDatastoreClusterDatastoreEndpointBindingEntryStruct>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedJointFabricDatastoreClusterNodeKeySetListAttributeCallback implements ChipClusters.JointFabricDatastoreCluster.NodeKeySetListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<ChipStructs.JointFabricDatastoreClusterDatastoreNodeKeySetEntryStruct> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.JointFabricDatastoreClusterDatastoreNodeKeySetEntryStruct>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedJointFabricDatastoreClusterNodeACLListAttributeCallback implements ChipClusters.JointFabricDatastoreCluster.NodeACLListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<ChipStructs.JointFabricDatastoreClusterDatastoreACLEntryStruct> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.JointFabricDatastoreClusterDatastoreACLEntryStruct>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedJointFabricDatastoreClusterNodeEndpointListAttributeCallback implements ChipClusters.JointFabricDatastoreCluster.NodeEndpointListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<ChipStructs.JointFabricDatastoreClusterDatastoreEndpointEntryStruct> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.JointFabricDatastoreClusterDatastoreEndpointEntryStruct>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedJointFabricDatastoreClusterGeneratedCommandListAttributeCallback implements ChipClusters.JointFabricDatastoreCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedJointFabricDatastoreClusterAcceptedCommandListAttributeCallback implements ChipClusters.JointFabricDatastoreCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedJointFabricDatastoreClusterAttributeListAttributeCallback implements ChipClusters.JointFabricDatastoreCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+
+  public static class DelegatedJointFabricAdministratorClusterICACCSRResponseCallback implements ChipClusters.JointFabricAdministratorCluster.ICACCSRResponseCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(Integer statusCode, Optional<byte[]> icaccsr) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+
+      CommandResponseInfo statusCodeResponseValue = new CommandResponseInfo("statusCode", "Integer");
+      responseValues.put(statusCodeResponseValue, statusCode);
+      CommandResponseInfo icaccsrResponseValue = new CommandResponseInfo("icaccsr", "Optional<byte[]>");
+      responseValues.put(icaccsrResponseValue, icaccsr);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
+
+  public static class DelegatedJointFabricAdministratorClusterICACResponseCallback implements ChipClusters.JointFabricAdministratorCluster.ICACResponseCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(Integer statusCode) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+
+      CommandResponseInfo statusCodeResponseValue = new CommandResponseInfo("statusCode", "Integer");
+      responseValues.put(statusCodeResponseValue, statusCode);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
+
+  public static class DelegatedJointFabricAdministratorClusterTransferAnchorResponseCallback implements ChipClusters.JointFabricAdministratorCluster.TransferAnchorResponseCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(Integer statusCode) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+
+      CommandResponseInfo statusCodeResponseValue = new CommandResponseInfo("statusCode", "Integer");
+      responseValues.put(statusCodeResponseValue, statusCode);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
+  public static class DelegatedJointFabricAdministratorClusterAdministratorFabricIndexAttributeCallback implements ChipClusters.JointFabricAdministratorCluster.AdministratorFabricIndexAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable Integer value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "Integer");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedJointFabricAdministratorClusterGeneratedCommandListAttributeCallback implements ChipClusters.JointFabricAdministratorCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedJointFabricAdministratorClusterAcceptedCommandListAttributeCallback implements ChipClusters.JointFabricAdministratorCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedJointFabricAdministratorClusterAttributeListAttributeCallback implements ChipClusters.JointFabricAdministratorCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+
+  public static class DelegatedTlsCertificateManagementClusterProvisionRootCertificateResponseCallback implements ChipClusters.TlsCertificateManagementCluster.ProvisionRootCertificateResponseCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(Integer caid) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+
+      CommandResponseInfo caidResponseValue = new CommandResponseInfo("caid", "Integer");
+      responseValues.put(caidResponseValue, caid);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
+
+  public static class DelegatedTlsCertificateManagementClusterFindRootCertificateResponseCallback implements ChipClusters.TlsCertificateManagementCluster.FindRootCertificateResponseCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(ArrayList<ChipStructs.TlsCertificateManagementClusterTLSCertStruct> certificateDetails) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+
+      // certificateDetails: TLSCertStruct
+      // Conversion from this type to Java is not properly implemented yet
+
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
+
+  public static class DelegatedTlsCertificateManagementClusterLookupRootCertificateResponseCallback implements ChipClusters.TlsCertificateManagementCluster.LookupRootCertificateResponseCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(Integer caid) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+
+      CommandResponseInfo caidResponseValue = new CommandResponseInfo("caid", "Integer");
+      responseValues.put(caidResponseValue, caid);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
+
+  public static class DelegatedTlsCertificateManagementClusterClientCSRResponseCallback implements ChipClusters.TlsCertificateManagementCluster.ClientCSRResponseCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(Integer ccdid, byte[] csr, byte[] nonceSignature) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+
+      CommandResponseInfo ccdidResponseValue = new CommandResponseInfo("ccdid", "Integer");
+      responseValues.put(ccdidResponseValue, ccdid);
+      CommandResponseInfo csrResponseValue = new CommandResponseInfo("csr", "byte[]");
+      responseValues.put(csrResponseValue, csr);
+      CommandResponseInfo nonceSignatureResponseValue = new CommandResponseInfo("nonceSignature", "byte[]");
+      responseValues.put(nonceSignatureResponseValue, nonceSignature);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
+
+  public static class DelegatedTlsCertificateManagementClusterFindClientCertificateResponseCallback implements ChipClusters.TlsCertificateManagementCluster.FindClientCertificateResponseCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(ArrayList<ChipStructs.TlsCertificateManagementClusterTLSClientCertificateDetailStruct> certificateDetails) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+
+      // certificateDetails: TLSClientCertificateDetailStruct
+      // Conversion from this type to Java is not properly implemented yet
+
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
+
+  public static class DelegatedTlsCertificateManagementClusterLookupClientCertificateResponseCallback implements ChipClusters.TlsCertificateManagementCluster.LookupClientCertificateResponseCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(Integer ccdid) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+
+      CommandResponseInfo ccdidResponseValue = new CommandResponseInfo("ccdid", "Integer");
+      responseValues.put(ccdidResponseValue, ccdid);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
+  public static class DelegatedTlsCertificateManagementClusterProvisionedRootCertificatesAttributeCallback implements ChipClusters.TlsCertificateManagementCluster.ProvisionedRootCertificatesAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<ChipStructs.TlsCertificateManagementClusterTLSCertStruct> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.TlsCertificateManagementClusterTLSCertStruct>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedTlsCertificateManagementClusterProvisionedClientCertificatesAttributeCallback implements ChipClusters.TlsCertificateManagementCluster.ProvisionedClientCertificatesAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<ChipStructs.TlsCertificateManagementClusterTLSClientCertificateDetailStruct> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.TlsCertificateManagementClusterTLSClientCertificateDetailStruct>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedTlsCertificateManagementClusterGeneratedCommandListAttributeCallback implements ChipClusters.TlsCertificateManagementCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedTlsCertificateManagementClusterAcceptedCommandListAttributeCallback implements ChipClusters.TlsCertificateManagementCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedTlsCertificateManagementClusterAttributeListAttributeCallback implements ChipClusters.TlsCertificateManagementCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+
+  public static class DelegatedTlsClientManagementClusterProvisionEndpointResponseCallback implements ChipClusters.TlsClientManagementCluster.ProvisionEndpointResponseCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(Integer endpointID) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+
+      CommandResponseInfo endpointIDResponseValue = new CommandResponseInfo("endpointID", "Integer");
+      responseValues.put(endpointIDResponseValue, endpointID);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
+
+  public static class DelegatedTlsClientManagementClusterFindEndpointResponseCallback implements ChipClusters.TlsClientManagementCluster.FindEndpointResponseCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(ChipStructs.TlsClientManagementClusterTLSEndpointStruct endpoint) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+
+      // endpoint: Struct TLSEndpointStruct
+      // Conversion from this type to Java is not properly implemented yet
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
+  public static class DelegatedTlsClientManagementClusterProvisionedEndpointsAttributeCallback implements ChipClusters.TlsClientManagementCluster.ProvisionedEndpointsAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<ChipStructs.TlsClientManagementClusterTLSEndpointStruct> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.TlsClientManagementClusterTLSEndpointStruct>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedTlsClientManagementClusterGeneratedCommandListAttributeCallback implements ChipClusters.TlsClientManagementCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedTlsClientManagementClusterAcceptedCommandListAttributeCallback implements ChipClusters.TlsClientManagementCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedTlsClientManagementClusterAttributeListAttributeCallback implements ChipClusters.TlsClientManagementCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedMeterIdentificationClusterMeterTypeAttributeCallback implements ChipClusters.MeterIdentificationCluster.MeterTypeAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable Integer value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "Integer");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedMeterIdentificationClusterPointOfDeliveryAttributeCallback implements ChipClusters.MeterIdentificationCluster.PointOfDeliveryAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable String value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "String");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedMeterIdentificationClusterMeterSerialNumberAttributeCallback implements ChipClusters.MeterIdentificationCluster.MeterSerialNumberAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable String value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "String");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedMeterIdentificationClusterProtocolVersionAttributeCallback implements ChipClusters.MeterIdentificationCluster.ProtocolVersionAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable String value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "String");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedMeterIdentificationClusterPowerThresholdAttributeCallback implements ChipClusters.MeterIdentificationCluster.PowerThresholdAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable ChipStructs.MeterIdentificationClusterPowerThresholdStruct value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "ChipStructs.MeterIdentificationClusterPowerThresholdStruct");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedMeterIdentificationClusterGeneratedCommandListAttributeCallback implements ChipClusters.MeterIdentificationCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedMeterIdentificationClusterAcceptedCommandListAttributeCallback implements ChipClusters.MeterIdentificationCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedMeterIdentificationClusterAttributeListAttributeCallback implements ChipClusters.MeterIdentificationCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedCommodityMeteringClusterMeteredQuantityAttributeCallback implements ChipClusters.CommodityMeteringCluster.MeteredQuantityAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable List<ChipStructs.CommodityMeteringClusterMeteredQuantityStruct> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.CommodityMeteringClusterMeteredQuantityStruct>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedCommodityMeteringClusterMeteredQuantityTimestampAttributeCallback implements ChipClusters.CommodityMeteringCluster.MeteredQuantityTimestampAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable Long value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "Long");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedCommodityMeteringClusterTariffUnitAttributeCallback implements ChipClusters.CommodityMeteringCluster.TariffUnitAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable Integer value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "Integer");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedCommodityMeteringClusterMaximumMeteredQuantitiesAttributeCallback implements ChipClusters.CommodityMeteringCluster.MaximumMeteredQuantitiesAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable Integer value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "Integer");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedCommodityMeteringClusterGeneratedCommandListAttributeCallback implements ChipClusters.CommodityMeteringCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedCommodityMeteringClusterAcceptedCommandListAttributeCallback implements ChipClusters.CommodityMeteringCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedCommodityMeteringClusterAttributeListAttributeCallback implements ChipClusters.CommodityMeteringCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -22494,27 +24226,6 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedUnitTestingClusterEventListAttributeCallback implements ChipClusters.UnitTestingCluster.EventListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
   public static class DelegatedUnitTestingClusterAttributeListAttributeCallback implements ChipClusters.UnitTestingCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -22558,27 +24269,6 @@ public class ClusterInfoMapping {
   }
 
   public static class DelegatedFaultInjectionClusterAcceptedCommandListAttributeCallback implements ChipClusters.FaultInjectionCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
-  public static class DelegatedFaultInjectionClusterEventListAttributeCallback implements ChipClusters.FaultInjectionCluster.EventListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -22664,27 +24354,6 @@ public class ClusterInfoMapping {
   }
 
   public static class DelegatedSampleMeiClusterAcceptedCommandListAttributeCallback implements ChipClusters.SampleMeiCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
-  public static class DelegatedSampleMeiClusterEventListAttributeCallback implements ChipClusters.SampleMeiCluster.EventListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -22893,10 +24562,6 @@ public class ClusterInfoMapping {
       (ptr, endpointId) -> new ChipClusters.IcdManagementCluster(ptr, endpointId), new HashMap<>());
     clusterMap.put("icdManagement", icdManagementClusterInfo);
 
-    ClusterInfo timerClusterInfo = new ClusterInfo(
-      (ptr, endpointId) -> new ChipClusters.TimerCluster(ptr, endpointId), new HashMap<>());
-    clusterMap.put("timer", timerClusterInfo);
-
     ClusterInfo ovenCavityOperationalStateClusterInfo = new ClusterInfo(
       (ptr, endpointId) -> new ChipClusters.OvenCavityOperationalStateCluster(ptr, endpointId), new HashMap<>());
     clusterMap.put("ovenCavityOperationalState", ovenCavityOperationalStateClusterInfo);
@@ -22977,6 +24642,10 @@ public class ClusterInfoMapping {
       (ptr, endpointId) -> new ChipClusters.ScenesManagementCluster(ptr, endpointId), new HashMap<>());
     clusterMap.put("scenesManagement", scenesManagementClusterInfo);
 
+    ClusterInfo groupcastClusterInfo = new ClusterInfo(
+      (ptr, endpointId) -> new ChipClusters.GroupcastCluster(ptr, endpointId), new HashMap<>());
+    clusterMap.put("groupcast", groupcastClusterInfo);
+
     ClusterInfo hepaFilterMonitoringClusterInfo = new ClusterInfo(
       (ptr, endpointId) -> new ChipClusters.HepaFilterMonitoringCluster(ptr, endpointId), new HashMap<>());
     clusterMap.put("hepaFilterMonitoring", hepaFilterMonitoringClusterInfo);
@@ -22984,6 +24653,10 @@ public class ClusterInfoMapping {
     ClusterInfo activatedCarbonFilterMonitoringClusterInfo = new ClusterInfo(
       (ptr, endpointId) -> new ChipClusters.ActivatedCarbonFilterMonitoringCluster(ptr, endpointId), new HashMap<>());
     clusterMap.put("activatedCarbonFilterMonitoring", activatedCarbonFilterMonitoringClusterInfo);
+
+    ClusterInfo waterTankLevelMonitoringClusterInfo = new ClusterInfo(
+      (ptr, endpointId) -> new ChipClusters.WaterTankLevelMonitoringCluster(ptr, endpointId), new HashMap<>());
+    clusterMap.put("waterTankLevelMonitoring", waterTankLevelMonitoringClusterInfo);
 
     ClusterInfo booleanStateConfigurationClusterInfo = new ClusterInfo(
       (ptr, endpointId) -> new ChipClusters.BooleanStateConfigurationCluster(ptr, endpointId), new HashMap<>());
@@ -23005,9 +24678,9 @@ public class ClusterInfoMapping {
       (ptr, endpointId) -> new ChipClusters.WaterHeaterManagementCluster(ptr, endpointId), new HashMap<>());
     clusterMap.put("waterHeaterManagement", waterHeaterManagementClusterInfo);
 
-    ClusterInfo demandResponseLoadControlClusterInfo = new ClusterInfo(
-      (ptr, endpointId) -> new ChipClusters.DemandResponseLoadControlCluster(ptr, endpointId), new HashMap<>());
-    clusterMap.put("demandResponseLoadControl", demandResponseLoadControlClusterInfo);
+    ClusterInfo commodityPriceClusterInfo = new ClusterInfo(
+      (ptr, endpointId) -> new ChipClusters.CommodityPriceCluster(ptr, endpointId), new HashMap<>());
+    clusterMap.put("commodityPrice", commodityPriceClusterInfo);
 
     ClusterInfo messagesClusterInfo = new ClusterInfo(
       (ptr, endpointId) -> new ChipClusters.MessagesCluster(ptr, endpointId), new HashMap<>());
@@ -23041,6 +24714,22 @@ public class ClusterInfoMapping {
       (ptr, endpointId) -> new ChipClusters.DeviceEnergyManagementModeCluster(ptr, endpointId), new HashMap<>());
     clusterMap.put("deviceEnergyManagementMode", deviceEnergyManagementModeClusterInfo);
 
+    ClusterInfo electricalGridConditionsClusterInfo = new ClusterInfo(
+      (ptr, endpointId) -> new ChipClusters.ElectricalGridConditionsCluster(ptr, endpointId), new HashMap<>());
+    clusterMap.put("electricalGridConditions", electricalGridConditionsClusterInfo);
+
+    ClusterInfo electricalAlarmClusterInfo = new ClusterInfo(
+      (ptr, endpointId) -> new ChipClusters.ElectricalAlarmCluster(ptr, endpointId), new HashMap<>());
+    clusterMap.put("electricalAlarm", electricalAlarmClusterInfo);
+
+    ClusterInfo electricalDistributionClusterInfo = new ClusterInfo(
+      (ptr, endpointId) -> new ChipClusters.ElectricalDistributionCluster(ptr, endpointId), new HashMap<>());
+    clusterMap.put("electricalDistribution", electricalDistributionClusterInfo);
+
+    ClusterInfo electricalProtectionAlarmClusterInfo = new ClusterInfo(
+      (ptr, endpointId) -> new ChipClusters.ElectricalProtectionAlarmCluster(ptr, endpointId), new HashMap<>());
+    clusterMap.put("electricalProtectionAlarm", electricalProtectionAlarmClusterInfo);
+
     ClusterInfo doorLockClusterInfo = new ClusterInfo(
       (ptr, endpointId) -> new ChipClusters.DoorLockCluster(ptr, endpointId), new HashMap<>());
     clusterMap.put("doorLock", doorLockClusterInfo);
@@ -23048,6 +24737,14 @@ public class ClusterInfoMapping {
     ClusterInfo windowCoveringClusterInfo = new ClusterInfo(
       (ptr, endpointId) -> new ChipClusters.WindowCoveringCluster(ptr, endpointId), new HashMap<>());
     clusterMap.put("windowCovering", windowCoveringClusterInfo);
+
+    ClusterInfo closureControlClusterInfo = new ClusterInfo(
+      (ptr, endpointId) -> new ChipClusters.ClosureControlCluster(ptr, endpointId), new HashMap<>());
+    clusterMap.put("closureControl", closureControlClusterInfo);
+
+    ClusterInfo closureDimensionClusterInfo = new ClusterInfo(
+      (ptr, endpointId) -> new ChipClusters.ClosureDimensionCluster(ptr, endpointId), new HashMap<>());
+    clusterMap.put("closureDimension", closureDimensionClusterInfo);
 
     ClusterInfo serviceAreaClusterInfo = new ClusterInfo(
       (ptr, endpointId) -> new ChipClusters.ServiceAreaCluster(ptr, endpointId), new HashMap<>());
@@ -23069,6 +24766,10 @@ public class ClusterInfoMapping {
       (ptr, endpointId) -> new ChipClusters.ThermostatUserInterfaceConfigurationCluster(ptr, endpointId), new HashMap<>());
     clusterMap.put("thermostatUserInterfaceConfiguration", thermostatUserInterfaceConfigurationClusterInfo);
 
+    ClusterInfo humidistatClusterInfo = new ClusterInfo(
+      (ptr, endpointId) -> new ChipClusters.HumidistatCluster(ptr, endpointId), new HashMap<>());
+    clusterMap.put("humidistat", humidistatClusterInfo);
+
     ClusterInfo colorControlClusterInfo = new ClusterInfo(
       (ptr, endpointId) -> new ChipClusters.ColorControlCluster(ptr, endpointId), new HashMap<>());
     clusterMap.put("colorControl", colorControlClusterInfo);
@@ -23076,6 +24777,10 @@ public class ClusterInfoMapping {
     ClusterInfo ballastConfigurationClusterInfo = new ClusterInfo(
       (ptr, endpointId) -> new ChipClusters.BallastConfigurationCluster(ptr, endpointId), new HashMap<>());
     clusterMap.put("ballastConfiguration", ballastConfigurationClusterInfo);
+
+    ClusterInfo dynamicLightingClusterInfo = new ClusterInfo(
+      (ptr, endpointId) -> new ChipClusters.DynamicLightingCluster(ptr, endpointId), new HashMap<>());
+    clusterMap.put("dynamicLighting", dynamicLightingClusterInfo);
 
     ClusterInfo illuminanceMeasurementClusterInfo = new ClusterInfo(
       (ptr, endpointId) -> new ChipClusters.IlluminanceMeasurementCluster(ptr, endpointId), new HashMap<>());
@@ -23140,6 +24845,30 @@ public class ClusterInfoMapping {
     ClusterInfo radonConcentrationMeasurementClusterInfo = new ClusterInfo(
       (ptr, endpointId) -> new ChipClusters.RadonConcentrationMeasurementCluster(ptr, endpointId), new HashMap<>());
     clusterMap.put("radonConcentrationMeasurement", radonConcentrationMeasurementClusterInfo);
+
+    ClusterInfo soilMeasurementClusterInfo = new ClusterInfo(
+      (ptr, endpointId) -> new ChipClusters.SoilMeasurementCluster(ptr, endpointId), new HashMap<>());
+    clusterMap.put("soilMeasurement", soilMeasurementClusterInfo);
+
+    ClusterInfo ambientContextSensingClusterInfo = new ClusterInfo(
+      (ptr, endpointId) -> new ChipClusters.AmbientContextSensingCluster(ptr, endpointId), new HashMap<>());
+    clusterMap.put("ambientContextSensing", ambientContextSensingClusterInfo);
+
+    ClusterInfo ambientSensingUnionClusterInfo = new ClusterInfo(
+      (ptr, endpointId) -> new ChipClusters.AmbientSensingUnionCluster(ptr, endpointId), new HashMap<>());
+    clusterMap.put("ambientSensingUnion", ambientSensingUnionClusterInfo);
+
+    ClusterInfo proximityRangingClusterInfo = new ClusterInfo(
+      (ptr, endpointId) -> new ChipClusters.ProximityRangingCluster(ptr, endpointId), new HashMap<>());
+    clusterMap.put("proximityRanging", proximityRangingClusterInfo);
+
+    ClusterInfo smokeConcentrationMeasurementClusterInfo = new ClusterInfo(
+      (ptr, endpointId) -> new ChipClusters.SmokeConcentrationMeasurementCluster(ptr, endpointId), new HashMap<>());
+    clusterMap.put("smokeConcentrationMeasurement", smokeConcentrationMeasurementClusterInfo);
+
+    ClusterInfo networkIdentityManagementClusterInfo = new ClusterInfo(
+      (ptr, endpointId) -> new ChipClusters.NetworkIdentityManagementCluster(ptr, endpointId), new HashMap<>());
+    clusterMap.put("networkIdentityManagement", networkIdentityManagementClusterInfo);
 
     ClusterInfo wiFiNetworkManagementClusterInfo = new ClusterInfo(
       (ptr, endpointId) -> new ChipClusters.WiFiNetworkManagementCluster(ptr, endpointId), new HashMap<>());
@@ -23217,6 +24946,10 @@ public class ClusterInfoMapping {
       (ptr, endpointId) -> new ChipClusters.CameraAvStreamManagementCluster(ptr, endpointId), new HashMap<>());
     clusterMap.put("cameraAvStreamManagement", cameraAvStreamManagementClusterInfo);
 
+    ClusterInfo cameraAvSettingsUserLevelManagementClusterInfo = new ClusterInfo(
+      (ptr, endpointId) -> new ChipClusters.CameraAvSettingsUserLevelManagementCluster(ptr, endpointId), new HashMap<>());
+    clusterMap.put("cameraAvSettingsUserLevelManagement", cameraAvSettingsUserLevelManagementClusterInfo);
+
     ClusterInfo webRTCTransportProviderClusterInfo = new ClusterInfo(
       (ptr, endpointId) -> new ChipClusters.WebRTCTransportProviderCluster(ptr, endpointId), new HashMap<>());
     clusterMap.put("webRTCTransportProvider", webRTCTransportProviderClusterInfo);
@@ -23225,9 +24958,21 @@ public class ClusterInfoMapping {
       (ptr, endpointId) -> new ChipClusters.WebRTCTransportRequestorCluster(ptr, endpointId), new HashMap<>());
     clusterMap.put("webRTCTransportRequestor", webRTCTransportRequestorClusterInfo);
 
+    ClusterInfo pushAvStreamTransportClusterInfo = new ClusterInfo(
+      (ptr, endpointId) -> new ChipClusters.PushAvStreamTransportCluster(ptr, endpointId), new HashMap<>());
+    clusterMap.put("pushAvStreamTransport", pushAvStreamTransportClusterInfo);
+
     ClusterInfo chimeClusterInfo = new ClusterInfo(
       (ptr, endpointId) -> new ChipClusters.ChimeCluster(ptr, endpointId), new HashMap<>());
     clusterMap.put("chime", chimeClusterInfo);
+
+    ClusterInfo avAnalysisClusterInfo = new ClusterInfo(
+      (ptr, endpointId) -> new ChipClusters.AvAnalysisCluster(ptr, endpointId), new HashMap<>());
+    clusterMap.put("avAnalysis", avAnalysisClusterInfo);
+
+    ClusterInfo commodityTariffClusterInfo = new ClusterInfo(
+      (ptr, endpointId) -> new ChipClusters.CommodityTariffCluster(ptr, endpointId), new HashMap<>());
+    clusterMap.put("commodityTariff", commodityTariffClusterInfo);
 
     ClusterInfo ecosystemInformationClusterInfo = new ClusterInfo(
       (ptr, endpointId) -> new ChipClusters.EcosystemInformationCluster(ptr, endpointId), new HashMap<>());
@@ -23236,6 +24981,30 @@ public class ClusterInfoMapping {
     ClusterInfo commissionerControlClusterInfo = new ClusterInfo(
       (ptr, endpointId) -> new ChipClusters.CommissionerControlCluster(ptr, endpointId), new HashMap<>());
     clusterMap.put("commissionerControl", commissionerControlClusterInfo);
+
+    ClusterInfo jointFabricDatastoreClusterInfo = new ClusterInfo(
+      (ptr, endpointId) -> new ChipClusters.JointFabricDatastoreCluster(ptr, endpointId), new HashMap<>());
+    clusterMap.put("jointFabricDatastore", jointFabricDatastoreClusterInfo);
+
+    ClusterInfo jointFabricAdministratorClusterInfo = new ClusterInfo(
+      (ptr, endpointId) -> new ChipClusters.JointFabricAdministratorCluster(ptr, endpointId), new HashMap<>());
+    clusterMap.put("jointFabricAdministrator", jointFabricAdministratorClusterInfo);
+
+    ClusterInfo tlsCertificateManagementClusterInfo = new ClusterInfo(
+      (ptr, endpointId) -> new ChipClusters.TlsCertificateManagementCluster(ptr, endpointId), new HashMap<>());
+    clusterMap.put("tlsCertificateManagement", tlsCertificateManagementClusterInfo);
+
+    ClusterInfo tlsClientManagementClusterInfo = new ClusterInfo(
+      (ptr, endpointId) -> new ChipClusters.TlsClientManagementCluster(ptr, endpointId), new HashMap<>());
+    clusterMap.put("tlsClientManagement", tlsClientManagementClusterInfo);
+
+    ClusterInfo meterIdentificationClusterInfo = new ClusterInfo(
+      (ptr, endpointId) -> new ChipClusters.MeterIdentificationCluster(ptr, endpointId), new HashMap<>());
+    clusterMap.put("meterIdentification", meterIdentificationClusterInfo);
+
+    ClusterInfo commodityMeteringClusterInfo = new ClusterInfo(
+      (ptr, endpointId) -> new ChipClusters.CommodityMeteringCluster(ptr, endpointId), new HashMap<>());
+    clusterMap.put("commodityMetering", commodityMeteringClusterInfo);
 
     ClusterInfo unitTestingClusterInfo = new ClusterInfo(
       (ptr, endpointId) -> new ChipClusters.UnitTestingCluster(ptr, endpointId), new HashMap<>());
@@ -23291,7 +25060,6 @@ public class ClusterInfoMapping {
     destination.get("proxyValid").combineCommands(source.get("proxyValid"));
     destination.get("booleanState").combineCommands(source.get("booleanState"));
     destination.get("icdManagement").combineCommands(source.get("icdManagement"));
-    destination.get("timer").combineCommands(source.get("timer"));
     destination.get("ovenCavityOperationalState").combineCommands(source.get("ovenCavityOperationalState"));
     destination.get("ovenMode").combineCommands(source.get("ovenMode"));
     destination.get("laundryDryerControls").combineCommands(source.get("laundryDryerControls"));
@@ -23312,14 +25080,16 @@ public class ClusterInfoMapping {
     destination.get("operationalState").combineCommands(source.get("operationalState"));
     destination.get("rvcOperationalState").combineCommands(source.get("rvcOperationalState"));
     destination.get("scenesManagement").combineCommands(source.get("scenesManagement"));
+    destination.get("groupcast").combineCommands(source.get("groupcast"));
     destination.get("hepaFilterMonitoring").combineCommands(source.get("hepaFilterMonitoring"));
     destination.get("activatedCarbonFilterMonitoring").combineCommands(source.get("activatedCarbonFilterMonitoring"));
+    destination.get("waterTankLevelMonitoring").combineCommands(source.get("waterTankLevelMonitoring"));
     destination.get("booleanStateConfiguration").combineCommands(source.get("booleanStateConfiguration"));
     destination.get("valveConfigurationAndControl").combineCommands(source.get("valveConfigurationAndControl"));
     destination.get("electricalPowerMeasurement").combineCommands(source.get("electricalPowerMeasurement"));
     destination.get("electricalEnergyMeasurement").combineCommands(source.get("electricalEnergyMeasurement"));
     destination.get("waterHeaterManagement").combineCommands(source.get("waterHeaterManagement"));
-    destination.get("demandResponseLoadControl").combineCommands(source.get("demandResponseLoadControl"));
+    destination.get("commodityPrice").combineCommands(source.get("commodityPrice"));
     destination.get("messages").combineCommands(source.get("messages"));
     destination.get("deviceEnergyManagement").combineCommands(source.get("deviceEnergyManagement"));
     destination.get("energyEvse").combineCommands(source.get("energyEvse"));
@@ -23328,15 +25098,23 @@ public class ClusterInfoMapping {
     destination.get("energyEvseMode").combineCommands(source.get("energyEvseMode"));
     destination.get("waterHeaterMode").combineCommands(source.get("waterHeaterMode"));
     destination.get("deviceEnergyManagementMode").combineCommands(source.get("deviceEnergyManagementMode"));
+    destination.get("electricalGridConditions").combineCommands(source.get("electricalGridConditions"));
+    destination.get("electricalAlarm").combineCommands(source.get("electricalAlarm"));
+    destination.get("electricalDistribution").combineCommands(source.get("electricalDistribution"));
+    destination.get("electricalProtectionAlarm").combineCommands(source.get("electricalProtectionAlarm"));
     destination.get("doorLock").combineCommands(source.get("doorLock"));
     destination.get("windowCovering").combineCommands(source.get("windowCovering"));
+    destination.get("closureControl").combineCommands(source.get("closureControl"));
+    destination.get("closureDimension").combineCommands(source.get("closureDimension"));
     destination.get("serviceArea").combineCommands(source.get("serviceArea"));
     destination.get("pumpConfigurationAndControl").combineCommands(source.get("pumpConfigurationAndControl"));
     destination.get("thermostat").combineCommands(source.get("thermostat"));
     destination.get("fanControl").combineCommands(source.get("fanControl"));
     destination.get("thermostatUserInterfaceConfiguration").combineCommands(source.get("thermostatUserInterfaceConfiguration"));
+    destination.get("humidistat").combineCommands(source.get("humidistat"));
     destination.get("colorControl").combineCommands(source.get("colorControl"));
     destination.get("ballastConfiguration").combineCommands(source.get("ballastConfiguration"));
+    destination.get("dynamicLighting").combineCommands(source.get("dynamicLighting"));
     destination.get("illuminanceMeasurement").combineCommands(source.get("illuminanceMeasurement"));
     destination.get("temperatureMeasurement").combineCommands(source.get("temperatureMeasurement"));
     destination.get("pressureMeasurement").combineCommands(source.get("pressureMeasurement"));
@@ -23353,6 +25131,12 @@ public class ClusterInfoMapping {
     destination.get("pm10ConcentrationMeasurement").combineCommands(source.get("pm10ConcentrationMeasurement"));
     destination.get("totalVolatileOrganicCompoundsConcentrationMeasurement").combineCommands(source.get("totalVolatileOrganicCompoundsConcentrationMeasurement"));
     destination.get("radonConcentrationMeasurement").combineCommands(source.get("radonConcentrationMeasurement"));
+    destination.get("soilMeasurement").combineCommands(source.get("soilMeasurement"));
+    destination.get("ambientContextSensing").combineCommands(source.get("ambientContextSensing"));
+    destination.get("ambientSensingUnion").combineCommands(source.get("ambientSensingUnion"));
+    destination.get("proximityRanging").combineCommands(source.get("proximityRanging"));
+    destination.get("smokeConcentrationMeasurement").combineCommands(source.get("smokeConcentrationMeasurement"));
+    destination.get("networkIdentityManagement").combineCommands(source.get("networkIdentityManagement"));
     destination.get("wiFiNetworkManagement").combineCommands(source.get("wiFiNetworkManagement"));
     destination.get("threadBorderRouterManagement").combineCommands(source.get("threadBorderRouterManagement"));
     destination.get("threadNetworkDirectory").combineCommands(source.get("threadNetworkDirectory"));
@@ -23372,11 +25156,21 @@ public class ClusterInfoMapping {
     destination.get("contentAppObserver").combineCommands(source.get("contentAppObserver"));
     destination.get("zoneManagement").combineCommands(source.get("zoneManagement"));
     destination.get("cameraAvStreamManagement").combineCommands(source.get("cameraAvStreamManagement"));
+    destination.get("cameraAvSettingsUserLevelManagement").combineCommands(source.get("cameraAvSettingsUserLevelManagement"));
     destination.get("webRTCTransportProvider").combineCommands(source.get("webRTCTransportProvider"));
     destination.get("webRTCTransportRequestor").combineCommands(source.get("webRTCTransportRequestor"));
+    destination.get("pushAvStreamTransport").combineCommands(source.get("pushAvStreamTransport"));
     destination.get("chime").combineCommands(source.get("chime"));
+    destination.get("avAnalysis").combineCommands(source.get("avAnalysis"));
+    destination.get("commodityTariff").combineCommands(source.get("commodityTariff"));
     destination.get("ecosystemInformation").combineCommands(source.get("ecosystemInformation"));
     destination.get("commissionerControl").combineCommands(source.get("commissionerControl"));
+    destination.get("jointFabricDatastore").combineCommands(source.get("jointFabricDatastore"));
+    destination.get("jointFabricAdministrator").combineCommands(source.get("jointFabricAdministrator"));
+    destination.get("tlsCertificateManagement").combineCommands(source.get("tlsCertificateManagement"));
+    destination.get("tlsClientManagement").combineCommands(source.get("tlsClientManagement"));
+    destination.get("meterIdentification").combineCommands(source.get("meterIdentification"));
+    destination.get("commodityMetering").combineCommands(source.get("commodityMetering"));
     destination.get("unitTesting").combineCommands(source.get("unitTesting"));
     destination.get("faultInjection").combineCommands(source.get("faultInjection"));
     destination.get("sampleMei").combineCommands(source.get("sampleMei"));
@@ -25262,6 +27056,57 @@ public class ClusterInfoMapping {
     );
     operationalCredentialsClusterInteractionInfoMap.put("addTrustedRootCertificate", operationalCredentialsaddTrustedRootCertificateInteractionInfo);
 
+    Map<String, CommandParameterInfo> operationalCredentialssetVIDVerificationStatementCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo operationalCredentialssetVIDVerificationStatementvendorIDCommandParameterInfo = new CommandParameterInfo("vendorID", Optional.class, Integer.class);
+    operationalCredentialssetVIDVerificationStatementCommandParams.put("vendorID",operationalCredentialssetVIDVerificationStatementvendorIDCommandParameterInfo);
+
+    CommandParameterInfo operationalCredentialssetVIDVerificationStatementVIDVerificationStatementCommandParameterInfo = new CommandParameterInfo("VIDVerificationStatement", Optional.class, byte[].class);
+    operationalCredentialssetVIDVerificationStatementCommandParams.put("VIDVerificationStatement",operationalCredentialssetVIDVerificationStatementVIDVerificationStatementCommandParameterInfo);
+
+    CommandParameterInfo operationalCredentialssetVIDVerificationStatementvvscCommandParameterInfo = new CommandParameterInfo("vvsc", Optional.class, byte[].class);
+    operationalCredentialssetVIDVerificationStatementCommandParams.put("vvsc",operationalCredentialssetVIDVerificationStatementvvscCommandParameterInfo);
+    InteractionInfo operationalCredentialssetVIDVerificationStatementInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.OperationalCredentialsCluster) cluster)
+        .setVIDVerificationStatement((DefaultClusterCallback) callback
+        , (Optional<Integer>)
+        commandArguments.get("vendorID")
+        , (Optional<byte[]>)
+        commandArguments.get("VIDVerificationStatement")
+        , (Optional<byte[]>)
+        commandArguments.get("vvsc")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        operationalCredentialssetVIDVerificationStatementCommandParams
+    );
+    operationalCredentialsClusterInteractionInfoMap.put("setVIDVerificationStatement", operationalCredentialssetVIDVerificationStatementInteractionInfo);
+
+    Map<String, CommandParameterInfo> operationalCredentialssignVIDVerificationRequestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo operationalCredentialssignVIDVerificationRequestfabricIndexCommandParameterInfo = new CommandParameterInfo("fabricIndex", Integer.class, Integer.class);
+    operationalCredentialssignVIDVerificationRequestCommandParams.put("fabricIndex",operationalCredentialssignVIDVerificationRequestfabricIndexCommandParameterInfo);
+
+    CommandParameterInfo operationalCredentialssignVIDVerificationRequestclientChallengeCommandParameterInfo = new CommandParameterInfo("clientChallenge", byte[].class, byte[].class);
+    operationalCredentialssignVIDVerificationRequestCommandParams.put("clientChallenge",operationalCredentialssignVIDVerificationRequestclientChallengeCommandParameterInfo);
+    InteractionInfo operationalCredentialssignVIDVerificationRequestInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.OperationalCredentialsCluster) cluster)
+          .signVIDVerificationRequest((ChipClusters.OperationalCredentialsCluster.SignVIDVerificationResponseCallback) callback
+           , (Integer)
+             commandArguments.get("fabricIndex")
+
+           , (byte[])
+             commandArguments.get("clientChallenge")
+
+            );
+        },
+        () -> new DelegatedOperationalCredentialsClusterSignVIDVerificationResponseCallback(),
+        operationalCredentialssignVIDVerificationRequestCommandParams
+      );
+    operationalCredentialsClusterInteractionInfoMap.put("signVIDVerificationRequest", operationalCredentialssignVIDVerificationRequestInteractionInfo);
+
     commandMap.put("operationalCredentials", operationalCredentialsClusterInteractionInfoMap);
 
     Map<String, InteractionInfo> groupKeyManagementClusterInteractionInfoMap = new LinkedHashMap<>();
@@ -25440,86 +27285,7 @@ public class ClusterInfoMapping {
 
     commandMap.put("icdManagement", icdManagementClusterInteractionInfoMap);
 
-    Map<String, InteractionInfo> timerClusterInteractionInfoMap = new LinkedHashMap<>();
-
-    Map<String, CommandParameterInfo> timersetTimerCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-
-    CommandParameterInfo timersetTimernewTimeCommandParameterInfo = new CommandParameterInfo("newTime", Long.class, Long.class);
-    timersetTimerCommandParams.put("newTime",timersetTimernewTimeCommandParameterInfo);
-    InteractionInfo timersetTimerInteractionInfo = new InteractionInfo(
-      (cluster, callback, commandArguments) -> {
-        ((ChipClusters.TimerCluster) cluster)
-        .setTimer((DefaultClusterCallback) callback
-        , (Long)
-        commandArguments.get("newTime")
-        );
-      },
-      () -> new DelegatedDefaultClusterCallback(),
-        timersetTimerCommandParams
-    );
-    timerClusterInteractionInfoMap.put("setTimer", timersetTimerInteractionInfo);
-
-    Map<String, CommandParameterInfo> timerresetTimerCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo timerresetTimerInteractionInfo = new InteractionInfo(
-      (cluster, callback, commandArguments) -> {
-        ((ChipClusters.TimerCluster) cluster)
-        .resetTimer((DefaultClusterCallback) callback
-        );
-      },
-      () -> new DelegatedDefaultClusterCallback(),
-        timerresetTimerCommandParams
-    );
-    timerClusterInteractionInfoMap.put("resetTimer", timerresetTimerInteractionInfo);
-
-    Map<String, CommandParameterInfo> timeraddTimeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-
-    CommandParameterInfo timeraddTimeadditionalTimeCommandParameterInfo = new CommandParameterInfo("additionalTime", Long.class, Long.class);
-    timeraddTimeCommandParams.put("additionalTime",timeraddTimeadditionalTimeCommandParameterInfo);
-    InteractionInfo timeraddTimeInteractionInfo = new InteractionInfo(
-      (cluster, callback, commandArguments) -> {
-        ((ChipClusters.TimerCluster) cluster)
-        .addTime((DefaultClusterCallback) callback
-        , (Long)
-        commandArguments.get("additionalTime")
-        );
-      },
-      () -> new DelegatedDefaultClusterCallback(),
-        timeraddTimeCommandParams
-    );
-    timerClusterInteractionInfoMap.put("addTime", timeraddTimeInteractionInfo);
-
-    Map<String, CommandParameterInfo> timerreduceTimeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-
-    CommandParameterInfo timerreduceTimetimeReductionCommandParameterInfo = new CommandParameterInfo("timeReduction", Long.class, Long.class);
-    timerreduceTimeCommandParams.put("timeReduction",timerreduceTimetimeReductionCommandParameterInfo);
-    InteractionInfo timerreduceTimeInteractionInfo = new InteractionInfo(
-      (cluster, callback, commandArguments) -> {
-        ((ChipClusters.TimerCluster) cluster)
-        .reduceTime((DefaultClusterCallback) callback
-        , (Long)
-        commandArguments.get("timeReduction")
-        );
-      },
-      () -> new DelegatedDefaultClusterCallback(),
-        timerreduceTimeCommandParams
-    );
-    timerClusterInteractionInfoMap.put("reduceTime", timerreduceTimeInteractionInfo);
-
-    commandMap.put("timer", timerClusterInteractionInfoMap);
-
     Map<String, InteractionInfo> ovenCavityOperationalStateClusterInteractionInfoMap = new LinkedHashMap<>();
-
-    Map<String, CommandParameterInfo> ovenCavityOperationalStatepauseCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo ovenCavityOperationalStatepauseInteractionInfo = new InteractionInfo(
-      (cluster, callback, commandArguments) -> {
-        ((ChipClusters.OvenCavityOperationalStateCluster) cluster)
-          .pause((ChipClusters.OvenCavityOperationalStateCluster.OperationalCommandResponseCallback) callback
-            );
-        },
-        () -> new DelegatedOvenCavityOperationalStateClusterOperationalCommandResponseCallback(),
-        ovenCavityOperationalStatepauseCommandParams
-      );
-    ovenCavityOperationalStateClusterInteractionInfoMap.put("pause", ovenCavityOperationalStatepauseInteractionInfo);
 
     Map<String, CommandParameterInfo> ovenCavityOperationalStatestopCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
     InteractionInfo ovenCavityOperationalStatestopInteractionInfo = new InteractionInfo(
@@ -25544,18 +27310,6 @@ public class ClusterInfoMapping {
         ovenCavityOperationalStatestartCommandParams
       );
     ovenCavityOperationalStateClusterInteractionInfoMap.put("start", ovenCavityOperationalStatestartInteractionInfo);
-
-    Map<String, CommandParameterInfo> ovenCavityOperationalStateresumeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo ovenCavityOperationalStateresumeInteractionInfo = new InteractionInfo(
-      (cluster, callback, commandArguments) -> {
-        ((ChipClusters.OvenCavityOperationalStateCluster) cluster)
-          .resume((ChipClusters.OvenCavityOperationalStateCluster.OperationalCommandResponseCallback) callback
-            );
-        },
-        () -> new DelegatedOvenCavityOperationalStateClusterOperationalCommandResponseCallback(),
-        ovenCavityOperationalStateresumeCommandParams
-      );
-    ovenCavityOperationalStateClusterInteractionInfoMap.put("resume", ovenCavityOperationalStateresumeInteractionInfo);
 
     commandMap.put("ovenCavityOperationalState", ovenCavityOperationalStateClusterInteractionInfoMap);
 
@@ -25994,8 +27748,8 @@ public class ClusterInfoMapping {
            , (String)
              commandArguments.get("sceneName")
 
-           , (ArrayList<ChipStructs.ScenesManagementClusterExtensionFieldSet>)
-             commandArguments.get("extensionFieldSets")
+           , (ArrayList<ChipStructs.ScenesManagementClusterExtensionFieldSetStruct>)
+             commandArguments.get("extensionFieldSetStructs")
 
             );
         },
@@ -26183,6 +27937,152 @@ public class ClusterInfoMapping {
 
     commandMap.put("scenesManagement", scenesManagementClusterInteractionInfoMap);
 
+    Map<String, InteractionInfo> groupcastClusterInteractionInfoMap = new LinkedHashMap<>();
+
+    Map<String, CommandParameterInfo> groupcastjoinGroupCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo groupcastjoinGroupgroupIDCommandParameterInfo = new CommandParameterInfo("groupID", Integer.class, Integer.class);
+    groupcastjoinGroupCommandParams.put("groupID",groupcastjoinGroupgroupIDCommandParameterInfo);
+
+    CommandParameterInfo groupcastjoinGroupendpointsCommandParameterInfo = new CommandParameterInfo("endpoints", ArrayList.class, ArrayList.class);
+    groupcastjoinGroupCommandParams.put("endpoints",groupcastjoinGroupendpointsCommandParameterInfo);
+
+    CommandParameterInfo groupcastjoinGroupkeySetIDCommandParameterInfo = new CommandParameterInfo("keySetID", Integer.class, Integer.class);
+    groupcastjoinGroupCommandParams.put("keySetID",groupcastjoinGroupkeySetIDCommandParameterInfo);
+
+    CommandParameterInfo groupcastjoinGroupkeyCommandParameterInfo = new CommandParameterInfo("key", Optional.class, byte[].class);
+    groupcastjoinGroupCommandParams.put("key",groupcastjoinGroupkeyCommandParameterInfo);
+
+    CommandParameterInfo groupcastjoinGroupuseAuxiliaryACLCommandParameterInfo = new CommandParameterInfo("useAuxiliaryACL", Optional.class, Boolean.class);
+    groupcastjoinGroupCommandParams.put("useAuxiliaryACL",groupcastjoinGroupuseAuxiliaryACLCommandParameterInfo);
+
+    CommandParameterInfo groupcastjoinGroupreplaceEndpointsCommandParameterInfo = new CommandParameterInfo("replaceEndpoints", Optional.class, Boolean.class);
+    groupcastjoinGroupCommandParams.put("replaceEndpoints",groupcastjoinGroupreplaceEndpointsCommandParameterInfo);
+
+    CommandParameterInfo groupcastjoinGroupmcastAddrPolicyCommandParameterInfo = new CommandParameterInfo("mcastAddrPolicy", Optional.class, Integer.class);
+    groupcastjoinGroupCommandParams.put("mcastAddrPolicy",groupcastjoinGroupmcastAddrPolicyCommandParameterInfo);
+    InteractionInfo groupcastjoinGroupInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.GroupcastCluster) cluster)
+        .joinGroup((DefaultClusterCallback) callback
+        , (Integer)
+        commandArguments.get("groupID")
+        , (ArrayList<Integer>)
+        commandArguments.get("endpoints")
+        , (Integer)
+        commandArguments.get("keySetID")
+        , (Optional<byte[]>)
+        commandArguments.get("key")
+        , (Optional<Boolean>)
+        commandArguments.get("useAuxiliaryACL")
+        , (Optional<Boolean>)
+        commandArguments.get("replaceEndpoints")
+        , (Optional<Integer>)
+        commandArguments.get("mcastAddrPolicy")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        groupcastjoinGroupCommandParams
+    );
+    groupcastClusterInteractionInfoMap.put("joinGroup", groupcastjoinGroupInteractionInfo);
+
+    Map<String, CommandParameterInfo> groupcastleaveGroupCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo groupcastleaveGroupgroupIDCommandParameterInfo = new CommandParameterInfo("groupID", Integer.class, Integer.class);
+    groupcastleaveGroupCommandParams.put("groupID",groupcastleaveGroupgroupIDCommandParameterInfo);
+
+    CommandParameterInfo groupcastleaveGroupendpointsCommandParameterInfo = new CommandParameterInfo("endpoints", Optional.class, ArrayList.class);
+    groupcastleaveGroupCommandParams.put("endpoints",groupcastleaveGroupendpointsCommandParameterInfo);
+    InteractionInfo groupcastleaveGroupInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.GroupcastCluster) cluster)
+          .leaveGroup((ChipClusters.GroupcastCluster.LeaveGroupResponseCallback) callback
+           , (Integer)
+             commandArguments.get("groupID")
+
+           , (Optional<ArrayList<Integer>>)
+             commandArguments.get("endpoints")
+
+            );
+        },
+        () -> new DelegatedGroupcastClusterLeaveGroupResponseCallback(),
+        groupcastleaveGroupCommandParams
+      );
+    groupcastClusterInteractionInfoMap.put("leaveGroup", groupcastleaveGroupInteractionInfo);
+
+    Map<String, CommandParameterInfo> groupcastupdateGroupKeyCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo groupcastupdateGroupKeygroupIDCommandParameterInfo = new CommandParameterInfo("groupID", Integer.class, Integer.class);
+    groupcastupdateGroupKeyCommandParams.put("groupID",groupcastupdateGroupKeygroupIDCommandParameterInfo);
+
+    CommandParameterInfo groupcastupdateGroupKeykeySetIDCommandParameterInfo = new CommandParameterInfo("keySetID", Integer.class, Integer.class);
+    groupcastupdateGroupKeyCommandParams.put("keySetID",groupcastupdateGroupKeykeySetIDCommandParameterInfo);
+
+    CommandParameterInfo groupcastupdateGroupKeykeyCommandParameterInfo = new CommandParameterInfo("key", Optional.class, byte[].class);
+    groupcastupdateGroupKeyCommandParams.put("key",groupcastupdateGroupKeykeyCommandParameterInfo);
+    InteractionInfo groupcastupdateGroupKeyInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.GroupcastCluster) cluster)
+        .updateGroupKey((DefaultClusterCallback) callback
+        , (Integer)
+        commandArguments.get("groupID")
+        , (Integer)
+        commandArguments.get("keySetID")
+        , (Optional<byte[]>)
+        commandArguments.get("key")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        groupcastupdateGroupKeyCommandParams
+    );
+    groupcastClusterInteractionInfoMap.put("updateGroupKey", groupcastupdateGroupKeyInteractionInfo);
+
+    Map<String, CommandParameterInfo> groupcastconfigureAuxiliaryACLCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo groupcastconfigureAuxiliaryACLgroupIDCommandParameterInfo = new CommandParameterInfo("groupID", Integer.class, Integer.class);
+    groupcastconfigureAuxiliaryACLCommandParams.put("groupID",groupcastconfigureAuxiliaryACLgroupIDCommandParameterInfo);
+
+    CommandParameterInfo groupcastconfigureAuxiliaryACLuseAuxiliaryACLCommandParameterInfo = new CommandParameterInfo("useAuxiliaryACL", Boolean.class, Boolean.class);
+    groupcastconfigureAuxiliaryACLCommandParams.put("useAuxiliaryACL",groupcastconfigureAuxiliaryACLuseAuxiliaryACLCommandParameterInfo);
+    InteractionInfo groupcastconfigureAuxiliaryACLInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.GroupcastCluster) cluster)
+        .configureAuxiliaryACL((DefaultClusterCallback) callback
+        , (Integer)
+        commandArguments.get("groupID")
+        , (Boolean)
+        commandArguments.get("useAuxiliaryACL")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        groupcastconfigureAuxiliaryACLCommandParams
+    );
+    groupcastClusterInteractionInfoMap.put("configureAuxiliaryACL", groupcastconfigureAuxiliaryACLInteractionInfo);
+
+    Map<String, CommandParameterInfo> groupcastgroupcastTestingCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo groupcastgroupcastTestingtestOperationCommandParameterInfo = new CommandParameterInfo("testOperation", Integer.class, Integer.class);
+    groupcastgroupcastTestingCommandParams.put("testOperation",groupcastgroupcastTestingtestOperationCommandParameterInfo);
+
+    CommandParameterInfo groupcastgroupcastTestingdurationSecondsCommandParameterInfo = new CommandParameterInfo("durationSeconds", Optional.class, Integer.class);
+    groupcastgroupcastTestingCommandParams.put("durationSeconds",groupcastgroupcastTestingdurationSecondsCommandParameterInfo);
+    InteractionInfo groupcastgroupcastTestingInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.GroupcastCluster) cluster)
+        .groupcastTesting((DefaultClusterCallback) callback
+        , (Integer)
+        commandArguments.get("testOperation")
+        , (Optional<Integer>)
+        commandArguments.get("durationSeconds")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        groupcastgroupcastTestingCommandParams
+    );
+    groupcastClusterInteractionInfoMap.put("groupcastTesting", groupcastgroupcastTestingInteractionInfo);
+
+    commandMap.put("groupcast", groupcastClusterInteractionInfoMap);
+
     Map<String, InteractionInfo> hepaFilterMonitoringClusterInteractionInfoMap = new LinkedHashMap<>();
 
     Map<String, CommandParameterInfo> hepaFilterMonitoringresetConditionCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
@@ -26214,6 +28114,22 @@ public class ClusterInfoMapping {
     activatedCarbonFilterMonitoringClusterInteractionInfoMap.put("resetCondition", activatedCarbonFilterMonitoringresetConditionInteractionInfo);
 
     commandMap.put("activatedCarbonFilterMonitoring", activatedCarbonFilterMonitoringClusterInteractionInfoMap);
+
+    Map<String, InteractionInfo> waterTankLevelMonitoringClusterInteractionInfoMap = new LinkedHashMap<>();
+
+    Map<String, CommandParameterInfo> waterTankLevelMonitoringresetConditionCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo waterTankLevelMonitoringresetConditionInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.WaterTankLevelMonitoringCluster) cluster)
+        .resetCondition((DefaultClusterCallback) callback
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        waterTankLevelMonitoringresetConditionCommandParams
+    );
+    waterTankLevelMonitoringClusterInteractionInfoMap.put("resetCondition", waterTankLevelMonitoringresetConditionInteractionInfo);
+
+    commandMap.put("waterTankLevelMonitoring", waterTankLevelMonitoringClusterInteractionInfoMap);
 
     Map<String, InteractionInfo> booleanStateConfigurationClusterInteractionInfoMap = new LinkedHashMap<>();
 
@@ -26330,90 +28246,45 @@ public class ClusterInfoMapping {
 
     commandMap.put("waterHeaterManagement", waterHeaterManagementClusterInteractionInfoMap);
 
-    Map<String, InteractionInfo> demandResponseLoadControlClusterInteractionInfoMap = new LinkedHashMap<>();
+    Map<String, InteractionInfo> commodityPriceClusterInteractionInfoMap = new LinkedHashMap<>();
 
-    Map<String, CommandParameterInfo> demandResponseLoadControlregisterLoadControlProgramRequestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    Map<String, CommandParameterInfo> commodityPricegetDetailedPriceRequestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
 
-    InteractionInfo demandResponseLoadControlregisterLoadControlProgramRequestInteractionInfo = new InteractionInfo(
+    CommandParameterInfo commodityPricegetDetailedPriceRequestdetailsCommandParameterInfo = new CommandParameterInfo("details", Integer.class, Integer.class);
+    commodityPricegetDetailedPriceRequestCommandParams.put("details",commodityPricegetDetailedPriceRequestdetailsCommandParameterInfo);
+    InteractionInfo commodityPricegetDetailedPriceRequestInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
-        ((ChipClusters.DemandResponseLoadControlCluster) cluster)
-        .registerLoadControlProgramRequest((DefaultClusterCallback) callback
-        , (ChipStructs.DemandResponseLoadControlClusterLoadControlProgramStruct)
-        commandArguments.get("loadControlProgram")
-        );
-      },
-      () -> new DelegatedDefaultClusterCallback(),
-        demandResponseLoadControlregisterLoadControlProgramRequestCommandParams
-    );
-    demandResponseLoadControlClusterInteractionInfoMap.put("registerLoadControlProgramRequest", demandResponseLoadControlregisterLoadControlProgramRequestInteractionInfo);
+        ((ChipClusters.CommodityPriceCluster) cluster)
+          .getDetailedPriceRequest((ChipClusters.CommodityPriceCluster.GetDetailedPriceResponseCallback) callback
+           , (Integer)
+             commandArguments.get("details")
 
-    Map<String, CommandParameterInfo> demandResponseLoadControlunregisterLoadControlProgramRequestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+            );
+        },
+        () -> new DelegatedCommodityPriceClusterGetDetailedPriceResponseCallback(),
+        commodityPricegetDetailedPriceRequestCommandParams
+      );
+    commodityPriceClusterInteractionInfoMap.put("getDetailedPriceRequest", commodityPricegetDetailedPriceRequestInteractionInfo);
 
-    CommandParameterInfo demandResponseLoadControlunregisterLoadControlProgramRequestloadControlProgramIDCommandParameterInfo = new CommandParameterInfo("loadControlProgramID", byte[].class, byte[].class);
-    demandResponseLoadControlunregisterLoadControlProgramRequestCommandParams.put("loadControlProgramID",demandResponseLoadControlunregisterLoadControlProgramRequestloadControlProgramIDCommandParameterInfo);
-    InteractionInfo demandResponseLoadControlunregisterLoadControlProgramRequestInteractionInfo = new InteractionInfo(
+    Map<String, CommandParameterInfo> commodityPricegetDetailedForecastRequestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo commodityPricegetDetailedForecastRequestdetailsCommandParameterInfo = new CommandParameterInfo("details", Integer.class, Integer.class);
+    commodityPricegetDetailedForecastRequestCommandParams.put("details",commodityPricegetDetailedForecastRequestdetailsCommandParameterInfo);
+    InteractionInfo commodityPricegetDetailedForecastRequestInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
-        ((ChipClusters.DemandResponseLoadControlCluster) cluster)
-        .unregisterLoadControlProgramRequest((DefaultClusterCallback) callback
-        , (byte[])
-        commandArguments.get("loadControlProgramID")
-        );
-      },
-      () -> new DelegatedDefaultClusterCallback(),
-        demandResponseLoadControlunregisterLoadControlProgramRequestCommandParams
-    );
-    demandResponseLoadControlClusterInteractionInfoMap.put("unregisterLoadControlProgramRequest", demandResponseLoadControlunregisterLoadControlProgramRequestInteractionInfo);
+        ((ChipClusters.CommodityPriceCluster) cluster)
+          .getDetailedForecastRequest((ChipClusters.CommodityPriceCluster.GetDetailedForecastResponseCallback) callback
+           , (Integer)
+             commandArguments.get("details")
 
-    Map<String, CommandParameterInfo> demandResponseLoadControladdLoadControlEventRequestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+            );
+        },
+        () -> new DelegatedCommodityPriceClusterGetDetailedForecastResponseCallback(),
+        commodityPricegetDetailedForecastRequestCommandParams
+      );
+    commodityPriceClusterInteractionInfoMap.put("getDetailedForecastRequest", commodityPricegetDetailedForecastRequestInteractionInfo);
 
-    InteractionInfo demandResponseLoadControladdLoadControlEventRequestInteractionInfo = new InteractionInfo(
-      (cluster, callback, commandArguments) -> {
-        ((ChipClusters.DemandResponseLoadControlCluster) cluster)
-        .addLoadControlEventRequest((DefaultClusterCallback) callback
-        , (ChipStructs.DemandResponseLoadControlClusterLoadControlEventStruct)
-        commandArguments.get("event")
-        );
-      },
-      () -> new DelegatedDefaultClusterCallback(),
-        demandResponseLoadControladdLoadControlEventRequestCommandParams
-    );
-    demandResponseLoadControlClusterInteractionInfoMap.put("addLoadControlEventRequest", demandResponseLoadControladdLoadControlEventRequestInteractionInfo);
-
-    Map<String, CommandParameterInfo> demandResponseLoadControlremoveLoadControlEventRequestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-
-    CommandParameterInfo demandResponseLoadControlremoveLoadControlEventRequesteventIDCommandParameterInfo = new CommandParameterInfo("eventID", byte[].class, byte[].class);
-    demandResponseLoadControlremoveLoadControlEventRequestCommandParams.put("eventID",demandResponseLoadControlremoveLoadControlEventRequesteventIDCommandParameterInfo);
-
-    CommandParameterInfo demandResponseLoadControlremoveLoadControlEventRequestcancelControlCommandParameterInfo = new CommandParameterInfo("cancelControl", Integer.class, Integer.class);
-    demandResponseLoadControlremoveLoadControlEventRequestCommandParams.put("cancelControl",demandResponseLoadControlremoveLoadControlEventRequestcancelControlCommandParameterInfo);
-    InteractionInfo demandResponseLoadControlremoveLoadControlEventRequestInteractionInfo = new InteractionInfo(
-      (cluster, callback, commandArguments) -> {
-        ((ChipClusters.DemandResponseLoadControlCluster) cluster)
-        .removeLoadControlEventRequest((DefaultClusterCallback) callback
-        , (byte[])
-        commandArguments.get("eventID")
-        , (Integer)
-        commandArguments.get("cancelControl")
-        );
-      },
-      () -> new DelegatedDefaultClusterCallback(),
-        demandResponseLoadControlremoveLoadControlEventRequestCommandParams
-    );
-    demandResponseLoadControlClusterInteractionInfoMap.put("removeLoadControlEventRequest", demandResponseLoadControlremoveLoadControlEventRequestInteractionInfo);
-
-    Map<String, CommandParameterInfo> demandResponseLoadControlclearLoadControlEventsRequestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo demandResponseLoadControlclearLoadControlEventsRequestInteractionInfo = new InteractionInfo(
-      (cluster, callback, commandArguments) -> {
-        ((ChipClusters.DemandResponseLoadControlCluster) cluster)
-        .clearLoadControlEventsRequest((DefaultClusterCallback) callback
-        );
-      },
-      () -> new DelegatedDefaultClusterCallback(),
-        demandResponseLoadControlclearLoadControlEventsRequestCommandParams
-    );
-    demandResponseLoadControlClusterInteractionInfoMap.put("clearLoadControlEventsRequest", demandResponseLoadControlclearLoadControlEventsRequestInteractionInfo);
-
-    commandMap.put("demandResponseLoadControl", demandResponseLoadControlClusterInteractionInfoMap);
+    commandMap.put("commodityPrice", commodityPriceClusterInteractionInfoMap);
 
     Map<String, InteractionInfo> messagesClusterInteractionInfoMap = new LinkedHashMap<>();
 
@@ -26826,6 +28697,135 @@ public class ClusterInfoMapping {
     deviceEnergyManagementModeClusterInteractionInfoMap.put("changeToMode", deviceEnergyManagementModechangeToModeInteractionInfo);
 
     commandMap.put("deviceEnergyManagementMode", deviceEnergyManagementModeClusterInteractionInfoMap);
+
+    Map<String, InteractionInfo> electricalGridConditionsClusterInteractionInfoMap = new LinkedHashMap<>();
+
+    commandMap.put("electricalGridConditions", electricalGridConditionsClusterInteractionInfoMap);
+
+    Map<String, InteractionInfo> electricalAlarmClusterInteractionInfoMap = new LinkedHashMap<>();
+
+    Map<String, CommandParameterInfo> electricalAlarmresetCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo electricalAlarmresetalarmsCommandParameterInfo = new CommandParameterInfo("alarms", Long.class, Long.class);
+    electricalAlarmresetCommandParams.put("alarms",electricalAlarmresetalarmsCommandParameterInfo);
+    InteractionInfo electricalAlarmresetInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.ElectricalAlarmCluster) cluster)
+        .reset((DefaultClusterCallback) callback
+        , (Long)
+        commandArguments.get("alarms")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        electricalAlarmresetCommandParams
+    );
+    electricalAlarmClusterInteractionInfoMap.put("reset", electricalAlarmresetInteractionInfo);
+
+    Map<String, CommandParameterInfo> electricalAlarmmodifyEnabledAlarmsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo electricalAlarmmodifyEnabledAlarmsmaskCommandParameterInfo = new CommandParameterInfo("mask", Long.class, Long.class);
+    electricalAlarmmodifyEnabledAlarmsCommandParams.put("mask",electricalAlarmmodifyEnabledAlarmsmaskCommandParameterInfo);
+    InteractionInfo electricalAlarmmodifyEnabledAlarmsInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.ElectricalAlarmCluster) cluster)
+        .modifyEnabledAlarms((DefaultClusterCallback) callback
+        , (Long)
+        commandArguments.get("mask")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        electricalAlarmmodifyEnabledAlarmsCommandParams
+    );
+    electricalAlarmClusterInteractionInfoMap.put("modifyEnabledAlarms", electricalAlarmmodifyEnabledAlarmsInteractionInfo);
+
+    Map<String, CommandParameterInfo> electricalAlarmsetElectricalAlarmThresholdsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo electricalAlarmsetElectricalAlarmThresholdsoverVoltageThresholdCommandParameterInfo = new CommandParameterInfo("overVoltageThreshold", Optional.class, Long.class);
+    electricalAlarmsetElectricalAlarmThresholdsCommandParams.put("overVoltageThreshold",electricalAlarmsetElectricalAlarmThresholdsoverVoltageThresholdCommandParameterInfo);
+
+    CommandParameterInfo electricalAlarmsetElectricalAlarmThresholdsunderVoltageThresholdCommandParameterInfo = new CommandParameterInfo("underVoltageThreshold", Optional.class, Long.class);
+    electricalAlarmsetElectricalAlarmThresholdsCommandParams.put("underVoltageThreshold",electricalAlarmsetElectricalAlarmThresholdsunderVoltageThresholdCommandParameterInfo);
+
+    CommandParameterInfo electricalAlarmsetElectricalAlarmThresholdsoverFrequencyThresholdCommandParameterInfo = new CommandParameterInfo("overFrequencyThreshold", Optional.class, Long.class);
+    electricalAlarmsetElectricalAlarmThresholdsCommandParams.put("overFrequencyThreshold",electricalAlarmsetElectricalAlarmThresholdsoverFrequencyThresholdCommandParameterInfo);
+
+    CommandParameterInfo electricalAlarmsetElectricalAlarmThresholdsunderFrequencyThresholdCommandParameterInfo = new CommandParameterInfo("underFrequencyThreshold", Optional.class, Long.class);
+    electricalAlarmsetElectricalAlarmThresholdsCommandParams.put("underFrequencyThreshold",electricalAlarmsetElectricalAlarmThresholdsunderFrequencyThresholdCommandParameterInfo);
+
+    CommandParameterInfo electricalAlarmsetElectricalAlarmThresholdsoverPowerThresholdCommandParameterInfo = new CommandParameterInfo("overPowerThreshold", Optional.class, Long.class);
+    electricalAlarmsetElectricalAlarmThresholdsCommandParams.put("overPowerThreshold",electricalAlarmsetElectricalAlarmThresholdsoverPowerThresholdCommandParameterInfo);
+
+    CommandParameterInfo electricalAlarmsetElectricalAlarmThresholdsunderPowerThresholdCommandParameterInfo = new CommandParameterInfo("underPowerThreshold", Optional.class, Long.class);
+    electricalAlarmsetElectricalAlarmThresholdsCommandParams.put("underPowerThreshold",electricalAlarmsetElectricalAlarmThresholdsunderPowerThresholdCommandParameterInfo);
+
+    CommandParameterInfo electricalAlarmsetElectricalAlarmThresholdsoverCurrentThresholdCommandParameterInfo = new CommandParameterInfo("overCurrentThreshold", Optional.class, Long.class);
+    electricalAlarmsetElectricalAlarmThresholdsCommandParams.put("overCurrentThreshold",electricalAlarmsetElectricalAlarmThresholdsoverCurrentThresholdCommandParameterInfo);
+
+    CommandParameterInfo electricalAlarmsetElectricalAlarmThresholdsunderCurrentThresholdCommandParameterInfo = new CommandParameterInfo("underCurrentThreshold", Optional.class, Long.class);
+    electricalAlarmsetElectricalAlarmThresholdsCommandParams.put("underCurrentThreshold",electricalAlarmsetElectricalAlarmThresholdsunderCurrentThresholdCommandParameterInfo);
+
+    CommandParameterInfo electricalAlarmsetElectricalAlarmThresholdspowerImportThresholdCommandParameterInfo = new CommandParameterInfo("powerImportThreshold", Optional.class, Long.class);
+    electricalAlarmsetElectricalAlarmThresholdsCommandParams.put("powerImportThreshold",electricalAlarmsetElectricalAlarmThresholdspowerImportThresholdCommandParameterInfo);
+
+    CommandParameterInfo electricalAlarmsetElectricalAlarmThresholdspowerExportThresholdCommandParameterInfo = new CommandParameterInfo("powerExportThreshold", Optional.class, Long.class);
+    electricalAlarmsetElectricalAlarmThresholdsCommandParams.put("powerExportThreshold",electricalAlarmsetElectricalAlarmThresholdspowerExportThresholdCommandParameterInfo);
+    InteractionInfo electricalAlarmsetElectricalAlarmThresholdsInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.ElectricalAlarmCluster) cluster)
+        .setElectricalAlarmThresholds((DefaultClusterCallback) callback
+        , (Optional<Long>)
+        commandArguments.get("overVoltageThreshold")
+        , (Optional<Long>)
+        commandArguments.get("underVoltageThreshold")
+        , (Optional<Long>)
+        commandArguments.get("overFrequencyThreshold")
+        , (Optional<Long>)
+        commandArguments.get("underFrequencyThreshold")
+        , (Optional<Long>)
+        commandArguments.get("overPowerThreshold")
+        , (Optional<Long>)
+        commandArguments.get("underPowerThreshold")
+        , (Optional<Long>)
+        commandArguments.get("overCurrentThreshold")
+        , (Optional<Long>)
+        commandArguments.get("underCurrentThreshold")
+        , (Optional<Long>)
+        commandArguments.get("powerImportThreshold")
+        , (Optional<Long>)
+        commandArguments.get("powerExportThreshold")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        electricalAlarmsetElectricalAlarmThresholdsCommandParams
+    );
+    electricalAlarmClusterInteractionInfoMap.put("setElectricalAlarmThresholds", electricalAlarmsetElectricalAlarmThresholdsInteractionInfo);
+
+    commandMap.put("electricalAlarm", electricalAlarmClusterInteractionInfoMap);
+
+    Map<String, InteractionInfo> electricalDistributionClusterInteractionInfoMap = new LinkedHashMap<>();
+
+    commandMap.put("electricalDistribution", electricalDistributionClusterInteractionInfoMap);
+
+    Map<String, InteractionInfo> electricalProtectionAlarmClusterInteractionInfoMap = new LinkedHashMap<>();
+
+    Map<String, CommandParameterInfo> electricalProtectionAlarmmodifyEnabledAlarmsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo electricalProtectionAlarmmodifyEnabledAlarmsmaskCommandParameterInfo = new CommandParameterInfo("mask", Long.class, Long.class);
+    electricalProtectionAlarmmodifyEnabledAlarmsCommandParams.put("mask",electricalProtectionAlarmmodifyEnabledAlarmsmaskCommandParameterInfo);
+    InteractionInfo electricalProtectionAlarmmodifyEnabledAlarmsInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.ElectricalProtectionAlarmCluster) cluster)
+        .modifyEnabledAlarms((DefaultClusterCallback) callback
+        , (Long)
+        commandArguments.get("mask")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        electricalProtectionAlarmmodifyEnabledAlarmsCommandParams
+    );
+    electricalProtectionAlarmClusterInteractionInfoMap.put("modifyEnabledAlarms", electricalProtectionAlarmmodifyEnabledAlarmsInteractionInfo);
+
+    commandMap.put("electricalProtectionAlarm", electricalProtectionAlarmClusterInteractionInfoMap);
 
     Map<String, InteractionInfo> doorLockClusterInteractionInfoMap = new LinkedHashMap<>();
 
@@ -27453,6 +29453,119 @@ public class ClusterInfoMapping {
 
     commandMap.put("windowCovering", windowCoveringClusterInteractionInfoMap);
 
+    Map<String, InteractionInfo> closureControlClusterInteractionInfoMap = new LinkedHashMap<>();
+
+    Map<String, CommandParameterInfo> closureControlstopCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo closureControlstopInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.ClosureControlCluster) cluster)
+        .stop((DefaultClusterCallback) callback
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        closureControlstopCommandParams
+    );
+    closureControlClusterInteractionInfoMap.put("stop", closureControlstopInteractionInfo);
+
+    Map<String, CommandParameterInfo> closureControlmoveToCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo closureControlmoveTopositionCommandParameterInfo = new CommandParameterInfo("position", Optional.class, Integer.class);
+    closureControlmoveToCommandParams.put("position",closureControlmoveTopositionCommandParameterInfo);
+
+    CommandParameterInfo closureControlmoveTolatchCommandParameterInfo = new CommandParameterInfo("latch", Optional.class, Boolean.class);
+    closureControlmoveToCommandParams.put("latch",closureControlmoveTolatchCommandParameterInfo);
+
+    CommandParameterInfo closureControlmoveTospeedCommandParameterInfo = new CommandParameterInfo("speed", Optional.class, Integer.class);
+    closureControlmoveToCommandParams.put("speed",closureControlmoveTospeedCommandParameterInfo);
+    InteractionInfo closureControlmoveToInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.ClosureControlCluster) cluster)
+        .moveTo((DefaultClusterCallback) callback
+        , (Optional<Integer>)
+        commandArguments.get("position")
+        , (Optional<Boolean>)
+        commandArguments.get("latch")
+        , (Optional<Integer>)
+        commandArguments.get("speed"), 10000
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        closureControlmoveToCommandParams
+    );
+    closureControlClusterInteractionInfoMap.put("moveTo", closureControlmoveToInteractionInfo);
+
+    Map<String, CommandParameterInfo> closureControlcalibrateCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo closureControlcalibrateInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.ClosureControlCluster) cluster)
+        .calibrate((DefaultClusterCallback) callback, 10000
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        closureControlcalibrateCommandParams
+    );
+    closureControlClusterInteractionInfoMap.put("calibrate", closureControlcalibrateInteractionInfo);
+
+    commandMap.put("closureControl", closureControlClusterInteractionInfoMap);
+
+    Map<String, InteractionInfo> closureDimensionClusterInteractionInfoMap = new LinkedHashMap<>();
+
+    Map<String, CommandParameterInfo> closureDimensionsetTargetCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo closureDimensionsetTargetpositionCommandParameterInfo = new CommandParameterInfo("position", Optional.class, Integer.class);
+    closureDimensionsetTargetCommandParams.put("position",closureDimensionsetTargetpositionCommandParameterInfo);
+
+    CommandParameterInfo closureDimensionsetTargetlatchCommandParameterInfo = new CommandParameterInfo("latch", Optional.class, Boolean.class);
+    closureDimensionsetTargetCommandParams.put("latch",closureDimensionsetTargetlatchCommandParameterInfo);
+
+    CommandParameterInfo closureDimensionsetTargetspeedCommandParameterInfo = new CommandParameterInfo("speed", Optional.class, Integer.class);
+    closureDimensionsetTargetCommandParams.put("speed",closureDimensionsetTargetspeedCommandParameterInfo);
+    InteractionInfo closureDimensionsetTargetInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.ClosureDimensionCluster) cluster)
+        .setTarget((DefaultClusterCallback) callback
+        , (Optional<Integer>)
+        commandArguments.get("position")
+        , (Optional<Boolean>)
+        commandArguments.get("latch")
+        , (Optional<Integer>)
+        commandArguments.get("speed"), 10000
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        closureDimensionsetTargetCommandParams
+    );
+    closureDimensionClusterInteractionInfoMap.put("setTarget", closureDimensionsetTargetInteractionInfo);
+
+    Map<String, CommandParameterInfo> closureDimensionstepCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo closureDimensionstepdirectionCommandParameterInfo = new CommandParameterInfo("direction", Integer.class, Integer.class);
+    closureDimensionstepCommandParams.put("direction",closureDimensionstepdirectionCommandParameterInfo);
+
+    CommandParameterInfo closureDimensionstepnumberOfStepsCommandParameterInfo = new CommandParameterInfo("numberOfSteps", Integer.class, Integer.class);
+    closureDimensionstepCommandParams.put("numberOfSteps",closureDimensionstepnumberOfStepsCommandParameterInfo);
+
+    CommandParameterInfo closureDimensionstepspeedCommandParameterInfo = new CommandParameterInfo("speed", Optional.class, Integer.class);
+    closureDimensionstepCommandParams.put("speed",closureDimensionstepspeedCommandParameterInfo);
+    InteractionInfo closureDimensionstepInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.ClosureDimensionCluster) cluster)
+        .step((DefaultClusterCallback) callback
+        , (Integer)
+        commandArguments.get("direction")
+        , (Integer)
+        commandArguments.get("numberOfSteps")
+        , (Optional<Integer>)
+        commandArguments.get("speed"), 10000
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        closureDimensionstepCommandParams
+    );
+    closureDimensionClusterInteractionInfoMap.put("step", closureDimensionstepInteractionInfo);
+
+    commandMap.put("closureDimension", closureDimensionClusterInteractionInfoMap);
+
     Map<String, InteractionInfo> serviceAreaClusterInteractionInfoMap = new LinkedHashMap<>();
 
     Map<String, CommandParameterInfo> serviceAreaselectAreasCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
@@ -27621,6 +29734,53 @@ public class ClusterInfoMapping {
     );
     thermostatClusterInteractionInfoMap.put("setActivePresetRequest", thermostatsetActivePresetRequestInteractionInfo);
 
+    Map<String, CommandParameterInfo> thermostataddThermostatSuggestionCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo thermostataddThermostatSuggestionpresetHandleCommandParameterInfo = new CommandParameterInfo("presetHandle", byte[].class, byte[].class);
+    thermostataddThermostatSuggestionCommandParams.put("presetHandle",thermostataddThermostatSuggestionpresetHandleCommandParameterInfo);
+
+    CommandParameterInfo thermostataddThermostatSuggestioneffectiveTimeCommandParameterInfo = new CommandParameterInfo("effectiveTime", Long.class, Long.class);
+    thermostataddThermostatSuggestionCommandParams.put("effectiveTime",thermostataddThermostatSuggestioneffectiveTimeCommandParameterInfo);
+
+    CommandParameterInfo thermostataddThermostatSuggestionexpirationInMinutesCommandParameterInfo = new CommandParameterInfo("expirationInMinutes", Integer.class, Integer.class);
+    thermostataddThermostatSuggestionCommandParams.put("expirationInMinutes",thermostataddThermostatSuggestionexpirationInMinutesCommandParameterInfo);
+    InteractionInfo thermostataddThermostatSuggestionInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.ThermostatCluster) cluster)
+          .addThermostatSuggestion((ChipClusters.ThermostatCluster.AddThermostatSuggestionResponseCallback) callback
+           , (byte[])
+             commandArguments.get("presetHandle")
+
+           , (Long)
+             commandArguments.get("effectiveTime")
+
+           , (Integer)
+             commandArguments.get("expirationInMinutes")
+
+            );
+        },
+        () -> new DelegatedThermostatClusterAddThermostatSuggestionResponseCallback(),
+        thermostataddThermostatSuggestionCommandParams
+      );
+    thermostatClusterInteractionInfoMap.put("addThermostatSuggestion", thermostataddThermostatSuggestionInteractionInfo);
+
+    Map<String, CommandParameterInfo> thermostatremoveThermostatSuggestionCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo thermostatremoveThermostatSuggestionuniqueIDCommandParameterInfo = new CommandParameterInfo("uniqueID", Integer.class, Integer.class);
+    thermostatremoveThermostatSuggestionCommandParams.put("uniqueID",thermostatremoveThermostatSuggestionuniqueIDCommandParameterInfo);
+    InteractionInfo thermostatremoveThermostatSuggestionInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.ThermostatCluster) cluster)
+        .removeThermostatSuggestion((DefaultClusterCallback) callback
+        , (Integer)
+        commandArguments.get("uniqueID")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        thermostatremoveThermostatSuggestionCommandParams
+    );
+    thermostatClusterInteractionInfoMap.put("removeThermostatSuggestion", thermostatremoveThermostatSuggestionInteractionInfo);
+
     Map<String, CommandParameterInfo> thermostatatomicRequestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
 
     CommandParameterInfo thermostatatomicRequestrequestTypeCommandParameterInfo = new CommandParameterInfo("requestType", Integer.class, Integer.class);
@@ -27687,6 +29847,52 @@ public class ClusterInfoMapping {
     Map<String, InteractionInfo> thermostatUserInterfaceConfigurationClusterInteractionInfoMap = new LinkedHashMap<>();
 
     commandMap.put("thermostatUserInterfaceConfiguration", thermostatUserInterfaceConfigurationClusterInteractionInfoMap);
+
+    Map<String, InteractionInfo> humidistatClusterInteractionInfoMap = new LinkedHashMap<>();
+
+    Map<String, CommandParameterInfo> humidistatsetSettingsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo humidistatsetSettingsuserSetpointCommandParameterInfo = new CommandParameterInfo("userSetpoint", Optional.class, Integer.class);
+    humidistatsetSettingsCommandParams.put("userSetpoint",humidistatsetSettingsuserSetpointCommandParameterInfo);
+
+    CommandParameterInfo humidistatsetSettingsmodeCommandParameterInfo = new CommandParameterInfo("mode", Optional.class, Integer.class);
+    humidistatsetSettingsCommandParams.put("mode",humidistatsetSettingsmodeCommandParameterInfo);
+
+    CommandParameterInfo humidistatsetSettingsmistTypeCommandParameterInfo = new CommandParameterInfo("mistType", Optional.class, Integer.class);
+    humidistatsetSettingsCommandParams.put("mistType",humidistatsetSettingsmistTypeCommandParameterInfo);
+
+    CommandParameterInfo humidistatsetSettingscontinuousCommandParameterInfo = new CommandParameterInfo("continuous", Optional.class, Boolean.class);
+    humidistatsetSettingsCommandParams.put("continuous",humidistatsetSettingscontinuousCommandParameterInfo);
+
+    CommandParameterInfo humidistatsetSettingssleepCommandParameterInfo = new CommandParameterInfo("sleep", Optional.class, Boolean.class);
+    humidistatsetSettingsCommandParams.put("sleep",humidistatsetSettingssleepCommandParameterInfo);
+
+    CommandParameterInfo humidistatsetSettingsoptimalCommandParameterInfo = new CommandParameterInfo("optimal", Optional.class, Boolean.class);
+    humidistatsetSettingsCommandParams.put("optimal",humidistatsetSettingsoptimalCommandParameterInfo);
+    InteractionInfo humidistatsetSettingsInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.HumidistatCluster) cluster)
+        .setSettings((DefaultClusterCallback) callback
+        , (Optional<Integer>)
+        commandArguments.get("userSetpoint")
+        , (Optional<Integer>)
+        commandArguments.get("mode")
+        , (Optional<Integer>)
+        commandArguments.get("mistType")
+        , (Optional<Boolean>)
+        commandArguments.get("continuous")
+        , (Optional<Boolean>)
+        commandArguments.get("sleep")
+        , (Optional<Boolean>)
+        commandArguments.get("optimal")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        humidistatsetSettingsCommandParams
+    );
+    humidistatClusterInteractionInfoMap.put("setSettings", humidistatsetSettingsInteractionInfo);
+
+    commandMap.put("humidistat", humidistatClusterInteractionInfoMap);
 
     Map<String, InteractionInfo> colorControlClusterInteractionInfoMap = new LinkedHashMap<>();
 
@@ -28379,6 +30585,52 @@ public class ClusterInfoMapping {
 
     commandMap.put("ballastConfiguration", ballastConfigurationClusterInteractionInfoMap);
 
+    Map<String, InteractionInfo> dynamicLightingClusterInteractionInfoMap = new LinkedHashMap<>();
+
+    Map<String, CommandParameterInfo> dynamicLightingstartEffectCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo dynamicLightingstartEffecteffectIDCommandParameterInfo = new CommandParameterInfo("effectID", Integer.class, Integer.class);
+    dynamicLightingstartEffectCommandParams.put("effectID",dynamicLightingstartEffecteffectIDCommandParameterInfo);
+
+    CommandParameterInfo dynamicLightingstartEffectspeedCommandParameterInfo = new CommandParameterInfo("speed", Integer.class, Integer.class);
+    dynamicLightingstartEffectCommandParams.put("speed",dynamicLightingstartEffectspeedCommandParameterInfo);
+
+    CommandParameterInfo dynamicLightingstartEffectcolorModeCommandParameterInfo = new CommandParameterInfo("colorMode", Integer.class, Integer.class);
+    dynamicLightingstartEffectCommandParams.put("colorMode",dynamicLightingstartEffectcolorModeCommandParameterInfo);
+
+    InteractionInfo dynamicLightingstartEffectInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.DynamicLightingCluster) cluster)
+        .startEffect((DefaultClusterCallback) callback
+        , (Integer)
+        commandArguments.get("effectID")
+        , (Integer)
+        commandArguments.get("speed")
+        , (Integer)
+        commandArguments.get("colorMode")
+        , (ArrayList<ChipStructs.DynamicLightingClusterEffectColorStruct>)
+        commandArguments.get("colorPalette")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        dynamicLightingstartEffectCommandParams
+    );
+    dynamicLightingClusterInteractionInfoMap.put("startEffect", dynamicLightingstartEffectInteractionInfo);
+
+    Map<String, CommandParameterInfo> dynamicLightingstopEffectCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo dynamicLightingstopEffectInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.DynamicLightingCluster) cluster)
+        .stopEffect((DefaultClusterCallback) callback
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        dynamicLightingstopEffectCommandParams
+    );
+    dynamicLightingClusterInteractionInfoMap.put("stopEffect", dynamicLightingstopEffectInteractionInfo);
+
+    commandMap.put("dynamicLighting", dynamicLightingClusterInteractionInfoMap);
+
     Map<String, InteractionInfo> illuminanceMeasurementClusterInteractionInfoMap = new LinkedHashMap<>();
 
     commandMap.put("illuminanceMeasurement", illuminanceMeasurementClusterInteractionInfoMap);
@@ -28443,6 +30695,202 @@ public class ClusterInfoMapping {
 
     commandMap.put("radonConcentrationMeasurement", radonConcentrationMeasurementClusterInteractionInfoMap);
 
+    Map<String, InteractionInfo> soilMeasurementClusterInteractionInfoMap = new LinkedHashMap<>();
+
+    commandMap.put("soilMeasurement", soilMeasurementClusterInteractionInfoMap);
+
+    Map<String, InteractionInfo> ambientContextSensingClusterInteractionInfoMap = new LinkedHashMap<>();
+
+    commandMap.put("ambientContextSensing", ambientContextSensingClusterInteractionInfoMap);
+
+    Map<String, InteractionInfo> ambientSensingUnionClusterInteractionInfoMap = new LinkedHashMap<>();
+
+    commandMap.put("ambientSensingUnion", ambientSensingUnionClusterInteractionInfoMap);
+
+    Map<String, InteractionInfo> proximityRangingClusterInteractionInfoMap = new LinkedHashMap<>();
+
+    Map<String, CommandParameterInfo> proximityRangingstartRangingRequestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo proximityRangingstartRangingRequesttechnologyCommandParameterInfo = new CommandParameterInfo("technology", Integer.class, Integer.class);
+    proximityRangingstartRangingRequestCommandParams.put("technology",proximityRangingstartRangingRequesttechnologyCommandParameterInfo);
+
+
+
+
+    CommandParameterInfo proximityRangingstartRangingRequestfrequencyBandCommandParameterInfo = new CommandParameterInfo("frequencyBand", Optional.class, Integer.class);
+    proximityRangingstartRangingRequestCommandParams.put("frequencyBand",proximityRangingstartRangingRequestfrequencyBandCommandParameterInfo);
+
+    CommandParameterInfo proximityRangingstartRangingRequestbandwidthCommandParameterInfo = new CommandParameterInfo("bandwidth", Optional.class, Long.class);
+    proximityRangingstartRangingRequestCommandParams.put("bandwidth",proximityRangingstartRangingRequestbandwidthCommandParameterInfo);
+
+    CommandParameterInfo proximityRangingstartRangingRequestsecurityModeCommandParameterInfo = new CommandParameterInfo("securityMode", Integer.class, Integer.class);
+    proximityRangingstartRangingRequestCommandParams.put("securityMode",proximityRangingstartRangingRequestsecurityModeCommandParameterInfo);
+
+
+    InteractionInfo proximityRangingstartRangingRequestInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.ProximityRangingCluster) cluster)
+          .startRangingRequest((ChipClusters.ProximityRangingCluster.StartRangingResponseCallback) callback
+           , (Integer)
+             commandArguments.get("technology")
+
+           , (Optional<ChipStructs.ProximityRangingClusterWiFiRangingDeviceRoleConfigStruct>)
+             commandArguments.get("wiFiRangingDeviceRoleConfig")
+
+           , (Optional<ChipStructs.ProximityRangingClusterBLERangingDeviceRoleConfigStruct>)
+             commandArguments.get("BLERangingDeviceRoleConfig")
+
+           , (Optional<ChipStructs.ProximityRangingClusterBLTChannelSoundingDeviceRoleConfigStruct>)
+             commandArguments.get("BLTChannelSoundingDeviceRoleConfig")
+
+           , (Optional<Integer>)
+             commandArguments.get("frequencyBand")
+
+           , (Optional<Long>)
+             commandArguments.get("bandwidth")
+
+           , (Integer)
+             commandArguments.get("securityMode")
+
+           , (ChipStructs.ProximityRangingClusterRangingTriggerConditionStruct)
+             commandArguments.get("trigger")
+
+           , (Optional<ChipStructs.ProximityRangingClusterReportingConditionStruct>)
+             commandArguments.get("reportingCondition")
+
+            );
+        },
+        () -> new DelegatedProximityRangingClusterStartRangingResponseCallback(),
+        proximityRangingstartRangingRequestCommandParams
+      );
+    proximityRangingClusterInteractionInfoMap.put("startRangingRequest", proximityRangingstartRangingRequestInteractionInfo);
+
+    Map<String, CommandParameterInfo> proximityRangingstopRangingRequestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo proximityRangingstopRangingRequestsessionIDCommandParameterInfo = new CommandParameterInfo("sessionID", Integer.class, Integer.class);
+    proximityRangingstopRangingRequestCommandParams.put("sessionID",proximityRangingstopRangingRequestsessionIDCommandParameterInfo);
+    InteractionInfo proximityRangingstopRangingRequestInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.ProximityRangingCluster) cluster)
+        .stopRangingRequest((DefaultClusterCallback) callback
+        , (Integer)
+        commandArguments.get("sessionID")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        proximityRangingstopRangingRequestCommandParams
+    );
+    proximityRangingClusterInteractionInfoMap.put("stopRangingRequest", proximityRangingstopRangingRequestInteractionInfo);
+
+    commandMap.put("proximityRanging", proximityRangingClusterInteractionInfoMap);
+
+    Map<String, InteractionInfo> smokeConcentrationMeasurementClusterInteractionInfoMap = new LinkedHashMap<>();
+
+    commandMap.put("smokeConcentrationMeasurement", smokeConcentrationMeasurementClusterInteractionInfoMap);
+
+    Map<String, InteractionInfo> networkIdentityManagementClusterInteractionInfoMap = new LinkedHashMap<>();
+
+    Map<String, CommandParameterInfo> networkIdentityManagementaddClientCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo networkIdentityManagementaddClientclientIdentityCommandParameterInfo = new CommandParameterInfo("clientIdentity", byte[].class, byte[].class);
+    networkIdentityManagementaddClientCommandParams.put("clientIdentity",networkIdentityManagementaddClientclientIdentityCommandParameterInfo);
+    InteractionInfo networkIdentityManagementaddClientInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.NetworkIdentityManagementCluster) cluster)
+          .addClient((ChipClusters.NetworkIdentityManagementCluster.AddClientResponseCallback) callback
+           , (byte[])
+             commandArguments.get("clientIdentity")
+
+            , 10000);
+        },
+        () -> new DelegatedNetworkIdentityManagementClusterAddClientResponseCallback(),
+        networkIdentityManagementaddClientCommandParams
+      );
+    networkIdentityManagementClusterInteractionInfoMap.put("addClient", networkIdentityManagementaddClientInteractionInfo);
+
+    Map<String, CommandParameterInfo> networkIdentityManagementremoveClientCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo networkIdentityManagementremoveClientclientIndexCommandParameterInfo = new CommandParameterInfo("clientIndex", Optional.class, Integer.class);
+    networkIdentityManagementremoveClientCommandParams.put("clientIndex",networkIdentityManagementremoveClientclientIndexCommandParameterInfo);
+
+    CommandParameterInfo networkIdentityManagementremoveClientclientIdentifierCommandParameterInfo = new CommandParameterInfo("clientIdentifier", Optional.class, byte[].class);
+    networkIdentityManagementremoveClientCommandParams.put("clientIdentifier",networkIdentityManagementremoveClientclientIdentifierCommandParameterInfo);
+    InteractionInfo networkIdentityManagementremoveClientInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.NetworkIdentityManagementCluster) cluster)
+        .removeClient((DefaultClusterCallback) callback
+        , (Optional<Integer>)
+        commandArguments.get("clientIndex")
+        , (Optional<byte[]>)
+        commandArguments.get("clientIdentifier"), 10000
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        networkIdentityManagementremoveClientCommandParams
+    );
+    networkIdentityManagementClusterInteractionInfoMap.put("removeClient", networkIdentityManagementremoveClientInteractionInfo);
+
+    Map<String, CommandParameterInfo> networkIdentityManagementqueryIdentityCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo networkIdentityManagementqueryIdentitynetworkIdentityIndexCommandParameterInfo = new CommandParameterInfo("networkIdentityIndex", Optional.class, Integer.class);
+    networkIdentityManagementqueryIdentityCommandParams.put("networkIdentityIndex",networkIdentityManagementqueryIdentitynetworkIdentityIndexCommandParameterInfo);
+
+    CommandParameterInfo networkIdentityManagementqueryIdentitynetworkIdentityTypeCommandParameterInfo = new CommandParameterInfo("networkIdentityType", Optional.class, Integer.class);
+    networkIdentityManagementqueryIdentityCommandParams.put("networkIdentityType",networkIdentityManagementqueryIdentitynetworkIdentityTypeCommandParameterInfo);
+
+    CommandParameterInfo networkIdentityManagementqueryIdentityidentifierCommandParameterInfo = new CommandParameterInfo("identifier", Optional.class, byte[].class);
+    networkIdentityManagementqueryIdentityCommandParams.put("identifier",networkIdentityManagementqueryIdentityidentifierCommandParameterInfo);
+    InteractionInfo networkIdentityManagementqueryIdentityInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.NetworkIdentityManagementCluster) cluster)
+          .queryIdentity((ChipClusters.NetworkIdentityManagementCluster.QueryIdentityResponseCallback) callback
+           , (Optional<Integer>)
+             commandArguments.get("networkIdentityIndex")
+
+           , (Optional<Integer>)
+             commandArguments.get("networkIdentityType")
+
+           , (Optional<byte[]>)
+             commandArguments.get("identifier")
+
+            );
+        },
+        () -> new DelegatedNetworkIdentityManagementClusterQueryIdentityResponseCallback(),
+        networkIdentityManagementqueryIdentityCommandParams
+      );
+    networkIdentityManagementClusterInteractionInfoMap.put("queryIdentity", networkIdentityManagementqueryIdentityInteractionInfo);
+
+    Map<String, CommandParameterInfo> networkIdentityManagementimportAdminSecretCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo networkIdentityManagementimportAdminSecretnetworkAdministratorSharedSecretCommandParameterInfo = new CommandParameterInfo("networkAdministratorSharedSecret", byte[].class, byte[].class);
+    networkIdentityManagementimportAdminSecretCommandParams.put("networkAdministratorSharedSecret",networkIdentityManagementimportAdminSecretnetworkAdministratorSharedSecretCommandParameterInfo);
+    InteractionInfo networkIdentityManagementimportAdminSecretInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.NetworkIdentityManagementCluster) cluster)
+        .importAdminSecret((DefaultClusterCallback) callback
+        , (byte[])
+        commandArguments.get("networkAdministratorSharedSecret"), 10000
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        networkIdentityManagementimportAdminSecretCommandParams
+    );
+    networkIdentityManagementClusterInteractionInfoMap.put("importAdminSecret", networkIdentityManagementimportAdminSecretInteractionInfo);
+
+    Map<String, CommandParameterInfo> networkIdentityManagementexportAdminSecretCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo networkIdentityManagementexportAdminSecretInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.NetworkIdentityManagementCluster) cluster)
+          .exportAdminSecret((ChipClusters.NetworkIdentityManagementCluster.ExportAdminSecretResponseCallback) callback
+            );
+        },
+        () -> new DelegatedNetworkIdentityManagementClusterExportAdminSecretResponseCallback(),
+        networkIdentityManagementexportAdminSecretCommandParams
+      );
+    networkIdentityManagementClusterInteractionInfoMap.put("exportAdminSecret", networkIdentityManagementexportAdminSecretInteractionInfo);
+
+    commandMap.put("networkIdentityManagement", networkIdentityManagementClusterInteractionInfoMap);
+
     Map<String, InteractionInfo> wiFiNetworkManagementClusterInteractionInfoMap = new LinkedHashMap<>();
 
     Map<String, CommandParameterInfo> wiFiNetworkManagementnetworkPassphraseRequestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
@@ -28499,7 +30947,7 @@ public class ClusterInfoMapping {
         , (byte[])
         commandArguments.get("activeDataset")
         , (Optional<Long>)
-        commandArguments.get("breadcrumb")
+        commandArguments.get("breadcrumb"), 10000
         );
       },
       () -> new DelegatedDefaultClusterCallback(),
@@ -28516,7 +30964,7 @@ public class ClusterInfoMapping {
         ((ChipClusters.ThreadBorderRouterManagementCluster) cluster)
         .setPendingDatasetRequest((DefaultClusterCallback) callback
         , (byte[])
-        commandArguments.get("pendingDataset")
+        commandArguments.get("pendingDataset"), 10000
         );
       },
       () -> new DelegatedDefaultClusterCallback(),
@@ -29350,7 +31798,7 @@ public class ClusterInfoMapping {
 
     Map<String, CommandParameterInfo> contentControlupdatePINCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
 
-    CommandParameterInfo contentControlupdatePINoldPINCommandParameterInfo = new CommandParameterInfo("oldPIN", Optional.class, String.class);
+    CommandParameterInfo contentControlupdatePINoldPINCommandParameterInfo = new CommandParameterInfo("oldPIN", String.class, String.class);
     contentControlupdatePINCommandParams.put("oldPIN",contentControlupdatePINoldPINCommandParameterInfo);
 
     CommandParameterInfo contentControlupdatePINnewPINCommandParameterInfo = new CommandParameterInfo("newPIN", String.class, String.class);
@@ -29359,10 +31807,10 @@ public class ClusterInfoMapping {
       (cluster, callback, commandArguments) -> {
         ((ChipClusters.ContentControlCluster) cluster)
         .updatePIN((DefaultClusterCallback) callback
-        , (Optional<String>)
+        , (String)
         commandArguments.get("oldPIN")
         , (String)
-        commandArguments.get("newPIN")
+        commandArguments.get("newPIN"), 10000
         );
       },
       () -> new DelegatedDefaultClusterCallback(),
@@ -29375,7 +31823,7 @@ public class ClusterInfoMapping {
       (cluster, callback, commandArguments) -> {
         ((ChipClusters.ContentControlCluster) cluster)
           .resetPIN((ChipClusters.ContentControlCluster.ResetPINResponseCallback) callback
-            );
+            , 10000);
         },
         () -> new DelegatedContentControlClusterResetPINResponseCallback(),
         contentControlresetPINCommandParams
@@ -29386,7 +31834,7 @@ public class ClusterInfoMapping {
     InteractionInfo contentControlenableInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
         ((ChipClusters.ContentControlCluster) cluster)
-        .enable((DefaultClusterCallback) callback
+        .enable((DefaultClusterCallback) callback, 10000
         );
       },
       () -> new DelegatedDefaultClusterCallback(),
@@ -29398,7 +31846,7 @@ public class ClusterInfoMapping {
     InteractionInfo contentControldisableInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
         ((ChipClusters.ContentControlCluster) cluster)
-        .disable((DefaultClusterCallback) callback
+        .disable((DefaultClusterCallback) callback, 10000
         );
       },
       () -> new DelegatedDefaultClusterCallback(),
@@ -29411,7 +31859,7 @@ public class ClusterInfoMapping {
     CommandParameterInfo contentControladdBonusTimePINCodeCommandParameterInfo = new CommandParameterInfo("PINCode", Optional.class, String.class);
     contentControladdBonusTimeCommandParams.put("PINCode",contentControladdBonusTimePINCodeCommandParameterInfo);
 
-    CommandParameterInfo contentControladdBonusTimebonusTimeCommandParameterInfo = new CommandParameterInfo("bonusTime", Optional.class, Long.class);
+    CommandParameterInfo contentControladdBonusTimebonusTimeCommandParameterInfo = new CommandParameterInfo("bonusTime", Long.class, Long.class);
     contentControladdBonusTimeCommandParams.put("bonusTime",contentControladdBonusTimebonusTimeCommandParameterInfo);
     InteractionInfo contentControladdBonusTimeInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
@@ -29419,7 +31867,7 @@ public class ClusterInfoMapping {
         .addBonusTime((DefaultClusterCallback) callback
         , (Optional<String>)
         commandArguments.get("PINCode")
-        , (Optional<Long>)
+        , (Long)
         commandArguments.get("bonusTime")
         );
       },
@@ -29503,6 +31951,100 @@ public class ClusterInfoMapping {
     );
     contentControlClusterInteractionInfoMap.put("setScheduledContentRatingThreshold", contentControlsetScheduledContentRatingThresholdInteractionInfo);
 
+    Map<String, CommandParameterInfo> contentControladdBlockChannelsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    InteractionInfo contentControladdBlockChannelsInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.ContentControlCluster) cluster)
+        .addBlockChannels((DefaultClusterCallback) callback
+        , (ArrayList<ChipStructs.ContentControlClusterBlockChannelStruct>)
+        commandArguments.get("channels")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        contentControladdBlockChannelsCommandParams
+    );
+    contentControlClusterInteractionInfoMap.put("addBlockChannels", contentControladdBlockChannelsInteractionInfo);
+
+    Map<String, CommandParameterInfo> contentControlremoveBlockChannelsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo contentControlremoveBlockChannelschannelIndexesCommandParameterInfo = new CommandParameterInfo("channelIndexes", ArrayList.class, ArrayList.class);
+    contentControlremoveBlockChannelsCommandParams.put("channelIndexes",contentControlremoveBlockChannelschannelIndexesCommandParameterInfo);
+    InteractionInfo contentControlremoveBlockChannelsInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.ContentControlCluster) cluster)
+        .removeBlockChannels((DefaultClusterCallback) callback
+        , (ArrayList<Integer>)
+        commandArguments.get("channelIndexes")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        contentControlremoveBlockChannelsCommandParams
+    );
+    contentControlClusterInteractionInfoMap.put("removeBlockChannels", contentControlremoveBlockChannelsInteractionInfo);
+
+    Map<String, CommandParameterInfo> contentControladdBlockApplicationsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    InteractionInfo contentControladdBlockApplicationsInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.ContentControlCluster) cluster)
+        .addBlockApplications((DefaultClusterCallback) callback
+        , (ArrayList<ChipStructs.ContentControlClusterAppInfoStruct>)
+        commandArguments.get("applications")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        contentControladdBlockApplicationsCommandParams
+    );
+    contentControlClusterInteractionInfoMap.put("addBlockApplications", contentControladdBlockApplicationsInteractionInfo);
+
+    Map<String, CommandParameterInfo> contentControlremoveBlockApplicationsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    InteractionInfo contentControlremoveBlockApplicationsInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.ContentControlCluster) cluster)
+        .removeBlockApplications((DefaultClusterCallback) callback
+        , (ArrayList<ChipStructs.ContentControlClusterAppInfoStruct>)
+        commandArguments.get("applications")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        contentControlremoveBlockApplicationsCommandParams
+    );
+    contentControlClusterInteractionInfoMap.put("removeBlockApplications", contentControlremoveBlockApplicationsInteractionInfo);
+
+    Map<String, CommandParameterInfo> contentControlsetBlockContentTimeWindowCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    InteractionInfo contentControlsetBlockContentTimeWindowInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.ContentControlCluster) cluster)
+        .setBlockContentTimeWindow((DefaultClusterCallback) callback
+        , (ChipStructs.ContentControlClusterTimeWindowStruct)
+        commandArguments.get("timeWindow")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        contentControlsetBlockContentTimeWindowCommandParams
+    );
+    contentControlClusterInteractionInfoMap.put("setBlockContentTimeWindow", contentControlsetBlockContentTimeWindowInteractionInfo);
+
+    Map<String, CommandParameterInfo> contentControlremoveBlockContentTimeWindowCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo contentControlremoveBlockContentTimeWindowtimeWindowIndexesCommandParameterInfo = new CommandParameterInfo("timeWindowIndexes", ArrayList.class, ArrayList.class);
+    contentControlremoveBlockContentTimeWindowCommandParams.put("timeWindowIndexes",contentControlremoveBlockContentTimeWindowtimeWindowIndexesCommandParameterInfo);
+    InteractionInfo contentControlremoveBlockContentTimeWindowInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.ContentControlCluster) cluster)
+        .removeBlockContentTimeWindow((DefaultClusterCallback) callback
+        , (ArrayList<Integer>)
+        commandArguments.get("timeWindowIndexes")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        contentControlremoveBlockContentTimeWindowCommandParams
+    );
+    contentControlClusterInteractionInfoMap.put("removeBlockContentTimeWindow", contentControlremoveBlockContentTimeWindowInteractionInfo);
+
     commandMap.put("contentControl", contentControlClusterInteractionInfoMap);
 
     Map<String, InteractionInfo> contentAppObserverClusterInteractionInfoMap = new LinkedHashMap<>();
@@ -29571,24 +32113,6 @@ public class ClusterInfoMapping {
     );
     zoneManagementClusterInteractionInfoMap.put("updateTwoDCartesianZone", zoneManagementupdateTwoDCartesianZoneInteractionInfo);
 
-    Map<String, CommandParameterInfo> zoneManagementgetTwoDCartesianZoneCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-
-    CommandParameterInfo zoneManagementgetTwoDCartesianZonezoneIDCommandParameterInfo = new CommandParameterInfo("zoneID", Optional.class, Integer.class);
-    zoneManagementgetTwoDCartesianZoneCommandParams.put("zoneID",zoneManagementgetTwoDCartesianZonezoneIDCommandParameterInfo);
-    InteractionInfo zoneManagementgetTwoDCartesianZoneInteractionInfo = new InteractionInfo(
-      (cluster, callback, commandArguments) -> {
-        ((ChipClusters.ZoneManagementCluster) cluster)
-          .getTwoDCartesianZone((ChipClusters.ZoneManagementCluster.GetTwoDCartesianZoneResponseCallback) callback
-           , (Optional<Integer>)
-             commandArguments.get("zoneID")
-
-            );
-        },
-        () -> new DelegatedZoneManagementClusterGetTwoDCartesianZoneResponseCallback(),
-        zoneManagementgetTwoDCartesianZoneCommandParams
-      );
-    zoneManagementClusterInteractionInfoMap.put("getTwoDCartesianZone", zoneManagementgetTwoDCartesianZoneInteractionInfo);
-
     Map<String, CommandParameterInfo> zoneManagementremoveZoneCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
 
     CommandParameterInfo zoneManagementremoveZonezoneIDCommandParameterInfo = new CommandParameterInfo("zoneID", Integer.class, Integer.class);
@@ -29606,14 +32130,46 @@ public class ClusterInfoMapping {
     );
     zoneManagementClusterInteractionInfoMap.put("removeZone", zoneManagementremoveZoneInteractionInfo);
 
+    Map<String, CommandParameterInfo> zoneManagementcreateOrUpdateTriggerCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    InteractionInfo zoneManagementcreateOrUpdateTriggerInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.ZoneManagementCluster) cluster)
+        .createOrUpdateTrigger((DefaultClusterCallback) callback
+        , (ChipStructs.ZoneManagementClusterZoneTriggerControlStruct)
+        commandArguments.get("trigger")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        zoneManagementcreateOrUpdateTriggerCommandParams
+    );
+    zoneManagementClusterInteractionInfoMap.put("createOrUpdateTrigger", zoneManagementcreateOrUpdateTriggerInteractionInfo);
+
+    Map<String, CommandParameterInfo> zoneManagementremoveTriggerCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo zoneManagementremoveTriggerzoneIDCommandParameterInfo = new CommandParameterInfo("zoneID", Integer.class, Integer.class);
+    zoneManagementremoveTriggerCommandParams.put("zoneID",zoneManagementremoveTriggerzoneIDCommandParameterInfo);
+    InteractionInfo zoneManagementremoveTriggerInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.ZoneManagementCluster) cluster)
+        .removeTrigger((DefaultClusterCallback) callback
+        , (Integer)
+        commandArguments.get("zoneID")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        zoneManagementremoveTriggerCommandParams
+    );
+    zoneManagementClusterInteractionInfoMap.put("removeTrigger", zoneManagementremoveTriggerInteractionInfo);
+
     commandMap.put("zoneManagement", zoneManagementClusterInteractionInfoMap);
 
     Map<String, InteractionInfo> cameraAvStreamManagementClusterInteractionInfoMap = new LinkedHashMap<>();
 
     Map<String, CommandParameterInfo> cameraAvStreamManagementaudioStreamAllocateCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
 
-    CommandParameterInfo cameraAvStreamManagementaudioStreamAllocatestreamTypeCommandParameterInfo = new CommandParameterInfo("streamType", Integer.class, Integer.class);
-    cameraAvStreamManagementaudioStreamAllocateCommandParams.put("streamType",cameraAvStreamManagementaudioStreamAllocatestreamTypeCommandParameterInfo);
+    CommandParameterInfo cameraAvStreamManagementaudioStreamAllocatestreamUsageCommandParameterInfo = new CommandParameterInfo("streamUsage", Integer.class, Integer.class);
+    cameraAvStreamManagementaudioStreamAllocateCommandParams.put("streamUsage",cameraAvStreamManagementaudioStreamAllocatestreamUsageCommandParameterInfo);
 
     CommandParameterInfo cameraAvStreamManagementaudioStreamAllocateaudioCodecCommandParameterInfo = new CommandParameterInfo("audioCodec", Integer.class, Integer.class);
     cameraAvStreamManagementaudioStreamAllocateCommandParams.put("audioCodec",cameraAvStreamManagementaudioStreamAllocateaudioCodecCommandParameterInfo);
@@ -29634,7 +32190,7 @@ public class ClusterInfoMapping {
         ((ChipClusters.CameraAvStreamManagementCluster) cluster)
           .audioStreamAllocate((ChipClusters.CameraAvStreamManagementCluster.AudioStreamAllocateResponseCallback) callback
            , (Integer)
-             commandArguments.get("streamType")
+             commandArguments.get("streamUsage")
 
            , (Integer)
              commandArguments.get("audioCodec")
@@ -29677,8 +32233,8 @@ public class ClusterInfoMapping {
 
     Map<String, CommandParameterInfo> cameraAvStreamManagementvideoStreamAllocateCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
 
-    CommandParameterInfo cameraAvStreamManagementvideoStreamAllocatestreamTypeCommandParameterInfo = new CommandParameterInfo("streamType", Integer.class, Integer.class);
-    cameraAvStreamManagementvideoStreamAllocateCommandParams.put("streamType",cameraAvStreamManagementvideoStreamAllocatestreamTypeCommandParameterInfo);
+    CommandParameterInfo cameraAvStreamManagementvideoStreamAllocatestreamUsageCommandParameterInfo = new CommandParameterInfo("streamUsage", Integer.class, Integer.class);
+    cameraAvStreamManagementvideoStreamAllocateCommandParams.put("streamUsage",cameraAvStreamManagementvideoStreamAllocatestreamUsageCommandParameterInfo);
 
     CommandParameterInfo cameraAvStreamManagementvideoStreamAllocatevideoCodecCommandParameterInfo = new CommandParameterInfo("videoCodec", Integer.class, Integer.class);
     cameraAvStreamManagementvideoStreamAllocateCommandParams.put("videoCodec",cameraAvStreamManagementvideoStreamAllocatevideoCodecCommandParameterInfo);
@@ -29697,11 +32253,8 @@ public class ClusterInfoMapping {
     CommandParameterInfo cameraAvStreamManagementvideoStreamAllocatemaxBitRateCommandParameterInfo = new CommandParameterInfo("maxBitRate", Long.class, Long.class);
     cameraAvStreamManagementvideoStreamAllocateCommandParams.put("maxBitRate",cameraAvStreamManagementvideoStreamAllocatemaxBitRateCommandParameterInfo);
 
-    CommandParameterInfo cameraAvStreamManagementvideoStreamAllocateminFragmentLenCommandParameterInfo = new CommandParameterInfo("minFragmentLen", Integer.class, Integer.class);
-    cameraAvStreamManagementvideoStreamAllocateCommandParams.put("minFragmentLen",cameraAvStreamManagementvideoStreamAllocateminFragmentLenCommandParameterInfo);
-
-    CommandParameterInfo cameraAvStreamManagementvideoStreamAllocatemaxFragmentLenCommandParameterInfo = new CommandParameterInfo("maxFragmentLen", Integer.class, Integer.class);
-    cameraAvStreamManagementvideoStreamAllocateCommandParams.put("maxFragmentLen",cameraAvStreamManagementvideoStreamAllocatemaxFragmentLenCommandParameterInfo);
+    CommandParameterInfo cameraAvStreamManagementvideoStreamAllocatekeyFrameIntervalCommandParameterInfo = new CommandParameterInfo("keyFrameInterval", Integer.class, Integer.class);
+    cameraAvStreamManagementvideoStreamAllocateCommandParams.put("keyFrameInterval",cameraAvStreamManagementvideoStreamAllocatekeyFrameIntervalCommandParameterInfo);
 
     CommandParameterInfo cameraAvStreamManagementvideoStreamAllocatewatermarkEnabledCommandParameterInfo = new CommandParameterInfo("watermarkEnabled", Optional.class, Boolean.class);
     cameraAvStreamManagementvideoStreamAllocateCommandParams.put("watermarkEnabled",cameraAvStreamManagementvideoStreamAllocatewatermarkEnabledCommandParameterInfo);
@@ -29713,7 +32266,7 @@ public class ClusterInfoMapping {
         ((ChipClusters.CameraAvStreamManagementCluster) cluster)
           .videoStreamAllocate((ChipClusters.CameraAvStreamManagementCluster.VideoStreamAllocateResponseCallback) callback
            , (Integer)
-             commandArguments.get("streamType")
+             commandArguments.get("streamUsage")
 
            , (Integer)
              commandArguments.get("videoCodec")
@@ -29737,10 +32290,7 @@ public class ClusterInfoMapping {
              commandArguments.get("maxBitRate")
 
            , (Integer)
-             commandArguments.get("minFragmentLen")
-
-           , (Integer)
-             commandArguments.get("maxFragmentLen")
+             commandArguments.get("keyFrameInterval")
 
            , (Optional<Boolean>)
              commandArguments.get("watermarkEnabled")
@@ -29760,7 +32310,6 @@ public class ClusterInfoMapping {
     CommandParameterInfo cameraAvStreamManagementvideoStreamModifyvideoStreamIDCommandParameterInfo = new CommandParameterInfo("videoStreamID", Integer.class, Integer.class);
     cameraAvStreamManagementvideoStreamModifyCommandParams.put("videoStreamID",cameraAvStreamManagementvideoStreamModifyvideoStreamIDCommandParameterInfo);
 
-
     CommandParameterInfo cameraAvStreamManagementvideoStreamModifywatermarkEnabledCommandParameterInfo = new CommandParameterInfo("watermarkEnabled", Optional.class, Boolean.class);
     cameraAvStreamManagementvideoStreamModifyCommandParams.put("watermarkEnabled",cameraAvStreamManagementvideoStreamModifywatermarkEnabledCommandParameterInfo);
 
@@ -29772,8 +32321,6 @@ public class ClusterInfoMapping {
         .videoStreamModify((DefaultClusterCallback) callback
         , (Integer)
         commandArguments.get("videoStreamID")
-        , (Optional<ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct>)
-        commandArguments.get("resolution")
         , (Optional<Boolean>)
         commandArguments.get("watermarkEnabled")
         , (Optional<Boolean>)
@@ -29807,16 +32354,19 @@ public class ClusterInfoMapping {
     CommandParameterInfo cameraAvStreamManagementsnapshotStreamAllocateimageCodecCommandParameterInfo = new CommandParameterInfo("imageCodec", Integer.class, Integer.class);
     cameraAvStreamManagementsnapshotStreamAllocateCommandParams.put("imageCodec",cameraAvStreamManagementsnapshotStreamAllocateimageCodecCommandParameterInfo);
 
-    CommandParameterInfo cameraAvStreamManagementsnapshotStreamAllocateframeRateCommandParameterInfo = new CommandParameterInfo("frameRate", Integer.class, Integer.class);
-    cameraAvStreamManagementsnapshotStreamAllocateCommandParams.put("frameRate",cameraAvStreamManagementsnapshotStreamAllocateframeRateCommandParameterInfo);
-
-    CommandParameterInfo cameraAvStreamManagementsnapshotStreamAllocatebitRateCommandParameterInfo = new CommandParameterInfo("bitRate", Long.class, Long.class);
-    cameraAvStreamManagementsnapshotStreamAllocateCommandParams.put("bitRate",cameraAvStreamManagementsnapshotStreamAllocatebitRateCommandParameterInfo);
+    CommandParameterInfo cameraAvStreamManagementsnapshotStreamAllocatemaxFrameRateCommandParameterInfo = new CommandParameterInfo("maxFrameRate", Integer.class, Integer.class);
+    cameraAvStreamManagementsnapshotStreamAllocateCommandParams.put("maxFrameRate",cameraAvStreamManagementsnapshotStreamAllocatemaxFrameRateCommandParameterInfo);
 
 
 
     CommandParameterInfo cameraAvStreamManagementsnapshotStreamAllocatequalityCommandParameterInfo = new CommandParameterInfo("quality", Integer.class, Integer.class);
     cameraAvStreamManagementsnapshotStreamAllocateCommandParams.put("quality",cameraAvStreamManagementsnapshotStreamAllocatequalityCommandParameterInfo);
+
+    CommandParameterInfo cameraAvStreamManagementsnapshotStreamAllocatewatermarkEnabledCommandParameterInfo = new CommandParameterInfo("watermarkEnabled", Optional.class, Boolean.class);
+    cameraAvStreamManagementsnapshotStreamAllocateCommandParams.put("watermarkEnabled",cameraAvStreamManagementsnapshotStreamAllocatewatermarkEnabledCommandParameterInfo);
+
+    CommandParameterInfo cameraAvStreamManagementsnapshotStreamAllocateOSDEnabledCommandParameterInfo = new CommandParameterInfo("OSDEnabled", Optional.class, Boolean.class);
+    cameraAvStreamManagementsnapshotStreamAllocateCommandParams.put("OSDEnabled",cameraAvStreamManagementsnapshotStreamAllocateOSDEnabledCommandParameterInfo);
     InteractionInfo cameraAvStreamManagementsnapshotStreamAllocateInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
         ((ChipClusters.CameraAvStreamManagementCluster) cluster)
@@ -29825,10 +32375,7 @@ public class ClusterInfoMapping {
              commandArguments.get("imageCodec")
 
            , (Integer)
-             commandArguments.get("frameRate")
-
-           , (Long)
-             commandArguments.get("bitRate")
+             commandArguments.get("maxFrameRate")
 
            , (ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct)
              commandArguments.get("minResolution")
@@ -29839,12 +32386,45 @@ public class ClusterInfoMapping {
            , (Integer)
              commandArguments.get("quality")
 
+           , (Optional<Boolean>)
+             commandArguments.get("watermarkEnabled")
+
+           , (Optional<Boolean>)
+             commandArguments.get("OSDEnabled")
+
             );
         },
         () -> new DelegatedCameraAvStreamManagementClusterSnapshotStreamAllocateResponseCallback(),
         cameraAvStreamManagementsnapshotStreamAllocateCommandParams
       );
     cameraAvStreamManagementClusterInteractionInfoMap.put("snapshotStreamAllocate", cameraAvStreamManagementsnapshotStreamAllocateInteractionInfo);
+
+    Map<String, CommandParameterInfo> cameraAvStreamManagementsnapshotStreamModifyCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo cameraAvStreamManagementsnapshotStreamModifysnapshotStreamIDCommandParameterInfo = new CommandParameterInfo("snapshotStreamID", Integer.class, Integer.class);
+    cameraAvStreamManagementsnapshotStreamModifyCommandParams.put("snapshotStreamID",cameraAvStreamManagementsnapshotStreamModifysnapshotStreamIDCommandParameterInfo);
+
+    CommandParameterInfo cameraAvStreamManagementsnapshotStreamModifywatermarkEnabledCommandParameterInfo = new CommandParameterInfo("watermarkEnabled", Optional.class, Boolean.class);
+    cameraAvStreamManagementsnapshotStreamModifyCommandParams.put("watermarkEnabled",cameraAvStreamManagementsnapshotStreamModifywatermarkEnabledCommandParameterInfo);
+
+    CommandParameterInfo cameraAvStreamManagementsnapshotStreamModifyOSDEnabledCommandParameterInfo = new CommandParameterInfo("OSDEnabled", Optional.class, Boolean.class);
+    cameraAvStreamManagementsnapshotStreamModifyCommandParams.put("OSDEnabled",cameraAvStreamManagementsnapshotStreamModifyOSDEnabledCommandParameterInfo);
+    InteractionInfo cameraAvStreamManagementsnapshotStreamModifyInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.CameraAvStreamManagementCluster) cluster)
+        .snapshotStreamModify((DefaultClusterCallback) callback
+        , (Integer)
+        commandArguments.get("snapshotStreamID")
+        , (Optional<Boolean>)
+        commandArguments.get("watermarkEnabled")
+        , (Optional<Boolean>)
+        commandArguments.get("OSDEnabled")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        cameraAvStreamManagementsnapshotStreamModifyCommandParams
+    );
+    cameraAvStreamManagementClusterInteractionInfoMap.put("snapshotStreamModify", cameraAvStreamManagementsnapshotStreamModifyInteractionInfo);
 
     Map<String, CommandParameterInfo> cameraAvStreamManagementsnapshotStreamDeallocateCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
 
@@ -29888,92 +32468,197 @@ public class ClusterInfoMapping {
     InteractionInfo cameraAvStreamManagementcaptureSnapshotInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
         ((ChipClusters.CameraAvStreamManagementCluster) cluster)
-        .captureSnapshot((DefaultClusterCallback) callback
-        , (Integer)
-        commandArguments.get("snapshotStreamID")
-        , (ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct)
-        commandArguments.get("requestedResolution")
+          .captureSnapshot((ChipClusters.CameraAvStreamManagementCluster.CaptureSnapshotResponseCallback) callback
+           , (Integer)
+             commandArguments.get("snapshotStreamID")
+
+           , (ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct)
+             commandArguments.get("requestedResolution")
+
+            );
+        },
+        () -> new DelegatedCameraAvStreamManagementClusterCaptureSnapshotResponseCallback(),
+        cameraAvStreamManagementcaptureSnapshotCommandParams
+      );
+    cameraAvStreamManagementClusterInteractionInfoMap.put("captureSnapshot", cameraAvStreamManagementcaptureSnapshotInteractionInfo);
+
+    commandMap.put("cameraAvStreamManagement", cameraAvStreamManagementClusterInteractionInfoMap);
+
+    Map<String, InteractionInfo> cameraAvSettingsUserLevelManagementClusterInteractionInfoMap = new LinkedHashMap<>();
+
+    Map<String, CommandParameterInfo> cameraAvSettingsUserLevelManagementMPTZSetPositionCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo cameraAvSettingsUserLevelManagementMPTZSetPositionpanCommandParameterInfo = new CommandParameterInfo("pan", Optional.class, Integer.class);
+    cameraAvSettingsUserLevelManagementMPTZSetPositionCommandParams.put("pan",cameraAvSettingsUserLevelManagementMPTZSetPositionpanCommandParameterInfo);
+
+    CommandParameterInfo cameraAvSettingsUserLevelManagementMPTZSetPositiontiltCommandParameterInfo = new CommandParameterInfo("tilt", Optional.class, Integer.class);
+    cameraAvSettingsUserLevelManagementMPTZSetPositionCommandParams.put("tilt",cameraAvSettingsUserLevelManagementMPTZSetPositiontiltCommandParameterInfo);
+
+    CommandParameterInfo cameraAvSettingsUserLevelManagementMPTZSetPositionzoomCommandParameterInfo = new CommandParameterInfo("zoom", Optional.class, Integer.class);
+    cameraAvSettingsUserLevelManagementMPTZSetPositionCommandParams.put("zoom",cameraAvSettingsUserLevelManagementMPTZSetPositionzoomCommandParameterInfo);
+    InteractionInfo cameraAvSettingsUserLevelManagementMPTZSetPositionInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.CameraAvSettingsUserLevelManagementCluster) cluster)
+        .MPTZSetPosition((DefaultClusterCallback) callback
+        , (Optional<Integer>)
+        commandArguments.get("pan")
+        , (Optional<Integer>)
+        commandArguments.get("tilt")
+        , (Optional<Integer>)
+        commandArguments.get("zoom")
         );
       },
       () -> new DelegatedDefaultClusterCallback(),
-        cameraAvStreamManagementcaptureSnapshotCommandParams
+        cameraAvSettingsUserLevelManagementMPTZSetPositionCommandParams
     );
-    cameraAvStreamManagementClusterInteractionInfoMap.put("captureSnapshot", cameraAvStreamManagementcaptureSnapshotInteractionInfo);
+    cameraAvSettingsUserLevelManagementClusterInteractionInfoMap.put("MPTZSetPosition", cameraAvSettingsUserLevelManagementMPTZSetPositionInteractionInfo);
 
-    Map<String, CommandParameterInfo> cameraAvStreamManagementsetViewportCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    Map<String, CommandParameterInfo> cameraAvSettingsUserLevelManagementMPTZRelativeMoveCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
 
-    InteractionInfo cameraAvStreamManagementsetViewportInteractionInfo = new InteractionInfo(
+    CommandParameterInfo cameraAvSettingsUserLevelManagementMPTZRelativeMovepanDeltaCommandParameterInfo = new CommandParameterInfo("panDelta", Optional.class, Integer.class);
+    cameraAvSettingsUserLevelManagementMPTZRelativeMoveCommandParams.put("panDelta",cameraAvSettingsUserLevelManagementMPTZRelativeMovepanDeltaCommandParameterInfo);
+
+    CommandParameterInfo cameraAvSettingsUserLevelManagementMPTZRelativeMovetiltDeltaCommandParameterInfo = new CommandParameterInfo("tiltDelta", Optional.class, Integer.class);
+    cameraAvSettingsUserLevelManagementMPTZRelativeMoveCommandParams.put("tiltDelta",cameraAvSettingsUserLevelManagementMPTZRelativeMovetiltDeltaCommandParameterInfo);
+
+    CommandParameterInfo cameraAvSettingsUserLevelManagementMPTZRelativeMovezoomDeltaCommandParameterInfo = new CommandParameterInfo("zoomDelta", Optional.class, Integer.class);
+    cameraAvSettingsUserLevelManagementMPTZRelativeMoveCommandParams.put("zoomDelta",cameraAvSettingsUserLevelManagementMPTZRelativeMovezoomDeltaCommandParameterInfo);
+    InteractionInfo cameraAvSettingsUserLevelManagementMPTZRelativeMoveInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
-        ((ChipClusters.CameraAvStreamManagementCluster) cluster)
-        .setViewport((DefaultClusterCallback) callback
-        , (ChipStructs.CameraAvStreamManagementClusterViewportStruct)
+        ((ChipClusters.CameraAvSettingsUserLevelManagementCluster) cluster)
+        .MPTZRelativeMove((DefaultClusterCallback) callback
+        , (Optional<Integer>)
+        commandArguments.get("panDelta")
+        , (Optional<Integer>)
+        commandArguments.get("tiltDelta")
+        , (Optional<Integer>)
+        commandArguments.get("zoomDelta")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        cameraAvSettingsUserLevelManagementMPTZRelativeMoveCommandParams
+    );
+    cameraAvSettingsUserLevelManagementClusterInteractionInfoMap.put("MPTZRelativeMove", cameraAvSettingsUserLevelManagementMPTZRelativeMoveInteractionInfo);
+
+    Map<String, CommandParameterInfo> cameraAvSettingsUserLevelManagementMPTZMoveToPresetCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo cameraAvSettingsUserLevelManagementMPTZMoveToPresetpresetIDCommandParameterInfo = new CommandParameterInfo("presetID", Integer.class, Integer.class);
+    cameraAvSettingsUserLevelManagementMPTZMoveToPresetCommandParams.put("presetID",cameraAvSettingsUserLevelManagementMPTZMoveToPresetpresetIDCommandParameterInfo);
+    InteractionInfo cameraAvSettingsUserLevelManagementMPTZMoveToPresetInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.CameraAvSettingsUserLevelManagementCluster) cluster)
+        .MPTZMoveToPreset((DefaultClusterCallback) callback
+        , (Integer)
+        commandArguments.get("presetID")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        cameraAvSettingsUserLevelManagementMPTZMoveToPresetCommandParams
+    );
+    cameraAvSettingsUserLevelManagementClusterInteractionInfoMap.put("MPTZMoveToPreset", cameraAvSettingsUserLevelManagementMPTZMoveToPresetInteractionInfo);
+
+    Map<String, CommandParameterInfo> cameraAvSettingsUserLevelManagementMPTZSavePresetCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo cameraAvSettingsUserLevelManagementMPTZSavePresetpresetIDCommandParameterInfo = new CommandParameterInfo("presetID", Optional.class, Integer.class);
+    cameraAvSettingsUserLevelManagementMPTZSavePresetCommandParams.put("presetID",cameraAvSettingsUserLevelManagementMPTZSavePresetpresetIDCommandParameterInfo);
+
+    CommandParameterInfo cameraAvSettingsUserLevelManagementMPTZSavePresetnameCommandParameterInfo = new CommandParameterInfo("name", String.class, String.class);
+    cameraAvSettingsUserLevelManagementMPTZSavePresetCommandParams.put("name",cameraAvSettingsUserLevelManagementMPTZSavePresetnameCommandParameterInfo);
+    InteractionInfo cameraAvSettingsUserLevelManagementMPTZSavePresetInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.CameraAvSettingsUserLevelManagementCluster) cluster)
+        .MPTZSavePreset((DefaultClusterCallback) callback
+        , (Optional<Integer>)
+        commandArguments.get("presetID")
+        , (String)
+        commandArguments.get("name")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        cameraAvSettingsUserLevelManagementMPTZSavePresetCommandParams
+    );
+    cameraAvSettingsUserLevelManagementClusterInteractionInfoMap.put("MPTZSavePreset", cameraAvSettingsUserLevelManagementMPTZSavePresetInteractionInfo);
+
+    Map<String, CommandParameterInfo> cameraAvSettingsUserLevelManagementMPTZRemovePresetCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo cameraAvSettingsUserLevelManagementMPTZRemovePresetpresetIDCommandParameterInfo = new CommandParameterInfo("presetID", Integer.class, Integer.class);
+    cameraAvSettingsUserLevelManagementMPTZRemovePresetCommandParams.put("presetID",cameraAvSettingsUserLevelManagementMPTZRemovePresetpresetIDCommandParameterInfo);
+    InteractionInfo cameraAvSettingsUserLevelManagementMPTZRemovePresetInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.CameraAvSettingsUserLevelManagementCluster) cluster)
+        .MPTZRemovePreset((DefaultClusterCallback) callback
+        , (Integer)
+        commandArguments.get("presetID")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        cameraAvSettingsUserLevelManagementMPTZRemovePresetCommandParams
+    );
+    cameraAvSettingsUserLevelManagementClusterInteractionInfoMap.put("MPTZRemovePreset", cameraAvSettingsUserLevelManagementMPTZRemovePresetInteractionInfo);
+
+    Map<String, CommandParameterInfo> cameraAvSettingsUserLevelManagementDPTZSetViewportCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo cameraAvSettingsUserLevelManagementDPTZSetViewportvideoStreamIDCommandParameterInfo = new CommandParameterInfo("videoStreamID", Integer.class, Integer.class);
+    cameraAvSettingsUserLevelManagementDPTZSetViewportCommandParams.put("videoStreamID",cameraAvSettingsUserLevelManagementDPTZSetViewportvideoStreamIDCommandParameterInfo);
+
+    InteractionInfo cameraAvSettingsUserLevelManagementDPTZSetViewportInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.CameraAvSettingsUserLevelManagementCluster) cluster)
+        .DPTZSetViewport((DefaultClusterCallback) callback
+        , (Integer)
+        commandArguments.get("videoStreamID")
+        , (ChipStructs.CameraAvSettingsUserLevelManagementClusterViewportStruct)
         commandArguments.get("viewport")
         );
       },
       () -> new DelegatedDefaultClusterCallback(),
-        cameraAvStreamManagementsetViewportCommandParams
+        cameraAvSettingsUserLevelManagementDPTZSetViewportCommandParams
     );
-    cameraAvStreamManagementClusterInteractionInfoMap.put("setViewport", cameraAvStreamManagementsetViewportInteractionInfo);
+    cameraAvSettingsUserLevelManagementClusterInteractionInfoMap.put("DPTZSetViewport", cameraAvSettingsUserLevelManagementDPTZSetViewportInteractionInfo);
 
-    Map<String, CommandParameterInfo> cameraAvStreamManagementsetImageRotationCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    Map<String, CommandParameterInfo> cameraAvSettingsUserLevelManagementDPTZRelativeMoveCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
 
-    CommandParameterInfo cameraAvStreamManagementsetImageRotationangleCommandParameterInfo = new CommandParameterInfo("angle", Integer.class, Integer.class);
-    cameraAvStreamManagementsetImageRotationCommandParams.put("angle",cameraAvStreamManagementsetImageRotationangleCommandParameterInfo);
-    InteractionInfo cameraAvStreamManagementsetImageRotationInteractionInfo = new InteractionInfo(
+    CommandParameterInfo cameraAvSettingsUserLevelManagementDPTZRelativeMovevideoStreamIDCommandParameterInfo = new CommandParameterInfo("videoStreamID", Integer.class, Integer.class);
+    cameraAvSettingsUserLevelManagementDPTZRelativeMoveCommandParams.put("videoStreamID",cameraAvSettingsUserLevelManagementDPTZRelativeMovevideoStreamIDCommandParameterInfo);
+
+    CommandParameterInfo cameraAvSettingsUserLevelManagementDPTZRelativeMovedeltaXCommandParameterInfo = new CommandParameterInfo("deltaX", Optional.class, Integer.class);
+    cameraAvSettingsUserLevelManagementDPTZRelativeMoveCommandParams.put("deltaX",cameraAvSettingsUserLevelManagementDPTZRelativeMovedeltaXCommandParameterInfo);
+
+    CommandParameterInfo cameraAvSettingsUserLevelManagementDPTZRelativeMovedeltaYCommandParameterInfo = new CommandParameterInfo("deltaY", Optional.class, Integer.class);
+    cameraAvSettingsUserLevelManagementDPTZRelativeMoveCommandParams.put("deltaY",cameraAvSettingsUserLevelManagementDPTZRelativeMovedeltaYCommandParameterInfo);
+
+    CommandParameterInfo cameraAvSettingsUserLevelManagementDPTZRelativeMovezoomDeltaCommandParameterInfo = new CommandParameterInfo("zoomDelta", Optional.class, Integer.class);
+    cameraAvSettingsUserLevelManagementDPTZRelativeMoveCommandParams.put("zoomDelta",cameraAvSettingsUserLevelManagementDPTZRelativeMovezoomDeltaCommandParameterInfo);
+    InteractionInfo cameraAvSettingsUserLevelManagementDPTZRelativeMoveInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
-        ((ChipClusters.CameraAvStreamManagementCluster) cluster)
-        .setImageRotation((DefaultClusterCallback) callback
+        ((ChipClusters.CameraAvSettingsUserLevelManagementCluster) cluster)
+        .DPTZRelativeMove((DefaultClusterCallback) callback
         , (Integer)
-        commandArguments.get("angle")
+        commandArguments.get("videoStreamID")
+        , (Optional<Integer>)
+        commandArguments.get("deltaX")
+        , (Optional<Integer>)
+        commandArguments.get("deltaY")
+        , (Optional<Integer>)
+        commandArguments.get("zoomDelta")
         );
       },
       () -> new DelegatedDefaultClusterCallback(),
-        cameraAvStreamManagementsetImageRotationCommandParams
+        cameraAvSettingsUserLevelManagementDPTZRelativeMoveCommandParams
     );
-    cameraAvStreamManagementClusterInteractionInfoMap.put("setImageRotation", cameraAvStreamManagementsetImageRotationInteractionInfo);
+    cameraAvSettingsUserLevelManagementClusterInteractionInfoMap.put("DPTZRelativeMove", cameraAvSettingsUserLevelManagementDPTZRelativeMoveInteractionInfo);
 
-    Map<String, CommandParameterInfo> cameraAvStreamManagementsetImageFlipHorizontalCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-
-    CommandParameterInfo cameraAvStreamManagementsetImageFlipHorizontalenabledCommandParameterInfo = new CommandParameterInfo("enabled", Boolean.class, Boolean.class);
-    cameraAvStreamManagementsetImageFlipHorizontalCommandParams.put("enabled",cameraAvStreamManagementsetImageFlipHorizontalenabledCommandParameterInfo);
-    InteractionInfo cameraAvStreamManagementsetImageFlipHorizontalInteractionInfo = new InteractionInfo(
-      (cluster, callback, commandArguments) -> {
-        ((ChipClusters.CameraAvStreamManagementCluster) cluster)
-        .setImageFlipHorizontal((DefaultClusterCallback) callback
-        , (Boolean)
-        commandArguments.get("enabled")
-        );
-      },
-      () -> new DelegatedDefaultClusterCallback(),
-        cameraAvStreamManagementsetImageFlipHorizontalCommandParams
-    );
-    cameraAvStreamManagementClusterInteractionInfoMap.put("setImageFlipHorizontal", cameraAvStreamManagementsetImageFlipHorizontalInteractionInfo);
-
-    Map<String, CommandParameterInfo> cameraAvStreamManagementsetImageFlipVerticalCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-
-    CommandParameterInfo cameraAvStreamManagementsetImageFlipVerticalenabledCommandParameterInfo = new CommandParameterInfo("enabled", Boolean.class, Boolean.class);
-    cameraAvStreamManagementsetImageFlipVerticalCommandParams.put("enabled",cameraAvStreamManagementsetImageFlipVerticalenabledCommandParameterInfo);
-    InteractionInfo cameraAvStreamManagementsetImageFlipVerticalInteractionInfo = new InteractionInfo(
-      (cluster, callback, commandArguments) -> {
-        ((ChipClusters.CameraAvStreamManagementCluster) cluster)
-        .setImageFlipVertical((DefaultClusterCallback) callback
-        , (Boolean)
-        commandArguments.get("enabled")
-        );
-      },
-      () -> new DelegatedDefaultClusterCallback(),
-        cameraAvStreamManagementsetImageFlipVerticalCommandParams
-    );
-    cameraAvStreamManagementClusterInteractionInfoMap.put("setImageFlipVertical", cameraAvStreamManagementsetImageFlipVerticalInteractionInfo);
-
-    commandMap.put("cameraAvStreamManagement", cameraAvStreamManagementClusterInteractionInfoMap);
+    commandMap.put("cameraAvSettingsUserLevelManagement", cameraAvSettingsUserLevelManagementClusterInteractionInfoMap);
 
     Map<String, InteractionInfo> webRTCTransportProviderClusterInteractionInfoMap = new LinkedHashMap<>();
 
     Map<String, CommandParameterInfo> webRTCTransportProvidersolicitOfferCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
 
-    CommandParameterInfo webRTCTransportProvidersolicitOfferstreamTypeCommandParameterInfo = new CommandParameterInfo("streamType", Integer.class, Integer.class);
-    webRTCTransportProvidersolicitOfferCommandParams.put("streamType",webRTCTransportProvidersolicitOfferstreamTypeCommandParameterInfo);
+    CommandParameterInfo webRTCTransportProvidersolicitOfferstreamUsageCommandParameterInfo = new CommandParameterInfo("streamUsage", Integer.class, Integer.class);
+    webRTCTransportProvidersolicitOfferCommandParams.put("streamUsage",webRTCTransportProvidersolicitOfferstreamUsageCommandParameterInfo);
+
+    CommandParameterInfo webRTCTransportProvidersolicitOfferoriginatingEndpointIDCommandParameterInfo = new CommandParameterInfo("originatingEndpointID", Integer.class, Integer.class);
+    webRTCTransportProvidersolicitOfferCommandParams.put("originatingEndpointID",webRTCTransportProvidersolicitOfferoriginatingEndpointIDCommandParameterInfo);
 
     CommandParameterInfo webRTCTransportProvidersolicitOffervideoStreamIDCommandParameterInfo = new CommandParameterInfo("videoStreamID", Optional.class, Integer.class);
     webRTCTransportProvidersolicitOfferCommandParams.put("videoStreamID",webRTCTransportProvidersolicitOffervideoStreamIDCommandParameterInfo);
@@ -29985,14 +32670,24 @@ public class ClusterInfoMapping {
     CommandParameterInfo webRTCTransportProvidersolicitOfferICETransportPolicyCommandParameterInfo = new CommandParameterInfo("ICETransportPolicy", Optional.class, String.class);
     webRTCTransportProvidersolicitOfferCommandParams.put("ICETransportPolicy",webRTCTransportProvidersolicitOfferICETransportPolicyCommandParameterInfo);
 
-    CommandParameterInfo webRTCTransportProvidersolicitOffermetadataOptionsCommandParameterInfo = new CommandParameterInfo("metadataOptions", Optional.class, Integer.class);
-    webRTCTransportProvidersolicitOfferCommandParams.put("metadataOptions",webRTCTransportProvidersolicitOffermetadataOptionsCommandParameterInfo);
+    CommandParameterInfo webRTCTransportProvidersolicitOffermetadataEnabledCommandParameterInfo = new CommandParameterInfo("metadataEnabled", Optional.class, Boolean.class);
+    webRTCTransportProvidersolicitOfferCommandParams.put("metadataEnabled",webRTCTransportProvidersolicitOffermetadataEnabledCommandParameterInfo);
+
+
+    CommandParameterInfo webRTCTransportProvidersolicitOffervideoStreamsCommandParameterInfo = new CommandParameterInfo("videoStreams", Optional.class, ArrayList.class);
+    webRTCTransportProvidersolicitOfferCommandParams.put("videoStreams",webRTCTransportProvidersolicitOffervideoStreamsCommandParameterInfo);
+
+    CommandParameterInfo webRTCTransportProvidersolicitOfferaudioStreamsCommandParameterInfo = new CommandParameterInfo("audioStreams", Optional.class, ArrayList.class);
+    webRTCTransportProvidersolicitOfferCommandParams.put("audioStreams",webRTCTransportProvidersolicitOfferaudioStreamsCommandParameterInfo);
     InteractionInfo webRTCTransportProvidersolicitOfferInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
         ((ChipClusters.WebRTCTransportProviderCluster) cluster)
           .solicitOffer((ChipClusters.WebRTCTransportProviderCluster.SolicitOfferResponseCallback) callback
            , (Integer)
-             commandArguments.get("streamType")
+             commandArguments.get("streamUsage")
+
+           , (Integer)
+             commandArguments.get("originatingEndpointID")
 
            , (Optional<Integer>)
              commandArguments.get("videoStreamID")
@@ -30006,8 +32701,17 @@ public class ClusterInfoMapping {
            , (Optional<String>)
              commandArguments.get("ICETransportPolicy")
 
-           , (Optional<Integer>)
-             commandArguments.get("metadataOptions")
+           , (Optional<Boolean>)
+             commandArguments.get("metadataEnabled")
+
+           , (Optional<ChipStructs.WebRTCTransportProviderClusterSFrameStruct>)
+             commandArguments.get("SFrameConfig")
+
+           , (Optional<ArrayList<Integer>>)
+             commandArguments.get("videoStreams")
+
+           , (Optional<ArrayList<Integer>>)
+             commandArguments.get("audioStreams")
 
             );
         },
@@ -30024,8 +32728,11 @@ public class ClusterInfoMapping {
     CommandParameterInfo webRTCTransportProviderprovideOffersdpCommandParameterInfo = new CommandParameterInfo("sdp", String.class, String.class);
     webRTCTransportProviderprovideOfferCommandParams.put("sdp",webRTCTransportProviderprovideOffersdpCommandParameterInfo);
 
-    CommandParameterInfo webRTCTransportProviderprovideOfferstreamTypeCommandParameterInfo = new CommandParameterInfo("streamType", Integer.class, Integer.class);
-    webRTCTransportProviderprovideOfferCommandParams.put("streamType",webRTCTransportProviderprovideOfferstreamTypeCommandParameterInfo);
+    CommandParameterInfo webRTCTransportProviderprovideOfferstreamUsageCommandParameterInfo = new CommandParameterInfo("streamUsage", Integer.class, Integer.class);
+    webRTCTransportProviderprovideOfferCommandParams.put("streamUsage",webRTCTransportProviderprovideOfferstreamUsageCommandParameterInfo);
+
+    CommandParameterInfo webRTCTransportProviderprovideOfferoriginatingEndpointIDCommandParameterInfo = new CommandParameterInfo("originatingEndpointID", Integer.class, Integer.class);
+    webRTCTransportProviderprovideOfferCommandParams.put("originatingEndpointID",webRTCTransportProviderprovideOfferoriginatingEndpointIDCommandParameterInfo);
 
     CommandParameterInfo webRTCTransportProviderprovideOffervideoStreamIDCommandParameterInfo = new CommandParameterInfo("videoStreamID", Optional.class, Integer.class);
     webRTCTransportProviderprovideOfferCommandParams.put("videoStreamID",webRTCTransportProviderprovideOffervideoStreamIDCommandParameterInfo);
@@ -30037,8 +32744,15 @@ public class ClusterInfoMapping {
     CommandParameterInfo webRTCTransportProviderprovideOfferICETransportPolicyCommandParameterInfo = new CommandParameterInfo("ICETransportPolicy", Optional.class, String.class);
     webRTCTransportProviderprovideOfferCommandParams.put("ICETransportPolicy",webRTCTransportProviderprovideOfferICETransportPolicyCommandParameterInfo);
 
-    CommandParameterInfo webRTCTransportProviderprovideOffermetadataOptionsCommandParameterInfo = new CommandParameterInfo("metadataOptions", Optional.class, Integer.class);
-    webRTCTransportProviderprovideOfferCommandParams.put("metadataOptions",webRTCTransportProviderprovideOffermetadataOptionsCommandParameterInfo);
+    CommandParameterInfo webRTCTransportProviderprovideOffermetadataEnabledCommandParameterInfo = new CommandParameterInfo("metadataEnabled", Optional.class, Boolean.class);
+    webRTCTransportProviderprovideOfferCommandParams.put("metadataEnabled",webRTCTransportProviderprovideOffermetadataEnabledCommandParameterInfo);
+
+
+    CommandParameterInfo webRTCTransportProviderprovideOffervideoStreamsCommandParameterInfo = new CommandParameterInfo("videoStreams", Optional.class, ArrayList.class);
+    webRTCTransportProviderprovideOfferCommandParams.put("videoStreams",webRTCTransportProviderprovideOffervideoStreamsCommandParameterInfo);
+
+    CommandParameterInfo webRTCTransportProviderprovideOfferaudioStreamsCommandParameterInfo = new CommandParameterInfo("audioStreams", Optional.class, ArrayList.class);
+    webRTCTransportProviderprovideOfferCommandParams.put("audioStreams",webRTCTransportProviderprovideOfferaudioStreamsCommandParameterInfo);
     InteractionInfo webRTCTransportProviderprovideOfferInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
         ((ChipClusters.WebRTCTransportProviderCluster) cluster)
@@ -30050,7 +32764,10 @@ public class ClusterInfoMapping {
              commandArguments.get("sdp")
 
            , (Integer)
-             commandArguments.get("streamType")
+             commandArguments.get("streamUsage")
+
+           , (Integer)
+             commandArguments.get("originatingEndpointID")
 
            , (Optional<Integer>)
              commandArguments.get("videoStreamID")
@@ -30064,8 +32781,17 @@ public class ClusterInfoMapping {
            , (Optional<String>)
              commandArguments.get("ICETransportPolicy")
 
-           , (Optional<Integer>)
-             commandArguments.get("metadataOptions")
+           , (Optional<Boolean>)
+             commandArguments.get("metadataEnabled")
+
+           , (Optional<ChipStructs.WebRTCTransportProviderClusterSFrameStruct>)
+             commandArguments.get("SFrameConfig")
+
+           , (Optional<ArrayList<Integer>>)
+             commandArguments.get("videoStreams")
+
+           , (Optional<ArrayList<Integer>>)
+             commandArguments.get("audioStreams")
 
             );
         },
@@ -30096,27 +32822,25 @@ public class ClusterInfoMapping {
     );
     webRTCTransportProviderClusterInteractionInfoMap.put("provideAnswer", webRTCTransportProviderprovideAnswerInteractionInfo);
 
-    Map<String, CommandParameterInfo> webRTCTransportProviderprovideICECandidateCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    Map<String, CommandParameterInfo> webRTCTransportProviderprovideICECandidatesCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
 
-    CommandParameterInfo webRTCTransportProviderprovideICECandidatewebRTCSessionIDCommandParameterInfo = new CommandParameterInfo("webRTCSessionID", Integer.class, Integer.class);
-    webRTCTransportProviderprovideICECandidateCommandParams.put("webRTCSessionID",webRTCTransportProviderprovideICECandidatewebRTCSessionIDCommandParameterInfo);
+    CommandParameterInfo webRTCTransportProviderprovideICECandidateswebRTCSessionIDCommandParameterInfo = new CommandParameterInfo("webRTCSessionID", Integer.class, Integer.class);
+    webRTCTransportProviderprovideICECandidatesCommandParams.put("webRTCSessionID",webRTCTransportProviderprovideICECandidateswebRTCSessionIDCommandParameterInfo);
 
-    CommandParameterInfo webRTCTransportProviderprovideICECandidateICECandidateCommandParameterInfo = new CommandParameterInfo("ICECandidate", String.class, String.class);
-    webRTCTransportProviderprovideICECandidateCommandParams.put("ICECandidate",webRTCTransportProviderprovideICECandidateICECandidateCommandParameterInfo);
-    InteractionInfo webRTCTransportProviderprovideICECandidateInteractionInfo = new InteractionInfo(
+    InteractionInfo webRTCTransportProviderprovideICECandidatesInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
         ((ChipClusters.WebRTCTransportProviderCluster) cluster)
-        .provideICECandidate((DefaultClusterCallback) callback
+        .provideICECandidates((DefaultClusterCallback) callback
         , (Integer)
         commandArguments.get("webRTCSessionID")
-        , (String)
-        commandArguments.get("ICECandidate")
+        , (ArrayList<ChipStructs.WebRTCTransportProviderClusterICECandidateStruct>)
+        commandArguments.get("ICECandidates")
         );
       },
       () -> new DelegatedDefaultClusterCallback(),
-        webRTCTransportProviderprovideICECandidateCommandParams
+        webRTCTransportProviderprovideICECandidatesCommandParams
     );
-    webRTCTransportProviderClusterInteractionInfoMap.put("provideICECandidate", webRTCTransportProviderprovideICECandidateInteractionInfo);
+    webRTCTransportProviderClusterInteractionInfoMap.put("provideICECandidates", webRTCTransportProviderprovideICECandidatesInteractionInfo);
 
     Map<String, CommandParameterInfo> webRTCTransportProviderendSessionCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
 
@@ -30196,27 +32920,25 @@ public class ClusterInfoMapping {
     );
     webRTCTransportRequestorClusterInteractionInfoMap.put("answer", webRTCTransportRequestoranswerInteractionInfo);
 
-    Map<String, CommandParameterInfo> webRTCTransportRequestorICECandidateCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    Map<String, CommandParameterInfo> webRTCTransportRequestorICECandidatesCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
 
-    CommandParameterInfo webRTCTransportRequestorICECandidatewebRTCSessionIDCommandParameterInfo = new CommandParameterInfo("webRTCSessionID", Integer.class, Integer.class);
-    webRTCTransportRequestorICECandidateCommandParams.put("webRTCSessionID",webRTCTransportRequestorICECandidatewebRTCSessionIDCommandParameterInfo);
+    CommandParameterInfo webRTCTransportRequestorICECandidateswebRTCSessionIDCommandParameterInfo = new CommandParameterInfo("webRTCSessionID", Integer.class, Integer.class);
+    webRTCTransportRequestorICECandidatesCommandParams.put("webRTCSessionID",webRTCTransportRequestorICECandidateswebRTCSessionIDCommandParameterInfo);
 
-    CommandParameterInfo webRTCTransportRequestorICECandidateICECandidateCommandParameterInfo = new CommandParameterInfo("ICECandidate", String.class, String.class);
-    webRTCTransportRequestorICECandidateCommandParams.put("ICECandidate",webRTCTransportRequestorICECandidateICECandidateCommandParameterInfo);
-    InteractionInfo webRTCTransportRequestorICECandidateInteractionInfo = new InteractionInfo(
+    InteractionInfo webRTCTransportRequestorICECandidatesInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
         ((ChipClusters.WebRTCTransportRequestorCluster) cluster)
-        .ICECandidate((DefaultClusterCallback) callback
+        .ICECandidates((DefaultClusterCallback) callback
         , (Integer)
         commandArguments.get("webRTCSessionID")
-        , (String)
-        commandArguments.get("ICECandidate")
+        , (ArrayList<ChipStructs.WebRTCTransportRequestorClusterICECandidateStruct>)
+        commandArguments.get("ICECandidates")
         );
       },
       () -> new DelegatedDefaultClusterCallback(),
-        webRTCTransportRequestorICECandidateCommandParams
+        webRTCTransportRequestorICECandidatesCommandParams
     );
-    webRTCTransportRequestorClusterInteractionInfoMap.put("ICECandidate", webRTCTransportRequestorICECandidateInteractionInfo);
+    webRTCTransportRequestorClusterInteractionInfoMap.put("ICECandidates", webRTCTransportRequestorICECandidatesInteractionInfo);
 
     Map<String, CommandParameterInfo> webRTCTransportRequestorendCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
 
@@ -30242,13 +32964,145 @@ public class ClusterInfoMapping {
 
     commandMap.put("webRTCTransportRequestor", webRTCTransportRequestorClusterInteractionInfoMap);
 
+    Map<String, InteractionInfo> pushAvStreamTransportClusterInteractionInfoMap = new LinkedHashMap<>();
+
+    Map<String, CommandParameterInfo> pushAvStreamTransportallocatePushTransportCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    InteractionInfo pushAvStreamTransportallocatePushTransportInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.PushAvStreamTransportCluster) cluster)
+          .allocatePushTransport((ChipClusters.PushAvStreamTransportCluster.AllocatePushTransportResponseCallback) callback
+           , (ChipStructs.PushAvStreamTransportClusterTransportOptionsStruct)
+             commandArguments.get("transportOptions")
+
+            );
+        },
+        () -> new DelegatedPushAvStreamTransportClusterAllocatePushTransportResponseCallback(),
+        pushAvStreamTransportallocatePushTransportCommandParams
+      );
+    pushAvStreamTransportClusterInteractionInfoMap.put("allocatePushTransport", pushAvStreamTransportallocatePushTransportInteractionInfo);
+
+    Map<String, CommandParameterInfo> pushAvStreamTransportdeallocatePushTransportCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo pushAvStreamTransportdeallocatePushTransportconnectionIDCommandParameterInfo = new CommandParameterInfo("connectionID", Integer.class, Integer.class);
+    pushAvStreamTransportdeallocatePushTransportCommandParams.put("connectionID",pushAvStreamTransportdeallocatePushTransportconnectionIDCommandParameterInfo);
+    InteractionInfo pushAvStreamTransportdeallocatePushTransportInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.PushAvStreamTransportCluster) cluster)
+        .deallocatePushTransport((DefaultClusterCallback) callback
+        , (Integer)
+        commandArguments.get("connectionID")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        pushAvStreamTransportdeallocatePushTransportCommandParams
+    );
+    pushAvStreamTransportClusterInteractionInfoMap.put("deallocatePushTransport", pushAvStreamTransportdeallocatePushTransportInteractionInfo);
+
+    Map<String, CommandParameterInfo> pushAvStreamTransportmodifyPushTransportCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo pushAvStreamTransportmodifyPushTransportconnectionIDCommandParameterInfo = new CommandParameterInfo("connectionID", Integer.class, Integer.class);
+    pushAvStreamTransportmodifyPushTransportCommandParams.put("connectionID",pushAvStreamTransportmodifyPushTransportconnectionIDCommandParameterInfo);
+
+    InteractionInfo pushAvStreamTransportmodifyPushTransportInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.PushAvStreamTransportCluster) cluster)
+        .modifyPushTransport((DefaultClusterCallback) callback
+        , (Integer)
+        commandArguments.get("connectionID")
+        , (ChipStructs.PushAvStreamTransportClusterTransportOptionsStruct)
+        commandArguments.get("transportOptions")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        pushAvStreamTransportmodifyPushTransportCommandParams
+    );
+    pushAvStreamTransportClusterInteractionInfoMap.put("modifyPushTransport", pushAvStreamTransportmodifyPushTransportInteractionInfo);
+
+    Map<String, CommandParameterInfo> pushAvStreamTransportsetTransportStatusCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo pushAvStreamTransportsetTransportStatusconnectionIDCommandParameterInfo = new CommandParameterInfo("connectionID", Integer.class, Integer.class);
+    pushAvStreamTransportsetTransportStatusCommandParams.put("connectionID",pushAvStreamTransportsetTransportStatusconnectionIDCommandParameterInfo);
+
+    CommandParameterInfo pushAvStreamTransportsetTransportStatustransportStatusCommandParameterInfo = new CommandParameterInfo("transportStatus", Integer.class, Integer.class);
+    pushAvStreamTransportsetTransportStatusCommandParams.put("transportStatus",pushAvStreamTransportsetTransportStatustransportStatusCommandParameterInfo);
+    InteractionInfo pushAvStreamTransportsetTransportStatusInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.PushAvStreamTransportCluster) cluster)
+        .setTransportStatus((DefaultClusterCallback) callback
+        , (Integer)
+        commandArguments.get("connectionID")
+        , (Integer)
+        commandArguments.get("transportStatus")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        pushAvStreamTransportsetTransportStatusCommandParams
+    );
+    pushAvStreamTransportClusterInteractionInfoMap.put("setTransportStatus", pushAvStreamTransportsetTransportStatusInteractionInfo);
+
+    Map<String, CommandParameterInfo> pushAvStreamTransportmanuallyTriggerTransportCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo pushAvStreamTransportmanuallyTriggerTransportconnectionIDCommandParameterInfo = new CommandParameterInfo("connectionID", Integer.class, Integer.class);
+    pushAvStreamTransportmanuallyTriggerTransportCommandParams.put("connectionID",pushAvStreamTransportmanuallyTriggerTransportconnectionIDCommandParameterInfo);
+
+    CommandParameterInfo pushAvStreamTransportmanuallyTriggerTransportactivationReasonCommandParameterInfo = new CommandParameterInfo("activationReason", Integer.class, Integer.class);
+    pushAvStreamTransportmanuallyTriggerTransportCommandParams.put("activationReason",pushAvStreamTransportmanuallyTriggerTransportactivationReasonCommandParameterInfo);
+
+
+    CommandParameterInfo pushAvStreamTransportmanuallyTriggerTransportuserDefinedCommandParameterInfo = new CommandParameterInfo("userDefined", Optional.class, byte[].class);
+    pushAvStreamTransportmanuallyTriggerTransportCommandParams.put("userDefined",pushAvStreamTransportmanuallyTriggerTransportuserDefinedCommandParameterInfo);
+    InteractionInfo pushAvStreamTransportmanuallyTriggerTransportInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.PushAvStreamTransportCluster) cluster)
+        .manuallyTriggerTransport((DefaultClusterCallback) callback
+        , (Integer)
+        commandArguments.get("connectionID")
+        , (Integer)
+        commandArguments.get("activationReason")
+        , (Optional<ChipStructs.PushAvStreamTransportClusterTransportMotionTriggerTimeControlStruct>)
+        commandArguments.get("timeControl")
+        , (Optional<byte[]>)
+        commandArguments.get("userDefined")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        pushAvStreamTransportmanuallyTriggerTransportCommandParams
+    );
+    pushAvStreamTransportClusterInteractionInfoMap.put("manuallyTriggerTransport", pushAvStreamTransportmanuallyTriggerTransportInteractionInfo);
+
+    Map<String, CommandParameterInfo> pushAvStreamTransportfindTransportCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo pushAvStreamTransportfindTransportconnectionIDCommandParameterInfo = new CommandParameterInfo("connectionID", Integer.class, Integer.class);
+    pushAvStreamTransportfindTransportCommandParams.put("connectionID",pushAvStreamTransportfindTransportconnectionIDCommandParameterInfo);
+    InteractionInfo pushAvStreamTransportfindTransportInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.PushAvStreamTransportCluster) cluster)
+          .findTransport((ChipClusters.PushAvStreamTransportCluster.FindTransportResponseCallback) callback
+           , (Integer)
+             commandArguments.get("connectionID")
+
+            );
+        },
+        () -> new DelegatedPushAvStreamTransportClusterFindTransportResponseCallback(),
+        pushAvStreamTransportfindTransportCommandParams
+      );
+    pushAvStreamTransportClusterInteractionInfoMap.put("findTransport", pushAvStreamTransportfindTransportInteractionInfo);
+
+    commandMap.put("pushAvStreamTransport", pushAvStreamTransportClusterInteractionInfoMap);
+
     Map<String, InteractionInfo> chimeClusterInteractionInfoMap = new LinkedHashMap<>();
 
     Map<String, CommandParameterInfo> chimeplayChimeSoundCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo chimeplayChimeSoundchimeIDCommandParameterInfo = new CommandParameterInfo("chimeID", Optional.class, Integer.class);
+    chimeplayChimeSoundCommandParams.put("chimeID",chimeplayChimeSoundchimeIDCommandParameterInfo);
     InteractionInfo chimeplayChimeSoundInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
         ((ChipClusters.ChimeCluster) cluster)
         .playChimeSound((DefaultClusterCallback) callback
+        , (Optional<Integer>)
+        commandArguments.get("chimeID")
         );
       },
       () -> new DelegatedDefaultClusterCallback(),
@@ -30257,6 +33111,159 @@ public class ClusterInfoMapping {
     chimeClusterInteractionInfoMap.put("playChimeSound", chimeplayChimeSoundInteractionInfo);
 
     commandMap.put("chime", chimeClusterInteractionInfoMap);
+
+    Map<String, InteractionInfo> avAnalysisClusterInteractionInfoMap = new LinkedHashMap<>();
+
+    Map<String, CommandParameterInfo> avAnalysisenableContextTriggersCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    InteractionInfo avAnalysisenableContextTriggersInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.AvAnalysisCluster) cluster)
+        .enableContextTriggers((DefaultClusterCallback) callback
+        , (ArrayList<ChipStructs.AvAnalysisClusterContextTriggerStruct>)
+        commandArguments.get("contextTriggers")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        avAnalysisenableContextTriggersCommandParams
+    );
+    avAnalysisClusterInteractionInfoMap.put("enableContextTriggers", avAnalysisenableContextTriggersInteractionInfo);
+
+    Map<String, CommandParameterInfo> avAnalysisdisableContextTriggersCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    InteractionInfo avAnalysisdisableContextTriggersInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.AvAnalysisCluster) cluster)
+        .disableContextTriggers((DefaultClusterCallback) callback
+        , (ArrayList<ChipStructs.AvAnalysisClusterContextTriggerStruct>)
+        commandArguments.get("contextTriggers")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        avAnalysisdisableContextTriggersCommandParams
+    );
+    avAnalysisClusterInteractionInfoMap.put("disableContextTriggers", avAnalysisdisableContextTriggersInteractionInfo);
+
+    Map<String, CommandParameterInfo> avAnalysisestablishAnalysisStreamCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo avAnalysisestablishAnalysisStreamnodeIDCommandParameterInfo = new CommandParameterInfo("nodeID", Long.class, Long.class);
+    avAnalysisestablishAnalysisStreamCommandParams.put("nodeID",avAnalysisestablishAnalysisStreamnodeIDCommandParameterInfo);
+    InteractionInfo avAnalysisestablishAnalysisStreamInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.AvAnalysisCluster) cluster)
+          .establishAnalysisStream((ChipClusters.AvAnalysisCluster.EstablishAnalysisStreamResponseCallback) callback
+           , (Long)
+             commandArguments.get("nodeID")
+
+            );
+        },
+        () -> new DelegatedAvAnalysisClusterEstablishAnalysisStreamResponseCallback(),
+        avAnalysisestablishAnalysisStreamCommandParams
+      );
+    avAnalysisClusterInteractionInfoMap.put("establishAnalysisStream", avAnalysisestablishAnalysisStreamInteractionInfo);
+
+    Map<String, CommandParameterInfo> avAnalysisactivateAnalysisStreamCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo avAnalysisactivateAnalysisStreamanalysisStreamIDCommandParameterInfo = new CommandParameterInfo("analysisStreamID", Integer.class, Integer.class);
+    avAnalysisactivateAnalysisStreamCommandParams.put("analysisStreamID",avAnalysisactivateAnalysisStreamanalysisStreamIDCommandParameterInfo);
+
+    CommandParameterInfo avAnalysisactivateAnalysisStreamwebRTCEndpointIDCommandParameterInfo = new CommandParameterInfo("webRTCEndpointID", Optional.class, Integer.class);
+    avAnalysisactivateAnalysisStreamCommandParams.put("webRTCEndpointID",avAnalysisactivateAnalysisStreamwebRTCEndpointIDCommandParameterInfo);
+
+    CommandParameterInfo avAnalysisactivateAnalysisStreampushAVEndpointIDCommandParameterInfo = new CommandParameterInfo("pushAVEndpointID", Optional.class, Integer.class);
+    avAnalysisactivateAnalysisStreamCommandParams.put("pushAVEndpointID",avAnalysisactivateAnalysisStreampushAVEndpointIDCommandParameterInfo);
+    InteractionInfo avAnalysisactivateAnalysisStreamInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.AvAnalysisCluster) cluster)
+        .activateAnalysisStream((DefaultClusterCallback) callback
+        , (Integer)
+        commandArguments.get("analysisStreamID")
+        , (Optional<Integer>)
+        commandArguments.get("webRTCEndpointID")
+        , (Optional<Integer>)
+        commandArguments.get("pushAVEndpointID")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        avAnalysisactivateAnalysisStreamCommandParams
+    );
+    avAnalysisClusterInteractionInfoMap.put("activateAnalysisStream", avAnalysisactivateAnalysisStreamInteractionInfo);
+
+    Map<String, CommandParameterInfo> avAnalysisdeactivateAnalysisStreamCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo avAnalysisdeactivateAnalysisStreamanalysisStreamIDCommandParameterInfo = new CommandParameterInfo("analysisStreamID", Integer.class, Integer.class);
+    avAnalysisdeactivateAnalysisStreamCommandParams.put("analysisStreamID",avAnalysisdeactivateAnalysisStreamanalysisStreamIDCommandParameterInfo);
+    InteractionInfo avAnalysisdeactivateAnalysisStreamInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.AvAnalysisCluster) cluster)
+        .deactivateAnalysisStream((DefaultClusterCallback) callback
+        , (Integer)
+        commandArguments.get("analysisStreamID")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        avAnalysisdeactivateAnalysisStreamCommandParams
+    );
+    avAnalysisClusterInteractionInfoMap.put("deactivateAnalysisStream", avAnalysisdeactivateAnalysisStreamInteractionInfo);
+
+    Map<String, CommandParameterInfo> avAnalysisremoveAnalysisStreamCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo avAnalysisremoveAnalysisStreamanalysisStreamIDCommandParameterInfo = new CommandParameterInfo("analysisStreamID", Integer.class, Integer.class);
+    avAnalysisremoveAnalysisStreamCommandParams.put("analysisStreamID",avAnalysisremoveAnalysisStreamanalysisStreamIDCommandParameterInfo);
+    InteractionInfo avAnalysisremoveAnalysisStreamInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.AvAnalysisCluster) cluster)
+        .removeAnalysisStream((DefaultClusterCallback) callback
+        , (Integer)
+        commandArguments.get("analysisStreamID")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        avAnalysisremoveAnalysisStreamCommandParams
+    );
+    avAnalysisClusterInteractionInfoMap.put("removeAnalysisStream", avAnalysisremoveAnalysisStreamInteractionInfo);
+
+    commandMap.put("avAnalysis", avAnalysisClusterInteractionInfoMap);
+
+    Map<String, InteractionInfo> commodityTariffClusterInteractionInfoMap = new LinkedHashMap<>();
+
+    Map<String, CommandParameterInfo> commodityTariffgetTariffComponentCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo commodityTariffgetTariffComponenttariffComponentIDCommandParameterInfo = new CommandParameterInfo("tariffComponentID", Long.class, Long.class);
+    commodityTariffgetTariffComponentCommandParams.put("tariffComponentID",commodityTariffgetTariffComponenttariffComponentIDCommandParameterInfo);
+    InteractionInfo commodityTariffgetTariffComponentInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.CommodityTariffCluster) cluster)
+          .getTariffComponent((ChipClusters.CommodityTariffCluster.GetTariffComponentResponseCallback) callback
+           , (Long)
+             commandArguments.get("tariffComponentID")
+
+            );
+        },
+        () -> new DelegatedCommodityTariffClusterGetTariffComponentResponseCallback(),
+        commodityTariffgetTariffComponentCommandParams
+      );
+    commodityTariffClusterInteractionInfoMap.put("getTariffComponent", commodityTariffgetTariffComponentInteractionInfo);
+
+    Map<String, CommandParameterInfo> commodityTariffgetDayEntryCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo commodityTariffgetDayEntrydayEntryIDCommandParameterInfo = new CommandParameterInfo("dayEntryID", Long.class, Long.class);
+    commodityTariffgetDayEntryCommandParams.put("dayEntryID",commodityTariffgetDayEntrydayEntryIDCommandParameterInfo);
+    InteractionInfo commodityTariffgetDayEntryInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.CommodityTariffCluster) cluster)
+          .getDayEntry((ChipClusters.CommodityTariffCluster.GetDayEntryResponseCallback) callback
+           , (Long)
+             commandArguments.get("dayEntryID")
+
+            );
+        },
+        () -> new DelegatedCommodityTariffClusterGetDayEntryResponseCallback(),
+        commodityTariffgetDayEntryCommandParams
+      );
+    commodityTariffClusterInteractionInfoMap.put("getDayEntry", commodityTariffgetDayEntryInteractionInfo);
+
+    commandMap.put("commodityTariff", commodityTariffClusterInteractionInfoMap);
 
     Map<String, InteractionInfo> ecosystemInformationClusterInteractionInfoMap = new LinkedHashMap<>();
 
@@ -30321,6 +33328,873 @@ public class ClusterInfoMapping {
     commissionerControlClusterInteractionInfoMap.put("commissionNode", commissionerControlcommissionNodeInteractionInfo);
 
     commandMap.put("commissionerControl", commissionerControlClusterInteractionInfoMap);
+
+    Map<String, InteractionInfo> jointFabricDatastoreClusterInteractionInfoMap = new LinkedHashMap<>();
+
+    Map<String, CommandParameterInfo> jointFabricDatastoreaddKeySetCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    InteractionInfo jointFabricDatastoreaddKeySetInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.JointFabricDatastoreCluster) cluster)
+        .addKeySet((DefaultClusterCallback) callback
+        , (ChipStructs.JointFabricDatastoreClusterDatastoreGroupKeySetStruct)
+        commandArguments.get("groupKeySet")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        jointFabricDatastoreaddKeySetCommandParams
+    );
+    jointFabricDatastoreClusterInteractionInfoMap.put("addKeySet", jointFabricDatastoreaddKeySetInteractionInfo);
+
+    Map<String, CommandParameterInfo> jointFabricDatastoreupdateKeySetCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    InteractionInfo jointFabricDatastoreupdateKeySetInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.JointFabricDatastoreCluster) cluster)
+        .updateKeySet((DefaultClusterCallback) callback
+        , (ChipStructs.JointFabricDatastoreClusterDatastoreGroupKeySetStruct)
+        commandArguments.get("groupKeySet")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        jointFabricDatastoreupdateKeySetCommandParams
+    );
+    jointFabricDatastoreClusterInteractionInfoMap.put("updateKeySet", jointFabricDatastoreupdateKeySetInteractionInfo);
+
+    Map<String, CommandParameterInfo> jointFabricDatastoreremoveKeySetCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo jointFabricDatastoreremoveKeySetgroupKeySetIDCommandParameterInfo = new CommandParameterInfo("groupKeySetID", Integer.class, Integer.class);
+    jointFabricDatastoreremoveKeySetCommandParams.put("groupKeySetID",jointFabricDatastoreremoveKeySetgroupKeySetIDCommandParameterInfo);
+    InteractionInfo jointFabricDatastoreremoveKeySetInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.JointFabricDatastoreCluster) cluster)
+        .removeKeySet((DefaultClusterCallback) callback
+        , (Integer)
+        commandArguments.get("groupKeySetID")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        jointFabricDatastoreremoveKeySetCommandParams
+    );
+    jointFabricDatastoreClusterInteractionInfoMap.put("removeKeySet", jointFabricDatastoreremoveKeySetInteractionInfo);
+
+    Map<String, CommandParameterInfo> jointFabricDatastoreaddGroupCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo jointFabricDatastoreaddGroupgroupIDCommandParameterInfo = new CommandParameterInfo("groupID", Integer.class, Integer.class);
+    jointFabricDatastoreaddGroupCommandParams.put("groupID",jointFabricDatastoreaddGroupgroupIDCommandParameterInfo);
+
+    CommandParameterInfo jointFabricDatastoreaddGroupfriendlyNameCommandParameterInfo = new CommandParameterInfo("friendlyName", String.class, String.class);
+    jointFabricDatastoreaddGroupCommandParams.put("friendlyName",jointFabricDatastoreaddGroupfriendlyNameCommandParameterInfo);
+
+    CommandParameterInfo jointFabricDatastoreaddGroupgroupKeySetIDCommandParameterInfo = new CommandParameterInfo("groupKeySetID", Integer.class, Integer.class);
+    jointFabricDatastoreaddGroupCommandParams.put("groupKeySetID",jointFabricDatastoreaddGroupgroupKeySetIDCommandParameterInfo);
+
+    CommandParameterInfo jointFabricDatastoreaddGroupgroupCATCommandParameterInfo = new CommandParameterInfo("groupCAT", Integer.class, Integer.class);
+    jointFabricDatastoreaddGroupCommandParams.put("groupCAT",jointFabricDatastoreaddGroupgroupCATCommandParameterInfo);
+
+    CommandParameterInfo jointFabricDatastoreaddGroupgroupCATVersionCommandParameterInfo = new CommandParameterInfo("groupCATVersion", Integer.class, Integer.class);
+    jointFabricDatastoreaddGroupCommandParams.put("groupCATVersion",jointFabricDatastoreaddGroupgroupCATVersionCommandParameterInfo);
+
+    CommandParameterInfo jointFabricDatastoreaddGroupgroupPermissionCommandParameterInfo = new CommandParameterInfo("groupPermission", Integer.class, Integer.class);
+    jointFabricDatastoreaddGroupCommandParams.put("groupPermission",jointFabricDatastoreaddGroupgroupPermissionCommandParameterInfo);
+    InteractionInfo jointFabricDatastoreaddGroupInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.JointFabricDatastoreCluster) cluster)
+        .addGroup((DefaultClusterCallback) callback
+        , (Integer)
+        commandArguments.get("groupID")
+        , (String)
+        commandArguments.get("friendlyName")
+        , (Integer)
+        commandArguments.get("groupKeySetID")
+        , (Integer)
+        commandArguments.get("groupCAT")
+        , (Integer)
+        commandArguments.get("groupCATVersion")
+        , (Integer)
+        commandArguments.get("groupPermission")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        jointFabricDatastoreaddGroupCommandParams
+    );
+    jointFabricDatastoreClusterInteractionInfoMap.put("addGroup", jointFabricDatastoreaddGroupInteractionInfo);
+
+    Map<String, CommandParameterInfo> jointFabricDatastoreupdateGroupCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo jointFabricDatastoreupdateGroupgroupIDCommandParameterInfo = new CommandParameterInfo("groupID", Integer.class, Integer.class);
+    jointFabricDatastoreupdateGroupCommandParams.put("groupID",jointFabricDatastoreupdateGroupgroupIDCommandParameterInfo);
+
+    CommandParameterInfo jointFabricDatastoreupdateGroupfriendlyNameCommandParameterInfo = new CommandParameterInfo("friendlyName", String.class, String.class);
+    jointFabricDatastoreupdateGroupCommandParams.put("friendlyName",jointFabricDatastoreupdateGroupfriendlyNameCommandParameterInfo);
+
+    CommandParameterInfo jointFabricDatastoreupdateGroupgroupKeySetIDCommandParameterInfo = new CommandParameterInfo("groupKeySetID", Integer.class, Integer.class);
+    jointFabricDatastoreupdateGroupCommandParams.put("groupKeySetID",jointFabricDatastoreupdateGroupgroupKeySetIDCommandParameterInfo);
+
+    CommandParameterInfo jointFabricDatastoreupdateGroupgroupCATCommandParameterInfo = new CommandParameterInfo("groupCAT", Integer.class, Integer.class);
+    jointFabricDatastoreupdateGroupCommandParams.put("groupCAT",jointFabricDatastoreupdateGroupgroupCATCommandParameterInfo);
+
+    CommandParameterInfo jointFabricDatastoreupdateGroupgroupCATVersionCommandParameterInfo = new CommandParameterInfo("groupCATVersion", Integer.class, Integer.class);
+    jointFabricDatastoreupdateGroupCommandParams.put("groupCATVersion",jointFabricDatastoreupdateGroupgroupCATVersionCommandParameterInfo);
+
+    CommandParameterInfo jointFabricDatastoreupdateGroupgroupPermissionCommandParameterInfo = new CommandParameterInfo("groupPermission", Integer.class, Integer.class);
+    jointFabricDatastoreupdateGroupCommandParams.put("groupPermission",jointFabricDatastoreupdateGroupgroupPermissionCommandParameterInfo);
+    InteractionInfo jointFabricDatastoreupdateGroupInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.JointFabricDatastoreCluster) cluster)
+        .updateGroup((DefaultClusterCallback) callback
+        , (Integer)
+        commandArguments.get("groupID")
+        , (String)
+        commandArguments.get("friendlyName")
+        , (Integer)
+        commandArguments.get("groupKeySetID")
+        , (Integer)
+        commandArguments.get("groupCAT")
+        , (Integer)
+        commandArguments.get("groupCATVersion")
+        , (Integer)
+        commandArguments.get("groupPermission")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        jointFabricDatastoreupdateGroupCommandParams
+    );
+    jointFabricDatastoreClusterInteractionInfoMap.put("updateGroup", jointFabricDatastoreupdateGroupInteractionInfo);
+
+    Map<String, CommandParameterInfo> jointFabricDatastoreremoveGroupCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo jointFabricDatastoreremoveGroupgroupIDCommandParameterInfo = new CommandParameterInfo("groupID", Integer.class, Integer.class);
+    jointFabricDatastoreremoveGroupCommandParams.put("groupID",jointFabricDatastoreremoveGroupgroupIDCommandParameterInfo);
+    InteractionInfo jointFabricDatastoreremoveGroupInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.JointFabricDatastoreCluster) cluster)
+        .removeGroup((DefaultClusterCallback) callback
+        , (Integer)
+        commandArguments.get("groupID")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        jointFabricDatastoreremoveGroupCommandParams
+    );
+    jointFabricDatastoreClusterInteractionInfoMap.put("removeGroup", jointFabricDatastoreremoveGroupInteractionInfo);
+
+    Map<String, CommandParameterInfo> jointFabricDatastoreaddAdminCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo jointFabricDatastoreaddAdminnodeIDCommandParameterInfo = new CommandParameterInfo("nodeID", Long.class, Long.class);
+    jointFabricDatastoreaddAdminCommandParams.put("nodeID",jointFabricDatastoreaddAdminnodeIDCommandParameterInfo);
+
+    CommandParameterInfo jointFabricDatastoreaddAdminfriendlyNameCommandParameterInfo = new CommandParameterInfo("friendlyName", String.class, String.class);
+    jointFabricDatastoreaddAdminCommandParams.put("friendlyName",jointFabricDatastoreaddAdminfriendlyNameCommandParameterInfo);
+
+    CommandParameterInfo jointFabricDatastoreaddAdminvendorIDCommandParameterInfo = new CommandParameterInfo("vendorID", Integer.class, Integer.class);
+    jointFabricDatastoreaddAdminCommandParams.put("vendorID",jointFabricDatastoreaddAdminvendorIDCommandParameterInfo);
+
+    CommandParameterInfo jointFabricDatastoreaddAdminicacCommandParameterInfo = new CommandParameterInfo("icac", byte[].class, byte[].class);
+    jointFabricDatastoreaddAdminCommandParams.put("icac",jointFabricDatastoreaddAdminicacCommandParameterInfo);
+    InteractionInfo jointFabricDatastoreaddAdminInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.JointFabricDatastoreCluster) cluster)
+        .addAdmin((DefaultClusterCallback) callback
+        , (Long)
+        commandArguments.get("nodeID")
+        , (String)
+        commandArguments.get("friendlyName")
+        , (Integer)
+        commandArguments.get("vendorID")
+        , (byte[])
+        commandArguments.get("icac")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        jointFabricDatastoreaddAdminCommandParams
+    );
+    jointFabricDatastoreClusterInteractionInfoMap.put("addAdmin", jointFabricDatastoreaddAdminInteractionInfo);
+
+    Map<String, CommandParameterInfo> jointFabricDatastoreupdateAdminCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo jointFabricDatastoreupdateAdminnodeIDCommandParameterInfo = new CommandParameterInfo("nodeID", Long.class, Long.class);
+    jointFabricDatastoreupdateAdminCommandParams.put("nodeID",jointFabricDatastoreupdateAdminnodeIDCommandParameterInfo);
+
+    CommandParameterInfo jointFabricDatastoreupdateAdminfriendlyNameCommandParameterInfo = new CommandParameterInfo("friendlyName", Optional.class, String.class);
+    jointFabricDatastoreupdateAdminCommandParams.put("friendlyName",jointFabricDatastoreupdateAdminfriendlyNameCommandParameterInfo);
+
+    CommandParameterInfo jointFabricDatastoreupdateAdminicacCommandParameterInfo = new CommandParameterInfo("icac", Optional.class, byte[].class);
+    jointFabricDatastoreupdateAdminCommandParams.put("icac",jointFabricDatastoreupdateAdminicacCommandParameterInfo);
+    InteractionInfo jointFabricDatastoreupdateAdminInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.JointFabricDatastoreCluster) cluster)
+        .updateAdmin((DefaultClusterCallback) callback
+        , (Long)
+        commandArguments.get("nodeID")
+        , (Optional<String>)
+        commandArguments.get("friendlyName")
+        , (Optional<byte[]>)
+        commandArguments.get("icac")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        jointFabricDatastoreupdateAdminCommandParams
+    );
+    jointFabricDatastoreClusterInteractionInfoMap.put("updateAdmin", jointFabricDatastoreupdateAdminInteractionInfo);
+
+    Map<String, CommandParameterInfo> jointFabricDatastoreremoveAdminCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo jointFabricDatastoreremoveAdminnodeIDCommandParameterInfo = new CommandParameterInfo("nodeID", Long.class, Long.class);
+    jointFabricDatastoreremoveAdminCommandParams.put("nodeID",jointFabricDatastoreremoveAdminnodeIDCommandParameterInfo);
+    InteractionInfo jointFabricDatastoreremoveAdminInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.JointFabricDatastoreCluster) cluster)
+        .removeAdmin((DefaultClusterCallback) callback
+        , (Long)
+        commandArguments.get("nodeID")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        jointFabricDatastoreremoveAdminCommandParams
+    );
+    jointFabricDatastoreClusterInteractionInfoMap.put("removeAdmin", jointFabricDatastoreremoveAdminInteractionInfo);
+
+    Map<String, CommandParameterInfo> jointFabricDatastoreaddPendingNodeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo jointFabricDatastoreaddPendingNodenodeIDCommandParameterInfo = new CommandParameterInfo("nodeID", Long.class, Long.class);
+    jointFabricDatastoreaddPendingNodeCommandParams.put("nodeID",jointFabricDatastoreaddPendingNodenodeIDCommandParameterInfo);
+
+    CommandParameterInfo jointFabricDatastoreaddPendingNodefriendlyNameCommandParameterInfo = new CommandParameterInfo("friendlyName", String.class, String.class);
+    jointFabricDatastoreaddPendingNodeCommandParams.put("friendlyName",jointFabricDatastoreaddPendingNodefriendlyNameCommandParameterInfo);
+    InteractionInfo jointFabricDatastoreaddPendingNodeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.JointFabricDatastoreCluster) cluster)
+        .addPendingNode((DefaultClusterCallback) callback
+        , (Long)
+        commandArguments.get("nodeID")
+        , (String)
+        commandArguments.get("friendlyName")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        jointFabricDatastoreaddPendingNodeCommandParams
+    );
+    jointFabricDatastoreClusterInteractionInfoMap.put("addPendingNode", jointFabricDatastoreaddPendingNodeInteractionInfo);
+
+    Map<String, CommandParameterInfo> jointFabricDatastorerefreshNodeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo jointFabricDatastorerefreshNodenodeIDCommandParameterInfo = new CommandParameterInfo("nodeID", Long.class, Long.class);
+    jointFabricDatastorerefreshNodeCommandParams.put("nodeID",jointFabricDatastorerefreshNodenodeIDCommandParameterInfo);
+    InteractionInfo jointFabricDatastorerefreshNodeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.JointFabricDatastoreCluster) cluster)
+        .refreshNode((DefaultClusterCallback) callback
+        , (Long)
+        commandArguments.get("nodeID")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        jointFabricDatastorerefreshNodeCommandParams
+    );
+    jointFabricDatastoreClusterInteractionInfoMap.put("refreshNode", jointFabricDatastorerefreshNodeInteractionInfo);
+
+    Map<String, CommandParameterInfo> jointFabricDatastoreupdateNodeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo jointFabricDatastoreupdateNodenodeIDCommandParameterInfo = new CommandParameterInfo("nodeID", Long.class, Long.class);
+    jointFabricDatastoreupdateNodeCommandParams.put("nodeID",jointFabricDatastoreupdateNodenodeIDCommandParameterInfo);
+
+    CommandParameterInfo jointFabricDatastoreupdateNodefriendlyNameCommandParameterInfo = new CommandParameterInfo("friendlyName", String.class, String.class);
+    jointFabricDatastoreupdateNodeCommandParams.put("friendlyName",jointFabricDatastoreupdateNodefriendlyNameCommandParameterInfo);
+    InteractionInfo jointFabricDatastoreupdateNodeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.JointFabricDatastoreCluster) cluster)
+        .updateNode((DefaultClusterCallback) callback
+        , (Long)
+        commandArguments.get("nodeID")
+        , (String)
+        commandArguments.get("friendlyName")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        jointFabricDatastoreupdateNodeCommandParams
+    );
+    jointFabricDatastoreClusterInteractionInfoMap.put("updateNode", jointFabricDatastoreupdateNodeInteractionInfo);
+
+    Map<String, CommandParameterInfo> jointFabricDatastoreremoveNodeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo jointFabricDatastoreremoveNodenodeIDCommandParameterInfo = new CommandParameterInfo("nodeID", Long.class, Long.class);
+    jointFabricDatastoreremoveNodeCommandParams.put("nodeID",jointFabricDatastoreremoveNodenodeIDCommandParameterInfo);
+    InteractionInfo jointFabricDatastoreremoveNodeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.JointFabricDatastoreCluster) cluster)
+        .removeNode((DefaultClusterCallback) callback
+        , (Long)
+        commandArguments.get("nodeID")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        jointFabricDatastoreremoveNodeCommandParams
+    );
+    jointFabricDatastoreClusterInteractionInfoMap.put("removeNode", jointFabricDatastoreremoveNodeInteractionInfo);
+
+    Map<String, CommandParameterInfo> jointFabricDatastoreupdateEndpointForNodeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo jointFabricDatastoreupdateEndpointForNodeendpointIDCommandParameterInfo = new CommandParameterInfo("endpointID", Integer.class, Integer.class);
+    jointFabricDatastoreupdateEndpointForNodeCommandParams.put("endpointID",jointFabricDatastoreupdateEndpointForNodeendpointIDCommandParameterInfo);
+
+    CommandParameterInfo jointFabricDatastoreupdateEndpointForNodenodeIDCommandParameterInfo = new CommandParameterInfo("nodeID", Long.class, Long.class);
+    jointFabricDatastoreupdateEndpointForNodeCommandParams.put("nodeID",jointFabricDatastoreupdateEndpointForNodenodeIDCommandParameterInfo);
+
+    CommandParameterInfo jointFabricDatastoreupdateEndpointForNodefriendlyNameCommandParameterInfo = new CommandParameterInfo("friendlyName", String.class, String.class);
+    jointFabricDatastoreupdateEndpointForNodeCommandParams.put("friendlyName",jointFabricDatastoreupdateEndpointForNodefriendlyNameCommandParameterInfo);
+    InteractionInfo jointFabricDatastoreupdateEndpointForNodeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.JointFabricDatastoreCluster) cluster)
+        .updateEndpointForNode((DefaultClusterCallback) callback
+        , (Integer)
+        commandArguments.get("endpointID")
+        , (Long)
+        commandArguments.get("nodeID")
+        , (String)
+        commandArguments.get("friendlyName")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        jointFabricDatastoreupdateEndpointForNodeCommandParams
+    );
+    jointFabricDatastoreClusterInteractionInfoMap.put("updateEndpointForNode", jointFabricDatastoreupdateEndpointForNodeInteractionInfo);
+
+    Map<String, CommandParameterInfo> jointFabricDatastoreaddGroupIDToEndpointForNodeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo jointFabricDatastoreaddGroupIDToEndpointForNodenodeIDCommandParameterInfo = new CommandParameterInfo("nodeID", Long.class, Long.class);
+    jointFabricDatastoreaddGroupIDToEndpointForNodeCommandParams.put("nodeID",jointFabricDatastoreaddGroupIDToEndpointForNodenodeIDCommandParameterInfo);
+
+    CommandParameterInfo jointFabricDatastoreaddGroupIDToEndpointForNodeendpointIDCommandParameterInfo = new CommandParameterInfo("endpointID", Integer.class, Integer.class);
+    jointFabricDatastoreaddGroupIDToEndpointForNodeCommandParams.put("endpointID",jointFabricDatastoreaddGroupIDToEndpointForNodeendpointIDCommandParameterInfo);
+
+    CommandParameterInfo jointFabricDatastoreaddGroupIDToEndpointForNodegroupIDCommandParameterInfo = new CommandParameterInfo("groupID", Integer.class, Integer.class);
+    jointFabricDatastoreaddGroupIDToEndpointForNodeCommandParams.put("groupID",jointFabricDatastoreaddGroupIDToEndpointForNodegroupIDCommandParameterInfo);
+    InteractionInfo jointFabricDatastoreaddGroupIDToEndpointForNodeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.JointFabricDatastoreCluster) cluster)
+        .addGroupIDToEndpointForNode((DefaultClusterCallback) callback
+        , (Long)
+        commandArguments.get("nodeID")
+        , (Integer)
+        commandArguments.get("endpointID")
+        , (Integer)
+        commandArguments.get("groupID")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        jointFabricDatastoreaddGroupIDToEndpointForNodeCommandParams
+    );
+    jointFabricDatastoreClusterInteractionInfoMap.put("addGroupIDToEndpointForNode", jointFabricDatastoreaddGroupIDToEndpointForNodeInteractionInfo);
+
+    Map<String, CommandParameterInfo> jointFabricDatastoreremoveGroupIDFromEndpointForNodeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo jointFabricDatastoreremoveGroupIDFromEndpointForNodenodeIDCommandParameterInfo = new CommandParameterInfo("nodeID", Long.class, Long.class);
+    jointFabricDatastoreremoveGroupIDFromEndpointForNodeCommandParams.put("nodeID",jointFabricDatastoreremoveGroupIDFromEndpointForNodenodeIDCommandParameterInfo);
+
+    CommandParameterInfo jointFabricDatastoreremoveGroupIDFromEndpointForNodeendpointIDCommandParameterInfo = new CommandParameterInfo("endpointID", Integer.class, Integer.class);
+    jointFabricDatastoreremoveGroupIDFromEndpointForNodeCommandParams.put("endpointID",jointFabricDatastoreremoveGroupIDFromEndpointForNodeendpointIDCommandParameterInfo);
+
+    CommandParameterInfo jointFabricDatastoreremoveGroupIDFromEndpointForNodegroupIDCommandParameterInfo = new CommandParameterInfo("groupID", Integer.class, Integer.class);
+    jointFabricDatastoreremoveGroupIDFromEndpointForNodeCommandParams.put("groupID",jointFabricDatastoreremoveGroupIDFromEndpointForNodegroupIDCommandParameterInfo);
+    InteractionInfo jointFabricDatastoreremoveGroupIDFromEndpointForNodeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.JointFabricDatastoreCluster) cluster)
+        .removeGroupIDFromEndpointForNode((DefaultClusterCallback) callback
+        , (Long)
+        commandArguments.get("nodeID")
+        , (Integer)
+        commandArguments.get("endpointID")
+        , (Integer)
+        commandArguments.get("groupID")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        jointFabricDatastoreremoveGroupIDFromEndpointForNodeCommandParams
+    );
+    jointFabricDatastoreClusterInteractionInfoMap.put("removeGroupIDFromEndpointForNode", jointFabricDatastoreremoveGroupIDFromEndpointForNodeInteractionInfo);
+
+    Map<String, CommandParameterInfo> jointFabricDatastoreaddBindingToEndpointForNodeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo jointFabricDatastoreaddBindingToEndpointForNodenodeIDCommandParameterInfo = new CommandParameterInfo("nodeID", Long.class, Long.class);
+    jointFabricDatastoreaddBindingToEndpointForNodeCommandParams.put("nodeID",jointFabricDatastoreaddBindingToEndpointForNodenodeIDCommandParameterInfo);
+
+    CommandParameterInfo jointFabricDatastoreaddBindingToEndpointForNodeendpointIDCommandParameterInfo = new CommandParameterInfo("endpointID", Integer.class, Integer.class);
+    jointFabricDatastoreaddBindingToEndpointForNodeCommandParams.put("endpointID",jointFabricDatastoreaddBindingToEndpointForNodeendpointIDCommandParameterInfo);
+
+    InteractionInfo jointFabricDatastoreaddBindingToEndpointForNodeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.JointFabricDatastoreCluster) cluster)
+        .addBindingToEndpointForNode((DefaultClusterCallback) callback
+        , (Long)
+        commandArguments.get("nodeID")
+        , (Integer)
+        commandArguments.get("endpointID")
+        , (ChipStructs.JointFabricDatastoreClusterDatastoreBindingTargetStruct)
+        commandArguments.get("binding")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        jointFabricDatastoreaddBindingToEndpointForNodeCommandParams
+    );
+    jointFabricDatastoreClusterInteractionInfoMap.put("addBindingToEndpointForNode", jointFabricDatastoreaddBindingToEndpointForNodeInteractionInfo);
+
+    Map<String, CommandParameterInfo> jointFabricDatastoreremoveBindingFromEndpointForNodeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo jointFabricDatastoreremoveBindingFromEndpointForNodelistIDCommandParameterInfo = new CommandParameterInfo("listID", Integer.class, Integer.class);
+    jointFabricDatastoreremoveBindingFromEndpointForNodeCommandParams.put("listID",jointFabricDatastoreremoveBindingFromEndpointForNodelistIDCommandParameterInfo);
+
+    CommandParameterInfo jointFabricDatastoreremoveBindingFromEndpointForNodeendpointIDCommandParameterInfo = new CommandParameterInfo("endpointID", Integer.class, Integer.class);
+    jointFabricDatastoreremoveBindingFromEndpointForNodeCommandParams.put("endpointID",jointFabricDatastoreremoveBindingFromEndpointForNodeendpointIDCommandParameterInfo);
+
+    CommandParameterInfo jointFabricDatastoreremoveBindingFromEndpointForNodenodeIDCommandParameterInfo = new CommandParameterInfo("nodeID", Long.class, Long.class);
+    jointFabricDatastoreremoveBindingFromEndpointForNodeCommandParams.put("nodeID",jointFabricDatastoreremoveBindingFromEndpointForNodenodeIDCommandParameterInfo);
+    InteractionInfo jointFabricDatastoreremoveBindingFromEndpointForNodeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.JointFabricDatastoreCluster) cluster)
+        .removeBindingFromEndpointForNode((DefaultClusterCallback) callback
+        , (Integer)
+        commandArguments.get("listID")
+        , (Integer)
+        commandArguments.get("endpointID")
+        , (Long)
+        commandArguments.get("nodeID")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        jointFabricDatastoreremoveBindingFromEndpointForNodeCommandParams
+    );
+    jointFabricDatastoreClusterInteractionInfoMap.put("removeBindingFromEndpointForNode", jointFabricDatastoreremoveBindingFromEndpointForNodeInteractionInfo);
+
+    Map<String, CommandParameterInfo> jointFabricDatastoreaddACLToNodeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo jointFabricDatastoreaddACLToNodenodeIDCommandParameterInfo = new CommandParameterInfo("nodeID", Long.class, Long.class);
+    jointFabricDatastoreaddACLToNodeCommandParams.put("nodeID",jointFabricDatastoreaddACLToNodenodeIDCommandParameterInfo);
+
+    InteractionInfo jointFabricDatastoreaddACLToNodeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.JointFabricDatastoreCluster) cluster)
+        .addACLToNode((DefaultClusterCallback) callback
+        , (Long)
+        commandArguments.get("nodeID")
+        , (ChipStructs.JointFabricDatastoreClusterDatastoreAccessControlEntryStruct)
+        commandArguments.get("ACLEntry")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        jointFabricDatastoreaddACLToNodeCommandParams
+    );
+    jointFabricDatastoreClusterInteractionInfoMap.put("addACLToNode", jointFabricDatastoreaddACLToNodeInteractionInfo);
+
+    Map<String, CommandParameterInfo> jointFabricDatastoreremoveACLFromNodeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo jointFabricDatastoreremoveACLFromNodelistIDCommandParameterInfo = new CommandParameterInfo("listID", Integer.class, Integer.class);
+    jointFabricDatastoreremoveACLFromNodeCommandParams.put("listID",jointFabricDatastoreremoveACLFromNodelistIDCommandParameterInfo);
+
+    CommandParameterInfo jointFabricDatastoreremoveACLFromNodenodeIDCommandParameterInfo = new CommandParameterInfo("nodeID", Long.class, Long.class);
+    jointFabricDatastoreremoveACLFromNodeCommandParams.put("nodeID",jointFabricDatastoreremoveACLFromNodenodeIDCommandParameterInfo);
+    InteractionInfo jointFabricDatastoreremoveACLFromNodeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.JointFabricDatastoreCluster) cluster)
+        .removeACLFromNode((DefaultClusterCallback) callback
+        , (Integer)
+        commandArguments.get("listID")
+        , (Long)
+        commandArguments.get("nodeID")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        jointFabricDatastoreremoveACLFromNodeCommandParams
+    );
+    jointFabricDatastoreClusterInteractionInfoMap.put("removeACLFromNode", jointFabricDatastoreremoveACLFromNodeInteractionInfo);
+
+    commandMap.put("jointFabricDatastore", jointFabricDatastoreClusterInteractionInfoMap);
+
+    Map<String, InteractionInfo> jointFabricAdministratorClusterInteractionInfoMap = new LinkedHashMap<>();
+
+    Map<String, CommandParameterInfo> jointFabricAdministratorICACCSRRequestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo jointFabricAdministratorICACCSRRequestInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.JointFabricAdministratorCluster) cluster)
+          .ICACCSRRequest((ChipClusters.JointFabricAdministratorCluster.ICACCSRResponseCallback) callback
+            );
+        },
+        () -> new DelegatedJointFabricAdministratorClusterICACCSRResponseCallback(),
+        jointFabricAdministratorICACCSRRequestCommandParams
+      );
+    jointFabricAdministratorClusterInteractionInfoMap.put("ICACCSRRequest", jointFabricAdministratorICACCSRRequestInteractionInfo);
+
+    Map<String, CommandParameterInfo> jointFabricAdministratoraddICACCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo jointFabricAdministratoraddICACICACValueCommandParameterInfo = new CommandParameterInfo("ICACValue", byte[].class, byte[].class);
+    jointFabricAdministratoraddICACCommandParams.put("ICACValue",jointFabricAdministratoraddICACICACValueCommandParameterInfo);
+    InteractionInfo jointFabricAdministratoraddICACInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.JointFabricAdministratorCluster) cluster)
+          .addICAC((ChipClusters.JointFabricAdministratorCluster.ICACResponseCallback) callback
+           , (byte[])
+             commandArguments.get("ICACValue")
+
+            );
+        },
+        () -> new DelegatedJointFabricAdministratorClusterICACResponseCallback(),
+        jointFabricAdministratoraddICACCommandParams
+      );
+    jointFabricAdministratorClusterInteractionInfoMap.put("addICAC", jointFabricAdministratoraddICACInteractionInfo);
+
+    Map<String, CommandParameterInfo> jointFabricAdministratoropenJointCommissioningWindowCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo jointFabricAdministratoropenJointCommissioningWindowcommissioningTimeoutCommandParameterInfo = new CommandParameterInfo("commissioningTimeout", Integer.class, Integer.class);
+    jointFabricAdministratoropenJointCommissioningWindowCommandParams.put("commissioningTimeout",jointFabricAdministratoropenJointCommissioningWindowcommissioningTimeoutCommandParameterInfo);
+
+    CommandParameterInfo jointFabricAdministratoropenJointCommissioningWindowPAKEPasscodeVerifierCommandParameterInfo = new CommandParameterInfo("PAKEPasscodeVerifier", byte[].class, byte[].class);
+    jointFabricAdministratoropenJointCommissioningWindowCommandParams.put("PAKEPasscodeVerifier",jointFabricAdministratoropenJointCommissioningWindowPAKEPasscodeVerifierCommandParameterInfo);
+
+    CommandParameterInfo jointFabricAdministratoropenJointCommissioningWindowdiscriminatorCommandParameterInfo = new CommandParameterInfo("discriminator", Integer.class, Integer.class);
+    jointFabricAdministratoropenJointCommissioningWindowCommandParams.put("discriminator",jointFabricAdministratoropenJointCommissioningWindowdiscriminatorCommandParameterInfo);
+
+    CommandParameterInfo jointFabricAdministratoropenJointCommissioningWindowiterationsCommandParameterInfo = new CommandParameterInfo("iterations", Long.class, Long.class);
+    jointFabricAdministratoropenJointCommissioningWindowCommandParams.put("iterations",jointFabricAdministratoropenJointCommissioningWindowiterationsCommandParameterInfo);
+
+    CommandParameterInfo jointFabricAdministratoropenJointCommissioningWindowsaltCommandParameterInfo = new CommandParameterInfo("salt", byte[].class, byte[].class);
+    jointFabricAdministratoropenJointCommissioningWindowCommandParams.put("salt",jointFabricAdministratoropenJointCommissioningWindowsaltCommandParameterInfo);
+    InteractionInfo jointFabricAdministratoropenJointCommissioningWindowInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.JointFabricAdministratorCluster) cluster)
+        .openJointCommissioningWindow((DefaultClusterCallback) callback
+        , (Integer)
+        commandArguments.get("commissioningTimeout")
+        , (byte[])
+        commandArguments.get("PAKEPasscodeVerifier")
+        , (Integer)
+        commandArguments.get("discriminator")
+        , (Long)
+        commandArguments.get("iterations")
+        , (byte[])
+        commandArguments.get("salt")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        jointFabricAdministratoropenJointCommissioningWindowCommandParams
+    );
+    jointFabricAdministratorClusterInteractionInfoMap.put("openJointCommissioningWindow", jointFabricAdministratoropenJointCommissioningWindowInteractionInfo);
+
+    Map<String, CommandParameterInfo> jointFabricAdministratortransferAnchorRequestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo jointFabricAdministratortransferAnchorRequestInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.JointFabricAdministratorCluster) cluster)
+          .transferAnchorRequest((ChipClusters.JointFabricAdministratorCluster.TransferAnchorResponseCallback) callback
+            );
+        },
+        () -> new DelegatedJointFabricAdministratorClusterTransferAnchorResponseCallback(),
+        jointFabricAdministratortransferAnchorRequestCommandParams
+      );
+    jointFabricAdministratorClusterInteractionInfoMap.put("transferAnchorRequest", jointFabricAdministratortransferAnchorRequestInteractionInfo);
+
+    Map<String, CommandParameterInfo> jointFabricAdministratortransferAnchorCompleteCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo jointFabricAdministratortransferAnchorCompleteInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.JointFabricAdministratorCluster) cluster)
+        .transferAnchorComplete((DefaultClusterCallback) callback
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        jointFabricAdministratortransferAnchorCompleteCommandParams
+    );
+    jointFabricAdministratorClusterInteractionInfoMap.put("transferAnchorComplete", jointFabricAdministratortransferAnchorCompleteInteractionInfo);
+
+    Map<String, CommandParameterInfo> jointFabricAdministratorannounceJointFabricAdministratorCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo jointFabricAdministratorannounceJointFabricAdministratorendpointIDCommandParameterInfo = new CommandParameterInfo("endpointID", Integer.class, Integer.class);
+    jointFabricAdministratorannounceJointFabricAdministratorCommandParams.put("endpointID",jointFabricAdministratorannounceJointFabricAdministratorendpointIDCommandParameterInfo);
+    InteractionInfo jointFabricAdministratorannounceJointFabricAdministratorInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.JointFabricAdministratorCluster) cluster)
+        .announceJointFabricAdministrator((DefaultClusterCallback) callback
+        , (Integer)
+        commandArguments.get("endpointID")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        jointFabricAdministratorannounceJointFabricAdministratorCommandParams
+    );
+    jointFabricAdministratorClusterInteractionInfoMap.put("announceJointFabricAdministrator", jointFabricAdministratorannounceJointFabricAdministratorInteractionInfo);
+
+    commandMap.put("jointFabricAdministrator", jointFabricAdministratorClusterInteractionInfoMap);
+
+    Map<String, InteractionInfo> tlsCertificateManagementClusterInteractionInfoMap = new LinkedHashMap<>();
+
+    Map<String, CommandParameterInfo> tlsCertificateManagementprovisionRootCertificateCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo tlsCertificateManagementprovisionRootCertificatecertificateCommandParameterInfo = new CommandParameterInfo("certificate", byte[].class, byte[].class);
+    tlsCertificateManagementprovisionRootCertificateCommandParams.put("certificate",tlsCertificateManagementprovisionRootCertificatecertificateCommandParameterInfo);
+
+    CommandParameterInfo tlsCertificateManagementprovisionRootCertificatecaidCommandParameterInfo = new CommandParameterInfo("caid", Integer.class, Integer.class);
+    tlsCertificateManagementprovisionRootCertificateCommandParams.put("caid",tlsCertificateManagementprovisionRootCertificatecaidCommandParameterInfo);
+    InteractionInfo tlsCertificateManagementprovisionRootCertificateInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.TlsCertificateManagementCluster) cluster)
+          .provisionRootCertificate((ChipClusters.TlsCertificateManagementCluster.ProvisionRootCertificateResponseCallback) callback
+           , (byte[])
+             commandArguments.get("certificate")
+
+           , (Integer)
+             commandArguments.get("caid")
+
+            );
+        },
+        () -> new DelegatedTlsCertificateManagementClusterProvisionRootCertificateResponseCallback(),
+        tlsCertificateManagementprovisionRootCertificateCommandParams
+      );
+    tlsCertificateManagementClusterInteractionInfoMap.put("provisionRootCertificate", tlsCertificateManagementprovisionRootCertificateInteractionInfo);
+
+    Map<String, CommandParameterInfo> tlsCertificateManagementfindRootCertificateCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo tlsCertificateManagementfindRootCertificatecaidCommandParameterInfo = new CommandParameterInfo("caid", Integer.class, Integer.class);
+    tlsCertificateManagementfindRootCertificateCommandParams.put("caid",tlsCertificateManagementfindRootCertificatecaidCommandParameterInfo);
+    InteractionInfo tlsCertificateManagementfindRootCertificateInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.TlsCertificateManagementCluster) cluster)
+          .findRootCertificate((ChipClusters.TlsCertificateManagementCluster.FindRootCertificateResponseCallback) callback
+           , (Integer)
+             commandArguments.get("caid")
+
+            );
+        },
+        () -> new DelegatedTlsCertificateManagementClusterFindRootCertificateResponseCallback(),
+        tlsCertificateManagementfindRootCertificateCommandParams
+      );
+    tlsCertificateManagementClusterInteractionInfoMap.put("findRootCertificate", tlsCertificateManagementfindRootCertificateInteractionInfo);
+
+    Map<String, CommandParameterInfo> tlsCertificateManagementlookupRootCertificateCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo tlsCertificateManagementlookupRootCertificatefingerprintCommandParameterInfo = new CommandParameterInfo("fingerprint", byte[].class, byte[].class);
+    tlsCertificateManagementlookupRootCertificateCommandParams.put("fingerprint",tlsCertificateManagementlookupRootCertificatefingerprintCommandParameterInfo);
+    InteractionInfo tlsCertificateManagementlookupRootCertificateInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.TlsCertificateManagementCluster) cluster)
+          .lookupRootCertificate((ChipClusters.TlsCertificateManagementCluster.LookupRootCertificateResponseCallback) callback
+           , (byte[])
+             commandArguments.get("fingerprint")
+
+            );
+        },
+        () -> new DelegatedTlsCertificateManagementClusterLookupRootCertificateResponseCallback(),
+        tlsCertificateManagementlookupRootCertificateCommandParams
+      );
+    tlsCertificateManagementClusterInteractionInfoMap.put("lookupRootCertificate", tlsCertificateManagementlookupRootCertificateInteractionInfo);
+
+    Map<String, CommandParameterInfo> tlsCertificateManagementremoveRootCertificateCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo tlsCertificateManagementremoveRootCertificatecaidCommandParameterInfo = new CommandParameterInfo("caid", Integer.class, Integer.class);
+    tlsCertificateManagementremoveRootCertificateCommandParams.put("caid",tlsCertificateManagementremoveRootCertificatecaidCommandParameterInfo);
+    InteractionInfo tlsCertificateManagementremoveRootCertificateInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.TlsCertificateManagementCluster) cluster)
+        .removeRootCertificate((DefaultClusterCallback) callback
+        , (Integer)
+        commandArguments.get("caid")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        tlsCertificateManagementremoveRootCertificateCommandParams
+    );
+    tlsCertificateManagementClusterInteractionInfoMap.put("removeRootCertificate", tlsCertificateManagementremoveRootCertificateInteractionInfo);
+
+    Map<String, CommandParameterInfo> tlsCertificateManagementclientCSRCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo tlsCertificateManagementclientCSRnonceCommandParameterInfo = new CommandParameterInfo("nonce", byte[].class, byte[].class);
+    tlsCertificateManagementclientCSRCommandParams.put("nonce",tlsCertificateManagementclientCSRnonceCommandParameterInfo);
+
+    CommandParameterInfo tlsCertificateManagementclientCSRccdidCommandParameterInfo = new CommandParameterInfo("ccdid", Integer.class, Integer.class);
+    tlsCertificateManagementclientCSRCommandParams.put("ccdid",tlsCertificateManagementclientCSRccdidCommandParameterInfo);
+    InteractionInfo tlsCertificateManagementclientCSRInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.TlsCertificateManagementCluster) cluster)
+          .clientCSR((ChipClusters.TlsCertificateManagementCluster.ClientCSRResponseCallback) callback
+           , (byte[])
+             commandArguments.get("nonce")
+
+           , (Integer)
+             commandArguments.get("ccdid")
+
+            );
+        },
+        () -> new DelegatedTlsCertificateManagementClusterClientCSRResponseCallback(),
+        tlsCertificateManagementclientCSRCommandParams
+      );
+    tlsCertificateManagementClusterInteractionInfoMap.put("clientCSR", tlsCertificateManagementclientCSRInteractionInfo);
+
+    Map<String, CommandParameterInfo> tlsCertificateManagementprovisionClientCertificateCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo tlsCertificateManagementprovisionClientCertificateccdidCommandParameterInfo = new CommandParameterInfo("ccdid", Integer.class, Integer.class);
+    tlsCertificateManagementprovisionClientCertificateCommandParams.put("ccdid",tlsCertificateManagementprovisionClientCertificateccdidCommandParameterInfo);
+
+    CommandParameterInfo tlsCertificateManagementprovisionClientCertificateclientCertificateCommandParameterInfo = new CommandParameterInfo("clientCertificate", byte[].class, byte[].class);
+    tlsCertificateManagementprovisionClientCertificateCommandParams.put("clientCertificate",tlsCertificateManagementprovisionClientCertificateclientCertificateCommandParameterInfo);
+
+    CommandParameterInfo tlsCertificateManagementprovisionClientCertificateintermediateCertificatesCommandParameterInfo = new CommandParameterInfo("intermediateCertificates", ArrayList.class, ArrayList.class);
+    tlsCertificateManagementprovisionClientCertificateCommandParams.put("intermediateCertificates",tlsCertificateManagementprovisionClientCertificateintermediateCertificatesCommandParameterInfo);
+    InteractionInfo tlsCertificateManagementprovisionClientCertificateInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.TlsCertificateManagementCluster) cluster)
+        .provisionClientCertificate((DefaultClusterCallback) callback
+        , (Integer)
+        commandArguments.get("ccdid")
+        , (byte[])
+        commandArguments.get("clientCertificate")
+        , (ArrayList<byte[]>)
+        commandArguments.get("intermediateCertificates")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        tlsCertificateManagementprovisionClientCertificateCommandParams
+    );
+    tlsCertificateManagementClusterInteractionInfoMap.put("provisionClientCertificate", tlsCertificateManagementprovisionClientCertificateInteractionInfo);
+
+    Map<String, CommandParameterInfo> tlsCertificateManagementfindClientCertificateCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo tlsCertificateManagementfindClientCertificateccdidCommandParameterInfo = new CommandParameterInfo("ccdid", Integer.class, Integer.class);
+    tlsCertificateManagementfindClientCertificateCommandParams.put("ccdid",tlsCertificateManagementfindClientCertificateccdidCommandParameterInfo);
+    InteractionInfo tlsCertificateManagementfindClientCertificateInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.TlsCertificateManagementCluster) cluster)
+          .findClientCertificate((ChipClusters.TlsCertificateManagementCluster.FindClientCertificateResponseCallback) callback
+           , (Integer)
+             commandArguments.get("ccdid")
+
+            );
+        },
+        () -> new DelegatedTlsCertificateManagementClusterFindClientCertificateResponseCallback(),
+        tlsCertificateManagementfindClientCertificateCommandParams
+      );
+    tlsCertificateManagementClusterInteractionInfoMap.put("findClientCertificate", tlsCertificateManagementfindClientCertificateInteractionInfo);
+
+    Map<String, CommandParameterInfo> tlsCertificateManagementlookupClientCertificateCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo tlsCertificateManagementlookupClientCertificatefingerprintCommandParameterInfo = new CommandParameterInfo("fingerprint", byte[].class, byte[].class);
+    tlsCertificateManagementlookupClientCertificateCommandParams.put("fingerprint",tlsCertificateManagementlookupClientCertificatefingerprintCommandParameterInfo);
+    InteractionInfo tlsCertificateManagementlookupClientCertificateInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.TlsCertificateManagementCluster) cluster)
+          .lookupClientCertificate((ChipClusters.TlsCertificateManagementCluster.LookupClientCertificateResponseCallback) callback
+           , (byte[])
+             commandArguments.get("fingerprint")
+
+            );
+        },
+        () -> new DelegatedTlsCertificateManagementClusterLookupClientCertificateResponseCallback(),
+        tlsCertificateManagementlookupClientCertificateCommandParams
+      );
+    tlsCertificateManagementClusterInteractionInfoMap.put("lookupClientCertificate", tlsCertificateManagementlookupClientCertificateInteractionInfo);
+
+    Map<String, CommandParameterInfo> tlsCertificateManagementremoveClientCertificateCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo tlsCertificateManagementremoveClientCertificateccdidCommandParameterInfo = new CommandParameterInfo("ccdid", Integer.class, Integer.class);
+    tlsCertificateManagementremoveClientCertificateCommandParams.put("ccdid",tlsCertificateManagementremoveClientCertificateccdidCommandParameterInfo);
+    InteractionInfo tlsCertificateManagementremoveClientCertificateInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.TlsCertificateManagementCluster) cluster)
+        .removeClientCertificate((DefaultClusterCallback) callback
+        , (Integer)
+        commandArguments.get("ccdid")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        tlsCertificateManagementremoveClientCertificateCommandParams
+    );
+    tlsCertificateManagementClusterInteractionInfoMap.put("removeClientCertificate", tlsCertificateManagementremoveClientCertificateInteractionInfo);
+
+    commandMap.put("tlsCertificateManagement", tlsCertificateManagementClusterInteractionInfoMap);
+
+    Map<String, InteractionInfo> tlsClientManagementClusterInteractionInfoMap = new LinkedHashMap<>();
+
+    Map<String, CommandParameterInfo> tlsClientManagementprovisionEndpointCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo tlsClientManagementprovisionEndpointhostnameCommandParameterInfo = new CommandParameterInfo("hostname", byte[].class, byte[].class);
+    tlsClientManagementprovisionEndpointCommandParams.put("hostname",tlsClientManagementprovisionEndpointhostnameCommandParameterInfo);
+
+    CommandParameterInfo tlsClientManagementprovisionEndpointportCommandParameterInfo = new CommandParameterInfo("port", Integer.class, Integer.class);
+    tlsClientManagementprovisionEndpointCommandParams.put("port",tlsClientManagementprovisionEndpointportCommandParameterInfo);
+
+    CommandParameterInfo tlsClientManagementprovisionEndpointcaidCommandParameterInfo = new CommandParameterInfo("caid", Integer.class, Integer.class);
+    tlsClientManagementprovisionEndpointCommandParams.put("caid",tlsClientManagementprovisionEndpointcaidCommandParameterInfo);
+
+    CommandParameterInfo tlsClientManagementprovisionEndpointccdidCommandParameterInfo = new CommandParameterInfo("ccdid", Integer.class, Integer.class);
+    tlsClientManagementprovisionEndpointCommandParams.put("ccdid",tlsClientManagementprovisionEndpointccdidCommandParameterInfo);
+
+    CommandParameterInfo tlsClientManagementprovisionEndpointendpointIDCommandParameterInfo = new CommandParameterInfo("endpointID", Integer.class, Integer.class);
+    tlsClientManagementprovisionEndpointCommandParams.put("endpointID",tlsClientManagementprovisionEndpointendpointIDCommandParameterInfo);
+    InteractionInfo tlsClientManagementprovisionEndpointInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.TlsClientManagementCluster) cluster)
+          .provisionEndpoint((ChipClusters.TlsClientManagementCluster.ProvisionEndpointResponseCallback) callback
+           , (byte[])
+             commandArguments.get("hostname")
+
+           , (Integer)
+             commandArguments.get("port")
+
+           , (Integer)
+             commandArguments.get("caid")
+
+           , (Integer)
+             commandArguments.get("ccdid")
+
+           , (Integer)
+             commandArguments.get("endpointID")
+
+            );
+        },
+        () -> new DelegatedTlsClientManagementClusterProvisionEndpointResponseCallback(),
+        tlsClientManagementprovisionEndpointCommandParams
+      );
+    tlsClientManagementClusterInteractionInfoMap.put("provisionEndpoint", tlsClientManagementprovisionEndpointInteractionInfo);
+
+    Map<String, CommandParameterInfo> tlsClientManagementfindEndpointCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo tlsClientManagementfindEndpointendpointIDCommandParameterInfo = new CommandParameterInfo("endpointID", Integer.class, Integer.class);
+    tlsClientManagementfindEndpointCommandParams.put("endpointID",tlsClientManagementfindEndpointendpointIDCommandParameterInfo);
+    InteractionInfo tlsClientManagementfindEndpointInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.TlsClientManagementCluster) cluster)
+          .findEndpoint((ChipClusters.TlsClientManagementCluster.FindEndpointResponseCallback) callback
+           , (Integer)
+             commandArguments.get("endpointID")
+
+            );
+        },
+        () -> new DelegatedTlsClientManagementClusterFindEndpointResponseCallback(),
+        tlsClientManagementfindEndpointCommandParams
+      );
+    tlsClientManagementClusterInteractionInfoMap.put("findEndpoint", tlsClientManagementfindEndpointInteractionInfo);
+
+    Map<String, CommandParameterInfo> tlsClientManagementremoveEndpointCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo tlsClientManagementremoveEndpointendpointIDCommandParameterInfo = new CommandParameterInfo("endpointID", Integer.class, Integer.class);
+    tlsClientManagementremoveEndpointCommandParams.put("endpointID",tlsClientManagementremoveEndpointendpointIDCommandParameterInfo);
+    InteractionInfo tlsClientManagementremoveEndpointInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.TlsClientManagementCluster) cluster)
+        .removeEndpoint((DefaultClusterCallback) callback
+        , (Integer)
+        commandArguments.get("endpointID")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        tlsClientManagementremoveEndpointCommandParams
+    );
+    tlsClientManagementClusterInteractionInfoMap.put("removeEndpoint", tlsClientManagementremoveEndpointInteractionInfo);
+
+    commandMap.put("tlsClientManagement", tlsClientManagementClusterInteractionInfoMap);
+
+    Map<String, InteractionInfo> meterIdentificationClusterInteractionInfoMap = new LinkedHashMap<>();
+
+    commandMap.put("meterIdentification", meterIdentificationClusterInteractionInfoMap);
+
+    Map<String, InteractionInfo> commodityMeteringClusterInteractionInfoMap = new LinkedHashMap<>();
+
+    commandMap.put("commodityMetering", commodityMeteringClusterInteractionInfoMap);
 
     Map<String, InteractionInfo> unitTestingClusterInteractionInfoMap = new LinkedHashMap<>();
 
@@ -30886,6 +34760,18 @@ public class ClusterInfoMapping {
         unitTestingglobalEchoRequestCommandParams
       );
     unitTestingClusterInteractionInfoMap.put("globalEchoRequest", unitTestingglobalEchoRequestInteractionInfo);
+
+    Map<String, CommandParameterInfo> unitTestingtestCheckCommandFlagsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo unitTestingtestCheckCommandFlagsInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.UnitTestingCluster) cluster)
+        .testCheckCommandFlags((DefaultClusterCallback) callback, 10000
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        unitTestingtestCheckCommandFlagsCommandParams
+    );
+    unitTestingClusterInteractionInfoMap.put("testCheckCommandFlags", unitTestingtestCheckCommandFlagsInteractionInfo);
 
     Map<String, CommandParameterInfo> unitTestingtestDifferentVendorMeiRequestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
 

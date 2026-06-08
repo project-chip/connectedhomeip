@@ -26,6 +26,7 @@
 #include "AndroidCurrentFabricRemover.h"
 #include "AndroidDeviceControllerWrapper.h"
 #include "AndroidInteractionClient.h"
+#include "AndroidLogDownloadFromNode.h"
 #include <controller/java/ControllerConfig.h>
 #include <lib/support/CHIPJNIError.h>
 #include <lib/support/JniReferences.h>
@@ -84,6 +85,9 @@ using namespace chip::Crypto;
 
 #define CDC_JNI_CALLBACK_LOCAL_REF_COUNT 256
 
+static void PairDevice(JNIEnv * env, AndroidDeviceControllerWrapper * wrapper, chip::NodeId deviceId,
+                       RendezvousParameters & rendezvousParams, jbyteArray csrNonce, jobject networkCredentials,
+                       jobject icdRegistrationInfo);
 static void * IOThreadMain(void * arg);
 static CHIP_ERROR StopIOThread();
 static CHIP_ERROR N2J_PaseVerifierParams(JNIEnv * env, jlong setupPincode, jbyteArray pakeVerifier, jobject & outParams);
@@ -108,7 +112,7 @@ jint JNI_OnLoad(JavaVM * jvm, void * reserved)
 
     ChipLogProgress(Controller, "JNI_OnLoad() called");
 
-    chip::Platform::MemoryInit();
+    TEMPORARY_RETURN_IGNORED chip::Platform::MemoryInit();
 
     // Save a reference to the JVM.  Will need this to call back into Java.
     JniReferences::GetInstance().SetJavaVm(jvm, "chip/devicecontroller/ChipDeviceController");
@@ -124,6 +128,11 @@ jint JNI_OnLoad(JavaVM * jvm, void * reserved)
     jclass controllerExceptionCls;
     err = JniReferences::GetInstance().GetLocalClassRef(env, "chip/devicecontroller/ChipDeviceControllerException",
                                                         controllerExceptionCls);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogProgress(Controller, "Fail to create local ref for ChipDeviceControllerException");
+        return JNI_ERR;
+    }
     SuccessOrExit(err = sChipDeviceControllerExceptionCls.Init(controllerExceptionCls));
 
     ChipLogProgress(Controller, "Java class references loaded.");
@@ -156,7 +165,7 @@ void JNI_OnUnload(JavaVM * jvm, void * reserved)
     // If the IO thread has not been stopped yet, shut it down now.
     // TODO(arkq): Maybe we should just assert here, as the IO thread
     //             should be stopped before the library is unloaded.
-    StopIOThread();
+    TEMPORARY_RETURN_IGNORED StopIOThread();
 
     sJVM = nullptr;
 
@@ -504,8 +513,8 @@ JNI_METHOD(void, setDeviceAttestationDelegate)
         chip::Optional<uint16_t> timeoutSecs  = chip::MakeOptional(static_cast<uint16_t>(failSafeExpiryTimeoutSecs));
         bool shouldWaitAfterDeviceAttestation = false;
         jclass deviceAttestationDelegateCls   = nullptr;
-        JniReferences::GetInstance().GetLocalClassRef(env, "chip/devicecontroller/DeviceAttestationDelegate",
-                                                      deviceAttestationDelegateCls);
+        TEMPORARY_RETURN_IGNORED JniReferences::GetInstance().GetLocalClassRef(
+            env, "chip/devicecontroller/DeviceAttestationDelegate", deviceAttestationDelegateCls);
         VerifyOrExit(deviceAttestationDelegateCls != nullptr, err = CHIP_JNI_ERROR_TYPE_NOT_FOUND);
 
         if (env->IsInstanceOf(deviceAttestationDelegate, deviceAttestationDelegateCls))
@@ -626,8 +635,16 @@ JNI_METHOD(void, commissionDevice)
         VerifyOrExit(err == CHIP_NO_ERROR, err = CHIP_ERROR_INVALID_ARGUMENT);
     }
 
-    commissioningParams.SetICDRegistrationStrategy(ICDRegistrationStrategy::kBeforeComplete);
-    wrapper->ApplyICDRegistrationInfo(commissioningParams, icdRegistrationInfo);
+    if (icdRegistrationInfo != nullptr)
+    {
+        commissioningParams.SetICDRegistrationStrategy(ICDRegistrationStrategy::kBeforeComplete);
+        err = wrapper->ApplyICDRegistrationInfo(commissioningParams, icdRegistrationInfo);
+        VerifyOrExit(err == CHIP_NO_ERROR, err = CHIP_ERROR_INVALID_ARGUMENT);
+    }
+    else
+    {
+        commissioningParams.SetICDRegistrationStrategy(ICDRegistrationStrategy::kIgnore);
+    }
 
     if (wrapper->GetDeviceAttestationDelegateBridge() != nullptr)
     {
@@ -647,12 +664,11 @@ exit:
     }
 }
 
-JNI_METHOD(void, pairDevice)
+JNI_METHOD(void, pairDeviceThroughBLE)
 (JNIEnv * env, jobject self, jlong handle, jlong deviceId, jint connObj, jlong pinCode, jbyteArray csrNonce,
  jobject networkCredentials, jobject icdRegistrationInfo)
 {
     chip::DeviceLayer::StackLock lock;
-    CHIP_ERROR err                           = CHIP_NO_ERROR;
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
 
     ChipLogProgress(Controller, "pairDevice() called with device ID, connection object, and pincode");
@@ -670,8 +686,18 @@ JNI_METHOD(void, pairDevice)
 #endif
                                                 .SetPeerAddress(Transport::PeerAddress::BLE());
 
+    PairDevice(env, wrapper, static_cast<chip::NodeId>(deviceId), rendezvousParams, csrNonce, networkCredentials,
+               icdRegistrationInfo);
+}
+
+static void PairDevice(JNIEnv * env, AndroidDeviceControllerWrapper * wrapper, chip::NodeId deviceId,
+                       RendezvousParameters & rendezvousParams, jbyteArray csrNonce, jobject networkCredentials,
+                       jobject icdRegistrationInfo)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
     CommissioningParameters commissioningParams = wrapper->GetCommissioningParameters();
-    wrapper->ApplyNetworkCredentials(commissioningParams, networkCredentials);
+    TEMPORARY_RETURN_IGNORED wrapper->ApplyNetworkCredentials(commissioningParams, networkCredentials);
 
     if (csrNonce != nullptr)
     {
@@ -679,20 +705,56 @@ JNI_METHOD(void, pairDevice)
         commissioningParams.SetCSRNonce(jniCsrNonce.byteSpan());
     }
 
-    commissioningParams.SetICDRegistrationStrategy(ICDRegistrationStrategy::kBeforeComplete);
-    wrapper->ApplyICDRegistrationInfo(commissioningParams, icdRegistrationInfo);
+    if (icdRegistrationInfo != nullptr)
+    {
+        commissioningParams.SetICDRegistrationStrategy(ICDRegistrationStrategy::kBeforeComplete);
+        err = wrapper->ApplyICDRegistrationInfo(commissioningParams, icdRegistrationInfo);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Controller, "ApplyICDRegistrationInfo failed. %" CHIP_ERROR_FORMAT, err.Format());
+            JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
+            return;
+        }
+    }
+    else
+    {
+        commissioningParams.SetICDRegistrationStrategy(ICDRegistrationStrategy::kIgnore);
+    }
 
     if (wrapper->GetDeviceAttestationDelegateBridge() != nullptr)
     {
         commissioningParams.SetDeviceAttestationDelegate(wrapper->GetDeviceAttestationDelegateBridge());
     }
-    err = wrapper->Controller()->PairDevice(static_cast<chip::NodeId>(deviceId), rendezvousParams, commissioningParams);
+
+    err = wrapper->Controller()->PairDevice(deviceId, rendezvousParams, commissioningParams);
 
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "Failed to pair the device.");
         JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
     }
+}
+
+JNI_METHOD(void, pairDeviceThroughNfc)
+(JNIEnv * env, jobject self, jlong handle, jlong deviceId, jlong pinCode, jbyteArray csrNonce, jobject networkCredentials,
+ jobject icdRegistrationInfo)
+{
+    chip::DeviceLayer::StackLock lock;
+    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
+
+    ChipLogProgress(Controller, "pairDeviceThroughNfc() called with device ID and pincode");
+
+    if (!chip::CanCastTo<uint32_t>(pinCode))
+    {
+        JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, CHIP_ERROR_INVALID_ARGUMENT);
+        return;
+    }
+
+    RendezvousParameters rendezvousParams =
+        RendezvousParameters().SetSetupPINCode(static_cast<uint32_t>(pinCode)).SetPeerAddress(Transport::PeerAddress::NFC());
+
+    PairDevice(env, wrapper, static_cast<chip::NodeId>(deviceId), rendezvousParams, csrNonce, networkCredentials,
+               icdRegistrationInfo);
 }
 
 JNI_METHOD(void, pairDeviceWithAddress)
@@ -726,8 +788,21 @@ JNI_METHOD(void, pairDeviceWithAddress)
         commissioningParams.SetCSRNonce(jniCsrNonce.byteSpan());
     }
 
-    commissioningParams.SetICDRegistrationStrategy(ICDRegistrationStrategy::kBeforeComplete);
-    wrapper->ApplyICDRegistrationInfo(commissioningParams, icdRegistrationInfo);
+    if (icdRegistrationInfo != nullptr)
+    {
+        commissioningParams.SetICDRegistrationStrategy(ICDRegistrationStrategy::kBeforeComplete);
+        err = wrapper->ApplyICDRegistrationInfo(commissioningParams, icdRegistrationInfo);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Controller, "ApplyICDRegistrationInfo failed: %" CHIP_ERROR_FORMAT, err.Format());
+            JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
+            return;
+        }
+    }
+    else
+    {
+        commissioningParams.SetICDRegistrationStrategy(ICDRegistrationStrategy::kIgnore);
+    }
 
     if (wrapper->GetDeviceAttestationDelegateBridge() != nullptr)
     {
@@ -775,11 +850,24 @@ JNI_METHOD(void, pairDeviceWithCode)
 
     if (networkCredentials != nullptr)
     {
-        wrapper->ApplyNetworkCredentials(commissioningParams, networkCredentials);
+        TEMPORARY_RETURN_IGNORED wrapper->ApplyNetworkCredentials(commissioningParams, networkCredentials);
     }
 
-    commissioningParams.SetICDRegistrationStrategy(ICDRegistrationStrategy::kBeforeComplete);
-    wrapper->ApplyICDRegistrationInfo(commissioningParams, icdRegistrationInfo);
+    if (icdRegistrationInfo != nullptr)
+    {
+        commissioningParams.SetICDRegistrationStrategy(ICDRegistrationStrategy::kBeforeComplete);
+        err = wrapper->ApplyICDRegistrationInfo(commissioningParams, icdRegistrationInfo);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Controller, "ApplyICDRegistrationInfo failed: %" CHIP_ERROR_FORMAT, err.Format());
+            JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
+            return;
+        }
+    }
+    else
+    {
+        commissioningParams.SetICDRegistrationStrategy(ICDRegistrationStrategy::kIgnore);
+    }
 
     if (wrapper->GetDeviceAttestationDelegateBridge() != nullptr)
     {
@@ -1051,7 +1139,7 @@ JNI_METHOD(jbyteArray, createRootCertificate)
 
     VerifyOrExit(outBuf.Alloc(allocatedCertLength), err = CHIP_ERROR_NO_MEMORY);
 
-    keypair.SetDelegate(jKeypair);
+    TEMPORARY_RETURN_IGNORED keypair.SetDelegate(jKeypair);
     err = keypair.Initialize(Crypto::ECPKeyTarget::ECDSA);
     SuccessOrExit(err);
 
@@ -1114,7 +1202,7 @@ JNI_METHOD(jbyteArray, createIntermediateCertificate)
 
     VerifyOrExit(outBuf.Alloc(allocatedCertLength), err = CHIP_ERROR_NO_MEMORY);
 
-    keypair.SetDelegate(rootKeypair);
+    TEMPORARY_RETURN_IGNORED keypair.SetDelegate(rootKeypair);
     err = keypair.Initialize(Crypto::ECPKeyTarget::ECDSA);
     SuccessOrExit(err);
 
@@ -1180,13 +1268,13 @@ JNI_METHOD(jbyteArray, createOperationalCertificate)
     if (caseAuthenticatedTags != nullptr)
     {
         jint size;
-        JniReferences::GetInstance().GetListSize(caseAuthenticatedTags, size);
+        TEMPORARY_RETURN_IGNORED JniReferences::GetInstance().GetListSize(caseAuthenticatedTags, size);
         VerifyOrExit(static_cast<size_t>(size) <= chip::kMaxSubjectCATAttributeCount, err = CHIP_ERROR_INVALID_ARGUMENT);
 
         for (jint i = 0; i < size; i++)
         {
             jobject cat = nullptr;
-            JniReferences::GetInstance().GetListItem(caseAuthenticatedTags, i, cat);
+            TEMPORARY_RETURN_IGNORED JniReferences::GetInstance().GetListItem(caseAuthenticatedTags, i, cat);
             VerifyOrExit(cat != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
             cats.values[i] = static_cast<uint32_t>(JniReferences::GetInstance().IntegerToPrimitive(cat));
         }
@@ -1194,7 +1282,7 @@ JNI_METHOD(jbyteArray, createOperationalCertificate)
 
     VerifyOrExit(outBuf.Alloc(allocatedCertLength), err = CHIP_ERROR_NO_MEMORY);
 
-    keypair.SetDelegate(signingKeypair);
+    TEMPORARY_RETURN_IGNORED keypair.SetDelegate(signingKeypair);
     err = keypair.Initialize(Crypto::ECPKeyTarget::ECDSA);
     SuccessOrExit(err);
     {
@@ -1326,6 +1414,35 @@ JNI_METHOD(void, unpairDeviceCallback)(JNIEnv * env, jobject self, jlong handle,
     }
 }
 
+#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
+// Method used in case of NFC-based Commissioning without power.
+// At end of 1st commissioning phase, the user is asked to install and power ON the device.
+// Present function is used to confirm that this action has been done.
+// The 2nd commissioning phase, on the Operational network, will then start.
+JNI_METHOD(void, continueCommissioningAfterConnectNetworkRequest)(JNIEnv * env, jobject self, jlong handle, jlong remoteDeviceId)
+{
+    chip::DeviceLayer::StackLock lock;
+    AndroidDeviceControllerWrapper * wrapper = nullptr;
+    CHIP_ERROR err                           = CHIP_NO_ERROR;
+
+    VerifyOrExit(env != nullptr, err = CHIP_ERROR_BAD_REQUEST);
+
+    wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
+    VerifyOrExit(wrapper != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+
+    err = wrapper->Controller()->ContinueCommissioningAfterConnectNetworkRequest(static_cast<NodeId>(remoteDeviceId));
+    SuccessOrExit(err);
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "Failed to continue Commissioning after Connect Network Request: %" CHIP_ERROR_FORMAT,
+                     err.Format());
+        JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
+    }
+}
+#endif // CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
+
 JNI_METHOD(void, stopDevicePairing)(JNIEnv * env, jobject self, jlong handle, jlong deviceId)
 {
     chip::DeviceLayer::StackLock lock;
@@ -1360,7 +1477,7 @@ JNI_METHOD(jlong, getDeviceBeingCommissionedPointer)(JNIEnv * env, jobject self,
 
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Controller, "Failed to get commissionee device: %s", ErrorStr(err));
+        ChipLogError(Controller, "Failed to get commissionee device: %" CHIP_ERROR_FORMAT, err.Format());
         JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
         return 0;
     }
@@ -1412,7 +1529,7 @@ JNI_METHOD(jlong, getGroupDevicePointer)(JNIEnv * env, jobject self, jlong handl
     if (device == nullptr)
     {
         CHIP_ERROR err = CHIP_ERROR_NO_MEMORY;
-        ChipLogError(Controller, "GroupDeviceProxy handle is nullptr: %s", ErrorStr(err));
+        ChipLogError(Controller, "GroupDeviceProxy handle is nullptr: %" CHIP_ERROR_FORMAT, err.Format());
         JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
         return 0;
     }
@@ -1451,9 +1568,9 @@ JNI_METHOD(jobject, getAvailableGroupIds)(JNIEnv * env, jobject self, jlong hand
         while (it->Next(group))
         {
             jobject jGroupId;
-            chip::JniReferences::GetInstance().CreateBoxedObject<jint>("java/lang/Integer", "(I)V",
-                                                                       static_cast<jint>(group.group_id), jGroupId);
-            chip::JniReferences::GetInstance().AddToList(groupIds, jGroupId);
+            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                "java/lang/Integer", "(I)V", static_cast<jint>(group.group_id), jGroupId);
+            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().AddToList(groupIds, jGroupId);
         }
     }
 
@@ -1507,16 +1624,16 @@ JNI_METHOD(jobject, findKeySetId)(JNIEnv * env, jobject self, jlong handle, jint
             if (groupKey.group_id == groupId)
             {
                 jobject jKeyId;
-                chip::JniReferences::GetInstance().CreateBoxedObject<jint>("java/lang/Integer", "(I)V",
-                                                                           static_cast<jint>(groupKey.keyset_id), jKeyId);
-                chip::JniReferences::GetInstance().CreateOptional(jKeyId, wrapperKeyId);
+                TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                    "java/lang/Integer", "(I)V", static_cast<jint>(groupKey.keyset_id), jKeyId);
+                TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(jKeyId, wrapperKeyId);
                 iter->Release();
                 return wrapperKeyId;
             }
         }
         iter->Release();
     }
-    chip::JniReferences::GetInstance().CreateOptional(nullptr, wrapperKeyId);
+    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(nullptr, wrapperKeyId);
     return wrapperKeyId;
 }
 
@@ -1573,9 +1690,9 @@ JNI_METHOD(jobject, getKeySetIds)(JNIEnv * env, jobject self, jlong handle)
         while (it->Next(keySet))
         {
             jobject jKeySetId;
-            chip::JniReferences::GetInstance().CreateBoxedObject<jint>("java/lang/Integer", "(I)V",
-                                                                       static_cast<jint>(keySet.keyset_id), jKeySetId);
-            chip::JniReferences::GetInstance().AddToList(keySetIds, jKeySetId);
+            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                "java/lang/Integer", "(I)V", static_cast<jint>(keySet.keyset_id), jKeySetId);
+            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().AddToList(keySetIds, jKeySetId);
         }
         it->Release();
     }
@@ -1605,16 +1722,16 @@ JNI_METHOD(jobject, getKeySecurityPolicy)(JNIEnv * env, jobject self, jlong hand
             if (keySet.keyset_id == keySetId)
             {
                 jobject jKeyPolicy;
-                chip::JniReferences::GetInstance().CreateBoxedObject<jint>("java/lang/Integer", "(I)V",
-                                                                           static_cast<jint>(keySet.policy), jKeyPolicy);
-                chip::JniReferences::GetInstance().CreateOptional(jKeyPolicy, wrapperKeyPolicy);
+                TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                    "java/lang/Integer", "(I)V", static_cast<jint>(keySet.policy), jKeyPolicy);
+                TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(jKeyPolicy, wrapperKeyPolicy);
                 it->Release();
                 return wrapperKeyPolicy;
             }
         }
         it->Release();
     }
-    chip::JniReferences::GetInstance().CreateOptional(nullptr, wrapperKeyPolicy);
+    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(nullptr, wrapperKeyPolicy);
     return wrapperKeyPolicy;
 }
 
@@ -1688,8 +1805,7 @@ JNI_METHOD(jboolean, addKeySet)
         static_cast<chip::Credentials::GroupDataProvider::SecurityPolicy>(jKeyPolicy);
     chip::JniByteArray jniEpochKey(env, epochKey);
     size_t epochKeySize = static_cast<size_t>(jniEpochKey.size());
-    if ((keyPolicy != chip::Credentials::GroupDataProvider::SecurityPolicy::kCacheAndSync &&
-         keyPolicy != chip::Credentials::GroupDataProvider::SecurityPolicy::kTrustFirst) ||
+    if (keyPolicy != chip::Credentials::GroupDataProvider::SecurityPolicy::kTrustFirst ||
         epochKeySize != chip::Credentials::GroupDataProvider::EpochKey::kLengthBytes)
     {
         return JNI_FALSE;
@@ -2059,13 +2175,35 @@ JNI_METHOD(jboolean, openPairingWindowWithPINCallback)
     return true;
 }
 
+JNI_METHOD(void, downloadLogFromNode)
+(JNIEnv * env, jobject self, jlong handle, jlong deviceId, jint typeEnum, jlong timeout, jobject downloadLogCallback)
+{
+    chip::DeviceLayer::StackLock lock;
+    CHIP_ERROR err                           = CHIP_NO_ERROR;
+    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
+    VerifyOrReturn(wrapper != nullptr,
+                   ChipLogError(Controller, "AndroidDeviceControllerWrapper::FromJNIHandle in downloadLogFromNode fails!"));
+
+    ChipLogProgress(Controller, "downloadLogFromNode() called with device ID and callback object");
+
+    err = AndroidLogDownloadFromNode::LogDownloadFromNode(wrapper->Controller(), static_cast<NodeId>(deviceId),
+                                                          static_cast<chip::app::Clusters::DiagnosticLogs::IntentEnum>(typeEnum),
+                                                          static_cast<uint16_t>(timeout), downloadLogCallback);
+
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "Failed to download Log the device.");
+        JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
+    }
+}
+
 JNI_METHOD(void, shutdownCommissioning)
 (JNIEnv * env, jobject self, jlong handle)
 {
     chip::DeviceLayer::StackLock lock;
 
     // Stop the IO thread, so that the controller can be safely shut down.
-    StopIOThread();
+    TEMPORARY_RETURN_IGNORED StopIOThread();
 
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
     wrapper->Shutdown();
@@ -2179,8 +2317,8 @@ JNI_METHOD(jbyteArray, validateAndExtractCSR)(JNIEnv * env, jclass clazz, jbyteA
                         ChipLogError(Controller, "csrNonce is not matched!"));
 
     jbyteArray javaCsr;
-    chip::JniReferences::GetInstance().N2J_ByteArray(chip::JniReferences::GetInstance().GetEnvForCurrentThread(), csrSpan.data(),
-                                                     static_cast<jsize>(csrSpan.size()), javaCsr);
+    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().N2J_ByteArray(
+        chip::JniReferences::GetInstance().GetEnvForCurrentThread(), csrSpan.data(), static_cast<jsize>(csrSpan.size()), javaCsr);
     return javaCsr;
 }
 
@@ -2240,7 +2378,7 @@ CHIP_ERROR StopIOThread()
         ChipLogProgress(Controller, "IO thread stopping");
         chip::DeviceLayer::StackUnlock unlock;
 
-        chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
+        TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
 
         pthread_join(sIOThread, nullptr);
         sIOThread = PTHREAD_NULL;

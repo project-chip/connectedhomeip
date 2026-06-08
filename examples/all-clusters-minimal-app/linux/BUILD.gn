@@ -34,7 +34,6 @@ source_set("chip-all-clusters-common") {
   deps = [
     "${chip_root}/examples/all-clusters-minimal-app/all-clusters-common",
     "${chip_root}/examples/platform/linux:app-main",
-    "${chip_root}/src/app/tests/suites/credentials:dac_provider",
     "${chip_root}/src/lib",
   ]
 
@@ -84,7 +83,7 @@ executable("chip-all-clusters-minimal-app") {
 
 if (chip_device_platform == "darwin") {
   action("codesign") {
-    script = "entitlements/codesign.py"
+    script = "${chip_root}/examples/common/darwin/entitlements/codesign.py"
     public_deps = [ ":chip-all-clusters-minimal-app" ]
 
     args = [

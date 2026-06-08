@@ -20,6 +20,7 @@
 #include "AppTask.h"
 #include "AppConfig.h"
 #include "AppEvent.h"
+#include "CHIPProjectConfig.h"
 #if defined(ENABLE_CHIP_SHELL)
 #include "EventHandlerLibShell.h"
 #endif // ENABLE_CHIP_SHELL
@@ -37,9 +38,9 @@
 #include <app-common/zap-generated/cluster-objects.h>
 
 #include <app/clusters/door-lock-server/door-lock-server.h>
-#include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
+#include <setup_payload/OnboardingCodesUtil.h>
 
 #include <assert.h>
 
@@ -66,7 +67,7 @@ using namespace chip::app;
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::DeviceLayer::Silabs;
 using namespace ::chip::DeviceLayer::Internal;
-using namespace EFR32DoorLock::LockInitParams;
+using namespace SilabsDoorLock::LockInitParams;
 
 namespace {
 LEDWidget sLockLED;
@@ -79,7 +80,8 @@ void UpdateClusterStateAfterUnlatch(intptr_t context)
 
 void UnlatchTimerCallback(TimerHandle_t xTimer)
 {
-    chip::DeviceLayer::PlatformMgr().ScheduleWork(UpdateClusterStateAfterUnlatch, reinterpret_cast<intptr_t>(nullptr));
+    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().ScheduleWork(UpdateClusterStateAfterUnlatch,
+                                                                           reinterpret_cast<intptr_t>(nullptr));
 }
 
 void CancelUnlatchTimer(void)
@@ -116,22 +118,11 @@ using namespace ::chip::DeviceLayer;
 
 AppTask AppTask::sAppTask;
 
-CHIP_ERROR AppTask::Init()
+CHIP_ERROR AppTask::AppInit()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     chip::DeviceLayer::Silabs::GetPlatform().SetButtonsCb(AppTask::ButtonEventHandler);
-
-#ifdef DISPLAY_ENABLED
-    GetLCD().Init((uint8_t *) "Lock-App", true);
-#endif
-
-    err = BaseApplication::Init();
-    if (err != CHIP_NO_ERROR)
-    {
-        SILABS_LOG("BaseApplication::Init() failed");
-        appError(err);
-    }
 
 #if defined(ENABLE_CHIP_SHELL)
     err = RegisterLockEvents();
@@ -206,7 +197,8 @@ CHIP_ERROR AppTask::Init()
                              .SetNumberOfWeekdaySchedulesPerUser(numberOfWeekdaySchedulesPerUser)
                              .SetNumberOfYeardaySchedulesPerUser(numberOfYeardaySchedulesPerUser)
                              .SetNumberOfHolidaySchedules(numberOfHolidaySchedules)
-                             .GetLockParam());
+                             .GetLockParam(),
+                         &Server::GetInstance().GetPersistentStorage());
 
     if (err != CHIP_NO_ERROR)
     {
@@ -236,7 +228,7 @@ CHIP_ERROR AppTask::Init()
 #endif // QR_CODE_ENABLED
 #endif
 
-    chip::DeviceLayer::PlatformMgr().ScheduleWork(UpdateClusterState, reinterpret_cast<intptr_t>(nullptr));
+    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().ScheduleWork(UpdateClusterState, reinterpret_cast<intptr_t>(nullptr));
 
     ConfigurationMgr().LogDeviceConfig();
 
@@ -265,9 +257,6 @@ void AppTask::AppTaskMain(void * pvParameter)
 #endif
 
     SILABS_LOG("App Task started");
-
-    // Users and credentials should be checked once from nvm flash on boot
-    LockMgr().ReadConfigValues();
 
     while (true)
     {
@@ -382,7 +371,8 @@ void AppTask::ActionCompleted(LockManager::Action_t aAction)
 
     if (sAppTask.mSyncClusterToButtonAction)
     {
-        chip::DeviceLayer::PlatformMgr().ScheduleWork(UpdateClusterState, reinterpret_cast<intptr_t>(nullptr));
+        TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().ScheduleWork(UpdateClusterState,
+                                                                               reinterpret_cast<intptr_t>(nullptr));
         sAppTask.mSyncClusterToButtonAction = false;
     }
 }

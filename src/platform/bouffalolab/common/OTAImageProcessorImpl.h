@@ -24,6 +24,31 @@
 
 namespace chip {
 
+#if CHIP_DEVICE_LAYER_TARGET_BL616
+typedef struct _ota_header_s
+{
+    uint8_t header[16];
+
+    uint8_t type[4];    // RAW XZ
+    uint32_t image_len; // body len
+    uint8_t pad0[8];
+
+    uint8_t ver_hardware[16];
+    uint8_t ver_software[16];
+
+    uint8_t sha256[32];
+} ota_header_s_t;
+
+typedef struct _ota_header
+{
+    union
+    {
+        ota_header_s_t s;
+        uint8_t _pad[512];
+    } u;
+} ota_header_t;
+#endif
+
 class OTAImageProcessorImpl : public OTAImageProcessorInterface
 {
 public:
@@ -59,6 +84,10 @@ private:
     MutableByteSpan mBlock;
     OTADownloader * mDownloader;
     OTAImageHeaderParser mHeaderParser;
+#if CHIP_DEVICE_LAYER_TARGET_BL616
+    ota_header_s_t mOtaHdr;
+    uint32_t mImageTotalSize;
+#endif
 };
 
 } // namespace chip

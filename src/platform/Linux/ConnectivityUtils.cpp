@@ -22,13 +22,14 @@
  */
 
 #include <platform/Linux/ConnectivityUtils.h>
-#include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <arpa/inet.h>
+#include <errno.h>
 #include <ifaddrs.h>
 #include <linux/ethtool.h>
 #include <linux/if_link.h>
 #include <linux/sockios.h>
+#include <linux/types.h> /* for "caddr_t" et al */
 #include <linux/wireless.h>
 #include <netdb.h>
 #include <stdio.h>
@@ -42,14 +43,18 @@
 #include <lib/core/CHIPEncoding.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
+#include <platform/internal/CHIPDeviceLayerInternal.h>
 
 using namespace ::chip::app::Clusters::GeneralDiagnostics;
 
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
+namespace ConnectivityUtils {
 
-uint16_t ConnectivityUtils::Map2400MHz(const uint8_t inChannel)
+namespace {
+
+constexpr uint16_t Map2400MHz(const uint8_t inChannel)
 {
     uint16_t frequency = 0;
 
@@ -65,7 +70,7 @@ uint16_t ConnectivityUtils::Map2400MHz(const uint8_t inChannel)
     return frequency;
 }
 
-uint16_t ConnectivityUtils::Map5000MHz(const uint8_t inChannel)
+constexpr uint16_t Map5000MHz(const uint8_t inChannel)
 {
     uint16_t frequency = 0;
 
@@ -202,7 +207,48 @@ uint16_t ConnectivityUtils::Map5000MHz(const uint8_t inChannel)
     return frequency;
 }
 
-uint16_t ConnectivityUtils::MapChannelToFrequency(const uint16_t inBand, const uint8_t inChannel)
+constexpr double ConvertFrequencyToFloat(const iw_freq * in)
+{
+    double result = (double) in->m;
+
+    for (int i = 0; i < in->e; i++)
+        result *= 10;
+
+    return result;
+}
+
+CHIP_ERROR GetWiFiParameter(int skfd,            /* Socket to the kernel */
+                            const char * ifname, /* Device name */
+                            int request,         /* WE ID */
+                            struct iwreq * pwrq) /* Fixed part of the request */
+{
+    /* Set device name */
+    Platform::CopyString(pwrq->ifr_name, ifname);
+
+    /* Do the request */
+    if (ioctl(skfd, request, pwrq) < 0)
+    {
+        return CHIP_ERROR_BAD_REQUEST;
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR GetWiFiStats(int skfd, const char * ifname, struct iw_statistics * stats)
+{
+    struct iwreq wrq = {};
+
+    wrq.u.data.pointer = stats;
+    wrq.u.data.length  = sizeof(struct iw_statistics);
+    wrq.u.data.flags   = 1; /* Clear updated flag */
+    Platform::CopyString(wrq.ifr_name, ifname);
+
+    return GetWiFiParameter(skfd, ifname, SIOCGIWSTATS, &wrq);
+}
+
+} // namespace
+
+uint16_t MapChannelToFrequency(const uint16_t inBand, const uint8_t inChannel)
 {
     uint16_t frequency = 0;
 
@@ -218,7 +264,7 @@ uint16_t ConnectivityUtils::MapChannelToFrequency(const uint16_t inBand, const u
     return frequency;
 }
 
-uint8_t ConnectivityUtils::MapFrequencyToChannel(const uint16_t frequency)
+uint8_t MapFrequencyToChannel(const uint16_t frequency)
 {
     if (frequency < 2412)
         return 0;
@@ -232,17 +278,7 @@ uint8_t ConnectivityUtils::MapFrequencyToChannel(const uint16_t frequency)
     return frequency / 5 - 1000;
 }
 
-double ConnectivityUtils::ConvertFrequenceToFloat(const iw_freq * in)
-{
-    double result = (double) in->m;
-
-    for (int i = 0; i < in->e; i++)
-        result *= 10;
-
-    return result;
-}
-
-InterfaceTypeEnum ConnectivityUtils::GetInterfaceConnectionType(const char * ifname)
+InterfaceTypeEnum GetInterfaceConnectionType(const char * ifname)
 {
     InterfaceTypeEnum ret = InterfaceTypeEnum::kUnspecified;
     int sock              = -1;
@@ -276,13 +312,17 @@ InterfaceTypeEnum ConnectivityUtils::GetInterfaceConnectionType(const char * ifn
     {
         ret = InterfaceTypeEnum::kEthernet;
     }
+    else if (strncmp(ifname, "wl", 2) == 0)
+    {
+        ret = InterfaceTypeEnum::kWiFi;
+    }
 
     close(sock);
 
     return ret;
 }
 
-CHIP_ERROR ConnectivityUtils::GetInterfaceHardwareAddrs(const char * ifname, uint8_t * buf, size_t bufSize)
+CHIP_ERROR GetInterfaceHardwareAddrs(const char * ifname, uint8_t * buf, size_t bufSize)
 {
     CHIP_ERROR err = CHIP_ERROR_READ_FAILED;
     int skfd;
@@ -314,99 +354,95 @@ CHIP_ERROR ConnectivityUtils::GetInterfaceHardwareAddrs(const char * ifname, uin
     return err;
 }
 
-CHIP_ERROR ConnectivityUtils::GetInterfaceIPv4Addrs(const char * ifname, uint8_t & size, NetworkInterface * ifp)
+CHIP_ERROR GetInterfaceIPv4Addrs(const char * ifname, uint8_t & size, NetworkInterface * ifp)
 {
-    CHIP_ERROR err;
+    CHIP_ERROR err          = CHIP_ERROR_READ_FAILED;
     struct ifaddrs * ifaddr = nullptr;
 
-    if (getifaddrs(&ifaddr) == -1)
-    {
-        ChipLogError(DeviceLayer, "Failed to get network interfaces");
-        err = CHIP_ERROR_READ_FAILED;
-    }
-    else
-    {
-        uint8_t index = 0;
+    VerifyOrReturnError(getifaddrs(&ifaddr) == 0, CHIP_ERROR_READ_FAILED,
+                        ChipLogError(DeviceLayer, "Failed to get network interfaces: %s", strerror(errno)));
 
-        for (struct ifaddrs * ifa = ifaddr; ifa != nullptr; ifa = ifa->ifa_next)
+    uint8_t index = 0;
+
+    for (struct ifaddrs * ifa = ifaddr; ifa != nullptr; ifa = ifa->ifa_next)
+    {
+        if (ifa->ifa_addr && ifa->ifa_addr->sa_family == AF_INET)
         {
-            if (ifa->ifa_addr && ifa->ifa_addr->sa_family == AF_INET)
+            if (strcmp(ifname, ifa->ifa_name) == 0)
             {
-                if (strcmp(ifname, ifa->ifa_name) == 0)
+                void * addPtr = &((struct sockaddr_in *) ifa->ifa_addr)->sin_addr;
+
+                memcpy(ifp->Ipv4AddressesBuffer[index], addPtr, kMaxIPv4AddrSize);
+                ifp->Ipv4AddressSpans[index] = ByteSpan(ifp->Ipv4AddressesBuffer[index], kMaxIPv4AddrSize);
+                index++;
+
+                if (index >= kMaxIPv4AddrCount)
                 {
-                    void * addPtr = &((struct sockaddr_in *) ifa->ifa_addr)->sin_addr;
-
-                    memcpy(ifp->Ipv4AddressesBuffer[index], addPtr, kMaxIPv4AddrSize);
-                    ifp->Ipv4AddressSpans[index] = ByteSpan(ifp->Ipv4AddressesBuffer[index], kMaxIPv4AddrSize);
-                    index++;
-
-                    if (index >= kMaxIPv4AddrCount)
-                    {
-                        break;
-                    }
+                    break;
                 }
             }
         }
-
-        if (index > 0)
-        {
-            err  = CHIP_NO_ERROR;
-            size = index;
-        }
-
-        freeifaddrs(ifaddr);
     }
 
-    return err;
-}
-
-CHIP_ERROR ConnectivityUtils::GetInterfaceIPv6Addrs(const char * ifname, uint8_t & size, NetworkInterface * ifp)
-{
-    CHIP_ERROR err;
-    struct ifaddrs * ifaddr = nullptr;
-
-    if (getifaddrs(&ifaddr) == -1)
+    if (index > 0)
     {
-        ChipLogError(DeviceLayer, "Failed to get network interfaces");
-        err = CHIP_ERROR_READ_FAILED;
+        err  = CHIP_NO_ERROR;
+        size = index;
     }
     else
     {
-        uint8_t index = 0;
-
-        for (struct ifaddrs * ifa = ifaddr; ifa != nullptr; ifa = ifa->ifa_next)
-        {
-            if (ifa->ifa_addr && ifa->ifa_addr->sa_family == AF_INET6)
-            {
-                if (strcmp(ifname, ifa->ifa_name) == 0)
-                {
-                    void * addPtr = &((struct sockaddr_in6 *) ifa->ifa_addr)->sin6_addr;
-
-                    memcpy(ifp->Ipv6AddressesBuffer[index], addPtr, kMaxIPv6AddrSize);
-                    ifp->Ipv6AddressSpans[index] = ByteSpan(ifp->Ipv6AddressesBuffer[index], kMaxIPv6AddrSize);
-                    index++;
-
-                    if (index >= kMaxIPv6AddrCount)
-                    {
-                        break;
-                    }
-                }
-            }
-        }
-
-        if (index > 0)
-        {
-            err  = CHIP_NO_ERROR;
-            size = index;
-        }
-
-        freeifaddrs(ifaddr);
+        err = CHIP_ERROR_NOT_FOUND;
     }
 
+    freeifaddrs(ifaddr);
     return err;
 }
 
-CHIP_ERROR ConnectivityUtils::GetWiFiInterfaceName(char * ifname, size_t bufSize)
+CHIP_ERROR GetInterfaceIPv6Addrs(const char * ifname, uint8_t & size, NetworkInterface * ifp)
+{
+    CHIP_ERROR err          = CHIP_ERROR_READ_FAILED;
+    struct ifaddrs * ifaddr = nullptr;
+
+    VerifyOrReturnError(getifaddrs(&ifaddr) == 0, CHIP_ERROR_READ_FAILED,
+                        ChipLogError(DeviceLayer, "Failed to get network interfaces: %s", strerror(errno)));
+
+    uint8_t index = 0;
+
+    for (struct ifaddrs * ifa = ifaddr; ifa != nullptr; ifa = ifa->ifa_next)
+    {
+        if (ifa->ifa_addr && ifa->ifa_addr->sa_family == AF_INET6)
+        {
+            if (strcmp(ifname, ifa->ifa_name) == 0)
+            {
+                void * addPtr = &((struct sockaddr_in6 *) ifa->ifa_addr)->sin6_addr;
+
+                memcpy(ifp->Ipv6AddressesBuffer[index], addPtr, kMaxIPv6AddrSize);
+                ifp->Ipv6AddressSpans[index] = ByteSpan(ifp->Ipv6AddressesBuffer[index], kMaxIPv6AddrSize);
+                index++;
+
+                if (index >= kMaxIPv6AddrCount)
+                {
+                    break;
+                }
+            }
+        }
+    }
+
+    if (index > 0)
+    {
+        err  = CHIP_NO_ERROR;
+        size = index;
+    }
+    else
+    {
+        err = CHIP_ERROR_NOT_FOUND;
+    }
+
+    freeifaddrs(ifaddr);
+    return err;
+}
+
+CHIP_ERROR GetWiFiInterfaceName(char * ifname, size_t bufSize)
 {
     CHIP_ERROR err          = CHIP_ERROR_READ_FAILED;
     struct ifaddrs * ifaddr = nullptr;
@@ -437,40 +473,11 @@ CHIP_ERROR ConnectivityUtils::GetWiFiInterfaceName(char * ifname, size_t bufSize
     return err;
 }
 
-CHIP_ERROR ConnectivityUtils::GetWiFiParameter(int skfd,            /* Socket to the kernel */
-                                               const char * ifname, /* Device name */
-                                               int request,         /* WE ID */
-                                               struct iwreq * pwrq) /* Fixed part of the request */
-{
-    /* Set device name */
-    Platform::CopyString(pwrq->ifr_name, ifname);
-
-    /* Do the request */
-    if (ioctl(skfd, request, pwrq) < 0)
-    {
-        return CHIP_ERROR_BAD_REQUEST;
-    }
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR ConnectivityUtils::GetWiFiStats(int skfd, const char * ifname, struct iw_statistics * stats)
-{
-    struct iwreq wrq;
-
-    wrq.u.data.pointer = (caddr_t) stats;
-    wrq.u.data.length  = sizeof(struct iw_statistics);
-    wrq.u.data.flags   = 1; /*Clear updated flag */
-    Platform::CopyString(wrq.ifr_name, ifname);
-
-    return GetWiFiParameter(skfd, ifname, SIOCGIWSTATS, &wrq);
-}
-
-CHIP_ERROR ConnectivityUtils::GetWiFiChannelNumber(const char * ifname, uint16_t & channelNumber)
+CHIP_ERROR GetWiFiChannelNumber(const char * ifname, uint16_t & channelNumber)
 {
     CHIP_ERROR err = CHIP_ERROR_READ_FAILED;
 
-    struct iwreq wrq;
+    struct iwreq wrq = {};
     int skfd;
 
     if ((skfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
@@ -481,7 +488,7 @@ CHIP_ERROR ConnectivityUtils::GetWiFiChannelNumber(const char * ifname, uint16_t
 
     if (GetWiFiParameter(skfd, ifname, SIOCGIWFREQ, &wrq) == CHIP_NO_ERROR)
     {
-        double freq = ConvertFrequenceToFloat(&(wrq.u.freq));
+        double freq = ConvertFrequencyToFloat(&(wrq.u.freq));
         VerifyOrReturnError((freq / 1000000) <= UINT16_MAX, CHIP_ERROR_INVALID_INTEGER_VALUE);
         channelNumber = MapFrequencyToChannel(static_cast<uint16_t>(freq / 1000000));
 
@@ -493,10 +500,10 @@ CHIP_ERROR ConnectivityUtils::GetWiFiChannelNumber(const char * ifname, uint16_t
     return err;
 }
 
-CHIP_ERROR ConnectivityUtils::GetWiFiRssi(const char * ifname, int8_t & rssi)
+CHIP_ERROR GetWiFiRssi(const char * ifname, int8_t & rssi)
 {
-    CHIP_ERROR err = CHIP_ERROR_READ_FAILED;
-    struct iw_statistics stats;
+    CHIP_ERROR err             = CHIP_ERROR_READ_FAILED;
+    struct iw_statistics stats = {};
     int skfd;
 
     if ((skfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
@@ -554,10 +561,10 @@ CHIP_ERROR ConnectivityUtils::GetWiFiRssi(const char * ifname, int8_t & rssi)
     return err;
 }
 
-CHIP_ERROR ConnectivityUtils::GetWiFiBeaconLostCount(const char * ifname, uint32_t & beaconLostCount)
+CHIP_ERROR GetWiFiBeaconLostCount(const char * ifname, uint32_t & beaconLostCount)
 {
-    CHIP_ERROR err = CHIP_ERROR_READ_FAILED;
-    struct iw_statistics stats;
+    CHIP_ERROR err             = CHIP_ERROR_READ_FAILED;
+    struct iw_statistics stats = {};
     int skfd;
 
     if ((skfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
@@ -577,10 +584,10 @@ CHIP_ERROR ConnectivityUtils::GetWiFiBeaconLostCount(const char * ifname, uint32
     return err;
 }
 
-CHIP_ERROR ConnectivityUtils::GetWiFiCurrentMaxRate(const char * ifname, uint64_t & currentMaxRate)
+CHIP_ERROR GetWiFiCurrentMaxRate(const char * ifname, uint64_t & currentMaxRate)
 {
-    CHIP_ERROR err = CHIP_ERROR_READ_FAILED;
-    struct iwreq wrq;
+    CHIP_ERROR err   = CHIP_ERROR_READ_FAILED;
+    struct iwreq wrq = {};
     int skfd;
 
     if ((skfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
@@ -600,7 +607,7 @@ CHIP_ERROR ConnectivityUtils::GetWiFiCurrentMaxRate(const char * ifname, uint64_
     return err;
 }
 
-CHIP_ERROR ConnectivityUtils::GetEthInterfaceName(char * ifname, size_t bufSize)
+CHIP_ERROR GetEthInterfaceName(char * ifname, size_t bufSize)
 {
     CHIP_ERROR err          = CHIP_ERROR_READ_FAILED;
     struct ifaddrs * ifaddr = nullptr;
@@ -631,7 +638,7 @@ CHIP_ERROR ConnectivityUtils::GetEthInterfaceName(char * ifname, size_t bufSize)
     return err;
 }
 
-CHIP_ERROR ConnectivityUtils::GetEthPHYRate(const char * ifname, app::Clusters::EthernetNetworkDiagnostics::PHYRateEnum & pHYRate)
+CHIP_ERROR GetEthPHYRate(const char * ifname, app::Clusters::EthernetNetworkDiagnostics::PHYRateEnum & pHYRate)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -701,7 +708,7 @@ CHIP_ERROR ConnectivityUtils::GetEthPHYRate(const char * ifname, app::Clusters::
     return err;
 }
 
-CHIP_ERROR ConnectivityUtils::GetEthFullDuplex(const char * ifname, bool & fullDuplex)
+CHIP_ERROR GetEthFullDuplex(const char * ifname, bool & fullDuplex)
 {
     CHIP_ERROR err = CHIP_ERROR_READ_FAILED;
 
@@ -735,6 +742,7 @@ CHIP_ERROR ConnectivityUtils::GetEthFullDuplex(const char * ifname, bool & fullD
     return err;
 }
 
+} // namespace ConnectivityUtils
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip

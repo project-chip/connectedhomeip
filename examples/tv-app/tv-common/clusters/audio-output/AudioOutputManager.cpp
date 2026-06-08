@@ -18,8 +18,11 @@
 
 #include "AudioOutputManager.h"
 
+#include <lib/support/Span.h>
+
 using namespace chip::app;
 using namespace chip::app::Clusters::AudioOutput;
+using namespace chip::literals;
 
 AudioOutputManager::AudioOutputManager()
 {
@@ -30,7 +33,7 @@ AudioOutputManager::AudioOutputManager()
         OutputInfoType outputInfo;
         outputInfo.outputType = chip::app::Clusters::AudioOutput::OutputTypeEnum::kHdmi;
         // note: safe only because of use of string literal
-        outputInfo.name  = chip::CharSpan::fromCharString("HDMI");
+        outputInfo.name  = "HDMI"_span;
         outputInfo.index = static_cast<uint8_t>(i);
         mOutputs.push_back(outputInfo);
     }
@@ -62,6 +65,11 @@ bool AudioOutputManager::HandleRenameOutput(const uint8_t & index, const chip::C
     {
         if (output.index == index)
         {
+            if (sizeof(mCharDataBuffer[index]) < name.size())
+            {
+                return audioOutputRenamed;
+            }
+
             audioOutputRenamed = true;
             memcpy(this->Data(index), name.data(), name.size());
             output.name = chip::CharSpan(this->Data(index), name.size());

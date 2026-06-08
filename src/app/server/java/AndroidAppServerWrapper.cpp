@@ -17,17 +17,19 @@
  */
 
 #include "AndroidAppServerWrapper.h"
-#include <app/server/OnboardingCodesUtil.h>
+
 #include <app/server/Server.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
+#include <data-model-providers/codegen/Instance.h>
 #include <iostream>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/JniTypeWrappers.h>
-#include <lib/support/ScopedBuffer.h>
+#include <lib/support/ScopedMemoryBuffer.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/PlatformManager.h>
+#include <setup_payload/OnboardingCodesUtil.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
 #include <thread>
@@ -50,6 +52,7 @@ CHIP_ERROR ChipAndroidAppInit(AppDelegate * appDelegate)
     // Init ZCL Data Model and CHIP App Server
     static chip::CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
+    initParams.dataModelProvider = app::CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
     if (appDelegate != nullptr)
     {
         initParams.appDelegate = appDelegate;
@@ -58,13 +61,18 @@ CHIP_ERROR ChipAndroidAppInit(AppDelegate * appDelegate)
     initParams.operationalServicePort        = CHIP_PORT;
     initParams.userDirectedCommissioningPort = CHIP_UDC_PORT;
 
-    err = chip::Server::GetInstance().Init(initParams);
-    SuccessOrExit(err);
+#if CHIP_DEVICE_CONFIG_ENABLE_PORT_RETRY
+    // Enable automatic port retry to handle port conflicts
+    initParams.portRetryCount = 9;
+#endif
 
     if (!IsDeviceAttestationCredentialsProviderSet())
     {
         SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
     }
+
+    err = chip::Server::GetInstance().Init(initParams);
+    SuccessOrExit(err);
 
 exit:
     if (err != CHIP_NO_ERROR)

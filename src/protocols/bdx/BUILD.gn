@@ -18,6 +18,8 @@ static_library("bdx") {
   output_name = "libBdx"
 
   sources = [
+    "AsyncTransferFacilitator.cpp",
+    "AsyncTransferFacilitator.h",
     "BdxMessages.cpp",
     "BdxMessages.h",
     "BdxTransferDiagnosticLog.cpp",

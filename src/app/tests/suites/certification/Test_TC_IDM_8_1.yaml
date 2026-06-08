@@ -576,19 +576,3 @@ tests:
           [1660742276.568954][17561:17566] CHIP:DMG: MoveToState ReadClient[0x7f8624024eb0]: Moving to [AwaitingSu]
           [1660742276.568986][17561:17566] CHIP:EM: Piggybacking Ack for MessageCounter:39674556 on exchange: 26542i
       disabled: true
-
-    - label:
-          "RC1 sends Subscribe Request Message to DUT with EventRequests set to
-          path where an event in the path is fabric-sensitive and the associated
-          fabric does not match the accessing fabric."
-      verification: |
-          Mark this as not testable /NA. Out of Scope for V1.1
-      disabled: true
-
-    - label:
-          "RC1 sends Read Request Message to DUT with EventRequests set to path
-          where an event in the path is fabric-sensitive and the associated
-          fabric does not match the accessing fabric."
-      verification: |
-          Mark this as not testable /NA. Out of Scope for V1.0
-      disabled: true

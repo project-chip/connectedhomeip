@@ -16,10 +16,35 @@
  */
 
 #import "MTRCommissioningParameters.h"
+#import "MTRCommissioningParameters_Internal.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @implementation MTRCommissioningParameters : NSObject
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRCommissioningParameters alloc] init];
+    other.csrNonce = self.csrNonce;
+    other.attestationNonce = self.attestationNonce;
+    other.wifiSSID = self.wifiSSID;
+    other.wifiCredentials = self.wifiCredentials;
+    other.threadOperationalDataset = self.threadOperationalDataset;
+    other.deviceAttestationDelegate = self.deviceAttestationDelegate;
+    other.failSafeTimeout = self.failSafeTimeout;
+    other.skipCommissioningComplete = self.skipCommissioningComplete;
+    other.countryCode = self.countryCode;
+    other.readEndpointInformation = self.readEndpointInformation;
+    other.acceptedTermsAndConditions = self.acceptedTermsAndConditions;
+    other.acceptedTermsAndConditionsVersion = self.acceptedTermsAndConditionsVersion;
+    other.extraAttributesToRead = self.extraAttributesToRead;
+    other.forceWiFiScan = self.forceWiFiScan;
+    other.forceThreadScan = self.forceThreadScan;
+
+    other.preventNetworkScans = self.preventNetworkScans;
+
+    return other;
+}
 
 @end
 
@@ -43,6 +68,13 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)setFailSafeExpiryTimeoutSecs:(NSNumber * _Nullable)failSafeExpiryTimeoutSecs
 {
     self.failSafeTimeout = failSafeExpiryTimeoutSecs;
+}
+
+- (NSString *)description
+{
+    return [NSString stringWithFormat:@"<MTRCommissioningParameters: %p, has ssid: %d, has thread dataset: %d>, accepted terms: %@, accepted terms version: %@>", self,
+                     self.wifiSSID != nil, self.threadOperationalDataset != nil,
+                     self.acceptedTermsAndConditions, self.acceptedTermsAndConditionsVersion];
 }
 
 @end

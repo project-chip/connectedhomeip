@@ -17,8 +17,11 @@
 
 #include "AppMain.h"
 #include <app/server/Server.h>
+#include <data-model-providers/codegen/Instance.h>
 
 #include <CommissionableInit.h>
+
+#include <providers/AllClustersExampleDeviceInfoProviderImpl.h>
 
 using namespace chip;
 using namespace chip::DeviceLayer;
@@ -26,8 +29,9 @@ using namespace chip::DeviceLayer;
 namespace {
 
 LinuxCommissionableDataProvider gCommissionableDataProvider;
+chip::DeviceLayer::AllClustersExampleDeviceInfoProviderImpl gAllClustersExampleDeviceInfoProvider;
 
-}
+} // namespace
 
 void CleanShutdown()
 {
@@ -53,9 +57,12 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t * aData, size_t aSize)
                                                                    LinuxDeviceOptions::GetInstance()) == CHIP_NO_ERROR);
         SetCommissionableDataProvider(&gCommissionableDataProvider);
 
+        DeviceLayer::SetDeviceInfoProvider(&gAllClustersExampleDeviceInfoProvider);
+
         // ChipLinuxAppMainLoop blocks, and we don't want that here.
         static chip::CommonCaseDeviceServerInitParams initParams;
-        (void) initParams.InitializeStaticResourcesBeforeServerInit();
+        RETURN_SAFELY_IGNORED initParams.InitializeStaticResourcesBeforeServerInit();
+        initParams.dataModelProvider = app::CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
         VerifyOrDie(Server::GetInstance().Init(initParams) == CHIP_NO_ERROR);
 
         ApplicationInit();
@@ -107,7 +114,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t * aData, size_t aSize)
         Server::GetInstance().GetSecureSessionManager().OnMessageReceived(peerAddr, std::move(buf));
     }
     // Now process pending events until our sentinel is reached.
-    PlatformMgr().ScheduleWork([](intptr_t) { PlatformMgr().StopEventLoopTask(); });
+    RETURN_SAFELY_IGNORED PlatformMgr().ScheduleWork([](intptr_t) { RETURN_SAFELY_IGNORED PlatformMgr().StopEventLoopTask(); });
     PlatformMgr().RunEventLoop();
     return 0;
 }

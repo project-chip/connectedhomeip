@@ -96,7 +96,8 @@ void RegisterStatCommands()
         { &StatResetHandler, "reset", "Reset peak usage of system resources" },
     };
 
-    static constexpr Command statCommand = { &SubShellCommand<ArraySize(subCommands), subCommands>, "stat", "Statistics commands" };
+    static constexpr Command statCommand = { &SubShellCommand<MATTER_ARRAY_SIZE(subCommands), subCommands>, "stat",
+                                             "Statistics commands" };
 
     Engine::Root().RegisterCommands(&statCommand, 1);
 }

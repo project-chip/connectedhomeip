@@ -31,5 +31,5 @@ chip_stack_lock_tracking = "none"
 matter_device_vid = "0xFFF1"
 matter_device_pid = "0x8003"
 
-pw_log_BACKEND = "${chip_root}/src/lib/support/pw_log_chip"
-pw_assert_BACKEND = "$dir_pw_assert_log:check_backend"
+pw_log_BACKEND = "${chip_root}/src/pw_backends/log"
+pw_assert_BACKEND = "${chip_root}/src/pw_backends/assert"

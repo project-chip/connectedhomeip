@@ -33,7 +33,8 @@
 #include <platform/CHIPDeviceConfig.h>
 
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
-#include <app/app-platform/ContentAppPlatform.h>
+#include <app/app-platform/ContentAppPlatform.h> // nogncheck
+
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 
 using namespace chip;
@@ -44,6 +45,10 @@ using namespace chip::AppPlatform;
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 using chip::app::Clusters::ContentAppObserver::Delegate;
 using chip::Protocols::InteractionModel::Status;
+
+#ifndef MATTER_DM_CONTENT_APP_OBSERVER_CLUSTER_SERVER_ENDPOINT_COUNT
+#define MATTER_DM_CONTENT_APP_OBSERVER_CLUSTER_SERVER_ENDPOINT_COUNT 0
+#endif
 
 static constexpr size_t kContentAppObserverDeletageTableSize =
     MATTER_DM_CONTENT_APP_OBSERVER_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
@@ -151,3 +156,4 @@ exit:
 // Plugin initialization
 
 void MatterContentAppObserverPluginServerInitCallback() {}
+void MatterContentAppObserverPluginServerShutdownCallback() {}

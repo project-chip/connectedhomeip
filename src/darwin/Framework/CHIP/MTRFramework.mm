@@ -15,6 +15,7 @@
  */
 
 #import "MTRFramework.h"
+#import "MTRFrameworkDiagnostics.h"
 
 #include <dispatch/dispatch.h>
 #include <lib/support/CHIPMem.h>
@@ -29,10 +30,12 @@ void MTRFrameworkInit()
         // malloc/free so there is nothing to initialize, so this just needs
         // to happen to avoid debug assertions.  The malloc version of
         // MemoryInit() never fails.
-        chip::Platform::MemoryInit();
+        TEMPORARY_RETURN_IGNORED chip::Platform::MemoryInit();
 
         // Suppress CHIP logging until we actually need it for redirection
         // (see MTRSetLogCallback()). Logging to os_log is always enabled.
         chip::Logging::SetLogFilter(chip::Logging::kLogCategory_None);
+
+        MTRFrameworkInitDiagnosticLog();
     });
 }

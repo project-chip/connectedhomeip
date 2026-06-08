@@ -16,7 +16,7 @@
  */
 
 #include "lib/support/CHIPMemString.h"
-#include "lib/support/ScopedBuffer.h"
+#include "lib/support/ScopedMemoryBuffer.h"
 #include <json/json.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/Base64.h>

@@ -84,8 +84,8 @@ private:
     {
         for (size_t i = 0; i < size; ++i)
         {
-            uint8_t byte1 = (buf1[i] >= 'A' && buf1[i] <= 'Z') ? buf1[i] - 'A' + 'a' : buf1[i];
-            uint8_t byte2 = (buf2[i] >= 'A' && buf2[i] <= 'Z') ? buf2[i] - 'A' + 'a' : buf2[i];
+            uint8_t byte1 = static_cast<uint8_t>((buf1[i] >= 'A' && buf1[i] <= 'Z') ? (buf1[i] - 'A' + 'a') : buf1[i]);
+            uint8_t byte2 = static_cast<uint8_t>((buf2[i] >= 'A' && buf2[i] <= 'Z') ? (buf2[i] - 'A' + 'a') : buf2[i]);
             if (byte1 != byte2)
             {
                 return false;

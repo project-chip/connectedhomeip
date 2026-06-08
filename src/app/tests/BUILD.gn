@@ -1,4 +1,4 @@
-# Copyright (c) 2020 Project CHIP Authors
+# Copyright (c) 2020-2026 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -46,21 +46,6 @@ static_library("helpers") {
   ]
 }
 
-source_set("binding-test-srcs") {
-  sources = [
-    "${chip_root}/src/app/clusters/bindings/PendingNotificationMap.cpp",
-    "${chip_root}/src/app/clusters/bindings/PendingNotificationMap.h",
-    "${chip_root}/src/app/util/binding-table.cpp",
-    "${chip_root}/src/app/util/binding-table.h",
-  ]
-
-  public_deps = [
-    "${chip_root}/src/app/util/mock:mock_codegen_data_model",
-    "${chip_root}/src/app/util/mock:mock_ember",
-    "${chip_root}/src/lib/core",
-  ]
-}
-
 source_set("ota-requestor-test-srcs") {
   sources = [
     "${chip_root}/src/app/clusters/ota-requestor/DefaultOTARequestorStorage.cpp",
@@ -69,36 +54,33 @@ source_set("ota-requestor-test-srcs") {
   ]
 
   public_deps = [
+    "${chip_root}/src/app/clusters/ota-requestor:interface",
     "${chip_root}/src/app/common:cluster-objects",
     "${chip_root}/src/lib/core",
   ]
 }
 
 source_set("thread-network-directory-test-srcs") {
-  sources = [
-    "${chip_root}/src/app/clusters/thread-network-directory-server/DefaultThreadNetworkDirectoryStorage.cpp",
-    "${chip_root}/src/app/clusters/thread-network-directory-server/DefaultThreadNetworkDirectoryStorage.h",
-    "${chip_root}/src/app/clusters/thread-network-directory-server/ThreadNetworkDirectoryStorage.h",
-  ]
-
   public_deps = [
+    "${chip_root}/src/app/clusters/thread-network-directory-server:thread-network-directory-server",
     "${chip_root}/src/app/common:cluster-objects",
     "${chip_root}/src/lib/core",
   ]
 }
 
 source_set("time-sync-data-provider-test-srcs") {
-  sources = [ "${chip_root}/src/app/clusters/time-synchronization-server/TimeSyncDataProvider.cpp" ]
-
   public_deps = [
+    "${chip_root}/src/app/clusters/time-synchronization-server:time-sync-data-provider",
     "${chip_root}/src/app/common:cluster-objects",
+    "${chip_root}/src/app/persistence:persistence",
     "${chip_root}/src/lib/core",
   ]
 }
 
 source_set("power-cluster-test-srcs") {
   sources = [
-    "${chip_root}/src/app/clusters/power-source-server/power-source-server.cpp",
+    "${chip_root}/src/app/clusters/power-source-server/codegen/power-source-server.cpp",
+    "${chip_root}/src/app/clusters/power-source-server/codegen/power-source-server.h",
   ]
 
   public_deps = [
@@ -110,20 +92,18 @@ source_set("power-cluster-test-srcs") {
 }
 
 source_set("scenes-table-test-srcs") {
+  # Tests currently validate/use capping logic from codegen, so we add codegen support
+  # and mock data models.
   sources = [
-    "${chip_root}/src/app/clusters/scenes-server/ExtensionFieldSets.h",
-    "${chip_root}/src/app/clusters/scenes-server/ExtensionFieldSetsImpl.cpp",
-    "${chip_root}/src/app/clusters/scenes-server/ExtensionFieldSetsImpl.h",
-    "${chip_root}/src/app/clusters/scenes-server/SceneHandlerImpl.cpp",
-    "${chip_root}/src/app/clusters/scenes-server/SceneHandlerImpl.h",
-    "${chip_root}/src/app/clusters/scenes-server/SceneTable.h",
-    "${chip_root}/src/app/clusters/scenes-server/SceneTableImpl.cpp",
-    "${chip_root}/src/app/clusters/scenes-server/SceneTableImpl.h",
+    "${chip_root}/src/app/clusters/scenes-server/CodegenAttributeValuePairValidator.cpp",
+    "${chip_root}/src/app/clusters/scenes-server/CodegenAttributeValuePairValidator.h",
   ]
 
   public_deps = [
     "${chip_root}/src/app",
+    "${chip_root}/src/app/clusters/scenes-server:scenes",
     "${chip_root}/src/app/common:cluster-objects",
+    "${chip_root}/src/app/storage:fabric-table",
     "${chip_root}/src/app/util/mock:mock_codegen_data_model",
     "${chip_root}/src/app/util/mock:mock_ember",
     "${chip_root}/src/lib/core",
@@ -135,21 +115,6 @@ source_set("operational-state-test-srcs") {
 
   public_deps = [
     "${chip_root}/src/app/common:cluster-objects",
-    "${chip_root}/src/lib/core",
-  ]
-}
-
-source_set("thread-border-router-management-test-srcs") {
-  sources = [
-    "${chip_root}/src/app/clusters/thread-border-router-management-server/thread-border-router-management-server.cpp",
-    "${chip_root}/src/app/clusters/thread-border-router-management-server/thread-border-router-management-server.h",
-    "${chip_root}/src/app/clusters/thread-border-router-management-server/thread-br-delegate.h",
-  ]
-
-  public_deps = [
-    "${chip_root}/src/app",
-    "${chip_root}/src/app/common:cluster-objects",
-    "${chip_root}/src/app/util/mock:mock_ember",
     "${chip_root}/src/lib/core",
   ]
 }
@@ -171,7 +136,7 @@ source_set("app-test-stubs") {
     "test-ember-api.cpp",
     "test-ember-api.h",
 
-    # The overrides in these files are overrides from ember-compatibility-functions
+    # The overrides in these files are overrides from ember generated code
     # and the data model interface is NOT aware of such functionality
     #
     # TODO: ideally tests should have been written via mock ember, however mock ember did
@@ -180,8 +145,6 @@ source_set("app-test-stubs") {
     "test-interaction-model-api.cpp",
     "test-interaction-model-api.h",
   ]
-
-  public_configs = [ "${chip_root}/src/lib/support/pw_log_chip:config" ]
 
   public_deps = [
     "${chip_root}/src/app/util/mock:mock_codegen_data_model",
@@ -196,16 +159,16 @@ chip_test_suite("tests") {
 
   test_sources = [
     "TestAclAttribute.cpp",
+    "TestAclCommand.cpp",
     "TestAclEvent.cpp",
     "TestAttributeAccessInterfaceCache.cpp",
     "TestAttributePathExpandIterator.cpp",
     "TestAttributePathParams.cpp",
-    "TestAttributePersistenceProvider.cpp",
     "TestAttributeValueDecoder.cpp",
     "TestAttributeValueEncoder.cpp",
     "TestBasicCommandPathRegistry.cpp",
-    "TestBindingTable.cpp",
     "TestBuilderParser.cpp",
+    "TestCASESessionManagerReleaseSession.cpp",
     "TestCheckInHandler.cpp",
     "TestCommandHandlerInterfaceRegistry.cpp",
     "TestCommandInteraction.cpp",
@@ -213,22 +176,27 @@ chip_test_suite("tests") {
     "TestConcreteAttributePath.cpp",
     "TestDataModelSerialization.cpp",
     "TestDefaultOTARequestorStorage.cpp",
+    "TestDefaultSafeAttributePersistenceProvider.cpp",
+    "TestDefaultTermsAndConditionsProvider.cpp",
     "TestDefaultThreadNetworkDirectoryStorage.cpp",
     "TestEcosystemInformationCluster.cpp",
     "TestEventLoggingNoUTCTime.cpp",
     "TestEventOverflow.cpp",
     "TestEventPathParams.cpp",
     "TestFabricScopedEventLogging.cpp",
+    "TestFailSafeContext.cpp",
     "TestInteractionModelEngine.cpp",
     "TestMessageDef.cpp",
     "TestNumericAttributeTraits.cpp",
+    "TestOperationalSessionSetupFallback.cpp",
     "TestOperationalStateClusterObjects.cpp",
-    "TestPendingNotificationMap.cpp",
     "TestPendingResponseTrackerImpl.cpp",
     "TestPowerSourceCluster.cpp",
     "TestReadInteraction.cpp",
     "TestReportScheduler.cpp",
     "TestReportingEngine.cpp",
+    "TestServer.cpp",
+    "TestSessionRelease.cpp",
     "TestStatusIB.cpp",
     "TestStatusResponseMessage.cpp",
     "TestTestEventTriggerDelegate.cpp",
@@ -237,26 +205,31 @@ chip_test_suite("tests") {
     "TestWriteInteraction.cpp",
   ]
 
+  sources = [ "CASESessionManagerTestAccess.h" ]
+
   cflags = [ "-Wconversion" ]
 
   public_deps = [
     ":app-test-stubs",
-    ":binding-test-srcs",
     ":ecosystem-information-test-srcs",
     ":operational-state-test-srcs",
     ":ota-requestor-test-srcs",
-    ":power-cluster-test-srcs",
     ":thread-network-directory-test-srcs",
     ":time-sync-data-provider-test-srcs",
     "${chip_root}/src/app",
-    "${chip_root}/src/app/codegen-data-model-provider:instance-header",
+    "${chip_root}/src/app:attribute-persistence",
     "${chip_root}/src/app/common:cluster-objects",
     "${chip_root}/src/app/data-model-provider/tests:encode-decode",
     "${chip_root}/src/app/icd/client:handler",
     "${chip_root}/src/app/icd/client:manager",
+    "${chip_root}/src/app/icd/server:configuration-data",
+    "${chip_root}/src/app/server",
+    "${chip_root}/src/app/server:terms_and_conditions",
+    "${chip_root}/src/app/server-cluster/testing",
     "${chip_root}/src/app/tests:helpers",
     "${chip_root}/src/app/util/mock:mock_codegen_data_model",
     "${chip_root}/src/app/util/mock:mock_ember",
+    "${chip_root}/src/data-model-providers/codegen:instance-header",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/core:string-builder-adapters",
     "${chip_root}/src/lib/support:test_utils",
@@ -266,29 +239,26 @@ chip_test_suite("tests") {
 
   if (chip_device_platform != "android") {
     test_sources += [
+      "TestCertificateTableImpl.cpp",
       "TestExtensionFieldSets.cpp",
       "TestSceneTable.cpp",
     ]
     public_deps += [
       ":power-cluster-test-srcs",
       ":scenes-table-test-srcs",
+      "${chip_root}/src/app/clusters/tls-certificate-management-server:certificate-table",
     ]
   }
 
-  if (chip_config_network_layer_ble &&
-      (chip_device_platform == "linux" || chip_device_platform == "darwin")) {
+  # TestCommissioningWindowManager uses MockClock to advance time and force timer expiration which
+  # does not behave as expected on darwin
+  if (chip_config_network_layer_ble && chip_device_platform == "linux") {
     test_sources += [ "TestCommissioningWindowManager.cpp" ]
     public_deps += [
+      "${chip_root}/src/app/clusters/administrator-commissioning-server:administrator-commissioning-server",
       "${chip_root}/src/app/server",
       "${chip_root}/src/messaging/tests/echo:common",
     ]
-  } else if (!chip_fake_platform) {
-    test_sources += [ "TestThreadBorderRouterManagementCluster.cpp" ]
-    public_deps += [ ":thread-border-router-management-test-srcs" ]
-  }
-
-  if (!chip_fake_platform) {
-    test_sources += [ "TestFailSafeContext.cpp" ]
   }
 
   # DefaultICDClientStorage assumes that raw AES key is used by the application
@@ -308,12 +278,18 @@ chip_test_suite("tests") {
     test_sources += [ "TestClusterStateCache.cpp" ]
   }
 
-  # On NRF, Open IoT SDK and fake platforms we do not have a realtime clock available, so
-  # TestEventLogging.cpp would be testing the same thing as
-  # TestEventLoggingNoUTCTime, but it's not set up to deal with the timestamps
-  # being that low.
-  if (chip_device_platform != "nrfconnect" &&
-      chip_device_platform != "openiotsdk" && chip_device_platform != "fake") {
+  # On NRF platform we do not have a realtime clock available,
+  # so TestEventLogging.cpp would be testing the same thing as TestEventLoggingNoUTCTime,
+  # but it's not set up to deal with the timestamps being that low.
+  if (chip_device_platform != "nrfconnect") {
     test_sources += [ "TestEventLogging.cpp" ]
+  }
+
+  # Some test files use complex mock object initialization, which leads to high
+  # estimated stack usage. This is acceptable for test code but causes the build
+  # to fail when stack-usage warnings are treated as errors.
+  # Disable the error on Zephyr so these tests can compile.
+  if (chip_device_platform == "zephyr") {
+    cflags += [ "-Wno-error=stack-usage=" ]
   }
 }

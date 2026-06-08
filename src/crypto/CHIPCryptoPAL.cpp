@@ -27,11 +27,15 @@
 #include <lib/asn1/ASN1.h>
 #include <lib/asn1/ASN1Macros.h>
 #include <lib/core/CHIPEncoding.h>
+#include <lib/support/Base64.h>
 #include <lib/support/BufferReader.h>
 #include <lib/support/BufferWriter.h>
 #include <lib/support/BytesToHex.h>
+#include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Span.h>
+#include <lib/support/StringBuilder.h>
+#include <lib/support/TypeTraits.h>
 #include <stdint.h>
 #include <string.h>
 
@@ -330,16 +334,16 @@ CHIP_ERROR Spake2p::BeginVerifier(const uint8_t * my_identity, size_t my_identit
 }
 
 CHIP_ERROR Spake2p::BeginProver(const uint8_t * my_identity, size_t my_identity_len, const uint8_t * peer_identity,
-                                size_t peer_identity_len, const uint8_t * w0in, size_t w0in_len, const uint8_t * w1in,
-                                size_t w1in_len)
+                                size_t peer_identity_len, const uint8_t * w0sin, size_t w0sin_len, const uint8_t * w1sin,
+                                size_t w1sin_len)
 {
     VerifyOrReturnError(state == CHIP_SPAKE2P_STATE::INIT, CHIP_ERROR_INTERNAL);
 
     ReturnErrorOnFailure(InternalHash(my_identity, my_identity_len));
     ReturnErrorOnFailure(InternalHash(peer_identity, peer_identity_len));
     ReturnErrorOnFailure(WriteMN());
-    ReturnErrorOnFailure(FELoad(w0in, w0in_len, w0));
-    ReturnErrorOnFailure(FELoad(w1in, w1in_len, w1));
+    ReturnErrorOnFailure(FELoad(w0sin, w0sin_len, w0));
+    ReturnErrorOnFailure(FELoad(w1sin, w1sin_len, w1));
 
     state = CHIP_SPAKE2P_STATE::STARTED;
     role  = CHIP_SPAKE2P_ROLE::PROVER;
@@ -570,8 +574,8 @@ CHIP_ERROR Spake2pVerifier::Deserialize(const ByteSpan & inSerialized)
 
 CHIP_ERROR Spake2pVerifier::Generate(uint32_t pbkdf2IterCount, const ByteSpan & salt, uint32_t setupPin)
 {
-    uint8_t serializedWS[kSpake2p_WS_Length * 2] = { 0 };
-    ReturnErrorOnFailure(ComputeWS(pbkdf2IterCount, salt, setupPin, serializedWS, sizeof(serializedWS)));
+    SensitiveDataFixedBuffer<kSpake2p_WS_Length * 2> serializedWS;
+    ReturnErrorOnFailure(ComputeWS(pbkdf2IterCount, salt, setupPin, serializedWS.Bytes(), serializedWS.Capacity()));
 
     CHIP_ERROR err = CHIP_NO_ERROR;
     size_t len;
@@ -583,12 +587,12 @@ CHIP_ERROR Spake2pVerifier::Generate(uint32_t pbkdf2IterCount, const ByteSpan & 
 
     // Compute w0
     len = sizeof(mW0);
-    SuccessOrExit(err = spake2p.ComputeW0(mW0, &len, &serializedWS[0], kSpake2p_WS_Length));
+    SuccessOrExit(err = spake2p.ComputeW0(mW0, &len, serializedWS.Bytes(), kSpake2p_WS_Length));
     VerifyOrExit(len == sizeof(mW0), err = CHIP_ERROR_INTERNAL);
 
     // Compute L
     len = sizeof(mL);
-    SuccessOrExit(err = spake2p.ComputeL(mL, &len, &serializedWS[kSpake2p_WS_Length], kSpake2p_WS_Length));
+    SuccessOrExit(err = spake2p.ComputeL(mL, &len, serializedWS.Bytes() + kSpake2p_WS_Length, kSpake2p_WS_Length));
     VerifyOrExit(len == sizeof(mL), err = CHIP_ERROR_INTERNAL);
 
 exit:
@@ -600,15 +604,15 @@ CHIP_ERROR Spake2pVerifier::ComputeWS(uint32_t pbkdf2IterCount, const ByteSpan &
                                       uint32_t ws_len)
 {
     PBKDF2_sha256 pbkdf2;
-    uint8_t littleEndianSetupPINCode[sizeof(uint32_t)];
-    Encoding::LittleEndian::Put32(littleEndianSetupPINCode, setupPin);
+    SensitiveDataFixedBuffer<sizeof(uint32_t)> littleEndianSetupPINCode;
+    Encoding::LittleEndian::Put32(littleEndianSetupPINCode.Bytes(), setupPin);
 
     VerifyOrReturnError(salt.size() >= kSpake2p_Min_PBKDF_Salt_Length && salt.size() <= kSpake2p_Max_PBKDF_Salt_Length,
                         CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(pbkdf2IterCount >= kSpake2p_Min_PBKDF_Iterations && pbkdf2IterCount <= kSpake2p_Max_PBKDF_Iterations,
                         CHIP_ERROR_INVALID_ARGUMENT);
 
-    return pbkdf2.pbkdf2_sha256(littleEndianSetupPINCode, sizeof(littleEndianSetupPINCode), salt.data(), salt.size(),
+    return pbkdf2.pbkdf2_sha256(littleEndianSetupPINCode.Bytes(), littleEndianSetupPINCode.Capacity(), salt.data(), salt.size(),
                                 pbkdf2IterCount, ws_len, ws);
 }
 
@@ -922,6 +926,65 @@ CHIP_ERROR DeriveGroupOperationalCredentials(const ByteSpan & epoch_key, const B
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR GenerateVendorFabricBindingMessage(FabricBindingVersion fabricBindingVersion, const P256PublicKey & rootPublicKey,
+                                              FabricId fabricId, uint16_t vendorId, MutableByteSpan & outputSpan)
+{
+    // Only V1 supported yet.
+    switch (fabricBindingVersion)
+    {
+    case FabricBindingVersion::kVersion1:
+        break;
+    default:
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    Encoding::BigEndian::BufferWriter writer(outputSpan);
+
+    // vendor_fabric_binding_message := fabric_binding_version (1 byte) || root_public_key || fabric_id || vendor_id
+    writer.Put8(to_underlying(fabricBindingVersion))
+        .Put(rootPublicKey.ConstBytes(), rootPublicKey.Length())
+        .Put64(fabricId)
+        .Put16(vendorId);
+
+    size_t actuallyWritten = 0;
+    VerifyOrReturnError(writer.Fit(actuallyWritten), CHIP_ERROR_BUFFER_TOO_SMALL);
+
+    outputSpan.reduce_size(actuallyWritten);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR GenerateVendorIdVerificationToBeSigned(FabricIndex fabricIndex, const ByteSpan & clientChallenge,
+                                                  const ByteSpan & attestationChallenge,
+                                                  const ByteSpan & vendorFabricBindingMessage,
+                                                  const ByteSpan & vidVerificationStatement, MutableByteSpan & outputSpan)
+{
+    VerifyOrReturnError((clientChallenge.size() == kVendorIdVerificationClientChallengeSize) &&
+                            (attestationChallenge.size() == CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES) &&
+                            !vendorFabricBindingMessage.empty(),
+                        CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Extract binding version from vendorFabricBindingMessage. Only V1 supported yet.
+    uint8_t fabricBindingVersion = vendorFabricBindingMessage[0];
+    VerifyOrReturnError(fabricBindingVersion == to_underlying(FabricBindingVersion::kVersion1), CHIP_ERROR_INVALID_ARGUMENT);
+
+    Encoding::BigEndian::BufferWriter writer(outputSpan);
+
+    // vendor_id_verification_tbs := fabric_binding_version || client_challenge || attestation_challenge || fabric_index ||
+    // vendor_fabric_binding_message || <vid_verification_statement>
+    writer.Put8(fabricBindingVersion)
+        .Put(clientChallenge.data(), clientChallenge.size())
+        .Put(attestationChallenge.data(), attestationChallenge.size())
+        .Put8(fabricIndex)
+        .Put(vendorFabricBindingMessage.data(), vendorFabricBindingMessage.size())
+        .Put(vidVerificationStatement.data(), vidVerificationStatement.size());
+
+    size_t actuallyWritten = 0;
+    VerifyOrReturnError(writer.Fit(actuallyWritten), CHIP_ERROR_BUFFER_TOO_SMALL);
+
+    outputSpan.reduce_size(actuallyWritten);
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR ExtractVIDPIDFromAttributeString(DNAttrType attrType, const ByteSpan & attr,
                                             AttestationCertVidPid & vidpidFromMatterAttr, AttestationCertVidPid & vidpidFromCNAttr)
 {
@@ -1114,7 +1177,7 @@ CHIP_ERROR GenerateCertificateSigningRequest(const P256Keypair * keypair, Mutabl
          *        attributes    [0] Attributes{{ CRIAttributes }}
          *     }
          */
-        GenerateCertificationRequestInformation(writer, keypair->Pubkey());
+        ReturnErrorOnFailure(GenerateCertificationRequestInformation(writer, keypair->Pubkey()));
 
         // algorithm  AlgorithmIdentifier
         ASN1_START_SEQUENCE
@@ -1191,6 +1254,85 @@ CHIP_ERROR VerifyCertificateSigningRequestFormat(const uint8_t * csr, size_t csr
     VerifyOrReturnError(csr_length == (seq_length + header_overhead), CHIP_ERROR_UNSUPPORTED_CERT_FORMAT);
 
     return CHIP_NO_ERROR;
+}
+
+const char * PemEncoder::NextLine()
+{
+    bool hasLine = false;
+
+    switch (mState)
+    {
+    case State::kPrintHeader: {
+        // The `.48s` is to make sure the header is not wider than out internal string buffer. We clamp the header.
+        mStringBuilder.Reset().AddFormat("-----BEGIN %.48s-----", mEncodedElement);
+        mState  = mDerBytes.empty() ? State::kPrintFooter : State::kPrintBody;
+        hasLine = true;
+        break;
+    }
+    case State::kPrintBody: {
+        size_t remaining      = mDerBytes.size() - mProcessedBytes;
+        size_t chunkSizeBytes = std::min(remaining, kNumBytesPerLine);
+
+        {
+            char base64EncodedBuf[kLineBufferSize];
+            size_t encodedLen = static_cast<size_t>(
+                Base64Encode(mDerBytes.data() + mProcessedBytes, static_cast<uint16_t>(chunkSizeBytes), base64EncodedBuf));
+            VerifyOrDie(encodedLen < sizeof(base64EncodedBuf));
+            base64EncodedBuf[encodedLen] = '\0';
+            mStringBuilder.Reset().Add(base64EncodedBuf);
+        }
+
+        mProcessedBytes += chunkSizeBytes;
+        mState  = (mProcessedBytes < mDerBytes.size()) ? State::kPrintBody : State::kPrintFooter;
+        hasLine = true;
+        break;
+    }
+    case State::kPrintFooter: {
+        // The `.50s` is to make sure the header is not wider than out internal string buffer. We clamp the footer.
+        mStringBuilder.Reset().AddFormat("-----END %.50s-----", mEncodedElement);
+        mState  = State::kDone;
+        hasLine = true;
+        break;
+    }
+    case State::kDone:
+        [[fallthrough]];
+    default: {
+        // Default initialized StringBuilder: empty output.
+        mState  = State::kDone;
+        hasLine = false;
+        break;
+    }
+    }
+
+    // All the string should have fit based on the logic. It would be a public
+    // API invariant failure if this ever fails.
+    VerifyOrDie(mStringBuilder.Fit());
+
+    return hasLine ? mStringBuilder.c_str() : nullptr;
+}
+
+CHIP_ERROR P256Keypair::HazardousOperationLoadKeypairFromRaw(ByteSpan private_key, ByteSpan public_key)
+{
+    Crypto::P256SerializedKeypair serialized_keypair;
+    ReturnErrorOnFailure(serialized_keypair.SetLength(private_key.size() + public_key.size()));
+    memcpy(serialized_keypair.Bytes(), public_key.data(), public_key.size());
+    memcpy(serialized_keypair.Bytes() + public_key.size(), private_key.data(), private_key.size());
+    return this->Deserialize(serialized_keypair);
+}
+
+__attribute__((weak)) CHIP_ERROR P256Keypair::InitializeFromBitsOrReject(FixedByteSpan<kP256_PrivateKey_Length> privateKeyBits)
+{
+    IgnoreUnusedVariable(privateKeyBits);
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+__attribute__((weak)) CHIP_ERROR P256Keypair::ECDSA_sign_msg_det(const uint8_t * msg, size_t msg_length,
+                                                                 P256ECDSASignature & out_signature) const
+{
+    IgnoreUnusedVariable(msg);
+    IgnoreUnusedVariable(msg_length);
+    IgnoreUnusedVariable(out_signature);
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
 } // namespace Crypto

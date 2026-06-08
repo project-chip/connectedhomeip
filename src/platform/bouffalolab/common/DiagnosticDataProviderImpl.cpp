@@ -23,15 +23,60 @@
 #include <platform/bouffalolab/common/DiagnosticDataProviderImpl.h>
 
 #include <FreeRTOS.h>
+#if CHIP_DEVICE_LAYER_TARGET_BL616
+#include <mm.h>
+#endif
 
 namespace chip {
 namespace DeviceLayer {
 
+extern "C" struct netif * deviceInterface_getNetif(void);
+
+#if CHIP_DEVICE_LAYER_TARGET_BL616
+void get_usage_info(uint64_t & used_size, uint64_t & free_size)
+{
+    uintptr_t irq_flags     = mm_lock_save();
+    mem_manager_t * manager = &g_mem_manager;
+    mm_heap_t * heap;
+    const mm_allocator_t * allocator;
+    struct mm_usage_info usage;
+    int heap_id = 0;
+
+    used_size = free_size = 0;
+    for (heap_id = 0; heap_id < CONFIG_MM_HEAP_COUNT; heap_id++)
+    {
+        if (!manager->initialized)
+        {
+            break;
+        }
+
+        heap = manager->heaps[heap_id];
+        if (!heap || !heap->is_active)
+        {
+            continue;
+        }
+
+        allocator = manager->allocators[heap->allocator_id];
+        if (!allocator || !allocator->get_usage_info)
+        {
+            continue;
+        }
+
+        allocator->get_usage_info(heap, &usage);
+
+        used_size += usage.used_size;
+        free_size += usage.free_size;
+    }
+
+    mm_unlock_restore(irq_flags);
+}
+
+#else
 extern "C" size_t get_heap_size(void);
 #ifdef CFG_USE_PSRAM
 extern "C" size_t get_heap3_size(void);
 #endif
-extern "C" struct netif * deviceInterface_getNetif(void);
+#endif
 
 DiagnosticDataProviderImpl & DiagnosticDataProviderImpl::GetDefaultInstance()
 {
@@ -41,22 +86,31 @@ DiagnosticDataProviderImpl & DiagnosticDataProviderImpl::GetDefaultInstance()
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapFree(uint64_t & currentHeapFree)
 {
-#ifdef CFG_USE_PSRAM
-    size_t freeHeapSize = xPortGetFreeHeapSize() + xPortGetFreeHeapSizePsram();
+#if CHIP_DEVICE_LAYER_TARGET_BL616
+    uint64_t used_size;
+    get_usage_info(used_size, currentHeapFree);
 #else
-    size_t freeHeapSize      = xPortGetFreeHeapSize();
+#ifdef CFG_USE_PSRAM
+    currentHeapFree = xPortGetFreeHeapSize() + xPortGetFreeHeapSizePsram();
+#else
+    currentHeapFree          = xPortGetFreeHeapSize();
+#endif
 #endif
 
-    currentHeapFree = static_cast<uint64_t>(freeHeapSize);
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapUsed(uint64_t & currentHeapUsed)
 {
+#if CHIP_DEVICE_LAYER_TARGET_BL616
+    uint64_t free_size;
+    get_usage_info(currentHeapUsed, free_size);
+#else
 #ifdef CFG_USE_PSRAM
     currentHeapUsed = (get_heap_size() + get_heap3_size() - xPortGetFreeHeapSize() - xPortGetFreeHeapSizePsram());
 #else
     currentHeapUsed          = (get_heap_size() - xPortGetFreeHeapSize());
+#endif
 #endif
 
     return CHIP_NO_ERROR;
@@ -64,14 +118,17 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapUsed(uint64_t & currentHeap
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapHighWatermark(uint64_t & currentHeapHighWatermark)
 {
+#if CHIP_DEVICE_LAYER_TARGET_BL616
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+#else
 #ifdef CFG_USE_PSRAM
     currentHeapHighWatermark =
         get_heap_size() + get_heap3_size() - xPortGetMinimumEverFreeHeapSize() - xPortGetMinimumEverFreeHeapSizePsram();
 #else
     currentHeapHighWatermark = get_heap_size() - xPortGetMinimumEverFreeHeapSize();
 #endif
-
     return CHIP_NO_ERROR;
+#endif
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetThreadMetrics(ThreadMetrics ** threadMetricsOut)
@@ -211,7 +268,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetActiveNetworkFaults(GeneralFaults<kMax
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** netifpp)
 {
-    NetworkInterface * ifp = new NetworkInterface();
+    auto ifp = std::make_unique<NetworkInterface>();
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     const char * threadNetworkName = otThreadGetNetworkName(ThreadStackMgrImpl().OTInstance());
@@ -220,12 +277,16 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
     ifp->offPremiseServicesReachableIPv4.SetNull();
     ifp->offPremiseServicesReachableIPv6.SetNull();
     ifp->type = app::Clusters::GeneralDiagnostics::InterfaceTypeEnum::kThread;
-    uint8_t macBuffer[ConfigurationManager::kPrimaryMACAddressLength];
-    ConfigurationMgr().GetPrimary802154MACAddress(macBuffer);
-    ifp->hardwareAddress = ByteSpan(macBuffer, ConfigurationManager::kPrimaryMACAddressLength);
+    TEMPORARY_RETURN_IGNORED ConfigurationMgr().GetPrimary802154MACAddress(ifp->MacAddress);
+    ifp->hardwareAddress = ByteSpan(ifp->MacAddress, sizeof(ifp->MacAddress));
 #else
 
     struct netif * netif = deviceInterface_getNetif();
+    if (netif == nullptr)
+    {
+        *netifpp = nullptr;
+        return CHIP_ERROR_NOT_FOUND;
+    }
 
     Platform::CopyString(ifp->Name, netif->name);
     ifp->name          = CharSpan::fromCharString(ifp->Name);
@@ -233,31 +294,47 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     ifp->type          = app::Clusters::GeneralDiagnostics::InterfaceTypeEnum::kWiFi;
 #else
-    ifp->type = app::Clusters::GeneralDiagnostics::InterfaceTypeEnum::kEthernet;
+    ifp->type                = app::Clusters::GeneralDiagnostics::InterfaceTypeEnum::kEthernet;
 #endif
     ifp->offPremiseServicesReachableIPv4.SetNull();
     ifp->offPremiseServicesReachableIPv6.SetNull();
-
     memcpy(ifp->MacAddress, netif->hwaddr, sizeof(netif->hwaddr));
     ifp->hardwareAddress = ByteSpan(ifp->MacAddress, sizeof(netif->hwaddr));
-
-    memcpy(ifp->Ipv4AddressesBuffer[0], netif_ip_addr4(netif), kMaxIPv4AddrSize);
-    ifp->Ipv4AddressSpans[0] = ByteSpan(ifp->Ipv4AddressesBuffer[0], kMaxIPv4AddrSize);
-    ifp->IPv4Addresses       = chip::app::DataModel::List<chip::ByteSpan>(ifp->Ipv4AddressSpans, 1);
-
-    int addr_count = 0;
-    for (size_t i = 0; (i < LWIP_IPV6_NUM_ADDRESSES) && (i < kMaxIPv6AddrCount); i++)
-    {
-        if (!ip6_addr_isany(&(netif->ip6_addr[i].u_addr.ip6)))
-        {
-            memcpy(ifp->Ipv6AddressesBuffer[addr_count], &(netif->ip6_addr[i].u_addr.ip6), sizeof(ip6_addr_t));
-            ifp->Ipv6AddressSpans[addr_count] = ByteSpan(ifp->Ipv6AddressesBuffer[addr_count], kMaxIPv6AddrSize);
-        }
-    }
-    ifp->IPv6Addresses = chip::app::DataModel::List<chip::ByteSpan>(ifp->Ipv6AddressSpans, addr_count);
 #endif
 
-    *netifpp = ifp;
+    // IPv6-only support
+    Inet::InterfaceAddressIterator interfAddrIterator;
+    uint32_t ipv6AddressesCount = 0, ipv4AddressesCount = 0;
+    chip::Inet::IPAddress ipAddress;
+    while (interfAddrIterator.HasCurrent())
+    {
+        if (interfAddrIterator.GetAddress(ipAddress) == CHIP_NO_ERROR)
+        {
+            if (ipAddress.IsIPv4())
+            {
+                if (ipv4AddressesCount < kMaxIPv4AddrCount)
+                {
+                    memcpy(ifp->Ipv4AddressesBuffer[ipv4AddressesCount], ipAddress.Addr, kMaxIPv4AddrSize);
+                    ifp->Ipv4AddressSpans[ipv4AddressesCount] = ByteSpan(ifp->Ipv4AddressesBuffer[ipv4AddressesCount]);
+                    ipv4AddressesCount++;
+                }
+            }
+            else
+            {
+                if (ipv6AddressesCount < kMaxIPv6AddrCount)
+                {
+                    memcpy(ifp->Ipv6AddressesBuffer[ipv6AddressesCount], ipAddress.Addr, kMaxIPv6AddrSize);
+                    ifp->Ipv6AddressSpans[ipv6AddressesCount] = ByteSpan(ifp->Ipv6AddressesBuffer[ipv6AddressesCount]);
+                    ipv6AddressesCount++;
+                }
+            }
+        }
+        interfAddrIterator.Next();
+    }
+    ifp->IPv4Addresses = chip::app::DataModel::List<chip::ByteSpan>(ifp->Ipv4AddressSpans, ipv4AddressesCount);
+    ifp->IPv6Addresses = chip::app::DataModel::List<chip::ByteSpan>(ifp->Ipv6AddressSpans, ipv6AddressesCount);
+
+    *netifpp = ifp.release();
 
     return CHIP_NO_ERROR;
 }

@@ -23,7 +23,6 @@
 
 #pragma once
 
-#include <platform/AttributeList.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/CHIPDeviceEvent.h>
 #include <system/PlatformEventSupport.h>
@@ -47,6 +46,7 @@ class TraitManager;
 class ThreadStackManagerImpl;
 
 namespace Internal {
+class NFCCommissioningManagerImpl;
 class BLEManagerImpl;
 template <class>
 class GenericConfigurationManagerImpl;
@@ -259,6 +259,7 @@ private:
     friend class FailSafeContext;
     friend class TraitManager;
     friend class ThreadStackManagerImpl;
+    friend class Internal::NFCCommissioningManagerImpl;
     friend class Internal::BLEManagerImpl;
     template <class>
     friend class Internal::GenericPlatformManagerImpl;

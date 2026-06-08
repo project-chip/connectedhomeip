@@ -22,7 +22,7 @@ import shutil
 import sys
 import tarfile
 import textwrap
-from typing import Any, Dict
+from typing import Any
 
 import constants
 import stateful_shell
@@ -40,6 +40,12 @@ _DEVICE_LIST = [file[:-4]
                 for file in os.listdir(_DEVICE_FOLDER) if file.endswith(".zap") and file != 'template.zap']
 _CICD_CONFIG_FILE_NAME = os.path.join(_CHEF_SCRIPT_PATH, "cicd_config.json")
 _CD_STAGING_DIR = os.path.join(_CHEF_SCRIPT_PATH, "staging")
+_EXCLUDE_DEVICE_FROM_LINUX_CI = [
+    "noip_rootnode_dimmablelight_bCwGYSDpoe",  # Broken.
+    "rootnode_genericswitch_2dfff6e516",  # not actively developed,
+]
+# Pattern to filter (based on device-name) devices that need ICD support.
+_ICD_DEVICE_PATTERN = "^icd_"
 
 gen_dir = ""  # Filled in after sample app type is read from args.
 
@@ -59,22 +65,20 @@ def splash() -> None:
 
 
 def load_config() -> None:
-    config = dict()
-    config["nrfconnect"] = dict()
-    config["esp32"] = dict()
-    config["silabs-thread"] = dict()
-    config["ameba"] = dict()
-    config["telink"] = dict()
+    config = {}
+    config["nrfconnect"] = {}
+    config["esp32"] = {}
+    config["silabs-thread"] = {}
+    config["ameba"] = {}
+    config["telink"] = {}
     configFile = f"{_CHEF_SCRIPT_PATH}/config.yaml"
     if (os.path.exists(configFile)):
-        configStream = open(configFile, 'r')
-        config = yaml.load(configStream, Loader=yaml.SafeLoader)
-        configStream.close()
+        with open(configFile) as f:
+            config = yaml.load(f, Loader=yaml.SafeLoader)
     else:
         flush_print("Running for the first time and configuring config.yaml. " +
                     "Change this configuration file to include correct configuration " +
                     "for the vendor's SDK")
-        configStream = open(configFile, 'w')
         config["nrfconnect"]["ZEPHYR_BASE"] = os.environ.get('ZEPHYR_BASE')
         config["nrfconnect"]["ZEPHYR_SDK_INSTALL_DIR"] = os.environ.get(
             'ZEPHYR_SDK_INSTALL_DIR')
@@ -94,24 +98,16 @@ def load_config() -> None:
             'TELINK_ZEPHYR_SDK_DIR')
         config["telink"]["TTY"] = None
 
-        flush_print(yaml.dump(config))
-        yaml.dump(config, configStream)
-        configStream.close()
+        with open(configFile, 'w') as f:
+            flush_print(yaml.dump(config))
+            yaml.dump(config, f)
 
     return config
 
 
-def check_python_version() -> None:
-    if sys.version_info[0] < 3:
-        flush_print('Must use Python 3. Current version is ' +
-                    str(sys.version_info[0]))
-        exit(1)
-
-
-def load_cicd_config() -> Dict[str, Any]:
+def load_cicd_config() -> dict[str, Any]:
     with open(_CICD_CONFIG_FILE_NAME) as config_file:
-        config = json.loads(config_file.read())
-    return config
+        return json.loads(config_file.read())
 
 
 def flush_print(
@@ -272,7 +268,6 @@ def bundle_telink(device_name: str) -> None:
 
 def main() -> int:
 
-    check_python_version()
     config = load_config()
     cicd_config = load_cicd_config()
 
@@ -324,6 +319,8 @@ def main() -> int:
                       action="store_true", dest="do_erase")
     parser.add_option("-i", "--terminal", help="opens terminal to interact with with device",
                       action="store_true", dest="do_interact")
+    parser.add_option("-I", "--enable_lit_icd", help="enable LIT ICD (Long Idle Time Intermittently Connected Device) mode",
+                      action="store_true", default=False)
     parser.add_option("-m", "--menuconfig", help="runs menuconfig on platforms that support it",
                       action="store_true", dest="do_menuconfig")
     parser.add_option("-z", "--zap", help="runs zap to generate data model & interaction model artifacts",
@@ -375,6 +372,10 @@ def main() -> int:
                       help=("For use with --build_all. Build labels to include. "
                             "Accepts a regex pattern. Mutually exclusive with --build_exclude."),
                       dest="build_include")
+    parser.add_option("", "--build_bundle",
+                      help=(
+                          "Build platform bundle after build successed when building single device."),
+                      action="store_true", dest="build_bundle")
     parser.add_option("-k", "--keep_going",
                       help="For use in CD only. Continues building all sample apps in the event of an error.",
                       dest="keep_going", action="store_true")
@@ -382,11 +383,22 @@ def main() -> int:
                       help=("Builds Chef examples defined in cicd_config. "
                             "Uses specified target from -t. Chef exits after completion."),
                       dest="ci", action="store_true")
-    parser.add_option(
-        "", "--enable_ipv4", help="Enable IPv4 mDNS. Only applicable to platforms that can support IPV4 (e.g, Linux, ESP32)",
-        action="store_true", default=False)
-    parser.add_option(
-        "", "--cpu_type", help="CPU type to compile for. Linux only.", choices=["arm64", "arm", "x64"])
+    parser.add_option("", "--ci_linux",
+                      help=("Builds Chef Examples defined in cicd_config under ci_allow_list_linux. "
+                            "Devices are built without -c for faster compilation."),
+                      dest="ci_linux", action="store_true")
+    parser.add_option("", "--cpu_type",
+                      help="CPU type to compile for. Linux only.",
+                      choices=["arm64", "arm", "x64"])
+    parser.add_option("", "--enable_ipv4",
+                      help="Enable IPv4 mDNS. Only applicable to platforms that can support IPV4 (e.g, Linux, ESP32)",
+                      action="store_true", default=False)
+    parser.add_option("", "--icd_persist_subscription",
+                      help="Enable ICD persistent subscription and re-establish subscriptions from the server side after reboot",
+                      action="store_true", default=False)
+    parser.add_option("", "--icd_subscription_resumption",
+                      help="Enable subscription resumption after timeout",
+                      action="store_true", default=False)
 
     options, _ = parser.parse_args(sys.argv[1:])
 
@@ -410,6 +422,21 @@ def main() -> int:
         exit(0)
 
     #
+    # CI Linux
+    #
+
+    if options.ci_linux:
+        for device_name in _DEVICE_LIST:
+            if device_name in _EXCLUDE_DEVICE_FROM_LINUX_CI:
+                continue
+            shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}")
+            command = f"./chef.py -br -d {device_name} -t linux"
+            flush_print(f"Building {command}", with_border=True)
+            shell.run_cmd(command)
+            bundle("linux", device_name)
+        exit(0)
+
+    #
     # CD
     #
 
@@ -428,12 +455,12 @@ def main() -> int:
                     archive_name = f"{label}-{device_name}"
                     if options.build_exclude and re.search(options.build_exclude, archive_name):
                         continue
-                    elif options.build_include and not re.search(options.build_include, archive_name):
+                    if options.build_include and not re.search(options.build_include, archive_name):
                         continue
                     if options.dry_run:
                         flush_print(archive_name)
                         continue
-                    command = f"./chef.py -cbr -d {device_name} -t {platform} "
+                    command = f"./chef.py -br -d {device_name} -t {platform} "
                     command += " ".join(args)
                     flush_print(f"Building {command}", with_border=True)
                     shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}")
@@ -504,7 +531,7 @@ def main() -> int:
         shell.run_cmd(
             f"export ZEPHYR_BASE={config['nrfconnect']['ZEPHYR_BASE']}")
         shell.run_cmd(
-            f'source {config["nrfconnect"]["ZEPHYR_BASE"]}/zephyr-env.sh')
+            f'source {config["nrfconnect"]["ZEPHYR_BASE"]}/../.zephyrrc')
         # QUIRK:
         # When the Zephyr SDK is installed as a part of the NCS toolchain, the build system will use
         # build tools from the NCS toolchain, but it will not update the PATH and LD_LIBRARY_PATH
@@ -740,6 +767,28 @@ def main() -> int:
             nrf_build_cmds.append(
                 f"-DCONFIG_CHEF_DEVICE_TYPE='\"{options.sample_device_type_name}\"'")
             nrf_build_cmds.append(
+                "-DCONFIG_OPENTHREAD_NORDIC_LIBRARY_MTD=y")
+            if options.enable_lit_icd or re.search(_ICD_DEVICE_PATTERN, options.sample_device_type_name):
+                nrf_build_cmds.append(
+                    "-DCONFIG_CHIP_ENABLE_ICD_SUPPORT=y")
+                nrf_build_cmds.append(
+                    "-DCONFIG_CHIP_ENABLE_READ_CLIENT=y")
+                nrf_build_cmds.append(
+                    "-DCONFIG_CHIP_ICD_LIT_SUPPORT=y")
+                nrf_build_cmds.append(
+                    "-DCONFIG_CHIP_ICD_CHECK_IN_SUPPORT=y")
+                nrf_build_cmds.append(
+                    "-DCONFIG_CHIP_ICD_UAT_SUPPORT=y")
+                nrf_build_cmds.append(
+                    "-DCONFIG_CHIP_ICD_DSLS_SUPPORT=y")
+                nrf_build_cmds.append(
+                    "-DCONFIG_CHIP_ICD_REPORT_ON_ACTIVE_MODE=y")
+                nrf_build_cmds.append(
+                    "-DCONFIG_CHIP_ICD_SIT_SLOW_POLL_LIMIT=5000")
+            else:
+                nrf_build_cmds.append(
+                    "-DCONFIG_CHIP_ENABLE_ICD_SUPPORT=n")
+            nrf_build_cmds.append(
                 f"-DCONFIG_CHIP_DEVICE_SOFTWARE_VERSION_STRING='\"{sw_ver_string}\"'")
 
             shell.run_cmd(" ".join(nrf_build_cmds))
@@ -791,7 +840,7 @@ def main() -> int:
                         CHEF_FLAGS += -DCONFIG_DEVICE_PRODUCT_ID={options.pid}
                         CHEF_FLAGS += -DCHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING=\"{options.pid}\"
                         """
-                                            ))
+                    ))
                 if options.do_clean:
                     shell.run_cmd("make clean")
                 shell.run_cmd("make chef")
@@ -816,7 +865,7 @@ def main() -> int:
                 'import("${chip_root}/config/standalone/args.gni")',
                 'chip_shell_cmd_server = false',
                 'chip_build_libshell = true',
-                'chip_enable_openthread = false',
+                'chip_enable_thread = false',
                 'chip_generate_link_map_file = true',
                 'chip_config_network_layer_ble = false',
                 'chip_device_project_config_include = "<CHIPProjectAppConfig.h>"',
@@ -828,6 +877,7 @@ def main() -> int:
                  f'"CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID={options.pid}", '
                  f'"CONFIG_ENABLE_PW_RPC={int(options.do_rpc)}", '
                  f'"CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_NAME=\\"{str(options.pname)}\\""]'),
+                'chip_app_data_model_target = "//:chef-data-model"',
             ])
 
             uname_resp = shell.run_cmd("uname -m", return_cmd_output=True)
@@ -871,6 +921,18 @@ def main() -> int:
             else:
                 linux_args.append("chip_inet_config_enable_ipv4=false")
 
+            if options.enable_lit_icd or re.search(_ICD_DEVICE_PATTERN, options.sample_device_type_name):
+                linux_args.append("chip_enable_icd_server = true")
+                linux_args.append("chip_icd_report_on_active_mode = true")
+                linux_args.append("chip_enable_icd_lit = true")
+                linux_args.append("chip_enable_icd_dsls = true")
+                if options.icd_subscription_resumption:
+                    options.icd_persist_subscription = True
+                    linux_args.append(
+                        "chip_subscription_timeout_resumption = true")
+                if options.icd_persist_subscription:
+                    linux_args.append("chip_persist_subscriptions = true")
+
             if sw_ver_string:
                 linux_args.append(
                     f'chip_device_config_device_software_version_string = "{sw_ver_string}"')
@@ -884,12 +946,19 @@ def main() -> int:
                         """))
             if options.do_clean:
                 shell.run_cmd("rm -rf out")
-            shell.run_cmd("gn gen --export-compile-commands out")
+            shell.run_cmd("gn gen --add-export-compile-commands=\"*\" out")
             shell.run_cmd("ninja -C out")
 
     #
     # Compilation DB TODO
     #
+
+    #
+    # Build bundle
+    #
+
+    if options.build_bundle:
+        bundle(options.build_target, options.sample_device_type_name)
 
     #
     # Flash

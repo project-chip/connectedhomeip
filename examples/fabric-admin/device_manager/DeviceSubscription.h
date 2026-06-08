@@ -20,13 +20,14 @@
 #include <app/ReadClient.h>
 #include <controller/CHIPDeviceController.h>
 #include <lib/core/DataModelTypes.h>
-
 #include <memory>
 
 #if defined(PW_RPC_ENABLED)
 #include "fabric_bridge_service/fabric_bridge_service.pb.h"
 #include "fabric_bridge_service/fabric_bridge_service.rpc.pb.h"
 #endif
+
+namespace admin {
 
 class DeviceSubscriptionManager;
 
@@ -95,3 +96,5 @@ private:
     bool mChangeDetected = false;
     State mState         = State::Idle;
 };
+
+} // namespace admin

@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#include "matter_shell.h"
+#include "MatterShell.h"
 #include "streamer.h"
 #include <lib/shell/Engine.h>
 #include <lib/support/CHIPMem.h>
@@ -218,12 +218,12 @@ void Engine::RunMainLoop()
 {
     streamer_printf(streamer_get(), kShellPrompt);
 
-    while (true)
+    while (mRunning)
     {
         char * line = static_cast<char *>(Platform::MemoryAlloc(CHIP_SHELL_MAX_LINE_SIZE));
         ReadLine(line, CHIP_SHELL_MAX_LINE_SIZE);
 #if CONFIG_DEVICE_LAYER
-        DeviceLayer::PlatformMgr().ScheduleWork(ProcessShellLine, reinterpret_cast<intptr_t>(line));
+        TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(ProcessShellLine, reinterpret_cast<intptr_t>(line));
 #else
         ProcessShellLine(reinterpret_cast<intptr_t>(line));
 #endif

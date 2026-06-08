@@ -15,14 +15,8 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
-/**
- *    @file
- *      This file defines read handler for a CHIP Interaction Data model
- *
- */
-
 #include <app/AppConfig.h>
+#include <app/AttributePathExpandIterator.h>
 #include <app/InteractionModelEngine.h>
 #include <app/MessageDef/EventPathIB.h>
 #include <app/MessageDef/StatusResponseMessage.h>
@@ -31,6 +25,7 @@
 #include <app/data-model-provider/Provider.h>
 #include <app/icd/server/ICDServerConfig.h>
 #include <lib/core/TLVUtilities.h>
+#include <lib/support/CodeUtils.h>
 #include <messaging/ExchangeContext.h>
 
 #include <app/ReadHandler.h>
@@ -47,16 +42,19 @@ using Status = Protocols::InteractionModel::Status;
 uint16_t ReadHandler::GetPublisherSelectedIntervalLimit()
 {
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-    return std::chrono::duration_cast<System::Clock::Seconds16>(ICDConfigurationData::GetInstance().GetIdleModeDuration()).count();
+    // We don't need to check for precision loss since the max value of the IdleModeDuration can fit inside a uint16_t
+    const auto idleModeDuration =
+        std::chrono::duration_cast<System::Clock::Seconds16>(ICDConfigurationData::GetInstance().GetIdleModeDuration()).count();
+    return std::max(idleModeDuration, kSubscriptionMaxIntervalPublisherLimit);
 #else
     return kSubscriptionMaxIntervalPublisherLimit;
 #endif
 }
 
 ReadHandler::ReadHandler(ManagementCallback & apCallback, Messaging::ExchangeContext * apExchangeContext,
-                         InteractionType aInteractionType, Observer * observer, DataModel::Provider * apDataModel) :
-    mAttributePathExpandIterator(apDataModel, nullptr),
-    mExchangeCtx(*this), mManagementCallback(apCallback)
+                         InteractionType aInteractionType, Observer * observer) :
+    mExchangeCtx(*this),
+    mManagementCallback(apCallback)
 {
     VerifyOrDie(apExchangeContext != nullptr);
 
@@ -80,8 +78,8 @@ ReadHandler::ReadHandler(ManagementCallback & apCallback, Messaging::ExchangeCon
 }
 
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
-ReadHandler::ReadHandler(ManagementCallback & apCallback, Observer * observer, DataModel::Provider * apDataModel) :
-    mAttributePathExpandIterator(apDataModel, nullptr), mExchangeCtx(*this), mManagementCallback(apCallback)
+ReadHandler::ReadHandler(ManagementCallback & apCallback, Observer * observer) :
+    mExchangeCtx(*this), mManagementCallback(apCallback)
 {
     mInteractionType = InteractionType::Subscribe;
     mFlags.ClearAll();
@@ -138,7 +136,8 @@ void ReadHandler::OnSubscriptionResumed(const SessionHandle & sessionHandle,
     SingleLinkedListNode<AttributePathParams> * attributePath = mpAttributePathList;
     while (attributePath)
     {
-        mManagementCallback.GetInteractionModelEngine()->GetReportingEngine().SetDirty(attributePath->mValue);
+        TEMPORARY_RETURN_IGNORED mManagementCallback.GetInteractionModelEngine()->GetReportingEngine().SetDirty(
+            attributePath->mValue);
         attributePath = attributePath->mpNext;
     }
 }
@@ -152,6 +151,7 @@ ReadHandler::~ReadHandler()
     auto * appCallback = mManagementCallback.GetAppCallback();
     if (mFlags.Has(ReadHandlerFlags::ActiveSubscription) && appCallback)
     {
+        mFlags.Clear(ReadHandlerFlags::ActiveSubscription);
         appCallback->OnSubscriptionTerminated(*this);
     }
 
@@ -172,7 +172,8 @@ void ReadHandler::Close(CloseOptions options)
         auto * subscriptionResumptionStorage = mManagementCallback.GetInteractionModelEngine()->GetSubscriptionResumptionStorage();
         if (subscriptionResumptionStorage)
         {
-            subscriptionResumptionStorage->Delete(GetInitiatorNodeId(), GetAccessingFabricIndex(), mSubscriptionId);
+            TEMPORARY_RETURN_IGNORED subscriptionResumptionStorage->Delete(GetInitiatorNodeId(), GetAccessingFabricIndex(),
+                                                                           mSubscriptionId);
         }
     }
 #endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
@@ -211,7 +212,7 @@ void ReadHandler::OnInitialRequest(System::PacketBufferHandle && aPayload)
         {
             status = StatusIB(err).mStatus;
         }
-        StatusResponse::Send(status, mExchangeCtx.Get(), /* aExpectResponse = */ false);
+        TEMPORARY_RETURN_IGNORED StatusResponse::Send(status, mExchangeCtx.Get(), /* aExpectResponse = */ false);
         // At this point we can't have a persisted subscription, since that
         // happens only when ProcessSubscribeRequest returns success. And our
         // subscription id is almost certainly not actually useful at this
@@ -250,7 +251,6 @@ CHIP_ERROR ReadHandler::OnStatusResponse(Messaging::ExchangeContext * apExchange
                 err = SendSubscribeResponse();
 
                 SetStateFlag(ReadHandlerFlags::ActiveSubscription);
-
                 auto * appCallback = mManagementCallback.GetAppCallback();
                 if (appCallback)
                 {
@@ -282,15 +282,21 @@ exit:
     return err;
 }
 
-CHIP_ERROR ReadHandler::SendStatusReport(Protocols::InteractionModel::Status aStatus)
+CHIP_ERROR ReadHandler::AcquireExchangeForSend()
 {
-    VerifyOrReturnLogError(mState == HandlerState::CanStartReporting, CHIP_ERROR_INCORRECT_STATE);
     if (IsPriming() || IsChunkedReport())
     {
+        // We already hold mExchangeCtx from the inbound request. The underlying
+        // session can be released while a send is pending (e.g. TCP teardown);
+        // guard before grabbing it to avoid crashing in UseSuggestedResponseTimeout.
+        VerifyOrReturnLogError(mExchangeCtx->HasSessionHandle(), CHIP_ERROR_MISSING_SECURE_SESSION);
         mSessionHandle.Grab(mExchangeCtx->GetSessionHandle());
     }
     else
     {
+        // For subscription re-reports, the previous exchange was released after
+        // the last send. mExchangeCtx must be null here; open a fresh exchange
+        // from the stored session handle.
         VerifyOrReturnLogError(!mExchangeCtx, CHIP_ERROR_INCORRECT_STATE);
         VerifyOrReturnLogError(mSessionHandle, CHIP_ERROR_INCORRECT_STATE);
 #if CHIP_CONFIG_UNSAFE_SUBSCRIPTION_EXCHANGE_MANAGER_USE
@@ -302,8 +308,13 @@ CHIP_ERROR ReadHandler::SendStatusReport(Protocols::InteractionModel::Status aSt
         VerifyOrReturnLogError(exchange != nullptr, CHIP_ERROR_INCORRECT_STATE);
         mExchangeCtx.Grab(exchange);
     }
+    return CHIP_NO_ERROR;
+}
 
-    VerifyOrReturnLogError(mExchangeCtx, CHIP_ERROR_INCORRECT_STATE);
+CHIP_ERROR ReadHandler::SendStatusReport(Protocols::InteractionModel::Status aStatus)
+{
+    VerifyOrReturnLogError(mState == HandlerState::CanStartReporting, CHIP_ERROR_INCORRECT_STATE);
+    ReturnErrorOnFailure(AcquireExchangeForSend());
     return StatusResponse::Send(aStatus, mExchangeCtx.Get(), /* aExpectResponse = */ false);
 }
 
@@ -311,25 +322,7 @@ CHIP_ERROR ReadHandler::SendReportData(System::PacketBufferHandle && aPayload, b
 {
     VerifyOrReturnLogError(mState == HandlerState::CanStartReporting, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrDie(!IsAwaitingReportResponse()); // Should not be reportable!
-    if (IsPriming() || IsChunkedReport())
-    {
-        mSessionHandle.Grab(mExchangeCtx->GetSessionHandle());
-    }
-    else
-    {
-        VerifyOrReturnLogError(!mExchangeCtx, CHIP_ERROR_INCORRECT_STATE);
-        VerifyOrReturnLogError(mSessionHandle, CHIP_ERROR_INCORRECT_STATE);
-#if CHIP_CONFIG_UNSAFE_SUBSCRIPTION_EXCHANGE_MANAGER_USE
-        auto exchange = mExchangeMgr->NewContext(mSessionHandle.Get().Value(), this);
-#else  // CHIP_CONFIG_UNSAFE_SUBSCRIPTION_EXCHANGE_MANAGER_USE
-        auto exchange =
-            mManagementCallback.GetInteractionModelEngine()->GetExchangeManager()->NewContext(mSessionHandle.Get().Value(), this);
-#endif // CHIP_CONFIG_UNSAFE_SUBSCRIPTION_EXCHANGE_MANAGER_USE
-        VerifyOrReturnLogError(exchange != nullptr, CHIP_ERROR_INCORRECT_STATE);
-        mExchangeCtx.Grab(exchange);
-    }
-
-    VerifyOrReturnLogError(mExchangeCtx, CHIP_ERROR_INCORRECT_STATE);
+    ReturnErrorOnFailure(AcquireExchangeForSend());
 
     if (!IsReporting())
     {
@@ -339,7 +332,7 @@ CHIP_ERROR ReadHandler::SendReportData(System::PacketBufferHandle && aPayload, b
     SetStateFlag(ReadHandlerFlags::ChunkedReport, aMoreChunks);
     bool responseExpected = IsType(InteractionType::Subscribe) || aMoreChunks;
 
-    mExchangeCtx->UseSuggestedResponseTimeout(app::kExpectedIMProcessingTime);
+    ReturnErrorOnFailure(mExchangeCtx->UseSuggestedResponseTimeout(app::kExpectedIMProcessingTime));
     CHIP_ERROR err = mExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::ReportData, std::move(aPayload),
                                                responseExpected ? Messaging::SendMessageFlags::kExpectResponse
                                                                 : Messaging::SendMessageFlags::kNone);
@@ -390,7 +383,7 @@ CHIP_ERROR ReadHandler::OnMessageReceived(Messaging::ExchangeContext * apExchang
 
     if (sendStatusResponse)
     {
-        StatusResponse::Send(Status::InvalidAction, apExchangeContext, false /*aExpectResponse*/);
+        TEMPORARY_RETURN_IGNORED StatusResponse::Send(Status::InvalidAction, apExchangeContext, false /*aExpectResponse*/);
     }
 
     if (err != CHIP_NO_ERROR)
@@ -411,6 +404,31 @@ void ReadHandler::OnResponseTimeout(Messaging::ExchangeContext * apExchangeConte
 {
     ChipLogError(DataManagement, "Time out! failed to receive status response from Exchange: " ChipLogFormatExchange,
                  ChipLogValueExchange(apExchangeContext));
+#if CHIP_CONFIG_ENABLE_ICD_SERVER && CHIP_CONFIG_ENABLE_ICD_CIP && CHIP_CONFIG_ENABLE_ICD_CHECK_IN_ON_REPORT_TIMEOUT
+    switch (mState)
+    {
+    case HandlerState::AwaitingReportResponse:
+        if (IsType(InteractionType::Subscribe) && !IsPriming())
+        {
+            // Trigger check-in message when a non-priming subscription report times out.
+            ChipLogError(DataManagement, "Trigger check-in message when non-priming subscription report times out");
+            if (mSessionHandle)
+            {
+                ICDNotifier::GetInstance().NotifySendCheckIn(MakeOptional(GetSubjectDescriptor()));
+            }
+            else
+            {
+                ChipLogError(DataManagement, "Failed to get subject descriptor for sending check-in message on report timeout");
+            }
+        }
+        break;
+    case HandlerState::CanStartReporting:
+    case HandlerState::Idle:
+    default:
+        break;
+    }
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP && CHIP_CONFIG_ENABLE_ICD_SERVER
+
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
     Close(CloseOptions::kKeepPersistedSubscription);
 #else
@@ -510,8 +528,8 @@ CHIP_ERROR ReadHandler::ProcessAttributePaths(AttributePathIBs::Parser & aAttrib
     if (CHIP_END_OF_TLV == err)
     {
         mManagementCallback.GetInteractionModelEngine()->RemoveDuplicateConcreteAttributePath(mpAttributePathList);
-        mAttributePathExpandIterator.ResetTo(mpAttributePathList);
-        err = CHIP_NO_ERROR;
+        mAttributePathExpandPosition = AttributePathExpandIterator::Position::StartIterating(mpAttributePathList);
+        err                          = CHIP_NO_ERROR;
     }
     return err;
 }
@@ -633,7 +651,7 @@ void ReadHandler::MoveToState(const HandlerState aTargetState)
     {
         if (ShouldReportUnscheduled())
         {
-            mManagementCallback.GetInteractionModelEngine()->GetReportingEngine().ScheduleRun();
+            TEMPORARY_RETURN_IGNORED mManagementCallback.GetInteractionModelEngine()->GetReportingEngine().ScheduleRun();
         }
         else
         {
@@ -748,53 +766,40 @@ CHIP_ERROR ReadHandler::ProcessSubscribeRequest(System::PacketBufferHandle && aP
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
 
-    // Default behavior for ICDs where the wanted MaxInterval for a subscription is the IdleModeDuration
-    // defined in the ICD Management Cluster.
-    // Behavior can be changed with the OnSubscriptionRequested function defined in the application callbacks
+    // To optimize ICD sleep/idle cycles, it is preferred to synchronize the subscription report interval
+    // with the IdleModeDuration defined in the ICD Management Cluster.
+    // We aim to use IdleModeDuration, but must respect the Min Interval Floor and Max Interval Ceiling.
+    // Note: This behavior can be overridden using the OnSubscriptionRequested callback defined
+    // in the application.
 
-    // Default Behavior Steps :
-    // If MinInterval > IdleModeDuration, try to set the MaxInterval to the first interval of IdleModeDurations above the
-    // MinInterval.
-    // If the next interval is greater than the MaxIntervalCeiling, use the MaxIntervalCeiling.
-    // Otherwise, use IdleModeDuration as MaxInterval
+    // Per spec and static checks, GetIdleModeDuration max value fits a uint16_t.
+    // The final selected interval must be a uint16_t but we use a uint32 here during calculation to prevent overflows.
+    uint32_t preferredMaxInterval = ICDConfigurationData::GetInstance().GetIdleModeDuration().count();
+    // Determine the max interval ceiling between GetPublisherSelectedIntervalLimit
+    // and the subscriber-requested MaxInterval.
+    uint16_t maxIntervalCeiling = std::max(GetPublisherSelectedIntervalLimit(), mMaxInterval);
 
-    // GetPublisherSelectedIntervalLimit() returns the IdleModeDuration if the device is an ICD
-    uint32_t decidedMaxInterval = GetPublisherSelectedIntervalLimit();
-
-    // Check if the PublisherSelectedIntervalLimit is 0. If so, set decidedMaxInterval to MaxIntervalCeiling
-    if (decidedMaxInterval == 0)
+    // Spec doesn't allow IdleModeDuration of 0 but make sure here to prevent div0
+    if (preferredMaxInterval == 0)
     {
-        decidedMaxInterval = mMaxInterval;
+        preferredMaxInterval = maxIntervalCeiling;
     }
-
-    // If requestedMinInterval is greater than the IdleTimeInterval, select next active up time as max interval
-    if (mMinIntervalFloorSeconds > decidedMaxInterval)
+    else
     {
-        uint16_t ratio = mMinIntervalFloorSeconds / static_cast<uint16_t>(decidedMaxInterval);
-        if (mMinIntervalFloorSeconds % decidedMaxInterval)
+        // Must respect the minimal interval floor
+        if (preferredMaxInterval < mMinIntervalFloorSeconds)
         {
-            ratio++;
+            // Round up to the nearest multiple of IdleModeDuration that is >= mMinIntervalFloorSeconds.
+            const uint32_t remainder = mMinIntervalFloorSeconds % preferredMaxInterval;
+            preferredMaxInterval =
+                remainder == 0 ? mMinIntervalFloorSeconds : (mMinIntervalFloorSeconds + (preferredMaxInterval - remainder));
         }
 
-        decidedMaxInterval *= ratio;
+        // Use the smallest interval between preferredMaxInterval and maxIntervalCeiling.
+        // This also ensure that no overflow occurs when casting to uint16_t below
+        preferredMaxInterval = std::min<uint32_t>(preferredMaxInterval, maxIntervalCeiling);
     }
-
-    // Verify that decidedMaxInterval is an acceptable value (overflow)
-    if (decidedMaxInterval > System::Clock::Seconds16::max().count())
-    {
-        decidedMaxInterval = System::Clock::Seconds16::max().count();
-    }
-
-    // Verify that the decidedMaxInterval respects MAX(GetPublisherSelectedIntervalLimit(), MaxIntervalCeiling)
-    uint16_t maximumMaxInterval = std::max(GetPublisherSelectedIntervalLimit(), mMaxInterval);
-    if (decidedMaxInterval > maximumMaxInterval)
-    {
-        decidedMaxInterval = maximumMaxInterval;
-    }
-
-    // Set max interval of the subscription
-    mMaxInterval = static_cast<uint16_t>(decidedMaxInterval);
-
+    mMaxInterval = static_cast<uint16_t>(preferredMaxInterval);
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
     //
@@ -853,15 +858,17 @@ void ReadHandler::PersistSubscription()
 
 void ReadHandler::ResetPathIterator()
 {
-    mAttributePathExpandIterator.ResetTo(mpAttributePathList);
+    mAttributePathExpandPosition = AttributePathExpandIterator::Position::StartIterating(mpAttributePathList);
     mAttributeEncoderState.Reset();
 }
 
-void ReadHandler::AttributePathIsDirty(const AttributePathParams & aAttributeChanged)
+void ReadHandler::AttributePathIsDirty(DataModel::Provider * apDataModel, const AttributePathParams & aAttributeChanged)
 {
-    ConcreteAttributePath path;
-
     mDirtyGeneration = mManagementCallback.GetInteractionModelEngine()->GetReportingEngine().GetDirtySetGeneration();
+
+    // We want to get the value, but not advance the iterator position.
+    AttributePathExpandIterator::Position tempPosition = mAttributePathExpandPosition;
+    ConcreteAttributePath path;
 
     // We won't reset the path iterator for every AttributePathIsDirty call to reduce the number of full data reports.
     // The iterator will be reset after finishing each report session.
@@ -872,7 +879,7 @@ void ReadHandler::AttributePathIsDirty(const AttributePathParams & aAttributeCha
     // TODO (#16699): Currently we can only guarantee the reports generated from a single path in the request are consistent. The
     // data might be inconsistent if the user send a request with two paths from the same cluster. We need to clearify the behavior
     // or make it consistent.
-    if (mAttributePathExpandIterator.Get(path) &&
+    if (AttributePathExpandIterator(apDataModel, tempPosition).Next(path) &&
         (aAttributeChanged.HasWildcardEndpointId() || aAttributeChanged.mEndpointId == path.mEndpointId) &&
         (aAttributeChanged.HasWildcardClusterId() || aAttributeChanged.mClusterId == path.mClusterId))
     {
@@ -882,7 +889,8 @@ void ReadHandler::AttributePathIsDirty(const AttributePathParams & aAttributeCha
         // If we're currently in the middle of generating reports for a given cluster and that in turn is marked dirty, let's reset
         // our iterator to point back to the beginning of that cluster. This ensures that the receiver will get a coherent view of
         // the state of the cluster as present on the server
-        mAttributePathExpandIterator.ResetCurrentCluster();
+        mAttributePathExpandPosition.IterateFromTheStartOfTheCurrentClusterIfAttributeWildcard();
+
         mAttributeEncoderState.Reset();
     }
 

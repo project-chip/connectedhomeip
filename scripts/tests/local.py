@@ -14,10 +14,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import configparser
 import enum
 import fnmatch
 import glob
 import logging
+import multiprocessing
 import os
 import platform
 import shlex
@@ -27,14 +29,40 @@ import sys
 import textwrap
 import time
 from dataclasses import dataclass
-from typing import List
+from typing import Iterable, Optional
 
 import alive_progress
 import click
+import colorama
 import coloredlogs
+import python_path
 import tabulate
+import yaml
 
-# We compile for the local architecture. Figure out what platform we need
+with python_path.PythonPath("../../src/python_testing/matter_testing_infrastructure", relative_to=__file__):
+    from matter.testing.metadata import extract_runs_args
+    from matter.testing.tasks import SubprocessKind
+
+
+log = logging.getLogger(__name__)
+
+
+def _get_apps_from_script(path: str) -> list[str]:
+    """
+    Parses a python script and returns the apps it is for.
+    """
+    try:
+        runs_args = extract_runs_args(path)
+        apps = set()
+        for run_config in runs_args.values():
+            if run_config and 'app' in run_config:
+                # app is like "${ALL_CLUSTERS_APP}"
+                app_name = run_config['app'].strip('${}')
+                apps.add(app_name)
+        return list(apps)
+    except Exception as e:
+        log.warning("Failed to parse metadata from '%s': %r", path, e)
+        return []
 
 
 def _get_native_machine_target():
@@ -43,14 +71,338 @@ def _get_native_machine_target():
     """
     current_system_info = platform.uname()
     arch = current_system_info.machine
-    if arch == 'x86_64':
-        arch = 'x64'
-    elif arch == 'i386' or arch == 'i686':
-        arch = 'x86'
-    elif arch in ('aarch64', 'aarch64_be', 'armv8b', 'armv8l'):
-        arch = 'arm64'
+    if arch == "x86_64":
+        arch = "x64"
+    elif arch == "i386" or arch == "i686":
+        arch = "x86"
+    elif arch in ("aarch64", "aarch64_be", "armv8b", "armv8l"):
+        arch = "arm64"
 
     return f"{current_system_info.system.lower()}-{arch}"
+
+
+_CONFIG_PATH = "out/local_py.ini"
+
+
+def get_coverage_default(coverage: Optional[bool]) -> bool:
+    if coverage is not None:
+        return coverage
+    config = configparser.ConfigParser()
+    try:
+        config.read(_CONFIG_PATH)
+        return config["OPTIONS"].getboolean("coverage")
+    except Exception:
+        return False
+
+
+def _get_variants(coverage: Optional[bool]):
+    """
+    compute the build variant suffixes for the given options
+    """
+    variants = ["no-ble", "clang", "boringssl"]
+
+    config = configparser.ConfigParser()
+    config["OPTIONS"] = {}
+    try:
+        config.read(_CONFIG_PATH)
+        log.info("Defaults read from '%s'", _CONFIG_PATH)
+    except Exception:
+        config["OPTIONS"]["coverage"] = "true"
+
+    if coverage is None:
+        # Coverage is NOT passed in as an explicit flag, so try to
+        # resume it from whatever last `build` flag was used
+        coverage = config["OPTIONS"].getboolean("coverage")
+        log.info("Coverage setting not provided via command line. Will use: %s", coverage)
+
+    if coverage:
+        variants.append("coverage")
+        config["OPTIONS"]["coverage"] = "true"
+    else:
+        config["OPTIONS"]["coverage"] = "false"
+
+    if not os.path.exists("./out"):
+        os.mkdir("./out")
+    with open(_CONFIG_PATH, "w") as f:
+        config.write(f)
+
+    return "-".join(variants)
+
+
+@dataclass
+class ApplicationTarget:
+    kind: SubprocessKind
+    env_key: str  # key for test_env running in python
+    cli_key: str  # key for YAML test runner (for --app-path / --tool-path)
+    target: str  # target name for build_examples (and directory in out)
+    binary: str  # elf binary to run after it is built
+
+
+def _get_targets(coverage: Optional[bool]) -> list[ApplicationTarget]:
+    target_prefix = _get_native_machine_target()
+    suffix = _get_variants(coverage)
+
+    targets = []
+
+    targets.append(
+        ApplicationTarget(
+            kind=SubprocessKind.TOOL,
+            env_key="CHIP_TOOL",
+            cli_key="chip-tool",
+            target=f"{target_prefix}-chip-tool-{suffix}",
+            binary="chip-tool",
+        )
+    )
+    targets.append(
+        ApplicationTarget(
+            kind=SubprocessKind.APP,
+            env_key="ALL_CLUSTERS_APP",
+            cli_key="all-clusters",
+            target=f"{target_prefix}-all-clusters-{suffix}",
+            binary="chip-all-clusters-app",
+        )
+    )
+    targets.append(
+        ApplicationTarget(
+            kind=SubprocessKind.APP,
+            env_key="ALL_CLUSTERS_NO_GROUPCAST_APP",
+            cli_key="all-clusters-no-groupcast",
+            target=f"{target_prefix}-all-clusters-no-groupcast-{suffix}",
+            binary="chip-all-clusters-app",
+        )
+    )
+    targets.append(
+        ApplicationTarget(
+            kind=SubprocessKind.APP,
+            env_key="CHIP_LOCK_APP",
+            cli_key="lock",
+            target=f"{target_prefix}-lock-{suffix}",
+            binary="chip-lock-app",
+        )
+    )
+    targets.append(
+        ApplicationTarget(
+            kind=SubprocessKind.APP,
+            env_key="ENERGY_GATEWAY_APP",
+            cli_key="energy-gateway",
+            target=f"{target_prefix}-energy-gateway-{suffix}",
+            binary="chip-energy-gateway-app",
+        )
+    )
+    targets.append(
+        ApplicationTarget(
+            kind=SubprocessKind.APP,
+            env_key="WATER_HEATER_APP",
+            cli_key="water-heater",
+            target=f"{target_prefix}-water-heater-{suffix}",
+            binary="matter-water-heater-app",
+        )
+    )
+    targets.append(
+        ApplicationTarget(
+            kind=SubprocessKind.APP,
+            env_key="EVSE_APP",
+            cli_key="evse",
+            target=f"{target_prefix}-evse-{suffix}",
+            binary="chip-evse-app",
+        )
+    )
+    targets.append(
+        ApplicationTarget(
+            kind=SubprocessKind.APP,
+            env_key="CLOSURE_APP",
+            cli_key="closure",
+            target=f"{target_prefix}-closure-{suffix}",
+            binary="closure-app",
+        )
+    )
+    targets.append(
+        ApplicationTarget(
+            kind=SubprocessKind.APP,
+            env_key="LIT_ICD_APP",
+            cli_key="lit-icd",
+            target=f"{target_prefix}-lit-icd-{suffix}",
+            binary="lit-icd-app",
+        )
+    )
+    targets.append(
+        ApplicationTarget(
+            kind=SubprocessKind.APP,
+            env_key="AIR_PURIFIER_APP",
+            cli_key="air-purifier",
+            target=f"{target_prefix}-air-purifier-{suffix}",
+            binary="chip-air-purifier-app",
+        )
+    )
+    targets.append(
+        ApplicationTarget(
+            kind=SubprocessKind.APP,
+            env_key="CHIP_MICROWAVE_OVEN_APP",
+            cli_key="microwave-oven",
+            target=f"{target_prefix}-microwave-oven-{suffix}",
+            binary="chip-microwave-oven-app",
+        )
+    )
+    targets.append(
+        ApplicationTarget(
+            kind=SubprocessKind.APP,
+            env_key="CHIP_RVC_APP",
+            cli_key="rvc",
+            target=f"{target_prefix}-rvc-{suffix}",
+            binary="chip-rvc-app",
+        )
+    )
+    targets.append(
+        ApplicationTarget(
+            kind=SubprocessKind.APP,
+            env_key="NETWORK_MANAGEMENT_APP",
+            cli_key="network-manager",
+            target=f"{target_prefix}-network-manager-ipv6only-{suffix}",
+            binary="matter-network-manager-app",
+        )
+    )
+    targets.append(
+        ApplicationTarget(
+            kind=SubprocessKind.APP,
+            env_key="FABRIC_ADMIN_APP",
+            cli_key="fabric-admin",
+            target=f"{target_prefix}-fabric-admin-no-wifi-rpc-ipv6only-{suffix}",
+            binary="fabric-admin",
+        )
+    )
+    targets.append(
+        ApplicationTarget(
+            kind=SubprocessKind.APP,
+            env_key="FABRIC_BRIDGE_APP",
+            cli_key="fabric-bridge",
+            target=f"{target_prefix}-fabric-bridge-no-wifi-rpc-ipv6only-{suffix}",
+            binary="fabric-bridge-app",
+        )
+    )
+    targets.append(
+        ApplicationTarget(
+            kind=SubprocessKind.APP,
+            env_key="FABRIC_SYNC_APP",
+            cli_key="fabric-sync",
+            target=f"{target_prefix}-fabric-sync-no-wifi-ipv6only-{suffix}",
+            binary="fabric-sync",
+        )
+    )
+    targets.append(
+        ApplicationTarget(
+            kind=SubprocessKind.APP,
+            env_key="LIGHTING_APP_NO_UNIQUE_ID",
+            cli_key="lighting",
+            target=f"{target_prefix}-light-data-model-no-unique-id-ipv6only-no-wifi-{suffix}",
+            binary="chip-lighting-data-model-no-unique-id-app",
+        )
+    )
+
+    # These are needed for chip tool tests
+    targets.append(
+        ApplicationTarget(
+            kind=SubprocessKind.APP,
+            env_key="OTA_PROVIDER_APP",
+            cli_key="ota-provider",
+            target=f"{target_prefix}-ota-provider-{suffix}",
+            binary="chip-ota-provider-app",
+        )
+    )
+    targets.append(
+        ApplicationTarget(
+            kind=SubprocessKind.APP,
+            env_key="OTA_REQUESTOR_APP",
+            cli_key="ota-requestor",
+            target=f"{target_prefix}-ota-requestor-{suffix}",
+            binary="chip-ota-requestor-app",
+        )
+    )
+    targets.append(
+        ApplicationTarget(
+            kind=SubprocessKind.APP,
+            env_key="TV_APP",
+            cli_key="tv",
+            target=f"{target_prefix}-tv-app-{suffix}",
+            binary="chip-tv-app",
+        )
+    )
+    targets.append(
+        ApplicationTarget(
+            kind=SubprocessKind.APP,
+            env_key="BRIDGE_APP",
+            cli_key="bridge",
+            target=f"{target_prefix}-bridge-{suffix}",
+            binary="chip-bridge-app",
+        )
+    )
+    targets.append(
+        ApplicationTarget(
+            kind=SubprocessKind.APP,
+            env_key="TERMS_AND_CONDITIONS_APP",
+            cli_key="terms-and-conditions",
+            target=f"{target_prefix}-terms-and-conditions-{suffix}",
+            binary="chip-terms-and-conditions-app",
+        )
+    )
+    targets.append(
+        ApplicationTarget(
+            kind=SubprocessKind.APP,
+            env_key="CAMERA_APP",
+            cli_key="camera",
+            target=f"{target_prefix}-camera-{suffix}",
+            binary="chip-camera-app",
+        )
+    )
+    targets.append(
+        ApplicationTarget(
+            kind=SubprocessKind.APP,
+            env_key="JF_CONTROL_APP",
+            cli_key="jf-control",
+            target=f"{target_prefix}-jf-control-app",
+            binary="jfc-app",
+        )
+    )
+    targets.append(
+        ApplicationTarget(
+            kind=SubprocessKind.APP,
+            env_key="JF_ADMIN_APP",
+            cli_key="jf-admin",
+            target=f"{target_prefix}-jf-admin-app",
+            binary="jfa-app",
+        )
+    )
+
+    targets.append(
+        ApplicationTarget(
+            kind=SubprocessKind.APP,
+            env_key="ALL_DEVICES_APP",
+            cli_key="all-devices",
+            target=f"{target_prefix}-all-devices-{suffix}",
+            binary="all-devices-app"
+        )
+    )
+
+    targets.append(
+        ApplicationTarget(
+            kind=SubprocessKind.APP,
+            env_key="CAMERA_CONTROLLER_APP",
+            cli_key="camera-controller",
+            target=f"{target_prefix}-camera-controller",
+            binary="chip-camera-controller"
+        )
+    )
+
+    targets.append(
+        ApplicationTarget(
+            kind=SubprocessKind.APP,
+            env_key="WATER_LEAK_DETECTOR_APP",
+            cli_key="water-leak-detector",
+            target=f"{target_prefix}-water-leak-detector-{suffix}",
+            binary="water-leak-detector-app"
+        )
+    )
+
+    return targets
 
 
 class BinaryRunner(enum.Enum):
@@ -62,14 +414,23 @@ class BinaryRunner(enum.Enum):
     NONE = enum.auto()
     RR = enum.auto()
     VALGRIND = enum.auto()
+    COVERAGE = enum.auto()
 
     def execute_str(self, path: str):
         if self == BinaryRunner.NONE:
             return path
-        elif self == BinaryRunner.RR:
-            return f"rr record {path}"
-        elif self == BinaryRunner.VALGRIND:
-            return f"valgrind {path}"
+        if self == BinaryRunner.RR:
+            return f"exec rr record {path}"
+        if self == BinaryRunner.VALGRIND:
+            return f"exec valgrind {path}"
+        if self == BinaryRunner.COVERAGE:
+            # Expected path is like "out/<target>/<binary>"
+            #
+            # We output up to 10K of separate profiles that will be merged as a
+            # final step.
+            rawname = os.path.basename(path[: path.rindex("/")] + "-run-%10000m.profraw")
+            return f'export LLVM_PROFILE_FILE="out/profiling/{rawname}"; exec {path}'
+        return None
 
 
 __RUNNERS__ = {
@@ -78,12 +439,7 @@ __RUNNERS__ = {
     "valgrind": BinaryRunner.VALGRIND,
 }
 
-__LOG_LEVELS__ = {
-    "debug": logging.DEBUG,
-    "info": logging.INFO,
-    "warn": logging.WARN,
-    "fatal": logging.FATAL,
-}
+__LOG_LEVELS__ = logging.getLevelNamesMapping()
 
 
 @dataclass
@@ -94,6 +450,7 @@ class ExecutionTimeInfo:
 
     script: str
     duration_sec: float
+    status: str
 
 
 # Top level command, groups all other commands for the purpose of having
@@ -129,15 +486,19 @@ def cli(log_level):
     )
 
 
-def _with_activate(build_cmd: List[str]) -> List[str]:
+def _with_activate(build_cmd: list[str], output_path=None) -> list[str]:
     """
     Given a bash command list, will generate a new command suitable for subprocess
     with an execution of `scripts/activate.sh` prepended to it
     """
+    cmd = shlex.join(build_cmd)
+    if output_path:
+        cmd = cmd + f" >{output_path}"
+
     return [
         "bash",
         "-c",
-        ";".join(["set -e", "source scripts/activate.sh", shlex.join(build_cmd)]),
+        ";".join(["set -e", "source scripts/activate.sh", cmd])
     ]
 
 
@@ -145,55 +506,46 @@ def _do_build_python():
     """
     Builds a python virtual environment into `out/venv`
     """
-    logging.info("Building python packages in out/venv ...")
+    log.info("Building python packages in out/venv ...")
     subprocess.run(
         ["./scripts/build_python.sh", "--install_virtual_env", "out/venv"], check=True
     )
 
 
-def _do_build_apps():
+def _do_build_apps(coverage: Optional[bool], ccache: bool):
     """
     Builds example python apps suitable for running all python_tests.
 
     This builds a LOT of apps (significant storage usage).
     """
-    logging.info("Building example apps...")
+    log.info("Building example apps...")
 
-    target_prefix = _get_native_machine_target()
-    targets = [
-        f"{target_prefix}-chip-tool-no-ble-clang-boringssl",
-        f"{target_prefix}-all-clusters-no-ble-clang-boringssl",
-        f"{target_prefix}-bridge-no-ble-clang-boringssl",
-        f"{target_prefix}-energy-management-no-ble-clang-boringssl",
-        f"{target_prefix}-lit-icd-no-ble-clang-boringssl",
-        f"{target_prefix}-lock-no-ble-clang-boringssl",
-        f"{target_prefix}-microwave-oven-no-ble-clang-boringssl",
-        f"{target_prefix}-ota-provider-no-ble-clang-boringssl",
-        f"{target_prefix}-ota-requestor-no-ble-clang-boringssl",
-        f"{target_prefix}-rvc-no-ble-clang-boringssl",
-        f"{target_prefix}-tv-app-no-ble-clang-boringssl",
-        f"{target_prefix}-network-manager-ipv6only-no-ble-clang-boringssl",
-    ]
+    targets = [t.target for t in _get_targets(coverage)]
 
     cmd = ["./scripts/build/build_examples.py"]
     for target in targets:
         cmd.append("--target")
         cmd.append(target)
+
+    if ccache:
+        cmd.append("--pw-command-launcher=ccache")
+
     cmd.append("build")
 
     subprocess.run(_with_activate(cmd), check=True)
 
 
-def _do_build_basic_apps():
+def _do_build_basic_apps(coverage: Optional[bool]):
     """
     Builds a minimal subset of test applications, specifically
     all-clusters and chip-tool only, for basic tests.
     """
-    logging.info("Building example apps...")
-    target_prefix = _get_native_machine_target()
+    log.info("Building example apps...")
+
+    all_targets = {t.env_key: t for t in _get_targets(coverage)}
     targets = [
-        f"{target_prefix}-chip-tool-no-ble-clang-boringssl",
-        f"{target_prefix}-all-clusters-no-ble-clang-boringssl",
+        all_targets["CHIP_TOOL"].target,
+        all_targets["ALL_CLUSTERS_APP"].target,
     ]
 
     cmd = ["./scripts/build/build_examples.py"]
@@ -206,9 +558,10 @@ def _do_build_basic_apps():
 
 
 @cli.command()
-def build_basic_apps():
+@click.option("--coverage/--no-coverage", default=None)
+def build_basic_apps(coverage):
     """Builds chip-tool and all-clusters app."""
-    _do_build_basic_apps()
+    _do_build_basic_apps(coverage)
 
 
 @cli.command()
@@ -224,7 +577,9 @@ def build_python():
 
 
 @cli.command()
-def build_apps():
+@click.option("--coverage/--no-coverage", default=None)
+@click.option("--ccache/--no-ccache", default=False)
+def build_apps(coverage, ccache):
     """
     Builds MANY apps used by python-tests.
 
@@ -232,18 +587,20 @@ def build_apps():
     To re-build the python environment use `build-python`.
     To re-build both python and apps, use `build`
     """
-    _do_build_apps()
+    _do_build_apps(coverage, ccache)
 
 
 @cli.command()
-def build():
+@click.option("--coverage/--no-coverage", default=None)
+@click.option("--ccache/--no-ccache", default=False)
+def build(coverage, ccache):
     """
     Builds both python and apps (same as build-python + build-apps)
 
     Generally used together with `python-tests`.
     """
     _do_build_python()
-    _do_build_apps()
+    _do_build_apps(coverage, ccache)
 
 
 def _maybe_with_runner(script_name: str, path: str, runner: BinaryRunner):
@@ -255,14 +612,16 @@ def _maybe_with_runner(script_name: str, path: str, runner: BinaryRunner):
         return path
 
     # create a separate runner script based on the app
-    script_name = f"out/{script_name}.sh"
-    with open(script_name, "wt") as f:
+    if not os.path.exists("out/runners"):
+        os.mkdir("out/runners")
+
+    script_name = f"out/runners/{script_name}.sh"
+    with open(script_name, "w") as f:
         f.write(
             textwrap.dedent(
                 f"""\
                 #!/usr/bin/env bash
-
-                {runner.execute_str(path)}
+                {runner.execute_str(path)} "$@"
                 """
             )
         )
@@ -287,12 +646,224 @@ def _add_target_to_cmd(cmd, flag, path, runner):
     cmd.append(_maybe_with_runner(flag[2:].replace("-", "_"), path, runner))
 
 
+def _specify_target_path(target: ApplicationTarget, runner) -> Iterable[str]:
+    """
+    Generates `--{app,tool}-path` argument for run_test_suite.py
+
+    Specifically it figures out how to convert the target `path` into either
+    itself or execution via a `runner` script.
+
+    cmd will get "--<kind>-path <key>:<executable>" appended to it, where executable
+    is either the input path or a wrapper script to execute via the given
+    input runner.
+    """
+    path = f"./out/{target.target}/{target.binary}"
+    path = _maybe_with_runner(target.cli_key, path, runner)
+    return [f"--{target.kind.value}-path", f"{target.cli_key}:{path}"]
+
+
+@dataclass
+class GlobFilter:
+    pattern: str
+
+    def matches(self, txt: str) -> bool:
+        return fnmatch.fnmatch(txt, self.pattern)
+
+
+@dataclass
+class FilterList:
+    filters: list[GlobFilter]
+
+    def any_matches(self, txt: str) -> bool:
+        return any(f.matches(txt) for f in self.filters)
+
+
+def _parse_filters(entry: str) -> FilterList:
+    if not entry:
+        entry = "*.*"
+
+    if "," in entry:
+        entry_list = entry.split(",")
+    else:
+        entry_list = [entry]
+
+    filters = []
+    for f in entry_list:
+        if not f.startswith("*"):
+            f = "*" + f
+        if not f.endswith("*"):
+            f = f + "*"
+        filters.append(GlobFilter(pattern=f))
+
+    return FilterList(filters=filters)
+
+
+@dataclass
+class RawProfile:
+    raw_profile_paths: list[str]
+    binary_path: str
+
+
+def _raw_profile_to_info(profile: RawProfile):
+    path = profile.raw_profile_paths[0]
+
+    # Merge all per-app profiles into a single large profile
+    data_path = path[:path.find("-run-")] + ".profdata"
+    cmd = [
+        "llvm-profdata",
+        "merge",
+        "-sparse",
+    ]
+    cmd.extend(["-o", data_path])
+    cmd.extend(profile.raw_profile_paths)
+
+    p = subprocess.run(_with_activate(cmd), check=True, capture_output=True)
+
+    # Export to something lcov likes
+    cmd = [
+        "llvm-cov",
+        "export",
+        "-format=lcov",
+        "--instr-profile",
+        data_path,
+        profile.binary_path
+    ]
+
+    # for -ignore-filename-regex
+    ignore_paths = [
+        "third_party/boringssl/.*",
+        "third_party/perfetto/.*",
+        "third_party/jsoncpp/.*",
+        "third_party/editline/.*",
+        "third_party/initpp/.*",
+        "third_party/libwebsockets/.*",
+        "third_party/pigweed/.*",
+        "third_party/nanopb/.*",
+        "third_party/nl.*",
+        "/usr/include/.*",
+        "/usr/lib/.*",
+    ]
+
+    for p in ignore_paths:
+        cmd.append("-ignore-filename-regex")
+        cmd.append(p)
+
+    info_path = path.replace(".profraw", ".info")
+    subprocess.run(_with_activate(cmd, output_path=info_path), check=True)
+    log.info("Generated '%s'", info_path)
+
+    # !!!!! HACK ALERT !!!!!
+    #
+    # The paths for our examples are generally including CHIP as
+    # examples/<name>/third_party/connectedhomeip/....
+    # So we will replace every occurence of these to remove the extra indirection into third_party
+    #
+    # Generally we will replace every path (Shown as SF:...) with the corresponding item
+    #
+    # We assume that the info lines fit in RAM
+    lines = []
+    with open(info_path) as f:
+        for line in f.readlines():
+            line = line.rstrip()
+            if line.startswith("SF:"):
+                # This is a source file line: "SF:..."
+                path = line[3:]
+                line = f"SF:{os.path.realpath(path)}\n"
+            lines.append(line)
+
+    # re-write it.
+    with open(info_path, "w") as f:
+        f.write("\n".join(lines))
+
+    return info_path
+
+
+@cli.command()
+@click.option(
+    "--flat",
+    default=False,
+    is_flag=True,
+    show_default=True,
+    help="Use a flat (1-directory) layout rather than hierarchical.",
+)
+def gen_coverage(flat):
+    """
+    Generate coverage from tests run with "--coverage"
+    """
+    # This assumes default.profraw exists, so it tries to
+    # generate coverage out of it
+    #
+    # Each target gets its own profile
+
+    raw_profiles = []
+    for t in _get_targets(coverage=True):
+        glob_str = os.path.join("./out", "profiling", f"{t.target}*.profraw")
+        app_profiles = []
+        for path in glob.glob(glob_str):
+            app_profiles.append(path)
+
+        if app_profiles:
+            raw_profiles.append(RawProfile(
+                raw_profile_paths=app_profiles,
+                binary_path=os.path.join("./out", t.target, t.binary)
+            ))
+        else:
+            log.warning("No profiles for '%s'", t.target)
+
+    with multiprocessing.Pool() as p:
+        trace_files = p.map(_raw_profile_to_info, raw_profiles)
+
+    if not trace_files:
+        log.error("Could not find any trace files. Did you run tests with coverage enabled?")
+        return
+
+    cmd = ["lcov"]
+    for t in trace_files:
+        cmd.append("--add-tracefile")
+        cmd.append(t)
+
+    errors_to_ignore = [
+        "inconsistent", "range", "corrupt", "category"
+    ]
+
+    cmd.append("--output-file")
+    cmd.append("out/profiling/merged.info")
+    for e in errors_to_ignore:
+        cmd.append("--ignore-errors")
+        cmd.append(e)
+
+    if os.path.exists("out/profiling/merged.info"):
+        os.unlink("out/profiling/merged.info")
+
+    subprocess.run(cmd, check=True)
+
+    log.info("Generating HTML...")
+    cmd = ["genhtml"]
+    for e in errors_to_ignore:
+        cmd.append("--ignore-errors")
+        cmd.append(e)
+
+    cmd.append("--flat" if flat else "--hierarchical")
+    cmd.append("--output-directory")
+    cmd.append("out/coverage")
+    cmd.append("out/profiling/merged.info")
+
+    subprocess.run(cmd, check=True)
+    log.info("Coverage HTML should be available in out/coverage/index.html")
+
+
 @cli.command()
 @click.option(
     "--test-filter",
     default="*",
     show_default=True,
-    help="Run only tests that match the given glob filter.",
+    help="Run only tests that match the given glob filter(s). Comma separated list of filters",
+)
+@click.option(
+    "--skip",
+    default="",
+    show_default=True,
+    help="Skip the tests matching the given glob. Comma separated list of filters. Empty for no skipping.",
 )
 @click.option(
     "--from-filter",
@@ -312,20 +883,65 @@ def _add_target_to_cmd(cmd, flag, path, runner):
     help="Don't actually execute the tests, just print out the command that would be run.",
 )
 @click.option(
-    "--show_timings",
+    "--no-show-timings",
+    default=False,
+    is_flag=True,
+    help="At the end of the execution, show how many seconds each test took.",
+)
+@click.option(
+    "--keep-going",
     default=False,
     is_flag=True,
     show_default=True,
-    help="At the end of the execution, show how many seconds each test took.",
+    help="Keep going on errors. Will report all failed tests at the end.",
 )
+@click.option(
+    "--fail-log-dir",
+    default=None,
+    help="Save failure logs into the specified directory instead of logging (as logging can be noisy/slow)",
+    type=click.Path(file_okay=False, dir_okay=True),
+)
+@click.option("--coverage/--no-coverage", default=None)
 @click.option(
     "--runner",
     default="none",
     type=click.Choice(list(__RUNNERS__.keys()), case_sensitive=False),
     help="Determines the verbosity of script output",
 )
+@click.option(
+    "--override-binary-path",
+    default=None,
+    nargs=2,
+    multiple=True,
+    help="Defines an override binary path for a given app. Can be used multiple times. E.g. --override-binary-path ALL_CLUSTERS_APP out/some/path/chip-all-clusters-app"
+)
+@click.option(
+    "--app-filter",
+    default=None,
+    type=str,
+    help="Run only tests that are for the given app. Comma separated list of apps. E.g. --app-filter ALL_CLUSTERS_APP,CHIP_TOOL",
+)
+@click.option(
+    "--include-nightly",
+    default=False,
+    is_flag=True,
+    show_default=True,
+    help="Include nightly tests (normally excluded as they are slow and reserved for nightly CI runs).",
+)
 def python_tests(
-    test_filter, from_filter, from_skip_filter, dry_run, show_timings, runner
+    test_filter,
+    skip,
+    from_filter,
+    from_skip_filter,
+    dry_run,
+    no_show_timings,
+    runner,
+    keep_going,
+    coverage,
+    fail_log_dir,
+    override_binary_path,
+    app_filter,
+    include_nightly,
 ):
     """
     Run python tests via `run_python_test.py`
@@ -335,36 +951,59 @@ def python_tests(
     """
     runner = __RUNNERS__[runner]
 
+    # make sure we are fully aware if running with or without coverage
+    coverage = get_coverage_default(coverage)
+    if coverage:
+        if runner != BinaryRunner.NONE:
+            log.error("Runner for coverage is implict")
+            sys.exit(1)
+
+        # wrap around so we get a good LLVM_PROFILE_FILE
+        runner = BinaryRunner.COVERAGE
+
     def as_runner(path):
         return _maybe_with_runner(os.path.basename(path), path, runner)
 
     # create an env file
-    target_prefix = _get_native_machine_target()
-    with open("out/test_env.yaml", "wt") as f:
-        f.write(
-            textwrap.dedent(
-                f"""\
-            ALL_CLUSTERS_APP: {as_runner(f'out/{target_prefix}-all-clusters-no-ble-clang-boringssl/chip-all-clusters-app')}
-            CHIP_LOCK_APP: {as_runner(f'out/{target_prefix}-lock-no-ble-clang-boringssl/chip-lock-app')}
-            ENERGY_MANAGEMENT_APP: {
-                as_runner(f'out/{target_prefix}-energy-management-no-ble-clang-boringssl/chip-energy-management-app')}
-            LIT_ICD_APP: {as_runner(f'out/{target_prefix}-lit-icd-no-ble-clang-boringssl/lit-icd-app')}
-            CHIP_MICROWAVE_OVEN_APP: {
-                as_runner(f'out/{target_prefix}-microwave-oven-no-ble-clang-boringssl/chip-microwave-oven-app')}
-            CHIP_RVC_APP: {as_runner(f'out/{target_prefix}-rvc-no-ble-clang-boringssl/chip-rvc-app')}
-            NETWORK_MANAGEMENT_APP: {
-                as_runner(f'out/{target_prefix}-network-manager-ipv6only-no-ble-clang-boringssl/matter-network-manager-app')}
-            TRACE_APP: out/trace_data/app-{{SCRIPT_BASE_NAME}}
-            TRACE_TEST_JSON: out/trace_data/test-{{SCRIPT_BASE_NAME}}
-            TRACE_TEST_PERFETTO: out/trace_data/test-{{SCRIPT_BASE_NAME}}
-            """
-            )
-        )
+    override_binaries = dict(override_binary_path or [])
 
-    if not test_filter.startswith("*"):
-        test_filter = "*" + test_filter
-    if not test_filter.endswith("*"):
-        test_filter = test_filter + "*"
+    with open("./out/test_env.yaml", "w") as f:
+        for target in _get_targets(coverage):
+            if target.env_key in override_binaries:
+                run_path = as_runner(override_binaries[target.env_key])
+            else:
+                run_path = as_runner(f"out/{target.target}/{target.binary}")
+            f.write(f"{target.env_key}: {run_path}\n")
+
+        # PushAV is special
+        f.write("PUSH_AV_SERVER: src/tools/push_av_server/src/server.py\n")
+
+        # Disable OTA requestor v2 for now
+        # This would be built by a shell script like this:
+        #
+        #    ./scripts/run_in_build_env.sh "./scripts/build/build_ota_images.sh --out-prefix out/su_ota_images_min --max-range 2"
+        #
+        # Which is not currently integrated in our build logic (we always use build_examples.py)
+        f.write("SU_OTA_REQUESTOR_V2: /usr/bin/false\n")
+
+        f.write("TRACE_APP: out/trace_data/app-{SCRIPT_BASE_NAME}\n")
+        f.write("TRACE_TEST_JSON: out/trace_data/test-{SCRIPT_BASE_NAME}\n")
+        f.write("TRACE_TEST_PERFETTO: out/trace_data/test-{SCRIPT_BASE_NAME}\n")
+
+    if not test_filter:
+        test_filter = "*"
+    test_filter = _parse_filters(test_filter)
+
+    app_filter_list = None
+    if app_filter:
+        if not extract_runs_args:
+            raise click.BadOptionUsage("--app-filter",
+                                       "The flag requires the python testing environment: ./scripts/tests/local.py build-python")
+        app_filter_list = _parse_filters(app_filter)
+
+    if skip:
+        print("SKIP IS %r" % skip)
+        skip = _parse_filters(skip)
 
     if from_filter:
         if not from_filter.startswith("*"):
@@ -382,112 +1021,59 @@ def python_tests(
     if not os.path.exists("out/trace_data"):
         os.mkdir("out/trace_data")
 
-    # IGNORES are taken out of `src/python_testing/execute_python_tests.py` in the SDK
-    excluded_patterns = {
-        "MinimalRepresentation.py",
-        "TC_CNET_4_4.py",
-        "TC_CCTRL_2_1.py",
-        "TC_CCTRL_2_2.py",
-        "TC_CCTRL_2_3.py",
-        "TC_DGGEN_3_2.py",
-        "TC_EEVSE_Utils.py",
-        "TC_ECOINFO_2_1.py",
-        "TC_ECOINFO_2_2.py",
-        "TC_EWATERHTRBase.py",
-        "TC_EWATERHTR_2_1.py",
-        "TC_EWATERHTR_2_2.py",
-        "TC_EWATERHTR_2_3.py",
-        "TC_EnergyReporting_Utils.py",
-        "TC_OpstateCommon.py",
-        "TC_pics_checker.py",
-        "TC_TMP_2_1.py",
-        "TC_MCORE_FS_1_1.py",
-        "TC_MCORE_FS_1_2.py",
-        "TC_MCORE_FS_1_3.py",
-        "TC_MCORE_FS_1_4.py",
-        "TC_MCORE_FS_1_5.py",
-        "TC_OCC_3_1.py",
-        "TC_OCC_3_2.py",
-        "TC_BRBINFO_4_1.py",
-        "TestCommissioningTimeSync.py",
-        "TestConformanceSupport.py",
-        "TestChoiceConformanceSupport.py",
-        "TC_DEMTestBase.py",
-        "choice_conformance_support.py",
-        "TestConformanceTest.py",  # Unit test of the conformance test (TC_DeviceConformance) - does not run against an app.
-        "TestIdChecks.py",
-        "TestSpecParsingDeviceType.py",
-        "TestMatterTestingSupport.py",
-        "TestSpecParsingSupport.py",
-        "TestTimeSyncTrustedTimeSource.py",
-        "basic_composition_support.py",
-        "conformance_support.py",
-        "drlk_2_x_common.py",
-        "execute_python_tests.py",
-        "global_attribute_ids.py",
-        "hello_external_runner.py",
-        "hello_test.py",
-        "matter_testing_support.py",
-        "pics_support.py",
-        "spec_parsing_support.py",
-        "taglist_and_topology_test_support.py",
-        "test_plan_support.py",
-        "test_plan_table_generator.py",
+    if fail_log_dir and not os.path.exists(fail_log_dir):
+        os.mkdir(fail_log_dir)
+
+    with open("src/python_testing/test_metadata.yaml") as f:
+        metadata = yaml.full_load(f)
+    excluded_patterns = {item["name"] for item in metadata["not_automated"]}
+    nightly_tests = {item["name"] for item in metadata["nightly"]}
+
+    # NOTE: for slow tests. we add logs to not get impatient
+    slow_test_duration = {
+        item["name"]: item["duration"] for item in metadata["slow_tests"] + metadata["nightly"]
     }
 
     if not os.path.isdir("src/python_testing"):
-        raise Exception(
-            "Script meant to be run from the CHIP checkout root (src/python_testing must exist)."
-        )
+        raise NotADirectoryError("Script meant to be run from the CHIP checkout root (src/python_testing must exist).")
 
     test_scripts = []
     for file in glob.glob(os.path.join("src/python_testing/", "*.py")):
         if os.path.basename(file) in excluded_patterns:
             continue
+        if not include_nightly and os.path.basename(file) in nightly_tests:
+            continue
         test_scripts.append(file)
-    test_scripts.append("src/controller/python/test/test_scripts/mobile-device-test.py")
+    test_scripts.append("src/controller/python/tests/scripts/mobile-device-test.py")
     test_scripts.sort()  # order consistent
 
-    # NOTE: VERY slow tests. we add logs to not get impatient
-    slow_test_duration = {
-        "mobile-device-test.py": "3 minutes",
-        "TC_AccessChecker.py": "1.5 minutes",
-        "TC_CADMIN_1_9.py": "40 seconds",
-        "TC_CC_2_2.py": "1.5 minutes",
-        "TC_DEM_2_10.py": "40 seconds",
-        "TC_DeviceBasicComposition.py": "25 seconds",
-        "TC_DRLK_2_12.py": "30 seconds",
-        "TC_DRLK_2_3.py": "30 seconds",
-        "TC_EEVSE_2_6.py": "30 seconds",
-        "TC_FAN_3_1.py": "15 seconds",
-        "TC_OPSTATE_2_5.py": "1.25 minutes",
-        "TC_OPSTATE_2_6.py": "35 seconds",
-        "TC_PS_2_3.py": "30 seconds",
-        "TC_RR_1_1.py": "25 seconds",
-        "TC_SWTCH.py": "1 minute",
-        "TC_TIMESYNC_2_10.py": "20 seconds",
-        "TC_TIMESYNC_2_11.py": "30 seconds",
-        "TC_TIMESYNC_2_12.py": "20 seconds",
-        "TC_TIMESYNC_2_7.py": "20 seconds",
-        "TC_TIMESYNC_2_8.py": "1.5 minutes",
-        "TC_ICDM_5_1.py": "TODO",
-    }
-
     execution_times = []
+    failed_tests = []
     try:
         to_run = []
-        for script in fnmatch.filter(test_scripts, test_filter or "*.*"):
+        for script in [t for t in test_scripts if test_filter.any_matches(t)]:
+            if app_filter_list:
+                required_apps = _get_apps_from_script(script)
+                if not any(app_filter_list.any_matches(app) for app in required_apps):
+                    log.info("Skipping '%s' due to app filter (requires %r)", script, required_apps)
+                    continue
+
             if from_filter:
                 if not fnmatch.fnmatch(script, from_filter):
-                    logging.info("From-filter SKIP %s", script)
+                    log.info("From-filter SKIP '%s'", script)
                     continue
                 from_filter = None
 
             if from_skip_filter:
                 if fnmatch.fnmatch(script, from_skip_filter):
                     from_skip_filter = None
-                logging.info("From-skip-filter SKIP %s", script)
+                log.info("From-skip-filter SKIP '%s'", script)
                 continue
+            if skip:
+                if skip.any_matches(script):
+                    log.info("EXPLICIT SKIP '%s'", script)
+                    continue
+
             to_run.append(script)
 
         with alive_progress.alive_bar(len(to_run), title="Running tests") as bar:
@@ -499,23 +1085,19 @@ def python_tests(
                     f"./scripts/tests/run_python_test.py --load-from-env out/test_env.yaml --script {script}",
                 ]
 
+                if app_filter_list:
+                    cmd.extend(('--app-filter', app_filter))
+
                 if dry_run:
                     print(shlex.join(cmd))
                     continue
 
                 base_name = os.path.basename(script)
                 if base_name in slow_test_duration:
-                    logging.warning(
+                    log.warning(
                         "SLOW test '%s' is executing (expect to take around %s). Be patient...",
                         base_name,
                         slow_test_duration[base_name],
-                    )
-                elif base_name == "TC_EEVSE_2_3.py":
-                    # TODO: this should be fixed ...
-                    #       for now just note that a `TZ=UTC` makes this pass
-                    logging.warning(
-                        "Test %s is TIMEZONE dependent. Passes with UTC but fails on EST. If this fails set 'TZ=UTC' for running the test.",
-                        base_name,
                     )
 
                 tstart = time.time()
@@ -523,40 +1105,71 @@ def python_tests(
                 tend = time.time()
 
                 if result.returncode != 0:
-                    logging.error("Test failed: %s", script)
-                    logging.info("STDOUT:\n%s", result.stdout.decode("utf8"))
-                    logging.warning("STDERR:\n%s", result.stderr.decode("utf8"))
-                    sys.exit(1)
+                    log.error("Test failed: '%s' (error code %d when running %r)", script, result.returncode, cmd)
+                    if fail_log_dir:
+                        out_name = os.path.join(fail_log_dir, f"{base_name}.out.log")
+                        err_name = os.path.join(fail_log_dir, f"{base_name}.err.log")
+
+                        log.error("STDOUT IN '%s'", out_name)
+                        log.error("STDERR IN '%s'", err_name)
+
+                        with open(out_name, "wb") as f:
+                            f.write(result.stdout)
+                        with open(err_name, "wb") as f:
+                            f.write(result.stderr)
+
+                    else:
+                        log.info("STDOUT:\n%s", result.stdout.decode("utf8", errors='replace'))
+                        log.warning("STDERR:\n%s", result.stderr.decode("utf8", errors='replace'))
+                    if not keep_going:
+                        sys.exit(1)
+                    failed_tests.append(script)
 
                 time_info = ExecutionTimeInfo(
-                    script=base_name, duration_sec=(tend - tstart)
+                    script=base_name,
+                    duration_sec=(tend - tstart),
+                    status=(
+                        "PASS"
+                        if result.returncode == 0
+                        else colorama.Fore.RED + "FAILURE" + colorama.Fore.RESET
+                    ),
                 )
                 execution_times.append(time_info)
 
                 if time_info.duration_sec > 20 and base_name not in slow_test_duration:
-                    logging.warning(
-                        "%s finished in %0.2f seconds",
-                        time_info.script,
-                        time_info.duration_sec,
-                    )
+                    log.warning("'%s' finished in %0.2f seconds", time_info.script, time_info.duration_sec)
                 bar()
     finally:
-        if execution_times and show_timings:
-            execution_times.sort(key=lambda v: v.duration_sec)
+        if failed_tests and keep_going:
+            log.error("FAILED TESTS:")
+            for name in failed_tests:
+                log.error("  '%s'", name)
+
+        if execution_times and not no_show_timings:
+            execution_times.sort(
+                key=lambda v: (0 if v.status == "PASS" else 1, v.duration_sec),
+            )
             print(
-                tabulate.tabulate(execution_times, headers=["Script", "Duration(sec)"])
+                tabulate.tabulate(
+                    execution_times, headers=["Script", "Duration(sec)", "Status"]
+                )
             )
 
+        if failed_tests:
+            # Propagate the final failure
+            sys.exit(1)
 
-def _do_build_fabric_sync_apps():
+
+def _do_build_fabric_sync_apps(coverage: Optional[bool]):
     """
     Build applications used for fabric sync tests
     """
     target_prefix = _get_native_machine_target()
+    suffix = _get_variants(coverage)
     targets = [
-        f"{target_prefix}-fabric-bridge-boringssl-rpc-no-ble",
-        f"{target_prefix}-fabric-admin-boringssl-rpc",
-        f"{target_prefix}-all-clusters-boringssl-no-ble",
+        f"{target_prefix}-fabric-admin-no-wifi-rpc-ipv6only-{suffix}",
+        f"{target_prefix}-fabric-bridge-no-wifi-rpc-ipv6only-{suffix}",
+        f"{target_prefix}-all-clusters-{suffix}",
     ]
 
     build_cmd = ["./scripts/build/build_examples.py"]
@@ -569,29 +1182,28 @@ def _do_build_fabric_sync_apps():
 
 
 @cli.command()
-def build_fabric_sync_apps():
+@click.option("--coverage/--no-coverage", default=None)
+def build_fabric_sync_apps(coverage):
     """
     Build fabric synchronizatio applications.
     """
-    _do_build_fabric_sync_apps()
+    _do_build_fabric_sync_apps(coverage)
 
 
 @cli.command()
-def build_fabric_sync():
+@click.option("--coverage/--no-coverage", default=None)
+def build_fabric_sync(coverage):
     """
     Builds both python environment and fabric sync applications
     """
     # fabric sync interfaces with python for convenience, so do that
     _do_build_python()
-    _do_build_fabric_sync_apps()
+    _do_build_fabric_sync_apps(coverage)
 
 
 @cli.command()
-@click.option(
-    "--data-model-interface", type=click.Choice(["enabled", "disabled", "check"])
-)
 @click.option("--asan", is_flag=True, default=False, show_default=True)
-def build_casting_apps(data_model_interface, asan):
+def build_casting_apps(asan):
     """
     Builds Applications used for tv casting tests
     """
@@ -602,10 +1214,6 @@ def build_casting_apps(data_model_interface, asan):
 
     tv_args.append('chip_crypto="boringssl"')
     casting_args.append('chip_crypto="boringssl"')
-
-    if data_model_interface:
-        tv_args.append(f'chip_use_data_model_interface="{data_model_interface}"')
-        casting_args.append(f'chip_use_data_model_interface="{data_model_interface}"')
 
     if asan:
         tv_args.append("is_asan=true is_clang=true")
@@ -673,17 +1281,41 @@ def casting_test(test, log_directory, tv_app, tv_casting_app, runner):
 
 
 @cli.command()
+def prereq():
+    """
+    Install/force some prerequisites inside the build environment.
+
+    Work in progress, however generally we have:
+      - libdatachannel requires cmake 3.5
+    """
+
+    # Camera app needs cmake 3.5 and 4.0 removed compatibility. Force cmake 3.*
+    cmd = ";".join(["set -e", "source scripts/activate.sh", "pip install 'cmake>=3,<4'"])
+    subprocess.run(["bash", "-c", cmd], check=True)
+
+
+@cli.command()
 @click.option("--target", default=None)
 @click.option("--target-glob", default=None)
 @click.option("--include-tags", default=None)
 @click.option("--expected-failures", default=None)
+@click.option("--coverage/--no-coverage", default=None)
+@click.option(
+    "--keep-going",
+    default=False,
+    is_flag=True,
+    show_default=True,
+    help="Keep going on errors. Will report all failed tests at the end.",
+)
 @click.option(
     "--runner",
     default="none",
     type=click.Choice(list(__RUNNERS__.keys()), case_sensitive=False),
     help="Determines the verbosity of script output",
 )
-def chip_tool_tests(target, target_glob, include_tags, expected_failures, runner):
+def chip_tool_tests(
+    target, target_glob, include_tags, expected_failures, coverage, keep_going, runner
+):
     """
     Run integration tests using chip-tool.
 
@@ -694,8 +1326,18 @@ def chip_tool_tests(target, target_glob, include_tags, expected_failures, runner
     # This likely should be run in docker to not allow breaking things
     # run as:
     #
-    # docker run --rm -it -v ~/devel/connectedhomeip:/workspace --privileged ghcr.io/project-chip/chip-build-vscode:64
+    # docker run --rm -it -v ~/devel/connectedhomeip:/workspace --privileged ghcr.io/project-chip/chip-build-vscode:<VERSION>
     runner = __RUNNERS__[runner]
+
+    # make sure we are fully aware if running with or without coverage
+    coverage = get_coverage_default(coverage)
+    if coverage:
+        if runner != BinaryRunner.NONE:
+            log.error("Runner for coverage is implict")
+            sys.exit(1)
+
+        # wrap around so we get a good LLVM_PROFILE_FILE
+        runner = BinaryRunner.COVERAGE
 
     cmd = [
         "./scripts/tests/run_test_suite.py",
@@ -703,10 +1345,11 @@ def chip_tool_tests(target, target_glob, include_tags, expected_failures, runner
         "chip_tool_python",
     ]
 
-    target_prefix = _get_native_machine_target()
-    cmd.extend(
-        ["--chip-tool", f"./out/{target_prefix}-chip-tool-no-ble-clang-boringssl/chip-tool"]
-    )
+    cmd.extend(["--exclude-tags", "MANUAL"])
+    cmd.extend(["--exclude-tags", "IN_DEVELOPMENT"])
+    cmd.extend(["--exclude-tags", "FLAKY"])
+    cmd.extend(["--exclude-tags", "EXTRA_SLOW"])
+    cmd.extend(["--exclude-tags", "PURPOSEFUL_FAILURE"])
 
     if target is not None:
         cmd.extend(["--target", target])
@@ -719,65 +1362,20 @@ def chip_tool_tests(target, target_glob, include_tags, expected_failures, runner
 
     cmd.append("run")
     cmd.extend(["--iterations", "1"])
-    cmd.extend(["--test-timeout-seconds", "60"])
+
+    for target in _get_targets(coverage):
+        cmd.extend(_specify_target_path(target, runner))
+
+    # NOTE: we allow all runs here except extra slow
+    #       This means our timeout is quite large
+    cmd.extend(["--test-timeout-seconds", "300"])
 
     if expected_failures is not None:
-        cmd.extend(["--expected-failures", expected_failures, "--keep-going"])
+        cmd.extend(["--expected-failures", expected_failures])
+        keep_going = True  # if we expect failures, we have to keep going
 
-    _add_target_to_cmd(
-        cmd,
-        "--all-clusters-app",
-        f"./out/{target_prefix}-all-clusters-no-ble-clang-boringssl/chip-all-clusters-app",
-        runner,
-    )
-    _add_target_to_cmd(
-        cmd,
-        "--lock-app",
-        f"./out/{target_prefix}-lock-no-ble-clang-boringssl/chip-lock-app",
-        runner,
-    )
-    _add_target_to_cmd(
-        cmd,
-        "--ota-provider-app",
-        f"./out/{target_prefix}-ota-provider-no-ble-clang-boringssl/chip-ota-provider-app",
-        runner,
-    )
-    _add_target_to_cmd(
-        cmd,
-        "--ota-requestor-app",
-        f"./out/{target_prefix}-ota-requestor-no-ble-clang-boringssl/chip-ota-requestor-app",
-        runner,
-    )
-    _add_target_to_cmd(
-        cmd,
-        "--tv-app",
-        f"./out/{target_prefix}-tv-app-no-ble-clang-boringssl/chip-tv-app",
-        runner,
-    )
-    _add_target_to_cmd(
-        cmd,
-        "--bridge-app",
-        f"./out/{target_prefix}-bridge-no-ble-clang-boringssl/chip-bridge-app",
-        runner,
-    )
-    _add_target_to_cmd(
-        cmd,
-        "--lit-icd-app",
-        f"./out/{target_prefix}-lit-icd-no-ble-clang-boringssl/lit-icd-app",
-        runner,
-    )
-    _add_target_to_cmd(
-        cmd,
-        "--microwave-oven-app",
-        f"./out/{target_prefix}-microwave-oven-no-ble-clang-boringssl/chip-microwave-oven-app",
-        runner,
-    )
-    _add_target_to_cmd(
-        cmd,
-        "--rvc-app",
-        f"./out/{target_prefix}-rvc-no-ble-clang-boringssl/chip-rvc-app",
-        runner,
-    )
+    if keep_going:
+        cmd.append("--keep-going")
 
     subprocess.run(_with_activate(cmd), check=True)
 

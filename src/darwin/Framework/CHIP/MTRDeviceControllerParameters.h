@@ -153,11 +153,11 @@ MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))
 /**
  * The root certificate we were initialized with.
  */
-@property (nonatomic, copy, readonly) MTRCertificateDERBytes rootCertificate MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy, readonly) MTRCertificateDERBytes rootCertificate MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2));
 
 @end
 
-MTR_NEWLY_AVAILABLE
+MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2))
 @interface MTRXPCDeviceControllerParameters : MTRDeviceControllerAbstractParameters
 
 - (instancetype)init NS_UNAVAILABLE;
@@ -171,11 +171,14 @@ MTR_NEWLY_AVAILABLE
  * @param uniqueIdentifier The unique id to assign to the controller.
  *
  */
-- (instancetype)initWithXPConnectionBlock:(NSXPCConnection * (^)(void) )xpcConnectionBlock
-                         uniqueIdentifier:(NSUUID *)uniqueIdentifier;
+- (instancetype)initWithXPCConnectionBlock:(NSXPCConnection * (^)(void) )xpcConnectionBlock
+                          uniqueIdentifier:(NSUUID *)uniqueIdentifier MTR_AVAILABLE(ios(26.0), macos(26.0), watchos(26.0), tvos(26.0));
 
-@property (atomic, readonly, retain) NSUUID * uniqueIdentifier MTR_NEWLY_AVAILABLE;
-@property (readonly, strong, nonatomic) NSXPCConnection * (^xpcConnectionBlock)(void) MTR_NEWLY_AVAILABLE;
+- (instancetype)initWithXPConnectionBlock:(NSXPCConnection * (^)(void) )xpcConnectionBlock
+                         uniqueIdentifier:(NSUUID *)uniqueIdentifier MTR_DEPRECATED("Please use initWithXPCConnectionBlock:uniqueIdentifier:", ios(18.2, 26.0), macos(15.2, 26.0), watchos(11.2, 26.0), tvos(18.2, 26.0));
+
+@property (atomic, readonly, retain) NSUUID * uniqueIdentifier MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2));
+@property (readonly, strong, nonatomic) NSXPCConnection * (^xpcConnectionBlock)(void) MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2));
 
 @end
 

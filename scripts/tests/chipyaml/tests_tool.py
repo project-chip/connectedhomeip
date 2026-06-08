@@ -16,17 +16,17 @@ import relative_importer  # isort: split # noqa: F401
 
 import asyncio
 import json
-from typing import List
 
 import click
-from matter_chip_tool_adapter.decoder import MatterLog
-from matter_yamltests.websocket_runner import WebSocketRunner, WebSocketRunnerConfig
+from chipyaml.adapters.chiptool.decoder import MatterLog
 from runner import runner_base
 from tests_logger import TestColoredLogPrinter, WebSocketRunnerLogger
 
+from matter.yamltests.websocket_runner import WebSocketRunner, WebSocketRunnerConfig
+
 
 @click.pass_context
-def send_yaml_command(ctx, test_tool, test_name: str, server_path: str, server_arguments: str, show_adapter_logs: bool, specifications_paths: str, pics: str, additional_pseudo_clusters_directory: str, commands: List[str]):
+def send_yaml_command(ctx, test_tool, test_name: str, server_path: str, server_arguments: str, show_adapter_logs: bool, specifications_paths: str, pics: str, additional_pseudo_clusters_directory: str, commands: list[str]):
     kwargs = {'test_name': test_name, 'show_adapter_logs': show_adapter_logs, 'specifications_paths': specifications_paths, 'pics': pics,
               'additional_pseudo_clusters_directory': additional_pseudo_clusters_directory}
 
@@ -65,5 +65,4 @@ def send_raw_command(command: str, server_path: str, server_arguments: str):
     log_printer = TestColoredLogPrinter()
     log_printer.print(MatterLog.decode_logs(json_payload.get('logs')))
 
-    success = not bool(len([lambda x: x.get('error') for x in json_payload.get('results')]))
-    return success
+    return not bool(len([lambda x: x.get('error') for x in json_payload.get('results')]))

@@ -73,7 +73,7 @@ void FailSafeContext::FailSafeTimerExpired()
     }
 
     ChipLogProgress(FailSafe, "Fail-safe timer expired");
-    ScheduleFailSafeCleanup(mFabricIndex, mAddNocCommandHasBeenInvoked, mUpdateNocCommandHasBeenInvoked);
+    ScheduleFailSafeCleanup(mFabricIndex, AddNocCommandHasBeenInvoked(), UpdateNocCommandHasBeenInvoked());
 }
 
 void FailSafeContext::ScheduleFailSafeCleanup(FabricIndex fabricIndex, bool addNocCommandInvoked, bool updateNocCommandInvoked)
@@ -86,9 +86,13 @@ void FailSafeContext::ScheduleFailSafeCleanup(FabricIndex fabricIndex, bool addN
     SetFailSafeArmed(false);
 
     ChipDeviceEvent event{ .Type                 = DeviceEventType::kFailSafeTimerExpired,
-                           .FailSafeTimerExpired = { .fabricIndex                    = fabricIndex,
-                                                     .addNocCommandHasBeenInvoked    = addNocCommandInvoked,
-                                                     .updateNocCommandHasBeenInvoked = updateNocCommandInvoked } };
+                           .FailSafeTimerExpired = {
+                               .fabricIndex                               = fabricIndex,
+                               .addNocCommandHasBeenInvoked               = addNocCommandInvoked,
+                               .updateNocCommandHasBeenInvoked            = updateNocCommandInvoked,
+                               .updateTermsAndConditionsHasBeenInvoked    = UpdateTermsAndConditionsHasBeenInvoked(),
+                               .setVidVerificationStatementHasBeenInvoked = HasSetVidVerificationStatementHasBeenInvoked(),
+                           } };
     CHIP_ERROR status = PlatformMgr().PostEvent(&event);
 
     if (status != CHIP_NO_ERROR)
@@ -96,7 +100,7 @@ void FailSafeContext::ScheduleFailSafeCleanup(FabricIndex fabricIndex, bool addN
         ChipLogError(FailSafe, "Failed to post fail-safe timer expired: %" CHIP_ERROR_FORMAT, status.Format());
     }
 
-    PlatformMgr().ScheduleWork(HandleDisarmFailSafe, reinterpret_cast<intptr_t>(this));
+    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(HandleDisarmFailSafe, reinterpret_cast<intptr_t>(this));
 }
 
 CHIP_ERROR FailSafeContext::ArmFailSafe(FabricIndex accessingFabricIndex, System::Clock::Seconds16 expiryLengthSeconds)

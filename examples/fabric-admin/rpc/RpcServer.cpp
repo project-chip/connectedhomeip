@@ -38,6 +38,8 @@
 
 using namespace ::chip;
 
+namespace admin {
+
 namespace {
 
 #if defined(PW_RPC_FABRIC_ADMIN_SERVICE) && PW_RPC_FABRIC_ADMIN_SERVICE
@@ -53,7 +55,7 @@ struct ScopedNodeIdHasher
     }
 };
 
-class FabricAdmin final : public rpc::FabricAdmin, public IcdManager::Delegate
+class FabricAdmin final : public rpc::FabricAdmin, public admin::PairingDelegate, public IcdManager::Delegate
 {
 public:
     void OnCheckInCompleted(const app::ICDClientInfo & clientInfo) override
@@ -85,13 +87,42 @@ public:
         // there is no mechanism for us to communicate with the client that sent out the KeepActive
         // command that there was a failure, we simply fail silently. After spec issue is
         // addressed, we can implement what spec defines here.
-        auto onDone    = [=](uint32_t promisedActiveDuration) { ActiveChanged(scopedNodeId, promisedActiveDuration); };
+        auto onDone = [=](uint32_t promisedActiveDuration) {
+            TEMPORARY_RETURN_IGNORED ActiveChanged(scopedNodeId, promisedActiveDuration);
+        };
         CHIP_ERROR err = StayActiveSender::SendStayActiveCommand(checkInData.mStayActiveDurationMs, clientInfo.peer_node,
                                                                  app::InteractionModelEngine::GetInstance(), onDone);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(NotSpecified, "Failed to send StayActive command %s", err.AsString());
         }
+    }
+
+    void OnCommissioningComplete(NodeId deviceId, CHIP_ERROR err) override
+    {
+        if (mNodeId != deviceId)
+        {
+            ChipLogError(NotSpecified,
+                         "Tried to pair a non-bridge device (0x:" ChipLogFormatX64 ") with result: %" CHIP_ERROR_FORMAT,
+                         ChipLogValueX64(deviceId), err.Format());
+            return;
+        }
+        else
+        {
+            ChipLogProgress(NotSpecified, "Reverse commission succeeded for NodeId:" ChipLogFormatX64, ChipLogValueX64(mNodeId));
+        }
+
+        if (err == CHIP_NO_ERROR)
+        {
+            DeviceManager::Instance().SetRemoteBridgeNodeId(deviceId);
+        }
+        else
+        {
+            ChipLogError(NotSpecified, "Failed to pair bridge device (0x:" ChipLogFormatX64 ") with error: %" CHIP_ERROR_FORMAT,
+                         ChipLogValueX64(deviceId), err.Format());
+        }
+
+        mNodeId = kUndefinedNodeId;
     }
 
     pw::Status OpenCommissioningWindow(const chip_rpc_DeviceCommissioningWindowInfo & request,
@@ -110,9 +141,9 @@ public:
                         ChipLogValueX64(scopedNodeId.GetNodeId()), commissioningTimeoutSec, iterations, discriminator);
 
         // Open the device commissioning window using raw binary data for salt and verifier
-        DeviceMgr().OpenDeviceCommissioningWindow(scopedNodeId, iterations, commissioningTimeoutSec, discriminator,
-                                                  ByteSpan(request.salt.bytes, request.salt.size),
-                                                  ByteSpan(request.verifier.bytes, request.verifier.size));
+        DeviceManager::Instance().OpenDeviceCommissioningWindow(scopedNodeId, iterations, commissioningTimeoutSec, discriminator,
+                                                                ByteSpan(request.salt.bytes, request.salt.size),
+                                                                ByteSpan(request.verifier.bytes, request.verifier.size));
 
         response.success = true;
 
@@ -122,7 +153,8 @@ public:
     pw::Status CommissionNode(const chip_rpc_DeviceCommissioningInfo & request, pw_protobuf_Empty & response) override
     {
         char saltHex[Crypto::kSpake2p_Max_PBKDF_Salt_Length * 2 + 1];
-        Encoding::BytesToHex(request.salt.bytes, request.salt.size, saltHex, sizeof(saltHex), Encoding::HexFlags::kNullTerminate);
+        TEMPORARY_RETURN_IGNORED Encoding::BytesToHex(request.salt.bytes, request.salt.size, saltHex, sizeof(saltHex),
+                                                      Encoding::HexFlags::kNullTerminate);
 
         ChipLogProgress(NotSpecified, "Received CommissionNode request");
 
@@ -144,13 +176,17 @@ public:
 
         if (error == CHIP_NO_ERROR)
         {
-            NodeId nodeId = DeviceMgr().GetNextAvailableNodeId();
+            mNodeId = DeviceManager::Instance().GetNextAvailableNodeId();
 
             // After responding with RequestCommissioningApproval to the node where the client initiated the
             // RequestCommissioningApproval, you need to wait for it to open a commissioning window on its bridge.
             usleep(kCommissionPrepareTimeMs * 1000);
+            PairingManager::Instance().SetPairingDelegate(this);
 
-            DeviceMgr().PairRemoteDevice(nodeId, code.c_str());
+            if (PairingManager::Instance().PairDeviceWithCode(mNodeId, code.c_str()) != CHIP_NO_ERROR)
+            {
+                ChipLogError(NotSpecified, "Failed to commission device " ChipLogFormatX64, ChipLogValueX64(mNodeId));
+            }
         }
         else
         {
@@ -170,7 +206,7 @@ public:
         KeepActiveWorkData * data =
             Platform::New<KeepActiveWorkData>(this, scopedNodeId, request.stay_active_duration_ms, request.timeout_ms);
         VerifyOrReturnValue(data, pw::Status::Internal());
-        DeviceLayer::PlatformMgr().ScheduleWork(KeepActiveWork, reinterpret_cast<intptr_t>(data));
+        TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(KeepActiveWork, reinterpret_cast<intptr_t>(data));
         return pw::OkStatus();
     }
 
@@ -222,6 +258,8 @@ private:
         Platform::Delete(data);
     }
 
+    NodeId mNodeId = chip::kUndefinedNodeId;
+
     // Modifications to mPendingCheckIn should be done on the MatterEventLoop thread
     // otherwise we would need a mutex protecting this data to prevent race as this
     // data is accessible by both RPC thread and Matter eventloop.
@@ -254,3 +292,5 @@ void InitRpcServer(uint16_t rpcServerPort)
     std::thread rpc_service(RunRpcService);
     rpc_service.detach();
 }
+
+} // namespace admin

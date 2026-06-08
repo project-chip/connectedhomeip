@@ -16,7 +16,6 @@
 
 import asyncio
 import contextlib
-import os
 import shutil
 import signal
 import sys
@@ -32,6 +31,7 @@ async def forward_f(prefix: bytes, f_in: asyncio.StreamReader,
 
     This function can optionally feed received lines to a callback function.
     """
+
     while line := await f_in.readline():
         if cb is not None:
             cb(line)
@@ -40,29 +40,9 @@ async def forward_f(prefix: bytes, f_in: asyncio.StreamReader,
         f_out.flush()
 
 
-async def forward_pipe(pipe_path: str, f_out: asyncio.StreamWriter):
-    """Forward named pipe to f_out.
-
-    Unfortunately, Python does not support async file I/O on named pipes. This
-    function performs busy waiting with a short asyncio-friendly sleep to read
-    from the pipe.
-    """
-    fd = os.open(pipe_path, os.O_RDONLY | os.O_NONBLOCK)
-    while True:
-        try:
-            data = os.read(fd, 1024)
-            if data:
-                f_out.write(data)
-                await f_out.drain()
-            if not data:
-                await asyncio.sleep(0.1)
-        except BlockingIOError:
-            await asyncio.sleep(0.1)
-
-
 async def forward_stdin(f_out: asyncio.StreamWriter):
     """Forward stdin to f_out."""
-    loop = asyncio.get_event_loop()
+    loop = asyncio.get_running_loop()
     reader = asyncio.StreamReader()
     protocol = asyncio.StreamReaderProtocol(reader)
     await loop.connect_read_pipe(lambda: protocol, sys.stdin)
@@ -174,9 +154,6 @@ async def main(args):
         storage = TemporaryDirectory(prefix="fabric-sync-app")
         storage_dir = Path(storage.name)
 
-    if args.stdin_pipe and not args.stdin_pipe.exists():
-        os.mkfifo(args.stdin_pipe)
-
     admin, bridge = await asyncio.gather(
         run_admin(
             args.app_admin,
@@ -198,15 +175,13 @@ async def main(args):
             passcode=args.passcode,
         ))
 
-    loop = asyncio.get_event_loop()
+    loop = asyncio.get_running_loop()
 
     def terminate():
         with contextlib.suppress(ProcessLookupError):
             admin.terminate()
         with contextlib.suppress(ProcessLookupError):
             bridge.terminate()
-        if args.stdin_pipe:
-            args.stdin_pipe.unlink(missing_ok=True)
         loop.remove_signal_handler(signal.SIGINT)
         loop.remove_signal_handler(signal.SIGTERM)
 
@@ -225,7 +200,7 @@ async def main(args):
             # the bridge is already commissioned.
             expected_output="Reading attribute: Cluster=0x0000_001D Endpoint=0x1 AttributeId=0x0000_0000",
             timeout=1.5)
-    except asyncio.TimeoutError:
+    except TimeoutError:
         # Commission the bridge to the admin.
         cmd = f"fabricsync add-local-bridge {bridge_node_id}"
         if args.passcode is not None:
@@ -248,17 +223,12 @@ async def main(args):
     await admin.send(f"pairing open-commissioning-window {bridge_node_id} {cw_endpoint_id}"
                      f" {cw_option} {cw_timeout} {cw_iteration} {cw_discriminator}")
 
-    def get_input_forwarder():
-        if args.stdin_pipe:
-            return forward_pipe(args.stdin_pipe, admin.p.stdin)
-        return forward_stdin(admin.p.stdin)
-
     try:
         # Wait for any of the tasks to complete.
         _, pending = await asyncio.wait([
             asyncio.create_task(admin.wait()),
             asyncio.create_task(bridge.wait()),
-            asyncio.create_task(get_input_forwarder()),
+            asyncio.create_task(forward_stdin(admin.p.stdin)),
         ], return_when=asyncio.FIRST_COMPLETED)
         # Cancel the remaining tasks.
         for task in pending:
@@ -284,8 +254,6 @@ if __name__ == "__main__":
                         help="fabric-admin RPC server port")
     parser.add_argument("--app-bridge-rpc-port", metavar="PORT", type=int,
                         help="fabric-bridge RPC server port")
-    parser.add_argument("--stdin-pipe", metavar="PATH", type=Path,
-                        help="read input from a named pipe instead of stdin")
     parser.add_argument("--storage-dir", metavar="PATH", type=Path,
                         help=("directory to place storage files in; by default "
                               "volatile storage is used"))
@@ -308,7 +276,5 @@ if __name__ == "__main__":
         parser.error("fabric-admin executable not found in PATH. Use '--app-admin' argument to provide it.")
     if args.app_bridge is None or not args.app_bridge.exists():
         parser.error("fabric-bridge-app executable not found in PATH. Use '--app-bridge' argument to provide it.")
-    if args.stdin_pipe and args.stdin_pipe.exists() and not args.stdin_pipe.is_fifo():
-        parser.error("given stdin pipe exists and is not a named pipe")
     with contextlib.suppress(KeyboardInterrupt):
         asyncio.run(main(args))

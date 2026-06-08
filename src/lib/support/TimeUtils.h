@@ -29,40 +29,37 @@
 
 namespace chip {
 
-enum
-{
-    kYearsPerCentury  = 100,
-    kLeapYearInterval = 4,
+inline constexpr int kYearsPerCentury  = 100;
+inline constexpr int kLeapYearInterval = 4;
 
-    kMonthsPerYear = 12,
+inline constexpr int kMonthsPerYear = 12;
 
-    kMaxDaysPerMonth = 31,
+inline constexpr int kMaxDaysPerMonth = 31;
 
-    kDaysPerWeek         = 7,
-    kDaysPerStandardYear = 365,
-    kDaysPerLeapYear     = kDaysPerStandardYear + 1,
+inline constexpr int kDaysPerWeek         = 7;
+inline constexpr int kDaysPerStandardYear = 365;
+inline constexpr int kDaysPerLeapYear     = kDaysPerStandardYear + 1;
 
-    kHoursPerDay  = 24,
-    kHoursPerWeek = kDaysPerWeek * kHoursPerDay,
+inline constexpr int kHoursPerDay  = 24;
+inline constexpr int kHoursPerWeek = kDaysPerWeek * kHoursPerDay;
 
-    kMinutesPerHour = 60,
-    kMinutesPerDay  = kHoursPerDay * kMinutesPerHour,
+inline constexpr int kMinutesPerHour = 60;
+inline constexpr int kMinutesPerDay  = kHoursPerDay * kMinutesPerHour;
 
-    kSecondsPerMinute       = 60,
-    kSecondsPerHour         = kSecondsPerMinute * kMinutesPerHour,
-    kSecondsPerDay          = kSecondsPerHour * kHoursPerDay,
-    kSecondsPerWeek         = kSecondsPerDay * kDaysPerWeek,
-    kSecondsPerStandardYear = kSecondsPerDay * kDaysPerStandardYear,
+inline constexpr int kSecondsPerMinute       = 60;
+inline constexpr int kSecondsPerHour         = kSecondsPerMinute * kMinutesPerHour;
+inline constexpr int kSecondsPerDay          = kSecondsPerHour * kHoursPerDay;
+inline constexpr int kSecondsPerWeek         = kSecondsPerDay * kDaysPerWeek;
+inline constexpr int kSecondsPerStandardYear = kSecondsPerDay * kDaysPerStandardYear;
 
-    kMillisecondsPerSecond = 1000,
+inline constexpr int kMillisecondsPerSecond = 1000;
 
-    kMicrosecondsPerSecond      = 1000000,
-    kMicrosecondsPerMillisecond = 1000,
+inline constexpr int kMicrosecondsPerSecond      = 1000000;
+inline constexpr int kMicrosecondsPerMillisecond = 1000;
 
-    kNanosecondsPerSecond      = 1000000000,
-    kNanosecondsPerMillisecond = 1000000,
-    kNanosecondsPerMicrosecond = 1000,
-};
+inline constexpr int kNanosecondsPerSecond      = 1000000000;
+inline constexpr int kNanosecondsPerMillisecond = 1000000;
+inline constexpr int kNanosecondsPerMicrosecond = 1000;
 
 enum
 {

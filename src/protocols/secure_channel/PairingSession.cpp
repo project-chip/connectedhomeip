@@ -35,6 +35,7 @@ CHIP_ERROR PairingSession::AllocateSecureSession(SessionManager & sessionManager
     VerifyOrReturnError(handle.HasValue(), CHIP_ERROR_NO_MEMORY);
     VerifyOrReturnError(mSecureSessionHolder.GrabPairingSession(handle.Value()), CHIP_ERROR_INTERNAL);
     mSessionManager = &sessionManager;
+    mSystemLayer    = sessionManager.SystemLayer();
     return CHIP_NO_ERROR;
 }
 
@@ -67,8 +68,7 @@ void PairingSession::Finish()
     {
         // Fetch the connection for the unauthenticated session used to set up
         // the secure session.
-        Transport::ActiveTCPConnectionState * conn =
-            mExchangeCtxt.Value()->GetSessionHandle()->AsUnauthenticatedSession()->GetTCPConnection();
+        auto conn = mExchangeCtxt.Value()->GetSessionHandle()->AsUnauthenticatedSession()->GetTCPConnection();
 
         // Associate the connection with the secure session being activated.
         mSecureSessionHolder->AsSecureSession()->SetTCPConnection(conn);
@@ -81,8 +81,7 @@ void PairingSession::Finish()
     if (err == CHIP_NO_ERROR)
     {
         VerifyOrDie(mSecureSessionHolder);
-        DeviceLayer::ChipDeviceEvent event;
-        event.Type                                   = DeviceLayer::DeviceEventType::kSecureSessionEstablished;
+        DeviceLayer::ChipDeviceEvent event{ .Type = DeviceLayer::DeviceEventType::kSecureSessionEstablished };
         event.SecureSessionEstablished.TransportType = to_underlying(address.GetTransportType());
         event.SecureSessionEstablished.SecureSessionType =
             to_underlying(mSecureSessionHolder->AsSecureSession()->GetSecureSessionType());
@@ -145,7 +144,8 @@ CHIP_ERROR PairingSession::EncodeSessionParameters(TLV::Tag tag, const ReliableM
     return tlvWriter.EndContainer(mrpParamsContainer);
 }
 
-CHIP_ERROR PairingSession::DecodeMRPParametersIfPresent(TLV::Tag expectedTag, TLV::ContiguousBufferTLVReader & tlvReader)
+CHIP_ERROR PairingSession::DecodeSessionParametersIfPresent(TLV::Tag expectedTag, TLV::ContiguousBufferTLVReader & tlvReader,
+                                                            SessionParameters & outSessionParameters)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -168,7 +168,7 @@ CHIP_ERROR PairingSession::DecodeMRPParametersIfPresent(TLV::Tag expectedTag, TL
     {
         uint32_t idleRetransTimeout;
         ReturnErrorOnFailure(tlvReader.Get(idleRetransTimeout));
-        mRemoteSessionParams.SetMRPIdleRetransTimeout(System::Clock::Milliseconds32(idleRetransTimeout));
+        outSessionParameters.SetMRPIdleRetransTimeout(System::Clock::Milliseconds32(idleRetransTimeout));
 
         // The next element is optional. If it's not present, return CHIP_NO_ERROR.
         SuccessOrExit(err = tlvReader.Next());
@@ -178,7 +178,7 @@ CHIP_ERROR PairingSession::DecodeMRPParametersIfPresent(TLV::Tag expectedTag, TL
     {
         uint32_t activeRetransTimeout;
         ReturnErrorOnFailure(tlvReader.Get(activeRetransTimeout));
-        mRemoteSessionParams.SetMRPActiveRetransTimeout(System::Clock::Milliseconds32(activeRetransTimeout));
+        outSessionParameters.SetMRPActiveRetransTimeout(System::Clock::Milliseconds32(activeRetransTimeout));
 
         // The next element is optional. If it's not present, return CHIP_NO_ERROR.
         SuccessOrExit(err = tlvReader.Next());
@@ -188,7 +188,7 @@ CHIP_ERROR PairingSession::DecodeMRPParametersIfPresent(TLV::Tag expectedTag, TL
     {
         uint16_t activeThresholdTime;
         ReturnErrorOnFailure(tlvReader.Get(activeThresholdTime));
-        mRemoteSessionParams.SetMRPActiveThresholdTime(System::Clock::Milliseconds16(activeThresholdTime));
+        outSessionParameters.SetMRPActiveThresholdTime(System::Clock::Milliseconds16(activeThresholdTime));
 
         // The next element is optional. If it's not present, return CHIP_NO_ERROR.
         SuccessOrExit(err = tlvReader.Next());
@@ -198,7 +198,7 @@ CHIP_ERROR PairingSession::DecodeMRPParametersIfPresent(TLV::Tag expectedTag, TL
     {
         uint16_t dataModelRevision;
         ReturnErrorOnFailure(tlvReader.Get(dataModelRevision));
-        mRemoteSessionParams.SetDataModelRevision(dataModelRevision);
+        outSessionParameters.SetDataModelRevision(dataModelRevision);
 
         // The next element is optional. If it's not present, return CHIP_NO_ERROR.
         SuccessOrExit(err = tlvReader.Next());
@@ -208,7 +208,7 @@ CHIP_ERROR PairingSession::DecodeMRPParametersIfPresent(TLV::Tag expectedTag, TL
     {
         uint16_t interactionModelRevision;
         ReturnErrorOnFailure(tlvReader.Get(interactionModelRevision));
-        mRemoteSessionParams.SetInteractionModelRevision(interactionModelRevision);
+        outSessionParameters.SetInteractionModelRevision(interactionModelRevision);
 
         // The next element is optional. If it's not present, return CHIP_NO_ERROR.
         SuccessOrExit(err = tlvReader.Next());
@@ -218,7 +218,7 @@ CHIP_ERROR PairingSession::DecodeMRPParametersIfPresent(TLV::Tag expectedTag, TL
     {
         uint32_t specificationVersion;
         ReturnErrorOnFailure(tlvReader.Get(specificationVersion));
-        mRemoteSessionParams.SetSpecificationVersion(specificationVersion);
+        outSessionParameters.SetSpecificationVersion(specificationVersion);
 
         // The next element is optional. If it's not present, return CHIP_NO_ERROR.
         SuccessOrExit(err = tlvReader.Next());
@@ -228,7 +228,7 @@ CHIP_ERROR PairingSession::DecodeMRPParametersIfPresent(TLV::Tag expectedTag, TL
     {
         uint16_t maxPathsPerInvoke;
         ReturnErrorOnFailure(tlvReader.Get(maxPathsPerInvoke));
-        mRemoteSessionParams.SetMaxPathsPerInvoke(maxPathsPerInvoke);
+        outSessionParameters.SetMaxPathsPerInvoke(maxPathsPerInvoke);
 
         // The next element is optional. If it's not present, return CHIP_NO_ERROR.
         SuccessOrExit(err = tlvReader.Next());
@@ -236,7 +236,7 @@ CHIP_ERROR PairingSession::DecodeMRPParametersIfPresent(TLV::Tag expectedTag, TL
 
     // Future proofing - Don't error out if there are other tags
 exit:
-    if (err == CHIP_END_OF_TLV)
+    if (err == CHIP_END_OF_TLV || err == CHIP_NO_ERROR)
     {
         return tlvReader.ExitContainer(containerType);
     }
@@ -297,18 +297,29 @@ void PairingSession::OnSessionReleased()
     // Send the error notification async, because our delegate is likely to want
     // to create a new session to listen for new connection attempts, and doing
     // that under an OnSessionReleased notification is not safe.
-    if (!mSessionManager)
+    //
+    // We capture the delegate by value and null mDelegate immediately, mirroring
+    // what NotifySessionEstablishmentError does on the synchronous path.  This
+    // means the lambda holds no reference to 'this' at all, so the PairingSession
+    // lifetime is irrelevant — the callback is safe even if the object is freed
+    // or recycled from a pool before the event loop drains this work item.
+    //
+    // mSystemLayer is captured from the session manager at AllocateSecureSession()
+    // and intentionally not cleared by Clear(), so it remains valid here even
+    // though mSessionManager has already been nulled.  Using it directly avoids
+    // any dependency on DeviceLayer (which may not be present on all platforms).
+    auto * delegate = mDelegate;
+    mDelegate       = nullptr;
+
+    if (delegate == nullptr || mSystemLayer == nullptr)
     {
         return;
     }
 
-    mSessionManager->SystemLayer()->ScheduleWork(
-        [](auto * systemLayer, auto * appState) -> void {
-            ChipLogError(Inet, "ASYNC CASE Session establishment failed");
-            auto * _this = static_cast<PairingSession *>(appState);
-            _this->NotifySessionEstablishmentError(CHIP_ERROR_CONNECTION_ABORTED);
-        },
-        this);
+    TEMPORARY_RETURN_IGNORED mSystemLayer->ScheduleLambda([delegate]() {
+        ChipLogError(Inet, "ASYNC Session establishment failed");
+        delegate->OnSessionEstablishmentError(CHIP_ERROR_CONNECTION_ABORTED, SessionEstablishmentStage::kNotInKeyExchange);
+    });
 }
 
 } // namespace chip

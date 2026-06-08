@@ -13,6 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import argparse
+import contextlib
 import glob
 import os
 import platform
@@ -27,6 +28,7 @@ def get_file_from_pigweed(name):
     for filename in glob.glob(pattern, recursive=True):
         if os.path.isfile(filename):
             return filename
+    return None
 
 
 def run_command(command):
@@ -49,10 +51,8 @@ def run_command(command):
     if returncode != 0:
         # command_log is binary, so decoding as utf-8 might technically fail.  We don't want
         # to throw on that.
-        try:
+        with contextlib.suppress(Exception):
             print("Failure log: {}".format(command_log.decode()))
-        except Exception:
-            pass
 
     return returncode
 
@@ -91,7 +91,8 @@ def build_darwin_framework(args):
         'CHIP_IS_ASAN': args.asan,
         'CHIP_IS_BLE': args.ble,
         'CHIP_IS_CLANG': args.clang,
-        'CHIP_ENABLE_ENCODING_SENTINEL_ENUM_VALUES': args.enable_encoding_sentinel_enum_values
+        'CHIP_ENABLE_ENCODING_SENTINEL_ENUM_VALUES': args.enable_encoding_sentinel_enum_values,
+        'CHIP_USE_NETWORK_FRAMEWORK': args.use_network_framework
     }
     for option in options:
         command += ["{}={}".format(option, "YES" if options[option] else "NO")]
@@ -176,6 +177,8 @@ if __name__ == "__main__":
     parser.add_argument('--clang', action=argparse.BooleanOptionalAction)
     parser.add_argument('--enable-encoding-sentinel-enum-values', action=argparse.BooleanOptionalAction)
     parser.add_argument('--compdb', action=argparse.BooleanOptionalAction)
+    parser.add_argument('--use-network-framework',
+                        action=argparse.BooleanOptionalAction)
 
     args = parser.parse_args()
     build_darwin_framework(args)

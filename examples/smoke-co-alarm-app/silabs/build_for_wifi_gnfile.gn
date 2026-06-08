@@ -24,5 +24,6 @@ default_args = {
   target_cpu = "arm"
   target_os = "freertos"
   chip_enable_wifi = true
+  chip_device_platform = "SiWx917"
   import("//build_for_wifi_args.gni")
 }

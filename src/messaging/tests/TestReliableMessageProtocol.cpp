@@ -21,6 +21,8 @@
  *      This file implements unit tests for the ReliableMessageProtocol
  *      implementation.
  */
+#include <queue>
+
 #include <errno.h>
 
 #include <pw_unit_test/framework.h>
@@ -29,6 +31,7 @@
 #include <lib/core/CHIPCore.h>
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <messaging/ReliableMessageContext.h>
 #include <messaging/ReliableMessageMgr.h>
 #include <messaging/ReliableMessageProtocolConfig.h>
@@ -61,7 +64,14 @@ using namespace chip::System::Clock::Literals;
 
 const char PAYLOAD[] = "Hello!";
 
-class TestReliableMessageProtocol : public chip::Test::LoopbackMessagingContext
+class TestReliablityAnalyticDelegate : public ReliableMessageAnalyticsDelegate
+{
+public:
+    virtual void OnTransmitEvent(const TransmitEvent & event) override { mTransmitEvents.push(event); }
+    std::queue<ReliableMessageAnalyticsDelegate::TransmitEvent> mTransmitEvents;
+};
+
+class TestReliableMessageProtocol : public chip::Testing::LoopbackMessagingContext
 {
 public:
     // Performs setup for each individual test in the test suite
@@ -70,7 +80,7 @@ public:
 #if CHIP_CRYPTO_PSA
         ASSERT_EQ(psa_crypto_init(), PSA_SUCCESS);
 #endif
-        chip::Test::LoopbackMessagingContext::SetUp();
+        chip::Testing::LoopbackMessagingContext::SetUp();
         GetSessionAliceToBob()->AsSecureSession()->SetRemoteSessionParameters(GetLocalMRPConfig().ValueOr(GetDefaultMRPConfig()));
         GetSessionBobToAlice()->AsSecureSession()->SetRemoteSessionParameters(GetLocalMRPConfig().ValueOr(GetDefaultMRPConfig()));
     }
@@ -355,7 +365,7 @@ TEST_F(TestReliableMessageProtocol, CheckAddClearRetrans)
 
     ReliableMessageMgr::RetransTableEntry * entry;
 
-    rm->AddToRetransTable(rc, &entry);
+    EXPECT_SUCCESS(rm->AddToRetransTable(rc, &entry));
     EXPECT_EQ(rm->TestGetCountRetransTable(), 1);
     rm->ClearRetransTable(*entry);
     EXPECT_EQ(rm->TestGetCountRetransTable(), 0);
@@ -695,8 +705,10 @@ TEST_F(TestReliableMessageProtocol, CheckResendApplicationMessageWithPeerExchang
     EXPECT_EQ(rm->TestGetCountRetransTable(), 0);
     EXPECT_TRUE(mockReceiver.IsOnMessageReceivedCalled);
 
-    err = GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Echo::MsgType::EchoRequest);
+    Messaging::UnsolicitedMessageHandler * removedHandler = nullptr;
+    err = GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Echo::MsgType::EchoRequest, &removedHandler);
     EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(removedHandler, &mockReceiver);
 }
 
 TEST_F(TestReliableMessageProtocol, CheckDuplicateMessageClosedExchange)
@@ -748,8 +760,10 @@ TEST_F(TestReliableMessageProtocol, CheckDuplicateMessageClosedExchange)
     // Let's not drop the duplicate message
     mockReceiver.SetDropAckResponse(false);
 
-    err = GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Echo::MsgType::EchoRequest);
+    Messaging::UnsolicitedMessageHandler * removedHandler = nullptr;
+    err = GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Echo::MsgType::EchoRequest, &removedHandler);
     EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(removedHandler, &mockReceiver);
 
     // Wait for the first re-transmit and ack (should take 64ms)
     GetIOContext().DriveIOUntil(1000_ms32, [&] { return loopback.mSentMessageCount >= 3; });
@@ -840,8 +854,10 @@ TEST_F(TestReliableMessageProtocol, CheckDuplicateOldMessageClosedExchange)
     // Let's not drop the duplicate message's ack.
     mockReceiver.SetDropAckResponse(false);
 
-    err = GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Echo::MsgType::EchoRequest);
+    Messaging::UnsolicitedMessageHandler * removedHandler = nullptr;
+    err = GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Echo::MsgType::EchoRequest, &removedHandler);
     EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(removedHandler, &mockReceiver);
 
     // Wait for the first re-transmit and ack (should take 64ms)
     rm->StartTimer();
@@ -905,8 +921,10 @@ TEST_F(TestReliableMessageProtocol, CheckResendSessionEstablishmentMessageWithPe
     EXPECT_EQ(rm->TestGetCountRetransTable(), 0);
     EXPECT_TRUE(mockReceiver.IsOnMessageReceivedCalled);
 
-    err = GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Echo::MsgType::EchoRequest);
+    Messaging::UnsolicitedMessageHandler * removedHandler = nullptr;
+    err = GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Echo::MsgType::EchoRequest, &removedHandler);
     EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(removedHandler, &mockReceiver);
 }
 
 TEST_F(TestReliableMessageProtocol, CheckDuplicateMessage)
@@ -955,8 +973,10 @@ TEST_F(TestReliableMessageProtocol, CheckDuplicateMessage)
     EXPECT_EQ(loopback.mDroppedMessageCount, 0u);
     EXPECT_EQ(rm->TestGetCountRetransTable(), 1);
 
-    err = GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Echo::MsgType::EchoRequest);
+    Messaging::UnsolicitedMessageHandler * removedHandler = nullptr;
+    err = GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Echo::MsgType::EchoRequest, &removedHandler);
     EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(removedHandler, &mockReceiver);
 
     // Let's not drop the duplicate message
     mockReceiver.SetDropAckResponse(false);
@@ -1025,7 +1045,7 @@ TEST_F(TestReliableMessageProtocol, CheckReceiveAfterStandaloneAck)
     EXPECT_TRUE(receiverRc->IsAckPending());
 
     // Send the standalone ack.
-    receiverRc->SendStandaloneAckMessage();
+    EXPECT_SUCCESS(receiverRc->SendStandaloneAckMessage());
     DrainAndServiceIO();
 
     // Ensure the ack was sent.
@@ -1053,8 +1073,10 @@ TEST_F(TestReliableMessageProtocol, CheckReceiveAfterStandaloneAck)
     // Ensure that we have received that response.
     EXPECT_TRUE(mockSender.IsOnMessageReceivedCalled);
 
-    err = GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Echo::MsgType::EchoRequest);
+    Messaging::UnsolicitedMessageHandler * removedHandler = nullptr;
+    err = GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Echo::MsgType::EchoRequest, &removedHandler);
     EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(removedHandler, &mockReceiver);
 
     EXPECT_EQ(rm->TestGetCountRetransTable(), 0);
 }
@@ -1178,8 +1200,10 @@ TEST_F(TestReliableMessageProtocol, CheckPiggybackAfterPiggyback)
     EXPECT_TRUE(mockSender.IsOnMessageReceivedCalled);
     EXPECT_TRUE(mockSender.mReceivedPiggybackAck);
 
-    err = GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Echo::MsgType::EchoRequest);
+    Messaging::UnsolicitedMessageHandler * removedHandler = nullptr;
+    err = GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Echo::MsgType::EchoRequest, &removedHandler);
     EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(removedHandler, &mockReceiver);
 
     EXPECT_EQ(rm->TestGetCountRetransTable(), 0);
 }
@@ -1362,8 +1386,10 @@ TEST_F(TestReliableMessageProtocol, CheckMessageAfterClosed)
     // immediately on the receiver, due to the exchange being closed.
     EXPECT_EQ(rm->TestGetCountRetransTable(), 0);
 
-    err = GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Echo::MsgType::EchoRequest);
+    Messaging::UnsolicitedMessageHandler * removedHandler = nullptr;
+    err = GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Echo::MsgType::EchoRequest, &removedHandler);
     EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(removedHandler, &mockReceiver);
 
     EXPECT_EQ(rm->TestGetCountRetransTable(), 0);
 }
@@ -1628,6 +1654,374 @@ TEST_F(TestReliableMessageProtocol, CheckIsPeerActiveNotInitiator)
     EXPECT_EQ(loopback.mSentMessageCount, 5u);
 }
 
+// =============================================================================
+// ICD-aware MRP retransmit backoff tests
+//
+// These exercise ReliableMessageMgr::CalculateNextRetransTime's choice of base
+// timeout (Active vs Idle) for an exchange where the peer is an Intermittently
+// Connected Device (ICD) advertising a Session Active Threshold (SAT) much
+// shorter than its Slow Idle Interval (SII).
+//
+// Per Matter Core spec §4.11.2.1 Retransmissions and §4.12 Intermittently
+// Connected Devices, the controller must spread retransmissions on the Idle
+// interval (SII) once the peer has dropped out of its Active window — even if
+// the local exchange has received messages from the peer earlier in the
+// exchange.
+//
+// Bug being guarded:
+//   A prior shortcut in CalculateNextRetransTime pinned to mActiveRetransTimeout
+//   (SAI) for the rest of the exchange as soon as HasReceivedAtLeastOneMessage()
+//   was true. For an ICD whose SAT < first-retx-backoff that meant every retx
+//   landed inside the peer's sleep window and reliable delivery silently failed
+//   (e.g. CASE Sigma3 to a sleepy Thread accessory).
+//
+// Test pattern (modeled after CheckIsPeerActiveNotInitiator above):
+//   Each test sends with kExpectResponse, drops one or more sends, then lets
+//   the retransmit succeed so the exchange closes naturally before TearDown.
+//   This avoids leaving an exchange in a "waiting for response" state, which
+//   would trip CancelResponseTimer through a torn-down SessionManager during
+//   shutdown.
+// =============================================================================
+
+namespace {
+
+// Helper: build an ICD-like peer MRP config.
+//
+//   SII = 1500 ms — Idle retx baseline; tests probing the post-SAT path
+//                    assert retx fires no sooner than this (after margin).
+//   SAI =  100 ms — Active retx baseline; tests of the pre-SAT-expiry path
+//                    assert retx fires well under this baseline + jitter.
+//   sat — Session Active Threshold; varied per test so we can stay inside
+//         the Active window or step outside it.
+ReliableMessageProtocolConfig MakeICDLikeMRPConfig(System::Clock::Milliseconds16 sat)
+{
+    return ReliableMessageProtocolConfig(1500_ms32, // mIdleRetransTimeout (SII)
+                                         100_ms32,  // mActiveRetransTimeout (SAI)
+                                         sat        // mActiveThresholdTime (SAT)
+    );
+}
+
+// Wall-clock tolerance for backoff timing assertions. MRP backoff adds up to
+// ~25% jitter on top of the (margin-adjusted) base, so a 50 ms lower-bound
+// margin keeps the tests stable on slow CI runners while still cleanly
+// distinguishing SAI- and SII-derived retx spacing.
+//
+// All tests in this file that consume these constants force the additional
+// MRP sender boost to 0 via ReliableMessageMgr::SetAdditionalMRPBackoffTime.
+// The platform default (CHIP_CONFIG_MRP_RETRY_INTERVAL_SENDER_BOOST = 1500ms
+// on OpenThread/non-Linux, 0 elsewhere) would otherwise shift these bounds
+// in a platform-dependent way.
+constexpr System::Clock::Milliseconds32 kMrpTimingMargin = 50_ms32;
+
+// SII-derived lower bound for "this retx was scheduled on Idle". Bottom of
+// the jitter range for SII × margin × backoff^0 — for our SII=1500ms config
+// (with sender boost forced to 0), the minimum is at least SII itself.
+constexpr System::Clock::Milliseconds32 kIdleRetxMinElapsed = 1500_ms32;
+
+// Upper fence for "this retx was scheduled on Active". With our SAI=100ms
+// config and sender boost forced to 0, an Active retx fires within a few
+// hundred ms of the original send; 1200 ms gives plenty of room for jitter
+// and CI noise while remaining well below kIdleRetxMinElapsed (1500 ms) so
+// the two regimes can't be confused.
+constexpr System::Clock::Milliseconds32 kActiveRetxMaxElapsed = 1200_ms32;
+
+} // namespace
+
+/**
+ * Verifies that once the peer's Session Active Threshold has elapsed, the
+ * responder's retransmissions of a subsequent reliable message are spaced on
+ * the IDLE interval (SII), even though the exchange has received at least one
+ * message from the peer earlier.
+ *
+ * Pattern:
+ *   1) Alice (initiator) sends EchoRequest to Bob with kExpectResponse.
+ *   2) Bob's exchange receives it; mockReceiver retains the exchange so we
+ *      can drive a response from it later. Bob's exchange now has
+ *      HasReceivedAtLeastOneMessage() = true, and Bob's session for Alice
+ *      has fresh mLastPeerActivityTime.
+ *   3) We configure Bob's view of Alice as an ICD-like sleepy peer with
+ *      SAT=50ms, and wait 200ms — well past SAT. IsPeerActive() for Alice
+ *      on Bob's session is now false.
+ *   4) Bob sends EchoResponse back to Alice; loopback drops it once.
+ *   5) Bob's MRP must schedule the retx on the Idle interval (SII=1500ms),
+ *      not the Active interval (SAI=100ms). The retx is allowed to succeed,
+ *      Alice receives the response, and the exchange closes naturally.
+ *   6) Verify timing: measured retx elapsed >= SII floor minus margin.
+ *   7) Verify clean shutdown: retransmit table is empty and Alice's
+ *      delegate observed the EchoResponse.
+ */
+TEST_F(TestReliableMessageProtocol, CheckICDPeerRetxUsesIdleBackoffAfterSATExpiry)
+{
+    // Force the additional MRP sender boost to 0 for the duration of this test so the timing
+    // bounds below are independent of the platform default (CHIP_CONFIG_MRP_RETRY_INTERVAL_SENDER_BOOST
+    // is 1500ms on OpenThread/non-Linux, 0 elsewhere). Reset at the bottom of the test.
+    ReliableMessageMgr::SetAdditionalMRPBackoffTime(MakeOptional(System::Clock::Timeout(0)));
+
+    chip::System::PacketBufferHandle buffer = chip::MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD));
+    EXPECT_FALSE(buffer.IsNull());
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    MockAppDelegate mockReceiver(*this);
+    err = GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(Echo::MsgType::EchoRequest, &mockReceiver);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    MockAppDelegate mockSender(*this);
+    ExchangeContext * exchange = NewExchangeToAlice(&mockSender);
+    ASSERT_NE(exchange, nullptr);
+
+    ReliableMessageMgr * rm = GetExchangeManager().GetReliableMessageMgr();
+    ASSERT_NE(rm, nullptr);
+
+    EXPECT_EQ(rm->TestGetCountRetransTable(), 0);
+
+    auto & loopback               = GetLoopback();
+    loopback.mSentMessageCount    = 0;
+    loopback.mNumMessagesToDrop   = 0;
+    loopback.mDroppedMessageCount = 0;
+
+    mockReceiver.mRetainExchange = true;
+    mockSender.mRetainExchange   = true;
+
+    // 1) Alice → Bob, expecting a response. Clean delivery — Bob acks via the
+    //    EchoResponse we drive in step 4.
+    err = exchange->SendMessage(Echo::MsgType::EchoRequest, std::move(buffer), SendFlags(SendMessageFlags::kExpectResponse));
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+    DrainAndServiceIO();
+    ASSERT_NE(mockReceiver.mExchange, nullptr);
+    EXPECT_TRUE(mockReceiver.mExchange->HasReceivedAtLeastOneMessage());
+
+    // 2) Configure Bob's session view of Alice as an ICD-like sleepy peer.
+    mockReceiver.mExchange->GetSessionHandle()->AsSecureSession()->SetRemoteSessionParameters(
+        MakeICDLikeMRPConfig(50_ms16 /* SAT */));
+
+    // 3) Step past SAT so IsPeerActive() returns false on Bob's session.
+    GetIOContext().DriveIOUntil(200_ms32, [&] { return false; });
+    DrainAndServiceIO();
+    EXPECT_FALSE(mockReceiver.mExchange->GetSessionHandle()->AsSecureSession()->IsPeerActive());
+
+    mockReceiver.mRetainExchange = false;
+    mockSender.mRetainExchange   = false;
+
+    // 4) Bob sends EchoResponse; loopback drops it once. The retx is allowed
+    //    to succeed on the second send.
+    buffer = chip::MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD));
+    EXPECT_FALSE(buffer.IsNull());
+    loopback.mNumMessagesToDrop      = 1;
+    uint32_t sentCountBeforeResponse = loopback.mSentMessageCount;
+
+    System::Clock::Timestamp txTime = System::SystemClock().GetMonotonicTimestamp();
+    err                             = mockReceiver.mExchange->SendMessage(Echo::MsgType::EchoResponse, std::move(buffer));
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+    DrainAndServiceIO();
+
+    EXPECT_EQ(loopback.mDroppedMessageCount, 1u);
+    EXPECT_EQ(loopback.mSentMessageCount, sentCountBeforeResponse + 1u);
+    // After Bob's EchoResponse drop, the retransmit table holds Bob's entry
+    // plus (typically) Alice's prior EchoRequest entry whose piggybacked ack
+    // was carried on the dropped EchoResponse. Don't pin the exact count.
+    EXPECT_GE(rm->TestGetCountRetransTable(), 1);
+
+    // 5) Wait long enough for the SII-derived retx to fire AND complete. We
+    //    poll until the message-count grows past the post-send baseline; in
+    //    the bug we'd see this in well under 200 ms (SAI-derived), in the
+    //    fixed path the soonest possible time is ~kIdleRetxMinElapsed.
+    GetIOContext().DriveIOUntil(3000_ms32, [&] { return mockSender.IsOnMessageReceivedCalled; });
+    DrainAndServiceIO();
+
+    System::Clock::Timestamp now              = System::SystemClock().GetMonotonicTimestamp();
+    System::Clock::Milliseconds64 elapsedMs64 = now - txTime;
+    auto elapsedMs                            = System::Clock::Milliseconds32(static_cast<uint32_t>(elapsedMs64.count()));
+    ChipLogProgress(Test, "ICD retx fired and was delivered at %" PRIu32 "ms (expected >= %" PRIu32 "ms)", elapsedMs.count(),
+                    (kIdleRetxMinElapsed - kMrpTimingMargin).count());
+
+    // 6) Timing assertion.
+    EXPECT_TRUE(mockSender.IsOnMessageReceivedCalled);
+    EXPECT_GE(elapsedMs.count(), (kIdleRetxMinElapsed - kMrpTimingMargin).count());
+
+    // 7) Clean shutdown: nothing should remain in the retransmit table.
+    EXPECT_EQ(rm->TestGetCountRetransTable(), 0);
+
+    ReliableMessageMgr::SetAdditionalMRPBackoffTime(NullOptional);
+}
+
+/**
+ * Inverse of the test above. Verifies that the SAI-fast-path is still in
+ * effect when the peer IS within its Active window: retx is spaced on SAI,
+ * not SII. Guards against an over-broad fix that always uses SII regardless
+ * of peer state.
+ */
+TEST_F(TestReliableMessageProtocol, CheckICDPeerRetxUsesActiveBackoffWithinSATWindow)
+{
+    // Force the additional MRP sender boost to 0 (see CheckICDPeerRetxUsesIdleBackoffAfterSATExpiry
+    // for rationale). Reset at the bottom of the test.
+    ReliableMessageMgr::SetAdditionalMRPBackoffTime(MakeOptional(System::Clock::Timeout(0)));
+
+    chip::System::PacketBufferHandle buffer = chip::MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD));
+    EXPECT_FALSE(buffer.IsNull());
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    MockAppDelegate mockReceiver(*this);
+    err = GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(Echo::MsgType::EchoRequest, &mockReceiver);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    MockAppDelegate mockSender(*this);
+    ExchangeContext * exchange = NewExchangeToAlice(&mockSender);
+    ASSERT_NE(exchange, nullptr);
+
+    ReliableMessageMgr * rm = GetExchangeManager().GetReliableMessageMgr();
+    ASSERT_NE(rm, nullptr);
+
+    EXPECT_EQ(rm->TestGetCountRetransTable(), 0);
+
+    auto & loopback               = GetLoopback();
+    loopback.mSentMessageCount    = 0;
+    loopback.mNumMessagesToDrop   = 0;
+    loopback.mDroppedMessageCount = 0;
+
+    mockReceiver.mRetainExchange = true;
+    mockSender.mRetainExchange   = true;
+
+    err = exchange->SendMessage(Echo::MsgType::EchoRequest, std::move(buffer), SendFlags(SendMessageFlags::kExpectResponse));
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+    DrainAndServiceIO();
+    ASSERT_NE(mockReceiver.mExchange, nullptr);
+    EXPECT_TRUE(mockReceiver.mExchange->HasReceivedAtLeastOneMessage());
+
+    // ICD-like config but with a LARGE SAT (2 seconds) so the peer stays
+    // Active for the entire test.
+    mockReceiver.mExchange->GetSessionHandle()->AsSecureSession()->SetRemoteSessionParameters(
+        MakeICDLikeMRPConfig(2000_ms16 /* SAT — well above the test runtime */));
+    EXPECT_TRUE(mockReceiver.mExchange->GetSessionHandle()->AsSecureSession()->IsPeerActive());
+
+    mockReceiver.mRetainExchange = false;
+    mockSender.mRetainExchange   = false;
+
+    buffer = chip::MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD));
+    EXPECT_FALSE(buffer.IsNull());
+    loopback.mNumMessagesToDrop      = 1;
+    uint32_t sentCountBeforeResponse = loopback.mSentMessageCount;
+
+    System::Clock::Timestamp txTime = System::SystemClock().GetMonotonicTimestamp();
+    err                             = mockReceiver.mExchange->SendMessage(Echo::MsgType::EchoResponse, std::move(buffer));
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+    DrainAndServiceIO();
+
+    EXPECT_EQ(loopback.mDroppedMessageCount, 1u);
+    EXPECT_EQ(loopback.mSentMessageCount, sentCountBeforeResponse + 1u);
+    EXPECT_GE(rm->TestGetCountRetransTable(), 1);
+
+    // Drive IO until the retx completes; expected well below the Idle floor.
+    GetIOContext().DriveIOUntil(kActiveRetxMaxElapsed, [&] { return mockSender.IsOnMessageReceivedCalled; });
+    DrainAndServiceIO();
+
+    System::Clock::Timestamp now              = System::SystemClock().GetMonotonicTimestamp();
+    System::Clock::Milliseconds64 elapsedMs64 = now - txTime;
+    auto elapsedMs                            = System::Clock::Milliseconds32(static_cast<uint32_t>(elapsedMs64.count()));
+    ChipLogProgress(Test, "Active retx fired and was delivered at %" PRIu32 "ms (expected <= %" PRIu32 "ms)", elapsedMs.count(),
+                    kActiveRetxMaxElapsed.count());
+
+    EXPECT_TRUE(mockSender.IsOnMessageReceivedCalled);
+    EXPECT_LE(elapsedMs.count(), kActiveRetxMaxElapsed.count());
+    EXPECT_EQ(rm->TestGetCountRetransTable(), 0);
+
+    ReliableMessageMgr::SetAdditionalMRPBackoffTime(NullOptional);
+}
+
+/**
+ * Exchange has NOT received any messages yet (HasReceivedAtLeastOneMessage =
+ * false), AND the test has explicitly stepped past SAT so IsPeerActive()
+ * returns false. Under those conditions the retx must be scheduled on the
+ * IDLE interval. Confirms the pre-existing else-branch behavior survives the
+ * simplification — the pre-fix shortcut never fired here either (it required
+ * HasReceivedAtLeastOneMessage to be true), but the post-fix code path now
+ * handles all retx scheduling, so this case still needs to be pinned.
+ *
+ * Alice sends a reliable EchoRequest (without kExpectResponse, so no
+ * response timer is left dangling at TearDown). Loopback drops the first
+ * attempt. The retransmit is allowed to succeed, Bob's MRP standalone ack
+ * reaches Alice and clears her retransmit entry. The retransmit table
+ * draining is the success signal; total elapsed time-to-drain must be
+ * >= the SII-derived floor.
+ */
+TEST_F(TestReliableMessageProtocol, CheckPeerRetxUsesIdleBackoffWhenNoMessagesReceived)
+{
+    // Force the additional MRP sender boost to 0 (see CheckICDPeerRetxUsesIdleBackoffAfterSATExpiry
+    // for rationale). Reset at the bottom of the test.
+    ReliableMessageMgr::SetAdditionalMRPBackoffTime(MakeOptional(System::Clock::Timeout(0)));
+
+    chip::System::PacketBufferHandle buffer = chip::MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD));
+    EXPECT_FALSE(buffer.IsNull());
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    MockAppDelegate mockReceiver(*this);
+    err = GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(Echo::MsgType::EchoRequest, &mockReceiver);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    MockAppDelegate mockSender(*this);
+    ExchangeContext * exchange = NewExchangeToAlice(&mockSender);
+    ASSERT_NE(exchange, nullptr);
+
+    // ICD-like config with a very short SAT so we can step past it cheaply. SecureSession
+    // initializes mLastPeerActivityTime to the session-creation timestamp, so a fresh session
+    // is implicitly Active for SAT milliseconds even before the first received message. The
+    // test's premise — Idle backoff for an exchange with no prior receives — only holds once
+    // SAT has elapsed against that initial timestamp.
+    exchange->GetSessionHandle()->AsSecureSession()->SetRemoteSessionParameters(MakeICDLikeMRPConfig(50_ms16 /* SAT */));
+
+    // Step past SAT so IsPeerActive() returns false on the sending session.
+    GetIOContext().DriveIOUntil(150_ms32, [&] { return false; });
+    DrainAndServiceIO();
+    EXPECT_FALSE(exchange->GetSessionHandle()->AsSecureSession()->IsPeerActive());
+
+    ReliableMessageMgr * rm = GetExchangeManager().GetReliableMessageMgr();
+    ASSERT_NE(rm, nullptr);
+    EXPECT_EQ(rm->TestGetCountRetransTable(), 0);
+
+    auto & loopback               = GetLoopback();
+    loopback.mSentMessageCount    = 0;
+    loopback.mNumMessagesToDrop   = 1;
+    loopback.mDroppedMessageCount = 0;
+
+    // The exchange has NOT received any messages from the peer (`HasReceivedAtLeastOneMessage`
+    // is false), and SAT has elapsed so the session is Idle. The pre-fix code's shortcut path
+    // didn't apply here (it required `HasReceivedAtLeastOneMessage` to be true), so this case
+    // already behaved correctly; the test pins that behavior under the simplified code path.
+    EXPECT_FALSE(exchange->HasReceivedAtLeastOneMessage());
+
+    System::Clock::Timestamp txTime = System::SystemClock().GetMonotonicTimestamp();
+    // No kExpectResponse: Alice does not need (and must not leave dangling) a
+    // response timer for this test. Bob receives the EchoRequest, sends a
+    // standalone ack, and the exchange tears down naturally once the ack
+    // clears Alice's MRP retransmit entry.
+    err = exchange->SendMessage(Echo::MsgType::EchoRequest, std::move(buffer));
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+    DrainAndServiceIO();
+
+    EXPECT_EQ(loopback.mDroppedMessageCount, 1u);
+    EXPECT_GE(rm->TestGetCountRetransTable(), 1);
+
+    // Drive IO until Bob's standalone ack has reached Alice and her entry has
+    // been cleared (retransmit table drains to 0). With Idle spacing the
+    // retx fires no sooner than ~kIdleRetxMinElapsed, plus the small ack
+    // round-trip; in the buggy SAI path it would fire in well under 200 ms.
+    GetIOContext().DriveIOUntil(3000_ms32, [&] { return rm->TestGetCountRetransTable() == 0; });
+    DrainAndServiceIO();
+
+    System::Clock::Timestamp now              = System::SystemClock().GetMonotonicTimestamp();
+    System::Clock::Milliseconds64 elapsedMs64 = now - txTime;
+    auto elapsedMs                            = System::Clock::Milliseconds32(static_cast<uint32_t>(elapsedMs64.count()));
+    ChipLogProgress(Test, "Initial Idle retx drained at %" PRIu32 "ms (expected >= %" PRIu32 "ms)", elapsedMs.count(),
+                    (kIdleRetxMinElapsed - kMrpTimingMargin).count());
+
+    EXPECT_EQ(rm->TestGetCountRetransTable(), 0);
+    EXPECT_GE(elapsedMs.count(), (kIdleRetxMinElapsed - kMrpTimingMargin).count());
+
+    ReliableMessageMgr::SetAdditionalMRPBackoffTime(NullOptional);
+}
+
 TEST_F(TestReliableMessageProtocol, CheckLostStandaloneAck)
 {
     /**
@@ -1789,8 +2183,8 @@ TEST_F(TestReliableMessageProtocol, CheckApplicationResponseDelayed)
     ASSERT_NE(rm, nullptr);
 
     exchange->GetSessionHandle()->AsSecureSession()->SetRemoteSessionParameters(ReliableMessageProtocolConfig({
-        30_ms32, // CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL
-        30_ms32, // CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL
+        100_ms32, // CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL
+        100_ms32, // CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL
     }));
 
     constexpr uint32_t kMaxMRPTransmits = 5; // Counting the initial message.
@@ -1804,7 +2198,7 @@ TEST_F(TestReliableMessageProtocol, CheckApplicationResponseDelayed)
     // Ensure the retransmit table is empty right now
     EXPECT_EQ(rm->TestGetCountRetransTable(), 0);
 
-    exchange->SetResponseTimeout(3000_ms32);
+    exchange->SetResponseTimeout(5000_ms32);
     err = exchange->SendMessage(Echo::MsgType::EchoRequest, std::move(buffer), SendMessageFlags::kExpectResponse);
     EXPECT_EQ(err, CHIP_NO_ERROR);
     DrainAndServiceIO();
@@ -1854,8 +2248,8 @@ TEST_F(TestReliableMessageProtocol, CheckApplicationResponseDelayed)
     loopback.mDroppedMessageCount = 0;
 
     mockReceiver.mExchange->GetSessionHandle()->AsSecureSession()->SetRemoteSessionParameters(ReliableMessageProtocolConfig({
-        30_ms32, // CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL
-        30_ms32, // CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL
+        100_ms32, // CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL
+        100_ms32, // CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL
     }));
 
     buffer = chip::MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD));
@@ -1917,8 +2311,10 @@ TEST_F(TestReliableMessageProtocol, CheckApplicationResponseDelayed)
     err = CreateSessionAliceToBob();
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
-    err = GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Echo::MsgType::EchoRequest);
+    Messaging::UnsolicitedMessageHandler * removedHandler = nullptr;
+    err = GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Echo::MsgType::EchoRequest, &removedHandler);
     EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(removedHandler, &mockReceiver);
 }
 
 TEST_F(TestReliableMessageProtocol, CheckApplicationResponseNeverComes)
@@ -1948,8 +2344,8 @@ TEST_F(TestReliableMessageProtocol, CheckApplicationResponseNeverComes)
     ASSERT_NE(rm, nullptr);
 
     exchange->GetSessionHandle()->AsSecureSession()->SetRemoteSessionParameters(ReliableMessageProtocolConfig({
-        30_ms32, // CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL
-        30_ms32, // CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL
+        100_ms32, // CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL
+        100_ms32, // CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL
     }));
 
     constexpr uint32_t kMaxMRPTransmits = 5; // Counting the initial message.
@@ -1963,7 +2359,7 @@ TEST_F(TestReliableMessageProtocol, CheckApplicationResponseNeverComes)
     // Ensure the retransmit table is empty right now
     EXPECT_EQ(rm->TestGetCountRetransTable(), 0);
 
-    exchange->SetResponseTimeout(2500_ms32);
+    exchange->SetResponseTimeout(4000_ms32);
     err = exchange->SendMessage(Echo::MsgType::EchoRequest, std::move(buffer), SendMessageFlags::kExpectResponse);
     EXPECT_EQ(err, CHIP_NO_ERROR);
     DrainAndServiceIO();
@@ -1977,7 +2373,7 @@ TEST_F(TestReliableMessageProtocol, CheckApplicationResponseNeverComes)
     EXPECT_FALSE(mockSender.IsOnMessageReceivedCalled);
 
     // Wait for all but the last retransmit to happen.
-    GetIOContext().DriveIOUntil(1000_ms32, [&] { return loopback.mDroppedMessageCount >= kMaxMRPTransmits - 1; });
+    GetIOContext().DriveIOUntil(2000_ms32, [&] { return loopback.mDroppedMessageCount >= kMaxMRPTransmits - 1; });
     DrainAndServiceIO();
 
     // Ensure that nothing has been sent yet.
@@ -1991,7 +2387,7 @@ TEST_F(TestReliableMessageProtocol, CheckApplicationResponseNeverComes)
     // Now allow through the next message (our last retransmit), but make sure
     // there is no standalone ack for it.
     mockReceiver.SetDropAckResponse(true);
-    GetIOContext().DriveIOUntil(500_ms32, [&] { return loopback.mSentMessageCount >= kMaxMRPTransmits; });
+    GetIOContext().DriveIOUntil(1000_ms32, [&] { return loopback.mSentMessageCount >= kMaxMRPTransmits; });
     DrainAndServiceIO();
 
     // Verify that message was sent and received but nothing else has been sent.
@@ -2005,7 +2401,7 @@ TEST_F(TestReliableMessageProtocol, CheckApplicationResponseNeverComes)
     mockReceiver.SetDropAckResponse(false);
 
     // Now wait for us to time out our MRP context.
-    GetIOContext().DriveIOUntil(1000_ms32, [&] { return rm->TestGetCountRetransTable() == 0; });
+    GetIOContext().DriveIOUntil(5000_ms32, [&] { return rm->TestGetCountRetransTable() == 0; });
     DrainAndServiceIO();
 
     EXPECT_EQ(loopback.mSentMessageCount, kMaxMRPTransmits);
@@ -2039,9 +2435,390 @@ TEST_F(TestReliableMessageProtocol, CheckApplicationResponseNeverComes)
     err = CreateSessionAliceToBob();
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
-    err = GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Echo::MsgType::EchoRequest);
+    Messaging::UnsolicitedMessageHandler * removedHandler = nullptr;
+    err = GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Echo::MsgType::EchoRequest, &removedHandler);
     EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(removedHandler, &mockReceiver);
 }
+
+#if CHIP_CONFIG_MRP_ANALYTICS_ENABLED
+TEST_F(TestReliableMessageProtocol, CheckReliableMessageAnalyticsForTransmitEventualSuccessForEstablishedCase)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    // Make sure we are using CASE sessions, because there is no defunct-marking for PASE.
+    ExpireSessionBobToAlice();
+    ExpireSessionAliceToBob();
+    err = CreateCASESessionBobToAlice();
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+    err = CreateCASESessionAliceToBob();
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    chip::System::PacketBufferHandle buffer = chip::MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD));
+    EXPECT_FALSE(buffer.IsNull());
+
+    MockAppDelegate mockSender(*this);
+    ExchangeContext * exchange = NewExchangeToAlice(&mockSender);
+    ASSERT_NE(exchange, nullptr);
+
+    ReliableMessageMgr * rm = GetExchangeManager().GetReliableMessageMgr();
+    ASSERT_NE(rm, nullptr);
+    TestReliablityAnalyticDelegate testAnalyticsDelegate;
+    rm->RegisterAnalyticsDelegate(&testAnalyticsDelegate);
+
+    constexpr auto kTestRetryInterval = System::Clock::Milliseconds32(100_ms32);
+    exchange->GetSessionHandle()->AsSecureSession()->SetRemoteSessionParameters(ReliableMessageProtocolConfig({
+        kTestRetryInterval, // CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL
+        kTestRetryInterval, // CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL
+    }));
+
+    const auto expectedFabricIndex = exchange->GetSessionHandle()->GetFabricIndex();
+    const auto expectedNodeId      = exchange->GetSessionHandle()->AsSecureSession()->GetPeerNodeId();
+
+    // Let's drop the initial message
+    auto & loopback               = GetLoopback();
+    loopback.mSentMessageCount    = 0;
+    loopback.mNumMessagesToDrop   = 4;
+    loopback.mDroppedMessageCount = 0;
+
+    // Ensure the retransmit table is empty right now
+    EXPECT_EQ(rm->TestGetCountRetransTable(), 0);
+
+    err = exchange->SendMessage(Echo::MsgType::EchoRequest, std::move(buffer));
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+    DrainAndServiceIO();
+
+    // Ensure the initial message was dropped and was added to retransmit table
+    EXPECT_EQ(loopback.mNumMessagesToDrop, 3u);
+    EXPECT_EQ(loopback.mDroppedMessageCount, 1u);
+    EXPECT_EQ(rm->TestGetCountRetransTable(), 1);
+
+    // Wait for the first retransmission to be sent (occurs after at least 100ms but less than 1000ms)
+    GetIOContext().DriveIOUntil(1000_ms32, [&] { return loopback.mSentMessageCount >= 2; });
+    DrainAndServiceIO();
+
+    // Ensure the 1st retry was dropped, and is still there in the retransmit table
+    EXPECT_EQ(loopback.mSentMessageCount, 2u);
+    EXPECT_EQ(loopback.mNumMessagesToDrop, 2u);
+    EXPECT_EQ(loopback.mDroppedMessageCount, 2u);
+    EXPECT_EQ(rm->TestGetCountRetransTable(), 1);
+
+    GetIOContext().DriveIOUntil(1000_ms32, [&] { return loopback.mSentMessageCount >= 3; });
+    DrainAndServiceIO();
+
+    // Ensure the 2nd retry was dropped, and is still there in the retransmit table
+    EXPECT_EQ(loopback.mSentMessageCount, 3u);
+    EXPECT_EQ(loopback.mNumMessagesToDrop, 1u);
+    EXPECT_EQ(loopback.mDroppedMessageCount, 3u);
+    EXPECT_EQ(rm->TestGetCountRetransTable(), 1);
+
+    GetIOContext().DriveIOUntil(1000_ms32, [&] { return loopback.mSentMessageCount >= 4; });
+    DrainAndServiceIO();
+
+    // Ensure the 3rd retry was dropped, and is still there in the retransmit table
+    EXPECT_EQ(loopback.mSentMessageCount, 4u);
+    EXPECT_EQ(loopback.mNumMessagesToDrop, 0u);
+    EXPECT_EQ(loopback.mDroppedMessageCount, 4u);
+    EXPECT_EQ(rm->TestGetCountRetransTable(), 1);
+
+    // Trigger final transmission
+    GetIOContext().DriveIOUntil(1500_ms32, [&] { return loopback.mSentMessageCount >= 5; });
+    DrainAndServiceIO();
+
+    // Ensure the last retransmission was NOT dropped, and the retransmit table is empty, as we should have gotten an ack
+    EXPECT_GE(loopback.mSentMessageCount, 5u);
+    EXPECT_EQ(loopback.mDroppedMessageCount, 4u);
+    EXPECT_EQ(rm->TestGetCountRetransTable(), 0);
+
+    ASSERT_EQ(testAnalyticsDelegate.mTransmitEvents.size(), 6u);
+    auto firstTransmitEvent = testAnalyticsDelegate.mTransmitEvents.front();
+    EXPECT_EQ(firstTransmitEvent.nodeId, expectedNodeId);
+    EXPECT_EQ(firstTransmitEvent.fabricIndex, expectedFabricIndex);
+    EXPECT_EQ(firstTransmitEvent.eventType, ReliableMessageAnalyticsDelegate::EventType::kInitialSend);
+    EXPECT_EQ(firstTransmitEvent.retransmissionCount, std::nullopt);
+    EXPECT_EQ(firstTransmitEvent.ackLatencyMs, std::nullopt);
+    // We have no way of validating the first messageCounter since this is a randomly generated value, but it should
+    // remain constant for all subsequent transmit events in this test.
+    const uint32_t messageCounter = firstTransmitEvent.messageCounter;
+
+    testAnalyticsDelegate.mTransmitEvents.pop();
+    auto secondTransmitEvent = testAnalyticsDelegate.mTransmitEvents.front();
+    EXPECT_EQ(secondTransmitEvent.nodeId, expectedNodeId);
+    EXPECT_EQ(secondTransmitEvent.fabricIndex, expectedFabricIndex);
+    EXPECT_EQ(secondTransmitEvent.eventType, ReliableMessageAnalyticsDelegate::EventType::kRetransmission);
+    EXPECT_EQ(secondTransmitEvent.retransmissionCount, 1);
+    EXPECT_EQ(secondTransmitEvent.ackLatencyMs, std::nullopt);
+    EXPECT_EQ(messageCounter, secondTransmitEvent.messageCounter);
+
+    testAnalyticsDelegate.mTransmitEvents.pop();
+    auto thirdTransmitEvent = testAnalyticsDelegate.mTransmitEvents.front();
+    EXPECT_EQ(thirdTransmitEvent.nodeId, expectedNodeId);
+    EXPECT_EQ(thirdTransmitEvent.fabricIndex, expectedFabricIndex);
+    EXPECT_EQ(thirdTransmitEvent.eventType, ReliableMessageAnalyticsDelegate::EventType::kRetransmission);
+    EXPECT_EQ(thirdTransmitEvent.retransmissionCount, 2);
+    EXPECT_EQ(thirdTransmitEvent.ackLatencyMs, std::nullopt);
+    EXPECT_EQ(messageCounter, thirdTransmitEvent.messageCounter);
+
+    testAnalyticsDelegate.mTransmitEvents.pop();
+    auto fourthTransmitEvent = testAnalyticsDelegate.mTransmitEvents.front();
+    EXPECT_EQ(fourthTransmitEvent.nodeId, expectedNodeId);
+    EXPECT_EQ(fourthTransmitEvent.fabricIndex, expectedFabricIndex);
+    EXPECT_EQ(fourthTransmitEvent.eventType, ReliableMessageAnalyticsDelegate::EventType::kRetransmission);
+    EXPECT_EQ(fourthTransmitEvent.retransmissionCount, 3);
+    EXPECT_EQ(fourthTransmitEvent.ackLatencyMs, std::nullopt);
+    EXPECT_EQ(messageCounter, fourthTransmitEvent.messageCounter);
+
+    testAnalyticsDelegate.mTransmitEvents.pop();
+    auto fifthTransmitEvent = testAnalyticsDelegate.mTransmitEvents.front();
+    EXPECT_EQ(fifthTransmitEvent.nodeId, expectedNodeId);
+    EXPECT_EQ(fifthTransmitEvent.fabricIndex, expectedFabricIndex);
+    EXPECT_EQ(fifthTransmitEvent.eventType, ReliableMessageAnalyticsDelegate::EventType::kRetransmission);
+    EXPECT_EQ(fifthTransmitEvent.retransmissionCount, 4);
+    EXPECT_EQ(fifthTransmitEvent.ackLatencyMs, std::nullopt);
+    EXPECT_EQ(messageCounter, fifthTransmitEvent.messageCounter);
+
+    testAnalyticsDelegate.mTransmitEvents.pop();
+    auto sixthTransmitEvent = testAnalyticsDelegate.mTransmitEvents.front();
+    EXPECT_EQ(sixthTransmitEvent.nodeId, expectedNodeId);
+    EXPECT_EQ(sixthTransmitEvent.fabricIndex, expectedFabricIndex);
+    EXPECT_EQ(sixthTransmitEvent.eventType, ReliableMessageAnalyticsDelegate::EventType::kAcknowledged);
+    EXPECT_EQ(sixthTransmitEvent.retransmissionCount, std::nullopt);
+    EXPECT_TRUE(sixthTransmitEvent.ackLatencyMs.has_value());
+    auto expectedMinimumAckLatencyTime = System::Clock::Milliseconds64(kTestRetryInterval * 5);
+    EXPECT_GT(sixthTransmitEvent.ackLatencyMs, expectedMinimumAckLatencyTime);
+    EXPECT_EQ(messageCounter, sixthTransmitEvent.messageCounter);
+}
+
+TEST_F(TestReliableMessageProtocol, CheckReliableMessageAnalyticsForTransmitFailureForEstablishedCase)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    // Make sure we are using CASE sessions, because there is no defunct-marking for PASE.
+    ExpireSessionBobToAlice();
+    ExpireSessionAliceToBob();
+    err = CreateCASESessionBobToAlice();
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+    err = CreateCASESessionAliceToBob();
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    chip::System::PacketBufferHandle buffer = chip::MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD));
+    EXPECT_FALSE(buffer.IsNull());
+
+    MockAppDelegate mockSender(*this);
+    ExchangeContext * exchange = NewExchangeToAlice(&mockSender);
+    ASSERT_NE(exchange, nullptr);
+
+    ReliableMessageMgr * rm = GetExchangeManager().GetReliableMessageMgr();
+    ASSERT_NE(rm, nullptr);
+    TestReliablityAnalyticDelegate testAnalyticsDelegate;
+    rm->RegisterAnalyticsDelegate(&testAnalyticsDelegate);
+
+    exchange->GetSessionHandle()->AsSecureSession()->SetRemoteSessionParameters(ReliableMessageProtocolConfig({
+        100_ms32, // CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL
+        100_ms32, // CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL
+    }));
+
+    const auto expectedFabricIndex = exchange->GetSessionHandle()->GetFabricIndex();
+    const auto expectedNodeId      = exchange->GetSessionHandle()->AsSecureSession()->GetPeerNodeId();
+
+    // Let's drop the initial message
+    auto & loopback               = GetLoopback();
+    loopback.mSentMessageCount    = 0;
+    loopback.mNumMessagesToDrop   = 5;
+    loopback.mDroppedMessageCount = 0;
+
+    // Ensure the retransmit table is empty right now
+    EXPECT_EQ(rm->TestGetCountRetransTable(), 0);
+
+    err = exchange->SendMessage(Echo::MsgType::EchoRequest, std::move(buffer));
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+    DrainAndServiceIO();
+
+    // Ensure the initial message was dropped and was added to retransmit table
+    EXPECT_EQ(loopback.mNumMessagesToDrop, 4u);
+    EXPECT_EQ(loopback.mDroppedMessageCount, 1u);
+    EXPECT_EQ(rm->TestGetCountRetransTable(), 1);
+
+    // Wait for the initial message to fail (should take 330-413ms)
+    GetIOContext().DriveIOUntil(1000_ms32, [&] { return loopback.mSentMessageCount >= 2; });
+    DrainAndServiceIO();
+
+    // Ensure the 1st retry was dropped, and is still there in the retransmit table
+    EXPECT_EQ(loopback.mSentMessageCount, 2u);
+    EXPECT_EQ(loopback.mNumMessagesToDrop, 3u);
+    EXPECT_EQ(loopback.mDroppedMessageCount, 2u);
+    EXPECT_EQ(rm->TestGetCountRetransTable(), 1);
+
+    GetIOContext().DriveIOUntil(1000_ms32, [&] { return loopback.mSentMessageCount >= 3; });
+    DrainAndServiceIO();
+
+    // Ensure the 2nd retry was dropped, and is still there in the retransmit table
+    EXPECT_EQ(loopback.mSentMessageCount, 3u);
+    EXPECT_EQ(loopback.mNumMessagesToDrop, 2u);
+    EXPECT_EQ(loopback.mDroppedMessageCount, 3u);
+    EXPECT_EQ(rm->TestGetCountRetransTable(), 1);
+
+    GetIOContext().DriveIOUntil(1000_ms32, [&] { return loopback.mSentMessageCount >= 4; });
+    DrainAndServiceIO();
+
+    // Ensure the 3rd retry was dropped, and is still there in the retransmit table
+    EXPECT_EQ(loopback.mSentMessageCount, 4u);
+    EXPECT_EQ(loopback.mNumMessagesToDrop, 1u);
+    EXPECT_EQ(loopback.mDroppedMessageCount, 4u);
+    EXPECT_EQ(rm->TestGetCountRetransTable(), 1);
+
+    // Trigger final transmission
+    GetIOContext().DriveIOUntil(1500_ms32, [&] { return loopback.mSentMessageCount >= 5; });
+    DrainAndServiceIO();
+
+    // Ensure the last retransmission was NOT dropped, and the retransmit table is empty, as we should have gotten an ack
+    EXPECT_GE(loopback.mSentMessageCount, 5u);
+    EXPECT_EQ(rm->TestGetCountRetransTable(), 1);
+    EXPECT_EQ(loopback.mDroppedMessageCount, 5u);
+
+    // Now wait for our exchange to time out.
+    GetIOContext().DriveIOUntil(3000_ms32, [&] { return rm->TestGetCountRetransTable() == 0; });
+    DrainAndServiceIO();
+    EXPECT_EQ(rm->TestGetCountRetransTable(), 0);
+
+    ASSERT_EQ(testAnalyticsDelegate.mTransmitEvents.size(), 6u);
+    auto firstTransmitEvent = testAnalyticsDelegate.mTransmitEvents.front();
+    EXPECT_EQ(firstTransmitEvent.nodeId, expectedNodeId);
+    EXPECT_EQ(firstTransmitEvent.fabricIndex, expectedFabricIndex);
+    EXPECT_EQ(firstTransmitEvent.eventType, ReliableMessageAnalyticsDelegate::EventType::kInitialSend);
+    EXPECT_EQ(firstTransmitEvent.retransmissionCount, std::nullopt);
+    // We have no way of validating the first messageCounter since this is a randomly generated value, but it should
+    // remain constant for all subsequent transmit events in this test.
+    const uint32_t messageCounter = firstTransmitEvent.messageCounter;
+
+    testAnalyticsDelegate.mTransmitEvents.pop();
+    auto secondTransmitEvent = testAnalyticsDelegate.mTransmitEvents.front();
+    EXPECT_EQ(secondTransmitEvent.nodeId, expectedNodeId);
+    EXPECT_EQ(secondTransmitEvent.fabricIndex, expectedFabricIndex);
+    EXPECT_EQ(secondTransmitEvent.eventType, ReliableMessageAnalyticsDelegate::EventType::kRetransmission);
+    EXPECT_EQ(secondTransmitEvent.retransmissionCount, 1);
+    EXPECT_EQ(messageCounter, secondTransmitEvent.messageCounter);
+
+    testAnalyticsDelegate.mTransmitEvents.pop();
+    auto thirdTransmitEvent = testAnalyticsDelegate.mTransmitEvents.front();
+    EXPECT_EQ(thirdTransmitEvent.nodeId, expectedNodeId);
+    EXPECT_EQ(thirdTransmitEvent.fabricIndex, expectedFabricIndex);
+    EXPECT_EQ(thirdTransmitEvent.eventType, ReliableMessageAnalyticsDelegate::EventType::kRetransmission);
+    EXPECT_EQ(thirdTransmitEvent.retransmissionCount, 2);
+    EXPECT_EQ(messageCounter, thirdTransmitEvent.messageCounter);
+
+    testAnalyticsDelegate.mTransmitEvents.pop();
+    auto fourthTransmitEvent = testAnalyticsDelegate.mTransmitEvents.front();
+    EXPECT_EQ(fourthTransmitEvent.nodeId, expectedNodeId);
+    EXPECT_EQ(fourthTransmitEvent.fabricIndex, expectedFabricIndex);
+    EXPECT_EQ(fourthTransmitEvent.eventType, ReliableMessageAnalyticsDelegate::EventType::kRetransmission);
+    EXPECT_EQ(fourthTransmitEvent.retransmissionCount, 3);
+    EXPECT_EQ(messageCounter, fourthTransmitEvent.messageCounter);
+
+    testAnalyticsDelegate.mTransmitEvents.pop();
+    auto fifthTransmitEvent = testAnalyticsDelegate.mTransmitEvents.front();
+    EXPECT_EQ(fifthTransmitEvent.nodeId, expectedNodeId);
+    EXPECT_EQ(fifthTransmitEvent.fabricIndex, expectedFabricIndex);
+    EXPECT_EQ(fifthTransmitEvent.retransmissionCount, 4);
+    EXPECT_EQ(fifthTransmitEvent.eventType, ReliableMessageAnalyticsDelegate::EventType::kRetransmission);
+    EXPECT_EQ(messageCounter, fifthTransmitEvent.messageCounter);
+
+    testAnalyticsDelegate.mTransmitEvents.pop();
+    auto sixthTransmitEvent = testAnalyticsDelegate.mTransmitEvents.front();
+    EXPECT_EQ(sixthTransmitEvent.nodeId, expectedNodeId);
+    EXPECT_EQ(sixthTransmitEvent.fabricIndex, expectedFabricIndex);
+    EXPECT_EQ(sixthTransmitEvent.retransmissionCount, std::nullopt);
+    EXPECT_EQ(sixthTransmitEvent.eventType, ReliableMessageAnalyticsDelegate::EventType::kFailed);
+    EXPECT_EQ(messageCounter, sixthTransmitEvent.messageCounter);
+}
+
+TEST_F(TestReliableMessageProtocol, CheckReliableMessageAnalyticsForTransmitEstablishedPase)
+{
+    CHIP_ERROR err                          = CHIP_NO_ERROR;
+    chip::System::PacketBufferHandle buffer = chip::MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD));
+    EXPECT_FALSE(buffer.IsNull());
+
+    MockAppDelegate mockSender(*this);
+    ExchangeContext * exchange = NewExchangeToAlice(&mockSender);
+    ASSERT_NE(exchange, nullptr);
+
+    ReliableMessageMgr * rm = GetExchangeManager().GetReliableMessageMgr();
+    ASSERT_NE(rm, nullptr);
+
+    TestReliablityAnalyticDelegate testAnalyticsDelegate;
+    rm->RegisterAnalyticsDelegate(&testAnalyticsDelegate);
+
+    exchange->GetSessionHandle()->AsSecureSession()->SetRemoteSessionParameters(ReliableMessageProtocolConfig({
+        100_ms32, // CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL
+        100_ms32, // CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL
+    }));
+
+    ASSERT_TRUE(exchange->GetSessionHandle()->AsSecureSession()->IsPASESession());
+
+    auto & loopback               = GetLoopback();
+    loopback.mSentMessageCount    = 0;
+    loopback.mNumMessagesToDrop   = 0;
+    loopback.mDroppedMessageCount = 0;
+
+    // Ensure the retransmit table is empty right now
+    EXPECT_EQ(rm->TestGetCountRetransTable(), 0);
+
+    err = exchange->SendMessage(Echo::MsgType::EchoRequest, std::move(buffer));
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+    DrainAndServiceIO();
+
+    // Test that the message was actually sent (and not dropped)
+    EXPECT_EQ(loopback.mSentMessageCount, 2u);
+    EXPECT_EQ(loopback.mDroppedMessageCount, 0u);
+
+    EXPECT_EQ(rm->TestGetCountRetransTable(), 0);
+
+    ASSERT_EQ(testAnalyticsDelegate.mTransmitEvents.size(), 0u);
+}
+
+TEST_F(TestReliableMessageProtocol, CheckReliableMessageAnalyticsForTransmitUnauthenticatedExchange)
+{
+    chip::System::PacketBufferHandle buffer = chip::MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD));
+    EXPECT_FALSE(buffer.IsNull());
+
+    MockSessionEstablishmentDelegate mockReceiver;
+    CHIP_ERROR err = GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(Echo::MsgType::EchoRequest, &mockReceiver);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    MockSessionEstablishmentDelegate mockSender;
+    ExchangeContext * exchange = NewUnauthenticatedExchangeToAlice(&mockSender);
+    ASSERT_NE(exchange, nullptr);
+
+    ReliableMessageMgr * rm = GetExchangeManager().GetReliableMessageMgr();
+    ASSERT_NE(rm, nullptr);
+
+    TestReliablityAnalyticDelegate testAnalyticsDelegate;
+    rm->RegisterAnalyticsDelegate(&testAnalyticsDelegate);
+
+    exchange->GetSessionHandle()->AsUnauthenticatedSession()->SetRemoteSessionParameters(ReliableMessageProtocolConfig({
+        64_ms32, // CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL
+        64_ms32, // CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL
+    }));
+
+    auto & loopback               = GetLoopback();
+    loopback.mSentMessageCount    = 0;
+    loopback.mNumMessagesToDrop   = 0;
+    loopback.mDroppedMessageCount = 0;
+
+    // Ensure the retransmit table is empty right now
+    EXPECT_EQ(rm->TestGetCountRetransTable(), 0);
+
+    err = exchange->SendMessage(Echo::MsgType::EchoRequest, std::move(buffer));
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+    DrainAndServiceIO();
+
+    // Test that the message was actually sent (and not dropped)
+    EXPECT_EQ(loopback.mSentMessageCount, 2u);
+    EXPECT_EQ(loopback.mDroppedMessageCount, 0u);
+
+    EXPECT_EQ(rm->TestGetCountRetransTable(), 0);
+
+    ASSERT_EQ(testAnalyticsDelegate.mTransmitEvents.size(), 0u);
+}
+#endif // CHIP_CONFIG_MRP_ANALYTICS_ENABLED
 
 /**
  * TODO: A test that we should have but can't write with the existing

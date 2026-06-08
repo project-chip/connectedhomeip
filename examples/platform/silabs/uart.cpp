@@ -16,26 +16,42 @@
  *    limitations under the License.
  */
 #include "AppConfig.h"
-#include "matter_shell.h"
+#ifdef ENABLE_CHIP_SHELL
+#include "MatterShell.h" // nogncheck
+#endif
 #include <cmsis_os2.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <sl_cmsis_os2_common.h>
+
+#include <platform/silabs/Logging.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #include "uart.h"
+#include <cinttypes>
 #include <stddef.h>
 #include <string.h>
 
+// GN fix that SLC doesn't need (probably)
+#ifndef SLI_SI91X_MCU_INTERFACE
+#define SLI_SI91X_MCU_INTERFACE 0
+#endif
+
 #define UART_CONSOLE_ERR -1 // Negative value in case of UART Console action failed. Triggers a failure for PW_RPC
+#ifdef CHIP_SHELL_MAX_LINE_SIZE
+#define MAX_BUFFER_SIZE CHIP_SHELL_MAX_LINE_SIZE
+#else
 #define MAX_BUFFER_SIZE 256
+#endif
 #define MAX_DMA_BUFFER_SIZE (MAX_BUFFER_SIZE / 2)
 
-#if SLI_SI91X_MCU_INTERFACE
+#if defined(SLI_SI91X_MCU_INTERFACE) && SLI_SI91X_MCU_INTERFACE
 #include "USART.h"
+#if defined(SL_SI91X_BOARD_INIT)
 #include "rsi_board.h"
+#endif // SL_SI91X_BOARD_INIT
 #include "rsi_debug.h"
 #include "rsi_rom_egpio.h"
 #else // For EFR32
@@ -50,8 +66,8 @@ extern "C" {
 #include "sl_board_control.h"
 #endif
 #include "sl_uartdrv_instances.h"
-#if SL_WIFI
-#include "spi_multiplex.h"
+#if defined(SL_WIFI) && SL_WIFI
+#include <platform/silabs/wifi/ncp/spi_multiplex.h>
 #endif // SL_WIFI
 #ifdef SL_CATALOG_UARTDRV_EUSART_PRESENT
 #include "sl_uartdrv_eusart_vcom_config.h"
@@ -90,7 +106,7 @@ extern "C" {
 #define EUSART_INT_ENABLE EUSART_IntEnable
 #define EUSART_INT_DISABLE EUSART_IntDisable
 #define EUSART_INT_CLEAR EUSART_IntClear
-#define EUSART_CLEAR_RX
+#define EUSART_CLEAR_RX(x) (void) x
 #define EUSART_GET_PENDING_INT EUSART_IntGet
 #define EUSART_ENABLE(eusart) EUSART_Enable(eusart, eusartEnable)
 #else
@@ -136,40 +152,51 @@ typedef struct
     uint16_t MaxSize;
 } Fifo_t;
 
-// uart transmit
-#if SILABS_LOG_OUT_UART
+#if defined(SLI_SI91X_MCU_INTERFACE) && SLI_SI91X_MCU_INTERFACE
 #define UART_MAX_QUEUE_SIZE 125
 #else
-#if (_SILICON_LABS_32B_SERIES < 3)
-#define UART_MAX_QUEUE_SIZE 25
+#if CHIP_DETAIL_LOGGING
+#define UART_MAX_QUEUE_SIZE 60
 #else
-#define UART_MAX_QUEUE_SIZE 50
+#define UART_MAX_QUEUE_SIZE 25
 #endif
 #endif
 
-#ifdef CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE
-#define UART_TX_MAX_BUF_LEN (CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE + 2) // \r\n
-#else
-#define UART_TX_MAX_BUF_LEN (258)
-#endif
+#define UART_TX_MAX_BUF_LEN 100 // Just enough for the QR code
+
+#define SILABS_TRUNCATED_TERMINATOR "....."
 
 static constexpr uint32_t kUartTxCompleteFlag = 1;
 static osThreadId_t sUartTaskHandle;
 constexpr uint32_t kUartTaskSize = 1024;
 static uint8_t uartStack[kUartTaskSize];
 static osThread_t sUartTaskControlBlock;
-constexpr osThreadAttr_t kUartTaskAttr = { .name       = "UART",
-                                           .attr_bits  = osThreadDetached,
-                                           .cb_mem     = &sUartTaskControlBlock,
-                                           .cb_size    = osThreadCbSize,
-                                           .stack_mem  = uartStack,
-                                           .stack_size = kUartTaskSize,
-                                           .priority   = osPriorityBelowNormal };
+constexpr osThreadAttr_t kUartTaskAttr = {
+    .name       = "UART",
+    .attr_bits  = osThreadDetached,
+    .cb_mem     = &sUartTaskControlBlock,
+    .cb_size    = osThreadCbSize,
+    .stack_mem  = uartStack,
+    .stack_size = kUartTaskSize,
+#if defined(SLI_SI91X_MCU_INTERFACE) && SLI_SI91X_MCU_INTERFACE
+    .priority = osPriorityBelowNormal, // for SOC, must be below Matter Task priority
+#else
+    .priority = osPriorityRealtime6, // Must be above Matter Task priority
+#endif // SLI_SI91X_MCU_INTERFACE
+};     // Must be above Matter Task priority
 
-typedef struct
+static uint32_t sMissedLogCount = 0; // Count of logs that were not sent to the UART due to queue full
+
+namespace SilabsCoreLogs = chip::Logging::Platform;
+// sizeof struct on arm is 4+8 +sizeof(data) so 12 + number of character in the string
+typedef struct UartTxStruct_t
 {
     uint8_t data[UART_TX_MAX_BUF_LEN];
-    uint16_t length = 0;
+    uint64_t timestamp                   = 0;
+    uint8_t length                       = 0;
+    SilabsCoreLogs::LogCategory category = SilabsCoreLogs::kLog_None;
+    bool isLog                           = false; // True if this is a log message, false if it is a command line message
+
 } UartTxStruct_t;
 
 static osMessageQueueId_t sUartTxQueue;
@@ -184,10 +211,38 @@ constexpr osMessageQueueAttr_t kUartTxQueueAttr = { .cb_mem  = &sUartTxQueueStru
 static uint8_t sRxFifoBuffer[MAX_BUFFER_SIZE];
 static Fifo_t sReceiveFifo;
 
-#if SLI_SI91X_MCU_INTERFACE == 0
+// Force transmit logs by default during the Init sequence
+static bool sSendLogImmediately = true;
+
+void sendLogImmediately(bool force)
+{
+    taskENTER_CRITICAL();
+    sSendLogImmediately = force;
+    taskEXIT_CRITICAL();
+}
+
+static int16_t formatAndSendLog(UartTxStruct_t & logStruct, bool forceTransmit);
+
+#if defined(SLI_SI91X_MCU_INTERFACE) && SLI_SI91X_MCU_INTERFACE == 0
 static void UART_rx_callback(UARTDRV_Handle_t handle, Ecode_t transferStatus, uint8_t * data, UARTDRV_Count_t transferCount);
 #endif // SLI_SI91X_MCU_INTERFACE == 0
-static void uartSendBytes(uint8_t * buffer, uint16_t nbOfBytes);
+static void uartSendBytes(uint8_t * data, uint16_t length);
+
+#if defined(SLI_SI91X_MCU_INTERFACE) && SLI_SI91X_MCU_INTERFACE
+static void ensureNullTermination(UartTxStruct_t & bufferStruct)
+{
+    if (bufferStruct.length > 0 && bufferStruct.length < MATTER_ARRAY_SIZE(bufferStruct.data) &&
+        bufferStruct.data[bufferStruct.length - 1] != '\0')
+    {
+        bufferStruct.data[bufferStruct.length] = '\0';
+    }
+    else
+    {
+        uint16_t nullPos           = (bufferStruct.length == 0) ? 0 : MATTER_ARRAY_SIZE(bufferStruct.data) - 1;
+        bufferStruct.data[nullPos] = '\0';
+    }
+}
+#endif
 
 static bool InitFifo(Fifo_t * fifo, uint8_t * pDataBuffer, uint16_t bufferSize)
 {
@@ -314,7 +369,7 @@ void uartConsoleInit(void)
     VerifyOrDie(sUartTaskHandle != nullptr);
     VerifyOrDie(sUartTxQueue != nullptr);
 
-#if SLI_SI91X_MCU_INTERFACE == 0
+#if defined(SLI_SI91X_MCU_INTERFACE) && SLI_SI91X_MCU_INTERFACE == 0
 #ifdef SL_BOARD_NAME
     sl_board_enable_vcom();
 #endif
@@ -343,7 +398,7 @@ void uartConsoleInit(void)
 #endif // SLI_SI91X_MCU_INTERFACE == 0
 }
 
-#if SLI_SI91X_MCU_INTERFACE
+#if defined(SLI_SI91X_MCU_INTERFACE) && SLI_SI91X_MCU_INTERFACE
 void cache_uart_rx_data(char character)
 {
     if (RemainingSpace(&sReceiveFifo) >= 1)
@@ -356,13 +411,13 @@ void cache_uart_rx_data(char character)
 }
 #endif // SLI_SI91X_MCU_INTERFACE
 
-#if SLI_SI91X_MCU_INTERFACE == 0
+#if !defined(SLI_SI91X_MCU_INTERFACE) || !SLI_SI91X_MCU_INTERFACE
 // For EFR32
 void USART_IRQHandler(void)
 {
 #ifdef ENABLE_CHIP_SHELL
     chip::NotifyShellProcess();
-#elif !defined(PW_RPC_ENABLED) && !defined(SL_WIFI)
+#elif !defined(PW_RPC_ENABLED) && CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI
     otSysEventSignalPending();
 #endif
 #ifdef SL_CATALOG_UARTDRV_EUSART_PRESENT
@@ -409,7 +464,7 @@ static void UART_rx_callback(UARTDRV_Handle_t handle, Ecode_t transferStatus, ui
 
 #ifdef ENABLE_CHIP_SHELL
     chip::NotifyShellProcess();
-#elif !defined(PW_RPC_ENABLED)
+#elif !defined(PW_RPC_ENABLED) && CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI
     otSysEventSignalPending();
 #endif
 }
@@ -461,36 +516,56 @@ int16_t uartConsoleWrite(const char * Buf, uint16_t BufLength)
  * @param length number of bytes to write
  * @return int16_t Amount of bytes written or ERROR (-1)
  */
-int16_t uartLogWrite(const char * log, uint16_t length)
+int16_t uartLogWrite(const char * log, uint8_t length, uint8_t category, uint64_t timestamp)
 {
-    if (log == NULL || length < 1 || (length + 2) > UART_TX_MAX_BUF_LEN)
+    if (log == NULL || length < 2)
     {
         return UART_CONSOLE_ERR;
+    }
+    bool truncated = false;
+    if (length > UART_TX_MAX_BUF_LEN)
+    {
+        length    = UART_TX_MAX_BUF_LEN - sizeof(SILABS_TRUNCATED_TERMINATOR); // Reserve space for headers and ...
+        truncated = true;
     }
 
     UartTxStruct_t workBuffer;
     memcpy(workBuffer.data, log, length);
-    memcpy(workBuffer.data + length, "\r\n", 2);
-    workBuffer.length = length + 2;
+    if (truncated)
+    {
+        memcpy(workBuffer.data + length, SILABS_TRUNCATED_TERMINATOR, sizeof(SILABS_TRUNCATED_TERMINATOR));
+        length += sizeof(SILABS_TRUNCATED_TERMINATOR);
+    }
+    workBuffer.length    = length;
+    workBuffer.isLog     = true; // This is a log message
+    workBuffer.category  = SilabsCoreLogs::LogCategory(category);
+    workBuffer.timestamp = timestamp;
+
+    if (sSendLogImmediately)
+    {
+        return formatAndSendLog(workBuffer, true);
+    }
 
     // Don't wait when queue is full. Drop the log and return UART_CONSOLE_ERR
     if (osMessageQueuePut(sUartTxQueue, &workBuffer, osPriorityNormal, 0) == osOK)
     {
         return length;
     }
+    else
+    {
+        sMissedLogCount++;
+    }
 
     return UART_CONSOLE_ERR;
 }
 
-/*
+/**
  *   @brief Read the data available from the console Uart
  *   @param Buffer for the data to be read, number bytes to read.
  *   @return Amount of bytes that was read from the rx fifo or ERROR (-1)
  */
 int16_t uartConsoleRead(char * Buf, uint16_t NbBytesToRead)
 {
-    uint8_t * data;
-
 #ifdef SL_CATALOG_UARTDRV_EUSART_PRESENT
     EUSART_INT_ENABLE(SL_UARTDRV_EUSART_VCOM_PERIPHERAL, EUSART_IF_RXFL);
 #endif
@@ -499,7 +574,8 @@ int16_t uartConsoleRead(char * Buf, uint16_t NbBytesToRead)
     {
         return UART_CONSOLE_ERR;
     }
-#if SLI_SI91X_MCU_INTERFACE == 0
+#if defined(SLI_SI91X_MCU_INTERFACE) && SLI_SI91X_MCU_INTERFACE == 0
+    uint8_t * data;
     if (NbBytesToRead > AvailableDataCount(&sReceiveFifo))
     {
         UARTDRV_Count_t count, remaining;
@@ -515,17 +591,65 @@ int16_t uartConsoleRead(char * Buf, uint16_t NbBytesToRead)
     return (int16_t) RetrieveFromFifo(&sReceiveFifo, (uint8_t *) Buf, NbBytesToRead);
 }
 
+static int16_t formatAndSendLog(UartTxStruct_t & logStruct, bool forceTransmit)
+{
+#if defined(SILABS_LOG_ENABLED) && SILABS_LOG_ENABLED
+    uint8_t timeStampString[SilabsCoreLogs::kTimeStampStringSize];
+    uint8_t logWorkBuffer[kHeaderSize + SilabsCoreLogs::kTimeStampStringSize + SilabsCoreLogs::kMaxCategoryStrLen +
+                          UART_TX_MAX_BUF_LEN + kEndOfLineSize +
+                          kFooterSize]; // Header + Timestamp + Category + Data + \r\n + Footer
+    SilabsCoreLogs::FormatTimestamp(reinterpret_cast<char *>(timeStampString), sizeof(timeStampString), logStruct.timestamp);
+    int32_t len =
+        snprintf(reinterpret_cast<char *>(logWorkBuffer), sizeof(logWorkBuffer), "%c%s%s%.*s\r\n%c", kLogHeader, timeStampString,
+                 SilabsCoreLogs::GetCategoryString(logStruct.category), logStruct.length, logStruct.data, kLogFooter);
+    if (len > 0)
+    {
+        if (forceTransmit)
+        {
+#if defined(SLI_SI91X_MCU_INTERFACE) && SLI_SI91X_MCU_INTERFACE
+            Board_UARTPutSTR(logWorkBuffer);
+#else
+            UARTDRV_ForceTransmit(vcom_handle, logWorkBuffer, static_cast<uint16_t>(len));
+#endif
+        }
+        else
+        {
+            uartSendBytes(logWorkBuffer, static_cast<uint16_t>(len));
+        }
+    }
+    return static_cast<int16_t>(len);
+#else
+    return 0;
+#endif // SILABS_LOG_ENABLED
+}
+
 void uartMainLoop(void * args)
 {
     UartTxStruct_t workBuffer;
-
     while (1)
     {
-
         osStatus_t eventReceived = osMessageQueueGet(sUartTxQueue, &workBuffer, nullptr, osWaitForever);
         while (eventReceived == osOK)
         {
-            uartSendBytes(workBuffer.data, workBuffer.length);
+            if (workBuffer.isLog)
+            {
+#if defined(SILABS_LOG_ENABLED) && SILABS_LOG_ENABLED
+                formatAndSendLog(workBuffer, false);
+#endif // SILABS_LOG_ENABLED
+            }
+            else
+            {
+                uartSendBytes(workBuffer.data, workBuffer.length);
+            }
+            if (sMissedLogCount)
+            {
+                // If there are missed logs, log the count
+
+                workBuffer.length =
+                    sprintf(reinterpret_cast<char *>(workBuffer.data), "\r\nMissed Logs: %" PRIu32 "\r\n", sMissedLogCount);
+                sMissedLogCount = 0; // Reset the count after logging
+                uartSendBytes(workBuffer.data, workBuffer.length);
+            }
             eventReceived = osMessageQueueGet(sUartTxQueue, &workBuffer, nullptr, 0);
         }
     }
@@ -534,38 +658,43 @@ void uartMainLoop(void * args)
 /**
  * @brief Send Bytes to UART. This blocks the UART task.
  *
- * @param buffer pointer to the buffer containing the data
- * @param nbOfBytes number of bytes to send
+ * @param bufferStruct reference to the UartTxStruct_t containing the data
  */
-void uartSendBytes(uint8_t * buffer, uint16_t nbOfBytes)
+void uartSendBytes(uint8_t * data, uint16_t length)
 {
-#if SLI_SI91X_MCU_INTERFACE
-    // ensuring null termination of buffer
-    if (nbOfBytes != CHIP_SHELL_MAX_LINE_SIZE && buffer[nbOfBytes - 1] != '\0')
+    if (data == nullptr || length == 0)
     {
-        buffer[nbOfBytes] = '\0';
+        return;
     }
-    Board_UARTPutSTR(reinterpret_cast<uint8_t *>(buffer));
+#if defined(SLI_SI91X_MCU_INTERFACE) && SLI_SI91X_MCU_INTERFACE
+    // Not optimal, waiting for a more efficient way to send logs over UART on SI91x
+    //
+    // Board_UARTPutSTR(data) does the exact same thing and is not compatible with
+    // the Silabs Matter console.
+    for (uint8_t i = 0; i < length; i++)
+    {
+        Board_UARTPutChar(data[i]);
+    }
 #else
 #if defined(SL_CATALOG_POWER_MANAGER_PRESENT)
     sl_power_manager_add_em_requirement(SL_POWER_MANAGER_EM1);
 #endif // SL_CATALOG_POWER_MANAGER_PRESENT
 
-#if SL_UARTCTRL_MUX
+#if defined(SL_UARTCTRL_MUX) && SL_UARTCTRL_MUX
     sl_wfx_host_pre_uart_transfer();
 #endif // SL_UARTCTRL_MUX
 
 #if (defined(EFR32MG24) && defined(WF200_WIFI))
     // Blocking transmit for the MG24 + WF200 since UART TX is multiplexed with
     // WF200 SPI IRQ
-    UARTDRV_ForceTransmit(vcom_handle, (uint8_t *) buffer, nbOfBytes);
+    UARTDRV_ForceTransmit(vcom_handle, data, length);
 #else
     // Non Blocking Transmit
-    UARTDRV_Transmit(vcom_handle, (uint8_t *) buffer, nbOfBytes, UART_tx_callback);
+    UARTDRV_Transmit(vcom_handle, data, length, UART_tx_callback);
     osThreadFlagsWait(kUartTxCompleteFlag, osFlagsWaitAny, osWaitForever);
 #endif /* EFR32MG24 && WF200_WIFI */
 
-#if SL_UARTCTRL_MUX
+#if defined(SL_UARTCTRL_MUX) && SL_UARTCTRL_MUX
     sl_wfx_host_post_uart_transfer();
 #endif // SL_UARTCTRL_MUX
 
@@ -573,6 +702,76 @@ void uartSendBytes(uint8_t * buffer, uint16_t nbOfBytes)
     sl_power_manager_remove_em_requirement(SL_POWER_MANAGER_EM1);
 #endif // SL_CATALOG_POWER_MANAGER_PRESENT
 #endif // SLI_SI91X_MCU_INTERFACE
+}
+
+/**
+ * @brief Flush the UART TX queue in a blocking manner.
+ *   UART logs are non blocking, so we need to flush the queue here otherwise the logs will not get logged in case of a hard
+ *   fault as they rely on the UART task to send the logs.
+ */
+void uartFlushTxQueue(void)
+{
+    UartTxStruct_t workBuffer;
+
+    while (osMessageQueueGet(sUartTxQueue, &workBuffer, nullptr, 0) == osOK)
+    {
+#if defined(SLI_SI91X_MCU_INTERFACE) && SLI_SI91X_MCU_INTERFACE
+        ensureNullTermination(workBuffer);
+        Board_UARTPutSTR(workBuffer.data);
+#else
+        UARTDRV_ForceTransmit(vcom_handle, workBuffer.data, workBuffer.length);
+#endif
+    }
+}
+
+#if defined(SLI_SI91X_MCU_INTERFACE) && SLI_SI91X_MCU_INTERFACE
+/**
+ * @brief Blocking UART transmit using direct register polling.
+ *
+ * This function bypasses the interrupt-driven UART driver and writes directly
+ * to the UART registers. It is intended ONLY for use in crash/failure scenarios
+ * (e.g., chipDie) where interrupts may be disabled or the system is in an
+ * undefined state.
+ *
+ * @param data   Pointer to data buffer to transmit
+ * @param length Number of bytes to transmit
+ */
+static void uartBlockingTransmit(const char * data, uint16_t length)
+{
+    VerifyOrReturn(data != nullptr && length > 0);
+
+    // Matter always uses ULP_UART for debug output on SiWx917
+    USART0_Type * uart = ULP_UART;
+    VerifyOrReturn(uart != nullptr);
+
+    for (uint16_t i = 0; i < length; i++)
+    {
+        // Wait for Transmit Holding Register to be empty (LSR bit 5)
+        while (!(uart->LSR_b.THRE))
+        {
+            // Busy wait - no timeout since we're in a crash state anyway
+        }
+        // Write byte to Transmit Holding Register
+        uart->THR = data[i];
+    }
+
+    // Wait for transmitter to fully complete (LSR bit 6 - TEMT)
+    while (!(uart->LSR_b.TEMT))
+    {
+        // Busy wait for last byte to finish transmitting
+    }
+}
+#endif // SLI_SI91X_MCU_INTERFACE
+
+void uartForceTransmit(const char * data, uint16_t length)
+{
+    VerifyOrReturn(data != nullptr && length > 0);
+
+#if defined(SLI_SI91X_MCU_INTERFACE) && SLI_SI91X_MCU_INTERFACE
+    uartBlockingTransmit(data, length);
+#else
+    UARTDRV_ForceTransmit(vcom_handle, reinterpret_cast<uint8_t *>(const_cast<char *>(data)), length);
+#endif
 }
 
 #ifdef __cplusplus

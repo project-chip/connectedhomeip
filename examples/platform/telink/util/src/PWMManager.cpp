@@ -142,7 +142,7 @@ void PwmManager::linkBackend(PwmBackend & backend)
     }
 }
 
-#if CONFIG_WS2812_STRIP
+#if CONFIG_WS2812_STRIP_GPIO_TELINK
 
 #include <zephyr_ws2812.h>
 
@@ -297,4 +297,4 @@ void PwmDummy::setPwmHWBreath(size_t pwm, size_t breathMs)
     LOG_WRN("PWM Dummy setPwmHWBreath not supported");
 }
 
-#endif // CONFIG_WS2812_STRIP
+#endif // CONFIG_WS2812_STRIP_GPIO_TELINK

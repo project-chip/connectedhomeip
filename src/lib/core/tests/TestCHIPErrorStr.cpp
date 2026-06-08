@@ -87,6 +87,7 @@ static const CHIP_ERROR kTestElements[] =
     CHIP_ERROR_INVALID_DATA_LIST,
     CHIP_ERROR_TIMEOUT,
     CHIP_ERROR_INVALID_DEVICE_DESCRIPTOR,
+    CHIP_ERROR_UNSUPPORTED_DNSSD_SERVICE_NAME,
     CHIP_ERROR_INVALID_PASE_PARAMETER,
     CHIP_ERROR_INVALID_USE_OF_SESSION_KEY,
     CHIP_ERROR_CONNECTION_CLOSED_UNEXPECTEDLY,
@@ -170,6 +171,31 @@ static const CHIP_ERROR kTestElements[] =
 };
 // clang-format on
 
+void CheckCoreErrorStrHelper(const char * errStr, CHIP_ERROR err)
+{
+    char expectedText[9];
+
+    // Assert that the error string contains the error number in hex.
+    snprintf(expectedText, sizeof(expectedText), "%08" PRIX32, static_cast<uint32_t>(err.AsInteger()));
+    EXPECT_TRUE((strstr(errStr, expectedText) != nullptr));
+
+#if !CHIP_CONFIG_SHORT_ERROR_STR
+    // Assert that the error string contains a description, which is signaled
+    // by a presence of a colon proceeding the description.
+    EXPECT_TRUE((strchr(errStr, ':') != nullptr));
+#endif // !CHIP_CONFIG_SHORT_ERROR_STR
+
+#if CHIP_CONFIG_ERROR_SOURCE
+    // GetFile() should be relative to ${chip_root}
+    char const * const file = err.GetFile();
+    ASSERT_NE(file, nullptr);
+    EXPECT_EQ(strstr(file, "src/lib/core/"), file);
+
+    // File should be included in the error.
+    EXPECT_NE(strstr(errStr, file), nullptr);
+#endif // CHIP_CONFIG_ERROR_SOURCE
+}
+
 TEST(TestCHIPErrorStr, CheckCoreErrorStr)
 {
     // Register the layer error formatter
@@ -179,29 +205,52 @@ TEST(TestCHIPErrorStr, CheckCoreErrorStr)
     // For each defined error...
     for (const auto & err : kTestElements)
     {
-        const char * errStr = ErrorStr(err);
-        char expectedText[9];
+        // ErrorStr with static char array.
+        CheckCoreErrorStrHelper(ErrorStr(err, /*withSourceLocation=*/true), err);
+    }
 
-        // Assert that the error string contains the error number in hex.
-        snprintf(expectedText, sizeof(expectedText), "%08" PRIX32, static_cast<uint32_t>(err.AsInteger()));
-        EXPECT_TRUE((strstr(errStr, expectedText) != nullptr));
+    // Deregister the layer error formatter
+    DeregisterCHIPLayerErrorFormatter();
+}
+
+TEST(TestCHIPErrorStr, CheckCoreErrorStrStorage)
+{
+    // Register the layer error formatter
+
+    RegisterCHIPLayerErrorFormatter();
+
+    // For each defined error...
+    for (const auto & err : kTestElements)
+    {
+        // ErrorStr with given storage.
+        ErrorStrStorage storage;
+        CheckCoreErrorStrHelper(ErrorStr(err, /*withSourceLocation=*/true, storage), err);
+    }
+
+    // Deregister the layer error formatter
+    DeregisterCHIPLayerErrorFormatter();
+}
+
+void CheckCoreErrorStrWithoutSourceLocationHelper(const char * errStr, CHIP_ERROR err)
+{
+    char expectedText[9];
+
+    // Assert that the error string contains the error number in hex.
+    snprintf(expectedText, sizeof(expectedText), "%08" PRIX32, static_cast<uint32_t>(err.AsInteger()));
+    EXPECT_TRUE((strstr(errStr, expectedText) != nullptr));
 
 #if !CHIP_CONFIG_SHORT_ERROR_STR
-        // Assert that the error string contains a description, which is signaled
-        // by a presence of a colon proceeding the description.
-        EXPECT_TRUE((strchr(errStr, ':') != nullptr));
+    // Assert that the error string contains a description, which is signaled
+    // by a presence of a colon proceeding the description.
+    EXPECT_TRUE((strchr(errStr, ':') != nullptr));
 #endif // !CHIP_CONFIG_SHORT_ERROR_STR
 
 #if CHIP_CONFIG_ERROR_SOURCE
-        // GetFile() should be relative to ${chip_root}
-        char const * const file = err.GetFile();
-        ASSERT_NE(file, nullptr);
-        EXPECT_EQ(strstr(file, "src/lib/core/"), file);
-
-        // File should be included in the error.
-        EXPECT_NE(strstr(errStr, file), nullptr);
+    char const * const file = err.GetFile();
+    ASSERT_NE(file, nullptr);
+    // File should not be included in the error.
+    EXPECT_EQ(strstr(errStr, file), nullptr);
 #endif // CHIP_CONFIG_ERROR_SOURCE
-    }
 }
 
 TEST(TestCHIPErrorStr, CheckCoreErrorStrWithoutSourceLocation)
@@ -213,24 +262,28 @@ TEST(TestCHIPErrorStr, CheckCoreErrorStrWithoutSourceLocation)
     // For each defined error...
     for (const auto & err : kTestElements)
     {
-        const char * errStr = ErrorStr(err, /*withSourceLocation=*/false);
-        char expectedText[9];
-
-        // Assert that the error string contains the error number in hex.
-        snprintf(expectedText, sizeof(expectedText), "%08" PRIX32, static_cast<uint32_t>(err.AsInteger()));
-        EXPECT_TRUE((strstr(errStr, expectedText) != nullptr));
-
-#if !CHIP_CONFIG_SHORT_ERROR_STR
-        // Assert that the error string contains a description, which is signaled
-        // by a presence of a colon proceeding the description.
-        EXPECT_TRUE((strchr(errStr, ':') != nullptr));
-#endif // !CHIP_CONFIG_SHORT_ERROR_STR
-
-#if CHIP_CONFIG_ERROR_SOURCE
-        char const * const file = err.GetFile();
-        ASSERT_NE(file, nullptr);
-        // File should not be included in the error.
-        EXPECT_EQ(strstr(errStr, file), nullptr);
-#endif // CHIP_CONFIG_ERROR_SOURCE
+        // ErrorStr with static char array.
+        CheckCoreErrorStrWithoutSourceLocationHelper(ErrorStr(err, /*withSourceLocation=*/false), err);
     }
+
+    // Deregister the layer error formatter
+    DeregisterCHIPLayerErrorFormatter();
+}
+
+TEST(TestCHIPErrorStr, CheckCoreErrorStrStorageWithoutSourceLocation)
+{
+    // Register the layer error formatter
+
+    RegisterCHIPLayerErrorFormatter();
+
+    // For each defined error...
+    for (const auto & err : kTestElements)
+    {
+        // ErrorStr with given storage.
+        ErrorStrStorage storage;
+        CheckCoreErrorStrWithoutSourceLocationHelper(ErrorStr(err, /*withSourceLocation=*/false, storage), err);
+    }
+
+    // Deregister the layer error formatter
+    DeregisterCHIPLayerErrorFormatter();
 }

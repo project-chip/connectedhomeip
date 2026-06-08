@@ -100,7 +100,7 @@ CHIP_ERROR ExportStoredOpKey(FabricIndex fabricIndex, PersistentStorageDelegate 
     ReturnErrorOnFailure(
         storage->SyncGetKeyValue(DefaultStorageKeyAllocator::FabricOpKey(fabricIndex).KeyName(), buf.Bytes(), size));
 
-    buf.SetLength(static_cast<size_t>(size));
+    ReturnErrorOnFailure(buf.SetLength(static_cast<size_t>(size)));
 
     // Read-out the operational key TLV entry.
     TLV::ContiguousBufferTLVReader reader;
@@ -126,10 +126,8 @@ CHIP_ERROR ExportStoredOpKey(FabricIndex fabricIndex, PersistentStorageDelegate 
         ReturnErrorOnFailure(reader.ExitContainer(containerType));
 
         memcpy(serializedOpKey.Bytes(), keyData.data(), keyData.size());
-        serializedOpKey.SetLength(keyData.size());
+        return serializedOpKey.SetLength(keyData.size());
     }
-
-    return CHIP_NO_ERROR;
 }
 
 /** WARNING: This can leave the operational key on the stack somewhere, since many of the platform
@@ -168,6 +166,11 @@ CHIP_ERROR SignWithStoredOpKey(FabricIndex fabricIndex, PersistentStorageDelegat
 }
 
 } // namespace
+
+bool PersistentStorageOperationalKeystore::HasPendingOpKeypair() const
+{
+    return (mPendingKeypair != nullptr);
+}
 
 bool PersistentStorageOperationalKeystore::HasOpKeypairForFabric(FabricIndex fabricIndex) const
 {
@@ -212,9 +215,15 @@ CHIP_ERROR PersistentStorageOperationalKeystore::NewOpKeypairForFabric(FabricInd
     mPendingKeypair = Platform::New<Crypto::P256Keypair>();
     VerifyOrReturnError(mPendingKeypair != nullptr, CHIP_ERROR_NO_MEMORY);
 
-    mPendingKeypair->Initialize(Crypto::ECPKeyTarget::ECDSA);
+    CHIP_ERROR err = mPendingKeypair->Initialize(Crypto::ECPKeyTarget::ECDSA);
+    if (err != CHIP_NO_ERROR)
+    {
+        ResetPendingKey();
+        return err;
+    }
+
     size_t csrLength = outCertificateSigningRequest.size();
-    CHIP_ERROR err   = mPendingKeypair->NewCertificateSigningRequest(outCertificateSigningRequest.data(), csrLength);
+    err              = mPendingKeypair->NewCertificateSigningRequest(outCertificateSigningRequest.data(), csrLength);
     if (err != CHIP_NO_ERROR)
     {
         ResetPendingKey();

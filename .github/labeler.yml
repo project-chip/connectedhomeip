@@ -30,6 +30,15 @@ examples:
       - examples/**/*
 
 ############################################################
+#  Examples Chef
+############################################################
+examples chef:
+  - changed-files:
+    - any-glob-to-any-file:
+      - examples/chef/*
+      - examples/chef/**/*
+
+############################################################
 #  Documentation
 ############################################################
 documentation:
@@ -118,15 +127,6 @@ test driver:
     - any-glob-to-any-file:
       - src/test_driver/*
       - src/test_driver/**/*
-
-# Cert tests touched: add current milestone delta-tracking label.
-# TODO: Change after Aug 15, 2024
-matter-1.4-te2-script-change:
-  - changed-files:
-    - any-glob-to-any-file:
-      - src/python_testing/*
-      - src/python_testing/**/*
-      - src/app/tests/suites/certification/*
 
 ############################################################
 #  Source Code
@@ -353,3 +353,11 @@ tizen:
       - src/platform/Tizen/**/*
       - src/test_driver/tizen/*
       - src/test_driver/tizen/**/*
+
+realtek:
+  - changed-files:
+    - any-glob-to-any-file:
+      - examples/platform/realtek/*
+      - examples/platform/realtek/**/*
+      - src/platform/realtek/*
+      - src/platform/realtek/**/*

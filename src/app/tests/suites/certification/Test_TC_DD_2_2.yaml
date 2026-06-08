@@ -46,8 +46,10 @@ tests:
           "Step 1a: TH starts matter announcement procedure using BLE transport"
       PICS: MCORE.DD.DISCOVERY_BLE
       verification: |
+          Initiate the Matter announcement procedure on the TH using BLE transport, and the TH must start sending BLE advertisements successfully.
           ./chip-all-clusters-app --wifi  --discriminator 3841
-          Verify in TH as commissionee side:
+
+          Verify in TH on the commissionee side:
 
           [1657221603.350406][368108:368108] CHIP:DL: Device Configuration:
           [1657221603.350445][368108:368108] CHIP:DL:   Serial Number: TEST_SN
@@ -70,6 +72,10 @@ tests:
           with a sufficient dwell time, interval, and overall duration of scan"
       PICS: MCORE.DD.DISCOVERY_BLE
       verification: |
+          Initiate BLE scan on the DUT across all three advertising channels, ensuring sufficient dwell time, interval,
+           and overall scan duration; the DUT must successfully detect the TH and retrieve the onboarding data for validation,
+            reporting the onboarding payload as set on the TH to meet the pass criteria.
+
           1. Discover commissionables over BLE using DUT=chip-tool pairing
 
           Verify in TH as commissionee side:
@@ -90,7 +96,8 @@ tests:
     - label: "Step 2b: TH starts matter announcement using BLE transport"
       PICS: MCORE.DD.DISCOVERY_BLE
       verification: |
-          $ ./out/all-clusters-app/chip-all-clusters-app --wifi --discriminator 3841
+          TH starts the Matter announcement using BLE transport, and the TH must begin sending BLE advertisements
+          ./chip-all-clusters-app --wifi --discriminator 3841
 
           Verify in TH as commissionee side
           [1653087913.247229][8083:8083] CHIP:SVR: Server Listening...
@@ -116,8 +123,8 @@ tests:
           as set on TH"
       PICS: MCORE.DD.DISCOVERY_BLE
       verification: |
+          DUT must detect the TH and retrieve the onboarding data for validation
           1. Discover commissionables over BLE using DUT=chip-tool pairing command
-
           Verify in TH as commissionee side:
           [1651743346.152716][5072:5075] CHIP:DL: Device E4:5F:01:0F:3B:B1 (Path: /org/bluez/hci0/dev_E4_5F_01_0F_3B_B1) Connected
           [1651743347.908807][5072:5075] CHIP:DL: BluezCharacteristicAcquireWrite is called, conn: 0xffffa0043700
@@ -164,25 +171,8 @@ tests:
           [1651743348.446962][5072:5072] CHIP:SVR: Commissioning completed session establishment step
       disabled: true
 
-    - label: "Step 3a: TH starts SoftAP and begin matter announcement procedure"
-      PICS: MCORE.DD.DISCOVERY_SOFTAP
-      verification: |
-          Out of Scope
-          SoftAP commissioning not currently supported on TH=all-clusters-app
-      disabled: true
-
     - label:
-          "Step 3b: DUT starts Wi-Fi scan of all 2.4 GHz Wi-Fi channels allowed
-          per its operational regulatory domain (channels 1, 6, and 11 are
-          preferred)"
-      PICS: MCORE.DD.DISCOVERY_SOFTAP
-      verification: |
-          Out of Scope
-          SoftAP commissioning not currently supported on TH=all-clusters-app
-      disabled: true
-
-    - label:
-          "Step 3c: TH is configured with the default channel to be Channel 6 in
+          "Step 3a: TH is configured with the default channel to be Channel 6 in
           2.4GHz. If TH has a 5GHz Wi-Fi radio, TH is configured with an
           additional channel list that includes Channel 44 and the operating
           channel Wi-Fi network the DUT is on if it is operating in non-ETSI
@@ -190,49 +180,64 @@ tests:
           regulatory domains."
       PICS: MCORE.DD.DISCOVERY_PAF
       verification: |
-          TH must start sending Wi-Fi PAF Publish Frames on the default channel and the channel list.
-          2.4g - $sudo ./chip-all-clusters-app --wifi --wifipaf freq_list=2437
-          5g - FCC - $sudo ./chip-all-clusters-app --wifi --wifipaf freq_list=5220
-          5g ETSI - $sudo ./chip-all-clusters-app --wifi --wifipaf freq_list=5745
+          WIFI - PAF feature is out of scope for V1.4
+           TH must start sending Wi-Fi PAF Publish Frames on the default channel and the channel list.
+           2.4g - $sudo ./chip-all-clusters-app --wifi --wifipaf freq_list=2437
+           5g - FCC - $sudo ./chip-all-clusters-app --wifi --wifipaf freq_list=5220
+           5g ETSI - $sudo ./chip-all-clusters-app --wifi --wifipaf freq_list=5745
       disabled: true
 
-    - label: "Step 3d: DUT starts Wi-Fi PAF scan in its commissioning channel"
+    - label: "Step 3b: DUT starts Wi-Fi PAF scan in its commissioning channel"
       PICS: MCORE.DD.DISCOVERY_PAF
       verification: |
-          DUT must find TH and provide onboarding data to for validation. Pass Criteria: DUT is able to report the Onboarding payload as set on TH
+          WIFI - PAF feature is out of scope for V1.4
 
-          $ sudo ./chip-tool pairing wifipaf-wifi 1 n_m_2g nxp12345 20202021 3840
+           DUT must find TH and provide onboarding data to for validation. Pass Criteria: DUT is able to report the Onboarding payload as set on TH
+
+           $ sudo ./chip-tool pairing wifipaf-wifi 1 n_m_2g nxp12345 20202021 3840
       disabled: true
 
-    - label: "Step 4a: DUT scans using Wi-Fi in background"
+    - label: "Step 4a: TH starts SoftAP and begin matter announcement procedure"
       PICS: MCORE.DD.DISCOVERY_SOFTAP
       verification: |
-          Out of Scope
-          SoftAP commissioning not currently supported on TH=all-clusters-app
-      disabled: true
-
-    - label: "Step 4b: TH starts SoftAP and begin matter announcement procedure"
-      PICS: MCORE.DD.DISCOVERY_SOFTAP
-      verification: |
-          Out of Scope
-          SoftAP commissioning not currently supported on TH=all-clusters-app
+          Out of Scope : SoftAP commissioning currently not supported
       disabled: true
 
     - label:
-          "Step 4c: DUT must find TH and provide onboarding data for
+          "Step 4b: DUT starts Wi-Fi scan of all 2.4 GHz Wi-Fi channels allowed
+          per its operational regulatory domain (channels 1, 6, and 11 are
+          preferred)"
+      PICS: MCORE.DD.DISCOVERY_SOFTAP
+      verification: |
+          Out of Scope : SoftAP commissioning currently not supported
+      disabled: true
+
+    - label: "Step 5a: DUT scans using Wi-Fi in background"
+      PICS: MCORE.DD.DISCOVERY_SOFTAP
+      verification: |
+          Out of Scope : SoftAP commissioning currently not supported
+      disabled: true
+
+    - label: "Step 5b: TH starts SoftAP and begin matter announcement procedure"
+      PICS: MCORE.DD.DISCOVERY_SOFTAP
+      verification: |
+          Out of Scope : SoftAP commissioning currently not supported
+      disabled: true
+    - label:
+          "Step 5c: DUT must find TH and provide onboarding data for
           validation.Pass Criteria: DUT is able to report the Onboarding payload
           as set on TH"
       PICS: MCORE.DD.DISCOVERY_SOFTAP
       verification: |
-          Out of Scope
-          SoftAP commissioning not currently supported on TH=all-clusters-app
+          Out of Scope : SoftAP commissioning currently not supported
       disabled: true
 
     - label:
-          "Step 5: With DUT and TH connected to the same network over IP, DUT
+          "Step 6: With DUT and TH connected to the same network over IP, DUT
           performs service discovery using DNS-SD"
       verification: |
-          1. TH is in commissioning mode and discoverable by DUT over IP through DNS-SD advertisements. This can also be verified using through the DUT's pairing command over IP.
+          TH is in commissioning mode and discoverable by DUT over IP through DNS-SD advertisements.
+          This can also be verified using through the DUT's pairing command over IP.
 
           Verify in TH as commissionee side:
           $ ./out/all-clusters-app/chip-all-clusters-app

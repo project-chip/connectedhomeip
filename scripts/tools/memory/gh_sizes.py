@@ -79,7 +79,10 @@ import memdf.select
 import memdf.util
 from memdf import Config, ConfigDescription, DFs, SectionDF
 
+log = logging.getLogger(__name__)
+
 PLATFORM_CONFIG_DIR = pathlib.Path('scripts/tools/memory/platform')
+
 
 CONFIG: ConfigDescription = {
     'event': {
@@ -124,7 +127,7 @@ def main(argv):
         _, platform, config_name, target_name, binary, *args = argv
     except ValueError:
         program = pathlib.Path(argv[0])
-        logging.error(
+        log.error(
             """
             Usage: %s platform config target binary [output] [options]
 
@@ -170,7 +173,7 @@ def main(argv):
         if config_file.is_file():
             config.read_config_file(config_file)
         else:
-            logging.warning('Missing config file: %s', config_file)
+            log.warning("Missing config file: '%s'", config_file)
         config.parse([argv[0]] + args)
 
         config.put('output.metadata.platform', platform)

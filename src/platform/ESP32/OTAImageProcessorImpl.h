@@ -48,6 +48,18 @@ public:
     bool IsFirstImageRun() override;
     CHIP_ERROR ConfirmCurrentImage() override;
 
+#ifdef CONFIG_OPENTHREAD_BORDER_ROUTER
+    class OTARcpProcessorDelegate
+    {
+    public:
+        virtual esp_err_t OnOtaRcpPrepareDownload()                                                               = 0;
+        virtual esp_err_t OnOtaRcpProcessBlock(const uint8_t * buffer, size_t bufLen, size_t & rcpOtaReceivedLen) = 0;
+        virtual esp_err_t OnOtaRcpFinalize()                                                                      = 0;
+        virtual esp_err_t OnOtaRcpAbort()                                                                         = 0;
+    };
+    void SetOtaRcpDelegate(OTARcpProcessorDelegate * delegate) { mOtaRcpDelegate = delegate; };
+#endif // CONFIG_OPENTHREAD_BORDER_ROUTER
+
 #ifdef CONFIG_ENABLE_ENCRYPTED_OTA
     // @brief This API initializes the handling of encrypted OTA image
     // @param key null terminated RSA-3072 key in PEM format
@@ -99,6 +111,10 @@ private:
     bool mEncryptedOTAEnabled                 = false;
     esp_decrypt_handle_t mOTADecryptionHandle = nullptr;
 #endif // CONFIG_ENABLE_ENCRYPTED_OTA
+
+#ifdef CONFIG_OPENTHREAD_BORDER_ROUTER
+    OTARcpProcessorDelegate * mOtaRcpDelegate = nullptr;
+#endif
 };
 
 } // namespace chip

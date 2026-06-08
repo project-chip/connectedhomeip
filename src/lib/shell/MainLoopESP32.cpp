@@ -70,7 +70,7 @@ namespace Shell {
 
 void Engine::RunMainLoop()
 {
-    while (true)
+    while (mRunning)
     {
         const char * prompt = LOG_COLOR_I "> " LOG_RESET_COLOR;
         char * line         = linenoise(prompt);
@@ -85,7 +85,7 @@ void Engine::RunMainLoop()
         }
         ShellLineArgs shellArgs(line, xTaskGetCurrentTaskHandle());
         linenoiseHistoryAdd(line);
-        PlatformMgr().ScheduleWork(ProcessShellLine, reinterpret_cast<intptr_t>(&shellArgs));
+        TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(ProcessShellLine, reinterpret_cast<intptr_t>(&shellArgs));
         shellArgs.WaitShellProcessDone();
         linenoiseFree(line);
     }

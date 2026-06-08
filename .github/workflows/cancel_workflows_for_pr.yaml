@@ -29,21 +29,22 @@ jobs:
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v4
-            - uses: actions/setup-python@v5
+              uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
+            - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6
               with:
                 python-version: '3.12'
             - name: Setup pip modules we use
               run: |
-                  pip install         \
+                  python3 -m venv venv
+                  venv/bin/pip3 install \
                       click           \
                       coloredlogs     \
                       python-dateutil \
                       pygithub        \
-                      && echo "DONE installint python prerequisites"
+                      && echo "DONE installing python prerequisites"
             - name: Cancel runs
               run: |
-                  scripts/tools/cancel_workflows_for_pr.py       \
+                  venv/bin/python3 scripts/tools/cancel_workflows_for_pr.py \
                     --gh-api-token "${{ secrets.GITHUB_TOKEN }}" \
                     --require "Restyled"       \
                     --require "Lint Code Base" \

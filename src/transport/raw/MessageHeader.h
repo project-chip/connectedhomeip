@@ -181,7 +181,7 @@ public:
     /**
      * Gets the message counter set in the header.
      *
-     * Message IDs are expecte to monotonically increase by one for each mesage
+     * Message IDs are expected to monotonically increase by one for each message
      * that has been sent.
      */
     uint32_t GetMessageCounter() const { return mMessageCounter; }
@@ -762,7 +762,7 @@ public:
     const uint8_t * GetTag() const { return &mTag[0]; }
 
     /** Set the message auth tag for this header. */
-    MessageAuthenticationCode & SetTag(PacketHeader * header, const uint8_t * tag, size_t len)
+    MessageAuthenticationCode & SetTag(const uint8_t * tag, size_t len)
     {
         const size_t tagLen = chip::Crypto::CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES;
         if (tagLen > 0 && tagLen <= kMaxTagLen && len == tagLen)

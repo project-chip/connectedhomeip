@@ -59,27 +59,28 @@ private:
         // buffer.
         char buffer[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE / 2];
         size_t prefixSize = ComputePrefixSize(label, indent);
-        if (prefixSize > ArraySize(buffer))
+        if (prefixSize > MATTER_ARRAY_SIZE(buffer))
         {
             DataModelLogger::LogString("", 0, "Prefix is too long to fit in buffer");
             return CHIP_ERROR_INTERNAL;
         }
 
-        const size_t availableSize = ArraySize(buffer) - prefixSize;
+        const size_t availableSize = MATTER_ARRAY_SIZE(buffer) - prefixSize;
         // Each byte ends up as two hex characters.
         const size_t bytesPerLogCall = availableSize / 2;
         std::string labelStr(label);
         while (value.size() > bytesPerLogCall)
         {
             ReturnErrorOnFailure(
-                chip::Encoding::BytesToUppercaseHexString(value.data(), bytesPerLogCall, &buffer[0], ArraySize(buffer)));
+                chip::Encoding::BytesToUppercaseHexString(value.data(), bytesPerLogCall, &buffer[0], MATTER_ARRAY_SIZE(buffer)));
             LogString(labelStr, indent, buffer);
             value = value.SubSpan(bytesPerLogCall);
             // For the second and following lines, make it clear that they are
             // continuation lines by replacing the label with "....".
             labelStr.replace(labelStr.begin(), labelStr.end(), labelStr.size(), '.');
         }
-        ReturnErrorOnFailure(chip::Encoding::BytesToUppercaseHexString(value.data(), value.size(), &buffer[0], ArraySize(buffer)));
+        ReturnErrorOnFailure(
+            chip::Encoding::BytesToUppercaseHexString(value.data(), value.size(), &buffer[0], MATTER_ARRAY_SIZE(buffer)));
         LogString(labelStr, indent, buffer);
 
         return CHIP_NO_ERROR;

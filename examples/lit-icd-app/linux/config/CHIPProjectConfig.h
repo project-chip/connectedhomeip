@@ -32,9 +32,6 @@
 // Uncomment this for a large Tunnel MTU.
 // #define CHIP_CONFIG_TUNNEL_INTERFACE_MTU                           (9000)
 
-// Enable support functions for parsing command-line arguments
-#define CHIP_CONFIG_ENABLE_ARG_PARSER 1
-
 //  Enable use of test setup parameters for testing purposes only.
 //
 //    WARNING: This option makes it possible to circumvent basic chip security functionality.
@@ -59,11 +56,7 @@
 //
 #define CHIP_CONFIG_SECURITY_TEST_MODE 0
 
-#define CHIP_CONFIG_ENABLE_UPDATE 1
-
 #define CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE 0
-
-#define CHIP_CONFIG_DATA_MANAGEMENT_CLIENT_EXPERIMENTAL 1
 
 #ifndef CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT
 #define CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT 4

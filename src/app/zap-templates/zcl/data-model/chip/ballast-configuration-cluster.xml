@@ -41,53 +41,61 @@ limitations under the License.
     <globalAttribute side="either" code="0xFFFD" value="4"/>
 
     <!-- Ballast Configuration Attribute Set -->
-    <attribute side="server" code="0x0000" define="PHYSICAL_MIN_LEVEL" type="int8u" min="0x01" max="0xFE" writable="false" default="0x01" optional="false">PhysicalMinLevel</attribute>
-    <attribute side="server" code="0x0001" define="PHYSICAL_MAX_LEVEL" type="int8u" min="0x01" max="0xFE" writable="false" default="0xFE" optional="false">PhysicalMaxLevel</attribute>
-    <attribute side="server" code="0x0002" define="BALLAST_STATUS" type="BallastStatusBitmap" min="0x00" max="0x03" writable="false" default="0x00" optional="true">BallastStatus</attribute>
-    <!-- Ballast Settings Attribute Set -->
-    <attribute side="server" code="0x0010" define="MIN_LEVEL" type="int8u" min="0x01" max="0xFE" writable="true" default="0x01" optional="false">
-        <description>MinLevel</description>
-        <access op="write" privilege="manage"/>
+    <attribute side="server" code="0x0000" name="PhysicalMinLevel" define="PHYSICAL_MIN_LEVEL" type="int8u" min="0x01" max="0xFE" default="0x01">
+      <mandatoryConform/>
     </attribute>
-    <attribute side="server" code="0x0011" define="MAX_LEVEL" type="int8u" min="0x01" max="0xFE" writable="true" default="0xFE" optional="false">
-        <description>MaxLevel</description>
-        <access op="write" privilege="manage"/>
+    <attribute side="server" code="0x0001" name="PhysicalMaxLevel" define="PHYSICAL_MAX_LEVEL" type="int8u" min="0x01" max="0xFE" default="0xFE">
+      <mandatoryConform/>
+    </attribute>
+    <attribute side="server" code="0x0002" name="BallastStatus" define="BALLAST_STATUS" type="BallastStatusBitmap" min="0x00" max="0x03" default="0x00" optional="true">
+      <optionalConform/>
+    </attribute>
+    <!-- Ballast Settings Attribute Set -->
+    <attribute side="server" code="0x0010" name="MinLevel" define="MIN_LEVEL" type="int8u" min="0x01" max="0xFE" writable="true" default="0x01">
+      <access op="write" privilege="manage"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute side="server" code="0x0011" name="MaxLevel" define="MAX_LEVEL" type="int8u" min="0x01" max="0xFE" writable="true" default="0xFE">
+      <access op="write" privilege="manage"/>
+      <mandatoryConform/>
     </attribute>
     <!-- PowerOnLevel and PowerOnFadeTime are deprecated -->
-    <attribute side="server" code="0x0014" define="INTRINSIC_BALLAST_FACTOR" type="int8u" writable="true" isNullable="true" optional="true">
-        <description>IntrinsicBallastFactor</description>
-        <access op="write" privilege="manage"/>
+    <attribute side="server" code="0x0014" name="IntrinsicBallastFactor" define="INTRINSIC_BALLAST_FACTOR" type="int8u" writable="true" isNullable="true" optional="true">
+      <access op="write" privilege="manage"/>
+      <optionalConform/>
     </attribute>
-    <attribute side="server" code="0x0015" define="BALLAST_FACTOR_ADJUSTMENT" type="int8u" min="0x64" writable="true" default="0xFF" isNullable="true" optional="true">
-        <description>BallastFactorAdjustment</description>
-        <access op="write" privilege="manage"/>
+    <attribute side="server" code="0x0015" name="BallastFactorAdjustment" define="BALLAST_FACTOR_ADJUSTMENT" type="int8u" min="0x64" writable="true" isNullable="true" optional="true">
+      <access op="write" privilege="manage"/>
+      <optionalConform/>
     </attribute>
     <!-- Lamp Information Attribute Set -->
-    <attribute side="server" code="0x0020" define="LAMP_QUANTITY" type="int8u" writable="false" optional="false">LampQuantity</attribute>
+    <attribute side="server" code="0x0020" name="LampQuantity" define="LAMP_QUANTITY" type="int8u">
+      <mandatoryConform/>
+    </attribute>
     <!-- Lamp Settings Attribute Set -->
-    <attribute side="server" code="0x0030" define="LAMP_TYPE" type="char_string" length="16" writable="true" optional="true">
-        <description>LampType</description>
-        <access op="write" privilege="manage"/>
+    <attribute side="server" code="0x0030" name="LampType" define="LAMP_TYPE" type="char_string" length="16" writable="true" optional="true">
+      <access op="write" privilege="manage"/>
+      <optionalConform/>
     </attribute>
-    <attribute side="server" code="0x0031" define="LAMP_MANUFACTURER" type="char_string" length="16" writable="true" optional="true">
-        <description>LampManufacturer</description>
-        <access op="write" privilege="manage"/>
+    <attribute side="server" code="0x0031" name="LampManufacturer" define="LAMP_MANUFACTURER" type="char_string" length="16" writable="true" optional="true">
+      <access op="write" privilege="manage"/>
+      <optionalConform/>
     </attribute>
-    <attribute side="server" code="0x0032" define="LAMP_RATED_HOURS" type="int24u" writable="true" default="0xFFFFFF" isNullable="true" optional="true">
-        <description>LampRatedHours</description>
-        <access op="write" privilege="manage"/>
+    <attribute side="server" code="0x0032" name="LampRatedHours" define="LAMP_RATED_HOURS" type="int24u" writable="true" isNullable="true" optional="true">
+      <access op="write" privilege="manage"/>
+      <optionalConform/>
     </attribute>
-    <attribute side="server" code="0x0033" define="LAMP_BURN_HOURS" type="int24u" writable="true" default="0x000000" isNullable="true" optional="true">
-        <description>LampBurnHours</description>
-        <access op="write" privilege="manage"/>
+    <attribute side="server" code="0x0033" name="LampBurnHours" define="LAMP_BURN_HOURS" type="int24u" writable="true" default="0x000000" isNullable="true" optional="true">
+      <access op="write" privilege="manage"/>
+      <optionalConform/>
     </attribute>
-    <attribute side="server" code="0x0034" define="LAMP_ALARM_MODE" type="LampAlarmModeBitmap" min="0x00" max="0x01" writable="true" default="0x00" optional="true">
-        <description>LampAlarmMode</description>
-        <access op="write" privilege="manage"/>
+    <attribute side="server" code="0x0034" name="LampAlarmMode" define="LAMP_ALARM_MODE" type="LampAlarmModeBitmap" min="0x00" max="0x01" writable="true" default="0x00" optional="true">
+      <access op="write" privilege="manage"/>
+      <optionalConform/>
     </attribute>
-    <attribute side="server" code="0x0035" define="LAMP_BURN_HOURS_TRIP_POINT" type="int24u" writable="true" default="0xFFFFFF" isNullable="true" optional="true">
-        <description>LampBurnHoursTripPoint</description>
-        <access op="write" privilege="manage"/>
+    <attribute side="server" code="0x0035" name="LampBurnHoursTripPoint" define="LAMP_BURN_HOURS_TRIP_POINT" type="int24u" writable="true" isNullable="true" optional="true">
+      <access op="write" privilege="manage"/>
+      <optionalConform/>
     </attribute>
   </cluster>
 </configurator>

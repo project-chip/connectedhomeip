@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2024 Project CHIP Authors
+ *    Copyright (c) 2024-2025 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,13 +17,19 @@
  */
 
 #include "AppTask.h"
+#include "ICDUtil.h"
 
-#if CONFIG_LOW_POWER
-#include "PWR_Interface.h"
+#if CONFIG_CHIP_APP_BATTERY_MANAGER
+#include "BatteryApplicationManager.h"
 #endif
 
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/InteractionModelEngine.h>
 #include <platform/CHIPDeviceLayer.h>
+
+// TODO: Ideally we should not depend on the codegen integration
+// It would be best if we could use generic cluster API instead
+#include <app/clusters/boolean-state-server/CodegenIntegration.h>
 
 #ifndef APP_DEVICE_TYPE_ENDPOINT
 #define APP_DEVICE_TYPE_ENDPOINT 1
@@ -36,17 +42,16 @@ void ContactSensorApp::AppTask::PreInitMatterStack()
     ChipLogProgress(DeviceLayer, "Welcome to NXP Contact Sensor Demo App");
 }
 
-#if CONFIG_LOW_POWER
-void ContactSensorApp::AppTask::AppMatter_DisallowDeviceToSleep()
+void ContactSensorApp::AppTask::PostInitMatterStack()
 {
-    PWR_DisallowDeviceToSleep();
-}
+    chip::app::InteractionModelEngine::GetInstance()->RegisterReadHandlerAppCallback(&chip::NXP::App::GetICDUtil());
 
-void ContactSensorApp::AppTask::AppMatter_AllowDeviceToSleep()
-{
-    PWR_AllowDeviceToSleep();
-}
+#if CONFIG_CHIP_APP_BATTERY_MANAGER
+    /* Initialize and start the battery application manager */
+    chip::NXP::App::BatteryAppMgr().Init();
+    chip::NXP::App::BatteryAppMgr().StartPeriodicUpdate();
 #endif
+}
 
 ContactSensorApp::AppTask & ContactSensorApp::AppTask::GetDefaultInstance()
 {
@@ -56,18 +61,19 @@ ContactSensorApp::AppTask & ContactSensorApp::AppTask::GetDefaultInstance()
 
 bool ContactSensorApp::AppTask::CheckStateClusterHandler(void)
 {
-    bool val = false;
-    BooleanState::Attributes::StateValue::Get(APP_DEVICE_TYPE_ENDPOINT, &val);
+    auto booleanState = BooleanState::FindClusterOnEndpoint(APP_DEVICE_TYPE_ENDPOINT);
+    VerifyOrReturnError(booleanState != nullptr, false);
+    bool val = booleanState->GetStateValue();
     return val;
 }
 
 CHIP_ERROR ContactSensorApp::AppTask::ProcessSetStateClusterHandler(void)
 {
-    bool val = false;
-    BooleanState::Attributes::StateValue::Get(APP_DEVICE_TYPE_ENDPOINT, &val);
-    auto status = BooleanState::Attributes::StateValue::Set(APP_DEVICE_TYPE_ENDPOINT, (bool) !val);
+    auto booleanState = BooleanState::FindClusterOnEndpoint(APP_DEVICE_TYPE_ENDPOINT);
+    VerifyOrReturnError(booleanState != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    VerifyOrReturnError(status == chip::Protocols::InteractionModel::Status::Success, CHIP_ERROR_WRITE_FAILED);
+    bool val = booleanState->GetStateValue();
+    booleanState->SetStateValue(!val);
 
     return CHIP_NO_ERROR;
 }

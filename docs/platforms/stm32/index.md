@@ -1,4 +1,4 @@
-# ESP32
+# STM32
 
 ```{toctree}
 :glob:

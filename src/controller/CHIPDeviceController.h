@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2022 Project CHIP Authors
+ *    Copyright (c) 2020-2024 Project CHIP Authors
  *    Copyright (c) 2013-2017 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -47,6 +47,7 @@
 #include <credentials/attestation_verifier/DeviceAttestationDelegate.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 #include <crypto/CHIPCryptoPAL.h>
+#include <inet/IPAddress.h>
 #include <inet/InetInterface.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPCore.h>
@@ -71,12 +72,22 @@
 #include <platform/CHIPDeviceLayer.h>
 #endif
 
+#if CHIP_SUPPORT_THREAD_MESHCOP
+#include <controller/ThreadMeshcopCommissionProxy.h>
+#endif
+
 #if CONFIG_NETWORK_LAYER_BLE
 #include <ble/Ble.h>
 #endif
 #include <controller/DeviceDiscoveryDelegate.h>
 
 namespace chip {
+
+namespace Testing {
+
+class DeviceCommissionerTestAccess;
+
+} // namespace Testing
 
 namespace Controller {
 
@@ -181,7 +192,7 @@ public:
     DeviceController();
     ~DeviceController() override {}
 
-    CHIP_ERROR Init(ControllerInitParams params);
+    virtual CHIP_ERROR Init(ControllerInitParams params);
 
     /**
      * @brief
@@ -199,6 +210,16 @@ public:
         if (mSystemState)
         {
             return mSystemState->SessionMgr();
+        }
+
+        return nullptr;
+    }
+
+    CASESessionManager * CASESessionMgr()
+    {
+        if (mSystemState)
+        {
+            return mSystemState->CASESessionMgr();
         }
 
         return nullptr;
@@ -466,9 +487,11 @@ class DLL_EXPORT DeviceCommissioner : public DeviceController,
 #endif
                                       public SessionEstablishmentDelegate
 {
+    friend class chip::Testing::DeviceCommissionerTestAccess;
+
 public:
     DeviceCommissioner();
-    ~DeviceCommissioner() override;
+    ~DeviceCommissioner() override {}
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY // make this commissioner discoverable
     /**
@@ -476,6 +499,8 @@ public:
      */
     CHIP_ERROR SetUdcListenPort(uint16_t listenPort);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
+
+    using DeviceController::Init;
 
     /**
      * Commissioner-specific initialization, includes parameters such as the pairing delegate.
@@ -511,7 +536,10 @@ public:
                           Optional<Dnssd::CommonResolutionData> resolutionData = NullOptional);
     CHIP_ERROR PairDevice(NodeId remoteDeviceId, const char * setUpCode, const CommissioningParameters & CommissioningParameters,
                           DiscoveryType discoveryType                          = DiscoveryType::kAll,
-                          Optional<Dnssd::CommonResolutionData> resolutionData = NullOptional);
+                          Optional<Dnssd::CommonResolutionData> resolutionData = NullOptional,
+                          Optional<SetUpCodePairer::ThreadMeshcopCommissionParameters> meshcopCommissionParams = NullOptional);
+
+    CHIP_ERROR GetLastThreadMeshcopDiscoveryDiagnosticJson(char * buffer, size_t bufferSize);
 
     /**
      * @brief
@@ -576,9 +604,10 @@ public:
      * @param[in] discoveryType         The network discovery type, defaults to DiscoveryType::kAll.
      * @param[in] resolutionData        Optional resolution data previously discovered on the network for the target device.
      */
-    CHIP_ERROR EstablishPASEConnection(NodeId remoteDeviceId, const char * setUpCode,
-                                       DiscoveryType discoveryType                          = DiscoveryType::kAll,
-                                       Optional<Dnssd::CommonResolutionData> resolutionData = NullOptional);
+    CHIP_ERROR
+    EstablishPASEConnection(NodeId remoteDeviceId, const char * setUpCode, DiscoveryType discoveryType = DiscoveryType::kAll,
+                            Optional<Dnssd::CommonResolutionData> resolutionData                                 = NullOptional,
+                            Optional<SetUpCodePairer::ThreadMeshcopCommissionParameters> meshcopCommissionParams = NullOptional);
 
     /**
      * @brief
@@ -592,7 +621,7 @@ public:
      * @param[in] remoteDeviceId        The remote device Id.
      * @param[in] params                The commissioning parameters
      */
-    CHIP_ERROR Commission(NodeId remoteDeviceId, CommissioningParameters & params);
+    virtual CHIP_ERROR Commission(NodeId remoteDeviceId, CommissioningParameters & params);
     CHIP_ERROR Commission(NodeId remoteDeviceId);
 
     /**
@@ -606,6 +635,17 @@ public:
      */
     CHIP_ERROR
     ContinueCommissioningAfterDeviceAttestation(DeviceProxy * device, Credentials::AttestationVerificationResult attestationResult);
+
+#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
+    /**
+     * @brief
+     *   This method instructs the commissioner to proceed to the commissioning complete stage for a device
+     *   that had previously being commissioned until request to connect to network.
+     *
+     * @param[in] remoteDeviceId        The remote device Id.
+     */
+    CHIP_ERROR ContinueCommissioningAfterConnectNetworkRequest(NodeId remoteDeviceId);
+#endif
 
     CHIP_ERROR GetDeviceBeingCommissioned(NodeId deviceId, CommissioneeDeviceProxy ** device);
 
@@ -720,6 +760,7 @@ public:
      */
     void CloseBleConnection();
 #endif
+
     /**
      * @brief
      *   Discover all devices advertising as commissionable.
@@ -760,7 +801,7 @@ public:
      * @param instanceName DNS-SD instance name for the client requesting commissioning
      *
      */
-    void FindCommissionableNode(char * instanceName) override;
+    void FindCommissionableNode(const char * instanceName) override;
 
     /**
      * @brief
@@ -804,9 +845,11 @@ public:
 
     Credentials::DeviceAttestationVerifier * GetDeviceAttestationVerifier() const { return mDeviceAttestationVerifier; }
 
-    Optional<CommissioningParameters> GetCommissioningParameters()
+    const CommissioningParameters & GetCommissioningParameters() { return mDefaultCommissioner->GetCommissioningParameters(); }
+
+    CHIP_ERROR UpdateCommissioningParameters(const CommissioningParameters & newParameters)
     {
-        return mDefaultCommissioner == nullptr ? NullOptional : MakeOptional(mDefaultCommissioner->GetCommissioningParameters());
+        return mDefaultCommissioner->SetCommissioningParameters(newParameters);
     }
 
     // Reset the arm failsafe timer during commissioning.  If this returns
@@ -822,18 +865,62 @@ public:
                                          /* fireAndForget = */ true);
     }
 
+    // Check if the commissioning mode is valid for the current commissioning parameters.
+    virtual bool HasValidCommissioningMode(const Dnssd::CommissionNodeData & nodeData);
+
+protected:
+    // Cleans up and resets failsafe as appropriate depending on the error and the failed stage.
+    // For success, sends completion report with the CommissioningDelegate and sends callbacks to the PairingDelegate
+    // For failures after AddNOC succeeds, sends completion report with the CommissioningDelegate and sends callbacks to the
+    // PairingDelegate. In this case, it does not disarm the failsafe or close the pase connection. For failures up through AddNOC,
+    // sends a command to immediately expire the failsafe, then sends completion report with the CommissioningDelegate and callbacks
+    // to the PairingDelegate upon arm failsafe command completion.
+    virtual void CleanupCommissioning(DeviceProxy * proxy, NodeId nodeId, const CompletionStatus & completionStatus);
+
+    /* This function start the JCM verification steps
+     */
+    virtual CHIP_ERROR StartJCMTrustVerification(DeviceProxy * proxy) { return CHIP_ERROR_NOT_IMPLEMENTED; }
+
+#if CHIP_CONFIG_ENABLE_READ_CLIENT
+    virtual CHIP_ERROR ParseExtraCommissioningInfo(ReadCommissioningInfo & info, const CommissioningParameters & params)
+    {
+        return CHIP_NO_ERROR;
+    }
+#endif // CHIP_CONFIG_ENABLE_READ_CLIENT
+
+#if CHIP_CONFIG_ENABLE_READ_CLIENT
+    Platform::UniquePtr<app::ClusterStateCache> mAttributeCache;
+    Platform::UniquePtr<app::ReadClient> mReadClient;
+#endif // CHIP_CONFIG_ENABLE_READ_CLIENT
+
 private:
     DevicePairingDelegate * mPairingDelegate = nullptr;
 
     DeviceProxy * mDeviceBeingCommissioned               = nullptr;
     CommissioneeDeviceProxy * mDeviceInPASEEstablishment = nullptr;
 
+    Optional<System::Clock::Timeout> mCommissioningStepTimeout; // Note: For multi-interaction steps this is per interaction
     CommissioningStage mCommissioningStage = CommissioningStage::kSecurePairing;
-    bool mRunCommissioningAfterConnection  = false;
+    uint8_t mReadCommissioningInfoProgress = 0; // see ContinueReadingCommissioningInfo()
+
+    // Stores the PASE session address to use as fallback during operational discovery
+    Optional<AddressResolve::ResolveResult> mFallbackOperationalResolveResult;
+
+    bool mRunCommissioningAfterConnection = false;
     Internal::InvokeCancelFn mInvokeCancelFn;
     Internal::WriteCancelFn mWriteCancelFn;
 
     ObjectPool<CommissioneeDeviceProxy, kNumMaxActiveDevices> mCommissioneeDevicePool;
+
+    // While we have an ongoing PASE attempt (i.e. after calling Pair() on the
+    // PASESession), track which RendezvousParameters we used for that attempt.
+    // This allows us to notify delegates about which thing it was we actually
+    // established PASE with, especially in the context of concatenated QR
+    // codes.
+    //
+    // This member only has a value while we are in the middle of session
+    // establishment.
+    std::optional<RendezvousParameters> mRendezvousParametersForPASEEstablishment;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY // make this commissioner discoverable
     Protocols::UserDirectedCommissioning::UserDirectedCommissioningServer * mUdcServer = nullptr;
@@ -947,6 +1034,9 @@ private:
     static void OnSetRegulatoryConfigResponse(
         void * context,
         const chip::app::Clusters::GeneralCommissioning::Commands::SetRegulatoryConfigResponse::DecodableType & data);
+    static void OnSetTCAcknowledgementsResponse(
+        void * context,
+        const chip::app::Clusters::GeneralCommissioning::Commands::SetTCAcknowledgementsResponse::DecodableType & data);
     static void OnSetUTCError(void * context, CHIP_ERROR error);
     static void
     OnSetTimeZoneResponse(void * context,
@@ -1024,7 +1114,6 @@ private:
     bool ExtendArmFailSafeInternal(DeviceProxy * proxy, CommissioningStage step, uint16_t armFailSafeTimeout,
                                    Optional<System::Clock::Timeout> commandTimeout, OnExtendFailsafeSuccess onSuccess,
                                    OnExtendFailsafeFailure onFailure, bool fireAndForget);
-
     template <typename RequestObjectT>
     CHIP_ERROR SendCommissioningCommand(DeviceProxy * device, const RequestObjectT & request,
                                         CommandResponseSuccessCallback<typename RequestObjectT::ResponseType> successCb,
@@ -1040,16 +1129,15 @@ private:
     void CancelCASECallbacks();
 
 #if CHIP_CONFIG_ENABLE_READ_CLIENT
-    void ParseCommissioningInfo();
-    // Parsing attributes read in kReadCommissioningInfo stage.
-    CHIP_ERROR ParseCommissioningInfo1(ReadCommissioningInfo & info);
-    // Parsing attributes read in kReadCommissioningInfo2 stage.
-    CHIP_ERROR ParseCommissioningInfo2(ReadCommissioningInfo & info);
-    // Called by ParseCommissioningInfo2
+    void ContinueReadingCommissioningInfo(const CommissioningParameters & params);
+    void FinishReadingCommissioningInfo(const CommissioningParameters & params);
+    CHIP_ERROR ParseGeneralCommissioningInfo(ReadCommissioningInfo & info);
+    CHIP_ERROR ParseBasicInformation(ReadCommissioningInfo & info);
+    CHIP_ERROR ParseNetworkCommissioningInfo(ReadCommissioningInfo & info);
+    CHIP_ERROR ParseNetworkCommissioningTimeouts(NetworkClusterInfo & networkInfo, const char * networkType);
     CHIP_ERROR ParseFabrics(ReadCommissioningInfo & info);
     CHIP_ERROR ParseICDInfo(ReadCommissioningInfo & info);
-    // Called by ParseCommissioningInfo
-    void ParseTimeSyncInfo(ReadCommissioningInfo & info);
+    CHIP_ERROR ParseTimeSyncInfo(ReadCommissioningInfo & info);
 #endif // CHIP_CONFIG_ENABLE_READ_CLIENT
 
     static CHIP_ERROR
@@ -1059,20 +1147,18 @@ private:
     // OnCommissioningComplete and either OnCommissioningSuccess or OnCommissioningFailure depending on the given completion status.
     void SendCommissioningCompleteCallbacks(NodeId nodeId, const CompletionStatus & completionStatus);
 
-    // Cleans up and resets failsafe as appropriate depending on the error and the failed stage.
-    // For success, sends completion report with the CommissioningDelegate and sends callbacks to the PairingDelegate
-    // For failures after AddNOC succeeds, sends completion report with the CommissioningDelegate and sends callbacks to the
-    // PairingDelegate. In this case, it does not disarm the failsafe or close the pase connection. For failures up through AddNOC,
-    // sends a command to immediately expire the failsafe, then sends completion report with the CommissioningDelegate and callbacks
-    // to the PairingDelegate upon arm failsafe command completion.
-    void CleanupCommissioning(DeviceProxy * proxy, NodeId nodeId, const CompletionStatus & completionStatus);
-
     // Extend the fail-safe before trying to do network-enable (since after that
     // point, for non-concurrent-commissioning devices, we may not have a way to
     // extend it).
     void ExtendFailsafeBeforeNetworkEnable(DeviceProxy * device, CommissioningParameters & params, CommissioningStage step);
 
     bool IsAttestationInformationMissing(const CommissioningParameters & params);
+
+#if CHIP_SUPPORT_THREAD_MESHCOP
+    CHIP_ERROR PairThreadMeshcop(RendezvousParameters & rendezvousParams, CommissioningParameters & commissioningParams);
+
+    ThreadMeshcopCommissionProxy mThreadMeshcopCommissionProxy;
+#endif
 
     chip::Callback::Callback<OnDeviceConnected> mOnDeviceConnectedCallback;
     chip::Callback::Callback<OnDeviceConnectionFailure> mOnDeviceConnectionFailureCallback;
@@ -1087,18 +1173,18 @@ private:
     SetUpCodePairer mSetUpCodePairer;
     AutoCommissioner mAutoCommissioner;
     CommissioningDelegate * mDefaultCommissioner =
-        nullptr; // Commissioning delegate to call when PairDevice / Commission functions are used
+        &mAutoCommissioner; // Commissioning delegate to call when PairDevice / Commission functions are used
     CommissioningDelegate * mCommissioningDelegate =
         nullptr; // Commissioning delegate that issued the PerformCommissioningStep command
     CompletionStatus mCommissioningCompletionStatus;
-
-#if CHIP_CONFIG_ENABLE_READ_CLIENT
-    Platform::UniquePtr<app::ClusterStateCache> mAttributeCache;
-    Platform::UniquePtr<app::ReadClient> mReadClient;
-#endif
     Credentials::AttestationVerificationResult mAttestationResult;
     Platform::UniquePtr<Credentials::DeviceAttestationVerifier::AttestationDeviceInfo> mAttestationDeviceInfo;
     Credentials::DeviceAttestationVerifier * mDeviceAttestationVerifier = nullptr;
+
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+    Optional<Crypto::P256PublicKey> mTrustedIcacPublicKeyB;
+    EndpointId mPeerAdminJFAdminClusterEndpointId = kInvalidEndpointId;
+#endif
 };
 
 } // namespace Controller

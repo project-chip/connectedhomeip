@@ -44,6 +44,7 @@ extern NSString * const kDarwinFrameworkToolControllerDomain;
 
 - (NSData *)valueForKey:(NSString *)key;
 - (void)storeValue:(NSData *)value forKey:key;
+- (void)print;
 @end
 
 NS_ASSUME_NONNULL_END

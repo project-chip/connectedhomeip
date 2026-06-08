@@ -407,7 +407,7 @@ protected:
                                                                     mTimedInteractionTimeoutMs, mSuppressResponse.ValueOr(false));
             VerifyOrReturnError(mWriteClient != nullptr, CHIP_ERROR_NO_MEMORY);
 
-            for (uint8_t i = 0; i < pathsConfig.count; i++)
+            for (size_t i = 0; i < pathsConfig.count; i++)
             {
                 auto & path        = pathsConfig.attributePathParams[i];
                 auto & dataVersion = pathsConfig.dataVersionFilter[i].mDataVersion;

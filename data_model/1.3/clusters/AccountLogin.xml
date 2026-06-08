@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-Copyright (C) Connectivity Standards Alliance (2021). All rights reserved.
+Copyright (C) Connectivity Standards Alliance (2025). All rights reserved.
 The information within this document is the property of the Connectivity
 Standards Alliance and its use and disclosure are restricted, except as
 expressly set forth herein.
@@ -72,7 +72,12 @@ Davis, CA 95616, USA
       <mandatoryConform/>
       <field id="0" name="TempAccountIdentifier" type="string">
         <mandatoryConform/>
-        <constraint type="lengthBetween" from="16" to="100"/>
+        <constraint>
+          <lengthBetween>
+            <from value="16"/>
+            <to value="100"/>
+          </lengthBetween>
+        </constraint>
       </field>
     </command>
     <command id="0x01" name="GetSetupPINResponse" direction="responseFromServer">
@@ -80,7 +85,9 @@ Davis, CA 95616, USA
       <mandatoryConform/>
       <field id="0" name="SetupPIN" type="string">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
     </command>
     <command id="0x02" name="Login" direction="commandToServer" response="Y">
@@ -88,11 +95,18 @@ Davis, CA 95616, USA
       <mandatoryConform/>
       <field id="0" name="TempAccountIdentifier" type="string">
         <mandatoryConform/>
-        <constraint type="lengthBetween" from="16" to="100"/>
+        <constraint>
+          <lengthBetween>
+            <from value="16"/>
+            <to value="100"/>
+          </lengthBetween>
+        </constraint>
       </field>
       <field id="1" name="SetupPIN" type="string">
         <mandatoryConform/>
-        <constraint type="minLength" value="8"/>
+        <constraint>
+          <minLength value="8"/>
+        </constraint>
       </field>
       <field id="2" name="Node" type="node-id">
         <optionalConform/>

@@ -1,4 +1,4 @@
-# Copyright (c) 2024 Project CHIP Authors
+# Copyright (c) 2024-2025 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@ import("//build_overrides/chip.gni")
 import("//build_overrides/nxp_sdk.gni")
 
 nxp_external_sdk = true
-nxp_build_matter_standalone_lib = true
 chip_device_platform = "nxp"
 lwip_platform = "nxp"
 
@@ -29,3 +28,6 @@ chip_ble_project_config_include = ""
 
 # mbedtls is built as part of the NXP SDK build process
 mbedtls_target = "${nxp_sdk_build_root}:nxp_mbedtls"
+
+custom_toolchain =
+    "${chip_root}/config/nxp/chip-gn-freertos/toolchain:nxpFreeRTOS"

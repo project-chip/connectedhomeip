@@ -36,7 +36,7 @@ CHIP_ERROR MTRP256KeypairBridge::Init(id<MTRKeypair> keypair)
     }
 
     mKeypair = keypair;
-    return setPubkey();
+    return MatterPubKeyFromMTRKeypair(mKeypair, &mPubkey);
 }
 
 CHIP_ERROR MTRP256KeypairBridge::Initialize(ECPKeyTarget key_target)
@@ -112,12 +112,11 @@ CHIP_ERROR MTRP256KeypairBridge::ECDSA_sign_msg(const uint8_t * msg, size_t msg_
             return CHIP_ERROR_INTERNAL;
         }
     }
-    if (signature.length > out_signature.Capacity()) {
+    if (out_signature.SetLength(signature.length) != CHIP_NO_ERROR) {
         MTR_LOG_ERROR("ECDSA sign msg failure: unexpected signature size %llu vs %llu", static_cast<uint64_t>(signature.length),
             static_cast<uint64_t>(out_signature.Capacity()));
         return CHIP_ERROR_NO_MEMORY;
     }
-    out_signature.SetLength(signature.length);
     std::memcpy(out_signature.Bytes(), signature.bytes, signature.length);
     return CHIP_NO_ERROR;
 }
@@ -131,8 +130,6 @@ CHIP_ERROR MTRP256KeypairBridge::ECDH_derive_secret(
 
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
-
-CHIP_ERROR MTRP256KeypairBridge::setPubkey() { return MatterPubKeyFromSecKeyRef([mKeypair publicKey], &mPubkey); }
 
 CHIP_ERROR MTRP256KeypairBridge::MatterPubKeyFromSecKeyRef(SecKeyRef pubkeyRef, P256PublicKey * matterPubKey)
 {
@@ -154,4 +151,25 @@ CHIP_ERROR MTRP256KeypairBridge::MatterPubKeyFromSecKeyRef(SecKeyRef pubkeyRef, 
     *matterPubKey = pubkeyBytes;
 
     return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR MTRP256KeypairBridge::MatterPubKeyFromMTRKeypair(id<MTRKeypair> keyPair, chip::Crypto::P256PublicKey * matterPubKey)
+{
+    SecKeyRef publicKey;
+    if ([keyPair respondsToSelector:@selector(copyPublicKey)]) {
+        publicKey = [keyPair copyPublicKey];
+    } else {
+        publicKey = [keyPair publicKey];
+        if (publicKey) {
+            CFRetain(publicKey);
+        }
+    }
+
+    CHIP_ERROR err = MatterPubKeyFromSecKeyRef(publicKey, matterPubKey);
+
+    if (publicKey) {
+        CFRelease(publicKey);
+    }
+
+    return err;
 }

@@ -137,7 +137,7 @@ CHIP_ERROR PSOC6Utils::StartWiFiLayer(void)
         if (result != CY_RSLT_SUCCESS)
         {
             err = CHIP_ERROR_INTERNAL;
-            ChipLogError(DeviceLayer, "StartWiFiLayer() PSOC6 Wi-Fi Started Failed: %s", chip::ErrorStr(err));
+            ChipLogError(DeviceLayer, "StartWiFiLayer() PSOC6 Wi-Fi Started Failed: %" CHIP_ERROR_FORMAT, err.Format());
             SuccessOrExit(err);
         }
         wcm_init_done = true;
@@ -160,7 +160,7 @@ CHIP_ERROR PSOC6Utils::EnableStationMode(void)
     {
         WiFiMode = WIFI_MODE_STA;
     }
-    wifi_set_mode(WiFiMode);
+    TEMPORARY_RETURN_IGNORED wifi_set_mode(WiFiMode);
     return err;
 }
 
@@ -420,7 +420,7 @@ CHIP_ERROR PSOC6Utils::p6_wifi_connect(void)
     cy_wcm_connect_params_t connect_param;
     cy_wcm_ip_address_t ip_addr;
 
-    p6_wifi_get_config(WIFI_IF_STA, &stationConfig);
+    TEMPORARY_RETURN_IGNORED p6_wifi_get_config(WIFI_IF_STA, &stationConfig);
     memset(&connect_param, 0, sizeof(cy_wcm_connect_params_t));
     memset(&ip_addr, 0, sizeof(cy_wcm_ip_address_t));
     memcpy(&connect_param.ap_credentials.SSID, &stationConfig.sta.ssid, strlen((char *) stationConfig.sta.ssid));
@@ -453,7 +453,7 @@ CHIP_ERROR PSOC6Utils::p6_start_ap(void)
 
     wifi_config_t stationConfig;
     memset(&stationConfig, 0, sizeof(stationConfig));
-    p6_wifi_get_config(WIFI_IF_AP, &stationConfig);
+    TEMPORARY_RETURN_IGNORED p6_wifi_get_config(WIFI_IF_AP, &stationConfig);
 
     cy_wcm_ap_config_t ap_conf;
     memset(&ap_conf, 0, sizeof(cy_wcm_ap_config_t));

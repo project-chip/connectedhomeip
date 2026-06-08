@@ -36,18 +36,18 @@ else
     PW_PATH="$PW_ENVIRONMENT_ROOT/cipd/packages/pigweed"
 fi
 
-set -x
-env
 USE_WIFI=false
 USE_DOCKER=false
-USE_GIT_SHA_FOR_VERSION=true
-USE_SLC=false
 GN_PATH="$PW_PATH/gn"
 USE_BOOTLOADER=false
 DOTFILE=".gn"
+VERBOSE_MODE=false
 
 SILABS_THREAD_TARGET=\""../silabs:ot-efr32-cert"\"
 USAGE="./scripts/examples/gn_silabs_example.sh <AppRootFolder> <outputFolder> <silabs_board_name> [<Build options>]"
+
+PROTOCOL_DIR_SUFFIX="thread"
+NCP_DIR_SUFFIX=""
 
 if [ "$#" == "0" ]; then
     echo "Build script for EFR32 Matter apps
@@ -101,12 +101,8 @@ if [ "$#" == "0" ]; then
             Enable Synchronized Sleepy end device. (Default false)
             Must also set chip_enable_icd_server=true chip_openthread_ftd=false
             --icd can be used to configure both arguments
-        use_rs9116
-            Build wifi example with extension board rs9116. (Default false)
         use_SiWx917
             Build wifi example with extension board SiWx917. (Default false)
-        use_wf200
-            Build wifi example with extension board wf200. (Default false)
         use_pw_rpc
             Use to build the example with pigweed RPC
         ota_periodic_query_timeout_sec
@@ -118,7 +114,7 @@ if [ "$#" == "0" ]; then
             (default: /third_party/silabs/slc_gen/<board>/)
         sl_pre_gen_path
             Allow users to define a path to pre-generated board files
-            (default: /third_party/silabs/matter_support/matter/<family>/<board>/)
+            (default: third_party/silabs/matter_support/board-support/<family>/<board>/)
         sl_matter_version
             Use provided software version at build time
         sl_matter_version_str
@@ -132,6 +128,8 @@ if [ "$#" == "0" ]; then
             Enable the Alarm Based Wakeup for 917 SoC when sleep is enabled (Default false)
         si91x_alarm_periodic_time
             Periodic time at which the 917 SoC should wakeup (Default: 30sec)
+        wifi_ncp_module
+            Build SiWx917_ncp example for NCP module board (Default false)
         Presets
         --icd
             enable ICD features, set thread mtd
@@ -139,8 +137,8 @@ if [ "$#" == "0" ]; then
         --low-power
             disables all power consuming features for the most power efficient build
             This flag is to be used with --icd
-        --wifi <wf200 | rs9116>
-            build wifi example variant for given exansion board
+        --wifi <SiWx917>
+            build wifi example variant for given expansion board
         --additional_data_advertising
             enable Addition data advertissing and rotating device ID
         --use_ot_lib
@@ -157,6 +155,8 @@ if [ "$#" == "0" ]; then
             Generate files with SLC for current board and options Requires an SLC-CLI installation or running in Docker.
         --slc_reuse_files
             Use generated files without running slc again.
+        --verbose
+            Add additional logs.
         --bootloader
             Add bootloader to the generated image.
 
@@ -185,21 +185,20 @@ else
                 ;;
             --wifi)
                 if [ -z "$2" ]; then
-                    echo "--wifi requires rs9116 or SiWx917 or wf200"
+                    echo "--wifi requires SiWx917"
                     exit 1
                 fi
-                if [ "$2" = "rs9116" ]; then
-                    optArgs+="use_rs9116=true "
-                elif [ "$2" = "SiWx917" ]; then
+
+                if [ "$2" = "SiWx917" ]; then
                     optArgs+="use_SiWx917=true "
-                elif [ "$2" = "wf200" ]; then
-                    optArgs+="use_wf200=true "
                 else
-                    echo "Wifi usage: --wifi rs9116|SiWx917|wf200"
+                    echo "Wifi usage: --wifi SiWx917"
                     exit 1
                 fi
+
+                NCP_DIR_SUFFIX="/"$2
                 USE_WIFI=true
-                optArgs+="chip_device_platform =\"efr32\" "
+                optArgs+="chip_device_platform =\"efr32\" chip_crypto_keystore=\"psa\" "
                 shift
                 shift
                 ;;
@@ -231,13 +230,8 @@ else
                 optArgs+="lwip_root=\""//third_party/connectedhomeip/third_party/lwip"\" "
                 shift
                 ;;
-            # Option not to be used until ot-efr32 github is updated
-            # --use_ot_github_sources)
-            #   optArgs+="openthread_root=\"//third_party/connectedhomeip/third_party/openthread/ot-efr32/openthread\" openthread_efr32_root=\"//third_party/connectedhomeip/third_party/openthread/ot-efr32/src/src\""
-            #    shift
-            #    ;;
             --release)
-                optArgs+="is_debug=false disable_lcd=true chip_build_libshell=false enable_openthread_cli=false use_external_flash=false chip_logging=false silabs_log_enabled=false "
+                optArgs+="is_debug=false disable_lcd=true chip_build_libshell=false enable_openthread_cli=false use_external_flash=false chip_logging=false silabs_log_enabled=false sl_uart_log_output=false "
                 shift
                 ;;
             --bootloader)
@@ -246,7 +240,6 @@ else
                 ;;
             --docker)
                 optArgs+="efr32_sdk_root=\"$GSDK_ROOT\" "
-                optArgs+="wiseconnect_sdk_root=\"$WISECONNECT_SDK_ROOT\" "
                 optArgs+="wifi_sdk_root=\"$WIFI_SDK_ROOT\" "
                 USE_DOCKER=true
                 shift
@@ -258,7 +251,6 @@ else
 
             --slc_generate)
                 optArgs+="slc_generate=true "
-                USE_SLC=true
                 shift
                 ;;
             --use_pw_rpc)
@@ -267,6 +259,11 @@ else
                 ;;
             --slc_reuse_files)
                 optArgs+="slc_reuse_files=true "
+                shift
+                ;;
+            --verbose)
+                optArgs+="sl_verbose_mode=true chip_detail_logging=true "
+                VERBOSE_MODE=true
                 shift
                 ;;
             --gn_path)
@@ -279,13 +276,8 @@ else
                 shift
                 shift
                 ;;
-            *"sl_matter_version_str="*)
-                optArgs+="$1 "
-                USE_GIT_SHA_FOR_VERSION=false
-                shift
-                ;;
             *)
-                if [ "$1" =~ *"use_rs9116=true"* ] || [ "$1" =~ *"use_SiWx917=true"* ] || [ "$1" =~ *"use_wf200=true"* ]; then
+                if [[ "$1" == *use_SiWx917=true* ]]; then
                     USE_WIFI=true
                     # NCP Mode so base MCU is an EFR32
                     optArgs+="chip_device_platform =\"efr32\" "
@@ -302,55 +294,99 @@ else
     fi
 
     # 917 exception. TODO find a more generic way
-    if [ "$SILABS_BOARD" == "BRD4338A" ] || [ "$SILABS_BOARD" == "BRD2605A" ] || [ "$SILABS_BOARD" == "BRD4343A" ]; then
+    WIFI_SOC_BOARDS=("BRD4338A" "BRD2605A" "BRD4343A" "BRD4342A" "BRD2708A" "BRD2911A")
+    if [[ " ${WIFI_SOC_BOARDS[@]} " =~ " ${SILABS_BOARD} " ]]; then
         echo "Compiling for 917 WiFi SOC"
         USE_WIFI=true
     fi
 
-    if [ "$USE_GIT_SHA_FOR_VERSION" == true ]; then
-        {
-            ShortCommitSha=$(git describe --always --dirty --exclude '*')
-            branchName=$(git rev-parse --abbrev-ref HEAD)
-            optArgs+="sl_matter_version_str=\"v1.3-$branchName-$ShortCommitSha\" "
-        } &>/dev/null
-    fi
+    # After a completed local install (.install-packages-done), run the Silabs package install step to check for updates. Docker never runs it (SDK is in the image).
+    if [ -f "$CHIP_ROOT/scripts/setup/silabs/.install-packages-done" ]; then # INSTALL_EVERYTHING
+        INSTALL_EVERYTHING=true
+    else
+        INSTALL_EVERYTHING=false
+    fi # INSTALL_EVERYTHING
 
-    if [ "$USE_SLC" == false ]; then
-        # Activation needs to be after SLC generation which is done in gn gen.
-        # Zap generation requires activation and is done in the build phase
-        source "$CHIP_ROOT/scripts/activate.sh"
+    # First-time local install: INSTALL_EVERYTHING is false until .install-packages-done (see above); respect opt-out. No prompt in Docker.
+    if [ "$USE_DOCKER" != true ] && [ "$INSTALL_EVERYTHING" != true ] && [ ! -f "$CHIP_ROOT/scripts/setup/silabs/.do-not-install-packages" ]; then # first-time install prompt
+        cat <<'EOF'
+        !!!!!!!!! FIRST TIME INSTALL !!!!!!!!!
+        Do you agree to install SILICON LABS PACKAGES MANAGER?
+
+        This will take around 8GB of spaces which will include but not limited to :
+        SLT (silabs packages manager), zap, arm-gcc,
+
+        Most of the files will be located under ~/.silabs,
+        some symbolic link will be created and it will replace simplicity_sdk submodule
+        This is required for the build to succeed.
+EOF
+
+        while true; do
+            read -p "Do you want to proceed? [Y/n]: " yn
+            case $yn in
+                "" | [Yy]*)
+                    INSTALL_EVERYTHING=true
+                    python3 -m pip install -q -r "$CHIP_ROOT/integrations/docker/images/stage-2/chip-build-efr32/requirements.txt" >/dev/null 2>&1 || true
+                    break
+                    ;; # Case for yes/Y (Enter accepts default)
+                [Nn]*)
+                    echo "You won't be asked again, cannot proceed with build. Exiting..."
+                    touch "$CHIP_ROOT/scripts/setup/silabs/.do-not-install-packages"
+                    exit 1
+                    break
+                    ;;                                                  # Case for no/N
+                *) echo "Invalid response. Please answer yes or no." ;; # Case for invalid input
+            esac
+        done
+    fi # first-time install prompt
+
+    # Local Silabs package install when agreed (INSTALL_EVERYTHING). Never under Docker.
+    if [ "$INSTALL_EVERYTHING" == true ] && [ "$USE_DOCKER" != true ]; then # run install-packages
+        python3 -m pip install -q -r "$CHIP_ROOT/integrations/docker/images/stage-2/chip-build-efr32/requirements.txt"
+        python3 "$CHIP_ROOT/scripts/setup/silabs/install-packages.py" || exit 1
+    fi # run install-packages
+
+    # Zap generation requires activation
+    source "$CHIP_ROOT/scripts/activate.sh"
+
+    if [ "$USE_WIFI" == true ]; then
+        DOTFILE="$ROOT/build_for_wifi_gnfile.gn"
+        PROTOCOL_DIR_SUFFIX="wifi"
+    else
+        DOTFILE="$ROOT/openthread.gn"
     fi
 
     PYTHON_PATH="$(which python3)"
-    BUILD_DIR=$OUTDIR/$SILABS_BOARD
+    BUILD_DIR=$OUTDIR/$PROTOCOL_DIR_SUFFIX/$SILABS_BOARD$NCP_DIR_SUFFIX
     echo BUILD_DIR="$BUILD_DIR"
 
     if [ "$DIR_CLEAN" == true ]; then
         rm -rf "$BUILD_DIR"
     fi
 
-    if [ "$USE_WIFI" == true ]; then
-        DOTFILE="$ROOT/build_for_wifi_gnfile.gn"
-    else
-        DOTFILE="$ROOT/openthread.gn"
-    fi
-
     if [ "$USE_DOCKER" == true ] && [ "$USE_WIFI" == false ]; then
         echo "Switching OpenThread ROOT"
-        optArgs+="openthread_root=\"$GSDK_ROOT/util/third_party/openthread\" "
+        optArgs+="openthread_root=\"$GSDK_ROOT/openthread_stack/util/third_party/openthread\" "
     fi
 
-    "$GN_PATH" gen --check --script-executable="$PYTHON_PATH" --fail-on-unused-args --export-compile-commands --root="$ROOT" --dotfile="$DOTFILE" --args="silabs_board=\"$SILABS_BOARD\" $optArgs" "$BUILD_DIR"
-
-    if [ "$USE_SLC" == true ]; then
-        # Activation needs to be after SLC generation which is done in gn gen.
-        # Zap generation requires activation and is done in the build phase
-        source "$CHIP_ROOT/scripts/activate.sh"
+    if [ "$VERBOSE_MODE" == false ]; then
+        optArgs+="chip_detail_logging=false "
     fi
+
+    "$GN_PATH" gen --check --script-executable="$PYTHON_PATH" --fail-on-unused-args --add-export-compile-commands=* --root="$ROOT" --dotfile="$DOTFILE" --args="silabs_board=\"$SILABS_BOARD\" $optArgs" "$BUILD_DIR"
 
     ninja -C "$BUILD_DIR"/
+
     #print stats
     arm-none-eabi-size -A "$BUILD_DIR"/*.out
+
+    if [ "$VERBOSE_MODE" == true ]; then
+        echo "================= Warning!!!!! ================"
+        echo "Verbose mode is enabled. BAUDRATE FOR UART LOGS IS SET TO 921600"
+        echo "Use Simplicity Studio or commander with the following command to set the baudrate:"
+        echo "commander vcom config --baudrate 921600 --handshake rtscts"
+        echo "==============================================="
+    fi
 
     # add bootloader to generated image
     if [ "$USE_BOOTLOADER" == true ]; then
@@ -372,7 +408,7 @@ else
         fi
 
         # search bootloader directory for the respective bootloaders for the input board
-        bootloaderFiles=("$(find "$MATTER_ROOT/third_party/silabs/matter_support/matter/efr32/bootloader_binaries/" -maxdepth 1 -name "*$SILABS_BOARD*" | tr '\n' ' ')")
+        bootloaderFiles=("$(find "$MATTER_ROOT/third_party/silabs/matter_support/board-support/efr32/bootloader_binaries/" -maxdepth 1 -name "*$SILABS_BOARD*" | tr '\n' ' ')")
 
         if [ "${#bootloaderFiles[@]}" -gt 1 ]; then
             for i in "${!bootloaderFiles[@]}"; do

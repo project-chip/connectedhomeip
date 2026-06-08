@@ -75,14 +75,53 @@ source_set("attributes") {
   ]
 }
 
-source_set("verifymacros_no_logging") {
-  sources = [ "VerificationMacrosNoLogging.h" ]
-
-  public_deps = [ "${nlassert_root}:nlassert" ]
+source_set("assertions") {
+  sources = [ "Assertions.h" ]
+  public_deps = [ "${chip_root}/src/lib/core:chip_config_header" ]
 }
 
 source_set("safeint") {
   sources = [ "SafeInt.h" ]
+}
+
+# Standalone source set for arg parsing functionality. This uses POSIX functions
+# like strcasecmp that are not available on embedded platforms, so it must remain
+# separate from the main support library and only be compiled when explicitly
+# depended on (typically by command-line tools).
+source_set("arg_parser") {
+  sources = [
+    "CHIPArgParser.cpp",
+    "CHIPArgParser.hpp",
+  ]
+
+  public_deps = [
+    ":memory",
+    ":safeint",
+    ":support",
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/core:chip_config_header",
+    "${chip_root}/src/lib/core:core",
+    "${chip_root}/src/lib/core:encoding",
+    "${chip_root}/src/lib/core:error",
+    "${chip_root}/src/lib/core:types",
+  ]
+
+  public_configs = [ "${chip_root}/src:includes" ]
+}
+
+source_set("numeric-primitives") {
+  sources = [
+    "PopCount.h",
+    "attribute-storage-null-handling.h",
+    "odd-sized-integers.h",
+  ]
+
+  deps = [
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/core:encoding",
+    "${chip_root}/src/lib/core:types",
+  ]
+  public_configs = [ "${chip_root}/src:includes" ]
 }
 
 source_set("memory") {
@@ -103,8 +142,8 @@ source_set("memory") {
   public_deps = [ "${chip_root}/src/lib/core:error" ]
 
   deps = [
+    ":assertions",
     ":safeint",
-    ":verifymacros_no_logging",
     "${chip_root}/src/lib/core:chip_config_header",
   ]
 }
@@ -116,9 +155,9 @@ source_set("text_only_logging") {
   ]
 
   public_deps = [
+    ":assertions",
     ":attributes",
     ":logging_constants",
-    ":verifymacros_no_logging",
     "${chip_root}/src/lib/core:chip_config_header",
   ]
 
@@ -133,19 +172,18 @@ source_set("text_only_logging") {
   ]
 }
 
-source_set("verifymacros") {
+source_set("codeutils") {
   sources = [
     "CodeUtils.h",
     "ObjectDump.h",
   ]
 
   public_deps = [
+    ":assertions",
     ":attributes",
     ":text_only_logging",
-    ":verifymacros_no_logging",
     "${chip_root}/src/lib/core:chip_config_header",
     "${chip_root}/src/lib/core:error",
-    "${nlassert_root}:nlassert",
   ]
 }
 
@@ -153,9 +191,13 @@ source_set("span") {
   sources = [ "Span.h" ]
 
   public_deps = [
-    ":verifymacros",
+    ":codeutils",
     "${chip_root}/src/lib/core:types",
   ]
+}
+
+source_set("fixedbuffer") {
+  sources = [ "FixedBuffer.h" ]
 }
 
 source_set("chip_version_header") {
@@ -172,19 +214,43 @@ source_set("testing") {
 }
 
 source_set("type-traits") {
-  sources = [ "TypeTraits.h" ]
+  sources = [
+    "CompileTimeString.h",
+    "FunctionTraits.h",
+    "TypeTraits.h",
+  ]
 }
 
 source_set("static-support") {
   sources = [ "static_support_smart_ptr.h" ]
 }
 
+source_set("timer-delegate") {
+  sources = [ "TimerDelegate.h" ]
+  public_deps = [
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/support",
+  ]
+}
+
+source_set("timer-delegate-mock") {
+  sources = [ "TimerDelegateMock.h" ]
+  public_deps = [
+    ":timer-delegate",
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/support",
+  ]
+}
+
 static_library("support") {
   output_name = "libSupportLayer"
 
   sources = [
+    "AutoRelease.h",
     "Base64.cpp",
     "Base64.h",
+    "Base85.cpp",
+    "Base85.h",
     "BitFlags.h",
     "BitMask.h",
     "BufferReader.cpp",
@@ -195,10 +261,9 @@ static_library("support") {
     "BytesCircularBuffer.h",
     "BytesToHex.cpp",
     "BytesToHex.h",
-    "CHIPArgParser.cpp",
-    "CHIPArgParser.hpp",
     "CHIPCounter.h",
     "CHIPMemString.h",
+    "CharSpanToStdString.h",
     "CommonIterator.h",
     "CommonPersistentData.h",
     "DLLUtil.h",
@@ -210,7 +275,6 @@ static_library("support") {
     "FixedBufferAllocator.cpp",
     "FixedBufferAllocator.h",
     "Fold.h",
-    "FunctionTraits.h",
     "IniEscaping.cpp",
     "IniEscaping.h",
     "IntrusiveList.h",
@@ -229,18 +293,25 @@ static_library("support") {
     "PoolWrapper.h",
     "PrivateHeap.cpp",
     "PrivateHeap.h",
+    "ReadOnlyBuffer.cpp",
+    "ReadOnlyBuffer.h",
     "ReferenceCountedHandle.h",
+    "ReferenceCountedPtr.h",
     "SafePointerCast.h",
     "SafeString.h",
     "Scoped.h",
-    "ScopedBuffer.h",
+    "ScopedMemoryBuffer.h",
     "SetupDiscriminator.h",
     "SortUtils.h",
+    "SpanSearchValue.h",
+    "SplitLambda.h",
     "StateMachine.h",
     "StringBuilder.cpp",
     "StringBuilder.h",
     "StringSplitter.h",
     "TemporaryFileStream.h",
+    "ThreadDiscoveryCode.cpp",
+    "ThreadDiscoveryCode.h",
     "ThreadOperationalDataset.cpp",
     "ThreadOperationalDataset.h",
     "TimeUtils.cpp",
@@ -277,23 +348,24 @@ static_library("support") {
   cflags = [ "-Wconversion" ]
 
   public_deps = [
+    ":assertions",
     ":attributes",
     ":chip_version_header",
+    ":codeutils",
+    ":fixedbuffer",
     ":logging_constants",
     ":memory",
     ":safeint",
     ":span",
     ":text_only_logging",
     ":type-traits",
-    ":verifymacros",
-    ":verifymacros_no_logging",
+    "${chip_root}/src/app/common:enums",
     "${chip_root}/src/lib/core:chip_config_header",
     "${chip_root}/src/lib/core:encoding",
     "${chip_root}/src/lib/core:error",
     "${chip_root}/src/lib/core:types",
     "${chip_root}/src/platform:platform_config_header",
     "${chip_root}/src/system:system_config_header",
-    "${nlassert_root}:nlassert",
   ]
 
   # These are needed because we include CHIPCore.h, which uses config
@@ -322,7 +394,10 @@ static_library("support") {
       "CHIPFaultInjection.cpp",
       "CHIPFaultInjection.h",
     ]
-    public_deps += [ "${nlfaultinjection_root}:nlfaultinjection" ]
+    public_deps += [
+      "${nlassert_root}:nlassert",
+      "${nlfaultinjection_root}:nlfaultinjection",
+    ]
   }
 
   if (chip_pw_tokenizer_logging) {
@@ -334,9 +409,7 @@ static_library("support") {
   }
 }
 
-static_library("test_utils") {
-  output_name = "libTestUtils"
-  output_dir = "${root_out_dir}/lib"
+source_set("test_utils") {
   deps = [ "${chip_root}/src/platform" ]
 
   sources = [
@@ -356,6 +429,7 @@ pw_static_library("pw_tests_wrapper") {
     "$dir_pw_unit_test",
     "$dir_pw_unit_test:logging",
     "${chip_root}/src/lib/core:string-builder-adapters",
+    "${chip_root}/src/system",
   ]
   sources = [
     "UnitTest.cpp",

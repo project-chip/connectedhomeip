@@ -18,9 +18,13 @@ import("${chip_root}/build/chip/chip_test_suite.gni")
 chip_test_suite("tests") {
   output_name = "libAppDataModelTests"
 
-  test_sources = [ "TestNullable.cpp" ]
+  test_sources = [
+    "TestList.cpp",
+    "TestNullable.cpp",
+  ]
 
   public_deps = [
+    "${chip_root}/src/app/data-model:data-model",
     "${chip_root}/src/app/data-model:nullable",
     "${chip_root}/src/lib/core:error",
     "${chip_root}/src/lib/core:string-builder-adapters",

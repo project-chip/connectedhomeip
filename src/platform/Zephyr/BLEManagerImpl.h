@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2020-2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -50,7 +50,7 @@ private:
     // ===== Members that implement the BLEManager internal interface.
 
     CHIP_ERROR _Init(void);
-    void _Shutdown() {}
+    void _Shutdown();
     bool _IsAdvertisingEnabled(void);
     CHIP_ERROR _SetAdvertisingEnabled(bool val);
     bool _IsAdvertising(void);
@@ -76,6 +76,7 @@ private:
     // ===== Members that implement virtual methods on BleApplicationDelegate.
 
     void NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId);
+    void CheckNonConcurrentBleClosing() override;
 
     // ===== Private members reserved for use by this class only.
 
@@ -105,6 +106,10 @@ private:
 #endif
     // The summarized number of Bluetooth LE connections related to the device (including these not related to Matter service).
     uint16_t mTotalConnNum;
+#ifdef CONFIG_CHIP_CUSTOM_BLE_ADV_DATA
+    Span<bt_data> mCustomAdvertising  = {};
+    Span<bt_data> mCustomScanResponse = {};
+#endif
 
     void DriveBLEState(void);
     CHIP_ERROR PrepareAdvertisingRequest();
@@ -149,6 +154,10 @@ public:
 
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
     static ssize_t HandleC3Read(struct bt_conn * conn, const struct bt_gatt_attr * attr, void * buf, uint16_t len, uint16_t offset);
+#endif
+#ifdef CONFIG_CHIP_CUSTOM_BLE_ADV_DATA
+    void SetCustomAdvertising(Span<bt_data> CustomAdvertising);
+    void SetCustomScanResponse(Span<bt_data> CustomScanResponse);
 #endif
 };
 

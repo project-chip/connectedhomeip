@@ -50,6 +50,8 @@ public:
 
     CHIP_ERROR GetNetworkInterfaces(NetworkInterface ** netifpp) override;
     void ReleaseNetworkInterfaces(NetworkInterface * netifp) override;
+    CHIP_ERROR GetThreadMetrics(ThreadMetrics ** threadMetricsOut) override;
+    void ReleaseThreadMetrics(ThreadMetrics * threadMetrics) override;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     CHIP_ERROR GetWiFiBssId(MutableByteSpan & BssId) override;
@@ -66,6 +68,9 @@ public:
     CHIP_ERROR GetWiFiOverrunCount(uint64_t & overrunCount) override;
     CHIP_ERROR ResetWiFiNetworkDiagnosticsCounts() override;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
+
+private:
+    std::optional<BootReasonType> mBootReason = std::nullopt;
 };
 
 /**

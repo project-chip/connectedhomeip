@@ -36,6 +36,7 @@ source_set("access_config") {
 source_set("types") {
   sources = [
     "AuthMode.h",
+    "AuxiliaryType.h",
     "Privilege.h",
     "RequestPath.h",
     "SubjectDescriptor.h",
@@ -43,6 +44,7 @@ source_set("types") {
 
   public_deps = [
     ":access_config",
+    "${chip_root}/src/app:app_config",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/core:types",
   ]
@@ -54,8 +56,11 @@ static_library("access") {
   sources = [
     "AccessControl.cpp",
     "AccessControl.h",
+    "GroupAuxiliaryAccessControlDelegate.h",
     "examples/ExampleAccessControlDelegate.cpp",
     "examples/ExampleAccessControlDelegate.h",
+    "examples/GroupAuxiliaryAccessControlDelegateImpl.cpp",
+    "examples/GroupAuxiliaryAccessControlDelegateImpl.h",
     "examples/PermissiveAccessControlDelegate.cpp",
     "examples/PermissiveAccessControlDelegate.h",
   ]
@@ -65,6 +70,7 @@ static_library("access") {
   public_deps = [
     ":access_config",
     ":types",
+    "${chip_root}/src/credentials",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/core:types",
     "${chip_root}/src/lib/support",
@@ -76,5 +82,15 @@ static_library("access") {
       "AccessRestrictionProvider.cpp",
       "AccessRestrictionProvider.h",
     ]
+    public_deps += [ "${chip_root}/src/app/common:cluster-objects" ]
   }
+}
+
+source_set("provider-impl") {
+  sources = [ "ProviderDeviceTypeResolver.h" ]
+
+  public_deps = [
+    ":access",
+    "${chip_root}/src/app/data-model-provider",
+  ]
 }

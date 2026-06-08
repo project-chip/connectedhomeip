@@ -107,7 +107,7 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
     mpConnectCallback = nullptr;
     mpScanCallback    = nullptr;
 
-    if (ConnectivityUtils::GetEthInterfaceName(mEthIfName, IFNAMSIZ) == CHIP_NO_ERROR)
+    if (ConnectivityUtils::GetEthInterfaceName(mEthIfName, Inet::InterfaceId::kMaxIfNameLength) == CHIP_NO_ERROR)
     {
         ChipLogProgress(DeviceLayer, "Got Ethernet interface: %s", mEthIfName);
     }
@@ -128,7 +128,7 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-    if (ConnectivityUtils::GetWiFiInterfaceName(sWiFiIfName, IFNAMSIZ) == CHIP_NO_ERROR)
+    if (ConnectivityUtils::GetWiFiInterfaceName(sWiFiIfName, Inet::InterfaceId::kMaxIfNameLength) == CHIP_NO_ERROR)
     {
         ChipLogProgress(DeviceLayer, "Got WiFi interface: %s", sWiFiIfName);
     }
@@ -274,16 +274,6 @@ void ConnectivityManagerImpl::_ClearWiFiStationProvision()
                             err ? err->message : "unknown error");
         }
     }
-}
-
-bool ConnectivityManagerImpl::_CanStartWiFiScan()
-{
-    std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
-
-    bool ret = mWpaSupplicant.state == GDBusWpaSupplicant::WPA_INTERFACE_CONNECTED &&
-        mWpaSupplicant.scanState == GDBusWpaSupplicant::WIFI_SCANNING_IDLE;
-
-    return ret;
 }
 
 CHIP_ERROR ConnectivityManagerImpl::_SetWiFiAPMode(WiFiAPMode val)
@@ -535,7 +525,7 @@ void ConnectivityManagerImpl::_OnWpaInterfaceProxyReady(GObject * sourceObject, 
         CHIP_ERROR errInner = StopAutoScan();
         if (errInner != CHIP_NO_ERROR)
         {
-            ChipLogError(DeviceLayer, "wpa_supplicant: Failed to stop auto scan: %s", ErrorStr(errInner));
+            ChipLogError(DeviceLayer, "wpa_supplicant: Failed to stop auto scan: %" CHIP_ERROR_FORMAT, errInner.Format());
         }
     });
 }
@@ -919,7 +909,7 @@ exit:
     if (err != CHIP_NO_ERROR)
     {
         SetWiFiAPMode(kWiFiAPMode_Disabled);
-        ChipLogError(DeviceLayer, "Drive AP state failed: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "Drive AP state failed: %" CHIP_ERROR_FORMAT, err.Format());
     }
 }
 
@@ -1025,7 +1015,7 @@ ConnectivityManagerImpl::_ConnectWiFiNetworkAsync(GVariant * args,
     const gchar * networkPath = wpa_fi_w1_wpa_supplicant1_interface_get_current_network(mWpaSupplicant.iface);
 
     // wpa_supplicant DBus API: if network path of current network is not "/", means we have already selected some network.
-    if (strcmp(networkPath, "/") != 0)
+    if (networkPath != nullptr && strcmp(networkPath, "/") != 0)
     {
         GAutoPtr<GError> error;
 
@@ -1272,7 +1262,7 @@ void ConnectivityManagerImpl::PostNetworkConnect()
     // This should be removed or find a better place once we depercate the rendezvous session.
     for (chip::Inet::InterfaceAddressIterator it; it.HasCurrent(); it.Next())
     {
-        char ifName[chip::Inet::InterfaceId::kMaxIfNameLength];
+        char ifName[Inet::InterfaceId::kMaxIfNameLength];
         if (it.IsUp() && CHIP_NO_ERROR == it.GetInterfaceName(ifName, sizeof(ifName)) &&
             strncmp(ifName, sWiFiIfName, sizeof(ifName)) == 0)
         {
@@ -1474,7 +1464,7 @@ CHIP_ERROR ConnectivityManagerImpl::GetConfiguredNetwork(NetworkCommissioning::N
     const gchar * networkPath = wpa_fi_w1_wpa_supplicant1_interface_get_current_network(mWpaSupplicant.iface);
 
     // wpa_supplicant DBus API: if network path of current network is "/", means no networks is currently selected.
-    if (strcmp(networkPath, "/") == 0)
+    if (networkPath == nullptr || strcmp(networkPath, "/") == 0)
     {
         return CHIP_ERROR_KEY_NOT_FOUND;
     }
@@ -1488,7 +1478,10 @@ CHIP_ERROR ConnectivityManagerImpl::GetConfiguredNetwork(NetworkCommissioning::N
 
     network.connected     = wpa_fi_w1_wpa_supplicant1_network_get_enabled(networkInfo.get());
     GVariant * properties = wpa_fi_w1_wpa_supplicant1_network_get_properties(networkInfo.get());
+    VerifyOrReturnError(properties != nullptr, CHIP_ERROR_KEY_NOT_FOUND);
+
     GAutoPtr<GVariant> ssid(g_variant_lookup_value(properties, "ssid", nullptr));
+    VerifyOrReturnError(ssid, CHIP_ERROR_KEY_NOT_FOUND);
     gsize length;
     const gchar * ssidStr = g_variant_get_string(ssid.get(), &length);
     // TODO: wpa_supplicant will return ssid with quotes! We should have a better way to get the actual ssid in bytes.
@@ -1710,8 +1703,8 @@ bool ConnectivityManagerImpl::_GetBssInfo(const gchar * bssPath, NetworkCommissi
         bssidLen = 0;
         ChipLogError(DeviceLayer, "Got a network with bssid not equals to 6");
     }
-    ChipLogDetail(DeviceLayer, "Network Found: %.*s (%s) Signal:%d", int(ssidLen), StringOrNullMarker((const gchar *) ssidStr),
-                  bssidStr, signal);
+    ChipLogDetail(DeviceLayer, "Network Found: %s (%s) Signal:%d",
+                  NullTerminated(StringOrNullMarker((const gchar *) ssidStr), ssidLen).c_str(), bssidStr, signal);
 
     // A flag for enterprise encryption option to avoid returning open for these networks by mistake
     // TODO: The following code will mistakenly recognize WEP encryption as OPEN network, this should be fixed by reading
@@ -1805,18 +1798,19 @@ bool ConnectivityManagerImpl::_GetBssInfo(const gchar * bssPath, NetworkCommissi
     VerifyOrReturnError(bssidLen == kWiFiBSSIDLength, false);
     memcpy(result.ssid, ssidStr, ssidLen);
     memcpy(result.bssid, bssidBuf, bssidLen);
-    result.ssidLen = ssidLen;
+    result.ssidLen     = ssidLen;
+    result.signal.type = NetworkCommissioning::WirelessSignalType::kdBm;
     if (signal < INT8_MIN)
     {
-        result.rssi = INT8_MIN;
+        result.signal.strength = INT8_MIN;
     }
     else if (signal > INT8_MAX)
     {
-        result.rssi = INT8_MAX;
+        result.signal.strength = INT8_MAX;
     }
     else
     {
-        result.rssi = static_cast<uint8_t>(signal);
+        result.signal.strength = static_cast<uint8_t>(signal);
     }
 
     auto bandInfo   = GetBandAndChannelFromFrequency(frequency);

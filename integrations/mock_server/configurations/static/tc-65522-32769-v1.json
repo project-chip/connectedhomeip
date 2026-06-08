@@ -1,0 +1,20 @@
+{
+    "schemaVersion": 1,
+    "esfRevision": 1,
+    "defaultCountry": "US",
+    "countryEntries": {
+        "US": {
+            "defaultLanguage": "en",
+            "languageEntries": {
+                "en": [
+                    {
+                        "ordinal": 0,
+                        "required": true,
+                        "title": "Terms and Conditions",
+                        "text": "<p><b>Feature 1 Text</b><br><br>Please accept these.</p>"
+                    }
+                ]
+            }
+        }
+    }
+}

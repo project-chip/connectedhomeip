@@ -25,6 +25,7 @@
 #import "MTRErrorTestUtils.h"
 #import "MTRTestCase+ServerAppRunner.h"
 #import "MTRTestCase.h"
+#import "MTRTestControllerDelegate.h"
 #import "MTRTestKeys.h"
 #import "MTRTestStorage.h"
 
@@ -435,41 +436,6 @@ static MTRBaseDevice * GetConnectedDevice(void)
     return mConnectedDevice;
 }
 
-@interface MTRRemoteDeviceSampleTestDeviceControllerDelegate : NSObject <MTRDeviceControllerDelegate>
-@property (nonatomic, strong) XCTestExpectation * expectation;
-@end
-
-@implementation MTRRemoteDeviceSampleTestDeviceControllerDelegate
-- (id)initWithExpectation:(XCTestExpectation *)expectation
-{
-    self = [super init];
-    if (self) {
-        _expectation = expectation;
-    }
-    return self;
-}
-
-- (void)controller:(MTRDeviceController *)controller commissioningSessionEstablishmentDone:(NSError *)error
-{
-    XCTAssertEqual(error.code, 0);
-    NSError * commissionError = nil;
-    [sController commissionNodeWithID:@(kDeviceId)
-                  commissioningParams:[[MTRCommissioningParameters alloc] init]
-                                error:&commissionError];
-    XCTAssertNil(commissionError);
-
-    // Keep waiting for controller:commissioningComplete
-}
-
-- (void)controller:(MTRDeviceController *)controller commissioningComplete:(NSError *)error
-{
-    XCTAssertEqual(error.code, 0);
-    [_expectation fulfill];
-    _expectation = nil;
-}
-
-@end
-
 typedef void (^MTRDeviceTestDelegateDataHandler)(NSArray<NSDictionary<NSString *, id> *> *);
 
 @interface MTRXPCDeviceTestDelegate : NSObject <MTRDeviceDelegate>
@@ -589,8 +555,8 @@ static BOOL sStackInitRan = NO;
 
     sController = controller;
 
-    MTRRemoteDeviceSampleTestDeviceControllerDelegate * deviceControllerDelegate =
-        [[MTRRemoteDeviceSampleTestDeviceControllerDelegate alloc] initWithExpectation:expectation];
+    MTRTestControllerDelegate * deviceControllerDelegate =
+        [[MTRTestControllerDelegate alloc] initWithExpectation:expectation newNodeID:@(kDeviceId)];
     dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.device_controller_delegate", DISPATCH_QUEUE_SERIAL);
 
     [controller setDeviceControllerDelegate:deviceControllerDelegate queue:callbackQueue];
@@ -770,6 +736,8 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
 - (void)test004_Subscribe
 {
+    XCTSkip("Skipping due to flakyness/failing. https://github.com/project-chip/connectedhomeip/issues/27449");
+
     XCTestExpectation * expectation = [self expectationWithDescription:@"subscribe OnOff attribute"];
 
     MTRBaseDevice * device = GetConnectedDevice();

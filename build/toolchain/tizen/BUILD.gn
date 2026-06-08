@@ -20,3 +20,10 @@ tizen_toolchain("tizen_arm") {
     arm_arch = "armv7-a"
   }
 }
+
+tizen_toolchain("tizen_arm64") {
+  toolchain_args = {
+    current_cpu = "arm64"
+    arm_arch = "armv8-a"
+  }
+}

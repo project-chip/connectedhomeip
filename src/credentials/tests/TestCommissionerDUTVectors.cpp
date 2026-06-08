@@ -33,6 +33,7 @@
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/Span.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 
 #include <dirent.h>
 #include <stdio.h>
@@ -41,6 +42,8 @@
 using namespace chip;
 using namespace chip::Crypto;
 using namespace chip::Credentials;
+
+void RunCommissionerDUTVectorsTest(bool allowTestKeys);
 
 static void OnAttestationInformationVerificationCallback(void * context, const DeviceAttestationVerifier::AttestationInfo & info,
                                                          AttestationVerificationResult result)
@@ -58,8 +61,21 @@ struct TestCommissionerDUTVectors : public ::testing::Test
 
 TEST_F(TestCommissionerDUTVectors, TestCommissionerDUTVectors)
 {
-    DeviceAttestationVerifier * example_dac_verifier = GetDefaultDACVerifier(GetTestAttestationTrustStore());
+    RunCommissionerDUTVectorsTest(true);
+}
+
+TEST_F(TestCommissionerDUTVectors, TestCommissionerDUTVectorsNoTestKeys)
+{
+    RunCommissionerDUTVectorsTest(false);
+}
+
+void RunCommissionerDUTVectorsTest(bool allowTestKeys)
+{
+    chip::Credentials::DeviceAttestationRevocationDelegate * kDeviceAttestationRevocationNotChecked = nullptr;
+    DeviceAttestationVerifier * example_dac_verifier =
+        GetDefaultDACVerifier(GetTestAttestationTrustStore(), kDeviceAttestationRevocationNotChecked);
     ASSERT_NE(example_dac_verifier, nullptr);
+    example_dac_verifier->EnableCdTestKeySupport(allowTestKeys);
 
     std::string dirPath("../../../../../credentials/development/commissioner_dut/");
     DIR * dir = opendir(dirPath.c_str());
@@ -84,6 +100,7 @@ TEST_F(TestCommissionerDUTVectors, TestCommissionerDUTVectors)
         if (strstr(entry->d_name, "struct_dac_sig_curve_secp256k1"))
             continue;
 
+        ChipLogProgress(NotSpecified, "Testing case: %s", entry->d_name);
         std::string jsonFilePath = dirPath + std::string(entry->d_name) + std::string("/test_case_vector.json");
 
         chip::Credentials::Examples::TestHarnessDACProvider dacProvider;
@@ -91,7 +108,7 @@ TEST_F(TestCommissionerDUTVectors, TestCommissionerDUTVectors)
 
         uint8_t attestationChallengeBuf[Crypto::kAES_CCM128_Key_Length];
         MutableByteSpan attestationChallengeSpan(attestationChallengeBuf);
-        Crypto::DRBG_get_bytes(attestationChallengeBuf, sizeof(attestationChallengeBuf));
+        EXPECT_SUCCESS(Crypto::DRBG_get_bytes(attestationChallengeBuf, sizeof(attestationChallengeBuf)));
 
         Crypto::P256ECDSASignature signature;
         MutableByteSpan attestationSignatureSpan{ signature.Bytes(), signature.Capacity() };
@@ -107,7 +124,7 @@ TEST_F(TestCommissionerDUTVectors, TestCommissionerDUTVectors)
 
         uint8_t attestationNonceBuf[kAttestationNonceLength];
         MutableByteSpan attestationNonceSpan(attestationNonceBuf);
-        Crypto::DRBG_get_bytes(attestationNonceBuf, sizeof(attestationNonceBuf));
+        EXPECT_SUCCESS(Crypto::DRBG_get_bytes(attestationNonceBuf, sizeof(attestationNonceBuf)));
 
         VendorId vid = TestVendor1;
         uint16_t pid = dacProvider.GetPid();
@@ -171,7 +188,9 @@ TEST_F(TestCommissionerDUTVectors, TestCommissionerDUTVectors)
             isSuccessCase = true;
         }
 
-        if (isSuccessCase)
+        // Every example in the SDK uses test keys because we don't have official signers. Expect they will all fail if we disallow
+        // test keys
+        if (isSuccessCase && allowTestKeys)
         {
             EXPECT_EQ(attestationResult, AttestationVerificationResult::kSuccess);
         }

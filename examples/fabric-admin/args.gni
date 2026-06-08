@@ -32,4 +32,3 @@ matter_log_json_payload_decode_full = true
 # make fabric-admin very strict by default
 chip_tlv_validate_char_string_on_read = true
 chip_tlv_validate_char_string_on_write = true
-chip_enable_ble = true

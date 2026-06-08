@@ -15,16 +15,20 @@
  */
 #pragma once
 
-// Experimental API for Access Control
+#include <lib/core/DataModelTypes.h>
+
+constexpr chip::EndpointId kOtaProviderDynamicEndpointId = 0;
 
 namespace chip {
 namespace app {
 namespace dynamic_server {
+
 /**
  * Initialize the access control module. Must be called on the Matter task
  * queue.
  */
 void InitAccessControl();
+
 } // namespace dynamic_server
 } // namespace app
 } // namespace chip

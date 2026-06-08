@@ -157,7 +157,7 @@ public class ChipDeviceController {
     setICDCheckInDelegate(deviceControllerPtr, new ICDCheckInDelegateWrapper(delegate));
   }
 
-  /* This method was deprecated. Please use {@link ChipDeviceController.pairDevice(BluetoothGatt, int, long, long, CommissionParameters)}. */
+  /* This method was deprecated. Please use {@link ChipDeviceController.pairDeviceThroughBLE(BluetoothGatt, int, long, long, CommissionParameters)}. */
   @Deprecated
   public void pairDevice(
       BluetoothGatt bleServer,
@@ -168,7 +168,7 @@ public class ChipDeviceController {
     pairDevice(bleServer, connId, deviceId, setupPincode, null, networkCredentials, null);
   }
 
-  /* This method was deprecated. Please use {@link ChipDeviceController.pairDevice(BluetoothGatt, int, long, long, CommissionParameters)}. */
+  /* This method was deprecated. Please use {@link ChipDeviceController.pairDeviceThroughBLE(BluetoothGatt, int, long, long, CommissionParameters)}. */
   @Deprecated
   public void pairDevice(
       BluetoothGatt bleServer,
@@ -181,7 +181,7 @@ public class ChipDeviceController {
         bleServer, connId, deviceId, setupPincode, null, networkCredentials, registrationInfo);
   }
 
-  /* This method was deprecated. Please use {@link ChipDeviceController.pairDevice(BluetoothGatt, int, long, long, CommissionParameters)}. */
+  /* This method was deprecated. Please use {@link ChipDeviceController.pairDeviceThroughBLE(BluetoothGatt, int, long, long, CommissionParameters)}. */
   @Deprecated
   public void pairDevice(
       BluetoothGatt bleServer,
@@ -207,7 +207,8 @@ public class ChipDeviceController {
    *     {@link ICDRegistrationInfo}. If this value is null when commissioning an ICD device, {@link
    *     CompletionListener.onICDRegistrationInfoRequired} is called to request the
    *     ICDRegistrationInfo value. This method was deprecated. Please use {@link
-   *     ChipDeviceController.pairDevice(BluetoothGatt, int, long, long, CommissionParameters)}.
+   *     ChipDeviceController.pairDeviceThroughBLE(BluetoothGatt, int, long, long,
+   *     CommissionParameters)}.
    */
   @Deprecated
   public void pairDevice(
@@ -224,7 +225,18 @@ public class ChipDeviceController {
             .setNetworkCredentials(networkCredentials)
             .setICDRegistrationInfo(icdRegistrationInfo)
             .build();
-    pairDevice(bleServer, connId, deviceId, setupPincode, params);
+    pairDeviceThroughBLE(bleServer, connId, deviceId, setupPincode, params);
+  }
+
+  /* This method was deprecated. Please use {@link ChipDeviceController.pairDeviceThroughBLE(BluetoothGatt, int, long, long, CommissionParameters)}. */
+  @Deprecated
+  public void pairDevice(
+      BluetoothGatt bleServer,
+      int connId,
+      long deviceId,
+      long setupPincode,
+      @Nonnull CommissionParameters params) {
+    pairDeviceThroughBLE(bleServer, connId, deviceId, setupPincode, params);
   }
 
   /**
@@ -237,7 +249,7 @@ public class ChipDeviceController {
    * @param params Parameters representing commissioning arguments. see detailed in {@link
    *     CommissionParameters}
    */
-  public void pairDevice(
+  public void pairDeviceThroughBLE(
       BluetoothGatt bleServer,
       int connId,
       long deviceId,
@@ -254,7 +266,7 @@ public class ChipDeviceController {
 
       Log.d(TAG, "Bluetooth connection added with ID: " + connectionId);
       Log.d(TAG, "Pairing device with ID: " + deviceId);
-      pairDevice(
+      pairDeviceThroughBLE(
           deviceControllerPtr,
           deviceId,
           connectionId,
@@ -268,7 +280,29 @@ public class ChipDeviceController {
     }
   }
 
+  /**
+   * Pair a device connected through NFC.
+   *
+   * @param deviceId the node ID to assign to the device
+   * @param setupPincode the pincode for the device
+   * @param params Parameters representing commissioning arguments. see detailed in {@link
+   *     CommissionParameters}
+   */
+  public void pairDeviceThroughNfc(
+      long deviceId, long setupPincode, @Nonnull CommissionParameters params) {
+
+    Log.d(TAG, "Pairing device with ID: " + deviceId + " through NFC");
+    pairDeviceThroughNfc(
+        deviceControllerPtr,
+        deviceId,
+        setupPincode,
+        params.getCsrNonce(),
+        params.getNetworkCredentials(),
+        params.getICDRegistrationInfo());
+  }
+
   /* This method was deprecated. Please use {@link ChipDeviceController.pairDeviceWithAddress(long, String, int, int, long, CommissionParameters)}. */
+  @Deprecated
   public void pairDeviceWithAddress(
       long deviceId,
       String address,
@@ -603,6 +637,10 @@ public class ChipDeviceController {
     unpairDeviceCallback(deviceControllerPtr, deviceId, callback);
   }
 
+  public void continueCommissioningAfterConnectNetworkRequest(long remoteDeviceId) {
+    continueCommissioningAfterConnectNetworkRequest(deviceControllerPtr, remoteDeviceId);
+  }
+
   /**
    * This function stops a pairing or commissioning process that is in progress.
    *
@@ -715,6 +753,12 @@ public class ChipDeviceController {
   public void onCommissioningStatusUpdate(long nodeId, String stage, long errorCode) {
     if (completionListener != null) {
       completionListener.onCommissioningStatusUpdate(nodeId, stage, errorCode);
+    }
+  }
+
+  public void onCommissioningStageStart(long nodeId, String stage) {
+    if (completionListener != null) {
+      completionListener.onCommissioningStageStart(nodeId, stage);
     }
   }
 
@@ -881,6 +925,20 @@ public class ChipDeviceController {
       OpenCommissioningCallback callback) {
     return openPairingWindowWithPINCallback(
         deviceControllerPtr, devicePtr, duration, iteration, discriminator, setupPinCode, callback);
+  }
+
+  /**
+   * This function is used for downloading logs from the device.
+   *
+   * @param deviceId The 64-bit node ID of the device.
+   * @param type The log type being downloaded. See detailed in {@link DiagnosticLogType}.
+   * @param timeout This function sets the timeout. If set to 0, there will be no timeout.
+   * @param callback The callback is registered to convey the status during log downloads. See
+   *     detailed in {@link DownloadLogCallback}.
+   */
+  public boolean downloadLogFromNode(
+      long deviceId, DiagnosticLogType type, long timeout, DownloadLogCallback callback) {
+    return downloadLogFromNode(deviceControllerPtr, deviceId, type.getValue(), timeout, callback);
   }
 
   public int getFabricIndex() {
@@ -1604,10 +1662,18 @@ public class ChipDeviceController {
   private native void setICDCheckInDelegate(
       long deviceControllerPtr, ICDCheckInDelegateWrapper delegate);
 
-  private native void pairDevice(
+  private native void pairDeviceThroughBLE(
       long deviceControllerPtr,
       long deviceId,
       int connectionId,
+      long pinCode,
+      @Nullable byte[] csrNonce,
+      NetworkCredentials networkCredentials,
+      @Nullable ICDRegistrationInfo icdRegistrationInfo);
+
+  private native void pairDeviceThroughNfc(
+      long deviceControllerPtr,
+      long deviceId,
       long pinCode,
       @Nullable byte[] csrNonce,
       NetworkCredentials networkCredentials,
@@ -1656,6 +1722,9 @@ public class ChipDeviceController {
 
   private native void unpairDeviceCallback(
       long deviceControllerPtr, long deviceId, UnpairDeviceCallback callback);
+
+  private native void continueCommissioningAfterConnectNetworkRequest(
+      long deviceControllerPtr, long remoteDeviceId);
 
   private native void stopDevicePairing(long deviceControllerPtr, long deviceId);
 
@@ -1726,6 +1795,13 @@ public class ChipDeviceController {
       int discriminator,
       @Nullable Long setupPinCode,
       OpenCommissioningCallback callback);
+
+  private native boolean downloadLogFromNode(
+      long deviceControllerPtr,
+      long deviceId,
+      int typeEnum,
+      long timeout,
+      DownloadLogCallback callback);
 
   private native byte[] getAttestationChallenge(long deviceControllerPtr, long devicePtr);
 
@@ -1835,6 +1911,9 @@ public class ChipDeviceController {
 
     /** Notifies the completion of each stage of commissioning. */
     void onCommissioningStatusUpdate(long nodeId, String stage, long errorCode);
+
+    /** Notifies when a commissioning stage starts. */
+    void onCommissioningStageStart(long nodeId, String stage);
 
     /** Notifies that the Chip connection has been closed. */
     void onNotifyChipConnectionClosed();

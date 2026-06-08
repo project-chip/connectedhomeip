@@ -16,14 +16,15 @@
 
 
 import logging
-import typing
+from datetime import UTC, datetime, timedelta
 
-import chip.clusters as Clusters
-from chip.clusters.Types import NullValue
-from chip.interaction_model import InteractionModelError, Status
 from mobly import asserts
 
-logger = logging.getLogger(__name__)
+import matter.clusters as Clusters
+from matter.clusters.Types import NullValue
+from matter.interaction_model import InteractionModelError, Status
+
+log = logging.getLogger(__name__)
 
 
 class EEVSEBaseTestHelper:
@@ -48,7 +49,7 @@ class EEVSEBaseTestHelper:
         value = await self.read_evse_attribute_expect_success(endpoint=endpoint, attribute=attribute)
         if allow_null and value is NullValue:
             # skip the range check
-            logger.info("value is NULL - OK")
+            log.info("value is NULL - OK")
             return value
 
         self.check_value_in_range(attribute, value, lower_value, upper_value)
@@ -59,7 +60,7 @@ class EEVSEBaseTestHelper:
 
     async def write_user_max_charge(self, endpoint: int = None, user_max_charge: int = 0):
         if endpoint is None:
-            endpoint = self.matter_test_config.endpoint
+            endpoint = self.get_endpoint()
         result = await self.default_controller.WriteAttribute(self.dut_node_id,
                                                               [(endpoint,
                                                                Clusters.EnergyEvse.Attributes.UserMaximumChargeCurrent(user_max_charge))])
@@ -69,14 +70,52 @@ class EEVSEBaseTestHelper:
     async def send_enable_charge_command(self, endpoint: int = None, charge_until: int = None, timedRequestTimeoutMs: int = 3000,
                                          min_charge: int = 6000, max_charge: int = 32000, expected_status: Status = Status.Success):
         try:
-            await self.send_single_cmd(cmd=Clusters.EnergyEvse.Commands.EnableCharging(
-                chargingEnabledUntil=charge_until,
-                minimumChargeCurrent=min_charge,
-                maximumChargeCurrent=max_charge),
-                endpoint=endpoint,
-                timedRequestTimeoutMs=timedRequestTimeoutMs)
+            if (charge_until is None):
+                # Omit the chargingEnabledUntil field
+                await self.send_single_cmd(cmd=Clusters.EnergyEvse.Commands.EnableCharging(
+                    minimumChargeCurrent=min_charge,
+                    maximumChargeCurrent=max_charge),
+                    endpoint=endpoint,
+                    timedRequestTimeoutMs=timedRequestTimeoutMs)
+            else:
+                await self.send_single_cmd(cmd=Clusters.EnergyEvse.Commands.EnableCharging(
+                    chargingEnabledUntil=charge_until,
+                    minimumChargeCurrent=min_charge,
+                    maximumChargeCurrent=max_charge),
+                    endpoint=endpoint,
+                    timedRequestTimeoutMs=timedRequestTimeoutMs)
+
+            # If the command was expected to fail but it succeeded, check it wasn't meant to fail
+            asserts.assert_equal(expected_status, Status.Success,
+                                 f"Unexpected Success returned when expected {expected_status}")
 
         except InteractionModelError as e:
+            # The command failed, which might be what we expected, check if it is the expected error
+            asserts.assert_equal(e.status, expected_status,
+                                 "Unexpected error returned")
+
+    async def send_enable_discharge_command(self, endpoint: int = None, discharge_until: int = None, timedRequestTimeoutMs: int = 3000,
+                                            max_discharge: int = 32000, expected_status: Status = Status.Success):
+        try:
+            if (discharge_until is None):
+                # Omit the dischargingEnabledUntil field
+                await self.send_single_cmd(cmd=Clusters.EnergyEvse.Commands.EnableDischarging(
+                    maximumDischargeCurrent=max_discharge),
+                    endpoint=endpoint,
+                    timedRequestTimeoutMs=timedRequestTimeoutMs)
+            else:
+                await self.send_single_cmd(cmd=Clusters.EnergyEvse.Commands.EnableDischarging(
+                    dischargingEnabledUntil=discharge_until,
+                    maximumDischargeCurrent=max_discharge),
+                    endpoint=endpoint,
+                    timedRequestTimeoutMs=timedRequestTimeoutMs)
+
+            # If the command was expected to fail but it succeeded, check it wasn't meant to fail
+            asserts.assert_equal(expected_status, Status.Success,
+                                 f"Unexpected Success returned when expected {expected_status}")
+
+        except InteractionModelError as e:
+            # The command failed, which might be what we expected, check if it is the expected error
             asserts.assert_equal(e.status, expected_status,
                                  "Unexpected error returned")
 
@@ -86,7 +125,12 @@ class EEVSEBaseTestHelper:
                                        endpoint=endpoint,
                                        timedRequestTimeoutMs=timedRequestTimeoutMs)
 
+            # If the command was expected to fail but it succeeded, check it wasn't meant to fail
+            asserts.assert_equal(expected_status, Status.Success,
+                                 f"Unexpected Success returned when expected {expected_status}")
+
         except InteractionModelError as e:
+            # The command failed, which might be what we expected, check if it is the expected error
             asserts.assert_equal(e.status, expected_status,
                                  "Unexpected error returned")
 
@@ -97,7 +141,12 @@ class EEVSEBaseTestHelper:
                                        endpoint=endpoint,
                                        timedRequestTimeoutMs=timedRequestTimeoutMs)
 
+            # If the command was expected to fail but it succeeded, check it wasn't meant to fail
+            asserts.assert_equal(expected_status, Status.Success,
+                                 f"Unexpected Success returned when expected {expected_status}")
+
         except InteractionModelError as e:
+            # The command failed, which might be what we expected, check if it is the expected error
             asserts.assert_equal(e.status, expected_status,
                                  "Unexpected error returned")
 
@@ -108,7 +157,12 @@ class EEVSEBaseTestHelper:
                                        endpoint=endpoint,
                                        timedRequestTimeoutMs=timedRequestTimeoutMs)
 
+            # If the command was expected to fail but it succeeded, check it wasn't meant to fail
+            asserts.assert_equal(expected_status, Status.Success,
+                                 f"Unexpected Success returned when expected {expected_status}")
+
         except InteractionModelError as e:
+            # The command failed, which might be what we expected, check if it is the expected error
             asserts.assert_equal(e.status, expected_status,
                                  "Unexpected error returned")
 
@@ -119,14 +173,19 @@ class EEVSEBaseTestHelper:
                                                           endpoint=endpoint,
                                                           timedRequestTimeoutMs=timedRequestTimeoutMs)
 
+            # If the command was expected to fail but it succeeded, check it wasn't meant to fail
+            asserts.assert_equal(expected_status, Status.Success,
+                                 f"Unexpected Success returned when expected {expected_status}")
+
         except InteractionModelError as e:
+            # The command failed, which might be what we expected, check if it is the expected error
             asserts.assert_equal(e.status, expected_status,
                                  "Unexpected error returned")
 
         return get_targets_resp
 
     async def send_set_targets_command(self, endpoint: int = None,
-                                       chargingTargetSchedules: typing.List[
+                                       chargingTargetSchedules: list[
                                            Clusters.EnergyEvse.Structs.ChargingTargetScheduleStruct] = None,
                                        timedRequestTimeoutMs: int = 3000,
                                        expected_status: Status = Status.Success):
@@ -135,7 +194,12 @@ class EEVSEBaseTestHelper:
                                        endpoint=endpoint,
                                        timedRequestTimeoutMs=timedRequestTimeoutMs)
 
+            # If the command was expected to fail but it succeeded, check it wasn't meant to fail
+            asserts.assert_equal(expected_status, Status.Success,
+                                 f"Unexpected Success returned when expected {expected_status}")
+
         except InteractionModelError as e:
+            # The command failed, which might be what we expected, check if it is the expected error
             asserts.assert_equal(e.status, expected_status,
                                  "Unexpected error returned")
 
@@ -174,6 +238,21 @@ class EEVSEBaseTestHelper:
 
     async def send_test_event_trigger_evse_diagnostics_complete(self):
         await self.send_test_event_triggers(eventTrigger=0x0099000000000020)
+
+    async def send_test_event_trigger_evse_set_soc_low(self):
+        await self.send_test_event_triggers(eventTrigger=0x0099000000000030)
+
+    async def send_test_event_trigger_evse_set_soc_high(self):
+        await self.send_test_event_triggers(eventTrigger=0x0099000000000031)
+
+    async def send_test_event_trigger_evse_set_soc_clear(self):
+        await self.send_test_event_triggers(eventTrigger=0x0099000000000032)
+
+    async def send_test_event_trigger_evse_set_vehicleid(self):
+        await self.send_test_event_triggers(eventTrigger=0x0099000000000040)
+
+    async def send_test_event_trigger_evse_trigger_rfid(self):
+        await self.send_test_event_triggers(eventTrigger=0x0099000000000050)
 
     def validate_energy_transfer_started_event(self, event_data, session_id, expected_state, expected_max_charge):
         asserts.assert_equal(session_id, event_data.sessionID,
@@ -214,3 +293,51 @@ class EEVSEBaseTestHelper:
                              f"Fault event faultStatePreviousState was {event_data.faultStatePreviousState}, expected {previous_fault}")
         asserts.assert_equal(event_data.faultStateCurrentState, current_fault,
                              f"Fault event faultStateCurrentState was {event_data.faultStateCurrentState}, expected {current_fault}")
+
+    def log_get_targets_response(self, get_targets_response):
+        log.info(f" Rx'd: {get_targets_response}")
+        for index, entry in enumerate(get_targets_response.chargingTargetSchedules):
+            log.info(
+                f"   [{index}] DayOfWeekForSequence: {entry.dayOfWeekForSequence:02x}")
+            for sub_index, sub_entry in enumerate(entry.chargingTargets):
+                log.info(
+                    f"    - [{sub_index}] TargetTime: {sub_entry.targetTimeMinutesPastMidnight} TargetSoC: {sub_entry.targetSoC} AddedEnergy: {sub_entry.addedEnergy}")
+
+    def convert_epoch_s_to_time(self, epoch_s, tz=UTC):
+        delta_from_epoch = timedelta(seconds=epoch_s)
+        # Matter Epoch is 1st Jan 2000
+        matter_epoch = datetime(2000, 1, 1, 0, 0, 0, 0, tz)
+
+        return matter_epoch + delta_from_epoch
+
+    def compute_expected_target_time_as_epoch_s(self, minutes_past_midnight):
+        """Takes minutes past midnight and assumes local timezone, returns the value in Matter Epoch_S"""
+        # Matter epoch is 0 hours, 0 minutes, 0 seconds on Jan 1, 2000 UTC
+        # Get the current midnight + minutesPastMidnight as epoch_s
+        # NOTE that MinutesPastMidnight is in LOCAL time not UTC so it reflects
+        # the charging time based on where the consumer is.
+        target_time = datetime.now()     # Get time in local time
+        target_time = target_time.replace(hour=int(minutes_past_midnight / 60),
+                                          minute=(minutes_past_midnight % 60), second=0,
+                                          microsecond=0)  # Align to minutes past midnight
+
+        if (target_time < datetime.now()):
+            # This is in the past - so we need to add 1 day
+            # We can get away with this in this test scenario - but should
+            # really look at the next target on this day to see if that is in the future
+            target_time = target_time + timedelta(days=1)
+
+        # Shift to UTC so we can use timezone aware subtraction from Matter epoch in UTC
+        target_time = target_time.astimezone(UTC)
+
+        log.info(
+            f"minutesPastMidnight = {minutes_past_midnight} => "
+            f"{int(minutes_past_midnight/60)}:{int(minutes_past_midnight % 60)}"
+            f" Expected target_time = {target_time}")
+
+        # Matter Epoch is 1st Jan 2000
+        matter_base_time = datetime(2000, 1, 1, 0, 0, 0, 0, tzinfo=UTC)
+
+        target_time_delta = target_time - matter_base_time
+
+        return int(target_time_delta.total_seconds())

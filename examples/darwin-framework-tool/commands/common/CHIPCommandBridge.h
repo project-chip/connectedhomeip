@@ -27,10 +27,6 @@
 
 #include "../provider/OTAProviderDelegate.h"
 
-inline constexpr char kIdentityAlpha[] = "alpha";
-inline constexpr char kIdentityBeta[] = "beta";
-inline constexpr char kIdentityGamma[] = "gamma";
-
 class CHIPCommandBridge : public Command {
 public:
     CHIPCommandBridge(const char * commandName, const char * helpText = nullptr)
@@ -42,7 +38,7 @@ public:
             "commissioner-name. Interactive mode will only set a single commissioner on the inital command. "
             "The commissioner node ID will be persisted until a different one is specified.");
         AddArgument("commissioner-shared-storage", 0, 1, &mCommissionerSharedStorage,
-            "Use a shared storage instance instead of individual storage for each commissioner. Default is true.");
+            "Use a shared storage instance instead of individual storage for each commissioner. Default is false.");
         AddArgument("paa-trust-store-path", &mPaaTrustStorePath,
             "Path to directory holding PAA certificate information.  Can be absolute or relative to the current working "
             "directory.");
@@ -51,6 +47,7 @@ public:
         AddArgument("commissioner-vendor-id", 0, UINT16_MAX, &mCommissionerVendorId,
             "The vendor id to use for darwin-framework-tool. If not provided, chip::VendorId::TestVendor1 (65521, 0xFFF1) will be "
             "used.");
+        AddArgument("use-xpc", &mUseXPC, "Use a controller that will connect to an XPC endpoint instead of talking to devices directly. If a string argument is provided, it must identify a Mach service name that can be used to connect to a remote endpoint. If no argument is provided, a local endpoint will be used.");
     }
 
     /////////// Command Interface /////////
@@ -97,6 +94,10 @@ protected:
     // Will utilize an existing PASE connection if the device is being commissioned.
     MTRBaseDevice * BaseDeviceWithNodeId(chip::NodeId nodeId);
 
+    // Returns the MTRDevice for the specified node ID.
+    // Will utilize an existing PASE connection if the device is being commissioned.
+    MTRDevice * DeviceWithNodeId(chip::NodeId nodeId);
+
     // Will log the given string and given error (as progress if success, error
     // if failure).
     void LogNSError(const char * logString, NSError * error);
@@ -120,6 +121,10 @@ protected:
     void StopCommissioners();
 
     void RestartCommissioners();
+
+    void SuspendOrResumeCommissioners();
+
+    MTRDevice * GetLastUsedDevice();
 
 private:
     CHIP_ERROR InitializeCommissioner(
@@ -157,4 +162,5 @@ private:
     chip::Optional<char *> mPaaTrustStorePath;
     chip::Optional<chip::VendorId> mCommissionerVendorId;
     std::string mCurrentIdentity;
+    chip::Optional<chip::app::DataModel::Nullable<char *>> mUseXPC;
 };

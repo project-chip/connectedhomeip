@@ -1,5 +1,4 @@
 /*
- *
  *    Copyright (c) 2024 Project CHIP Authors
  *    All rights reserved.
  *
@@ -35,6 +34,9 @@
 
 // FabricSync needs to be both commissioners and commissionees
 #define CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE 1
+
+// See issue 23625.
+#define CHIP_CONFIG_UNSAFE_SUBSCRIPTION_EXCHANGE_MANAGER_USE 1
 
 // Enable app platform
 #define CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED 1

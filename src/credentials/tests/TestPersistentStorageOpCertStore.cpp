@@ -27,6 +27,7 @@
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <lib/support/Span.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 
 using namespace chip;
 using namespace chip::Credentials;
@@ -147,8 +148,8 @@ TEST_F(TestPersistentStorageOpCertStore, TestAddNocFlow)
     EXPECT_FALSE(opCertStore.HasPendingNocChain());
     EXPECT_TRUE(opCertStore.HasPendingRootCert());
 
-    storageDelegate.SyncDeleteKeyValue(DefaultStorageKeyAllocator::FabricICAC(kFabricIndex2).KeyName());
-    storageDelegate.SyncDeleteKeyValue(DefaultStorageKeyAllocator::FabricNOC(kFabricIndex2).KeyName());
+    EXPECT_SUCCESS(storageDelegate.SyncDeleteKeyValue(DefaultStorageKeyAllocator::FabricICAC(kFabricIndex2).KeyName()));
+    EXPECT_SUCCESS(storageDelegate.SyncDeleteKeyValue(DefaultStorageKeyAllocator::FabricNOC(kFabricIndex2).KeyName()));
     EXPECT_EQ(storageDelegate.GetNumKeys(), 0u);
 
     // Trying to do AddNewOpCertsForFabric for same fabric as that with pending RCAC should succeed
@@ -349,8 +350,8 @@ TEST_F(TestPersistentStorageOpCertStore, TestUpdateNocFlow)
     EXPECT_EQ(err, CHIP_ERROR_INCORRECT_STATE);
 
     // Committing writes the new values (we even "background-remove" the old ICAC/NOC before commit)
-    storageDelegate.SyncDeleteKeyValue(DefaultStorageKeyAllocator::FabricICAC(kFabricIndex1).KeyName());
-    storageDelegate.SyncDeleteKeyValue(DefaultStorageKeyAllocator::FabricNOC(kFabricIndex1).KeyName());
+    EXPECT_SUCCESS(storageDelegate.SyncDeleteKeyValue(DefaultStorageKeyAllocator::FabricICAC(kFabricIndex1).KeyName()));
+    EXPECT_SUCCESS(storageDelegate.SyncDeleteKeyValue(DefaultStorageKeyAllocator::FabricNOC(kFabricIndex1).KeyName()));
     EXPECT_EQ(storageDelegate.GetNumKeys(), 1u); //< Root remains
 
     err = opCertStore.CommitOpCertsForFabric(kFabricIndex1);

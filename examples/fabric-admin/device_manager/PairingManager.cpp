@@ -23,17 +23,16 @@
 #include <sys/types.h>
 
 #include <commands/common/CHIPCommand.h>
+#include <device_manager/DeviceManager.h>
 #include <device_manager/DeviceSynchronization.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <setup_payload/ManualSetupPayloadParser.h>
 #include <setup_payload/QRCodeSetupPayloadParser.h>
 
-#if defined(PW_RPC_ENABLED)
-#include <rpc/RpcClient.h>
-#endif
-
 using namespace ::chip;
 using namespace ::chip::Controller;
+
+namespace admin {
 
 namespace {
 
@@ -286,6 +285,12 @@ void PairingManager::OnPairingDeleted(CHIP_ERROR err)
 
 void PairingManager::OnCommissioningComplete(NodeId nodeId, CHIP_ERROR err)
 {
+    if (mPairingDelegate)
+    {
+        mPairingDelegate->OnCommissioningComplete(nodeId, err);
+        SetPairingDelegate(nullptr);
+    }
+
     if (err == CHIP_NO_ERROR)
     {
         // print to console
@@ -308,12 +313,6 @@ void PairingManager::OnCommissioningComplete(NodeId nodeId, CHIP_ERROR err)
             }
         }
         ChipLogProgress(NotSpecified, "Device commissioning Failure: %s", ErrorStr(err));
-    }
-
-    if (mCommissioningDelegate)
-    {
-        mCommissioningDelegate->OnCommissioningComplete(nodeId, err);
-        SetCommissioningDelegate(nullptr);
     }
 }
 
@@ -348,8 +347,9 @@ void PairingManager::OnICDRegistrationComplete(ScopedNodeId nodeId, uint32_t icd
 {
     char icdSymmetricKeyHex[Crypto::kAES_CCM128_Key_Length * 2 + 1];
 
-    Encoding::BytesToHex(mICDSymmetricKey.Value().data(), mICDSymmetricKey.Value().size(), icdSymmetricKeyHex,
-                         sizeof(icdSymmetricKeyHex), Encoding::HexFlags::kNullTerminate);
+    TEMPORARY_RETURN_IGNORED Encoding::BytesToHex(mICDSymmetricKey.Value().data(), mICDSymmetricKey.Value().size(),
+                                                  icdSymmetricKeyHex, sizeof(icdSymmetricKeyHex),
+                                                  Encoding::HexFlags::kNullTerminate);
 
     app::ICDClientInfo clientInfo;
     clientInfo.peer_node         = nodeId;
@@ -450,7 +450,7 @@ void PairingManager::OnDeviceAttestationCompleted(Controller::DeviceCommissioner
                             "Failed validation: vendorID or productID must not be 0."
                             "Requested VID: %u, Requested PID: %u.",
                             payload.vendorID, payload.productID);
-            deviceCommissioner->ContinueCommissioningAfterDeviceAttestation(
+            TEMPORARY_RETURN_IGNORED deviceCommissioner->ContinueCommissioningAfterDeviceAttestation(
                 device, Credentials::AttestationVerificationResult::kInvalidArgument);
             return;
         }
@@ -462,7 +462,7 @@ void PairingManager::OnDeviceAttestationCompleted(Controller::DeviceCommissioner
                             "Requested VID: %u, Requested PID: %u,"
                             "Detected VID: %u, Detected PID %u.",
                             payload.vendorID, payload.productID, info.BasicInformationVendorId(), info.BasicInformationProductId());
-            deviceCommissioner->ContinueCommissioningAfterDeviceAttestation(
+            TEMPORARY_RETURN_IGNORED deviceCommissioner->ContinueCommissioningAfterDeviceAttestation(
                 device,
                 payload.vendorID == info.BasicInformationVendorId()
                     ? Credentials::AttestationVerificationResult::kDacProductIdMismatch
@@ -499,7 +499,9 @@ CommissioningParameters PairingManager::GetCommissioningParameters()
 
         if (!mICDSymmetricKey.HasValue())
         {
-            Crypto::DRBG_get_bytes(mRandomGeneratedICDSymmetricKey, sizeof(mRandomGeneratedICDSymmetricKey));
+            VerifyOrDieWithMsg(Crypto::DRBG_get_bytes(mRandomGeneratedICDSymmetricKey, sizeof(mRandomGeneratedICDSymmetricKey)) ==
+                                   CHIP_NO_ERROR,
+                               NotSpecified, "Failed to generate ICD symmetric key (DRBG failure)");
             mICDSymmetricKey.SetValue(ByteSpan(mRandomGeneratedICDSymmetricKey));
         }
         if (!mICDCheckInNodeId.HasValue())
@@ -545,17 +547,23 @@ void PairingManager::OnCurrentFabricRemove(void * context, NodeId nodeId, CHIP_E
     PairingManager * self = reinterpret_cast<PairingManager *>(context);
     VerifyOrReturn(self != nullptr, ChipLogError(NotSpecified, "OnCurrentFabricRemove: context is null"));
 
+    ChipLogProgress(NotSpecified, "PairingManager::OnCurrentFabricRemove");
+
     if (err == CHIP_NO_ERROR)
     {
         // print to console
-        fprintf(stderr, "Device with Node ID: " ChipLogFormatX64 "has been successfully removed.\n", ChipLogValueX64(nodeId));
+        fprintf(stderr, "Device with Node ID: " ChipLogFormatX64 " has been successfully removed.\n", ChipLogValueX64(nodeId));
 
-#if defined(PW_RPC_ENABLED)
+        if (self->mPairingDelegate)
+        {
+            self->mPairingDelegate->OnDeviceRemoved(nodeId, err);
+            self->SetPairingDelegate(nullptr);
+        }
+
         FabricIndex fabricIndex = self->CurrentCommissioner().GetFabricIndex();
         app::InteractionModelEngine::GetInstance()->ShutdownSubscriptions(fabricIndex, nodeId);
         ScopedNodeId scopedNodeId(nodeId, fabricIndex);
-        RemoveSynchronizedDevice(scopedNodeId);
-#endif
+        DeviceManager::Instance().RemoveSyncedDevice(scopedNodeId);
     }
     else
     {
@@ -655,3 +663,36 @@ CHIP_ERROR PairingManager::UnpairDevice(NodeId nodeId)
         }
     });
 }
+
+void PairingManager::ResetForNextCommand()
+{
+    mCommissioningWindowDelegate = nullptr;
+    mPairingDelegate             = nullptr;
+    mNodeId                      = chip::kUndefinedNodeId;
+    mVerifier                    = chip::ByteSpan();
+    mSalt                        = chip::ByteSpan();
+    mDiscriminator               = 0;
+    mSetupPINCode                = 0;
+    mDeviceIsICD                 = false;
+
+    memset(mRandomGeneratedICDSymmetricKey, 0, sizeof(mRandomGeneratedICDSymmetricKey));
+    memset(mVerifierBuffer, 0, sizeof(mVerifierBuffer));
+    memset(mSaltBuffer, 0, sizeof(mSaltBuffer));
+    memset(mRemoteIpAddr, 0, sizeof(mRemoteIpAddr));
+    memset(mOnboardingPayload, 0, sizeof(mOnboardingPayload));
+
+    mICDRegistration.ClearValue();
+    mICDCheckInNodeId.ClearValue();
+    mICDClientType.ClearValue();
+    mICDSymmetricKey.ClearValue();
+    mICDMonitoredSubject.ClearValue();
+    mICDStayActiveDurationMsec.ClearValue();
+
+    mWindowOpener.reset();
+    mOnOpenCommissioningWindowCallback.Cancel();
+    mOnOpenCommissioningWindowVerifierCallback.Cancel();
+    mCurrentFabricRemover.reset();
+    mCurrentFabricRemoveCallback.Cancel();
+}
+
+} // namespace admin

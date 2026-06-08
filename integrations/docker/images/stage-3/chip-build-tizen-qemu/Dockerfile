@@ -2,9 +2,9 @@ ARG VERSION=1
 FROM ghcr.io/project-chip/chip-build-tizen:${VERSION}
 LABEL org.opencontainers.image.source https://github.com/project-chip/connectedhomeip
 
-ENV TIZEN_IOT_QEMU_KERNEL $TIZEN_SDK_ROOT/iot-qemu-virt-zImage
-ENV TIZEN_IOT_IMAGE_ROOT $TIZEN_SDK_ROOT/iot-rootfs.img
-ENV TIZEN_IOT_IMAGE_DATA $TIZEN_SDK_ROOT/iot-sysdata.img
+ENV TIZEN_IOT_QEMU_KERNEL=$TIZEN_SDK_ROOT/iot-qemu-virt-zImage
+ENV TIZEN_IOT_IMAGE_ROOT=$TIZEN_SDK_ROOT/iot-rootfs.img
+ENV TIZEN_IOT_IMAGE_DATA=$TIZEN_SDK_ROOT/iot-sysdata.img
 
 # ------------------------------------------------------------------------------
 # Switch to the root user so we could install things
@@ -21,6 +21,7 @@ RUN set -x \
     patch \
     qemu-system-arm \
     xz-utils \
+    gdb-multiarch \
     # Cleanup
     && apt-get clean \
     && rm -rf /var/lib/apt/lists \
@@ -39,7 +40,7 @@ RUN set -x \
     && wget --progress=dot:giga -r -nd --no-parent -e robots=off -A 'rpi4-linux-kernel-*.src.rpm' \
     http://download.tizen.org/snapshots/TIZEN/Tizen-$TIZEN_VERSION/Tizen-$TIZEN_VERSION-Unified/latest/repos/standard/source/ \
     # Prepare kernel source (Linux kernel + Tizen patchset)
-    && unrpm rpi4-linux-kernel-*.src.rpm \
+    && 7z x -so rpi4-linux-kernel-*.src.rpm | cpio -idmv \
     && rm rpi4-linux-kernel-*.src.rpm \
     && tar -xJf linux-kernel-*.tar.xz \
     && rm linux-kernel-*.tar.xz \
@@ -76,7 +77,7 @@ RUN set -x \
 RUN set -x \
     && mkdir -p /tmp/workdir && cd /tmp/workdir \
     && SYSTEMD_SYSTEM=/usr/lib/systemd/system \
-    && SYSTEMD_REQUIRES_LOCAL_FS=$SYSTEMD_SYSTEM/local-fs.target.requires \
+    && SYSTEMD_TARGET_LOCAL_FS_WANTS=$SYSTEMD_SYSTEM/local-fs.target.wants \
     # Download Tizen images
     && wget --progress=dot:giga -r -nd --no-parent -e robots=off -A 'tizen-*.tar.gz' \
     http://download.tizen.org/snapshots/TIZEN/Tizen-$TIZEN_VERSION/Tizen-$TIZEN_VERSION-Unified/latest/images/standard/tizen-headless-armv7l/  \
@@ -98,23 +99,34 @@ RUN set -x \
     $TIZEN_SDK_SYSROOT/usr/lib/libcapi-network-thread.so.* \
     $TIZEN_SDK_SYSROOT/usr/lib/libnsd-dns-sd.so.* \
     /usr/lib/ \
-    # Disable failing systemd services
+    # Disable failing (and not essential) systemd services
     && guestfish --rw -a $TIZEN_IOT_IMAGE_ROOT -m /dev/sda \
-    glob rm $SYSTEMD_SYSTEM/clone_partitions.service : \
-    glob rm $SYSTEMD_SYSTEM/deviced.service : \
-    glob rm $SYSTEMD_SYSTEM/mm-resource-managerd.service : \
-    glob rm $SYSTEMD_SYSTEM/mnt-inform.mount : \
-    glob rm $SYSTEMD_SYSTEM/muse-server.* : \
-    glob rm $SYSTEMD_SYSTEM/murphyd.service : \
-    glob rm $SYSTEMD_SYSTEM/pulseaudio.service \
+    glob rm-f $SYSTEMD_SYSTEM/clone_partitions.* : \
+    glob rm-f $SYSTEMD_SYSTEM/deviced.* : \
+    glob rm-f $SYSTEMD_SYSTEM/display-manager.* : \
+    glob rm-f $SYSTEMD_SYSTEM/display-manager-ready.* : \
+    glob rm-f $SYSTEMD_SYSTEM/mm-resource-managerd.* : \
+    glob rm-f $SYSTEMD_SYSTEM/mnt-inform.* : \
+    glob rm-f $SYSTEMD_SYSTEM/muse-server.* : \
+    glob rm-f $SYSTEMD_SYSTEM/murphyd.* : \
+    glob rm-f $SYSTEMD_SYSTEM/pulseaudio.* : \
+    glob rm-f $SYSTEMD_SYSTEM/stability-monitor.* : \
+    glob rm-f $SYSTEMD_SYSTEM/update-manager.* : \
     # Mount Tizen system partition on /opt-ro instead of /opt
     && SYSTEMD_UNIT_OPT_RO_MOUNT=$SYSTEMD_SYSTEM/opt\\x2dro.mount \
     && guestfish --rw -a $TIZEN_IOT_IMAGE_ROOT -m /dev/sda \
-    mv $SYSTEMD_SYSTEM/opt.mount $SYSTEMD_UNIT_OPT_RO_MOUNT : \
-    ln-sf $SYSTEMD_UNIT_OPT_RO_MOUNT $SYSTEMD_REQUIRES_LOCAL_FS : \
+    ln-sf $SYSTEMD_UNIT_OPT_RO_MOUNT $SYSTEMD_TARGET_LOCAL_FS_WANTS : \
     mkdir /opt-ro \
-    && virt-edit $TIZEN_IOT_IMAGE_ROOT -e 's#/opt#/opt-ro#g' $SYSTEMD_UNIT_OPT_RO_MOUNT \
-    && virt-edit $TIZEN_IOT_IMAGE_ROOT -e 's#Options=#Options=ro,#' $SYSTEMD_UNIT_OPT_RO_MOUNT \
+    && echo -n \
+    "[Unit]\n" \
+    "Before=local-fs.target\n" \
+    "ConditionPathIsMountPoint=!/opt-ro\n" \
+    "[Mount]\n" \
+    "What=LABEL=system-data\n" \
+    "Where=/opt-ro\n" \
+    "Type=ext4\n" \
+    "Options=ro,relatime\n" \
+    | guestfish --rw -a $TIZEN_IOT_IMAGE_ROOT -m /dev/sda upload - $SYSTEMD_UNIT_OPT_RO_MOUNT \
     # Create /tmp/.opt-upper and /tmp/.opt-work after /tmp is mounted
     && SYSTEMD_UNIT_OPT_PRE_MOUNT=$SYSTEMD_SYSTEM/opt.pre-mount.service \
     && echo -n \
@@ -129,7 +141,8 @@ RUN set -x \
     # Mount Tizen system partition as a tmp-based overlay
     && SYSTEMD_UNIT_OPT_MOUNT=$SYSTEMD_SYSTEM/opt.mount \
     && echo -n \
-    "[Unit]\nConditionPathIsMountPoint=!/opt\n" \
+    "[Unit]\n" \
+    "ConditionPathIsMountPoint=!/opt\n" \
     "RequiresMountsFor=/opt-ro /tmp\n" \
     "Wants=opt.pre-mount.service\n" \
     "After=opt.pre-mount.service\n" \
@@ -139,7 +152,7 @@ RUN set -x \
     "Type=overlay\n" \
     "Options=lowerdir=/opt-ro,upperdir=/tmp/.opt-upper,workdir=/tmp/.opt-work\n" \
     | guestfish --rw -a $TIZEN_IOT_IMAGE_ROOT -m /dev/sda upload - $SYSTEMD_UNIT_OPT_MOUNT : \
-    ln-sf $SYSTEMD_UNIT_OPT_MOUNT $SYSTEMD_REQUIRES_LOCAL_FS \
+    ln-sf $SYSTEMD_UNIT_OPT_MOUNT $SYSTEMD_TARGET_LOCAL_FS_WANTS \
     # Fix SMACK label for /tmp/.opt-work/work
     && SYSTEMD_UNIT_OPT_POST_MOUNT=$SYSTEMD_SYSTEM/opt.post-mount.service \
     && echo -n \
@@ -151,7 +164,7 @@ RUN set -x \
     "ExecStart=chsmack -a * /tmp/.opt-work/work\n" \
     "RemainAfterExit=yes\n" \
     | guestfish --rw -a $TIZEN_IOT_IMAGE_ROOT -m /dev/sda upload - $SYSTEMD_UNIT_OPT_POST_MOUNT : \
-    ln-sf $SYSTEMD_UNIT_OPT_POST_MOUNT $SYSTEMD_REQUIRES_LOCAL_FS \
+    ln-sf $SYSTEMD_UNIT_OPT_POST_MOUNT $SYSTEMD_TARGET_LOCAL_FS_WANTS \
     # Mount using 9P at /mnt/chip
     && SYSTEMD_UNIT_9P_MOUNT=$SYSTEMD_SYSTEM/mnt-chip.mount \
     && echo -n \
@@ -163,8 +176,12 @@ RUN set -x \
     "Type=9p\n" \
     "Options=nofail,trans=virtio\n" \
     | guestfish --rw -a $TIZEN_IOT_IMAGE_ROOT -m /dev/sda upload - $SYSTEMD_UNIT_9P_MOUNT : \
-    ln-sf $SYSTEMD_UNIT_9P_MOUNT $SYSTEMD_REQUIRES_LOCAL_FS : \
+    ln-sf $SYSTEMD_UNIT_9P_MOUNT $SYSTEMD_TARGET_LOCAL_FS_WANTS : \
     mkdir /mnt/chip \
+    # Setup crash manager
+    && guestfish --rw -a $TIZEN_IOT_IMAGE_ROOT -m /dev/sda download /etc/crash-manager.conf crash-manager.conf \
+    && sed -i 's|# CrashRootPath=/usr/opt/share/crash/|CrashRootPath=/mnt/chip/|g' crash-manager.conf \
+    && guestfish --rw -a $TIZEN_IOT_IMAGE_ROOT -m /dev/sda upload crash-manager.conf /etc/crash-manager.conf \
     # Setup auto-login for root user
     && SYSTEMD_UNIT_SERIAL_GETTY=$SYSTEMD_SYSTEM/serial-getty@.service \
     && virt-edit $TIZEN_IOT_IMAGE_ROOT -e \

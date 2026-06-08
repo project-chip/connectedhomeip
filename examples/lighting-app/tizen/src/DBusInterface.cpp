@@ -203,7 +203,8 @@ gboolean DBusInterface::OnColorTemperatureChanged(LightAppColorControl * colorCo
     data.colorTemperatureMireds = light_app_color_control_get_color_temperature_mireds(colorControl);
 
     chip::DeviceLayer::StackLock lock;
-    ColorControlServer::Instance().moveToColorTempCommand(&handler, path, data);
+    auto status = ColorControlServer::Instance().moveToColorTempCommand(self->mEndpointId, data);
+    handler.AddStatus(path, status);
 
     return G_DBUS_METHOD_INVOCATION_HANDLED;
 }

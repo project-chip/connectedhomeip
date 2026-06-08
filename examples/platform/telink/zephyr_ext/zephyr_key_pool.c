@@ -18,6 +18,9 @@
 #include "zephyr_key_pool.h"
 #include <stdlib.h>
 
+#include <zephyr/logging/log.h>
+LOG_MODULE_REGISTER(key_pool, CONFIG_CHIP_APP_LOG_LEVEL);
+
 /* Key pool denouncing settle time */
 #define KEY_POOL_DEBOUNCING_GUARD_MS 10
 
@@ -75,7 +78,7 @@ static void key_pool_poll(struct key_pool_data * key_pool, bool init)
 /* Key pool scan worker */
 static void key_pool_event_work(struct k_work * item)
 {
-    struct key_pool_data * key_pool = CONTAINER_OF(item, struct key_pool_data, work);
+    struct key_pool_data * key_pool = CONTAINER_OF(k_work_delayable_from_work(item), struct key_pool_data, work);
 
     key_pool_poll(key_pool, false);
 }
@@ -85,7 +88,11 @@ static void key_pool_on_pin_isr(const struct device * dev, struct gpio_callback 
 {
     struct key_pool_aux_data * key_pool_aux = CONTAINER_OF(cb, struct key_pool_aux_data, callback);
 
-    (void) k_work_reschedule(&key_pool_aux->key_pool->work, K_MSEC(KEY_POOL_DEBOUNCING_GUARD_MS));
+    int err = k_work_reschedule(&key_pool_aux->key_pool->work, K_MSEC(KEY_POOL_DEBOUNCING_GUARD_MS));
+    if (err < 0)
+    {
+        LOG_ERR("k_work_schedule err: %d", err);
+    }
 }
 
 /* Public APIs */

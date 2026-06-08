@@ -10,14 +10,14 @@ RUN set -x \
 
 WORKDIR /opt/nxp/
 
-ARG NXP_SDK_EXAMPLE_PATH=nxp_matter_support/github_sdk/common_sdk/repo/examples
-
 RUN set -x \
-    && git clone --branch v1.4.0-pvw1 https://github.com/NXP/nxp_matter_support.git \
+    && git clone https://github.com/NXP/nxp_matter_support.git \
+    && cd nxp_matter_support \
+    # Checkout commit aligned with updated west manifest using MCUX SDK 26.03.00,
+    # including patches for Matter support in specific components
+    && git checkout dffd117e15a3cab14cab0503c9734b232a345cc6 \
     && pip3 install --break-system-packages -U --no-cache-dir west \
-    && ./nxp_matter_support/scripts/update_nxp_sdk.py \
-    && cd $NXP_SDK_EXAMPLE_PATH \
-    && find . -maxdepth 1 -mindepth 1 -type d ! -name '.*' -a ! -name '*rt1170*' -a ! -name '*rt1060*' -a ! -name '*rw612*' -a ! -name '*k32w*' -a ! -name '*mcxw*' -exec rm -rf {} + `# Remove unused folder to reduce image size` \
+    && ./scripts/update_nxp_sdk.py --platform common \
     && : # last line
 
 FROM ghcr.io/project-chip/chip-build:${VERSION}

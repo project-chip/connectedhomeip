@@ -29,6 +29,7 @@
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
@@ -48,14 +49,14 @@ using namespace chip::Inet;
 using namespace chip::Transport;
 using namespace chip::Messaging;
 
-struct TestExchangeMgr : public chip::Test::LoopbackMessagingContext
+struct TestExchangeMgr : public chip::Testing::LoopbackMessagingContext
 {
     void SetUp() override
     {
 #if CHIP_CRYPTO_PSA
         ASSERT_EQ(psa_crypto_init(), PSA_SUCCESS);
 #endif
-        chip::Test::LoopbackMessagingContext::SetUp();
+        chip::Testing::LoopbackMessagingContext::SetUp();
     }
 };
 
@@ -120,7 +121,11 @@ TEST_F(TestExchangeMgr, CheckNewContextTest)
 
     ExchangeContext * ec2 = NewExchangeToAlice(&mockAppDelegate);
     ASSERT_NE(ec2, nullptr);
-    EXPECT_GT(ec2->GetExchangeId(), ec1->GetExchangeId());
+    // Exchange IDs are a 16-bit counter that starts from a random value and increments
+    // per exchange. We do an exact (+1) check rather than a lenient greater-than check,
+    // because greater-than does not work when the exchange ID wraps (0xFFFF -> 0x0000) —
+    // and it will sometimes wrap, given the random starting ID.
+    EXPECT_EQ(ec2->GetExchangeId(), static_cast<uint16_t>(ec1->GetExchangeId() + 1));
     EXPECT_EQ(ec2->GetSessionHandle(), GetSessionBobToAlice());
 
     ec1->Close();
@@ -149,8 +154,10 @@ TEST_F(TestExchangeMgr, CheckSessionExpirationBasics)
     EXPECT_FALSE(receiveDelegate.IsOnMessageReceivedCalled);
     ec1->Close();
 
-    err = GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Protocols::BDX::Id, kMsgType_TEST1);
+    Messaging::UnsolicitedMessageHandler * removedHandler = nullptr;
+    err = GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Protocols::BDX::Id, kMsgType_TEST1, &removedHandler);
     EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(removedHandler, &receiveDelegate);
 
     // recreate closed session.
     EXPECT_EQ(CreateSessionAliceToBob(), CHIP_NO_ERROR);
@@ -161,8 +168,9 @@ TEST_F(TestExchangeMgr, CheckSessionExpirationTimeout)
     WaitForTimeoutDelegate sendDelegate;
     ExchangeContext * ec1 = NewExchangeToBob(&sendDelegate);
 
-    ec1->SendMessage(Protocols::BDX::Id, kMsgType_TEST1, System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize),
-                     SendFlags(Messaging::SendMessageFlags::kExpectResponse).Set(Messaging::SendMessageFlags::kNoAutoRequestAck));
+    EXPECT_SUCCESS(ec1->SendMessage(
+        Protocols::BDX::Id, kMsgType_TEST1, System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize),
+        SendFlags(Messaging::SendMessageFlags::kExpectResponse).Set(Messaging::SendMessageFlags::kNoAutoRequestAck)));
 
     DrainAndServiceIO();
     EXPECT_FALSE(sendDelegate.IsOnResponseTimeoutCalled);
@@ -187,8 +195,9 @@ TEST_F(TestExchangeMgr, CheckSessionExpirationDuringTimeout)
 
     EXPECT_FALSE(sendDelegate.IsOnResponseTimeoutCalled);
 
-    ec1->SendMessage(Protocols::BDX::Id, kMsgType_TEST1, System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize),
-                     SendFlags(Messaging::SendMessageFlags::kExpectResponse).Set(Messaging::SendMessageFlags::kNoAutoRequestAck));
+    EXPECT_SUCCESS(ec1->SendMessage(
+        Protocols::BDX::Id, kMsgType_TEST1, System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize),
+        SendFlags(Messaging::SendMessageFlags::kExpectResponse).Set(Messaging::SendMessageFlags::kNoAutoRequestAck)));
     DrainAndServiceIO();
 
     // Wait for our timeout to elapse. Give it an extra 1000ms of slack,
@@ -219,11 +228,15 @@ TEST_F(TestExchangeMgr, CheckUmhRegistrationTest)
     err = GetExchangeManager().UnregisterUnsolicitedMessageHandlerForProtocol(Protocols::Echo::Id);
     EXPECT_NE(err, CHIP_NO_ERROR);
 
-    err = GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Protocols::Echo::Id, kMsgType_TEST1);
+    Messaging::UnsolicitedMessageHandler * removedHandler = nullptr;
+    err = GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Protocols::Echo::Id, kMsgType_TEST1, &removedHandler);
     EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(removedHandler, &mockAppDelegate);
 
-    err = GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Protocols::Echo::Id, kMsgType_TEST2);
+    removedHandler = nullptr;
+    err = GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Protocols::Echo::Id, kMsgType_TEST2, &removedHandler);
     EXPECT_NE(err, CHIP_NO_ERROR);
+    EXPECT_EQ(removedHandler, nullptr);
 }
 
 TEST_F(TestExchangeMgr, CheckExchangeMessages)
@@ -241,8 +254,9 @@ TEST_F(TestExchangeMgr, CheckExchangeMessages)
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
     // send a malicious packet
-    ec1->SendMessage(Protocols::BDX::Id, kMsgType_TEST2, System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize),
-                     SendFlags(Messaging::SendMessageFlags::kNoAutoRequestAck));
+    EXPECT_SUCCESS(ec1->SendMessage(Protocols::BDX::Id, kMsgType_TEST2,
+                                    System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize),
+                                    SendFlags(Messaging::SendMessageFlags::kNoAutoRequestAck)));
 
     DrainAndServiceIO();
     EXPECT_FALSE(mockUnsolicitedAppDelegate.IsOnMessageReceivedCalled);
@@ -250,14 +264,17 @@ TEST_F(TestExchangeMgr, CheckExchangeMessages)
     ec1 = NewExchangeToAlice(&mockSolicitedAppDelegate);
 
     // send a good packet
-    ec1->SendMessage(Protocols::BDX::Id, kMsgType_TEST1, System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize),
-                     SendFlags(Messaging::SendMessageFlags::kNoAutoRequestAck));
+    EXPECT_SUCCESS(ec1->SendMessage(Protocols::BDX::Id, kMsgType_TEST1,
+                                    System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize),
+                                    SendFlags(Messaging::SendMessageFlags::kNoAutoRequestAck)));
 
     DrainAndServiceIO();
     EXPECT_TRUE(mockUnsolicitedAppDelegate.IsOnMessageReceivedCalled);
 
-    err = GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Protocols::BDX::Id, kMsgType_TEST1);
+    Messaging::UnsolicitedMessageHandler * removedHandler = nullptr;
+    err = GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Protocols::BDX::Id, kMsgType_TEST1, &removedHandler);
     EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(removedHandler, &mockUnsolicitedAppDelegate);
 }
 
 } // namespace

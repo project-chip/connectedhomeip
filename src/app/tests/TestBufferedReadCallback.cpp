@@ -17,18 +17,21 @@
  */
 #include <vector>
 
-#include "app-common/zap-generated/ids/Attributes.h"
-#include "lib/core/TLVTags.h"
-#include "protocols/interaction_model/Constants.h"
-#include "system/SystemPacketBuffer.h"
-#include "system/TLVPacketBufferBackingStore.h"
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app-common/zap-generated/ids/Attributes.h>
 #include <app/BufferedReadCallback.h>
+#include <app/ConcreteAttributePath.h>
+#include <app/MessageDef/StatusIB.h>
 #include <app/data-model/DecodableList.h>
 #include <app/data-model/Decode.h>
 #include <app/tests/AppTestContext.h>
+#include <lib/core/TLVTags.h>
+#include <protocols/interaction_model/Constants.h>
+#include <system/SystemPacketBuffer.h>
+#include <system/TLVPacketBufferBackingStore.h>
 
 #include <lib/core/StringBuilderAdapters.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <pw_unit_test/framework.h>
 
 using namespace chip::app;
@@ -64,7 +67,18 @@ struct ValidationInstruction
 
 using InstructionListType = std::vector<ValidationInstruction>;
 
-using TestBufferedReadCallback = chip::Test::AppContext;
+using TestBufferedReadCallback = chip::Testing::AppContext;
+
+class NoopCallback : public BufferedReadCallback::Callback
+{
+public:
+    NoopCallback() = default;
+
+    void OnReportBegin() override {}
+    void OnReportEnd() override {}
+    void OnAttributeData(const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData, const StatusIB & aStatus) override {}
+    void OnDone(ReadClient *) override {}
+};
 
 class DataSeriesValidator : public BufferedReadCallback::Callback
 {
@@ -426,7 +440,7 @@ void DataSeriesGenerator::Generate()
                 path.mListOp      = ConcreteDataAttributePath::ListOperation::ReplaceAll;
                 EXPECT_EQ(DataModel::Encode(writer, TLV::AnonymousTag(), value), CHIP_NO_ERROR);
 
-                writer.Finalize(&handle);
+                EXPECT_SUCCESS(writer.Finalize(&handle));
                 reader.Init(std::move(handle));
                 EXPECT_EQ(reader.Next(), CHIP_NO_ERROR);
                 callback->OnAttributeData(path, &reader, status);
@@ -449,7 +463,7 @@ void DataSeriesGenerator::Generate()
 
                 EXPECT_EQ(DataModel::Encode(writer, TLV::AnonymousTag(), listItem), CHIP_NO_ERROR);
 
-                writer.Finalize(&handle);
+                EXPECT_SUCCESS(writer.Finalize(&handle));
                 reader.Init(std::move(handle));
                 EXPECT_EQ(reader.Next(), CHIP_NO_ERROR);
                 callback->OnAttributeData(path, &reader, status);
@@ -469,7 +483,7 @@ void DataSeriesGenerator::Generate()
                 path.mListOp      = ConcreteDataAttributePath::ListOperation::ReplaceAll;
                 EXPECT_EQ(DataModel::Encode(writer, TLV::AnonymousTag(), value), CHIP_NO_ERROR);
 
-                writer.Finalize(&handle);
+                EXPECT_SUCCESS(writer.Finalize(&handle));
                 reader.Init(std::move(handle));
                 EXPECT_EQ(reader.Next(), CHIP_NO_ERROR);
                 callback->OnAttributeData(path, &reader, status);
@@ -488,7 +502,7 @@ void DataSeriesGenerator::Generate()
 
                 EXPECT_EQ(DataModel::Encode(writer, TLV::AnonymousTag(), (uint8_t) (i)), CHIP_NO_ERROR);
 
-                writer.Finalize(&handle);
+                EXPECT_SUCCESS(writer.Finalize(&handle));
                 reader.Init(std::move(handle));
                 EXPECT_EQ(reader.Next(), CHIP_NO_ERROR);
                 callback->OnAttributeData(path, &reader, status);
@@ -503,7 +517,7 @@ void DataSeriesGenerator::Generate()
 
         if (hasData)
         {
-            writer.Finalize(&handle);
+            EXPECT_SUCCESS(writer.Finalize(&handle));
             reader.Init(std::move(handle));
             EXPECT_EQ(reader.Next(), CHIP_NO_ERROR);
             callback->OnAttributeData(path, &reader, status);
@@ -523,6 +537,26 @@ void RunAndValidateSequence(std::vector<ValidationInstruction> instructionList)
     generator.Generate();
 
     EXPECT_EQ(validator.mCurrentInstruction, instructionList.size());
+}
+
+TEST_F(TestBufferedReadCallback, TestInvalidInput)
+{
+    NoopCallback noop;
+    BufferedReadCallback reader(noop);
+    ReadClient::Callback & callback = reader; // access as a public interface
+                                              //
+    // Send a list operation, but with null data, ensure no deferencing
+    callback.OnAttributeData(ConcreteDataAttributePath{ 1, 2, 3, ConcreteDataAttributePath::ListOperation::AppendItem, 0 }, nullptr,
+                             StatusIB{ Protocols::InteractionModel::Status::Success });
+
+    callback.OnAttributeData(ConcreteDataAttributePath{ 1, 2, 3, ConcreteDataAttributePath::ListOperation::ReplaceAll, 0 }, nullptr,
+                             StatusIB{ Protocols::InteractionModel::Status::Success });
+
+    callback.OnAttributeData(ConcreteDataAttributePath{ 1, 2, 3, ConcreteDataAttributePath::ListOperation::DeleteItem, 123 },
+                             nullptr, StatusIB{ Protocols::InteractionModel::Status::Success });
+
+    callback.OnAttributeData(ConcreteDataAttributePath{ 1, 2, 3, ConcreteDataAttributePath::ListOperation::ReplaceItem, 1 },
+                             nullptr, StatusIB{ Protocols::InteractionModel::Status::Success });
 }
 
 TEST_F(TestBufferedReadCallback, TestBufferedSequences)

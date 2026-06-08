@@ -1,16 +1,3 @@
-```{toctree}
-:glob:
-:maxdepth: 1
-:hidden:
-
-matter-migration-guide/matter_cc2674_migration.md
-matter-syscfg/getting-started.md
-matter-syscfg/sysconfig-board.md
-matter-users-guide/ti_openthread_library_usage.md
-matter-users-guide/ti_factory_data_user_guide.md
-matter-users-guide/enabling_icd_on_ti_devices.md
-```
-
 # Texas Instruments platform overview
 
 The Texas Instruments Matter platform is based on the TI SimpleLink™ SDK.
@@ -60,14 +47,6 @@ Instruments Dynamic Multi-protocol Manager.
 
 <hr>
 
-## LwIP stack
-
-The Lightweight IP stack interfaces with the OpenThread stack to offer standard
-IP connectivity protocols that OpenThread does not natively support. This offers
-a standard socket based interface to the Matter platform.
-
-<hr>
-
 ## MbedTLS
 
 The MbedTLS library is used by OpenThread and Matter for a wide variety of
@@ -82,19 +61,19 @@ configuration file.
 
 ## Matter Stack to TI Platform Interface
 
-Matter Stack interacts with LwIP, OpenThread, and the TI-BLE stack to achieve
-the protocol and application functionality. A Bluetooth LE profile is registered
-with the TI-BLE stack to enable provisioning and configuration. Once the device
-is provisioned Matter will configure the OpenThread interface to connect to an
+Matter interacts with OpenThread and the TI-BLE stack to achieve the protocol
+and application functionality. A Bluetooth LE profile is registered with the
+TI-BLE stack to enable provisioning and configuration. Once the device is
+provisioned Matter will configure the OpenThread interface to connect to an
 existing Thread network or to start its own network. From there the Matter IP
-messages are sent to the LwIP stack to be routed to the OpenThread stack for
-transmission. Matter Impl (Implementation) layer acts as an interface between
-Matter stack and the TI platform components such as BLE stack, OpenThread,
-FreeRTOS. It also supports components such as connectivity manager that provides
-the implementation for functionality required by Matter stack. Overall,
-applications generally only need to interface with the Cluster Library from
-Matter. The transport of messages and configuration of the device is all handled
-by the platform implementation files.
+messages are sent to the Protocol Buffers to be routed to the OpenThread stack
+for transmission. Matter Impl (Implementation) layer acts as an interface
+between Matter stack and the TI platform components such as BLE stack,
+OpenThread, FreeRTOS. It also supports components such as connectivity manager
+that provides the implementation for functionality required by Matter stack.
+Overall, applications generally only need to interface with the Cluster Library
+from Matter. The transport of messages and configuration of the device is all
+handled by the platform implementation files.
 
 <hr>
 
@@ -116,26 +95,21 @@ Below are several resources available for Matter development:
 Sample Matter applications are provided for the TI platform. These can be used
 as reference for your own application.
 
--   [lock-app](../../../examples/lock-app/cc13x4_26x4/README.md)
--   [pump-app](../../../examples/pump-app/cc13x4_26x4/README.md)
--   [pump-controller-app](../../../examples/pump-controller-app/cc13x4_26x4/README.md)
--   [lighting-app](../../../examples/lighting-app/cc13x4_26x4/README.md)
-    <hr>
+| Example             |                                Device Support                                 |
+| ------------------- | :---------------------------------------------------------------------------: |
+| lighting-app        |    [CC13x4_26x4](../../../examples/lighting-app/ti/cc13x4_26x4/README.md)     |
+| light-switch-app    |  [CC13x4_26x4](../../../examples/light-switch-app/ti/cc13x4_26x4/README.md)   |
+| lock-app            |      [CC13x4_26x4](../../../examples/lock-app/ti/cc13x4_26x4/README.md)       |
+| pump-app            |      [CC13x4_26x4](../../../examples/pump-app/ti/cc13x4_26x4/README.md)       |
+| pump-controller-app | [CC13x4_26x4](../../../examples/pump-controller-app/ti/cc13x4_26x4/README.md) |
+
+<hr>
 
 ### Build system
 
 The TI platform uses GN to generate ninja build scripts. Build files have
 already been written to build and link the TI specific code within the
 SimpleLink SDK.
-
-<hr>
-
-## CC2674 Migration
-
-For instructions on how to migrate the CC1354P10-6 examples to either the
-CC2674P10 or the CC2674R10, please refer to the guide linked below.
-
--   [TI CC2674 Migration Guide](./matter-migration-guide/matter_cc2674_migration.md)
 
 <hr>
 

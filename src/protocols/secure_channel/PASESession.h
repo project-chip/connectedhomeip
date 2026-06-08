@@ -27,7 +27,7 @@
 #pragma once
 
 #include <crypto/CHIPCryptoPAL.h>
-#if CHIP_CRYPTO_PSA_SPAKE2P
+#if CHIP_CRYPTO_SPAKE2P_PSA
 #include <crypto/PSASpake2p.h>
 #endif
 #include <lib/support/Base64.h>
@@ -38,12 +38,15 @@
 #include <protocols/secure_channel/PairingSession.h>
 #include <protocols/secure_channel/SessionEstablishmentExchangeDispatch.h>
 #include <system/SystemPacketBuffer.h>
+#include <system/TLVPacketBufferBackingStore.h>
 #include <transport/CryptoContext.h>
 #include <transport/raw/MessageHeader.h>
 #include <transport/raw/PeerAddress.h>
 
 namespace chip {
-
+namespace Testing {
+class TestPASESession;
+}
 extern const char kSpake2pI2RSessionInfo[];
 extern const char kSpake2pR2ISessionInfo[];
 
@@ -174,6 +177,7 @@ private:
         kInvalidKeyConfirmation = 0x00,
         kUnexpected             = 0xff,
     };
+    friend class Testing::TestPASESession;
 
     CHIP_ERROR Init(SessionManager & sessionManager, uint32_t setupCode, SessionEstablishmentDelegate * delegate);
 
@@ -198,12 +202,20 @@ private:
     CHIP_ERROR OnFailureStatusReport(Protocols::SecureChannel::GeneralStatusCode generalCode, uint16_t protocolCode,
                                      Optional<uintptr_t> protocolData) override;
 
+    /** This function returns the CHIP_ERROR from a call to TLVReader::Next() method.
+     *
+     * @retval #CHIP_END_OF_TLV            If the end of the TLV encoding is reached.
+     * @retval #CHIP_NO_ERROR              If there are additional non-parsed TLV Elements.
+     * @retval other                       See return values of TLVReader::Next()
+     **/
+    CHIP_ERROR ReadSessionParamsIfPresent(const TLV::Tag & SessionParamsTag, System::PacketBufferTLVReader & tlvReader);
+
     void Finish();
 
     // mNextExpectedMsg is set when we are expecting a message.
     Optional<Protocols::SecureChannel::MsgType> mNextExpectedMsg;
 
-#if CHIP_CRYPTO_PSA_SPAKE2P
+#if CHIP_CRYPTO_SPAKE2P_PSA
     Crypto::PSASpake2p_P256_SHA256_HKDF_HMAC mSpake2p;
 #else
     Crypto::Spake2p_P256_SHA256_HKDF_HMAC mSpake2p;

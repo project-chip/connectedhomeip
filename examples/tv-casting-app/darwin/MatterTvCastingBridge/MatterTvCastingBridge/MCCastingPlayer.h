@@ -27,12 +27,45 @@
 @class MCEndpoint;
 
 /**
+ * @brief Represents CastingPlayer ConnectionState.
+ * @note Should be kept up to date with matter::casting::core::ConnectionState.
+ */
+typedef enum {
+    MC_CASTING_PLAYER_NOT_CONNECTED,
+    MC_CASTING_PLAYER_CONNECTING,
+    MC_CASTING_PLAYER_CONNECTED,
+} MCCastingPlayerConnectionState;
+
+/**
  * @brief MCCastingPlayer represents a Matter commissioner that is able to play media to a physical
  * output or to a display screen which is part of the device.
  */
 @interface MCCastingPlayer : NSObject
 
 + (NSInteger)kMinCommissioningWindowTimeoutSec;
+
+/**
+ * @brief Directly sends a User-directed Commissioning request with the provided identificationDeclarationOptions. This
+ *     bypasses additional checks and processes around commissioning like setting up a
+ *     commissioning-window and instead can be used to directly talk to the CastingPlayer.
+ * @param connectionCallbacks contains the connectionCompleteCallback (Required) and
+ *     commissionerDeclarationCallback (Optional) callbacks defined in MCConnectionCallbacks.
+ *     <p>For example: During UDC with NoPasscode (targeted app selection), the
+ *     Commissioner replies with a CommissionerDeclaration message with NoAppsFound and NeedsPasscode
+ *     set indicating if the target app was found.
+ * @param identificationDeclarationOptions (Optional) Parameters in the IdentificationDeclaration
+ *     message sent by the Commissionee to the Commissioner. These parameters specify the
+ *     information relating to the requested commissioning session.
+ *     <p>For example: During the UDC with NoPasscode (targeted app selection) flow,
+ *     the client would call this API with IdentificationDeclarationOptions containing
+ *     NoPasscode set to true. See IdentificationDeclarationOptions for a complete
+ *     list of optional parameters.
+ *     <p>Furthermore, attributes (such as VendorId) describe the TargetApp that the client wants
+ *     to interact with after commissioning.
+ * @return nil if request submitted successfully, otherwise a NSError object corresponding to the error.
+ */
+- (NSError * _Nullable)sendUDCWithCallbacks:(MCConnectionCallbacks * _Nonnull)connectionCallbacks
+           identificationDeclarationOptions:(MCIdentificationDeclarationOptions * _Nullable)identificationDeclarationOptions;
 
 /**
  * @brief Verifies that a connection exists with this CastingPlayer, or triggers a new
@@ -147,6 +180,19 @@
  * @brief Sets the internal connection state of this MCCastingPlayer to "disconnected"
  */
 - (void)disconnect;
+
+/**
+ * @brief Removes any fabric associated with this player in order to cause the UDC flow when
+ *     verifyOrEstablishConnection is called
+ */
+- (void)removeFabric;
+
+/**
+ * @brief Get the CastingPlayer's connection state
+ * @param state The current connection state that will be return.
+ * @return nil if request submitted successfully, otherwise a NSError object corresponding to the error.
+ */
+- (NSError * _Nullable)getConnectionState:(MCCastingPlayerConnectionState * _Nonnull)state;
 
 - (NSString * _Nonnull)identifier;
 - (NSString * _Nonnull)deviceName;

@@ -16,15 +16,18 @@
  */
 
 #include "TargetNavigatorManager.h"
+
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/util/config.h>
 #include <json/json.h>
+#include <lib/support/Span.h>
 
 #include <list>
 #include <string>
 
 using namespace chip::app;
 using namespace chip::app::Clusters::TargetNavigator;
+using namespace chip::literals;
 using ContentAppAttributeDelegate = chip::AppPlatform::ContentAppAttributeDelegate;
 
 TargetNavigatorManager::TargetNavigatorManager(ContentAppAttributeDelegate * attributeDelegate, std::list<std::string> targets,
@@ -58,7 +61,6 @@ CHIP_ERROR TargetNavigatorManager::HandleGetTargetList(AttributeValueEncoder & a
                 if (value[attrId].isArray())
                 {
                     return aEncoder.EncodeList([&](const auto & encoder) -> CHIP_ERROR {
-                        int i                  = 0;
                         std::string targetId   = std::to_string(static_cast<uint32_t>(
                             chip::app::Clusters::TargetNavigator::Structs::TargetInfoStruct::Fields::kIdentifier));
                         std::string targetName = std::to_string(
@@ -69,14 +71,12 @@ CHIP_ERROR TargetNavigatorManager::HandleGetTargetList(AttributeValueEncoder & a
                             {
                                 // invalid target ID. Ignore.
                                 ChipLogError(Zcl, "TargetNavigatorManager::HandleNavigateTarget invalid target ignored");
-                                i++;
                                 continue;
                             }
                             Structs::TargetInfoStruct::Type outputInfo;
                             outputInfo.identifier = static_cast<uint8_t>(entry[targetId].asUInt());
                             outputInfo.name       = CharSpan::fromCharString(entry[targetName].asCString());
                             ReturnErrorOnFailure(encoder.Encode(outputInfo));
-                            i++;
                         }
                         return CHIP_NO_ERROR;
                     });
@@ -137,16 +137,16 @@ void TargetNavigatorManager::HandleNavigateTarget(CommandResponseHelper<Navigate
     NavigateTargetResponseType response;
     if (target == kNoCurrentTarget || target > mTargets.size())
     {
-        response.data   = chip::MakeOptional(CharSpan::fromCharString("error"));
+        response.data   = chip::MakeOptional("error"_span);
         response.status = StatusEnum::kTargetNotFound;
-        helper.Success(response);
+        TEMPORARY_RETURN_IGNORED helper.Success(response);
         return;
     }
     mCurrentTarget = static_cast<uint8_t>(target);
 
-    response.data   = chip::MakeOptional(CharSpan::fromCharString("data response"));
+    response.data   = chip::MakeOptional("data response"_span);
     response.status = StatusEnum::kSuccess;
-    helper.Success(response);
+    TEMPORARY_RETURN_IGNORED helper.Success(response);
 }
 
 uint16_t TargetNavigatorManager::GetClusterRevision(chip::EndpointId endpoint)

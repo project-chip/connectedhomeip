@@ -32,7 +32,7 @@ jint AndroidChipInteractionJNI_OnLoad(JavaVM * jvm, void * reserved)
 
     ChipLogProgress(Controller, "AndroidChipInteractionJNI_OnLoad called");
 
-    chip::Platform::MemoryInit();
+    TEMPORARY_RETURN_IGNORED chip::Platform::MemoryInit();
 
     // Save a reference to the JVM.  Will need this to call back into Java.
     chip::JniReferences::GetInstance().SetJavaVm(jvm, "chip/devicecontroller/ChipInteractionClient");

@@ -22,8 +22,9 @@
 # test-runner-runs:
 #   run1:
 #     app: examples/fabric-admin/scripts/fabric-sync-app.py
-#     app-args: --app-admin=${FABRIC_ADMIN_APP} --app-bridge=${FABRIC_BRIDGE_APP} --stdin-pipe=dut-fsa-stdin --discriminator=1234
+#     app-args: --app-admin=${FABRIC_ADMIN_APP} --app-bridge=${FABRIC_BRIDGE_APP} --discriminator=1234
 #     app-ready-pattern: "Successfully opened pairing window on the device"
+#     app-stdin-pipe: dut-fsa-stdin
 #     script-args: >
 #       --PICS src/app/tests/suites/certification/ci-pics-values
 #       --storage-path admin_storage.json
@@ -35,6 +36,23 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
+#   run2:
+#     app: ${FABRIC_SYNC_APP}
+#     app-args: --discriminator=1234
+#     app-stdin-pipe: dut-fsa-stdin
+#     script-args: >
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --bool-arg unified_fabric_sync_app:true
+#       --string-arg th_server_app_path:${ALL_CLUSTERS_APP}
+#       --string-arg dut_fsa_stdin_pipe:dut-fsa-stdin
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 import asyncio
@@ -42,19 +60,26 @@ import hashlib
 import logging
 import os
 import queue
+import random
 import secrets
 import struct
 import tempfile
 import time
-from dataclasses import dataclass
 
-import chip.clusters as Clusters
-from chip import ChipDeviceCtrl
-from chip.testing.apps import AppServerSubprocess
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, type_matches
 from ecdsa.curves import NIST256p
 from mobly import asserts
 from TC_SC_3_6 import AttributeChangeAccumulator
+
+import matter.clusters as Clusters
+import matter.testing.matchers as matchers
+from matter import ChipDeviceCtrl
+from matter.testing.apps import AppServerSubprocess
+from matter.testing.commissioning import SetupParameters
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.runner import TestStep, default_matter_test_main
+
+log = logging.getLogger(__name__)
 
 # Length of `w0s` and `w1s` elements
 WS_LENGTH = NIST256p.baselen + 8
@@ -69,20 +94,13 @@ def _generate_verifier(passcode: int, salt: bytes, iterations: int) -> bytes:
     return w0.to_bytes(NIST256p.baselen, byteorder='big') + L.to_bytes('uncompressed')
 
 
-@dataclass
-class _SetupParameters:
-    setup_qr_code: str
-    manual_code: int
-    discriminator: int
-    passcode: int
-
-
 class TC_MCORE_FS_1_2(MatterBaseTest):
     @async_test_body
     async def setup_class(self):
         super().setup_class()
 
         self._partslist_subscription = None
+        self.dut_fsa_stdin = None
         self.th_server = None
         self.storage = None
 
@@ -95,21 +113,18 @@ class TC_MCORE_FS_1_2(MatterBaseTest):
 
         # Create a temporary storage directory for keeping KVS files.
         self.storage = tempfile.TemporaryDirectory(prefix=self.__class__.__name__)
-        logging.info("Temporary storage directory: %s", self.storage.name)
+        log.info("Temporary storage directory: %s", self.storage.name)
 
         if self.is_pics_sdk_ci_only:
             # Get the named pipe path for the DUT_FSA app input from the user params.
             dut_fsa_stdin_pipe = self.user_params.get("dut_fsa_stdin_pipe")
             if not dut_fsa_stdin_pipe:
                 asserts.fail("CI setup requires --string-arg dut_fsa_stdin_pipe:<path_to_pipe>")
-            self.dut_fsa_stdin = open(dut_fsa_stdin_pipe, "w")
+            self.dut_fsa_stdin = open(dut_fsa_stdin_pipe, "w")  # noqa: SIM115
 
         self.th_server_port = th_server_port
-        # These are default testing values.
-        self.th_server_setup_params = _SetupParameters(
-            setup_qr_code="MT:-24J0AFN00KA0648G00",
-            manual_code=34970112332,
-            discriminator=3840,
+        self.th_server_setup_params = SetupParameters(
+            discriminator=random.randint(0, 4095),
             passcode=20202021)
 
         # Start the TH_SERVER app.
@@ -127,31 +142,35 @@ class TC_MCORE_FS_1_2(MatterBaseTest):
         if self._partslist_subscription is not None:
             self._partslist_subscription.Shutdown()
             self._partslist_subscription = None
+        if self.dut_fsa_stdin is not None:
+            self.dut_fsa_stdin.close()
         if self.th_server is not None:
             self.th_server.terminate()
         if self.storage is not None:
             self.storage.cleanup()
         super().teardown_class()
 
-    def _ask_for_vendor_commissioning_ux_operation(self, setup_params: _SetupParameters):
+    def _ask_for_vendor_commissioning_ux_operation(self, setup_params: SetupParameters):
         self.wait_for_user_input(
             prompt_msg=f"Using the DUT vendor's provided interface, commission the ICD device using the following parameters:\n"
             f"- discriminator: {setup_params.discriminator}\n"
             f"- setupPinCode: {setup_params.passcode}\n"
-            f"- setupQRCode: {setup_params.setup_qr_code}\n"
+            f"- setupQRCode: {setup_params.qr_code}\n"
             f"- setupManualCode: {setup_params.manual_code}\n"
             f"If using FabricSync Admin test app, you may type:\n"
             f">>> pairing onnetwork 111 {setup_params.passcode}")
 
     def steps_TC_MCORE_FS_1_2(self) -> list[TestStep]:
-        steps = [TestStep(1, "TH subscribes to PartsList attribute of the Descriptor cluster of DUT_FSA endpoint 0."),
-                 TestStep(2, "Follow manufacturer provided instructions to have DUT_FSA commission TH_SERVER"),
-                 TestStep(3, "TH waits up to 30 seconds for subscription report from the PartsList attribute of the Descriptor to contain new endpoint"),
-                 TestStep(4, "TH uses DUT to open commissioning window to TH_SERVER"),
-                 TestStep(5, "TH commissions TH_SERVER"),
-                 TestStep(6, "TH reads all attributes in Basic Information cluster from TH_SERVER directly"),
-                 TestStep(7, "TH reads all attributes in the Bridged Device Basic Information cluster on new endpoint identified in step 3 from the DUT_FSA")]
-        return steps
+        return [
+            TestStep("precondition", "Commission DUT if not done", is_commissioning=True),
+            TestStep(1, "TH subscribes to PartsList attribute of the Descriptor cluster of DUT_FSA endpoint 0."),
+            TestStep(2, "Follow manufacturer provided instructions to have DUT_FSA commission TH_SERVER"),
+            TestStep(3, "TH waits up to 30 seconds for subscription report from the PartsList attribute of the Descriptor to contain new endpoint"),
+            TestStep(4, "TH uses DUT to open commissioning window to TH_SERVER"),
+            TestStep(5, "TH commissions TH_SERVER"),
+            TestStep(6, "TH reads all attributes in Basic Information cluster from TH_SERVER directly"),
+            TestStep(7, "TH reads all attributes in the Bridged Device Basic Information cluster on new endpoint identified in step 3 from the DUT_FSA"),
+        ]
 
     # This test has some manual steps, so we need a longer timeout. Test typically runs under 1 mins so 3 mins should
     # be enough time for test to run
@@ -161,6 +180,9 @@ class TC_MCORE_FS_1_2(MatterBaseTest):
 
     @async_test_body
     async def test_TC_MCORE_FS_1_2(self):
+
+        # Commissioning - done
+        self.step("precondition")
 
         min_report_interval_sec = self.user_params.get("min_report_interval_sec", 0)
         max_report_interval_sec = self.user_params.get("max_report_interval_sec", 30)
@@ -172,10 +194,10 @@ class TC_MCORE_FS_1_2(MatterBaseTest):
             (root_endpoint, Clusters.Descriptor.Attributes.PartsList)
         ]
         self._partslist_subscription = await self.default_controller.ReadAttribute(
-            nodeid=self.dut_node_id,
+            nodeId=self.dut_node_id,
             attributes=subscription_contents,
             reportInterval=(min_report_interval_sec, max_report_interval_sec),
-            keepSubscriptions=False
+            keepSubscriptions=True
         )
 
         parts_list_queue = queue.Queue()
@@ -185,21 +207,23 @@ class TC_MCORE_FS_1_2(MatterBaseTest):
         cached_attributes = self._partslist_subscription.GetAttributes()
         step_1_dut_parts_list = cached_attributes[root_endpoint][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList]
 
-        asserts.assert_true(type_matches(step_1_dut_parts_list, list), "PartsList is expected to be a list")
+        asserts.assert_true(matchers.is_type(step_1_dut_parts_list, list), "PartsList is expected to be a list")
 
         self.step(2)
         if not self.is_pics_sdk_ci_only:
             self._ask_for_vendor_commissioning_ux_operation(self.th_server_setup_params)
         else:
-            self.dut_fsa_stdin.write(
-                f"pairing onnetwork 2 {self.th_server_setup_params.passcode}\n")
+            if self.user_params.get("unified_fabric_sync_app"):
+                self.dut_fsa_stdin.write(f"app pair-device 2 {self.th_server_setup_params.qr_code}\n")
+            else:
+                self.dut_fsa_stdin.write(f"pairing onnetwork 2 {self.th_server_setup_params.passcode}\n")
             self.dut_fsa_stdin.flush()
             # Wait for the commissioning to complete.
             await asyncio.sleep(5)
 
         self.step(3)
         report_waiting_timeout_delay_sec = 30
-        logging.info("Waiting for update to PartsList.")
+        log.info("Waiting for update to PartsList.")
         start_time = time.time()
         elapsed = 0
         time_remaining = report_waiting_timeout_delay_sec
@@ -259,7 +283,7 @@ class TC_MCORE_FS_1_2(MatterBaseTest):
         bridged_info_for_th_server = dut_read[newly_added_endpoint][Clusters.BridgedDeviceBasicInformation]
         basic_info_attr = Clusters.BasicInformation.Attributes
         bridged_device_info_attr = Clusters.BridgedDeviceBasicInformation.Attributes
-        Clusters.BasicInformation.Attributes
+
         asserts.assert_equal(th_server_basic_info[basic_info_attr.VendorName],
                              bridged_info_for_th_server[bridged_device_info_attr.VendorName], "VendorName incorrectly reported by DUT")
         asserts.assert_equal(th_server_basic_info[basic_info_attr.VendorID],

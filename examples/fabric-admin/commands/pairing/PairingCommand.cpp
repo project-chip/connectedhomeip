@@ -23,6 +23,7 @@
 #include <commands/interactive/InteractiveCommands.h>
 #include <controller/ExampleOperationalCredentialsIssuer.h>
 #include <crypto/CHIPCryptoPAL.h>
+#include <device_manager/DeviceManager.h>
 #include <device_manager/DeviceSynchronization.h>
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -32,10 +33,6 @@
 #include <setup_payload/QRCodeSetupPayloadParser.h>
 
 #include <string>
-
-#if defined(PW_RPC_ENABLED)
-#include <rpc/RpcClient.h>
-#endif
 
 using namespace ::chip;
 using namespace ::chip::Controller;
@@ -149,7 +146,10 @@ CommissioningParameters PairingCommand::GetCommissioningParameters()
 
         if (!mICDSymmetricKey.HasValue())
         {
-            Crypto::DRBG_get_bytes(mRandomGeneratedICDSymmetricKey, sizeof(mRandomGeneratedICDSymmetricKey));
+            VerifyOrDieWithMsg(Crypto::DRBG_get_bytes(mRandomGeneratedICDSymmetricKey, sizeof(mRandomGeneratedICDSymmetricKey)) ==
+                                   CHIP_NO_ERROR,
+                               NotSpecified, "Failed to generate ICD symmetric key (DRBG failure)");
+
             mICDSymmetricKey.SetValue(ByteSpan(mRandomGeneratedICDSymmetricKey));
         }
         if (!mICDCheckInNodeId.HasValue())
@@ -405,7 +405,7 @@ void PairingCommand::OnCommissioningComplete(NodeId nodeId, CHIP_ERROR err)
         fprintf(stderr, "New device with Node ID: 0x%lx has been successfully added.\n", nodeId);
         // CurrentCommissioner() has a lifetime that is the entire life of the application itself
         // so it is safe to provide to StartDeviceSynchronization.
-        DeviceSynchronizer::Instance().StartDeviceSynchronization(&CurrentCommissioner(), mNodeId, mDeviceIsICD);
+        admin::DeviceSynchronizer::Instance().StartDeviceSynchronization(&CurrentCommissioner(), mNodeId, mDeviceIsICD);
     }
     else
     {
@@ -456,8 +456,9 @@ void PairingCommand::OnICDRegistrationComplete(ScopedNodeId nodeId, uint32_t icd
 {
     char icdSymmetricKeyHex[Crypto::kAES_CCM128_Key_Length * 2 + 1];
 
-    Encoding::BytesToHex(mICDSymmetricKey.Value().data(), mICDSymmetricKey.Value().size(), icdSymmetricKeyHex,
-                         sizeof(icdSymmetricKeyHex), Encoding::HexFlags::kNullTerminate);
+    TEMPORARY_RETURN_IGNORED Encoding::BytesToHex(mICDSymmetricKey.Value().data(), mICDSymmetricKey.Value().size(),
+                                                  icdSymmetricKeyHex, sizeof(icdSymmetricKeyHex),
+                                                  Encoding::HexFlags::kNullTerminate);
 
     app::ICDClientInfo clientInfo;
     clientInfo.peer_node         = nodeId;
@@ -534,16 +535,16 @@ void PairingCommand::OnCurrentFabricRemove(void * context, NodeId nodeId, CHIP_E
     PairingCommand * command = reinterpret_cast<PairingCommand *>(context);
     VerifyOrReturn(command != nullptr, ChipLogError(NotSpecified, "OnCurrentFabricRemove: context is null"));
 
+    ChipLogProgress(NotSpecified, "PairingCommand::OnCurrentFabricRemove");
+
     if (err == CHIP_NO_ERROR)
     {
         // print to console
         fprintf(stderr, "Device with Node ID: 0x%lx has been successfully removed.\n", nodeId);
 
-#if defined(PW_RPC_ENABLED)
         app::InteractionModelEngine::GetInstance()->ShutdownSubscriptions(command->CurrentCommissioner().GetFabricIndex(), nodeId);
         ScopedNodeId scopedNodeId(nodeId, command->CurrentCommissioner().GetFabricIndex());
-        RemoveSynchronizedDevice(scopedNodeId);
-#endif
+        admin::DeviceManager::Instance().RemoveSyncedDevice(scopedNodeId);
     }
     else
     {

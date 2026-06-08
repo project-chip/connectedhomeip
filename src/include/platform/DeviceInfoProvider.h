@@ -24,12 +24,12 @@
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
-#include <platform/AttributeList.h>
+#include <lib/support/Span.h>
 
 namespace chip {
 namespace DeviceLayer {
 
-static constexpr size_t kMaxUserLabelListLength = 10;
+static constexpr size_t kMaxUserLabelListLength = 4;
 static constexpr size_t kMaxLabelNameLength     = 16;
 static constexpr size_t kMaxLabelValueLength    = 16;
 static constexpr size_t kMaxActiveLocaleLength  = 35;
@@ -89,8 +89,46 @@ public:
      */
     void SetStorageDelegate(PersistentStorageDelegate * storage);
 
-    CHIP_ERROR SetUserLabelList(EndpointId endpoint, const AttributeList<UserLabelType, kMaxUserLabelListLength> & labelList);
+    /**
+     * @brief Sets the user label list for a specified endpoint.
+     *
+     * Replaces the current user label list with a new list. If the new list is smaller
+     * than the existing one, excess labels are deleted to free up space.
+     *
+     * @param[in] endpoint The endpoint ID associated with the user label list.
+     * @param[in] labelList The new list of user labels to store.
+     *
+     * @return CHIP_NO_ERROR on success.
+     * @return CHIP_ERROR if an error occurs.
+     */
+    CHIP_ERROR SetUserLabelList(EndpointId endpoint, Span<const UserLabelType> labelList);
+
+    /**
+     * @brief Clears the user label list for a specified endpoint.
+     *
+     * Deletes all user labels associated with the given endpoint, resetting the list length to zero.
+     * If no previous list exists, this function has no effect.
+     *
+     * @param[in] endpoint The endpoint ID whose user label list will be cleared.
+     *
+     * @return CHIP_NO_ERROR on success or if no previous value exists.
+     * @return CHIP_ERROR if an error occurs during deletion.
+     */
     CHIP_ERROR ClearUserLabelList(EndpointId endpoint);
+
+    /**
+     * @brief Appends a user label to the user label list for a specified endpoint.
+     *
+     * Adds a new label to the end of the existing user label list. The list size must not
+     * exceed `kMaxUserLabelListLength`. If the list is full, the function returns an error.
+     *
+     * @param[in] endpoint The endpoint ID to which the user label will be added.
+     * @param[in] label The user label to append to the list.
+     *
+     * @return CHIP_NO_ERROR on success.
+     * @return CHIP_ERROR_NO_MEMORY if the list is already at its maximum size.
+     * @return CHIP_ERROR if an error occurs during storage.
+     */
     CHIP_ERROR AppendUserLabel(EndpointId endpoint, const UserLabelType & label);
 
     // Iterators
@@ -168,7 +206,7 @@ protected:
  *
  * Callers have to externally synchronize usage of this function.
  *
- * @return The global Device Info Provider. Assume never null.
+ * @return The global Device Info Provider.
  */
 DeviceInfoProvider * GetDeviceInfoProvider();
 
@@ -176,8 +214,6 @@ DeviceInfoProvider * GetDeviceInfoProvider();
  * Instance setter for the global DeviceInfoProvider.
  *
  * Callers have to externally synchronize usage of this function.
- *
- * If the `provider` is nullptr, no change is done.
  *
  * @param[in] provider the Device Info Provider
  */

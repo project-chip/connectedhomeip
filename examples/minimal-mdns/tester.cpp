@@ -20,6 +20,7 @@
 #include <memory>
 
 #include <TracingCommandLineArgument.h>
+#include <inet/IPAddress.h>
 #include <inet/InetInterface.h>
 #include <inet/UDPEndPoint.h>
 #include <lib/dnssd/MinimalMdnsServer.h>
@@ -284,7 +285,7 @@ int main(int argc, char ** args)
             // attempts to free UDP sockets with system layer down will segfault
             gMdnsServer.Shutdown();
 
-            DeviceLayer::PlatformMgr().StopEventLoopTask();
+            TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().StopEventLoopTask();
         },
         nullptr);
     if (err != CHIP_NO_ERROR)

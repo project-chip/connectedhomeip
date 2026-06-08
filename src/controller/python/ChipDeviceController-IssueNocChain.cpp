@@ -20,7 +20,7 @@
 #include <string>
 
 #include <controller/CHIPDeviceController.h>
-#include <controller/python/chip/native/PyChipError.h>
+#include <controller/python/matter/native/PyChipError.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/Span.h>
 
@@ -80,8 +80,16 @@ void pychip_DeviceController_IssueNOCChainCallback(void * context, CHIP_ERROR st
     chipRcacSpan = MutableByteSpan(chipRcac.Get(), Credentials::kMaxCHIPCertLength);
 
     SuccessOrExit(err = ConvertX509CertToChipCert(noc, chipNocSpan));
-    SuccessOrExit(err = ConvertX509CertToChipCert(icac, chipIcacSpan));
     SuccessOrExit(err = ConvertX509CertToChipCert(rcac, chipRcacSpan));
+
+    if (!icac.empty())
+    {
+        SuccessOrExit(err = ConvertX509CertToChipCert(icac, chipIcacSpan));
+    }
+    else
+    {
+        chipIcacSpan.reduce_size(0);
+    }
 
 exit:
     if (err == CHIP_NO_ERROR)

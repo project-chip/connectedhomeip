@@ -26,9 +26,8 @@
 
 #pragma once
 
-#include "app/ConcreteCommandPath.h"
 #include <app/AppConfig.h>
-#include <app/DeviceProxy.h>
+#include <app/ConcreteCommandPath.h>
 #include <controller/InvokeInteraction.h>
 #include <controller/ReadInteraction.h>
 #include <controller/WriteInteraction.h>

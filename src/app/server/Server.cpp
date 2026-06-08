@@ -17,16 +17,17 @@
 
 #include <app/server/Server.h>
 
+#include <access/ProviderDeviceTypeResolver.h>
 #include <access/examples/ExampleAccessControlDelegate.h>
 
 #include <app/AppConfig.h>
 #include <app/EventManagement.h>
 #include <app/InteractionModelEngine.h>
+#include <app/SafeAttributePersistenceProvider.h>
 #include <app/data-model-provider/Provider.h>
 #include <app/server/Dnssd.h>
 #include <app/server/EchoHandler.h>
-#include <app/util/DataModelHandler.h>
-#include <app/util/ember-compatibility-functions.h>
+#include <platform/DefaultTimerDelegate.h>
 
 #if CONFIG_NETWORK_LAYER_BLE
 #include <ble/Ble.h>
@@ -57,6 +58,9 @@
 #include <system/SystemPacketBuffer.h>
 #include <system/TLVPacketBufferBackingStore.h>
 #include <transport/SessionManager.h>
+#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
+#include <transport/raw/NFC.h>
+#endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
 #include <transport/raw/WiFiPAF.h>
@@ -80,49 +84,137 @@ using chip::Transport::UdpListenParameters;
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
 using chip::Transport::TcpListenParameters;
 #endif
+#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
+using chip::Transport::NfcListenParameters;
+#endif
 
 namespace {
 
-#if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
-class DeviceTypeResolver : public chip::Access::AccessControl::DeviceTypeResolver
-{
-public:
-    bool IsDeviceTypeOnEndpoint(chip::DeviceTypeId deviceType, chip::EndpointId endpoint) override
-    {
-        chip::app::DataModel::Provider * model = chip::app::InteractionModelEngine::GetInstance()->GetDataModelProvider();
-
-        for (auto type = model->FirstDeviceType(endpoint); type.has_value(); type = model->NextDeviceType(endpoint, *type))
-        {
-            if (type->deviceTypeId == deviceType)
-            {
-#if CHIP_CONFIG_USE_EMBER_DATA_MODEL
-                VerifyOrDie(chip::app::IsDeviceTypeOnEndpoint(deviceType, endpoint));
-#endif // CHIP_CONFIG_USE_EMBER_DATA_MODEL
-                return true;
-            }
-        }
-#if CHIP_CONFIG_USE_EMBER_DATA_MODEL
-        VerifyOrDie(!chip::app::IsDeviceTypeOnEndpoint(deviceType, endpoint));
-#endif // CHIP_CONFIG_USE_EMBER_DATA_MODEL
-        return false;
-    }
-} sDeviceTypeResolver;
-#else // CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
-
-// Ember implementation of the device type resolver
-class DeviceTypeResolver : public chip::Access::AccessControl::DeviceTypeResolver
-{
-public:
-    bool IsDeviceTypeOnEndpoint(chip::DeviceTypeId deviceType, chip::EndpointId endpoint) override
-    {
-        return chip::app::IsDeviceTypeOnEndpoint(deviceType, endpoint);
-    }
-} sDeviceTypeResolver;
-#endif
+chip::Access::DynamicProviderDeviceTypeResolver sDeviceTypeResolver([] {
+    return chip::app::InteractionModelEngine::GetInstance()->GetDataModelProvider();
+});
 
 } // namespace
 
 namespace chip {
+
+#if CHIP_DEVICE_CONFIG_ENABLE_PORT_RETRY
+
+namespace {
+
+/**
+ * Helper function to check if an error is an "address already in use" error
+ *
+ * @param err The error to check
+ * @return true if the error indicates the address/port is already in use
+ */
+bool IsAddressInUseError(CHIP_ERROR err)
+{
+    // CHIP_ERROR_POSIX(EADDRINUSE) - Address already in use
+    // The error code 0x02000062 corresponds to this
+    return (err == CHIP_ERROR_POSIX(EADDRINUSE));
+}
+
+/**
+ * Helper function to safely increment a port number with overflow protection
+ *
+ * @param basePort The base port number
+ * @param increment The amount to increment
+ * @param[out] outPort The resulting port number
+ * @return true if the increment was successful, false if overflow would occur
+ */
+bool SafePortIncrement(uint16_t basePort, uint16_t increment, uint16_t & outPort)
+{
+    // Check for overflow: if basePort + increment > UINT16_MAX
+    if (increment > (UINT16_MAX - basePort))
+    {
+        return false;
+    }
+    outPort = static_cast<uint16_t>(basePort + increment);
+    return true;
+}
+
+/**
+ * Helper function to initialize a transport with automatic port selection and retry logic
+ *
+ * This function attempts to initialize a transport on a specific port, and if the port is already
+ * in use, it will retry with incrementing port numbers up to the specified retry count.
+ *
+ * @param basePort The initial port to try
+ * @param maxRetries Maximum number of retry attempts
+ * @param componentName Name of the component being initialized (for logging)
+ * @param initFunction Function to call to initialize the transport with a given port
+ *                     Returns CHIP_ERROR indicating success or failure
+ * @param closeFunction Function to call to close/cleanup the transport on retry
+ * @param[out] outBoundPort The actual port that was successfully bound
+ * @return CHIP_ERROR indicating success or failure of the initialization
+ */
+CHIP_ERROR InitTransportWithPortRetry(uint16_t basePort, uint16_t maxRetries, const char * componentName,
+                                      std::function<CHIP_ERROR(uint16_t)> initFunction, std::function<void()> closeFunction,
+                                      uint16_t & outBoundPort)
+{
+    uint16_t portToTry     = basePort;
+    uint16_t attemptNumber = 0;
+    CHIP_ERROR err         = CHIP_NO_ERROR;
+
+    for (;;)
+    {
+        // Try next sequential port if retrying
+        if (attemptNumber > 0)
+        {
+            if (!SafePortIncrement(basePort, attemptNumber, portToTry))
+            {
+                ChipLogError(AppServer, "%s: Port increment would overflow (base: %u, increment: %u)", componentName, basePort,
+                             attemptNumber);
+                return CHIP_ERROR_INVALID_ARGUMENT;
+            }
+
+            ChipLogProgress(AppServer, "Retrying %s initialization with port %u (attempt %u/%u)", componentName, portToTry,
+                            attemptNumber + 1, maxRetries + 1);
+        }
+
+        // Attempt to initialize transport with the selected port
+        err = initFunction(portToTry);
+
+        // Check if initialization succeeded
+        if (err == CHIP_NO_ERROR)
+        {
+            // Success! Update the output port to the actually bound port
+            outBoundPort = portToTry;
+            if (attemptNumber > 0)
+            {
+                ChipLogProgress(AppServer, "Successfully bound %s to port %u after %u attempt(s)", componentName, outBoundPort,
+                                attemptNumber + 1);
+            }
+            break;
+        }
+
+        // Check if we should retry
+        if (IsAddressInUseError(err) && attemptNumber < maxRetries)
+        {
+            closeFunction();
+            ChipLogProgress(AppServer, "%s port %u already in use (error: %" CHIP_ERROR_FORMAT "), will retry with different port",
+                            componentName, portToTry, err.Format());
+            attemptNumber++;
+            continue;
+        }
+
+        // No retry possible or different error - break out
+        if (IsAddressInUseError(err))
+        {
+            ChipLogError(AppServer,
+                         "Failed to bind %s to port %u: Address already in use. "
+                         "Consider setting portRetryCount > 0 to enable automatic port selection.",
+                         componentName, portToTry);
+        }
+        break;
+    }
+
+    return err;
+}
+
+} // anonymous namespace
+#endif // CHIP_DEVICE_CONFIG_ENABLE_PORT_RETRY
 
 Server Server::sServer;
 
@@ -131,8 +223,8 @@ Server Server::sServer;
 static uint8_t sInfoEventBuffer[CHIP_DEVICE_CONFIG_EVENT_LOGGING_INFO_BUFFER_SIZE];
 static uint8_t sDebugEventBuffer[CHIP_DEVICE_CONFIG_EVENT_LOGGING_DEBUG_BUFFER_SIZE];
 static uint8_t sCritEventBuffer[CHIP_DEVICE_CONFIG_EVENT_LOGGING_CRIT_BUFFER_SIZE];
-static ::chip::PersistedCounter<chip::EventNumber> sGlobalEventIdCounter;
-static ::chip::app::CircularEventBuffer sLoggingBuffer[CHIP_NUM_EVENT_LOGGING_BUFFERS];
+static PersistedCounter<EventNumber> sGlobalEventIdCounter;
+static app::CircularEventBuffer sLoggingBuffer[CHIP_NUM_EVENT_LOGGING_BUFFERS];
 #endif // CHIP_CONFIG_ENABLE_SERVER_IM_EVENT
 
 CHIP_ERROR Server::Init(const ServerInitParams & initParams)
@@ -149,6 +241,12 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     mUserDirectedCommissioningPort = initParams.userDirectedCommissioningPort;
     mInterfaceId                   = initParams.interfaceId;
 
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    auto tcpListenParams = TcpListenParameters(DeviceLayer::TCPEndPointManager())
+                               .SetAddressType(IPAddressType::kIPv6)
+                               .SetListenPort(mOperationalServicePort);
+#endif
+
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     VerifyOrExit(initParams.persistentStorageDelegate != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
@@ -160,8 +258,17 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     VerifyOrExit(initParams.opCertStore != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(initParams.reportScheduler != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 
-    // TODO(16969): Remove chip::Platform::MemoryInit() call from Server class, it belongs to outer code
-    chip::Platform::MemoryInit();
+    // Extra log since this is an incremental requirement and existing applications may not be aware
+    if (initParams.dataModelProvider == nullptr)
+    {
+        ChipLogError(AppServer, "Application Server requires a `initParams.dataModelProvider` value.");
+        ChipLogError(AppServer, "For backwards compatibility, you likely can use `CodegenDataModelProviderInstance(...)`");
+    }
+
+    VerifyOrExit(initParams.dataModelProvider != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
+
+    // TODO(16969): Remove Platform::MemoryInit() call from Server class, it belongs to outer code
+    TEMPORARY_RETURN_IGNORED Platform::MemoryInit();
 
     // Initialize PersistentStorageDelegate-based storage
     mDeviceStorage                 = initParams.persistentStorageDelegate;
@@ -181,17 +288,16 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     }
 
 #if defined(CHIP_SUPPORT_ENABLE_STORAGE_API_AUDIT)
-    VerifyOrDie(chip::audit::ExecutePersistentStorageApiAudit(*mDeviceStorage));
+    VerifyOrDie(audit::ExecutePersistentStorageApiAudit(*mDeviceStorage));
 #endif
 
 #if defined(CHIP_SUPPORT_ENABLE_STORAGE_LOAD_TEST_AUDIT)
-    VerifyOrDie(chip::audit::ExecutePersistentStorageLoadTestAudit(*mDeviceStorage));
+    VerifyOrDie(audit::ExecutePersistentStorageLoadTestAudit(*mDeviceStorage));
 #endif
 
     // Set up attribute persistence before we try to bring up the data model
     // handler.
     SuccessOrExit(err = mAttributePersister.Init(mDeviceStorage));
-    SetAttributePersistenceProvider(&mAttributePersister);
     SetSafeAttributePersistenceProvider(&mAttributePersister);
 
     {
@@ -204,7 +310,22 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
         SuccessOrExit(err);
     }
 
+    mGroupsProvider = initParams.groupDataProvider;
+    SetGroupDataProvider(mGroupsProvider);
+    mGroupsProvider->SetGroupcastEnabled(CHIP_CONFIG_ENABLE_GROUPCAST);
+
     SuccessOrExit(err = mAccessControl.Init(initParams.accessDelegate, sDeviceTypeResolver));
+    if (initParams.groupAuxiliaryAccessControlDelegate != nullptr)
+    {
+        // If the application handed us an uninitialized delegate (e.g. the default owned by
+        // CommonCaseDeviceServerInitParams), Initialize it now with the Server's FabricTable
+        // so auxiliary-entry iteration walks only provisioned fabric indices.
+        if (!initParams.groupAuxiliaryAccessControlDelegate->IsInitialized())
+        {
+            SuccessOrExit(err = initParams.groupAuxiliaryAccessControlDelegate->Initialize(mGroupsProvider, &mFabrics));
+        }
+        SuccessOrExit(mAccessControl.RegisterGroupAuxiliaryDelegate(initParams.groupAuxiliaryAccessControlDelegate));
+    }
     Access::SetAccessControl(mAccessControl);
 
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
@@ -216,9 +337,6 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
 
     mAclStorage = initParams.aclStorage;
     SuccessOrExit(err = mAclStorage->Init(*mDeviceStorage, mFabrics.begin(), mFabrics.end()));
-
-    mGroupsProvider = initParams.groupDataProvider;
-    SetGroupDataProvider(mGroupsProvider);
 
     mReportScheduler = initParams.reportScheduler;
 
@@ -235,13 +353,77 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     }
 
     // Init transport before operations with secure session mgr.
+    //
+    // The logic below expects that the IPv6 transport is at index 0. Keep that logic in sync with
+    // this code.
+    //
+#if CHIP_DEVICE_CONFIG_ENABLE_PORT_RETRY
+    // Use helper function for automatic port selection with retry logic and overflow protection
+    err = InitTransportWithPortRetry(
+        mOperationalServicePort, initParams.portRetryCount, "transport",
+        [&](uint16_t port) -> CHIP_ERROR {
+    // Update TCP listen params if enabled
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+            tcpListenParams.SetListenPort(port);
+#endif
+
+            // Attempt to initialize transports with the selected port
+            return mTransports.Init(
+                UdpListenParameters(DeviceLayer::UDPEndPointManager())
+                    .SetAddressType(IPAddressType::kIPv6)
+                    .SetListenPort(port)
+                    .SetNativeParams(initParams.endpointNativeParams)
+#if INET_CONFIG_ENABLE_IPV4
+                    ,
+                // The logic below expects that the IPv4 transport, if enabled, is at
+                // index 1. Keep that logic in sync with this code.
+                UdpListenParameters(DeviceLayer::UDPEndPointManager()).SetAddressType(IPAddressType::kIPv4).SetListenPort(port)
+#endif
+#if CONFIG_NETWORK_LAYER_BLE
+                    ,
+                BleListenParameters(DeviceLayer::ConnectivityMgr().GetBleLayer())
+#endif
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+                    ,
+                tcpListenParams
+#if INET_CONFIG_ENABLE_IPV4
+                ,
+                TcpListenParameters(DeviceLayer::TCPEndPointManager()).SetAddressType(IPAddressType::kIPv4).SetListenPort(port)
+#endif
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+                    ,
+                Transport::WiFiPAFListenParameters(
+                    static_cast<Transport::WiFiPAFBase *>(DeviceLayer::ConnectivityMgr().GetWiFiPAF()->mWiFiPAFTransport))
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
+                    ,
+                NfcListenParameters(nullptr)
+#endif
+            );
+        },
+        [&]() {
+            // Close transports from the failed attempt before retrying
+            // BLE transport now handles re-initialization gracefully as a no-op
+            mTransports.Close();
+        },
+        mOperationalServicePort);
+#else // CHIP_DEVICE_CONFIG_ENABLE_PORT_RETRY
+    // Initialize transports without port retry
+
+    // Update TCP listen params if enabled
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    tcpListenParams.SetListenPort(mOperationalServicePort);
+#endif
+
     err = mTransports.Init(UdpListenParameters(DeviceLayer::UDPEndPointManager())
                                .SetAddressType(IPAddressType::kIPv6)
                                .SetListenPort(mOperationalServicePort)
                                .SetNativeParams(initParams.endpointNativeParams)
-
 #if INET_CONFIG_ENABLE_IPV4
                                ,
+                           // The logic below expects that the IPv4 transport, if enabled, is at
+                           // index 1. Keep that logic in sync with this code.
                            UdpListenParameters(DeviceLayer::UDPEndPointManager())
                                .SetAddressType(IPAddressType::kIPv4)
                                .SetListenPort(mOperationalServicePort)
@@ -252,15 +434,25 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
 #endif
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
                                ,
+                           tcpListenParams
+#if INET_CONFIG_ENABLE_IPV4
+                           ,
                            TcpListenParameters(DeviceLayer::TCPEndPointManager())
-                               .SetAddressType(IPAddressType::kIPv6)
+                               .SetAddressType(IPAddressType::kIPv4)
                                .SetListenPort(mOperationalServicePort)
+#endif
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
                                ,
-                           Transport::WiFiPAFListenParameters(DeviceLayer::ConnectivityMgr().GetWiFiPAF())
+                           Transport::WiFiPAFListenParameters(static_cast<Transport::WiFiPAFBase *>(
+                               DeviceLayer::ConnectivityMgr().GetWiFiPAF()->mWiFiPAFTransport))
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
+                               ,
+                           NfcListenParameters(nullptr)
 #endif
     );
+#endif // CHIP_DEVICE_CONFIG_ENABLE_PORT_RETRY
 
     SuccessOrExit(err);
     err = mListener.Init(this);
@@ -278,7 +470,7 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
 
     err = mFabricDelegate.Init(this);
     SuccessOrExit(err);
-    mFabrics.AddFabricDelegate(&mFabricDelegate);
+    TEMPORARY_RETURN_IGNORED mFabrics.AddFabricDelegate(&mFabricDelegate);
 
     err = mExchangeMgr.Init(&mSessions);
     SuccessOrExit(err);
@@ -294,7 +486,7 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     app::DnssdServer::Instance().SetFabricTable(&mFabrics);
     app::DnssdServer::Instance().SetCommissioningModeProvider(&mCommissioningWindowManager);
 
-    chip::Dnssd::Resolver::Instance().Init(DeviceLayer::UDPEndPointManager());
+    TEMPORARY_RETURN_IGNORED Dnssd::Resolver::Instance().Init(DeviceLayer::UDPEndPointManager());
 
 #if CHIP_CONFIG_ENABLE_SERVER_IM_EVENT
     // Initialize event logging subsystem
@@ -303,33 +495,47 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     SuccessOrExit(err);
 
     {
-        ::chip::app::LogStorageResources logStorageResources[] = {
-            { &sDebugEventBuffer[0], sizeof(sDebugEventBuffer), ::chip::app::PriorityLevel::Debug },
-            { &sInfoEventBuffer[0], sizeof(sInfoEventBuffer), ::chip::app::PriorityLevel::Info },
-            { &sCritEventBuffer[0], sizeof(sCritEventBuffer), ::chip::app::PriorityLevel::Critical }
+        app::LogStorageResources logStorageResources[] = {
+            { &sDebugEventBuffer[0], sizeof(sDebugEventBuffer), app::PriorityLevel::Debug },
+            { &sInfoEventBuffer[0], sizeof(sInfoEventBuffer), app::PriorityLevel::Info },
+            { &sCritEventBuffer[0], sizeof(sCritEventBuffer), app::PriorityLevel::Critical }
         };
 
-        chip::app::EventManagement::GetInstance().Init(&mExchangeMgr, CHIP_NUM_EVENT_LOGGING_BUFFERS, &sLoggingBuffer[0],
+        err = app::EventManagement::GetInstance().Init(&mExchangeMgr, CHIP_NUM_EVENT_LOGGING_BUFFERS, &sLoggingBuffer[0],
                                                        &logStorageResources[0], &sGlobalEventIdCounter,
-                                                       std::chrono::duration_cast<System::Clock::Milliseconds64>(mInitTimestamp));
+                                                       std::chrono::duration_cast<System::Clock::Milliseconds64>(mInitTimestamp),
+                                                       &app::InteractionModelEngine::GetInstance()->GetReportingEngine());
+
+        SuccessOrExit(err);
     }
 #endif // CHIP_CONFIG_ENABLE_SERVER_IM_EVENT
 
-    // This initializes clusters, so should come after lower level initialization.
-    InitDataModelHandler();
+    // SetDataModelProvider() initializes and starts the provider, which in turn
+    // triggers the initialization of cluster implementations. This callsite is
+    // critical because it ensures that cluster-level initialization occurs only
+    // after all necessary low-level dependencies have been set up.
+    //
+    // Ordering guarantees:
+    // 1) Provider initialization (under SetDataModelProvider) must happen after
+    //    SetSafeAttributePersistenceProvider to ensure the provider can leverage
+    //    the safe persistence provider for attribute persistence logic.
+    // 2) It must occur after all low-level components that cluster implementations
+    //    might depend on have been initialized, as they rely on these components
+    //    during their own initialization.
+    //
+    // This remains the single point of entry to ensure that all cluster-level
+    // initialization is performed in the correct order.
+    app::InteractionModelEngine::GetInstance()->SetDataModelProvider(initParams.dataModelProvider);
 
 #if defined(CHIP_APP_USE_ECHO)
     err = InitEchoHandler(&mExchangeMgr);
     SuccessOrExit(err);
 #endif
 
-    //
-    // We need to advertise the port that we're listening to for unsolicited messages over UDP. However, we have both a IPv4
-    // and IPv6 endpoint to pick from. Given that the listen port passed in may be set to 0 (which then has the kernel select
-    // a valid port at bind time), that will result in two possible ports being provided back from the resultant endpoint
-    // initializations. Since IPv6 is POR for Matter, let's go ahead and pick that port.
-    //
-    app::DnssdServer::Instance().SetSecuredPort(mTransports.GetTransport().GetImplAtIndex<0>().GetBoundPort());
+    app::DnssdServer::Instance().SetSecuredIPv6Port(mTransports.GetTransport().GetImplAtIndex<0>().GetBoundPort());
+#if INET_CONFIG_ENABLE_IPV4
+    app::DnssdServer::Instance().SetSecuredIPv4Port(mTransports.GetTransport().GetImplAtIndex<1>().GetBoundPort());
+#endif // INET_CONFIG_ENABLE_IPV4
 
     app::DnssdServer::Instance().SetUnsecuredPort(mUserDirectedCommissioningPort);
     app::DnssdServer::Instance().SetInterfaceId(mInterfaceId);
@@ -341,25 +547,27 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     app::DnssdServer::Instance().SetICDManager(&mICDManager);
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    // Enable the TCP Server based on the TCPListenParameters setting.
+    app::DnssdServer::Instance().SetTCPServerEnabled(tcpListenParams.IsServerListenEnabled());
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
+
     if (GetFabricTable().FabricCount() != 0)
     {
 #if CONFIG_NETWORK_LAYER_BLE
         // The device is already commissioned, proactively disable BLE advertisement.
         ChipLogProgress(AppServer, "Fabric already commissioned. Disabling BLE advertisement");
-        chip::DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(false);
+        TEMPORARY_RETURN_IGNORED DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(false);
 #endif
     }
-    else
+    else if (initParams.advertiseCommissionableIfNoFabrics)
     {
-#if CHIP_DEVICE_CONFIG_ENABLE_PAIRING_AUTOSTART
-        SuccessOrExit(err = mCommissioningWindowManager.OpenBasicCommissioningWindow());
-#endif
+        SuccessOrExit(err = mCommissioningWindowManager.OpenBasicCommissioningWindow(initParams.discoveryTimeout));
     }
 
     // TODO @bzbarsky-apple @cecille Move to examples
-    // ESP32 and Mbed OS examples have a custom logic for enabling DNS-SD
-#if !CHIP_DEVICE_LAYER_TARGET_ESP32 && !CHIP_DEVICE_LAYER_TARGET_MBED &&                                                           \
-    (!CHIP_DEVICE_LAYER_TARGET_AMEBA || !CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE)
+    // ESP32 examples have a custom logic for enabling DNS-SD
+#if !CHIP_DEVICE_LAYER_TARGET_ESP32 && (!CHIP_DEVICE_LAYER_TARGET_AMEBA || !CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE)
     // StartServer only enables commissioning mode if device has not been commissioned
     app::DnssdServer::Instance().StartServer();
 #endif
@@ -387,8 +595,8 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
                                                     &mCertificateValidityPolicy, mGroupsProvider);
     SuccessOrExit(err);
 
-    err = chip::app::InteractionModelEngine::GetInstance()->Init(&mExchangeMgr, &GetFabricTable(), mReportScheduler,
-                                                                 &mCASESessionManager, mSubscriptionResumptionStorage);
+    err = app::InteractionModelEngine::GetInstance()->Init(&mExchangeMgr, &GetFabricTable(), mReportScheduler, &mCASESessionManager,
+                                                           mSubscriptionResumptionStorage);
     SuccessOrExit(err);
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
@@ -409,7 +617,7 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
         .SetFabricTable(&GetFabricTable())
         .SetSymmetricKeyStore(mSessionKeystore)
         .SetExchangeManager(&mExchangeMgr)
-        .SetSubscriptionsInfoProvider(chip::app::InteractionModelEngine::GetInstance())
+        .SetSubscriptionsInfoProvider(app::InteractionModelEngine::GetInstance())
         .SetICDCheckInBackOffStrategy(initParams.icdCheckInBackOffStrategy);
 
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP
@@ -418,7 +626,7 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     // Register Test Event Trigger Handler
     if (mTestEventTriggerDelegate != nullptr)
     {
-        mTestEventTriggerDelegate->AddHandler(&mICDManager);
+        TEMPORARY_RETURN_IGNORED mTestEventTriggerDelegate->AddHandler(&mICDManager);
     }
 
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
@@ -428,9 +636,9 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     //
     // Thread LWIP devices using dedicated Inet endpoint implementations are excluded because they call this function from:
     // src/platform/OpenThread/GenericThreadStackManagerImpl_OpenThread_LwIP.cpp
-#if !CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+#if !CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
     RejoinExistingMulticastGroups();
-#endif // !CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+#endif // !CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
 
     // Handle deferred clean-up of a previously armed fail-safe that occurred during FabricTable commit.
     // This is done at the very end since at the earlier time above when FabricTable::Init() is called,
@@ -455,7 +663,7 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
             // Because Matter runs a single event loop for all scheduled work, it will occur after the above has
             // taken place. If a reset occurs before we have cleaned everything up, the next boot will still
             // see the commit marker.
-            PlatformMgr().ScheduleWork(
+            TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(
                 [](intptr_t arg) {
                     Server * server = reinterpret_cast<Server *>(arg);
                     VerifyOrReturn(server != nullptr);
@@ -468,23 +676,48 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT // support UDC port for commissioner declaration msgs
-    mUdcTransportMgr = chip::Platform::New<UdcTransportMgr>();
-    ReturnErrorOnFailure(mUdcTransportMgr->Init(Transport::UdpListenParameters(DeviceLayer::UDPEndPointManager())
-                                                    .SetAddressType(Inet::IPAddressType::kIPv6)
-                                                    .SetListenPort(static_cast<uint16_t>(mCdcListenPort))
+#if CHIP_DEVICE_CONFIG_ENABLE_PORT_RETRY
+    // Use helper function for UDC transport initialization with automatic port selection and overflow protection
+    mUdcTransportMgr = Platform::New<UdcTransportMgr>();
+    err              = InitTransportWithPortRetry(
+        mCdcListenPort, initParams.portRetryCount, "UDC transport",
+        [&](uint16_t port) -> CHIP_ERROR {
+            // Attempt to initialize UDC transport with the selected port
+            return mUdcTransportMgr->Init(Transport::UdpListenParameters(DeviceLayer::UDPEndPointManager())
+                                                           .SetAddressType(Inet::IPAddressType::kIPv6)
+                                                           .SetListenPort(port)
+                                                           .SetNativeParams(initParams.endpointNativeParams)
 #if INET_CONFIG_ENABLE_IPV4
-                                                    ,
-                                                Transport::UdpListenParameters(DeviceLayer::UDPEndPointManager())
-                                                    .SetAddressType(Inet::IPAddressType::kIPv4)
-                                                    .SetListenPort(static_cast<uint16_t>(mCdcListenPort))
+                                              ,
+                                          Transport::UdpListenParameters(DeviceLayer::UDPEndPointManager())
+                                              .SetAddressType(Inet::IPAddressType::kIPv4)
+                                              .SetListenPort(port)
 #endif // INET_CONFIG_ENABLE_IPV4
-                                                    ));
+            );
+        },
+        [&]() { mUdcTransportMgr->Close(); }, mCdcListenPort);
+#else // CHIP_DEVICE_CONFIG_ENABLE_PORT_RETRY
+    // Initialize UDC transport without port retry
+    mUdcTransportMgr = Platform::New<UdcTransportMgr>();
+    err              = mUdcTransportMgr->Init(Transport::UdpListenParameters(DeviceLayer::UDPEndPointManager())
+                                                  .SetAddressType(Inet::IPAddressType::kIPv6)
+                                                  .SetListenPort(mCdcListenPort)
+                                                  .SetNativeParams(initParams.endpointNativeParams)
+#if INET_CONFIG_ENABLE_IPV4
+                                                  ,
+                                              Transport::UdpListenParameters(DeviceLayer::UDPEndPointManager())
+                                                  .SetAddressType(Inet::IPAddressType::kIPv4)
+                                                  .SetListenPort(mCdcListenPort)
+#endif // INET_CONFIG_ENABLE_IPV4
+                 );
+#endif // CHIP_DEVICE_CONFIG_ENABLE_PORT_RETRY
+    SuccessOrExit(err);
 
-    gUDCClient = chip::Platform::New<Protocols::UserDirectedCommissioning::UserDirectedCommissioningClient>();
+    gUDCClient = Platform::New<Protocols::UserDirectedCommissioning::UserDirectedCommissioningClient>();
     mUdcTransportMgr->SetSessionManager(gUDCClient);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 
-    PlatformMgr().AddEventHandler(OnPlatformEventWrapper, reinterpret_cast<intptr_t>(this));
+    TEMPORARY_RETURN_IGNORED PlatformMgr().AddEventHandler(OnPlatformEventWrapper, reinterpret_cast<intptr_t>(this));
     PlatformMgr().HandleServerStarted();
 
     mIsDnssdReady = Dnssd::Resolver::Instance().IsInitialized();
@@ -532,7 +765,7 @@ void Server::OnPlatformEvent(const DeviceLayer::ChipDeviceEvent & event)
         ResumeSubscriptions();
 #endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
         break;
-#if CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+#if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
     case DeviceEventType::kThreadConnectivityChange:
         if (event.ThreadConnectivityChange.Result == kConnectivity_Established)
         {
@@ -541,7 +774,7 @@ void Server::OnPlatformEvent(const DeviceLayer::ChipDeviceEvent & event)
             RejoinExistingMulticastGroups();
         }
         break;
-#endif // CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+#endif // CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
     default:
         break;
     }
@@ -569,6 +802,8 @@ void Server::RejoinExistingMulticastGroups()
 {
     ChipLogProgress(AppServer, "Joining Multicast groups");
     CHIP_ERROR err = CHIP_NO_ERROR;
+
+    bool groupcast_joined = false;
     for (const FabricInfo & fabric : mFabrics)
     {
         Credentials::GroupDataProvider::GroupInfo groupInfo;
@@ -579,8 +814,18 @@ void Server::RejoinExistingMulticastGroups()
             // GroupDataProvider was able to allocate rescources for an iterator
             while (iterator->Next(groupInfo))
             {
-                err = mTransports.MulticastGroupJoinLeave(
-                    Transport::PeerAddress::Multicast(fabric.GetFabricId(), groupInfo.group_id), true);
+                bool use_iana_addr = !groupInfo.UsePerGroupAddress();
+                if (use_iana_addr && groupcast_joined)
+                {
+                    // Already joined groupcast address
+                    continue;
+                }
+
+                const Transport::PeerAddress & address = use_iana_addr
+                    ? Transport::PeerAddress::BuildMatterIanaMulticastAddress()
+                    : Transport::PeerAddress::BuildMatterPerGroupMulticastAddress(fabric.GetFabricId(), groupInfo.group_id);
+
+                err = mTransports.MulticastGroupJoinLeave(address, true);
                 if (err != CHIP_NO_ERROR)
                 {
                     ChipLogError(AppServer, "Error when trying to join Group %u of fabric index %u : %" CHIP_ERROR_FORMAT,
@@ -591,6 +836,8 @@ void Server::RejoinExistingMulticastGroups()
                     iterator->Release();
                     return;
                 }
+                if (use_iana_addr)
+                    groupcast_joined = true;
             }
 
             iterator->Release();
@@ -613,12 +860,25 @@ bool Server::ShouldCheckInMsgsBeSentAtBootFunction(FabricIndex aFabricIndex, Nod
 
 void Server::GenerateShutDownEvent()
 {
-    PlatformMgr().ScheduleWork([](intptr_t) { PlatformMgr().HandleServerShuttingDown(); });
+    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork([](intptr_t) { PlatformMgr().HandleServerShuttingDown(); });
+}
+
+void Server::PostFactoryResetEvent()
+{
+    DeviceLayer::ChipDeviceEvent event{ .Type = DeviceLayer::DeviceEventType::kFactoryReset };
+
+    CHIP_ERROR error = DeviceLayer::PlatformMgr().PostEvent(&event);
+    if (error != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "Posting kFactoryReset event failed with %" CHIP_ERROR_FORMAT, error.Format());
+    }
 }
 
 void Server::ScheduleFactoryReset()
 {
-    PlatformMgr().ScheduleWork([](intptr_t) {
+    PostFactoryResetEvent();
+
+    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork([](intptr_t) {
         // Delete all fabrics and emit Leave event.
         GetInstance().GetFabricTable().DeleteAllFabrics();
         PlatformMgr().HandleServerShuttingDown();
@@ -629,33 +889,39 @@ void Server::ScheduleFactoryReset()
 void Server::Shutdown()
 {
     assertChipStackLockedByCurrentThread();
-    PlatformMgr().RemoveEventHandler(OnPlatformEventWrapper, 0);
+    PlatformMgr().RemoveEventHandler(OnPlatformEventWrapper, reinterpret_cast<intptr_t>(this));
     mCASEServer.Shutdown();
     mCASESessionManager.Shutdown();
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     app::DnssdServer::Instance().SetICDManager(nullptr);
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
     app::DnssdServer::Instance().SetCommissioningModeProvider(nullptr);
-    chip::Dnssd::ServiceAdvertiser::Instance().Shutdown();
+    Dnssd::ServiceAdvertiser::Instance().Shutdown();
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
     if (mUdcTransportMgr != nullptr)
     {
-        chip::Platform::Delete(mUdcTransportMgr);
+        Platform::Delete(mUdcTransportMgr);
         mUdcTransportMgr = nullptr;
     }
     if (gUDCClient != nullptr)
     {
-        chip::Platform::Delete(gUDCClient);
+        Platform::Delete(gUDCClient);
         gUDCClient = nullptr;
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 
-    chip::Dnssd::Resolver::Instance().Shutdown();
-    chip::app::InteractionModelEngine::GetInstance()->Shutdown();
+    Dnssd::Resolver::Instance().Shutdown();
+    app::InteractionModelEngine::GetInstance()->Shutdown();
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     app::InteractionModelEngine::GetInstance()->SetICDManager(nullptr);
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
+
+    // EventManagement::Init() guards against double-init with a state check.
+    // Reset it here (after IME shutdown, which may trigger cluster shutdowns
+    // that access EventManagement) so a subsequent Server::Init() can re-initialize it.
+    app::EventManagement::DestroyEventManagement();
+
     // Shut down any remaining sessions (and hence exchanges) before we do any
     // futher teardown.  CASE handshakes have been shut down already via
     // shutting down mCASESessionManager and mCASEServer above; shutting
@@ -678,7 +944,7 @@ void Server::Shutdown()
     }
     mICDManager.Shutdown();
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
-    mAttributePersister.Shutdown();
+
     // TODO(16969): Remove chip::Platform::MemoryInit() call from Server class, it belongs to outer code
     chip::Platform::MemoryShutdown();
 }
@@ -687,7 +953,7 @@ void Server::Shutdown()
 // NOTE: UDC client is located in Server.cpp because it really only makes sense
 // to send UDC from a Matter device. The UDC message payload needs to include the device's
 // randomly generated service name.
-CHIP_ERROR Server::SendUserDirectedCommissioningRequest(chip::Transport::PeerAddress commissioner,
+CHIP_ERROR Server::SendUserDirectedCommissioningRequest(Transport::PeerAddress commissioner,
                                                         Protocols::UserDirectedCommissioning::IdentificationDeclaration & id)
 {
     ChipLogDetail(AppServer, "Server::SendUserDirectedCommissioningRequest()");
@@ -698,7 +964,7 @@ CHIP_ERROR Server::SendUserDirectedCommissioningRequest(chip::Transport::PeerAdd
     if (strlen(id.GetInstanceName()) == 0)
     {
         ChipLogDetail(AppServer, "Server::SendUserDirectedCommissioningRequest() Instance Name not known");
-        char nameBuffer[chip::Dnssd::Commission::kInstanceNameMaxLength + 1];
+        char nameBuffer[Dnssd::Commission::kInstanceNameMaxLength + 1];
         err = app::DnssdServer::Instance().GetCommissionableInstanceName(nameBuffer, sizeof(nameBuffer));
         if (err != CHIP_NO_ERROR)
         {
@@ -740,9 +1006,9 @@ CHIP_ERROR Server::SendUserDirectedCommissioningRequest(chip::Transport::PeerAdd
 
     if (strlen(id.GetDeviceName()) == 0)
     {
-        char deviceName[chip::Dnssd::kKeyDeviceNameMaxLength + 1] = {};
-        if (!chip::DeviceLayer::ConfigurationMgr().IsCommissionableDeviceNameEnabled() ||
-            chip::DeviceLayer::ConfigurationMgr().GetCommissionableDeviceName(deviceName, sizeof(deviceName)) != CHIP_NO_ERROR)
+        char deviceName[Dnssd::kKeyDeviceNameMaxLength + 1] = {};
+        if (!DeviceLayer::ConfigurationMgr().IsCommissionableDeviceNameEnabled() ||
+            DeviceLayer::ConfigurationMgr().GetCommissionableDeviceName(deviceName, sizeof(deviceName)) != CHIP_NO_ERROR)
         {
             ChipLogDetail(AppServer, "Server::SendUserDirectedCommissioningRequest() Device Name not known");
         }
@@ -756,13 +1022,13 @@ CHIP_ERROR Server::SendUserDirectedCommissioningRequest(chip::Transport::PeerAdd
     if (id.GetRotatingIdLength() == 0)
     {
         AdditionalDataPayloadGeneratorParams additionalDataPayloadParams;
-        uint8_t rotatingDeviceIdUniqueId[chip::DeviceLayer::ConfigurationManager::kRotatingDeviceIDUniqueIDLength];
+        uint8_t rotatingDeviceIdUniqueId[DeviceLayer::ConfigurationManager::kRotatingDeviceIDUniqueIDLength];
         MutableByteSpan rotatingDeviceIdUniqueIdSpan(rotatingDeviceIdUniqueId);
 
         ReturnErrorOnFailure(
-            chip::DeviceLayer::GetDeviceInstanceInfoProvider()->GetRotatingDeviceIdUniqueId(rotatingDeviceIdUniqueIdSpan));
+            DeviceLayer::GetDeviceInstanceInfoProvider()->GetRotatingDeviceIdUniqueId(rotatingDeviceIdUniqueIdSpan));
         ReturnErrorOnFailure(
-            chip::DeviceLayer::ConfigurationMgr().GetLifetimeCounter(additionalDataPayloadParams.rotatingDeviceIdLifetimeCounter));
+            DeviceLayer::ConfigurationMgr().GetLifetimeCounter(additionalDataPayloadParams.rotatingDeviceIdLifetimeCounter));
         additionalDataPayloadParams.rotatingDeviceIdUniqueId = rotatingDeviceIdUniqueIdSpan;
 
         uint8_t rotatingDeviceIdInternalBuffer[RotatingDeviceId::kMaxLength];
@@ -797,7 +1063,7 @@ CHIP_ERROR Server::SendUserDirectedCommissioningRequest(chip::Transport::PeerAdd
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
 void Server::ResumeSubscriptions()
 {
-    CHIP_ERROR err = chip::app::InteractionModelEngine::GetInstance()->ResumeSubscriptions();
+    CHIP_ERROR err = app::InteractionModelEngine::GetInstance()->ResumeSubscriptions();
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(AppServer, "Error when trying to resume subscriptions : %" CHIP_ERROR_FORMAT, err.Format());
@@ -806,24 +1072,5 @@ void Server::ResumeSubscriptions()
 #endif
 
 Credentials::IgnoreCertificateValidityPeriodPolicy Server::sDefaultCertValidityPolicy;
-
-KvsPersistentStorageDelegate CommonCaseDeviceServerInitParams::sKvsPersistenStorageDelegate;
-PersistentStorageOperationalKeystore CommonCaseDeviceServerInitParams::sPersistentStorageOperationalKeystore;
-Credentials::PersistentStorageOpCertStore CommonCaseDeviceServerInitParams::sPersistentStorageOpCertStore;
-Credentials::GroupDataProviderImpl CommonCaseDeviceServerInitParams::sGroupDataProvider;
-app::DefaultTimerDelegate CommonCaseDeviceServerInitParams::sTimerDelegate;
-app::reporting::ReportSchedulerImpl
-    CommonCaseDeviceServerInitParams::sReportScheduler(&CommonCaseDeviceServerInitParams::sTimerDelegate);
-#if CHIP_CONFIG_ENABLE_SESSION_RESUMPTION
-SimpleSessionResumptionStorage CommonCaseDeviceServerInitParams::sSessionResumptionStorage;
-#endif
-#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
-app::SimpleSubscriptionResumptionStorage CommonCaseDeviceServerInitParams::sSubscriptionResumptionStorage;
-#endif
-app::DefaultAclStorage CommonCaseDeviceServerInitParams::sAclStorage;
-Crypto::DefaultSessionKeystore CommonCaseDeviceServerInitParams::sSessionKeystore;
-#if CHIP_CONFIG_ENABLE_ICD_CIP
-app::DefaultICDCheckInBackOffStrategy CommonCaseDeviceServerInitParams::sDefaultICDCheckInBackOffStrategy;
-#endif
 
 } // namespace chip

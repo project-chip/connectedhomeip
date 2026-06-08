@@ -133,19 +133,19 @@ void PerfettoBackend::LogMetricEvent(const MetricEvent & event)
     switch (event.ValueType())
     {
     case ValueType::kInt32:
-        TRACE_EVENT_INSTANT("Matter", event.key(), "value", event.ValueInt32());
+        TRACE_EVENT_INSTANT("Matter", perfetto::DynamicString(event.key()), "value", event.ValueInt32());
         break;
     case ValueType::kUInt32:
-        TRACE_EVENT_INSTANT("Matter", event.key(), "value", event.ValueUInt32());
+        TRACE_EVENT_INSTANT("Matter", perfetto::DynamicString(event.key()), "value", event.ValueUInt32());
         break;
     case ValueType::kChipErrorCode:
-        TRACE_EVENT_INSTANT("Matter", event.key(), "error", event.ValueErrorCode());
+        TRACE_EVENT_INSTANT("Matter", perfetto::DynamicString(event.key()), "error", event.ValueErrorCode());
         break;
     case ValueType::kUndefined:
-        TRACE_EVENT_INSTANT("Matter", event.key());
+        TRACE_EVENT_INSTANT("Matter", perfetto::DynamicString(event.key()));
         break;
     default:
-        TRACE_EVENT_INSTANT("Matter", event.key(), "type", "UNKNOWN");
+        TRACE_EVENT_INSTANT("Matter", perfetto::DynamicString(event.key()), "type", "UNKNOWN");
         break;
     }
 }

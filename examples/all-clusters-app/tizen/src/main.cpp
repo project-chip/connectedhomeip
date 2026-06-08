@@ -20,6 +20,7 @@
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/clusters/network-commissioning/network-commissioning.h>
+#include <app/clusters/temperature-control-server/temperature-control-server.h>
 #include <app/util/endpoint-config-api.h>
 #include <platform/Tizen/NetworkCommissioningDriver.h>
 #include <static-supported-modes-manager.h>
@@ -49,8 +50,8 @@ void ApplicationInit()
     // Enable secondary endpoint only when we need it.
     emberAfEndpointEnableDisable(kNetworkCommissioningEndpointSecondary, false);
 
-    sEthernetNetworkCommissioningInstance.Init();
-    app::Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
+    SuccessOrDie(sEthernetNetworkCommissioningInstance.Init());
+    app::Clusters::TemperatureControl::SetDelegate(&sAppSupportedTemperatureLevelsDelegate);
     Clusters::ModeSelect::setSupportedModesManager(&sStaticSupportedModesManager);
 }
 
@@ -61,7 +62,7 @@ int main(int argc, char * argv[])
     TizenServiceAppMain app;
     VerifyOrDie(app.Init(argc, argv) == 0);
 
-    VerifyOrDie(InitBindingHandlers() == CHIP_NO_ERROR);
+    SuccessOrDie(InitBindingHandlers());
 
     return app.RunMainLoop();
 }

@@ -17,13 +17,18 @@ import("//build_overrides/chip.gni")
 
 import("//build_overrides/bouffalolab_iot_sdk.gni")
 import("${build_root}/toolchain/gcc_toolchain.gni")
+import("${chip_root}/src/platform/device.gni")
 
 template("riscv_toolchain") {
   gcc_toolchain(target_name) {
     _tool_name_root = ""
 
     if ("linux" == host_os) {
-      _tool_name_root = "${bouffalolab_sdk_root}/toolchain/riscv/Linux/bin/riscv64-unknown-elf-"
+      if (chip_device_platform == "bl616") {
+        _tool_name_root = "${bouffalolab_sdk_root}/toolchain/t-head-riscv/gcc_t-head_v2.6.1/bin/riscv64-unknown-elf-"
+      } else {
+        _tool_name_root = "${bouffalolab_sdk_root}/toolchain/riscv/Linux/bin/riscv64-unknown-elf-"
+      }
     } else if ("mac" == host_os || "darwin" == host_os) {
       _tool_name_root = "${bouffalolab_sdk_root}/toolchain/riscv/Darwin/bin/riscv64-unknown-elf-"
     }

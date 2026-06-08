@@ -45,7 +45,7 @@ NSString * const kDarwinFrameworkToolCertificatesDomain = @"com.apple.chiptool";
     return [_storage reset];
 }
 
-// MARK: CHIPPersistentStorageDelegate
+#pragma mark - CHIPPersistentStorageDelegate
 
 - (nullable NSData *)storageDataForKey:(NSString *)key
 {

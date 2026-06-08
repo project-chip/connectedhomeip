@@ -61,7 +61,7 @@ void JniReferences::SetJavaVm(JavaVM * jvm, const char * clsType)
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Support, "fail to init mArrayListClass"));
     err = chip::JniReferences::GetInstance().GetLocalClassRef(env, "java/util/HashMap", hashMapClass);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Support, "fail to get local class ref for HashMap"));
-    mHashMapClass.Init(static_cast<jobject>(hashMapClass));
+    err = mHashMapClass.Init(static_cast<jobject>(hashMapClass));
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Support, "fail to init mHashMapClass"));
 }
 
@@ -310,8 +310,8 @@ CHIP_ERROR JniReferences::GetOptionalValue(jobject optionalObj, jobject & option
 {
     JNIEnv * env = GetEnvForCurrentThread();
     VerifyOrReturnError(env != nullptr, CHIP_JNI_ERROR_NULL_OBJECT);
-    jclass optionalCls = nullptr;
-    ReturnErrorOnFailure(chip::JniReferences::GetInstance().GetLocalClassRef(env, "java/util/Optional", optionalCls));
+    VerifyOrReturnError(optionalObj != nullptr, CHIP_JNI_ERROR_NULL_OBJECT);
+    jclass optionalCls        = env->GetObjectClass(optionalObj);
     jmethodID isPresentMethod = env->GetMethodID(optionalCls, "isPresent", "()Z");
     VerifyOrReturnError(isPresentMethod != nullptr, CHIP_JNI_ERROR_METHOD_NOT_FOUND);
     jboolean isPresent = optionalObj && env->CallBooleanMethod(optionalObj, isPresentMethod);

@@ -30,7 +30,7 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
-import com.R;
+import com.chip.casting.R;
 import com.matter.casting.core.CastingPlayer;
 import com.matter.casting.support.CommissionerDeclaration;
 import com.matter.casting.support.ConnectionCallbacks;
@@ -47,9 +47,6 @@ public class ConnectionExampleFragment extends Fragment {
   // Must be >= 3 minutes.
   private static final short MIN_CONNECTION_TIMEOUT_SEC = 3 * 60;
   private static final Integer DESIRED_TARGET_APP_VENDOR_ID = 65521;
-  // Use this Target Content Application Vendor ID, configured on the tv-app, to demonstrate the
-  // CastingPlayer/Commissioner-Generated passcode commissioning flow.
-  private static final Integer DESIRED_TARGET_APP_VENDOR_ID_FOR_CGP_FLOW = 1111;
   private static final long DEFAULT_COMMISSIONER_GENERATED_PASSCODE = 12345678;
   private static final int DEFAULT_DISCRIMINATOR_FOR_CGP_FLOW = 0;
   private final CastingPlayer targetCastingPlayer;
@@ -139,8 +136,8 @@ public class ConnectionExampleFragment extends Fragment {
               if (useCommissionerGeneratedPasscode) {
                 // Set commissionerPasscode to true for CastingPlayer/Commissioner-Generated
                 // passcode commissioning.
-                idOptions = new IdentificationDeclarationOptions(false, false, true, false, false);
-                targetAppInfo = new TargetAppInfo(DESIRED_TARGET_APP_VENDOR_ID_FOR_CGP_FLOW);
+                idOptions =
+                    new IdentificationDeclarationOptions(false, false, true, false, false, 0);
                 Log.d(
                     TAG,
                     "onViewCreated() calling CastingPlayer.verifyOrEstablishConnection() Target Content Application Vendor ID: "
@@ -148,7 +145,16 @@ public class ConnectionExampleFragment extends Fragment {
                         + ", useCommissionerGeneratedPasscode: "
                         + useCommissionerGeneratedPasscode);
               } else {
-                idOptions = new IdentificationDeclarationOptions();
+                int passcodeLength =
+                    String.valueOf(
+                            Math.abs(
+                                InitializationExample.commissionableDataProvider
+                                    .get()
+                                    .getSetupPasscode()))
+                        .length();
+                idOptions =
+                    new IdentificationDeclarationOptions(
+                        false, false, false, false, false, passcodeLength);
                 Log.d(
                     TAG,
                     "onViewCreated() calling CastingPlayer.verifyOrEstablishConnection() Target Content Application Vendor ID: "
@@ -211,7 +217,7 @@ public class ConnectionExampleFragment extends Fragment {
 
                       FragmentActivity activity = getActivity();
                       // Prevent possible NullPointerException. This callback could be called when
-                      // this Fragment is not attached to its host activity or when the fragment's
+                      // this fragment is not attached to its host activity or when the fragment's
                       // lifecycle is not in a valid state for interacting with the activity.
                       if (activity != null && !activity.isFinishing()) {
                         activity.runOnUiThread(
@@ -223,7 +229,9 @@ public class ConnectionExampleFragment extends Fragment {
                                 displayPasscodeInputDialog(activity);
 
                                 connectionFragmentStatusTextView.setText(
-                                    "CommissionerDeclaration message received from Casting Player: A passcode is now displayed for the user by the Casting Player. \n\n");
+                                    "CommissionerDeclaration message received from Casting Player: A passcode (length "
+                                        + cd.getPasscodeLength()
+                                        + ") is now displayed for the user by the Casting Player. \n\n");
                               }
                               if (cd.getCancelPasscode()) {
                                 if (useCommissionerGeneratedPasscode) {
@@ -260,6 +268,21 @@ public class ConnectionExampleFragment extends Fragment {
                         });
               }
             });
+  }
+
+  @Override
+  public void onStop() {
+    super.onStop();
+    // Only stop connection if we are still connecting to the device
+    if (targetCastingPlayer.getConnectionState() == CastingPlayer.ConnectionState.CONNECTING) {
+      // NOTE, once stopConnecting() is called, the targetCastingPlayer's native object is freed
+      MatterError err = targetCastingPlayer.stopConnecting();
+      if (err.hasError()) {
+        Log.e(
+            TAG,
+            "Going back before connection finishes but stopConnecting() failed due to: " + err);
+      }
+    }
   }
 
   private void displayPasscodeInputDialog(Context context) {
@@ -336,18 +359,9 @@ public class ConnectionExampleFragment extends Fragment {
                         connectionFragmentStatusTextView.setText(
                             "Casting Player CONTINUE CONNECTING failed due to: "
                                 + finalErr
-                                + "\n\n");
+                                + ". Route back to disconnect & try again. \n\n");
                       });
-              Log.e(
-                  TAG,
-                  "displayPasscodeInputDialog() continueConnecting() failed, calling stopConnecting() due to: "
-                      + err);
-              // Since continueConnecting() failed, Attempt to cancel the connection attempt with
-              // the CastingPlayer/Commissioner.
-              err = targetCastingPlayer.stopConnecting();
-              if (err.hasError()) {
-                Log.e(TAG, "displayPasscodeInputDialog() stopConnecting() failed due to: " + err);
-              }
+              Log.e(TAG, "displayPasscodeInputDialog() continueConnecting() failed due to: " + err);
             }
           }
         });
@@ -359,20 +373,9 @@ public class ConnectionExampleFragment extends Fragment {
           public void onClick(DialogInterface dialog, int which) {
             Log.i(
                 TAG,
-                "displayPasscodeInputDialog() user cancelled the CastingPlayer/Commissioner-Generated Passcode input dialog. Calling stopConnecting()");
+                "displayPasscodeInputDialog() user cancelled the CastingPlayer/Commissioner-Generated Passcode input dialog");
             connectionFragmentStatusTextView.setText(
-                "Connection attempt with Casting Player cancelled by the Casting Client/Commissionee user. \n\nRoute back to exit. \n\n");
-            MatterError err = targetCastingPlayer.stopConnecting();
-            if (err.hasError()) {
-              MatterError finalErr = err;
-              getActivity()
-                  .runOnUiThread(
-                      () -> {
-                        connectionFragmentStatusTextView.setText(
-                            "Casting Player CANCEL failed due to: " + finalErr + "\n\n");
-                      });
-              Log.e(TAG, "displayPasscodeInputDialog() stopConnecting() failed due to: " + err);
-            }
+                "Connection attempt with Casting Player cancelled by the Casting Client/Commissionee user. \n\nRoute back to disconnect & exit. \n\n");
             dialog.cancel();
           }
         });

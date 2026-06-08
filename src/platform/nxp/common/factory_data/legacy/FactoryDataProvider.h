@@ -16,24 +16,27 @@
  */
 #pragma once
 
+#include <credentials/CHIPCert.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
+#include <lib/core/CHIPError.h>
 #include <platform/CommissionableDataProvider.h>
 #include <platform/internal/GenericDeviceInstanceInfoProvider.h>
-#include <src/lib/core/CHIPError.h>
+
+#if CONFIG_CHIP_OTA_FACTORY_DATA_PROCESSOR
+#include <lib/support/DefaultStorageKeyAllocator.h>
+#endif
 
 #include <platform/nxp/common/factory_data/legacy/FactoryDataDriver.h>
 
 #include <vector>
 
-#include "CHIPPlatformConfig.h"
-
-#include <vector>
+#include CHIP_PLATFORM_CONFIG_INCLUDE
 
 namespace chip {
 namespace DeviceLayer {
 
 #define CHIP_FACTORY_DATA_ERROR(e)                                                                                                 \
-    ChipError(ChipError::Range::kLastRange, ((uint8_t) ChipError::Range::kLastRange << 2) | e, __FILE__, __LINE__)
+    CHIP_GENERIC_ERROR(ChipError::Range::kLastRange, ((uint8_t) ChipError::Range::kLastRange << 2) | e)
 
 #define CHIP_FACTORY_DATA_SHA_CHECK CHIP_FACTORY_DATA_ERROR(0x01)
 #define CHIP_FACTORY_DATA_HEADER_READ CHIP_FACTORY_DATA_ERROR(0x02)
@@ -66,12 +69,30 @@ public:
         uint32_t size;
         uint8_t hash[4];
     };
+    enum KeyType
+    {
+        kHwKey  = 0U,
+        kSftKey = 1U,
+    };
 
     struct FactoryDataConfig
     {
         uint32_t start;
         uint32_t size;
         uint32_t payload;
+    };
+
+    enum EncryptionMode
+    {
+        encrypt_none = 0U,
+        encrypt_ecb  = 1U,
+        encrypt_cbc  = 2U
+    };
+
+    enum AESKeySize
+    {
+        aes_128 = 128u,
+        aes_256 = 256U
     };
 
     // Default factory data IDs
@@ -100,6 +121,10 @@ public:
         kProductLabel,
         kProductFinish,
         kProductPrimaryColor,
+        kEl2GoBlob,
+        kEl2GoDacKeyId,
+        kEl2GoDacCertId,
+
         kMaxId
     };
 
@@ -117,6 +142,12 @@ public:
 
     virtual CHIP_ERROR SearchForId(uint8_t searchedType, uint8_t * pBuf, size_t bufLength, uint16_t & length,
                                    uint32_t * offset = nullptr);
+    virtual CHIP_ERROR SetAesKey(const uint8_t * keyAes, AESKeySize keySize);
+    virtual CHIP_ERROR SetEncryptionMode(EncryptionMode mode);
+    virtual CHIP_ERROR EncryptFactoryData(uint8_t * FactoryDataBuff) { return CHIP_NO_ERROR; };
+    virtual CHIP_ERROR DecryptFactoryData(uint8_t * FactoryDataBuff) { return CHIP_NO_ERROR; };
+    virtual CHIP_ERROR SetKeyType(KeyType type) { return CHIP_NO_ERROR; };
+    virtual CHIP_ERROR SetCbcInitialVector(const uint8_t * iv, uint16_t ivSize);
 
 #if CONFIG_CHIP_OTA_FACTORY_DATA_PROCESSOR
     using RestoreMechanism = CHIP_ERROR (*)(void);
@@ -124,8 +155,13 @@ public:
     CHIP_ERROR ValidateWithRestore();
     void RegisterRestoreMechanism(RestoreMechanism mechanism);
 
-    virtual CHIP_ERROR PreResetCheck()  = 0;
-    virtual CHIP_ERROR PostResetCheck() = 0;
+    virtual CHIP_ERROR PreResetCheck();
+    virtual CHIP_ERROR PostResetCheck();
+
+    StorageKeyName GetTargetVersionKey() { return StorageKeyName::FromConst("nxp/tgt-sw-ver"); }
+
+    CHIP_ERROR GetTargetVersion(uint32_t & version);
+    CHIP_ERROR SaveTargetVersion(uint32_t & version);
 #endif
 
     // ===== Members functions that implement the CommissionableDataProvider
@@ -161,6 +197,13 @@ public:
     CHIP_ERROR GetProductPrimaryColor(app::Clusters::BasicInformation::ColorEnum * primaryColor) override;
 
 protected:
+    // Use when factory data are encrypted using aes key
+    const uint8_t * pAesKey = nullptr;
+    // AES key size in bit
+    AESKeySize pAESKeySize;
+    EncryptionMode encryptMode       = encrypt_ecb;
+    const uint8_t * cbcInitialVector = nullptr;
+
     Header mHeader;
     FactoryDataConfig mConfig;
 #if CONFIG_CHIP_OTA_FACTORY_DATA_PROCESSOR
@@ -169,9 +212,7 @@ protected:
 #endif
 };
 
-extern FactoryDataProvider & FactoryDataPrvd();
-
-extern FactoryDataProviderImpl & FactoryDataPrvdImpl();
+extern FactoryDataProvider & FactoryDataPrvdImpl();
 
 } // namespace DeviceLayer
 } // namespace chip

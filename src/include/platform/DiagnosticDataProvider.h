@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021,2024 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -34,7 +34,6 @@ namespace DeviceLayer {
 // Maximum length of vendor defined name or prefix of the software thread that is
 // static for the duration of the thread.
 static constexpr size_t kMaxThreadNameLength = 8;
-
 // 48-bit IEEE MAC Address or a 64-bit IEEE MAC Address (e.g. EUI-64).
 inline constexpr size_t kMaxHardwareAddrSize = 8;
 
@@ -59,7 +58,7 @@ struct NetworkInterface : public app::Clusters::GeneralDiagnostics::Structs::Net
     uint8_t Ipv6AddressesBuffer[kMaxIPv6AddrCount][kMaxIPv6AddrSize];
     chip::ByteSpan Ipv4AddressSpans[kMaxIPv4AddrCount];
     chip::ByteSpan Ipv6AddressSpans[kMaxIPv6AddrCount];
-    NetworkInterface * Next; /* Pointer to the next structure.  */
+    NetworkInterface * Next = nullptr; /* Pointer to the next structure.  */
 };
 
 class DiagnosticDataProviderImpl;
@@ -192,7 +191,7 @@ public:
     virtual CHIP_ERROR GetAverageWearCount(uint32_t & averageWearCount);
 
     /*
-     * Get the linked list of network interfaces of the current plaform. After usage, each caller of GetNetworkInterfaces
+     * Get the linked list of network interfaces of the current platform. After usage, each caller of GetNetworkInterfaces
      * needs to release the network interface list it gets via ReleaseNetworkInterfaces.
      *
      */
@@ -203,7 +202,7 @@ public:
      * Software Diagnostics methods.
      */
 
-    /// Feature support - this returns support gor GetCurrentHeapHighWatermark and ResetWatermarks()
+    /// Feature support - this returns support for GetCurrentHeapHighWatermark and ResetWatermarks()
     virtual bool SupportsWatermarks() { return false; }
 
     virtual CHIP_ERROR GetCurrentHeapFree(uint64_t & currentHeapFree);
@@ -212,7 +211,7 @@ public:
     virtual CHIP_ERROR ResetWatermarks();
 
     /*
-     * Get the linked list of thread metrics of the current plaform. After usage, each caller of GetThreadMetrics
+     * Get the linked list of thread metrics of the current platform. After usage, each caller of GetThreadMetrics
      * needs to release the thread metrics list it gets via ReleaseThreadMetrics.
      *
      */

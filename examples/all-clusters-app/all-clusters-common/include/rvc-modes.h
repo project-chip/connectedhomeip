@@ -38,20 +38,18 @@ class RvcRunModeDelegate : public ModeBase::Delegate
 {
 private:
     using ModeTagStructType               = detail::Structs::ModeTagStruct::Type;
-    ModeTagStructType ModeTagsIdle[1]     = { { .value = to_underlying(ModeTag::kIdle) } };
-    ModeTagStructType ModeTagsCleaning[1] = { { .value = to_underlying(ModeTag::kCleaning) } };
-    ModeTagStructType ModeTagsMapping[1]  = { { .value = to_underlying(ModeTag::kMapping) } };
+    ModeTagStructType ModeTagsIdle[1]     = { { .mfgCode = {}, .value = to_underlying(ModeTag::kIdle) } };
+    ModeTagStructType ModeTagsCleaning[1] = { { .mfgCode = {}, .value = to_underlying(ModeTag::kCleaning) } };
+    ModeTagStructType ModeTagsMapping[1]  = { { .mfgCode = {}, .value = to_underlying(ModeTag::kMapping) } };
 
     const detail::Structs::ModeOptionStruct::Type kModeOptions[3] = {
-        detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Idle"),
-                                                 .mode     = ModeIdle,
-                                                 .modeTags = DataModel::List<const ModeTagStructType>(ModeTagsIdle) },
-        detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Cleaning"),
+        detail::Structs::ModeOptionStruct::Type{
+            .label = "Idle"_span, .mode = ModeIdle, .modeTags = DataModel::List<const ModeTagStructType>(ModeTagsIdle) },
+        detail::Structs::ModeOptionStruct::Type{ .label    = "Cleaning"_span,
                                                  .mode     = ModeCleaning,
                                                  .modeTags = DataModel::List<const ModeTagStructType>(ModeTagsCleaning) },
-        detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Mapping"),
-                                                 .mode     = ModeMapping,
-                                                 .modeTags = DataModel::List<const ModeTagStructType>(ModeTagsMapping) },
+        detail::Structs::ModeOptionStruct::Type{
+            .label = "Mapping"_span, .mode = ModeMapping, .modeTags = DataModel::List<const ModeTagStructType>(ModeTagsMapping) },
     };
 
     CHIP_ERROR Init() override;
@@ -82,19 +80,17 @@ class RvcCleanModeDelegate : public ModeBase::Delegate
 {
 private:
     using ModeTagStructType            = detail::Structs::ModeTagStruct::Type;
-    ModeTagStructType modeTagsVac[1]   = { { .value = to_underlying(ModeTag::kVacuum) } };
-    ModeTagStructType modeTagsMop[1]   = { { .value = to_underlying(ModeTag::kMop) } };
-    ModeTagStructType modeTagsBoost[2] = { { .value = to_underlying(ModeBase::ModeTag::kMax) },
-                                           { .value = to_underlying(ModeTag::kDeepClean) } };
+    ModeTagStructType modeTagsVac[1]   = { { .mfgCode = {}, .value = to_underlying(ModeTag::kVacuum) } };
+    ModeTagStructType modeTagsMop[1]   = { { .mfgCode = {}, .value = to_underlying(ModeTag::kMop) } };
+    ModeTagStructType modeTagsBoost[2] = { { .mfgCode = {}, .value = to_underlying(ModeBase::ModeTag::kMax) },
+                                           { .mfgCode = {}, .value = to_underlying(ModeTag::kDeepClean) } };
 
     const detail::Structs::ModeOptionStruct::Type kModeOptions[3] = {
-        detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Vacuum"),
-                                                 .mode     = ModeVacuum,
-                                                 .modeTags = DataModel::List<const ModeTagStructType>(modeTagsVac) },
-        detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Wash"),
-                                                 .mode     = ModeWash,
-                                                 .modeTags = DataModel::List<const ModeTagStructType>(modeTagsMop) },
-        detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Deep clean"),
+        detail::Structs::ModeOptionStruct::Type{
+            .label = "Vacuum"_span, .mode = ModeVacuum, .modeTags = DataModel::List<const ModeTagStructType>(modeTagsVac) },
+        detail::Structs::ModeOptionStruct::Type{
+            .label = "Wash"_span, .mode = ModeWash, .modeTags = DataModel::List<const ModeTagStructType>(modeTagsMop) },
+        detail::Structs::ModeOptionStruct::Type{ .label    = "Deep clean"_span,
                                                  .mode     = ModeDeepClean,
                                                  .modeTags = DataModel::List<const ModeTagStructType>(modeTagsBoost) },
     };

@@ -20,7 +20,6 @@
 #include "pw_hdlc/decoder.h"
 #include "pw_hdlc/default_addresses.h"
 #include "pw_hdlc/rpc_channel.h"
-#include "pw_log/log.h"
 #include "pw_rpc_system_server/rpc_server.h"
 #include "pw_stream/sys_io_stream.h"
 
@@ -40,12 +39,7 @@ rpc::Server server(channels);
 
 } // namespace
 
-void Init()
-{
-    // Send log messages to HDLC address 1. This prevents logs from interfering
-    // with pw_rpc communications.
-    pw::log_basic::SetOutput([](std::string_view log) { pw::hdlc::WriteUIFrame(1, pw::as_bytes(pw::span(log)), writer); });
-}
+void Init() {}
 
 rpc::Server & Server()
 {

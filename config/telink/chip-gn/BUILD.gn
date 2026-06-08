@@ -31,7 +31,7 @@ group("telink") {
   }
 
   if (chip_build_example_providers) {
-    deps += [ "${chip_root}/examples/providers:device_info_provider" ]
+    deps += [ "${chip_root}/examples/providers:device_info_provider_please_do_not_reuse_as_is" ]
   }
 }
 

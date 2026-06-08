@@ -30,8 +30,9 @@
 #include <platform/CHIPDeviceLayer.h>
 
 #include <app/clusters/network-commissioning/network-commissioning.h>
-#include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
+#include <data-model-providers/codegen/Instance.h>
+#include <setup_payload/OnboardingCodesUtil.h>
 
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
@@ -41,12 +42,13 @@
 #include <app-common/zap-generated/callback.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/server/Dnssd.h>
-#include <app/util/att-storage.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 
+#if CONFIG_HAVE_DISPLAY
 #include "Display.h"
 #include "QRCodeScreen.h"
 #include "ScreenManager.h"
+#endif // CONFIG_HAVE_DISPLAY
 
 #if CONFIG_ENABLE_PW_RPC
 #include "Rpc.h"
@@ -159,10 +161,13 @@ void InitServer(intptr_t)
     // Start IM server
     static chip::CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
-    chip::Server::GetInstance().Init(initParams);
+    initParams.dataModelProvider = app::CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
 
     // Device Attestation & Onboarding codes
     chip::Credentials::SetDeviceAttestationCredentialsProvider(chip::Credentials::Examples::GetExampleDACProvider());
+
+    LogErrorOnFailure(chip::Server::GetInstance().Init(initParams));
+
     sWiFiNetworkCommissioningInstance.Init();
     chip::DeviceLayer::ConfigurationMgr().LogDeviceConfig();
 

@@ -22,9 +22,25 @@ import os
 import subprocess
 from collections import namedtuple
 
+
+class PlatformAction(argparse.Action):
+    """Expand comma- or space-separated platform tokens and validate against ALL_PLATFORMS."""
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        items = []
+        for value in values:
+            for item in value.split(','):
+                item = item.strip()
+                if item:
+                    items.append(item)
+        setattr(namespace, self.dest, items)
+
+
+log = logging.getLogger(__name__)
+
 CHIP_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 
-ALL_PLATFORMS = set([
+ALL_PLATFORMS = {
     'ameba',
     'android',
     'asr',
@@ -39,19 +55,18 @@ ALL_PLATFORMS = set([
     'nxp',
     'rw61x',
     'linux',
-    'mbed',
     'nrfconnect',
     'nuttx',
     'qpg',
+    'realtek',
     'stm32',
     'telink',
     'tizen',
     'webos',
-    'mw320',
     'genio',
-    'openiotsdk',
     'silabs_docker',
-])
+    'unit_tests'
+}
 
 Module = namedtuple('Module', 'name path platforms recursive')
 
@@ -66,6 +81,18 @@ def load_module_info() -> None:
             platforms = set(filter(None, platforms))
             assert not (
                 platforms - ALL_PLATFORMS), "Submodule's platform not contained in ALL_PLATFORMS"
+
+            # Check for explicitly excluded platforms
+            excluded_platforms = module.get('excluded-platforms', '').split(',')
+            excluded_platforms = set(filter(None, excluded_platforms))
+            assert not (
+                excluded_platforms - ALL_PLATFORMS), "Submodule excluded on platforms not contained in ALL_PLATFORMS"
+
+            if len(excluded_platforms) != 0:
+                if len(platforms) == 0:
+                    platforms = ALL_PLATFORMS
+                platforms = platforms - excluded_platforms
+
             recursive = module.getboolean('recursive', False)
             name = name.replace('submodule "', '').replace('"', '')
             yield Module(name=name, path=module['path'], platforms=platforms, recursive=recursive)
@@ -91,17 +118,17 @@ def make_chip_root_safe_directory() -> None:
         config.check_returncode()
         existing = config.stdout.split('\0')
     if CHIP_ROOT not in existing:
-        logging.info(
-            "Adding CHIP_ROOT to global git safe.directory configuration")
+        log.info("Adding CHIP_ROOT to global git safe.directory configuration")
         subprocess.check_call(
             ['git', 'config', '--global', '--add', 'safe.directory', CHIP_ROOT])
 
 
 def checkout_modules(modules: list, shallow: bool, force: bool, recursive: bool, jobs: int) -> None:
     names = ', '.join([module.name for module in modules])
-    logging.info(f'Checking out: {names}')
+    log.info("Checking out '%s'", names)
 
-    cmd = ['git', '-C', CHIP_ROOT, 'submodule', '--quiet', 'update', '--init']
+    cmd = ['git', '-c', 'core.symlinks=true', '-C', CHIP_ROOT]
+    cmd += ['submodule', '--quiet', 'update', '--init']
     cmd += ['--depth', '1'] if shallow else []
     cmd += ['--force'] if force else []
     cmd += ['--recursive'] if recursive else []
@@ -125,7 +152,7 @@ def checkout_modules(modules: list, shallow: bool, force: bool, recursive: bool,
 
 def deinit_modules(modules: list, force: bool) -> None:
     names = ', '.join([module.name for module in modules])
-    logging.info(f'Deinitializing: {names}')
+    log.info("Deinitializing: '%s'", names)
 
     cmd = ['git', '-C', CHIP_ROOT, 'submodule', '--quiet', 'deinit']
     cmd += ['--force'] if force else []
@@ -143,8 +170,9 @@ def main():
                         help='Allow global git options to be modified if necessary, e.g. safe.directory')
     parser.add_argument('--shallow', action='store_true',
                         help='Fetch submodules without history')
-    parser.add_argument('--platform', nargs='+', choices=ALL_PLATFORMS, default=[],
-                        help='Process submodules for specific platforms only')
+    parser.add_argument('--platform', nargs='+', default=[], action=PlatformAction,
+                        metavar='{' + ','.join(sorted(ALL_PLATFORMS)) + '}',
+                        help='Process submodules for specific platforms only (space- or comma-separated).')
     parser.add_argument('--force', action='store_true',
                         help='Perform action despite of warnings')
     parser.add_argument('--deinit-unmatched', action='store_true',
@@ -156,7 +184,15 @@ def main():
     args = parser.parse_args()
 
     modules = list(load_module_info())
+
+    invalid = [p for p in args.platform if p not in ALL_PLATFORMS]
+    if invalid:
+        invalid_display = ', '.join(sorted(set(invalid)))
+        valid_choices = ', '.join(sorted(ALL_PLATFORMS))
+        parser.error(f"Invalid platform(s): {invalid_display}. Valid choices: {valid_choices}")
+
     selected_platforms = set(args.platform)
+
     selected_modules = [
         m for m in modules if module_matches_platforms(m, selected_platforms)]
     unmatched_modules = [m for m in modules if not module_matches_platforms(

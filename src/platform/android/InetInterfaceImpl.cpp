@@ -51,7 +51,6 @@ struct if_nameindex * if_nameindexImpl()
     size_t intfIter              = 0;
     size_t maxIntfNum            = 0;
     size_t numIntf               = 0;
-    size_t numAddrs              = 0;
     struct if_nameindex * retval = nullptr;
     struct if_nameindex * tmpval = nullptr;
     struct ifaddrs * addrList    = nullptr;
@@ -64,7 +63,6 @@ struct if_nameindex * if_nameindexImpl()
     // coalesce on consecutive interface names
     for (addrIter = addrList; addrIter != nullptr; addrIter = addrIter->ifa_next)
     {
-        numAddrs++;
         if (strcmp(addrIter->ifa_name, lastIntfName) != 0)
         {
             numIntf++;

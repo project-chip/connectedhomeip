@@ -25,7 +25,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/GLibTypeDeleter.h>
-#include <platform/Linux/dbus/bluez/DbusBluez.h>
+#include <platform/Linux/dbus/bluez/DBusBluez.h>
 
 #include "BluezObjectIterator.h"
 #include "BluezObjectList.h"
@@ -76,7 +76,7 @@ bool AdapterIterator::Next()
         VerifyOrReturnError(
             err == CHIP_NO_ERROR, false,
             ChipLogError(DeviceLayer, "Failed to initialize BlueZ object manager: %" CHIP_ERROR_FORMAT, err.Format()));
-        mObjectList.Init(mObjectManager.GetObjectManager());
+        TEMPORARY_RETURN_IGNORED mObjectList.Init(mObjectManager.GetObjectManager());
         mIterator      = mObjectList.begin();
         mIsInitialized = true;
     }

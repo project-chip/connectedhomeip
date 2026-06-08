@@ -19,9 +19,9 @@
  * @file Contains shell commands for for performing discovery (eg. of commissionable nodes) related to commissioning.
  */
 
-#include <AppMain.h>
-#include <ControllerShellCommands.h>
-#include <inttypes.h>
+#include "ControllerShellCommands.h"
+#include "CommissionerMain.h"
+
 #include <lib/core/CHIPCore.h>
 #include <lib/shell/Commands.h>
 #include <lib/shell/Engine.h>
@@ -32,6 +32,8 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <protocols/secure_channel/RendezvousParameters.h>
 #include <protocols/user_directed_commissioning/UserDirectedCommissioning.h>
+
+#include <inttypes.h>
 
 namespace chip {
 namespace Shell {
@@ -81,7 +83,7 @@ static CHIP_ERROR discover(bool printHeader)
     }
 
     Dnssd::DiscoveryFilter filter(Dnssd::DiscoveryFilterType::kNone, (uint64_t) 0);
-    GetDeviceCommissioner()->DiscoverCommissionableNodes(filter);
+    ReturnErrorOnFailure(GetDeviceCommissioner()->DiscoverCommissionableNodes(filter));
 
     streamer_printf(sout, "done\r\n");
 
@@ -98,7 +100,7 @@ static CHIP_ERROR discover(bool printHeader, char * instance)
     }
 
     Dnssd::DiscoveryFilter filter(Dnssd::DiscoveryFilterType::kInstanceName, instance);
-    GetDeviceCommissioner()->DiscoverCommissionableNodes(filter);
+    ReturnErrorOnFailure(GetDeviceCommissioner()->DiscoverCommissionableNodes(filter));
 
     streamer_printf(sout, "done\r\n");
 

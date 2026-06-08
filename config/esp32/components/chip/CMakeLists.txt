@@ -31,19 +31,13 @@ endif()
 
 include(${CMAKE_CURRENT_LIST_DIR}/ota-image.cmake)
 
-set(CHIP_REQUIRE_COMPONENTS esp_eth freertos lwip bt mbedtls fatfs app_update console openthread nvs_flash spi_flash)
-
-set(CHIP_DATA_MODEL_INTERFACE "disabled" CACHE STRING "Data model interface option to use: enabled or disabled")
-
-if(NOT "${IDF_TARGET}" STREQUAL "esp32h2")
-    list(APPEND CHIP_REQUIRE_COMPONENTS mdns)
-endif()
+set(CHIP_REQUIRE_COMPONENTS esp_eth freertos lwip bt mbedtls fatfs app_update console openthread nvs_flash spi_flash mdns)
 
 if (NOT CMAKE_BUILD_EARLY_EXPANSION)
     if (CONFIG_COMPILER_OPTIMIZATION_ASSERTIONS_DISABLE)
-        set(is_debug TRUE)
-    else()
         set(is_debug FALSE)
+    else()
+        set(is_debug TRUE)
     endif()
 endif()
 
@@ -66,12 +60,6 @@ macro(chip_gn_arg_bool arg boolean)
     endif()
 endmacro()
 
-if ("${CHIP_DATA_MODEL_INTERFACE}" STREQUAL "enabled")
-    chip_gn_arg_append("chip_use_data_model_interface" "\"enabled\"")
-else()
-    chip_gn_arg_append("chip_use_data_model_interface" "\"disabled\"")
-endif()
-
 # ESP-IDF lets user set software version string by two ways:
 # 1. Project's CMakeLists.txt file and 2. Config option
 # It depends on CONFIG_APP_PROJECT_VER_FROM_CONFIG option
@@ -89,6 +77,21 @@ chip_gn_arg_append("esp32_cc"              "\"${CMAKE_C_COMPILER}\"")
 chip_gn_arg_append("esp32_cxx"             "\"${CMAKE_CXX_COMPILER}\"")
 chip_gn_arg_append("esp32_cpu"             "\"esp32\"")
 chip_gn_arg_bool("is_debug"                ${is_debug})
+
+# Use PSA Crypto backend for esp-idf v6.0 and onwards
+# esp-idf v6.0 and onwards migrated to mbedTLS 4.x where PSA is the crypto backend primary interface
+if (IDF_VERSION_MAJOR GREATER_EQUAL 6)
+    chip_gn_arg_append("chip_crypto"                    "\"psa\"")
+    # keep using older mbedTLS APIs for spake2p, PSA driver for PSA_ALG_SPAKE2P_MATTER is not yet available in mbedtls v4.x
+    chip_gn_arg_append("chip_crypto_spake2p"            "\"mbedtls\"")
+    chip_gn_arg_bool("chip_crypto_psa_aead_single_part" "true")
+endif()
+
+# If ccache was enabled by IDF and the ccache executable was found,
+# use it as the command launcher for GN to speed up subsequent builds.
+if (CCACHE_ENABLE AND CCACHE_FOUND)
+    chip_gn_arg_append("pw_command_launcher" "\"${CCACHE_FOUND}\"")
+endif()
 
 if (CONFIG_CHIP_CONFIG_IM_PRETTY_PRINT)
     chip_gn_arg_bool("enable_im_pretty_print" "true")
@@ -133,6 +136,12 @@ if(CONFIG_DISABLE_IPV4)
     endif()
 endif()
 
+if(CONFIG_ENABLE_TCP_TRANSPORT)
+    chip_gn_arg_append("chip_inet_config_enable_tcp_endpoint" "true")
+else()
+    chip_gn_arg_append("chip_inet_config_enable_tcp_endpoint" "false")
+endif()
+
 if(CONFIG_DISABLE_READ_CLIENT)
     chip_gn_arg_append("chip_enable_read_client"             "false")
 endif()
@@ -147,7 +156,15 @@ if(CONFIG_ENABLE_ICD_SERVER)
         chip_gn_arg_append("chip_icd_report_on_active_mode"               "true")
     endif()
     if(CONFIG_ENABLE_ICD_LIT)
-        chip_gn_arg_append("chip_enable_icd_lit"               "true")
+        chip_gn_arg_append("chip_enable_icd_lit"                        "true")
+        chip_gn_arg_append("chip_enable_icd_checkin"                    "true")
+        chip_gn_arg_append("chip_enable_icd_user_active_mode_trigger"   "true")
+        if (CONFIG_ENABLE_ICD_DSLS)
+            chip_gn_arg_append("chip_enable_icd_dsls"           "true")
+        else()
+            chip_gn_arg_append("chip_enable_icd_dsls"           "false")
+        endif()
+    else()
         if(CONFIG_ENABLE_ICD_CIP)
             chip_gn_arg_append("chip_enable_icd_checkin"               "true")
         else()
@@ -159,6 +176,19 @@ if(CONFIG_ENABLE_ICD_SERVER)
             chip_gn_arg_append("chip_enable_icd_user_active_mode_trigger"               "false")
         endif()
     endif()
+    if (CONFIG_ENABLE_ICD_CHECK_IN_ON_REPORT_TIMEOUT)
+        chip_gn_arg_append("chip_enable_icd_checkin_on_report_timeout"  "true")
+    else()
+        chip_gn_arg_append("chip_enable_icd_checkin_on_report_timeout"  "false")
+    endif()
+endif()
+
+if(CONFIG_CHIP_MEM_ALLOC_MODE_INTERNAL)
+    chip_gn_arg_append("chip_memory_alloc_mode"               "\"internal\"")
+elseif(CONFIG_CHIP_MEM_ALLOC_MODE_EXTERNAL)
+    chip_gn_arg_append("chip_memory_alloc_mode"               "\"external\"")
+elseif(CONFIG_CHIP_MEM_ALLOC_MODE_DEFAULT)
+    chip_gn_arg_append("chip_memory_alloc_mode"               "\"default\"")
 endif()
 
 if(CONFIG_ENABLE_PW_RPC)
@@ -175,10 +205,6 @@ endif()
 
 if (CONFIG_BUILD_CHIP_TESTS)
     chip_gn_arg_bool("chip_build_tests"     "true")
-endif()
-
-if (CONFIG_IM_PRETTY_PRINT)
-    chip_gn_arg_bool("enable_im_pretty_print"	"true")
 endif()
 
 if (NOT CONFIG_USE_MINIMAL_MDNS)
@@ -228,12 +254,21 @@ if (CONFIG_ENABLE_ETHERNET_TELEMETRY)
 endif()
 
 if (CONFIG_ENABLE_MATTER_OVER_THREAD)
-    chip_gn_arg_append("chip_enable_openthread"                 "true")
+    chip_gn_arg_append("chip_enable_thread"                     "true")
     if (CONFIG_THREAD_NETWORK_COMMISSIONING_DRIVER)
         chip_gn_arg_append("chip_device_config_thread_network_endpoint_id" ${CONFIG_THREAD_NETWORK_ENDPOINT_ID})
     endif()
 else()
-    chip_gn_arg_append("chip_enable_openthread"                 "false")
+    chip_gn_arg_append("chip_enable_thread"                     "false")
+endif()
+
+if (CONFIG_CHIP_USE_OT_ENDPOINT)
+    chip_gn_arg_append("chip_system_config_use_openthread_inet_endpoints" "true")
+    chip_gn_arg_append("chip_openthread_target"                  "\"//:openthread\"")
+    chip_gn_arg_append("chip_with_lwip"                         "false")
+else()
+    chip_gn_arg_append("chip_system_config_use_openthread_inet_endpoints" "false")
+    chip_gn_arg_append("chip_with_lwip"                         "true")
 endif()
 
 if (CONFIG_OPENTHREAD_FTD)
@@ -250,6 +285,10 @@ endif()
 
 if (CONFIG_ENABLE_OTA_REQUESTOR)
     chip_gn_arg_append("chip_enable_ota_requestor"                 "true")
+endif()
+
+if (CONFIG_ENABLE_ACCESS_RESTRICTIONS)
+    chip_gn_arg_append("chip_enable_access_restrictions"                 "true")
 endif()
 
 if (CONFIG_ENABLE_ROTATING_DEVICE_ID)
@@ -301,21 +340,33 @@ if (CONFIG_SEC_CERT_DAC_PROVIDER)
     chip_gn_arg_append("chip_use_secure_cert_dac_provider"                 "true")
 endif()
 
-if (CONFIG_ENABLE_ESP_INSIGHTS_TRACE)
-  chip_gn_arg_bool("matter_enable_tracing_support"  "true")
-  chip_gn_arg_append("matter_trace_config" "\"${CHIP_ROOT}/src/tracing/esp32_trace:esp32_trace_tracing\"")
-endif()
-
-if (CONFIG_ENABLE_ESP_INSIGHTS_SYSTEM_STATS)
-     chip_gn_arg_append("matter_enable_esp_insights_system_stats"            "true")
+if (CONFIG_CHIP_ENABLE_ESP_DIAGNOSTICS)
+    chip_gn_arg_bool("matter_enable_tracing_support"  "true")
+    chip_gn_arg_append("matter_trace_config" "\"${CHIP_ROOT}/src/tracing/esp32_diagnostics:esp32_diagnostic_tracing\"")
 endif()
 
 if (CONFIG_USE_ESP32_ECDSA_PERIPHERAL)
     chip_gn_arg_append("chip_use_esp32_ecdsa_peripheral" "true")
 endif()
 
-if (CONFIG_ENABLE_ESP_INSIGHTS_TRACE)
-   target_include_directories(${COMPONENT_LIB} INTERFACE "${CHIP_ROOT}/src/tracing/esp32_trace/include")
+if (CONFIG_CHIP_ENABLE_ESP_DIAGNOSTICS)
+    target_include_directories(${COMPONENT_LIB} INTERFACE "${CHIP_ROOT}/src/tracing/esp32_diagnostics/include")
+endif()
+
+if (CONFIG_CHIP_DEVICE_ENABLE_DYNAMIC_SERVER)
+    chip_gn_arg_append("chip_build_controller_dynamic_server" "true")
+endif()
+
+if (CONFIG_ICD_MAX_NOTIFICATION_SUBSCRIBERS)
+    chip_gn_arg_append("icd_max_notification_subscribers" ${CONFIG_ICD_MAX_NOTIFICATION_SUBSCRIBERS})
+endif()
+
+if (CONFIG_CHIP_ENABLE_GROUPCAST)
+chip_gn_arg_bool("chip_config_enable_groupcast" CONFIG_CHIP_ENABLE_GROUPCAST)
+endif()
+
+if (CONFIG_CHIP_DEVICE_ENABLE_THREAD_MESHCOP)
+chip_gn_arg_bool("chip_device_config_enable_thread_meshcop" CONFIG_CHIP_DEVICE_ENABLE_THREAD_MESHCOP)
 endif()
 
 set(args_gn_input "${CMAKE_CURRENT_BINARY_DIR}/args.gn.in")
@@ -335,14 +386,19 @@ list(APPEND filter_out "-Iconfig")
 idf_build_get_property(config_dir CONFIG_DIR)
 target_compile_options(${COMPONENT_LIB} PRIVATE "-I${config_dir}")
 
+if (CONFIG_CHIP_USE_OT_ENDPOINT)
+    idf_component_get_property(openthread_dir openthread COMPONENT_DIR)
+    target_compile_options(${COMPONENT_LIB} PRIVATE "-I${openthread_dir}/private_include")
+endif()
+
 if(filter_out)
     set(filter_arg "--filter-out=${filter_out}")
 endif()
 
 set(args_gn "${CMAKE_CURRENT_BINARY_DIR}/args.gn")
 add_custom_command(OUTPUT "${args_gn}"
-                   COMMAND ${python} 
-                           ${CMAKE_CURRENT_LIST_DIR}/create_args_gn.py 
+                   COMMAND ${python}
+                           ${CMAKE_CURRENT_LIST_DIR}/create_args_gn.py
                            "${CMAKE_BINARY_DIR}"
                            "${idf_path}"
                            "${CMAKE_CURRENT_LIST_DIR}/chip.c"
@@ -367,13 +423,18 @@ set(GN_ROOT_TARGET ${CHIP_ROOT}/config/esp32)
 
 set(chip_libraries "${CMAKE_CURRENT_BINARY_DIR}/lib/libCHIP.a")
 
+if (CONFIG_BUILD_CHIP_TESTS)
+    list(APPEND chip_libraries "${CMAKE_CURRENT_BINARY_DIR}/lib/libPWTestsWrapper.a")
+endif()
+
 if(CONFIG_ENABLE_PW_RPC)
   list(APPEND chip_libraries "${CMAKE_CURRENT_BINARY_DIR}/lib/libPwRpc.a")
 endif()
 
-if (CONFIG_ENABLE_ESP_INSIGHTS_TRACE)
-  list(APPEND chip_libraries "${CMAKE_CURRENT_BINARY_DIR}/lib/libEsp32TracingBackend.a")
+if (CONFIG_CHIP_ENABLE_ESP_DIAGNOSTICS)
+  list(APPEND chip_libraries "${CMAKE_CURRENT_BINARY_DIR}/lib/libEsp32DiagnosticsBackend.a")
 endif()
+
 
 # When using the pregenerated files, there is a edge case where an error appears for
 # undeclared argument chip_code_pre_generated_directory. To get around with it we are
@@ -393,7 +454,6 @@ externalproject_add(
     BUILD_COMMAND           ninja "esp32"
     INSTALL_COMMAND         ""
     BUILD_BYPRODUCTS        ${chip_libraries}
-    WORKING_DIRECTORY       ${CMAKE_CURRENT_LIST_DIR}
     DEPENDS                 args_gn
     BUILD_ALWAYS            1
 )
@@ -425,155 +485,38 @@ target_include_directories(${COMPONENT_LIB} INTERFACE
     "${CHIP_ROOT}/config/esp32/${CONFIG_CHIP_EXTERNAL_PLATFORM_DIR}/../../"
 )
 
-idf_component_get_property(mbedtls_lib mbedtls COMPONENT_LIB)
-
-idf_build_get_property(idf_target IDF_TARGET)
-set(target_name "${idf_target}")
-
-if(CONFIG_BT_ENABLED)
-    idf_component_get_property(bt_lib bt COMPONENT_LIB)
-    if((target_name STREQUAL "esp32h2") OR (target_name STREQUAL "esp32c2") OR (target_name STREQUAL "esp32c6"))
-        idf_component_get_property(bt_dir bt COMPONENT_DIR)
-        list(APPEND chip_libraries $<TARGET_FILE:${bt_lib}>)
-        list(APPEND chip_libraries "${bt_dir}/controller/lib_${target_name}/${target_name}-bt-lib/libble_app.a")
-    else()
-        list(APPEND chip_libraries $<TARGET_FILE:${bt_lib}> -lbtdm_app)
-    endif()
+set(matter_requires lwip freertos console bt)
+idf_build_get_property(build_components BUILD_COMPONENTS)
+if("espressif__mdns" IN_LIST build_components)
+    list(APPEND matter_requires espressif__mdns)
+elseif("mdns" IN_LIST build_components)
+    list(APPEND matter_requires mdns)
 endif()
 
-if (CONFIG_ENABLE_CHIP_SHELL)
-    idf_component_get_property(console_lib console COMPONENT_LIB)
-    list(APPEND chip_libraries $<TARGET_FILE:${console_lib}>)
+if (CONFIG_OPENTHREAD_BORDER_ROUTER)
+    list(APPEND matter_requires espressif__esp_rcp_update)
 endif()
 
-if(CONFIG_OPENTHREAD_ENABLED)
-    idf_component_get_property(openthread_lib openthread COMPONENT_LIB)
-    list(APPEND chip_libraries $<TARGET_FILE:${openthread_lib}>)
-    if (CONFIG_IEEE802154_ENABLED)
-        idf_component_get_property(ieee802154_lib ieee802154 COMPONENT_LIB)
-        list(APPEND chip_libraries $<TARGET_FILE:${ieee802154_lib}>)
-    endif()
-endif()
-
-if(NOT CONFIG_USE_MINIMAL_MDNS)
-    idf_build_get_property(build_components BUILD_COMPONENTS)
-    # For IDF v5.x, the mdns component was moved to idf_managed_components.
-    # We should use 'espressif__mdns' for 'idf_component_get_property'.
-    if("espressif__mdns" IN_LIST build_components)
-        idf_component_get_property(mdns_lib espressif__mdns COMPONENT_LIB)
-        list(APPEND chip_libraries $<TARGET_FILE:${mdns_lib}>)
-    elseif("mdns" IN_LIST build_components)
-        idf_component_get_property(mdns_lib mdns COMPONENT_LIB)
-        list(APPEND chip_libraries $<TARGET_FILE:${mdns_lib}>)
-    endif()
-endif()
-
-if(CONFIG_OPENTHREAD_BORDER_ROUTER)
-    idf_component_get_property(rcp_update_lib espressif__esp_rcp_update COMPONENT_LIB)
-    list(APPEND chip_libraries $<TARGET_FILE:${rcp_update_lib}>)
-    idf_component_get_property(serial_flasher_lib espressif__esp-serial-flasher COMPONENT_LIB)
-    list(APPEND chip_libraries $<TARGET_FILE:${serial_flasher_lib}>)
+if (CONFIG_SEC_CERT_DAC_PROVIDER)
+    list(APPEND matter_requires espressif__esp_secure_cert_mgr)
 endif()
 
 if (CONFIG_ENABLE_ENCRYPTED_OTA)
-    idf_component_get_property(esp_encrypted_img_lib espressif__esp_encrypted_img COMPONENT_LIB)
-    list(APPEND chip_libraries $<TARGET_FILE:${esp_encrypted_img_lib}>)
-endif()
-
-# Let user set EXECUTABLE_COMPONENT_NAME and defaults to main if not specified
-if (NOT EXECUTABLE_COMPONENT_NAME)
-  set(EXECUTABLE_COMPONENT_NAME "main")
+    list(APPEND matter_requires espressif__esp_encrypted_img)
 endif()
 
 if (CONFIG_ENABLE_DELTA_OTA)
-    idf_component_get_property(esp_delta_ota_lib espressif__esp_delta_ota COMPONENT_LIB)
-    list(APPEND chip_libraries $<TARGET_FILE:${esp_delta_ota_lib}>)
+    list(APPEND matter_requires espressif__esp_delta_ota)
 endif()
 
-idf_component_get_property(main_lib ${EXECUTABLE_COMPONENT_NAME} COMPONENT_LIB)
-list(APPEND chip_libraries $<TARGET_FILE:${main_lib}>)
-
-if (CONFIG_SEC_CERT_DAC_PROVIDER)
-    idf_component_get_property(esp32_secure_cert_mgr_lib espressif__esp_secure_cert_mgr COMPONENT_LIB)
-    list(APPEND chip_libraries $<TARGET_FILE:${esp32_secure_cert_mgr_lib}>)
+if(NOT TARGET matterlib)
+    add_prebuilt_library(matterlib "${CMAKE_CURRENT_BINARY_DIR}/lib/libCHIP.a"
+                         REQUIRES ${matter_requires})
 endif()
-
-if (CONFIG_ENABLE_ESP_INSIGHTS_TRACE)
-    idf_build_get_property(build_components BUILD_COMPONENTS)
-    # esp_insights can be used as an independent component or through component manager so,
-    # We should check and add the right component.
-    if("espressif__esp_insights" IN_LIST build_components)
-        idf_component_get_property(esp_insights_lib espressif__esp_insights COMPONENT_LIB)
-    elseif("esp_insights" IN_LIST build_components)
-        idf_component_get_property(esp_insights_lib esp_insights COMPONENT_LIB)
-    endif()
-
-    list(APPEND chip_libraries $<TARGET_FILE:${esp_insights_lib}>)
-endif()
-
-idf_component_get_property(lwip_lib lwip COMPONENT_LIB)
-list(APPEND chip_libraries $<TARGET_FILE:${lwip_lib}>)
-
-
-if (CONFIG_ESP32_WIFI_ENABLED)
-    idf_component_get_property(esp_wifi_lib esp_wifi COMPONENT_LIB)
-    idf_component_get_property(esp_wifi_dir esp_wifi COMPONENT_DIR)
-    list(APPEND chip_libraries $<TARGET_FILE:${esp_wifi_lib}>)
-    if (CONFIG_IDF_TARGET_ESP32C2)
-        set(blobs core net80211 pp)
-    else()
-        set(blobs core mesh net80211 pp)
-    endif()
-
-    foreach(blob ${blobs})
-    list(APPEND chip_libraries "${esp_wifi_dir}/lib/${target_name}/lib${blob}.a")
-    endforeach()
-
-    idf_component_get_property(wpa_supplicant_lib wpa_supplicant COMPONENT_LIB)
-    list(APPEND chip_libraries $<TARGET_FILE:${wpa_supplicant_lib}>)
-endif()
-
-if (CONFIG_ETH_ENABLED)
-    idf_component_get_property(esp_eth_lib esp_eth COMPONENT_LIB)
-    list(APPEND chip_libraries $<TARGET_FILE:${esp_eth_lib}>)
-endif()
-
-idf_component_get_property(esp_netif_lib esp_netif COMPONENT_LIB)
-list(APPEND chip_libraries $<TARGET_FILE:${esp_netif_lib}>)
-
-idf_component_get_property(esp_hw_support_lib esp_hw_support COMPONENT_LIB)
-list(APPEND chip_libraries $<TARGET_FILE:${esp_hw_support_lib}>)
-
-idf_component_get_property(esp_phy_lib esp_phy COMPONENT_LIB)
-idf_component_get_property(esp_phy_dir esp_phy COMPONENT_DIR)
-list(APPEND chip_libraries $<TARGET_FILE:${esp_phy_lib}>)
-
-if (CONFIG_IDF_TARGET_ESP32)
-    set(phy_blobs phy rtc)
-elseif (CONFIG_IDF_TARGET_ESP32S2)
-    set(phy_blobs phy)
-else()
-    set(phy_blobs phy btbb)
-endif()
-foreach(phy_blob ${phy_blobs})
-    list(APPEND chip_libraries "${esp_phy_dir}/lib/${target_name}/lib${phy_blob}.a")
-endforeach()
-
-set(components_to_link esp_event hal esp_system soc efuse vfs driver esp_coex freertos esp_timer)
-idf_build_get_property(build_components BUILD_COMPONENTS)
-foreach(component ${components_to_link})
-    # Some of the components are not present in IDF v4.x
-    # So, Check if the component is in the list of build components
-    if("${component}" IN_LIST build_components)
-        idf_component_get_property(lib_name ${component} COMPONENT_LIB)
-        list(APPEND chip_libraries $<TARGET_FILE:${lib_name}>)
-    endif()
-endforeach()
 
 target_link_libraries(${COMPONENT_LIB} INTERFACE -Wl,--start-group
                                                 ${chip_libraries}
-                                                $<TARGET_FILE:mbedcrypto> $<TARGET_FILE:mbedx509>
-                                                $<TARGET_FILE:${mbedtls_lib}>
+                                                matterlib
                                                 -Wl,--end-group)
 
 # Make the component dependent on our CHIP build
@@ -588,10 +531,19 @@ endif()
 
 # Build Matter OTA image
 if (CONFIG_CHIP_OTA_IMAGE_BUILD)
-    chip_ota_image(chip-ota-image
-        INPUT_FILES ${BUILD_DIR}/${CMAKE_PROJECT_NAME}.bin
-        OUTPUT_FILE ${BUILD_DIR}/${CMAKE_PROJECT_NAME}-ota.bin
-    )
-    # Adding dependecy as app target so that this runs after images are ready
-    add_dependencies(chip-ota-image app)
+    if (CONFIG_OPENTHREAD_BORDER_ROUTER AND CONFIG_AUTO_UPDATE_RCP)
+        chip_ota_image(chip-ota-image
+            INPUT_FILES ${BUILD_DIR}/ota_with_rcp_image
+            OUTPUT_FILE ${BUILD_DIR}/ota_with_rcp_image-ota.bin
+        )
+        # Adding dependecy as app target so that this runs after images are ready
+        add_dependencies(chip-ota-image gen_ota_image)
+    else()
+        chip_ota_image(chip-ota-image
+            INPUT_FILES ${BUILD_DIR}/${CMAKE_PROJECT_NAME}.bin
+            OUTPUT_FILE ${BUILD_DIR}/${CMAKE_PROJECT_NAME}-ota.bin
+        )
+        # Adding dependecy as app target so that this runs after images are ready
+        add_dependencies(chip-ota-image app)
+    endif()
 endif()

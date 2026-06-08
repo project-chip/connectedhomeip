@@ -38,7 +38,7 @@ public:
     ~BDXDiagnosticLogsProvider(){};
 
     /**
-     * Intializes the BDX transfer session by creating a new exchange context for the transfer session.
+     * Initializes the BDX transfer session by creating a new exchange context for the transfer session.
      * It starts the BDX transfer session by calling InitiateTransfer which sends the SendInit BDX message
      * to the log requestor.
      *
@@ -76,8 +76,10 @@ private:
     /**
      * This method is called to reset state. It resets the transfer, cleans up the
      * exchange and ends log collection.
+     * @param[in] error  A CHIP_ERROR value indicating the reason for resetting the state.
+     *                   It is permissible to pass CHIP_NO_ERROR to indicate normal termination.
      */
-    void Reset();
+    void Reset(CHIP_ERROR error);
 
     Messaging::ExchangeContext * mBDXTransferExchangeCtx;
     DiagnosticLogsProviderDelegate * mDelegate;

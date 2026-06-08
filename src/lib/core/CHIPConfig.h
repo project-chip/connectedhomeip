@@ -232,6 +232,54 @@
 #endif // CHIP_CONFIG_HKDF_KEY_HANDLE_CONTEXT_SIZE
 
 /**
+ *  @def CHIP_CONFIG_P256_KEYPAIR_HANDLE_SIZE
+ *
+ *  @brief
+ *    Size of a statically allocated P256 keypair handle in CryptoPAL.
+ *
+ *  If this is 0 (the default), then key handles are not supported and
+ *  serialized keypairs (containing the raw public and private keys) are used instead.
+ *
+ *  Platforms that use PSA can define this to match the size of psa_key_id_t (4).
+ */
+#ifndef CHIP_CONFIG_P256_KEYPAIR_HANDLE_SIZE
+#define CHIP_CONFIG_P256_KEYPAIR_HANDLE_SIZE (0)
+#endif // CHIP_CONFIG_P256_KEYPAIR_HANDLE_SIZE
+
+/**
+ * @def CHIP_CONFIG_CRYPTO_PSA_KEY_ID_BASE
+ *
+ * @brief
+ *   Base of the PSA key identifier range used by Matter.
+ *
+ * Cryptographic keys stored in the PSA Internal Trusted Storage must have
+ * a user-assigned identifer from the range PSA_KEY_ID_USER_MIN to
+ * PSA_KEY_ID_USER_MAX. This option allows to override the base used to derive
+ * key identifiers used by Matter to avoid overlapping with other firmware
+ * components that also use PSA crypto API. The default value was selected
+ * not to interfere with OpenThread's default base that is 0x20000.
+ *
+ * Note that volatile keys like ephemeral keys used for ECDH have identifiers
+ * auto-assigned by the PSA backend.
+ */
+#ifndef CHIP_CONFIG_CRYPTO_PSA_KEY_ID_BASE
+#define CHIP_CONFIG_CRYPTO_PSA_KEY_ID_BASE 0x30000
+#endif // CHIP_CONFIG_CRYPTO_PSA_KEY_ID_BASE
+
+/**
+ * @def CHIP_CONFIG_CRYPTO_PSA_KEY_ID_END
+ *
+ * @brief
+ *   End of the PSA key identifier range used by Matter.
+ *
+ * This setting establishes the maximum limit for the key range specific to Matter, in order to
+ * prevent any overlap with other firmware components that also employ the PSA crypto API.
+ */
+#ifndef CHIP_CONFIG_CRYPTO_PSA_KEY_ID_END
+#define CHIP_CONFIG_CRYPTO_PSA_KEY_ID_END 0x3FFFF
+#endif // CHIP_CONFIG_CRYPTO_PSA_KEY_ID_END
+
+/**
  *  @def CHIP_CONFIG_MAX_UNSOLICITED_MESSAGE_HANDLERS
  *
  *  @brief
@@ -483,14 +531,27 @@
 #endif // CHIP_CONFIG_ERROR_SOURCE
 
 /**
+ *  @def CHIP_CONFIG_ERROR_STD_SOURCE_LOCATION
+ *
+ *  If asserted (1) along with CHIP_CONFIG_ERROR_SOURCE, then CHIP_ERROR will store the error location
+ *  using the std::source_location (requires at least C++20) instead of keeping raw __FILE__ and __LINE__.
+ *  This feature comes with FLASH and RAM overhead, so it is disabled by default.
+ */
+#ifndef CHIP_CONFIG_ERROR_STD_SOURCE_LOCATION
+#define CHIP_CONFIG_ERROR_STD_SOURCE_LOCATION 0
+#endif // CHIP_CONFIG_ERROR_STD_SOURCE_LOCATION
+
+/**
  *  @def CHIP_CONFIG_ERROR_SOURCE_NO_ERROR
  *
  *  If asserted (1) along with CHIP_CONFIG_ERROR_SOURCE, then instances of CHIP_NO_ERROR will also include
  *  the source location of their expansion. Otherwise, CHIP_NO_ERROR is excluded from source tracking.
+ *  Since CHIP_NO_ERROR is used in many places and tracking it adds marginal debugging value, it is
+ *  disabled by default.
  */
 #ifndef CHIP_CONFIG_ERROR_SOURCE_NO_ERROR
-#define CHIP_CONFIG_ERROR_SOURCE_NO_ERROR 1
-#endif // CHIP_CONFIG_ERROR_SOURCE
+#define CHIP_CONFIG_ERROR_SOURCE_NO_ERROR 0
+#endif // CHIP_CONFIG_ERROR_SOURCE_NO_ERROR
 
 /**
  *  @def CHIP_CONFIG_ERROR_FORMAT_AS_STRING
@@ -499,7 +560,6 @@
  *  If 1, then ChipError::Format() returns a const char *, from chip::ErrorStr().
  *  In either case, the macro CHIP_ERROR_FORMAT expands to a suitable printf format.
  */
-
 #ifndef CHIP_CONFIG_ERROR_FORMAT_AS_STRING
 #define CHIP_CONFIG_ERROR_FORMAT_AS_STRING 0
 #endif // CHIP_CONFIG_ERROR_FORMAT_AS_STRING
@@ -618,13 +678,13 @@
 #define _CHIP_CONFIG_IsPlatformLwIPErrorNonCritical(CODE) 0
 #endif // !CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 #define _CHIP_CONFIG_IsPlatformPOSIXErrorNonCritical(CODE)                                                                         \
     ((CODE) == CHIP_ERROR_POSIX(EHOSTUNREACH) || (CODE) == CHIP_ERROR_POSIX(ENETUNREACH) ||                                        \
      (CODE) == CHIP_ERROR_POSIX(EADDRNOTAVAIL) || (CODE) == CHIP_ERROR_POSIX(EPIPE))
-#else // !CHIP_SYSTEM_CONFIG_USE_SOCKETS
+#else // !(CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK)
 #define _CHIP_CONFIG_IsPlatformPOSIXErrorNonCritical(CODE) 0
-#endif // !CHIP_SYSTEM_CONFIG_USE_SOCKETS
+#endif // !(CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK)
 
 #define CHIP_CONFIG_IsPlatformErrorNonCritical(CODE)                                                                               \
     (_CHIP_CONFIG_IsPlatformPOSIXErrorNonCritical(CODE) || _CHIP_CONFIG_IsPlatformLwIPErrorNonCritical(CODE))
@@ -693,23 +753,13 @@
 #endif
 
 /**
- * @def CHIP_CONFIG_ENABLE_ARG_PARSER
+ * @def CHIP_CONFIG_MAX_TRACING_BACKENDS
  *
- * @brief Enable support functions for parsing command-line arguments
+ * @brief The maximum number of tracing backends that can be registered.
+ * This value only takes effect if tracing is enabled at all.
  */
-#ifndef CHIP_CONFIG_ENABLE_ARG_PARSER
-#define CHIP_CONFIG_ENABLE_ARG_PARSER 0
-#endif
-
-/**
- * @def CHIP_CONFIG_ENABLE_ARG_PARSER_VALIDITY_CHECKS
- *
- * @brief Enable validity checking of command-line argument definitions.
- *
- * // TODO: Determine why we wouldn't need this
- */
-#ifndef CHIP_CONFIG_ENABLE_ARG_PARSER_VALIDITY_CHECKS
-#define CHIP_CONFIG_ENABLE_ARG_PARSER_VALIDITY_CHECKS 1
+#ifndef CHIP_CONFIG_MAX_TRACING_BACKENDS
+#define CHIP_CONFIG_MAX_TRACING_BACKENDS 4
 #endif
 
 /**
@@ -1015,6 +1065,17 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif
 
 /**
+ * @def CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE_NO_COND
+ *
+ * @brief If true, VerifyOrDie() built with @c CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE
+ *        generates a short message that includes only the source code location,
+ *        without the condition that fails.
+ */
+#ifndef CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE_NO_COND
+#define CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE_NO_COND 0
+#endif
+
+/**
  * @def CHIP_CONFIG_CONTROLLER_MAX_ACTIVE_DEVICES
  *
  * @brief Number of devices a controller can be simultaneously connected to
@@ -1061,10 +1122,29 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  * @brief Defines the number of "endpoint->controlling group" mappings per fabric.
  *
  * Binds to number of GroupMapping entries per fabric
+ * TODO cleanup this config #43166
  */
 #ifndef CHIP_CONFIG_MAX_GROUP_ENDPOINTS_PER_FABRIC
 #define CHIP_CONFIG_MAX_GROUP_ENDPOINTS_PER_FABRIC 1
 #endif
+
+/**
+ * @def CHIP_CONFIG_MAX_BINDING_ENTRIES_PER_FABRIC
+ *
+ * @brief Defines the number of binding entries per fabric.
+ */
+#ifndef CHIP_CONFIG_MAX_BINDING_ENTRIES_PER_FABRIC
+#define CHIP_CONFIG_MAX_BINDING_ENTRIES_PER_FABRIC 4
+#endif
+
+/**
+ * @def CHIP_CONFIG_MAX_GROUPCAST_MEMBERSHIP_COUNT
+ *
+ * @brief Defines the maximum number of group memberships
+ */
+#ifndef CHIP_CONFIG_MAX_GROUPCAST_MEMBERSHIP_COUNT
+#define CHIP_CONFIG_MAX_GROUPCAST_MEMBERSHIP_COUNT 10
+#endif // CHIP_CONFIG_MAX_GROUPCAST_MEMBERSHIP_COUNT
 
 /**
  * @def CHIP_CONFIG_MAX_GROUPS_PER_FABRIC
@@ -1072,6 +1152,7 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  * @brief Defines the number of groups supported per fabric, see Group Key Management Cluster in specification.
  *
  * Binds to number of GroupState entries to support per fabric
+ * TODO cleanup this config #43166
  */
 #ifndef CHIP_CONFIG_MAX_GROUPS_PER_FABRIC
 #define CHIP_CONFIG_MAX_GROUPS_PER_FABRIC (4 * CHIP_CONFIG_MAX_GROUP_ENDPOINTS_PER_FABRIC)
@@ -1082,14 +1163,14 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif
 
 /**
- * @def CHIP_CONFIG_MAX_GROUPS_PER_FABRIC
+ * @def CHIP_CONFIG_MAX_GROUP_KEYS_PER_FABRIC
  *
  * @brief Defines the number of groups key sets supported per fabric, see Group Key Management Cluster in specification.
  *
  * Binds to number of KeySet entries to support per fabric (Need at least 1 for Identity Protection Key)
  */
 #ifndef CHIP_CONFIG_MAX_GROUP_KEYS_PER_FABRIC
-#define CHIP_CONFIG_MAX_GROUP_KEYS_PER_FABRIC 3
+#define CHIP_CONFIG_MAX_GROUP_KEYS_PER_FABRIC (3 + 1) // support 3 KeySets + IPK per fabric
 #endif
 
 #if CHIP_CONFIG_MAX_GROUP_KEYS_PER_FABRIC < 1
@@ -1188,6 +1269,18 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif
 
 /**
+ * @def CHIP_CONFIG_ENABLE_ACL_EXTENSIONS
+ *
+ * If set to 1, the `Extension` attribute of the ACL Cluster will be enabled
+ * and supported. This attribute is optional and costly to implement. It is required by
+ * some device types, so some applications must enable it in their CHIPProjectConfig.h
+ * as an override.
+ */
+#ifndef CHIP_CONFIG_ENABLE_ACL_EXTENSIONS
+#define CHIP_CONFIG_ENABLE_ACL_EXTENSIONS 0
+#endif
+
+/**
  * @def CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_FLEXIBLE_COPY_SUPPORT
  *
  * Support flexible copy in the example access control implementation.
@@ -1265,19 +1358,6 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #ifndef CHIP_CONFIG_ENABLE_SERVER_IM_EVENT
 #define CHIP_CONFIG_ENABLE_SERVER_IM_EVENT 1
 #endif
-
-/**
- * Accepts receipt of invalid privacy flag usage that affected some early SVE2 test event implementations.
- * When SVE2 started, group messages would be sent with the privacy flag enabled, but without privacy encrypting the message header.
- * The issue was subsequently corrected in master, the 1.0 branch, and the SVE2 branch.
- * This is a temporary workaround for interoperability with those erroneous early-SVE2 implementations.
- * The cost of this compatibity mode is twice as many decryption steps per received group message.
- *
- * TODO(#24573): Remove this workaround once interoperability with legacy pre-SVE2 is no longer required.
- */
-#ifndef CHIP_CONFIG_PRIVACY_ACCEPT_NONSPEC_SVE2
-#define CHIP_CONFIG_PRIVACY_ACCEPT_NONSPEC_SVE2 1
-#endif // CHIP_CONFIG_PRIVACY_ACCEPT_NONSPEC_SVE2
 
 /**
  *  @def CHIP_RESUBSCRIBE_MAX_RETRY_WAIT_INTERVAL_MS
@@ -1545,7 +1625,8 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  *  Scene Max name size + OnOff : 55 bytes
  *  Scene Max name size + LevelControl : 64 bytes
  *  Scene Max name size + ColorControl : 130 bytes
- *  Scene Max name size + OnOff + LevelControl + ColoControl : 175 bytes
+ *  Scene Max name size + ModeSelect : 55 bytes
+ *  Scene Max name size + OnOff + LevelControl + ColorControl + ModeSelect : 230 bytes
  *
  *  Cluster Sizes:
  *  OnOff Cluster Max Size: 21 bytes
@@ -1554,17 +1635,6 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  * */
 #ifndef CHIP_CONFIG_SCENES_MAX_SERIALIZED_SCENE_SIZE_BYTES
 #define CHIP_CONFIG_SCENES_MAX_SERIALIZED_SCENE_SIZE_BYTES 256
-#endif
-
-/**
- * @def CHIP_CONFIG_MAX_SCENES_CONCURRENT_ITERATORS
- *
- * @brief Defines the number of simultaneous Scenes iterators that can be allocated
- *
- * Number of iterator instances that can be allocated at any one time
- */
-#ifndef CHIP_CONFIG_MAX_SCENES_CONCURRENT_ITERATORS
-#define CHIP_CONFIG_MAX_SCENES_CONCURRENT_ITERATORS 2
 #endif
 
 /**
@@ -1639,6 +1709,21 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  */
 #ifndef CHIP_CONFIG_ICD_IDLE_MODE_DURATION_SEC
 #define CHIP_CONFIG_ICD_IDLE_MODE_DURATION_SEC 300
+#endif
+
+/**
+ * @def CHIP_CONFIG_ICD_SHORT_IDLE_MODE_DURATION_SEC
+ *
+ * The CHIP_CONFIG_ICD_SHORT_IDLE_MODE_DURATION_SEC is a configuration for shorter idle mode interval for LIT capable devices
+ * operating in SIT mode. This allows devices to report more frequently and maintain a more reliable availability status with their
+ * subscribers.
+ *
+ * The short idleMode duration SHALL be lesser than or equal to the IdleModeDuration.
+ *
+ * NOTE: To make full use of the ShortIdleModeDuration, users SHOULD also set ICD_REPORT_ON_ENTER_ACTIVE_MODE
+ */
+#ifndef CHIP_CONFIG_ICD_SHORT_IDLE_MODE_DURATION_SEC
+#define CHIP_CONFIG_ICD_SHORT_IDLE_MODE_DURATION_SEC CHIP_CONFIG_ICD_IDLE_MODE_DURATION_SEC
 #endif
 
 /**
@@ -1818,10 +1903,10 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  * @def CHIP_CONFIG_ICD_OBSERVERS_POOL_SIZE
  *
  * @brief Defines the entry iterator delegate pool size of the ICDObserver object pool in ICDManager.h.
- *        Two are used in the default implementation. Users can increase it to register more observers.
+ *        Three are used in the default implementation. Users can increase it to register more observers.
  */
 #ifndef CHIP_CONFIG_ICD_OBSERVERS_POOL_SIZE
-#define CHIP_CONFIG_ICD_OBSERVERS_POOL_SIZE 2
+#define CHIP_CONFIG_ICD_OBSERVERS_POOL_SIZE 3
 #endif
 
 /**
@@ -1844,6 +1929,167 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #ifndef CHIP_CONFIG_MAX_BDX_LOG_TRANSFERS
 #define CHIP_CONFIG_MAX_BDX_LOG_TRANSFERS 5
 #endif // CHIP_CONFIG_MAX_BDX_LOG_TRANSFERS
+
+/**
+ *  @def CHIP_CONFIG_BDX_LOG_TRANSFER_MAX_BLOCK_SIZE
+ *
+ *  @brief
+ *    Maximum block size recommended by device for BDX transfers of diagnostic logs.
+ *    If increased, also increase CHIP_SYSTEM_CONFIG_PACKETBUFFER_CAPACITY_MAX.
+ *    Note that SecureSession::AllowsLargePayload limits the payload size for all transport
+ *    types besides TCP, so, if using UDP, BDX blocks larger than a certain size (e.g. 1174)
+ *    will be unable to send.
+ *
+ */
+#ifndef CHIP_CONFIG_BDX_LOG_TRANSFER_MAX_BLOCK_SIZE
+#define CHIP_CONFIG_BDX_LOG_TRANSFER_MAX_BLOCK_SIZE 1024
+#endif // CHIP_CONFIG_BDX_LOG_TRANSFER_MAX_BLOCK_SIZE
+
+/**
+ *  @def CHIP_CONFIG_TEST_GOOGLETEST
+ *
+ *  @brief
+ *    If asserted (1), enable APIs that support unit tests built with the GoogleTest framework
+ *
+ */
+#ifndef CHIP_CONFIG_TEST_GOOGLETEST
+#define CHIP_CONFIG_TEST_GOOGLETEST 0
+#endif // CHIP_CONFIG_TEST_GOOGLETEST
+
+/**
+ *  @def CHIP_CONFIG_MRP_ANALYTICS_ENABLED
+ *
+ *  @brief
+ *    Enables code for collecting and sending analytic related events for MRP
+ *
+ * The purpose of this macro is to prevent compiling code related to MRP analytics
+ * for devices that are not interested interested to save on flash.
+ */
+
+#ifndef CHIP_CONFIG_MRP_ANALYTICS_ENABLED
+#define CHIP_CONFIG_MRP_ANALYTICS_ENABLED 0
+#endif // CHIP_CONFIG_MRP_ANALYTICS_ENABLED
+
+/**
+ *  @def CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
+ *
+ *  @brief
+ *    Enables EndpointUniqueId attribute for the endpoint in descriptor cluster
+ *
+ * The purpose of this macro is to prevent compiling code related to EndpointUniqueId
+ * for devices that are not interested to support this optional attribute in descriptor cluster by
+ * overriding this macro in project specific configuration.
+ */
+#ifndef CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
+#define CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID 0
+#endif // CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
+
+/**
+ * @def CHIP_CONFIG_TLS_PERSISTED_ROOT_CERT_BYTES
+ *
+ * @brief The maximum number of bytes taken by the TLS root certificate in persistent storage. This needs
+ * to be increased if the size of TLSCertStruct changes.
+ *
+ * @note The default is based on real-world testing of serialization for the worst case allowed by the spec.
+ */
+#ifndef CHIP_CONFIG_TLS_PERSISTED_ROOT_CERT_BYTES
+#define CHIP_CONFIG_TLS_PERSISTED_ROOT_CERT_BYTES 3200
+#endif // CHIP_CONFIG_TLS_PERSISTED_ROOT_CERT_BYTES
+
+/**
+ * @def CHIP_CONFIG_TLS_PERSISTED_CLIENT_CERT_BYTES
+ *
+ * @brief The maximum number of bytes taken by the TLS client certificate in persistent storage. This needs
+ * to be increased if the size of TLSClientCertificateDetailStruct changes.
+ *
+ * @note The default is based on real-world testing of serialization for the worst case allowed by the spec.
+ */
+#ifndef CHIP_CONFIG_TLS_PERSISTED_CLIENT_CERT_BYTES
+#define CHIP_CONFIG_TLS_PERSISTED_CLIENT_CERT_BYTES 31000
+#endif // CHIP_CONFIG_TLS_PERSISTED_CLIENT_CERT_BYTES
+
+/**
+ * @def CHIP_CONFIG_TLS_MAX_CLIENT_CERTS_PER_FABRIC_TABLE_SIZE
+ *
+ * @brief The maximum number of client certificates per fabric for the TLS table
+ */
+#ifndef CHIP_CONFIG_TLS_MAX_CLIENT_CERTS_PER_FABRIC_TABLE_SIZE
+#define CHIP_CONFIG_TLS_MAX_CLIENT_CERTS_PER_FABRIC_TABLE_SIZE 5
+#endif // CHIP_CONFIG_TLS_MAX_CLIENT_CERTS_PER_FABRIC_TABLE_SIZE
+
+/**
+ * @def CHIP_CONFIG_TLS_MAX_ROOT_PER_FABRIC_CERTS_TABLE_SIZE
+ *
+ * @brief The maximum number of root certificates per fabric for the TLS table
+ */
+#ifndef CHIP_CONFIG_TLS_MAX_ROOT_PER_FABRIC_CERTS_TABLE_SIZE
+#define CHIP_CONFIG_TLS_MAX_ROOT_PER_FABRIC_CERTS_TABLE_SIZE 5
+#endif // CHIP_CONFIG_TLS_MAX_ROOT_PER_FABRIC_CERTS_TABLE_SIZE
+
+/**
+ * @def CHIP_CONFIG_TLS_MAX_PROVISIONED_ENDPOINTS
+ *
+ * @brief The default maximum number of TLS endpoints that can be provisioned in the
+ *        TLS Client Management cluster when using the code-driven implementation. The Matter spec
+ *        requires this to be between 5 and 254. Applications can override this by providing a custom delegate.
+ */
+#ifndef CHIP_CONFIG_TLS_MAX_PROVISIONED_ENDPOINTS
+#define CHIP_CONFIG_TLS_MAX_PROVISIONED_ENDPOINTS 5
+#endif // CHIP_CONFIG_TLS_MAX_PROVISIONED_ENDPOINTS
+
+/**
+ * @def CHIP_CONFIG_MAX_NUM_CAMERA_VIDEO_STREAMS
+ *
+ * @brief The maximum number of video streams per device
+ */
+#ifndef CHIP_CONFIG_MAX_NUM_CAMERA_VIDEO_STREAMS
+#define CHIP_CONFIG_MAX_NUM_CAMERA_VIDEO_STREAMS 8
+#endif // CHIP_CONFIG_MAX_NUM_CAMERA_VIDEO_STREAMS
+
+/**
+ * @def CHIP_CONFIG_MAX_NUM_CAMERA_AUDIO_STREAMS
+ *
+ * @brief The maximum number of audio streams per device
+ */
+#ifndef CHIP_CONFIG_MAX_NUM_CAMERA_AUDIO_STREAMS
+#define CHIP_CONFIG_MAX_NUM_CAMERA_AUDIO_STREAMS 8
+#endif // CHIP_CONFIG_MAX_NUM_CAMERA_AUDIO_STREAMS
+
+/**
+ * @def CHIP_CONFIG_MAX_NUM_CAMERA_SNAPSHOT_STREAMS
+ *
+ * @brief The maximum number of snapshot streams per device
+ */
+#ifndef CHIP_CONFIG_MAX_NUM_CAMERA_SNAPSHOT_STREAMS
+#define CHIP_CONFIG_MAX_NUM_CAMERA_SNAPSHOT_STREAMS 8
+#endif // CHIP_CONFIG_MAX_NUM_CAMERA_SNAPSHOT_STREAMS
+
+/**
+ * @def CHIP_CONFIG_MAX_NUM_PUSH_TRANSPORTS
+ *
+ * @brief The maximum number of PushAV transports per device per fabric
+ */
+#ifndef CHIP_CONFIG_MAX_NUM_PUSH_TRANSPORTS
+#define CHIP_CONFIG_MAX_NUM_PUSH_TRANSPORTS 4
+#endif // CHIP_CONFIG_MAX_NUM_PUSH_TRANSPORTS
+
+/**
+ * @def CHIP_CONFIG_MAX_NUM_ZONES
+ *
+ * @brief The maximum number of zones
+ */
+#ifndef CHIP_CONFIG_MAX_NUM_ZONES
+#define CHIP_CONFIG_MAX_NUM_ZONES 4
+#endif // CHIP_CONFIG_MAX_NUM_ZONES
+
+/**
+ * @def CHIP_MEMORY_SANITIZER_ENABLED
+ *
+ * @brief True when building with Clang MemorySanitizer (MSan).
+ */
+#ifndef CHIP_MEMORY_SANITIZER_ENABLED
+#define CHIP_MEMORY_SANITIZER_ENABLED 0
+#endif
 
 /**
  * @}

@@ -122,57 +122,87 @@ void BdxOtaSender::HandleTransferSessionOutput(TransferSession::OutputEvent & ev
         memcpy(mFileDesignator, fd, fdl);
         mFileDesignator[fdl] = 0;
 
+        // Validate that the designator exists in the map
+        const auto entry = mFileDesignatorMap.find(mFileDesignator);
+        if (entry == mFileDesignatorMap.cend())
+        {
+            VerifyOrReturn(mTransfer.AbortTransfer(StatusCode::kFileDesignatorUnknown) == CHIP_NO_ERROR,
+                           ChipLogError(BDX, "AbortTransfer failed"));
+            return;
+        }
+
         break;
     }
-    case TransferSession::OutputEventType::kQueryReceived: {
+    case TransferSession::OutputEventType::kQueryReceived:
+    case TransferSession::OutputEventType::kQueryWithSkipReceived: {
         TransferSession::BlockData blockData;
         uint16_t blockSize   = mTransfer.GetTransferBlockSize();
         uint16_t bytesToRead = blockSize;
+        uint64_t bytesToSkip = 0;
+
+        if (event.EventType == TransferSession::OutputEventType::kQueryWithSkipReceived)
+        {
+            bytesToSkip = event.bytesToSkip.BytesToSkip;
+        }
+        uint64_t seekOffset = mNumBytesSent + bytesToSkip;
 
         // TODO: This should be a utility function in TransferSession
-        if (mTransfer.GetTransferLength() > 0 && mNumBytesSent + blockSize > mTransfer.GetTransferLength())
+        if ((mTransfer.GetTransferLength() > 0) && ((seekOffset + blockSize) > mTransfer.GetTransferLength()))
         {
             // cast should be safe because of condition above
-            bytesToRead = static_cast<uint16_t>(mTransfer.GetTransferLength() - mNumBytesSent);
+            bytesToRead = static_cast<uint16_t>(mTransfer.GetTransferLength() - seekOffset);
         }
 
         chip::System::PacketBufferHandle blockBuf = chip::System::PacketBufferHandle::New(bytesToRead);
         if (blockBuf.IsNull())
         {
             // TODO(#13981): AbortTransfer() needs to support GeneralStatusCode failures as well as BDX specific errors.
-            mTransfer.AbortTransfer(StatusCode::kUnknown);
+            TEMPORARY_RETURN_IGNORED mTransfer.AbortTransfer(StatusCode::kUnknown);
             return;
         }
 
-        std::ifstream otaFile(mFileDesignator, std::ifstream::in);
+        const auto entry = mFileDesignatorMap.find(mFileDesignator);
+        if (entry == mFileDesignatorMap.cend())
+        {
+            VerifyOrReturn(mTransfer.AbortTransfer(StatusCode::kFileDesignatorUnknown) == CHIP_NO_ERROR,
+                           ChipLogError(BDX, "AbortTransfer failed"));
+            return;
+        }
+        std::ifstream otaFile(entry->second.c_str(), std::ifstream::in | std::ios::binary);
         if (!otaFile.good())
         {
             ChipLogError(BDX, "OTA file open failed");
-            mTransfer.AbortTransfer(StatusCode::kFileDesignatorUnknown);
+            TEMPORARY_RETURN_IGNORED mTransfer.AbortTransfer(StatusCode::kFileDesignatorUnknown);
             return;
         }
 
-        otaFile.seekg(mNumBytesSent);
+        if (seekOffset > static_cast<uint64_t>(std::numeric_limits<std::streamoff>::max()))
+        {
+            ChipLogError(BDX, "Seek offset too large");
+            TEMPORARY_RETURN_IGNORED mTransfer.AbortTransfer(StatusCode::kLengthTooLarge);
+            return;
+        }
+        otaFile.seekg(static_cast<std::streamoff>(seekOffset));
         otaFile.read(reinterpret_cast<char *>(blockBuf->Start()), bytesToRead);
         if (!(otaFile.good() || otaFile.eof()))
         {
             ChipLogError(BDX, "OTA file read failed");
-            mTransfer.AbortTransfer(StatusCode::kFileDesignatorUnknown);
+            TEMPORARY_RETURN_IGNORED mTransfer.AbortTransfer(StatusCode::kFileDesignatorUnknown);
             return;
         }
 
         blockData.Data   = blockBuf->Start();
         blockData.Length = static_cast<size_t>(otaFile.gcount());
         blockData.IsEof  = (blockData.Length < blockSize) ||
-            (mNumBytesSent + static_cast<uint64_t>(blockData.Length) == mTransfer.GetTransferLength() || (otaFile.peek() == EOF));
-        mNumBytesSent = static_cast<uint32_t>(mNumBytesSent + blockData.Length);
+            (seekOffset + static_cast<uint64_t>(blockData.Length) == mTransfer.GetTransferLength() || (otaFile.peek() == EOF));
+        mNumBytesSent = static_cast<uint32_t>(seekOffset + blockData.Length);
         otaFile.close();
 
         err = mTransfer.PrepareBlock(blockData);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(BDX, "PrepareBlock failed: %" CHIP_ERROR_FORMAT, err.Format());
-            mTransfer.AbortTransfer(StatusCode::kUnknown);
+            TEMPORARY_RETURN_IGNORED mTransfer.AbortTransfer(StatusCode::kUnknown);
         }
         break;
     }
@@ -221,4 +251,13 @@ void BdxOtaSender::Reset()
     mInitialized  = false;
     mNumBytesSent = 0;
     memset(mFileDesignator, 0, chip::bdx::kMaxFileDesignatorLen);
+}
+
+void BdxOtaSender::AbortTransfer()
+{
+    if (mInitialized)
+    {
+        TEMPORARY_RETURN_IGNORED mTransfer.AbortTransfer(StatusCode::kUnknown);
+        PollForOutput();
+    }
 }

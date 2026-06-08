@@ -17,16 +17,15 @@
 package chip.devicecontroller.cluster.eventstructs
 
 import chip.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class ZoneManagementClusterZoneTriggeredEvent(val zones: List<UInt>, val reason: UInt) {
+class ZoneManagementClusterZoneTriggeredEvent(val zone: UInt, val reason: UInt) {
   override fun toString(): String = buildString {
     append("ZoneManagementClusterZoneTriggeredEvent {\n")
-    append("\tzones : $zones\n")
+    append("\tzone : $zone\n")
     append("\treason : $reason\n")
     append("}\n")
   }
@@ -34,35 +33,24 @@ class ZoneManagementClusterZoneTriggeredEvent(val zones: List<UInt>, val reason:
   fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
       startStructure(tlvTag)
-      startArray(ContextSpecificTag(TAG_ZONES))
-      for (item in zones.iterator()) {
-        put(AnonymousTag, item)
-      }
-      endArray()
+      put(ContextSpecificTag(TAG_ZONE), zone)
       put(ContextSpecificTag(TAG_REASON), reason)
       endStructure()
     }
   }
 
   companion object {
-    private const val TAG_ZONES = 0
+    private const val TAG_ZONE = 0
     private const val TAG_REASON = 1
 
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ZoneManagementClusterZoneTriggeredEvent {
       tlvReader.enterStructure(tlvTag)
-      val zones =
-        buildList<UInt> {
-          tlvReader.enterArray(ContextSpecificTag(TAG_ZONES))
-          while (!tlvReader.isEndOfContainer()) {
-            this.add(tlvReader.getUInt(AnonymousTag))
-          }
-          tlvReader.exitContainer()
-        }
+      val zone = tlvReader.getUInt(ContextSpecificTag(TAG_ZONE))
       val reason = tlvReader.getUInt(ContextSpecificTag(TAG_REASON))
 
       tlvReader.exitContainer()
 
-      return ZoneManagementClusterZoneTriggeredEvent(zones, reason)
+      return ZoneManagementClusterZoneTriggeredEvent(zone, reason)
     }
   }
 }

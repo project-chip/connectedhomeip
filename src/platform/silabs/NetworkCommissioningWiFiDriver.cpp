@@ -25,6 +25,7 @@
 
 using namespace ::chip;
 using namespace ::chip::DeviceLayer::Internal;
+using namespace ::chip::DeviceLayer::Silabs;
 
 namespace chip {
 namespace DeviceLayer {
@@ -35,49 +36,50 @@ NetworkCommissioning::WiFiScanResponse * sScanResult;
 SlScanResponseIterator<NetworkCommissioning::WiFiScanResponse> mScanResponseIter(sScanResult);
 } // namespace
 
+SlWiFiDriver * SlWiFiDriver::mDriver = nullptr;
+
 CHIP_ERROR SlWiFiDriver::Init(NetworkStatusChangeCallback * networkStatusChangeCallback)
 {
     CHIP_ERROR err;
-    size_t ssidLen         = 0;
-    size_t credentialsLen  = 0;
     mpScanCallback         = nullptr;
     mpConnectCallback      = nullptr;
     mpStatusChangeCallback = networkStatusChangeCallback;
-
+    mDriver                = this;
+    // TODO: default to SL_WIFI_SSID and SL_WIFI_PSK if not defined
 #ifdef SL_ONNETWORK_PAIRING
     memcpy(&mSavedNetwork.ssid[0], SL_WIFI_SSID, sizeof(SL_WIFI_SSID));
-    memcpy(&mSavedNetwork.credentials[0], SL_WIFI_PSK, sizeof(SL_WIFI_PSK));
-    credentialsLen               = sizeof(SL_WIFI_PSK);
-    ssidLen                      = sizeof(SL_WIFI_SSID);
-    mSavedNetwork.credentialsLen = credentialsLen;
-    mSavedNetwork.ssidLen        = ssidLen;
-    mStagingNetwork              = mSavedNetwork;
-    err                          = CHIP_NO_ERROR;
+    memcpy(&mSavedNetwork.key[0], SL_WIFI_PSK, sizeof(SL_WIFI_PSK));
+    mSavedNetwork.keyLen  = sizeof(SL_WIFI_PSK);
+    mSavedNetwork.ssidLen = sizeof(SL_WIFI_SSID);
+    err                   = CHIP_NO_ERROR;
 #else
     // If reading fails, wifi is not provisioned, no need to go further.
-    err = SilabsConfig::ReadConfigValueStr(SilabsConfig::kConfigKey_WiFiSSID, mSavedNetwork.ssid, sizeof(mSavedNetwork.ssid),
-                                           ssidLen);
+    err = SilabsConfig::ReadConfigValueBin(SilabsConfig::kConfigKey_WiFiSSID, mSavedNetwork.ssid, sizeof(mSavedNetwork.ssid),
+                                           mSavedNetwork.ssidLen);
     VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_NO_ERROR);
 
-    err = SilabsConfig::ReadConfigValueStr(SilabsConfig::kConfigKey_WiFiPSK, mSavedNetwork.credentials,
-                                           sizeof(mSavedNetwork.credentials), credentialsLen);
+    err = SilabsConfig::ReadConfigValueBin(SilabsConfig::kConfigKey_WiFiPSK, mSavedNetwork.key, sizeof(mSavedNetwork.key),
+                                           mSavedNetwork.keyLen);
     VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_NO_ERROR);
 
-    mSavedNetwork.credentialsLen = credentialsLen;
-    mSavedNetwork.ssidLen        = ssidLen;
-    mStagingNetwork              = mSavedNetwork;
-#endif
-    ConnectWiFiNetwork(mSavedNetwork.ssid, ssidLen, mSavedNetwork.credentials, credentialsLen);
+#endif // SL_ONNETWORK_PAIRING
+    mStagingNetwork = mSavedNetwork;
+    err             = ConnectWiFiNetwork(reinterpret_cast<const char *>(mSavedNetwork.ssid), mSavedNetwork.ssidLen,
+                                         reinterpret_cast<const char *>(mSavedNetwork.key), mSavedNetwork.keyLen);
     return err;
 }
 
 CHIP_ERROR SlWiFiDriver::CommitConfiguration()
 {
-    uint8_t securityType = WFX_SEC_WPA2;
+    constexpr uint8_t kDefaultSecurityBitmap =
+        static_cast<uint8_t>(chip::app::Clusters::NetworkCommissioning::WiFiSecurityBitmap::kWpa2Personal);
 
-    ReturnErrorOnFailure(SilabsConfig::WriteConfigValueStr(SilabsConfig::kConfigKey_WiFiSSID, mStagingNetwork.ssid));
-    ReturnErrorOnFailure(SilabsConfig::WriteConfigValueStr(SilabsConfig::kConfigKey_WiFiPSK, mStagingNetwork.credentials));
-    ReturnErrorOnFailure(SilabsConfig::WriteConfigValueBin(SilabsConfig::kConfigKey_WiFiSEC, &securityType, sizeof(securityType)));
+    ReturnErrorOnFailure(SilabsConfig::WriteConfigValueBin(
+        SilabsConfig::kConfigKey_WiFiSSID, reinterpret_cast<const uint8_t *>(mStagingNetwork.ssid), mStagingNetwork.ssidLen));
+    ReturnErrorOnFailure(SilabsConfig::WriteConfigValueBin(
+        SilabsConfig::kConfigKey_WiFiPSK, reinterpret_cast<const uint8_t *>(mStagingNetwork.key), mStagingNetwork.keyLen));
+    ReturnErrorOnFailure(SilabsConfig::WriteConfigValueBin(SilabsConfig::kConfigKey_WiFiSEC, &kDefaultSecurityBitmap,
+                                                           sizeof(kDefaultSecurityBitmap)));
 
     mSavedNetwork = mStagingNetwork;
     return CHIP_NO_ERROR;
@@ -89,7 +91,7 @@ CHIP_ERROR SlWiFiDriver::RevertConfiguration()
     return CHIP_NO_ERROR;
 }
 
-bool SlWiFiDriver::NetworkMatch(const WiFiNetwork & network, ByteSpan networkId)
+bool SlWiFiDriver::NetworkMatch(const Silabs::WifiInterface::WiFiCredentials & network, ByteSpan networkId)
 {
     return networkId.size() == network.ssidLen && memcmp(networkId.data(), network.ssid, network.ssidLen) == 0;
 }
@@ -100,16 +102,18 @@ Status SlWiFiDriver::AddOrUpdateNetwork(ByteSpan ssid, ByteSpan credentials, Mut
     outDebugText.reduce_size(0);
     outNetworkIndex = 0;
     VerifyOrReturnError(mStagingNetwork.ssidLen == 0 || NetworkMatch(mStagingNetwork, ssid), Status::kBoundsExceeded);
-    VerifyOrReturnError(credentials.size() <= sizeof(mStagingNetwork.credentials), Status::kOutOfRange);
+    VerifyOrReturnError(credentials.size() <= sizeof(mStagingNetwork.key), Status::kOutOfRange);
     VerifyOrReturnError(ssid.size() <= sizeof(mStagingNetwork.ssid), Status::kOutOfRange);
 
-    memset(mStagingNetwork.credentials, 0, sizeof(mStagingNetwork.credentials));
-    memcpy(mStagingNetwork.credentials, credentials.data(), credentials.size());
-    mStagingNetwork.credentialsLen = static_cast<decltype(mStagingNetwork.credentialsLen)>(credentials.size());
+    VerifyOrReturnError(ssid.data() != nullptr, Status::kNetworkNotFound);
+    MutableByteSpan ssidSpan(mStagingNetwork.ssid, sizeof(mStagingNetwork.ssid));
+    VerifyOrReturnError(CopySpanToMutableSpan(ssid, ssidSpan) == CHIP_NO_ERROR, Status::kBoundsExceeded);
+    mStagingNetwork.ssidLen = ssid.size();
 
-    memset(mStagingNetwork.ssid, 0, sizeof(mStagingNetwork.ssid));
-    memcpy(mStagingNetwork.ssid, ssid.data(), ssid.size());
-    mStagingNetwork.ssidLen = static_cast<decltype(mStagingNetwork.ssidLen)>(ssid.size());
+    VerifyOrReturnError(credentials.data() != nullptr, Status::kNetworkNotFound);
+    MutableByteSpan keySpan(mStagingNetwork.key, sizeof(mStagingNetwork.key));
+    VerifyOrReturnError(CopySpanToMutableSpan(credentials, keySpan) == CHIP_NO_ERROR, Status::kBoundsExceeded);
+    mStagingNetwork.keyLen = credentials.size();
 
     return Status::kSuccess;
 }
@@ -136,35 +140,30 @@ Status SlWiFiDriver::ReorderNetwork(ByteSpan networkId, uint8_t index, MutableCh
 
 CHIP_ERROR SlWiFiDriver::ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen, const char * key, uint8_t keyLen)
 {
-    int32_t status = SL_STATUS_OK;
     if (ConnectivityMgr().IsWiFiStationProvisioned())
     {
-        ChipLogProgress(DeviceLayer, "Disconecting for current wifi");
-        status = wfx_sta_discon();
-        if (status != SL_STATUS_OK)
-        {
-            return CHIP_ERROR_INTERNAL;
-        }
+        ChipLogProgress(DeviceLayer, "Disconnecting for current wifi");
+        WifiInterface::GetInstance().TriggerDisconnection();
     }
     ReturnErrorOnFailure(ConnectivityMgr().SetWiFiStationMode(ConnectivityManager::kWiFiStationMode_Disabled));
 
     // Set the wifi configuration
-    wfx_wifi_provision_t wifiConfig;
-    memset(&wifiConfig, 0, sizeof(wifiConfig));
+    WifiInterface::WiFiCredentials wifiConfig;
 
-    VerifyOrReturnError(ssidLen <= WFX_MAX_SSID_LENGTH, CHIP_ERROR_BUFFER_TOO_SMALL);
+    VerifyOrReturnError(ssidLen <= kMaxWiFiSSIDLength, CHIP_ERROR_BUFFER_TOO_SMALL);
     memcpy(wifiConfig.ssid, ssid, ssidLen);
-    wifiConfig.ssid_length = ssidLen;
+    wifiConfig.ssidLen = ssidLen;
 
-    VerifyOrReturnError(keyLen < WFX_MAX_PASSKEY_LENGTH, CHIP_ERROR_BUFFER_TOO_SMALL);
-    memcpy(wifiConfig.passkey, key, keyLen);
-    wifiConfig.passkey_length = keyLen;
+    VerifyOrReturnError(keyLen < kMaxWiFiKeyLength, CHIP_ERROR_BUFFER_TOO_SMALL);
+    memcpy(wifiConfig.key, key, keyLen);
+    wifiConfig.keyLen = keyLen;
 
-    wifiConfig.security = WFX_SEC_WPA2;
+    wifiConfig.security.Set(chip::app::Clusters::NetworkCommissioning::WiFiSecurityBitmap::kWpa2Personal);
 
-    ChipLogProgress(NetworkProvisioning, "Setting up connection for WiFi SSID: %.*s", static_cast<int>(ssidLen), ssid);
-    // Configure the WFX WiFi interface.
-    wfx_set_wifi_provision(&wifiConfig);
+    ChipLogProgress(NetworkProvisioning, "Setting up connection for WiFi SSID: %s", NullTerminated(ssid, ssidLen).c_str());
+    // Resetting the retry connection state machine for a new access point connection
+    WifiInterface::GetInstance().ResetConnectionRetryInterval();
+    ReturnErrorOnFailure(WifiInterface::GetInstance().SetWifiCredentials(wifiConfig));
     ReturnErrorOnFailure(ConnectivityMgr().SetWiFiStationMode(ConnectivityManager::kWiFiStationMode_Disabled));
     ReturnErrorOnFailure(ConnectivityMgr().SetWiFiStationMode(ConnectivityManager::kWiFiStationMode_Enabled));
     return CHIP_NO_ERROR;
@@ -186,7 +185,7 @@ void SlWiFiDriver::UpdateNetworkingStatus()
     }
 
     ByteSpan networkId = ByteSpan((const unsigned char *) mStagingNetwork.ssid, mStagingNetwork.ssidLen);
-    if (!wfx_is_sta_connected())
+    if (!WifiInterface::GetInstance().IsStationConnected())
     {
         // TODO: https://github.com/project-chip/connectedhomeip/issues/26861
         mpStatusChangeCallback->OnNetworkingStatusChange(Status::kUnknownError, MakeOptional(networkId),
@@ -200,7 +199,7 @@ void SlWiFiDriver::OnConnectWiFiNetwork()
 {
     if (mpConnectCallback)
     {
-        CommitConfiguration();
+        TEMPORARY_RETURN_IGNORED CommitConfiguration();
         mpConnectCallback->OnResult(Status::kSuccess, CharSpan(), 0);
         mpConnectCallback = nullptr;
     }
@@ -214,8 +213,8 @@ void SlWiFiDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * callback
     VerifyOrExit(NetworkMatch(mStagingNetwork, networkId), networkingStatus = Status::kNetworkIDNotFound);
     VerifyOrExit(mpConnectCallback == nullptr, networkingStatus = Status::kUnknownError);
 
-    err = ConnectWiFiNetwork(mStagingNetwork.ssid, mStagingNetwork.ssidLen, mStagingNetwork.credentials,
-                             mStagingNetwork.credentialsLen);
+    err = ConnectWiFiNetwork(reinterpret_cast<const char *>(mStagingNetwork.ssid), mStagingNetwork.ssidLen,
+                             reinterpret_cast<const char *>(mStagingNetwork.key), mStagingNetwork.keyLen);
     if (err == CHIP_NO_ERROR)
     {
         mpConnectCallback = callback;
@@ -225,95 +224,61 @@ void SlWiFiDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * callback
 exit:
     if (networkingStatus != Status::kSuccess)
     {
-        ChipLogError(NetworkProvisioning, "Failed to connect to WiFi network:%s", chip::ErrorStr(err));
+        ChipLogError(NetworkProvisioning, "Failed to connect to WiFi network: %" CHIP_ERROR_FORMAT, err.Format());
         mpConnectCallback = nullptr;
         callback->OnResult(networkingStatus, CharSpan(), 0);
     }
 }
 
-chip::BitFlags<WiFiSecurity> SlWiFiDriver::ConvertSecuritytype(wfx_sec_t security)
+uint32_t SlWiFiDriver::GetSupportedWiFiBandsMask() const
 {
-    chip::BitFlags<WiFiSecurity> securityType;
-    if (security == WFX_SEC_NONE)
-    {
-        securityType = WiFiSecurity::kUnencrypted;
-    }
-    else if (security == WFX_SEC_WEP)
-    {
-        securityType = WiFiSecurity::kWep;
-    }
-    else if (security == WFX_SEC_WPA)
-    {
-        securityType = WiFiSecurity::kWpaPersonal;
-    }
-    else if (security == WFX_SEC_WPA2)
-    {
-        securityType = WiFiSecurity::kWpa2Personal;
-    }
-    else if (security == WFX_SEC_WPA3)
-    {
-        securityType = WiFiSecurity::kWpa3Personal;
-    }
-    else
-    {
-        // wfx_sec_t support more type
-        securityType = WiFiSecurity::kUnencrypted;
-    }
-
-    return securityType;
+    return WifiInterface::GetInstance().GetSupportedWiFiBandsMask();
 }
 
 bool SlWiFiDriver::StartScanWiFiNetworks(ByteSpan ssid)
 {
-    bool scanStarted = false;
-    ChipLogProgress(DeviceLayer, "Start Scan WiFi Networks");
-    if (!ssid.empty()) // ssid is given, only scan this network
+    ChipLogDetail(DeviceLayer, "Start Scan WiFi Networks");
+    CHIP_ERROR err = WifiInterface::GetInstance().StartNetworkScan(ssid, OnScanWiFiNetworkDone);
+
+    if (err != CHIP_NO_ERROR)
     {
-        char cSsid[DeviceLayer::Internal::kMaxWiFiSSIDLength] = {};
-        memcpy(cSsid, ssid.data(), ssid.size());
-        scanStarted = wfx_start_scan(cSsid, OnScanWiFiNetworkDone);
+        ChipLogError(DeviceLayer, "StartNetworkScan failed: %" CHIP_ERROR_FORMAT, err.Format());
+        return false;
     }
-    else // scan all networks
-    {
-        scanStarted = wfx_start_scan(nullptr, OnScanWiFiNetworkDone);
-    }
-    return scanStarted;
+
+    return true;
 }
 
-void SlWiFiDriver::OnScanWiFiNetworkDone(wfx_wifi_scan_result_t * aScanResult)
+void SlWiFiDriver::OnScanWiFiNetworkDone(NetworkCommissioning::WiFiScanResponse * aScanResult)
 {
-    ChipLogProgress(DeviceLayer, "OnScanWiFiNetworkDone");
+    SlWiFiDriver * nwDriver = NetworkCommissioning::SlWiFiDriver::GetInstance();
+    // Cannot use the driver if the instance is not initialized.
+    VerifyOrDie(nwDriver != nullptr); // should never be null
+
     if (!aScanResult)
     {
-        if (GetInstance().mpScanCallback != nullptr)
+        ChipLogProgress(DeviceLayer, "OnScanWiFiNetworkDone: Receive all scanned networks information.");
+
+        if (nwDriver->mpScanCallback != nullptr)
         {
             if (mScanResponseIter.Count() == 0)
             {
                 // if there is no network found, return kNetworkNotFound
-                DeviceLayer::SystemLayer().ScheduleLambda([]() {
-                    GetInstance().mpScanCallback->OnFinished(NetworkCommissioning::Status::kNetworkNotFound, CharSpan(), nullptr);
-                    GetInstance().mpScanCallback = nullptr;
+                TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([nwDriver]() {
+                    nwDriver->mpScanCallback->OnFinished(NetworkCommissioning::Status::kNetworkNotFound, CharSpan(), nullptr);
+                    nwDriver->mpScanCallback = nullptr;
                 });
                 return;
             }
-            DeviceLayer::SystemLayer().ScheduleLambda([]() {
-                GetInstance().mpScanCallback->OnFinished(NetworkCommissioning::Status::kSuccess, CharSpan(), &mScanResponseIter);
-                GetInstance().mpScanCallback = nullptr;
+            TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([nwDriver]() {
+                nwDriver->mpScanCallback->OnFinished(NetworkCommissioning::Status::kSuccess, CharSpan(), &mScanResponseIter);
+                nwDriver->mpScanCallback = nullptr;
             });
         }
     }
     else
     {
-        NetworkCommissioning::WiFiScanResponse scanResponse = {};
-
-        scanResponse.security.Set(GetInstance().ConvertSecuritytype(aScanResult->security));
-        scanResponse.channel = aScanResult->chan;
-        scanResponse.rssi    = aScanResult->rssi;
-        scanResponse.ssidLen = strnlen(aScanResult->ssid, DeviceLayer::Internal::kMaxWiFiSSIDLength);
-        memcpy(scanResponse.ssid, aScanResult->ssid, scanResponse.ssidLen);
-        memcpy(scanResponse.bssid, aScanResult->bssid, sizeof(scanResponse.bssid));
-
-        mScanResponseIter.Add(&scanResponse);
+        mScanResponseIter.Add(aScanResult);
     }
 }
 
@@ -333,17 +298,22 @@ void SlWiFiDriver::ScanNetworks(ByteSpan ssid, WiFiDriver::ScanCallback * callba
 
 CHIP_ERROR GetConnectedNetwork(Network & network)
 {
-    wfx_wifi_provision_t wifiConfig;
+    WifiInterface::WiFiCredentials wifiConfig;
     network.networkIDLen = 0;
     network.connected    = false;
+
     // we are able to fetch the wifi provision data and STA should be connected
-    VerifyOrReturnError(wfx_get_wifi_provision(&wifiConfig), CHIP_ERROR_UNINITIALIZED);
-    VerifyOrReturnError(wfx_is_sta_connected(), CHIP_ERROR_NOT_CONNECTED);
+    VerifyOrReturnError(WifiInterface::GetInstance().IsStationConnected(), CHIP_ERROR_NOT_CONNECTED);
+    ReturnErrorOnFailure(WifiInterface::GetInstance().GetWifiCredentials(wifiConfig));
+    VerifyOrReturnError(wifiConfig.ssidLen <= NetworkCommissioning::kMaxNetworkIDLen, CHIP_ERROR_BUFFER_TOO_SMALL);
+
     network.connected = true;
-    uint8_t length    = strnlen(wifiConfig.ssid, DeviceLayer::Internal::kMaxWiFiSSIDLength);
-    VerifyOrReturnError(length < sizeof(network.networkID), CHIP_ERROR_BUFFER_TOO_SMALL);
-    memcpy(network.networkID, wifiConfig.ssid, length);
-    network.networkIDLen = length;
+
+    ByteSpan ssidSpan(wifiConfig.ssid, wifiConfig.ssidLen);
+    MutableByteSpan networkIdSpan(network.networkID, NetworkCommissioning::kMaxNetworkIDLen);
+
+    ReturnErrorOnFailure(CopySpanToMutableSpan(ssidSpan, networkIdSpan));
+    network.networkIDLen = wifiConfig.ssidLen;
 
     return CHIP_NO_ERROR;
 }

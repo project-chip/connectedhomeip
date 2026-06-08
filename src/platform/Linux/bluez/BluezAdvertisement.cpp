@@ -25,11 +25,12 @@
 #include <glib.h>
 
 #include <ble/Ble.h>
+#include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/ConfigurationManager.h>
 #include <platform/GLibTypeDeleter.h>
-#include <platform/Linux/dbus/bluez/DbusBluez.h>
+#include <platform/Linux/dbus/bluez/DBusBluez.h>
 #include <platform/PlatformManager.h>
 
 #include "BluezEndpoint.h"
@@ -96,7 +97,7 @@ gboolean BluezAdvertisement::BluezLEAdvertisement1Release(BluezLEAdvertisement1 
     mIsAdvertising = false;
     bluez_leadvertisement1_complete_release(aAdv, aInvocation);
     BLEManagerImpl::NotifyBLEPeripheralAdvReleased();
-    return TRUE;
+    return G_DBUS_METHOD_INVOCATION_HANDLED;
 }
 
 CHIP_ERROR BluezAdvertisement::InitImpl()
@@ -119,11 +120,11 @@ CHIP_ERROR BluezAdvertisement::Init(BluezAdapter1 * apAdapter, const char * aAdv
     GAutoPtr<char> rootPath;
     g_object_get(G_OBJECT(mEndpoint.GetGattApplicationObjectManager()), "object-path", &rootPath.GetReceiver(), nullptr);
     g_snprintf(mAdvPath, sizeof(mAdvPath), "%s/advertising", rootPath.get());
-    g_strlcpy(mAdvUUID, aAdvUUID, sizeof(mAdvUUID));
+    chip::Platform::CopyString(mAdvUUID, aAdvUUID);
 
     if (aAdvName != nullptr)
     {
-        g_strlcpy(mAdvName, aAdvName, sizeof(mAdvName));
+        chip::Platform::CopyString(mAdvName, aAdvName);
     }
     else
     {
@@ -203,7 +204,7 @@ void BluezAdvertisement::Shutdown()
 
     // Release resources on the glib thread to synchronize with potential signal handlers
     // attached to the advertising object that may run on the glib thread.
-    PlatformMgrImpl().GLibMatterContextInvokeSync(
+    TEMPORARY_RETURN_IGNORED PlatformMgrImpl().GLibMatterContextInvokeSync(
         +[](BluezAdvertisement * self) {
             // The application object manager might not be released right away (it may be held
             // by other BLE layer objects). We need to unexport the advertisement object in the

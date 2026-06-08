@@ -56,7 +56,7 @@ Instance::Instance(StorageDelegate * storageDelegate, Delegate * aDelegate, Endp
 
 Instance::~Instance()
 {
-    CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
+    TEMPORARY_RETURN_IGNORED CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
     AttributeAccessInterfaceRegistry::Instance().Unregister(this);
 }
 
@@ -833,8 +833,8 @@ bool Instance::AddSupportedMap(uint32_t aMapId, const CharSpan & aMapName)
         // the name cannot be the same as an existing map
         if (entry.IsNameEqual(aMapName))
         {
-            ChipLogError(Zcl, "AddSupportedMapRaw %" PRIu32 " - A map already exists with same name '%.*s'", aMapId,
-                         static_cast<int>(entry.GetName().size()), entry.GetName().data());
+            ChipLogError(Zcl, "AddSupportedMapRaw %" PRIu32 " - A map already exists with same name '%s'", aMapId,
+                         NullTerminated(entry.GetName()).c_str());
             return false;
         }
 
@@ -896,8 +896,8 @@ bool Instance::RenameSupportedMap(uint32_t aMapId, const CharSpan & newMapName)
 
         if (entry.IsNameEqual(newMapName))
         {
-            ChipLogError(Zcl, "RenameSupportedMap %" PRIu32 " - map already exists with same name '%.*s'", aMapId,
-                         static_cast<int>(entry.GetName().size()), entry.GetName().data());
+            ChipLogError(Zcl, "RenameSupportedMap %" PRIu32 " - map already exists with same name '%s'", aMapId,
+                         NullTerminated(entry.GetName()).c_str());
             return false;
         }
 
@@ -1023,8 +1023,7 @@ bool Instance::AddSelectedArea(uint32_t & aSelectedArea)
 
     if (!mDelegate->IsSetSelectedAreasAllowed(locationStatusText))
     {
-        ChipLogError(Zcl, "AddSelectedAreaRaw %" PRIu32 " - %.*s", aSelectedArea, static_cast<int>(locationStatusText.size()),
-                     locationStatusText.data());
+        ChipLogError(Zcl, "AddSelectedAreaRaw %" PRIu32 " - %s", aSelectedArea, NullTerminated(locationStatusText).c_str());
         return false;
     }
 

@@ -36,7 +36,7 @@ chip::Access::AccessControl gPermissiveAccessControl;
 } // namespace
 
 namespace chip {
-namespace Test {
+namespace Testing {
 
 void AppContext::SetUpTestSuite()
 {
@@ -52,7 +52,7 @@ void AppContext::TearDownTestSuite()
     // This can particularly be a problem when this unprocessed work involves reporting engine runs,
     // since those can take a while and cause later tests to not reach their queued work before
     // their timeouts hit.  This is only an issue in setups where all unit tests are compiled into
-    // a single file (e.g. nRF CI (Zephyr native_posix)).
+    // a single file (e.g. nRF CI (Zephyr native_sim)).
     //
     // Work around this issue by doing a DrainAndServiceIO() here to attempt to flush out any queued-up work.
     //
@@ -86,5 +86,5 @@ void AppContext::TearDown()
     LoopbackMessagingContext::TearDown();
 }
 
-} // namespace Test
+} // namespace Testing
 } // namespace chip

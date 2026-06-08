@@ -17,8 +17,8 @@ and set the following parameter to true:
 chip_enable_icd_server = true
 ```
 
-To enable LIT ICD behavior, Check In Protocol Support and User Active Mode
-Trigger Support, set the following parameter to true:
+To enable Long Idle Time (LIT) ICD behavior, Check In Protocol Support and User
+Active Mode Trigger Support, set the following parameter to true:
 
 ```
 chip_enable_icd_lit = true
@@ -35,9 +35,16 @@ chip_persist_subscriptions = true
 Subscription timeout resumption allows devices to attempt re-establishing
 subscriptions that may have expired. This feature is disabled out of box.
 
+To enable Dynamic SIT/LIT Support (DSLS), set the following parameter to true
+(LIT must be enabled first):
+
+```
+chip_enable_icd_dsls = true
+```
+
 In addition, various ICD parameters such as idle/active mode duration, active
 mode threshold, and polling intervals can be configured in
-`src/platform/cc13xx_26xx/cc13x4_26x4/CHIPPlatformConfig.h`
+`src/platform/ti/cc13xx_26xx/cc13x4_26x4/CHIPPlatformConfig.h`
 
 ```
 #define CHIP_CONFIG_ICD_ACTIVE_MODE_DURATION_MS 1000
@@ -59,7 +66,11 @@ Endpoint 0 as either a Server or Client, depending on your configuration.
 To enable LIT ICD behavior, set the FeatureMap to 0x0007 to enable Check-In
 Protocol Support, User Active Mode Trigger Support, and Long Idle Time Support.
 In addition, enable the UserActiveModeTriggerHint,
-UserActiveModeTriggerInstruction, and MaximumCheckInBackOff attributes.
+UserActiveModeTriggerInstruction, and MaximumCheckInBackOff attributes, and
+enable the RegisterClient, RegisterClientSupport, `UnregisterClient`,
+StayActiveRequest and StayActiveResponse commands in the 'Commands' tab.
+
+To enable DSLS support, change the FeatureMap to 0x000F.
 
 After making the desired changes in the zap file, generate the .matter file by
 running the following commands:

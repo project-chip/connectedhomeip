@@ -26,15 +26,33 @@
 # test-runner-runs:
 #   run1:
 #     app: examples/fabric-admin/scripts/fabric-sync-app.py
-#     app-args: --app-admin=${FABRIC_ADMIN_APP} --app-bridge=${FABRIC_BRIDGE_APP} --stdin-pipe=dut-fsa-stdin --discriminator=1234
+#     app-args: --app-admin=${FABRIC_ADMIN_APP} --app-bridge=${FABRIC_BRIDGE_APP} --discriminator=1234
 #     app-ready-pattern: "Successfully opened pairing window on the device"
+#     app-stdin-pipe: dut-fsa-stdin
 #     script-args: >
 #       --PICS src/app/tests/suites/certification/ci-pics-values
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
 #       --discriminator 1234
 #       --passcode 20202021
+#       --string-arg th_server_no_uid_app_path:${LIGHTING_APP_NO_UNIQUE_ID} dut_fsa_stdin_pipe:dut-fsa-stdin
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
+#   run2:
+#     app: ${FABRIC_SYNC_APP}
+#     app-args: --discriminator=1234
+#     app-stdin-pipe: dut-fsa-stdin
+#     script-args: >
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --bool-arg unified_fabric_sync_app:true
 #       --string-arg th_server_no_uid_app_path:${LIGHTING_APP_NO_UNIQUE_ID}
+#       --string-arg dut_fsa_stdin_pipe:dut-fsa-stdin
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
@@ -47,12 +65,18 @@ import os
 import random
 import tempfile
 
-import chip.clusters as Clusters
-from chip import ChipDeviceCtrl
-from chip.interaction_model import Status
-from chip.testing.apps import AppServerSubprocess
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, type_matches
 from mobly import asserts
+
+import matter.clusters as Clusters
+import matter.testing.matchers as matchers
+from matter import ChipDeviceCtrl
+from matter.interaction_model import Status
+from matter.testing.apps import AppServerSubprocess
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.runner import TestStep, default_matter_test_main
+
+log = logging.getLogger(__name__)
 
 _DEVICE_TYPE_AGGREGATOR = 0x000E
 
@@ -67,19 +91,27 @@ class TC_MCORE_FS_1_3(MatterBaseTest):
     def setup_class(self):
         super().setup_class()
 
+        self.dut_fsa_stdin = None
         self.th_server = None
         self.storage = None
 
         # Get the path to the TH_SERVER_NO_UID app from the user params.
-        th_server_app = self.user_params.get("th_server_no_uid_app_path", None)
-        if not th_server_app:
+        th_server_no_uid_app = self.user_params.get("th_server_no_uid_app_path", None)
+        if not th_server_no_uid_app:
             asserts.fail("This test requires a TH_SERVER_NO_UID app. Specify app path with --string-arg th_server_no_uid_app_path:<path_to_app>")
-        if not os.path.exists(th_server_app):
-            asserts.fail(f"The path {th_server_app} does not exist")
+        if not os.path.exists(th_server_no_uid_app):
+            asserts.fail(f"The path {th_server_no_uid_app} does not exist")
 
         # Create a temporary storage directory for keeping KVS files.
         self.storage = tempfile.TemporaryDirectory(prefix=self.__class__.__name__)
-        logging.info("Temporary storage directory: %s", self.storage.name)
+        log.info("Temporary storage directory: %s", self.storage.name)
+
+        if self.is_pics_sdk_ci_only:
+            # Get the named pipe path for the DUT_FSA app input from the user params.
+            dut_fsa_stdin_pipe = self.user_params.get("dut_fsa_stdin_pipe")
+            if not dut_fsa_stdin_pipe:
+                asserts.fail("CI setup requires --string-arg dut_fsa_stdin_pipe:<path_to_pipe>")
+            self.dut_fsa_stdin = open(dut_fsa_stdin_pipe, "w")  # noqa: SIM115
 
         self.th_server_port = 5544
         self.th_server_discriminator = random.randint(0, 4095)
@@ -87,7 +119,7 @@ class TC_MCORE_FS_1_3(MatterBaseTest):
 
         # Start the TH_SERVER_NO_UID app.
         self.th_server = AppServerSubprocess(
-            th_server_app,
+            th_server_no_uid_app,
             storage_dir=self.storage.name,
             port=self.th_server_port,
             discriminator=self.th_server_discriminator,
@@ -97,6 +129,8 @@ class TC_MCORE_FS_1_3(MatterBaseTest):
             timeout=30)
 
     def teardown_class(self):
+        if self.dut_fsa_stdin is not None:
+            self.dut_fsa_stdin.close()
         if self.th_server is not None:
             self.th_server.terminate()
         if self.storage is not None:
@@ -110,60 +144,6 @@ class TC_MCORE_FS_1_3(MatterBaseTest):
             TestStep(2, "DUT_FSA commissions TH_SERVER_NO_UID to DUT_FSA's fabric and generates a UniqueID.",
                      "TH verifies a value is visible for the UniqueID from the DUT_FSA's Bridged Device Basic Information Cluster."),
         ]
-
-    async def commission_via_commissioner_control(self, controller_node_id: int, device_node_id: int, endpoint_id: int):
-        """Commission device_node_id to controller_node_id using CommissionerControl cluster."""
-
-        request_id = random.randint(0, 0xFFFFFFFFFFFFFFFF)
-
-        vendor_id = await self.read_single_attribute_check_success(
-            node_id=device_node_id,
-            cluster=Clusters.BasicInformation,
-            attribute=Clusters.BasicInformation.Attributes.VendorID,
-        )
-
-        product_id = await self.read_single_attribute_check_success(
-            node_id=device_node_id,
-            cluster=Clusters.BasicInformation,
-            attribute=Clusters.BasicInformation.Attributes.ProductID,
-        )
-
-        await self.send_single_cmd(
-            node_id=controller_node_id,
-            endpoint=endpoint_id,
-            cmd=Clusters.CommissionerControl.Commands.RequestCommissioningApproval(
-                requestID=request_id,
-                vendorID=vendor_id,
-                productID=product_id,
-            ),
-        )
-
-        if not self.is_pics_sdk_ci_only:
-            self.wait_for_user_input("Approve Commissioning Approval Request on DUT using manufacturer specified mechanism")
-
-        resp = await self.send_single_cmd(
-            node_id=controller_node_id,
-            endpoint=endpoint_id,
-            cmd=Clusters.CommissionerControl.Commands.CommissionNode(
-                requestID=request_id,
-                responseTimeoutSeconds=30,
-            ),
-        )
-
-        asserts.assert_equal(type(resp), Clusters.CommissionerControl.Commands.ReverseOpenCommissioningWindow,
-                             "Incorrect response type")
-
-        await self.send_single_cmd(
-            node_id=device_node_id,
-            cmd=Clusters.AdministratorCommissioning.Commands.OpenCommissioningWindow(
-                commissioningTimeout=3*60,
-                PAKEPasscodeVerifier=resp.PAKEPasscodeVerifier,
-                discriminator=resp.discriminator,
-                iterations=resp.iterations,
-                salt=resp.salt,
-            ),
-            timedRequestTimeoutMs=5000,
-        )
 
     @async_test_body
     async def test_TC_MCORE_FS_1_3(self):
@@ -213,18 +193,42 @@ class TC_MCORE_FS_1_3(MatterBaseTest):
             # Check if any of the device types is an AGGREGATOR
             if any(device_type.deviceType == _DEVICE_TYPE_AGGREGATOR for device_type in device_type_list):
                 aggregator_endpoint = endpoint
-                logging.info(f"Aggregator endpoint found: {aggregator_endpoint}")
+                log.info(f"Aggregator endpoint found: {aggregator_endpoint}")
                 break
 
         asserts.assert_not_equal(aggregator_endpoint, 0, "Invalid aggregator endpoint. Cannot proceed with commissioning.")
 
-        await self.commission_via_commissioner_control(
-            controller_node_id=self.dut_node_id,
-            device_node_id=th_server_th_node_id,
-            endpoint_id=aggregator_endpoint)
+        # Open commissioning window on TH_SERVER_NO_UID.
+        discriminator = random.randint(0, 4095)
+        params = await self.default_controller.OpenCommissioningWindow(
+            nodeId=th_server_th_node_id,
+            option=self.default_controller.CommissioningWindowPasscode.kTokenWithRandomPin,
+            discriminator=discriminator,
+            iteration=10000,
+            timeout=600)
+
+        # Commissioning TH_SERVER_NO_UID to DUT_FSA fabric.
+        if not self.is_pics_sdk_ci_only:
+            self.wait_for_user_input(
+                f"Commission TH_SERVER_NO_UID on DUT using manufacturer specified mechanism.\n"
+                f"Use the following parameters:\n"
+                f"- discriminator: {discriminator}\n"
+                f"- setupPinCode: {params.setupPinCode}\n"
+                f"- setupQRCode: {params.setupQRCode}\n"
+                f"- setupManualCode: {params.setupManualCode}\n"
+                f"If using FabricSync Admin, you may type:\n"
+                f">>> pairing onnetwork <desired_node_id> {params.setupPinCode}")
+        else:
+            if self.user_params.get("unified_fabric_sync_app"):
+                self.dut_fsa_stdin.write(f"app pair-device 10 {params.setupQRCode}\n")
+            else:
+                self.dut_fsa_stdin.write(f"pairing onnetwork 10 {params.setupPinCode}\n")
+            self.dut_fsa_stdin.flush()
+            # Wait for the commissioning to complete.
+            await asyncio.sleep(5)
 
         # Wait for the device to appear on the DUT_FSA_BRIDGE.
-        await asyncio.sleep(2 if self.is_pics_sdk_ci_only else 30)
+        await asyncio.sleep(1)
 
         # Get the list of endpoints on the DUT_FSA_BRIDGE after adding the TH_SERVER_NO_UID.
         dut_fsa_bridge_endpoints_new = set(await self.read_single_attribute_check_success(
@@ -235,7 +239,7 @@ class TC_MCORE_FS_1_3(MatterBaseTest):
         ))
 
         # Get the endpoint number for just added TH_SERVER_NO_UID.
-        logging.info("Endpoints on DUT_FSA_BRIDGE: old=%s, new=%s", dut_fsa_bridge_endpoints, dut_fsa_bridge_endpoints_new)
+        log.info("Endpoints on DUT_FSA_BRIDGE: old=%s, new=%s", dut_fsa_bridge_endpoints, dut_fsa_bridge_endpoints_new)
         asserts.assert_true(dut_fsa_bridge_endpoints_new.issuperset(dut_fsa_bridge_endpoints),
                             "Expected only new endpoints to be added")
         unique_endpoints_set = dut_fsa_bridge_endpoints_new - dut_fsa_bridge_endpoints
@@ -246,9 +250,9 @@ class TC_MCORE_FS_1_3(MatterBaseTest):
             cluster=Clusters.BridgedDeviceBasicInformation,
             attribute=Clusters.BridgedDeviceBasicInformation.Attributes.UniqueID,
             endpoint=dut_fsa_bridge_th_server_endpoint)
-        asserts.assert_true(type_matches(dut_fsa_bridge_th_server_unique_id, str), "UniqueID should be a string")
+        asserts.assert_true(matchers.is_type(dut_fsa_bridge_th_server_unique_id, str), "UniqueID should be a string")
         asserts.assert_true(dut_fsa_bridge_th_server_unique_id, "UniqueID should not be an empty string")
-        logging.info("UniqueID generated for TH_SERVER_NO_UID: %s", dut_fsa_bridge_th_server_unique_id)
+        log.info("UniqueID generated for TH_SERVER_NO_UID: %s", dut_fsa_bridge_th_server_unique_id)
 
 
 if __name__ == "__main__":

@@ -49,7 +49,7 @@ MTR_EXTERN MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6)) NSSt
  * or '<Unknown commandID %d>' (if the cluster ID is known but the command ID is not known)
  * will be returned.
  */
-MTR_EXTERN MTR_NEWLY_AVAILABLE NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDType commandID);
+MTR_EXTERN MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2)) NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDType commandID);
 
 /**
  * Resolve Matter response (server to client) command IDs into a descriptive string.
@@ -58,7 +58,7 @@ MTR_EXTERN MTR_NEWLY_AVAILABLE NSString * MTRRequestCommandNameForID(MTRClusterI
  * or '<Unknown commandID %d>' (if the cluster ID is known but the command ID is not known)
  * will be returned.
  */
-MTR_EXTERN MTR_NEWLY_AVAILABLE NSString * MTRResponseCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDType commandID);
+MTR_EXTERN MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2)) NSString * MTRResponseCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDType commandID);
 
 /**
  * Resolve Matter event IDs into a descriptive string.
@@ -67,4 +67,4 @@ MTR_EXTERN MTR_NEWLY_AVAILABLE NSString * MTRResponseCommandNameForID(MTRCluster
  * or '<Unknown eventID %d>' (if the cluster ID is known but the event ID is not known)
  * will be returned.
  */
-MTR_EXTERN MTR_NEWLY_AVAILABLE NSString * MTREventNameForID(MTRClusterIDType clusterID, MTREventIDType eventID);
+MTR_EXTERN MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2)) NSString * MTREventNameForID(MTRClusterIDType clusterID, MTREventIDType eventID);

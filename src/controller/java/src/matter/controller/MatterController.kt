@@ -53,6 +53,9 @@ interface MatterController : Closeable, InteractionClient {
     /** Notifies the completion of each stage of commissioning. */
     fun onCommissioningStatusUpdate(nodeId: Long, stage: String?, errorCode: UInt)
 
+    /** Notifies when a commissioning stage starts. */
+    fun onCommissioningStageStart(nodeId: Long, stage: String?)
+
     /** Notifies the listener of an error. */
     fun onError(error: Throwable)
 

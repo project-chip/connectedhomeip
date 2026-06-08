@@ -37,22 +37,16 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:81
+            image: ghcr.io/project-chip/chip-build:194
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v4
+              uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
 
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
                   platform: linux
-
-            - name: Set Up Environment for Size Reports
-              uses: ./.github/actions/setup-size-reports
-              if: ${{ !env.ACT }}
-              with:
-                  gh-context: ${{ toJson(github) }}
 
             - name: Build Linux tv-app
               run: |
@@ -72,19 +66,15 @@ jobs:
                     "python3 ./scripts/tests/run_tv_casting_test.py"
               timeout-minutes: 2 # Comment this out to debug if GitHub Action times out.
 
-            # TODO: this test is flaky and was disabled
-            #       https://github.com/project-chip/connectedhomeip/issues/34598
-            #
-            #  - name:
-            #        Test casting from Linux tv-casting-app to Linux tv-app -
-            #        Commissioner Generated Passcode
-            #    run: |
-            #        ./scripts/run_in_build_env.sh \
-            #          "python3 ./scripts/tests/run_tv_casting_test.py --commissioner-generated-passcode=True"
-            #    timeout-minutes: 2 # Comment this out to debug if GitHub Action times out.
-
-            - name: Uploading Size Reports
-              uses: ./.github/actions/upload-size-reports
-              if: ${{ !env.ACT }}
+            - name:
+                  Test casting from Linux tv-casting-app to Linux tv-app -
+                  Commissioner Generated Passcode
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                    "python3 ./scripts/tests/run_tv_casting_test.py --commissioner-generated-passcode=True"
+              timeout-minutes: 2 # Comment this out to debug if GitHub Action times out.
+            - name: Notify Slack on Failure
+              if: failure()
+              uses: ./.github/actions/notify-slack-failure
               with:
-                  platform-name: Linux
+                slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}

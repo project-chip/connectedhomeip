@@ -118,9 +118,12 @@ function(nrfconnect_create_factory_data factory_data_target script_path schema_p
     string(APPEND script_args "--dac_key \"${ZEPHYR_CONNECTEDHOMEIP_MODULE_DIR}/credentials/development/attestation/Matter-Development-DAC-${raw_vid_upper}-${raw_pid_upper}-Key.der\"\n")
     string(APPEND script_args "--pai_cert \"${ZEPHYR_CONNECTEDHOMEIP_MODULE_DIR}/credentials/development/attestation/Matter-Development-PAI-${raw_vid_upper}-noPID-Cert.der\"\n")
   elseif(CONFIG_CHIP_FACTORY_DATA_CERT_SOURCE_USER)
-    string(APPEND script_args "--dac_cert \"${CONFIG_CHIP_FACTORY_DATA_USER_CERTS_DAC_CERT}\"\n")
-    string(APPEND script_args "--dac_key \"${CONFIG_CHIP_FACTORY_DATA_USER_CERTS_DAC_KEY}\"\n")
-    string(APPEND script_args "--pai_cert \"${CONFIG_CHIP_FACTORY_DATA_USER_CERTS_PAI_CERT}\"\n")
+    string(CONFIGURE "${CONFIG_CHIP_FACTORY_DATA_USER_CERTS_DAC_CERT}" DAC_CERT)
+    string(CONFIGURE "${CONFIG_CHIP_FACTORY_DATA_USER_CERTS_DAC_KEY}" DAC_KEY)
+    string(CONFIGURE "${CONFIG_CHIP_FACTORY_DATA_USER_CERTS_PAI_CERT}" PAI_CERT)
+    string(APPEND script_args "--dac_cert \"${DAC_CERT}\"\n")
+    string(APPEND script_args "--dac_key \"${DAC_KEY}\"\n")
+    string(APPEND script_args "--pai_cert \"${PAI_CERT}\"\n")
   elseif(CONFIG_CHIP_FACTORY_DATA_CERT_SOURCE_GENERATED)
     string(APPEND script_args "--gen_certs\n")
   endif()
@@ -163,21 +166,16 @@ function(nrfconnect_create_factory_data factory_data_target script_path schema_p
     string(APPEND script_args "--offset $<TARGET_PROPERTY:partition_manager,PM_FACTORY_DATA_ADDRESS>\n")
     string(APPEND script_args "--size $<TARGET_PROPERTY:partition_manager,PM_FACTORY_DATA_OFFSET>\n")
   else()
-    include(${CMAKE_BINARY_DIR}/${DEFAULT_IMAGE}/zephyr/dts.cmake)
+    include(${ZEPHYR_NRF_MODULE_DIR}/cmake/sysbuild/suit_utilities.cmake)
 
-    get_target_property(factory_data_alias devicetree_target "DT_ALIAS|factory-data")
-    get_target_property(factory_data_address devicetree_target "DT_REG|${factory_data_alias}|ADDR")
-    get_target_property(factory_data_size devicetree_target "DT_REG|${factory_data_alias}|SIZE")
-
-    # remove ; from address and size properties
-    string(SUBSTRING ${factory_data_address} 0 -1 factory_data_address)
-    string(SUBSTRING ${factory_data_size} 0 -1 factory_data_size)
-    if(NOT (DEFINED factory_data_alias AND DEFINED factory_data_address AND DEFINED factory_data_size))
-      message(FATAL_ERROR "factory-data alias does not exist in DTS")
-    endif()
-
+    dt_alias(factory_data_alias TARGET ${DEFAULT_IMAGE} PROPERTY "factory-data")
+    dt_reg_addr(factory_data_address TARGET ${DEFAULT_IMAGE} PATH "${factory_data_alias}")
+    dt_reg_size(factory_data_size TARGET ${DEFAULT_IMAGE} PATH "${factory_data_alias}")
     string(APPEND script_args "--offset ${factory_data_address}\n")
     string(APPEND script_args "--size ${factory_data_size}\n")
+    suit_add_merge_hex_file(FILES ${factory_data_output_path}.hex
+                            DEPENDENCIES ${factory_data_target}
+    )
   endif()
 
   # Execute first script to create a JSON file

@@ -19,13 +19,15 @@
 #include "CHIPCommand.h"
 
 #include "IcdManager.h"
+
 #include <controller/CHIPDeviceControllerFactory.h>
 #include <credentials/attestation_verifier/FileAttestationTrustStore.h>
+#include <data-model-providers/codegen/Instance.h>
 #include <device_manager/PairingManager.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPVendorIdentifiers.hpp>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/ScopedBuffer.h>
+#include <lib/support/ScopedMemoryBuffer.h>
 #include <lib/support/TestGroupData.h>
 #include <platform/LockTracker.h>
 
@@ -121,6 +123,7 @@ CHIP_ERROR CHIPCommand::MaybeSetUpStack()
     factoryInitParams.opCertStore              = &mOpCertStore;
     factoryInitParams.enableServerInteractions = NeedsOperationalAdvertising();
     factoryInitParams.sessionKeystore          = &sSessionKeystore;
+    factoryInitParams.dataModelProvider        = chip::app::CodegenDataModelProviderInstance(&mDefaultStorage);
 
     // Init group data provider that will be used for all group keys and IPKs for the
     // fabric-admin-configured fabrics. This is OK to do once since the fabric tables
@@ -182,7 +185,7 @@ CHIP_ERROR CHIPCommand::MaybeSetUpStack()
     mCredIssuerCmds->SetCredentialIssuerOption(CredentialIssuerCommands::CredentialIssuerOptions::kAllowTestCdSigningKey,
                                                allowTestCdSigningKey);
 
-    ReturnLogErrorOnFailure(PairingManager::Instance().Init(&CurrentCommissioner(), mCredIssuerCmds));
+    ReturnLogErrorOnFailure(admin::PairingManager::Instance().Init(&CurrentCommissioner(), mCredIssuerCmds));
 
     return CHIP_NO_ERROR;
 }
@@ -513,7 +516,7 @@ CHIP_ERROR CHIPCommand::InitializeCommissioner(CommissionerIdentity & identity, 
             chip::Credentials::SetSingleIpkEpochKey(&sGroupDataProvider, fabricIndex, defaultIpk, compressed_fabric_id_span));
     }
 
-    CHIPCommand::sICDClientStorage.UpdateFabricList(commissioner->GetFabricIndex());
+    ReturnErrorOnFailure(CHIPCommand::sICDClientStorage.UpdateFabricList(commissioner->GetFabricIndex()));
 
     mCommissioners[identity] = std::move(commissioner);
 

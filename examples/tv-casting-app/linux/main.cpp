@@ -16,6 +16,8 @@
  *    limitations under the License.
  */
 
+#include <signal.h>
+
 #include "commands/clusters/SubscriptionsCommands.h"
 #include "commands/common/Commands.h"
 #include "commands/example/ExampleCredentialIssuerCommands.h"
@@ -31,10 +33,12 @@
 
 #include "LinuxCommissionableDataProvider.h"
 #include "Options.h"
+#include <DeviceInfoProviderImpl.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
+#include <data-model-providers/codegen/Instance.h>
 #include <platform/TestOnlyCommissionableDataProvider.h>
 
 using namespace chip;
@@ -94,6 +98,8 @@ LinuxCommissionableDataProvider gCommissionableDataProvider;
 ExampleCredentialIssuerCommands gCredIssuerCommands;
 Commands gCommands;
 
+chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
+
 CHIP_ERROR ProcessClusterCommand(int argc, char ** argv)
 {
     if (!CastingServer::GetInstance()->GetActiveTargetVideoPlayer()->IsInitialized())
@@ -104,20 +110,60 @@ CHIP_ERROR ProcessClusterCommand(int argc, char ** argv)
     return CHIP_NO_ERROR;
 }
 
+void StopMainEventLoop()
+{
+    Server::GetInstance().GenerateShutDownEvent();
+    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda(
+        []() { TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().StopEventLoopTask(); });
+}
+
+void StopSignalHandler(int /* signal */)
+{
+#if defined(ENABLE_CHIP_SHELL)
+    Engine::Root().StopMainLoop();
+#endif
+    StopMainEventLoop();
+}
+
 int main(int argc, char * argv[])
 {
-    ChipLogProgress(AppServer, "chip_casting_simplified = 0"); // this file is built/run only if chip_casting_simplified = 0
+    // This file is built/run only if chip_casting_simplified = 0
+    ChipLogProgress(AppServer, "chip_casting_simplified = 0");
+
+#if defined(ENABLE_CHIP_SHELL)
+    /* Block SIGINT and SIGTERM. Other threads created by the main thread
+     * will inherit the signal mask. Then we can explicitly unblock signals
+     * in the shell thread to handle them, so the read(stdin) call can be
+     * interrupted by a signal. */
+    sigset_t set;
+    sigemptyset(&set);
+    sigaddset(&set, SIGINT);
+    sigaddset(&set, SIGTERM);
+    pthread_sigmask(SIG_BLOCK, &set, nullptr);
+#endif
+
     VerifyOrDie(CHIP_NO_ERROR == chip::Platform::MemoryInit());
     VerifyOrDie(CHIP_NO_ERROR == chip::DeviceLayer::PlatformMgr().InitChipStack());
 
 #if defined(ENABLE_CHIP_SHELL)
     Engine::Root().Init();
-    std::thread shellThread([]() { Engine::Root().RunMainLoop(); });
     Shell::RegisterCastingCommands();
+    std::thread shellThread([]() {
+        sigset_t set_;
+        sigemptyset(&set_);
+        sigaddset(&set_, SIGINT);
+        sigaddset(&set_, SIGTERM);
+        // Unblock SIGINT and SIGTERM, so that the shell thread can handle
+        // them - we need read() call to be interrupted.
+        pthread_sigmask(SIG_UNBLOCK, &set_, nullptr);
+        Engine::Root().RunMainLoop();
+        StopMainEventLoop();
+    });
 #endif
+
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init(CHIP_CONFIG_KVS_PATH);
+    TEMPORARY_RETURN_IGNORED DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init(CHIP_CONFIG_KVS_PATH);
 
     // Init the commissionable data provider based on command line options
     // to handle custom verifiers, discriminators, etc.
@@ -132,14 +178,24 @@ int main(int argc, char * argv[])
     {
         // TODO: Replace testingRootStore with a AttestationTrustStore that has the necessary official PAA roots available
         const chip::Credentials::AttestationTrustStore * testingRootStore = chip::Credentials::GetTestAttestationTrustStore();
-        SetDeviceAttestationVerifier(GetDefaultDACVerifier(testingRootStore));
+        chip::Credentials::DeviceAttestationRevocationDelegate * kDeviceAttestationRevocationNotChecked = nullptr;
+        SetDeviceAttestationVerifier(GetDefaultDACVerifier(testingRootStore, kDeviceAttestationRevocationNotChecked));
     }
 
     SuccessOrExit(err = CastingServer::GetInstance()->PreInit());
 
+    // DeviceInfoProvider is needed by localization configuration cluster, so we set it before Server::Init to set up the storage of
+    // DeviceInfoProvider properly.
+    chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
+
     // Enter commissioning mode, open commissioning window
     static chip::CommonCaseDeviceServerInitParams initParams;
     VerifyOrDie(CHIP_NO_ERROR == initParams.InitializeStaticResourcesBeforeServerInit());
+    initParams.dataModelProvider = app::CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
+#if CHIP_DEVICE_CONFIG_ENABLE_PORT_RETRY
+    // Enable automatic port retry for casting apps to handle port conflicts
+    initParams.portRetryCount = CHIP_DEVICE_CONFIG_PORT_RETRY_COUNT;
+#endif
     VerifyOrDie(CHIP_NO_ERROR == chip::Server::GetInstance().Init(initParams));
 
     if (argc > 1)
@@ -156,9 +212,12 @@ int main(int argc, char * argv[])
         SuccessOrExit(err = CastingServer::GetInstance()->DiscoverCommissioners());
 
         // Give commissioners some time to respond and then ScheduleWork to initiate commissioning
-        DeviceLayer::SystemLayer().StartTimer(
+        TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().StartTimer(
             chip::System::Clock::Milliseconds32(kCommissionerDiscoveryTimeoutInMs),
-            [](System::Layer *, void *) { chip::DeviceLayer::PlatformMgr().ScheduleWork(InitCommissioningFlow); }, nullptr);
+            [](System::Layer *, void *) {
+                TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().ScheduleWork(InitCommissioningFlow);
+            },
+            nullptr);
     }
 
     registerClusters(gCommands, &gCredIssuerCommands);
@@ -167,14 +226,28 @@ int main(int argc, char * argv[])
     if (argc > 1)
     {
         // if there are command-line arguments, then automatically start server
-        ProcessClusterCommand(argc, argv);
+        TEMPORARY_RETURN_IGNORED ProcessClusterCommand(argc, argv);
+    }
+
+    {
+        struct sigaction sa = {};
+        sa.sa_handler       = StopSignalHandler;
+        sa.sa_flags         = static_cast<int>(SA_RESETHAND);
+        sigaction(SIGINT, &sa, nullptr);
+        sigaction(SIGTERM, &sa, nullptr);
     }
 
     DeviceLayer::PlatformMgr().RunEventLoop();
+
 exit:
+
 #if defined(ENABLE_CHIP_SHELL)
     shellThread.join();
 #endif
+
+    chip::Server::GetInstance().Shutdown();
+    chip::DeviceLayer::PlatformMgr().Shutdown();
+
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(AppServer, "Failed to run TV Casting App: %s", ErrorStr(err));

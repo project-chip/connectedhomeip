@@ -49,22 +49,10 @@ class ZoneManagementCluster(
 ) {
   class CreateTwoDCartesianZoneResponse(val zoneID: UShort)
 
-  class GetTwoDCartesianZoneResponse(val zones: List<ZoneManagementClusterTwoDCartesianZoneStruct>)
-
-  class SupportedZoneSourcesAttribute(val value: List<UByte>)
-
-  sealed class SupportedZoneSourcesAttributeSubscriptionState {
-    data class Success(val value: List<UByte>) : SupportedZoneSourcesAttributeSubscriptionState()
-
-    data class Error(val exception: Exception) : SupportedZoneSourcesAttributeSubscriptionState()
-
-    object SubscriptionEstablished : SupportedZoneSourcesAttributeSubscriptionState()
-  }
-
-  class ZonesAttribute(val value: List<ZoneManagementClusterZoneInformationStruct>?)
+  class ZonesAttribute(val value: List<ZoneManagementClusterZoneInformationStruct>)
 
   sealed class ZonesAttributeSubscriptionState {
-    data class Success(val value: List<ZoneManagementClusterZoneInformationStruct>?) :
+    data class Success(val value: List<ZoneManagementClusterZoneInformationStruct>) :
       ZonesAttributeSubscriptionState()
 
     data class Error(val exception: Exception) : ZonesAttributeSubscriptionState()
@@ -72,15 +60,26 @@ class ZoneManagementCluster(
     object SubscriptionEstablished : ZonesAttributeSubscriptionState()
   }
 
-  class TimeControlAttribute(val value: List<ZoneManagementClusterZoneTriggeringTimeControlStruct>)
+  class TriggersAttribute(val value: List<ZoneManagementClusterZoneTriggerControlStruct>)
 
-  sealed class TimeControlAttributeSubscriptionState {
-    data class Success(val value: List<ZoneManagementClusterZoneTriggeringTimeControlStruct>) :
-      TimeControlAttributeSubscriptionState()
+  sealed class TriggersAttributeSubscriptionState {
+    data class Success(val value: List<ZoneManagementClusterZoneTriggerControlStruct>) :
+      TriggersAttributeSubscriptionState()
 
-    data class Error(val exception: Exception) : TimeControlAttributeSubscriptionState()
+    data class Error(val exception: Exception) : TriggersAttributeSubscriptionState()
 
-    object SubscriptionEstablished : TimeControlAttributeSubscriptionState()
+    object SubscriptionEstablished : TriggersAttributeSubscriptionState()
+  }
+
+  class TwoDCartesianMaxAttribute(val value: ZoneManagementClusterTwoDCartesianVertexStruct?)
+
+  sealed class TwoDCartesianMaxAttributeSubscriptionState {
+    data class Success(val value: ZoneManagementClusterTwoDCartesianVertexStruct?) :
+      TwoDCartesianMaxAttributeSubscriptionState()
+
+    data class Error(val exception: Exception) : TwoDCartesianMaxAttributeSubscriptionState()
+
+    object SubscriptionEstablished : TwoDCartesianMaxAttributeSubscriptionState()
   }
 
   class GeneratedCommandListAttribute(val value: List<UInt>)
@@ -101,16 +100,6 @@ class ZoneManagementCluster(
     data class Error(val exception: Exception) : AcceptedCommandListAttributeSubscriptionState()
 
     object SubscriptionEstablished : AcceptedCommandListAttributeSubscriptionState()
-  }
-
-  class EventListAttribute(val value: List<UInt>)
-
-  sealed class EventListAttributeSubscriptionState {
-    data class Success(val value: List<UInt>) : EventListAttributeSubscriptionState()
-
-    data class Error(val exception: Exception) : EventListAttributeSubscriptionState()
-
-    object SubscriptionEstablished : EventListAttributeSubscriptionState()
   }
 
   class AttributeListAttribute(val value: List<UInt>)
@@ -198,17 +187,14 @@ class ZoneManagementCluster(
     logger.log(Level.FINE, "Invoke command succeeded: ${response}")
   }
 
-  suspend fun getTwoDCartesianZone(
-    zoneID: UShort?,
-    timedInvokeTimeout: Duration? = null,
-  ): GetTwoDCartesianZoneResponse {
+  suspend fun removeZone(zoneID: UShort, timedInvokeTimeout: Duration? = null) {
     val commandId: UInt = 3u
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
 
     val TAG_ZONE_ID_REQ: Int = 0
-    zoneID?.let { tlvWriter.put(ContextSpecificTag(TAG_ZONE_ID_REQ), zoneID) }
+    tlvWriter.put(ContextSpecificTag(TAG_ZONE_ID_REQ), zoneID)
     tlvWriter.endStructure()
 
     val request: InvokeRequest =
@@ -220,39 +206,33 @@ class ZoneManagementCluster(
 
     val response: InvokeResponse = controller.invoke(request)
     logger.log(Level.FINE, "Invoke command succeeded: ${response}")
-
-    val tlvReader = TlvReader(response.payload)
-    tlvReader.enterStructure(AnonymousTag)
-    val TAG_ZONES: Int = 0
-    var zones_decoded: List<ZoneManagementClusterTwoDCartesianZoneStruct>? = null
-
-    while (!tlvReader.isEndOfContainer()) {
-      val tag = tlvReader.peekElement().tag
-
-      if (tag == ContextSpecificTag(TAG_ZONES)) {
-        zones_decoded =
-          buildList<ZoneManagementClusterTwoDCartesianZoneStruct> {
-            tlvReader.enterArray(tag)
-            while (!tlvReader.isEndOfContainer()) {
-              add(ZoneManagementClusterTwoDCartesianZoneStruct.fromTlv(AnonymousTag, tlvReader))
-            }
-            tlvReader.exitContainer()
-          }
-      } else {
-        tlvReader.skipElement()
-      }
-    }
-
-    if (zones_decoded == null) {
-      throw IllegalStateException("zones not found in TLV")
-    }
-
-    tlvReader.exitContainer()
-
-    return GetTwoDCartesianZoneResponse(zones_decoded)
   }
 
-  suspend fun removeZone(zoneID: UShort, timedInvokeTimeout: Duration? = null) {
+  suspend fun createOrUpdateTrigger(
+    trigger: ZoneManagementClusterZoneTriggerControlStruct,
+    timedInvokeTimeout: Duration? = null,
+  ) {
+    val commandId: UInt = 4u
+
+    val tlvWriter = TlvWriter()
+    tlvWriter.startStructure(AnonymousTag)
+
+    val TAG_TRIGGER_REQ: Int = 0
+    trigger.toTlv(ContextSpecificTag(TAG_TRIGGER_REQ), tlvWriter)
+    tlvWriter.endStructure()
+
+    val request: InvokeRequest =
+      InvokeRequest(
+        CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
+        tlvPayload = tlvWriter.getEncoded(),
+        timedRequest = timedInvokeTimeout,
+      )
+
+    val response: InvokeResponse = controller.invoke(request)
+    logger.log(Level.FINE, "Invoke command succeeded: ${response}")
+  }
+
+  suspend fun removeTrigger(zoneID: UShort, timedInvokeTimeout: Duration? = null) {
     val commandId: UInt = 5u
 
     val tlvWriter = TlvWriter()
@@ -273,7 +253,7 @@ class ZoneManagementCluster(
     logger.log(Level.FINE, "Invoke command succeeded: ${response}")
   }
 
-  suspend fun readSupportedZoneSourcesAttribute(): SupportedZoneSourcesAttribute {
+  suspend fun readMaxUserDefinedZonesAttribute(): UByte? {
     val ATTRIBUTE_ID: UInt = 0u
 
     val attributePath =
@@ -295,26 +275,24 @@ class ZoneManagementCluster(
         it.path.attributeId == ATTRIBUTE_ID
       }
 
-    requireNotNull(attributeData) { "Supportedzonesources attribute not found in response" }
+    requireNotNull(attributeData) { "Maxuserdefinedzones attribute not found in response" }
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: List<UByte> =
-      buildList<UByte> {
-        tlvReader.enterArray(AnonymousTag)
-        while (!tlvReader.isEndOfContainer()) {
-          add(tlvReader.getUByte(AnonymousTag))
-        }
-        tlvReader.exitContainer()
+    val decodedValue: UByte? =
+      if (tlvReader.isNextTag(AnonymousTag)) {
+        tlvReader.getUByte(AnonymousTag)
+      } else {
+        null
       }
 
-    return SupportedZoneSourcesAttribute(decodedValue)
+    return decodedValue
   }
 
-  suspend fun subscribeSupportedZoneSourcesAttribute(
+  suspend fun subscribeMaxUserDefinedZonesAttribute(
     minInterval: Int,
     maxInterval: Int,
-  ): Flow<SupportedZoneSourcesAttributeSubscriptionState> {
+  ): Flow<UByteSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 0u
     val attributePaths =
       listOf(
@@ -333,7 +311,7 @@ class ZoneManagementCluster(
       when (subscriptionState) {
         is SubscriptionState.SubscriptionErrorNotification -> {
           emit(
-            SupportedZoneSourcesAttributeSubscriptionState.Error(
+            UByteSubscriptionState.Error(
               Exception(
                 "Subscription terminated with error code: ${subscriptionState.terminationCause}"
               )
@@ -347,31 +325,110 @@ class ZoneManagementCluster(
               .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
 
           requireNotNull(attributeData) {
-            "Supportedzonesources attribute not found in Node State update"
+            "Maxuserdefinedzones attribute not found in Node State update"
           }
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: List<UByte> =
-            buildList<UByte> {
-              tlvReader.enterArray(AnonymousTag)
-              while (!tlvReader.isEndOfContainer()) {
-                add(tlvReader.getUByte(AnonymousTag))
-              }
-              tlvReader.exitContainer()
+          val decodedValue: UByte? =
+            if (tlvReader.isNextTag(AnonymousTag)) {
+              tlvReader.getUByte(AnonymousTag)
+            } else {
+              null
             }
 
-          emit(SupportedZoneSourcesAttributeSubscriptionState.Success(decodedValue))
+          decodedValue?.let { emit(UByteSubscriptionState.Success(it)) }
         }
         SubscriptionState.SubscriptionEstablished -> {
-          emit(SupportedZoneSourcesAttributeSubscriptionState.SubscriptionEstablished)
+          emit(UByteSubscriptionState.SubscriptionEstablished)
+        }
+      }
+    }
+  }
+
+  suspend fun readMaxZonesAttribute(): UByte {
+    val ATTRIBUTE_ID: UInt = 1u
+
+    val attributePath =
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+
+    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
+
+    val response = controller.read(readRequest)
+
+    if (response.successes.isEmpty()) {
+      logger.log(Level.WARNING, "Read command failed")
+      throw IllegalStateException("Read command failed with failures: ${response.failures}")
+    }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) { "Maxzones attribute not found in response" }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: UByte = tlvReader.getUByte(AnonymousTag)
+
+    return decodedValue
+  }
+
+  suspend fun subscribeMaxZonesAttribute(
+    minInterval: Int,
+    maxInterval: Int,
+  ): Flow<UByteSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 1u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            UByteSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) { "Maxzones attribute not found in Node State update" }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: UByte = tlvReader.getUByte(AnonymousTag)
+
+          emit(UByteSubscriptionState.Success(decodedValue))
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(UByteSubscriptionState.SubscriptionEstablished)
         }
       }
     }
   }
 
   suspend fun readZonesAttribute(): ZonesAttribute {
-    val ATTRIBUTE_ID: UInt = 1u
+    val ATTRIBUTE_ID: UInt = 2u
 
     val attributePath =
       AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -396,17 +453,13 @@ class ZoneManagementCluster(
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: List<ZoneManagementClusterZoneInformationStruct>? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        buildList<ZoneManagementClusterZoneInformationStruct> {
-          tlvReader.enterArray(AnonymousTag)
-          while (!tlvReader.isEndOfContainer()) {
-            add(ZoneManagementClusterZoneInformationStruct.fromTlv(AnonymousTag, tlvReader))
-          }
-          tlvReader.exitContainer()
+    val decodedValue: List<ZoneManagementClusterZoneInformationStruct> =
+      buildList<ZoneManagementClusterZoneInformationStruct> {
+        tlvReader.enterArray(AnonymousTag)
+        while (!tlvReader.isEndOfContainer()) {
+          add(ZoneManagementClusterZoneInformationStruct.fromTlv(AnonymousTag, tlvReader))
         }
-      } else {
-        null
+        tlvReader.exitContainer()
       }
 
     return ZonesAttribute(decodedValue)
@@ -416,7 +469,7 @@ class ZoneManagementCluster(
     minInterval: Int,
     maxInterval: Int,
   ): Flow<ZonesAttributeSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 1u
+    val ATTRIBUTE_ID: UInt = 2u
     val attributePaths =
       listOf(
         AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -451,20 +504,16 @@ class ZoneManagementCluster(
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: List<ZoneManagementClusterZoneInformationStruct>? =
-            if (tlvReader.isNextTag(AnonymousTag)) {
-              buildList<ZoneManagementClusterZoneInformationStruct> {
-                tlvReader.enterArray(AnonymousTag)
-                while (!tlvReader.isEndOfContainer()) {
-                  add(ZoneManagementClusterZoneInformationStruct.fromTlv(AnonymousTag, tlvReader))
-                }
-                tlvReader.exitContainer()
+          val decodedValue: List<ZoneManagementClusterZoneInformationStruct> =
+            buildList<ZoneManagementClusterZoneInformationStruct> {
+              tlvReader.enterArray(AnonymousTag)
+              while (!tlvReader.isEndOfContainer()) {
+                add(ZoneManagementClusterZoneInformationStruct.fromTlv(AnonymousTag, tlvReader))
               }
-            } else {
-              null
+              tlvReader.exitContainer()
             }
 
-          decodedValue?.let { emit(ZonesAttributeSubscriptionState.Success(it)) }
+          emit(ZonesAttributeSubscriptionState.Success(decodedValue))
         }
         SubscriptionState.SubscriptionEstablished -> {
           emit(ZonesAttributeSubscriptionState.SubscriptionEstablished)
@@ -473,8 +522,8 @@ class ZoneManagementCluster(
     }
   }
 
-  suspend fun readTimeControlAttribute(): TimeControlAttribute {
-    val ATTRIBUTE_ID: UInt = 2u
+  suspend fun readTriggersAttribute(): TriggersAttribute {
+    val ATTRIBUTE_ID: UInt = 3u
 
     val attributePath =
       AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -495,74 +544,27 @@ class ZoneManagementCluster(
         it.path.attributeId == ATTRIBUTE_ID
       }
 
-    requireNotNull(attributeData) { "Timecontrol attribute not found in response" }
+    requireNotNull(attributeData) { "Triggers attribute not found in response" }
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: List<ZoneManagementClusterZoneTriggeringTimeControlStruct> =
-      buildList<ZoneManagementClusterZoneTriggeringTimeControlStruct> {
+    val decodedValue: List<ZoneManagementClusterZoneTriggerControlStruct> =
+      buildList<ZoneManagementClusterZoneTriggerControlStruct> {
         tlvReader.enterArray(AnonymousTag)
         while (!tlvReader.isEndOfContainer()) {
-          add(ZoneManagementClusterZoneTriggeringTimeControlStruct.fromTlv(AnonymousTag, tlvReader))
+          add(ZoneManagementClusterZoneTriggerControlStruct.fromTlv(AnonymousTag, tlvReader))
         }
         tlvReader.exitContainer()
       }
 
-    return TimeControlAttribute(decodedValue)
+    return TriggersAttribute(decodedValue)
   }
 
-  suspend fun writeTimeControlAttribute(
-    value: List<ZoneManagementClusterZoneTriggeringTimeControlStruct>,
-    timedWriteTimeout: Duration? = null,
-  ) {
-    val ATTRIBUTE_ID: UInt = 2u
-
-    val tlvWriter = TlvWriter()
-    tlvWriter.startArray(AnonymousTag)
-    for (item in value.iterator()) {
-      item.toTlv(AnonymousTag, tlvWriter)
-    }
-    tlvWriter.endArray()
-
-    val writeRequests: WriteRequests =
-      WriteRequests(
-        requests =
-          listOf(
-            WriteRequest(
-              attributePath =
-                AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded(),
-            )
-          ),
-        timedRequest = timedWriteTimeout,
-      )
-
-    val response: WriteResponse = controller.write(writeRequests)
-
-    when (response) {
-      is WriteResponse.Success -> {
-        logger.log(Level.FINE, "Write command succeeded")
-      }
-      is WriteResponse.PartialWriteFailure -> {
-        val aggregatedErrorMessage =
-          response.failures.joinToString("\n") { failure ->
-            "Error at ${failure.attributePath}: ${failure.ex.message}"
-          }
-
-        response.failures.forEach { failure ->
-          logger.log(Level.WARNING, "Error at ${failure.attributePath}: ${failure.ex.message}")
-        }
-
-        throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
-      }
-    }
-  }
-
-  suspend fun subscribeTimeControlAttribute(
+  suspend fun subscribeTriggersAttribute(
     minInterval: Int,
     maxInterval: Int,
-  ): Flow<TimeControlAttributeSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 2u
+  ): Flow<TriggersAttributeSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 3u
     val attributePaths =
       listOf(
         AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -580,7 +582,7 @@ class ZoneManagementCluster(
       when (subscriptionState) {
         is SubscriptionState.SubscriptionErrorNotification -> {
           emit(
-            TimeControlAttributeSubscriptionState.Error(
+            TriggersAttributeSubscriptionState.Error(
               Exception(
                 "Subscription terminated with error code: ${subscriptionState.terminationCause}"
               )
@@ -593,35 +595,113 @@ class ZoneManagementCluster(
               .filterIsInstance<ReadData.Attribute>()
               .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
 
-          requireNotNull(attributeData) { "Timecontrol attribute not found in Node State update" }
+          requireNotNull(attributeData) { "Triggers attribute not found in Node State update" }
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: List<ZoneManagementClusterZoneTriggeringTimeControlStruct> =
-            buildList<ZoneManagementClusterZoneTriggeringTimeControlStruct> {
+          val decodedValue: List<ZoneManagementClusterZoneTriggerControlStruct> =
+            buildList<ZoneManagementClusterZoneTriggerControlStruct> {
               tlvReader.enterArray(AnonymousTag)
               while (!tlvReader.isEndOfContainer()) {
-                add(
-                  ZoneManagementClusterZoneTriggeringTimeControlStruct.fromTlv(
-                    AnonymousTag,
-                    tlvReader,
-                  )
-                )
+                add(ZoneManagementClusterZoneTriggerControlStruct.fromTlv(AnonymousTag, tlvReader))
               }
               tlvReader.exitContainer()
             }
 
-          emit(TimeControlAttributeSubscriptionState.Success(decodedValue))
+          emit(TriggersAttributeSubscriptionState.Success(decodedValue))
         }
         SubscriptionState.SubscriptionEstablished -> {
-          emit(TimeControlAttributeSubscriptionState.SubscriptionEstablished)
+          emit(TriggersAttributeSubscriptionState.SubscriptionEstablished)
         }
       }
     }
   }
 
-  suspend fun readSensitivityAttribute(): UByte {
-    val ATTRIBUTE_ID: UInt = 3u
+  suspend fun readSensitivityMaxAttribute(): UByte {
+    val ATTRIBUTE_ID: UInt = 4u
+
+    val attributePath =
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+
+    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
+
+    val response = controller.read(readRequest)
+
+    if (response.successes.isEmpty()) {
+      logger.log(Level.WARNING, "Read command failed")
+      throw IllegalStateException("Read command failed with failures: ${response.failures}")
+    }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) { "Sensitivitymax attribute not found in response" }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: UByte = tlvReader.getUByte(AnonymousTag)
+
+    return decodedValue
+  }
+
+  suspend fun subscribeSensitivityMaxAttribute(
+    minInterval: Int,
+    maxInterval: Int,
+  ): Flow<UByteSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 4u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            UByteSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) {
+            "Sensitivitymax attribute not found in Node State update"
+          }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: UByte = tlvReader.getUByte(AnonymousTag)
+
+          emit(UByteSubscriptionState.Success(decodedValue))
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(UByteSubscriptionState.SubscriptionEstablished)
+        }
+      }
+    }
+  }
+
+  suspend fun readSensitivityAttribute(): UByte? {
+    val ATTRIBUTE_ID: UInt = 5u
 
     val attributePath =
       AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -646,13 +726,18 @@ class ZoneManagementCluster(
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UByte = tlvReader.getUByte(AnonymousTag)
+    val decodedValue: UByte? =
+      if (tlvReader.isNextTag(AnonymousTag)) {
+        tlvReader.getUByte(AnonymousTag)
+      } else {
+        null
+      }
 
     return decodedValue
   }
 
   suspend fun writeSensitivityAttribute(value: UByte, timedWriteTimeout: Duration? = null) {
-    val ATTRIBUTE_ID: UInt = 3u
+    val ATTRIBUTE_ID: UInt = 5u
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -695,7 +780,7 @@ class ZoneManagementCluster(
     minInterval: Int,
     maxInterval: Int,
   ): Flow<UByteSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 3u
+    val ATTRIBUTE_ID: UInt = 5u
     val attributePaths =
       listOf(
         AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -730,12 +815,110 @@ class ZoneManagementCluster(
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: UByte = tlvReader.getUByte(AnonymousTag)
+          val decodedValue: UByte? =
+            if (tlvReader.isNextTag(AnonymousTag)) {
+              tlvReader.getUByte(AnonymousTag)
+            } else {
+              null
+            }
 
-          emit(UByteSubscriptionState.Success(decodedValue))
+          decodedValue?.let { emit(UByteSubscriptionState.Success(it)) }
         }
         SubscriptionState.SubscriptionEstablished -> {
           emit(UByteSubscriptionState.SubscriptionEstablished)
+        }
+      }
+    }
+  }
+
+  suspend fun readTwoDCartesianMaxAttribute(): TwoDCartesianMaxAttribute {
+    val ATTRIBUTE_ID: UInt = 6u
+
+    val attributePath =
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+
+    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
+
+    val response = controller.read(readRequest)
+
+    if (response.successes.isEmpty()) {
+      logger.log(Level.WARNING, "Read command failed")
+      throw IllegalStateException("Read command failed with failures: ${response.failures}")
+    }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) { "Twodcartesianmax attribute not found in response" }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: ZoneManagementClusterTwoDCartesianVertexStruct? =
+      if (tlvReader.isNextTag(AnonymousTag)) {
+        ZoneManagementClusterTwoDCartesianVertexStruct.fromTlv(AnonymousTag, tlvReader)
+      } else {
+        null
+      }
+
+    return TwoDCartesianMaxAttribute(decodedValue)
+  }
+
+  suspend fun subscribeTwoDCartesianMaxAttribute(
+    minInterval: Int,
+    maxInterval: Int,
+  ): Flow<TwoDCartesianMaxAttributeSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 6u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            TwoDCartesianMaxAttributeSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) {
+            "Twodcartesianmax attribute not found in Node State update"
+          }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: ZoneManagementClusterTwoDCartesianVertexStruct? =
+            if (tlvReader.isNextTag(AnonymousTag)) {
+              ZoneManagementClusterTwoDCartesianVertexStruct.fromTlv(AnonymousTag, tlvReader)
+            } else {
+              null
+            }
+
+          decodedValue?.let { emit(TwoDCartesianMaxAttributeSubscriptionState.Success(it)) }
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(TwoDCartesianMaxAttributeSubscriptionState.SubscriptionEstablished)
         }
       }
     }
@@ -930,101 +1113,6 @@ class ZoneManagementCluster(
         }
         SubscriptionState.SubscriptionEstablished -> {
           emit(AcceptedCommandListAttributeSubscriptionState.SubscriptionEstablished)
-        }
-      }
-    }
-  }
-
-  suspend fun readEventListAttribute(): EventListAttribute {
-    val ATTRIBUTE_ID: UInt = 65530u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Eventlist attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: List<UInt> =
-      buildList<UInt> {
-        tlvReader.enterArray(AnonymousTag)
-        while (!tlvReader.isEndOfContainer()) {
-          add(tlvReader.getUInt(AnonymousTag))
-        }
-        tlvReader.exitContainer()
-      }
-
-    return EventListAttribute(decodedValue)
-  }
-
-  suspend fun subscribeEventListAttribute(
-    minInterval: Int,
-    maxInterval: Int,
-  ): Flow<EventListAttributeSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 65530u
-    val attributePaths =
-      listOf(
-        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-      )
-
-    val subscribeRequest: SubscribeRequest =
-      SubscribeRequest(
-        eventPaths = emptyList(),
-        attributePaths = attributePaths,
-        minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
-      )
-
-    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
-      when (subscriptionState) {
-        is SubscriptionState.SubscriptionErrorNotification -> {
-          emit(
-            EventListAttributeSubscriptionState.Error(
-              Exception(
-                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
-              )
-            )
-          )
-        }
-        is SubscriptionState.NodeStateUpdate -> {
-          val attributeData =
-            subscriptionState.updateState.successes
-              .filterIsInstance<ReadData.Attribute>()
-              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
-
-          requireNotNull(attributeData) { "Eventlist attribute not found in Node State update" }
-
-          // Decode the TLV data into the appropriate type
-          val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: List<UInt> =
-            buildList<UInt> {
-              tlvReader.enterArray(AnonymousTag)
-              while (!tlvReader.isEndOfContainer()) {
-                add(tlvReader.getUInt(AnonymousTag))
-              }
-              tlvReader.exitContainer()
-            }
-
-          emit(EventListAttributeSubscriptionState.Success(decodedValue))
-        }
-        SubscriptionState.SubscriptionEstablished -> {
-          emit(EventListAttributeSubscriptionState.SubscriptionEstablished)
         }
       }
     }

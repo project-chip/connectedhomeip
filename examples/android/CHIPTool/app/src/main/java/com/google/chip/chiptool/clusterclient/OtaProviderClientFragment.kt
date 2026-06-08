@@ -63,6 +63,9 @@ class OtaProviderClientFragment : Fragment() {
   private val vendorId: Int
     get() = binding.vendorIdEd.text.toString().toInt()
 
+  private val softwareVersion: Long
+    get() = binding.softwareVersionEd.text.toString().toLongOrNull() ?: 0L
+
   private val otaProviderCallback = OtaProviderCallback()
   private val binding
     get() = _binding!!
@@ -218,8 +221,9 @@ class OtaProviderClientFragment : Fragment() {
       AccessControlClusterAccessControlEntryStruct(
         privilege,
         2U /* CASE */,
-        listOf(nodeId),
-        null,
+        listOf(nodeId), /* single nodeId as subject. */
+        null, /* null (empty) targets: wildcard access to everything */
+        Optional.empty(), /* no auxiliaryType (does not apply to writes) */
         deviceController.fabricIndex.toUInt()
       )
     newEntry.toTlv(AnonymousTag, tlvWriter)
@@ -471,8 +475,8 @@ class OtaProviderClientFragment : Fragment() {
   }
 
   private fun updateOTAStatusBtnClick() {
-    val version = 2L
-    val versionString = "2.0"
+    val version = softwareVersion
+    val versionString = softwareVersion.toString()
 
     val filename = binding.firmwareFileTv.text.toString()
     Log.d(TAG, "updateOTAStatusBtnClick : $filename")
@@ -648,6 +652,7 @@ class OtaProviderClientFragment : Fragment() {
       bufferedInputStream?.close()
       inputStream = null
       bufferedInputStream = null
+      showMessage("BDXTransfer End! - ErrorCode: $errorCode")
     }
 
     override fun handleBDXQuery(

@@ -17,30 +17,29 @@
 import json
 import logging
 import os
+import shlex
 import sys
 
 import click
 import coloredlogs
-from builders.builder import BuilderOptions
+from builders.builder import BuilderOptions, BuildProfile
 from runner import PrintOnlyRunner, ShellRunner
+from runner.shell import SubcommandException
 
 import build
 
 sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 
+log = logging.getLogger(__name__)
 
 # Supported log levels, mapping string values required for argument
 # parsing into logging constants
 __LOG_LEVELS__ = {
     'debug': logging.DEBUG,
     'info': logging.INFO,
-    'warn': logging.WARN,
+    'warn': logging.WARNING,
     'fatal': logging.FATAL,
 }
-
-
-def CommaSeparate(items) -> str:
-    return ', '.join([x for x in items])
 
 
 def ValidateRepoPath(context, parameter, value):
@@ -54,9 +53,8 @@ def ValidateRepoPath(context, parameter, value):
     for name in ['BUILD.gn', '.gn', os.path.join('scripts', 'bootstrap.sh')]:
         expected_file = os.path.join(value, name)
         if not os.path.exists(expected_file):
-            raise click.BadParameter(
-                ("'%s' does not look like a valid repository path: "
-                 "%s not found.") % (value, expected_file))
+            raise click.BadParameter("'%s' does not look like a valid repository path: "
+                                     "%s not found." % (value, expected_file))
     return value
 
 
@@ -79,11 +77,26 @@ def ValidateTargetNames(context, parameter, values):
     type=click.Choice(__LOG_LEVELS__.keys(), case_sensitive=False),
     help='Determines the verbosity of script output.')
 @click.option(
+    '--verbose',
+    default=False,
+    is_flag=True,
+    help='Pass verbose flag to ninja.')
+@click.option(
+    '--quiet',
+    default=False,
+    is_flag=True,
+    help='Pass quiet flag to ninja.')
+@click.option(
     '--target',
     default=[],
     multiple=True,
     callback=ValidateTargetNames,
     help='Build target(s)')
+@click.option(
+    "--build-profile",
+    default=BuildProfile.DEFAULT,
+    type=click.Choice(BuildProfile, case_sensitive=False),
+    help="The build profile to use.")
 @click.option(
     '--enable-link-map-file',
     default=False,
@@ -112,6 +125,16 @@ def ValidateTargetNames(context, parameter, values):
     default=None,
     help='Number of ninja jobs')
 @click.option(
+    '--concurrent-generation',
+    type=click.IntRange(min=0),
+    default=0,
+    help='Number of concurrent generation jobs. If 0, use number of CPU cores.')
+@click.option(
+    '--concurrent-builders',
+    type=click.IntRange(min=1),
+    default=1,
+    help='Number of concurrent builders. If greater than 1, count of Ninja jobs is scaled down accordingly')
+@click.option(
     '--pregen-dir',
     default=None,
     type=click.Path(file_okay=False, resolve_path=True),
@@ -132,23 +155,24 @@ def ValidateTargetNames(context, parameter, values):
     type=click.File("wt"),
     help='Where to write the dry run output')
 @click.option(
-    '--no-log-timestamps',
-    default=False,
-    is_flag=True,
-    help='Skip timestaps in log output')
+    '--log-timestamps/--no-log-timestamps',
+    default=True,
+    help='Show timestamps in log output')
 @click.option(
     '--pw-command-launcher',
+    default=None,
     help=(
         'Set pigweed command launcher. E.g.: "--pw-command-launcher=ccache" '
         'for using ccache when building examples.'))
 @click.pass_context
-def main(context, log_level, target, enable_link_map_file, repo,
-         out_prefix, ninja_jobs, pregen_dir, clean, dry_run, dry_run_output,
-         enable_flashbundle, no_log_timestamps, pw_command_launcher):
+def main(context, log_level, verbose, quiet, target, build_profile, enable_link_map_file, repo, out_prefix, ninja_jobs,
+         concurrent_generation: int, concurrent_builders: int, pregen_dir, clean, dry_run, dry_run_output, enable_flashbundle,
+         log_timestamps, pw_command_launcher):
     # Ensures somewhat pretty logging of what is going on
-    log_fmt = '%(asctime)s %(levelname)-7s %(message)s'
-    if no_log_timestamps:
-        log_fmt = '%(levelname)-7s %(message)s'
+    if log_timestamps:
+        log_fmt = '%(asctime)s.%(msecs)03d %(levelname)-7s %(threadName)s: %(message)s'
+    else:
+        log_fmt = '%(levelname)-7s %(threadName)s: %(message)s'
     coloredlogs.install(level=__LOG_LEVELS__[log_level], fmt=log_fmt)
 
     if 'PW_PROJECT_ROOT' not in os.environ:
@@ -161,15 +185,31 @@ before running this script.
 
     if dry_run:
         runner = PrintOnlyRunner(dry_run_output, root=repo)
+
+        if concurrent_generation > 1:
+            log.warning(
+                "Concurrent generation is set to %d, but dry-run mode is enabled. "
+                "Ignoring concurrent generation and running in single-threaded mode.",
+                concurrent_generation)
+            concurrent_generation = 1
+
+        if concurrent_builders > 1:
+            log.warning(
+                "Concurrent builders is set to %d, but dry-run mode is enabled. "
+                "Ignoring concurrent builders and running in single-threaded mode.",
+                concurrent_builders)
+            concurrent_builders = 1
     else:
         runner = ShellRunner(root=repo)
 
-    requested_targets = set([t.lower() for t in target])
-    logging.info('Building targets: %s', CommaSeparate(requested_targets))
-
     context.obj = build.Context(
-        repository_path=repo, output_prefix=out_prefix, ninja_jobs=ninja_jobs, runner=runner)
+        repository_path=repo, output_prefix=out_prefix, verbose=verbose, quiet=quiet, ninja_jobs=ninja_jobs,
+        concurrent_generation=concurrent_generation, concurrent_builders=concurrent_builders, runner=runner
+    )
+
+    requested_targets = {t.lower() for t in target}
     context.obj.SetupBuilders(targets=requested_targets, options=BuilderOptions(
+        build_profile=build_profile,
         enable_link_map_file=enable_link_map_file,
         enable_flashbundle=enable_flashbundle,
         pw_command_launcher=pw_command_launcher,
@@ -191,25 +231,33 @@ def cmd_generate(context):
     'targets',
     help=('Lists the targets that can be used with the build and gen commands'))
 @click.option(
-    '--format',
+    '--format', 'format_type',
     default='summary',
-    type=click.Choice(['summary', 'expanded', 'json'], case_sensitive=False),
+    type=click.Choice(['summary', 'expanded', 'json', 'completion'], case_sensitive=False),
     help="""
-        summary - list of shorthand strings summarzing the available targets;
+        summary - list of shorthand strings summarizing the available targets;
 
         expanded - list all possible targets rather than the shorthand string;
 
-        json - a JSON representation of the available targets
+        json - a JSON representation of the available targets;
+
+        completion - a list of strings suitable for shell completion;
         """)
+@click.argument('COMPLETION-PREFIX', default='')
 @click.pass_context
-def cmd_targets(context, format):
-    if format == 'expanded':
+def cmd_targets(context, format_type, completion_prefix):
+    if format_type == 'expanded':
+        build.target.report_rejected_parts = False
         for target in build.targets.BUILD_TARGETS:
-            build.target.report_rejected_parts = False
             for s in target.AllVariants():
                 print(s)
-    elif format == 'json':
+    elif format_type == 'json':
         print(json.dumps([target.ToDict() for target in build.targets.BUILD_TARGETS], indent=4))
+    elif format_type == 'completion':
+        build.target.report_rejected_parts = False
+        for target in build.targets.BUILD_TARGETS:
+            for s in target.CompletionStrings(completion_prefix):
+                print(s)
     else:
         for target in build.targets.BUILD_TARGETS:
             print(target.HumanString())
@@ -228,7 +276,11 @@ def cmd_targets(context, format):
     help='Prefix of compressed archives of the generated files.')
 @click.pass_context
 def cmd_build(context, copy_artifacts_to, create_archives):
-    context.obj.Build()
+    try:
+        context.obj.Build()
+    except SubcommandException as e:
+        log.error("Command '%s' failed with error code %d", shlex.join(e.command), e.returncode)
+        sys.exit(1)
 
     if copy_artifacts_to:
         context.obj.CopyArtifactsTo(copy_artifacts_to)

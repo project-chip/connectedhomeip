@@ -13,12 +13,65 @@
 # limitations under the License.
 
 import os
+import shlex
+import subprocess
+import sys
+
+from pathlib import Path
 from enum import Enum, auto
 from platform import uname
 from typing import Optional
 
-from .builder import BuilderOutput
+from runner.runner import Runner
+
+from .builder import BuilderOutput, OutDirLock, lock_output_dir
 from .gn import GnBuilder
+
+_MSAN_DEFAULT_SYSROOT = Path.home() / '.cache/matter/msan_sysroot'
+_MSAN_BUILD_SCRIPT = 'scripts/build/build_msan_sysroot.sh'
+
+
+def _msan_sysroot_path() -> Path:
+    """Resolve the MSAN sysroot path that GN will reference.
+    """
+    return Path(os.getenv('SYSROOT_MSAN', _MSAN_DEFAULT_SYSROOT)).absolute()
+
+
+def _msan_validate_sysroot(chip_root: str) -> None:
+    """Fail fast if the MSAN sysroot is missing or stale.
+
+    Delegates the freshness check to build_msan_sysroot.sh --check so the
+    hash logic has a single source of truth in bash. Passes the resolved
+    sysroot path explicitly so the script checks the same one GN will use.
+
+    Exits via sys.exit() rather than raising so the user sees a clean
+    actionable message instead of a click/builder traceback.
+    """
+    sysroot = _msan_sysroot_path()
+    script = Path(chip_root) / _MSAN_BUILD_SCRIPT
+    result = subprocess.run(
+        [script, '--out-dir', sysroot, '--check'],
+        capture_output=True, text=True,
+    )
+    if result.returncode == 0:
+        return
+
+    detail = result.stderr.strip() or result.stdout.strip() or '<no output>'
+    print(
+        '\n'
+        f'MSAN sysroot check failed: {detail}\n'
+        '\n'
+        'MSAN needs every dependency (libc++, libc++abi, OpenSSL, etc.) compiled \n'
+        'with -fsanitize=memory; uninstrumented code triggers false positives.\n'
+        '\n'
+        'Build it with:\n'
+        f'    {_MSAN_BUILD_SCRIPT}\n'
+        '\n'
+        'First-time build: 5-15 min, ~4 GB on disk during build\n'
+        'Override path with: export SYSROOT_MSAN=<path>',
+        file=sys.stderr,
+    )
+    sys.exit(result.returncode)
 
 
 class HostCryptoLibrary(Enum):
@@ -26,15 +79,21 @@ class HostCryptoLibrary(Enum):
     OPENSSL = auto()
     MBEDTLS = auto()
     BORINGSSL = auto()
+    PSA = auto()
 
     @property
     def gn_argument(self):
         if self == HostCryptoLibrary.OPENSSL:
             return 'chip_crypto="openssl"'
-        elif self == HostCryptoLibrary.MBEDTLS:
+        if self == HostCryptoLibrary.MBEDTLS:
             return 'chip_crypto="mbedtls"'
-        elif self == HostCryptoLibrary.BORINGSSL:
+        if self == HostCryptoLibrary.BORINGSSL:
             return 'chip_crypto="boringssl"'
+        if self == HostCryptoLibrary.PSA:
+            # The vendored mbedTLS (2.28) has no multi-part PSA AEAD, so use the
+            # one-shot implementation (as ESP32 does).
+            return 'chip_crypto="psa" chip_crypto_psa_aead_single_part=true'
+        raise ValueError("Unknown host crypto library: %r" % self)
 
 
 class HostFuzzingType(Enum):
@@ -48,6 +107,7 @@ class HostFuzzingType(Enum):
 class HostApp(Enum):
     ALL_CLUSTERS = auto()
     ALL_CLUSTERS_MINIMAL = auto()
+    ALL_DEVICES_APP = auto()
     CHIP_TOOL = auto()
     CHIP_TOOL_DARWIN = auto()
     THERMOSTAT = auto()
@@ -84,84 +144,131 @@ class HostApp(Enum):
     LIT_ICD = auto()
     AIR_QUALITY_SENSOR = auto()
     NETWORK_MANAGER = auto()
-    ENERGY_MANAGEMENT = auto()
+    ENERGY_GATEWAY = auto()
+    EVSE = auto()
+    WATER_HEATER = auto()
     WATER_LEAK_DETECTOR = auto()
+    TERMS_AND_CONDITIONS = auto()
+    CAMERA = auto()
+    CAMERA_CONTROLLER = auto()
+    JF_CONTROL = auto()
+    JF_ADMIN = auto()
+    CLOSURE = auto()
+
+    def UnifiedTargetName(self):
+        """
+        returns the target name to compile an app as a unified build (i.e. with the GN
+        root set to '')
+        """
+        TARGETS = {
+            # keep-sorted start
+            HostApp.AIR_PURIFIER: ":linux_air_purifier_app",
+            HostApp.BRIDGE: ":linux_bridge_app",
+            HostApp.CLOSURE: ":linux_closure_app",
+            HostApp.LIGHT: ":linux_lighting_app",
+            HostApp.LOCK: ":linux_lock_app",
+            HostApp.MICROWAVE_OVEN: ":linux_microwave_oven_app",
+            HostApp.OTA_PROVIDER: ":linux_ota_provider_app",
+            HostApp.RVC: ":linux_rvc_app",
+            HostApp.THERMOSTAT: ":linux_thermostat_app",
+            HostApp.TV_APP: ":linux_tv_app",
+            HostApp.WATER_LEAK_DETECTOR: ":linux_water_leak_detector_app",
+            # keep-sorted end
+        }
+        return TARGETS[self]
 
     def ExamplePath(self):
         if self == HostApp.ALL_CLUSTERS:
             return 'all-clusters-app/linux'
-        elif self == HostApp.ALL_CLUSTERS_MINIMAL:
+        if self == HostApp.ALL_CLUSTERS_MINIMAL:
             return 'all-clusters-minimal-app/linux'
-        elif self == HostApp.CHIP_TOOL:
+        if self == HostApp.ALL_DEVICES_APP:
+            return 'all-devices-app/posix'
+        if self == HostApp.CHIP_TOOL:
             return 'chip-tool'
-        elif self == HostApp.CHIP_TOOL_DARWIN:
+        if self == HostApp.CHIP_TOOL_DARWIN:
             return 'darwin-framework-tool'
-        elif self == HostApp.THERMOSTAT:
+        if self == HostApp.THERMOSTAT:
             return 'thermostat/linux'
-        elif self == HostApp.RPC_CONSOLE:
+        if self == HostApp.RPC_CONSOLE:
             return 'common/pigweed/rpc_console'
-        elif self == HostApp.MIN_MDNS:
+        if self == HostApp.MIN_MDNS:
             return 'minimal-mdns'
-        elif self == HostApp.TV_APP:
+        if self == HostApp.TV_APP:
             return 'tv-app/linux'
-        elif self == HostApp.TV_CASTING_APP:
+        if self == HostApp.TV_CASTING_APP:
             return 'tv-casting-app/linux'
-        elif self == HostApp.LIGHT:
+        if self == HostApp.LIGHT:
             return 'lighting-app/linux'
-        elif self == HostApp.LIGHT_DATA_MODEL_NO_UNIQUE_ID:
+        if self == HostApp.LIGHT_DATA_MODEL_NO_UNIQUE_ID:
             return 'lighting-app-data-mode-no-unique-id/linux'
-        elif self == HostApp.LOCK:
+        if self == HostApp.LOCK:
             return 'lock-app/linux'
-        elif self == HostApp.SHELL:
+        if self == HostApp.SHELL:
             return 'shell/standalone'
-        elif self == HostApp.OTA_PROVIDER:
+        if self == HostApp.OTA_PROVIDER:
             return 'ota-provider-app/linux'
-        elif self in [HostApp.SIMULATED_APP1, HostApp.SIMULATED_APP2]:
+        if self in [HostApp.SIMULATED_APP1, HostApp.SIMULATED_APP2]:
             return 'placeholder/linux/'
-        elif self == HostApp.OTA_REQUESTOR:
+        if self == HostApp.OTA_REQUESTOR:
             return 'ota-requestor-app/linux'
-        elif self in [HostApp.ADDRESS_RESOLVE, HostApp.TESTS, HostApp.PYTHON_BINDINGS, HostApp.CERT_TOOL]:
+        if self in [HostApp.ADDRESS_RESOLVE, HostApp.TESTS, HostApp.PYTHON_BINDINGS, HostApp.CERT_TOOL]:
             return '../'
-        elif self == HostApp.EFR32_TEST_RUNNER:
+        if self == HostApp.EFR32_TEST_RUNNER:
             return '../src/test_driver/efr32'
-        elif self == HostApp.TV_CASTING:
+        if self == HostApp.TV_CASTING:
             return 'tv-casting-app/linux'
-        elif self == HostApp.BRIDGE:
+        if self == HostApp.BRIDGE:
             return 'bridge-app/linux'
-        elif self == HostApp.FABRIC_ADMIN:
+        if self == HostApp.FABRIC_ADMIN:
             return 'fabric-admin'
-        elif self == HostApp.FABRIC_BRIDGE:
+        if self == HostApp.FABRIC_BRIDGE:
             return 'fabric-bridge-app/linux'
-        elif self == HostApp.FABRIC_SYNC:
+        if self == HostApp.FABRIC_SYNC:
             return 'fabric-sync'
-        elif self == HostApp.JAVA_MATTER_CONTROLLER:
+        if self == HostApp.JAVA_MATTER_CONTROLLER:
             return 'java-matter-controller'
-        elif self == HostApp.KOTLIN_MATTER_CONTROLLER:
+        if self == HostApp.KOTLIN_MATTER_CONTROLLER:
             return 'kotlin-matter-controller'
-        elif self == HostApp.CONTACT_SENSOR:
+        if self == HostApp.CONTACT_SENSOR:
             return 'contact-sensor-app/linux'
-        elif self == HostApp.DISHWASHER:
+        if self == HostApp.DISHWASHER:
             return 'dishwasher-app/linux'
-        elif self == HostApp.MICROWAVE_OVEN:
+        if self == HostApp.MICROWAVE_OVEN:
             return 'microwave-oven-app/linux'
-        elif self == HostApp.REFRIGERATOR:
+        if self == HostApp.REFRIGERATOR:
             return 'refrigerator-app/linux'
-        elif self == HostApp.RVC:
+        if self == HostApp.RVC:
             return 'rvc-app/linux'
-        elif self == HostApp.AIR_PURIFIER:
+        if self == HostApp.AIR_PURIFIER:
             return 'air-purifier-app/linux'
-        elif self == HostApp.LIT_ICD:
+        if self == HostApp.LIT_ICD:
             return 'lit-icd-app/linux'
-        elif self == HostApp.AIR_QUALITY_SENSOR:
+        if self == HostApp.AIR_QUALITY_SENSOR:
             return 'air-quality-sensor-app/linux'
-        elif self == HostApp.NETWORK_MANAGER:
+        if self == HostApp.NETWORK_MANAGER:
             return 'network-manager-app/linux'
-        elif self == HostApp.ENERGY_MANAGEMENT:
-            return 'energy-management-app/linux'
-        elif self == HostApp.WATER_LEAK_DETECTOR:
-            return 'water-leak-detector/linux'
-        else:
-            raise Exception('Unknown app type: %r' % self)
+        if self == HostApp.ENERGY_GATEWAY:
+            return 'energy-gateway-app/linux'
+        if self == HostApp.EVSE:
+            return 'evse-app/linux'
+        if self == HostApp.WATER_HEATER:
+            return 'water-heater-app/linux'
+        if self == HostApp.WATER_LEAK_DETECTOR:
+            return 'water-leak-detector-app/linux'
+        if self == HostApp.TERMS_AND_CONDITIONS:
+            return 'terms-and-conditions-app/linux'
+        if self == HostApp.CAMERA:
+            return 'camera-app/linux'
+        if self == HostApp.CAMERA_CONTROLLER:
+            return 'camera-controller'
+        if self == HostApp.JF_CONTROL:
+            return 'jf-control-app'
+        if self == HostApp.JF_ADMIN:
+            return 'jf-admin-app/linux'
+        if self == HostApp.CLOSURE:
+            return 'closure-app/linux'
+        raise Exception('Unknown app type: %r' % self)
 
     def OutputNames(self):
         if self == HostApp.ALL_CLUSTERS:
@@ -170,6 +277,9 @@ class HostApp(Enum):
         elif self == HostApp.ALL_CLUSTERS_MINIMAL:
             yield 'chip-all-clusters-minimal-app'
             yield 'chip-all-clusters-minimal-app.map'
+        elif self == HostApp.ALL_DEVICES_APP:
+            yield 'all-devices-app'
+            yield 'all-devices-app.map'
         elif self == HostApp.CHIP_TOOL:
             yield 'chip-tool'
             yield 'chip-tool.map'
@@ -197,9 +307,12 @@ class HostApp(Enum):
         elif self == HostApp.TV_CASTING_APP:
             yield 'chip-tv-casting-app'
             yield 'chip-tv-casting-app.map'
-        elif self == HostApp.LIGHT or self == HostApp.LIGHT_DATA_MODEL_NO_UNIQUE_ID:
+        elif self == HostApp.LIGHT:
             yield 'chip-lighting-app'
             yield 'chip-lighting-app.map'
+        elif self == HostApp.LIGHT_DATA_MODEL_NO_UNIQUE_ID:
+            yield 'chip-lighting-data-model-no-unique-id-app'
+            yield 'chip-lighting-data-model-no-unique-id-app.map'
         elif self == HostApp.LOCK:
             yield 'chip-lock-app'
             yield 'chip-lock-app.map'
@@ -224,7 +337,7 @@ class HostApp(Enum):
             yield 'chip-ota-requestor-app'
             yield 'chip-ota-requestor-app.map'
         elif self == HostApp.PYTHON_BINDINGS:
-            yield 'controller/python'  # Directory containing WHL files
+            yield 'obj/src/controller/python/matter-controller-wheels'
         elif self == HostApp.EFR32_TEST_RUNNER:
             yield 'chip_pw_test_runner_wheels'
         elif self == HostApp.TV_CASTING:
@@ -264,20 +377,42 @@ class HostApp(Enum):
             yield 'chip-rvc-app'
             yield 'chip-rvc-app.map'
         elif self == HostApp.AIR_PURIFIER:
-            yield 'air-purifier-app'
-            yield 'air-purifier-app.map'
+            yield 'chip-air-purifier-app'
+            yield 'chip-air-purifier-app.map'
         elif self == HostApp.LIT_ICD:
             yield 'lit-icd-app'
             yield 'lit-icd-app.map'
         elif self == HostApp.NETWORK_MANAGER:
             yield 'matter-network-manager-app'
             yield 'matter-network-manager-app.map'
-        elif self == HostApp.ENERGY_MANAGEMENT:
-            yield 'chip-energy-management-app'
-            yield 'chip-energy-management-app.map'
+        elif self == HostApp.ENERGY_GATEWAY:
+            yield 'chip-energy-gateway-app'
+            yield 'chip-energy-gateway-app.map'
+        elif self == HostApp.EVSE:
+            yield 'chip-evse-app'
+            yield 'chip-evse-app.map'
+        elif self == HostApp.WATER_HEATER:
+            yield 'matter-water-heater-app'
+            yield 'matter-water-heater-app.map'
         elif self == HostApp.WATER_LEAK_DETECTOR:
             yield 'water-leak-detector-app'
             yield 'water-leak-detector-app.map'
+        elif self == HostApp.TERMS_AND_CONDITIONS:
+            yield 'chip-terms-and-conditions-app'
+            yield 'chip-terms-and-conditions-app.map'
+        elif self == HostApp.CAMERA:
+            yield 'chip-camera-app'
+            yield 'chip-camera-app.map'
+        elif self == HostApp.CAMERA_CONTROLLER:
+            yield 'chip-camera-controller'
+            yield 'chip-camera-controller.map'
+        elif self == HostApp.JF_CONTROL:
+            yield 'jfc-app'
+        elif self == HostApp.JF_ADMIN:
+            yield 'jfa-app'
+        elif self == HostApp.CLOSURE:
+            yield 'closure-app'
+            yield 'closure-app.map'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -287,6 +422,7 @@ class HostBoard(Enum):
 
     # cross-compile support
     ARM64 = auto()
+    ARM = auto()
 
     # for test support
     FAKE = auto()
@@ -305,28 +441,28 @@ class HostBoard(Enum):
                 arch = 'arm64'
 
             return arch
-        elif self == HostBoard.ARM64:
+        if self == HostBoard.ARM64:
             return 'arm64'
-        elif self == HostBoard.FAKE:
+        if self == HostBoard.ARM:
+            return 'arm'
+        if self == HostBoard.FAKE:
             return 'fake'
-        else:
-            raise Exception('Unknown host board type: %r' % self)
+        raise Exception('Unknown host board type: %r' % self)
 
     def PlatformName(self):
         if self == HostBoard.NATIVE:
             return uname().system.lower()
-        elif self == HostBoard.FAKE:
+        if self == HostBoard.FAKE:
             return 'fake'
-        else:
-            # Cross compilation assumes linux currently
-            return 'linux'
+        # Cross compilation assumes linux currently
+        return 'linux'
 
 
 class HostBuilder(GnBuilder):
 
-    def __init__(self, root, runner, app: HostApp, board=HostBoard.NATIVE,
-                 enable_ipv4=True, enable_ble=True, enable_wifi=True,
-                 enable_thread=True, use_tsan=False, use_asan=False, use_ubsan=False,
+    def __init__(self, root: str, runner: Runner, output_dir_lock: OutDirLock, app: HostApp, board=HostBoard.NATIVE,
+                 enable_ipv4=True, enable_ble=True, enable_wifi=True, enable_wifipaf=True,
+                 enable_groupcast=True, enable_thread=True, use_tsan=False, use_asan=False, use_ubsan=False, use_msan=False,
                  separate_event_loop=True, fuzzing_type: HostFuzzingType = HostFuzzingType.NONE, use_clang=False,
                  interactive_mode=True, extra_tests=False, use_nl_fault_injection=False, use_platform_mdns=False, enable_rpcs=False,
                  use_coverage=False, use_dmalloc=False, minmdns_address_policy=None,
@@ -334,18 +470,40 @@ class HostBuilder(GnBuilder):
                  enable_test_event_triggers=None,
                  enable_dnssd_tests: Optional[bool] = None,
                  chip_casting_simplified: Optional[bool] = None,
-                 data_model_interface: Optional[str] = None,
-                 chip_data_model_check_die_on_failure: Optional[bool] = None,
-                 disable_shell=False
+                 disable_shell=False,
+                 use_googletest=False,
+                 enable_webrtc=False,
+                 terms_and_conditions_required: Optional[bool] = None, chip_enable_nfc_based_commissioning=None,
+                 openthread_endpoint=False,
+                 unified=False,
+                 chip_enable_endpoint_unique_id: Optional[bool] = None,
+                 all_devices_enabled_devices=None,
                  ):
-        super(HostBuilder, self).__init__(
-            root=os.path.join(root, 'examples', app.ExamplePath()),
-            runner=runner)
+        """
+        Construct a host builder.
+
+        Params (limited docs, documenting interesting ones):
+
+           - unified: build will happen in a SINGLE output directory instead of separated out
+                      into per-target directories. Directory name will be "unified"
+        """
+
+        # Save before `root` is mutated below (used by MSAN validation later).
+        chip_root = os.path.abspath(root)
+
+        # Unified builds use the top level root for compilation
+        if not unified:
+            root = os.path.join(root, 'examples', app.ExamplePath())
+
+        super().__init__(root=root, runner=runner, output_dir_lock=output_dir_lock)
 
         self.app = app
         self.board = board
         self.extra_gn_options = []
         self.build_env = {}
+        self.fuzzing_type = fuzzing_type
+        self.unified = unified
+        self.use_msan = use_msan
 
         if enable_rpcs:
             self.extra_gn_options.append('import("//with_pw_rpc.gni")')
@@ -353,14 +511,29 @@ class HostBuilder(GnBuilder):
         if not enable_ipv4:
             self.extra_gn_options.append('chip_inet_config_enable_ipv4=false')
 
+        if not enable_groupcast:
+            self.extra_gn_options.append('chip_config_enable_groupcast=false')
+
         if not enable_ble:
             self.extra_gn_options.append('chip_config_network_layer_ble=false')
+            self.extra_gn_options.append('chip_enable_ble=false')
+
+        if unified:
+            self.extra_gn_options.append('target_os="all"')
+            self.extra_gn_options.append('matter_enable_tracing_support=true')
+            self.extra_gn_options.append('matter_log_json_payload_hex=true')
+            self.extra_gn_options.append('matter_log_json_payload_decode_full=true')
+            self.build_command = app.UnifiedTargetName()
+
+        if not enable_wifipaf:
+            self.extra_gn_options.append(
+                'chip_device_config_enable_wifipaf=false')
 
         if not enable_wifi:
             self.extra_gn_options.append('chip_enable_wifi=false')
 
         if not enable_thread:
-            self.extra_gn_options.append('chip_enable_openthread=false')
+            self.extra_gn_options.append('chip_enable_thread=false')
 
         if disable_shell:
             self.extra_gn_options.append('chip_build_libshell=false')
@@ -374,8 +547,12 @@ class HostBuilder(GnBuilder):
         if use_ubsan:
             self.extra_gn_options.append('is_ubsan=true')
 
-        if data_model_interface is not None:
-            self.extra_gn_options.append(f'chip_use_data_model_interface="{data_model_interface}"')
+        if use_msan:
+            if not runner.dry_run:
+                _msan_validate_sysroot(chip_root)
+            self.extra_gn_options.append('is_msan=true')
+            # Tell GN to build against the same sysroot we just validated.
+            self.extra_gn_options.append(f'msan_sysroot="{_msan_sysroot_path()}"')
 
         if use_dmalloc:
             self.extra_gn_options.append('chip_config_memory_debug_checks=true')
@@ -407,6 +584,7 @@ class HostBuilder(GnBuilder):
         if use_coverage:
             self.extra_gn_options.append('use_coverage=true')
 
+        self.use_clang = use_clang  # for usage in other commands
         if use_clang:
             self.extra_gn_options.append('is_clang=true')
 
@@ -415,6 +593,7 @@ class HostBuilder(GnBuilder):
                 # so setting clang is not correct
                 raise Exception('Fake host board is always gcc (not clang)')
 
+        self.use_nl_fault_injection = use_nl_fault_injection
         if use_nl_fault_injection:
             self.extra_gn_options.append('chip_with_nlfaultinjection=true')
 
@@ -436,19 +615,20 @@ class HostBuilder(GnBuilder):
 
         if app == HostApp.TESTS:
             self.extra_gn_options.append('chip_build_tests=true')
-            self.extra_gn_options.append('chip_data_model_check_die_on_failure=true')
             self.build_command = 'check'
-        elif chip_data_model_check_die_on_failure is not None:
-            if chip_data_model_check_die_on_failure:
-                self.extra_gn_options.append('chip_data_model_check_die_on_failure=true')
-            else:
-                self.extra_gn_options.append('chip_data_model_check_die_on_failure=false')
 
         if app == HostApp.EFR32_TEST_RUNNER:
             self.build_command = 'runner'
             # board will NOT be used, but is required to be able to properly
             # include things added by the test_runner efr32 build
             self.extra_gn_options.append('silabs_board="BRD4187C"')
+
+            if "GSDK_ROOT" in os.environ:
+                # EFR32 SDK is very large. If the SDK path is already known (the
+                # case for pre-installed images), use it directly.
+                sdk_path = shlex.quote(os.environ['GSDK_ROOT'])
+                self.extra_gn_options.append(f"efr32_sdk_root=\"{sdk_path}\"")
+                self.extra_gn_options.append(f"openthread_root=\"{sdk_path}/openthread_stack/util/third_party/openthread\"")
 
         # Crypto library has per-platform defaults (like openssl for linux/mac
         # and mbedtls for android/freertos/zephyr/mbed/...)
@@ -465,16 +645,53 @@ class HostBuilder(GnBuilder):
             else:
                 self.extra_gn_options.append('chip_enable_dnssd_tests=false')
 
+        if chip_enable_nfc_based_commissioning is not None:
+            if chip_enable_nfc_based_commissioning:
+                self.extra_gn_options.append('chip_enable_nfc_based_commissioning=true')
+            else:
+                self.extra_gn_options.append('chip_enable_nfc_based_commissioning=false')
+
         if chip_casting_simplified is not None:
             self.extra_gn_options.append(f'chip_casting_simplified={str(chip_casting_simplified).lower()}')
+            if chip_casting_simplified:
+                self.extra_gn_options.append(
+                    'chip_data_model_overrides_dir='
+                    '"${chip_root}/examples/tv-casting-app/tv-casting-common"'
+                )
 
-        if self.board == HostBoard.ARM64:
+        if enable_webrtc:
+            self.extra_gn_options.append('chip_support_webrtc_python_bindings=true')
+
+        if terms_and_conditions_required is not None:
+            if terms_and_conditions_required:
+                self.extra_gn_options.append('chip_terms_and_conditions_required=true')
+            else:
+                self.extra_gn_options.append('chip_terms_and_conditions_required=false')
+
+        if chip_enable_endpoint_unique_id is not None:
+            if chip_enable_endpoint_unique_id:
+                self.extra_gn_options.append('chip_enable_endpoint_unique_id=true')
+            else:
+                self.extra_gn_options.append('chip_enable_endpoint_unique_id=false')
+
+        self.all_devices_enabled_devices = all_devices_enabled_devices or []
+        if self.all_devices_enabled_devices:
+            devices_str = '[' + ','.join(f'"{d}"' for d in self.all_devices_enabled_devices) + ']'
+            self.extra_gn_options.append(f'all_devices_enabled_devices={devices_str}')
+
+        if openthread_endpoint:
+            if enable_wifi:
+                raise Exception("OpenThread EndPoint mode does not support Wifi")
+
+            self.extra_gn_options.append('chip_system_config_use_openthread_inet_endpoints=true')
+
+        if self.board in (HostBoard.ARM64, HostBoard.ARM):
             if not use_clang:
                 raise Exception("Cross compile only supported using clang")
 
         if app == HostApp.CERT_TOOL:
             # Certification only built for openssl
-            if self.board == HostBoard.ARM64 and crypto_library == HostCryptoLibrary.MBEDTLS:
+            if self.board in (HostBoard.ARM64, HostBoard.ARM) and crypto_library == HostCryptoLibrary.MBEDTLS:
                 raise Exception("MbedTLS not supported for cross compiling cert tool")
             self.build_command = 'src/tools/chip-cert'
         elif app == HostApp.ADDRESS_RESOLVE:
@@ -482,7 +699,7 @@ class HostBuilder(GnBuilder):
         elif app == HostApp.PYTHON_BINDINGS:
             self.extra_gn_options.append('enable_rtti=false')
             self.extra_gn_options.append('chip_project_config_include_dirs=["//config/python"]')
-            self.build_command = 'chip-repl'
+            self.build_command = 'python_wheels'
 
         if self.app == HostApp.SIMULATED_APP1:
             self.extra_gn_options.append('chip_tests_zap_config="app1"')
@@ -496,31 +713,39 @@ class HostBuilder(GnBuilder):
         if self.app == HostApp.TESTS and fuzzing_type == HostFuzzingType.PW_FUZZTEST:
             self.build_command = 'pw_fuzz_tests'
 
+        if self.app == HostApp.TESTS and use_googletest:
+            self.extra_gn_options.append('import("//build_overrides/pigweed.gni")')
+            self.extra_gn_options.append('import("//build_overrides/googletest.gni")')
+            self.extra_gn_options.append('pw_unit_test_BACKEND="$dir_pw_unit_test:googletest"')
+            self.extra_gn_options.append('dir_pw_third_party_googletest="$dir_googletest"')
+            self.extra_gn_options.append('chip_build_tests_googletest=true')
+
     def GnBuildArgs(self):
-        if self.board == HostBoard.NATIVE:
-            return self.extra_gn_options
-        elif self.board == HostBoard.ARM64:
-            self.extra_gn_options.extend(
-                [
+        args = super().GnBuildArgs()
+        args.extend(self.extra_gn_options)
+        match self.board:
+            case HostBoard.NATIVE:
+                pass
+            case HostBoard.ARM64:
+                args.extend([
                     'target_cpu="arm64"',
                     'sysroot="%s"' % self.SysRootPath('SYSROOT_AARCH64')
-                ]
-            )
-
-            return self.extra_gn_options
-        elif self.board == HostBoard.FAKE:
-            self.extra_gn_options.extend(
-                [
+                ])
+            case HostBoard.ARM:
+                args.extend([
+                    'target_cpu="arm"',
+                    'sysroot="%s"' % self.SysRootPath('SYSROOT_ARMHF'),
+                ])
+            case HostBoard.FAKE:
+                args.extend([
                     'custom_toolchain="//build/toolchain/fake:fake_x64_gcc"',
                     'chip_link_tests=true',
                     'chip_device_platform="fake"',
                     'chip_fake_platform=true',
-                ]
-            )
-            return self.extra_gn_options
-        else:
-            raise Exception('Unknown host board type: %r' % self)
+                ])
+        return args
 
+    @lock_output_dir
     def createJavaExecutable(self, java_program):
         self._Execute(
             [
@@ -535,6 +760,25 @@ class HostBuilder(GnBuilder):
         if self.board == HostBoard.ARM64:
             self.build_env['PKG_CONFIG_PATH'] = os.path.join(
                 self.SysRootPath('SYSROOT_AARCH64'), 'lib/aarch64-linux-gnu/pkgconfig')
+        if self.board == HostBoard.ARM:
+            self.build_env['PKG_CONFIG_PATH'] = os.path.join(
+                self.SysRootPath('SYSROOT_ARMHF'), 'lib/arm-linux-gnueabihf/pkgconfig')
+        if self.use_msan:
+            # make pkg-config use the instrumented OpenSSL/zlib/glib/etc. in the MSAN sysroot.
+            # Without this, Matter's GN config picks up the system's libs, and MSAN reports endless
+            # false positives from uninstrumented dependencies at runtime.
+            sysroot = _msan_sysroot_path()
+            self.build_env['PKG_CONFIG_PATH'] = ':'.join([
+                f'{sysroot}/lib/pkgconfig',
+                f'{sysroot}/lib64/pkgconfig',
+            ])
+        if self.app == HostApp.TESTS and self.use_coverage and self.use_clang and self.fuzzing_type == HostFuzzingType.NONE:
+            # Every test is expected to have a distinct build ID, so `%m` will be
+            # distinct.
+            #
+            # Output is relative to "output_dir" since that is where GN executes
+            self.build_env['LLVM_PROFILE_FILE'] = os.path.join("coverage", "profiles", "run_%b.profraw")
+
         return self.build_env
 
     def SysRootPath(self, name):
@@ -542,9 +786,10 @@ class HostBuilder(GnBuilder):
             raise Exception('Missing environment variable "%s"' % name)
         return os.environ[name]
 
+    @lock_output_dir
     def generate(self):
-        super(HostBuilder, self).generate()
-        if 'JAVA_PATH' in os.environ:
+        super().generate(dedup=self.unified)
+        if 'JAVA_HOME' in os.environ:
             self._Execute(
                 ["third_party/java_deps/set_up_java_deps.sh"],
                 title="Setting up Java deps",
@@ -574,8 +819,9 @@ class HostBuilder(GnBuilder):
             self.coverage_dir = os.path.join(self.output_dir, 'coverage')
             self._Execute(['mkdir', '-p', self.coverage_dir], title="Create coverage output location")
 
+    @lock_output_dir
     def PreBuildCommand(self):
-        if self.app == HostApp.TESTS and self.use_coverage:
+        if self.app == HostApp.TESTS and self.use_coverage and not self.use_clang:
             cmd = ['ninja', '-C', self.output_dir]
 
             if self.ninja_jobs is not None:
@@ -592,8 +838,10 @@ class HostBuilder(GnBuilder):
                            '--exclude', '/usr/include/*',
                            '--output-file', os.path.join(self.coverage_dir, 'lcov_base.info')], title="Initial coverage baseline")
 
+    @lock_output_dir
     def PostBuildCommand(self):
-        if self.app == HostApp.TESTS and self.use_coverage:
+        # TODO: CLANG coverage is not yet implemented, requires different tooling
+        if self.app == HostApp.TESTS and self.use_coverage and not self.use_clang:
             self._Execute(['lcov', '--capture', '--directory', os.path.join(self.output_dir, 'obj'),
                            '--exclude', os.path.join(self.chip_dir, '**/tests/*'),
                            '--exclude', os.path.join(self.chip_dir, 'zzz_generated/*'),
@@ -608,13 +856,98 @@ class HostBuilder(GnBuilder):
             self._Execute(['genhtml', os.path.join(self.coverage_dir, 'lcov_final.info'), '--output-directory',
                            os.path.join(self.coverage_dir, 'html')], title="HTML coverage")
 
+        # coverage for clang works by having perfdata for every test run, which are in "*.profraw" files
+        if self.app == HostApp.TESTS and self.use_coverage and self.use_clang and self.fuzzing_type == HostFuzzingType.NONE:
+            # Clang coverage config generates "coverage/{name}.profraw" for each test indivdually
+            # Here we are merging ALL raw profiles into a single indexed file
+
+            _indexed_instrumentation = shlex.quote(os.path.join(self.coverage_dir, "merged.profdata"))
+
+            self._Execute([
+                "bash",
+                "-c",
+                f'find {shlex.quote(self.coverage_dir)} -name "*.profraw"'
+                + f' | xargs -n 10240 llvm-profdata merge -sparse -o {_indexed_instrumentation}'
+            ],
+                title="Generating merged coverage data")
+
+            _lcov_data = os.path.join(self.coverage_dir, "merged.lcov")
+
+            self._Execute([
+                "bash",
+                "-c",
+                f'find {shlex.quote(self.coverage_dir)} -name "*.profraw"'
+                + ' | xargs -n1 basename | sed "s/\\.profraw//" '
+                + f' | xargs -I @ echo -object {shlex.quote(os.path.join(self.output_dir, "tests", "@"))}'
+                + f' | xargs -n 10240 llvm-cov export -format=lcov --instr-profile {_indexed_instrumentation} '
+                # only care about SDK code. third_party is not considered sdk
+                + ' --ignore-filename-regex "/third_party/"'
+                # about 75K lines with almost 0% coverage
+                + ' --ignore-filename-regex "/zzz_generated/"'
+                # generated interface files. about 8K lines with little coverage
+                + ' --ignore-filename-regex "/out/.*/Linux/dbus/"'
+                # 100% coverage for 1K lines, but not relevant (test code)
+                + ' --ignore-filename-regex "/out/.*/clang_static_coverage_config/"'
+                # Tests are likely 100% or close to, want to see only "functionality tested"
+                + ' --ignore-filename-regex "/tests/"'
+                # Ignore system includes
+                + ' --ignore-filename-regex "/usr/include/"'
+                + ' --ignore-filename-regex "/usr/lib/"'
+                + f' | cat >{shlex.quote(_lcov_data)}'
+            ],
+                title="Generating lcov data")
+
+            self._Execute([
+                "genhtml",
+                "--ignore-errors",
+                "inconsistent",
+                "--ignore-errors",
+                "range",
+                # "--hierarchical" <- this may be interesting
+                "--output",
+                os.path.join(self.output_dir, "html"),
+                os.path.join(self.coverage_dir, "merged.lcov"),
+            ],
+                title="Generating HTML coverage report")
+
         if self.app == HostApp.JAVA_MATTER_CONTROLLER:
             self.createJavaExecutable("java-matter-controller")
 
         if self.app == HostApp.KOTLIN_MATTER_CONTROLLER:
             self.createJavaExecutable("kotlin-matter-controller")
 
+        if self.app == HostApp.LIGHT_DATA_MODEL_NO_UNIQUE_ID:
+            self._Execute(
+                ['mv',
+                 os.path.join(self.output_dir, 'chip-lighting-app'),
+                 os.path.join(self.output_dir, 'chip-lighting-data-model-no-unique-id-app')],
+                title="Rename lighting-data-model-no-unique-id app binary"
+            )
+
+        if self.app == HostApp.ALL_CLUSTERS and self.use_nl_fault_injection:
+            self._Execute(
+                ['mv',
+                 os.path.join(self.output_dir, 'chip-all-clusters-app'),
+                 os.path.join(self.output_dir, 'chip-all-clusters-app-nlfaultinject')],
+                title="Rename all-clusters nlfaultinject app binary"
+            )
+
+    def _AllDevicesOutputName(self):
+        """Return the binary name produced by the all-devices-app build."""
+        if self.all_devices_enabled_devices:
+            # device built with all-examples does not change the name.
+            return 'example-device-app'
+        return 'all-devices-app'
+
+    @lock_output_dir
     def build_outputs(self):
+        if self.app == HostApp.ALL_DEVICES_APP:
+            base = self._AllDevicesOutputName()
+            for name in [base, base + '.map']:
+                if not self.options.enable_link_map_file and name.endswith('.map'):
+                    continue
+                yield BuilderOutput(os.path.join(self.output_dir, name), name)
+            return
         for name in self.app.OutputNames():
             if not self.options.enable_link_map_file and name.endswith(".map"):
                 continue
@@ -623,5 +956,15 @@ class HostBuilder(GnBuilder):
                 for root, dirs, files in os.walk(path):
                     for file in files:
                         yield BuilderOutput(os.path.join(root, file), file)
+            elif self.unified:
+                # unified builds are generally in 'standalone' however this is not
+                # a rule and lit-icd is a special case.
+                path = os.path.join(self.output_dir, "standalone", name)
+                if not os.path.exists(path):
+                    path = os.path.join(self.output_dir, 'lit_icd', name)
+                if not os.path.exists(path):
+                    path = os.path.join(self.output_dir, name)
+
+                yield BuilderOutput(path, name)
             else:
                 yield BuilderOutput(os.path.join(self.output_dir, name), name)

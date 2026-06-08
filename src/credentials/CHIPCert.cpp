@@ -38,7 +38,7 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
-#include <lib/support/ScopedBuffer.h>
+#include <lib/support/ScopedMemoryBuffer.h>
 #include <lib/support/TimeUtils.h>
 #include <protocols/Protocols.h>
 
@@ -406,6 +406,7 @@ CHIP_ERROR ChipCertificateSet::ValidateCert(const ChipCertificateData * cert, Va
     err = FindValidCert(cert->mIssuerDN, cert->mAuthKeyId, context, static_cast<uint8_t>(depth + 1), &caCert);
     if (err != CHIP_NO_ERROR)
     {
+        ChipLogError(SecureChannel, "Failed to find valid cert during chain traversal: %" CHIP_ERROR_FORMAT, err.Format());
         ExitNow(err = CHIP_ERROR_CA_CERT_NOT_FOUND);
     }
 
@@ -632,6 +633,12 @@ CHIP_ERROR ChipDN::GetCertType(CertType & certType) const
 
             lCertType = CertType::kICA;
         }
+        else if (rdn[i].mAttrOID == kOID_AttributeType_MatterVidVerificationSignerId)
+        {
+            VerifyOrReturnError(lCertType == CertType::kNotSpecified, CHIP_ERROR_WRONG_CERT_DN);
+
+            lCertType = CertType::kVidVerificationSigner;
+        }
         else if (rdn[i].mAttrOID == kOID_AttributeType_MatterNodeId)
         {
             VerifyOrReturnError(lCertType == CertType::kNotSpecified, CHIP_ERROR_WRONG_CERT_DN);
@@ -668,6 +675,12 @@ CHIP_ERROR ChipDN::GetCertType(CertType & certType) const
         VerifyOrReturnError(!catsPresent, CHIP_ERROR_WRONG_CERT_DN);
     }
 
+    if (lCertType == CertType::kVidVerificationSigner)
+    {
+        VerifyOrReturnError(!fabricIdPresent, CHIP_ERROR_WRONG_CERT_DN);
+        // Lack of NodeID already checked since presence of NodeID will be detected as CertType::kNode.
+    }
+
     certType = lCertType;
 
     return CHIP_NO_ERROR;
@@ -688,6 +701,7 @@ CHIP_ERROR ChipDN::GetCertChipId(uint64_t & chipId) const
         case kOID_AttributeType_MatterICACId:
         case kOID_AttributeType_MatterNodeId:
         case kOID_AttributeType_MatterFirmwareSigningId:
+        case kOID_AttributeType_MatterVidVerificationSignerId:
             VerifyOrReturnError(!foundId, CHIP_ERROR_WRONG_CERT_DN);
 
             chipId  = rdn[i].mChipVal;
@@ -1475,7 +1489,7 @@ void InitNetworkIdentitySubject(ChipDN & name)
 {
     name.Clear();
     CHIP_ERROR err = name.AddAttribute_CommonName(kNetworkIdentityCN, /* not printable */ false);
-    VerifyOrDie(err == CHIP_NO_ERROR); // AddAttribute can't fail in this case
+    SuccessOrDie(err); // AddAttribute can't fail in this case
 }
 
 static CHIP_ERROR CalculateKeyIdentifierSha256(const P256PublicKeySpan & publicKey, MutableCertificateKeyId outKeyId)
@@ -1536,6 +1550,21 @@ CHIP_ERROR ExtractIdentifierFromChipNetworkIdentity(const ByteSpan & cert, Mutab
     return CHIP_NO_ERROR;
 }
 
+template <bool Deterministic>
+static CHIP_ERROR SignMessageECDSA(const P256Keypair & keypair, const uint8_t * msg, size_t msgLength,
+                                   P256ECDSASignature & outSignature)
+{
+    if constexpr (Deterministic)
+    {
+        return keypair.ECDSA_sign_msg_det(msg, msgLength, outSignature);
+    }
+    else
+    {
+        return keypair.ECDSA_sign_msg(msg, msgLength, outSignature);
+    }
+}
+
+template <bool Deterministic>
 static CHIP_ERROR GenerateNetworkIdentitySignature(const P256Keypair & keypair, P256ECDSASignature & signature)
 {
     // Create a buffer and writer to capture the TBS (to-be-signed) portion of the certificate.
@@ -1547,8 +1576,7 @@ static CHIP_ERROR GenerateNetworkIdentitySignature(const P256Keypair & keypair, 
 
     // Generate the TBSCertificate and sign it
     ReturnErrorOnFailure(EncodeNetworkIdentityTBSCert(keypair.Pubkey(), writer));
-    ReturnErrorOnFailure(keypair.ECDSA_sign_msg(asn1TBSBuf.Get(), writer.GetLengthWritten(), signature));
-
+    ReturnErrorOnFailure(SignMessageECDSA<Deterministic>(keypair, asn1TBSBuf.Get(), writer.GetLengthWritten(), signature));
     return CHIP_NO_ERROR;
 }
 
@@ -1563,13 +1591,11 @@ static CHIP_ERROR EncodeCompactIdentityCert(TLVWriter & writer, Tag tag, const P
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR NewChipNetworkIdentity(const Crypto::P256Keypair & keypair, MutableByteSpan & outCompactCert)
+template <bool Deterministic>
+static CHIP_ERROR GenerateNetworkIdentity(const Crypto::P256Keypair & keypair, MutableByteSpan & outCompactCert)
 {
-    VerifyOrReturnError(!outCompactCert.empty(), CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(CanCastTo<uint32_t>(outCompactCert.size()), CHIP_ERROR_INVALID_ARGUMENT);
-
     Crypto::P256ECDSASignature signature;
-    ReturnErrorOnFailure(GenerateNetworkIdentitySignature(keypair, signature));
+    ReturnErrorOnFailure(GenerateNetworkIdentitySignature<Deterministic>(keypair, signature));
 
     TLVWriter writer;
     writer.Init(outCompactCert);
@@ -1580,6 +1606,16 @@ CHIP_ERROR NewChipNetworkIdentity(const Crypto::P256Keypair & keypair, MutableBy
 
     outCompactCert.reduce_size(writer.GetLengthWritten());
     return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR NewChipNetworkIdentity(const Crypto::P256Keypair & keypair, MutableByteSpan & outCompactCert)
+{
+    return GenerateNetworkIdentity<false>(keypair, outCompactCert);
+}
+
+CHIP_ERROR DeriveChipNetworkIdentity(const Crypto::P256Keypair & keypair, MutableByteSpan & outCompactCert)
+{
+    return GenerateNetworkIdentity<true>(keypair, outCompactCert);
 }
 
 } // namespace Credentials

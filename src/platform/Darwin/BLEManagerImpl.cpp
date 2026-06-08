@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2025 Project CHIP Authors
  *    Copyright (c) 2018 Nest Labs, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -26,9 +26,9 @@
 #include <ble/Ble.h>
 #include <lib/core/Global.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <platform/Darwin/BleApplicationDelegate.h>
-#include <platform/Darwin/BleConnectionDelegate.h>
-#include <platform/Darwin/BlePlatformDelegate.h>
+#include <platform/Darwin/BleApplicationDelegateImpl.h>
+#include <platform/Darwin/BleConnectionDelegateImpl.h>
+#include <platform/Darwin/BlePlatformDelegateImpl.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
@@ -43,61 +43,29 @@ Global<BLEManagerImpl> BLEManagerImpl::sInstance;
 
 CHIP_ERROR BLEManagerImpl::_Init()
 {
-    CHIP_ERROR err;
+    ChipLogDetail(DeviceLayer, "Initializing BLE Manager");
 
-    ChipLogDetail(DeviceLayer, "%s", __FUNCTION__);
-
-    // Initialize the Chip BleLayer.
-    BleApplicationDelegateImpl * appDelegate   = new BleApplicationDelegateImpl();
-    BleConnectionDelegateImpl * connDelegate   = new BleConnectionDelegateImpl();
-    BlePlatformDelegateImpl * platformDelegate = new BlePlatformDelegateImpl();
-
-    mApplicationDelegate = appDelegate;
-    mConnectionDelegate  = connDelegate;
-    mPlatformDelegate    = platformDelegate;
-
-    err = BleLayer::Init(platformDelegate, connDelegate, appDelegate, &DeviceLayer::SystemLayer());
-
-    if (CHIP_NO_ERROR != err)
-    {
-        _Shutdown();
-    }
-
-    return err;
+    // Initialize the CHIP BleLayer. The application, connection, and platform delegate
+    // implementations are all stateless classes that we inherit from privately.
+    return BleLayer::Init(this, this, this, &DeviceLayer::SystemLayer());
 }
 
 void BLEManagerImpl::_Shutdown()
 {
-    if (mApplicationDelegate)
-    {
-        delete mApplicationDelegate;
-        mApplicationDelegate = nullptr;
-    }
-
-    if (mConnectionDelegate)
-    {
-        delete mConnectionDelegate;
-        mConnectionDelegate = nullptr;
-    }
-
-    if (mPlatformDelegate)
-    {
-        delete mPlatformDelegate;
-        mPlatformDelegate = nullptr;
-    }
+    // Nothing to do
 }
 
 CHIP_ERROR BLEManagerImpl::StartScan(BleScannerDelegate * delegate, BleScanMode mode)
 {
-    VerifyOrReturnError(mConnectionDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    static_cast<BleConnectionDelegateImpl *>(mConnectionDelegate)->StartScan(delegate, mode);
+    VerifyOrReturnError(BleLayer::IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
+    BleConnectionDelegateImpl::StartScan(delegate, mode);
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR BLEManagerImpl::StopScan()
 {
-    VerifyOrReturnError(mConnectionDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    static_cast<BleConnectionDelegateImpl *>(mConnectionDelegate)->StopScan();
+    VerifyOrReturnError(BleLayer::IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
+    BleConnectionDelegateImpl::StopScan();
     return CHIP_NO_ERROR;
 }
 

@@ -20,7 +20,9 @@
 #include "PigweedLoggerMutex.h"
 #include "pigweed/RpcService.h"
 #include "pw_sys_io_efr32/init.h"
+#include <CHIPProjectConfig.h>
 #include <cmsis_os2.h>
+#include <platform/silabs/platformAbstraction/SilabsPlatform.h>
 #include <sl_cmsis_os2_common.h>
 
 #if defined(PW_RPC_ATTRIBUTE_SERVICE) && PW_RPC_ATTRIBUTE_SERVICE
@@ -29,6 +31,9 @@
 
 #if defined(PW_RPC_BUTTON_SERVICE) && PW_RPC_BUTTON_SERVICE
 #include "pigweed/rpc_services/Button.h"
+#if defined(CHIP_SILABS_APP_USE_CUSTOMER_APP_TASK)
+#include "CustomerAppTask.h"
+#endif // defined(CHIP_SILABS_APP_USE_CUSTOMER_APP_TASK)
 #endif // defined(PW_RPC_BUTTON_SERVICE) && PW_RPC_BUTTON_SERVICE
 
 #if defined(PW_RPC_DESCRIPTOR_SERVICE) && PW_RPC_DESCRIPTOR_SERVICE
@@ -73,6 +78,8 @@ size_t pw_trace_GetTraceTimeTicksPerSecond()
 
 #endif // defined(PW_RPC_TRACING_SERVICE) && PW_RPC_TRACING_SERVICE
 
+using namespace chip::DeviceLayer::Silabs;
+
 namespace chip {
 namespace rpc {
 
@@ -82,7 +89,12 @@ class Efr32Button final : public Button
 public:
     pw::Status Event(const chip_rpc_ButtonEvent & request, pw_protobuf_Empty & response) override
     {
+#if defined(CHIP_SILABS_APP_USE_CUSTOMER_APP_TASK)
+        // Same entry point as SetButtonsCb (CRTP CustomerAppTask static); not AppTask::ButtonEventHandler (base static).
+        CustomerAppTask::ButtonEventHandler(request.idx /* PB 0 or PB 1 */, request.pushed);
+#else
         AppTask::GetAppTask().ButtonEventHandler(request.idx /* PB 0 or PB 1 */, request.pushed);
+#endif
         return pw::OkStatus();
     }
 };
@@ -117,7 +129,7 @@ private:
     osTimer_t mRebootTimerBuffer;
     osTimerAttr_t mRebootTimerAttr = { .name = "Reboot", .cb_mem = &mRebootTimerBuffer, .cb_size = osTimerCbSize };
 
-    static void RebootHandler(void * timerCbArg) { NVIC_SystemReset(); }
+    static void RebootHandler(void * timerCbArg) { GetPlatform().SoftwareReset(); }
 };
 #endif // defined(PW_RPC_DEVICE_SERVICE) && PW_RPC_DEVICE_SERVICE
 
@@ -225,6 +237,5 @@ void Init()
     // Start App task.
     sRpcTaskHandle = osThreadNew(RunRpcService, nullptr, &kRpcTaskAttr);
 }
-
 } // namespace rpc
 } // namespace chip

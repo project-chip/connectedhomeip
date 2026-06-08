@@ -21,8 +21,8 @@ import("${chip_root}/config/standalone/args.gni")
 
 import("//build_overrides/pigweed.gni")
 
-pw_log_BACKEND = "$dir_pw_log_basic"
-pw_assert_BACKEND = "$dir_pw_assert_log:check_backend"
+pw_log_BACKEND = "${chip_root}/src/pw_backends/log"
+pw_assert_BACKEND = "${chip_root}/src/pw_backends/assert"
 pw_sys_io_BACKEND = "$dir_pw_sys_io_stdio"
 pw_trace_BACKEND = "$dir_pw_trace_tokenized"
 pw_unit_test_MAIN = "$dir_pw_unit_test:logging_main"
@@ -30,6 +30,7 @@ pw_rpc_system_server_BACKEND = "${chip_root}/config/linux/lib/pw_rpc:pw_rpc"
 dir_pw_third_party_nanopb = "${chip_root}/third_party/nanopb/repo"
 pw_chrono_SYSTEM_CLOCK_BACKEND = "$dir_pw_chrono_stl:system_clock"
 pw_sync_MUTEX_BACKEND = "$dir_pw_sync_stl:mutex_backend"
+pw_sync_INTERRUPT_SPIN_LOCK_BACKEND = "$dir_pw_sync_stl:interrupt_spin_lock"
 pw_thread_YIELD_BACKEND = "$dir_pw_thread_stl:yield"
 pw_thread_SLEEP_BACKEND = "$dir_pw_thread_stl:sleep"
 
@@ -39,4 +40,3 @@ pw_build_LINK_DEPS = [
 ]
 
 chip_enable_pw_rpc = true
-chip_use_pw_logging = true

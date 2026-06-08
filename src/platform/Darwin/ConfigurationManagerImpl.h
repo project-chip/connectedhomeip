@@ -34,7 +34,7 @@
 namespace chip {
 namespace DeviceLayer {
 
-static constexpr int kCountryCodeLength = 2;
+inline constexpr int kCountryCodeLength = 2;
 
 /**
  * Concrete implementation of the ConfigurationManager singleton object for the Darwin platform.
@@ -42,8 +42,31 @@ static constexpr int kCountryCodeLength = 2;
 class ConfigurationManagerImpl : public Internal::GenericConfigurationManagerImpl<Internal::PosixConfig>
 {
 public:
+    /**
+     * General-purpose callback for providing configuration values at runtime.
+     * Mirrors Android's ConfigurationManager.readConfigValueStr(namespace, name).
+     *
+     * @param configNamespace  The config namespace (e.g. "chip-factory")
+     * @param name             The config key name (e.g. "device-name")
+     * @param buf              Buffer to write the null-terminated value into
+     * @param bufSize          Size of the buffer
+     * @param outLen           Set to the length of the value written (excluding null terminator)
+     * @return CHIP_NO_ERROR if a value was provided,
+     *         CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND to fall through to the next source
+     */
+    using ConfigValueProvider = CHIP_ERROR (*)(const char * configNamespace, const char * name, char * buf, size_t bufSize,
+                                               size_t & outLen);
+
     CHIP_ERROR StoreVendorId(uint16_t vendorId);
     CHIP_ERROR StoreProductId(uint16_t productId);
+    CHIP_ERROR GetCommissionableDeviceName(char * buf, size_t bufSize) override;
+
+    /**
+     * Set a general-purpose config value provider that is consulted at runtime
+     * before PosixConfig or compile-time defaults. Analogous to Android's
+     * PreferencesConfigurationManager.readConfigValueStr().
+     */
+    void SetConfigValueProvider(ConfigValueProvider provider) { mConfigValueProvider = provider; }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     CHIP_ERROR GetWiFiNetworkInformations(WiFiNetworkInfos & infos);
@@ -70,12 +93,16 @@ private:
     CHIP_ERROR StoreBootReason(uint32_t bootReason) override;
     CHIP_ERROR GetRegulatoryLocation(uint8_t & location) override;
     CHIP_ERROR GetLocationCapability(uint8_t & location) override;
+    CHIP_ERROR GetConfigurationVersion(uint32_t & configurationVersion) override;
+    CHIP_ERROR StoreConfigurationVersion(uint32_t configurationVersion) override;
     CHIP_ERROR ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t & value) override;
     CHIP_ERROR WritePersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t value) override;
 
     // NOTE: Other public interface methods are implemented by GenericConfigurationManagerImpl<>.
     CHIP_ERROR WriteConfigValue(Key key, uint16_t val);
     CHIP_ERROR ReadConfigValue(Key key, uint16_t & val);
+
+    ConfigValueProvider mConfigValueProvider = nullptr;
 
     // ===== Members that implement the GenericConfigurationManagerImpl protected interface.
     CHIP_ERROR ReadConfigValue(Key key, bool & val) override;

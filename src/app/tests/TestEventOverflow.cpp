@@ -51,7 +51,7 @@ static uint8_t gInfoEventBuffer[2048];
 static uint8_t gCritEventBuffer[2048];
 static chip::app::CircularEventBuffer gCircularEventBuffer[3];
 
-class TestEventOverflow : public chip::Test::AppContext
+class TestEventOverflow : public chip::Testing::AppContext
 {
 public:
     // Performs setup for each individual test in the test suite
@@ -67,7 +67,7 @@ public:
         VerifyOrReturn(!HasFailure());
 
         ASSERT_EQ(mEventCounter.Init(0), CHIP_NO_ERROR);
-        chip::app::EventManagement::CreateEventManagement(&GetExchangeManager(), ArraySize(logStorageResources),
+        chip::app::EventManagement::CreateEventManagement(&GetExchangeManager(), MATTER_ARRAY_SIZE(logStorageResources),
                                                           gCircularEventBuffer, logStorageResources, &mEventCounter);
     }
 
