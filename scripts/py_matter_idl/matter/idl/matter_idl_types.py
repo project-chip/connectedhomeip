@@ -46,6 +46,7 @@ class ParseMetaData:
             self.start_pos = start_pos
 
 
+
 class StructQuality(enum.Flag):
     NONE = 0
     FABRIC_SCOPED = enum.auto()

@@ -174,6 +174,28 @@ class TestIdlRendering(unittest.TestCase):
         idl2 = parser.parse(rendered)
         self.assertEqual(idl, idl2)
 
+    def test_optional_command_event_rendering(self):
+        idl_content = """
+            client cluster MyCluster = 1 {
+                info event optional OptionalEvent = 1 {}
+                critical event optional OptionalCriticalEvent = 2 {}
+
+                command optional OptionalCommand(): DefaultSuccess = 10;
+                timed command optional OptionalTimedCommand(): DefaultSuccess = 11;
+            }
+        """
+        parser = CreateParser(skip_meta=False, merge_globals=False)
+        idl = parser.parse(idl_content)
+        rendered = RenderAsIdlTxt(idl)
+
+        self.assertIn("info event optional OptionalEvent = 1 {", rendered)
+        self.assertIn("critical event optional OptionalCriticalEvent = 2 {", rendered)
+        self.assertIn("command optional OptionalCommand(): DefaultSuccess = 10;", rendered)
+        self.assertIn("timed command optional OptionalTimedCommand(): DefaultSuccess = 11;", rendered)
+
+        idl2 = parser.parse(rendered)
+        self.assertEqual(idl, idl2)
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -57,8 +57,6 @@ def human_text_string(value: Union[StructTag, StructQuality, EventPriority, Even
         result = ""
         if EventQuality.FABRIC_SENSITIVE in value:
             result += "fabric_sensitive "
-        if EventQuality.OPTIONAL in value:
-            result += "optional "
         return result.strip()
     elif type(value) is AccessPrivilege:
         if value == AccessPrivilege.VIEW:
@@ -86,8 +84,6 @@ def human_text_string(value: Union[StructTag, StructQuality, EventPriority, Even
             result += "fabric "
         if CommandQuality.TIMED_INVOKE in value:
             result += "timed "
-        if CommandQuality.OPTIONAL in value:
-            result += "optional "
         return result
     elif type(value) is ApiMaturity:
         if value == ApiMaturity.STABLE:
@@ -121,6 +117,18 @@ def event_access_string(e: Event) -> str:
     if not result:
         return ""
     return f"access({result}) "
+
+
+def event_optional_string(e: Event) -> str:
+    if EventQuality.OPTIONAL in e.qualities:
+        return "optional "
+    return ""
+
+
+def command_optional_string(c: Command) -> str:
+    if CommandQuality.OPTIONAL in c.qualities:
+        return "optional "
+    return ""
 
 
 def command_access_string(c: Command) -> str:
@@ -185,6 +193,8 @@ class IdlGenerator(CodeGenerator):
         self.jinja_env.filters['command_access'] = command_access_string
         self.jinja_env.filters['attribute_access'] = attribute_access_string
         self.jinja_env.filters['render_default'] = render_default
+        self.jinja_env.filters['event_optional'] = event_optional_string
+        self.jinja_env.filters['command_optional'] = command_optional_string
 
         # Easier whitespace management
         self.jinja_env.trim_blocks = True

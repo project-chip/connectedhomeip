@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import dataclasses
+import enum
 import functools
 import logging
 import pprint
@@ -284,20 +285,26 @@ class MatterIdlTransformer(Transformer):
     def debug_priority(self, _):
         return EventPriority.DEBUG
 
-    def prefix_fabric_sensitive(self, _):
-        return "fabric_sensitive"
+    def command_fabric_scoped(self, _):
+        return CommandQuality.FABRIC_SCOPED
 
-    def prefix_fabric_scoped(self, _):
-        return "fabric"
+    def command_timed(self, _):
+        return CommandQuality.TIMED_INVOKE
 
-    def prefix_timed(self, _):
-        return "timed"
+    def command_qualities(self, qualities):
+        return UnionOfAllFlags(qualities) or CommandQuality.NONE
 
-    def prefix_optional(self, _):
-        return "optional"
+    def event_fabric_sensitive(self, _):
+        return EventQuality.FABRIC_SENSITIVE
 
-    def prefix_qualities(self, qualities):
-        return set(qualities)
+    def event_qualities(self, qualities):
+        return UnionOfAllFlags(qualities) or EventQuality.NONE
+
+    def command_optional(self, _):
+        return CommandQuality.OPTIONAL
+
+    def event_optional(self, _):
+        return EventQuality.OPTIONAL
 
     @v_args(meta=True)
     def struct_field(self, meta, args):
@@ -315,14 +322,15 @@ class MatterIdlTransformer(Transformer):
         return privilege[0]
 
     def command_with_access(self, args):
-        # Arguments
-        #   - optional access for invoke
-        #   - event identifier (name)
         init_args = {
-            "name": args[-1]
+            "name": args[-1],
+            "qualities": CommandQuality.NONE
         }
-        if len(args) > 1:
-            init_args["invokeacl"] = args[0]
+        for arg in args[:-1]:
+            if isinstance(arg, CommandQuality):
+                init_args["qualities"] = arg
+            elif isinstance(arg, AccessPrivilege):
+                init_args["invokeacl"] = arg
 
         return init_args
 
@@ -336,18 +344,9 @@ class MatterIdlTransformer(Transformer):
         if len(args) != 5:
             args.insert(2, None)
 
-        qualities_set = args[0] or set()
-        allowed = {"fabric", "timed", "optional"}
-        if not qualities_set.issubset(allowed):
-            raise ValueError(f"Unsupported command qualities: {qualities_set - allowed}")
-
-        qualities = CommandQuality.NONE
-        if "fabric" in qualities_set:
-            qualities |= CommandQuality.FABRIC_SCOPED
-        if "timed" in qualities_set:
-            qualities |= CommandQuality.TIMED_INVOKE
-        if "optional" in qualities_set:
-            qualities |= CommandQuality.OPTIONAL
+        qualities = args[0] or CommandQuality.NONE
+        with_access = args[1]
+        qualities |= with_access.pop("qualities", CommandQuality.NONE)
 
         meta = None if self.skip_meta else ParseMetaData(meta)
 
@@ -355,21 +354,22 @@ class MatterIdlTransformer(Transformer):
             parse_meta=meta,
             qualities=qualities,
             input_param=args[2], output_param=args[3], code=args[4],
-            **args[1],
+            **with_access,
         )
 
     def event_access(self, privilege):
         return privilege[0]
 
     def event_with_access(self, args):
-        # Arguments
-        #   - optional access for read
-        #   - event identifier (name)
         init_args = {
-            "name": args[-1]
+            "name": args[-1],
+            "qualities": EventQuality.NONE
         }
-        if len(args) > 1:
-            init_args["readacl"] = args[0]
+        for arg in args[:-1]:
+            if isinstance(arg, EventQuality):
+                init_args["qualities"] = arg
+            elif isinstance(arg, AccessPrivilege):
+                init_args["readacl"] = arg
 
         return init_args
 
@@ -379,19 +379,12 @@ class MatterIdlTransformer(Transformer):
 
     @v_args(meta=True)
     def event(self, meta, args):
-        qualities_set = args[0] or set()
-        allowed = {"fabric_sensitive", "optional"}
-        if not qualities_set.issubset(allowed):
-            raise ValueError(f"Unsupported event qualities: {qualities_set - allowed}")
-
-        qualities = EventQuality.NONE
-        if "fabric_sensitive" in qualities_set:
-            qualities |= EventQuality.FABRIC_SENSITIVE
-        if "optional" in qualities_set:
-            qualities |= EventQuality.OPTIONAL
+        qualities = args[0] or EventQuality.NONE
+        with_access = args[2]
+        qualities |= with_access.pop("qualities", EventQuality.NONE)
 
         meta = None if self.skip_meta else ParseMetaData(meta)
-        return Event(qualities=qualities, priority=args[1], code=args[3], fields=args[4:], parse_meta=meta, **args[2])
+        return Event(qualities=qualities, priority=args[1], code=args[3], fields=args[4:], parse_meta=meta, **with_access)
 
     def view_privilege(self, args):
         return AccessPrivilege.VIEW

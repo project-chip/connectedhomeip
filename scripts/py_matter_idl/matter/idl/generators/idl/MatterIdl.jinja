@@ -132,7 +132,7 @@ struct {{s.name}} {##}
   {##}  {##}
   {{-e.api_maturity|idltxt}}
   {%- if e.qualities %}{{e.qualities | idltxt}} {% endif %}
-  {{-e.priority | idltxt}} event {{e | event_access}}{{e.name}} = {{e.code}} {
+  {{-e.priority | idltxt}} event {{e | event_access}}{{e | event_optional}}{{e.name}} = {{e.code}} {
     {% for field in e.fields %}
     {{render_field(field)}}
     {% endfor %}
@@ -156,7 +156,7 @@ struct {{s.name}} {##}
   {% if c.description %}
   /** {{c.description}} */
   {% endif %}
-  {{c.api_maturity | idltxt}}{{c.qualities | idltxt}}command {{c | command_access}}{{c.name}}(
+  {{c.api_maturity | idltxt}}{{c.qualities | idltxt}}command {{c | command_access}}{{c | command_optional}}{{c.name}}(
      {%- if c.input_param %}{{c.input_param}}{% endif -%}
   ): {{c.output_param}} = {{c.code}};
   {% endfor %}
