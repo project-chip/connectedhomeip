@@ -13,7 +13,7 @@ updates:
   - package-ecosystem: "github-actions"
     directories:
       - "/"
-      - "/.github/actions/*"
+      - "/.github/actions/**"
     schedule:
       interval: "weekly"
 

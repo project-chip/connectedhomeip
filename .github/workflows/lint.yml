@@ -45,36 +45,19 @@ jobs:
             - name: Mark workspace as safe for Git
               run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
 
-            - name: Check CodeQL action version consistency
+            - name: Check CodeQL action pins are consistent
               if: always()
+              # All github/codeql-action pins (init, analyze, upload-sarif) must
+              # share one SHA; a mismatch breaks CodeQL with a CLI/config version skew.
               run: |
-                  python3 - <<'PY'
-                  import pathlib
-                  import re
-                  import sys
-
-                  codeql_action = re.compile(r"^\s*uses:\s+github/codeql-action/[^@\s]+@([^\s#]+)")
-                  refs = {}
-                  for base in (pathlib.Path(".github/workflows"), pathlib.Path(".github/actions")):
-                      for path in base.rglob("*"):
-                          if path.suffix not in (".yml", ".yaml"):
-                              continue
-                          for line_number, line in enumerate(path.read_text().splitlines(), 1):
-                              match = codeql_action.match(line)
-                              if match:
-                                  refs.setdefault(match.group(1), []).append(f"{path}:{line_number}")
-
-                  if len(refs) > 1:
-                      print("github/codeql-action refs must match across all workflows and local actions.")
-                      for ref, locations in sorted(refs.items()):
-                          print(f"{ref}:")
-                          for location in locations:
-                              print(f"  {location}")
-                      sys.exit(1)
-
-                  if refs:
-                      print(f"All github/codeql-action uses are pinned to {next(iter(refs))}.")
-                  PY
+                  shas=$(grep -rhoE '^[[:space:]]*uses:[[:space:]]+github/codeql-action/[^@[:space:]]+@[0-9a-f]{40}' \
+                      .github/workflows .github/actions | grep -oE '[0-9a-f]{40}' | sort -u)
+                  if [ "$(printf '%s\n' "$shas" | grep -c .)" -gt 1 ]; then
+                      echo "::error::github/codeql-action pins diverge across workflows/actions:"
+                      printf '%s\n' "$shas"
+                      exit 1
+                  fi
+                  echo "codeql-action pinned consistently: ${shas:-<none>}"
 
             - name: Check for orphaned gn files
               if: always()
