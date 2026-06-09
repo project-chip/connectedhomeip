@@ -22,8 +22,8 @@ including:
 -   Specification as parsed by Alchemy.
 
 The goal is for the Matter IDL format to be generic enough to accommodate and
-represent all these sources. This ensures we can trust the serialized
-`.matter` files as a source of truth for the codebase.
+represent all these sources. This ensures we can trust the serialized `.matter`
+files as a source of truth for the codebase.
 
 The actual grammar is defined as a
 [Lark](https://lark-parser.readthedocs.io/en/latest/index.html) parsing grammar,
