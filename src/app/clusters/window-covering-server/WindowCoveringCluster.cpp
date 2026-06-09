@@ -11,7 +11,7 @@
  *    Unless required by applicable law or agreed to in writing, software
  *    distributed under the License is distributed on an "AS IS" BASIS,
  *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
+ *    See the License for the specific language governing permissions o,and
  *    limitations under the License.
  */
 
@@ -21,10 +21,6 @@
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <clusters/WindowCovering/Metadata.h>
 #include <lib/support/TypeTraits.h>
-
-#ifdef MATTER_DM_PLUGIN_SCENES_MANAGEMENT
-#include <app/clusters/scenes-server/scenes-server.h> // nogncheck
-#endif                                                // MATTER_DM_PLUGIN_SCENES_MANAGEMENT
 
 using namespace chip;
 using namespace chip::app::Clusters;
@@ -93,7 +89,11 @@ WindowCoveringCluster::WindowCoveringCluster(EndpointId endpointId, const Config
     DefaultServerCluster(ConcreteClusterPath(endpointId, WindowCovering::Id)), mFeatureMap(config.mFeatures),
     mOptionalAttributes(config.mOptionalAttributes)
 {
-    if (mFeatureMap.Has(Feature::kPositionAwareLift))
+    // Lift or Tilt must be enabled.
+    VerifyOrDieWithMsg(mFeatureMap.Has(Feature::kLift) || mFeatureMap.Has(Feature::kTilt), AppServer,
+                       "Validation failed: Neither Lift nor Tilt is enabled.");
+
+    if (mFeatureMap.Has(Feature::kLift) && mFeatureMap.Has(Feature::kPositionAwareLift))
     {
         VerifyOrDieWithMsg(mFeatureMap.Has(Feature::kLift), AppServer,
                            "Validation failed: PositionAwareLift requires Lift feature.");
@@ -385,12 +385,12 @@ CHIP_ERROR WindowCoveringCluster::AcceptedCommands(const ConcreteClusterPath & p
         ReturnErrorOnFailure(builder.ReferenceExisting(kGoToLiftPercentageCommand));
     }
 
-    ReturnErrorOnFailure(builder.ReferenceExisting(kMandatoryCommands));
-
     if (GetFeatureMap().Has(Feature::kPositionAwareTilt))
     {
         ReturnErrorOnFailure(builder.ReferenceExisting(kGoToTiltPercentageCommand));
     }
+    ReturnErrorOnFailure(builder.ReferenceExisting(kMandatoryCommands));
+
     return CHIP_NO_ERROR;
 }
 
