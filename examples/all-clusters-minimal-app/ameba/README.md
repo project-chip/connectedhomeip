@@ -5,15 +5,15 @@ control.
 
 ---
 
-- [CHIP Ameba All Clusters Example](#chip-ameba-all-clusters-example)
-    - [Supported Device](#supported-device)
-    - [Building the Example Application](#building-the-example-application)
-    - [Commissioning and cluster control](#commissioning-and-cluster-control)
-        - [Commissioning](#commissioning)
-            - [BLE mode](#ble-mode)
-            - [IP mode](#ip-mode)
-        - [Cluster control](#cluster-control)
-    - [Running RPC Console](#running-rpc-console)
+-   [CHIP Ameba All Clusters Example](#chip-ameba-all-clusters-example)
+    -   [Supported Device](#supported-device)
+    -   [Building the Example Application](#building-the-example-application)
+    -   [Commissioning and cluster control](#commissioning-and-cluster-control)
+        -   [Commissioning](#commissioning)
+            -   [BLE mode](#ble-mode)
+            -   [IP mode](#ip-mode)
+        -   [Cluster control](#cluster-control)
+    -   [Running RPC Console](#running-rpc-console)
 
 ---
 
@@ -24,25 +24,25 @@ The CHIP demo application is supported on
 
 ## Building the Example Application
 
-- Pull docker image:
+-   Pull docker image:
 
           ```
           $ docker pull ghcr.io/project-chip/chip-build-ameba:200
           ```
 
-- Run docker container:
+-   Run docker container:
 
           ```
           $ docker run -it -v ${CHIP_DIR}:/root/chip ghcr.io/project-chip/chip-build-ameba:200
           ```
 
-- Setup build environment:
+-   Setup build environment:
 
           ```
           $ source ./scripts/bootstrap.sh
           ```
 
-- To build the demo application:
+-   To build the demo application:
 
           ```
           $ ./scripts/build/build_examples.py --target ameba-amebad-all-clusters build
@@ -54,8 +54,8 @@ The CHIP demo application is supported on
     The bootloader image files are stored in
     `out/ameba-amebad-all-clusters/asdk/bootloader` folder.
 
-- After building the application, **Ameba Image Tool** is used to flash it to
-  Ameba board.
+-   After building the application, **Ameba Image Tool** is used to flash it to
+    Ameba board.
 
 1. Connect your device via USB and open Ameba Image Tool.
 2. Select correct serial port and set baudrate as **115200**.
@@ -72,9 +72,11 @@ There are two commissioning modes supported by Ameba platform:
 ### BLE mode
 
 1. In "connectedhomeip/config/ameba/args.gni"
+
     - Set `chip_config_network_layer_ble = true`
 
 2. In `connectedhomeip/src/platform/Ameba/CHIPDevicePlatformConfig.h`
+
     - Set `#define CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE 1`
 
 3. Build and Flash
@@ -86,9 +88,11 @@ There are two commissioning modes supported by Ameba platform:
 ### IP mode
 
 1. In `connectedhomeip/config/ameba/args.gni`
+
     - Set `chip_config_network_layer_ble = false`
 
 2. In `connectedhomeip/src/platform/Ameba/CHIPDevicePlatformConfig.h`
+
     - Set `#define CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE 0`
 
 3. Build and Flash
@@ -104,8 +108,8 @@ After successful commissioning, use the OnOff cluster command to control the
 OnOff attribute. This allows you to toggle a parameter implemented by the device
 to be On or Off.
 
-- Via
-  [Chip-Tool](https://github.com/project-chip/connectedhomeip/tree/master/examples/chip-tool#using-the-client-to-send-matter-commands)
+-   Via
+    [Chip-Tool](https://github.com/project-chip/connectedhomeip/tree/master/examples/chip-tool#using-the-client-to-send-matter-commands)
 
           ```
           $ ./chip-tool onoff on ${NODE_ID_TO_ASSIGN} 1
@@ -114,7 +118,7 @@ to be On or Off.
 
 ## Running RPC Console
 
-- Connect a USB-TTL Adapter as shown below
+-   Connect a USB-TTL Adapter as shown below
 
             ```
             Ameba         USB-TTL
@@ -123,25 +127,25 @@ to be On or Off.
             GND           GND
             ```
 
-- Build the
-  [chip-rpc console](https://github.com/project-chip/connectedhomeip/tree/master/examples/common/pigweed/rpc_console)
+-   Build the
+    [chip-rpc console](https://github.com/project-chip/connectedhomeip/tree/master/examples/common/pigweed/rpc_console)
 
-- As part of building the example with RPCs enabled the chip_rpc python
-  interactive console is installed into your venv. The python wheel files are
-  also created in the output folder: out/debug/chip_rpc_console_wheels. To
-  install the wheel files without rebuilding:
+-   As part of building the example with RPCs enabled the chip_rpc python
+    interactive console is installed into your venv. The python wheel files are
+    also created in the output folder: out/debug/chip_rpc_console_wheels. To
+    install the wheel files without rebuilding:
 
             ```
             $ pip3 install out/debug/chip_rpc_console_wheels/*.whl
             ```
 
-- Launch the chip-rpc console after resetting Ameba board
+-   Launch the chip-rpc console after resetting Ameba board
 
             ```
             $ chip-console --device /dev/tty<port connected to USB-TTL adapter> -b 115200
             ```
 
-- Get and Set lighting directly using the RPC console
+-   Get and Set lighting directly using the RPC console
 
             ```python
             rpcs.chip.rpc.Lighting.Get()
