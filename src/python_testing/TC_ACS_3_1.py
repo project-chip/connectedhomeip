@@ -376,5 +376,6 @@ class TC_ACS_3_1(MatterBaseTest):
 
         attrib_listener.reset()
 
+
 if __name__ == "__main__":
     default_matter_test_main()
