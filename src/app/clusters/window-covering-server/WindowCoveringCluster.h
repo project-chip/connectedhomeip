@@ -198,62 +198,13 @@ private:
     std::optional<DataModel::ActionReturnStatus> GetMotionLockStatus() const;
     void UpdateOperationalStateForField(chip::BitMask<OperationalStatus> field, OperationalState state);
 
-    /**
-     * @brief Handles the UpOrOpen command.
-     *        Sets the target lift/tilt positions to fully open and requests movement from the delegate.
-     *
-     * @return Status::Success on successful handling.
-     *         Status::Busy if the device is in maintenance mode.
-     *         Status::Failure if the device is in calibration mode or otherwise not operational.
-     */
     std::optional<DataModel::ActionReturnStatus> HandleUpOrOpen();
-
-    /**
-     * @brief Handles the DownOrClose command.
-     *        Sets the target lift/tilt positions to fully closed and requests movement from the delegate.
-     *
-     * @return Status::Success on successful handling.
-     *         Status::Busy if the device is in maintenance mode.
-     *         Status::Failure if the device is in calibration mode or otherwise not operational.
-     */
     std::optional<DataModel::ActionReturnStatus> HandleDownOrClose();
-
-    /**
-     * @brief Handles the StopMotion command.
-     *        Asks the delegate to stop any ongoing motion and (unless the delegate reports motion is still in progress)
-     *        latches the current position as the new target.
-     */
     std::optional<DataModel::ActionReturnStatus> HandleStopMotion(const Commands::StopMotion::DecodableType & fields);
-
-    /**
-     * @brief Handles the GoToLiftValue command.
-     *        Only supported when both AbsolutePosition and PositionAwareLift features are present.
-     */
     std::optional<DataModel::ActionReturnStatus> HandleGoToLiftValue(const Commands::GoToLiftValue::DecodableType & commandData);
-
-    /**
-     * @brief Handles the GoToTiltValue command.
-     *        Only supported when both AbsolutePosition and PositionAwareTilt features are present.
-     */
     std::optional<DataModel::ActionReturnStatus> HandleGoToTiltValue(const Commands::GoToTiltValue::DecodableType & commandData);
-
-    /**
-     * @brief Handles the GoToLiftPercentage command.
-     *        Validates the percent100ths value and requests lift movement from the delegate.
-     *
-     * @return Status::ConstraintError if the percentage is out of range.
-     *         Status::Failure if the PositionAwareLift feature is not supported.
-     */
     std::optional<DataModel::ActionReturnStatus>
     HandleGoToLiftPercentage(const Commands::GoToLiftPercentage::DecodableType & fields);
-
-    /**
-     * @brief Handles the GoToTiltPercentage command.
-     *        Validates the percent100ths value and requests tilt movement from the delegate.
-     *
-     * @return Status::ConstraintError if the percentage is out of range.
-     *         Status::Failure if the PositionAwareTilt feature is not supported.
-     */
     std::optional<DataModel::ActionReturnStatus>
     HandleGoToTiltPercentage(const Commands::GoToTiltPercentage::DecodableType & fields);
 
@@ -294,8 +245,10 @@ Percent100ths ValueToPercent100ths(AbsoluteLimits limits, uint16_t absolute);
 
 uint16_t LiftToPercent100ths(chip::EndpointId endpoint, uint16_t lift);
 uint16_t Percent100thsToLift(chip::EndpointId endpoint, uint16_t percent100ths);
+z
 
-uint16_t TiltToPercent100ths(chip::EndpointId endpoint, uint16_t tilt);
+    uint16_t
+    TiltToPercent100ths(chip::EndpointId endpoint, uint16_t tilt);
 uint16_t Percent100thsToTilt(chip::EndpointId endpoint, uint16_t percent100ths);
 
 } // namespace WindowCovering
