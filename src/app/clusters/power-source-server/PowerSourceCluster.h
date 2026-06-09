@@ -271,15 +271,11 @@ public:
               std::enable_if_t<batteryFeatureSupported, size_t> = 0>
     PowerSourceCluster(EndpointId endpointId, const Config & config) :
         Config(config), DefaultServerCluster({ endpointId, PowerSource::Id }),
-        PowerSource::detail::BatteryTimerContextsModule<batteryFeatureSupported>(
-            Config::GetTimerDelegate(), *this)
+        PowerSource::detail::BatteryTimerContextsModule<batteryFeatureSupported>(Config::GetTimerDelegate(), *this)
     {}
 
     // implement `PowerSource::detail::BatteryTimerContext::NotifierDelegate`
-    void Notify(AttributeId id) override
-    {
-        NotifyAttributeChanged(id);
-    }
+    void Notify(AttributeId id) override { NotifyAttributeChanged(id); }
 
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override

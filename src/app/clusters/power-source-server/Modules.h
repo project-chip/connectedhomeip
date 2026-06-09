@@ -366,7 +366,7 @@ public:
 
     struct NotifierDelegate
     {
-        virtual ~NotifierDelegate() = default;
+        virtual ~NotifierDelegate()         = default;
         virtual void Notify(AttributeId id) = 0;
     };
 
