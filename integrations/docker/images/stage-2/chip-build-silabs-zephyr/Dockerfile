@@ -11,7 +11,6 @@ RUN set -x \
     && ZEPHYR_SILABS_HASH=7a2673077f4d2fbec085d6bc43259e084a32d2b2 \
     && python3 -m venv venv \
     && . venv/bin/activate \
-    # requests and jsonschema required for west blobs fetch
     && pip3 install west \
     # Initialize west with the specific commit of the zephyr-silabs repository
     # This commit corresponds to the version of the Zephyr SDK used in the project
