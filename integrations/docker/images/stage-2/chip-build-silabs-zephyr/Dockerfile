@@ -8,7 +8,7 @@ RUN set -x \
     && ZEPHYR_SDK_VERSION=1.0.1 \
     # Zephyr Silabs commit hash silabs/dev branch June 3 2026:
     # v4.4.0 + 917 fixes and ieee802.15.4 drivers
-    && ZEPHYR_SILABS_HASH=65312131daf76129aea92a99bdc7ccc040ac6091 \
+    && ZEPHYR_SILABS_HASH=7a2673077f4d2fbec085d6bc43259e084a32d2b2 \
     && python3 -m venv venv \
     && . venv/bin/activate \
     # requests and jsonschema required for west blobs fetch
