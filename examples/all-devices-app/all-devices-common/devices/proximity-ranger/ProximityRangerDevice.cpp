@@ -27,6 +27,12 @@ namespace {
 
 ProximityRanging::ProximityRangingDriver * gDriver = nullptr;
 
+// Span over the same fixed adapter set the driver was constructed with.
+// Populated atomically with gDriver on first ProximityRangerDevice
+// construction and read by Register() to derive the cluster's feature map
+// from the adapter technologies.
+Span<ProximityRanging::RangingAdapter * const> gAdapterSet;
+
 } // namespace
 
 ProximityRanging::ProximityRangingDriver & ProximityRangerDevice::GetRangingDriver()
@@ -38,10 +44,8 @@ ProximityRanging::ProximityRangingDriver & ProximityRangerDevice::GetRangingDriv
     return *gDriver;
 }
 
-ProximityRangerDevice::ProximityRangerDevice(TimerDelegate & timerDelegate, PersistentStorageDelegate & storage,
-                                             BitMask<ProximityRanging::Feature> features) :
-    SingleEndpointDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kProximityRanger, 1)),
-    mTimerDelegate(timerDelegate), mFeatures(features)
+ProximityRangerDevice::ProximityRangerDevice(TimerDelegate & timerDelegate, PersistentStorageDelegate & storage) :
+    SingleEndpointDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kProximityRanger, 1)), mTimerDelegate(timerDelegate)
 {
     // Function-local statics give us first-construction-wins semantics for
     // the shared driver and its adapter set: timerDelegate and storage are
@@ -63,7 +67,8 @@ ProximityRangerDevice::ProximityRangerDevice(TimerDelegate & timerDelegate, Pers
                                                              timerDelegate };
     if (gDriver == nullptr)
     {
-        gDriver = &sDriver;
+        gDriver     = &sDriver;
+        gAdapterSet = Span<ProximityRanging::RangingAdapter * const>(sAdapters);
     }
 }
 
@@ -84,8 +89,31 @@ CHIP_ERROR ProximityRangerDevice::Register(chip::EndpointId endpoint, CodeDriven
     mIdentifyCluster.Create(IdentifyCluster::Config(endpoint, mTimerDelegate));
     ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
 
+    // Derive the cluster's feature map from the registered adapters'
+    // technologies so the feature set is a function of what the device can
+    // actually do, not a separate constant the caller has to keep in sync.
+    BitMask<ProximityRanging::Feature> features;
+    for (auto * adapter : gAdapterSet)
+    {
+        switch (adapter->GetTechnology())
+        {
+        case ProximityRanging::RangingTechEnum::kBLEBeaconRSSIRanging:
+            features.Set(ProximityRanging::Feature::kBleBeaconRssi);
+            break;
+        case ProximityRanging::RangingTechEnum::kWiFiRoundTripTimeRanging:
+        case ProximityRanging::RangingTechEnum::kWiFiNextGenerationRanging:
+            features.Set(ProximityRanging::Feature::kWiFiUsdProximityDetection);
+            break;
+        case ProximityRanging::RangingTechEnum::kBluetoothChannelSounding:
+            features.Set(ProximityRanging::Feature::kBluetoothChannelSounding);
+            break;
+        default:
+            break;
+        }
+    }
+
     mProximityRangingCluster.Create(endpoint,
-                                    ProximityRanging::ProximityRangingCluster::Config(GetRangingDriver()).WithFeatures(mFeatures));
+                                    ProximityRanging::ProximityRangingCluster::Config(GetRangingDriver()).WithFeatures(features));
     ReturnErrorOnFailure(provider.AddCluster(mProximityRangingCluster.Registration()));
 
     ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
