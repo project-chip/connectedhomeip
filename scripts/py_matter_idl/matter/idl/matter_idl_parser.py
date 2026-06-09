@@ -339,13 +339,13 @@ class MatterIdlTransformer(Transformer):
     def command(self, meta, *tuple_args):
         # The command takes 4 arguments if no input argument, 5 if input
         # argument is provided
+        qualities = tuple_args[0] or CommandQuality.NONE
+        with_access = tuple_args[1]
+        qualities |= with_access.pop("qualities", CommandQuality.NONE)
+
         args = list(tuple_args)  # convert from tuple
         if len(args) != 5:
             args.insert(2, None)
-
-        qualities = args[0] or CommandQuality.NONE
-        with_access = args[1]
-        qualities |= with_access.pop("qualities", CommandQuality.NONE)
 
         meta = None if self.skip_meta else ParseMetaData(meta)
 
