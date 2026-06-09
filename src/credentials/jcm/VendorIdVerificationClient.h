@@ -59,18 +59,21 @@ protected:
                                                       ByteSpan & globallyTrustedRootSpan) = 0;
     virtual void OnVendorIdVerificationComplete(const CHIP_ERROR & err)                   = 0;
 
-    // Liveness guard for async callbacks. The attribute reads and the SignVIDVerification invoke issued
-    // during JCM trust verification are fire-and-forget: the underlying ReadClient/CommandSender owns
-    // its own callback and outlives this object. A FailSafe teardown can destroy this object while one
-    // of those exchanges is still in flight; the late callback would then run through a freed `this`.
-    // GuardWithLiveness() wraps a callback so it captures a weak reference to a
-    // control block that dies with this object, and the wrapped callback becomes a no-op once the object
-    // is gone. The in-flight exchange is not cancelled — it simply self-reaps when it completes.
+    /**
+     * Liveness guard for async callbacks. Returns a function that only executes the input function if `this` is still in scope.
+     *
+     * Intended for async callbacks that might outlive `this`.
+     *
+     * @param [in] f The function to invoke if `this` is alive
+     *
+     * @return A new function, `f'`, which invokes `f` if and only if `this` is alive
+     */
     template <typename F>
     auto GuardWithLiveness(F && f)
     {
         std::weak_ptr<int> weak = mLivenessToken;
         return [weak, f = std::forward<F>(f)](auto &&... args) {
+            // If we're able to lock the pointer to the liveness token, `this` is still alive and the function is safe to execute.
             if (auto strong = weak.lock())
             {
                 f(std::forward<decltype(args)>(args)...);
@@ -85,7 +88,9 @@ private:
     Verify(TrustVerificationInfo * info, const ByteSpan clientChallengeSpan, ByteSpan attestationChallengeSpan,
            const app::Clusters::OperationalCredentials::Commands::SignVIDVerificationResponse::DecodableType responseData);
 
-    // Control block whose lifetime tracks this object; see GuardWithLiveness().
+    /**
+     * Token whose lifetime tracks this object; see GuardWithLiveness().
+     */
     std::shared_ptr<int> mLivenessToken = std::make_shared<int>(0);
 };
 
