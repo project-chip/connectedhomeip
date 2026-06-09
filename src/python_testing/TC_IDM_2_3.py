@@ -127,8 +127,8 @@ class TC_IDM_2_3(BasicCompositionTests):
         else:
             log.info("Basic Information Cluster revision is less than 6, read paths and subscribe paths are not part of CapabilityMinima struct.")
 
-        log.info(f"CapabilityMinima: readPathsSupported={num_read_paths_supported}, "
-                 f"subscribePathsSupported={num_subscribe_paths_supported}")
+        log.info("CapabilityMinima: readPathsSupported=%s, subscribePathsSupported=%s",
+                 num_read_paths_supported, num_subscribe_paths_supported)
 
         # Step 2: Collect available paths
         self.step(2)
@@ -164,7 +164,7 @@ class TC_IDM_2_3(BasicCompositionTests):
             # of an AttributePath, as well as the size of the payload for the MTU. See Issue #43083
             if num_paths > MAX_NUM_PATHS_IN_MTU:
                 paths[:] = paths[:MAX_NUM_PATHS_IN_MTU]
-                log.info(f"Reduced number of paths used from {num_paths} to {MAX_NUM_PATHS_IN_MTU}")
+                log.info("Reduced number of paths used from %s to %s", num_paths, MAX_NUM_PATHS_IN_MTU)
             return await request_function(paths)
 
         read_response = await conduct_request_with_potential_path_size_reduction(read_paths, num_read_paths_supported, read_request)

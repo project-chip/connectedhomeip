@@ -16,6 +16,8 @@
  *    limitations under the License.
  */
 #include <app/clusters/water-heater-management-server/water-heater-management-server.h>
+#include <app/reporting/reporting.h>
+#include <platform/CHIPDeviceLayer.h>
 
 #include <WaterHeaterDelegateImpl.h>
 #include <WaterHeaterManufacturer.h>

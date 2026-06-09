@@ -51,7 +51,7 @@ class StreamService:
         self.wd.mkdir("streams", str(stream_id))
         self._save_stream(stream)
 
-        log.info(f"Stream created: id={stream_id}, interface={interface}")
+        log.info("Stream created: id=%s, interface=%s", stream_id, interface)
         return stream
 
     def get_stream(self, stream_id: int) -> Optional[Stream]:

@@ -64,10 +64,10 @@ class MdnsServiceListener(ServiceListener):
             None
         """
         try:
-            log.info(f"Service record information lookup {rec_types} for '{service_name}' in progress...")
+            log.info("Service record information lookup %s for '%s' in progress...", rec_types, service_name)
             await wait_for(self.updated_event.wait(), timeout)
         except TimeoutError:
             log.info(
-                f"Service record information lookup {rec_types} for '{service_name}' timeout ({timeout} seconds) reached without an update."
+                "Service record information lookup %s for '%s' timeout (%s seconds) reached without an update.", rec_types, service_name, timeout
             )
             raise

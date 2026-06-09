@@ -3222,52 +3222,6 @@ cluster IcdManagement = 70 {
   command StayActiveRequest(StayActiveRequestRequest): StayActiveResponse = 3;
 }
 
-/** This cluster supports creating a simple timer functionality. */
-provisional cluster Timer = 71 {
-  revision 1;
-
-  enum TimerStatusEnum : enum8 {
-    kRunning = 0;
-    kPaused = 1;
-    kExpired = 2;
-    kReady = 3;
-  }
-
-  bitmap Feature : bitmap32 {
-    kReset = 0x1;
-  }
-
-  readonly attribute elapsed_s setTime = 0;
-  readonly attribute elapsed_s timeRemaining = 1;
-  readonly attribute TimerStatusEnum timerState = 2;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-
-  request struct SetTimerRequest {
-    elapsed_s newTime = 0;
-  }
-
-  request struct AddTimeRequest {
-    elapsed_s additionalTime = 0;
-  }
-
-  request struct ReduceTimeRequest {
-    elapsed_s timeReduction = 0;
-  }
-
-  /** This command is used to set the timer. */
-  command SetTimer(SetTimerRequest): DefaultSuccess = 0;
-  /** This command is used to reset the timer to the original value. */
-  command ResetTimer(): DefaultSuccess = 1;
-  /** This command is used to add time to the existing timer. */
-  command AddTime(AddTimeRequest): DefaultSuccess = 2;
-  /** This command is used to reduce time on the existing timer. */
-  command ReduceTime(ReduceTimeRequest): DefaultSuccess = 3;
-}
-
 /** This cluster supports remotely monitoring and, where supported, changing the operational state of an Oven. */
 cluster OvenCavityOperationalState = 72 {
   revision 2;
@@ -5193,8 +5147,8 @@ cluster Messages = 151 {
 }
 
 /** This cluster allows a client to manage the power draw of a device. An example of such a client could be an Energy Management System (EMS) which controls an Energy Smart Appliance (ESA). */
-provisional cluster DeviceEnergyManagement = 152 {
-  revision 4;
+cluster DeviceEnergyManagement = 152 {
+  revision 5;
 
   enum AdjustmentCauseEnum : enum8 {
     kLocalOptimization = 0;
@@ -5207,6 +5161,7 @@ provisional cluster DeviceEnergyManagement = 152 {
     kFault = 2;
     kUserOptOut = 3;
     kCancelled = 4;
+    kInvalid = 5;
   }
 
   enum CostTypeEnum : enum8 {
@@ -5269,6 +5224,7 @@ provisional cluster DeviceEnergyManagement = 152 {
     kPausable = 0x10;
     kForecastAdjustment = 0x20;
     kConstraintBasedAdjustment = 0x40;
+    kPowerRangeAdjustment = 0x80;
   }
 
   struct CostStruct {
@@ -5331,6 +5287,13 @@ provisional cluster DeviceEnergyManagement = 152 {
     optional int8s loadControl = 4;
   }
 
+  struct PowerRangeAdjustStruct {
+    nullable power_mw minPower = 0;
+    nullable power_mw maxPower = 1;
+    PowerAdjustReasonEnum cause = 2;
+    epoch_s endTime = 3;
+  }
+
   struct SlotAdjustmentStruct {
     int8u slotIndex = 0;
     optional power_mw nominalPower = 1;
@@ -5353,6 +5316,17 @@ provisional cluster DeviceEnergyManagement = 152 {
     CauseEnum cause = 0;
   }
 
+  provisional info event PowerRangeAdjustStart = 4 {
+    PowerRangeAdjustStruct adjustment = 0;
+    elapsed_s duration = 1;
+  }
+
+  provisional info event PowerRangeAdjustEnd = 5 {
+    CauseEnum cause = 0;
+    elapsed_s duration = 1;
+    energy_mwh energyUse = 2;
+  }
+
   readonly attribute ESATypeEnum ESAType = 0;
   readonly attribute boolean ESACanGenerate = 1;
   readonly attribute ESAStateEnum ESAState = 2;
@@ -5361,6 +5335,7 @@ provisional cluster DeviceEnergyManagement = 152 {
   readonly attribute optional nullable PowerAdjustCapabilityStruct powerAdjustmentCapability = 5;
   readonly attribute optional nullable ForecastStruct forecast = 6;
   readonly attribute optional OptOutStateEnum optOutState = 7;
+  provisional readonly attribute optional nullable PowerRangeAdjustStruct powerRangeAdjustment = 8;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -5394,6 +5369,13 @@ provisional cluster DeviceEnergyManagement = 152 {
     AdjustmentCauseEnum cause = 1;
   }
 
+  request struct PowerRangeAdjustRequestRequest {
+    nullable power_mw minPower = 0;
+    nullable power_mw maxPower = 1;
+    elapsed_s duration = 2;
+    AdjustmentCauseEnum cause = 3;
+  }
+
   /** Allows a client to request an adjustment in the power consumption of an ESA for a specified duration. */
   command PowerAdjustRequest(PowerAdjustRequestRequest): DefaultSuccess = 0;
   /** Allows a client to cancel an ongoing PowerAdjustmentRequest operation. */
@@ -5410,6 +5392,10 @@ provisional cluster DeviceEnergyManagement = 152 {
   command RequestConstraintBasedForecast(RequestConstraintBasedForecastRequest): DefaultSuccess = 6;
   /** Allows a client to request cancellation of a previous adjustment request in a StartTimeAdjustRequest, ModifyForecastRequest or RequestConstraintBasedForecast command. */
   command CancelRequest(): DefaultSuccess = 7;
+  /** Allows a client to request an adjustment in the range of powers that an ESA can operate within for a specified duration. */
+  command PowerRangeAdjustRequest(PowerRangeAdjustRequestRequest): DefaultSuccess = 8;
+  /** Allows a client to cancel an ongoing PowerRangeAdjustmentRequest operation. */
+  command CancelPowerRangeAdjustRequest(): DefaultSuccess = 9;
 }
 
 /** Electric Vehicle Supply Equipment (EVSE) is equipment used to charge an Electric Vehicle (EV) or Plug-In Hybrid Electric Vehicle. This cluster provides an interface to the functionality of Electric Vehicle Supply Equipment (EVSE) management. */
@@ -5646,7 +5632,7 @@ cluster PowerTopology = 156 {
 
   readonly attribute optional endpoint_no availableEndpoints[] = 0;
   readonly attribute optional endpoint_no activeEndpoints[] = 1;
-  attribute optional CircuitNodeStruct electricalCircuitNodes[] = 2;
+  provisional attribute optional CircuitNodeStruct electricalCircuitNodes[] = 2;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -5859,6 +5845,292 @@ provisional cluster ElectricalGridConditions = 160 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+}
+
+/** This cluster is a derived cluster of the Alarm Base cluster and provides the alarm definition related to Electrical Sensor device type. */
+provisional cluster ElectricalAlarm = 161 {
+  revision 1;
+
+  bitmap AlarmBitmap : bitmap64 {
+    kOverVoltage = 0x1;
+    kUnderVoltage = 0x2;
+    kSwappedPolarity = 0x400;
+    kLossOfMeasurement = 0x800;
+    kLossOfGridPower = 0x1000;
+    kPowerImported = 0x2000;
+    kPowerExported = 0x4000;
+    kOverFrequency = 0x4;
+    kUnderFrequency = 0x8;
+    kOverPower = 0x10;
+    kUnderPower = 0x20;
+    kOverCurrent = 0x40;
+    kUnderCurrent = 0x80;
+    kFrequencyQuality = 0x100;
+    kVoltageQuality = 0x200;
+  }
+
+  bitmap Feature : bitmap32 {
+    kReset = 0x1;
+    kAdjustableThresholds = 0x100000;
+    kOverVoltage = 0x200000;
+    kUnderVoltage = 0x400000;
+    kOverFrequency = 0x800000;
+    kUnderFrequency = 0x1000000;
+    kOverPower = 0x2000000;
+    kUnderPower = 0x4000000;
+    kOverCurrent = 0x8000000;
+    kUnderCurrent = 0x10000000;
+    kPowerImport = 0x20000000;
+    kPowerExport = 0x40000000;
+  }
+
+  info event Notify = 0 {
+    AlarmBitmap active = 0;
+    AlarmBitmap inactive = 1;
+    AlarmBitmap state = 2;
+    AlarmBitmap mask = 3;
+  }
+
+  readonly attribute AlarmBitmap mask = 0;
+  readonly attribute optional AlarmBitmap latch = 1;
+  readonly attribute AlarmBitmap state = 2;
+  readonly attribute AlarmBitmap supported = 3;
+  readonly attribute optional voltage_mv overVoltageThreshold = 128;
+  readonly attribute optional voltage_mv underVoltageThreshold = 129;
+  readonly attribute optional int64s overFrequencyThreshold = 130;
+  readonly attribute optional int64s underFrequencyThreshold = 131;
+  readonly attribute optional power_mw overPowerThreshold = 132;
+  readonly attribute optional power_mw underPowerThreshold = 133;
+  readonly attribute optional amperage_ma overCurrentThreshold = 134;
+  readonly attribute optional amperage_ma underCurrentThreshold = 135;
+  readonly attribute optional power_mw powerImportThreshold = 136;
+  readonly attribute optional power_mw powerExportThreshold = 137;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct ResetRequest {
+    AlarmBitmap alarms = 0;
+  }
+
+  request struct ModifyEnabledAlarmsRequest {
+    AlarmBitmap mask = 0;
+  }
+
+  request struct SetElectricalAlarmThresholdsRequest {
+    optional voltage_mv overVoltageThreshold = 0;
+    optional voltage_mv underVoltageThreshold = 1;
+    optional int64s overFrequencyThreshold = 2;
+    optional int64s underFrequencyThreshold = 3;
+    optional power_mw overPowerThreshold = 4;
+    optional power_mw underPowerThreshold = 5;
+    optional amperage_ma overCurrentThreshold = 6;
+    optional amperage_ma underCurrentThreshold = 7;
+    optional power_mw powerImportThreshold = 8;
+    optional power_mw powerExportThreshold = 9;
+  }
+
+  /** This command resets active and latched alarms (if possible). */
+  command Reset(ResetRequest): DefaultSuccess = 0;
+  /** This command allows a client to request that an alarm be enabled or suppressed at the server. */
+  command ModifyEnabledAlarms(ModifyEnabledAlarmsRequest): DefaultSuccess = 1;
+  /** This command will set the alarm thresholds for the specified values. */
+  command SetElectricalAlarmThresholds(SetElectricalAlarmThresholdsRequest): DefaultSuccess = 128;
+}
+
+/** This cluster provides an interface for a device which distributes electrical power to other devices, providing information about the capacity of the device as well as whether it has been damaged or has reached the end of its service life. */
+provisional cluster ElectricalDistribution = 162 {
+  revision 1;
+
+  enum EndOfLifeEnum : enum8 {
+    kNone = 0;
+    kDamaged = 1;
+    kDegraded = 2;
+    kExpired = 3;
+  }
+
+  provisional readonly attribute nullable amperage_ma maxContinuousCurrent = 0;
+  provisional readonly attribute nullable voltage_mv maxVoltage = 1;
+  provisional readonly attribute nullable int16u numberOfPoles = 2;
+  provisional readonly attribute nullable EndOfLifeEnum endOfLife = 3;
+  provisional readonly attribute nullable boolean serviceEntranceRated = 4;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
+/** This cluster is a derived cluster of the Alarm Base cluster and provides the alarm definition related to the Electrical Protection device type. */
+provisional cluster ElectricalProtectionAlarm = 163 {
+  revision 1;
+
+  enum CurrentTripCurveEnum : enum8 {
+    kTypeZ = 0;
+    kTypeB = 1;
+    kTypeC = 2;
+    kTypeK = 3;
+    kTypeD = 4;
+  }
+
+  enum CurrentWaveformEnum : enum8 {
+    kAC = 0 [spec_name = "AC"];
+    kA = 1;
+    kF = 2;
+    kB = 3;
+  }
+
+  enum GroundFaultClassEnum : enum8 {
+    kClassA = 0;
+    kClassB = 1;
+    kClassC = 2;
+    kClassD = 3;
+    kClassE = 4;
+  }
+
+  bitmap AlarmBitmap : bitmap32 {
+    kShortCircuitFault = 0x1;
+    kOverLoadFault = 0x2;
+    kOverVoltageFault = 0x4;
+    kVoltageSurgeFault = 0x8;
+    kResidualCurrentFault = 0x10;
+    kArcFault = 0x20;
+    kSelfTest = 0x40;
+  }
+
+  bitmap ArcCauseBitmap : bitmap8 {
+    kSeries = 0x1;
+    kParallelToNeutral = 0x2;
+    kParallelToGround = 0x4;
+  }
+
+  bitmap CurrentTripMechanismBitmap : bitmap8 {
+    kThermal = 0x1;
+    kMagnetic = 0x2;
+    kElectronic = 0x4;
+  }
+
+  bitmap Feature : bitmap32 {
+    kShortCircuit = 0x100000;
+    kOverLoad = 0x200000;
+    kOverVoltage = 0x400000;
+    kSurgeProtection = 0x800000;
+    kResidualCurrent = 0x1000000;
+    kArcFault = 0x2000000;
+    kSelfTest = 0x4000000;
+  }
+
+  bitmap SurgeProtectionClassBitmap : bitmap16 {
+    kClassI = 0x1;
+    kClassII = 0x2;
+    kClassIII = 0x4;
+  }
+
+  bitmap SurgeProtectionTypeBitmap : bitmap16 {
+    kType1 = 0x1;
+    kType2 = 0x2;
+    kType3 = 0x4;
+  }
+
+  bitmap TrippingCharacteristicsBitmap : bitmap16 {
+    kShortDelay = 0x1;
+    kSelective = 0x2;
+    kSuperImmune = 0x4;
+  }
+
+  bitmap VoltageTripMechanismBitmap : bitmap8 {
+    kMOV = 0x1 [spec_name = "MOV"];
+    kSAD = 0x2 [spec_name = "SAD"];
+    kGDT = 0x4 [spec_name = "GDT"];
+  }
+
+  struct ArcFaultRatingsStruct {
+    optional amperage_ma seriesArcCurrentSensitivity = 0;
+    optional amperage_ma parallelArcCurrentSensitivity = 1;
+    optional ArcCauseBitmap supportedArcCauses = 2;
+  }
+
+  struct OverLoadRatingsStruct {
+    optional amperage_ma tripCurrent = 0;
+    optional CurrentTripCurveEnum tripCurve = 1;
+    optional CurrentTripMechanismBitmap tripMechanism = 2;
+    optional amperage_ma ultimateMaxCurrent = 3;
+    optional amperage_ma serviceMaxCurrent = 4;
+  }
+
+  struct OverVoltageRatingsStruct {
+    optional VoltageTripMechanismBitmap tripMechanism = 0;
+    optional voltage_mv tripVoltage = 1;
+    optional voltage_mv maxContinuousOperatingVoltage = 2;
+    optional int64u responseTime = 3;
+  }
+
+  struct ResidualCurrentFaultRatingsStruct {
+    optional amperage_ma currentSensitivity = 0;
+    optional CurrentTripMechanismBitmap tripMechanism = 1;
+    optional boolean voltageDependent = 2;
+    optional GroundFaultClassEnum groundFaultClass = 3;
+    optional CurrentWaveformEnum waveform = 4;
+    optional TrippingCharacteristicsBitmap trippingCharacteristic = 5;
+    optional amperage_ma ultimateMaxCurrent = 6;
+    optional amperage_ma serviceMaxCurrent = 7;
+  }
+
+  struct ShortCircuitRatingsStruct {
+    optional amperage_ma tripCurrent = 0;
+    optional CurrentTripMechanismBitmap tripMechanism = 1;
+    optional CurrentTripCurveEnum tripCurve = 2;
+    optional amperage_ma ultimateMaxCurrent = 3;
+    optional amperage_ma serviceMaxCurrent = 4;
+    optional amperage_ma maxCurrent = 5;
+  }
+
+  struct SurgeProtectionRatingsStruct {
+    optional VoltageTripMechanismBitmap tripMechanism = 0;
+    optional SurgeProtectionClassBitmap protectionClass = 1;
+    optional SurgeProtectionTypeBitmap protectionType = 2;
+    optional voltage_mv maxContinuousOperatingVoltage = 3;
+    optional voltage_mv maxVoltageProtection = 4;
+    optional voltage_mv maxTemporaryVoltage = 5;
+    optional amperage_ma nominalDischargeCurrent = 6;
+    optional amperage_ma maximumDishargeCurrent = 7;
+    optional amperage_ma ratedShortCircuitCurrent = 8;
+    optional amperage_ma ratedShortTimeWithstandCurrent = 9;
+    optional int64u energyAbsorptionCapability = 10;
+    optional int64u responseTime = 11;
+  }
+
+  provisional info event Notify = 0 {
+    AlarmBitmap active = 0;
+    AlarmBitmap inactive = 1;
+    AlarmBitmap state = 2;
+    AlarmBitmap mask = 3;
+  }
+
+  provisional readonly attribute AlarmBitmap mask = 0;
+  provisional readonly attribute AlarmBitmap state = 2;
+  provisional readonly attribute AlarmBitmap supported = 3;
+  provisional readonly attribute optional nullable ArcCauseBitmap arcCause = 128;
+  provisional readonly attribute optional nullable OverLoadRatingsStruct overLoadRating = 129;
+  provisional readonly attribute optional nullable OverVoltageRatingsStruct overVoltageRating = 130;
+  provisional readonly attribute optional nullable SurgeProtectionRatingsStruct surgeProtectionRating = 131;
+  provisional readonly attribute optional nullable ShortCircuitRatingsStruct shortCircuitRating = 132;
+  provisional readonly attribute optional nullable ResidualCurrentFaultRatingsStruct residualCurrentRating = 133;
+  provisional readonly attribute optional nullable ArcFaultRatingsStruct arcFaultRating = 134;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct ModifyEnabledAlarmsRequest {
+    AlarmBitmap mask = 0;
+  }
+
+  /** This command allows a client to request that an alarm be enabled or suppressed at the server. */
+  command ModifyEnabledAlarms(ModifyEnabledAlarmsRequest): DefaultSuccess = 1;
 }
 
 /** An interface to a generic way to secure a door */
@@ -8927,7 +9199,7 @@ provisional cluster SoilMeasurement = 1072 {
 
 /** This server cluster provides an interface to ambient context sensing functionality. */
 provisional cluster AmbientContextSensing = 1073 {
-  revision 1;
+  revision 2;
 
   bitmap Feature : bitmap32 {
     kHumanActivity = 0x1;
@@ -8935,11 +9207,12 @@ provisional cluster AmbientContextSensing = 1073 {
     kObjectIdentification = 0x4;
     kSoundIdentification = 0x8;
     kPredictedActivity = 0x10;
+    kSensorFusion = 0x20;
   }
 
   struct AmbientContextTypeStruct {
     SemanticTagStruct ambientContextSensed[] = 0;
-    optional epoch_s detectionStartTime = 1;
+    optional nullable percent detectionConfidence = 1;
   }
 
   struct HoldTimeLimitsStruct {
@@ -8964,12 +9237,13 @@ provisional cluster AmbientContextSensing = 1073 {
 
   provisional info event AmbientContextDetectStarted = 0 {
     optional AmbientContextTypeStruct ambientContextDetected = 0;
-    optional boolean objectCountReached = 1;
+    optional boolean objectCountThresholdReached = 1;
     optional int16u objectCount = 2;
   }
 
   provisional info event AmbientContextDetectEnded = 1 {
-    posix_ms eventStartTime = 0;
+    optional posix_ms eventStartTimePos = 0;
+    optional systime_ms eventStartTimeSys = 1;
   }
 
   provisional readonly attribute optional boolean humanActivityDetected = 0;
@@ -8977,13 +9251,58 @@ provisional cluster AmbientContextSensing = 1073 {
   provisional readonly attribute optional boolean audioContextDetected = 2;
   provisional readonly attribute optional AmbientContextTypeStruct ambientContextType[] = 3;
   provisional readonly attribute optional SemanticTagStruct ambientContextTypeSupported[] = 4;
-  provisional readonly attribute optional boolean objectCountReached = 5;
+  provisional readonly attribute optional boolean objectCountThresholdReached = 5;
   provisional attribute access(write: manage) optional ObjectCountConfigStruct objectCountConfig = 6;
   provisional readonly attribute optional int16u objectCount = 7;
-  provisional attribute int8u simultaneousDetectionLimit = 8;
+  provisional readonly attribute int8u simultaneousDetectionLimit = 8;
   provisional attribute access(write: manage) int16u holdTime = 9;
   provisional readonly attribute HoldTimeLimitsStruct holdTimeLimits = 10;
   provisional readonly attribute optional PredictedActivityStruct predictedActivity[] = 11;
+  provisional readonly attribute optional SemanticTagStruct sensorFusionSupported[] = 12;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
+/** This cluster provides data modeling and protocol implementation of multi-node ambient sensing system. */
+provisional cluster AmbientSensingUnion = 1074 {
+  revision 1;
+
+  enum UnionContributorStatusEnum : enum8 {
+    kUnionContributorOnline = 0;
+    kUnionContributorOffline = 1;
+  }
+
+  enum UnionHealthEnum : enum8 {
+    kFullyFunctional = 0;
+    kLimitedDegraded = 1;
+    kNonFunctional = 2;
+  }
+
+  struct UnionContributorStruct {
+    nullable node_id contributorNodeID = 0;
+    nullable endpoint_no contributorEndpointID = 1;
+    optional char_string<128> contributorName = 2;
+    UnionContributorStatusEnum contributorHealth = 3;
+  }
+
+  provisional info event UnionContributorAdded = 0 {
+    UnionContributorStruct addedContributor[] = 0;
+  }
+
+  provisional info event UnionContributorRemoved = 1 {
+    UnionContributorStruct removedContributor[] = 0;
+  }
+
+  provisional info event UnionContributorStatusChanged = 2 {
+    UnionContributorStruct statusChangedContributor[] = 0;
+  }
+
+  attribute char_string<128> unionName = 0;
+  readonly attribute UnionHealthEnum unionHealth = 1;
+  readonly attribute UnionContributorStruct unionContributorList[] = 2;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -11195,7 +11514,7 @@ cluster WebRTCTransportRequestor = 1364 {
 
 /** This cluster implements the upload of Audio and Video streams from the Push AV Stream Transport Cluster using suitable push-based transports. */
 cluster PushAvStreamTransport = 1365 {
-  revision 2;
+  revision 3;
 
   enum CMAFInterfaceEnum : enum8 {
     kInterface1 = 0;
@@ -11235,6 +11554,7 @@ cluster PushAvStreamTransport = 1365 {
     kCommand = 0;
     kMotion = 1;
     kContinuous = 2;
+    kAmbientContext = 3;
   }
 
   enum TriggerActivationReasonEnum : enum8 {
@@ -11283,10 +11603,8 @@ cluster PushAvStreamTransport = 1365 {
     CMAFInterfaceEnum CMAFInterface = 0;
     int16u segmentDuration = 1;
     int16u chunkDuration = 2;
-    int8u sessionGroup = 3;
-    char_string<16> trackName = 4;
-    optional octet_string<16> CENCKey = 5;
-    optional octet_string<16> CENCKeyID = 6;
+    optional int8u sessionGroup = 3;
+    optional char_string<16> trackName = 4;
     optional boolean metadataEnabled = 7;
   }
 
@@ -11325,13 +11643,13 @@ cluster PushAvStreamTransport = 1365 {
     int16u connectionID = 0;
     TransportTriggerTypeEnum triggerType = 1;
     optional TriggerActivationReasonEnum activationReason = 2;
-    ContainerFormatEnum containerType = 3;
+    optional ContainerFormatEnum containerType = 3;
     optional int64u CMAFSessionNumber = 4;
   }
 
   info event PushTransportEnd = 1 {
     int16u connectionID = 0;
-    ContainerFormatEnum containerType = 1;
+    optional ContainerFormatEnum containerType = 1;
     optional int64u CMAFSessionNumber = 2;
   }
 
@@ -11424,9 +11742,127 @@ cluster Chime = 1366 {
   command PlayChimeSound(PlayChimeSoundRequest): DefaultSuccess = 0;
 }
 
+/** This server cluster provides an interface for controlling events pertaining to AV analysis. */
+provisional cluster AvAnalysis = 1367 {
+  revision 1;
+
+  enum AnalysisStreamStateEnum : enum8 {
+    kPendingInitiation = 0;
+    kFailure = 1;
+    kWebRTCInitiated = 2;
+    kPushAVAllocated = 3;
+    kWebRTCActive = 4;
+    kPushAVActive = 5;
+    kPushAVPendingDeactivation = 6;
+    kWebRTCPendingDeactivation = 7;
+  }
+
+  bitmap Feature : bitmap32 {
+    kLocalContextDetection = 0x1;
+    kRemoteContextDetection = 0x2;
+    kPerZoneContextDetection = 0x4;
+  }
+
+  struct AnalysisStreamStruct {
+    int16u analysisStreamID = 0;
+    optional nullable endpoint_no webRTCEndpointID = 1;
+    optional nullable endpoint_no pushAVEndpointID = 2;
+    AnalysisStreamStateEnum analysisStreamState = 3;
+  }
+
+  struct ContextTriggerStruct {
+    SemanticTagStruct context = 0;
+    optional nullable int16u zoneIDs[] = 1;
+  }
+
+  struct TrackedContext {
+    int16u identifiedContextID = 0;
+    SemanticTagStruct identifiedContext = 1;
+    optional nullable int16u previousZone = 2;
+    optional nullable int16u currentZone = 3;
+    epoch_s startTime = 4;
+    nullable epoch_s endTime = 5;
+  }
+
+  provisional info event AnalysisSessionStart = 0 {
+    int16u sessionID = 0;
+    optional node_id sourceNodeId = 1;
+    nullable int16u triggeredZones[] = 2;
+  }
+
+  provisional info event AnalysisSessionEnd = 1 {
+    int16u sessionID = 0;
+    optional node_id sourceNodeId = 1;
+  }
+
+  provisional info event PerceivedContext = 2 {
+    int16u sessionID = 0;
+    optional node_id sourceNodeId = 1;
+    optional epoch_us sourceStartTimestamp = 2;
+    optional TrackedContext newIdentifiedContexts[] = 3;
+    optional TrackedContext currentIdentifiedContexts[] = 4;
+    optional TrackedContext expiredContexts[] = 5;
+  }
+
+  readonly attribute SemanticTagStruct supportedAmbientContexts[] = 0;
+  readonly attribute ContextTriggerStruct activeAmbientContextTriggers[] = 1;
+  readonly attribute optional int8u maxAnalysisStreamCount = 2;
+  readonly attribute optional int8u currentAnalysisStreamCount = 3;
+  readonly attribute optional AnalysisStreamStruct analysisStreams[] = 4;
+  attribute access(read: manage, write: manage) boolean trackingEnabled = 5;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct EnableContextTriggersRequest {
+    nullable ContextTriggerStruct contextTriggers[] = 0;
+  }
+
+  request struct DisableContextTriggersRequest {
+    nullable ContextTriggerStruct contextTriggers[] = 0;
+  }
+
+  request struct EstablishAnalysisStreamRequest {
+    node_id nodeID = 0;
+  }
+
+  response struct EstablishAnalysisStreamResponse = 3 {
+    int16u analysisStreamID = 0;
+  }
+
+  request struct ActivateAnalysisStreamRequest {
+    int16u analysisStreamID = 0;
+    optional endpoint_no webRTCEndpointID = 1;
+    optional endpoint_no pushAVEndpointID = 2;
+  }
+
+  request struct DeactivateAnalysisStreamRequest {
+    int16u analysisStreamID = 0;
+  }
+
+  request struct RemoveAnalysisStreamRequest {
+    int16u analysisStreamID = 0;
+  }
+
+  /** This command SHALL enable the generation of PerceivedContext events for the set of ambient context triggers that are provided, should they be detected. */
+  command EnableContextTriggers(EnableContextTriggersRequest): DefaultSuccess = 0;
+  /** This command will disable the generation of PerceivedContext events for the set of ambient context triggers that are provided, should they be detected. */
+  command DisableContextTriggers(DisableContextTriggersRequest): DefaultSuccess = 1;
+  /** This command will cause the Analysis Node to establish a video stream with a StreamUsage of Analysis Value with the identified camera. */
+  command EstablishAnalysisStream(EstablishAnalysisStreamRequest): EstablishAnalysisStreamResponse = 2;
+  /** This command will cause the Analysis Node to activate either a WebRTC livestream or PushAV recording stream with a StreamUsage of Analysis Value with the identified camera. */
+  command ActivateAnalysisStream(ActivateAnalysisStreamRequest): DefaultSuccess = 4;
+  /** This command will cause the Analysis Node to deactivate either a WebRTC livestream or PushAV recording stream with a StreamUsage of Analysis Value with the identified camera. */
+  command DeactivateAnalysisStream(DeactivateAnalysisStreamRequest): DefaultSuccess = 5;
+  /** This command will cause the Analysis Node to remove a previously allocated video stream. */
+  command RemoveAnalysisStream(RemoveAnalysisStreamRequest): DefaultSuccess = 6;
+}
+
 /** The CommodityTariffCluster provides the mechanism for communicating Commodity Tariff information within the premises. */
 provisional cluster CommodityTariff = 1792 {
-  revision 1;
+  revision 2;
 
   enum AuxiliaryLoadSettingEnum : enum8 {
     kOff = 0;
@@ -11507,6 +11943,7 @@ provisional cluster CommodityTariff = 1792 {
     nullable int64s threshold = 6;
     optional nullable char_string<128> label = 7;
     optional boolean predicted = 8;
+    optional char_string<36> externalID = 9;
   }
 
   struct CalendarPeriodStruct {

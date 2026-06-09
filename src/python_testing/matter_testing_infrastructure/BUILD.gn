@@ -35,6 +35,9 @@ pw_python_package("matter-testing-module") {
         "Programming Language :: Python :: 3",
       ]
     }
+    options = {
+      install_requires = [ "sdbus; sys_platform == \"linux\"" ]
+    }
   }
 
   inputs = [ "env_test.yaml" ]
@@ -47,6 +50,8 @@ pw_python_package("matter-testing-module") {
     "matter/testing/choice_conformance.py",
     "matter/testing/commissioning.py",
     "matter/testing/commissioning_types.py",
+    "matter/testing/concurrency/__init__.py",
+    "matter/testing/concurrency/context.py",
     "matter/testing/conformance.py",
     "matter/testing/conversions.py",
     "matter/testing/credentials.py",
