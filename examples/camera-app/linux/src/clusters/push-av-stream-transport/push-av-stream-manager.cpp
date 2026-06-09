@@ -655,6 +655,14 @@ PushAvStreamTransportManager::PersistentAttributesLoadedCallback()
                     ChipLogError(Zcl, "Failed to re-allocate transport for connection ID: %u, status: %u", connectionID,
                                  to_underlying(status));
                 }
+                else
+                {
+                    // Restore transport status from persisted configuration
+                    if (transportConfig.transportStatus == TransportStatusEnum::kActive)
+                    {
+                        this->SetTransportStatus({ connectionID }, TransportStatusEnum::kActive);
+                    }
+                }
             }
             else
             {
