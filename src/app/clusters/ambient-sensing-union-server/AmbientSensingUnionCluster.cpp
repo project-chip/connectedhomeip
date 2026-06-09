@@ -74,8 +74,8 @@ CHIP_ERROR AmbientSensingUnionCluster::Startup(ServerClusterContext & context)
         }
         else
         {
-            ChipLogProgress(Zcl, "AmbientSensingUnion: Loaded persisted UnionName: %.*s",
-                            static_cast<int>(mUnionNameLength), mUnionNameBuffer);
+            ChipLogProgress(Zcl, "AmbientSensingUnion: Loaded persisted UnionName: %.*s", static_cast<int>(mUnionNameLength),
+                            mUnionNameBuffer);
         }
     }
 
@@ -424,7 +424,6 @@ void AmbientSensingUnionCluster::EmitContributorStatusChangedEvent(const Contrib
 
     mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
 }
-
 
 // =============================================================================
 // Attribute Encoding

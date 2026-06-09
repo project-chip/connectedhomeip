@@ -81,8 +81,8 @@ struct TestAmbientSensingUnionCluster : public ::testing::Test
     static void TearDownTestSuite() { Platform::MemoryShutdown(); }
 
     void SetUp() override
-    { 
-        mDelegate.Reset(); 
+    {
+        mDelegate.Reset();
         mContext = std::make_unique<chip::Testing::TestServerClusterContext>();
     }
 
@@ -97,8 +97,7 @@ struct TestAmbientSensingUnionCluster : public ::testing::Test
 TEST_F(TestAmbientSensingUnionCluster, TestReadClusterRevision)
 {
 
-    auto cluster = std::make_unique<AmbientSensingUnionCluster>(
-        AmbientSensingUnionCluster::Config{ kTestEndpointId } );
+    auto cluster = std::make_unique<AmbientSensingUnionCluster>(AmbientSensingUnionCluster::Config{ kTestEndpointId });
     EXPECT_EQ(cluster->Startup(mContext->Get()), CHIP_NO_ERROR);
     chip::Testing::ClusterTester tester(*cluster);
 
@@ -110,8 +109,7 @@ TEST_F(TestAmbientSensingUnionCluster, TestReadClusterRevision)
 TEST_F(TestAmbientSensingUnionCluster, TestReadFeatureMap)
 {
 
-    auto cluster = std::make_unique<AmbientSensingUnionCluster>(
-        AmbientSensingUnionCluster::Config{ kTestEndpointId } );
+    auto cluster = std::make_unique<AmbientSensingUnionCluster>(AmbientSensingUnionCluster::Config{ kTestEndpointId });
     EXPECT_EQ(cluster->Startup(mContext->Get()), CHIP_NO_ERROR);
     chip::Testing::ClusterTester tester(*cluster);
 
@@ -125,8 +123,7 @@ TEST_F(TestAmbientSensingUnionCluster, TestReadUnionName)
     constexpr char kTestName[] = "LivingRoomUnion";
 
     auto cluster = std::make_unique<AmbientSensingUnionCluster>(
-        AmbientSensingUnionCluster::Config{ kTestEndpointId }.WithUnionName(
-        CharSpan::fromCharString(kTestName)) );
+        AmbientSensingUnionCluster::Config{ kTestEndpointId }.WithUnionName(CharSpan::fromCharString(kTestName)));
     EXPECT_EQ(cluster->Startup(mContext->Get()), CHIP_NO_ERROR);
     chip::Testing::ClusterTester tester(*cluster);
 
@@ -140,11 +137,9 @@ TEST_F(TestAmbientSensingUnionCluster, TestReadUnionName)
 TEST_F(TestAmbientSensingUnionCluster, TestReadUnionHealth)
 {
 
-
     // Test health with no contributors (NonFunctional)
     {
-        auto cluster = std::make_unique<AmbientSensingUnionCluster>(
-        AmbientSensingUnionCluster::Config{ kTestEndpointId } );
+        auto cluster = std::make_unique<AmbientSensingUnionCluster>(AmbientSensingUnionCluster::Config{ kTestEndpointId });
         EXPECT_EQ(cluster->Startup(mContext->Get()), CHIP_NO_ERROR);
         chip::Testing::ClusterTester tester(*cluster);
 
@@ -155,8 +150,7 @@ TEST_F(TestAmbientSensingUnionCluster, TestReadUnionHealth)
 
     // Test health with all online contributors (FullyFunctional)
     {
-        auto cluster = std::make_unique<AmbientSensingUnionCluster>(
-        AmbientSensingUnionCluster::Config{ kTestEndpointId } );
+        auto cluster = std::make_unique<AmbientSensingUnionCluster>(AmbientSensingUnionCluster::Config{ kTestEndpointId });
         EXPECT_EQ(cluster->Startup(mContext->Get()), CHIP_NO_ERROR);
 
         EXPECT_EQ(cluster->AddMatterContributor(kTestNodeId1, kContributorEp1, UnionContributorStatusEnum::kUnionContributorOnline),
@@ -171,14 +165,14 @@ TEST_F(TestAmbientSensingUnionCluster, TestReadUnionHealth)
 
     // Test health with mixed online/offline contributors (LimitedDegraded)
     {
-        auto cluster = std::make_unique<AmbientSensingUnionCluster>(
-        AmbientSensingUnionCluster::Config{ kTestEndpointId } );
+        auto cluster = std::make_unique<AmbientSensingUnionCluster>(AmbientSensingUnionCluster::Config{ kTestEndpointId });
         EXPECT_EQ(cluster->Startup(mContext->Get()), CHIP_NO_ERROR);
 
         EXPECT_EQ(cluster->AddMatterContributor(kTestNodeId1, kContributorEp1, UnionContributorStatusEnum::kUnionContributorOnline),
                   CHIP_NO_ERROR);
-        EXPECT_EQ(cluster->AddMatterContributor(kTestNodeId2, kContributorEp1, UnionContributorStatusEnum::kUnionContributorOffline),
-                  CHIP_NO_ERROR);
+        EXPECT_EQ(
+            cluster->AddMatterContributor(kTestNodeId2, kContributorEp1, UnionContributorStatusEnum::kUnionContributorOffline),
+            CHIP_NO_ERROR);
 
         chip::Testing::ClusterTester tester(*cluster);
 
@@ -191,8 +185,7 @@ TEST_F(TestAmbientSensingUnionCluster, TestReadUnionHealth)
 TEST_F(TestAmbientSensingUnionCluster, TestReadEmptyContributorList)
 {
 
-    auto cluster = std::make_unique<AmbientSensingUnionCluster>(
-        AmbientSensingUnionCluster::Config{ kTestEndpointId } );
+    auto cluster = std::make_unique<AmbientSensingUnionCluster>(AmbientSensingUnionCluster::Config{ kTestEndpointId });
     EXPECT_EQ(cluster->Startup(mContext->Get()), CHIP_NO_ERROR);
 
     EXPECT_EQ(cluster->GetContributorCount(), 0u);
@@ -206,7 +199,7 @@ TEST_F(TestAmbientSensingUnionCluster, TestWriteUnionName)
 {
 
     auto cluster = std::make_unique<AmbientSensingUnionCluster>(
-        AmbientSensingUnionCluster::Config{ kTestEndpointId }.WithDelegate(&mDelegate) );
+        AmbientSensingUnionCluster::Config{ kTestEndpointId }.WithDelegate(&mDelegate));
     EXPECT_EQ(cluster->Startup(mContext->Get()), CHIP_NO_ERROR);
     chip::Testing::ClusterTester tester(*cluster);
 
@@ -226,7 +219,7 @@ TEST_F(TestAmbientSensingUnionCluster, TestWriteUnionNameViaSetMethod)
 {
 
     auto cluster = std::make_unique<AmbientSensingUnionCluster>(
-        AmbientSensingUnionCluster::Config{ kTestEndpointId }.WithDelegate(&mDelegate) );
+        AmbientSensingUnionCluster::Config{ kTestEndpointId }.WithDelegate(&mDelegate));
     EXPECT_EQ(cluster->Startup(mContext->Get()), CHIP_NO_ERROR);
 
     constexpr char kNewName[] = "KitchenUnion";
@@ -240,10 +233,9 @@ TEST_F(TestAmbientSensingUnionCluster, TestWriteUnionNameSameValueNoOp)
 {
     constexpr char kTestName[] = "TestUnion";
 
-    auto cluster = std::make_unique<AmbientSensingUnionCluster>(
-        AmbientSensingUnionCluster::Config{ kTestEndpointId }
-                                            .WithUnionName(CharSpan::fromCharString(kTestName))
-                                            .WithDelegate(&mDelegate) );
+    auto cluster = std::make_unique<AmbientSensingUnionCluster>(AmbientSensingUnionCluster::Config{ kTestEndpointId }
+                                                                    .WithUnionName(CharSpan::fromCharString(kTestName))
+                                                                    .WithDelegate(&mDelegate));
     EXPECT_EQ(cluster->Startup(mContext->Get()), CHIP_NO_ERROR);
 
     EXPECT_EQ(cluster->SetUnionName(CharSpan::fromCharString(kTestName)), CHIP_NO_ERROR);
@@ -253,12 +245,12 @@ TEST_F(TestAmbientSensingUnionCluster, TestWriteUnionNameSameValueNoOp)
 TEST_F(TestAmbientSensingUnionCluster, TestWriteUnionNameMaxLength)
 {
 
-    auto cluster = std::make_unique<AmbientSensingUnionCluster>(
-        AmbientSensingUnionCluster::Config{ kTestEndpointId } );
+    auto cluster = std::make_unique<AmbientSensingUnionCluster>(AmbientSensingUnionCluster::Config{ kTestEndpointId });
     EXPECT_EQ(cluster->Startup(mContext->Get()), CHIP_NO_ERROR);
     chip::Testing::ClusterTester tester(*cluster);
 
-    static const char maxLengthName[] = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"; // 128 A's
+    static const char maxLengthName[] = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+                                        "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"; // 128 A's
 
     EXPECT_EQ(tester.WriteAttribute(Attributes::UnionName::Id, CharSpan::fromCharString(maxLengthName)), CHIP_NO_ERROR);
 
@@ -270,22 +262,22 @@ TEST_F(TestAmbientSensingUnionCluster, TestWriteUnionNameMaxLength)
 TEST_F(TestAmbientSensingUnionCluster, TestWriteUnionNameTooLong)
 {
 
-    auto cluster = std::make_unique<AmbientSensingUnionCluster>(
-        AmbientSensingUnionCluster::Config{ kTestEndpointId } );
+    auto cluster = std::make_unique<AmbientSensingUnionCluster>(AmbientSensingUnionCluster::Config{ kTestEndpointId });
     EXPECT_EQ(cluster->Startup(mContext->Get()), CHIP_NO_ERROR);
     chip::Testing::ClusterTester tester(*cluster);
 
-    static const char tooLongName[] = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"; // 129 A's
+    static const char tooLongName[] = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+                                      "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"; // 129 A's
 
-    EXPECT_EQ(tester.WriteAttribute(Attributes::UnionName::Id, CharSpan::fromCharString(tooLongName)), CHIP_IM_GLOBAL_STATUS(ConstraintError));
+    EXPECT_EQ(tester.WriteAttribute(Attributes::UnionName::Id, CharSpan::fromCharString(tooLongName)),
+              CHIP_IM_GLOBAL_STATUS(ConstraintError));
 }
 
 TEST_F(TestAmbientSensingUnionCluster, TestWriteUnionNameEmptyString)
 {
 
     auto cluster = std::make_unique<AmbientSensingUnionCluster>(
-        AmbientSensingUnionCluster::Config{ kTestEndpointId }.WithUnionName(
-        CharSpan::fromCharString("InitialName")) );
+        AmbientSensingUnionCluster::Config{ kTestEndpointId }.WithUnionName(CharSpan::fromCharString("InitialName")));
     EXPECT_EQ(cluster->Startup(mContext->Get()), CHIP_NO_ERROR);
     chip::Testing::ClusterTester tester(*cluster);
 
@@ -304,7 +296,7 @@ TEST_F(TestAmbientSensingUnionCluster, TestAddMatterContributor)
 {
 
     auto cluster = std::make_unique<AmbientSensingUnionCluster>(
-        AmbientSensingUnionCluster::Config{ kTestEndpointId }.WithDelegate(&mDelegate) );
+        AmbientSensingUnionCluster::Config{ kTestEndpointId }.WithDelegate(&mDelegate));
     EXPECT_EQ(cluster->Startup(mContext->Get()), CHIP_NO_ERROR);
 
     EXPECT_EQ(cluster->AddMatterContributor(kTestNodeId1, kContributorEp1, UnionContributorStatusEnum::kUnionContributorOnline),
@@ -317,8 +309,7 @@ TEST_F(TestAmbientSensingUnionCluster, TestAddMatterContributor)
 TEST_F(TestAmbientSensingUnionCluster, TestAddMatterContributorDuplicate)
 {
 
-    auto cluster = std::make_unique<AmbientSensingUnionCluster>(
-        AmbientSensingUnionCluster::Config{ kTestEndpointId } );
+    auto cluster = std::make_unique<AmbientSensingUnionCluster>(AmbientSensingUnionCluster::Config{ kTestEndpointId });
     EXPECT_EQ(cluster->Startup(mContext->Get()), CHIP_NO_ERROR);
 
     EXPECT_EQ(cluster->AddMatterContributor(kTestNodeId1, kContributorEp1), CHIP_NO_ERROR);
@@ -330,8 +321,7 @@ TEST_F(TestAmbientSensingUnionCluster, TestAddMatterContributorDuplicate)
 TEST_F(TestAmbientSensingUnionCluster, TestAddMultipleMatterContributors)
 {
 
-    auto cluster = std::make_unique<AmbientSensingUnionCluster>(
-        AmbientSensingUnionCluster::Config{ kTestEndpointId } );
+    auto cluster = std::make_unique<AmbientSensingUnionCluster>(AmbientSensingUnionCluster::Config{ kTestEndpointId });
     EXPECT_EQ(cluster->Startup(mContext->Get()), CHIP_NO_ERROR);
 
     EXPECT_EQ(cluster->AddMatterContributor(kTestNodeId1, kContributorEp1), CHIP_NO_ERROR);
@@ -345,7 +335,7 @@ TEST_F(TestAmbientSensingUnionCluster, TestRemoveMatterContributor)
 {
 
     auto cluster = std::make_unique<AmbientSensingUnionCluster>(
-        AmbientSensingUnionCluster::Config{ kTestEndpointId }.WithDelegate(&mDelegate) );
+        AmbientSensingUnionCluster::Config{ kTestEndpointId }.WithDelegate(&mDelegate));
     EXPECT_EQ(cluster->Startup(mContext->Get()), CHIP_NO_ERROR);
 
     EXPECT_EQ(cluster->AddMatterContributor(kTestNodeId1, kContributorEp1), CHIP_NO_ERROR);
@@ -361,8 +351,7 @@ TEST_F(TestAmbientSensingUnionCluster, TestRemoveMatterContributor)
 TEST_F(TestAmbientSensingUnionCluster, TestRemoveMatterContributorNotFound)
 {
 
-    auto cluster = std::make_unique<AmbientSensingUnionCluster>(
-        AmbientSensingUnionCluster::Config{ kTestEndpointId } );
+    auto cluster = std::make_unique<AmbientSensingUnionCluster>(AmbientSensingUnionCluster::Config{ kTestEndpointId });
     EXPECT_EQ(cluster->Startup(mContext->Get()), CHIP_NO_ERROR);
 
     EXPECT_EQ(cluster->RemoveMatterContributor(kTestNodeId1, kContributorEp1), CHIP_ERROR_NOT_FOUND);
@@ -372,7 +361,7 @@ TEST_F(TestAmbientSensingUnionCluster, TestUpdateMatterContributorStatus)
 {
 
     auto cluster = std::make_unique<AmbientSensingUnionCluster>(
-        AmbientSensingUnionCluster::Config{ kTestEndpointId }.WithDelegate(&mDelegate) );
+        AmbientSensingUnionCluster::Config{ kTestEndpointId }.WithDelegate(&mDelegate));
     EXPECT_EQ(cluster->Startup(mContext->Get()), CHIP_NO_ERROR);
 
     EXPECT_EQ(cluster->AddMatterContributor(kTestNodeId1, kContributorEp1, UnionContributorStatusEnum::kUnionContributorOnline),
@@ -392,7 +381,7 @@ TEST_F(TestAmbientSensingUnionCluster, TestUpdateMatterContributorStatusSameValu
 {
 
     auto cluster = std::make_unique<AmbientSensingUnionCluster>(
-        AmbientSensingUnionCluster::Config{ kTestEndpointId }.WithDelegate(&mDelegate) );
+        AmbientSensingUnionCluster::Config{ kTestEndpointId }.WithDelegate(&mDelegate));
     EXPECT_EQ(cluster->Startup(mContext->Get()), CHIP_NO_ERROR);
 
     EXPECT_EQ(cluster->AddMatterContributor(kTestNodeId1, kContributorEp1, UnionContributorStatusEnum::kUnionContributorOnline),
@@ -410,8 +399,7 @@ TEST_F(TestAmbientSensingUnionCluster, TestUpdateMatterContributorStatusSameValu
 TEST_F(TestAmbientSensingUnionCluster, TestUpdateMatterContributorStatusNotFound)
 {
 
-    auto cluster = std::make_unique<AmbientSensingUnionCluster>(
-        AmbientSensingUnionCluster::Config{ kTestEndpointId } );
+    auto cluster = std::make_unique<AmbientSensingUnionCluster>(AmbientSensingUnionCluster::Config{ kTestEndpointId });
     EXPECT_EQ(cluster->Startup(mContext->Get()), CHIP_NO_ERROR);
 
     EXPECT_EQ(
@@ -427,13 +415,13 @@ TEST_F(TestAmbientSensingUnionCluster, TestAddNonMatterContributor)
 {
 
     auto cluster = std::make_unique<AmbientSensingUnionCluster>(
-        AmbientSensingUnionCluster::Config{ kTestEndpointId }.WithDelegate(&mDelegate) );
+        AmbientSensingUnionCluster::Config{ kTestEndpointId }.WithDelegate(&mDelegate));
     EXPECT_EQ(cluster->Startup(mContext->Get()), CHIP_NO_ERROR);
 
     constexpr char kContributorName[] = "ZigbeeSensor1";
 
     EXPECT_EQ(cluster->AddNonMatterContributor(CharSpan::fromCharString(kContributorName),
-                                              UnionContributorStatusEnum::kUnionContributorOnline),
+                                               UnionContributorStatusEnum::kUnionContributorOnline),
               CHIP_NO_ERROR);
 
     EXPECT_EQ(cluster->GetContributorCount(), 1u);
@@ -443,8 +431,7 @@ TEST_F(TestAmbientSensingUnionCluster, TestAddNonMatterContributor)
 TEST_F(TestAmbientSensingUnionCluster, TestAddNonMatterContributorEmptyName)
 {
 
-    auto cluster = std::make_unique<AmbientSensingUnionCluster>(
-        AmbientSensingUnionCluster::Config{ kTestEndpointId } );
+    auto cluster = std::make_unique<AmbientSensingUnionCluster>(AmbientSensingUnionCluster::Config{ kTestEndpointId });
     EXPECT_EQ(cluster->Startup(mContext->Get()), CHIP_NO_ERROR);
 
     EXPECT_EQ(cluster->AddNonMatterContributor(CharSpan(), UnionContributorStatusEnum::kUnionContributorOnline),
@@ -456,8 +443,7 @@ TEST_F(TestAmbientSensingUnionCluster, TestAddNonMatterContributorEmptyName)
 TEST_F(TestAmbientSensingUnionCluster, TestAddNonMatterContributorDuplicate)
 {
 
-    auto cluster = std::make_unique<AmbientSensingUnionCluster>(
-        AmbientSensingUnionCluster::Config{ kTestEndpointId } );
+    auto cluster = std::make_unique<AmbientSensingUnionCluster>(AmbientSensingUnionCluster::Config{ kTestEndpointId });
     EXPECT_EQ(cluster->Startup(mContext->Get()), CHIP_NO_ERROR);
 
     constexpr char kContributorName[] = "LegacySensor";
@@ -472,7 +458,7 @@ TEST_F(TestAmbientSensingUnionCluster, TestRemoveNonMatterContributor)
 {
 
     auto cluster = std::make_unique<AmbientSensingUnionCluster>(
-        AmbientSensingUnionCluster::Config{ kTestEndpointId }.WithDelegate(&mDelegate) );
+        AmbientSensingUnionCluster::Config{ kTestEndpointId }.WithDelegate(&mDelegate));
     EXPECT_EQ(cluster->Startup(mContext->Get()), CHIP_NO_ERROR);
 
     constexpr char kContributorName[] = "BluetoothSensor";
@@ -492,18 +478,18 @@ TEST_F(TestAmbientSensingUnionCluster, TestUpdateNonMatterContributorStatus)
 {
 
     auto cluster = std::make_unique<AmbientSensingUnionCluster>(
-        AmbientSensingUnionCluster::Config{ kTestEndpointId }.WithDelegate(&mDelegate) );
+        AmbientSensingUnionCluster::Config{ kTestEndpointId }.WithDelegate(&mDelegate));
     EXPECT_EQ(cluster->Startup(mContext->Get()), CHIP_NO_ERROR);
 
     constexpr char kContributorName[] = "WifiSensor";
 
     EXPECT_EQ(cluster->AddNonMatterContributor(CharSpan::fromCharString(kContributorName),
-                                              UnionContributorStatusEnum::kUnionContributorOnline),
+                                               UnionContributorStatusEnum::kUnionContributorOnline),
               CHIP_NO_ERROR);
     mDelegate.Reset();
 
     EXPECT_EQ(cluster->UpdateNonMatterContributorStatus(CharSpan::fromCharString(kContributorName),
-                                                       UnionContributorStatusEnum::kUnionContributorOffline),
+                                                        UnionContributorStatusEnum::kUnionContributorOffline),
               CHIP_NO_ERROR);
 
     EXPECT_TRUE(mDelegate.mUnionHealthChangedCalled);
@@ -517,8 +503,7 @@ TEST_F(TestAmbientSensingUnionCluster, TestUpdateNonMatterContributorStatus)
 TEST_F(TestAmbientSensingUnionCluster, TestMixedContributors)
 {
 
-    auto cluster = std::make_unique<AmbientSensingUnionCluster>(
-        AmbientSensingUnionCluster::Config{ kTestEndpointId } );
+    auto cluster = std::make_unique<AmbientSensingUnionCluster>(AmbientSensingUnionCluster::Config{ kTestEndpointId });
     EXPECT_EQ(cluster->Startup(mContext->Get()), CHIP_NO_ERROR);
 
     EXPECT_EQ(cluster->AddMatterContributor(kTestNodeId1, kContributorEp1), CHIP_NO_ERROR);
@@ -543,8 +528,7 @@ TEST_F(TestAmbientSensingUnionCluster, TestMixedContributors)
 TEST_F(TestAmbientSensingUnionCluster, TestMaxContributorsBoundary)
 {
 
-    auto cluster = std::make_unique<AmbientSensingUnionCluster>(
-        AmbientSensingUnionCluster::Config{ kTestEndpointId } );
+    auto cluster = std::make_unique<AmbientSensingUnionCluster>(AmbientSensingUnionCluster::Config{ kTestEndpointId });
     EXPECT_EQ(cluster->Startup(mContext->Get()), CHIP_NO_ERROR);
 
     for (uint16_t i = 0; i < 100; i++)
@@ -578,8 +562,7 @@ TEST_F(TestAmbientSensingUnionCluster, TestMaxContributorsBoundary)
 TEST_F(TestAmbientSensingUnionCluster, TestContributorSlotReuse)
 {
 
-    auto cluster = std::make_unique<AmbientSensingUnionCluster>(
-        AmbientSensingUnionCluster::Config{ kTestEndpointId } );
+    auto cluster = std::make_unique<AmbientSensingUnionCluster>(AmbientSensingUnionCluster::Config{ kTestEndpointId });
     EXPECT_EQ(cluster->Startup(mContext->Get()), CHIP_NO_ERROR);
 
     EXPECT_EQ(cluster->AddMatterContributor(kTestNodeId1, kContributorEp1), CHIP_NO_ERROR);
@@ -605,7 +588,7 @@ TEST_F(TestAmbientSensingUnionCluster, TestUnionHealthAllOnline)
 {
 
     auto cluster = std::make_unique<AmbientSensingUnionCluster>(
-        AmbientSensingUnionCluster::Config{ kTestEndpointId }.WithDelegate(&mDelegate) );
+        AmbientSensingUnionCluster::Config{ kTestEndpointId }.WithDelegate(&mDelegate));
     EXPECT_EQ(cluster->Startup(mContext->Get()), CHIP_NO_ERROR);
 
     EXPECT_EQ(cluster->AddMatterContributor(kTestNodeId1, kContributorEp1, UnionContributorStatusEnum::kUnionContributorOnline),
@@ -620,7 +603,7 @@ TEST_F(TestAmbientSensingUnionCluster, TestUnionHealthAllOffline)
 {
 
     auto cluster = std::make_unique<AmbientSensingUnionCluster>(
-        AmbientSensingUnionCluster::Config{ kTestEndpointId }.WithDelegate(&mDelegate) );
+        AmbientSensingUnionCluster::Config{ kTestEndpointId }.WithDelegate(&mDelegate));
     EXPECT_EQ(cluster->Startup(mContext->Get()), CHIP_NO_ERROR);
 
     EXPECT_EQ(cluster->AddMatterContributor(kTestNodeId1, kContributorEp1, UnionContributorStatusEnum::kUnionContributorOffline),
@@ -635,7 +618,7 @@ TEST_F(TestAmbientSensingUnionCluster, TestUnionHealthPartialOffline)
 {
 
     auto cluster = std::make_unique<AmbientSensingUnionCluster>(
-        AmbientSensingUnionCluster::Config{ kTestEndpointId }.WithDelegate(&mDelegate) );
+        AmbientSensingUnionCluster::Config{ kTestEndpointId }.WithDelegate(&mDelegate));
     EXPECT_EQ(cluster->Startup(mContext->Get()), CHIP_NO_ERROR);
 
     EXPECT_EQ(cluster->AddMatterContributor(kTestNodeId1, kContributorEp1, UnionContributorStatusEnum::kUnionContributorOnline),
@@ -650,7 +633,7 @@ TEST_F(TestAmbientSensingUnionCluster, TestUnionHealthNoContributors)
 {
 
     auto cluster = std::make_unique<AmbientSensingUnionCluster>(
-        AmbientSensingUnionCluster::Config{ kTestEndpointId }.WithDelegate(&mDelegate) );
+        AmbientSensingUnionCluster::Config{ kTestEndpointId }.WithDelegate(&mDelegate));
     EXPECT_EQ(cluster->Startup(mContext->Get()), CHIP_NO_ERROR);
 
     EXPECT_EQ(cluster->AddMatterContributor(kTestNodeId1, kContributorEp1), CHIP_NO_ERROR);
@@ -663,7 +646,7 @@ TEST_F(TestAmbientSensingUnionCluster, TestUnionHealthTransitions)
 {
 
     auto cluster = std::make_unique<AmbientSensingUnionCluster>(
-        AmbientSensingUnionCluster::Config{ kTestEndpointId }.WithDelegate(&mDelegate) );
+        AmbientSensingUnionCluster::Config{ kTestEndpointId }.WithDelegate(&mDelegate));
     EXPECT_EQ(cluster->Startup(mContext->Get()), CHIP_NO_ERROR);
 
     EXPECT_EQ(cluster->AddMatterContributor(kTestNodeId1, kContributorEp1, UnionContributorStatusEnum::kUnionContributorOnline),
@@ -696,7 +679,7 @@ TEST_F(TestAmbientSensingUnionCluster, TestUnionContributorAddedEvent)
 {
 
     auto cluster = std::make_unique<AmbientSensingUnionCluster>(
-        AmbientSensingUnionCluster::Config{ kTestEndpointId }.WithDelegate(&mDelegate) );
+        AmbientSensingUnionCluster::Config{ kTestEndpointId }.WithDelegate(&mDelegate));
     EXPECT_EQ(cluster->Startup(mContext->Get()), CHIP_NO_ERROR);
 
     EXPECT_EQ(cluster->AddMatterContributor(kTestNodeId1, kContributorEp1, UnionContributorStatusEnum::kUnionContributorOnline),
@@ -725,7 +708,7 @@ TEST_F(TestAmbientSensingUnionCluster, TestUnionContributorRemovedEvent)
 {
 
     auto cluster = std::make_unique<AmbientSensingUnionCluster>(
-        AmbientSensingUnionCluster::Config{ kTestEndpointId }.WithDelegate(&mDelegate) );
+        AmbientSensingUnionCluster::Config{ kTestEndpointId }.WithDelegate(&mDelegate));
     EXPECT_EQ(cluster->Startup(mContext->Get()), CHIP_NO_ERROR);
 
     EXPECT_EQ(cluster->AddMatterContributor(kTestNodeId1, kContributorEp1), CHIP_NO_ERROR);
@@ -756,7 +739,7 @@ TEST_F(TestAmbientSensingUnionCluster, TestUnionContributorStatusChangedEvent)
 {
 
     auto cluster = std::make_unique<AmbientSensingUnionCluster>(
-        AmbientSensingUnionCluster::Config{ kTestEndpointId }.WithDelegate(&mDelegate) );
+        AmbientSensingUnionCluster::Config{ kTestEndpointId }.WithDelegate(&mDelegate));
     EXPECT_EQ(cluster->Startup(mContext->Get()), CHIP_NO_ERROR);
 
     EXPECT_EQ(cluster->AddMatterContributor(kTestNodeId1, kContributorEp1, UnionContributorStatusEnum::kUnionContributorOnline),
@@ -794,15 +777,13 @@ TEST_F(TestAmbientSensingUnionCluster, TestUnionNamePersistence)
     // The TestServerClusterContext provides a mock AttributePersistenceProvider
     // that is shared across cluster instances within this test.
 
-
     constexpr char kInitialName[] = "InitialUnion";
     constexpr char kNewName[]     = "UpdatedUnion";
 
     // First cluster instance — write a new name, expect it to be persisted
     {
         auto cluster = std::make_unique<AmbientSensingUnionCluster>(
-        AmbientSensingUnionCluster::Config{ kTestEndpointId }.WithUnionName(
-            CharSpan::fromCharString(kInitialName)) );
+            AmbientSensingUnionCluster::Config{ kTestEndpointId }.WithUnionName(CharSpan::fromCharString(kInitialName)));
         EXPECT_EQ(cluster->Startup(mContext->Get()), CHIP_NO_ERROR);
 
         EXPECT_EQ(cluster->SetUnionName(CharSpan::fromCharString(kNewName)), CHIP_NO_ERROR);
@@ -813,8 +794,7 @@ TEST_F(TestAmbientSensingUnionCluster, TestUnionNamePersistence)
     // overriding the default set in Config
     {
         auto cluster = std::make_unique<AmbientSensingUnionCluster>(
-        AmbientSensingUnionCluster::Config{ kTestEndpointId }.WithUnionName(
-            CharSpan::fromCharString(kInitialName)) );
+            AmbientSensingUnionCluster::Config{ kTestEndpointId }.WithUnionName(CharSpan::fromCharString(kInitialName)));
         EXPECT_EQ(cluster->Startup(mContext->Get()), CHIP_NO_ERROR);
 
         EXPECT_TRUE(cluster->GetUnionName().data_equal(CharSpan::fromCharString(kNewName)));
@@ -825,12 +805,10 @@ TEST_F(TestAmbientSensingUnionCluster, TestUnionNameDefaultUsedWhenNothingPersis
 {
     // A fresh context has no persisted data — the cluster should use the Config default
 
-
     constexpr char kDefaultName[] = "DefaultUnion";
 
     auto cluster = std::make_unique<AmbientSensingUnionCluster>(
-        AmbientSensingUnionCluster::Config{ kTestEndpointId }.WithUnionName(
-        CharSpan::fromCharString(kDefaultName)) );
+        AmbientSensingUnionCluster::Config{ kTestEndpointId }.WithUnionName(CharSpan::fromCharString(kDefaultName)));
     EXPECT_EQ(cluster->Startup(mContext->Get()), CHIP_NO_ERROR);
 
     EXPECT_TRUE(cluster->GetUnionName().data_equal(CharSpan::fromCharString(kDefaultName)));
@@ -843,11 +821,11 @@ TEST_F(TestAmbientSensingUnionCluster, TestUnionNameDefaultUsedWhenNothingPersis
 TEST_F(TestAmbientSensingUnionCluster, TestSetUnionNameTooLong)
 {
 
-    auto cluster = std::make_unique<AmbientSensingUnionCluster>(
-        AmbientSensingUnionCluster::Config{ kTestEndpointId } );
+    auto cluster = std::make_unique<AmbientSensingUnionCluster>(AmbientSensingUnionCluster::Config{ kTestEndpointId });
     EXPECT_EQ(cluster->Startup(mContext->Get()), CHIP_NO_ERROR);
 
-    static const char tooLongName[] = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"; // 129 A's
+    static const char tooLongName[] = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+                                      "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"; // 129 A's
 
     EXPECT_EQ(cluster->SetUnionName(CharSpan::fromCharString(tooLongName)), CHIP_ERROR_INVALID_ARGUMENT);
 }
@@ -859,8 +837,7 @@ TEST_F(TestAmbientSensingUnionCluster, TestSetUnionNameTooLong)
 TEST_F(TestAmbientSensingUnionCluster, TestUnionNameChangeNotification)
 {
 
-    auto cluster = std::make_unique<AmbientSensingUnionCluster>(
-        AmbientSensingUnionCluster::Config{ kTestEndpointId } );
+    auto cluster = std::make_unique<AmbientSensingUnionCluster>(AmbientSensingUnionCluster::Config{ kTestEndpointId });
     EXPECT_EQ(cluster->Startup(mContext->Get()), CHIP_NO_ERROR);
 
     EXPECT_FALSE(mContext->ChangeListener().IsDirty({ kTestEndpointId, AmbientSensingUnion::Id, Attributes::UnionName::Id }));
@@ -873,8 +850,7 @@ TEST_F(TestAmbientSensingUnionCluster, TestUnionNameChangeNotification)
 TEST_F(TestAmbientSensingUnionCluster, TestUnionHealthChangeNotification_OnContributorAdd)
 {
 
-    auto cluster = std::make_unique<AmbientSensingUnionCluster>(
-        AmbientSensingUnionCluster::Config{ kTestEndpointId } );
+    auto cluster = std::make_unique<AmbientSensingUnionCluster>(AmbientSensingUnionCluster::Config{ kTestEndpointId });
     EXPECT_EQ(cluster->Startup(mContext->Get()), CHIP_NO_ERROR);
 
     EXPECT_EQ(cluster->AddMatterContributor(kTestNodeId1, kContributorEp1, UnionContributorStatusEnum::kUnionContributorOnline),
@@ -886,8 +862,7 @@ TEST_F(TestAmbientSensingUnionCluster, TestUnionHealthChangeNotification_OnContr
 TEST_F(TestAmbientSensingUnionCluster, TestContributorListChangeNotification_OnAdd)
 {
 
-    auto cluster = std::make_unique<AmbientSensingUnionCluster>(
-        AmbientSensingUnionCluster::Config{ kTestEndpointId } );
+    auto cluster = std::make_unique<AmbientSensingUnionCluster>(AmbientSensingUnionCluster::Config{ kTestEndpointId });
     EXPECT_EQ(cluster->Startup(mContext->Get()), CHIP_NO_ERROR);
 
     EXPECT_FALSE(
@@ -907,8 +882,7 @@ TEST_F(TestAmbientSensingUnionCluster, TestContributorListChangeNotification_OnA
 TEST_F(TestAmbientSensingUnionCluster, TestWriteReadOnlyUnionHealth)
 {
 
-    auto cluster = std::make_unique<AmbientSensingUnionCluster>(
-        AmbientSensingUnionCluster::Config{ kTestEndpointId } );
+    auto cluster = std::make_unique<AmbientSensingUnionCluster>(AmbientSensingUnionCluster::Config{ kTestEndpointId });
     EXPECT_EQ(cluster->Startup(mContext->Get()), CHIP_NO_ERROR);
     chip::Testing::ClusterTester tester(*cluster);
 
@@ -919,8 +893,7 @@ TEST_F(TestAmbientSensingUnionCluster, TestWriteReadOnlyUnionHealth)
 TEST_F(TestAmbientSensingUnionCluster, TestWriteReadOnlyContributorList)
 {
 
-    auto cluster = std::make_unique<AmbientSensingUnionCluster>(
-        AmbientSensingUnionCluster::Config{ kTestEndpointId } );
+    auto cluster = std::make_unique<AmbientSensingUnionCluster>(AmbientSensingUnionCluster::Config{ kTestEndpointId });
     EXPECT_EQ(cluster->Startup(mContext->Get()), CHIP_NO_ERROR);
     chip::Testing::ClusterTester tester(*cluster);
 
@@ -943,8 +916,7 @@ TEST_F(TestAmbientSensingUnionCluster, TestWriteReadOnlyContributorList)
 TEST_F(TestAmbientSensingUnionCluster, TestShutdown)
 {
 
-    auto cluster = std::make_unique<AmbientSensingUnionCluster>(
-        AmbientSensingUnionCluster::Config{ kTestEndpointId } );
+    auto cluster = std::make_unique<AmbientSensingUnionCluster>(AmbientSensingUnionCluster::Config{ kTestEndpointId });
     EXPECT_EQ(cluster->Startup(mContext->Get()), CHIP_NO_ERROR);
 
     EXPECT_EQ(cluster->AddMatterContributor(kTestNodeId1, kContributorEp1), CHIP_NO_ERROR);
@@ -962,11 +934,11 @@ TEST_F(TestAmbientSensingUnionCluster, TestShutdown)
 TEST_F(TestAmbientSensingUnionCluster, TestNonMatterContributorMaxNameLength)
 {
 
-    auto cluster = std::make_unique<AmbientSensingUnionCluster>(
-        AmbientSensingUnionCluster::Config{ kTestEndpointId } );
+    auto cluster = std::make_unique<AmbientSensingUnionCluster>(AmbientSensingUnionCluster::Config{ kTestEndpointId });
     EXPECT_EQ(cluster->Startup(mContext->Get()), CHIP_NO_ERROR);
 
-    static const char maxLengthName[] = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"; // 128 A's
+    static const char maxLengthName[] = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+                                        "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"; // 128 A's
 
     EXPECT_EQ(cluster->AddNonMatterContributor(CharSpan::fromCharString(maxLengthName)), CHIP_NO_ERROR);
     EXPECT_EQ(cluster->GetContributorCount(), 1u);
@@ -975,11 +947,11 @@ TEST_F(TestAmbientSensingUnionCluster, TestNonMatterContributorMaxNameLength)
 TEST_F(TestAmbientSensingUnionCluster, TestNonMatterContributorNameTooLong)
 {
 
-    auto cluster = std::make_unique<AmbientSensingUnionCluster>(
-        AmbientSensingUnionCluster::Config{ kTestEndpointId } );
+    auto cluster = std::make_unique<AmbientSensingUnionCluster>(AmbientSensingUnionCluster::Config{ kTestEndpointId });
     EXPECT_EQ(cluster->Startup(mContext->Get()), CHIP_NO_ERROR);
 
-    static const char tooLongName[] = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"; // 129 A's
+    static const char tooLongName[] = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+                                      "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"; // 129 A's
 
     EXPECT_EQ(cluster->AddNonMatterContributor(CharSpan::fromCharString(tooLongName)), CHIP_ERROR_INVALID_ARGUMENT);
     EXPECT_EQ(cluster->GetContributorCount(), 0u);
@@ -992,8 +964,7 @@ TEST_F(TestAmbientSensingUnionCluster, TestNonMatterContributorNameTooLong)
 TEST_F(TestAmbientSensingUnionCluster, TestOperationsWithoutDelegate)
 {
 
-    auto cluster = std::make_unique<AmbientSensingUnionCluster>(
-        AmbientSensingUnionCluster::Config{ kTestEndpointId } );
+    auto cluster = std::make_unique<AmbientSensingUnionCluster>(AmbientSensingUnionCluster::Config{ kTestEndpointId });
     EXPECT_EQ(cluster->Startup(mContext->Get()), CHIP_NO_ERROR);
 
     EXPECT_EQ(cluster->SetUnionName(CharSpan::fromCharString("TestUnion")), CHIP_NO_ERROR);
@@ -1011,10 +982,9 @@ TEST_F(TestAmbientSensingUnionCluster, TestOperationsWithoutDelegate)
 TEST_F(TestAmbientSensingUnionCluster, TestFullWorkflow)
 {
 
-    auto cluster = std::make_unique<AmbientSensingUnionCluster>(
-        AmbientSensingUnionCluster::Config{ kTestEndpointId }
-                                            .WithUnionName(CharSpan::fromCharString("SmartHomeUnion"))
-                                            .WithDelegate(&mDelegate) );
+    auto cluster = std::make_unique<AmbientSensingUnionCluster>(AmbientSensingUnionCluster::Config{ kTestEndpointId }
+                                                                    .WithUnionName(CharSpan::fromCharString("SmartHomeUnion"))
+                                                                    .WithDelegate(&mDelegate));
     EXPECT_EQ(cluster->Startup(mContext->Get()), CHIP_NO_ERROR);
 
     // 1. Initial state
@@ -1035,7 +1005,7 @@ TEST_F(TestAmbientSensingUnionCluster, TestFullWorkflow)
 
     // 4. Add non-Matter contributor (online)
     EXPECT_EQ(cluster->AddNonMatterContributor(CharSpan::fromCharString("ZigbeeSensor"),
-                                              UnionContributorStatusEnum::kUnionContributorOnline),
+                                               UnionContributorStatusEnum::kUnionContributorOnline),
               CHIP_NO_ERROR);
     EXPECT_EQ(cluster->GetContributorCount(), 3u);
     EXPECT_EQ(cluster->GetUnionHealth(), UnionHealthEnum::kLimitedDegraded);
@@ -1066,11 +1036,9 @@ TEST_F(TestAmbientSensingUnionCluster, TestFullWorkflow)
 TEST_F(TestAmbientSensingUnionCluster, TestConfigurationChaining)
 {
 
-
-    auto cluster = std::make_unique<AmbientSensingUnionCluster>(
-        AmbientSensingUnionCluster::Config{ kTestEndpointId }
-                                            .WithUnionName(CharSpan::fromCharString("ChainedConfig"))
-                                            .WithDelegate(&mDelegate) );
+    auto cluster = std::make_unique<AmbientSensingUnionCluster>(AmbientSensingUnionCluster::Config{ kTestEndpointId }
+                                                                    .WithUnionName(CharSpan::fromCharString("ChainedConfig"))
+                                                                    .WithDelegate(&mDelegate));
 
     EXPECT_TRUE(cluster->GetUnionName().data_equal(CharSpan::fromCharString("ChainedConfig")));
 
@@ -1091,14 +1059,13 @@ TEST_F(TestAmbientSensingUnionCluster, TestConfigurationChaining)
 TEST_F(TestAmbientSensingUnionCluster, TestGetContributorsArray)
 {
 
-    auto cluster = std::make_unique<AmbientSensingUnionCluster>(
-        AmbientSensingUnionCluster::Config{ kTestEndpointId } );
+    auto cluster = std::make_unique<AmbientSensingUnionCluster>(AmbientSensingUnionCluster::Config{ kTestEndpointId });
     EXPECT_EQ(cluster->Startup(mContext->Get()), CHIP_NO_ERROR);
 
     EXPECT_EQ(cluster->AddMatterContributor(kTestNodeId1, kContributorEp1, UnionContributorStatusEnum::kUnionContributorOnline),
               CHIP_NO_ERROR);
     EXPECT_EQ(cluster->AddNonMatterContributor(CharSpan::fromCharString("TestSensor"),
-                                              UnionContributorStatusEnum::kUnionContributorOnline),
+                                               UnionContributorStatusEnum::kUnionContributorOnline),
               CHIP_NO_ERROR);
 
     const auto * contributors = cluster->GetContributors();
