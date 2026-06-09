@@ -47,7 +47,7 @@ void DecreasingBatteryPowerSourceDevice::Unregister(CodeDrivenDataModelProvider 
 void DecreasingBatteryPowerSourceDevice::TimerFired()
 {
     auto & batteryCluster = BatteryPowerSourceCluster();
-    auto batteryLevel = batteryCluster.GetBatPercentRemaining();
+    auto batteryLevel     = batteryCluster.GetBatPercentRemaining();
 
     if (batteryLevel.IsNull())
     {

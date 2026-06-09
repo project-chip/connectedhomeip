@@ -1126,7 +1126,8 @@ private:
     }
 
     template <class T>
-    CHIP_ERROR SetQuietNullableAttribute(DataModel::Nullable<T> & oldVal, DataModel::Nullable<T> newVal, PowerSource::detail::BatteryTimerContext & timerContext)
+    CHIP_ERROR SetQuietNullableAttribute(DataModel::Nullable<T> & oldVal, DataModel::Nullable<T> newVal,
+                                         PowerSource::detail::BatteryTimerContext & timerContext)
     {
         if (oldVal == newVal)
         {
@@ -1147,7 +1148,8 @@ private:
         }
         else
         {
-            // if new value is null, notify immediately without timer, so a new non null value can be notified immediately without waiting for the timer.
+            // if new value is null, notify immediately without timer, so a new non null value can be notified immediately without
+            // waiting for the timer.
             NotifyAttributeChanged(timerContext.GetAttributeId());
         }
         return CHIP_NO_ERROR;
