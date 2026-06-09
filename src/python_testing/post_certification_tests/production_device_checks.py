@@ -152,8 +152,8 @@ class DclCheck(BasicCompositionTests):
         key_model_versions = 'modelVersions'
         asserts.assert_true(key_model_versions in entry,
                             f"Unable to find {key_model_versions} in software versions schema for {self.vid_pid_str}")
-        log.info(f'Found version info for vid=0x{self.vid_pid_str} in the DCL:')
-        log.info(f'{entry[key_model_versions]}')
+        log.info('Found version info for %s in the DCL:', self.vid_pid_str)
+        log.info('%s', entry[key_model_versions])
         key_software_versions = 'softwareVersions'
         asserts.assert_true(key_software_versions in entry[key_model_versions],
                             f"Unable to find {key_software_versions} in software versions schema for {self.vid_pid_str}")
@@ -181,8 +181,8 @@ class DclCheck(BasicCompositionTests):
         entry = requests.get(f"{self.url}/dcl/vendorinfo/vendors/{self.vid}").json()
         key = 'vendorInfo'
         asserts.assert_true(key in entry, f"Unable to find vendor entry for {self.vid_str}")
-        log.info(f'Found vendor key for {self.vid_str} in the DCL:')
-        log.info(f'{entry[key]}')
+        log.info('Found vendor key for %s in the DCL:', self.vid_str)
+        log.info('%s', entry[key])
 
     def steps_Model(self):
         return [TestStep(1, "Check if device VID/PID are listed in the DCL model schema", "Listing found")]
@@ -192,8 +192,8 @@ class DclCheck(BasicCompositionTests):
         key = 'model'
         entry = requests.get(f"{self.url}/dcl/model/models/{self.vid}/{self.pid}").json()
         asserts.assert_true(key in entry, f"Unable to find model entry for {self.vid_pid_str}")
-        log.info(f'Found model entry for {self.vid_pid_str} in the DCL:')
-        log.info(f'{entry[key]}')
+        log.info('Found model entry for %s in the DCL:', self.vid_pid_str)
+        log.info('%s', entry[key])
 
     def steps_Compliance(self):
         return [TestStep(1, "Query the information about all software versions for this PID/VID", "DCL entry exists"),
@@ -217,8 +217,8 @@ class DclCheck(BasicCompositionTests):
             if key in entry and entry[key][sub_key] == software_version:
                 found_versions.append(software_version)
                 log.info(
-                    f'Found compliance info for {vid_pid_sv_str} in the DCL:')
-                log.info(f'{entry[key]}')
+                    'Found compliance info for %s in the DCL:', vid_pid_sv_str)
+                log.info('%s', entry[key])
                 certified_model_entry = requests.get(
                     f"{self.url}/dcl/compliance/certified-models/{self.vid}/{self.pid}/{software_version}/matter").json()
                 asserts.assert_true(cert_model_key in certified_model_entry,
@@ -246,8 +246,8 @@ class DclCheck(BasicCompositionTests):
             if key in entry and entry[key][sub_key] == software_version:
                 is_found = True
                 log.info(
-                    f'Found certified model for {vid_pid_sv_str} in the DCL:')
-                log.info(f'{entry[key]}')
+                    'Found certified model for %s in the DCL:', vid_pid_sv_str)
+                log.info('%s', entry[key])
                 break
         asserts.assert_true(is_found,
                             f"Unable to find at least one certified model entry for the versions {software_versions}")
@@ -269,7 +269,7 @@ class DclCheck(BasicCompositionTests):
                 problems.append(
                     f'Missing key {key_model_version} in entry for {self.vid_pid_str} software version={software_version}')
                 continue
-            log.info(f'Found entry version entry for {self.vid_pid_str} software version={software_version}')
+            log.info('Found entry version entry for %s software version=%s', self.vid_pid_str, software_version)
             log.info(entry_wrapper)
             entry = entry_wrapper[key_model_version]
             key_ota_url = 'otaUrl'

@@ -47,7 +47,7 @@ class WebRTCTestHelper:
 
                 case _:
                     aBitRate = 30000
-                    log.warning(f"Using default bitrate {aBitRate} for unhandled codec {codec}")
+                    log.warning("Using default bitrate %s for unhandled codec %s", aBitRate, codec)
 
             adoStreamAllocateCmd = CameraAvStreamManagement.Commands.AudioStreamAllocate(
                 streamUsage=aStreamUsagePriorities[0],
@@ -61,7 +61,7 @@ class WebRTCTestHelper:
             return audioStreamAllocateResponse.audioStreamID
 
         except Exception as e:
-            log.error(f"Failed to allocate audio stream. {e}")
+            log.error("Failed to allocate audio stream. %s", e)
             return None
 
     async def allocate_video_stream(self, endpoint, devCtrl=None, node_id=None):
@@ -110,5 +110,5 @@ class WebRTCTestHelper:
             return response.videoStreamID
 
         except Exception as e:
-            log.error(f"Failed to allocate video stream. {e}")
+            log.error("Failed to allocate video stream. %s", e)
             return None

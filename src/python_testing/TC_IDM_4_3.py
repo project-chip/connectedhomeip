@@ -125,7 +125,7 @@ class TC_IDM_4_3(IDMBaseTest):
 
         # Calculate MRP retransmission timeout once at the beginning for use across all steps
         mrp_timeout_sec = self.get_mrp_retransmission_timeout_sec(TH)
-        log.info(f"Calculated MRP retransmission timeout: {mrp_timeout_sec:.2f}s")
+        log.info("Calculated MRP retransmission timeout: %.2fs", mrp_timeout_sec)
 
         # Step 1: Empty report verification
         # (This was originally test step 3 in the test plan it appears)
@@ -139,7 +139,7 @@ class TC_IDM_4_3(IDMBaseTest):
             nonlocal empty_report_received, empty_report_time
             empty_report_time = time.time()
             empty_report_event.set()
-            log.debug(f"Empty report callback triggered at {empty_report_time}")
+            log.debug("Empty report callback triggered at %s", empty_report_time)
 
         # Use AttributeSubscriptionHandler for cleaner subscription management
         attr_handler_step1 = AttributeSubscriptionHandler(
@@ -178,10 +178,8 @@ class TC_IDM_4_3(IDMBaseTest):
         sub_report_elapsed = empty_report_time - sub_time
 
         max_expected_time = self.max_interval_ceiling_sec + mrp_timeout_sec
-        log.info(
-            f"Empty report received after {sub_report_elapsed}s (MinInterval: {self.min_interval_floor_sec}s, "
-            f"MaxInterval: {self.max_interval_ceiling_sec}s, MRP timeout: {mrp_timeout_sec:.2f}s, "
-            f"Max expected: {max_expected_time:.2f}s)")
+        log.info("Empty report received after %ss (MinInterval: %ss, MaxInterval: %ss, MRP timeout: %.2fs, Max expected: %.2fs)",
+                 sub_report_elapsed, self.min_interval_floor_sec, self.max_interval_ceiling_sec, mrp_timeout_sec, max_expected_time)
 
         asserts.assert_greater_equal(
             sub_report_elapsed, self.min_interval_floor_sec,
@@ -584,7 +582,7 @@ class TC_IDM_4_3(IDMBaseTest):
         changed_count = await self.change_writable_attributes_and_verify_reports(
             handler_step8, priming_data, "Step 8"
         )
-        log.info(f"Changed and verified {changed_count} attribute(s)")
+        log.info("Changed and verified %s attribute(s)", changed_count)
 
         # Shutdown subscription and wait for cleanup
         handler_step8.shutdown()
@@ -667,8 +665,8 @@ class TC_IDM_4_3(IDMBaseTest):
         asserts.assert_greater(total_clusters, 10, "Should receive reports from multiple clusters")
         asserts.assert_greater(total_attributes, 50, "Should receive reports for many attributes")
 
-        log.info(
-            f"Step 10: Priming data received from {num_endpoints} endpoints, {total_clusters} clusters, {total_attributes} attributes")
+        log.info("Step 10: Priming data received from %s endpoints, %s clusters, %s attributes",
+                 num_endpoints, total_clusters, total_attributes)
 
         # Reset handler to clear priming report tracking before making changes
         handler_step10.reset()
@@ -680,7 +678,7 @@ class TC_IDM_4_3(IDMBaseTest):
         changed_count = await self.change_writable_attributes_and_verify_reports(
             handler_step10, priming_data, "Step 10"
         )
-        log.info(f"Changed and verified {changed_count} attribute(s)")
+        log.info("Changed and verified %s attribute(s)", changed_count)
 
         handler_step10.shutdown()
         await asyncio.sleep(1)  # Allow time for subscription teardown to complete
@@ -732,7 +730,7 @@ class TC_IDM_4_3(IDMBaseTest):
         changed_count = await self.change_writable_attributes_and_verify_reports(
             handler_step11, priming_data, "Step 11"
         )
-        log.info(f"Changed and verified {changed_count} attribute(s)")
+        log.info("Changed and verified %s attribute(s)", changed_count)
 
         handler_step11.shutdown()
         await asyncio.sleep(1)  # Allow time for subscription teardown to complete
