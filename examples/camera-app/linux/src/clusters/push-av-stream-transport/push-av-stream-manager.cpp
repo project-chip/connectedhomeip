@@ -658,9 +658,9 @@ PushAvStreamTransportManager::PersistentAttributesLoadedCallback()
                 else
                 {
                     // Restore transport status from persisted configuration
-                    if (transportConfig.transportStatus == TransportStatusEnum::kActive)
+                    if (transportConfig.transportStatus != TransportStatusEnum::kInactive)
                     {
-                        this->SetTransportStatus({ connectionID }, TransportStatusEnum::kActive);
+                        this->SetTransportStatus({ connectionID }, transportConfig.transportStatus);
                     }
                 }
             }
