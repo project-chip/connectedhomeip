@@ -44,7 +44,7 @@ void SetTestEventTrigger_SoftwareFaultOccurred()
     softwareFault.id = currentTaskStatus.xTaskNumber;
     softwareFault.name.SetValue(CharSpan::fromCharString(threadName));
 
-    char timeChar[50] = "";
+    char timeChar[50]  = "";
     std::time_t result = std::time(nullptr);
     // Using size of 50 as it is double the expected 25 characters "Www Mmm dd hh:mm:ss yyyy\n".
     if (std::strftime(timeChar, sizeof(timeChar), "%c", std::localtime(&result)))

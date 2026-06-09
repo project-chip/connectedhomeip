@@ -16,7 +16,6 @@
  *    limitations under the License.
  */
 
-
 /*****************************************************************************
  *                    Includes Definitions
  *****************************************************************************/
@@ -32,8 +31,8 @@
 
 #include <platform/stm32/stm32wba/OTAImageProcessorImpl.h>
 
-#include <platform/stm32/stm32wba/FactoryDataProvider.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorUserConsent.h>
+#include <platform/stm32/stm32wba/FactoryDataProvider.h>
 
 using namespace chip;
 using namespace chip::DeviceLayer;
@@ -94,8 +93,6 @@ void InitializeOTARequestor(void)
     gUserConsentProvider.SetUserConsentState(gUserConsentState);
     // Test to trigger ota. this function can be trigger by a Push Button
     TriggerOTAQuery();
-
-
 }
 
 void TriggerOTAQuery(void)
@@ -118,4 +115,3 @@ void TriggerOTAQuery(void)
     }
 }
 #endif /* (OTA_SUPPORT == 1) */
-

@@ -1,64 +1,62 @@
 /* USER CODE BEGIN Header */
 /**
  ******************************************************************************
-  * File Name          : app_thread.c
-  * Description        : Thread Application.
-  ******************************************************************************
-  * @attention
-  *
-  * Copyright (c) 2025 STMicroelectronics.
-  * All rights reserved.
-  *
-  * This software is licensed under terms that can be found in the LICENSE file
-  * in the root directory of this software component.
-  * If no LICENSE file comes with this software, it is provided AS-IS.
-  *
-  ******************************************************************************
-  */
+ * File Name          : app_thread.c
+ * Description        : Thread Application.
+ ******************************************************************************
+ * @attention
+ *
+ * Copyright (c) 2025 STMicroelectronics.
+ * All rights reserved.
+ *
+ * This software is licensed under terms that can be found in the LICENSE file
+ * in the root directory of this software component.
+ * If no LICENSE file comes with this software, it is provided AS-IS.
+ *
+ ******************************************************************************
+ */
 /* USER CODE END Header */
 
 /* Includes ------------------------------------------------------------------*/
 #include <assert.h>
 #include <stdint.h>
 
-#include "app_conf.h"
 #include "app_common.h"
+#include "app_conf.h"
 #include "app_entry.h"
 #include "app_thread.h"
-#include "log_module.h"
-#include "app_thread.h"
 #include "dbg_trace.h"
+#include "log_module.h"
 #include "stm32_rtos.h"
 #include "stm32_timer.h"
 #if (CFG_LPM_LEVEL != 0)
 #include "stm32_lpm.h"
 #endif // CFG_LPM_LEVEL
-#include "common_types.h"
-#include "instance.h"
-#include "radio.h"
-#include "platform.h"
-#include "ll_sys_startup.h"
-#include "event_manager.h"
-#include "platform_wba.h"
-#include "link.h"
 #include "cli.h"
 #include "coap.h"
+#include "common_types.h"
+#include "event_manager.h"
+#include "instance.h"
+#include "link.h"
+#include "ll_sys_startup.h"
+#include "platform.h"
+#include "platform_wba.h"
+#include "radio.h"
 #include "tasklet.h"
 #include "thread.h"
 #if (OT_CLI_USE == 1)
 #include "uart.h"
 #endif
-#include "joiner.h"
 #include "alarm.h"
+#include "joiner.h"
 #include OPENTHREAD_CONFIG_FILE
 #include "stm32_lpm_if.h"
 /* Private includes -----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "app_bsp.h"
-#include "stm32wba65i_discovery.h"
 #include "data_transfer.h"
+#include "stm32wba65i_discovery.h"
 #include "udp.h"
-
 
 /* USER CODE END Includes */
 
@@ -68,15 +66,13 @@
 /* USER CODE END PTD */
 
 /* Private defines -----------------------------------------------------------*/
-#define C_SIZE_CMD_STRING       256U
-#define C_PANID                 0xBA98U
-#define C_CHANNEL_NB            16U
-#define C_CCA_THRESHOLD         -70
+#define C_SIZE_CMD_STRING 256U
+#define C_PANID 0xBA98U
+#define C_CHANNEL_NB 16U
+#define C_CCA_THRESHOLD -70
 
 /* USER CODE BEGIN PD */
-#define C_RESSOURCE                     "light"
-
-
+#define C_RESSOURCE "light"
 
 /* USER CODE END PD */
 
@@ -90,7 +86,7 @@ static void APP_THREAD_DeviceConfig(void);
 static void APP_THREAD_TraceError(const char * pMess, uint32_t ErrCode);
 
 #if (OT_CLI_USE == 1)
-static void APP_THREAD_CliInit(otInstance *aInstance);
+static void APP_THREAD_CliInit(otInstance * aInstance);
 static void APP_THREAD_ProcessUart(void);
 #endif /* OT_CLI_USE */
 
@@ -103,8 +99,7 @@ otInstance * PtOpenThreadInstance;
 
 /* USER CODE BEGIN PV */
 
-osSemaphoreId_t       TaskletsMutex;
-
+osSemaphoreId_t TaskletsMutex;
 
 /* USER CODE END PV */
 
@@ -116,11 +111,11 @@ osSemaphoreId_t       TaskletsMutex;
  * @param  None
  * @retval None
  */
-void APP_THREAD_ProcessAlarm(void *argument)
+void APP_THREAD_ProcessAlarm(void * argument)
 {
-  UNUSED(argument);
+    UNUSED(argument);
 
-  arcAlarmProcess(PtOpenThreadInstance);
+    arcAlarmProcess(PtOpenThreadInstance);
 }
 
 /**
@@ -129,11 +124,11 @@ void APP_THREAD_ProcessAlarm(void *argument)
  * @param  None
  * @retval None
  */
-void APP_THREAD_ProcessUsAlarm(void *argument)
+void APP_THREAD_ProcessUsAlarm(void * argument)
 {
-  UNUSED(argument);
+    UNUSED(argument);
 
-  arcUsAlarmProcess(PtOpenThreadInstance);
+    arcUsAlarmProcess(PtOpenThreadInstance);
 }
 
 /**
@@ -142,12 +137,12 @@ void APP_THREAD_ProcessUsAlarm(void *argument)
  * @param  None
  * @retval None
  */
-void APP_THREAD_ProcessOpenThreadTasklets(void *argument)
+void APP_THREAD_ProcessOpenThreadTasklets(void * argument)
 {
-  UNUSED(argument);
+    UNUSED(argument);
 
-  /* process the tasklet */
-  otTaskletsProcess(PtOpenThreadInstance);
+    /* process the tasklet */
+    otTaskletsProcess(PtOpenThreadInstance);
 }
 
 /**
@@ -155,11 +150,11 @@ void APP_THREAD_ProcessOpenThreadTasklets(void *argument)
  *
  * @param[in] aInstance A pointer to an OpenThread instance.
  */
-void otTaskletsSignalPending(otInstance *aInstance)
+void otTaskletsSignalPending(otInstance * aInstance)
 {
-  UNUSED(aInstance);
+    UNUSED(aInstance);
 
-  osThreadFlagsSet(WpanTaskHandle, 1U << CFG_RTOS_FLAG_OT_Tasklet);
+    osThreadFlagsSet(WpanTaskHandle, 1U << CFG_RTOS_FLAG_OT_Tasklet);
 }
 
 /**
@@ -170,7 +165,7 @@ void otTaskletsSignalPending(otInstance *aInstance)
  */
 void APP_THREAD_ScheduleAlarm(void)
 {
-  osThreadFlagsSet(WpanTaskHandle, 1U << CFG_RTOS_FLAG_OT_Alarm_ms);
+    osThreadFlagsSet(WpanTaskHandle, 1U << CFG_RTOS_FLAG_OT_Alarm_ms);
 }
 
 /**
@@ -181,7 +176,7 @@ void APP_THREAD_ScheduleAlarm(void)
  */
 void APP_THREAD_ScheduleUsAlarm(void)
 {
-  osThreadFlagsSet(WpanTaskHandle, 1U << CFG_RTOS_FLAG_OT_Alarm_us);
+    osThreadFlagsSet(WpanTaskHandle, 1U << CFG_RTOS_FLAG_OT_Alarm_us);
 }
 
 /**
@@ -192,7 +187,7 @@ void APP_THREAD_ScheduleUsAlarm(void)
  */
 void APP_THREAD_LockThreadStack(void)
 {
-	osSemaphoreAcquire(TaskletsMutex, osWaitForever);
+    osSemaphoreAcquire(TaskletsMutex, osWaitForever);
 }
 
 /**
@@ -203,7 +198,7 @@ void APP_THREAD_LockThreadStack(void)
  */
 bool APP_THREAD_TryLockThreadStack(void)
 {
-	return osSemaphoreAcquire(TaskletsMutex, 0) == osOK;
+    return osSemaphoreAcquire(TaskletsMutex, 0) == osOK;
 }
 
 /**
@@ -214,7 +209,7 @@ bool APP_THREAD_TryLockThreadStack(void)
  */
 void APP_THREAD_UnLockThreadStack(void)
 {
-  osSemaphoreRelease(TaskletsMutex);
+    osSemaphoreRelease(TaskletsMutex);
 }
 
 /**
@@ -223,60 +218,56 @@ void APP_THREAD_UnLockThreadStack(void)
  * @param  None
  * @retval ot instance
  */
-otInstance*  APP_THREAD_GetotInstance(void)
+otInstance * APP_THREAD_GetotInstance(void)
 {
-	return PtOpenThreadInstance;
+    return PtOpenThreadInstance;
 }
-
 
 void Thread_Init(void)
 {
 #if OPENTHREAD_CONFIG_MULTIPLE_INSTANCE_ENABLE
-  size_t otInstanceBufferLength = 0;
-  uint8_t *otInstanceBuffer = NULL;
+    size_t otInstanceBufferLength = 0;
+    uint8_t * otInstanceBuffer    = NULL;
 #endif
 
-  otSysInit(0, NULL);
+    otSysInit(0, NULL);
 
 #if OPENTHREAD_CONFIG_MULTIPLE_INSTANCE_ENABLE
-  // Call to query the buffer size
-  (void)otInstanceInit(NULL, &otInstanceBufferLength);
+    // Call to query the buffer size
+    (void) otInstanceInit(NULL, &otInstanceBufferLength);
 
-  // Call to allocate the buffer
-  otInstanceBuffer = (uint8_t *)malloc(otInstanceBufferLength);
-  assert(otInstanceBuffer);
+    // Call to allocate the buffer
+    otInstanceBuffer = (uint8_t *) malloc(otInstanceBufferLength);
+    assert(otInstanceBuffer);
 
-  // Initialize OpenThread with the buffer
-  PtOpenThreadInstance = otInstanceInit(otInstanceBuffer, &otInstanceBufferLength);
+    // Initialize OpenThread with the buffer
+    PtOpenThreadInstance = otInstanceInit(otInstanceBuffer, &otInstanceBufferLength);
 #else
-  PtOpenThreadInstance = otInstanceInitSingle();
+    PtOpenThreadInstance = otInstanceInitSingle();
 #endif
 
-  assert(PtOpenThreadInstance);
+    assert(PtOpenThreadInstance);
 
 #if (OT_CLI_USE == 1)
-  APP_THREAD_CliInit(PtOpenThreadInstance);
+    APP_THREAD_CliInit(PtOpenThreadInstance);
 #endif
 
-  otDispatch_tbl_init(PtOpenThreadInstance);
+    otDispatch_tbl_init(PtOpenThreadInstance);
 
+    /* Create Mutex to protect OT thread */
+    TaskletsMutex = osSemaphoreNew(1, 1, NULL);
+    if (TaskletsMutex == NULL)
+    {
+        LOG_ERROR_APP("ERROR FREERTOS : TASKLETS SEMAPHORE CREATION FAILED");
+        while (1)
+            ;
+    }
 
+    ll_sys_thread_init();
 
-   /* Create Mutex to protect OT thread */
-  TaskletsMutex = osSemaphoreNew( 1, 1, NULL );
-  if ( TaskletsMutex == NULL )
-  {
-    LOG_ERROR_APP( "ERROR FREERTOS : TASKLETS SEMAPHORE CREATION FAILED" );
-    while(1);
-  }
+    /* USER CODE BEGIN INIT TASKS */
 
-  ll_sys_thread_init();
-
-  /* USER CODE BEGIN INIT TASKS */
-
-  /* USER CODE END INIT TASKS */
-
-
+    /* USER CODE END INIT TASKS */
 }
 
 /**
@@ -286,36 +277,36 @@ void Thread_Init(void)
  */
 static void APP_THREAD_DeviceConfig(void)
 {
-  otError error = OT_ERROR_NONE;
+    otError error = OT_ERROR_NONE;
 
-  error = otPlatRadioSetCcaEnergyDetectThreshold(PtOpenThreadInstance, C_CCA_THRESHOLD);
-  if (error != OT_ERROR_NONE)
-  {
-    APP_THREAD_Error(ERR_THREAD_SET_THRESHOLD,error);
-  }
+    error = otPlatRadioSetCcaEnergyDetectThreshold(PtOpenThreadInstance, C_CCA_THRESHOLD);
+    if (error != OT_ERROR_NONE)
+    {
+        APP_THREAD_Error(ERR_THREAD_SET_THRESHOLD, error);
+    }
 
-  otPlatRadioEnableSrcMatch(PtOpenThreadInstance, true);
+    otPlatRadioEnableSrcMatch(PtOpenThreadInstance, true);
 
 #if (CFG_LPM_LEVEL == 2)
-  UTIL_LPM_SetMaxMode(1 << CFG_LPM_APP, UTIL_LPM_MAX_MODE);
+    UTIL_LPM_SetMaxMode(1 << CFG_LPM_APP, UTIL_LPM_MAX_MODE);
 #endif // CFG_LPM_LEVEL
 #if (CFG_LPM_LEVEL == 1)
-  UTIL_LPM_SetMaxMode(1 << CFG_LPM_APP, UTIL_LPM_STOP1_MODE);
+    UTIL_LPM_SetMaxMode(1 << CFG_LPM_APP, UTIL_LPM_STOP1_MODE);
 #endif // CFG_LPM_LEVEL
 
-  /* USER CODE END DEVICECONFIG */
-  /* USER CODE END DEVICECONFIG */
+    /* USER CODE END DEVICECONFIG */
+    /* USER CODE END DEVICECONFIG */
 }
 
-void APP_THREAD_Init( void )
+void APP_THREAD_Init(void)
 {
 #if (CFG_LPM_LEVEL != 0)
-  UTIL_LPM_SetMaxMode(1 << CFG_LPM_APP, UTIL_LPM_SLEEP_MODE);
+    UTIL_LPM_SetMaxMode(1 << CFG_LPM_APP, UTIL_LPM_SLEEP_MODE);
 #endif // CFG_LPM_LEVEL
 
-  Thread_Init();
+    Thread_Init();
 
-  APP_THREAD_DeviceConfig();
+    APP_THREAD_DeviceConfig();
 }
 
 /**
@@ -327,15 +318,15 @@ void APP_THREAD_Init( void )
  */
 static void APP_THREAD_TraceError(const char * pMess, uint32_t ErrCode)
 {
-  /* USER CODE BEGIN TRACE_ERROR */
-  LOG_ERROR_APP("**** FATAL ERROR = %s (Err = %d)", pMess, ErrCode);
-  /* In this case, the LEDs on the Board will start blinking. */
+    /* USER CODE BEGIN TRACE_ERROR */
+    LOG_ERROR_APP("**** FATAL ERROR = %s (Err = %d)", pMess, ErrCode);
+    /* In this case, the LEDs on the Board will start blinking. */
 
-  while(1U == 1U)
-  {
-  }
+    while (1U == 1U)
+    {
+    }
 
-  /* USER CODE END TRACE_ERROR */
+    /* USER CODE END TRACE_ERROR */
 }
 
 /**
@@ -346,103 +337,102 @@ static void APP_THREAD_TraceError(const char * pMess, uint32_t ErrCode)
  */
 void APP_THREAD_Error(uint32_t ErrId, uint32_t ErrCode)
 {
-  /* USER CODE BEGIN APP_THREAD_Error_1 */
+    /* USER CODE BEGIN APP_THREAD_Error_1 */
 
-  /* USER CODE END APP_THREAD_Error_1 */
+    /* USER CODE END APP_THREAD_Error_1 */
 
-  switch(ErrId)
-  {
-    case ERR_THREAD_SET_STATE_CB :
-        APP_THREAD_TraceError("ERROR : ERR_THREAD_SET_STATE_CB ",ErrCode);
+    switch (ErrId)
+    {
+    case ERR_THREAD_SET_STATE_CB:
+        APP_THREAD_TraceError("ERROR : ERR_THREAD_SET_STATE_CB ", ErrCode);
         break;
 
-    case ERR_THREAD_SET_CHANNEL :
-        APP_THREAD_TraceError("ERROR : ERR_THREAD_SET_CHANNEL ",ErrCode);
+    case ERR_THREAD_SET_CHANNEL:
+        APP_THREAD_TraceError("ERROR : ERR_THREAD_SET_CHANNEL ", ErrCode);
         break;
 
-    case ERR_THREAD_SET_PANID :
-        APP_THREAD_TraceError("ERROR : ERR_THREAD_SET_PANID ",ErrCode);
+    case ERR_THREAD_SET_PANID:
+        APP_THREAD_TraceError("ERROR : ERR_THREAD_SET_PANID ", ErrCode);
         break;
 
-    case ERR_THREAD_IPV6_ENABLE :
-        APP_THREAD_TraceError("ERROR : ERR_THREAD_IPV6_ENABLE ",ErrCode);
+    case ERR_THREAD_IPV6_ENABLE:
+        APP_THREAD_TraceError("ERROR : ERR_THREAD_IPV6_ENABLE ", ErrCode);
         break;
 
-    case ERR_THREAD_START :
+    case ERR_THREAD_START:
         APP_THREAD_TraceError("ERROR: ERR_THREAD_START ", ErrCode);
         break;
 
-    case ERR_THREAD_ERASE_PERSISTENT_INFO :
-        APP_THREAD_TraceError("ERROR : ERR_THREAD_ERASE_PERSISTENT_INFO ",ErrCode);
+    case ERR_THREAD_ERASE_PERSISTENT_INFO:
+        APP_THREAD_TraceError("ERROR : ERR_THREAD_ERASE_PERSISTENT_INFO ", ErrCode);
         break;
 
-    case ERR_THREAD_SET_NETWORK_KEY :
-        APP_THREAD_TraceError("ERROR : ERR_THREAD_SET_NETWORK_KEY ",ErrCode);
+    case ERR_THREAD_SET_NETWORK_KEY:
+        APP_THREAD_TraceError("ERROR : ERR_THREAD_SET_NETWORK_KEY ", ErrCode);
         break;
 
-    case ERR_THREAD_CHECK_WIRELESS :
-        APP_THREAD_TraceError("ERROR : ERR_THREAD_CHECK_WIRELESS ",ErrCode);
+    case ERR_THREAD_CHECK_WIRELESS:
+        APP_THREAD_TraceError("ERROR : ERR_THREAD_CHECK_WIRELESS ", ErrCode);
         break;
 
     /* USER CODE BEGIN APP_THREAD_Error_2 */
-    case ERR_THREAD_COAP_START :
-        APP_THREAD_TraceError("ERROR : ERR_THREAD_COAP_START ",ErrCode);
+    case ERR_THREAD_COAP_START:
+        APP_THREAD_TraceError("ERROR : ERR_THREAD_COAP_START ", ErrCode);
         break;
 
-    case ERR_THREAD_COAP_ADD_RESSOURCE :
-        APP_THREAD_TraceError("ERROR : ERR_THREAD_COAP_ADD_RESSOURCE ",ErrCode);
+    case ERR_THREAD_COAP_ADD_RESSOURCE:
+        APP_THREAD_TraceError("ERROR : ERR_THREAD_COAP_ADD_RESSOURCE ", ErrCode);
         break;
 
-    case ERR_THREAD_MESSAGE_READ :
-        APP_THREAD_TraceError("ERROR : ERR_THREAD_MESSAGE_READ ",ErrCode);
+    case ERR_THREAD_MESSAGE_READ:
+        APP_THREAD_TraceError("ERROR : ERR_THREAD_MESSAGE_READ ", ErrCode);
         break;
 
-    case ERR_THREAD_COAP_SEND_RESPONSE :
-        APP_THREAD_TraceError("ERROR : ERR_THREAD_COAP_SEND_RESPONSE ",ErrCode);
+    case ERR_THREAD_COAP_SEND_RESPONSE:
+        APP_THREAD_TraceError("ERROR : ERR_THREAD_COAP_SEND_RESPONSE ", ErrCode);
         break;
 
-    case ERR_THREAD_COAP_APPEND :
-        APP_THREAD_TraceError("ERROR : ERR_THREAD_COAP_APPEND ",ErrCode);
+    case ERR_THREAD_COAP_APPEND:
+        APP_THREAD_TraceError("ERROR : ERR_THREAD_COAP_APPEND ", ErrCode);
         break;
 
-    case ERR_THREAD_COAP_SEND_REQUEST :
-        APP_THREAD_TraceError("ERROR : ERR_THREAD_COAP_SEND_REQUEST ",ErrCode);
+    case ERR_THREAD_COAP_SEND_REQUEST:
+        APP_THREAD_TraceError("ERROR : ERR_THREAD_COAP_SEND_REQUEST ", ErrCode);
         break;
 
     case ERR_THREAD_MSG_COMPARE_FAILED:
-        APP_THREAD_TraceError("ERROR : ERR_THREAD_MSG_COMPARE_FAILED ",ErrCode);
+        APP_THREAD_TraceError("ERROR : ERR_THREAD_MSG_COMPARE_FAILED ", ErrCode);
         break;
 
     /* USER CODE END APP_THREAD_Error_2 */
-    default :
+    default:
         APP_THREAD_TraceError("ERROR Unknown ", 0);
         break;
-  }
+    }
 }
 
 #if (OT_CLI_USE == 1)
 /* OT CLI UART functions */
-void APP_THREAD_ProcessUart(void *argument)
+void APP_THREAD_ProcessUart(void * argument)
 {
-  UNUSED(argument);
+    UNUSED(argument);
 
-  arcUartProcess();
+    arcUartProcess();
 }
 
 void APP_THREAD_ScheduleUART(void)
 {
-  osThreadFlagsSet(WpanTaskHandle, 1U << CFG_RTOS_FLAG_OT_CLIuart);
+    osThreadFlagsSet(WpanTaskHandle, 1U << CFG_RTOS_FLAG_OT_CLIuart);
 }
 
-static void APP_THREAD_CliInit(otInstance *aInstance)
+static void APP_THREAD_CliInit(otInstance * aInstance)
 {
 
-  (void)otPlatUartEnable();
-  otCliInit(aInstance, CliUartOutput, aInstance);
+    (void) otPlatUartEnable();
+    otCliInit(aInstance, CliUartOutput, aInstance);
 }
 #endif /* OT_CLI_USE */
 
 /* USER CODE BEGIN FD_LOCAL_FUNCTIONS */
 
 /* USER CODE END FD_LOCAL_FUNCTIONS */
-

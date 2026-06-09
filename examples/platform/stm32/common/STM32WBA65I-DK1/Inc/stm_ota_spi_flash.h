@@ -36,17 +36,17 @@ extern "C" {
 #if (OTA_EXTERNAL_FLASH_ENABLE == 1)
 
 #define NS_IMAGE_SECONDARY_PARTITION_OFFSET (FLASH_AREA_2_OFFSET + FLASH_S_PARTITION_SIZE)
-#define S_IMAGE_SECONDARY_PARTITION_OFFSET  (FLASH_AREA_2_OFFSET)
+#define S_IMAGE_SECONDARY_PARTITION_OFFSET (FLASH_AREA_2_OFFSET)
 
 /* SLOT A - Non Secure application slot */
-#define SLOT_DWL_A_START            (SPI_FLASH_BASE_ADDRESS + NS_IMAGE_SECONDARY_PARTITION_OFFSET)
-#define SLOT_DWL_A_SIZE             FLASH_NS_PARTITION_SIZE
-#define SLOT_DWL_A_END              (SLOT_DWL_A_START + SLOT_DWL_A_SIZE - 1U) 
+#define SLOT_DWL_A_START (SPI_FLASH_BASE_ADDRESS + NS_IMAGE_SECONDARY_PARTITION_OFFSET)
+#define SLOT_DWL_A_SIZE FLASH_NS_PARTITION_SIZE
+#define SLOT_DWL_A_END (SLOT_DWL_A_START + SLOT_DWL_A_SIZE - 1U)
 
 /* SLOT B - Secure application slot */
-#define SLOT_DWL_B_START            (SPI_FLASH_BASE_ADDRESS + S_IMAGE_SECONDARY_PARTITION_OFFSET)
-#define SLOT_DWL_B_SIZE             FLASH_S_PARTITION_SIZE
-#define SLOT_DWL_B_END              (SLOT_DWL_B_START + SLOT_DWL_B_SIZE - 1U) 
+#define SLOT_DWL_B_START (SPI_FLASH_BASE_ADDRESS + S_IMAGE_SECONDARY_PARTITION_OFFSET)
+#define SLOT_DWL_B_SIZE FLASH_S_PARTITION_SIZE
+#define SLOT_DWL_B_END (SLOT_DWL_B_START + SLOT_DWL_B_SIZE - 1U)
 
 /* Exported variables ------------------------------------------------------- */
 /* Exported functions ------------------------------------------------------- */
@@ -54,7 +54,7 @@ extern "C" {
 /**
  * @brief  init ota fw
  */
-STM_OTA_StatusTypeDef STM_OTA_SPI_FLASH_Init( void );
+STM_OTA_StatusTypeDef STM_OTA_SPI_FLASH_Init(void);
 
 /**
  * @brief  Delete old image in external flash
@@ -64,12 +64,12 @@ STM_OTA_StatusTypeDef STM_OTA_SPI_FLASH_Delete_Image(uint32_t Address, uint32_t 
 /**
  * @brief  Write chunk of data in external flash
  */
-STM_OTA_StatusTypeDef STM_OTA_SPI_FLASH_WriteChunk(uint32_t *pDestAddress, uint32_t *pSrcBuffer, uint32_t Length);
+STM_OTA_StatusTypeDef STM_OTA_SPI_FLASH_WriteChunk(uint32_t * pDestAddress, uint32_t * pSrcBuffer, uint32_t Length);
 
 /**
  * @brief  Read chunk of data in external flash
  */
-STM_OTA_StatusTypeDef STM_OTA_SPI_FLASH_ReadChunk(uint32_t *pSrcAddress, uint32_t *pDestBuffer, uint32_t Length);
+STM_OTA_StatusTypeDef STM_OTA_SPI_FLASH_ReadChunk(uint32_t * pSrcAddress, uint32_t * pDestBuffer, uint32_t Length);
 
 #endif /* (OTA_EXTERNAL_FLASH_ENABLE == 1) */
 

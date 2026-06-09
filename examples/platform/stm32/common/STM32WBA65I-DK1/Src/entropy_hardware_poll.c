@@ -18,30 +18,28 @@
  */
 /* USER CODE END Header */
 
-#include <string.h>
+#include "hw.h"
 #include "main.h"
 #include "stm32wbaxx_hal.h"
 #include "stm32wbaxx_ll_hsem.h"
-#include "hw.h"
+#include <string.h>
 
-
-//int mbedtls_hardware_poll(void *data, unsigned char *output, size_t len, size_t *olen);
+// int mbedtls_hardware_poll(void *data, unsigned char *output, size_t len, size_t *olen);
 //
-//int mbedtls_hardware_poll(void *data, unsigned char *output, size_t len, size_t *olen) {
-//    HAL_StatusTypeDef status = HAL_OK;
-//    uint32_t random_number = 0;
+// int mbedtls_hardware_poll(void *data, unsigned char *output, size_t len, size_t *olen) {
+//     HAL_StatusTypeDef status = HAL_OK;
+//     uint32_t random_number = 0;
 //
-//    ((void) data);
-//    *olen = 0;
+//     ((void) data);
+//     *olen = 0;
 //
-//    if ((len < sizeof(uint32_t)) || (HAL_OK != status)) {
-//        return 0;
-//    }
-//    HW_RNG_Get(1, &random_number);
+//     if ((len < sizeof(uint32_t)) || (HAL_OK != status)) {
+//         return 0;
+//     }
+//     HW_RNG_Get(1, &random_number);
 //
-//    memcpy(output, &random_number, sizeof(uint32_t));
-//    *olen = sizeof(uint32_t);
+//     memcpy(output, &random_number, sizeof(uint32_t));
+//     *olen = sizeof(uint32_t);
 //
-//    return 0;
-//}
-
+//     return 0;
+// }

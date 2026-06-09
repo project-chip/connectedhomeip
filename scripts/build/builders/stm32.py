@@ -39,8 +39,8 @@ class stm32App(Enum):
             return 'lighting_app.flashbundle.txt'
         raise Exception('Unknown app type: %r' % self)
 
-    def BuildRoot(self, root,stm32_chip):
-        return os.path.join(root, 'examples', self.ExampleName(), 'stm32',stm32_chip)
+    def BuildRoot(self, root, stm32_chip):
+        return os.path.join(root, 'examples', self.ExampleName(), 'stm32', stm32_chip)
 
 
 class stm32Board(Enum):
@@ -50,7 +50,7 @@ class stm32Board(Enum):
     def GetIC(self):
         if self == stm32Board.STM32WB55XX:
             return 'STM32WB5MM-DK'
-        elif stm32Board.STM32WBA6XX:
+        if stm32Board.STM32WBA6XX:
             return 'STM32WBA65I-DK1'
         raise Exception('Unknown board #: %r' % self)
 
@@ -71,7 +71,7 @@ class stm32Builder(GnBuilder):
         stm32_chip = self.board.GetIC()
         self.extra_gn_options = [' stm32_ic_family="%s"' % stm32_chip]
 
-        self.extra_gn_options =  ['chip_config_network_layer_ble=true']
+        self.extra_gn_options = ['chip_config_network_layer_ble=true']
         self.extra_gn_options.append('treat_warnings_as_errors=false')
 
     def GnBuildArgs(self):

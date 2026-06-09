@@ -1,20 +1,20 @@
 /**
-  ******************************************************************************
-  * @file    pka_ctrl.h
-  * @author  MCD Application Team
-  * @brief   Header for PKA client manager module
-  ******************************************************************************
-  * @attention
-  *
-  * Copyright (c) 2023 STMicroelectronics.
-  * All rights reserved.
-  *
-  * This software is licensed under terms that can be found in the LICENSE file
-  * in the root directory of this software component.
-  * If no LICENSE file comes with this software, it is provided AS-IS.
-  *
-  ******************************************************************************
-  */
+ ******************************************************************************
+ * @file    pka_ctrl.h
+ * @author  MCD Application Team
+ * @brief   Header for PKA client manager module
+ ******************************************************************************
+ * @attention
+ *
+ * Copyright (c) 2023 STMicroelectronics.
+ * All rights reserved.
+ *
+ * This software is licensed under terms that can be found in the LICENSE file
+ * in the root directory of this software component.
+ * If no LICENSE file comes with this software, it is provided AS-IS.
+ *
+ ******************************************************************************
+ */
 
 #ifndef PKA_CTRL_H
 #define PKA_CTRL_H
@@ -32,11 +32,11 @@ extern "C" {
  */
 enum
 {
-  PKACTRL_OK    =  0,
-  PKACTRL_FULL  = -1,
-  PKACTRL_BUSY  = -2,
-  PKACTRL_EOF   = -3,
-  PKACTRL_ERROR = -5
+    PKACTRL_OK    = 0,
+    PKACTRL_FULL  = -1,
+    PKACTRL_BUSY  = -2,
+    PKACTRL_EOF   = -3,
+    PKACTRL_ERROR = -5
 };
 
 /* Exported constants --------------------------------------------------------*/
@@ -57,7 +57,7 @@ void PKACTRL_Reset(void);
  *         P-256 private key (Little Endian format)
  * @retval status (PKACTRL_XX)
  */
-int PKACTRL_StartP256Key(const uint32_t* local_private_key);
+int PKACTRL_StartP256Key(const uint32_t * local_private_key);
 
 /**
  * @brief  Get result of P-256 public key generation
@@ -65,7 +65,7 @@ int PKACTRL_StartP256Key(const uint32_t* local_private_key);
  *         function with the generated P-256 public key (Little Endian format)
  * @retval status (PKACTRL_XX)
  */
-int PKACTRL_ReadP256Key(uint32_t* local_public_key);
+int PKACTRL_ReadP256Key(uint32_t * local_public_key);
 
 /**
  * @brief  Start DH key computation
@@ -75,8 +75,7 @@ int PKACTRL_ReadP256Key(uint32_t* local_public_key);
  *         remote P-256 public key (Little Endian format)
  * @retval status (PKACTRL_XX)
  */
-int PKACTRL_StartDhKey(const uint32_t* local_private_key,
-                       const uint32_t* remote_public_key);
+int PKACTRL_StartDhKey(const uint32_t * local_private_key, const uint32_t * remote_public_key);
 
 /**
  * @brief  Get result of DH key computation
@@ -84,7 +83,7 @@ int PKACTRL_StartDhKey(const uint32_t* local_private_key,
  *         with the generated DH key (Little Endian format)
  * @retval status (PKACTRL_XX)
  */
-int PKACTRL_ReadDhKey(uint32_t* dh_key);
+int PKACTRL_ReadDhKey(uint32_t * dh_key);
 
 /**
  * @brief  PKA controller background task

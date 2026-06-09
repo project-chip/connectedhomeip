@@ -1,21 +1,21 @@
 /* USER CODE BEGIN Header */
 /**
-  ******************************************************************************
-  * @file    host_stack_if.h
-  * @author  MCD Application Team
-  * @brief : This file contains the interface for the stack tasks
-  ******************************************************************************
-  * @attention
-  *
-  * Copyright (c) 2025 STMicroelectronics.
-  * All rights reserved.
-  *
-  * This software is licensed under terms that can be found in the LICENSE file
-  * in the root directory of this software component.
-  * If no LICENSE file comes with this software, it is provided AS-IS.
-  *
-  ******************************************************************************
-  */
+ ******************************************************************************
+ * @file    host_stack_if.h
+ * @author  MCD Application Team
+ * @brief : This file contains the interface for the stack tasks
+ ******************************************************************************
+ * @attention
+ *
+ * Copyright (c) 2025 STMicroelectronics.
+ * All rights reserved.
+ *
+ * This software is licensed under terms that can be found in the LICENSE file
+ * in the root directory of this software component.
+ * If no LICENSE file comes with this software, it is provided AS-IS.
+ *
+ ******************************************************************************
+ */
 /* USER CODE END Header */
 
 #ifndef HOST_STACK_IF_H
@@ -49,17 +49,23 @@ extern "C" {
 /* Exported macro ------------------------------------------------------------*/
 /* Halt if any aci/hci functions call is made under ISR context, for debug purpose. */
 /* Acquire Link Layer Mutex before calling any aci/hci functions */
-#define BLE_WRAP_PREPROC() do{ \
-                             if( __get_IPSR() != 0 )while(1); \
-                             osMutexAcquire(LinkLayerMutex, osWaitForever); \
-                           }while(0)
+#define BLE_WRAP_PREPROC()                                                                                                         \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        if (__get_IPSR() != 0)                                                                                                     \
+            while (1)                                                                                                              \
+                ;                                                                                                                  \
+        osMutexAcquire(LinkLayerMutex, osWaitForever);                                                                             \
+    } while (0)
 
 /* Release Link Layer Mutex */
 /* Trigger BLE Host stack process after calling any aci/hci functions */
-#define BLE_WRAP_POSTPROC() do{ \
-                              osMutexRelease(LinkLayerMutex); \
-                              BleStackCB_Process(); \
-                            }while(0)
+#define BLE_WRAP_POSTPROC()                                                                                                        \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        osMutexRelease(LinkLayerMutex);                                                                                            \
+        BleStackCB_Process();                                                                                                      \
+    } while (0)
 
 /* USER CODE BEGIN EM */
 

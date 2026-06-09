@@ -1,21 +1,21 @@
 /* USER CODE BEGIN Header */
 /**
-  ******************************************************************************
-  * @file    ll_sys_if.h
-  * @author  MCD Application Team
-  * @brief   Header file for initiating system
-  ******************************************************************************
-  * @attention
-  *
-  * Copyright (c) 2025 STMicroelectronics.
-  * All rights reserved.
-  *
-  * This software is licensed under terms that can be found in the LICENSE file
-  * in the root directory of this software component.
-  * If no LICENSE file comes with this software, it is provided AS-IS.
-  *
-  ******************************************************************************
-  */
+ ******************************************************************************
+ * @file    ll_sys_if.h
+ * @author  MCD Application Team
+ * @brief   Header file for initiating system
+ ******************************************************************************
+ * @attention
+ *
+ * Copyright (c) 2025 STMicroelectronics.
+ * All rights reserved.
+ *
+ * This software is licensed under terms that can be found in the LICENSE file
+ * in the root directory of this software component.
+ * If no LICENSE file comes with this software, it is provided AS-IS.
+ *
+ ******************************************************************************
+ */
 /* USER CODE END Header */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
@@ -27,8 +27,8 @@ extern "C" {
 #endif
 
 /* Includes ------------------------------------------------------------------*/
-#include "stdint.h"
 #include "cmsis_os2.h"
+#include "stdint.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -41,27 +41,27 @@ extern "C" {
 /* USER CODE END ET */
 
 /* Exported constants --------------------------------------------------------*/
-#define DRIFT_TIME_DEFAULT                      (14)
-#define DRIFT_TIME_EXTRA_LSI2                   (9)
-#define DRIFT_TIME_EXTRA_GCC_DEBUG              (6)
+#define DRIFT_TIME_DEFAULT (14)
+#define DRIFT_TIME_EXTRA_LSI2 (9)
+#define DRIFT_TIME_EXTRA_GCC_DEBUG (6)
 
-#define EXEC_TIME_DEFAULT                       (28)
-#define EXEC_TIME_EXTRA_LSI2                    (3)
-#define EXEC_TIME_EXTRA_GCC_DEBUG               (4)
+#define EXEC_TIME_DEFAULT (28)
+#define EXEC_TIME_EXTRA_LSI2 (3)
+#define EXEC_TIME_EXTRA_GCC_DEBUG (4)
 
-#define SCHDL_TIME_DEFAULT                      (20)
+#define SCHDL_TIME_DEFAULT (20)
 /* USER CODE BEGIN EC */
-#define DRIFT_TIME_OPTIMIZED                    (13)
-#define EXEC_TIME_OPTIMIZED                     (20)
+#define DRIFT_TIME_OPTIMIZED (13)
+#define EXEC_TIME_OPTIMIZED (20)
 
 #if DRIFT_TIME_EXTRA_GCC_DEBUG
-    #undef  DRIFT_TIME_EXTRA_GCC_DEBUG
-    #define DRIFT_TIME_EXTRA_GCC_DEBUG          (5)  
-#endif  
-  
+#undef DRIFT_TIME_EXTRA_GCC_DEBUG
+#define DRIFT_TIME_EXTRA_GCC_DEBUG (5)
+#endif
+
 #if EXEC_TIME_EXTRA_GCC_DEBUG
-    #undef  EXEC_TIME_EXTRA_GCC_DEBUG
-    #define EXEC_TIME_EXTRA_GCC_DEBUG           (1) 
+#undef EXEC_TIME_EXTRA_GCC_DEBUG
+#define EXEC_TIME_EXTRA_GCC_DEBUG (1)
 #endif
 /* USER CODE END EC */
 
@@ -90,7 +90,7 @@ void ll_sys_bg_temperature_measurement(void);
 void ll_sys_apply_cte_settings(void);
 #endif /* defined(STM32WBA52xx) || defined(STM32WBA54xx) || defined(STM32WBA55xx) || defined(STM32WBA65xx) */
 #if (CFG_LPM_STANDBY_SUPPORTED == 0)
-void ll_sys_get_ble_profile_statistics(uint32_t* exec_time, uint32_t* drift_time, uint32_t* average_drift_time, uint8_t reset);
+void ll_sys_get_ble_profile_statistics(uint32_t * exec_time, uint32_t * drift_time, uint32_t * average_drift_time, uint8_t reset);
 #endif
 
 void ll_sys_set_rtl_polling_time(uint8_t rtl_polling_time);

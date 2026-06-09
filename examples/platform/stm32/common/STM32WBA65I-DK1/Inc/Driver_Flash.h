@@ -41,61 +41,61 @@
 #ifndef DRIVER_FLASH_H_
 #define DRIVER_FLASH_H_
 
-#ifdef  __cplusplus
-extern "C"
-{
+#ifdef __cplusplus
+extern "C" {
 #endif
 
 #include "Driver_Common.h"
 
-#define ARM_FLASH_API_VERSION ARM_DRIVER_VERSION_MAJOR_MINOR(2,1)  /* API version */
+#define ARM_FLASH_API_VERSION ARM_DRIVER_VERSION_MAJOR_MINOR(2, 1) /* API version */
 
+#define _ARM_Driver_Flash_(n) Driver_Flash##n
+#define ARM_Driver_Flash_(n) _ARM_Driver_Flash_(n)
 
-#define _ARM_Driver_Flash_(n)      Driver_Flash##n
-#define  ARM_Driver_Flash_(n) _ARM_Driver_Flash_(n)
-
-
-#define ARM_FLASH_SECTOR_INFO(addr,size) { (addr), (addr)+(size)-1 }
+#define ARM_FLASH_SECTOR_INFO(addr, size)                                                                                          \
+    {                                                                                                                              \
+        (addr), (addr) + (size) -1                                                                                                 \
+    }
 
 /**
 \brief Flash Sector information
 */
-typedef struct _ARM_FLASH_SECTOR {
-  uint32_t start;                       ///< Sector Start address
-  uint32_t end;                         ///< Sector End address (start+size-1)
+typedef struct _ARM_FLASH_SECTOR
+{
+    uint32_t start; ///< Sector Start address
+    uint32_t end;   ///< Sector End address (start+size-1)
 } const ARM_FLASH_SECTOR;
 
 /**
 \brief Flash information
 */
-typedef struct _ARM_FLASH_INFO {
-  ARM_FLASH_SECTOR *sector_info;        ///< Sector layout information (NULL=Uniform sectors)
-  uint32_t          sector_count;       ///< Number of sectors
-  uint32_t          sector_size;        ///< Uniform sector size in bytes (0=sector_info used) 
-  uint32_t          page_size;          ///< Optimal programming page size in bytes
-  uint32_t          program_unit;       ///< Smallest programmable unit in bytes
-  uint8_t           erased_value;       ///< Contents of erased memory (usually 0xFF)
+typedef struct _ARM_FLASH_INFO
+{
+    ARM_FLASH_SECTOR * sector_info; ///< Sector layout information (NULL=Uniform sectors)
+    uint32_t sector_count;          ///< Number of sectors
+    uint32_t sector_size;           ///< Uniform sector size in bytes (0=sector_info used)
+    uint32_t page_size;             ///< Optimal programming page size in bytes
+    uint32_t program_unit;          ///< Smallest programmable unit in bytes
+    uint8_t erased_value;           ///< Contents of erased memory (usually 0xFF)
 #if defined(BL2_USE_SFDP_EXT_FLASH_INFO)
 } ARM_FLASH_INFO;
-#else /* not BL2_USE_SFDP_EXT_FLASH_INFO */
+#else  /* not BL2_USE_SFDP_EXT_FLASH_INFO */
 } const ARM_FLASH_INFO;
 #endif /* BL2_USE_SFDP_EXT_FLASH_INFO */
-
 
 /**
 \brief Flash Status
 */
-typedef volatile struct _ARM_FLASH_STATUS {
-  uint32_t busy     : 1;                ///< Flash busy flag
-  uint32_t error    : 1;                ///< Read/Program/Erase error flag (cleared on start of next operation)
-  uint32_t reserved : 30;
+typedef volatile struct _ARM_FLASH_STATUS
+{
+    uint32_t busy : 1;  ///< Flash busy flag
+    uint32_t error : 1; ///< Read/Program/Erase error flag (cleared on start of next operation)
+    uint32_t reserved : 30;
 } ARM_FLASH_STATUS;
 
-
 /****** Flash Event *****/
-#define ARM_FLASH_EVENT_READY           (1UL << 0)  ///< Flash Ready
-#define ARM_FLASH_EVENT_ERROR           (1UL << 1)  ///< Read/Program/Erase Error
-
+#define ARM_FLASH_EVENT_READY (1UL << 0) ///< Flash Ready
+#define ARM_FLASH_EVENT_ERROR (1UL << 1) ///< Read/Program/Erase Error
 
 // Function documentation
 /**
@@ -171,38 +171,39 @@ typedef volatile struct _ARM_FLASH_STATUS {
   \return      none
 */
 
-typedef void (*ARM_Flash_SignalEvent_t) (uint32_t event);    ///< Pointer to \ref ARM_Flash_SignalEvent : Signal Flash Event.
-
+typedef void (*ARM_Flash_SignalEvent_t)(uint32_t event); ///< Pointer to \ref ARM_Flash_SignalEvent : Signal Flash Event.
 
 /**
 \brief Flash Driver Capabilities.
 */
-typedef struct _ARM_FLASH_CAPABILITIES {
-  uint32_t event_ready  : 1;            ///< Signal Flash Ready event
-  uint32_t data_width   : 2;            ///< Data width: 0=8-bit, 1=16-bit, 2=32-bit
-  uint32_t erase_chip   : 1;            ///< Supports EraseChip operation
-  uint32_t reserved     : 28;           ///< Reserved (must be zero)
+typedef struct _ARM_FLASH_CAPABILITIES
+{
+    uint32_t event_ready : 1; ///< Signal Flash Ready event
+    uint32_t data_width : 2;  ///< Data width: 0=8-bit, 1=16-bit, 2=32-bit
+    uint32_t erase_chip : 1;  ///< Supports EraseChip operation
+    uint32_t reserved : 28;   ///< Reserved (must be zero)
 } ARM_FLASH_CAPABILITIES;
-
 
 /**
 \brief Access structure of the Flash Driver
 */
-typedef struct _ARM_DRIVER_FLASH {
-  ARM_DRIVER_VERSION     (*GetVersion)     (void);                                          ///< Pointer to \ref ARM_Flash_GetVersion : Get driver version.
-  ARM_FLASH_CAPABILITIES (*GetCapabilities)(void);                                          ///< Pointer to \ref ARM_Flash_GetCapabilities : Get driver capabilities.
-  int32_t                (*Initialize)     (ARM_Flash_SignalEvent_t cb_event);              ///< Pointer to \ref ARM_Flash_Initialize : Initialize Flash Interface.
-  int32_t                (*Uninitialize)   (void);                                          ///< Pointer to \ref ARM_Flash_Uninitialize : De-initialize Flash Interface.
-  int32_t                (*PowerControl)   (ARM_POWER_STATE state);                         ///< Pointer to \ref ARM_Flash_PowerControl : Control Flash Interface Power.
-  int32_t                (*ReadData)       (uint32_t addr,       void *data, uint32_t cnt); ///< Pointer to \ref ARM_Flash_ReadData : Read data from Flash.
-  int32_t                (*ProgramData)    (uint32_t addr, const void *data, uint32_t cnt); ///< Pointer to \ref ARM_Flash_ProgramData : Program data to Flash.
-  int32_t                (*EraseSector)    (uint32_t addr);                                 ///< Pointer to \ref ARM_Flash_EraseSector : Erase Flash Sector.
-  int32_t                (*EraseChip)      (void);                                          ///< Pointer to \ref ARM_Flash_EraseChip : Erase complete Flash.
-  ARM_FLASH_STATUS       (*GetStatus)      (void);                                          ///< Pointer to \ref ARM_Flash_GetStatus : Get Flash status.
-  ARM_FLASH_INFO *       (*GetInfo)        (void);                                          ///< Pointer to \ref ARM_Flash_GetInfo : Get Flash information.
+typedef struct _ARM_DRIVER_FLASH
+{
+    ARM_DRIVER_VERSION (*GetVersion)(void);          ///< Pointer to \ref ARM_Flash_GetVersion : Get driver version.
+    ARM_FLASH_CAPABILITIES (*GetCapabilities)(void); ///< Pointer to \ref ARM_Flash_GetCapabilities : Get driver capabilities.
+    int32_t (*Initialize)(ARM_Flash_SignalEvent_t cb_event); ///< Pointer to \ref ARM_Flash_Initialize : Initialize Flash Interface.
+    int32_t (*Uninitialize)(void);                  ///< Pointer to \ref ARM_Flash_Uninitialize : De-initialize Flash Interface.
+    int32_t (*PowerControl)(ARM_POWER_STATE state); ///< Pointer to \ref ARM_Flash_PowerControl : Control Flash Interface Power.
+    int32_t (*ReadData)(uint32_t addr, void * data, uint32_t cnt); ///< Pointer to \ref ARM_Flash_ReadData : Read data from Flash.
+    int32_t (*ProgramData)(uint32_t addr, const void * data,
+                           uint32_t cnt);  ///< Pointer to \ref ARM_Flash_ProgramData : Program data to Flash.
+    int32_t (*EraseSector)(uint32_t addr); ///< Pointer to \ref ARM_Flash_EraseSector : Erase Flash Sector.
+    int32_t (*EraseChip)(void);            ///< Pointer to \ref ARM_Flash_EraseChip : Erase complete Flash.
+    ARM_FLASH_STATUS (*GetStatus)(void);   ///< Pointer to \ref ARM_Flash_GetStatus : Get Flash status.
+    ARM_FLASH_INFO * (*GetInfo)(void);     ///< Pointer to \ref ARM_Flash_GetInfo : Get Flash information.
 } const ARM_DRIVER_FLASH;
 
-#ifdef  __cplusplus
+#ifdef __cplusplus
 }
 #endif
 

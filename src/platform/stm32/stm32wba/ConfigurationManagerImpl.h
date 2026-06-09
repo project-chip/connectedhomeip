@@ -33,14 +33,13 @@ namespace DeviceLayer {
  * Concrete implementation of the ConfigurationManager singleton object for the platform.
  */
 
-//class ConfigurationManagerImpl final : public Internal::GenericConfigurationManagerImpl<ConfigurationManagerImpl>,
- //                                     public Internal::STM32Config
+// class ConfigurationManagerImpl final : public Internal::GenericConfigurationManagerImpl<ConfigurationManagerImpl>,
+//                                      public Internal::STM32Config
 class ConfigurationManagerImpl : public Internal::GenericConfigurationManagerImpl<Internal::STM32Config>
 {
 public:
     // This returns an instance of this class.
     static ConfigurationManagerImpl & GetDefaultInstance();
-
 
 private:
     // ===== Members that implement the ConfigurationManager public interface.

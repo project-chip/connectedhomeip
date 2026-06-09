@@ -31,26 +31,27 @@
 using namespace chip;
 using namespace chip::app::Clusters;
 
-void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath &attributePath,
-        uint8_t type, uint16_t size, uint8_t *value) {
-    ClusterId clusterId = attributePath.mClusterId;
+void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
+                                       uint8_t * value)
+{
+    ClusterId clusterId     = attributePath.mClusterId;
     AttributeId attributeId = attributePath.mAttributeId;
 
-    if (clusterId == OnOff::Id && attributeId == OnOff::Attributes::OnOff::Id) {
-        LightingMgr().InitiateAction(
-                *value ? LightingManager::ON_ACTION : LightingManager::OFF_ACTION, 0, size, value);
-    } else if (clusterId == LevelControl::Id
-            && attributeId == LevelControl::Attributes::CurrentLevel::Id) {
+    if (clusterId == OnOff::Id && attributeId == OnOff::Attributes::OnOff::Id)
+    {
+        LightingMgr().InitiateAction(*value ? LightingManager::ON_ACTION : LightingManager::OFF_ACTION, 0, size, value);
+    }
+    else if (clusterId == LevelControl::Id && attributeId == LevelControl::Attributes::CurrentLevel::Id)
+    {
         LightingMgr().InitiateAction(LightingManager::LEVEL_ACTION, 0, size, value);
     }
 }
-
 
 void emberAfOnOffClusterInitCallback(EndpointId endpoint)
 {
     bool onOffValue = false;
     app::DataModel::Nullable<uint8_t> currentLevel;
-    uint8_t Level=0;
+    uint8_t Level = 0;
     Protocols::InteractionModel::Status status;
 
     /* restore last values saved in persistence */
@@ -58,9 +59,8 @@ void emberAfOnOffClusterInitCallback(EndpointId endpoint)
 
     if (status == Protocols::InteractionModel::Status::Success)
     {
-		uint8_t onOffByte = onOffValue ? 1: 0;
-        LightingMgr().InitiateAction(onOffValue ? LightingManager::ON_ACTION : LightingManager::OFF_ACTION, 0, 1,
-                                    &onOffByte);
+        uint8_t onOffByte = onOffValue ? 1 : 0;
+        LightingMgr().InitiateAction(onOffValue ? LightingManager::ON_ACTION : LightingManager::OFF_ACTION, 0, 1, &onOffByte);
     }
 
     status = LevelControl::Attributes::CurrentLevel::Get(endpoint, currentLevel);
@@ -70,6 +70,4 @@ void emberAfOnOffClusterInitCallback(EndpointId endpoint)
         Level = currentLevel.Value();
         LightingMgr().InitiateAction(LightingManager::LEVEL_ACTION, 0, 1, &Level);
     }
-
 }
-

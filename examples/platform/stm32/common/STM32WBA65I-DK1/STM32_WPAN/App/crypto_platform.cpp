@@ -66,14 +66,14 @@ using namespace Crypto;
 //---------------------------------------------------------------------------------------------------------------------
 // Default/weak implementation of crypto platform APIs
 
-#if (!defined(MBEDTLS_NO_DEFAULT_ENTROPY_SOURCES) && \
+#if (!defined(MBEDTLS_NO_DEFAULT_ENTROPY_SOURCES) &&                                                                               \
      (!defined(MBEDTLS_NO_PLATFORM_ENTROPY) || defined(MBEDTLS_HAVEGE_C) || defined(MBEDTLS_ENTROPY_HARDWARE_ALT)))
 #define OT_MBEDTLS_STRONG_DEFAULT_ENTROPY_PRESENT
 #endif
 
 #if OPENTHREAD_FTD || OPENTHREAD_MTD
 static mbedtls_ctr_drbg_context sCtrDrbgContext;
-static mbedtls_entropy_context  sEntropyContext;
+static mbedtls_entropy_context sEntropyContext;
 #ifndef OT_MBEDTLS_STRONG_DEFAULT_ENTROPY_PRESENT
 static constexpr uint16_t kEntropyMinThreshold = 16;
 #endif
@@ -85,10 +85,10 @@ OT_TOOL_WEAK void otPlatCryptoInit(void)
 }
 
 // AES  Implementation
-OT_TOOL_WEAK otError otPlatCryptoAesInit(otCryptoContext *aContext)
+OT_TOOL_WEAK otError otPlatCryptoAesInit(otCryptoContext * aContext)
 {
-    Error                error = kErrorNone;
-    mbedtls_aes_context *context;
+    Error error = kErrorNone;
+    mbedtls_aes_context * context;
 
     VerifyOrExit(aContext != nullptr, error = kErrorInvalidArgs);
     VerifyOrExit(aContext->mContextSize >= sizeof(mbedtls_aes_context), error = kErrorFailed);
@@ -100,27 +100,26 @@ exit:
     return error;
 }
 
-OT_TOOL_WEAK otError otPlatCryptoAesSetKey(otCryptoContext *aContext, const otCryptoKey *aKey)
+OT_TOOL_WEAK otError otPlatCryptoAesSetKey(otCryptoContext * aContext, const otCryptoKey * aKey)
 {
-    Error                error = kErrorNone;
-    mbedtls_aes_context *context;
-    const LiteralKey     key(*static_cast<const Key *>(aKey));
+    Error error = kErrorNone;
+    mbedtls_aes_context * context;
+    const LiteralKey key(*static_cast<const Key *>(aKey));
 
     VerifyOrExit(aContext != nullptr, error = kErrorInvalidArgs);
     VerifyOrExit(aContext->mContextSize >= sizeof(mbedtls_aes_context), error = kErrorFailed);
 
     context = static_cast<mbedtls_aes_context *>(aContext->mContext);
-    VerifyOrExit((mbedtls_aes_setkey_enc(context, key.GetBytes(), (key.GetLength() * kBitsPerByte)) == 0),
-                 error = kErrorFailed);
+    VerifyOrExit((mbedtls_aes_setkey_enc(context, key.GetBytes(), (key.GetLength() * kBitsPerByte)) == 0), error = kErrorFailed);
 
 exit:
     return error;
 }
 
-OT_TOOL_WEAK otError otPlatCryptoAesEncrypt(otCryptoContext *aContext, const uint8_t *aInput, uint8_t *aOutput)
+OT_TOOL_WEAK otError otPlatCryptoAesEncrypt(otCryptoContext * aContext, const uint8_t * aInput, uint8_t * aOutput)
 {
-    Error                error = kErrorNone;
-    mbedtls_aes_context *context;
+    Error error = kErrorNone;
+    mbedtls_aes_context * context;
 
     VerifyOrExit(aContext != nullptr, error = kErrorInvalidArgs);
     VerifyOrExit(aContext->mContextSize >= sizeof(mbedtls_aes_context), error = kErrorFailed);
@@ -132,10 +131,10 @@ exit:
     return error;
 }
 
-OT_TOOL_WEAK otError otPlatCryptoAesFree(otCryptoContext *aContext)
+OT_TOOL_WEAK otError otPlatCryptoAesFree(otCryptoContext * aContext)
 {
-    Error                error = kErrorNone;
-    mbedtls_aes_context *context;
+    Error error = kErrorNone;
+    mbedtls_aes_context * context;
 
     VerifyOrExit(aContext != nullptr, error = kErrorInvalidArgs);
     VerifyOrExit(aContext->mContextSize >= sizeof(mbedtls_aes_context), error = kErrorFailed);
@@ -150,11 +149,11 @@ exit:
 #if OPENTHREAD_FTD || OPENTHREAD_MTD
 
 // HMAC implementations
-OT_TOOL_WEAK otError otPlatCryptoHmacSha256Init(otCryptoContext *aContext)
+OT_TOOL_WEAK otError otPlatCryptoHmacSha256Init(otCryptoContext * aContext)
 {
-    Error                    error  = kErrorNone;
-    const mbedtls_md_info_t *mdInfo = nullptr;
-    mbedtls_md_context_t    *context;
+    Error error                      = kErrorNone;
+    const mbedtls_md_info_t * mdInfo = nullptr;
+    mbedtls_md_context_t * context;
 
     VerifyOrExit(aContext != nullptr, error = kErrorInvalidArgs);
     VerifyOrExit(aContext->mContextSize >= sizeof(mbedtls_md_context_t), error = kErrorFailed);
@@ -168,10 +167,10 @@ exit:
     return error;
 }
 
-OT_TOOL_WEAK otError otPlatCryptoHmacSha256Deinit(otCryptoContext *aContext)
+OT_TOOL_WEAK otError otPlatCryptoHmacSha256Deinit(otCryptoContext * aContext)
 {
-    Error                 error = kErrorNone;
-    mbedtls_md_context_t *context;
+    Error error = kErrorNone;
+    mbedtls_md_context_t * context;
 
     VerifyOrExit(aContext != nullptr, error = kErrorInvalidArgs);
     VerifyOrExit(aContext->mContextSize >= sizeof(mbedtls_md_context_t), error = kErrorFailed);
@@ -183,11 +182,11 @@ exit:
     return error;
 }
 
-OT_TOOL_WEAK otError otPlatCryptoHmacSha256Start(otCryptoContext *aContext, const otCryptoKey *aKey)
+OT_TOOL_WEAK otError otPlatCryptoHmacSha256Start(otCryptoContext * aContext, const otCryptoKey * aKey)
 {
-    Error                 error = kErrorNone;
-    const LiteralKey      key(*static_cast<const Key *>(aKey));
-    mbedtls_md_context_t *context;
+    Error error = kErrorNone;
+    const LiteralKey key(*static_cast<const Key *>(aKey));
+    mbedtls_md_context_t * context;
 
     VerifyOrExit(aContext != nullptr, error = kErrorInvalidArgs);
     VerifyOrExit(aContext->mContextSize >= sizeof(mbedtls_md_context_t), error = kErrorFailed);
@@ -199,28 +198,27 @@ exit:
     return error;
 }
 
-OT_TOOL_WEAK otError otPlatCryptoHmacSha256Update(otCryptoContext *aContext, const void *aBuf, uint16_t aBufLength)
+OT_TOOL_WEAK otError otPlatCryptoHmacSha256Update(otCryptoContext * aContext, const void * aBuf, uint16_t aBufLength)
 {
-    Error                 error = kErrorNone;
-    mbedtls_md_context_t *context;
+    Error error = kErrorNone;
+    mbedtls_md_context_t * context;
 
     VerifyOrExit(aContext != nullptr, error = kErrorInvalidArgs);
     VerifyOrExit(aContext->mContextSize >= sizeof(mbedtls_md_context_t), error = kErrorFailed);
 
     context = static_cast<mbedtls_md_context_t *>(aContext->mContext);
-    VerifyOrExit((mbedtls_md_hmac_update(context, reinterpret_cast<const uint8_t *>(aBuf), aBufLength) == 0),
-                 error = kErrorFailed);
+    VerifyOrExit((mbedtls_md_hmac_update(context, reinterpret_cast<const uint8_t *>(aBuf), aBufLength) == 0), error = kErrorFailed);
 
 exit:
     return error;
 }
 
-OT_TOOL_WEAK otError otPlatCryptoHmacSha256Finish(otCryptoContext *aContext, uint8_t *aBuf, size_t aBufLength)
+OT_TOOL_WEAK otError otPlatCryptoHmacSha256Finish(otCryptoContext * aContext, uint8_t * aBuf, size_t aBufLength)
 {
     OT_UNUSED_VARIABLE(aBufLength);
 
-    Error                 error = kErrorNone;
-    mbedtls_md_context_t *context;
+    Error error = kErrorNone;
+    mbedtls_md_context_t * context;
 
     VerifyOrExit(aContext != nullptr, error = kErrorInvalidArgs);
     VerifyOrExit(aContext->mContextSize >= sizeof(mbedtls_md_context_t), error = kErrorFailed);
@@ -232,7 +230,7 @@ exit:
     return error;
 }
 
-otError otPlatCryptoHkdfInit(otCryptoContext *aContext)
+otError otPlatCryptoHkdfInit(otCryptoContext * aContext)
 {
     Error error = kErrorNone;
 
@@ -245,18 +243,15 @@ exit:
     return error;
 }
 
-OT_TOOL_WEAK otError otPlatCryptoHkdfExpand(otCryptoContext *aContext,
-                                            const uint8_t   *aInfo,
-                                            uint16_t         aInfoLength,
-                                            uint8_t         *aOutputKey,
-                                            uint16_t         aOutputKeyLength)
+OT_TOOL_WEAK otError otPlatCryptoHkdfExpand(otCryptoContext * aContext, const uint8_t * aInfo, uint16_t aInfoLength,
+                                            uint8_t * aOutputKey, uint16_t aOutputKeyLength)
 {
-    Error             error = kErrorNone;
-    HmacSha256        hmac;
-    HmacSha256::Hash  hash;
-    uint8_t           iter = 0;
-    uint16_t          copyLength;
-    HmacSha256::Hash *prk;
+    Error error = kErrorNone;
+    HmacSha256 hmac;
+    HmacSha256::Hash hash;
+    uint8_t iter = 0;
+    uint16_t copyLength;
+    HmacSha256::Hash * prk;
 
     VerifyOrExit(aContext != nullptr, error = kErrorInvalidArgs);
     VerifyOrExit(aContext->mContextSize >= sizeof(HmacSha256::Hash), error = kErrorFailed);
@@ -305,16 +300,14 @@ exit:
     return error;
 }
 
-OT_TOOL_WEAK otError otPlatCryptoHkdfExtract(otCryptoContext   *aContext,
-                                             const uint8_t     *aSalt,
-                                             uint16_t           aSaltLength,
-                                             const otCryptoKey *aInputKey)
+OT_TOOL_WEAK otError otPlatCryptoHkdfExtract(otCryptoContext * aContext, const uint8_t * aSalt, uint16_t aSaltLength,
+                                             const otCryptoKey * aInputKey)
 {
-    Error             error = kErrorNone;
-    HmacSha256        hmac;
-    Key               cryptoKey;
-    HmacSha256::Hash *prk;
-    const LiteralKey  inputKey(*static_cast<const Key *>(aInputKey));
+    Error error = kErrorNone;
+    HmacSha256 hmac;
+    Key cryptoKey;
+    HmacSha256::Hash * prk;
+    const LiteralKey inputKey(*static_cast<const Key *>(aInputKey));
 
     VerifyOrExit(aContext != nullptr, error = kErrorInvalidArgs);
     VerifyOrExit(aContext->mContextSize >= sizeof(HmacSha256::Hash), error = kErrorFailed);
@@ -331,10 +324,10 @@ exit:
     return error;
 }
 
-otError otPlatCryptoHkdfDeinit(otCryptoContext *aContext)
+otError otPlatCryptoHkdfDeinit(otCryptoContext * aContext)
 {
-    Error             error = kErrorNone;
-    HmacSha256::Hash *prk;
+    Error error = kErrorNone;
+    HmacSha256::Hash * prk;
 
     VerifyOrExit(aContext != nullptr, error = kErrorInvalidArgs);
     VerifyOrExit(aContext->mContextSize >= sizeof(HmacSha256::Hash), error = kErrorFailed);
@@ -349,10 +342,10 @@ exit:
 }
 
 // SHA256 platform implementations
-OT_TOOL_WEAK otError otPlatCryptoSha256Init(otCryptoContext *aContext)
+OT_TOOL_WEAK otError otPlatCryptoSha256Init(otCryptoContext * aContext)
 {
-    Error                   error = kErrorNone;
-    mbedtls_sha256_context *context;
+    Error error = kErrorNone;
+    mbedtls_sha256_context * context;
 
     VerifyOrExit(aContext != nullptr, error = kErrorInvalidArgs);
 
@@ -363,10 +356,10 @@ exit:
     return error;
 }
 
-OT_TOOL_WEAK otError otPlatCryptoSha256Deinit(otCryptoContext *aContext)
+OT_TOOL_WEAK otError otPlatCryptoSha256Deinit(otCryptoContext * aContext)
 {
-    Error                   error = kErrorNone;
-    mbedtls_sha256_context *context;
+    Error error = kErrorNone;
+    mbedtls_sha256_context * context;
 
     VerifyOrExit(aContext != nullptr, error = kErrorInvalidArgs);
     VerifyOrExit(aContext->mContextSize >= sizeof(mbedtls_sha256_context), error = kErrorFailed);
@@ -380,10 +373,10 @@ exit:
     return error;
 }
 
-OT_TOOL_WEAK otError otPlatCryptoSha256Start(otCryptoContext *aContext)
+OT_TOOL_WEAK otError otPlatCryptoSha256Start(otCryptoContext * aContext)
 {
-    Error                   error = kErrorNone;
-    mbedtls_sha256_context *context;
+    Error error = kErrorNone;
+    mbedtls_sha256_context * context;
 
     VerifyOrExit(aContext != nullptr, error = kErrorInvalidArgs);
     VerifyOrExit(aContext->mContextSize >= sizeof(mbedtls_sha256_context), error = kErrorFailed);
@@ -400,10 +393,10 @@ exit:
     return error;
 }
 
-OT_TOOL_WEAK otError otPlatCryptoSha256Update(otCryptoContext *aContext, const void *aBuf, uint16_t aBufLength)
+OT_TOOL_WEAK otError otPlatCryptoSha256Update(otCryptoContext * aContext, const void * aBuf, uint16_t aBufLength)
 {
-    Error                   error = kErrorNone;
-    mbedtls_sha256_context *context;
+    Error error = kErrorNone;
+    mbedtls_sha256_context * context;
 
     VerifyOrExit(aContext != nullptr, error = kErrorInvalidArgs);
     VerifyOrExit(aContext->mContextSize >= sizeof(mbedtls_sha256_context), error = kErrorFailed);
@@ -411,8 +404,7 @@ OT_TOOL_WEAK otError otPlatCryptoSha256Update(otCryptoContext *aContext, const v
     context = static_cast<mbedtls_sha256_context *>(aContext->mContext);
 
 #if (MBEDTLS_VERSION_NUMBER >= 0x03000000)
-    VerifyOrExit((mbedtls_sha256_update(context, reinterpret_cast<const uint8_t *>(aBuf), aBufLength) == 0),
-                 error = kErrorFailed);
+    VerifyOrExit((mbedtls_sha256_update(context, reinterpret_cast<const uint8_t *>(aBuf), aBufLength) == 0), error = kErrorFailed);
 #else
     VerifyOrExit((mbedtls_sha256_update_ret(context, reinterpret_cast<const uint8_t *>(aBuf), aBufLength) == 0),
                  error = kErrorFailed);
@@ -422,12 +414,12 @@ exit:
     return error;
 }
 
-OT_TOOL_WEAK otError otPlatCryptoSha256Finish(otCryptoContext *aContext, uint8_t *aHash, uint16_t aHashSize)
+OT_TOOL_WEAK otError otPlatCryptoSha256Finish(otCryptoContext * aContext, uint8_t * aHash, uint16_t aHashSize)
 {
     OT_UNUSED_VARIABLE(aHashSize);
 
-    Error                   error = kErrorNone;
-    mbedtls_sha256_context *context;
+    Error error = kErrorNone;
+    mbedtls_sha256_context * context;
 
     VerifyOrExit(aContext != nullptr, error = kErrorInvalidArgs);
     VerifyOrExit(aContext->mContextSize >= sizeof(mbedtls_sha256_context), error = kErrorFailed);
@@ -446,7 +438,7 @@ exit:
 
 #ifndef OT_MBEDTLS_STRONG_DEFAULT_ENTROPY_PRESENT
 
-static int handleMbedtlsEntropyPoll(void *aData, unsigned char *aOutput, size_t aInLen, size_t *aOutLen)
+static int handleMbedtlsEntropyPoll(void * aData, unsigned char * aOutput, size_t aInLen, size_t * aOutLen)
 {
     int rval = MBEDTLS_ERR_ENTROPY_SOURCE_FAILED;
 
@@ -485,7 +477,7 @@ OT_TOOL_WEAK void otPlatCryptoRandomDeinit(void)
     mbedtls_ctr_drbg_free(&sCtrDrbgContext);
 }
 
-OT_TOOL_WEAK otError otPlatCryptoRandomGet(uint8_t *aBuffer, uint16_t aSize)
+OT_TOOL_WEAK otError otPlatCryptoRandomGet(uint8_t * aBuffer, uint16_t aSize)
 {
     return ot::Crypto::MbedTls::MapError(
         mbedtls_ctr_drbg_random(&sCtrDrbgContext, static_cast<unsigned char *>(aBuffer), static_cast<size_t>(aSize)));
@@ -493,10 +485,10 @@ OT_TOOL_WEAK otError otPlatCryptoRandomGet(uint8_t *aBuffer, uint16_t aSize)
 
 #if OPENTHREAD_CONFIG_ECDSA_ENABLE
 
-OT_TOOL_WEAK otError otPlatCryptoEcdsaGenerateKey(otPlatCryptoEcdsaKeyPair *aKeyPair)
+OT_TOOL_WEAK otError otPlatCryptoEcdsaGenerateKey(otPlatCryptoEcdsaKeyPair * aKeyPair)
 {
     mbedtls_pk_context pk;
-    int                ret;
+    int ret;
 
     mbedtls_pk_init(&pk);
 
@@ -511,8 +503,7 @@ OT_TOOL_WEAK otError otPlatCryptoEcdsaGenerateKey(otPlatCryptoEcdsaKeyPair *aKey
 
     aKeyPair->mDerLength = static_cast<uint8_t>(ret);
 
-    memmove(aKeyPair->mDerBytes, aKeyPair->mDerBytes + OT_CRYPTO_ECDSA_MAX_DER_SIZE - aKeyPair->mDerLength,
-            aKeyPair->mDerLength);
+    memmove(aKeyPair->mDerBytes, aKeyPair->mDerBytes + OT_CRYPTO_ECDSA_MAX_DER_SIZE - aKeyPair->mDerLength, aKeyPair->mDerLength);
 
 exit:
     mbedtls_pk_free(&pk);
@@ -520,35 +511,33 @@ exit:
     return (ret >= 0) ? kErrorNone : MbedTls::MapError(ret);
 }
 
-OT_TOOL_WEAK otError otPlatCryptoEcdsaGetPublicKey(const otPlatCryptoEcdsaKeyPair *aKeyPair,
-                                                   otPlatCryptoEcdsaPublicKey     *aPublicKey)
+OT_TOOL_WEAK otError otPlatCryptoEcdsaGetPublicKey(const otPlatCryptoEcdsaKeyPair * aKeyPair,
+                                                   otPlatCryptoEcdsaPublicKey * aPublicKey)
 {
-    Error                error = kErrorNone;
-    mbedtls_pk_context   pk;
-    mbedtls_ecp_keypair *keyPair;
-    int                  ret;
+    Error error = kErrorNone;
+    mbedtls_pk_context pk;
+    mbedtls_ecp_keypair * keyPair;
+    int ret;
 
     mbedtls_pk_init(&pk);
 
     VerifyOrExit(mbedtls_pk_setup(&pk, mbedtls_pk_info_from_type(MBEDTLS_PK_ECKEY)) == 0, error = kErrorFailed);
 
 #if (MBEDTLS_VERSION_NUMBER >= 0x03000000)
-    VerifyOrExit(mbedtls_pk_parse_key(&pk, aKeyPair->mDerBytes, aKeyPair->mDerLength, nullptr, 0,
-                                      MbedTls::CryptoSecurePrng, nullptr) == 0,
-                 error = kErrorParse);
+    VerifyOrExit(
+        mbedtls_pk_parse_key(&pk, aKeyPair->mDerBytes, aKeyPair->mDerLength, nullptr, 0, MbedTls::CryptoSecurePrng, nullptr) == 0,
+        error = kErrorParse);
 #else
-    VerifyOrExit(mbedtls_pk_parse_key(&pk, aKeyPair->mDerBytes, aKeyPair->mDerLength, nullptr, 0) == 0,
-                 error = kErrorParse);
+    VerifyOrExit(mbedtls_pk_parse_key(&pk, aKeyPair->mDerBytes, aKeyPair->mDerLength, nullptr, 0) == 0, error = kErrorParse);
 #endif
 
     keyPair = mbedtls_pk_ec(pk);
 
-    ret = mbedtls_mpi_write_binary(&keyPair->MBEDTLS_PRIVATE(Q).MBEDTLS_PRIVATE(X), aPublicKey->m8,
-                                   Ecdsa::P256::kMpiSize);
+    ret = mbedtls_mpi_write_binary(&keyPair->MBEDTLS_PRIVATE(Q).MBEDTLS_PRIVATE(X), aPublicKey->m8, Ecdsa::P256::kMpiSize);
     VerifyOrExit(ret == 0, error = MbedTls::MapError(ret));
 
-    ret = mbedtls_mpi_write_binary(&keyPair->MBEDTLS_PRIVATE(Q).MBEDTLS_PRIVATE(Y),
-                                   aPublicKey->m8 + Ecdsa::P256::kMpiSize, Ecdsa::P256::kMpiSize);
+    ret = mbedtls_mpi_write_binary(&keyPair->MBEDTLS_PRIVATE(Q).MBEDTLS_PRIVATE(Y), aPublicKey->m8 + Ecdsa::P256::kMpiSize,
+                                   Ecdsa::P256::kMpiSize);
     VerifyOrExit(ret == 0, error = MbedTls::MapError(ret));
 
 exit:
@@ -556,17 +545,16 @@ exit:
     return error;
 }
 
-OT_TOOL_WEAK otError otPlatCryptoEcdsaSign(const otPlatCryptoEcdsaKeyPair *aKeyPair,
-                                           const otPlatCryptoSha256Hash   *aHash,
-                                           otPlatCryptoEcdsaSignature     *aSignature)
+OT_TOOL_WEAK otError otPlatCryptoEcdsaSign(const otPlatCryptoEcdsaKeyPair * aKeyPair, const otPlatCryptoSha256Hash * aHash,
+                                           otPlatCryptoEcdsaSignature * aSignature)
 {
-    Error                 error = kErrorNone;
-    mbedtls_pk_context    pk;
-    mbedtls_ecp_keypair  *keypair;
+    Error error = kErrorNone;
+    mbedtls_pk_context pk;
+    mbedtls_ecp_keypair * keypair;
     mbedtls_ecdsa_context ecdsa;
-    mbedtls_mpi           r;
-    mbedtls_mpi           s;
-    int                   ret;
+    mbedtls_mpi r;
+    mbedtls_mpi s;
+    int ret;
 
     mbedtls_pk_init(&pk);
     mbedtls_ecdsa_init(&ecdsa);
@@ -576,12 +564,11 @@ OT_TOOL_WEAK otError otPlatCryptoEcdsaSign(const otPlatCryptoEcdsaKeyPair *aKeyP
     VerifyOrExit(mbedtls_pk_setup(&pk, mbedtls_pk_info_from_type(MBEDTLS_PK_ECKEY)) == 0, error = kErrorFailed);
 
 #if (MBEDTLS_VERSION_NUMBER >= 0x03000000)
-    VerifyOrExit(mbedtls_pk_parse_key(&pk, aKeyPair->mDerBytes, aKeyPair->mDerLength, nullptr, 0,
-                                      MbedTls::CryptoSecurePrng, nullptr) == 0,
-                 error = kErrorParse);
+    VerifyOrExit(
+        mbedtls_pk_parse_key(&pk, aKeyPair->mDerBytes, aKeyPair->mDerLength, nullptr, 0, MbedTls::CryptoSecurePrng, nullptr) == 0,
+        error = kErrorParse);
 #else
-    VerifyOrExit(mbedtls_pk_parse_key(&pk, aKeyPair->mDerBytes, aKeyPair->mDerLength, nullptr, 0) == 0,
-                 error = kErrorParse);
+    VerifyOrExit(mbedtls_pk_parse_key(&pk, aKeyPair->mDerBytes, aKeyPair->mDerLength, nullptr, 0) == 0, error = kErrorParse);
 #endif
 
     keypair = mbedtls_pk_ec(pk);
@@ -590,11 +577,11 @@ OT_TOOL_WEAK otError otPlatCryptoEcdsaSign(const otPlatCryptoEcdsaKeyPair *aKeyP
     VerifyOrExit(ret == 0, error = MbedTls::MapError(ret));
 
 #if (MBEDTLS_VERSION_NUMBER >= 0x02130000)
-    ret = mbedtls_ecdsa_sign_det_ext(&ecdsa.MBEDTLS_PRIVATE(grp), &r, &s, &ecdsa.MBEDTLS_PRIVATE(d), aHash->m8,
-                                     Sha256::Hash::kSize, MBEDTLS_MD_SHA256, MbedTls::CryptoSecurePrng, nullptr);
+    ret = mbedtls_ecdsa_sign_det_ext(&ecdsa.MBEDTLS_PRIVATE(grp), &r, &s, &ecdsa.MBEDTLS_PRIVATE(d), aHash->m8, Sha256::Hash::kSize,
+                                     MBEDTLS_MD_SHA256, MbedTls::CryptoSecurePrng, nullptr);
 #else
-    ret = mbedtls_ecdsa_sign_det(&ecdsa.MBEDTLS_PRIVATE(grp), &r, &s, &ecdsa.MBEDTLS_PRIVATE(d), aHash->m8,
-                                 Sha256::Hash::kSize, MBEDTLS_MD_SHA256);
+    ret = mbedtls_ecdsa_sign_det(&ecdsa.MBEDTLS_PRIVATE(grp), &r, &s, &ecdsa.MBEDTLS_PRIVATE(d), aHash->m8, Sha256::Hash::kSize,
+                                 MBEDTLS_MD_SHA256);
 #endif
     VerifyOrExit(ret == 0, error = MbedTls::MapError(ret));
 
@@ -615,15 +602,14 @@ exit:
     return error;
 }
 
-OT_TOOL_WEAK otError otPlatCryptoEcdsaVerify(const otPlatCryptoEcdsaPublicKey *aPublicKey,
-                                             const otPlatCryptoSha256Hash     *aHash,
-                                             const otPlatCryptoEcdsaSignature *aSignature)
+OT_TOOL_WEAK otError otPlatCryptoEcdsaVerify(const otPlatCryptoEcdsaPublicKey * aPublicKey, const otPlatCryptoSha256Hash * aHash,
+                                             const otPlatCryptoEcdsaSignature * aSignature)
 {
-    Error                 error = kErrorNone;
+    Error error = kErrorNone;
     mbedtls_ecdsa_context ecdsa;
-    mbedtls_mpi           r;
-    mbedtls_mpi           s;
-    int                   ret;
+    mbedtls_mpi r;
+    mbedtls_mpi s;
+    int ret;
 
     mbedtls_ecdsa_init(&ecdsa);
     mbedtls_mpi_init(&r);
@@ -646,8 +632,7 @@ OT_TOOL_WEAK otError otPlatCryptoEcdsaVerify(const otPlatCryptoEcdsaPublicKey *a
     ret = mbedtls_mpi_read_binary(&s, aSignature->m8 + Ecdsa::P256::kMpiSize, Ecdsa::P256::kMpiSize);
     VerifyOrExit(ret == 0, error = MbedTls::MapError(ret));
 
-    ret = mbedtls_ecdsa_verify(&ecdsa.MBEDTLS_PRIVATE(grp), aHash->m8, Sha256::Hash::kSize, &ecdsa.MBEDTLS_PRIVATE(Q),
-                               &r, &s);
+    ret = mbedtls_ecdsa_verify(&ecdsa.MBEDTLS_PRIVATE(grp), aHash->m8, Sha256::Hash::kSize, &ecdsa.MBEDTLS_PRIVATE(Q), &r, &s);
     VerifyOrExit(ret == 0, error = kErrorSecurity);
 
 exit:
@@ -664,29 +649,24 @@ exit:
 
 #if OPENTHREAD_FTD
 
-OT_TOOL_WEAK otError otPlatCryptoPbkdf2GenerateKey(const uint8_t *aPassword,
-                                                   uint16_t       aPasswordLen,
-                                                   const uint8_t *aSalt,
-                                                   uint16_t       aSaltLen,
-                                                   uint32_t       aIterationCounter,
-                                                   uint16_t       aKeyLen,
-                                                   uint8_t       *aKey)
+OT_TOOL_WEAK otError otPlatCryptoPbkdf2GenerateKey(const uint8_t * aPassword, uint16_t aPasswordLen, const uint8_t * aSalt,
+                                                   uint16_t aSaltLen, uint32_t aIterationCounter, uint16_t aKeyLen, uint8_t * aKey)
 {
 #if (MBEDTLS_VERSION_NUMBER >= 0x03050000)
     const size_t kBlockSize = MBEDTLS_CMAC_MAX_BLOCK_SIZE;
 #else
     const size_t kBlockSize = MBEDTLS_CIPHER_BLKSIZE_MAX;
 #endif
-    uint8_t  prfInput[OT_CRYPTO_PBDKF2_MAX_SALT_SIZE + 4]; // Salt || INT(), for U1 calculation
-    long     prfOne[kBlockSize / sizeof(long)];
-    long     prfTwo[kBlockSize / sizeof(long)];
-    long     keyBlock[kBlockSize / sizeof(long)];
+    uint8_t prfInput[OT_CRYPTO_PBDKF2_MAX_SALT_SIZE + 4]; // Salt || INT(), for U1 calculation
+    long prfOne[kBlockSize / sizeof(long)];
+    long prfTwo[kBlockSize / sizeof(long)];
+    long keyBlock[kBlockSize / sizeof(long)];
     uint32_t blockCounter = 0;
-    uint8_t *key          = aKey;
+    uint8_t * key         = aKey;
     uint16_t keyLen       = aKeyLen;
     uint16_t useLen       = 0;
-    Error    error        = kErrorNone;
-    int      ret;
+    Error error           = kErrorNone;
+    int ret;
 
     OT_ASSERT(aSaltLen <= sizeof(prfInput));
     memcpy(prfInput, aSalt, aSaltLen);
@@ -707,8 +687,7 @@ OT_TOOL_WEAK otError otPlatCryptoPbkdf2GenerateKey(const uint8_t *aPassword,
         prfInput[aSaltLen + 3] = static_cast<uint8_t>(blockCounter);
 
         // Calculate U_1
-        ret = mbedtls_aes_cmac_prf_128(aPassword, aPasswordLen, prfInput, aSaltLen + 4,
-                                       reinterpret_cast<uint8_t *>(keyBlock));
+        ret = mbedtls_aes_cmac_prf_128(aPassword, aPasswordLen, prfInput, aSaltLen + 4, reinterpret_cast<uint8_t *>(keyBlock));
         VerifyOrExit(ret == 0, error = MbedTls::MapError(ret));
 
         // Calculate U_2
@@ -724,12 +703,12 @@ OT_TOOL_WEAK otError otPlatCryptoPbkdf2GenerateKey(const uint8_t *aPassword,
         for (uint32_t i = 1; i < aIterationCounter; ++i)
         {
             // Calculate U_{2 * i - 1}
-            ret = mbedtls_aes_cmac_prf_128(aPassword, aPasswordLen, reinterpret_cast<const uint8_t *>(prfOne),
-                                           kBlockSize, reinterpret_cast<uint8_t *>(prfTwo));
+            ret = mbedtls_aes_cmac_prf_128(aPassword, aPasswordLen, reinterpret_cast<const uint8_t *>(prfOne), kBlockSize,
+                                           reinterpret_cast<uint8_t *>(prfTwo));
             VerifyOrExit(ret == 0, error = MbedTls::MapError(ret));
             // Calculate U_{2 * i}
-            ret = mbedtls_aes_cmac_prf_128(aPassword, aPasswordLen, reinterpret_cast<const uint8_t *>(prfTwo),
-                                           kBlockSize, reinterpret_cast<uint8_t *>(prfOne));
+            ret = mbedtls_aes_cmac_prf_128(aPassword, aPasswordLen, reinterpret_cast<const uint8_t *>(prfTwo), kBlockSize,
+                                           reinterpret_cast<uint8_t *>(prfOne));
             VerifyOrExit(ret == 0, error = MbedTls::MapError(ret));
 
             for (uint32_t j = 0; j < kBlockSize / sizeof(long); ++j)
@@ -755,15 +734,15 @@ exit:
 #if OPENTHREAD_FTD || OPENTHREAD_MTD
 #if OPENTHREAD_CONFIG_ECDSA_ENABLE
 
-OT_TOOL_WEAK otError otPlatCryptoEcdsaGenerateKey(otPlatCryptoEcdsaKeyPair *aKeyPair)
+OT_TOOL_WEAK otError otPlatCryptoEcdsaGenerateKey(otPlatCryptoEcdsaKeyPair * aKeyPair)
 {
     OT_UNUSED_VARIABLE(aKeyPair);
 
     return OT_ERROR_NOT_CAPABLE;
 }
 
-OT_TOOL_WEAK otError otPlatCryptoEcdsaGetPublicKey(const otPlatCryptoEcdsaKeyPair *aKeyPair,
-                                                   otPlatCryptoEcdsaPublicKey     *aPublicKey)
+OT_TOOL_WEAK otError otPlatCryptoEcdsaGetPublicKey(const otPlatCryptoEcdsaKeyPair * aKeyPair,
+                                                   otPlatCryptoEcdsaPublicKey * aPublicKey)
 {
     OT_UNUSED_VARIABLE(aKeyPair);
     OT_UNUSED_VARIABLE(aPublicKey);
@@ -771,9 +750,8 @@ OT_TOOL_WEAK otError otPlatCryptoEcdsaGetPublicKey(const otPlatCryptoEcdsaKeyPai
     return OT_ERROR_NOT_CAPABLE;
 }
 
-OT_TOOL_WEAK otError otPlatCryptoEcdsaSign(const otPlatCryptoEcdsaKeyPair *aKeyPair,
-                                           const otPlatCryptoSha256Hash   *aHash,
-                                           otPlatCryptoEcdsaSignature     *aSignature)
+OT_TOOL_WEAK otError otPlatCryptoEcdsaSign(const otPlatCryptoEcdsaKeyPair * aKeyPair, const otPlatCryptoSha256Hash * aHash,
+                                           otPlatCryptoEcdsaSignature * aSignature)
 {
     OT_UNUSED_VARIABLE(aKeyPair);
     OT_UNUSED_VARIABLE(aHash);
@@ -782,9 +760,8 @@ OT_TOOL_WEAK otError otPlatCryptoEcdsaSign(const otPlatCryptoEcdsaKeyPair *aKeyP
     return OT_ERROR_NOT_CAPABLE;
 }
 
-OT_TOOL_WEAK otError otPlatCryptoEcdsaVerify(const otPlatCryptoEcdsaPublicKey *aPublicKey,
-                                             const otPlatCryptoSha256Hash     *aHash,
-                                             const otPlatCryptoEcdsaSignature *aSignature)
+OT_TOOL_WEAK otError otPlatCryptoEcdsaVerify(const otPlatCryptoEcdsaPublicKey * aPublicKey, const otPlatCryptoSha256Hash * aHash,
+                                             const otPlatCryptoEcdsaSignature * aSignature)
 
 {
     OT_UNUSED_VARIABLE(aPublicKey);
@@ -799,13 +776,8 @@ OT_TOOL_WEAK otError otPlatCryptoEcdsaVerify(const otPlatCryptoEcdsaPublicKey *a
 
 #if OPENTHREAD_FTD
 
-OT_TOOL_WEAK otError otPlatCryptoPbkdf2GenerateKey(const uint8_t *aPassword,
-                                                   uint16_t       aPasswordLen,
-                                                   const uint8_t *aSalt,
-                                                   uint16_t       aSaltLen,
-                                                   uint32_t       aIterationCounter,
-                                                   uint16_t       aKeyLen,
-                                                   uint8_t       *aKey)
+OT_TOOL_WEAK otError otPlatCryptoPbkdf2GenerateKey(const uint8_t * aPassword, uint16_t aPasswordLen, const uint8_t * aSalt,
+                                                   uint16_t aSaltLen, uint32_t aIterationCounter, uint16_t aKeyLen, uint8_t * aKey)
 {
     OT_UNUSED_VARIABLE(aPassword);
     OT_UNUSED_VARIABLE(aPasswordLen);

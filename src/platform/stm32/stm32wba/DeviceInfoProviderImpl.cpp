@@ -70,8 +70,7 @@ bool DeviceInfoProviderImpl::FixedLabelIteratorImpl::Next(FixedLabelType & outpu
         return false;
     }
 
-    ChipLogProgress(DeviceLayer, "Get the fixed label with index:%u at endpoint:%d",
-                    static_cast<unsigned>(mIndex), mEndpoint);
+    ChipLogProgress(DeviceLayer, "Get the fixed label with index:%u at endpoint:%d", static_cast<unsigned>(mIndex), mEndpoint);
 
     VerifyOrReturnError(std::strlen(kDefaultLabel) <= kMaxLabelNameLength, false);
     VerifyOrReturnError(std::strlen(kDefaultValue) <= kMaxLabelValueLength, false);
@@ -191,28 +190,28 @@ DeviceInfoProvider::SupportedLocalesIterator * DeviceInfoProviderImpl::IterateSu
 
 size_t DeviceInfoProviderImpl::SupportedLocalesIteratorImpl::Count()
 {
-	// only a default.
-	return 1;
+    // only a default.
+    return 1;
 }
 
 bool DeviceInfoProviderImpl::SupportedLocalesIteratorImpl::Next(CharSpan & output)
 {
-	// Only one default Locale.
-	static constexpr const char kDefaultLocale[] = "en-US";
+    // Only one default Locale.
+    static constexpr const char kDefaultLocale[] = "en-US";
 
-	// If we've already returned it once, stop iterating.
-	if (mIndex > 0)
-	{
-		return false;
-	}
+    // If we've already returned it once, stop iterating.
+    if (mIndex > 0)
+    {
+        return false;
+    }
 
-	VerifyOrReturnError(std::strlen(kDefaultLocale) <= kMaxActiveLocaleLength, false);
+    VerifyOrReturnError(std::strlen(kDefaultLocale) <= kMaxActiveLocaleLength, false);
 
-	Platform::CopyString(mActiveLocaleBuf, kMaxActiveLocaleLength + 1, kDefaultLocale);
-	output = CharSpan::fromCharString(mActiveLocaleBuf);
+    Platform::CopyString(mActiveLocaleBuf, kMaxActiveLocaleLength + 1, kDefaultLocale);
+    output = CharSpan::fromCharString(mActiveLocaleBuf);
 
-	mIndex++;
-	return true;
+    mIndex++;
+    return true;
 }
 
 DeviceInfoProvider::SupportedCalendarTypesIterator * DeviceInfoProviderImpl::IterateSupportedCalendarTypes()
@@ -222,25 +221,25 @@ DeviceInfoProvider::SupportedCalendarTypesIterator * DeviceInfoProviderImpl::Ite
 
 size_t DeviceInfoProviderImpl::SupportedCalendarTypesIteratorImpl::Count()
 {
-	// only a default.
-	return 1;
+    // only a default.
+    return 1;
 }
 
 bool DeviceInfoProviderImpl::SupportedCalendarTypesIteratorImpl::Next(CalendarType & output)
 {
-	// Only one default calendar type.
-	static constexpr app::Clusters::TimeFormatLocalization::CalendarTypeEnum kDefaultCalendarType =
-		app::Clusters::TimeFormatLocalization::CalendarTypeEnum::kGregorian;
+    // Only one default calendar type.
+    static constexpr app::Clusters::TimeFormatLocalization::CalendarTypeEnum kDefaultCalendarType =
+        app::Clusters::TimeFormatLocalization::CalendarTypeEnum::kGregorian;
 
-	// If we've already returned it once, stop iterating.
-	if (mIndex > 0)
-	{
-		return false;
-	}
+    // If we've already returned it once, stop iterating.
+    if (mIndex > 0)
+    {
+        return false;
+    }
 
-	output = kDefaultCalendarType;
-	mIndex++;
-	return true;
+    output = kDefaultCalendarType;
+    mIndex++;
+    return true;
 }
 
 } // namespace DeviceLayer

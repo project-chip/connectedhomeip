@@ -23,7 +23,6 @@
 
 #include <functional>
 
-
 #include <lib/core/CHIPError.h>
 
 class LightingManager
@@ -59,7 +58,6 @@ private:
     State_t mState;
     uint8_t mLevel;
 
-
     LightingCallback_fn mActionInitiated_CB;
     LightingCallback_fn mActionCompleted_CB;
 
@@ -68,7 +66,6 @@ private:
     void UpdateLight();
 
     static LightingManager sLight;
-
 };
 
 inline LightingManager & LightingMgr(void)

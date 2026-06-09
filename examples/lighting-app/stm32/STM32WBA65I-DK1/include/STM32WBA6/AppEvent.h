@@ -16,11 +16,11 @@
  *    limitations under the License.
  */
 
+#include <stdarg.h>
 #include <stdint.h>
-#include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdarg.h>
+#include <string.h>
 
 #ifndef APP_EVENT_H
 #define APP_EVENT_H
