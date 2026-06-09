@@ -74,7 +74,7 @@ class AttributeChangeAccumulator:
                 'attribute': path.AttributeType,
                 'value': data
             }
-            log.info("Got subscription report on client %s for %s: %s" % (self.name, path.AttributeType, data))
+            log.info("Got subscription report on client %s for %s: %s", self.name, path.AttributeType, data)
             self._output.put(value)
 
     @property
@@ -89,7 +89,7 @@ class ResubscriptionCatcher:
 
     def __call__(self, transaction: SubscriptionTransaction, terminationError, nextResubscribeIntervalMsec):
         self._got_resubscription_event.set()
-        log.info("Got resubscription on client %s" % self.name)
+        log.info("Got resubscription on client %s", self.name)
 
     @property
     def name(self) -> str:
@@ -134,7 +134,7 @@ class TC_SC_3_6(MatterBaseTest):
         for fabric_idx in range(num_fabrics_to_commission):
             for controller_idx in range(num_controllers_per_fabric):
                 all_names.append("RD%d%s" % (fabric_idx + 1, chr(ord('A') + controller_idx)))
-        log.info("Client names that will be used: %s" % all_names)
+        log.info("Client names that will be used: %s", all_names)
         client_list = []
 
         log.info("Pre-conditions: validate CapabilityMinima.CaseSessionsPerFabric >= 3")
@@ -161,11 +161,11 @@ class TC_SC_3_6(MatterBaseTest):
                 if fabric.fabricIndex == current_fabric_index:
                     continue
                 # This is not the test client's fabric, so remove it.
-                log.info(f"Removing extra fabric at {fabric.fabricIndex} from device.")
+                log.info("Removing extra fabric at %s from device.", fabric.fabricIndex)
                 await dev_ctrl.SendCommand(
                     self.dut_node_id, 0, Clusters.OperationalCredentials.Commands.RemoveFabric(fabricIndex=fabric.fabricIndex))
 
-        log.info("Pre-conditions: use existing fabric to configure new fabrics so that total is %d fabrics" %
+        log.info("Pre-conditions: use existing fabric to configure new fabrics so that total is %d fabrics",
                  num_fabrics_to_commission)
 
         # Generate Node IDs for subsequent controllers start at 200, follow 200, 300, ...
@@ -190,7 +190,7 @@ class TC_SC_3_6(MatterBaseTest):
         # Prepare clients for subsequent fabrics
         for i in range(num_fabrics_to_commission - 1):
             admin_index = 2 + i
-            log.info("Commissioning fabric %d/%d" % (admin_index, num_fabrics_to_commission))
+            log.info("Commissioning fabric %d/%d", admin_index, num_fabrics_to_commission)
             new_certificate_authority = self.certificate_authority_manager.NewCertificateAuthority()
             new_fabric_admin = new_certificate_authority.NewFabricAdmin(vendorId=0xFFF1, fabricId=1)
             new_admin_ctrl = new_fabric_admin.NewController(nodeId=dev_ctrl.nodeId)
@@ -229,9 +229,9 @@ class TC_SC_3_6(MatterBaseTest):
         resub_catchers = []
         output_queue = queue.Queue()
 
-        log.info("Step 1 (first part): Establish subscription with all %d clients" % len(client_list))
+        log.info("Step 1 (first part): Establish subscription with all %d clients", len(client_list))
         for sub_idx, client in enumerate(client_list):
-            log.info("Establishing subscription %d/%d from controller node %s" % (sub_idx + 1, len(client_list), client.name))
+            log.info("Establishing subscription %d/%d from controller node %s", sub_idx + 1, len(client_list), client.name)
 
             sub = await client.ReadAttribute(
                 nodeId=self.dut_node_id,
@@ -275,7 +275,7 @@ class TC_SC_3_6(MatterBaseTest):
                 # Record arrival of an expected subscription change when seen
                 if endpoint == 0 and attribute == Clusters.BasicInformation.Attributes.NodeLabel and value == AFTER_LABEL:
                     if not all_changes[client_name]:
-                        log.info("Got expected attribute change for client %s" % client_name)
+                        log.info("Got expected attribute change for client %s", client_name)
                         all_changes[client_name] = True
 
                 # We are done waiting when we have accumulated all results
@@ -294,14 +294,14 @@ class TC_SC_3_6(MatterBaseTest):
 
         for catcher in resub_catchers:
             if catcher.caught_resubscription:
-                log.error("Client %s saw a resubscription" % catcher.name)
+                log.error("Client %s saw a resubscription", catcher.name)
                 failed = True
             else:
-                log.info("Client %s correctly did not see a resubscription" % catcher.name)
+                log.info("Client %s correctly did not see a resubscription", catcher.name)
 
         all_reports_gotten = all(all_changes.values())
         if not all_reports_gotten:
-            log.error("Missing reports from the following clients: %s" %
+            log.error("Missing reports from the following clients: %s",
                       ", ".join([name for name, value in all_changes.items() if value is False]))
             failed = True
         else:

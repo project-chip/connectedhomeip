@@ -43,7 +43,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-nxp:194
+            image: ghcr.io/project-chip/chip-build-nxp:199
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
         steps:
@@ -62,6 +62,7 @@ jobs:
                   filters: |
                       nxp:
                         - '**/nxp/**'
+                        - 'third_party/simw-top-mini/**'
 
             - name: Set up environment for size reports
               uses: ./.github/actions/setup-size-reports
@@ -146,7 +147,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-nxp-zephyr:194
+            image: ghcr.io/project-chip/chip-build-nxp-zephyr:199
 
         steps:
             - name: Checkout
@@ -164,6 +165,7 @@ jobs:
                         - '**/nxp/**'
                         - '**/Zephyr/**'
                         - '**/zephyr/**'
+                        - 'third_party/simw-top-mini/**'
                       pigweed:
                         - 'src/pw_backends/**'
                         - 'third_party/pigweed/**'

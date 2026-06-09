@@ -65,7 +65,7 @@ class TC_SEAR_1_5(MatterBaseTest):
         self.print_step(step, "Read SupportedAreas attribute")
         supported_areas = await self.read_sear_attribute_expect_success(
             endpoint=self.endpoint, attribute=Clusters.ServiceArea.Attributes.SupportedAreas)
-        log.info("SupportedAreas: %s" % supported_areas)
+        log.info("SupportedAreas: %s", supported_areas)
 
         return [a.areaID for a in supported_areas]
 
@@ -73,7 +73,7 @@ class TC_SEAR_1_5(MatterBaseTest):
         self.print_step(step, "Read SelectedAreas attribute")
         selected_areas = await self.read_sear_attribute_expect_success(
             endpoint=self.endpoint, attribute=Clusters.ServiceArea.Attributes.SelectedAreas)
-        log.info(f"SelectedAreas {selected_areas}")
+        log.info("SelectedAreas %s", selected_areas)
 
         return selected_areas
 
@@ -81,7 +81,7 @@ class TC_SEAR_1_5(MatterBaseTest):
         self.print_step(step, "Read Progress attribute")
         progress = await self.read_sear_attribute_expect_success(
             endpoint=self.endpoint, attribute=Clusters.ServiceArea.Attributes.Progress)
-        log.info(f"Progress {progress}")
+        log.info("Progress %s", progress)
 
         return progress
 
@@ -89,7 +89,7 @@ class TC_SEAR_1_5(MatterBaseTest):
         self.print_step(step, "Read CurrentArea attribute")
         current_area = await self.read_sear_attribute_expect_success(
             endpoint=self.endpoint, attribute=Clusters.ServiceArea.Attributes.CurrentArea)
-        log.info(f"CurrentArea {current_area}")
+        log.info("CurrentArea %s", current_area)
 
         return current_area
 

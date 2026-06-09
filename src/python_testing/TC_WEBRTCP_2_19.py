@@ -134,14 +134,14 @@ class TC_WEBRTCP_2_19(MatterBaseTest, WEBRTCPTestBase):
                              "Incorrect response type")
         session_id = resp.webRTCSessionID
         asserts.assert_true(session_id >= 0, f"Invalid session ID: {session_id}")
-        log.info(f"DUT allocated WebRTC session ID: {session_id}")
+        log.info("DUT allocated WebRTC session ID: %s", session_id)
 
         # Register the session ID with the WebRTC manager so it can handle incoming commands
         webrtc_manager.session_id_created(session_id, self.dut_node_id)
 
         self.step(3)
         # Wait for incoming Offer command from DUT on WebRTC Requestor cluster
-        log.info(f"Waiting for Offer command from DUT for session {session_id}")
+        log.info("Waiting for Offer command from DUT for session %s", session_id)
 
         # Wait for the Offer command from the DUT
         offer_sessionId, offer_sdp = await webrtc_peer.get_remote_offer(timeout_s=30)
@@ -149,11 +149,11 @@ class TC_WEBRTCP_2_19(MatterBaseTest, WEBRTCPTestBase):
         # Verify the Offer command contains the same session ID
         asserts.assert_equal(offer_sessionId, session_id,
                              f"Offer session ID {offer_sessionId} does not match expected {session_id}")
-        log.info(f"Received Offer command for session {session_id}")
+        log.info("Received Offer command for session %s", session_id)
 
         # Verify the Offer contains valid SDP content
         asserts.assert_true(len(offer_sdp) > 0, "SDP offer is empty")
-        log.info(f"Received SDP offer with length: {len(offer_sdp)} bytes")
+        log.info("Received SDP offer with length: %s bytes", len(offer_sdp))
         webrtc_peer.set_remote_offer(offer_sdp)
 
         self.step(4)
@@ -165,7 +165,7 @@ class TC_WEBRTCP_2_19(MatterBaseTest, WEBRTCPTestBase):
 
         # Use an invalid session ID (e.g., session_id + 1000 to ensure it doesn't exist)
         invalid_session_id = session_id + 1000
-        log.info(f"Using invalid session ID: {invalid_session_id}")
+        log.info("Using invalid session ID: %s", invalid_session_id)
 
         # Send the ProvideAnswer command with invalid session ID and expect NOT_FOUND
         try:
@@ -178,11 +178,11 @@ class TC_WEBRTCP_2_19(MatterBaseTest, WEBRTCPTestBase):
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.NotFound,
                                  f"Expected NOT_FOUND status, got {e.status}")
-            log.info(f"Correctly received NOT_FOUND error for invalid session ID {invalid_session_id}")
+            log.info("Correctly received NOT_FOUND error for invalid session ID %s", invalid_session_id)
 
         self.step(5)
         # Send EndSession command to terminate the WebRTC session
-        log.info(f"Sending EndSession command for session {session_id}")
+        log.info("Sending EndSession command for session %s", session_id)
 
         await self.send_single_cmd(
             cmd=Clusters.WebRTCTransportProvider.Commands.EndSession(
@@ -192,7 +192,7 @@ class TC_WEBRTCP_2_19(MatterBaseTest, WEBRTCPTestBase):
             endpoint=endpoint,
         )
 
-        log.info(f"Successfully ended WebRTC session {session_id}")
+        log.info("Successfully ended WebRTC session %s", session_id)
 
         self.step(6)
         # Deallocate the Audio and Video streams to return DUT to known state
@@ -205,7 +205,7 @@ class TC_WEBRTCP_2_19(MatterBaseTest, WEBRTCPTestBase):
             ),
             endpoint=endpoint,
         )
-        log.info(f"Successfully deallocated audio stream {audio_stream_id}")
+        log.info("Successfully deallocated audio stream %s", audio_stream_id)
 
         # Deallocate video stream
         await self.send_single_cmd(
@@ -214,7 +214,7 @@ class TC_WEBRTCP_2_19(MatterBaseTest, WEBRTCPTestBase):
             ),
             endpoint=endpoint,
         )
-        log.info(f"Successfully deallocated video stream {video_stream_id}")
+        log.info("Successfully deallocated video stream %s", video_stream_id)
 
         # Clean up
         await webrtc_manager.close_all()
