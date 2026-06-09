@@ -19,7 +19,7 @@ RUN set -x \
     && git checkout ${ZEPHYR_SILABS_HASH} \
     && cd ../ \
     && west update \
-    && pip3 install -r zephyr/scripts/requirements.txt \ 
+    && pip3 install -r zephyr/scripts/requirements.txt \
     && west blobs fetch \
     && mkdir -p /opt/silabs/sdk \
     && cd /opt/silabs/sdk \
