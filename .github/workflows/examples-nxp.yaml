@@ -62,6 +62,7 @@ jobs:
                   filters: |
                       nxp:
                         - '**/nxp/**'
+                        - 'third_party/simw-top-mini/**'
 
             - name: Set up environment for size reports
               uses: ./.github/actions/setup-size-reports
@@ -164,6 +165,7 @@ jobs:
                         - '**/nxp/**'
                         - '**/Zephyr/**'
                         - '**/zephyr/**'
+                        - 'third_party/simw-top-mini/**'
                       pigweed:
                         - 'src/pw_backends/**'
                         - 'third_party/pigweed/**'
