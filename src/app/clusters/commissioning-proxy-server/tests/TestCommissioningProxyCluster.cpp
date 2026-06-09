@@ -611,7 +611,7 @@ TEST_F(TestCommissioningProxyCluster, TestProxyConnectRequest_ReservedTransportB
     auto code = result.GetStatusCode();
     ASSERT_TRUE(code.has_value());
     // Spec §10.5.7.1: invalid Transport → InvalidTransportType
-    EXPECT_EQ(code->GetStatus(), Protocols::InteractionModel::Status::InvalidTransportType);
+    EXPECT_EQ(code.value().GetStatus(), Protocols::InteractionModel::Status::InvalidTransportType);
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
@@ -648,7 +648,7 @@ TEST_F(TestCommissioningProxyCluster, TestProxyConnectRequest_BleCapability)
     auto result = tester.Invoke(MakeConnectRequest(CapabilitiesBitmap::kBle));
     EXPECT_TRUE(result.IsSuccess());
     ASSERT_TRUE(result.response.has_value());
-    EXPECT_EQ(result.response->sessionId, 1u);
+    EXPECT_EQ(result.response.value().sessionId, 1u);
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
@@ -676,7 +676,7 @@ TEST_F(TestCommissioningProxyCluster, TestProxyConnectRequest_WiFiBandWithBleTra
     EXPECT_FALSE(result.IsSuccess());
     auto code = result.GetStatusCode();
     ASSERT_TRUE(code.has_value());
-    EXPECT_EQ(code->GetStatus(), Protocols::InteractionModel::Status::InvalidCommand);
+    EXPECT_EQ(code.value().GetStatus(), Protocols::InteractionModel::Status::InvalidCommand);
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
@@ -696,7 +696,7 @@ TEST_F(TestCommissioningProxyCluster, TestProxyConnectRequest_WiFiPAFWithWIFeatu
 
     EXPECT_TRUE(result.IsSuccess());
     ASSERT_TRUE(result.response.has_value());
-    EXPECT_EQ(result.response->sessionId, 1u);
+    EXPECT_EQ(result.response.value().sessionId, 1u);
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
@@ -826,7 +826,7 @@ TEST_F(TestCommissioningProxyCluster, TestProxyConnectRequest_ResourceExhaustedA
     EXPECT_FALSE(result.IsSuccess());
     auto code = result.GetStatusCode();
     ASSERT_TRUE(code.has_value());
-    EXPECT_EQ(code->GetStatus(), Protocols::InteractionModel::Status::ResourceExhausted);
+    EXPECT_EQ(code.value().GetStatus(), Protocols::InteractionModel::Status::ResourceExhausted);
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
@@ -874,7 +874,7 @@ TEST_F(TestCommissioningProxyCluster, TestProxyConnectRequest_DelegateTimeout_Pr
     EXPECT_FALSE(result.IsSuccess());
     auto code = result.GetStatusCode();
     ASSERT_TRUE(code.has_value());
-    EXPECT_EQ(code->GetStatus(), Protocols::InteractionModel::Status::Timeout);
+    EXPECT_EQ(code.value().GetStatus(), Protocols::InteractionModel::Status::Timeout);
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
@@ -897,7 +897,7 @@ TEST_F(TestCommissioningProxyCluster, TestProxyDisconnectRequest_AfterConnect)
 
     // Disconnect the session using the sessionId from the response.
     Commands::ProxyDisconnectRequest::Type cmd;
-    cmd.sessionId = connectResult.response->sessionId;
+    cmd.sessionId = connectResult.response.value().sessionId;
     EXPECT_TRUE(tester.Invoke(cmd).IsSuccess());
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
@@ -1010,7 +1010,7 @@ TEST_F(TestCommissioningProxyCluster, TestProxyDisconnectRequest_CancelPending_A
     EXPECT_FALSE(result.IsSuccess());
     auto code = result.GetStatusCode();
     ASSERT_TRUE(code.has_value());
-    EXPECT_EQ(code->GetStatus(), Protocols::InteractionModel::Status::InvalidInState);
+    EXPECT_EQ(code.value().GetStatus(), Protocols::InteractionModel::Status::InvalidInState);
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
@@ -1045,7 +1045,7 @@ TEST_F(TestCommissioningProxyCluster, TestProxyDisconnectRequest_CancelPending_W
     EXPECT_FALSE(result.IsSuccess());
     auto code = result.GetStatusCode();
     ASSERT_TRUE(code.has_value());
-    EXPECT_EQ(code->GetStatus(), Protocols::InteractionModel::Status::NotFound);
+    EXPECT_EQ(code.value().GetStatus(), Protocols::InteractionModel::Status::NotFound);
 
     // Fabric 1 (the owner) cancels its own pending connect — SHALL succeed.
     tester.SetFabricIndex(1);
@@ -1300,7 +1300,7 @@ TEST_F(TestCommissioningProxyCluster, TestProxyMessageRequest_WithMessage)
     auto result = tester.Invoke(cmd);
     EXPECT_TRUE(result.IsSuccess());
     ASSERT_TRUE(result.response.has_value());
-    EXPECT_EQ(result.response->sessionId, 1u);
+    EXPECT_EQ(result.response.value().sessionId, 1u);
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
@@ -1324,9 +1324,9 @@ TEST_F(TestCommissioningProxyCluster, TestProxyMessageRequest_NullMessage_Poll)
     auto result = tester.Invoke(cmd);
     EXPECT_TRUE(result.IsSuccess());
     ASSERT_TRUE(result.response.has_value());
-    EXPECT_EQ(result.response->sessionId, 1u);
+    EXPECT_EQ(result.response.value().sessionId, 1u);
     // Null response message signals no pending data from commissionee.
-    EXPECT_TRUE(result.response->message.IsNull());
+    EXPECT_TRUE(result.response.value().message.IsNull());
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
@@ -1350,7 +1350,7 @@ TEST_F(TestCommissioningProxyCluster, TestProxyMessageRequest_SessionIdEchoed)
     auto result = tester.Invoke(cmd);
     ASSERT_TRUE(result.IsSuccess());
     ASSERT_TRUE(result.response.has_value());
-    EXPECT_EQ(result.response->sessionId, 42u);
+    EXPECT_EQ(result.response.value().sessionId, 42u);
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
@@ -1387,7 +1387,7 @@ TEST_F(TestCommissioningProxyCluster, TestProxyMessageRequest_DelegateNotFound_P
     EXPECT_FALSE(result.IsSuccess());
     auto code = result.GetStatusCode();
     ASSERT_TRUE(code.has_value());
-    EXPECT_EQ(code->GetStatus(), Protocols::InteractionModel::Status::NotFound);
+    EXPECT_EQ(code.value().GetStatus(), Protocols::InteractionModel::Status::NotFound);
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
@@ -1422,7 +1422,7 @@ TEST_F(TestCommissioningProxyCluster, TestProxyMessageRequest_DelegateBusy_Propa
     EXPECT_FALSE(result.IsSuccess());
     auto code = result.GetStatusCode();
     ASSERT_TRUE(code.has_value());
-    EXPECT_EQ(code->GetStatus(), Protocols::InteractionModel::Status::Busy);
+    EXPECT_EQ(code.value().GetStatus(), Protocols::InteractionModel::Status::Busy);
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
@@ -1452,7 +1452,7 @@ TEST_F(TestCommissioningProxyCluster, TestProxyDisconnectRequest_DelegateNotFoun
     EXPECT_FALSE(result.IsSuccess());
     auto code = result.GetStatusCode();
     ASSERT_TRUE(code.has_value());
-    EXPECT_EQ(code->GetStatus(), Protocols::InteractionModel::Status::NotFound);
+    EXPECT_EQ(code.value().GetStatus(), Protocols::InteractionModel::Status::NotFound);
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
@@ -1854,7 +1854,7 @@ TEST_F(TestCommissioningProxyCluster, TestBgScanStop_DelegateNotFound_Propagated
     EXPECT_FALSE(result.IsSuccess());
     auto code = result.GetStatusCode();
     ASSERT_TRUE(code.has_value());
-    EXPECT_EQ(code->GetStatus(), Protocols::InteractionModel::Status::NotFound);
+    EXPECT_EQ(code.value().GetStatus(), Protocols::InteractionModel::Status::NotFound);
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }

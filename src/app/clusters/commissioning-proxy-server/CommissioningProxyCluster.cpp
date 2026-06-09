@@ -506,7 +506,7 @@ CHIP_ERROR CommissioningProxyCluster::SetCPState(CommissioningProxyCluster::Stat
     return CHIP_NO_ERROR;
 }
 
-CommissioningProxyCluster::State_t CommissioningProxyCluster::GetCPState(void)
+CommissioningProxyCluster::State_t CommissioningProxyCluster::GetCPState()
 {
     return mMainCommissioningProxyState;
 }

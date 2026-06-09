@@ -58,6 +58,7 @@ enum class PairingMode
     AlreadyDiscoveredByIndexWithCode,
     OnNetwork,
     Nfc,
+    Proxy,
 };
 
 enum class PairingNetworkType

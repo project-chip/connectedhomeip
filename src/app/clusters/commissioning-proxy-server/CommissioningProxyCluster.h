@@ -104,7 +104,7 @@ public:
     CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,
                                 ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
     CHIP_ERROR SetCPState(State_t state);
-    CommissioningProxyCluster::State_t GetCPState(void);
+    CommissioningProxyCluster::State_t GetCPState();
 
     /**
      * @brief Notify subscribers that CachedResults and NumCachedResults have changed.
