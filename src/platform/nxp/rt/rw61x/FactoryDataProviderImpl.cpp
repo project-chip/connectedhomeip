@@ -304,7 +304,7 @@ CHIP_ERROR FactoryDataProviderImpl::ELS_ConvertDacKey()
 
     uint8_t * data = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(newSize));
     /* Import pain DAC key and generate the blob */
-    SuccessOrExit(ELS_ExportBlob(blob, &blobSize, KeyAddr));
+    SuccessOrExit(error = ELS_ExportBlob(blob, &blobSize, KeyAddr));
 
     ChipLogProgress(DeviceLayer, "SSS: extracted blob from DAC private key");
     PLOG_DEBUG_BUFFER("blob", blob, blobSize);
@@ -318,7 +318,7 @@ CHIP_ERROR FactoryDataProviderImpl::ELS_ConvertDacKey()
 
     /* Replace private plain DAC key by the blob into factory data RAM buffer (the blob length is higher then the plain key length)
      */
-    SuccessOrExit(ReplaceWithBlob(data, blob, blobSize, KeyAddr));
+    SuccessOrExit(error = ReplaceWithBlob(data, blob, blobSize, KeyAddr));
     ChipLogError(DeviceLayer, "SSS: replaced DAC private key with secured blob");
 
     /* Erase flash factory data sectors */
