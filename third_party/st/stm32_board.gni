@@ -24,7 +24,6 @@ if (stm32_board == "") {
   stm32_board = "STM32WBA65I-DK1"
 }
 
-
 assert(stm32_board != "", "stm32_board must be specified")
 
 # Differentiate between boards

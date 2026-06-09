@@ -28,7 +28,6 @@ if (chip_crypto == "platform") {
   import("//build_overrides/mbedtls.gni")
 }
 
-
 static_library("stm32wba") {
   friend = [ ":lighting_app" ]
   deps = [ "${chip_root}/src/setup_payload" ]
@@ -66,10 +65,10 @@ static_library("stm32wba") {
     "SystemPlatformConfig.h",
   ]
 
-    deps += [
-      "${chip_root}/src/app/clusters/ota-requestor:interface",
-      "${chip_root}/src/app/common:ids",
-    ]
+  deps += [
+    "${chip_root}/src/app/clusters/ota-requestor:interface",
+    "${chip_root}/src/app/common:ids",
+  ]
   public = [
     "${chip_root}/src/credentials/DeviceAttestationCredsProvider.h",
     "${chip_root}/src/credentials/examples/ExampleDACs.h",
@@ -80,7 +79,7 @@ static_library("stm32wba") {
   ]
 
   if (chip_enable_thread) {
-      sources += [
+    sources += [
       "../../OpenThread/DnssdImpl.cpp",
       "../../OpenThread/OpenThreadDnssdImpl.cpp",
       "../../OpenThread/OpenThreadUtils.cpp",
@@ -115,5 +114,5 @@ static_library("stm32wba") {
       "${chip_root}/src/crypto",
       #"${mbedtls_root}:mbedtls",
     ]
-   }
   }
+}
