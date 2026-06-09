@@ -206,7 +206,7 @@
 	branch = master
 [submodule "third_party/mt793x_sdk/filogic"]
 	path = third_party/mt793x_sdk/filogic
-	url = https://github.com/MediaTek-Labs/genio-matter-bsp.git
+	url = https://github.com/RyanHo-MTK/genio-matter-bsp.git
 	branch = main
 	platforms = genio
 [submodule "third_party/mt793x_sdk/mDNSResponder"]
