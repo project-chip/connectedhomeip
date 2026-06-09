@@ -3331,6 +3331,67 @@ static id _Nullable DecodeEventPayloadForDeviceEnergyManagementCluster(EventId a
 
         return value;
     }
+    case Events::PowerRangeAdjustStart::Id: {
+        Events::PowerRangeAdjustStart::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRDeviceEnergyManagementClusterPowerRangeAdjustStartEvent new];
+
+        do {
+            MTRDeviceEnergyManagementClusterPowerRangeAdjustStruct * _Nonnull memberValue;
+            memberValue = [MTRDeviceEnergyManagementClusterPowerRangeAdjustStruct new];
+            if (cppValue.adjustment.minPower.IsNull()) {
+                memberValue.minPower = nil;
+            } else {
+                memberValue.minPower = [NSNumber numberWithLongLong:cppValue.adjustment.minPower.Value()];
+            }
+            if (cppValue.adjustment.maxPower.IsNull()) {
+                memberValue.maxPower = nil;
+            } else {
+                memberValue.maxPower = [NSNumber numberWithLongLong:cppValue.adjustment.maxPower.Value()];
+            }
+            memberValue.cause = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.adjustment.cause)];
+            memberValue.endTime = [NSNumber numberWithUnsignedInt:cppValue.adjustment.endTime];
+            value.adjustment = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedInt:cppValue.duration];
+            value.duration = memberValue;
+        } while (0);
+
+        return value;
+    }
+    case Events::PowerRangeAdjustEnd::Id: {
+        Events::PowerRangeAdjustEnd::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRDeviceEnergyManagementClusterPowerRangeAdjustEndEvent new];
+
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.cause)];
+            value.cause = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedInt:cppValue.duration];
+            value.duration = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithLongLong:cppValue.energyUse];
+            value.energyUse = memberValue;
+        } while (0);
+
+        return value;
+    }
     default: {
         // Not a known DeviceEnergyManagement event.
         break;

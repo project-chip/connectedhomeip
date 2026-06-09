@@ -184,7 +184,7 @@ class TC_ACE_1_6(MatterBaseTest):
             asserts.assert_false(pixit_g_endpoint is None,
                                  "--endpoint <endpoint> with Groups cluster must be included on the command line.")
             asserts.assert_not_equal(pixit_g_endpoint, 0, "Not allowed to have groups clusters on endpoint 0.")
-            log.info(f"Endpoint value for PIXIT.G.ENDPOINT used for test steps with groups cluster: {pixit_g_endpoint}")
+            log.info("Endpoint value for PIXIT.G.ENDPOINT used for test steps with groups cluster: %s", pixit_g_endpoint)
         else:
             # Find "ep~1~" (not endpoint1) (non-root node endpoint) that has both operate privilege commands and the Groups cluster.
             endpoint_to_search = self.get_endpoint() or None
@@ -205,17 +205,17 @@ class TC_ACE_1_6(MatterBaseTest):
                         operate_only_command = cmds[0]
                         break
                 except Exception as e:
-                    log.warning(f"Failed to read ServerList for endpoint {ep}: {e}")
+                    log.warning("Failed to read ServerList for endpoint %s: %s", ep, e)
                     continue
 
             asserts.assert_not_equal(
                 ep1, None, "Could not find an endpoint with both operate privilege commands and Groups cluster.")
 
-            log.info(f"Endpoint value for ep~1~ used for test steps with groupcast cluster: {ep1}")
-            log.info(
-                f"Targeted cluster used for groupcast case is: {operate_only_command.cluster_object.__name__} ({operate_only_command.cluster_object.id})")
-            log.info(
-                f"Targeted command with operate priviliege on the targeted cluster used for groupcast case is: {operate_only_command.command_object.__name__}")
+            log.info("Endpoint value for ep~1~ used for test steps with groupcast cluster: %s", ep1)
+            log.info("Targeted cluster used for groupcast case is: %s (%s)",
+                     operate_only_command.cluster_object.__name__, operate_only_command.cluster_object.id)
+            log.info("Targeted command with operate priviliege on the targeted cluster used for groupcast case is: %s",
+                     operate_only_command.command_object.__name__)
 
         # Step 1b: KeySetWrite 0x01a3
         self.step("1b")

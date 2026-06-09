@@ -157,7 +157,7 @@ class BasicCompositionTests(MatterBaseTest):
         """
         node_dump_dict = {endpoint_id: MatterTlvToJson(self.endpoints_tlv[endpoint_id]) for endpoint_id in self.endpoints_tlv}
         json_dump_string = json.dumps(node_dump_dict, indent=2)
-        LOGGER.debug(f"Raw TLV contents of Node: {json_dump_string}")
+        LOGGER.debug("Raw TLV contents of Node: %s", json_dump_string)
 
         if dump_device_composition_path is not None:
             with open(pathlib.Path(dump_device_composition_path).with_suffix(".json"), "w+") as outfile:
@@ -262,7 +262,7 @@ class BasicCompositionTests(MatterBaseTest):
     def build_spec_xmls(self):
         dm = self._get_dm()
         LOGGER.info("----------------------------------------------------------------------------------")
-        LOGGER.info(f"-- Running tests against Specification version {dm.dirname}")
+        LOGGER.info("-- Running tests against Specification version %s", dm.dirname)
         LOGGER.info("----------------------------------------------------------------------------------")
         self.xml_clusters, self.problems = build_xml_clusters(dm)
         self.xml_device_types, problems = build_xml_device_types(dm)

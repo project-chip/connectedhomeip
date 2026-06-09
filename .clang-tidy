@@ -35,7 +35,6 @@ Checks: >
   -bugprone-unused-return-value,
   -clang-analyzer-core.CallAndMessage,
   -clang-analyzer-core.NonNullParamChecker,
-  -clang-analyzer-core.NullDereference,
   -clang-analyzer-cplusplus.Move,
   -clang-analyzer-deadcode.DeadStores,
   -clang-analyzer-nullability.NullablePassedToNonnull,
@@ -46,7 +45,6 @@ Checks: >
   -clang-analyzer-optin.performance.Padding,
   -clang-analyzer-security.insecureAPI.rand,
   -clang-analyzer-security.insecureAPI.strcpy,
-  -clang-analyzer-unix.Malloc,
   -clang-analyzer-webkit.NoUncountedMemberChecker,
   -clang-diagnostic-implicit-int-conversion,
   -clang-diagnostic-missing-template-arg-list-after-template-kw

@@ -398,7 +398,7 @@ class TC_JFADMIN_2_2(CADMINBaseTest):
                 break
         asserts.assert_is_not_none(
             service_found, "Failed to find a commissionable service with CM=3 (Joint Commissioning Method) being advertised.")
-        log.info(f"Successfully found service with CM={service_found.cm}, D={service_found.d}")
+        log.info("Successfully found service with CM=%s, D=%s", service_found.cm, service_found.d)
 
         self.step("5")
         log.info("Setup event on fabric_a_admin for JCM completion message")

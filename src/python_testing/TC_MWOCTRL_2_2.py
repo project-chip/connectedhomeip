@@ -137,7 +137,7 @@ class TC_MWOCTRL_2_2(MatterBaseTest):
             minPowerValue = await self.read_mwoctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.MinPower)
             asserts.assert_greater_equal(minPowerValue, 1, "MinPower is less than 1")
             asserts.assert_less_equal(minPowerValue, 99, "MinPower is less than 1")
-        log.info("MinPower is %s" % minPowerValue)
+        log.info("MinPower is %s", minPowerValue)
 
         self.step(4)
         maxPowerValue = 100
@@ -147,7 +147,7 @@ class TC_MWOCTRL_2_2(MatterBaseTest):
             maxPowerValue = await self.read_mwoctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.MaxPower)
             asserts.assert_greater(maxPowerValue, minPowerValue, "MaxPower is less than MinPower")
             asserts.assert_less(maxPowerValue, 100, "MaxPower is greater than 100")
-        log.info("MaxPower is %s" % maxPowerValue)
+        log.info("MaxPower is %s", maxPowerValue)
 
         self.step(6)
         powerStepValue = 10
@@ -159,7 +159,7 @@ class TC_MWOCTRL_2_2(MatterBaseTest):
             asserts.assert_less_equal(powerStepValue, maxPowerValue, "PowerStep is greater than MaxPower")
             asserts.assert_true((maxPowerValue - minPowerValue) % powerStepValue ==
                                 0, "PowerStep is not correct for MaxPower - MinPower")
-        log.info("PowerStep is %s" % powerStepValue)
+        log.info("PowerStep is %s", powerStepValue)
 
         self.step(8)
         powerValue = await self.read_mwoctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.PowerSetting)
@@ -168,12 +168,12 @@ class TC_MWOCTRL_2_2(MatterBaseTest):
         asserts.assert_true((powerValue-minPowerValue) % powerStepValue == 0, "PowerSetting is not a multiple of power step")
 
         self.step(9)
-        log.info("minPowerValue is %s" % minPowerValue)
-        log.info("maxPowerValue is %s" % maxPowerValue)
-        log.info("powerStepValue is %s" % powerStepValue)
-        log.info("powerValue is %s" % powerValue)
+        log.info("minPowerValue is %s", minPowerValue)
+        log.info("maxPowerValue is %s", maxPowerValue)
+        log.info("powerStepValue is %s", powerStepValue)
+        log.info("powerValue is %s", powerValue)
         newPowerValue = (powerValue-minPowerValue) % (maxPowerValue-minPowerValue)+powerStepValue+minPowerValue
-        log.info("newPowerValue is %s" % newPowerValue)
+        log.info("newPowerValue is %s", newPowerValue)
         await self.set_power_setting_expect_success(endpoint, newPowerValue)
 
         self.step(10)

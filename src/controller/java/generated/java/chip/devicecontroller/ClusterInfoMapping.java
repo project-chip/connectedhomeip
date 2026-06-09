@@ -9733,6 +9733,27 @@ public class ClusterInfoMapping {
     }
   }
 
+  public static class DelegatedDeviceEnergyManagementClusterPowerRangeAdjustmentAttributeCallback implements ChipClusters.DeviceEnergyManagementCluster.PowerRangeAdjustmentAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable ChipStructs.DeviceEnergyManagementClusterPowerRangeAdjustStruct value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "ChipStructs.DeviceEnergyManagementClusterPowerRangeAdjustStruct");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
   public static class DelegatedDeviceEnergyManagementClusterGeneratedCommandListAttributeCallback implements ChipClusters.DeviceEnergyManagementCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -28505,6 +28526,50 @@ public class ClusterInfoMapping {
         deviceEnergyManagementcancelRequestCommandParams
     );
     deviceEnergyManagementClusterInteractionInfoMap.put("cancelRequest", deviceEnergyManagementcancelRequestInteractionInfo);
+
+    Map<String, CommandParameterInfo> deviceEnergyManagementpowerRangeAdjustRequestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo deviceEnergyManagementpowerRangeAdjustRequestminPowerCommandParameterInfo = new CommandParameterInfo("minPower", Long.class, Long.class);
+    deviceEnergyManagementpowerRangeAdjustRequestCommandParams.put("minPower",deviceEnergyManagementpowerRangeAdjustRequestminPowerCommandParameterInfo);
+
+    CommandParameterInfo deviceEnergyManagementpowerRangeAdjustRequestmaxPowerCommandParameterInfo = new CommandParameterInfo("maxPower", Long.class, Long.class);
+    deviceEnergyManagementpowerRangeAdjustRequestCommandParams.put("maxPower",deviceEnergyManagementpowerRangeAdjustRequestmaxPowerCommandParameterInfo);
+
+    CommandParameterInfo deviceEnergyManagementpowerRangeAdjustRequestdurationCommandParameterInfo = new CommandParameterInfo("duration", Long.class, Long.class);
+    deviceEnergyManagementpowerRangeAdjustRequestCommandParams.put("duration",deviceEnergyManagementpowerRangeAdjustRequestdurationCommandParameterInfo);
+
+    CommandParameterInfo deviceEnergyManagementpowerRangeAdjustRequestcauseCommandParameterInfo = new CommandParameterInfo("cause", Integer.class, Integer.class);
+    deviceEnergyManagementpowerRangeAdjustRequestCommandParams.put("cause",deviceEnergyManagementpowerRangeAdjustRequestcauseCommandParameterInfo);
+    InteractionInfo deviceEnergyManagementpowerRangeAdjustRequestInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.DeviceEnergyManagementCluster) cluster)
+        .powerRangeAdjustRequest((DefaultClusterCallback) callback
+        , (Long)
+        commandArguments.get("minPower")
+        , (Long)
+        commandArguments.get("maxPower")
+        , (Long)
+        commandArguments.get("duration")
+        , (Integer)
+        commandArguments.get("cause")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        deviceEnergyManagementpowerRangeAdjustRequestCommandParams
+    );
+    deviceEnergyManagementClusterInteractionInfoMap.put("powerRangeAdjustRequest", deviceEnergyManagementpowerRangeAdjustRequestInteractionInfo);
+
+    Map<String, CommandParameterInfo> deviceEnergyManagementcancelPowerRangeAdjustRequestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo deviceEnergyManagementcancelPowerRangeAdjustRequestInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.DeviceEnergyManagementCluster) cluster)
+        .cancelPowerRangeAdjustRequest((DefaultClusterCallback) callback
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        deviceEnergyManagementcancelPowerRangeAdjustRequestCommandParams
+    );
+    deviceEnergyManagementClusterInteractionInfoMap.put("cancelPowerRangeAdjustRequest", deviceEnergyManagementcancelPowerRangeAdjustRequestInteractionInfo);
 
     commandMap.put("deviceEnergyManagement", deviceEnergyManagementClusterInteractionInfoMap);
 
