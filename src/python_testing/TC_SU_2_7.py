@@ -190,13 +190,13 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
         await self.announce_ota_provider(controller, self.provider_node_id, self.requestor_node_id)
         # Register event, should change to Querying
         event_report = state_transition_event_handler.wait_for_event_report(self.ota_req.Events.StateTransition, timeout_sec=600)
-        logger.info(f"Event report {event_report}")
+        logger.info("Event report %s", event_report)
         self.verify_state_transition_event(event_report, expected_previous_state=self.ota_req.Enums.UpdateStateEnum.kIdle,
                                            expected_new_state=self.ota_req.Enums.UpdateStateEnum.kQuerying, expected_target_version=NullValue)
 
         # Event for Downloading
         event_report = state_transition_event_handler.wait_for_event_report(self.ota_req.Events.StateTransition, timeout_sec=70)
-        logger.info(f"Event report for Downloading {event_report}")
+        logger.info("Event report for Downloading %s", event_report)
         self.verify_state_transition_event(event_report, expected_previous_state=self.ota_req.Enums.UpdateStateEnum.kQuerying,
                                            expected_new_state=self.ota_req.Enums.UpdateStateEnum.kDownloading, expected_target_version=self.expected_software_version)
 
@@ -242,7 +242,7 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
             events=[(0, version_applied_event, urgent)],
             fabricFiltered=True
         )
-        logger.info(f"Events gathered {events_response}")
+        logger.info("Events gathered %s", events_response)
         # Only UpdateAppliedEvent should be in the list
         if len(events_response) == 0:
             asserts.fail("Failed to read events")
@@ -287,7 +287,7 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
         self.verify_state_transition_event(event_report=event_report, expected_previous_state=self.ota_req.Enums.UpdateStateEnum.kQuerying,
                                            expected_new_state=self.ota_req.Enums.UpdateStateEnum.kDelayedOnQuery, expected_reason=self.ota_req.Enums.ChangeReasonEnum.kDelayByProvider)
         state_transition_event_handler.cancel()
-        logger.info(f"About close the provider app with proc {self.current_provider_app_proc}")
+        logger.info("About close the provider app with proc %s", self.current_provider_app_proc)
         self.terminate_provider()
 
         self.step(3)
@@ -309,12 +309,12 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
         self.current_provider_app_proc.kill()
         await self.announce_ota_provider(controller, self.provider_node_id, self.requestor_node_id)
         event_report = state_transition_event_handler.wait_for_event_report(self.ota_req.Events.StateTransition, timeout_sec=600)
-        logger.info(f"Event response after killing app: {event_report}")
+        logger.info("Event response after killing app: %s", event_report)
         # Catch the Event Querying
         asserts.assert_equal(event_report.newState, self.ota_req.Enums.UpdateStateEnum.kQuerying)
         event_report = state_transition_event_handler.wait_for_event_report(self.ota_req.Events.StateTransition, timeout_sec=60)
         # Change status to KIdle
-        logger.info(f"Event response : {event_report}")
+        logger.info("Event response : %s", event_report)
         self.verify_state_transition_event(event_report, expected_previous_state=self.ota_req.Enums.UpdateStateEnum.kQuerying,
                                            expected_new_state=self.ota_req.Enums.UpdateStateEnum.kIdle, expected_reason=self.ota_req.Enums.ChangeReasonEnum.kFailure)
         state_transition_event_handler.cancel()
@@ -370,10 +370,10 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
         # Block waiting for Download
         logger.info("About to wait for StateTransition Events")
         event_report = state_transition_event_handler.wait_for_event_report(self.ota_req.Events.StateTransition, timeout_sec=600)
-        logger.info(f"Event report Querying {event_report}")
+        logger.info("Event report Querying %s", event_report)
         asserts.assert_equal(event_report.newState, self.ota_req.Enums.UpdateStateEnum.kQuerying)
         event_report = state_transition_event_handler.wait_for_event_report(self.ota_req.Events.StateTransition, timeout_sec=60)
-        logger.info(f"Event report Downloading {event_report}")
+        logger.info("Event report Downloading %s", event_report)
         asserts.assert_equal(event_report.newState, self.ota_req.Enums.UpdateStateEnum.kDownloading)
         # Once the Device is Downloading wait some time to let it download some data and then Kill the current process
         # Create and Wait for DownloadErrorEvent
@@ -390,17 +390,17 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
         # Device must wait for State kIdle in this case we wait for Idle status which should not happend in less than 5 minutes
         event_report = state_transition_event_handler.wait_for_event_report(self.ota_req.Events.StateTransition, timeout_sec=600)
         end_time = time()
-        logger.info(f"Event Transition Event for kIdle Timeout: {event_report}")
+        logger.info("Event Transition Event for kIdle Timeout: %s", event_report)
         self.verify_state_transition_event(event_report=event_report, expected_previous_state=self.ota_req.Enums.UpdateStateEnum.kDownloading,
                                            expected_new_state=self.ota_req.Enums.UpdateStateEnum.kIdle)
         state_transition_event_handler.cancel()
         total_time_to_kidle = int(end_time - start_time)
-        logger.info(f"Total time taken to UpdateStatus kIdle {total_time_to_kidle} seconds")
+        logger.info("Total time taken to UpdateStatus kIdle %s seconds", total_time_to_kidle)
         asserts.assert_greater_equal(total_time_to_kidle, 300, "Time to UpdateState kIdle was less than 5 minutes.")
 
         download_event_report = error_download_event_handler.wait_for_event_report(
             self.ota_req.Events.DownloadError, timeout_sec=600)
-        logger.info(f"Download error Event: {download_event_report}")
+        logger.info("Download error Event: %s", download_event_report)
         asserts.assert_equal(download_event_report.softwareVersion, self.expected_software_version,
                              f"Expected Software version {self.expected_software_version}, found {download_event_report.softwareVersion}")
         asserts.assert_greater(download_event_report.bytesDownloaded, 0, "Download was 0 bytes")
@@ -449,7 +449,7 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
 
         # Verification of the testStep DelayedOnApply
         event_report = state_transition_event_handler.wait_for_event_report(self.ota_req.Events.StateTransition, timeout_sec=60)
-        logger.info(f"Event report: {event_report}")
+        logger.info("Event report: %s", event_report)
         self.verify_state_transition_event(event_report=event_report, expected_previous_state=self.ota_req.Enums.UpdateStateEnum.kApplying, expected_new_state=self.ota_req.Enums.UpdateStateEnum.kDelayedOnApply,
                                            expected_reason=self.ota_req.Enums.ChangeReasonEnum.kDelayByProvider, expected_target_version=NullValue)
         update_state_attr_handler.cancel()

@@ -181,6 +181,32 @@ TEST_F(TestPushAVStreamTransportStorage, TestTransportTriggerOptionsStorage)
     EXPECT_EQ(motionZone2Base.sensitivity.Value(), 10);
 }
 
+// Test corner case where kMotion with motionZones present-but-null (spec: null motionZones ==
+// "motion anywhere triggers"). Verify the decodable->storage copy preserves
+// that state as a present Optional containing a null Nullable.
+TEST_F(TestPushAVStreamTransportStorage, TestTransportTriggerOptionsStorageMotionZonesNull)
+{
+    TransportMotionTriggerTimeControlDecodableStruct motionTimeControl;
+    motionTimeControl.initialDuration      = 5000;
+    motionTimeControl.augmentationDuration = 2000;
+    motionTimeControl.maxDuration          = 30000;
+    motionTimeControl.blindDuration        = 1000;
+
+    TransportTriggerOptionsDecodableStruct triggerOptions;
+    triggerOptions.triggerType = TransportTriggerTypeEnum::kMotion;
+    // present (HasValue) but explicitly null (IsNull)
+    triggerOptions.motionZones.SetValue(DataModel::NullNullable);
+    triggerOptions.motionSensitivity.SetValue(DataModel::MakeNullable<uint8_t>(5));
+    triggerOptions.motionTimeControl.SetValue(motionTimeControl);
+    triggerOptions.maxPreRollLen.SetValue(1000);
+
+    TransportTriggerOptionsStorage transportTriggerOptionsStorage(triggerOptions);
+
+    EXPECT_EQ(transportTriggerOptionsStorage.triggerType, TransportTriggerTypeEnum::kMotion);
+    ASSERT_TRUE(transportTriggerOptionsStorage.motionZones.HasValue());
+    EXPECT_TRUE(transportTriggerOptionsStorage.motionZones.Value().IsNull());
+}
+
 TEST_F(TestPushAVStreamTransportStorage, TestCMAFContainerOptionsStorage)
 {
     CMAFContainerOptionsStruct cmafContainerOptions;

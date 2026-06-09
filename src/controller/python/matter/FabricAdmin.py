@@ -19,7 +19,7 @@
 from __future__ import annotations
 
 import logging
-from typing import Optional
+from typing import Callable, Optional
 
 from . import CertificateAuthority, ChipDeviceCtrl
 from .crypto import p256keypair
@@ -32,6 +32,12 @@ class FabricAdmin:
     ''' Administers a fabric associated with a unique FabricID under a given CertificateAuthority
         instance.
     '''
+
+    # Hook invoked by NewController() each time a controller is created.
+    # MatterBaseTest registers this in setup_class to auto-populate its
+    # _extra_controllers list used for test cleanup in teardown_class.
+    _new_controller_hook: Optional[Callable] = None
+
     @classmethod
     def _Handle(cls):
         return GetLibraryHandle()
@@ -58,7 +64,7 @@ class FabricAdmin:
         self._fabricId = fabricId
         self._certificateAuthority = certificateAuthority
 
-        LOGGER.info(f"New FabricAdmin: FabricId: 0x{self._fabricId:016X}, VendorId = 0x{self.vendorId:04X}")
+        LOGGER.info("New FabricAdmin: FabricId: 0x%016X, VendorId = 0x%04X", self._fabricId, self.vendorId)
 
         self._isActive = True
         self._activeControllers: list[ChipDeviceCtrl.ChipDeviceController] = []
@@ -95,9 +101,8 @@ class FabricAdmin:
             if (nodeId in nodeIdList):
                 raise RuntimeError(f"Provided NodeId {nodeId} collides with an existing controller instance!")
 
-        LOGGER.info(
-            f"Allocating new controller with CaIndex: {self._certificateAuthority.caIndex}, "
-            f"FabricId: 0x{self._fabricId:016X}, NodeId: 0x{nodeId:016X}, CatTags: {catTags}")
+        LOGGER.info("Allocating new controller with CaIndex: %s, FabricId: 0x%016X, NodeId: 0x%016X, CatTags: %s",
+                    self._certificateAuthority.caIndex, self._fabricId, nodeId, catTags)
 
         controller = ChipDeviceCtrl.ChipDeviceController(
             opCredsContext=self._certificateAuthority.GetOpCredsContext(),
@@ -114,6 +119,11 @@ class FabricAdmin:
             controller.SetDACRevocationSetPath(dacRevocationSetPath)
 
         self._activeControllers.append(controller)
+
+        # Adds the new controller to MatterBaseTest._extra_controllers via the registered hook
+        if self._new_controller_hook:
+            self._new_controller_hook(controller)
+
         return controller
 
     def Shutdown(self):

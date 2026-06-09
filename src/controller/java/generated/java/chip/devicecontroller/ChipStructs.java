@@ -8802,6 +8802,97 @@ public static class DeviceEnergyManagementClusterConstraintsStruct {
     return output.toString();
   }
 }
+public static class DeviceEnergyManagementClusterPowerRangeAdjustStruct {
+  public @Nullable Long minPower;
+  public @Nullable Long maxPower;
+  public Integer cause;
+  public Long endTime;
+  private static final long MIN_POWER_ID = 0L;
+  private static final long MAX_POWER_ID = 1L;
+  private static final long CAUSE_ID = 2L;
+  private static final long END_TIME_ID = 3L;
+
+  public DeviceEnergyManagementClusterPowerRangeAdjustStruct(
+    @Nullable Long minPower,
+    @Nullable Long maxPower,
+    Integer cause,
+    Long endTime
+  ) {
+    this.minPower = minPower;
+    this.maxPower = maxPower;
+    this.cause = cause;
+    this.endTime = endTime;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(MIN_POWER_ID, minPower != null ? new IntType(minPower) : new NullType()));
+    values.add(new StructElement(MAX_POWER_ID, maxPower != null ? new IntType(maxPower) : new NullType()));
+    values.add(new StructElement(CAUSE_ID, new UIntType(cause)));
+    values.add(new StructElement(END_TIME_ID, new UIntType(endTime)));
+
+    return new StructType(values);
+  }
+
+  public static DeviceEnergyManagementClusterPowerRangeAdjustStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    @Nullable Long minPower = null;
+    @Nullable Long maxPower = null;
+    Integer cause = null;
+    Long endTime = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == MIN_POWER_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Int) {
+          IntType castingValue = element.value(IntType.class);
+          minPower = castingValue.value(Long.class);
+        }
+      } else if (element.contextTagNum() == MAX_POWER_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Int) {
+          IntType castingValue = element.value(IntType.class);
+          maxPower = castingValue.value(Long.class);
+        }
+      } else if (element.contextTagNum() == CAUSE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          cause = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == END_TIME_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          endTime = castingValue.value(Long.class);
+        }
+      }
+    }
+    return new DeviceEnergyManagementClusterPowerRangeAdjustStruct(
+      minPower,
+      maxPower,
+      cause,
+      endTime
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("DeviceEnergyManagementClusterPowerRangeAdjustStruct {\n");
+    output.append("\tminPower: ");
+    output.append(minPower);
+    output.append("\n");
+    output.append("\tmaxPower: ");
+    output.append(maxPower);
+    output.append("\n");
+    output.append("\tcause: ");
+    output.append(cause);
+    output.append("\n");
+    output.append("\tendTime: ");
+    output.append(endTime);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class DeviceEnergyManagementClusterSlotAdjustmentStruct {
   public Integer slotIndex;
   public Optional<Long> nominalPower;
@@ -20993,6 +21084,7 @@ public static class CommodityTariffClusterTariffComponentStruct {
   public @Nullable Long threshold;
   public @Nullable Optional<String> label;
   public Optional<Boolean> predicted;
+  public Optional<String> externalID;
   private static final long TARIFF_COMPONENT_ID_ID = 0L;
   private static final long PRICE_ID = 1L;
   private static final long FRIENDLY_CREDIT_ID = 2L;
@@ -21002,6 +21094,7 @@ public static class CommodityTariffClusterTariffComponentStruct {
   private static final long THRESHOLD_ID = 6L;
   private static final long LABEL_ID = 7L;
   private static final long PREDICTED_ID = 8L;
+  private static final long EXTERNAL_ID_ID = 9L;
 
   public CommodityTariffClusterTariffComponentStruct(
     Long tariffComponentID,
@@ -21012,7 +21105,8 @@ public static class CommodityTariffClusterTariffComponentStruct {
     Optional<ChipStructs.CommodityTariffClusterPowerThresholdStruct> powerThreshold,
     @Nullable Long threshold,
     @Nullable Optional<String> label,
-    Optional<Boolean> predicted
+    Optional<Boolean> predicted,
+    Optional<String> externalID
   ) {
     this.tariffComponentID = tariffComponentID;
     this.price = price;
@@ -21023,6 +21117,7 @@ public static class CommodityTariffClusterTariffComponentStruct {
     this.threshold = threshold;
     this.label = label;
     this.predicted = predicted;
+    this.externalID = externalID;
   }
 
   public StructType encodeTlv() {
@@ -21036,6 +21131,7 @@ public static class CommodityTariffClusterTariffComponentStruct {
     values.add(new StructElement(THRESHOLD_ID, threshold != null ? new IntType(threshold) : new NullType()));
     values.add(new StructElement(LABEL_ID, label != null ? label.<BaseTLVType>map((nonOptionallabel) -> new StringType(nonOptionallabel)).orElse(new EmptyType()) : new NullType()));
     values.add(new StructElement(PREDICTED_ID, predicted.<BaseTLVType>map((nonOptionalpredicted) -> new BooleanType(nonOptionalpredicted)).orElse(new EmptyType())));
+    values.add(new StructElement(EXTERNAL_ID_ID, externalID.<BaseTLVType>map((nonOptionalexternalID) -> new StringType(nonOptionalexternalID)).orElse(new EmptyType())));
 
     return new StructType(values);
   }
@@ -21053,6 +21149,7 @@ public static class CommodityTariffClusterTariffComponentStruct {
     @Nullable Long threshold = null;
     @Nullable Optional<String> label = null;
     Optional<Boolean> predicted = Optional.empty();
+    Optional<String> externalID = Optional.empty();
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == TARIFF_COMPONENT_ID_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -21099,6 +21196,11 @@ public static class CommodityTariffClusterTariffComponentStruct {
           BooleanType castingValue = element.value(BooleanType.class);
           predicted = Optional.of(castingValue.value(Boolean.class));
         }
+      } else if (element.contextTagNum() == EXTERNAL_ID_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          externalID = Optional.of(castingValue.value(String.class));
+        }
       }
     }
     return new CommodityTariffClusterTariffComponentStruct(
@@ -21110,7 +21212,8 @@ public static class CommodityTariffClusterTariffComponentStruct {
       powerThreshold,
       threshold,
       label,
-      predicted
+      predicted,
+      externalID
     );
   }
 
@@ -21144,6 +21247,9 @@ public static class CommodityTariffClusterTariffComponentStruct {
     output.append("\n");
     output.append("\tpredicted: ");
     output.append(predicted);
+    output.append("\n");
+    output.append("\texternalID: ");
+    output.append(externalID);
     output.append("\n");
     output.append("}\n");
     return output.toString();

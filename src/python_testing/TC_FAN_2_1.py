@@ -143,7 +143,7 @@ class TC_FAN_2_1(MatterBaseTest):
         self.step(2)
         feature_map = await self.read_setting(attribute.FeatureMap)
         supports_auto = bool(feature_map & feature.kAuto)
-        log.info(f"[FC] DUT supports Auto FanMode feature: {supports_auto}")
+        log.info("[FC] DUT supports Auto FanMode feature: %s", supports_auto)
 
         # *** STEP 3 ***
         # TH reads from the DUT the FanModeSequence attribute
