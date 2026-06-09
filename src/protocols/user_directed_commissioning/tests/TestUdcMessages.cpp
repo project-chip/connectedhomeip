@@ -521,7 +521,7 @@ TEST_F(TestUdcMessages, TestUDCIdentificationDeclarationTruncatedPayload)
 TEST_F(TestUdcMessages, TestUDCIdentificationDeclarationPureHeader)
 {
     IdentificationDeclaration idOut;
-    const char * instanceName = "servertest1";
+    const char * instanceName                                       = "servertest1";
     uint8_t idBuffer[Dnssd::Commission::kInstanceNameMaxLength + 1] = {};
     Platform::CopyString(reinterpret_cast<char *>(idBuffer), sizeof(idBuffer), instanceName);
 
