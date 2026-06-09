@@ -79,7 +79,9 @@ public:
 protected:
 
     CHIP_ERROR _StartThreadTask();
-
+    void _LockThreadStack();
+    bool _TryLockThreadStack();
+    void _UnlockThreadStack();
     void _ProcessThreadActivity();
 
 private:

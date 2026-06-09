@@ -7,7 +7,7 @@
   ******************************************************************************
   * @attention
   *
-  * Copyright (c) 2022 STMicroelectronics.
+  * Copyright (c) 2025 STMicroelectronics.
   * All rights reserved.
   *
   * This software is licensed under terms that can be found in the LICENSE file
@@ -18,18 +18,24 @@
   */
 /* USER CODE END Header */
 
-#include "app_common.h"
 #include "stm32wbaxx_hal.h"
-#include "linklayer_plat.h"
 #include "stm32wbaxx_hal_conf.h"
 #include "stm32wbaxx_ll_rcc.h"
+
+#include "app_common.h"
 #include "app_conf.h"
+#include "linklayer_plat.h"
 #include "scm.h"
+#include "log_module.h"
+#include "stm32_rtos.h"
 #if (USE_TEMPERATURE_BASED_RADIO_CALIBRATION == 1)
 #include "adc_ctrl.h"
 #endif /* (USE_TEMPERATURE_BASED_RADIO_CALIBRATION == 1) */
 
+#if (CFG_LPM_LEVEL != 0)
 #include "stm32_lpm.h"
+#include "stm32_lpm_if.h"
+#endif /* (CFG_LPM_LEVEL != 0) */
 
 /* USER CODE BEGIN Includes */
 
@@ -92,12 +98,55 @@ void LINKLAYER_PLAT_ClockInit()
   */
 void LINKLAYER_PLAT_DelayUs(uint32_t delay)
 {
-__IO register uint32_t Delay = delay * (SystemCoreClock / 1000000U);
-	do
-	{
-		__NOP();
-	}
-	while (Delay --);
+  static uint8_t lock = 0;
+  uint32_t t0;
+  uint32_t primask_bit;
+
+  /* Enter critical section */
+  primask_bit= __get_PRIMASK();
+  __disable_irq();
+
+  if (lock == 0U)
+  {
+    /* Initialize counter */
+    /* Reset cycle counter to prevent overflow
+       As a us counter, it is assumed than even with re-entrancy,
+       overflow will never happen before re-initializing this counter */
+    DWT->CYCCNT = 0U;
+    /* Enable DWT by safety but should be useless (as already set) */
+    SET_BIT(DCB->DEMCR, DCB_DEMCR_TRCENA_Msk);
+    /* Enable counter */
+    SET_BIT(DWT->CTRL, DWT_CTRL_CYCCNTENA_Msk);
+  }
+  /* Increment 're-entrance' counter */
+  lock++;
+  /* Get starting time stamp */
+  t0 = DWT->CYCCNT;
+  /* Exit critical section */
+ __set_PRIMASK(primask_bit);
+
+  /* Turn us into cycles */
+  delay = delay * (SystemCoreClock / 1000000U);
+  delay += t0;
+
+  /* Busy waiting loop */
+  while (DWT->CYCCNT < delay)
+  {
+  };
+
+  /* Enter critical section */
+  primask_bit= __get_PRIMASK();
+  __disable_irq();
+  if (lock == 1U)
+  {
+    /* Disable counter */
+    CLEAR_BIT(DWT->CTRL, DWT_CTRL_CYCCNTENA_Msk);
+  }
+  /* Decrement 're-entrance' counter */
+  lock--;
+  /* Exit critical section */
+ __set_PRIMASK(primask_bit);
+
 }
 
 /**
@@ -126,6 +175,44 @@ void LINKLAYER_PLAT_WaitHclkRdy(void)
 }
 
 /**
+  * @brief  Notify the Link Layer platform layer the system will enter in WFI
+  *         and AHB5 clock may be turned of regarding the 2.4Ghz radio state.
+  * @param  None
+  * @retval None
+  */
+void LINKLAYER_PLAT_NotifyWFIEnter(void)
+{
+  /* Check if Radio state will allow the AHB5 clock to be cut */
+
+  /* AHB5 clock will be cut in the following cases:
+   * - 2.4GHz radio is not in ACTIVE mode (in SLEEP or DEEPSLEEP mode).
+   * - RADIOSMEN and STRADIOCLKON bits are at 0.
+   */
+  if((LL_PWR_GetRadioMode() != LL_PWR_RADIO_ACTIVE_MODE) ||
+     ((__HAL_RCC_RADIO_IS_CLK_SLEEP_ENABLED() == 0) && (LL_RCC_RADIO_IsEnabledSleepTimerClock() == 0)))
+  {
+    AHB5_SwitchedOff = 1;
+  }
+}
+
+/**
+  * @brief  Notify the Link Layer platform layer the system exited WFI and AHB5
+  *         clock may be resynchronized as is may have been turned of during
+  *         low power mode entry.
+  * @param  None
+  * @retval None
+  */
+void LINKLAYER_PLAT_NotifyWFIExit(void)
+{
+  /* Check if AHB5 clock has been turned of and needs resynchronisation */
+  if (AHB5_SwitchedOff)
+  {
+    /* Read sleep register as earlier as possible */
+    radio_sleep_timer_val = ll_intf_cmn_get_slptmr_value();
+  }
+}
+
+/**
   * @brief  Active wait on bus clock readiness.
   * @param  None
   * @retval None
@@ -140,7 +227,7 @@ void LINKLAYER_PLAT_AclkCtrl(uint8_t enable)
     SCM_HSE_WaitUntilReady();
     /* Enable RADIO baseband clock (active CLK) */
     HAL_RCCEx_EnableRadioBBClock();
-	/* SCM HSE END */
+    /* SCM HSE END */
 #else
     /* Enable RADIO baseband clock (active CLK) */
     HAL_RCCEx_EnableRadioBBClock();
@@ -300,9 +387,9 @@ void LINKLAYER_PLAT_EnableSpecificIRQ(uint8_t isr_type)
     {
       /* When specific counter for link layer high ISR reaches 0, interrupt is enabled */
       HAL_NVIC_EnableIRQ(RADIO_INTR_NUM);
-      /* USER CODE BEGIN LINKLAYER_PLAT_EnableSpecificIRQ_1*/
+      /* USER CODE BEGIN LINKLAYER_PLAT_EnableSpecificIRQ_1 */
 
-      /* USER CODE END LINKLAYER_PLAT_EnableSpecificIRQ_1*/
+      /* USER CODE END LINKLAYER_PLAT_EnableSpecificIRQ_1 */
     }
   }
 
@@ -345,9 +432,9 @@ void LINKLAYER_PLAT_DisableSpecificIRQ(uint8_t isr_type)
     prio_high_isr_counter++;
     if(prio_high_isr_counter == 1)
     {
-      /* USER CODE BEGIN LINKLAYER_PLAT_DisableSpecificIRQ_1*/
+      /* USER CODE BEGIN LINKLAYER_PLAT_DisableSpecificIRQ_1 */
 
-      /* USER CODE END LINKLAYER_PLAT_DisableSpecificIRQ_1*/
+      /* USER CODE END LINKLAYER_PLAT_DisableSpecificIRQ_1 */
       /* When specific counter for link layer high ISR value is 1, interrupt is disabled */
       HAL_NVIC_DisableIRQ(RADIO_INTR_NUM);
     }
@@ -384,15 +471,15 @@ void LINKLAYER_PLAT_DisableSpecificIRQ(uint8_t isr_type)
   */
 void LINKLAYER_PLAT_EnableRadioIT(void)
 {
-  /* USER CODE BEGIN LINKLAYER_PLAT_EnableRadioIT_1*/
+  /* USER CODE BEGIN LINKLAYER_PLAT_EnableRadioIT_1 */
 
-  /* USER CODE END LINKLAYER_PLAT_EnableRadioIT_1*/
+  /* USER CODE END LINKLAYER_PLAT_EnableRadioIT_1 */
 
   HAL_NVIC_EnableIRQ((IRQn_Type) RADIO_INTR_NUM);
 
-  /* USER CODE BEGIN LINKLAYER_PLAT_EnableRadioIT_2*/
+  /* USER CODE BEGIN LINKLAYER_PLAT_EnableRadioIT_2 */
 
-  /* USER CODE END LINKLAYER_PLAT_EnableRadioIT_2*/
+  /* USER CODE END LINKLAYER_PLAT_EnableRadioIT_2 */
 }
 
 /**
@@ -402,15 +489,15 @@ void LINKLAYER_PLAT_EnableRadioIT(void)
   */
 void LINKLAYER_PLAT_DisableRadioIT(void)
 {
-  /* USER CODE BEGIN LINKLAYER_PLAT_DisableRadioIT_1*/
+  /* USER CODE BEGIN LINKLAYER_PLAT_DisableRadioIT_1 */
 
-  /* USER CODE END LINKLAYER_PLAT_DisableRadioIT_1*/
+  /* USER CODE END LINKLAYER_PLAT_DisableRadioIT_1 */
 
   HAL_NVIC_DisableIRQ((IRQn_Type) RADIO_INTR_NUM);
 
-  /* USER CODE BEGIN LINKLAYER_PLAT_DisableRadioIT_2*/
+  /* USER CODE BEGIN LINKLAYER_PLAT_DisableRadioIT_2 */
 
-  /* USER CODE END LINKLAYER_PLAT_DisableRadioIT_2*/
+  /* USER CODE END LINKLAYER_PLAT_DisableRadioIT_2 */
 }
 
 /**
@@ -420,6 +507,10 @@ void LINKLAYER_PLAT_DisableRadioIT(void)
   */
 void LINKLAYER_PLAT_StartRadioEvt(void)
 {
+#if (CFG_LPM_LEVEL != 0)
+  UTIL_LPM_SetMaxMode(1U << CFG_LPM_THREAD_RX_ACK, UTIL_LPM_SLEEP_MODE);
+#endif /* (CFG_LPM_LEVEL != 0) */
+
   __HAL_RCC_RADIO_CLK_SLEEP_ENABLE();
   NVIC_SetPriority(RADIO_INTR_NUM, RADIO_INTR_PRIO_HIGH);
 #if (CFG_SCM_SUPPORTED == 1)
@@ -439,6 +530,10 @@ void LINKLAYER_PLAT_StopRadioEvt(void)
 #if (CFG_SCM_SUPPORTED == 1)
   scm_notifyradiostate(SCM_RADIO_NOT_ACTIVE);
 #endif /* CFG_SCM_SUPPORTED */
+#if (CFG_LPM_LEVEL != 0)
+  UTIL_LPM_SetMaxMode(1U << CFG_LPM_THREAD_RX_ACK, UTIL_LPM_MAX_MODE);
+#endif /* (CFG_LPM_LEVEL != 0) */
+
 }
 
 /**
@@ -448,16 +543,13 @@ void LINKLAYER_PLAT_StopRadioEvt(void)
   */
 void LINKLAYER_PLAT_RCOStartClbr(void)
 {
-#if (CFG_SCM_SUPPORTED == 1)
 #if (CFG_LPM_LEVEL != 0)
-#if (CFG_LPM_STDBY_SUPPORTED == 1)
-  UTIL_LPM_SetOffMode(1U << CFG_LPM_APP, UTIL_LPM_DISABLE);
-#endif /* (CFG_LPM_STDBY_SUPPORTED == 1) */
-  UTIL_LPM_SetStopMode(1U << CFG_LPM_APP, UTIL_LPM_DISABLE);
+  UTIL_LPM_SetMaxMode(1U << CFG_LPM_LL_HW_RCO_CLBR, UTIL_LPM_IDLE_MODE);
 #endif /* (CFG_LPM_LEVEL != 0) */
-  scm_setsystemclock(SCM_USER_LL_HW_RCO_CLBR, HSE_32MHZ); 
+#if (CFG_SCM_SUPPORTED == 1)
+  scm_setsystemclock(SCM_USER_LL_HW_RCO_CLBR, HSE_32MHZ);
   while (LL_PWR_IsActiveFlag_VOS() == 0);
-#endif /* CFG_SCM_SUPPORTED */
+#endif /* (CFG_SCM_SUPPORTED == 1) */
 }
 
 /**
@@ -467,16 +559,12 @@ void LINKLAYER_PLAT_RCOStartClbr(void)
   */
 void LINKLAYER_PLAT_RCOStopClbr(void)
 {
-#if (CFG_SCM_SUPPORTED == 1)
 #if (CFG_LPM_LEVEL != 0)
-#if (CFG_LPM_STDBY_SUPPORTED == 1)
-  UTIL_LPM_SetOffMode(1U << CFG_LPM_APP, UTIL_LPM_ENABLE);
-#endif /* (CFG_LPM_STDBY_SUPPORTED == 1) */
-  UTIL_LPM_SetStopMode(1U << CFG_LPM_APP, UTIL_LPM_ENABLE);
+  UTIL_LPM_SetMaxMode(1U << CFG_LPM_LL_HW_RCO_CLBR, UTIL_LPM_MAX_MODE);
 #endif /* (CFG_LPM_LEVEL != 0) */
-  scm_setsystemclock(SCM_USER_LL_HW_RCO_CLBR, HSE_16MHZ); 
-  while (LL_PWR_IsActiveFlag_VOS() == 0);
-#endif /* CFG_SCM_SUPPORTED */
+#if (CFG_SCM_SUPPORTED == 1)
+  scm_setsystemclock(SCM_USER_LL_HW_RCO_CLBR, HSE_16MHZ);
+#endif /* (CFG_SCM_SUPPORTED == 1) */
 }
 
 /**
@@ -492,21 +580,35 @@ void LINKLAYER_PLAT_RequestTemperature(void)
 }
 
 /**
-  * @brief  Enable RTOS context switch.
+  * @brief  PHY Start calibration.
   * @param  None
   * @retval None
   */
-void LINKLAYER_PLAT_EnableOSContextSwitch(void)
+void LINKLAYER_PLAT_PhyStartClbr(void)
 {
+  /* USER CODE BEGIN LINKLAYER_PLAT_PhyStartClbr_0 */
+
+  /* USER CODE END LINKLAYER_PLAT_PhyStartClbr_0 */
+
+  /* USER CODE BEGIN LINKLAYER_PLAT_PhyStartClbr_1 */
+
+  /* USER CODE END LINKLAYER_PLAT_PhyStartClbr_1 */
 }
 
 /**
-  * @brief  Disable RTOS context switch.
+  * @brief  PHY Stop calibration.
   * @param  None
   * @retval None
   */
-void LINKLAYER_PLAT_DisableOSContextSwitch(void)
+void LINKLAYER_PLAT_PhyStopClbr(void)
 {
+  /* USER CODE BEGIN LINKLAYER_PLAT_PhyStopClbr_0 */
+
+  /* USER CODE END LINKLAYER_PLAT_PhyStopClbr_0 */
+
+  /* USER CODE BEGIN LINKLAYER_PLAT_PhyStopClbr_1 */
+
+  /* USER CODE END LINKLAYER_PLAT_PhyStopClbr_1 */
 }
 
 /**
@@ -516,6 +618,9 @@ void LINKLAYER_PLAT_DisableOSContextSwitch(void)
  */
 void LINKLAYER_PLAT_SCHLDR_TIMING_UPDATE_NOT(Evnt_timing_t * p_evnt_timing)
 {
+  /* USER CODE BEGIN LINKLAYER_PLAT_SCHLDR_TIMING_UPDATE_NOT_0 */
+
+  /* USER CODE END LINKLAYER_PLAT_SCHLDR_TIMING_UPDATE_NOT_0 */
 }
 
 /**
@@ -537,3 +642,7 @@ uint32_t LINKLAYER_PLAT_GetUDN(void)
 {
   return LL_FLASH_GetUDN();
 }
+
+/* USER CODE BEGIN LINKLAYER_PLAT 0 */
+
+/* USER CODE END LINKLAYER_PLAT 0 */

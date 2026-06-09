@@ -21,6 +21,24 @@
 #include "stm32wbaxx_ll_rng.h"
 #include "RTDebug.h"
 
+/*****************************************************************************/
+
+extern void Error_Handler(void);
+
+/*****************************************************************************/
+
+__WEAK int RNG_MutexTake(void)
+{
+  return 0; /* This shall be implemented by user */
+}
+
+__WEAK int RNG_MutexRelease(void)
+{
+  return 0; /* This shall be implemented by user */
+}
+
+/*****************************************************************************/
+
 __weak void RNG_KERNEL_CLK_ON(void)
 {
   /* NOTE : This function should not be modified, when the callback is needed,
@@ -44,7 +62,7 @@ __weak void RNG_KERNEL_CLK_OFF(void)
 
 typedef struct
 {
-  uint32_t pool[CFG_HW_RNG_POOL_SIZE];
+  uint32_t pool[HW_RNG_POOL_SIZE];
   uint8_t  size;
   uint8_t  run;
   uint8_t  clock_en;
@@ -54,6 +72,8 @@ typedef struct
 /*****************************************************************************/
 
 static HW_RNG_VAR_T HW_RNG_var;
+  
+static uint8_t hw_rng_pool_threshold = HW_RNG_POOL_DEFAULT_THRESHOLD;
 
 /*****************************************************************************/
 
@@ -136,9 +156,15 @@ void HW_RNG_DisableClock( uint8_t user_mask )
  */
 static void HW_RNG_WaitingClockSynchronization( void )
 {
+  /* RNG busy flag is not available in STM32WBA5xxx */
+#if defined(STM32WBA52xx) || defined(STM32WBA54xx) || defined(STM32WBA55xx) || defined(STM32WBA5Mxx)|| defined(STM32WBA65xx) /* MATTER ADD WBA6 */
   volatile unsigned int cpt;
-
+  
   for(cpt = 178 ; cpt!=0 ; --cpt);
+#else
+  /* wait until RNG_SR_BUSY (bit 4) is cleared */
+  while(RNG->SR & (1 << 4));
+#endif /* defined(STM32WBA52xx) || defined(STM32WBA54xx) || defined(STM32WBA55xx) || defined(STM32WBA5Mxx) */  
 }
 
 /*****************************************************************************/
@@ -150,86 +176,56 @@ static void HW_RNG_WaitingClockSynchronization( void )
  * It always returns 0 in normal conditions. In error conditions, it returns
  * an error code different from 0.
  */
-static int HW_RNG_Run( HW_RNG_VAR_T* pv )
+static int HW_RNG_Run(HW_RNG_VAR_T* pv)
 {
   int i, error = HW_OK;
 
-  /* If the RNG is OFF */
-
-  if ( !pv->run )
-  {
-    SYSTEM_DEBUG_SIGNAL_SET(RNG_ENABLE);
-
-    /* Enable RNG clocks */
-    HW_RNG_EnableClock( 1 );
-
-    /* Set RNG enable bit */
-    LL_RNG_Enable( RNG );
-
-    SYSTEM_DEBUG_SIGNAL_RESET(RNG_ENABLE);
-
-    /* Set flag indicating that RNG is ON */
-    pv->run = TRUE;
-  }
-
-  /* Else check for RNG clock error */
-
-  else if ( LL_RNG_IsActiveFlag_CECS( RNG ) )
+  /* check for RNG clock error */
+  if (LL_RNG_IsActiveFlag_CECS(RNG))
   {
     /* Clear RNG clock error interrupt status flags */
-    LL_RNG_ClearFlag_CEIS( RNG );
+    LL_RNG_ClearFlag_CEIS(RNG);
 
     error = HW_RNG_CLOCK_ERROR;
   }
 
-  /* Else check for RNG seed error */
-
-  else if ( LL_RNG_IsActiveFlag_SEIS( RNG ) )
+  /* check for RNG seed error */
+  if (LL_RNG_IsActiveFlag_SEIS(RNG))
   {
     /* Clear RNG seed error interrupt status flags */
-    LL_RNG_ClearFlag_SEIS( RNG );
+    LL_RNG_ClearFlag_SEIS(RNG);
 
     /* Discard 12 words from RNG_DR in order to clean the pipeline */
     for ( i = 12; i > 0; i-- )
     {
-      LL_RNG_ReadRandData32( RNG );
+      LL_RNG_ReadRandData32(RNG);
     }
 
     error = HW_RNG_NOISE_ERROR;
   }
 
-  /* Else if the pool is not full */
+  /* if the pool is not full, read the H/W generated values until the pool is full */
+  UTILS_ENTER_CRITICAL_SECTION();
+  SYSTEM_DEBUG_SIGNAL_SET(RNG_GEN_RAND_NUM);
 
-  else if ( pv->size < CFG_HW_RNG_POOL_SIZE )
+  while (pv->size < HW_RNG_POOL_SIZE)
   {
-    /* Read the H/W generated values until the pool is full */
-
-    UTILS_ENTER_CRITICAL_SECTION( );
-
-    SYSTEM_DEBUG_SIGNAL_SET(RNG_GEN_RAND_NUM);
-
-    while ( (pv->size < CFG_HW_RNG_POOL_SIZE) &&
-            LL_RNG_IsActiveFlag_DRDY( RNG ) )
+    if (LL_RNG_IsActiveFlag_DRDY(RNG))
     {
-      pv->pool[pv->size] = LL_RNG_ReadRandData32( RNG );
+      pv->pool[pv->size] = LL_RNG_ReadRandData32(RNG);
       pv->size++;
     }
-
-    SYSTEM_DEBUG_SIGNAL_RESET(RNG_GEN_RAND_NUM);
-    UTILS_EXIT_CRITICAL_SECTION( );
   }
 
-  /* Else if the pool is full, disable the RNG */
+  SYSTEM_DEBUG_SIGNAL_RESET(RNG_GEN_RAND_NUM);
+  UTILS_EXIT_CRITICAL_SECTION( );
 
-  else
-  {
-    /* Disable RNG peripheral and its RCC clock */
-    HW_RNG_Disable( );
+  /* pool is full, disable the RNG and its RCC clock */
+  HW_RNG_Disable( );
 
-    /* Reset flag indicating that the RNG is ON */
-    pv->run = FALSE;
-  }
-
+  /* Reset flag indicating that the RNG is ON */
+  pv->run = FALSE;
+  
   return error;
 }
 
@@ -245,12 +241,22 @@ void HW_RNG_Start( void )
   pv->error = HW_OK;
   pv->clock_en = 0;
 
+  if (0 != RNG_MutexTake())
+  {
+	  Error_Handler();
+  }
+
   /* Fill the random numbers pool by calling the "run" function */
   do
   {
     pv->error = HW_RNG_Run( pv );
   }
   while ( pv->run && !pv->error );
+
+  if (0 != RNG_MutexRelease())
+  {
+    Error_Handler();
+  }
 }
 
 /*****************************************************************************/
@@ -267,7 +273,7 @@ void HW_RNG_Get( uint8_t n, uint32_t* val )
     if ( pv->size == 0 )
     {
       pv->error = HW_RNG_UFLOW_ERROR;
-      pool_value = ~pv->pool[n & (CFG_HW_RNG_POOL_SIZE - 1)];
+      pool_value = ~pv->pool[HW_RNG_POOL_SIZE - n];
     }
     else
     {
@@ -290,35 +296,93 @@ int HW_RNG_Process( void )
   HW_RNG_VAR_T* pv = &HW_RNG_var;
   int status = HW_OK;
 
-  /* Check if the process is not done or if the pool is not full */
-  if ( pv->run || (pv->size < CFG_HW_RNG_POOL_SIZE) )
+  if (0 != RNG_MutexTake())
   {
-    UTILS_ENTER_CRITICAL_SECTION( );
-
-    /* Check if an error occurred during a previous call to HW_RNG API */
-    status = pv->error;
-    pv->error = HW_OK;
-
-    UTILS_EXIT_CRITICAL_SECTION( );
-
-    if ( status == HW_OK )
+    status = HW_BUSY;
+  }  
+  else 
+  {
+    /* Check if the process is not done or if the pool is not full */
+    if (pv->size < hw_rng_pool_threshold)
     {
-      /* Call the "run" function that generates random data */
-      status = HW_RNG_Run( pv );
+      HW_RNG_Init();
+      UTILS_ENTER_CRITICAL_SECTION( );
 
-      /* If the process is not done, return "busy" status */
-      if ( (status == HW_OK) && pv->run )
+      /* Check if an error occurred during a previous call to HW_RNG API */
+      status = pv->error;
+      pv->error = HW_OK;
+
+      UTILS_EXIT_CRITICAL_SECTION( );
+
+      if ( status == HW_OK )
       {
-        status = HW_BUSY;
+        /* Call the "run" function that generates random data */
+        status = HW_RNG_Run( pv );
+
+        /* If the process is not done, return "busy" status */
+        if ( (status == HW_OK) && pv->run )
+        {
+          status = HW_BUSY;
+        }
       }
+    }
+    
+    if (0 != RNG_MutexRelease())
+    {
+      Error_Handler();
     }
   }
 
-  if(status != HW_OK)
+  if (status != HW_OK)
   {
     HWCB_RNG_Process( );
   }
 
   /* Return status */
   return status;
+}
+
+void HW_RNG_Init(void)
+{
+  HW_RNG_VAR_T* pv = &HW_RNG_var;
+
+  SYSTEM_DEBUG_SIGNAL_SET(RNG_ENABLE);
+
+  LL_RCC_SetRNGClockSource(LL_RCC_RNG_CLKSOURCE_HSI);
+  LL_AHB2_GRP1_EnableClock(LL_AHB2_GRP1_PERIPH_RNG);
+  LL_RNG_Disable(RNG);
+  while(LL_RNG_IsEnabled(RNG));
+ 
+  /* Recommended value for NIST compliance, refer to application note AN4230 */
+  /* Using LL macros to set these values is not convenient as it's split 
+     in 3 parts and need some bit polling at each step to check completion.
+     So, for efficiency, register direct access */
+  WRITE_REG(RNG->CR, RNG_CR_NIST_VALUE | RNG_CR_CONDRST | RNG_CED_DISABLE);
+  /* Recommended value for NIST compliance, refer to application note AN4230 */
+ 
+  LL_RNG_DisableClkErrorDetect(RNG);
+  LL_RNG_DisableCondReset(RNG);
+
+#if !(defined(STM32WBA52xx) || defined(STM32WBA54xx) || defined(STM32WBA55xx) || defined(STM32WBA5Mxx)) 
+  while((RNG->SR & (1 << 4)));
+#endif 
+  
+  while(LL_RNG_IsEnabledCondReset(RNG));
+
+  LL_RNG_SetHealthConfig(RNG,RNG_HTCR_NIST_VALUE);
+
+  LL_RNG_Enable(RNG);
+  while(!LL_RNG_IsActiveFlag_DRDY(RNG)); /*wait for data to be ready*/
+
+  pv->run = TRUE;
+  SYSTEM_DEBUG_SIGNAL_RESET(RNG_ENABLE);
+}
+ 
+  
+void HW_RNG_SetPoolThreshold(uint8_t threshold)
+{
+  if(threshold < HW_RNG_POOL_SIZE)
+  {
+    hw_rng_pool_threshold = threshold;
+  }
 }

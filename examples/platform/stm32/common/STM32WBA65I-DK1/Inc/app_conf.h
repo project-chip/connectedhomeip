@@ -24,28 +24,37 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "hw_if.h"
+#include "ble_defs.h"
 #include "utilities_conf.h"
-#include "log_module.h"
 
 /* USER CODE BEGIN Includes */
 #include "cmsis_compiler.h"
+#include "FreeRTOSConfig.h"
 /* USER CODE END Includes */
 
 /******************************************************************************
  * Application Config
  ******************************************************************************/
 /**< generic parameters ******************************************************/
+
+#define APP_NAME "Lighting-app"
+/* Version */
+#define X_CUBE_MATTER_VERSION "v1.6.0"
+#define PRODUCT_NAME "Dimmable Light"
+#define VENDOR_NAME "STMicroelectronics"
+#define MATTER_SDK_VERSION "1.5.0.1"
+
 /* HIGHWATERMARK */
 #define HIGHWATERMARK 1
 
 /* App task define */
-#define APPTASK_NAME        "APPTASK"
+#define APPTASK_NAME    "APPTASK"
 #define APP_ATTR_BITS   (0)
 #define APP_CB_MEM      (0)
 #define APP_CB_SIZE     (0)
 #define APP_STACK_MEM   (0)
 #define APP_PRIORITY    osPriorityNormal
-#define APP_STACK_SIZE  (1024*10)
+#define APP_STACK_SIZE  (1024*9)
 /**
  * Define Tx Power
  */
@@ -55,12 +64,12 @@
  * Definition of public BD Address,
  * when CFG_BD_ADDRESS = 0x000000000000 the BD address is generated based on Unique Device Number.
  */
-#define CFG_BD_ADDRESS                    (0x0000000000000)
+#define CFG_BD_ADDRESS                    (0x000000000000)
 
 /**
  * Define BD_ADDR type: define proper address. Can only be GAP_PUBLIC_ADDR (0x00) or GAP_STATIC_RANDOM_ADDR (0x01)
  */
-#define CFG_BD_ADDRESS_TYPE               (GAP_PUBLIC_ADDR)
+#define CFG_BD_ADDRESS_DEVICE             (GAP_STATIC_RANDOM_ADDR)
 
 /**
  * Define privacy: PRIVACY_DISABLED or PRIVACY_ENABLED
@@ -73,57 +82,51 @@
  * if CFG_PRIVACY equals PRIVACY_DISABLED, CFG_BLE_ADDRESS_TYPE has 2 allowed values: GAP_PUBLIC_ADDR or GAP_STATIC_RANDOM_ADDR
  * if CFG_PRIVACY equals PRIVACY_ENABLED, CFG_BLE_ADDRESS_TYPE has 2 allowed values: GAP_RESOLVABLE_PRIVATE_ADDR or GAP_NON_RESOLVABLE_PRIVATE_ADDR
  */
-#define CFG_BLE_ADDRESS_TYPE              (GAP_PUBLIC_ADDR)
+#define CFG_BD_ADDRESS_TYPE               (GAP_STATIC_RANDOM_ADDR)
 
-#define ADV_INTERVAL_MIN                  (0x0080)
-#define ADV_INTERVAL_MAX                  (0x00A0)
-#define ADV_LP_INTERVAL_MIN               (0x0640)
-#define ADV_LP_INTERVAL_MAX               (0x0FA0)
+#define ADV_INTERVAL_MIN                  (80)
+#define ADV_INTERVAL_MAX                  (100)
+#define ADV_LP_INTERVAL_MIN               (800)
+#define ADV_LP_INTERVAL_MAX               (1000)
 #define ADV_TYPE                          ADV_IND
 #define ADV_FILTER                        NO_WHITE_LIST_USE
 
 /**
  * Define IO Authentication
  */
-#define CFG_BONDING_MODE                 (1)
-#define CFG_USED_FIXED_PIN               (0) /* 0->fixed pin is used ; 1->No fixed pin used*/
-#define CFG_FIXED_PIN                    (111111)
-#define CFG_ENCRYPTION_KEY_SIZE_MAX      (16)
-#define CFG_ENCRYPTION_KEY_SIZE_MIN      (8)
+#define CFG_BONDING_MODE                  (0)
+#define CFG_ENCRYPTION_KEY_SIZE_MAX       (16)
+#define CFG_ENCRYPTION_KEY_SIZE_MIN       (8)
 
 /**
  * Define Input Output capabilities
  */
-#define CFG_IO_CAPABILITY                (IO_CAP_DISPLAY_YES_NO)
+#define CFG_IO_CAPABILITY                 (IO_CAP_DISPLAY_YES_NO)
 
 /**
  * Define Man In The Middle modes
  */
-#define CFG_MITM_PROTECTION              (MITM_PROTECTION_REQUIRED)
+#define CFG_MITM_PROTECTION               (MITM_PROTECTION_REQUIRED)
 
 /**
  * Define Secure Connections Support
  */
-#define CFG_SECURE_NOT_SUPPORTED              (0x00)
-#define CFG_SECURE_OPTIONAL                   (0x01)
-#define CFG_SECURE_MANDATORY                  (0x02)
-
-#define CFG_SC_SUPPORT                        CFG_SECURE_OPTIONAL
+#define CFG_SC_SUPPORT                    (SC_PAIRING_OPTIONAL)
 
 /**
  * Define Keypress Notification Support
  */
-#define CFG_KEYPRESS_NOTIFICATION_SUPPORT     (KEYPRESS_NOT_SUPPORTED)
+#define CFG_KEYPRESS_NOTIFICATION_SUPPORT (KEYPRESS_NOT_SUPPORTED)
 
 /**
 *   Identity root key used to derive IRK and DHK(Legacy)
 */
-#define CFG_BLE_IR      {0x12, 0x34, 0x56, 0x78, 0x9A, 0xBC, 0xDE, 0xF0, 0x12, 0x34, 0x56, 0x78, 0x9A, 0xBC, 0xDE, 0xF0}
+#define CFG_BLE_IR  {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}
 
 /**
 * Encryption root key used to derive LTK(Legacy) and CSRK
 */
-#define CFG_BLE_ER      {0xFE, 0xDC, 0xBA, 0x09, 0x87, 0x65, 0x43, 0x21, 0xFE, 0xDC, 0xBA, 0x09, 0x87, 0x65, 0x43, 0x21}
+#define CFG_BLE_ER  {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}
 
 /* USER CODE BEGIN Generic_Parameters */
 
@@ -143,6 +146,7 @@
  * BLE stack options, bitmap to active or not some features at BleStack_Init() function call.
  */
 #define CFG_BLE_OPTIONS             (0 | \
+                                     0 | \
                                      0 | \
                                      0 | \
                                      0 | \
@@ -188,7 +192,12 @@
  *  - 2, if extended properties is used
  *  The total amount of memory needed is the sum of the above quantities for each attribute.
  */
-#define CFG_BLE_ATT_VALUE_ARRAY_SIZE    (1344)
+#define CFG_BLE_ATT_VALUE_ARRAY_SIZE  (1344)
+
+/**
+ * Maximum numbers of bearers that can be created for Enhanced ATT per ACL links
+ */
+#define CFG_BLE_EATT_BEARER_PER_LINK  (0)
 
 /**
  * depth of the PREPARE WRITE queue when PREPARE WRITE REQUEST
@@ -205,6 +214,21 @@
 #define CFG_BLE_MBLOCK_COUNT          (BLE_MBLOCKS_CALC(PREP_WRITE_LIST_SIZE, \
                                        CFG_BLE_ATT_MTU_MAX, CFG_BLE_NUM_LINK) \
                                        + CFG_BLE_MBLOCK_COUNT_MARGIN)
+
+/**
+ * Size of the RAM buffer allocated to store BLE host events
+ */
+#define CFG_BLE_HOST_EVENT_BUF_SIZE   (512)
+
+/**
+ * Size of the RAM buffer allocated for the extension of BLE host commands
+ */
+#define CFG_BLE_EXTRA_DATA_BUF_SIZE (0)
+
+/**
+ * Size of the RAM buffer allocated for long write commands, can be 0 or 256.
+ */
+#define CFG_BLE_LONG_WRITE_DATA_BUF_SIZE (0)
 
 /**
  * Appearance of device set into BLE GAP
@@ -234,16 +258,26 @@
  *
  *  When CFG_LPM_LEVEL is set to:
  *   - 0 : Low Power Mode is not activated, RUN mode will be used.
- *   - 1 : Low power active, the one selected with CFG_LPM_STDBY_SUPPORTED
- *   - 2 : In addition, force to disable modules to reach lowest power figures.
- *
- * When CFG_LPM_STDBY_SUPPORTED is set to:
- *   - 1 : Standby is used as low power mode.
- *   - 0 : Standby is not used, so stop mode 1 is used as low power mode.
- *
+ *   - 1 : Low power active, mode(s) selected with CFG_LPM_mode_SUPPORTED
+ *   - 2 : In addition log and debug are disabled to reach lowest power figures.
  ******************************************************************************/
-#define CFG_LPM_LEVEL            (0)
-#define CFG_LPM_STDBY_SUPPORTED  (0)
+#define CFG_LPM_LEVEL               (0U)
+
+#define CFG_LPM_STOP1_SUPPORTED     (0U)
+#define CFG_LPM_STOP2_SUPPORTED     (0U)
+#define CFG_LPM_STANDBY_SUPPORTED   (0U)
+
+/**
+ * Defines to use dynamic low power wakeup time profilling.
+ * With this option at boot wake up time is profiled and then is used.
+ */
+#define CFG_LPM_WAKEUP_TIME_PROFILING (1U)
+
+/**
+ * Defines time to wake up from standby before radio event to meet timings
+ * This value will be dynamically updated when using CFG_LPM_WAKEUP_TIME_PROFILING
+ */
+#define CFG_LPM_STDBY_WAKEUP_TIME (1500U)
 
 /* USER CODE BEGIN Low_Power 0 */
 
@@ -259,6 +293,9 @@ typedef enum
   CFG_LPM_LOG,
   CFG_LPM_LL_DEEPSLEEP,
   CFG_LPM_LL_HW_RCO_CLBR,
+  CFG_LPM_APP_THREAD,
+  CFG_LPM_PKA,
+  CFG_LPM_PKA_OVR_IT,
   /* USER CODE BEGIN CFG_LPM_Id_t */
 
   /* USER CODE END CFG_LPM_Id_t */
@@ -268,15 +305,9 @@ typedef enum
 
 /* USER CODE END Low_Power 1 */
 
-/* Core voltage supply selection, it can be PWR_LDO_SUPPLY or PWR_SMPS_SUPPLY */
-#define CFG_CORE_SUPPLY          (PWR_LDO_SUPPLY)
-
 /******************************************************************************
  * RTC
  ******************************************************************************/
-//#define RTC_N_PREDIV_S (10)
-//#define RTC_PREDIV_S ((1<<RTC_N_PREDIV_S)-1)
-//#define RTC_PREDIV_A ((1<<(15-RTC_N_PREDIV_S))-1)
 
 /* USER CODE BEGIN RTC */
 
@@ -295,10 +326,13 @@ typedef enum
 /**
  * Enable or disable LOG over UART in the application.
  * Low power level(CFG_LPM_LEVEL) above 1 will disable LOG.
- * Standby low power mode(CFG_LPM_STDBY_SUPPORTED) will disable LOG.
+ * Enabled low power modes above STOP1 (STOP2 or STANDBY) will disable LOG.
  */
-#define CFG_LOG_SUPPORTED           (1U)
+#define CFG_LOG_SUPPORTED           (1)
 
+/* Usart used by LOG */
+extern UART_HandleTypeDef           huart1;
+#define LOG_UART_HANDLER            huart1
 /* Configure Log display settings */
 #define CFG_LOG_INSERT_COLOR_INSIDE_THE_TRACE       (1U)
 #define CFG_LOG_INSERT_TIME_STAMP_INSIDE_THE_TRACE  (0U)
@@ -306,27 +340,28 @@ typedef enum
 
 #define CFG_LOG_TRACE_FIFO_SIZE     (4096U)
 #define CFG_LOG_TRACE_BUF_SIZE      (256U)
-/* macro ensuring retrocompatibility with old applications */
-#define APP_DBG                     LOG_INFO_APP
-#define APP_DBG_MSG                 LOG_INFO_APP
 
-/* Usart used by LOG */
-extern UART_HandleTypeDef           huart1;
-#define LOG_UART_HANDLER            huart1
 /* USER CODE BEGIN Logs */
 
 /* USER CODE END Logs */
 
 /******************************************************************************
  * Configure Log level for Application
+ *
+ * APPLI_CONFIG_LOG_LEVEL can be any value of the Log_Verbose_Level_t enum.
+ *
+ * APPLI_CONFIG_LOG_REGION can either be :
+ * - LOG_REGION_ALL_REGIONS to enable all regions
+ * or
+ * - One or several specific regions (any value except LOG_REGION_ALL_REGIONS)
+ *   from the Log_Region_t enum and matching the mask value.
+ *
+ *   For example, to enable both LOG_REGION_BLE and LOG_REGION_APP,
+ *   the value assigned to the define is :
+ *   (1U << LOG_REGION_BLE | 1U << LOG_REGION_APP)
  ******************************************************************************/
 #define APPLI_CONFIG_LOG_LEVEL      LOG_VERBOSE_INFO
-#define APPLI_PRINT_FILE_FUNC_LINE    0
-/******************************************************************************
- * Configure Log level for Application
- ******************************************************************************/
-
-
+#define APPLI_CONFIG_LOG_REGION     (LOG_REGION_ALL_REGIONS)
 /* USER CODE BEGIN Log_level */
 
 /* USER CODE END Log_level */
@@ -334,103 +369,60 @@ extern UART_HandleTypeDef           huart1;
 /******************************************************************************
  * Configure Serial Link used for Thread Command Line
  ******************************************************************************/
+/* if OT_CLI_USE is defined to be 1, the LPM will be disabled */
 #define OT_CLI_USE                  (0U)
-extern UART_HandleTypeDef           hlpuart1;
-#define OT_CLI_UART_HANDLER         hlpuart1
+extern UART_HandleTypeDef           huart2;
+#define OT_CLI_UART_HANDLER         huart2
 
 /******************************************************************************
- * Sequencer
+ * RTOS configuration
  ******************************************************************************/
 
-/**
- * These are the lists of task id registered to the sequencer
- * Each task id shall be in the range [0:31]
- */
 typedef enum
 {
-  CFG_TASK_HW_RNG,                /* Task linked to chip internal peripheral. */
-  CFG_TASH_HW_PKA,
-  CFG_TASK_LINK_LAYER,            /* Tasks linked to Communications Layers. */
-  CFG_TASK_HCI_ASYNCH_EVT_ID,
-  CFG_TASK_LINK_LAYER_TEMP_MEAS,
-  CFG_TASK_BLE_HOST,
-  CFG_TASK_BPKA,
-  CFG_TASK_AMM_BCKGND,
-  CFG_TASK_FLASH_MANAGER_BCKGND,
-  CFG_TASK_BLE_TIMER_BCKGND,
-  /* USER CODE BEGIN CFG_Task_Id_t */
-  
-  /* OT Tasks */
-  CFG_TASK_OT_UART,
-  CFG_TASK_OT_ALARM,
-  CFG_TASK_OT_US_ALARM,
-  CFG_TASK_OT_TASKLETS,
-  CFG_TASK_SEND_COAP_MSG,
-  CFG_TASK_MEAS_REQ_ID,
-  CFG_TASK_ADV_LP_REQ_ID,
-  /* USER CODE END CFG_Task_Id_t */
-  CFG_TASK_NBR /* Shall be LAST in the list */
-} CFG_Task_Id_t;
+  CFG_RTOS_FLAG_RNG = 0,
+  CFG_RTOS_FLAG_PKA,
+  CFG_RTOS_FLAG_FlashManager,
+  CFG_RTOS_FLAG_LinkLayer,
+  CFG_RTOS_FLAG_OT_Tasklet,
+  CFG_RTOS_FLAG_OT_Alarm_ms,
+  CFG_RTOS_FLAG_OT_Alarm_us,
+  CFG_RTOS_FLAG_OT_CLIuart,
+  CFG_RTOS_FLAG_BLEhost,
+  CFG_RTOS_FLAG_BLEhciEvt,
+  CFG_RTOS_FLAG_BLEtimer,
+  CFG_RTOS_FLAG_TempRadioCalib,
+  CFG_RTOS_FLAG_AMM,
+/* USER CODE BEGIN CFG_RTOS_FLAG_Id_t */
 
-/* USER CODE BEGIN DEFINE_TASK */
+/* USER CODE END CFG_RTOS_FLAG_Id_t */
+  CFG_RTOS_FLAG_LAST
+} CFG_RTOS_FLAG_Id_t;
+/* USER CODE BEGIN RTOS_config */
 
-/* USER CODE END DEFINE_TASK */
-
-
-/**
- * This is a bit mapping over 32bits listing all events id supported in the application
- */
-typedef enum
-{
-  CFG_IDLEEVT_PROC_GAP_COMPLETE,
-  CFG_IDLEEVT_PKA_END_OF_OPERATION,
-  /* USER CODE BEGIN CFG_IdleEvt_Id_t */
-
-  /* USER CODE END CFG_IdleEvt_Id_t */
-} CFG_IdleEvt_Id_t;
-
-/* Sequencer priorities by default  */
-
-/* USER CODE BEGIN TASK_Priority_Define */
-
-/* USER CODE END TASK_Priority_Define */
-
-
-/**
- * These are the lists of events id registered to the sequencer
- * Each event id shall be in the range [0:31]
- */
-typedef enum
-{
-  /* USER CODE BEGIN CFG_Event_Id_t */
-
-  /* USER CODE END CFG_Event_Id_t */
-  CFG_EVENT_NBR                   /* Shall be LAST in the list */
-} CFG_Event_Id_t;
-
-/**< Events defines */
-
+/* USER CODE END RTOS_config */
 /******************************************************************************
  * NVM configuration
  ******************************************************************************/
 
-#define CFG_SNVMA_START_SECTOR_ID     (FLASH_PAGE_NB - 2u)
+#define CFG_SNVMA_START_SECTOR_ID     ((FLASH_SIZE / FLASH_PAGE_SIZE) - 2u)
 
 #define CFG_SNVMA_START_ADDRESS       (FLASH_BASE + (FLASH_PAGE_SIZE * (CFG_SNVMA_START_SECTOR_ID)))
+
+/* Number of 64-bit words in NVM flash area */
+#define CFG_BLE_NVM_SIZE_MAX          ((2048/8)-4)
+  /**
+   * This is the max size of data the THREAD Stack needs to write in NVM
+   * This is different to the size allocated in the EEPROM emulator
+   * The THREAD Stack shall write all data at an address in the range of [0 : (y-1)]
+   * The size is a number of 32bits values
+   */
+#define CFG_NVMA_THREAD_NVM_SIZE                    ( 0u )
 
 /* USER CODE BEGIN NVM_Configuration */
 
 /* USER CODE END NVM_Configuration */
 
-/******************************************************************************
- * BLEPLAT configuration
- ******************************************************************************/
-/* Number of 64-bit words in NVM flash area */
-#define CFG_BLEPLAT_NVM_MAX_SIZE            ((2048/8)-4)
-
-/* USER CODE BEGIN BLEPLAT_Configuration */
-
-/* USER CODE END BLEPLAT_Configuration */
 
 /******************************************************************************
  * Debugger
@@ -447,52 +439,45 @@ typedef enum
  * RealTime GPIO debug module configuration
  ******************************************************************************/
 
-#define CFG_RT_DEBUG_GPIO_MODULE         (0)
-#define CFG_RT_DEBUG_DTB                 (0)
+#define CFG_RT_DEBUG_GPIO_MODULE            (0)
+#define CFG_RT_DEBUG_DTB                    (0)
 
 /******************************************************************************
  * System Clock Manager module configuration
+ *
+ *  When CFG_SCM_SUPPORTED is set to:
+ *   - 0 : System Clock Manager is disabled and user must handle himself
+ *         all clock management, taking care of radio requirements.
+ *         (radio operation requires HSE 32MHz with Voltage Scaling Range 1)
+ *   - 1 : System Clock Manager ensures proper clock settings and switchings
+ *         according to radio requirements and user preferences
+ *
  ******************************************************************************/
-
-#define CFG_SCM_SUPPORTED            (1)
+#define CFG_SCM_SUPPORTED                   (1)
 
 /******************************************************************************
  * HW RADIO configuration
  ******************************************************************************/
-/* Do not modify - must be 1 */
-#define USE_RADIO_LOW_ISR                   (1)
-
-/* Do not modify - must be 1 */
-#define NEXT_EVENT_SCHEDULING_FROM_ISR      (1)
-
 /* Link Layer uses temperature based calibration (0 --> NO ; 1 --> YES) */
 #define USE_TEMPERATURE_BASED_RADIO_CALIBRATION  (0)
 
 #define RADIO_INTR_NUM                      RADIO_IRQn     /* 2.4GHz RADIO global interrupt */
-#define RADIO_INTR_PRIO_HIGH                (5)            /* 2.4GHz RADIO interrupt priority when radio is Active */
-#define RADIO_INTR_PRIO_LOW                 (7)            /* 2.4GHz RADIO interrupt priority when radio is Not Active - Sleep Timer Only */
+#define RADIO_INTR_PRIO_HIGH                (configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY)            /* 2.4GHz RADIO interrupt priority when radio is Active */
+#define RADIO_INTR_PRIO_LOW                 (configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY + 2)        /* 2.4GHz RADIO interrupt priority when radio is Not Active - Sleep Timer Only */
 
-#if (USE_RADIO_LOW_ISR == 1)
-#define RADIO_SW_LOW_INTR_NUM               HASH_IRQn      /* Selected interrupt vector for 2.4GHz RADIO low ISR */
+#define RADIO_SW_LOW_INTR_NUM               COMP_IRQn      /* Selected interrupt vector for 2.4GHz RADIO low ISR */
 #define RADIO_SW_LOW_INTR_PRIO              (15)           /* 2.4GHz RADIO low ISR priority */
-#endif /* USE_RADIO_LOW_ISR */
-
-/* Link Layer supported number of antennas */
-#define RADIO_NUM_OF_ANTENNAS               (4)
 
 #define RCC_INTR_PRIO                       (1)           /* HSERDY and PLL1RDY */
 
 /* RF TX power table ID selection:
- *   0 -> RF TX output level from -20 dBm to +10 dBm
- *   1 -> RF TX output level from -20 dBm to +3 dBm
+ *   0 -> RF TX output level from -20 dBm to +10 dBm. VDDRFPA at VDD level.
+ *   1 -> RF TX output level from -20 dBm to +3 dBm. VDDRFPA at VDD11 level like on ST MB1803 and MB2130 boards.
  */
-#define CFG_RF_TX_POWER_TABLE_ID            (1)
+#define CFG_RF_TX_POWER_TABLE_ID            (0)
 
-/* Custom LSE sleep clock accuracy to use if both conditions are met: 
- * - LSE is selected as Link Layer sleep clock source
- * - the LSE used is different from the default one.
- */
-#define CFG_RADIO_LSE_SLEEP_TIMER_CUSTOM_SCA_RANGE (0)
+/* Radio sleep clock LSE accuracy configuration */
+#define CFG_RADIO_LSE_SLEEP_TIMER_CUSTOM_SCA_RANGE (0x04)
 
 /* USER CODE BEGIN Radio_Configuration */
 
@@ -502,64 +487,83 @@ typedef enum
  * HW_RNG configuration
  ******************************************************************************/
 
-/* Number of 32-bit random values stored in internal pool */
+/* Number of 32-bit random numbers stored in internal pool */
 #define CFG_HW_RNG_POOL_SIZE                (32)
+
+/* Threshold of random numbers available before triggering pool refill */
+#define CFG_HW_RNG_POOL_THRESHOLD           (16)
 
 /* USER CODE BEGIN HW_RNG_Configuration */
 
 /* USER CODE END HW_RNG_Configuration */
 
 /******************************************************************************
+ * PKA configuration
+ ******************************************************************************/
+/* PKA IRQ priority of the PKA end of process */
+#define PKA_INTR_PRIO_PROCEND               (7)
+
+/******************************************************************************
  * MEMORY MANAGER
  ******************************************************************************/
 
-#define CFG_MM_POOL_SIZE                          (4000)
-#define CFG_PWR_VOS2_SUPPORTED                    (0)   /* VOS2 power configuration not currently supported with radio activity */
-#define CFG_AMM_VIRTUAL_MEMORY_NUMBER             (2u)
-#define CFG_AMM_VIRTUAL_STACK_BLE                 (1U)
-#define CFG_AMM_VIRTUAL_STACK_BLE_BUFFER_SIZE     (400U)
-#define CFG_AMM_VIRTUAL_APP_BLE                   (2U)
-#define CFG_AMM_VIRTUAL_APP_BLE_BUFFER_SIZE       (200U)
-#define CFG_AMM_POOL_SIZE                      DIVC(CFG_MM_POOL_SIZE, sizeof (uint32_t)) \
-                                               + (AMM_VIRTUAL_INFO_ELEMENT_SIZE * CFG_AMM_VIRTUAL_MEMORY_NUMBER)
+#define CFG_MM_POOL_SIZE                                  (4000U)  /* bytes */
+#define CFG_AMM_VIRTUAL_MEMORY_NUMBER                     (2U)
+#define CFG_AMM_VIRTUAL_BLE_TIMERS                        (1U)
+#define CFG_AMM_VIRTUAL_BLE_TIMERS_BUFFER_SIZE     (400U)  /* words (32 bits) */
+#define CFG_AMM_VIRTUAL_BLE_EVENTS                        (2U)
+#define CFG_AMM_VIRTUAL_BLE_EVENTS_BUFFER_SIZE     (64U)  /* words (32 bits) */
 
 /* USER CODE BEGIN MEMORY_MANAGER_Configuration */
 
 /* USER CODE END MEMORY_MANAGER_Configuration */
 
 /* USER CODE BEGIN Defines */
+#define CFG_BSP_ON_FREERTOS                    (1)
+#define CFG_BSP_ON_DISCOVERY                   (1)
+
 /**
  * User interaction
  * When CFG_LED_SUPPORTED is set, LEDS are activated if requested
- * When CFG_LCD_SUPPORTED is set, the LCD screen is activated if requested
- * When CFG_BUTTON_SUPPORTED is set, the push button are activated if requested
- * When CFG_JOYSTICK_SUPPORTED is set , the joystick is activated if requested
+ * When CFG_JOYSTICK_SUPPORTED is set, the push button are activated if requested
  */
 
-#define CFG_BSP_ON_DISCOVERY        (1)
-#define CFG_BSP_ON_FREERTOS         (1)
+#define CFG_LED_SUPPORTED                       (1)
+#define CFG_JOYSTICK_SUPPORTED                  (1)
+#define CFG_JOYSTICK_USE_TYPE                   (JOYSTICK_USE_AS_BUTTON_WITH_TIME)
+#define CFG_JOYSTICK_MODE                       (JOY_MODE_POLLING)
+#define CFG_LCD_SUPPORTED                       (1)
 
-#define CFG_LED_SUPPORTED           (1)
-#define CFG_JOYSTICK_SUPPORTED      (1)
-#define CFG_LCD_SUPPORTED           (1)
+/**
+ * Overwrite LPM configuration imposed by OpenThread CLI Option
+ */
+#if (OT_CLI_USE == 1)
+  #if CFG_LPM_LEVEL
+    #undef  CFG_LPM_LEVEL
+    #define CFG_LPM_LEVEL                (0)
+  #endif /* CFG_LPM_LEVEL */
+  #if CFG_LPM_STDBY_SUPPORTED
+    #undef  CFG_LPM_STDBY_SUPPORTED
+    #define CFG_LPM_STDBY_SUPPORTED      (0)
+  #endif /* CFG_LPM_STDBY_SUPPORTED */
+#endif /* OT_CLI_USE */
 
 /**
  * Overwrite some configuration imposed by Low Power level selected.
  */
-#if (CFG_LPM_LEVEL > 1)
+#if (CFG_LPM_LEVEL > 0)
   #if CFG_LED_SUPPORTED
     #undef  CFG_LED_SUPPORTED
     #define CFG_LED_SUPPORTED      (0)
   #endif /* CFG_LED_SUPPORTED */
+  #if CFG_LCD_SUPPORTED
+    #undef  CFG_LCD_SUPPORTED
+    #define CFG_LCD_SUPPORTED      (0)
+  #endif /* CFG_LCD_SUPPORTED */
 #endif /* CFG_LPM_LEVEL */
 
 /* USER CODE END Defines */
 
-/*******************************************************************************
-* SDK BOOT REASON support
-* add SDK BOOT REASON support to identify each Boot Reason Reset Type of system
-********************************************************************************/
-#define ENABLE_SDK_BOOT_REASON_SUPPORT 0
 
 /**
  * Overwrite some configuration imposed by Low Power level selected.
@@ -567,46 +571,53 @@ typedef enum
 #if (CFG_LPM_LEVEL > 1)
   #if CFG_LOG_SUPPORTED
     #undef  CFG_LOG_SUPPORTED
-    #define CFG_LOG_SUPPORTED       (0)
+    #define CFG_LOG_SUPPORTED       (0U)
   #endif /* CFG_LOG_SUPPORTED */
   #if CFG_DEBUGGER_LEVEL
     #undef  CFG_DEBUGGER_LEVEL
-    #define CFG_DEBUGGER_LEVEL      (0)
+    #define CFG_DEBUGGER_LEVEL      (0U)
   #endif /* CFG_DEBUGGER_LEVEL */
 #endif /* CFG_LPM_LEVEL */
 
-#if (CFG_LPM_STDBY_SUPPORTED == 1)
-  #if CFG_LOG_SUPPORTED
-    #undef  CFG_LOG_SUPPORTED
-    #define CFG_LOG_SUPPORTED       (0)
-  #endif /* CFG_LOG_SUPPORTED */
-#endif /* CFG_LPM_STDBY_SUPPORTED */
+#if (CFG_LPM_LEVEL == 0)
+  #undef CFG_LPM_STOP1_SUPPORTED
+  #define CFG_LPM_STOP1_SUPPORTED   (0U)
+  #undef CFG_LPM_STOP2_SUPPORTED
+  #define CFG_LPM_STOP2_SUPPORTED   (0U)
+  #undef CFG_LPM_STANDBY_SUPPORTED
+  #define CFG_LPM_STANDBY_SUPPORTED (0U)
+#endif
 
-/**
- * Switch to enable/disable BLE radio activity shown on green LED
- * 0 : disable / 1 : enable
- */
-#define BLE_RADIO_ACTIVITY_ON_LED_SUPPORT               (1)
+#if !defined(PWR_STOP2_SUPPORT)
+  #undef CFG_LPM_STOP2_SUPPORTED
+  #define CFG_LPM_STOP2_SUPPORTED   (0U)
+#endif
 
-#if (CFG_LED_SUPPORTED == 0)
-#undef BLE_RADIO_ACTIVITY_ON_LED_SUPPORT
-#define BLE_RADIO_ACTIVITY_ON_LED_SUPPORT               (0)
-#endif                                                 
+/*********************************************************************
+ * CAUTION: CFG_LPM_STDBY_SUPPORTED is deprecated and must be removed
+ * Please use a combination of previous defines instead
+ * Temporary define for backward compatibility
+ *********************************************************************/
+ #if (CFG_LPM_STANDBY_SUPPORTED == 1U)
+ #define CFG_LPM_STDBY_SUPPORTED (1U)
+ #else
+ #define CFG_LPM_STDBY_SUPPORTED (0U)
+ #endif
 
+/* USER CODE BEGIN Defines_2 */
 
-#define CFG_LPM_STDBY_WAKEUP_TIME	(1500)
 /* USER CODE BEGIN Defines_2 */
 
 /******************************************************************************
  * Matter Factory data
  ******************************************************************************/
-#define CONFIG_STM32_FACTORY_DATA_ENABLE 0
+#define CONFIG_STM32_FACTORY_DATA_ENABLE (0)
 
 /******************************************************************************
  * OTA support
  ******************************************************************************/
-#define OTA_SUPPORT                (1)
-#define OTA_EXTERNAL_FLASH_ENABLE  (1)
+#define OTA_SUPPORT                (0)
+#define OTA_EXTERNAL_FLASH_ENABLE  (0)
 
 /* USER CODE END Defines_2 */
 

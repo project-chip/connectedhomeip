@@ -7,7 +7,7 @@
   ******************************************************************************
   * @attention
   *
-  * Copyright (c) 2024 STMicroelectronics.
+  * Copyright (c) 2025 STMicroelectronics.
   * All rights reserved.
   *
   * This software is licensed under terms that can be found in the LICENSE file
@@ -47,6 +47,36 @@ extern "C" {
 /* USER CODE END PD */
 
 /* Exported types ------------------------------------------------------------*/
+typedef enum
+{
+  /* USER CODE BEGIN MT1 */
+  /* USER CODE END MT1 */
+  UTIL_LPM_IDLE_MODE,            /**< Idle mode */
+  /* USER CODE BEGIN MT2 */
+  /* USER CODE END MT2 */
+  UTIL_LPM_SLEEP_MODE,           /**< Sleep mode */
+  /* USER CODE BEGIN MT3 */
+  /* USER CODE END MT3 */
+#if (CFG_LPM_STOP1_SUPPORTED == 1)
+  UTIL_LPM_STOP1_MODE,           /**< Stop 1 mode */
+  /* USER CODE BEGIN MT4 */
+  /* USER CODE END MT4 */
+#endif
+#if (CFG_LPM_STOP2_SUPPORTED == 1)
+  UTIL_LPM_STOP2_MODE,           /**< Stop 2 mode */
+  /* USER CODE BEGIN MT5 */
+  /* USER CODE END MT5 */
+#endif
+#if (CFG_LPM_STANDBY_SUPPORTED == 1)
+  UTIL_LPM_STANDBY_MODE,         /**< Standby mode */
+  /* USER CODE BEGIN MT6 */
+  /* USER CODE END MT6 */
+#endif
+  UTIL_LPM_NUM_MODES             /**< Number of supported modes */
+} UTIL_LPM_Mode_t;
+
+#define UTIL_LPM_MAX_MODE (UTIL_LPM_NUM_MODES - 1) /**< Highest (most efficient )supported modes */
+
 /* USER CODE BEGIN ET */
 
 /* USER CODE END ET */
@@ -78,37 +108,50 @@ extern "C" {
 
 /* Exported functions prototypes ---------------------------------------------*/
 /**
-  * @brief Enters Low Power Off Mode
+  * @brief Handle enter and exit of Idle mode
   */
-void PWR_EnterOffMode( void );
-/**
-  * @brief Exits Low Power Off Mode
-  */
-void PWR_ExitOffMode( void );
+void LPM_IdleMode(uint32_t param);
 
 /**
-  * @brief Enters Low Power Stop Mode
+  * @brief Handle enter and exit of Sleep mode
   */
-void PWR_EnterStopMode( void );
-/**
-  * @brief Exits Low Power Stop Mode
-  */
-void PWR_ExitStopMode( void );
+void LPM_SleepMode(uint32_t param);
 
+#if (CFG_LPM_STOP1_SUPPORTED == 1)
 /**
-  * @brief Enters Low Power Sleep Mode
+  * @brief Handle enter and exit of Stop1 mode
   */
-void PWR_EnterSleepMode( void );
+void LPM_Stop1Mode(uint32_t param);
 
+#endif
+#if (CFG_LPM_STOP2_SUPPORTED == 1)
 /**
-  * @brief Exits Low Power Sleep Mode
+  * @brief Handle enter and exit of Stop2 mode
   */
-void PWR_ExitSleepMode( void );
+void LPM_Stop2Mode(uint32_t param);
+
+#endif
+#if (CFG_LPM_STANDBY_SUPPORTED == 1)
+/**
+  * @brief Handle enter and exit of Standby mode
+  */
+void LPM_StandbyMode(uint32_t param);
+
+#endif
 
 /**
   * @brief Check if the system is waking-up from standby low power mode.
   */
 uint32_t is_boot_from_standby(void);
+
+#if (CFG_LPM_WAKEUP_TIME_PROFILING == 1)
+#if (CFG_LPM_STANDBY_SUPPORTED == 1)
+/**
+  * @brief returns 0 if wakeup time profiling is not done.
+  */
+uint32_t LPM_is_wakeup_time_profiling_done(void);
+#endif /* CFG_LPM_STANDBY_SUPPORTED */
+#endif /* CFG_LPM_WAKEUP_TIME_PROFILING */
 
 /**
   * @brief will save MCU context if before standby entry

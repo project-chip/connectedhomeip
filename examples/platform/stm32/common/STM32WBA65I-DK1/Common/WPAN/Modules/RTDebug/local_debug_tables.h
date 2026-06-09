@@ -20,6 +20,10 @@
 #ifndef LOCAL_DEBUG_TABLES_H
 #define LOCAL_DEBUG_TABLES_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #if(CFG_RT_DEBUG_GPIO_MODULE == 1)
 
 /*******************************/
@@ -1149,8 +1153,18 @@ static const rt_debug_signal_t linklayer_debug_table[] = {
 #else
   [DBG_IO_LLHWC_GET_CH_IDX_ALGO_2] = RT_DEBUG_SIGNAL_UNUSED,
 #endif /* USE_RT_DEBUG_LLHWC_GET_CH_IDX_ALGO_2 */
+  
+#if (USE_RT_DEBUG_BACK_FROM_DEEP_SLEEP == 1)
+  [DBG_IO_BACK_FROM_DEEP_SLEEP] = RT_DEBUG_BACK_FROM_DEEP_SLEEP,
+#else
+  [DBG_IO_BACK_FROM_DEEP_SLEEP] = RT_DEBUG_SIGNAL_UNUSED,
+#endif /* USE_RT_DEBUG_BACK_FROM_DEEP_SLEEP */  
 };
 
 #endif /* CFG_RT_DEBUG_GPIO_MODULE */
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* LOCAL_DEBUG_TABLES_H*/

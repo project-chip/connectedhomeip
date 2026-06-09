@@ -20,10 +20,22 @@
 #ifndef TEMP_MEASUREMENT_H
 #define TEMP_MEASUREMENT_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* Includes ------------------------------------------------------------------*/
 #include "utilities_common.h"
 
 /* Exported defines ----------------------------------------------------------*/
+/**
+ * @brief Minimum operating temperature limit absolute value
+ *
+ * @details I.e.: Operating temperature is between -40C and 105degC,
+ *          Minimum value expected is 40u.
+ */
+#define TEMPMEAS_MIN_TEMP_LIMIT     ((uint32_t)40u)
+
 /* Exported types ------------------------------------------------------------*/
 /**
  * @brief Temperature Measurement command status codes
@@ -54,5 +66,9 @@ TEMPMEAS_Cmd_Status_t TEMPMEAS_Init (void);
   * @retval None
   */
 void TEMPMEAS_RequestTemperatureMeasurement (void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* TEMP_MEASUREMENT_H */

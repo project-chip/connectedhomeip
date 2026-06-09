@@ -131,11 +131,12 @@ extern "C" {
 #define MBEDTLS_SSL_CIPHERSUITES MBEDTLS_TLS_ECJPAKE_WITH_AES_128_CCM_8
 
 #define MBEDTLS_CIPHER_MODE_WITH_PADDING
+//#define MBEDTLS_CIPHER_MODE_CBC
 
 #define MBEDTLS_THREADING_ALT
 #define MBEDTLS_THREADING_C
 #define MBEDTLS_MEMORY_BUFFER_ALLOC_C
-#define  MBEDTLS_PKCS5_C
+#define MBEDTLS_PKCS5_C
 
 #define MBEDTLS_ERROR_C 1
 /**
@@ -211,6 +212,9 @@ extern "C" {
   */
 #define MBEDTLS_GCM_ALT
 #define MBEDTLS_HAL_GCM_ALT
+//#define MBEDTLS_CCM_ALT
+//#define MBEDTLS_HAL_CCM_ALT
+//#define HW_CRYPTO_DPA_AES
 
 /**
   * @brief HW_CRYPTO_DPA_GCM Allows DPA resistance for GCM by using secure crypto
@@ -252,7 +256,7 @@ extern "C" {
   *        Uncomment a macro to enable ST SHA256 hardware alternative module.
   *        Requires: MBEDTLS_SHA256_C, MBEDTLS_SHA256_ALT.
   */
-//#define MBEDTLS_HAL_SHA256_ALT
+#define MBEDTLS_HAL_SHA256_ALT
 
 /**
   * @brief ST_HW_CONTEXT_SAVING Enables ST HASH save context
@@ -329,10 +333,12 @@ extern "C" {
 #define MBEDTLS_ENTROPY_HARDWARE_ALT
 #define MBEDTLS_HAL_ENTROPY_HARDWARE_ALT
 
+#if (USE_TFM_PSA == 1)
+#undef MBEDTLS_PSA_CRYPTO_C
+#undef MBEDTLS_PSA_CRYPTO_STORAGE_C
+#define MBEDTLS_PSA_CRYPTO_CLIENT
 
-#define MBEDTLS_PSA_CRYPTO_C
-#define MBEDTLS_PSA_CRYPTO_STORAGE_C
-
+#define MBEDTLS_MD_SOME_PSA
 
 /**
   * @brief PSA_USE_ITS_ALT Enables ITS alternative module to replace
@@ -354,6 +360,7 @@ extern "C" {
   *        Requires: MBEDTLS_PSA_CRYPTO_STORAGE_C, PSA_USE_ITS_ALT.
   */
 #define PSA_USE_ENCRYPTED_ITS
+#endif /* (USE_TFM_PSA == 1)*/
 
 #include "check_crypto_config.h"
 #include "mbedtls/build_info.h"

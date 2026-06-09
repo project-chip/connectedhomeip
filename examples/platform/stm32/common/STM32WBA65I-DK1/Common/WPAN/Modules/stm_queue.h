@@ -23,6 +23,10 @@
 #ifndef __STM_QUEUE_H
 #define __STM_QUEUE_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* Includes ------------------------------------------------------------------*/
 /* Exported define -----------------------------------------------------------*/
 /* Options flags */
@@ -57,4 +61,9 @@ uint8_t* CircularQueue_Remove_Copy(queue_t *q, uint16_t* elementSize, uint8_t* b
 uint8_t* CircularQueue_Sense_Copy(queue_t *q, uint16_t* elementSize, uint8_t* buffer);
 
 /******************* (C) COPYRIGHT 2010 STMicroelectronics *****END OF FILE****/
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif /* __STM_QUEUE_H */

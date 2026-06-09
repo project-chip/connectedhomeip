@@ -22,6 +22,10 @@
 #ifndef MEMORY_MANAGER_H
 #define MEMORY_MANAGER_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* Includes ------------------------------------------------------------------*/
 /* Exported defines -----------------------------------------------------------*/
 /* Exported types ------------------------------------------------------------*/
@@ -37,5 +41,9 @@ MM_pBufAdd_t MM_GetBuffer(uint32_t size, MM_pCb_t cb );
 void MM_ReleaseBuffer( MM_pBufAdd_t p_buffer );
 
 /* Exported functions to be implemented by the user if required ------------- */
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* MEMORY_MANAGER_H */

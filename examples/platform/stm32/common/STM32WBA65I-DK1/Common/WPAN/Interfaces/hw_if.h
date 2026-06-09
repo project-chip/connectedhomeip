@@ -37,6 +37,7 @@ extern "C" {
 #include "stm32wbaxx_ll_utils.h"
 #include "stm32wbaxx_ll_gpio.h"
 #include "stm32wbaxx_ll_rtc.h"
+#include "stm32wbaxx_ll_pka.h"
 
 /* Private includes ----------------------------------------------------------*/
 

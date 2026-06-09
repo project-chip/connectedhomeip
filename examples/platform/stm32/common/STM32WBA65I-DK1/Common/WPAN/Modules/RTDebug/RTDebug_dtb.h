@@ -19,6 +19,10 @@
 #ifndef RT_DEBUG_DTB_H
 #define RT_DEBUG_DTB_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * The DEBUG DTB interface is INTENDED TO BE USED ONLY ON REQUEST FROM ST SUPPORT.
  * It provides HW signals from RF PHY activity.
@@ -30,6 +34,10 @@
 void RT_DEBUG_DTBConfig(void);
 void RT_DEBUG_DTBInit(void);
 #endif /* CFG_RT_DEBUG_DTB */
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* RT_DEBUG_DTB_H */
 

@@ -20,6 +20,10 @@
 #ifndef RF_EXTERNAL_PA_H
 #define RF_EXTERNAL_PA_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "stm32wbaxx.h"
 
 #define RF_EPA_CSD     {GPIOA, GPIO_PIN_9, GPIO_MODE_OUTPUT_PP, GPIO_AF15_EVENTOUT}
@@ -49,5 +53,9 @@ static const st_gpio_epa_t rf_external_pa_gpio_table[] =
 };
 
 void RF_CONTROL_ExternalPA(rf_external_pa_state_t state);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* RF_EXTERNAL_PA_H */

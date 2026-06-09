@@ -7,7 +7,7 @@
   ******************************************************************************
   * @attention
   *
-  * Copyright (c) 2022 STMicroelectronics.
+  * Copyright (c) 2025 STMicroelectronics.
   * All rights reserved.
   *
   * This software is licensed under terms that can be found in the LICENSE file
@@ -153,6 +153,14 @@ extern "C" {
 #define UTIL_ADV_TRACE_FIFO_SIZE                   (CFG_LOG_TRACE_FIFO_SIZE)             /*!< trace fifo size */
 #define UTIL_ADV_TRACE_MEMSET8( dest, value, size) UTIL_MEM_set_8((dest),(value),(size)) /*!< memset utilities interface to trace feature */
 #define UTIL_ADV_TRACE_VSNPRINTF(...)              vsnprintf(__VA_ARGS__)      /*!< vsnprintf utilities interface to trace feature */
+
+/******************************************************************************
+ * tiny low power manager
+ ******************************************************************************/
+/* Maximum number of supported LPM drivers */
+#define UTIL_LPM_DRIVER_MAX_NUM (10)
+/* Enables LPM legacy APIs */
+#define UTIL_LPM_LEGACY_ENABLED (0)
 
 /* USER CODE BEGIN EM */
 

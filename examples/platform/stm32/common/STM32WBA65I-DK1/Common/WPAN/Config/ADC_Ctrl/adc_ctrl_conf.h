@@ -5,9 +5,9 @@
   * @author  MCD Application Team
   * @brief   Configuration Header for adc_ctrl.c module
   ******************************************************************************
-  * @attention
+   * @attention
   *
-  * Copyright (c) 2023 STMicroelectronics.
+  * Copyright (c) 2025 STMicroelectronics.
   * All rights reserved.
   *
   * This software is licensed under terms that can be found in the LICENSE file
@@ -34,6 +34,12 @@
  * @brief Physical address of the ADC to use
  */
 #define ADCCTRL_HWADDR   ADC4
+
+/**
+ * @brief Flag to determine whether the dynamic VRefInt is performed or not
+ * @details Enable: 1u, Disable: 0u
+ */
+#define ADCCTRL_USE_DYNAMIC_VREF  (0u)
 
 /**
  * @brief Set ADC Clock source
@@ -66,5 +72,9 @@ extern ADCCTRL_Handle_t LLTempRequest_Handle;
 
 /* Exported macros -----------------------------------------------------------*/
 /* Exported functions prototypes ---------------------------------------------*/
+
+/* USER CODE BEGIN ADC_CTRL_CONF_H */
+
+/* USER CODE END ADC_CTRL_CONF_H */
 
 #endif /* ADC_CTRL_CONF_H */

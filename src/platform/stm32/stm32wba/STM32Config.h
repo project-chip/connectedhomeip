@@ -24,7 +24,7 @@
 #pragma once
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
-#include "flash_wb.h"
+#include "app_nvm.h"
 
 namespace chip {
 namespace DeviceLayer {

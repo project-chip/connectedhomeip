@@ -54,68 +54,36 @@ DeviceInfoProviderImpl::FixedLabelIteratorImpl::FixedLabelIteratorImpl(EndpointI
 
 size_t DeviceInfoProviderImpl::FixedLabelIteratorImpl::Count()
 {
-    // A hardcoded labelList on all endpoints.
-    return 4;
+    // only a default.
+    return 1;
 }
 
 bool DeviceInfoProviderImpl::FixedLabelIteratorImpl::Next(FixedLabelType & output)
 {
-    bool retval = true;
+    // Only one default fixed label.
+    static constexpr const char kDefaultLabel[] = "room";
+    static constexpr const char kDefaultValue[] = "bedroom 1";
 
-    // A hardcoded list for testing only
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    const char * labelPtr = nullptr;
-    const char * valuePtr = nullptr;
-
-    VerifyOrReturnError(mIndex < 4, false);
-
-    ChipLogProgress(DeviceLayer, "Get the fixed label with index:%u at endpoint:%d", static_cast<unsigned>(mIndex), mEndpoint);
-
-    switch (mIndex)
+    // Already returned once? Stop.
+    if (mIndex > 0)
     {
-    case 0:
-        labelPtr = "room";
-        valuePtr = "bedroom 2";
-        break;
-    case 1:
-        labelPtr = "orientation";
-        valuePtr = "North";
-        break;
-    case 2:
-        labelPtr = "floor";
-        valuePtr = "2";
-        break;
-    case 3:
-        labelPtr = "direction";
-        valuePtr = "up";
-        break;
-    default:
-        err = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
-        break;
+        return false;
     }
 
-    if (err == CHIP_NO_ERROR)
-    {
-        VerifyOrReturnError(std::strlen(labelPtr) <= kMaxLabelNameLength, false);
-        VerifyOrReturnError(std::strlen(valuePtr) <= kMaxLabelValueLength, false);
+    ChipLogProgress(DeviceLayer, "Get the fixed label with index:%u at endpoint:%d",
+                    static_cast<unsigned>(mIndex), mEndpoint);
 
-        Platform::CopyString(mFixedLabelNameBuf, kMaxLabelNameLength + 1, labelPtr);
-        Platform::CopyString(mFixedLabelValueBuf, kMaxLabelValueLength + 1, valuePtr);
+    VerifyOrReturnError(std::strlen(kDefaultLabel) <= kMaxLabelNameLength, false);
+    VerifyOrReturnError(std::strlen(kDefaultValue) <= kMaxLabelValueLength, false);
 
-        output.label = CharSpan::fromCharString(mFixedLabelNameBuf);
-        output.value = CharSpan::fromCharString(mFixedLabelValueBuf);
+    Platform::CopyString(mFixedLabelNameBuf, kMaxLabelNameLength + 1, kDefaultLabel);
+    Platform::CopyString(mFixedLabelValueBuf, kMaxLabelValueLength + 1, kDefaultValue);
 
-        mIndex++;
+    output.label = CharSpan::fromCharString(mFixedLabelNameBuf);
+    output.value = CharSpan::fromCharString(mFixedLabelValueBuf);
 
-        retval = true;
-    }
-    else
-    {
-        retval = false;
-    }
-
-    return retval;
+    mIndex++;
+    return true;
 }
 
 CHIP_ERROR DeviceInfoProviderImpl::SetUserLabelLength(EndpointId endpoint, size_t val)
@@ -223,72 +191,28 @@ DeviceInfoProvider::SupportedLocalesIterator * DeviceInfoProviderImpl::IterateSu
 
 size_t DeviceInfoProviderImpl::SupportedLocalesIteratorImpl::Count()
 {
-    // Hardcoded list of locales
-    // {("en-US"), ("de-DE"), ("fr-FR"), ("en-GB"), ("es-ES"), ("zh-CN"), ("it-IT"), ("ja-JP")}
-
-    return 8;
+	// only a default.
+	return 1;
 }
 
 bool DeviceInfoProviderImpl::SupportedLocalesIteratorImpl::Next(CharSpan & output)
 {
-    bool retval = true;
+	// Only one default Locale.
+	static constexpr const char kDefaultLocale[] = "en-US";
 
-    // Hardcoded list of locales
-    CHIP_ERROR err = CHIP_NO_ERROR;
+	// If we've already returned it once, stop iterating.
+	if (mIndex > 0)
+	{
+		return false;
+	}
 
-    const char * activeLocalePtr = nullptr;
+	VerifyOrReturnError(std::strlen(kDefaultLocale) <= kMaxActiveLocaleLength, false);
 
-    VerifyOrReturnError(mIndex < 8, false);
+	Platform::CopyString(mActiveLocaleBuf, kMaxActiveLocaleLength + 1, kDefaultLocale);
+	output = CharSpan::fromCharString(mActiveLocaleBuf);
 
-    switch (mIndex)
-    {
-    case 0:
-        activeLocalePtr = "en-US";
-        break;
-    case 1:
-        activeLocalePtr = "de-DE";
-        break;
-    case 2:
-        activeLocalePtr = "fr-FR";
-        break;
-    case 3:
-        activeLocalePtr = "en-GB";
-        break;
-    case 4:
-        activeLocalePtr = "es-ES";
-        break;
-    case 5:
-        activeLocalePtr = "zh-CN";
-        break;
-    case 6:
-        activeLocalePtr = "it-IT";
-        break;
-    case 7:
-        activeLocalePtr = "ja-JP";
-        break;
-    default:
-        err = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
-        break;
-    }
-
-    if (err == CHIP_NO_ERROR)
-    {
-        VerifyOrReturnError(std::strlen(activeLocalePtr) <= kMaxActiveLocaleLength, false);
-
-        Platform::CopyString(mActiveLocaleBuf, kMaxActiveLocaleLength + 1, activeLocalePtr);
-
-        output = CharSpan::fromCharString(mActiveLocaleBuf);
-
-        mIndex++;
-
-        retval = true;
-    }
-    else
-    {
-        retval = false;
-    }
-
-    return retval;
+	mIndex++;
+	return true;
 }
 
 DeviceInfoProvider::SupportedCalendarTypesIterator * DeviceInfoProviderImpl::IterateSupportedCalendarTypes()
@@ -298,76 +222,25 @@ DeviceInfoProvider::SupportedCalendarTypesIterator * DeviceInfoProviderImpl::Ite
 
 size_t DeviceInfoProviderImpl::SupportedCalendarTypesIteratorImpl::Count()
 {
-    // Hardcoded list of strings
-    // {("kBuddhist"), ("kChinese"), ("kCoptic"), ("kEthiopian"), ("kGregorian"), ("kHebrew"), ("kIndian"), ("kJapanese"),
-    //  ("kKorean"), ("kPersian"), ("kTaiwanese"), ("kIslamic")}
-
-    return 12;
+	// only a default.
+	return 1;
 }
 
 bool DeviceInfoProviderImpl::SupportedCalendarTypesIteratorImpl::Next(CalendarType & output)
 {
-    bool retval = true;
+	// Only one default calendar type.
+	static constexpr app::Clusters::TimeFormatLocalization::CalendarTypeEnum kDefaultCalendarType =
+		app::Clusters::TimeFormatLocalization::CalendarTypeEnum::kGregorian;
 
-    // Hardcoded list of Strings that are valid values for the Calendar Types.
-    CHIP_ERROR err = CHIP_NO_ERROR;
+	// If we've already returned it once, stop iterating.
+	if (mIndex > 0)
+	{
+		return false;
+	}
 
-    VerifyOrReturnError(mIndex < 12, false);
-
-    switch (mIndex)
-    {
-    case 0:
-        output = app::Clusters::TimeFormatLocalization::CalendarTypeEnum::kBuddhist;
-        break;
-    case 1:
-        output = app::Clusters::TimeFormatLocalization::CalendarTypeEnum::kChinese;
-        break;
-    case 2:
-        output = app::Clusters::TimeFormatLocalization::CalendarTypeEnum::kCoptic;
-        break;
-    case 3:
-        output = app::Clusters::TimeFormatLocalization::CalendarTypeEnum::kEthiopian;
-        break;
-    case 4:
-        output = app::Clusters::TimeFormatLocalization::CalendarTypeEnum::kGregorian;
-        break;
-    case 5:
-        output = app::Clusters::TimeFormatLocalization::CalendarTypeEnum::kHebrew;
-        break;
-    case 6:
-        output = app::Clusters::TimeFormatLocalization::CalendarTypeEnum::kIndian;
-        break;
-    case 7:
-        output = app::Clusters::TimeFormatLocalization::CalendarTypeEnum::kJapanese;
-        break;
-    case 8:
-        output = app::Clusters::TimeFormatLocalization::CalendarTypeEnum::kKorean;
-        break;
-    case 9:
-        output = app::Clusters::TimeFormatLocalization::CalendarTypeEnum::kPersian;
-        break;
-    case 10:
-        output = app::Clusters::TimeFormatLocalization::CalendarTypeEnum::kTaiwanese;
-        break;
-    case 11:
-        output = app::Clusters::TimeFormatLocalization::CalendarTypeEnum::kIslamic;
-        break;
-    default:
-        err = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
-        break;
-    }
-
-    if (err == CHIP_NO_ERROR)
-    {
-        mIndex++;
-        retval = true;
-    }
-    else
-    {
-        retval = false;
-    }
-
-    return retval;
+	output = kDefaultCalendarType;
+	mIndex++;
+	return true;
 }
 
 } // namespace DeviceLayer

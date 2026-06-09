@@ -68,7 +68,9 @@
  * @details supply Vdda (unit: mV).
  *
  */
-#define VDDA_APPLI                     (3300UL)
+#ifndef VDDA_APPLI
+#define VDDA_APPLI      VDD_VALUE
+#endif
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private macros ------------------------------------------------------------*/
@@ -92,6 +94,50 @@ static uint32_t MaxRegisteredId = ADCCTRL_NO_CONFIG;
  * @brief Handle of the ADC
  */
 static ADC_TypeDef * p_ADCHandle = ADCCTRL_HWADDR;
+
+#if (ADCCTRL_USE_DYNAMIC_VREF == 1u)
+/**
+ * @brief ADC Handle configuration for LL VRefInt request
+ */
+ static ADCCTRL_Handle_t VRefIntRequest_Handle =
+ {
+   .Uid = 0x00,
+   .State = ADCCTRL_HANDLE_NOT_REG,
+   .InitConf =
+   {
+     .ConvParams =
+     {
+       .TriggerFrequencyMode = LL_ADC_TRIGGER_FREQ_LOW,
+       .Resolution = LL_ADC_RESOLUTION_12B,
+       .DataAlign = LL_ADC_DATA_ALIGN_RIGHT,
+       .TriggerStart = LL_ADC_REG_TRIG_SOFTWARE,
+       .TriggerEdge = LL_ADC_REG_TRIG_EXT_RISING,
+       .ConversionMode = LL_ADC_REG_CONV_SINGLE,
+       .DmaTransfer = LL_ADC_REG_DMA_TRANSFER_NONE,
+       .Overrun = LL_ADC_REG_OVR_DATA_OVERWRITTEN,
+       .SamplingTimeCommon1 = LL_ADC_SAMPLINGTIME_814CYCLES_5,
+       .SamplingTimeCommon2 = LL_ADC_SAMPLINGTIME_1CYCLE_5
+     },
+     .SeqParams =
+     {
+       .Setup = LL_ADC_REG_SEQ_CONFIGURABLE,
+       .Length = LL_ADC_REG_SEQ_SCAN_DISABLE,
+       .DiscMode = LL_ADC_REG_SEQ_DISCONT_DISABLE
+     },
+     .LowPowerParams =
+     {
+       .AutoPowerOff = DISABLE,
+       .AutonomousDPD = LL_ADC_LP_AUTONOMOUS_DPD_DISABLE
+     }
+   },
+   .ChannelConf =
+   {
+     .Channel = LL_ADC_CHANNEL_VREFINT,      /* Internal reference voltage channel */
+     .Rank = LL_ADC_REG_RANK_1,
+     .SamplingTime = LL_ADC_SAMPLINGTIME_COMMON_1
+   }
+ };
+#endif /* (ADCCTRL_USE_DYNAMIC_VREF == 1u) */
 
 /* Global variables ----------------------------------------------------------*/
 /* Error Handler */
@@ -165,6 +211,13 @@ __WEAK ADCCTRL_Cmd_Status_t ADCCTRL_Init (void)
 
     /* Reset ADC Client list */
     ClientList = 0x00u;
+    
+#if (ADCCTRL_USE_DYNAMIC_VREF == 1u)
+    /* Setup the VRefInt handle */
+    MaxRegisteredId = MaxRegisteredId + 1u;
+    VRefIntRequest_Handle.Uid = MaxRegisteredId;
+    VRefIntRequest_Handle.State = ADCCTRL_HANDLE_REG;
+#endif /* (ADCCTRL_USE_DYNAMIC_VREF == 1u) */
 
     /* Deactivate the ADC */
     AdcDeactivate();
@@ -312,12 +365,16 @@ __WEAK ADCCTRL_Cmd_Status_t ADCCTRL_RequestRawValue (const ADCCTRL_Handle_t * co
 }
 
 __WEAK ADCCTRL_Cmd_Status_t ADCCTRL_RequestTemperature (const ADCCTRL_Handle_t * const p_Handle,
-                                                        uint16_t * const p_ReadValue)
+                                                        int16_t * const p_ReadValue)
 {
   ADCCTRL_Cmd_Status_t error = ADCCTRL_UNKNOWN;
 
   /* Variables for ADC conversion data */
   __IO uint16_t uhADCxConvertedData = 0x00;
+
+#if (ADCCTRL_USE_DYNAMIC_VREF == 1u)
+  uint16_t vddValue = 0x00;
+#endif /* (ADCCTRL_USE_DYNAMIC_VREF == 1u) */
 
   SYSTEM_DEBUG_SIGNAL_SET(ADC_TEMPERATURE_ACQUISITION);
 
@@ -349,6 +406,68 @@ __WEAK ADCCTRL_Cmd_Status_t ADCCTRL_RequestTemperature (const ADCCTRL_Handle_t *
 
     if (ADCCTRL_OK == error)
     {
+#if (ADCCTRL_USE_DYNAMIC_VREF == 1u)     
+      /* Configure the ADC before use */
+      error = AdcConfigure (&VRefIntRequest_Handle);
+
+      /* Enable ADC */
+      LL_ADC_Enable(p_ADCHandle);
+
+      if (ADCCTRL_OK == error)
+      {
+        /* Return the read value */
+        uhADCxConvertedData = AdcReadRaw (p_Handle);
+
+        /* Computation of ADC conversions raw data to physical values             */
+        /* using LL ADC driver helper macro.                                      */
+        vddValue = __LL_ADC_CALC_VREFANALOG_VOLTAGE (uhADCxConvertedData,
+                                                     VRefIntRequest_Handle.InitConf.ConvParams.Resolution);
+      }
+      else
+      {
+        error = ADCCTRL_ERROR_CONFIG;
+      }
+      
+      if (ADCCTRL_OK == error)
+      {
+        /* Configure the ADC before use - Temperature handle */
+        error = AdcConfigure (p_Handle);
+        
+        /* Enable ADC */
+        LL_ADC_Enable(p_ADCHandle);
+        
+        if (ADCCTRL_NOK == error)
+        {
+          error = ADCCTRL_ERROR_CONFIG;
+        }
+      }
+
+      if (ADCCTRL_OK == error)
+      {
+        /* Return the read value */
+        uhADCxConvertedData = AdcReadRaw (p_Handle);
+
+        /* Computation of ADC conversions raw data to physical values             */
+        /* using LL ADC driver helper macro.                                      */
+        if(*TEMPSENSOR_CAL1_ADDR == *TEMPSENSOR_CAL2_ADDR)
+        {
+          /* Case of samples not calibrated in production */
+          *p_ReadValue = __LL_ADC_CALC_TEMPERATURE_TYP_PARAMS (TEMPSENSOR_TYP_AVGSLOPE,
+                                                               TEMPSENSOR_TYP_CAL1_V,
+                                                               TEMPSENSOR_CAL1_TEMP,
+                                                               vddValue,
+                                                               uhADCxConvertedData,
+                                                               p_Handle->InitConf.ConvParams.Resolution);
+        }
+        else
+        {
+          /* Case of samples calibrated in production */
+          *p_ReadValue = __LL_ADC_CALC_TEMPERATURE (vddValue,
+                                                    uhADCxConvertedData,
+                                                    p_Handle->InitConf.ConvParams.Resolution);
+        }
+      }
+#else
       /* Is the current config IS NOT the same as the one requested ? */
       if (CurrentConfig != p_Handle->Uid)
       {
@@ -358,7 +477,7 @@ __WEAK ADCCTRL_Cmd_Status_t ADCCTRL_RequestTemperature (const ADCCTRL_Handle_t *
         /* Enable ADC */
         LL_ADC_Enable(p_ADCHandle);
       }
-
+      
       if (ADCCTRL_OK == error)
       {
         /* Return the read value */
@@ -388,6 +507,7 @@ __WEAK ADCCTRL_Cmd_Status_t ADCCTRL_RequestTemperature (const ADCCTRL_Handle_t *
       {
         error = ADCCTRL_ERROR_CONFIG;
       }
+#endif /* (ADCCTRL_USE_DYNAMIC_VREF == 1u) */
 
       /* Release the mutex */
       ADCCTRL_MutexRelease ();
@@ -403,7 +523,11 @@ __WEAK ADCCTRL_Cmd_Status_t ADCCTRL_RequestCoreVoltage (const ADCCTRL_Handle_t *
   ADCCTRL_Cmd_Status_t error = ADCCTRL_UNKNOWN;
 
   /* Variables for ADC conversion data */
-  __IO uint16_t uhADCxConvertedData = 0x00;
+  __IO uint16_t uhADCxConvertedData = 0x00;  
+
+#if (ADCCTRL_USE_DYNAMIC_VREF == 1u)
+  uint16_t vddValue = 0x00;
+#endif /* (ADCCTRL_USE_DYNAMIC_VREF == 1u) */
 
   SYSTEM_DEBUG_SIGNAL_SET(ADC_TEMPERATURE_ACQUISITION);
 
@@ -435,6 +559,54 @@ __WEAK ADCCTRL_Cmd_Status_t ADCCTRL_RequestCoreVoltage (const ADCCTRL_Handle_t *
 
     if (ADCCTRL_OK == error)
     {
+#if (ADCCTRL_USE_DYNAMIC_VREF == 1u)      
+      /* Configure the ADC before use */
+      error = AdcConfigure (&VRefIntRequest_Handle);
+
+      /* Enable ADC */
+      LL_ADC_Enable(p_ADCHandle);
+
+      if (ADCCTRL_OK == error)
+      {
+        /* Return the read value */
+        uhADCxConvertedData = AdcReadRaw (p_Handle);
+
+        /* Computation of ADC conversions raw data to physical values             */
+        /* using LL ADC driver helper macro.                                      */
+        vddValue = __LL_ADC_CALC_VREFANALOG_VOLTAGE (uhADCxConvertedData,
+                                                     VRefIntRequest_Handle.InitConf.ConvParams.Resolution);
+      }
+      else
+      {
+        error = ADCCTRL_ERROR_CONFIG;
+      }
+
+      if (ADCCTRL_OK == error)
+      {
+        /* Configure the ADC before use - Core Voltage handle */
+        error = AdcConfigure (p_Handle);
+        
+        /* Enable ADC */
+        LL_ADC_Enable(p_ADCHandle);
+        
+        if (ADCCTRL_NOK == error)
+        {
+          error = ADCCTRL_ERROR_CONFIG;
+        }
+      }
+      
+      if (ADCCTRL_OK == error)
+      {
+        /* Return the read value */
+        uhADCxConvertedData = AdcReadRaw (p_Handle);
+
+        /* Computation of ADC conversions raw data to physical values             */
+        /* using LL ADC driver helper macro.                                      */
+        *p_ReadValue = __LL_ADC_CALC_DATA_TO_VOLTAGE (vddValue,
+                                                      uhADCxConvertedData,
+                                                      p_Handle->InitConf.ConvParams.Resolution);
+      }
+#else
       /* Is the current config IS NOT the same as the one requested ? */
       if (CurrentConfig != p_Handle->Uid)
       {
@@ -460,6 +632,7 @@ __WEAK ADCCTRL_Cmd_Status_t ADCCTRL_RequestCoreVoltage (const ADCCTRL_Handle_t *
       {
         error = ADCCTRL_ERROR_CONFIG;
       }
+#endif /* (ADCCTRL_USE_DYNAMIC_VREF == 1u) */
 
       /* Release the mutex */
       ADCCTRL_MutexRelease ();

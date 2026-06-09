@@ -20,6 +20,10 @@
 #ifndef SCM_H
 #define SCM_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 
@@ -28,10 +32,8 @@
 #include "stm32wbaxx_ll_pwr.h"
 #include "stm32wbaxx_ll_rcc.h"
 #include "stm32wbaxx_ll_tim.h"
+#include "common_wpan_conf.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 /* Exported types ------------------------------------------------------------*/
 typedef enum {
   NO_CLOCK_CONFIG = 0,
@@ -52,13 +54,6 @@ typedef enum {
   HSEPRE_DISABLE = 0,
   HSEPRE_ENABLE
 } scm_hse_hsepre_t;
-
-typedef enum {
-  SCM_USER_APP,
-  SCM_USER_LL_FW,
-  SCM_USER_LL_HW_RCO_CLBR,
-  TOTAL_CLIENT_NUM, /* To be at the end of the enum */
-} scm_user_id_t;
 
 typedef enum {
   NO_PLL,
@@ -277,7 +272,9 @@ void scm_hserdy_isr(void);
 void scm_pllrdy_isr(void);
 
 #endif /* CFG_SCM_SUPPORTED */
+
 #ifdef __cplusplus
 }
 #endif
+
 #endif /* SCM_H */

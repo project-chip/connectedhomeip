@@ -19,7 +19,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "stm_ota_spi_flash.h"
 #include "app_conf.h"
-
+#include "log_module.h"
 #include "Driver_Flash.h" /* coming from Middlewares\Third_Party\mcuboot\platform\ext\driver */
 
 #if (OTA_EXTERNAL_FLASH_ENABLE == 1)
@@ -51,7 +51,7 @@ STM_OTA_StatusTypeDef STM_OTA_SPI_FLASH_Init(void)
 
   if ( LOADER_FLASH_DEV_NAME.Initialize(NULL) != ARM_DRIVER_OK)
   {
-    APP_DBG("Driver Flash Init : Failed\n");
+	  LOG_INFO_APP("Driver Flash Init : Failed\n");
   }
 
   ARM_FLASH_INFO *data = LOADER_FLASH_DEV_NAME.GetInfo();
@@ -85,7 +85,7 @@ STM_OTA_StatusTypeDef STM_OTA_SPI_FLASH_Delete_Image(uint32_t Address, uint32_t 
     ret_arm = LOADER_FLASH_DEV_NAME.EraseSector(sector_address);
     if (ret_arm < 0)
     {
-      APP_DBG("External flash erase error for sector=0x%x.\n", sector_address);		
+      LOG_INFO_APP("External flash erase error for sector=0x%x.\n", sector_address);
       ret = STM_OTA_FLASH_DELETE_FAILED;
     }
   }
@@ -114,7 +114,7 @@ STM_OTA_StatusTypeDef STM_OTA_SPI_FLASH_WriteChunk(uint32_t *pDestAddress, uint3
 
   if (LOADER_FLASH_DEV_NAME.ProgramData((uint32_t)pDestAddress, pSrcBuffer, Length) != ARM_DRIVER_OK)
   {
-      APP_DBG("Write external flash error\n");		
+	  LOG_INFO_APP("Write external flash error\n");
       ret = STM_OTA_FLASH_WRITE_FAILED;
   }
   return ret;
@@ -141,7 +141,7 @@ STM_OTA_StatusTypeDef STM_OTA_SPI_FLASH_ReadChunk(uint32_t *pSrcAddress, uint32_
 
   if (LOADER_FLASH_DEV_NAME.ReadData((uint32_t)pSrcAddress, pDestBuffer, Length) != ARM_DRIVER_OK)
   {
-      APP_DBG("Read external flash error\n");		
+	  LOG_INFO_APP("Read external flash error\n");
       ret = STM_OTA_FLASH_READ_FAILED;
   }
 

@@ -107,18 +107,6 @@ static bool RTC_Initialized = 0;
 static uint32_t RtcTimerContext = 0;
 
 /* Exported macro ------------------------------------------------------------*/
-#ifdef RTIF_DEBUG
-#include "sys_app.h" /*for app_log*/
-/**
-  * @brief Post the RTC log string format to the circular queue for printing in using the polling mode
-  */
-#define TIMER_IF_DBG_PRINTF(...) do{ {UTIL_ADV_TRACE_COND_FSend(VLEVEL_ALWAYS, T_REG_OFF, TS_OFF, __VA_ARGS__);} }while(0);
-#else
-/**
-  * @brief not used
-  */
-#define TIMER_IF_DBG_PRINTF(...)
-#endif /* RTIF_DEBUG */
 
 /* Private function prototypes -----------------------------------------------*/
 /**
@@ -342,5 +330,11 @@ static uint32_t TIMER_IF_BkUp_Read_MSBticks(void)
 
 static inline uint32_t GetTimerTicks(void)
 {
-  return (UINT32_MAX - LL_RTC_TIME_GetSubSecond(RTC));
+  uint32_t ssr = LL_RTC_TIME_GetSubSecond(RTC);
+  /* read twice to make sure value it valid*/
+  while (ssr != LL_RTC_TIME_GetSubSecond(RTC))
+  {
+    ssr = LL_RTC_TIME_GetSubSecond(RTC);
+  }
+  return UINT32_MAX - ssr;
 }

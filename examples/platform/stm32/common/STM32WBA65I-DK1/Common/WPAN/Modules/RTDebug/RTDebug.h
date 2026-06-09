@@ -19,6 +19,10 @@
 #ifndef SYSTEM_DEBUG_H
 #define SYSTEM_DEBUG_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "debug_config.h"
 
 #if(CFG_RT_DEBUG_GPIO_MODULE == 1)
@@ -28,48 +32,46 @@
 /** and global signal table GPIO manipulation                **/
 /**************************************************************/
 
-#define GENERIC_DEBUG_GPIO_SET(signal, table) do {                    \
-  uint32_t debug_table_idx = 0;                                       \
-  if(signal >= sizeof(table))                                         \
-  {                                                                   \
-    return;                                                           \
-  }                                                                   \
-  debug_table_idx = table[signal];                                    \
-  if(debug_table_idx != RT_DEBUG_SIGNAL_UNUSED)                       \
-  {                                                                   \
-    HAL_GPIO_WritePin(general_debug_table[debug_table_idx].GPIO_port, \
-                      general_debug_table[debug_table_idx].GPIO_pin,  \
-                      GPIO_PIN_SET);                                  \
-  }                                                                   \
+#define GENERIC_DEBUG_GPIO_SET(signal, table) do {                         \
+  uint32_t debug_table_idx = 0;                                            \
+  if(signal >= sizeof(table))                                              \
+  {                                                                        \
+    return;                                                                \
+  }                                                                        \
+  debug_table_idx = table[signal];                                         \
+  if(debug_table_idx != RT_DEBUG_SIGNAL_UNUSED)                            \
+  {                                                                        \
+    LL_GPIO_SetOutputPin(general_debug_table[debug_table_idx].GPIO_port,   \
+                      general_debug_table[debug_table_idx].GPIO_pin);      \
+  }                                                                        \
 } while(0)
 
-#define GENERIC_DEBUG_GPIO_RESET(signal, table) do {                  \
-  uint32_t debug_table_idx = 0;                                       \
-  if(signal >= sizeof(table))                                         \
-  {                                                                   \
-    return;                                                           \
-  }                                                                   \
-  debug_table_idx = table[signal];                                    \
-  if(debug_table_idx != RT_DEBUG_SIGNAL_UNUSED)                       \
-  {                                                                   \
-    HAL_GPIO_WritePin(general_debug_table[debug_table_idx].GPIO_port, \
-                      general_debug_table[debug_table_idx].GPIO_pin,  \
-                      GPIO_PIN_RESET);                                \
-  }                                                                   \
+#define GENERIC_DEBUG_GPIO_RESET(signal, table) do {                       \
+  uint32_t debug_table_idx = 0;                                            \
+  if(signal >= sizeof(table))                                              \
+  {                                                                        \
+    return;                                                                \
+  }                                                                        \
+  debug_table_idx = table[signal];                                         \
+  if(debug_table_idx != RT_DEBUG_SIGNAL_UNUSED)                            \
+  {                                                                        \
+    LL_GPIO_ResetOutputPin(general_debug_table[debug_table_idx].GPIO_port, \
+                      general_debug_table[debug_table_idx].GPIO_pin);      \
+  }                                                                        \
 } while(0)
 
-#define GENERIC_DEBUG_GPIO_TOGGLE(signal, table) do {                  \
-  uint32_t debug_table_idx = 0;                                        \
-  if(signal >= sizeof(table))                                          \
-  {                                                                    \
-    return;                                                            \
-  }                                                                    \
-  debug_table_idx = table[signal];                                     \
-  if(debug_table_idx != RT_DEBUG_SIGNAL_UNUSED)                        \
-  {                                                                    \
-    HAL_GPIO_TogglePin(general_debug_table[debug_table_idx].GPIO_port, \
-                       general_debug_table[debug_table_idx].GPIO_pin); \
-  }                                                                    \
+#define GENERIC_DEBUG_GPIO_TOGGLE(signal, table) do {                      \
+  uint32_t debug_table_idx = 0;                                            \
+  if(signal >= sizeof(table))                                              \
+  {                                                                        \
+    return;                                                                \
+  }                                                                        \
+  debug_table_idx = table[signal];                                         \
+  if(debug_table_idx != RT_DEBUG_SIGNAL_UNUSED)                            \
+  {                                                                        \
+    LL_GPIO_TogglePin(general_debug_table[debug_table_idx].GPIO_port,      \
+                       general_debug_table[debug_table_idx].GPIO_pin);     \
+  }                                                                        \
 } while(0)
 
 #endif /* CFG_RT_DEBUG_GPIO_MODULE */
@@ -83,5 +85,9 @@ void SYSTEM_DEBUG_SIGNAL_TOGGLE(system_debug_signal_t signal);
 void LINKLAYER_DEBUG_SIGNAL_SET(linklayer_debug_signal_t signal);
 void LINKLAYER_DEBUG_SIGNAL_RESET(linklayer_debug_signal_t signal);
 void LINKLAYER_DEBUG_SIGNAL_TOGGLE(linklayer_debug_signal_t signal);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* SYSTEM_DEBUG_H */

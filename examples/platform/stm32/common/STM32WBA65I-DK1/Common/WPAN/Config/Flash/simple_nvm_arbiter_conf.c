@@ -8,7 +8,7 @@
   ******************************************************************************
   * @attention
   *
-  * Copyright (c) 2022 STMicroelectronics.
+  * Copyright (c) 2025 STMicroelectronics.
   * All rights reserved.
   *
   * This software is licensed under terms that can be found in the LICENSE file
@@ -41,11 +41,6 @@ SNVMA_NvmElt_t SNVMA_NvmConfiguration [SNVMA_NVM_NUMBER] =
   {
     .BankNumber = SNVMA_NVM_ID_1_BANK_NUMBER,
     .BankSize = SNVMA_NVM_ID_1_BANK_SIZE,
-  },
-  /* NVM ID #2 */
-  {
-    .BankNumber = SNVMA_NVM_ID_2_BANK_NUMBER,
-    .BankSize = SNVMA_NVM_ID_2_BANK_SIZE,
   },
 };
 

@@ -29,6 +29,7 @@
 // Use a default pairing code if one hasn't been provisioned in flash.
 #define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE 20202021
 
+#define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR 0xF00
 
 // Use a default pairing code if one hasn't been provisioned in flash.
 #define CHIP_DEVICE_CONFIG_USE_TEST_PAIRING_CODE "CHIPUS"
@@ -55,8 +56,9 @@
  */
 #define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID 0x8004
 
+
 /* define Device type based on the application */
-#define CHIP_DEVICE_CONFIG_DEVICE_TYPE 257 // 0x0101  Dimmable Bulb
+#define CHIP_DEVICE_CONFIG_DEVICE_TYPE 0x0101 // Dimmable Light
 
 /**
  * CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER
@@ -64,7 +66,7 @@
  * Enables the use of a hard-coded default serial number if none
  * is found in Chip NV storage.
  */
-#define CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER "TEST_SN"
+#define CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER "TEST_SN_0x0101"
 
 /**
  * CHIP_CONFIG_EVENT_LOGGING_UTC_TIMESTAMPS
@@ -107,7 +109,9 @@
  * CHIP service currently expects the software version to be in the format
  * {MAJOR_VERSION}.0d{MINOR_VERSION}
  */
+#ifndef CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING
 #define CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING X_CUBE_MATTER_VERSION
+#endif
 
 /**
  * CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION
@@ -136,7 +140,7 @@
  * {MAJOR_VERSION}.0d{MINOR_VERSION}
  */
 #ifndef CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION_STRING
-#define CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION_STRING "1.6 OEM"
+#define CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION_STRING "1.7.1"
 #endif
 
 /**
@@ -149,6 +153,12 @@
  */
 #define CHIP_DEVICE_CONFIG_DEVICE_HARDWARE_VERSION 1
 
+/**
+ * CHIP_DETAIL_LOGGING
+ *
+ * Show detail log in terminal
+ */
+#define CHIP_DETAIL_LOGGING 0
 
 /**
  * CHIP_ERROR_LOGGING
@@ -170,6 +180,8 @@
  * Show  automation log in terminal
  */
 #define CHIP_AUTOMATION_LOGGING 1
+
+#define CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT 4
 
 #define CHIP_DEVICE_CONFIG_MAX_DISCOVERED_IP_ADDRESSES 5
 

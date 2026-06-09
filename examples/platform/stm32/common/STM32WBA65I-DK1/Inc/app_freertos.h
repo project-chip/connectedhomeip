@@ -1,13 +1,12 @@
 /* USER CODE BEGIN Header */
 /**
   ******************************************************************************
-  * @file    app_freertos.h
-  * @author  MCD Application Team
-  * @brief   FreeRTOS applicative header file
+  * File Name          : app_freertos.h
+  * Description        : FreeRTOS applicative header file
   ******************************************************************************
-    * @attention
+  * @attention
   *
-  * Copyright (c) 2023 STMicroelectronics.
+  * Copyright (c) 2025 STMicroelectronics.
   * All rights reserved.
   *
   * This software is licensed under terms that can be found in the LICENSE file
@@ -23,14 +22,13 @@
 #define __APP_FREERTOS_H
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
-
 /* Includes ------------------------------------------------------------------*/
 #include "FreeRTOS.h"
 #include "task.h"
+#include "main.h"
 #include "cmsis_os2.h"
-
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -39,7 +37,7 @@
 
 /* Exported types ------------------------------------------------------------*/
 /* USER CODE BEGIN ET */
-extern osMutexId_t             LinkLayerMutex;
+
 /* USER CODE END ET */
 
 /* Exported constants --------------------------------------------------------*/
@@ -47,40 +45,26 @@ extern osMutexId_t             LinkLayerMutex;
 
 /* USER CODE END EC */
 
-/* External variables --------------------------------------------------------*/
-extern void* p_param;
-/* USER CODE BEGIN EV */
-
-/* USER CODE END EV */
-
-/* Private defines -----------------------------------------------------------*/
-
+/* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
 
 /* USER CODE END PD */
 
-/* Main thread defines -------------------------------------------------------*/
-/* USER CODE BEGIN MTD */
-
-/* USER CODE END MTD */
-
-/* Exported macro ------------------------------------------------------------*/
+/* Exported macro -------------------------------------------------------------*/
 /* USER CODE BEGIN EM */
 
 /* USER CODE END EM */
 
-/* Exported functions prototypes ---------------------------------------------*/
+/* Exported function prototypes -----------------------------------------------*/
+/* USER CODE BEGIN FunctionPrototypes */
+void BSPInitTask_Entry(void *argument);
+void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
-/* USER CODE BEGIN EFP */
+/* USER CODE BEGIN Application */
 
-/* USER CODE END EFP */
-
-/* USER CODE BEGIN 1 */
-
-
-/* USER CODE END 1 */
+/* USER CODE END Application */
 
 #ifdef __cplusplus
 }
 #endif
-#endif /* __APP_FREERTOS_H__ */
+#endif /* __APP_FREERTOS_H */

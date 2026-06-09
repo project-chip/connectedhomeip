@@ -65,7 +65,7 @@ TEMPMEAS_Cmd_Status_t TEMPMEAS_Init (void)
 
 void TEMPMEAS_RequestTemperatureMeasurement (void)
 {
-  uint16_t temperature_value = 0;
+  int16_t temperature_value = 0;
 
   /* Enter limited critical section : disable all the interrupts with priority higher than RCC one
    * Concerns link layer interrupts (high and SW low) or any other high priority user system interrupt
@@ -82,8 +82,8 @@ void TEMPMEAS_RequestTemperatureMeasurement (void)
   /* Request ADC IP deactivation */
   ADCCTRL_RequestIpState(&LLTempRequest_Handle, ADC_OFF);
 
-  /* Give the temperature information to the link layer */
-  ll_intf_cmn_set_temperature_value(temperature_value);
+  /* Give shifted value of the temperature to the link layer */
+  ll_intf_cmn_set_temperature_value((uint32_t)(temperature_value + TEMPMEAS_MIN_TEMP_LIMIT));
 
   /* Exit limited critical section */
   UTILS_EXIT_LIMITED_CRITICAL_SECTION();

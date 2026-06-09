@@ -1,7 +1,7 @@
 #include <assert.h>
 #include <stdio.h>
 #include <string.h>
-#include "flash_wb.h"
+#include "app_nvm.h"
 #include "platform/flash.h"
 #include OPENTHREAD_CONFIG_FILE
 
@@ -36,16 +36,15 @@ struct settingsBlock
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
 /* Flag to know whether we are in reset */
-__attribute__ ((section (".noinit"))) uint32_t sSettingsIsReset;
+uint32_t sSettingsIsReset;
 
 /* Pointer to Buf currently used */
-__attribute__ ((section (".noinit"))) uint32_t sSettingsBufPos;
-
-//Keep last, aligned 32-bit
-//__attribute__ ((section (".noinit"))) __attribute__ ((aligned (8))) static uint8_t sSettingBufStart[THREAD_SETTINGS_BUFFER_SIZE];
+uint32_t sSettingsBufPos;
 
 /* Private function prototypes -----------------------------------------------*/
-/* USER CODE BEGIN PFP */
+/**
+ * @brief return base address of setting buffer
+*/
 static inline uint32_t GetSettingsBuffer_Base(void);
 static inline uint32_t GetSettingsBuffer_Size(void);
 static uint32_t SetBufferToFreeSpace(void);
@@ -55,7 +54,7 @@ static uint32_t SetBufferToFreeSpace(void);
 static inline uint32_t GetSettingsBuffer_Base(void)
  {
 	static uint32_t Ot_NVMAddr = 0;
-	NM_GetOtNVMAddr(&Ot_NVMAddr);
+	NVM_GetOtNVMAddr(&Ot_NVMAddr);
 	return (uint32_t) Ot_NVMAddr;
 }
 

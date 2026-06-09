@@ -46,6 +46,7 @@
 #include <openthread/ip6.h>
 #include <openthread/netdata.h>
 #include <openthread/thread.h>
+#include "app_thread.h"
 
 namespace chip {
 namespace DeviceLayer {
@@ -56,7 +57,7 @@ ThreadStackManagerImpl ThreadStackManagerImpl::sInstance;
 
 CHIP_ERROR ThreadStackManagerImpl::_InitThreadStack(void)
 {
-    return InitThreadStack(NULL);
+    return InitThreadStack(APP_THREAD_GetotInstance());
 }
 
 
@@ -88,6 +89,23 @@ exit:
      return err;
 
 }
+
+void ThreadStackManagerImpl::_LockThreadStack()
+{
+	APP_THREAD_LockThreadStack();
+}
+
+bool ThreadStackManagerImpl::_TryLockThreadStack()
+{
+	return APP_THREAD_TryLockThreadStack();
+}
+
+void ThreadStackManagerImpl::_UnlockThreadStack()
+{
+	APP_THREAD_UnLockThreadStack();
+
+}
+
 CHIP_ERROR ThreadStackManagerImpl::SetThreadEnabled(bool val)
 {
 	 CHIP_ERROR err = CHIP_NO_ERROR;

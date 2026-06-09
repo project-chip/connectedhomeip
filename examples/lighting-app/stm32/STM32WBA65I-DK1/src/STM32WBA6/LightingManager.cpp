@@ -21,14 +21,14 @@
 #include <lib/support/logging/CHIPLogging.h>
 
 // default initialization value for the light level after start
-constexpr uint8_t kDefaultLevel = 64;
+constexpr uint8_t kDefaultLevel = 0;
 
 LightingManager LightingManager::sLight;
 
 CHIP_ERROR LightingManager::Init() {
     mState = kState_Off;
     mLevel = kDefaultLevel;
-
+    
     return CHIP_NO_ERROR;
 }
 
@@ -53,20 +53,16 @@ bool LightingManager::InitiateAction(Action_t aAction, int32_t aActor, uint16_t 
 
     switch (aAction) {
     case ON_ACTION:
-        ChipLogProgress(NotSpecified, "LightMgr:ON: %s->ON", mState == kState_On ? "ON" : "OFF")
-        ;
+        ChipLogProgress(NotSpecified, "LightMgr:ON: %s->ON", mState == kState_On ? "ON" : "OFF");
         break;
     case OFF_ACTION:
-        ChipLogProgress(NotSpecified, "LightMgr:OFF: %s->OFF", mState == kState_On ? "ON" : "OFF")
-        ;
+        ChipLogProgress(NotSpecified, "LightMgr:OFF: %s->OFF", mState == kState_On ? "ON" : "OFF");
         break;
     case LEVEL_ACTION:
-        ChipLogProgress(NotSpecified, "LightMgr:LEVEL: lev:%u->%u", mLevel, *value)
-        ;
+        ChipLogProgress(NotSpecified, "LightMgr:LEVEL: lev:%u->%u", mLevel, *value);
         break;
     default:
-        ChipLogProgress(NotSpecified, "LightMgr:Unknown")
-        ;
+        ChipLogProgress(NotSpecified, "LightMgr:Unknown");
         break;
     }
 

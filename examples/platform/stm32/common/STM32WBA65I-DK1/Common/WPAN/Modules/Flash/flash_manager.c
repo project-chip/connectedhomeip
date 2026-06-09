@@ -60,8 +60,13 @@ typedef struct FM_FlashOpConfig
 
 /* Private defines -----------------------------------------------------------*/
 #define FLASH_PAGE_NBR    (FLASH_SIZE / FLASH_PAGE_SIZE)
+#if defined(STM32WBA25xx) || defined(STM32WBA23xx) 
+#define FLASH_WRITE_BLOCK_SIZE  2U
+#else
 #define FLASH_WRITE_BLOCK_SIZE  4U
+#endif /* defined(STM32WBA25xx) || defined(STM32WBA23xx)  */
 #define ALIGNMENT_32   0x00000003
+#define ALIGNMENT_64   0x00000007
 #define ALIGNMENT_128  0x0000000F
 
 /* Private macros ------------------------------------------------------------*/
@@ -86,11 +91,6 @@ static bool fm_window_granted = FALSE;
   * @brief Callback node list for pending flash operation request
   */
 static tListNode fm_cb_pending_list;
-
-/**
-  * @brief Flag indicating if pending node list has been initialized
-  */
-static bool fm_cb_pending_list_init = FALSE;
 
 /**
   * @brief Pointer to current flash operation requester's callback
@@ -118,6 +118,20 @@ static FM_Cmd_Status_t FM_CheckFlashManagerState(FM_CallbackNode_t *CallbackNode
 static void FM_WindowAllowed_Callback(void);
 
 /* Functions Definition ------------------------------------------------------*/
+/**
+ * @brief Initialize the Flash manager module
+ */
+void FM_Init (void)
+{
+  static bool fm_cb_pending_list_init = false;
+
+  /* Initialize pending list if not done */
+  if (fm_cb_pending_list_init == false)
+  {
+    LST_init_head(&fm_cb_pending_list);
+    fm_cb_pending_list_init = true;
+  }
+}
 
 /**
   * @brief  Request the Flash Manager module to initiate a Flash Write operation
@@ -133,7 +147,7 @@ FM_Cmd_Status_t FM_Write(uint32_t *Src, uint32_t *Dest, int32_t Size, FM_Callbac
   FM_Cmd_Status_t status;
 
   if (((uint32_t)Dest < FLASH_BASE) || ((uint32_t)Dest > (FLASH_BASE + FLASH_SIZE))
-                                    || (((uint32_t)Dest + Size) > (FLASH_BASE + FLASH_SIZE)))
+                                    || (((uint32_t)Dest + (Size << 2)) > (FLASH_BASE + FLASH_SIZE)))
   {
     LOG_ERROR_SYSTEM("\r\nFM_Write - Destination address not part of the flash");
 
@@ -141,7 +155,11 @@ FM_Cmd_Status_t FM_Write(uint32_t *Src, uint32_t *Dest, int32_t Size, FM_Callbac
     return FM_ERROR;
   }
 
+#ifdef FLASH_DOUBLEWORD_SUPPORT
+  if (((uint32_t) Src & ALIGNMENT_32) || ((uint32_t) Dest & ALIGNMENT_64))
+#else
   if (((uint32_t) Src & ALIGNMENT_32) || ((uint32_t) Dest & ALIGNMENT_128))
+#endif    
   {
     LOG_ERROR_SYSTEM("\r\nFM_Write - Source or destination address not properly aligned");
 
@@ -167,61 +185,7 @@ FM_Cmd_Status_t FM_Write(uint32_t *Src, uint32_t *Dest, int32_t Size, FM_Callbac
     FM_ProcessRequest();
   }
 
-  LOG_INFO_SYSTEM("\r\nFM_Write - Returned value : %d", status);
-
-  return status;
-}
-
-/**
-  * @brief  Request the Flash Manager module to initiate a Flash Write operation
-  * @param  Src: Address of the data to be stored in FLASH. It shall be 32bits aligned
-  *              Compared to FM_write, removes the 32bits alignment constraint.
-  * @param  Dest: Address where the data shall be written. It shall be 128bits aligned
-  * @param  Size: This is the size of data to be written in Flash.
-                  The size is a multiple of 32bits (size = 1 means 32bits)
-  * @param  CallbackNode: Pointer to the callback node for storage in list
-  * @retval FM_Cmd_Status_t: Status of the Flash Manager module
-  */
-FM_Cmd_Status_t FM_Write_ext(uint32_t *Src, uint32_t *Dest, int32_t Size, FM_CallbackNode_t *CallbackNode)
-{
-  FM_Cmd_Status_t status;
-
-  if (((uint32_t)Dest < FLASH_BASE) || ((uint32_t)Dest > (FLASH_BASE + FLASH_SIZE))
-                                    || (((uint32_t)Dest + Size) > (FLASH_BASE + FLASH_SIZE)))
-  {
-    LOG_ERROR_SYSTEM("\r\nFM_Write - Destination address not part of the flash");
-
-    /* Destination address not part of the flash */
-    return FM_ERROR;
-  }
-
-  if ((uint32_t) Dest & ALIGNMENT_128)
-  {
-    LOG_ERROR_SYSTEM("\r\nFM_Write - Source or destination address not properly aligned");
-
-    /* Source or destination address not properly aligned */
-    return FM_ERROR;
-  }
-
-  status = FM_CheckFlashManagerState(CallbackNode);
-
-  if (status == FM_OK)
-  { /* Flash manager is available */
-
-    /* Save Write parameters */
-    fm_flashop_parameters.writeSrc = Src;
-    fm_flashop_parameters.writeDest = Dest;
-    fm_flashop_parameters.writeSize = Size;
-
-    fm_flashop = FM_WRITE_OP;
-
-    FM_CurrentBackGroundState = FM_BKGND_NOWINDOW_FLASHOP;
-
-    /* Window request to be executed in background */
-    FM_ProcessRequest();
-  }
-
-  LOG_INFO_SYSTEM("\r\nFM_Write - Returned value : %d", status);
+  LOG_DEBUG_SYSTEM("\r\nFM_Write - Returned value : %d", status);
 
   return status;
 }
@@ -270,7 +234,7 @@ FM_Cmd_Status_t FM_Erase(uint32_t FirstSect, uint32_t NbrSect, FM_CallbackNode_t
     FM_ProcessRequest();
   }
 
-  LOG_INFO_SYSTEM("\r\nFM_Erase - Returned value : %d", status);
+  LOG_DEBUG_SYSTEM("\r\nFM_Erase - Returned value : %d", status);
 
   return status;
 }
@@ -291,11 +255,11 @@ void FM_BackgroundProcess (void)
   {
     case FM_BKGND_NOWINDOW_FLASHOP:
     {
-      LOG_INFO_SYSTEM("\r\nFM_BackgroundProcess - Case FM_BKGND_NOWINDOW_FLASHOP");
+      LOG_DEBUG_SYSTEM("\r\nFM_BackgroundProcess - Case FM_BKGND_NOWINDOW_FLASHOP");
 
       if (fm_flashop == FM_WRITE_OP)
       {
-        LOG_INFO_SYSTEM("\r\nFM_BackgroundProcess - Case FM_BKGND_NOWINDOW_FLASHOP - Write operation");
+        LOG_DEBUG_SYSTEM("\r\nFM_BackgroundProcess - Case FM_BKGND_NOWINDOW_FLASHOP - Write operation");
 
         /* Update duration time value */
         duration = TIME_WINDOW_WRITE_REQUEST;
@@ -329,7 +293,7 @@ void FM_BackgroundProcess (void)
       }
       else
       {
-        LOG_INFO_SYSTEM("\r\nFM_BackgroundProcess - Case FM_BKGND_NOWINDOW_FLASHOP - Erase operation");
+        LOG_DEBUG_SYSTEM("\r\nFM_BackgroundProcess - Case FM_BKGND_NOWINDOW_FLASHOP - Erase operation");
 
         /* Update duration time value */
         duration = TIME_WINDOW_ERASE_REQUEST;
@@ -363,23 +327,23 @@ void FM_BackgroundProcess (void)
 
     case FM_BKGND_WINDOWED_FLASHOP:
     {
-      LOG_INFO_SYSTEM("\r\nFM_BackgroundProcess - Case FM_BKGND_WINDOWED_FLASHOP");
+      LOG_DEBUG_SYSTEM("\r\nFM_BackgroundProcess - Case FM_BKGND_WINDOWED_FLASHOP");
 
       if (fm_window_granted == false)
       {
-        LOG_INFO_SYSTEM("\r\nFM_BackgroundProcess - Case FM_BKGND_WINDOWED_FLASHOP - No time window granted yet, request one");
+        LOG_DEBUG_SYSTEM("\r\nFM_BackgroundProcess - Case FM_BKGND_WINDOWED_FLASHOP - No time window granted yet, request one");
 
         /* No time window granted yet, request one */
         RFTS_ReqWindow(duration, &FM_WindowAllowed_Callback);
       }
       else
       {
-        LOG_INFO_SYSTEM("\r\nFM_BackgroundProcess - Case FM_BKGND_WINDOWED_FLASHOP - Time window granted");
+        LOG_DEBUG_SYSTEM("\r\nFM_BackgroundProcess - Case FM_BKGND_WINDOWED_FLASHOP - Time window granted");
 
         if (fm_flashop == FM_WRITE_OP)
         {
           /* Flash Write operation */
-          LOG_INFO_SYSTEM("\r\nFM_BackgroundProcess - Case FM_BKGND_WINDOWED_FLASHOP - Write operation");
+          LOG_DEBUG_SYSTEM("\r\nFM_BackgroundProcess - Case FM_BKGND_WINDOWED_FLASHOP - Write operation");
 
           HAL_FLASH_Unlock();
 
@@ -403,7 +367,7 @@ void FM_BackgroundProcess (void)
     else
     {
       /* Flash Erase operation */
-      LOG_INFO_SYSTEM("\r\nFM_BackgroundProcess - Case FM_BKGND_WINDOWED_FLASHOP - Erase operation");
+      LOG_DEBUG_SYSTEM("\r\nFM_BackgroundProcess - Case FM_BKGND_WINDOWED_FLASHOP - Erase operation");
 
       HAL_FLASH_Unlock();
 
@@ -468,7 +432,7 @@ void FM_BackgroundProcess (void)
   else
   {
     /* Flash operation not complete yet */
-    LOG_INFO_SYSTEM("\r\nFM_BackgroundProcess - Flash operation not complete yet, request a new time window");
+    LOG_DEBUG_SYSTEM("\r\nFM_BackgroundProcess - Flash operation not complete yet, request a new time window");
 
     /* Request a new time window */
     RFTS_ReqWindow(duration, &FM_WindowAllowed_Callback);
@@ -488,12 +452,6 @@ static FM_Cmd_Status_t FM_CheckFlashManagerState(FM_CallbackNode_t *CallbackNode
   /* Check if semaphore on flash is available */
   UTILS_ENTER_CRITICAL_SECTION();
 
-  /* Initialize pending list if not done */
-  if (fm_cb_pending_list_init == false)
-  {
-    LST_init_head(&fm_cb_pending_list);
-    fm_cb_pending_list_init = true;
-  }
   /* Check if semaphore on flash is available */
   if (busy_flash_sem == false)
   { /* Check if Flash Manager is already busy */
@@ -559,7 +517,7 @@ static void FM_WindowAllowed_Callback(void)
 {
   fm_window_granted = true;
 
-  LOG_INFO_SYSTEM("\r\nFM_WindowAllowed_Callback");
+  LOG_DEBUG_SYSTEM("\r\nFM_WindowAllowed_Callback");
 
   /* Flash operation to be executed in background */
   FM_ProcessRequest();

@@ -20,9 +20,12 @@
 #include "AppTask.h"
 #include "LightingManager.h"
 
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/ConcreteAttributePath.h>
+#include <app/util/af-types.h>
+#include <assert.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip;
@@ -42,6 +45,31 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath &a
     }
 }
 
-void emberAfOnOffClusterInitCallback(EndpointId endpoint) {
+
+void emberAfOnOffClusterInitCallback(EndpointId endpoint)
+{
+    bool onOffValue = false;
+    app::DataModel::Nullable<uint8_t> currentLevel;
+    uint8_t Level=0;
+    Protocols::InteractionModel::Status status;
+
+    /* restore last values saved in persistence */
+    status = OnOff::Attributes::OnOff::Get(endpoint, &onOffValue);
+
+    if (status == Protocols::InteractionModel::Status::Success)
+    {
+		uint8_t onOffByte = onOffValue ? 1: 0;
+        LightingMgr().InitiateAction(onOffValue ? LightingManager::ON_ACTION : LightingManager::OFF_ACTION, 0, 1,
+                                    &onOffByte);
+    }
+
+    status = LevelControl::Attributes::CurrentLevel::Get(endpoint, currentLevel);
+
+    if (status == Protocols::InteractionModel::Status::Success && !currentLevel.IsNull())
+    {
+        Level = currentLevel.Value();
+        LightingMgr().InitiateAction(LightingManager::LEVEL_ACTION, 0, 1, &Level);
+    }
+
 }
 

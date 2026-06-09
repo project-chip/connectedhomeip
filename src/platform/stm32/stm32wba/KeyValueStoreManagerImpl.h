@@ -23,9 +23,9 @@
 #pragma once
 
 #include <platform/KeyValueStoreManager.h>
+#include "app_nvm.h"
 
-//#include "stm_logging.h"
-#include "flash_wb.h"
+#include "app_nvm.h"
 
 namespace chip {
 namespace DeviceLayer {

@@ -48,7 +48,10 @@ class PlatformManagerImpl final : public PlatformManager, public Internal::Gener
 public:
     // ===== Platform-specific members that may be accessed directly by the application.
 
+    CHIP_ERROR InitLwIPCoreLock(void);
+
     System::Clock::Timestamp GetStartTime() { return mStartTime; }
+    void ScheduleSoftwareReset(void);
 
 private:
     // ===== Methods that implement the PlatformManager abstract interface.
@@ -57,6 +60,7 @@ private:
     void _Shutdown(void);
     void _RunEventLoop(void);
     CHIP_ERROR _GetTotalOperationalHours(uint32_t & totalOperationalHours);
+    static void SoftwareReset(void);
     // ===== Members for internal use by the following friends.
 
     friend PlatformManager & PlatformMgr(void);

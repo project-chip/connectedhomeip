@@ -7,7 +7,7 @@
   ******************************************************************************
   * @attention
   *
-  * Copyright (c) 2023 STMicroelectronics.
+  * Copyright (c) 2025 STMicroelectronics.
   * All rights reserved.
   *
   * This software is licensed under terms that can be found in the LICENSE file
@@ -20,6 +20,13 @@
 #ifndef APP_SYS_H
 #define APP_SYS_H
 
+#include <stdint.h>
+
+#include "main.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 /* Exported constants --------------------------------------------------------*/
 
 /* The RADIO_DEEPSLEEP_WAKEUP_TIME_US macro allows to define when the system
@@ -34,9 +41,15 @@
 /* USER CODE END EC */
 
 /* Exported functions prototypes ---------------------------------------------*/
+
 void APP_SYS_BLE_EnterDeepSleep(void);
+void APP_SYS_SetWakeupOffset(uint32_t wakeup_offset_us);
 /* USER CODE BEGIN EFP */
 
 /* USER CODE END EFP */
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* APP_SYS_H */

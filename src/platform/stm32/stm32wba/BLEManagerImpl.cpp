@@ -235,13 +235,13 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent *event) {
 CHIP_ERROR BLEManagerImpl::SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const ChipBleUUID *svcId,
         const ChipBleUUID *charId) {
     ChipLogProgress(DeviceLayer, "BLEManagerImpl::SubscribeCharacteristic() not supported");
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
 CHIP_ERROR BLEManagerImpl::UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT conId,
         const ChipBleUUID *svcId, const ChipBleUUID *charId) {
     ChipLogProgress(DeviceLayer, "BLEManagerImpl::UnsubscribeCharacteristic() not supported");
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
 CHIP_ERROR BLEManagerImpl::CloseConnection(BLE_CONNECTION_OBJECT conId) {
@@ -249,7 +249,7 @@ CHIP_ERROR BLEManagerImpl::CloseConnection(BLE_CONNECTION_OBJECT conId) {
 
     ChipLogProgress(DeviceLayer, "Closing BLE GATT connection");
     //aci_gap_terminate(gconnid, CONNECTION_CLOSE);
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    return CHIP_NO_ERROR;
 }
 
 uint16_t BLEManagerImpl::GetMTU(BLE_CONNECTION_OBJECT conId) const {
@@ -262,7 +262,6 @@ uint16_t BLEManagerImpl::GetMTU(BLE_CONNECTION_OBJECT conId) const {
 CHIP_ERROR BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUUID *svcId,
         const ChipBleUUID *charId, PacketBufferHandle data) {
     
-    CHIP_ERROR err = CHIP_NO_ERROR;
     uint16_t dataLen = data->DataLength();
 
 //    ChipLogDetail(DeviceLayer, "Sending notification for CHIPoBLE Client TX (con %u, len %u)",
@@ -270,7 +269,7 @@ CHIP_ERROR BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const Chi
 
     APP_MATTER_Send_Notification(dataLen, data->Start());
 
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR BLEManagerImpl::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const ChipBleUUID *svcId,

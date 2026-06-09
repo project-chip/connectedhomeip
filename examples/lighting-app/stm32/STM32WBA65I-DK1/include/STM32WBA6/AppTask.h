@@ -31,7 +31,7 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/stm32/stm32wba/FactoryDataProvider.h>
 
-#define APP_NAME "Lighting-app"
+
 
 class AppTask
 {

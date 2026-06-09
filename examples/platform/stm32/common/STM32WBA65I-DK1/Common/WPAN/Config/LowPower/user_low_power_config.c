@@ -28,9 +28,6 @@
 const volatile uint32_t* const register_backup_table[] =
 {
   &(SCB->CPACR),     /* FPU SCB->CPACR register */
-  &(SysTick->CTRL),  /* SysTick CTRL register */
-  &(SysTick->LOAD),  /* SysTick LOAD register */
-  &(SysTick->VAL),   /* SysTick VAL register */
   &(SCB->VTOR),      /* SCB->VTOR register */
 
   /* USER CODE BEGIN RBL */

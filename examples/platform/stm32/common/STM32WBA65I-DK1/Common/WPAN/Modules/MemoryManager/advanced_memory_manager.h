@@ -20,15 +20,20 @@
 #ifndef ADVANCED_MEMORY_MANAGER_H
 #define ADVANCED_MEMORY_MANAGER_H
 
-/* Includes ------------------------------------------------------------------*/
-#include "stm_list.h"
-
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/* Includes ------------------------------------------------------------------*/
+#include "stm_list.h"
+
 /* Exported defines -----------------------------------------------------------*/
 
-/* Define for No Virtual Memory ID */
+/**
+ * @brief Define for No Virtual Memory ID
+ *
+ * @details This ID can be used to allocate memory from the shared pool
+ */
 #define AMM_NO_VIRTUAL_ID 0x00u
 
 /**
@@ -43,7 +48,7 @@ extern "C" {
  * - numberOfVirtualMemory = 3
  * - actualSizeOfThePoolToGive = sizeOfDesiredPool + numberOfVirtualMemory * AMM_VIRTUAL_INFO_ELEMENT_SIZE
  */
-#define AMM_VIRTUAL_INFO_ELEMENT_SIZE 0x3u
+#define AMM_VIRTUAL_INFO_ELEMENT_SIZE (uint32_t)(sizeof (VirtualMemoryInfo_t) / sizeof (uint32_t))
 
 /* Exported types ------------------------------------------------------------*/
 /* Redefine the header for chained list */
@@ -81,6 +86,23 @@ typedef enum AMM_Function_Error
   /* Not initialized AMM error */
   AMM_ERROR_NOT_INIT
 } AMM_Function_Error_t;
+
+/**
+ * @brief   Virtual Memory information struct
+ */
+ typedef struct __attribute__((packed, aligned(4))) VirtualMemoryInfo
+ {
+   /* Identifier of the Virtual Memory */
+   uint8_t Id;
+   /* Size required for this Virtual Memory buffer with a multiple of 32bits */
+   uint32_t RequiredSize;
+   /* Current occupation of the Virtual Memory buffer with a multiple of 32bits */
+   uint32_t OccupiedSize;
+ #if (AMM_USE_MEMORY_STATISTICS == 1)
+   /* Peak occupation of the Virtual Memory buffer with a multiple of 32bits */
+   uint32_t PeakOccupationSize;
+ #endif /* AMM_USE_MEMORY_STATISTICS */
+ }VirtualMemoryInfo_t;
 
 /**
  * @brief   Virtual Memory configuration struct
@@ -149,6 +171,24 @@ typedef struct AMM_VirtualMemoryCallbackFunction
 /* External variables --------------------------------------------------------*/
 /* Exported macros -----------------------------------------------------------*/
 /* Exported functions prototypes ---------------------------------------------*/
+
+#if (AMM_USE_MEMORY_STATISTICS == 1)
+/**
+ * @brief Get the Current Occupation of the required virtual memory
+ * @details @ref AMM_NO_VIRTUAL_ID can be used to get the shared pool occupation
+ * @param VirtualMemoryId: ID of the Virtual Memory
+ * @return Value of the current occupation in 32bits words
+ */
+uint32_t GetCurrentOccupation (const uint8_t VirtualMemoryId);
+
+/**
+ * @brief Get the Peak Occupation of the required virtual memory
+ * @details @ref AMM_NO_VIRTUAL_ID can be used to get the shared pool peak occupation
+ * @param VirtualMemoryId: ID of the Virtual Memory
+ * @return Value of the peak occupation in 32bits words
+ */
+uint32_t GetPeakOccupation (const uint8_t VirtualMemoryId);
+#endif /* AMM_USE_MEMORY_STATISTICS */
 
 /**
  * @brief  Initialize the Advance Memory Manager Pool

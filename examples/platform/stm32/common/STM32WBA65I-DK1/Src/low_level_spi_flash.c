@@ -18,11 +18,10 @@
 #include "Driver_Flash.h"
 #include "low_level_spi_flash.h"
 #include <string.h>
-//#include "stm32_hal.h"
+#include "stm32_hal.h"
 #include "appli_flash_layout.h"
 #include <stdio.h>
 #include <inttypes.h>
-#include <stdint.h>
 
 #if defined (OEMIROT_EXTERNAL_FLASH_ENABLE)
 #include "stm32wba65i_discovery_conf.h"

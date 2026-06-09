@@ -20,6 +20,10 @@
 #ifndef BAES_GLOBAL_H__
 #define BAES_GLOBAL_H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "app_common.h"
 #include "baes.h"
 
@@ -115,5 +119,9 @@ extern void BAES_RawEncrypt( const uint32_t* p_in,
 extern void BAES_RawDecrypt( const uint32_t* p_in,
                              uint32_t* p_out,
                              const uint32_t* p_exp_key );
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* BAES_GLOBAL_H__ */

@@ -19,6 +19,10 @@
 #ifndef CRC_CTRL_H
 #define CRC_CTRL_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* Includes ------------------------------------------------------------------*/
 /* Utilities */
 #include "utilities_common.h"
@@ -26,9 +30,6 @@
 /* HAL CRC header */
 #include "stm32wbaxx_hal_crc.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 /* Exported defines ----------------------------------------------------------*/
 /* Exported types ------------------------------------------------------------*/
 /**
@@ -209,4 +210,5 @@ extern CRCCTRL_Cmd_Status_t CRCCTRL_MutexRelease (void);
 #ifdef __cplusplus
 }
 #endif
+
 #endif /* CRC_CTRL_H */

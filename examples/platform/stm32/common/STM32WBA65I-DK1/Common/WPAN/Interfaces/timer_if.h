@@ -27,15 +27,13 @@ extern "C" {
 /* Includes ------------------------------------------------------------------*/
 #include "stm32_timer.h"
 #include "stm32_systime.h"
+#include "common_wpan_conf.h"
 
 /* Private includes ----------------------------------------------------------*/
 
 /* Private typedef -----------------------------------------------------------*/
 
 /* Private define ------------------------------------------------------------*/
-#define RTC_N_PREDIV_S      (10U)
-#define RTC_PREDIV_S        ( ( 1U << RTC_N_PREDIV_S ) - 1U )
-#define RTC_PREDIV_A        ( ( 1U << ( 15U - RTC_N_PREDIV_S ) ) - 1U )
 
 /* Exported types ------------------------------------------------------------*/
 

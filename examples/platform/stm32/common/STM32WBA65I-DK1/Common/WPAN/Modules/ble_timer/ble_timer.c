@@ -7,7 +7,7 @@
   ******************************************************************************
   * @attention
   *
-  * Copyright (c) 2022 STMicroelectronics.
+  * Copyright (c) 2025 STMicroelectronics.
   * All rights reserved.
   *
   * This software is licensed under terms that can be found in the LICENSE file
@@ -19,8 +19,11 @@
 /* USER CODE END Header */
 
 /* Includes ------------------------------------------------------------------*/
-#include "stm32wbaxx.h"
+#include "main.h"
+#include "app_common.h"
+#include "log_module.h"
 #include "blestack.h"
+#include "host_stack_if.h"
 #include "stm32_timer.h"
 #include "bleplat.h"
 #include "stm_list.h"
@@ -29,8 +32,6 @@
 #include "app_conf.h"
 #include "ll_sys.h"
 #include "stm32_rtos.h"
-#include "cmsis_os2.h"
-#include "main.h"
 
 /* Private typedef -----------------------------------------------------------*/
 typedef struct
@@ -43,58 +44,51 @@ typedef struct
 /* Private defines -----------------------------------------------------------*/
 
 /* Private variables ---------------------------------------------------------*/
-tListNode BLE_TIMER_List;
-static BLE_TIMER_t* BLE_TIMER_timer;
-
-/* BLE_TIMER_TASK related resources */
-osSemaphoreId_t     BleTimerSemaphore;
-osThreadId_t        BleTimerThread;
+static tListNode BLE_TIMER_RunningList = {0};
+static tListNode BLE_TIMER_ExpiredList = {0};
 
 /* Private functions prototype------------------------------------------------*/
-void BLE_TIMER_Background(void);
 static void BLE_TIMER_Callback(void* arg);
 static BLE_TIMER_t* BLE_TIMER_GetFromList(tListNode * listHead, uint16_t id);
-static void BleTimer_Task_Entry(void* thread_input);
 
 void BLE_TIMER_Init(void)
 {
-  /* This function initializes the timer Queue */
-  LST_init_head(&BLE_TIMER_List);
+  /* Initializes timers Queue */
+  LST_init_head(&BLE_TIMER_RunningList);
+  LST_init_head(&BLE_TIMER_ExpiredList);
 
-  /* Register Timer background task */
-  const osSemaphoreAttr_t BleTimerSemaphore_attributes = {
-    .name = "BLE timer Semaphore"
-  };
-  BleTimerSemaphore = osSemaphoreNew(1U, 0U, &BleTimerSemaphore_attributes);
-  if (BleTimerSemaphore == NULL)
+}
+
+void BLE_TIMER_Deinit(void)
+{
+  tListNode *listNodeRemoved;
+
+  while(LST_is_empty(&BLE_TIMER_RunningList) != TRUE)
   {
-    Error_Handler();
+    LST_remove_tail(&BLE_TIMER_RunningList, &listNodeRemoved);
+    (void)AMM_Free((uint32_t *)listNodeRemoved);
   }
-  const osThreadAttr_t BleTimerTask_attributes = {
-    .name = "BLE timer Task",
-    .priority = (osPriority_t)CFG_TASK_PRIO_BLE_TIMER,
-    .stack_size = TASK_BLE_TIMER_STACK_SIZE
-  };
-
-  BleTimerThread = osThreadNew(BleTimer_Task_Entry, NULL, &BleTimerTask_attributes);
-  if (BleTimerThread == NULL)
+  while(LST_is_empty(&BLE_TIMER_ExpiredList) != TRUE)
   {
-    Error_Handler();
+    LST_remove_tail(&BLE_TIMER_ExpiredList, &listNodeRemoved);
+    (void)AMM_Free((uint32_t *)listNodeRemoved);
   }
 
-  /* Initialize the Timer Server */
-  UTIL_TIMER_Init();
+  /* Reset timers Queues */
+  LST_init_head(&BLE_TIMER_RunningList);
+  LST_init_head(&BLE_TIMER_ExpiredList);
+
 }
 
 uint8_t BLE_TIMER_Start(uint16_t id, uint32_t timeout)
 {
+  BLE_TIMER_t *timer = NULL;
+
   /* If the timer's id already exists, stop it */
   BLE_TIMER_Stop(id);
 
   /* Create a new timer instance and add it to the list */
-  BLE_TIMER_t *timer = NULL;
-
-  if(AMM_ERROR_OK != AMM_Alloc (CFG_AMM_VIRTUAL_STACK_BLE,
+  if(AMM_ERROR_OK != AMM_Alloc (CFG_AMM_VIRTUAL_BLE_TIMERS,
                                 DIVC(sizeof(BLE_TIMER_t), sizeof(uint32_t)),
                                 (uint32_t **)&timer,
                                 NULL))
@@ -102,30 +96,35 @@ uint8_t BLE_TIMER_Start(uint16_t id, uint32_t timeout)
     return BLE_STATUS_INSUFFICIENT_RESOURCES;
   }
 
-  timer->id = id;
-  LST_insert_tail(&BLE_TIMER_List, (tListNode *)timer);
-
   if(UTIL_TIMER_Create(&timer->timerObject, timeout, UTIL_TIMER_ONESHOT, &BLE_TIMER_Callback, timer) != UTIL_TIMER_OK)
   {
-    LST_remove_node ((tListNode *)timer);
     (void)AMM_Free((uint32_t *)timer);
     return BLE_STATUS_FAILED;
   }
 
   if(UTIL_TIMER_Start(&timer->timerObject) != UTIL_TIMER_OK)
   {
-    LST_remove_node ((tListNode *)timer);
     (void)AMM_Free((uint32_t *)timer);
     return BLE_STATUS_FAILED;
   }
+
+  timer->id = id;
+  LST_insert_tail(&BLE_TIMER_RunningList, (tListNode *)timer);
 
   return BLE_STATUS_SUCCESS;
 }
 
 void BLE_TIMER_Stop(uint16_t id)
 {
-  /* Search for the id in the timers list */
-  BLE_TIMER_t* timer = BLE_TIMER_GetFromList(&BLE_TIMER_List, id);
+  BLE_TIMER_t* timer;
+
+  /* Search for the id in the running timers list */
+  timer = BLE_TIMER_GetFromList(&BLE_TIMER_RunningList, id);
+  /* If not found, try elapsed timers list */
+  if (NULL == timer)
+  {
+    timer = BLE_TIMER_GetFromList(&BLE_TIMER_ExpiredList, id);
+  }
 
   /* If the timer's id exists, stop it */
   if(NULL != timer)
@@ -139,48 +138,40 @@ void BLE_TIMER_Stop(uint16_t id)
 
 void BLE_TIMER_Background(void)
 {
-  BLEPLATCB_TimerExpiry( (uint16_t)BLE_TIMER_timer->id);
-  HostStack_Process( );
+  BLE_TIMER_t* timer;
 
-  /* Delete the BLE_TIMER_timer from the list */
-  LST_remove_node((tListNode *)BLE_TIMER_timer);
-
-  (void)AMM_Free((uint32_t *)BLE_TIMER_timer);
-}
-
-static void BleTimer_Task_Entry(void* thread_input)
-{
-  (void)(thread_input);
-#if HIGHWATERMARK
-    UBaseType_t uxHighWaterMark;
-    UBaseType_t lastHighWaterMark = 0;
-#endif // endif HIGHWATERMARK
-
-  while(1)
+  if (TRUE != LST_is_empty(&BLE_TIMER_ExpiredList))
   {
-    osSemaphoreAcquire(BleTimerSemaphore, osWaitForever);
-    BLE_TIMER_Background();
-    osThreadYield();
-#if HIGHWATERMARK
-        uxHighWaterMark = uxTaskGetStackHighWaterMark(NULL);
-        if (uxHighWaterMark != lastHighWaterMark) {
-            APP_DBG("\x1b[34m" "BleTimerTaskEntry_stack_HighWaterMark %lu \n" "\x1b[0m", uxHighWaterMark);
-            lastHighWaterMark = uxHighWaterMark;
-        }
-#endif
+    /* Get first timer from (sorted) expired list and remove it from this list */
+    LST_remove_head(&BLE_TIMER_ExpiredList, (tListNode **)&timer);
+    BLEPLATCB_TimerExpiry(timer->id);
+    BleStackCB_Process();
+    (void)AMM_Free((uint32_t *)timer);
+
+    if (TRUE != LST_is_empty(&BLE_TIMER_ExpiredList))
+    {
+      /* At least one other timer expired and has not been processed,
+         so trigger task again */
+      osThreadFlagsSet(WpanTaskHandle, 1U << CFG_RTOS_FLAG_BLEtimer);
+    }
   }
 }
 
 static void BLE_TIMER_Callback(void* arg)
 {
-  BLE_TIMER_timer = (BLE_TIMER_t*)arg;
+  /* Remove timer from running list */
+  LST_remove_node((tListNode *)arg);
+  /* Add it to expired list */
+  LST_insert_tail(&BLE_TIMER_ExpiredList, (tListNode *)arg);
 
-  osSemaphoreRelease(BleTimerSemaphore);
+  osThreadFlagsSet(WpanTaskHandle, 1U << CFG_RTOS_FLAG_BLEtimer);
 }
 
 static BLE_TIMER_t* BLE_TIMER_GetFromList(tListNode * listHead, uint16_t id)
 {
-  BLE_TIMER_t* currentNode = (BLE_TIMER_t*)listHead->next;
+  BLE_TIMER_t* currentNode;
+
+  LST_get_next_node(listHead, (tListNode **)&currentNode);
   while((tListNode *)currentNode != listHead)
   {
     if(currentNode->id == id)
@@ -191,4 +182,3 @@ static BLE_TIMER_t* BLE_TIMER_GetFromList(tListNode * listHead, uint16_t id)
   }
   return NULL;
 }
-

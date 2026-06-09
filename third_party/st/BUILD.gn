@@ -37,6 +37,13 @@ config("stm32_mbedtls_config") {
       chip_root,
       "${chip_root}/examples/platform/stm32/config_files/STM32WB5/",
     ]
+  } else {
+    defines = [ "MBEDTLS_USER_CONFIG_FILE=<examples/platform/stm32/config_files/STM32WB6/matter_config.h>" ]
+
+    include_dirs = [
+      chip_root,
+      "${chip_root}/examples/platform/stm32/config_files/STM32WB6/",
+    ]
   }
 }
 mbedtls_target("mbedtls") {

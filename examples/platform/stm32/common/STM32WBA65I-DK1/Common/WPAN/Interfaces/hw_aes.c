@@ -19,6 +19,11 @@
 #include "app_common.h"
 #include "stm32wbaxx_ll_bus.h"
 
+
+/*****************************************************************************/
+
+extern void Error_Handler(void);
+
 /*****************************************************************************/
 
 #define HW_AESX AES
@@ -44,14 +49,35 @@ static HW_AES_VAR_T HW_AES_var;
 
 /*****************************************************************************/
 
+__WEAK int CRYP_MutexTake(void)
+{
+  return 0; /* This shall be implemented by user */
+}
+
+__WEAK int CRYP_MutexRelease(void)
+{
+  return 0; /* This shall be implemented by user */
+}
+
+/*****************************************************************************/
+
 int HW_AES_Enable( void )
 {
   HW_AES_VAR_T* av = &HW_AES_var;
 
-  /* Test if the driver is not already in use */
+  if (0 != CRYP_MutexTake())
+  {
+    return FALSE;
+  }
 
+  /* Test if the driver is not already in use */
   if ( HW_AES_CLOCK_IS_ENABLE() )
   {
+    if (0 != CRYP_MutexRelease())
+    {
+      Error_Handler();
+    }
+    
     return FALSE;
   }
   av->run = TRUE;
@@ -111,7 +137,7 @@ void HW_AES_SetKey( uint32_t mode,
     HW_AESX->CR |= AES_CR_EN;
 
     /* Wait for CCF flag to be raised */
-    while ( ! (HW_AESX->SR & AES_SR_CCF) );
+    while ( ! (HW_AESX->ISR & AES_ISR_CCF) );
 
     /* Clear CCF Flag */
     HW_AESX->ICR |= AES_ICR_CCF;
@@ -143,7 +169,7 @@ void HW_AES_Crypt( const uint32_t* input,
   HW_AESX->DINR = input[3];
 
   /* Wait for CCF flag to be raised */
-  while ( !(HW_AESX->SR & AES_SR_CCF) );
+  while ( !(HW_AESX->ISR & AES_ISR_CCF) );
 
   /* Read the output block from the output FIFO */
   output[0] = HW_AESX->DOUTR;
@@ -173,6 +199,11 @@ void HW_AES_Disable( void )
 
     UTILS_EXIT_CRITICAL_SECTION( );
 
+    if (0 != CRYP_MutexRelease())
+    {
+      Error_Handler();
+    }
+
     av->run = FALSE;
   }
 }
@@ -193,7 +224,7 @@ void HW_AES_Crypt8( const uint8_t * pInput, uint8_t * pOutput )
   HW_AESX->DINR = __REV( pTemp[3] );
 
   // -- Wait for CCF flag to be raised /
-  while ( (HW_AESX->SR & AES_SR_CCF) == 0x00u )
+  while ( (HW_AESX->ISR & AES_ISR_CCF) == 0x00u )
     { }
 
   /* Read the output block from the output FIFO */
@@ -238,7 +269,7 @@ void HW_AES_InitCcm( uint8_t decrypt,
   HW_AESX->CR |= AES_CR_EN;
 
   /* Wait for CCF flag to be raised */
-  while ( ! (HW_AESX->SR & AES_SR_CCF) );
+  while ( ! (HW_AESX->ISR & AES_ISR_CCF) );
 
   /* Clear CCF Flag */
   HW_AESX->ICR |= AES_ICR_CCF;
@@ -256,7 +287,7 @@ void HW_AES_InitCcm( uint8_t decrypt,
   HW_AESX->DINR = b1[3];
 
   /* Wait for CCF flag to be raised */
-  while ( !(HW_AESX->SR & AES_SR_CCF) );
+  while ( !(HW_AESX->ISR & AES_ISR_CCF) );
 
   /* Clear CCF Flag */
   HW_AESX->ICR |= AES_ICR_CCF;
@@ -278,7 +309,7 @@ void HW_AES_EndCcm( uint8_t tag_length,
                  AES_CR_GCMPH_0 | AES_CR_GCMPH_1 | AES_CR_DATATYPE_1);
 
   /* Wait for CCF flag to be raised */
-  while ( !(HW_AESX->SR & AES_SR_CCF) );
+  while ( !(HW_AESX->ISR & AES_ISR_CCF) );
 
   /* Read the output block from the output FIFO */
   tmp[0] = HW_AESX->DOUTR;

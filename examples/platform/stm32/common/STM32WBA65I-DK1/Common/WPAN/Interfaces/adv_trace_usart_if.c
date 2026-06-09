@@ -117,19 +117,19 @@ UTIL_ADV_TRACE_Status_t UART_TransmitDMA ( uint8_t * pData, uint16_t iSize )
   UTIL_ADV_TRACE_Status_t eStatus = UTIL_ADV_TRACE_OK;
   HAL_StatusTypeDef eResult;
   IRQn_Type         eUseDmaTx;
-  IRQn_Type         eUseDmaRx;
 
   eUseDmaTx = get_IRQn_Type_from_DMA_HandleTypeDef( LOG_UART_HANDLER.hdmatx );
-  eUseDmaRx = get_IRQn_Type_from_DMA_HandleTypeDef( LOG_UART_HANDLER.hdmarx );
-
+#if defined(STM32WBA25xx) || defined(STM32WBA23xx) 
+  if ( ( eUseDmaTx == LPDMA1_Channel0_IRQn ) || ( eUseDmaTx == LPDMA1_Channel1_IRQn ) ||
+       ( eUseDmaTx == LPDMA1_Channel2_IRQn ) || ( eUseDmaTx == LPDMA1_Channel3_IRQn ) ||
+       ( eUseDmaTx == LPDMA1_Channel4_IRQn ) || ( eUseDmaTx == LPDMA1_Channel5_IRQn ) ||
+       ( eUseDmaTx == LPDMA1_Channel6_IRQn ) || ( eUseDmaTx == LPDMA1_Channel7_IRQn ) )
+#else
   if ( ( eUseDmaTx == GPDMA1_Channel0_IRQn ) || ( eUseDmaTx == GPDMA1_Channel1_IRQn ) ||
        ( eUseDmaTx == GPDMA1_Channel2_IRQn ) || ( eUseDmaTx == GPDMA1_Channel3_IRQn ) ||
        ( eUseDmaTx == GPDMA1_Channel4_IRQn ) || ( eUseDmaTx == GPDMA1_Channel5_IRQn ) ||
-       ( eUseDmaTx == GPDMA1_Channel6_IRQn ) || ( eUseDmaTx == GPDMA1_Channel7_IRQn ) ||
-       ( eUseDmaRx == GPDMA1_Channel0_IRQn ) || ( eUseDmaRx == GPDMA1_Channel1_IRQn ) ||
-       ( eUseDmaRx == GPDMA1_Channel2_IRQn ) || ( eUseDmaRx == GPDMA1_Channel3_IRQn ) ||
-       ( eUseDmaRx == GPDMA1_Channel4_IRQn ) || ( eUseDmaRx == GPDMA1_Channel5_IRQn ) ||
-       ( eUseDmaRx == GPDMA1_Channel6_IRQn ) || ( eUseDmaRx == GPDMA1_Channel7_IRQn ) )
+       ( eUseDmaTx == GPDMA1_Channel6_IRQn ) || ( eUseDmaTx == GPDMA1_Channel7_IRQn ) )
+#endif /* defined(STM32WBA25xx) || defined(STM32WBA23xx)  */
   {
     eResult = HAL_UART_Transmit_DMA( &LOG_UART_HANDLER, pData, iSize );
   }
@@ -178,6 +178,31 @@ static void UsartIf_RxCpltCallback(UART_HandleTypeDef *huart)
   */
 static IRQn_Type get_IRQn_Type_from_DMA_HandleTypeDef( DMA_HandleTypeDef * hDmaHandler )
 {
+#if defined(STM32WBA25xx) || defined(STM32WBA23xx) 
+  if ( hDmaHandler->Instance == LPDMA1_Channel0 ) 
+    { return LPDMA1_Channel0_IRQn; }
+  
+  if ( hDmaHandler->Instance == LPDMA1_Channel1 ) 
+    { return LPDMA1_Channel1_IRQn; }
+  
+  if ( hDmaHandler->Instance == LPDMA1_Channel2 ) 
+    { return LPDMA1_Channel2_IRQn; }
+  
+  if ( hDmaHandler->Instance == LPDMA1_Channel3 ) 
+    { return LPDMA1_Channel3_IRQn; }
+  
+  if ( hDmaHandler->Instance == LPDMA1_Channel4 ) 
+    { return LPDMA1_Channel4_IRQn; }
+  
+  if ( hDmaHandler->Instance == LPDMA1_Channel5 ) 
+    { return LPDMA1_Channel5_IRQn; }
+  
+  if  (hDmaHandler->Instance == LPDMA1_Channel6 ) 
+    { return LPDMA1_Channel6_IRQn; }
+  
+  if ( hDmaHandler->Instance == LPDMA1_Channel7 ) 
+    { return LPDMA1_Channel7_IRQn; }
+#else
   if ( hDmaHandler->Instance == GPDMA1_Channel0 ) 
     { return GPDMA1_Channel0_IRQn; }
   
@@ -201,6 +226,7 @@ static IRQn_Type get_IRQn_Type_from_DMA_HandleTypeDef( DMA_HandleTypeDef * hDmaH
   
   if ( hDmaHandler->Instance == GPDMA1_Channel7 ) 
     { return GPDMA1_Channel7_IRQn; }
+#endif /* defined(STM32WBA25xx) || defined(STM32WBA23xx)  */
 
   /* Values from (-1) to (-15) are already in used. This value isn't used so it should be safe.
      So, if you see this value, it means you used an invalid DMA handler as input. */

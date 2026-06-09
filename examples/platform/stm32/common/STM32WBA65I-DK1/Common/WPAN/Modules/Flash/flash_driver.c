@@ -89,7 +89,11 @@ FD_FlashOp_Status_t FD_WriteData(uint32_t Dest, uint32_t Payload)
   /* Wait for system to allow flash access */
   while (FD_Flash_Control_status & (1u << FD_FLASHACCESS_SYSTEM));
 
+#ifdef FLASH_DOUBLEWORD_SUPPORT
+  if (HAL_FLASH_Program(FLASH_TYPEPROGRAM_DOUBLEWORD, Dest, Payload) == HAL_OK)
+#else
   if (HAL_FLASH_Program(FLASH_TYPEPROGRAM_QUADWORD, Dest, Payload) == HAL_OK)
+#endif /* FLASH_DOUBLEWORD_SUPPORT */    
   {
     status = FD_FLASHOP_SUCCESS;
   }

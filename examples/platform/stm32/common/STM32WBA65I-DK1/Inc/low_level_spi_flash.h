@@ -21,8 +21,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-//#include "stm32_hal.h"
-#include <stdint.h>
+#include "stm32_hal.h"
 
 #define WIP_Pos     0U
 #define WIP_Msk     (1U << WIP_Pos)

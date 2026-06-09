@@ -38,6 +38,20 @@ PlatformManagerImpl PlatformManagerImpl::sInstance;
 
 extern "C" int mbedtls_hardware_poll(void *data, unsigned char *output, size_t len, size_t *olen);
 
+void PlatformManagerImpl::ScheduleSoftwareReset(void)
+{
+    ScheduleWork([](intptr_t) {
+        PlatformMgr().HandleServerShuttingDown();
+        SoftwareReset(); });
+}
+
+void PlatformManagerImpl::SoftwareReset(void)
+{
+    osDelay(100);
+    ChipLogProgress(DeviceLayer, "Performing software reset");
+    NVIC_SystemReset();
+}
+
 CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 {
     System::Clock::InitClock_RealTime();

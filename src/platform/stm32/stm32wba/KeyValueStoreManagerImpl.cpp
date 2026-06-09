@@ -18,7 +18,7 @@
 
 #include <platform/KeyValueStoreManager.h>
 #include <lib/support/CodeUtils.h>
-#include "flash_wb.h"
+#include "app_nvm.h"
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
@@ -34,10 +34,10 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char *key, void *value,
 		size_t value_size, size_t *read_bytes_size, size_t offset) {
 	CHIP_ERROR err = CHIP_NO_ERROR;
 
-	if ((key != NULL) && (value != NULL) && (read_bytes_size != NULL)) {
+	if ((key != NULL) && (value != NULL)) {
 		return this->_PrintError(
-				NM_GetKeyValue(value, key, (uint32_t) value_size,
-						read_bytes_size,SECTOR_SECURE));
+				NVM_GetKeyValue(value, key, (uint32_t) value_size,
+						read_bytes_size,SECTOR_MATTER));
 	} else {
 		err = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
 	}
@@ -48,7 +48,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Delete(const char *key) {
 
 	ChipLogDetail( DataManagement, "DELETE=> %s",key);
 	if (key != NULL) {
-		return this->_PrintError(NM_DeleteKey(key,SECTOR_SECURE));
+		return this->_PrintError(NVM_DeleteKey(key,SECTOR_MATTER));
 
 	}
 	return CHIP_ERROR_PERSISTED_STORAGE_FAILED;
@@ -60,8 +60,8 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Put(const char *key, const void *value,
 	if ((value_size != 0) && (key != NULL) && (value != NULL)) {
 
 		return this->_PrintError(
-				NM_SetKeyValue((char*) value, (char*) key,
-						(uint32_t) value_size,SECTOR_SECURE));
+				NVM_SetKeyValue((char*) value, (char*) key,
+						(uint32_t) value_size,SECTOR_MATTER));
 
 	}
 

@@ -21,11 +21,14 @@
 /* Includes ------------------------------------------------------------------*/
 #include "app_common.h"
 #include "app_conf.h"
+#include "cmsis_os2.h"
+#include "svc_ctl.h"
 #include "app_entry.h"
 #include "dbg_trace.h"
-#include "ble.h"
+#include "ble_core.h"
+#include "uuid.h"
+#include "log_module.h"
 #include "app_matter.h"
-#include "cmsis_os2.h"
 #include "custom_stm.h"
 
 /* Private includes ----------------------------------------------------------*/
@@ -138,8 +141,8 @@ void APP_MATTER_Notification(MATTER_App_Notification_evt_t *pNotification) {
 		message.connid = pNotification->ConnectionHandle;
 		message.notif = 1;
 		P2P_Server_App_Context.Notification_Status = 1;
-		APP_DBG_MSG("-- Matter APPLICATION SERVER : INDICATE ENABLED\n");
-		APP_DBG_MSG(" \n\r");
+		LOG_INFO_APP("-- Matter APPLICATION SERVER : INDICATE ENABLED\n");
+		LOG_INFO_APP(" \n\r");
 		BLETXCharCCCDWriteCb(&message);
 		/* USER CODE END P2PS_STM__NOTIFY_ENABLED_EVT */
 		break;
@@ -149,8 +152,8 @@ void APP_MATTER_Notification(MATTER_App_Notification_evt_t *pNotification) {
 		message.connid = pNotification->ConnectionHandle;
 		message.notif = 0;
 		P2P_Server_App_Context.Notification_Status = 0;
-		APP_DBG_MSG("-- Matter APPLICATION SERVER : INDICATE DISABLED\n");
-		APP_DBG_MSG(" \n\r");
+		LOG_INFO_APP("-- Matter APPLICATION SERVER : INDICATE DISABLED\n");
+		LOG_INFO_APP(" \n\r");
 		BLETXCharCCCDWriteCb(&message);
 		/* USER CODE END P2PS_STM_NOTIFY_DISABLED_EVT */
 		break;
@@ -211,7 +214,7 @@ void APP_MATTER_Send_Notification(uint16_t datalength, uint8_t *data) {
 	if (P2P_Server_App_Context.Notification_Status) {
 		CUSTOM_STM_App_Update_Char(P2P_NOTIFY_CHAR_UUID, (uint8_t*) data, datalength);
 	} else {
-		APP_DBG_MSG("-- Matter APPLICATION SERVER : CAN'T INFORM CLIENT -  NOTIFICATION DISABLED\n ");
+		LOG_INFO_APP("-- Matter APPLICATION SERVER : CAN'T INFORM CLIENT -  NOTIFICATION DISABLED\n ");
 	}
 
 	return;

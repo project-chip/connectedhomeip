@@ -35,7 +35,7 @@ struct ChipDeviceEvent;
 // ==================== Platform Adaptations ====================
 #define CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_TIME 1
 #define CHIP_SYSTEM_CONFIG_EVENT_OBJECT_TYPE const struct ::chip::DeviceLayer::ChipDeviceEvent *
-
+#define CHIP_SYSTEM_CONFIG_THREAD_LOCAL_STORAGE 0
 // ========== Platform-specific Configuration Overrides =========
 
 #ifndef CHIP_SYSTEM_CONFIG_NUM_TIMERS

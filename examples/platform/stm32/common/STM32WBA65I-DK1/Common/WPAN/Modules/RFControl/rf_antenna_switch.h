@@ -19,6 +19,10 @@
 #ifndef RF_ANTENNA_SWITCH_H
 #define RF_ANTENNA_SWITCH_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "stm32wbaxx.h"
 
 #define RF_ANTSW0  {GPIOA, GPIO_PIN_12, GPIO_AF11_RF_ANTSW0}
@@ -44,5 +48,9 @@ static const st_gpio_antsw_t rt_antenna_switch_gpio_table[] =
 };
 
 void RF_CONTROL_AntennaSwitch(rf_antenna_switch_state_t state);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* RF_ANTENNA_SWITCH_H */

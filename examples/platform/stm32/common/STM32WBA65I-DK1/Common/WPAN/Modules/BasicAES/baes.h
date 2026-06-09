@@ -19,6 +19,10 @@
 #ifndef BAES_H__
 #define BAES_H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdint.h>
 
 /* Basic AES module dedicated to BLE stack with the following features:
@@ -69,5 +73,9 @@ extern int BAES_CcmCrypt( uint8_t mode,
                           uint8_t tag_length,
                           uint8_t* tag,
                           uint8_t* output );
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* BAES_H__ */

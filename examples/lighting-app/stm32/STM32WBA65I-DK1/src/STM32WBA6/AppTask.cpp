@@ -24,8 +24,9 @@
 #include "cmsis_os2.h"
 #include "AppEvent.h"
 #include "AppTask.h"
-#include "flash_wb.h"
-
+#include "app_nvm.h"
+#include "main.h"
+#include "IdentifierEffect.h"
 #if (OTA_SUPPORT == 1)
 #include "ota.h"
 #endif /* (OTA_SUPPORT == 1) */
@@ -43,8 +44,8 @@
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
-#include <data-model-providers/codegen/Instance.h>
 #include <inet/EndPointStateOpenThread.h>
+#include <data-model-providers/codegen/Instance.h>
 #include <setup_payload/OnboardingCodesUtil.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
@@ -55,6 +56,12 @@
 #include <platform/OpenThread/OpenThreadUtils.h>
 #include <platform/ThreadStackManager.h>
 #endif
+
+#include <app/TestEventTriggerDelegate.h>
+#include <app/clusters/software-diagnostics-server/SoftwareDiagnosticsTestEventTriggerHandler.h>
+#if (OTA_SUPPORT == 1)
+#include <app/clusters/ota-requestor/OTATestEventTriggerHandler.h>
+#endif /* (OTA_SUPPORT == 1) */
 
 #include "stm32wba65i_discovery.h"
 #include "app_conf.h"
@@ -67,6 +74,7 @@ using namespace chip::Credentials;
 using namespace chip::DeviceLayer;
 using namespace ::chip::Platform;
 using namespace ::chip::Credentials;
+
 using namespace ::chip::app::Clusters;
 using chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr;
 
@@ -78,6 +86,11 @@ chip::DeviceLayer::FactoryDataProvider mFactoryDataProvider;
 #define STM32_LIGHT_ENDPOINT_ID 1
 
 static QueueHandle_t sAppEventQueue;
+
+#if CHIP_ENABLE_OPENTHREAD
+Clusters::NetworkCommissioning::InstanceAndDriver<DeviceLayer::NetworkCommissioning::GenericThreadDriver>
+    sThreadNetworkDriver(0 /*endpointId*/);
+#endif // CHIP_ENABLE_OPENTHREAD
 
 
 const osThreadAttr_t AppTask_attr =
@@ -100,19 +113,14 @@ static bool sHaveFabric = false;
 
 chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 
-#if CHIP_ENABLE_OPENTHREAD
-Clusters::NetworkCommissioning::InstanceAndDriver<DeviceLayer::NetworkCommissioning::GenericThreadDriver>
-    sThreadNetworkDriver(0 /*endpointId*/);
-#endif // CHIP_ENABLE_OPENTHREAD
-
 CHIP_ERROR AppTask::StartAppTask() {
     sAppEventQueue = xQueueCreate(APP_EVENT_QUEUE_SIZE, sizeof(AppEvent));
     if (sAppEventQueue == NULL) {
-        APP_DBG("Failed to allocate app event queue\n");
+        LOG_ERROR_APP("Failed to allocate app event queue\n");
         return CHIP_ERROR_NO_MEMORY;
     }
 
-    // Start App task.
+    /* Start App task. */
     osThreadNew(AppTaskMain, NULL, &AppTask_attr);
 
     return CHIP_NO_ERROR;
@@ -130,18 +138,27 @@ CHIP_ERROR AppTask::Init() {
 
     CHIP_ERROR err = CHIP_NO_ERROR;
 
+    ChipLogProgress(NotSpecified, "Current Software Version: %s",
+            CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
+
     /* Setup button handler */
     APPE_PushButtonSetReceiveCb(ButtonEventHandler);
 
     ThreadStackMgr().InitThreadStack();
-
-    ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_Router);
+    ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_FullEndDevice);
     sThreadNetworkDriver.Init();
+
     PlatformMgr().AddEventHandler(MatterEventHandler, 0);
+
+    err = IdentifierEffect_Init();
+    if (err != CHIP_NO_ERROR) {
+        LOG_ERROR_APP("IdentifierEffect_Init() failed\n");
+        return err;
+    }
 
     err = LightingMgr().Init();
     if (err != CHIP_NO_ERROR) {
-        APP_DBG("LightingMgr().Init() failed\n");
+        LOG_ERROR_APP("LightingMgr().Init() failed\n");
         return err;
     }
     LightingMgr().SetCallbacks(ActionInitiated, ActionCompleted);
@@ -158,26 +175,47 @@ CHIP_ERROR AppTask::Init() {
     SetDeviceInstanceInfoProvider(&mFactoryDataProvider);
     SetCommissionableDataProvider(&mFactoryDataProvider);
     SetDeviceAttestationCredentialsProvider(&mFactoryDataProvider);
-    
+
     chip::Inet::EndPointStateOpenThread::OpenThreadEndpointInitParam nativeParams;
-    nativeParams.lockCb = LockOpenThreadTask;
-    nativeParams.unlockCb = UnlockOpenThreadTask;
+    nativeParams.lockCb                = LockOpenThreadTask;
+    nativeParams.unlockCb              = UnlockOpenThreadTask;
     nativeParams.openThreadInstancePtr = chip::DeviceLayer::ThreadStackMgrImpl().OTInstance();
-    initParams.endpointNativeParams = static_cast<void*>(&nativeParams);
+    initParams.endpointNativeParams    = static_cast<void *>(&nativeParams);
+
+    // Manage TestEventTrigger
+    static SimpleTestEventTriggerDelegate sTestEventTriggerDelegate{};
+    static uint8_t sTestEventTriggerEnableKey[TestEventTriggerDelegate::kEnableKeyLength] = { 0 };
+    // Read EnableKey from the factory data.
+    MutableByteSpan enableKey(sTestEventTriggerEnableKey);
+    err = mFactoryDataProvider.GetEnableKey(enableKey);
+    if (err != CHIP_NO_ERROR)
+    {
+        LOG_ERROR_APP("mFactoryDataProvider.GetEnableKey() failed!\n");
+        memset(sTestEventTriggerEnableKey, 0, sizeof(sTestEventTriggerEnableKey));
+    }
+    VerifyOrDie(sTestEventTriggerDelegate.Init(ByteSpan(sTestEventTriggerEnableKey)) == CHIP_NO_ERROR);
+    static SoftwareDiagnosticsTestEventTriggerHandler sSoftwareDiagnosticsTestEventTriggerHandler;
+    sTestEventTriggerDelegate.AddHandler(&sSoftwareDiagnosticsTestEventTriggerHandler);
+#if (OTA_SUPPORT == 1)
+    static OTATestEventTriggerHandler sOTATestEventTriggerHandler;
+    sTestEventTriggerDelegate.AddHandler(&sOTATestEventTriggerHandler);
+#endif /* (OTA_SUPPORT == 1) */
+    initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
+
+    chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
     chip::Server::GetInstance().Init(initParams);
 
     gExampleDeviceInfoProvider.SetStorageDelegate(&Server::GetInstance().GetPersistentStorage());
-    chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
-
+   
     ConfigurationMgr().LogDeviceConfig();
-    
+
     // Open commissioning after boot if no fabric was available
     if (chip::Server::GetInstance().GetFabricTable().FabricCount() == 0) {
         PrintOnboardingCodes(
                 chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
         // Enable BLE advertisements
         chip::Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow();
-        APP_DBG("BLE advertising started. Waiting for Pairing.\n");
+        LOG_INFO_APP("BLE advertising started. Waiting for Pairing.\n");
     } else {  // try to attach to the thread network
         sHaveFabric = true;
     }
@@ -186,7 +224,7 @@ CHIP_ERROR AppTask::Init() {
 
     err = PlatformMgr().StartEventLoopTask();
     if (err != CHIP_NO_ERROR) {
-        APP_DBG("PlatformMgr().StartEventLoopTask() failed\n");
+        LOG_ERROR_APP("PlatformMgr().StartEventLoopTask() failed\n");
     }
 
     return err;
@@ -197,11 +235,11 @@ CHIP_ERROR AppTask::InitMatter() {
 
     err = chip::Platform::MemoryInit();
     if (err != CHIP_NO_ERROR) {
-        APP_DBG("Platform::MemoryInit() failed\n");
+        LOG_ERROR_APP("Platform::MemoryInit() failed\n");
     } else {
         err = PlatformMgr().InitChipStack();
         if (err != CHIP_NO_ERROR) {
-            APP_DBG("PlatformMgr().InitChipStack() failed\n");
+            LOG_ERROR_APP("PlatformMgr().InitChipStack() failed\n");
         }
     }
     return err;
@@ -209,8 +247,8 @@ CHIP_ERROR AppTask::InitMatter() {
 
 void AppTask::AppTaskMain(void *pvParameter) {
     AppEvent event;
+    LOG_INFO_APP("Enter AppTaskMain\n");
 #if (CFG_LCD_SUPPORTED == 1)
-    APP_BSP_LcdInit();
     BSP_LCD_Clear(LCD1,LCD_COLOR_BLACK);
     UTIL_LCD_DisplayStringAt(0, 0, (uint8_t*) PRODUCT_NAME, CENTER_MODE);
     BSP_LCD_Refresh(LCD1);
@@ -234,23 +272,26 @@ void AppTask::AppTaskMain(void *pvParameter) {
     HeapStats_t HeapStatsInfo;
 #endif // endif HIGHWATERMARK
     if (err != CHIP_NO_ERROR) {
-        APP_DBG("App task init failed\n");
+        LOG_ERROR_APP("App task init failed\n");
     }
 
-    APP_DBG("App Task started\n");
-    while (true) {
-
+    LOG_INFO_APP("App Task started\n");
+    while (true)
+    {
         BaseType_t eventReceived = xQueueReceive(sAppEventQueue, &event, portMAX_DELAY);
-        while (eventReceived == pdTRUE) {
-            sAppTask.DispatchEvent(&event);
+        while (eventReceived == pdTRUE)
+        {
+        	sAppTask.DispatchEvent(&event);
             eventReceived = xQueueReceive(sAppEventQueue, &event, 0);
         }
+
 #if HIGHWATERMARK
         uxHighWaterMark = uxTaskGetStackHighWaterMark( NULL );
-        APP_DBG ("\x1b[34m" "AppTask_stack_HighWaterMark %lu \n" "\x1b[0m",uxHighWaterMark);
+        LOG_INFO_APP ("\x1b[34m" "AppTask_stack_HighWaterMark %lu \n" "\x1b[0m",uxHighWaterMark);
+        UNUSED(uxHighWaterMark);
         vPortGetHeapStats(&HeapStatsInfo);
-        APP_DBG ("\x1b[34m" "AppTask_FreeRTOS_heap.freespace %u bytes\n" "\x1b[0m",HeapStatsInfo.xAvailableHeapSpaceInBytes);
-        APP_DBG ("\x1b[34m" "AppTask_FreeRTOS_heap.minimum_ever_free %u bytes\n" "\x1b[0m",HeapStatsInfo.xMinimumEverFreeBytesRemaining);
+        LOG_INFO_APP ("\x1b[34m" "AppTask_FreeRTOS_heap.freespace %u bytes\n" "\x1b[0m",HeapStatsInfo.xAvailableHeapSpaceInBytes);
+        LOG_INFO_APP ("\x1b[34m" "AppTask_FreeRTOS_heap.minimum_ever_free %u bytes\n" "\x1b[0m",HeapStatsInfo.xMinimumEverFreeBytesRemaining);
 
 #endif // endif HIGHWATERMARK
     }
@@ -284,9 +325,8 @@ void AppTask::LightingActionEventHandler(AppEvent *aEvent) {
 void AppTask::ButtonEventHandler(ButtonDesc_t *Button) {
 
 
-    if (Button->button == B1) { /* JOY_UP */
-            // Hand off to Functionality handler - depends on duration of press
-    	 AppEvent event;
+    if (Button->button == B1) { /* JOY_DOWN */
+         AppEvent event;
     	 event.Type = AppEvent::kEventType_Timer;
     	 event.Handler = UpdateNvmEventHandler;
     	 sAppTask.mFunction = kFunction_SaveNvm;
@@ -309,7 +349,7 @@ void AppTask::ButtonEventHandler(ButtonDesc_t *Button) {
 void AppTask::ActionInitiated(LightingManager::Action_t aAction) {
     // Placeholder for light action
     if (aAction == LightingManager::ON_ACTION) {
-        APP_DBG("Light goes on\n");
+        LOG_INFO_APP("Light goes on\n");
 
 #if (CFG_LCD_SUPPORTED == 1)
         UTIL_LCD_ClearStringLine(2);
@@ -322,7 +362,7 @@ void AppTask::ActionInitiated(LightingManager::Action_t aAction) {
         BSP_LED_On(LED_GREEN);
 
     } else if (aAction == LightingManager::OFF_ACTION) {
-        APP_DBG("Light goes off\n ");
+        LOG_INFO_APP("Light goes off\n ");
 
 #if (CFG_LCD_SUPPORTED == 1)
         UTIL_LCD_ClearStringLine(2);
@@ -341,7 +381,7 @@ void AppTask::ActionInitiated(LightingManager::Action_t aAction) {
             BSP_LCD_Refresh(LCD1);
 #endif /* (CFG_LCD_SUPPORTED == 1) */
 
-        	APP_DBG("Update level control %d\n", LightingMgr().GetLevel());
+        	LOG_INFO_APP("Update level control %d\n", LightingMgr().GetLevel());
         }
     }
 
@@ -350,9 +390,9 @@ void AppTask::ActionInitiated(LightingManager::Action_t aAction) {
 void AppTask::ActionCompleted(LightingManager::Action_t aAction) {
     // Placeholder for light action completed
     if (aAction == LightingManager::ON_ACTION) {
-        APP_DBG("Light action on completed\n");
+        LOG_INFO_APP("Light action on completed\n");
     } else if (aAction == LightingManager::OFF_ACTION) {
-        APP_DBG("Light action off completed\n");
+        LOG_INFO_APP("Light action off completed\n");
     }
     if (sAppTask.mSyncClusterToButtonAction) {
         sAppTask.UpdateClusterState();
@@ -404,15 +444,15 @@ void AppTask::UpdateNvmEventHandler(AppEvent *aEvent) {
     uint8_t err = 0;
 
     if (sAppTask.mFunction == kFunction_SaveNvm) {
-        err = NM_Dump();
+        err = NVM_Dump();
         if (err == 0) {
-            APP_DBG("SAVE NVM\n");
+            LOG_INFO_APP("SAVE NVM\n");
         } else {
-            APP_DBG("Failed to SAVE NVM\n");
+            LOG_ERROR_APP("Failed to SAVE NVM\n");
         }
     } else if (sAppTask.mFunction == kFunction_FactoryReset) {
-        APP_DBG("FACTORY RESET\n");
-        NM_ResetFactory();
+        LOG_INFO_APP("FACTORY RESET\n");
+        NVM_ResetFactory();
     }
 }
 
@@ -432,14 +472,14 @@ void AppTask::MatterEventHandler(const ChipDeviceEvent *event, intptr_t) {
 
     case DeviceEventType::kCHIPoBLEConnectionEstablished: {
         sHaveBLEConnections = true;
-        APP_DBG("kCHIPoBLEConnectionEstablished\n");
+        LOG_INFO_APP("kCHIPoBLEConnectionEstablished\n");
         UpdateLCD();
         break;
     }
 
     case DeviceEventType::kCHIPoBLEConnectionClosed: {
         sHaveBLEConnections = false;
-        APP_DBG("kCHIPoBLEConnectionClosed\n");
+        LOG_INFO_APP("kCHIPoBLEConnectionClosed\n");
         UpdateLCD();
         if (sFabricNeedSaved) {
             AppEvent event;
@@ -455,7 +495,7 @@ void AppTask::MatterEventHandler(const ChipDeviceEvent *event, intptr_t) {
     case DeviceEventType::kCommissioningComplete: {
         sFabricNeedSaved = true;
         sHaveFabric = true;
-        // check if ble is on, since before save in nvm we need to stop m0, Better to write in nvm when m0 is less busy
+
         if (sHaveBLEConnections == false) {
             sFabricNeedSaved = false; // put to false to avoid save in nvm 2 times
             AppEvent event;

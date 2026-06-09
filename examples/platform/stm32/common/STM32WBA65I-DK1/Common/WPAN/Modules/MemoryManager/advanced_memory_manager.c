@@ -22,20 +22,6 @@
 #include "advanced_memory_manager.h"
 
 /* Private typedef -----------------------------------------------------------*/
-
-/**
- * @brief   Virtual Memory information struct
- */
-typedef struct __attribute__((packed, aligned(4))) VirtualMemoryInfo
-{
-  /* Identifier of the Virtual Memory */
-  uint8_t Id;
-  /* Size required for this Virtual Memory buffer with a multiple of 32bits */
-  uint32_t RequiredSize;
-  /* Current occupation of the Virtual Memory buffer with a multiple of 32bits */
-  uint32_t OccupiedSize;
-}VirtualMemoryInfo_t;
-
 /* Private defines -----------------------------------------------------------*/
 
 /* Defines that the module is not initialized */
@@ -80,6 +66,11 @@ static uint32_t AmmPoolSize;
 /* AMM occupied shared pool size */
 static uint32_t AmmOccupiedSharedPoolSize;
 
+#if (AMM_USE_MEMORY_STATISTICS == 1)
+/* AMM peak shared pool size */
+static uint32_t AmmPeakSharedPoolSize;
+#endif /* AMM_USE_MEMORY_STATISTICS */
+
 /* AMM needed virtual memory */
 static uint32_t AmmRequiredVirtualMemorySize;
 
@@ -121,6 +112,67 @@ static inline void passPendingToActive (void);
 static inline AMM_VirtualMemoryCallbackFunction_t * popActive (void);
 
 /* Functions Definition ------------------------------------------------------*/
+#if (AMM_USE_MEMORY_STATISTICS == 1)
+uint32_t GetCurrentOccupation (const uint8_t VirtualMemoryId)
+{
+  uint32_t currentOccupation = 0x00;
+
+  if (AmmInitialized == INITIALIZED)
+  {
+    /* Shared memory use case */
+    if (VirtualMemoryId == AMM_NO_VIRTUAL_ID)
+    {
+      currentOccupation = AmmOccupiedSharedPoolSize;
+    }
+    else
+    {  
+      /* Check virtual memory info */
+      for (uint32_t memIdx = 0x00;
+           (memIdx < AmmVirtualMemoryNumber) && (currentOccupation == 0x00);
+           memIdx++)
+      {
+        /* Check if ID is known */
+        if (VirtualMemoryId == p_AmmVirtualMemoryList[memIdx].Id)
+        {
+          currentOccupation = p_AmmVirtualMemoryList[memIdx].OccupiedSize;
+        }
+      }
+    }
+  }
+
+  return currentOccupation;
+}
+
+uint32_t GetPeakOccupation (const uint8_t VirtualMemoryId)
+{
+  uint32_t peakOccupation = 0x00;
+
+  if (AmmInitialized == INITIALIZED)
+  {
+    /* Shared memory use case */
+    if (VirtualMemoryId == AMM_NO_VIRTUAL_ID)
+    {
+      peakOccupation = AmmPeakSharedPoolSize;
+    }
+    else
+    {
+      /* Check virtual memory info */
+      for (uint32_t memIdx = 0x00;
+           (memIdx < AmmVirtualMemoryNumber) && (peakOccupation == 0x00);
+           memIdx++)
+      {
+        /* Check if ID is known */
+        if (VirtualMemoryId == p_AmmVirtualMemoryList[memIdx].Id)
+        {
+          peakOccupation = p_AmmVirtualMemoryList[memIdx].PeakOccupationSize;
+        }
+      }
+    }
+  }
+
+  return peakOccupation;
+}
+#endif /* AMM_USE_MEMORY_STATISTICS */
 
 AMM_Function_Error_t AMM_Init (const AMM_InitParameters_t * const p_InitParams)
 {
@@ -260,6 +312,10 @@ AMM_Function_Error_t AMM_Init (const AMM_InitParameters_t * const p_InitParams)
           /* Actualize actual shared pool occupied size */
           AmmOccupiedSharedPoolSize = AmmOccupiedSharedPoolSize + (AMM_VIRTUAL_INFO_ELEMENT_SIZE
                                                                    * AmmVirtualMemoryNumber);
+          
+#if (AMM_USE_MEMORY_STATISTICS == 1)
+          AmmPeakSharedPoolSize = AmmOccupiedSharedPoolSize;
+#endif /* AMM_USE_MEMORY_STATISTICS */
 
           for (uint32_t memIdx = 0x00;
                memIdx < AmmVirtualMemoryNumber;
@@ -268,6 +324,9 @@ AMM_Function_Error_t AMM_Init (const AMM_InitParameters_t * const p_InitParams)
             p_AmmVirtualMemoryList[memIdx].Id = p_InitParams->p_VirtualMemoryConfigList[memIdx].Id;
             p_AmmVirtualMemoryList[memIdx].RequiredSize = p_InitParams->p_VirtualMemoryConfigList[memIdx].BufferSize;
             p_AmmVirtualMemoryList[memIdx].OccupiedSize = 0x00;
+#if (AMM_USE_MEMORY_STATISTICS == 1)
+            p_AmmVirtualMemoryList[memIdx].PeakOccupationSize = 0x00;
+#endif /* AMM_USE_MEMORY_STATISTICS */
 
             AmmRequiredVirtualMemorySize = AmmRequiredVirtualMemorySize + p_AmmVirtualMemoryList[memIdx].RequiredSize;
           }
@@ -330,13 +389,16 @@ AMM_Function_Error_t AMM_Alloc (const uint8_t VirtualMemoryId,
 
   uint32_t * p_TmpAllocAddr = NULL;
 
+  /* Set pointer to NULL */
+  *pp_AllocBuffer = NULL;
+
   if (AmmInitialized == NOT_INITIALIZED)
   {
     error = AMM_ERROR_NOT_INIT;
   }
   /* Check if buffer size is not zero */
   else if (BufferSize == 0)
-  {
+  {    
     error = AMM_ERROR_BAD_ALLOCATION_SIZE;
   }
   /* Check if no virtual ID requested */
@@ -365,6 +427,14 @@ AMM_Function_Error_t AMM_Alloc (const uint8_t VirtualMemoryId,
 
         /* Actualize the current memory occupation of the shared space */
         AmmOccupiedSharedPoolSize = AmmOccupiedSharedPoolSize + BufferSize + VIRTUAL_MEMORY_HEADER_SIZE;
+
+#if (AMM_USE_MEMORY_STATISTICS == 1)
+        /* Check if peak occupation has to be updated */
+        if (AmmOccupiedSharedPoolSize > AmmPeakSharedPoolSize)
+        {
+          AmmPeakSharedPoolSize = AmmOccupiedSharedPoolSize;
+        }
+#endif /* AMM_USE_MEMORY_STATISTICS */
 
         error = AMM_ERROR_OK;
       }
@@ -434,6 +504,14 @@ AMM_Function_Error_t AMM_Alloc (const uint8_t VirtualMemoryId,
                                                           + BufferSize
                                                           + VIRTUAL_MEMORY_HEADER_SIZE;
 
+#if (AMM_USE_MEMORY_STATISTICS == 1)
+            /* Check if peak occupation has to be updated */
+            if (p_AmmVirtualMemoryList[memIdx].OccupiedSize > p_AmmVirtualMemoryList[memIdx].PeakOccupationSize)
+            {
+              p_AmmVirtualMemoryList[memIdx].PeakOccupationSize = p_AmmVirtualMemoryList[memIdx].OccupiedSize;
+            }
+#endif /* AMM_USE_MEMORY_STATISTICS */
+
             /* Check for overlapping the reserved memory */
             if (p_AmmVirtualMemoryList[memIdx].RequiredSize < p_AmmVirtualMemoryList[memIdx].OccupiedSize)
             {
@@ -441,6 +519,13 @@ AMM_Function_Error_t AMM_Alloc (const uint8_t VirtualMemoryId,
               AmmOccupiedSharedPoolSize = AmmOccupiedSharedPoolSize
                                           + BufferSize - selfAvailable
                                           + VIRTUAL_MEMORY_HEADER_SIZE;
+#if (AMM_USE_MEMORY_STATISTICS == 1)
+              /* Check if peak occupation has to be updated */
+              if (AmmOccupiedSharedPoolSize > AmmPeakSharedPoolSize)
+              {
+                AmmPeakSharedPoolSize = AmmOccupiedSharedPoolSize;
+              }
+#endif /* AMM_USE_MEMORY_STATISTICS */
             }
 
             error = AMM_ERROR_OK;

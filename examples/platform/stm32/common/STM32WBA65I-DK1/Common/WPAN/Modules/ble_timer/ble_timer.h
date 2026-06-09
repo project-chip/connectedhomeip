@@ -7,7 +7,7 @@
   ******************************************************************************
   * @attention
   *
-  * Copyright (c) 2022 STMicroelectronics.
+  * Copyright (c) 2025 STMicroelectronics.
   * All rights reserved.
   *
   * This software is licensed under terms that can be found in the LICENSE file
@@ -21,15 +21,27 @@
 #ifndef BLE_TIMER_H__
 #define BLE_TIMER_H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 void BLE_TIMER_Init( void );
+void BLE_TIMER_Deinit( void );
 
 uint8_t BLE_TIMER_Start( uint16_t id,
                      uint32_t ms_timeout );
 
 void BLE_TIMER_Stop( uint16_t id );
 
+void BLE_TIMER_Background(void);
+
 /* Callback
  */
 void BLE_TIMERCB_Expiry( uint16_t id );
+
+#ifdef __cplusplus
+}
+#endif
+
 
 #endif /* BLE_TIMER_H__ */

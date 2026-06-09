@@ -17,7 +17,10 @@
  */
 
 /* Includes ------------------------------------------------------------------*/
-#include "common_blesvc.h"
+#include "svc_ctl.h"
+#include "ble_types.h"
+#include "ble_core.h"
+#include "uuid.h"
 #include "app_matter.h"
 
 /* Private typedef -----------------------------------------------------------*/
@@ -41,7 +44,7 @@ typedef struct {
 /* Private macros ------------------------------------------------------------*/
 
 /* Private variables ---------------------------------------------------------*/
-
+static const uint16_t CharValueSize = 247;
 MATTER_App_Notification_evt_t Notification;
 
 /**
@@ -81,8 +84,8 @@ do {\
  */
 void SVCCTL_InitCustomSvc(void) {
 
-	Char_UUID_t uuid16;
-
+	Char_UUID_t uuid;
+	uint8_t max_attr_record;
 	/**
 	 *	Register the event handler to the BLE controller
 	 */
@@ -93,38 +96,48 @@ void SVCCTL_InitCustomSvc(void) {
 	 *
 	 * Max_Attribute_Records = 2*no_of_char + 1
 	 */
+	max_attr_record = 8;
+    uuid.Char_UUID_16 = MATTER_SERVICE_UUID;
 
-	uint16_t uuid = MATTER_SERVICE_UUID;
 
-	aci_gatt_add_service(UUID_TYPE_16, (Service_UUID_t*) &uuid,
-	PRIMARY_SERVICE, 8, &(aCustomContext.CustomSvcHdle));
+	aci_gatt_add_service(UUID_TYPE_16,
+			            (Service_UUID_t*) &uuid,
+	                    PRIMARY_SERVICE,
+						max_attr_record,
+						&(aCustomContext.CustomSvcHdle));
 
 	/**
 	 *  Add RX Characteristic
 	 */
-	COPY_CHAR_RX_UUID(uuid16.Char_UUID_128);
+	COPY_CHAR_RX_UUID(uuid.Char_UUID_128);
+
 	aci_gatt_add_char(aCustomContext.CustomSvcHdle,
-	UUID_TYPE_128, &uuid16, 247,
-	CHAR_PROP_WRITE,
-	ATTR_PERMISSION_NONE,
-	GATT_NOTIFY_ATTRIBUTE_WRITE | GATT_NOTIFY_WRITE_REQ_AND_WAIT_FOR_APPL_RESP, /* gattEvtMask */
-	10, /* encryKeySize */
-	1, /* isVariable */
-	&(aCustomContext.WriteClientToServerCharHdle));
+					  UUID_TYPE_128,
+					  (Char_UUID_t *) &uuid,
+					  CharValueSize,
+	                  CHAR_PROP_WRITE,
+	                  ATTR_PERMISSION_NONE,
+	                  GATT_NOTIFY_ATTRIBUTE_WRITE | GATT_NOTIFY_WRITE_REQ_AND_WAIT_FOR_APPL_RESP, /* gattEvtMask */
+	                  0x0A, /* encryKeySize */
+	                  1, /* isVariable */
+	                  &(aCustomContext.WriteClientToServerCharHdle));
 
 	/**
 	 *   Add notification Characteristic
 	 */
 
-	COPY_CHAR_TX_UUID(uuid16.Char_UUID_128);
+	COPY_CHAR_TX_UUID(uuid.Char_UUID_128);
+
 	aci_gatt_add_char(aCustomContext.CustomSvcHdle,
-	UUID_TYPE_128, &uuid16, 247,
-	CHAR_PROP_INDICATE,
-	ATTR_PERMISSION_NONE,
-	GATT_NOTIFY_ATTRIBUTE_WRITE, /* gattEvtMask */
-	10, /* encryKeySize */
-	1, /* isVariable: 1 */
-	&(aCustomContext.NotifyServerToClientCharHdle));
+	                  UUID_TYPE_128,
+					  &uuid,
+					  CharValueSize,
+	                  CHAR_PROP_INDICATE,
+	                  ATTR_PERMISSION_NONE,
+	                  GATT_NOTIFY_ATTRIBUTE_WRITE, /* gattEvtMask */
+	                  0x0A, /* encryKeySize */
+	                  1, /* isVariable: 1 */
+	                  &(aCustomContext.NotifyServerToClientCharHdle));
 
 	return;
 }
@@ -136,13 +149,17 @@ void SVCCTL_InitCustomSvc(void) {
  *
  */
 tBleStatus CUSTOM_STM_App_Update_Char(uint16_t UUID, uint8_t *pPayload, uint16_t Length) {
+
 	tBleStatus result = BLE_STATUS_INVALID_PARAMS;
+
 	switch (UUID) {
 	case P2P_NOTIFY_CHAR_UUID:
 
-		result = aci_gatt_update_char_value(aCustomContext.CustomSvcHdle, aCustomContext.NotifyServerToClientCharHdle, 0, /* charValOffset */
-		Length, /* charValueLen */
-		(uint8_t*) pPayload);
+		result = aci_gatt_update_char_value(aCustomContext.CustomSvcHdle,
+				                            aCustomContext.NotifyServerToClientCharHdle,
+											0, /* charValOffset */
+		                                    Length, /* charValueLen */
+		                                    (uint8_t*) pPayload);
 
 		break;
 
@@ -161,58 +178,59 @@ tBleStatus CUSTOM_STM_App_Update_Char(uint16_t UUID, uint8_t *pPayload, uint16_t
  * @retval Ack: Return whether the Event has been managed or not
  */
 static SVCCTL_EvtAckStatus_t Matter_Event_Handler(void *Event) {
+
 	SVCCTL_EvtAckStatus_t return_value;
-	hci_event_pckt *event_pckt;
-	evt_blecore_aci *blecore_evt;
-	aci_gatt_attribute_modified_event_rp0 *attribute_modified;
+	hci_event_pckt *p_event_pckt;
+	evt_blecore_aci *p_blecore_evt;
+	aci_gatt_attribute_modified_event_rp0 *p_attribute_modified;
 
 	return_value = SVCCTL_EvtNotAck;
-	event_pckt = (hci_event_pckt*) (((hci_uart_pckt*) Event)->data);
+	p_event_pckt = (hci_event_pckt*) (((hci_uart_pckt*) Event)->data);
 
-	switch (event_pckt->evt) {
+	switch (p_event_pckt->evt) {
 	case HCI_VENDOR_SPECIFIC_DEBUG_EVT_CODE: {
-		blecore_evt = (evt_blecore_aci*) event_pckt->data;
-		switch (blecore_evt->ecode) {
+		p_blecore_evt = (evt_blecore_aci*)p_event_pckt->data;
+		switch (p_blecore_evt->ecode) {
 		case ACI_GATT_SERVER_CONFIRMATION_VSEVT_CODE: {
-			attribute_modified = (aci_gatt_attribute_modified_event_rp0*) blecore_evt->data;
+			p_attribute_modified = (aci_gatt_attribute_modified_event_rp0*) p_blecore_evt->data;
 			Notification.Evt_Opcode = MATTER_STM_ACK_INDICATE_EVT;
-			Notification.ConnectionHandle = attribute_modified->Connection_Handle;
+			Notification.ConnectionHandle = p_attribute_modified->Connection_Handle;
 			APP_MATTER_Notification(&Notification);
 		}
 		case ACI_GATT_ATTRIBUTE_MODIFIED_VSEVT_CODE: {
-			attribute_modified = (aci_gatt_attribute_modified_event_rp0*) blecore_evt->data;
-			if (attribute_modified->Attr_Handle == (aCustomContext.NotifyServerToClientCharHdle + 2)) {
+			p_attribute_modified = (aci_gatt_attribute_modified_event_rp0*) p_blecore_evt->data;
+			if (p_attribute_modified->Attr_Handle == (aCustomContext.NotifyServerToClientCharHdle + 2)) {
 				/**
 				 * Descriptor handle
 				 */
 				return_value = SVCCTL_EvtAckFlowEnable;
-				APP_DBG_MSG("Subscribe for c2 notification\n");
+
 				/**
 				 * Indicate to application
 				 */
-				if (attribute_modified->Attr_Data[0] & COMSVC_Indication) {
+				if (p_attribute_modified->Attr_Data[0] & (1<<1)) { //COMSVC_Indication) {
 					Notification.Evt_Opcode = MATTER_STM_INDICATE_ENABLED_EVT;
-					Notification.ConnectionHandle = attribute_modified->Connection_Handle;
+					Notification.ConnectionHandle = p_attribute_modified->Connection_Handle;
 					APP_MATTER_Notification(&Notification);
 				} else {
 					Notification.Evt_Opcode = MATTER_STM_INDICATE_DISABLED_EVT;
-					Notification.ConnectionHandle = attribute_modified->Connection_Handle;
+					Notification.ConnectionHandle = p_attribute_modified->Connection_Handle;
 					APP_MATTER_Notification(&Notification);
 				}
 			}
 
-			else if (attribute_modified->Attr_Handle == (aCustomContext.WriteClientToServerCharHdle + 1)) {
+			else if (p_attribute_modified->Attr_Handle == (aCustomContext.WriteClientToServerCharHdle + 1)) {
 				Notification.Evt_Opcode = MATTER_STM_WRITE_EVT;
-				Notification.DataTransfered.Length = attribute_modified->Attr_Data_Length;
-				Notification.DataTransfered.pPayload = attribute_modified->Attr_Data;
-				Notification.ConnectionHandle = attribute_modified->Connection_Handle;
+				Notification.DataTransfered.Length = p_attribute_modified->Attr_Data_Length;
+				Notification.DataTransfered.pPayload = p_attribute_modified->Attr_Data;
+				Notification.ConnectionHandle = p_attribute_modified->Connection_Handle;
 				APP_MATTER_Notification(&Notification);
 			}
 		}
 			break;
 		case ACI_GATT_WRITE_PERMIT_REQ_VSEVT_CODE: {
 			aci_gatt_write_permit_req_event_rp0 *write_perm_req;
-			write_perm_req = (aci_gatt_write_permit_req_event_rp0*) blecore_evt->data;
+			write_perm_req = (aci_gatt_write_permit_req_event_rp0*) p_blecore_evt->data;
 			aci_gatt_write_resp(write_perm_req->Connection_Handle, write_perm_req->Attribute_Handle, 0x00, /* write_status = 0 (no error))*/
 			0x00, /* err_code */
 			write_perm_req->Data_Length, (uint8_t*) &(write_perm_req->Data[0]));
