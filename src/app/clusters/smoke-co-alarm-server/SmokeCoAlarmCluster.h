@@ -28,8 +28,6 @@
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/OptionalAttributeSet.h>
 
-using namespace chip::app::Clusters::SmokeCoAlarm;
-
 namespace chip {
 namespace app {
 namespace Clusters {
@@ -39,22 +37,14 @@ class SmokeCoAlarmDelegate;
 class SmokeCoAlarmCluster : public DefaultServerCluster
 {
 public:
-    /**
-     * Tracks which optional attributes are present on this endpoint.
-     * Populated at construction time from the ZAP/ember attribute store via CodegenIntegration.
-     */
-    using OptionalAttributeSet =
-        chip::app::OptionalAttributeSet<Attributes::DeviceMuted::Id, Attributes::InterconnectSmokeAlarm::Id,
-                                        Attributes::InterconnectCOAlarm::Id, Attributes::ContaminationState::Id,
-                                        Attributes::SmokeSensitivityLevel::Id, Attributes::ExpiryDate::Id,
-                                        Attributes::Unmounted::Id>;
-    /**
-     * Construction-time configuration.
-     * Passed in by CodegenIntegration from the ZAP static config.
-     */
+    using OptionalAttributeSet = chip::app::OptionalAttributeSet<
+        SmokeCoAlarm::Attributes::DeviceMuted::Id, SmokeCoAlarm::Attributes::InterconnectSmokeAlarm::Id,
+        SmokeCoAlarm::Attributes::InterconnectCOAlarm::Id, SmokeCoAlarm::Attributes::ContaminationState::Id,
+        SmokeCoAlarm::Attributes::SmokeSensitivityLevel::Id, SmokeCoAlarm::Attributes::ExpiryDate::Id,
+        SmokeCoAlarm::Attributes::Unmounted::Id>;
     struct Config
     {
-        chip::BitFlags<Feature> featureMap;
+        chip::BitFlags<SmokeCoAlarm::Feature> featureMap;
         OptionalAttributeSet optionalAttribs;
         bool inoperativeWhenUnmounted = false;
     };
@@ -69,7 +59,7 @@ public:
      * @brief Set the highest level of Expressed State according to priorityOrder
      * @param priorityOrder Priority order of expressed state from highest to lowest
      */
-    void SetExpressedStateByPriority(const std::array<ExpressedStateEnum, kPriorityOrderLength> & priorityOrder);
+    void SetExpressedStateByPriority(const std::array<SmokeCoAlarm::ExpressedStateEnum, kPriorityOrderLength> & priorityOrder);
 
     /**
      * @brief Request self-test when receiving local commands
@@ -82,17 +72,17 @@ public:
      * (feature disabled or optional attribute absent). void-returning setters always succeed.
      */
 
-    bool SetSmokeState(AlarmStateEnum newSmokeState);
-    bool SetCOState(AlarmStateEnum newCOState);
-    void SetBatteryAlert(AlarmStateEnum newBatteryAlert);
-    bool SetDeviceMuted(MuteStateEnum newDeviceMuted);
+    bool SetSmokeState(SmokeCoAlarm::AlarmStateEnum newSmokeState);
+    bool SetCOState(SmokeCoAlarm::AlarmStateEnum newCOState);
+    void SetBatteryAlert(SmokeCoAlarm::AlarmStateEnum newBatteryAlert);
+    bool SetDeviceMuted(SmokeCoAlarm::MuteStateEnum newDeviceMuted);
     void SetTestInProgress(bool newTestInProgress);
     void SetHardwareFaultAlert(bool newHardwareFaultAlert);
-    void SetEndOfServiceAlert(EndOfServiceEnum newEndOfServiceAlert);
-    bool SetInterconnectSmokeAlarm(AlarmStateEnum newInterconnectSmokeAlarm);
-    bool SetInterconnectCOAlarm(AlarmStateEnum newInterconnectCOAlarm);
-    void SetContaminationState(ContaminationStateEnum newContaminationState);
-    void SetSmokeSensitivityLevel(SensitivityEnum newSmokeSensitivityLevel);
+    void SetEndOfServiceAlert(SmokeCoAlarm::EndOfServiceEnum newEndOfServiceAlert);
+    bool SetInterconnectSmokeAlarm(SmokeCoAlarm::AlarmStateEnum newInterconnectSmokeAlarm);
+    bool SetInterconnectCOAlarm(SmokeCoAlarm::AlarmStateEnum newInterconnectCOAlarm);
+    void SetContaminationState(SmokeCoAlarm::ContaminationStateEnum newContaminationState);
+    void SetSmokeSensitivityLevel(SmokeCoAlarm::SensitivityEnum newSmokeSensitivityLevel);
     void SetExpiryDate(uint32_t newExpiryDate);
     /**
      * @brief Sets Unmounted attribute and updates ExpressedState accordingly.
@@ -104,24 +94,24 @@ public:
     void SetInoperativeWhenUnmounted(bool v) { mInoperativeWhenUnmounted = v; }
     void SetDelegate(SmokeCoAlarmDelegate * delegate) { mDelegate = delegate; }
 
-    ExpressedStateEnum GetExpressedState() const { return mExpressedState; }
-    AlarmStateEnum GetSmokeState() const { return mSmokeState; }
-    AlarmStateEnum GetCOState() const { return mCOState; }
-    AlarmStateEnum GetBatteryAlert() const { return mBatteryAlert; }
-    MuteStateEnum GetDeviceMuted() const { return mDeviceMuted; }
+    SmokeCoAlarm::ExpressedStateEnum GetExpressedState() const { return mExpressedState; }
+    SmokeCoAlarm::AlarmStateEnum GetSmokeState() const { return mSmokeState; }
+    SmokeCoAlarm::AlarmStateEnum GetCOState() const { return mCOState; }
+    SmokeCoAlarm::AlarmStateEnum GetBatteryAlert() const { return mBatteryAlert; }
+    SmokeCoAlarm::MuteStateEnum GetDeviceMuted() const { return mDeviceMuted; }
     bool GetTestInProgress() const { return mTestInProgress; }
     bool GetHardwareFaultAlert() const { return mHardwareFaultAlert; }
-    EndOfServiceEnum GetEndOfServiceAlert() const { return mEndOfServiceAlert; }
-    AlarmStateEnum GetInterconnectSmokeAlarm() const { return mInterconnectSmokeAlarm; }
-    AlarmStateEnum GetInterconnectCOAlarm() const { return mInterconnectCOAlarm; }
-    ContaminationStateEnum GetContaminationState() const { return mContaminationState; }
-    SensitivityEnum GetSmokeSensitivityLevel() const { return mSmokeSensitivityLevel; }
+    SmokeCoAlarm::EndOfServiceEnum GetEndOfServiceAlert() const { return mEndOfServiceAlert; }
+    SmokeCoAlarm::AlarmStateEnum GetInterconnectSmokeAlarm() const { return mInterconnectSmokeAlarm; }
+    SmokeCoAlarm::AlarmStateEnum GetInterconnectCOAlarm() const { return mInterconnectCOAlarm; }
+    SmokeCoAlarm::ContaminationStateEnum GetContaminationState() const { return mContaminationState; }
+    SmokeCoAlarm::SensitivityEnum GetSmokeSensitivityLevel() const { return mSmokeSensitivityLevel; }
     uint32_t GetExpiryDate() const { return mExpiryDate; }
     bool GetUnmountedState() const { return mUnmounted; }
 
-    chip::BitFlags<Feature> GetFeatures() const { return mConfig.featureMap; }
-    bool SupportsSmokeAlarm() const { return mConfig.featureMap.Has(Feature::kSmokeAlarm); }
-    bool SupportsCOAlarm() const { return mConfig.featureMap.Has(Feature::kCoAlarm); }
+    chip::BitFlags<SmokeCoAlarm::Feature> GetFeatures() const { return mConfig.featureMap; }
+    bool SupportsSmokeAlarm() const { return mConfig.featureMap.Has(SmokeCoAlarm::Feature::kSmokeAlarm); }
+    bool SupportsCOAlarm() const { return mConfig.featureMap.Has(SmokeCoAlarm::Feature::kCoAlarm); }
 
     // DefaultServerCluster overrides
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
@@ -143,27 +133,27 @@ private:
      * @note If the value of ExpressedState is not Normal, the attribute corresponding to the
      *       value should not be Normal.
      */
-    void SetExpressedState(ExpressedStateEnum newExpressedState);
+    void SetExpressedState(SmokeCoAlarm::ExpressedStateEnum newExpressedState);
 
     const Config mConfig;
     bool mInoperativeWhenUnmounted   = false;
     SmokeCoAlarmDelegate * mDelegate = nullptr;
 
     // Runtime attribute storage
-    ExpressedStateEnum mExpressedState         = ExpressedStateEnum::kNormal;
-    AlarmStateEnum mSmokeState                 = AlarmStateEnum::kNormal;
-    AlarmStateEnum mCOState                    = AlarmStateEnum::kNormal;
-    AlarmStateEnum mBatteryAlert               = AlarmStateEnum::kNormal;
-    MuteStateEnum mDeviceMuted                 = MuteStateEnum::kNotMuted;
-    bool mTestInProgress                       = false;
-    bool mHardwareFaultAlert                   = false;
-    EndOfServiceEnum mEndOfServiceAlert        = EndOfServiceEnum::kNormal;
-    AlarmStateEnum mInterconnectSmokeAlarm     = AlarmStateEnum::kNormal;
-    AlarmStateEnum mInterconnectCOAlarm        = AlarmStateEnum::kNormal;
-    ContaminationStateEnum mContaminationState = ContaminationStateEnum::kNormal;
-    SensitivityEnum mSmokeSensitivityLevel     = SensitivityEnum::kStandard;
-    uint32_t mExpiryDate                       = 0;
-    bool mUnmounted                            = false;
+    SmokeCoAlarm::ExpressedStateEnum mExpressedState         = SmokeCoAlarm::ExpressedStateEnum::kNormal;
+    SmokeCoAlarm::AlarmStateEnum mSmokeState                 = SmokeCoAlarm::AlarmStateEnum::kNormal;
+    SmokeCoAlarm::AlarmStateEnum mCOState                    = SmokeCoAlarm::AlarmStateEnum::kNormal;
+    SmokeCoAlarm::AlarmStateEnum mBatteryAlert               = SmokeCoAlarm::AlarmStateEnum::kNormal;
+    SmokeCoAlarm::MuteStateEnum mDeviceMuted                 = SmokeCoAlarm::MuteStateEnum::kNotMuted;
+    bool mTestInProgress                                     = false;
+    bool mHardwareFaultAlert                                 = false;
+    SmokeCoAlarm::EndOfServiceEnum mEndOfServiceAlert        = SmokeCoAlarm::EndOfServiceEnum::kNormal;
+    SmokeCoAlarm::AlarmStateEnum mInterconnectSmokeAlarm     = SmokeCoAlarm::AlarmStateEnum::kNormal;
+    SmokeCoAlarm::AlarmStateEnum mInterconnectCOAlarm        = SmokeCoAlarm::AlarmStateEnum::kNormal;
+    SmokeCoAlarm::ContaminationStateEnum mContaminationState = SmokeCoAlarm::ContaminationStateEnum::kNormal;
+    SmokeCoAlarm::SensitivityEnum mSmokeSensitivityLevel     = SmokeCoAlarm::SensitivityEnum::kStandard;
+    uint32_t mExpiryDate                                     = 0;
+    bool mUnmounted                                          = false;
 };
 
 /**
