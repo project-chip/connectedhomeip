@@ -67,7 +67,7 @@ TEST_F(TestCommissioningProxyClusterBackwardsCompatibility, TestInstanceLifecycl
         EXPECT_TRUE(instance.HasFeature(Feature::kWiFiNetworkInterface));
 
         // Test shutdown (unregistration)
-        instance.Shutdown(ClusterShutdownType::kClusterShutdown);
+        instance.Shutdown();
 
         // Verify cluster is unregistered from the registry
         auto * unregisteredCluster =
@@ -89,7 +89,7 @@ TEST_F(TestCommissioningProxyClusterBackwardsCompatibility, TestInstanceLifecycl
         EXPECT_FALSE(instance.HasFeature(Feature::kWiFiNetworkInterface));
 
         // Test shutdown
-        instance.Shutdown(ClusterShutdownType::kClusterShutdown);
+        instance.Shutdown();
     }
 }
 
