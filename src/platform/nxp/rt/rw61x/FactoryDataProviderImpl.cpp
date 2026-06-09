@@ -303,6 +303,7 @@ CHIP_ERROR FactoryDataProviderImpl::ELS_ConvertDacKey()
     hal_flash_status_t status;
 
     uint8_t * data = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(newSize));
+    VerifyOrExit(data != nullptr, error = CHIP_ERROR_INTERNAL);
     /* Import pain DAC key and generate the blob */
     SuccessOrExit(error = ELS_ExportBlob(blob, &blobSize, KeyAddr));
 

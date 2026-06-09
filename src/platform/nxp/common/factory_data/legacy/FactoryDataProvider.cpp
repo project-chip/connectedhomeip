@@ -896,14 +896,10 @@ CHIP_ERROR FactoryDataProvider::ParseEl2GoBlob(const uint8_t * blob, size_t maxS
                 valueLength = (valueLength << 8) | currentPtr[2 + i];
             }
         }
-
-        // Calculate total TLV size (tag + length field + value)
-        size_t totalTlvSize = 1 + lengthFieldSize + valueLength;
-
-        // Verify TLV doesn't exceed buffer
-        VerifyOrExit(currentPtr + totalTlvSize <= endPtr, {
-            ChipLogError(DeviceLayer, "ParseEl2GoBlob: TLV size %u exceeds buffer at offset %u (tag=0x%02X, valueLength=%u)",
-                         totalTlvSize, currentPtr - blob, tag, valueLength);
+        // Verify TLV doesn't exceed buffer bounds safely without overflow
+        VerifyOrExit(remainingBytes >= 1 + lengthFieldSize && remainingBytes - (1 + lengthFieldSize) >= valueLength, {
+            ChipLogError(DeviceLayer, "ParseEl2GoBlob: TLV size exceeds buffer at offset %u (tag=0x%02X, valueLength=%u)",
+                         currentPtr - blob, tag, valueLength);
             err = CHIP_ERROR_BUFFER_TOO_SMALL;
         });
 

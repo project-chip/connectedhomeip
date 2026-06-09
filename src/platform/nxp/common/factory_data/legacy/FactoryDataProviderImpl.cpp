@@ -146,6 +146,7 @@ CHIP_ERROR FactoryDataProviderImpl::ImportPrivateKeyBlob()
 
 CHIP_ERROR FactoryDataProviderImpl::ConvertDacKey()
 {
+    CHIP_ERROR error                    = CHIP_NO_ERROR;
     size_t blobSize                     = kPrivateKeyBlobLength;
     size_t newSize                      = sizeof(FactoryDataProvider::Header) + mHeader.size + kSEBlobAdditionalLength;
     uint8_t blob[kPrivateKeyBlobLength] = { 0 };
@@ -154,39 +155,45 @@ CHIP_ERROR FactoryDataProviderImpl::ConvertDacKey()
     bool convNeeded                     = true;
     uint8_t status                      = 0;
 
-    VerifyOrReturnError(mFactoryData != nullptr, CHIP_ERROR_INTERNAL);
+    VerifyOrExit(mFactoryData != nullptr, error = CHIP_ERROR_INTERNAL);
 
-    data = static_cast<extendedAppFactoryData_t *>(
-        chip::Platform::MemoryAlloc(offsetof(extendedAppFactoryData_t, app_factory_data) + newSize));
-    VerifyOrReturnError(data != nullptr, CHIP_ERROR_INTERNAL);
+    error = ExportBlob(blob, &blobSize, offset, convNeeded);
+    SuccessOrExit(error);
 
-    ReturnErrorOnFailure(ExportBlob(blob, &blobSize, offset, convNeeded));
     if (!convNeeded)
     {
         ChipLogError(DeviceLayer, "DAC private key already converted to blob");
-        chip::Platform::MemoryFree(data);
-        return CHIP_NO_ERROR;
+        goto exit;
     }
     ChipLogError(DeviceLayer, "extracted blob from DAC private key");
+
+    data = static_cast<extendedAppFactoryData_t *>(
+        chip::Platform::MemoryAlloc(offsetof(extendedAppFactoryData_t, app_factory_data) + newSize));
+    VerifyOrExit(data != nullptr, error = CHIP_ERROR_INTERNAL);
 
     memcpy(data, mFactoryData, offsetof(extendedAppFactoryData_t, app_factory_data) + mFactoryData->extendedDataLength);
     ChipLogError(DeviceLayer, "cached factory data in RAM");
 
-    ReturnErrorOnFailure(ReplaceWithBlob(&data->app_factory_data[0], blob, blobSize, offset));
+    error = ReplaceWithBlob(&data->app_factory_data[0], blob, blobSize, offset);
+    SuccessOrExit(error);
     ChipLogError(DeviceLayer, "replaced DAC private key with secured blob");
 
     data->extendedDataLength = newSize;
     status                   = Nv_WriteAppFactoryData(data, newSize);
-    VerifyOrReturnError(status == 0, CHIP_ERROR_INTERNAL);
+    VerifyOrExit(status == 0, error = CHIP_ERROR_INTERNAL);
     ChipLogError(DeviceLayer, "updated factory data");
 
-    memset(data, 0, newSize);
-    chip::Platform::MemoryFree(data);
-    ChipLogError(DeviceLayer, "sanitized RAM cache");
+    error = Validate();
+    SuccessOrExit(error);
 
-    ReturnErrorOnFailure(Validate());
-
-    return CHIP_NO_ERROR;
+exit:
+    if (data != nullptr)
+    {
+        memset(data, 0, offsetof(extendedAppFactoryData_t, app_factory_data) + newSize);
+        chip::Platform::MemoryFree(data);
+        ChipLogError(DeviceLayer, "sanitized RAM cache");
+    }
+    return error;
 }
 
 CHIP_ERROR FactoryDataProviderImpl::ExportBlob(uint8_t * data, size_t * dataLen, uint32_t & offset, bool & isNeeded)

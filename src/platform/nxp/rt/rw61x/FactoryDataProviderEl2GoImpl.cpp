@@ -177,7 +177,7 @@ CHIP_ERROR FactoryDataProviderImpl::ReadAndCheckFactoryDataInFlash(void)
     /* Init mflash */
     status = mflash_drv_init();
 
-    if (status != kStatus_Success || factoryDataSize > sizeof(factoryDataRamBuffer))
+    if (status != kStatus_Success || factoryDataSize > sizeof(factoryDataRamBuffer) || factoryDataSize < sizeof(mHeader))
     {
         return CHIP_ERROR_INTERNAL;
     }
@@ -393,7 +393,7 @@ CHIP_ERROR FactoryDataProviderImpl::FactoryReset()
         mKeyIdsCached   = false;
     }
 
-    return CHIP_NO_ERROR;
+    return err;
 }
 
 } // namespace DeviceLayer
