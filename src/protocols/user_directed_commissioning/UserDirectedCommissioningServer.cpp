@@ -61,7 +61,7 @@ void UserDirectedCommissioningServer::OnMessageReceived(const Transport::PeerAdd
     TEMPORARY_RETURN_IGNORED msg->Read(udcPayload, udcPayloadLength);
 
     IdentificationDeclaration id;
-    ReturnOnFailure(id.ReadPayload(udcPayload, sizeof(udcPayload)));
+    ReturnOnFailure(id.ReadPayload(udcPayload, udcPayloadLength));
 
     if (id.GetCancelPasscode())
     {
