@@ -21,6 +21,7 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <credentials/CHIPCert.h>
+#include <crypto/CHIPCryptoPAL.h>
 #include <functional>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/core/CHIPVendorIdentifiers.hpp>
@@ -445,11 +446,16 @@ public:
     }
 
 private:
+    // Epoch keys are raw group-key secret material. Hold them in a self-zeroizing buffer so they are
+    // wiped on every deallocation path (per-record erase, overwrite, and whole-map/object destruction),
+    // not just the explicit removal helpers.
+    using EpochKeyStorage = Crypto::SensitiveDataBuffer<Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES>;
+
     struct GroupKeySetStorage
     {
-        std::vector<uint8_t> epochKey0;
-        std::vector<uint8_t> epochKey1;
-        std::vector<uint8_t> epochKey2;
+        EpochKeyStorage epochKey0;
+        EpochKeyStorage epochKey1;
+        EpochKeyStorage epochKey2;
     };
 
     struct GroupInformationStorage
@@ -463,7 +469,8 @@ private:
     {
         // Friendly names are stored as owned raw bytes for CharSpan (not C-string) semantics.
         std::vector<char> friendlyName;
-        std::vector<uint8_t> icac;
+        // ICAC DER is sensitive credential material; hold it in a self-zeroizing buffer (see EpochKeyStorage).
+        Crypto::SensitiveDataBuffer<Credentials::kMaxDERCertLength> icac;
     };
 
     static constexpr size_t kMaxNodes            = 256;
@@ -543,7 +550,7 @@ private:
     void RemoveEndpointFriendlyNameStorage(NodeId nodeId, EndpointId endpointId);
 
     // Helper methods for copying optional ByteSpan and simple nullable values
-    void CopyByteSpanWithOwnedStorage(const DataModel::Nullable<ByteSpan> & source, std::vector<uint8_t> & storage,
+    void CopyByteSpanWithOwnedStorage(const DataModel::Nullable<ByteSpan> & source, EpochKeyStorage & storage,
                                       DataModel::Nullable<ByteSpan> & destination);
 
     template <typename T>

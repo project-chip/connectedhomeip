@@ -17,25 +17,12 @@
 
 #include <app/server/JointFabricDatastore.h>
 
-#include <crypto/CHIPCryptoPAL.h>
-
 #include <algorithm>
+#include <cstring>
 #include <unordered_set>
 
 namespace chip {
 namespace app {
-
-namespace {
-// Zeroize cryptographic material before the backing storage is freed, so raw epoch HMAC keys and
-// ICAC DER bytes do not linger in freed heap.
-void ScrubSecretBytes(std::vector<uint8_t> & secret)
-{
-    if (!secret.empty())
-    {
-        Crypto::ClearSecretData(secret.data(), secret.size());
-    }
-}
-} // namespace
 
 void JointFabricDatastore::CopyGroupKeySetWithOwnedSpans(
     const Clusters::JointFabricDatastore::Structs::DatastoreGroupKeySetStruct::Type & source,
@@ -57,14 +44,8 @@ void JointFabricDatastore::CopyGroupKeySetWithOwnedSpans(
 
 void JointFabricDatastore::RemoveGroupKeySetStorage(uint16_t groupKeySetId)
 {
-    auto it = mGroupKeySetStorage.find(groupKeySetId);
-    if (it != mGroupKeySetStorage.end())
-    {
-        ScrubSecretBytes(it->second.epochKey0);
-        ScrubSecretBytes(it->second.epochKey1);
-        ScrubSecretBytes(it->second.epochKey2);
-        mGroupKeySetStorage.erase(it);
-    }
+    // The epoch-key buffers self-zeroize in their destructors when the entry is erased.
+    mGroupKeySetStorage.erase(groupKeySetId);
 }
 
 void JointFabricDatastore::SetGroupInformationFriendlyNameWithOwnedStorage(
@@ -90,20 +71,17 @@ CHIP_ERROR JointFabricDatastore::SetAdminEntryWithOwnedStorage(
     storage.friendlyName.assign(friendlyName.data(), friendlyName.data() + friendlyName.size());
     destination.friendlyName = CharSpan(storage.friendlyName.data(), storage.friendlyName.size());
 
-    storage.icac.assign(icac.data(), icac.data() + icac.size());
-    destination.icac = ByteSpan(storage.icac.data(), storage.icac.size());
+    ReturnErrorOnFailure(storage.icac.SetLength(icac.size()));
+    memcpy(storage.icac.Bytes(), icac.data(), icac.size());
+    destination.icac = storage.icac.Span();
 
     return CHIP_NO_ERROR;
 }
 
 void JointFabricDatastore::RemoveAdminEntryStorage(NodeId nodeId)
 {
-    auto it = mAdminEntryStorage.find(nodeId);
-    if (it != mAdminEntryStorage.end())
-    {
-        ScrubSecretBytes(it->second.icac);
-        mAdminEntryStorage.erase(it);
-    }
+    // The ICAC buffer self-zeroizes in its destructor when the entry is erased.
+    mAdminEntryStorage.erase(nodeId);
 }
 
 void JointFabricDatastore::SetEndpointFriendlyNameWithOwnedStorage(
@@ -121,16 +99,18 @@ void JointFabricDatastore::RemoveEndpointFriendlyNameStorage(NodeId nodeId, Endp
 }
 
 void JointFabricDatastore::CopyByteSpanWithOwnedStorage(const DataModel::Nullable<ByteSpan> & source,
-                                                        std::vector<uint8_t> & storage, DataModel::Nullable<ByteSpan> & destination)
+                                                        EpochKeyStorage & storage, DataModel::Nullable<ByteSpan> & destination)
 {
-    if (!source.IsNull())
+    // The self-zeroizing storage has a fixed capacity (epoch key length); a source that does not fit is
+    // not a valid epoch key, so treat it as absent rather than truncating.
+    if (!source.IsNull() && storage.SetLength(source.Value().size()) == CHIP_NO_ERROR)
     {
-        storage.assign(source.Value().data(), source.Value().data() + source.Value().size());
-        destination = ByteSpan(storage.data(), storage.size());
+        memcpy(storage.Bytes(), source.Value().data(), source.Value().size());
+        destination = storage.Span();
     }
     else
     {
-        storage.clear();
+        storage.Clear();
         destination.SetNull();
     }
 }
@@ -1116,8 +1096,9 @@ CHIP_ERROR JointFabricDatastore::UpdateAdmin(NodeId nodeId, Optional<CharSpan> f
             if (icac.HasValue())
             {
                 const auto & icacVal = icac.Value();
-                storage.icac.assign(icacVal.data(), icacVal.data() + icacVal.size());
-                entry.icac = ByteSpan(storage.icac.data(), storage.icac.size());
+                ReturnErrorOnFailure(storage.icac.SetLength(icacVal.size()));
+                memcpy(storage.icac.Bytes(), icacVal.data(), icacVal.size());
+                entry.icac = storage.icac.Span();
             }
             return CHIP_NO_ERROR;
         }
