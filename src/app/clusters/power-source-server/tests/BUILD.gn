@@ -39,7 +39,5 @@ chip_test_suite("tests") {
 
   cflags = [ "-Wconversion" ]
 
-  public_deps = [
-    ":common",
-  ]
+  public_deps = [ ":common" ]
 }
