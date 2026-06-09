@@ -79,7 +79,7 @@ CHIP_ERROR HKDF_sha_SE05x::HKDF_SHA256(const uint8_t * secret, const size_t secr
     error = CHIP_NO_ERROR;
 exit:
 
-    if (keyObject.keyStore->session != NULL)
+    if (keyObject.keyStore != nullptr && keyObject.keyStore->session != NULL)
     {
         se_sss_key_store_erase_key(&gex_sss_chip_ctx.ks, &keyObject);
     }

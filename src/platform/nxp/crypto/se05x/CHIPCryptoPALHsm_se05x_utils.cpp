@@ -360,6 +360,9 @@ CHIP_ERROR se05x_set_certificate(uint32_t keyId, const uint8_t * buf, size_t buf
     se_sss_object_t keyObject = { 0 };
     sss_status_t status    = kStatus_SSS_Fail;
 
+    VerifyOrReturnError(buf != nullptr, CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError((SIZE_MAX / 8) >= (buflen), CHIP_ERROR_INTERNAL);
+
     status = se_sss_key_object_init(&keyObject, &gex_sss_chip_ctx.ks);
     VerifyOrReturnError(status == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
 
@@ -378,6 +381,9 @@ CHIP_ERROR se05x_set_binary_data(uint32_t keyId, const uint8_t * buf, size_t buf
 {
     se_sss_object_t keyObject = { 0 };
     sss_status_t status    = kStatus_SSS_Fail;
+
+    VerifyOrReturnError(buf != nullptr, CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError((SIZE_MAX / 8) >= (buflen), CHIP_ERROR_INTERNAL);
 
     status = se_sss_key_object_init(&keyObject, &gex_sss_chip_ctx.ks);
     VerifyOrReturnError(status == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
