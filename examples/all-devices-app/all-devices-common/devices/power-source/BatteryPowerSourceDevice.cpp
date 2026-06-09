@@ -39,8 +39,8 @@ CHIP_ERROR BatteryPowerSourceDevice::Register(chip::EndpointId endpoint, CodeDri
     // Power Source (some arbitrary configuration)
     SimpleBatteryPowerSourceCluster::Config config(mDescription, mReplaceability, mTimerDelegate);
     config.usedOptionalAttributes.Set<BatPercentRemainingId>();
-    config.status    = Clusters::PowerSource::PowerSourceStatusEnum::kActive;
-    config.order     = 0;
+    config.status = Clusters::PowerSource::PowerSourceStatusEnum::kActive;
+    config.order  = 0;
     config.batPercentRemaining.SetNonNull(200); // 100% (doubled percentage)
     mEndpointList[0] = endpoint;
 
