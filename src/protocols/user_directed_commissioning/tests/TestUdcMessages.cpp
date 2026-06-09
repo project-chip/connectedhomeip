@@ -482,6 +482,34 @@ TEST_F(TestUdcMessages, TestUDCIdentificationDeclaration)
     // NL_TEST_ASSERT(inSuite, rotatingIdLen != id.GetRotatingIdLength());
 }
 
+TEST_F(TestUdcMessages, TestUDCIdentificationDeclarationOversizedRotatingId)
+{
+    IdentificationDeclaration idOut;
+    const char * instanceName = "servertest1";
+
+    uint8_t idBuffer[500];
+    memcpy(idBuffer, instanceName, strlen(instanceName) + 1);
+
+    size_t offset = strlen(instanceName) + 1;
+    TLV::TLVWriter writer;
+    writer.Init(idBuffer + offset, sizeof(idBuffer) - offset);
+
+    TLV::TLVType outerContainerType = TLV::kTLVType_Structure;
+    EXPECT_SUCCESS(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerContainerType));
+
+    uint8_t oversizedId[60] = {};
+    memset(oversizedId, 0xAB, sizeof(oversizedId));
+    EXPECT_SUCCESS(writer.PutBytes(TLV::ContextTag(7), oversizedId, sizeof(oversizedId)));
+
+    EXPECT_SUCCESS(writer.EndContainer(outerContainerType));
+    EXPECT_SUCCESS(writer.Finalize());
+
+    size_t totalLen = offset + writer.GetLengthWritten();
+
+    EXPECT_NE(idOut.ReadPayload(idBuffer, totalLen), CHIP_NO_ERROR);
+    EXPECT_EQ(idOut.GetRotatingIdLength(), 0u);
+}
+
 TEST_F(TestUdcMessages, TestUDCCommissionerDeclaration)
 {
     CommissionerDeclaration id;

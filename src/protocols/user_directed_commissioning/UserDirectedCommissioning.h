@@ -297,12 +297,12 @@ private:
 
     uint16_t mVendorId  = 0;
     uint16_t mProductId = 0;
-    uint8_t mRotatingId[chip::Dnssd::kMaxRotatingIdLen];
+    uint8_t mRotatingId[chip::Dnssd::kMaxRotatingIdLen]               = {};
     size_t mRotatingIdLen = 0;
 
     constexpr static size_t kMaxTargetAppInfos = 10;
     uint8_t mNumTargetAppInfos                 = 0; // number of vendor Ids
-    TargetAppInfo mTargetAppInfos[kMaxTargetAppInfos];
+    TargetAppInfo mTargetAppInfos[kMaxTargetAppInfos]                 = {};
 
     char mPairingInst[chip::Dnssd::kMaxPairingInstructionLen + 1] = {};
     uint16_t mPairingHint                                         = 0;
