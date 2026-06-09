@@ -151,7 +151,9 @@ public:
     virtual CHIP_ERROR SetKeyType(KeyType type) { return CHIP_NO_ERROR; };
     virtual CHIP_ERROR SetCbcInitialVector(const uint8_t * iv, uint16_t ivSize);
 
-    virtual void UpdateKeyAttributes(psa_key_attributes_t & attrs) { /* Empty Default implementation - can be overridden by derived classes */  }
+    virtual void UpdateKeyAttributes(psa_key_attributes_t & attrs)
+    { /* Empty Default implementation - can be overridden by derived classes */
+    }
 
     virtual CHIP_ERROR FactoryReset() { return CHIP_NO_ERROR; };
 #if CONFIG_CHIP_OTA_FACTORY_DATA_PROCESSOR
@@ -254,10 +256,10 @@ protected:
      * @note If a key already exists, it is destroyed and replaced
      * @note Function stops at first error and cleans up all imported keys
      */
-    CHIP_ERROR ParseEl2GoBlobs(const uint8_t *blobArea, size_t blobAreaSize, size_t *blobsImported,
-                               uint32_t *dacKeyId, uint32_t *dacCertId);
+    CHIP_ERROR ParseEl2GoBlobs(const uint8_t * blobArea, size_t blobAreaSize, size_t * blobsImported, uint32_t * dacKeyId,
+                               uint32_t * dacCertId);
 
-     /**
+    /**
      * @brief Parses an EL2GO blob and extracts PSA-relevant metadata
      *
      * Parses a TLV-encoded EL2GO blob and populates a BlobContext structure
@@ -277,42 +279,40 @@ protected:
      * @note Non-PSA fields (magic, IV, signature) are validated during parsing
      *       but not stored in blobCtx
      */
-    CHIP_ERROR ParseEl2GoBlob(const uint8_t * blob, size_t maxSize, BlobContext & blobCtx,
-                               size_t * actualSize);
+    CHIP_ERROR ParseEl2GoBlob(const uint8_t * blob, size_t maxSize, BlobContext & blobCtx, size_t * actualSize);
 #endif
 
 private:
-
 #if CONFIG_CHIP_ENABLE_EL2GO_FACTORY_DATA
     // EL2GO blob magic signature constants
     static constexpr size_t kBlobMagicTlvSize = 0x0D;
-    static constexpr uint32_t kBlobMagicTlv1 = 0x400B6564U;
-    static constexpr uint32_t kBlobMagicTlv2 = 0x67656C6FU;
-    static constexpr uint32_t kBlobMagicTlv3 = 0x636B3267U;
-    static constexpr uint8_t kBlobMagicTlv4 = 0x6FU;
+    static constexpr uint32_t kBlobMagicTlv1  = 0x400B6564U;
+    static constexpr uint32_t kBlobMagicTlv2  = 0x67656C6FU;
+    static constexpr uint32_t kBlobMagicTlv3  = 0x636B3267U;
+    static constexpr uint8_t kBlobMagicTlv4   = 0x6FU;
 
     // System Keys not imported
-    static constexpr uint32_t kOemKeyId = 0x7FFF817BU;
-    static constexpr uint32_t kRkthKeyId = 0x7FFF817AU;
-    static constexpr uint32_t kOtpDataKeyId =  0x7FFF817CU;
+    static constexpr uint32_t kOemKeyId       = 0x7FFF817BU;
+    static constexpr uint32_t kRkthKeyId      = 0x7FFF817AU;
+    static constexpr uint32_t kOtpDataKeyId   = 0x7FFF817CU;
     static constexpr uint32_t kBatchFlowKeyId = 0x7FFF8181U;
 
     // EL2GO Blob TLV Tag Constants
-    static constexpr uint8_t kTagMagic = 0x40U;
-    static constexpr uint8_t kTagKeyId = 0x41U;
+    static constexpr uint8_t kTagMagic              = 0x40U;
+    static constexpr uint8_t kTagKeyId              = 0x41U;
     static constexpr uint8_t kTagPermittedAlgorithm = 0x42U;
-    static constexpr uint8_t kTagKeyUsageFlags = 0x43U;
-    static constexpr uint8_t kTagKeyType = 0x44U;
-    static constexpr uint8_t kTagKeyBits = 0x45U;
-    static constexpr uint8_t kTagKeyLifetime = 0x46U;
-    static constexpr uint8_t kTagDeviceLifecycle = 0x47U;
-    static constexpr uint8_t kTagWrappingKeyId = 0x50U;
-    static constexpr uint8_t kTagWrappingAlgorithm = 0x51U;
-    static constexpr uint8_t kTagIv = 0x52U;
-    static constexpr uint8_t kTagSignatureKeyId = 0x53U;
+    static constexpr uint8_t kTagKeyUsageFlags      = 0x43U;
+    static constexpr uint8_t kTagKeyType            = 0x44U;
+    static constexpr uint8_t kTagKeyBits            = 0x45U;
+    static constexpr uint8_t kTagKeyLifetime        = 0x46U;
+    static constexpr uint8_t kTagDeviceLifecycle    = 0x47U;
+    static constexpr uint8_t kTagWrappingKeyId      = 0x50U;
+    static constexpr uint8_t kTagWrappingAlgorithm  = 0x51U;
+    static constexpr uint8_t kTagIv                 = 0x52U;
+    static constexpr uint8_t kTagSignatureKeyId     = 0x53U;
     static constexpr uint8_t kTagSignatureAlgorithm = 0x54U;
-    static constexpr uint8_t kTagPlain = 0x55U;
-    static constexpr uint8_t kTagSignature = 0x5EU;
+    static constexpr uint8_t kTagPlain              = 0x55U;
+    static constexpr uint8_t kTagSignature          = 0x5EU;
 
     /**
      * @brief Converts BlobContext to PSA key attributes
@@ -322,8 +322,7 @@ private:
      *
      * @return CHIP_NO_ERROR on success
      */
-    CHIP_ERROR BlobContextToPsaAttributes(const BlobContext & blobCtx,
-                                          psa_key_attributes_t & psaAttrs);
+    CHIP_ERROR BlobContextToPsaAttributes(const BlobContext & blobCtx, psa_key_attributes_t & psaAttrs);
 
     /**
      * @brief Checks if a memory location contains the EL2GO blob magic signature
@@ -339,7 +338,7 @@ private:
      *
      * @note Performs bounds checking to prevent buffer overruns
      */
-    bool IsBlobMagic(const uint8_t *ptr, const uint8_t *endPtr);
+    bool IsBlobMagic(const uint8_t * ptr, const uint8_t * endPtr);
 
     /**
      * @brief Reads a 32-bit unsigned integer from a byte array (big-endian)
@@ -355,7 +354,7 @@ private:
      *
      * @note Byte order: input[0] is MSB, input[3] is LSB
      */
-    uint32_t GetUint32(const uint8_t *input);
+    uint32_t GetUint32(const uint8_t * input);
 
     /**
      * @brief Reads a 16-bit unsigned integer from a byte array (big-endian)
@@ -371,7 +370,7 @@ private:
      *
      * @note Byte order: input[0] is MSB, input[1] is LSB
      */
-    uint16_t GetUint16(const uint8_t *input);
+    uint16_t GetUint16(const uint8_t * input);
 #endif
 };
 

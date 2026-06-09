@@ -48,9 +48,9 @@
 #endif
 
 #if CHIP_CRYPTO_PSA
-#include <crypto/PSAKeyAllocator.h>
 #include "crypto/S200/S200KeyAllocator.h"
 #include "psa/crypto.h"
+#include <crypto/PSAKeyAllocator.h>
 static_assert(CHIP_CONFIG_SHA256_CONTEXT_SIZE == sizeof(psa_hash_operation_t),
               "CHIP_CONFIG_SHA256_CONTEXT_SIZE is too small for psa_hash_operation_t");
 #if defined(MBEDTLS_THREADING_C) && defined(MBEDTLS_THREADING_ALT)

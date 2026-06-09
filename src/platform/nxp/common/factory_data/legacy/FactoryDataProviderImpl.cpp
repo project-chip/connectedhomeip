@@ -18,8 +18,8 @@
 #include <platform/nxp/common/factory_data/legacy/FactoryDataProviderImpl.h>
 
 #include "fsl_adapter_flash.h"
-#include <psa/crypto.h>
 #include "mcux_psa_s2xx_key_locations.h"
+#include <psa/crypto.h>
 
 #if CONFIG_CHIP_OTA_FACTORY_DATA_PROCESSOR
 extern "C" WEAK CHIP_ERROR FactoryDataDefaultRestoreMechanism();
@@ -29,9 +29,10 @@ namespace chip {
 namespace DeviceLayer {
 
 #if CONFIG_NXP_FACTORY_DAC_BLOB_GENERATION
-static constexpr size_t kPrivateKeyBlobLength  = PSA_S200_NON_EL2GO_BLOB_EXPORT_SIZE(PSA_KEY_TYPE_ECC_KEY_PAIR(PSA_ECC_FAMILY_SECP_R1), 256);
+static constexpr size_t kPrivateKeyBlobLength =
+    PSA_S200_NON_EL2GO_BLOB_EXPORT_SIZE(PSA_KEY_TYPE_ECC_KEY_PAIR(PSA_ECC_FAMILY_SECP_R1), 256);
 
-static_assert (kPrivateKeyBlobLength >= Crypto::kP256_PrivateKey_Length);
+static_assert(kPrivateKeyBlobLength >= Crypto::kP256_PrivateKey_Length);
 static constexpr size_t kSEBlobAdditionalLength = kPrivateKeyBlobLength - Crypto::kP256_PrivateKey_Length;
 #endif
 
@@ -98,8 +99,9 @@ void FactoryDataProviderImpl::UpdateKeyAttributes(psa_key_attributes_t & attrs)
 {
     if (psa_get_key_lifetime(&attrs) == PSA_KEY_LIFETIME_VOLATILE)
     {
-        psa_set_key_lifetime(&attrs, PSA_KEY_LIFETIME_FROM_PERSISTENCE_AND_LOCATION(
-                                PSA_KEY_LIFETIME_VOLATILE, PSA_KEY_LOCATION_S200_KEY_STORAGE_NON_EL2GO));
+        psa_set_key_lifetime(
+            &attrs,
+            PSA_KEY_LIFETIME_FROM_PERSISTENCE_AND_LOCATION(PSA_KEY_LIFETIME_VOLATILE, PSA_KEY_LOCATION_S200_KEY_STORAGE_NON_EL2GO));
     }
 }
 
@@ -114,14 +116,14 @@ CHIP_ERROR FactoryDataProviderImpl::InitContext()
 CHIP_ERROR FactoryDataProviderImpl::ImportPrivateKeyBlob()
 {
     psa_status_t status;
-    psa_key_attributes_t attributes = PSA_KEY_ATTRIBUTES_INIT;
+    psa_key_attributes_t attributes     = PSA_KEY_ATTRIBUTES_INIT;
     uint8_t blob[kPrivateKeyBlobLength] = { 0 };
     uint16_t blobSize                   = 0;
 
     ReturnErrorOnFailure(SearchForId(FactoryDataId::kDacPrivateKeyId, blob, kPrivateKeyBlobLength, blobSize));
 
     // Define key usage and type
-    psa_key_usage_t usage = PSA_KEY_USAGE_SIGN_HASH | PSA_KEY_USAGE_SIGN_MESSAGE;
+    psa_key_usage_t usage   = PSA_KEY_USAGE_SIGN_HASH | PSA_KEY_USAGE_SIGN_MESSAGE;
     psa_key_type_t key_type = PSA_KEY_TYPE_ECC_KEY_PAIR(PSA_ECC_FAMILY_SECP_R1);
 
     // Set key attributes for P256 private key
@@ -148,13 +150,13 @@ CHIP_ERROR FactoryDataProviderImpl::ConvertDacKey()
     size_t newSize                      = sizeof(FactoryDataProvider::Header) + mHeader.size + kSEBlobAdditionalLength;
     uint8_t blob[kPrivateKeyBlobLength] = { 0 };
     extendedAppFactoryData_t * data     = nullptr;
-    uint32_t offset = 0;
-    bool convNeeded = true;
-    uint8_t status  = 0;
+    uint32_t offset                     = 0;
+    bool convNeeded                     = true;
+    uint8_t status                      = 0;
 
-     VerifyOrReturnError(mFactoryData != nullptr, CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(mFactoryData != nullptr, CHIP_ERROR_INTERNAL);
 
-     data     = static_cast<extendedAppFactoryData_t *>(
+    data = static_cast<extendedAppFactoryData_t *>(
         chip::Platform::MemoryAlloc(offsetof(extendedAppFactoryData_t, app_factory_data) + newSize));
     VerifyOrReturnError(data != nullptr, CHIP_ERROR_INTERNAL);
 
@@ -189,7 +191,7 @@ CHIP_ERROR FactoryDataProviderImpl::ConvertDacKey()
 
 CHIP_ERROR FactoryDataProviderImpl::ExportBlob(uint8_t * data, size_t * dataLen, uint32_t & offset, bool & isNeeded)
 {
-    CHIP_ERROR error = CHIP_NO_ERROR;
+    CHIP_ERROR error    = CHIP_NO_ERROR;
     psa_status_t status = PSA_SUCCESS;
 
     uint8_t keyBuf[kPrivateKeyBlobLength];
@@ -198,7 +200,7 @@ CHIP_ERROR FactoryDataProviderImpl::ExportBlob(uint8_t * data, size_t * dataLen,
     isNeeded         = true;
 
     psa_key_attributes_t attributes = PSA_KEY_ATTRIBUTES_INIT;
-    psa_key_id_t temp_key_id = PSA_KEY_ID_NULL;
+    psa_key_id_t temp_key_id        = PSA_KEY_ID_NULL;
 
     // Search for the DAC private key in factory data
     error = SearchForId(FactoryDataId::kDacPrivateKeyId, dacPrivateKeySpan.data(), dacPrivateKeySpan.size(), keySize, &offset);
@@ -361,9 +363,9 @@ void FactoryDataProviderImpl::RunApiTest()
     // Test importing the blob
     psa_status_t status;
     psa_key_attributes_t attributes = PSA_KEY_ATTRIBUTES_INIT;
-    psa_key_id_t test_key_id = PSA_KEY_ID_NULL;
+    psa_key_id_t test_key_id        = PSA_KEY_ID_NULL;
 
-    psa_key_usage_t usage = PSA_KEY_USAGE_SIGN_MESSAGE | PSA_KEY_USAGE_SIGN_HASH;
+    psa_key_usage_t usage   = PSA_KEY_USAGE_SIGN_MESSAGE | PSA_KEY_USAGE_SIGN_HASH;
     psa_key_type_t key_type = PSA_KEY_TYPE_ECC_KEY_PAIR(PSA_ECC_FAMILY_SECP_R1);
 
     psa_set_key_type(&attributes, key_type);
@@ -379,16 +381,14 @@ void FactoryDataProviderImpl::RunApiTest()
     _assert((test_key_id != PSA_KEY_ID_NULL));
 
     // Test signing with the imported key
-    uint8_t test_hash[Crypto::kSHA256_Hash_Length] = { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,
-                                                        0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f, 0x10,
-                                                        0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18,
-                                                        0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f, 0x20 };
-    uint8_t signature[PSA_SIGNATURE_MAX_SIZE] = { 0 };
-    size_t signature_length = 0;
+    uint8_t test_hash[Crypto::kSHA256_Hash_Length] = { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b,
+                                                       0x0c, 0x0d, 0x0e, 0x0f, 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16,
+                                                       0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f, 0x20 };
+    uint8_t signature[PSA_SIGNATURE_MAX_SIZE]      = { 0 };
+    size_t signature_length                        = 0;
 
-    status = psa_sign_hash(test_key_id, PSA_ALG_ECDSA(PSA_ALG_SHA_256),
-                          test_hash, sizeof(test_hash),
-                          signature, sizeof(signature), &signature_length);
+    status = psa_sign_hash(test_key_id, PSA_ALG_ECDSA(PSA_ALG_SHA_256), test_hash, sizeof(test_hash), signature, sizeof(signature),
+                           &signature_length);
     _assert((status == PSA_SUCCESS));
     _assert((signature_length > 0));
 

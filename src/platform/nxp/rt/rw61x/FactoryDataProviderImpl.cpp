@@ -70,12 +70,11 @@ using namespace ::chip::Crypto;
 namespace chip {
 namespace DeviceLayer {
 
-
 CHIP_ERROR FactoryDataProviderImpl::DecryptAesEcb(uint8_t * dest, uint8_t * source)
 {
     psa_status_t status;
     psa_key_attributes_t key_attr = PSA_KEY_ATTRIBUTES_INIT;
-    psa_key_id_t key_id = 0;
+    psa_key_id_t key_id           = 0;
 
     // Configure key attributes
     psa_set_key_usage_flags(&key_attr, PSA_KEY_USAGE_DECRYPT);
@@ -92,14 +91,9 @@ CHIP_ERROR FactoryDataProviderImpl::DecryptAesEcb(uint8_t * dest, uint8_t * sour
 
     // Perform AES-ECB decrypt
     size_t out_len = 0;
-    status = psa_cipher_decrypt(
-        key_id,
-        PSA_ALG_ECB_NO_PADDING,
-        source,
-        16,        // ECB always processes 16‑byte blocks
-        dest,
-        16,
-        &out_len);
+    status         = psa_cipher_decrypt(key_id, PSA_ALG_ECB_NO_PADDING, source,
+                                        16, // ECB always processes 16‑byte blocks
+                                        dest, 16, &out_len);
 
     // Clean up key regardless of outcome
     psa_destroy_key(key_id);
@@ -111,7 +105,6 @@ CHIP_ERROR FactoryDataProviderImpl::DecryptAesEcb(uint8_t * dest, uint8_t * sour
 
     return CHIP_NO_ERROR;
 }
-
 
 CHIP_ERROR FactoryDataProviderImpl::SearchForId(uint8_t searchedType, uint8_t * pBuf, size_t bufLength, uint16_t & length,
                                                 uint32_t * contentAddr)

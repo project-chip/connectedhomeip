@@ -23,9 +23,9 @@
 extern "C" {
 #endif /* __cplusplus */
 
-#include "mflash_drv.h"
 #include "fsl_adapter_flash.h"
 #include "fusemap.h"
+#include "mflash_drv.h"
 
 #if defined(__cplusplus)
 }
@@ -62,16 +62,16 @@ namespace DeviceLayer {
 
 CHIP_ERROR FactoryDataProviderImpl::Init(void)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    uint16_t blobAreaSize = 0;
-    uint32_t blobAreaAddr = 0;
-    size_t blobsImported = 0;
-    uint16_t keyIdSize = 0;
-    uint16_t certIdSize = 0;
-    uint32_t factoryDacKeyId = 0;
+    CHIP_ERROR err            = CHIP_NO_ERROR;
+    uint16_t blobAreaSize     = 0;
+    uint32_t blobAreaAddr     = 0;
+    size_t blobsImported      = 0;
+    uint16_t keyIdSize        = 0;
+    uint16_t certIdSize       = 0;
+    uint32_t factoryDacKeyId  = 0;
     uint32_t factoryDacCertId = 0;
-    uint32_t blobDacKeyId = 0;
-    uint32_t blobDacCertId = 0;
+    uint32_t blobDacKeyId     = 0;
+    uint32_t blobDacCertId    = 0;
 
     // Step 0: Verify secure boot is enabled
     VerifyOrExit(OTP_SECURE_BOOT_EN_FUSE_VALUE() != 0, {
@@ -82,92 +82,73 @@ CHIP_ERROR FactoryDataProviderImpl::Init(void)
     // Step 1: Load and validate factory data from flash
     err = ReadAndCheckFactoryDataInFlash();
     VerifyOrExit(err == CHIP_NO_ERROR,
-    {
-        ChipLogError(DeviceLayer, "Init: ReadAndCheckFactoryDataInFlash failed: %" CHIP_ERROR_FORMAT,
-                    err.Format());
-    });
+                 { ChipLogError(DeviceLayer, "Init: ReadAndCheckFactoryDataInFlash failed: %" CHIP_ERROR_FORMAT, err.Format()); });
 
     // Step 2: Get DAC Key ID and Certificate ID from factory data
-    err = SearchForId(FactoryDataId::kEl2GoDacKeyId, (uint8_t *) &factoryDacKeyId,
-                     sizeof(factoryDacKeyId), keyIdSize);
-    VerifyOrExit(err == CHIP_NO_ERROR,
-    {
+    err = SearchForId(FactoryDataId::kEl2GoDacKeyId, (uint8_t *) &factoryDacKeyId, sizeof(factoryDacKeyId), keyIdSize);
+    VerifyOrExit(err == CHIP_NO_ERROR, {
         ChipLogError(DeviceLayer, "Init: Failed to find DAC Key ID in factory data: %" CHIP_ERROR_FORMAT, err.Format());
     });
 
-    err = SearchForId(FactoryDataId::kEl2GoDacCertId, (uint8_t *) &factoryDacCertId,
-                     sizeof(factoryDacCertId), certIdSize);
-    VerifyOrExit(err == CHIP_NO_ERROR,
-    {
+    err = SearchForId(FactoryDataId::kEl2GoDacCertId, (uint8_t *) &factoryDacCertId, sizeof(factoryDacCertId), certIdSize);
+    VerifyOrExit(err == CHIP_NO_ERROR, {
         ChipLogError(DeviceLayer, "Init: Failed to find DAC Certificate ID in factory data: %" CHIP_ERROR_FORMAT, err.Format());
     });
 
     ChipLogProgress(DeviceLayer, "Init: Factory data specifies DAC Key ID 0x%08" PRIx32 " and Certificate ID 0x%08" PRIx32,
-                   factoryDacKeyId, factoryDacCertId);
+                    factoryDacKeyId, factoryDacCertId);
 
     // Step 3: Validate factory data IDs are in EL2GO range
-    VerifyOrExit(factoryDacKeyId >= CHIP_CONFIG_CRYPTO_PSA_KEY_ID_EL2GO_BASE &&
-                 factoryDacKeyId <= CHIP_CONFIG_CRYPTO_PSA_KEY_ID_EL2GO_END,
-    {
-        ChipLogError(DeviceLayer, "Init: Factory DAC Key ID 0x%08" PRIx32 " outside EL2GO range [0x%08X, 0x%08X]",
-                    factoryDacKeyId, CHIP_CONFIG_CRYPTO_PSA_KEY_ID_EL2GO_BASE, CHIP_CONFIG_CRYPTO_PSA_KEY_ID_EL2GO_END);
-        err = CHIP_ERROR_INVALID_ARGUMENT;
-    });
+    VerifyOrExit(
+        factoryDacKeyId >= CHIP_CONFIG_CRYPTO_PSA_KEY_ID_EL2GO_BASE && factoryDacKeyId <= CHIP_CONFIG_CRYPTO_PSA_KEY_ID_EL2GO_END, {
+            ChipLogError(DeviceLayer, "Init: Factory DAC Key ID 0x%08" PRIx32 " outside EL2GO range [0x%08X, 0x%08X]",
+                         factoryDacKeyId, CHIP_CONFIG_CRYPTO_PSA_KEY_ID_EL2GO_BASE, CHIP_CONFIG_CRYPTO_PSA_KEY_ID_EL2GO_END);
+            err = CHIP_ERROR_INVALID_ARGUMENT;
+        });
 
-
-    VerifyOrExit(factoryDacCertId >= CHIP_CONFIG_CRYPTO_PSA_KEY_ID_EL2GO_BASE &&
-                 factoryDacCertId <= CHIP_CONFIG_CRYPTO_PSA_KEY_ID_EL2GO_END,
-    {
-        ChipLogError(DeviceLayer, "Init: Factory DAC Certificate ID 0x%08" PRIx32 " outside EL2GO range [0x%08X, 0x%08X]",
-                    factoryDacCertId, CHIP_CONFIG_CRYPTO_PSA_KEY_ID_EL2GO_BASE, CHIP_CONFIG_CRYPTO_PSA_KEY_ID_EL2GO_END);
-        err = CHIP_ERROR_INVALID_ARGUMENT;
-    });
+    VerifyOrExit(
+        factoryDacCertId >= CHIP_CONFIG_CRYPTO_PSA_KEY_ID_EL2GO_BASE && factoryDacCertId <= CHIP_CONFIG_CRYPTO_PSA_KEY_ID_EL2GO_END,
+        {
+            ChipLogError(DeviceLayer, "Init: Factory DAC Certificate ID 0x%08" PRIx32 " outside EL2GO range [0x%08X, 0x%08X]",
+                         factoryDacCertId, CHIP_CONFIG_CRYPTO_PSA_KEY_ID_EL2GO_BASE, CHIP_CONFIG_CRYPTO_PSA_KEY_ID_EL2GO_END);
+            err = CHIP_ERROR_INVALID_ARGUMENT;
+        });
 
     // Step 4: Get EL2GO blob area address and size from factory data
     err = SearchForId(FactoryDataId::kEl2GoBlob, NULL, 0, blobAreaSize, &blobAreaAddr);
     VerifyOrExit(err == CHIP_NO_ERROR,
-    {
-        ChipLogError(DeviceLayer, "Init: SearchForId failed: %" CHIP_ERROR_FORMAT,
-                    err.Format());
-    });
+                 { ChipLogError(DeviceLayer, "Init: SearchForId failed: %" CHIP_ERROR_FORMAT, err.Format()); });
 
-    ChipLogProgress(DeviceLayer, "Init: Found EL2GO blob area at 0x%08" PRIx32 " (size: %u bytes)",
-                   blobAreaAddr, blobAreaSize);
+    ChipLogProgress(DeviceLayer, "Init: Found EL2GO blob area at 0x%08" PRIx32 " (size: %u bytes)", blobAreaAddr, blobAreaSize);
 
     // Step 5: Import EL2GO blobs and get DAC IDs from blobs
-    err = ParseEl2GoBlobs((const uint8_t *)blobAreaAddr, blobAreaSize, &blobsImported,
-                         &blobDacKeyId, &blobDacCertId);
+    err = ParseEl2GoBlobs((const uint8_t *) blobAreaAddr, blobAreaSize, &blobsImported, &blobDacKeyId, &blobDacCertId);
     VerifyOrExit(err == CHIP_NO_ERROR,
-    {
-        ChipLogError(DeviceLayer, "Init: ParseEl2GoBlobs failed: %" CHIP_ERROR_FORMAT,
-                    err.Format());
-    });
+                 { ChipLogError(DeviceLayer, "Init: ParseEl2GoBlobs failed: %" CHIP_ERROR_FORMAT, err.Format()); });
 
     ChipLogProgress(DeviceLayer, "Init: Successfully imported %u EL2GO blobs (DAC Key: 0x%08" PRIx32 ", DAC Cert: 0x%08" PRIx32 ")",
-                   blobsImported, blobDacKeyId, blobDacCertId);
+                    blobsImported, blobDacKeyId, blobDacCertId);
 
     // Step 6: Verify factory data IDs match blob IDs
-    VerifyOrExit(factoryDacKeyId == blobDacKeyId,
-    {
-        ChipLogError(DeviceLayer, "Init: DAC Key ID mismatch - Factory: 0x%08" PRIx32 ", Blob: 0x%08" PRIx32,
-                    factoryDacKeyId, blobDacKeyId);
+    VerifyOrExit(factoryDacKeyId == blobDacKeyId, {
+        ChipLogError(DeviceLayer, "Init: DAC Key ID mismatch - Factory: 0x%08" PRIx32 ", Blob: 0x%08" PRIx32, factoryDacKeyId,
+                     blobDacKeyId);
         err = CHIP_ERROR_INVALID_ARGUMENT;
     });
 
-    VerifyOrExit(factoryDacCertId == blobDacCertId,
-    {
+    VerifyOrExit(factoryDacCertId == blobDacCertId, {
         ChipLogError(DeviceLayer, "Init: DAC Certificate ID mismatch - Factory: 0x%08" PRIx32 ", Blob: 0x%08" PRIx32,
-                    factoryDacCertId, blobDacCertId);
+                     factoryDacCertId, blobDacCertId);
         err = CHIP_ERROR_INVALID_ARGUMENT;
     });
 
     // Step 7: Cache the validated IDs
-    mEl2GoDacKeyId = blobDacKeyId;
+    mEl2GoDacKeyId  = blobDacKeyId;
     mEl2GoDacCertId = blobDacCertId;
-    mKeyIdsCached = true;
+    mKeyIdsCached   = true;
 
     ChipLogProgress(DeviceLayer, "Init: DAC Key ID 0x%08" PRIx32 " and Certificate ID 0x%08" PRIx32 " validated and cached",
-                   mEl2GoDacKeyId, mEl2GoDacCertId);
+                    mEl2GoDacKeyId, mEl2GoDacCertId);
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -290,30 +271,27 @@ CHIP_ERROR FactoryDataProviderImpl::SearchForId(uint8_t searchedType, uint8_t * 
 
 CHIP_ERROR FactoryDataProviderImpl::GetDeviceAttestationCert(MutableByteSpan & outBuffer)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err         = CHIP_NO_ERROR;
     psa_status_t psaStatus = PSA_SUCCESS;
-    size_t certLen = 0;
+    size_t certLen         = 0;
 
     // Use cached certificate ID
-    VerifyOrExit(mKeyIdsCached,
-    {
+    VerifyOrExit(mKeyIdsCached, {
         ChipLogError(DeviceLayer, "GetDeviceAttestationCert: Key IDs not cached, Init() may have failed");
         err = CHIP_ERROR_INCORRECT_STATE;
     });
 
     // Export certificate directly to output buffer
     psaStatus = psa_export_key(mEl2GoDacCertId, outBuffer.data(), outBuffer.size(), &certLen);
-    VerifyOrExit(psaStatus == PSA_SUCCESS,
-    {
+    VerifyOrExit(psaStatus == PSA_SUCCESS, {
         ChipLogError(DeviceLayer, "GetDeviceAttestationCert: psa_export_key failed: %" PRId32, psaStatus);
         err = CHIP_ERROR_INTERNAL;
     });
 
     // Validate certificate size
-    VerifyOrExit(certLen > 0 && certLen <= chip::Credentials::kMaxDERCertLength,
-    {
-        ChipLogError(DeviceLayer, "GetDeviceAttestationCert: Invalid certificate size: %u (max: %u)",
-                    certLen, static_cast<size_t>(chip::Credentials::kMaxDERCertLength));
+    VerifyOrExit(certLen > 0 && certLen <= chip::Credentials::kMaxDERCertLength, {
+        ChipLogError(DeviceLayer, "GetDeviceAttestationCert: Invalid certificate size: %u (max: %u)", certLen,
+                     static_cast<size_t>(chip::Credentials::kMaxDERCertLength));
         err = CHIP_ERROR_INVALID_ARGUMENT;
     });
 
@@ -328,11 +306,11 @@ exit:
 
 CHIP_ERROR FactoryDataProviderImpl::SignWithDacKey(const ByteSpan & messageToSign, MutableByteSpan & outSignBuffer)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    psa_status_t psa_status = PSA_SUCCESS;
-    psa_algorithm_t alg = PSA_ALG_ECDSA(PSA_ALG_SHA_256);
+    CHIP_ERROR err                                     = CHIP_NO_ERROR;
+    psa_status_t psa_status                            = PSA_SUCCESS;
+    psa_algorithm_t alg                                = PSA_ALG_ECDSA(PSA_ALG_SHA_256);
     unsigned char eccSignature[PSA_SIGNATURE_MAX_SIZE] = { 0 };
-    size_t eccSignatureLength = 0;
+    size_t eccSignatureLength                          = 0;
 
     // Step 1: Validate input parameters
     VerifyOrExit(!outSignBuffer.empty(), {
@@ -346,8 +324,8 @@ CHIP_ERROR FactoryDataProviderImpl::SignWithDacKey(const ByteSpan & messageToSig
     });
 
     VerifyOrExit(outSignBuffer.size() >= Crypto::kP256_ECDSA_Signature_Length_Raw, {
-        ChipLogError(DeviceLayer, "SignWithDacKey: Output buffer too small (%u < %u)",
-                    outSignBuffer.size(), Crypto::kP256_ECDSA_Signature_Length_Raw);
+        ChipLogError(DeviceLayer, "SignWithDacKey: Output buffer too small (%u < %u)", outSignBuffer.size(),
+                     Crypto::kP256_ECDSA_Signature_Length_Raw);
         err = CHIP_ERROR_BUFFER_TOO_SMALL;
     });
 
@@ -360,10 +338,8 @@ CHIP_ERROR FactoryDataProviderImpl::SignWithDacKey(const ByteSpan & messageToSig
     ChipLogProgress(DeviceLayer, "SignWithDacKey: Using cached DAC key PSA ID = 0x%08" PRIx32, mEl2GoDacKeyId);
 
     // Step 3: Sign the message directly using PSA (secure element handles hashing internally)
-    psa_status = psa_sign_message(mEl2GoDacKeyId, alg,
-                                  messageToSign.data(), messageToSign.size(),
-                                  eccSignature, sizeof(eccSignature),
-                                  &eccSignatureLength);
+    psa_status = psa_sign_message(mEl2GoDacKeyId, alg, messageToSign.data(), messageToSign.size(), eccSignature,
+                                  sizeof(eccSignature), &eccSignatureLength);
     VerifyOrExit(psa_status == PSA_SUCCESS, {
         ChipLogError(DeviceLayer, "SignWithDacKey: psa_sign_message failed: %" PRId32, psa_status);
         err = CHIP_ERROR_INTERNAL;
@@ -371,17 +347,15 @@ CHIP_ERROR FactoryDataProviderImpl::SignWithDacKey(const ByteSpan & messageToSig
 
     // Step 4: Validate signature size
     VerifyOrExit(eccSignatureLength == Crypto::kP256_ECDSA_Signature_Length_Raw, {
-        ChipLogError(DeviceLayer, "SignWithDacKey: Invalid signature size: %u (expected: %u)",
-                    eccSignatureLength, Crypto::kP256_ECDSA_Signature_Length_Raw);
+        ChipLogError(DeviceLayer, "SignWithDacKey: Invalid signature size: %u (expected: %u)", eccSignatureLength,
+                     Crypto::kP256_ECDSA_Signature_Length_Raw);
         err = CHIP_ERROR_INTERNAL;
     });
 
     // Step 5: Copy signature to output buffer
     err = CopySpanToMutableSpan(ByteSpan{ eccSignature, eccSignatureLength }, outSignBuffer);
-    VerifyOrExit(err == CHIP_NO_ERROR, {
-        ChipLogError(DeviceLayer, "SignWithDacKey: CopySpanToMutableSpan failed: %" CHIP_ERROR_FORMAT,
-                    err.Format());
-    });
+    VerifyOrExit(err == CHIP_NO_ERROR,
+                 { ChipLogError(DeviceLayer, "SignWithDacKey: CopySpanToMutableSpan failed: %" CHIP_ERROR_FORMAT, err.Format()); });
 
     ChipLogProgress(DeviceLayer, "SignWithDacKey: Successfully signed message (%u bytes)", eccSignatureLength);
 
@@ -414,9 +388,9 @@ CHIP_ERROR FactoryDataProviderImpl::FactoryReset()
         }
 
         // Clear cached values
-        mEl2GoDacKeyId = 0;
+        mEl2GoDacKeyId  = 0;
         mEl2GoDacCertId = 0;
-        mKeyIdsCached = false;
+        mKeyIdsCached   = false;
     }
 
     return CHIP_NO_ERROR;

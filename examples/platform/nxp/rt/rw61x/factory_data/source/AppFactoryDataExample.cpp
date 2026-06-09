@@ -70,25 +70,20 @@ CHIP_ERROR NXP::App::AppFactoryData_PostMatterStackInit(void)
     /* Please Note, because currently we only support AES-256 key provisioning and de-wrap, so the trasfterred AES key should be 256
      * bit size*/
     err = FactoryDataPrvdImpl().SetEncryptionMode(FactoryDataProvider::encrypt_ecb);
-    VerifyOrExit(err == CHIP_NO_ERROR,
-    {
+    VerifyOrExit(err == CHIP_NO_ERROR, {
         ChipLogError(DeviceLayer, "AppFactoryData_PostMatterStackInit: SetEncryptionMode failed: %" CHIP_ERROR_FORMAT,
-                    err.Format());
+                     err.Format());
     });
 
-
     err = FactoryDataPrvdImpl().SetAesKey(&aes256TestKey[0], FactoryDataProvider::aes_256);
-    VerifyOrExit(err == CHIP_NO_ERROR,
-    {
-        ChipLogError(DeviceLayer, "AppFactoryData_PostMatterStackInit: SetAesKey failed: %" CHIP_ERROR_FORMAT,
-                    err.Format());
+    VerifyOrExit(err == CHIP_NO_ERROR, {
+        ChipLogError(DeviceLayer, "AppFactoryData_PostMatterStackInit: SetAesKey failed: %" CHIP_ERROR_FORMAT, err.Format());
     });
 #endif
     err = FactoryDataPrvdImpl().Init();
-    VerifyOrExit(err == CHIP_NO_ERROR,
-    {
+    VerifyOrExit(err == CHIP_NO_ERROR, {
         ChipLogError(DeviceLayer, "AppFactoryData_PostMatterStackInit: FactoryDataPrvdImpl().Init() failed: %" CHIP_ERROR_FORMAT,
-                    err.Format());
+                     err.Format());
     });
 
     SetDeviceInstanceInfoProvider(&FactoryDataPrvdImpl());
