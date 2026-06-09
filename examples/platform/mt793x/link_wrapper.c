@@ -22,6 +22,8 @@ int __wrap__write(int file, char * ptr, int len)
 #include "task.h"
 #include <sys/time.h>
 #include <sys/times.h>
+#include <errno.h>
+#include <sys/stat.h>
 
 int __wrap__gettimeofday(struct timeval * tv, void * ptz)
 {
@@ -111,3 +113,54 @@ void __wrap__wlan_printf(int skip, int level, const char * fmt, ...)
 }
 
 /****************************************************************************/
+
+extern int __io_getchar(void) __attribute__((weak));
+int _read(int file, char * ptr, int len)
+{
+    int DataIdx;
+
+    for (DataIdx = 0; DataIdx < len; DataIdx++)
+    {
+        *ptr++ = __io_getchar();
+    }
+
+    return len;
+}
+
+int _close(int file)
+{
+    return -1;
+}
+
+int _fstat(int file, struct stat * st)
+{
+    st->st_mode = S_IFCHR;
+    return 0;
+}
+
+int _isatty(int file)
+{
+    return 1;
+}
+
+int _lseek(int file, int ptr, int dir)
+{
+    return 0;
+}
+
+int _open(const char * name, int flags, int mode)
+{
+    return -1;
+}
+
+int _getpid(void)
+{
+    errno = ENOTSUP;
+    return -1;
+}
+
+int _kill(int pid, int sig)
+{
+    errno = ENOTSUP;
+    return -1;
+}

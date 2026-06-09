@@ -65,7 +65,7 @@ CHIP_ERROR GenioWiFiDriver::Init(NetworkStatusChangeCallback * networkStatusChan
     mSavedNetwork.ssidLen        = ssidLen;
     mStagingNetwork              = mSavedNetwork;
 
-    ConnectWiFiNetwork(mSavedNetwork.ssid, ssidLen, mSavedNetwork.credentials, credentialsLen);
+    TEMPORARY_RETURN_IGNORED ConnectWiFiNetwork(mSavedNetwork.ssid, ssidLen, mSavedNetwork.credentials, credentialsLen);
     return err;
 }
 
@@ -182,7 +182,7 @@ void GenioWiFiDriver::OnConnectWiFiNetwork()
 
     if (mpConnectCallback)
     {
-        CommitConfiguration();
+        TEMPORARY_RETURN_IGNORED CommitConfiguration();
         mpConnectCallback->OnResult(Status::kSuccess, CharSpan(), 0);
         mpConnectCallback = nullptr;
     }

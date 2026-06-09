@@ -36,6 +36,7 @@
 
 #include <assert.h>
 
+#include <DeviceInfoProviderImpl.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 
@@ -105,6 +106,8 @@ using namespace chip::DeviceLayer::NetworkCommissioning;
 chip::app::Clusters::NetworkCommissioning::Instance sWiFiNetworkCommissioningInstance(0 /* Endpoint Id */,
                                                                                       &GenioWiFiDriver::GetInstance());
 #endif
+
+chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 
 } // namespace
 
@@ -319,14 +322,18 @@ CHIP_ERROR AppTask::Init()
     MT793X_LOG("APP: Done WiFi Init");
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
-    sWiFiNetworkCommissioningInstance.Init();
+    TEMPORARY_RETURN_IGNORED sWiFiNetworkCommissioningInstance.Init();
 #endif
 
     // Init ZCL Data Model and start server
     static chip::CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
     initParams.dataModelProvider = chip::app::CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
-    chip::Server::GetInstance().Init(initParams);
+    
+    gExampleDeviceInfoProvider.SetStorageDelegate(initParams.persistentStorageDelegate);
+    chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
+    
+    TEMPORARY_RETURN_IGNORED chip::Server::GetInstance().Init(initParams);
 
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
