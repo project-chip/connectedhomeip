@@ -319,7 +319,7 @@ def run_on_singleton_matching_endpoint(accept_function: EndpointCheckFunction):
                 old_endpoint = self.matter_test_config.endpoint
                 self.matter_test_config.endpoint = matching[0]
                 LOGGER.info(
-                    f'Running test on endpoint {self.matter_test_config.endpoint}')
+                    'Running test on endpoint %s', self.matter_test_config.endpoint)
                 timeout = getattr(self.matter_test_config,
                                   'timeout', None) or self.default_timeout
                 self.event_loop.run_until_complete(asyncio.wait_for(
@@ -369,7 +369,7 @@ def run_if_endpoint_matches(accept_function: EndpointCheckFunction):
                 asserts.skip('Endpoint does not match test requirements')
                 return
             LOGGER.info(
-                f'Running test on endpoint {test_instance.matter_test_config.endpoint}')
+                'Running test on endpoint %s', test_instance.matter_test_config.endpoint)
             timeout = getattr(test_instance.matter_test_config,
                               'timeout', None) or test_instance.default_timeout
             test_instance.event_loop.run_until_complete(asyncio.wait_for(

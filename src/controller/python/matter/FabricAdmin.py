@@ -64,7 +64,7 @@ class FabricAdmin:
         self._fabricId = fabricId
         self._certificateAuthority = certificateAuthority
 
-        LOGGER.info(f"New FabricAdmin: FabricId: 0x{self._fabricId:016X}, VendorId = 0x{self.vendorId:04X}")
+        LOGGER.info("New FabricAdmin: FabricId: 0x%016X, VendorId = 0x%04X", self._fabricId, self.vendorId)
 
         self._isActive = True
         self._activeControllers: list[ChipDeviceCtrl.ChipDeviceController] = []
@@ -101,9 +101,8 @@ class FabricAdmin:
             if (nodeId in nodeIdList):
                 raise RuntimeError(f"Provided NodeId {nodeId} collides with an existing controller instance!")
 
-        LOGGER.info(
-            f"Allocating new controller with CaIndex: {self._certificateAuthority.caIndex}, "
-            f"FabricId: 0x{self._fabricId:016X}, NodeId: 0x{nodeId:016X}, CatTags: {catTags}")
+        LOGGER.info("Allocating new controller with CaIndex: %s, FabricId: 0x%016X, NodeId: 0x%016X, CatTags: %s",
+                    self._certificateAuthority.caIndex, self._fabricId, nodeId, catTags)
 
         controller = ChipDeviceCtrl.ChipDeviceController(
             opCredsContext=self._certificateAuthority.GetOpCredsContext(),

@@ -199,7 +199,7 @@ class TestCommissioningStatusDetectionIntegration(MatterBaseTest):
             )
             if is_operational:
                 break
-            LOGGER.info(f"DNS-SD check attempt {attempt + 1} returned False, retrying...")
+            LOGGER.info("DNS-SD check attempt %s returned False, retrying...", attempt + 1)
             await asyncio.sleep(2)
 
         asserts.assert_true(

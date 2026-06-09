@@ -175,7 +175,7 @@ class TC_IDM_9_1(IDMBaseTest):
                             constraints=xml_attr.constraints,
                         ))
 
-        log.info(f"Found {len(writable_attributes)} writable attributes on DUT")
+        log.info("Found %s writable attributes on DUT", len(writable_attributes))
 
         # Test attributes with constraints
         tested_count = 0
@@ -199,14 +199,14 @@ class TC_IDM_9_1(IDMBaseTest):
                 else:
                     tested_count += 1
             except Exception as e:
-                log.warning(f"Exception testing {attr_info.cluster_name}.{attr_info.attribute_name}: {e}")
+                log.warning("Exception testing %s.%s: %s", attr_info.cluster_name, attr_info.attribute_name, e)
                 skipped_count += 1
 
-        log.info(f"Step 2 complete: Tested {tested_count} attributes, skipped {skipped_count}")
+        log.info("Step 2 complete: Tested %s attributes, skipped %s", tested_count, skipped_count)
 
         if failed_attributes:
             failed_list = ', '.join(failed_attributes)
-            log.error(f"Failed attributes constraints not enforced: {failed_list}")
+            log.error("Failed attributes constraints not enforced: %s", failed_list)
             asserts.fail(f"Failed attributes constraints not enforced: {failed_list}")
 
 

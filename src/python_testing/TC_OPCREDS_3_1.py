@@ -101,7 +101,7 @@ class TC_OPCREDS_3_1(MatterBaseTest):
                      "Treating the DUT as older than Matter 1.6.0.")
             return True
 
-        log.info(f"DUT's SpecificationVersion Attribute = 0x{spec_version:08X}")
+        log.info("DUT's SpecificationVersion Attribute = 0x%08X", spec_version)
         return spec_version < MATTER_1_6_0
 
     @async_test_body
