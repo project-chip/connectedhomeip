@@ -160,8 +160,7 @@ class TestCleanupFramework(MatterBaseTest):
         logger.info("--- Scenario: open commissioning window ---")
         logger.info("Opening an Enhanced Commissioning Window and leaving it open")
         ecw = await self.open_commissioning_window(dev_ctrl=self.default_controller, node_id=self.dut_node_id)
-        logger.info(f"Window open: discriminator={ecw.randomDiscriminator}, "
-                    f"pin={ecw.commissioningParameters.setupPinCode}")
+        logger.info("Window open: discriminator=%s, pin=%s", ecw.randomDiscriminator, ecw.commissioningParameters.setupPinCode)
         logger.info("Expected: cleanup framework closes this window via _close_commissioning_windows")
 
     @async_test_body
@@ -176,7 +175,7 @@ class TestCleanupFramework(MatterBaseTest):
         ecw = await self.open_commissioning_window(dev_ctrl=self.default_controller, node_id=self.dut_node_id)
         th2_node_id = self.dut_node_id + 1
 
-        logger.info(f"TH2 commissioning DUT (th2_node_id={th2_node_id:#x})")
+        logger.info("TH2 commissioning DUT (th2_node_id=%#x)", th2_node_id)
         await th2.CommissionOnNetwork(
             nodeId=th2_node_id,
             setupPinCode=ecw.commissioningParameters.setupPinCode,
@@ -192,12 +191,12 @@ class TestCleanupFramework(MatterBaseTest):
     async def test_failsafe_cleanup(self):
         logger.info("--- Scenario: armed failsafe ---")
         expiry = 30
-        logger.info(f"Arming failsafe with expiryLengthSeconds={expiry}")
+        logger.info("Arming failsafe with expiryLengthSeconds=%d", expiry)
         resp = await self.send_single_cmd(
             cmd=Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=expiry),
             endpoint=0
         )
-        logger.info(f"ArmFailSafe response: errorCode={resp.errorCode}")
+        logger.info("ArmFailSafe response: errorCode=%s", resp.errorCode)
         logger.info("Expected: cleanup framework disarms this failsafe via _disarm_failsafes")
 
     @async_test_body
@@ -206,7 +205,7 @@ class TestCleanupFramework(MatterBaseTest):
         key_set_id = 1
         epoch_key = b'\x00' * 16
 
-        logger.info(f"Writing group key set groupKeySetID={key_set_id}")
+        logger.info("Writing group key set groupKeySetID=%d", key_set_id)
         await self.send_single_cmd(
             cmd=Clusters.GroupKeyManagement.Commands.KeySetWrite(
                 groupKeySet=Clusters.GroupKeyManagement.Structs.GroupKeySetStruct(
@@ -230,7 +229,7 @@ class TestCleanupFramework(MatterBaseTest):
                 Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct(groupId=1, groupKeySetID=key_set_id)
             ]))]
         )
-        logger.info(f"Group key set {key_set_id} and mapping added")
+        logger.info("Group key set %d and mapping added", key_set_id)
         logger.info("Expected: cleanup framework removes key sets and mappings via _purge_groups")
 
     @async_test_body
@@ -242,12 +241,12 @@ class TestCleanupFramework(MatterBaseTest):
             return
 
         group_id = 0x0001
-        logger.info(f"Adding group {group_id:#x} on endpoint {ep}")
+        logger.info("Adding group %#x on endpoint %d", group_id, ep)
         await self.send_single_cmd(
             cmd=Clusters.Groups.Commands.AddGroup(groupID=group_id, groupName="cleanup-test"),
             endpoint=ep
         )
-        logger.info(f"Group {group_id:#x} added on endpoint {ep}")
+        logger.info("Group %#x added on endpoint %d", group_id, ep)
         logger.info("Expected: cleanup framework removes all group memberships via _purge_group_memberships")
 
     @async_test_body
@@ -258,24 +257,24 @@ class TestCleanupFramework(MatterBaseTest):
             logger.info("ScenesManagement cluster not present on DUT — skipping")
             return
         if not _has_cluster(self.stored_global_wildcard, ep, Clusters.Groups):
-            logger.info(f"Groups cluster not present on endpoint {ep} — skipping scenes scenario")
+            logger.info("Groups cluster not present on endpoint %d — skipping scenes scenario", ep)
             return
 
         group_id = 0x0002
         scene_id = 0x01
 
-        logger.info(f"Adding group {group_id:#x} on endpoint {ep}")
+        logger.info("Adding group %#x on endpoint %d", group_id, ep)
         await self.send_single_cmd(
             cmd=Clusters.Groups.Commands.AddGroup(groupID=group_id, groupName="scenes-test"),
             endpoint=ep
         )
 
-        logger.info(f"Storing scene {scene_id:#x} for group {group_id:#x} on endpoint {ep}")
+        logger.info("Storing scene %#x for group %#x on endpoint %d", scene_id, group_id, ep)
         await self.send_single_cmd(
             cmd=Clusters.ScenesManagement.Commands.StoreScene(groupID=group_id, sceneID=scene_id),
             endpoint=ep
         )
-        logger.info(f"Scene {scene_id:#x} stored for group {group_id:#x}")
+        logger.info("Scene %#x stored for group %#x", scene_id, group_id)
         logger.info("Expected: cleanup framework removes scenes via _purge_scenes, "
                     "then group membership via _purge_group_memberships")
 
@@ -287,7 +286,7 @@ class TestCleanupFramework(MatterBaseTest):
             logger.info("DoorLock cluster not present on DUT — skipping")
             return
 
-        logger.info(f"Setting PIN credential on DoorLock endpoint {ep}")
+        logger.info("Setting PIN credential on DoorLock endpoint %d", ep)
         await self.send_single_cmd(
             cmd=Clusters.DoorLock.Commands.SetCredential(
                 operationType=Clusters.DoorLock.Enums.DataOperationTypeEnum.kAdd,
@@ -316,7 +315,7 @@ class TestCleanupFramework(MatterBaseTest):
             return
 
         check_in_node_id = self.default_controller.nodeId
-        logger.info(f"Registering ICD client checkInNodeID={check_in_node_id:#x}")
+        logger.info("Registering ICD client checkInNodeID=%#x", check_in_node_id)
         await self.send_single_cmd(
             cmd=Clusters.IcdManagement.Commands.RegisterClient(
                 checkInNodeID=check_in_node_id,
@@ -326,7 +325,7 @@ class TestCleanupFramework(MatterBaseTest):
             ),
             endpoint=0
         )
-        logger.info(f"ICD client {check_in_node_id:#x} registered")
+        logger.info("ICD client %#x registered", check_in_node_id)
         logger.info("Expected: cleanup framework unregisters this client via _unregister_icd_clients")
 
     @async_test_body
@@ -337,7 +336,7 @@ class TestCleanupFramework(MatterBaseTest):
             logger.info("TlsClientManagement cluster not present on DUT — skipping")
             return
         if not _has_cluster(self.stored_global_wildcard, ep, Clusters.TlsCertificateManagement):
-            logger.info(f"TlsCertificateManagement cluster not present on endpoint {ep} — skipping")
+            logger.info("TlsCertificateManagement cluster not present on endpoint %d — skipping", ep)
             return
 
         # Generate a minimal self-signed root certificate for provisioning
@@ -356,7 +355,7 @@ class TestCleanupFramework(MatterBaseTest):
             .public_bytes(serialization.Encoding.DER)
         )
 
-        logger.info(f"Provisioning root certificate on endpoint {ep}")
+        logger.info("Provisioning root certificate on endpoint %d", ep)
         resp = await self.send_single_cmd(
             cmd=Clusters.TlsCertificateManagement.Commands.ProvisionRootCertificate(
                 certificate=cert_bytes,
@@ -366,9 +365,9 @@ class TestCleanupFramework(MatterBaseTest):
             payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD,
         )
         caid = resp.caid
-        logger.info(f"Root certificate provisioned with CAID={caid:#x}")
+        logger.info("Root certificate provisioned with CAID=%#x", caid)
 
-        logger.info(f"Provisioning TLS endpoint with CAID={caid:#x} on endpoint {ep}")
+        logger.info("Provisioning TLS endpoint with CAID=%#x on endpoint %d", caid, ep)
         await self.send_single_cmd(
             cmd=Clusters.TlsClientManagement.Commands.ProvisionEndpoint(
                 hostname=b"cleanup-test.example.com",
