@@ -250,7 +250,7 @@ DataModel::ActionReturnStatus GeneralDiagnosticsCluster::ReadAttribute(const Dat
         return EncodeListOfValues(valueList, err, encoder);
     }
     case GeneralDiagnostics::Attributes::RebootCount::Id: {
-        uint16_t value  = 0;
+        uint16_t value = 0;
         CHIP_ERROR err = GetRebootCount(value);
         return EncodeValue(value, err, encoder);
     }
@@ -259,7 +259,7 @@ DataModel::ActionReturnStatus GeneralDiagnosticsCluster::ReadAttribute(const Dat
         return encoder.Encode(static_cast<uint64_t>(system_time_seconds.count()));
     }
     case GeneralDiagnostics::Attributes::TotalOperationalHours::Id: {
-        uint32_t value  = 0;
+        uint32_t value = 0;
         CHIP_ERROR err = GetTotalOperationalHours(value);
         return EncodeValue(value, err, encoder);
     }
