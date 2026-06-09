@@ -263,7 +263,7 @@ This will be made more clear using examples
 
 ### Notes
 
-For simplicty there are 4 already named specializations of the class in the
+For simplicity there are 4 already named specializations of the class in the
 `NamedPowerSourceClusters.h` -
 
 -   `MinimalWiredPowerSourceCluster`
