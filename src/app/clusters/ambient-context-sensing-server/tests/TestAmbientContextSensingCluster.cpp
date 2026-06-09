@@ -479,10 +479,12 @@ TEST_F(TestAmbientContextSensingCluster, TestHoldTimeAttribute)
     EXPECT_EQ(cluster.GetHoldTime(), 180);
 
     // Verify that we cannot write a hold time less than the minimum via WriteAttribute
-    EXPECT_EQ(tester.WriteAttribute(Attributes::HoldTime::Id, static_cast<uint16_t>(5)), Protocols::InteractionModel::Status::ConstraintError);
+    EXPECT_EQ(tester.WriteAttribute(Attributes::HoldTime::Id, static_cast<uint16_t>(5)),
+              Protocols::InteractionModel::Status::ConstraintError);
 
     // Verify that we cannot write a hold time greater than the maximum via WriteAttribute
-    EXPECT_EQ(tester.WriteAttribute(Attributes::HoldTime::Id, static_cast<uint16_t>(250)), Protocols::InteractionModel::Status::ConstraintError);
+    EXPECT_EQ(tester.WriteAttribute(Attributes::HoldTime::Id, static_cast<uint16_t>(250)),
+              Protocols::InteractionModel::Status::ConstraintError);
 
     // Give the new HoldTimeLimitation whose range is different. The HoldTime should be reset
     holdTimeLimitsConfig.holdTimeMin     = 201;
