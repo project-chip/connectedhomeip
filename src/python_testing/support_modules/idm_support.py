@@ -1302,7 +1302,7 @@ class IDMBaseTest(BasicCompositionTests):
                         Clusters.Thermostat.Attributes.ControlSequenceOfOperation,
                         # TC-TSTAT-2.2 step 11a mandates that writes to MinSetpointDeadBand are silently
                         # discarded (Success returned, value unchanged) unless the device opts in via the
-                        # TSTAT.S.M.MINSETPOINTDEADBANDWRITABLE PICS. 
+                        # TSTAT.S.M.MINSETPOINTDEADBANDWRITABLE PICS.
                         Clusters.Thermostat.Attributes.MinSetpointDeadBand,
                     ]
                     if attribute in ATTRIBUTES_WITH_WRITE_CONSTRAINTS:
