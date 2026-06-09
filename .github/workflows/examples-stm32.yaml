@@ -70,7 +70,7 @@ jobs:
               run: |
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     stm32 STM32WB5MM-DK light \
-                    out/stm32-stm32wb5mm-dk-light/chip-stm32-lighting-example.elf \
+                    out/stm32-stm32wb5mm-dk-light/STM32WB5MM-DK-lighting.elf \
                     /tmp/bloat_reports/
 
             - name: Uploading Size Reports
