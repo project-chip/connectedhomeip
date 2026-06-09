@@ -314,7 +314,8 @@
             "PowerAdjustmentCapability",
             "Forecast",
             "OptOutState",
-            "FeatureMap"
+            "FeatureMap",
+            "PowerRangeAdjustment"
         ],
         "Device Energy Management Mode": [
             "SupportedModes",

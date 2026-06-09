@@ -19,7 +19,7 @@
 from __future__ import annotations
 
 import logging
-from typing import Optional
+from typing import Callable, Optional
 
 from . import CertificateAuthority, ChipDeviceCtrl
 from .crypto import p256keypair
@@ -32,6 +32,12 @@ class FabricAdmin:
     ''' Administers a fabric associated with a unique FabricID under a given CertificateAuthority
         instance.
     '''
+
+    # Hook invoked by NewController() each time a controller is created.
+    # MatterBaseTest registers this in setup_class to auto-populate its
+    # _extra_controllers list used for test cleanup in teardown_class.
+    _new_controller_hook: Optional[Callable] = None
+
     @classmethod
     def _Handle(cls):
         return GetLibraryHandle()
@@ -114,6 +120,11 @@ class FabricAdmin:
             controller.SetDACRevocationSetPath(dacRevocationSetPath)
 
         self._activeControllers.append(controller)
+
+        # Adds the new controller to MatterBaseTest._extra_controllers via the registered hook
+        if self._new_controller_hook:
+            self._new_controller_hook(controller)
+
         return controller
 
     def Shutdown(self):
