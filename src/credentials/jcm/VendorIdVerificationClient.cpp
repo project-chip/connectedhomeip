@@ -170,9 +170,7 @@ CHIP_ERROR VendorIdVerificationClient::VerifyVendorId(Messaging::ExchangeManager
     if (!session.HasValue())
     {
         ChipLogError(Controller, "Session is missing");
-        CHIP_ERROR err = CHIP_ERROR_INCORRECT_STATE;
-        OnVendorIdVerificationComplete(err);
-        return err;
+        return CHIP_ERROR_INCORRECT_STATE;
     }
     // Guard the response callbacks: a FailSafe teardown can destroy this object while the invoke is in
     // flight, and the CommandSender-owned callback would otherwise fire OnVendorIdVerificationComplete()
@@ -182,7 +180,7 @@ CHIP_ERROR VendorIdVerificationClient::VerifyVendorId(Messaging::ExchangeManager
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "Failed to send SignVIDVerificationRequest: %s", ErrorStr(err));
-        this->OnVendorIdVerificationComplete(err);
+        return err;
     }
 
     return CHIP_NO_ERROR;
