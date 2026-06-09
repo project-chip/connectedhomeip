@@ -60,7 +60,7 @@ EthernetDiagnosticsServerCluster::EthernetDiagnosticsServerCluster(DeviceLayer::
 DataModel::ActionReturnStatus EthernetDiagnosticsServerCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                                               AttributeValueEncoder & encoder)
 {
-    uint64_t value;
+    uint64_t value = 0;
     CHIP_ERROR err = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 
     switch (request.path.mAttributeId)

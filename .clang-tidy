@@ -1,6 +1,10 @@
 ---
 Checks: >
   bugprone-*,
+  clang-analyzer-core.*,
+  clang-analyzer-cplusplus.*,
+  clang-analyzer-security*,
+  clang-analyzer-unix.Malloc,
   cppcoreguidelines-virtual-class-destructor,
   modernize-redundant-void-arg,
   modernize-use-bool-literals,
@@ -33,9 +37,8 @@ Checks: >
   -bugprone-switch-missing-default-case,
   -bugprone-undelegated-constructor,
   -bugprone-unused-return-value,
-  -clang-analyzer-core.CallAndMessage,
-  -clang-analyzer-core.NonNullParamChecker,
-  -clang-analyzer-cplusplus.Move,
+  -clang-analyzer-cplusplus.Move, # FP-only: intentional moved-from test asserts (already NOLINTed for bugprone-use-after-move) + a TLVReader.h FP; enabling needs mass/ongoing NOLINT for 0 real bugs,
+  -clang-analyzer-cplusplus.NewDeleteLeaks, # FP-only: std::function/self-delete lifetimes the analyzer cannot model; enabling needs mass/ongoing NOLINT for 0 real bugs,
   -clang-analyzer-deadcode.DeadStores,
   -clang-analyzer-nullability.NullablePassedToNonnull,
   -clang-analyzer-optin.core.EnumCastOutOfRange,
