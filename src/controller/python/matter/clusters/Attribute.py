@@ -762,11 +762,9 @@ class AsyncReadTransaction:
                     try:
                         eventValue = eventType.FromTLV(data)
                     except Exception as ex:
-                        LOGGER.error(
-                            f"Error convering TLV to Cluster Object for path: Endpoint = {path.EndpointId}/"
-                            f"Cluster = {path.ClusterId}/Event = {path.EventId}")
-                        LOGGER.error(
-                            f"Failed Cluster Object: {str(eventType)}")
+                        LOGGER.error("Error converting TLV to Cluster Object for path: Endpoint = %s/Cluster = %s/Event = %s",
+                                     path.EndpointId, path.ClusterId, path.EventId)
+                        LOGGER.error("Failed Cluster Object: %s", eventType)
                         LOGGER.error(ex)
                         eventValue = ValueDecodeFailure(
                             tlvData, ex)

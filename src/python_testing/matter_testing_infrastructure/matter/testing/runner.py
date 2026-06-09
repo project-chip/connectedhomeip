@@ -125,7 +125,7 @@ class InternalTestRunnerHooks(TestRunnerHooks):
         Args:
             count: The number of tests in the set.
         """
-        LOGGER.info(f'Starting test set, running {count} tests')
+        LOGGER.info('Starting test set, running %s tests', count)
 
     def stop(self, duration: int):
         """
@@ -134,7 +134,7 @@ class InternalTestRunnerHooks(TestRunnerHooks):
         Args:
             duration: The duration of the test set in milliseconds.
         """
-        LOGGER.info(f'Finished test set, ran for {duration}ms')
+        LOGGER.info('Finished test set, ran for %sms', duration)
 
     def test_start(
             self,
@@ -151,7 +151,7 @@ class InternalTestRunnerHooks(TestRunnerHooks):
             count: Number of steps in the test
             steps: List of step descriptions
         """
-        LOGGER.info(f'Starting test from {filename}: {name} - {count} steps')
+        LOGGER.info('Starting test from %s: %s - %s steps', filename, name, count)
 
     def test_stop(self, exception: Exception, duration: int):
         """
@@ -161,7 +161,7 @@ class InternalTestRunnerHooks(TestRunnerHooks):
             exception: Exception raised during test execution, or None if successful
             duration: Test execution duration in milliseconds
         """
-        LOGGER.info(f'Finished test in {duration}ms')
+        LOGGER.info('Finished test in %sms', duration)
 
     def step_skipped(self, name: str, expression: str):
         """
@@ -173,7 +173,7 @@ class InternalTestRunnerHooks(TestRunnerHooks):
         """
         # TODO: Do we really need the expression as a string? We can evaluate
         # this in code very easily
-        LOGGER.info(f'\t\t**** Skipping: {name}')
+        LOGGER.info('		**** Skipping: %s', name)
 
     def step_start(self, name: str):
         """
@@ -184,7 +184,7 @@ class InternalTestRunnerHooks(TestRunnerHooks):
         """
         # The way I'm calling this, the name is already includes the step
         # number, but it seems like it might be good to separate these
-        LOGGER.info(f'\t\t***** Test Step {name}')
+        LOGGER.info('		***** Test Step %s', name)
 
     def step_success(self, logger, logs, duration: int, request):
         """
@@ -211,9 +211,9 @@ class InternalTestRunnerHooks(TestRunnerHooks):
         """
         LOGGER.info('\t\t***** Test Failure : ')
         if received is not None:
-            LOGGER.info(f'\t\t      Received: {received}')
+            LOGGER.info('		      Received: %s', received)
         if request is not None:
-            LOGGER.info(f'\t\t      Expected: {request}')
+            LOGGER.info('		      Expected: %s', request)
 
     def step_unknown(self):
         """
@@ -243,7 +243,7 @@ class InternalTestRunnerHooks(TestRunnerHooks):
             filename: Source file containing the test
             name: Name of the test
         """
-        LOGGER.info(f"Skipping test from {filename}: {name}")
+        LOGGER.info("Skipping test from %s: %s", filename, name)
 
 
 @dataclass
@@ -795,12 +795,12 @@ def convert_args_to_matter_config(args: argparse.Namespace):
     if config.pipe_name is not None and not os.path.exists(config.pipe_name):
         # Named pipes are unique, so we MUST have consistent paths
         # Verify from start the named pipe exists.
-        LOGGER.error("Named pipe %r does NOT exist" % config.pipe_name)
+        LOGGER.error("Named pipe %r does NOT exist", config.pipe_name)
         raise FileNotFoundError("CANNOT FIND %r" % config.pipe_name)
 
     config.pipe_name_out = args.app_pipe_out
     if config.pipe_name_out is not None and not os.path.exists(config.pipe_name_out):
-        LOGGER.error("Named pipe %r does NOT exist" % config.pipe_name_out)
+        LOGGER.error("Named pipe %r does NOT exist", config.pipe_name_out)
         raise FileNotFoundError("CANNOT FIND %r" % config.pipe_name_out)
 
     config.fail_on_skipped_tests = args.fail_on_skipped

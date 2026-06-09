@@ -49,7 +49,7 @@ select = [
     # Check for common exception issues
     "RSE",
     # Check for common logging issues
-    "LOG",
+    "G", "LOG",
     # Check for common optimization issues
     "SLOT",
     # Check for builtin symbols aliasing
