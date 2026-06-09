@@ -594,6 +594,7 @@ std::optional<DataModel::ActionReturnStatus> WindowCoveringCluster::HandleUpOrOp
     {
         SetTargetPositionLiftPercent100ths(NPercent100ths(kWcPercent100thsMinOpen));
     }
+    return Status::Success;
 }
 
 Status GetMotionLockStatus(chip::EndpointId endpoint)
