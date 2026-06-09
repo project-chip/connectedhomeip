@@ -178,20 +178,20 @@ class BackgroundWildcardSubscriptionCache:
     """Framework-internal cache backing MatterBaseTest's background wildcard subscription.
 
     Test authors should not instantiate this directly.  It is created and managed by
-    ``MatterBaseTest._start_wildcard_subscription`` and consulted from
-    ``verify_attribute_subscription_value`` (which is invoked transparently by
-    ``read_single_attribute``, ``read_single_attribute_check_success``, and
-    ``read_single_attribute_all_endpoints``).  For per-attribute or per-event
-    subscriptions inside a test, use ``AttributeSubscriptionHandler`` or
-    ``EventSubscriptionHandler`` from ``matter.testing.event_attribute_reporting``
+    MatterBaseTest._start_wildcard_subscription and consulted from
+    verify_attribute_subscription_value (which is invoked transparently by
+    read_single_attribute, read_single_attribute_check_success, and
+    read_single_attribute_all_endpoints).  For per-attribute or per-event
+    subscriptions inside a test, use AttributeSubscriptionHandler or
+    EventSubscriptionHandler from matter.testing.event_attribute_reporting
     instead.
 
     The class plays two roles:
         1. **Subscription callback** — receives every attribute report from a wildcard
-           subscription via ``__call__`` and records it.
+           subscription via __call__ and records it.
         2. **Latest-value cache** — exposes the most recent reported value for any
-           ``(endpoint_id, cluster_id, attribute_id)`` tuple via ``_latest_values``,
-           seeded from the priming read in ``start()``.
+           (endpoint_id, cluster_id, attribute_id) tuple via _latest_values,
+           seeded from the priming read in start().
 
     Attributes with the Changes Omitted (C) or Quieter Reporting (Q) spec quality flags can be
     excluded by passing their (cluster_id, attribute_id) pairs as `excluded_attribute_ids`.
@@ -658,7 +658,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         Parses the Matter spec data-model XML for `dm_dir` and collects every attribute
         that carries the Changes Omitted (changeOmitted="true") or Quieter Reporting
         (quieterReporting="true") quality flag, then unions in
-        ``_CQ_EXPECTED_BUT_NOT_YET_MARKED`` for attributes that should be C in practice
+        _CQ_EXPECTED_BUT_NOT_YET_MARKED for attributes that should be C in practice
         but are not yet flagged in the XML (see that constant for the tracking issues).
 
         These attributes are excluded from the background wildcard subscription so that
@@ -701,13 +701,13 @@ class MatterBaseTest(base_test.BaseTestClass):
         Subscribes to *all* attributes on all endpoints via a wildcard path.  The
         subscription handler's callback silently drops reports for attributes that carry
         Changes Omitted (C) or Quieter Reporting (Q) spec quality flags (using the
-        exclusion set built in ``setup_class``), so those never enter the cache.  All
-        other reports update a latest-value cache that ``verify_attribute_subscription_value``
+        exclusion set built in setup_class), so those never enter the cache.  All
+        other reports update a latest-value cache that verify_attribute_subscription_value
         compares against direct reads.
 
-        The subscription uses ``fabricFiltered=False`` so the cache reflects data from all
-        fabrics.  Comparison logic in ``verify_attribute_subscription_value`` and
-        ``_fabric_filtered_match`` handles the difference between the unfiltered cache and
+        The subscription uses fabricFiltered=False so the cache reflects data from all
+        fabrics.  Comparison logic in verify_attribute_subscription_value and
+        _fabric_filtered_match handles the difference between the unfiltered cache and
         fabric-filtered reads.
 
         A secondary controller (node_id = controller_node_id + 123456) is used so that
@@ -723,7 +723,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         controller's ACL entry (e.g. via a full ACL overwrite), the subscription stops
         receiving reports rather than repeatedly retrying with failing re-subscriptions.
 
-        The subscription handler is stored as ``self.wildcard_subscription_handler`` and is
+        The subscription handler is stored as self.wildcard_subscription_handler and is
         shut down automatically in teardown_test.
 
         This is a synchronous wrapper around an async operation; it uses self.event_loop
@@ -1365,15 +1365,15 @@ class MatterBaseTest(base_test.BaseTestClass):
         self.cleanup_config = TestCleanupConfig()
         if self.runner_hook and not self.is_commissioning:
             # Start the background wildcard subscription only for tests that interact with a
-            # real DUT (``requires_dut = True``, the default) and unless the test has opted out
-            # via ``--no-wildcard-subscription`` or ``disable_wildcard_subscription = True`` on
+            # real DUT (requires_dut = True, the default) and unless the test has opted out
+            # via --no-wildcard-subscription or disable_wildcard_subscription = True on
             # the test class (e.g. tests that directly manipulate the ACL or tests that count
             # the TH entries).
             #
-            # Parser/unit tests under test_testing/ override ``requires_dut = False`` so they
+            # Parser/unit tests under test_testing/ override requires_dut = False so they
             # don't try to subscribe to a device that isn't there (which would hang ~30s per
-            # test and blow the CI timeout).  Gating on ``requires_dut`` rather than on
-            # ``--commissioning-method`` keeps this decoupled from harness CLI flags whose
+            # test and blow the CI timeout).  Gating on requires_dut rather than on
+            # --commissioning-method keeps this decoupled from harness CLI flags whose
             # semantics may shift at certification time.
             if not self._wildcard_subscription_disabled() and self.requires_dut:
                 self._start_wildcard_subscription()
@@ -2137,8 +2137,8 @@ class MatterBaseTest(base_test.BaseTestClass):
             attribute: The attribute to read.
             fabricFiltered: Whether to apply fabric filtering.
             verify_wildcard_subscription: Per-call override for the background
-                wildcard-subscription verification.  ``None`` (default) defers to the
-                class-level ``default_verify_wildcard_subscription``; ``False`` skips
+                wildcard-subscription verification.  None (default) defers to the
+                class-level default_verify_wildcard_subscription; False skips
                 the check for this read only.
 
         Returns:
@@ -2176,11 +2176,11 @@ class MatterBaseTest(base_test.BaseTestClass):
             cluster: The cluster object the attribute belongs to.
             attribute: The attribute to read.
             dev_ctrl: Device controller to use for the read operation.  Defaults to
-                ``self.default_controller``.
-            node_id: Node ID of the target device.  Defaults to ``self.dut_node_id``.
+                self.default_controller.
+            node_id: Node ID of the target device.  Defaults to self.dut_node_id.
             verify_wildcard_subscription: Per-call override for the background
-                wildcard-subscription verification.  ``None`` (default) defers to the
-                class-level ``default_verify_wildcard_subscription``; ``False`` skips
+                wildcard-subscription verification.  None (default) defers to the
+                class-level default_verify_wildcard_subscription; False skips
                 the check for this read only.
 
         Returns:
@@ -2283,9 +2283,9 @@ class MatterBaseTest(base_test.BaseTestClass):
         Called automatically from the base-class read helpers so any single-attribute read
         performed through the test harness is validated against the background subscription:
 
-        - ``read_single_attribute_check_success()``
-        - ``read_single_attribute()``
-        - ``read_single_attribute_all_endpoints()`` (verifies each endpoint)
+        - read_single_attribute_check_success()
+        - read_single_attribute()
+        - read_single_attribute_all_endpoints() (verifies each endpoint)
 
         Direct callers may also invoke this method after an ad-hoc read to confirm that
         the device is reporting the same value through its subscription as it returns on a
@@ -2303,9 +2303,9 @@ class MatterBaseTest(base_test.BaseTestClass):
         4. **Retry with delay** — On a mismatch, the method retries up to 3 times (1 s apart)
            to allow the subscription report to arrive.
         5. **Fabric-scoped filtering** — During each retry (and once more after retries are
-           exhausted), ``_fabric_filtered_match()`` checks whether the mismatch is caused by
+           exhausted), _fabric_filtered_match() checks whether the mismatch is caused by
            the subscription cache containing entries from multiple fabrics while the read
-           (which defaults to ``fabricFiltered=True``) only returns the reading fabric's
+           (which defaults to fabricFiltered=True) only returns the reading fabric's
            entries.  If the cache, filtered to the read value's fabric indices, matches the
            read value, the difference is purely cross-fabric data and not a DUT bug.
         6. **ACL conflict check** — If retries and fabric filtering both fail, the method
@@ -2313,7 +2313,7 @@ class MatterBaseTest(base_test.BaseTestClass):
            was removed by the test.  If so, the mismatch is an ACL conflict (not a DUT bug)
            and is logged as a warning.
         7. **Fail** — If none of the above resolve the mismatch, it is reported as a test
-           failure (``assert_on_error=True``) or recorded problem (``assert_on_error=False``).
+           failure (assert_on_error=True) or recorded problem (assert_on_error=False).
 
         Args:
             attribute:      Attribute descriptor class (e.g. Clusters.OnOff.Attributes.OnOff).
@@ -2422,19 +2422,19 @@ class MatterBaseTest(base_test.BaseTestClass):
     def _fabric_filtered_match(read_value: Any, cached_value: Any) -> bool:
         """Check whether a read-vs-cache mismatch is caused by fabric-scoped filtering.
 
-        The wildcard subscription uses ``fabricFiltered=False`` so its cache contains entries
-        from all fabrics.  ``read_single_attribute_check_success`` defaults to
-        ``fabricFiltered=True``, so the direct read only returns entries for the reading
+        The wildcard subscription uses fabricFiltered=False so its cache contains entries
+        from all fabrics.  read_single_attribute_check_success defaults to
+        fabricFiltered=True, so the direct read only returns entries for the reading
         controller's fabric.  For fabric-scoped list attributes (structs with a
-        ``fabricIndex`` field) this means the cache legitimately has more entries than the
+        fabricIndex field) this means the cache legitimately has more entries than the
         read.
 
         Algorithm:
             1. Both values must be non-empty lists and the cache must be strictly longer.
-            2. Every entry in the cached list must have a ``fabricIndex`` attribute
+            2. Every entry in the cached list must have a fabricIndex attribute
                (i.e. the attribute is fabric-scoped).
-            3. Collect the set of ``fabricIndex`` values present in the read value.
-            4. Filter the cached list to only entries whose ``fabricIndex`` is in that set.
+            3. Collect the set of fabricIndex values present in the read value.
+            4. Filter the cached list to only entries whose fabricIndex is in that set.
             5. Compare the filtered cache against the read value.
 
         Returns:
