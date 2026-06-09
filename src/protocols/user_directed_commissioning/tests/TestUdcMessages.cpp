@@ -510,6 +510,25 @@ TEST_F(TestUdcMessages, TestUDCIdentificationDeclarationOversizedRotatingId)
     EXPECT_EQ(idOut.GetRotatingIdLength(), 0u);
 }
 
+TEST_F(TestUdcMessages, TestUDCIdentificationDeclarationTruncatedPayload)
+{
+    IdentificationDeclaration idOut;
+    uint8_t idBuffer[5] = { 't', 'e', 's', 't', '\0' };
+
+    EXPECT_EQ(idOut.ReadPayload(idBuffer, sizeof(idBuffer)), CHIP_ERROR_INVALID_MESSAGE_LENGTH);
+}
+
+TEST_F(TestUdcMessages, TestUDCIdentificationDeclarationPureHeader)
+{
+    IdentificationDeclaration idOut;
+    const char * instanceName = "servertest1";
+    uint8_t idBuffer[Dnssd::Commission::kInstanceNameMaxLength + 1] = {};
+    Platform::CopyString(reinterpret_cast<char *>(idBuffer), sizeof(idBuffer), instanceName);
+
+    EXPECT_EQ(idOut.ReadPayload(idBuffer, sizeof(idBuffer)), CHIP_NO_ERROR);
+    EXPECT_STREQ(idOut.GetInstanceName(), instanceName);
+}
+
 TEST_F(TestUdcMessages, TestUDCCommissionerDeclaration)
 {
     CommissionerDeclaration id;
