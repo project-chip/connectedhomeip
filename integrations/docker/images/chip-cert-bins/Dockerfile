@@ -368,34 +368,35 @@ RUN case ${TARGETPLATFORM} in \
 RUN find out -maxdepth 1 -type f -executable -exec strip --strip-all {} \;
 
 # Stage 3: Copy relevant cert bins to a minimal image to reduce size.
-FROM ubuntu:24.04
+FROM ubuntu:24.04 AS builder
 ENV TZ=Etc/UTC
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 RUN apt-get update -y \
     && DEBIAN_FRONTEND=noninteractive apt-get satisfy -y --no-install-recommends \
-    avahi-utils \
-    ffmpeg \
-    gstreamer1.0-plugins-good \
-    gstreamer1.0-plugins-ugly \
-    iproute2 \
-    libavahi-client-dev \
-    libcairo2-dev \
-    libcurl4 \
-    libdbus-1-dev \
-    libevent-dev \
-    libgirepository1.0-dev \
-    libglib2.0-dev \
-    libgstreamer1.0-0 \
-    libgstreamer-plugins-base1.0-0 \
-    libpcsclite1 \
-    libpcsclite-dev \
-    libssl-dev \
-    meson \
-    pcscd \
-    python3-dev \
-    python3-pip \
-    && : # last line
+        avahi-utils \
+        ffmpeg \
+        gstreamer1.0-plugins-good \
+        gstreamer1.0-plugins-ugly \
+        iproute2 \
+        libavahi-client-dev \
+        libcairo2-dev \
+        libcurl4 \
+        libdbus-1-dev \
+        libevent-dev \
+        libgirepository1.0-dev \
+        libglib2.0-dev \
+        libgstreamer1.0-0 \
+        libgstreamer-plugins-base1.0-0 \
+        libpcsclite1 \
+        libpcsclite-dev \
+        libssl-dev \
+        meson \
+        pcscd \
+        python3-dev \
+        python3-pip \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /root/
 COPY --from=chip-build-cert-bins /root/.sdk-sha-version .sdk-sha-version
@@ -428,19 +429,50 @@ RUN pip install --break-system-packages --no-cache-dir \
     python_lib/python/obj/scripts/py_matter_idl/matter-idl._build_wheel/matter_idl-*.whl \
     python_lib/python/obj/scripts/py_matter_yamltests/matter-yamltests._build_wheel/matter_yamltests-*.whl \
     python_lib/obj/src/python_testing/matter_testing_infrastructure/matter-testing._build_wheel/matter_testing-*.whl \
-    python_lib/obj/src/controller/python/matter-controller-wheels/*.whl \
-    && rm -rf ../python_lib \
-    && rm -rf python_lib \
-    && rm -rf /root/.cache
+    python_lib/obj/src/controller/python/matter-controller-wheels/*.whl
 
-# Copy device attestation revocation set and device attestation test vectors
-WORKDIR /root
-RUN mkdir -p credentials/test/revoked-attestation-certificates
+FROM ubuntu:24.04
+
+ENV TZ=Etc/UTC
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
+RUN apt-get update -y \
+    && DEBIAN_FRONTEND=noninteractive apt-get satsify -y --no-install-recommends \
+        avahi-utils \
+        ffmpeg \
+        gstreamer1.0-plugins-good \
+        gstreamer1.0-plugins-ugly \
+        iproute2 \
+        libavahi-client3 \
+        libcairo2 \
+        libcurl4 \
+        libdbus-1-3 \
+        # commands still fail without the dev packages from libevent
+        libevent-dev \
+        libglib2.0-0t64 \
+        libgstreamer1.0-0 \
+        libgstreamer-plugins-base1.0-0 \
+        libpcsclite1 \
+        libssl3t64 \
+        pcscd \
+        python3 \
+        python3-pip \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /root/
+
+COPY --from=chip-build-cert-bins /root/.sdk-sha-version .sdk-sha-version
 COPY --from=chip-build-cert-bins /root/connectedhomeip/credentials/test/revoked-attestation-certificates/dac-provider-test-vectors credentials/test/revoked-attestation-certificates/dac-provider-test-vectors
 COPY --from=chip-build-cert-bins /root/connectedhomeip/credentials/test/revoked-attestation-certificates/revocation-sets credentials/test/revoked-attestation-certificates/revocation-sets
+COPY --from=builder /root/apps ./apps
+COPY --from=builder /root/python_testing ./python_testing
+COPY --from=builder /root/mock_server ./mock_server
 
-RUN apt-get remove -y \
-    meson
+# Copy the installed Python packages from builder's site-packages
+COPY --from=builder /usr/local/lib/python3.12/dist-packages /usr/local/lib/python3.12/dist-packages
+# Copy any symlinks or scripts from /usr/local/bin
+COPY --from=builder /usr/local/bin /usr/local/bin
 
-RUN apt-get autoremove -y
-RUN apt-get clean
+# Recreate symlinks in runtime stage
+RUN cd /root && ln -s apps/* .
