@@ -23,7 +23,6 @@ from matter.testing.harness_params import (HarnessParamDefinition, format_declar
                                            format_missing_test_parameters, get_harness_param_definitions, harness_params,
                                            resolve_harness_value, validate_harness_params)
 from matter.testing.matter_test_config import MatterTestConfig
-from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.pixit import (_PIXIT_NO_DEFAULT, PixitDefinition, _type_to_arg_flag, format_pixit_error, get_pixit_definitions,
                                   pixit, validate_pixits)
 
@@ -487,34 +486,10 @@ class TestResolveHarnessValue(unittest.TestCase):
             resolve_harness_value("nope", MatterTestConfig())
 
 
-class TestMatterBaseTestPixit(unittest.TestCase):
-    """Tests for MatterBaseTest.pixit() default resolution."""
-
-    def _make_test_instance(self, test_method_name: str):
-        class PixitTestClass(MatterBaseTest):
-            @pixit("path", str, "Required path", required=True, default="/decorator/default")
-            def test_required(self):
-                pass
-
-            @pixit("timeout", int, "Timeout", required=False, default=30)
-            def test_optional(self):
-                pass
-
-        instance = PixitTestClass.__new__(PixitTestClass)
-        instance.user_params = {}
-        instance.current_test_info = type("TestInfo", (), {"name": test_method_name})()
-        return instance
-
-    def test_required_pixit_ignores_decorator_default(self):
-        """Required PIXITs must not mask missing values with a decorator default."""
-        instance = self._make_test_instance("test_required")
-        self.assertIsNone(instance.pixit("path"))
-        self.assertEqual(instance.pixit("path", default="method-default"), "method-default")
-
-    def test_optional_pixit_uses_decorator_default(self):
-        """Optional PIXITs fall back to the decorator default when unset."""
-        instance = self._make_test_instance("test_optional")
-        self.assertEqual(instance.pixit("timeout"), 30)
+# NOTE: Tests for MatterBaseTest.pixit() default resolution live in
+# src/python_testing/test_testing/TestPixitSupport.py. They import MatterBaseTest,
+# which pulls in the compiled `matter` wheel, so they cannot run in this
+# lightweight pigweed unit-test package and run in the REPL env (out/venv) instead.
 
 
 if __name__ == "__main__":
