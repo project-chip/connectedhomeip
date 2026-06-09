@@ -15,14 +15,19 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 <!--
-  Test cluster for manufacturer-specific cluster handling validation.
-  
-  This cluster is intentionally NOT included in controller-clusters.matter
-  to simulate a real-world scenario where a device has a vendor-specific 
-  cluster that the controller/test harness has no knowledge of.
-  
-  Used to validate TC_IDM_2_2 and other tests correctly handle unknown manufacturer-specific clusters.
-  
+  Test cluster for validating manufacturer-specific cluster handling in CI.
+
+  Reproduces an SVE finding: a vendor's device exposed a manufacturer-
+  specific cluster the Python test harness had no codegen for, which
+  crashed TC_IDM_2_2 wildcard reads. Pinning that scenario into
+  all-clusters-app prevents the regression from returning.
+
+  The cluster is present in controller-clusters.matter as an `internal`
+  cluster, but excluded from Python ClusterObjects.ALL_CLUSTERS by an
+  allowlist in
+  src/controller/python/templates/python-cluster-Objects-py.zapt, so
+  test scripts must reach it via raw AttributePath / tlvAttributes.
+
   Cluster ID: 0xFFF1FC21 (4294048801)
   - Vendor ID: 0xFFF1 (test vendor)
   - Cluster suffix: 0xFC21 (within manufacturer-specific range 0xFC00-0xFFFE per spec)
