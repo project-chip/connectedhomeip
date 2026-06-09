@@ -1678,7 +1678,34 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * v
 } // namespace Actions
 
 namespace BasicInformation {
-namespace Attributes {} // namespace Attributes
+namespace Attributes {
+
+#error Attribute "DeviceLocation" in cluster "Basic Information" is struct-typed and must be added to the attributeAccessInterfaceAttributes object in src/app/zap-templates/zcl/zcl.json and src/app/zap-templates/zcl/zcl-with-test-extensions.json
+namespace DeviceLocation {
+
+Protocols::InteractionModel::Status
+GetDefault(EndpointId endpoint, DataModel::Nullable<chip::app::Clusters::Globals::Structs::LocationDescriptorStruct::Type> & value)
+{
+    using Traits = NumericAttributeTraits<chip::app::Clusters::Globals::Structs::LocationDescriptorStruct::Type>;
+    Traits::StorageType temp;
+    uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
+    Protocols::InteractionModel::Status status =
+        emberAfReadAttribute(endpoint, Clusters::BasicInformation::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
+    if (Traits::IsNullValue(temp))
+    {
+        value.SetNull();
+    }
+    else
+    {
+        value.SetNonNull() = Traits::StorageToWorking(temp);
+    }
+    return status;
+}
+
+} // namespace DeviceLocation
+
+} // namespace Attributes
 } // namespace BasicInformation
 
 namespace OtaSoftwareUpdateProvider {

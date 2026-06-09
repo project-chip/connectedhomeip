@@ -299,7 +299,15 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * v
 } // namespace Actions
 
 namespace BasicInformation {
-namespace Attributes {} // namespace Attributes
+namespace Attributes {
+
+namespace DeviceLocation {
+Protocols::InteractionModel::Status GetDefault(
+    EndpointId endpoint,
+    DataModel::Nullable<chip::app::Clusters::Globals::Structs::LocationDescriptorStruct::Type> & value); // LocationDescriptorStruct
+} // namespace DeviceLocation
+
+} // namespace Attributes
 } // namespace BasicInformation
 
 namespace OtaSoftwareUpdateProvider {
