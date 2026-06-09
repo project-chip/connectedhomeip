@@ -337,22 +337,31 @@ class MatterIdlTransformer(Transformer):
     #       between lark versions in https://github.com/lark-parser/lark/pull/993
     @v_args(meta=True, inline=True)
     def command(self, meta, *tuple_args):
-        # The command takes 4 arguments if no input argument, 5 if input
-        # argument is provided
+        # tuple_args contains:
+        # 0: command_qualities
+        # 1: [command_optional] (CommandQuality.OPTIONAL or None)
+        # 2: command_with_access
+        # Rest: input_param (optional), output_param, code
         qualities = tuple_args[0] or CommandQuality.NONE
-        with_access = tuple_args[1]
-        qualities |= with_access.pop("qualities", CommandQuality.NONE)
+        if tuple_args[1]:
+            qualities |= tuple_args[1]
 
-        args = list(tuple_args)  # convert from tuple
-        if len(args) != 5:
-            args.insert(2, None)
+        with_access = tuple_args[2]
+        with_access.pop("qualities", None)
+
+        args = list(tuple_args[3:])  # the rest of the arguments
+        if len(args) != 3:
+            # input_param is missing, insert None
+            args.insert(0, None)
+
+        input_param, output_param, code = args[0], args[1], args[2]
 
         meta = None if self.skip_meta else ParseMetaData(meta)
 
         return Command(
             parse_meta=meta,
             qualities=qualities,
-            input_param=args[2], output_param=args[3], code=args[4],
+            input_param=input_param, output_param=output_param, code=code,
             **with_access,
         )
 
@@ -379,11 +388,18 @@ class MatterIdlTransformer(Transformer):
     @v_args(meta=True)
     def event(self, meta, args):
         qualities = args[0] or EventQuality.NONE
-        with_access = args[2]
-        qualities |= with_access.pop("qualities", EventQuality.NONE)
+        if args[2]:
+            qualities |= args[2]
+
+        with_access = args[3]
+        with_access.pop("qualities", None)
+
+        priority = args[1]
+        code = args[4]
+        fields = args[5:]
 
         meta = None if self.skip_meta else ParseMetaData(meta)
-        return Event(qualities=qualities, priority=args[1], code=args[3], fields=args[4:], parse_meta=meta, **with_access)
+        return Event(qualities=qualities, priority=priority, code=code, fields=fields, parse_meta=meta, **with_access)
 
     def view_privilege(self, args):
         return AccessPrivilege.VIEW

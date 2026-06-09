@@ -1188,11 +1188,11 @@ server cluster A = 1 { /* Test comment */ }
                 attribute nullable int8u nullAttr = 2;
                 attribute optional nullable int8u optNullAttr = 3;
 
-                info event optional OptionalEvent = 1 {}
-                critical event optional OptionalCriticalEvent = 2 {}
+                info optional event OptionalEvent = 1 {}
+                critical optional event OptionalCriticalEvent = 2 {}
 
-                command optional OptionalCommand(): DefaultSuccess = 10;
-                timed command optional OptionalTimedCommand(): DefaultSuccess = 11;
+                optional command OptionalCommand(): DefaultSuccess = 10;
+                timed optional command OptionalTimedCommand(): DefaultSuccess = 11;
             }
         """)
 

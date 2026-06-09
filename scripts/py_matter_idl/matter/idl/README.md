@@ -94,7 +94,7 @@ cluster AccessControl = 31 {
   }
 
   // optional events are supported
-  event optional OptionalEvent = 4 {
+  info optional event OptionalEvent = 4 {
   }
 
   attribute AccessControlEntry acl[] = 0;    // attributes are read-write by default
@@ -140,7 +140,7 @@ cluster AccessControl = 31 {
   fabric command ViewGroup(ViewGroupRequest): ViewGroupResponse = 1;
 
   // commands may have multiple attributes
-  provisional fabric timed command optional RequiresTimedInvoke(): DefaultSuccess = 7;
+  provisional fabric timed optional command RequiresTimedInvoke(): DefaultSuccess = 7;
 
   // Items may have a prefix about api stability.
   //   - "provisional" are generally subject to change

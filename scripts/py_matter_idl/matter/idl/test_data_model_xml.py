@@ -782,8 +782,8 @@ endpoint 2 {
 
         expected_idl = IdlTextToIdl('''
             client cluster Test = 123 {
-               info event optional OptionalEvent = 1 {}
-               command optional OptionalCommand(): DefaultSuccess = 10;
+               info optional event OptionalEvent = 1 {}
+               optional command OptionalCommand(): DefaultSuccess = 10;
 
                readonly attribute attrib_id attributeList[] = 65531;
                readonly attribute event_id eventList[] = 65530;
