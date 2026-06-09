@@ -19,7 +19,7 @@ set -e
 # Configuration
 CRASH_REMOTE_DIR="/opt/usr/share/crash/dump"
 LOCAL_TMP_DIR="out/tizen-crashes-tmp"
-SEARCH_HOURS=1
+SEARCH_HOURS=24
 CLEANUP=true
 VERBOSE=false
 SELECT_LAST=false
@@ -36,7 +36,7 @@ Usage:
 $0 [--help] [--hours NUM] [--target SDB_ID] [--out-dir DIR] [--last] [--verbose] [--no-clean]
 
 Options:
-    --hours NUM     - Filter crashes from the last NUM hours (default: 1)
+    --hours NUM     - Filter crashes from the last NUM hours (default: 24)
     --target SDB_ID - SDB identifier (e.g. 192.168.0.118:26101)
     --out-dir DIR   - Build output directory (e.g. out/tizen-arm64-light-no-thread).
                       When set, only crashes matching binaries in this directory
@@ -90,7 +90,7 @@ function parse_arguments() {
 
 function setup_sdb() {
     SDB_CMD=("sdb")
-    if [ -n "$TARGET_DEVICE" ]; then
+    if [ "$TARGET_DEVICE" != "" ]; then
         SDB_CMD=("sdb" "-s" "$TARGET_DEVICE")
     fi
 
@@ -161,7 +161,7 @@ function format_time_ago() {
 function fetch_recent_crashes() {
     # Get device time as both Unix epoch and formatted string to compute timezone offset
     TARGET_NOW=$("${SDB_CMD[@]}" shell "date +%s" | tr -d '\r' | grep -E '^[0-9]+$')
-    if [ -z "$TARGET_NOW" ]; then
+    if [ "$TARGET_NOW" = "" ]; then
         echo "ERROR: Failed to retrieve current time from target device."
         exit 1
     fi
@@ -176,13 +176,17 @@ function fetch_recent_crashes() {
     local cutoff_time=$((TARGET_NOW - SEARCH_HOURS * 3600))
 
     echo "Fetching crash logs from the last $SEARCH_HOURS hour(s)..."
-    local remote_files
-    remote_files=$("${SDB_CMD[@]}" shell "ls $CRASH_REMOTE_DIR/*.zip 2>/dev/null" | tr -d '\r')
+    local remote_files_raw
+    remote_files_raw=$("${SDB_CMD[@]}" shell "ls $CRASH_REMOTE_DIR/*.zip 2>/dev/null" | tr -d '\r')
+
+    # Split into proper array for word-safe iteration
+    local remote_files=()
+    readarray -t remote_files <<<"$remote_files_raw"
 
     # Collect crashes as "EPOCH:PATH" pairs for sorting
     local crash_pairs=()
-    for remote_zip in $remote_files; do
-        [ -n "$remote_zip" ] || continue
+    for remote_zip in "${remote_files[@]}"; do
+        [ "$remote_zip" != "" ] || continue
         [[ "$remote_zip" == *"No such file"* ]] && continue
 
         local filename timestamp_str formatted_time file_epoch
@@ -190,7 +194,7 @@ function fetch_recent_crashes() {
         # Extract timestamp from filename format: APPID_PID_YYYYMMDDHHMMSS.zip
         timestamp_str=$(echo "$filename" | grep -oE '[0-9]{14}')
 
-        if [ -n "$timestamp_str" ]; then
+        if [ "$timestamp_str" != "" ]; then
             formatted_time="${timestamp_str:0:4}-${timestamp_str:4:2}-${timestamp_str:6:2} ${timestamp_str:8:2}:${timestamp_str:10:2}:${timestamp_str:12:2}"
             # Parse on host (host timezone) then apply device timezone offset
             file_epoch=$(date -d "$formatted_time" +%s 2>/dev/null || echo 0)
@@ -209,7 +213,7 @@ function fetch_recent_crashes() {
     CRASH_EPOCHS=()
     local pair
     for pair in "${sorted_pairs[@]}"; do
-        [ -n "$pair" ] || continue
+        [ "$pair" != "" ] || continue
         CRASH_EPOCHS+=("${pair%%:*}")
         VALID_CRASHES+=("${pair#*:}")
     done
@@ -269,7 +273,7 @@ function filter_matter_crashes() {
             fi
         done
 
-        if $found; then
+        if "$found"; then
             filtered_crashes+=("$remote_zip")
             filtered_epochs+=("${CRASH_EPOCHS[$i]}")
         fi
@@ -304,7 +308,7 @@ function select_crash_log() {
     echo "------------------------------------------------------------"
 
     while true; do
-        read -r -p "Select a crash log to analyze [0-$(( ${#VALID_CRASHES[@]} - 1 ))]: " choice
+        read -r -p "Select a crash log to analyze [0-$((${#VALID_CRASHES[@]} - 1))]: " choice
         if [[ "$choice" =~ ^[0-9]+$ ]] && [ "$choice" -lt ${#VALID_CRASHES[@]} ]; then
             SELECTED_ZIP="${VALID_CRASHES[$choice]}"
             break
@@ -354,7 +358,7 @@ function find_coredump() {
 
     local coredump
     coredump=$(find "$LOCAL_TMP_DIR" -type f -name "*.coredump" | head -n 1)
-    if [ -n "$coredump" ]; then
+    if [ "$coredump" != "" ]; then
         echo "$coredump"
         return
     fi
@@ -412,7 +416,7 @@ function select_build_target() {
 
     if [ ${#targets[@]} -eq 0 ]; then
         echo "ERROR: Could not find a matching local unstripped binary for '$binary' with correct architecture inside out/tizen-* directories."
-        $CLEANUP && rm -rf "$LOCAL_TMP_DIR"
+        "$CLEANUP" && rm -rf "$LOCAL_TMP_DIR"
         exit 1
     fi
 
@@ -431,7 +435,7 @@ function select_build_target() {
     echo "------------------------------------------------------------"
 
     while true; do
-        read -r -p "Select a build target [0-$(( ${#targets[@]} - 1 ))]: " choice
+        read -r -p "Select a build target [0-$((${#targets[@]} - 1))]: " choice
         if [[ "$choice" =~ ^[0-9]+$ ]] && [ "$choice" -lt ${#targets[@]} ]; then
             SELECTED_TARGET="${targets[$choice]}"
             break
@@ -510,7 +514,7 @@ function run_gdb_analysis() {
 parse_arguments "$@"
 setup_sdb
 
-if [ -n "$OUT_DIR" ]; then
+if [ "$OUT_DIR" != "" ]; then
     if [ ! -d "$OUT_DIR" ]; then
         echo "ERROR: --out-dir directory does not exist: $OUT_DIR"
         exit 1
@@ -520,7 +524,7 @@ fi
 
 fetch_recent_crashes
 
-if [ -n "$OUT_DIR" ]; then
+if [ "$OUT_DIR" != "" ]; then
     filter_crashes_for_out_dir "$OUT_DIR"
 else
     filter_matter_crashes
@@ -535,18 +539,18 @@ binary=$(resolve_binary_name "$app_id")
 pull_and_extract_crash "$SELECTED_ZIP"
 
 coredump=$(find_coredump)
-if [ -z "$coredump" ] || [ ! -f "$coredump" ]; then
+if [ "$coredump" = "" ] || [ ! -f "$coredump" ]; then
     echo "ERROR: Could not find a valid core dump file inside the pulled archive."
-    $CLEANUP && rm -rf "$LOCAL_TMP_DIR"
+    "$CLEANUP" && rm -rf "$LOCAL_TMP_DIR"
     exit 1
 fi
 
 is_core_64=$(detect_core_is_64bit "$coredump")
 
-if [ -n "$OUT_DIR" ]; then
+if [ "$OUT_DIR" != "" ]; then
     if [ ! -f "$OUT_DIR/$binary" ]; then
         echo "ERROR: Binary '$binary' not found in $OUT_DIR"
-        $CLEANUP && rm -rf "$LOCAL_TMP_DIR"
+        "$CLEANUP" && rm -rf "$LOCAL_TMP_DIR"
         exit 1
     fi
     SELECTED_TARGET="$OUT_DIR"
@@ -560,7 +564,7 @@ sysroot=$(get_sdk_sysroot "$SELECTED_TARGET")
 
 run_gdb_analysis "$gdb_bin" "$sysroot" "$SELECTED_TARGET/$binary" "$coredump" "$crash_filename"
 
-if $CLEANUP; then
+if "$CLEANUP"; then
     rm -rf "$LOCAL_TMP_DIR"
 else
     echo "Temporary files preserved in: $LOCAL_TMP_DIR"
