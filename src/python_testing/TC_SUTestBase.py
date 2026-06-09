@@ -23,8 +23,7 @@ from os import path
 from time import sleep
 from typing import Optional
 
-from mobly import asserts
-from mobly import signals
+from mobly import asserts, signals
 
 import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
@@ -468,7 +467,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             try:
                 download_progress_attr_handler.await_all_expected_report_matches(
                     [download_progress_attr_matcher_obj], timeout_sec=max_timeout)
-            except signals.TestFailure as e:
+            except signals.TestFailure:
                 # Cancel this to avoid having reports in the command line
                 download_progress_attr_handler.cancel()
                 retry = True
@@ -487,8 +486,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
                     # Update nonlocalvalues
                     current_progress = update_state_progress
                     continue
-                else:
-                    asserts.fail("Test terminated by user.")
+                asserts.fail("Test terminated by user.")
 
             # Did not fail and the Download Track Continues
             current_max_progress += progress_step
