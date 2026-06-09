@@ -29,7 +29,6 @@ import time
 from dataclasses import dataclass
 from enum import Flag, auto
 from pathlib import Path
-from typing import List
 
 log = logging.getLogger(__name__)
 
@@ -108,7 +107,7 @@ class ZapInput:
 
         return "chef" in self.zap_file
 
-    def build_command(self, script: str) -> List[str]:
+    def build_command(self, script: str) -> list[str]:
         """What command to execute for this zap input. """
         if self.zap_file:
             return [script, self.zap_file]
@@ -298,13 +297,6 @@ class JinjaCodegenTarget:
         log.info("  %s", shlex.join(self.command))
 
 
-def checkPythonVersion():
-    if sys.version_info[0] < 3:
-        print('Must use Python 3. Current version is ' +
-              str(sys.version_info[0]))
-        exit(1)
-
-
 def setupArgumentsParser():
     parser = argparse.ArgumentParser(
         description='Generate content from ZAP files')
@@ -482,7 +474,6 @@ def main():
             os.execv(launcher, [launcher, shlex.join(what_to_run)])
         sys.exit(1)
 
-    checkPythonVersion()
     os.chdir(CHIP_ROOT_DIR)
     args = setupArgumentsParser()
 

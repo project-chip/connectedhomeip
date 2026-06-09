@@ -300,7 +300,7 @@ RUN pip install --break-system-packages --no-cache-dir \
     python_lib/python/obj/scripts/py_matter_idl/matter-idl._build_wheel/matter_idl-*.whl \
     python_lib/python/obj/scripts/py_matter_yamltests/matter-yamltests._build_wheel/matter_yamltests-*.whl \
     python_lib/obj/src/python_testing/matter_testing_infrastructure/matter-testing._build_wheel/matter_testing-*.whl \
-    python_lib/controller/python/matter*.whl \
+    python_lib/obj/src/controller/python/matter-controller-wheels/*.whl \
     && rm ../python_lib \
     && rm -rf python_lib
 

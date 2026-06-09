@@ -32,7 +32,7 @@ from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 from itertools import chain
 from pathlib import Path
-from typing import Any, List, Optional, Tuple
+from typing import Any, Optional
 from unittest.mock import MagicMock
 
 from mobly import signals, utils
@@ -126,7 +126,7 @@ class InternalTestRunnerHooks(TestRunnerHooks):
         Args:
             count: The number of tests in the set.
         """
-        LOGGER.info(f'Starting test set, running {count} tests')
+        LOGGER.info('Starting test set, running %s tests', count)
 
     def stop(self, duration: int):
         """
@@ -135,7 +135,7 @@ class InternalTestRunnerHooks(TestRunnerHooks):
         Args:
             duration: The duration of the test set in milliseconds.
         """
-        LOGGER.info(f'Finished test set, ran for {duration}ms')
+        LOGGER.info('Finished test set, ran for %sms', duration)
 
     def test_start(
             self,
@@ -152,7 +152,7 @@ class InternalTestRunnerHooks(TestRunnerHooks):
             count: Number of steps in the test
             steps: List of step descriptions
         """
-        LOGGER.info(f'Starting test from {filename}: {name} - {count} steps')
+        LOGGER.info('Starting test from %s: %s - %s steps', filename, name, count)
 
     def test_stop(self, exception: Exception, duration: int):
         """
@@ -162,7 +162,7 @@ class InternalTestRunnerHooks(TestRunnerHooks):
             exception: Exception raised during test execution, or None if successful
             duration: Test execution duration in milliseconds
         """
-        LOGGER.info(f'Finished test in {duration}ms')
+        LOGGER.info('Finished test in %sms', duration)
 
     def step_skipped(self, name: str, expression: str):
         """
@@ -174,7 +174,7 @@ class InternalTestRunnerHooks(TestRunnerHooks):
         """
         # TODO: Do we really need the expression as a string? We can evaluate
         # this in code very easily
-        LOGGER.info(f'\t\t**** Skipping: {name}')
+        LOGGER.info('		**** Skipping: %s', name)
 
     def step_start(self, name: str):
         """
@@ -185,7 +185,7 @@ class InternalTestRunnerHooks(TestRunnerHooks):
         """
         # The way I'm calling this, the name is already includes the step
         # number, but it seems like it might be good to separate these
-        LOGGER.info(f'\t\t***** Test Step {name}')
+        LOGGER.info('		***** Test Step %s', name)
 
     def step_success(self, logger, logs, duration: int, request):
         """
@@ -212,9 +212,9 @@ class InternalTestRunnerHooks(TestRunnerHooks):
         """
         LOGGER.info('\t\t***** Test Failure : ')
         if received is not None:
-            LOGGER.info(f'\t\t      Received: {received}')
+            LOGGER.info('		      Received: %s', received)
         if request is not None:
-            LOGGER.info(f'\t\t      Expected: {request}')
+            LOGGER.info('		      Expected: %s', request)
 
     def step_unknown(self):
         """
@@ -244,7 +244,7 @@ class InternalTestRunnerHooks(TestRunnerHooks):
             filename: Source file containing the test
             name: Name of the test
         """
-        LOGGER.info(f"Skipping test from {filename}: {name}")
+        LOGGER.info("Skipping test from %s: %s", filename, name)
 
 
 @dataclass
@@ -427,6 +427,7 @@ def run_tests_no_exit(
                 catTags=matter_test_config.controller_cat_tags,
                 dacRevocationSetPath=matter_test_config.dac_revocation_set_path if matter_test_config.dac_revocation_set_path else ""
             )
+        default_controller._is_default_controller = True
         test_config.user_params["default_controller"] = global_stash.stash_globally(
             default_controller)
         test_config.user_params["matter_test_config"] = global_stash.stash_globally(
@@ -795,12 +796,12 @@ def convert_args_to_matter_config(args: argparse.Namespace):
     if config.pipe_name is not None and not os.path.exists(config.pipe_name):
         # Named pipes are unique, so we MUST have consistent paths
         # Verify from start the named pipe exists.
-        LOGGER.error("Named pipe %r does NOT exist" % config.pipe_name)
+        LOGGER.error("Named pipe %r does NOT exist", config.pipe_name)
         raise FileNotFoundError("CANNOT FIND %r" % config.pipe_name)
 
     config.pipe_name_out = args.app_pipe_out
     if config.pipe_name_out is not None and not os.path.exists(config.pipe_name_out):
-        LOGGER.error("Named pipe %r does NOT exist" % config.pipe_name_out)
+        LOGGER.error("Named pipe %r does NOT exist", config.pipe_name_out)
         raise FileNotFoundError("CANNOT FIND %r" % config.pipe_name_out)
 
     config.fail_on_skipped_tests = args.fail_on_skipped
@@ -842,7 +843,7 @@ def str_from_manual_code(s: str) -> str:
     return s
 
 
-def int_named_arg(s: str) -> Tuple[str, int]:
+def int_named_arg(s: str) -> tuple[str, int]:
     regex = r"^(?P<name>[a-zA-Z_0-9_.-]+):((?P<hex_value>0x[0-9a-fA-F_]+)|(?P<decimal_value>-?\d+))$"
     match = re.match(regex, s)
     if not match:
@@ -856,7 +857,7 @@ def int_named_arg(s: str) -> Tuple[str, int]:
     return (name, value)
 
 
-def str_named_arg(s: str) -> Tuple[str, str]:
+def str_named_arg(s: str) -> tuple[str, str]:
     regex = r"^(?P<name>[a-zA-Z_0-9.]+):(?P<value>.*)$"
     match = re.match(regex, s)
     if not match:
@@ -865,7 +866,7 @@ def str_named_arg(s: str) -> Tuple[str, str]:
     return (match.group("name"), match.group("value"))
 
 
-def float_named_arg(s: str) -> Tuple[str, float]:
+def float_named_arg(s: str) -> tuple[str, float]:
     regex = r"^(?P<name>[a-zA-Z_0-9.]+):(?P<value>.*)$"
     match = re.match(regex, s)
     if not match:
@@ -877,7 +878,7 @@ def float_named_arg(s: str) -> Tuple[str, float]:
     return (name, value)
 
 
-def json_named_arg(s: str) -> Tuple[str, object]:
+def json_named_arg(s: str) -> tuple[str, object]:
     regex = r"^(?P<name>[a-zA-Z_0-9.]+):(?P<value>.*)$"
     match = re.match(regex, s)
     if not match:
@@ -889,7 +890,7 @@ def json_named_arg(s: str) -> Tuple[str, object]:
     return (name, value)
 
 
-def bool_named_arg(s: str) -> Tuple[str, bool]:
+def bool_named_arg(s: str) -> tuple[str, bool]:
     regex = r"^(?P<name>[a-zA-Z_0-9.]+):((?P<truth_value>true|false)|(?P<decimal_value>[01]))$"
     match = re.match(regex, s, re.IGNORECASE)
     if not match:
@@ -904,7 +905,7 @@ def bool_named_arg(s: str) -> Tuple[str, bool]:
     return (name, value)
 
 
-def bytes_as_hex_named_arg(s: str) -> Tuple[str, bytes]:
+def bytes_as_hex_named_arg(s: str) -> tuple[str, bytes]:
     regex = r"^(?P<name>[a-zA-Z_0-9.]+):(?P<value>[0-9a-fA-F:]+)$"
     match = re.match(regex, s)
     if not match:
@@ -937,7 +938,7 @@ def root_index(s: str) -> int:
         return root_index
 
 
-def parse_matter_test_args(argv: Optional[List[str]] = None):
+def parse_matter_test_args(argv: Optional[list[str]] = None):
     parser = argparse.ArgumentParser(description='Matter standalone Python test')
 
     basic_group = parser.add_argument_group(title="Basic arguments", description="Overall test execution arguments")

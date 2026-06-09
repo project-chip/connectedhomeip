@@ -32,15 +32,36 @@ import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.clusters import ClusterObjects as ClusterObjects
 from matter.clusters.Attribute import AttributePath, TypedAttributePath, ValueDecodeFailure
+from matter.clusters.Types import NullValue
 from matter.exceptions import ChipStackError
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing import global_attribute_ids
+from matter.testing.basic_composition import BasicCompositionTests
 from matter.testing.event_attribute_reporting import WildcardAttributeSubscriptionHandler
 from matter.testing.global_attribute_ids import GlobalAttributeIds, is_standard_attribute_id
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.spec_parsing import ConstraintReference, Constraints
 from matter.tlv import uint
 
 log = logging.getLogger(__name__)
+
+
+@dataclass
+class WritableAttributeInfo:
+    """Describes a single writable attribute discovered on the DUT.
+
+    Aggregates the cluster/attribute identity, the generated Python classes
+    used to read/write it, and the spec-parsed constraint metadata needed to
+    synthesize out-of-bounds test values.
+    """
+    endpoint_id: int
+    cluster_id: int
+    cluster_name: str
+    attribute_id: int
+    attribute_name: str
+    attribute: type[ClusterObjects.ClusterAttributeDescriptor]
+    cluster_class: type[ClusterObjects.Cluster]
+    datatype: str
+    constraints: Optional[Constraints]
 
 
 @dataclass
@@ -99,7 +120,7 @@ def client_cmd(cmd_class):
 # IDMBaseTest - Main Base Class
 # ============================================================================
 
-class IDMBaseTest(MatterBaseTest):
+class IDMBaseTest(BasicCompositionTests):
     """Base test class for IDM tests with shared functionality."""
 
     ROOT_NODE_ENDPOINT_ID = 0
@@ -233,7 +254,7 @@ class IDMBaseTest(MatterBaseTest):
         Find an attribute that requires timed write on the actual device
         Uses the wildcard read data that's already in endpoints_data
         """
-        log.info(f"Searching for timed write attributes across {len(endpoints_data)} endpoints")
+        log.info("Searching for timed write attributes across %s endpoints", len(endpoints_data))
         for endpoint_id, endpoint in endpoints_data.items():
             for cluster_type, cluster_data in endpoint.items():
                 cluster_id = cluster_type.id
@@ -250,8 +271,8 @@ class IDMBaseTest(MatterBaseTest):
                             issubclass(attr_type, ClusterObjects.ClusterAttributeDescriptor)):
                         # Check if this attribute requires timed write using the must_use_timed_write class property
                         if attr_type.must_use_timed_write:
-                            log.info(f"Found timed write attribute: {attr_type.__name__} "
-                                     f"in cluster {cluster_type.__name__} on endpoint {endpoint_id}")
+                            log.info("Found timed write attribute: %s in cluster %s on endpoint %s",
+                                     attr_type.__name__, cluster_type.__name__, endpoint_id)
                             return endpoint_id, attr_type
         log.warning("No timed write attributes found on device")
         return None, None
@@ -386,6 +407,139 @@ class IDMBaseTest(MatterBaseTest):
                     ClusterObjects.ALL_CLUSTERS[cluster].Attributes.AttributeList.attribute_id])
                 asserts.assert_equal(returned_attrs, attr_list,
                                      f"Mismatch for {cluster} at endpoint {endpoint}")
+
+    async def resolve_dynamic_constraint(self, cluster_class, endpoint_id: int, ref: ConstraintReference) -> Optional[int]:
+        """Resolve a dynamic constraint reference by reading the attribute value."""
+        ref_attr = getattr(cluster_class.Attributes, ref.attribute, None)
+        if not ref_attr:
+            return None
+
+        ref_value = await self.read_single_attribute_check_success(
+            endpoint=endpoint_id,
+            cluster=cluster_class,
+            attribute=ref_attr
+        )
+
+        if ref.field:
+            python_field_name = ref.field[0].lower() + ref.field[1:]
+            if hasattr(ref_value, python_field_name):
+                return getattr(ref_value, python_field_name)
+            return None
+
+        return ref_value if isinstance(ref_value, (int, float)) else None
+
+    def generate_constraint_violation(self, attr_info: WritableAttributeInfo, constraints: Constraints):
+        """Generate a test value that violates the given constraints."""
+        datatype = attr_info.datatype
+
+        # String constraints
+        if 'string' in datatype or 'octstr' in datatype:
+            if constraints.max_length is not None:
+                return 'x' * (constraints.max_length + 1)
+            if constraints.min_length is not None:
+                return 'x' * max(0, constraints.min_length - 1)
+
+        # List constraints
+        if 'list' in datatype:
+            if constraints.max_count is not None:
+                return [{}] * (constraints.max_count + 1)
+            if constraints.min_count is not None:
+                count = max(0, constraints.min_count - 1)
+                return [{}] * count if count > 0 else []
+
+        # Numeric-like constraints (int, uint, percent, elapsed-s, temperature, etc.)
+        if constraints.max_value is not None:
+            return constraints.max_value + 1
+        if constraints.min_value is not None:
+            return max(0, constraints.min_value - 1)
+
+        return None
+
+    async def check_attribute_constraint(self, attr_info: WritableAttributeInfo, constraints: Constraints) -> bool:
+        """Test a single attribute's constraint. Returns True if test passed, False otherwise."""
+        # Resolve dynamic constraints if present
+        if constraints.min_value_ref or constraints.max_value_ref or constraints.min_count_ref or constraints.max_count_ref:
+            cluster_class = attr_info.cluster_class
+
+            if constraints.min_value_ref:
+                constraints.min_value = await self.resolve_dynamic_constraint(
+                    cluster_class, attr_info.endpoint_id, constraints.min_value_ref
+                )
+
+            if constraints.max_value_ref:
+                constraints.max_value = await self.resolve_dynamic_constraint(
+                    cluster_class, attr_info.endpoint_id, constraints.max_value_ref
+                )
+
+            if constraints.min_count_ref:
+                constraints.min_count = await self.resolve_dynamic_constraint(
+                    cluster_class, attr_info.endpoint_id, constraints.min_count_ref
+                )
+
+            if constraints.max_count_ref:
+                constraints.max_count = await self.resolve_dynamic_constraint(
+                    cluster_class, attr_info.endpoint_id, constraints.max_count_ref
+                )
+
+        # Generate constraint violation
+        test_value = self.generate_constraint_violation(attr_info, constraints)
+        if test_value is None:
+            return None  # Unsupported constraint type
+
+        # Read original value
+        original_value = await self.read_single_attribute_check_success(
+            endpoint=attr_info.endpoint_id,
+            cluster=attr_info.cluster_class,
+            attribute=attr_info.attribute
+        )
+
+        # Attempt to write violating value
+        attr_obj = attr_info.attribute(test_value)
+        write_result = await self.default_controller.WriteAttribute(
+            nodeId=self.dut_node_id,
+            attributes=[(attr_info.endpoint_id, attr_obj)]
+        )
+        result_status = write_result[0].Status
+
+        if result_status == Status.ConstraintError:
+            # Verify value wasn't set to the violating value
+            new_value = await self.read_single_attribute_check_success(
+                endpoint=attr_info.endpoint_id,
+                cluster=attr_info.cluster_class,
+                attribute=attr_info.attribute
+            )
+
+            if new_value == test_value:
+                log.error("FAIL: %s.%s was set to invalid value %s despite CONSTRAINT_ERROR", attr_info.cluster_name,
+                          attr_info.attribute_name, test_value)
+                return False
+
+            log.info("PASS: %s.%s constraint properly enforced (original=%s, rejected=%s)", attr_info.cluster_name,
+                     attr_info.attribute_name, original_value, test_value)
+            return True
+
+        log.error("FAIL: %s.%s got %s instead of CONSTRAINT_ERROR for value %s", attr_info.cluster_name, attr_info.attribute_name,
+                  result_status, test_value)
+        return False
+
+    def checkable_attributes(self, cluster_id, cluster, xml_cluster) -> list[uint]:
+        """Get list of attributes that exist on the DUT and have spec/codegen data available."""
+        all_attrs = cluster[GlobalAttributeIds.ATTRIBUTE_LIST_ID]
+
+        checkable_attrs = []
+        for attr_id in all_attrs:
+            if not is_standard_attribute_id(attr_id):
+                continue
+
+            if attr_id not in xml_cluster.attributes:
+                continue
+
+            if attr_id not in Clusters.ClusterObjects.ALL_ATTRIBUTES[cluster_id]:
+                continue
+
+            checkable_attrs.append(attr_id)
+
+        return checkable_attrs
 
     # ========================================================================
     # Attribute Reading Helper Functions
@@ -543,7 +697,7 @@ class IDMBaseTest(MatterBaseTest):
                 error=Status.UnsupportedCluster)
             asserts.assert_true(isinstance(result.Reason, InteractionModelError),
                                 msg=f"Unexpected success reading invalid cluster on endpoint {endpoint_id}")
-            log.info(f"Confirmed unsupported cluster {unsupported_cluster_id} returns error on endpoint {endpoint_id}")
+            log.info("Confirmed unsupported cluster %s returns error on endpoint %s", unsupported_cluster_id, endpoint_id)
 
     async def read_unsupported_attribute(self):
         """Attempt to read an unsupported attribute from a supported cluster on any endpoint.
@@ -565,7 +719,7 @@ class IDMBaseTest(MatterBaseTest):
                 if unsupported:
                     unsupported_attr = ClusterObjects.ALL_ATTRIBUTES[cluster_type.id][unsupported[0]]
                     log.info(
-                        f"Testing unsupported attribute: endpoint={endpoint_id}, cluster={cluster_type}, attribute={unsupported_attr}")
+                        "Testing unsupported attribute: endpoint=%s, cluster=%s, attribute=%s", endpoint_id, cluster_type, unsupported_attr)
                     # Only request this single attribute
                     result = await self.read_single_attribute_expect_error(
                         endpoint=endpoint_id,
@@ -575,11 +729,170 @@ class IDMBaseTest(MatterBaseTest):
                     )
                     asserts.assert_true(isinstance(result.Reason, InteractionModelError),
                                         msg="Unexpected success reading invalid attribute")
-                    log.info(f"Confirmed unsupported attribute {unsupported_attr} returns error on endpoint {endpoint_id}")
+                    log.info("Confirmed unsupported attribute %s returns error on endpoint %s", unsupported_attr, endpoint_id)
                     return
 
         # If we get here, we got problems as there should always be at least one unsupported attribute
         asserts.fail("No unsupported attributes found - must find at least one unsupported attribute")
+
+    # ========================================================================
+    # Write-to-unsupported-target helpers
+    # ========================================================================
+    #
+    # These helpers underpin TC-IDM-3.2 steps 2 and 3, which exercise the
+    # DUT's error responses by deliberately writing to a cluster or
+    # attribute the DUT does not host. The target is intentionally absent
+    # from the device. The *value* on the wire is irrelevant; the helper
+    # only needs to put any valid TLV on the wire so the WriteRequest
+    # leaves the host and the DUT gets a chance to reply with
+    # UNSUPPORTED_CLUSTER / UNSUPPORTED_ATTRIBUTE.
+    #
+    # That last part is where the original bug bit: an earlier version of
+    # the helper passed the bare ClusterAttributeDescriptor *class* to
+    # write_single_attribute. For Optional[T] attributes, that meant the
+    # controller serialized the class-level dataclass default value=None,
+    # which produced an empty TLV. The C++ TLVWriter::CopyElement then
+    # rejected the empty reader with CHIP_ERROR_INCORRECT_STATE locally,
+    # before the WriteRequest ever reached the DUT. Tests then failed with
+    # a misleading "Incorrect state" error instead of the UNSUPPORTED_*
+    # status the spec requires the DUT to return.
+    #
+    # _try_write_with_fallback_values fixes that by always instantiating
+    # the attribute with a real value, trying (NullValue, 0, "", b"") in
+    # order:
+    #   - NullValue covers spec-nullable attributes (Union[Nullable, T]);
+    #     the encoder writes a proper Null TLV element.
+    #   - 0 / "" / b"" cover plain scalar shapes (uint, int, char-string,
+    #     octet-string), including conformance-optional attributes that
+    #     are Optional[T] in Python but NOT spec-nullable (e.g.
+    #     BooleanStateConfiguration.CurrentSensitivityLevel, which is
+    #     Optional[uint] because it's feature-gated on SENSLVL).
+    # Shapes we still can't encode with these dummies (lists, structs,
+    # enums without a zero member, etc.) raise ValueError/TypeError and
+    # are skipped; the caller moves on to the next candidate.
+    _WRITE_FALLBACK_VALUES = (NullValue, 0, "", b"")
+
+    async def _try_write_with_fallback_values(
+        self,
+        endpoint_id: int,
+        attr_class: type[ClusterObjects.ClusterAttributeDescriptor],
+    ) -> Optional[Status]:
+        """
+        Attempts to write `attr_class` on `endpoint_id` using a small set
+        of dummy values. Returns the resulting Status, or None if no value
+        could be serialized for this attribute type.
+        """
+        for test_value in self._WRITE_FALLBACK_VALUES:
+            try:
+                return await self.write_single_attribute(
+                    attribute_value=attr_class(test_value),
+                    endpoint_id=endpoint_id,
+                    expect_success=False,
+                )
+            except (TypeError, ValueError) as e:
+                log.info(
+                    "Attribute %s not serializable with test value %r (%s): %s",
+                    attr_class, test_value, type(e).__name__, e,
+                )
+        return None
+
+    async def write_unsupported_cluster(self, endpoint_id: int = ROOT_NODE_ENDPOINT_ID):
+        """Find a standard cluster the DUT does not host on any endpoint and
+        attempt a write to one of its attributes on `endpoint_id`.
+
+        Asserts that the DUT returns UNSUPPORTED_CLUSTER. Skips the calling
+        step if no unsupported standard cluster exists, or if no attribute
+        on the chosen cluster can be encoded with the fallback value set.
+        """
+        supported_cluster_ids = set()
+        for endpoint_clusters in self.endpoints.values():
+            supported_cluster_ids.update({
+                cluster.id for cluster in endpoint_clusters
+                if global_attribute_ids.cluster_id_type(cluster.id) == global_attribute_ids.ClusterIdType.kStandard
+            })
+
+        all_standard_cluster_ids = {
+            cluster_id for cluster_id in ClusterObjects.ALL_CLUSTERS
+            if global_attribute_ids.cluster_id_type(cluster_id) == global_attribute_ids.ClusterIdType.kStandard
+        }
+
+        unsupported_cluster_ids = all_standard_cluster_ids - supported_cluster_ids
+        if not unsupported_cluster_ids:
+            self.skip_step("No unsupported standard clusters found to test")
+            return
+
+        # Sort so iteration order is reproducible across runs (set
+        # iteration is hash-based and varies between processes). Walk every
+        # unsupported cluster, not just the first, so the step doesn't skip
+        # when the first cluster happens to expose only complex types
+        # (lists, structs, etc.) that the fallback values can't encode.
+        for unsupported_cluster_id in sorted(unsupported_cluster_ids):
+            cluster_attributes = ClusterObjects.ALL_ATTRIBUTES[unsupported_cluster_id]
+            for attr_id in sorted(cluster_attributes.keys()):
+                attr_class = cluster_attributes[attr_id]
+                write_status = await self._try_write_with_fallback_values(
+                    endpoint_id=endpoint_id, attr_class=attr_class,
+                )
+                if write_status is None:
+                    continue
+                log.info(
+                    "Wrote unsupported cluster: cluster_id=0x%04X, attribute=%s, endpoint_id=%s, status=%s",
+                    unsupported_cluster_id, attr_class.__name__, endpoint_id, write_status,
+                )
+                asserts.assert_equal(
+                    write_status, Status.UnsupportedCluster,
+                    f"Write to unsupported cluster should return UNSUPPORTED_CLUSTER, got {write_status}",
+                )
+                return
+
+        self.skip_step("No attribute on any unsupported standard cluster could be encoded with fallback values")
+
+    async def write_unsupported_attribute(self):
+        """
+        Find a (endpoint, cluster, attribute) where the attribute is in
+        the spec but missing from the DUT's AttributeList, write to it, and
+        assert that the DUT returns UNSUPPORTED_ATTRIBUTE.
+
+        Skips the calling step if no candidate attribute can be encoded.
+        """
+        candidates: list[tuple[int, int, type[ClusterObjects.ClusterAttributeDescriptor]]] = []
+        for endpoint_id, endpoint in self.endpoints.items():
+            for cluster_type, cluster_data in endpoint.items():
+                if global_attribute_ids.cluster_id_type(cluster_type.id) != global_attribute_ids.ClusterIdType.kStandard:
+                    continue
+
+                all_attrs = set(ClusterObjects.ALL_ATTRIBUTES[cluster_type.id].keys())
+                # AttributeList (0xFFFB) is a mandatory global attribute. If
+                # it's missing from the wildcard read, that's a DUT defect we
+                # want to surface as a KeyError rather than silently treat as
+                # "this cluster has no attributes".
+                dut_attrs = set(cluster_data[cluster_type.Attributes.AttributeList])
+
+                # Sort by attribute id so the candidate order is reproducible
+                # across runs (set difference iteration is hash-based).
+                for attr_id in sorted(all_attrs - dut_attrs):
+                    if global_attribute_ids.attribute_id_type(attr_id) == global_attribute_ids.AttributeIdType.kStandardNonGlobal:
+                        candidates.append(
+                            (endpoint_id, cluster_type.id, ClusterObjects.ALL_ATTRIBUTES[cluster_type.id][attr_id])
+                        )
+
+        for endpoint_id, cluster_id, candidate_attr in candidates:
+            write_status = await self._try_write_with_fallback_values(
+                endpoint_id=endpoint_id, attr_class=candidate_attr,
+            )
+            if write_status is None:
+                continue
+            log.info(
+                "Wrote unsupported attribute: %s, cluster_id=0x%04X, endpoint_id=%s, status=%s",
+                candidate_attr.__name__, cluster_id, endpoint_id, write_status,
+            )
+            asserts.assert_equal(
+                write_status, Status.UnsupportedAttribute,
+                f"Write to unsupported attribute should return UNSUPPORTED_ATTRIBUTE, got {write_status}",
+            )
+            return
+
+        self.skip_step("No serializable unsupported attribute found to test")
 
     async def read_repeat_attribute(self, endpoint, cluster, attribute, repeat_count):
         """Read the same attribute multiple times and verify consistency.
@@ -609,7 +922,7 @@ class IDMBaseTest(MatterBaseTest):
                 asserts.assert_equal(first_attr_value, current_attr_value,
                                      f"Read {i} returned different value than first read")
 
-        log.info(f"Successfully completed {repeat_count} consistent reads of {attribute}")
+        log.info("Successfully completed %s consistent reads of %s", repeat_count, attribute)
         return results
 
     async def read_data_version_filter(self, endpoint, cluster, attribute, test_value=None):
@@ -703,7 +1016,7 @@ class IDMBaseTest(MatterBaseTest):
             await self.default_controller.WriteAttribute(
                 self.dut_node_id,
                 [(endpoint, Clusters.AccessControl.Attributes.Acl(dut_acl))])
-            log.info(f"Granted TH2 View access to only cluster {cluster_id}")
+            log.info("Granted TH2 View access to only cluster %s", cluster_id)
 
             # Use TH2 to read ALL attributes from ALL clusters at the endpoint
             read_request = await TH2.Read(
@@ -716,7 +1029,7 @@ class IDMBaseTest(MatterBaseTest):
 
             # Verify only the allowed cluster is returned
             returned_clusters = list(read_request.attributes[endpoint].keys())
-            log.info(f"Clusters returned with limited access (TH2): {[c.id for c in returned_clusters]}")
+            log.info("Clusters returned with limited access (TH2): %s", [c.id for c in returned_clusters])
 
             # The allowed cluster should be present
             allowed_cluster_obj = None
@@ -742,7 +1055,7 @@ class IDMBaseTest(MatterBaseTest):
                     [(endpoint, Clusters.AccessControl.Attributes.Acl(dut_acl_original))])
                 log.info("Restored original ACL")
             except Exception as e:
-                log.error(f"Failed to restore original ACL: {e}")
+                log.error("Failed to restore original ACL: %s", e)
 
             # Removes TH2 controller
             TH2.Shutdown()
@@ -957,7 +1270,7 @@ class IDMBaseTest(MatterBaseTest):
 
                 cluster_data = self.endpoints_tlv[endpoint_id][cluster_id]
                 writable_attr_ids = self.get_writable_attributes_for_cluster(cluster_id, cluster_data)
-                log.info(f'Writable attributes for cluster {cluster_id}: {writable_attr_ids}')
+                log.info('Writable attributes for cluster %s: %s', cluster_id, writable_attr_ids)
 
                 if not writable_attr_ids:
                     continue
@@ -984,7 +1297,7 @@ class IDMBaseTest(MatterBaseTest):
                         Clusters.BasicInformation.Attributes.Location,
                     ]
                     if attribute in ATTRIBUTES_WITH_WRITE_CONSTRAINTS:
-                        log.debug(f"{test_step}: Skipping {attribute.__name__} - known to have write constraints")
+                        log.debug("%s: Skipping %s - known to have write constraints", test_step, attribute.__name__)
                         continue
 
                     # Get current value from priming data
@@ -1008,8 +1321,7 @@ class IDMBaseTest(MatterBaseTest):
                         # List attribute - toggle between empty and non-empty to ensure actual change
                         if len(cached_val) == 0:
                             # Skip empty lists - writing a valid non-empty list requires XML spec knowledge to write valid data, this is outside the bounds of the IDM tests, and is covered by ACE tests
-                            log.info(
-                                f"{test_step}: Skipping {attribute.__name__} - empty list")
+                            log.info("%s: Skipping %s - empty list", test_step, attribute.__name__)
                             continue
                         # Non-empty list -> write empty list (safe change)
                         new_val = []
@@ -1032,11 +1344,11 @@ class IDMBaseTest(MatterBaseTest):
                     else:
                         # For other types, skip to avoid writing same value
                         # Writing the same value should NOT trigger a report
-                        log.info(f"{test_step}: Skipping {attribute.__name__} - unsupported type for change")
+                        log.info("%s: Skipping %s - unsupported type for change", test_step, attribute.__name__)
                         continue
 
                     # Write the attribute
-                    log.info(f"{test_step}: Writing {attribute.__name__} on EP{endpoint_id}: {cached_val} -> {new_val}")
+                    log.info("%s: Writing %s on EP%s: %s -> %s", test_step, attribute.__name__, endpoint_id, cached_val, new_val)
                     resp = await self.default_controller.WriteAttribute(
                         nodeId=self.dut_node_id,
                         attributes=[(endpoint_id, attribute(new_val))]
@@ -1044,8 +1356,9 @@ class IDMBaseTest(MatterBaseTest):
 
                     if resp[0].Status == Status.Success:
                         changed_count += 1
-                        log.info(
-                            f"{test_step}: [{changed_count}] Changed {attribute.__name__} (0x{attribute_id:04X}) on endpoint {endpoint_id}, cluster 0x{cluster_id:04X}: {cached_val} -> {new_val}")
+                        log.info("%s: [%s] Changed %s (0x%04X) on endpoint %s, cluster 0x%04X: %s -> %s",
+                                 test_step, changed_count, attribute.__name__, attribute_id, endpoint_id, cluster_id, cached_val,
+                                 new_val)
 
                         # Track this change for verification
                         changed_attributes.append(ChangedAttribute(
@@ -1062,7 +1375,7 @@ class IDMBaseTest(MatterBaseTest):
                     else:
                         # Other errors are acceptable per TC_AccessChecker pattern
                         # (e.g., InvalidValue, ConstraintError - as long as it's not UnsupportedAccess)
-                        log.info(f"{test_step}: Write to {attribute.__name__} returned {resp[0].Status}")
+                        log.info("%s: Write to %s returned %s", test_step, attribute.__name__, resp[0].Status)
 
         # Wait for change reports to arrive
         # Wait in small increments, checking periodically
@@ -1079,7 +1392,7 @@ class IDMBaseTest(MatterBaseTest):
             elif current_reports == changed_count:
                 break
             else:
-                log.debug(f"{test_step}: {count}s elapsed, {current_reports} unique attributes reported (no change)")
+                log.debug("%s: %ss elapsed, %s unique attributes reported (no change)", test_step, count, current_reports)
 
         # Verify that we received reports for all the changed attributes we wrote to
         verified_count = 0
@@ -1094,16 +1407,16 @@ class IDMBaseTest(MatterBaseTest):
             if handler.was_attribute_reported(ep, cluster, attr):
                 verified_count += 1
                 reports_count = handler.get_attribute_report_count(ep, cluster, attr)
-                log.info(f"Reports count for {cluster.__name__} on endpoint {ep}: {reports_count}")
+                log.info("Reports count for %s on endpoint %s: %s", cluster.__name__, ep, reports_count)
             else:
                 missing_reports.append(f"{attr.__name__} on endpoint {ep}")
 
-        log.info(
-            f"{test_step}: Verified {verified_count}/{len(changed_attributes)} attribute change reports received")
+        log.info("%s: Verified %s/%s attribute change reports received",
+                 test_step, verified_count, len(changed_attributes))
 
         # Report summary of all attributes that received reports
         all_reported = handler.get_all_reported_attributes()
-        log.info(f"{test_step}: Total unique attributes with reports: {len(all_reported)}")
+        log.info("%s: Total unique attributes with reports: %s", test_step, len(all_reported))
 
         asserts.assert_less_equal(
             len(missing_reports), 0,
