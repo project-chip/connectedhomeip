@@ -2,17 +2,24 @@ name: MediaTek Genio MT7933
 
 on:
   push:
-    branches: [ master ]
+    branches: 
+      - master
+      - mtk-1.5-filogic
   pull_request:
-    branches: [ master ]
-  workflow_dispatch: # 讓您可以在 GitHub 網頁上手動點擊執行測試
+    branches: 
+      - master
+      - mtk-1.5-filogic
+  workflow_dispatch:
 
 jobs:
   build_mt7933:
     runs-on: ubuntu-latest
     
     container:
-      image: ghcr.io/project-chip/chip-build-mt793x:latest
+      image: ghcr.io/project-chip/chip-build:latest
+
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
     steps:
       - name: Checkout code
@@ -20,14 +27,11 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Bootstrap the build system
-        run: |
-          ./scripts/checkout_submodules.py --platform genio
-          source scripts/activate.sh
-
       - name: Build MT7933 Lighting App
         run: |
-          ./scripts/examples/gn_build_example.sh examples/lighting-app/genio out/lighting-app
+          ./scripts/checkout_submodules.py --platform mt793x
+          source scripts/activate.sh
+          ./scripts/examples/gn_build_example.sh examples/lighting-app/mt793x out/lighting-app
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
