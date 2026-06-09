@@ -66,12 +66,6 @@ logger = logging.getLogger(__name__)
 # Commissioning Proxy cluster is registered on endpoint 1 in the reference app.
 COMPRO_ENDPOINT = 1
 
-# CapabilitiesBitmap bit 4 (NTL transport) is defined in the spec but is not yet
-# present in the generated CapabilitiesBitmap enum, so reference it by value.
-# Defined transport bits per the CommissioningProxy cluster spec:
-#   bit 1 = BLE, bit 3 = WiFiPAF, bit 4 = NTL.  Bits 0, 2 and 5-7 are reserved.
-CAPABILITIES_NTL_BIT = 0x10
-
 # Default node ID assigned by the Matter test framework (TestingDefaults.DUT_NODE_ID).
 _DEFAULT_DUT_NODE_ID = 0x12344321
 
@@ -531,12 +525,11 @@ class COMPROBaseTest(MatterBaseTest):
 
         Per the CommissioningProxy cluster spec this is BLE (bit 1), WiFiPAF
         (bit 3) and NTL (bit 4).  All other bits (0, 2 and 5-7) are reserved.
-        NTL is referenced by value because it is not yet in the generated enum.
         """
         cp = Clusters.CommissioningProxy
         return (int(cp.Bitmaps.CapabilitiesBitmap.kBle) |
                 int(cp.Bitmaps.CapabilitiesBitmap.kWiFiPAF) |
-                CAPABILITIES_NTL_BIT)
+                int(cp.Bitmaps.CapabilitiesBitmap.kNtl))
 
     def assert_transport_value_valid(self, transport: int) -> None:
         """Assert a CapabilitiesBitmap value has at least one defined transport
