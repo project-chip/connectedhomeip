@@ -79,6 +79,7 @@ class HostCryptoLibrary(Enum):
     OPENSSL = auto()
     MBEDTLS = auto()
     BORINGSSL = auto()
+    PSA = auto()
 
     @property
     def gn_argument(self):
@@ -88,6 +89,10 @@ class HostCryptoLibrary(Enum):
             return 'chip_crypto="mbedtls"'
         if self == HostCryptoLibrary.BORINGSSL:
             return 'chip_crypto="boringssl"'
+        if self == HostCryptoLibrary.PSA:
+            # The vendored mbedTLS (2.28) has no multi-part PSA AEAD, so use the
+            # one-shot implementation (as ESP32 does).
+            return 'chip_crypto="psa" chip_crypto_psa_aead_single_part=true'
         raise ValueError("Unknown host crypto library: %r" % self)
 
 
@@ -332,7 +337,7 @@ class HostApp(Enum):
             yield 'chip-ota-requestor-app'
             yield 'chip-ota-requestor-app.map'
         elif self == HostApp.PYTHON_BINDINGS:
-            yield 'controller/python'  # Directory containing WHL files
+            yield 'obj/src/controller/python/matter-controller-wheels'
         elif self == HostApp.EFR32_TEST_RUNNER:
             yield 'chip_pw_test_runner_wheels'
         elif self == HostApp.TV_CASTING:
@@ -694,7 +699,7 @@ class HostBuilder(GnBuilder):
         elif app == HostApp.PYTHON_BINDINGS:
             self.extra_gn_options.append('enable_rtti=false')
             self.extra_gn_options.append('chip_project_config_include_dirs=["//config/python"]')
-            self.build_command = 'matter-repl'
+            self.build_command = 'python_wheels'
 
         if self.app == HostApp.SIMULATED_APP1:
             self.extra_gn_options.append('chip_tests_zap_config="app1"')

@@ -130,10 +130,10 @@ class TC_ICDB_1_2(ICDBaseTest):
         active_mode_threshold_ms = await self.read_icdm_attribute_expect_success(attributes.ActiveModeThreshold)
         user_active_mode_trigger_hint = await self.read_icdm_attribute_expect_success(attributes.UserActiveModeTriggerHint)
         user_active_mode_trigger_instruction = await self.read_icdm_attribute_expect_success(attributes.UserActiveModeTriggerInstruction)
-        log.info(f"ActiveModeDuration: {active_mode_duration_ms}ms")
-        log.info(f"ActiveModeThreshold: {active_mode_threshold_ms}ms")
-        log.info(f"UserActiveModeTriggerHint: 0x{user_active_mode_trigger_hint:08X}")
-        log.info(f"UserActiveModeTriggerInstruction: {user_active_mode_trigger_instruction}")
+        log.info("ActiveModeDuration: %sms", active_mode_duration_ms)
+        log.info("ActiveModeThreshold: %sms", active_mode_threshold_ms)
+        log.info("UserActiveModeTriggerHint: 0x%08X", user_active_mode_trigger_hint)
+        log.info("UserActiveModeTriggerInstruction: %s", user_active_mode_trigger_instruction)
 
         # *** STEP 3 ***
         # TH sends RegisterClient command with parameters: CheckInNodeID: <th_node_id>, MonitoredSubject: <th_node_id>,
@@ -150,7 +150,7 @@ class TC_ICDB_1_2(ICDBaseTest):
             asserts.assert_fail(f"Unexpected error returned when registering client: {e}, command: {cmd}")
 
         icd_counter_at_registration = response.ICDCounter
-        log.info(f"RegisterClient response ICDCounter: {icd_counter_at_registration}")
+        log.info("RegisterClient response ICDCounter: %s", icd_counter_at_registration)
 
         # *** STEP 4 ***
         # Wait for DUT to transition to Idle Mode, then use UAT hint/instructions to transition DUT from Idle Mode to Active Mode.
@@ -171,7 +171,7 @@ class TC_ICDB_1_2(ICDBaseTest):
         for i, bit in enumerate(hints_to_test, start=1):
             # Get current hint name
             bit_name = uat_bit_name(bit)
-            log.info(f"UAT hint {i}/{len(hints_to_test)}: {bit_name}...")
+            log.info("UAT hint %s/%s: %s...", i, len(hints_to_test), bit_name)
 
             # For the first hint, we don’t need to wait for the DUT to transition back to Idle Mode
             # because it’s already in Idle Mode from the previous step. For hints after the first,
@@ -185,7 +185,7 @@ class TC_ICDB_1_2(ICDBaseTest):
                 # arrives and triggers a transition from Idle Mode to Active Mode (which sends the check-in)
                 # NOTE: This wait value was derived empirically; it was enough for GitHub CI to pass reliably
                 # given the CI environment and the hardware used for the app + controller.
-                log.info(f"Waiting {MAX_CI_IDLE_CYCLE_WAIT_S}s for lit-icd-app to fully settle into Idle Mode...")
+                log.info("Waiting %ss for lit-icd-app to fully settle into Idle Mode...", MAX_CI_IDLE_CYCLE_WAIT_S)
                 await asyncio.sleep(MAX_CI_IDLE_CYCLE_WAIT_S)
 
                 # Send AddActiveModeReq event trigger to transition lit-icd-app from Idle Mode to Active Mode
@@ -201,14 +201,14 @@ class TC_ICDB_1_2(ICDBaseTest):
 
             # Verify the ICDCounter value increased
             current_icd_counter = await self.read_icdm_attribute_expect_success(attributes.ICDCounter)
-            log.info(f"ICDCounter after '{bit_name}': {current_icd_counter} (was {previous_icd_counter})")
+            log.info("ICDCounter after '%s': %s (was %s)", bit_name, current_icd_counter, previous_icd_counter)
             asserts.assert_greater(current_icd_counter, previous_icd_counter,
                                    f"ICDCounter should have incremented after '{bit_name}'. Previous: {previous_icd_counter}, Current: {current_icd_counter}")
 
             # Verify the ActiveModeThreshold value is unchanged
             current_active_mode_threshold_ms = await self.read_icdm_attribute_expect_success(attributes.ActiveModeThreshold)
             log.info(
-                f"ActiveModeThreshold after '{bit_name}': {current_active_mode_threshold_ms}ms (expected {active_mode_threshold_ms}ms)")
+                "ActiveModeThreshold after '%s': %sms (expected %sms)", bit_name, current_active_mode_threshold_ms, active_mode_threshold_ms)
             asserts.assert_equal(current_active_mode_threshold_ms, active_mode_threshold_ms,
                                  f"ActiveModeThreshold value must be unchanged but changed after '{bit_name}'. Expected: {active_mode_threshold_ms}ms, Current: {current_active_mode_threshold_ms}ms")
 
