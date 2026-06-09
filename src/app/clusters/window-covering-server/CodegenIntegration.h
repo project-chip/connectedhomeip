@@ -70,6 +70,9 @@ chip::BitMask<SafetyStatus> SafetyStatusGet(chip::EndpointId endpoint);
 void LiftPositionSet(chip::EndpointId endpoint, NPercent100ths position);
 void TiltPositionSet(chip::EndpointId endpoint, NPercent100ths position);
 
+uint16_t Percent100thsToLift(chip::EndpointId endpoint, uint16_t percent100ths);
+uint16_t Percent100thsToTilt(chip::EndpointId endpoint, uint16_t percent100ths);
+
 /**
  * @brief PostAttributeChange is called when an Attribute is modified.
  *

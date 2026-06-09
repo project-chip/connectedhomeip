@@ -85,26 +85,9 @@ public:
     public:
         Config() = default;
 
-        Config & WithLift()
+        Config & WithFeatures(BitFlags<Feature> features)
         {
-            mFeatures.Set(Feature::kLift);
-            return *this;
-        }
-        Config & WithTilt()
-        {
-            mFeatures.Set(Feature::kTilt);
-            return *this;
-        }
-        Config & WithPositionAwareLift()
-        {
-            mFeatures.Set(Feature::kLift);
-            mFeatures.Set(Feature::kPositionAwareLift);
-            return *this;
-        }
-        Config & WithPositionAwareTilt()
-        {
-            mFeatures.Set(Feature::kTilt);
-            mFeatures.Set(Feature::kPositionAwareTilt);
+            mFeatures = features;
             return *this;
         }
 
@@ -243,13 +226,11 @@ OperationalState ComputeOperationalState(NPercent100ths target, NPercent100ths c
 Percent100ths ComputePercent100thsStep(OperationalState direction, Percent100ths previous, Percent100ths delta);
 
 uint16_t Percent100thsToValue(AbsoluteLimits limits, Percent100ths relative);
-Percent100ths ValueToPercent100ths(AbsoluteLimits limits, uint16_t absolute);
+uint16_t ValueToPercent100ths(AbsoluteLimits limits, uint16_t absolute);
 
 uint16_t LiftToPercent100ths(chip::EndpointId endpoint, uint16_t lift);
-uint16_t Percent100thsToLift(chip::EndpointId endpoint, uint16_t percent100ths);
 
 uint16_t TiltToPercent100ths(chip::EndpointId endpoint, uint16_t tilt);
-uint16_t Percent100thsToTilt(chip::EndpointId endpoint, uint16_t percent100ths);
 
 } // namespace WindowCovering
 } // namespace Clusters

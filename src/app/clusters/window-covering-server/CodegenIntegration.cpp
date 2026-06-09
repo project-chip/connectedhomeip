@@ -90,24 +90,7 @@ public:
         }
 
         WindowCoveringCluster::Config config;
-        if (features.Has(Feature::kPositionAwareLift))
-        {
-            config.WithPositionAwareLift();
-        }
-        else if (features.Has(Feature::kLift))
-        {
-            config.WithLift();
-        }
-        if (features.Has(Feature::kPositionAwareTilt))
-        {
-            config.WithPositionAwareTilt();
-        }
-        else if (features.Has(Feature::kTilt))
-        {
-            config.WithTilt();
-        }
-
-        config.WithOptionalAttributes(optionalAttributes);
+        config.WithFeatures(features).WithOptionalAttributes(optionalAttributes);
         gServers[clusterInstanceIndex].Create(endpointId, config);
 
         auto & cluster = gServers[clusterInstanceIndex].Cluster();
