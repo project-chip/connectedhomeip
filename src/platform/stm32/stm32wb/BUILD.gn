@@ -53,8 +53,6 @@ static_library("stm32wb") {
     "InetPlatformConfig.h",
     "KeyValueStoreManagerImpl.cpp",
     "KeyValueStoreManagerImpl.h",
-    "OTAImageProcessorImpl.cpp",
-    "OTAImageProcessorImpl.h",
     "PlatformManagerImpl.cpp",
     "PlatformManagerImpl.h",
     "STM32Config.cpp",

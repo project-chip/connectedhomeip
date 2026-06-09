@@ -69,10 +69,11 @@ class stm32Builder(GnBuilder):
         self.app = app
 
         stm32_chip = self.board.GetIC()
-        self.extra_gn_options = [' stm32_ic_family="%s"' % stm32_chip]
-
-        self.extra_gn_options = ['chip_config_network_layer_ble=true']
-        self.extra_gn_options.append('treat_warnings_as_errors=false')
+        self.extra_gn_options = [
+            'stm32_board="%s"' % stm32_chip,
+            'chip_config_network_layer_ble=true',
+            'treat_warnings_as_errors=false',
+            ]
 
     def GnBuildArgs(self):
         args = super().GnBuildArgs()
