@@ -686,9 +686,11 @@ private:
 
             mServer->GetCommissioningWindowManager().OnFabricRemoved(fabricIndex);
 
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
             // Clear any cached Joint Fabric VID-verification state tied to the removed fabric so it
             // cannot be honored for a different fabric that later reuses this FabricIndex.
             mServer->GetJointFabricAdministrator().OnFabricRemoved(fabricIndex);
+#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
         }
 
         void OnFabricUpdated(const FabricTable & fabricTable, chip::FabricIndex fabricIndex) override

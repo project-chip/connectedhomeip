@@ -54,10 +54,9 @@ public:
     void SetVidVerificationForFabric(chip::FabricIndex fabricIndex) { mVidVerificationFabricIndex = fabricIndex; }
     void ClearVidVerificationForFabric() { mVidVerificationFabricIndex.reset(); }
 
-    // Clear the cached VID-verification state when its fabric is removed. The flag is RAM-only and is
-    // otherwise only cleared on Announce/failsafe expiry, so without this a removed fabric's
-    // "VID-verified" state would survive and could be honored for a different fabric that later reuses
-    // the freed FabricIndex. Wired in from FabricTable::Delegate::OnFabricRemoved.
+    /**
+     * Clear cached VID-verification state when its fabric is removed.
+     */
     void OnFabricRemoved(chip::FabricIndex removedFabricIndex)
     {
         if (mVidVerificationFabricIndex.has_value() && (mVidVerificationFabricIndex.value() == removedFabricIndex))
