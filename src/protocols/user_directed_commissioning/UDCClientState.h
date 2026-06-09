@@ -230,9 +230,9 @@ private:
     char mPairingInst[chip::Dnssd::kMaxPairingInstructionLen + 1]     = {};
     uint16_t mPairingHint                                             = 0;
 
-    constexpr static size_t kMaxTargetAppInfos = CHIP_DEVICE_CONFIG_UDC_MAX_TARGET_APPS;
-    uint8_t mNumTargetAppInfos                 = 0; // number of vendor Ids
-    TargetAppInfo mTargetAppInfos[kMaxTargetAppInfos]                 = {};
+    constexpr static size_t kMaxTargetAppInfos        = CHIP_DEVICE_CONFIG_UDC_MAX_TARGET_APPS;
+    uint8_t mNumTargetAppInfos                        = 0; // number of vendor Ids
+    TargetAppInfo mTargetAppInfos[kMaxTargetAppInfos] = {};
 
     bool mNoPasscode                = false;
     bool mCdUponPasscodeDialog      = false;
