@@ -117,9 +117,10 @@ source_set("libopenthread-rw61x") {
   ]
 
   cflags = [
-# avoid defined but not used error like for static void otPlatLogImpl
+    # avoid defined but not used error like for static void otPlatLogImpl
     "-Wno-unused-function",
-# avoid ot-nxp debug_cli.c error due to type format
+
+    # avoid ot-nxp debug_cli.c error due to type format
     "-Wno-error=format",
   ]
 
@@ -191,10 +192,9 @@ source_set("libopenthread-rw61x") {
 
   defines += [ "OT_PLAT_SPINEL_OVER_HDLC" ]
   deps += [ "${openthread_root}:libopenthread-radio-spinel" ]
-  if(chip_openthread_ftd){
+  if (chip_openthread_ftd) {
     public_configs += [ "${openthread_root}:openthread_ftd_config" ]
-  }
-  else{
+  } else {
     public_configs += [ "${openthread_root}:openthread_mtd_config" ]
   }
 }

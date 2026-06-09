@@ -115,9 +115,10 @@ source_set("libopenthread-rt1170") {
   ]
 
   cflags = [
-# avoid defined but not used error like for static void otPlatLogImpl
+    # avoid defined but not used error like for static void otPlatLogImpl
     "-Wno-unused-function",
-# avoid ot-nxp debug_cli.c error due to type format
+
+    # avoid ot-nxp debug_cli.c error due to type format
     "-Wno-error=format",
   ]
 
@@ -161,7 +162,7 @@ source_set("libopenthread-rt1170") {
     sources += [ "${openthread_nxp_root}/src/common/flash_nvs.c" ]
   }
 
-  defines = [ ]
+  defines = []
 
   if (nxp_ot_spinel_interface_link == "hci_spinel_single_uart") {
     defines += [ "OT_PLAT_SPINEL_HCI_OVER_HDLC" ]
@@ -181,10 +182,9 @@ source_set("libopenthread-rt1170") {
     "../../..:libopenthread-platform-utils",
   ]
   deps += [ "${openthread_root}:libopenthread-radio-spinel" ]
-  if(chip_openthread_ftd){
+  if (chip_openthread_ftd) {
     public_configs += [ "${openthread_root}:openthread_ftd_config" ]
-  }
-  else{
+  } else {
     public_configs += [ "${openthread_root}:openthread_mtd_config" ]
   }
 
