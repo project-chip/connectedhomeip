@@ -21,7 +21,6 @@
 #include <app/clusters/proximity-ranging-server/ProximityRangingDriver.h>
 #include <devices/interface/SingleEndpointDevice.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
-#include <lib/support/BitMask.h>
 #include <lib/support/TimerDelegate.h>
 
 namespace chip {
@@ -48,8 +47,12 @@ public:
      */
     static Clusters::ProximityRanging::ProximityRangingDriver & GetRangingDriver();
 
-    ProximityRangerDevice(TimerDelegate & timerDelegate, PersistentStorageDelegate & storage,
-                          BitMask<Clusters::ProximityRanging::Feature> features);
+    /**
+     * The cluster's feature map is derived from the fixed adapter set in
+     * Register() (one feature bit per technology the adapters expose), so
+     * the caller does not pass features in.
+     */
+    ProximityRangerDevice(TimerDelegate & timerDelegate, PersistentStorageDelegate & storage);
     ~ProximityRangerDevice() override = default;
 
     CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
@@ -58,8 +61,6 @@ public:
 
 private:
     TimerDelegate & mTimerDelegate;
-
-    BitMask<Clusters::ProximityRanging::Feature> mFeatures;
 
     LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;
     LazyRegisteredServerCluster<Clusters::ProximityRanging::ProximityRangingCluster> mProximityRangingCluster;

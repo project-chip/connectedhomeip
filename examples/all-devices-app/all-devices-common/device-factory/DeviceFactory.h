@@ -239,14 +239,7 @@ private:
         {
             RegisterCreator("proximity-ranger", [this]() {
                 VerifyOrDie(mContext.has_value());
-                // Feature map matches the fixed adapter set that
-                // ProximityRangerDevice creates internally.
-                constexpr BitMask<Clusters::ProximityRanging::Feature> kFeatures{
-                    Clusters::ProximityRanging::Feature::kBleBeaconRssi,
-                    Clusters::ProximityRanging::Feature::kWiFiUsdProximityDetection,
-                    Clusters::ProximityRanging::Feature::kBluetoothChannelSounding,
-                };
-                return std::make_unique<ProximityRangerDevice>(mContext->timerDelegate, mContext->storageDelegate, kFeatures);
+                return std::make_unique<ProximityRangerDevice>(mContext->timerDelegate, mContext->storageDelegate);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_POWER_SOURCE)
