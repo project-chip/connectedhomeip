@@ -45,7 +45,15 @@ namespace JCM {
 class DLL_EXPORT VendorIdVerificationClient
 {
 public:
+    VendorIdVerificationClient()          = default;
     virtual ~VendorIdVerificationClient() = default;
+
+    // We forbid moving or copying because they could cause old GuardWithLiveness callbacks to execute with a stale `this`.
+    // VendorIdVerificationClients are not currently copied or moved, but this is a good defensive change.
+    VendorIdVerificationClient(const VendorIdVerificationClient &)             = delete;
+    VendorIdVerificationClient & operator=(const VendorIdVerificationClient &) = delete;
+    VendorIdVerificationClient(VendorIdVerificationClient &&)                  = delete;
+    VendorIdVerificationClient & operator=(VendorIdVerificationClient &&)      = delete;
 
     // Used to obtain SessionHandles from VerifyVendorId callers. SessionHandles cannot be stored, so we must retrieve them
     // dynamically with a callback.
