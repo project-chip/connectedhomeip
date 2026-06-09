@@ -379,8 +379,7 @@ class AttributeChangeAccumulator:
             result = _ActionResult(status=_ActionStatus.SUCCESS, response=path.AttributeType(data))
 
             item = _AttributeSubscriptionCallbackResult(self._name, path, result)
-            LOGGER.debug(
-                f'Got subscription report on client {self.name} for {path.AttributeType}: {data}')
+            LOGGER.debug('Got subscription report on client %s for %s: %s', self.name, path.AttributeType, data)
             self._output_queue.put(item)
 
     @property
@@ -401,7 +400,7 @@ class EventChangeAccumulator:
             result = _ActionResult(status=_ActionStatus.SUCCESS, response=event_response)
 
             item = _EventSubscriptionCallbackResult(self._name, result)
-            LOGGER.debug(f'Got subscription report on client {self.name}')
+            LOGGER.debug('Got subscription report on client %s', self.name)
             self._output_queue.put(item)
 
     @property
@@ -714,7 +713,7 @@ class DiscoveryCommandAction(BaseAction):
             filterType=self.filterType, filter=self.filter, stopOnFirst=True, timeoutSecond=5)
 
         # Devices will be a list: [CommissionableNode(), ...]
-        LOGGER.info("Discovered devices: %r" % devices)
+        LOGGER.info("Discovered devices: %r", devices)
 
         if not devices:
             LOGGER.error("No devices found")
@@ -833,7 +832,7 @@ class ReplTestRunner:
         try:
             return DefaultPseudoCluster(test_step)
         except ActionCreationError as e:
-            LOGGER.warning(f"Failed to create default pseudo cluster: {e}")
+            LOGGER.warning("Failed to create default pseudo cluster: %s", e)
             return None
 
     def encode(self, request) -> Optional[BaseAction]:
@@ -869,7 +868,7 @@ class ReplTestRunner:
             action = self._default_pseudo_cluster(request)
 
         if action is None:
-            LOGGER.warning(f"Failed to parse {request.label}")
+            LOGGER.warning("Failed to parse %s", request.label)
         return action
 
     def decode(self, result: _ActionResult):

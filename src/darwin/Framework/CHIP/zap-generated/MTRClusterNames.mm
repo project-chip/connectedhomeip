@@ -4469,6 +4469,10 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"OptOutState";
             break;
 
+        case MTRAttributeIDTypeClusterDeviceEnergyManagementAttributePowerRangeAdjustmentID:
+            result = @"PowerRangeAdjustment";
+            break;
+
         case MTRAttributeIDTypeClusterDeviceEnergyManagementAttributeGeneratedCommandListID:
             result = @"GeneratedCommandList";
             break;
@@ -11544,6 +11548,14 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
             result = @"CancelRequest";
             break;
 
+        case MTRCommandIDTypeClusterDeviceEnergyManagementCommandPowerRangeAdjustRequestID:
+            result = @"PowerRangeAdjustRequest";
+            break;
+
+        case MTRCommandIDTypeClusterDeviceEnergyManagementCommandCancelPowerRangeAdjustRequestID:
+            result = @"CancelPowerRangeAdjustRequest";
+            break;
+
         default:
             result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
             break;
@@ -16428,6 +16440,14 @@ NSString * MTREventNameForID(MTRClusterIDType clusterID, MTREventIDType eventID)
 
         case MTREventIDTypeClusterDeviceEnergyManagementEventResumedID:
             result = @"Resumed";
+            break;
+
+        case MTREventIDTypeClusterDeviceEnergyManagementEventPowerRangeAdjustStartID:
+            result = @"PowerRangeAdjustStart";
+            break;
+
+        case MTREventIDTypeClusterDeviceEnergyManagementEventPowerRangeAdjustEndID:
+            result = @"PowerRangeAdjustEnd";
             break;
 
         default:

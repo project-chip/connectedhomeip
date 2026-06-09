@@ -51,6 +51,14 @@
 #include <app/clusters/relative-humidity-measurement-server/CodegenIntegration.h>
 #endif
 
+#if MATTER_DM_FLOW_MEASUREMENT_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+#include <app/clusters/flow-measurement-server/CodegenIntegration.h>
+#endif
+
+#if MATTER_DM_PRESSURE_MEASUREMENT_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+#include <app/clusters/pressure-measurement-server/CodegenIntegration.h>
+#endif
+
 #if MATTER_DM_BOOLEAN_STATE_CONFIGURATION_CLUSTER_SERVER_ENDPOINT_COUNT > 0
 #include <app/clusters/boolean-state-configuration-server/CodegenIntegration.h>
 #endif
@@ -342,6 +350,98 @@ public:
             }
             break;
 #endif // MATTER_DM_RELATIVE_HUMIDITY_MEASUREMENT_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+#if MATTER_DM_FLOW_MEASUREMENT_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+        case FlowMeasurement::Id:
+            switch (path.mAttributeId)
+            {
+            case FlowMeasurement::Attributes::MeasuredValue::Id: {
+                DataModel::Nullable<uint16_t> measuredValue;
+                CHIP_ERROR err = decoder.Decode(measuredValue);
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(Zcl, "[Pw] Failed to decode measuredValue: %" CHIP_ERROR_FORMAT, err.Format());
+                    return ::pw::Status::Internal();
+                }
+
+                err = FlowMeasurement::SetMeasuredValue(path.mEndpointId, measuredValue);
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(Zcl, "[Pw] Failed to set measuredValue: %" CHIP_ERROR_FORMAT, err.Format());
+                    return ::pw::Status::Internal();
+                }
+
+                if (measuredValue.IsNull())
+                {
+                    ChipLogProgress(Zcl, "[Pw] Successfully set measuredValue to null.");
+                }
+                else
+                {
+                    ChipLogProgress(Zcl, "[Pw] Successfully set measuredValue to %u.", measuredValue.Value());
+                }
+                return ::pw::OkStatus();
+            }
+            }
+            break;
+#endif // MATTER_DM_FLOW_MEASUREMENT_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+#if MATTER_DM_PRESSURE_MEASUREMENT_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+        case PressureMeasurement::Id:
+            switch (path.mAttributeId)
+            {
+            case PressureMeasurement::Attributes::MeasuredValue::Id: {
+                DataModel::Nullable<int16_t> measuredValue;
+                CHIP_ERROR err = decoder.Decode(measuredValue);
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(Zcl, "[Pw] Failed to decode measuredValue: %" CHIP_ERROR_FORMAT, err.Format());
+                    return ::pw::Status::Internal();
+                }
+
+                err = PressureMeasurement::SetMeasuredValue(path.mEndpointId, measuredValue);
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(Zcl, "[Pw] Failed to set measuredValue: %" CHIP_ERROR_FORMAT, err.Format());
+                    return ::pw::Status::Internal();
+                }
+
+                if (measuredValue.IsNull())
+                {
+                    ChipLogProgress(Zcl, "[Pw] Successfully set measuredValue to null.");
+                }
+                else
+                {
+                    ChipLogProgress(Zcl, "[Pw] Successfully set measuredValue to %d.", measuredValue.Value());
+                }
+                return ::pw::OkStatus();
+            }
+            case PressureMeasurement::Attributes::ScaledValue::Id: {
+                DataModel::Nullable<int16_t> scaledValue;
+                CHIP_ERROR err = decoder.Decode(scaledValue);
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(Zcl, "[Pw] Failed to decode scaledValue: %" CHIP_ERROR_FORMAT, err.Format());
+                    return ::pw::Status::Internal();
+                }
+
+                err = PressureMeasurement::SetScaledValue(path.mEndpointId, scaledValue);
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(Zcl, "[Pw] Failed to set scaledValue: %" CHIP_ERROR_FORMAT, err.Format());
+                    return ::pw::Status::Internal();
+                }
+
+                if (scaledValue.IsNull())
+                {
+                    ChipLogProgress(Zcl, "[Pw] Successfully set scaledValue to null.");
+                }
+                else
+                {
+                    ChipLogProgress(Zcl, "[Pw] Successfully set scaledValue to %d.", scaledValue.Value());
+                }
+                return ::pw::OkStatus();
+            }
+            }
+            break;
+#endif // MATTER_DM_PRESSURE_MEASUREMENT_CLUSTER_SERVER_ENDPOINT_COUNT > 0
 #if MATTER_DM_BOOLEAN_STATE_CONFIGURATION_CLUSTER_SERVER_ENDPOINT_COUNT > 0
         case BooleanStateConfiguration::Id:
             switch (path.mAttributeId)
