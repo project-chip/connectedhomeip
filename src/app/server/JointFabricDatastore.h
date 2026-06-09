@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <algorithm>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <credentials/CHIPCert.h>
@@ -26,6 +27,7 @@
 #include <lib/core/NodeId.h>
 #include <lib/support/ReadOnlyBuffer.h>
 #include <map>
+#include <type_traits>
 #include <unordered_map>
 #include <utility>
 #include <vector>
@@ -58,6 +60,28 @@ struct ACLEntryStruct
 };
 
 } // namespace datastore
+
+namespace detail {
+
+/**
+ * Searches `vec` for the first entry that returns true when passed to `pred`, then marks that entry as committed.
+ *
+ * @param [in,out] vec   The vector to search; the matching entry is mutated in place to mark it committed.
+ * @param [in] pred      Predicate invoked as `bool(const T &)`; the first entry for which it returns true is marked.
+ */
+template <typename T, typename Pred>
+void MarkEntryCommittedIfFound(std::vector<T> & vec, Pred pred)
+{
+    static_assert(std::is_invocable_r_v<bool, Pred, const T &>,
+                  "MarkEntryCommittedIfFound predicate must accept a const T & and return bool");
+    auto it = std::find_if(vec.begin(), vec.end(), pred);
+    if (it != vec.end())
+    {
+        it->statusEntry.state = Clusters::JointFabricDatastore::DatastoreStateEnum::kCommitted;
+    }
+}
+
+} // namespace detail
 
 enum RefreshState
 {

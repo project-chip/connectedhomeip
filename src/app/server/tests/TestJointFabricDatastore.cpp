@@ -718,4 +718,83 @@ TEST(JointFabricDatastoreTest, PoC_AddBindingBackReferenceMarksWrongEntry)
     EXPECT_TRUE(found);
 }
 
+// Direct unit tests for the detail::MarkEntryCommittedIfFound helper. It re-resolves an entry by a
+// stable-key predicate (rather than a captured iterator/index) inside an async SyncNode completion
+// and marks the matched entry kCommitted. A minimal fake entry mirrors the only field the helper
+// touches (statusEntry.state), keeping these tests focused on the generic lookup/mutate contract.
+namespace {
+
+struct FakeEntry
+{
+    int key;
+    struct
+    {
+        JointFabricCluster::DatastoreStateEnum state;
+    } statusEntry;
+};
+
+FakeEntry MakePendingEntry(int key)
+{
+    return FakeEntry{ key, { JointFabricCluster::DatastoreStateEnum::kPending } };
+}
+
+auto MatchKey(int key)
+{
+    return [key](const FakeEntry & e) { return e.key == key; };
+}
+
+} // namespace
+
+TEST(MarkEntryCommittedIfFoundTest, MarksMatchingEntryCommitted)
+{
+    std::vector<FakeEntry> entries{ MakePendingEntry(1) };
+
+    chip::app::detail::MarkEntryCommittedIfFound(entries, MatchKey(1));
+
+    EXPECT_EQ(entries[0].statusEntry.state, JointFabricCluster::DatastoreStateEnum::kCommitted);
+}
+
+TEST(MarkEntryCommittedIfFoundTest, LeavesNonMatchingEntriesUntouched)
+{
+    std::vector<FakeEntry> entries{ MakePendingEntry(1), MakePendingEntry(2), MakePendingEntry(3) };
+
+    chip::app::detail::MarkEntryCommittedIfFound(entries, MatchKey(2));
+
+    EXPECT_EQ(entries[0].statusEntry.state, JointFabricCluster::DatastoreStateEnum::kPending);
+    EXPECT_EQ(entries[1].statusEntry.state, JointFabricCluster::DatastoreStateEnum::kCommitted);
+    EXPECT_EQ(entries[2].statusEntry.state, JointFabricCluster::DatastoreStateEnum::kPending);
+}
+
+TEST(MarkEntryCommittedIfFoundTest, NoMatchIsNoOp)
+{
+    std::vector<FakeEntry> entries{ MakePendingEntry(1), MakePendingEntry(2) };
+
+    chip::app::detail::MarkEntryCommittedIfFound(entries, MatchKey(99));
+
+    EXPECT_EQ(entries[0].statusEntry.state, JointFabricCluster::DatastoreStateEnum::kPending);
+    EXPECT_EQ(entries[1].statusEntry.state, JointFabricCluster::DatastoreStateEnum::kPending);
+}
+
+TEST(MarkEntryCommittedIfFoundTest, EmptyVectorIsNoOp)
+{
+    std::vector<FakeEntry> entries;
+
+    // Must not dereference end(); simply does nothing on an empty vector.
+    chip::app::detail::MarkEntryCommittedIfFound(entries, MatchKey(1));
+
+    EXPECT_TRUE(entries.empty());
+}
+
+TEST(MarkEntryCommittedIfFoundTest, MarksOnlyFirstMatch)
+{
+    // find_if stops at the first match: a duplicate key only commits the earliest entry. Callers are
+    // expected to pass predicates that uniquely identify the synced entry.
+    std::vector<FakeEntry> entries{ MakePendingEntry(7), MakePendingEntry(7) };
+
+    chip::app::detail::MarkEntryCommittedIfFound(entries, MatchKey(7));
+
+    EXPECT_EQ(entries[0].statusEntry.state, JointFabricCluster::DatastoreStateEnum::kCommitted);
+    EXPECT_EQ(entries[1].statusEntry.state, JointFabricCluster::DatastoreStateEnum::kPending);
+}
+
 } // namespace

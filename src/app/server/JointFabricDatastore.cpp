@@ -26,21 +26,6 @@ namespace chip {
 namespace app {
 
 namespace {
-// Re-resolve an entry by a stable key inside an async SyncNode completion and mark it kCommitted.
-// Capturing a raw iterator / loop index / back() reference into the completion is unsafe: an
-// interleaved Add*/Remove* Invoke can reallocate or shrink the vector before the completion fires,
-// leaving the captured handle dangling. Looking the entry up by key here is bounds-safe and tolerates
-// the vector having changed (if the entry is gone, this is simply a no-op).
-template <typename Vec, typename Pred>
-void MarkEntryCommittedIfFound(Vec & vec, Pred pred)
-{
-    auto it = std::find_if(vec.begin(), vec.end(), pred);
-    if (it != vec.end())
-    {
-        it->statusEntry.state = Clusters::JointFabricDatastore::DatastoreStateEnum::kCommitted;
-    }
-}
-
 // Zeroize cryptographic material before the backing storage is freed, so raw epoch HMAC keys and
 // ICAC DER bytes do not linger in freed heap.
 void ScrubSecretBytes(std::vector<uint8_t> & secret)
@@ -449,12 +434,12 @@ CHIP_ERROR JointFabricDatastore::ContinueRefresh()
             {
                 if (it->statusEntry.state == Clusters::JointFabricDatastore::DatastoreStateEnum::kPending)
                 {
-                    auto entryToSync         = *it;
-                    const NodeId nodeId      = entryToSync.nodeID;
-                    const EndpointId epId    = entryToSync.endpointID;
-                    const GroupId groupId    = entryToSync.groupID;
+                    auto entryToSync      = *it;
+                    const NodeId nodeId   = entryToSync.nodeID;
+                    const EndpointId epId = entryToSync.endpointID;
+                    const GroupId groupId = entryToSync.groupID;
                     ReturnErrorOnFailure(mDelegate->SyncNode(mRefreshingNodeId, entryToSync, [this, nodeId, epId, groupId]() {
-                        MarkEntryCommittedIfFound(mEndpointGroupIDEntries, [&](const auto & e) {
+                        detail::MarkEntryCommittedIfFound(mEndpointGroupIDEntries, [&](const auto & e) {
                             return e.nodeID == nodeId && e.endpointID == epId && e.groupID == groupId;
                         });
                     }));
@@ -751,7 +736,7 @@ CHIP_ERROR JointFabricDatastore::ContinueRefresh()
                     const NodeId entryNodeId = nkIt->nodeID;
                     auto groupKeySet         = *gksIt;
                     ReturnErrorOnFailure(mDelegate->SyncNode(nkIt->nodeID, groupKeySet, [this, entryNodeId, groupKeySetId]() {
-                        MarkEntryCommittedIfFound(mNodeKeySetEntries, [&](const auto & e) {
+                        detail::MarkEntryCommittedIfFound(mNodeKeySetEntries, [&](const auto & e) {
                             return e.nodeID == entryNodeId && e.groupKeySetID == groupKeySetId;
                         });
                     }));
@@ -790,7 +775,7 @@ CHIP_ERROR JointFabricDatastore::ContinueRefresh()
                         const NodeId entryNodeId = nkIt->nodeID;
                         auto groupKeySet         = *gksIt;
                         ReturnErrorOnFailure(mDelegate->SyncNode(nkIt->nodeID, groupKeySet, [this, entryNodeId, groupKeySetId]() {
-                            MarkEntryCommittedIfFound(mNodeKeySetEntries, [&](const auto & e) {
+                            detail::MarkEntryCommittedIfFound(mNodeKeySetEntries, [&](const auto & e) {
                                 return e.nodeID == entryNodeId && e.groupKeySetID == groupKeySetId;
                             });
                         }));
@@ -1170,10 +1155,10 @@ JointFabricDatastore::UpdateNodeKeySetList(Clusters::JointFabricDatastore::Struc
                 Clusters::JointFabricDatastore::DatastoreGroupKeySecurityPolicyEnum::kUnknownEnumValue)
             {
 
-                const NodeId entryNodeId         = entry.nodeID;
+                const NodeId entryNodeId          = entry.nodeID;
                 const uint16_t entryGroupKeySetID = groupKeySet.groupKeySetID;
                 LogErrorOnFailure(mDelegate->SyncNode(entry.nodeID, groupKeySet, [this, entryNodeId, entryGroupKeySetID]() {
-                    MarkEntryCommittedIfFound(mNodeKeySetEntries, [&](const auto & e) {
+                    detail::MarkEntryCommittedIfFound(mNodeKeySetEntries, [&](const auto & e) {
                         return e.nodeID == entryNodeId && e.groupKeySetID == entryGroupKeySetID;
                     });
                 }));
@@ -1301,9 +1286,9 @@ JointFabricDatastore::UpdateGroup(const Clusters::JointFabricDatastore::Commands
 
                     const NodeId entryNodeId         = epGroupEntry.nodeID;
                     const EndpointId entryEndpointId = epGroupEntry.endpointID;
-                    CHIP_ERROR syncErr =
-                        mDelegate->SyncNode(epGroupEntry.nodeID, entryToSync, [this, entryNodeId, entryEndpointId, updatedGroupId]() {
-                            MarkEntryCommittedIfFound(mEndpointGroupIDEntries, [&](const auto & e) {
+                    CHIP_ERROR syncErr               = mDelegate->SyncNode(
+                        epGroupEntry.nodeID, entryToSync, [this, entryNodeId, entryEndpointId, updatedGroupId]() {
+                            detail::MarkEntryCommittedIfFound(mEndpointGroupIDEntries, [&](const auto & e) {
                                 return e.nodeID == entryNodeId && e.endpointID == entryEndpointId && e.groupID == updatedGroupId;
                             });
                         });
@@ -1414,10 +1399,10 @@ JointFabricDatastore::UpdateGroup(const Clusters::JointFabricDatastore::Commands
             // Attempt to update the ACL on the node. On success, mark the ACL entry as Committed.
             // Re-resolve by stable key (nodeID + listID) inside the completion; capturing the loop
             // index would mark the wrong/invalid slot if an interleaved Invoke mutated the vector.
-            const NodeId entryNodeId  = acl.nodeID;
+            const NodeId entryNodeId   = acl.nodeID;
             const uint16_t entryListId = acl.listID;
             ReturnErrorOnFailure(mDelegate->SyncNode(acl.nodeID, entryToEncode, [this, entryNodeId, entryListId]() {
-                MarkEntryCommittedIfFound(
+                detail::MarkEntryCommittedIfFound(
                     mACLEntries, [&](const auto & e) { return e.nodeID == entryNodeId && e.listID == entryListId; });
             }));
         }
@@ -1542,7 +1527,7 @@ CHIP_ERROR JointFabricDatastore::AddGroupIDToEndpointForNode(NodeId nodeId, chip
             mNodeKeySetEntries.push_back(newNodeKeySet);
 
             ReturnErrorOnFailure(mDelegate->SyncNode(nodeId, newNodeKeySet, [this, nodeId, groupKeySetID]() {
-                MarkEntryCommittedIfFound(mNodeKeySetEntries, [&](const auto & entry) {
+                detail::MarkEntryCommittedIfFound(mNodeKeySetEntries, [&](const auto & entry) {
                     return entry.nodeID == nodeId && entry.groupKeySetID == groupKeySetID;
                 });
             }));
@@ -1571,7 +1556,7 @@ CHIP_ERROR JointFabricDatastore::AddGroupIDToEndpointForNode(NodeId nodeId, chip
     mEndpointGroupIDEntries.push_back(newGroupEntry);
 
     return mDelegate->SyncNode(nodeId, newGroupEntry, [this, nodeId, endpointId, groupId]() {
-        MarkEntryCommittedIfFound(mEndpointGroupIDEntries, [&](const auto & entry) {
+        detail::MarkEntryCommittedIfFound(mEndpointGroupIDEntries, [&](const auto & entry) {
             return entry.nodeID == nodeId && entry.endpointID == endpointId && entry.groupID == groupId;
         });
     });
@@ -1753,7 +1738,7 @@ JointFabricDatastore::AddBindingToEndpointForNode(
 
     const uint16_t listID = newBindingEntry.listID;
     return mDelegate->SyncNode(nodeId, newBindingEntry, [this, nodeId, endpointId, listID]() {
-        MarkEntryCommittedIfFound(mEndpointBindingEntries, [&](const auto & entry) {
+        detail::MarkEntryCommittedIfFound(mEndpointBindingEntries, [&](const auto & entry) {
             return entry.nodeID == nodeId && entry.endpointID == endpointId && entry.listID == listID;
         });
     });
@@ -2006,11 +1991,10 @@ CHIP_ERROR JointFabricDatastore::RemoveACLFromNode(uint16_t listId, NodeId nodeI
             // Re-resolve by stable key inside the async completion instead of capturing the raw
             // iterator (which dangles if an interleaved Add*/Remove* reallocates the vector).
             return mDelegate->SyncNode(nodeId, entryToDelete, [this, listId, nodeId]() {
-                mACLEntries.erase(std::remove_if(mACLEntries.begin(), mACLEntries.end(),
-                                                 [&](const auto & entry) {
-                                                     return entry.nodeID == nodeId && entry.listID == listId;
-                                                 }),
-                                  mACLEntries.end());
+                mACLEntries.erase(
+                    std::remove_if(mACLEntries.begin(), mACLEntries.end(),
+                                   [&](const auto & entry) { return entry.nodeID == nodeId && entry.listID == listId; }),
+                    mACLEntries.end());
             });
         }
     }
@@ -2062,7 +2046,7 @@ CHIP_ERROR JointFabricDatastore::AddNodeKeySetEntry(GroupId groupId, uint16_t gr
             // completion; capturing the index would mark the wrong/invalid slot if an interleaved
             // Invoke mutated the vector before the async completion fires.
             ReturnErrorOnFailure(mDelegate->SyncNode(nodeId, newEntry, [this, nodeId, groupKeySetId]() {
-                MarkEntryCommittedIfFound(
+                detail::MarkEntryCommittedIfFound(
                     mNodeKeySetEntries, [&](const auto & e) { return e.nodeID == nodeId && e.groupKeySetID == groupKeySetId; });
             }));
         }
@@ -2127,8 +2111,8 @@ CHIP_ERROR JointFabricDatastore::TestAddNodeKeySetEntry(GroupId groupId, uint16_
     // Sync to the node and mark committed on success. Re-resolve by stable key inside the completion
     // rather than capturing the index, which an interleaved Invoke could invalidate.
     return mDelegate->SyncNode(nodeId, newEntry, [this, nodeId, groupKeySetId]() {
-        MarkEntryCommittedIfFound(mNodeKeySetEntries,
-                                  [&](const auto & e) { return e.nodeID == nodeId && e.groupKeySetID == groupKeySetId; });
+        detail::MarkEntryCommittedIfFound(mNodeKeySetEntries,
+                                          [&](const auto & e) { return e.nodeID == nodeId && e.groupKeySetID == groupKeySetId; });
     });
 }
 
