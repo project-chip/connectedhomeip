@@ -45,6 +45,37 @@ jobs:
             - name: Mark workspace as safe for Git
               run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
 
+            - name: Check CodeQL action version consistency
+              if: always()
+              run: |
+                  python3 - <<'PY'
+                  import pathlib
+                  import re
+                  import sys
+
+                  codeql_action = re.compile(r"^\s*uses:\s+github/codeql-action/[^@\s]+@([^\s#]+)")
+                  refs = {}
+                  for base in (pathlib.Path(".github/workflows"), pathlib.Path(".github/actions")):
+                      for path in base.rglob("*"):
+                          if path.suffix not in (".yml", ".yaml"):
+                              continue
+                          for line_number, line in enumerate(path.read_text().splitlines(), 1):
+                              match = codeql_action.match(line)
+                              if match:
+                                  refs.setdefault(match.group(1), []).append(f"{path}:{line_number}")
+
+                  if len(refs) > 1:
+                      print("github/codeql-action refs must match across all workflows and local actions.")
+                      for ref, locations in sorted(refs.items()):
+                          print(f"{ref}:")
+                          for location in locations:
+                              print(f"  {location}")
+                      sys.exit(1)
+
+                  if refs:
+                      print(f"All github/codeql-action uses are pinned to {next(iter(refs))}.")
+                  PY
+
             - name: Check for orphaned gn files
               if: always()
               # We should enforce that ALL new files are referenced in our build scripts.
