@@ -1,0 +1,36 @@
+name: MediaTek Genio MT7933
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+  workflow_dispatch: # 讓您可以在 GitHub 網頁上手動點擊執行測試
+
+jobs:
+  build_mt7933:
+    runs-on: ubuntu-latest
+    
+    container:
+      image: ghcr.io/project-chip/chip-build-mt793x:latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Bootstrap the build system
+        run: |
+          ./scripts/checkout_submodules.py --platform genio
+          source scripts/activate.sh
+
+      - name: Build MT7933 Lighting App
+        run: |
+          ./scripts/examples/gn_build_example.sh examples/lighting-app/genio out/lighting-app
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: mt7933-lighting-bin
+          path: out/lighting-app/*.bin
