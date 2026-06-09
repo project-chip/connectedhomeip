@@ -127,13 +127,13 @@ class TC_PAVST_2_10(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
                         cmd=pvcluster.Commands.DeallocatePushTransport(ConnectionID=cfg.ConnectionID),
                         endpoint=endpoint)
                 except InteractionModelError as e:
-                    log.warning(f"Failed to deallocate connection {cfg.ConnectionID} during cleanup: {e}")
+                    log.warning("Failed to deallocate connection %s during cleanup: %s", cfg.ConnectionID, e)
 
         # Read supported formats (step 2)
         self.step(2)
         aSupportedFormats = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=pvcluster, attribute=pvattr.SupportedFormats)
-        log.info(f"aSupportedFormats={aSupportedFormats}")
+        log.info("aSupportedFormats=%s", aSupportedFormats)
 
         # Read allocated video streams (step 3)
         self.step(3)
