@@ -195,111 +195,111 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         self.step(0)
 
         self.step(1)
-        # update_state_attr_handler = AttributeSubscriptionHandler(
-        #     expected_cluster=Clusters.OtaSoftwareUpdateRequestor,
-        #     expected_attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState
-        # )
-        # await update_state_attr_handler.start(dev_ctrl=self.controller, node_id=self.requestor_node_id, endpoint=0,
-        #                                       fabric_filtered=False, min_interval_sec=0, max_interval_sec=5)
-        # await self.announce_ota_provider(self.controller, self.provider_node_id, self.requestor_node_id)
+        update_state_attr_handler = AttributeSubscriptionHandler(
+            expected_cluster=Clusters.OtaSoftwareUpdateRequestor,
+            expected_attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState
+        )
+        await update_state_attr_handler.start(dev_ctrl=self.controller, node_id=self.requestor_node_id, endpoint=0,
+                                              fabric_filtered=False, min_interval_sec=0, max_interval_sec=5)
+        await self.announce_ota_provider(self.controller, self.provider_node_id, self.requestor_node_id)
 
-        # update_state_match = AttributeMatcher.from_callable(
-        #     "Update state is Downloading",
-        #     lambda report: report.value == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading)
-        # update_state_attr_handler.await_all_expected_report_matches([update_state_match], timeout_sec=600)
+        update_state_match = AttributeMatcher.from_callable(
+            "Update state is Downloading",
+            lambda report: report.value == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading)
+        update_state_attr_handler.await_all_expected_report_matches([update_state_match], timeout_sec=600)
 
-        # # Trackt most of the download and let the Test wait for the next UpdateState
-        # await self.track_download_progress(controller=self.controller, requestor_node_id=self.requestor_node_id, max_progress=99)
+        # Trackt most of the download and let the Test wait for the next UpdateState
+        await self.track_download_progress(controller=self.controller, requestor_node_id=self.requestor_node_id, max_progress=99)
 
-        # update_state_match = AttributeMatcher.from_callable(
-        #     "Update state is Applying",
-        #     lambda report: report.value == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kApplying)
-        # update_state_attr_handler.await_all_expected_report_matches(
-        #     [update_state_match], timeout_sec=self.applying_timeout)
+        update_state_match = AttributeMatcher.from_callable(
+            "Update state is Applying",
+            lambda report: report.value == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kApplying)
+        update_state_attr_handler.await_all_expected_report_matches(
+            [update_state_match], timeout_sec=self.applying_timeout)
 
-        # await self._wait_for_idle_after_softwareaupdate(update_state_handler=update_state_attr_handler)
+        await self._wait_for_idle_after_softwareaupdate(update_state_handler=update_state_attr_handler)
 
-        # # Once in idle verify the version match the expected software version
-        # await self.verify_version_applied_basic_information(
-        #     controller=self.controller, node_id=self.requestor_node_id, target_version=self.expected_software_version)
-        # update_state = await self.read_single_attribute_check_success(
-        #     Clusters.OtaSoftwareUpdateRequestor, Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState, self.controller, self.requestor_node_id, 0)
-        # asserts.assert_equal(update_state, Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle,
-        #                      "Update state should be idle")
+        # Once in idle verify the version match the expected software version
+        await self.verify_version_applied_basic_information(
+            controller=self.controller, node_id=self.requestor_node_id, target_version=self.expected_software_version)
+        update_state = await self.read_single_attribute_check_success(
+            Clusters.OtaSoftwareUpdateRequestor, Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState, self.controller, self.requestor_node_id, 0)
+        asserts.assert_equal(update_state, Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle,
+                             "Update state should be idle")
         self.terminate_provider()
-        # self.restart_requestor(restore=True)
+        self.restart_requestor(restore=True)
 
         self.step(2)
         # Set values for step 2
-        # delayed_apply_action_time = 180
-        # current_sw_version = await self.read_single_attribute_check_success(
-        #     dev_ctrl=self.controller,
-        #     cluster=Clusters.BasicInformation,
-        #     attribute=Clusters.BasicInformation.Attributes.SoftwareVersion,
-        #     node_id=self.requestor_node_id)
-        # extra_arguments = ['--applyUpdateAction', 'proceed', '--delayedApplyActionTimeSec', str(delayed_apply_action_time)]
-        # self.start_provider(
-        #     provider_app_path=self.provider_app_path,
-        #     ota_image_path=self.ota_image,
-        #     setup_pincode=self.provider_setup_pincode,
-        #     discriminator=self.provider_discriminator,
-        #     port=self.ota_provider_port,
-        #     kvs_path=self.provider_kvs_path,
-        #     log_file=self.provider_log,
-        #     extra_args=extra_arguments,
-        # )
+        delayed_apply_action_time = 180
+        current_sw_version = await self.read_single_attribute_check_success(
+            dev_ctrl=self.controller,
+            cluster=Clusters.BasicInformation,
+            attribute=Clusters.BasicInformation.Attributes.SoftwareVersion,
+            node_id=self.requestor_node_id)
+        extra_arguments = ['--applyUpdateAction', 'proceed', '--delayedApplyActionTimeSec', str(delayed_apply_action_time)]
+        self.start_provider(
+            provider_app_path=self.provider_app_path,
+            ota_image_path=self.ota_image,
+            setup_pincode=self.provider_setup_pincode,
+            discriminator=self.provider_discriminator,
+            port=self.ota_provider_port,
+            kvs_path=self.provider_kvs_path,
+            log_file=self.provider_log,
+            extra_args=extra_arguments,
+        )
 
-        # # Software Version Attr Handler
-        # software_version_attr_handler = AttributeSubscriptionHandler(
-        #     expected_cluster=Clusters.BasicInformation,
-        #     expected_attribute=Clusters.BasicInformation.Attributes.SoftwareVersion
-        # )
+        # Software Version Attr Handler
+        software_version_attr_handler = AttributeSubscriptionHandler(
+            expected_cluster=Clusters.BasicInformation,
+            expected_attribute=Clusters.BasicInformation.Attributes.SoftwareVersion
+        )
 
-        # # UpdateState Handler
-        # update_state_attr_handler = AttributeSubscriptionHandler(
-        #     expected_cluster=Clusters.OtaSoftwareUpdateRequestor,
-        #     expected_attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState
-        # )
-        # await software_version_attr_handler.start(dev_ctrl=self.controller, node_id=self.requestor_node_id, endpoint=0,
-        #                                           fabric_filtered=False, min_interval_sec=0, max_interval_sec=5)
+        # UpdateState Handler
+        update_state_attr_handler = AttributeSubscriptionHandler(
+            expected_cluster=Clusters.OtaSoftwareUpdateRequestor,
+            expected_attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState
+        )
+        await software_version_attr_handler.start(dev_ctrl=self.controller, node_id=self.requestor_node_id, endpoint=0,
+                                                  fabric_filtered=False, min_interval_sec=0, max_interval_sec=5)
 
-        # await update_state_attr_handler.start(dev_ctrl=self.controller, node_id=self.requestor_node_id, endpoint=0,
-        #                                       fabric_filtered=False, min_interval_sec=0, max_interval_sec=5)
+        await update_state_attr_handler.start(dev_ctrl=self.controller, node_id=self.requestor_node_id, endpoint=0,
+                                              fabric_filtered=False, min_interval_sec=0, max_interval_sec=5)
 
-        # await self.announce_ota_provider(self.controller, self.provider_node_id, self.requestor_node_id)
+        await self.announce_ota_provider(self.controller, self.provider_node_id, self.requestor_node_id)
 
-        # update_state_match = AttributeMatcher.from_callable(
-        #     "Update state is Downloading",
-        #     lambda report: report.value == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading)
-        # update_state_attr_handler.await_all_expected_report_matches([update_state_match], timeout_sec=600)
+        update_state_match = AttributeMatcher.from_callable(
+            "Update state is Downloading",
+            lambda report: report.value == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading)
+        update_state_attr_handler.await_all_expected_report_matches([update_state_match], timeout_sec=600)
 
-        # # Track the download progress up to 99% then wait for th kApplying state
-        # await self.track_download_progress(controller=self.controller, requestor_node_id=self.requestor_node_id, max_progress=99)
+        # Track the download progress up to 99% then wait for th kApplying state
+        await self.track_download_progress(controller=self.controller, requestor_node_id=self.requestor_node_id, max_progress=99)
 
-        # update_state_match = AttributeMatcher.from_callable(
-        #     "Update state is Applying",
-        #     lambda report: report.value == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kApplying)
-        # update_state_attr_handler.await_all_expected_report_matches(
-        #     [update_state_match], timeout_sec=self.applying_timeout)
-        # update_state_attr_handler.reset()
+        update_state_match = AttributeMatcher.from_callable(
+            "Update state is Applying",
+            lambda report: report.value == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kApplying)
+        update_state_attr_handler.await_all_expected_report_matches(
+            [update_state_match], timeout_sec=self.applying_timeout)
+        update_state_attr_handler.reset()
 
-        # # Device should stay in ApplyingState During 180 seconds and not Apply the software Update after the 60 seconds.
-        # software_version_match = AttributeMatcher.from_callable(
-        #     f"Sofware Version should be: {current_sw_version}",
-        #     lambda report: report.value == current_sw_version)
-        # software_version_attr_handler.wait_all_final_values_reported_persisted(
-        #     expected_matchers=[software_version_match], timeout_sec=delayed_apply_action_time)
+        # Device should stay in ApplyingState During 180 seconds and not Apply the software Update after the 60 seconds.
+        software_version_match = AttributeMatcher.from_callable(
+            f"Sofware Version should be: {current_sw_version}",
+            lambda report: report.value == current_sw_version)
+        software_version_attr_handler.wait_all_final_values_reported_persisted(
+            expected_matchers=[software_version_match], timeout_sec=delayed_apply_action_time)
 
-        # software_version_attr_handler.flush_reports()
-        # software_version_attr_handler.cancel()
+        software_version_attr_handler.flush_reports()
+        software_version_attr_handler.cancel()
 
-        # await self._wait_for_idle_after_softwareaupdate(update_state_handler=update_state_attr_handler)
+        await self._wait_for_idle_after_softwareaupdate(update_state_handler=update_state_attr_handler)
 
-        # await self.verify_version_applied_basic_information(
-        #     controller=self.controller, node_id=self.requestor_node_id, target_version=self.expected_software_version)
-        # # Terminate the provider
+        await self.verify_version_applied_basic_information(
+            controller=self.controller, node_id=self.requestor_node_id, target_version=self.expected_software_version)
+        # Terminate the provider
         self.terminate_provider()
-        # self.restart_requestor(restore=True)
+        self.restart_requestor(restore=True)
 
         self.step(3)
         delayed_apply_action_time = 60
