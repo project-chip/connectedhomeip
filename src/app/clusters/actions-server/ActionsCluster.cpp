@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2024 Project CHIP Authors
+ *    Copyright (c) 2024-2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,95 +15,73 @@
  *    limitations under the License.
  */
 
-#include "CodegenIntegration.h"
-
-#include <app-common/zap-generated/cluster-objects.h>
-#include <app-common/zap-generated/ids/Attributes.h>
-#include <app/AttributeAccessInterfaceRegistry.h>
-#include <app/CommandHandlerInterfaceRegistry.h>
-#include <app/EventLogging.h>
-#include <app/util/attribute-storage.h>
+#include <app/clusters/actions-server/ActionsCluster.h>
+#include <app/clusters/actions-server/ActionsStructs.h>
+#include <app/server-cluster/AttributeListBuilder.h>
+#include <clusters/Actions/Metadata.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip;
 using namespace chip::app;
-using namespace chip::app::Clusters;
-using namespace chip::app::Clusters::Actions;
-using namespace chip::app::Clusters::Actions::Attributes;
 using namespace chip::Protocols::InteractionModel;
 
-ActionsServer::~ActionsServer()
+namespace chip::app::Clusters {
+
+using namespace Actions;
+
+namespace {
+static constexpr size_t kMaxEndpointListLength = 256u;
+static constexpr size_t kMaxActionListLength   = 256u;
+} // namespace
+
+void ActionsCluster::GenerateEvent(const Events::StateChanged::Type & event)
 {
-    Shutdown();
+    VerifyOrReturn(mContext != nullptr, ChipLogError(Zcl, "ActionsCluster: mContext is null, cannot generate event"));
+    mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
 }
 
-void ActionsServer::Shutdown()
+void ActionsCluster::GenerateEvent(const Events::ActionFailed::Type & event)
 {
-    TEMPORARY_RETURN_IGNORED CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
-    AttributeAccessInterfaceRegistry::Instance().Unregister(this);
+    VerifyOrReturn(mContext != nullptr, ChipLogError(Zcl, "ActionsCluster: mContext is null, cannot generate event"));
+    mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
 }
 
-CHIP_ERROR ActionsServer::Init()
+DataModel::ActionReturnStatus ActionsCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
+                                                            AttributeValueEncoder & encoder)
 {
-    ReturnErrorOnFailure(CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this));
-    VerifyOrReturnError(AttributeAccessInterfaceRegistry::Instance().Register(this), CHIP_ERROR_INCORRECT_STATE);
-    return CHIP_NO_ERROR;
-}
-
-void ActionsServer::OnStateChanged(EndpointId aEndpoint, uint16_t aActionId, uint32_t aInvokeId, ActionStateEnum aActionState)
-{
-    ChipLogProgress(Zcl, "ActionsServer: OnStateChanged");
-
-    // Generate StateChanged event
-    EventNumber eventNumber;
-    Events::StateChanged::Type event{ aActionId, aInvokeId, aActionState };
-
-    if (CHIP_NO_ERROR != LogEvent(event, aEndpoint, eventNumber))
+    using namespace Actions::Attributes;
+    switch (request.path.mAttributeId)
     {
-        ChipLogError(Zcl, "ActionsServer: Failed to generate OnStateChanged event");
+    case ClusterRevision::Id:
+        return encoder.Encode(Actions::kRevision);
+    case FeatureMap::Id:
+        // The Actions cluster currently doesn't use feature maps, so we encode 0
+        return encoder.Encode(static_cast<uint32_t>(0));
+    case SetupURL::Id: {
+        if (!mSetupURL.has_value())
+        {
+            return Protocols::InteractionModel::Status::Failure;
+        }
+        // Safety fallback: if data() pointer is nullptr, encode empty string with valid pointer
+        const CharSpan & urlToEncode = mSetupURL.value_or(""_span);
+        return encoder.Encode(urlToEncode);
     }
-}
-
-void ActionsServer::OnActionFailed(EndpointId aEndpoint, uint16_t aActionId, uint32_t aInvokeId, ActionStateEnum aActionState,
-                                   ActionErrorEnum aActionError)
-{
-    ChipLogProgress(Zcl, "ActionsServer: OnActionFailed");
-
-    // Generate ActionFailed event
-    EventNumber eventNumber;
-    Events::ActionFailed::Type event{ aActionId, aInvokeId, aActionState, aActionError };
-
-    if (CHIP_NO_ERROR != LogEvent(event, aEndpoint, eventNumber))
-    {
-        ChipLogError(Zcl, "ActionsServer: Failed to generate OnActionFailed event");
-    }
-}
-
-CHIP_ERROR ActionsServer::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
-{
-    VerifyOrDie(aPath.mClusterId == Actions::Id);
-
-    switch (aPath.mAttributeId)
-    {
-    case ActionList::Id: {
-        ReturnErrorOnFailure(aEncoder.EncodeList(
-            [this, aPath](const auto & encoder) -> CHIP_ERROR { return this->ReadActionListAttribute(aPath, encoder); }));
-        return CHIP_NO_ERROR;
-    }
-    case EndpointLists::Id: {
-        ReturnErrorOnFailure(aEncoder.EncodeList(
-            [this, aPath](const auto & encoder) -> CHIP_ERROR { return this->ReadEndpointListAttribute(aPath, encoder); }));
-        return CHIP_NO_ERROR;
-    }
+    case ActionList::Id:
+        return encoder.EncodeList([this, &request](const auto & listEncoder) -> CHIP_ERROR {
+            return this->ReadActionListAttribute(request, listEncoder);
+        });
+    case EndpointLists::Id:
+        return encoder.EncodeList([this, &request](const auto & listEncoder) -> CHIP_ERROR {
+            return this->ReadEndpointListAttribute(request, listEncoder);
+        });
     default:
-        break;
+        return Protocols::InteractionModel::Status::UnsupportedAttribute;
     }
-    return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ActionsServer::ReadActionListAttribute(const ConcreteReadAttributePath & aPath,
-                                                  const AttributeValueEncoder::ListEncodeHelper & aEncoder)
+CHIP_ERROR ActionsCluster::ReadActionListAttribute(const DataModel::ReadAttributeRequest & request,
+                                                   const AttributeValueEncoder::ListEncodeHelper & aEncoder)
 {
     for (uint16_t i = 0; i < kMaxActionListLength; i++)
     {
@@ -119,8 +97,8 @@ CHIP_ERROR ActionsServer::ReadActionListAttribute(const ConcreteReadAttributePat
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ActionsServer::ReadEndpointListAttribute(const ConcreteReadAttributePath & aPath,
-                                                    const AttributeValueEncoder::ListEncodeHelper & aEncoder)
+CHIP_ERROR ActionsCluster::ReadEndpointListAttribute(const DataModel::ReadAttributeRequest & request,
+                                                     const AttributeValueEncoder::ListEncodeHelper & aEncoder)
 {
     for (uint16_t i = 0; i < kMaxEndpointListLength; i++)
     {
@@ -136,202 +114,151 @@ CHIP_ERROR ActionsServer::ReadEndpointListAttribute(const ConcreteReadAttributeP
     return CHIP_NO_ERROR;
 }
 
-bool ActionsServer::HaveActionWithId(EndpointId aEndpointId, uint16_t aActionId, uint16_t & aActionIndex)
+Status ActionsCluster::ValidateActionExists(uint16_t actionID, uint16_t & outActionIndex)
 {
-    return mDelegate.HaveActionWithId(aActionId, aActionIndex);
+    outActionIndex = kMaxActionListLength;
+    VerifyOrReturnValue(mDelegate.HaveActionWithId(actionID, outActionIndex), Status::NotFound);
+    return Status::Success;
 }
 
-template <typename RequestT, typename FuncT>
-void ActionsServer::HandleCommand(HandlerContext & handlerContext, FuncT func)
+Status ActionsCluster::ValidateCommandSupported(uint16_t actionIndex, CommandId commandId)
 {
-    if (!handlerContext.mCommandHandled && (handlerContext.mRequestPath.mCommandId == RequestT::GetCommandId()))
+    // If index wasn't populated by the delegate but it exists, bypass command check
+    if (actionIndex == kMaxActionListLength)
     {
-        RequestT requestPayload;
-
-        // If the command matches what the caller is looking for, let's mark this as being handled
-        // even if errors happen after this. This ensures that we don't execute any fall-back strategies
-        // to handle this command since at this point, the caller is taking responsibility for handling
-        // the command in its entirety, warts and all.
-        //
-        handlerContext.SetCommandHandled();
-
-        if (DataModel::Decode(handlerContext.mPayload, requestPayload) != CHIP_NO_ERROR)
-        {
-            handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath,
-                                                     Protocols::InteractionModel::Status::InvalidCommand);
-            return;
-        }
-
-        uint16_t actionIndex = kMaxActionListLength;
-        if (!HaveActionWithId(handlerContext.mRequestPath.mEndpointId, requestPayload.actionID, actionIndex))
-        {
-            handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, Protocols::InteractionModel::Status::NotFound);
-            return;
-        }
-        if (actionIndex != kMaxActionListLength)
-        {
-            ActionStructStorage action;
-            TEMPORARY_RETURN_IGNORED mDelegate.ReadActionAtIndex(actionIndex, action);
-            // Check if the command bit is set in the SupportedCommands of an ations.
-            if (!(action.supportedCommands.Raw() & (1 << handlerContext.mRequestPath.mCommandId)))
-            {
-                handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath,
-                                                         Protocols::InteractionModel::Status::InvalidCommand);
-                return;
-            }
-        }
-
-        func(handlerContext, requestPayload);
+        return Status::Success;
     }
-}
 
-void ActionsServer::HandleInstantAction(HandlerContext & ctx, const Commands::InstantAction::DecodableType & commandData)
-{
-    Status status = mDelegate.HandleInstantAction(commandData.actionID, commandData.invokeID);
-    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
-}
-
-void ActionsServer::HandleInstantActionWithTransition(HandlerContext & ctx,
-                                                      const Commands::InstantActionWithTransition::DecodableType & commandData)
-{
-    Status status =
-        mDelegate.HandleInstantActionWithTransition(commandData.actionID, commandData.transitionTime, commandData.invokeID);
-    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
-}
-
-void ActionsServer::HandleStartAction(HandlerContext & ctx, const Commands::StartAction::DecodableType & commandData)
-{
-    Status status = mDelegate.HandleStartAction(commandData.actionID, commandData.invokeID);
-    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
-}
-
-void ActionsServer::HandleStartActionWithDuration(HandlerContext & ctx,
-                                                  const Commands::StartActionWithDuration::DecodableType & commandData)
-{
-    Status status = mDelegate.HandleStartActionWithDuration(commandData.actionID, commandData.duration, commandData.invokeID);
-    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
-}
-
-void ActionsServer::HandleStopAction(HandlerContext & ctx, const Commands::StopAction::DecodableType & commandData)
-{
-    Status status = mDelegate.HandleStopAction(commandData.actionID, commandData.invokeID);
-    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
-}
-
-void ActionsServer::HandlePauseAction(HandlerContext & ctx, const Commands::PauseAction::DecodableType & commandData)
-{
-    Status status = mDelegate.HandlePauseAction(commandData.actionID, commandData.invokeID);
-    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
-}
-
-void ActionsServer::HandlePauseActionWithDuration(HandlerContext & ctx,
-                                                  const Commands::PauseActionWithDuration::DecodableType & commandData)
-{
-    Status status = mDelegate.HandlePauseActionWithDuration(commandData.actionID, commandData.duration, commandData.invokeID);
-    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
-}
-
-void ActionsServer::HandleResumeAction(HandlerContext & ctx, const Commands::ResumeAction::DecodableType & commandData)
-{
-    Status status = mDelegate.HandleResumeAction(commandData.actionID, commandData.invokeID);
-    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
-}
-
-void ActionsServer::HandleEnableAction(HandlerContext & ctx, const Commands::EnableAction::DecodableType & commandData)
-{
-    Status status = mDelegate.HandleEnableAction(commandData.actionID, commandData.invokeID);
-    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
-}
-
-void ActionsServer::HandleEnableActionWithDuration(HandlerContext & ctx,
-                                                   const Commands::EnableActionWithDuration::DecodableType & commandData)
-{
-    Status status = mDelegate.HandleEnableActionWithDuration(commandData.actionID, commandData.duration, commandData.invokeID);
-    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
-}
-
-void ActionsServer::HandleDisableAction(HandlerContext & ctx, const Commands::DisableAction::DecodableType & commandData)
-{
-    Status status = mDelegate.HandleDisableAction(commandData.actionID, commandData.invokeID);
-    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
-}
-
-void ActionsServer::HandleDisableActionWithDuration(HandlerContext & ctx,
-                                                    const Commands::DisableActionWithDuration::DecodableType & commandData)
-{
-    Status status = mDelegate.HandleDisableActionWithDuration(commandData.actionID, commandData.duration, commandData.invokeID);
-    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
-}
-
-void ActionsServer::InvokeCommand(HandlerContext & handlerContext)
-{
-    switch (handlerContext.mRequestPath.mCommandId)
+    ActionStructStorage action;
+    CHIP_ERROR err = mDelegate.ReadActionAtIndex(actionIndex, action);
+    if (err != CHIP_NO_ERROR)
     {
-    case Actions::Commands::InstantAction::Id:
-        HandleCommand<Commands::InstantAction::DecodableType>(
-            handlerContext, [this](HandlerContext & ctx, const auto & commandData) { HandleInstantAction(ctx, commandData); });
-        return;
-    case Actions::Commands::InstantActionWithTransition::Id:
-        HandleCommand<Commands::InstantActionWithTransition::DecodableType>(
-            handlerContext,
-            [this](HandlerContext & ctx, const auto & commandData) { HandleInstantActionWithTransition(ctx, commandData); });
-        return;
-    case Actions::Commands::StartAction::Id:
-        HandleCommand<Commands::StartAction::DecodableType>(
-            handlerContext, [this](HandlerContext & ctx, const auto & commandData) { HandleStartAction(ctx, commandData); });
-        return;
-    case Actions::Commands::StartActionWithDuration::Id:
-        HandleCommand<Commands::StartActionWithDuration::DecodableType>(
-            handlerContext,
-            [this](HandlerContext & ctx, const auto & commandData) { HandleStartActionWithDuration(ctx, commandData); });
-        return;
-    case Actions::Commands::StopAction::Id:
-        HandleCommand<Commands::StopAction::DecodableType>(
-            handlerContext, [this](HandlerContext & ctx, const auto & commandData) { HandleStopAction(ctx, commandData); });
-        return;
-    case Actions::Commands::PauseAction::Id:
-        HandleCommand<Commands::PauseAction::DecodableType>(
-            handlerContext, [this](HandlerContext & ctx, const auto & commandData) { HandlePauseAction(ctx, commandData); });
-        return;
-    case Actions::Commands::PauseActionWithDuration::Id:
-        HandleCommand<Commands::PauseActionWithDuration::DecodableType>(
-            handlerContext,
-            [this](HandlerContext & ctx, const auto & commandData) { HandlePauseActionWithDuration(ctx, commandData); });
-        return;
-    case Actions::Commands::ResumeAction::Id:
-        HandleCommand<Commands::ResumeAction::DecodableType>(
-            handlerContext, [this](HandlerContext & ctx, const auto & commandData) { HandleResumeAction(ctx, commandData); });
-        return;
-    case Actions::Commands::EnableAction::Id:
-        HandleCommand<Commands::EnableAction::DecodableType>(
-            handlerContext, [this](HandlerContext & ctx, const auto & commandData) { HandleEnableAction(ctx, commandData); });
-        return;
-    case Actions::Commands::EnableActionWithDuration::Id:
-        HandleCommand<Commands::EnableActionWithDuration::DecodableType>(
-            handlerContext,
-            [this](HandlerContext & ctx, const auto & commandData) { HandleEnableActionWithDuration(ctx, commandData); });
-        return;
-    case Actions::Commands::DisableAction::Id:
-        HandleCommand<Commands::DisableAction::DecodableType>(
-            handlerContext, [this](HandlerContext & ctx, const auto & commandData) { HandleDisableAction(ctx, commandData); });
-        return;
-    case Actions::Commands::DisableActionWithDuration::Id:
-        HandleCommand<Commands::DisableActionWithDuration::DecodableType>(
-            handlerContext,
-            [this](HandlerContext & ctx, const auto & commandData) { HandleDisableActionWithDuration(ctx, commandData); });
-        return;
+        ChipLogError(Zcl, "Failed to read action at index %u: %" CHIP_ERROR_FORMAT, actionIndex, err.Format());
+        return Status::Failure;
     }
+
+    // Ensure the command is supported via bitmask
+    VerifyOrReturnValue((action.supportedCommands.Raw() & (1 << commandId)), Status::InvalidCommand);
+    return Status::Success;
 }
 
-void ActionsServer::ActionListModified(EndpointId aEndpoint)
+std::optional<DataModel::ActionReturnStatus> ActionsCluster::InvokeCommand(const DataModel::InvokeRequest & request,
+                                                                           chip::TLV::TLVReader & input_arguments,
+                                                                           CommandHandler * handler)
 {
-    MarkDirty(aEndpoint, Attributes::ActionList::Id);
+    using namespace Actions::Commands;
+
+    // Common validation shared by every command: decode, find the action, check support.
+#define DECODE_AND_VALIDATE(CommandType)                                                                                           \
+    CommandType::DecodableType commandData;                                                                                        \
+    VerifyOrReturnValue(DataModel::Decode(input_arguments, commandData) == CHIP_NO_ERROR, Status::InvalidCommand);                 \
+    uint16_t actionIndex = kMaxActionListLength;                                                                                   \
+    {                                                                                                                              \
+        Status s = ValidateActionExists(commandData.actionID, actionIndex);                                                        \
+        VerifyOrReturnValue(s == Status::Success, s);                                                                              \
+        s = ValidateCommandSupported(actionIndex, request.path.mCommandId);                                                        \
+        VerifyOrReturnValue(s == Status::Success, s);                                                                              \
+    }
+
+    switch (request.path.mCommandId)
+    {
+    case InstantAction::Id: {
+        DECODE_AND_VALIDATE(InstantAction)
+        return mDelegate.HandleInstantAction(commandData.actionID, commandData.invokeID);
+    }
+    case InstantActionWithTransition::Id: {
+        DECODE_AND_VALIDATE(InstantActionWithTransition)
+        return mDelegate.HandleInstantActionWithTransition(commandData.actionID, commandData.transitionTime, commandData.invokeID);
+    }
+    case StartAction::Id: {
+        DECODE_AND_VALIDATE(StartAction)
+        return mDelegate.HandleStartAction(commandData.actionID, commandData.invokeID);
+    }
+    case StartActionWithDuration::Id: {
+        DECODE_AND_VALIDATE(StartActionWithDuration)
+        return mDelegate.HandleStartActionWithDuration(commandData.actionID, commandData.duration, commandData.invokeID);
+    }
+    case StopAction::Id: {
+        DECODE_AND_VALIDATE(StopAction)
+        return mDelegate.HandleStopAction(commandData.actionID, commandData.invokeID);
+    }
+    case PauseAction::Id: {
+        DECODE_AND_VALIDATE(PauseAction)
+        return mDelegate.HandlePauseAction(commandData.actionID, commandData.invokeID);
+    }
+    case PauseActionWithDuration::Id: {
+        DECODE_AND_VALIDATE(PauseActionWithDuration)
+        return mDelegate.HandlePauseActionWithDuration(commandData.actionID, commandData.duration, commandData.invokeID);
+    }
+    case ResumeAction::Id: {
+        DECODE_AND_VALIDATE(ResumeAction)
+        return mDelegate.HandleResumeAction(commandData.actionID, commandData.invokeID);
+    }
+    case EnableAction::Id: {
+        DECODE_AND_VALIDATE(EnableAction)
+        return mDelegate.HandleEnableAction(commandData.actionID, commandData.invokeID);
+    }
+    case EnableActionWithDuration::Id: {
+        DECODE_AND_VALIDATE(EnableActionWithDuration)
+        return mDelegate.HandleEnableActionWithDuration(commandData.actionID, commandData.duration, commandData.invokeID);
+    }
+    case DisableAction::Id: {
+        DECODE_AND_VALIDATE(DisableAction)
+        return mDelegate.HandleDisableAction(commandData.actionID, commandData.invokeID);
+    }
+    case DisableActionWithDuration::Id: {
+        DECODE_AND_VALIDATE(DisableActionWithDuration)
+        return mDelegate.HandleDisableActionWithDuration(commandData.actionID, commandData.duration, commandData.invokeID);
+    }
+    }
+
+#undef DECODE_AND_VALIDATE
+
+    return Status::UnsupportedCommand;
 }
 
-void ActionsServer::EndpointListModified(EndpointId aEndpoint)
+CHIP_ERROR ActionsCluster::Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
-    MarkDirty(aEndpoint, Attributes::EndpointLists::Id);
+    using namespace Actions::Attributes;
+    constexpr DataModel::AttributeEntry optionalAttributesMeta[] = {
+        SetupURL::kMetadataEntry,
+    };
+
+    AttributeListBuilder listBuilder(builder);
+    return listBuilder.Append(Span(kMandatoryMetadata), Span{ optionalAttributesMeta }, mOptionalAttributes);
 }
 
-void MatterActionsPluginServerInitCallback() {}
-void MatterActionsPluginServerShutdownCallback() {}
+CHIP_ERROR ActionsCluster::AcceptedCommands(const ConcreteClusterPath & path,
+                                            ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
+{
+    using namespace Actions::Commands;
+
+    static const DataModel::AcceptedCommandEntry kCommands[] = {
+        InstantAction::kMetadataEntry,
+        InstantActionWithTransition::kMetadataEntry,
+        StartAction::kMetadataEntry,
+        StartActionWithDuration::kMetadataEntry,
+        StopAction::kMetadataEntry,
+        PauseAction::kMetadataEntry,
+        PauseActionWithDuration::kMetadataEntry,
+        ResumeAction::kMetadataEntry,
+        EnableAction::kMetadataEntry,
+        EnableActionWithDuration::kMetadataEntry,
+        DisableAction::kMetadataEntry,
+        DisableActionWithDuration::kMetadataEntry,
+    };
+
+    return builder.ReferenceExisting(kCommands);
+}
+
+void ActionsCluster::ActionListModified()
+{
+    NotifyAttributeChanged(Actions::Attributes::ActionList::Id);
+}
+
+void ActionsCluster::EndpointListsModified()
+{
+    NotifyAttributeChanged(Actions::Attributes::EndpointLists::Id);
+}
+
+} // namespace chip::app::Clusters

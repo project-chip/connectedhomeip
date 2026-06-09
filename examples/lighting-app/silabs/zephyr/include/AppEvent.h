@@ -26,7 +26,6 @@ struct AppEvent
     {
         kEventType_Timer = 0,
         kEventType_TurnOn,
-        kEventType_Install,
     };
 
     uint16_t Type;

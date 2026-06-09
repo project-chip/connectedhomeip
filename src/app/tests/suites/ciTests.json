@@ -39,12 +39,7 @@
         "TestColorControl_9_1",
         "TestColorControl_9_2"
     ],
-    "DeviceManagement": [
-        "Test_TC_OPCREDS_3_7",
-        "Test_TC_BINFO_2_1",
-        "Test_TC_BINFO_2_2",
-        "Test_TC_CNET_1_3"
-    ],
+    "DeviceManagement": ["Test_TC_OPCREDS_3_7", "Test_TC_CNET_1_3"],
     "Descriptor": [],
     "DeviceEnergyManagementMode": ["Test_TC_DEMM_2_1"],
     "EthernetNetworkDiagnostics": ["Test_TC_DGETH_2_1", "Test_TC_DGETH_2_2"],
@@ -75,8 +70,7 @@
         "Test_TC_LVL_4_1",
         "Test_TC_LVL_5_1",
         "Test_TC_LVL_6_1",
-        "Test_TC_LVL_7_1",
-        "Test_TC_LVL_9_1"
+        "Test_TC_LVL_7_1"
     ],
     "LocalizationConfiguration": [],
     "TimeFormatLocalization": ["Test_TC_LTIME_1_2"],
@@ -139,8 +133,7 @@
         "Test_TC_OO_2_1",
         "Test_TC_OO_2_2",
         "Test_TC_OO_2_4",
-        "Test_TC_OO_2_6",
-        "Test_TC_OO_2_7"
+        "Test_TC_OO_2_6"
     ],
     "PowerSource": ["Test_TC_PS_2_1"],
     "PowerTopology": ["Test_TC_PWRTL_1_1"],

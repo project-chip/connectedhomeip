@@ -193,8 +193,6 @@ import os
 from dataclasses import dataclass
 from typing import Any, Callable
 
-from test_testing.DeviceConformanceTests import get_supersets
-
 import matter.clusters as Clusters
 import matter.clusters.ClusterObjects
 import matter.tlv
@@ -206,6 +204,7 @@ from matter.exceptions import ChipStackError
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.basic_composition import BasicCompositionTests
 from matter.testing.decorators import async_test_body
+from matter.testing.device_conformance_tests import get_supersets
 from matter.testing.global_attribute_ids import (AttributeIdType, ClusterIdType, CommandIdType, GlobalAttributeIds,
                                                  attribute_id_type, cluster_id_type, command_id_type)
 from matter.testing.problem_notices import AttributePathLocation, ClusterPathLocation, CommandPathLocation, UnknownProblemLocation
@@ -341,13 +340,61 @@ class TC_DeviceBasicComposition(BasicCompositionTests):
                                   problem=f'Root node does not contain required cluster {c}', spec_location="Root node device type")
                 self.fail_current_test()
 
+        # NOTE: This was provisional in 1.6.0, but due to issues with reaching the finish line,
+        #       this step was punted to a later release to reduce friction for SVE participants.
+        self.print_step(6, "Verify that the specification version is above 1.6.0 for the next steps")
+        specification_version = root[Clusters.BasicInformation].get(Clusters.BasicInformation.Attributes.SpecificationVersion, 0)
+        # Gate Groupcast requirements on Matter > 1.6.0
+        if specification_version > 0x01060000:
+            groupcast_feature_map = 0
+            if Clusters.Groupcast in root:
+                groupcast_feature_map = root[Clusters.Groupcast][Clusters.Groupcast.Attributes.FeatureMap]
+            has_groupcast_listener = bool(groupcast_feature_map & Clusters.Groupcast.Bitmaps.Feature.kListener)
+            has_groupcast_sender = bool(groupcast_feature_map & Clusters.Groupcast.Bitmaps.Feature.kSender)
+
+            self.print_step(7, "Verify GroupcastListenerCond: if any endpoint has Groups server, "
+                            "Groupcast with Listener feature must be on EP0")
+            has_groups_server = any(
+                Clusters.Groups in self.endpoints[ep_id]
+                for ep_id in self.endpoints if ep_id != 0
+            )
+            log.info("has_groups_server: %s, has_groupcast_listener: %s", has_groups_server, has_groupcast_listener)
+            if has_groups_server and not has_groupcast_listener:
+                self.record_error(self.get_test_name(), location=AttributePathLocation(endpoint_id=0),
+                                  problem="Groups server found on an endpoint but Groupcast cluster with Listener "
+                                  "feature is not present on the root node (EP0)",
+                                  spec_location="Root node device type - GroupcastListenerCond")
+                self.fail_current_test()
+
+            self.print_step(8, "Verify GroupcastSenderCond: if any endpoint has Binding server, "
+                            "Groupcast with Sender feature must be on EP0")
+            has_binding_server = any(
+                Clusters.Binding in self.endpoints[ep_id]
+                for ep_id in self.endpoints if ep_id != 0
+            )
+            log.info("has_binding_server: %s, has_groupcast_sender: %s", has_binding_server, has_groupcast_sender)
+            if has_binding_server and not has_groupcast_sender:
+                self.record_error(self.get_test_name(), location=AttributePathLocation(endpoint_id=0),
+                                  problem="Binding server found on an endpoint but Groupcast cluster with Sender "
+                                  "feature is not present on the root node (EP0)",
+                                  spec_location="Root node device type - GroupcastSenderCond")
+                self.fail_current_test()
+            if has_groupcast_listener:
+                acl_feature_map = root[Clusters.AccessControl][Clusters.AccessControl.Attributes.FeatureMap]
+                has_acl_aux = bool(acl_feature_map & Clusters.AccessControl.Bitmaps.Feature.kAuxiliary)
+                if not has_acl_aux:
+                    self.record_error(self.get_test_name(), location=AttributePathLocation(endpoint_id=0),
+                                      problem="Groupcast with Listener feature is on EP0 but Access Control cluster does not have Auxiliary feature",
+                                      spec_location="Root node device type - GroupcastListenerCond")
+                    self.fail_current_test()
+
     def test_TC_DT_1_1(self):
         self.print_step(1, "Perform a wildcard read of attributes on all endpoints - already done")
         self.print_step(2, "Verify that each endpoint includes a descriptor cluster")
         success = True
         for endpoint_id, endpoint in self.endpoints.items():
             has_descriptor = (Clusters.Descriptor in endpoint)
-            log.info(f"Checking descriptor on Endpoint {endpoint_id}: {'found' if has_descriptor else 'not_found'}")
+            log.info("Checking descriptor on Endpoint %s: %s", endpoint_id, 'found' if has_descriptor else 'not_found')
             if not has_descriptor:
                 self.record_error(self.get_test_name(), location=AttributePathLocation(endpoint_id=endpoint_id, cluster_id=Clusters.Descriptor.id),
                                   problem=f"Did not find a descriptor on endpoint {endpoint_id}", spec_location="Base Cluster Requirements for Matter")
@@ -426,8 +473,9 @@ class TC_DeviceBasicComposition(BasicCompositionTests):
 
                     has_attribute = (req_attribute.id in cluster)
                     location = AttributePathLocation(endpoint_id, cluster_id, req_attribute.id)
-                    log.debug(
-                        f"Checking for mandatory global {attribute_string} on {location.as_cluster_string(self.cluster_mapper)}: {'found' if has_attribute else 'not_found'}")
+                    log.debug("Checking for mandatory global %s on %s: %s",
+                              attribute_string, location.as_cluster_string(self.cluster_mapper),
+                              'found' if has_attribute else 'not_found')
 
                     # Check attribute is actually present
                     if not has_attribute:
@@ -465,8 +513,9 @@ class TC_DeviceBasicComposition(BasicCompositionTests):
                         has_attribute = attribute_id in cluster
 
                         attribute_string = self.cluster_mapper.get_attribute_string(cluster_id, attribute_id)
-                        log.debug(
-                            f"Checking presence of claimed supported {attribute_string} on {location.as_cluster_string(self.cluster_mapper)}: {'found' if has_attribute else 'not_found'}")
+                        log.debug("Checking presence of claimed supported %s on %s: %s",
+                                  attribute_string, location.as_cluster_string(self.cluster_mapper),
+                                  'found' if has_attribute else 'not_found')
 
                         if not has_attribute:
                             # Check if this is a write-only attribute by trying to read it.
@@ -509,8 +558,9 @@ class TC_DeviceBasicComposition(BasicCompositionTests):
         mei_range_min = 0x0001_0000
         for endpoint_id, endpoint in self.endpoints_tlv.items():
             for cluster_id, cluster in endpoint.items():
-                globals = [a for a in cluster[GlobalAttributeIds.ATTRIBUTE_LIST_ID] if a >= global_range_min and a < mei_range_min]
-                unexpected_globals = sorted(set(globals) - set(allowed_globals))
+                endpoint_globals = filter(lambda a: a >= global_range_min and a < mei_range_min,
+                                          cluster[GlobalAttributeIds.ATTRIBUTE_LIST_ID])
+                unexpected_globals = sorted(set(endpoint_globals) - set(allowed_globals))
                 for unexpected in unexpected_globals:
                     location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, attribute_id=unexpected)
                     self.record_error(self.get_test_name(), location=location,
@@ -684,6 +734,12 @@ class TC_DeviceBasicComposition(BasicCompositionTests):
                 if cluster_id not in matter.clusters.ClusterObjects.ALL_CLUSTERS:
                     continue
                 feature_map = cluster[GlobalAttributeIds.FEATURE_MAP_ID]
+                if isinstance(feature_map, ValueDecodeFailure):
+                    location = AttributePathLocation(endpoint_id, cluster_id, GlobalAttributeIds.FEATURE_MAP_ID)
+                    self.record_error(self.get_test_name(), location=location,
+                                      problem=f"Found a failure to read/decode FEATURE_MAP on {location.as_cluster_string(self.cluster_mapper)}")
+                    success = False
+                    continue
                 feature_mask = 0
                 try:
                     feature_map_enum = matter.clusters.ClusterObjects.ALL_CLUSTERS[cluster_id].Bitmaps.Feature
@@ -808,10 +864,10 @@ class TC_DeviceBasicComposition(BasicCompositionTests):
         self.print_step(5, "Check for cycles in the tree endpoints")
         part_list_errors = parts_list_problems(tree, self.endpoints)
         if len(part_list_errors) != 0:
-            for id in part_list_errors:
-                location = AttributePathLocation(endpoint_id=id, cluster_id=cluster_id, attribute_id=attribute_id)
+            for _id in part_list_errors:
+                location = AttributePathLocation(endpoint_id=_id, cluster_id=cluster_id, attribute_id=attribute_id)
                 self.record_error(self.get_test_name(), location=location,
-                                  problem=f"Endpoint {id} parts list includes a cycle or endpoint with multiple paths to the root or non-existent endpoint", spec_location="PartsList Attribute")
+                                  problem=f"Endpoint {_id} parts list includes a cycle or endpoint with multiple paths to the root or non-existent endpoint", spec_location="PartsList Attribute")
             self.fail_current_test()
 
         self.print_step(6, "Check flat lists include all sub ids")
@@ -894,7 +950,7 @@ class TC_DeviceBasicComposition(BasicCompositionTests):
                                          [Clusters.Descriptor.Attributes.DeviceTypeList]]
             parts_list[endpoint_id] = endpoint[Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList]
 
-        bridged_nodes = [id for (id, dev_type) in device_types.items() if BRIDGED_NODE_DEVICE_TYPE_ID in dev_type]
+        bridged_nodes = [_id for (_id, dev_type) in device_types.items() if BRIDGED_NODE_DEVICE_TYPE_ID in dev_type]
 
         for endpoint_id in bridged_nodes:
             if Clusters.PowerSource not in self.endpoints[endpoint_id]:

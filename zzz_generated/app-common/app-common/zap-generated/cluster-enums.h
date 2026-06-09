@@ -29,9 +29,11 @@
 #include <clusters/AdministratorCommissioning/Enums.h>
 #include <clusters/AirQuality/Enums.h>
 #include <clusters/AmbientContextSensing/Enums.h>
+#include <clusters/AmbientSensingUnion/Enums.h>
 #include <clusters/ApplicationBasic/Enums.h>
 #include <clusters/ApplicationLauncher/Enums.h>
 #include <clusters/AudioOutput/Enums.h>
+#include <clusters/AvAnalysis/Enums.h>
 #include <clusters/BallastConfiguration/Enums.h>
 #include <clusters/BasicInformation/Enums.h>
 #include <clusters/Binding/Enums.h>
@@ -61,10 +63,14 @@
 #include <clusters/DishwasherAlarm/Enums.h>
 #include <clusters/DishwasherMode/Enums.h>
 #include <clusters/DoorLock/Enums.h>
+#include <clusters/DynamicLighting/Enums.h>
 #include <clusters/EcosystemInformation/Enums.h>
+#include <clusters/ElectricalAlarm/Enums.h>
+#include <clusters/ElectricalDistribution/Enums.h>
 #include <clusters/ElectricalEnergyMeasurement/Enums.h>
 #include <clusters/ElectricalGridConditions/Enums.h>
 #include <clusters/ElectricalPowerMeasurement/Enums.h>
+#include <clusters/ElectricalProtectionAlarm/Enums.h>
 #include <clusters/EnergyEvse/Enums.h>
 #include <clusters/EnergyEvseMode/Enums.h>
 #include <clusters/EnergyPreference/Enums.h>
@@ -80,6 +86,7 @@
 #include <clusters/Groupcast/Enums.h>
 #include <clusters/Groups/Enums.h>
 #include <clusters/HepaFilterMonitoring/Enums.h>
+#include <clusters/Humidistat/Enums.h>
 #include <clusters/IcdManagement/Enums.h>
 #include <clusters/Identify/Enums.h>
 #include <clusters/IlluminanceMeasurement/Enums.h>
@@ -100,6 +107,7 @@
 #include <clusters/MicrowaveOvenMode/Enums.h>
 #include <clusters/ModeSelect/Enums.h>
 #include <clusters/NetworkCommissioning/Enums.h>
+#include <clusters/NetworkIdentityManagement/Enums.h>
 #include <clusters/NitrogenDioxideConcentrationMeasurement/Enums.h>
 #include <clusters/OccupancySensing/Enums.h>
 #include <clusters/OnOff/Enums.h>
@@ -117,6 +125,7 @@
 #include <clusters/PowerSourceConfiguration/Enums.h>
 #include <clusters/PowerTopology/Enums.h>
 #include <clusters/PressureMeasurement/Enums.h>
+#include <clusters/ProximityRanging/Enums.h>
 #include <clusters/ProxyConfiguration/Enums.h>
 #include <clusters/ProxyDiscovery/Enums.h>
 #include <clusters/ProxyValid/Enums.h>
@@ -134,6 +143,7 @@
 #include <clusters/ScenesManagement/Enums.h>
 #include <clusters/ServiceArea/Enums.h>
 #include <clusters/SmokeCoAlarm/Enums.h>
+#include <clusters/SmokeConcentrationMeasurement/Enums.h>
 #include <clusters/SoftwareDiagnostics/Enums.h>
 #include <clusters/SoilMeasurement/Enums.h>
 #include <clusters/Switch/Enums.h>
@@ -147,7 +157,6 @@
 #include <clusters/ThreadNetworkDirectory/Enums.h>
 #include <clusters/TimeFormatLocalization/Enums.h>
 #include <clusters/TimeSynchronization/Enums.h>
-#include <clusters/Timer/Enums.h>
 #include <clusters/TlsCertificateManagement/Enums.h>
 #include <clusters/TlsClientManagement/Enums.h>
 #include <clusters/TotalVolatileOrganicCompoundsConcentrationMeasurement/Enums.h>

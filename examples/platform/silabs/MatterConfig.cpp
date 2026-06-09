@@ -35,18 +35,19 @@
 #endif // defined(SL_MATTER_EM4_SLEEP) && (SL_MATTER_EM4_SLEEP == 1)
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
+#include <sl_component_catalog.h>
+#ifdef SL_CATALOG_WATCHDOG_MANAGER_PRESENT
+#include <sl_watchdog_manager.h>
+#endif // SL_CATALOG_WATCHDOG_MANAGER_PRESENT
+
 #ifdef SL_WIFI
 #include <platform/silabs/NetworkCommissioningWiFiDriver.h>
 #include <platform/silabs/wifi/WifiInterface.h> // nogncheck
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
 #include <platform/silabs/wifi/icd/WifiSleepManager.h> // nogncheck
-#endif                                                 // CHIP_CONFIG_ENABLE_ICD_SERVER
 
-// TODO: We shouldn't need any platform specific includes in this file
-#if (defined(SLI_SI91X_MCU_INTERFACE) && SLI_SI91X_MCU_INTERFACE == 1)
-#include <platform/silabs/SiWx/SiWxPlatformInterface.h>
-#endif // (defined(SLI_SI91X_MCU_INTERFACE) && SLI_SI91X_MCU_INTERFACE == 1)
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 #endif // SL_WIFI
 
 #if defined(PW_RPC_ENABLED) && PW_RPC_ENABLED
@@ -70,7 +71,9 @@ static chip::DeviceLayer::Internal::Efr32PsaOperationalKeystore gOperationalKeys
 #endif
 
 #include <app/InteractionModelEngine.h>
+#if !SL_MATTER_USE_CODE_DRIVEN_DATA_MODEL
 #include <data-model-providers/codegen/Instance.h>
+#endif // !SL_MATTER_USE_CODE_DRIVEN_DATA_MODEL
 #include <headers/ProvisionManager.h>
 #include <platform/DefaultTimerDelegate.h>
 
@@ -90,6 +93,10 @@ static chip::DeviceLayer::Internal::Efr32PsaOperationalKeystore gOperationalKeys
 #include <performance_test_commands.h>
 #endif
 
+#if SILABS_LOG_OUT_UART
+#include "uart.h"
+#endif // SILABS_LOG_OUT_UART
+
 #include <AppTask.h>
 
 #include <DeviceInfoProviderImpl.h>
@@ -97,7 +104,9 @@ static chip::DeviceLayer::Internal::Efr32PsaOperationalKeystore gOperationalKeys
 
 #include <platform/silabs/platformAbstraction/SilabsPlatform.h>
 
+#if !SL_MATTER_USE_CODE_DRIVEN_DATA_MODEL
 #include <app/clusters/network-commissioning/network-commissioning.h>
+#endif
 /**********************************************************
  * Defines
  *********************************************************/
@@ -109,9 +118,11 @@ using namespace ::chip::DeviceLayer;
 using namespace ::chip::Credentials;
 using namespace chip::DeviceLayer::Silabs;
 
+#if !SL_MATTER_USE_CODE_DRIVEN_DATA_MODEL
 #ifdef SL_WIFI
 Clusters::NetworkCommissioning::InstanceAndDriver<NetworkCommissioning::SlWiFiDriver> sWifiNetworkDriver(kRootEndpointId);
 #endif /* SL_WIFI */
+#endif // !SL_MATTER_USE_CODE_DRIVEN_DATA_MODEL
 
 #if CHIP_ENABLE_OPENTHREAD
 #include <inet/EndPointStateOpenThread.h>
@@ -126,9 +137,11 @@ Clusters::NetworkCommissioning::InstanceAndDriver<NetworkCommissioning::SlWiFiDr
 #include <openthread/tasklet.h>
 #include <openthread/thread.h>
 
+#if !SL_MATTER_USE_CODE_DRIVEN_DATA_MODEL
 #include <platform/OpenThread/GenericNetworkCommissioningThreadDriver.h>
 
 Clusters::NetworkCommissioning::InstanceAndDriver<NetworkCommissioning::GenericThreadDriver> sThreadNetworkDriver(kRootEndpointId);
+#endif // !SL_MATTER_USE_CODE_DRIVEN_DATA_MODEL
 // ================================================================================
 // Matter Networking Callbacks
 // ================================================================================
@@ -163,7 +176,9 @@ CHIP_ERROR SilabsMatterConfig::InitOpenThread(void)
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 #endif // CHIP_DEVICE_CONFIG_THREAD_FTD
 
+#if !SL_MATTER_USE_CODE_DRIVEN_DATA_MODEL
     TEMPORARY_RETURN_IGNORED sThreadNetworkDriver.Init();
+#endif
 
     return ThreadStackMgrImpl().StartThreadTask();
 }
@@ -198,6 +213,9 @@ void ApplicationStart(void * unused)
     if (err != CHIP_NO_ERROR)
         appError(err);
 
+#if SILABS_LOG_OUT_UART
+    sendLogImmediately(false);
+#endif                                                       // SILABS_LOG_OUT_UART
     VerifyOrDie(osThreadTerminate(sMainTaskHandle) == osOK); // Deleting the main task should never fail.
     sMainTaskHandle = nullptr;
 }
@@ -291,11 +309,13 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
     nativeParams.openThreadInstancePtr = chip::DeviceLayer::ThreadStackMgrImpl().OTInstance();
     initParams.endpointNativeParams    = static_cast<void *>(&nativeParams);
 #endif
+#if !SL_MATTER_USE_CODE_DRIVEN_DATA_MODEL
 #ifdef SL_WIFI
     // This must be initialized after InitWiFiStack and InitChipStack which enable communication between the TA an M4
     // This is required for TA nvm access used by the sWifiNetworkDriver.
     ReturnErrorOnFailure(sWifiNetworkDriver.Init());
 #endif
+#endif // !SL_MATTER_USE_CODE_DRIVEN_DATA_MODEL
 
     // Verify if the platform is updated by reading the NVM3 config value. This needs to be done after the wifi network driver
     // initialization, as the 917 nvm is accessed through the TA, and the communication between the M4 and the TA is available at
@@ -330,8 +350,24 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
 
     // Initialize the remaining (not overridden) providers to the SDK example defaults
     ReturnErrorOnFailure(initParams.InitializeStaticResourcesBeforeServerInit());
+
+#if SL_MATTER_USE_CODE_DRIVEN_DATA_MODEL
+    // App is using code-driven data model - initialize it
+    CHIP_ERROR dmErr = AppTask::InitCodeDrivenDataModel(*initParams.persistentStorageDelegate, initParams.groupDataProvider);
+    if (dmErr == CHIP_NO_ERROR)
+    {
+        initParams.dataModelProvider = AppTask::GetDataModelProvider();
+        SILABS_LOG("Using code-driven data model");
+    }
+    else
+    {
+        SILABS_LOG("Code-driven data model init failed: %" CHIP_ERROR_FORMAT, dmErr.Format());
+        return dmErr;
+    }
+#else
     initParams.dataModelProvider = CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
-    initParams.appDelegate       = &BaseApplication::sAppDelegate;
+#endif
+    initParams.appDelegate = &BaseApplication::sAppDelegate;
 
     // This is needed by localization configuration cluster so we set it before the initialization
     gExampleDeviceInfoProvider.SetStorageDelegate(initParams.persistentStorageDelegate);
@@ -383,17 +419,17 @@ void OnEM4Trigger(uint32_t duration)
 // FreeRTOS Callbacks
 // ================================================================================
 
+#ifdef SL_CATALOG_WATCHDOG_MANAGER_PRESENT
+void sl_watchdog_manager_user_idle_hook(void)
+#else
 extern "C" void vApplicationIdleHook(void)
+#endif
 {
 #if ((defined(SLI_SI91X_MCU_INTERFACE) && SLI_SI91X_MCU_INTERFACE) && CHIP_CONFIG_ENABLE_ICD_SERVER)
 #ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
-    SiWxPlatformInterface::sl_si91x_btn_event_handler();
+    GetPlatform().SleepButtonActionHandler();
 #endif // SL_CATALOG_SIMPLE_BUTTON_PRESENT
-    SiWxPlatformInterface::sl_si91x_uart_power_requirement_handler();
-#endif
-#if SL_MATTER_DEBUG_WATCHDOG_ENABLE
-    GetPlatform().WatchdogFeed();
-#endif // SL_MATTER_DEBUG_WATCHDOG_ENABLE
+#endif // ((defined(SLI_SI91X_MCU_INTERFACE) && SLI_SI91X_MCU_INTERFACE) && CHIP_CONFIG_ENABLE_ICD_SERVER)
 }
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER

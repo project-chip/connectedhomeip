@@ -24,7 +24,9 @@
 #include "AppConfig.h"
 #include "AppEvent.h"
 #include "AppTask.h"
+#if defined(SILABS_OTA_ENABLED) && SILABS_OTA_ENABLED
 #include "OTAConfig.h"
+#endif // SILABS_OTA_ENABLED
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
 
@@ -37,6 +39,12 @@
 #endif // QR_CODE_ENABLED
 #endif // DISPLAY_ENABLED
 
+#ifdef ENABLE_CHIP_SHELL
+#if defined(CHIP_CONFIG_ENABLE_READ_CLIENT) && CHIP_CONFIG_ENABLE_READ_CLIENT
+#include <shell/im/IMShellCommands.h> // nogncheck
+#endif                                // CHIP_CONFIG_ENABLE_READ_CLIENT
+#endif                                // ENABLE_CHIP_SHELL
+
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
 #include <app/icd/server/ICDNotifier.h> // nogncheck
 #ifdef ENABLE_CHIP_SHELL
@@ -44,7 +52,6 @@
 #endif // ENABLE_CHIP_SHELL
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
-#include <app/util/attribute-storage.h>
 #include <assert.h>
 #include <headers/ProvisionManager.h>
 #include <lib/support/CodeUtils.h>
@@ -85,6 +92,10 @@
 #ifdef MATTER_DM_PLUGIN_IDENTIFY_SERVER
 #include <app-common/zap-generated/callback.h>
 #endif
+
+#ifdef CHIP_SILABS_APP_USE_CUSTOMER_APP_TASK
+#include "CustomerAppTask.h"
+#endif // CHIP_SILABS_APP_USE_CUSTOMER_APP_TASK
 
 /**********************************************************
  * Defines and Constants
@@ -278,8 +289,6 @@ CHIP_ERROR BaseApplication::Init()
         appError(err);
         return err;
     }
-
-    GetPlatform().WatchdogInit();
     return err;
 }
 
@@ -341,6 +350,9 @@ CHIP_ERROR BaseApplication::BaseInit()
 #endif // ENABLE_WSTK_LEDS
 
 #ifdef ENABLE_CHIP_SHELL
+#if defined(CHIP_CONFIG_ENABLE_READ_CLIENT) && CHIP_CONFIG_ENABLE_READ_CLIENT
+    IMShellCommands::RegisterCommands();
+#endif // CHIP_CONFIG_ENABLE_READ_CLIENT
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     ICDCommands::RegisterCommands();
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
@@ -1026,3 +1038,12 @@ bool BaseApplication::GetProvisionStatus()
 {
     return BaseApplication::sIsProvisioned;
 }
+
+#ifdef CHIP_SILABS_APP_USE_CUSTOMER_APP_TASK
+void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
+                                       uint8_t * value)
+{
+    // Route through CustomerAppTask / AppTaskImpl (CRTP) so overrides use DMPostAttributeChangeCallbackImpl.
+    CustomerAppTask::GetAppTask().DMPostAttributeChangeCallback(attributePath, type, size, value);
+}
+#endif // CHIP_SILABS_APP_USE_CUSTOMER_APP_TASK

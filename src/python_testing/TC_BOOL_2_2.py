@@ -108,7 +108,6 @@ class TC_BOOL_2_2(MatterBaseTest):
     def pics_TC_BOOL_2_2(self) -> list[str]:
         return [
             "BOOL.S",
-            "BOOL.S.M.ManuallyControlled",
         ]
 
     def _feature_map_has_chgevent(self, feature_map: int) -> bool:
@@ -189,10 +188,10 @@ class TC_BOOL_2_2(MatterBaseTest):
             cluster=cbool,
             attribute=cbool.Attributes.FeatureMap,
         )
-        logger.info(f"FeatureMap attribute: {feature_map}")
+        logger.info("FeatureMap attribute: %s", feature_map)
 
         should_test_state_change_event = self._should_test_state_change_event(feature_map)
-        logger.info(f"StateChange event test enabled: {should_test_state_change_event}")
+        logger.info("StateChange event test enabled: %s", should_test_state_change_event)
 
         # Step 3: Put DUT in FALSE
         self.step("3")
@@ -201,7 +200,7 @@ class TC_BOOL_2_2(MatterBaseTest):
         # Step 4: Verify FALSE
         self.step("4")
         state_value = await self._read_state_value(dev_ctrl=dev_ctrl, node_id=node_id, endpoint=endpoint)
-        logger.info(f"StateValue: {state_value}")
+        logger.info("StateValue: %s", state_value)
         asserts.assert_false(state_value, "StateValue should be FALSE")
 
         # Step 5/6: Subscription + accumulate reports
@@ -237,7 +236,7 @@ class TC_BOOL_2_2(MatterBaseTest):
         # Step 8: Read StateValue == TRUE
         self.step("8")
         state_value = await self._read_state_value(dev_ctrl=dev_ctrl, node_id=node_id, endpoint=endpoint)
-        logger.info(f"StateValue: {state_value}")
+        logger.info("StateValue: %s", state_value)
         asserts.assert_true(state_value, "StateValue should be TRUE")
 
         # Step 9: Wait attribute report within 30s and verify it indicates TRUE
@@ -245,7 +244,7 @@ class TC_BOOL_2_2(MatterBaseTest):
 
         item = self.wait_for_statevalue_report(attr_cb, endpoint, expected=True, timeout_sec=30.0)
 
-        logger.info(f"State value report: {item}")
+        logger.info("State value report: %s", item)
 
         # Step 10: Event report if supported
         self.step("10")
@@ -275,7 +274,7 @@ class TC_BOOL_2_2(MatterBaseTest):
         # Step 13: Read StateValue == FALSE
         self.step("13")
         state_value = await self._read_state_value(dev_ctrl=dev_ctrl, node_id=node_id, endpoint=endpoint)
-        logger.info(f"StateValue: {state_value}")
+        logger.info("StateValue: %s", state_value)
         asserts.assert_false(state_value, "StateValue should be FALSE at step 13")
 
         # Step 14: Wait attribute report within 30s and verify it indicates FALSE
@@ -283,7 +282,7 @@ class TC_BOOL_2_2(MatterBaseTest):
 
         item = self.wait_for_statevalue_report(attr_cb, endpoint, expected=False, timeout_sec=30.0)
 
-        logger.info(f"State value report: {item}")
+        logger.info("State value report: %s", item)
 
         # Step 15: Event report if supported
         self.step("15")

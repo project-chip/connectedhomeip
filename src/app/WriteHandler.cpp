@@ -40,6 +40,7 @@
 #include <lib/support/logging/TextOnlyLogging.h>
 #include <messaging/ExchangeContext.h>
 #include <protocols/interaction_model/StatusCode.h>
+#include <transport/raw/GroupcastTesting.h>
 
 #include <optional>
 
@@ -86,7 +87,6 @@ CHIP_ERROR WriteHandler::Init(DataModel::Provider * apProvider, WriteHandlerDele
     mDelegate = apWriteHandlerDelegate;
     MoveToState(State::Initialized);
 
-    mACLCheckCache.ClearValue();
     mProcessingAttributePath.ClearValue();
 
     return CHIP_NO_ERROR;
@@ -244,7 +244,8 @@ CHIP_ERROR WriteHandler::SendWriteResponse(System::PacketBufferTLVWriter && aMes
     SuccessOrExit(err);
 
     VerifyOrExit(mExchangeCtx, err = CHIP_ERROR_INCORRECT_STATE);
-    mExchangeCtx->UseSuggestedResponseTimeout(app::kExpectedIMProcessingTime);
+    err = mExchangeCtx->UseSuggestedResponseTimeout(app::kExpectedIMProcessingTime);
+    SuccessOrExit(err);
     err = mExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::WriteResponse, std::move(packet),
                                     mStateFlags.Has(StateBits::kHasMoreChunks) ? Messaging::SendMessageFlags::kExpectResponse
                                                                                : Messaging::SendMessageFlags::kNone);
@@ -503,6 +504,15 @@ CHIP_ERROR WriteHandler::ProcessGroupAttributeDataIBs(TLV::TLVReader & aAttribut
             }
 
             dataAttributePath.mEndpointId = mapping.endpoint_id;
+            // Groupcast Testing
+            auto & testing = Groupcast::GetTesting();
+            if (testing.IsEnabled() && testing.IsFabricUnderTest(fabric))
+            {
+                testing.SetGroupID(groupId);
+                testing.SetEndpointID(dataAttributePath.mEndpointId);
+                testing.SetClusterID(dataAttributePath.mClusterId);
+                testing.SetElementID(static_cast<uint32_t>(dataAttributePath.mAttributeId));
+            }
 
             // Try to get the metadata from for the attribute from one of the expanded endpoints (it doesn't really matter which
             // endpoint we pick, as long as it's valid) and update the path info according to it and recheck if we need to report

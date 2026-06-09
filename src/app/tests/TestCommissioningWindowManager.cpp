@@ -17,6 +17,7 @@
 
 #include <app/TestEventTriggerDelegate.h>
 #include <app/clusters/administrator-commissioning-server/AdministratorCommissioningCluster.h>
+#include <app/data-model-provider/AttributeChangeListener.h>
 #include <app/reporting/ReportSchedulerImpl.h>
 #include <app/server/CommissioningWindowManager.h>
 #include <app/server/Server.h>
@@ -86,13 +87,10 @@ void ResetDirtyFlags()
     sWindowStatusDirty     = false;
 }
 
-class TestCommissioningWindowManagerDataModelProvider : public chip::app::CodegenDataModelProvider
+class GlobalAttributeChangeListener : public DataModel::AttributeChangeListener
 {
 public:
-    TestCommissioningWindowManagerDataModelProvider()  = default;
-    ~TestCommissioningWindowManagerDataModelProvider() = default;
-
-    void Temporary_ReportAttributeChanged(const chip::app::AttributePathParams & path) override
+    void OnAttributeChanged(const ConcreteAttributePath & path, DataModel::AttributeChangeType type) override
     {
         using namespace chip::app::Clusters;
         using namespace chip::app::Clusters::AdministratorCommissioning::Attributes;
@@ -117,21 +115,6 @@ public:
         }
     }
 };
-
-chip::app::DataModel::Provider * TestDataModelProviderInstance(chip::PersistentStorageDelegate * delegate)
-{
-    static TestCommissioningWindowManagerDataModelProvider gTestModel;
-
-    if (delegate != nullptr)
-    {
-        gTestModel.SetPersistentStorageDelegate(delegate);
-    }
-
-    return &gTestModel;
-}
-
-} // namespace
-namespace {
 
 void TearDownTask(intptr_t context)
 {
@@ -194,7 +177,11 @@ public:
         static chip::SimpleTestEventTriggerDelegate sSimpleTestEventTriggerDelegate;
         initParams.testEventTriggerDelegate = &sSimpleTestEventTriggerDelegate;
         (void) initParams.InitializeStaticResourcesBeforeServerInit();
-        initParams.dataModelProvider = TestDataModelProviderInstance(initParams.persistentStorageDelegate);
+
+        mModel.SetPersistentStorageDelegate(initParams.persistentStorageDelegate);
+        mModel.RegisterAttributeChangeListener(mListener);
+
+        initParams.dataModelProvider = &mModel;
         // Use whatever server port the kernel decides to give us.
         initParams.operationalServicePort = 0;
 
@@ -202,8 +189,10 @@ public:
 
         Server::GetInstance().GetCommissioningWindowManager().CloseCommissioningWindow();
     }
+
     static void TearDownTestSuite()
     {
+        mModel.UnregisterAttributeChangeListener(mListener);
 
         // TODO: The platform memory was intentionally left not deinitialized so that minimal mdns can destruct
         EXPECT_SUCCESS(chip::DeviceLayer::PlatformMgr().ScheduleWork(TearDownTask, 0));
@@ -242,7 +231,14 @@ public:
                                 TestSecurePairingDelegate & delegateCommissioner);
 
     void ServiceEvents();
+
+private:
+    static chip::app::CodegenDataModelProvider mModel;
+    static GlobalAttributeChangeListener mListener;
 };
+
+chip::app::CodegenDataModelProvider TestCommissioningWindowManager::mModel;
+GlobalAttributeChangeListener TestCommissioningWindowManager::mListener;
 
 void TestCommissioningWindowManager::ServiceEvents()
 {
@@ -513,6 +509,47 @@ TEST_F(TestCommissioningWindowManager, CheckCommissioningWindowManagerWindowTime
 
     VerifyCommissioningWindowManagerWindowClosed();
     EXPECT_EQ(delegateApp.mOnCommissioningWindowClosedCount, 1u);
+
+    commissionMgr.SetAppDelegate(nullptr);
+}
+
+// Regression: ResetState must cancel HandleSessionEstablishmentTimeout.
+// Otherwise the orphaned timer fires HandleFailedAttempt after window
+// cleanup — detected here via the delegate's error-callback counter.
+TEST_F(TestCommissioningWindowManager, WindowTimeoutCancelsPASEEstablishmentTimer)
+{
+    System::Clock::Internal::RAIIMockClock clock;
+
+    CommissioningWindowManager & commissionMgr = Server::GetInstance().GetCommissioningWindowManager();
+    MockAppDelegate delegateApp;
+    commissionMgr.SetAppDelegate(&delegateApp);
+
+    constexpr auto kCommissioningWindowSeconds = chip::System::Clock::Seconds32(1);
+    constexpr uint16_t kCommissioningWindowMs  = 1000;
+    constexpr unsigned kSleepPadding           = 100;
+    constexpr uint32_t kPASETimerSeconds       = 60;
+
+    commissionMgr.OverrideMinCommissioningTimeout(kCommissioningWindowSeconds);
+    EXPECT_SUCCESS(
+        commissionMgr.OpenBasicCommissioningWindow(kCommissioningWindowSeconds, CommissioningWindowAdvertisement::kDnssdOnly));
+    EXPECT_TRUE(commissionMgr.IsCommissioningWindowOpen());
+
+    // Arm the 60s PASE-establishment timer (PBKDFParamRequest received).
+    commissionMgr.OnSessionEstablishmentStarted();
+
+    // Window times out: HandleCommissioningWindowTimeout -> CloseCommissioningWindow -> Cleanup -> ResetState.
+    clock.AdvanceMonotonic(chip::System::Clock::Milliseconds64(kCommissioningWindowMs + kSleepPadding));
+    ServiceEvents();
+    EXPECT_FALSE(commissionMgr.IsCommissioningWindowOpen());
+
+    const auto errorCallbacksBefore = delegateApp.mOnCommissioningSessionEstablishmentErrorCount;
+
+    // Advance past the 60s PASE timer. Bug present -> stale callback fires; fix in place -> no callback.
+    clock.AdvanceMonotonic(chip::System::Clock::Milliseconds64((kPASETimerSeconds + 1) * 1000));
+    ServiceEvents();
+
+    // If this fails: ResetState() did not cancel HandleSessionEstablishmentTimeout.
+    EXPECT_EQ(delegateApp.mOnCommissioningSessionEstablishmentErrorCount, errorCallbacksBefore);
 
     commissionMgr.SetAppDelegate(nullptr);
 }

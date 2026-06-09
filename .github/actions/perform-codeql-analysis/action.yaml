@@ -8,13 +8,13 @@ runs:
   using: "composite"
   steps:
     - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v4
+      uses: github/codeql-action/analyze@95e58e9a2cdfd71adc6e0353d5c52f41a045d225 # v4
       with:
         category: "/language:${{ inputs.language }}"
         upload: False
         output: sarif-results
     - name: filter-sarif
-      uses: advanced-security/filter-sarif@v1
+      uses: advanced-security/filter-sarif@f3b8118a9349d88f7b1c0c488476411145b6270d # v1
       with:
         # We also disable checks that are not too important and that result in many hundreds of alerts with generated code, such as the check "Empty branch of conditional"
         patterns: |
@@ -27,11 +27,11 @@ runs:
         output: "sarif-results/${{ inputs.language }}.sarif"
 
     - name: Upload SARIF
-      uses: github/codeql-action/upload-sarif@v4
+      uses: github/codeql-action/upload-sarif@95e58e9a2cdfd71adc6e0353d5c52f41a045d225 # v4
       with:
         sarif_file: "sarif-results/${{ inputs.language }}.sarif"
     - name: Upload loc as a Build Artifact
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
       with:
         name: sarif-results
         path: sarif-results

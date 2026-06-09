@@ -257,7 +257,7 @@ class Encoder:
 
         arguments = self.__get_arguments(request)
         base64_arguments = base64.b64encode(
-            (f'{{ {arguments} }}').encode('utf-8')).decode('utf-8')
+            (f'{{ {arguments} }}').encode()).decode('utf-8')
 
         payload = f'"cluster": "{cluster}", "command": "{command}", "arguments" : "base64:{base64_arguments}"'
         if command_specifier:

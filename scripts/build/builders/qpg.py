@@ -15,7 +15,9 @@
 import os
 from enum import Enum, auto
 
-from .builder import BuilderOutput
+from runner.runner import Runner
+
+from .builder import BuilderOutput, OutDirLock, lock_output_dir
 from .gn import GnBuilder
 
 
@@ -87,29 +89,29 @@ class QpgBoard(Enum):
 class QpgBuilder(GnBuilder):
 
     def __init__(self,
-                 root,
-                 runner,
+                 root: str,
+                 runner: Runner,
+                 output_dir_lock: OutDirLock,
                  app: QpgApp = QpgApp.LIGHT,
                  board: QpgBoard = QpgBoard.QPG6200,
                  enable_rpcs: bool = False,
-                 update_image: bool = False,
-                 ):
-        super(QpgBuilder, self).__init__(
-            root=app.BuildRoot(root),
-            runner=runner)
+                 update_image: bool = False):
+        super().__init__(root=app.BuildRoot(root), runner=runner, output_dir_lock=output_dir_lock)
         self.app = app
         self.board = board
         self.enable_rpcs = enable_rpcs
         self.update_image = update_image
 
     def GnBuildArgs(self):
-        args = ['qpg_target_ic=\"%s\"' % (self.board.QpgBoardName)]
+        args = super().GnBuildArgs()
+        args.append('qpg_target_ic=\"%s\"' % (self.board.QpgBoardName))
         if self.enable_rpcs:
             args.append('import("//with_pw_rpc.gni")')
         if self.update_image:
             args.append('matter_ota_test_image=true')
         return args
 
+    @lock_output_dir
     def build_outputs(self):
         extensions = ["out", "out.hex"]
         if self.options.enable_link_map_file:

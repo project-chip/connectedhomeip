@@ -54,9 +54,7 @@ class TC_DD_3_23(MatterBaseTest):
             if isinstance(stage, bytes):
                 stage = stage.decode("utf-8", errors="replace")
 
-            log.info(
-                f"[_stage_start_listener] node=0x{node_id:X}, stage={stage}"
-            )
+            log.info("[_stage_start_listener] node=0x%X, stage=%s", node_id, stage)
 
             self.commissionee_node_id = node_id
 
@@ -76,6 +74,9 @@ class TC_DD_3_23(MatterBaseTest):
     @async_test_body
     async def test_TC_DD_3_23(self):
 
+        self.wait_for_user_input(prompt_msg="Put the DUT in commissionable mode, bring its NFC interface close to the NFC reader"
+                                 " and keep the DUT powered")
+
         # Step 1: Here we check if the Tag is connected to the Host machine and read the NFC Tag data
         self.step(1)
 
@@ -83,7 +84,7 @@ class TC_DD_3_23(MatterBaseTest):
         reader = matter.testing.nfc.NFCReader(nfc_reader_index)
 
         nfc_tag_data = reader.read_nfc_tag_data()
-        log.info(f"NFC Tag data : '{nfc_tag_data}'")
+        log.info("NFC Tag data : '%s'", nfc_tag_data)
         asserts.assert_true(
             reader.is_onboarding_data(nfc_tag_data),
             f"'{nfc_tag_data}' is not a valid Matter URI"
@@ -94,7 +95,15 @@ class TC_DD_3_23(MatterBaseTest):
         self.step(2)
         payload = SetupPayload().ParseQrCode(nfc_tag_data)
         asserts.assert_true(payload.supports_nfc_commissioning, "Device does not Support NFC Commissioning")
-        self.matter_test_config.commissioning_method = self.matter_test_config.in_test_commissioning_method
+
+        commissioning_method = self.matter_test_config.in_test_commissioning_method
+        asserts.assert_is_not_none(commissioning_method, "in_test_commissioning_method must not be None")
+        asserts.assert_true(
+            str(commissioning_method).startswith("nfc-"),
+            f"Expected in_test_commissioning_method to start with 'nfc-', got: {commissioning_method}"
+        )
+
+        self.matter_test_config.commissioning_method = commissioning_method
         commissioning_success = await self.commission_devices()
         asserts.assert_true(commissioning_success, "Device Commissioning using nfc transport has failed")
 

@@ -46,7 +46,15 @@ void ScriptPairingDeviceDiscoveryDelegate::OnDiscoveredDevice(const Dnssd::Commi
 
     RendezvousParameters keyExchangeParams = RendezvousParameters().SetSetupPINCode(mSetupPasscode).SetPeerAddress(peerAddress);
 
-    CHIP_ERROR err = mActiveDeviceCommissioner->PairDevice(mNodeId, keyExchangeParams, mParams);
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    if (mEstablishPaseOnly)
+    {
+        err = mActiveDeviceCommissioner->EstablishPASEConnection(mNodeId, keyExchangeParams);
+    }
+    else
+    {
+        err = mActiveDeviceCommissioner->PairDevice(mNodeId, keyExchangeParams, mParams);
+    }
     if (err != CHIP_NO_ERROR)
     {
         VerifyOrReturn(mPairingDelegate != nullptr);

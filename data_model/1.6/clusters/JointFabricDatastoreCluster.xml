@@ -62,9 +62,7 @@ Davis, CA 95616, USA
     <revision revision="1" summary="Initial revision"/>
   </revisionHistory>
   <clusterIds>
-    <clusterId id="0x0752" name="Joint Fabric Datastore">
-      <provisionalConform/>
-    </clusterId>
+    <clusterId id="0x0752" name="Joint Fabric Datastore"/>
   </clusterIds>
   <classification hierarchy="base" role="utility" picsCode="JFDS" scope="Node"/>
   <dataTypes>
@@ -82,9 +80,6 @@ Davis, CA 95616, USA
     <enum name="DatastoreAccessControlEntryPrivilegeEnum">
       <item value="1" name="View" summary="Can read and observe all (except Access Control Cluster)">
         <mandatoryConform/>
-      </item>
-      <item value="2" name="ProxyView">
-        <deprecateConform/>
       </item>
       <item value="3" name="Operate" summary="View privileges, and can perform the primary function of this Node (except Access Control Cluster)">
         <mandatoryConform/>
@@ -180,19 +175,19 @@ Davis, CA 95616, USA
       </field>
     </struct>
     <struct name="DatastoreAdministratorInformationEntryStruct">
-      <field id="1" name="NodeID" type="node-id">
+      <field id="0" name="NodeID" type="node-id">
         <mandatoryConform/>
       </field>
-      <field id="2" name="FriendlyName" type="string">
+      <field id="1" name="FriendlyName" type="string">
         <mandatoryConform/>
         <constraint>
           <maxLength value="32"/>
         </constraint>
       </field>
-      <field id="3" name="VendorID" type="vendor-id">
+      <field id="2" name="VendorID" type="vendor-id">
         <mandatoryConform/>
       </field>
-      <field id="4" name="ICAC" type="octstr">
+      <field id="3" name="ICAC" type="octstr">
         <mandatoryConform/>
         <constraint>
           <maxLength value="400"/>
@@ -238,9 +233,6 @@ Davis, CA 95616, USA
       </field>
       <field id="3" name="Binding" type="DatastoreBindingTargetStruct">
         <mandatoryConform/>
-        <constraint>
-          <desc/>
-        </constraint>
       </field>
       <field id="4" name="StatusEntry" type="DatastoreStatusEntryStruct">
         <mandatoryConform/>
@@ -258,9 +250,6 @@ Davis, CA 95616, USA
         <constraint>
           <maxLength value="32"/>
         </constraint>
-      </field>
-      <field id="3" name="StatusEntry" type="DatastoreStatusEntryStruct">
-        <mandatoryConform/>
       </field>
     </struct>
     <struct name="DatastoreEndpointGroupIDEntryStruct">
@@ -359,23 +348,20 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </field>
       <field id="8" name="GroupKeyMulticastPolicy" type="DatastoreGroupKeyMulticastPolicyEnum">
-        <otherwiseConform>
-          <provisionalConform/>
-          <mandatoryConform/>
-        </otherwiseConform>
+        <deprecateConform/>
       </field>
     </struct>
     <struct name="DatastoreNodeInformationEntryStruct">
-      <field id="1" name="NodeID" type="node-id">
+      <field id="0" name="NodeID" type="node-id">
         <mandatoryConform/>
       </field>
-      <field id="2" name="FriendlyName" type="string">
+      <field id="1" name="FriendlyName" type="string">
         <mandatoryConform/>
         <constraint>
           <maxLength value="32"/>
         </constraint>
       </field>
-      <field id="3" name="CommissioningStatusEntry" type="DatastoreStatusEntryStruct">
+      <field id="2" name="CommissioningStatusEntry" type="DatastoreStatusEntryStruct">
         <mandatoryConform/>
       </field>
     </struct>
@@ -391,13 +377,13 @@ Davis, CA 95616, USA
       </field>
     </struct>
     <struct name="DatastoreStatusEntryStruct">
-      <field id="0" name="State" type="DatastoreStateEnum" default="Pending">
+      <field id="0" name="State" type="DatastoreStateEnum">
         <mandatoryConform/>
       </field>
       <field id="1" name="UpdateTimestamp" type="epoch-s">
         <mandatoryConform/>
       </field>
-      <field id="2" name="FailureCode" type="status" default="SUCCESS">
+      <field id="2" name="FailureCode" type="status">
         <mandatoryConform/>
       </field>
     </struct>
@@ -405,31 +391,26 @@ Davis, CA 95616, USA
   <attributes>
     <attribute id="0x0000" name="AnchorRootCA" type="octstr">
       <access read="true" readPrivilege="admin"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform/>
-      </otherwiseConform>
+      <quality persistence="nonVolatile"/>
+      <mandatoryConform/>
+      <constraint>
+        <maxLength value="400"/>
+      </constraint>
     </attribute>
     <attribute id="0x0001" name="AnchorNodeID" type="node-id">
       <access read="true" readPrivilege="admin"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform/>
-      </otherwiseConform>
+      <quality persistence="nonVolatile"/>
+      <mandatoryConform/>
     </attribute>
     <attribute id="0x0002" name="AnchorVendorID" type="vendor-id">
       <access read="true" readPrivilege="admin"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform/>
-      </otherwiseConform>
+      <quality persistence="nonVolatile"/>
+      <mandatoryConform/>
     </attribute>
     <attribute id="0x0003" name="FriendlyName" type="string">
       <access read="true" readPrivilege="admin"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform/>
-      </otherwiseConform>
+      <quality persistence="nonVolatile"/>
+      <mandatoryConform/>
       <constraint>
         <maxLength value="32"/>
       </constraint>
@@ -437,120 +418,124 @@ Davis, CA 95616, USA
     <attribute id="0x0004" name="GroupKeySetList" type="list">
       <entry type="DatastoreGroupKeySetStruct"/>
       <access read="true" readPrivilege="admin"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform/>
-      </otherwiseConform>
+      <quality persistence="nonVolatile"/>
+      <mandatoryConform/>
+      <constraint>
+        <countBetween>
+          <from value="1"/>
+          <to value="254"/>
+        </countBetween>
+      </constraint>
     </attribute>
     <attribute id="0x0005" name="GroupList" type="list">
       <entry type="DatastoreGroupInformationEntryStruct"/>
       <access read="true" readPrivilege="admin"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform/>
-      </otherwiseConform>
+      <quality persistence="nonVolatile"/>
+      <mandatoryConform/>
+      <constraint>
+        <countBetween>
+          <from value="1"/>
+          <to value="254"/>
+        </countBetween>
+      </constraint>
     </attribute>
     <attribute id="0x0006" name="NodeList" type="list">
       <entry type="DatastoreNodeInformationEntryStruct"/>
       <access read="true" readPrivilege="admin"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform/>
-      </otherwiseConform>
+      <quality persistence="nonVolatile"/>
+      <mandatoryConform/>
+      <constraint>
+        <maxCount value="1024"/>
+      </constraint>
     </attribute>
     <attribute id="0x0007" name="AdminList" type="list">
       <entry type="DatastoreAdministratorInformationEntryStruct"/>
       <access read="true" readPrivilege="admin"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform/>
-      </otherwiseConform>
+      <quality persistence="nonVolatile"/>
+      <mandatoryConform/>
+      <constraint>
+        <countBetween>
+          <from value="1"/>
+          <to value="32"/>
+        </countBetween>
+      </constraint>
     </attribute>
     <attribute id="0x0008" name="Status" type="DatastoreStatusEntryStruct">
       <access read="true" readPrivilege="admin"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform/>
-      </otherwiseConform>
+      <quality persistence="nonVolatile"/>
+      <mandatoryConform/>
     </attribute>
     <attribute id="0x0009" name="EndpointGroupIDList" type="list">
       <entry type="DatastoreEndpointGroupIDEntryStruct"/>
       <access read="true" readPrivilege="admin"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform/>
-      </otherwiseConform>
+      <quality persistence="nonVolatile"/>
+      <mandatoryConform/>
+      <constraint>
+        <maxCount value="8192"/>
+      </constraint>
     </attribute>
     <attribute id="0x000A" name="EndpointBindingList" type="list">
       <entry type="DatastoreEndpointBindingEntryStruct"/>
       <access read="true" readPrivilege="admin"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform/>
-      </otherwiseConform>
+      <quality persistence="nonVolatile"/>
+      <mandatoryConform/>
+      <constraint>
+        <maxCount value="8192"/>
+      </constraint>
     </attribute>
     <attribute id="0x000B" name="NodeKeySetList" type="list">
       <entry type="DatastoreNodeKeySetEntryStruct"/>
       <access read="true" readPrivilege="admin"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform/>
-      </otherwiseConform>
+      <quality persistence="nonVolatile"/>
+      <mandatoryConform/>
+      <constraint>
+        <maxCount value="8192"/>
+      </constraint>
     </attribute>
     <attribute id="0x000C" name="NodeACLList" type="list">
       <entry type="DatastoreACLEntryStruct"/>
       <access read="true" readPrivilege="admin"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform/>
-      </otherwiseConform>
+      <quality persistence="nonVolatile"/>
+      <mandatoryConform/>
+      <constraint>
+        <maxCount value="8192"/>
+      </constraint>
     </attribute>
     <attribute id="0x000D" name="NodeEndpointList" type="list">
       <entry type="DatastoreEndpointEntryStruct"/>
       <access read="true" readPrivilege="admin"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform/>
-      </otherwiseConform>
+      <quality persistence="nonVolatile"/>
+      <mandatoryConform/>
+      <constraint>
+        <maxCount value="8192"/>
+      </constraint>
     </attribute>
   </attributes>
   <commands>
     <command id="0x00" name="AddKeySet" direction="commandToServer" response="Y">
       <access invokePrivilege="admin"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform/>
-      </otherwiseConform>
+      <mandatoryConform/>
       <field id="0" name="GroupKeySet" type="DatastoreGroupKeySetStruct">
         <mandatoryConform/>
       </field>
     </command>
     <command id="0x01" name="UpdateKeySet" direction="commandToServer" response="Y">
       <access invokePrivilege="admin"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform/>
-      </otherwiseConform>
+      <mandatoryConform/>
       <field id="0" name="GroupKeySet" type="DatastoreGroupKeySetStruct">
         <mandatoryConform/>
       </field>
     </command>
     <command id="0x02" name="RemoveKeySet" direction="commandToServer" response="Y">
       <access invokePrivilege="admin"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform/>
-      </otherwiseConform>
+      <mandatoryConform/>
       <field id="0" name="GroupKeySetID" type="uint16">
         <mandatoryConform/>
       </field>
     </command>
     <command id="0x03" name="AddGroup" direction="commandToServer" response="Y">
       <access invokePrivilege="admin"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform/>
-      </otherwiseConform>
+      <mandatoryConform/>
       <field id="0" name="GroupID" type="group-id">
         <mandatoryConform/>
       </field>
@@ -593,10 +578,7 @@ Davis, CA 95616, USA
     </command>
     <command id="0x04" name="UpdateGroup" direction="commandToServer" response="Y">
       <access invokePrivilege="admin"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform/>
-      </otherwiseConform>
+      <mandatoryConform/>
       <field id="0" name="GroupID" type="group-id">
         <mandatoryConform/>
       </field>
@@ -641,33 +623,27 @@ Davis, CA 95616, USA
     </command>
     <command id="0x05" name="RemoveGroup" direction="commandToServer" response="Y">
       <access invokePrivilege="admin"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform/>
-      </otherwiseConform>
+      <mandatoryConform/>
       <field id="0" name="GroupID" type="group-id">
         <mandatoryConform/>
       </field>
     </command>
     <command id="0x06" name="AddAdmin" direction="commandToServer" response="Y">
       <access invokePrivilege="admin"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform/>
-      </otherwiseConform>
-      <field id="1" name="NodeID" type="node-id">
+      <mandatoryConform/>
+      <field id="0" name="NodeID" type="node-id">
         <mandatoryConform/>
       </field>
-      <field id="2" name="FriendlyName" type="string">
+      <field id="1" name="FriendlyName" type="string">
         <mandatoryConform/>
         <constraint>
           <maxLength value="32"/>
         </constraint>
       </field>
-      <field id="3" name="VendorID" type="vendor-id">
+      <field id="2" name="VendorID" type="vendor-id">
         <mandatoryConform/>
       </field>
-      <field id="4" name="ICAC" type="octstr">
+      <field id="3" name="ICAC" type="octstr">
         <mandatoryConform/>
         <constraint>
           <maxLength value="400"/>
@@ -676,24 +652,18 @@ Davis, CA 95616, USA
     </command>
     <command id="0x07" name="UpdateAdmin" direction="commandToServer" response="Y">
       <access invokePrivilege="admin"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform/>
-      </otherwiseConform>
+      <mandatoryConform/>
       <field id="0" name="NodeID" type="node-id">
-        <quality nullable="true"/>
         <mandatoryConform/>
       </field>
       <field id="1" name="FriendlyName" type="string">
-        <quality nullable="true"/>
-        <mandatoryConform/>
+        <optionalConform/>
         <constraint>
           <maxLength value="32"/>
         </constraint>
       </field>
       <field id="2" name="ICAC" type="octstr">
-        <quality nullable="true"/>
-        <mandatoryConform/>
+        <optionalConform/>
         <constraint>
           <maxLength value="400"/>
         </constraint>
@@ -701,20 +671,14 @@ Davis, CA 95616, USA
     </command>
     <command id="0x08" name="RemoveAdmin" direction="commandToServer" response="Y">
       <access invokePrivilege="admin"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform/>
-      </otherwiseConform>
+      <mandatoryConform/>
       <field id="0" name="NodeID" type="node-id">
         <mandatoryConform/>
       </field>
     </command>
     <command id="0x09" name="AddPendingNode" direction="commandToServer" response="Y">
       <access invokePrivilege="admin"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform/>
-      </otherwiseConform>
+      <mandatoryConform/>
       <field id="0" name="NodeID" type="node-id">
         <mandatoryConform/>
       </field>
@@ -727,20 +691,14 @@ Davis, CA 95616, USA
     </command>
     <command id="0x0A" name="RefreshNode" direction="commandToServer" response="Y">
       <access invokePrivilege="admin"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform/>
-      </otherwiseConform>
+      <mandatoryConform/>
       <field id="0" name="NodeID" type="node-id">
         <mandatoryConform/>
       </field>
     </command>
     <command id="0x0B" name="UpdateNode" direction="commandToServer" response="Y">
       <access invokePrivilege="admin"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform/>
-      </otherwiseConform>
+      <mandatoryConform/>
       <field id="0" name="NodeID" type="node-id">
         <mandatoryConform/>
       </field>
@@ -753,20 +711,14 @@ Davis, CA 95616, USA
     </command>
     <command id="0x0C" name="RemoveNode" direction="commandToServer" response="Y">
       <access invokePrivilege="admin"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform/>
-      </otherwiseConform>
+      <mandatoryConform/>
       <field id="0" name="NodeID" type="node-id">
         <mandatoryConform/>
       </field>
     </command>
     <command id="0x0D" name="UpdateEndpointForNode" direction="commandToServer" response="Y">
       <access invokePrivilege="admin"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform/>
-      </otherwiseConform>
+      <mandatoryConform/>
       <field id="0" name="EndpointID" type="endpoint-no">
         <mandatoryConform/>
       </field>
@@ -782,10 +734,7 @@ Davis, CA 95616, USA
     </command>
     <command id="0x0E" name="AddGroupIDToEndpointForNode" direction="commandToServer" response="Y">
       <access invokePrivilege="admin"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform/>
-      </otherwiseConform>
+      <mandatoryConform/>
       <field id="0" name="NodeID" type="node-id">
         <mandatoryConform/>
       </field>
@@ -798,10 +747,7 @@ Davis, CA 95616, USA
     </command>
     <command id="0x0F" name="RemoveGroupIDFromEndpointForNode" direction="commandToServer" response="Y">
       <access invokePrivilege="admin"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform/>
-      </otherwiseConform>
+      <mandatoryConform/>
       <field id="0" name="NodeID" type="node-id">
         <mandatoryConform/>
       </field>
@@ -814,10 +760,7 @@ Davis, CA 95616, USA
     </command>
     <command id="0x10" name="AddBindingToEndpointForNode" direction="commandToServer" response="Y">
       <access invokePrivilege="admin"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform/>
-      </otherwiseConform>
+      <mandatoryConform/>
       <field id="0" name="NodeID" type="node-id">
         <mandatoryConform/>
       </field>
@@ -830,10 +773,7 @@ Davis, CA 95616, USA
     </command>
     <command id="0x11" name="RemoveBindingFromEndpointForNode" direction="commandToServer" response="Y">
       <access invokePrivilege="admin"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform/>
-      </otherwiseConform>
+      <mandatoryConform/>
       <field id="0" name="ListID" type="uint16">
         <mandatoryConform/>
       </field>
@@ -846,10 +786,7 @@ Davis, CA 95616, USA
     </command>
     <command id="0x12" name="AddACLToNode" direction="commandToServer" response="Y">
       <access invokePrivilege="admin"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform/>
-      </otherwiseConform>
+      <mandatoryConform/>
       <field id="0" name="NodeID" type="node-id">
         <mandatoryConform/>
       </field>
@@ -859,10 +796,7 @@ Davis, CA 95616, USA
     </command>
     <command id="0x13" name="RemoveACLFromNode" direction="commandToServer" response="Y">
       <access invokePrivilege="admin"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform/>
-      </otherwiseConform>
+      <mandatoryConform/>
       <field id="0" name="ListID" type="uint16">
         <mandatoryConform/>
       </field>

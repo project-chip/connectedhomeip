@@ -1550,6 +1550,21 @@ CHIP_ERROR ExtractIdentifierFromChipNetworkIdentity(const ByteSpan & cert, Mutab
     return CHIP_NO_ERROR;
 }
 
+template <bool Deterministic>
+static CHIP_ERROR SignMessageECDSA(const P256Keypair & keypair, const uint8_t * msg, size_t msgLength,
+                                   P256ECDSASignature & outSignature)
+{
+    if constexpr (Deterministic)
+    {
+        return keypair.ECDSA_sign_msg_det(msg, msgLength, outSignature);
+    }
+    else
+    {
+        return keypair.ECDSA_sign_msg(msg, msgLength, outSignature);
+    }
+}
+
+template <bool Deterministic>
 static CHIP_ERROR GenerateNetworkIdentitySignature(const P256Keypair & keypair, P256ECDSASignature & signature)
 {
     // Create a buffer and writer to capture the TBS (to-be-signed) portion of the certificate.
@@ -1561,8 +1576,7 @@ static CHIP_ERROR GenerateNetworkIdentitySignature(const P256Keypair & keypair, 
 
     // Generate the TBSCertificate and sign it
     ReturnErrorOnFailure(EncodeNetworkIdentityTBSCert(keypair.Pubkey(), writer));
-    ReturnErrorOnFailure(keypair.ECDSA_sign_msg(asn1TBSBuf.Get(), writer.GetLengthWritten(), signature));
-
+    ReturnErrorOnFailure(SignMessageECDSA<Deterministic>(keypair, asn1TBSBuf.Get(), writer.GetLengthWritten(), signature));
     return CHIP_NO_ERROR;
 }
 
@@ -1577,13 +1591,11 @@ static CHIP_ERROR EncodeCompactIdentityCert(TLVWriter & writer, Tag tag, const P
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR NewChipNetworkIdentity(const Crypto::P256Keypair & keypair, MutableByteSpan & outCompactCert)
+template <bool Deterministic>
+static CHIP_ERROR GenerateNetworkIdentity(const Crypto::P256Keypair & keypair, MutableByteSpan & outCompactCert)
 {
-    VerifyOrReturnError(!outCompactCert.empty(), CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(CanCastTo<uint32_t>(outCompactCert.size()), CHIP_ERROR_INVALID_ARGUMENT);
-
     Crypto::P256ECDSASignature signature;
-    ReturnErrorOnFailure(GenerateNetworkIdentitySignature(keypair, signature));
+    ReturnErrorOnFailure(GenerateNetworkIdentitySignature<Deterministic>(keypair, signature));
 
     TLVWriter writer;
     writer.Init(outCompactCert);
@@ -1594,6 +1606,16 @@ CHIP_ERROR NewChipNetworkIdentity(const Crypto::P256Keypair & keypair, MutableBy
 
     outCompactCert.reduce_size(writer.GetLengthWritten());
     return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR NewChipNetworkIdentity(const Crypto::P256Keypair & keypair, MutableByteSpan & outCompactCert)
+{
+    return GenerateNetworkIdentity<false>(keypair, outCompactCert);
+}
+
+CHIP_ERROR DeriveChipNetworkIdentity(const Crypto::P256Keypair & keypair, MutableByteSpan & outCompactCert)
+{
+    return GenerateNetworkIdentity<true>(keypair, outCompactCert);
 }
 
 } // namespace Credentials

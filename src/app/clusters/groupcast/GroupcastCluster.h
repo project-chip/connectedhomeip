@@ -17,6 +17,7 @@
 #pragma once
 
 #include "GroupcastContext.h"
+#include <access/AccessControl.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <clusters/Groupcast/AttributeIds.h>
 #include <clusters/Groupcast/ClusterId.h>
@@ -29,6 +30,7 @@
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/TimerDelegate.h>
 #include <protocols/interaction_model/StatusCode.h>
+#include <transport/raw/GroupcastTesting.h>
 
 namespace chip {
 namespace app {
@@ -37,7 +39,9 @@ namespace Clusters {
 /**
  * @brief Provides code-driven implementation for the Groupcast cluster server.
  */
-class GroupcastCluster : public DefaultServerCluster, public Credentials::GroupDataProvider::GroupListener
+class GroupcastCluster : public DefaultServerCluster,
+                         public Credentials::GroupDataProvider::GroupListener,
+                         public ::chip::Groupcast::Testing::Delegate
 {
 public:
     static constexpr uint16_t kMaxMembershipEndpoints = 255;
@@ -60,6 +64,9 @@ public:
 
     CHIP_ERROR GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder) override;
 
+    // Groupcast::Testing::Delegate implementation
+    void FlushGroupcastTestingEvent() override;
+
 private:
     struct EndpointList
     {
@@ -70,7 +77,6 @@ private:
     Protocols::InteractionModel::Status GroupcastTesting(FabricIndex fabricIndex,
                                                          Groupcast::Commands::GroupcastTesting::DecodableType data);
 
-    inline FabricIndex GetFabricUnderTest() const { return mFabricUnderTest; }
     const BitFlags<Groupcast::Feature> & Features() const { return mFeatures; }
 
     // Methods moved from GroupcastLogic
@@ -80,17 +86,17 @@ private:
     CHIP_ERROR ReadMaxMcastAddrCount(EndpointId endpoint, AttributeValueEncoder & aEncoder);
     CHIP_ERROR ReadUsedMcastAddrCount(EndpointId endpoint, AttributeValueEncoder & aEncoder);
 
-    Protocols::InteractionModel::Status JoinGroup(FabricIndex fabric_index,
+    Protocols::InteractionModel::Status JoinGroup(const ConcreteCommandPath & path,
                                                   const Groupcast::Commands::JoinGroup::DecodableType & data,
                                                   const chip::Access::SubjectDescriptor & subjectDescriptor);
-    Protocols::InteractionModel::Status LeaveGroup(FabricIndex fabric_index,
-                                                   const Groupcast::Commands::LeaveGroup::DecodableType & data,
+    Protocols::InteractionModel::Status LeaveGroup(const Groupcast::Commands::LeaveGroup::DecodableType & data,
                                                    EndpointList & endpoints,
                                                    const chip::Access::SubjectDescriptor & subjectDescriptor);
-    Protocols::InteractionModel::Status UpdateGroupKey(FabricIndex fabric_index,
-                                                       const Groupcast::Commands::UpdateGroupKey::DecodableType & data);
+    Protocols::InteractionModel::Status UpdateGroupKey(const ConcreteCommandPath & path,
+                                                       const Groupcast::Commands::UpdateGroupKey::DecodableType & data,
+                                                       const chip::Access::SubjectDescriptor & subjectDescriptor);
     Protocols::InteractionModel::Status
-    ConfigureAuxiliaryACL(FabricIndex fabric_index, const Groupcast::Commands::ConfigureAuxiliaryACL::DecodableType & data,
+    ConfigureAuxiliaryACL(const Groupcast::Commands::ConfigureAuxiliaryACL::DecodableType & data,
                           const chip::Access::SubjectDescriptor & subjectDescriptor);
 
     void SetDataModelProvider(DataModel::Provider & provider) { mDataModelProvider = &provider; }
@@ -108,10 +114,10 @@ private:
     Credentials::GroupDataProvider & Provider() { return mGroupcastContext.groupDataProvider; }
     chip::FabricTable & Fabrics() { return mGroupcastContext.fabricTable; }
 
-    Protocols::InteractionModel::Status SetKeySet(FabricIndex fabric_index, GroupId group_id, KeysetId keyset_id,
-                                                  const chip::Optional<chip::ByteSpan> & key);
-    Protocols::InteractionModel::Status RemoveGroup(FabricIndex fabric_index, GroupId group_id,
-                                                    const Groupcast::Commands::LeaveGroup::DecodableType & data,
+    Protocols::InteractionModel::Status SetKeySet(const ConcreteCommandPath & path,
+                                                  const chip::Access::SubjectDescriptor & subjectDescriptor, GroupId group_id,
+                                                  KeysetId keyset_id, const chip::Optional<chip::ByteSpan> & key);
+    Protocols::InteractionModel::Status RemoveGroup(GroupId group_id, const Groupcast::Commands::LeaveGroup::DecodableType & data,
                                                     EndpointList * endpoints,
                                                     const chip::Access::SubjectDescriptor & subjectDescriptor);
     Protocols::InteractionModel::Status RemoveGroupEndpoint(FabricIndex fabric_index, GroupId group_id, EndpointId endpoint_id,
@@ -120,8 +126,6 @@ private:
     void NotifyUsedMcastAddrCountOnChange();
     void NotifyMembershipChanged();
 
-    void EmitAuxiliaryAccessUpdated(const chip::Access::SubjectDescriptor & subjectDescriptor);
-
     GroupcastContext mGroupcastContext;
     const BitFlags<Groupcast::Feature> mFeatures;
     DataModel::Provider * mDataModelProvider = nullptr;
@@ -129,7 +133,6 @@ private:
     bool mIanaAddressUsed                    = false;
 
     Groupcast::GroupcastTestingEnum mTestingState = Groupcast::GroupcastTestingEnum::kDisableTesting;
-    FabricIndex mFabricUnderTest                  = kUndefinedFabricIndex;
     class MembershipChangedTimer : public TimerContext
     {
     public:

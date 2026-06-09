@@ -34,8 +34,14 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/BuildTime.h>
+#include <platform/CHIPDeviceConfig.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/DeviceInstanceInfoProvider.h>
+
+#ifdef __APPLE__
+#include <platform/Darwin/ConfigurationManagerImpl.h>
+#include <platform/Darwin/PosixConfig.h>
+#endif
 
 using namespace chip;
 using namespace chip::Logging;
@@ -472,5 +478,161 @@ TEST_F(TestConfigurationMgr, GetProductId)
     EXPECT_GE(productId, 1u);
     EXPECT_LE(productId, 0xffff);
 }
+
+TEST_F(TestConfigurationMgr, GetCommissionableDeviceName)
+{
+    char buf[64];
+
+    if (!ConfigurationMgr().IsCommissionableDeviceNameEnabled())
+    {
+        // If device name is not enabled, skip this test
+        GTEST_SKIP();
+    }
+
+    CHIP_ERROR err = ConfigurationMgr().GetCommissionableDeviceName(buf, sizeof(buf));
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_GT(strlen(buf), 0u);
+    EXPECT_STREQ(buf, CHIP_DEVICE_CONFIG_DEVICE_NAME);
+}
+
+#ifdef __APPLE__
+TEST_F(TestConfigurationMgr, GetCommissionableDeviceNameFromConfig)
+{
+    using namespace chip::DeviceLayer::Internal;
+
+    char buf[64];
+    const char * testName = "My Test Device";
+
+    // Write a device name to PosixConfig
+    CHIP_ERROR err = PosixConfig::WriteConfigValueStr(PosixConfig::kConfigKey_DeviceName, testName);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    // Verify ConfigurationMgr returns the stored value
+    err = ConfigurationMgr().GetCommissionableDeviceName(buf, sizeof(buf));
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_STREQ(buf, testName);
+
+    // Clear the config key and verify fallback to compile-time default
+    PosixConfig::ClearConfigValue(PosixConfig::kConfigKey_DeviceName);
+    err = ConfigurationMgr().GetCommissionableDeviceName(buf, sizeof(buf));
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_STREQ(buf, CHIP_DEVICE_CONFIG_DEVICE_NAME);
+}
+
+static CHIP_ERROR TestConfigValueProvider(const char * configNamespace, const char * name, char * buf, size_t bufSize,
+                                          size_t & outLen)
+{
+    if (strcmp(name, "device-name") == 0)
+    {
+        const char * value = "Dynamic Device Name";
+        if (bufSize <= strlen(value))
+        {
+            return CHIP_ERROR_BUFFER_TOO_SMALL;
+        }
+        strcpy(buf, value);
+        outLen = strlen(value);
+        return CHIP_NO_ERROR;
+    }
+    return CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
+}
+
+TEST_F(TestConfigurationMgr, GetCommissionableDeviceNameFromProvider)
+{
+    char buf[64];
+
+    // Set a dynamic provider
+    ConfigurationManagerImpl::GetDefaultInstance().SetConfigValueProvider(TestConfigValueProvider);
+
+    CHIP_ERROR err = ConfigurationMgr().GetCommissionableDeviceName(buf, sizeof(buf));
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_STREQ(buf, "Dynamic Device Name");
+
+    // Clear provider, verify fallback to compile-time default
+    ConfigurationManagerImpl::GetDefaultInstance().SetConfigValueProvider(nullptr);
+    err = ConfigurationMgr().GetCommissionableDeviceName(buf, sizeof(buf));
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_STREQ(buf, CHIP_DEVICE_CONFIG_DEVICE_NAME);
+}
+
+static CHIP_ERROR ProviderThatReturnsNotFound(const char * configNamespace, const char * name, char * buf, size_t bufSize,
+                                              size_t & outLen)
+{
+    return CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
+}
+
+static CHIP_ERROR ProviderWithSmallBuffer(const char * configNamespace, const char * name, char * buf, size_t bufSize,
+                                          size_t & outLen)
+{
+    if (strcmp(name, "device-name") == 0)
+    {
+        const char * value = "This name is longer than a tiny buffer";
+        if (bufSize <= strlen(value))
+        {
+            return CHIP_ERROR_BUFFER_TOO_SMALL;
+        }
+        strcpy(buf, value);
+        outLen = strlen(value);
+        return CHIP_NO_ERROR;
+    }
+    return CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
+}
+
+TEST_F(TestConfigurationMgr, ConfigValueProviderTakesPriorityOverConfig)
+{
+    using namespace chip::DeviceLayer::Internal;
+
+    char buf[64];
+    const char * configName = "Config Name";
+
+    // Write a value to PosixConfig
+    CHIP_ERROR err = PosixConfig::WriteConfigValueStr(PosixConfig::kConfigKey_DeviceName, configName);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    // Set a provider — it should take priority over the config value
+    ConfigurationManagerImpl::GetDefaultInstance().SetConfigValueProvider(TestConfigValueProvider);
+    err = ConfigurationMgr().GetCommissionableDeviceName(buf, sizeof(buf));
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_STREQ(buf, "Dynamic Device Name");
+
+    // Provider returns NOT_FOUND — should fall through to PosixConfig
+    ConfigurationManagerImpl::GetDefaultInstance().SetConfigValueProvider(ProviderThatReturnsNotFound);
+    err = ConfigurationMgr().GetCommissionableDeviceName(buf, sizeof(buf));
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_STREQ(buf, configName);
+
+    // Clean up
+    ConfigurationManagerImpl::GetDefaultInstance().SetConfigValueProvider(nullptr);
+    PosixConfig::ClearConfigValue(PosixConfig::kConfigKey_DeviceName);
+}
+
+TEST_F(TestConfigurationMgr, ConfigValueProviderBufferTooSmall)
+{
+    char smallBuf[5];
+
+    ConfigurationManagerImpl::GetDefaultInstance().SetConfigValueProvider(ProviderWithSmallBuffer);
+    CHIP_ERROR err = ConfigurationMgr().GetCommissionableDeviceName(smallBuf, sizeof(smallBuf));
+    EXPECT_EQ(err, CHIP_ERROR_BUFFER_TOO_SMALL);
+
+    // Clean up
+    ConfigurationManagerImpl::GetDefaultInstance().SetConfigValueProvider(nullptr);
+}
+
+TEST_F(TestConfigurationMgr, DeviceNameConfigBufferTooSmall)
+{
+    using namespace chip::DeviceLayer::Internal;
+
+    char smallBuf[5];
+    const char * longName = "A name that exceeds the buffer";
+
+    CHIP_ERROR err = PosixConfig::WriteConfigValueStr(PosixConfig::kConfigKey_DeviceName, longName);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    err = ConfigurationMgr().GetCommissionableDeviceName(smallBuf, sizeof(smallBuf));
+    EXPECT_NE(err, CHIP_NO_ERROR);
+
+    // Clean up
+    PosixConfig::ClearConfigValue(PosixConfig::kConfigKey_DeviceName);
+}
+#endif // __APPLE__
 
 } // namespace
