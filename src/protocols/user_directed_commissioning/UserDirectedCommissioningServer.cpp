@@ -58,7 +58,7 @@ void UserDirectedCommissioningServer::OnMessageReceived(const Transport::PeerAdd
 
     uint8_t udcPayload[IdentificationDeclaration::kUdcTLVDataMaxBytes] = {};
     size_t udcPayloadLength                                            = std::min<size_t>(msg->DataLength(), sizeof(udcPayload));
-    TEMPORARY_RETURN_IGNORED msg->Read(udcPayload, udcPayloadLength);
+    ReturnOnFailure(msg->Read(udcPayload, udcPayloadLength));
 
     IdentificationDeclaration id;
     ReturnOnFailure(id.ReadPayload(udcPayload, udcPayloadLength));
