@@ -1158,9 +1158,14 @@ jobs:
               with:
                 name: repl-build-data
 
-            - name: Unpack artifacts
-              run: |
-                tar xfJ repl-build-data.tar.xz
+            # OverlayFS (Docker container storage) layer copy-up occasionally causes
+            # "Directory renamed before its status could be extracted" during rapid unpack.
+            - uses: Wandalen/wretry.action@1a10d4835a1506f513ad8e7488aeb474ab20055c # v1.4.10
+              name: Unpack artifacts
+              with:
+                  command: tar xfJ repl-build-data.tar.xz
+                  attempt_limit: 3
+                  attempt_delay: 2000
 
             - name: Generate an argument environment file
               run: |
