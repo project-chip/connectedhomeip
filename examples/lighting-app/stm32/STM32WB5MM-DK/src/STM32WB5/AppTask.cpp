@@ -24,7 +24,9 @@
 #include "cmsis_os.h"
 #include "dbg_trace.h"
 #include "flash_wb.h"
+#if (OTA_SUPPORT == 1)
 #include "ota.h"
+#endif
 #include "ssd1315.h"
 #include "stm32_lcd.h"
 #include "stm32_lpm.h"
