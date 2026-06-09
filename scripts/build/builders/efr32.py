@@ -316,7 +316,7 @@ class Efr32Builder(GnBuilder):
         # Only unit-test needs to generate the flashbundle here.  All other examples will generate a flashbundle via the silabs_executable template.
         if self.app == Efr32App.UNIT_TEST:
             flash_bundle_path = os.path.join(self.output_dir, self.app.FlashBundleName())
-            log.info(f'Generating flashbundle {flash_bundle_path}')
+            log.info('Generating flashbundle %s', flash_bundle_path)
 
             patterns = [
                 os.path.join(self.output_dir, "tests", "*.flash.py"),

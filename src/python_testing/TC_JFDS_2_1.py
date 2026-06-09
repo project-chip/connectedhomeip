@@ -231,7 +231,7 @@ class TC_JFDS_2_1(MatterBaseTest):
         for endpoint_id, endpoint_data in descriptor_response.items():
             if Clusters.JointFabricDatastore.id in endpoint_data[Clusters.Descriptor].serverList:
                 jfds_endpoint = endpoint_id
-                log.info(f"Found JointFabricDatastore cluster on endpoint {jfds_endpoint}")
+                log.info("Found JointFabricDatastore cluster on endpoint %s", jfds_endpoint)
                 break
 
         asserts.assert_is_not_none(jfds_endpoint, "JointFabricDatastore cluster not found on any endpoint")
