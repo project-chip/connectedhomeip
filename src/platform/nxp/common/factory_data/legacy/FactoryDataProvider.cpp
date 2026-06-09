@@ -50,7 +50,8 @@ static constexpr size_t kSpake2pSerializedVerifier_MaxBase64Len =
 static constexpr size_t kSpake2pSalt_MaxBase64Len = BASE64_ENCODED_LEN(chip::Crypto::kSpake2p_Max_PBKDF_Salt_Length) + 1;
 
 #ifdef CONFIG_CHIP_NXP_PLATFORM_MCXW72
-static constexpr size_t kDacKeyBlobSize = PSA_S200_NON_EL2GO_BLOB_EXPORT_SIZE(PSA_KEY_TYPE_ECC_KEY_PAIR(PSA_ECC_FAMILY_SECP_R1), 256);
+static constexpr size_t kDacKeyBlobSize =
+    PSA_S200_NON_EL2GO_BLOB_EXPORT_SIZE(PSA_KEY_TYPE_ECC_KEY_PAIR(PSA_ECC_FAMILY_SECP_R1), 256);
 #elif defined(CONFIG_CHIP_NXP_PLATFORM_RW61X)
 static constexpr size_t kDacKeyBlobSize = 48;
 #else
@@ -111,16 +112,16 @@ CHIP_ERROR FactoryDataProvider::SignWithDacKey(const ByteSpan & messageToSign, M
     uint16_t keySize = 0;
 
     psa_key_attributes_t attributes = PSA_KEY_ATTRIBUTES_INIT;
-    psa_key_id_t key_id = 0;
-    psa_key_lifetime_t lifetime = PSA_KEY_LIFETIME_VOLATILE;
-    psa_algorithm_t alg = PSA_ALG_ECDSA(PSA_ALG_SHA_256);
-    psa_key_usage_t usage = PSA_KEY_USAGE_SIGN_HASH | PSA_KEY_USAGE_SIGN_MESSAGE ;
-    psa_key_type_t key_type = PSA_KEY_TYPE_ECC_KEY_PAIR(PSA_ECC_FAMILY_SECP_R1);
-    size_t bits = 256;
+    psa_key_id_t key_id             = 0;
+    psa_key_lifetime_t lifetime     = PSA_KEY_LIFETIME_VOLATILE;
+    psa_algorithm_t alg             = PSA_ALG_ECDSA(PSA_ALG_SHA_256);
+    psa_key_usage_t usage           = PSA_KEY_USAGE_SIGN_HASH | PSA_KEY_USAGE_SIGN_MESSAGE;
+    psa_key_type_t key_type         = PSA_KEY_TYPE_ECC_KEY_PAIR(PSA_ECC_FAMILY_SECP_R1);
+    size_t bits                     = 256;
     psa_status_t status;
     uint8_t digest[Crypto::kSHA256_Hash_Length];
     unsigned char ecc_signature[PSA_SIGNATURE_MAX_SIZE] = { 0 };
-    size_t signature_length = sizeof(ecc_signature);
+    size_t signature_length                             = sizeof(ecc_signature);
 
     VerifyOrExit(!outSignBuffer.empty(), error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(!messageToSign.empty(), error = CHIP_ERROR_INVALID_ARGUMENT);
@@ -147,10 +148,7 @@ CHIP_ERROR FactoryDataProvider::SignWithDacKey(const ByteSpan & messageToSign, M
     status = psa_import_key(&attributes, dacPrivateKeySpan.data(), dacPrivateKeySpan.size(), &key_id);
     VerifyOrExit(status == PSA_SUCCESS, error = CHIP_ERROR_INTERNAL);
 
-    status = psa_sign_hash(key_id, alg,
-                                   digest, sizeof(digest),
-                                   ecc_signature, sizeof(ecc_signature),
-                                   &signature_length);
+    status = psa_sign_hash(key_id, alg, digest, sizeof(digest), ecc_signature, sizeof(ecc_signature), &signature_length);
 
     VerifyOrExit(status == PSA_SUCCESS, error = CHIP_ERROR_INTERNAL);
 
@@ -615,19 +613,18 @@ CHIP_ERROR FactoryDataProvider::SetCbcInitialVector(const uint8_t * iv, uint16_t
     return error;
 }
 
-
 #if CONFIG_CHIP_ENABLE_EL2GO_FACTORY_DATA
-CHIP_ERROR FactoryDataProvider::ParseEl2GoBlobs(const uint8_t *blobArea, size_t blobAreaSize, size_t *blobsImported,
-                                                uint32_t *dacKeyId, uint32_t *dacCertId)
+CHIP_ERROR FactoryDataProvider::ParseEl2GoBlobs(const uint8_t * blobArea, size_t blobAreaSize, size_t * blobsImported,
+                                                uint32_t * dacKeyId, uint32_t * dacCertId)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     psa_key_id_t importedKeys[16]; // Adjust size based on expected max blobs
     size_t importedKeyCount = 0;
 
-    const uint8_t* blobAreaEnd = nullptr;
-    const uint8_t *currentBlobPtr = nullptr;
+    const uint8_t * blobAreaEnd    = nullptr;
+    const uint8_t * currentBlobPtr = nullptr;
 
-    bool foundDacKey = false;
+    bool foundDacKey  = false;
     bool foundDacCert = false;
 
     VerifyOrExit(blobArea != nullptr, {
@@ -651,8 +648,8 @@ CHIP_ERROR FactoryDataProvider::ParseEl2GoBlobs(const uint8_t *blobArea, size_t 
     });
 
     *blobsImported = 0;
-    *dacKeyId = 0;
-    *dacCertId = 0;
+    *dacKeyId      = 0;
+    *dacCertId     = 0;
 
     // Now initialize the variables
     blobAreaEnd = blobArea + blobAreaSize;
@@ -689,24 +686,20 @@ CHIP_ERROR FactoryDataProvider::ParseEl2GoBlobs(const uint8_t *blobArea, size_t 
         size_t currentBlobSize = 0;
 
         err = ParseEl2GoBlob(currentBlobPtr, remainingBytes, blobCtx, &currentBlobSize);
-        VerifyOrExit(err == CHIP_NO_ERROR,
-        {
+        VerifyOrExit(err == CHIP_NO_ERROR, {
             ChipLogError(DeviceLayer, "ParseEl2GoBlobs: Failed to parse blob at offset %u: %" CHIP_ERROR_FORMAT,
-                        currentBlobPtr - blobArea, err.Format());
+                         currentBlobPtr - blobArea, err.Format());
         });
 
-        ChipLogProgress(DeviceLayer, "ParseEl2GoBlobs: Parsed blob with key ID 0x%08" PRIx32 ", size %u",
-                       blobCtx.keyId, currentBlobSize);
+        ChipLogProgress(DeviceLayer, "ParseEl2GoBlobs: Parsed blob with key ID 0x%08" PRIx32 ", size %u", blobCtx.keyId,
+                        currentBlobSize);
 
         // Skip system blobs
-        if (blobCtx.keyId == kOemKeyId ||
-            blobCtx.keyId == kRkthKeyId ||
-            blobCtx.keyId == kOtpDataKeyId ||
+        if (blobCtx.keyId == kOemKeyId || blobCtx.keyId == kRkthKeyId || blobCtx.keyId == kOtpDataKeyId ||
             blobCtx.keyId == kBatchFlowKeyId)
         {
-            ChipLogProgress(DeviceLayer, "ParseEl2GoBlobs: Skipping system blob with key ID 0x%08" PRIx32,
-                           blobCtx.keyId);
-            currentBlobPtr += currentBlobSize;  // Jump to next blob
+            ChipLogProgress(DeviceLayer, "ParseEl2GoBlobs: Skipping system blob with key ID 0x%08" PRIx32, blobCtx.keyId);
+            currentBlobPtr += currentBlobSize; // Jump to next blob
             continue;
         }
 
@@ -714,27 +707,26 @@ CHIP_ERROR FactoryDataProvider::ParseEl2GoBlobs(const uint8_t *blobArea, size_t 
         psa_key_attributes_t psaAttrs;
         err = BlobContextToPsaAttributes(blobCtx, psaAttrs);
         VerifyOrExit(err == CHIP_NO_ERROR, {
-            ChipLogError(DeviceLayer, "ParseEl2GoBlobs: Failed to convert to PSA attributes: %" CHIP_ERROR_FORMAT,
-                        err.Format());
+            ChipLogError(DeviceLayer, "ParseEl2GoBlobs: Failed to convert to PSA attributes: %" CHIP_ERROR_FORMAT, err.Format());
         });
 
         // Detect DAC key and certificate based on key type and usage
         psa_key_type_t keyType = psa_get_key_type(&psaAttrs);
-        psa_key_usage_t usage = psa_get_key_usage_flags(&psaAttrs);
+        psa_key_usage_t usage  = psa_get_key_usage_flags(&psaAttrs);
 
         // DAC Private Key: ECC key pair with sign usage
         if (PSA_KEY_TYPE_IS_ECC_KEY_PAIR(keyType) && (usage & PSA_KEY_USAGE_SIGN_MESSAGE))
         {
             if (!foundDacKey)
             {
-                *dacKeyId = blobCtx.keyId;
+                *dacKeyId   = blobCtx.keyId;
                 foundDacKey = true;
                 ChipLogProgress(DeviceLayer, "ParseEl2GoBlobs: Found DAC private key with ID 0x%08" PRIx32, blobCtx.keyId);
             }
             else
             {
                 ChipLogProgress(DeviceLayer, "ParseEl2GoBlobs: Found additional signing key 0x%08" PRIx32 " (ignoring)",
-                               blobCtx.keyId);
+                                blobCtx.keyId);
             }
         }
         // DAC Certificate: Raw data type with export usage
@@ -742,33 +734,32 @@ CHIP_ERROR FactoryDataProvider::ParseEl2GoBlobs(const uint8_t *blobArea, size_t 
         {
             if (!foundDacCert)
             {
-                *dacCertId = blobCtx.keyId;
+                *dacCertId   = blobCtx.keyId;
                 foundDacCert = true;
                 ChipLogProgress(DeviceLayer, "ParseEl2GoBlobs: Found DAC certificate with ID 0x%08" PRIx32, blobCtx.keyId);
             }
             else
             {
                 ChipLogProgress(DeviceLayer, "ParseEl2GoBlobs: Found additional certificate 0x%08" PRIx32 " (ignoring)",
-                               blobCtx.keyId);
+                                blobCtx.keyId);
             }
         }
 
         // Import into PSA
-        psa_key_id_t keyId = PSA_KEY_ID_NULL;
+        psa_key_id_t keyId  = PSA_KEY_ID_NULL;
         psa_status_t status = psa_import_key(&psaAttrs, currentBlobPtr, currentBlobSize, &keyId);
 
         if (status == PSA_ERROR_ALREADY_EXISTS)
         {
-            ChipLogProgress(DeviceLayer, "ParseEl2GoBlobs: Key 0x%08" PRIx32 " already exists, using existing key",
-                           blobCtx.keyId);
+            ChipLogProgress(DeviceLayer, "ParseEl2GoBlobs: Key 0x%08" PRIx32 " already exists, using existing key", blobCtx.keyId);
             // Key already exists, use it - don't re-import
-            keyId = blobCtx.keyId;
+            keyId  = blobCtx.keyId;
             status = PSA_SUCCESS;
         }
 
         VerifyOrExit(status == PSA_SUCCESS, {
-            ChipLogError(DeviceLayer, "ParseEl2GoBlobs: psa_import_key failed for key 0x%08" PRIx32 ": %" PRId32,
-                        blobCtx.keyId, status);
+            ChipLogError(DeviceLayer, "ParseEl2GoBlobs: psa_import_key failed for key 0x%08" PRIx32 ": %" PRId32, blobCtx.keyId,
+                         status);
             err = CHIP_ERROR_INTERNAL;
         });
 
@@ -784,8 +775,7 @@ CHIP_ERROR FactoryDataProvider::ParseEl2GoBlobs(const uint8_t *blobArea, size_t 
             goto exit;
         }
 
-        ChipLogProgress(DeviceLayer, "ParseEl2GoBlobs: Successfully imported blob with key ID 0x%08" PRIx32,
-                       blobCtx.keyId);
+        ChipLogProgress(DeviceLayer, "ParseEl2GoBlobs: Successfully imported blob with key ID 0x%08" PRIx32, blobCtx.keyId);
         (*blobsImported)++;
 
         // Move to next blob using the size returned by ParseEl2GoBlob
@@ -803,14 +793,15 @@ CHIP_ERROR FactoryDataProvider::ParseEl2GoBlobs(const uint8_t *blobArea, size_t 
         err = CHIP_ERROR_KEY_NOT_FOUND;
     });
 
-    ChipLogProgress(DeviceLayer, "ParseEl2GoBlobs: Successfully imported %u blobs (DAC Key: 0x%08" PRIx32 ", DAC Cert: 0x%08" PRIx32 ")",
-                   *blobsImported, *dacKeyId, *dacCertId);
+    ChipLogProgress(DeviceLayer,
+                    "ParseEl2GoBlobs: Successfully imported %u blobs (DAC Key: 0x%08" PRIx32 ", DAC Cert: 0x%08" PRIx32 ")",
+                    *blobsImported, *dacKeyId, *dacCertId);
 
 exit:
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "ParseEl2GoBlobs: Failed with error: %" CHIP_ERROR_FORMAT ", cleaning up %u imported keys",
-                    err.Format(), importedKeyCount);
+                     err.Format(), importedKeyCount);
 
         // Destroy all successfully imported keys on error
         for (size_t i = 0; i < importedKeyCount; i++)
@@ -819,33 +810,30 @@ exit:
             if (destroyStatus != PSA_SUCCESS)
             {
                 ChipLogError(DeviceLayer, "ParseEl2GoBlobs: Failed to destroy key 0x%08" PRIx32 " during cleanup: %" PRId32,
-                            importedKeys[i], destroyStatus);
+                             importedKeys[i], destroyStatus);
             }
             else
             {
-                ChipLogProgress(DeviceLayer, "ParseEl2GoBlobs: Destroyed key 0x%08" PRIx32 " during cleanup",
-                               importedKeys[i]);
+                ChipLogProgress(DeviceLayer, "ParseEl2GoBlobs: Destroyed key 0x%08" PRIx32 " during cleanup", importedKeys[i]);
             }
         }
 
         *blobsImported = 0; // Reset count since we cleaned up
-        *dacKeyId = 0;
-        *dacCertId = 0;
+        *dacKeyId      = 0;
+        *dacCertId     = 0;
     }
 
     return err;
 }
 
-CHIP_ERROR FactoryDataProvider::ParseEl2GoBlob(const uint8_t * blob, size_t maxSize,
-                                              BlobContext & blobCtx,
-                                              size_t * actualSize)
+CHIP_ERROR FactoryDataProvider::ParseEl2GoBlob(const uint8_t * blob, size_t maxSize, BlobContext & blobCtx, size_t * actualSize)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err             = CHIP_NO_ERROR;
     const uint8_t * currentPtr = nullptr;
-    const uint8_t * endPtr = nullptr;
-    size_t blobSize = 0;
-    bool foundMagic = false;
-    bool foundKeyId = false;
+    const uint8_t * endPtr     = nullptr;
+    size_t blobSize            = 0;
+    bool foundMagic            = false;
+    bool foundKeyId            = false;
 
     VerifyOrExit(blob != nullptr, {
         ChipLogError(DeviceLayer, "ParseEl2GoBlob: blob is NULL");
@@ -861,29 +849,28 @@ CHIP_ERROR FactoryDataProvider::ParseEl2GoBlob(const uint8_t * blob, size_t maxS
     memset(&blobCtx, 0, sizeof(blobCtx));
 
     currentPtr = blob;
-    endPtr = blob + maxSize;
+    endPtr     = blob + maxSize;
 
     // Parse TLVs until we hit TAG_SIGNATURE (which marks the end of the blob)
     while (currentPtr < endPtr)
     {
         // Ensure we have at least tag + length indicator
         VerifyOrExit(currentPtr + 2 <= endPtr, {
-            ChipLogError(DeviceLayer, "ParseEl2GoBlob: Insufficient bytes for TLV header at offset %u",
-                        currentPtr - blob);
+            ChipLogError(DeviceLayer, "ParseEl2GoBlob: Insufficient bytes for TLV header at offset %u", currentPtr - blob);
             err = CHIP_ERROR_BUFFER_TOO_SMALL;
         });
 
-        uint8_t tag = *currentPtr;
+        uint8_t tag            = *currentPtr;
         size_t lengthFieldSize = 0;
-        size_t valueLength = 0;
-        size_t remainingBytes = endPtr - currentPtr;
+        size_t valueLength     = 0;
+        size_t remainingBytes  = endPtr - currentPtr;
 
         // Parse TLV length field
         if ((currentPtr[1] & 0x80) == 0)
         {
             // Short form: length is in bits 0-6 of the first byte
             lengthFieldSize = 1;
-            valueLength = currentPtr[1];
+            valueLength     = currentPtr[1];
         }
         else
         {
@@ -892,18 +879,17 @@ CHIP_ERROR FactoryDataProvider::ParseEl2GoBlob(const uint8_t * blob, size_t maxS
 
             VerifyOrExit(numLengthBytes > 0 && numLengthBytes <= 4, {
                 ChipLogError(DeviceLayer, "ParseEl2GoBlob: Invalid length encoding (numLengthBytes=%u) at offset %u",
-                            numLengthBytes, currentPtr - blob);
+                             numLengthBytes, currentPtr - blob);
                 err = CHIP_ERROR_INVALID_ARGUMENT;
             });
 
             VerifyOrExit(remainingBytes >= 2 + numLengthBytes, {
-                ChipLogError(DeviceLayer, "ParseEl2GoBlob: Insufficient bytes for length field at offset %u",
-                            currentPtr - blob);
+                ChipLogError(DeviceLayer, "ParseEl2GoBlob: Insufficient bytes for length field at offset %u", currentPtr - blob);
                 err = CHIP_ERROR_BUFFER_TOO_SMALL;
             });
 
             lengthFieldSize = 1 + numLengthBytes;
-            valueLength = 0;
+            valueLength     = 0;
 
             for (uint8_t i = 0; i < numLengthBytes; i++)
             {
@@ -917,7 +903,7 @@ CHIP_ERROR FactoryDataProvider::ParseEl2GoBlob(const uint8_t * blob, size_t maxS
         // Verify TLV doesn't exceed buffer
         VerifyOrExit(currentPtr + totalTlvSize <= endPtr, {
             ChipLogError(DeviceLayer, "ParseEl2GoBlob: TLV size %u exceeds buffer at offset %u (tag=0x%02X, valueLength=%u)",
-                        totalTlvSize, currentPtr - blob, tag, valueLength);
+                         totalTlvSize, currentPtr - blob, tag, valueLength);
             err = CHIP_ERROR_BUFFER_TOO_SMALL;
         });
 
@@ -942,7 +928,7 @@ CHIP_ERROR FactoryDataProvider::ParseEl2GoBlob(const uint8_t * blob, size_t maxS
                 err = CHIP_ERROR_INVALID_ARGUMENT;
             });
             blobCtx.keyId = GetUint32(valuePtr);
-            foundKeyId = true;
+            foundKeyId    = true;
             ChipLogProgress(DeviceLayer, "ParseEl2GoBlob: Key ID = 0x%08" PRIx32, blobCtx.keyId);
             break;
 
@@ -997,7 +983,7 @@ CHIP_ERROR FactoryDataProvider::ParseEl2GoBlob(const uint8_t * blob, size_t maxS
                 err = CHIP_ERROR_INVALID_ARGUMENT;
             });
             ChipLogProgress(DeviceLayer, "ParseEl2GoBlob: Device Lifecycle = 0x%08" PRIx32 " (validated, not stored)",
-                        GetUint32(valuePtr));
+                            GetUint32(valuePtr));
             break;
 
         case kTagWrappingKeyId:
@@ -1006,7 +992,7 @@ CHIP_ERROR FactoryDataProvider::ParseEl2GoBlob(const uint8_t * blob, size_t maxS
                 err = CHIP_ERROR_INVALID_ARGUMENT;
             });
             ChipLogProgress(DeviceLayer, "ParseEl2GoBlob: Wrapping Key ID = 0x%08" PRIx32 " (validated, not stored)",
-                        GetUint32(valuePtr));
+                            GetUint32(valuePtr));
             break;
 
         case kTagWrappingAlgorithm:
@@ -1015,7 +1001,7 @@ CHIP_ERROR FactoryDataProvider::ParseEl2GoBlob(const uint8_t * blob, size_t maxS
                 err = CHIP_ERROR_INVALID_ARGUMENT;
             });
             ChipLogProgress(DeviceLayer, "ParseEl2GoBlob: Wrapping Algorithm = 0x%08" PRIx32 " (validated, not stored)",
-                        GetUint32(valuePtr));
+                            GetUint32(valuePtr));
             break;
 
         case kTagIv:
@@ -1028,7 +1014,7 @@ CHIP_ERROR FactoryDataProvider::ParseEl2GoBlob(const uint8_t * blob, size_t maxS
                 err = CHIP_ERROR_INVALID_ARGUMENT;
             });
             ChipLogProgress(DeviceLayer, "ParseEl2GoBlob: Signature Key ID = 0x%08" PRIx32 " (validated, not stored)",
-                        GetUint32(valuePtr));
+                            GetUint32(valuePtr));
             break;
 
         case kTagSignatureAlgorithm:
@@ -1037,7 +1023,7 @@ CHIP_ERROR FactoryDataProvider::ParseEl2GoBlob(const uint8_t * blob, size_t maxS
                 err = CHIP_ERROR_INVALID_ARGUMENT;
             });
             ChipLogProgress(DeviceLayer, "ParseEl2GoBlob: Signature Algorithm = 0x%08" PRIx32 " (validated, not stored)",
-                        GetUint32(valuePtr));
+                            GetUint32(valuePtr));
             break;
 
         case kTagPlain:
@@ -1048,8 +1034,7 @@ CHIP_ERROR FactoryDataProvider::ParseEl2GoBlob(const uint8_t * blob, size_t maxS
             // Signature marks the END of the blob - this is the termination condition
             blobSize += totalTlvSize;
 
-            ChipLogProgress(DeviceLayer, "ParseEl2GoBlob: Signature size = %u, total blob size = %u",
-                           valueLength, blobSize);
+            ChipLogProgress(DeviceLayer, "ParseEl2GoBlob: Signature size = %u, total blob size = %u", valueLength, blobSize);
 
             if (actualSize != nullptr)
             {
@@ -1068,7 +1053,7 @@ CHIP_ERROR FactoryDataProvider::ParseEl2GoBlob(const uint8_t * blob, size_t maxS
             });
 
             ChipLogProgress(DeviceLayer, "ParseEl2GoBlob: Successfully parsed blob with key ID 0x%08" PRIx32, blobCtx.keyId);
-            goto exit;  // Exit after signature - blob is complete
+            goto exit; // Exit after signature - blob is complete
 
         default:
             ChipLogProgress(DeviceLayer, "ParseEl2GoBlob: Skipping unknown tag 0x%02X (size %u)", tag, valueLength);
@@ -1092,8 +1077,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR FactoryDataProvider::BlobContextToPsaAttributes(const BlobContext & blobCtx,
-                                                               psa_key_attributes_t & psaAttrs)
+CHIP_ERROR FactoryDataProvider::BlobContextToPsaAttributes(const BlobContext & blobCtx, psa_key_attributes_t & psaAttrs)
 {
     // Initialize PSA attributes
     psaAttrs = psa_key_attributes_init();
@@ -1109,7 +1093,7 @@ CHIP_ERROR FactoryDataProvider::BlobContextToPsaAttributes(const BlobContext & b
     return CHIP_NO_ERROR;
 }
 
-bool FactoryDataProvider::IsBlobMagic(const uint8_t *ptr, const uint8_t *endPtr)
+bool FactoryDataProvider::IsBlobMagic(const uint8_t * ptr, const uint8_t * endPtr)
 {
     if (ptr + kBlobMagicTlvSize > endPtr)
     {
@@ -1117,26 +1101,21 @@ bool FactoryDataProvider::IsBlobMagic(const uint8_t *ptr, const uint8_t *endPtr)
     }
 
     // The magic TLV is 104 bits long, sufficient to not randomly appear inside the blob (for practical purposes)
-    return GetUint32(ptr)     == kBlobMagicTlv1  &&
-           GetUint32(ptr + 4) == kBlobMagicTlv2  &&
-           GetUint32(ptr + 8) == kBlobMagicTlv3  &&
-           *(ptr + 12)        == kBlobMagicTlv4;
+    return GetUint32(ptr) == kBlobMagicTlv1 && GetUint32(ptr + 4) == kBlobMagicTlv2 && GetUint32(ptr + 8) == kBlobMagicTlv3 &&
+        *(ptr + 12) == kBlobMagicTlv4;
 }
 
-uint32_t FactoryDataProvider::GetUint32(const uint8_t *input)
+uint32_t FactoryDataProvider::GetUint32(const uint8_t * input)
 {
     // Big-endian (MSB first) - matches EL2GO blob format
-    return (static_cast<uint32_t>(input[0]) << 24) |
-           (static_cast<uint32_t>(input[1]) << 16) |
-           (static_cast<uint32_t>(input[2]) << 8) |
-           static_cast<uint32_t>(input[3]);
+    return (static_cast<uint32_t>(input[0]) << 24) | (static_cast<uint32_t>(input[1]) << 16) |
+        (static_cast<uint32_t>(input[2]) << 8) | static_cast<uint32_t>(input[3]);
 }
 
-uint16_t FactoryDataProvider::GetUint16(const uint8_t *input)
+uint16_t FactoryDataProvider::GetUint16(const uint8_t * input)
 {
     // Big-endian (MSB first) - matches EL2GO blob format
-    return (static_cast<uint16_t>(input[0]) << 8) |
-           static_cast<uint16_t>(input[1]);
+    return (static_cast<uint16_t>(input[0]) << 8) | static_cast<uint16_t>(input[1]);
 }
 #endif
 

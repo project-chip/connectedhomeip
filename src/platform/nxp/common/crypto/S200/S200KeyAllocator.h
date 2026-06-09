@@ -15,9 +15,8 @@
  *    limitations under the License.
  */
 #pragma once
-#include <crypto/PSAKeyAllocator.h>
 #include "mcux_psa_s2xx_key_locations.h"
-
+#include <crypto/PSAKeyAllocator.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -28,9 +27,9 @@ public:
     {
 
         using namespace chip::Crypto;
-        psa_key_id_t keyId = psa_get_key_id(&attrs);
+        psa_key_id_t keyId          = psa_get_key_id(&attrs);
         psa_key_lifetime_t lifetime = psa_get_key_lifetime(&attrs);
-        psa_key_type_t keyType = psa_get_key_type(&attrs);
+        psa_key_type_t keyType      = psa_get_key_type(&attrs);
 
         if (keyId >= to_underlying(KeyIdBase::ICDKeyRangeStart) &&
             keyId < to_underlying(KeyIdBase::ICDKeyRangeStart) + kMaxICDClientKeys)
@@ -43,19 +42,20 @@ public:
 
         if (lifetime == PSA_KEY_LIFETIME_PERSISTENT)
         {
-            psa_set_key_lifetime(&attrs, PSA_KEY_LIFETIME_FROM_PERSISTENCE_AND_LOCATION(
-                                 PSA_KEY_LIFETIME_PERSISTENT, PSA_KEY_LOCATION_S200_KEY_STORAGE_NON_EL2GO));
+            psa_set_key_lifetime(&attrs,
+                                 PSA_KEY_LIFETIME_FROM_PERSISTENCE_AND_LOCATION(PSA_KEY_LIFETIME_PERSISTENT,
+                                                                                PSA_KEY_LOCATION_S200_KEY_STORAGE_NON_EL2GO));
             return;
         }
 
         /* NON_EL2GO storage for CASE Ephemeral Keys and pending operational keys */
-        if ((lifetime == PSA_KEY_LIFETIME_VOLATILE) &&
-            PSA_KEY_TYPE_IS_ECC_KEY_PAIR(keyType) &&
+        if ((lifetime == PSA_KEY_LIFETIME_VOLATILE) && PSA_KEY_TYPE_IS_ECC_KEY_PAIR(keyType) &&
             (PSA_ECC_FAMILY_SECP_R1 == PSA_KEY_TYPE_ECC_GET_FAMILY(keyType)) &&
             (psa_get_key_bits(&attrs) == kP256_PrivateKey_Length * 8))
         {
-            psa_set_key_lifetime(&attrs, PSA_KEY_LIFETIME_FROM_PERSISTENCE_AND_LOCATION(
-                PSA_KEY_LIFETIME_VOLATILE, PSA_KEY_LOCATION_S200_KEY_STORAGE_NON_EL2GO));
+            psa_set_key_lifetime(&attrs,
+                                 PSA_KEY_LIFETIME_FROM_PERSISTENCE_AND_LOCATION(PSA_KEY_LIFETIME_VOLATILE,
+                                                                                PSA_KEY_LOCATION_S200_KEY_STORAGE_NON_EL2GO));
             return;
         }
     }

@@ -53,7 +53,7 @@ public:
 private:
     // Factory data validation constants
     static constexpr uint32_t kFactoryDataHashId = 0xCE47BA5E;
-    static constexpr size_t kHashLength = 4;
+    static constexpr size_t kHashLength          = 4;
     struct Header
     {
         uint32_t hashId;
@@ -63,8 +63,8 @@ private:
     uint8_t factoryDataRamBuffer[FACTORY_DATA_MAX_SIZE];
     Header mHeader;
 
-    bool mKeyIdsCached = false;
-    uint32_t mEl2GoDacKeyId = 0;
+    bool mKeyIdsCached       = false;
+    uint32_t mEl2GoDacKeyId  = 0;
     uint32_t mEl2GoDacCertId = 0;
 
     CHIP_ERROR ReadAndCheckFactoryDataInFlash(void);

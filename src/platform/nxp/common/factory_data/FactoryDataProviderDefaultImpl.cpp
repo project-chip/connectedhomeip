@@ -31,7 +31,6 @@ extern "C" {
 }
 #endif /* __cplusplus */
 
-
 #define HASH_ID 0xCE47BA5E
 #define HASH_LEN 4
 
@@ -49,7 +48,7 @@ CHIP_ERROR FactoryDataProviderImpl::DecryptAesEcb(uint8_t * dest, uint8_t * sour
 {
     psa_status_t status;
     psa_key_attributes_t key_attr = PSA_KEY_ATTRIBUTES_INIT;
-    psa_key_id_t key_id = 0;
+    psa_key_id_t key_id           = 0;
 
     // Configure key attributes
     psa_set_key_usage_flags(&key_attr, PSA_KEY_USAGE_DECRYPT);
@@ -66,14 +65,9 @@ CHIP_ERROR FactoryDataProviderImpl::DecryptAesEcb(uint8_t * dest, uint8_t * sour
 
     // Perform AES-ECB decrypt
     size_t out_len = 0;
-    status = psa_cipher_decrypt(
-        key_id,
-        PSA_ALG_ECB_NO_PADDING,
-        source,
-        16,        // ECB always processes 16‑byte blocks
-        dest,
-        16,
-        &out_len);
+    status         = psa_cipher_decrypt(key_id, PSA_ALG_ECB_NO_PADDING, source,
+                                        16, // ECB always processes 16‑byte blocks
+                                        dest, 16, &out_len);
 
     // Clean up key regardless of outcome
     psa_destroy_key(key_id);
