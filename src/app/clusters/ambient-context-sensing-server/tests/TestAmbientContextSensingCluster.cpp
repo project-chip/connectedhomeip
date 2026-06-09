@@ -457,20 +457,20 @@ TEST_F(TestAmbientContextSensingCluster, TestHoldTimeAttribute)
     chip::Testing::ClusterTester tester(cluster);
 
     // Verify that we can set a valid hold time via direct method call
-    EXPECT_EQ(cluster.SetHoldTime(150), CHIP_NO_ERROR);
+    EXPECT_EQ(cluster.SetHoldTime(150), Protocols::InteractionModel::Status::Success);
     uint16_t holdTime;
     EXPECT_EQ(tester.ReadAttribute(Attributes::HoldTime::Id, holdTime), CHIP_NO_ERROR);
     EXPECT_EQ(holdTime, 150);
     EXPECT_EQ(cluster.GetHoldTime(), 150);
 
     // Verify that setting the same value returns CHIP_NO_ERROR
-    EXPECT_EQ(cluster.SetHoldTime(150), CHIP_NO_ERROR);
+    EXPECT_EQ(cluster.SetHoldTime(150), DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp);
 
     // Verify that we cannot set a hold time less than the minimum
-    EXPECT_EQ(cluster.SetHoldTime(5), CHIP_ERROR_INVALID_ARGUMENT);
+    EXPECT_EQ(cluster.SetHoldTime(5), Protocols::InteractionModel::Status::ConstraintError);
 
     // Verify that we cannot set a hold time greater than the maximum
-    EXPECT_EQ(cluster.SetHoldTime(250), CHIP_ERROR_INVALID_ARGUMENT);
+    EXPECT_EQ(cluster.SetHoldTime(250), Protocols::InteractionModel::Status::ConstraintError);
 
     // Verify that we can write a valid hold time via WriteAttribute
     EXPECT_EQ(tester.WriteAttribute(Attributes::HoldTime::Id, static_cast<uint16_t>(180)), CHIP_NO_ERROR);
@@ -479,10 +479,10 @@ TEST_F(TestAmbientContextSensingCluster, TestHoldTimeAttribute)
     EXPECT_EQ(cluster.GetHoldTime(), 180);
 
     // Verify that we cannot write a hold time less than the minimum via WriteAttribute
-    EXPECT_EQ(tester.WriteAttribute(Attributes::HoldTime::Id, static_cast<uint16_t>(5)), CHIP_ERROR_INVALID_ARGUMENT);
+    EXPECT_EQ(tester.WriteAttribute(Attributes::HoldTime::Id, static_cast<uint16_t>(5)), Protocols::InteractionModel::Status::ConstraintError);
 
     // Verify that we cannot write a hold time greater than the maximum via WriteAttribute
-    EXPECT_EQ(tester.WriteAttribute(Attributes::HoldTime::Id, static_cast<uint16_t>(250)), CHIP_ERROR_INVALID_ARGUMENT);
+    EXPECT_EQ(tester.WriteAttribute(Attributes::HoldTime::Id, static_cast<uint16_t>(250)), Protocols::InteractionModel::Status::ConstraintError);
 
     // Give the new HoldTimeLimitation whose range is different. The HoldTime should be reset
     holdTimeLimitsConfig.holdTimeMin     = 201;

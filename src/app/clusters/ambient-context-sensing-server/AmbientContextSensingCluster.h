@@ -108,7 +108,7 @@ public:
     uint16_t GetObjectCount() { return mObjectCount; }
     DataModel::ActionReturnStatus SetSimultaneousDetectionLimit(const uint8_t simultaneousDetectionLimit);
     uint8_t GetSimultaneousDetectionLimit() { return mSimultaneousDetectionLimit; }
-    CHIP_ERROR SetHoldTime(uint16_t holdTime);
+    DataModel::ActionReturnStatus SetHoldTime(uint16_t holdTime);
     uint16_t GetHoldTime() const { return mHoldTime; }
     void SetHoldTimeLimits(const AmbientContextSensing::Structs::HoldTimeLimitsStruct::Type & holdTimeLimits);
     AmbientContextSensing::Structs::HoldTimeLimitsStruct::Type GetHoldTimeLimits() { return mHoldTimeLimits; }

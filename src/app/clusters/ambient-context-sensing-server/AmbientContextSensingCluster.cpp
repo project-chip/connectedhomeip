@@ -59,7 +59,13 @@ CHIP_ERROR AmbientContextSensingCluster::Startup(ServerClusterContext & context)
                                           storedHoldTime, mHoldTime))
     {
         // A value was found in persistence.
-        LogErrorOnFailure(SetHoldTime(storedHoldTime));
+        if ((SetHoldTime(storedHoldTime) == Protocols::InteractionModel::Status::ConstraintError) && (mContext != nullptr))
+        {
+            // A value was found in persistence and if stored value is not valid, replace it
+            LogErrorOnFailure(
+                mContext->attributeStorage.WriteValue({ mPath.mEndpointId, AmbientContextSensing::Id, Attributes::HoldTime::Id },
+                                                      { reinterpret_cast<const uint8_t *>(&mHoldTime), sizeof(mHoldTime) }));
+        }
     }
 
     return CHIP_NO_ERROR;
@@ -376,11 +382,11 @@ DataModel::ActionReturnStatus AmbientContextSensingCluster::SetSimultaneousDetec
     return Protocols::InteractionModel::Status::Success;
 }
 
-CHIP_ERROR AmbientContextSensingCluster::SetHoldTime(uint16_t holdTime)
+DataModel::ActionReturnStatus AmbientContextSensingCluster::SetHoldTime(uint16_t holdTime)
 {
     VerifyOrReturnError((mHoldTimeLimits.holdTimeMin <= holdTime) && (holdTime <= mHoldTimeLimits.holdTimeMax),
-                        CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(holdTime != mHoldTime, CHIP_NO_ERROR);
+                        Protocols::InteractionModel::Status::ConstraintError);
+    VerifyOrReturnError(holdTime != mHoldTime, DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp);
 
     mHoldTime = holdTime;
     NotifyAttributeChanged(Attributes::HoldTime::Id);
@@ -393,7 +399,7 @@ CHIP_ERROR AmbientContextSensingCluster::SetHoldTime(uint16_t holdTime)
                                                   { reinterpret_cast<const uint8_t *>(&mHoldTime), sizeof(mHoldTime) }));
     }
 
-    return CHIP_NO_ERROR;
+    return Protocols::InteractionModel::Status::Success;
 }
 
 void AmbientContextSensingCluster::SetHoldTimeLimits(
@@ -421,7 +427,8 @@ void AmbientContextSensingCluster::SetHoldTimeLimits(
     {
         // HoldTime is out of the new bounds. Resetting to the new default value
         ChipLogProgress(Zcl, "HoldTime is out of the new bounds. Resetting to the new default value");
-        LogErrorOnFailure(SetHoldTime(mHoldTimeLimits.holdTimeDefault));
+        // mHoldTimeLimits.holdTimeDefault was verified at the beginning of the function
+        RETURN_SAFELY_IGNORED SetHoldTime(mHoldTimeLimits.holdTimeDefault);
     }
 }
 
