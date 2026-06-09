@@ -98,8 +98,8 @@ void JointFabricDatastore::RemoveEndpointFriendlyNameStorage(NodeId nodeId, Endp
     mEndpointFriendlyNameStorage.erase({ nodeId, endpointId });
 }
 
-void JointFabricDatastore::CopyByteSpanWithOwnedStorage(const DataModel::Nullable<ByteSpan> & source,
-                                                        EpochKeyStorage & storage, DataModel::Nullable<ByteSpan> & destination)
+void JointFabricDatastore::CopyByteSpanWithOwnedStorage(const DataModel::Nullable<ByteSpan> & source, EpochKeyStorage & storage,
+                                                        DataModel::Nullable<ByteSpan> & destination)
 {
     // The self-zeroizing storage has a fixed capacity (epoch key length); a source that does not fit is
     // not a valid epoch key, so treat it as absent rather than truncating.
