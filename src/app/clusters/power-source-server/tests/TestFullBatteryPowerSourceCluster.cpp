@@ -196,7 +196,7 @@ TEST_F(TestFullBatteryPowerSourceCluster, TestBounds)
     EXPECT_EQ(cluster.SetBatPercentRemaining(uint8_t{ 50 }), CHIP_NO_ERROR);
     EXPECT_EQ(cluster.SetBatPercentRemaining(uint8_t{ 150 }), CHIP_NO_ERROR);
     EXPECT_EQ(cluster.SetBatPercentRemaining(uint8_t{ 200 }), CHIP_NO_ERROR);
-    EXPECT_EQ(cluster.SetBatPercentRemaining(uint8_t{ 201 }), CHIP_ERROR_INVALID_INTEGER_VALUE);
+    EXPECT_EQ(cluster.SetBatPercentRemaining(uint8_t{ 201 }), CHIP_IM_GLOBAL_STATUS(ConstraintError));
 }
 
 } // namespace

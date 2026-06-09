@@ -18,6 +18,8 @@
 #pragma once
 #include "PowerSourceCluster.h"
 
+namespace chip::app::Clusters {
+
 using FullWiredPowerSourceCluster =
     PowerSourceCluster<BitFlags<PowerSource::Feature>(PowerSource::Feature::kWired).Raw(), UINT32_MAX>;
 using FullWiredPowerSourceConfig = FullWiredPowerSourceCluster::Config;
@@ -35,3 +37,5 @@ using MinimalWiredPowerSourceConfig  = MinimalWiredPowerSourceCluster::Config;
 using MinimalBatteryPowerSourceCluster =
     PowerSourceCluster<BitFlags<PowerSource::Feature>(PowerSource::Feature::kBattery).Raw(), 0>;
 using MinimalBatteryPowerSourceConfig = MinimalBatteryPowerSourceCluster::Config;
+
+} // namespace chip::app::Clusters

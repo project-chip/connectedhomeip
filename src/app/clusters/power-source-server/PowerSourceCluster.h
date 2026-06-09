@@ -1125,10 +1125,16 @@ public:
             return CHIP_NO_ERROR;
         }
     }
+
+    /// This function takes the list by view, it doesn't store the data into the cluster.
+    /// If `CHIP_NO_ERROR` is returned, it is guaranteed that the internal `endpointList` points to the new storage, EVEN IF the content is the same.
+    /// If something other then `CHIP_NO_ERROR` is returned, the internal `endpointList` is not updated and still points to the old storage.
+    /// The underlying storage of `val` needs to be valid until this function is called again and a `CHIP_NO_ERROR` is returned.
     CHIP_ERROR SetEndpointList(Span<const EndpointId> val)
     {
         if (GetEndpointList().data_equal(val))
         {
+            this->endpointList = val;
             return CHIP_NO_ERROR;
         }
 
