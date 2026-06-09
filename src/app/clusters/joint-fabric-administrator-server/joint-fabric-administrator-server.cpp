@@ -339,10 +339,6 @@ void JointFabricAdministratorGlobalInstance::HandleICACCSRRequest(HandlerContext
                  nonDefaultStatus = Status::Failure);
     VerifyOrExit(!administratorFabricIndex.IsNull(),
                  status.Emplace(ICACCSRResponseStatusCodeEnum::kInvalidAdministratorFabricIndex));
-    // The Joint Fabric Anchor identity must match the fabric making the request; otherwise an admin on a
-    // different fabric could request an ICAC CSR.
-    VerifyOrExit(administratorFabricIndex.Value() == ctx.mCommandHandler.GetAccessingFabricIndex(),
-                 status.Emplace(ICACCSRResponseStatusCodeEnum::kInvalidAdministratorFabricIndex));
 
     VerifyOrExit(jointFabricAdministrator.GetDelegate() != nullptr, nonDefaultStatus = Status::Failure);
     VerifyOrExit(jointFabricAdministrator.GetDelegate()->GetIcacCsr(icacCsr) == CHIP_NO_ERROR, nonDefaultStatus = Status::Failure);
