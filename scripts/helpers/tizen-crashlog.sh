@@ -19,8 +19,9 @@ set -e
 # Configuration
 CRASH_REMOTE_DIR="/opt/usr/share/crash/dump"
 LOCAL_TMP_DIR="out/tizen-crashes-tmp"
-LOCAL_SYSROOT="out/tizen-crash-sysroot"
 SEARCH_HOURS=1
+CLEANUP=true
+VERBOSE=false
 
 # ============================================================================
 # Utility Functions
@@ -29,11 +30,16 @@ SEARCH_HOURS=1
 function help() {
     cat <<EOF
 Usage:
-$0 [--help] [--hours NUM] [--target SDB_ID]
+$0 [--help] [--hours NUM] [--target SDB_ID] [--out-dir DIR] [--verbose] [--no-clean]
 
 Options:
     --hours NUM     - Filter crashes from the last NUM hours (default: 1)
     --target SDB_ID - SDB identifier (e.g. 192.168.0.118:26101)
+    --out-dir DIR   - Build output directory (e.g. out/tizen-arm64-light-no-thread).
+                      When set, only crashes matching binaries in this directory
+                      are shown and build target selection is skipped.
+    --verbose       - Print commands before execution (especially GDB invocation)
+    --no-clean      - Keep temporary files (pulled crash archives) after analysis
     --help          - Print help
 EOF
 }
@@ -48,6 +54,18 @@ function parse_arguments() {
             --target)
                 TARGET_DEVICE="$2"
                 shift 2
+                ;;
+            --out-dir)
+                OUT_DIR="$2"
+                shift 2
+                ;;
+            --verbose)
+                VERBOSE=true
+                shift
+                ;;
+            --no-clean)
+                CLEANUP=false
+                shift
                 ;;
             --help)
                 help
@@ -70,6 +88,51 @@ function setup_sdb() {
 
     echo "Connecting to target device via SDB..."
     "${SDB_CMD[@]}" root on
+}
+
+function verbose_log() {
+    if [ "$VERBOSE" = true ]; then
+        echo "+ $*"
+    fi
+}
+
+# ============================================================================
+# Binary Resolution
+# ============================================================================
+
+function resolve_binary_name() {
+    local app_id="$1"
+
+    # Lookup app_id -> exec in tizen-manifest.xml files
+    for manifest in examples/*/tizen/tizen-manifest.xml; do
+        [ -f "$manifest" ] || continue
+        local manifest_appid
+        manifest_appid=$(sed -n 's/.*appid="\([^"]*\)".*/\1/p' "$manifest" | head -1)
+        if [ "$manifest_appid" = "$app_id" ]; then
+            sed -n 's/.*exec="\([^"]*\)".*/\1/p' "$manifest" | head -1
+            return
+        fi
+    done
+
+    # Fallback: use app_id as binary name
+    echo "$app_id"
+}
+
+function list_binaries_in_out_dir() {
+    local out_dir="$1"
+    local f
+    for f in "$out_dir"/*; do
+        [ -f "$f" ] || continue
+        local basename
+        basename=$(basename "$f")
+        [[ "$basename" == *.txt ]] && continue
+        [[ "$basename" == *.json ]] && continue
+        [[ "$basename" == *.zip ]] && continue
+        [[ "$basename" == *.log ]] && continue
+        if file "$f" | grep -q 'executable'; then
+            echo "$basename"
+        fi
+    done
 }
 
 # ============================================================================
@@ -102,7 +165,6 @@ function fetch_recent_crashes() {
         timestamp_str=$(echo "$filename" | grep -oE '[0-9]{14}')
 
         if [ -n "$timestamp_str" ]; then
-            # Convert YYYYMMDDHHMMSS to Unix epoch
             formatted_time="${timestamp_str:0:4}-${timestamp_str:4:2}-${timestamp_str:6:2} ${timestamp_str:8:2}:${timestamp_str:10:2}:${timestamp_str:12:2}"
             file_epoch=$(date -d "$formatted_time" +%s 2>/dev/null || echo 0)
 
@@ -111,6 +173,35 @@ function fetch_recent_crashes() {
             fi
         fi
     done
+}
+
+function filter_crashes_for_out_dir() {
+    local out_dir="$1"
+
+    mapfile -t available_binaries < <(list_binaries_in_out_dir "$out_dir")
+    if [ ${#available_binaries[@]} -eq 0 ]; then
+        echo "WARNING: No ELF executables found in $out_dir"
+        return
+    fi
+
+    local filtered=()
+    local remote_zip
+    for remote_zip in "${VALID_CRASHES[@]}"; do
+        local filename app_id binary
+        filename=$(basename "$remote_zip")
+        app_id="${filename%%_*}"
+        binary=$(resolve_binary_name "$app_id")
+
+        local b
+        for b in "${available_binaries[@]}"; do
+            if [ "$b" = "$binary" ]; then
+                filtered+=("$remote_zip")
+                break
+            fi
+        done
+    done
+
+    VALID_CRASHES=("${filtered[@]}")
 }
 
 function select_crash_log() {
@@ -144,28 +235,6 @@ function select_crash_log() {
 }
 
 # ============================================================================
-# Binary Resolution
-# ============================================================================
-
-function resolve_binary_name() {
-    local app_id="$1"
-
-    # Lookup app_id -> exec in tizen-manifest.xml files
-    for manifest in examples/*/tizen/tizen-manifest.xml; do
-        [ -f "$manifest" ] || continue
-        local manifest_appid
-        manifest_appid=$(sed -n 's/.*appid="\([^"]*\)".*/\1/p' "$manifest" | head -1)
-        if [ "$manifest_appid" = "$app_id" ]; then
-            sed -n 's/.*exec="\([^"]*\)".*/\1/p' "$manifest" | head -1
-            return
-        fi
-    done
-
-    # Fallback: use app_id as binary name
-    echo "$app_id"
-}
-
-# ============================================================================
 # Crash Archive Extraction
 # ============================================================================
 
@@ -183,7 +252,6 @@ function pull_and_extract_crash() {
     echo "Extracting crash archive..."
     unzip -qo "$local_zip" -d "$LOCAL_TMP_DIR"
 
-    # Handle inner tar structure if present inside the Tizen zip layout
     local archive
     mapfile -t nested_tars < <(find "$LOCAL_TMP_DIR" -type f \( -name "*.tar" -o -name "*.tar.gz" \) 2>/dev/null)
     for archive in "${nested_tars[@]}"; do
@@ -194,9 +262,6 @@ function pull_and_extract_crash() {
 }
 
 function find_coredump() {
-    local coredump=""
-
-    # Find by file signature first (most reliable)
     local f
     mapfile -t all_files < <(find "$LOCAL_TMP_DIR" -type f)
     for f in "${all_files[@]}"; do
@@ -206,7 +271,7 @@ function find_coredump() {
         fi
     done
 
-    # Fallback: find by extension
+    local coredump
     coredump=$(find "$LOCAL_TMP_DIR" -type f -name "*.coredump" | head -n 1)
     if [ -n "$coredump" ]; then
         echo "$coredump"
@@ -246,7 +311,6 @@ function find_matching_targets() {
         [ -d "$target" ] || continue
         [ -f "$target/$binary" ] || continue
 
-        # Enforce architecture alignment between core file and build target
         if [ "$is_core_64" = true ]; then
             [[ "$target" != *"arm64"* ]] && [[ "$target" != *"aarch64"* ]] && continue
         else
@@ -267,7 +331,7 @@ function select_build_target() {
 
     if [ ${#targets[@]} -eq 0 ]; then
         echo "ERROR: Could not find a matching local unstripped binary for '$binary' with correct architecture inside out/tizen-* directories."
-        rm -rf "$LOCAL_TMP_DIR"
+        $CLEANUP && rm -rf "$LOCAL_TMP_DIR"
         exit 1
     fi
 
@@ -309,59 +373,14 @@ function get_gdb_binary() {
     fi
 }
 
-function set_sysroot_env() {
+function get_sdk_sysroot() {
     local target_path="$1"
 
     if [[ "$target_path" == *"arm64"* ]] || [[ "$target_path" == *"aarch64"* ]]; then
-        export TIZEN_SDK_SYSROOT="$TIZEN_SDK_ROOT/platforms/tizen-10.0/tizen/rootstraps/tizen-10.0-device64.core"
+        echo "$TIZEN_SDK_ROOT/platforms/tizen-10.0/tizen/rootstraps/tizen-10.0-device64.core"
     else
-        export TIZEN_SDK_SYSROOT="$TIZEN_SDK_ROOT/platforms/tizen-10.0/tizen/rootstraps/tizen-10.0-device.core"
+        echo "$TIZEN_SDK_ROOT/platforms/tizen-10.0/tizen/rootstraps/tizen-10.0-device.core"
     fi
-}
-
-# ============================================================================
-# Local Sysroot Builder
-# ============================================================================
-
-function build_local_sysroot() {
-    local coredump="$1"
-
-    echo "Building local sysroot from device shared libraries..."
-
-    # Extract mapped file paths from the coredump's NT_FILE notes
-    # readelf -n output format: "  0xADDR  0xADDR  0xOFFSET  /path/to/file"
-    local core_libs
-    mapfile -t core_libs < <(readelf -n "$coredump" 2>/dev/null | grep -oE '/[^ ]+' | sort -u)
-
-    if [ ${#core_libs[@]} -eq 0 ]; then
-        echo "WARNING: Could not parse coredump file mappings. Backtrace may be incomplete."
-        echo "Consider pulling /usr/lib64 from the device manually into a sysroot."
-        SYSROOT_TO_USE="$TIZEN_SDK_SYSROOT"
-        return
-    fi
-
-    local pulled_count=0 cached_count=0
-    local lib_path local_lib
-    for lib_path in "${core_libs[@]}"; do
-        # Skip non-library paths
-        [[ "$lib_path" == /dev/* ]] && continue
-        [[ "$lib_path" == /proc/* ]] && continue
-        [[ "$lib_path" == /sys/* ]] && continue
-
-        local_lib="$LOCAL_SYSROOT$lib_path"
-        if [ -f "$local_lib" ]; then
-            cached_count=$((cached_count + 1))
-            continue
-        fi
-
-        mkdir -p "$(dirname "$local_lib")"
-        if "${SDB_CMD[@]}" pull "$lib_path" "$local_lib" 2>/dev/null; then
-            pulled_count=$((pulled_count + 1))
-        fi
-    done
-
-    echo "Sysroot: $pulled_count libraries pulled, $cached_count cached from previous runs."
-    SYSROOT_TO_USE="$LOCAL_SYSROOT"
 }
 
 # ============================================================================
@@ -383,6 +402,17 @@ function run_gdb_analysis() {
     echo "SYSROOT:        $sysroot"
     echo "----------------------------------------------------------------------------------------------------"
 
+    # Build the GDB command line with proper quoting for copy-paste
+    local gdb_invocation="$gdb_bin --batch"
+    gdb_invocation+=" -ex \"set auto-load safe-path /\""
+    gdb_invocation+=" -ex \"set sysroot $sysroot\""
+    gdb_invocation+=" -ex \"set solib-absolute-prefix $sysroot\""
+    gdb_invocation+=" -ex \"file $binary_path\""
+    gdb_invocation+=" -ex \"core-file $coredump\""
+    gdb_invocation+=" -ex \"thread apply all bt full\""
+
+    verbose_log "$gdb_invocation"
+
     "$gdb_bin" --batch \
         -ex "set auto-load safe-path /" \
         -ex "set sysroot $sysroot" \
@@ -399,10 +429,22 @@ function run_gdb_analysis() {
 parse_arguments "$@"
 setup_sdb
 
+if [ -n "$OUT_DIR" ]; then
+    if [ ! -d "$OUT_DIR" ]; then
+        echo "ERROR: --out-dir directory does not exist: $OUT_DIR"
+        exit 1
+    fi
+    echo "Using build output directory: $OUT_DIR"
+fi
+
 fetch_recent_crashes
+
+if [ -n "$OUT_DIR" ]; then
+    filter_crashes_for_out_dir "$OUT_DIR"
+fi
+
 select_crash_log
 
-# Resolve crash app_id to binary name
 crash_filename=$(basename "$SELECTED_ZIP")
 app_id="${crash_filename%%_*}"
 binary=$(resolve_binary_name "$app_id")
@@ -412,21 +454,31 @@ pull_and_extract_crash "$SELECTED_ZIP"
 coredump=$(find_coredump)
 if [ -z "$coredump" ] || [ ! -f "$coredump" ]; then
     echo "ERROR: Could not find a valid core dump file inside the pulled archive."
-    rm -rf "$LOCAL_TMP_DIR"
+    $CLEANUP && rm -rf "$LOCAL_TMP_DIR"
     exit 1
 fi
 
 is_core_64=$(detect_core_is_64bit "$coredump")
 
-mapfile -t matching_targets < <(find_matching_targets "$binary" "$is_core_64")
-select_build_target "$binary" "${matching_targets[@]}"
+if [ -n "$OUT_DIR" ]; then
+    if [ ! -f "$OUT_DIR/$binary" ]; then
+        echo "ERROR: Binary '$binary' not found in $OUT_DIR"
+        $CLEANUP && rm -rf "$LOCAL_TMP_DIR"
+        exit 1
+    fi
+    SELECTED_TARGET="$OUT_DIR"
+else
+    mapfile -t matching_targets < <(find_matching_targets "$binary" "$is_core_64")
+    select_build_target "$binary" "${matching_targets[@]}"
+fi
 
 gdb_bin=$(get_gdb_binary "$SELECTED_TARGET")
-set_sysroot_env "$SELECTED_TARGET"
+sysroot=$(get_sdk_sysroot "$SELECTED_TARGET")
 
-build_local_sysroot "$coredump"
+run_gdb_analysis "$gdb_bin" "$sysroot" "$SELECTED_TARGET/$binary" "$coredump" "$crash_filename"
 
-run_gdb_analysis "$gdb_bin" "$SYSROOT_TO_USE" "$SELECTED_TARGET/$binary" "$coredump" "$crash_filename"
-
-# Cleanup temporary files (keep sysroot cached for future runs)
-rm -rf "$LOCAL_TMP_DIR"
+if $CLEANUP; then
+    rm -rf "$LOCAL_TMP_DIR"
+else
+    echo "Temporary files preserved in: $LOCAL_TMP_DIR"
+fi
