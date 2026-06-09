@@ -73,7 +73,7 @@ class stm32Builder(GnBuilder):
             'stm32_board="%s"' % stm32_chip,
             'chip_config_network_layer_ble=true',
             'treat_warnings_as_errors=false',
-            ]
+        ]
 
     def GnBuildArgs(self):
         args = super().GnBuildArgs()
