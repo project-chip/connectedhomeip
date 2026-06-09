@@ -4,13 +4,13 @@ This example demonstrates the Matter Lighting application on Ameba platform.
 
 ---
 
--   [CHIP Ameba Lighting Example](#chip-ameba-lighting-example)
-    -   [Supported Device](#supported-device)
-    -   [Building the Example Application](#building-the-example-application)
-    -   [Commissioning](#commissioning)
-        -   [BLE mode](#ble-mode)
-        -   [IP mode](#ip-mode)
-    -   [Cluster control](#cluster-control)
+- [CHIP Ameba Lighting Example](#chip-ameba-lighting-example)
+  - [Supported Device](#supported-device)
+  - [Building the Example Application](#building-the-example-application)
+  - [Commissioning](#commissioning)
+    - [BLE mode](#ble-mode)
+    - [IP mode](#ip-mode)
+  - [Cluster Control](#cluster-control)
 
 ---
 
@@ -21,19 +21,19 @@ The CHIP demo application is supported on
 
 ## Building the Example Application
 
--   Pull docker image:
+- Pull docker image:
 
-          $ docker pull ghcr.io/project-chip/chip-build-ameba:199
+          $ docker pull ghcr.io/project-chip/chip-build-ameba:200
 
--   Run docker container:
+- Run docker container:
 
-          $ docker run -it -v ${CHIP_DIR}:/root/chip ghcr.io/project-chip/chip-build-ameba:199
+          $ docker run -it -v ${CHIP_DIR}:/root/chip ghcr.io/project-chip/chip-build-ameba:200
 
--   Setup build environment:
+- Setup build environment:
 
           $ source ./scripts/bootstrap.sh
 
--   To build the demo application:
+- To build the demo application:
 
           $ ./scripts/build/build_examples.py --target ameba-amebad-lighting build
 
@@ -43,8 +43,8 @@ The CHIP demo application is supported on
     The bootloader image files are stored in
     `out/ameba-amebad-lighting/asdk/bootloader` folder.
 
--   After building the application, **Ameba Image Tool** is used to flash it to
-    Ameba board.
+- After building the application, **Ameba Image Tool** is used to flash it to
+  Ameba board.
 
 1. Connect your device via USB and open Ameba Image Tool.
 2. Select correct serial port and set baudrate as **115200**.
@@ -77,8 +77,8 @@ After successful commissioning, use the OnOff cluster command to control the
 OnOff attribute. This allows you to toggle a parameter implemented by the device
 to be On or Off.
 
--   Via
-    [Chip-Tool](https://github.com/project-chip/connectedhomeip/tree/master/examples/chip-tool#using-the-client-to-send-matter-commands)
+- Via
+  [Chip-Tool](https://github.com/project-chip/connectedhomeip/tree/master/examples/chip-tool#using-the-client-to-send-matter-commands)
 
           $ ./chip-tool onoff on ${NODE_ID_TO_ASSIGN} 1
           $ ./chip-tool onoff off ${NODE_ID_TO_ASSIGN} 1

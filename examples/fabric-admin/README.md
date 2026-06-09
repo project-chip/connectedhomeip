@@ -5,7 +5,7 @@ fabrics.
 
 ---
 
--   [Building the Example Application](#building-the-example-application)
+- [Building the Example Application](#building-the-example-application)
 
 ---
 
@@ -23,13 +23,13 @@ For Raspberry Pi 4 example:
 ### Pull Docker Images
 
 ```
-docker pull ghcr.io/project-chip/chip-build-crosscompile:199
+docker pull ghcr.io/project-chip/chip-build-crosscompile:200
 ```
 
 ### Run docker
 
 ```
-docker run -it -v ~/connectedhomeip:/var/connectedhomeip ghcr.io/project-chip/chip-build-crosscompile:199 /bin/bash
+docker run -it -v ~/connectedhomeip:/var/connectedhomeip ghcr.io/project-chip/chip-build-crosscompile:200 /bin/bash
 ```
 
 ### Build

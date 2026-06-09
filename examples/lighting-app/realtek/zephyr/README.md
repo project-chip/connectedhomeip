@@ -7,13 +7,13 @@ your own application.
 
 The example is based on:
 
--   [Matter](https://github.com/project-chip/connectedhomeip)
--   [Realtek zephyr SDK](https://github.com/rtkconnectivity/zephyr)
--   [Realtek HAL module](https://github.com/rtkconnectivity/hal_realtek)
+- [Matter](https://github.com/project-chip/connectedhomeip)
+- [Realtek zephyr SDK](https://github.com/rtkconnectivity/zephyr)
+- [Realtek HAL module](https://github.com/rtkconnectivity/hal_realtek)
 
 ## Supported Device
 
--   RTL87x2G
+- RTL87x2G
 
 ## Introduction
 
@@ -39,26 +39,26 @@ In order to build the example, it is recommended to use a Linux distribution.
 Please visit the supported Operating Systems list in
 [BUILDING.md](../../../../docs/guides/BUILDING.md#prerequisites).
 
--   Make sure that below prerequisites are correctly installed (as described in
-    [BUILDING.md](../../../../docs/guides/BUILDING.md#prerequisites))
+- Make sure that below prerequisites are correctly installed (as described in
+  [BUILDING.md](../../../../docs/guides/BUILDING.md#prerequisites))
 
 ```
 sudo apt-get install git gcc g++ pkg-config libssl-dev libdbus-1-dev libglib2.0-dev libavahi-client-dev ninja-build python3-venv python3-dev python3-pip unzip libgirepository1.0-dev libcairo2-dev libreadline-dev
 ```
 
--   Step 1: Pull docker image
+- Step 1: Pull docker image
 
     ```bash
-    $ docker pull ghcr.io/project-chip/chip-build-realtek-zephyr:199
+    $ docker pull ghcr.io/project-chip/chip-build-realtek-zephyr:200
     ```
 
--   Step 2: Run docker container:
+- Step 2: Run docker container:
 
     ```bash
-    $ docker run -it -v ${CHIP_DIR}:/root/chip ghcr.io/project-chip/chip-build-realtek-zephyr:199
+    $ docker run -it -v ${CHIP_DIR}:/root/chip ghcr.io/project-chip/chip-build-realtek-zephyr:200
     ```
 
--   Step 3: Activate build environment
+- Step 3: Activate build environment
 
     ```bash
     $ source ./scripts/activate.sh
@@ -73,7 +73,7 @@ sudo apt-get install git gcc g++ pkg-config libssl-dev libdbus-1-dev libglib2.0-
 
 ## Building
 
--   To build the demo application:
+- To build the demo application:
 
         ```bash
         $ ./scripts/build/build_examples.py --target realtek-rtl87x2g-lighting build

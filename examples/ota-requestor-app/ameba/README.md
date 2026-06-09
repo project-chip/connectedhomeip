@@ -4,19 +4,19 @@ A prototype application that demonstrates OTA Requestor capabilities.
 
 ## Building the Example Application
 
--   Pull docker image:
+- Pull docker image:
 
-          $ docker pull ghcr.io/project-chip/chip-build-ameba:199
+          $ docker pull ghcr.io/project-chip/chip-build-ameba:200
 
--   Run docker container:
+- Run docker container:
 
-          $ docker run -it -v ${CHIP_DIR}:/root/chip ghcr.io/project-chip/chip-build-ameba:199
+          $ docker run -it -v ${CHIP_DIR}:/root/chip ghcr.io/project-chip/chip-build-ameba:200
 
--   Setup build environment:
+- Setup build environment:
 
           $ source ./scripts/bootstrap.sh
 
--   To build the demo application:
+- To build the demo application:
 
           $ ./scripts/build/build_examples.py --target ameba-amebad-ota-requestor build
 
@@ -26,8 +26,8 @@ A prototype application that demonstrates OTA Requestor capabilities.
     The bootloader image files are stored in
     `out/ameba-amebad-ota-requestor/asdk/bootloader` folder.
 
--   After building the application, **Ameba Image Tool** is used to flash it to
-    Ameba board.
+- After building the application, **Ameba Image Tool** is used to flash it to
+  Ameba board.
 
 1. Connect your device via USB and open Ameba Image Tool.
 2. Select correct serial port and set baudrate as **115200**.

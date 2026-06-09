@@ -6,7 +6,10 @@ Linux.
 
 ---
 
--   [Building the Example Application](#building-the-example-application)
+- [CHIP Linux Camera Example App](#chip-linux-camera-example-app)
+  - [Building the Example Application](#building-the-example-application)
+    - [1. Prerequisites](#1-prerequisites)
+    - [2. Building](#2-building)
 
 ---
 
@@ -78,7 +81,7 @@ environment to ensure all dependencies are correct.
 1. Pull the Cross-Compilation Docker Image
 
 ```
-docker pull ghcr.io/project-chip/chip-build-crosscompile:199
+docker pull ghcr.io/project-chip/chip-build-crosscompile:200
 ```
 
 2. Run the Docker Container This command starts an interactive shell inside the
@@ -86,7 +89,7 @@ docker pull ghcr.io/project-chip/chip-build-crosscompile:199
    container's /var/connectedhomeip directory.
 
 ```
-docker run -it -v ~/connectedhomeip:/var/connectedhomeip ghcr.io/project-chip/chip-build-crosscompile:199 /bin/bash
+docker run -it -v ~/connectedhomeip:/var/connectedhomeip ghcr.io/project-chip/chip-build-crosscompile:200 /bin/bash
 ```
 
 3. Build Inside the Container From within the Docker container's shell, execute

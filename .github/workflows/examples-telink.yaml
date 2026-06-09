@@ -39,7 +39,7 @@ jobs:
             BUILD_TYPE: telink
 
         container:
-            image: ghcr.io/project-chip/chip-build:199
+            image: ghcr.io/project-chip/chip-build:200
 
         steps:
             - name: Checkout
@@ -74,7 +74,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-telink:199
+            image: ghcr.io/project-chip/chip-build-telink:200
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
 
@@ -458,7 +458,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-telink-zephyr_3_3:199
+            image: ghcr.io/project-chip/chip-build-telink-zephyr_3_3:200
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
 
