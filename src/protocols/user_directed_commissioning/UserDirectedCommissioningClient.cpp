@@ -270,7 +270,7 @@ void UserDirectedCommissioningClient::OnMessageReceived(const Transport::PeerAdd
                     static_cast<uint32_t>(msg->DataLength()));
 
     uint8_t udcPayload[IdentificationDeclaration::kUdcTLVDataMaxBytes] = {};
-    size_t udcPayloadLength = std::min<size_t>(msg->DataLength(), sizeof(udcPayload));
+    size_t udcPayloadLength                                            = std::min<size_t>(msg->DataLength(), sizeof(udcPayload));
     ReturnOnFailure(msg->Read(udcPayload, udcPayloadLength));
 
     CommissionerDeclaration cd;
