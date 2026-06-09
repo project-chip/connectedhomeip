@@ -63,7 +63,6 @@ EndProductType EndProductTypeGet(chip::EndpointId endpoint);
 
 void ModePrint(const chip::BitMask<Mode> & mode);
 void ModeSet(chip::EndpointId endpoint, chip::BitMask<Mode> & mode);
-chip::BitMask<Mode> ModeGet(chip::EndpointId endpoint);
 
 void SafetyStatusSet(chip::EndpointId endpoint, const chip::BitMask<SafetyStatus> & status);
 chip::BitMask<SafetyStatus> SafetyStatusGet(chip::EndpointId endpoint);

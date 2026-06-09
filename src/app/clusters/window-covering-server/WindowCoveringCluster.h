@@ -232,6 +232,8 @@ private:
 };
 
 // Helper functions
+chip::BitMask<Mode> ModeGet(chip::EndpointId endpoint);
+
 LimitStatus CheckLimitState(uint16_t position, AbsoluteLimits limits);
 bool IsPercent100thsValid(Percent100ths percent100ths);
 bool IsPercent100thsValid(NPercent100ths npercent100ths);
@@ -245,10 +247,8 @@ Percent100ths ValueToPercent100ths(AbsoluteLimits limits, uint16_t absolute);
 
 uint16_t LiftToPercent100ths(chip::EndpointId endpoint, uint16_t lift);
 uint16_t Percent100thsToLift(chip::EndpointId endpoint, uint16_t percent100ths);
-z
 
-    uint16_t
-    TiltToPercent100ths(chip::EndpointId endpoint, uint16_t tilt);
+uint16_t TiltToPercent100ths(chip::EndpointId endpoint, uint16_t tilt);
 uint16_t Percent100thsToTilt(chip::EndpointId endpoint, uint16_t percent100ths);
 
 } // namespace WindowCovering
