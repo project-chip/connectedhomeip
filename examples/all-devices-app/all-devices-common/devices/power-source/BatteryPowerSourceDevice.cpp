@@ -41,6 +41,7 @@ CHIP_ERROR BatteryPowerSourceDevice::Register(chip::EndpointId endpoint, CodeDri
     config.usedOptionalAttributes.Set<BatPercentRemainingId>();
     config.status = Clusters::PowerSource::PowerSourceStatusEnum::kActive;
     config.order  = 0;
+    mEndpointList[0] = endpoint;
 
     mBatteryPowerSourceCluster.Create(endpoint, config);
     ReturnErrorOnFailure(mBatteryPowerSourceCluster.Cluster().SetEndpointList(Span<const EndpointId>(mEndpointList)));

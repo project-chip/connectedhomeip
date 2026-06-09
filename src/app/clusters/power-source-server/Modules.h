@@ -359,13 +359,19 @@ struct AllModules : public MandatoryModule,
 {
 };
 
-using NotifyCallback = std::function<void(AttributeId)>;
 class BatteryTimerContext : public TimerContext
 {
 public:
     constexpr static inline uint16_t kTimerDurationS = 10;
-    BatteryTimerContext(AttributeId id, TimerDelegate & timerDelegate, NotifyCallback notifier) :
-        mId(id), mTimerDelegate(timerDelegate), mNotifier(std::move(notifier))
+
+    struct NotifierDelegate
+    {
+        virtual ~NotifierDelegate() = default;
+        virtual void Notify(AttributeId id) = 0;
+    };
+
+    BatteryTimerContext(AttributeId id, TimerDelegate & timerDelegate, NotifierDelegate & notifier) :
+        mId(id), mTimerDelegate(timerDelegate), mNotifier(notifier)
     {}
     CriticalFailure NotifyOrSchedule(uint32_t value)
     {
@@ -398,11 +404,11 @@ private:
     uint32_t mReported{};
     uint32_t mToBeReported{};
     TimerDelegate & mTimerDelegate;
-    NotifyCallback mNotifier;
+    NotifierDelegate & mNotifier;
     void NotifyChange()
     {
         mReported = mToBeReported;
-        mNotifier(mId);
+        mNotifier.Notify(mId);
     }
 };
 
@@ -417,10 +423,10 @@ struct BatteryTimerContextsModule<true>
     BatteryTimerContext batTimeRemainingNotifyTimerContext;
     BatteryTimerContext batTimeToFullChargeNotifyTimerContext;
 
-    BatteryTimerContextsModule(TimerDelegate & timerDelegate, NotifyCallback notifier) :
+    BatteryTimerContextsModule(TimerDelegate & timerDelegate, BatteryTimerContext::NotifierDelegate & notifier) :
         batPercentRemainingNotifyTimerContext(PowerSource::Attributes::BatPercentRemaining::Id, timerDelegate, notifier),
         batTimeRemainingNotifyTimerContext(PowerSource::Attributes::BatTimeRemaining::Id, timerDelegate, notifier),
-        batTimeToFullChargeNotifyTimerContext(PowerSource::Attributes::BatTimeToFullCharge::Id, timerDelegate, std::move(notifier))
+        batTimeToFullChargeNotifyTimerContext(PowerSource::Attributes::BatTimeToFullCharge::Id, timerDelegate, notifier)
     {}
 };
 

@@ -75,11 +75,11 @@ This will be made more clear using examples
     ```cpp
 
     // the config
-    MyWiredPowerSourceCluster::Config config(powerSourceEndpointId, "Wired Power Source (description)"_span, PowerSource::WiredCurrentTypeEnum::kDc);
+    MyWiredPowerSourceCluster::Config config("Wired Power Source (description)"_span, PowerSource::WiredCurrentTypeEnum::kDc);
     config.wiredNominalVoltage = 23000; // 23V
 
     // the cluster
-    RegisteredServerCluster<MyWiredPowerSourceCluster> powerSourceInstance(config);
+    RegisteredServerCluster<MyWiredPowerSourceCluster> powerSourceInstance(powerSourceEndpointId, config);
 
     // register the cluster, this will call `Startup` on the cluster
     CodeDrivenDataModelProvider::Instance().Registry().Register(powerSourceInstance.Registration());
@@ -172,18 +172,18 @@ This will be made more clear using examples
     attrSet3.Set<PowerSource::Attributes::BatCapacity::Id>();
 
     // the configs
-    MyBatteryPowerSourceCluster::Config config1(powerSourceEndpointId1, "Simple battery cluster"_span, PowerSource::BatReplaceabilityEnum::kUnspecified, timerDelegate);
+    MyBatteryPowerSourceCluster::Config config1("Simple battery cluster"_span, PowerSource::BatReplaceabilityEnum::kUnspecified, timerDelegate);
     config1.batPercentRemaining = 200; // 100%, doubled percentage
     config1.usedOptionalAttributes = attrSet1;
 
-    MyBatteryPowerSourceCluster::Config config2(powerSourceEndpointId1, "Rechargeable battery cluster"_span, PowerSource::BatReplaceabilityEnum::kNotReplaceable, timerDelegate);
+    MyBatteryPowerSourceCluster::Config config2("Rechargeable battery cluster"_span, PowerSource::BatReplaceabilityEnum::kNotReplaceable, timerDelegate);
     // this will make the cluster report itself as rechargeable, otherwise it would be like a simple cluster to the data model
     config2.MakeRechargeable();
     config2.batPercentRemaining = 200;
     config2.batChargingCurrent = 5000; // 5A
     config2.usedOptionalAttributes = attrSet2;
 
-    MyBatteryPowerSourceCluster::Config config3(powerSourceEndpointId1, "Replaceable battery cluster"_span, PowerSource::BatReplaceabilityEnum::kUserReplaceable, timerDelegate);
+    MyBatteryPowerSourceCluster::Config config3("Replaceable battery cluster"_span, PowerSource::BatReplaceabilityEnum::kUserReplaceable, timerDelegate);
     // make it replaceable
     config3.MakeReplaceable("Description for replacement"_span, /* quantity */ 1);
     config3.batTimeRemaining = 3600; // 1h estimated uptime
@@ -191,9 +191,9 @@ This will be made more clear using examples
     config3.usedOptionalAttributes = attrSet3;
 
     // the clusters
-    RegisteredServerCluster<MyBatteryPowerSourceCluster> simpleBatteryInstance(config1);
-    RegisteredServerCluster<MyBatteryPowerSourceCluster> rechargeableBatteryInstance(config2);
-    RegisteredServerCluster<MyBatteryPowerSourceCluster> replaceableBatteryInstance(config3);
+    RegisteredServerCluster<MyBatteryPowerSourceCluster> simpleBatteryInstance(powerSourceEndpointId1, config1);
+    RegisteredServerCluster<MyBatteryPowerSourceCluster> rechargeableBatteryInstance(powerSourceEndpointId2, config2);
+    RegisteredServerCluster<MyBatteryPowerSourceCluster> replaceableBatteryInstance(powerSourceEndpointId3, config3);
 
     // register the clusters, this will call `Startup` on them
     CodeDrivenDataModelProvider::Instance().Registry().Register(simpleBatteryInstance.Registration());
@@ -243,14 +243,14 @@ This will be made more clear using examples
     ```cpp
 
     // the configs
-    MyWiredPowerSourceCluster::Config config1(powerSourceEndpointId1, "Wired cluster"_span, PowerSource::WiredCurrentTypeEnum::kAc);
+    MyWiredPowerSourceCluster::Config config1("Wired cluster"_span, PowerSource::WiredCurrentTypeEnum::kAc);
     config1.status = PowerSource::PowerSourceStatusEnum::kUnavailable;
 
-    MyBatteryPowerSourceCluster::Config config2(powerSourceEndpointId1, "Simple battery cluster"_span, PowerSource::BatReplaceabilityEnum::kNotReplaceable, timerDelegate);
+    MyBatteryPowerSourceCluster::Config config2("Simple battery cluster"_span, PowerSource::BatReplaceabilityEnum::kNotReplaceable, timerDelegate);
 
     // the clusters
-    RegisteredServerCluster<MyWiredPowerSourceCluster> wiredInstance(config1);
-    RegisteredServerCluster<MyBatteryPowerSourceCluster> batteryInstance(config2);
+    RegisteredServerCluster<MyWiredPowerSourceCluster> wiredInstance(powerSourceEndpointId1, config1);
+    RegisteredServerCluster<MyBatteryPowerSourceCluster> batteryInstance(powerSourceEndpointId2, config2);
 
     // register the clusters, this will call `Startup` on them
     CodeDrivenDataModelProvider::Instance().Registry().Register(wiredInstance.Registration());
@@ -263,8 +263,8 @@ This will be made more clear using examples
 
 ### Notes
 
-For simplicity there are 4 already named specializations of the class in the
-`PowerSourceCluster.h` -
+For simplicty there are 4 already named specializations of the class in the
+`NamedPowerSourceClusters.h` -
 
 -   `MinimalWiredPowerSourceCluster`
 -   `MinimalBatteryPowerSourceCluster`

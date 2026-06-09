@@ -237,6 +237,7 @@ struct PowerSourceClusterConfig : public PowerSource::detail::AllModules<support
 template <std::underlying_type_t<PowerSource::Feature> supportedFeatureBits, uint32_t supportedOptionalAttributeBits>
 class PowerSourceCluster : protected PowerSourceClusterConfig<supportedFeatureBits, supportedOptionalAttributeBits>,
                            public DefaultServerCluster,
+                           public PowerSource::detail::BatteryTimerContext::NotifierDelegate,
                            protected PowerSource::detail::BatteryTimerContextsModule<
                                BitFlags<PowerSource::Feature>(supportedFeatureBits).Has(PowerSource::Feature::kBattery)>
 {
@@ -271,8 +272,14 @@ public:
     PowerSourceCluster(EndpointId endpointId, const Config & config) :
         Config(config), DefaultServerCluster({ endpointId, PowerSource::Id }),
         PowerSource::detail::BatteryTimerContextsModule<batteryFeatureSupported>(
-            Config::GetTimerDelegate(), [this](AttributeId id) { NotifyAttributeChanged(id); })
+            Config::GetTimerDelegate(), *this)
     {}
+
+    // implement `PowerSource::detail::BatteryTimerContext::NotifierDelegate`
+    void Notify(AttributeId id) override
+    {
+        NotifyAttributeChanged(id);
+    }
 
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override
@@ -905,7 +912,7 @@ public:
             if (!val.IsNull())
             {
                 // Maximum value of 200 representing 100% battery.
-                VerifyOrReturnError(val.Value() <= 200, CHIP_ERROR_INVALID_INTEGER_VALUE);
+                VerifyOrReturnError(val.Value() <= 200, CHIP_IM_GLOBAL_STATUS(ConstraintError));
             }
 
             if (this->batPercentRemaining == val)
@@ -1246,23 +1253,5 @@ private:
 
     constexpr static System::Clock::Timeout kNotifyTimerDuration = System::Clock::Seconds16(10);
 };
-
-using FullWiredPowerSourceCluster =
-    PowerSourceCluster<BitFlags<PowerSource::Feature>(PowerSource::Feature::kWired).Raw(), UINT32_MAX>;
-using FullWiredPowerSourceConfig = FullWiredPowerSourceCluster::Config;
-
-using FullBatteryPowerSourceCluster =
-    PowerSourceCluster<BitFlags<PowerSource::Feature>(PowerSource::Feature::kBattery, PowerSource::Feature::kReplaceable,
-                                                      PowerSource::Feature::kRechargeable)
-                           .Raw(),
-                       UINT32_MAX>;
-using FullBatteryPowerSourceConfig = FullBatteryPowerSourceCluster::Config;
-
-using MinimalWiredPowerSourceCluster = PowerSourceCluster<BitFlags<PowerSource::Feature>(PowerSource::Feature::kWired).Raw(), 0>;
-using MinimalWiredPowerSourceConfig  = MinimalWiredPowerSourceCluster::Config;
-
-using MinimalBatteryPowerSourceCluster =
-    PowerSourceCluster<BitFlags<PowerSource::Feature>(PowerSource::Feature::kBattery).Raw(), 0>;
-using MinimalBatteryPowerSourceConfig = MinimalBatteryPowerSourceCluster::Config;
 
 } // namespace chip::app::Clusters

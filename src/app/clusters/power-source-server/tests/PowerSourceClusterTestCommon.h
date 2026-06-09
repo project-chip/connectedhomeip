@@ -19,7 +19,7 @@
 
 #include <pw_unit_test/framework.h>
 
-#include <app/clusters/power-source-server/PowerSourceCluster.h>
+#include <app/clusters/power-source-server/NamedPowerSourceClusters.h>
 #include <app/server-cluster/testing/ClusterTester.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <lib/support/TimerDelegateMock.h>
