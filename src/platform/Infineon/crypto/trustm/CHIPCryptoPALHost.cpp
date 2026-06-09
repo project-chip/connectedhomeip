@@ -409,10 +409,6 @@ static EntropyContext * get_entropy_context()
         mbedtls_ctr_drbg_init(&gsEntropyContext.mDRBGCtxt);
 
 #if !ENABLE_TRUSTM_RANDOM
-        // mbedtls_entropy_init() auto-registers mbedtls_hardware_poll (PSoC6
-        // TRNG) because MBEDTLS_ENTROPY_HARDWARE_ALT is defined globally.
-        gsEntropyContext.mEntropy.source_count = 0;
-
         // Register TrustM as a strong entropy source for CHIP's DRBG.
         const int entropy_err = mbedtls_entropy_add_source(&gsEntropyContext.mEntropy, trustm_entropy_source, nullptr,
                                                            MBEDTLS_CTR_DRBG_ENTROPY_LEN, MBEDTLS_ENTROPY_SOURCE_STRONG);

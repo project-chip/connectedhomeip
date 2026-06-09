@@ -95,11 +95,11 @@ CHIP_ERROR ExampleTrustMDACProvider::GetCertificationDeclaration(MutableByteSpan
     //-> certification_type = 0
     //-> dac_origin_vendor_id is not present
     //-> dac_origin_product_id is not present
-    size_t buflen = out_cd_buffer.size();
+    uint16_t buflen = static_cast<uint16_t>(out_cd_buffer.size());
     ChipLogDetail(Crypto, "Get certificate declaration from trustm");
     if (gCDLen > 0)
         return CopySpanToMutableSpan(ByteSpan(gCDBuf, gCDLen), out_cd_buffer);
-    ReturnErrorOnFailure(trustmGetCertificate(CERT_DECLARATION_ID, out_cd_buffer.data(), (uint16_t *) &buflen));
+    ReturnErrorOnFailure(trustmGetCertificate(CERT_DECLARATION_ID, out_cd_buffer.data(), &buflen));
     out_cd_buffer.reduce_size(buflen);
     return CHIP_NO_ERROR;
 }

@@ -873,6 +873,7 @@ int trustm_entropy_source(void * /* data */, unsigned char * output, size_t len,
 
         size_t copy = (chunk > len) ? len : chunk;
         memcpy(output, scratch, copy);
+        mbedtls_platform_zeroize(scratch, sizeof(scratch));
         output += copy;
         *olen += copy;
         len -= copy;
