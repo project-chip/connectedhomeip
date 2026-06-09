@@ -35,7 +35,7 @@ using chip::app::DataModel::NullNullable;
 
 AutoCommissioner::AutoCommissioner()
 {
-    TEMPORARY_RETURN_IGNORED SetCommissioningParameters(CommissioningParameters());
+    TEMPORARY_RETURN_IGNORED AutoCommissioner::SetCommissioningParameters(CommissioningParameters());
 }
 
 AutoCommissioner::~AutoCommissioner() {}

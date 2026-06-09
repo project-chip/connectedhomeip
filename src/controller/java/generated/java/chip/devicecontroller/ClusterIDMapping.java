@@ -9788,6 +9788,7 @@ public class ClusterIDMapping {
             PowerAdjustmentCapability(5L),
             Forecast(6L),
             OptOutState(7L),
+            PowerRangeAdjustment(8L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             AttributeList(65531L),
@@ -9816,7 +9817,9 @@ public class ClusterIDMapping {
             PowerAdjustStart(0L),
             PowerAdjustEnd(1L),
             Paused(2L),
-            Resumed(3L),;
+            Resumed(3L),
+            PowerRangeAdjustStart(4L),
+            PowerRangeAdjustEnd(5L),;
             private final long id;
             Event(long id) {
                 this.id = id;
@@ -9844,7 +9847,9 @@ public class ClusterIDMapping {
             ResumeRequest(4L),
             ModifyForecastRequest(5L),
             RequestConstraintBasedForecast(6L),
-            CancelRequest(7L),;
+            CancelRequest(7L),
+            PowerRangeAdjustRequest(8L),
+            CancelPowerRangeAdjustRequest(9L),;
             private final long id;
             Command(long id) {
                 this.id = id;
@@ -9941,6 +9946,23 @@ public class ClusterIDMapping {
                     }
                     public static RequestConstraintBasedForecastCommandField value(int id) throws NoSuchFieldError {
                         for (RequestConstraintBasedForecastCommandField field : RequestConstraintBasedForecastCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum PowerRangeAdjustRequestCommandField {MinPower(0),MaxPower(1),Duration(2),Cause(3),;
+                    private final int id;
+                    PowerRangeAdjustRequestCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static PowerRangeAdjustRequestCommandField value(int id) throws NoSuchFieldError {
+                        for (PowerRangeAdjustRequestCommandField field : PowerRangeAdjustRequestCommandField.values()) {
                         if (field.getID() == id) {
                             return field;
                         }

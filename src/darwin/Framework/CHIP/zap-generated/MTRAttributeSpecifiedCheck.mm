@@ -3075,6 +3075,9 @@ static BOOL AttributeIsSpecifiedInDeviceEnergyManagementCluster(AttributeId aAtt
     case Attributes::OptOutState::Id: {
         return YES;
     }
+    case Attributes::PowerRangeAdjustment::Id: {
+        return YES;
+    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }

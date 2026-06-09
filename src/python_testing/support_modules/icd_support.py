@@ -101,9 +101,9 @@ def uat_bit_name(bit):
 def uat_set_hints(hint_bitmap):
     """Return a list of individual UAT bits set in the given bitmap, logging each one."""
     hints = [bit for bit in uat if hint_bitmap & bit.value]
-    log.info(f"UserActiveModeTriggerHint has {len(hints)} bit(s) set:")
+    log.info("UserActiveModeTriggerHint has %s bit(s) set:", len(hints))
     for bit in hints:
-        log.info(f"  - {uat_bit_name(bit)} (0x{bit.value:05X})")
+        log.info("  - %s (0x%05X)", uat_bit_name(bit), bit.value)
     return hints
 
 
@@ -139,7 +139,7 @@ async def assert_subscription_heartbeat_received(subscription, max_interval_ceil
         elapsed,
         f"No subscription heartbeat report received within {max_interval_ceiling_s + buffer_s:.1f}s"
     )
-    log.info(f"Subscription heartbeat received in {elapsed:.1f}s (MaxInterval={max_interval_ceiling_s}s)")
+    log.info("Subscription heartbeat received in %.1fs (MaxInterval=%ss)", elapsed, max_interval_ceiling_s)
     return elapsed
 
 
@@ -227,7 +227,7 @@ class ICDBaseTest(MatterBaseTest):
             if idle_mode_duration_s is not None:
                 raise ValueError("ActiveToIdle does not use idle_mode_duration_s")
             wait_s = (active_mode_duration_ms / 1000.0) + 1.0
-            log.info(f"ActiveToIdle: active_mode_duration_ms={active_mode_duration_ms} -> Wait time: {wait_s}s")
+            log.info("ActiveToIdle: active_mode_duration_ms=%s -> Wait time: %ss", active_mode_duration_ms, wait_s)
             return wait_s
 
         if transition == ICDTransition.IdleToActive:
@@ -236,7 +236,7 @@ class ICDBaseTest(MatterBaseTest):
             if active_mode_duration_ms is not None:
                 raise ValueError("IdleToActive does not use active_mode_duration_ms")
             wait_s = idle_mode_duration_s + 1.0
-            log.info(f"IdleToActive: idle_mode_duration_s={idle_mode_duration_s} -> Wait time: {wait_s}s")
+            log.info("IdleToActive: idle_mode_duration_s=%s -> Wait time: %ss", idle_mode_duration_s, wait_s)
             return wait_s
 
         if transition == ICDTransition.FullCycle:
@@ -246,7 +246,7 @@ class ICDBaseTest(MatterBaseTest):
                 raise ValueError("FullCycle requires idle_mode_duration_s")
             wait_s = (active_mode_duration_ms / 1000.0) + 1.0 + idle_mode_duration_s + 1.0
             log.info(
-                f"FullCycle: active_mode_duration_ms={active_mode_duration_ms}, idle_mode_duration_s={idle_mode_duration_s} -> Wait time: {wait_s}s")
+                "FullCycle: active_mode_duration_ms=%s, idle_mode_duration_s=%s -> Wait time: %ss", active_mode_duration_ms, idle_mode_duration_s, wait_s)
             return wait_s
 
         raise ValueError(f"Unknown ICDTransition: {transition}")
@@ -258,7 +258,7 @@ class ICDBaseTest(MatterBaseTest):
         wait_s = self.compute_wait_time(transition,
                                         active_mode_duration_ms=active_mode_duration_ms,
                                         idle_mode_duration_s=idle_mode_duration_s)
-        log.info(f"Waiting {wait_s}s for {transition.name}...")
+        log.info("Waiting %ss for %s...", wait_s, transition.name)
         await asyncio.sleep(wait_s)
 
     def create_new_controller(
@@ -311,7 +311,7 @@ class ICDBaseTest(MatterBaseTest):
         log.info("RegisteredClients is not empty; unregistering all clients...")
         for client in registeredClients:
             try:
-                log.info(f"Unregistering client: {client}...")
+                log.info("Unregistering client: %s...", client)
                 await self.send_single_icdm_command(commands.UnregisterClient(checkInNodeID=client.checkInNodeID))
             except InteractionModelError as e:
                 asserts.assert_fail(f"Unexpected error returned when unregistering client: {e}")

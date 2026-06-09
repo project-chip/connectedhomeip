@@ -12,6 +12,13 @@ etc.) to assist with development and code review in the Matter repository.
 -   **Triggers**: Automatically activates when reviewing files ending in
     `_test.py` or located in `src/python_testing`.
 
+### GitHub PR Description Writer
+
+-   **Location**: `.agents/skills/github-pr-description-writer/`
+-   **Purpose**: Guidelines for generating clear, concise, and objective GitHub
+    Pull Request descriptions.
+-   **Triggers**: Use when preparing or writing descriptions for pull requests.
+
 ## Using Skills
 
 AI agents will automatically discover and load these skills when they are

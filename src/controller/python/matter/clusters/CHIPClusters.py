@@ -6551,6 +6551,22 @@ class ChipClusters:
                 "args": {
                 },
             },
+            0x00000008: {
+                "commandId": 0x00000008,
+                "commandName": "PowerRangeAdjustRequest",
+                "args": {
+                    "minPower": "int",
+                    "maxPower": "int",
+                    "duration": "int",
+                    "cause": "int",
+                },
+            },
+            0x00000009: {
+                "commandId": 0x00000009,
+                "commandName": "CancelPowerRangeAdjustRequest",
+                "args": {
+                },
+            },
         },
         "attributes": {
             0x00000000: {
@@ -6599,6 +6615,12 @@ class ChipClusters:
                 "attributeName": "OptOutState",
                 "attributeId": 0x00000007,
                 "type": "int",
+                "reportable": True,
+            },
+            0x00000008: {
+                "attributeName": "PowerRangeAdjustment",
+                "attributeId": 0x00000008,
+                "type": "",
                 "reportable": True,
             },
             0x0000FFF8: {

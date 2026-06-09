@@ -255,17 +255,17 @@ class CoreBluetoothManager(ChipBleBase):
                 if not self.scan_quiet:
                     LOGGER.info("adding to scan list:")
                     LOGGER.info("")
-                    LOGGER.info("{:<16}= {:<80}".format("Name", str(peripheral._.name)))
-                    LOGGER.info("{:<16}= {:<80}".format("ID", str(peripheral._.identifier.UUIDString())))
-                    LOGGER.info("{:<16}= {:<80}".format("RSSI", rssi))
+                    LOGGER.info("%-16s= %-80s", "Name", peripheral._.name)
+                    LOGGER.info("%-16s= %-80s", "ID", peripheral._.identifier.UUIDString())
+                    LOGGER.info("%-16s= %-80s", "RSSI", rssi)
                     devIdInfo = BlePeripheral(
                         peripheral, data).getPeripheralDevIdInfo()
                     if devIdInfo:
-                        LOGGER.info("{:<16}= {}".format("Pairing State", devIdInfo.pairingState))
-                        LOGGER.info("{:<16}= {}".format("Discriminator", devIdInfo.discriminator))
-                        LOGGER.info("{:<16}= {}".format("Vendor Id", devIdInfo.vendorId))
-                        LOGGER.info("{:<16}= {}".format("Product Id", devIdInfo.productId))
-                    LOGGER.info("ADV data: " + repr(data))
+                        LOGGER.info("%-16s= %s", "Pairing State", devIdInfo.pairingState)
+                        LOGGER.info("%-16s= %s", "Discriminator", devIdInfo.discriminator)
+                        LOGGER.info("%-16s= %s", "Vendor Id", devIdInfo.vendorId)
+                        LOGGER.info("%-16s= %s", "Product Id", devIdInfo.productId)
+                    LOGGER.info("ADV data: %r", data)
                     LOGGER.info("")
 
                 self.peripheral_list.append(peripheral)
@@ -291,7 +291,7 @@ class CoreBluetoothManager(ChipBleBase):
         self, manager, peripheral, error
     ):
         """Called by CoreBluetooth via runloop when a connection fails."""
-        LOGGER.info("Failed to connect error = " + repr(error))
+        LOGGER.info("Failed to connect error = %r", error)
         self.loop_condition = True
         self.connect_state = False
 
@@ -300,7 +300,7 @@ class CoreBluetoothManager(ChipBleBase):
         self.loop_condition = True
         self.connect_state = False
         if self.devCtrl:
-            LOGGER.info("BLE disconnected, error = " + repr(error))
+            LOGGER.info("BLE disconnected, error = %r", error)
             dcEvent = BleDisconnectEvent(BLE_ERROR_REMOTE_DEVICE_DISCONNECTED)
             self.chip_queue.put(dcEvent)
             self.devCtrl.DriveBleIO()
@@ -330,14 +330,9 @@ class CoreBluetoothManager(ChipBleBase):
         self, peripheral, service, error
     ):
         """Called by CoreBluetooth via runloop when a characteristic for a service is discovered."""
-        LOGGER.debug(
-            "didDiscoverCharacteristicsForService:error "
-            + str(repr(peripheral))
-            + " "
-            + str(repr(service))
-        )
-        LOGGER.debug(repr(service))
-        LOGGER.debug(repr(error))
+        LOGGER.debug("didDiscoverCharacteristicsForService:error %r %r", peripheral, service)
+        LOGGER.debug("%r", service)
+        LOGGER.debug("%r", error)
 
         if not error:
             self.characteristics[service.UUID()] = list(self.service.characteristics())
@@ -356,7 +351,7 @@ class CoreBluetoothManager(ChipBleBase):
     ):
         """Called by CoreBluetooth via runloop when a write to characteristic
         operation completes. error = None on success."""
-        LOGGER.debug("didWriteValue error = " + repr(error))
+        LOGGER.debug("didWriteValue error = %r", error)
         self.send_condition = True
         charId = bytearray(characteristic.UUID().data().bytes().tobytes())
         svcId = bytearray(CHIP_SERVICE.data().bytes().tobytes())
@@ -383,8 +378,8 @@ class CoreBluetoothManager(ChipBleBase):
             operation = BLE_SUBSCRIBE_OPERATION_UNSUBSCRIBE
             self.subscribe_condition = False
 
-        LOGGER.debug("Operation = " + repr(operation))
-        LOGGER.debug("success = " + repr(success))
+        LOGGER.debug("Operation = %r", operation)
+        LOGGER.debug("success = %r", success)
 
         if self.devCtrl:
             subscribeEvent = BleSubscribeEvent(
@@ -398,7 +393,7 @@ class CoreBluetoothManager(ChipBleBase):
     ):
         """Called by CoreBluetooth via runloop when a new characteristic value is received for a
         characteristic to which this device has subscribed."""
-        # len = characteristic.value().length()
+        length = characteristic.value().length()
         buf = bytearray(characteristic.value().bytes().tobytes())
         charId = bytearray(characteristic.UUID().data().bytes().tobytes())
         svcId = bytearray(CHIP_SERVICE.data().bytes().tobytes())
@@ -411,12 +406,7 @@ class CoreBluetoothManager(ChipBleBase):
             self.devCtrl.DriveBleIO()
 
         LOGGER.debug("received")
-        LOGGER.debug(
-            "received ("
-            + str(len)
-            + ") bytes: "
-            + repr(characteristic.value().bytes().tobytes())
-        )
+        LOGGER.debug("received (%s) bytes: %r", length, characteristic.value().bytes().tobytes())
 
     def GetBleEvent(self):
         """ Called by ChipDeviceMgr.py on behalf of Chip to retrieve a queued message."""
