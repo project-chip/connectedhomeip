@@ -108,8 +108,7 @@ class TestPythonController(CHIPVirtualHome):
 
         # Check if device can be controlled by controller
         for device_id in server_ids:
-            self.logger.info("checking device log for {}".format(
-                self.get_device_pretty_id(device_id)))
+            self.logger.info("checking device log for %s", self.get_device_pretty_id(device_id))
             self.assertTrue(self.sequenceMatch(self.get_device_log(device_id).decode('utf-8'), [
                 "Received command for Endpoint=1 Cluster=0x0000_0006 Command=0x0000_0001",
                 "Toggle ep1 on/off from state 0 to 1",

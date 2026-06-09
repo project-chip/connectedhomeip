@@ -130,9 +130,9 @@ class TC_SC_5_1(MatterBaseTest):
                         "applicable endpoints. Having zero applicable endpoints is acceptable for this test.")
             self.mark_all_remaining_steps_skipped("1")
             return
-        logger.info(f'Found the following endpoints with Groups clusters: {endpoints}')
+        logger.info('Found the following endpoints with Groups clusters: %s', endpoints)
         for endpoint in endpoints:
-            logger.info(f"Running test against endpoint {endpoint} groups cluster")
+            logger.info("Running test against endpoint %s groups cluster", endpoint)
             self.current_step_index = 2
             await self.run_test_against_endpoint(endpoint)
 

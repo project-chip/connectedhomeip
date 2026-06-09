@@ -72,14 +72,14 @@ class NFCReader:
 
         log.info("Available readers:")
         for idx, reader in enumerate(reader_list):
-            log.info(f"{idx}: {reader}")
+            log.info("%s: %s", idx, reader)
 
         if nfc_reader_index < 0 or nfc_reader_index >= len(reader_list):
             raise IndexError(f"Reader index {nfc_reader_index} is out of range.")
 
         self.reader = reader_list[nfc_reader_index]
         self._monitor_manager = None
-        log.info(f"Using NFC reader: {self.reader}")
+        log.info("Using NFC reader: %s", self.reader)
 
     def read_nfc_tag_data(self) -> str:
         """
@@ -153,7 +153,7 @@ class NFCReader:
 
             _write_ndef_record(connection, record)
 
-        log.info(f"Successfully wrote URI '{uri}' to NFC tag.")
+        log.info("Successfully wrote URI '%s' to NFC tag.", uri)
 
     def is_onboarding_data(self, ndef_uri: str) -> bool:
         """
@@ -340,8 +340,8 @@ def _read_cc_file_content(connection) -> int:
     tag = cc_data[target_idx]
 
     if tag != 0x04:
-        log.error(f"Expected TLV Tag 0x04 at index {target_idx}, but got 0x{tag:02X}")
-        log.error(f"Full Data: {cc_data}")
+        log.error("Expected TLV Tag 0x04 at index %s, but got 0x%02X", target_idx, tag)
+        log.error("Full Data: %s", cc_data)
         raise ValueError(f"NDEF File Control TLV (0x04) not found at expected index {target_idx}")
 
     return (cc_data[target_idx + 2] << 8) | cc_data[target_idx + 3]
@@ -516,7 +516,7 @@ class TagEventObserver(smartcard.CardMonitoring.CardObserver):
                 self.last_ndef = nfc_tag_data
                 log.debug(nfc_tag_data)
             except Exception as e:
-                log.info(f"Error reading NFC tag: {e}")
+                log.info("Error reading NFC tag: %s", e)
         for tag in removed_tags:
             log.debug("Tag removed.")
 
@@ -586,5 +586,5 @@ class NFCConnection:
             if self.connection:
                 self.connection.disconnect()
         except Exception as e:
-            log.warning(f"Failed to disconnect NFC connection: {e}")
+            log.warning("Failed to disconnect NFC connection: %s", e)
         return False

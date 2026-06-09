@@ -719,6 +719,15 @@ static BOOL CommandNeedsTimedInvokeInElectricalGridConditionsCluster(AttributeId
     }
     }
 }
+static BOOL CommandNeedsTimedInvokeInElectricalAlarmCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::ElectricalAlarm;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL CommandNeedsTimedInvokeInElectricalDistributionCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::ElectricalDistribution;
@@ -1058,6 +1067,15 @@ static BOOL CommandNeedsTimedInvokeInAmbientContextSensingCluster(AttributeId aA
     }
     }
 }
+static BOOL CommandNeedsTimedInvokeInAmbientSensingUnionCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::AmbientSensingUnion;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL CommandNeedsTimedInvokeInProximityRangingCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::ProximityRanging;
@@ -1337,6 +1355,15 @@ static BOOL CommandNeedsTimedInvokeInPushAVStreamTransportCluster(AttributeId aA
 static BOOL CommandNeedsTimedInvokeInChimeCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::Chime;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
+static BOOL CommandNeedsTimedInvokeInAVAnalysisCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::AvAnalysis;
     switch (aAttributeId) {
     default: {
         return NO;
@@ -1686,6 +1713,9 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     case Clusters::ElectricalGridConditions::Id: {
         return CommandNeedsTimedInvokeInElectricalGridConditionsCluster(commandID);
     }
+    case Clusters::ElectricalAlarm::Id: {
+        return CommandNeedsTimedInvokeInElectricalAlarmCluster(commandID);
+    }
     case Clusters::ElectricalDistribution::Id: {
         return CommandNeedsTimedInvokeInElectricalDistributionCluster(commandID);
     }
@@ -1785,6 +1815,9 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     case Clusters::AmbientContextSensing::Id: {
         return CommandNeedsTimedInvokeInAmbientContextSensingCluster(commandID);
     }
+    case Clusters::AmbientSensingUnion::Id: {
+        return CommandNeedsTimedInvokeInAmbientSensingUnionCluster(commandID);
+    }
     case Clusters::ProximityRanging::Id: {
         return CommandNeedsTimedInvokeInProximityRangingCluster(commandID);
     }
@@ -1865,6 +1898,9 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     }
     case Clusters::Chime::Id: {
         return CommandNeedsTimedInvokeInChimeCluster(commandID);
+    }
+    case Clusters::AvAnalysis::Id: {
+        return CommandNeedsTimedInvokeInAVAnalysisCluster(commandID);
     }
     case Clusters::CommodityTariff::Id: {
         return CommandNeedsTimedInvokeInCommodityTariffCluster(commandID);
