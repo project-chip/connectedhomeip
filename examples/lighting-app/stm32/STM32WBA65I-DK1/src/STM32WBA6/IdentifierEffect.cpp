@@ -21,17 +21,17 @@
  * Includes
  *********************************************************/
 #include "IdentifierEffect.h"
-#include "stm32wba65i_discovery.h"
 #include "FreeRTOS.h"
+#include "stm32wba65i_discovery.h"
 #include "timers.h"
 
-#include <platform/CHIPDeviceLayer.h>
 #include <app/clusters/identify-server/identify-server.h>
+#include <platform/CHIPDeviceLayer.h>
 
 #define IDENTIFIER_BLINK_LED (500) // in mS
 
 chip::app::Clusters::Identify::EffectIdentifierEnum sIdentifyEffect =
-        chip::app::Clusters::Identify::EffectIdentifierEnum::kStopEffect;
+    chip::app::Clusters::Identify::EffectIdentifierEnum::kStopEffect;
 
 TimerHandle_t IdentifierLightTimer;
 void TimerIdentifierLightEventHandler(TimerHandle_t xTimer);
@@ -39,25 +39,30 @@ void TimerIdentifierLightEventHandler(TimerHandle_t xTimer);
 /**********************************************************
  * Identify Callbacks
  *********************************************************/
-void OnIdentifyStart(Identify*) {
+void OnIdentifyStart(Identify *)
+{
     ChipLogProgress(Zcl, "OnIdentifyStart");
-    if (xTimerIsTimerActive(IdentifierLightTimer) == 0) {
+    if (xTimerIsTimerActive(IdentifierLightTimer) == 0)
+    {
         xTimerStart(IdentifierLightTimer, 0);
     }
 }
 
-void OnIdentifyStop(Identify*) {
+void OnIdentifyStop(Identify *)
+{
     ChipLogProgress(Zcl, "OnIdentifyStop");
     xTimerStop(IdentifierLightTimer, 0);
     BSP_LED_Off(LED_RED);
 }
 
-void OnTriggerIdentifyEffectCompleted(chip::System::Layer *systemLayer, void *appState) {
+void OnTriggerIdentifyEffectCompleted(chip::System::Layer * systemLayer, void * appState)
+{
     ChipLogProgress(Zcl, "IDENTIFY : effect completed");
     sIdentifyEffect = chip::app::Clusters::Identify::EffectIdentifierEnum::kStopEffect;
 }
 
-void OnTriggerIdentifyEffect(Identify *identify) {
+void OnTriggerIdentifyEffect(Identify * identify)
+{
     uint16_t duration = 0;
 
     sIdentifyEffect = identify->mCurrentEffectIdentifier;
@@ -100,32 +105,31 @@ void OnTriggerIdentifyEffect(Identify *identify) {
     if (duration != 0)
     {
         (void) chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds16(duration),
-                                                           OnTriggerIdentifyEffectCompleted,
-                                                           identify);
+                                                           OnTriggerIdentifyEffectCompleted, identify);
     }
 }
 
-void TimerIdentifierLightEventHandler(TimerHandle_t xTimer) {
+void TimerIdentifierLightEventHandler(TimerHandle_t xTimer)
+{
     BSP_LED_Toggle(LED_RED);
 }
 
 static Identify gIdentify = {
-    chip::EndpointId { 1 },
-    OnIdentifyStart,
-    OnIdentifyStop,
-    chip::app::Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator,
+    chip::EndpointId{ 1 },   OnIdentifyStart, OnIdentifyStop, chip::app::Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator,
     OnTriggerIdentifyEffect,
 };
 
-CHIP_ERROR IdentifierEffect_Init(void) {
+CHIP_ERROR IdentifierEffect_Init(void)
+{
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    IdentifierLightTimer = xTimerCreate("IdentifierLightTimer", // Just a text name, not used by the RTOS kernel
+    IdentifierLightTimer = xTimerCreate("IdentifierLightTimer",              // Just a text name, not used by the RTOS kernel
                                         pdMS_TO_TICKS(IDENTIFIER_BLINK_LED), // default timer period (in mS)
-                                        true, // timer autoreload
-                                        NULL, // timer identifier
-                                        TimerIdentifierLightEventHandler); // timer callback
-    if (IdentifierLightTimer == NULL) {
+                                        true,                                // timer autoreload
+                                        NULL,                                // timer identifier
+                                        TimerIdentifierLightEventHandler);   // timer callback
+    if (IdentifierLightTimer == NULL)
+    {
         err = CHIP_ERROR_NO_MEMORY;
     }
     return err;

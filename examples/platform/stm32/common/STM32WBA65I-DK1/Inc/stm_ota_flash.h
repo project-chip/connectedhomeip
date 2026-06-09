@@ -35,21 +35,21 @@ extern "C" {
 
 #if (OTA_EXTERNAL_FLASH_ENABLE == 0)
 
-#define FLASH_PAGE_SIZE_WBA6        ((uint32_t) 0x2000)     /* DO NOT MODIFY */
+#define FLASH_PAGE_SIZE_WBA6 ((uint32_t) 0x2000) /* DO NOT MODIFY */
 
 /* SLOT A - Non Secure application slot */
-#define SLOT_DWL_A_START            (NS_ROM_ALIAS_BASE + NS_IMAGE_SECONDARY_PARTITION_OFFSET)
-#define SLOT_DWL_A_SIZE             FLASH_NS_PARTITION_SIZE
-#define SLOT_DWL_A_END              (SLOT_DWL_A_START + SLOT_DWL_A_SIZE - 1U) 
-#define SLOT_DWL_A_START_SECTOR     ((SLOT_DWL_A_START - NS_ROM_ALIAS_BASE) / FLASH_PAGE_SIZE_WBA6)
-#define SLOT_DWL_A_NB_SECTORS       (SLOT_DWL_A_SIZE / FLASH_PAGE_SIZE_WBA6)
+#define SLOT_DWL_A_START (NS_ROM_ALIAS_BASE + NS_IMAGE_SECONDARY_PARTITION_OFFSET)
+#define SLOT_DWL_A_SIZE FLASH_NS_PARTITION_SIZE
+#define SLOT_DWL_A_END (SLOT_DWL_A_START + SLOT_DWL_A_SIZE - 1U)
+#define SLOT_DWL_A_START_SECTOR ((SLOT_DWL_A_START - NS_ROM_ALIAS_BASE) / FLASH_PAGE_SIZE_WBA6)
+#define SLOT_DWL_A_NB_SECTORS (SLOT_DWL_A_SIZE / FLASH_PAGE_SIZE_WBA6)
 
 /* SLOT B - Secure application slot */
-#define SLOT_DWL_B_START            (NS_ROM_ALIAS_BASE + S_IMAGE_SECONDARY_PARTITION_OFFSET)
-#define SLOT_DWL_B_SIZE             FLASH_S_PARTITION_SIZE
-#define SLOT_DWL_B_END              (SLOT_DWL_B_START + SLOT_DWL_B_SIZE - 1U) 
-#define SLOT_DWL_B_START_SECTOR     ((SLOT_DWL_B_START - NS_ROM_ALIAS_BASE) / FLASH_PAGE_SIZE_WBA6)
-#define SLOT_DWL_B_NB_SECTORS       (SLOT_DWL_B_SIZE / FLASH_PAGE_SIZE_WBA6)
+#define SLOT_DWL_B_START (NS_ROM_ALIAS_BASE + S_IMAGE_SECONDARY_PARTITION_OFFSET)
+#define SLOT_DWL_B_SIZE FLASH_S_PARTITION_SIZE
+#define SLOT_DWL_B_END (SLOT_DWL_B_START + SLOT_DWL_B_SIZE - 1U)
+#define SLOT_DWL_B_START_SECTOR ((SLOT_DWL_B_START - NS_ROM_ALIAS_BASE) / FLASH_PAGE_SIZE_WBA6)
+#define SLOT_DWL_B_NB_SECTORS (SLOT_DWL_B_SIZE / FLASH_PAGE_SIZE_WBA6)
 
 /* Exported variables ------------------------------------------------------- */
 /* Exported functions ------------------------------------------------------- */
@@ -57,7 +57,7 @@ extern "C" {
 /**
  * @brief  init ota fw
  */
-STM_OTA_StatusTypeDef STM_OTA_FLASH_Init( void );
+STM_OTA_StatusTypeDef STM_OTA_FLASH_Init(void);
 
 /**
  * @brief  Delete old image in internal flash
@@ -67,7 +67,7 @@ STM_OTA_StatusTypeDef STM_OTA_FLASH_Delete_Image(uint32_t Address, uint32_t Leng
 /**
  * @brief  Write chunk of data in internal flash
  */
-STM_OTA_StatusTypeDef STM_OTA_FLASH_WriteChunk(uint32_t *pDestAddress, uint32_t *pSrcBuffer, uint32_t Length);
+STM_OTA_StatusTypeDef STM_OTA_FLASH_WriteChunk(uint32_t * pDestAddress, uint32_t * pSrcBuffer, uint32_t Length);
 
 #endif /* (OTA_EXTERNAL_FLASH_ENABLE == 0) */
 

@@ -56,7 +56,6 @@
  */
 #define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID 0x8004
 
-
 /* define Device type based on the application */
 #define CHIP_DEVICE_CONFIG_DEVICE_TYPE 0x0101 // Dimmable Light
 

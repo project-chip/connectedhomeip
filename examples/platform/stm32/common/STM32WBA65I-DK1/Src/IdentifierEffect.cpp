@@ -2,23 +2,21 @@
 #include "AppTask.h"
 #include <app/clusters/identify-server/identify-server.h>
 
-chip::app::Clusters::Identify::EffectIdentifierEnum sIdentifyEffect = chip::app::Clusters::Identify::EffectIdentifierEnum::kStopEffect;
+chip::app::Clusters::Identify::EffectIdentifierEnum sIdentifyEffect =
+    chip::app::Clusters::Identify::EffectIdentifierEnum::kStopEffect;
 
 /**********************************************************
  * Identify Callbacks
  *********************************************************/
 
-
-
-
 namespace {
 void OnTriggerIdentifyEffectCompleted(chip::System::Layer * systemLayer, void * appState)
 {
-	sIdentifyEffect = chip::app::Clusters::Identify::EffectIdentifierEnum::kStopEffect;
+    sIdentifyEffect = chip::app::Clusters::Identify::EffectIdentifierEnum::kStopEffect;
 }
 } // namespace
 
- void OnTriggerIdentifyEffect(Identify * identify)
+void OnTriggerIdentifyEffect(Identify * identify)
 {
     sIdentifyEffect = identify->mCurrentEffectIdentifier;
 
@@ -34,7 +32,7 @@ void OnTriggerIdentifyEffectCompleted(chip::System::Layer * systemLayer, void * 
     case chip::app::Clusters::Identify::EffectIdentifierEnum::kBlink:
     case chip::app::Clusters::Identify::EffectIdentifierEnum::kBreathe:
     case chip::app::Clusters::Identify::EffectIdentifierEnum::kOkay:
-    	(void) chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds16(5), OnTriggerIdentifyEffectCompleted,
+        (void) chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds16(5), OnTriggerIdentifyEffectCompleted,
                                                            identify);
         break;
     case chip::app::Clusters::Identify::EffectIdentifierEnum::kFinishEffect:
@@ -51,12 +49,10 @@ void OnTriggerIdentifyEffectCompleted(chip::System::Layer * systemLayer, void * 
     }
 }
 
- static Identify gIdentify = {
-     chip::EndpointId{ 1 },
-     [](Identify *) { ChipLogProgress(Zcl, "onIdentifyStart"); },
-     [](Identify *) { ChipLogProgress(Zcl, "onIdentifyStop"); },
-	 chip::app::Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator,
-	 OnTriggerIdentifyEffect,
- };
-
-
+static Identify gIdentify = {
+    chip::EndpointId{ 1 },
+    [](Identify *) { ChipLogProgress(Zcl, "onIdentifyStart"); },
+    [](Identify *) { ChipLogProgress(Zcl, "onIdentifyStop"); },
+    chip::app::Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator,
+    OnTriggerIdentifyEffect,
+};

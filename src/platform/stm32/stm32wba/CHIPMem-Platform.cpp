@@ -44,10 +44,10 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/logging/CHIPLogging.h>
 
-#include "cmsis_os2.h"
 #include "FreeRTOS.h"
-#include "task.h"
+#include "cmsis_os2.h"
 #include "mbedtls/platform.h"
+#include "task.h"
 
 #include <atomic>
 #include <cstdio>
@@ -56,8 +56,8 @@
 
 #if CHIP_CONFIG_MEMORY_MGMT_PLATFORM
 
-extern "C" void memMonitoringTrackAlloc(void *ptr, size_t size);
-extern "C" void memMonitoringTrackFree(void *ptr, size_t size);
+extern "C" void memMonitoringTrackAlloc(void * ptr, size_t size);
+extern "C" void memMonitoringTrackFree(void * ptr, size_t size);
 
 #ifndef trackAlloc
 #define trackAlloc(pvAddress, uiSize) memMonitoringTrackAlloc(pvAddress, uiSize)
@@ -73,8 +73,9 @@ using namespace std;
 // Define the new operator for C++ to use the freeRTOS memory management
 // functions.
 //
-void* operator new(size_t size) {
-    void *p;
+void * operator new(size_t size)
+{
+    void * p;
 #ifdef USE_FREERTOS
     if (uxTaskGetNumberOfTasks())
         p = pvPortMalloc(size);
@@ -82,11 +83,11 @@ void* operator new(size_t size) {
         p = malloc(size);
 
 #else
-	p = malloc(size);
+    p = malloc(size);
 
 #endif
 #ifdef __EXCEPTIONS
-    if (p == 0) // did pvPortMalloc succeed?
+    if (p == 0)                 // did pvPortMalloc succeed?
         throw std::bad_alloc(); // ANSI/ISO compliant behavior
 #endif
     return p;
@@ -96,20 +97,22 @@ void* operator new(size_t size) {
 // Define the delete operator for C++ to use the freeRTOS memory
 // functions.
 //
-void operator delete(void *p) {
+void operator delete(void * p)
+{
 #ifdef USE_FREERTOS
     if (uxTaskGetNumberOfTasks())
         vPortFree(p);
     else
         free(p);
 #else
-	free(p);
+    free(p);
 #endif
     p = NULL;
 }
 
-void* operator new[](size_t size) {
-    void *p;
+void * operator new[](size_t size)
+{
+    void * p;
 #ifdef USE_FREERTOS
     if (uxTaskGetNumberOfTasks())
         p = pvPortMalloc(size);
@@ -117,11 +120,11 @@ void* operator new[](size_t size) {
         p = malloc(size);
 
 #else
-	p = malloc(size);
+    p = malloc(size);
 
 #endif
 #ifdef __EXCEPTIONS
-    if (p == 0) // did pvPortMalloc succeed?
+    if (p == 0)                 // did pvPortMalloc succeed?
         throw std::bad_alloc(); // ANSI/ISO compliant behavior
 #endif
     return p;
@@ -131,14 +134,15 @@ void* operator new[](size_t size) {
 // Define the delete operator for C++ to use the freeRTOS memory
 // functions. THIS IS NOT OPTIONAL!
 //
-void operator delete[](void *p) {
+void operator delete[](void * p)
+{
 #ifdef USE_FREERTOS
     if (uxTaskGetNumberOfTasks())
         vPortFree(p);
     else
         free(p);
 #else
-	free(p);
+    free(p);
 #endif
     p = NULL;
 }
@@ -148,31 +152,35 @@ namespace Platform {
 
 #define VERIFY_INITIALIZED() VerifyInitialized(__func__)
 
-static std::atomic_int memoryInitialized { 0 };
+static std::atomic_int memoryInitialized{ 0 };
 
-static void VerifyInitialized(const char *func) {
-    if (!memoryInitialized) {
-        ChipLogError(DeviceLayer,
-                "ABORT: chip::Platform::%s() called before chip::Platform::MemoryInit()\n", func);
+static void VerifyInitialized(const char * func)
+{
+    if (!memoryInitialized)
+    {
+        ChipLogError(DeviceLayer, "ABORT: chip::Platform::%s() called before chip::Platform::MemoryInit()\n", func);
         abort();
     }
 }
 
-static size_t MemoryBlockSize(void *ptr) {
+static size_t MemoryBlockSize(void * ptr)
+{
 
-    uint8_t *p = static_cast<uint8_t*>(ptr);
+    uint8_t * p = static_cast<uint8_t *>(ptr);
     // Subtract the size of the header from the pointer
     p -= sizeof(size_t);
     // Read the size of the memory block from the header
-    size_t size = *reinterpret_cast<size_t*>(p);
+    size_t size = *reinterpret_cast<size_t *>(p);
     // Add the size of the header to the size of the memory block
     size += sizeof(size_t);
 
     return size;
 }
 
-CHIP_ERROR MemoryAllocatorInit(void *buf, size_t bufSize) {
-    if (memoryInitialized++ > 0) {
+CHIP_ERROR MemoryAllocatorInit(void * buf, size_t bufSize)
+{
+    if (memoryInitialized++ > 0)
+    {
         ChipLogError(DeviceLayer, "ABORT: chip::Platform::MemoryInit() called twice.\n");
         abort();
     }
@@ -180,8 +188,10 @@ CHIP_ERROR MemoryAllocatorInit(void *buf, size_t bufSize) {
     return CHIP_NO_ERROR;
 }
 
-void MemoryAllocatorShutdown() {
-    if (--memoryInitialized < 0) {
+void MemoryAllocatorShutdown()
+{
+    if (--memoryInitialized < 0)
+    {
         ChipLogError(DeviceLayer, "ABORT: chip::Platform::MemoryShutdown() called twice.\n");
         abort();
     }
@@ -226,20 +236,24 @@ void * MemoryCalloc(size_t num, size_t size)
 void * MemoryRealloc(void * p, size_t size)
 {
     VERIFY_INITIALIZED();
-    void *new_ptr;
-    if (size == 0) {
+    void * new_ptr;
+    if (size == 0)
+    {
         MemoryFree(p);
         return NULL;
     }
 
     new_ptr = MemoryAlloc(size);
-    if (new_ptr == NULL) {
+    if (new_ptr == NULL)
+    {
         return NULL;
     }
 
-    if (p != NULL) {
+    if (p != NULL)
+    {
         size_t copy_size = MemoryBlockSize(p);
-        if (copy_size > size) {
+        if (copy_size > size)
+        {
             copy_size = size;
         }
         memcpy(new_ptr, p, copy_size);
@@ -256,17 +270,16 @@ void MemoryFree(void * p)
     vPortFree(p);
 }
 
-bool MemoryInternalCheckPointer(const void *p, size_t min_size) {
+bool MemoryInternalCheckPointer(const void * p, size_t min_size)
+{
     return (p != nullptr);
 }
 
 } // namespace Platform
 } // namespace chip
 
-extern "C" void memMonitoringTrackAlloc(void *ptr, size_t size) {
-}
+extern "C" void memMonitoringTrackAlloc(void * ptr, size_t size) {}
 
-extern "C" void memMonitoringTrackFree(void *ptr, size_t size) {
-}
+extern "C" void memMonitoringTrackFree(void * ptr, size_t size) {}
 
 #endif // CHIP_CONFIG_MEMORY_MGMT_PLATFORM
