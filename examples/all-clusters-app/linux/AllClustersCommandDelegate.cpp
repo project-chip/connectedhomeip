@@ -361,7 +361,7 @@ void SetAmbientContextSupportType(Json::Value & jsonValue)
         tagBuf[i].tag         = tagId;
     }
     semanticTags = Span<Globals::Structs::SemanticTagStruct::Type>(tagBuf.get(), actArray.size());
-    TEMPORARY_RETURN_IGNORED cluster->SetAmbientContextTypeSupported(semanticTags);
+    LogErrorOnFailure(cluster->SetAmbientContextTypeSupported(semanticTags));
 }
 
 static bool GetAmbientContextType(const Json::Value & actArray,
@@ -464,7 +464,7 @@ void SetAmbientContextDetect(Json::Value & jsonValue)
         ACSType.detectionConfidence.SetValue(static_cast<chip::Percent>(confidenceValue));
     }
 
-    TEMPORARY_RETURN_IGNORED cluster->AddDetection(ACSType);
+    LogErrorOnFailure(cluster->AddDetection(ACSType));
 }
 
 /**
