@@ -89,6 +89,11 @@ function parse_arguments() {
 }
 
 function setup_sdb() {
+    if ! command -v sdb >/dev/null 2>&1; then
+        echo "ERROR: 'sdb' command not found. Please install Tizen SDK or add sdb to your PATH."
+        exit 1
+    fi
+
     SDB_CMD=("sdb")
     if [ "$TARGET_DEVICE" != "" ]; then
         SDB_CMD=("sdb" "-s" "$TARGET_DEVICE")
@@ -160,7 +165,7 @@ function format_time_ago() {
 
 function fetch_recent_crashes() {
     # Get device time as both Unix epoch and formatted string to compute timezone offset
-    TARGET_NOW=$("${SDB_CMD[@]}" shell "date +%s" | tr -d '\r' | grep -E '^[0-9]+$')
+    TARGET_NOW=$("${SDB_CMD[@]}" shell "date +%s" | tr -d '\r' | grep -E '^[0-9]+$' || true)
     if [ "$TARGET_NOW" = "" ]; then
         echo "ERROR: Failed to retrieve current time from target device."
         exit 1
@@ -170,7 +175,11 @@ function fetch_recent_crashes() {
     device_datetime=$("${SDB_CMD[@]}" shell "date '+%Y-%m-%d %H:%M:%S'" | tr -d '\r')
     # Compute offset: device epoch vs host's interpretation of device's local time
     local host_epoch=0
-    host_epoch=$(date -d "$device_datetime" +%s 2>/dev/null || echo 0)
+    if date --version >/dev/null 2>&1; then
+        host_epoch=$(date -d "$device_datetime" +%s 2>/dev/null || echo 0)
+    else
+        host_epoch=$(date -j -f "%Y-%m-%d %H:%M:%S" "$device_datetime" +%s 2>/dev/null || echo 0)
+    fi
     local tz_offset=$((TARGET_NOW - host_epoch))
 
     local cutoff_time=$((TARGET_NOW - SEARCH_HOURS * 3600))
@@ -192,7 +201,7 @@ function fetch_recent_crashes() {
         local filename timestamp_str formatted_time file_epoch
         filename=$(basename "$remote_zip")
         # Extract timestamp from filename format: APPID_PID_YYYYMMDDHHMMSS.zip
-        timestamp_str=$(echo "$filename" | grep -oE '[0-9]{14}')
+        timestamp_str=$(echo "$filename" | grep -oE '[0-9]{14}' || true)
 
         if [ "$timestamp_str" != "" ]; then
             formatted_time="${timestamp_str:0:4}-${timestamp_str:4:2}-${timestamp_str:6:2} ${timestamp_str:8:2}:${timestamp_str:10:2}:${timestamp_str:12:2}"
@@ -416,7 +425,7 @@ function select_build_target() {
 
     if [ ${#targets[@]} -eq 0 ]; then
         echo "ERROR: Could not find a matching local unstripped binary for '$binary' with correct architecture inside out/tizen-* directories."
-        "$CLEANUP" && rm -rf "$LOCAL_TMP_DIR"
+        if [ "$CLEANUP" = true ]; then rm -rf "$LOCAL_TMP_DIR"; fi
         exit 1
     fi
 
@@ -488,23 +497,19 @@ function run_gdb_analysis() {
     echo "----------------------------------------------------------------------------------------------------"
 
     # Build the GDB command line with proper quoting for copy-paste
-    local gdb_invocation="$gdb_bin --batch"
-    gdb_invocation+=" -ex \"set auto-load safe-path /\""
-    gdb_invocation+=" -ex \"set sysroot $sysroot\""
-    gdb_invocation+=" -ex \"set solib-absolute-prefix $sysroot\""
-    gdb_invocation+=" -ex \"file $binary_path\""
-    gdb_invocation+=" -ex \"core-file $coredump\""
-    gdb_invocation+=" -ex \"thread apply all bt full\""
+    local gdb_args=(
+        "--batch"
+        "-ex" "set auto-load safe-path /"
+        "-ex" "set sysroot $sysroot"
+        "-ex" "set solib-absolute-prefix $sysroot"
+        "-ex" "file $binary_path"
+        "-ex" "core-file $coredump"
+        "-ex" "thread apply all bt full"
+    )
 
-    verbose_log "$gdb_invocation"
+    verbose_log "$gdb_bin ${gdb_args[*]}"
 
-    "$gdb_bin" --batch \
-        -ex "set auto-load safe-path /" \
-        -ex "set sysroot $sysroot" \
-        -ex "set solib-absolute-prefix $sysroot" \
-        -ex "file $binary_path" \
-        -ex "core-file $coredump" \
-        -ex "thread apply all bt full"
+    "$gdb_bin" "${gdb_args[@]}"
 }
 
 # ============================================================================
