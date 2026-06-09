@@ -95,7 +95,12 @@ class TC_DeviceConformance(DeviceConformanceTests):
         success, problems = self.check_device_type(fail_on_extra_clusters,
                                                    allow_provisional_test_event_only_disallowed_for_certification)
         self.problems.extend(problems)
-        if not success:
+
+        composed_dt_req_success, composed_dt_req_problems = self.check_composed_device_type_requirements(
+            allow_provisional_test_event_only_disallowed_for_certification)
+        self.problems.extend(composed_dt_req_problems)
+
+        if not success or not composed_dt_req_success:
             self.fail_current_test("Problems with Device type conformance on one or more endpoints")
 
     def test_TC_IDM_10_6(self):

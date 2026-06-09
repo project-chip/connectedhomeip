@@ -83,4 +83,18 @@ Davis, CA 95616, USA
       <mandatoryConform/>
     </cluster>
   </clusters>
+  <composedDeviceTypes>
+    <deviceType deviceTypeId="0x002C" deviceTypeName="Air Quality Sensor" deviceTypeLocation="anywhere">
+      <optionalConform/>
+    </deviceType>
+    <deviceType deviceTypeId="0x0307" deviceTypeName="Humidity Sensor" deviceTypeLocation="anywhere">
+      <optionalConform/>
+    </deviceType>
+    <deviceType deviceTypeId="0x0302" deviceTypeName="Temperature Sensor" deviceTypeLocation="anywhere">
+      <optionalConform/>
+    </deviceType>
+    <deviceType deviceTypeId="0x0301" deviceTypeName="Thermostat" deviceTypeLocation="anywhere">
+      <optionalConform/>
+    </deviceType>
+  </composedDeviceTypes>
 </deviceType>

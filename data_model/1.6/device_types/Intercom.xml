@@ -119,4 +119,21 @@ Davis, CA 95616, USA
       <optionalConform/>
     </cluster>
   </clusters>
+  <composedDeviceTypes>
+    <deviceType deviceTypeId="0x000F" deviceTypeName="Generic Switch" deviceTypeLocation="childEndpoint">
+      <mandatoryConform/>
+      <constraint>
+        <min value="1"/>
+      </constraint>
+      <clusterRequirements>
+        <cluster id="0x003B" name="Switch">
+          <features>
+            <feature code="MS">
+              <mandatoryConform/>
+            </feature>
+          </features>
+        </cluster>
+      </clusterRequirements>
+    </deviceType>
+  </composedDeviceTypes>
 </deviceType>

@@ -109,4 +109,12 @@ Davis, CA 95616, USA
       <optionalConform/>
     </cluster>
   </clusters>
+  <composedDeviceTypes>
+    <deviceType deviceTypeId="0x0307" deviceTypeName="Humidity Sensor" deviceTypeLocation="childEndpoint">
+      <optionalConform/>
+    </deviceType>
+    <deviceType deviceTypeId="0x0302" deviceTypeName="Temperature Sensor" deviceTypeLocation="childEndpoint">
+      <optionalConform/>
+    </deviceType>
+  </composedDeviceTypes>
 </deviceType>

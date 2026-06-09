@@ -75,4 +75,18 @@ Davis, CA 95616, USA
       <optionalConform/>
     </cluster>
   </clusters>
+  <composedDeviceTypes>
+    <deviceType deviceTypeId="0x0078" deviceTypeName="Cooktop" deviceTypeLocation="childEndpoint">
+      <optionalConform/>
+      <constraint>
+        <max value="1"/>
+      </constraint>
+    </deviceType>
+    <deviceType deviceTypeId="0x0071" deviceTypeName="Temperature Controlled Cabinet" deviceTypeLocation="childEndpoint">
+      <mandatoryConform/>
+      <constraint>
+        <min value="1"/>
+      </constraint>
+    </deviceType>
+  </composedDeviceTypes>
 </deviceType>
