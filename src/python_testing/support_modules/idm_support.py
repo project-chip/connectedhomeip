@@ -1418,7 +1418,11 @@ class IDMBaseTest(BasicCompositionTests):
         # Wait in small increments, checking periodically
         count = 0
         last_report_count = len(handler.get_all_reported_attributes())
-        max_wait_time = 30
+        # DUT can batch a backlog of reports for unexpectedly long stretches
+        # (~30s seen in CI on all-clusters-app) after a burst of writes. Cap
+        # generously; the loop exits early via the changed_count check on
+        # healthy runs.
+        max_wait_time = 60
         while count < max_wait_time:
             await asyncio.sleep(1)
             count += 1
