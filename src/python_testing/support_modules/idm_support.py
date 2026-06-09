@@ -39,6 +39,7 @@ from matter.testing import global_attribute_ids
 from matter.testing.basic_composition import BasicCompositionTests
 from matter.testing.event_attribute_reporting import WildcardAttributeSubscriptionHandler
 from matter.testing.global_attribute_ids import GlobalAttributeIds, is_standard_attribute_id
+from matter.testing.problem_notices import AttributePathLocation
 from matter.testing.spec_parsing import ConstraintReference, Constraints
 from matter.tlv import uint
 
@@ -1299,6 +1300,10 @@ class IDMBaseTest(BasicCompositionTests):
                         # ignore writes to ControlSequenceOfOperation for Zigbee back-compat. The write
                         # returns Success but the value never changes, so no subscription report is emitted.
                         Clusters.Thermostat.Attributes.ControlSequenceOfOperation,
+                        # TC-TSTAT-2.2 step 11a mandates that writes to MinSetpointDeadBand are silently
+                        # discarded (Success returned, value unchanged) unless the device opts in via the
+                        # TSTAT.S.M.MINSETPOINTDEADBANDWRITABLE PICS. 
+                        Clusters.Thermostat.Attributes.MinSetpointDeadBand,
                     ]
                     if attribute in ATTRIBUTES_WITH_WRITE_CONSTRAINTS:
                         log.debug("%s: Skipping %s - known to have write constraints", test_step, attribute.__name__)
@@ -1359,25 +1364,39 @@ class IDMBaseTest(BasicCompositionTests):
                     )
 
                     if resp[0].Status == Status.Success:
-                        # A Success status doesn't guarantee the value actually changed. Some
-                        # attributes are spec-mandated to silently ignore writes (handled by the
-                        # skip list above), and others silently clamp due to cross-attribute
-                        # constraints the test doesn't know about (e.g. Thermostat setpoint
-                        # deadband bounds). Re-read and only track a change report expectation
-                        # when the readback differs from the cached value.
+                        # A Success status doesn't mean the value actually changed. Some attributes are
+                        # spec-mandated to silently ignore writes (see skip list above); others get
+                        # clamped silently by cross-attribute constraints. Re-read so we only expect a
+                        # report when the value actually moved.
                         readback = await self.read_single_attribute_check_success(
                             endpoint=endpoint_id, cluster=cluster_class, attribute=attribute,
                         )
                         if readback == cached_val:
-                            log.info(
-                                f"{test_step}: Write to {attribute.__name__} on EP{endpoint_id} "
-                                f"returned Success but value unchanged ({cached_val}); "
-                                f"not expecting a subscription report")
+                            # Write succeeded but value didn't change, and the attribute isn't on the skip
+                            # list above, so this is a possible DUT bug. Record a problem notice for the
+                            # end-of-test summary verifying actual write semantics is the per-cluster
+                            # test's job, not IDM 4.3's. Add to the skip list if it turns out to be
+                            # spec-compliant.
+                            self.record_warning(
+                                test_name=test_step,
+                                location=AttributePathLocation(
+                                    endpoint_id=endpoint_id,
+                                    cluster_id=cluster_id,
+                                    attribute_id=attribute_id,
+                                ),
+                                problem=(
+                                    f"Write to {attribute.__name__} returned Success but value "
+                                    f"unchanged ({cached_val!r}). Possible DUT defect or spec-mandated "
+                                    f"silent-discard not yet on the IDM 4.3 skip list."
+                                ),
+                            )
                             continue
 
                         changed_count += 1
                         log.info(
-                            f"{test_step}: [{changed_count}] Changed {attribute.__name__} (0x{attribute_id:04X}) on endpoint {endpoint_id}, cluster 0x{cluster_id:04X}: {cached_val} -> {readback}")
+                            "%s: [%d] Changed %s (0x%04X) on endpoint %s, cluster 0x%04X: %s -> %s",
+                            test_step, changed_count, attribute.__name__, attribute_id,
+                            endpoint_id, cluster_id, cached_val, readback)
 
                         changed_attributes.append(ChangedAttribute(
                             endpoint=endpoint_id,
@@ -1457,8 +1476,7 @@ class IDMBaseTest(BasicCompositionTests):
                 attributes=[(ep, attr(old_value))]
             )
             if resp[0].Status != Status.Success:
-                log.warning(
-                    f"{test_step}: Failed to revert {attr.__name__} on endpoint {ep} "
-                    f"to {old_value}: {resp[0].Status}")
+                log.warning("%s: Failed to revert %s on endpoint %s to %s: %s",
+                            test_step, attr.__name__, ep, old_value, resp[0].Status)
 
         return verified_count
