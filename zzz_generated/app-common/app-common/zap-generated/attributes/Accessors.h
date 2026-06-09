@@ -4662,11 +4662,11 @@ namespace CommissioningProxy {
 namespace Attributes {
 
 namespace FeatureMap {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint32_t * value); // bitmap32
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value); // bitmap32
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value); // int16u
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value); // int16u
 } // namespace ClusterRevision
 
 } // namespace Attributes
