@@ -487,6 +487,7 @@ class AttributeSubscriptionHandler:
             # Determine if all were met
             if all(report_matches.values()):
                 LOGGER.info("Found all expected matchers did match.")
+                return
 
             elapsed = time.time() - start_time
             time_remaining = timeout_sec - elapsed
