@@ -358,7 +358,7 @@ class TC_DeviceBasicComposition(BasicCompositionTests):
                 Clusters.Groups in self.endpoints[ep_id]
                 for ep_id in self.endpoints if ep_id != 0
             )
-            log.info(f"has_groups_server: {has_groups_server}, has_groupcast_listener: {has_groupcast_listener}")
+            log.info("has_groups_server: %s, has_groupcast_listener: %s", has_groups_server, has_groupcast_listener)
             if has_groups_server and not has_groupcast_listener:
                 self.record_error(self.get_test_name(), location=AttributePathLocation(endpoint_id=0),
                                   problem="Groups server found on an endpoint but Groupcast cluster with Listener "
@@ -372,7 +372,7 @@ class TC_DeviceBasicComposition(BasicCompositionTests):
                 Clusters.Binding in self.endpoints[ep_id]
                 for ep_id in self.endpoints if ep_id != 0
             )
-            log.info(f"has_binding_server: {has_binding_server}, has_groupcast_sender: {has_groupcast_sender}")
+            log.info("has_binding_server: %s, has_groupcast_sender: %s", has_binding_server, has_groupcast_sender)
             if has_binding_server and not has_groupcast_sender:
                 self.record_error(self.get_test_name(), location=AttributePathLocation(endpoint_id=0),
                                   problem="Binding server found on an endpoint but Groupcast cluster with Sender "
@@ -394,7 +394,7 @@ class TC_DeviceBasicComposition(BasicCompositionTests):
         success = True
         for endpoint_id, endpoint in self.endpoints.items():
             has_descriptor = (Clusters.Descriptor in endpoint)
-            log.info(f"Checking descriptor on Endpoint {endpoint_id}: {'found' if has_descriptor else 'not_found'}")
+            log.info("Checking descriptor on Endpoint %s: %s", endpoint_id, 'found' if has_descriptor else 'not_found')
             if not has_descriptor:
                 self.record_error(self.get_test_name(), location=AttributePathLocation(endpoint_id=endpoint_id, cluster_id=Clusters.Descriptor.id),
                                   problem=f"Did not find a descriptor on endpoint {endpoint_id}", spec_location="Base Cluster Requirements for Matter")
@@ -473,8 +473,9 @@ class TC_DeviceBasicComposition(BasicCompositionTests):
 
                     has_attribute = (req_attribute.id in cluster)
                     location = AttributePathLocation(endpoint_id, cluster_id, req_attribute.id)
-                    log.debug(
-                        f"Checking for mandatory global {attribute_string} on {location.as_cluster_string(self.cluster_mapper)}: {'found' if has_attribute else 'not_found'}")
+                    log.debug("Checking for mandatory global %s on %s: %s",
+                              attribute_string, location.as_cluster_string(self.cluster_mapper),
+                              'found' if has_attribute else 'not_found')
 
                     # Check attribute is actually present
                     if not has_attribute:
@@ -512,8 +513,9 @@ class TC_DeviceBasicComposition(BasicCompositionTests):
                         has_attribute = attribute_id in cluster
 
                         attribute_string = self.cluster_mapper.get_attribute_string(cluster_id, attribute_id)
-                        log.debug(
-                            f"Checking presence of claimed supported {attribute_string} on {location.as_cluster_string(self.cluster_mapper)}: {'found' if has_attribute else 'not_found'}")
+                        log.debug("Checking presence of claimed supported %s on %s: %s",
+                                  attribute_string, location.as_cluster_string(self.cluster_mapper),
+                                  'found' if has_attribute else 'not_found')
 
                         if not has_attribute:
                             # Check if this is a write-only attribute by trying to read it.

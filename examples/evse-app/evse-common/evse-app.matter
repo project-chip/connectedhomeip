@@ -2035,8 +2035,8 @@ cluster ElectricalEnergyMeasurement = 145 {
 }
 
 /** This cluster allows a client to manage the power draw of a device. An example of such a client could be an Energy Management System (EMS) which controls an Energy Smart Appliance (ESA). */
-provisional cluster DeviceEnergyManagement = 152 {
-  revision 4;
+cluster DeviceEnergyManagement = 152 {
+  revision 5;
 
   enum AdjustmentCauseEnum : enum8 {
     kLocalOptimization = 0;
@@ -2049,6 +2049,7 @@ provisional cluster DeviceEnergyManagement = 152 {
     kFault = 2;
     kUserOptOut = 3;
     kCancelled = 4;
+    kInvalid = 5;
   }
 
   enum CostTypeEnum : enum8 {
@@ -2111,6 +2112,7 @@ provisional cluster DeviceEnergyManagement = 152 {
     kPausable = 0x10;
     kForecastAdjustment = 0x20;
     kConstraintBasedAdjustment = 0x40;
+    kPowerRangeAdjustment = 0x80;
   }
 
   struct CostStruct {
@@ -2173,6 +2175,13 @@ provisional cluster DeviceEnergyManagement = 152 {
     optional int8s loadControl = 4;
   }
 
+  struct PowerRangeAdjustStruct {
+    nullable power_mw minPower = 0;
+    nullable power_mw maxPower = 1;
+    PowerAdjustReasonEnum cause = 2;
+    epoch_s endTime = 3;
+  }
+
   struct SlotAdjustmentStruct {
     int8u slotIndex = 0;
     optional power_mw nominalPower = 1;
@@ -2195,6 +2204,17 @@ provisional cluster DeviceEnergyManagement = 152 {
     CauseEnum cause = 0;
   }
 
+  provisional info event PowerRangeAdjustStart = 4 {
+    PowerRangeAdjustStruct adjustment = 0;
+    elapsed_s duration = 1;
+  }
+
+  provisional info event PowerRangeAdjustEnd = 5 {
+    CauseEnum cause = 0;
+    elapsed_s duration = 1;
+    energy_mwh energyUse = 2;
+  }
+
   readonly attribute ESATypeEnum ESAType = 0;
   readonly attribute boolean ESACanGenerate = 1;
   readonly attribute ESAStateEnum ESAState = 2;
@@ -2203,6 +2223,7 @@ provisional cluster DeviceEnergyManagement = 152 {
   readonly attribute optional nullable PowerAdjustCapabilityStruct powerAdjustmentCapability = 5;
   readonly attribute optional nullable ForecastStruct forecast = 6;
   readonly attribute optional OptOutStateEnum optOutState = 7;
+  provisional readonly attribute optional nullable PowerRangeAdjustStruct powerRangeAdjustment = 8;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -2236,6 +2257,13 @@ provisional cluster DeviceEnergyManagement = 152 {
     AdjustmentCauseEnum cause = 1;
   }
 
+  request struct PowerRangeAdjustRequestRequest {
+    nullable power_mw minPower = 0;
+    nullable power_mw maxPower = 1;
+    elapsed_s duration = 2;
+    AdjustmentCauseEnum cause = 3;
+  }
+
   /** Allows a client to request an adjustment in the power consumption of an ESA for a specified duration. */
   command PowerAdjustRequest(PowerAdjustRequestRequest): DefaultSuccess = 0;
   /** Allows a client to cancel an ongoing PowerAdjustmentRequest operation. */
@@ -2252,6 +2280,10 @@ provisional cluster DeviceEnergyManagement = 152 {
   command RequestConstraintBasedForecast(RequestConstraintBasedForecastRequest): DefaultSuccess = 6;
   /** Allows a client to request cancellation of a previous adjustment request in a StartTimeAdjustRequest, ModifyForecastRequest or RequestConstraintBasedForecast command. */
   command CancelRequest(): DefaultSuccess = 7;
+  /** Allows a client to request an adjustment in the range of powers that an ESA can operate within for a specified duration. */
+  command PowerRangeAdjustRequest(PowerRangeAdjustRequestRequest): DefaultSuccess = 8;
+  /** Allows a client to cancel an ongoing PowerRangeAdjustmentRequest operation. */
+  command CancelPowerRangeAdjustRequest(): DefaultSuccess = 9;
 }
 
 /** Electric Vehicle Supply Equipment (EVSE) is equipment used to charge an Electric Vehicle (EV) or Plug-In Hybrid Electric Vehicle. This cluster provides an interface to the functionality of Electric Vehicle Supply Equipment (EVSE) management. */

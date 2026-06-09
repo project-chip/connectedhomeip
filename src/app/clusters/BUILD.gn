@@ -12,9 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import("//build_overrides/chip.gni")
+import("${chip_root}/src/lib/lib.gni")
 import("${chip_root}/src/platform/device.gni")
 
 source_set("clusters") {
+  # Note: Cluster with external dependencies must be included conditionally
+  # on a per-cluster chip_enable_* argument declared in lib.gni.
   public_deps = [
     # keep-sorted: start
     "access-control-server",
@@ -50,7 +53,6 @@ source_set("clusters") {
     "operational-credentials-server",
     "pressure-measurement-server",
     "proximity-ranging-server",
-    "push-av-stream-transport-server",
     "relative-humidity-measurement-server",
     "resource-monitoring-server",
     "scenes-server",
@@ -70,29 +72,7 @@ source_set("clusters") {
     # keep-sorted: end
   ]
 
-  if (chip_device_platform == "ameba") {
-    # Ameba/Realtek overrides various things in c-headers that are C++ standard items. Generally
-    # these get pulled via LWIP and end up overriding things like true/false/isalpha by macros.
-    #
-    # This results in errors in libraries used by these clusters, like:
-    #
-    # INFO    In file included from /opt/ameba/ambd_sdk_with_chip_non_NDA/component/common/api/platform/platform_stdlib_rtl8721d.h:25,
-    # INFO                     from /opt/ameba/ambd_sdk_with_chip_non_NDA/component/common/api/platform/platform_stdlib.h:39,
-    # INFO                     from /opt/ameba/ambd_sdk_with_chip_non_NDA/component/common/api/network/include/lwipopts.h:17,
-    # INFO                     from /opt/ameba/ambd_sdk_with_chip_non_NDA/component/common/network/lwip/lwip_v2.1.2/src/include/lwip/opt.h:51,
-    # INFO                     from /opt/ameba/ambd_sdk_with_chip_non_NDA/component/common/network/lwip/lwip_v2.1.2/src/include/lwip/errno.h:40,
-    # INFO                     from ../../../config/ameba/third_party/connectedhomeip/third_party/uriparser/repo/src/UriMemory.c:56:
-    # INFO    /__w/connectedhomeip/connectedhomeip/.environment/cipd/packages/arm/arm-none-eabi/include/ctype.h:14:5: error: expected identifier or '(' before 'int'
-    # INFO       14 | int isalpha (int __c);
-    # INFO          |     ^~~~~~~
-    # INFO    /opt/ameba/ambd_sdk_with_chip_non_NDA/component/soc/realtek/amebad/swlib/string/strproc.h:26:30: error: expected ')' before '>=' token
-    # INFO       26 | #define isupper(c)      (((c)>='A')&&((c)<='Z'))
-    public_deps -= [ "push-av-stream-transport-server" ]
-  }
-
-  if (chip_device_platform == "darwin") {
-    # Darwin does not include the uriparser submodule, which is required by
-    # push-av-stream-transport-server.
-    public_deps -= [ "push-av-stream-transport-server" ]
+  if (chip_enable_push_av_stream_transport) {
+    public_deps += [ "push-av-stream-transport-server" ]
   }
 }

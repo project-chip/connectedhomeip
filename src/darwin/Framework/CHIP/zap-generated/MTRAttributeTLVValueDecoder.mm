@@ -9520,6 +9520,33 @@ static id _Nullable DecodeAttributeValueForDeviceEnergyManagementCluster(Attribu
         value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue)];
         return value;
     }
+    case Attributes::PowerRangeAdjustment::Id: {
+        using TypeInfo = Attributes::PowerRangeAdjustment::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        MTRDeviceEnergyManagementClusterPowerRangeAdjustStruct * _Nullable value;
+        if (cppValue.IsNull()) {
+            value = nil;
+        } else {
+            value = [MTRDeviceEnergyManagementClusterPowerRangeAdjustStruct new];
+            if (cppValue.Value().minPower.IsNull()) {
+                value.minPower = nil;
+            } else {
+                value.minPower = [NSNumber numberWithLongLong:cppValue.Value().minPower.Value()];
+            }
+            if (cppValue.Value().maxPower.IsNull()) {
+                value.maxPower = nil;
+            } else {
+                value.maxPower = [NSNumber numberWithLongLong:cppValue.Value().maxPower.Value()];
+            }
+            value.cause = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.Value().cause)];
+            value.endTime = [NSNumber numberWithUnsignedInt:cppValue.Value().endTime];
+        }
+        return value;
+    }
     default: {
         // Not a known DeviceEnergyManagement attribute.
         break;

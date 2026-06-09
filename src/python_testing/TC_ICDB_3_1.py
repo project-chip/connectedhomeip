@@ -145,7 +145,7 @@ class TC_ICDB_3_1(ICDBaseTest):
         # TH reads from the DUT the OperatingMode attribute
         self.step("1b")
         operating_mode = await self.read_icdm_attribute_expect_success(attributes.OperatingMode)
-        log.info(f"OperatingMode: {operating_mode}")
+        log.info("OperatingMode: %s", operating_mode)
 
         # Verify that the DUT response contains value of OperatingMode=0 (SIT Operating Mode)
         asserts.assert_equal(operating_mode, modes.kSit,
@@ -177,14 +177,14 @@ class TC_ICDB_3_1(ICDBaseTest):
             asserts.assert_fail(f"Unexpected error returned when registering client: {e}")
 
         # Verify that the DUT response contains ICDCounter
-        log.info(f"RegisterClient response ICDCounter: {response.ICDCounter}")
+        log.info("RegisterClient response ICDCounter: %s", response.ICDCounter)
         asserts.assert_is_not_none(response.ICDCounter, "RegisterClient response must contain ICDCounter.")
 
         # *** STEP 3a ***
         # TH reads from the DUT the OperatingMode attribute
         self.step("3a")
         operating_mode = await self.read_icdm_attribute_expect_success(attributes.OperatingMode)
-        log.info(f"OperatingMode after RegisterClient: {operating_mode}")
+        log.info("OperatingMode after RegisterClient: %s", operating_mode)
 
         # Verify that the DUT response contains value of OperatingMode=1 (LIT Operating Mode)
         asserts.assert_equal(operating_mode, modes.kLit,
@@ -248,7 +248,7 @@ class TC_ICDB_3_1(ICDBaseTest):
         # Verify that the ICD DNS-SD TXT key is present
         self.step("5c")
         icd_txt = await self.get_icd_txt_key()
-        log.info(f"ICD DNS-SD TXT key after DSLS withdraw SIT: ICD={icd_txt}")
+        log.info("ICD DNS-SD TXT key after DSLS withdraw SIT: ICD=%s", icd_txt)
 
         # Verify that ICD DNS-SD TXT key shows ICD=1
         asserts.assert_equal(icd_txt, modes.kLit,
@@ -261,7 +261,7 @@ class TC_ICDB_3_1(ICDBaseTest):
             await self.send_single_icdm_command(commands.UnregisterClient(checkInNodeID=check_in_node_id))
         except InteractionModelError as e:
             asserts.assert_fail(f"Unexpected error returned when unregistering client: {e}")
-        log.info(f"UnregisterClient SUCCESS for checkInNodeID={check_in_node_id}")
+        log.info("UnregisterClient SUCCESS for checkInNodeID=%s", check_in_node_id)
 
         # *** STEP 6b ***
         # TH reads from the DUT the OperatingMode attribute
