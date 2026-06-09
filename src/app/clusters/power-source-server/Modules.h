@@ -398,6 +398,7 @@ public:
         mTimerDelegate.CancelTimer(this);
         LogErrorOnFailure(mTimerDelegate.StartTimer(this, System::Clock::Seconds16(kTimerDurationS)));
     }
+    AttributeId GetAttributeId() const { return mId; }
 
 private:
     const AttributeId mId;

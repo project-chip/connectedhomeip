@@ -21,8 +21,7 @@
 
 using namespace chip::app::Clusters;
 
-namespace chip {
-namespace app {
+namespace chip::app {
 
 BatteryPowerSourceDevice::BatteryPowerSourceDevice(CharSpan description,
                                                    Clusters::PowerSource::BatReplaceabilityEnum replaceability,
@@ -67,5 +66,4 @@ BatteryPowerSourceDevice::SimpleBatteryPowerSourceCluster & BatteryPowerSourceDe
     return mBatteryPowerSourceCluster.Cluster();
 }
 
-} // namespace app
-} // namespace chip
+} // namespace chip::app

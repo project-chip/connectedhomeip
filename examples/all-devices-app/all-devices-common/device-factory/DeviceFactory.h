@@ -27,7 +27,7 @@
 #include <devices/network-infrastructure-manager/NetworkInfrastructureManagerDevice.h>
 #include <devices/occupancy-sensor/impl/TogglingOccupancySensorDevice.h>
 #include <devices/on-off-light/LoggingOnOffLightDevice.h>
-#include <devices/power-source/BatteryPowerSourceDevice.h>
+#include <devices/power-source/impl/DecreasingBatteryPowerSourceDevice.h>
 #include <devices/proximity-ranger/ProximityRangerDevice.h>
 #include <devices/soil-sensor/impl/IncreasingMoistureSoilSensorDevice.h>
 #include <devices/speaker/impl/LoggingSpeakerDevice.h>
@@ -246,9 +246,7 @@ private:
         if constexpr (ALL_DEVICES_ENABLE_POWER_SOURCE)
         {
             RegisterCreator("power-source", [this]() {
-                VerifyOrDie(mContext.has_value());
-                return std::make_unique<BatteryPowerSourceDevice>(
-                    "Simple battery"_span, Clusters::PowerSource::BatReplaceabilityEnum::kNotReplaceable, mContext->timerDelegate);
+                return std::make_unique<DecreasingBatteryPowerSourceDevice>();
             });
         }
 

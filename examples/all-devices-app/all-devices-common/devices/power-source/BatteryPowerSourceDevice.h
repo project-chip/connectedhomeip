@@ -22,8 +22,7 @@
 #include <devices/interface/SingleEndpointDevice.h>
 #include <lib/support/TimerDelegate.h>
 
-namespace chip {
-namespace app {
+namespace chip::app {
 
 class BatteryPowerSourceDevice : public SingleEndpointDevice
 {
@@ -54,5 +53,4 @@ protected:
     LazyRegisteredServerCluster<SimpleBatteryPowerSourceCluster> mBatteryPowerSourceCluster;
 };
 
-} // namespace app
-} // namespace chip
+} // namespace chip::app

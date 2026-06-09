@@ -911,42 +911,14 @@ public:
                 VerifyOrReturnError(val.Value() <= 200, CHIP_IM_GLOBAL_STATUS(ConstraintError));
             }
 
-            if (this->batPercentRemaining == val)
-            {
-                return CHIP_NO_ERROR;
-            }
-
-            if (this->batPercentRemaining.IsNull() || val.IsNull())
-            {
-                this->batPercentRemainingNotifyTimerContext.CancelCurrentTimer();
-                SetAttributeValue(this->batPercentRemaining, val, PowerSource::Attributes::BatPercentRemaining::Id);
-                return CHIP_NO_ERROR;
-            }
-
-            this->batPercentRemaining = val;
-            LogErrorOnFailure(this->batPercentRemainingNotifyTimerContext.NotifyOrSchedule(val.Value()));
-            return CHIP_NO_ERROR;
+            return SetQuietNullableAttribute(this->batPercentRemaining, val, this->batPercentRemainingNotifyTimerContext);
         }
     }
     CHIP_ERROR SetBatTimeRemaining(DataModel::Nullable<uint32_t> val)
     {
         ENABLE_IF_ATTRIBUTE_SUPPORTED(BatTimeRemaining)
         {
-            if (this->batTimeRemaining == val)
-            {
-                return CHIP_NO_ERROR;
-            }
-
-            if (this->batTimeRemaining.IsNull() || val.IsNull())
-            {
-                this->batTimeRemainingNotifyTimerContext.CancelCurrentTimer();
-                SetAttributeValue(this->batTimeRemaining, val, PowerSource::Attributes::BatTimeRemaining::Id);
-                return CHIP_NO_ERROR;
-            }
-
-            this->batTimeRemaining = val;
-            LogErrorOnFailure(this->batTimeRemainingNotifyTimerContext.NotifyOrSchedule(val.Value()));
-            return CHIP_NO_ERROR;
+            return SetQuietNullableAttribute(this->batTimeRemaining, val, this->batTimeRemainingNotifyTimerContext);
         }
     }
     CHIP_ERROR SetBatChargeLevel(BatChargeLevelEnum val)
@@ -1039,21 +1011,7 @@ public:
     {
         ENABLE_IF_ATTRIBUTE_SUPPORTED(BatTimeToFullCharge)
         {
-            if (this->batTimeToFullCharge == val)
-            {
-                return CHIP_NO_ERROR;
-            }
-
-            if (this->batTimeToFullCharge.IsNull() || val.IsNull())
-            {
-                this->batTimeToFullChargeNotifyTimerContext.CancelCurrentTimer();
-                SetAttributeValue(this->batTimeToFullCharge, val, PowerSource::Attributes::BatTimeToFullCharge::Id);
-                return CHIP_NO_ERROR;
-            }
-
-            this->batTimeToFullCharge = val;
-            LogErrorOnFailure(this->batTimeToFullChargeNotifyTimerContext.NotifyOrSchedule(val.Value()));
-            return CHIP_NO_ERROR;
+            return SetQuietNullableAttribute(this->batTimeToFullCharge, val, this->batTimeToFullChargeNotifyTimerContext);
         }
     }
     void SetBatFunctionalWhileCharging(bool val)
@@ -1165,6 +1123,34 @@ private:
                 .Set(PowerSource::Feature::kReplaceable, this->batReplaceable)
                 .Set(PowerSource::Feature::kRechargeable, this->batRechargeable);
         }
+    }
+
+    template <class T>
+    CHIP_ERROR SetQuietNullableAttribute(DataModel::Nullable<T> & oldVal, DataModel::Nullable<T> newVal, PowerSource::detail::BatteryTimerContext & timerContext)
+    {
+        if (oldVal == newVal)
+        {
+            return CHIP_NO_ERROR;
+        }
+
+        if (oldVal.IsNull() || newVal.IsNull())
+        {
+            // Cancel the current timer to guarantee a notification with `NotifyOrSchedule` if needed
+            timerContext.CancelCurrentTimer();
+        }
+
+        oldVal = newVal;
+        if (!newVal.IsNull())
+        {
+            // if not a null value, notify with a timer to avoid too frequent notifications with non null values.
+            LogErrorOnFailure(timerContext.NotifyOrSchedule(newVal.Value()));
+        }
+        else
+        {
+            // if new value is null, notify immediately without timer, so a new non null value can be notified immediately without waiting for the timer.
+            NotifyAttributeChanged(timerContext.GetAttributeId());
+        }
+        return CHIP_NO_ERROR;
     }
 
     void GenerateWiredFaultEventAndSetAndNotify(BitSetType newBitSet)
