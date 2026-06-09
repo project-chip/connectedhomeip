@@ -785,8 +785,9 @@ class MatterBaseTest(base_test.BaseTestClass):
             self.event_loop.run_until_complete(_start())
             self.wildcard_subscription_handler = handler
             LOGGER.info(
-                f"[MatterBaseTest] Wildcard subscription started ({len(self._cq_excluded_attr_ids)} C/Q attrs excluded, "
-                f"{len(handler.latest_values)} attrs cached from priming read)",
+                "[MatterBaseTest] Wildcard subscription started (%d C/Q attrs excluded, "
+                "%d attrs cached from priming read)",
+                len(self._cq_excluded_attr_ids), len(handler.latest_values),
             )
         except Exception as e:
             LOGGER.warning("[MatterBaseTest] Could not start wildcard subscription: %s", e)
@@ -2347,9 +2348,12 @@ class MatterBaseTest(base_test.BaseTestClass):
             try:
                 if dev_ctrl.fabricId != self.subscription_controller.fabricId:
                     LOGGER.info(
-                        f"[verify_subscription] Skipping validation for {attribute.__name__} on endpoint {endpoint_id}: "
-                        f"reading controller fabric {dev_ctrl.fabricId} differs from subscription controller "
-                        f"fabric {self.subscription_controller.fabricId} — fabric-scoped attributes will legitimately differ")
+                        "[verify_subscription] Skipping validation for %s on endpoint %s: "
+                        "reading controller fabric %s differs from subscription controller fabric %s "
+                        "(fabric-scoped attributes will legitimately differ)",
+                        attribute.__name__, endpoint_id, dev_ctrl.fabricId,
+                        self.subscription_controller.fabricId,
+                    )
                     return True
             except AttributeError:
                 pass
@@ -2370,35 +2374,43 @@ class MatterBaseTest(base_test.BaseTestClass):
 
         if cached_value != read_value:
             LOGGER.info(
-                f"[verify_subscription] Mismatch on first check for {attribute.__name__} on endpoint {endpoint_id}: "
-                f"read={read_value!r}, cache={cached_value!r}. Retrying after delay...")
+                "[verify_subscription] Mismatch on first check for %s on endpoint %s: "
+                "read=%r, cache=%r. Retrying after delay...",
+                attribute.__name__, endpoint_id, read_value, cached_value,
+            )
             for attempt in range(3):
                 await asyncio.sleep(1)
                 cached_value = self.wildcard_subscription_handler.get_latest_value(endpoint_id, cluster_id, attr_id)
                 if cached_value == read_value:
                     LOGGER.info(
-                        f"[verify_subscription] {attribute.__name__} on endpoint {endpoint_id} matched after "
-                        f"{attempt + 1}s retry: {read_value}")
+                        "[verify_subscription] %s on endpoint %s matched after %ds retry: %s",
+                        attribute.__name__, endpoint_id, attempt + 1, read_value,
+                    )
                     return True
                 if self._fabric_filtered_match(read_value, cached_value):
                     LOGGER.info(
-                        f"[verify_subscription] {attribute.__name__} on endpoint {endpoint_id} matched after "
-                        f"fabric-scoped filtering (retry {attempt + 1})")
+                        "[verify_subscription] %s on endpoint %s matched after fabric-scoped filtering (retry %d)",
+                        attribute.__name__, endpoint_id, attempt + 1,
+                    )
                     return True
                 LOGGER.info(
-                    f"[verify_subscription] Retry {attempt + 1}/3: still mismatched, cache={cached_value!r}")
+                    "[verify_subscription] Retry %d/3: still mismatched, cache=%r",
+                    attempt + 1, cached_value,
+                )
 
             if self._fabric_filtered_match(read_value, cached_value):
                 LOGGER.info(
-                    f"[verify_subscription] {attribute.__name__} on endpoint {endpoint_id} "
-                    f"differs only by cross-fabric entries — not a DUT bug")
+                    "[verify_subscription] %s on endpoint %s differs only by cross-fabric entries (not a DUT bug)",
+                    attribute.__name__, endpoint_id,
+                )
                 return True
 
             if await self._is_subscription_acl_removed():
                 LOGGER.warning(
-                    f"[verify_subscription] Subscription controller ACL entry removed by test — "
-                    f"skipping validation for {attribute.__name__} on endpoint {endpoint_id} "
-                    f"(read={read_value!r}, cache={cached_value!r})")
+                    "[verify_subscription] Subscription controller ACL entry removed by test, "
+                    "skipping validation for %s on endpoint %s (read=%r, cache=%r)",
+                    attribute.__name__, endpoint_id, read_value, cached_value,
+                )
                 return True
 
             problem = (
@@ -2415,7 +2427,9 @@ class MatterBaseTest(base_test.BaseTestClass):
             return False
 
         LOGGER.info(
-            f"[verify_subscription] {attribute.__name__} on endpoint {endpoint_id} matches read value: {read_value}")
+            "[verify_subscription] %s on endpoint %s matches read value: %s",
+            attribute.__name__, endpoint_id, read_value,
+        )
         return True
 
     @staticmethod
