@@ -22,6 +22,9 @@ LOCAL_TMP_DIR="out/tizen-crashes-tmp"
 SEARCH_HOURS=1
 CLEANUP=true
 VERBOSE=false
+SELECT_LAST=false
+# Target device time (set during fetch_recent_crashes, used for time-ago display)
+TARGET_NOW=0
 
 # ============================================================================
 # Utility Functions
@@ -30,7 +33,7 @@ VERBOSE=false
 function help() {
     cat <<EOF
 Usage:
-$0 [--help] [--hours NUM] [--target SDB_ID] [--out-dir DIR] [--verbose] [--no-clean]
+$0 [--help] [--hours NUM] [--target SDB_ID] [--out-dir DIR] [--last] [--verbose] [--no-clean]
 
 Options:
     --hours NUM     - Filter crashes from the last NUM hours (default: 1)
@@ -38,6 +41,7 @@ Options:
     --out-dir DIR   - Build output directory (e.g. out/tizen-arm64-light-no-thread).
                       When set, only crashes matching binaries in this directory
                       are shown and build target selection is skipped.
+    --last          - Automatically select the most recent crash log
     --verbose       - Print commands before execution (especially GDB invocation)
     --no-clean      - Keep temporary files (pulled crash archives) after analysis
     --help          - Print help
@@ -65,6 +69,10 @@ function parse_arguments() {
                 ;;
             --no-clean)
                 CLEANUP=false
+                shift
+                ;;
+            --last)
+                SELECT_LAST=true
                 shift
                 ;;
             --help)
@@ -139,22 +147,40 @@ function list_binaries_in_out_dir() {
 # Crash Log Discovery
 # ============================================================================
 
-function fetch_recent_crashes() {
-    local target_now cutoff_time
+function format_time_ago() {
+    local epoch="$1"
+    local diff=$((TARGET_NOW - epoch))
+    if [ "$diff" -lt 0 ]; then
+        diff=0
+    fi
+    local hours=$((diff / 3600))
+    local minutes=$(((diff % 3600) / 60))
+    printf "%dh%02dm ago" "$hours" "$minutes"
+}
 
-    target_now=$("${SDB_CMD[@]}" shell "date +%s" | tr -d '\r' | grep -E '^[0-9]+$')
-    if [ -z "$target_now" ]; then
+function fetch_recent_crashes() {
+    # Get device time as both Unix epoch and formatted string to compute timezone offset
+    TARGET_NOW=$("${SDB_CMD[@]}" shell "date +%s" | tr -d '\r' | grep -E '^[0-9]+$')
+    if [ -z "$TARGET_NOW" ]; then
         echo "ERROR: Failed to retrieve current time from target device."
         exit 1
     fi
 
-    cutoff_time=$((target_now - SEARCH_HOURS * 3600))
+    local device_datetime
+    device_datetime=$("${SDB_CMD[@]}" shell "date '+%Y-%m-%d %H:%M:%S'" | tr -d '\r')
+    # Compute offset: device epoch vs host's interpretation of device's local time
+    local host_epoch=0
+    host_epoch=$(date -d "$device_datetime" +%s 2>/dev/null || echo 0)
+    local tz_offset=$((TARGET_NOW - host_epoch))
+
+    local cutoff_time=$((TARGET_NOW - SEARCH_HOURS * 3600))
 
     echo "Fetching crash logs from the last $SEARCH_HOURS hour(s)..."
     local remote_files
     remote_files=$("${SDB_CMD[@]}" shell "ls $CRASH_REMOTE_DIR/*.zip 2>/dev/null" | tr -d '\r')
 
-    VALID_CRASHES=()
+    # Collect crashes as "EPOCH:PATH" pairs for sorting
+    local crash_pairs=()
     for remote_zip in $remote_files; do
         [ -n "$remote_zip" ] || continue
         [[ "$remote_zip" == *"No such file"* ]] && continue
@@ -166,12 +192,26 @@ function fetch_recent_crashes() {
 
         if [ -n "$timestamp_str" ]; then
             formatted_time="${timestamp_str:0:4}-${timestamp_str:4:2}-${timestamp_str:6:2} ${timestamp_str:8:2}:${timestamp_str:10:2}:${timestamp_str:12:2}"
+            # Parse on host (host timezone) then apply device timezone offset
             file_epoch=$(date -d "$formatted_time" +%s 2>/dev/null || echo 0)
+            file_epoch=$((file_epoch + tz_offset))
 
             if [ "$file_epoch" -ge "$cutoff_time" ]; then
-                VALID_CRASHES+=("$remote_zip")
+                crash_pairs+=("$file_epoch:$remote_zip")
             fi
         fi
+    done
+
+    # Sort newest first (descending by epoch)
+    mapfile -t sorted_pairs < <(printf '%s\n' "${crash_pairs[@]}" | sort -t: -k1,1nr)
+
+    VALID_CRASHES=()
+    CRASH_EPOCHS=()
+    local pair
+    for pair in "${sorted_pairs[@]}"; do
+        [ -n "$pair" ] || continue
+        CRASH_EPOCHS+=("${pair%%:*}")
+        VALID_CRASHES+=("${pair#*:}")
     done
 }
 
@@ -184,9 +224,10 @@ function filter_crashes_for_out_dir() {
         return
     fi
 
-    local filtered=()
-    local remote_zip
-    for remote_zip in "${VALID_CRASHES[@]}"; do
+    local filtered_crashes=()
+    local filtered_epochs=()
+    for i in "${!VALID_CRASHES[@]}"; do
+        local remote_zip="${VALID_CRASHES[$i]}"
         local filename app_id binary
         filename=$(basename "$remote_zip")
         app_id="${filename%%_*}"
@@ -195,13 +236,47 @@ function filter_crashes_for_out_dir() {
         local b
         for b in "${available_binaries[@]}"; do
             if [ "$b" = "$binary" ]; then
-                filtered+=("$remote_zip")
+                filtered_crashes+=("$remote_zip")
+                filtered_epochs+=("${CRASH_EPOCHS[$i]}")
                 break
             fi
         done
     done
 
-    VALID_CRASHES=("${filtered[@]}")
+    VALID_CRASHES=("${filtered_crashes[@]}")
+    CRASH_EPOCHS=("${filtered_epochs[@]}")
+}
+
+function filter_matter_crashes() {
+    # Remove crashes that don't correspond to any known Matter binary
+    # in the out/tizen-* build directories
+    local filtered_crashes=()
+    local filtered_epochs=()
+
+    for i in "${!VALID_CRASHES[@]}"; do
+        local remote_zip="${VALID_CRASHES[$i]}"
+        local filename app_id binary found
+        filename=$(basename "$remote_zip")
+        app_id="${filename%%_*}"
+        binary=$(resolve_binary_name "$app_id")
+
+        found=false
+        local target
+        for target in out/tizen-*/"$binary"; do
+            if [ -f "$target" ]; then
+                found=true
+                break
+            fi
+        done
+
+        if $found; then
+            filtered_crashes+=("$remote_zip")
+            filtered_epochs+=("${CRASH_EPOCHS[$i]}")
+        fi
+    done
+
+    VALID_CRASHES=("${filtered_crashes[@]}")
+    CRASH_EPOCHS=("${filtered_epochs[@]}")
 }
 
 function select_crash_log() {
@@ -210,9 +285,11 @@ function select_crash_log() {
         exit 0
     fi
 
-    if [ ${#VALID_CRASHES[@]} -eq 1 ]; then
+    if [ ${#VALID_CRASHES[@]} -eq 1 ] || [ "$SELECT_LAST" = true ]; then
         SELECTED_ZIP="${VALID_CRASHES[0]}"
-        echo "Found exactly one crash log: $(basename "$SELECTED_ZIP")"
+        local time_ago
+        time_ago=$(format_time_ago "${CRASH_EPOCHS[0]}")
+        echo "Selected crash log: $(basename "$SELECTED_ZIP") ($time_ago)"
         return
     fi
 
@@ -220,7 +297,9 @@ function select_crash_log() {
     echo "Available crash logs from the last $SEARCH_HOURS hour(s):"
     echo "------------------------------------------------------------"
     for i in "${!VALID_CRASHES[@]}"; do
-        echo "[$i] $(basename "${VALID_CRASHES[$i]}")"
+        local time_ago
+        time_ago=$(format_time_ago "${CRASH_EPOCHS[$i]}")
+        echo "[$i] $(basename "${VALID_CRASHES[$i]}")  ($time_ago)"
     done
     echo "------------------------------------------------------------"
 
@@ -243,6 +322,8 @@ function pull_and_extract_crash() {
     local filename
     filename=$(basename "$remote_zip")
 
+    # Clean stale tmp files from previous runs to avoid coredump confusion
+    rm -rf "$LOCAL_TMP_DIR"
     mkdir -p "$LOCAL_TMP_DIR"
 
     local local_zip="$LOCAL_TMP_DIR/$filename"
@@ -441,6 +522,8 @@ fetch_recent_crashes
 
 if [ -n "$OUT_DIR" ]; then
     filter_crashes_for_out_dir "$OUT_DIR"
+else
+    filter_matter_crashes
 fi
 
 select_crash_log
