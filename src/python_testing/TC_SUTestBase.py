@@ -515,7 +515,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
                 break
             except (TimeoutError, ChipStackError):
                 log.info(
-                    f'{extra_message} - Waiting for DUT to come back online (attempt {attempt + 1}/{reboot_timeout_sec // poll_interval_sec})...')
+                    "%s - Waiting for DUT to come back online (attempt %d / %d)...", extra_message, attempt + 1, reboot_timeout_sec // poll_interval_sec)
 
         asserts.assert_true(
             reconnected, f'{extra_message}: DUT did not come back online within {reboot_timeout_sec}s after OTA reboot.')
