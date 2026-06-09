@@ -320,7 +320,7 @@ CHIP_ERROR NFCDataRetrievalInfo::SynchronizeNetworkCredentials()
 {
     constexpr size_t kMaxBufferSize = 512;
 
-    uint8_t buffer[kMaxBufferSize];
+    uint8_t buffer[kMaxBufferSize] = {0};
     char password[DeviceLayer::Internal::kMaxWiFiKeyLength] = { 0 };
     size_t ssid_len                                         = sizeof(this->op_data_set);
     size_t password_len                                     = sizeof(password);
