@@ -113,7 +113,7 @@
 #if CHIP_CONFIG_SYNCHRONOUS_REPORTS_ENABLED
 #include <app/reporting/SynchronizedReportSchedulerImpl.h>
 #endif
- 
+
 #if CONFIG_CHIP_CRYPTO_PSA && CONFIG_APP_FREERTOS_OS
 #include <crypto/PSAOperationalKeystore.h>
 #endif

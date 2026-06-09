@@ -127,7 +127,7 @@ CHIP_ERROR FactoryDataProviderImpl::Init(void)
     err = SearchForId(FactoryDataId::kEl2GoBlob, NULL, 0, blobAreaSize, &blobAreaAddr);
     VerifyOrExit(err == CHIP_NO_ERROR,
     {
-        ChipLogError(DeviceLayer, "Init: SearchForId failed: %" CHIP_ERROR_FORMAT, 
+        ChipLogError(DeviceLayer, "Init: SearchForId failed: %" CHIP_ERROR_FORMAT,
                     err.Format());
     });
 

@@ -72,7 +72,7 @@ CHIP_ERROR NXP::App::AppFactoryData_PostMatterStackInit(void)
     err = FactoryDataPrvdImpl().SetEncryptionMode(FactoryDataProvider::encrypt_ecb);
     VerifyOrExit(err == CHIP_NO_ERROR,
     {
-        ChipLogError(DeviceLayer, "AppFactoryData_PostMatterStackInit: SetEncryptionMode failed: %" CHIP_ERROR_FORMAT, 
+        ChipLogError(DeviceLayer, "AppFactoryData_PostMatterStackInit: SetEncryptionMode failed: %" CHIP_ERROR_FORMAT,
                     err.Format());
     });
 
@@ -80,14 +80,14 @@ CHIP_ERROR NXP::App::AppFactoryData_PostMatterStackInit(void)
     err = FactoryDataPrvdImpl().SetAesKey(&aes256TestKey[0], FactoryDataProvider::aes_256);
     VerifyOrExit(err == CHIP_NO_ERROR,
     {
-        ChipLogError(DeviceLayer, "AppFactoryData_PostMatterStackInit: SetAesKey failed: %" CHIP_ERROR_FORMAT, 
+        ChipLogError(DeviceLayer, "AppFactoryData_PostMatterStackInit: SetAesKey failed: %" CHIP_ERROR_FORMAT,
                     err.Format());
     });
 #endif
     err = FactoryDataPrvdImpl().Init();
     VerifyOrExit(err == CHIP_NO_ERROR,
     {
-        ChipLogError(DeviceLayer, "AppFactoryData_PostMatterStackInit: FactoryDataPrvdImpl().Init() failed: %" CHIP_ERROR_FORMAT, 
+        ChipLogError(DeviceLayer, "AppFactoryData_PostMatterStackInit: FactoryDataPrvdImpl().Init() failed: %" CHIP_ERROR_FORMAT,
                     err.Format());
     });
 

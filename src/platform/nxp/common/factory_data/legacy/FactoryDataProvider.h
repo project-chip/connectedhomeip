@@ -152,7 +152,7 @@ public:
     virtual CHIP_ERROR SetCbcInitialVector(const uint8_t * iv, uint16_t ivSize);
 
     virtual void UpdateKeyAttributes(psa_key_attributes_t & attrs) { /* Empty Default implementation - can be overridden by derived classes */  }
- 
+
     virtual CHIP_ERROR FactoryReset() { return CHIP_NO_ERROR; };
 #if CONFIG_CHIP_OTA_FACTORY_DATA_PROCESSOR
     using RestoreMechanism = CHIP_ERROR (*)(void);

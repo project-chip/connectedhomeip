@@ -53,7 +53,7 @@ static constexpr size_t kSpake2pSalt_MaxBase64Len = BASE64_ENCODED_LEN(chip::Cry
 static constexpr size_t kDacKeyBlobSize = PSA_S200_NON_EL2GO_BLOB_EXPORT_SIZE(PSA_KEY_TYPE_ECC_KEY_PAIR(PSA_ECC_FAMILY_SECP_R1), 256);
 #elif defined(CONFIG_CHIP_NXP_PLATFORM_RW61X)
 static constexpr size_t kDacKeyBlobSize = 48;
-#else 
+#else
 #define kDacKeyBlobSize Crypto::kP256_PrivateKey_Length
 #endif
 
@@ -151,7 +151,7 @@ CHIP_ERROR FactoryDataProvider::SignWithDacKey(const ByteSpan & messageToSign, M
                                    digest, sizeof(digest),
                                    ecc_signature, sizeof(ecc_signature),
                                    &signature_length);
-    
+
     VerifyOrExit(status == PSA_SUCCESS, error = CHIP_ERROR_INTERNAL);
 
     /* Generate MutableByteSpan with ECC signature and ECC signature size */
