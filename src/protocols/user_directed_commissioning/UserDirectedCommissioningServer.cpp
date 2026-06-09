@@ -238,15 +238,21 @@ CHIP_ERROR UserDirectedCommissioningServer::EncodeUDCMessage(const System::Packe
 
 CHIP_ERROR IdentificationDeclaration::ReadPayload(uint8_t * udcPayload, size_t payloadBufferSize)
 {
-    size_t i = 0;
-    while (i < std::min<size_t>(sizeof(mInstanceName), payloadBufferSize) && udcPayload[i] != '\0')
+    if (payloadBufferSize < sizeof(mInstanceName))
     {
-        mInstanceName[i] = (char) udcPayload[i];
+        ChipLogError(AppServer, "UDC payload too short for instance name");
+        return CHIP_ERROR_INVALID_MESSAGE_LENGTH;
+    }
+
+    size_t i = 0;
+    while (i < sizeof(mInstanceName) && udcPayload[i] != '\0')
+    {
+        mInstanceName[i] = static_cast<char>(udcPayload[i]);
         i++;
     }
     mInstanceName[i] = '\0';
 
-    if (payloadBufferSize <= sizeof(mInstanceName))
+    if (payloadBufferSize == sizeof(mInstanceName))
     {
         ChipLogProgress(AppServer, "UDC - No TLV information in Identification Declaration");
         return CHIP_NO_ERROR;
