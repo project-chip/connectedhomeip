@@ -24,10 +24,26 @@
 namespace chip {
 namespace app {
 
-void JointFabricDatastore::CopyGroupKeySetWithOwnedSpans(
+namespace {
+/**
+ * Validate that an input is the correct length to be an Epoch Key. Null keys are considered valid.
+ */
+bool EpochKeyFitsStorage(const DataModel::Nullable<ByteSpan> & key)
+{
+    using EpochKeyStorage = Crypto::SensitiveDataBuffer<Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES>;
+    return key.IsNull() || key.Value().size() <= EpochKeyStorage::Capacity();
+}
+} // namespace
+
+CHIP_ERROR JointFabricDatastore::CopyGroupKeySetWithOwnedSpans(
     const Clusters::JointFabricDatastore::Structs::DatastoreGroupKeySetStruct::Type & source,
     Clusters::JointFabricDatastore::Structs::DatastoreGroupKeySetStruct::Type & destination)
 {
+    // Validate before mutating any storage so a non-conformant input leaves existing entries untouched.
+    VerifyOrReturnError(EpochKeyFitsStorage(source.epochKey0) && EpochKeyFitsStorage(source.epochKey1) &&
+                            EpochKeyFitsStorage(source.epochKey2),
+                        CHIP_IM_GLOBAL_STATUS(ConstraintError));
+
     auto & storage = mGroupKeySetStorage[source.groupKeySetID];
 
     destination.groupKeySetID          = source.groupKeySetID;
@@ -40,6 +56,8 @@ void JointFabricDatastore::CopyGroupKeySetWithOwnedSpans(
     CopyNullableValue(source.epochStartTime0, destination.epochStartTime0);
     CopyNullableValue(source.epochStartTime1, destination.epochStartTime1);
     CopyNullableValue(source.epochStartTime2, destination.epochStartTime2);
+
+    return CHIP_NO_ERROR;
 }
 
 void JointFabricDatastore::RemoveGroupKeySetStorage(uint16_t groupKeySetId)
@@ -98,11 +116,11 @@ void JointFabricDatastore::RemoveEndpointFriendlyNameStorage(NodeId nodeId, Endp
     mEndpointFriendlyNameStorage.erase({ nodeId, endpointId });
 }
 
-void JointFabricDatastore::CopyByteSpanWithOwnedStorage(const DataModel::Nullable<ByteSpan> & source,
-                                                        EpochKeyStorage & storage, DataModel::Nullable<ByteSpan> & destination)
+void JointFabricDatastore::CopyByteSpanWithOwnedStorage(const DataModel::Nullable<ByteSpan> & source, EpochKeyStorage & storage,
+                                                        DataModel::Nullable<ByteSpan> & destination)
 {
-    // The self-zeroizing storage has a fixed capacity (epoch key length); a source that does not fit is
-    // not a valid epoch key, so treat it as absent rather than truncating.
+    // Over-length epoch keys are rejected by CopyGroupKeySetWithOwnedSpans before reaching here, so the
+    // SetLength below is expected to succeed; the failure branch remains as a defensive fallback only.
     if (!source.IsNull() && storage.SetLength(source.Value().size()) == CHIP_NO_ERROR)
     {
         memcpy(storage.Bytes(), source.Value().data(), source.Value().size());
@@ -662,13 +680,13 @@ CHIP_ERROR JointFabricDatastore::ContinueRefresh()
                         if (it == mGroupKeySetList.end())
                         {
                             Clusters::JointFabricDatastore::Structs::DatastoreGroupKeySetStruct::Type copiedKeySet;
-                            CopyGroupKeySetWithOwnedSpans(groupKeySet, copiedKeySet);
+                            LogErrorOnFailure(CopyGroupKeySetWithOwnedSpans(groupKeySet, copiedKeySet));
                             mGroupKeySetList.push_back(copiedKeySet);
                         }
                         else
                         {
                             // Update existing entry
-                            CopyGroupKeySetWithOwnedSpans(groupKeySet, *it);
+                            LogErrorOnFailure(CopyGroupKeySetWithOwnedSpans(groupKeySet, *it));
                         }
 
                         ++mRefreshingGroupKeySetIndex;
@@ -989,7 +1007,7 @@ JointFabricDatastore::AddGroupKeySetEntry(
     VerifyOrReturnError(mGroupKeySetList.size() < kMaxGroupKeySet, CHIP_ERROR_NO_MEMORY);
 
     Clusters::JointFabricDatastore::Structs::DatastoreGroupKeySetStruct::Type copiedKeySet;
-    CopyGroupKeySetWithOwnedSpans(groupKeySet, copiedKeySet);
+    ReturnErrorOnFailure(CopyGroupKeySetWithOwnedSpans(groupKeySet, copiedKeySet));
 
     mGroupKeySetList.push_back(copiedKeySet);
 
@@ -1040,7 +1058,7 @@ JointFabricDatastore::UpdateGroupKeySetEntry(
                                     Clusters::JointFabricDatastore::DatastoreGroupKeySecurityPolicyEnum::kUnknownEnumValue,
                                 CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
-            CopyGroupKeySetWithOwnedSpans(groupKeySet, entry);
+            ReturnErrorOnFailure(CopyGroupKeySetWithOwnedSpans(groupKeySet, entry));
 
             return CHIP_NO_ERROR;
         }

@@ -530,8 +530,9 @@ private:
     CHIP_ERROR AddNodeKeySetEntry(GroupId groupId, uint16_t groupKeySetId);
     CHIP_ERROR RemoveNodeKeySetEntry(GroupId groupId, uint16_t groupKeySetId);
 
-    void CopyGroupKeySetWithOwnedSpans(const Clusters::JointFabricDatastore::Structs::DatastoreGroupKeySetStruct::Type & source,
-                                       Clusters::JointFabricDatastore::Structs::DatastoreGroupKeySetStruct::Type & destination);
+    CHIP_ERROR
+    CopyGroupKeySetWithOwnedSpans(const Clusters::JointFabricDatastore::Structs::DatastoreGroupKeySetStruct::Type & source,
+                                  Clusters::JointFabricDatastore::Structs::DatastoreGroupKeySetStruct::Type & destination);
     void RemoveGroupKeySetStorage(uint16_t groupKeySetId);
 
     void SetGroupInformationFriendlyNameWithOwnedStorage(
