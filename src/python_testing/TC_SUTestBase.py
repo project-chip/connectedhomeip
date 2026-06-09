@@ -392,7 +392,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             raise ValueError(
                 f"kvs_path_prefix must be an absolute path starting with /tmp/ or /private/tmp/, but was: {real_kvs_path_prefix}")
         subprocess.run(['rm', '-rf', f'{real_kvs_path_prefix}*'])
-        log.info(f"Removed all KVS files/folders with prefix: {real_kvs_path_prefix}")
+        log.info("Removed all KVS files/folders with prefix: %s", real_kvs_path_prefix)
 
     async def track_download_progress(self, controller: ChipDeviceCtrl.ChipDeviceController, requestor_node_id:  int, max_progress: int = 99):
         """Track the progress of the download using AttributeSubscription.
@@ -457,7 +457,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
 
         while int(current_progress) < max_progress:
             log.info(
-                f"Current OTA Image download progress is {current_progress}% , waiting for reports to reach {current_max_progress}%")
+                "Current OTA Image download progress is %d % , waiting for reports to reach %d %", current_progress, current_max_progress)
 
             # Handle subscribe issues
             if current_progress > current_max_progress:
@@ -493,7 +493,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             if current_max_progress > max_progress:
                 current_max_progress = max_progress
             progress_seen = False
-            log.info(f"Current OTA Image download progress is {current_progress}%")
+            log.info("Current OTA Image download progress is %d %", current_progress)
             download_progress_attr_handler.reset()
 
         # After completing the Download cancel the AttributeReportHandler for Download
@@ -511,7 +511,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
                 await controller.GetConnectedDevice(
                     requestor_node_id, allowPASE=False, timeoutMs=reconnect_timeout_ms)
                 reconnected = True
-                log.info(f'{extra_message} - DUT reconnected after OTA reboot (attempt {attempt + 1}).')
+                log.info("%s - DUT reconnected after OTA reboot (attempt %d).", extra_message, (attempt + 1))
                 break
             except (TimeoutError, ChipStackError):
                 log.info(

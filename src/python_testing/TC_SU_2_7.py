@@ -206,7 +206,7 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
         # Event for Applying
         event_report = state_transition_event_handler.wait_for_event_report(
             self.ota_req.Events.StateTransition, timeout_sec=120)
-        logger.info(f"Event report for Applying {event_report}")
+        logger.info("Event report for Applying %s", event_report)
         self.verify_state_transition_event(event_report, expected_previous_state=self.ota_req.Enums.UpdateStateEnum.kDownloading,
                                            expected_new_state=self.ota_req.Enums.UpdateStateEnum.kApplying, expected_target_version=self.expected_software_version)
         state_transition_event_handler.cancel()
@@ -444,7 +444,7 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
         # Wait for Applying Event
         event_report = state_transition_event_handler.wait_for_event_report(
             self.ota_req.Events.StateTransition, timeout_sec=120)
-        logger.info(f"Event report: {event_report}")
+        logger.info("Event report: %s", event_report)
         asserts.assert_equal(event_report.newState, self.ota_req.Enums.UpdateStateEnum.kApplying)
 
         # Verification of the testStep DelayedOnApply

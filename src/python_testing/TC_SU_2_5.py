@@ -424,7 +424,7 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
             lambda report: report.value == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDelayedOnApply)
         update_state_attr_handler.await_all_expected_report_matches(
             [update_state_match], timeout_sec=self.applying_timeout)
-        logger.info(f"Waiting the time of DelayedApplyAction of {delayed_apply_action_time} seconds.")
+        logger.info("Waiting the time of DelayedApplyAction of %d seconds.", delayed_apply_action_time)
         # Device should stay in ApplyingState and not apply the update during the 180 seconds. Only after this timeframe.
         software_version_match = AttributeMatcher.from_callable(
             f"Sofware Version should be: {current_sw_version}",
