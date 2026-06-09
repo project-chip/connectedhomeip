@@ -15,12 +15,6 @@
  *    limitations under the License.
  */
 
-/**
- * @file
- *   Application-facing server API for the Smoke CO Alarm cluster.
- *
- */
-
 #pragma once
 
 #include <app/clusters/smoke-co-alarm-server/SmokeCoAlarmCluster.h>
@@ -44,34 +38,35 @@ public:
     SmokeCoAlarmServer() = default;
     ~SmokeCoAlarmServer();
 
-    static SmokeCoAlarmServer & Instance() { return sInstance; }
+    static SmokeCoAlarmServer & Instance()
+    {
+        static SmokeCoAlarmServer sInstance;
+        return sInstance;
+    }
 
     void SetInoperativeWhenUnmounted(bool v);
-    CHIP_ERROR Init(EndpointId endpointId, const SmokeCoAlarm::SmokeCoAlarmCluster::Config & config,
-                    SmokeCoAlarm::SmokeCoAlarmDelegate * delegate = nullptr);
-    SmokeCoAlarm::SmokeCoAlarmCluster & Cluster();
+    CHIP_ERROR Init(EndpointId endpointId, const SmokeCoAlarmCluster::Config & config, SmokeCoAlarmDelegate * delegate = nullptr);
+    SmokeCoAlarmCluster & Cluster();
 
-    static constexpr size_t kPriorityOrderLength = SmokeCoAlarm::SmokeCoAlarmCluster::kPriorityOrderLength;
+    static constexpr size_t kPriorityOrderLength = SmokeCoAlarmCluster::kPriorityOrderLength;
 
     bool RequestSelfTest(EndpointId endpoint);
-    void HandleRemoteSelfTestRequest(EndpointId endpoint, chip::app::CommandHandler * commandObj,
-                                     const chip::app::ConcreteCommandPath & commandPath);
 
     // Endpoint-taking overloads for backwards compatibility with old call sites.
-    // The endpoint param is ignored; Instance() already owns a specific endpoint.
+    // Returns false (or no-ops for void) if endpoint does not match the one passed to Init().
     void SetExpressedStateByPriority(EndpointId, const std::array<SmokeCoAlarm::ExpressedStateEnum, kPriorityOrderLength> & o);
     bool SetSmokeState(EndpointId, SmokeCoAlarm::AlarmStateEnum v);
     bool SetCOState(EndpointId, SmokeCoAlarm::AlarmStateEnum v);
-    bool SetBatteryAlert(EndpointId, SmokeCoAlarm::AlarmStateEnum v);
+    void SetBatteryAlert(EndpointId, SmokeCoAlarm::AlarmStateEnum v);
     bool SetDeviceMuted(EndpointId, SmokeCoAlarm::MuteStateEnum v);
-    bool SetTestInProgress(EndpointId, bool v);
-    bool SetHardwareFaultAlert(EndpointId, bool v);
-    bool SetEndOfServiceAlert(EndpointId, SmokeCoAlarm::EndOfServiceEnum v);
+    void SetTestInProgress(EndpointId, bool v);
+    void SetHardwareFaultAlert(EndpointId, bool v);
+    void SetEndOfServiceAlert(EndpointId, SmokeCoAlarm::EndOfServiceEnum v);
     bool SetInterconnectSmokeAlarm(EndpointId, SmokeCoAlarm::AlarmStateEnum v);
     bool SetInterconnectCOAlarm(EndpointId, SmokeCoAlarm::AlarmStateEnum v);
-    bool SetContaminationState(EndpointId, SmokeCoAlarm::ContaminationStateEnum v);
-    bool SetSmokeSensitivityLevel(EndpointId, SmokeCoAlarm::SensitivityEnum v);
-    bool SetExpiryDate(EndpointId, uint32_t v);
+    void SetContaminationState(EndpointId, SmokeCoAlarm::ContaminationStateEnum v);
+    void SetSmokeSensitivityLevel(EndpointId, SmokeCoAlarm::SensitivityEnum v);
+    void SetExpiryDate(EndpointId, uint32_t v);
     bool SetUnmountedState(EndpointId, bool v);
 
     chip::BitFlags<SmokeCoAlarm::Feature> GetFeatures() const;
@@ -79,7 +74,7 @@ public:
     bool SupportsCOAlarm() const;
 
     // Endpoint-taking Get overloads for backwards compatibility with old call sites.
-    // The endpoint param is ignored; Instance() already owns a specific endpoint.
+    // Returns false if endpoint does not match the one passed to Init().
     bool GetExpressedState(EndpointId, SmokeCoAlarm::ExpressedStateEnum & v) const;
     bool GetSmokeState(EndpointId, SmokeCoAlarm::AlarmStateEnum & v) const;
     bool GetCOState(EndpointId, SmokeCoAlarm::AlarmStateEnum & v) const;
@@ -100,10 +95,8 @@ public:
 
 private:
     EndpointId mEndpointId;
-    SmokeCoAlarm::SmokeCoAlarmCluster::Config mConfig;
-    LazyRegisteredServerCluster<SmokeCoAlarm::SmokeCoAlarmCluster> mCluster;
-
-    static SmokeCoAlarmServer sInstance;
+    SmokeCoAlarmCluster::Config mConfig;
+    LazyRegisteredServerCluster<SmokeCoAlarmCluster> mCluster;
 };
 
 } // namespace Clusters

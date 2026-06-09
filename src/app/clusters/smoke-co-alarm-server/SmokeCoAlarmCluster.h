@@ -28,10 +28,11 @@
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/OptionalAttributeSet.h>
 
+using namespace chip::app::Clusters::SmokeCoAlarm;
+
 namespace chip {
 namespace app {
 namespace Clusters {
-namespace SmokeCoAlarm {
 
 class SmokeCoAlarmDelegate;
 
@@ -77,21 +78,22 @@ public:
     bool RequestSelfTest();
 
     /**
-     * For all the functions below, the return value is true on success, false on failure
+     * For the bool-returning setters below, false means the operation is not supported
+     * (feature disabled or optional attribute absent). void-returning setters always succeed.
      */
 
     bool SetSmokeState(AlarmStateEnum newSmokeState);
     bool SetCOState(AlarmStateEnum newCOState);
-    bool SetBatteryAlert(AlarmStateEnum newBatteryAlert);
+    void SetBatteryAlert(AlarmStateEnum newBatteryAlert);
     bool SetDeviceMuted(MuteStateEnum newDeviceMuted);
-    bool SetTestInProgress(bool newTestInProgress);
-    bool SetHardwareFaultAlert(bool newHardwareFaultAlert);
-    bool SetEndOfServiceAlert(EndOfServiceEnum newEndOfServiceAlert);
+    void SetTestInProgress(bool newTestInProgress);
+    void SetHardwareFaultAlert(bool newHardwareFaultAlert);
+    void SetEndOfServiceAlert(EndOfServiceEnum newEndOfServiceAlert);
     bool SetInterconnectSmokeAlarm(AlarmStateEnum newInterconnectSmokeAlarm);
     bool SetInterconnectCOAlarm(AlarmStateEnum newInterconnectCOAlarm);
-    bool SetContaminationState(ContaminationStateEnum newContaminationState);
-    bool SetSmokeSensitivityLevel(SensitivityEnum newSmokeSensitivityLevel);
-    bool SetExpiryDate(uint32_t newExpiryDate);
+    void SetContaminationState(ContaminationStateEnum newContaminationState);
+    void SetSmokeSensitivityLevel(SensitivityEnum newSmokeSensitivityLevel);
+    void SetExpiryDate(uint32_t newExpiryDate);
     /**
      * @brief Sets Unmounted attribute and updates ExpressedState accordingly.
      * @param isUnmounted new unmounted state
@@ -102,20 +104,20 @@ public:
     void SetInoperativeWhenUnmounted(bool v) { mInoperativeWhenUnmounted = v; }
     void SetDelegate(SmokeCoAlarmDelegate * delegate) { mDelegate = delegate; }
 
-    bool GetExpressedState(ExpressedStateEnum & expressedState) const;
-    bool GetSmokeState(AlarmStateEnum & smokeState) const;
-    bool GetCOState(AlarmStateEnum & coState) const;
-    bool GetBatteryAlert(AlarmStateEnum & batteryAlert) const;
-    bool GetDeviceMuted(MuteStateEnum & deviceMuted) const;
-    bool GetTestInProgress(bool & testInProgress) const;
-    bool GetHardwareFaultAlert(bool & hardwareFaultAlert) const;
-    bool GetEndOfServiceAlert(EndOfServiceEnum & endOfServiceAlert) const;
-    bool GetInterconnectSmokeAlarm(AlarmStateEnum & interconnectSmokeAlarm) const;
-    bool GetInterconnectCOAlarm(AlarmStateEnum & interconnectCOAlarm) const;
-    bool GetContaminationState(ContaminationStateEnum & contaminationState) const;
-    bool GetSmokeSensitivityLevel(SensitivityEnum & smokeSensitivityLevel) const;
-    bool GetExpiryDate(uint32_t & expiryDate) const;
-    bool GetUnmountedState(bool & unmountedState) const;
+    ExpressedStateEnum GetExpressedState() const { return mExpressedState; }
+    AlarmStateEnum GetSmokeState() const { return mSmokeState; }
+    AlarmStateEnum GetCOState() const { return mCOState; }
+    AlarmStateEnum GetBatteryAlert() const { return mBatteryAlert; }
+    MuteStateEnum GetDeviceMuted() const { return mDeviceMuted; }
+    bool GetTestInProgress() const { return mTestInProgress; }
+    bool GetHardwareFaultAlert() const { return mHardwareFaultAlert; }
+    EndOfServiceEnum GetEndOfServiceAlert() const { return mEndOfServiceAlert; }
+    AlarmStateEnum GetInterconnectSmokeAlarm() const { return mInterconnectSmokeAlarm; }
+    AlarmStateEnum GetInterconnectCOAlarm() const { return mInterconnectCOAlarm; }
+    ContaminationStateEnum GetContaminationState() const { return mContaminationState; }
+    SensitivityEnum GetSmokeSensitivityLevel() const { return mSmokeSensitivityLevel; }
+    uint32_t GetExpiryDate() const { return mExpiryDate; }
+    bool GetUnmountedState() const { return mUnmounted; }
 
     chip::BitFlags<Feature> GetFeatures() const { return mConfig.featureMap; }
     bool SupportsSmokeAlarm() const { return mConfig.featureMap.Has(Feature::kSmokeAlarm); }
@@ -130,13 +132,11 @@ public:
     std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
                                                                chip::TLV::TLVReader & input_arguments,
                                                                CommandHandler * handler) override;
-    CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
-        override; /**
-                   * @brief Common handler for the SelfTestRequest command
-                   */
-    void HandleRemoteSelfTestRequest(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath);
+    CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,
+                                ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
 
 private:
+    Protocols::InteractionModel::Status HandleRemoteSelfTestRequest();
     /**
      * @brief Updates the expressed state with new value
      *
@@ -144,14 +144,6 @@ private:
      *       value should not be Normal.
      */
     void SetExpressedState(ExpressedStateEnum newExpressedState);
-
-    /**
-     * @brief Send generic event
-     *
-     * @tparam T  Any event type supported by Matter
-     */
-    template <typename T>
-    void SendEvent(T & event);
 
     const Config mConfig;
     bool mInoperativeWhenUnmounted   = false;
@@ -193,13 +185,8 @@ public:
      *        is invoked.
      */
     virtual void OnSelfTestRequested() = 0;
-
-protected:
-    friend class SmokeCoAlarmCluster;
-    SmokeCoAlarmCluster * mCluster = nullptr;
 };
 
-} // namespace SmokeCoAlarm
 } // namespace Clusters
 } // namespace app
 } // namespace chip

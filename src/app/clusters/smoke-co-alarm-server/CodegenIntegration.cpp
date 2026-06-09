@@ -17,15 +17,11 @@
  */
 
 #include "CodegenIntegration.h"
-#include <app-common/zap-generated/cluster-objects.h>
+#include <clusters/SmokeCoAlarm/Attributes.h>
 #include <lib/support/CodeUtils.h>
 
-using namespace chip;
-using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::SmokeCoAlarm;
-
-SmokeCoAlarmServer SmokeCoAlarmServer::sInstance;
 
 SmokeCoAlarmServer::~SmokeCoAlarmServer()
 {
@@ -67,70 +63,98 @@ SmokeCoAlarmCluster & SmokeCoAlarmServer::Cluster()
 bool SmokeCoAlarmServer::RequestSelfTest(EndpointId endpoint)
 {
     VerifyOrDie(mCluster.IsConstructed());
+    if (endpoint != mEndpointId)
+    {
+        ChipLogError(Zcl, "RequestSelfTest called with endpoint %d but cluster is on endpoint %d", endpoint, mEndpointId);
+        return false;
+    }
     return mCluster.Cluster().RequestSelfTest();
 }
 
-void SmokeCoAlarmServer::HandleRemoteSelfTestRequest(EndpointId, CommandHandler * commandObj,
-                                                     const ConcreteCommandPath & commandPath)
+void SmokeCoAlarmServer::SetExpressedStateByPriority(EndpointId endpoint,
+                                                     const std::array<ExpressedStateEnum, kPriorityOrderLength> & o)
 {
-    Cluster().HandleRemoteSelfTestRequest(commandObj, commandPath);
-}
-
-void SmokeCoAlarmServer::SetExpressedStateByPriority(EndpointId, const std::array<ExpressedStateEnum, kPriorityOrderLength> & o)
-{
+    VerifyOrReturn(endpoint == mEndpointId,
+                   ChipLogError(Zcl, "%s: endpoint %d does not match cluster endpoint %d", __func__, endpoint, mEndpointId));
     Cluster().SetExpressedStateByPriority(o);
 }
 
-bool SmokeCoAlarmServer::SetSmokeState(EndpointId, AlarmStateEnum v)
+bool SmokeCoAlarmServer::SetSmokeState(EndpointId endpoint, AlarmStateEnum v)
 {
+    VerifyOrReturnValue(endpoint == mEndpointId, false,
+                        ChipLogError(Zcl, "%s: endpoint %d does not match cluster endpoint %d", __func__, endpoint, mEndpointId));
     return Cluster().SetSmokeState(v);
 }
-bool SmokeCoAlarmServer::SetCOState(EndpointId, AlarmStateEnum v)
+bool SmokeCoAlarmServer::SetCOState(EndpointId endpoint, AlarmStateEnum v)
 {
+    VerifyOrReturnValue(endpoint == mEndpointId, false,
+                        ChipLogError(Zcl, "%s: endpoint %d does not match cluster endpoint %d", __func__, endpoint, mEndpointId));
     return Cluster().SetCOState(v);
 }
-bool SmokeCoAlarmServer::SetBatteryAlert(EndpointId, AlarmStateEnum v)
+void SmokeCoAlarmServer::SetBatteryAlert(EndpointId endpoint, AlarmStateEnum v)
 {
-    return Cluster().SetBatteryAlert(v);
+    VerifyOrReturn(endpoint == mEndpointId,
+                   ChipLogError(Zcl, "%s: endpoint %d does not match cluster endpoint %d", __func__, endpoint, mEndpointId));
+    Cluster().SetBatteryAlert(v);
 }
-bool SmokeCoAlarmServer::SetDeviceMuted(EndpointId, MuteStateEnum v)
+bool SmokeCoAlarmServer::SetDeviceMuted(EndpointId endpoint, MuteStateEnum v)
 {
+    VerifyOrReturnValue(endpoint == mEndpointId, false,
+                        ChipLogError(Zcl, "%s: endpoint %d does not match cluster endpoint %d", __func__, endpoint, mEndpointId));
     return Cluster().SetDeviceMuted(v);
 }
-bool SmokeCoAlarmServer::SetTestInProgress(EndpointId, bool v)
+void SmokeCoAlarmServer::SetTestInProgress(EndpointId endpoint, bool v)
 {
-    return Cluster().SetTestInProgress(v);
+    VerifyOrReturn(endpoint == mEndpointId,
+                   ChipLogError(Zcl, "%s: endpoint %d does not match cluster endpoint %d", __func__, endpoint, mEndpointId));
+    Cluster().SetTestInProgress(v);
 }
-bool SmokeCoAlarmServer::SetHardwareFaultAlert(EndpointId, bool v)
+void SmokeCoAlarmServer::SetHardwareFaultAlert(EndpointId endpoint, bool v)
 {
-    return Cluster().SetHardwareFaultAlert(v);
+    VerifyOrReturn(endpoint == mEndpointId,
+                   ChipLogError(Zcl, "%s: endpoint %d does not match cluster endpoint %d", __func__, endpoint, mEndpointId));
+    Cluster().SetHardwareFaultAlert(v);
 }
-bool SmokeCoAlarmServer::SetEndOfServiceAlert(EndpointId, EndOfServiceEnum v)
+void SmokeCoAlarmServer::SetEndOfServiceAlert(EndpointId endpoint, EndOfServiceEnum v)
 {
-    return Cluster().SetEndOfServiceAlert(v);
+    VerifyOrReturn(endpoint == mEndpointId,
+                   ChipLogError(Zcl, "%s: endpoint %d does not match cluster endpoint %d", __func__, endpoint, mEndpointId));
+    Cluster().SetEndOfServiceAlert(v);
 }
-bool SmokeCoAlarmServer::SetInterconnectSmokeAlarm(EndpointId, AlarmStateEnum v)
+bool SmokeCoAlarmServer::SetInterconnectSmokeAlarm(EndpointId endpoint, AlarmStateEnum v)
 {
+    VerifyOrReturnValue(endpoint == mEndpointId, false,
+                        ChipLogError(Zcl, "%s: endpoint %d does not match cluster endpoint %d", __func__, endpoint, mEndpointId));
     return Cluster().SetInterconnectSmokeAlarm(v);
 }
-bool SmokeCoAlarmServer::SetInterconnectCOAlarm(EndpointId, AlarmStateEnum v)
+bool SmokeCoAlarmServer::SetInterconnectCOAlarm(EndpointId endpoint, AlarmStateEnum v)
 {
+    VerifyOrReturnValue(endpoint == mEndpointId, false,
+                        ChipLogError(Zcl, "%s: endpoint %d does not match cluster endpoint %d", __func__, endpoint, mEndpointId));
     return Cluster().SetInterconnectCOAlarm(v);
 }
-bool SmokeCoAlarmServer::SetContaminationState(EndpointId, ContaminationStateEnum v)
+void SmokeCoAlarmServer::SetContaminationState(EndpointId endpoint, ContaminationStateEnum v)
 {
-    return Cluster().SetContaminationState(v);
+    VerifyOrReturn(endpoint == mEndpointId,
+                   ChipLogError(Zcl, "%s: endpoint %d does not match cluster endpoint %d", __func__, endpoint, mEndpointId));
+    Cluster().SetContaminationState(v);
 }
-bool SmokeCoAlarmServer::SetSmokeSensitivityLevel(EndpointId, SensitivityEnum v)
+void SmokeCoAlarmServer::SetSmokeSensitivityLevel(EndpointId endpoint, SensitivityEnum v)
 {
-    return Cluster().SetSmokeSensitivityLevel(v);
+    VerifyOrReturn(endpoint == mEndpointId,
+                   ChipLogError(Zcl, "%s: endpoint %d does not match cluster endpoint %d", __func__, endpoint, mEndpointId));
+    Cluster().SetSmokeSensitivityLevel(v);
 }
-bool SmokeCoAlarmServer::SetExpiryDate(EndpointId, uint32_t v)
+void SmokeCoAlarmServer::SetExpiryDate(EndpointId endpoint, uint32_t v)
 {
-    return Cluster().SetExpiryDate(v);
+    VerifyOrReturn(endpoint == mEndpointId,
+                   ChipLogError(Zcl, "%s: endpoint %d does not match cluster endpoint %d", __func__, endpoint, mEndpointId));
+    Cluster().SetExpiryDate(v);
 }
-bool SmokeCoAlarmServer::SetUnmountedState(EndpointId, bool v)
+bool SmokeCoAlarmServer::SetUnmountedState(EndpointId endpoint, bool v)
 {
+    VerifyOrReturnValue(endpoint == mEndpointId, false,
+                        ChipLogError(Zcl, "%s: endpoint %d does not match cluster endpoint %d", __func__, endpoint, mEndpointId));
     return Cluster().SetUnmountedState(v);
 }
 
@@ -152,110 +176,130 @@ bool SmokeCoAlarmServer::SupportsCOAlarm() const
     return mCluster.Cluster().SupportsCOAlarm();
 }
 
-bool SmokeCoAlarmServer::GetExpressedState(EndpointId, ExpressedStateEnum & v) const
+bool SmokeCoAlarmServer::GetExpressedState(EndpointId endpoint, ExpressedStateEnum & v) const
 {
+    VerifyOrReturnValue(endpoint == mEndpointId, false);
     VerifyOrDie(mCluster.IsConstructed());
-    return mCluster.Cluster().GetExpressedState(v);
-}
-
-bool SmokeCoAlarmServer::GetSmokeState(EndpointId, AlarmStateEnum & v) const
-{
-    VerifyOrDie(mCluster.IsConstructed());
-    return mCluster.Cluster().GetSmokeState(v);
-}
-
-bool SmokeCoAlarmServer::GetCOState(EndpointId, AlarmStateEnum & v) const
-{
-    VerifyOrDie(mCluster.IsConstructed());
-    return mCluster.Cluster().GetCOState(v);
-}
-
-bool SmokeCoAlarmServer::GetBatteryAlert(EndpointId, AlarmStateEnum & v) const
-{
-    VerifyOrDie(mCluster.IsConstructed());
-    return mCluster.Cluster().GetBatteryAlert(v);
-}
-
-bool SmokeCoAlarmServer::GetDeviceMuted(EndpointId, MuteStateEnum & v) const
-{
-    VerifyOrDie(mCluster.IsConstructed());
-    return mCluster.Cluster().GetDeviceMuted(v);
-}
-
-bool SmokeCoAlarmServer::GetTestInProgress(EndpointId, bool & v) const
-{
-    VerifyOrDie(mCluster.IsConstructed());
-    return mCluster.Cluster().GetTestInProgress(v);
-}
-
-bool SmokeCoAlarmServer::GetHardwareFaultAlert(EndpointId, bool & v) const
-{
-    VerifyOrDie(mCluster.IsConstructed());
-    return mCluster.Cluster().GetHardwareFaultAlert(v);
-}
-
-bool SmokeCoAlarmServer::GetEndOfServiceAlert(EndpointId, EndOfServiceEnum & v) const
-{
-    VerifyOrDie(mCluster.IsConstructed());
-    return mCluster.Cluster().GetEndOfServiceAlert(v);
-}
-
-bool SmokeCoAlarmServer::GetInterconnectSmokeAlarm(EndpointId, AlarmStateEnum & v) const
-{
-    VerifyOrDie(mCluster.IsConstructed());
-    return mCluster.Cluster().GetInterconnectSmokeAlarm(v);
-}
-
-bool SmokeCoAlarmServer::GetInterconnectCOAlarm(EndpointId, AlarmStateEnum & v) const
-{
-    VerifyOrDie(mCluster.IsConstructed());
-    return mCluster.Cluster().GetInterconnectCOAlarm(v);
-}
-
-bool SmokeCoAlarmServer::GetContaminationState(EndpointId, ContaminationStateEnum & v) const
-{
-    VerifyOrDie(mCluster.IsConstructed());
-    return mCluster.Cluster().GetContaminationState(v);
-}
-
-bool SmokeCoAlarmServer::GetSmokeSensitivityLevel(EndpointId, SensitivityEnum & v) const
-{
-    VerifyOrDie(mCluster.IsConstructed());
-    return mCluster.Cluster().GetSmokeSensitivityLevel(v);
-}
-
-bool SmokeCoAlarmServer::GetExpiryDate(EndpointId, uint32_t & v) const
-{
-    VerifyOrDie(mCluster.IsConstructed());
-    return mCluster.Cluster().GetExpiryDate(v);
-}
-
-bool SmokeCoAlarmServer::GetUnmountedState(EndpointId, bool & v) const
-{
-    VerifyOrDie(mCluster.IsConstructed());
-    return mCluster.Cluster().GetUnmountedState(v);
-}
-
-chip::BitFlags<Feature> SmokeCoAlarmServer::GetFeatures(EndpointId) const
-{
-    return GetFeatures();
-}
-bool SmokeCoAlarmServer::SupportsSmokeAlarm(EndpointId) const
-{
-    return SupportsSmokeAlarm();
-}
-bool SmokeCoAlarmServer::SupportsCOAlarm(EndpointId) const
-{
-    return SupportsCOAlarm();
-}
-
-bool __attribute__((weak))
-emberAfSmokeCoAlarmClusterSelfTestRequestCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-                                                  const SmokeCoAlarm::Commands::SelfTestRequest::DecodableType & commandData)
-{
-    SmokeCoAlarmServer::Instance().Cluster().HandleRemoteSelfTestRequest(commandObj, commandPath);
+    v = mCluster.Cluster().GetExpressedState();
     return true;
 }
 
-void __attribute__((weak)) MatterSmokeCoAlarmPluginServerInitCallback() {}
-void __attribute__((weak)) MatterSmokeCoAlarmPluginServerShutdownCallback() {}
+bool SmokeCoAlarmServer::GetSmokeState(EndpointId endpoint, AlarmStateEnum & v) const
+{
+    VerifyOrReturnValue(endpoint == mEndpointId, false);
+    VerifyOrDie(mCluster.IsConstructed());
+    v = mCluster.Cluster().GetSmokeState();
+    return true;
+}
+
+bool SmokeCoAlarmServer::GetCOState(EndpointId endpoint, AlarmStateEnum & v) const
+{
+    VerifyOrReturnValue(endpoint == mEndpointId, false);
+    VerifyOrDie(mCluster.IsConstructed());
+    v = mCluster.Cluster().GetCOState();
+    return true;
+}
+
+bool SmokeCoAlarmServer::GetBatteryAlert(EndpointId endpoint, AlarmStateEnum & v) const
+{
+    VerifyOrReturnValue(endpoint == mEndpointId, false);
+    VerifyOrDie(mCluster.IsConstructed());
+    v = mCluster.Cluster().GetBatteryAlert();
+    return true;
+}
+
+bool SmokeCoAlarmServer::GetDeviceMuted(EndpointId endpoint, MuteStateEnum & v) const
+{
+    VerifyOrReturnValue(endpoint == mEndpointId, false);
+    VerifyOrDie(mCluster.IsConstructed());
+    v = mCluster.Cluster().GetDeviceMuted();
+    return true;
+}
+
+bool SmokeCoAlarmServer::GetTestInProgress(EndpointId endpoint, bool & v) const
+{
+    VerifyOrReturnValue(endpoint == mEndpointId, false);
+    VerifyOrDie(mCluster.IsConstructed());
+    v = mCluster.Cluster().GetTestInProgress();
+    return true;
+}
+
+bool SmokeCoAlarmServer::GetHardwareFaultAlert(EndpointId endpoint, bool & v) const
+{
+    VerifyOrReturnValue(endpoint == mEndpointId, false);
+    VerifyOrDie(mCluster.IsConstructed());
+    v = mCluster.Cluster().GetHardwareFaultAlert();
+    return true;
+}
+
+bool SmokeCoAlarmServer::GetEndOfServiceAlert(EndpointId endpoint, EndOfServiceEnum & v) const
+{
+    VerifyOrReturnValue(endpoint == mEndpointId, false);
+    VerifyOrDie(mCluster.IsConstructed());
+    v = mCluster.Cluster().GetEndOfServiceAlert();
+    return true;
+}
+
+bool SmokeCoAlarmServer::GetInterconnectSmokeAlarm(EndpointId endpoint, AlarmStateEnum & v) const
+{
+    VerifyOrReturnValue(endpoint == mEndpointId, false);
+    VerifyOrDie(mCluster.IsConstructed());
+    v = mCluster.Cluster().GetInterconnectSmokeAlarm();
+    return true;
+}
+
+bool SmokeCoAlarmServer::GetInterconnectCOAlarm(EndpointId endpoint, AlarmStateEnum & v) const
+{
+    VerifyOrReturnValue(endpoint == mEndpointId, false);
+    VerifyOrDie(mCluster.IsConstructed());
+    v = mCluster.Cluster().GetInterconnectCOAlarm();
+    return true;
+}
+
+bool SmokeCoAlarmServer::GetContaminationState(EndpointId endpoint, ContaminationStateEnum & v) const
+{
+    VerifyOrReturnValue(endpoint == mEndpointId, false);
+    VerifyOrDie(mCluster.IsConstructed());
+    v = mCluster.Cluster().GetContaminationState();
+    return true;
+}
+
+bool SmokeCoAlarmServer::GetSmokeSensitivityLevel(EndpointId endpoint, SensitivityEnum & v) const
+{
+    VerifyOrReturnValue(endpoint == mEndpointId, false);
+    VerifyOrDie(mCluster.IsConstructed());
+    v = mCluster.Cluster().GetSmokeSensitivityLevel();
+    return true;
+}
+
+bool SmokeCoAlarmServer::GetExpiryDate(EndpointId endpoint, uint32_t & v) const
+{
+    VerifyOrReturnValue(endpoint == mEndpointId, false);
+    VerifyOrDie(mCluster.IsConstructed());
+    v = mCluster.Cluster().GetExpiryDate();
+    return true;
+}
+
+bool SmokeCoAlarmServer::GetUnmountedState(EndpointId endpoint, bool & v) const
+{
+    VerifyOrReturnValue(endpoint == mEndpointId, false);
+    VerifyOrDie(mCluster.IsConstructed());
+    v = mCluster.Cluster().GetUnmountedState();
+    return true;
+}
+
+chip::BitFlags<Feature> SmokeCoAlarmServer::GetFeatures(EndpointId endpoint) const
+{
+    VerifyOrDie(endpoint == mEndpointId);
+    return GetFeatures();
+}
+bool SmokeCoAlarmServer::SupportsSmokeAlarm(EndpointId endpoint) const
+{
+    VerifyOrDie(endpoint == mEndpointId);
+    return SupportsSmokeAlarm();
+}
+bool SmokeCoAlarmServer::SupportsCOAlarm(EndpointId endpoint) const
+{
+    VerifyOrDie(endpoint == mEndpointId);
+    return SupportsCOAlarm();
+}

@@ -226,7 +226,7 @@ bool SmokeCoAlarmCluster::SetInterconnectCOAlarm(AlarmStateEnum newInterconnectC
 
 void SmokeCoAlarmCluster::SetContaminationState(ContaminationStateEnum newContaminationState)
 {
-    VerifyOrReturnValue(SupportsSmokeAlarm(), false);
+    VerifyOrReturn(SupportsSmokeAlarm());
     SetAttributeValue(mContaminationState, newContaminationState, ContaminationState::Id);
 }
 
@@ -242,10 +242,10 @@ void SmokeCoAlarmCluster::SetExpiryDate(uint32_t newExpiryDate)
     SetAttributeValue(mExpiryDate, newExpiryDate, ExpiryDate::Id);
 }
 
-bool SmokeCoAlarmCluster::SetExpiryDate(uint32_t newExpiryDate)
+void SmokeCoAlarmCluster::SetExpiryDate(uint32_t newExpiryDate)
 {
+    VerifyOrReturn(mConfig.optionalAttribs.IsSet(ExpiryDate::Id));
     SetAttributeValue(mExpiryDate, newExpiryDate, ExpiryDate::Id);
-    return true;
 }
 
 bool SmokeCoAlarmCluster::SetUnmountedState(bool isUnmounted)
@@ -393,7 +393,7 @@ DataModel::ActionReturnStatus SmokeCoAlarmCluster::WriteAttribute(const DataMode
 
     SensitivityEnum value;
     ReturnErrorOnFailure(decoder.Decode(value));
-    VerifyOrReturnError(SetSmokeSensitivityLevel(value), Status::Failure);
+    SetSmokeSensitivityLevel(value);
     return Status::Success;
 }
 

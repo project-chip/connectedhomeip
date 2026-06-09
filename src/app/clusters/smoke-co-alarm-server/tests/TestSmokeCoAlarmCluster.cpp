@@ -152,9 +152,7 @@ TEST_F(TestSmokeCoAlarmCluster, SetSmokeState_CriticalAutoUnmutes)
 {
     ASSERT_TRUE(cluster.SetDeviceMuted(MuteStateEnum::kMuted));
     ASSERT_TRUE(cluster.SetSmokeState(AlarmStateEnum::kCritical));
-    MuteStateEnum muted{};
-    ASSERT_TRUE(cluster.GetDeviceMuted(muted));
-    EXPECT_EQ(muted, MuteStateEnum::kNotMuted);
+    EXPECT_EQ(cluster.GetDeviceMuted(), MuteStateEnum::kNotMuted);
 }
 
 TEST_F(TestSmokeCoAlarmCluster, SetDeviceMuted_BlockedByCriticalAlarms)
@@ -168,8 +166,14 @@ TEST_F(TestSmokeCoAlarmCluster, SetDeviceMuted_BlockedByCriticalAlarms)
           [](SmokeCoAlarmCluster & c, AlarmStateEnum v) { return c.SetSmokeState(v); } },
         { [](SmokeCoAlarmCluster & c, AlarmStateEnum v) { return c.SetCOState(v); },
           [](SmokeCoAlarmCluster & c, AlarmStateEnum v) { return c.SetCOState(v); } },
-        { [](SmokeCoAlarmCluster & c, AlarmStateEnum v) { return c.SetBatteryAlert(v); },
-          [](SmokeCoAlarmCluster & c, AlarmStateEnum v) { return c.SetBatteryAlert(v); } },
+        { [](SmokeCoAlarmCluster & c, AlarmStateEnum v) {
+             c.SetBatteryAlert(v);
+             return true;
+         },
+          [](SmokeCoAlarmCluster & c, AlarmStateEnum v) {
+              c.SetBatteryAlert(v);
+              return true;
+          } },
         { [](SmokeCoAlarmCluster & c, AlarmStateEnum v) { return c.SetInterconnectSmokeAlarm(v); },
           [](SmokeCoAlarmCluster & c, AlarmStateEnum v) { return c.SetInterconnectSmokeAlarm(v); } },
         { [](SmokeCoAlarmCluster & c, AlarmStateEnum v) { return c.SetInterconnectCOAlarm(v); },
@@ -187,17 +191,13 @@ TEST_F(TestSmokeCoAlarmCluster, SetDeviceMuted_AllowedWhenWarning)
 {
     ASSERT_TRUE(cluster.SetSmokeState(AlarmStateEnum::kWarning));
     EXPECT_TRUE(cluster.SetDeviceMuted(MuteStateEnum::kMuted));
-    MuteStateEnum muted{};
-    ASSERT_TRUE(cluster.GetDeviceMuted(muted));
-    EXPECT_EQ(muted, MuteStateEnum::kMuted);
+    EXPECT_EQ(cluster.GetDeviceMuted(), MuteStateEnum::kMuted);
 }
 
 TEST_F(TestSmokeCoAlarmCluster, RequestSelfTest_SetsTestingState)
 {
     ASSERT_TRUE(cluster.RequestSelfTest());
-    ExpressedStateEnum expressed{};
-    ASSERT_TRUE(cluster.GetExpressedState(expressed));
-    EXPECT_EQ(expressed, ExpressedStateEnum::kTesting);
+    EXPECT_EQ(cluster.GetExpressedState(), ExpressedStateEnum::kTesting);
     EXPECT_FALSE(cluster.RequestSelfTest()); // blocked while testing
 }
 
@@ -222,9 +222,7 @@ TEST_F(TestSmokeCoAlarmCluster, SetExpressedStateByPriority_PicksFirst)
     ASSERT_TRUE(cluster.SetCOState(AlarmStateEnum::kCritical));
 
     cluster.SetExpressedStateByPriority(kDefaultPriority); // smoke first
-    ExpressedStateEnum expressed{};
-    ASSERT_TRUE(cluster.GetExpressedState(expressed));
-    EXPECT_EQ(expressed, ExpressedStateEnum::kSmokeAlarm);
+    EXPECT_EQ(cluster.GetExpressedState(), ExpressedStateEnum::kSmokeAlarm);
 
     const std::array<ExpressedStateEnum, SmokeCoAlarmCluster::kPriorityOrderLength> coFirst = {
         ExpressedStateEnum::kCOAlarm,           ExpressedStateEnum::kSmokeAlarm,     ExpressedStateEnum::kBatteryAlert,
@@ -232,8 +230,7 @@ TEST_F(TestSmokeCoAlarmCluster, SetExpressedStateByPriority_PicksFirst)
         ExpressedStateEnum::kInterconnectSmoke, ExpressedStateEnum::kInterconnectCO, ExpressedStateEnum::kInoperative,
     };
     cluster.SetExpressedStateByPriority(coFirst);
-    ASSERT_TRUE(cluster.GetExpressedState(expressed));
-    EXPECT_EQ(expressed, ExpressedStateEnum::kCOAlarm);
+    EXPECT_EQ(cluster.GetExpressedState(), ExpressedStateEnum::kCOAlarm);
 }
 
 TEST_F(TestSmokeCoAlarmCluster, SetExpressedStateByPriority_AllClear)
@@ -242,9 +239,7 @@ TEST_F(TestSmokeCoAlarmCluster, SetExpressedStateByPriority_AllClear)
     cluster.SetExpressedStateByPriority(kDefaultPriority);
     ASSERT_TRUE(cluster.SetSmokeState(AlarmStateEnum::kNormal));
     cluster.SetExpressedStateByPriority(kDefaultPriority);
-    ExpressedStateEnum expressed{};
-    ASSERT_TRUE(cluster.GetExpressedState(expressed));
-    EXPECT_EQ(expressed, ExpressedStateEnum::kNormal);
+    EXPECT_EQ(cluster.GetExpressedState(), ExpressedStateEnum::kNormal);
 }
 
 TEST_F(TestSmokeCoAlarmCluster, InvokeCommand_SelfTestRequest)
@@ -253,12 +248,10 @@ TEST_F(TestSmokeCoAlarmCluster, InvokeCommand_SelfTestRequest)
 
     auto ok = tester.Invoke(request);
     EXPECT_TRUE(ok.IsSuccess());
-    ExpressedStateEnum expressed{};
-    ASSERT_TRUE(cluster.GetExpressedState(expressed));
-    EXPECT_EQ(expressed, ExpressedStateEnum::kTesting);
+    EXPECT_EQ(cluster.GetExpressedState(), ExpressedStateEnum::kTesting);
 
     // Now alarming → Busy
-    ASSERT_TRUE(cluster.SetTestInProgress(false));
+    cluster.SetTestInProgress(false);
     ASSERT_TRUE(cluster.SetSmokeState(AlarmStateEnum::kWarning));
     cluster.SetExpressedStateByPriority(kDefaultPriority);
     auto busy = tester.Invoke(request);
@@ -297,13 +290,10 @@ TEST_F(TestSmokeCoAlarmCluster, SetUnmountedState_InoperativeWhenUnmounted)
     ASSERT_EQ(local.Startup(t.GetServerClusterContext()), CHIP_NO_ERROR);
 
     ASSERT_TRUE(local.SetUnmountedState(true));
-    ExpressedStateEnum expressed{};
-    ASSERT_TRUE(local.GetExpressedState(expressed));
-    EXPECT_EQ(expressed, ExpressedStateEnum::kInoperative);
+    EXPECT_EQ(local.GetExpressedState(), ExpressedStateEnum::kInoperative);
 
     ASSERT_TRUE(local.SetUnmountedState(false));
-    ASSERT_TRUE(local.GetExpressedState(expressed));
-    EXPECT_EQ(expressed, ExpressedStateEnum::kNormal);
+    EXPECT_EQ(local.GetExpressedState(), ExpressedStateEnum::kNormal);
 
     local.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
@@ -315,54 +305,42 @@ TEST_F(TestSmokeCoAlarmCluster, SetAlarmState_CriticalAutoUnmutes_AllSources)
     auto runCase = [&](auto setFn) {
         ASSERT_TRUE(cluster.SetDeviceMuted(MuteStateEnum::kMuted));
         ASSERT_TRUE(setFn(AlarmStateEnum::kCritical));
-        MuteStateEnum muted{};
-        ASSERT_TRUE(cluster.GetDeviceMuted(muted));
-        EXPECT_EQ(muted, MuteStateEnum::kNotMuted);
-        ASSERT_TRUE(setFn(AlarmStateEnum::kNormal)); // reset for next iteration
+        EXPECT_EQ(cluster.GetDeviceMuted(), MuteStateEnum::kNotMuted);
+        setFn(AlarmStateEnum::kNormal); // reset for next iteration
     };
 
     runCase([&](AlarmStateEnum v) { return cluster.SetCOState(v); });
-    runCase([&](AlarmStateEnum v) { return cluster.SetBatteryAlert(v); });
+    runCase([&](AlarmStateEnum v) {
+        cluster.SetBatteryAlert(v);
+        return true;
+    });
     runCase([&](AlarmStateEnum v) { return cluster.SetInterconnectSmokeAlarm(v); });
     runCase([&](AlarmStateEnum v) { return cluster.SetInterconnectCOAlarm(v); });
 }
 
 TEST_F(TestSmokeCoAlarmCluster, SetTestInProgress_Completion)
 {
-    ASSERT_TRUE(cluster.SetTestInProgress(true));
-    ASSERT_TRUE(cluster.SetTestInProgress(false));
-    bool inProgress{};
-    ASSERT_TRUE(cluster.GetTestInProgress(inProgress));
-    EXPECT_FALSE(inProgress);
+    cluster.SetTestInProgress(true);
+    cluster.SetTestInProgress(false);
+    EXPECT_FALSE(cluster.GetTestInProgress());
 }
 
 TEST_F(TestSmokeCoAlarmCluster, RemainingAlarmAttributes_ReadBack)
 {
-    AlarmStateEnum alarmVal{};
     ASSERT_TRUE(cluster.SetInterconnectSmokeAlarm(AlarmStateEnum::kWarning));
-    ASSERT_TRUE(cluster.GetInterconnectSmokeAlarm(alarmVal));
-    EXPECT_EQ(alarmVal, AlarmStateEnum::kWarning);
+    EXPECT_EQ(cluster.GetInterconnectSmokeAlarm(), AlarmStateEnum::kWarning);
 
     ASSERT_TRUE(cluster.SetInterconnectCOAlarm(AlarmStateEnum::kCritical));
-    ASSERT_TRUE(cluster.GetInterconnectCOAlarm(alarmVal));
-    EXPECT_EQ(alarmVal, AlarmStateEnum::kCritical);
+    EXPECT_EQ(cluster.GetInterconnectCOAlarm(), AlarmStateEnum::kCritical);
 
-    ASSERT_TRUE(cluster.SetHardwareFaultAlert(true));
-    bool hw{};
-    ASSERT_TRUE(cluster.GetHardwareFaultAlert(hw));
-    EXPECT_TRUE(hw);
+    cluster.SetHardwareFaultAlert(true);
+    EXPECT_TRUE(cluster.GetHardwareFaultAlert());
 
-    ASSERT_TRUE(cluster.SetEndOfServiceAlert(EndOfServiceEnum::kExpired));
-    EndOfServiceEnum eos{};
-    ASSERT_TRUE(cluster.GetEndOfServiceAlert(eos));
-    EXPECT_EQ(eos, EndOfServiceEnum::kExpired);
+    cluster.SetEndOfServiceAlert(EndOfServiceEnum::kExpired);
+    EXPECT_EQ(cluster.GetEndOfServiceAlert(), EndOfServiceEnum::kExpired);
 
-    ASSERT_TRUE(cluster.SetContaminationState(ContaminationStateEnum::kCritical));
-    ContaminationStateEnum cs{};
-    ASSERT_TRUE(cluster.GetContaminationState(cs));
-    EXPECT_EQ(cs, ContaminationStateEnum::kCritical);
+    cluster.SetContaminationState(ContaminationStateEnum::kCritical);
+    EXPECT_EQ(cluster.GetContaminationState(), ContaminationStateEnum::kCritical);
 
-    uint32_t date{};
-    ASSERT_TRUE(cluster.GetExpiryDate(date));
-    EXPECT_EQ(date, 0u);
+    EXPECT_EQ(cluster.GetExpiryDate(), 0u);
 }
