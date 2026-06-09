@@ -58,32 +58,24 @@ CHIP_ERROR AmbientSensingUnionCluster::Startup(ServerClusterContext & context)
 {
     ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
 
-    // Load persisted UnionName from attributeStorage if available,
-    // otherwise store the Config default so it survives future reboots.
     AttributePersistence persistence(context.attributeStorage);
     Storage::String<kMaxUnionNameLength> storedName;
 
     if (persistence.LoadString({ mPath.mEndpointId, AmbientSensingUnion::Id, Attributes::UnionName::Id }, storedName))
     {
         CharSpan loaded  = storedName.Content();
-        mUnionNameLength = loaded.size();
+        mUnionNameLength = std::min(loaded.size(), kMaxUnionNameLength);
         memcpy(mUnionNameBuffer, loaded.data(), mUnionNameLength);
         mUnionNameBuffer[mUnionNameLength] = '\0';
-        ChipLogProgress(Zcl, "AmbientSensingUnion: Loaded persisted UnionName: %.*s", static_cast<int>(mUnionNameLength),
-                        mUnionNameBuffer);
-    }
-    else
-    {
-        // First boot — store the Config default into persistence
-        Storage::String<kMaxUnionNameLength> defaultName;
-        if (defaultName.SetContent(GetUnionName()))
+        if (loaded.size() > kMaxUnionNameLength)
         {
-            CHIP_ERROR err =
-                persistence.StoreString({ mPath.mEndpointId, AmbientSensingUnion::Id, Attributes::UnionName::Id }, defaultName);
-            if (err != CHIP_NO_ERROR)
-            {
-                ChipLogError(Zcl, "AmbientSensingUnion: Failed to store default UnionName: %" CHIP_ERROR_FORMAT, err.Format());
-            }
+            ChipLogError(Zcl, "AmbientSensingUnion: Persisted UnionName exceeded max length, truncated to %.*s",
+                         static_cast<int>(mUnionNameLength), mUnionNameBuffer);
+        }
+        else
+        {
+            ChipLogProgress(Zcl, "AmbientSensingUnion: Loaded persisted UnionName: %.*s",
+                            static_cast<int>(mUnionNameLength), mUnionNameBuffer);
         }
     }
 
@@ -395,10 +387,7 @@ CHIP_ERROR AmbientSensingUnionCluster::UpdateNonMatterContributorStatus(const Ch
 
 void AmbientSensingUnionCluster::EmitContributorAddedEvent(const ContributorEntry & entry)
 {
-    if (mContext == nullptr)
-    {
-        return;
-    }
+    VerifyOrReturn(mContext != nullptr);
 
     AmbientSensingUnion::Structs::UnionContributorStruct::Type contributor;
     entry.CopyTo(contributor);
@@ -411,10 +400,7 @@ void AmbientSensingUnionCluster::EmitContributorAddedEvent(const ContributorEntr
 
 void AmbientSensingUnionCluster::EmitContributorRemovedEvent(const ContributorEntry & entry)
 {
-    if (mContext == nullptr)
-    {
-        return;
-    }
+    VerifyOrReturn(mContext != nullptr);
 
     AmbientSensingUnion::Structs::UnionContributorStruct::Type contributor;
     entry.CopyTo(contributor);
@@ -427,10 +413,7 @@ void AmbientSensingUnionCluster::EmitContributorRemovedEvent(const ContributorEn
 
 void AmbientSensingUnionCluster::EmitContributorStatusChangedEvent(const ContributorEntry & entry)
 {
-    if (mContext == nullptr)
-    {
-        return;
-    }
+    VerifyOrReturn(mContext != nullptr);
 
     AmbientSensingUnion::Structs::UnionContributorStruct::Type contributor;
     entry.CopyTo(contributor);
@@ -441,6 +424,7 @@ void AmbientSensingUnionCluster::EmitContributorStatusChangedEvent(const Contrib
 
     mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
 }
+
 
 // =============================================================================
 // Attribute Encoding
