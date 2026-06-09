@@ -37,6 +37,7 @@ constexpr size_t kWindowCoveringMaxClusterCount   = kWindowCoveringFixedClusterC
 
 class CodegenWindowCoveringCluster : public WindowCoveringCluster
 {
+public:
     using WindowCoveringCluster::SetEndProductType;
     using WindowCoveringCluster::SetType;
     using WindowCoveringCluster::WindowCoveringCluster;
@@ -252,7 +253,7 @@ void SetDefaultDelegate(EndpointId endpointId, WindowCoveringDelegate * delegate
 
 void TypeSet(chip::EndpointId endpoint, Type type)
 {
-    auto cluster = FindClusterOnEndpoint(endpoint);
+    auto cluster = FindCodegenCluster(endpoint);
     VerifyOrDie(cluster != nullptr);
     cluster->SetType(type);
 }
@@ -349,7 +350,7 @@ OperationalState OperationalStateGet(chip::EndpointId endpoint, const chip::BitM
 
 void EndProductTypeSet(chip::EndpointId endpoint, EndProductType type)
 {
-    auto cluster = FindClusterOnEndpoint(endpoint);
+    auto cluster = FindCodegenCluster(endpoint);
     VerifyOrDie(cluster != nullptr);
     cluster->SetEndProductType(type);
 }
