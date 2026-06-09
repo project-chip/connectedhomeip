@@ -80,11 +80,6 @@ namespace app {
 namespace Clusters {
 namespace WindowCovering {
 
-Percent100ths ValueToPercent100ths(AbsoluteLimits limits, uint16_t absolute)
-{
-    return ConvertValue(limits.open, limits.closed, kWcPercent100thsMinOpen, kWcPercent100thsMaxClosed, absolute);
-}
-
 WindowCoveringCluster::WindowCoveringCluster(EndpointId endpointId, const Config & config) :
     DefaultServerCluster(ConcreteClusterPath(endpointId, WindowCovering::Id)), mFeatureMap(config.mFeatures),
     mOptionalAttributes(config.mOptionalAttributes)
@@ -594,25 +589,6 @@ std::optional<DataModel::ActionReturnStatus> WindowCoveringCluster::HandleUpOrOp
     {
         SetTargetPositionLiftPercent100ths(NPercent100ths(kWcPercent100thsMinOpen));
     }
-    return Status::Success;
-}
-
-Status GetMotionLockStatus(chip::EndpointId endpoint)
-{
-    BitMask<Mode> mode = ModeGet(endpoint);
-
-    if (mode.Has(Mode::kMaintenanceMode))
-    {
-        // Mainterance Mode
-        return Status::Busy;
-    }
-
-    if (mode.Has(Mode::kCalibrationMode))
-    {
-        // Calibration Mode
-        return Status::Failure;
-    }
-
     return Status::Success;
 }
 
