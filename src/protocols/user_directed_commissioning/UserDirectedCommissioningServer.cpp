@@ -310,7 +310,8 @@ CHIP_ERROR IdentificationDeclaration::ReadPayload(uint8_t * udcPayload, size_t p
             }
             else
             {
-                err = CHIP_ERROR_BUFFER_TOO_SMALL;
+                mRotatingIdLen = 0;
+                err            = CHIP_ERROR_BUFFER_TOO_SMALL;
             }
             break;
         case kTargetAppListTag:

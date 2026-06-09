@@ -487,10 +487,10 @@ TEST_F(TestUdcMessages, TestUDCIdentificationDeclarationOversizedRotatingId)
     IdentificationDeclaration idOut;
     const char * instanceName = "servertest1";
 
-    uint8_t idBuffer[500];
-    memcpy(idBuffer, instanceName, strlen(instanceName) + 1);
+    uint8_t idBuffer[500] = {};
+    Platform::CopyString(reinterpret_cast<char *>(idBuffer), Dnssd::Commission::kInstanceNameMaxLength + 1, instanceName);
 
-    size_t offset = strlen(instanceName) + 1;
+    size_t offset = Dnssd::Commission::kInstanceNameMaxLength + 1;
     TLV::TLVWriter writer;
     writer.Init(idBuffer + offset, sizeof(idBuffer) - offset);
 
