@@ -105,22 +105,22 @@ class TC_ACS_3_2(MatterBaseTest):
         attr = Clusters.AmbientContextSensing.Attributes
         dev_ctrl = self.default_controller
 
-        self.step("1")
+        self.step("1", "Commissioning, already done", is_commissioning=True)
         # Commission DUT - already done
         # Implicit step to get the feature map to ensure attribute operations
         # are performed on supported features
         aFeatureMap = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.FeatureMap)
-        log.info(f"Rx'd FeatureMap: {aFeatureMap}")
+        log.info("Rx'd FeatureMap: %", {aFeatureMap})
         self.HumanActivitySupported = ((aFeatureMap & cluster.Bitmaps.Feature.kHumanActivity) != 0)
-        log.info(f"Rx'd HumanActivitySupported: {self.HumanActivitySupported}")
+        log.info("Rx'd HumanActivitySupported: %", {self.HumanActivitySupported})
         self.ObjectCountingSupported = ((aFeatureMap & cluster.Bitmaps.Feature.kObjectCounting) != 0)
-        log.info(f"Rx'd ObjectCountingSupported: {self.ObjectCountingSupported}")
+        log.info("Rx'd ObjectCountingSupported: %", {self.ObjectCountingSupported})
         self.ObjectIdentificationSupported = ((aFeatureMap & cluster.Bitmaps.Feature.kObjectIdentification) != 0)
-        log.info(f"Rx'd ObjectIdentificationSupported: {self.ObjectIdentificationSupported}")
+        log.info("Rx'd ObjectIdentificationSupported: %", {self.ObjectIdentificationSupported})
         self.SoundIdentificationSupported = ((aFeatureMap & cluster.Bitmaps.Feature.kSoundIdentification) != 0)
-        log.info(f"Rx'd SoundIdentificationSupported: {self.SoundIdentificationSupported}")
+        log.info("Rx'd SoundIdentificationSupported: %", {self.SoundIdentificationSupported})
         self.PredictedActivitySupported = ((aFeatureMap & cluster.Bitmaps.Feature.kPredictedActivity) != 0)
-        log.info(f"Rx'd PredictedActivitySupported: {self.PredictedActivitySupported}")
+        log.info("Rx'd PredictedActivitySupported: %", {self.PredictedActivitySupported})
 
         self.step("2")
         # Add AmbientContextSupported elements based on DUT capability for ci
@@ -142,9 +142,9 @@ class TC_ACS_3_2(MatterBaseTest):
 
         # attribute subscription check (in replacement of reading)
         subscription_expected = attrib_listener.attribute_reports[cluster.Attributes.HoldTime]
-        log.info(f"Rx'd subscription_expected: {subscription_expected}")
+        log.info("Rx'd subscription_expected: %", {subscription_expected})
         holdTime_sub = subscription_expected[0].value
-        log.info(f"Rx'd holdTime_sub: {holdTime_sub}")
+        log.info("Rx'd holdTime_sub: %", {holdTime_sub})
         asserts.assert_true(holdTime_sub, holdTime_input, "Subscribed HoldTime is different from the input HoldTime.")
         attrib_listener.reset()
 
@@ -167,7 +167,7 @@ class TC_ACS_3_2(MatterBaseTest):
             list_dec = ast.literal_eval(user_data)  # convert string hex to decimal
             namespaceID1 = list_dec[0]
             tag1 = list_dec[1]
-            log.info(f"user input: {namespaceID1} {tag1}")
+            log.info("user input: % %", {namespaceID1}, {tag1})
 
         # Add 1 second delay to make sure it's done
         await asyncio.sleep(1)
@@ -176,31 +176,30 @@ class TC_ACS_3_2(MatterBaseTest):
         # Check the boolean attribute subscription
         if namespaceID1 == HUMAN_ACTIVITY_NAMESPACE_ID:
             subscription_expected1 = attrib_listener.attribute_reports[cluster.Attributes.HumanActivityDetected]
-            log.info(f"Rx'd subscription_expected1: {subscription_expected1}")
+            log.info("Rx'd subscription_expected1: %", {subscription_expected1})
             humanActivityDetected = subscription_expected1[0].value
-            log.info(f"Rx'd humanActivityDetected: {humanActivityDetected}")
+            log.info("Rx'd humanActivityDetected: %", {humanActivityDetected})
             asserts.assert_true(humanActivityDetected, "Failed to get HumanActivityDetected being True.")
 
         elif namespaceID1 == OBJECT_IDENTIFICATION_NAMESPACE_ID:
             # AmbientContextType attribute subscription check for PIXIT.ACS.AmbientContextSensed_2 = Object identification person
             subscription_expected2 = attrib_listener.attribute_reports[cluster.Attributes.ObjectIdentified]
-            log.info(f"Rx'd subscription_expected2: {subscription_expected2}")
+            log.info("Rx'd subscription_expected2: %", {subscription_expected2})
             objectIdentified = subscription_expected2[0].value
-            log.info(f"Rx'd objectIdentified: {objectIdentified}")
             asserts.assert_true(objectIdentified, "Failed to get ObjectIdentified being True.")
 
         elif namespaceID1 == SOUND_IDENTIFICATION_NAMESPACE_ID:
             # AmbientContextType attribute subscription check for PIXIT.ACS.AmbientContextSensed_2 = Object identification person
             subscription_expected3 = attrib_listener.attribute_reports[cluster.Attributes.AudioContextDetected]
-            log.info(f"Rx'd subscription_expected3: {subscription_expected3}")
+            log.info("Rx'd subscription_expected3: %", {subscription_expected3})
             audioContextDetected = subscription_expected3[0].value
-            log.info(f"Rx'd audioContextDetected: {audioContextDetected}")
+            log.info("Rx'd audioContextDetected: %", {audioContextDetected})
             asserts.assert_true(audioContextDetected, "Failed to get audioContextDetected being True.")
 
         # Read AmbientContextType attribute
         ambientContextType_read = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.AmbientContextType)
-        log.info(f"Rx'd AmbientContextType_read: {ambientContextType_read}")
+        log.info("Rx'd AmbientContextType_read: %", {ambientContextType_read})
 
         # check attribute read
         nsID_1_read = ambientContextType_read[0].ambientContextSensed[0].namespaceID
@@ -235,7 +234,7 @@ class TC_ACS_3_2(MatterBaseTest):
             list_dec = ast.literal_eval(user_data)  # convert string hex to decimal
             namespaceID1 = list_dec[0]
             tag1 = list_dec[1]
-            log.info(f"user input: {namespaceID1} {tag1}")
+            log.info("user input: % %", {namespaceID1}, {tag1})
 
             self.wait_for_user_input(
                 prompt_msg="Type any letter and press ENTER after the same type ambient sensing event is re-triggered.")
@@ -246,7 +245,7 @@ class TC_ACS_3_2(MatterBaseTest):
         self.step("7")
         ambientContextType = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.AmbientContextType)
-        log.info(f"Rx'd AmbientContextType: {ambientContextType}")
+        log.info("Rx'd AmbientContextType: %", {ambientContextType})
 
         # Same trigger shouldn't add to the list
         asserts.assert_equal(len(ambientContextType), 1, "AmbientContextType needs to be the size of 1.")
@@ -254,25 +253,25 @@ class TC_ACS_3_2(MatterBaseTest):
         # Check the boolean attribute subscription
         if namespaceID1 == HUMAN_ACTIVITY_NAMESPACE_ID:
             subscription_expected1 = attrib_listener.attribute_reports[cluster.Attributes.HumanActivityDetected]
-            log.info(f"Rx'd subscription_expected1: {subscription_expected1}")
+            log.info("Rx'd subscription_expected1: %", {subscription_expected1})
             humanActivityDetected = subscription_expected1[0].value
-            log.info(f"Rx'd humanActivityDetected: {humanActivityDetected}")
+            log.info("Rx'd humanActivityDetected: %", {humanActivityDetected})
             asserts.assert_true(humanActivityDetected, "Failed to get HumanActivityDetected being True.")
 
         elif namespaceID1 == OBJECT_IDENTIFICATION_NAMESPACE_ID:
             # AmbientContextType attribute subscription check for PIXIT.ACS.AmbientContextSensed_2 = Object identification person
             subscription_expected2 = attrib_listener.attribute_reports[cluster.Attributes.ObjectIdentified]
-            log.info(f"Rx'd subscription_expected2: {subscription_expected2}")
+            log.info("Rx'd subscription_expected2: %", {subscription_expected2})
             objectIdentified = subscription_expected2[0].value
-            log.info(f"Rx'd objectIdentified: {objectIdentified}")
+            log.info("Rx'd objectIdentified: %", {objectIdentified})
             asserts.assert_true(objectIdentified, "Failed to get ObjectIdentified being True.")
 
         elif namespaceID1 == SOUND_IDENTIFICATION_NAMESPACE_ID:
             # AmbientContextType attribute subscription check for PIXIT.ACS.AmbientContextSensed_2 = Object identification person
             subscription_expected3 = attrib_listener.attribute_reports[cluster.Attributes.AudioContextDetected]
-            log.info(f"Rx'd subscription_expected3: {subscription_expected3}")
+            log.info("Rx'd subscription_expected3: %", {subscription_expected3})
             audioContextDetected = subscription_expected3[0].value
-            log.info(f"Rx'd audioContextDetected: {audioContextDetected}")
+            log.info("Rx'd audioContextDetected: %", {audioContextDetected})
             asserts.assert_true(audioContextDetected, "Failed to get audioContextDetected being True.")
 
         # check attribute read
@@ -310,21 +309,21 @@ class TC_ACS_3_2(MatterBaseTest):
             # subscription check
             subscription_expected1 = attrib_listener.attribute_reports[cluster.Attributes.HumanActivityDetected]
             humanActivityDetected = subscription_expected1[0].value
-            log.info(f"Rx'd humanActivityDetected: {humanActivityDetected}")
+            log.info("Rx'd humanActivityDetected: %", {humanActivityDetected})
             asserts.assert_true(humanActivityDetected is False, "Failed to get HumanActivityDetected being False.")
         elif objectIdentified & self.ObjectIdentificationSupported:
             # subscription check
             subscription_expected2 = attrib_listener.attribute_reports[cluster.Attributes.ObjectIdentified]
-            log.info(f"Rx'd subscription_expected2: {subscription_expected2}")
+            log.info("Rx'd subscription_expected2: %", {subscription_expected2})
             objectIdentified = subscription_expected2[0].value
-            log.info(f"Rx'd objectIdentified: {objectIdentified}")
+            log.info("Rx'd objectIdentified: %", {objectIdentified})
             asserts.assert_true(objectIdentified is False, "Failed to get ObjectIdentified being False.")
         elif audioContextDetected & self.SoundIdentificationSupported:
             # subscription check
             subscription_expected3 = attrib_listener.attribute_reports[cluster.Attributes.AudioContextDetected]
-            log.info(f"Rx'd subscription_expected3: {subscription_expected3}")
+            log.info("Rx'd subscription_expected3: %", {subscription_expected3})
             audioContextDetected = subscription_expected3[0].value
-            log.info(f"Rx'd audioContextDetected: {audioContextDetected}")
+            log.info("Rx'd audioContextDetected: %", {audioContextDetected})
             asserts.assert_true(not audioContextDetected, "Failed to get audioContextDetected being False.")
 
         attrib_listener.reset()
