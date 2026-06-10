@@ -265,7 +265,7 @@ class TC_ACS_3_1(MatterBaseTest):
 
             # early namespace id == namespaceID1
             namespaceid_test1 = subscription_expected[1].ambientContextSensed[0].namespaceID
-            log.info("namespaceid_test1: %s", {namespaceid_test1}")
+            log.info("namespaceid_test1: %s", {namespaceid_test1})
             asserts.assert_true(namespaceid_test1 == namespaceID1,
                                 f"Unexpected namespaceID, {namespaceid_test1}, exp {namespaceID1}")
             asserts.assert_true(subscription_expected[1].ambientContextSensed[0].tag == tag1,
