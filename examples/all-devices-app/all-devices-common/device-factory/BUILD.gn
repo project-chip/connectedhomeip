@@ -33,6 +33,7 @@ source_set("device-factory") {
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/aggregator",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/air-quality-sensor",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/boolean-state-sensor",
+    "${chip_root}/examples/all-devices-app/all-devices-common/devices/bridged-node",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/chime",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/dimmable-light/impl:logging",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/fan/impl:logging",

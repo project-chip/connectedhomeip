@@ -51,6 +51,9 @@ _available_devices = [
     "AIR_QUALITY_SENSOR",
   ],
   [
+    "bridged-node",
+    "BRIDGED_NODE",
+  [
     "chime",
     "CHIME",
   ],
