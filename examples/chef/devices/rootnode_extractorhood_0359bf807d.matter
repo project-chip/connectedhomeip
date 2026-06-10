@@ -2097,15 +2097,15 @@ endpoint 1 {
   }
 
   server cluster FanControl {
-    ram      attribute fanMode default = 0;
+    callback attribute fanMode;
     ram      attribute fanModeSequence;
-    ram      attribute percentSetting default = 0;
-    ram      attribute percentCurrent;
+    callback attribute percentSetting;
+    callback attribute percentCurrent;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 0x0006;
+    callback attribute clusterRevision;
   }
 }
 
