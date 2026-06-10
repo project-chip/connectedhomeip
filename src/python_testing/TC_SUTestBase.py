@@ -457,7 +457,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
 
         while int(current_progress) < max_progress:
             log.info(
-                "Current OTA Image download progress is %d % , waiting for reports to reach %d %", current_progress, current_max_progress)
+                "Current OTA Image download progress is %d%% , waiting for reports to reach %d%%", current_progress, current_max_progress)
 
             # Handle subscribe issues
             if current_progress > current_max_progress:
@@ -493,29 +493,8 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             if current_max_progress > max_progress:
                 current_max_progress = max_progress
             progress_seen = False
-            log.info("Current OTA Image download progress is %d %", current_progress)
+            log.info("Current OTA Image download progress is %d%% ", current_progress)
             download_progress_attr_handler.reset()
 
         # After completing the Download cancel the AttributeReportHandler for Download
         download_progress_attr_handler.cancel()
-
-    async def get_connected_device_after_reboot(self, controller: ChipDeviceCtrl.ChipDeviceController, requestor_node_id: int, extra_message: str = ""):
-
-        reboot_timeout_sec = 120
-        poll_interval_sec = 5
-        reconnect_timeout_ms = 5000
-        reconnected = False
-        for attempt in range(reboot_timeout_sec // poll_interval_sec):
-            await asyncio.sleep(poll_interval_sec)
-            try:
-                await controller.GetConnectedDevice(
-                    requestor_node_id, allowPASE=False, timeoutMs=reconnect_timeout_ms)
-                reconnected = True
-                log.info("%s - DUT reconnected after OTA reboot (attempt %d).", extra_message, (attempt + 1))
-                break
-            except (TimeoutError, ChipStackError):
-                log.info(
-                    "%s - Waiting for DUT to come back online (attempt %d / %d)...", extra_message, attempt + 1, reboot_timeout_sec // poll_interval_sec)
-
-        asserts.assert_true(
-            reconnected, f'{extra_message}: DUT did not come back online within {reboot_timeout_sec}s after OTA reboot.')

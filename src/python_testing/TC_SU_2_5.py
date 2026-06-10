@@ -355,7 +355,6 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
             lambda report: report.value == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kApplying)
         update_state_attr_handler.await_all_expected_report_matches(
             [update_state_match], timeout_sec=5)
-        update_state_attr_handler.cancel()
 
         # Start the handler
         await software_version_attr_handler.start(dev_ctrl=self.controller, node_id=self.requestor_node_id, endpoint=0,
@@ -369,8 +368,8 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
             expected_matchers=[software_version_match], timeout_sec=spec_wait_time)
         software_version_attr_handler.cancel()
 
-        # await self._wait_for_idle_after_softwareaupdate(update_state_handler=update_state_attr_handler)
-        await self.get_connected_device_after_reboot(controller=self.controller, requestor_node_id=self.requestor_node_id, extra_message="Reboot for Step 3")
+        await self._wait_for_idle_after_softwareaupdate(update_state_handler=update_state_attr_handler)
+        update_state_attr_handler.cancel()
 
         # Now software version should be in the expected software version
         await self.verify_version_applied_basic_information(controller=self.controller, node_id=self.requestor_node_id, target_version=self.expected_software_version)
