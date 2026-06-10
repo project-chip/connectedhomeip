@@ -201,7 +201,7 @@ class TC_ACL_2_10(MatterBaseTest):
             # TH1 writes Extension attribute with D_OK_EMPTY
             extension1 = Clusters.AccessControl.Structs.AccessControlExtensionStruct(
                 data=D_OK_EMPTY)
-            log.info(f"Writing extension with data {D_OK_EMPTY.hex()}")
+            log.info("Writing extension with data %s", D_OK_EMPTY.hex())
             extensions_list1 = [extension1]
             result = await self.th1.WriteAttribute(
                 self.dut_node_id,
@@ -216,7 +216,7 @@ class TC_ACL_2_10(MatterBaseTest):
             # TH2 writes Extension attribute with D_OK_SINGLE
             extension2 = Clusters.AccessControl.Structs.AccessControlExtensionStruct(
                 data=D_OK_SINGLE)
-            log.info(f"Writing extension with data {D_OK_SINGLE.hex()}")
+            log.info("Writing extension with data %s", D_OK_SINGLE.hex())
             extensions_list2 = [extension2]
 
             result = await self.th2.WriteAttribute(

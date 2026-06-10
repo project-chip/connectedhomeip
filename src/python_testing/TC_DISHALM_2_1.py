@@ -122,9 +122,9 @@ class TC_DISHALM_2_1(BasicCompositionTests):
                 non_provisional_bits.append(component.name)
                 mask |= bit_mask
 
-        logger.info(f"Non-provisional alarm bits: {non_provisional_bits}")
-        logger.info(f"Provisional alarm bits: {provisional_bits}")
-        logger.info(f"Valid alarm bitmap mask: 0x{mask:08X} (allow_provisional={allow_provisional})")
+        logger.info("Non-provisional alarm bits: %s", non_provisional_bits)
+        logger.info("Provisional alarm bits: %s", provisional_bits)
+        logger.info("Valid alarm bitmap mask: 0x%08X (allow_provisional=%s)", mask, allow_provisional)
 
         return mask
 
@@ -166,7 +166,7 @@ class TC_DISHALM_2_1(BasicCompositionTests):
                 )
                 asserts.fail(asserts_fail_msg)
 
-        logger.info(f"{attribute_name} bitmap validation passed: 0x{bitmap_value:08X}")
+        logger.info("%s bitmap validation passed: 0x%08X", attribute_name, bitmap_value)
 
     async def read_and_check_attributes_from_dishwasher_alarm(self, attribute: type[ClusterObjects.ClusterAttributeDescriptor], name: str) -> int:
         resp = await self.read_single_attribute_check_success(
@@ -176,7 +176,7 @@ class TC_DISHALM_2_1(BasicCompositionTests):
 
         matter_asserts.assert_valid_uint32(resp, name)
 
-        logger.info(f"Reading attribute: {name}, response: {resp}")
+        logger.info("Reading attribute: %s, response: %s", name, resp)
         return int(resp)
 
     @run_if_endpoint_matches(has_cluster(Clusters.DishwasherAlarm))
@@ -187,7 +187,7 @@ class TC_DISHALM_2_1(BasicCompositionTests):
 
         # Get test parameter for allowing provisional alarms (default: False for certification)
         allow_provisional = self.user_params.get("allow_provisional_test_event_only_disallowed_for_certification", False)
-        logger.info(f"Test running with allow_provisional={allow_provisional}")
+        logger.info("Test running with allow_provisional=%s", allow_provisional)
 
         self.step(1)
 

@@ -71,10 +71,10 @@ class TC_ACL_2_5(MatterBaseTest):
             events=[(0, acec_event)],
             fabricFiltered=True
         )
-        log.info(f"Initial events response {str(events_response)}")
+        log.info("Initial events response %s", events_response)
 
         # Extract events from the response
-        log.info(f"Found {len(events_response)} initial events")
+        log.info("Found %s initial events", len(events_response))
         if not force_legacy_encoding:
             # if new list method is used we will have 0 events, however since we created events during prior run with new list method then we would have events already
             asserts.assert_equal(len(events_response), 0, "Expected 0 events")
@@ -92,7 +92,7 @@ class TC_ACL_2_5(MatterBaseTest):
             data=D_OK_EMPTY)
 
         # Write the extension to the device - properly wrap the extensions list
-        log.info(f"Writing extension with data {D_OK_EMPTY.hex()}")
+        log.info("Writing extension with data %s", D_OK_EMPTY.hex())
         extensions_list = [extension]
         result = await self.write_attribute_with_encoding_option(
             self.default_controller,
@@ -100,7 +100,7 @@ class TC_ACL_2_5(MatterBaseTest):
             [(0, extension_attr(value=extensions_list))],
             forceLegacyListEncoding=force_legacy_encoding
         )
-        log.info(f"Write result {str(result)}")
+        log.info("Write result %s", result)
         asserts.assert_equal(
             result[0].Status, Status.Success, "Write should have succeeded")
 
@@ -124,7 +124,7 @@ class TC_ACL_2_5(MatterBaseTest):
         direct_event = direct_events[0]
 
         # Verify both methods return the same event data
-        log.info(f"Comparing subscription event: {subscription_event} with direct event: {direct_event}")
+        log.info("Comparing subscription event: %s with direct event: %s", subscription_event, direct_event)
         asserts.assert_equal(subscription_event, direct_event.Data, "Subscription event should be in direct event")
 
         asserts.assert_equal(subscription_event.changeType,
@@ -156,7 +156,7 @@ class TC_ACL_2_5(MatterBaseTest):
             data=D_OK_SINGLE)
 
         # Write the new extension
-        log.info(f"Writing new extension with data {D_OK_SINGLE.hex()}")
+        log.info("Writing new extension with data %s", D_OK_SINGLE.hex())
         extensions_list = [new_extension]
         result = await self.write_attribute_with_encoding_option(
             self.default_controller,
@@ -164,7 +164,7 @@ class TC_ACL_2_5(MatterBaseTest):
             [(0, extension_attr(value=extensions_list))],
             forceLegacyListEncoding=force_legacy_encoding
         )
-        log.info(f"Write result: {result}")
+        log.info("Write result: %s", result)
         asserts.assert_equal(
             result[0].Status, Status.Success, "Write should have succeeded")
 
@@ -251,7 +251,7 @@ class TC_ACL_2_5(MatterBaseTest):
             [(0, extension_attr(value=extensions_list))],
             forceLegacyListEncoding=force_legacy_encoding
         )
-        log.info(f"Write result {str(a)}")
+        log.info("Write result %s", a)
         asserts.assert_equal(a[0].Status, Status.ConstraintError,
                              "Write should have failed with CONSTRAINT_ERROR 135")
 
@@ -268,10 +268,10 @@ class TC_ACL_2_5(MatterBaseTest):
             fabricFiltered=True,
             eventNumberFilter=latest_event_num + 1
         )
-        log.info(f"Events response {str(events_response2)}")
+        log.info("Events response %s", events_response2)
 
         # Extract events from the response
-        log.info(f"Found {len(events_response2)} events")
+        log.info("Found %s events", len(events_response2))
         if not force_legacy_encoding:
             asserts.assert_equal(len(events_response2), 0, "There should be no events found")
 
@@ -306,7 +306,7 @@ class TC_ACL_2_5(MatterBaseTest):
             [(0, extension_attr(value=extensions_list))],
             forceLegacyListEncoding=force_legacy_encoding
         )
-        log.info(f"Write result {str(b)}")
+        log.info("Write result %s", b)
         asserts.assert_equal(b[0].Status, Status.ConstraintError,
                              "Write should have failed with CONSTRAINT_ERROR")
 
@@ -322,10 +322,10 @@ class TC_ACL_2_5(MatterBaseTest):
             fabricFiltered=True,
             eventNumberFilter=latest_event_num2 + 1
         )
-        log.info(f"Events response {str(events_response3)}")
+        log.info("Events response %s", events_response3)
 
         # Extract events from the response
-        log.info(f"Found {len(events_response3)} events")
+        log.info("Found %s events", len(events_response3))
         if not force_legacy_encoding:
             asserts.assert_equal(len(events_response3), 0, "There should be no events found")
         else:
@@ -359,7 +359,7 @@ class TC_ACL_2_5(MatterBaseTest):
             [(0, extension_attr(value=extensions_list2))],
             forceLegacyListEncoding=force_legacy_encoding
         )
-        log.info(f"Write result {str(result)}")
+        log.info("Write result %s", result)
         asserts.assert_equal(
             result[0].Status, Status.Success, "Write should have succeeded")
 

@@ -797,7 +797,7 @@ TEST_F(TestGroupcastCluster, TestMaxMcastAddrCount)
     tester.SetSubjectDescriptor(kAdminSubjectDescriptor);
 
     // Read MaxMcastAddrCount
-    app::Clusters::Groupcast::Attributes::MaxMcastAddrCount::TypeInfo::DecodableType maxMcastAddrCount;
+    app::Clusters::Groupcast::Attributes::MaxMcastAddrCount::TypeInfo::DecodableType maxMcastAddrCount{};
     ASSERT_EQ(tester.ReadAttribute(app::Clusters::Groupcast::Attributes::MaxMcastAddrCount::Id, maxMcastAddrCount), CHIP_NO_ERROR);
     ASSERT_GT(maxMcastAddrCount, 0u);
 
