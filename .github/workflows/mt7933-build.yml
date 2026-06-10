@@ -35,7 +35,7 @@ jobs:
         run: |
           ./scripts/checkout_submodules.py --platform mt793x
           source scripts/activate.sh
-          ./scripts/examples/gn_build_example.sh examples/lighting-app/mt793x out/lighting-app
+          ./scripts/examples/gn_build_example.sh examples/lighting-app/genio out/lighting-app
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
