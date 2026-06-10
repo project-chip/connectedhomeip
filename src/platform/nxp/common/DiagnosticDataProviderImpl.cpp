@@ -43,16 +43,9 @@ extern "C" {
 }
 #endif
 
-#if NXP_USE_MML
-#include "fsl_component_mem_manager.h"
-#define GetFreeHeapSize MEM_GetFreeHeapSize
-#define HEAP_SIZE MinimalHeapSize_c
-#define GetMinimumEverFreeHeapSize MEM_GetFreeHeapSizeLowWaterMark
-#else
 #define GetFreeHeapSize xPortGetFreeHeapSize
 #define HEAP_SIZE configTOTAL_HEAP_SIZE
 #define GetMinimumEverFreeHeapSize xPortGetMinimumEverFreeHeapSize
-#endif // NXP_USE_MML
 
 namespace chip {
 namespace DeviceLayer {
@@ -99,11 +92,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::ResetWatermarks()
     // If implemented, the server SHALL set the value of the CurrentHeapHighWatermark attribute to the
     // value of the CurrentHeapUsed.
 
-#if NXP_USE_MML
-    MEM_ResetFreeHeapSizeLowWaterMark();
-#else
     xPortResetHeapMinimumEverFreeHeapSize();
-#endif
     return CHIP_NO_ERROR;
 }
 
