@@ -133,7 +133,7 @@ PushAvStreamTransportManager::AllocatePushTransport(const TransportOptionsStruct
     // Acquire the referenced audio/video streams so the HAL pipelines are started for this consumer. Stream pipelines are
     // started lazily on the first acquire and stopped on the last release.
     TEMPORARY_RETURN_IGNORED mCameraDevice->GetCameraAVStreamMgmtController().OnTransportAcquireAudioVideoStreams(audioStreams,
-                                                                                                                videoStreams);
+                                                                                                                  videoStreams);
 
     uint32_t newTransportBandwidthbps = 0;
     GetBandwidthForStreams(transportOptions.videoStreamID, transportOptions.audioStreamID, newTransportBandwidthbps);
@@ -200,7 +200,7 @@ void PushAvStreamTransportManager::ReleaseStreamsForConnection(uint16_t connecti
     GetReferencedStreams(optsIt->second, audioStreams, videoStreams);
 
     TEMPORARY_RETURN_IGNORED mCameraDevice->GetCameraAVStreamMgmtController().OnTransportReleaseAudioVideoStreams(audioStreams,
-                                                                                                                videoStreams);
+                                                                                                                  videoStreams);
 }
 
 void PushAvStreamTransportManager::GetReferencedStreams(const TransportOptionsStruct & transportOptions,
