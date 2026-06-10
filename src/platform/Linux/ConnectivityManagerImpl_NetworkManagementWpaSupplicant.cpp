@@ -1465,7 +1465,7 @@ bool ConnectivityManagerImpl::_GetBssInfo(const gchar * bssPath, NetworkCommissi
             {
                 res.Set(app::Clusters::NetworkCommissioning::WiFiSecurityBitmap::kWpaPersonal);
             }
-            else if (g_strcasecmp(keyMgmtVal, "wpa-eap"))
+            else if (g_strcasecmp(keyMgmtVal, "wpa-eap") == 0)
             {
                 res.Set(kEAP);
             }
