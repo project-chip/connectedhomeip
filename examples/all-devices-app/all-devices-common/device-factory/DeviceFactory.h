@@ -20,6 +20,7 @@
 #include <app_config/enabled_devices.h>
 #include <devices/Types.h>
 #include <devices/air-quality-sensor/AirQualitySensorDevice.h>
+#include <devices/aggregator/AggregatorDevice.h>
 #include <devices/boolean-state-sensor/BooleanStateSensorDevice.h>
 #include <devices/chime/ChimeDevice.h>
 #include <devices/dimmable-light/impl/LoggingDimmableLightDevice.h>
@@ -135,6 +136,13 @@ private:
                                 .unit      = MeasurementUnitEnum::kPpm,
                             },
                     });
+            });
+        }
+        if constexpr (ALL_DEVICES_ENABLE_AGGREGATOR)
+        {
+            RegisterCreator("aggregator", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return std::make_unique<AggregatorDevice>(mContext->timerDelegate);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_CONTACT_SENSOR)
