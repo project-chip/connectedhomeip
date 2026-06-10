@@ -29,8 +29,6 @@ namespace Clusters {
 
 SmokeCoAlarmCluster::SmokeCoAlarmCluster(EndpointId endpointId) : SmokeCoAlarmCluster(endpointId, Config{}) {}
 
-SmokeCoAlarmCluster::SmokeCoAlarmCluster(EndpointId endpointId) : SmokeCoAlarmCluster(endpointId, Config{}) {}
-
 SmokeCoAlarmCluster::SmokeCoAlarmCluster(EndpointId endpointId, const Config & config) :
     DefaultServerCluster({ endpointId, Id }), mConfig(config), mInoperativeWhenUnmounted(config.inoperativeWhenUnmounted)
 {}
@@ -234,12 +232,6 @@ void SmokeCoAlarmCluster::SetSmokeSensitivityLevel(SensitivityEnum newSmokeSensi
 {
     VerifyOrReturn(SupportsSmokeAlarm());
     SetAttributeValue(mSmokeSensitivityLevel, newSmokeSensitivityLevel, SmokeSensitivityLevel::Id);
-}
-
-void SmokeCoAlarmCluster::SetExpiryDate(uint32_t newExpiryDate)
-{
-    VerifyOrReturn(mConfig.optionalAttribs.IsSet(ExpiryDate::Id));
-    SetAttributeValue(mExpiryDate, newExpiryDate, ExpiryDate::Id);
 }
 
 void SmokeCoAlarmCluster::SetExpiryDate(uint32_t newExpiryDate)
