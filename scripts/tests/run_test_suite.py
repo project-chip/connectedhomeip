@@ -614,6 +614,11 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int, app_path: li
         # We just print the message, as the actual test failure with stack trace has already been logged.
         log.error("%s", error)
         raise SystemExit(2) from None
+    finally:
+        with run_summary:
+            run_summary.print_summary(show_failed=True, show_flaky=False, top_slowest=0, show_all=True)
+            if summary_file is not None:
+                run_summary.write_json(summary_file)
 
 
 @main.command(

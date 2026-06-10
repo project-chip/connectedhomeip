@@ -458,9 +458,3 @@ class ResultProcessingThread(TerminableThread):
             if not self.resource_thread_join():
                 raise RuntimeError(
                     "Failed to terminate result processing thread. Result summary may be incomplete or corrupted") from e
-        finally:
-            # We don't take the lock to ensure there is no deadlock in case of the thread being stuck on acquiring the lock. This
-            # may lead to incomplete or corrupted summary, but it's better than hanging indefinitely.
-            self.summary.print_summary(show_failed=True, show_flaky=False, top_slowest=0, show_all=True)
-            if self.summary_file is not None:
-                self.summary.write_json(self.summary_file)
