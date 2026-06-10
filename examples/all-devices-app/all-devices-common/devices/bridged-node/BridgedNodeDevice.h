@@ -21,8 +21,8 @@
 #include <app/clusters/bridged-device-basic-information-server/BridgedDeviceBasicInformationDelegate.h>
 #include <data-model-providers/codedriven/CodeDrivenDataModelProvider.h>
 #include <devices/interface/SingleEndpointDevice.h>
-#include <lib/support/TimerDelegate.h>
 #include <functional>
+#include <lib/support/TimerDelegate.h>
 #include <string>
 
 namespace chip {
@@ -31,7 +31,7 @@ namespace app {
 class BridgedNodeDevice : public SingleEndpointDevice, public Clusters::BridgedDeviceBasicInformationDelegate
 {
 public:
-    using UniqueIdGenerator = std::function<std::string(chip::EndpointId)>;
+    using UniqueIdGenerator  = std::function<std::string(chip::EndpointId)>;
     using NodeLabelGenerator = std::function<std::string(chip::EndpointId)>;
 
     BridgedNodeDevice(TimerDelegate & timerDelegate, UniqueIdGenerator uniqueIdGenerator = nullptr,

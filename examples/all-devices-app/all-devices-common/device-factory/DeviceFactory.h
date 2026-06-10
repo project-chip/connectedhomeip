@@ -152,8 +152,7 @@ private:
             RegisterCreator("bridged-node", [this]() {
                 VerifyOrDie(mContext.has_value());
                 return std::make_unique<BridgedNodeDevice>(
-                    mContext->timerDelegate,
-                    [](EndpointId endpoint) { return "bridged-node-EP" + std::to_string(endpoint); },
+                    mContext->timerDelegate, [](EndpointId endpoint) { return "bridged-node-EP" + std::to_string(endpoint); },
                     [](EndpointId endpoint) { return "Bridged Node"; });
             });
         }

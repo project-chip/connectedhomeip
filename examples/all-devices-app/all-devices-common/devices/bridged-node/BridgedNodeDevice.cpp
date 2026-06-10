@@ -28,31 +28,30 @@ namespace app {
 
 BridgedNodeDevice::BridgedNodeDevice(TimerDelegate & timerDelegate, UniqueIdGenerator uniqueIdGenerator,
                                      NodeLabelGenerator nodeLabelGenerator) :
-    SingleEndpointDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kBridgedNode, 1)), mTimerDelegate(timerDelegate),
-    mUniqueIdGenerator(uniqueIdGenerator), mNodeLabelGenerator(nodeLabelGenerator)
+    SingleEndpointDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kBridgedNode, 1)),
+    mTimerDelegate(timerDelegate), mUniqueIdGenerator(uniqueIdGenerator), mNodeLabelGenerator(nodeLabelGenerator)
 {}
 
 CHIP_ERROR BridgedNodeDevice::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointId parentId)
 {
     ReturnErrorOnFailure(SingleEndpointRegistration(endpoint, provider, parentId));
 
-    mResolvedUniqueId = mUniqueIdGenerator ? mUniqueIdGenerator(endpoint) : ("bridged-node-EP" + std::to_string(endpoint));
+    mResolvedUniqueId  = mUniqueIdGenerator ? mUniqueIdGenerator(endpoint) : ("bridged-node-EP" + std::to_string(endpoint));
     mResolvedNodeLabel = mNodeLabelGenerator ? mNodeLabelGenerator(endpoint) : "Bridged Node";
 
     // Create the Bridged Device Basic Information cluster.
-    mBridgedDeviceBasicInformationCluster.Create(
-        endpoint,
-        BridgedDeviceBasicInformationCluster::MutableData{
-            .reachable = true,
-            .nodeLabel = mResolvedNodeLabel,
-        },
-        BridgedDeviceBasicInformationCluster::FixedData{
-            .uniqueId = mResolvedUniqueId,
-        },
-        BridgedDeviceBasicInformationCluster::Context{
-            .delegate      = *this,
-            .timerDelegate = mTimerDelegate,
-        });
+    mBridgedDeviceBasicInformationCluster.Create(endpoint,
+                                                 BridgedDeviceBasicInformationCluster::MutableData{
+                                                     .reachable = true,
+                                                     .nodeLabel = mResolvedNodeLabel,
+                                                 },
+                                                 BridgedDeviceBasicInformationCluster::FixedData{
+                                                     .uniqueId = mResolvedUniqueId,
+                                                 },
+                                                 BridgedDeviceBasicInformationCluster::Context{
+                                                     .delegate      = *this,
+                                                     .timerDelegate = mTimerDelegate,
+                                                 });
 
     ReturnErrorOnFailure(provider.AddCluster(mBridgedDeviceBasicInformationCluster.Registration()));
 
