@@ -48,6 +48,7 @@ ALL_PLATFORMS = {
     'tizen',
     'webos',
     'genio',
+    'mt793x',
     'silabs_docker',
     'unit_tests'
 }
