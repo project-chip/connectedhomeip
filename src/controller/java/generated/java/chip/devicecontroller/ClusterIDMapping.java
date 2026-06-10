@@ -16333,7 +16333,7 @@ public class ClusterIDMapping {
                         }
                         throw new NoSuchFieldError();
                     }
-                }public enum QueryIdentityCommandField {NetworkIdentityIndex(0),NetworkIdentityType(1),Identifier(2),;
+                }public enum QueryIdentityCommandField {NetworkIdentityIndex(0),NetworkIdentityType(1),ClientIndex(2),Identifier(3),;
                     private final int id;
                     QueryIdentityCommandField(int id) {
                         this.id = id;
