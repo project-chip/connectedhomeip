@@ -51,11 +51,10 @@ from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
-# Namespace in integer (not hex)
-HUMANACTIVITYNAMESPACEID = 75  # 0x4B
-OBJECTIDENTIFICATIONNAMESPACEID = 73  # 0x49
-SOUNDIDENTIFICATIONNAMESPACEID = 74  # 0x4A
-
+# Namespace in integer
+HUMAN_ACTIVITY_NAMESPACE_ID = 75 #0x4B
+OBJECT_IDENTIFICATION_NAMESPACE_ID = 73 #0x49
+SOUND_IDENTIFICATION_NAMESPACE_ID = 74 #0x4A
 
 class TC_ACS_3_1(MatterBaseTest):
     def desc_TC_ACS_3_1(self) -> str:
@@ -120,28 +119,29 @@ class TC_ACS_3_1(MatterBaseTest):
         attr = Clusters.AmbientContextSensing.Attributes
         dev_ctrl = self.default_controller
 
-        self.step("1")
+        self.step("1", "Commissioning, already done", is_commissioning=True)
         # Commission DUT - already done
         # Implicit step to get the feature map to ensure attribute operations
         # are performed on supported features
         aFeatureMap = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.FeatureMap)
-        log.info(f"Rx'd FeatureMap: {aFeatureMap}")
+        log.info("Rx'd FeatureMap: %s", {aFeatureMap})
         self.HumanActivitySupported = ((aFeatureMap & cluster.Bitmaps.Feature.kHumanActivity) != 0)
-        log.info(f"Rx'd HumanActivitySupported: {self.HumanActivitySupported}")
+        log.info("Rx'd HumanActivitySupported: %s", {self.HumanActivitySupported})
         self.ObjectCountingSupported = ((aFeatureMap & cluster.Bitmaps.Feature.kObjectCounting) != 0)
-        log.info(f"Rx'd ObjectCountingSupported: {self.ObjectCountingSupported}")
+        log.info("Rx'd ObjectCountingSupported: %s", {self.ObjectCountingSupported})
         self.ObjectIdentificationSupported = ((aFeatureMap & cluster.Bitmaps.Feature.kObjectIdentification) != 0)
-        log.info(f"Rx'd ObjectIdentificationSupported: {self.ObjectIdentificationSupported}")
+        log.info("Rx'd ObjectIdentificationSupported: %s", {self.ObjectIdentificationSupported})
         self.SoundIdentificationSupported = ((aFeatureMap & cluster.Bitmaps.Feature.kSoundIdentification) != 0)
-        log.info(f"Rx'd SoundIdentificationSupported: {self.SoundIdentificationSupported}")
+        log.info("Rx'd SoundIdentificationSupported: %s", {self.SoundIdentificationSupported})
         self.PredictedActivitySupported = ((aFeatureMap & cluster.Bitmaps.Feature.kPredictedActivity) != 0)
-        log.info(f"Rx'd PredictedActivitySupported: {self.PredictedActivitySupported}")
+        log.info("Rx'd PredictedActivitySupported: %s", {self.PredictedActivitySupported})
 
-        self.step("2")
+        self.step("2", "TH reads the SimultaneousDetectionLimit attribute.",
+                     "If 1 is read, skip this test case. Otherwise proceed the following.")
         simultaneousDetectionLimit = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.SimultaneousDetectionLimit
         )
-        log.info(f"Rx'd SimultaneousDetectionLimit: {simultaneousDetectionLimit}")
+        log.info("Rx'd SimultaneousDetectionLimit: %s", {simultaneousDetectionLimit})
 
         # check if multi detection is supported
         if simultaneousDetectionLimit < 2:
@@ -157,7 +157,7 @@ class TC_ACS_3_1(MatterBaseTest):
             self.skip_step("7")
             return
 
-        self.step("3")
+        self.step("3", "TH establishes a wildcard subscription to all attributes on Ambient Context Sensing Cluster on the endpoint under test with minIntervalFloor set to 0, MaxIntervalCeiling set to 30 and KeepSubscriptions set to false.")
         # subscription setup
         attrib_listener = AttributeSubscriptionHandler(expected_cluster=cluster)
         await attrib_listener.start(dev_ctrl, node_id, endpoint=endpoint, min_interval_sec=0, max_interval_sec=30, keepSubscriptions=False)
@@ -166,7 +166,8 @@ class TC_ACS_3_1(MatterBaseTest):
         event_listener = EventSubscriptionHandler(expected_cluster=cluster)
         await event_listener.start(dev_ctrl, node_id, endpoint=endpoint, min_interval_sec=0, max_interval_sec=90)
 
-        self.step("4")
+        self.step("4", "TH writes DUT HoldTime attribute.",
+                     "VVerify that its value is ranged between HoldTimeLimits.HoldTimeMin and HoldTimeLimits.HoldTimeMax.")
         holdTime_input = 30  # 30 seconds
         await self.write_single_attribute(attr.HoldTime(holdTime_input))
 
@@ -183,20 +184,22 @@ class TC_ACS_3_1(MatterBaseTest):
         # Human activity walking, Object identification person, Audio identification barking
         if self.is_ci:
             self.write_to_app_pipe(
-                '{"Name":"SetAmbientContextSupport","EndpointId":1,"AmbientContextType":[{"TypeId":73, "TagId":3},{"TypeId":74, "TagId":4},{"TypeId":75,"TagId":3}]}')
+                '{"Name":"SetAmbientContextSupport","EndpointId":{endpoint},"AmbientContextType":[{"TypeId":73, "TagId":3},{"TypeId":74, "TagId":4},{"TypeId":75,"TagId":3}]}')
 
         # check the SimultaneousDetectLimit
         simultaneousDetectionLimit = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.SimultaneousDetectionLimit)
 
         if simultaneousDetectionLimit == 2:
-            self.step("5a")
+            self.step("5a", "This step is for DUT capable of supporting only 2 simultaneous detection. Otherwise, skip to 6a.",
+                     "An operator actuates DUT to generate the first ambient sensing event, and then removes its sensing stimulus.",
+                     "And within HoldTime duration, an operator actuates DUT to generate the second ambient sensing event, and then removes its sensing stimulus.")
             # CI for the first ambient sensing event => Human activity walking
             # Use decimal number not hex
-            namespaceID1 = HUMANACTIVITYNAMESPACEID  # 75
+            namespaceID1 = HUMAN_ACTIVITY_NAMESPACE_ID  # 75
             tag1 = 3  # walking
             if self.is_ci:
                 self.write_to_app_pipe(
-                    '{"Name":"AddAmbientContextDetect", "EndpointId":1, "AmbientContextType":[{"TypeId":75, "TagId":3}]}')
+                    '{"Name":"AddAmbientContextDetect", "EndpointId":{endpoint}, "AmbientContextType":[{"TypeId":75, "TagId":3}]}')
             else:
                 # Trigger the ambient sensor to change AmbientContextType.AmbientContextSensed.NamespaceID
                 # and AmbientContextType.AmbientContextSensed.Tag => TESTER ACTION on DUT
@@ -209,17 +212,17 @@ class TC_ACS_3_1(MatterBaseTest):
                 # log.info(f"list_dec: {list_dec}")
                 namespaceID1 = list_dec[0]
                 tag1 = list_dec[1]
-                log.info(f"user input: {namespaceID1} {tag1}")
+                log.info("user input: %s %s", {namespaceID1}, {tag1})
 
             # Add 1 second delay to make sure it's done
             await asyncio.sleep(1)
 
             # CI for the second ambient sensing event => Object Identification person
-            namespaceID2 = OBJECTIDENTIFICATIONNAMESPACEID  # 73
+            namespaceID2 = OBJECT_IDENTIFICATION_NAMESPACE_ID  # 73
             tag2 = 3  # person
             if self.is_ci:
                 self.write_to_app_pipe(
-                    '{"Name":"AddAmbientContextDetect", "EndpointId":1, "AmbientContextType":[{"TypeId":73, "TagId":3}]}')
+                    '{"Name":"AddAmbientContextDetect", "EndpointId":{endpoint}, "AmbientContextType":[{"TypeId":73, "TagId":3}]}')
             else:
                 # Trigger the ambient sensor to change AmbientContextType.AmbientContextSensed.NamespaceID
                 # and AmbientContextType.AmbientContextSensed.Tag => TESTER ACTION on DUT
@@ -230,15 +233,17 @@ class TC_ACS_3_1(MatterBaseTest):
                 list_dec = ast.literal_eval(user_data)  # convert string hex to decimal
                 namespaceID2 = list_dec[0]
                 tag2 = list_dec[1]
-                log.info(f"user input: {namespaceID2} {tag2}")
+                log.info("user input: %s %s", {namespaceID2}, {tag2})
 
             # Add 1 second delay to make sure it's done
             await asyncio.sleep(1)
 
-            self.step("5b")
+            self.step("5b", "TH verifies the AmbientContextType attribute change.",
+                     "Verify that DUT response contains the AmbientContextSensed struct data list size of up to 2.",
+                     "Verify that DUT response contains the AmbientContextSensed struct data including the namespace ID and its tag ID that match both ambient sensing events from the step 5a.")
             ambientContextType = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.AmbientContextType)
-            log.info(f"Rx'd AmbientContextType: {ambientContextType}")
+            log.info("Rx'd AmbientContextType: %s", {ambientContextType})
 
             # Simultaneous Detection <= 2
             asserts.assert_less_equal(len(ambientContextType), 2, "AmbientContextType list needs to be the size of 2.")
@@ -259,55 +264,56 @@ class TC_ACS_3_1(MatterBaseTest):
 
             # early namespace id == namespaceID1
             namespaceid_test1 = subscription_expected[1].ambientContextSensed[0].namespaceID
-            log.info(f"namespaceid_test1: {namespaceid_test1}")
+            log.info("namespaceid_test1: %s", {namespaceid_test1}")
             asserts.assert_true(namespaceid_test1 == namespaceID1,
                                 f"Unexpected namespaceID, {namespaceid_test1}, exp {namespaceID1}")
             asserts.assert_true(subscription_expected[1].ambientContextSensed[0].tag == tag1,
                                 f"Unexpected tag, {subscription_expected[1].ambientContextSensed[0].tag}, exp {tag1}")
 
             # AmbientContextType attribute subscription check for the latest event boolean attribute
-            if (namespaceid_test == HUMANACTIVITYNAMESPACEID) & self.HumanActivitySupported:
+            if (namespaceid_test == HUMAN_ACTIVITY_NAMESPACE_ID) & self.HumanActivitySupported:
                 subscription_bool_expected = attrib_listener.attribute_reports[cluster.Attributes.HumanActivityDetected]
-                log.info(f"Rx'd subscription_bool_expected: {subscription_bool_expected}")
+                log.info("Rx'd subscription_bool_expected: %s", {subscription_bool_expected})
                 humanActivityDetected = subscription_bool_expected[0].value
-                log.info(f"Rx'd humanActivityDetected: {humanActivityDetected}")
+                log.info("Rx'd humanActivityDetected: %s", {humanActivityDetected})
                 asserts.assert_true(humanActivityDetected, "Failed to get HumanActivityDetected being True.")
-            elif (namespaceid_test == OBJECTIDENTIFICATIONNAMESPACEID) & self.ObjectIdentificationSupported:
+            elif (namespaceid_test == OBJECT_IDENTIFICATION_NAMESPACE_ID) & self.ObjectIdentificationSupported:
                 subscription_bool_expected = attrib_listener.attribute_reports[cluster.Attributes.ObjectIdentified]
-                log.info(f"Rx'd subscription_bool_expected: {subscription_bool_expected}")
+                log.info("Rx'd subscription_bool_expected: %s", {subscription_bool_expected})
                 objectIdentified = subscription_bool_expected[0].value
-                log.info(f"Rx'd objectIdentified: {objectIdentified}")
+                log.info("Rx'd objectIdentified: %s", {objectIdentified})
                 asserts.assert_true(objectIdentified, "Failed to get ObjectIdentified being True.")
-            elif (namespaceid_test == SOUNDIDENTIFICATIONNAMESPACEID) & self.SoundIdentificationSupported:
+            elif (namespaceid_test == SOUND_IDENTIFICATION_NAMESPACE_ID) & self.SoundIdentificationSupported:
                 subscription_bool_expected = attrib_listener.attribute_reports[cluster.Attributes.AudioContextDetected]
-                log.info(f"Rx'd subscription_bool_expected: {subscription_bool_expected}")
+                log.info("Rx'd subscription_bool_expected: %s", {subscription_bool_expected})
                 audioContextDetected = subscription_bool_expected[0].value
-                log.info(f"Rx'd audioContextDetected: {audioContextDetected}")
+                log.info("Rx'd audioContextDetected: %s", {audioContextDetected})
                 asserts.assert_true(audioContextDetected, "Failed to get audioContextDetected being True.")
 
             # AmbientContextType attribute subscription check for the early boolean attribute
-            if (namespaceid_test1 == HUMANACTIVITYNAMESPACEID) & self.HumanActivitySupported:
+            if (namespaceid_test1 == HUMAN_ACTIVITY_NAMESPACE_ID) & self.HumanActivitySupported:
                 subscription_bool_expected1 = attrib_listener.attribute_reports[cluster.Attributes.HumanActivityDetected]
-                log.info(f"Rx'd subscription_expected1: {subscription_bool_expected1}")
+                log.info("Rx'd subscription_expected1: %s", {subscription_bool_expected1})
                 humanActivityDetected = subscription_bool_expected1[0].value
-                log.info(f"Rx'd humanActivityDetected: {humanActivityDetected}")
+                log.info("Rx'd humanActivityDetected: %s", {humanActivityDetected})
                 asserts.assert_true(humanActivityDetected, "Failed to get HumanActivityDetected being True.")
-            elif (namespaceid_test1 == OBJECTIDENTIFICATIONNAMESPACEID) & self.ObjectIdentificationSupported:
+            elif (namespaceid_test1 == OBJECT_IDENTIFICATION_NAMESPACE_ID) & self.ObjectIdentificationSupported:
                 subscription_bool_expected1 = attrib_listener.attribute_reports[cluster.Attributes.ObjectIdentified]
-                log.info(f"Rx'd subscription_bool_expected1: {subscription_bool_expected1}")
+                log.info("Rx'd subscription_bool_expected1: %s", {subscription_bool_expected1})
                 objectIdentified = subscription_bool_expected1[0].value
-                log.info(f"Rx'd objectIdentified: {objectIdentified}")
+                log.info("Rx'd objectIdentified: %s", {objectIdentified})
                 asserts.assert_true(objectIdentified, "Failed to get ObjectIdentified being True.")
-            elif (namespaceid_test1 == SOUNDIDENTIFICATIONNAMESPACEID) & self.SoundIdentificationSupported:
+            elif (namespaceid_test1 == SOUND_IDENTIFICATION_NAMESPACE_ID) & self.SoundIdentificationSupported:
                 subscription_bool_expected1 = attrib_listener.attribute_reports[cluster.Attributes.AudioContextDetected]
-                log.info(f"Rx'd subscription_bool_expected1: {subscription_bool_expected1}")
+                log.info("Rx'd subscription_bool_expected1: %s", {subscription_bool_expected1})
                 audioContextDetected = subscription_bool_expected1[0].value
-                log.info(f"Rx'd audioContextDetected: {audioContextDetected}")
+                log.info("Rx'd audioContextDetected: %s", {audioContextDetected})
                 asserts.assert_true(audioContextDetected, "Failed to get audioContextDetected being True.")
 
             attrib_listener.reset()
 
-            self.step("5c")
+            self.step("5c", "An operator waits until the HoldTime duration expires since the step 5a execution.",
+                     "Check if AmbientContextDetectEnded is received for the second ambient sensing event.")
             # wait until HoldTime expires
             # CI call to trigger on
             if self.is_ci:
@@ -330,14 +336,16 @@ class TC_ACS_3_1(MatterBaseTest):
             self.skip_step("5b")
             self.skip_step("5c")
 
-            self.step("6a")
+            self.step("6a", "This step is for DUT capable of supporting 3 or more simultaneous detection. An operator actuates DUT to generate the first ambient sensing event, and then removes its sensing stimulus.",
+                     "And within HoldTime duration, an operator actuates DUT to generate the second ambient sensing event, and then removes its sensing stimulus.",
+                     "And within HoldTime duration, an operator actuates DUT to generate the third ambient sensing event, and then removes its sensing stimulus.")
             # CI for the first ambient sensing event => Human activity walking
             # Use decimal number not hex
-            namespaceID1 = HUMANACTIVITYNAMESPACEID  # 75
+            namespaceID1 = HUMAN_ACTIVITY_NAMESPACE_ID  # 75
             tag1 = 3  # walking
             if self.is_ci:
                 self.write_to_app_pipe(
-                    '{"Name":"AddAmbientContextDetect", "EndpointId":1, "AmbientContextType":[{"TypeId":75, "TagId":3}]}')
+                    '{"Name":"AddAmbientContextDetect", "EndpointId":{endpoint}, "AmbientContextType":[{"TypeId":75, "TagId":3}]}')
             else:
                 # Trigger the ambient sensor to change AmbientContextType.AmbientContextSensed.NamespaceID
                 # and AmbientContextType.AmbientContextSensed.Tag => TESTER ACTION on DUT
@@ -350,17 +358,17 @@ class TC_ACS_3_1(MatterBaseTest):
                 # log.info(f"list_dec: {list_dec}")
                 namespaceID1 = list_dec[0]
                 tag1 = list_dec[1]
-                log.info(f"user input: {namespaceID1} {tag1}")
+                log.info("user input: %s %s", {namespaceID1}, {tag1})
 
             # Add 1 second delay to make sure it's done
             await asyncio.sleep(1)
 
             # CI for the second ambient sensing event => Object Identification person
-            namespaceID2 = OBJECTIDENTIFICATIONNAMESPACEID  # 73
+            namespaceID2 = OBJECT_IDENTIFICATION_NAMESPACE_ID  # 73
             tag2 = 3  # person
             if self.is_ci:
                 self.write_to_app_pipe(
-                    '{"Name":"AddAmbientContextDetect", "EndpointId":1, "AmbientContextType":[{"TypeId":73, "TagId":3}]}')
+                    '{"Name":"AddAmbientContextDetect", "EndpointId":{endpoint}, "AmbientContextType":[{"TypeId":73, "TagId":3}]}')
             else:
                 # Trigger the ambient sensor to change AmbientContextType.AmbientContextSensed.NamespaceID
                 # and AmbientContextType.AmbientContextSensed.Tag => TESTER ACTION on DUT
@@ -371,17 +379,17 @@ class TC_ACS_3_1(MatterBaseTest):
                 list_dec = ast.literal_eval(user_data)  # convert string hex to decimal
                 namespaceID2 = list_dec[0]
                 tag2 = list_dec[1]
-                log.info(f"user input: {namespaceID2} {tag2}")
+                log.info("user input: %s %s", {namespaceID2}, {tag2})
 
             # Add 1 second delay to make sure it's done
             await asyncio.sleep(1)
 
             # CI for the third ambient sensing event => Sound context barking
-            namespaceID3 = SOUNDIDENTIFICATIONNAMESPACEID  # 74
+            namespaceID3 = SOUND_IDENTIFICATION_NAMESPACE_ID  # 74
             tag3 = 4  # person
             if self.is_ci:
                 self.write_to_app_pipe(
-                    '{"Name":"AddAmbientContextDetect", "EndpointId":1, "AmbientContextType":[{"TypeId":74, "TagId":4}]}')
+                    '{"Name":"AddAmbientContextDetect", "EndpointId":{endpoint}, "AmbientContextType":[{"TypeId":74, "TagId":4}]}')
             else:
                 # Trigger the ambient sensor to change AmbientContextType.AmbientContextSensed.NamespaceID
                 # and AmbientContextType.AmbientContextSensed.Tag => TESTER ACTION on DUT
@@ -392,7 +400,7 @@ class TC_ACS_3_1(MatterBaseTest):
                 list_dec = ast.literal_eval(user_data)  # convert string hex to decimal
                 namespaceID3 = list_dec[0]
                 tag3 = list_dec[1]
-                log.info(f"user input: {namespaceID3} {tag3}")
+                log.info("user input: %s %s", {namespaceID3}, {tag3})
 
             # Add 1 second delay to make sure it's done
             await asyncio.sleep(1)
@@ -401,10 +409,12 @@ class TC_ACS_3_1(MatterBaseTest):
             # event = event_listener.wait_for_event_report(cluster.Events.AmbientContextDetectStarted, timeout_sec=10)
             # start_event_id = event.event_id
 
-            self.step("6b")
+            self.step("6b", "TH verifies the AmbientContextType attribute change.",
+                     "Verify that DUT response contains the AmbientContextSensed struct data list size of up to 3.",
+                     "Verify that DUT response contains the AmbientContextSensed struct data including the namespace ID and its tag ID that match both ambient sensing events from the step 6a.")
             ambientContextType = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.AmbientContextType)
-            log.info(f"Rx'd AmbientContextType: {ambientContextType}")
+            log.info("Rx'd AmbientContextType: %s", {ambientContextType}")
 
             # Simultaneous Detection <= 3
             asserts.assert_less_equal(len(ambientContextType), 3, "AmbientContextType list needs to be the size of 3.")
@@ -417,7 +427,7 @@ class TC_ACS_3_1(MatterBaseTest):
 
             # latest namespace id == namespaceID3
             namespaceid_test = subscription_expected[0].ambientContextSensed[0].namespaceID
-            log.info(f"namespaceid_test: {namespaceid_test}")
+            #log.info(f"namespaceid_test: {namespaceid_test}")
             asserts.assert_true(namespaceid_test == namespaceID3,
                                 f"Unexpected namespaceID, {namespaceid_test}, exp {namespaceID3}")
             asserts.assert_true(subscription_expected[0].ambientContextSensed[0].tag == tag3,
@@ -425,7 +435,7 @@ class TC_ACS_3_1(MatterBaseTest):
 
             # early namespace id == namespaceID2
             namespaceid_test1 = subscription_expected[1].ambientContextSensed[0].namespaceID
-            log.info(f"namespaceid_test1: {namespaceid_test1}")
+            #log.info(f"namespaceid_test1: {namespaceid_test1}")
             asserts.assert_true(namespaceid_test1 == namespaceID2,
                                 f"Unexpected namespaceID, {namespaceid_test1}, exp {namespaceID2}")
             asserts.assert_true(subscription_expected[1].ambientContextSensed[0].tag == tag2,
@@ -433,75 +443,76 @@ class TC_ACS_3_1(MatterBaseTest):
 
             # earliest namespace id == namespaceID1
             namespaceid_test2 = subscription_expected[2].ambientContextSensed[0].namespaceID
-            log.info(f"namespaceid_test2: {namespaceid_test2}")
+            #log.info(f"namespaceid_test2: {namespaceid_test2}")
             asserts.assert_true(namespaceid_test2 == namespaceID1,
                                 f"Unexpected namespaceID, {namespaceid_test2}, exp {namespaceID1}")
             asserts.assert_true(subscription_expected[2].ambientContextSensed[0].tag == tag1,
                                 f"Unexpected tag, {subscription_expected[2].ambientContextSensed[0].tag}, exp {tag1}")
 
             # AmbientContextType attribute subscription check for the latest event boolean attribute
-            if (namespaceid_test == HUMANACTIVITYNAMESPACEID) & self.HumanActivitySupported:
+            if (namespaceid_test == HUMAN_ACTIVITY_NAMESPACE_ID) & self.HumanActivitySupported:
                 subscription_bool_expected = attrib_listener.attribute_reports[cluster.Attributes.HumanActivityDetected]
-                log.info(f"Rx'd subscription_bool_expected: {subscription_bool_expected}")
+                #log.info(f"Rx'd subscription_bool_expected: {subscription_bool_expected}")
                 humanActivityDetected = subscription_bool_expected[0].value
-                log.info(f"Rx'd humanActivityDetected: {humanActivityDetected}")
+                #log.info(f"Rx'd humanActivityDetected: {humanActivityDetected}")
                 asserts.assert_true(humanActivityDetected, "Failed to get HumanActivityDetected being True.")
-            elif (namespaceid_test == OBJECTIDENTIFICATIONNAMESPACEID) & self.ObjectIdentificationSupported:
+            elif (namespaceid_test == OBJECT_IDENTIFICATION_NAMESPACE_ID) & self.ObjectIdentificationSupported:
                 subscription_bool_expected = attrib_listener.attribute_reports[cluster.Attributes.ObjectIdentified]
-                log.info(f"Rx'd subscription_bool_expected: {subscription_bool_expected}")
+                #log.info(f"Rx'd subscription_bool_expected: {subscription_bool_expected}")
                 objectIdentified = subscription_bool_expected[0].value
-                log.info(f"Rx'd objectIdentified: {objectIdentified}")
+                #log.info(f"Rx'd objectIdentified: {objectIdentified}")
                 asserts.assert_true(objectIdentified, "Failed to get ObjectIdentified being True.")
-            elif (namespaceid_test == SOUNDIDENTIFICATIONNAMESPACEID) & self.SoundIdentificationSupported:
+            elif (namespaceid_test == SOUND_IDENTIFICATION_NAMESPACE_ID) & self.SoundIdentificationSupported:
                 subscription_bool_expected = attrib_listener.attribute_reports[cluster.Attributes.AudioContextDetected]
-                log.info(f"Rx'd subscription_bool_expected: {subscription_bool_expected}")
+                #log.info(f"Rx'd subscription_bool_expected: {subscription_bool_expected}")
                 audioContextDetected = subscription_bool_expected[0].value
-                log.info(f"Rx'd audioContextDetected: {audioContextDetected}")
+                #log.info(f"Rx'd audioContextDetected: {audioContextDetected}")
                 asserts.assert_true(audioContextDetected, "Failed to get audioContextDetected being True.")
 
             # AmbientContextType attribute subscription check for the early boolean attribute
-            if (namespaceid_test1 == HUMANACTIVITYNAMESPACEID) & self.HumanActivitySupported:
+            if (namespaceid_test1 == HUMAN_ACTIVITY_NAMESPACE_ID) & self.HumanActivitySupported:
                 subscription_bool_expected1 = attrib_listener.attribute_reports[cluster.Attributes.HumanActivityDetected]
-                log.info(f"Rx'd subscription_expected1: {subscription_bool_expected1}")
+                #log.info(f"Rx'd subscription_expected1: {subscription_bool_expected1}")
                 humanActivityDetected = subscription_bool_expected1[0].value
-                log.info(f"Rx'd humanActivityDetected: {humanActivityDetected}")
+                #log.info(f"Rx'd humanActivityDetected: {humanActivityDetected}")
                 asserts.assert_true(humanActivityDetected, "Failed to get HumanActivityDetected being True.")
-            elif (namespaceid_test1 == OBJECTIDENTIFICATIONNAMESPACEID) & self.ObjectIdentificationSupported:
+            elif (namespaceid_test1 == OBJECT_IDENTIFICATION_NAMESPACE_ID) & self.ObjectIdentificationSupported:
                 subscription_bool_expected1 = attrib_listener.attribute_reports[cluster.Attributes.ObjectIdentified]
-                log.info(f"Rx'd subscription_bool_expected1: {subscription_bool_expected1}")
+                #log.info(f"Rx'd subscription_bool_expected1: {subscription_bool_expected1}")
                 objectIdentified = subscription_bool_expected1[0].value
-                log.info(f"Rx'd objectIdentified: {objectIdentified}")
+                #log.info(f"Rx'd objectIdentified: {objectIdentified}")
                 asserts.assert_true(objectIdentified, "Failed to get ObjectIdentified being True.")
-            elif (namespaceid_test1 == SOUNDIDENTIFICATIONNAMESPACEID) & self.SoundIdentificationSupported:
+            elif (namespaceid_test1 == SOUND_IDENTIFICATION_NAMESPACE_ID) & self.SoundIdentificationSupported:
                 subscription_bool_expected1 = attrib_listener.attribute_reports[cluster.Attributes.AudioContextDetected]
-                log.info(f"Rx'd subscription_bool_expected1: {subscription_bool_expected1}")
+                #log.info(f"Rx'd subscription_bool_expected1: {subscription_bool_expected1}")
                 audioContextDetected = subscription_bool_expected1[0].value
-                log.info(f"Rx'd audioContextDetected: {audioContextDetected}")
+                #log.info(f"Rx'd audioContextDetected: {audioContextDetected}")
                 asserts.assert_true(audioContextDetected, "Failed to get audioContextDetected being True.")
 
             # AmbientContextType attribute subscription check for the early boolean attribute
-            if (namespaceid_test2 == HUMANACTIVITYNAMESPACEID) & self.HumanActivitySupported:
+            if (namespaceid_test2 == HUMAN_ACTIVITY_NAMESPACE_ID) & self.HumanActivitySupported:
                 subscription_bool_expected2 = attrib_listener.attribute_reports[cluster.Attributes.HumanActivityDetected]
-                log.info(f"Rx'd subscription_expected2: {subscription_bool_expected2}")
+                #log.info(f"Rx'd subscription_expected2: {subscription_bool_expected2}")
                 humanActivityDetected = subscription_bool_expected2[0].value
-                log.info(f"Rx'd humanActivityDetected: {humanActivityDetected}")
+                #log.info(f"Rx'd humanActivityDetected: {humanActivityDetected}")
                 asserts.assert_true(humanActivityDetected, "Failed to get HumanActivityDetected being True.")
-            elif (namespaceid_test2 == OBJECTIDENTIFICATIONNAMESPACEID) & self.ObjectIdentificationSupported:
+            elif (namespaceid_test2 == OBJECT_IDENTIFICATION_NAMESPACE_ID) & self.ObjectIdentificationSupported:
                 subscription_bool_expected2 = attrib_listener.attribute_reports[cluster.Attributes.ObjectIdentified]
-                log.info(f"Rx'd subscription_bool_expected2: {subscription_bool_expected2}")
+                #log.info(f"Rx'd subscription_bool_expected2: {subscription_bool_expected2}")
                 objectIdentified = subscription_bool_expected2[0].value
-                log.info(f"Rx'd objectIdentified: {objectIdentified}")
+                #log.info(f"Rx'd objectIdentified: {objectIdentified}")
                 asserts.assert_true(objectIdentified, "Failed to get ObjectIdentified being True.")
-            elif (namespaceid_test2 == SOUNDIDENTIFICATIONNAMESPACEID) & self.SoundIdentificationSupported:
+            elif (namespaceid_test2 == SOUND_IDENTIFICATION_NAMESPACE_ID) & self.SoundIdentificationSupported:
                 subscription_bool_expected2 = attrib_listener.attribute_reports[cluster.Attributes.AudioContextDetected]
-                log.info(f"Rx'd subscription_bool_expected1: {subscription_bool_expected2}")
+                #log.info(f"Rx'd subscription_bool_expected1: {subscription_bool_expected2}")
                 audioContextDetected = subscription_bool_expected2[0].value
-                log.info(f"Rx'd audioContextDetected: {audioContextDetected}")
+                #log.info(f"Rx'd audioContextDetected: {audioContextDetected}")
                 asserts.assert_true(audioContextDetected, "Failed to get audioContextDetected being True.")
 
             attrib_listener.reset()
 
-            self.step("6c")
+            self.step("6c", "An operator waits until the HoldTime duration expires since the step 6a execution.",
+                     "Check if AmbientContextDetectEnded is received for the last ambient sensing event.")
             # wait until HoldTime expires
             # CI call to trigger on
             if self.is_ci:
@@ -517,29 +528,30 @@ class TC_ACS_3_1(MatterBaseTest):
             # this check not ready yet.
             # asserts.assert_equal(event.event_id, start_event_id, "Wrong Event ID")
 
-        self.step("7")
+        self.step("7", "TH reads the AmbientContextType attribute.",
+                     "Verify that the AmbientContextType attribute contains an empty list and the Boolean attributes related the step 5a or 6a are False.")
         # Check the boolean attributes are set to False
         if humanActivityDetected & self.HumanActivitySupported:
             subscription_bool_expected = attrib_listener.attribute_reports[cluster.Attributes.HumanActivityDetected]
-            log.info(f"Rx'd subscription_bool_expected: {subscription_bool_expected}")
+            #log.info(f"Rx'd subscription_bool_expected: {subscription_bool_expected}")
             humanActivityDetected = subscription_bool_expected[0].value
-            log.info(f"Rx'd humanActivityDetected: {humanActivityDetected}")
+            #log.info(f"Rx'd humanActivityDetected: {humanActivityDetected}")
             asserts.assert_true(not humanActivityDetected, "Failed to get HumanActivityDetected being False.")
 
         if objectIdentified & self.ObjectIdentificationSupported:
             # AmbientContextType attribute subscription check for PIXIT.ACS.AmbientContextSensed_2 = Object identification person
             subscription_bool_expected = attrib_listener.attribute_reports[cluster.Attributes.ObjectIdentified]
-            log.info(f"Rx'd subscription_bool_expected: {subscription_bool_expected}")
+            #log.info(f"Rx'd subscription_bool_expected: {subscription_bool_expected}")
             objectIdentified = subscription_bool_expected[0].value
-            log.info(f"Rx'd objectIdentified: {objectIdentified}")
+            #log.info(f"Rx'd objectIdentified: {objectIdentified}")
             asserts.assert_true(not objectIdentified, "Failed to get ObjectIdentified being False.")
 
         if audioContextDetected & self.SoundIdentificationSupported:
             # AmbientContextType attribute subscription check for PIXIT.ACS.AmbientContextSensed_2 = Object identification person
             subscription_bool_expected = attrib_listener.attribute_reports[cluster.Attributes.AudioContextDetected]
-            log.info(f"Rx'd subscription_bool_expected: {subscription_bool_expected}")
+            #log.info(f"Rx'd subscription_bool_expected: {subscription_bool_expected}")
             audioContextDetected = subscription_bool_expected[0].value
-            log.info(f"Rx'd audioContextDetected: {audioContextDetected}")
+            #log.info(f"Rx'd audioContextDetected: {audioContextDetected}")
             asserts.assert_true(not audioContextDetected, "Failed to get audioContextDetected being False.")
 
         # check the subscription of AmbientContextType attribute (to be empty list)
