@@ -26,16 +26,17 @@ using namespace chip::app::Clusters;
 namespace chip {
 namespace app {
 
-BridgedNodeDevice::BridgedNodeDevice(TimerDelegate & timerDelegate) :
-    SingleEndpointDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kBridgedNode, 1)), mTimerDelegate(timerDelegate)
+BridgedNodeDevice::BridgedNodeDevice(TimerDelegate & timerDelegate, const std::string & uniqueId) :
+    SingleEndpointDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kBridgedNode, 1)), mTimerDelegate(timerDelegate),
+    mUniqueId(uniqueId)
 {}
 
 CHIP_ERROR BridgedNodeDevice::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointId parentId)
 {
     ReturnErrorOnFailure(SingleEndpointRegistration(endpoint, provider, parentId));
 
-    // Dynamic unique ID setup
-    std::string uniqueId = "bridged-node-EP" + std::to_string(endpoint);
+    // Setup unique ID: use injected unique ID if specified, otherwise fall back to endpoint-based default
+    std::string uniqueId = mUniqueId.empty() ? ("bridged-node-EP" + std::to_string(endpoint)) : mUniqueId;
 
     // Create the Bridged Device Basic Information cluster.
     mBridgedDeviceBasicInformationCluster.Create(

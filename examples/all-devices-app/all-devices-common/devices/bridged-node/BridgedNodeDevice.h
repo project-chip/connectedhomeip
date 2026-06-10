@@ -22,6 +22,7 @@
 #include <data-model-providers/codedriven/CodeDrivenDataModelProvider.h>
 #include <devices/interface/SingleEndpointDevice.h>
 #include <lib/support/TimerDelegate.h>
+#include <string>
 
 namespace chip {
 namespace app {
@@ -29,7 +30,7 @@ namespace app {
 class BridgedNodeDevice : public SingleEndpointDevice, public Clusters::BridgedDeviceBasicInformationDelegate
 {
 public:
-    BridgedNodeDevice(TimerDelegate & timerDelegate);
+    BridgedNodeDevice(TimerDelegate & timerDelegate, const std::string & uniqueId = "");
     ~BridgedNodeDevice() override = default;
 
     CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
@@ -38,6 +39,7 @@ public:
 
 protected:
     TimerDelegate & mTimerDelegate;
+    std::string mUniqueId;
     LazyRegisteredServerCluster<Clusters::BridgedDeviceBasicInformationCluster> mBridgedDeviceBasicInformationCluster;
 };
 
