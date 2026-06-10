@@ -12,31 +12,53 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from collections.abc import Callable
 import contextlib
 import queue
 import threading
 import time
 from collections.abc import Callable
 from multiprocessing.managers import SyncManager
-from typing import Generic, Protocol, TypeVar
+from typing import Generic, ParamSpec, Protocol, TypeVar, runtime_checkable
 
 from chiptest.concurrency.context import TerminableResource
 
 
+@runtime_checkable
 class Waitable(Protocol):
     def wait(self, timeout: float | None = None) -> bool: ...
 
 
-def wait_for_mp_managed(waitable: Waitable, timeout_sec: float | None = None, polling_interval_sec: float = 0.1) -> bool:
+P = ParamSpec("P")
+
+
+@runtime_checkable
+class WaitableFor(Protocol, Generic[P]):
+    def wait_for(self, predicate: Callable[P, bool], timeout: float | None = None) -> bool: ...
+
+
+def wait_for_mp_managed(waitable: Waitable | WaitableFor[P], predicate: Callable[P, bool] | None = None,
+                        timeout_sec: float | None = None, polling_interval_sec: float = 0.1) -> bool:
     """
     Wait for a resource managed by multiprocessing.Manager.
 
     Required because otherwise we wouldn't be able to catch a KeyboardInterrupt for a resource managed by multiprocessing.Manager,
     as the manager process explicitly ignores SIGINT.
     """
+    if predicate is not None:
+        if not isinstance(waitable, WaitableFor):
+            raise TypeError("Waitable must have wait_for() method if predicate is provided")
+
+        def wait_fn(timeout: float | None = None) -> bool:
+            return waitable.wait_for(predicate, timeout)
+    else:
+        if not isinstance(waitable, Waitable):
+            raise TypeError("Waitable must have wait() method")
+        wait_fn = waitable.wait
+
     # Blocking wait with no timeout. Cancellable only with a KeyboardInterrupt.
     if timeout_sec is None:
-        while not waitable.wait(polling_interval_sec):
+        while not wait_fn(polling_interval_sec):
             pass
         return True
 
@@ -45,12 +67,12 @@ def wait_for_mp_managed(waitable: Waitable, timeout_sec: float | None = None, po
     # returns immediately. The default Condition implementation checks if `timeout > 0`: if so, it acquires the underlying lock
     # with a timeout (blocking). Otherwise, it acquires the lock without blocking, without checking for negative timeout values.
     if timeout_sec <= 0:
-        return waitable.wait(timeout_sec)
+        return wait_fn(timeout_sec)
 
     # Countdown wait with polling, so that we can catch KeyboardInterrupt.
     end = time.monotonic() + timeout_sec
     while (time_left_sec := end - time.monotonic()) > 0:
-        if waitable.wait(min(polling_interval_sec, time_left_sec)):
+        if wait_fn(min(polling_interval_sec, time_left_sec)):
             return True
 
     return False

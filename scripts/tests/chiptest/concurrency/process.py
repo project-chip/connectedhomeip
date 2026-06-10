@@ -29,7 +29,7 @@ from multiprocessing.managers import SyncManager, ValueProxy
 from types import TracebackType
 from typing import ClassVar, Concatenate, Generic, ParamSpec, Protocol, Self, TypeVar
 
-from chiptest.concurrency.work_queue import CancellableQueue, EndOfQueue, QueueCancelled
+from chiptest.concurrency.work_queue import CancellableQueue, EndOfQueue, QueueCancelled, wait_for_mp_managed
 from chiptest.log_config import LogConfig
 
 log = logging.getLogger(__name__)
@@ -161,9 +161,12 @@ class ProcessState:
         Timeout as for `Condition.wait_for()`, i.e. it can be a positive float for maximum wait time, or None to wait indefinitely.
 
         Returns the result of the predicate.
+
+        We need the wait_for_mp_managed wrapper because otherwise we wouldn't be able to catch a KeyboardInterrupt for the condition
+        which is managed by multiprocessing.Manager, as the manager process explicitly ignores SIGINT.
         """
         with self._state_changed:
-            return self._state_changed.wait_for(lambda: predicate(self._phase.get(), self._exception.get()), timeout)
+            return wait_for_mp_managed(self._state_changed, lambda: predicate(self._phase.get(), self._exception.get()), timeout)
 
 
 WorkerConfigT = TypeVar("WorkerConfigT", bound=ProcessConfig)
