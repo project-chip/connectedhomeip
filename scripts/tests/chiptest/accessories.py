@@ -57,7 +57,7 @@ class XmlRpcFuncCall:
 XmlRpcFuncRet: TypeAlias = bool | Exception
 
 
-class XmlRpcServerProcess(WrappedProcess[XmlRpcFuncCall, XmlRpcFuncRet], StartStopContextMixin):
+class XmlRpcServerProcess(WrappedProcess[ProcessConfig, XmlRpcFuncCall, XmlRpcFuncRet], StartStopContextMixin):
     """
     Wrapped subprocess that hosts the XML-RPC endpoint for `AppsRegister`.
 

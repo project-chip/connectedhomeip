@@ -166,11 +166,12 @@ class ProcessState:
             return self._state_changed.wait_for(lambda: predicate(self._phase.get(), self._exception.get()), timeout)
 
 
+WorkerConfigT = TypeVar("WorkerConfigT", bound=ProcessConfig)
 WorkRequestT = TypeVar("WorkRequestT")
 WorkResponseT = TypeVar("WorkResponseT")
 
 
-class WrappedProcess(ABC, Generic[WorkRequestT, WorkResponseT]):
+class WrappedProcess(ABC, Generic[WorkerConfigT, WorkRequestT, WorkResponseT]):
     """
     Base class for wrapped Python subprocesses.
 
@@ -206,7 +207,7 @@ class WrappedProcess(ABC, Generic[WorkRequestT, WorkResponseT]):
     """
     # Methods run in the parent process.
 
-    def __init__(self, mp_context: SpawnContext, mp_manager: SyncManager, config: ProcessConfig,
+    def __init__(self, mp_context: SpawnContext, mp_manager: SyncManager, config: WorkerConfigT,
                  work_queue: CancellableQueue[WorkRequestT], rsp_queue: CancellableQueue[WorkResponseT]) -> None:
         # Neither mp_context or mp_manager should be saved as fields, as they are not picklable between processes. They can be used
         # to initialize some shared resources in the constructor.
