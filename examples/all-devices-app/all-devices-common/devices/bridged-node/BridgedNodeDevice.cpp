@@ -26,24 +26,25 @@ using namespace chip::app::Clusters;
 namespace chip {
 namespace app {
 
-BridgedNodeDevice::BridgedNodeDevice(TimerDelegate & timerDelegate, const std::string & uniqueId) :
+BridgedNodeDevice::BridgedNodeDevice(TimerDelegate & timerDelegate, UniqueIdGenerator uniqueIdGenerator,
+                                     NodeLabelGenerator nodeLabelGenerator) :
     SingleEndpointDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kBridgedNode, 1)), mTimerDelegate(timerDelegate),
-    mUniqueId(uniqueId)
+    mUniqueIdGenerator(uniqueIdGenerator), mNodeLabelGenerator(nodeLabelGenerator)
 {}
 
 CHIP_ERROR BridgedNodeDevice::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointId parentId)
 {
     ReturnErrorOnFailure(SingleEndpointRegistration(endpoint, provider, parentId));
 
-    // Setup unique ID: use injected unique ID if specified, otherwise fall back to endpoint-based default
-    std::string uniqueId = mUniqueId.empty() ? ("bridged-node-EP" + std::to_string(endpoint)) : mUniqueId;
+    std::string uniqueId = mUniqueIdGenerator ? mUniqueIdGenerator(endpoint) : ("bridged-node-EP" + std::to_string(endpoint));
+    std::string nodeLabel = mNodeLabelGenerator ? mNodeLabelGenerator(endpoint) : "Bridged Node";
 
     // Create the Bridged Device Basic Information cluster.
     mBridgedDeviceBasicInformationCluster.Create(
         endpoint,
         BridgedDeviceBasicInformationCluster::MutableData{
             .reachable = true,
-            .nodeLabel = "Bridged Node",
+            .nodeLabel = nodeLabel,
         },
         BridgedDeviceBasicInformationCluster::FixedData{
             .uniqueId = uniqueId,
