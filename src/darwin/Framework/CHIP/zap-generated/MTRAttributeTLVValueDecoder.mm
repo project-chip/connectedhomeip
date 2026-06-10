@@ -18101,6 +18101,7 @@ static id _Nullable DecodeAttributeValueForNetworkIdentityManagementCluster(Attr
                 newElement_0 = [MTRNetworkIdentityManagementClusterClientStruct new];
                 newElement_0.clientIndex = [NSNumber numberWithUnsignedShort:entry_0.clientIndex];
                 newElement_0.clientIdentifier = AsData(entry_0.clientIdentifier);
+                newElement_0.clientIdentityType = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.clientIdentityType)];
                 if (entry_0.networkIdentityIndex.IsNull()) {
                     newElement_0.networkIdentityIndex = nil;
                 } else {

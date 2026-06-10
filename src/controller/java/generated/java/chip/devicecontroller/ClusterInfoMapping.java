@@ -30903,6 +30903,9 @@ public class ClusterInfoMapping {
     CommandParameterInfo networkIdentityManagementqueryIdentitynetworkIdentityTypeCommandParameterInfo = new CommandParameterInfo("networkIdentityType", Optional.class, Integer.class);
     networkIdentityManagementqueryIdentityCommandParams.put("networkIdentityType",networkIdentityManagementqueryIdentitynetworkIdentityTypeCommandParameterInfo);
 
+    CommandParameterInfo networkIdentityManagementqueryIdentityclientIndexCommandParameterInfo = new CommandParameterInfo("clientIndex", Optional.class, Integer.class);
+    networkIdentityManagementqueryIdentityCommandParams.put("clientIndex",networkIdentityManagementqueryIdentityclientIndexCommandParameterInfo);
+
     CommandParameterInfo networkIdentityManagementqueryIdentityidentifierCommandParameterInfo = new CommandParameterInfo("identifier", Optional.class, byte[].class);
     networkIdentityManagementqueryIdentityCommandParams.put("identifier",networkIdentityManagementqueryIdentityidentifierCommandParameterInfo);
     InteractionInfo networkIdentityManagementqueryIdentityInteractionInfo = new InteractionInfo(
@@ -30914,6 +30917,9 @@ public class ClusterInfoMapping {
 
            , (Optional<Integer>)
              commandArguments.get("networkIdentityType")
+
+           , (Optional<Integer>)
+             commandArguments.get("clientIndex")
 
            , (Optional<byte[]>)
              commandArguments.get("identifier")
