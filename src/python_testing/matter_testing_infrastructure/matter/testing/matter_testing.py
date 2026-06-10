@@ -338,8 +338,8 @@ class BackgroundWildcardSubscriptionCache:
         from matter.clusters.Attribute import ValueDecodeFailure  # local import avoids top-level cost
         try:
             priming_data = self._subscription.GetAttributes()
-        except Exception:
-            LOGGER.warning("[BackgroundWildcardSubscriptionCache] Could not read priming attribute cache")
+        except Exception as e:
+            LOGGER.warning("[BackgroundWildcardSubscriptionCache] Could not read priming attribute cache: %s", e)
             return
 
         with self._lock:
@@ -791,6 +791,16 @@ class MatterBaseTest(base_test.BaseTestClass):
             )
         except Exception as e:
             LOGGER.warning("[MatterBaseTest] Could not start wildcard subscription: %s", e)
+            if self._pre_subscription_acl is not None:
+                try:
+                    self.event_loop.run_until_complete(
+                        self.default_controller.WriteAttribute(
+                            nodeId=self.dut_node_id,
+                            attributes=[(0, Clusters.AccessControl.Attributes.Acl(list(self._pre_subscription_acl)))],
+                        )
+                    )
+                except Exception as restore_err:
+                    LOGGER.warning("[MatterBaseTest] Error restoring ACL after wildcard subscription failure: %s", restore_err)
             self._pre_subscription_acl = None
             self.wildcard_subscription_handler = None
 
@@ -1438,6 +1448,19 @@ class MatterBaseTest(base_test.BaseTestClass):
         """
         _config = getattr(self, 'matter_test_config', None)
         if _config is None or not self._wildcard_subscription_disabled():
+            # Restore the ACL snapshot taken when starting the subscription controller so each test
+            # runs with the same baseline ACL.
+            if getattr(self, '_pre_subscription_acl', None) is not None:
+                try:
+                    self.event_loop.run_until_complete(
+                        self.default_controller.WriteAttribute(
+                            nodeId=self.dut_node_id,
+                            attributes=[(0, Clusters.AccessControl.Attributes.Acl(list(self._pre_subscription_acl)))],
+                        )
+                    )
+                except Exception as e:
+                    LOGGER.warning("[MatterBaseTest] Error restoring ACL after wildcard subscription: %s", e)
+                self._pre_subscription_acl = None
             if getattr(self, 'wildcard_subscription_handler', None) is not None:
                 try:
                     self.wildcard_subscription_handler.shutdown()
