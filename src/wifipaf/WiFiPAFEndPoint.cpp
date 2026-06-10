@@ -24,6 +24,7 @@
 
 #include "WiFiPAFEndPoint.h"
 
+#include <algorithm>
 #include <cstdint>
 #include <cstring>
 #include <utility>
@@ -693,6 +694,7 @@ CHIP_ERROR WiFiPAFEndPoint::HandleCapabilitiesRequestReceived(PacketBufferHandle
     }
 
     // Select fragment size for connection based on MTU.
+    VerifyOrReturnError(mtu >= WiFiPAFTP::sMinFragmentSize, WIFIPAF_ERROR_INVALID_FRAGMENT_SIZE);
     resp.mFragmentSize = std::min(static_cast<uint16_t>(mtu), WiFiPAFTP::sMaxFragmentSize);
 
     // Select local and remote max receive window size based on local resources available for both incoming writes
@@ -752,7 +754,7 @@ CHIP_ERROR WiFiPAFEndPoint::HandleCapabilitiesResponseReceived(PacketBufferHandl
     // Decode PAFTP capabilities response.
     ReturnErrorOnFailure(PAFTransportCapabilitiesResponseMessage::Decode(data, resp));
 
-    VerifyOrReturnError(resp.mFragmentSize > 0, WIFIPAF_ERROR_INVALID_FRAGMENT_SIZE);
+    VerifyOrReturnError(resp.mFragmentSize >= WiFiPAFTP::sMinFragmentSize, WIFIPAF_ERROR_INVALID_FRAGMENT_SIZE);
 
     ChipLogProgress(WiFiPAF, "Publisher chose PAFTP version %d; subscriber expected between %d and %d",
                     resp.mSelectedProtocolVersion, CHIP_PAF_TRANSPORT_PROTOCOL_MIN_SUPPORTED_VERSION,
@@ -780,8 +782,9 @@ CHIP_ERROR WiFiPAFEndPoint::HandleCapabilitiesResponseReceived(PacketBufferHandl
         mState = kState_Aborting;
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    mRemoteReceiveWindowSize = mLocalReceiveWindowSize = mReceiveWindowMaxSize = resp.mWindowSize;
-    ChipLogProgress(WiFiPAF, "local and remote recv window size = %u", resp.mWindowSize);
+    mRemoteReceiveWindowSize = mLocalReceiveWindowSize = mReceiveWindowMaxSize =
+        std::min(resp.mWindowSize, static_cast<uint8_t>(PAF_MAX_RECEIVE_WINDOW_SIZE));
+    ChipLogProgress(WiFiPAF, "local and remote recv window size = %u", mReceiveWindowMaxSize);
 
     // Shrink local receive window counter by 1, since connect handshake indication requires acknowledgement.
     mLocalReceiveWindowSize = static_cast<SequenceNumber_t>(mLocalReceiveWindowSize - 1);

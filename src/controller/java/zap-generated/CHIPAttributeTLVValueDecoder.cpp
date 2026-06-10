@@ -42371,6 +42371,13 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                         static_cast<jsize>(entry_0.clientIdentifier.size()),
                                         reinterpret_cast<const jbyte *>(entry_0.clientIdentifier.data()));
                 newElement_0_clientIdentifier = newElement_0_clientIdentifierByteArray;
+                jobject newElement_0_clientIdentityType;
+                std::string newElement_0_clientIdentityTypeClassName     = "java/lang/Integer";
+                std::string newElement_0_clientIdentityTypeCtorSignature = "(I)V";
+                jint jninewElement_0_clientIdentityType                  = static_cast<jint>(entry_0.clientIdentityType);
+                TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                    newElement_0_clientIdentityTypeClassName.c_str(), newElement_0_clientIdentityTypeCtorSignature.c_str(),
+                    jninewElement_0_clientIdentityType, newElement_0_clientIdentityType);
                 jobject newElement_0_networkIdentityIndex;
                 if (entry_0.networkIdentityIndex.IsNull())
                 {
@@ -42398,9 +42405,9 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
 
                     jmethodID clientStructStructCtor_1;
-                    err = chip::JniReferences::GetInstance().FindMethod(env, clientStructStructClass_1, "<init>",
-                                                                        "(Ljava/lang/Integer;[BLjava/lang/Integer;)V",
-                                                                        &clientStructStructCtor_1);
+                    err = chip::JniReferences::GetInstance().FindMethod(
+                        env, clientStructStructClass_1, "<init>", "(Ljava/lang/Integer;[BLjava/lang/Integer;Ljava/lang/Integer;)V",
+                        &clientStructStructCtor_1);
                     if (err != CHIP_NO_ERROR || clientStructStructCtor_1 == nullptr)
                     {
                         ChipLogError(Zcl, "Could not find ChipStructs$NetworkIdentityManagementClusterClientStruct constructor");
@@ -42408,7 +42415,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
 
                     newElement_0 = env->NewObject(clientStructStructClass_1, clientStructStructCtor_1, newElement_0_clientIndex,
-                                                  newElement_0_clientIdentifier, newElement_0_networkIdentityIndex);
+                                                  newElement_0_clientIdentifier, newElement_0_clientIdentityType,
+                                                  newElement_0_networkIdentityIndex);
                 }
                 TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }

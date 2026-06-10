@@ -12223,6 +12223,7 @@ public:
     {
         AddArgument("NetworkIdentityIndex", 0, UINT16_MAX, &mRequest.networkIdentityIndex);
         AddArgument("NetworkIdentityType", 0, UINT8_MAX, &mRequest.networkIdentityType);
+        AddArgument("ClientIndex", 0, UINT16_MAX, &mRequest.clientIndex);
         AddArgument("Identifier", &mRequest.identifier);
         ClusterCommand::AddArguments();
     }
