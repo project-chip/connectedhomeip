@@ -33,7 +33,6 @@ import threading
 import time
 import typing
 import uuid
-from pathlib import Path
 
 import click
 import coloredlogs
@@ -44,7 +43,8 @@ from matter.testing.tasks import Subprocess
 
 log = logging.getLogger(__name__)
 
-DEFAULT_CHIP_ROOT = next(filter(lambda p: (p / 'SPECIFICATION_VERSION').is_file(), Path(__file__).parents))
+DEFAULT_CHIP_ROOT = os.path.abspath(
+    os.path.join(os.path.dirname(__file__), '..', '..'))
 
 MATTER_DEVELOPMENT_PAA_ROOT_CERTS = "credentials/development/paa-root-certs"
 

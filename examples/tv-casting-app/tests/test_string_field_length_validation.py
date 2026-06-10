@@ -17,7 +17,6 @@ Property 2: String Field Length Validation
 
 import os
 import re
-from pathlib import Path
 
 from hypothesis import HealthCheck, given, settings
 from hypothesis import strategies as st
@@ -26,7 +25,7 @@ from hypothesis import strategies as st
 # Paths
 # ---------------------------------------------------------------------------
 
-REPO_ROOT = next(filter(lambda p: (p / 'SPECIFICATION_VERSION').is_file(), Path(__file__).parents))
+REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
 MC_DEVICE_INSTANCE_INFO_M = os.path.join(
     REPO_ROOT,
     "examples",

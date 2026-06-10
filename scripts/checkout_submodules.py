@@ -21,7 +21,6 @@ import logging
 import os
 import subprocess
 from collections import namedtuple
-from pathlib import Path
 
 
 class PlatformAction(argparse.Action):
@@ -39,7 +38,7 @@ class PlatformAction(argparse.Action):
 
 log = logging.getLogger(__name__)
 
-CHIP_ROOT = next(filter(lambda p: (p / 'SPECIFICATION_VERSION').is_file(), Path(__file__).parents))
+CHIP_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 
 ALL_PLATFORMS = {
     'ameba',

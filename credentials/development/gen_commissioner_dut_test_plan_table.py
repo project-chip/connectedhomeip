@@ -20,7 +20,6 @@ import argparse
 import json
 import os
 from dataclasses import dataclass
-from pathlib import Path
 
 
 @dataclass
@@ -30,7 +29,7 @@ class TestInfo:
     pid: int
 
 
-CHIP_ROOT = next(filter(lambda p: (p / 'SPECIFICATION_VERSION').is_file(), Path(__file__).parents))
+CHIP_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..'))
 RUNNER_SCRIPT_DIR = os.path.join(CHIP_ROOT, 'scripts/tests')
 
 

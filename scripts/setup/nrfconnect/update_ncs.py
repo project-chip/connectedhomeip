@@ -20,7 +20,6 @@ import argparse
 import os
 import subprocess
 import sys
-from pathlib import Path
 
 
 def get_commit_sha(repository_location, rev):
@@ -46,7 +45,8 @@ def update_ncs(repository_location, revision, fetch_shallow):
 
 
 def get_ncs_recommended_revision():
-    chip_root = next(filter(lambda p: (p / 'SPECIFICATION_VERSION').is_file(), Path(__file__).parents))
+    chip_root = os.path.abspath(os.path.join(
+        os.path.dirname(__file__), os.path.normpath('../../..')))
 
     # Read recommended revision saved in the .nrfconnect-recommended-revision file.
     try:
