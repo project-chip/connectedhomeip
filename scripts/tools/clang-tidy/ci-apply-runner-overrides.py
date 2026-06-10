@@ -20,9 +20,13 @@ the runner itself, so the PR clang-tidy job is unaffected. Rationale:
 Idempotent. Asserts the anchor still exists so a future runner rewrite fails loudly
 (re-roll the overrides) instead of silently scanning ~all TUs broken again.
 """
+import os
 import sys
 
-RUNNER = "scripts/run-clang-tidy-on-compile-commands.py"
+# Resolve the runner relative to this script so it works regardless of CWD.
+RUNNER = os.path.normpath(
+    os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "run-clang-tidy-on-compile-commands.py")
+)
 ANCHOR = "            self.clang_arguments = command_items[1:]\n"
 INJECT = (
     '            self.clang_arguments.append("-Wno-error")\n'

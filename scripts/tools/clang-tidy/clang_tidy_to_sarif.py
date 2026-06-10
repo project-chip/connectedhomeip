@@ -61,7 +61,11 @@ def to_repo_relative(path, repo_root):
     """Resolve a diagnostic path to a repo-root-relative POSIX path, or None if
     it lands outside the repo (system / third-party headers)."""
     abs_path = path if os.path.isabs(path) else os.path.join(repo_root, path)
-    rel = os.path.relpath(os.path.realpath(abs_path), repo_root)
+    try:
+        rel = os.path.relpath(os.path.realpath(abs_path), repo_root)
+    except ValueError:
+        # Different drives on Windows -> not under the repo root.
+        return None
     if rel.startswith(".."):
         return None
     return rel.replace(os.sep, "/")
@@ -76,13 +80,17 @@ def main():
     args = ap.parse_args()
 
     repo_root = os.path.realpath(args.repo_root)
-    stream = open(args.log, encoding="utf-8", errors="replace") if args.log else sys.stdin
+    if args.log:
+        with open(args.log, encoding="utf-8", errors="replace") as fh:
+            raw_lines = fh.readlines()
+    else:
+        raw_lines = sys.stdin.readlines()
 
     rules = {}      # check-name -> rule object
     results = []
     seen = set()    # dedup (rel, line, col, check, msg)
 
-    for raw in stream:
+    for raw in raw_lines:
         m = DIAG_RE.search(raw.rstrip("\n"))
         if not m:
             continue
