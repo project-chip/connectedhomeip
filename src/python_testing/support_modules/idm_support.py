@@ -39,7 +39,6 @@ from matter.testing import global_attribute_ids
 from matter.testing.basic_composition import BasicCompositionTests
 from matter.testing.event_attribute_reporting import WildcardAttributeSubscriptionHandler
 from matter.testing.global_attribute_ids import GlobalAttributeIds, is_standard_attribute_id
-from matter.testing.problem_notices import AttributePathLocation
 from matter.testing.spec_parsing import ConstraintReference, Constraints
 from matter.tlv import uint
 
@@ -1372,23 +1371,14 @@ class IDMBaseTest(BasicCompositionTests):
                             endpoint=endpoint_id, cluster=cluster_class, attribute=attribute,
                         )
                         if readback == cached_val:
-                            # Write succeeded but value didn't change, and the attribute isn't on the skip
-                            # list above, so this is a possible DUT bug. Record a problem notice for the
-                            # end-of-test summary verifying actual write semantics is the per-cluster
-                            # test's job, not IDM 4.3's. Add to the skip list if it turns out to be
-                            # spec-compliant.
-                            self.record_warning(
-                                test_name=test_step,
-                                location=AttributePathLocation(
-                                    endpoint_id=endpoint_id,
-                                    cluster_id=cluster_id,
-                                    attribute_id=attribute_id,
-                                ),
-                                problem=(
-                                    f"Write to {attribute.__name__} returned Success but value "
-                                    f"unchanged ({cached_val!r}). Possible DUT defect or spec-mandated "
-                                    f"silent-discard not yet on the IDM 4.3 skip list."
-                                ),
+                            # Write succeeded but the value did not change and the attribute is not on the exclusion
+                            # list above. Since IDM_4_3 validates subscription reporting behavior, do not expect
+                            # a report when no value change occurred. Attribute-specific write semantics are
+                            # validated by the corresponding cluster tests.
+                            log.warning(
+                                "Write to %s returned Success but value unchanged (%r). "
+                                "Possible DUT defect or spec-mandated silent-discard not yet on the IDM 4.3 skip list.",
+                                attribute.__name__, cached_val,
                             )
                             continue
 
