@@ -31,7 +31,6 @@
 #include "optiga_util.h"
 #include "pal.h"
 #include "pal_ifx_i2c_config.h"
-#include "pal_os_datastore.h"
 #include "pal_os_event.h"
 #include "pal_os_memory.h"
 #include "pal_os_timer.h"
