@@ -415,7 +415,7 @@ class TC_ACS_3_1(MatterBaseTest):
                      "Verify that DUT response contains the AmbientContextSensed struct data including the namespace ID and its tag ID that match both ambient sensing events from the step 6a.")
             ambientContextType = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.AmbientContextType)
-            log.info("Rx'd AmbientContextType: %s", {ambientContextType}")
+            log.info("Rx'd AmbientContextType: %s", {ambientContextType})
 
             # Simultaneous Detection <= 3
             asserts.assert_less_equal(len(ambientContextType), 3, "AmbientContextType list needs to be the size of 3.")
