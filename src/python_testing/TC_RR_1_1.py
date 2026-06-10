@@ -136,7 +136,7 @@ class TC_RR_1_1(MatterBaseTest):
         has_user_labels = len(endpoints_with_user_label_list) > 0
         if has_user_labels:
             log.info("--> User label cluster present on endpoints %s",
-                     ", ".join(["%d" % ep for ep in endpoints_with_user_label_list]))
+                     ", ".join([str(ep) for ep in endpoints_with_user_label_list]))
         else:
             log.info("--> User label cluster not present on any endpoitns")
 
@@ -335,7 +335,7 @@ class TC_RR_1_1(MatterBaseTest):
             client = client_by_name[client_name]
 
             # Send the UpdateLabel command
-            label = (("%d." % fabric.fabricIndex) * 16)[:32]
+            label = ((f"{fabric.fabricIndex}." * 16)[:32])
             log.info("Step 2a: Setting fabric label on fabric %d to '%s' using client %s", fabric.fabricIndex, label, client_name)
             await client.SendCommand(self.dut_node_id, 0, Clusters.OperationalCredentials.Commands.UpdateFabricLabel(label))
 
