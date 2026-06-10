@@ -31,6 +31,7 @@ jobs:
         run: git config --global --add safe.directory '*'
 
       - name: Build MT7933 Lighting App
+        shell: bash
         run: |
           ./scripts/checkout_submodules.py --platform mt793x
           source scripts/activate.sh
