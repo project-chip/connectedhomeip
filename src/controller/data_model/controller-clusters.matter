@@ -9580,7 +9580,7 @@ provisional cluster NetworkIdentityManagement = 1104 {
   revision 1;
 
   enum IdentityTypeEnum : enum8 {
-    kECDSA = 0 [spec_name = "ECDSA"];
+    kECDSA = 1 [spec_name = "ECDSA"];
   }
 
   struct ActiveNetworkIdentityStruct {
@@ -9595,7 +9595,8 @@ provisional cluster NetworkIdentityManagement = 1104 {
   struct ClientStruct {
     int16u clientIndex = 0;
     octet_string<20> clientIdentifier = 1;
-    nullable int16u networkIdentityIndex = 2;
+    IdentityTypeEnum clientIdentityType = 2;
+    nullable int16u networkIdentityIndex = 3;
   }
 
   readonly attribute access(read: manage) ActiveNetworkIdentityStruct activeNetworkIdentities[] = 0;
@@ -9623,7 +9624,8 @@ provisional cluster NetworkIdentityManagement = 1104 {
   request struct QueryIdentityRequest {
     optional int16u networkIdentityIndex = 0;
     optional IdentityTypeEnum networkIdentityType = 1;
-    optional octet_string<20> identifier = 2;
+    optional int16u clientIndex = 2;
+    optional octet_string<20> identifier = 3;
   }
 
   response struct QueryIdentityResponse = 4 {

@@ -5944,6 +5944,14 @@ DataModelLogger::LogValue(const char * label, size_t indent,
         }
     }
     {
+        CHIP_ERROR err = LogValue("ClientIdentityType", indent + 1, value.clientIdentityType);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ClientIdentityType'");
+            return err;
+        }
+    }
+    {
         CHIP_ERROR err = LogValue("NetworkIdentityIndex", indent + 1, value.networkIdentityIndex);
         if (err != CHIP_NO_ERROR)
         {
