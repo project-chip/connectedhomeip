@@ -143,8 +143,7 @@ public:
     {
         BitFlags<FanControl::Feature> features(featureMap);
 
-        gClusters[clusterInstanceIndex].integrationDelegateWrapper.Init(endpointId,
-                                                                          gClusters[clusterInstanceIndex].userDelegate);
+        gClusters[clusterInstanceIndex].integrationDelegateWrapper.Init(endpointId, gClusters[clusterInstanceIndex].userDelegate);
         FanControlCluster::Config config(endpointId, gClusters[clusterInstanceIndex].integrationDelegateWrapper);
 
         // Initialize FanModeSequence from attribute storage if available, otherwise use default.
