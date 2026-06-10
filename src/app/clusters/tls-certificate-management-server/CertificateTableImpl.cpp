@@ -364,8 +364,7 @@ CHIP_ERROR ClientSerializer::DeserializeData(TLV::TLVReader & reader, Certificat
 template <>
 void ClientSerializer::Clear(CertificateTable::ClientCertWithKey & data)
 {
-    data.detail = {};
-    data.key.Clear();
+    data.Clear();
 }
 
 template class chip::app::Storage::FabricTableImpl<CertificateId, CertificateTable::ClientCertWithKey>;
