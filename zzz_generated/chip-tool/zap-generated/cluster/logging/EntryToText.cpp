@@ -179,6 +179,8 @@ char const * ClusterIdToText(chip::ClusterId id)
         return "DeviceEnergyManagementMode";
     case chip::app::Clusters::ElectricalGridConditions::Id:
         return "ElectricalGridConditions";
+    case chip::app::Clusters::ElectricalAlarm::Id:
+        return "ElectricalAlarm";
     case chip::app::Clusters::ElectricalDistribution::Id:
         return "ElectricalDistribution";
     case chip::app::Clusters::ElectricalProtectionAlarm::Id:
@@ -245,6 +247,8 @@ char const * ClusterIdToText(chip::ClusterId id)
         return "SoilMeasurement";
     case chip::app::Clusters::AmbientContextSensing::Id:
         return "AmbientContextSensing";
+    case chip::app::Clusters::AmbientSensingUnion::Id:
+        return "AmbientSensingUnion";
     case chip::app::Clusters::ProximityRanging::Id:
         return "ProximityRanging";
     case chip::app::Clusters::SmokeConcentrationMeasurement::Id:
@@ -299,6 +303,8 @@ char const * ClusterIdToText(chip::ClusterId id)
         return "PushAvStreamTransport";
     case chip::app::Clusters::Chime::Id:
         return "Chime";
+    case chip::app::Clusters::AvAnalysis::Id:
+        return "AvAnalysis";
     case chip::app::Clusters::CommodityTariff::Id:
         return "CommodityTariff";
     case chip::app::Clusters::EcosystemInformation::Id:
@@ -2440,6 +2446,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "Forecast";
         case chip::app::Clusters::DeviceEnergyManagement::Attributes::OptOutState::Id:
             return "OptOutState";
+        case chip::app::Clusters::DeviceEnergyManagement::Attributes::PowerRangeAdjustment::Id:
+            return "PowerRangeAdjustment";
         case chip::app::Clusters::DeviceEnergyManagement::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::DeviceEnergyManagement::Attributes::AcceptedCommandList::Id:
@@ -2648,6 +2656,51 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
         case chip::app::Clusters::ElectricalGridConditions::Attributes::FeatureMap::Id:
             return "FeatureMap";
         case chip::app::Clusters::ElectricalGridConditions::Attributes::ClusterRevision::Id:
+            return "ClusterRevision";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::ElectricalAlarm::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::ElectricalAlarm::Attributes::Mask::Id:
+            return "Mask";
+        case chip::app::Clusters::ElectricalAlarm::Attributes::Latch::Id:
+            return "Latch";
+        case chip::app::Clusters::ElectricalAlarm::Attributes::State::Id:
+            return "State";
+        case chip::app::Clusters::ElectricalAlarm::Attributes::Supported::Id:
+            return "Supported";
+        case chip::app::Clusters::ElectricalAlarm::Attributes::OverVoltageThreshold::Id:
+            return "OverVoltageThreshold";
+        case chip::app::Clusters::ElectricalAlarm::Attributes::UnderVoltageThreshold::Id:
+            return "UnderVoltageThreshold";
+        case chip::app::Clusters::ElectricalAlarm::Attributes::OverFrequencyThreshold::Id:
+            return "OverFrequencyThreshold";
+        case chip::app::Clusters::ElectricalAlarm::Attributes::UnderFrequencyThreshold::Id:
+            return "UnderFrequencyThreshold";
+        case chip::app::Clusters::ElectricalAlarm::Attributes::OverPowerThreshold::Id:
+            return "OverPowerThreshold";
+        case chip::app::Clusters::ElectricalAlarm::Attributes::UnderPowerThreshold::Id:
+            return "UnderPowerThreshold";
+        case chip::app::Clusters::ElectricalAlarm::Attributes::OverCurrentThreshold::Id:
+            return "OverCurrentThreshold";
+        case chip::app::Clusters::ElectricalAlarm::Attributes::UnderCurrentThreshold::Id:
+            return "UnderCurrentThreshold";
+        case chip::app::Clusters::ElectricalAlarm::Attributes::PowerImportThreshold::Id:
+            return "PowerImportThreshold";
+        case chip::app::Clusters::ElectricalAlarm::Attributes::PowerExportThreshold::Id:
+            return "PowerExportThreshold";
+        case chip::app::Clusters::ElectricalAlarm::Attributes::GeneratedCommandList::Id:
+            return "GeneratedCommandList";
+        case chip::app::Clusters::ElectricalAlarm::Attributes::AcceptedCommandList::Id:
+            return "AcceptedCommandList";
+        case chip::app::Clusters::ElectricalAlarm::Attributes::AttributeList::Id:
+            return "AttributeList";
+        case chip::app::Clusters::ElectricalAlarm::Attributes::FeatureMap::Id:
+            return "FeatureMap";
+        case chip::app::Clusters::ElectricalAlarm::Attributes::ClusterRevision::Id:
             return "ClusterRevision";
         default:
             return "Unknown";
@@ -4092,8 +4145,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "AmbientContextType";
         case chip::app::Clusters::AmbientContextSensing::Attributes::AmbientContextTypeSupported::Id:
             return "AmbientContextTypeSupported";
-        case chip::app::Clusters::AmbientContextSensing::Attributes::ObjectCountReached::Id:
-            return "ObjectCountReached";
+        case chip::app::Clusters::AmbientContextSensing::Attributes::ObjectCountThresholdReached::Id:
+            return "ObjectCountThresholdReached";
         case chip::app::Clusters::AmbientContextSensing::Attributes::ObjectCountConfig::Id:
             return "ObjectCountConfig";
         case chip::app::Clusters::AmbientContextSensing::Attributes::ObjectCount::Id:
@@ -4106,6 +4159,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "HoldTimeLimits";
         case chip::app::Clusters::AmbientContextSensing::Attributes::PredictedActivity::Id:
             return "PredictedActivity";
+        case chip::app::Clusters::AmbientContextSensing::Attributes::SensorFusionSupported::Id:
+            return "SensorFusionSupported";
         case chip::app::Clusters::AmbientContextSensing::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::AmbientContextSensing::Attributes::AcceptedCommandList::Id:
@@ -4115,6 +4170,29 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
         case chip::app::Clusters::AmbientContextSensing::Attributes::FeatureMap::Id:
             return "FeatureMap";
         case chip::app::Clusters::AmbientContextSensing::Attributes::ClusterRevision::Id:
+            return "ClusterRevision";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::AmbientSensingUnion::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::AmbientSensingUnion::Attributes::UnionName::Id:
+            return "UnionName";
+        case chip::app::Clusters::AmbientSensingUnion::Attributes::UnionHealth::Id:
+            return "UnionHealth";
+        case chip::app::Clusters::AmbientSensingUnion::Attributes::UnionContributorList::Id:
+            return "UnionContributorList";
+        case chip::app::Clusters::AmbientSensingUnion::Attributes::GeneratedCommandList::Id:
+            return "GeneratedCommandList";
+        case chip::app::Clusters::AmbientSensingUnion::Attributes::AcceptedCommandList::Id:
+            return "AcceptedCommandList";
+        case chip::app::Clusters::AmbientSensingUnion::Attributes::AttributeList::Id:
+            return "AttributeList";
+        case chip::app::Clusters::AmbientSensingUnion::Attributes::FeatureMap::Id:
+            return "FeatureMap";
+        case chip::app::Clusters::AmbientSensingUnion::Attributes::ClusterRevision::Id:
             return "ClusterRevision";
         default:
             return "Unknown";
@@ -4860,6 +4938,35 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
         case chip::app::Clusters::Chime::Attributes::FeatureMap::Id:
             return "FeatureMap";
         case chip::app::Clusters::Chime::Attributes::ClusterRevision::Id:
+            return "ClusterRevision";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::AvAnalysis::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::AvAnalysis::Attributes::SupportedAmbientContexts::Id:
+            return "SupportedAmbientContexts";
+        case chip::app::Clusters::AvAnalysis::Attributes::ActiveAmbientContextTriggers::Id:
+            return "ActiveAmbientContextTriggers";
+        case chip::app::Clusters::AvAnalysis::Attributes::MaxAnalysisStreamCount::Id:
+            return "MaxAnalysisStreamCount";
+        case chip::app::Clusters::AvAnalysis::Attributes::CurrentAnalysisStreamCount::Id:
+            return "CurrentAnalysisStreamCount";
+        case chip::app::Clusters::AvAnalysis::Attributes::AnalysisStreams::Id:
+            return "AnalysisStreams";
+        case chip::app::Clusters::AvAnalysis::Attributes::TrackingEnabled::Id:
+            return "TrackingEnabled";
+        case chip::app::Clusters::AvAnalysis::Attributes::GeneratedCommandList::Id:
+            return "GeneratedCommandList";
+        case chip::app::Clusters::AvAnalysis::Attributes::AcceptedCommandList::Id:
+            return "AcceptedCommandList";
+        case chip::app::Clusters::AvAnalysis::Attributes::AttributeList::Id:
+            return "AttributeList";
+        case chip::app::Clusters::AvAnalysis::Attributes::FeatureMap::Id:
+            return "FeatureMap";
+        case chip::app::Clusters::AvAnalysis::Attributes::ClusterRevision::Id:
             return "ClusterRevision";
         default:
             return "Unknown";
@@ -5980,6 +6087,10 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "RequestConstraintBasedForecast";
         case chip::app::Clusters::DeviceEnergyManagement::Commands::CancelRequest::Id:
             return "CancelRequest";
+        case chip::app::Clusters::DeviceEnergyManagement::Commands::PowerRangeAdjustRequest::Id:
+            return "PowerRangeAdjustRequest";
+        case chip::app::Clusters::DeviceEnergyManagement::Commands::CancelPowerRangeAdjustRequest::Id:
+            return "CancelPowerRangeAdjustRequest";
         default:
             return "Unknown";
         }
@@ -6028,6 +6139,19 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
         {
         case chip::app::Clusters::DeviceEnergyManagementMode::Commands::ChangeToMode::Id:
             return "ChangeToMode";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::ElectricalAlarm::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::ElectricalAlarm::Commands::Reset::Id:
+            return "Reset";
+        case chip::app::Clusters::ElectricalAlarm::Commands::ModifyEnabledAlarms::Id:
+            return "ModifyEnabledAlarms";
+        case chip::app::Clusters::ElectricalAlarm::Commands::SetElectricalAlarmThresholds::Id:
+            return "SetElectricalAlarmThresholds";
         default:
             return "Unknown";
         }
@@ -6623,6 +6747,25 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
         {
         case chip::app::Clusters::Chime::Commands::PlayChimeSound::Id:
             return "PlayChimeSound";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::AvAnalysis::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::AvAnalysis::Commands::EnableContextTriggers::Id:
+            return "EnableContextTriggers";
+        case chip::app::Clusters::AvAnalysis::Commands::DisableContextTriggers::Id:
+            return "DisableContextTriggers";
+        case chip::app::Clusters::AvAnalysis::Commands::EstablishAnalysisStream::Id:
+            return "EstablishAnalysisStream";
+        case chip::app::Clusters::AvAnalysis::Commands::ActivateAnalysisStream::Id:
+            return "ActivateAnalysisStream";
+        case chip::app::Clusters::AvAnalysis::Commands::DeactivateAnalysisStream::Id:
+            return "DeactivateAnalysisStream";
+        case chip::app::Clusters::AvAnalysis::Commands::RemoveAnalysisStream::Id:
+            return "RemoveAnalysisStream";
         default:
             return "Unknown";
         }
@@ -7359,6 +7502,15 @@ char const * GeneratedCommandIdToText(chip::ClusterId cluster, chip::CommandId i
             return "Unknown";
         }
     }
+    case chip::app::Clusters::AvAnalysis::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::AvAnalysis::Commands::EstablishAnalysisStreamResponse::Id:
+            return "EstablishAnalysisStreamResponse";
+        default:
+            return "Unknown";
+        }
+    }
     case chip::app::Clusters::CommodityTariff::Id: {
         switch (id)
         {
@@ -7661,6 +7813,8 @@ char const * DeviceTypeIdToText(chip::DeviceTypeId id)
         return "Electrical Energy Tariff";
     case 0x00000514:
         return "Electrical Meter";
+    case 0x00000516:
+        return "Electrical Circuit Breaker";
     case 0x00000517:
         return "Electrical Distribution Enclosure";
     case 0x00000840:

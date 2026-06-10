@@ -67,9 +67,9 @@ class restartRemoteDevice(threading.Thread):
                 "ps aux | grep -E \'out/debug/standalone/{}\' | grep -v grep | grep -v gdb | awk \'{{print $2}}\'".format(
                     self.remote_server_app))
             if not stdout.read().decode().strip():
-                logger.info(f"Succeed to kill remote process {self.remote_server_app}")
+                logger.info("Succeed to kill remote process %s", self.remote_server_app)
             else:
-                logger.error(f"Failed to kill remote process {self.remote_server_app}")
+                logger.error("Failed to kill remote process %s", self.remote_server_app)
 
             restart_remote_device_command = (
                 "CHIPCirqueDaemon.py -- run gdb -batch -return-child-result -q -ex \"set pagination off\" "

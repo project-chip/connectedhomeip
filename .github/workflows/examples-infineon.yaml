@@ -38,7 +38,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-infineon:194
+            image: ghcr.io/project-chip/chip-build-infineon:200
             env:
                # TODO: this should probably be part of the dockerfile itself
                CY_TOOLS_PATHS: /opt/Tools/ModusToolbox/tools_3.2
@@ -46,7 +46,7 @@ jobs:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
         steps:
             - name: Checkout
-              uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+              uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:

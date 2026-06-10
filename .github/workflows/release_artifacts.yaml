@@ -32,11 +32,11 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: ghcr.io/project-chip/chip-build-esp32:194
+            image: ghcr.io/project-chip/chip-build-esp32:200
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v6.0.2
+              uses: actions/checkout@v6.0.3
               with:
                   ref: "${{ github.event.inputs.releaseTag }}"
             - name: Bootstrap
@@ -69,10 +69,10 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: ghcr.io/project-chip/chip-build-efr32:194
+            image: ghcr.io/project-chip/chip-build-efr32:200
         steps:
             - name: Checkout
-              uses: actions/checkout@v6.0.2
+              uses: actions/checkout@v6.0.3
               with:
                   ref: "${{ github.event.inputs.releaseTag }}"
             - name: Bootstrap

@@ -81,6 +81,15 @@ class PyChipError(ctypes.Structure):
         const char * mFile;
     };
     ```
+
+    NOTE: When logging a PyChipError, format it eagerly -- pass ``str(err)``, not ``err``, to the logger::
+
+        LOGGER.warning("Operation failed: %s", str(err))
+
+    ``PyChipError.__str__`` calls into the native library (``pychip_FormatError``), which takes the CHIP stack lock. With lazy
+    ``%s`` formatting that call runs inside ``Handler.emit()``, so the logging handler lock and the CHIP stack lock end up nested.
+    In Matter completion callbacks (e.g. those in ``ChipDeviceCtrl``) the calling thread already holds the CHIP stack lock, and this
+    nesting deadlocks the Matter event loop: the callback never returns and any awaited future hangs forever.
     '''
     _fields_ = [('code', ctypes.c_uint32), ('line', ctypes.c_uint32), ('file', ctypes.c_void_p)]
 
