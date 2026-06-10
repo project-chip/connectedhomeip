@@ -217,8 +217,7 @@ class TC_DRLK_2_9(MatterBaseTest, DRLK_COMMON):
             asserts.assert_true(response.userName == username,
                                 f"Error when executing GetUserResponse command, userName={str(response.userName)}")
             asserts.assert_true(response.userUniqueID == useruniqueid,
-                                "Error when executing GetUserResponse command, userUniqueID={}".format(
-                                    str(response.userUniqueID)))
+                                f"Error when executing GetUserResponse command, userUniqueID={str(response.userUniqueID)}")
             log.info("Credentials value is GetUserResponse Command %s", str(response.credentials))
 
             asserts.assert_equal(len(credentiallist), len(response.credentials),
@@ -634,7 +633,7 @@ class TC_DRLK_2_9(MatterBaseTest, DRLK_COMMON):
                         log.info("The updated value of nextCredentialIndex is %s", nextCredentialIndex)
                         start_credential_index += 1
                         asserts.assert_true(nextCredentialIndex == start_credential_index,
-                                            "Error mismatch in expected nextCredentialIndex={}".format(str(nextCredentialIndex)))
+                                            f"Error mismatch in expected nextCredentialIndex={str(nextCredentialIndex)}")
                         log.info("The updated value of start_credential_index is %s", start_credential_index)
                     else:
                         break

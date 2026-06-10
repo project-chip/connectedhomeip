@@ -261,7 +261,7 @@ class TC_DA_1_7(MatterBaseTest):
         self.step(f'{dut_index}.6')
         pk = dac_cert.public_key().public_bytes(encoding=Encoding.X962, format=PublicFormat.UncompressedPoint)
         log.info("Subject public key pk: %s", hex_from_bytes(pk))
-        key = 'pk_{}'.format(dut_index)
+        key = f'pk_{dut_index}'
         self.record_data({key: hex_from_bytes(pk)})
         return pk
 
