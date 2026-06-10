@@ -14,33 +14,31 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import contextlib
 import enum
-import functools
 import logging
-import multiprocessing
 import os
 import random
-import shlex
 import subprocess
 import sys
 import time
 import warnings
 from dataclasses import dataclass
+from multiprocessing.managers import SyncManager
 from pathlib import Path
 from typing import Any
 
 import chiptest
 import click
-from chiptest.accessories import AppsRegister
+from chiptest.concurrency.context import mp_wrapped_spawn_context
+from chiptest.concurrency.process import ProcessPhase
 from chiptest.concurrency.work_queue import CancellableQueue
+from chiptest.concurrency.worker import WorkerConfig, WorkerJob, WorkerProcessCls
 from chiptest.glob_matcher import GlobMatcher
 from chiptest.log_config import LOG_LEVELS, LogConfig, LogMessageCounter
 from chiptest.results import ResultError, ResultProcessingThread, RunSummary, TestResult, TestStatus
-from chiptest.runner import Executor, SubprocessKind
+from chiptest.runner import SubprocessKind
 from chiptest.status import PeriodicStatusThread
-from chiptest.test_definition import TEST_THREAD_DATASET, SubprocessInfoRepo, TestDefinition, TestRunTime, TestTag
-from chiptest.worker import TaskQueueT, WorkerThread
+from chiptest.test_definition import CommissioningMethod, SubprocessInfoRepo, TestDefinition, TestJobConfig, TestRunTime, TestTag
 from chipyaml.paths_finder import PathsFinder
 
 log = logging.getLogger(__name__)
@@ -53,6 +51,13 @@ if sys.platform == 'darwin':
 
 DEFAULT_CHIP_ROOT = next(filter(lambda p: (p / 'SPECIFICATION_VERSION').is_file(), Path(__file__).parents))
 
+if sys.platform == "linux":
+    # We have a private /run as we're running in unshare, so we can place it in any place under /run. We don't want it in /tmp, as
+    # we remount it to worker-specific scratchpad.
+    SYNC_MANAGER_PATH = "/run/python_pool_manager.sock"
+else:
+    # Other platforms will fall back to their default.
+    SYNC_MANAGER_PATH = None
 
 class ManualHandling(enum.Enum):
     INCLUDE = enum.auto()
@@ -503,110 +508,55 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int, app_path: li
                                    f"Option --commissioning-method={commissioning_method} is available on Linux platform only")
 
     run_summary = RunSummary(iterations, tests_per_iteration=len(context.obj.tests))
-    ble_controller_app = None
-    ble_controller_tool = None
-    thread_ba_host = None
-    thread_ba_port = None
-    task_queue: TaskQueueT = CancellableQueue()
+
+    # For now, we have only one worker process.
+    test_config = TestJobConfig(
+        commissioning_method, dry_run, subproc_info_repo, pics_file, context.obj.runtime, test_timeout_seconds, concurrency=1)
+    worker_config = WorkerConfig.from_test_job_config(context.obj.log_config, test_config).with_formatted_name()
 
     try:
-        with (multiprocessing.Manager() as mp_manager,
-                LogMessageCounter(mp_manager) as log_msg_counter,
-                context.obj.log_config.filter.msg_counter_ctx(log_msg_counter),
-                ResultProcessingThread(run_summary, expected_failures, keep_going, summary_file) as result_thread,
-                contextlib.ExitStack() as stack):
-            mgmt_ns_wrapper: str | None = None
-            if sys.platform == 'linux':
-                app_name = 'wlx-app' if wifi_required else 'eth-app'
-                tool_name = 'wlx-tool' if commissioning_method == 'wifipaf-wifi' else 'eth-tool'
+        with (SyncManager(address=SYNC_MANAGER_PATH) as mp_manager,
 
-                ns: chiptest.linux.IsolatedNetworkNamespace = stack.enter_context(chiptest.linux.IsolatedNetworkNamespace(
-                    index=0,
-                    # Do not bring up the app interface link automatically when doing BLE-WiFi commissioning.
-                    app_link_up=not wifi_required,
-                    add_ula=not thread_required,
-                    # Change the app link name so the interface will be recognized as WiFi or Ethernet
-                    # depending on the commissioning method used.
-                    app_link_name=app_name, tool_link_name=tool_name))
-                mgmt_ns_wrapper = shlex.join(ns.mgmt_ns.netns_cmd_wrapper)
+              # Logger context with message counter used for the StatusThread.
+              LogMessageCounter(mp_manager) as log_msg_counter,
+              context.obj.log_config.filter.msg_counter_ctx(log_msg_counter),
 
-                match commissioning_method:
-                    case CommissioningMethod.BLE_WIFI:
-                        stack.enter_context(chiptest.linux.DBusTestSystemBus())
-                        stack.enter_context(chiptest.linux.BluetoothMock())
-                        stack.enter_context(chiptest.linux.WpaSupplicantMock([app_name], "MatterAP", "MatterAPPassword", ns))
-                        ble_controller_app = 0   # Bind app to the first BLE controller
-                        ble_controller_tool = 1  # Bind tool to the second BLE controller
-                    case CommissioningMethod.BLE_THREAD:
-                        stack.enter_context(chiptest.linux.DBusTestSystemBus())
-                        stack.enter_context(chiptest.linux.BluetoothMock())
-                        stack.enter_context(chiptest.linux.ThreadBorderRouter(TEST_THREAD_DATASET, ns))
-                        ble_controller_app = 0   # Bind app to the first BLE controller
-                        ble_controller_tool = 1  # Bind tool to the second BLE controller
-                    case CommissioningMethod.THREAD_MESHCOP:
-                        stack.enter_context(tbr := chiptest.linux.ThreadBorderRouter(TEST_THREAD_DATASET, ns))
-                        thread_ba_host = tbr.get_border_agent_host()
-                        thread_ba_port = tbr.get_border_agent_port()
-                    case CommissioningMethod.WIFIPAF_WIFI:
-                        stack.enter_context(chiptest.linux.DBusTestSystemBus())
-                        stack.enter_context(chiptest.linux.WpaSupplicantMock(
-                            [app_name, tool_name], "MatterAP", "MatterAPPassword", ns))
+              # Results processing context.
+              CancellableQueue(mp_manager, TestResult, "Result Queue") as result_queue,
+              ResultProcessingThread(run_summary, expected_failures, keep_going, result_queue) as result_thread,
 
-                executor: chiptest.linux.LinuxNamespacedExecutor = stack.enter_context(chiptest.linux.LinuxNamespacedExecutor(ns))
-            elif sys.platform == 'darwin':
-                executor: chiptest.darwin.DarwinExecutor = stack.enter_context(chiptest.darwin.DarwinExecutor())
-            else:
-                log.warning("No platform-specific executor for '%s'", sys.platform)
-                executor: Executor = stack.enter_context(Executor())
+              # Worker context.
+              mp_wrapped_spawn_context(wrapper_linux="unshare --map-root-user -n -m") as mp_ctx,
+              CancellableQueue(mp_manager, WorkerJob, "Task Queue") as task_queue,
+              WorkerProcessCls(mp_ctx, mp_manager, worker_config, task_queue, result_queue) as worker):
+            try:
+                # Schedule all tests.
+                log.info("Each test will be executed %d times", iterations)
+                for i in range(1, iterations + 1):
+                    log.info("Scheduling iteration %d", i)
+                    for test in context.obj.tests:
+                        log.debug("Enqueuing test %s", test.name)
+                        task_queue.put(WorkerJob(i, test))
 
-            runner = chiptest.runner.Runner(executor=executor)
+                    # If this is the last iteration schedule finalization event by closing the task queue.
+                    if i == iterations:
+                        task_queue.close()
 
-            apps_register: AppsRegister = stack.enter_context(AppsRegister(mgmt_ns_wrapper, context.obj.log_config))
+                log.info("All jobs scheduled")
 
-            status_thread = PeriodicStatusThread(run_summary, log_msg_counter, periodicity=periodic_status)
-            status_thread.start()
+                # Start status thread only after all jobs are scheduled, so that there is something to report. It is a daemon thread
+                # which will close once log_msg_counter is closed.
+                PeriodicStatusThread(run_summary, log_msg_counter, periodicity=periodic_status).start()
 
-            # Initialize and start the worker thread last, to ensure it's terminated first.
-            worker_thread: WorkerThread = stack.enter_context(WorkerThread(task_queue, result_thread.result_queue))
-
-            # Schedule all tests.
-            log.info("Each test will be executed %d times", iterations)
-            for i in range(1, iterations + 1):
-                log.info("Scheduling iteration %d", i)
-                for test in context.obj.tests:
-                    log.debug("Enqueuing test %s", test.name)
-                    task_queue.put(functools.partial(
-                        TestResult.run_test, test.name, i, dry_run, context.obj.log_config, functools.partial(
-                            test.Run, runner, apps_register, subproc_info_repo, pics_file, test_timeout_seconds, dry_run,
-                            test_runtime=context.obj.runtime,
-                            ble_controller_app=ble_controller_app,
-                            ble_controller_tool=ble_controller_tool,
-                            op_network='Thread' if thread_required else 'WiFi',
-                            thread_ba_host=thread_ba_host,
-                            thread_ba_port=thread_ba_port,
-                            wifipaf_wifi=commissioning_method == CommissioningMethod.WIFIPAF_WIFI)))
-
-                # If this is the last iteration schedule finalization event by closing the task queue.
-                if i == iterations:
-                    task_queue.close()
-
-            log.info("All jobs scheduled")
-
-            # Wait for exception or completion.
-            while True:
-                # First check if there is an exception first in result thread, then in worker and propagate it to the main thread.
-                if (exception := result_thread.exception or worker_thread.exception) is not None:
-                    raise exception
-
-                # If the worker thread has finished processing all tasks, finalize the result processing.
-                if not worker_thread.is_alive():
-                    result_thread.result_queue.close()
-
-                # Wait for the result thread to finish after closing the result queue to capture any exceptions.
-                if not result_thread.is_alive():
-                    break
-
-                time.sleep(0.5)
+                # Wait for exception or completion. Any exceptions will be raised in each of the context manager exit functions. In both
+                # cases, we want to stop waiting for results and exit the loop.
+                while True:
+                    if result_thread.exception is not None or worker.state.phase == ProcessPhase.CLOSED:
+                        break
+                    time.sleep(0.5)
+            finally:
+                task_queue.cancel()
+                result_queue.close()
     except KeyboardInterrupt:
         log.info("Interrupting execution on user request")
         raise

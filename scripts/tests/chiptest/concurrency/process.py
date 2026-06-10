@@ -23,7 +23,7 @@ import signal
 import threading
 import traceback
 from abc import ABC, abstractmethod
-from collections.abc import Callable
+from collections.abc import Callable, Iterator
 from multiprocessing.context import SpawnContext
 from multiprocessing.managers import SyncManager, ValueProxy
 from types import TracebackType
@@ -168,6 +168,15 @@ class ProcessState:
         with self._state_changed:
             return wait_for_mp_managed(self._state_changed, lambda: predicate(self._phase.get(), self._exception.get()), timeout)
 
+    @contextlib.contextmanager
+    def working_context(self) -> Iterator[None]:
+        """Context manager to set the process phase to WORKING for the duration of the context."""
+        self.phase = ProcessPhase.WORKING
+        try:
+            yield
+        finally:
+            self.phase = ProcessPhase.READY
+
 
 WorkerConfigT = TypeVar("WorkerConfigT", bound=ProcessConfig)
 WorkRequestT = TypeVar("WorkRequestT")
@@ -197,7 +206,7 @@ class WrappedProcess(ABC, Generic[WorkerConfigT, WorkRequestT, WorkResponseT]):
        resources that require cleanup should be registered in the provided `ExitStack`.
     4. On success, phase becomes `READY`.
     5. `_proc_work()` executes the main loop (by default waits for cancellation). Implementations may optionally toggle between
-       `READY` and `WORKING` to expose idle vs active periods.
+       `READY` and `WORKING` to expose idle vs active periods. You can use working_context() for that.
     6. After finishing work, the resources initialized in `_proc_init()` are cleaned up by the exit stack.
     7. Phase becomes `CLOSED` when the subprocess exits.
 
