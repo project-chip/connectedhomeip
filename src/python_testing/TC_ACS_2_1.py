@@ -81,12 +81,13 @@ class TC_ACS_2_1(MatterBaseTest):
                      "Verify that the DUT response contains SemanticTag struct data field including namespace ID and tag ID from IdentifiedObject or IdentifiedHumanActivity or IdentifiedSound namespaces.",
                      "Verify that the list size is less than equal to 50."),
             TestStep("6", "If DUT supports HumanActivity or ObjectIdentification or SoundIdentification, TH reads the AmbientContextType attribute.",
-                     "Verify that DUT response contains namespace ID and tag ID scoped within the AmbientContextTypeSupported attribute."),
+                     "Verify that DUT response contains the list size is less than SimultaneousDetectionLimit.",
+                     "Verify that DUT response contains the list of namespace ID and tag ID scoped within the AmbientContextTypeSupported attribute."),
             TestStep("7", "If DUT supports ObjectCounting and ObjectIdentification feature, then TH reads the ObjectCountThresholdReached attribute.",
                      "TH reads the ObjectCountThresholdReached containing Boolean True or False."),
             TestStep("8", "If DUT supports ObjectCounting and ObjectIdentification feature, then TH reads the ObjectCountConfig attribute.",
                      "Verify that DUT response contains the list of ObjectCountDataStruct entries and its CountingObject field is SemanticTagStruct data type containing namespace ID and tag ID from IdentifiedObject.",
-                     "Verify that the ObjectCountThreshold field is an uint16 value."),
+                     "Verify that the ObjectCountThreshold value is greater than equal to 1."),
             TestStep("9", "If DUT supports ObjectCount attribute, TH reads the ObjectCount attribute.",
                      "Verity that DUT reads uint16 value."),
             TestStep("10", "TH reads the SimultaneousDetectionLimit attribute.",
@@ -196,6 +197,9 @@ class TC_ACS_2_1(MatterBaseTest):
             if ambientContextType:
 
                 log.info(f"Rx'd AmbientContextType: {ambientContextType}")
+                simultaneousDetectionLimit = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.SimultaneousDetectionLimit)
+                asserts.assert_less_equal(len(ambientContextTypeSupported), simultaneousDetectionLimit,
+                                          "AmbientContextTypeSupported should be less than equalt to SimultaneousDetectLimit.")
 
                 for context in ambientContextType:
                     nsID = context.ambientContextSensed.namespaceID
@@ -250,13 +254,9 @@ class TC_ACS_2_1(MatterBaseTest):
             asserts.assert_equal(nsID, OBJECTIDENTIFICATIONNAMESPACEID, "Not Identified Object Namespace ID")
             asserts.assert_less_equal(tagID, OBJECTIDENTIFICATIONMAXTAGNUMBER, "Tag number doesn't exit.")
 
-            # ObjectCountThreshold should be uint16
-            asserts.assert_true(isinstance(objectCountConfig.objectCountThreshold, (int, np.integer)),
-                                "Threshold value should be uint16 data.")
-            asserts.assert_less_equal(min_value_uint16, objectCountConfig.objectCountThreshold,
-                                      "Threshold value should be uint16 data.")
-            asserts.assert_less_equal(objectCountConfig.objectCountThreshold, max_value_uint16,
-                                      "Threshold value should be uint16 data.")
+            # ObjectCountThreshold should be greater than equal to 1
+            asserts.assert_less_equal(1, objectCountConfig.objectCountThreshold,
+                                      "Threshold value should be greater than equalt to 1.")
 
             self.step("9")
             # ObjectCount should be uint16
@@ -273,9 +273,8 @@ class TC_ACS_2_1(MatterBaseTest):
             self.skip_step("9")
 
         self.step("10")
-        simultaneousDetectionLimit = await self.read_single_attribute_check_success(
-            endpoint=endpoint, cluster=cluster, attribute=attr.SimultaneousDetectionLimit
-        )
+        # simultaneousDetectionLimit from the step 6
+
         log.info(f"Rx'd AudioContextDetected: {simultaneousDetectionLimit}")
         asserts.assert_less_equal(1, simultaneousDetectionLimit, "SimultaneousDetectionLimit is not within 1 and 10.")
         asserts.assert_less_equal(simultaneousDetectionLimit, 10, "SimultaneousDetectionLimit is not within 1 and 10.")
@@ -324,10 +323,10 @@ class TC_ACS_2_1(MatterBaseTest):
                 asserts.assert_less_equal(endTime, startTime+1, "EndTimestamp must be greater than StartTimestamp.")
 
                 # Confidence
-                asserts.assert_less_equal(0, predictedActivity.confidence,
-                                          "Expected the percentage to be between 0 and 100.")
+                asserts.assert_less_than(0, predictedActivity.confidence,
+                                          "Expected the percentage greater than 0 and less than equat to 100.")
                 asserts.assert_less_equal(predictedActivity.confidence, 100,
-                                          "Expected the percentage to be between 0 and 100.")
+                                          "Expected the percentage greater than 0 and less than equat to 100.")
 
                 if self.HumanActivitySupported or self.ObjectIdentificationSupported or self.SoundIdentificationSupported:
 
