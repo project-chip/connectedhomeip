@@ -27,6 +27,9 @@ jobs:
         with:
           submodules: recursive
 
+      - name: Fix git safe directory
+        run: git config --global --add safe.directory '*'
+
       - name: Build MT7933 Lighting App
         run: |
           ./scripts/checkout_submodules.py --platform mt793x
