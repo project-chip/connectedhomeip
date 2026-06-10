@@ -1,6 +1,6 @@
 /*
  *
- * Copyright (c) 2022-2026 Project CHIP Authors
+ * Copyright (c) 2026 Project CHIP Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -104,10 +104,7 @@ public:
     FanControlCluster(const Config & config);
     ~FanControlCluster() = default;
 
-    /** Shared delegate when no application delegate is registered. HandleStep returns Failure. */
-    static FanControl::Delegate & PlaceholderDelegate();
-
-    // ServerClusterInterface Implementation
+    // DefaultServerCluster overrides.
     CHIP_ERROR Startup(ServerClusterContext & context) override;
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override;
@@ -144,11 +141,19 @@ public:
     bool SetPercentCurrent(chip::Percent value);
     bool SetSpeedCurrent(uint8_t value);
 
-    void SetDelegate(FanControl::Delegate * delegate);
-
 private:
+    // Returns true if the given FanMode is allowed by the configured FanModeSequence. A FanMode is
+    // rejected when the sequence does not include that speed:
+    //   - kLow:    not allowed for the OffHigh / OffHighAuto sequences (they have no low speed).
+    //   - kMedium: only allowed for the OffLowMedHigh / OffLowMedHighAuto sequences.
+    //   - kAuto:   only allowed when an Auto sequence is configured (see SupportsAuto()).
+    // All other modes are always allowed.
     bool IsFanModeSupportedBySequence(FanControl::FanModeEnum value) const;
 
+    // The SupportsXxx() helpers below each report whether one feature was enabled in the Config.
+    // Most check whether the feature's optional attribute was registered, the two exceptions are
+    // SupportsAuto() (decided by the FanModeSequence) and SupportsStep() (decided by the feature map,
+    // since Step is a command with no attribute).
     bool SupportsMultiSpeed() const { return mOptionalAttributes.IsSet(FanControl::Attributes::SpeedMax::Id); }
     bool SupportsAuto() const
     {
@@ -161,20 +166,28 @@ private:
     bool SupportsStep() const { return mFeatureMap.Has(FanControl::Feature::kStep); }
     bool SupportsAirflowDirection() const { return mOptionalAttributes.IsSet(FanControl::Attributes::AirflowDirection::Id); }
 
+    // Turns the fan off. If FanMode is already kOff this does nothing. Otherwise it switches FanMode
+    // to kOff, zeroes the related attributes (PercentSetting/SpeedSetting and PercentCurrent/
+    // SpeedCurrent) to match, and saves the new mode to persistent storage.
     void CommitFanModeOffState();
 
-    // Updates PercentSetting (and SpeedSetting when MultiSpeed is supported) for the given
-    // FanMode: Off clears settings to 0 and zeros PercentCurrent / SpeedCurrent. Low/Medium/High
-    // set fixed percentages and matching speeds without changing current attributes. Auto nulls
-    // settings while leaving current values unchanged.
+    // Updates PercentSetting (and SpeedSetting when MultiSpeed is supported) for the given FanMode.
     void ApplyFanModeSideEffects(FanControl::FanModeEnum fanMode);
 
+    // Updates FanMode to match a changed PercentSetting, and SpeedSetting too when MultiSpeed is supported.
     void ApplyPercentSettingChanged();
+
+    // Updates FanMode and PercentSetting to match a changed SpeedSetting.
     void ApplySpeedSettingChanged();
+
+    // Maps a non-zero speed percentage to a FanMode (e.g. Low/Medium/High, depending on the configured
+    // FanModeSequence) and updates FanMode accordingly. Used when a non-zero speed is requested.
     void ApplyNonZeroFanDrive(chip::Percent percent);
 
+    // Persists the current FanMode to non-volatile storage so it can be restored at Startup().
     void StoreFanModePersistence();
 
+    // Notifies the delegate of the current fan-drive state (FanMode + Percent/Speed Setting/Current).
     void NotifyDelegateFanDriveState();
 
     // Set while the cluster is notifying its delegate of a fan-drive change. It serves two purposes:
@@ -203,7 +216,7 @@ private:
     BitMask<FanControl::WindBitmap> mWindSupport;
     OptionalAttributes mOptionalAttributes;
     BitFlags<FanControl::Feature> mFeatureMap;
-    FanControl::Delegate * mDelegate;
+    FanControl::Delegate & mDelegate;
 };
 
 } // namespace chip::app::Clusters

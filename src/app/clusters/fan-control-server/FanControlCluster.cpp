@@ -39,24 +39,10 @@ using Protocols::InteractionModel::Status;
 
 namespace chip::app::Clusters {
 
-namespace {
-struct FanControlPlaceholderDelegate final : public FanControl::Delegate
-{
-    FanControlPlaceholderDelegate() : FanControl::Delegate(kInvalidEndpointId) {}
-    Status HandleStep(StepDirectionEnum, bool, bool) override { return Status::Failure; }
-};
-} // namespace
-
-FanControl::Delegate & FanControlCluster::PlaceholderDelegate()
-{
-    static FanControlPlaceholderDelegate sPlaceholder;
-    return sPlaceholder;
-}
-
 FanControlCluster::FanControlCluster(const Config & config) :
     DefaultServerCluster({ config.mEndpointId, FanControl::Id }), mFanModeSequence(config.mFanModeSequence),
     mSpeedMax(config.mSpeedMax), mRockSupport(config.mRockSupport), mWindSupport(config.mWindSupport),
-    mOptionalAttributes(config.mOptionalAttributes), mFeatureMap(config.mFeatureMap), mDelegate(&config.mDelegate)
+    mOptionalAttributes(config.mOptionalAttributes), mFeatureMap(config.mFeatureMap), mDelegate(config.mDelegate)
 {}
 
 void FanControlCluster::NotifyDelegateFanDriveState()
@@ -66,7 +52,7 @@ void FanControlCluster::NotifyDelegateFanDriveState()
     // Prevent potential callback loops
     mTemporarilyIgnoreFanDriveDelegateCallbacks = true;
     const FanDriveState state{ mFanMode, mPercentSetting, mPercentCurrent, mSpeedSetting, mSpeedCurrent };
-    mDelegate->OnFanDriveStateChanged(state);
+    mDelegate.OnFanDriveStateChanged(state);
     mTemporarilyIgnoreFanDriveDelegateCallbacks = false;
 }
 
@@ -369,7 +355,7 @@ std::optional<DataModel::ActionReturnStatus> FanControlCluster::InvokeCommand(co
         bool wrapValue      = commandData.wrap.ValueOr(false);
         bool lowestOffValue = commandData.lowestOff.ValueOr(true);
 
-        return mDelegate->HandleStep(commandData.direction, wrapValue, lowestOffValue);
+        return mDelegate.HandleStep(commandData.direction, wrapValue, lowestOffValue);
     }
     default:
         return Status::UnsupportedCommand;
@@ -508,7 +494,7 @@ Status FanControlCluster::SetRockSetting(BitMask<RockBitmap> value)
     {
         return Status::Success;
     }
-    mDelegate->OnRockSettingChanged(mRockSetting);
+    mDelegate.OnRockSettingChanged(mRockSetting);
     return Status::Success;
 }
 
@@ -525,7 +511,7 @@ Status FanControlCluster::SetWindSetting(BitMask<WindBitmap> value)
     {
         return Status::Success;
     }
-    mDelegate->OnWindSettingChanged(mWindSetting);
+    mDelegate.OnWindSettingChanged(mWindSetting);
     return Status::Success;
 }
 
@@ -540,7 +526,7 @@ Status FanControlCluster::SetAirflowDirection(AirflowDirectionEnum value)
     {
         return Status::Success;
     }
-    mDelegate->OnAirflowDirectionChanged(mAirflowDirection);
+    mDelegate.OnAirflowDirectionChanged(mAirflowDirection);
     return Status::Success;
 }
 
@@ -568,18 +554,6 @@ void FanControlCluster::StoreFanModePersistence()
     const FanModeEnum value = mFanMode;
     LogErrorOnFailure(mContext->attributeStorage.WriteValue(ConcreteAttributePath(mPath.mEndpointId, FanControl::Id, FanMode::Id),
                                                             ByteSpan(reinterpret_cast<const uint8_t *>(&value), sizeof(value))));
-}
-
-void FanControlCluster::SetDelegate(FanControl::Delegate * delegate)
-{
-    if (delegate != nullptr)
-    {
-        mDelegate = delegate;
-    }
-    else
-    {
-        mDelegate = &PlaceholderDelegate();
-    }
 }
 
 } // namespace chip::app::Clusters

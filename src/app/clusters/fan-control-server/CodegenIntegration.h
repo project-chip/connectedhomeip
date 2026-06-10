@@ -31,14 +31,14 @@ FanControlCluster * FindClusterOnEndpoint(EndpointId endpointId);
 /**
  * Registers the application `FanControl::Delegate` for `aEndpoint` used by the codegen integration layer.
  *
- * The integration keeps one delegate pointer per Fan Control server endpoint. That pointer is passed into
- * `FanControlCluster` when the cluster instance is created, and drives application-specific behavior (for
- * example the Step command via `Delegate::HandleStep`, and optional notifications such as
- * `OnFanDriveStateChanged`). Call this from application init (for example `emberAfFanControlClusterInitCallback`)
- * before or after the cluster is constructed, if the cluster already exists, the running instance is updated.
+ * The integration keeps one delegate pointer per Fan Control server endpoint. The code-driven cluster is
+ * always wired to an internal `FanControlIntegrationDelegateWrapper` (see CodegenIntegration.cpp) that
+ * holds that pointer and forwards `HandleStep` and optional notifications; when no application delegate
+ * is registered, `HandleStep` returns Failure. Call this from application init (for example
+ * `emberAfFanControlClusterInitCallback`) before or after the cluster is constructed; `Init` on the wrapper
+ * updates the live target if the cluster instance already exists.
  *
- * @param aDelegate Application delegate, or `nullptr` to unbind. While unbound, the cluster uses
- * `FanControlCluster::PlaceholderDelegate()` internally (for example `HandleStep` returns Failure).
+ * @param aDelegate Application delegate, or `nullptr` to unbind.
  */
 void SetDefaultDelegate(EndpointId aEndpoint, Delegate * aDelegate);
 

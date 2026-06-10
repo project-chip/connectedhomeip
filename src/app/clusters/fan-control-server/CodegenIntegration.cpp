@@ -41,15 +41,20 @@ static_assert(kFanControlFixedClusterCount == MATTER_DM_FAN_CONTROL_CLUSTER_SERV
               "FanControl static cluster config must match ZAP server endpoint count");
 static_assert(kFanControlMaxClusterCount <= kEmberInvalidEndpointIndex, "FanControl cluster table size error");
 
-// Wraps the app-supplied delegate so that OnFanDriveStateChanged also emits
-// MatterPostAttributeChangeCallback for FanMode / PercentSetting / SpeedSetting.
-// This preserves backward compatibility for apps that still react to FanControl
-// attribute changes via PostAttributeChangeCallback without requiring any changes
-// to those apps.
-class CompatDelegate : public FanControl::Delegate
+// Proxy delegate used only by the codegen integration layer.
+//
+// FanControlCluster is constructed with a mandatory FanControl::Delegate& (no nullptr). Ember/ZAP apps
+// historically register a real application delegate later (or never) via SetDefaultDelegate, so the
+// cluster cannot assume an application delegate exists at construction time.
+//
+// This wrapper is the single object passed into FanControlCluster::Config: it always lives for the
+// endpoint slot and holds an optional pointer to the application delegate. Virtual calls forward when
+// that pointer is non-null; otherwise HandleStep returns Failure and optional notifications are no-ops.
+// OnFanDriveStateChanged also emits MatterPostAttributeChangeCallback so legacy apps keep working.
+class FanControlIntegrationDelegateWrapper final : public FanControl::Delegate
 {
 public:
-    CompatDelegate() : FanControl::Delegate(kInvalidEndpointId) {}
+    FanControlIntegrationDelegateWrapper() : FanControl::Delegate(kInvalidEndpointId) {}
 
     void Init(EndpointId ep, FanControl::Delegate * wrapped)
     {
@@ -124,7 +129,7 @@ private:
 struct ClusterWithDelegate
 {
     Delegate * userDelegate = nullptr;
-    CompatDelegate compatDelegate;
+    FanControlIntegrationDelegateWrapper integrationDelegateWrapper;
     LazyRegisteredServerCluster<FanControlCluster> server;
 };
 
@@ -138,8 +143,9 @@ public:
     {
         BitFlags<FanControl::Feature> features(featureMap);
 
-        gClusters[clusterInstanceIndex].compatDelegate.Init(endpointId, gClusters[clusterInstanceIndex].userDelegate);
-        FanControlCluster::Config config(endpointId, gClusters[clusterInstanceIndex].compatDelegate);
+        gClusters[clusterInstanceIndex].integrationDelegateWrapper.Init(endpointId,
+                                                                          gClusters[clusterInstanceIndex].userDelegate);
+        FanControlCluster::Config config(endpointId, gClusters[clusterInstanceIndex].integrationDelegateWrapper);
 
         // Initialize FanModeSequence from attribute storage if available, otherwise use default.
         FanModeSequenceEnum defaultFanModeSequence =
@@ -271,13 +277,7 @@ void SetDefaultDelegate(EndpointId aEndpoint, Delegate * aDelegate)
     if (ep < kFanControlMaxClusterCount)
     {
         gClusters[ep].userDelegate = aDelegate;
-        gClusters[ep].compatDelegate.Init(aEndpoint, aDelegate);
-
-        // Update the cluster instance if it already exists (e.g. app sets delegate in emberAfFanControlClusterInitCallback)
-        if (gClusters[ep].server.IsConstructed())
-        {
-            gClusters[ep].server.Cluster().SetDelegate(&gClusters[ep].compatDelegate);
-        }
+        gClusters[ep].integrationDelegateWrapper.Init(aEndpoint, aDelegate);
     }
 }
 
@@ -635,7 +635,5 @@ Status Set(EndpointId endpoint, BitMask<WindBitmap> value)
 }
 
 } // namespace WindSetting
-
 } // namespace Attributes
-
 } // namespace chip::app::Clusters::FanControl
