@@ -70,9 +70,9 @@ public:
         userCoolLimits(OptionalSetpoint(Attributes::MinCoolSetpointLimit::Id, absoluteCoolLimits.minimum),
                        OptionalSetpoint(Attributes::MaxCoolSetpointLimit::Id, absoluteCoolLimits.maximum)),
         occupiedRange(AbsoluteSetpoint(Attributes::OccupiedHeatingSetpoint::Id, kDefaultHeatingSetpoint),
-                 AbsoluteSetpoint(Attributes::OccupiedCoolingSetpoint::Id, kDefaultCoolingSetpoint)),
+                      AbsoluteSetpoint(Attributes::OccupiedCoolingSetpoint::Id, kDefaultCoolingSetpoint)),
         unoccupiedRange(AbsoluteSetpoint(Attributes::UnoccupiedHeatingSetpoint::Id, kDefaultHeatingSetpoint),
-                   AbsoluteSetpoint(Attributes::UnoccupiedCoolingSetpoint::Id, kDefaultCoolingSetpoint)),
+                        AbsoluteSetpoint(Attributes::UnoccupiedCoolingSetpoint::Id, kDefaultCoolingSetpoint)),
         deadBand(kDefaultDeadBand)
     {}
 
@@ -111,7 +111,7 @@ public:
 
         occupiedRange   = other.occupiedRange;
         unoccupiedRange = other.unoccupiedRange;
-        deadBand   = other.deadBand;
+        deadBand        = other.deadBand;
 
         return *this;
     }

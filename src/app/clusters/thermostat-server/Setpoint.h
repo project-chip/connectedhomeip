@@ -67,9 +67,8 @@ public:
 
     bool operator==(const Setpoint & other) const
     {
-        return mAttributeId == other.mAttributeId &&
-               HasTemperature() == other.HasTemperature() &&
-               (!HasTemperature() || Temperature() == other.Temperature());
+        return mAttributeId == other.mAttributeId && HasTemperature() == other.HasTemperature() &&
+            (!HasTemperature() || Temperature() == other.Temperature());
     }
     bool operator!=(const Setpoint & other) const { return !(*this == other); }
 
