@@ -278,7 +278,7 @@ class TC_ACS_3_3(MatterBaseTest):
 # .................................................................
             # Exp:
             event = event_listener.get_last_event()
-            log.info("eventheader: %s, {event})
+            log.info("eventheader: %s", {event})
             asserts.assert_equal(event.Header.EventId, cluster.Events.AmbientContextDetectStarted.event_id,
                                  f"Wrong event, {event.Header.EventId}, {cluster.Events.AmbientContextDetectStarted.event_id}")
             asserts.assert_equal(
