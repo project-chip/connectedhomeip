@@ -157,6 +157,21 @@ private:
      */
     void GetBandwidthForStreams(const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
                                 const Optional<DataModel::Nullable<uint16_t>> & audioStreamId, uint32_t & outBandwidthbps);
+
+    /**
+     * @brief Releases the audio/video streams referenced by the given connection so the AV Stream Management delegate can stop
+     *        the underlying HAL pipelines once no consumer remains. No-op if the connection has no stored transport options.
+     * @param connectionID The connection whose referenced streams should be released.
+     */
+    void ReleaseStreamsForConnection(uint16_t connectionID);
+
+    /**
+     * @brief Extracts the referenced audio/video streams from the given transport options into the given vectors.
+     *        An absent or null stream ID results in an empty vector for that stream type, which the AV Stream Management
+     *        controller treats as "no stream" and skips.
+     */
+    static void GetReferencedStreams(const TransportOptionsStruct & transportOptions, std::vector<uint16_t> & audioStreams,
+                                     std::vector<uint16_t> & videoStreams);
 };
 
 } // namespace PushAvStreamTransport
