@@ -147,7 +147,7 @@ class CancellableQueue(TerminableResource, Generic[QueueElementT]):
                     return self.get(timeout=0)
 
                 # We wait for the condition within the timeout (or infinitely when timeout=None).
-                if not self._cond.wait(timeout):
+                if not wait_for_mp_managed(self._cond, timeout_sec=timeout):
                     raise TimeoutError("Timeout when waiting for queue item")
 
             # Check for cancel event.
@@ -168,9 +168,6 @@ class CancellableQueue(TerminableResource, Generic[QueueElementT]):
     def cancel(self) -> None:
         """Set cancel event and notify all consumers."""
         with self._cond:
-            if self._cancel_event.is_set():
-                return
-
             self._cancel_event.set()
             self._cond.notify_all()
 
@@ -181,9 +178,6 @@ class CancellableQueue(TerminableResource, Generic[QueueElementT]):
     def close(self) -> None:
         """Set end-of-queue event and notify all consumers."""
         with self._cond:
-            if self._end_of_queue.is_set():
-                return
-
             self._end_of_queue.set()
             self._cond.notify_all()
 
