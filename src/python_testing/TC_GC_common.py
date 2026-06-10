@@ -107,7 +107,7 @@ async def valid_endpoints_list(test, ln_enabled: bool) -> list:
     """Get the JoinGroup cmd endpoints list based on enabled features such as Listener/Sender.
 
     For Senders: return empty list.
-    For Listeners: return the list of non-root endpoints that have at least one cluster exposing at least
+    For Listeners: return the list of non-root endpoints that have at least one cluster exposing
     one command requiring Operate privilege.
     """
     endpoints_list: list = []
