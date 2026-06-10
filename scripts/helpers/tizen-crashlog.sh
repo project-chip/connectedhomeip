@@ -23,6 +23,7 @@ SEARCH_HOURS=24
 CLEANUP=true
 VERBOSE=false
 SELECT_LAST=false
+LOCAL_MODE=false
 # Target device time (set during fetch_recent_crashes, used for time-ago display)
 TARGET_NOW=0
 
@@ -33,7 +34,7 @@ TARGET_NOW=0
 function help() {
     cat <<EOF
 Usage:
-$0 [--help] [--hours NUM] [--target SDB_ID] [--out-dir DIR] [--last] [--verbose] [--no-clean]
+$0 [--help] [--hours NUM] [--target SDB_ID] [--out-dir DIR] [--last] [--local] [--verbose] [--no-clean]
 
 Options:
     --hours NUM     - Filter crashes from the last NUM hours (default: 24)
@@ -42,6 +43,8 @@ Options:
                       When set, only crashes matching binaries in this directory
                       are shown and build target selection is skipped.
     --last          - Automatically select the most recent crash log
+    --local         - Local mode: analyze crash dumps from out/tizen-*/dump/
+                      (no SDB device required, used in CI)
     --verbose       - Print commands before execution (especially GDB invocation)
     --no-clean      - Keep temporary files (pulled crash archives) after analysis
     --help          - Print help
@@ -73,6 +76,10 @@ function parse_arguments() {
                 ;;
             --last)
                 SELECT_LAST=true
+                shift
+                ;;
+            --local)
+                LOCAL_MODE=true
                 shift
                 ;;
             --help)
@@ -513,10 +520,76 @@ function run_gdb_analysis() {
 }
 
 # ============================================================================
+# Local Mode (CI-compatible, no SDB required)
+# ============================================================================
+
+function analyze_local_crashes() {
+    # Original behavior: iterate over out/tizen-*/dump/*.zip and analyze
+    # each coredump with the matching binary. Used in CI workflows.
+    local found_any=false
+
+    for target in out/tizen-*; do
+        [ -d "$target" ] || continue
+        for zip in "$target/dump"/*.zip; do
+            [ -f "$zip" ] || continue
+            found_any=true
+
+            local basepath filename binary path coredump
+            basepath=$(dirname "$zip")
+            filename=$(basename "$zip")
+            binary="${filename%%_*}"
+            path="$basepath/${filename%.*}"
+            coredump="$path/${filename%.*}.coredump"
+
+            unzip -o "$zip" -d "$basepath"
+            tar -xf "$path"/*.tar -C "$path" 2>/dev/null || true
+
+            echo "----------------------------------------------------------------------------------------------------"
+
+            # Use cross-GDB from SDK if available, otherwise fallback to gdb-multiarch
+            if [ "$TIZEN_SDK_ROOT" != "" ] && [ -d "$TIZEN_SDK_ROOT" ]; then
+                local gdb_bin sysroot
+                gdb_bin=$(get_gdb_binary "$target")
+                sysroot=$(get_sdk_sysroot "$target")
+                "$gdb_bin" --batch \
+                    -ex "set auto-load safe-path /" \
+                    -ex "set sysroot $sysroot" \
+                    -ex "set solib-absolute-prefix $sysroot" \
+                    -ex "file $target/$binary" \
+                    -ex "core-file $coredump" \
+                    -ex "thread apply all bt full"
+            else
+                gdb-multiarch --batch \
+                    -ex "set auto-load safe-path /" \
+                    -ex "set sysroot $TIZEN_SDK_SYSROOT" \
+                    -ex "thread apply all bt full" \
+                    "$target/$binary" "$coredump"
+            fi
+        done
+    done
+
+    if [ "$found_any" = false ]; then
+        echo "No crash dumps found in out/tizen-*/dump/"
+    fi
+}
+
+# ============================================================================
 # Main
 # ============================================================================
 
 parse_arguments "$@"
+
+# Auto-detect local mode when SDB is not available (e.g. CI environment)
+if [ "$LOCAL_MODE" = false ] && ! command -v sdb >/dev/null 2>&1; then
+    echo "SDB not found, switching to local mode."
+    LOCAL_MODE=true
+fi
+
+if [ "$LOCAL_MODE" = true ]; then
+    analyze_local_crashes
+    exit 0
+fi
+
 setup_sdb
 
 if [ "$OUT_DIR" != "" ]; then
