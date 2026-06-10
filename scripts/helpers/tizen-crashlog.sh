@@ -500,21 +500,41 @@ function run_gdb_analysis() {
     echo "TARGET BINARY:  $binary_path"
     echo "REAL COREDUMP:  $coredump"
     echo "USING GDB:      $gdb_bin"
-    echo "SYSROOT:        $sysroot"
+    if [ "$sysroot" != "" ] && [ -d "$sysroot" ]; then
+        echo "SYSROOT:        $sysroot"
+    else
+        echo "SYSROOT:        (none)"
+    fi
     echo "----------------------------------------------------------------------------------------------------"
 
     # Build the GDB command line with proper quoting for copy-paste
-    local gdb_args=(
-        "--batch"
-        "-ex" "set auto-load safe-path /"
-        "-ex" "set sysroot $sysroot"
-        "-ex" "set solib-absolute-prefix $sysroot"
+    local gdb_args=("--batch" "-ex" "set auto-load safe-path /")
+
+    if [ "$sysroot" != "" ] && [ -d "$sysroot" ]; then
+        gdb_args+=("-ex" "set sysroot $sysroot")
+        gdb_args+=("-ex" "set solib-absolute-prefix $sysroot")
+    fi
+
+    gdb_args+=(
         "-ex" "file $binary_path"
         "-ex" "core-file $coredump"
         "-ex" "thread apply all bt full"
     )
 
-    verbose_log "$gdb_bin ${gdb_args[*]}"
+    # Build a copy-pasteable representation of the GDB command
+    local gdb_cmd_str="$gdb_bin"
+    local i
+    for ((i = 0; i < ${#gdb_args[@]}; i++)); do
+        if [ "${gdb_args[$i]}" = "-ex" ]; then
+            # Next element is the -ex argument — quote it
+            gdb_cmd_str+=" -ex \"${gdb_args[$((i + 1))]}\""
+            ((i++))
+        else
+            gdb_cmd_str+=" ${gdb_args[$i]}"
+        fi
+    done
+
+    verbose_log "$gdb_cmd_str"
 
     "$gdb_bin" "${gdb_args[@]}"
 }
@@ -524,8 +544,8 @@ function run_gdb_analysis() {
 # ============================================================================
 
 function analyze_local_crashes() {
-    # Original behavior: iterate over out/tizen-*/dump/*.zip and analyze
-    # each coredump with the matching binary. Used in CI workflows.
+    # Iterate over out/tizen-*/dump/*.zip and analyze each coredump.
+    # Used in CI workflows (QEMU tests) and as fallback when no SDB device.
     local found_any=false
 
     for target in out/tizen-*; do
@@ -544,27 +564,17 @@ function analyze_local_crashes() {
             unzip -o "$zip" -d "$basepath"
             tar -xf "$path"/*.tar -C "$path" 2>/dev/null || true
 
-            echo "----------------------------------------------------------------------------------------------------"
-
-            # Use cross-GDB from SDK if available, otherwise fallback to gdb-multiarch
+            # Determine GDB binary and sysroot based on available tools
+            local gdb_bin sysroot
             if [ "$TIZEN_SDK_ROOT" != "" ] && [ -d "$TIZEN_SDK_ROOT" ]; then
-                local gdb_bin sysroot
                 gdb_bin=$(get_gdb_binary "$target")
                 sysroot=$(get_sdk_sysroot "$target")
-                "$gdb_bin" --batch \
-                    -ex "set auto-load safe-path /" \
-                    -ex "set sysroot $sysroot" \
-                    -ex "set solib-absolute-prefix $sysroot" \
-                    -ex "file $target/$binary" \
-                    -ex "core-file $coredump" \
-                    -ex "thread apply all bt full"
             else
-                gdb-multiarch --batch \
-                    -ex "set auto-load safe-path /" \
-                    -ex "set sysroot $TIZEN_SDK_SYSROOT" \
-                    -ex "thread apply all bt full" \
-                    "$target/$binary" "$coredump"
+                gdb_bin="gdb-multiarch"
+                sysroot=$(get_sdk_sysroot "$target")
             fi
+
+            run_gdb_analysis "$gdb_bin" "$sysroot" "$target/$binary" "$coredump" "$filename"
         done
     done
 
