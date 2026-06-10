@@ -579,10 +579,15 @@ function analyze_local_crashes() {
 
 parse_arguments "$@"
 
-# Auto-detect local mode when SDB is not available (e.g. CI environment)
-if [ "$LOCAL_MODE" = false ] && ! command -v sdb >/dev/null 2>&1; then
-    echo "SDB not found, switching to local mode."
-    LOCAL_MODE=true
+# Auto-detect local mode when no SDB device is connected (e.g. CI environment)
+if [ "$LOCAL_MODE" = false ]; then
+    if ! command -v sdb >/dev/null 2>&1; then
+        echo "SDB not found, switching to local mode."
+        LOCAL_MODE=true
+    elif [ "$(sdb devices 2>/dev/null | grep -cv 'List of devices attached')" -eq 0 ]; then
+        echo "No SDB device connected, switching to local mode."
+        LOCAL_MODE=true
+    fi
 fi
 
 if [ "$LOCAL_MODE" = true ]; then
