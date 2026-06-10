@@ -14,7 +14,7 @@ runs:
         upload: False
         output: sarif-results
     - name: filter-sarif
-      uses: advanced-security/filter-sarif@f3b8118a9349d88f7b1c0c488476411145b6270d # v1
+      uses: advanced-security/filter-sarif@2da736ff05ef065cb2894ac6892e47b5eac2c3c0 # v1.1
       with:
         # We also disable checks that are not too important and that result in many hundreds of alerts with generated code, such as the check "Empty branch of conditional"
         patterns: |

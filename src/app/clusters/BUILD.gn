@@ -65,6 +65,7 @@ source_set("clusters") {
     "thread-network-directory-server",
     "tls-certificate-management-server",
     "tls-client-management-server",
+    "water-heater-management-server",
     "webrtc-transport-provider-server",
     "wifi-network-diagnostics-server",
     "wifi-network-management-server",
