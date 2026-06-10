@@ -562,7 +562,7 @@ function analyze_local_crashes() {
             coredump="$path/${filename%.*}.coredump"
 
             unzip -o "$zip" -d "$basepath"
-            tar -xf "$path"/*.tar -C "$path" 2>/dev/null || true
+            tar -xf "$path"/*.tar -C "$path"
 
             # Determine GDB binary and sysroot based on available tools
             local gdb_bin sysroot
