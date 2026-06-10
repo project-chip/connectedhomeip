@@ -15,7 +15,6 @@
 #    limitations under the License.
 
 
-import asyncio
 import logging
 import subprocess
 import tempfile
@@ -28,7 +27,6 @@ from mobly import asserts, signals
 import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.clusters.Types import NullValue
-from matter.exceptions import ChipStackError
 from matter.interaction_model import Status
 from matter.testing.apps import OtaImagePath, OTAProviderSubprocess
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
