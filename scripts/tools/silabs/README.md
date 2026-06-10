@@ -4,7 +4,7 @@
 
 The python `FactoryDataProvider.py` script allows a user to store a set of
 commissionable data in the matter nvm3 section of an EFR32 device. This script
-can handle writing to any MCU EFR32MG12 or EFR32MG24 family.
+can handle writing to any MCU EFR32MG24 family.
 
 # Prerequisites
 
@@ -39,7 +39,7 @@ connected to the host, write the data in the right nvm3 location.
 
 If the device is not connected, The script will generate an image that can be
 flashed to your device at a later time but you must provide the MCU family name.
-(EFR32MG12 or EFR32MG24).
+(EFR32MG24).
 
 If you have more than one device connected to the host. Provide the J-tag serial
 number to ensure you are writing to the right device.
@@ -52,7 +52,7 @@ number to ensure you are writing to the right device.
 | --spake2_salt        | Required             | string<sup>1</sup> | Provide Spake2+ salt used to generate the spake2p verifier.                             |
 | --spake2_verifier    | optional<sup>2</sup> | string<sup>1</sup> | Provide The pre-generated Spake2+ verifier.                                             |
 | --gen_spake2p_path   | optional<sup>2</sup> | string             | Provide the absolute path to spake2p generator.                                         |
-| --mcu_family         | optional             | string             | MCU Family target. Only needed if your board isn't plugged in (EFR32MG12 or EFR32MG24). |
+| --mcu_family         | optional             | string             | MCU Family target. Only needed if your board isn't plugged in (EFR32MG24). |
 | --jtag_serial        | optional             | string             | Provide the serial number of the jtag if you have more than one board connected.        |
 | --product_id         | optional             | dec/hex            | Provide the product ID. e.g: 32773 or 0x8005 (Max 2 bytes).                             |
 | --vendor_id          | optional             | dec/hex            | Provide the vendor ID. e.g: 65521 or 0xFFF1 (Max 2 bytes).                              |

@@ -25,7 +25,6 @@ class FactoryDataWriter:
     # CONSTANTS
     TEMP_FILE = script_dir + "/tmp_nvm3.s37"
     OUT_FILE = script_dir + "/matter_factorydata.s37"  # Final output file containing the nvm3 data to flash to the device
-    BASE_MG12_FILE = script_dir + "/base_matter_mg12_nvm3.s37"
     BASE_MG24_FILE = script_dir + "/base_matter_mg24_nvm3.s37"
     # nvm3 keys to set
     SERIAL_NUMBER_NVM3_KEY = "0x87200:"
@@ -202,10 +201,8 @@ class FactoryDataWriter:
                 output = subprocess.check_output(cmd)
                 output = output.decode('utf-8').splitlines()
                 deviceInfo = dict(map(str.strip, lines.split(':')) for lines in output[0:len(output)-1])
-                # Only MG12 and MG24 are supported in matter currently
-                if "EFR32MG12" in deviceInfo["Part Number"]:
-                    inputImage = self.BASE_MG12_FILE
-                elif "EFR32MG24" in deviceInfo["Part Number"]:
+                # Only MG24 are supported in matter currently
+                if "EFR32MG24" in deviceInfo["Part Number"]:
                     inputImage = self.BASE_MG24_FILE
                 else:
                     raise Exception('Invalid MCU')
@@ -214,9 +211,7 @@ class FactoryDataWriter:
                 print("Device not connected")
                 # When no device is connected user needs to provide the mcu family for which those credentials are to be created
                 if self._args.mcu_family:
-                    if self._args.mcu_family == "EFR32MG12":
-                        inputImage = self.BASE_MG12_FILE
-                    elif self._args.mcu_family == "EFR32MG24":
+                    if self._args.mcu_family == "EFR32MG24":
                         inputImage = self.BASE_MG24_FILE
                 else:
                     print("Connect debug port or provide the mcu_family")
