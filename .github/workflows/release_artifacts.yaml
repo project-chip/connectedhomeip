@@ -32,11 +32,11 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: ghcr.io/project-chip/chip-build-esp32:194
+            image: ghcr.io/project-chip/chip-build-esp32:200
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v6.0.2
+              uses: actions/checkout@v6.0.3
               with:
                   ref: "${{ github.event.inputs.releaseTag }}"
             - name: Bootstrap
@@ -55,6 +55,11 @@ jobs:
                      --working-directory $BUILD_DIRECTORY                  \
                      --bundle-name esp32-chip-all-clusters-app
 
+            - name: Notify Slack on Failure
+              if: failure()
+              uses: ./.github/actions/notify-slack-failure
+              with:
+                slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}
     efr32:
         name: EFR32
         env:
@@ -64,10 +69,10 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: ghcr.io/project-chip/chip-build-efr32:194
+            image: ghcr.io/project-chip/chip-build-efr32:200
         steps:
             - name: Checkout
-              uses: actions/checkout@v6.0.2
+              uses: actions/checkout@v6.0.3
               with:
                   ref: "${{ github.event.inputs.releaseTag }}"
             - name: Bootstrap
@@ -87,3 +92,8 @@ jobs:
                      --bundle-files $BUILD_DIRECTORY/lock_app.flashbundle.txt \
                      --working-directory $BUILD_DIRECTORY                     \
                      --bundle-name efr32-$SILABS_BOARD-chip-lock-example
+            - name: Notify Slack on Failure
+              if: failure()
+              uses: ./.github/actions/notify-slack-failure
+              with:
+                slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}

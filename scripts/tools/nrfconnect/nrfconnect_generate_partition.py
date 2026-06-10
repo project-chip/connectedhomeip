@@ -49,7 +49,7 @@ class PartitionCreator:
         self._input_file = input_file
         try:
             self.__data_to_save = self._convert_to_dict(self._load_json())
-        except IOError:
+        except OSError:
             sys.exit(-1)
 
     def generate_cbor(self):
@@ -120,7 +120,7 @@ class PartitionCreator:
         try:
             with open(self._input_file, "rb") as json_file:
                 return json.loads(json_file.read())
-        except IOError as e:
+        except OSError as e:
             log.error("Can not read Json file '%s'", self._input_file)
             raise e
 

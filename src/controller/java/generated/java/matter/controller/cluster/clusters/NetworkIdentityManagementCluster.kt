@@ -185,6 +185,7 @@ class NetworkIdentityManagementCluster(
   suspend fun queryIdentity(
     networkIdentityIndex: UShort?,
     networkIdentityType: UByte?,
+    clientIndex: UShort?,
     identifier: ByteArray?,
     timedInvokeTimeout: Duration? = null,
   ): QueryIdentityResponse {
@@ -203,7 +204,10 @@ class NetworkIdentityManagementCluster(
       tlvWriter.put(ContextSpecificTag(TAG_NETWORK_IDENTITY_TYPE_REQ), networkIdentityType)
     }
 
-    val TAG_IDENTIFIER_REQ: Int = 2
+    val TAG_CLIENT_INDEX_REQ: Int = 2
+    clientIndex?.let { tlvWriter.put(ContextSpecificTag(TAG_CLIENT_INDEX_REQ), clientIndex) }
+
+    val TAG_IDENTIFIER_REQ: Int = 3
     identifier?.let { tlvWriter.put(ContextSpecificTag(TAG_IDENTIFIER_REQ), identifier) }
     tlvWriter.endStructure()
 
