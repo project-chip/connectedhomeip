@@ -83,7 +83,7 @@ static_library("mt793x") {
       "route_hook/mtk_route_hook.h",
       "route_hook/mtk_route_table.c",
       "route_hook/mtk_route_table.h",
-      "route_hook/mtk_lwip_hook.h",
+   #  "route_hook/mtk_lwip_hook.h",
     ]
   }
 }
