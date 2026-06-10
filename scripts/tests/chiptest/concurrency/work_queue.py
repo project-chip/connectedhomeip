@@ -16,8 +16,11 @@ import contextlib
 import queue
 import threading
 import time
+from collections.abc import Callable
 from multiprocessing.managers import SyncManager
 from typing import Generic, Protocol, TypeVar
+
+from chiptest.concurrency.context import TerminableResource
 
 
 class Waitable(Protocol):
@@ -64,7 +67,7 @@ class EndOfQueue(Exception):
 QueueElementT = TypeVar("QueueElementT")
 
 
-class CancellableQueue(Generic[QueueElementT]):
+class CancellableQueue(TerminableResource, Generic[QueueElementT]):
     """
     Queue that supports synchronized cancellation and end-of-work signaling.
 
@@ -82,7 +85,21 @@ class CancellableQueue(Generic[QueueElementT]):
     _cancel_event: threading.Event
     _end_of_queue: threading.Event
 
-    def __init__(self, mp_manager: SyncManager | None = None) -> None:
+    def __init__(self, mp_manager: SyncManager | None = None, queue_element_cls: type[QueueElementT] | None = None,
+                 name: str | None = None) -> None:
+        """
+        Initialize the queue.
+
+        If `mp_manager` is provided, the queue will be managed by the multiprocessing manager and can be shared across processes.
+        Otherwise, it will be a regular in-memory queue for use within a single process.
+
+        `queue_element_cls` is an optional argument to specify the type of elements in the queue. Useful when the queue is used as
+        a context manager.
+        """
+        if queue_element_cls is not None and name is None:
+            name = f"CancellableQueue[{queue_element_cls.__name__}]"
+        super().__init__(name, terminate_debug_logging=name is not None)
+
         if mp_manager is None:
             self._cond = threading.Condition()
             self._queue = queue.Queue()
@@ -173,3 +190,7 @@ class CancellableQueue(Generic[QueueElementT]):
     def wait_for_closed(self) -> bool:
         """Wait until the queue is closed."""
         return wait_for_mp_managed(self._end_of_queue)
+
+    def resource_terminate(self) -> None:
+        """On termination, we cancel the queue to unblock any waiting consumers."""
+        self.cancel()
