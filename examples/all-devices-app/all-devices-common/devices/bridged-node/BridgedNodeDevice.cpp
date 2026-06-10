@@ -36,8 +36,8 @@ CHIP_ERROR BridgedNodeDevice::Register(EndpointId endpoint, CodeDrivenDataModelP
 {
     ReturnErrorOnFailure(SingleEndpointRegistration(endpoint, provider, parentId));
 
-    mResolvedUniqueId  = mUniqueIdGenerator ? mUniqueIdGenerator(endpoint) : ("bridged-node-EP" + std::to_string(endpoint));
-    mResolvedNodeLabel = mNodeLabelGenerator ? mNodeLabelGenerator(endpoint) : "Bridged Node";
+    mResolvedUniqueId  = mUniqueIdGenerator(endpoint);
+    mResolvedNodeLabel = mNodeLabelGenerator(endpoint);
 
     // Create the Bridged Device Basic Information cluster.
     mBridgedDeviceBasicInformationCluster.Create(endpoint,
