@@ -548,7 +548,7 @@ public:
     }
 };
 
-TEST(JointFabricDatastoreTest, PoC_RemoveBindingIteratorUseAfterFree)
+TEST(JointFabricDatastoreTest, RemoveBindingIteratorUseAfterFree)
 {
     JointFabricDatastore store;
     DeferringBindingDelegate delegate;
@@ -627,7 +627,7 @@ public:
     }
 };
 
-TEST(JointFabricDatastoreTest, PoC_RemoveAclIteratorUseAfterFree)
+TEST(JointFabricDatastoreTest, RemoveAclIteratorUseAfterFree)
 {
     JointFabricDatastore store;
     DeferringAclDelegate delegate;
@@ -675,7 +675,7 @@ TEST(JointFabricDatastoreTest, PoC_RemoveAclIteratorUseAfterFree)
 // and the binding that was actually synced is left stuck Pending. The fix re-resolves by stable key
 // (nodeID + endpointID + listID). This site is in-bounds (logic corruption), so the assertion checks
 // the correct entry is committed rather than relying on ASan.
-TEST(JointFabricDatastoreTest, PoC_AddBindingBackReferenceMarksWrongEntry)
+TEST(JointFabricDatastoreTest, AddBindingBackReferenceMarksWrongEntry)
 {
     JointFabricDatastore store;
     DeferringBindingDelegate delegate;

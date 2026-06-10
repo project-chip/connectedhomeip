@@ -376,7 +376,7 @@ protected:
     void TestReadAdminNOCsPopulatesCommissionerCerts();
     void TestPerformVendorIdVerificationCompletesOnceOnReadFailure();
     void TestPerformVendorIdVerificationDoesNotUseFreedCommissioneeOnReadFailure();
-    void PoC_FailSafeAsyncReadUseAfterFree();
+    void FailSafeAsyncReadUseAfterFree();
 };
 
 TEST_F_FROM_FIXTURE(TestJCMCommissionee, TestNextStageFollowsExpectedOrder)
@@ -807,7 +807,7 @@ protected:
     }
 };
 
-TEST_F_FROM_FIXTURE(TestJCMCommissionee, PoC_FailSafeAsyncReadUseAfterFree)
+TEST_F_FROM_FIXTURE(TestJCMCommissionee, FailSafeAsyncReadUseAfterFree)
 {
     FakeCommandHandler commandHandler;
     CommandHandler::Handle handle(&commandHandler);
