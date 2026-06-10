@@ -939,6 +939,7 @@ CameraAVStreamManager::OnTransportAcquireAudioVideoStreams(const std::vector<uin
     // Update the available audio streams in the HAL
     for (uint16_t audioStreamID : audioStreams)
     {
+        bool startFailed = false;
         for (AudioStream & stream : mCameraDeviceHAL->GetCameraHALInterface().GetAvailableAudioStreams())
         {
             if (stream.audioStreamParams.audioStreamID == audioStreamID && stream.isAllocated)
@@ -951,7 +952,10 @@ CameraAVStreamManager::OnTransportAcquireAudioVideoStreams(const std::vector<uin
                         ChipLogProgress(Camera, "Starting audio stream with ID: %u on first acquire", audioStreamID);
                         if (mCameraDeviceHAL->GetCameraHALInterface().StartAudioStream(audioStreamID) != CameraError::SUCCESS)
                         {
+                            // Leave the reference count at 0 so a later acquire retries the start.
                             ChipLogError(Camera, "Failed to start HAL Audio Stream for ID %u on acquire.", audioStreamID);
+                            startFailed = true;
+                            break;
                         }
                     }
                     stream.audioStreamParams.referenceCount++;
@@ -962,6 +966,12 @@ CameraAVStreamManager::OnTransportAcquireAudioVideoStreams(const std::vector<uin
                 }
                 break;
             }
+        }
+
+        // Keep the SDK ref count consistent with the HAL: skip the increment when the HAL pipeline failed to start.
+        if (startFailed)
+        {
+            continue;
         }
 
         // Update the counts in the SDK allocated stream attributes
@@ -975,6 +985,7 @@ CameraAVStreamManager::OnTransportAcquireAudioVideoStreams(const std::vector<uin
     // Update the available video streams in the HAL
     for (uint16_t videoStreamID : videoStreams)
     {
+        bool startFailed = false;
         for (VideoStream & stream : mCameraDeviceHAL->GetCameraHALInterface().GetAvailableVideoStreams())
         {
             if (stream.videoStreamParams.videoStreamID == videoStreamID && stream.isAllocated)
@@ -988,14 +999,14 @@ CameraAVStreamManager::OnTransportAcquireAudioVideoStreams(const std::vector<uin
                         if (mCameraDeviceHAL->GetCameraHALInterface().StartVideoStream(stream.videoStreamParams) !=
                             CameraError::SUCCESS)
                         {
+                            // Leave the reference count at 0 so a later acquire retries the start.
                             ChipLogError(Camera, "Failed to start HAL Video Stream for ID %u on acquire.", videoStreamID);
+                            startFailed = true;
+                            break;
                         }
-                        else
-                        {
-                            // Reflect the frame rate reported by the HAL once the stream has started.
-                            TEMPORARY_RETURN_IGNORED GetCameraAVStreamManagementCluster()->SetCurrentFrameRate(
-                                mCameraDeviceHAL->GetCameraHALInterface().GetCurrentFrameRate());
-                        }
+                        // Reflect the frame rate reported by the HAL once the stream has started.
+                        TEMPORARY_RETURN_IGNORED GetCameraAVStreamManagementCluster()->SetCurrentFrameRate(
+                            mCameraDeviceHAL->GetCameraHALInterface().GetCurrentFrameRate());
                     }
                     stream.videoStreamParams.referenceCount++;
                 }
@@ -1005,6 +1016,12 @@ CameraAVStreamManager::OnTransportAcquireAudioVideoStreams(const std::vector<uin
                 }
                 break;
             }
+        }
+
+        // Keep the SDK ref count consistent with the HAL: skip the increment when the HAL pipeline failed to start.
+        if (startFailed)
+        {
+            continue;
         }
 
         // Update the counts in the SDK allocated stream attributes
