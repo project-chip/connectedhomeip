@@ -1648,7 +1648,7 @@ def parse_single_device_type(root: ElementTree.Element, cluster_definition_xml: 
                 # Workaround for 1.3 device types with zigbee clusters and old scenes
                 # This is OK because there are other tests that ensure that unknown clusters do not appear on the device
                 if cid not in cluster_definition_xml:
-                    LOGGER.info(f"Skipping unknown cluster {cid:04X}")
+                    LOGGER.info("Skipping unknown cluster %04X", cid)
                     continue
                 conformance_xml, tmp_problem = get_conformance(c, cid)
                 if tmp_problem:
@@ -1717,7 +1717,7 @@ def parse_single_device_type(root: ElementTree.Element, cluster_definition_xml: 
                                 # ifdefs. We can ignore problems if the device type spec disallows things that don't exist.
                                 if is_disallowed(conformance_override):
                                     LOGGER.info(
-                                        f"Ignoring unknown {override_element_type} {element_name} in cluster {cid} because the conformance is disallowed")
+                                        "Ignoring unknown %s %s in cluster %s because the conformance is disallowed", override_element_type, element_name, cid)
                                     continue
                                 problems.append(ProblemNotice("Parse Device Type XML", location=location,
                                                 severity=ProblemSeverity.WARNING, problem=f"Unknown {override_element_type} {element_name} in cluster 0x{cid:04X} - map = {map_id}"))
@@ -1869,7 +1869,8 @@ def build_xml_global_data_types(data_model_directory: Union[PrebuiltDataModelDir
                 filtered_problems = []
                 for problem in temp_problems:
                     if "ConformanceException" in problem.problem and any(field_name in problem.problem for field_name in ['PercentMax', 'PercentMin', 'FixedMax', 'FixedMin', 'MfgCode']):
-                        LOGGER.info(f"Ignoring complex conformance in global data type {name} from {f.name}: {problem.problem}")
+                        LOGGER.info("Ignoring complex conformance in global data type %s from %s: %s",
+                                    name, f.name, problem.problem)
                         continue
                     filtered_problems.append(problem)
 

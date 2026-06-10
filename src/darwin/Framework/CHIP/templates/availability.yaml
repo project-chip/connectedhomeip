@@ -10998,7 +10998,7 @@
                   - ConvectionRoast
                   - Warming
                   - Proofing
-                  - Steam
+                  # Steam was added to XML much later.
           RefrigeratorAndTemperatureControlledCabinetMode:
               ModeTag:
                   - Auto
@@ -11616,6 +11616,23 @@
               # an empty bitmap.
               - Feature
 
+- release: "6F5CE96C-A805-4EAA-9459-471D88E910A4"
+  versions:
+      iOS: "27.0"
+      macOS: "27.0"
+      watchOS: "27.0"
+      tvOS: "27.0"
+  introduced:
+      enum values:
+          OvenMode:
+              ModeTag:
+                  - Steam
+  removed:
+      enums:
+          Globals:
+              # Not a data model type at all; DCL-only
+              SoftwareVersionCertificationStatusEnum
+
 - release: "Future"
   versions: "future"
   provisional:
@@ -11633,24 +11650,62 @@
           # In-progress for Joint Fabric feature
           - JointFabricDatastore
           - JointFabricAdministrator
-          # In-progress for new groups setup
+          # In-progress for new groups setup (groupcast)
           - Groupcast
+          # In-progress for ???
+          - AVAnalysis
+          - AmbientContextSensing
+          - AmbientSensingUnion
+          - DynamicLighting
+          - ElectricalAlarm
+          - ElectricalDistribution
+          - ElectricalProtectionAlarm
+          - Humidistat
+          - NetworkIdentityManagement
+          - ProximityRanging
+          - SmokeConcentrationMeasurement
+          - WaterTankLevelMonitoring
       attributes:
+          AccessControl:
+              # In-progress for new groups setup (groupcast)
+              - AuxiliaryACL
           BasicInformation:
               # In-progress for maybe Matter 1.5
               - ConfigurationVersion
+              # In-progress for ???
+              - DeviceLocation
           BridgedDeviceBasicInformation:
               # In-progress for maybe Matter 1.5
               - ConfigurationVersion
+              # In-progress for ???
+              - DeviceLocation
           Descriptor:
               # In-progress for maybe Matter 1.5
               - EndpointUniqueID
+          DeviceEnergyManagement:
+              # In progress for PowerRangeAdjustment feature
+              - PowerRangeAdjustment
           GeneralCommissioning:
               # In-progress for network recovery feature
               - NetworkRecoveryReason
               - RecoveryIdentifier
               # In-progress for NFC commissioning feature
               - IsCommissioningWithoutPower
+          GeneralDiagnostics:
+              # In progress for ???
+              - DeviceLoadStatus
+          GroupKeyManagement:
+              # In-progress for new groups setup (groupcast)
+              - GroupcastAdoption
+          OccupancySensing:
+              # In-progress for ???
+              - PredictedOccupancy
+          PowerTopology:
+              # In-progress for ???
+              - ElectricalCircuitNodes
+          SmokeCOAlarm:
+              # In-progress for ???
+              - Unmounted
           Thermostat:
               # In-progress for Matter 1.5: Thermostat Suggestions feature
               - CurrentThermostatSuggestion
@@ -11669,6 +11724,10 @@
               # for now just start doing that for new additions to it.
               - UnsupportedAttributeRequiringAdminPrivilege
       commands:
+          DeviceEnergyManagement:
+              # In progress for PowerRangeAdjustment feature
+              - PowerRangeAdjustRequest
+              - CancelPowerRangeAdjustRequest
           OperationalCredentials:
               # In-progress for Matter 1.5: VID Verification feature
               - SetVIDVerificationStatement
@@ -11684,6 +11743,21 @@
               # for now just start doing that for new additions to it.
               - TestCheckCommandFlags
       structs:
+          DeviceEnergyManagement:
+              # In progress for PowerRangeAdjustment feature
+              - PowerRangeAdjustStruct
+          GeneralDiagnostics:
+              # In progress for ???
+              - DeviceLoadStruct
+          GroupKeyManagement:
+              # In-progress for new groups setup (groupcast)
+              - GroupcastAdoptionStruct
+          OccupancySensing:
+              # In-progress for ???
+              - PredictedOccupancyStruct
+          PowerTopology:
+              # In-progress for ???
+              - CircuitNodeStruct
           Thermostat:
               # In-progress for Matter 1.5: Thermostat Suggestions feature
               - ThermostatSuggestionStruct
@@ -11702,11 +11776,26 @@
               # Waiting to see whether any compat issues arise from making this global
               - SemanticTagStruct
       struct fields:
+          AccessControl:
+              AccessControlEntryStruct:
+                  # In-progress for new groups setup (groupcast)
+                  - auxiliaryType
+          BasicInformation:
+              CapabilityMinimaStruct:
+                  # In-progress for ???
+                  - readPathsSupported
+                  - simultaneousInvocationsSupported
+                  - simultaneousWritesSupported
+                  - subscribePathsSupported
           ElectricalEnergyMeasurement:
               EnergyMeasurementStruct:
                   # In-progress for maybe Matter 1.5
                   - apparentEnergy
                   - reactiveEnergy
+          GroupKeyManagement:
+              # In-progress for new groups setup (groupcast)
+              GroupKeySetStruct:
+                  - groupKeyMulticastPolicy
           OperationalCredentials:
               # In-progress for Matter 1.5: VID Verification feature
               FabricDescriptorStruct:
@@ -11714,6 +11803,13 @@
               NOCStruct:
                   - vvsc
       events:
+          AccessControl:
+              # In-progress for new groups setup (groupcast)
+              - AuxiliaryAccessUpdated
+          DeviceEnergyManagement:
+              # In progress for PowerRangeAdjustment feature
+              - PowerRangeAdjustStart
+              - PowerRangeAdjustEnd
           Thermostat:
               # Thermostat Events is in-progress for Matter 1.6
               - ActivePresetChange
@@ -11730,9 +11826,18 @@
                   # In-progress for maybe Matter 1.5
                   - fabricIndex
       enums:
+          AccessControl:
+              # In-progress for new groups setup (groupcast)
+              - AccessControlAuxiliaryTypeEnum
+          DoorLock:
+              # In-progress for ??? (got converted to type, but naming of values is suspect)
+              - StatusCodeEnum
           GeneralCommissioning:
               # In-progress for network recovery feature
               - NetworkRecoveryReasonEnum
+          GroupKeyManagement:
+              # In-progress for new groups setup (groupcast)
+              - GroupKeyMulticastPolicyEnum
           Globals:
               # In-progress for maybe Matter 1.5
               - LocationTag
@@ -11744,6 +11849,10 @@
               - TariffUnitEnum
               - WebRTCEndReasonEnum
       enum values:
+          DeviceEnergyManagement:
+              # In-progress for PowerRangeAdjustment feature
+              CauseEnum:
+                  - Invalid
           ElectricalPowerMeasurement:
               # In-progress for maybe Matter 1.5
               MeasurementTypeEnum:
@@ -11754,6 +11863,12 @@
               MeasurementTypeEnum:
                   - ApparentEnergy
                   - ReactiveEnergy
+          OvenMode:
+              ModeTag:
+                  # In-progress for ???
+                  - AirFry
+                  - AirSousVide
+                  - FrozenFood
           RVCCleanMode:
               # In progress for maybe Matter 1.5
               ModeTag:
@@ -11774,16 +11889,90 @@
                   - CleaningMop
                   - FillingWaterTank
                   - UpdatingMaps
+          SmokeCOAlarm:
+              ExpressedStateEnum:
+                  # In-progress for ???
+                  - Inoperative
+          # New measurement units in progress for ???
+          #
+          # Not all of these units may make sense for all the clusters, so think
+          # about which ones we would actually expose.  We don't necessarily
+          # want to pretend that carbon dioxide concentration can be measured in
+          # decibels per meter
+          CarbonDioxideConcentrationMeasurement:
+              MeasurementUnitEnum:
+                  - DBPM
+                  - PCFT
+          CarbonMonoxideConcentrationMeasurement:
+              MeasurementUnitEnum:
+                  - DBPM
+                  - PCFT
+          FormaldehydeConcentrationMeasurement:
+              MeasurementUnitEnum:
+                  - DBPM
+                  - PCFT
+          NitrogenDioxideConcentrationMeasurement:
+              MeasurementUnitEnum:
+                  - DBPM
+                  - PCFT
+          OzoneConcentrationMeasurement:
+              MeasurementUnitEnum:
+                  - DBPM
+                  - PCFT
+          PM1ConcentrationMeasurement:
+              MeasurementUnitEnum:
+                  - DBPM
+                  - PCFT
+          PM10ConcentrationMeasurement:
+              MeasurementUnitEnum:
+                  - DBPM
+                  - PCFT
+          PM25ConcentrationMeasurement:
+              MeasurementUnitEnum:
+                  - DBPM
+                  - PCFT
+          RadonConcentrationMeasurement:
+              MeasurementUnitEnum:
+                  - DBPM
+                  - PCFT
+          TotalVolatileOrganicCompoundsConcentrationMeasurement:
+              MeasurementUnitEnum:
+                  - DBPM
+                  - PCFT
       bitmaps:
+          BooleanState:
+              # In-progress for ??
+              - Feature
           Thermostat:
               # In-progress for Matter 1.6: Thermostat Suggestions feature
               - ThermostatSuggestionNotFollowingReasonBitmap
       bitmap values:
+          AccessControl:
+              Feature:
+                  # In-progress for new groups setup (groupcast)
+                  - Auxiliary
+          BooleanStateConfiguration:
+              Feature:
+                  # In-progress for ????
+                  - FaultEvents
+          DeviceEnergyManagement:
+              Feature:
+                  # In progress for PowerRangeAdjustment feature
+                  - PowerRangeAdjustment
           ElectricalEnergyMeasurement:
               Feature:
                   # In-progress for Matter 1.5
                   - ApparentEnergy
                   - ReactiveEnergy
+          OccupancySensing:
+              Feature:
+                  # In-progress for ???
+                  - OccupancyEvent
+                  - Prediction
+          PowerTopology:
+              Feature:
+                  # In-progress for ???
+                  - ElectricalCircuit
           Thermostat:
               Feature:
                   # Thermostat Events is in-progress for Matter 1.6
@@ -11813,3 +12002,10 @@
           - VideoDoorbell
           # In-progress for Joint Fabric feature
           - JointFabricAdministrator
+          # In-progress for ???
+          - AmbientContextSensor
+          - Doorbell
+          - ElectricalCircuitBreaker
+          - ElectricalDistributionEnclosure
+          - HumidifierDehumidifier
+          - ProximityRanger
