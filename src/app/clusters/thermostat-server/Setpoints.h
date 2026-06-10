@@ -55,8 +55,8 @@ public:
     UserSetpointLimits userHeatLimits;
     UserSetpointLimits userCoolLimits;
 
-    SetpointRange occupied;
-    SetpointRange unoccupied;
+    SetpointRange occupiedRange;
+    SetpointRange unoccupiedRange;
 
     temperature deadBand;
 
@@ -69,9 +69,9 @@ public:
                        OptionalSetpoint(Attributes::MaxHeatSetpointLimit::Id, absoluteHeatLimits.maximum)),
         userCoolLimits(OptionalSetpoint(Attributes::MinCoolSetpointLimit::Id, absoluteCoolLimits.minimum),
                        OptionalSetpoint(Attributes::MaxCoolSetpointLimit::Id, absoluteCoolLimits.maximum)),
-        occupied(AbsoluteSetpoint(Attributes::OccupiedHeatingSetpoint::Id, kDefaultHeatingSetpoint),
+        occupiedRange(AbsoluteSetpoint(Attributes::OccupiedHeatingSetpoint::Id, kDefaultHeatingSetpoint),
                  AbsoluteSetpoint(Attributes::OccupiedCoolingSetpoint::Id, kDefaultCoolingSetpoint)),
-        unoccupied(AbsoluteSetpoint(Attributes::UnoccupiedHeatingSetpoint::Id, kDefaultHeatingSetpoint),
+        unoccupiedRange(AbsoluteSetpoint(Attributes::UnoccupiedHeatingSetpoint::Id, kDefaultHeatingSetpoint),
                    AbsoluteSetpoint(Attributes::UnoccupiedCoolingSetpoint::Id, kDefaultCoolingSetpoint)),
         deadBand(kDefaultDeadBand)
     {}
@@ -84,7 +84,7 @@ public:
                        OptionalSetpoint(spl.userHeatLimits.maximum, absoluteHeatLimits.maximum)),
         userCoolLimits(OptionalSetpoint(spl.userCoolLimits.minimum, absoluteCoolLimits.minimum),
                        OptionalSetpoint(spl.userCoolLimits.maximum, absoluteCoolLimits.maximum)),
-        occupied(spl.occupied), unoccupied(spl.unoccupied), deadBand(spl.deadBand)
+        occupiedRange(spl.occupiedRange), unoccupiedRange(spl.unoccupiedRange), deadBand(spl.deadBand)
     {}
 
     Setpoints & operator=(const Setpoints & other)
@@ -109,8 +109,8 @@ public:
         userCoolLimits = UserSetpointLimits(OptionalSetpoint(other.userCoolLimits.minimum, absoluteCoolLimits.minimum),
                                             OptionalSetpoint(other.userCoolLimits.maximum, absoluteCoolLimits.maximum));
 
-        occupied   = other.occupied;
-        unoccupied = other.unoccupied;
+        occupiedRange   = other.occupiedRange;
+        unoccupiedRange = other.unoccupiedRange;
         deadBand   = other.deadBand;
 
         return *this;
@@ -126,7 +126,7 @@ public:
     */
     SetpointRange & GetRange(chip::app::Clusters::Thermostat::OccupancyBitmap occupancy)
     {
-        return occupancy == OccupancyBitmap::kOccupied ? occupied : unoccupied;
+        return occupancy == OccupancyBitmap::kOccupied ? occupiedRange : unoccupiedRange;
     }
 
     /*

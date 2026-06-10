@@ -46,39 +46,45 @@ Status ValidateSetpointChange(Setpoints & setpoints, chip::AttributeId attribute
     switch (attributeId)
     {
     case OccupiedHeatingSetpoint::Id:
-        return setpoints.ChangeRangeHeating(setpoints.occupied, value, Setpoints::ClampMode::kDontClamp, changedAttributes);
+        return setpoints.ChangeRangeHeating(setpoints.occupiedRange, value, Setpoints::ClampMode::kDontClamp, changedAttributes);
     case OccupiedCoolingSetpoint::Id:
-        return setpoints.ChangeRangeCooling(setpoints.occupied, value, Setpoints::ClampMode::kDontClamp, changedAttributes);
+        return setpoints.ChangeRangeCooling(setpoints.occupiedRange, value, Setpoints::ClampMode::kDontClamp, changedAttributes);
     case UnoccupiedHeatingSetpoint::Id:
         if (!setpoints.occupancySupported)
         {
             return Status::UnsupportedAttribute;
         }
-        return setpoints.ChangeRangeHeating(setpoints.unoccupied, value, Setpoints::ClampMode::kDontClamp, changedAttributes);
+        return setpoints.ChangeRangeHeating(setpoints.unoccupiedRange, value, Setpoints::ClampMode::kDontClamp, changedAttributes);
     case UnoccupiedCoolingSetpoint::Id:
         if (!setpoints.occupancySupported)
         {
             return Status::UnsupportedAttribute;
         }
-        return setpoints.ChangeRangeCooling(setpoints.unoccupied, value, Setpoints::ClampMode::kDontClamp, changedAttributes);
+        return setpoints.ChangeRangeCooling(setpoints.unoccupiedRange, value, Setpoints::ClampMode::kDontClamp, changedAttributes);
     case MinHeatSetpointLimit::Id:
         if (!setpoints.heatSupported)
+        {
             return Status::UnsupportedAttribute;
+        }
         return setpoints.ChangeLimitMinimum(setpoints.userHeatLimits, setpoints.absoluteHeatLimits, value, changedAttributes);
     case MaxHeatSetpointLimit::Id:
         if (!setpoints.heatSupported)
+        {
             return Status::UnsupportedAttribute;
+        }
         return setpoints.ChangeLimitMaximum(setpoints.userHeatLimits, setpoints.absoluteHeatLimits, value, changedAttributes);
     case MinCoolSetpointLimit::Id:
         if (!setpoints.coolSupported)
+        {
             return Status::UnsupportedAttribute;
+        }
         return setpoints.ChangeLimitMinimum(setpoints.userCoolLimits, setpoints.absoluteCoolLimits, value, changedAttributes);
     case MaxCoolSetpointLimit::Id:
         if (!setpoints.coolSupported)
+        {
             return Status::UnsupportedAttribute;
+        }
         return setpoints.ChangeLimitMaximum(setpoints.userCoolLimits, setpoints.absoluteCoolLimits, value, changedAttributes);
-    case MinSetpointDeadBand::Id:
-        return Status::Success;
     default:
         return Status::UnsupportedAttribute;
     }
@@ -98,16 +104,16 @@ void HandleSetpointWrite(const ConcreteAttributePath & attributePath)
     switch (attributePath.mAttributeId)
     {
     case OccupiedHeatingSetpoint::Id:
-        temp = setpoints.occupied.heating.Temperature();
+        temp = setpoints.occupiedRange.heating.Temperature();
         break;
     case OccupiedCoolingSetpoint::Id:
-        temp = setpoints.occupied.cooling.Temperature();
+        temp = setpoints.occupiedRange.cooling.Temperature();
         break;
     case UnoccupiedHeatingSetpoint::Id:
-        temp = setpoints.unoccupied.heating.Temperature();
+        temp = setpoints.unoccupiedRange.heating.Temperature();
         break;
     case UnoccupiedCoolingSetpoint::Id:
-        temp = setpoints.unoccupied.cooling.Temperature();
+        temp = setpoints.unoccupiedRange.cooling.Temperature();
         break;
     case MinHeatSetpointLimit::Id:
         temp = setpoints.userHeatLimits.minimum.Temperature();

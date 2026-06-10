@@ -82,11 +82,11 @@ bool Setpoints::Valid()
         {
             return false;
         }
-        if (!userHeatLimits.Valid(occupied.heating))
+        if (!userHeatLimits.Valid(occupiedRange.heating))
         {
             return false;
         }
-        if (occupancySupported && !userHeatLimits.Valid(unoccupied.heating))
+        if (occupancySupported && !userHeatLimits.Valid(unoccupiedRange.heating))
         {
             return false;
         }
@@ -109,11 +109,11 @@ bool Setpoints::Valid()
         {
             return false;
         }
-        if (!userCoolLimits.Valid(occupied.cooling))
+        if (!userCoolLimits.Valid(occupiedRange.cooling))
         {
             return false;
         }
-        if (occupancySupported && !userCoolLimits.Valid(unoccupied.cooling))
+        if (occupancySupported && !userCoolLimits.Valid(unoccupiedRange.cooling))
         {
             return false;
         }
@@ -374,10 +374,10 @@ Status Setpoints::Fix(SetpointAttributes & changedAttributes)
         FixUserLimitDeadband(userHeatLimits.minimum, userCoolLimits.minimum, absoluteHeatLimits.Minimum(),
                              absoluteCoolLimits.Minimum(), changedAttributes, fixedAttributes);
     }
-    FixRange(occupied, changedAttributes, fixedAttributes);
+    FixRange(occupiedRange, changedAttributes, fixedAttributes);
     if (occupancySupported)
     {
-        FixRange(unoccupied, changedAttributes, fixedAttributes);
+        FixRange(unoccupiedRange, changedAttributes, fixedAttributes);
     }
     changedAttributes.Set(fixedAttributes);
     return Valid() ? Status::Success : Status::ConstraintError;
@@ -541,7 +541,6 @@ Status LoadSetpoints(EndpointId endpoint, Setpoints & setpoints)
 
     if (setpoints.coolSupported)
     {
-
         setpoints.absoluteCoolLimits.minimum.SetTemperature(
             ReadSetpointAttribute(endpoint, AbsMinCoolSetpointLimit::Get, kDefaultAbsMinCoolSetpointLimit));
 
@@ -566,7 +565,7 @@ Status LoadSetpoints(EndpointId endpoint, Setpoints & setpoints)
             ChipLogError(Zcl, "Error: Can not read Occupied Cooling Setpoint");
             return Status::Failure;
         }
-        setpoints.occupied.cooling.SetTemperature(occupiedCoolingSetpoint);
+        setpoints.occupiedRange.cooling.SetTemperature(occupiedCoolingSetpoint);
 
         if (setpoints.occupancySupported)
         {
@@ -577,7 +576,7 @@ Status LoadSetpoints(EndpointId endpoint, Setpoints & setpoints)
                 ChipLogError(Zcl, "Error: Can not read Unoccupied Cooling Setpoint");
                 return Status::Failure;
             }
-            setpoints.unoccupied.cooling.SetTemperature(unoccupiedCoolingSetpoint);
+            setpoints.unoccupiedRange.cooling.SetTemperature(unoccupiedCoolingSetpoint);
         }
     }
 
@@ -605,7 +604,7 @@ Status LoadSetpoints(EndpointId endpoint, Setpoints & setpoints)
             ChipLogError(Zcl, "Error: Can not read Occupied Heating Setpoint");
             return Status::Failure;
         }
-        setpoints.occupied.heating.SetTemperature(occupiedHeatingSetpoint);
+        setpoints.occupiedRange.heating.SetTemperature(occupiedHeatingSetpoint);
 
         if (setpoints.occupancySupported)
         {
@@ -616,7 +615,7 @@ Status LoadSetpoints(EndpointId endpoint, Setpoints & setpoints)
                 ChipLogError(Zcl, "Error: Can not read Unoccupied Heating Setpoint");
                 return Status::Failure;
             }
-            setpoints.unoccupied.heating.SetTemperature(unoccupiedHeatingSetpoint);
+            setpoints.unoccupiedRange.heating.SetTemperature(unoccupiedHeatingSetpoint);
         }
     }
 
@@ -676,28 +675,28 @@ Status SaveSetpoints(EndpointId endpoint, Setpoints & setpoints, SetpointAttribu
     }
     if (affectedAttributes.Has(Attributes::OccupiedHeatingSetpoint::Id))
     {
-        if ((status = OccupiedHeatingSetpoint::Set(endpoint, setpoints.occupied.heating.Temperature())) != Status::Success)
+        if ((status = OccupiedHeatingSetpoint::Set(endpoint, setpoints.occupiedRange.heating.Temperature())) != Status::Success)
         {
             return status;
         }
     }
     if (affectedAttributes.Has(Attributes::OccupiedCoolingSetpoint::Id))
     {
-        if ((status = OccupiedCoolingSetpoint::Set(endpoint, setpoints.occupied.cooling.Temperature())) != Status::Success)
+        if ((status = OccupiedCoolingSetpoint::Set(endpoint, setpoints.occupiedRange.cooling.Temperature())) != Status::Success)
         {
             return status;
         }
     }
     if (affectedAttributes.Has(Attributes::UnoccupiedHeatingSetpoint::Id))
     {
-        if ((status = UnoccupiedHeatingSetpoint::Set(endpoint, setpoints.unoccupied.heating.Temperature())) != Status::Success)
+        if ((status = UnoccupiedHeatingSetpoint::Set(endpoint, setpoints.unoccupiedRange.heating.Temperature())) != Status::Success)
         {
             return status;
         }
     }
     if (affectedAttributes.Has(Attributes::UnoccupiedCoolingSetpoint::Id))
     {
-        if ((status = UnoccupiedCoolingSetpoint::Set(endpoint, setpoints.unoccupied.cooling.Temperature())) != Status::Success)
+        if ((status = UnoccupiedCoolingSetpoint::Set(endpoint, setpoints.unoccupiedRange.cooling.Temperature())) != Status::Success)
         {
             return status;
         }
