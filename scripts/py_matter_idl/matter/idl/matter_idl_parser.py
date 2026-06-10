@@ -342,19 +342,18 @@ class MatterIdlTransformer(Transformer):
         # 1: [command_optional] (CommandQuality.OPTIONAL or None)
         # 2: command_with_access
         # Rest: input_param (optional), output_param, code
-        qualities = tuple_args[0] or CommandQuality.NONE
-        if tuple_args[1]:
-            qualities |= tuple_args[1]
+        qualities, optional_quality, with_access, *rest = tuple_args
+        qualities = qualities or CommandQuality.NONE
+        if optional_quality:
+            qualities |= optional_quality
 
-        with_access = tuple_args[2]
         with_access.pop("qualities", None)
 
-        args = list(tuple_args[3:])  # the rest of the arguments
-        if len(args) != 3:
-            # input_param is missing, insert None
-            args.insert(0, None)
-
-        input_param, output_param, code = args[0], args[1], args[2]
+        if len(rest) == 2:
+            input_param = None
+            output_param, code = rest
+        else:
+            input_param, output_param, code = rest
 
         meta = None if self.skip_meta else ParseMetaData(meta)
 
@@ -387,16 +386,14 @@ class MatterIdlTransformer(Transformer):
 
     @v_args(meta=True)
     def event(self, meta, args):
-        qualities = args[0] or EventQuality.NONE
-        if args[2]:
-            qualities |= args[2]
-
-        with_access = args[3]
-        with_access.pop("qualities", None)
-
-        priority = args[1]
-        code = args[4]
+        qualities, priority, optional_quality, with_access, code = args[:5]
         fields = args[5:]
+
+        qualities = qualities or EventQuality.NONE
+        if optional_quality:
+            qualities |= optional_quality
+
+        with_access.pop("qualities", None)
 
         meta = None if self.skip_meta else ParseMetaData(meta)
         return Event(qualities=qualities, priority=priority, code=code, fields=fields, parse_meta=meta, **with_access)

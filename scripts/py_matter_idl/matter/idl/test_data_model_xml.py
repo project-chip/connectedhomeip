@@ -771,10 +771,20 @@ endpoint 2 {
                 <event id="1" name="OptionalEvent" priority="info">
                   <optionalConform/>
                 </event>
+                <event id="2" name="OptionalEventWithFeature" priority="info">
+                  <optionalConform>
+                    <feature name="FEAT"/>
+                  </optionalConform>
+                </event>
               </events>
               <commands>
                 <command id="10" name="OptionalCommand" source="client">
                   <optionalConform/>
+                </command>
+                <command id="11" name="OptionalCommandWithFeature" source="client">
+                  <optionalConform>
+                    <feature name="FEAT"/>
+                  </optionalConform>
                 </command>
               </commands>
             </cluster>
@@ -783,7 +793,9 @@ endpoint 2 {
         expected_idl = IdlTextToIdl('''
             client cluster Test = 123 {
                info optional event OptionalEvent = 1 {}
+               info optional event OptionalEventWithFeature = 2 {}
                optional command OptionalCommand(): DefaultSuccess = 10;
+               optional command OptionalCommandWithFeature(): DefaultSuccess = 11;
 
                readonly attribute attrib_id attributeList[] = 65531;
                readonly attribute event_id eventList[] = 65530;
