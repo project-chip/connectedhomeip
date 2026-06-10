@@ -15,12 +15,6 @@
  *    limitations under the License.
  */
 
-/**
- * @file
- *   APIs and defines for the Smoke CO Alarm Server plugin.
- *
- */
-
 #pragma once
 
 #include <app/CommandHandler.h>
