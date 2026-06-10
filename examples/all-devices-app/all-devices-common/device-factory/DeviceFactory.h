@@ -245,7 +245,7 @@ private:
         }
         if constexpr (ALL_DEVICES_ENABLE_POWER_SOURCE)
         {
-            RegisterCreator("power-source", [this]() { return std::make_unique<DecreasingBatteryPowerSourceDevice>(); });
+            RegisterCreator("power-source", []() { return std::make_unique<DecreasingBatteryPowerSourceDevice>(); });
         }
 
         // at least one device type MUST be enabled
