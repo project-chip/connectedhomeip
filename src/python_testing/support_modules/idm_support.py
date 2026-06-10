@@ -1298,10 +1298,11 @@ class IDMBaseTest(BasicCompositionTests):
                         # Thermostat spec (cluster 0x0201, revision 8) requires the server to silently
                         # ignore writes to ControlSequenceOfOperation for Zigbee back-compat. The write
                         # returns Success but the value never changes, so no subscription report is emitted.
+                        # Spec Link: https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/app_clusters/Thermostat.adoc#1121-controlsequenceofoperation-attribute
                         Clusters.Thermostat.Attributes.ControlSequenceOfOperation,
-                        # TC-TSTAT-2.2 step 11a mandates that writes to MinSetpointDeadBand are silently
-                        # discarded (Success returned, value unchanged) unless the device opts in via the
-                        # TSTAT.S.M.MINSETPOINTDEADBANDWRITABLE PICS.
+                        # MinSetpointDeadBand is optionally writable, but any writes SHALL be silently
+                        # ignored per spec (backwards compatibility). 
+                        # Spec Link: https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/app_clusters/Thermostat.adoc#1119-minsetpointdeadband-attribute
                         Clusters.Thermostat.Attributes.MinSetpointDeadBand,
                     ]
                     if attribute in ATTRIBUTES_WITH_WRITE_CONSTRAINTS:
