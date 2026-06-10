@@ -45,6 +45,7 @@ from .target import BuildTarget, TargetPart
 _ALL_DEVICES_APP_DEVICES = [
     # keep-sorted: start
     'aggregator',
+    'bridged-node',
     'chime',
     'contact-sensor',
     'dimmable-light',

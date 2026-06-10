@@ -1,4 +1,4 @@
-# Copyright (c) 2025 Project CHIP Authors
+# Copyright (c) 2026 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,20 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
-import("${chip_root}/config/recommended.gni")
-import("${chip_root}/src/platform/device.gni")
-import("${chip_root}/src/system/system.gni")
 
-declare_args() {
-  # Build controller (set to false for a device)
-  chip_support_commissioning_in_controller = true
+source_set("bridged-node") {
+  sources = [
+    "BridgedNodeDevice.cpp",
+    "BridgedNodeDevice.h",
+  ]
 
-  # Build controller with webrtc python bindings
-  chip_support_webrtc_python_bindings = false
-}
-
-declare_args() {
-  # Disable Thread MeshCoP if cross-compiling because of missing libevent.
-  chip_support_thread_meshcop = false
+  public_deps = [
+    "${chip_root}/examples/all-devices-app/all-devices-common/devices/interface:single-endpoint-device",
+    "${chip_root}/src/app/clusters/bridged-device-basic-information-server",
+    "${chip_root}/src/data-model-providers/codedriven",
+    "${chip_root}/src/lib/core:error",
+    "${chip_root}/src/lib/support",
+    "${chip_root}/zzz_generated/app-common/devices/",
+  ]
 }
