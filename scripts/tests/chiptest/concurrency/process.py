@@ -329,6 +329,8 @@ class WrappedProcess(ABC, Generic[WorkerConfigT, WorkRequestT, WorkResponseT]):
             raise TimeoutError(f"Failed to terminate the process {self.name}. May become a zombie")
         finally:
             self._stopped = True
+            if isinstance(self.state.exception, KeyboardInterrupt):
+                raise self.state.exception
             if self.state.exception is not None:
                 raise RuntimeError("Process reported an exception during execution") from self.state.exception
 
@@ -378,10 +380,11 @@ class WrappedProcess(ABC, Generic[WorkerConfigT, WorkRequestT, WorkResponseT]):
                     log.warning("Received a cancel event")
                 except EndOfQueue:
                     log.debug("Received end of work signal")
-                except KeyboardInterrupt:
-                    log.debug("Caught an interrupt")
         except BaseException as e:
-            log.error("Process failed with an exception: %r", e)
+            if isinstance(e, KeyboardInterrupt):
+                log.debug("Process interrupted by user")
+            else:
+                log.error("Process failed with an exception: %r", e)
             self.state.exception = e
         finally:
             self.state.phase = ProcessPhase.CLOSED
