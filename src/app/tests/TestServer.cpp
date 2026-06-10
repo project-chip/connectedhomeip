@@ -19,6 +19,7 @@
 #include <pw_unit_test/framework.h>
 
 #include <app/server/Server.h>
+#include <cstdlib>
 #include <lib/support/tests/ExtraPwTestMacros.h>
 #include <platform/CHIPDeviceLayer.h>
 
@@ -72,6 +73,14 @@ TEST_F(TestServer, TestFactoryResetEvent)
     EXPECT_EQ(handler.mEvent.Type, DeviceEventType::kFactoryReset);
 
     PlatformMgr().RemoveEventHandler(TestFactoryResetEventHandler::EventHandler, reinterpret_cast<intptr_t>(&handler));
+}
+
+// TODO: Remove this test after verifying crashlog workflow
+TEST(TestCrashlog, Abort)
+{
+    // Deliberately abort to trigger coredump generation for crashlog testing.
+    // This test is independent of TestServer (which requires BLE/stack init).
+    abort();
 }
 
 } // namespace server
