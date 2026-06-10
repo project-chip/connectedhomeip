@@ -237,7 +237,7 @@ const char * gOutKeyFileName        = nullptr;
 uint32_t gValidDays                 = kCertValidDays_Undefined;
 const char * gCDPURI                = nullptr;
 const char * gCRLIssuerCertFileName = nullptr;
-const char * gKeyTypeName          = nullptr;
+const char * gKeyTypeName           = nullptr;
 struct tm gValidFrom;
 CertStructConfig gCertConfig;
 

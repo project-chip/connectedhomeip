@@ -1047,7 +1047,7 @@ CHIP_ERROR MakeCertTLV(CertType certType, const ToolChipDN * subjectDN, X509 * c
     // otherwise use compact identity format for Network (Client) Identities.
     bool useCompactIdentityFormat = (!certConfig.IsErrorTestCaseEnabled() && certType == CertType::kNetworkIdentity);
 
-    bool isMLDSAKey = IsMLDSAKey(newKey);
+    bool isMLDSAKey         = IsMLDSAKey(newKey);
     size_t subjectPubkeyLen = 0;
     size_t issuerPubkeyLen  = 0;
 
@@ -1064,22 +1064,21 @@ CHIP_ERROR MakeCertTLV(CertType certType, const ToolChipDN * subjectDN, X509 * c
 
         VerifyOrReturnError(EVP_PKEY_get_raw_public_key(caKey, nullptr, &issuerPubkeyLen) == 1, CHIP_ERROR_INTERNAL);
         issuerPubkeyBuf.reset(new uint8_t[issuerPubkeyLen]);
-        VerifyOrReturnError(EVP_PKEY_get_raw_public_key(caKey, issuerPubkeyBuf.get(), &issuerPubkeyLen) == 1,
-                            CHIP_ERROR_INTERNAL);
+        VerifyOrReturnError(EVP_PKEY_get_raw_public_key(caKey, issuerPubkeyBuf.get(), &issuerPubkeyLen) == 1, CHIP_ERROR_INTERNAL);
     }
     else
     {
         subjectPubkeyLen = chip::Crypto::CHIP_CRYPTO_PUBLIC_KEY_SIZE_BYTES;
         uint8_t * p      = subjectPubkey;
-        VerifyOrReturnError(
-            i2o_ECPublicKey(EVP_PKEY_get0_EC_KEY(newKey), &p) == static_cast<int>(chip::Crypto::CHIP_CRYPTO_PUBLIC_KEY_SIZE_BYTES),
-            CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(i2o_ECPublicKey(EVP_PKEY_get0_EC_KEY(newKey), &p) ==
+                                static_cast<int>(chip::Crypto::CHIP_CRYPTO_PUBLIC_KEY_SIZE_BYTES),
+                            CHIP_ERROR_INVALID_ARGUMENT);
 
         issuerPubkeyLen = chip::Crypto::CHIP_CRYPTO_PUBLIC_KEY_SIZE_BYTES;
         p               = issuerPubkey;
-        VerifyOrReturnError(
-            i2o_ECPublicKey(EVP_PKEY_get0_EC_KEY(caKey), &p) == static_cast<int>(chip::Crypto::CHIP_CRYPTO_PUBLIC_KEY_SIZE_BYTES),
-            CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(i2o_ECPublicKey(EVP_PKEY_get0_EC_KEY(caKey), &p) ==
+                                static_cast<int>(chip::Crypto::CHIP_CRYPTO_PUBLIC_KEY_SIZE_BYTES),
+                            CHIP_ERROR_INVALID_ARGUMENT);
     }
 
     writer.Init(chipCert);
@@ -1198,7 +1197,8 @@ CHIP_ERROR MakeCertTLV(CertType certType, const ToolChipDN * subjectDN, X509 * c
                 subjectPubkey[CertStructConfig::kPublicKeyErrorByte] ^= 0xFF;
             }
         }
-        ReturnErrorOnFailure(writer.PutBytes(ContextTag(kTag_EllipticCurvePublicKey), pubkeyData, static_cast<uint32_t>(pubkeyLen)));
+        ReturnErrorOnFailure(
+            writer.PutBytes(ContextTag(kTag_EllipticCurvePublicKey), pubkeyData, static_cast<uint32_t>(pubkeyLen)));
     }
 
     // extensions

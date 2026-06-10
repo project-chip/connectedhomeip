@@ -364,7 +364,7 @@ bool GenerateKeyPair_MLDSA(std::unique_ptr<EVP_PKEY, void (*)(EVP_PKEY *)> & key
 
     {
         std::unique_ptr<EVP_PKEY_CTX, void (*)(EVP_PKEY_CTX *)> ctx(EVP_PKEY_CTX_new_from_name(nullptr, algorithm, nullptr),
-                                                                     &EVP_PKEY_CTX_free);
+                                                                    &EVP_PKEY_CTX_free);
         if (ctx.get() == nullptr)
         {
             ReportOpenSSLErrorAndExit("EVP_PKEY_CTX_new_from_name", res = false);
