@@ -317,18 +317,18 @@ class TC_ACS_3_1(MatterBaseTest):
                 self.wait_for_user_input(
                     prompt_msg="Type any letter and press ENTER after HoldTime duration from the step 5a has passed.")
 
-            skip("6a")
-            skip("6b")
-            skip("6c")
+            self.skip_step("6a")
+            self.skip_step("6b")
+            self.skip_step("6c")
             # check if the last AmbientContextDetectEnded event is from the event start number of AmbientContextSensed_2
             # this latest 2nd event end ensures that the HoldTime has passed.
             # event = event_listener.wait_for_event_report(cluster.Events.AmbientContextDetectEnded, timeout_sec=(holdtime_dut))
             # this check not ready yet.
             # asserts.assert_equal(event.event_id, start_event_id, "Wrong Event ID")
         else:
-            skip("5a")
-            skip("5b")
-            skip("5c")
+            self.skip_step("5a")
+            self.skip_step("5b")
+            self.skip_step("5c")
 
             self.step("6a")
             # CI for the first ambient sensing event => Human activity walking
