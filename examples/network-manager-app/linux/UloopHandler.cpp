@@ -103,9 +103,10 @@ void UloopHandler::UloopFdSet(uloop_fd * fd, unsigned int events)
     VerifyOrDieWithMsg(!(events & ~(ULOOP_READ | ULOOP_WRITE | ULOOP_BLOCKING)), DeviceLayer,
                        "Unsupported uloop fd_set events: 0x%x", events);
 
+    CHIP_ERROR err;
     auto & system = SystemLayer();
     System::SocketWatchToken watch;
-    CHIP_ERROR err = system.StartWatchingSocket(fd->fd, &watch); // or find existing watch
+    SuccessOrExit(err = system.StartWatchingSocket(fd->fd, &watch)); // or find existing watch
     if (events != 0)
     {
         int changed = fd->flags ^ events;
@@ -113,28 +114,27 @@ void UloopHandler::UloopFdSet(uloop_fd * fd, unsigned int events)
         {
             if (events & ULOOP_READ)
             {
-                system.RequestCallbackOnPendingRead(watch);
+                SuccessOrExit(err = system.RequestCallbackOnPendingRead(watch));
             }
             else
             {
-                system.ClearCallbackOnPendingRead(watch);
+                SuccessOrExit(err = system.ClearCallbackOnPendingRead(watch));
             }
         }
         if (changed & ULOOP_WRITE)
         {
             if (events & ULOOP_WRITE)
             {
-                system.RequestCallbackOnPendingWrite(watch);
+                SuccessOrExit(err = system.RequestCallbackOnPendingWrite(watch));
             }
             else
             {
-                system.ClearCallbackOnPendingWrite(watch);
+                SuccessOrExit(err = system.ClearCallbackOnPendingWrite(watch));
             }
         }
     }
     else
     {
-        VerifyOrReturn(err == CHIP_NO_ERROR); // shouldn't happen, but ignore
         SuccessOrExit(err = system.StopWatchingSocket(&watch));
     }
 
