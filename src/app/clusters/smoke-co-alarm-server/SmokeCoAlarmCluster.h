@@ -23,16 +23,29 @@
 
 #pragma once
 
-#include <app-common/zap-generated/cluster-objects.h>
 #include <app/CommandHandler.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/OptionalAttributeSet.h>
+#include <clusters/SmokeCoAlarm/Attributes.h>
+#include <clusters/SmokeCoAlarm/Events.h>
 
 namespace chip {
 namespace app {
 namespace Clusters {
 
-class SmokeCoAlarmDelegate;
+class SmokeCoAlarmDelegate
+{
+public:
+    virtual ~SmokeCoAlarmDelegate() = default;
+
+    /**
+     * @brief Called when a self-test is initiated (locally or via the
+     *        SelfTestRequest command).  The cluster has already set
+     *        TestInProgress=true and ExpressedState=Testing before this
+     *        is invoked.
+     */
+    virtual void OnSelfTestRequested() = 0;
+};
 
 class SmokeCoAlarmCluster : public DefaultServerCluster
 {
@@ -154,27 +167,6 @@ private:
     SmokeCoAlarm::SensitivityEnum mSmokeSensitivityLevel     = SmokeCoAlarm::SensitivityEnum::kStandard;
     uint32_t mExpiryDate                                     = 0;
     bool mUnmounted                                          = false;
-};
-
-/**
- * @brief Application delegate for SmokeCoAlarmCluster.
- *
- * Implement this to provide device-specific self-test behaviour. Pass the
- * concrete instance to SmokeCoAlarmServer::Init() or
- * SmokeCoAlarmCluster::SetDelegate().
- */
-class SmokeCoAlarmDelegate
-{
-public:
-    virtual ~SmokeCoAlarmDelegate() = default;
-
-    /**
-     * @brief Called when a self-test is initiated (locally or via the
-     *        SelfTestRequest command).  The cluster has already set
-     *        TestInProgress=true and ExpressedState=Testing before this
-     *        is invoked.
-     */
-    virtual void OnSelfTestRequested() = 0;
 };
 
 } // namespace Clusters

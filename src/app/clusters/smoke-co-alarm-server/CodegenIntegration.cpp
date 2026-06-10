@@ -17,7 +17,6 @@
  */
 
 #include "CodegenIntegration.h"
-#include <clusters/SmokeCoAlarm/Attributes.h>
 #include <lib/support/CodeUtils.h>
 
 using namespace chip::app::Clusters;
