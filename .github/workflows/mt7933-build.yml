@@ -4,11 +4,11 @@ on:
   push:
     branches: 
       - master
-      - mtk-1.5-filogic
+      - 'mtk-*'
   pull_request:
     branches: 
       - master
-      - mtk-1.5-filogic
+      - 'mtk-*'
   workflow_dispatch:
 
 jobs:
