@@ -1561,7 +1561,7 @@ void ConnectivityManagerImpl::_OnWpaInterfaceScanDone(WpaSupplicant1Interface * 
         return;
     }
 
-    std::vector<WiFiScanResponse> * networkScanned = new std::vector<WiFiScanResponse>();
+    auto networkScanned = std::make_unique<std::vector<WiFiScanResponse>>();
     for (const char * bssPath = (bsss != nullptr ? *bsss : nullptr); bssPath != nullptr; bssPath = *(++bsss))
     {
         WiFiScanResponse network;
@@ -1576,14 +1576,24 @@ void ConnectivityManagerImpl::_OnWpaInterfaceScanDone(WpaSupplicant1Interface * 
         }
     }
 
-    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([this, networkScanned]() {
+    CHIP_ERROR err = DeviceLayer::SystemLayer().ScheduleLambda([this, scanned = networkScanned.get()]() {
         // Note: We cannot post an event in ScheduleLambda since std::vector is not trivial copyable.
-        LinuxScanResponseIterator<WiFiScanResponse> iter(networkScanned);
+        LinuxScanResponseIterator<WiFiScanResponse> iter(scanned);
 
         OnScanFinished(Status::kSuccess, CharSpan(), &iter);
 
-        delete networkScanned;
+        delete scanned;
     });
+
+    if (err == CHIP_NO_ERROR)
+    {
+        networkScanned.release();
+    }
+    else
+    {
+        ChipLogError(DeviceLayer, WPA_SUPPLICANT_CLIENT_LOG_PREFIX "failed to schedule scan completion: %" CHIP_ERROR_FORMAT,
+                     err.Format());
+    }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
     mPafChannelAvailable = true;
