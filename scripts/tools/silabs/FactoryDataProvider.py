@@ -213,9 +213,10 @@ class FactoryDataWriter:
                 if self._args.mcu_family:
                     if self._args.mcu_family == "EFR32MG24":
                         inputImage = self.BASE_MG24_FILE
+                    else:
+                        raise ValueError(f"Unsupported MCU family: {self._args.mcu_family}. Only EFR32MG24 is currently supported.")
                 else:
-                    print("Connect debug port or provide the mcu_family")
-                    return
+                    raise RuntimeError("Device not connected. Please connect a debug port or provide '--mcu_family EFR32MG24'.")
 
         # Convert interger to little endian hex format and strings to hex byte array format for nvm3 storage
         spake2pIterationCount = self._args.spake2_iteration.to_bytes(4, 'little').hex()
