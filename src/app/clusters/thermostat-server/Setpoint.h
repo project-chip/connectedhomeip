@@ -65,12 +65,16 @@ public:
      */
     chip::AttributeId AttributeId() const { return mAttributeId; }
 
-    bool operator==(const Setpoint & other) const { return isEqual(other); }
-    bool operator!=(const Setpoint & other) const { return !isEqual(other); }
+    bool operator==(const Setpoint & other) const
+    {
+        return mAttributeId == other.mAttributeId &&
+               HasTemperature() == other.HasTemperature() &&
+               (!HasTemperature() || Temperature() == other.Temperature());
+    }
+    bool operator!=(const Setpoint & other) const { return !(*this == other); }
 
 protected:
     chip::AttributeId mAttributeId;
-    virtual bool isEqual(const Setpoint & other) const = 0;
 };
 
 /*
@@ -91,13 +95,6 @@ public:
      * Returns true if the temperature was changed, false otherwise.
      */
     bool SetTemperature(temperature temp) override;
-
-protected:
-    bool isEqual(const Setpoint & other) const override
-    {
-        auto otherSetpoint = static_cast<const AbsoluteSetpoint *>(&other);
-        return otherSetpoint != nullptr && mTemperature == otherSetpoint->mTemperature;
-    }
 
 private:
     temperature mTemperature;
@@ -143,13 +140,6 @@ public:
      * Returns true if the temperature was cleared, false otherwise.
      */
     bool ClearTemperature();
-
-protected:
-    bool isEqual(const Setpoint & other) const override
-    {
-        auto otherSetpoint = static_cast<const OptionalSetpoint *>(&other);
-        return otherSetpoint != nullptr && mTemperature == otherSetpoint->mTemperature;
-    }
 
 private:
     const AbsoluteSetpoint & mAbsoluteSetpoint;
