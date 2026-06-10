@@ -27,6 +27,6 @@ source_set("bridged-node") {
     "${chip_root}/src/data-model-providers/codedriven",
     "${chip_root}/src/lib/core:error",
     "${chip_root}/src/lib/support",
-    "${chip_root}/zzz_generated/app-common/devices/",
+    "${chip_root}/zzz_generated/app-common/devices",
   ]
 }

@@ -46,6 +46,8 @@ protected:
     TimerDelegate & mTimerDelegate;
     UniqueIdGenerator mUniqueIdGenerator;
     NodeLabelGenerator mNodeLabelGenerator;
+    std::string mResolvedUniqueId;
+    std::string mResolvedNodeLabel;
     LazyRegisteredServerCluster<Clusters::BridgedDeviceBasicInformationCluster> mBridgedDeviceBasicInformationCluster;
 };
 
