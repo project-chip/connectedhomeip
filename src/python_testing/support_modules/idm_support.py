@@ -1301,7 +1301,7 @@ class IDMBaseTest(BasicCompositionTests):
                         # Spec Link: https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/app_clusters/Thermostat.adoc#1121-controlsequenceofoperation-attribute
                         Clusters.Thermostat.Attributes.ControlSequenceOfOperation,
                         # MinSetpointDeadBand is optionally writable, but any writes SHALL be silently
-                        # ignored per spec (backwards compatibility). 
+                        # ignored per spec (backwards compatibility).
                         # Spec Link: https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/app_clusters/Thermostat.adoc#1119-minsetpointdeadband-attribute
                         Clusters.Thermostat.Attributes.MinSetpointDeadBand,
                     ]
