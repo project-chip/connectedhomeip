@@ -30,7 +30,7 @@ platform-specific specializations kept separate:
     -   Core cluster logic and device interfaces.
     -   Base device implementations.
     -   The **`DeviceFactory`** (in
-        `all-devices-common/devices/device-factory/DeviceFactory.h`), which
+        `all-devices-common/device-factory/DeviceFactory.h`), which
         enables runtime registration and creation of supported device types.
 -   **`esp32/`, `posix/`**: Contain platform-specific implementations (with
     `posix/` containing `linux/` and `darwin/` subdirectories), entry points,

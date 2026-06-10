@@ -16,7 +16,12 @@ import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 import("${chip_root}/build/chip/buildconfig_header.gni")
 import(
-    "${chip_root}/examples/all-devices-app/all-devices-common/devices/enabled_devices.gni")
+    "${chip_root}/examples/all-devices-app/all-devices-common/device-factory/enabled_devices.gni")
+
+config("includes") {
+  # allows includes like "device-factory/..."
+  include_dirs = [ ".." ]
+}
 
 # Generate app_config/enabled_devices.h.
 # Will define a set of ALL_DEVICES_ENABLE_* constants
@@ -27,6 +32,8 @@ enabled_devices_buildconfig_header("enabled_devices_buildconfig") {
 
 source_set("device-factory") {
   sources = [ "DeviceFactory.h" ]
+
+  public_configs = [ ":includes" ]
 
   public_deps = [
     ":enabled_devices_buildconfig",
