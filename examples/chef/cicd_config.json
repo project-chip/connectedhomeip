@@ -1,5 +1,5 @@
 {
-    "ci_allow_list": ["rootnode_waterheater_21bd13d651"],
+    "ci_allow_list": ["rootnode_dimmablelight_bCwGYSDpoe"],
     "cd_platforms": {
         "linux": {
             "linux_x86": ["--cpu_type", "x64", "--enable_ipv4", "-a"],
