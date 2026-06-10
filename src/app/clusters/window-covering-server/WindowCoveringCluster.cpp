@@ -589,6 +589,28 @@ std::optional<DataModel::ActionReturnStatus> WindowCoveringCluster::HandleUpOrOp
     {
         SetTargetPositionLiftPercent100ths(NPercent100ths(kWcPercent100thsMinOpen));
     }
+
+    if (GetFeatureMap().Has(Feature::kPositionAwareTilt))
+    {
+        SetTargetPositionLiftPercent100ths(NPercent100ths(kWcPercent100thsMinOpen));
+    }
+
+    WindowCoveringDelegate * delegate = GetDelegate();
+    if (delegate != nullptr)
+    {
+        if (GetFeatureMap().Has(Feature::kPositionAwareLift))
+        {
+            LogErrorOnFailure(delegate->HandleMovement(WindowCoveringType::Lift));
+        }
+        if (GetFeatureMap().Has(Feature::kPositionAwareTilt))
+        {
+            LogErrorOnFailure(delegate->HandleMovement(WindowCoveringType::Tilt));
+        }
+    }
+    else
+    {
+        ChipLogProgress(Zcl, "WindowCovering has no delegate set for endpoint:%u", GetEndpointId());
+    }
     return Status::Success;
 }
 
