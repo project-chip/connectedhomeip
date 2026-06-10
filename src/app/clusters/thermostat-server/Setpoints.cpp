@@ -47,9 +47,9 @@ SetpointRange & Setpoints::GetRange(OccupancyBitmap occupancy)
 {
     if (occupancy == OccupancyBitmap::kOccupied)
     {
-        return occupied;
+        return occupiedRange;
     }
-    return unoccupied;
+    return unoccupiedRange;
 }
 
 SetpointLimits<AbsoluteSetpoint> Setpoints::GetLimits(SystemModeEnum mode)
@@ -92,11 +92,11 @@ bool Setpoints::Valid()
         {
             return false;
         }
-        if (!userHeatLimits.Valid(occupied.heating))
+        if (!userHeatLimits.Valid(occupiedRange.heating))
         {
             return false;
         }
-        if (occupancySupported && !userHeatLimits.Valid(unoccupied.heating))
+        if (occupancySupported && !userHeatLimits.Valid(unoccupiedRange.heating))
         {
             return false;
         }
@@ -119,31 +119,30 @@ bool Setpoints::Valid()
         {
             return false;
         }
-        if (!userCoolLimits.Valid(occupied.cooling))
+        if (!userCoolLimits.Valid(occupiedRange.cooling))
         {
             return false;
         }
-        if (occupancySupported && !userCoolLimits.Valid(unoccupied.cooling))
+        if (occupancySupported && !userCoolLimits.Valid(unoccupiedRange.cooling))
         {
             return false;
         }
     }
     if (autoSupported)
     {
-        if (static_cast<temperature>(userCoolLimits.maximum.Temperature() - userHeatLimits.maximum.Temperature()) < deadBand)
+        if (ViolatesDeadband(userCoolLimits.maximum, userHeatLimits.maximum))
         {
             return false;
         }
-        if (static_cast<temperature>(userCoolLimits.minimum.Temperature() - userHeatLimits.minimum.Temperature()) < deadBand)
+        if (ViolatesDeadband(userCoolLimits.minimum, userHeatLimits.minimum))
         {
             return false;
         }
-        if (static_cast<temperature>(occupied.cooling.Temperature() - occupied.heating.Temperature()) < deadBand)
+        if (ViolatesDeadband(occupiedRange.cooling, occupiedRange.heating))
         {
             return false;
         }
-        if (occupancySupported &&
-            static_cast<temperature>(unoccupied.cooling.Temperature() - unoccupied.heating.Temperature()) < deadBand)
+        if (occupancySupported && ViolatesDeadband(unoccupiedRange.cooling, unoccupiedRange.heating))
         {
             return false;
         }
@@ -276,7 +275,7 @@ void Setpoints::FixRange(SetpointRange & range, SetpointAttributes & changedAttr
             fixedAttributes.Set(range.cooling.AttributeId());
         }
     }
-    if (!autoSupported || static_cast<int16_t>(range.cooling.Temperature() - range.heating.Temperature()) >= deadBand)
+    if (!autoSupported || !ViolatesDeadband(range.cooling, range.heating))
     {
         return;
     }
@@ -361,10 +360,10 @@ DataModel::ActionReturnStatus Setpoints::Fix(SetpointAttributes & changedAttribu
         FixUserLimitDeadband(userHeatLimits.minimum, userCoolLimits.minimum, absoluteHeatLimits.Minimum(),
                              absoluteCoolLimits.Minimum(), changedAttributes, fixedAttributes);
     }
-    FixRange(occupied, changedAttributes, fixedAttributes);
+    FixRange(occupiedRange, changedAttributes, fixedAttributes);
     if (occupancySupported)
     {
-        FixRange(unoccupied, changedAttributes, fixedAttributes);
+        FixRange(unoccupiedRange, changedAttributes, fixedAttributes);
     }
     changedAttributes.Set(fixedAttributes);
     return Valid() ? Status::Success : Status::ConstraintError;

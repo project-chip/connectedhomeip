@@ -77,25 +77,25 @@ DataModel::ActionReturnStatus ThermostatCluster::ReadAttribute(const DataModel::
         {
             return Status::UnsupportedAttribute;
         }
-        return encoder.Encode(mSetpoints.occupied.heating.Temperature());
+        return encoder.Encode(mSetpoints.occupiedRange.heating.Temperature());
     case OccupiedCoolingSetpoint::Id:
         if (!mSetpoints.coolSupported)
         {
             return Status::UnsupportedAttribute;
         }
-        return encoder.Encode(mSetpoints.occupied.cooling.Temperature());
+        return encoder.Encode(mSetpoints.occupiedRange.cooling.Temperature());
     case UnoccupiedHeatingSetpoint::Id:
         if (!mSetpoints.heatSupported || !mSetpoints.occupancySupported)
         {
             return Status::UnsupportedAttribute;
         }
-        return encoder.Encode(mSetpoints.unoccupied.heating.Temperature());
+        return encoder.Encode(mSetpoints.unoccupiedRange.heating.Temperature());
     case UnoccupiedCoolingSetpoint::Id:
         if (!mSetpoints.coolSupported || !mSetpoints.occupancySupported)
         {
             return Status::UnsupportedAttribute;
         }
-        return encoder.Encode(mSetpoints.unoccupied.cooling.Temperature());
+        return encoder.Encode(mSetpoints.unoccupiedRange.cooling.Temperature());
     case AbsMinHeatSetpointLimit::Id:
         if (!mSetpoints.heatSupported)
         {
