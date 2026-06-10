@@ -176,11 +176,15 @@ class XmlRpcServerProcessManager(threading.Thread):
                 raise RuntimeError("XMLRPC Manager initialization failed") from self._exception
         except BaseException as start_exc:
             log.error("Stopping XMLRPC Manager after init error: %r", start_exc)
-            self.stop(raise_on_proc_error=False)
+            try:
+                self.stop()
+            except BaseException as stop_exc:
+                log.error("Error when stopping XMLRPC Manager after init error: %r", stop_exc)
+                raise stop_exc.with_traceback(stop_exc.__traceback__) from start_exc
             raise
 
     @with_annotated_exception
-    def stop(self, raise_on_proc_error: bool = True) -> None:
+    def stop(self) -> None:
         if self._stopped:
             log.debug("XMLRPC Manager is already stopped")
             return

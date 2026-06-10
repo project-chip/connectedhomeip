@@ -267,7 +267,13 @@ class WrappedProcess(ABC, Generic[WorkRequestT, WorkResponseT]):
         except BaseException as start_exc:
             if not isinstance(start_exc, KeyboardInterrupt):
                 log.error("Stopping process %s on failure during initialization", self.name)
-            self.stop(raise_on_proc_error=False)
+            try:
+                self.stop()
+            except KeyboardInterrupt:
+                raise
+            except BaseException as stop_exc:
+                log.error("Error when stopping process %s after failure during initialization: %r", self.name, stop_exc)
+                raise stop_exc.with_traceback(stop_exc.__traceback__) from start_exc
             raise
 
     def has_stopped(self, timeout: float) -> bool:
@@ -278,7 +284,7 @@ class WrappedProcess(ABC, Generic[WorkRequestT, WorkResponseT]):
         return False
 
     @with_annotated_exception
-    def stop(self, raise_on_proc_error: bool = True) -> None:
+    def stop(self) -> None:
         """
         Stop the subprocess with escalating termination signals.
 
@@ -319,7 +325,7 @@ class WrappedProcess(ABC, Generic[WorkRequestT, WorkResponseT]):
             raise TimeoutError(f"Failed to terminate the process {self.name}. May become a zombie")
         finally:
             self._stopped = True
-            if raise_on_proc_error and self.state.exception is not None:
+            if self.state.exception is not None:
                 raise RuntimeError("Process reported an exception during execution") from self.state.exception
 
     # Methods run in the subprocess.
