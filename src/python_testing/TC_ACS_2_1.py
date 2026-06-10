@@ -131,7 +131,8 @@ class TC_ACS_2_1(MatterBaseTest):
         log.info("Rx'd PredictedActivitySupported: %s", {self.PredictedActivitySupported})
 
         if self.HumanActivitySupported:
-            self.step("2", "If DUT supports HumanActivity feature, TH reads the HumanActivityDetected attribute.", "TH reads the HumanActivityDetected attribute containing Boolean True or False.")
+            self.step("2", "If DUT supports HumanActivity feature, TH reads the HumanActivityDetected attribute.",
+                      "TH reads the HumanActivityDetected attribute containing Boolean True or False.")
             humanActivityDetected = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.HumanActivityDetected
             )
@@ -143,7 +144,8 @@ class TC_ACS_2_1(MatterBaseTest):
             self.skip_step("2")
 
         if self.ObjectIdentificationSupported:
-            self.step("3", "If DUT supports ObjectIdentification feature, TH reads the ObjectIdentified attribute.", "TH reads the ObjectIdentified attribute containing Boolean True or False.")
+            self.step("3", "If DUT supports ObjectIdentification feature, TH reads the ObjectIdentified attribute.",
+                      "TH reads the ObjectIdentified attribute containing Boolean True or False.")
             objectIdentified = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.ObjectIdentified
             )
@@ -155,7 +157,8 @@ class TC_ACS_2_1(MatterBaseTest):
             self.skip_step("3")
 
         if self.SoundIdentificationSupported:
-            self.step("4", "If DUT supports SoundIdentification feature, TH reads the AudioContextDetected attribute.", "TH reads the AudioContextDetected attribute containing Boolean True or False.")
+            self.step("4", "If DUT supports SoundIdentification feature, TH reads the AudioContextDetected attribute.",
+                      "TH reads the AudioContextDetected attribute containing Boolean True or False.")
             audioContextDetected = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.AudioContextDetected
             )
@@ -169,8 +172,8 @@ class TC_ACS_2_1(MatterBaseTest):
         if self.HumanActivitySupported or self.ObjectIdentificationSupported or self.SoundIdentificationSupported:
 
             self.step("5", "If DUT supports HumanActivity or ObjectIdentification or SoundIdentification, TH reads the AmbientContextTypeSupported attribute.",
-                     "Verify that the DUT response contains SemanticTag struct data field including namespace ID and tag ID from IdentifiedObject or IdentifiedHumanActivity or IdentifiedSound namespaces.",
-                     "Verify that the list size is less than equal to 50.")
+                      "Verify that the DUT response contains SemanticTag struct data field including namespace ID and tag ID from IdentifiedObject or IdentifiedHumanActivity or IdentifiedSound namespaces.",
+                      "Verify that the list size is less than equal to 50.")
             ambientContextTypeSupported = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.AmbientContextTypeSupported)
             if ambientContextTypeSupported:
@@ -194,8 +197,8 @@ class TC_ACS_2_1(MatterBaseTest):
                                                   "Tag number doesn't exit in IdentifiedSound namesapce.")
 
             self.step("6", "If DUT supports HumanActivity or ObjectIdentification or SoundIdentification, TH reads the AmbientContextType attribute.",
-                     "Verify that DUT response contains the list size is less than SimultaneousDetectionLimit.",
-                     "Verify that DUT response contains the list of namespace ID and tag ID scoped within the AmbientContextTypeSupported attribute.")
+                      "Verify that DUT response contains the list size is less than SimultaneousDetectionLimit.",
+                      "Verify that DUT response contains the list of namespace ID and tag ID scoped within the AmbientContextTypeSupported attribute.")
             ambientContextType = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.AmbientContextType)
             if ambientContextType:
@@ -239,7 +242,7 @@ class TC_ACS_2_1(MatterBaseTest):
 
         if self.ObjectCountingSupported and self.ObjectIdentificationSupported:
             self.step("7", "If DUT supports ObjectCounting and ObjectIdentification feature, then TH reads the ObjectCountThresholdReached attribute.",
-                     "TH reads the ObjectCountThresholdReached containing Boolean True or False.")
+                      "TH reads the ObjectCountThresholdReached containing Boolean True or False.")
             objectCountThresholdReached = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.ObjectCountThresholdReached
             )
@@ -248,8 +251,8 @@ class TC_ACS_2_1(MatterBaseTest):
                                 "Expected True or False Boolean value.")
 
             self.step("8", "If DUT supports ObjectCounting and ObjectIdentification feature, then TH reads the ObjectCountConfig attribute.",
-                     "Verify that DUT response contains the list of ObjectCountDataStruct entries and its CountingObject field is SemanticTagStruct data type containing namespace ID and tag ID from IdentifiedObject.",
-                     "Verify that the ObjectCountThreshold value is greater than equal to 1.")
+                      "Verify that DUT response contains the list of ObjectCountDataStruct entries and its CountingObject field is SemanticTagStruct data type containing namespace ID and tag ID from IdentifiedObject.",
+                      "Verify that the ObjectCountThreshold value is greater than equal to 1.")
             objectCountConfig = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.ObjectCountConfig
             )
@@ -266,7 +269,7 @@ class TC_ACS_2_1(MatterBaseTest):
                                       "Threshold value should be greater than equalt to 1.")
 
             self.step("9", "If DUT supports ObjectCount attribute, TH reads the ObjectCount attribute.",
-                     "Verity that DUT reads uint16 value.")
+                      "Verity that DUT reads uint16 value.")
             # ObjectCount should be uint16
             if hasattr(objectCountConfig, 'objectCount') and objectCountConfig.objectCount is not None:
                 asserts.assert_true((type(objectCountConfig.objectCount) is int), "ObjectCount value should be uint16 data.")
@@ -279,7 +282,7 @@ class TC_ACS_2_1(MatterBaseTest):
             self.skip_step("9")
 
         self.step("10", "TH reads the SimultaneousDetectionLimit attribute.",
-                     "Verify that the DUT response contains a value greater than equal to 1 and less than equal to 10.")
+                  "Verify that the DUT response contains a value greater than equal to 1 and less than equal to 10.")
         # simultaneousDetectionLimit from the step 6
 
         log.info("Rx'd AudioContextDetected: %s", {simultaneousDetectionLimit})
@@ -287,7 +290,7 @@ class TC_ACS_2_1(MatterBaseTest):
         asserts.assert_less_equal(simultaneousDetectionLimit, 10, "SimultaneousDetectionLimit is not within 1 and 10.")
 
         self.step("11", "TH reads the HoldTime attribute.",
-                     "Verify that DUT response contains an uint16 value ranging between HoldTimeLimits.HoldTimeMin and HoldTimeLimits.HoldTimeMax")
+                  "Verify that DUT response contains an uint16 value ranging between HoldTimeLimits.HoldTimeMin and HoldTimeLimits.HoldTimeMax")
         holdTime = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.HoldTime)
         holdTimeLimits = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.HoldTimeLimits)
         log.info("Rx'd HoldTime: %s", {holdTime})
@@ -295,8 +298,8 @@ class TC_ACS_2_1(MatterBaseTest):
         asserts.assert_less_equal(holdTime, holdTimeLimits.holdTimeMax, "Expected to be between HoldTimeMin and HoldTimeMax.")
 
         self.step("12", "TH reads the HoldTimeLimits attribute.",
-                     "Verify that DUT response contains HoldTimeMin (>=1), HolTimeMax (min maxOf(HoldTimeMin, 10)) and HoldTimeDefault (between HoldTimeMin and HoldTimeMax)")
-        #log.info(f"Rx'd HoldTimeLimits: {holdTimeLimits}")
+                  "Verify that DUT response contains HoldTimeMin (>=1), HolTimeMax (min maxOf(HoldTimeMin, 10)) and HoldTimeDefault (between HoldTimeMin and HoldTimeMax)")
+        # log.info(f"Rx'd HoldTimeLimits: {holdTimeLimits}")
         asserts.assert_greater_equal(holdTimeLimits.holdTimeMin, 1,
                                      "Expected HoldTimeMin to be greater than equal to 1.")
 
@@ -318,8 +321,8 @@ class TC_ACS_2_1(MatterBaseTest):
 
             if predictedActivity:
                 self.step("13a", "If DUT supports PredictedActivity feature, then TH reads the PredictedActivity attribute.",
-                     "Verify that DUT response contains StartTimestamp epoch-s data less than equal to EndTimestamp-1 and EndTimestamp epoch-s data greater than equal to StartTimestamp-1 and Verify that DUT response contains Confidence field that is a percentage data between 0 and 100.",
-                     "If DUT supports HumanActivity or ObjectIdentification or SoundIdentification, then TH reads a list of SemanticTagStruct data that includes namespace ID and tag ID from IdentifiedObject or IdentifiedHumanActivity or IdentifiedSound namespaces.")
+                          "Verify that DUT response contains StartTimestamp epoch-s data less than equal to EndTimestamp-1 and EndTimestamp epoch-s data greater than equal to StartTimestamp-1 and Verify that DUT response contains Confidence field that is a percentage data between 0 and 100.",
+                          "If DUT supports HumanActivity or ObjectIdentification or SoundIdentification, then TH reads a list of SemanticTagStruct data that includes namespace ID and tag ID from IdentifiedObject or IdentifiedHumanActivity or IdentifiedSound namespaces.")
 
                 # less than 20
                 asserts.assert_less_equal(len(predictedActivity), 20, "PredictedActivity should be less than 20.")
@@ -351,7 +354,8 @@ class TC_ACS_2_1(MatterBaseTest):
                             tagID = acts.tag
 
                             if self.HumanActivitySupported:
-                                asserts.assert_equal(nsID, HUMAN_ACTIVITY_NAMESPACE_ID, "Not Identified Human Activity Namespace ID")
+                                asserts.assert_equal(nsID, HUMAN_ACTIVITY_NAMESPACE_ID,
+                                                     "Not Identified Human Activity Namespace ID")
                                 asserts.assert_less_equal(tagID, HUMAN_ACTIVITY_TAG_ID, "Tag number doesn't exit.")
 
                             if self.ObjectIdentificationSupported:
@@ -364,8 +368,8 @@ class TC_ACS_2_1(MatterBaseTest):
 
                 if self.ObjectCountingSupported and predictedActivity:
                     self.step("13b", "If DUT supports PredictedActivity feature, then TH reads the PredictedActivity attribute.",
-                     "Verify that DUT response contains StartTimestamp epoch-s data less than equal to EndTimestamp-1 and EndTimestamp epoch-s data greater than equal to StartTimestamp-1 and Verify that DUT response contains Confidence field that is a percentage data between 0 and 100.",
-                     "If DUT supports HumanActivity or ObjectIdentification or SoundIdentification, then TH reads a list of SemanticTagStruct data that includes namespace ID and tag ID from IdentifiedObject or IdentifiedHumanActivity or IdentifiedSound namespaces.")
+                              "Verify that DUT response contains StartTimestamp epoch-s data less than equal to EndTimestamp-1 and EndTimestamp epoch-s data greater than equal to StartTimestamp-1 and Verify that DUT response contains Confidence field that is a percentage data between 0 and 100.",
+                              "If DUT supports HumanActivity or ObjectIdentification or SoundIdentification, then TH reads a list of SemanticTagStruct data that includes namespace ID and tag ID from IdentifiedObject or IdentifiedHumanActivity or IdentifiedSound namespaces.")
 
                     # CrowdDetected
                     asserts.assert_true(predictedActivity.crowdDetected in [True, False],
@@ -374,7 +378,7 @@ class TC_ACS_2_1(MatterBaseTest):
 
                     # CrowdCount
                     if "crowdCount" in predictedActivity:
-                        #log.info(f"Rx'd CrowdCount: {predictedActivity.crowdCount}")
+                        # log.info(f"Rx'd CrowdCount: {predictedActivity.crowdCount}")
                         asserts.assert_less_equal(min_value_uint8, predictedActivity.crowdCount,
                                                   "CrowdCount is expected to be between 1 and 254.")
                         asserts.assert_less_equal(predictedActivity.crowdCount, max_value_uint8,
