@@ -293,22 +293,6 @@ def cmd_list(context: click.Context) -> None:
         print("%s%s" % (test.name, tags))
 
 
-class CommissioningMethod(enum.StrEnum):
-    ON_NETWORK = "on-network"
-    BLE_WIFI = "ble-wifi"
-    BLE_THREAD = "ble-thread"
-    THREAD_MESHCOP = "thread-meshcop"
-    WIFIPAF_WIFI = "wifipaf-wifi"
-
-    @property
-    def wifi_required(self) -> bool:
-        return self in {CommissioningMethod.BLE_WIFI, CommissioningMethod.WIFIPAF_WIFI}
-
-    @property
-    def thread_required(self) -> bool:
-        return self in {CommissioningMethod.BLE_THREAD, CommissioningMethod.THREAD_MESHCOP}
-
-
 @main.command(
     'run', help='Execute the tests')
 @click.option(
@@ -514,10 +498,7 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int, app_path: li
         raise click.BadOptionUsage("{app,tool}-path", f"Missing required path: {e}")
 
     # Derive boolean flags from commissioning_method parameter
-    wifi_required = commissioning_method.wifi_required
-    thread_required = commissioning_method.thread_required
-
-    if (wifi_required or thread_required) and sys.platform != "linux":
+    if (commissioning_method.wifi_required or commissioning_method.thread_required) and sys.platform != "linux":
         raise click.BadOptionUsage("commissioning-method",
                                    f"Option --commissioning-method={commissioning_method} is available on Linux platform only")
 
