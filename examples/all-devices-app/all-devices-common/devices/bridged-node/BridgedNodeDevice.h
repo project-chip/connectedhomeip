@@ -34,8 +34,8 @@ public:
     using UniqueIdGenerator = std::function<std::string(chip::EndpointId)>;
     using NodeLabelGenerator = std::function<std::string(chip::EndpointId)>;
 
-    BridgedNodeDevice(TimerDelegate & timerDelegate, UniqueIdGenerator uniqueIdGenerator = nullptr,
-                      NodeLabelGenerator nodeLabelGenerator = nullptr);
+    BridgedNodeDevice(TimerDelegate & timerDelegate, UniqueIdGenerator uniqueIdGenerator,
+                      NodeLabelGenerator nodeLabelGenerator);
     ~BridgedNodeDevice() override = default;
 
     CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
