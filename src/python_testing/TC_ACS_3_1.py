@@ -52,9 +52,10 @@ from matter.testing.runner import TestStep, default_matter_test_main
 log = logging.getLogger(__name__)
 
 # Namespace in integer
-HUMAN_ACTIVITY_NAMESPACE_ID = 75 #0x4B
-OBJECT_IDENTIFICATION_NAMESPACE_ID = 73 #0x49
-SOUND_IDENTIFICATION_NAMESPACE_ID = 74 #0x4A
+HUMAN_ACTIVITY_NAMESPACE_ID = 75  # 0x4B
+OBJECT_IDENTIFICATION_NAMESPACE_ID = 73  # 0x49
+SOUND_IDENTIFICATION_NAMESPACE_ID = 74  # 0x4A
+
 
 class TC_ACS_3_1(MatterBaseTest):
     def desc_TC_ACS_3_1(self) -> str:
