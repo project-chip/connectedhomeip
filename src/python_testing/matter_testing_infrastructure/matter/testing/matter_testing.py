@@ -660,7 +660,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         if self.stored_global_wildcard is None:
             LOGGER.info("[CLN] wildcard not available, skipping TLS endpoint cleanup")
             return
-        
+
         for endpoint_id, clusters in self.stored_global_wildcard.attributes.items():
             server_list = clusters.get(Clusters.Descriptor, {}).get(Clusters.Descriptor.Attributes.ServerList)
             if server_list is None or tls_cluster_id not in server_list:
