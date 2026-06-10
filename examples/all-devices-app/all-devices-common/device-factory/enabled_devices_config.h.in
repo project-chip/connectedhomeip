@@ -1,5 +1,5 @@
 // NOTE:
-//    all-devices-common/devices/enabled_devices_config.h.in
+//    all-devices-common/device-factory/enabled_devices_config.h.in
 //    is a TEMPLATE to generate device enable/disable flags
 //
 // DO NOT EDIT except in template format ('.h.in' extension).
