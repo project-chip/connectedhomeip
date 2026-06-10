@@ -2129,4 +2129,77 @@ TEST_F(TestGroupcastCluster, TestTotalMaxMembership)
     EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::ResourceExhausted));
 }
 
+// When a LeaveGroup command's Endpoints list size exceeds the maximum constraint, the
+// LeaveGroupResponse Endpoints list must be empty (the endpoints are still removed). The response is
+// collected into a fixed-size buffer, so an oversized request must neither populate that response nor
+// write past the buffer.
+TEST_F(TestGroupcastCluster, TestLeaveGroupEndpointsExceedingMaxReturnsEmptyResponse)
+{
+    static constexpr uint16_t kMaxCommandEndpoints = app::Clusters::GroupcastCluster::kMaxCommandEndpoints;
+    static constexpr uint16_t kEndpointsInGroup    = kMaxMembershipEndpoints + 5; // exceeds the per-command maximum
+    const GroupId kGroup                           = 0xab01;
+    const KeysetId kKeyset                         = 0xabcd;
+    const uint8_t key[] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F };
+
+    chip::Testing::ClusterTester tester(mListener);
+    tester.SetFabricIndex(kTestFabricIndex);
+    tester.SetSubjectDescriptor(kAdminSubjectDescriptor);
+
+    // Join the group with kEndpointsInGroup distinct endpoints, kMaxCommandEndpoints at a time.
+    {
+        Commands::JoinGroup::Type data;
+        data.groupID  = kGroup;
+        data.keySetID = kKeyset;
+        data.key      = MakeOptional(ByteSpan(key));
+
+        EndpointId nextEndpoint = 1;
+        for (uint16_t added = 0; added < kEndpointsInGroup;)
+        {
+            EndpointId chunk[kMaxCommandEndpoints];
+            uint16_t count = 0;
+            for (; count < kMaxCommandEndpoints && added < kEndpointsInGroup; count++, added++)
+            {
+                chunk[count] = nextEndpoint++;
+            }
+            data.endpoints = DataModel::List<const EndpointId>(chunk, count);
+            auto result    = tester.Invoke(Commands::JoinGroup::Id, data);
+            ASSERT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::Success));
+            data.key.ClearValue();
+        }
+    }
+
+    // Leave the group naming every member endpoint (more than the maximum constraint). The command
+    // succeeds and the returned Endpoints list is empty.
+    {
+        EndpointId leaveEndpoints[kEndpointsInGroup];
+        for (uint16_t i = 0; i < kEndpointsInGroup; i++)
+        {
+            leaveEndpoints[i] = static_cast<EndpointId>(i + 1);
+        }
+
+        Commands::LeaveGroup::Type data;
+        data.groupID   = kGroup;
+        data.endpoints = MakeOptional(DataModel::List<const EndpointId>(leaveEndpoints, kEndpointsInGroup));
+
+        auto result = tester.Invoke(Commands::LeaveGroup::Id, data);
+        EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::Success));
+        ASSERT_TRUE(result.response.has_value());
+        size_t responseEndpointCount = 0;
+        EXPECT_EQ(result.response->endpoints.ComputeSize(&responseEndpointCount), CHIP_NO_ERROR);
+        EXPECT_EQ(responseEndpointCount, 0u);
+    }
+
+    // The endpoints were removed: the group is no longer present in the Membership attribute.
+    {
+        app::Clusters::Groupcast::Attributes::Membership::TypeInfo::DecodableType memberships;
+        ASSERT_EQ(tester.ReadAttribute(Attributes::Membership::Id, memberships), CHIP_NO_ERROR);
+        auto it = memberships.begin();
+        while (it.Next())
+        {
+            EXPECT_NE(it.GetValue().groupID, kGroup);
+        }
+        EXPECT_EQ(it.GetStatus(), CHIP_NO_ERROR);
+    }
+}
+
 } // namespace
