@@ -796,12 +796,12 @@ def convert_args_to_matter_config(args: argparse.Namespace):
         # Named pipes are unique, so we MUST have consistent paths
         # Verify from start the named pipe exists.
         LOGGER.error("Named pipe %r does NOT exist", config.pipe_name)
-        raise FileNotFoundError("CANNOT FIND %r" % config.pipe_name)
+        raise FileNotFoundError(f"CANNOT FIND {config.pipe_name!r}")
 
     config.pipe_name_out = args.app_pipe_out
     if config.pipe_name_out is not None and not os.path.exists(config.pipe_name_out):
         LOGGER.error("Named pipe %r does NOT exist", config.pipe_name_out)
-        raise FileNotFoundError("CANNOT FIND %r" % config.pipe_name_out)
+        raise FileNotFoundError(f"CANNOT FIND {config.pipe_name_out!r}")
 
     config.fail_on_skipped_tests = args.fail_on_skipped
 
