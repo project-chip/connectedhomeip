@@ -45602,12 +45602,12 @@ class NetworkIdentityManagement(Cluster):
 
     class Enums:
         class IdentityTypeEnum(MatterIntEnum):
-            kEcdsa = 0x00
+            kEcdsa = 0x01
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 1
+            kUnknownEnumValue = 0
 
     class Structs:
         @dataclass
@@ -45639,11 +45639,13 @@ class NetworkIdentityManagement(Cluster):
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="clientIndex", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(Label="clientIdentifier", Tag=1, Type=bytes),
-                        ClusterObjectFieldDescriptor(Label="networkIdentityIndex", Tag=2, Type=typing.Union[Nullable, uint]),
+                        ClusterObjectFieldDescriptor(Label="clientIdentityType", Tag=2, Type=NetworkIdentityManagement.Enums.IdentityTypeEnum),
+                        ClusterObjectFieldDescriptor(Label="networkIdentityIndex", Tag=3, Type=typing.Union[Nullable, uint]),
                     ])
 
             clientIndex: 'uint' = 0
             clientIdentifier: 'bytes' = b""
+            clientIdentityType: 'NetworkIdentityManagement.Enums.IdentityTypeEnum' = 0
             networkIdentityIndex: 'typing.Union[Nullable, uint]' = NullValue
 
     class Commands:
@@ -45718,11 +45720,13 @@ class NetworkIdentityManagement(Cluster):
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="networkIdentityIndex", Tag=0, Type=typing.Optional[uint]),
                         ClusterObjectFieldDescriptor(Label="networkIdentityType", Tag=1, Type=typing.Optional[NetworkIdentityManagement.Enums.IdentityTypeEnum]),
-                        ClusterObjectFieldDescriptor(Label="identifier", Tag=2, Type=typing.Optional[bytes]),
+                        ClusterObjectFieldDescriptor(Label="clientIndex", Tag=2, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="identifier", Tag=3, Type=typing.Optional[bytes]),
                     ])
 
             networkIdentityIndex: typing.Optional[uint] = None
             networkIdentityType: typing.Optional[NetworkIdentityManagement.Enums.IdentityTypeEnum] = None
+            clientIndex: typing.Optional[uint] = None
             identifier: typing.Optional[bytes] = None
 
         @dataclass

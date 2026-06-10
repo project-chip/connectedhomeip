@@ -251,9 +251,10 @@ using LogRedirectCallback_t = void (*)(const char * module, uint8_t category, co
  *  }
  *  @endcode
  *
- *  @param[in]  aValue    64-bit value that will be split in 32-bit MSB/LSB part
+ *  @param[in]  aValue    unsigned 64-bit value that will be split in 32-bit MSB/LSB part
  */
-#define ChipLogValueX64(aValue) static_cast<uint32_t>(aValue >> 32), static_cast<uint32_t>(aValue)
+#define ChipLogValueX64(aValue)                                                                                                    \
+    static_cast<uint32_t>(static_cast<uint64_t>(aValue) >> 32), static_cast<uint32_t>(static_cast<uint64_t>(aValue))
 
 /*
  *  @brief
