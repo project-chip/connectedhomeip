@@ -324,7 +324,7 @@ class TC_ACS_2_1(MatterBaseTest):
 
                 # Confidence
                 asserts.assert_less_than(0, predictedActivity.confidence,
-                                          "Expected the percentage greater than 0 and less than equat to 100.")
+                                         "Expected the percentage greater than 0 and less than equat to 100.")
                 asserts.assert_less_equal(predictedActivity.confidence, 100,
                                           "Expected the percentage greater than 0 and less than equat to 100.")
 
