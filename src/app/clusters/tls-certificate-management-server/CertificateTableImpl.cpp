@@ -270,7 +270,7 @@ CHIP_ERROR RootSerializer::DeserializeData(TLV::TLVReader & reader, CertificateT
 template <>
 void RootSerializer::Clear(CertificateTable::RootCertStruct & data)
 {
-    new (&data) CertificateTable::RootCertStruct();
+    data = {};
 }
 
 template class chip::app::Storage::FabricTableImpl<CertificateId, CertificateTable::RootCertStruct>;
@@ -364,7 +364,8 @@ CHIP_ERROR ClientSerializer::DeserializeData(TLV::TLVReader & reader, Certificat
 template <>
 void ClientSerializer::Clear(CertificateTable::ClientCertWithKey & data)
 {
-    new (&data) CertificateTable::ClientCertWithKey();
+    data.detail = {};
+    data.key.Clear();
 }
 
 template class chip::app::Storage::FabricTableImpl<CertificateId, CertificateTable::ClientCertWithKey>;
