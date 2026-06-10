@@ -77,7 +77,7 @@ def extract_runs_args(py_script_path: str) -> dict[str, dict[str, str]]:
                 runs_arg_lines[run]['run'] = run
                 runs_arg_lines[run].update(args)
         except yaml.YAMLError as e:
-            LOGGER.error(f"Failed to parse CI arguments YAML: {e}")
+            LOGGER.error("Failed to parse CI arguments YAML: %s", e)
 
     return runs_arg_lines
 

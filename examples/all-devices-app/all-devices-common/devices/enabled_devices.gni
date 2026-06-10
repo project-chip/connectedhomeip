@@ -59,6 +59,10 @@ _available_devices = [
     "DIMMABLE_LIGHT",
   ],
   [
+    "fan",
+    "FAN",
+  ],
+  [
     "network-infrastructure-manager",
     "NETWORK_INFRASTRUCTURE_MANAGER",
   ],
