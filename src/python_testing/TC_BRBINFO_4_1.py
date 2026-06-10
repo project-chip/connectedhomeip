@@ -227,7 +227,7 @@ class TC_BRBINFO_4_1(MatterBaseTest):
             self.dut_fsa_stdin.flush()
             # Wait for the commissioning to complete.
             # 5s is insufficient for mDNS discovery + ICD commissioning through the bridge;
-            # use 30s to match the value already used later in this test (see step 17 wait).
+            # use 15s to provide enough time for discovery/commissioning before continuing.
             await asyncio.sleep(15)
 
     def teardown_class(self):
