@@ -6302,6 +6302,171 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
 
             return value;
         }
+        case Events::PowerRangeAdjustStart::Id: {
+            Events::PowerRangeAdjustStart::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value_adjustment;
+            jobject value_adjustment_minPower;
+            if (cppValue.adjustment.minPower.IsNull())
+            {
+                value_adjustment_minPower = nullptr;
+            }
+            else
+            {
+                std::string value_adjustment_minPowerClassName     = "java/lang/Long";
+                std::string value_adjustment_minPowerCtorSignature = "(J)V";
+                jlong jnivalue_adjustment_minPower                 = static_cast<jlong>(cppValue.adjustment.minPower.Value());
+                TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                    value_adjustment_minPowerClassName.c_str(), value_adjustment_minPowerCtorSignature.c_str(),
+                    jnivalue_adjustment_minPower, value_adjustment_minPower);
+            }
+            jobject value_adjustment_maxPower;
+            if (cppValue.adjustment.maxPower.IsNull())
+            {
+                value_adjustment_maxPower = nullptr;
+            }
+            else
+            {
+                std::string value_adjustment_maxPowerClassName     = "java/lang/Long";
+                std::string value_adjustment_maxPowerCtorSignature = "(J)V";
+                jlong jnivalue_adjustment_maxPower                 = static_cast<jlong>(cppValue.adjustment.maxPower.Value());
+                TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                    value_adjustment_maxPowerClassName.c_str(), value_adjustment_maxPowerCtorSignature.c_str(),
+                    jnivalue_adjustment_maxPower, value_adjustment_maxPower);
+            }
+            jobject value_adjustment_cause;
+            std::string value_adjustment_causeClassName     = "java/lang/Integer";
+            std::string value_adjustment_causeCtorSignature = "(I)V";
+            jint jnivalue_adjustment_cause                  = static_cast<jint>(cppValue.adjustment.cause);
+            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                value_adjustment_causeClassName.c_str(), value_adjustment_causeCtorSignature.c_str(), jnivalue_adjustment_cause,
+                value_adjustment_cause);
+            jobject value_adjustment_endTime;
+            std::string value_adjustment_endTimeClassName     = "java/lang/Long";
+            std::string value_adjustment_endTimeCtorSignature = "(J)V";
+            jlong jnivalue_adjustment_endTime                 = static_cast<jlong>(cppValue.adjustment.endTime);
+            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                value_adjustment_endTimeClassName.c_str(), value_adjustment_endTimeCtorSignature.c_str(),
+                jnivalue_adjustment_endTime, value_adjustment_endTime);
+
+            {
+                jclass powerRangeAdjustStructStructClass_0;
+                err = chip::JniReferences::GetInstance().GetLocalClassRef(
+                    env, "chip/devicecontroller/ChipStructs$DeviceEnergyManagementClusterPowerRangeAdjustStruct",
+                    powerRangeAdjustStructStructClass_0);
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(Zcl, "Could not find class ChipStructs$DeviceEnergyManagementClusterPowerRangeAdjustStruct");
+                    return nullptr;
+                }
+
+                jmethodID powerRangeAdjustStructStructCtor_0;
+                err = chip::JniReferences::GetInstance().FindMethod(
+                    env, powerRangeAdjustStructStructClass_0, "<init>",
+                    "(Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/Integer;Ljava/lang/Long;)V", &powerRangeAdjustStructStructCtor_0);
+                if (err != CHIP_NO_ERROR || powerRangeAdjustStructStructCtor_0 == nullptr)
+                {
+                    ChipLogError(Zcl, "Could not find ChipStructs$DeviceEnergyManagementClusterPowerRangeAdjustStruct constructor");
+                    return nullptr;
+                }
+
+                value_adjustment = env->NewObject(powerRangeAdjustStructStructClass_0, powerRangeAdjustStructStructCtor_0,
+                                                  value_adjustment_minPower, value_adjustment_maxPower, value_adjustment_cause,
+                                                  value_adjustment_endTime);
+            }
+
+            jobject value_duration;
+            std::string value_durationClassName     = "java/lang/Long";
+            std::string value_durationCtorSignature = "(J)V";
+            jlong jnivalue_duration                 = static_cast<jlong>(cppValue.duration);
+            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                value_durationClassName.c_str(), value_durationCtorSignature.c_str(), jnivalue_duration, value_duration);
+
+            jclass powerRangeAdjustStartStructClass;
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
+                env, "chip/devicecontroller/ChipEventStructs$DeviceEnergyManagementClusterPowerRangeAdjustStartEvent",
+                powerRangeAdjustStartStructClass);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl, "Could not find class ChipEventStructs$DeviceEnergyManagementClusterPowerRangeAdjustStartEvent");
+                return nullptr;
+            }
+
+            jmethodID powerRangeAdjustStartStructCtor;
+            err = chip::JniReferences::GetInstance().FindMethod(
+                env, powerRangeAdjustStartStructClass, "<init>",
+                "(Lchip/devicecontroller/ChipStructs$DeviceEnergyManagementClusterPowerRangeAdjustStruct;Ljava/lang/Long;)V",
+                &powerRangeAdjustStartStructCtor);
+            if (err != CHIP_NO_ERROR || powerRangeAdjustStartStructCtor == nullptr)
+            {
+                ChipLogError(Zcl,
+                             "Could not find ChipEventStructs$DeviceEnergyManagementClusterPowerRangeAdjustStartEvent constructor");
+                return nullptr;
+            }
+
+            jobject value =
+                env->NewObject(powerRangeAdjustStartStructClass, powerRangeAdjustStartStructCtor, value_adjustment, value_duration);
+
+            return value;
+        }
+        case Events::PowerRangeAdjustEnd::Id: {
+            Events::PowerRangeAdjustEnd::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value_cause;
+            std::string value_causeClassName     = "java/lang/Integer";
+            std::string value_causeCtorSignature = "(I)V";
+            jint jnivalue_cause                  = static_cast<jint>(cppValue.cause);
+            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                value_causeClassName.c_str(), value_causeCtorSignature.c_str(), jnivalue_cause, value_cause);
+
+            jobject value_duration;
+            std::string value_durationClassName     = "java/lang/Long";
+            std::string value_durationCtorSignature = "(J)V";
+            jlong jnivalue_duration                 = static_cast<jlong>(cppValue.duration);
+            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                value_durationClassName.c_str(), value_durationCtorSignature.c_str(), jnivalue_duration, value_duration);
+
+            jobject value_energyUse;
+            std::string value_energyUseClassName     = "java/lang/Long";
+            std::string value_energyUseCtorSignature = "(J)V";
+            jlong jnivalue_energyUse                 = static_cast<jlong>(cppValue.energyUse);
+            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                value_energyUseClassName.c_str(), value_energyUseCtorSignature.c_str(), jnivalue_energyUse, value_energyUse);
+
+            jclass powerRangeAdjustEndStructClass;
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
+                env, "chip/devicecontroller/ChipEventStructs$DeviceEnergyManagementClusterPowerRangeAdjustEndEvent",
+                powerRangeAdjustEndStructClass);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl, "Could not find class ChipEventStructs$DeviceEnergyManagementClusterPowerRangeAdjustEndEvent");
+                return nullptr;
+            }
+
+            jmethodID powerRangeAdjustEndStructCtor;
+            err = chip::JniReferences::GetInstance().FindMethod(env, powerRangeAdjustEndStructClass, "<init>",
+                                                                "(Ljava/lang/Integer;Ljava/lang/Long;Ljava/lang/Long;)V",
+                                                                &powerRangeAdjustEndStructCtor);
+            if (err != CHIP_NO_ERROR || powerRangeAdjustEndStructCtor == nullptr)
+            {
+                ChipLogError(Zcl,
+                             "Could not find ChipEventStructs$DeviceEnergyManagementClusterPowerRangeAdjustEndEvent constructor");
+                return nullptr;
+            }
+
+            jobject value = env->NewObject(powerRangeAdjustEndStructClass, powerRangeAdjustEndStructCtor, value_cause,
+                                           value_duration, value_energyUse);
+
+            return value;
+        }
         default:
             *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
             break;

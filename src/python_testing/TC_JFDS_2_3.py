@@ -249,7 +249,7 @@ class TC_JFDS_2_3(MatterBaseTest):
         for endpoint_id, endpoint_data in descriptor_response.items():
             if Clusters.JointFabricDatastore.id in endpoint_data[Clusters.Descriptor].serverList:
                 jfds_endpoint = endpoint_id
-                log.info(f"Found JointFabricDatastore cluster on endpoint {jfds_endpoint}")
+                log.info("Found JointFabricDatastore cluster on endpoint %s", jfds_endpoint)
                 break
 
         asserts.assert_is_not_none(jfds_endpoint, "JointFabricDatastore cluster not found on any endpoint")
@@ -263,7 +263,7 @@ class TC_JFDS_2_3(MatterBaseTest):
 
         # Note the number of entries returned
         num_entries = len(groupList)
-        log.info(f"GroupList contains {num_entries} entries")
+        log.info("GroupList contains %s entries", num_entries)
 
         # Variables to track found entries
         admin_cat_group_id = None
@@ -271,7 +271,7 @@ class TC_JFDS_2_3(MatterBaseTest):
 
         # Look for entries matching Admin CAT and Anchor CAT
         for entry in groupList:
-            log.info(f"GroupList entry: GroupID={entry.groupID}, CAT={entry.groupCAT}")
+            log.info("GroupList entry: GroupID=%s, CAT=%s", entry.groupID, entry.groupCAT)
 
             # Check if this entry's CAT matches our controller's CAT tags
             # Admin CAT should be present (commissioned with --anchor true)
@@ -280,18 +280,18 @@ class TC_JFDS_2_3(MatterBaseTest):
                 # If CAT matches and we haven't found admin yet, consider it admin
                 if admin_cat_group_id is None and entry.groupCAT == 0xFFFF:
                     admin_cat_group_id = entry.groupID
-                    log.info(f"Found Admin CAT entry with GroupID: {admin_cat_group_id}")
+                    log.info("Found Admin CAT entry with GroupID: %s", admin_cat_group_id)
                 # If CAT matches and admin already found, consider it anchor
                 elif anchor_cat_group_id is None and entry.groupCAT == 0xFFFE:
                     anchor_cat_group_id = entry.groupID
-                    log.info(f"Found Anchor CAT entry with GroupID: {anchor_cat_group_id}")
+                    log.info("Found Anchor CAT entry with GroupID: %s", anchor_cat_group_id)
 
         # Verify that both Admin CAT and Anchor CAT entries were found
         asserts.assert_is_not_none(admin_cat_group_id, "Admin CAT entry must exist in GroupList")
         asserts.assert_is_not_none(anchor_cat_group_id, "Anchor CAT entry must exist in GroupList")
 
-        log.info(f"Admin CAT GroupID: {admin_cat_group_id}")
-        log.info(f"Anchor CAT GroupID: {anchor_cat_group_id}")
+        log.info("Admin CAT GroupID: %s", admin_cat_group_id)
+        log.info("Anchor CAT GroupID: %s", anchor_cat_group_id)
 
         # Store these for potential use in future steps
         self.admin_cat_group_id = admin_cat_group_id

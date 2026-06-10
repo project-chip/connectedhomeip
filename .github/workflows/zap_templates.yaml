@@ -35,7 +35,7 @@ jobs:
 
         runs-on: ubuntu-latest
         container:
-            image: ghcr.io/project-chip/chip-build:194
+            image: ghcr.io/project-chip/chip-build:200
         defaults:
             run:
                 shell: sh
