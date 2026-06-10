@@ -244,6 +244,11 @@ private:
     @param fixedAttributes The set of attributes fixed by this operation.
     */
     void FixRange(SetpointRange & range, SetpointAttributes & changedAttributes, SetpointAttributes & fixedAttributes);
+
+    bool ViolatesDeadband(const Setpoint & max, const Setpoint & min) const
+    {
+        return (max.Temperature() - min.Temperature()) < static_cast<int32_t>(deadBand);
+    }
 };
 
 /*
