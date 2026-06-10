@@ -331,7 +331,7 @@ TEST_F(TestFanControlCluster, ReadFanMode)
 {
     ClusterTester tester(cluster);
 
-    FanModeEnum fanMode;
+    FanModeEnum fanMode{};
     ASSERT_EQ(tester.ReadAttribute(FanControl::Attributes::FanMode::Id, fanMode), CHIP_NO_ERROR);
     EXPECT_EQ(fanMode, FanModeEnum::kOff);
 }
@@ -350,7 +350,7 @@ TEST_F(TestFanControlCluster, WriteFanMode)
 
     ASSERT_EQ(tester.WriteAttribute(FanControl::Attributes::FanMode::Id, FanModeEnum::kHigh), CHIP_NO_ERROR);
 
-    FanModeEnum fanMode;
+    FanModeEnum fanMode{};
     ASSERT_EQ(tester.ReadAttribute(FanControl::Attributes::FanMode::Id, fanMode), CHIP_NO_ERROR);
     EXPECT_EQ(fanMode, FanModeEnum::kHigh);
 }
@@ -511,7 +511,7 @@ TEST_F(TestFanControlCluster, PercentSettingZero_SetsFanModeOff)
     percentSetting.SetNonNull(0);
     ASSERT_EQ(tester.WriteAttribute(FanControl::Attributes::PercentSetting::Id, percentSetting), CHIP_NO_ERROR);
 
-    FanModeEnum fanMode;
+    FanModeEnum fanMode{};
     ASSERT_EQ(tester.ReadAttribute(FanControl::Attributes::FanMode::Id, fanMode), CHIP_NO_ERROR);
     EXPECT_EQ(fanMode, FanModeEnum::kOff);
 }
@@ -529,7 +529,7 @@ TEST_F(TestFanControlClusterWithMultiSpeed, SpeedSettingZero_SetsFanModeOff)
     speedSetting.SetNonNull(0);
     ASSERT_EQ(tester.WriteAttribute(FanControl::Attributes::SpeedSetting::Id, speedSetting), CHIP_NO_ERROR);
 
-    FanModeEnum fanMode;
+    FanModeEnum fanMode{};
     ASSERT_EQ(tester.ReadAttribute(FanControl::Attributes::FanMode::Id, fanMode), CHIP_NO_ERROR);
     EXPECT_EQ(fanMode, FanModeEnum::kOff);
 }
@@ -578,7 +578,7 @@ TEST_F(TestFanControlCluster, FanModeOn_MapsToHigh)
 
     ASSERT_EQ(tester.WriteAttribute(FanControl::Attributes::FanMode::Id, FanModeEnum::kOn), CHIP_NO_ERROR);
 
-    FanModeEnum fanMode;
+    FanModeEnum fanMode{};
     ASSERT_EQ(tester.ReadAttribute(FanControl::Attributes::FanMode::Id, fanMode), CHIP_NO_ERROR);
     EXPECT_EQ(fanMode, FanModeEnum::kHigh);
 }
@@ -589,7 +589,7 @@ TEST_F(TestFanControlClusterWithAuto, FanModeSmart_MapsToAuto)
 
     ASSERT_EQ(tester.WriteAttribute(FanControl::Attributes::FanMode::Id, FanModeEnum::kSmart), CHIP_NO_ERROR);
 
-    FanModeEnum fanMode;
+    FanModeEnum fanMode{};
     ASSERT_EQ(tester.ReadAttribute(FanControl::Attributes::FanMode::Id, fanMode), CHIP_NO_ERROR);
     EXPECT_EQ(fanMode, FanModeEnum::kAuto);
 }
@@ -600,7 +600,7 @@ TEST_F(TestFanControlCluster, FanModeSmart_MapsToHigh_WhenAutoNotSupported)
 
     ASSERT_EQ(tester.WriteAttribute(FanControl::Attributes::FanMode::Id, FanModeEnum::kSmart), CHIP_NO_ERROR);
 
-    FanModeEnum fanMode;
+    FanModeEnum fanMode{};
     ASSERT_EQ(tester.ReadAttribute(FanControl::Attributes::FanMode::Id, fanMode), CHIP_NO_ERROR);
     EXPECT_EQ(fanMode, FanModeEnum::kHigh);
 }
@@ -611,7 +611,7 @@ TEST_F(TestFanControlClusterOffHighAuto, FanModeSmart_MapsToAuto)
 
     ASSERT_EQ(tester.WriteAttribute(FanControl::Attributes::FanMode::Id, FanModeEnum::kSmart), CHIP_NO_ERROR);
 
-    FanModeEnum fanMode;
+    FanModeEnum fanMode{};
     ASSERT_EQ(tester.ReadAttribute(FanControl::Attributes::FanMode::Id, fanMode), CHIP_NO_ERROR);
     EXPECT_EQ(fanMode, FanModeEnum::kAuto);
 }
@@ -638,7 +638,7 @@ TEST_F(TestFanControlClusterOffHighAuto, FanModeAuto_Succeeds)
 
     ASSERT_EQ(tester.WriteAttribute(FanControl::Attributes::FanMode::Id, FanModeEnum::kAuto), CHIP_NO_ERROR);
 
-    FanModeEnum fanMode;
+    FanModeEnum fanMode{};
     ASSERT_EQ(tester.ReadAttribute(FanControl::Attributes::FanMode::Id, fanMode), CHIP_NO_ERROR);
     EXPECT_EQ(fanMode, FanModeEnum::kAuto);
 }
@@ -664,7 +664,7 @@ TEST_F(TestFanControlClusterOffLowMedHigh, FanModeLowAndMedium_Succeed)
     ClusterTester tester(cluster);
 
     ASSERT_EQ(tester.WriteAttribute(FanControl::Attributes::FanMode::Id, FanModeEnum::kLow), CHIP_NO_ERROR);
-    FanModeEnum fanMode;
+    FanModeEnum fanMode{};
     ASSERT_EQ(tester.ReadAttribute(FanControl::Attributes::FanMode::Id, fanMode), CHIP_NO_ERROR);
     EXPECT_EQ(fanMode, FanModeEnum::kLow);
 
