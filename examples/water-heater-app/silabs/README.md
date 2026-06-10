@@ -195,13 +195,13 @@ after flashing the .out file.
 Once the above is complete, log output can be viewed using the JLinkExe tool in
 combination with JLinkRTTClient as follows:
 
-- Run the JLinkExe tool with arguments to autoconnect to the WSTK board:
+-   Run the JLinkExe tool with arguments to autoconnect to the WSTK board:
 
     For MG24 use:
 
-            ```
-            $ JLinkExe -device EFR32MG24AXXXF1536 -if SWD -speed 4000 -autoconnect 1
-            ```
+              ```
+              $ JLinkExe -device EFR32MG24AXXXF1536 -if SWD -speed 4000 -autoconnect 1
+              ```
 
 -   In a second terminal, run the JLinkRTTClient to view logs:
 
