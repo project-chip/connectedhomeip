@@ -134,7 +134,6 @@ RUN echo "Cloning at commit: ${COMMITHASH}" \
     && mkdir /root/connectedhomeip \
     && git init /root/connectedhomeip \
     && cd /root/connectedhomeip \
-    && git init . \
     && git remote add origin https://github.com/project-chip/connectedhomeip.git \
     && git fetch --depth 1 origin ${COMMITHASH} \
     && git checkout FETCH_HEAD
@@ -187,6 +186,7 @@ RUN printf '%s\n' \
     shell-ipv6only-platform-mdns \
     fabric-admin-rpc-ipv6only \
     fabric-bridge-rpc-ipv6only \
+    network-manager-ipv6only \
     > /tmp/targets.txt
 RUN --mount=type=cache,target=/root/connectedhomeip/.ccache \
     TARGET_ARGS=() \
@@ -223,6 +223,7 @@ RUN --mount=type=cache,target=/root/connectedhomeip/.ccache \
 
 RUN printf '%s\n' \
     light-ipv6only \
+    light-data-model-no-unique-id-ipv6only \
     thermostat-ipv6only \
     lock-ipv6only \
     air-purifier-ipv6only \
@@ -288,6 +289,7 @@ RUN printf '%s\n' \
     lit-icd-ipv6only \
     energy-gateway-ipv6only \
     closure-ipv6only \
+    terms-and-conditions-ipv6only \
     > /tmp/targets.txt
 RUN --mount=type=cache,target=/root/connectedhomeip/.ccache \
     TARGET_ARGS=() \
@@ -373,7 +375,7 @@ ENV TZ=Etc/UTC
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 RUN apt-get update -y \
-    && DEBIAN_FRONTEND=noninteractive apt-get satisfy -y --no-install-recommends \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
         avahi-utils \
         ffmpeg \
         gstreamer1.0-plugins-good \
@@ -437,7 +439,7 @@ ENV TZ=Etc/UTC
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 RUN apt-get update -y \
-    && DEBIAN_FRONTEND=noninteractive apt-get satsify -y --no-install-recommends \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
         avahi-utils \
         ffmpeg \
         gstreamer1.0-plugins-good \
