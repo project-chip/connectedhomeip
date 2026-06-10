@@ -201,7 +201,7 @@ class FactoryDataWriter:
                 output = subprocess.check_output(cmd)
                 output = output.decode('utf-8').splitlines()
                 deviceInfo = dict(map(str.strip, lines.split(':')) for lines in output[0:len(output)-1])
-                # Only MG24 are supported in matter currently
+                # Only MG24 is supported in Matter currently
                 if "EFR32MG24" in deviceInfo["Part Number"]:
                     inputImage = self.BASE_MG24_FILE
                 else:
