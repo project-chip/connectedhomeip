@@ -210,10 +210,10 @@ class TC_ACS_3_1(MatterBaseTest):
                 namespaceID1 = list_dec[0]
                 tag1 = list_dec[1]
                 log.info(f"user input: {namespaceID1} {tag1}")
-    
+
             # Add 1 second delay to make sure it's done
             await asyncio.sleep(1)
-    
+
             # CI for the second ambient sensing event => Object Identification person
             namespaceID2 = OBJECTIDENTIFICATIONNAMESPACEID  # 73
             tag2 = 3  # person
@@ -231,7 +231,7 @@ class TC_ACS_3_1(MatterBaseTest):
                 namespaceID2 = list_dec[0]
                 tag2 = list_dec[1]
                 log.info(f"user input: {namespaceID2} {tag2}")
-    
+
             # Add 1 second delay to make sure it's done
             await asyncio.sleep(1)
 
@@ -239,16 +239,16 @@ class TC_ACS_3_1(MatterBaseTest):
             ambientContextType = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.AmbientContextType)
             log.info(f"Rx'd AmbientContextType: {ambientContextType}")
-    
+
             # Simultaneous Detection <= 2
             asserts.assert_less_equal(len(ambientContextType), 2, "AmbientContextType list needs to be the size of 2.")
-    
+
             # check the subscription of AmbientContextType attribute
             subscription_expected = attrib_listener.attribute_reports[cluster.Attributes.AmbientContextType][-1].value
             humanActivityDetected = False
             objectIdentified = False
             audioContextDetected = False
-    
+
             # latest namespace id == namespaceID2
             namespaceid_test = subscription_expected[0].ambientContextSensed[0].namespaceID
             log.info(f"namespaceid_test: {namespaceid_test}")
@@ -256,7 +256,7 @@ class TC_ACS_3_1(MatterBaseTest):
                                 f"Unexpected namespaceID, {namespaceid_test}, exp {namespaceID2}")
             asserts.assert_true(subscription_expected[0].ambientContextSensed[0].tag == tag2,
                                 f"Unexpected tag, {subscription_expected[0].ambientContextSensed[0].tag}, exp {tag2}")
-    
+
             # early namespace id == namespaceID1
             namespaceid_test1 = subscription_expected[1].ambientContextSensed[0].namespaceID
             log.info(f"namespaceid_test1: {namespaceid_test1}")
@@ -264,7 +264,7 @@ class TC_ACS_3_1(MatterBaseTest):
                                 f"Unexpected namespaceID, {namespaceid_test1}, exp {namespaceID1}")
             asserts.assert_true(subscription_expected[1].ambientContextSensed[0].tag == tag1,
                                 f"Unexpected tag, {subscription_expected[1].ambientContextSensed[0].tag}, exp {tag1}")
-    
+
             # AmbientContextType attribute subscription check for the latest event boolean attribute
             if (namespaceid_test == HUMANACTIVITYNAMESPACEID) & self.HumanActivitySupported:
                 subscription_bool_expected = attrib_listener.attribute_reports[cluster.Attributes.HumanActivityDetected]
@@ -284,7 +284,7 @@ class TC_ACS_3_1(MatterBaseTest):
                 audioContextDetected = subscription_bool_expected[0].value
                 log.info(f"Rx'd audioContextDetected: {audioContextDetected}")
                 asserts.assert_true(audioContextDetected, "Failed to get audioContextDetected being True.")
-    
+
             # AmbientContextType attribute subscription check for the early boolean attribute
             if (namespaceid_test1 == HUMANACTIVITYNAMESPACEID) & self.HumanActivitySupported:
                 subscription_bool_expected1 = attrib_listener.attribute_reports[cluster.Attributes.HumanActivityDetected]
@@ -304,9 +304,9 @@ class TC_ACS_3_1(MatterBaseTest):
                 audioContextDetected = subscription_bool_expected1[0].value
                 log.info(f"Rx'd audioContextDetected: {audioContextDetected}")
                 asserts.assert_true(audioContextDetected, "Failed to get audioContextDetected being True.")
-    
+
             attrib_listener.reset()
-    
+
             self.step("5c")
             # wait until HoldTime expires
             # CI call to trigger on
@@ -316,7 +316,7 @@ class TC_ACS_3_1(MatterBaseTest):
             else:
                 self.wait_for_user_input(
                     prompt_msg="Type any letter and press ENTER after HoldTime duration from the step 5a has passed.")
-    
+
             skip("6a")
             skip("6b")
             skip("6c")
@@ -329,7 +329,7 @@ class TC_ACS_3_1(MatterBaseTest):
             skip("5a")
             skip("5b")
             skip("5c")
-            
+
             self.step("6a")
             # CI for the first ambient sensing event => Human activity walking
             # Use decimal number not hex
@@ -351,10 +351,10 @@ class TC_ACS_3_1(MatterBaseTest):
                 namespaceID1 = list_dec[0]
                 tag1 = list_dec[1]
                 log.info(f"user input: {namespaceID1} {tag1}")
-    
+
             # Add 1 second delay to make sure it's done
             await asyncio.sleep(1)
-    
+
             # CI for the second ambient sensing event => Object Identification person
             namespaceID2 = OBJECTIDENTIFICATIONNAMESPACEID  # 73
             tag2 = 3  # person
@@ -372,10 +372,10 @@ class TC_ACS_3_1(MatterBaseTest):
                 namespaceID2 = list_dec[0]
                 tag2 = list_dec[1]
                 log.info(f"user input: {namespaceID2} {tag2}")
-    
+
             # Add 1 second delay to make sure it's done
             await asyncio.sleep(1)
-    
+
             # CI for the third ambient sensing event => Sound context barking
             namespaceID3 = SOUNDIDENTIFICATIONNAMESPACEID  # 74
             tag3 = 4  # person
@@ -393,7 +393,7 @@ class TC_ACS_3_1(MatterBaseTest):
                 namespaceID3 = list_dec[0]
                 tag3 = list_dec[1]
                 log.info(f"user input: {namespaceID3} {tag3}")
-    
+
             # Add 1 second delay to make sure it's done
             await asyncio.sleep(1)
 
@@ -403,18 +403,18 @@ class TC_ACS_3_1(MatterBaseTest):
 
             self.step("6b")
             ambientContextType = await self.read_single_attribute_check_success(
-                    endpoint=endpoint, cluster=cluster, attribute=attr.AmbientContextType)
+                endpoint=endpoint, cluster=cluster, attribute=attr.AmbientContextType)
             log.info(f"Rx'd AmbientContextType: {ambientContextType}")
-        
+
             # Simultaneous Detection <= 3
             asserts.assert_less_equal(len(ambientContextType), 3, "AmbientContextType list needs to be the size of 3.")
-            
+
             # check the subscription of AmbientContextType attribute
             subscription_expected = attrib_listener.attribute_reports[cluster.Attributes.AmbientContextType][-1].value
             humanActivityDetected = False
             objectIdentified = False
             audioContextDetected = False
-    
+
             # latest namespace id == namespaceID3
             namespaceid_test = subscription_expected[0].ambientContextSensed[0].namespaceID
             log.info(f"namespaceid_test: {namespaceid_test}")
@@ -422,7 +422,7 @@ class TC_ACS_3_1(MatterBaseTest):
                                 f"Unexpected namespaceID, {namespaceid_test}, exp {namespaceID3}")
             asserts.assert_true(subscription_expected[0].ambientContextSensed[0].tag == tag3,
                                 f"Unexpected tag, {subscription_expected[0].ambientContextSensed[0].tag}, exp {tag3}")
-    
+
             # early namespace id == namespaceID2
             namespaceid_test1 = subscription_expected[1].ambientContextSensed[0].namespaceID
             log.info(f"namespaceid_test1: {namespaceid_test1}")
@@ -430,7 +430,7 @@ class TC_ACS_3_1(MatterBaseTest):
                                 f"Unexpected namespaceID, {namespaceid_test1}, exp {namespaceID2}")
             asserts.assert_true(subscription_expected[1].ambientContextSensed[0].tag == tag2,
                                 f"Unexpected tag, {subscription_expected[1].ambientContextSensed[0].tag}, exp {tag2}")
-    
+
             # earliest namespace id == namespaceID1
             namespaceid_test2 = subscription_expected[2].ambientContextSensed[0].namespaceID
             log.info(f"namespaceid_test2: {namespaceid_test2}")
@@ -438,7 +438,7 @@ class TC_ACS_3_1(MatterBaseTest):
                                 f"Unexpected namespaceID, {namespaceid_test2}, exp {namespaceID1}")
             asserts.assert_true(subscription_expected[2].ambientContextSensed[0].tag == tag1,
                                 f"Unexpected tag, {subscription_expected[2].ambientContextSensed[0].tag}, exp {tag1}")
-    
+
             # AmbientContextType attribute subscription check for the latest event boolean attribute
             if (namespaceid_test == HUMANACTIVITYNAMESPACEID) & self.HumanActivitySupported:
                 subscription_bool_expected = attrib_listener.attribute_reports[cluster.Attributes.HumanActivityDetected]
@@ -458,7 +458,7 @@ class TC_ACS_3_1(MatterBaseTest):
                 audioContextDetected = subscription_bool_expected[0].value
                 log.info(f"Rx'd audioContextDetected: {audioContextDetected}")
                 asserts.assert_true(audioContextDetected, "Failed to get audioContextDetected being True.")
-    
+
             # AmbientContextType attribute subscription check for the early boolean attribute
             if (namespaceid_test1 == HUMANACTIVITYNAMESPACEID) & self.HumanActivitySupported:
                 subscription_bool_expected1 = attrib_listener.attribute_reports[cluster.Attributes.HumanActivityDetected]
@@ -478,7 +478,7 @@ class TC_ACS_3_1(MatterBaseTest):
                 audioContextDetected = subscription_bool_expected1[0].value
                 log.info(f"Rx'd audioContextDetected: {audioContextDetected}")
                 asserts.assert_true(audioContextDetected, "Failed to get audioContextDetected being True.")
-    
+
             # AmbientContextType attribute subscription check for the early boolean attribute
             if (namespaceid_test2 == HUMANACTIVITYNAMESPACEID) & self.HumanActivitySupported:
                 subscription_bool_expected2 = attrib_listener.attribute_reports[cluster.Attributes.HumanActivityDetected]
@@ -498,9 +498,9 @@ class TC_ACS_3_1(MatterBaseTest):
                 audioContextDetected = subscription_bool_expected2[0].value
                 log.info(f"Rx'd audioContextDetected: {audioContextDetected}")
                 asserts.assert_true(audioContextDetected, "Failed to get audioContextDetected being True.")
-    
+
             attrib_listener.reset()
-    
+
             self.step("6c")
             # wait until HoldTime expires
             # CI call to trigger on
@@ -510,13 +510,13 @@ class TC_ACS_3_1(MatterBaseTest):
             else:
                 self.wait_for_user_input(
                     prompt_msg="Type any letter and press ENTER after HoldTime duration from the step 6a has passed.")
-    
+
             # check if the last AmbientContextDetectEnded event is from the event start number of AmbientContextSensed_2
             # this latest 2nd event end ensures that the HoldTime has passed.
             # event = event_listener.wait_for_event_report(cluster.Events.AmbientContextDetectEnded, timeout_sec=(holdtime_dut))
             # this check not ready yet.
             # asserts.assert_equal(event.event_id, start_event_id, "Wrong Event ID")
-        
+
         self.step("7")
         # Check the boolean attributes are set to False
         if humanActivityDetected & self.HumanActivitySupported:
