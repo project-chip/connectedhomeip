@@ -319,12 +319,20 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
             daemon=True)
         restart_monitor_thread.start()
 
+    # Ensure we have a value for --timeout if present to avoid have invalid values for timeout while executing the test.
     split_args = shlex.split(script_args)
     timeout_key = '--timeout'
-    timeout_index = split_args.index(timeout_key) if timeout_key in split_args else None
     test_arg_timeout = None
+    timeout_index = split_args.index(timeout_key) if timeout_key in split_args else None
     if timeout_index is not None:
-        test_arg_timeout = int(split_args[timeout_index+1])
+        try:
+            test_arg_timeout = int(split_args[timeout_index+1])
+        except ValueError as ve:
+            log.warning("Invalid value for argument --timeout")
+            exit(1)
+        except IndexError as ie:
+            log.warning("Unable to retrieve the value for argument --timeout")
+            exit(1)
 
     # TODO: Remove this below workaround once we understand if mobile-device-test needs to be run through Cirque and through this script for CI test pipeline, task PR: https://github.com/project-chip/matter-test-scripts/issues/681
     if "mobile-device-test.py" not in script:
