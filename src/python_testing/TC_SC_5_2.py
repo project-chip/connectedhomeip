@@ -289,8 +289,9 @@ class TC_SC_5_2(MatterBaseTest):
                               f"No Operate-privilege command found on endpoint {groups_endpoint}; cannot validate groupcast listener.")
             operate_only_command = operate_only_commands_dict[groups_endpoint][0]
             logger.info(
-                f"Using {operate_only_command.cluster_object.__name__}.{operate_only_command.command_object.__name__} "
-                f"as the group command for endpoint {groups_endpoint}")
+                "Using %s.%s as the group command for endpoint %d",
+                operate_only_command.cluster_object.__name__, operate_only_command.command_object.__name__,
+                groups_endpoint)
 
             # Step 15c: Send the operate-only command as a group command to GroupID 0x0103.
             self.step("15c")
