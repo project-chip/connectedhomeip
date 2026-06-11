@@ -25,6 +25,7 @@
 #include <functional>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/core/CHIPVendorIdentifiers.hpp>
+#include <lib/core/DataModelTypes.h>
 #include <lib/core/NodeId.h>
 #include <lib/support/ReadOnlyBuffer.h>
 #include <map>
@@ -301,6 +302,18 @@ public:
     }
     VendorId GetAnchorVendorId() { return mAnchorVendorId; }
 
+    /**
+     * We track the FabricIndex of the Joint Fabric so that the datastore can be wiped if the Joint Fabric is removed.
+     */
+    void SetAnchorFabricIndex(FabricIndex anchorFabricIndex) { mAnchorFabricIndex = anchorFabricIndex; }
+    FabricIndex GetAnchorFabricIndex() const { return mAnchorFabricIndex; }
+
+    /**
+     * Runs when a fabric is removed from the node's FabricTable. If the removed fabric is the anchor fabric, the entire datastore
+     * should be cleared. A no-op for any other fabric.
+     */
+    void OnFabricRemoved(FabricIndex fabricIndex);
+
     CHIP_ERROR SetFriendlyName(const CharSpan & friendlyName)
     {
         if (friendlyName.size() >= sizeof(mFriendlyNameBuffer))
@@ -486,7 +499,14 @@ private:
     size_t mFriendlyNameBufferLength                      = 0;
     NodeId mAnchorNodeId                                  = kUndefinedNodeId;
     VendorId mAnchorVendorId                              = VendorId::NotSpecified;
+    FabricIndex mAnchorFabricIndex                        = kUndefinedFabricIndex;
     Clusters::JointFabricDatastore::Structs::DatastoreStatusEntryStruct::Type mDatastoreStatusEntry;
+
+    /**
+     * Clears all stored records and resets anchor identity. Used by OnFabricRemoved() when the joint fabric is removed.
+     * Self-zeroizing buffers wipe their secrets as the containers are cleared.
+     */
+    void ClearAllRecords();
 
     // TODO: Persist these members to local storage
     std::vector<GenericDatastoreNodeInformationEntry> mNodeInformationEntries;

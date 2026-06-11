@@ -102,6 +102,52 @@ void JointFabricDatastore::RemoveAdminEntryStorage(NodeId nodeId)
     mAdminEntryStorage.erase(nodeId);
 }
 
+void JointFabricDatastore::OnFabricRemoved(FabricIndex fabricIndex)
+{
+    // Only act when the joint fabric is removed; records for any other fabric are not stored here.
+    if (mAnchorFabricIndex == kUndefinedFabricIndex || fabricIndex != mAnchorFabricIndex)
+    {
+        return;
+    }
+
+    ClearAllRecords();
+
+    for (Listener * listener = mListeners; listener != nullptr; listener = listener->mNext)
+    {
+        listener->MarkNodeListChanged();
+    }
+}
+
+void JointFabricDatastore::ClearAllRecords()
+{
+    // Erasing the secret-bearing maps destroys the self-zeroizing EpochKeyStorage / ICAC buffers,
+    // wiping their contents.
+    mGroupKeySetStorage.clear();
+    mAdminEntryStorage.clear();
+    mGroupInformationStorage.clear();
+    mEndpointFriendlyNameStorage.clear();
+
+    mNodeInformationEntries.clear();
+    mGroupKeySetList.clear();
+    mAdminEntries.clear();
+    mGroupInformationEntries.clear();
+    mEndpointGroupIDEntries.clear();
+    mEndpointBindingEntries.clear();
+    mNodeKeySetEntries.clear();
+    mACLEntries.clear();
+    mEndpointEntries.clear();
+
+    // Reset anchor identity: with the joint fabric gone, the datastore no longer describes a fabric.
+    memset(mAnchorRootCA, 0, sizeof(mAnchorRootCA));
+    mAnchorRootCALength       = 0;
+    mFriendlyNameBuffer[0]    = '\0';
+    mFriendlyNameBufferLength = 0;
+    mAnchorNodeId             = kUndefinedNodeId;
+    mAnchorVendorId           = VendorId::NotSpecified;
+    mAnchorFabricIndex        = kUndefinedFabricIndex;
+    mDatastoreStatusEntry     = Clusters::JointFabricDatastore::Structs::DatastoreStatusEntryStruct::Type{};
+}
+
 void JointFabricDatastore::SetEndpointFriendlyNameWithOwnedStorage(
     NodeId nodeId, EndpointId endpointId, const CharSpan & friendlyName,
     Clusters::JointFabricDatastore::Structs::DatastoreEndpointEntryStruct::Type & destination)

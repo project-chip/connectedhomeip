@@ -718,6 +718,71 @@ TEST(JointFabricDatastoreTest, AddBindingBackReferenceMarksWrongEntry)
     EXPECT_TRUE(found);
 }
 
+// When removing the anchor fabric, every record must be wiped and the anchor identity must be reset.
+// When other fabrics are removed, nothing should happen (the datastore holds no records owned by other fabrics.)
+TEST(JointFabricDatastoreTest, OnFabricRemovedWipesDatastoreOnlyForAnchorFabric)
+{
+    JointFabricDatastore store;
+    TrackingDelegate delegate;
+    ASSERT_EQ(store.SetDelegate(&delegate), CHIP_NO_ERROR);
+
+    constexpr FabricIndex kAnchorFabric = 1;
+    constexpr FabricIndex kOtherFabric  = 2;
+    store.SetAnchorFabricIndex(kAnchorFabric);
+    ASSERT_EQ(store.SetAnchorNodeId(0xABCD), CHIP_NO_ERROR);
+
+    // A spread of records, including the secret-bearing group-key-set and admin (ICAC) entries.
+    uint8_t epoch0[] = { 0x01, 0x02, 0x03 };
+    GroupKeySetType keySet;
+    keySet.groupKeySetID = 11;
+    keySet.epochKey0.SetNonNull(ByteSpan(epoch0));
+    keySet.epochKey1.SetNull();
+    keySet.epochKey2.SetNull();
+    ASSERT_EQ(store.AddGroupKeySetEntry(keySet), CHIP_NO_ERROR);
+
+    char adminName[] = "admin";
+    uint8_t icac[]   = { 0x0A, 0x0B };
+    AdminEntryType admin;
+    admin.nodeID       = 100;
+    admin.vendorID     = static_cast<VendorId>(7);
+    admin.friendlyName = CharSpan(adminName, sizeof(adminName) - 1);
+    admin.icac         = ByteSpan(icac);
+    ASSERT_EQ(store.AddAdmin(admin), CHIP_NO_ERROR);
+
+    ASSERT_EQ(store.AddPendingNode(123, "controller"_span), CHIP_NO_ERROR);
+    ASSERT_EQ(store.TestAddEndpointEntry(1, 123, "endpoint"_span), CHIP_NO_ERROR);
+
+    JointFabricCluster::Structs::DatastoreBindingTargetStruct::Type binding;
+    binding.group.SetValue(10);
+    ASSERT_EQ(store.AddBindingToEndpointForNode(123, 1, binding), CHIP_NO_ERROR);
+
+    JointFabricCluster::Structs::DatastoreAccessControlEntryStruct::DecodableType aclEntry;
+    aclEntry.privilege = JointFabricCluster::DatastoreAccessControlEntryPrivilegeEnum::kView;
+    aclEntry.authMode  = JointFabricCluster::DatastoreAccessControlEntryAuthModeEnum::kCase;
+    ASSERT_EQ(store.AddACLToNode(123, aclEntry), CHIP_NO_ERROR);
+
+    // Removing a non-anchor fabric leaves everything intact.
+    store.OnFabricRemoved(kOtherFabric);
+    EXPECT_EQ(store.GetGroupKeySetList().size(), 1u);
+    EXPECT_EQ(store.GetAdminEntries().size(), 1u);
+    EXPECT_EQ(store.GetNodeInformationEntries().size(), 1u);
+    EXPECT_EQ(store.GetNodeACLList().size(), 1u);
+    EXPECT_EQ(store.GetEndpointBindingList().size(), 1u);
+    EXPECT_EQ(store.GetNodeEndpointList().size(), 1u);
+    EXPECT_EQ(store.GetAnchorFabricIndex(), kAnchorFabric);
+
+    // Removing the joint (anchor) fabric wipes the datastore and resets anchor identity.
+    store.OnFabricRemoved(kAnchorFabric);
+    EXPECT_TRUE(store.GetGroupKeySetList().empty());
+    EXPECT_TRUE(store.GetAdminEntries().empty());
+    EXPECT_TRUE(store.GetNodeInformationEntries().empty());
+    EXPECT_TRUE(store.GetNodeACLList().empty());
+    EXPECT_TRUE(store.GetEndpointBindingList().empty());
+    EXPECT_TRUE(store.GetNodeEndpointList().empty());
+    EXPECT_EQ(store.GetAnchorFabricIndex(), kUndefinedFabricIndex);
+    EXPECT_EQ(store.GetAnchorNodeId(), kUndefinedNodeId);
+}
+
 // Direct unit tests for the detail::MarkEntryCommittedIfFound helper. It re-resolves an entry by a
 // stable-key predicate (rather than a captured iterator/index) inside an async SyncNode completion
 // and marks the matched entry kCommitted. A minimal fake entry mirrors the only field the helper

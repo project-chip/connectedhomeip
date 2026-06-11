@@ -690,6 +690,10 @@ private:
             // Clear any cached Joint Fabric VID-verification state tied to the removed fabric so it
             // cannot be honored for a different fabric that later reuses this FabricIndex.
             mServer->GetJointFabricAdministrator().OnFabricRemoved(fabricIndex);
+
+            // If the removed fabric is the joint (anchor) fabric, purge the Joint Fabric Datastore:
+            // all of its records belong to that fabric, and its anchor identity is no longer valid.
+            mServer->GetJointFabricDatastore().OnFabricRemoved(fabricIndex);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
         }
 
