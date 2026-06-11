@@ -1376,10 +1376,7 @@ def build_xml_clusters(data_model_directory: Union[PrebuiltDataModelDirectory, T
                 active_rev = data_model_directory.parent.name
 
             errata_problems = apply_errata(clusters, errata_data, active_spec_revision=active_rev)
-            for ep in errata_problems:
-                sev = ProblemSeverity.ERROR if ep.startswith('CRITICAL') else ProblemSeverity.WARNING
-                problems.append(ProblemNotice(test_name='Data Model Errata', location=UnknownProblemLocation(),
-                                              severity=sev, problem=ep))
+            problems.extend(errata_problems)
         else:
             problems.append(ProblemNotice(test_name='Data Model Errata', location=UnknownProblemLocation(),
                                           severity=ProblemSeverity.ERROR, problem=f"Failed to load required errata overlay: '{errata_path}'"))

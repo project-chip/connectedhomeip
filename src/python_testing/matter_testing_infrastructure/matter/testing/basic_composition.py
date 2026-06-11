@@ -39,7 +39,8 @@ from matter.testing.conformance import ConformanceException
 from matter.testing.matter_test_config import MatterTestConfig
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.problem_notices import ProblemNotice
-from matter.testing.spec_parsing import PrebuiltDataModelDirectory, build_xml_clusters, build_xml_device_types, dm_from_spec_version
+from matter.testing.spec_parsing import (PrebuiltDataModelDirectory, XmlCluster, XmlDeviceType,
+                                            build_xml_clusters, build_xml_device_types, dm_from_spec_version)
 
 LOGGER = logging.getLogger(__name__)
 
@@ -149,8 +150,8 @@ class BasicCompositionTests(MatterBaseTest):
     problems: list[ProblemNotice]
     endpoints: dict[int, Any]  # Wildcard read result
     endpoints_tlv: dict[int, Any]  # Wildcard read result (raw TLV)
-    xml_clusters: dict[Any, Any]
-    xml_device_types: dict[Any, Any]
+    xml_clusters: dict[int, XmlCluster]
+    xml_device_types: dict[int, XmlDeviceType]
 
     def dump_wildcard(self, dump_device_composition_path: typing.Optional[str]) -> tuple[str, str]:
         """ Dumps a json and a txt file of the attribute wildcard for this device if the dump_device_composition_path is supplied.
@@ -262,7 +263,7 @@ class BasicCompositionTests(MatterBaseTest):
 
     def build_spec_xmls(self, errata_path: str | Traversable | None = None):
         if errata_path is None:
-            errata_path = getattr(self.matter_test_config, 'spec_errata_path', None)
+            errata_path = self.matter_test_config.spec_errata_path
 
         dm = self._get_dm()
         LOGGER.info("----------------------------------------------------------------------------------")

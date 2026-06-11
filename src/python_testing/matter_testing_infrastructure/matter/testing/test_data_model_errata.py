@@ -125,7 +125,7 @@ class TestDataModelErrata(unittest.TestCase):
 
         problems = apply_errata(clusters, errata)
         self.assertEqual(len(problems), 1)
-        self.assertIn("Errata referenced unknown Cluster", problems[0])
+        self.assertIn("Errata referenced unknown Cluster", problems[0].problem)
 
     def test_error_unknown_element(self):
         cluster = self._create_dummy_cluster("BasicInformation")
@@ -141,7 +141,7 @@ class TestDataModelErrata(unittest.TestCase):
 
         problems = apply_errata(clusters, errata)
         self.assertEqual(len(problems), 1)
-        self.assertIn("Errata referenced unknown Element", problems[0])
+        self.assertIn("Errata referenced unknown Element", problems[0].problem)
 
     def test_revision_compatibility_pass(self):
         cluster = self._create_dummy_cluster("AmbientSensing")
@@ -162,7 +162,7 @@ class TestDataModelErrata(unittest.TestCase):
         }
         problems = apply_errata(clusters, errata, active_spec_revision="1.5")
         self.assertEqual(len(problems), 1)
-        self.assertIn("CRITICAL: Errata overlay is not compatible", problems[0])
+        self.assertIn("CRITICAL: Errata overlay is not compatible", problems[0].problem)
 
     def test_revision_compatibility_missing_active_rev(self):
         cluster = self._create_dummy_cluster("AmbientSensing")
@@ -173,7 +173,7 @@ class TestDataModelErrata(unittest.TestCase):
         }
         problems = apply_errata(clusters, errata, active_spec_revision=None)
         self.assertEqual(len(problems), 1)
-        self.assertIn("CRITICAL: Errata overlay mandates a compatible specification check", problems[0])
+        self.assertIn("CRITICAL: Errata overlay mandates a compatible specification check", problems[0].problem)
 
     def test_load_authoritative_errata_missing_file(self):
         errata = load_authoritative_errata("non_existent_errata_file_99.yaml")
@@ -187,7 +187,7 @@ class TestDataModelErrata(unittest.TestCase):
         }
         problems = apply_errata(clusters, errata)
         self.assertEqual(len(problems), 1)
-        self.assertIn("CRITICAL: Cluster name 'Ambient Context Sensing' in errata violates", problems[0])
+        self.assertIn("CRITICAL: Cluster name 'Ambient Context Sensing' in errata violates", problems[0].problem)
 
     def test_reject_raw_xml_element_name(self):
         cluster = self._create_dummy_cluster("AmbientContextSensing")
@@ -201,7 +201,7 @@ class TestDataModelErrata(unittest.TestCase):
         }
         problems = apply_errata(clusters, errata)
         self.assertEqual(len(problems), 1)
-        self.assertIn("CRITICAL: Element name 'Simultaneous Detection Limit' in 'AmbientContextSensing' violates", problems[0])
+        self.assertIn("CRITICAL: Element name 'Simultaneous Detection Limit' in 'AmbientContextSensing' violates", problems[0].problem)
 
 
 if __name__ == "__main__":
