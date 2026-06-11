@@ -194,18 +194,25 @@ void AppTaskCommon::PowerOnFactoryReset(void)
 void PowerOnNetworkCheck(void)
 {
     Thread::OperationalDataset curDataset;
-    CHIP_ERROR err = DeviceLayer::ThreadStackMgrImpl().GetThreadProvision(curDataset);
+    CHIP_ERROR err  = DeviceLayer::ThreadStackMgrImpl().GetThreadProvision(curDataset);
     bool hasDataset = (err == CHIP_NO_ERROR); // Check if stored OpenThread dataset
 
     uint8_t fabricNum = chip::Server::GetInstance().GetFabricTable().FabricCount();
 
-    if (!hasDataset && fabricNum == 0) { // New device
+    if (!hasDataset && fabricNum == 0)
+    { // New device
         return;
-    } else if (hasDataset && fabricNum > 0) { // Device successfully commissioned
+    }
+    else if (hasDataset && fabricNum > 0)
+    { // Device successfully commissioned
         return;
-    } else if (hasDataset && fabricNum == 0) {
+    }
+    else if (hasDataset && fabricNum == 0)
+    {
         ChipLogProgress(DeviceLayer, "Thread dataset exists, but matter uncommissioned\n");
-    } else {
+    }
+    else
+    {
         ChipLogProgress(DeviceLayer, "Matter commissioned, but thread dataset lost\n");
     }
     chip::Server::GetInstance().ScheduleFactoryReset();
