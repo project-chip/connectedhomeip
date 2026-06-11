@@ -19,7 +19,6 @@
 This module contains CommissionDeviceTest class designed to handle the commissioning process of Matter devices.
 """
 
-from typing import List
 
 from mobly import signals
 
@@ -37,7 +36,7 @@ class CommissionDeviceTest(MatterBaseTest):
 
         # Use inherited matter_test_config property instead of manual extraction
         config = self.matter_test_config
-        self.dut_node_ids: List[int] = config.dut_node_ids
+        self.dut_node_ids: list[int] = config.dut_node_ids
         self.commissioning_info: CommissioningInfo = CommissioningInfo(
             commissionee_ip_address_just_for_testing=config.commissionee_ip_address_just_for_testing,
             commissioning_method=config.commissioning_method,
@@ -50,7 +49,7 @@ class CommissionDeviceTest(MatterBaseTest):
             thread_ba_port=config.thread_ba_port,
         )
         # Use inherited get_setup_payload_info method
-        self.setup_payloads: List[SetupPayloadInfo] = self.get_setup_payload_info()
+        self.setup_payloads: list[SetupPayloadInfo] = self.get_setup_payload_info()
 
     def test_run_commissioning(self):
         """This method is the test called by mobly, which try to commission the device until is complete or raises an error.

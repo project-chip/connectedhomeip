@@ -54,9 +54,7 @@ class TC_DD_3_23(MatterBaseTest):
             if isinstance(stage, bytes):
                 stage = stage.decode("utf-8", errors="replace")
 
-            log.info(
-                f"[_stage_start_listener] node=0x{node_id:X}, stage={stage}"
-            )
+            log.info("[_stage_start_listener] node=0x%X, stage=%s", node_id, stage)
 
             self.commissionee_node_id = node_id
 
@@ -86,7 +84,7 @@ class TC_DD_3_23(MatterBaseTest):
         reader = matter.testing.nfc.NFCReader(nfc_reader_index)
 
         nfc_tag_data = reader.read_nfc_tag_data()
-        log.info(f"NFC Tag data : '{nfc_tag_data}'")
+        log.info("NFC Tag data : '%s'", nfc_tag_data)
         asserts.assert_true(
             reader.is_onboarding_data(nfc_tag_data),
             f"'{nfc_tag_data}' is not a valid Matter URI"

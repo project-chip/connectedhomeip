@@ -30,8 +30,8 @@ platform-specific specializations kept separate:
     -   Core cluster logic and device interfaces.
     -   Base device implementations.
     -   The **`DeviceFactory`** (in
-        `all-devices-common/devices/device-factory/DeviceFactory.h`), which
-        enables runtime registration and creation of supported device types.
+        `all-devices-common/device-factory/DeviceFactory.h`), which enables
+        runtime registration and creation of supported device types.
 -   **`esp32/`, `posix/`**: Contain platform-specific implementations (with
     `posix/` containing `linux/` and `darwin/` subdirectories), entry points,
     and build configurations.
@@ -53,6 +53,8 @@ but the application is constantly evolving and new device types are added often:
 -   `occupancy-sensor`
 -   `chime`
 -   `dimmable-light`
+-   `fan`
+-   `fan-no-onoff`
 -   `on-off-light`
 -   `speaker`
 -   `soil-sensor`
@@ -66,7 +68,7 @@ Usage: ./out/linux-x64-all-devices-boringssl-no-ble/all-devices-app
 
 PROGRAM OPTIONS
 
-  --device <chime|contact-sensor|dimmable-light|occupancy-sensor|on-off-light|soil-sensor|speaker|water-leak-detector>
+  --device <chime|contact-sensor|dimmable-light|fan|fan-no-onoff|occupancy-sensor|on-off-light|soil-sensor|speaker|water-leak-detector>
        Select the device to start up. Format: 'type' or 'type:endpoint' or 'type:endpoint,parent=parentId'
        Can be specified multiple times for multi-endpoint devices.
        Example: --device chime:1 --device speaker:2,parent=1

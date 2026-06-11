@@ -21,7 +21,7 @@ import os
 import random
 import shutil
 import tempfile
-from enum import Enum
+from enum import StrEnum
 from typing import Optional
 
 import psutil
@@ -36,7 +36,7 @@ from matter.testing.tasks import Subprocess
 log = logging.getLogger(__name__)
 
 
-class SupportedIngestInterface(str, Enum):
+class SupportedIngestInterface(StrEnum):
     cmaf = "cmaf-ingest"  # Interface 1
     dash = "dash"  # Interface 2, DASH version
     hls = "hls"  # Interface 2, HLS version
@@ -60,7 +60,7 @@ class PushAvServerProcess(Subprocess):
         server_ip: str | None = None,
     ):
         if server_path is None:
-            log.error(f"No path provided for Push AV Server, using the default path for TH: {self.DEFAULT_SERVER_PATH}")
+            log.error("No path provided for Push AV Server, using the default path for TH: %s", self.DEFAULT_SERVER_PATH)
             server_path = self.DEFAULT_SERVER_PATH
         self._working_directory = os.path.join(tempfile.gettempdir(), "pavstest")
         if os.path.exists(self._working_directory):
@@ -187,7 +187,7 @@ class PAVSTIUtils:
 
         # TLS clusters are always on EP0, per spec
         tls_utils = TLSUtils(self, endpoint=0)
-        log.info(f"Using IP: {host_ip} as hostname to provision TLS Endpoint")
+        log.info("Using IP: %s as hostname to provision TLS Endpoint", host_ip)
         root_cert_der = server.get_root_cert()
         prc_result = await tls_utils.send_provision_root_command(certificate=root_cert_der)
         tls_utils.assert_valid_caid(prc_result.caid)

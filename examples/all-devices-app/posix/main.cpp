@@ -35,7 +35,7 @@
 
 #include <app_options/AppOptions.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
-#include <devices/device-factory/DeviceFactory.h>
+#include <device-factory/DeviceFactory.h>
 #include <devices/device-type-parser/DeviceTypeParser.h>
 #include <platform/CommissionableDataProvider.h>
 #include <platform/DeviceInstanceInfoProvider.h>
@@ -45,6 +45,7 @@
 #include <string>
 #include <system/SystemLayer.h>
 
+#include <BleInit.h>
 #include <TermHandling.h>
 
 using namespace chip;
@@ -375,7 +376,8 @@ CHIP_ERROR Initialize(int argc, char * argv[])
     ChipLogProgress(AppServer, "Initializing...");
     ReturnErrorOnFailure(Platform::MemoryInit());
 
-    static OptionSet * sAppOptionSets[] = { AppOptions::GetOptions(), nullptr };
+    static HelpOptions sHelpOptions(argv[0], "Usage: all-devices-app [options]", "1.0");
+    static OptionSet * sAppOptionSets[] = { AppOptions::GetOptions(), &sHelpOptions, nullptr };
     if (!ArgParser::ParseArgs(argv[0], argc, argv, sAppOptionSets))
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
@@ -400,11 +402,7 @@ CHIP_ERROR Initialize(int argc, char * argv[])
 
     ReturnErrorOnFailure(DeviceLayer::PlatformMgrImpl().AddEventHandler(EventHandler, 0));
 
-#if CONFIG_NETWORK_LAYER_BLE
-    ReturnErrorOnFailure(DeviceLayer::ConnectivityMgr().SetBLEDeviceName(nullptr));
-    ReturnErrorOnFailure(DeviceLayer::Internal::BLEMgrImpl().ConfigureBle(AppOptions::GetConfig().bleController, false));
-    ReturnErrorOnFailure(DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(true));
-#endif
+    ReturnErrorOnFailure(chip::app::InitBle(AppOptions::GetConfig().bleController));
 
     return CHIP_NO_ERROR;
 }

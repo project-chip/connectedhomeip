@@ -142,7 +142,7 @@ class NrfConnectBuilder(Builder):
                  board: NrfBoard = NrfBoard.NRF52840DK,
                  enable_rpcs: bool = False,
                  ):
-        super(NrfConnectBuilder, self).__init__(root, runner, output_dir_lock)
+        super().__init__(root, runner, output_dir_lock)
         self.app = app
         self.board = board
         self.enable_rpcs = enable_rpcs
@@ -224,7 +224,7 @@ class NrfConnectBuilder(Builder):
 
     @lock_output_dir
     def _bundle(self):
-        log.info(f'Generating flashbundle at {self.output_dir}')
+        log.info('Generating flashbundle at %s', self.output_dir)
 
         self._Execute(['ninja', '-C', os.path.join(self.output_dir, 'nrfconnect'), 'flashing_script'],
                       title='Generating flashable files of ' + self.identifier)

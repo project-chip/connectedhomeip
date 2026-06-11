@@ -846,7 +846,7 @@ ConnectivityManagerImpl::_ConnectWiFiNetworkAsync(GVariant * args,
 
     const char * networkPath = wpa_supplicant_1_interface_get_current_network(mWpaSupplicant.iface.get());
     // wpa_supplicant DBus API: if network path of current network is not "/", means we have already selected some network.
-    if (strcmp(networkPath, "/") != 0)
+    if (networkPath != nullptr && strcmp(networkPath, "/") != 0)
     {
         if (!wpa_supplicant_1_interface_call_remove_network_sync(mWpaSupplicant.iface.get(), networkPath, nullptr,
                                                                  &err.GetReceiver()))
@@ -1167,6 +1167,7 @@ CHIP_ERROR ConnectivityManagerImpl::GetWiFiSecurityType(SecurityTypeEnum & secur
 
     const char * mode = wpa_supplicant_1_interface_get_current_auth_mode(mWpaSupplicant.iface.get());
     ChipLogProgress(DeviceLayer, WPA_SUPPLICANT_CLIENT_LOG_PREFIX "Current Wi-Fi security type: %s", StringOrNullMarker(mode));
+    VerifyOrReturnError(mode != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     if (strncmp(mode, "WPA-PSK", 7) == 0)
     {
@@ -1450,12 +1451,12 @@ bool ConnectivityManagerImpl::_GetBssInfo(const gchar * bssPath, NetworkCommissi
             return 0;
         }
         GAutoPtr<const char *> keyMgmts(g_variant_get_strv(keyMgmt.get(), nullptr));
-        const gchar ** keyMgmtsHendle = keyMgmts.get();
+        const gchar ** keyMgmtsHandle = keyMgmts.get();
         uint8_t res                   = 0;
 
-        VerifyOrReturnError(keyMgmtsHendle != nullptr, res);
+        VerifyOrReturnError(keyMgmtsHandle != nullptr, res);
 
-        for (auto keyMgmtVal = *keyMgmtsHendle; keyMgmtVal != nullptr; keyMgmtVal = *(++keyMgmtsHendle))
+        for (auto keyMgmtVal = *keyMgmtsHandle; keyMgmtVal != nullptr; keyMgmtVal = *(++keyMgmtsHandle))
         {
             if (g_strcasecmp(keyMgmtVal, "wpa-psk") == 0 || g_strcasecmp(keyMgmtVal, "wpa-none") == 0)
             {
@@ -1480,12 +1481,12 @@ bool ConnectivityManagerImpl::_GetBssInfo(const gchar * bssPath, NetworkCommissi
             return 0;
         }
         GAutoPtr<const char *> keyMgmts(g_variant_get_strv(keyMgmt.get(), nullptr));
-        const gchar ** keyMgmtsHendle = keyMgmts.get();
+        const gchar ** keyMgmtsHandle = keyMgmts.get();
         uint8_t res                   = 0;
 
-        VerifyOrReturnError(keyMgmtsHendle != nullptr, res);
+        VerifyOrReturnError(keyMgmtsHandle != nullptr, res);
 
-        for (auto keyMgmtVal = *keyMgmtsHendle; keyMgmtVal != nullptr; keyMgmtVal = *(++keyMgmtsHendle))
+        for (auto keyMgmtVal = *keyMgmtsHandle; keyMgmtVal != nullptr; keyMgmtVal = *(++keyMgmtsHandle))
         {
             if (g_strcasecmp(keyMgmtVal, "wpa-psk") == 0 || g_strcasecmp(keyMgmtVal, "wpa-psk-sha256") == 0 ||
                 g_strcasecmp(keyMgmtVal, "wpa-ft-psk") == 0)
@@ -1560,7 +1561,7 @@ void ConnectivityManagerImpl::_OnWpaInterfaceScanDone(WpaSupplicant1Interface * 
         return;
     }
 
-    std::vector<WiFiScanResponse> * networkScanned = new std::vector<WiFiScanResponse>();
+    auto networkScanned = std::make_unique<std::vector<WiFiScanResponse>>();
     for (const char * bssPath = (bsss != nullptr ? *bsss : nullptr); bssPath != nullptr; bssPath = *(++bsss))
     {
         WiFiScanResponse network;
@@ -1575,14 +1576,24 @@ void ConnectivityManagerImpl::_OnWpaInterfaceScanDone(WpaSupplicant1Interface * 
         }
     }
 
-    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([this, networkScanned]() {
+    CHIP_ERROR err = DeviceLayer::SystemLayer().ScheduleLambda([this, scanned = networkScanned.get()]() {
         // Note: We cannot post an event in ScheduleLambda since std::vector is not trivial copyable.
-        LinuxScanResponseIterator<WiFiScanResponse> iter(networkScanned);
+        LinuxScanResponseIterator<WiFiScanResponse> iter(scanned);
 
         OnScanFinished(Status::kSuccess, CharSpan(), &iter);
 
-        delete networkScanned;
+        delete scanned;
     });
+
+    if (err == CHIP_NO_ERROR)
+    {
+        networkScanned.release();
+    }
+    else
+    {
+        ChipLogError(DeviceLayer, WPA_SUPPLICANT_CLIENT_LOG_PREFIX "failed to schedule scan completion: %" CHIP_ERROR_FORMAT,
+                     err.Format());
+    }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
     mPafChannelAvailable = true;

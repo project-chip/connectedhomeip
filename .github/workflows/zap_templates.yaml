@@ -35,7 +35,7 @@ jobs:
 
         runs-on: ubuntu-latest
         container:
-            image: ghcr.io/project-chip/chip-build:194
+            image: ghcr.io/project-chip/chip-build:200
         defaults:
             run:
                 shell: sh
@@ -43,7 +43,7 @@ jobs:
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v6.0.2
+              uses: actions/checkout@v6.0.3
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
@@ -82,3 +82,8 @@ jobs:
                   # to tell at a glance what might be going on.  And throw in
                   # --exit-code to make this job fail if there is a difference.
                   git diff-index --exit-code HEAD --
+            - name: Notify Slack on Failure
+              if: failure()
+              uses: ./.github/actions/notify-slack-failure
+              with:
+                slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}

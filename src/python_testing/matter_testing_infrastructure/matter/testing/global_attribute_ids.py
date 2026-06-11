@@ -75,7 +75,7 @@ class CommandIdType(Enum):
 # because the class handles the non-inclusive range.
 
 
-class IdRange():
+class IdRange:
     def __init__(self, _min, _max):
         self.min_max = range(_min, _max+1)
 

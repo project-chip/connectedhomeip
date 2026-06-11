@@ -190,7 +190,7 @@ class TC_PAVSTI_1_2(MatterBaseTest, AVSMTestBase, PAVSTIUtils):
             cluster=pushavCluster,
             attribute=pushavAttr.CurrentConnections
         )
-        log.info(f"Rx'd CurrentConnections: {currentConnections}")
+        log.info("Rx'd CurrentConnections: %s", currentConnections)
         if len(currentConnections) > 0:
             for connectionId in currentConnections:
                 await self.send_single_cmd(
@@ -206,7 +206,7 @@ class TC_PAVSTI_1_2(MatterBaseTest, AVSMTestBase, PAVSTIUtils):
             cluster=pushavCluster,
             attribute=pushavAttr.SupportedFormats,
         )
-        log.info(f"Rx'd SupportedFormats: {supportedFormats}")
+        log.info("Rx'd SupportedFormats: %s", supportedFormats)
         asserts.assert_greater_equal(
             len(supportedFormats), 1, "SupportedFormats must not be empty"
         )
@@ -228,7 +228,7 @@ class TC_PAVSTI_1_2(MatterBaseTest, AVSMTestBase, PAVSTIUtils):
             cluster=avsmCluster,
             attribute=avsmAttr.AllocatedVideoStreams,
         )
-        log.info(f"Rx'd AllocatedVideoStreams: {allocatedVideoStreams}")
+        log.info("Rx'd AllocatedVideoStreams: %s", allocatedVideoStreams)
         asserts.assert_true(
             len(allocatedVideoStreams) != 0, "AllocatedVideoStreams must not be empty"
         )
@@ -242,7 +242,7 @@ class TC_PAVSTI_1_2(MatterBaseTest, AVSMTestBase, PAVSTIUtils):
             cluster=avsmCluster,
             attribute=avsmAttr.AllocatedAudioStreams,
         )
-        log.info(f"Rx'd AllocatedAudioStreams: {allocatedAudioStreams}")
+        log.info("Rx'd AllocatedAudioStreams: %s", allocatedAudioStreams)
         asserts.assert_true(
             len(allocatedAudioStreams) != 0, "AllocatedAudioStreams must not be empty"
         )
@@ -272,7 +272,7 @@ class TC_PAVSTI_1_2(MatterBaseTest, AVSMTestBase, PAVSTIUtils):
             endpoint=endpoint,
         )
         log.info(
-            f"Rx'd allocatePushTransportResponse = {allocatePushTransportResponse}"
+            "Rx'd allocatePushTransportResponse = %s", allocatePushTransportResponse
         )
         aConnectionID = (
             allocatePushTransportResponse.transportConfiguration.connectionID

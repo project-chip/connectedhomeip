@@ -78,6 +78,9 @@ menu "Demo"
           depends on BT_ENABLED
       config RENDEZVOUS_MODE_ON_NETWORK
           bool "On-Network"
+      config RENDEZVOUS_MODE_THREAD_MESHCOP
+          bool "Thread MeshCoP"
+          depends on CHIP_DEVICE_ENABLE_THREAD_MESHCOP
       config RENDEZVOUS_MODE_SOFTAP_ON_NETWORK
           bool "Soft-AP / On-Network"
           select ESP_WIFI_SOFTAP_SUPPORT
@@ -103,10 +106,11 @@ menu "Demo"
 
     config RENDEZVOUS_MODE
        int
-       range 0 8
+       range 0 63
        default 1 if RENDEZVOUS_MODE_SOFTAP
        default 2 if RENDEZVOUS_MODE_BLE
        default 4 if RENDEZVOUS_MODE_ON_NETWORK
+       default 32 if RENDEZVOUS_MODE_THREAD_MESHCOP
        default 5 if RENDEZVOUS_MODE_SOFTAP_ON_NETWORK
        default 6 if RENDEZVOUS_MODE_BLE_ON_NETWORK
 

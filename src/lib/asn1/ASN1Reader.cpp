@@ -53,8 +53,33 @@ CHIP_ERROR ASN1Reader::Next()
     VerifyOrReturnError(!EndOfContents, ASN1_END);
     VerifyOrReturnError(!IndefiniteLen, ASN1_ERROR_UNSUPPORTED_ENCODING);
 
-    // Note: avoid using addition assignment operator (+=), which may result in integer overflow
-    // in the right hand side of an assignment (mHeadLen + ValueLen).
+    // Defense-in-depth against integer overflow: mHeadLen + ValueLen are both uint32_t and
+    // their sum could in principle wrap around, advancing mElemStart to an unintended
+    // location. DecodeHead already caps ValueLen at the remaining buffer, so this cannot
+    // wrap from any input reaching Next() through the public API; the guard hardens against
+    // a future caller or a regression in those upstream bounds checks.
+    VerifyOrReturnError(mHeadLen <= UINT32_MAX - ValueLen, ASN1_ERROR_LENGTH_OVERFLOW);
+    // Defend against an inconsistent reader state where mElemStart has advanced past
+    // mContainerEnd (e.g. a prior failed unwind left stale pointers). Without this
+    // check the pointer subtraction below would underflow when cast to size_t and the
+    // bounds comparison would silently pass.
+    VerifyOrReturnError(mContainerEnd >= mElemStart, ASN1_ERROR_INVALID_STATE);
+    // Compare in integer space rather than pointer space. On 32-bit targets size_t == uint32_t,
+    // so the size_t cast provides no additional width; the preceding LENGTH_OVERFLOW guard is
+    // what prevents wrap there. The size_t widening eliminates pointer-arithmetic UB on 64-bit
+    // targets where computing `mElemStart + mHeadLen + ValueLen` could otherwise wrap past the
+    // end of the address space before the comparison runs.
+    //
+    // BEHAVIOR CHANGE: a bounds-exceeded result here means a child element claims more bytes
+    // than its parent container holds (malformed encoding). Previously this advanced mElemStart
+    // past mContainerEnd and the subsequent `mElemStart != mContainerEnd` check returned ASN1_END,
+    // which callers (and the ASN1_EXIT_* macros) treat as a clean end of container -- silently
+    // swallowing the malformed input. It now surfaces as ASN1_ERROR_INVALID_ENCODING. A child
+    // ending exactly at mContainerEnd still passes this `<=` check and reports ASN1_END as before,
+    // so well-formed certificates are unaffected.
+    VerifyOrReturnError(static_cast<size_t>(mHeadLen) + ValueLen <= static_cast<size_t>(mContainerEnd - mElemStart),
+                        ASN1_ERROR_INVALID_ENCODING);
+
     mElemStart = mElemStart + mHeadLen + ValueLen;
 
     ResetElementState();
@@ -79,6 +104,14 @@ CHIP_ERROR ASN1Reader::ExitConstructedType()
 CHIP_ERROR ASN1Reader::GetConstructedType(const uint8_t *& val, uint32_t & valLen)
 {
     VerifyOrReturnError(Constructed, ASN1_ERROR_INVALID_STATE);
+
+    // Defend against an inconsistent reader state where mElemStart has advanced past
+    // mContainerEnd. Required ahead of any size_t-widened subtraction so the result
+    // cannot underflow.
+    VerifyOrReturnError(mContainerEnd >= mElemStart, ASN1_ERROR_INVALID_STATE);
+    // Guard against integer overflow: mHeadLen + ValueLen are both uint32_t and their sum
+    // could wrap around, producing a bogus length for the caller.
+    VerifyOrReturnError(mHeadLen <= UINT32_MAX - ValueLen, ASN1_ERROR_LENGTH_OVERFLOW);
 
     val    = mElemStart;
     valLen = mHeadLen + ValueLen;
@@ -105,6 +138,17 @@ CHIP_ERROR ASN1Reader::EnterContainer(uint32_t offset)
 {
     VerifyOrReturnError(mNumSavedContexts != kMaxContextDepth, ASN1_ERROR_MAX_DEPTH_EXCEEDED);
 
+    // Peek-then-commit: validate all preconditions BEFORE mutating reader
+    // state. If any guard fires the saved-context stack, mElemStart, and
+    // mContainerEnd are all left untouched so the reader stays in a
+    // consistent state.
+    if (!IndefiniteLen)
+    {
+        VerifyOrReturnError(CanCastTo<uint32_t>(mBufEnd - Value), ASN1_ERROR_VALUE_OVERFLOW);
+        VerifyOrReturnError(static_cast<uint32_t>(mBufEnd - Value) >= ValueLen, ASN1_ERROR_VALUE_OVERFLOW);
+    }
+
+    // All checks passed - now commit by pushing the saved context and updating reader state.
     mSavedContexts[mNumSavedContexts].ElemStart     = mElemStart;
     mSavedContexts[mNumSavedContexts].HeadLen       = mHeadLen;
     mSavedContexts[mNumSavedContexts].ValueLen      = ValueLen;
@@ -115,8 +159,6 @@ CHIP_ERROR ASN1Reader::EnterContainer(uint32_t offset)
     mElemStart = Value + offset;
     if (!IndefiniteLen)
     {
-        VerifyOrReturnError(CanCastTo<uint32_t>(mBufEnd - Value), ASN1_ERROR_VALUE_OVERFLOW);
-        VerifyOrReturnError(static_cast<uint32_t>(mBufEnd - Value) >= ValueLen, ASN1_ERROR_VALUE_OVERFLOW);
         mContainerEnd = Value + ValueLen;
     }
 
@@ -129,10 +171,33 @@ CHIP_ERROR ASN1Reader::ExitContainer()
 {
     VerifyOrReturnError(mNumSavedContexts != 0, ASN1_ERROR_INVALID_STATE);
 
-    ASN1ParseContext & prevContext = mSavedContexts[--mNumSavedContexts];
+    // Peek-then-commit: validate the saved context BEFORE mutating any reader
+    // state. On any error the saved-context stack is left untouched so the
+    // reader stays in a consistent state and a follow-up call sees the same
+    // failure (rather than silently operating on a half-popped stack).
+    const ASN1ParseContext & prevContext = mSavedContexts[mNumSavedContexts - 1];
 
     VerifyOrReturnError(!prevContext.IndefiniteLen, ASN1_ERROR_UNSUPPORTED_ENCODING);
 
+    // Guard against integer overflow: HeadLen + ValueLen are both uint32_t and their sum
+    // could wrap around, potentially advancing mElemStart to an unintended location.
+    VerifyOrReturnError(prevContext.HeadLen <= UINT32_MAX - prevContext.ValueLen, ASN1_ERROR_LENGTH_OVERFLOW);
+    // Defend against a saved context with ContainerEnd < ElemStart so the pointer
+    // subtraction below cannot underflow when widened to size_t.
+    VerifyOrReturnError(prevContext.ContainerEnd >= prevContext.ElemStart, ASN1_ERROR_INVALID_STATE);
+    // Compare in integer space rather than pointer space. On 32-bit targets size_t == uint32_t
+    // and the LENGTH_OVERFLOW guard above is what prevents wrap; the size_t widening eliminates
+    // pointer-arithmetic UB on 64-bit targets where `prevContext.ElemStart + prevContext.HeadLen
+    // + prevContext.ValueLen` could otherwise wrap past the end of the address space. A
+    // bounds-exceeded result here means the saved container declared more bytes than its parent
+    // holds (malformed encoding), NOT a clean end of container, so it must surface as
+    // INVALID_ENCODING rather than ASN1_END.
+    VerifyOrReturnError(static_cast<size_t>(prevContext.HeadLen) + prevContext.ValueLen <=
+                            static_cast<size_t>(prevContext.ContainerEnd - prevContext.ElemStart),
+                        ASN1_ERROR_INVALID_ENCODING);
+
+    // All checks passed - now commit by popping the saved context and updating reader state.
+    --mNumSavedContexts;
     mElemStart = prevContext.ElemStart + prevContext.HeadLen + prevContext.ValueLen;
 
     mContainerEnd = prevContext.ContainerEnd;
@@ -155,7 +220,15 @@ CHIP_ERROR ASN1Reader::GetInteger(int64_t & val)
     VerifyOrReturnError(Value != nullptr, ASN1_ERROR_INVALID_STATE);
     VerifyOrReturnError(ValueLen >= 1, ASN1_ERROR_INVALID_ENCODING);
     VerifyOrReturnError(ValueLen <= sizeof(int64_t), ASN1_ERROR_VALUE_OVERFLOW);
-    VerifyOrReturnError(mElemStart + mHeadLen + ValueLen <= mContainerEnd, ASN1_ERROR_UNDERRUN);
+    // Mirrors the guard sequence in Next(): (1) reject inconsistent state where
+    // mContainerEnd < mElemStart (without this the size_t-widened subtraction below would
+    // underflow to a huge value and the bounds compare would trivially pass), (2) reject
+    // mHeadLen + ValueLen wrap on 32-bit targets where size_t == uint32_t, (3) bounds-check
+    // via the size_t-widened comparison.
+    VerifyOrReturnError(mContainerEnd >= mElemStart, ASN1_ERROR_INVALID_STATE);
+    VerifyOrReturnError(mHeadLen <= UINT32_MAX - ValueLen, ASN1_ERROR_LENGTH_OVERFLOW);
+    VerifyOrReturnError(static_cast<size_t>(mHeadLen) + ValueLen <= static_cast<size_t>(mContainerEnd - mElemStart),
+                        ASN1_ERROR_UNDERRUN);
 
     if ((*Value & 0x80) == 0x80)
     {
@@ -175,7 +248,13 @@ CHIP_ERROR ASN1Reader::GetBoolean(bool & val)
 {
     VerifyOrReturnError(Value != nullptr, ASN1_ERROR_INVALID_STATE);
     VerifyOrReturnError(ValueLen == 1, ASN1_ERROR_INVALID_ENCODING);
-    VerifyOrReturnError(mElemStart + mHeadLen + ValueLen <= mContainerEnd, ASN1_ERROR_UNDERRUN);
+    // Mirrors the guard sequence in Next(): (1) reject inconsistent state where
+    // mContainerEnd < mElemStart, (2) reject mHeadLen + ValueLen wrap on 32-bit
+    // (size_t == uint32_t), (3) bounds-check via size_t-widened comparison.
+    VerifyOrReturnError(mContainerEnd >= mElemStart, ASN1_ERROR_INVALID_STATE);
+    VerifyOrReturnError(mHeadLen <= UINT32_MAX - ValueLen, ASN1_ERROR_LENGTH_OVERFLOW);
+    VerifyOrReturnError(static_cast<size_t>(mHeadLen) + ValueLen <= static_cast<size_t>(mContainerEnd - mElemStart),
+                        ASN1_ERROR_UNDERRUN);
     VerifyOrReturnError(Value[0] == 0 || Value[0] == 0xFF, ASN1_ERROR_INVALID_ENCODING);
 
     val = (Value[0] != 0);
@@ -188,7 +267,13 @@ CHIP_ERROR ASN1Reader::GetUTCTime(ASN1UniversalTime & outTime)
     // Supported Encoding: YYMMDDHHMMSSZ
     VerifyOrReturnError(Value != nullptr, ASN1_ERROR_INVALID_STATE);
     VerifyOrReturnError(ValueLen >= 1, ASN1_ERROR_INVALID_ENCODING);
-    VerifyOrReturnError(mElemStart + mHeadLen + ValueLen <= mContainerEnd, ASN1_ERROR_UNDERRUN);
+    // Mirrors the guard sequence in Next(): (1) reject inconsistent state where
+    // mContainerEnd < mElemStart, (2) reject mHeadLen + ValueLen wrap on 32-bit
+    // (size_t == uint32_t), (3) bounds-check via size_t-widened comparison.
+    VerifyOrReturnError(mContainerEnd >= mElemStart, ASN1_ERROR_INVALID_STATE);
+    VerifyOrReturnError(mHeadLen <= UINT32_MAX - ValueLen, ASN1_ERROR_LENGTH_OVERFLOW);
+    VerifyOrReturnError(static_cast<size_t>(mHeadLen) + ValueLen <= static_cast<size_t>(mContainerEnd - mElemStart),
+                        ASN1_ERROR_UNDERRUN);
     VerifyOrReturnError(ValueLen == 13 && Value[12] == 'Z', ASN1_ERROR_UNSUPPORTED_ENCODING);
 
     return outTime.ImportFrom_ASN1_TIME_string(CharSpan(reinterpret_cast<const char *>(Value), ValueLen));
@@ -199,7 +284,13 @@ CHIP_ERROR ASN1Reader::GetGeneralizedTime(ASN1UniversalTime & outTime)
     // Supported Encoding: YYYYMMDDHHMMSSZ
     VerifyOrReturnError(Value != nullptr, ASN1_ERROR_INVALID_STATE);
     VerifyOrReturnError(ValueLen >= 1, ASN1_ERROR_INVALID_ENCODING);
-    VerifyOrReturnError(mElemStart + mHeadLen + ValueLen <= mContainerEnd, ASN1_ERROR_UNDERRUN);
+    // Mirrors the guard sequence in Next(): (1) reject inconsistent state where
+    // mContainerEnd < mElemStart, (2) reject mHeadLen + ValueLen wrap on 32-bit
+    // (size_t == uint32_t), (3) bounds-check via size_t-widened comparison.
+    VerifyOrReturnError(mContainerEnd >= mElemStart, ASN1_ERROR_INVALID_STATE);
+    VerifyOrReturnError(mHeadLen <= UINT32_MAX - ValueLen, ASN1_ERROR_LENGTH_OVERFLOW);
+    VerifyOrReturnError(static_cast<size_t>(mHeadLen) + ValueLen <= static_cast<size_t>(mContainerEnd - mElemStart),
+                        ASN1_ERROR_UNDERRUN);
     VerifyOrReturnError(ValueLen == 15 && Value[14] == 'Z', ASN1_ERROR_UNSUPPORTED_ENCODING);
 
     return outTime.ImportFrom_ASN1_TIME_string(CharSpan(reinterpret_cast<const char *>(Value), ValueLen));
@@ -222,7 +313,13 @@ CHIP_ERROR ASN1Reader::GetBitString(uint32_t & outVal)
     VerifyOrReturnError(Value != nullptr, ASN1_ERROR_INVALID_STATE);
     VerifyOrReturnError(ValueLen >= 1, ASN1_ERROR_INVALID_ENCODING);
     VerifyOrReturnError(ValueLen <= 5, ASN1_ERROR_UNSUPPORTED_ENCODING);
-    VerifyOrReturnError(mElemStart + mHeadLen + ValueLen <= mContainerEnd, ASN1_ERROR_UNDERRUN);
+    // Mirrors the guard sequence in Next(): (1) reject inconsistent state where
+    // mContainerEnd < mElemStart, (2) reject mHeadLen + ValueLen wrap on 32-bit
+    // (size_t == uint32_t), (3) bounds-check via size_t-widened comparison.
+    VerifyOrReturnError(mContainerEnd >= mElemStart, ASN1_ERROR_INVALID_STATE);
+    VerifyOrReturnError(mHeadLen <= UINT32_MAX - ValueLen, ASN1_ERROR_LENGTH_OVERFLOW);
+    VerifyOrReturnError(static_cast<size_t>(mHeadLen) + ValueLen <= static_cast<size_t>(mContainerEnd - mElemStart),
+                        ASN1_ERROR_UNDERRUN);
 
     if (ValueLen == 1)
     {
@@ -230,11 +327,14 @@ CHIP_ERROR ASN1Reader::GetBitString(uint32_t & outVal)
     }
     else
     {
-        outVal    = ReverseBits(Value[1]);
-        int shift = 8;
+        outVal             = ReverseBits(Value[1]);
+        unsigned int shift = 8;
         for (uint32_t i = 2; i < ValueLen; i++, shift += 8)
         {
-            outVal |= static_cast<uint32_t>(ReverseBits(Value[i]) << shift);
+            // Cast to uint32_t before shifting: ReverseBits returns uint8_t which
+            // would be promoted to (signed) int, and shifts of 24+ on a value with
+            // the high bit set are undefined behavior on signed integers.
+            outVal |= (static_cast<uint32_t>(ReverseBits(Value[i])) << shift);
         }
     }
 

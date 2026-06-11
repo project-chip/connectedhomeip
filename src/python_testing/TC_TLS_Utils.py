@@ -18,7 +18,7 @@
 import datetime
 import random
 import string
-from typing import Callable, List, Optional, Union
+from typing import Callable, Optional, Union
 
 from cryptography import x509
 from cryptography.hazmat.primitives import hashes, serialization
@@ -106,9 +106,9 @@ class TLSUtils:
             .issuer_name(root_cert_subject)
             .public_key(public_key)
             .serial_number(random_serial_number())
-            .not_valid_before(datetime.datetime.now(datetime.timezone.utc))
+            .not_valid_before(datetime.datetime.now(datetime.UTC))
             .not_valid_after(
-                datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(days=365.25*20)
+                datetime.datetime.now(datetime.UTC) + datetime.timedelta(days=365.25*20)
             )
             .add_extension(
                 # We make it so that our root can only issue leaf certificates, no intermediate here.
@@ -254,7 +254,7 @@ class TLSUtils:
             return e
 
     async def send_provision_client_command(
-            self, certificate: bytes, ccdid: int, intermediates: List[bytes] = [],
+            self, certificate: bytes, ccdid: int, intermediates: list[bytes] = [],
             expected_status: Status = Status.Success) -> InteractionModelError:
         try:
             result = await self.test.send_single_cmd(cmd=Clusters.TlsCertificateManagement.Commands.ProvisionClientCertificate(ccdid=ccdid, clientCertificate=certificate, intermediateCertificates=intermediates),
