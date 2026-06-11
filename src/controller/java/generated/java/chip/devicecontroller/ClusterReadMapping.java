@@ -5689,6 +5689,87 @@ public class ClusterReadMapping {
      
        return result;
     }
+    private static Map<String, InteractionInfo> readTemperatureControlledCabinetTopologyInteractionInfo() {
+       Map<String, InteractionInfo> result = new LinkedHashMap<>();Map<String, CommandParameterInfo> readTemperatureControlledCabinetTopologyDisabledCabinetsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readTemperatureControlledCabinetTopologyDisabledCabinetsAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.TemperatureControlledCabinetTopologyCluster) cluster).readDisabledCabinetsAttribute(
+              (ChipClusters.TemperatureControlledCabinetTopologyCluster.DisabledCabinetsAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedTemperatureControlledCabinetTopologyClusterDisabledCabinetsAttributeCallback(),
+          readTemperatureControlledCabinetTopologyDisabledCabinetsCommandParams
+        );
+        result.put("readDisabledCabinetsAttribute", readTemperatureControlledCabinetTopologyDisabledCabinetsAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readTemperatureControlledCabinetTopologyTopologyCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readTemperatureControlledCabinetTopologyTopologyAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.TemperatureControlledCabinetTopologyCluster) cluster).readTopologyAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readTemperatureControlledCabinetTopologyTopologyCommandParams
+        );
+        result.put("readTopologyAttribute", readTemperatureControlledCabinetTopologyTopologyAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readTemperatureControlledCabinetTopologyGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readTemperatureControlledCabinetTopologyGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.TemperatureControlledCabinetTopologyCluster) cluster).readGeneratedCommandListAttribute(
+              (ChipClusters.TemperatureControlledCabinetTopologyCluster.GeneratedCommandListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedTemperatureControlledCabinetTopologyClusterGeneratedCommandListAttributeCallback(),
+          readTemperatureControlledCabinetTopologyGeneratedCommandListCommandParams
+        );
+        result.put("readGeneratedCommandListAttribute", readTemperatureControlledCabinetTopologyGeneratedCommandListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readTemperatureControlledCabinetTopologyAcceptedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readTemperatureControlledCabinetTopologyAcceptedCommandListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.TemperatureControlledCabinetTopologyCluster) cluster).readAcceptedCommandListAttribute(
+              (ChipClusters.TemperatureControlledCabinetTopologyCluster.AcceptedCommandListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedTemperatureControlledCabinetTopologyClusterAcceptedCommandListAttributeCallback(),
+          readTemperatureControlledCabinetTopologyAcceptedCommandListCommandParams
+        );
+        result.put("readAcceptedCommandListAttribute", readTemperatureControlledCabinetTopologyAcceptedCommandListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readTemperatureControlledCabinetTopologyAttributeListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readTemperatureControlledCabinetTopologyAttributeListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.TemperatureControlledCabinetTopologyCluster) cluster).readAttributeListAttribute(
+              (ChipClusters.TemperatureControlledCabinetTopologyCluster.AttributeListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedTemperatureControlledCabinetTopologyClusterAttributeListAttributeCallback(),
+          readTemperatureControlledCabinetTopologyAttributeListCommandParams
+        );
+        result.put("readAttributeListAttribute", readTemperatureControlledCabinetTopologyAttributeListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readTemperatureControlledCabinetTopologyFeatureMapCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readTemperatureControlledCabinetTopologyFeatureMapAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.TemperatureControlledCabinetTopologyCluster) cluster).readFeatureMapAttribute(
+              (ChipClusters.LongAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+          readTemperatureControlledCabinetTopologyFeatureMapCommandParams
+        );
+        result.put("readFeatureMapAttribute", readTemperatureControlledCabinetTopologyFeatureMapAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readTemperatureControlledCabinetTopologyClusterRevisionCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readTemperatureControlledCabinetTopologyClusterRevisionAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.TemperatureControlledCabinetTopologyCluster) cluster).readClusterRevisionAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readTemperatureControlledCabinetTopologyClusterRevisionCommandParams
+        );
+        result.put("readClusterRevisionAttribute", readTemperatureControlledCabinetTopologyClusterRevisionAttributeInteractionInfo);
+     
+       return result;
+    }
     private static Map<String, InteractionInfo> readModeSelectInteractionInfo() {
        Map<String, InteractionInfo> result = new LinkedHashMap<>();Map<String, CommandParameterInfo> readModeSelectDescriptionCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readModeSelectDescriptionAttributeInteractionInfo = new InteractionInfo(
@@ -22271,6 +22352,7 @@ public class ClusterReadMapping {
             put("ovenCavityOperationalState", readOvenCavityOperationalStateInteractionInfo());
             put("ovenMode", readOvenModeInteractionInfo());
             put("laundryDryerControls", readLaundryDryerControlsInteractionInfo());
+            put("temperatureControlledCabinetTopology", readTemperatureControlledCabinetTopologyInteractionInfo());
             put("modeSelect", readModeSelectInteractionInfo());
             put("laundryWasherMode", readLaundryWasherModeInteractionInfo());
             put("refrigeratorAndTemperatureControlledCabinetMode", readRefrigeratorAndTemperatureControlledCabinetModeInteractionInfo());
