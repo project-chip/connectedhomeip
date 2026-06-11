@@ -9834,6 +9834,8 @@ NS_ASSUME_NONNULL_BEGIN
 
         _clientIdentifier = [NSData data];
 
+        _clientIdentityType = @(0);
+
         _networkIdentityIndex = nil;
     }
     return self;
@@ -9845,6 +9847,7 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.clientIndex = self.clientIndex;
     other.clientIdentifier = self.clientIdentifier;
+    other.clientIdentityType = self.clientIdentityType;
     other.networkIdentityIndex = self.networkIdentityIndex;
 
     return other;
@@ -9852,7 +9855,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: clientIndex:%@; clientIdentifier:%@; networkIdentityIndex:%@; >", NSStringFromClass([self class]), _clientIndex, [_clientIdentifier base64EncodedStringWithOptions:0], _networkIdentityIndex];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: clientIndex:%@; clientIdentifier:%@; clientIdentityType:%@; networkIdentityIndex:%@; >", NSStringFromClass([self class]), _clientIndex, [_clientIdentifier base64EncodedStringWithOptions:0], _clientIdentityType, _networkIdentityIndex];
     return descriptionString;
 }
 

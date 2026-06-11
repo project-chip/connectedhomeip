@@ -12337,6 +12337,7 @@ class ChipClusters:
                 "args": {
                     "networkIdentityIndex": "int",
                     "networkIdentityType": "int",
+                    "clientIndex": "int",
                     "identifier": "bytes",
                 },
             },

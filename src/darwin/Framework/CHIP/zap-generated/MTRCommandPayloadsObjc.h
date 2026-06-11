@@ -9528,6 +9528,8 @@ MTR_PROVISIONALLY_AVAILABLE
 
 @property (nonatomic, copy) NSNumber * _Nullable networkIdentityType MTR_PROVISIONALLY_AVAILABLE;
 
+@property (nonatomic, copy) NSNumber * _Nullable clientIndex MTR_PROVISIONALLY_AVAILABLE;
+
 @property (nonatomic, copy) NSData * _Nullable identifier MTR_PROVISIONALLY_AVAILABLE;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).

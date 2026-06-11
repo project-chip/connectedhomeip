@@ -2282,6 +2282,7 @@ MTR_PROVISIONALLY_AVAILABLE
 @interface MTRNetworkIdentityManagementClusterClientStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull clientIndex MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSData * _Nonnull clientIdentifier MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull clientIdentityType MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nullable networkIdentityIndex MTR_PROVISIONALLY_AVAILABLE;
 @end
 

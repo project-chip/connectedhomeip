@@ -55961,11 +55961,11 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
-    public void queryIdentity(QueryIdentityResponseCallback callback, Optional<Integer> networkIdentityIndex, Optional<Integer> networkIdentityType, Optional<byte[]> identifier) {
-      queryIdentity(callback, networkIdentityIndex, networkIdentityType, identifier, 0);
+    public void queryIdentity(QueryIdentityResponseCallback callback, Optional<Integer> networkIdentityIndex, Optional<Integer> networkIdentityType, Optional<Integer> clientIndex, Optional<byte[]> identifier) {
+      queryIdentity(callback, networkIdentityIndex, networkIdentityType, clientIndex, identifier, 0);
     }
 
-    public void queryIdentity(QueryIdentityResponseCallback callback, Optional<Integer> networkIdentityIndex, Optional<Integer> networkIdentityType, Optional<byte[]> identifier, int timedInvokeTimeoutMs) {
+    public void queryIdentity(QueryIdentityResponseCallback callback, Optional<Integer> networkIdentityIndex, Optional<Integer> networkIdentityType, Optional<Integer> clientIndex, Optional<byte[]> identifier, int timedInvokeTimeoutMs) {
       final long commandId = 3L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
@@ -55977,7 +55977,11 @@ public class ChipClusters {
       BaseTLVType networkIdentityTypetlvValue = networkIdentityType.<BaseTLVType>map((nonOptionalnetworkIdentityType) -> new UIntType(nonOptionalnetworkIdentityType)).orElse(new EmptyType());
       elements.add(new StructElement(networkIdentityTypeFieldID, networkIdentityTypetlvValue));
 
-      final long identifierFieldID = 2L;
+      final long clientIndexFieldID = 2L;
+      BaseTLVType clientIndextlvValue = clientIndex.<BaseTLVType>map((nonOptionalclientIndex) -> new UIntType(nonOptionalclientIndex)).orElse(new EmptyType());
+      elements.add(new StructElement(clientIndexFieldID, clientIndextlvValue));
+
+      final long identifierFieldID = 3L;
       BaseTLVType identifiertlvValue = identifier.<BaseTLVType>map((nonOptionalidentifier) -> new ByteArrayType(nonOptionalidentifier)).orElse(new EmptyType());
       elements.add(new StructElement(identifierFieldID, identifiertlvValue));
 
