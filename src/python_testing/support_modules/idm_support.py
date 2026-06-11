@@ -1364,24 +1364,9 @@ class IDMBaseTest(BasicCompositionTests):
                     )
 
                     if resp[0].Status == Status.Success:
-                        # A Success status doesn't mean the value actually changed. Some attributes are
-                        # spec-mandated to silently ignore writes (see skip list above); others get
-                        # clamped silently by cross-attribute constraints. Re-read so we only expect a
-                        # report when the value actually moved.
                         readback = await self.read_single_attribute_check_success(
                             endpoint=endpoint_id, cluster=cluster_class, attribute=attribute,
                         )
-                        if readback == cached_val:
-                            # Write succeeded but the value did not change and the attribute is not on the exclusion
-                            # list above. Since IDM_4_3 validates subscription reporting behavior, do not expect
-                            # a report when no value change occurred. Attribute-specific write semantics are
-                            # validated by the corresponding cluster tests.
-                            log.warning(
-                                "Write to %s returned Success but value unchanged (%r). "
-                                "Possible DUT defect or spec-mandated silent-discard not yet on the IDM 4.3 skip list.",
-                                attribute.__name__, cached_val,
-                            )
-                            continue
 
                         changed_count += 1
                         log.info(
