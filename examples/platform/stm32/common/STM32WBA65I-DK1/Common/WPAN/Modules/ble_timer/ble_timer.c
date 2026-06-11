@@ -21,7 +21,6 @@
 /* Includes ------------------------------------------------------------------*/
 #include "ble_timer.h"
 #include "advanced_memory_manager.h"
-#include "app_common.h"
 #include "app_conf.h"
 #include "bleplat.h"
 #include "blestack.h"

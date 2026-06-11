@@ -25,6 +25,7 @@ extern "C" {
 #endif
 
 /* Includes ------------------------------------------------------------------*/
+#include "app_common.h"
 #include "utilities_common.h"
 
 /* Exported types ------------------------------------------------------------*/

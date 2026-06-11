@@ -25,6 +25,8 @@
 extern "C" {
 #endif
 
+#include "app_common.h"
+
 void BLE_TIMER_Init(void);
 void BLE_TIMER_Deinit(void);
 

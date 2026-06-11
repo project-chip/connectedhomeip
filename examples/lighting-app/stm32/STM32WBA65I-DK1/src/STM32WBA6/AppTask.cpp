@@ -121,8 +121,11 @@ CHIP_ERROR AppTask::StartAppTask()
     }
 
     /* Start App task. */
-    osThreadNew(AppTaskMain, NULL, &AppTask_attr);
-
+    if(osThreadNew(AppTaskMain, NULL, &AppTask_attr) == NULL)
+    {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+        
     return CHIP_NO_ERROR;
 }
 
@@ -453,9 +456,12 @@ void AppTask::PostEvent(const AppEvent * aEvent)
 
 void AppTask::DispatchEvent(AppEvent * aEvent)
 {
-    if (aEvent->Handler)
+    if(aEvent != NULL)
     {
-        aEvent->Handler(aEvent);
+        if (aEvent->Handler)
+            {
+                aEvent->Handler(aEvent);
+            }
     }
     else
     {
