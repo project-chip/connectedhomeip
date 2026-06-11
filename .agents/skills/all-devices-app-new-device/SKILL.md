@@ -124,36 +124,18 @@ namespace app {
 
 CHIP_ERROR <DeviceName>Device::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointId parentId)
 {
-    // Always call SingleEndpointRegistration first to register common clusters & endpoint structure
     ReturnErrorOnFailure(SingleEndpointRegistration(endpoint, provider, parentId));
 
-    // Register each cluster supported by the device on this endpoint
     mIdentifyCluster.Create(Clusters::IdentifyCluster::Config(endpoint, mTimerDelegate));
-    CHIP_ERROR err = provider.AddCluster(mIdentifyCluster.Registration());
-    if (err != CHIP_NO_ERROR)
-    {
-        // Graceful rollback on failure
-        Unregister(provider);
-        return err;
-    }
+    ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
 
-    // Finalize by registering the endpoint entry in the provider
-    err = provider.AddEndpoint(mEndpointRegistration);
-    if (err != CHIP_NO_ERROR)
-    {
-        Unregister(provider);
-        return err;
-    }
-
-    return CHIP_NO_ERROR;
+    return provider.AddEndpoint(mEndpointRegistration);
 }
 
 void <DeviceName>Device::Unregister(CodeDrivenDataModelProvider & provider)
 {
-    // Call base unregistration helper
     SingleEndpointUnregistration(provider);
 
-    // Destroy and remove specific clusters
     if (mIdentifyCluster.IsConstructed())
     {
         LogErrorOnFailure(provider.RemoveCluster(&mIdentifyCluster.Cluster()));
@@ -260,15 +242,12 @@ Add your new device target dependency to the public dependencies of
   ]
 ```
 
-### 5. Executable Dependencies (`posix/BUILD.gn` and `silabs/BUILD.gn`)
+### 5. Platform Executable Dependencies (`BUILD.gn` files)
 
-Add the target dependency to the POSIX and Silabs builds:
+Add the target dependency to the relevant platform builds where `all-devices-app` is built (e.g., `posix/BUILD.gn`, `silabs/BUILD.gn`, `esp32/BUILD.gn`, `telink/BUILD.gn`):
 
 ```gn
-# In examples/all-devices-app/posix/BUILD.gn (deps block)
-    "${chip_root}/examples/all-devices-app/all-devices-common/devices/<device-name>",
-
-# In examples/all-devices-app/silabs/BUILD.gn (deps block under All devices common targets)
+# In the platform executable target's deps block
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/<device-name>",
 ```
 
