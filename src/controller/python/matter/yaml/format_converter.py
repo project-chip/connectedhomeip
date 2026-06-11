@@ -15,6 +15,7 @@
 #    limitations under the License.
 #
 
+import types
 import typing
 from dataclasses import dataclass
 
@@ -28,7 +29,7 @@ from .errors import ValidationError
 
 @dataclass
 class _TargetTypeInfo:
-    field: typing.Union[list[matter_idl_types.Field], matter_idl_types.Field]
+    field: list[matter_idl_types.Field] | matter_idl_types.Field
     is_fabric_scoped: bool
 
 
@@ -147,7 +148,7 @@ def convert_to_data_model_type(field_value, field_type):
     if field_value is None:
         field_value = NullValue
 
-    if (origin == typing.Union or origin == typing.Optional or origin == Nullable):
+    if (origin in (typing.Union, types.UnionType, typing.Optional, Nullable)):
         underlying_field_type = None
 
         if field_value is NullValue:
