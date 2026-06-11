@@ -81,8 +81,8 @@ public:
             break;
         }
 
-        ChipLogProgress(DeviceLayer, "Aggregator [Endpoint %d]: Trigger effect: %s",
-                        cluster.GetPaths()[0].mEndpointId, msg.c_str());
+        ChipLogProgress(DeviceLayer, "Aggregator [Endpoint %d]: Trigger effect: %s", cluster.GetPaths()[0].mEndpointId,
+                        msg.c_str());
     }
 
     bool IsTriggerEffectEnabled() const override { return true; }
