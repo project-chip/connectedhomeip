@@ -244,7 +244,9 @@ Add your new device target dependency to the public dependencies of
 
 ### 5. Platform Executable Dependencies (`BUILD.gn` files)
 
-Add the target dependency to the relevant platform builds where `all-devices-app` is built (e.g., `posix/BUILD.gn`, `silabs/BUILD.gn`, `esp32/BUILD.gn`, `telink/BUILD.gn`):
+Add the target dependency to the relevant platform builds where
+`all-devices-app` is built (e.g., `posix/BUILD.gn`, `silabs/BUILD.gn`,
+`esp32/BUILD.gn`, `telink/BUILD.gn`):
 
 ```gn
 # In the platform executable target's deps block
