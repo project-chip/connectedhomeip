@@ -88,6 +88,9 @@ class EventHandler(BaseHandler):
         if attrs.get('isFabricSensitive', "false").lower() == 'true':
             self._event.qualities |= EventQuality.FABRIC_SENSITIVE
 
+        if attrs.get('optional', "false").lower() == 'true':
+            self._event.qualities |= EventQuality.OPTIONAL
+
     def GetNextProcessor(self, name: str, attrs):
         if name.lower() == 'field':
             data_type = DataType(name=attrs['type'])
@@ -427,6 +430,9 @@ class CommandHandler(BaseHandler):
 
             if attrs.get('mustUseTimedInvoke', 'false') == 'true':
                 self._command.qualities |= CommandQuality.TIMED_INVOKE
+
+            if attrs.get('optional', 'false').lower() == 'true':
+                self._command.qualities |= CommandQuality.OPTIONAL
 
         else:
             self._struct.tag = StructTag.RESPONSE

@@ -27,7 +27,7 @@
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/GroupDataProviderImpl.h>
 #include <data-model-providers/codedriven/CodeDrivenDataModelProvider.h>
-#include <devices/device-factory/DeviceFactory.h>
+#include <device-factory/DeviceFactory.h>
 #include <devices/interface/DeviceInterface.h>
 #include <devices/root-node/RootNodeDevice.h>
 #include <platform/DeviceControlServer.h>

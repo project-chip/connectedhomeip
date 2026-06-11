@@ -33,6 +33,7 @@
 #include <system/RAIIMockClock.h>
 #include <system/SystemLayer.h>
 #include <system/SystemPacketBuffer.h>
+#include <system/SystemStats.h>
 
 #include <wifipaf/WiFiPAFError.h>
 #include <wifipaf/WiFiPAFLayer.h>
@@ -85,6 +86,8 @@ public:
     bool mResourceAvailable = true;
     bool isSendQueueNull() { return mEndPoint->mSendQueue.IsNull(); }
     uint8_t GetResourceWaitCount() { return mEndPoint->mResourceWaitCount; }
+    void EpParkAckToSend(System::PacketBufferHandle && b) { mEndPoint->mAckToSend = std::move(b); }
+    void EpClearAll() { mEndPoint->ClearAll(); }
 
 private:
     WiFiPAFEndPoint * mEndPoint;
@@ -411,5 +414,82 @@ TEST_F(TestWiFiPAFLayer, CheckRunAsCommissionee)
     EXPECT_EQ(RmPafSession(PafInfoAccess::kAccSessionId, sessionInfo), CHIP_NO_ERROR);
     EpDoClose(kWiFiPAFCloseFlag_AbortTransmission, WIFIPAF_ERROR_APP_CLOSED_CONNECTION);
 }
-}; // namespace WiFiPAF
-}; // namespace chip
+
+// kSystemLayer_NumPacketBufs only exists as a single counter when packet buffers are not the
+// custom-pool LWIP configuration (which splits the counter per pool via lwippools.h), so guard
+// these counter-based checks the same way SystemStats.h declares the entry.
+#if CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS && !(CHIP_SYSTEM_CONFIG_USE_LWIP && CHIP_SYSTEM_CONFIG_LWIP_PBUF_FROM_CUSTOM_POOL)
+// ClearAll() must release any PacketBufferHandle the endpoint still owns. Park one in a handle
+// member, then check ClearAll() returns it to the pool.
+TEST_F(TestWiFiPAFLayer, ClearAllReleasesOwnedBuffer)
+{
+    WiFiPAFSession sessionInfo = {
+        .role          = kWiFiPafRole_Subscriber,
+        .id            = 1,
+        .peer_id       = 1,
+        .peer_addr     = { 0xd0, 0x17, 0x69, 0xee, 0x7f, 0x3c },
+        .nodeId        = 1,
+        .discriminator = 0xF00,
+    };
+
+    WiFiPAFEndPoint * newEndPoint = nullptr;
+    ASSERT_EQ(NewEndPoint(&newEndPoint, sessionInfo, sessionInfo.role), CHIP_NO_ERROR);
+    ASSERT_NE(newEndPoint, nullptr);
+    SetEndPoint(newEndPoint);
+
+    auto * inUse                 = chip::System::Stats::GetResourcesInUse();
+    const int baselinePacketBufs = inUse[chip::System::Stats::kSystemLayer_NumPacketBufs];
+
+    // Park a live packet buffer in a handle member.
+    auto buf = System::PacketBufferHandle::New(kTestPacketLength);
+    ASSERT_FALSE(buf.IsNull());
+    EXPECT_GT(static_cast<int>(inUse[chip::System::Stats::kSystemLayer_NumPacketBufs]), baselinePacketBufs);
+    EpParkAckToSend(std::move(buf));
+
+    EpClearAll();
+
+    // The buffer must be back in the pool.
+    EXPECT_EQ(static_cast<int>(inUse[chip::System::Stats::kSystemLayer_NumPacketBufs]), baselinePacketBufs);
+}
+
+// A Subscriber closed with a non-fatal error reaches ClearAll() via FinalizeClose without going
+// through Free() (the endpoint is kept to signal close). A pending ack owned at that point must
+// still be released.
+TEST_F(TestWiFiPAFLayer, SubscriberNonFatalCloseReleasesPendingAck)
+{
+    WiFiPAFSession sessionInfo = {
+        .role          = kWiFiPafRole_Subscriber,
+        .id            = 1,
+        .peer_id       = 1,
+        .peer_addr     = { 0xd0, 0x17, 0x69, 0xee, 0x7f, 0x3c },
+        .nodeId        = 1,
+        .discriminator = 0xF00,
+    };
+
+    WiFiPAFEndPoint * newEndPoint = nullptr;
+    ASSERT_EQ(NewEndPoint(&newEndPoint, sessionInfo, sessionInfo.role), CHIP_NO_ERROR);
+    ASSERT_NE(newEndPoint, nullptr);
+    SetEndPoint(newEndPoint);
+    EXPECT_EQ(AddPafSession(PafInfoAccess::kAccSessionId, sessionInfo), CHIP_NO_ERROR);
+    newEndPoint->mState = WiFiPAFEndPoint::kState_Connected;
+
+    auto * inUse                 = chip::System::Stats::GetResourcesInUse();
+    const int baselinePacketBufs = inUse[chip::System::Stats::kSystemLayer_NumPacketBufs];
+
+    // A pending stand-alone ack, as if queued when the close arrives.
+    auto buf = System::PacketBufferHandle::New(kTestPacketLength);
+    ASSERT_FALSE(buf.IsNull());
+    EXPECT_GT(static_cast<int>(inUse[chip::System::Stats::kSystemLayer_NumPacketBufs]), baselinePacketBufs);
+    EpParkAckToSend(std::move(buf));
+
+    // Subscriber + non-fatal error: FinalizeClose skips Free(), then calls ClearAll().
+    EpDoClose(kWiFiPAFCloseFlag_AbortTransmission, CHIP_ERROR_INTERNAL);
+
+    // The pending ack must be back in the pool.
+    EXPECT_EQ(static_cast<int>(inUse[chip::System::Stats::kSystemLayer_NumPacketBufs]), baselinePacketBufs);
+
+    EXPECT_EQ(RmPafSession(PafInfoAccess::kAccSessionId, sessionInfo), CHIP_NO_ERROR);
+}
+#endif // CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS && !(custom-pool LWIP)
+};     // namespace WiFiPAF
+};     // namespace chip

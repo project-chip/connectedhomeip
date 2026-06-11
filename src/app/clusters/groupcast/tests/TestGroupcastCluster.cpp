@@ -588,8 +588,8 @@ TEST_F(TestGroupcastCluster, TestReadMembership)
         }
 
         // Group2: 40 endpoints from intervals 1-2
-        EndpointId group2_endpoints[2 * kMaxEndpoints];
-        for (size_t i = 0; i < 2 * kMaxEndpoints; i++)
+        EndpointId group2_endpoints[2 * static_cast<size_t>(kMaxEndpoints)];
+        for (size_t i = 0; i < 2 * static_cast<size_t>(kMaxEndpoints); i++)
         {
             group2_endpoints[i] = static_cast<EndpointId>(i + 1);
         }
@@ -598,7 +598,7 @@ TEST_F(TestGroupcastCluster, TestReadMembership)
         EndpointId group3_endpoints[8];
         for (size_t i = 0; i < 8; i++)
         {
-            group3_endpoints[i] = static_cast<EndpointId>(4 * kMaxEndpoints + i + 1);
+            group3_endpoints[i] = static_cast<EndpointId>(4 * static_cast<size_t>(kMaxEndpoints) + i + 1);
         }
 
         Clusters::Groupcast::Structs::MembershipStruct::Type expectedMembership[] = {

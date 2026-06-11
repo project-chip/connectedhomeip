@@ -17,7 +17,7 @@
 #include "DeviceFactoryPlatformOverride.h"
 #include "Esp32BleRssiRangingAdapter.h"
 
-#include <devices/device-factory/DeviceFactory.h>
+#include <device-factory/DeviceFactory.h>
 #include <devices/proximity-ranger/ProximityRangerDevice.h>
 
 namespace chip {
