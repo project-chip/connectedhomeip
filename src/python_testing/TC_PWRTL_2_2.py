@@ -26,6 +26,7 @@
 #       --discriminator 1234
 #       --KVS kvs1
 #       --trace-to json:${TRACE_APP}.json
+#     app-ready-pattern: "APP STATUS: Starting event loop"
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
@@ -68,12 +69,12 @@ class TC_PWRTL_2_2(MatterBaseTest):
         entries; list length constraint (max 50 entries) and Label field
         constraint (max 128 characters) including the CONSTRAINT_ERROR negative
         paths; Fabric-Scoped (F) per-fabric isolation (TH1/TH2); persistence
-        across DUT reboot (Non-Volatile quality); ACL-restricted access (TH3
-        View-only); and subscription reporting.
+        across DUT reboot (Non-Volatile quality); and subscription reporting.
 
-        Steps 7-14 (multi-fabric, reboot, ACL, subscription) are scaffolded
-        as self.skip_step() calls pending the test-harness primitives.
-        Steps 1-6 (single-fabric writes + constraint negatives) are
+        Steps 8-9 (TH2 fabric-isolation) and step 11 (subscription) are
+        scaffolded as self.skip_step() calls pending the test-harness
+        primitives. Steps 1-7 (single-fabric writes + constraint negatives)
+        and step 10 (reboot via self.request_device_reboot()) are
         implemented for real.
 
         Test Plan:
@@ -138,22 +139,20 @@ class TC_PWRTL_2_2(MatterBaseTest):
         self.mark_current_step_skipped()
 
         self.step(10, "Reboot DUT; TH1 reads ElectricalCircuitNodes - persisted value returned (Non-Volatile)")
-        # TODO: invoke GeneralDiagnostics.TestEventTrigger with reboot trigger,
-        # wait for DUT to come back, re-establish session, read attribute.
-        self.mark_current_step_skipped()
+        pre_reboot = await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=cluster, attribute=attr)
+        await self.request_device_reboot()
+        post_reboot = await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=cluster, attribute=attr)
+        asserts.assert_equal(len(post_reboot), len(pre_reboot),
+                             'ElectricalCircuitNodes list length must persist across reboot (Non-Volatile)')
+        # Deep-compare the Label field of the first entry as a representative
+        # check that struct contents (not just list length) survived the reboot.
+        if pre_reboot:
+            asserts.assert_equal(post_reboot[0].label, pre_reboot[0].label,
+                                 'ElectricalCircuitNodes[0].label must persist across reboot')
 
-        self.step(11, "TH1 writes ACL granting TH3 View-only privilege on this cluster")
-        # TODO: commission TH3 onto TH1's fabric, install ACL entry granting
-        # View only on this cluster.
-        self.mark_current_step_skipped()
-
-        self.step(12, "TH3 attempts to write ElectricalCircuitNodes - expect UNSUPPORTED_ACCESS")
-        self.mark_current_step_skipped()
-
-        self.step(13, "TH3 reads ElectricalCircuitNodes - expect SUCCESS (View privilege sufficient for reads)")
-        self.mark_current_step_skipped()
-
-        self.step(14, "TH1 establishes subscription; subsequently writes - subscription report reflects update")
+        self.step(11, "TH1 establishes subscription; subsequently writes - subscription report reflects update")
         # TODO: use self.default_controller.ReadAttribute with reportInterval
         # to establish subscription, then perform write and await report.
         self.mark_current_step_skipped()
