@@ -302,3 +302,6 @@ bool SmokeCoAlarmServer::SupportsCOAlarm(EndpointId endpoint) const
     VerifyOrDie(endpoint == mEndpointId);
     return SupportsCOAlarm();
 }
+
+void MatterSmokeCoAlarmPluginServerInitCallback() {}
+void MatterSmokeCoAlarmPluginServerShutdownCallback() {}
