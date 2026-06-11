@@ -45,22 +45,26 @@ model directory (e.g., `1.6`) to load.
 By default, low-level specification parsing (`spec_parsing.py`) applies **no
 errata**, ensuring pure, strict certification validation. When executing
 Interaction Data Model (IDM) tests or in-progress PR validation suites, the
-harness explicitly enables errata loading (via the `--enable-spec-errata` CLI
-flag or `spec_errata_path` configuration).
+harness explicitly enables errata loading (via the
+`--enable-spec-errata-ci-only-disallowed-for-certification` CLI flag or
+`spec_errata_path` configuration).
 
 Right after assembling base and derived clusters, the parser invokes
 `apply_errata` (from `matter.testing.data_model_errata`). This verifies that the
 active specification revision matches the YAML's compatibility list, resolves
-element names via sanitized AST maps (`attribute_map`, `command_map`) while
-actively rejecting non-sanitized raw XML names, and applies the specified
-overrides in memory.
+element names via sanitized AST maps (`_sanitize_name()` matches keys to lowercase
+structures, ensuring spaces and punctuation like `On/Off` map to clean CamelCase)
+while actively rejecting raw XML names with spaces or slashes, and applies the
+specified overrides in memory.
 
 ### Supported Overrides
 
 -   **Attributes**: `read_access`, `write_access` (Supports standard access
     privilege codes: `RV`, `RO`, `RM`, `RA`, `none`, or `view`, `operate`,
-    `manage`, `admin`).
--   **Commands**: `invoke_access` / `privilege`.
+    `manage`, `administer`).
+-   **Commands**: `invoke_access` / `privilege` (Supports standard access
+    privilege codes: `RV`, `RO`, `RM`, `RA`, `none`, or `view`, `operate`,
+    `manage`, `administer`).
 
 ## Extending Engine Capabilities (Supporting New Errata Overrides)
 
@@ -70,18 +74,17 @@ follow these steps to extend the engine core:
 
 1. **Locate the Engine Core**: Open
    `src/python_testing/matter_testing_infrastructure/matter/testing/data_model_errata.py`.
-2. **Modify Element Resolution (`apply_errata`)**:
+2. **Modify Element Resolution**:
     - For existing target types (like Attributes or Commands), locate their
-      corresponding sanitized parsing branch (e.g., `if attr_id is not None:` or
-      `if cmd_id is not None:`).
-    - Add a new dictionary lookup for your intended override key (e.g.,
-      `if 'conformance' in overrides:`).
-    - Parse the raw YAML value and directly mutate the target AST object field
+      corresponding helper functions (e.g., `_apply_attribute_errata` or
+      `_apply_command_errata`).
+    - Add a new check for your intended override key (e.g., `if 'conformance' in overrides:`).
+    - Parse the YAML value and directly mutate the target object field
       (e.g., `target_attribute.conformance = ...`).
 3. **Support New Target Element Types**:
     - If extending support to target completely new AST structures (such as
-      `events` or `structs`), insert an additional `elif event_id is not None:`
-      branch.
+      `events` or `structs`), insert an additional lookup branch in
+      `_apply_element_errata` (e.g., resolving against a sanitized event map).
     - Retrieve the target object from `target_cluster.events` and apply the
       intended alterations.
 4. **Unit Test Verification**: Always append a formal test method in
