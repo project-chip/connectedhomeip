@@ -32,22 +32,22 @@ class SmokeCoAlarmDevice : public SingleEndpointDevice
 public:
     using ConcentrationCluster = Clusters::ConcentrationMeasurement::ConcentrationMeasurementCluster;
 
-    SmokeCoAlarmDevice(TimerDelegate & timerDelegate, const ConcentrationCluster::Config & smokeConfig);
+    SmokeCoAlarmDevice(TimerDelegate & timerDelegate, const ConcentrationCluster::Config & coConfig);
     ~SmokeCoAlarmDevice() override = default;
 
     CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
                         EndpointId parentId = kInvalidEndpointId) override;
     void Unregister(CodeDrivenDataModelProvider & provider) override;
 
-    ConcentrationCluster & GetSmokeConcentCluster();
+    ConcentrationCluster & GetCoConcentrationCluster();
     Clusters::SmokeCoAlarmCluster & GetSmokeCoAlarmCluster();
     Clusters::IdentifyCluster & GetIdentifyCluster();
 
 protected:
     TimerDelegate & mTimerDelegate;
-    ConcentrationCluster::Config mSmokeConfig;
+    ConcentrationCluster::Config mCoConfig;
 
-    LazyRegisteredServerCluster<ConcentrationCluster> mSmokeMeasurementCluster;
+    LazyRegisteredServerCluster<ConcentrationCluster> mCoMeasurementCluster;
     LazyRegisteredServerCluster<Clusters::SmokeCoAlarmCluster> mSmokeCoAlarmCluster;
     LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;
 };

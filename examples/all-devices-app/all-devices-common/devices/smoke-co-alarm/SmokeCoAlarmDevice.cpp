@@ -24,9 +24,9 @@ using namespace chip::app::Clusters;
 namespace chip {
 namespace app {
 
-SmokeCoAlarmDevice::SmokeCoAlarmDevice(TimerDelegate & timerDelegate, const ConcentrationCluster::Config & smokeConfig) :
+SmokeCoAlarmDevice::SmokeCoAlarmDevice(TimerDelegate & timerDelegate, const ConcentrationCluster::Config & coConfig) :
     SingleEndpointDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kSmokeCoAlarm, 1)), mTimerDelegate(timerDelegate),
-    mSmokeConfig(smokeConfig)
+    mCoConfig(coConfig)
 {}
 
 CHIP_ERROR SmokeCoAlarmDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointId parentId)
@@ -39,8 +39,8 @@ CHIP_ERROR SmokeCoAlarmDevice::Register(chip::EndpointId endpoint, CodeDrivenDat
     mSmokeCoAlarmCluster.Create(endpoint);
     ReturnErrorOnFailure(provider.AddCluster(mSmokeCoAlarmCluster.Registration()));
 
-    mSmokeMeasurementCluster.Create(endpoint, mSmokeConfig);
-    ReturnErrorOnFailure(provider.AddCluster(mSmokeMeasurementCluster.Registration()));
+    mCoMeasurementCluster.Create(endpoint, mCoConfig);
+    ReturnErrorOnFailure(provider.AddCluster(mCoMeasurementCluster.Registration()));
 
     return provider.AddEndpoint(mEndpointRegistration);
 }
@@ -48,10 +48,10 @@ CHIP_ERROR SmokeCoAlarmDevice::Register(chip::EndpointId endpoint, CodeDrivenDat
 void SmokeCoAlarmDevice::Unregister(CodeDrivenDataModelProvider & provider)
 {
     SingleEndpointUnregistration(provider);
-    if (mSmokeMeasurementCluster.IsConstructed())
+    if (mCoMeasurementCluster.IsConstructed())
     {
-        LogErrorOnFailure(provider.RemoveCluster(&mSmokeMeasurementCluster.Cluster()));
-        mSmokeMeasurementCluster.Destroy();
+        LogErrorOnFailure(provider.RemoveCluster(&mCoMeasurementCluster.Cluster()));
+        mCoMeasurementCluster.Destroy();
     }
     if (mSmokeCoAlarmCluster.IsConstructed())
     {
@@ -65,10 +65,10 @@ void SmokeCoAlarmDevice::Unregister(CodeDrivenDataModelProvider & provider)
     }
 }
 
-SmokeCoAlarmDevice::ConcentrationCluster & SmokeCoAlarmDevice::GetSmokeConcentCluster()
+SmokeCoAlarmDevice::ConcentrationCluster & SmokeCoAlarmDevice::GetCoConcentrationCluster()
 {
-    VerifyOrDie(mSmokeMeasurementCluster.IsConstructed());
-    return mSmokeMeasurementCluster.Cluster();
+    VerifyOrDie(mCoMeasurementCluster.IsConstructed());
+    return mCoMeasurementCluster.Cluster();
 }
 Clusters::SmokeCoAlarmCluster & SmokeCoAlarmDevice::GetSmokeCoAlarmCluster()
 {
