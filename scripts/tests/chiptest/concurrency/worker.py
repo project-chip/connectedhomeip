@@ -83,10 +83,10 @@ class WorkerProcess(WrappedProcess[WorkerConfig, WorkerJob, TestResult], StartSt
         self.thread_ba_port: int | None = None
 
         # Initialize platform-specific executor.
-        self.executor = exit_stack.enter_context(executor := self._platform_init(exit_stack))
+        self.executor = self._platform_init(exit_stack)
 
         # Finalize common parts.
-        self.runner = chiptest.runner.Runner(executor)
+        self.runner = chiptest.runner.Runner(self.executor)
         self.apps_register: AppsRegister = exit_stack.enter_context(AppsRegister(self.mgmt_ns_wrapper, self._config.log_config))
 
     @abstractmethod
@@ -157,7 +157,7 @@ if sys.platform == "linux":
                         [commissioning_method.app_link_name, commissioning_method.tool_link_name],
                         "MatterAP", "MatterAPPassword", self.net_ns))
 
-            return linux.LinuxNamespacedExecutor(self.net_ns)
+            return exit_stack.enter_context(linux.LinuxNamespacedExecutor(self.net_ns))
 
     WorkerProcessCls = LinuxWorkerProcess
 
