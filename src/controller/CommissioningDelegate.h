@@ -68,20 +68,16 @@ enum CommissioningStage : uint8_t
     // NOTE: If any new steps are added between kWiFiNetworkSetup and kICDSendStayActive, double-check
     // whether the logic in AutoCommissioner::CommissioningStepFinished that checks for "network
     // failure" conditions still makes sense.
-    kWiFiNetworkSetup,            ///< Send AddOrUpdateWiFiNetwork (0x31:2) command to the device
-    kThreadNetworkSetup,          ///< Send AddOrUpdateThreadNetwork (0x31:3) command to the device
-    kFailsafeBeforeWiFiEnable,    ///< Extend the fail-safe before doing kWiFiNetworkEnable
-    kFailsafeBeforeThreadEnable,  ///< Extend the fail-safe before doing kThreadNetworkEnable
-    kWiFiNetworkEnable,           ///< Send ConnectNetwork (0x31:6) command to the device for the WiFi network
-    kThreadNetworkEnable,         ///< Send ConnectNetwork (0x31:6) command to the device for the Thread network
-    kPoweredInitialPhaseComplete, ///< Initial phase of commissioning completed for powered commissioning.
-    // kUnpoweredInitialPhaseComplete is only used if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING is set,
-    // but various tests rely on the actual values of this enum, so unconditionally define it to avoid differences
-    // in the values depending on this feature being enabled.
-    kUnpoweredInitialPhaseComplete, ///< Initial phase of commissioning completed for unpowered commissioning (NFC).
-    kEvictPreviousCaseSessions,     ///< Evict previous stale case sessions from a commissioned device with this node ID before
-    kFindOperationalForStayActive,  ///< Perform operational discovery and establish a CASE session with the device for ICD
-                                    ///< StayActive command
+    kWiFiNetworkSetup,             ///< Send AddOrUpdateWiFiNetwork (0x31:2) command to the device
+    kThreadNetworkSetup,           ///< Send AddOrUpdateThreadNetwork (0x31:3) command to the device
+    kFailsafeBeforeWiFiEnable,     ///< Extend the fail-safe before doing kWiFiNetworkEnable
+    kFailsafeBeforeThreadEnable,   ///< Extend the fail-safe before doing kThreadNetworkEnable
+    kWiFiNetworkEnable,            ///< Send ConnectNetwork (0x31:6) command to the device for the WiFi network
+    kThreadNetworkEnable,          ///< Send ConnectNetwork (0x31:6) command to the device for the Thread network
+    kInitialPhaseComplete,         ///< Initial phase of commissioning completed.
+    kEvictPreviousCaseSessions,    ///< Evict previous stale case sessions from a commissioned device with this node ID before
+    kFindOperationalForStayActive, ///< Perform operational discovery and establish a CASE session with the device for ICD
+                                   ///< StayActive command
     kFindOperationalForCommissioningComplete, ///< Perform operational discovery and establish a CASE session with the device for
                                               ///< Commissioning Complete command
     kSendComplete,                            ///< Send CommissioningComplete (0x30:4) command to the device

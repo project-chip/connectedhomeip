@@ -151,11 +151,8 @@ const char * StageToString(CommissioningStage stage)
     case kRequestThreadCredentials:
         return "RequestThreadCredentials";
 
-    case kPoweredInitialPhaseComplete:
-        return "PoweredInitialPhaseComplete";
-
-    case kUnpoweredInitialPhaseComplete:
-        return "UnpoweredInitialPhaseComplete";
+    case kInitialPhaseComplete:
+        return "InitialPhaseComplete";
 
     case kCleanup:
         return "Cleanup";
@@ -295,11 +292,8 @@ const char * MetricKeyForCommissioningStage(CommissioningStage stage)
     case kRequestThreadCredentials:
         return "core_commissioning_stage_request_thread_credentials";
 
-    case kPoweredInitialPhaseComplete:
-        return "core_commissioning_stage_powered_initial_phase";
-
-    case kUnpoweredInitialPhaseComplete:
-        return "core_commissioning_stage_unpowered_initial_phase";
+    case kInitialPhaseComplete:
+        return "core_commissioning_stage_initial_phase";
 
     case kCleanup:
         return "core_commissioning_stage_cleanup";
