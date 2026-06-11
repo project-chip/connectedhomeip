@@ -23,6 +23,7 @@
 #include <devices/boolean-state-sensor/BooleanStateSensorDevice.h>
 #include <devices/chime/ChimeDevice.h>
 #include <devices/dimmable-light/impl/LoggingDimmableLightDevice.h>
+#include <devices/fan/impl/LoggingFanDevice.h>
 #include <devices/network-infrastructure-manager/NetworkInfrastructureManagerDevice.h>
 #include <devices/occupancy-sensor/impl/TogglingOccupancySensorDevice.h>
 #include <devices/on-off-light/LoggingOnOffLightDevice.h>
@@ -210,6 +211,27 @@ private:
         if constexpr (ALL_DEVICES_ENABLE_TEMPERATURE_SENSOR)
         {
             RegisterCreator("temperature-sensor", []() { return std::make_unique<IncreasingTemperatureSensorDevice>(); });
+        }
+        if constexpr (ALL_DEVICES_ENABLE_FAN)
+        {
+            RegisterCreator("fan", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return std::make_unique<LoggingFanDevice>(LoggingFanDevice::Context{
+                    .groupDataProvider   = mContext->groupDataProvider,
+                    .fabricTable         = mContext->fabricTable,
+                    .timerDelegate       = mContext->timerDelegate,
+                    .includeOnOffCluster = true,
+                });
+            });
+            RegisterCreator("fan-no-onoff", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return std::make_unique<LoggingFanDevice>(LoggingFanDevice::Context{
+                    .groupDataProvider   = mContext->groupDataProvider,
+                    .fabricTable         = mContext->fabricTable,
+                    .timerDelegate       = mContext->timerDelegate,
+                    .includeOnOffCluster = false,
+                });
+            });
         }
 
         if constexpr (ALL_DEVICES_ENABLE_PROXIMITY_RANGER)

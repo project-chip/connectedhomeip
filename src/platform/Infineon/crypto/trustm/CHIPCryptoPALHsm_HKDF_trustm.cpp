@@ -48,12 +48,6 @@ CHIP_ERROR HKDF_sha::HKDF_SHA256(const uint8_t * secret, const size_t secret_len
     uint16_t out_length_u16    = static_cast<uint16_t>(out_length);
     uint16_t secret_length_u16 = static_cast<uint16_t>(secret_length);
 
-    if (salt_length > 64 || info_length > 80 || secret_length > 256 || out_length > 768)
-    {
-        /* Length not supported by trustm. Rollback to SW */
-        return HKDF_SHA256_H(secret, secret_length, salt, salt_length, info, info_length, out_buffer, out_length);
-    }
-
     // Salt is optional
     if (salt_length > 0)
     {
@@ -65,11 +59,19 @@ CHIP_ERROR HKDF_sha::HKDF_SHA256(const uint8_t * secret, const size_t secret_len
     VerifyOrReturnError(out_buffer != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(secret != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
+    if (salt_length > 64 || info_length > 80 || secret_length > 256 || out_length > 768)
+    {
+        /* Length not supported by trustm. Rollback to SW */
+        return HKDF_SHA256_H(secret, secret_length, salt, salt_length, info, info_length, out_buffer, out_length);
+    }
+
     // Trust M init
-    trustm_Open();
+    return_status = trustm_Open();
+    VerifyOrExit(return_status == OPTIGA_LIB_SUCCESS, error = CHIP_ERROR_INTERNAL);
 
     // Write the secret key
-    write_data(TRUSTM_HKDF_OID_KEY, secret, secret_length_u16);
+    return_status = write_data(TRUSTM_HKDF_OID_KEY, secret, secret_length_u16);
+    VerifyOrExit(return_status == OPTIGA_LIB_SUCCESS, error = CHIP_ERROR_INTERNAL);
 
     return_status = OPTIGA_LIB_BUSY;
 
@@ -81,6 +83,7 @@ CHIP_ERROR HKDF_sha::HKDF_SHA256(const uint8_t * secret, const size_t secret_len
 exit:
     if (error != CHIP_NO_ERROR)
     {
+        ClearSecretData(out_buffer, out_length);
         trustm_close();
     }
     return error;

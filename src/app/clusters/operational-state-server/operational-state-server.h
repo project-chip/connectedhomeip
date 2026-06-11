@@ -19,7 +19,7 @@
 #pragma once
 
 // Backward-compat stub — do not add new content here.
-// The cluster class lives in OperationalStateCluster.h; the delegate interfaces
+// The Instance classes live in CodegenIntegration.h; the delegate interfaces
 // live in OperationalStateDelegate.h.
-#include "OperationalStateCluster.h"
+#include "CodegenIntegration.h"
 #include "OperationalStateDelegate.h"
