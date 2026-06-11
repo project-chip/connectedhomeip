@@ -505,6 +505,9 @@ def run_tests_no_exit(
                         if commissionee is not None:
                             stored_global_wildcard = read_global_wildcard(event_loop, default_controller, node_id)
                             test_config.user_params["stored_global_wildcard"] = global_stash.stash_globally(stored_global_wildcard)
+                            # Drop the prefetch PASE session so CommissionDeviceTest (and PASE-first tests such as
+                            # TC_SC_7_1) do not compete with this controller session.
+                            default_controller.ExpireSessions(nodeId=node_id)
                         else:
                             LOGGER.error("FindOrEstablishPASESession returned None")
                     except Exception:
