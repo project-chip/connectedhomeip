@@ -33,7 +33,6 @@ CHIP_ERROR AggregatorDevice::Register(EndpointId endpoint, CodeDrivenDataModelPr
 {
     ReturnErrorOnFailure(SingleEndpointRegistration(endpoint, provider, parentId));
 
-    // Create the identify cluster.
     mIdentifyCluster.Create(IdentifyCluster::Config(endpoint, mTimerDelegate));
     ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
 
