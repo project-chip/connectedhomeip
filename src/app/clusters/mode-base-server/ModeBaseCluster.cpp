@@ -338,8 +338,8 @@ ModeBaseCluster::HandleChangeToMode(CommandHandler & commandObj, const ConcreteC
     return std::nullopt;
 }
 
-template <typename Func>
-void ModeBaseCluster::LoadScalarValue(const ConcreteAttributePath & path, Func func, const char * attributeName)
+void ModeBaseCluster::LoadScalarValue(const ConcreteAttributePath & path, const char * attributeName,
+                                      std::function<Status(const uint8_t &)> func)
 {
     uint8_t value  = 0;
     CHIP_ERROR err = mSafeAttributePersistenceProvider.ReadScalarValue(path, value);
@@ -363,8 +363,8 @@ void ModeBaseCluster::LoadScalarValue(const ConcreteAttributePath & path, Func f
     }
 }
 
-template <typename Func>
-void ModeBaseCluster::LoadNullableScalarValue(const ConcreteAttributePath & path, Func func, const char * attributeName)
+void ModeBaseCluster::LoadNullableScalarValue(const ConcreteAttributePath & path, const char * attributeName,
+                                              std::function<Status(const DataModel::Nullable<uint8_t> &)> func)
 {
     DataModel::Nullable<uint8_t> value;
     CHIP_ERROR err = mSafeAttributePersistenceProvider.ReadScalarValue(path, value);
@@ -404,14 +404,12 @@ void ModeBaseCluster::LoadNullableScalarValue(const ConcreteAttributePath & path
 
 void ModeBaseCluster::LoadPersistentAttributes()
 {
-    LoadScalarValue(
-        { mPath.mEndpointId, mPath.mClusterId, CurrentMode::Id }, [this](const auto & value) { return UpdateCurrentMode(value); },
-        "CurrentMode");
-    LoadNullableScalarValue(
-        { mPath.mEndpointId, mPath.mClusterId, StartUpMode::Id }, [this](const auto & value) { return UpdateStartUpMode(value); },
-        "StartUpMode");
-    LoadNullableScalarValue(
-        { mPath.mEndpointId, mPath.mClusterId, OnMode::Id }, [this](const auto & value) { return UpdateOnMode(value); }, "OnMode");
+    LoadScalarValue({ mPath.mEndpointId, mPath.mClusterId, CurrentMode::Id }, "CurrentMode",
+                    [this](const auto & value) { return UpdateCurrentMode(value); });
+    LoadNullableScalarValue({ mPath.mEndpointId, mPath.mClusterId, StartUpMode::Id }, "StartUpMode",
+                            [this](const auto & value) { return UpdateStartUpMode(value); });
+    LoadNullableScalarValue({ mPath.mEndpointId, mPath.mClusterId, OnMode::Id }, "OnMode",
+                            [this](const auto & value) { return UpdateOnMode(value); });
 }
 
 CHIP_ERROR ModeBaseCluster::EncodeSupportedModes(const AttributeValueEncoder::ListEncodeHelper & encoder)

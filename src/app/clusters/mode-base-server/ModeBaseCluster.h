@@ -148,20 +148,20 @@ private:
     /**
      * Helper function that loads a scalar value from the KVS.
      * @param path The path to the attribute.
-     * @param func The function to call to load the value.
      * @param attributeName The name of the attribute.
+     * @param func The function to call to update the attribute.
      */
-    template <typename Func>
-    void LoadScalarValue(const ConcreteAttributePath & path, Func func, const char * attributeName);
+    void LoadScalarValue(const ConcreteAttributePath & path, const char * attributeName,
+                         std::function<Protocols::InteractionModel::Status(const uint8_t &)> func);
 
     /**
      * Helper function that loads a nullable scalar value from the KVS.
      * @param path The path to the attribute.
-     * @param func The function to call to load the value.
      * @param attributeName The name of the attribute.
+     * @param func The function to call to update the attribute.
      */
-    template <typename Func>
-    void LoadNullableScalarValue(const ConcreteAttributePath & path, Func func, const char * attributeName);
+    void LoadNullableScalarValue(const ConcreteAttributePath & path, const char * attributeName,
+                                 std::function<Protocols::InteractionModel::Status(const DataModel::Nullable<uint8_t> &)> func);
 
     /**
      * Helper function that encodes the supported modes.
