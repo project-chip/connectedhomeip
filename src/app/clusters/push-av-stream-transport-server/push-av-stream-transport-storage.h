@@ -87,7 +87,7 @@ static constexpr size_t kMaxOneCurrentConnectionSerializedSize =
 
 // Max size for the TLV-encoded array of CurrentConnection structs
 static constexpr size_t kMaxCurrentConnectionsSerializedSize = 2 /* ArrayTlvOverhead */ +
-    (CHIP_CONFIG_MAX_FABRICS * CHIP_CONFIG_MAX_NUM_PUSH_TRANSPORTS * kMaxOneCurrentConnectionSerializedSize);
+    (static_cast<size_t>(CHIP_CONFIG_MAX_FABRICS) * CHIP_CONFIG_MAX_NUM_PUSH_TRANSPORTS * kMaxOneCurrentConnectionSerializedSize);
 
 /**
  * @brief Storage implementation for transport trigger options.
