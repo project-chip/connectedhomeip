@@ -19,12 +19,12 @@
  */
 
 /* Includes ------------------------------------------------------------------*/
-#include <stdbool.h>
 #include "rf_timing_synchro.h"
 #include "evnt_schdlr_gnrc_if.h"
 #include "flash_driver.h"
 #include "stm32_timer.h"
 #include "utilities_conf.h"
+#include <stdbool.h>
 
 /* Global variables ----------------------------------------------------------*/
 
