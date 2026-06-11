@@ -71,8 +71,10 @@ public:
      *
      * @param[in]       aes128KeyHandle   Key handle with which to decrypt the received check-in payload (using AEAD).
      * @param[in]       hmac128KeyHandle  Key handle with which to verify the received nonce in the check-in payload (using HMAC).
+     * @param[in]       startCounter      The starting ICD counter value for this client (used for counter validation).
+     * @param[in]       clientOffset      The last known counter offset for this client (used for duplicate detection).
      * @param[in]       payload           The received payload to decrypt and parse
-     * @param[out]      counter           The counter value retrieved from the payload
+     * @param[out]      offset            The counter offset from startCounter (i.e. receivedCounter - startCounter).
      *                                    If an error occurs, no value will be set.
      * @param[in,out]   appData           The optional application data decrypted. The input size of appData must be at least the
      *                                    size of GetAppDataSize(payload) + sizeof(CounterType), because appData is used as a work
@@ -82,12 +84,14 @@ public:
      *
      * @return CHIP_ERROR_INVALID_MESSAGE_LENGTH if the payload is shorter than the minimum payload size
      *         CHIP_ERROR_BUFFER_TOO_SMALL if appData buffer is too small
+     *         CHIP_ERROR_DUPLICATE_MESSAGE_RECEIVED if the counter indicates a duplicate check-in message
      *         CHIP_ERROR_INTERNAL if we were not able to decrypt or validate the Check-In message
      */
 
     static CHIP_ERROR ParseCheckinMessagePayload(const Crypto::Aes128KeyHandle & aes128KeyHandle,
-                                                 const Crypto::Hmac128KeyHandle & hmacKeyHandle, const ByteSpan & payload,
-                                                 CounterType & counter, MutableByteSpan & appData);
+                                                 const Crypto::Hmac128KeyHandle & hmacKeyHandle, CounterType startCounter,
+                                                 CounterType clientOffset, const ByteSpan & payload, CounterType & offset,
+                                                 MutableByteSpan & appData);
 
     static inline size_t GetCheckinPayloadSize(size_t appDataSize) { return appDataSize + kMinPayloadSize; }
 
