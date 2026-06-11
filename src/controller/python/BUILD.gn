@@ -416,6 +416,8 @@ pw_python_package("matter-clusters-module") {
       ]
     }
   }
+
+  python_deps = [ ":matter-core-module" ]
 }
 
 pw_python_distribution("matter-clusters") {
