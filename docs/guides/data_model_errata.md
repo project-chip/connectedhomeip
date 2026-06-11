@@ -52,10 +52,10 @@ harness explicitly enables errata loading (via the
 Right after assembling base and derived clusters, the parser invokes
 `apply_errata` (from `matter.testing.data_model_errata`). This verifies that the
 active specification revision matches the YAML's compatibility list, resolves
-element names via sanitized AST maps (`_sanitize_name()` matches keys to lowercase
-structures, ensuring spaces and punctuation like `On/Off` map to clean CamelCase)
-while actively rejecting raw XML names with spaces or slashes, and applies the
-specified overrides in memory.
+element names via sanitized AST maps (`_sanitize_name()` matches keys to
+lowercase structures, ensuring spaces and punctuation like `On/Off` map to clean
+CamelCase) while actively rejecting raw XML names with spaces or slashes, and
+applies the specified overrides in memory.
 
 ### Supported Overrides
 
@@ -78,9 +78,10 @@ follow these steps to extend the engine core:
     - For existing target types (like Attributes or Commands), locate their
       corresponding helper functions (e.g., `_apply_attribute_errata` or
       `_apply_command_errata`).
-    - Add a new check for your intended override key (e.g., `if 'conformance' in overrides:`).
-    - Parse the YAML value and directly mutate the target object field
-      (e.g., `target_attribute.conformance = ...`).
+    - Add a new check for your intended override key (e.g.,
+      `if 'conformance' in overrides:`).
+    - Parse the YAML value and directly mutate the target object field (e.g.,
+      `target_attribute.conformance = ...`).
 3. **Support New Target Element Types**:
     - If extending support to target completely new AST structures (such as
       `events` or `structs`), insert an additional lookup branch in
