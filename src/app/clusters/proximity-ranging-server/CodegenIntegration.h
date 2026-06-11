@@ -19,11 +19,13 @@
 #pragma once
 
 #include <app/clusters/proximity-ranging-server/ProximityRangingCluster.h>
-#include <app/clusters/proximity-ranging-server/ProximityRangingDriver.h>
+#include <app/clusters/proximity-ranging-server/RangingAdapter.h>
 #include <app/server-cluster/ServerClusterInterfaceRegistry.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/BitMask.h>
+#include <lib/support/Span.h>
+#include <lib/support/TimerDelegate.h>
 
 namespace chip {
 namespace app {
@@ -34,8 +36,12 @@ namespace ProximityRanging {
  * @brief Codegen integration helper for the Proximity Ranging cluster.
  *
  * Owns a single ProximityRangingCluster instance bound to an endpoint and
- * registers it with the codegen data model provider. The driver reference
- * supplied to this server must outlive the server.
+ * registers it with the codegen data model provider. The cluster owns its
+ * own ProximityRangingDriver internally; this helper just plumbs the
+ * application's TimerDelegate and adapter set into the cluster's Config.
+ *
+ * The TimerDelegate and the backing array behind the adapters span must
+ * outlive this object.
  *
  * Construction does not register the cluster; callers must invoke Init()
  * (typically from the application's post-Server::Init hook) so the cluster
@@ -45,12 +51,20 @@ class ProximityRangingServer
 {
 public:
     /**
-     * @param endpointId Endpoint hosting the Proximity Ranging cluster. Must
-     *                   match the .zap configuration.
-     * @param driver     Reference used by the cluster for all technology-specific
-     *                   operations. Must outlive this object.
+     * @param endpointId    Endpoint hosting the Proximity Ranging cluster. Must
+     *                      match the .zap configuration.
+     * @param timerDelegate Drives wall-clock scheduling inside the cluster's
+     *                      driver. Must outlive this object.
+     * @param adapters      Technology adapter set the cluster's driver routes
+     *                      ranging operations to. Each adapter is registered
+     *                      exclusively with this cluster and must not be
+     *                      registered with any other ProximityRangingCluster
+     *                      instance. The backing array must outlive this
+     *                      object.
      */
-    ProximityRangingServer(EndpointId endpointId, ProximityRangingDriver & driver) : mEndpointId(endpointId), mDriver(driver) {}
+    ProximityRangingServer(EndpointId endpointId, TimerDelegate & timerDelegate, Span<RangingAdapter * const> adapters) :
+        mEndpointId(endpointId), mTimerDelegate(timerDelegate), mAdapters(adapters)
+    {}
 
     ~ProximityRangingServer();
 
@@ -68,7 +82,8 @@ public:
 
 private:
     const EndpointId mEndpointId;
-    ProximityRangingDriver & mDriver;
+    TimerDelegate & mTimerDelegate;
+    Span<RangingAdapter * const> mAdapters;
     LazyRegisteredServerCluster<ProximityRangingCluster> mCluster;
 };
 

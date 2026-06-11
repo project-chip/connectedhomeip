@@ -36,7 +36,7 @@ CHIP_ERROR ProximityRangingServer::Init(BitMask<Feature> features)
 {
     VerifyOrReturnError(!mCluster.IsConstructed(), CHIP_ERROR_ALREADY_INITIALIZED);
 
-    mCluster.Create(mEndpointId, ProximityRangingCluster::Config(mDriver).WithFeatures(features));
+    mCluster.Create(mEndpointId, ProximityRangingCluster::Config(mTimerDelegate).WithFeatures(features).WithAdapters(mAdapters));
 
     CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(mCluster.Registration());
     if (err != CHIP_NO_ERROR)
@@ -63,10 +63,10 @@ void ProximityRangingServer::Deinit()
 } // namespace app
 } // namespace chip
 
-// The Proximity Ranging cluster requires a ProximityRangingDriver reference at
-// construction. The auto-generated init callbacks fire before the application
-// has supplied a driver, so cluster construction and registration are deferred
-// to the application via ProximityRangingServer (declared above).
+// The Proximity Ranging cluster requires a TimerDelegate and an adapter set
+// at construction. The auto-generated init callbacks fire before the
+// application has supplied either, so cluster construction and registration
+// are deferred to the application via ProximityRangingServer (declared above).
 // These callbacks are intentional no-ops.
 void MatterProximityRangingClusterInitCallback(chip::EndpointId) {}
 void MatterProximityRangingClusterShutdownCallback(chip::EndpointId, MatterClusterShutdownType) {}

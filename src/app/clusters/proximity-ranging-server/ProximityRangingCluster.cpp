@@ -183,31 +183,23 @@ ProximityRangingCluster::HandleStartRangingRequest(const DataModel::InvokeReques
     ReturnErrorOnFailure(commandData.Decode(reader));
 
     Commands::StartRangingResponse::Type response;
-    ResultCodeEnum resultCode = ValidateStartRangingRequest(commandData);
-    uint8_t sessionId         = kInvalidSessionId;
-    if (resultCode == ResultCodeEnum::kAccepted)
+    response.resultCode = ValidateStartRangingRequest(commandData);
+    response.sessionID.SetNull();
+    if (response.resultCode == ResultCodeEnum::kAccepted)
     {
-        sessionId = GenerateSessionId();
+        uint8_t sessionId = GenerateSessionId();
         if (sessionId == kInvalidSessionId)
         {
-            // Failed to generate session ID without collision
-            resultCode = ResultCodeEnum::kBusySessionCapacityReached;
+            response.resultCode = ResultCodeEnum::kBusySessionCapacityReached;
         }
         else
         {
-            resultCode = mDriver.HandleStartRanging(sessionId, commandData);
+            response.resultCode = mDriver.HandleStartRanging(sessionId, commandData);
+            if (response.resultCode == ResultCodeEnum::kAccepted)
+            {
+                response.sessionID.SetNonNull(sessionId);
+            }
         }
-    }
-
-    response.resultCode = resultCode;
-
-    if (resultCode == ResultCodeEnum::kAccepted)
-    {
-        response.sessionID.SetNonNull(sessionId);
-    }
-    else
-    {
-        response.sessionID.SetNull();
     }
 
     handler->AddResponse(request.path, response);

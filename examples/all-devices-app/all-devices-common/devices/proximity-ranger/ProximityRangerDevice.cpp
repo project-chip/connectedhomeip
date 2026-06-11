@@ -25,33 +25,23 @@ namespace chip {
 namespace app {
 namespace {
 
-ProximityRanging::ProximityRangingDriver * gDriver = nullptr;
-
-// Span over the same fixed adapter set the driver was constructed with.
-// Populated atomically with gDriver on first ProximityRangerDevice
-// construction and read by Register() to derive the cluster's feature map
-// from the adapter technologies.
+// Span over the fixed adapter set this device exposes. Populated on the
+// first ProximityRangerDevice construction (which lazily-initializes the
+// statics that back the span) and read by Register() to build the cluster
+// Config. Real radios are hardware-singletons, so this span is constructed
+// once per process and shared across every ProximityRangerDevice instance.
 Span<ProximityRanging::RangingAdapter * const> gAdapterSet;
 
 } // namespace
-
-ProximityRanging::ProximityRangingDriver & ProximityRangerDevice::GetRangingDriver()
-{
-    // The first ProximityRangerDevice constructor sets gDriver via the
-    // static initialization block below. Calling this before any
-    // ProximityRangerDevice exists is a programming error.
-    VerifyOrDie(gDriver != nullptr);
-    return *gDriver;
-}
 
 ProximityRangerDevice::ProximityRangerDevice(TimerDelegate & timerDelegate, PersistentStorageDelegate & storage) :
     SingleEndpointDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kProximityRanger, 1)), mTimerDelegate(timerDelegate)
 {
     // Function-local statics give us first-construction-wins semantics for
-    // the shared driver and its adapter set: timerDelegate and storage are
-    // captured on the first ProximityRangerDevice construction and ignored
-    // thereafter. The driver lives until process exit, so the adapters
-    // (also static) outlive it.
+    // the shared adapter set: timerDelegate and storage are captured on the
+    // first ProximityRangerDevice construction and ignored thereafter. The
+    // adapters live until process exit, matching the lifetime of the
+    // hardware radios they wrap.
     static ProximityRanging::LoggingRangingAdapter sLoggingBleAdapter(ProximityRanging::RangingTechEnum::kBLEBeaconRSSIRanging,
                                                                       timerDelegate, &storage, true);
     static ProximityRanging::LoggingRangingAdapter sLoggingWiFiAdapter(ProximityRanging::RangingTechEnum::kWiFiRoundTripTimeRanging,
@@ -63,11 +53,8 @@ ProximityRangerDevice::ProximityRangerDevice(TimerDelegate & timerDelegate, Pers
         &sLoggingWiFiAdapter,
         &sLoggingBltcsAdapter,
     };
-    static ProximityRanging::ProximityRangingDriver sDriver{ Span<ProximityRanging::RangingAdapter * const>(sAdapters),
-                                                             timerDelegate };
-    if (gDriver == nullptr)
+    if (gAdapterSet.empty())
     {
-        gDriver     = &sDriver;
         gAdapterSet = Span<ProximityRanging::RangingAdapter * const>(sAdapters);
     }
 }
@@ -104,8 +91,9 @@ CHIP_ERROR ProximityRangerDevice::Register(chip::EndpointId endpoint, CodeDriven
         }
     }
 
-    mProximityRangingCluster.Create(endpoint,
-                                    ProximityRanging::ProximityRangingCluster::Config(GetRangingDriver()).WithFeatures(features));
+    mProximityRangingCluster.Create(
+        endpoint,
+        ProximityRanging::ProximityRangingCluster::Config(mTimerDelegate).WithFeatures(features).WithAdapters(gAdapterSet));
     ReturnErrorOnFailure(provider.AddCluster(mProximityRangingCluster.Registration()));
 
     ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));

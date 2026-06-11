@@ -18,7 +18,6 @@
 
 #include <app/clusters/identify-server/IdentifyCluster.h>
 #include <app/clusters/proximity-ranging-server/ProximityRangingCluster.h>
-#include <app/clusters/proximity-ranging-server/ProximityRangingDriver.h>
 #include <devices/interface/SingleEndpointDevice.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/support/TimerDelegate.h>
@@ -30,27 +29,10 @@ class ProximityRangerDevice : public SingleEndpointDevice
 {
 public:
     /**
-     * Returns the process-wide ProximityRangingDriver shared by every
-     * ProximityRangerDevice instance. Construction of the first
-     * ProximityRangerDevice initializes the driver with a fixed set of
-     * LoggingRangingAdapters (BLE-RSSI, WiFi USD, BLT-CS); subsequent
-     * constructions reuse the same instance.
-     *
-     * Sharing a single driver across devices keeps adapter Callback
-     * registrations stable when devices are constructed and destroyed
-     * in sequence: each ProximityRangingDriver constructor registers
-     * itself as the adapter callback, so per-device drivers would
-     * alias and overwrite each other.
-     *
-     * MUST NOT be called before the first ProximityRangerDevice is
-     * constructed.
-     */
-    static Clusters::ProximityRanging::ProximityRangingDriver & GetRangingDriver();
-
-    /**
-     * The cluster's feature map is derived from the fixed adapter set in
-     * Register() (one feature bit per technology the adapters expose), so
-     * the caller does not pass features in.
+     * The cluster owns its own ProximityRangingDriver internally. The cluster's
+     * feature map is derived from the fixed adapter set this device exposes
+     * (one feature bit per technology), so the caller does not pass features
+     * in.
      */
     ProximityRangerDevice(TimerDelegate & timerDelegate, PersistentStorageDelegate & storage);
     ~ProximityRangerDevice() override = default;
