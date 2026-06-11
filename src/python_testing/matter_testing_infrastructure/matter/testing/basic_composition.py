@@ -32,6 +32,7 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 import matter.tlv
+from matter.tlv import uint
 from matter.ChipDeviceCtrl import ChipDeviceController
 from matter.clusters.Attribute import AttributeCache, ValueDecodeFailure
 from matter.MatterTlvJson import TLVJsonConverter
@@ -150,8 +151,8 @@ class BasicCompositionTests(MatterBaseTest):
     problems: list[ProblemNotice]
     endpoints: dict[int, Any]  # Wildcard read result
     endpoints_tlv: dict[int, Any]  # Wildcard read result (raw TLV)
-    xml_clusters: dict[int, XmlCluster]
-    xml_device_types: dict[int, XmlDeviceType]
+    xml_clusters: dict[uint, XmlCluster]
+    xml_device_types: dict[uint, XmlDeviceType]
 
     def dump_wildcard(self, dump_device_composition_path: typing.Optional[str]) -> tuple[str, str]:
         """ Dumps a json and a txt file of the attribute wildcard for this device if the dump_device_composition_path is supplied.
