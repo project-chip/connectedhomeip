@@ -201,7 +201,8 @@ class TestDataModelErrata(unittest.TestCase):
         }
         problems = apply_errata(clusters, errata)
         self.assertEqual(len(problems), 1)
-        self.assertIn("CRITICAL: Element name 'Simultaneous Detection Limit' in 'AmbientContextSensing' violates", problems[0].problem)
+        self.assertIn("CRITICAL: Element name 'Simultaneous Detection Limit' in 'AmbientContextSensing' violates",
+                      problems[0].problem)
 
 
 if __name__ == "__main__":

@@ -24,8 +24,8 @@ from typing import Any, Mapping, Optional
 import yaml
 
 import matter.clusters as Clusters
-from matter.testing.problem_notices import (AttributePathLocation, ClusterPathLocation, CommandPathLocation,
-                                            ProblemNotice, ProblemSeverity, UnknownProblemLocation)
+from matter.testing.problem_notices import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, ProblemNotice,
+                                            ProblemSeverity, UnknownProblemLocation)
 from matter.tlv import uint
 
 LOGGER = logging.getLogger(__name__)
