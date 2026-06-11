@@ -339,8 +339,7 @@ struct TransportOptionsStorage : public TransportOptionsStruct
         for (size_t i = 0; i < mVideoStreamsStorage.size(); i++)
         {
             mVideoStreamsStorage[i].videoStreamName =
-                CharSpan(mVideoStreamNameBuffer.data() + i * kMaxStreamNameLength,
-                         mVideoStreamsStorage[i].videoStreamName.size());
+                CharSpan(mVideoStreamNameBuffer.data() + i * kMaxStreamNameLength, mVideoStreamsStorage[i].videoStreamName.size());
         }
 
         // Rebind videoStreams list view to point to our storage
@@ -361,8 +360,7 @@ struct TransportOptionsStorage : public TransportOptionsStruct
         for (size_t i = 0; i < mAudioStreamsStorage.size(); i++)
         {
             mAudioStreamsStorage[i].audioStreamName =
-                CharSpan(mAudioStreamNameBuffer.data() + i * kMaxStreamNameLength,
-                         mAudioStreamsStorage[i].audioStreamName.size());
+                CharSpan(mAudioStreamNameBuffer.data() + i * kMaxStreamNameLength, mAudioStreamsStorage[i].audioStreamName.size());
         }
 
         // Rebind audioStreams list view to point to our storage

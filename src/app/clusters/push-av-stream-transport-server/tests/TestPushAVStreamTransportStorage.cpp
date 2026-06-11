@@ -798,7 +798,7 @@ TEST_F(TestPushAVStreamTransportStorage, TestAddVideoStreamBufferFullDefenseInDe
 
     // The 17th AddVideoStream should be silently rejected (defense-in-depth)
     Structs::VideoStreamStruct::Type extraStream;
-    std::string extraName      = "ExtraStream";
+    std::string extraName       = "ExtraStream";
     extraStream.videoStreamID   = 99;
     extraStream.videoStreamName = CharSpan(extraName.data(), extraName.size());
     transportOptionsStorage.AddVideoStream(extraStream);
@@ -837,7 +837,7 @@ TEST_F(TestPushAVStreamTransportStorage, TestAddAudioStreamBufferFullDefenseInDe
 
     // The 17th AddAudioStream should be silently rejected (defense-in-depth)
     Structs::AudioStreamStruct::Type extraStream;
-    std::string extraName      = "ExtraStream";
+    std::string extraName       = "ExtraStream";
     extraStream.audioStreamID   = 99;
     extraStream.audioStreamName = CharSpan(extraName.data(), extraName.size());
     transportOptionsStorage.AddAudioStream(extraStream);
@@ -960,7 +960,7 @@ TEST_F(TestPushAVStreamTransportStorage, TestTransportOptionsStorage_DecodableTy
 
     // Create a DecodableType transport options with 20 video streams (>kMaxVideoStreams=16)
     TransportOptionsDecodableStruct transportOptionsDecodable;
-    transportOptionsDecodable.streamUsage   = StreamUsageEnum::kAnalysis;
+    transportOptionsDecodable.streamUsage = StreamUsageEnum::kAnalysis;
     transportOptionsDecodable.videoStreamID.ClearValue();
     transportOptionsDecodable.audioStreamID.ClearValue();
     transportOptionsDecodable.TLSEndpointID = 1;
@@ -970,7 +970,7 @@ TEST_F(TestPushAVStreamTransportStorage, TestTransportOptionsStorage_DecodableTy
 
     // Create minimal valid trigger options
     TransportTriggerOptionsDecodableStruct triggerOptions;
-    triggerOptions.triggerType        = TransportTriggerTypeEnum::kCommand;
+    triggerOptions.triggerType = TransportTriggerTypeEnum::kCommand;
     triggerOptions.motionZones.ClearValue();
     triggerOptions.motionSensitivity.ClearValue();
     triggerOptions.motionTimeControl.ClearValue();
