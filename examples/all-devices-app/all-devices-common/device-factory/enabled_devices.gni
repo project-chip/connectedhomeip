@@ -13,7 +13,7 @@
 # limitations under the License.
 
 # Authoritative device-selection configuration for the GN (POSIX) build.
-# Parallel to all-devices-common/devices/enabled_devices.cmake for the CMake build.
+# Parallel to all-devices-common/device-factory/enabled_devices.cmake for the CMake build.
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 import("${chip_root}/build/chip/buildconfig_header.gni")

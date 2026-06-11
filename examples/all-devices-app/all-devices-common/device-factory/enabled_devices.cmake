@@ -16,7 +16,7 @@
 #
 
 # Authoritative device configuration for the CMake (ESP32) build.
-# Parallel to all-devices-common/devices/enabled_devices.gni for the GN build.
+# Parallel to all-devices-common/device-factory/enabled_devices.gni for the GN build.
 #
 # Callers must define ALL_DEVICES_COMMON_DIR before including this file.
 #
