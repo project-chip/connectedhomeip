@@ -782,8 +782,8 @@ class WaitForAttributeValueAction(BaseAction):
         timeout_s = (self._expected_duration_ms + self._extra_duration_ms) / 1000.0
         poll_interval_s = 0.1
 
-        LOGGER.info(f"Waiting for attribute {self._cluster}.{self._attribute_name} "
-                    f"to become {self._expected_value} (timeout: {timeout_s}s)")
+        LOGGER.info("Waiting for attribute %s.%s to become %s (timeout: %ss)",
+                    self._cluster, self._attribute_name, self._expected_value, timeout_s)
 
         while True:
             try:
@@ -795,23 +795,23 @@ class WaitForAttributeValueAction(BaseAction):
                 if not isinstance(resp, ValueDecodeFailure):
                     return_val = self._request_object(resp)
                     if return_val.value == self._expected_value:
-                        LOGGER.info(f"Attribute reached expected value {self._expected_value} "
-                                    f"after {time.monotonic() - start_time:.2f}s")
+                        LOGGER.info("Attribute reached expected value %s after %.2fs",
+                                    self._expected_value, time.monotonic() - start_time)
                         return _ActionResult(status=_ActionStatus.SUCCESS, response=None)
             except (AttributeError, NameError, TypeError):
                 # Let programming errors (bugs in our code or test definition)
                 # propagate immediately instead of timing out.
                 raise
             except (MatterInteractionModel.InteractionModelError, ChipStackError, TimeoutError, KeyError) as e:
-                LOGGER.debug(f"ReadAttribute failed during wait: {e}")
+                LOGGER.debug("ReadAttribute failed during wait: %s", e)
 
             if time.monotonic() - start_time >= timeout_s:
                 break
 
             await asyncio.sleep(poll_interval_s)
 
-        LOGGER.error(f"Timeout waiting for attribute {self._cluster}.{self._attribute_name} "
-                     f"to become {self._expected_value}")
+        LOGGER.error("Timeout waiting for attribute %s.%s to become %s",
+                     self._cluster, self._attribute_name, self._expected_value)
         return _ActionResult(status=_ActionStatus.ERROR, response=None)
 
 
