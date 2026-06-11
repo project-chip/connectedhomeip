@@ -59,6 +59,7 @@ set(ALL_DEVICES_DEVICE_SOURCES
     "${ALL_DEVICES_COMMON_DIR}/devices/soil-sensor/impl/IncreasingMoistureSoilSensorDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/speaker/SpeakerDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/speaker/impl/LoggingSpeakerDevice.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/devices/smoke-co-alarm/SmokeCoAlarmDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/temperature-sensor/TemperatureSensorDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/temperature-sensor/impl/IncreasingTemperatureSensorDevice.cpp"
     # keep-sorted: end
