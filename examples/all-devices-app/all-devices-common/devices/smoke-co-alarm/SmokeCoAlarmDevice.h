@@ -17,9 +17,9 @@
 
 #pragma once
 
-#include <app/clusters/smoke-co-alarm-server/SmokeCoAlarmCluster.h>
 #include <app/clusters/concentration-measurement-server/ConcentrationMeasurementCluster.h>
 #include <app/clusters/identify-server/IdentifyCluster.h>
+#include <app/clusters/smoke-co-alarm-server/SmokeCoAlarmCluster.h>
 #include <data-model-providers/codedriven/CodeDrivenDataModelProvider.h>
 #include <devices/interface/SingleEndpointDevice.h>
 #include <lib/support/TimerDelegate.h>

@@ -247,7 +247,6 @@ private:
         if constexpr (ALL_DEVICES_ENABLE_POWER_SOURCE)
         {
             RegisterCreator("power-source", []() { return std::make_unique<DecreasingBatteryPowerSourceDevice>(); });
-
         }
         if constexpr (ALL_DEVICES_ENABLE_SMOKE_CO_ALARM)
         {

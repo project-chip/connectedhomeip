@@ -15,8 +15,8 @@
  *    limitations under the License.
  */
 
-#include <devices/Types.h>
 #include "SmokeCoAlarmDevice.h"
+#include <devices/Types.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip::app::Clusters;
@@ -25,8 +25,8 @@ namespace chip {
 namespace app {
 
 SmokeCoAlarmDevice::SmokeCoAlarmDevice(TimerDelegate & timerDelegate, const ConcentrationCluster::Config & smokeConfig) :
-    SingleEndpointDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kSmokeCoAlarm, 1)),
-    mTimerDelegate(timerDelegate), mSmokeConfig(smokeConfig)
+    SingleEndpointDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kSmokeCoAlarm, 1)), mTimerDelegate(timerDelegate),
+    mSmokeConfig(smokeConfig)
 {}
 
 CHIP_ERROR SmokeCoAlarmDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointId parentId)
@@ -75,11 +75,11 @@ Clusters::SmokeCoAlarmCluster & SmokeCoAlarmDevice::GetSmokeCoAlarmCluster()
     VerifyOrDie(mSmokeCoAlarmCluster.IsConstructed());
     return mSmokeCoAlarmCluster.Cluster();
 }
-    Clusters::IdentifyCluster &  SmokeCoAlarmDevice::GetIdentifyCluster()
-    {
-        VerifyOrDie(mIdentifyCluster.IsConstructed());
-        return mIdentifyCluster.Cluster();
-    }
+Clusters::IdentifyCluster & SmokeCoAlarmDevice::GetIdentifyCluster()
+{
+    VerifyOrDie(mIdentifyCluster.IsConstructed());
+    return mIdentifyCluster.Cluster();
+}
 
 } // namespace app
 } // namespace chip
