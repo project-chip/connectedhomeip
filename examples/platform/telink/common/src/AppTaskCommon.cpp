@@ -45,6 +45,8 @@
 #include <data-model-providers/codegen/Instance.h>
 #endif
 
+#include <lib/support/ThreadOperationalDataset.h>
+
 #if CONFIG_BOOTLOADER_MCUBOOT
 #include <OTAUtil.h>
 #endif
@@ -188,6 +190,26 @@ void AppTaskCommon::PowerOnFactoryReset(void)
     chip::Server::GetInstance().ScheduleFactoryReset();
 }
 #endif /* CONFIG_CHIP_ENABLE_POWER_ON_FACTORY_RESET */
+
+void PowerOnNetworkCheck(void)
+{
+    Thread::OperationalDataset curDataset;
+    CHIP_ERROR err = DeviceLayer::ThreadStackMgrImpl().GetThreadProvision(curDataset);
+    bool hasDataset = (err == CHIP_NO_ERROR); // Check if stored OpenThread dataset
+
+    uint8_t fabricNum = chip::Server::GetInstance().GetFabricTable().FabricCount();
+
+    if (!hasDataset && fabricNum == 0) { // New device
+        return;
+    } else if (hasDataset && fabricNum > 0) { // Device successfully commissioned
+        return;
+    } else if (hasDataset && fabricNum == 0) {
+        ChipLogProgress(DeviceLayer, "Thread dataset exists, but matter uncommissioned\n");
+    } else {
+        ChipLogProgress(DeviceLayer, "Matter commissioned, but thread dataset lost\n");
+    }
+    chip::Server::GetInstance().ScheduleFactoryReset();
+}
 
 CHIP_ERROR AppTaskCommon::StartApp(void)
 {
@@ -341,6 +363,9 @@ CHIP_ERROR AppTaskCommon::InitCommonParts(void)
     // Note that all the initialization code should happen prior to this point to avoid data races
     // between the main and the CHIP threads.
     LogErrorOnFailure(PlatformMgr().AddEventHandler(ChipEventHandler, 0));
+
+    /* Check network state */
+    PowerOnNetworkCheck();
 
     return CHIP_NO_ERROR;
 }
