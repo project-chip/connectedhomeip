@@ -476,7 +476,7 @@ chip::Protocols::InteractionModel::Status chefRvcOperationalStateReadCallback(ch
     return ret;
 }
 
-void emberAfRvcOperationalStateClusterInitCallback(chip::EndpointId endpointId)
+void MatterRvcOperationalStateClusterInitCallback(chip::EndpointId endpointId)
 {
     VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1.
     VerifyOrDie(!gRvcOperationalStateDelegate && !gRvcOperationalStateInstance);
@@ -485,4 +485,15 @@ void emberAfRvcOperationalStateClusterInitCallback(chip::EndpointId endpointId)
     gRvcOperationalStateInstance = std::make_unique<RvcOperationalState::Instance>(gRvcOperationalStateDelegate.get(), endpointId);
     TEMPORARY_RETURN_IGNORED gRvcOperationalStateInstance->Init();
 }
+
+void MatterRvcOperationalStateClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType)
+{
+    if (gRvcOperationalStateInstance)
+    {
+        gRvcOperationalStateInstance->Shutdown();
+    }
+    gRvcOperationalStateInstance.reset();
+    gRvcOperationalStateDelegate.reset();
+}
+
 #endif // MATTER_DM_PLUGIN_RVC_OPERATIONAL_STATE_SERVER
