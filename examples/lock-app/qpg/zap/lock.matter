@@ -2420,8 +2420,8 @@ cluster DoorLock = 257 {
   }
 
   enum StatusCodeEnum : enum8 {
-    kDUPLICATE = 2 [spec_name = "DUPLICATE"];
-    kOCCUPIED = 3 [spec_name = "OCCUPIED"];
+    kDuplicate = 2;
+    kOccupied = 3;
   }
 
   enum UserStatusEnum : enum8 {

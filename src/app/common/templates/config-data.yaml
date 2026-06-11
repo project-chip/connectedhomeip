@@ -60,7 +60,6 @@ ClustersWithAttributeChangedFunctions:
     # keep-sorted start
     - Bridged Device Basic Information
     - Door Lock
-    - Fan Control
     - Pump Configuration and Control
     - Thermostat
     - Window Covering
@@ -81,7 +80,6 @@ ClustersWithPreAttributeChangeFunctions:
     # keep-sorted start
     - Door Lock
     - Energy Preference
-    - Fan Control
     - Laundry Dryer Controls
     - Laundry Washer Controls
     - Mode Select
@@ -119,6 +117,7 @@ CodeDrivenClusters:
     - Energy EVSE
     - Energy EVSE Mode
     - Ethernet Network Diagnostics
+    - Fan Control
     - Fixed Label
     - Flow Measurement
     - General Commissioning

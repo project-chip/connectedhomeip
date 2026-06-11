@@ -345,6 +345,17 @@
             "OverrunCount",
             "ClusterRevision"
         ],
+        "Fan Control": [
+            "FanMode",
+            "PercentSetting",
+            "PercentCurrent",
+            "SpeedSetting",
+            "SpeedCurrent",
+            "RockSetting",
+            "WindSetting",
+            "AirflowDirection",
+            "ClusterRevision"
+        ],
         "General Commissioning": [
             "FeatureMap",
             "ClusterRevision",

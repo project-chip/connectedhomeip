@@ -20,7 +20,7 @@
 
 #if CONFIG_CHIP_LIB_SHELL
 
-#include <devices/device-factory/DeviceFactory.h>
+#include <device-factory/DeviceFactory.h>
 #include <platform/CHIPDeviceLayer.h>
 
 #include <zephyr/shell/shell.h>
