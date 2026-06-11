@@ -156,7 +156,7 @@ ChargingTargetsMemMgr::AllocAndCopy(const DataModel::DecodableList<Structs::Char
     // NOTE: ChargingTargetsMemMgr::PrepareDaySchedule() must be called as specified in the class comments in
     // ChargingTargetsMemMgr.h before this method can be called.
 
-    VerifyOrDie(mpListOfDays[mChargingTargetSchedulesIdx] == nullptr);
+    VerifyOrReturnError(mpListOfDays[mChargingTargetSchedulesIdx] == nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     size_t numDailyChargingTargets = 0;
     ReturnErrorOnFailure(chargingTargets.ComputeSize(&numDailyChargingTargets));

@@ -280,9 +280,6 @@ CHIP_ERROR EvseTargetsDelegate::SetTargets(
         bool found                                 = false;
         uint16_t updatedChargingTargetSchedulesIdx = 0;
 
-        // Let the updatedChargingTargets object of the schedule index
-        updatedChargingTargets.PrepareDaySchedule(updatedChargingTargetSchedulesIdx);
-
         for (auto & currentChargingTargetSchedule : mChargingTargetSchedulesList)
         {
             uint8_t currentBitmask =
@@ -304,6 +301,7 @@ CHIP_ERROR EvseTargetsDelegate::SetTargets(
                 updatedBitmask = BitMask<TargetDayOfWeekBitmap>(bitmaskA);
 
                 // Copy the new chargingTargets to this schedule index
+                updatedChargingTargets.PrepareDaySchedule(updatedChargingTargetSchedulesIdx);
                 CHIP_ERROR err = updatedChargingTargets.AllocAndCopy(newChargingTargetSchedule.chargingTargets);
                 if (err != CHIP_NO_ERROR)
                 {
@@ -320,6 +318,7 @@ CHIP_ERROR EvseTargetsDelegate::SetTargets(
                 updatedBitmask = BitMask<TargetDayOfWeekBitmap>(bitmaskB);
 
                 // Copy the existing chargingTargets
+                updatedChargingTargets.PrepareDaySchedule(updatedChargingTargetSchedulesIdx);
                 CHIP_ERROR err = updatedChargingTargets.AllocAndCopy(currentChargingTargetSchedule.chargingTargets);
                 if (err != CHIP_NO_ERROR)
                 {
@@ -338,15 +337,13 @@ CHIP_ERROR EvseTargetsDelegate::SetTargets(
 
             // Going to look at the next schedule entry
             updatedChargingTargetSchedulesIdx++;
-
-            // Let the updatedChargingTargets object of the schedule index
-            updatedChargingTargets.PrepareDaySchedule(updatedChargingTargetSchedulesIdx);
         }
 
         // If found is false, then there were no existing entries for the dayOfWeekForSequence. Add a new entry
         if (!found)
         {
             // Copy the new chargingTargets
+            updatedChargingTargets.PrepareDaySchedule(updatedChargingTargetSchedulesIdx);
             CHIP_ERROR err = updatedChargingTargets.AllocAndCopy(newChargingTargetSchedule.chargingTargets);
             if (err != CHIP_NO_ERROR)
             {
@@ -364,9 +361,6 @@ CHIP_ERROR EvseTargetsDelegate::SetTargets(
 
             // We've added a new schedule entry
             updatedChargingTargetSchedulesIdx++;
-
-            // Let the updatedChargingTargets object of the schedule index
-            updatedChargingTargets.PrepareDaySchedule(updatedChargingTargetSchedulesIdx);
         }
 
         // Now create the full Target data structure that we are going to save to persistent storage
