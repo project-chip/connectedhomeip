@@ -3870,9 +3870,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         CommissioningStageComplete(CHIP_NO_ERROR);
         return;
     }
-    case CommissioningStage::kUnpoweredInitialPhaseComplete:
-        FALLTHROUGH;
-    case CommissioningStage::kPoweredInitialPhaseComplete:
+    case CommissioningStage::kInitialPhaseComplete:
         CommissioningInitialPhaseComplete(proxy);
         return;
     case CommissioningStage::kFindOperationalForStayActive:
@@ -4050,32 +4048,17 @@ bool DeviceCommissioner::HasValidCommissioningMode(const Dnssd::CommissionNodeDa
     return true;
 }
 
-static bool IsInitialPhaseComplete(const CommissioningStage step, bool & isUnpowered)
-{
-#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
-    if (step == CommissioningStage::kUnpoweredInitialPhaseComplete)
-    {
-        isUnpowered = true;
-        return true;
-    }
-#else
-    VerifyOrDie(step != CommissioningStage::kUnpoweredInitialPhaseComplete);
-#endif
-    isUnpowered = false;
-    return step == CommissioningStage::kPoweredInitialPhaseComplete;
-}
-
 void DeviceCommissioner::CommissioningInitialPhaseComplete(DeviceProxy * proxy)
 {
-    bool isUnpowered;
-    VerifyOrDie(IsInitialPhaseComplete(mCommissioningStage, isUnpowered));
+    VerifyOrDie(mCommissioningStage == kInitialPhaseComplete);
 
     ChipLogProgress(Controller, "Completed initial phase of commissioning");
     if (mPairingDelegate != nullptr)
     {
         mPairingDelegate->OnInitialPhaseComplete(
             PeerId(GetCompressedFabricId(), proxy->GetDeviceId()),
-            proxy->GetSecureSession().Value()->AsSecureSession()->GetPeerAddress().GetTransportType(), isUnpowered);
+            proxy->GetSecureSession().Value()->AsSecureSession()->GetPeerAddress().GetTransportType(),
+            mAutoCommissioner.IsCommissioningWithoutPower());
     }
     CommissioningStageComplete(CHIP_NO_ERROR);
 }

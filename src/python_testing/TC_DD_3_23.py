@@ -20,7 +20,8 @@ import logging
 from mobly import asserts
 
 import matter.testing.nfc
-from matter.ChipDeviceCtrl import _DevicePairingDelegate_OnCommissioningStageStartFunct
+from matter.ChipDeviceCtrl import (_DevicePairingDelegate_OnCommissioningStageStartFunct,
+                                   _DevicePairingDelegate_OnInitialPhaseCompleteFunct)
 from matter.setup_payload import SetupPayload
 from matter.testing.decorators import async_test_body
 from matter.testing.matter_testing import MatterBaseTest, TestStep
@@ -43,8 +44,9 @@ class TC_DD_3_23(MatterBaseTest):
         super().setup_test()
 
         # Booleans to detect some commissioner stages
-        self.unpowered_phase_complete_seen: bool = False
+        self.initial_phase_complete_seen: bool = False
         self.send_complete_seen: bool = False
+        self.initial_phase_unpowered: bool = False
 
         # Filled at runtime
         self.commissionee_node_id = 0
@@ -60,10 +62,6 @@ class TC_DD_3_23(MatterBaseTest):
 
             self.commissionee_node_id = node_id
 
-            if stage == "UnpoweredPhaseComplete":
-                log.info("Detected 'UnpoweredPhaseComplete' commissioning stage")
-                self.unpowered_phase_complete_seen = True
-
             if stage == "SendComplete":
                 log.info("Detected 'SendComplete' commissioning stage")
                 self.send_complete_seen = True
@@ -72,6 +70,19 @@ class TC_DD_3_23(MatterBaseTest):
             _stage_start_listener
         )
         self.default_controller.setCommissioningStageStartCallback(self._commissioning_stage_start_callback)
+
+        def _initial_phase_complete_listener(node_id: int, transport_type: str, unpowered: bool):
+            log.info(
+                "[_initial_phase_complete_listener] node=0x%X, transport_type=%s, unpowered=%s",
+                node_id, transport_type, unpowered)
+
+            self.initial_phase_complete_seen = True
+            self.initial_phase_unpowered = unpowered
+
+        self._commissioning_initial_phase_complete_callback = _DevicePairingDelegate_OnInitialPhaseCompleteFunct(
+            _initial_phase_complete_listener
+        )
+        self.default_controller.setInitialPhaseCompleteCallback(self._commissioning_initial_phase_complete_callback)
 
     @async_test_body
     async def test_TC_DD_3_23(self):
@@ -109,7 +120,8 @@ class TC_DD_3_23(MatterBaseTest):
         commissioning_success = await self.commission_devices()
         asserts.assert_true(commissioning_success, "Device Commissioning using nfc transport has failed")
 
-        asserts.assert_false(self.unpowered_phase_complete_seen, "Stage 'UnpoweredPhaseComplete' was seen which is not expected!")
+        asserts.assert_true(self.initial_phase_complete_seen, "Stage 'InitialPhaseComplete' was seen which is not expected!")
+        asserts.assert_false(self.initial_phase_unpowered, "Stage 'InitialPhaseComplete' was seen which is not expected!")
         asserts.assert_true(self.send_complete_seen, "Stage 'send_complete_seen' was not seen!")
 
 

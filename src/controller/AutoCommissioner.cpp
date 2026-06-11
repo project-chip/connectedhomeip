@@ -481,7 +481,7 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
         {
             return CommissioningStage::kCleanup;
         }
-        return GetInitialPhaseCompleteStage();
+        return kInitialPhaseComplete;
     case CommissioningStage::kScanNetworks:
     case CommissioningStage::kRequestWiFiCredentials:
     case CommissioningStage::kRequestThreadCredentials:
@@ -503,17 +503,20 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
             return CommissioningStage::kCleanup;
         }
         SetCASEFailsafeTimerIfNeeded();
-        return GetInitialPhaseCompleteStage();
+        return kInitialPhaseComplete;
     case CommissioningStage::kThreadNetworkEnable:
         SetCASEFailsafeTimerIfNeeded();
         if (mParams.GetSkipCommissioningComplete().ValueOr(false))
         {
             return CommissioningStage::kCleanup;
         }
-        return GetInitialPhaseCompleteStage();
-    case CommissioningStage::kUnpoweredInitialPhaseComplete:
-        return CommissioningStage::kCleanup; // End commissioning (initial phase)
-    case CommissioningStage::kPoweredInitialPhaseComplete:
+        return kInitialPhaseComplete;
+    case CommissioningStage::kInitialPhaseComplete:
+        if (IsCommissioningWithoutPower())
+        {
+            // Cleanup, the setup phase will happen after discovery of the device on the operational network.
+            return CommissioningStage::kCleanup;
+        }
         return CommissioningStage::kEvictPreviousCaseSessions;
     case CommissioningStage::kEvictPreviousCaseSessions:
         return CommissioningStage::kFindOperationalForStayActive;

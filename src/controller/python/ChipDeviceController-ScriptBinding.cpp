@@ -237,6 +237,10 @@ PyChipError
 pychip_ScriptDevicePairingDelegate_SetFabricCheckCallback(chip::Controller::ScriptDevicePairingDelegate * pairingDelegate,
                                                           chip::Controller::DevicePairingDelegate_OnFabricCheckFunct callback);
 
+PyChipError pychip_ScriptDevicePairingDelegate_SetInitialPhaseCompleteCallback(
+    chip::Controller::ScriptDevicePairingDelegate * pairingDelegate,
+    chip::Controller::DevicePairingDelegate_OnInitialPhaseCompleteFunct callback);
+
 PyChipError pychip_ScriptDevicePairingDelegate_SetOpenWindowCompleteCallback(
     chip::Controller::ScriptDevicePairingDelegate * pairingDelegate,
     chip::Controller::DevicePairingDelegate_OnWindowOpenCompleteFunct callback);
@@ -1007,6 +1011,14 @@ pychip_ScriptDevicePairingDelegate_SetFabricCheckCallback(chip::Controller::Scri
                                                           chip::Controller::DevicePairingDelegate_OnFabricCheckFunct callback)
 {
     pairingDelegate->SetFabricCheckCallback(callback);
+    return ToPyChipError(CHIP_NO_ERROR);
+}
+
+PyChipError pychip_ScriptDevicePairingDelegate_SetInitialPhaseCompleteCallback(
+    chip::Controller::ScriptDevicePairingDelegate * pairingDelegate,
+    chip::Controller::DevicePairingDelegate_OnInitialPhaseCompleteFunct callback)
+{
+    pairingDelegate->SetInitialPhaseCompleteCallback(callback);
     return ToPyChipError(CHIP_NO_ERROR);
 }
 
