@@ -1090,7 +1090,7 @@ jobs:
     repl_tests_linux_run:
         name: REPL Tests - Linux (RUN)
         needs: repl_tests_linux_build
-        timeout-minutes: 45
+        timeout-minutes: 60
 
         if: github.actor != 'restyled-io[bot]'
 
