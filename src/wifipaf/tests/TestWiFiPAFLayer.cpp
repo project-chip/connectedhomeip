@@ -488,5 +488,5 @@ TEST_F(TestWiFiPAFLayer, SubscriberNonFatalCloseReleasesPendingAck)
     EXPECT_EQ(RmPafSession(PafInfoAccess::kAccSessionId, sessionInfo), CHIP_NO_ERROR);
 }
 #endif // CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS
-}; // namespace WiFiPAF
-}; // namespace chip
+};     // namespace WiFiPAF
+};     // namespace chip
