@@ -66,6 +66,13 @@ nonce = random.randbytes(32)
 
 
 class TC_CADMIN(CADMINBaseTest):
+    # Opt out of the framework background subscription: it joins the existing fabric as a
+    # second operational node (controller_node_id + 123456), which adds a second operational
+    # mDNS SRV record per fabric. Combined with the fabrics this test commissions, that pushes
+    # minimal-mDNS past its parser limit, truncating responses and causing address resolution
+    # to time out, a false failure unrelated to the behavior under test.
+    disable_wildcard_subscription = True
+
     async def combined_commission_val_steps(self, commission_type: str):
         """
         Combined test function for commissioning tests.

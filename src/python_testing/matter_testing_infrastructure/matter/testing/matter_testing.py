@@ -747,6 +747,23 @@ class MatterBaseTest(base_test.BaseTestClass):
                 LOGGER.info("[MatterBaseTest] Subscription controller created "
                             "(node_id=0x%016X)", subscription_node_id)
 
+                # NewController fired _new_controller_hook synchronously, which registered
+                # this controller AND its certificate authority for generic cleanup in
+                # _shutdown_extra_controllers.  That CA is the SHARED default CA
+                # (activeCaList[0]) the default controller also uses; removing it from
+                # admin_storage.json corrupts fabric state for any subsequent
+                # --no-factory-reset run, which then finds no CA in storage, mints a new one
+                # with a different root key, and can no longer resolve the DUT it commissioned
+                # under the original fabric.  The subscription controller is shut down
+                # explicitly in teardown_class, so untrack it here and make sure the shared CA
+                # is never scheduled for removal.
+                self.subscription_controller._skip_cleanup_tracking = True
+                if self.subscription_controller in self._extra_controllers:
+                    self._extra_controllers.remove(self.subscription_controller)
+                sub_ca = self.subscription_controller.fabricAdmin.certificateAuthority
+                if sub_ca in self._extra_cas:
+                    self._extra_cas.remove(sub_ca)
+
             # Snapshot the current ACL, then append an Administer entry for the subscription
             # controller.  teardown_test will restore from this snapshot after every test.
             acl_result = await self.default_controller.ReadAttribute(
@@ -942,7 +959,23 @@ class MatterBaseTest(base_test.BaseTestClass):
         # Shut down each CA and remove it from the manager's active list and from
         # persistent storage (caList in admin_storage.json) directly.
         mgr = self.certificate_authority_manager
+
+        # Never tear down the CA the default controller depends on. Removing it from
+        # admin_storage.json corrupts fabric state for subsequent --no-factory-reset runs,
+        # which then mint a fresh CA with a new root key and can no longer resolve a DUT
+        # commissioned under the original fabric.
+        default_ca = None
+        try:
+            default_ctrl = self.default_controller
+            if default_ctrl is not None and default_ctrl.fabricAdmin is not None:
+                default_ca = default_ctrl.fabricAdmin.certificateAuthority
+        except Exception:
+            default_ca = None
+
         for ca in self._extra_cas:
+            if ca is default_ca:
+                LOGGER.info("[CLN] skipping shared default CA index %d (still in use)", ca.caIndex)
+                continue
             try:
                 LOGGER.info("[CLN] shutting down CA index %d", ca.caIndex)
                 ca.Shutdown()
