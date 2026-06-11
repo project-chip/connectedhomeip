@@ -254,7 +254,7 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
     //
     // Legend that can be used to decode this log line can be found in README.md
     //
-    ChipLogProgress(
+    ChipLogDetail(
         ExchangeManager,
         ">>> [E:" ChipLogFormatExchangeId " S:%u M:" ChipLogFormatMessageCounter "%s] (%s) Msg RX %s --- Type %s (%s:%s) (B:%u)",
         ChipLogValueExchangeIdFromReceivedHeader(payloadHeader), session->SessionIdForLogging(), packetHeader.GetMessageCounter(),
