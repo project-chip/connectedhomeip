@@ -32,7 +32,6 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 import matter.tlv
-from matter.tlv import uint
 from matter.ChipDeviceCtrl import ChipDeviceController
 from matter.clusters.Attribute import AttributeCache, ValueDecodeFailure
 from matter.MatterTlvJson import TLVJsonConverter
@@ -42,6 +41,7 @@ from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.problem_notices import ProblemNotice
 from matter.testing.spec_parsing import (PrebuiltDataModelDirectory, XmlCluster, XmlDeviceType, build_xml_clusters,
                                          build_xml_device_types, dm_from_spec_version)
+from matter.tlv import uint
 
 LOGGER = logging.getLogger(__name__)
 
