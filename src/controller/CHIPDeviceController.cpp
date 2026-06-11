@@ -919,7 +919,9 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
                             params.GetPeerAddress().GetRemoteId());
             mRendezvousParametersForDeviceDiscoveredOverWiFiPAF = params;
             auto nodeId                                         = params.GetPeerAddress().GetRemoteId();
-            const SetupDiscriminator connDiscriminator(params.GetSetupDiscriminator().value());
+            auto setupDiscriminator                             = params.GetSetupDiscriminator();
+            VerifyOrExit(setupDiscriminator.has_value(), err = CHIP_ERROR_INVALID_ARGUMENT);
+            const SetupDiscriminator connDiscriminator(setupDiscriminator.value());
             VerifyOrReturnValue(!connDiscriminator.IsShortDiscriminator(), CHIP_ERROR_INVALID_ARGUMENT,
                                 ChipLogError(Controller, "Error, Long discriminator is required"));
             uint16_t discriminator              = connDiscriminator.GetLongValue();
