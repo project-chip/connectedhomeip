@@ -75,7 +75,7 @@ def verify_mode_tag_in_supported_modes(supported_modes, mode_value, expected_tag
     for entry in supported_modes:
         if entry.mode == mode_value:
             tag_values = [tag.value for tag in entry.modeTags]
-            log.info(f"Matched SupportedMode entry: {entry}, ModeTags: {tag_values}")
+            log.info("Matched SupportedMode entry: %s, ModeTags: %s", entry, tag_values)
             asserts.assert_in(expected_tag.value, tag_values,
                               f"Expected ModeTag '{expected_tag.name}' (0x{expected_tag.value:04x}) not found in ModeTags: {tag_values}")
             return
@@ -198,7 +198,7 @@ class TC_RVCOPSTATE_2_5(MatterBaseTest):
             self.step("3")
             supported_run_modes_dut = await self.read_supported_mode(endpoint=self.endpoint)
             # Logging the SupportedModes Attribute output responses from the DUT:
-            log.info("SupportedModes: %s" % (supported_run_modes_dut))
+            log.info("SupportedModes: %s", supported_run_modes_dut)
             # As per SPEC, the SupportedModes must have at least two entries
             asserts.assert_greater_equal(len(supported_run_modes_dut), 2, "SupportedModes must have at least two entries!")
 
@@ -240,7 +240,7 @@ class TC_RVCOPSTATE_2_5(MatterBaseTest):
             self.step("7")
             cleaning_run_mode_dut = await self.read_current_mode_with_check(cleaning_mode, endpoint=self.endpoint)
             # Logging the CurrentMode Attribute output responses from the DUT:
-            log.info(f"CurrentMode: {cleaning_run_mode_dut}")
+            log.info("CurrentMode: %s", cleaning_run_mode_dut)
             verify_mode_tag_in_supported_modes(supported_run_modes_dut, cleaning_run_mode_dut,
                                                Clusters.RvcRunMode.Enums.ModeTag.kCleaning)
 
@@ -268,7 +268,7 @@ class TC_RVCOPSTATE_2_5(MatterBaseTest):
             self.step("10")
             post_docking_run_mode_dut = await self.read_current_mode_with_check(expected_mode=idle_mode, endpoint=self.endpoint)
             # Logging the CurrentMode Attribute output responses from the DUT:
-            log.info(f"CurrentMode: {post_docking_run_mode_dut}")
+            log.info("CurrentMode: %s", post_docking_run_mode_dut)
             verify_mode_tag_in_supported_modes(supported_run_modes_dut, post_docking_run_mode_dut,
                                                Clusters.RvcRunMode.Enums.ModeTag.kIdle)
 

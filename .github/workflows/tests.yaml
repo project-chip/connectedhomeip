@@ -61,7 +61,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: ghcr.io/project-chip/chip-build:194
+            image: ghcr.io/project-chip/chip-build:200
             options: >-
                 --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
@@ -72,14 +72,14 @@ jobs:
                 echo "TSAN_OPTIONS=halt_on_error=1 suppressions=${GITHUB_WORKSPACE}/scripts/tests/chiptest/tsan-linux-suppressions.txt" >> $GITHUB_ENV
                 echo "CCACHE_DIR=${GITHUB_WORKSPACE}/.ccache" >> $GITHUB_ENV
             - name: Checkout
-              uses: actions/checkout@v6.0.2
+              uses: actions/checkout@v6.0.3
             # To use act like:
             #   act -j test_suites_linux
             #
             # Note you likely still need to have non submodules setup for the
             # local machine, like:
             #   git submodule deinit --all
-            - uses: actions/checkout@v6.0.2
+            - uses: actions/checkout@v6.0.3
               if: ${{ env.ACT }}
               name: Checkout (ACT for local build)
             - name: Checkout submodules & Bootstrap
@@ -124,6 +124,8 @@ jobs:
                       --log-level info \
                       src/app/zap-templates/zcl/data-model/chip/global-attributes.xml \
                       src/app/zap-templates/zcl/data-model/chip/ambient-context-sensing-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/ambient-sensing-union-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/av-analysis-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/boolean-state-configuration-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/bridged-device-basic-information-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/chime-cluster.xml \
@@ -132,6 +134,8 @@ jobs:
                       src/app/zap-templates/zcl/data-model/chip/commodity-metering-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/commodity-price-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/commodity-tariff-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/electrical-distribution-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/electrical-protection-alarm-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/global-bitmaps.xml \
                       src/app/zap-templates/zcl/data-model/chip/global-enums.xml \
                       src/app/zap-templates/zcl/data-model/chip/global-structs.xml \
@@ -140,6 +144,8 @@ jobs:
                       src/app/zap-templates/zcl/data-model/chip/icd-management-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/meter-identification-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/network-identity-management-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/ota-provider-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/ota-requestor-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/proximity-ranging-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/push-av-stream-transport-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/semantic-tag-namespace-enums.xml \
@@ -158,7 +164,6 @@ jobs:
                       src/app/zap-templates/zcl/data-model/chip/actions-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/camera-av-settings-user-level-management-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/camera-av-stream-management-cluster.xml \
-                      src/app/zap-templates/zcl/data-model/chip/chip-ota.xml \
                       src/app/zap-templates/zcl/data-model/chip/chip-types.xml \
                       src/app/zap-templates/zcl/data-model/chip/channel-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/clusters-extensions.xml \
@@ -246,7 +251,6 @@ jobs:
                       src/app/zap-templates/zcl/data-model/chip/thread-network-directory-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/time-format-localization-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/time-synchronization-cluster.xml \
-                      src/app/zap-templates/zcl/data-model/chip/timer-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/tls-certificate-management-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/tls-client-management-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/user-label-cluster.xml \
@@ -562,10 +566,11 @@ jobs:
               run: |
                   for f in test-summaries/*.json; do
                       [ -f "$f" ] || continue
+                      [[ "$f" == *"purposeful-failures"* ]] && continue
                       echo ""
                       echo ">>> $f"
                       ./scripts/run_in_build_env.sh \
-                        "scripts/tests/run_test_suite.py summarize --summary-file $f" || true
+                        "scripts/tests/run_test_suite.py summarize --summary-file $f --compact-failures-file test-summaries/compact-failures.txt" || true
                   done
             - name: Upload test run summaries
               uses: actions/upload-artifact@v7
@@ -606,6 +611,14 @@ jobs:
                   path: .ccache
                   key: ${{ env.CCACHE_KEY }}
 
+            - name: Notify Slack on Failure
+              if: failure()
+              uses: ./.github/actions/notify-slack-failure
+              with:
+                slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}
+                job-name: "Test Suites - Linux"
+                job-details: "${{ matrix.build_variant }}"
+                extra-details-file: "test-summaries/compact-failures.txt"
     test_suites_darwin:
         name: Test Suites - Darwin
 
@@ -634,7 +647,7 @@ jobs:
               run: |
                 echo "CCACHE_DIR=${GITHUB_WORKSPACE}/.ccache" >> $GITHUB_ENV
             - name: Checkout
-              uses: actions/checkout@v6.0.2
+              uses: actions/checkout@v6.0.3
             - name: Setup Environment
               # coreutils for stdbuf; gnubin is needed because newer coreutils only exposes 'stdbuf' under libexec/gnubin
               run: |
@@ -757,10 +770,11 @@ jobs:
               run: |
                   for f in test-summaries/*.json; do
                       [ -f "$f" ] || continue
+                      [[ "$f" == *"purposeful-failures"* ]] && continue
                       echo ""
                       echo ">>> $f"
                       ./scripts/run_in_build_env.sh \
-                        "scripts/tests/run_test_suite.py summarize --summary-file $f" || true
+                        "scripts/tests/run_test_suite.py summarize --summary-file $f --compact-failures-file test-summaries/compact-failures.txt" || true
                   done
             - name: Upload test run summaries
               uses: actions/upload-artifact@v7
@@ -807,6 +821,14 @@ jobs:
                   path: .ccache
                   key: ${{ env.CCACHE_KEY }}
 
+            - name: Notify Slack on Failure
+              if: failure()
+              uses: ./.github/actions/notify-slack-failure
+              with:
+                slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}
+                job-name: "Test Suites - Darwin"
+                job-details: "${{ matrix.os }}, ${{ matrix.arch }}, ${{ matrix.build_variant }}"
+                extra-details-file: "test-summaries/compact-failures.txt"
     repl_tests_linux_build:
         name: REPL Tests - Linux (BUILD)
 
@@ -822,7 +844,7 @@ jobs:
         runs-on: namespace-profile-16x32
 
         container:
-            image: ghcr.io/project-chip/chip-build:194
+            image: ghcr.io/project-chip/chip-build:200
             volumes:
                 - /var/run/nsc/:/var/run/nsc/
             env:
@@ -842,7 +864,7 @@ jobs:
                 echo "TSAN_OPTIONS=halt_on_error=1 suppressions=${GITHUB_WORKSPACE}/scripts/tests/chiptest/tsan-linux-suppressions.txt" >> $GITHUB_ENV
                 echo "CCACHE_DIR=${GITHUB_WORKSPACE}/.ccache" >> $GITHUB_ENV
             - name: Checkout
-              uses: actions/checkout@v6.0.2
+              uses: actions/checkout@v6.0.3
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
@@ -1058,6 +1080,13 @@ jobs:
                   path: .ccache
                   key: ${{ env.CCACHE_KEY }}
 
+            - name: Notify Slack on Failure
+              if: failure()
+              uses: ./.github/actions/notify-slack-failure
+              with:
+                slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}
+                job-name: "REPL Tests - Linux (BUILD)"
+                job-details: "${{ matrix.build_variant }}"
     repl_tests_linux_run:
         name: REPL Tests - Linux (RUN)
         needs: repl_tests_linux_build
@@ -1092,7 +1121,7 @@ jobs:
         runs-on: namespace-profile-1x2
 
         container:
-            image: ghcr.io/project-chip/chip-build:194
+            image: ghcr.io/project-chip/chip-build:200
             volumes:
                 - /var/run/nsc/:/var/run/nsc/
             env:
@@ -1111,7 +1140,7 @@ jobs:
               run: |
                 echo "TSAN_OPTIONS=halt_on_error=1 suppressions=${GITHUB_WORKSPACE}/scripts/tests/chiptest/tsan-linux-suppressions.txt" >> $GITHUB_ENV
             - name: Checkout
-              uses: actions/checkout@v6.0.2
+              uses: actions/checkout@v6.0.3
 
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
@@ -1130,9 +1159,14 @@ jobs:
               with:
                 name: repl-build-data
 
-            - name: Unpack artifacts
-              run: |
-                tar xfJ repl-build-data.tar.xz
+            # OverlayFS (Docker container storage) layer copy-up occasionally causes
+            # "Directory renamed before its status could be extracted" during rapid unpack.
+            - uses: Wandalen/wretry.action@e68c23e6309f2871ca8ae4763e7629b9c258e1ea # v3.8.0
+              name: Unpack artifacts
+              with:
+                  command: tar xfJ repl-build-data.tar.xz
+                  attempt_limit: 3
+                  attempt_delay: 2000
 
             - name: Generate an argument environment file
               run: |
@@ -1220,7 +1254,7 @@ jobs:
               run: |
                   [ -f test-summaries/python-tests.json ] && \
                     scripts/run_in_python_env.sh out/venv \
-                      'src/python_testing/execute_python_tests.py summarize --summary-file test-summaries/python-tests.json' || true
+                      'src/python_testing/execute_python_tests.py summarize --summary-file test-summaries/python-tests.json --compact-failures-file test-summaries/compact-failures.txt' || true
             - name: Upload python test summary
               uses: actions/upload-artifact@v7
               if: ${{ matrix.filter != '' && always() }}
@@ -1274,6 +1308,14 @@ jobs:
             #     duration: 30m
             #     authorized-users: andy31415
     # TODO, factor out this job and the one in nightly.yaml into a separate action that can be called
+            - name: Notify Slack on Failure
+              if: failure()
+              uses: ./.github/actions/notify-slack-failure
+              with:
+                slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}
+                job-name: "REPL Tests - Linux (RUN)"
+                job-details: "${{ matrix.filter }}"
+                extra-details-file: "test-summaries/compact-failures.txt"
     repl_tests_linux_report:
       name: REPL Tests - Linux (REPORT RESULTS)
       needs: repl_tests_linux_run
@@ -1281,7 +1323,7 @@ jobs:
 
       runs-on: ubuntu-latest
       concurrency:
-          group: gh-pages-deploy
+          group: ${{ github.event_name == 'pull_request' && format('gh-pages-report-{0}', github.run_id) || 'gh-pages-deploy' }}
           cancel-in-progress: false
       permissions:
           contents: write
@@ -1289,7 +1331,7 @@ jobs:
 
       steps:
           - name: Checkout
-            uses: actions/checkout@v6.0.2
+            uses: actions/checkout@v6.0.3
 
           - name: Download all JUnit XML results
             uses: actions/download-artifact@v8
@@ -1307,13 +1349,13 @@ jobs:
                 annotate_only: true
 
           - name: Checkout gh-pages for Allure history
-            uses: actions/checkout@v6.0.2
+            uses: actions/checkout@v6.0.3
             with:
                 ref: gh-pages
                 path: gh-pages
 
           - name: Generate Allure Report
-            uses: simple-elf/allure-report-action@v1.13
+            uses: simple-elf/allure-report-action@v1.14
             with:
                 allure_results: junit-results
                 allure_report: allure-report
@@ -1341,6 +1383,12 @@ jobs:
                 destination_dir: allure-report/ci_tests
                 keep_files: true
 
+          - name: Notify Slack on Failure
+            if: failure()
+            uses: ./.github/actions/notify-slack-failure
+            with:
+              slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}
+              job-name: "Deploy to GitHub Pages"
     repl_tests_darwin:
         name: REPL Tests - Darwin (Build Only)
         strategy:
@@ -1364,7 +1412,7 @@ jobs:
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v6.0.2
+              uses: actions/checkout@v6.0.3
             - name: Setup Environment
               # coreutils for stdbuf; gnubin is needed because newer coreutils only exposes 'stdbuf' under libexec/gnubin
               run: |
@@ -1424,3 +1472,10 @@ jobs:
                   path: objdir-clone/
                   # objdirs are big; don't hold on to them too long.
                   retention-days: 5
+            - name: Notify Slack on Failure
+              if: failure()
+              uses: ./.github/actions/notify-slack-failure
+              with:
+                slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}
+                job-name: "REPL Tests - Darwin (Build Only)"
+                job-details: "${{ matrix.os }}, ${{ matrix.arch }}, ${{ matrix.build_variant }}"

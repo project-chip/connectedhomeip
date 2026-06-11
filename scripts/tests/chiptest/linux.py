@@ -20,7 +20,7 @@ Handles linux-specific functionality for running test cases
 
 import logging
 import os
-from typing import IO, Any
+from typing import BinaryIO
 
 from chiptest.runner import Executor, LogPipe, SubprocessInfo
 from python_path import PythonPath
@@ -52,8 +52,8 @@ class LinuxNamespacedExecutor(Executor):
         super().__init__()
         self.ns = ns
 
-    def run(self, subproc: SubprocessInfo, stdin: IO[Any] | None = None, stdout: IO[Any] | LogPipe | None = None,
-            stderr: IO[Any] | LogPipe | None = None):
+    def run(self, subproc: SubprocessInfo, stdin: BinaryIO | None = None, stdout: BinaryIO | LogPipe | None = None,
+            stderr: BinaryIO | LogPipe | None = None):
         try:
             subprocess_ns = self.ns.netns_for_subprocess_kind(subproc.kind)
             wrapped = subproc.wrap_with(*subprocess_ns.netns_cmd_wrapper)

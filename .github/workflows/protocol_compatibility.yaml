@@ -26,7 +26,7 @@ jobs:
 
     steps:
        - name: Checkout
-         uses: actions/checkout@v6.0.2
+         uses: actions/checkout@v6.0.3
        - name: Setup python
          uses: actions/setup-python@v6
          with:
@@ -46,3 +46,8 @@ jobs:
        - name: Check backwards compatibility
          run: |
            venv/bin/matter-idl-check-backward-compatibility out/old_version.matter out/new_version.matter
+       - name: Notify Slack on Failure
+         if: failure()
+         uses: ./.github/actions/notify-slack-failure
+         with:
+           slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}

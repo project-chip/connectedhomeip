@@ -5,7 +5,7 @@ from pathlib import Path
 
 # -- Paths -------------------------------------------------------------------
 
-MATTER_BASE = Path(__file__).resolve().parents[1]
+MATTER_BASE = next(filter(lambda p: (p / 'SPECIFICATION_VERSION').is_file(), Path(__file__).parents))
 
 sys.path.insert(0, str(MATTER_BASE / "docs" / "_extensions"))
 

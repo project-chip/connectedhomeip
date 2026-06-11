@@ -346,6 +346,9 @@ CHIP_ERROR Hash_SHA1(const uint8_t * data, const size_t data_length, uint8_t * o
     return status == PSA_SUCCESS ? CHIP_NO_ERROR : CHIP_ERROR_INTERNAL;
 }
 
+static_assert(kMAX_Hash_SHA256_Context_Size >= sizeof(psa_hash_operation_t),
+              "kMAX_Hash_SHA256_Context_Size is too small for the size of underlying psa_hash_operation_t");
+
 static inline psa_hash_operation_t * toHashOperation(HashSHA256OpaqueContext * context)
 {
     return SafePointerCast<psa_hash_operation_t *>(context);

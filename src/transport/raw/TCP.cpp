@@ -389,7 +389,7 @@ CHIP_ERROR TCPBase::ProcessReceivedBuffer(const Inet::TCPEndPointHandle & endPoi
             return err;
         }
         uint32_t messageSize = LittleEndian::Get32(messageSizeBuf);
-        if (messageSize >= kMaxTCPMessageSize)
+        if (messageSize > kMaxTCPMessageSize)
         {
             // Message is too big for this node to process. Disconnect from peer.
             ChipLogError(Inet, "Received TCP message of length %" PRIu32 " exceeds limit.", messageSize);
