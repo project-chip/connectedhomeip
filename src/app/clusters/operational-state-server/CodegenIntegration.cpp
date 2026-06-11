@@ -35,8 +35,7 @@ using namespace chip::app::Clusters::OperationalState;
 
 // Standalone constructor: creates and owns an OperationalStateCluster.
 Instance::Instance(Delegate * aDelegate, EndpointId aEndpointId, const OperationalStateCluster::Config & config) :
-    mDelegate(aDelegate),
-    mOwnedStorage(Platform::MakeUnique<detail::OperationalInstanceBase>(aDelegate, aEndpointId, config)),
+    mDelegate(aDelegate), mOwnedStorage(Platform::MakeUnique<detail::OperationalInstanceBase>(aDelegate, aEndpointId, config)),
     mCluster(mOwnedStorage->mCluster.Cluster()), mRegPtr(&mOwnedStorage->mCluster.Registration())
 {
     aDelegate->SetInstance(this);
