@@ -22,6 +22,7 @@
 #include <setup_payload/QRCodeSetupPayloadParser.h>
 #include <setup_payload/SetupPayload.h>
 
+#include <inttypes.h>
 #include <string>
 
 using namespace ::chip;
@@ -172,18 +173,12 @@ CHIP_ERROR SetupPayloadParseCommand::Print(const SetupPayload & payload)
     std::vector<OptionalQRCodeInfo> optionalVendorData = payload.getAllOptionalVendorData();
     for (const OptionalQRCodeInfo & info : optionalVendorData)
     {
-        bool isTypeString = info.type == optionalQRCodeInfoTypeString;
-        bool isTypeInt32  = info.type == optionalQRCodeInfoTypeInt32;
-        VerifyOrReturnError(isTypeString || isTypeInt32, CHIP_ERROR_INVALID_ARGUMENT);
-
-        if (isTypeString)
-        {
-            ChipLogProgress(SetupPayload, "OptionalQRCodeInfo:  tag=%u,string value=%s", info.tag, info.data.c_str());
-        }
-        else
-        {
-            ChipLogProgress(SetupPayload, "OptionalQRCodeInfo:  tag=%u,int value=%u", info.tag, info.int32);
-        }
+        info.visitValue(
+            [&](const std::string & v) {
+                ChipLogProgress(SetupPayload, "OptionalQRCodeInfo:  tag=%u,string value=%s", info.tag, v.c_str());
+            },
+            [&](int64_t v) { ChipLogProgress(SetupPayload, "OptionalQRCodeInfo:  tag=%u,int value=%" PRId64, info.tag, v); },
+            [&](uint64_t v) { ChipLogProgress(SetupPayload, "OptionalQRCodeInfo:  tag=%u,int value=%" PRIu64, info.tag, v); });
     }
 
     return CHIP_NO_ERROR;
