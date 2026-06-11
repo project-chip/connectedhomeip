@@ -43,9 +43,9 @@ extern "C" {
 }
 #endif
 
-#define GetFreeHeapSize xPortGetFreeHeapSize
-#define HEAP_SIZE configTOTAL_HEAP_SIZE
-#define GetMinimumEverFreeHeapSize xPortGetMinimumEverFreeHeapSize
+inline size_t GetFreeHeapSize() { return xPortGetFreeHeapSize(); }
+constexpr size_t HEAP_SIZE = configTOTAL_HEAP_SIZE;
+inline size_t GetMinimumEverFreeHeapSize() { return xPortGetMinimumEverFreeHeapSize(); }
 
 namespace chip {
 namespace DeviceLayer {
