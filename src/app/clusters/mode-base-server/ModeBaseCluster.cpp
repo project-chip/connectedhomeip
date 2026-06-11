@@ -393,24 +393,31 @@ void ModeBaseCluster::LoadPersistentAttributes()
         ChipLogError(Zcl, "ModeBase: Unable to load the CurrentMode from the KVS. Assuming zero.");
     }
 
-    err = mSafeAttributePersistenceProvider.ReadScalarValue({ mPath.mEndpointId, mPath.mClusterId, StartUpMode::Id }, startUpMode);
-    if (err == CHIP_NO_ERROR)
+    if (mOptionalAttributeSet.IsSet(StartUpMode::Id))
     {
-        LogStatus(UpdateStartUpMode(startUpMode), startUpMode, "StartUpMode");
-    }
-    else
-    {
-        ChipLogError(Zcl, "ModeBase: Unable to load the StartUpMode from the KVS. Assuming null.");
+        err = mSafeAttributePersistenceProvider.ReadScalarValue({ mPath.mEndpointId, mPath.mClusterId, StartUpMode::Id },
+                                                                startUpMode);
+        if (err == CHIP_NO_ERROR)
+        {
+            LogStatus(UpdateStartUpMode(startUpMode), startUpMode, "StartUpMode");
+        }
+        else
+        {
+            ChipLogError(Zcl, "ModeBase: Unable to load the StartUpMode from the KVS. Assuming null.");
+        }
     }
 
-    err = mSafeAttributePersistenceProvider.ReadScalarValue({ mPath.mEndpointId, mPath.mClusterId, OnMode::Id }, onMode);
-    if (err == CHIP_NO_ERROR)
+    if (mFeature.Has(Feature::kOnOff))
     {
-        LogStatus(UpdateOnMode(onMode), onMode, "OnMode");
-    }
-    else
-    {
-        ChipLogError(Zcl, "ModeBase: Unable to load the OnMode from the KVS. Assuming null.");
+        err = mSafeAttributePersistenceProvider.ReadScalarValue({ mPath.mEndpointId, mPath.mClusterId, OnMode::Id }, onMode);
+        if (err == CHIP_NO_ERROR)
+        {
+            LogStatus(UpdateOnMode(onMode), onMode, "OnMode");
+        }
+        else
+        {
+            ChipLogError(Zcl, "ModeBase: Unable to load the OnMode from the KVS. Assuming null.");
+        }
     }
 }
 
