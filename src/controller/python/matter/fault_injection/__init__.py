@@ -54,7 +54,15 @@ class CHIPFaultId(IntEnum):
     ClearInMemoryAllocatedVideoStreams = 34
     ClearInMemoryAllocatedAudioStreams = 35
     ClearInMemoryAllocatedSnapshotStreams = 36
-    LoadPersistedAllocatedVideoStreams = 37
+    # Slot 37 was already named LoadPersistentCameraAVSMAttributes in the C++ header
+    # (src/lib/support/CHIPFaultInjection.h) but this Python mirror still carried the older
+    # LoadPersistedAllocatedVideoStreams name. Corrected here to satisfy the IF-CHANGE-ALSO-CHANGE
+    # sync invariant before appending the CASE fault IDs below.
+    LoadPersistentCameraAVSMAttributes = 37
+    CASESigma2WrongFabricId = 38
+    CASESigma2WrongPeerNodeId = 39
+    CASECorruptSigma2ResumeMIC = 40
+    CASESigma3WrongFabricId = 41
 
 # END-IF-CHANGE-ALSO-CHANGE(/src/lib/support/CHIPFaultInjection.h)
 # IMPORTANT: CHIPFaultId enum above must be kept in sync with the 'Id' enum in src/lib/support/CHIPFaultInjection.h

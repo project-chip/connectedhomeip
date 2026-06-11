@@ -478,6 +478,24 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, CHIP_ERROR err)
     case CHIP_ERROR_HANDLER_NOT_SET.AsInteger():
         desc = "Callback function or callable object is not set";
         break;
+    case CHIP_ERROR_CASE_WRONG_FABRIC.AsInteger():
+        desc = "CASE peer NOC is on a different fabric";
+        break;
+    case CHIP_ERROR_CASE_WRONG_PEER_NODEID.AsInteger():
+        desc = "CASE peer NOC node ID does not match expected peer node ID";
+        break;
+    case CHIP_ERROR_CASE_NOCCHAIN_INVALID.AsInteger():
+        desc = "CASE peer operational certificate chain failed validation";
+        break;
+    case CHIP_ERROR_CASE_SIGMA_DECRYPT_FAILURE.AsInteger():
+        desc = "CASE Sigma payload decryption failed (MIC mismatch)";
+        break;
+    case CHIP_ERROR_CASE_SIGNATURE_MISMATCH.AsInteger():
+        desc = "CASE Sigma operational signature verification failed";
+        break;
+    case CHIP_ERROR_CASE_RESUME_MIC_MISMATCH.AsInteger():
+        desc = "CASE session resumption MIC verification failed";
+        break;
     }
 #endif // !CHIP_CONFIG_SHORT_ERROR_STR
 
