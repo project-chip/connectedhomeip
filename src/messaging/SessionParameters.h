@@ -20,15 +20,16 @@
 
 #include <lib/core/TLV.h>
 #include <messaging/ReliableMessageProtocolConfig.h>
+#include <system/SystemConfig.h>
 
 namespace chip {
 
 // TODO We should get part of this from constexpr that is in ReliableMessageProtocolConfig.h
 
-class SessionParameters
+class BasicSessionParameters
 {
 public:
-    SessionParameters(ReliableMessageProtocolConfig mrpConfig = GetDefaultMRPConfig()) : mMRPConfig(mrpConfig) {}
+    BasicSessionParameters(ReliableMessageProtocolConfig mrpConfig = GetDefaultMRPConfig()) : mMRPConfig(mrpConfig) {}
 
     // This estimated TLV size calc is here instead of messaging/ReliableMessageProtocolConfig.h
     // because we would need to add `include <lib/core/TLV.h>`. While we could make it all work
@@ -56,6 +57,14 @@ public:
         kInteractionModelRevision = 5,
         kSpecificationVersion     = 6,
         kMaxPathsPerInvoke        = 7,
+        kSupportedTransports      = 8,
+        kMaxTCPPayloadSize        = 9,
+    };
+
+    enum class SupportedTransport : uint16_t
+    {
+        kTcpClient = 0x02,
+        kTcpServer = 0x04,
     };
 
     const ReliableMessageProtocolConfig & GetMRPConfig() const { return mMRPConfig; }
@@ -91,7 +100,11 @@ public:
     uint16_t GetMaxPathsPerInvoke() const { return mMaxPathsPerInvoke; }
     void SetMaxPathsPerInvoke(const uint16_t maxPathsPerInvoke) { mMaxPathsPerInvoke = maxPathsPerInvoke; }
 
-private:
+    // Default implementations for TCP parameters returning 0 when not supported.
+    uint16_t GetSupportedTransports() const { return 0; }
+    uint32_t GetMaxTCPPayloadSize() const { return 0; }
+
+protected:
     ReliableMessageProtocolConfig mMRPConfig;
     // For legacy reasons if we do not get DataModelRevision it means either 16 or 17. But there isn't
     // a way to know for certain.
@@ -105,5 +118,36 @@ private:
     // When maxPathsPerInvoke is not provided legacy is always 1
     uint16_t mMaxPathsPerInvoke = 1;
 };
+
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+class SessionParameters : public BasicSessionParameters
+{
+public:
+    SessionParameters(ReliableMessageProtocolConfig mrpConfig = GetDefaultMRPConfig()) : BasicSessionParameters(mrpConfig) {}
+
+    static constexpr size_t kSizeOfSupportedTransports = sizeof(uint16_t);
+    static constexpr size_t kSizeOfMaxTCPPayloadSize   = sizeof(uint32_t);
+
+    static constexpr size_t kEstimatedTLVSize =
+        TLV::EstimateStructOverhead(kSizeOfSessionIdleInterval, kSizeOfSessionActiveInterval, kSizeOfSessionActiveThreshold,
+                                    kSizeOfDataModelRevision, kSizeOfInteractionModelRevision, kSizeOfSpecificationVersion,
+                                    kSizeOfMaxPathsPerInvoke, kSizeOfSupportedTransports, kSizeOfMaxTCPPayloadSize);
+
+    uint16_t GetSupportedTransports() const { return mSupportedTransports; }
+    void SetSupportedTransports(const uint16_t supportedTransports) { mSupportedTransports = supportedTransports; }
+
+    uint32_t GetMaxTCPPayloadSize() const { return mMaxTCPPayloadSize; }
+    void SetMaxTCPPayloadSize(const uint32_t maxTCPPayloadSize) { mMaxTCPPayloadSize = maxTCPPayloadSize; }
+
+private:
+    // Bitmap of supported transports.
+    uint16_t mSupportedTransports = 0;
+    // Maximum size of the TCP payload that the node is capable of receiving
+    // from its peer.
+    uint32_t mMaxTCPPayloadSize = CHIP_SYSTEM_CONFIG_MAX_LARGE_BUFFER_SIZE_BYTES - kSizeOfMaxTCPPayloadSize;
+};
+#else
+using SessionParameters = BasicSessionParameters;
+#endif
 
 } // namespace chip

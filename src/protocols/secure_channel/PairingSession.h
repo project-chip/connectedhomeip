@@ -105,8 +105,7 @@ public:
     /**
      * Encode the Session Parameters using the provided TLV tag.
      */
-    static CHIP_ERROR EncodeSessionParameters(TLV::Tag tag, const ReliableMessageProtocolConfig & mrpLocalConfig,
-                                              TLV::TLVWriter & tlvWriter);
+    static CHIP_ERROR EncodeSessionParameters(TLV::Tag tag, const SessionParameters & sessionParams, TLV::TLVWriter & tlvWriter);
 
 protected:
     /**
