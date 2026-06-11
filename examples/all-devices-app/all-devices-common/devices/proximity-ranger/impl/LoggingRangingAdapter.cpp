@@ -231,7 +231,7 @@ LoggingRangingAdapter::LoggingRangingAdapter(RangingTechEnum technology, TimerDe
         // cannot be correlated to beacons
         VerifyOrDie(mpStore != nullptr);
         VerifyOrDie(BleRssi::RetrieveGenerateBleDeviceId(*mpStore, mBleDeviceId) == CHIP_NO_ERROR);
-        ChipLogProgress(NotSpecified, "[LoggingRangingAdapter:%s] Generated and persisted new BLEDeviceID", LogTag());
+        ChipLogProgress(AppServer, "[LoggingRangingAdapter:%s] Generated and persisted new BLEDeviceID", LogTag());
     }
 
     // CSPRNG-fill the device identity key for the matching technology. These
@@ -242,11 +242,11 @@ LoggingRangingAdapter::LoggingRangingAdapter(RangingTechEnum technology, TimerDe
     case RangingTechEnum::kWiFiRoundTripTimeRanging:
     case RangingTechEnum::kWiFiNextGenerationRanging:
         VerifyOrDie(Crypto::DRBG_get_bytes(mWiFiDevIK, kDeviceIdentityKeyLen) == CHIP_NO_ERROR);
-        ChipLogProgress(NotSpecified, "[LoggingRangingAdapter:%s] Generated random WiFiDevIK", LogTag());
+        ChipLogProgress(AppServer, "[LoggingRangingAdapter:%s] Generated random WiFiDevIK", LogTag());
         break;
     case RangingTechEnum::kBluetoothChannelSounding:
         VerifyOrDie(Crypto::DRBG_get_bytes(mBltDevIK, kDeviceIdentityKeyLen) == CHIP_NO_ERROR);
-        ChipLogProgress(NotSpecified, "[LoggingRangingAdapter:%s] Generated random BLTDevIK", LogTag());
+        ChipLogProgress(AppServer, "[LoggingRangingAdapter:%s] Generated random BLTDevIK", LogTag());
         break;
     default:
         break;
@@ -343,26 +343,26 @@ LoggingRangingAdapter::~LoggingRangingAdapter()
 // but doing the work synchronously is preferred where the radio supports it.
 ResultCodeEnum LoggingRangingAdapter::PrepareSession(uint8_t sessionId, const StartSessionParams & params)
 {
-    ChipLogProgress(NotSpecified, "[LoggingRangingAdapter:%s] PrepareSession id=%u tech=%s", LogTag(), sessionId,
+    ChipLogProgress(AppServer, "[LoggingRangingAdapter:%s] PrepareSession id=%u tech=%s", LogTag(), sessionId,
                     TechName(params.technology));
 
     if (params.wifiRoleConfig.has_value())
     {
         const auto & cfg = *params.wifiRoleConfig;
-        ChipLogProgress(NotSpecified, "[LoggingRangingAdapter:%s]   WiFiRoleConfig role=%s peerWiFiDevIK.size=%u pmk=%s", LogTag(),
+        ChipLogProgress(AppServer, "[LoggingRangingAdapter:%s]   WiFiRoleConfig role=%s peerWiFiDevIK.size=%u pmk=%s", LogTag(),
                         RoleName(cfg.role), static_cast<unsigned>(cfg.peerWiFiDevIK.size()),
                         cfg.pmk.HasValue() ? "present" : "absent");
     }
     if (params.bleRoleConfig.has_value())
     {
         const auto & cfg = *params.bleRoleConfig;
-        ChipLogProgress(NotSpecified, "[LoggingRangingAdapter:%s]   BLERoleConfig role=%s peerBLEDeviceID=0x%016" PRIx64, LogTag(),
+        ChipLogProgress(AppServer, "[LoggingRangingAdapter:%s]   BLERoleConfig role=%s peerBLEDeviceID=0x%016" PRIx64, LogTag(),
                         RoleName(cfg.role), cfg.peerBLEDeviceID);
     }
     if (params.bltRoleConfig.has_value())
     {
         const auto & cfg = *params.bltRoleConfig;
-        ChipLogProgress(NotSpecified,
+        ChipLogProgress(AppServer,
                         "[LoggingRangingAdapter:%s]   BLTRoleConfig role=%s peerBLTDevIK.size=%u "
                         "BLTCSMode=%s BLTCSSecurityLevel=%s ltk=%s",
                         LogTag(), RoleName(cfg.role), static_cast<unsigned>(cfg.peerBLTDevIK.size()),
@@ -413,8 +413,8 @@ ResultCodeEnum LoggingRangingAdapter::PrepareSession(uint8_t sessionId, const St
     }
     if (session->isPassiveResponder)
     {
-        ChipLogProgress(NotSpecified, "[LoggingRangingAdapter:%s] sid=%u passive responder role; will not emit measurements",
-                        LogTag(), sessionId);
+        ChipLogProgress(AppServer, "[LoggingRangingAdapter:%s] sid=%u passive responder role; will not emit measurements", LogTag(),
+                        sessionId);
     }
 
     // One-time peer-identity sentinel check: if the request targets the
@@ -426,7 +426,7 @@ ResultCodeEnum LoggingRangingAdapter::PrepareSession(uint8_t sessionId, const St
         IsUnknownPeerIdentity(mTechnology, session->peerBleDeviceId, session->peerWiFiDevIK, session->peerBltDevIK);
     if (session->isUnknownPeer)
     {
-        ChipLogProgress(NotSpecified,
+        ChipLogProgress(AppServer,
                         "[LoggingRangingAdapter:%s] sid=%u peer identity matches kUnknownPeer sentinel; will not emit measurements",
                         LogTag(), sessionId);
     }
@@ -451,7 +451,7 @@ ResultCodeEnum LoggingRangingAdapter::PrepareSession(uint8_t sessionId, const St
 // The radio reports measurements asynchronously from this point on.
 CHIP_ERROR LoggingRangingAdapter::StartSession(uint8_t sessionId)
 {
-    ChipLogProgress(NotSpecified, "[LoggingRangingAdapter:%s] StartSession id=%u", LogTag(), sessionId);
+    ChipLogProgress(AppServer, "[LoggingRangingAdapter:%s] StartSession id=%u", LogTag(), sessionId);
     auto it = std::find_if(mSessions.begin(), mSessions.end(),
                            [sessionId](const std::unique_ptr<Session> & s) { return s->sessionId == sessionId; });
     VerifyOrReturnError(it != mSessions.end(), CHIP_ERROR_NOT_FOUND);
@@ -482,7 +482,7 @@ CHIP_ERROR LoggingRangingAdapter::StartSession(uint8_t sessionId)
 // OnRangingSessionStopped only once the radio has confirmed teardown.
 CHIP_ERROR LoggingRangingAdapter::StopSession(uint8_t sessionId)
 {
-    ChipLogProgress(NotSpecified, "[LoggingRangingAdapter:%s] StopSession id=%u", LogTag(), sessionId);
+    ChipLogProgress(AppServer, "[LoggingRangingAdapter:%s] StopSession id=%u", LogTag(), sessionId);
     auto it = std::find_if(mSessions.begin(), mSessions.end(),
                            [sessionId](const std::unique_ptr<Session> & s) { return s->sessionId == sessionId; });
     VerifyOrReturnError(it != mSessions.end(), CHIP_ERROR_NOT_FOUND);

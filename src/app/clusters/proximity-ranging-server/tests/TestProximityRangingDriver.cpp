@@ -132,6 +132,8 @@ public:
         return CHIP_NO_ERROR;
     }
 
+    std::optional<WiFiUsdConfig> GetWiFiUsdConfig() override { return mWiFiUsdConfig; }
+
     Callback * GetCallback() const { return mCallback; }
 
     ResultCodeEnum mPrepareResult = ResultCodeEnum::kAccepted;
@@ -145,6 +147,7 @@ public:
     uint8_t mLastStartSessionId   = 0;
     uint8_t mLastStopSessionId    = 0;
     StartSessionParams mLastPrepareParams{};
+    std::optional<WiFiUsdConfig> mWiFiUsdConfig;
     /// Sessions for which PrepareSession returned kAccepted and StopSession
     /// has not yet been invoked. Single-shot model: there is no separate
     /// "active" list — measurements happen synchronously when the driver
@@ -767,6 +770,94 @@ TEST_F(TestProximityRangingDriver, PeriodicRangingBusyAdapterDoesNotRetireSessio
     EXPECT_EQ(ble.mStopCalls, 0);
 
     driver.Shutdown();
+}
+
+// 21. Init can only be called once between Shutdown calls. A second Init
+//     without an intervening Shutdown surfaces CHIP_ERROR_INCORRECT_STATE so
+//     a second cluster cannot silently steal the callback wiring.
+TEST_F(TestProximityRangingDriver, InitTwiceFailsWithoutShutdown)
+{
+    TimerDelegateMock timer;
+    ProximityRangingDriver driver{ {}, timer };
+
+    struct Sink : public ProximityRangingDriver::Callback
+    {
+        void OnMeasurementData(uint8_t, const Structs::RangingMeasurementDataStruct::Type &) override {}
+        void OnSessionStopped(uint8_t, RangingSessionStatusEnum) override {}
+        void OnAttributeChanged(AttributeId) override {}
+    } sink;
+
+    EXPECT_EQ(driver.Init(sink), CHIP_NO_ERROR);
+    EXPECT_EQ(driver.Init(sink), CHIP_ERROR_INCORRECT_STATE);
+
+    driver.Shutdown();
+    // After Shutdown, Init must succeed again.
+    EXPECT_EQ(driver.Init(sink), CHIP_NO_ERROR);
+    driver.Shutdown();
+}
+
+// 22. Shutdown drives StopSession on every active session and releases the
+//     pool slots so a re-Init starts clean.
+TEST_F(TestProximityRangingDriver, ShutdownStopsActiveSessions)
+{
+    TimerDelegateMock timer;
+    MockRangingAdapter ble(RangingTechEnum::kBLEBeaconRSSIRanging);
+    RangingAdapter * adapters[] = { &ble };
+    ProximityRangingDriver driver{ Span<RangingAdapter * const>(adapters), timer };
+    RecordingClusterCallback cb;
+    ASSERT_EQ(driver.Init(cb), CHIP_NO_ERROR);
+
+    auto request              = MakeBleRequest();
+    request.trigger.startTime = 0;
+    ASSERT_EQ(driver.HandleStartRanging(11, request), ResultCodeEnum::kAccepted);
+    ASSERT_EQ(driver.HandleStartRanging(12, request), ResultCodeEnum::kAccepted);
+    ASSERT_EQ(driver.GetNumActiveSessionIds(), 2u);
+
+    // Shutdown must drive each adapter's StopSession path; the mock then
+    // routes OnRangingSessionStopped back, which RetireSession releases.
+    driver.Shutdown();
+    EXPECT_EQ(driver.GetNumActiveSessionIds(), 0u);
+}
+
+// 23. GetActiveSessionIds returns CHIP_ERROR_BUFFER_TOO_SMALL when the
+//     caller-supplied span cannot hold every active session ID.
+TEST_F(TestProximityRangingDriver, GetActiveSessionIdsBufferTooSmall)
+{
+    TimerDelegateMock timer;
+    MockRangingAdapter ble(RangingTechEnum::kBLEBeaconRSSIRanging);
+    RangingAdapter * adapters[] = { &ble };
+    ProximityRangingDriver driver{ Span<RangingAdapter * const>(adapters), timer };
+    RecordingClusterCallback cb;
+    ASSERT_EQ(driver.Init(cb), CHIP_NO_ERROR);
+
+    auto request              = MakeBleRequest();
+    request.trigger.startTime = 0;
+    ASSERT_EQ(driver.HandleStartRanging(1, request), ResultCodeEnum::kAccepted);
+    ASSERT_EQ(driver.HandleStartRanging(2, request), ResultCodeEnum::kAccepted);
+
+    uint8_t buffer[1] = {};
+    Span<uint8_t> tooSmall(buffer, 1);
+    EXPECT_EQ(driver.GetActiveSessionIds(tooSmall), CHIP_ERROR_BUFFER_TOO_SMALL);
+
+    driver.Shutdown();
+}
+
+// 24. GetWiFiUsdConfig falls back to the kWiFiNextGenerationRanging adapter
+//     when no kWiFiRoundTripTimeRanging adapter is bound. Exercises the
+//     second-branch lookup.
+TEST_F(TestProximityRangingDriver, GetWiFiUsdConfigViaNextGenerationAdapter)
+{
+    TimerDelegateMock timer;
+    MockRangingAdapter ngAdapter(RangingTechEnum::kWiFiNextGenerationRanging);
+    WiFiUsdConfig cfg{};
+    memset(cfg.deviceIdentityKey, 0x5A, sizeof(cfg.deviceIdentityKey));
+    ngAdapter.mWiFiUsdConfig    = cfg;
+    RangingAdapter * adapters[] = { &ngAdapter };
+    ProximityRangingDriver driver{ Span<RangingAdapter * const>(adapters), timer };
+
+    auto resolved = driver.GetWiFiUsdConfig();
+    ASSERT_TRUE(resolved.has_value());
+    EXPECT_EQ(resolved->deviceIdentityKey[0], 0x5A);
 }
 
 } // namespace
