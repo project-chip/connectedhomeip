@@ -414,6 +414,9 @@ NSString * MTRClusterNameForID(MTRClusterIDType clusterID)
     case MTRClusterIDTypeContentAppObserverID:
         result = @"ContentAppObserver";
         break;
+    case MTRClusterIDTypeMediaFileManagementID:
+        result = @"MediaFileManagement";
+        break;
     case MTRClusterIDTypeZoneManagementID:
         result = @"ZoneManagement";
         break;
@@ -8836,6 +8839,54 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
         }
         break;
 
+    case MTRClusterIDTypeMediaFileManagementID:
+
+        switch (attributeID) {
+
+            // Cluster MediaFileManagement attributes
+        case MTRAttributeIDTypeClusterMediaFileManagementAttributeTotalStorageID:
+            result = @"TotalStorage";
+            break;
+
+        case MTRAttributeIDTypeClusterMediaFileManagementAttributeAvailableStorageID:
+            result = @"AvailableStorage";
+            break;
+
+        case MTRAttributeIDTypeClusterMediaFileManagementAttributeAvailableFilesID:
+            result = @"AvailableFiles";
+            break;
+
+        case MTRAttributeIDTypeClusterMediaFileManagementAttributeSupportedMimeTypesID:
+            result = @"SupportedMimeTypes";
+            break;
+
+        case MTRAttributeIDTypeClusterMediaFileManagementAttributeGeneratedCommandListID:
+            result = @"GeneratedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterMediaFileManagementAttributeAcceptedCommandListID:
+            result = @"AcceptedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterMediaFileManagementAttributeAttributeListID:
+            result = @"AttributeList";
+            break;
+
+        case MTRAttributeIDTypeClusterMediaFileManagementAttributeFeatureMapID:
+            result = @"FeatureMap";
+            break;
+
+        case MTRAttributeIDTypeClusterMediaFileManagementAttributeClusterRevisionID:
+            result = @"ClusterRevision";
+            break;
+
+        default:
+            // Not a known MediaFileManagement attribute.
+            result = [NSString stringWithFormat:@"<Unknown attributeID %u>", attributeID];
+            break;
+        }
+        break;
+
     case MTRClusterIDTypeZoneManagementID:
 
         switch (attributeID) {
@@ -12782,6 +12833,36 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
         }
         break;
 
+    case MTRClusterIDTypeMediaFileManagementID:
+
+        switch (commandID) {
+
+        case MTRCommandIDTypeClusterMediaFileManagementCommandAddFileID:
+            result = @"AddFile";
+            break;
+
+        case MTRCommandIDTypeClusterMediaFileManagementCommandDeleteFileID:
+            result = @"DeleteFile";
+            break;
+
+        case MTRCommandIDTypeClusterMediaFileManagementCommandRequestSharedFilesID:
+            result = @"RequestSharedFiles";
+            break;
+
+        case MTRCommandIDTypeClusterMediaFileManagementCommandGetSharedFileID:
+            result = @"GetSharedFile";
+            break;
+
+        case MTRCommandIDTypeClusterMediaFileManagementCommandOfferFileID:
+            result = @"OfferFile";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
     case MTRClusterIDTypeZoneManagementID:
 
         switch (commandID) {
@@ -15056,6 +15137,24 @@ NSString * MTRResponseCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDT
         }
         break;
 
+    case MTRClusterIDTypeMediaFileManagementID:
+
+        switch (commandID) {
+
+        case MTRCommandIDTypeClusterMediaFileManagementCommandAddFileResponseID:
+            result = @"AddFileResponse";
+            break;
+
+        case MTRCommandIDTypeClusterMediaFileManagementCommandGetSharedFileResponseID:
+            result = @"GetSharedFileResponse";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
     case MTRClusterIDTypeZoneManagementID:
 
         switch (commandID) {
@@ -17309,6 +17408,21 @@ NSString * MTREventNameForID(MTRClusterIDType clusterID, MTREventIDType eventID)
     case MTRClusterIDTypeContentAppObserverID:
 
         switch (eventID) {
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown eventID %u>", eventID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeMediaFileManagementID:
+
+        switch (eventID) {
+
+            // Cluster MediaFileManagement events
+        case MTREventIDTypeClusterMediaFileManagementEventSharedFilesAddedID:
+            result = @"SharedFilesAdded";
+            break;
 
         default:
             result = [NSString stringWithFormat:@"<Unknown eventID %u>", eventID];

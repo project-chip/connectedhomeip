@@ -6413,6 +6413,43 @@ static BOOL AttributeIsSpecifiedInContentAppObserverCluster(AttributeId aAttribu
     }
     }
 }
+static BOOL AttributeIsSpecifiedInMediaFileManagementCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::MediaFileManagement;
+    switch (aAttributeId) {
+    case Attributes::TotalStorage::Id: {
+        return YES;
+    }
+    case Attributes::AvailableStorage::Id: {
+        return YES;
+    }
+    case Attributes::AvailableFiles::Id: {
+        return YES;
+    }
+    case Attributes::SupportedMimeTypes::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        // Not a known MediaFileManagement attribute.
+        return NO;
+    }
+    }
+}
 static BOOL AttributeIsSpecifiedInZoneManagementCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::ZoneManagement;
@@ -7923,6 +7960,9 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     }
     case Clusters::ContentAppObserver::Id: {
         return AttributeIsSpecifiedInContentAppObserverCluster(aAttributeId);
+    }
+    case Clusters::MediaFileManagement::Id: {
+        return AttributeIsSpecifiedInMediaFileManagementCluster(aAttributeId);
     }
     case Clusters::ZoneManagement::Id: {
         return AttributeIsSpecifiedInZoneManagementCluster(aAttributeId);
