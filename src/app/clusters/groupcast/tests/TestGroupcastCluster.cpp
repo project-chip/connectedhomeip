@@ -2136,9 +2136,10 @@ TEST_F(TestGroupcastCluster, TestTotalMaxMembership)
 TEST_F(TestGroupcastCluster, TestLeaveGroupEndpointsExceedingMaxReturnsEmptyResponse)
 {
     static constexpr uint16_t kMaxCommandEndpoints = app::Clusters::GroupcastCluster::kMaxCommandEndpoints;
-    static constexpr uint16_t kEndpointsInGroup    = kMaxMembershipEndpoints + 5; // exceeds the per-command maximum
-    const GroupId kGroup                           = 0xab01;
-    const KeysetId kKeyset                         = 0xabcd;
+    // exceeds kMaxMembershipEndpoints (response buffer sizing) and kMaxCommandEndpoints
+    static constexpr uint16_t kEndpointsInGroup = kMaxMembershipEndpoints + 5;
+    const GroupId kGroup                        = 0xab01;
+    const KeysetId kKeyset                      = 0xabcd;
     const uint8_t key[] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F };
 
     chip::Testing::ClusterTester tester(mListener);

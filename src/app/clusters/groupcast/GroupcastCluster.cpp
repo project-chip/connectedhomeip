@@ -706,19 +706,21 @@ Status GroupcastCluster::RemoveGroup(GroupId group_id, const Groupcast::Commands
         // maximum constraint, the response Endpoints list SHALL be empty. The endpoints are still
         // removed, but they are not collected into the (fixed-size) response in that case.
         size_t requestedCount = 0;
-        VerifyOrReturnError(data.endpoints.Value().ComputeSize(&requestedCount) == CHIP_NO_ERROR, Status::Failure);
-        EndpointList * responseEndpoints = (requestedCount > kMaxCommandEndpoints) ? nullptr : endpoints;
-
-        // Remove endpoints
-        auto iter = data.endpoints.Value().begin();
+        auto iter             = data.endpoints.Value().begin();
         while (iter.Next())
         {
+            requestedCount++;
             auto endpoint_id = iter.GetValue();
             if (groups.HasEndpoint(fabricIndex, group_id, endpoint_id))
             {
-                stat = RemoveGroupEndpoint(fabricIndex, group_id, endpoint_id, responseEndpoints);
+                EndpointList * responseEndpoints = (requestedCount <= kMaxCommandEndpoints) ? endpoints : nullptr;
+                stat                             = RemoveGroupEndpoint(fabricIndex, group_id, endpoint_id, responseEndpoints);
                 VerifyOrReturnError(Status::Success == stat, stat);
             }
+        }
+        if (requestedCount > kMaxCommandEndpoints && endpoints != nullptr)
+        {
+            endpoints->count = 0;
         }
     }
     else
