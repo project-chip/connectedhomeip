@@ -325,6 +325,8 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_SetThreadProvis
         return MapOpenThreadError(otErr);
     }
 
+    printk("@@@ Thread Dataset persist done, REBOOT NOW to reproduce orphan state\n");
+
     // post an event alerting other subsystems about change in provisioning state
     ChipDeviceEvent event{ .Type                      = DeviceEventType::kServiceProvisioningChange,
                            .ServiceProvisioningChange = { .IsServiceProvisioned = true } };
