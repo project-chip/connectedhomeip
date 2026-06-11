@@ -1374,33 +1374,6 @@ class MatterBaseTest(base_test.BaseTestClass):
         self._teardown_ran = False
         self._framework_cleanup_done = False
         self.cleanup_config = TestCleanupConfig()
-        if self.runner_hook and not self.is_commissioning:
-            # Start the background wildcard subscription only for tests that interact with a
-            # real DUT (requires_dut = True, the default) and unless the test has opted out
-            # via --no-wildcard-subscription or disable_wildcard_subscription = True on
-            # the test class (e.g. tests that directly manipulate the ACL or tests that count
-            # the TH entries).
-            #
-            # Parser/unit tests under test_testing/ override requires_dut = False so they
-            # don't try to subscribe to a device that isn't there (which would hang ~30s per
-            # test and blow the CI timeout).  Gating on requires_dut rather than on
-            # --commissioning-method keeps this decoupled from harness CLI flags whose
-            # semantics may shift at certification time.
-            if not self._wildcard_subscription_disabled() and self.requires_dut:
-                self._start_wildcard_subscription()
-            test_name = self.current_test_info.name
-            steps = self.get_defined_test_steps(test_name)
-            num_steps = 1 if steps is None else len(steps)
-            filename = inspect.getfile(self.__class__)
-            desc = self.get_test_desc(test_name)
-            steps_descriptions = [] if steps is None else [step.description for step in steps]
-            self.runner_hook.test_start(filename=filename, name=desc, count=num_steps, steps=steps_descriptions)
-            # If we don't have defined steps, we're going to start the one and only step now
-            # if there are steps defined by the test, rely on the test calling the step() function
-            # to indicates how it is proceeding
-            if steps is None:
-                self.step(1)
-
         # Capture the ACL before the test runs so _reset_acls_to_default can restore it
         # in teardown_class. Skip when the DUT is not known to be available: unit tests
         # never commission a device so _dut_confirmed_available stays False, and
@@ -1428,6 +1401,33 @@ class MatterBaseTest(base_test.BaseTestClass):
                 )
             except Exception:
                 self._original_acl = None
+
+        if self.runner_hook and not self.is_commissioning:
+            # Start the background wildcard subscription only for tests that interact with a
+            # real DUT (requires_dut = True, the default) and unless the test has opted out
+            # via --no-wildcard-subscription or disable_wildcard_subscription = True on
+            # the test class (e.g. tests that directly manipulate the ACL or tests that count
+            # the TH entries).
+            #
+            # Parser/unit tests under test_testing/ override requires_dut = False so they
+            # don't try to subscribe to a device that isn't there (which would hang ~30s per
+            # test and blow the CI timeout).  Gating on requires_dut rather than on
+            # --commissioning-method keeps this decoupled from harness CLI flags whose
+            # semantics may shift at certification time.
+            if not self._wildcard_subscription_disabled() and self.requires_dut:
+                self._start_wildcard_subscription()
+            test_name = self.current_test_info.name
+            steps = self.get_defined_test_steps(test_name)
+            num_steps = 1 if steps is None else len(steps)
+            filename = inspect.getfile(self.__class__)
+            desc = self.get_test_desc(test_name)
+            steps_descriptions = [] if steps is None else [step.description for step in steps]
+            self.runner_hook.test_start(filename=filename, name=desc, count=num_steps, steps=steps_descriptions)
+            # If we don't have defined steps, we're going to start the one and only step now
+            # if there are steps defined by the test, rely on the test calling the step() function
+            # to indicates how it is proceeding
+            if steps is None:
+                self.step(1)
 
     def teardown_test(self):
         """Per-test teardown called by the Mobly framework after every test_ method.
