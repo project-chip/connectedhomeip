@@ -97,6 +97,12 @@ void GetTextEntries(DnssdService & service, const unsigned char * data, uint16_t
         textEntry.mKey      = chip::Platform::MemoryAllocString(key, strlen(key));
         textEntry.mData     = nullptr;
         textEntry.mDataSize = 0;
+        if (textEntry.mKey == nullptr)
+        {
+            ChipLogError(Discovery, "Mdns: Failed to allocate TXT key");
+            service.mTextEntrySize = i;
+            break;
+        }
 
         if (valueLen > 0)
         {
@@ -104,7 +110,10 @@ void GetTextEntries(DnssdService & service, const unsigned char * data, uint16_t
             if (buf == nullptr)
             {
                 ChipLogError(Discovery, "Mdns: Failed to allocate %u-byte TXT value", valueLen);
-                continue;
+                chip::Platform::MemoryFree(const_cast<char *>(textEntry.mKey));
+                textEntry.mKey         = nullptr;
+                service.mTextEntrySize = i;
+                break;
             }
             memcpy(buf, valuePtr, valueLen);
             textEntry.mData     = buf;
