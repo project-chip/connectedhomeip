@@ -23,6 +23,7 @@
 #   run1:
 #     app: ${ALL_CLUSTERS_APP}
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app-ready-pattern: "APP STATUS: Starting event loop"
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
@@ -61,8 +62,10 @@ class TC_ELDIST_2_2(MatterBaseTest):
 
         Verify that all five mandatory attributes of the Electrical Distribution
         Cluster maintain their values across reboot (Fixed-by-manufacturer
-        quality X). The reboot + persistence verification steps are operator-
-        driven and dispatch via is_pics_sdk_ci_only (skipped in CI).
+        quality X). The reboot is driven by the framework helper
+        self.request_device_reboot() in conjunction with the app-ready-pattern
+        directive in the CI block above; canonical reference pattern is
+        TC_AVSUM_2_9.py.
         """
         endpoint = self.get_endpoint()
         cluster = Clusters.ElectricalDistribution
@@ -121,44 +124,37 @@ class TC_ELDIST_2_2(MatterBaseTest):
         asserts.assert_equal(status, Status.UnsupportedWrite,
                              "Write to ServiceEntranceRated should return UNSUPPORTED_WRITE")
 
-        self.step(7, "Operator reboots DUT (skipped in CI)")
-        if self.is_pics_sdk_ci_only:
-            self.mark_current_step_skipped()
-        else:
-            self.wait_for_user_input(
-                prompt_msg="Reboot the DUT and wait for it to rejoin the fabric. Press Enter.")
+        self.step(7, "Reboot DUT via the framework helper (returns when the app comes back up)")
+        await self.request_device_reboot()
 
-        self.step(8, "TH re-reads all five attributes and verifies values unchanged across reboot (skipped in CI)")
-        if self.is_pics_sdk_ci_only:
-            self.mark_current_step_skipped()
-        else:
-            mcc_post = await self.read_single_attribute_check_success(
-                endpoint=endpoint, cluster=cluster,
-                attribute=attributes.MaxContinuousCurrent)
-            mv_post = await self.read_single_attribute_check_success(
-                endpoint=endpoint, cluster=cluster,
-                attribute=attributes.MaxVoltage)
-            nop_post = await self.read_single_attribute_check_success(
-                endpoint=endpoint, cluster=cluster,
-                attribute=attributes.NumberOfPoles)
-            eol_post = await self.read_single_attribute_check_success(
-                endpoint=endpoint, cluster=cluster,
-                attribute=attributes.EndOfLife)
-            ser_post = await self.read_single_attribute_check_success(
-                endpoint=endpoint, cluster=cluster,
-                attribute=attributes.ServiceEntranceRated)
+        self.step(8, "TH re-reads all five attributes and verifies values unchanged across reboot")
+        mcc_post = await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=cluster,
+            attribute=attributes.MaxContinuousCurrent)
+        mv_post = await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=cluster,
+            attribute=attributes.MaxVoltage)
+        nop_post = await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=cluster,
+            attribute=attributes.NumberOfPoles)
+        eol_post = await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=cluster,
+            attribute=attributes.EndOfLife)
+        ser_post = await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=cluster,
+            attribute=attributes.ServiceEntranceRated)
 
-            asserts.assert_equal(mcc_post, mcc_1,
-                                 "MaxContinuousCurrent changed after reboot")
-            asserts.assert_equal(mv_post, mv_1,
-                                 "MaxVoltage changed after reboot")
-            asserts.assert_equal(nop_post, nop_1,
-                                 "NumberOfPoles changed after reboot")
-            asserts.assert_equal(eol_post, eol_1,
-                                 "EndOfLife changed after reboot")
-            asserts.assert_equal(ser_post, ser_1,
-                                 "ServiceEntranceRated changed after reboot")
-            log.info("All Fixed-by-manufacturer attributes verified stable across reboot")
+        asserts.assert_equal(mcc_post, mcc_1,
+                             "MaxContinuousCurrent changed after reboot")
+        asserts.assert_equal(mv_post, mv_1,
+                             "MaxVoltage changed after reboot")
+        asserts.assert_equal(nop_post, nop_1,
+                             "NumberOfPoles changed after reboot")
+        asserts.assert_equal(eol_post, eol_1,
+                             "EndOfLife changed after reboot")
+        asserts.assert_equal(ser_post, ser_1,
+                             "ServiceEntranceRated changed after reboot")
+        log.info("All Fixed-by-manufacturer attributes verified stable across reboot")
 
 
 if __name__ == "__main__":
