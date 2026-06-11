@@ -26,14 +26,15 @@ import queue
 import random
 import select
 import shlex
+import socket
 import subprocess
 import textwrap
 import time
 import typing
-from dataclasses import asdict, dataclass
-from datetime import datetime, timedelta, timezone
+from dataclasses import asdict, dataclass, fields
+from datetime import UTC, datetime, timedelta
 from enum import IntFlag
-from typing import Any, Callable, List, Optional, Tuple, Type, Union
+from typing import Any, Callable, Optional, Union
 
 import matter.testing.matchers as matchers
 
@@ -52,12 +53,13 @@ import matter.logging
 import matter.native
 import matter.testing.global_stash as global_stash
 from matter.clusters import Attribute, ClusterObjects
+from matter.clusters.Types import NullValue
 from matter.exceptions import ChipStackError
 from matter.interaction_model import InteractionModelError, Status
 from matter.setup_payload import SetupPayload
 from matter.testing.commissioning import (CommissioningInfo, CustomCommissioningParameters, SetupPayloadInfo, commission_devices,
                                           get_setup_payload_info_config)
-from matter.testing.decorators import _has_attribute, _has_command, _has_feature
+from matter.testing.decorators import _has_attribute, _has_cluster, _has_command, _has_feature
 from matter.testing.global_attribute_ids import GlobalAttributeIds
 from matter.testing.matter_stack_state import MatterStackState
 from matter.testing.matter_test_config import MatterTestConfig
@@ -135,7 +137,7 @@ class AttributeMatcher:
         return self._description
 
     @staticmethod
-    def from_callable(description: str, matcher: Callable[[AttributeValue], bool]) -> "AttributeMatcher":
+    def from_callable(description: str, matcher: Callable[[AttributeValue], bool]) -> AttributeMatcher:
         """Take a single callable and wrap it into an AttributeMatcher object. Useful to wrap closures."""
         class AttributeMatcherFromCallable(AttributeMatcher):
             def __init__(self, description, matcher: Callable[[AttributeValue], bool]):
@@ -169,7 +171,47 @@ class SetupParameters:
                                                         self.custom_flow, self.capabilities, self.version)
 
 
+@dataclass
+class TestCleanupConfig:
+    """
+    A class to keep track of which cleanup steps should be performed.
+    Default behavior: all cleanup steps are enabled. Test classes can disable individual steps by
+    setting flags in setup_test or in the test method body, after calling super().
+    """
+
+    # DUT clean-up items
+    disarm_failsafes: bool = True              # sends ArmFailSafe(expiryLengthSeconds=0) on GeneralCommissioning
+    reset_acls_to_default: bool = True         # restores ACL on endpoint 0 to the state captured before the test ran
+    close_commissioning_windows: bool = True   # sends RevokeCommissioning on AdministratorCommissioning
+    remove_extra_fabrics: bool = True          # removes all fabrics on the DUT except TH1's via RemoveFabric
+    purge_scenes: bool = True                  # calls RemoveAllScenes per group on every ScenesManagement endpoint
+    purge_groups: bool = True                  # removes all non-IPK group key sets and clears GroupKeyMap
+    purge_group_memberships: bool = True       # calls RemoveAllGroups on every Groups endpoint
+    purge_doorlock: bool = True                # clears all DoorLock credentials and users
+    purge_tls_endpoints: bool = True           # removes all provisioned endpoints via TlsClientManagement
+    unregister_icd_clients: bool = True        # unregisters all entries from IcdManagement.RegisteredClients
+
+    # Controller clean-up items
+    shutdown_extra_controllers: bool = True    # shuts down extra controllers and removes their CAs from storage
+
+    @classmethod
+    def disabled(cls) -> TestCleanupConfig:
+        """Returns a config with all cleanup steps disabled."""
+        return cls(**{f.name: False for f in fields(cls)})
+
+
 class MatterBaseTest(base_test.BaseTestClass):
+    def __init_subclass__(cls, **kwargs):
+        super().__init_subclass__(**kwargs)
+        if 'teardown_test' in cls.__dict__:
+            original = cls.__dict__['teardown_test']
+
+            def _wrapped_teardown(self, _original=original):
+                _original(self)
+                MatterBaseTest.teardown_test(self)
+
+            cls.teardown_test = _wrapped_teardown
+
     def __init__(self, *args):
         super().__init__(*args)
 
@@ -177,6 +219,17 @@ class MatterBaseTest(base_test.BaseTestClass):
         self.problems = []
         self.is_commissioning = False
         self.cached_steps: dict[str, Optional[list[TestStep]]] = {}
+        self.cleanup_config = TestCleanupConfig()
+        self._extra_controllers: list[ChipDeviceCtrl.ChipDeviceController] = []
+        self._extra_cas: list[matter.CertificateAuthority.CertificateAuthority] = []
+        self._original_acl = None
+        self._framework_cleanup_done = False
+        # Set to True by commission_devices() on success; gates the per-test ACL read in
+        # setup_test so unit tests (which never commission) incur zero network overhead.
+        self._dut_confirmed_available = False
+        # Prevents double-execution when the override calls super().teardown_test()
+        # and __init_subclass__ also calls it afterward.
+        self._teardown_ran = False
 
     #
     # Mobly Test Controller Methods (Framework Interface)
@@ -209,11 +262,15 @@ class MatterBaseTest(base_test.BaseTestClass):
         """
         super().setup_class()
 
+        # Set a hook on FabricAdmin so every NewController() call during this test automatically
+        # populates self._extra_controllers. This is used during cleanup in teardown_class.
+        matter.FabricAdmin.FabricAdmin._new_controller_hook = self._on_new_controller_created
+
         # Mappings of cluster IDs to names and metadata.
         # TODO: Move to using non-generated code and rather use data model description (.matter or .xml)
         self.cluster_mapper = ClusterMapper(self.default_controller._Cluster)
         self.current_step_index = 0
-        self.step_start_time = datetime.now(timezone.utc)
+        self.step_start_time = datetime.now(UTC)
         self.step_skipped = False
         # self.stored_global_wildcard stores value of self.global_wildcard after first async call.
         # Because setup_class can be called before commissioning, this variable is lazy-initialized
@@ -221,15 +278,23 @@ class MatterBaseTest(base_test.BaseTestClass):
         self.stored_global_wildcard = None
 
     def teardown_class(self):
-        """Final teardown after all tests: log all problems and dump device attributes if available.
-            Test authors may overwrite this method in the derived class to perform teardown that is common for all tests
-             This function is called only once per class. To perform teardown after each test, use teardown_test.
-             Test authors that implement steps in this function need to be careful of step handling if there is
-             more than one test in the class.
-             Test authors that implement this method should ensure super().teardown_class() is called after any
-             custom teardown code.
+        """Final teardown after all tests: run framework cleanup, log problems, dump attributes.
 
+        Runs _run_framework_cleanup() once after all test methods in the class have
+        completed. Framework cleanup is class-scoped rather than per-test because
+        multi-test classes run sequentially — between-test cleanup is not required
+        and would interfere with intentional class-scoped DUT state.
+
+        Test authors may overwrite this method in the derived class to perform teardown
+        that is common for all tests. This function is called only once per class.
+        Test authors that implement this method should ensure super().teardown_class()
+        is called after any custom teardown code.
         """
+        self.event_loop.run_until_complete(self._run_framework_cleanup())
+
+        # Clear the hook set in setup_class; self._extra_controllers, if any, is fully populated by now.
+        matter.FabricAdmin.FabricAdmin._new_controller_hook = None
+
         if len(self.problems) > 0:
             # Attempt to dump device attribute data for debugging when problems are found during Confirmation Tests
             if self.matter_test_config.debug:
@@ -243,6 +308,436 @@ class MatterBaseTest(base_test.BaseTestClass):
             LOGGER.info("###########################################################")
         self._log_execution_parameters_summary()
         super().teardown_class()
+
+    async def async_teardown_test(self) -> None:
+        """Override to add async class-level teardown without @async_test_body boilerplate.
+
+        Called once from _run_framework_cleanup (which runs in teardown_class) before
+        any framework cleanup steps run, so the DUT and all controllers are still
+        fully available.
+
+        For per-test async teardown, override teardown_test with @async_test_body instead.
+        """
+        pass
+
+    async def _run_framework_cleanup(self) -> None:
+        """Runs all enabled cleanup steps once at class teardown.
+
+        Called from teardown_class after all test methods have run. DUT-side cleanup
+        runs first (while the default controller is still active), followed by
+        controller-side cleanup. Each step is gated by TestCleanupConfig so individual
+        steps can be disabled by test authors when needed.
+
+        Wildcard attributes are pre-fetched once so all cluster-presence checks within
+        a single cleanup pass share the same read.
+        """
+
+        # If a teardown_test override already called this (per-test cleanup
+        # opt-in), teardown_class will skip it to avoid running cleanup twice.
+        if self._framework_cleanup_done:
+            return
+        self._framework_cleanup_done = True
+        await self.async_teardown_test()
+
+        # If setup_test could not read the ACL, the DUT was unreachable at test
+        # start, skip DUT cleanup to avoid a slow network discovery attempt.
+        dut_reachable = self._original_acl is not None
+        if dut_reachable:
+            try:
+                # Lightweight reachability check, confirm the DUT is still alive before attempting cleanup.
+                await self.default_controller.Read(
+                    self.dut_node_id,
+                    [(0, Clusters.BasicInformation.Attributes.VendorID)]
+                )
+            except Exception as e:  # DUT may be unreachable or mid-reboot; skip all DUT cleanup rather than failing the test
+                LOGGER.warning("[CLN] DUT is unreachable, skipping all DUT cleanup: %s", e)
+                dut_reachable = False
+
+        if dut_reachable:
+            await self._populate_wildcard()
+            # DUT cleanup (run first as controller must still be alive to send commands)
+            # - Scenes must be removed before group memberships: RemoveAllScenes requires the target
+            #   group to still exist on the DUT, so group memberships cannot be cleared first.
+            if self.cleanup_config.disarm_failsafes:
+                await self._disarm_failsafes()
+            if self.cleanup_config.reset_acls_to_default:
+                await self._reset_acls_to_default()
+            if self.cleanup_config.close_commissioning_windows:
+                await self._close_commissioning_windows()
+            if self.cleanup_config.remove_extra_fabrics:
+                await self._remove_extra_fabrics()
+            if self.cleanup_config.purge_scenes:
+                await self._purge_scenes()
+            if self.cleanup_config.purge_groups:
+                await self._purge_groups()
+            if self.cleanup_config.purge_group_memberships:
+                await self._purge_group_memberships()
+            if self.cleanup_config.purge_doorlock:
+                await self._purge_doorlock()
+            if self.cleanup_config.purge_tls_endpoints:
+                await self._purge_tls_endpoints()
+            if self.cleanup_config.unregister_icd_clients:
+                await self._unregister_icd_clients()
+
+        # Controller cleanup (runs regardless, no DUT connection needed)
+        if self.cleanup_config.shutdown_extra_controllers:
+            self._shutdown_extra_controllers()
+
+    def _on_new_controller_created(self, controller: ChipDeviceCtrl.ChipDeviceController) -> None:
+        """Hook set and fired by FabricAdmin for every NewController() call.
+
+        Skips the default controller and any controller that opts out of per-test
+        cleanup tracking by setting _skip_cleanup_tracking = True. Use the opt-out
+        for class-scoped controllers that must outlive individual tests.
+
+        Args:
+            controller: The controller that was created.
+        """
+        if not getattr(controller, '_is_default_controller', False) and not getattr(controller, '_skip_cleanup_tracking', False):
+
+            # Track controller for shutdown in teardown_class
+            self._extra_controllers.append(controller)
+
+            # Track the controller's CA so it can be removed from
+            # persistent storage after controller shutdown
+            fa = controller.fabricAdmin
+            if fa is not None:
+                ca = fa.certificateAuthority
+                if ca not in self._extra_cas:
+                    self._extra_cas.append(ca)
+
+    def _shutdown_extra_controllers(self) -> None:
+        """Shuts down all extra controllers created during the test run and
+        removes their CAs from persistent storage (admin_storage.json).
+        """
+        for ctrl in self._extra_controllers:
+            try:
+                LOGGER.info("[CLN] shutting down controller nodeId=%#x", ctrl.nodeId)
+                ctrl.Shutdown()
+                LOGGER.info("[CLN] controller nodeId=%#x shut down successfully", ctrl.nodeId)
+            except Exception as e:  # Shutdown can fail if the controller is already stopped or the stack is in a bad state
+                LOGGER.warning("[CLN] controller shutdown failed: %s", e)
+        self._extra_controllers.clear()
+
+        # Shut down each CA and remove it from the manager's active list and from
+        # persistent storage (caList in admin_storage.json) directly.
+        mgr = self.certificate_authority_manager
+        for ca in self._extra_cas:
+            try:
+                LOGGER.info("[CLN] shutting down CA index %d", ca.caIndex)
+                ca.Shutdown()
+                if ca in mgr._activeCaList:
+                    mgr._activeCaList.remove(ca)
+                ca_list = mgr._persistentStorage.GetKey('caList') or {}
+                if str(ca.caIndex) in ca_list:
+                    del ca_list[str(ca.caIndex)]
+                    mgr._persistentStorage.SetKey('caList', ca_list)
+                LOGGER.info("[CLN] CA index %d removed successfully", ca.caIndex)
+            except Exception as e:  # Storage may be inconsistent if the controller was shut down in a bad state
+                LOGGER.warning("[CLN] CA removal failed: %s", e)
+        self._extra_cas.clear()
+
+    async def _disarm_failsafes(self) -> None:
+        """Sends ArmFailSafe(expiryLengthSeconds=0) to disarm any active failsafe on the DUT."""
+        LOGGER.info("[CLN] sending ArmFailSafe(0) to disarm any active failsafe")
+        try:
+            resp = typing.cast(
+                Clusters.GeneralCommissioning.Commands.ArmFailSafeResponse,
+                await self.send_single_cmd(
+                    cmd=Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=uint(0)),
+                    endpoint=0
+                )
+            )
+            if resp.errorCode != Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kOk:
+                LOGGER.warning("[CLN] disarm failsafe returned errorCode %s", resp.errorCode)
+            else:
+                LOGGER.info("[CLN] failsafe disarmed successfully")
+        except Exception as e:  # DUT may be unreachable or session may have expired; log and continue cleanup
+            LOGGER.warning("[CLN] disarm failsafe failed: %s", e)
+
+    async def _reset_acls_to_default(self) -> None:
+        """Restores the ACL on endpoint 0 to the state captured before the test ran.
+
+        Uses the ACL saved in setup_test (_original_acl).
+        """
+        if self._original_acl is None:
+            LOGGER.warning("[CLN] no pre-test ACL captured, skipping ACL restore")
+            return
+        LOGGER.info("[CLN] restoring ACL to pre-test state")
+        try:
+            result = await self.default_controller.WriteAttribute(
+                self.dut_node_id,
+                [(0, Clusters.AccessControl.Attributes.Acl(self._original_acl))]
+            )
+            if result[0].Status != Status.Success:
+                LOGGER.warning("[CLN] ACL reset returned status %s", result[0].Status)
+            else:
+                LOGGER.info("[CLN] ACL restored successfully")
+        except Exception as e:  # Session may have expired or DUT ACL may be in a state that rejects the write
+            LOGGER.warning("[CLN] ACL reset failed: %s", e)
+
+    async def _remove_extra_fabrics(self) -> None:
+        """Removes any fabric on the DUT that is not the default controller's fabric."""
+        try:
+            # Read TH1's fabric index on the DUT via the default controller
+            th1_fabric_index = await self.read_single_attribute_check_success(
+                cluster=Clusters.OperationalCredentials,  # type: ignore[arg-type]
+                attribute=Clusters.OperationalCredentials.Attributes.CurrentFabricIndex,
+                endpoint=0
+            )
+
+            # Read all fabrics unfiltered so we see every fabric, not just TH1's
+            fabrics = typing.cast(
+                list[Clusters.OperationalCredentials.Structs.FabricDescriptorStruct],
+                await self.read_single_attribute_check_success(
+                    cluster=Clusters.OperationalCredentials,  # type: ignore[arg-type]
+                    attribute=Clusters.OperationalCredentials.Attributes.Fabrics,
+                    endpoint=0,
+                    fabric_filtered=False
+                )
+            )
+        except Exception as e:  # DUT may be unreachable or session may have expired after a multi-fabric test
+            LOGGER.warning(
+                "[CLN] could not read fabric list (DUT unreachable, session expired, or attribute read error), skipping fabric removal: %s", e)
+            return
+
+        extra_fabric_indices = [f.fabricIndex for f in fabrics if f.fabricIndex != th1_fabric_index]
+
+        if not extra_fabric_indices:
+            LOGGER.info("[CLN] no extra fabrics to remove")
+            return
+
+        LOGGER.info("[CLN] removing %d extra fabric(s) from DUT", len(extra_fabric_indices))
+        for fabric_index in extra_fabric_indices:
+            LOGGER.info("[CLN] sending RemoveFabric(fabricIndex=%d)", fabric_index)
+            try:
+                await self.send_single_cmd(
+                    cmd=Clusters.OperationalCredentials.Commands.RemoveFabric(fabricIndex=fabric_index),
+                    endpoint=0
+                )
+                LOGGER.info("[CLN] fabric index %d removed successfully", fabric_index)
+            except Exception as e:  # RemoveFabric may fail if the fabric was already removed by the test or a prior cleanup
+                LOGGER.warning("[CLN] RemoveFabric(%d) failed: %s", fabric_index, e)
+
+    async def _purge_groups(self) -> None:
+        """Removes all non-IPK group key sets and clears the group key map on the DUT.
+
+        Key set 0 (IPK) is skipped as it cannot be removed.
+        """
+        LOGGER.info("[CLN] purging group key sets and key map")
+        try:
+            resp = typing.cast(
+                Clusters.GroupKeyManagement.Commands.KeySetReadAllIndicesResponse,
+                await self.send_single_cmd(
+                    cmd=Clusters.GroupKeyManagement.Commands.KeySetReadAllIndices(),
+                    endpoint=0
+                )
+            )
+
+            # Remove all non-IPK key sets, key set 0 (IPK) cannot be removed
+            for key_set_id in resp.groupKeySetIDs:
+                if key_set_id != 0:
+                    LOGGER.info("[CLN] removing group key set %d", key_set_id)
+                    await self.send_single_cmd(
+                        cmd=Clusters.GroupKeyManagement.Commands.KeySetRemove(groupKeySetID=key_set_id),
+                        endpoint=0
+                    )
+        except Exception as e:  # DUT may be unreachable, or key sets may already be absent; skip rather than aborting cleanup
+            LOGGER.warning("[CLN] key set removal failed: %s", e)
+
+        # Clear all group key mappings
+        try:
+            result = await self.default_controller.WriteAttribute(
+                self.dut_node_id,
+                [(0, Clusters.GroupKeyManagement.Attributes.GroupKeyMap([]))]
+            )
+            if result[0].Status != Status.Success:
+                LOGGER.warning("[CLN] GroupKeyMap clear returned status %s", result[0].Status)
+            else:
+                LOGGER.info("[CLN] group key map cleared successfully")
+        except Exception as e:  # Write may fail if session expired or the DUT rejected the empty map
+            LOGGER.warning("[CLN] GroupKeyMap clear failed: %s", e)
+
+    async def _purge_scenes(self) -> None:
+        """Removes all scenes from all groups on every endpoint that has ScenesManagement.
+
+        Must run before _purge_group_memberships since RemoveAllScenes needs the group to
+        still exist on the DUT.
+        """
+        if self.stored_global_wildcard is None:
+            LOGGER.info("[CLN] wildcard not available, skipping scene cleanup")
+            return
+
+        for endpoint_id in self.stored_global_wildcard.attributes:
+            if not _has_cluster(wildcard=self.stored_global_wildcard, endpoint=endpoint_id,
+                                cluster=Clusters.ScenesManagement):  # type: ignore[arg-type]
+                continue
+            if not _has_cluster(wildcard=self.stored_global_wildcard, endpoint=endpoint_id,
+                                cluster=Clusters.Groups):  # type: ignore[arg-type]
+                continue
+            try:
+                resp = typing.cast(
+                    Clusters.Groups.Commands.GetGroupMembershipResponse,
+                    await self.send_single_cmd(
+                        cmd=Clusters.Groups.Commands.GetGroupMembership(groupList=[]),
+                        endpoint=endpoint_id
+                    )
+                )
+                group_ids = resp.groupList
+                if not group_ids:
+                    continue
+                LOGGER.info("[CLN] removing scenes for groups %s on endpoint %d", group_ids, endpoint_id)
+                for gid in group_ids:
+                    await self.send_single_cmd(
+                        cmd=Clusters.ScenesManagement.Commands.RemoveAllScenes(groupID=gid),
+                        endpoint=endpoint_id
+                    )
+                LOGGER.info("[CLN] scenes cleared on endpoint %d", endpoint_id)
+            except Exception as e:  # DUT may be unreachable or the group may have been removed by the test
+                LOGGER.warning("[CLN] scene removal failed on endpoint %d: %s", endpoint_id, e)
+
+    async def _purge_group_memberships(self) -> None:
+        """Removes all group memberships from the DUT's group table.
+
+        Must run after _purge_scenes since scenes need their groups to still exist for RemoveAllScenes.
+        """
+        if self.stored_global_wildcard is None:
+            LOGGER.info("[CLN] wildcard not available, skipping group membership cleanup")
+            return
+
+        found_any = False
+        for endpoint_id in self.stored_global_wildcard.attributes:
+            if not _has_cluster(wildcard=self.stored_global_wildcard, endpoint=endpoint_id,
+                                cluster=Clusters.Groups):  # type: ignore[arg-type]
+                continue
+            found_any = True
+            LOGGER.info("[CLN] sending RemoveAllGroups on endpoint %d", endpoint_id)
+            try:
+                await self.send_single_cmd(
+                    cmd=Clusters.Groups.Commands.RemoveAllGroups(),
+                    endpoint=endpoint_id
+                )
+                LOGGER.info("[CLN] group memberships cleared on endpoint %d", endpoint_id)
+            except Exception as e:  # DUT may be unreachable or session may have expired after a multi-fabric test
+                LOGGER.warning("[CLN] RemoveAllGroups failed on endpoint %d: %s", endpoint_id, e)
+        if not found_any:
+            LOGGER.info("[CLN] Groups cluster not present on any endpoint, skipping group membership cleanup")
+
+    async def _purge_doorlock(self) -> None:
+        """Clears all DoorLock users and credentials on every endpoint with the DoorLock cluster."""
+        if self.stored_global_wildcard is None:
+            LOGGER.info("[CLN] wildcard not available, skipping DoorLock cleanup")
+            return
+
+        found_any = False
+        for endpoint_id in self.stored_global_wildcard.attributes:
+            if not _has_cluster(wildcard=self.stored_global_wildcard, endpoint=endpoint_id,
+                                cluster=Clusters.DoorLock):  # type: ignore[arg-type]
+                continue
+            found_any = True
+            LOGGER.info("[CLN] clearing DoorLock users and credentials on endpoint %d", endpoint_id)
+            try:
+                await self.send_single_cmd(
+                    cmd=Clusters.DoorLock.Commands.ClearCredential(credential=NullValue),
+                    endpoint=endpoint_id,
+                    timedRequestTimeoutMs=1000
+                )
+                await self.send_single_cmd(
+                    cmd=Clusters.DoorLock.Commands.ClearUser(userIndex=uint(0xFFFE)),
+                    endpoint=endpoint_id,
+                    timedRequestTimeoutMs=1000
+                )
+                LOGGER.info("[CLN] DoorLock users and credentials cleared on endpoint %d", endpoint_id)
+            except Exception as e:  # DUT may be unreachable or DoorLock may be in a state that rejects the clear
+                LOGGER.warning("[CLN] DoorLock cleanup failed on endpoint %d: %s", endpoint_id, e)
+        if not found_any:
+            LOGGER.info("[CLN] DoorLock cluster not present on any endpoint, skipping DoorLock cleanup")
+
+    async def _purge_tls_endpoints(self) -> None:
+        """Removes all provisioned TLS endpoints on every endpoint with TlsClientManagement.
+
+        Uses stored_global_wildcard (pre-populated by _run_framework_cleanup) to locate
+        TlsClientManagement via ServerList, no extra network read needed.
+        """
+        tls_cluster_id = Clusters.TlsClientManagement.id
+        found_any = False
+        for endpoint_id, clusters in self.stored_global_wildcard.attributes.items():
+            server_list = clusters.get(Clusters.Descriptor, {}).get(Clusters.Descriptor.Attributes.ServerList)
+            if server_list is None or tls_cluster_id not in server_list:
+                continue
+            found_any = True
+            try:
+                provisioned = typing.cast(
+                    list[Clusters.TlsClientManagement.Structs.TLSEndpointStruct],
+                    await self.read_single_attribute_check_success(
+                        cluster=Clusters.TlsClientManagement,  # type: ignore[arg-type]
+                        attribute=Clusters.TlsClientManagement.Attributes.ProvisionedEndpoints,
+                        endpoint=endpoint_id
+                    )
+                )
+                if not provisioned:
+                    LOGGER.info("[CLN] no TLS endpoints provisioned on endpoint %d", endpoint_id)
+                    continue
+                LOGGER.info("[CLN] removing %d TLS endpoint(s) on endpoint %d", len(provisioned), endpoint_id)
+                for tls_ep in provisioned:
+                    await self.send_single_cmd(
+                        cmd=Clusters.TlsClientManagement.Commands.RemoveEndpoint(endpointID=tls_ep.endpointID),
+                        endpoint=endpoint_id,
+                        payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD
+                    )
+                LOGGER.info("[CLN] TLS endpoints removed on endpoint %d", endpoint_id)
+            except Exception as e:  # DUT may be unreachable or TLS endpoint may have already been removed
+                LOGGER.warning("[CLN] TLS endpoint cleanup failed on endpoint %d: %s", endpoint_id, e)
+        if not found_any:
+            LOGGER.info("[CLN] TlsClientManagement cluster not present on any endpoint, skipping TLS endpoint cleanup")
+
+    async def _close_commissioning_windows(self) -> None:
+        """Sends RevokeCommissioning to close any open commissioning window on the DUT.
+
+        If no window is open the DUT returns an error, which is expected and logged as info.
+        """
+        LOGGER.info("[CLN] revoking any open commissioning window")
+        try:
+            await self.send_single_cmd(
+                cmd=Clusters.AdministratorCommissioning.Commands.RevokeCommissioning(),
+                endpoint=0,
+                timedRequestTimeoutMs=6000
+            )
+            LOGGER.info("[CLN] commissioning window revoked successfully")
+        except Exception as e:  # Expected when no commissioning window is open; the DUT returns an error in that case
+            LOGGER.info("[CLN] RevokeCommissioning skipped (likely no window open): %s", e)
+
+    async def _unregister_icd_clients(self) -> None:
+        """Unregisters all ICD clients registered on the DUT via the default controller"""
+        # Check if the ICD Management cluster is present on the DUT.
+        # Wildcard is pre-populated by _run_framework_cleanup; guard for standalone calls.
+        if self.stored_global_wildcard is None:
+            LOGGER.info("[CLN] wildcard not available, skipping ICD client cleanup")
+            return
+        if not _has_attribute(wildcard=self.stored_global_wildcard, endpoint=0,
+                              attribute=Clusters.IcdManagement.Attributes.RegisteredClients):  # type: ignore[arg-type]
+            LOGGER.info("[CLN] ICD Management cluster not present, skipping ICD client cleanup")
+            return
+
+        registered_clients = self.stored_global_wildcard.attributes.get(0, {}).get(
+            Clusters.IcdManagement, {}).get(Clusters.IcdManagement.Attributes.RegisteredClients)
+
+        if not registered_clients:
+            LOGGER.info("[CLN] no ICD clients registered, skipping")
+            return
+
+        LOGGER.info("[CLN] unregistering %d ICD client(s)", len(registered_clients))
+        for entry in registered_clients:
+            try:
+                await self.send_single_cmd(
+                    cmd=Clusters.IcdManagement.Commands.UnregisterClient(
+                        checkInNodeID=entry.checkInNodeID
+                    ),
+                    endpoint=0
+                )
+                LOGGER.info("[CLN] unregistered ICD client %#x", entry.checkInNodeID)
+            except Exception as e:  # DUT may be unreachable or the client may have already been unregistered
+                LOGGER.warning("[CLN] UnregisterClient(%#x) failed: %s", entry.checkInNodeID, e)
 
     def _format_summary_value(self, key: str, value: Any) -> str:
         """Format values for end-of-test summary logs."""
@@ -298,7 +793,7 @@ class MatterBaseTest(base_test.BaseTestClass):
 
         if self.is_pics_sdk_ci_only:
             test_name = self.__class__.__name__
-            LOGGER.info(f"===== PICS_SDK_CI_ONLY is enabled (True) for test '{test_name}'.")
+            LOGGER.info("===== PICS_SDK_CI_ONLY is enabled (True) for test '%s'.", test_name)
 
         LOGGER.info("===== EXECUTION FLAGS SUMMARY END =====")
 
@@ -332,10 +827,10 @@ class MatterBaseTest(base_test.BaseTestClass):
             dump_string: The data to be logged
         """
         lines = dump_string.splitlines()
-        LOGGER.info(f'{start_tag}BEGIN ({len(lines)} lines)====')
+        LOGGER.info('%sBEGIN (%s lines)====', start_tag, len(lines))
         for line in lines:
-            LOGGER.info(f'{start_tag}{line}')
-        LOGGER.info(f'{start_tag}END ====')
+            LOGGER.info('%s%s', start_tag, line)
+        LOGGER.info('%sEND ====', start_tag)
 
     def setup_test(self):
         """Set up for each individual test execution.
@@ -349,10 +844,13 @@ class MatterBaseTest(base_test.BaseTestClass):
         Test authors that implement this method should ensure super().setup_test() is called before any custom setup.
         """
         self.current_step_index = 0
-        self.test_start_time = datetime.now(timezone.utc)
-        self.step_start_time = datetime.now(timezone.utc)
+        self.test_start_time = datetime.now(UTC)
+        self.step_start_time = datetime.now(UTC)
         self.step_skipped = False
         self.failed = False
+        self._teardown_ran = False
+        self._framework_cleanup_done = False
+        self.cleanup_config = TestCleanupConfig()
         if self.runner_hook and not self.is_commissioning:
             test_name = self.current_test_info.name
             steps = self.get_defined_test_steps(test_name)
@@ -366,6 +864,52 @@ class MatterBaseTest(base_test.BaseTestClass):
             # to indicates how it is proceeding
             if steps is None:
                 self.step(1)
+
+        # Capture the ACL before the test runs so _reset_acls_to_default can restore it
+        # in teardown_class. Skip when the DUT is not known to be available: unit tests
+        # never commission a device so _dut_confirmed_available stays False, and
+        # commissioning_method is None, eliminating any network overhead for them.
+        # For runner-commissioned tests commissioning_method is set; for in-test
+        # commissioning the flag is set by commission_devices() on success.
+        # is_commissioning is True for CommissionDeviceTest, where the DUT is not yet
+        # on the fabric, an operational read there would send CASE Sigma1 to an
+        # uncommissioned device, triggering unexpected DUT behaviour.
+        dut_expected = (
+            not self.is_commissioning
+            and (
+                self._dut_confirmed_available
+                or self.matter_test_config.commissioning_method is not None
+            )
+        )
+        if dut_expected:
+            try:
+                self._original_acl = self.event_loop.run_until_complete(
+                    self.read_single_attribute_check_success(
+                        cluster=Clusters.AccessControl,
+                        attribute=Clusters.AccessControl.Attributes.Acl,
+                        endpoint=0
+                    )
+                )
+            except Exception:
+                self._original_acl = None
+
+    def teardown_test(self):
+        """Per-test teardown called by the Mobly framework after every test_ method.
+
+        Framework cleanup (DUT state restoration, extra controller shutdown) runs
+        once at class end in teardown_class, not here. Override this method to add
+        custom per-test teardown.
+
+        Subclasses do not need to call super().teardown_test() — __init_subclass__
+        wraps every override so this base method always runs after the override
+        completes, regardless of whether super() was called.
+
+        Idempotency: _teardown_ran prevents double-execution if super() was called
+        explicitly from the override.
+        """
+        if not self._teardown_ran:
+            self._teardown_ran = True
+            super().teardown_test()
 
     def on_fail(self, record):
         """Handle test failure callback from Mobly framework.
@@ -382,12 +926,12 @@ class MatterBaseTest(base_test.BaseTestClass):
             exception = record.termination_signal.exception
 
             try:
-                step_duration = (datetime.now(timezone.utc) - self.step_start_time) / timedelta(microseconds=1)
+                step_duration = (datetime.now(UTC) - self.step_start_time) / timedelta(microseconds=1)
             except AttributeError:
                 # If we failed during setup, these may not be populated
                 step_duration = 0
             try:
-                test_duration = (datetime.now(timezone.utc) - self.test_start_time) / timedelta(microseconds=1)
+                test_duration = (datetime.now(UTC) - self.test_start_time) / timedelta(microseconds=1)
             except AttributeError:
                 test_duration = 0
             # TODO: I have no idea what logger, logs, request or received are. Hope None works because I have nothing to give
@@ -475,8 +1019,8 @@ class MatterBaseTest(base_test.BaseTestClass):
         if self.runner_hook and not self.is_commissioning:
             # What is request? This seems like an implementation detail for the runner
             # TODO: As with failure, I have no idea what logger, logs or request are meant to be
-            step_duration = (datetime.now(timezone.utc) - self.step_start_time) / timedelta(microseconds=1)
-            test_duration = (datetime.now(timezone.utc) - self.test_start_time) / timedelta(microseconds=1)
+            step_duration = (datetime.now(UTC) - self.step_start_time) / timedelta(microseconds=1)
+            test_duration = (datetime.now(UTC) - self.test_start_time) / timedelta(microseconds=1)
             self.runner_hook.step_success(logger=None, logs=None, duration=step_duration, request=None)
 
         # TODO: this check could easily be annoying when doing dev. flag it somehow? Ditto with the in-order check
@@ -505,7 +1049,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             record: TestResultRecord containing skip information.
         """
         if self.runner_hook and not self.is_commissioning:
-            test_duration = (datetime.now(timezone.utc) - self.test_start_time) / timedelta(microseconds=1)
+            test_duration = (datetime.now(UTC) - self.test_start_time) / timedelta(microseconds=1)
             test_name = self.current_test_info.name
             filename = inspect.getfile(self.__class__)
             self.runner_hook.test_skipped(filename, test_name)
@@ -592,13 +1136,57 @@ class MatterBaseTest(base_test.BaseTestClass):
         '''
         return self.matter_test_config.wifi_passphrase if self.matter_test_config.wifi_passphrase is not None else default
 
-    def get_setup_payload_info(self) -> List[SetupPayloadInfo]:
+    def get_setup_payload_info(self) -> list[SetupPayloadInfo]:
         """
         Get and builds the payload info provided in the execution.
         Returns:
             List[SetupPayloadInfo]: List of Payload used by the test case
         """
         return get_setup_payload_info_config(self.matter_test_config)
+
+    def get_random_port(self) -> int:
+        """Selects a random port and checks that it is not yet in use.
+
+        Note that this check can be racy, but the way this function is generally used
+        is assumed fine.
+        """
+        if not hasattr(self, '_allocated_ports'):
+            self._allocated_ports: set[int] = set()
+
+        def is_port_available(p: int) -> bool:
+            import errno
+
+            # Verify TCP and UDP on all IPv4 interfaces
+            for sock_type in (socket.SOCK_STREAM, socket.SOCK_DGRAM):
+                with socket.socket(socket.AF_INET, sock_type) as s:
+                    try:
+                        s.bind(('', p))
+                    except OSError as e:
+                        if e.errno == errno.EADDRINUSE:
+                            return False
+                        raise
+
+            # Verify TCP and UDP on all IPv6 interfaces if available
+            if socket.has_ipv6:
+                for sock_type in (socket.SOCK_STREAM, socket.SOCK_DGRAM):
+                    with socket.socket(socket.AF_INET6, sock_type) as s:
+                        try:
+                            s.bind(('::', p))
+                        except OSError as e:
+                            if e.errno == errno.EADDRINUSE:
+                                return False
+                            raise
+            return True
+
+        while True:
+            # The chosen safe range (35000-45000) naturally avoids well-known bad/conflicting
+            # ports like 5353 (mDNS) and 5550-5555 (Matter standard ports).
+            port = random.randint(35000, 45000)
+            if port in self._allocated_ports:
+                continue
+            if is_port_available(port):
+                self._allocated_ports.add(port)
+                return port
 
     #
     # Matter Test API - Test Definition Helpers (Steps, PICS, Description)
@@ -738,14 +1326,14 @@ class MatterBaseTest(base_test.BaseTestClass):
             # If we've reached the next step with no assertion and the step wasn't skipped, it passed
             if not self.step_skipped and self.current_step_index != 0:
                 # TODO: As with failure, I have no idea what loger, logs or request are meant to be
-                step_duration = (datetime.now(timezone.utc) - self.step_start_time) / timedelta(microseconds=1)
+                step_duration = (datetime.now(UTC) - self.step_start_time) / timedelta(microseconds=1)
                 self.runner_hook.step_success(logger=None, logs=None, duration=step_duration, request=None)
 
             # TODO: it seems like the step start should take a number and a name
             name = f'{step} : {current_step.description}'
             self.runner_hook.step_start(name=name)
 
-        self.step_start_time = datetime.now(tz=timezone.utc)
+        self.step_start_time = datetime.now(tz=UTC)
         self.current_step_index = self.current_step_index + 1
         self.step_skipped = False
 
@@ -756,7 +1344,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             stepnum: The step number or identifier.
             title: The descriptive title of the step.
         """
-        LOGGER.info(f'***** Test Step {stepnum} : {title}')
+        LOGGER.info('***** Test Step %s : %s', stepnum, title)
 
     def skip_step(self, step):
         """Execute and immediately mark a step as skipped.
@@ -782,7 +1370,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             # TODO: I very much do not want to have people passing in strings here. Do we really need the expression
             #       as a string? Does it get used by the TH?
             self.runner_hook.step_skipped(name=str(num), expression="")
-        LOGGER.info(f'**** Skipping: {num}')
+        LOGGER.info('**** Skipping: %s', num)
         self.step_skipped = True
 
     def mark_all_remaining_steps_skipped(self, starting_step_number: typing.Union[int, str]) -> None:
@@ -877,7 +1465,7 @@ class MatterBaseTest(base_test.BaseTestClass):
 
     async def _populate_wildcard(self):
         """ Populates self.stored_global_wildcard if not already filled. """
-        if self.stored_global_wildcard is None:
+        if not hasattr(self, 'stored_global_wildcard') or self.stored_global_wildcard is None:
             global_wildcard = asyncio.wait_for(self.default_controller.Read(self.dut_node_id, [(Clusters.Descriptor), Attribute.AttributePath(None, None, GlobalAttributeIds.ATTRIBUTE_LIST_ID), Attribute.AttributePath(
                 None, None, GlobalAttributeIds.FEATURE_MAP_ID), Attribute.AttributePath(None, None, GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID)]), timeout=60)
             self.stored_global_wildcard = await global_wildcard
@@ -953,8 +1541,8 @@ class MatterBaseTest(base_test.BaseTestClass):
             True if commissioning succeeded, False otherwise.
         """
         dev_ctrl: ChipDeviceCtrl.ChipDeviceController = self.default_controller
-        dut_node_ids: List[int] = self.matter_test_config.dut_node_ids
-        setup_payloads: List[SetupPayloadInfo] = self.get_setup_payload_info()
+        dut_node_ids: list[int] = self.matter_test_config.dut_node_ids
+        setup_payloads: list[SetupPayloadInfo] = self.get_setup_payload_info()
         commissioning_info: CommissioningInfo = CommissioningInfo(
             commissionee_ip_address_just_for_testing=self.matter_test_config.commissionee_ip_address_just_for_testing,
             commissioning_method=self.matter_test_config.commissioning_method,
@@ -967,7 +1555,10 @@ class MatterBaseTest(base_test.BaseTestClass):
             thread_ba_port=self.matter_test_config.thread_ba_port,
         )
 
-        return await commission_devices(dev_ctrl, dut_node_ids, setup_payloads, commissioning_info)
+        result = await commission_devices(dev_ctrl, dut_node_ids, setup_payloads, commissioning_info)
+        if result:
+            self._dut_confirmed_available = True
+        return result
 
     async def open_commissioning_window(self, dev_ctrl: Optional[ChipDeviceCtrl.ChipDeviceController] = None, node_id: Optional[int] = None, timeout: int = 900) -> CustomCommissioningParameters:
         """Open a commissioning window on the target device.
@@ -998,7 +1589,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             raise  # Help mypy understand this never returns
 
     async def read_single_attribute(
-            self, dev_ctrl: ChipDeviceCtrl.ChipDeviceController, node_id: int, endpoint: int, attribute: Type[ClusterObjects.ClusterAttributeDescriptor], fabricFiltered: bool = True) -> object:
+            self, dev_ctrl: ChipDeviceCtrl.ChipDeviceController, node_id: int, endpoint: int, attribute: type[ClusterObjects.ClusterAttributeDescriptor], fabricFiltered: bool = True) -> object:
         """Read a single attribute value from a device.
 
         Args:
@@ -1016,7 +1607,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         return list(data.values())[0][attribute]
 
     async def read_single_attribute_all_endpoints(
-            self, cluster: ClusterObjects.Cluster, attribute: Type[ClusterObjects.ClusterAttributeDescriptor],
+            self, cluster: ClusterObjects.Cluster, attribute: type[ClusterObjects.ClusterAttributeDescriptor],
             dev_ctrl: Optional[ChipDeviceCtrl.ChipDeviceController] = None, node_id: Optional[int] = None):
         """Reads a single attribute of a specified cluster across all endpoints.
 
@@ -1038,7 +1629,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         return attrs
 
     async def read_single_attribute_check_success(
-            self, cluster: ClusterObjects.Cluster, attribute: Type[ClusterObjects.ClusterAttributeDescriptor],
+            self, cluster: ClusterObjects.Cluster, attribute: type[ClusterObjects.ClusterAttributeDescriptor],
             dev_ctrl: Optional[ChipDeviceCtrl.ChipDeviceController] = None, node_id: Optional[int] = None, endpoint: Optional[int] = None, fabric_filtered: bool = True, assert_on_error: bool = True, test_name: str = "", payloadCapability: int = ChipDeviceCtrl.TransportPayloadCapability.MRP_PAYLOAD) -> object:
         if dev_ctrl is None:
             dev_ctrl = self.default_controller
@@ -1069,7 +1660,7 @@ class MatterBaseTest(base_test.BaseTestClass):
 
     async def poll_until_attributes_in_range(
             self, cluster: ClusterObjects.Cluster,
-            attribute_bounds: List[Tuple[Type[ClusterObjects.ClusterAttributeDescriptor], int, int]],
+            attribute_bounds: list[tuple[type[ClusterObjects.ClusterAttributeDescriptor], int, int]],
             timeout_sec: int = 1) -> None:
         """Poll attributes until each value falls within [min_value, max_value].
 
@@ -1092,7 +1683,7 @@ class MatterBaseTest(base_test.BaseTestClass):
                 value = await self.read_single_attribute_check_success(cluster, attribute)
 
     async def read_single_attribute_expect_error(
-            self, cluster: ClusterObjects.Cluster, attribute: Type[ClusterObjects.ClusterAttributeDescriptor],
+            self, cluster: ClusterObjects.Cluster, attribute: type[ClusterObjects.ClusterAttributeDescriptor],
             error: Status, dev_ctrl: Optional[ChipDeviceCtrl.ChipDeviceController] = None, node_id: Optional[int] = None, endpoint: Optional[int] = None,
             fabric_filtered: bool = True, assert_on_error: bool = True, test_name: str = "") -> object:
         if dev_ctrl is None:
@@ -1276,17 +1867,17 @@ class MatterBaseTest(base_test.BaseTestClass):
         # remotely via SSH from the target device.
         if dut_ip is None:
             with open(app_pipe, "w") as app_pipe_fp:
-                LOGGER.info(f"Sending out-of-band command: {command} to file: {app_pipe}")
+                LOGGER.info("Sending out-of-band command: %s to file: %s", command, app_pipe)
                 app_pipe_fp.write(json.dumps(command_dict) + "\n")
             # TODO(#31239): remove the need for sleep
             # This was tested with matter.js as being reliable enough
             time.sleep(0.05)
         else:
-            LOGGER.info(f"Using DUT IP address: {dut_ip}")
+            LOGGER.info("Using DUT IP address: %s", dut_ip)
 
             dut_uname = os.getenv('LINUX_DUT_USER')
             asserts.assert_true(dut_uname is not None, "The LINUX_DUT_USER environment variable must be set")
-            LOGGER.info(f"Using DUT user name: {dut_uname}")
+            LOGGER.info("Using DUT user name: %s", dut_uname)
             command_fixed = shlex.quote(json.dumps(command_dict))
             cmd = "echo \"%s\" | ssh %s@%s \'cat > %s\'" % (command_fixed, dut_uname, dut_ip, app_pipe)
             os.system(cmd)
@@ -1450,8 +2041,8 @@ class MatterBaseTest(base_test.BaseTestClass):
                                          placeholder=prompt_msg_placeholder,
                                          default_value=default_value)
 
-        LOGGER.info(f"========= USER PROMPT for Endpoint {endpoint_id} =========")
-        LOGGER.info(f">>> {prompt_msg.rstrip()} (press enter to confirm)")
+        LOGGER.info("========= USER PROMPT for Endpoint %s =========", endpoint_id)
+        LOGGER.info(">>> %s (press enter to confirm)", prompt_msg.rstrip())
         try:
             return input()
         except EOFError:
@@ -1501,7 +2092,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             hook_method = getattr(self.runner_hook, hook_method_name)
             hook_method(msg=prompt_msg)
 
-            LOGGER.info(f"========= USER PROMPT for {validation_name} =========")
+            LOGGER.info("========= USER PROMPT for %s =========", validation_name)
 
             try:
                 result = input()
@@ -1591,9 +2182,9 @@ class MatterBaseTest(base_test.BaseTestClass):
                     if controller.isActive:
                         try:
                             controller.ExpireSessions(self.dut_node_id)
-                            LOGGER.info(f"Expired sessions on controller with nodeId {controller.nodeId}")
+                            LOGGER.info("Expired sessions on controller with nodeId %s", controller.nodeId)
                         except ChipStackError as e:  # chipstack-ok
-                            LOGGER.warning(f"Failed to expire sessions on controller {controller.nodeId}: {e}")
+                            LOGGER.warning("Failed to expire sessions on controller %s: %s", controller.nodeId, e)
 
     async def request_device_reboot(self):
         """Request a reboot of the Device Under Test (DUT).
@@ -1633,7 +2224,7 @@ class MatterBaseTest(base_test.BaseTestClass):
                 LOGGER.info("App reboot completed successfully")
 
             except Exception as e:
-                LOGGER.error(f"Failed to reboot app: {e}")
+                LOGGER.error("Failed to reboot app: %s", e)
                 asserts.fail(f"App reboot failed: {e}")
 
     async def request_device_factory_reset(self, reset_ctrl: bool = False) -> None:

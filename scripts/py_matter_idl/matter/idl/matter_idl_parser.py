@@ -16,7 +16,7 @@ import dataclasses
 import functools
 import logging
 import pprint
-from typing import Dict, List, Optional
+from typing import Optional
 
 import click
 from lark import Lark
@@ -50,7 +50,7 @@ class PrefixCppDocComment:
             return
 
         actual_pos = self.start_pos + self.value_len
-        while content[actual_pos] in ' \t\n\r':
+        while actual_pos < len(content) and content[actual_pos] in ' \t\n\r':
             actual_pos += 1
 
         # A doc comment will apply to any supported element assuming it immediately
@@ -67,8 +67,7 @@ class PrefixCppDocComment:
             yield cluster
             for attribute in cluster.attributes:
                 yield attribute.definition
-            for command in cluster.commands:
-                yield command
+            yield from cluster.commands
             for struct in cluster.structs:
                 yield struct
                 for field in struct.fields:
@@ -285,20 +284,26 @@ class MatterIdlTransformer(Transformer):
     def debug_priority(self, _):
         return EventPriority.DEBUG
 
+    def command_fabric_scoped(self, _):
+        return CommandQuality.FABRIC_SCOPED
+
+    def command_timed(self, _):
+        return CommandQuality.TIMED_INVOKE
+
+    def command_qualities(self, qualities):
+        return UnionOfAllFlags(qualities) or CommandQuality.NONE
+
     def event_fabric_sensitive(self, _):
         return EventQuality.FABRIC_SENSITIVE
 
-    def event_qualities(selt, qualities):
+    def event_qualities(self, qualities):
         return UnionOfAllFlags(qualities) or EventQuality.NONE
 
-    def timed_command(self, _):
-        return CommandQuality.TIMED_INVOKE
+    def command_optional(self, _):
+        return CommandQuality.OPTIONAL
 
-    def fabric_scoped_command(self, _):
-        return CommandQuality.FABRIC_SCOPED
-
-    def command_qualities(self, attrs):
-        return UnionOfAllFlags(attrs) or CommandQuality.NONE
+    def event_optional(self, _):
+        return EventQuality.OPTIONAL
 
     @v_args(meta=True)
     def struct_field(self, meta, args):
@@ -316,14 +321,15 @@ class MatterIdlTransformer(Transformer):
         return privilege[0]
 
     def command_with_access(self, args):
-        # Arguments
-        #   - optional access for invoke
-        #   - event identifier (name)
         init_args = {
-            "name": args[-1]
+            "name": args[-1],
+            "qualities": CommandQuality.NONE
         }
-        if len(args) > 1:
-            init_args["invokeacl"] = args[0]
+        for arg in args[:-1]:
+            if isinstance(arg, CommandQuality):
+                init_args["qualities"] = arg
+            elif isinstance(arg, AccessPrivilege):
+                init_args["invokeacl"] = arg
 
         return init_args
 
@@ -331,33 +337,46 @@ class MatterIdlTransformer(Transformer):
     #       between lark versions in https://github.com/lark-parser/lark/pull/993
     @v_args(meta=True, inline=True)
     def command(self, meta, *tuple_args):
-        # The command takes 4 arguments if no input argument, 5 if input
-        # argument is provided
-        args = list(tuple_args)  # convert from tuple
-        if len(args) != 5:
-            args.insert(2, None)
+        # tuple_args contains:
+        # 0: command_qualities
+        # 1: [command_optional] (CommandQuality.OPTIONAL or None)
+        # 2: command_with_access
+        # Rest: input_param (optional), output_param, code
+        qualities, optional_quality, with_access, *rest = tuple_args
+        qualities = qualities or CommandQuality.NONE
+        if optional_quality:
+            qualities |= optional_quality
+
+        with_access.pop("qualities", None)
+
+        if len(rest) == 2:
+            input_param = None
+            output_param, code = rest
+        else:
+            input_param, output_param, code = rest
 
         meta = None if self.skip_meta else ParseMetaData(meta)
 
         return Command(
             parse_meta=meta,
-            qualities=args[0],
-            input_param=args[2], output_param=args[3], code=args[4],
-            **args[1],
+            qualities=qualities,
+            input_param=input_param, output_param=output_param, code=code,
+            **with_access,
         )
 
     def event_access(self, privilege):
         return privilege[0]
 
     def event_with_access(self, args):
-        # Arguments
-        #   - optional access for read
-        #   - event identifier (name)
         init_args = {
-            "name": args[-1]
+            "name": args[-1],
+            "qualities": EventQuality.NONE
         }
-        if len(args) > 1:
-            init_args["readacl"] = args[0]
+        for arg in args[:-1]:
+            if isinstance(arg, EventQuality):
+                init_args["qualities"] = arg
+            elif isinstance(arg, AccessPrivilege):
+                init_args["readacl"] = arg
 
         return init_args
 
@@ -367,8 +386,17 @@ class MatterIdlTransformer(Transformer):
 
     @v_args(meta=True)
     def event(self, meta, args):
+        qualities, priority, optional_quality, with_access, code = args[:5]
+        fields = args[5:]
+
+        qualities = qualities or EventQuality.NONE
+        if optional_quality:
+            qualities |= optional_quality
+
+        with_access.pop("qualities", None)
+
         meta = None if self.skip_meta else ParseMetaData(meta)
-        return Event(qualities=args[0], priority=args[1], code=args[3], fields=args[4:], parse_meta=meta, **args[2])
+        return Event(qualities=qualities, priority=priority, code=code, fields=fields, parse_meta=meta, **with_access)
 
     def view_privilege(self, args):
         return AccessPrivilege.VIEW
@@ -506,10 +534,16 @@ class MatterIdlTransformer(Transformer):
         return AddServerClusterToEndpointTransform(
             ServerClusterInstantiation(parse_meta=meta, name=cluster_id, attributes=attributes, events_emitted=events, commands=commands))
 
-    @v_args(inline=True)
-    def cluster_content(self, api_maturity, element):
+    @v_args(meta=True)
+    def cluster_content(self, meta, args):
+        api_maturity, element = args[0], args[1]
         if api_maturity is not None:
             element.api_maturity = api_maturity
+        if not self.skip_meta:
+            if isinstance(element, Attribute):
+                element.definition.parse_meta = ParseMetaData(meta)
+            elif hasattr(element, 'parse_meta'):
+                element.parse_meta = ParseMetaData(meta)
         return element
 
     @v_args(inline=True, meta=True)
@@ -579,7 +613,7 @@ class MatterIdlTransformer(Transformer):
             self.doc_comments.append(PrefixCppDocComment(token))
 
 
-def _referenced_type_names(cluster: Cluster) -> List[str]:
+def _referenced_type_names(cluster: Cluster) -> list[str]:
     """
     Return the ORDERED and UNIQUE names of all data types referenced by the given cluster.
     """
@@ -709,7 +743,7 @@ class ParserWithLines:
         #
         # A zap PR to allow us to not need this is:
         #    https://github.com/project-chip/zap/pull/1216
-        clusters: Dict[int, Cluster] = {}
+        clusters: dict[int, Cluster] = {}
         for c in idl.clusters:
             if c.code in clusters:
                 if c != clusters[c.code]:

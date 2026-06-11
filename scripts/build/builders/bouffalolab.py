@@ -114,7 +114,7 @@ class BouffalolabBuilder(GnBuilder):
         else:
             raise Exception(f"module_type {module_type} is not supported")
 
-        super(BouffalolabBuilder, self).__init__(
+        super().__init__(
             root=os.path.join(root, 'examples',
                               app.ExampleName(), 'bouffalolab', bouffalo_chip),
             runner=runner,
@@ -274,7 +274,7 @@ class BouffalolabBuilder(GnBuilder):
         pattern = r'PROJECT_SDK_VERSION\s+"([^"]+)"'
 
         try:
-            with open(filepath, 'r', encoding='utf-8') as f:
+            with open(filepath, encoding='utf-8') as f:
                 content = f.read()
             match = re.search(pattern, content)
             if match:
@@ -284,7 +284,7 @@ class BouffalolabBuilder(GnBuilder):
                 return ver
             raise Exception('Invalid version format')
         except Exception as err:
-            log.error(f"Failed to extract SDK version: {err}")
+            log.error("Failed to extract SDK version: %s", err)
             return (2, 1, 0)
 
     def GnBuildArgs(self):
@@ -324,13 +324,13 @@ class BouffalolabBuilder(GnBuilder):
 
             log.info('*' * 80)
 
-            log.info("Firmware is built out at: {}".format(path_fw))
+            log.info("Firmware is built out at: %s", path_fw)
             log.info("Command to generate ota image: ")
-            log.info('./{} --build-ota --vendor-id <vendor id> --product-id <product id> '
-                     '--version <version> --version-str <version string> '
-                     '--digest-algorithm <digest algorithm>'.format(path_flash_script))
+            log.info("./%s --build-ota --vendor-id <vendor id> --product-id <product id> "
+                     "--version <version> --version-str <version string> "
+                     "--digest-algorithm <digest algorithm>", path_flash_script)
             log.info("Command to generate and sign ota image: ")
-            log.info('./{} --build-ota --vendor-id <vendor id> --product-id <product id> '
-                     '--version <version> --version-str <version string> '
-                     '--digest-algorithm <digest algorithm> --sk <private key>'.format(path_flash_script))
+            log.info("./%s --build-ota --vendor-id <vendor id> --product-id <product id> "
+                     "--version <version> --version-str <version string> "
+                     "--digest-algorithm <digest algorithm> --sk <private key>", path_flash_script)
             log.info('*' * 80)

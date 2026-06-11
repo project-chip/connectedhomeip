@@ -9,6 +9,16 @@ not_automated:
       reason:
           NFC-Thread hardware setup needed for running this test-case and CI
           does not support it
+    - name: TC_SC_TC_2_1.py
+      reason: Test requires Thread MeshCoP hardware or simulation.
+    - name: TC_SC_TC_2_2.py
+      reason: Test requires Thread MeshCoP hardware or simulation.
+    - name: TC_SC_TC_3_1.py
+      reason: Test requires Thread MeshCoP hardware or simulation.
+    - name: TC_SC_TC_4_1.py
+      reason: Test requires Thread MeshCoP hardware or simulation.
+    - name: thread_meshcop_testing.py
+      reason: Shared code for Thread MeshCoP tests, not a standalone test.
     - name: MinimalRepresentation.py
       reason: Code/Test not being used or not shared code for any other tests
     - name: TC_AVSMTestBase.py
@@ -171,10 +181,6 @@ not_automated:
       reason:
           Very flaky in CI.
           https://github.com/project-chip/connectedhomeip/issues/71932
-    - name: TC_PAVST_2_13.py
-      reason:
-          Used to be flaky, now it seems to deadlock and tests are cancelled.
-          https://github.com/project-chip/connectedhomeip/issues/71808
 
 # This is a list of slow tests (just arbitrarily picked around 20 seconds)
 # used in some script reporting for "be patient" messages as well as potentially
@@ -193,6 +199,8 @@ slow_tests:
     - { name: TC_DRLK_2_3.py, duration: 30 seconds }
     - { name: TC_EEVSE_2_6.py, duration: 30 seconds }
     - { name: TC_FAN_3_1.py, duration: 15 seconds }
+    - { name: TC_IDM_2_2.py, duration: 3 minutes }
+    - { name: TC_IDM_4_3.py, duration: 4 minutes }
     - { name: TC_MCORE_FS_1_4.py, duration: 20 seconds }
     - { name: TC_OPSTATE_2_5.py, duration: 1.25 minutes }
     - { name: TC_OPSTATE_2_6.py, duration: 35 seconds }

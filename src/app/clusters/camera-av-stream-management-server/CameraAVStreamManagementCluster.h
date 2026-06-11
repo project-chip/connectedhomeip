@@ -392,57 +392,86 @@ public:
         SafeAttributePersistenceProvider & safeAttributePersistenceProvider;
     };
 
+    struct InitArguments
+    {
+        /**
+         * Context providing injected dependencies.
+         * Note: the caller must ensure that the SafeAttributePersistenceProvider referenced by the context outlives this instance.
+         */
+        Context context;
+
+        /**
+         * A reference to the delegate to be used by this server.
+         * Note: the caller must ensure that the delegate lives throughout the instance's lifetime.
+         */
+        CameraAVStreamManagementDelegate & delegate;
+
+        /** The endpoint on which this cluster exists. This must match the zap configuration. */
+        EndpointId endpointId;
+
+        /** The bitflags value that identifies which features are supported by this instance. */
+        BitFlags<Feature> features;
+
+        /** The bitflags value that identifies the optional attributes supported by this instance. */
+        BitFlags<OptionalAttribute> optionalAttrs;
+
+        /** The maximum number of video encoders supported by camera. */
+        uint8_t maxConcurrentEncoders = 0;
+
+        /** The maximum data rate (encoded pixels/sec) supported by camera. */
+        uint32_t maxEncodedPixelRate = 0;
+
+        /** The set of video sensor parameters for the camera. */
+        VideoSensorParamsStruct videoSensorParams;
+
+        /** Indicates whether nightvision mode does or does not use infrared. */
+        bool nightVisionUsesInfrared = false;
+
+        /** Indicates minimum resolution (width/height) in pixels allowed for camera viewport. */
+        VideoResolutionStruct minViewPort;
+
+        /** Indicates the list of rate distortion trade-off points for supported hardware encoders. */
+        std::vector<RateDistortionTradeOffStruct> rateDistortionTradeOffPoints;
+
+        /** The maximum size of the content buffer containing data for all streams, including pre-roll. */
+        uint32_t maxContentBufferSize = 0;
+
+        /** Indicates the audio capabilities of the microphone in terms of the codec used, supported sample rates and the number of
+         * channels. */
+        AudioCapabilitiesStruct microphoneCapabilities;
+
+        /** Indicates the audio capabilities of the speaker in terms of the codec used, supported sample rates and the number of
+         * channels. */
+        AudioCapabilitiesStruct spkrCapabilities;
+
+        /** Indicates the type of two-way talk support the device has, e.g., half-duplex, full-duplex, etc. */
+        TwoWayTalkSupportTypeEnum twoWayTalkSupport = TwoWayTalkSupportTypeEnum::kNotSupported;
+
+        /** Indicates the set of supported snapshot capabilities by the device, e.g., the image codec, the resolution and the
+         * maximum frame rate. */
+        std::vector<SnapshotCapabilitiesStruct> snapshotCapabilities;
+
+        /** Indicates the maximum network bandwidth (in bps) that the device would consume for the transmission of its media
+         * streams. */
+        uint32_t maxNetworkBandwidth = 0;
+
+        /** Indicates the possible stream types available. */
+        std::vector<Globals::StreamUsageEnum> supportedStreamUsages;
+
+        /** Indicates the priority ranking of the available streams. */
+        std::vector<Globals::StreamUsageEnum> streamUsagePriorities;
+    };
+
     /**
      * @brief Creates a Camera AV Stream Management cluster instance. The Init() function needs to be called for this instance
      * to be registered and called by the interaction model at the appropriate times.
      *
-     * @param aContext                          Context providing injected dependencies (e.g., SafeAttributePersistenceProvider).
-     *                                          Note: the caller must ensure that the provided SafeAttributePersistenceProvider
-     *                                          outlives this instance.
-     *
-     * @param aDelegate                         A pointer to the delegate to be used by this server.
-     *                                          Note: the caller must ensure that the delegate lives throughout the instance's
-     *                                          lifetime.
-     *
-     * @param aEndpointId                       The endpoint on which this cluster exists. This must match the zap configuration.
-     * @param aFeatures                         The bitflags value that identifies which features are supported by this instance.
-     * @param aOptionalAttrs                    The bitflags value that identifies the optional attributes supported by this
-     *                                          instance.
-     * @param aMaxConcurrentEncoders            The maximum number of video encoders supported by camera.
-     * @param aMaxEncodedPixelRate              The maximum data rate (encoded pixels/sec) supported by camera.
-     * @param aVideoSensorParams                The set of video sensor parameters for the camera.
-     * @param aNightVisionUsesInfrared          Indicates whether nightvision mode does or does not use infrared
-     * @param aMinViewPort                      Indicates minimum resolution (width/height) in pixels allowed for camera viewport.
-     * @param aRateDistortionTradeOffPoints     Indicates the list of rate distortion trade-off points for supported hardware
-     *                                          encoders.
-     * @param aMaxContentBufferSize             The maximum size of the content buffer containing data for all streams, including
-     *                                          pre-roll.
-     * @param aMicrophoneCapabilities           Indicates the audio capabilities of the speaker in terms of the codec used,
-     *                                          supported sample rates and the number of channels.
-     * @param aSpkrCapabilities                 Indicates the audio capabilities of the speaker in terms of the codec used,
-     *                                          supported sample rates and the number of channels.
-     * @param aTwoWayTalkSupport                Indicates the type of two-way talk support the device has, e.g., half-duplex,
-     *                                          full-duplex, etc.
-     * @param aSnapshotCapabilities             Indicates the set of supported snapshot capabilities by the device, e.g., the image
-     *                                          codec, the resolution and the maximum frame rate.
-     * @param aMaxNetworkBandwidth              Indicates the maximum network bandwidth (in bps) that the device would consume
-     * @param aSupportedStreamUsages            Indicates the possible stream types available
-     * @param aStreamUsagePriorities            Indicates the priority ranking of the available streams
-     * for the transmission of its media streams.
+     * @param aArgs                             Initialization arguments.
+     *                                          Note: The caller must ensure that resources referenced in aArgs (like the delegate
+     *                                          and the SafeAttributePersistenceProvider in context) outlive this cluster instance.
      *
      */
-    CameraAVStreamManagementCluster(const Context & aContext, CameraAVStreamManagementDelegate & aDelegate, EndpointId aEndpointId,
-                                    const BitFlags<Feature> aFeatures, const BitFlags<OptionalAttribute> aOptionalAttrs,
-                                    uint8_t aMaxConcurrentEncoders, uint32_t aMaxEncodedPixelRate,
-                                    const VideoSensorParamsStruct & aVideoSensorParams, bool aNightVisionUsesInfrared,
-                                    const VideoResolutionStruct & aMinViewPort,
-                                    const std::vector<RateDistortionTradeOffStruct> & aRateDistortionTradeOffPoints,
-                                    uint32_t aMaxContentBufferSize, const AudioCapabilitiesStruct & aMicrophoneCapabilities,
-                                    const AudioCapabilitiesStruct & aSpkrCapabilities, TwoWayTalkSupportTypeEnum aTwoWayTalkSupport,
-                                    const std::vector<SnapshotCapabilitiesStruct> & aSnapshotCapabilities,
-                                    uint32_t aMaxNetworkBandwidth,
-                                    const std::vector<Globals::StreamUsageEnum> & aSupportedStreamUsages,
-                                    const std::vector<Globals::StreamUsageEnum> & aStreamUsagePriorities);
+    CameraAVStreamManagementCluster(InitArguments && aArgs);
 
     ~CameraAVStreamManagementCluster() override;
 

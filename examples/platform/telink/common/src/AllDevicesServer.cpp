@@ -27,7 +27,7 @@
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/GroupDataProviderImpl.h>
 #include <data-model-providers/codedriven/CodeDrivenDataModelProvider.h>
-#include <devices/device-factory/DeviceFactory.h>
+#include <device-factory/DeviceFactory.h>
 #include <devices/interface/DeviceInterface.h>
 #include <devices/root-node/RootNodeDevice.h>
 #include <platform/DeviceControlServer.h>
@@ -152,6 +152,7 @@ CHIP_ERROR PopulateAllDevicesDataModelProvider(CommonCaseDeviceServerInitParams 
         .groupDataProvider = gGroupDataProvider,
         .fabricTable       = Server::GetInstance().GetFabricTable(),
         .timerDelegate     = gTimerDelegate,
+        .storageDelegate   = *initParams.persistentStorageDelegate,
     });
 
     VerifyOrReturnError(!gDeviceType.empty(), CHIP_ERROR_INVALID_ARGUMENT);

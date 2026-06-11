@@ -22,7 +22,8 @@ import shutil
 import sys
 import tarfile
 import textwrap
-from typing import Any, Dict
+from pathlib import Path
+from typing import Any
 
 import constants
 import stateful_shell
@@ -34,7 +35,7 @@ TermColors = constants.TermColors
 shell = stateful_shell.StatefulShell()
 
 _CHEF_SCRIPT_PATH = os.path.abspath(os.path.dirname(__file__))
-_REPO_BASE_PATH = os.path.join(_CHEF_SCRIPT_PATH, "../../")
+_REPO_BASE_PATH = next(filter(lambda p: (p / 'SPECIFICATION_VERSION').is_file(), Path(__file__).parents))
 _DEVICE_FOLDER = os.path.join(_CHEF_SCRIPT_PATH, "devices")
 _DEVICE_LIST = [file[:-4]
                 for file in os.listdir(_DEVICE_FOLDER) if file.endswith(".zap") and file != 'template.zap']
@@ -105,14 +106,7 @@ def load_config() -> None:
     return config
 
 
-def check_python_version() -> None:
-    if sys.version_info[0] < 3:
-        flush_print('Must use Python 3. Current version is ' +
-                    str(sys.version_info[0]))
-        exit(1)
-
-
-def load_cicd_config() -> Dict[str, Any]:
+def load_cicd_config() -> dict[str, Any]:
     with open(_CICD_CONFIG_FILE_NAME) as config_file:
         return json.loads(config_file.read())
 
@@ -275,7 +269,6 @@ def bundle_telink(device_name: str) -> None:
 
 def main() -> int:
 
-    check_python_version()
     config = load_config()
     cicd_config = load_cicd_config()
 

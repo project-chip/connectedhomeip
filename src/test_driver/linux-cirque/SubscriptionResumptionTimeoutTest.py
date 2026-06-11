@@ -16,11 +16,13 @@ limitations under the License.
 """
 
 import logging
-import os
+import shlex
 import sys
 import time
 
 from helper.CHIPTestBase import CHIPVirtualHome
+from helper.paths import (CHIP_ALL_CLUSTERS_APP_ESC, CHIP_REPO_STR, CONTROLLER_TEST_SCRIPTS_DIR_PATH,
+                          MATTER_CONTROLLER_INSTALL_WHEELS, MATTER_DEVELOPMENT_PAA_ROOT_CERTS_ESC)
 
 """
 Subscription Resumption Timeout Test to validate that the device will keep resuming subscription
@@ -43,12 +45,9 @@ logger.addHandler(sh)
 CHIP_PORT = 5540
 
 CIRQUE_URL = "http://localhost:5000"
-CHIP_REPO = os.path.join(os.path.abspath(
-    os.path.dirname(__file__)), "..", "..", "..")
 TEST_EXTPANID = "fedcba9876543210"
 TEST_DISCRIMINATOR = 3840
-MATTER_DEVELOPMENT_PAA_ROOT_CERTS = "credentials/development/paa-root-certs"
-TEST_END_DEVICE_APP = "standalone/chip-all-clusters-app"
+TEST_SCRIPT_ESC = shlex.quote(str(CONTROLLER_TEST_SCRIPTS_DIR_PATH / "subscription_resumption_timeout_test.py"))
 
 DEVICE_CONFIG = {
     'device0': {
@@ -58,7 +57,7 @@ DEVICE_CONFIG = {
         'rcp_mode': True,
         'docker_network': 'Ipv6',
         'traffic_control': {'latencyMs': 25},
-        "mount_pairs": [[CHIP_REPO, CHIP_REPO]],
+        "mount_pairs": [[CHIP_REPO_STR, CHIP_REPO_STR]],
     },
     'device1': {
         'type': 'CHIPEndDevice',
@@ -67,7 +66,7 @@ DEVICE_CONFIG = {
         'rcp_mode': True,
         'docker_network': 'Ipv6',
         'traffic_control': {'latencyMs': 25},
-        "mount_pairs": [[CHIP_REPO, CHIP_REPO]],
+        "mount_pairs": [[CHIP_REPO_STR, CHIP_REPO_STR]],
     }
 }
 
@@ -92,27 +91,18 @@ class TestSubscriptionResumptionTimeout(CHIPVirtualHome):
         server_device_id = server_ids[0]
         self.execute_device_cmd(
             server_device_id,
-            ("CHIPCirqueDaemon.py -- run gdb -batch -return-child-result -q -ex \"set pagination off\" "
-             "-ex run -ex \"thread apply all bt\" --args {} --thread --discriminator {} "
-             "--subscription-resumption-retry-interval 5").format(
-                os.path.join(CHIP_REPO, "out/debug", TEST_END_DEVICE_APP), TEST_DISCRIMINATOR))
+            'CHIPCirqueDaemon.py -- run gdb -batch -return-child-result -q -ex "set pagination off" -ex run '
+            f'-ex "thread apply all bt" --args {CHIP_ALL_CLUSTERS_APP_ESC} --thread --discriminator {TEST_DISCRIMINATOR} '
+            '--subscription-resumption-retry-interval 5')
 
         self.reset_thread_devices(server_ids)
 
         req_device_id = req_ids[0]
 
-        self.execute_device_cmd(req_device_id, "pip3 install --break-system-packages {}".format(os.path.join(
-            CHIP_REPO, "out/debug/linux_x64_gcc/controller/python/matter_clusters-1.0.0-py3-none-any.whl")))
-        self.execute_device_cmd(req_device_id, "pip3 install --break-system-packages {}".format(os.path.join(
-            CHIP_REPO, "out/debug/linux_x64_gcc/controller/python/matter_core-1.0.0-cp311-abi3-linux_x86_64.whl")))
-        self.execute_device_cmd(req_device_id, "pip3 install --break-system-packages {}".format(os.path.join(
-            CHIP_REPO, "out/debug/linux_x64_gcc/controller/python/matter_repl-1.0.0-py3-none-any.whl")))
+        self.execute_device_cmd(req_device_id, MATTER_CONTROLLER_INSTALL_WHEELS)
 
-        command = ("gdb -batch -return-child-result -q -ex run -ex \"thread apply all bt\" "
-                   "--args python3 {} -t 300 --paa-trust-store-path {}").format(
-            os.path.join(
-                CHIP_REPO, "src/controller/python/tests/scripts/subscription_resumption_timeout_test.py"),
-            os.path.join(CHIP_REPO, MATTER_DEVELOPMENT_PAA_ROOT_CERTS))
+        command = (f'gdb -batch -return-child-result -q -ex run -ex "thread apply all bt" --args python3 {TEST_SCRIPT_ESC} -t 300 '
+                   f'--paa-trust-store-path {MATTER_DEVELOPMENT_PAA_ROOT_CERTS_ESC}')
         ret = self.execute_device_cmd(req_device_id, command)
 
         self.assertEqual(ret['return_code'], '0',
@@ -122,8 +112,7 @@ class TestSubscriptionResumptionTimeout(CHIPVirtualHome):
         time.sleep(120)
 
         # Check the device can resume subscriptions
-        self.logger.info("checking device log for {}".format(
-            self.get_device_pretty_id(server_device_id)))
+        self.logger.info("checking device log for %s", self.get_device_pretty_id(server_device_id))
         self.assertTrue(self.sequenceMatch(self.get_device_log(server_device_id).decode('utf-8'), [
             "Schedule subscription resumption when failing to establish session, Retries: 1",
             "Schedule subscription resumption when failing to establish session, Retries: 2"]),
