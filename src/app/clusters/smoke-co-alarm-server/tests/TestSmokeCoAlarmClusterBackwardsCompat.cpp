@@ -100,10 +100,6 @@ TEST_F(TestSmokeCoAlarmBackwardsCompatInitialized, DoubleInit_IsNoOp)
 
 TEST_F(TestSmokeCoAlarmBackwardsCompatInitialized, Features_ReportedCorrectly)
 {
-    EXPECT_TRUE(SmokeCoAlarmServer::Instance().SupportsSmokeAlarm());
-    EXPECT_TRUE(SmokeCoAlarmServer::Instance().SupportsCOAlarm());
-    EXPECT_TRUE(SmokeCoAlarmServer::Instance().GetFeatures().Has(Feature::kSmokeAlarm));
-    // Verify endpoint-taking overloads delegate correctly.
     EXPECT_TRUE(SmokeCoAlarmServer::Instance().GetFeatures(kTestEndpointId).Has(Feature::kSmokeAlarm));
     EXPECT_TRUE(SmokeCoAlarmServer::Instance().SupportsSmokeAlarm(kTestEndpointId));
     EXPECT_TRUE(SmokeCoAlarmServer::Instance().SupportsCOAlarm(kTestEndpointId));

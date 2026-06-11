@@ -157,20 +157,22 @@ bool SmokeCoAlarmServer::SetUnmountedState(EndpointId endpoint, bool v)
     return Cluster().SetUnmountedState(v);
 }
 
-chip::BitFlags<Feature> SmokeCoAlarmServer::GetFeatures() const
+chip::BitFlags<Feature> SmokeCoAlarmServer::GetFeatures(EndpointId endpoint) const
 {
+    VerifyOrDie(endpoint == mEndpointId);
     VerifyOrDie(mCluster.IsConstructed());
     return mCluster.Cluster().GetFeatures();
 }
 
-bool SmokeCoAlarmServer::SupportsSmokeAlarm() const
+bool SmokeCoAlarmServer::SupportsSmokeAlarm(EndpointId endpoint) const
 {
+    VerifyOrDie(endpoint == mEndpointId);
     VerifyOrDie(mCluster.IsConstructed());
     return mCluster.Cluster().SupportsSmokeAlarm();
 }
-
-bool SmokeCoAlarmServer::SupportsCOAlarm() const
+bool SmokeCoAlarmServer::SupportsCOAlarm(EndpointId endpoint) const
 {
+    VerifyOrDie(endpoint == mEndpointId);
     VerifyOrDie(mCluster.IsConstructed());
     return mCluster.Cluster().SupportsCOAlarm();
 }
@@ -285,20 +287,4 @@ bool SmokeCoAlarmServer::GetUnmountedState(EndpointId endpoint, bool & v) const
     VerifyOrDie(mCluster.IsConstructed());
     v = mCluster.Cluster().GetUnmountedState();
     return true;
-}
-
-chip::BitFlags<Feature> SmokeCoAlarmServer::GetFeatures(EndpointId endpoint) const
-{
-    VerifyOrDie(endpoint == mEndpointId);
-    return GetFeatures();
-}
-bool SmokeCoAlarmServer::SupportsSmokeAlarm(EndpointId endpoint) const
-{
-    VerifyOrDie(endpoint == mEndpointId);
-    return SupportsSmokeAlarm();
-}
-bool SmokeCoAlarmServer::SupportsCOAlarm(EndpointId endpoint) const
-{
-    VerifyOrDie(endpoint == mEndpointId);
-    return SupportsCOAlarm();
 }
