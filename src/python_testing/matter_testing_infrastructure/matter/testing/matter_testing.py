@@ -324,8 +324,10 @@ class MatterBaseTest(base_test.BaseTestClass):
         controller-side cleanup. Each step is gated by TestCleanupConfig so individual
         steps can be disabled by test authors when needed.
 
-        Wildcard attributes are pre-fetched once so all cluster-presence checks within
-        a single cleanup pass share the same read.
+        Cluster-presence checks use ``stored_global_wildcard``, which the test runner
+        populates in ``user_params`` at session start (see ``read_global_wildcard`` in
+        ``runner.run_tests_no_exit``). If that read failed, cleanup steps that need it
+        log and skip.
         """
 
         # If a teardown_test override already called this (per-test cleanup
@@ -350,7 +352,6 @@ class MatterBaseTest(base_test.BaseTestClass):
                 dut_reachable = False
 
         if dut_reachable:
-            await self._populate_wildcard()
             # DUT cleanup (run first as controller must still be alive to send commands)
             # - Scenes must be removed before group memberships: RemoveAllScenes requires the target
             #   group to still exist on the DUT, so group memberships cannot be cleared first.
@@ -652,7 +653,7 @@ class MatterBaseTest(base_test.BaseTestClass):
     async def _purge_tls_endpoints(self) -> None:
         """Removes all provisioned TLS endpoints on every endpoint with TlsClientManagement.
 
-        Uses stored_global_wildcard (pre-populated by _run_framework_cleanup) to locate
+        Uses stored_global_wildcard (pre-populated by the test runner) to locate
         TlsClientManagement via ServerList, no extra network read needed.
         """
         tls_cluster_id = Clusters.TlsClientManagement.id
@@ -710,7 +711,7 @@ class MatterBaseTest(base_test.BaseTestClass):
     async def _unregister_icd_clients(self) -> None:
         """Unregisters all ICD clients registered on the DUT via the default controller"""
         # Check if the ICD Management cluster is present on the DUT.
-        # Wildcard is pre-populated by _run_framework_cleanup; guard for standalone calls.
+        # Wildcard is pre-populated by the test runner; guard when unavailable.
         if self.stored_global_wildcard is None:
             LOGGER.info("[CLN] wildcard not available, skipping ICD client cleanup")
             return
