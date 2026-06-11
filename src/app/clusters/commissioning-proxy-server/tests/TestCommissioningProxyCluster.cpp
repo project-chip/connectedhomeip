@@ -1851,6 +1851,7 @@ TEST_F(TestCommissioningProxyCluster, TestBgScanStop_DelegateNotFound_Propagated
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
     ClusterTester tester(cluster);
+    SKIP_IF_TRANSPORT_UNSUPPORTED(tester, CapabilitiesBitmap::kBle);
     auto result = tester.Invoke(MakeBgScanStopRequest(CapabilitiesBitmap::kBle));
     EXPECT_FALSE(result.IsSuccess());
     EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Protocols::InteractionModel::Status::NotFound));
