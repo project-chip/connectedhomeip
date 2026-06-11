@@ -524,7 +524,7 @@ TEST_F(TestPushAVStreamTransportServerLogic, TestValidateIncomingTransportOption
     motionTimeControl.maxDuration          = 30000;
     motionTimeControl.blindDuration        = 1000;
 
-    triggerOptions.triggerType        = TransportTriggerTypeEnum::kMotion;
+    triggerOptions.triggerType = TransportTriggerTypeEnum::kMotion;
     triggerOptions.motionSensitivity.ClearValue();
     triggerOptions.motionTimeControl.SetValue(motionTimeControl);
     triggerOptions.maxPreRollLen.SetValue(1000);
@@ -551,10 +551,10 @@ TEST_F(TestPushAVStreamTransportServerLogic, TestValidateIncomingTransportOption
     triggerOptions.motionZones.SetValue(DataModel::MakeNullable(decodedList));
 
     // Create valid transport options
-    transportOptions.streamUsage   = StreamUsageEnum::kAnalysis;
-    transportOptions.TLSEndpointID = 1;
-    std::string url                = "https://192.168.1.100:554/stream/";
-    transportOptions.url           = Span(url.data(), url.size());
+    transportOptions.streamUsage      = StreamUsageEnum::kAnalysis;
+    transportOptions.TLSEndpointID    = 1;
+    std::string url                   = "https://192.168.1.100:554/stream/";
+    transportOptions.url              = Span(url.data(), url.size());
     transportOptions.triggerOptions   = triggerOptions;
     transportOptions.containerOptions = containerOptions;
     transportOptions.expiryTime.ClearValue();
