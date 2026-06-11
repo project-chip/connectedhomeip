@@ -22,8 +22,33 @@
 #include <lib/support/TimerDelegate.h>
 #include <memory>
 
+#if defined(PW_RPC_ENABLED) && PW_RPC_ENABLED
+#include <pigweed/rpc_services/AccessInterceptor.h>
+#include <pigweed/rpc_services/AccessInterceptorRegistry.h>
+#endif // defined(PW_RPC_ENABLED)
+
 namespace chip {
 namespace app {
+
+class BooleanStateSensorDevice;
+
+namespace BooleanStateSensor {
+
+#if defined(PW_RPC_ENABLED) && PW_RPC_ENABLED
+class AttributeAccessor : public chip::rpc::PigweedDebugAccessInterceptor
+{
+public:
+    AttributeAccessor() = default;
+    std::optional<::pw::Status> Write(const ConcreteDataAttributePath & path, AttributeValueDecoder & decoder) override;
+    ~AttributeAccessor() override = default;
+
+    void SetDevice(BooleanStateSensorDevice * device) { mBooleanStateDevice = device; }
+
+private:
+    BooleanStateSensorDevice * mBooleanStateDevice = nullptr;
+};
+#endif // defined(PW_RPC_ENABLED)
+} // namespace BooleanStateSensor
 
 class BooleanStateSensorDevice : public SingleEndpointDevice
 {
@@ -48,6 +73,9 @@ private:
     TimerDelegate * mTimerDelegate;
     LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;
     LazyRegisteredServerCluster<Clusters::BooleanStateCluster> mBooleanStateCluster;
+#if defined(PW_RPC_ENABLED) && PW_RPC_ENABLED
+    BooleanStateSensor::AttributeAccessor mPwAccessor;
+#endif // defined(PW_RPC_ENABLED)
 };
 
 } // namespace app
