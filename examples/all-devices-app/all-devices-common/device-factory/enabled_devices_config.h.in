@@ -1,5 +1,5 @@
 // NOTE:
-//    all-devices-common/devices/enabled_devices_config.h.in
+//    all-devices-common/device-factory/enabled_devices_config.h.in
 //    is a TEMPLATE to generate device enable/disable flags
 //
 // DO NOT EDIT except in template format ('.h.in' extension).
@@ -13,6 +13,7 @@
 #cmakedefine01 ALL_DEVICES_ENABLE_OCCUPANCY_SENSOR
 #cmakedefine01 ALL_DEVICES_ENABLE_CHIME
 #cmakedefine01 ALL_DEVICES_ENABLE_DIMMABLE_LIGHT
+#cmakedefine01 ALL_DEVICES_ENABLE_FAN
 #cmakedefine01 ALL_DEVICES_ENABLE_NETWORK_INFRASTRUCTURE_MANAGER
 #cmakedefine01 ALL_DEVICES_ENABLE_ON_OFF_LIGHT
 #cmakedefine01 ALL_DEVICES_ENABLE_SPEAKER

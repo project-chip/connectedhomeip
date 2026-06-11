@@ -16,7 +16,7 @@
 #
 
 # Authoritative device configuration for the CMake (ESP32) build.
-# Parallel to all-devices-common/devices/enabled_devices.gni for the GN build.
+# Parallel to all-devices-common/device-factory/enabled_devices.gni for the GN build.
 #
 # Callers must define ALL_DEVICES_COMMON_DIR before including this file.
 #
@@ -40,6 +40,8 @@ set(ALL_DEVICES_DEVICE_SOURCES
     "${ALL_DEVICES_COMMON_DIR}/devices/chime/ChimeDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/dimmable-light/DimmableLightDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/dimmable-light/impl/LoggingDimmableLightDevice.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/devices/fan/FanDevice.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/devices/fan/impl/LoggingFanDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/interface/DeviceInterface.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/interface/SingleEndpointDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/network-infrastructure-manager/NetworkInfrastructureManagerDevice.cpp"
@@ -101,6 +103,7 @@ foreach(_key
         chime
         contact-sensor
         dimmable-light
+        fan
         network-infrastructure-manager
         occupancy-sensor
         on-off-light
