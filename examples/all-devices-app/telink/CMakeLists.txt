@@ -23,7 +23,7 @@ get_filename_component(ALL_DEVICES_COMMON_DIR ${CHIP_ROOT}/examples/all-devices-
 
 include(${TELINK_COMMON}/common.cmake)
 include(${CHIP_ROOT}/config/telink/app/enable-gnu-std.cmake)
-include(${ALL_DEVICES_COMMON_DIR}/devices/enabled_devices.cmake)
+include(${ALL_DEVICES_COMMON_DIR}/device-factory/enabled_devices.cmake)
 
 add_compile_definitions(IDENTIFY_CLUSTER_DISABLED=1)
 

@@ -51,8 +51,7 @@ if sys.platform == "linux":
 if sys.platform == 'darwin':
     import chiptest.darwin
 
-DEFAULT_CHIP_ROOT = os.path.abspath(
-    os.path.join(os.path.dirname(__file__), '..', '..'))
+DEFAULT_CHIP_ROOT = next(filter(lambda p: (p / 'SPECIFICATION_VERSION').is_file(), Path(__file__).parents))
 
 
 class ManualHandling(enum.Enum):

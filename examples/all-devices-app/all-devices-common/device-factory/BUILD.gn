@@ -16,7 +16,7 @@ import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 import("${chip_root}/build/chip/buildconfig_header.gni")
 import(
-    "${chip_root}/examples/all-devices-app/all-devices-common/devices/enabled_devices.gni")
+    "${chip_root}/examples/all-devices-app/all-devices-common/device-factory/enabled_devices.gni")
 
 # Generate app_config/enabled_devices.h.
 # Will define a set of ALL_DEVICES_ENABLE_* constants
@@ -34,6 +34,7 @@ source_set("device-factory") {
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/boolean-state-sensor",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/chime",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/dimmable-light/impl:logging",
+    "${chip_root}/examples/all-devices-app/all-devices-common/devices/fan/impl:logging",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/network-infrastructure-manager",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/occupancy-sensor/impl:toggling",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/on-off-light",
