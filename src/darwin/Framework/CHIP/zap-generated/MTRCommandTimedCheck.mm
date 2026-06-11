@@ -374,6 +374,15 @@ static BOOL CommandNeedsTimedInvokeInLaundryDryerControlsCluster(AttributeId aAt
     }
     }
 }
+static BOOL CommandNeedsTimedInvokeInTemperatureControlledCabinetTopologyCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::TemperatureControlledCabinetTopology;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL CommandNeedsTimedInvokeInModeSelectCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::ModeSelect;
@@ -1595,6 +1604,9 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     }
     case Clusters::LaundryDryerControls::Id: {
         return CommandNeedsTimedInvokeInLaundryDryerControlsCluster(commandID);
+    }
+    case Clusters::TemperatureControlledCabinetTopology::Id: {
+        return CommandNeedsTimedInvokeInTemperatureControlledCabinetTopologyCluster(commandID);
     }
     case Clusters::ModeSelect::Id: {
         return CommandNeedsTimedInvokeInModeSelectCluster(commandID);
