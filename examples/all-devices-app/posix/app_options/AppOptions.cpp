@@ -44,14 +44,51 @@ AppOptions::AppConfig AppOptions::mConfig;
 
 const AppOptions::AppConfig & AppOptions::GetConfig()
 {
-    if (mConfig.deviceTypeEntries.empty())
+    static bool expanded = false;
+    if (expanded)
     {
-        mConfig.deviceTypeEntries.push_back({
+        return mConfig;
+    }
+
+    std::vector<DeviceTypeParser::Entry> finalEntries;
+
+    // Process all standard devices, expanding wildcard (*)
+    for (const auto & entry : mConfig.deviceTypeEntries)
+    {
+        if (entry.type == "*")
+        {
+            chip::EndpointId nextEp = entry.endpoint;
+            for (const auto & deviceType : chip::app::DeviceFactory::GetInstance().SupportedDeviceTypes())
+            {
+                if (deviceType == "aggregator" || deviceType == "bridged-node" || deviceType == "fan-no-onoff")
+                {
+                    continue;
+                }
+                finalEntries.push_back({
+                    .type     = deviceType,
+                    .endpoint = nextEp++,
+                    .parentId = entry.parentId,
+                });
+            }
+        }
+        else
+        {
+            finalEntries.push_back(entry);
+        }
+    }
+
+    // Default device fallback
+    if (finalEntries.empty())
+    {
+        finalEntries.push_back({
             .type     = chip::app::DeviceFactory::GetInstance().GetDefaultDevice(),
             .endpoint = 1,
             .parentId = chip::kInvalidEndpointId,
         });
     }
+
+    mConfig.deviceTypeEntries = finalEntries;
+    expanded = true;
     return mConfig;
 }
 
@@ -154,9 +191,11 @@ OptionSet * AppOptions::GetOptions()
             result.append(name);
             result.append("|");
         }
-        result.replace(result.length() - 1, 1, ">");
+        result.append("*");
+        result.append(">");
         result += "\n";
-        result += "       Select the device to start up. Format: 'type' or 'type:endpoint' or 'type:endpoint,parent=parentId'\n";
+        result += "       Select the device to start up. Format: 'type' or 'type:endpoint' or 'type:endpoint,parent=parentId'.\n";
+        result += "       Use '*' to select all supported leaf devices (e.g. --device *:1).\n";
         result += "       Can be specified multiple times for multi-endpoint devices.\n";
         result += "       Example: --device chime:1 --device speaker:2,parent=1\n\n";
 
