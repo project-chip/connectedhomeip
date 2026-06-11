@@ -554,7 +554,7 @@ function analyze_local_crashes() {
             [ -f "$zip" ] || continue
             found_any=true
 
-            local basepath filename binary path coredump
+            local basepath filename binary path coredump binary_path
             basepath=$(dirname "$zip")
             filename=$(basename "$zip")
             binary="${filename%%_*}"
@@ -562,7 +562,16 @@ function analyze_local_crashes() {
             coredump="$path/${filename%.*}.coredump"
 
             unzip -o "$zip" -d "$basepath"
-            tar -xf "$path"/*.tar -C "$path"
+
+            # Find the binary - it may be in $target/ or $target/tests/
+            if [ -f "$target/$binary" ]; then
+                binary_path="$target/$binary"
+            elif [ -f "$target/tests/$binary" ]; then
+                binary_path="$target/tests/$binary"
+            else
+                echo "WARNING: Binary '$binary' not found in $target"
+                continue
+            fi
 
             # Determine GDB binary and sysroot based on available tools
             local gdb_bin sysroot
@@ -571,10 +580,10 @@ function analyze_local_crashes() {
                 sysroot=$(get_sdk_sysroot "$target")
             else
                 gdb_bin="gdb-multiarch"
-                sysroot=$(get_sdk_sysroot "$target")
+                sysroot=""
             fi
 
-            run_gdb_analysis "$gdb_bin" "$sysroot" "$target/$binary" "$coredump" "$filename"
+            run_gdb_analysis "$gdb_bin" "$sysroot" "$binary_path" "$coredump" "$filename"
         done
     done
 
