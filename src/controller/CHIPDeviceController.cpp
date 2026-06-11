@@ -929,8 +929,8 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
             WiFiPAF::WiFiPAFSession sessionInfo = { .role          = WiFiPAF::WiFiPafRole::kWiFiPafRole_Subscriber,
                                                     .nodeId        = nodeId,
                                                     .discriminator = discriminator };
-            SuccessOrExit(
-                err = DeviceLayer::ConnectivityMgr().GetWiFiPAF()->AddPafSession(WiFiPAF::PafInfoAccess::kAccNodeInfo, sessionInfo));
+            SuccessOrExit(err = DeviceLayer::ConnectivityMgr().GetWiFiPAF()->AddPafSession(WiFiPAF::PafInfoAccess::kAccNodeInfo,
+                                                                                           sessionInfo));
             ExitNow(err = DeviceLayer::ConnectivityMgr().WiFiPAFSubscribe(discriminator, reinterpret_cast<void *>(this),
                                                                           OnWiFiPAFSubscribeComplete, OnWiFiPAFSubscribeError));
         }
