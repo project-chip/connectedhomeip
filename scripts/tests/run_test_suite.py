@@ -203,7 +203,7 @@ def main(context: click.Context, log_level: str, log_level_tests: str | None, lo
 
     if sys.platform == "linux":
         if not internal_inside_unshare:
-            # If not running in an unshared network namespace yet, try to rerun the script with the 'unshare' command.
+            # If not running in an unshared namespace yet, try to rerun the script with the 'unshare' command.
             chiptest.linux.ensure_namespace_availability()
         else:
             chiptest.linux.ensure_private_state()
