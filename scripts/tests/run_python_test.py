@@ -327,10 +327,10 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
     if timeout_index is not None:
         try:
             test_arg_timeout = int(split_args[timeout_index+1])
-        except ValueError as ve:
+        except ValueError:
             log.warning("Invalid value for argument --timeout")
             exit(1)
-        except IndexError as ie:
+        except IndexError:
             log.warning("Unable to retrieve the value for argument --timeout")
             exit(1)
 
