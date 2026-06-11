@@ -47,12 +47,14 @@ _ALL_DEVICES_APP_DEVICES = [
     'chime',
     'contact-sensor',
     'dimmable-light',
+    'fan',
     'occupancy-sensor',
     'on-off-light',
     'soil-sensor',
     'speaker',
     'temperature-sensor',
     'water-leak-detector',
+    'power-source',
     'proximity-ranger',
     # keep-sorted: end
 ]

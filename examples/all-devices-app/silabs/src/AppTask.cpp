@@ -40,7 +40,7 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <setup_payload/OnboardingCodesUtil.h>
 
-#include <devices/device-factory/DeviceFactory.h>
+#include <device-factory/DeviceFactory.h>
 #include <devices/root-node/RootNodeDevice.h>
 
 #if CHIP_ENABLE_OPENTHREAD

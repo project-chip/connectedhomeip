@@ -3366,6 +3366,24 @@ cluster LaundryDryerControls = 74 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
+/** This cluster provides contextual information with respect to the disablement or otherwise of Temperature Controlled Cabinet Endpoints that may be composed as part of a Device. */
+provisional cluster TemperatureControlledCabinetTopology = 75 {
+  revision 1;
+
+  enum TopologyEnum : enum8 {
+    kHorizontal = 0;
+    kVertical = 1;
+  }
+
+  provisional readonly attribute endpoint_no disabledCabinets[] = 0;
+  provisional readonly attribute TopologyEnum topology = 1;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
 /** Attributes and commands for selecting a mode from a list of supported options. */
 cluster ModeSelect = 80 {
   revision 2;
@@ -6320,8 +6338,8 @@ cluster DoorLock = 257 {
   }
 
   enum StatusCodeEnum : enum8 {
-    kDUPLICATE = 2 [spec_name = "DUPLICATE"];
-    kOCCUPIED = 3 [spec_name = "OCCUPIED"];
+    kDuplicate = 2;
+    kOccupied = 3;
   }
 
   enum UserStatusEnum : enum8 {
@@ -9580,7 +9598,7 @@ provisional cluster NetworkIdentityManagement = 1104 {
   revision 1;
 
   enum IdentityTypeEnum : enum8 {
-    kECDSA = 0 [spec_name = "ECDSA"];
+    kECDSA = 1 [spec_name = "ECDSA"];
   }
 
   struct ActiveNetworkIdentityStruct {
@@ -9595,7 +9613,8 @@ provisional cluster NetworkIdentityManagement = 1104 {
   struct ClientStruct {
     int16u clientIndex = 0;
     octet_string<20> clientIdentifier = 1;
-    nullable int16u networkIdentityIndex = 2;
+    IdentityTypeEnum clientIdentityType = 2;
+    nullable int16u networkIdentityIndex = 3;
   }
 
   readonly attribute access(read: manage) ActiveNetworkIdentityStruct activeNetworkIdentities[] = 0;
@@ -9623,7 +9642,8 @@ provisional cluster NetworkIdentityManagement = 1104 {
   request struct QueryIdentityRequest {
     optional int16u networkIdentityIndex = 0;
     optional IdentityTypeEnum networkIdentityType = 1;
-    optional octet_string<20> identifier = 2;
+    optional int16u clientIndex = 2;
+    optional octet_string<20> identifier = 3;
   }
 
   response struct QueryIdentityResponse = 4 {

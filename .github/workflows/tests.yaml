@@ -242,6 +242,7 @@ jobs:
                       src/app/zap-templates/zcl/data-model/chip/switch-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/target-navigator-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/temperature-control-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/temperature-controlled-cabinet-topology-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/temperature-measurement-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/test-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/thermostat-user-interface-configuration-cluster.xml \
@@ -377,6 +378,7 @@ jobs:
                      --target TestOperationalState \
                      --test-order random \
                      run \
+                     --value-wait-extra-duration-ms 5000 \
                      --iterations 1 \
                      --test-timeout-seconds 120 \
                      --tool-path chip-tool:./objdir-clone/linux-x64-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT}/chip-tool \
@@ -397,6 +399,7 @@ jobs:
                      --runner chip_tool_python \
                      --target TestOperationalState \
                      run \
+                     --value-wait-extra-duration-ms 5000 \
                      --iterations 1 \
                      --test-timeout-seconds 120 \
                      --tool-path chip-tool:./objdir-clone/linux-x64-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT}/chip-tool \
@@ -415,6 +418,7 @@ jobs:
                      --runner chip_tool_python \
                      --test-order random \
                      run \
+                     --value-wait-extra-duration-ms 5000 \
                      --iterations 1 \
                      --test-timeout-seconds 120 \
                      --tool-path chip-tool:./objdir-clone/linux-x64-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT}/chip-tool \
@@ -445,6 +449,7 @@ jobs:
                      --include-tags PURPOSEFUL_FAILURE \
                      --test-order random \
                      run \
+                     --value-wait-extra-duration-ms 5000 \
                      --iterations 1 \
                      --expected-failures 3 \
                      --keep-going \
@@ -469,6 +474,7 @@ jobs:
                      --target TestOperationalState \
                      --test-order random \
                      run \
+                     --value-wait-extra-duration-ms 5000 \
                      --iterations 1 \
                      --test-timeout-seconds 120 \
                      --tool-path chip-tool:./objdir-clone/linux-x64-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT}/chip-tool \
@@ -492,6 +498,7 @@ jobs:
                      --target TestOperationalState \
                      --test-order random \
                      run \
+                     --value-wait-extra-duration-ms 5000 \
                      --iterations 1 \
                      --test-timeout-seconds 120 \
                      --tool-path chip-tool:./objdir-clone/linux-x64-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT}/chip-tool \
@@ -515,6 +522,7 @@ jobs:
                      --exclude-tags PURPOSEFUL_FAILURE \
                      --test-order random \
                      run \
+                     --value-wait-extra-duration-ms 5000 \
                      --iterations 1 \
                      --test-timeout-seconds 120 \
                      --app-path all-clusters:./objdir-clone/linux-x64-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
@@ -543,6 +551,7 @@ jobs:
                      --runner matter_repl_python \
                      --test-order random \
                      run \
+                     --value-wait-extra-duration-ms 5000 \
                      --iterations 1 \
                      --test-timeout-seconds 120 \
                      --app-path all-clusters:./objdir-clone/linux-x64-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
@@ -724,6 +733,7 @@ jobs:
                      --target-skip-glob '{Test_TC_DGTHREAD_2_1,Test_TC_DGTHREAD_2_2,Test_TC_DGTHREAD_2_3,Test_TC_DGTHREAD_2_4}' \
                      --test-order random \
                      run \
+                     --value-wait-extra-duration-ms 5000 \
                      --iterations 1 \
                      --test-timeout-seconds 120 \
                      --tool-path chip-tool:./objdir-clone/darwin-${{matrix.arch}}-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT}/chip-tool \
@@ -756,6 +766,7 @@ jobs:
                      --include-tags PURPOSEFUL_FAILURE \
                      --test-order random \
                      run \
+                     --value-wait-extra-duration-ms 5000 \
                      --iterations 1 \
                      --expected-failures 3 \
                      --keep-going \
@@ -1090,7 +1101,7 @@ jobs:
     repl_tests_linux_run:
         name: REPL Tests - Linux (RUN)
         needs: repl_tests_linux_build
-        timeout-minutes: 45
+        timeout-minutes: 60
 
         if: github.actor != 'restyled-io[bot]'
 
@@ -1161,7 +1172,7 @@ jobs:
 
             # OverlayFS (Docker container storage) layer copy-up occasionally causes
             # "Directory renamed before its status could be extracted" during rapid unpack.
-            - uses: Wandalen/wretry.action@1a10d4835a1506f513ad8e7488aeb474ab20055c # v1.4.10
+            - uses: Wandalen/wretry.action@e68c23e6309f2871ca8ae4763e7629b9c258e1ea # v3.8.0
               name: Unpack artifacts
               with:
                   command: tar xfJ repl-build-data.tar.xz
