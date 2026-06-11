@@ -18,14 +18,15 @@
 #include <credentials/CHIPCert.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <esp_fault.h>
+#include <esp_idf_version.h>
 #include <esp_log.h>
 #include <esp_secure_cert_read.h>
 #include <platform/ESP32/ESP32Config.h>
 #include <platform/ESP32/ESP32SecureCertDACProvider.h>
 
-#ifdef CONFIG_USE_ESP32_ECDSA_PERIPHERAL
+#if defined(CONFIG_USE_ESP32_ECDSA_PERIPHERAL) || defined(CONFIG_USE_ESP32_TEE_SECURE_STORAGE)
 #include <platform/ESP32/ESP32CHIPCryptoPAL.h>
-#endif // CONFIG_USE_ESP32_ECDSA_PERIPHERAL
+#endif // CONFIG_USE_ESP32_ECDSA_PERIPHERAL || CONFIG_USE_ESP32_TEE_SECURE_STORAGE
 
 #define TAG "dac_provider"
 
@@ -119,6 +120,20 @@ CHIP_ERROR ESP32SecureCertDACProvider ::SignWithDeviceAttestationKey(const ByteS
     VerifyOrReturnError(!outSignBuffer.empty(), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(!messageToSign.empty(), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(outSignBuffer.size() >= signature.Capacity(), CHIP_ERROR_BUFFER_TOO_SMALL);
+
+#if defined(CONFIG_USE_ESP32_TEE_SECURE_STORAGE) && (ESP_IDF_VERSION < ESP_IDF_VERSION_VAL(6, 0, 0))
+    {
+        Crypto::ESP32P256Keypair keypair;
+        const char * key_id = chip::DeviceLayer::Internal::ESP32Config::kConfigKey_DACPrivateKey.Name;
+
+        ESP_LOGD(TAG, "TEE secure storage key id: %s", key_id);
+
+        ReturnErrorOnFailure(keypair.InitializeFromTEE(chip::Crypto::ECPKeyTarget::ECDSA, key_id));
+        ReturnErrorOnFailure(keypair.ECDSA_sign_msg(messageToSign.data(), messageToSign.size(), signature));
+
+        return CopySpanToMutableSpan(ByteSpan{ signature.ConstBytes(), signature.Length() }, outSignBuffer);
+    }
+#endif // CONFIG_USE_ESP32_TEE_SECURE_STORAGE && ESP_IDF_VERSION < 6.0.0
 
     esp_err = esp_secure_cert_get_priv_key_type(&keyType);
     VerifyOrReturnError(esp_err == ESP_OK, CHIP_ERROR_INCORRECT_STATE,
