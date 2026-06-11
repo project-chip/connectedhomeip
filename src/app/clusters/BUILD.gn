@@ -35,6 +35,7 @@ source_set("clusters") {
     "commissioner-control-server",
     "concentration-measurement-server",
     "descriptor",
+    "fan-control-server",
     "flow-measurement-server",
     "general-commissioning-server",
     "general-diagnostics-server",
