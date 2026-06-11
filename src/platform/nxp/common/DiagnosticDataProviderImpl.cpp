@@ -23,6 +23,7 @@
  */
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
+#include <FreeRTOS.h>
 
 #include "DiagnosticDataProviderImpl.h"
 #include <crypto/CHIPCryptoPAL.h>
