@@ -620,6 +620,7 @@ chip::Protocols::InteractionModel::Status Connect(chip::app::CommandHandler * co
     ctx->cluster       = cluster;
     ctx->fabricIndex   = request.subjectDescriptor.fabricIndex;
     sBlePendingConnect = ctx;
+    commandObj->FlushAcksRightAwayOnSlowCommand();
 
     if (auto * exchange = commandObj->GetExchangeContext())
     {

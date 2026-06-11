@@ -397,6 +397,8 @@ Clusters::CommissioningProxy::MyCPDelegate::ProxyScanRequest(CapabilitiesBitmap 
             : firstError;
     }
 
+    commandObj->FlushAcksRightAwayOnSlowCommand();
+
     // The dispatcher owns the exchange now; keep it alive for the full scan window.
     if (auto * exchange = commandObj->GetExchangeContext())
     {
@@ -508,6 +510,7 @@ Clusters::CommissioningProxy::MyCPDelegate::ProxyMessageRequest(uint16_t session
 
     // Keep the invoke handler alive until the commissionee replies.
     auto * ctx                     = new ProxyMsgCtx{ chip::app::CommandHandler::Handle(commandObj), request.path, sessionId };
+    commandObj->FlushAcksRightAwayOnSlowCommand();
     sPendingProxyMsgCtx[sessionId] = ctx;
 
     if (auto * exchange = commandObj->GetExchangeContext())
