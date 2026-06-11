@@ -27,6 +27,7 @@
 #include <devices/network-infrastructure-manager/NetworkInfrastructureManagerDevice.h>
 #include <devices/occupancy-sensor/impl/TogglingOccupancySensorDevice.h>
 #include <devices/on-off-light/LoggingOnOffLightDevice.h>
+#include <devices/power-source/impl/DecreasingBatteryPowerSourceDevice.h>
 #include <devices/proximity-ranger/ProximityRangerDevice.h>
 #include <devices/soil-sensor/impl/IncreasingMoistureSoilSensorDevice.h>
 #include <devices/speaker/impl/LoggingSpeakerDevice.h>
@@ -241,6 +242,10 @@ private:
                 return std::make_unique<ProximityRangerDevice>(mContext->timerDelegate,
                                                                Span<Clusters::ProximityRanging::RangingAdapter * const>());
             });
+        }
+        if constexpr (ALL_DEVICES_ENABLE_POWER_SOURCE)
+        {
+            RegisterCreator("power-source", []() { return std::make_unique<DecreasingBatteryPowerSourceDevice>(); });
         }
 
         // at least one device type MUST be enabled

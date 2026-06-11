@@ -34,6 +34,7 @@ CommandHandlerInterfaceOnlyClusters:
     - RVC Operational State
     - Sample MEI
     - Service Area
+    - Smoke CO Alarm
     - Soil Measurement
     - Thread Border Router Management
     - Thread Network Directory

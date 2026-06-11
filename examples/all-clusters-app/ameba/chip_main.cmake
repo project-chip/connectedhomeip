@@ -153,6 +153,7 @@ list(
     APPEND ${list_chip_main_sources}
 
     ${chip_dir}/src/app/clusters/microwave-oven-control-server/MicrowaveOvenControlCluster.cpp
+    ${chip_dir}/src/app/clusters/smoke-co-alarm-server/SmokeCoAlarmCluster.cpp
 
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/bridged-actions-stub.cpp
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/air-quality-instance.cpp

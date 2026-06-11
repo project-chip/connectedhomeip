@@ -56,6 +56,7 @@ but the application is constantly evolving and new device types are added often:
 -   `fan`
 -   `fan-no-onoff`
 -   `on-off-light`
+-   `power-source`
 -   `speaker`
 -   `soil-sensor`
 
@@ -68,7 +69,7 @@ Usage: ./out/linux-x64-all-devices-boringssl-no-ble/all-devices-app
 
 PROGRAM OPTIONS
 
-  --device <chime|contact-sensor|dimmable-light|fan|fan-no-onoff|occupancy-sensor|on-off-light|soil-sensor|speaker|water-leak-detector>
+  --device <chime|contact-sensor|dimmable-light|fan|fan-no-onoff|occupancy-sensor|on-off-light|power-source|soil-sensor|speaker|water-leak-detector>
        Select the device to start up. Format: 'type' or 'type:endpoint' or 'type:endpoint,parent=parentId'
        Can be specified multiple times for multi-endpoint devices.
        Example: --device chime:1 --device speaker:2,parent=1
