@@ -41,6 +41,7 @@ pw_python_package("matter-testing-module") {
   }
 
   inputs = [ "env_test.yaml" ]
+  python_deps = [ "${chip_root}/src/controller/python:matter-clusters-module" ]
 
   sources = [
     "matter/testing/CommissioningPreTest.py",
@@ -55,6 +56,7 @@ pw_python_package("matter-testing-module") {
     "matter/testing/conformance.py",
     "matter/testing/conversions.py",
     "matter/testing/credentials.py",
+    "matter/testing/data_model_errata.py",
     "matter/testing/decorators.py",
     "matter/testing/default_checker.py",
     "matter/testing/defaults.py",
@@ -88,6 +90,7 @@ pw_python_package("matter-testing-module") {
     "matter/testing/test_metadata.py",
     "matter/testing/test_tasks.py",
     "matter/testing/test_matter_asserts.py",
+    "matter/testing/test_data_model_errata.py",
   ]
 }
 
@@ -224,6 +227,7 @@ pw_python_distribution("matter-testing") {
     "${root_out_dir}/data_model/zip_1_5.zip > matter/testing/data_model/1.5/allfiles.zip",
     "${root_out_dir}/data_model/zip_1_5_1.zip > matter/testing/data_model/1.5.1/allfiles.zip",
     "${root_out_dir}/data_model/zip_1_6.zip > matter/testing/data_model/1.6/allfiles.zip",
+    "${chip_root}/data_model/errata_future.yaml > matter/testing/data_model/errata_future.yaml",
     "${root_out_dir}/credentials/zip_development.zip > matter/testing/credentials/development/allfiles.zip",
     "${root_out_dir}/credentials/zip_production.zip > matter/testing/credentials/production/allfiles.zip",
   ]
