@@ -8802,6 +8802,97 @@ public static class DeviceEnergyManagementClusterConstraintsStruct {
     return output.toString();
   }
 }
+public static class DeviceEnergyManagementClusterPowerRangeAdjustStruct {
+  public @Nullable Long minPower;
+  public @Nullable Long maxPower;
+  public Integer cause;
+  public Long endTime;
+  private static final long MIN_POWER_ID = 0L;
+  private static final long MAX_POWER_ID = 1L;
+  private static final long CAUSE_ID = 2L;
+  private static final long END_TIME_ID = 3L;
+
+  public DeviceEnergyManagementClusterPowerRangeAdjustStruct(
+    @Nullable Long minPower,
+    @Nullable Long maxPower,
+    Integer cause,
+    Long endTime
+  ) {
+    this.minPower = minPower;
+    this.maxPower = maxPower;
+    this.cause = cause;
+    this.endTime = endTime;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(MIN_POWER_ID, minPower != null ? new IntType(minPower) : new NullType()));
+    values.add(new StructElement(MAX_POWER_ID, maxPower != null ? new IntType(maxPower) : new NullType()));
+    values.add(new StructElement(CAUSE_ID, new UIntType(cause)));
+    values.add(new StructElement(END_TIME_ID, new UIntType(endTime)));
+
+    return new StructType(values);
+  }
+
+  public static DeviceEnergyManagementClusterPowerRangeAdjustStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    @Nullable Long minPower = null;
+    @Nullable Long maxPower = null;
+    Integer cause = null;
+    Long endTime = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == MIN_POWER_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Int) {
+          IntType castingValue = element.value(IntType.class);
+          minPower = castingValue.value(Long.class);
+        }
+      } else if (element.contextTagNum() == MAX_POWER_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Int) {
+          IntType castingValue = element.value(IntType.class);
+          maxPower = castingValue.value(Long.class);
+        }
+      } else if (element.contextTagNum() == CAUSE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          cause = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == END_TIME_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          endTime = castingValue.value(Long.class);
+        }
+      }
+    }
+    return new DeviceEnergyManagementClusterPowerRangeAdjustStruct(
+      minPower,
+      maxPower,
+      cause,
+      endTime
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("DeviceEnergyManagementClusterPowerRangeAdjustStruct {\n");
+    output.append("\tminPower: ");
+    output.append(minPower);
+    output.append("\n");
+    output.append("\tmaxPower: ");
+    output.append(maxPower);
+    output.append("\n");
+    output.append("\tcause: ");
+    output.append(cause);
+    output.append("\n");
+    output.append("\tendTime: ");
+    output.append(endTime);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class DeviceEnergyManagementClusterSlotAdjustmentStruct {
   public Integer slotIndex;
   public Optional<Long> nominalPower;
@@ -14114,18 +14205,22 @@ public static class NetworkIdentityManagementClusterActiveNetworkIdentityStruct 
 public static class NetworkIdentityManagementClusterClientStruct {
   public Integer clientIndex;
   public byte[] clientIdentifier;
+  public Integer clientIdentityType;
   public @Nullable Integer networkIdentityIndex;
   private static final long CLIENT_INDEX_ID = 0L;
   private static final long CLIENT_IDENTIFIER_ID = 1L;
-  private static final long NETWORK_IDENTITY_INDEX_ID = 2L;
+  private static final long CLIENT_IDENTITY_TYPE_ID = 2L;
+  private static final long NETWORK_IDENTITY_INDEX_ID = 3L;
 
   public NetworkIdentityManagementClusterClientStruct(
     Integer clientIndex,
     byte[] clientIdentifier,
+    Integer clientIdentityType,
     @Nullable Integer networkIdentityIndex
   ) {
     this.clientIndex = clientIndex;
     this.clientIdentifier = clientIdentifier;
+    this.clientIdentityType = clientIdentityType;
     this.networkIdentityIndex = networkIdentityIndex;
   }
 
@@ -14133,6 +14228,7 @@ public static class NetworkIdentityManagementClusterClientStruct {
     ArrayList<StructElement> values = new ArrayList<>();
     values.add(new StructElement(CLIENT_INDEX_ID, new UIntType(clientIndex)));
     values.add(new StructElement(CLIENT_IDENTIFIER_ID, new ByteArrayType(clientIdentifier)));
+    values.add(new StructElement(CLIENT_IDENTITY_TYPE_ID, new UIntType(clientIdentityType)));
     values.add(new StructElement(NETWORK_IDENTITY_INDEX_ID, networkIdentityIndex != null ? new UIntType(networkIdentityIndex) : new NullType()));
 
     return new StructType(values);
@@ -14144,6 +14240,7 @@ public static class NetworkIdentityManagementClusterClientStruct {
     }
     Integer clientIndex = null;
     byte[] clientIdentifier = null;
+    Integer clientIdentityType = null;
     @Nullable Integer networkIdentityIndex = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == CLIENT_INDEX_ID) {
@@ -14156,6 +14253,11 @@ public static class NetworkIdentityManagementClusterClientStruct {
           ByteArrayType castingValue = element.value(ByteArrayType.class);
           clientIdentifier = castingValue.value(byte[].class);
         }
+      } else if (element.contextTagNum() == CLIENT_IDENTITY_TYPE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          clientIdentityType = castingValue.value(Integer.class);
+        }
       } else if (element.contextTagNum() == NETWORK_IDENTITY_INDEX_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
@@ -14166,6 +14268,7 @@ public static class NetworkIdentityManagementClusterClientStruct {
     return new NetworkIdentityManagementClusterClientStruct(
       clientIndex,
       clientIdentifier,
+      clientIdentityType,
       networkIdentityIndex
     );
   }
@@ -14179,6 +14282,9 @@ public static class NetworkIdentityManagementClusterClientStruct {
     output.append("\n");
     output.append("\tclientIdentifier: ");
     output.append(Arrays.toString(clientIdentifier));
+    output.append("\n");
+    output.append("\tclientIdentityType: ");
+    output.append(clientIdentityType);
     output.append("\n");
     output.append("\tnetworkIdentityIndex: ");
     output.append(networkIdentityIndex);

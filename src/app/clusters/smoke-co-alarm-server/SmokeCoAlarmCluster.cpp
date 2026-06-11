@@ -362,7 +362,7 @@ bool SmokeCoAlarmServer::SetUnmountedState(EndpointId endpointId, bool isUnmount
     return true;
 }
 
-bool SmokeCoAlarmServer::GetExpressedState(chip ::EndpointId endpointId, ExpressedStateEnum & expressedState)
+bool SmokeCoAlarmServer::GetExpressedState(chip::EndpointId endpointId, ExpressedStateEnum & expressedState)
 {
     return GetAttribute(endpointId, ExpressedState::Id, ExpressedState::Get, expressedState);
 }

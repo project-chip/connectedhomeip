@@ -196,7 +196,7 @@ class Subprocess(threading.Thread):
         self.p.stdin.flush()
 
         if expected_output is not None and not self.event.wait(timeout):
-            raise TimeoutError("Expected output not found")
+            raise TimeoutError(f"Expected output {expected_output!r} not found within {timeout} seconds")
 
     def terminate(self) -> None:
         """Terminate the subprocess and wait for it to finish."""

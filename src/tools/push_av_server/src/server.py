@@ -86,7 +86,7 @@ class PushAvContext:
             if isinstance(exc, HTTPException):
                 # Re-raise HTTPException for FastAPI's default handler to process
                 raise exc
-            logger.error(f"Exception: {exc}")
+            logger.error("Exception: %s", exc)
             return JSONResponse(
                 status_code=500,
                 content={"detail": str(exc)}

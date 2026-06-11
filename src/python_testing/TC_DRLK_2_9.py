@@ -221,7 +221,7 @@ class TC_DRLK_2_9(MatterBaseTest, DRLK_COMMON):
             asserts.assert_true(response.userUniqueID == useruniqueid,
                                 "Error when executing GetUserResponse command, userUniqueID={}".format(
                                     str(response.userUniqueID)))
-            log.info("Credentials value is GetUserResponse Command %s" % (str(response.credentials)))
+            log.info("Credentials value is GetUserResponse Command %s", str(response.credentials))
 
             asserts.assert_equal(len(credentiallist), len(response.credentials),  "Error mismatch in expected credential from GetUserResponse command = {}".format(
                 str(credentiallist)))
@@ -272,7 +272,7 @@ class TC_DRLK_2_9(MatterBaseTest, DRLK_COMMON):
             credentialIndex=credentialIndex)
         try:
 
-            log.info("Credential Data is %s" % (credentialData))
+            log.info("Credential Data is %s", credentialData)
             response = await self.send_single_cmd(cmd=drlkcluster.Commands.SetCredential(
                 operationType=operationType,
                 credential=credentials,
@@ -351,7 +351,7 @@ class TC_DRLK_2_9(MatterBaseTest, DRLK_COMMON):
                     timedRequestTimeoutMs=1000)
                 asserts.assert_equal(expected_status, Status.Success)
         except InteractionModelError as e:
-            log.exception(f"Got exception when performing SetAliroReaderConfig {e}")
+            log.exception("Got exception when performing SetAliroReaderConfig %s", e)
             asserts.assert_equal(e.status, expected_status, f"Unexpected error returned: {e}")
 
     @property
@@ -629,18 +629,18 @@ class TC_DRLK_2_9(MatterBaseTest, DRLK_COMMON):
                 while 1:
                     uniquePincodeString = await self.generate_max_pincode_len(self.maxpincodelength)
                     uniquePincode = bytes(uniquePincodeString, 'ascii')
-                    log.info("Credential Data value is %s" % (uniquePincode))
+                    log.info("Credential Data value is %s", uniquePincode)
                     if start_credential_index <= (numberofcredentialsupportedperuser):
                         nextCredentialIndex = await self.set_credential_cmd(credentialData=uniquePincode,
                                                                             operationType=drlkcluster.Enums.DataOperationTypeEnum.kAdd,
                                                                             credential_enum=drlkcluster.Enums.CredentialTypeEnum.kPin,
 
                                                                             credentialIndex=start_credential_index, userIndex=userIndex_1, userStatus=NullValue, userType=NullValue, statuscode=Status.Success)
-                        log.info(f"The updated value of nextCredentialIndex is {nextCredentialIndex}")
+                        log.info("The updated value of nextCredentialIndex is %s", nextCredentialIndex)
                         start_credential_index += 1
                         asserts.assert_true(nextCredentialIndex == start_credential_index,
                                             "Error mismatch in expected nextCredentialIndex={}".format(str(nextCredentialIndex)))
-                        log.info(f"The updated value of start_credential_index is {start_credential_index}")
+                        log.info("The updated value of start_credential_index is %s", start_credential_index)
                     else:
                         break
         self.step("15d")

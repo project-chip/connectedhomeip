@@ -948,9 +948,9 @@ cluster BasicInformation = 40 {
   command MfgSpecificPing(): DefaultSuccess = 0;
 }
 
-/** Provides an interface for providing OTA software updates */
+/** This cluster implements the Provider role in the OTA process. */
 cluster OtaSoftwareUpdateProvider = 41 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   enum ApplyUpdateActionEnum : enum8 {
     kProceed = 0;
@@ -986,18 +986,18 @@ cluster OtaSoftwareUpdateProvider = 41 {
     optional int16u hardwareVersion = 4;
     optional char_string<2> location = 5;
     optional boolean requestorCanConsent = 6;
-    optional octet_string<512> metadataForProvider = 7;
+    optional long_octet_string<512> metadataForProvider = 7;
   }
 
   response struct QueryImageResponse = 1 {
     StatusEnum status = 0;
     optional int32u delayedActionTime = 1;
-    optional char_string<256> imageURI = 2;
+    optional long_char_string<256> imageURI = 2;
     optional int32u softwareVersion = 3;
     optional char_string<64> softwareVersionString = 4;
     optional octet_string<32> updateToken = 5;
     optional boolean userConsentNeeded = 6;
-    optional octet_string<512> metadataForRequestor = 7;
+    optional long_octet_string<512> metadataForRequestor = 7;
   }
 
   request struct ApplyUpdateRequestRequest {
@@ -1015,11 +1015,11 @@ cluster OtaSoftwareUpdateProvider = 41 {
     int32u softwareVersion = 1;
   }
 
-  /** Determine availability of a new Software Image */
+  /** Upon receipt, this command SHALL trigger an attempt to find an updated Software Image by the OTA Provider to match the OTA Requestor's constraints provided in the payload fields. */
   command QueryImage(QueryImageRequest): QueryImageResponse = 0;
-  /** Determine next action to take for a downloaded Software Image */
+  /** This command requests the specified version be installed on the device. */
   command ApplyUpdateRequest(ApplyUpdateRequestRequest): ApplyUpdateResponse = 2;
-  /** Notify OTA Provider that an update was applied */
+  /** This command tells the Provider that the specified update has been applied. */
   command NotifyUpdateApplied(NotifyUpdateAppliedRequest): DefaultSuccess = 4;
 }
 

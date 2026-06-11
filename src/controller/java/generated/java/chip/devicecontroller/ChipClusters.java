@@ -29476,6 +29476,7 @@ public class ChipClusters {
     private static final long POWER_ADJUSTMENT_CAPABILITY_ATTRIBUTE_ID = 5L;
     private static final long FORECAST_ATTRIBUTE_ID = 6L;
     private static final long OPT_OUT_STATE_ATTRIBUTE_ID = 7L;
+    private static final long POWER_RANGE_ADJUSTMENT_ATTRIBUTE_ID = 8L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
@@ -29668,12 +29669,64 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
+    public void powerRangeAdjustRequest(DefaultClusterCallback callback, @Nullable Long minPower, @Nullable Long maxPower, Long duration, Integer cause) {
+      powerRangeAdjustRequest(callback, minPower, maxPower, duration, cause, 0);
+    }
+
+    public void powerRangeAdjustRequest(DefaultClusterCallback callback, @Nullable Long minPower, @Nullable Long maxPower, Long duration, Integer cause, int timedInvokeTimeoutMs) {
+      final long commandId = 8L;
+
+      ArrayList<StructElement> elements = new ArrayList<>();
+      final long minPowerFieldID = 0L;
+      BaseTLVType minPowertlvValue = minPower != null ? new IntType(minPower) : new NullType();
+      elements.add(new StructElement(minPowerFieldID, minPowertlvValue));
+
+      final long maxPowerFieldID = 1L;
+      BaseTLVType maxPowertlvValue = maxPower != null ? new IntType(maxPower) : new NullType();
+      elements.add(new StructElement(maxPowerFieldID, maxPowertlvValue));
+
+      final long durationFieldID = 2L;
+      BaseTLVType durationtlvValue = new UIntType(duration);
+      elements.add(new StructElement(durationFieldID, durationtlvValue));
+
+      final long causeFieldID = 3L;
+      BaseTLVType causetlvValue = new UIntType(cause);
+      elements.add(new StructElement(causeFieldID, causetlvValue));
+
+      StructType commandArgs = new StructType(elements);
+      invoke(new InvokeCallbackImpl(callback) {
+          @Override
+          public void onResponse(StructType invokeStructValue) {
+          callback.onSuccess();
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
+    }
+
+    public void cancelPowerRangeAdjustRequest(DefaultClusterCallback callback) {
+      cancelPowerRangeAdjustRequest(callback, 0);
+    }
+
+    public void cancelPowerRangeAdjustRequest(DefaultClusterCallback callback, int timedInvokeTimeoutMs) {
+      final long commandId = 9L;
+
+      ArrayList<StructElement> elements = new ArrayList<>();
+      StructType commandArgs = new StructType(elements);
+      invoke(new InvokeCallbackImpl(callback) {
+          @Override
+          public void onResponse(StructType invokeStructValue) {
+          callback.onSuccess();
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
+    }
+
     public interface PowerAdjustmentCapabilityAttributeCallback extends BaseAttributeCallback {
       void onSuccess(@Nullable ChipStructs.DeviceEnergyManagementClusterPowerAdjustCapabilityStruct value);
     }
 
     public interface ForecastAttributeCallback extends BaseAttributeCallback {
       void onSuccess(@Nullable ChipStructs.DeviceEnergyManagementClusterForecastStruct value);
+    }
+
+    public interface PowerRangeAdjustmentAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(@Nullable ChipStructs.DeviceEnergyManagementClusterPowerRangeAdjustStruct value);
     }
 
     public interface GeneratedCommandListAttributeCallback extends BaseAttributeCallback {
@@ -29894,6 +29947,32 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, OPT_OUT_STATE_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readPowerRangeAdjustmentAttribute(
+        PowerRangeAdjustmentAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, POWER_RANGE_ADJUSTMENT_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            @Nullable ChipStructs.DeviceEnergyManagementClusterPowerRangeAdjustStruct value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, POWER_RANGE_ADJUSTMENT_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribePowerRangeAdjustmentAttribute(
+        PowerRangeAdjustmentAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, POWER_RANGE_ADJUSTMENT_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            @Nullable ChipStructs.DeviceEnergyManagementClusterPowerRangeAdjustStruct value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, POWER_RANGE_ADJUSTMENT_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readGeneratedCommandListAttribute(
@@ -55882,11 +55961,11 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
-    public void queryIdentity(QueryIdentityResponseCallback callback, Optional<Integer> networkIdentityIndex, Optional<Integer> networkIdentityType, Optional<byte[]> identifier) {
-      queryIdentity(callback, networkIdentityIndex, networkIdentityType, identifier, 0);
+    public void queryIdentity(QueryIdentityResponseCallback callback, Optional<Integer> networkIdentityIndex, Optional<Integer> networkIdentityType, Optional<Integer> clientIndex, Optional<byte[]> identifier) {
+      queryIdentity(callback, networkIdentityIndex, networkIdentityType, clientIndex, identifier, 0);
     }
 
-    public void queryIdentity(QueryIdentityResponseCallback callback, Optional<Integer> networkIdentityIndex, Optional<Integer> networkIdentityType, Optional<byte[]> identifier, int timedInvokeTimeoutMs) {
+    public void queryIdentity(QueryIdentityResponseCallback callback, Optional<Integer> networkIdentityIndex, Optional<Integer> networkIdentityType, Optional<Integer> clientIndex, Optional<byte[]> identifier, int timedInvokeTimeoutMs) {
       final long commandId = 3L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
@@ -55898,7 +55977,11 @@ public class ChipClusters {
       BaseTLVType networkIdentityTypetlvValue = networkIdentityType.<BaseTLVType>map((nonOptionalnetworkIdentityType) -> new UIntType(nonOptionalnetworkIdentityType)).orElse(new EmptyType());
       elements.add(new StructElement(networkIdentityTypeFieldID, networkIdentityTypetlvValue));
 
-      final long identifierFieldID = 2L;
+      final long clientIndexFieldID = 2L;
+      BaseTLVType clientIndextlvValue = clientIndex.<BaseTLVType>map((nonOptionalclientIndex) -> new UIntType(nonOptionalclientIndex)).orElse(new EmptyType());
+      elements.add(new StructElement(clientIndexFieldID, clientIndextlvValue));
+
+      final long identifierFieldID = 3L;
       BaseTLVType identifiertlvValue = identifier.<BaseTLVType>map((nonOptionalidentifier) -> new ByteArrayType(nonOptionalidentifier)).orElse(new EmptyType());
       elements.add(new StructElement(identifierFieldID, identifiertlvValue));
 
