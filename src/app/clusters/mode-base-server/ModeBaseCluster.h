@@ -25,8 +25,6 @@
 #include <app/server-cluster/OptionalAttributeSet.h>
 #include <platform/DiagnosticDataProvider.h>
 
-#include <functional>
-
 namespace chip::app::Clusters {
 
 class ModeBaseCluster : public DefaultServerCluster
@@ -148,22 +146,21 @@ private:
     void LoadPersistentAttributes();
 
     /**
-     * Helper function that loads a scalar value from the KVS.
-     * @param path The path to the attribute.
+     * Helper function that logs the status of a scalar value from the KVS.
+     * @param status The status of the operation.
+     * @param value The value of the attribute.
      * @param attributeName The name of the attribute.
-     * @param func The function to call to update the attribute.
      */
-    void LoadScalarValue(const ConcreteAttributePath & path, const char * attributeName,
-                         std::function<Protocols::InteractionModel::Status(const uint8_t &)> func);
+    void LogStatus(Protocols::InteractionModel::Status status, const uint8_t & value, const char * attributeName);
 
     /**
-     * Helper function that loads a nullable scalar value from the KVS.
-     * @param path The path to the attribute.
+     * Helper function that logs the status of a nullable scalar value from the KVS.
+     * @param status The status of the operation.
+     * @param value The value of the attribute.
      * @param attributeName The name of the attribute.
-     * @param func The function to call to update the attribute.
      */
-    void LoadNullableScalarValue(const ConcreteAttributePath & path, const char * attributeName,
-                                 std::function<Protocols::InteractionModel::Status(const DataModel::Nullable<uint8_t> &)> func);
+    void LogStatus(Protocols::InteractionModel::Status status, const DataModel::Nullable<uint8_t> & value,
+                   const char * attributeName);
 
     /**
      * Helper function that encodes the supported modes.
