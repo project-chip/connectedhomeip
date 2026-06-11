@@ -52,12 +52,12 @@ _ALL_DEVICES_APP_DEVICES = [
     'fan',
     'occupancy-sensor',
     'on-off-light',
+    'power-source',
+    'proximity-ranger',
     'soil-sensor',
     'speaker',
     'temperature-sensor',
     'water-leak-detector',
-    'power-source',
-    'proximity-ranger',
     # keep-sorted: end
 ]
 
