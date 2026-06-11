@@ -59,7 +59,7 @@ def load_errata_file(errata_path: Path | Traversable) -> dict[str, Any]:
     """Loads and parses raw errata YAML content from a Path or Traversable resource."""
     try:
         if isinstance(errata_path, Path):
-            with open(errata_path, 'r', encoding='utf-8') as f:
+            with open(errata_path, encoding='utf-8') as f:
                 return yaml.safe_load(f) or {}
         else:
             with errata_path.open('r', encoding='utf-8') as f:
