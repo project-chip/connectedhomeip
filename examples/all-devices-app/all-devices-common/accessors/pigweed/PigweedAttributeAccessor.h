@@ -22,6 +22,15 @@
 
 namespace chip::app {
 
+// TODO: currently added to be able to get the TLV reader from the decoder. Options to void using TestOnly:
+// A. Update chip::rpc::PigweedDebugAccessInterceptor::Write interface to take in TLV reader instead of decoder.
+// B. Add a new chip::rpc::PigweedDebugAccessInterceptor::Write interface that takes in a TLV.
+class TestOnlyAttributeValueDecoderAccessor
+{
+public:
+    static TLV::TLVReader & GetReader(AttributeValueDecoder & decoder) { return decoder.mReader; }
+};
+
 class PigweedAttributeAccessor : public chip::rpc::PigweedDebugAccessInterceptor
 {
 public:
@@ -30,25 +39,29 @@ public:
 
     std::optional<::pw::Status> Write(const ConcreteDataAttributePath & path, AttributeValueDecoder & decoder) override
     {
-        CHIP_ERROR err = AccessorRegistry::Instance().SetAttribute(path, decoder);
-        if (err == CHIP_NO_ERROR)
+        TLV::TLVReader & reader = TestOnlyAttributeValueDecoderAccessor::GetReader(decoder);
+
+        auto result = AccessorRegistry::Instance().HandleAction(OOBAccessor::kActionSetAttribute, reader, &path);
+        if (result.has_value())
         {
-            if (!decoder.TriedDecode())
+            CHIP_ERROR err = *result;
+            if (err == CHIP_NO_ERROR)
             {
-                ChipLogError(Support,
-                             "OOB Accessor returned success but did not decode the value. Path: (%d, " ChipLogFormatMEI
-                             ", " ChipLogFormatMEI ")",
-                             path.mEndpointId, ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mAttributeId));
-                return ::pw::Status::FailedPrecondition();
+                if (!decoder.TriedDecode())
+                {
+                    ChipLogError(Support,
+                                 "OOB Accessor returned success but did not decode the value. Path: (%d, " ChipLogFormatMEI
+                                 ", " ChipLogFormatMEI ")",
+                                 path.mEndpointId, ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mAttributeId));
+                    return ::pw::Status::FailedPrecondition();
+                }
+                return ::pw::OkStatus();
             }
-            return ::pw::OkStatus();
+            ChipLogError(Support, "OOB Accessor failed to write attribute: %" CHIP_ERROR_FORMAT, err.Format());
+            return ::pw::Status::Internal();
         }
-        if (err == CHIP_ERROR_KEY_NOT_FOUND || err == CHIP_ERROR_NOT_IMPLEMENTED)
-        {
-            // If a null is seen the Attributes service handler moves ahead to the next accessor or datamodel provider.
-            return std::nullopt;
-        }
-        return ::pw::Status::Internal();
+
+        return std::nullopt;
     }
 };
 

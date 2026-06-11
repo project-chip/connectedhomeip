@@ -14,22 +14,47 @@
  *    limitations under the License.
  */
 
+#include <access/SubjectDescriptor.h>
 #include <devices/boolean-state-sensor/BooleanStateSensorAccessor.h>
+#include <lib/support/CodeUtils.h>
 
 using namespace chip::app::Clusters;
 
 namespace chip::app {
 
-BooleanStateSensorAccessor::BooleanStateSensorAccessor(BooleanStateSensorDevice * device) : SingleEndpointDeviceAccessor(device) {}
-
-CHIP_ERROR BooleanStateSensorAccessor::SetAttribute(const ConcreteDataAttributePath & path, AttributeValueDecoder & decoder)
+BooleanStateSensorAccessor::BooleanStateSensorAccessor(BooleanStateSensorDevice * device) : mDevice(device)
 {
-    auto * device = static_cast<BooleanStateSensorDevice *>(mDevice);
-    if (device == nullptr)
+    VerifyOrDie(mDevice != nullptr);
+}
+
+std::optional<CHIP_ERROR> BooleanStateSensorAccessor::HandleAction(CharSpan actionName, chip::TLV::TLVReader & arguments,
+                                                                   const ConcreteDataAttributePath * path)
+{
+    if (!actionName.data_equal(kActionSetAttribute))
     {
-        return CHIP_ERROR_INTERNAL;
+        return std::nullopt;
     }
 
+    if (path == nullptr)
+    {
+        return std::make_optional(CHIP_ERROR_INVALID_ARGUMENT);
+    }
+
+    if (path->mEndpointId != mDevice->GetEndpointId())
+    {
+        return std::nullopt; // Not for our endpoint
+    }
+
+    // arguments TLVReader is positioned at the value.
+    // Reconstruct decoder.
+    Access::SubjectDescriptor subjectDescriptor{ .authMode = chip::Access::AuthMode::kInternalDeviceAccess };
+    AttributeValueDecoder decoder(arguments, subjectDescriptor);
+
+    return SetAttribute(*path, decoder);
+}
+
+std::optional<CHIP_ERROR> BooleanStateSensorAccessor::SetAttribute(const ConcreteDataAttributePath & path, AttributeValueDecoder & decoder)
+{
     if (path.mClusterId == BooleanState::Id)
     {
         switch (path.mAttributeId)
@@ -37,15 +62,15 @@ CHIP_ERROR BooleanStateSensorAccessor::SetAttribute(const ConcreteDataAttributeP
         case BooleanState::Attributes::StateValue::Id: {
             bool stateValue;
             ReturnErrorOnFailure(decoder.Decode(stateValue));
-            device->BooleanState().SetStateValue(stateValue);
-            return CHIP_NO_ERROR;
+            mDevice->BooleanState().SetStateValue(stateValue);
+            return std::make_optional(CHIP_NO_ERROR);
         }
         default:
             break;
         }
     }
 
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    return std::nullopt;
 }
 
 } // namespace chip::app

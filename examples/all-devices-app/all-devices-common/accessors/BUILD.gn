@@ -24,6 +24,7 @@ config("includes") {
 source_set("common") {
   sources = [
     "common/AccessorRegistry.h",
+    "common/OOBAccessor.h",
     "common/SingleEndpointDeviceAccessor.h",
   ]
 

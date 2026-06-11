@@ -38,6 +38,7 @@
 #include <devices/device-factory/DeviceFactory.h>
 #if defined(CHIP_ALL_DEVICES_APP_ENABLE_OOB_ACCESSORS) && CHIP_ALL_DEVICES_APP_ENABLE_OOB_ACCESSORS
 #include <accessors/common/AccessorRegistry.h>
+#include <accessors/common/OOBAccessor.h>
 #include <devices/boolean-state-sensor/BooleanStateSensorAccessor.h>
 #if defined(PW_RPC_ENABLED)
 #include <accessors/pigweed/PigweedAttributeAccessor.h>
@@ -208,7 +209,7 @@ private:
     std::vector<std::unique_ptr<DeviceInterface>> mConstructedDevices;
 
 #if defined(CHIP_ALL_DEVICES_APP_ENABLE_OOB_ACCESSORS) && CHIP_ALL_DEVICES_APP_ENABLE_OOB_ACCESSORS
-    std::vector<std::unique_ptr<SingleEndpointDeviceAccessor>> mConstructedAccessors;
+    std::vector<std::unique_ptr<chip::app::OOBAccessor>> mConstructedAccessors;
 #endif // CHIP_ALL_DEVICES_APP_ENABLE_OOB_ACCESSORS
 };
 

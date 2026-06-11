@@ -37,7 +37,7 @@
 #include <platform/DefaultTimerDelegate.h>
 
 #if defined(CHIP_ALL_DEVICES_APP_ENABLE_OOB_ACCESSORS) && CHIP_ALL_DEVICES_APP_ENABLE_OOB_ACCESSORS
-#include <accessors/common/SingleEndpointDeviceAccessor.h>
+#include <accessors/common/OOBAccessor.h>
 #include <devices/boolean-state-sensor/BooleanStateSensorAccessor.h>
 #endif // CHIP_ALL_DEVICES_APP_ENABLE_OOB_ACCESSORS
 
@@ -57,7 +57,7 @@ public:
     using DeviceCreator = std::function<std::unique_ptr<DeviceInterface>()>;
 
 #if defined(CHIP_ALL_DEVICES_APP_ENABLE_OOB_ACCESSORS) && CHIP_ALL_DEVICES_APP_ENABLE_OOB_ACCESSORS
-    using DeviceAccessorCreator = std::function<std::unique_ptr<SingleEndpointDeviceAccessor>(DeviceInterface *)>;
+    using DeviceAccessorCreator = std::function<std::unique_ptr<OOBAccessor>(DeviceInterface *)>;
 #endif // CHIP_ALL_DEVICES_APP_ENABLE_OOB_ACCESSORS
 
     struct Context
@@ -110,7 +110,7 @@ public:
     }
 
 #if defined(CHIP_ALL_DEVICES_APP_ENABLE_OOB_ACCESSORS) && CHIP_ALL_DEVICES_APP_ENABLE_OOB_ACCESSORS
-    std::unique_ptr<SingleEndpointDeviceAccessor> CreateAccessor(const std::string & deviceTypeArg, DeviceInterface * device)
+    std::unique_ptr<OOBAccessor> CreateAccessor(const std::string & deviceTypeArg, DeviceInterface * device)
     {
         if (IsValidDevice(deviceTypeArg))
         {
