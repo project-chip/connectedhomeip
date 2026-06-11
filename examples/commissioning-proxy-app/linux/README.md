@@ -3,7 +3,13 @@
 An example showing the use of the Matter Commissioning Proxy cluster on Linux.
 The Commissioning Proxy (CP) acts as a tunnel between a Commissioner (chip-tool)
 and a Commissionee that is reachable via a transport not available on the
-Commissioner — for example, Wi-Fi Aware (PAF).
+Commissioner — for example, Wi-Fi Aware (PAF) or BLE.
+
+The app is built from per-transport modules: the transport-agnostic dispatcher
+is always present, and the **WiFi-PAF** and **BLE** transports are each compiled
+in when their stack is enabled (see [Building](#building)). The cluster
+`FeatureMap` is derived from the enabled transports — `BackgroundScan` is always
+advertised, and `WiFiNetworkInterface` only when WiFi-PAF is compiled in.
 
 This document describes how to build and run the Commissioning Proxy app and how
 to commission a device through it using chip-tool.
@@ -43,6 +49,21 @@ wpa_supplicant patching, and deploying all three binaries to the RPi.
 
     To omit RPC support, replace the `--args` value with `--args=''` or omit it
     entirely.
+
+-   **Selecting transports.** By default both transports are compiled in when
+    their stacks are available. To build a single-transport binary, disable the
+    other transport's GN flag:
+
+          # WiFi-PAF only (BLE disabled)
+          $ gn gen out/wifipaf --args='import("//with_pw_rpc.gni") chip_config_network_layer_ble=false'
+
+          # BLE only (WiFi-PAF disabled)
+          $ gn gen out/ble --args='import("//with_pw_rpc.gni") chip_device_config_enable_wifipaf=false'
+
+    A WiFi-PAF–only binary advertises `FeatureMap` `WiFiNetworkInterface |
+    BackgroundScan`; a BLE-only binary advertises `BackgroundScan` only. For RPi
+    cross-compilation `~/scripts/build-commissioning-proxy-transport.sh` wraps
+    these flags for the PAF-only and BLE-only variants.
 
 -   To delete generated executable, libraries and object files use:
 
@@ -108,6 +129,13 @@ Once commissioned the proxy app cancels its own NAN publisher advertisement and
 disconnects the associated signal handler, so that subsequent PAF subscribe
 calls it makes on behalf of commissioners register exactly one handler.
 
+The transport used to reach the commissionee is selected per-command by the
+`Transport` field of `ProxyConnectRequest` / `ProxyScanRequest`, not by a
+command-line flag. `--wifi` / `--wifipaf` configure the WiFi-PAF transport; BLE
+needs no extra flag. For a BLE proxy connect the app pauses its own BLE
+peripheral advertising and acts as a BLE central for the duration of the proxy
+session(s), resuming peripheral advertising once the last session closes.
+
 ## Commissioning a Device via the Proxy
 
 Once the proxy node is commissioned, use `chip-tool pairing proxy` to commission
@@ -148,8 +176,14 @@ implementation detail, see `IMPLEMENTATION_README.md §Architecture Overview`.
 
 For annotated and copy-paste command forms see `../CP_getting_started.md §8.1`.
 
-The proxy can perform a one-shot foreground NAN scan for commissionable devices
-and return results immediately via `ProxyScanResponse`.
+The proxy can perform a one-shot foreground scan for commissionable devices and
+return results immediately via `ProxyScanResponse`.
+
+The `Transport` field MAY combine more than one transport bit (e.g. `10` =
+`BLE | WiFi-PAF`). The proxy starts a sub-scan on each requested transport in
+parallel and returns a single combined `ProxyScanResponse` once every sub-scan
+has completed. Every requested bit must be a transport this build supports, or
+the command is rejected with `INVALID_TRANSPORT_TYPE`.
 
 ```
 $ ./chip-tool commissioningproxy proxy-scan-request \
@@ -237,8 +271,8 @@ discriminator) currently held in the proxy's cache.
 Each proxy session is bound to the fabric that created it via
 `ProxyConnectRequest`. Attempts by a different fabric to send
 `ProxyMessageRequest`, `ProxyDisconnectRequest`, or a `CancelPendingConnect`
-(SessionId `0xFFFF`) for a session owned by another fabric are rejected with
-`Status::NotFound`.
+(a `ProxyDisconnectRequest` carrying a null `sessionID`) for a session owned by
+another fabric are rejected with `Status::NotFound`.
 
 ## Device Tracing
 

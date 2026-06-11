@@ -436,6 +436,15 @@ Output binary:
 examples/commissioning-proxy-app/linux/out/rpi-arm64/chip-commissioning-proxy-app
 ```
 
+> **Transport variants.** The command above builds a binary with **both**
+> transports (WiFi-PAF and BLE) compiled in, which is what this guide uses. The
+> proxy app is split into per-transport modules and each transport can be
+> disabled at build time (`chip_config_network_layer_ble=false` for PAF-only,
+> `chip_device_config_enable_wifipaf=false` for BLE-only). See
+> `linux/README.md §Building` and `IMPLEMENTATION_README.md §Proxy App:
+> Dispatcher and Per-Transport Modules` for the transport architecture and the
+> `FeatureMap` each variant advertises.
+
 ### 4.3 Build chip-tool (RPi arm64)
 
 chip-tool runs on the **Test Harness RPi** (not the build machine). Create and
