@@ -19,7 +19,6 @@ import importlib
 import importlib.resources
 import logging
 import re
-from enum import IntEnum
 from importlib.resources.abc import Traversable
 from pathlib import Path
 from typing import Any, Mapping, Optional
