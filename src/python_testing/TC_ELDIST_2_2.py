@@ -89,8 +89,8 @@ class TC_ELDIST_2_2(MatterBaseTest):
         ser_1 = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster,
             attribute=attributes.ServiceEntranceRated)
-        log.info(f"Pre-reboot values: MCC={mcc_1}, MV={mv_1}, "
-                 f"NOP={nop_1}, EOL={eol_1}, SER={ser_1}")
+        log.info("Pre-reboot values: MCC=%s, MV=%s, NOP=%s, EOL=%s, SER=%s",
+                 mcc_1, mv_1, nop_1, eol_1, ser_1)
 
         self.step(3, "TH re-reads MaxContinuousCurrent to confirm stability within single boot")
         mcc_2 = await self.read_single_attribute_check_success(
