@@ -141,7 +141,7 @@ private:
                                                               Feature::kAverageMeasurement, Feature::kLevelIndication),
                                 .medium    = MeasurementMediumEnum::kAir,
                                 .unit      = MeasurementUnitEnum::kPpm,
-                             },
+                            },
                     });
             });
         }
