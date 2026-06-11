@@ -36,7 +36,7 @@ import matter.testing.conformance as conformance_support
 from matter.testing.conformance import (OPTIONAL_CONFORM, TOP_LEVEL_CONFORMANCE_TAGS, ConformanceException,
                                         ConformanceParseParameters, feature, is_disallowed, mandatory, optional, or_operation,
                                         parse_callable_from_xml)
-from matter.testing.data_model_errata import AccessControlEntryPrivilegeEnum, apply_errata, load_authoritative_errata
+from matter.testing.data_model_errata import apply_errata, load_authoritative_errata
 from matter.testing.global_attribute_ids import GlobalAttributeIds
 from matter.testing.problem_notices import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, DeviceTypePathLocation,
                                             EventPathLocation, FeaturePathLocation, NamespacePathLocation, ProblemNotice,
@@ -45,8 +45,8 @@ from matter.tlv import uint
 
 LOGGER = logging.getLogger(__name__)
 
-# Type alias maintained for constants access; actual values are IntEnum copies at compile time
-ACCESS_CONTROL_PRIVILEGE_ENUM = AccessControlEntryPrivilegeEnum
+# Type alias maintained for constants access; actual values are ints at runtime
+ACCESS_CONTROL_PRIVILEGE_ENUM = Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum
 
 _PRIVILEGE_STR: dict[Optional[int], str] = {
     None: "N/A",

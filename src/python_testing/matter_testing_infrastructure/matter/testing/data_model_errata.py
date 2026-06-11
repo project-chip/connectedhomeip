@@ -26,22 +26,13 @@ from typing import Any, Mapping, Optional
 
 import yaml
 
+import matter.clusters as Clusters
 from matter.tlv import uint
 
 LOGGER = logging.getLogger(__name__)
 
 
-# Standalone copy of AccessControlEntryPrivilegeEnum.
-# Required because Pigweed GN evaluates `matter-testing-module.tests` within `matter_build_venv`.
-# `matter_build_venv` omits runtime Controller PyPI wheels (`construct`, `rich`), causing direct
-# imports of `matter.clusters` to fail with `ModuleNotFoundError`.
-class AccessControlEntryPrivilegeEnum(IntEnum):
-    kView = 1
-    kProxyView = 2
-    kOperate = 3
-    kManage = 4
-    kAdminister = 5
-    kUnknownEnumValue = 0
+AccessControlEntryPrivilegeEnum = Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum
 
 
 def parse_errata_access(val: str) -> int:
