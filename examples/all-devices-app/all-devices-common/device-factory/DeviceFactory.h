@@ -28,7 +28,7 @@
 #include <devices/occupancy-sensor/impl/TogglingOccupancySensorDevice.h>
 #include <devices/on-off-light/LoggingOnOffLightDevice.h>
 #include <devices/power-source/impl/DecreasingBatteryPowerSourceDevice.h>
-#include <devices/proximity-ranger/ProximityRangerDevice.h>
+#include <devices/proximity-ranger/impl/LoggingProximityRangerDevice.h>
 #include <devices/soil-sensor/impl/IncreasingMoistureSoilSensorDevice.h>
 #include <devices/speaker/impl/LoggingSpeakerDevice.h>
 #include <devices/temperature-sensor/impl/IncreasingTemperatureSensorDevice.h>
@@ -239,7 +239,7 @@ private:
         {
             RegisterCreator("proximity-ranger", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return std::make_unique<ProximityRangerDevice>(mContext->timerDelegate, mContext->storageDelegate);
+                return std::make_unique<LoggingProximityRangerDevice>(mContext->timerDelegate, mContext->storageDelegate);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_POWER_SOURCE)
