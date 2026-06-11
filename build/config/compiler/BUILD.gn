@@ -496,7 +496,7 @@ config("sanitize_address") {
     ldflags += [ "-fsanitize-address-use-after-return=always" ]
   }
   if (_asan_use_padded_libcxx) {
-    cflags += [ "-fsanitize-address-field-padding=1" ]
+    cflags += [ "-fsanitize-address-field-padding=2" ]
     cflags_cc += [
       "-nostdinc++",
       "-isystem",
