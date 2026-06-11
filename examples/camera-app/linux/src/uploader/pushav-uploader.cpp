@@ -429,7 +429,7 @@ void PushAVUploader::UploadData(std::pair<std::string, std::string> data)
             contentType = "application/dash+xml";
             // Strip .upload suffix so remote URL uses .mpd extension
             static constexpr size_t kUploadSuffixLen = 7; // strlen(".upload")
-            fullPath = fullPath.substr(0, fullPath.size() - kUploadSuffixLen);
+            fullPath                                 = fullPath.substr(0, fullPath.size() - kUploadSuffixLen);
         }
     }
     else if (extension == ".mpd")
