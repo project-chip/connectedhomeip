@@ -15,8 +15,6 @@
 #    limitations under the License.
 #
 
-import importlib
-import importlib.resources
 import logging
 import re
 from importlib.resources.abc import Traversable
@@ -75,29 +73,17 @@ def load_authoritative_errata(errata_target: str | Path | Traversable) -> dict[s
         LOGGER.info("Loading errata from Traversable resource %s", errata_target)
         return load_errata_file(errata_target)
 
-    # If it is an absolute path or exists locally, load it
-    try:
-        local_path = Path(errata_target)
-        if local_path.is_absolute() or local_path.exists():
-            LOGGER.info("Loading local errata file from %s", local_path)
-            return load_errata_file(local_path)
-    except Exception as e:
-        LOGGER.debug("Could not load local errata path %s: %s", errata_target, e)
+    # Load from the local path
+    local_path = Path(errata_target)
+    if local_path.is_absolute() or local_path.exists():
+        LOGGER.info("Loading local errata file from %s", local_path)
+        return load_errata_file(local_path)
 
-    # Otherwise assume it is a filename packaged inside matter.testing.data_model
-    try:
-        res = importlib.resources.files(importlib.import_module('matter.testing')).joinpath('data_model').joinpath(
-            str(errata_target))
-        if res.is_file():
-            LOGGER.info("Loading packaged errata from %s", res)
-            return load_errata_file(res)
-    except Exception as e:
-        LOGGER.debug("Packaged errata resource '%s' not found: %s", errata_target, e)
-
+    LOGGER.error("Errata file path '%s' not found.", errata_target)
     return {}
 
 
-def _is_valid_pascal_case(name: str) -> bool:
+def _has_no_separators(name: str) -> bool:
     """Returns True if the identifier contains no spaces, slashes, or underscores."""
     return not bool(re.search(r'[\s/\-_]', name))
 
@@ -156,7 +142,7 @@ def _apply_element_errata(target_cluster: Any, element_name: str, overrides: Any
         problems.append(f"Errata overrides for '{cluster_name}::{element_name}' must be a dictionary.")
         return
 
-    if not _is_valid_pascal_case(element_name):
+    if not _has_no_separators(element_name):
         problems.append(
             f"CRITICAL: Element name '{element_name}' in '{cluster_name}' violates Matter SDK PascalCase conventions. Please use clean sanitized names.")
         return
@@ -199,7 +185,7 @@ def apply_errata(clusters: Mapping[uint, Any], errata_data: dict[str, Any],
         if cluster_name == 'compatible_specification_revisions':
             continue
 
-        if not _is_valid_pascal_case(cluster_name):
+        if not _has_no_separators(cluster_name):
             problems.append(
                 f"CRITICAL: Cluster name '{cluster_name}' in errata violates Matter SDK PascalCase conventions. Please use clean sanitized names (e.g. 'OnOff', 'AmbientContextSensing').")
             continue
