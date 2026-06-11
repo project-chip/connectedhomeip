@@ -39,6 +39,7 @@
 // Framesize for audio pipeline
 #define AUDIO_FRAMESIZE 20
 
+using namespace chip;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::Chime;
 using namespace chip::app::Clusters::CameraAvStreamManagement;
@@ -1634,6 +1635,15 @@ CameraError CameraDevice::SetPhysicalPTZ(chip::Optional<int16_t> aPan, chip::Opt
     return CameraError::SUCCESS;
 }
 
+std::vector<app::Clusters::Descriptor::Structs::SemanticTagStruct::Type> CameraDevice::GetSupportedAmbientContexts()
+{
+    static std::vector<app::Clusters::Descriptor::Structs::SemanticTagStruct::Type> ambientContexts = {
+        { std::nullopt, static_cast<uint8_t>(0x49), static_cast<uint8_t>(0x0B),  
+          MakeOptional(chip::app::DataModel::Nullable<chip::CharSpan>("Object.Package"_span)) /* Identified Object:Package */}
+    };
+    return ambientContexts;
+}
+
 CameraError CameraDevice::SetDetectionSensitivity(uint8_t aSensitivity)
 {
     mDetectionSensitivity = aSensitivity;
@@ -1892,6 +1902,11 @@ CameraAvSettingsUserLevelManagementDelegate & CameraDevice::GetCameraAVSettingsU
 ZoneManagement::Delegate & CameraDevice::GetZoneManagementDelegate()
 {
     return mZoneManager;
+}
+
+AvAnalysisDelegate & CameraDevice::GetAVAnalysisDelegate()
+{
+    return mAVAnalysisManager;
 }
 
 MediaController & CameraDevice::GetMediaController()

@@ -25,6 +25,7 @@
 #include <app/clusters/push-av-stream-transport-server/PushAVStreamTransportCluster.h>
 #include <app/clusters/webrtc-transport-provider-server/WebRTCTransportProviderCluster.h>
 #include <app/clusters/zone-management-server/zone-management-server.h>
+#include <app/clusters/av-analysis-server/AvAnalysisCluster.h>
 
 using chip::app::Clusters::CameraAvStreamManagement::AudioCapabilitiesStruct;
 using chip::app::Clusters::CameraAvStreamManagement::AudioStreamStruct;
@@ -146,6 +147,9 @@ public:
 
     // Getter for PushAVStreamTransport Delegate
     virtual chip::app::Clusters::PushAvStreamTransportDelegate & GetPushAVTransportDelegate() = 0;
+    
+    // Getter for the AVAnalysis Delegate
+    virtual chip::app::Clusters::AvAnalysisDelegate & GetAVAnalysisDelegate() = 0;
 
     // Class defining the Camera HAL interface
     class CameraHALInterface
@@ -366,6 +370,11 @@ public:
         virtual int16_t GetTiltMax() = 0;
         virtual uint8_t GetZoomMax() = 0;
 
+        // Get the maximum number of Analysis Streams supported by the camera.
+        virtual uint8_t GetMaxAnalysisStreams() = 0;
+        
+        virtual std::vector<chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::Type> GetSupportedAmbientContexts() = 0;
+        
         // Get the maximum number of zones supported by camera.
         virtual uint8_t GetMaxZones() = 0;
 

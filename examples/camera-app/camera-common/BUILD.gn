@@ -58,6 +58,7 @@ source_set("camera-lib") {
     "${chip_root}/src/app/clusters/camera-av-settings-user-level-management-server",
     "${chip_root}/src/app/clusters/push-av-stream-transport-server",
     "${chip_root}/src/app/clusters/webrtc-transport-provider-server",
+    "${chip_root}/src/app/clusters/av-analysis-server",
     "${chip_root}/src/lib",
   ]
 
