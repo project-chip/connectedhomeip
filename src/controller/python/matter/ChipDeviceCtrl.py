@@ -1728,6 +1728,11 @@ class ChipDeviceControllerBase:
             interactionTimeoutMs=interactionTimeoutMs, busyWaitMs=busyWaitMs, suppressResponse=suppressResponse,
             remoteMaxPathsPerInvoke=remoteMaxPathsPerInvoke, suppressTimedRequestMessage=suppressTimedRequestMessage,
             commandRefsOverride=commandRefsOverride).raise_on_error()
+
+        if suppressResponse:
+            if not future.done():
+                future.set_result(None)
+
         return await future
 
     async def TestOnlySendCommandTimedRequestFlagWithNoTimedInvoke(self, nodeId: int, endpoint: int,
@@ -1862,6 +1867,11 @@ class ChipDeviceControllerBase:
             ), payload, timedRequestTimeoutMs=timedRequestTimeoutMs,
             interactionTimeoutMs=interactionTimeoutMs, busyWaitMs=busyWaitMs, suppressResponse=suppressResponse, allowLargePayload=allow_large_payload)
         res.raise_on_error()
+
+        if suppressResponse:
+            if not future.done():
+                future.set_result(None)
+
         return await future
 
     async def SendBatchCommands(self, nodeId: int, commands: list[ClusterCommand.InvokeRequestInfo],
@@ -1903,6 +1913,11 @@ class ChipDeviceControllerBase:
             timedRequestTimeoutMs=timedRequestTimeoutMs,
             interactionTimeoutMs=interactionTimeoutMs, busyWaitMs=busyWaitMs, suppressResponse=suppressResponse)
         res.raise_on_error()
+
+        if suppressResponse:
+            if not future.done():
+                future.set_result(None)
+
         return await future
 
     def SendGroupCommand(self, groupid: int, payload: ClusterObjects.ClusterCommand, busyWaitMs: typing.Optional[int] = None):

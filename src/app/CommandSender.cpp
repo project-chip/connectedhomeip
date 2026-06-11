@@ -201,9 +201,18 @@ CHIP_ERROR CommandSender::SendInvokeRequest()
     using namespace Protocols::InteractionModel;
     using namespace Messaging;
 
-    ReturnErrorOnFailure(
-        mExchangeCtx->SendMessage(MsgType::InvokeCommandRequest, std::move(mPendingInvokeData), SendMessageFlags::kExpectResponse));
-    MoveToState(State::AwaitingResponse);
+    if (mSuppressResponse)
+    {
+        ReturnErrorOnFailure(
+            mExchangeCtx->SendMessage(MsgType::InvokeCommandRequest, std::move(mPendingInvokeData), SendMessageFlags::kNone));
+        Close();
+    }
+    else
+    {
+        ReturnErrorOnFailure(mExchangeCtx->SendMessage(MsgType::InvokeCommandRequest, std::move(mPendingInvokeData),
+                                                       SendMessageFlags::kExpectResponse));
+        MoveToState(State::AwaitingResponse);
+    }
 
     return CHIP_NO_ERROR;
 }
@@ -348,10 +357,14 @@ CHIP_ERROR CommandSender::ProcessInvokeResponse(System::PacketBufferHandle && pa
 
 void CommandSender::OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext)
 {
-    ChipLogProgress(DataManagement, "Time out! failed to receive invoke command response from Exchange: " ChipLogFormatExchange,
-                    ChipLogValueExchange(apExchangeContext));
+    // Only report error when response is expected
+    if (mSuppressResponse == false)
+    {
+        ChipLogProgress(DataManagement, "Time out! failed to receive invoke command response from Exchange: " ChipLogFormatExchange,
+                        ChipLogValueExchange(apExchangeContext));
 
-    OnErrorCallback(CHIP_ERROR_TIMEOUT);
+        OnErrorCallback(CHIP_ERROR_TIMEOUT);
+    }
     Close();
 }
 
@@ -373,6 +386,11 @@ void CommandSender::Close()
 {
     mSuppressResponse = false;
     mTimedRequest     = false;
+    // avoid OnDoneCallback being called more than once
+    if (mState == State::AwaitingDestruction)
+    {
+        return;
+    }
     MoveToState(State::AwaitingDestruction);
     OnDoneCallback();
 }

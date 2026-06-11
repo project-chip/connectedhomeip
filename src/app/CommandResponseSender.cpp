@@ -115,10 +115,10 @@ void CommandResponseSender::StartSendingCommandResponses()
 
 void CommandResponseSender::OnDone(CommandHandlerImpl & apCommandObj)
 {
-    if (mState == State::ErrorSentDelayCloseUntilOnDone || apCommandObj.IsGroupRequest())
+    if (mState == State::ErrorSentDelayCloseUntilOnDone || apCommandObj.IsGroupRequest() || apCommandObj.IsResponseSuppressed())
     {
         // We either have already sent a message to the client indicating that we are not expecting
-        // a response, or do not need to send response to a groupcast.
+        // a response, or do not need to send response to a groupcast or a command with SuppressResponse flag set.
         Close();
         return;
     }
@@ -144,7 +144,10 @@ CHIP_ERROR CommandResponseSender::SendCommandResponse()
     if (mChunks.IsNull())
     {
         VerifyOrReturnError(mReportResponseDropped, CHIP_ERROR_INCORRECT_STATE);
-        SendStatusResponse(Status::ResourceExhausted);
+        if (!mCommandHandler.IsResponseSuppressed())
+        {
+            SendStatusResponse(Status::ResourceExhausted);
+        }
         mReportResponseDropped = false;
         return CHIP_NO_ERROR;
     }
@@ -218,7 +221,10 @@ void CommandResponseSender::OnInvokeCommandRequest(Messaging::ExchangeContext * 
     if (status != Status::Success)
     {
         VerifyOrDie(mState == State::ReadyForInvokeResponses);
-        SendStatusResponse(status);
+        if (!mCommandHandler.IsResponseSuppressed())
+        {
+            SendStatusResponse(status);
+        }
         // The API contract of OnInvokeCommandRequest requires the CommandResponder instance to outlive
         // the CommandHandler. Therefore, we cannot safely call Close() here, even though we have
         // finished sending data. Closing must be deferred until the CommandHandler::OnDone callback.
