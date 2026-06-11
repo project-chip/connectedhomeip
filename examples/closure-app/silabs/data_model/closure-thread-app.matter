@@ -2500,6 +2500,8 @@ endpoint 2 {
 
     handle command SetTarget;
     handle command Step;
+    handle command GroupedSetTarget;
+    handle command GroupedStep;
   }
 }
 endpoint 3 {
@@ -2538,6 +2540,8 @@ endpoint 3 {
 
     handle command SetTarget;
     handle command Step;
+    handle command GroupedSetTarget;
+    handle command GroupedStep;
   }
 }
 
