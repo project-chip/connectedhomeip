@@ -37,7 +37,7 @@ jobs:
     if: github.actor != 'restyled-io[bot]'
 
     container:
-      image: ghcr.io/malbert-silabs/chip-build-silabs-zephyr:201
+      image: ghcr.io/project-chip/chip-build-silabs-zephyr:202
     steps:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
@@ -46,13 +46,17 @@ jobs:
         with:
           platform: silabs_docker
 
-      - name: Build SiWx917 Lighting App
+      - name: Build SiWx917 Zephyr Lighting App
         run: |
-          cd /opt/silabs/zephyr-silabs \
-          && west build -b siwx917_rb4338a -p always "${GITHUB_WORKSPACE}/examples/lighting-app/silabs/zephyr"
+          cd ${GITHUB_WORKSPACE} && ./scripts/run_in_build_env.sh \
+             "cd /opt/silabs/zephyr-silabs \
+              && west build -b siwx917_rb4338a -p always ${GITHUB_WORKSPACE}/examples/lighting-app/silabs/zephyr"
 
-      - name: Clean out build output
-        run: rm -rf ./out
+      - name: Build EFR32xG24 Zephyr Lighting App
+        run: |
+          cd ${GITHUB_WORKSPACE} && ./scripts/run_in_build_env.sh \
+             "cd /opt/silabs/zephyr-silabs \
+              && west build -b xg24_rb4187c -p always ${GITHUB_WORKSPACE}/examples/lighting-app/silabs/zephyr"
 
       - name: Notify Slack on Failure
         if: failure()
