@@ -25,6 +25,8 @@
 #include <app/server-cluster/OptionalAttributeSet.h>
 #include <platform/DiagnosticDataProvider.h>
 
+#include <functional>
+
 namespace chip::app::Clusters {
 
 class ModeBaseCluster : public DefaultServerCluster
