@@ -201,6 +201,8 @@ void ConnectivityManagerImpl::OnDiscoveryResult(GVariant * discov_info)
     dataValue.reset(value);
     g_variant_get(dataValue.get(), "&s", &paddr);
     chip::Platform::CopyString(addr_str, paddr);
+    // Fixed-width MAC from wpa_supplicant D-Bus reply
+    // NOLINTNEXTLINE(bugprone-unchecked-string-to-number-conversion)
     sscanf(addr_str, "%02hhx:%02hhx:%02hhx:%02hhx:%02hhx:%02hhx", &peer_addr[0], &peer_addr[1], &peer_addr[2], &peer_addr[3],
            &peer_addr[4], &peer_addr[5]);
 
@@ -294,6 +296,8 @@ void ConnectivityManagerImpl::OnReplied(GVariant * reply_info)
     dataValue.reset(value);
     g_variant_get(dataValue.get(), "&s", &paddr);
     chip::Platform::CopyString(addr_str, paddr);
+    // Fixed-width MAC from wpa_supplicant D-Bus reply
+    // NOLINTNEXTLINE(bugprone-unchecked-string-to-number-conversion)
     sscanf(addr_str, "%02hhx:%02hhx:%02hhx:%02hhx:%02hhx:%02hhx", &peer_addr[0], &peer_addr[1], &peer_addr[2], &peer_addr[3],
            &peer_addr[4], &peer_addr[5]);
 
@@ -373,6 +377,8 @@ void ConnectivityManagerImpl::OnNanReceive(GVariant * obj)
     dataValue.reset(value);
     g_variant_get(dataValue.get(), "&s", &paddr);
     chip::Platform::CopyString(addr_str, paddr);
+    // Fixed-width MAC from wpa_supplicant D-Bus reply
+    // NOLINTNEXTLINE(bugprone-unchecked-string-to-number-conversion)
     sscanf(addr_str, "%02hhx:%02hhx:%02hhx:%02hhx:%02hhx:%02hhx", &RxInfo.peer_addr[0], &RxInfo.peer_addr[1], &RxInfo.peer_addr[2],
            &RxInfo.peer_addr[3], &RxInfo.peer_addr[4], &RxInfo.peer_addr[5]);
 

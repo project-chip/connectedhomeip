@@ -144,6 +144,8 @@ CHIP_ERROR BluezObjectManager::SetupAdapter(BluezAdapter1 * aAdapter)
 void BluezObjectManager::NotifyAdapterAdded(BluezAdapter1 * aAdapter)
 {
     unsigned int adapterId = 0;
+    // Trusted BlueZ D-Bus object path
+    // NOLINTNEXTLINE(bugprone-unchecked-string-to-number-conversion)
     sscanf(GetAdapterObjectPath(aAdapter), BLUEZ_PATH "/hci%u", &adapterId);
     // Notify the application that new adapter has been just added
     BLEManagerImpl::NotifyBLEAdapterAdded(adapterId, bluez_adapter1_get_address(aAdapter));
@@ -152,6 +154,8 @@ void BluezObjectManager::NotifyAdapterAdded(BluezAdapter1 * aAdapter)
 void BluezObjectManager::NotifyAdapterRemoved(BluezAdapter1 * aAdapter)
 {
     unsigned int adapterId = 0;
+    // Trusted BlueZ D-Bus object path
+    // NOLINTNEXTLINE(bugprone-unchecked-string-to-number-conversion)
     sscanf(GetAdapterObjectPath(aAdapter), BLUEZ_PATH "/hci%u", &adapterId);
     // Notify the application that the adapter is no longer available
     BLEManagerImpl::NotifyBLEAdapterRemoved(adapterId, bluez_adapter1_get_address(aAdapter));

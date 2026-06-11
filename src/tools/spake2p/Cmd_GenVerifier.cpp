@@ -176,6 +176,8 @@ static uint32_t GetNextPinCode()
         {
             pinCodeStr = pinCodeStr.substr(0, 8);
         }
+        // Parsed value is validated by IsValidSetupPIN below
+        // NOLINTNEXTLINE(bugprone-unchecked-string-to-number-conversion)
         pinCode = static_cast<uint32_t>(atoi(pinCodeStr.c_str()));
         if (!chip::SetupPayload::IsValidSetupPIN(pinCode))
         {
