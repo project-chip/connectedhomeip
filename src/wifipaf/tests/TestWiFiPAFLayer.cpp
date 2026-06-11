@@ -415,7 +415,10 @@ TEST_F(TestWiFiPAFLayer, CheckRunAsCommissionee)
     EpDoClose(kWiFiPAFCloseFlag_AbortTransmission, WIFIPAF_ERROR_APP_CLOSED_CONNECTION);
 }
 
-#if CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS
+// kSystemLayer_NumPacketBufs only exists as a single counter when packet buffers are not the
+// custom-pool LWIP configuration (which splits the counter per pool via lwippools.h), so guard
+// these counter-based checks the same way SystemStats.h declares the entry.
+#if CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS && !(CHIP_SYSTEM_CONFIG_USE_LWIP && CHIP_SYSTEM_CONFIG_LWIP_PBUF_FROM_CUSTOM_POOL)
 // ClearAll() must release any PacketBufferHandle the endpoint still owns. Park one in a handle
 // member, then check ClearAll() returns it to the pool.
 TEST_F(TestWiFiPAFLayer, ClearAllReleasesOwnedBuffer)
@@ -487,6 +490,6 @@ TEST_F(TestWiFiPAFLayer, SubscriberNonFatalCloseReleasesPendingAck)
 
     EXPECT_EQ(RmPafSession(PafInfoAccess::kAccSessionId, sessionInfo), CHIP_NO_ERROR);
 }
-#endif // CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS
+#endif // CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS && !(custom-pool LWIP)
 };     // namespace WiFiPAF
 };     // namespace chip
