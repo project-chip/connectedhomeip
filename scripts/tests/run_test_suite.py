@@ -59,6 +59,7 @@ else:
     # Other platforms will fall back to their default.
     SYNC_MANAGER_PATH = None
 
+
 class ManualHandling(enum.Enum):
     INCLUDE = enum.auto()
     SKIP = enum.auto()

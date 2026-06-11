@@ -121,7 +121,6 @@ class TestResult:
                           exc_info=(type(result.exception), result.exception, result.exception.__traceback__))
 
 
-
 @dataclass
 class RunStats:
     """Statistics of test runs, aggregated across iterations."""
@@ -388,7 +387,6 @@ class RunSummary(RunStats):
 
 class ResultError(Exception):
     """Exception raised when processing results."""
-
 
 
 @dataclass(eq=False)
