@@ -131,8 +131,8 @@ static void HandleResolve(void * context, DnssdService * result, const chip::Spa
     ASSERT_GE(result->mTextEntrySize, 1u);
     EXPECT_STREQ(result->mTextEntries[0].mKey, "key");
     constexpr uint8_t kExpectedVal[] = { 'v', 'a', 'l' };
-    EXPECT_TRUE(chip::ByteSpan(result->mTextEntries[0].mData, result->mTextEntries[0].mDataSize)
-                    .data_equal(chip::ByteSpan(kExpectedVal)));
+    EXPECT_TRUE(
+        chip::ByteSpan(result->mTextEntries[0].mData, result->mTextEntries[0].mDataSize).data_equal(chip::ByteSpan(kExpectedVal)));
 
     if (ctx->mBrowsedServicesCount == ++ctx->mResolvedServicesCount)
     {
