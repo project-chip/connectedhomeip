@@ -19,8 +19,8 @@
 
 #include <app_config/enabled_devices.h>
 #include <devices/Types.h>
-#include <devices/air-quality-sensor/AirQualitySensorDevice.h>
 #include <devices/aggregator/AggregatorDevice.h>
+#include <devices/air-quality-sensor/AirQualitySensorDevice.h>
 #include <devices/boolean-state-sensor/BooleanStateSensorDevice.h>
 #include <devices/chime/ChimeDevice.h>
 #include <devices/dimmable-light/impl/LoggingDimmableLightDevice.h>
