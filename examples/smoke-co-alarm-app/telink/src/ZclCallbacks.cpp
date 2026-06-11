@@ -21,7 +21,6 @@
  */
 
 #include "AppConfig.h"
-#include "SmokeCoAlarmManager.h"
 
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
@@ -45,23 +44,4 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
         ChipLogProgress(Zcl, "Smoke CO Alarm cluster: " ChipLogFormatMEI " state %d", ChipLogValueMEI(clusterId),
                         to_underlying(expressedState));
     }
-}
-
-/** @brief Smoke CO Alarm Cluster Init
- *
- * This function is called when a specific cluster is initialized. It gives the
- * application an opportunity to take care of cluster initialization procedures.
- * It is called exactly once for each endpoint where cluster is present.
- *
- * @param endpoint   Ver.: always
- *
- */
-void emberAfSmokeCoAlarmClusterInitCallback(EndpointId endpoint)
-{
-    // TODO: implement any additional Cluster Server init actions
-}
-
-void emberAfPluginSmokeCoAlarmSelfTestRequestCommand(EndpointId endpointId)
-{
-    AlarmMgr().StartSelfTesting();
 }
