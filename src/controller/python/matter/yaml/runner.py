@@ -755,7 +755,9 @@ class WaitForAttributeValueAction(BaseAction):
         self._expected_duration_ms = args_dict['expectedDurationMs']
         self._node_id = test_step.node_id
 
-        self._fabric_filtered = True  # default
+        self._fabric_filtered = True
+        if test_step.fabric_filtered is not None:
+            self._fabric_filtered = test_step.fabric_filtered
 
         self._extra_duration_ms = test_step.get_config_value('valueWaitExtraDurationMs', 250)
 
@@ -800,7 +802,7 @@ class WaitForAttributeValueAction(BaseAction):
                 # Let programming errors (bugs in our code or test definition)
                 # propagate immediately instead of timing out.
                 raise
-            except (MatterInteractionModel.InteractionModelError, ChipStackError, TimeoutError) as e:
+            except (MatterInteractionModel.InteractionModelError, ChipStackError, TimeoutError, KeyError) as e:
                 LOGGER.debug(f"ReadAttribute failed during wait: {e}")
 
             if time.monotonic() - start_time >= timeout_s:
