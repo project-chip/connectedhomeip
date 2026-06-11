@@ -127,7 +127,7 @@ class PushAvServer:
         Always save the uploaded file to disk for further analysis.
         If strict mode is enabled, return bad requests with the errors if any.
         """
-        log.debug(f"Upload started: stream={stream_id}, file={file_path}.{ext}")
+        log.debug("Upload started: stream=%s, file=%s.%s", stream_id, file_path, ext)
 
         with self.stream_service.open_stream(stream_id) as stream:
             if stream is None:
@@ -150,7 +150,7 @@ class PushAvServer:
                 timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
                 backup_path = file_local_path.with_stem(f"{file_local_path.stem}.{timestamp}")
                 file_local_path.rename(backup_path)
-                log.info(f"Backed up existing file to {backup_path}")
+                log.info("Backed up existing file to %s", backup_path)
 
             # Save certificate details if available
             cert_details = req.scope["extensions"]["ssl"].get('client_certificate', None)
@@ -172,10 +172,11 @@ class PushAvServer:
                 self.stream_service.add_valid_upload(stream, session_id, file_path_with_ext)
 
             if stream.strict_mode and len(errors) > 0:
-                log.warning(f"Upload validation failed: {errors}")
+                log.warning("Upload validation failed: %s", errors)
                 return JSONResponse(status_code=400, content={"errors": errors})
 
-            log.info(f"Upload successful: stream={stream_id}, file={file_path}.{ext}, errors={errors}, strict={stream.strict_mode}")
+            log.info("Upload successful: stream=%s, file=%s.%s, errors=%s, strict=%s",
+                     stream_id, file_path, ext, errors, stream.strict_mode)
             return Response(status_code=202)
 
     def ffprobe_check(self, stream_id: int, file_path: str):

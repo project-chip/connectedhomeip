@@ -181,5 +181,33 @@ TEST_F(TestWiFiPAFTP, CheckErrorRecv)
     auto packet_invalid_ack = System::PacketBufferHandle::NewWithData(packetData_invalid_ack, sizeof(packetData_invalid_ack));
     EXPECT_EQ(HandleCharacteristicReceived(std::move(packet_invalid_ack), receivedAck, didReceiveAck), CHIP_NO_ERROR);
 }
+
+TEST_F(TestWiFiPAFTP, EnforcesMinFragmentSize)
+{
+    const uint16_t belowMinFragmentSize = static_cast<uint16_t>(WiFiPAFTP::sMinFragmentSize - 1);
+    const uint16_t aboveMinFragmentSize = static_cast<uint16_t>(WiFiPAFTP::sMinFragmentSize + 4);
+    const uint16_t aboveMaxFragmentSize = static_cast<uint16_t>(WiFiPAFTP::sMaxFragmentSize + 3);
+
+    EXPECT_EQ(GetTxFragmentSize(), WiFiPAFTP::sDefaultFragmentSize);
+    EXPECT_EQ(GetRxFragmentSize(), WiFiPAFTP::sDefaultFragmentSize);
+
+    SetTxFragmentSize(belowMinFragmentSize);
+    SetRxFragmentSize(belowMinFragmentSize);
+
+    EXPECT_EQ(GetTxFragmentSize(), WiFiPAFTP::sMinFragmentSize);
+    EXPECT_EQ(GetRxFragmentSize(), WiFiPAFTP::sMinFragmentSize);
+
+    SetTxFragmentSize(aboveMinFragmentSize);
+    SetRxFragmentSize(aboveMinFragmentSize);
+
+    EXPECT_EQ(GetTxFragmentSize(), aboveMinFragmentSize);
+    EXPECT_EQ(GetRxFragmentSize(), aboveMinFragmentSize);
+
+    SetTxFragmentSize(aboveMaxFragmentSize);
+    SetRxFragmentSize(aboveMaxFragmentSize);
+
+    EXPECT_EQ(GetTxFragmentSize(), WiFiPAFTP::sMaxFragmentSize);
+    EXPECT_EQ(GetRxFragmentSize(), WiFiPAFTP::sMaxFragmentSize);
+}
 }; // namespace WiFiPAF
 }; // namespace chip

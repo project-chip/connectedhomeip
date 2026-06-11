@@ -32,6 +32,20 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
+#   run2:
+#     app: ${ALL_DEVICES_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --device fan
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --endpoint 1
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 import logging
@@ -143,7 +157,7 @@ class TC_FAN_2_1(MatterBaseTest):
         self.step(2)
         feature_map = await self.read_setting(attribute.FeatureMap)
         supports_auto = bool(feature_map & feature.kAuto)
-        log.info(f"[FC] DUT supports Auto FanMode feature: {supports_auto}")
+        log.info("[FC] DUT supports Auto FanMode feature: %s", supports_auto)
 
         # *** STEP 3 ***
         # TH reads from the DUT the FanModeSequence attribute
