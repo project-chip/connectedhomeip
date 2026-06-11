@@ -210,7 +210,7 @@ private:
     std::vector<std::unique_ptr<DeviceInterface>> mConstructedDevices;
 
 #if defined(CHIP_ALL_DEVICES_APP_ENABLE_OOB_ACCESSORS) && CHIP_ALL_DEVICES_APP_ENABLE_OOB_ACCESSORS
-    std::vector<std::unique_ptr<SingleEndpointDeviceAccessor>> mConstructedAccessors;
+    std::vector<std::unique_ptr<chip::app::OOBAccessor>> mConstructedAccessors;
 #endif // CHIP_ALL_DEVICES_APP_ENABLE_OOB_ACCESSORS
 };
 
