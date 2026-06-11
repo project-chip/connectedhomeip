@@ -117,8 +117,8 @@ PushAVClipRecorder::~PushAVClipRecorder()
         std::string finalMpdPath = GetUploadMpdPath(mpdPath);
         // Add SegmentTimeline to the MPD per spec
         FinalizeMPD(finalMpdPath);
-        ChipLogProgress(Camera, "Uploading final MPD: %s for track: %s, sessionID: %" PRIu64 ", connectionID: %u", finalMpdPath.c_str(),
-                        mClipInfo.mTrackName.c_str(), mClipInfo.mSessionNumber, mConnectionID);
+        ChipLogProgress(Camera, "Uploading final MPD: %s for track: %s, sessionID: %" PRIu64 ", connectionID: %u",
+                        finalMpdPath.c_str(), mClipInfo.mTrackName.c_str(), mClipInfo.mSessionNumber, mConnectionID);
         CheckAndUploadFile(finalMpdPath);
     }
 }
@@ -901,14 +901,14 @@ void PushAVClipRecorder::FinalizeMPD(const std::string & mpdPath)
     // After av_write_trailer, the MPD is already static with type="static",
     // mediaPresentationDuration, and no minimumUpdatePeriod/suggestedPresentationDelay.
     // The only missing piece is the SegmentTimeline inside each SegmentTemplate.
-    bool modified                       = false;
+    bool modified = false;
     std::vector<std::string> outputLines;
-    size_t streamIdx                    = 0;
+    size_t streamIdx = 0;
 
     // State for tracking multi-line SegmentTemplate elements where the opening tag
     // and closing tag are on different lines (e.g., after av_write_trailer converts
     // the MPD to static with multi-line formatting).
-    bool inMultiLineSegmentTemplate     = false;
+    bool inMultiLineSegmentTemplate = false;
     std::string pendingTimelineOpen;
     std::string pendingTimelineEntry;
     std::string pendingTimelineClose;
@@ -926,8 +926,8 @@ void PushAVClipRecorder::FinalizeMPD(const std::string & mpdPath)
                 outputLines.push_back(pendingTimelineEntry);
                 outputLines.push_back(pendingTimelineClose);
                 outputLines.push_back(lines[i]);
-                modified                    = true;
-                inMultiLineSegmentTemplate  = false;
+                modified                   = true;
+                inMultiLineSegmentTemplate = false;
                 streamIdx++;
                 continue;
             }
@@ -1012,7 +1012,7 @@ void PushAVClipRecorder::FinalizeMPD(const std::string & mpdPath)
                 break;
             }
         }
-        std::string timelineOpen   = indent + "<SegmentTimeline>";
+        std::string timelineOpen = indent + "<SegmentTimeline>";
         // Use r attribute for repeat count: r="N" means the S element repeats N additional times (total N+1)
         std::string timelineEntry;
         if (segCount == 1)
@@ -1022,8 +1022,8 @@ void PushAVClipRecorder::FinalizeMPD(const std::string & mpdPath)
         else
         {
             // r = segCount - 1 (the S element itself counts as 1, r adds segCount-1 more)
-            timelineEntry = indent + "    <S t=\"0\" d=\"" + std::to_string(segDurationTs) + "\" r=\"" + std::to_string(segCount - 1) +
-                "\" />";
+            timelineEntry =
+                indent + "    <S t=\"0\" d=\"" + std::to_string(segDurationTs) + "\" r=\"" + std::to_string(segCount - 1) + "\" />";
         }
         std::string timelineClose = indent + "</SegmentTimeline>";
 
@@ -1053,9 +1053,9 @@ void PushAVClipRecorder::FinalizeMPD(const std::string & mpdPath)
             // Neither /> nor </SegmentTemplate> on the same line - multi-line SegmentTemplate.
             // Store the timeline entries and insert them when we find the closing tag.
             inMultiLineSegmentTemplate = true;
-            pendingTimelineOpen         = timelineOpen;
-            pendingTimelineEntry        = timelineEntry;
-            pendingTimelineClose        = timelineClose;
+            pendingTimelineOpen        = timelineOpen;
+            pendingTimelineEntry       = timelineEntry;
+            pendingTimelineClose       = timelineClose;
         }
 
         streamIdx++;
