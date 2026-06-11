@@ -90,6 +90,7 @@ void FakeReadings::StartFakeReadings(EndpointId aEndpointId, int64_t aPower_mW, 
         // which are caused when the test is checking for 2 different numbers.
         // This is statistically more likely when the test runs for a long time
         // or if the seed is not set
+        // NOLINTNEXTLINE(bugprone-random-generator-seed)
         srand(1);
 
         mTotalEnergyImported = 0;

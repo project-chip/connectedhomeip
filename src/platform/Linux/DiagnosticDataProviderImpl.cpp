@@ -323,6 +323,8 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetThreadMetrics(ThreadMetrics ** threadM
 
             Platform::CopyString(thread->NameBuf, entry->d_name);
             thread->name.Emplace(CharSpan::fromCharString(thread->NameBuf));
+            // /proc task entry name is always a numeric tid
+            // NOLINTNEXTLINE(bugprone-unchecked-string-to-number-conversion)
             thread->id = atoi(entry->d_name);
 
             // TODO: Get stack info of each thread: thread->stackFreeCurrent,
