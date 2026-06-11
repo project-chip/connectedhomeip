@@ -509,7 +509,7 @@ Clusters::CommissioningProxy::MyCPDelegate::ProxyMessageRequest(uint16_t session
     }
 
     // Keep the invoke handler alive until the commissionee replies.
-    auto * ctx                     = new ProxyMsgCtx{ chip::app::CommandHandler::Handle(commandObj), request.path, sessionId };
+    auto * ctx = new ProxyMsgCtx{ chip::app::CommandHandler::Handle(commandObj), request.path, sessionId };
     commandObj->FlushAcksRightAwayOnSlowCommand();
     sPendingProxyMsgCtx[sessionId] = ctx;
 
