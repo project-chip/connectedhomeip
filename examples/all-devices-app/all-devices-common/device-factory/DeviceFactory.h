@@ -116,6 +116,13 @@ private:
         // NOTE: context is set in `::Init`, so each lambda checks its
         //       existence separately. `Init` must be called before mRegistry
         //       factories are usable.
+        if constexpr (ALL_DEVICES_ENABLE_AGGREGATOR)
+        {
+            RegisterCreator("aggregator", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return std::make_unique<AggregatorDevice>(mContext->timerDelegate);
+            });
+        }
         if constexpr (ALL_DEVICES_ENABLE_AIR_QUALITY_SENSOR)
         {
             RegisterCreator("air-quality-sensor", [this]() {
@@ -134,15 +141,8 @@ private:
                                                               Feature::kAverageMeasurement, Feature::kLevelIndication),
                                 .medium    = MeasurementMediumEnum::kAir,
                                 .unit      = MeasurementUnitEnum::kPpm,
-                            },
+                             },
                     });
-            });
-        }
-        if constexpr (ALL_DEVICES_ENABLE_AGGREGATOR)
-        {
-            RegisterCreator("aggregator", [this]() {
-                VerifyOrDie(mContext.has_value());
-                return std::make_unique<AggregatorDevice>(mContext->timerDelegate);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_CONTACT_SENSOR)

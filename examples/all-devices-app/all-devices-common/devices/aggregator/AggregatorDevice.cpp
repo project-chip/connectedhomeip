@@ -31,29 +31,13 @@ AggregatorDevice::AggregatorDevice(TimerDelegate & timerDelegate) :
 
 CHIP_ERROR AggregatorDevice::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointId parentId)
 {
-    CHIP_ERROR err = SingleEndpointRegistration(endpoint, provider, parentId);
-    if (err != CHIP_NO_ERROR)
-    {
-        return err;
-    }
+    ReturnErrorOnFailure(SingleEndpointRegistration(endpoint, provider, parentId));
 
     // Create the identify cluster.
     mIdentifyCluster.Create(IdentifyCluster::Config(endpoint, mTimerDelegate));
-    err = provider.AddCluster(mIdentifyCluster.Registration());
-    if (err != CHIP_NO_ERROR)
-    {
-        Unregister(provider);
-        return err;
-    }
+    ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
 
-    err = provider.AddEndpoint(mEndpointRegistration);
-    if (err != CHIP_NO_ERROR)
-    {
-        Unregister(provider);
-        return err;
-    }
-
-    return CHIP_NO_ERROR;
+    return provider.AddEndpoint(mEndpointRegistration);
 }
 
 void AggregatorDevice::Unregister(CodeDrivenDataModelProvider & provider)
