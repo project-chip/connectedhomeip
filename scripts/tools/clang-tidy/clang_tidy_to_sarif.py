@@ -57,10 +57,17 @@ def check_help_uri(check):
     return CLANG_TIDY_CHECKS_URL
 
 
-def to_repo_relative(path, repo_root):
+def to_repo_relative(path, repo_root, base_dir):
     """Resolve a diagnostic path to a repo-root-relative POSIX path, or None if
-    it lands outside the repo (system / third-party headers)."""
-    abs_path = path if os.path.isabs(path) else os.path.join(repo_root, path)
+    it lands outside the repo (system / third-party headers).
+
+    Relative paths are resolved against base_dir, the directory the compile
+    commands ran from. run-clang-tidy-on-compile-commands.py replays each command
+    with cwd=<build dir>, so clang-tidy emits paths relative to that dir (e.g.
+    '../../src/foo.h' from out/host) -- NOT relative to the repo root. Anchoring
+    them at repo_root instead would push every '../..'-prefixed path above the
+    root and silently drop it."""
+    abs_path = path if os.path.isabs(path) else os.path.join(base_dir, path)
     try:
         rel = os.path.relpath(os.path.realpath(abs_path), repo_root)
     except ValueError:
@@ -76,10 +83,15 @@ def main():
     ap.add_argument("log", nargs="?", help="clang-tidy log file (default: stdin)")
     ap.add_argument("--repo-root", default=os.getcwd(),
                     help="repo root for relativizing paths (default: cwd)")
+    ap.add_argument("--build-dir",
+                    help="directory the compile commands ran from (e.g. out/host); "
+                         "relative diagnostic paths are resolved against it "
+                         "(default: repo root)")
     ap.add_argument("--tool-name", default="clang-tidy")
     args = ap.parse_args()
 
     repo_root = os.path.realpath(args.repo_root)
+    base_dir = os.path.realpath(args.build_dir) if args.build_dir else repo_root
     if args.log:
         with open(args.log, encoding="utf-8", errors="replace") as fh:
             raw_lines = fh.readlines()
@@ -94,7 +106,7 @@ def main():
         m = DIAG_RE.search(raw.rstrip("\n"))
         if not m:
             continue
-        rel = to_repo_relative(m["path"], repo_root)
+        rel = to_repo_relative(m["path"], repo_root, base_dir)
         if rel is None:
             continue
         line, col = int(m["line"]), int(m["col"])

@@ -517,8 +517,10 @@ jobs:
                   python3 scripts/tools/clang-tidy/ci-apply-runner-overrides.py
                   ./scripts/run_in_build_env.sh './scripts/run-clang-tidy-on-compile-commands.py --compile-database out/host/compile_commands.json --file-include-regex "(src|examples)/" --file-exclude-regex "/(repo|zzz_generated|lwip)/|-ReadImpl|-InvokeSubscribeImpl|CodegenDataModel_Write|QuieterReporting|/tests/|CodegenIntegration" check' 2>&1 | tee clang-tidy.log || true
 
+            # --build-dir matches the compile DB above: the runner emits diagnostic
+            # paths relative to out/host, so the converter must resolve them there.
             - name: Convert clang-tidy log to SARIF
-              run: python3 scripts/tools/clang-tidy/clang_tidy_to_sarif.py clang-tidy.log --repo-root . > clang-tidy.sarif
+              run: python3 scripts/tools/clang-tidy/clang_tidy_to_sarif.py clang-tidy.log --repo-root . --build-dir out/host > clang-tidy.sarif
 
             - name: Upload SARIF to Code Scanning
               uses: github/codeql-action/upload-sarif@8aad20d150bbac5944a9f9d289da16a4b0d87c1e
