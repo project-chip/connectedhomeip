@@ -79,16 +79,17 @@ with the `sessionId` returned by `ProxyConnectResponse` and then calls
 ### Proxy App: Dispatcher and Per-Transport Modules
 
 The Linux proxy app is split into per-transport modules. The cluster delegate
-(`MyCPDelegate`) and the transport-agnostic bookkeeping live in the **dispatcher**
-(`CommissioningProxyCommandDelegate.cpp`); each physical transport is implemented
-in its own module behind a small `namespace`-scoped API:
+(`MyCPDelegate`) and the transport-agnostic bookkeeping live in the
+**dispatcher** (`CommissioningProxyCommandDelegate.cpp`); each physical
+transport is implemented in its own module behind a small `namespace`-scoped
+API:
 
-| Module                                  | Namespace          | Compiled when                       |
-| --------------------------------------- | ------------------ | ----------------------------------- |
-| `CommissioningProxyCommandDelegate.cpp` | `ProxyDispatcher`  | always                              |
-| `CommissioningProxyPafTransport.cpp`    | `Paf`              | `chip_device_config_enable_wifipaf` |
-| `CommissioningProxyBleTransport.cpp`    | `Ble`              | `chip_config_network_layer_ble`     |
-| `CommissioningProxyBgScanCache.cpp`     | `BgScanCache`      | always                              |
+| Module                                  | Namespace         | Compiled when                       |
+| --------------------------------------- | ----------------- | ----------------------------------- |
+| `CommissioningProxyCommandDelegate.cpp` | `ProxyDispatcher` | always                              |
+| `CommissioningProxyPafTransport.cpp`    | `Paf`             | `chip_device_config_enable_wifipaf` |
+| `CommissioningProxyBleTransport.cpp`    | `Ble`             | `chip_config_network_layer_ble`     |
+| `CommissioningProxyBgScanCache.cpp`     | `BgScanCache`     | always                              |
 
 The dispatcher owns everything that does not depend on a specific transport:
 
@@ -99,27 +100,27 @@ The dispatcher owns everything that does not depend on a specific transport:
     `ProxyDisconnectRequest` look up the session's transport and `switch` to the
     matching module (`Paf::` / `Ble::`). The per-transport `#if` guards mean an
     unsupported transport bit falls through to `Status::InvalidTransportType`.
--   **Pending `ProxyMessageRequest` bookkeeping** and the hard
-    `responseTimeout` timer; the transport module hands a commissionee reply back
-    via `ProxyDispatcher::DispatchMessageResponse()` (→ `ProxyMessageResponse`) or
+-   **Pending `ProxyMessageRequest` bookkeeping** and the hard `responseTimeout`
+    timer; the transport module hands a commissionee reply back via
+    `ProxyDispatcher::DispatchMessageResponse()` (→ `ProxyMessageResponse`) or
     fails it via `DispatchMessageFailure()`.
--   **Fabric isolation** and **MaxSessions** enforcement. `GetActiveSessionCount()`
-    returns `sProxySessions.size()` plus one for each transport reporting
-    `IsConnectPending()`, so the cluster's `RESOURCE_EXHAUSTED` gate covers both
-    established and in-flight connects across all transports.
+-   **Fabric isolation** and **MaxSessions** enforcement.
+    `GetActiveSessionCount()` returns `sProxySessions.size()` plus one for each
+    transport reporting `IsConnectPending()`, so the cluster's
+    `RESOURCE_EXHAUSTED` gate covers both established and in-flight connects
+    across all transports.
 -   **Multi-transport `ProxyScanRequest` aggregation**: a scan may select more
     than one transport. The dispatcher starts each requested transport's scan in
     parallel, holds the single command handle in a `ScanAggregator`, and emits
-    one combined `ProxyScanResponse` once every started sub-scan has reported via
-    `ProxyDispatcher::ContributeScanResults()`. An `OnScanWatchdog` timer
+    one combined `ProxyScanResponse` once every started sub-scan has reported
+    via `ProxyDispatcher::ContributeScanResults()`. An `OnScanWatchdog` timer
     force-emits if a started sub-scan never reports, so a stalled transport
     cannot wedge future scans.
 
-`BgScanCache` is a single cluster-wide background-scan result cache shared by all
-transports (`CachedResults` is one list keyed on
-discriminator / VendorID / ProductID / Transport), giving one combined
-`MaxCachedResults` cap, one `NumCachedResults` / `CachedResults` view, and one
-TTL sweep.
+`BgScanCache` is a single cluster-wide background-scan result cache shared by
+all transports (`CachedResults` is one list keyed on discriminator / VendorID /
+ProductID / Transport), giving one combined `MaxCachedResults` cap, one
+`NumCachedResults` / `CachedResults` view, and one TTL sweep.
 
 ### WiFi-PAF Integration
 
@@ -128,7 +129,8 @@ between `WiFiPAFLayer` and the original server-side transport delegate:
 
 -   On `WiFiPAFMessageReceived`: if the `peer_id` matches an active proxy
     session the message is routed to `OnProxyWiFiPAFMessageReceived` which hands
-    it to `ProxyDispatcher::DispatchMessageResponse()` (→ `ProxyMessageResponse`).
+    it to `ProxyDispatcher::DispatchMessageResponse()` (→
+    `ProxyMessageResponse`).
 -   For all other sessions the original delegate is called unchanged, so normal
     (non-proxy) PAF sessions continue to work.
 
@@ -182,33 +184,33 @@ chip-tool                 commissioning-proxy-app (CP)       commissionee
 
 ### Cluster Server (`src/app/clusters/commissioning-proxy-server/`)
 
-| File                                          | Change                                                                                                                                                                                                                                                                                                                                                                                                                    |
-| --------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| File                                          | Change                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| --------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `CommissioningProxyCluster.cpp`               | New: full code-driven cluster implementation — attribute R/W, command dispatch, async null pattern, `HandleProxyBackGroundScanStartRequest` / `HandleProxyBackGroundScanStopRequest` handlers, `MaxCachedResults` / `NumCachedResults` / `CacheTimeout` / `CachedResults` / `WiFiBand` / `MaxSessions` attribute reads, `MarkCachedResultsDirty()`. Transport validation: `ProxyConnectRequest` requires exactly one bit (`HasExactlyOneBitSet`), while the scan commands accept one-or-more bits and verify each is supported by this instance; otherwise `InvalidTransportType`. MaxSessions gate uses `GetActiveSessionCount()`. |
-| `CommissioningProxyCluster.h`                 | New: `CommissioningProxyCluster` class and `Config` struct                                                                                                                                                                                                                                                                                                                                                                |
-| `CommissioningProxyDelegate.h`                | New: abstract `Delegate` interface with `ProxyConnectRequest`, `ProxyDisconnectRequest`, `ProxyMessageRequest`, `ProxyScanRequest`, `ProxyBackgroundScanStartRequest`, `ProxyBackgroundScanStopRequest`, `CancelPendingConnect`, cache attribute accessors, `GetMaxSessions()`, `GetActiveSessionCount()`, `GetSupportedWiFiBands()`, and `EncodeCachedResults()`                                                                                    |
-| `CodegenIntegration.h/.cpp`                   | New: thin compatibility shim for ZAP-based apps                                                                                                                                                                                                                                                                                                                                                                           |
-| `CommissioningProxyTestEventTriggerHandler.h` | New: test-event trigger handler stub. Carries a single `kTemplateNotUsed` placeholder keyed off the CommissioningProxy cluster ID 0x0455; no real triggers are defined yet.                                                                                                                                                                                                                                               |
-| `BUILD.gn` / `*.cmake` / `*.gni`              | Updated: build rules to include the new cluster source files                                                                                                                                                                                                                                                                                                                                                              |
-| `tests/`                                      | New: `TestCommissioningProxyCluster.cpp` (session management, fabric isolation, MaxSessions, scan, timeout), `TestCommissioningProxyClusterBackwardsCompatibility.cpp`, `CommissioningProxyMockDelegate.cpp/.h`                                                                                                                                                                                                           |
-| `README.md`                                   | New: cluster server documentation                                                                                                                                                                                                                                                                                                                                                                                         |
+| `CommissioningProxyCluster.h`                 | New: `CommissioningProxyCluster` class and `Config` struct                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| `CommissioningProxyDelegate.h`                | New: abstract `Delegate` interface with `ProxyConnectRequest`, `ProxyDisconnectRequest`, `ProxyMessageRequest`, `ProxyScanRequest`, `ProxyBackgroundScanStartRequest`, `ProxyBackgroundScanStopRequest`, `CancelPendingConnect`, cache attribute accessors, `GetMaxSessions()`, `GetActiveSessionCount()`, `GetSupportedWiFiBands()`, and `EncodeCachedResults()`                                                                                                                                                                                                                                                                   |
+| `CodegenIntegration.h/.cpp`                   | New: thin compatibility shim for ZAP-based apps                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| `CommissioningProxyTestEventTriggerHandler.h` | New: test-event trigger handler stub. Carries a single `kTemplateNotUsed` placeholder keyed off the CommissioningProxy cluster ID 0x0455; no real triggers are defined yet.                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| `BUILD.gn` / `*.cmake` / `*.gni`              | Updated: build rules to include the new cluster source files                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| `tests/`                                      | New: `TestCommissioningProxyCluster.cpp` (session management, fabric isolation, MaxSessions, scan, timeout), `TestCommissioningProxyClusterBackwardsCompatibility.cpp`, `CommissioningProxyMockDelegate.cpp/.h`                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| `README.md`                                   | New: cluster server documentation                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
 
 ### Linux Platform Delegate (`examples/commissioning-proxy-app/linux/`)
 
-| File                                    | Change                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
-| --------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `CommissioningProxyCommandDelegate.cpp` | The transport-agnostic **dispatcher**: `MyCPDelegate` command handlers, session table (`sProxySessions`), `ProxyDispatcher` helpers (`AllocSessionId` / `RegisterSession` / `RemoveSession` / `DispatchMessageResponse` / `DispatchMessageFailure`), the hard `responseTimeout` timer, fabric isolation, `GetActiveSessionCount()` MaxSessions gate, and the multi-transport `ProxyScanRequest` aggregator (`ScanAggregator`, `ContributeScanResults`, `OnScanWatchdog`). Routes each command to the `Paf::` / `Ble::` module by the session's transport.                       |
-| `CommissioningProxyDispatcher.h`        | New: private `ProxyDispatcher` API the per-transport modules call to register/clean up sessions, route commissionee responses, and contribute scan results                                                                                                                                                                                                                                                                                                                                                                                                                    |
-| `CommissioningProxyPafTransport.cpp/.h` | New (`Paf::` namespace, gated on `chip_device_config_enable_wifipaf`): the WiFi-PAF transport — `ProxyWiFiPAFDelegate`, async connect/message/disconnect, `OnProxyConnectTimeout` (cancels NAN subscribe, `Status::Timeout`), `WiFiPAFScan` foreground scan, background scan start/stop                                                                                                                                                                                                                                                                                          |
-| `CommissioningProxyBleTransport.cpp/.h` | New (`Ble::` namespace, gated on `chip_config_network_layer_ble`): the BLE central transport — pauses the proxy's own peripheral advertising on first connect, opens a `BLEEndPoint` to the commissionee, tunnels packets over BTP, resumes advertising when the last session closes; async scan + background scan                                                                                                                                                                                                                                                               |
-| `CommissioningProxyBgScanCache.cpp/.h`  | New (`BgScanCache::` namespace): the single cluster-wide background-scan result cache shared by all transports — combined `MaxCachedResults` cap, `Count()` / `Collect()` for `NumCachedResults` / `CachedResults`, single TTL sweep                                                                                                                                                                                                                                                                                                                                            |
-| `CommissioningProxyCommandDelegate.h`   | Removed: replaced by `commissioning-proxy-delegate-impl.h`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
-| `CPAppCommandDelegate.cpp/.h`           | New: named-pipe command handler for the proxy app                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
-| `main.cpp`                              | Updated: builds the cluster `FeatureMap` (`gFeatures`) — `kBackgroundScan` always, `kWiFiNetworkInterface` only when `CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF`; registers `CommissioningProxyCluster` via `CodegenDataModelProvider`; on commissioning complete disconnects the `nanreceive` handler (`WiFiPAFDisconnectPublishReceiveHandler()`); derives the `WiFiBand` attribute value from `--wifipaf freq_list=` and passes it to `MyCPDelegate::SetSupportedWiFiBands()` (PAF builds only)                                                                                                                                   |
-| `args.gni`                              | Updated: enables TCP endpoint (`chip_inet_config_enable_tcp_endpoint`)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
-| `BUILD.gn`                              | Updated: always builds the dispatcher (`CommissioningProxyCommandDelegate.cpp`) and `CommissioningProxyBgScanCache.cpp`; conditionally adds `CommissioningProxyPafTransport.cpp` (`chip_device_config_enable_wifipaf`) and `CommissioningProxyBleTransport.cpp` (`chip_config_network_layer_ble`); adds `ProxyTransport` and cluster server as build dependencies                                                                                                                                                                                                                                                          |
-| `include/CHIPProjectAppConfig.h`        | Updated: project-level CHIP config overrides. Sets `CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY=1` and `CHIP_DEVICE_CONFIG_WIFIPAF_EARLY_CONNECT_NETWORK_RESPONSE=1` for shared-radio hardware.                                                                                                                                                                                                                                                                                                                                                                                                                          |
-| `entrypoint.sh`                         | Updated: fix `comissioning` typo so the container launches `chip-commissioning-proxy-app` under `--thread`.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| File                                    | Change                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| --------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `CommissioningProxyCommandDelegate.cpp` | The transport-agnostic **dispatcher**: `MyCPDelegate` command handlers, session table (`sProxySessions`), `ProxyDispatcher` helpers (`AllocSessionId` / `RegisterSession` / `RemoveSession` / `DispatchMessageResponse` / `DispatchMessageFailure`), the hard `responseTimeout` timer, fabric isolation, `GetActiveSessionCount()` MaxSessions gate, and the multi-transport `ProxyScanRequest` aggregator (`ScanAggregator`, `ContributeScanResults`, `OnScanWatchdog`). Routes each command to the `Paf::` / `Ble::` module by the session's transport. |
+| `CommissioningProxyDispatcher.h`        | New: private `ProxyDispatcher` API the per-transport modules call to register/clean up sessions, route commissionee responses, and contribute scan results                                                                                                                                                                                                                                                                                                                                                                                                |
+| `CommissioningProxyPafTransport.cpp/.h` | New (`Paf::` namespace, gated on `chip_device_config_enable_wifipaf`): the WiFi-PAF transport — `ProxyWiFiPAFDelegate`, async connect/message/disconnect, `OnProxyConnectTimeout` (cancels NAN subscribe, `Status::Timeout`), `WiFiPAFScan` foreground scan, background scan start/stop                                                                                                                                                                                                                                                                   |
+| `CommissioningProxyBleTransport.cpp/.h` | New (`Ble::` namespace, gated on `chip_config_network_layer_ble`): the BLE central transport — pauses the proxy's own peripheral advertising on first connect, opens a `BLEEndPoint` to the commissionee, tunnels packets over BTP, resumes advertising when the last session closes; async scan + background scan                                                                                                                                                                                                                                        |
+| `CommissioningProxyBgScanCache.cpp/.h`  | New (`BgScanCache::` namespace): the single cluster-wide background-scan result cache shared by all transports — combined `MaxCachedResults` cap, `Count()` / `Collect()` for `NumCachedResults` / `CachedResults`, single TTL sweep                                                                                                                                                                                                                                                                                                                      |
+| `CommissioningProxyCommandDelegate.h`   | Removed: replaced by `commissioning-proxy-delegate-impl.h`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| `CPAppCommandDelegate.cpp/.h`           | New: named-pipe command handler for the proxy app                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| `main.cpp`                              | Updated: builds the cluster `FeatureMap` (`gFeatures`) — `kBackgroundScan` always, `kWiFiNetworkInterface` only when `CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF`; registers `CommissioningProxyCluster` via `CodegenDataModelProvider`; on commissioning complete disconnects the `nanreceive` handler (`WiFiPAFDisconnectPublishReceiveHandler()`); derives the `WiFiBand` attribute value from `--wifipaf freq_list=` and passes it to `MyCPDelegate::SetSupportedWiFiBands()` (PAF builds only)                                                                |
+| `args.gni`                              | Updated: enables TCP endpoint (`chip_inet_config_enable_tcp_endpoint`)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| `BUILD.gn`                              | Updated: always builds the dispatcher (`CommissioningProxyCommandDelegate.cpp`) and `CommissioningProxyBgScanCache.cpp`; conditionally adds `CommissioningProxyPafTransport.cpp` (`chip_device_config_enable_wifipaf`) and `CommissioningProxyBleTransport.cpp` (`chip_config_network_layer_ble`); adds `ProxyTransport` and cluster server as build dependencies                                                                                                                                                                                         |
+| `include/CHIPProjectAppConfig.h`        | Updated: project-level CHIP config overrides. Sets `CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY=1` and `CHIP_DEVICE_CONFIG_WIFIPAF_EARLY_CONNECT_NETWORK_RESPONSE=1` for shared-radio hardware.                                                                                                                                                                                                                                                                                                                                                         |
+| `entrypoint.sh`                         | Updated: fix `comissioning` typo so the container launches `chip-commissioning-proxy-app` under `--thread`.                                                                                                                                                                                                                                                                                                                                                                                                                                               |
 
 ### Commissioning Proxy Common (`examples/commissioning-proxy-app/commissioning-proxy-common/`)
 
@@ -331,22 +333,22 @@ new NAN discovery results arrive.
 
 Defines the pure-virtual `Delegate` interface. Key methods:
 
-| Method                                            | Description                                                                                                                                                                    |
-| ------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `ProxyConnectRequest()`                           | Open a PAF session; must call `commandObj->AddResponse()` asynchronously                                                                                                       |
-| `ProxyDisconnectRequest()`                        | Tear down the PAF session identified by `sessionId`                                                                                                                            |
-| `ProxyMessageRequest()`                           | Forward `message` over PAF; must call `commandObj->AddResponse()` asynchronously                                                                                               |
-| `ProxyScanRequest()`                              | Initiate a NAN scan; must call `commandObj->AddResponse()` asynchronously                                                                                                      |
-| `ProxyBackgroundScanStartRequest()`               | Start a continuous background NAN scan; results cached and served as a cluster attribute                                                                                       |
-| `ProxyBackgroundScanStopRequest()`                | Stop the background scan for the requesting fabric/node; silently ignores calls from a non-matching fabric/node                                                                |
-| `CancelPendingConnect()`                          | Cancel any in-progress `ProxyConnectRequest` (invoked when `ProxyDisconnectRequest` carries a null `sessionID`); enforces fabric isolation                                     |
-| `GetScanMaxTime()` / `SetScanMaxTime()`           | Attribute accessors                                                                                                                                                            |
-| `GetMaxCachedResults()` / `GetNumCachedResults()` | Read-only cache size/count attribute accessors                                                                                                                                 |
-| `GetCacheTimeout()` / `SetCacheTimeout()`         | Cache expiry timeout attribute accessors                                                                                                                                       |
-| `GetMaxSessions()`                                | Returns the maximum number of simultaneous proxy sessions supported; served as the `MaxSessions` attribute and used as the `RESOURCE_EXHAUSTED` ceiling                        |
+| Method                                            | Description                                                                                                                                                                     |
+| ------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `ProxyConnectRequest()`                           | Open a PAF session; must call `commandObj->AddResponse()` asynchronously                                                                                                        |
+| `ProxyDisconnectRequest()`                        | Tear down the PAF session identified by `sessionId`                                                                                                                             |
+| `ProxyMessageRequest()`                           | Forward `message` over PAF; must call `commandObj->AddResponse()` asynchronously                                                                                                |
+| `ProxyScanRequest()`                              | Initiate a NAN scan; must call `commandObj->AddResponse()` asynchronously                                                                                                       |
+| `ProxyBackgroundScanStartRequest()`               | Start a continuous background NAN scan; results cached and served as a cluster attribute                                                                                        |
+| `ProxyBackgroundScanStopRequest()`                | Stop the background scan for the requesting fabric/node; silently ignores calls from a non-matching fabric/node                                                                 |
+| `CancelPendingConnect()`                          | Cancel any in-progress `ProxyConnectRequest` (invoked when `ProxyDisconnectRequest` carries a null `sessionID`); enforces fabric isolation                                      |
+| `GetScanMaxTime()` / `SetScanMaxTime()`           | Attribute accessors                                                                                                                                                             |
+| `GetMaxCachedResults()` / `GetNumCachedResults()` | Read-only cache size/count attribute accessors                                                                                                                                  |
+| `GetCacheTimeout()` / `SetCacheTimeout()`         | Cache expiry timeout attribute accessors                                                                                                                                        |
+| `GetMaxSessions()`                                | Returns the maximum number of simultaneous proxy sessions supported; served as the `MaxSessions` attribute and used as the `RESOURCE_EXHAUSTED` ceiling                         |
 | `GetActiveSessionCount()`                         | Returns established proxy sessions plus any in-flight connect across all transports; the cluster compares this against `GetMaxSessions()` before invoking `ProxyConnectRequest` |
-| `GetSupportedWiFiBands()`                         | Returns the `WiFiBandBitmap` of bands supported by the hardware; used for the `WiFiBand` attribute read and to validate WiFiBands fields in scan and connect requests          |
-| `EncodeCachedResults()`                           | Encodes the `CachedResults` list attribute into a TLV `AttributeValueEncoder`                                                                                                  |
+| `GetSupportedWiFiBands()`                         | Returns the `WiFiBandBitmap` of bands supported by the hardware; used for the `WiFiBand` attribute read and to validate WiFiBands fields in scan and connect requests           |
+| `EncodeCachedResults()`                           | Encodes the `CachedResults` list attribute into a TLV `AttributeValueEncoder`                                                                                                   |
 
 ---
 
@@ -365,9 +367,9 @@ the shared bookkeeping.
 
 **Session tracking** (`sProxySessions`): a
 `std::map<uint16_t, ProxySessionInfo>` maps each proxy session ID (allocated by
-`AllocSessionId()`) to its `{transport, fabricIndex}`. The transport bit recorded
-here is what the dispatcher uses to route a later `ProxyMessageRequest` /
-`ProxyDisconnectRequest` to the correct module.
+`AllocSessionId()`) to its `{transport, fabricIndex}`. The transport bit
+recorded here is what the dispatcher uses to route a later `ProxyMessageRequest`
+/ `ProxyDisconnectRequest` to the correct module.
 
 **`AllocSessionId()`**: allocates the next non-zero session ID, skipping any
 already in use. Session ID `0` is explicitly skipped as it is reserved to mean
@@ -484,21 +486,23 @@ this ownership:
     — returns `NOT_FOUND` if the requesting fabric does not match the
     `fabricIndex` of the pending connect.
 
-**MaxSessions enforcement**: the cluster server gates `HandleProxyConnectRequest`
-on `mDelegate.GetActiveSessionCount() >= mDelegate.GetMaxSessions()`, returning
-`Status::ResourceExhausted` before touching any transport. `GetActiveSessionCount()`
-(in the dispatcher) returns `sProxySessions.size()` plus one for each transport
-reporting `IsConnectPending()`, so a connect that is mid-handshake on either
-transport still counts toward the limit.
+**MaxSessions enforcement**: the cluster server gates
+`HandleProxyConnectRequest` on
+`mDelegate.GetActiveSessionCount() >= mDelegate.GetMaxSessions()`, returning
+`Status::ResourceExhausted` before touching any transport.
+`GetActiveSessionCount()` (in the dispatcher) returns `sProxySessions.size()`
+plus one for each transport reporting `IsConnectPending()`, so a connect that is
+mid-handshake on either transport still counts toward the limit.
 
-**Multi-transport scan aggregation**: `ProxyScanRequest` MAY select more than one
-transport bit. `MyCPDelegate::ProxyScanRequest` allocates a `ScanAggregator`
+**Multi-transport scan aggregation**: `ProxyScanRequest` MAY select more than
+one transport bit. `MyCPDelegate::ProxyScanRequest` allocates a `ScanAggregator`
 (holding the single `CommandHandler::Handle`), starts each requested transport's
 sub-scan (`Paf::Scan` / `Ble::Scan`), and counts how many started successfully.
-Each sub-scan reports its results via `ProxyDispatcher::ContributeScanResults()`;
-when the last outstanding sub-scan reports — or the `OnScanWatchdog` timer fires —
-the dispatcher emits one combined `ProxyScanResponse`. A second concurrent
-`ProxyScanRequest` returns `Status::Busy` while an aggregate scan is live.
+Each sub-scan reports its results via
+`ProxyDispatcher::ContributeScanResults()`; when the last outstanding sub-scan
+reports — or the `OnScanWatchdog` timer fires — the dispatcher emits one
+combined `ProxyScanResponse`. A second concurrent `ProxyScanRequest` returns
+`Status::Busy` while an aggregate scan is live.
 
 #### `main.cpp`
 

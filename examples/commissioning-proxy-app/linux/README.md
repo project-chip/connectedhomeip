@@ -60,10 +60,11 @@ wpa_supplicant patching, and deploying all three binaries to the RPi.
           # BLE only (WiFi-PAF disabled)
           $ gn gen out/ble --args='import("//with_pw_rpc.gni") chip_device_config_enable_wifipaf=false'
 
-    A WiFi-PAF–only binary advertises `FeatureMap` `WiFiNetworkInterface |
-    BackgroundScan`; a BLE-only binary advertises `BackgroundScan` only. For RPi
-    cross-compilation `~/scripts/build-commissioning-proxy-transport.sh` wraps
-    these flags for the PAF-only and BLE-only variants.
+    A WiFi-PAF–only binary advertises `FeatureMap`
+    `WiFiNetworkInterface | BackgroundScan`; a BLE-only binary advertises
+    `BackgroundScan` only. For RPi cross-compilation
+    `~/scripts/build-commissioning-proxy-transport.sh` wraps these flags for the
+    PAF-only and BLE-only variants.
 
 -   To delete generated executable, libraries and object files use:
 
@@ -270,8 +271,8 @@ discriminator) currently held in the proxy's cache.
 
 Each proxy session is bound to the fabric that created it via
 `ProxyConnectRequest`. Attempts by a different fabric to send
-`ProxyMessageRequest`, `ProxyDisconnectRequest`, or a `CancelPendingConnect`
-(a `ProxyDisconnectRequest` carrying a null `sessionID`) for a session owned by
+`ProxyMessageRequest`, `ProxyDisconnectRequest`, or a `CancelPendingConnect` (a
+`ProxyDisconnectRequest` carrying a null `sessionID`) for a session owned by
 another fabric are rejected with `Status::NotFound`.
 
 ## Device Tracing
