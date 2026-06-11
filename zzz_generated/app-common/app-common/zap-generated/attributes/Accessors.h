@@ -1000,6 +1000,34 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, Mar
 } // namespace Attributes
 } // namespace LaundryDryerControls
 
+namespace TemperatureControlledCabinetTopology {
+namespace Attributes {
+
+namespace Topology {
+Protocols::InteractionModel::Status
+Get(EndpointId endpoint, chip::app::Clusters::TemperatureControlledCabinetTopology::TopologyEnum * value); // TopologyEnum
+Protocols::InteractionModel::Status Set(EndpointId endpoint,
+                                        chip::app::Clusters::TemperatureControlledCabinetTopology::TopologyEnum value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint,
+                                        chip::app::Clusters::TemperatureControlledCabinetTopology::TopologyEnum value,
+                                        MarkAttributeDirty markDirty);
+} // namespace Topology
+
+namespace FeatureMap {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, uint32_t * value); // bitmap32
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, MarkAttributeDirty markDirty);
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value); // int16u
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty);
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace TemperatureControlledCabinetTopology
+
 namespace ModeSelect {
 namespace Attributes {
 
