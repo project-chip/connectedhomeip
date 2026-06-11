@@ -16,7 +16,7 @@
 #
 
 import importlib
-import importlib.resources as pkg_resources
+import importlib.resources
 import logging
 import re
 from enum import IntEnum
@@ -96,7 +96,7 @@ def load_authoritative_errata(errata_target: str | Path | Traversable) -> dict[s
 
     # Otherwise assume it is a filename packaged inside matter.testing.data_model
     try:
-        res = pkg_resources.files(importlib.import_module('matter.testing')).joinpath('data_model').joinpath(
+        res = importlib.resources.files(importlib.import_module('matter.testing')).joinpath('data_model').joinpath(
             str(errata_target))
         if res.is_file():
             LOGGER.info("Loading packaged errata from %s", res)
