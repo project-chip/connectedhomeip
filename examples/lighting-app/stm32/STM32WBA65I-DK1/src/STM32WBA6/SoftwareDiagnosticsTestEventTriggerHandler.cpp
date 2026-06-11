@@ -46,12 +46,12 @@ void SetTestEventTrigger_SoftwareFaultOccurred()
 
     char timeChar[50]  = "";
     std::time_t result = std::time(nullptr);
+    struct std::tm timeInfo;
     // Using size of 50 as it is double the expected 25 characters "Www Mmm dd hh:mm:ss yyyy\n".
-    if (std::strftime(timeChar, sizeof(timeChar), "%c", std::localtime(&result)))
+    if (localtime_r(&result, &timeInfo) != nullptr && std::strftime(timeChar, sizeof(timeChar), "%c", &timeInfo))
     {
         softwareFault.faultRecording.SetValue(ByteSpan(Uint8::from_const_char(timeChar), strlen(timeChar)));
     }
-    softwareFault.faultRecording.SetValue(ByteSpan(Uint8::from_const_char(timeChar), strlen(timeChar)));
 
     Clusters::SoftwareDiagnostics::SoftwareFaultListener::GlobalNotifySoftwareFaultDetect(softwareFault);
 }
