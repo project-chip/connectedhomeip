@@ -7522,12 +7522,6 @@ bool emberAfModeSelectClusterChangeToModeCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::ModeSelect::Commands::ChangeToMode::DecodableType & commandData);
 /**
- * @brief Smoke CO Alarm Cluster SelfTestRequest Command callback (from client)
- */
-bool emberAfSmokeCoAlarmClusterSelfTestRequestCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::SmokeCoAlarm::Commands::SelfTestRequest::DecodableType & commandData);
-/**
  * @brief Dishwasher Alarm Cluster Reset Command callback (from client)
  */
 bool emberAfDishwasherAlarmClusterResetCallback(
