@@ -519,6 +519,7 @@ matter_clusters_sources = [
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/clusters/SwitchCluster.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/clusters/TargetNavigatorCluster.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/clusters/TemperatureControlCluster.kt",
+  "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/clusters/TemperatureControlledCabinetTopologyCluster.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/clusters/TemperatureMeasurementCluster.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/clusters/ThermostatCluster.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/clusters/ThermostatUserInterfaceConfigurationCluster.kt",
