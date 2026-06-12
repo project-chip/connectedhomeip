@@ -20,6 +20,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
+#include <algorithm>
 #include <cstdlib>
 #include <cstring>
 
@@ -63,6 +64,10 @@ bool DeviceTypeParser::ParseDeviceTypeEntry(const char * value, Entry & entry)
     if (colon == nullptr)
     {
         entry.type = mainConfig;
+        if (entry.type == "*")
+        {
+            entry.endpoint = chip::kInvalidEndpointId;
+        }
     }
     else
     {
@@ -120,4 +125,46 @@ CHIP_ERROR DeviceTypeParser::ParseSingleDeviceString(const char * value)
 const std::vector<DeviceTypeParser::Entry> & DeviceTypeParser::GetDeviceTypeEntries()
 {
     return mDeviceTypeEntries;
+}
+
+void DeviceTypeParser::ExpandWildcards(const std::vector<std::string> & wildcardExpandedTypes)
+{
+    if (std::none_of(mDeviceTypeEntries.begin(), mDeviceTypeEntries.end(),
+                     [](const auto & entry) { return entry.type == "*"; }))
+    {
+        return;
+    }
+
+    std::vector<Entry> expandedEntries;
+    chip::EndpointId nextAvailableEp = 1;
+
+    for (const auto & entry : mDeviceTypeEntries)
+    {
+        if (entry.type == "*")
+        {
+            chip::EndpointId nextEp = (entry.endpoint == chip::kInvalidEndpointId) ? nextAvailableEp : entry.endpoint;
+            for (const auto & deviceType : wildcardExpandedTypes)
+            {
+                expandedEntries.push_back({
+                    .type     = deviceType,
+                    .endpoint = nextEp++,
+                    .parentId = entry.parentId,
+                });
+            }
+            if (nextEp > nextAvailableEp)
+            {
+                nextAvailableEp = nextEp;
+            }
+        }
+        else
+        {
+            expandedEntries.push_back(entry);
+            if (entry.endpoint != chip::kInvalidEndpointId && entry.endpoint >= nextAvailableEp)
+            {
+                nextAvailableEp = entry.endpoint + 1;
+            }
+        }
+    }
+
+    mDeviceTypeEntries = std::move(expandedEntries);
 }
