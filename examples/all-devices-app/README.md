@@ -126,6 +126,23 @@ rm -rf /tmp/chip_*
 ./out/linux-x64-all-devices-boringssl-no-ble/all-devices-app --device chime:1 --device speaker:2,parent=1 --device dimmable-light:3
 ```
 
+## Advanced Topology: Wildcard Expansion (`*`)
+
+You can use the wildcard `*` to automatically instantiate all supported leaf
+device types. When an endpoint is specified, it represents the starting number.
+
+-   **Standard Wildcard:** Start all devices from endpoint 1 sequentially.
+
+    ```bash
+    ./out/linux-x64-all-devices-boringssl/all-devices-app --device "*:1"
+    ```
+
+-   **Parented Wildcard:** Start all devices from endpoint 2 sequentially and
+    make them all children of parent endpoint 1 (e.g., an aggregator).
+    ```bash
+    ./out/linux-x64-all-devices-boringssl/all-devices-app --device aggregator:1 --device "*:2,parent=1"
+    ```
+
 ## Testing with chip-tool
 
 You can use `chip-tool` as a controller to interact with the `all-devices-app`.
