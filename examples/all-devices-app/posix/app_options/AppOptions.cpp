@@ -21,6 +21,7 @@
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceConfig.h>
 
+#include <algorithm>
 #include <cstdlib>
 #include <cstring>
 
@@ -31,31 +32,14 @@ namespace {
 
 bool IsExcludedFromWildcard(const std::string & type)
 {
+    // These device types are excluded from the wildcard (*) expansion to prevent redundant,
+    // invalid, or non-leaf endpoint structures.
     static const std::vector<std::string> kExcludedDevices = {
-        "aggregator",
-        "bridged-node",
-        "fan-no-onoff",
+        "aggregator",   // Top-level container representing a bridge; not a standalone leaf device.
+        "bridged-node", // Base class representing a bridged endpoint wrapper; not a standalone leaf device.
     };
-    for (const auto & excluded : kExcludedDevices)
-    {
-        if (excluded == type)
-        {
-            return true;
-        }
-    }
-    return false;
-}
-
-bool HasWildcard(const std::vector<DeviceTypeParser::Entry> & entries)
-{
-    for (const auto & entry : entries)
-    {
-        if (entry.type == "*")
-        {
-            return true;
-        }
-    }
-    return false;
+    return std::any_of(kExcludedDevices.begin(), kExcludedDevices.end(),
+                       [&type](const auto & excluded) { return excluded == type; });
 }
 
 } // namespace
@@ -88,40 +72,19 @@ const AppOptions::AppConfig & AppOptions::GetConfig()
         return mConfig;
     }
 
-    // Check if wildcard expansion is needed
-    if (!HasWildcard(mConfig.deviceTypeEntries))
+    // Expand wildcards using the supported device types from DeviceFactory
+    std::vector<std::string> supportedTypes;
+    for (const auto & deviceType : chip::app::DeviceFactory::GetInstance().SupportedDeviceTypes())
     {
-        return mConfig;
-    }
-
-    std::vector<DeviceTypeParser::Entry> expandedEntries;
-
-    // Process and expand wildcard (*) entries
-    for (const auto & entry : mConfig.deviceTypeEntries)
-    {
-        if (entry.type == "*")
+        if (!IsExcludedFromWildcard(deviceType))
         {
-            chip::EndpointId nextEp = (entry.endpoint == chip::kInvalidEndpointId) ? 1 : entry.endpoint;
-            for (const auto & deviceType : chip::app::DeviceFactory::GetInstance().SupportedDeviceTypes())
-            {
-                if (IsExcludedFromWildcard(deviceType))
-                {
-                    continue;
-                }
-                expandedEntries.push_back({
-                    .type     = deviceType,
-                    .endpoint = nextEp++,
-                    .parentId = entry.parentId,
-                });
-            }
-        }
-        else
-        {
-            expandedEntries.push_back(entry);
+            supportedTypes.push_back(deviceType);
         }
     }
 
-    mConfig.deviceTypeEntries = expandedEntries;
+    sParser.ExpandWildcards(supportedTypes);
+    mConfig.deviceTypeEntries = sParser.GetDeviceTypeEntries();
+
     return mConfig;
 }
 
