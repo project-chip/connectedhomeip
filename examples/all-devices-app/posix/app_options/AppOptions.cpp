@@ -59,20 +59,41 @@ AppOptions::AppConfig AppOptions::mConfig;
 
 const AppOptions::AppConfig & AppOptions::GetConfig()
 {
-    static bool expanded = false;
-    if (expanded)
+    // Default device fallback if no devices are configured
+    if (mConfig.deviceTypeEntries.empty())
+    {
+        mConfig.deviceTypeEntries.push_back({
+            .type     = chip::app::DeviceFactory::GetInstance().GetDefaultDevice(),
+            .endpoint = 1,
+            .parentId = chip::kInvalidEndpointId,
+        });
+        return mConfig;
+    }
+
+    // Check if wildcard expansion is needed
+    bool hasWildcard = false;
+    for (const auto & entry : mConfig.deviceTypeEntries)
+    {
+        if (entry.type == "*")
+        {
+            hasWildcard = true;
+            break;
+        }
+    }
+
+    if (!hasWildcard)
     {
         return mConfig;
     }
 
     std::vector<DeviceTypeParser::Entry> finalEntries;
 
-    // Process all standard devices, expanding wildcard (*)
+    // Process and expand wildcard (*) entries
     for (const auto & entry : mConfig.deviceTypeEntries)
     {
         if (entry.type == "*")
         {
-            chip::EndpointId nextEp = entry.endpoint;
+            chip::EndpointId nextEp = (entry.endpoint == chip::kInvalidEndpointId) ? 1 : entry.endpoint;
             for (const auto & deviceType : chip::app::DeviceFactory::GetInstance().SupportedDeviceTypes())
             {
                 if (IsExcludedFromWildcard(deviceType))
@@ -92,18 +113,7 @@ const AppOptions::AppConfig & AppOptions::GetConfig()
         }
     }
 
-    // Default device fallback
-    if (finalEntries.empty())
-    {
-        finalEntries.push_back({
-            .type     = chip::app::DeviceFactory::GetInstance().GetDefaultDevice(),
-            .endpoint = 1,
-            .parentId = chip::kInvalidEndpointId,
-        });
-    }
-
     mConfig.deviceTypeEntries = finalEntries;
-    expanded                  = true;
     return mConfig;
 }
 
