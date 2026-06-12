@@ -14,9 +14,8 @@ design principles of the application.
 The `all-devices-app` implements the **Code-Driven Data Model**:
 
 -   **Dynamic Runtime Registration**: Clusters and endpoints are instantiated as
-    standard C++ objects and registered with the Matter server data model at
-    runtime using
-    `chip::app::app::Server::Instance().GetEndpointServer().RegisterEndpoint(...)`.
+    standard C++ objects and registered with the active data model provider at
+    runtime using `provider.AddEndpoint(...)` via `CodeDrivenDataModelProvider`.
 -   **Decoupled Cluster Logic**: Server clusters are implemented by deriving
     from `DefaultServerCluster` (or similar code-driven base classes).
     Attributes and commands are strongly typed and encapsulated within the

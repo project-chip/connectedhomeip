@@ -151,7 +151,7 @@ void ApplicationResumedHook(PersistentStorageDelegate & storageDelegate)
     auto & groupDataProvider = *Credentials::GetGroupDataProvider();
     auto & fabricTable       = Server::GetInstance().GetFabricTable();
 
-    // Boot our optimized custom production device topology
+    // Boot our fixed production device topology
     VerifyOrDie(chip::app::MyBulbDeviceManager::Instance().Init(storageDelegate, groupDataProvider, fabricTable) == CHIP_NO_ERROR);
 }
 

@@ -4,7 +4,7 @@ This guide explains how to implement a simulated Matter device in the
 `all-devices-app`.
 
 We will walk through creating a device named `MySensor` (`--device my-sensor`),
-implementing its data model, registering it in the modular factory, expanding
+implementing its data model, registering it in the device factory, expanding
 build targets, and executing certification tests.
 
 ---
@@ -27,10 +27,9 @@ the Matter Device Library Specification) to determine:
 
 ## Design Principles: Generic Structure & Dependency Injection
 
-To ensure the `all-devices-app` remains highly portable, modular, and testable,
-adhere strictly to these architectural patterns:
+To ensure application code portability and testability, adhere strictly to these architectural patterns:
 
-1. **Keep the `devices/` Directory Highly Generic**:
+1. **Keep the `devices/` Directory Platform-Agnostic**:
 
     - Avoid injecting platform-specific code, RTOS dependencies, or direct
       application state management inside core device classes.
@@ -97,7 +96,7 @@ protected:
 ### The Source (`MySensorDevice.cpp`)
 
 Implement `Register()` to instantiate dynamic clusters and register them with
-the provider. Ensure robust error handling: if any registration step fails,
+the provider. Ensure strict error handling: if any registration step fails,
 gracefully roll back to prevent orphaned configurations. Implement
 `Unregister()` to destroy them cleanly.
 
@@ -285,14 +284,13 @@ foreach(_key
 Add your new device target to the `public_deps` of `device-factory` (keep
 sorted):
 
-````gn
 ```text
   public_deps = [
     ...
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/my-sensor",
     ...
   ]
-````
+```
 
 ### 5. Platform Executable Dependencies (`BUILD.gn` files)
 
@@ -300,10 +298,9 @@ Add the target dependency to the relevant platform executable targets where
 `all-devices-app` is built (e.g., `examples/all-devices-app/posix/BUILD.gn`, and
 embedded platform builds such as Silicon Labs or ESP32):
 
-````gn
 ```text
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/my-sensor",
-````
+```
 
 ---
 
@@ -385,11 +382,17 @@ Confirm that all test cases execute and pass successfully.
 For manual interactive validation, execute `chip-tool` (refer to the
 `chip-tool-testing` skill for detailed commissioning setups):
 
-1. Start your application configured with your new device:
+1. Compile `chip-tool` from source:
+    ```bash
+    ./scripts/build/build_examples.py --target linux-x64-chip-tool-clang build
+    ```
+
+2. Start your application configured with your new device:
     ```bash
     ./out/linux-x64-all-devices-clang/all-devices-app --device my-sensor
     ```
-2. Commission the app and execute interaction model read/write commands or
+
+3. Commission the app and execute interaction model read/write commands or
    custom cluster commands against your new device endpoint to verify functional
    data model operations.
 
