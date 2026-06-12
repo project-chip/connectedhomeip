@@ -20,8 +20,7 @@ declare_args() {
   stm32_config_files = "${chip_root}/examples/platform/stm32/config_files/STM32WB5"
 
   ## PATHS FOR FREERTOS ##  
-  freertos_st = "${chip_root}/third_party/st/STM32CubeWB/Middlewares/Third_Party/FreeRTOS/Source"
-  
+  freertos_st = "${chip_root}/third_party/st/STM32CubeWB/Middlewares/Third_Party/FreeRTOS/Source" 
 }
 
 SOURCES = [
@@ -122,7 +121,7 @@ INCLUDE_DIRS = [
   "${cmsis_device_wb}/Include",
   "${stm32_wb_hal}/Inc",
   "${stm32_wb_hal}/Inc/Legacy",
-  "${chip_root}/src/platform/stm32",
+  "${chip_root}/src/platform/stm32/stm32wb",
   "${chip_root}/src/include/",
 
   #WPAN
@@ -151,6 +150,7 @@ INCLUDE_DIRS = [
   "${freertos_st}/portable/GCC/ARM_CM4F",
   "${freertos_st}/portable",
   "${freertos_st}/CMSIS_RTOS_V2",
+
 
 ]
 
