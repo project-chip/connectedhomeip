@@ -118,13 +118,13 @@ device types. When an endpoint is specified, it represents the starting number.
 -   **Standard Wildcard:** Start all devices from endpoint 1 sequentially.
 
     ```bash
-    ./out/linux-x64-all-devices-boringssl/all-devices-app --device *:1
+    ./out/linux-x64-all-devices-boringssl/all-devices-app --device "*:1"
     ```
 
 -   **Parented Wildcard:** Start all devices from endpoint 2 sequentially and
     make them all children of parent endpoint 1 (e.g., an aggregator).
     ```bash
-    ./out/linux-x64-all-devices-boringssl/all-devices-app --device aggregator:1 --device *:2,parent=1
+    ./out/linux-x64-all-devices-boringssl/all-devices-app --device aggregator:1 --device "*:2,parent=1"
     ```
 
 ## Testing with chip-tool

@@ -191,7 +191,7 @@ OptionSet * AppOptions::GetOptions()
         result.append(">");
         result += "\n";
         result += "       Select the device to start up. Format: 'type' or 'type:endpoint' or 'type:endpoint,parent=parentId'.\n";
-        result += "       Use '*' to select all supported leaf devices (e.g. --device *:1).\n";
+        result += "       Use '*' to select all supported leaf devices (e.g. --device \"*:1\").\n";
         result += "       Can be specified multiple times for multi-endpoint devices.\n";
         result += "       Example: --device chime:1 --device speaker:2,parent=1\n\n";
 
