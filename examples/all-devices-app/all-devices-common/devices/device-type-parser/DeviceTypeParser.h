@@ -50,6 +50,14 @@ public:
     CHIP_ERROR ParseSingleDeviceString(const char * value);
 
     /**
+     * Expands any wildcard "*" entries in the parsed list into the given list of device types,
+     * maintaining parentage and allocating sequential endpoints.
+     *
+     * @param wildcardExpandedTypes The list of leaf device types that wildcard should expand to.
+     */
+    void ExpandWildcards(const std::vector<std::string> & wildcardExpandedTypes);
+
+    /**
      * Gets the list of parsed device configurations.
      */
     const std::vector<Entry> & GetDeviceTypeEntries();
