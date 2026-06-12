@@ -281,33 +281,35 @@ foreach(_key
 ```
 
 ### 4. Device Factory Dependency (`all-devices-common/device-factory/BUILD.gn`)
-<<<<<<< conflict 2 of 3
-+++++++ lntxykqw 2a6a8351 "Fix misspell CI check failures in all-devices-app documentation" (rebase destination)
+
+<<<<<<< conflict 2 of 3 +++++++ lntxykqw 2a6a8351 "Fix misspell CI check
+failures in all-devices-app documentation" (rebase destination)
 
 Add your new device target to the `public_deps` of `device-factory` (keep
 sorted):
 
-```gn
+````gn
 ```text
   public_deps = [
     ...
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/my-sensor",
     ...
   ]
-```
+````
 
 ### 5. Platform Executable Dependencies (`BUILD.gn` files)
-<<<<<<< conflict 3 of 3
-+++++++ lntxykqw 2a6a8351 "Fix misspell CI check failures in all-devices-app documentation" (rebase destination)
+
+<<<<<<< conflict 3 of 3 +++++++ lntxykqw 2a6a8351 "Fix misspell CI check
+failures in all-devices-app documentation" (rebase destination)
 
 Add the target dependency to the relevant platform executable targets where
 `all-devices-app` is built (e.g., `examples/all-devices-app/posix/BUILD.gn`, and
 embedded platform builds such as Silicon Labs or ESP32):
 
-```gn
+````gn
 ```text
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/my-sensor",
-```
+````
 
 ---
 
