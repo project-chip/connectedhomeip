@@ -22,10 +22,10 @@
 
 #include "AppConfig.h"
 
-#include <app/clusters/smoke-co-alarm-server/CodegenIntegration.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/ConcreteAttributePath.h>
+#include <app/clusters/smoke-co-alarm-server/CodegenIntegration.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 using namespace ::chip;
