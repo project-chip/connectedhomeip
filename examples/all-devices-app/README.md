@@ -118,9 +118,11 @@ topology used for representing bridged devices in Matter (exposing bridging
 metadata via the `BridgedDeviceBasicInformation` cluster on a parent node).
 
 -   **Explicit Bridged Device:**
+
     ```bash
     ./out/linux-x64-all-devices-boringssl/all-devices-app --device aggregator:1 --device "chime:2,parent=1,bridged"
     ```
+
     This command explicitly maps a chime on Endpoint 2 to be bridged under the
     aggregator on Endpoint 1. The application automatically expands this to the
     following layout:
