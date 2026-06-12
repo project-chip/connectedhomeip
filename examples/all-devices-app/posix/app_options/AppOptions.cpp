@@ -46,6 +46,18 @@ bool IsExcludedFromWildcard(const std::string & type)
     return false;
 }
 
+bool HasWildcard(const std::vector<DeviceTypeParser::Entry> & entries)
+{
+    for (const auto & entry : entries)
+    {
+        if (entry.type == "*")
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
 } // namespace
 
 // App custom argument handling
@@ -77,17 +89,7 @@ const AppOptions::AppConfig & AppOptions::GetConfig()
     }
 
     // Check if wildcard expansion is needed
-    bool hasWildcard = false;
-    for (const auto & entry : mConfig.deviceTypeEntries)
-    {
-        if (entry.type == "*")
-        {
-            hasWildcard = true;
-            break;
-        }
-    }
-
-    if (!hasWildcard)
+    if (!HasWildcard(mConfig.deviceTypeEntries))
     {
         return mConfig;
     }
