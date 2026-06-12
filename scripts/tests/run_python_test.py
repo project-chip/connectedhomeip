@@ -329,7 +329,7 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
             # Add one minute to let the test timeout if the test reach the timeout.
             test_arg_timeout = int(split_args[timeout_index+1])
             test_arg_timeout += 60
-        except ValueError as ve:
+        except ValueError:
             log.warning("Invalid value for argument --timeout")
             exit(1)
         except IndexError:
