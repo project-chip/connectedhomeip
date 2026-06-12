@@ -29,7 +29,7 @@ public:
     struct Entry
     {
         std::string type;
-        chip::EndpointId endpoint;
+        chip::EndpointId endpoint = chip::kInvalidEndpointId;
         chip::EndpointId parentId = chip::kInvalidEndpointId;
         bool bridged              = false;
     };
