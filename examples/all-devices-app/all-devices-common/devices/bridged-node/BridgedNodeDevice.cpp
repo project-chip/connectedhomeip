@@ -17,6 +17,7 @@
 
 #include <devices/Types.h>
 #include <devices/bridged-node/BridgedNodeDevice.h>
+#include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 #include <string>

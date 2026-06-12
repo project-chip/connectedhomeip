@@ -91,12 +91,12 @@ _available_devices = [
     "PROXIMITY_RANGER",
   ],
   [
-    "soil-sensor",
-    "SOIL_SENSOR",
-  ],
-  [
     "smoke-co-alarm",
     "SMOKE_CO_ALARM",
+  ],
+  [
+    "soil-sensor",
+    "SOIL_SENSOR",
   ],
   [
     "speaker",
