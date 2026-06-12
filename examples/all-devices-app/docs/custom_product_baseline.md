@@ -136,7 +136,7 @@ void MyBulbDeviceManager::Shutdown()
 
 ---
 
-## 4. Hooking into Application Entrypoints
+## 4. Hooking into Application Entry Points
 
 In the platform entrypoint (`main.cpp` or `AppTask::Init()`), initialize the
 static configuration after the Matter stack initializes:
@@ -170,7 +170,7 @@ void ApplicationShutdownHook()
    against required device modules (e.g.,
    `all-devices-common/devices/dimmable-light`) rather than `device-factory` to
    minimize RAM and Flash usage.
-2. **Hardcode Endpoint Topologies**: Hardcode fixed `EndpointId` parameters
+2. **Statically Define Topologies**: Configure fixed `EndpointId` parameters
    instead of using auto-incrementing IDs to ensure a fixed data model.
 3. **Persist Hardware State**: Replace simulated cluster implementations with
    hardware drivers (e.g., binding a PWM driver to WriteAttribute callbacks) and

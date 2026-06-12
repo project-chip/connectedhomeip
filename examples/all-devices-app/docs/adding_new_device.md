@@ -4,7 +4,7 @@ This guide explains how to implement a simulated Matter device in the
 `all-devices-app`.
 
 We will walk through creating a device named `MySensor` (`--device my-sensor`),
-implementing its data model, registering it in the pluggable factory, expanding
+implementing its data model, registering it in the modular factory, expanding
 build targets, and executing certification tests.
 
 ---
@@ -25,7 +25,7 @@ the Matter Device Library Specification) to determine:
 
 ---
 
-## Design Principles: Genericity & Dependency Injection
+## Design Principles: Generic Structure & Dependency Injection
 
 To ensure the `all-devices-app` remains highly portable, modular, and testable,
 adhere strictly to these architectural patterns:
@@ -35,7 +35,7 @@ adhere strictly to these architectural patterns:
     - Avoid injecting platform-specific code, RTOS dependencies, or direct
       application state management inside core device classes.
     - Any hardware interactions or platform services (e.g., playing audio,
-      toggling GPIOs, interacting with network interfaces) must be abstracted
+      toggling GPIO pins, interacting with network interfaces) must be abstracted
       behind pure virtual delegate interfaces.
 
 2. **Strict Dependency Injection**:
