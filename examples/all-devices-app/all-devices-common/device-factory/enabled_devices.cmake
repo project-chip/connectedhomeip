@@ -115,6 +115,7 @@ foreach(_key
         power-source
         proximity-ranger
         soil-sensor
+        smoke-co-alarm
         speaker
         temperature-sensor
         water-leak-detector

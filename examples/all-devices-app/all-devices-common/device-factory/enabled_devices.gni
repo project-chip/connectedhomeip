@@ -91,6 +91,10 @@ _available_devices = [
     "SOIL_SENSOR",
   ],
   [
+    "smoke-co-alarm",
+    "SMOKE_CO_ALARM",
+  ],
+  [
     "speaker",
     "SPEAKER",
   ],
@@ -101,10 +105,6 @@ _available_devices = [
   [
     "water-leak-detector",
     "WATER_LEAK_DETECTOR",
-  ],
-  [
-    "smoke-co-alarm",
-    "SMOKE_CO_ALARM",
   ],
 ]
 
