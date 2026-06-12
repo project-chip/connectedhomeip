@@ -5,11 +5,8 @@ zeroconf
 ifaddr
 langcodes
 requests
-<<<<<<< HEAD
-pyscard
 ndeflib
-=======
-pycountry
-validators
 nest-asyncio
->>>>>>> 7cd45f21ed ([Testing infra] Add missing nest-asyncio dependency to python testing requirements (#72507))
+pycountry
+pyscard
+validators
