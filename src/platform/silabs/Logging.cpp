@@ -318,6 +318,9 @@ extern "C" void LwIPLog(const char * aFormat, ...)
 #if defined(SL_COMPONENT_CATALOG_PRESENT) &&                                                                                       \
     (defined(SL_CATALOG_ZIGBEE_ZCL_CLI_PRESENT) || defined(SL_CATALOG_ZIGBEE_DEBUG_PRINT_PRESENT))
 #include "zcl-debug-print.h"
+#if defined(ENABLE_CHIP_SHELL) && ENABLE_CHIP_SHELL
+#include "uart.h"
+#endif // defined(ENABLE_CHIP_SHELL) && ENABLE_CHIP_SHELL
 extern "C" void sli_zigbee_af_print_internal_var_arg(uint16_t area, uint32_t log_level, bool newLine, const char * formatString,
                                                      va_list ap)
 {
@@ -354,7 +357,14 @@ extern "C" void sli_zigbee_af_print_internal_var_arg(uint16_t area, uint32_t log
 
         char buffer[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE];
         int chWritten = vsnprintf(buffer, sizeof(buffer), formatString, ap);
-        uartConsoleWrite(const_cast<char *>(buffer), chWritten);
+        if (chWritten <0)
+        {
+            uartConsoleWrite("ZB CLI response too large", sizeof("ZB CLI response too large"));
+        }
+        else
+        {
+            uartConsoleWrite(const_cast<char *>(buffer), chWritten);
+        }
     }
 #endif
 }
