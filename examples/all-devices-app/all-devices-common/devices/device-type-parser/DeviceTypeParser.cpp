@@ -225,3 +225,59 @@ void DeviceTypeParser::ExpandWildcards(const std::vector<std::string> & wildcard
 
     mDeviceTypeEntries = std::move(expandedEntries);
 }
+
+CHIP_ERROR DeviceTypeParser::ValidateConfig(const std::vector<Entry> & entries)
+{
+    std::vector<chip::EndpointId> endpoints;
+
+    for (const auto & entry : entries)
+    {
+        // Check for duplicate endpoint IDs
+        if (std::find(endpoints.begin(), endpoints.end(), entry.endpoint) != endpoints.end())
+        {
+            ChipLogError(Support, "Error: Duplicate endpoint ID %u in configuration", entry.endpoint);
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
+        endpoints.push_back(entry.endpoint);
+
+        // 1. A bridged-node must specify a parent (cannot be directly under root node in this bridge topology)
+        if (entry.type == "bridged-node" && entry.parentId == chip::kInvalidEndpointId)
+        {
+            ChipLogError(Support, "Error: bridged-node (endpoint %u) must specify a parent (e.g. parent=aggregatorId)",
+                         entry.endpoint);
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
+
+        // 2. If it has a parent, verify the parent exists in the config
+        if (entry.parentId != chip::kInvalidEndpointId)
+        {
+            bool parentExists = false;
+            std::string parentType;
+            for (const auto & other : entries)
+            {
+                if (other.endpoint == entry.parentId)
+                {
+                    parentExists = true;
+                    parentType   = other.type;
+                    break;
+                }
+            }
+            if (!parentExists)
+            {
+                ChipLogError(Support, "Error: Parent endpoint %u for device %s (endpoint %u) does not exist in configuration",
+                             entry.parentId, entry.type.c_str(), entry.endpoint);
+                return CHIP_ERROR_INVALID_ARGUMENT;
+            }
+
+            // 3. If this is a bridged-node, its parent must be an aggregator (or power-source for testing)
+            if (entry.type == "bridged-node" && parentType != "aggregator" && parentType != "power-source")
+            {
+                ChipLogError(Support, "Error: Parent of bridged-node (endpoint %u) must be aggregator, but found %s (endpoint %u)",
+                             entry.endpoint, parentType.c_str(), entry.parentId);
+                return CHIP_ERROR_INVALID_ARGUMENT;
+            }
+        }
+    }
+
+    return CHIP_NO_ERROR;
+}

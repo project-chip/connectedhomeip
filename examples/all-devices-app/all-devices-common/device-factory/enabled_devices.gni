@@ -53,6 +53,7 @@ _available_devices = [
   [
     "bridged-node",
     "BRIDGED_NODE",
+  ],
   [
     "chime",
     "CHIME",
