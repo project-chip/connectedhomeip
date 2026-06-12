@@ -35,8 +35,8 @@ adhere strictly to these architectural patterns:
     - Avoid injecting platform-specific code, RTOS dependencies, or direct
       application state management inside core device classes.
     - Any hardware interactions or platform services (e.g., playing audio,
-      toggling GPIO pins, interacting with network interfaces) must be abstracted
-      behind pure virtual delegate interfaces.
+      toggling GPIO pins, interacting with network interfaces) must be
+      abstracted behind pure virtual delegate interfaces.
 
 2. **Strict Dependency Injection**:
     - Do not instantiate, manage, or copy global system dependencies (such as
