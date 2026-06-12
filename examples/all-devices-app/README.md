@@ -140,9 +140,13 @@ metadata via the `BridgedDeviceBasicInformation` cluster on a parent node).
     This command explicitly maps a chime on Endpoint 2 to be bridged under the
     aggregator on Endpoint 1. The application automatically expands this to the
     following layout:
-    -   Endpoint 1: `aggregator`
-    -   Endpoint 2: `bridged-node` (parent: Endpoint 1)
-    -   Endpoint 3: `chime` (parent: Endpoint 2)
+
+    ```text
+    Endpoint 0 (Root Node)
+       └── Endpoint 1 (aggregator)
+              └── Endpoint 2 (bridged-node)
+                     └── Endpoint 3 (chime)
+    ```
 
 ## Advanced Topology: Wildcard Expansion (`*`)
 
