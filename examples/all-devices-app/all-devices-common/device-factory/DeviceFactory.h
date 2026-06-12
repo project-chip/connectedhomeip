@@ -30,6 +30,7 @@
 #include <devices/on-off-light/LoggingOnOffLightDevice.h>
 #include <devices/power-source/impl/DecreasingBatteryPowerSourceDevice.h>
 #include <devices/proximity-ranger/ProximityRangerDevice.h>
+#include <devices/smoke-co-alarm/SmokeCoAlarmDevice.h>
 #include <devices/soil-sensor/impl/IncreasingMoistureSoilSensorDevice.h>
 #include <devices/speaker/impl/LoggingSpeakerDevice.h>
 #include <devices/temperature-sensor/impl/IncreasingTemperatureSensorDevice.h>
@@ -296,6 +297,22 @@ private:
         if constexpr (ALL_DEVICES_ENABLE_POWER_SOURCE)
         {
             RegisterCreator("power-source", []() { return std::make_unique<DecreasingBatteryPowerSourceDevice>(); });
+        }
+        if constexpr (ALL_DEVICES_ENABLE_SMOKE_CO_ALARM)
+        {
+            RegisterCreator("smoke-co-alarm", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return std::make_unique<SmokeCoAlarmDevice>(
+                    mContext->timerDelegate,
+                    SmokeCoAlarmDevice::ConcentrationCluster::Config{
+                        .clusterId = Clusters::CarbonMonoxideConcentrationMeasurement::Id,
+                        .features  = BitFlags<Clusters::ConcentrationMeasurement::Feature>(
+                            Clusters::ConcentrationMeasurement::Feature::kNumericMeasurement,
+                            Clusters::ConcentrationMeasurement::Feature::kLevelIndication),
+                        .medium = Clusters::ConcentrationMeasurement::MeasurementMediumEnum::kAir,
+                        .unit   = Clusters::ConcentrationMeasurement::MeasurementUnitEnum::kPpm,
+                    });
+            });
         }
 
         // at least one device type MUST be enabled
