@@ -71,17 +71,8 @@ const AppOptions::AppConfig & AppOptions::GetConfig()
     }
 
     // Check if wildcard expansion is needed
-    bool hasWildcard = false;
-    for (const auto & entry : mConfig.deviceTypeEntries)
-    {
-        if (entry.type == "*")
-        {
-            hasWildcard = true;
-            break;
-        }
-    }
-
-    if (!hasWildcard)
+    if (std::none_of(mConfig.deviceTypeEntries.begin(), mConfig.deviceTypeEntries.end(),
+                     [](const auto & entry) { return entry.type == "*"; }))
     {
         return mConfig;
     }
