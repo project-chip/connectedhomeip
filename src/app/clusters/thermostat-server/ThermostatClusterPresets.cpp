@@ -308,6 +308,8 @@ Status ThermostatAttrAccess::SetActivePreset(EndpointId endpoint, DataModel::Nul
         return Status::InvalidCommand;
     }
 
+    // Delegate centralizes ActivePresetHandle subscription reporting to ensure
+    // all update paths (command and suggestion-driven) emit reports consistently.
     CHIP_ERROR err = delegate->SetActivePresetHandle(presetHandle);
 
     if (err != CHIP_NO_ERROR)

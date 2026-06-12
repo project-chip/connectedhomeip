@@ -147,9 +147,12 @@ CHIP_ERROR ThermostatDelegate::GetActivePresetHandle(DataModel::Nullable<Mutable
 
 CHIP_ERROR ThermostatDelegate::SetActivePresetHandle(const DataModel::Nullable<ByteSpan> & newActivePresetHandle)
 {
-    if (!newActivePresetHandle.IsNull())
+    const bool isNewActivePresetHandleNull = newActivePresetHandle.IsNull();
+    size_t newActivePresetHandleSize       = 0;
+
+    if (!isNewActivePresetHandleNull)
     {
-        size_t newActivePresetHandleSize = newActivePresetHandle.Value().size();
+        newActivePresetHandleSize = newActivePresetHandle.Value().size();
         if (newActivePresetHandleSize > sizeof(mActivePresetHandleData))
         {
             ChipLogError(NotSpecified,
@@ -157,6 +160,23 @@ CHIP_ERROR ThermostatDelegate::SetActivePresetHandle(const DataModel::Nullable<B
                          static_cast<uint8_t>(newActivePresetHandleSize), static_cast<uint8_t>(kPresetHandleSize));
             return CHIP_ERROR_NO_MEMORY;
         }
+    }
+
+    bool activePresetHandleChanged = (mActivePresetHandleDataSize != newActivePresetHandleSize);
+    if (!isNewActivePresetHandleNull && !activePresetHandleChanged)
+    {
+        activePresetHandleChanged =
+            !ByteSpan(mActivePresetHandleData, mActivePresetHandleDataSize).data_equal(newActivePresetHandle.Value());
+    }
+
+    if (!activePresetHandleChanged)
+    {
+        ChipLogDetail(NotSpecified, "ActivePresetHandle unchanged");
+        return CHIP_NO_ERROR;
+    }
+
+    if (!isNewActivePresetHandleNull)
+    {
         memcpy(mActivePresetHandleData, newActivePresetHandle.Value().data(), newActivePresetHandleSize);
         mActivePresetHandleDataSize = newActivePresetHandleSize;
         ChipLogDetail(NotSpecified, "Set ActivePresetHandle to ");
@@ -168,6 +188,10 @@ CHIP_ERROR ThermostatDelegate::SetActivePresetHandle(const DataModel::Nullable<B
         mActivePresetHandleDataSize = 0;
         ChipLogDetail(NotSpecified, "Clear ActivePresetHandle");
     }
+
+    // Centralize reporting here and only notify when ActivePresetHandle changes.
+    MatterReportingAttributeChangeCallback(mEndpointId, Thermostat::Id, Attributes::ActivePresetHandle::Id);
+
     return CHIP_NO_ERROR;
 }
 
@@ -449,7 +473,6 @@ CHIP_ERROR ThermostatDelegate::ReEvaluateCurrentSuggestion()
         // ActivePresetHandle. Otherwise set the ActivePresetHandle to the preset handle in the suggestion and set
         // ThermostatSuggestionNotFollowingReason to null.
         TEMPORARY_RETURN_IGNORED SetActivePresetHandle(currentThermostatSuggestion.GetPresetHandle());
-        MatterReportingAttributeChangeCallback(mEndpointId, Thermostat::Id, Attributes::ActivePresetHandle::Id);
         TEMPORARY_RETURN_IGNORED SetThermostatSuggestionNotFollowingReason(DataModel::NullNullable);
 
         // Start a timer from the timestamp in currentMatterEpochTimestamp to the timestamp in the expiration time.
