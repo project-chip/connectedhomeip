@@ -90,7 +90,7 @@ the binary override path:
 ```bash
 ./scripts/tests/local.py python-tests \
     --test-filter TC_IDM_2_3 \
-    --override-binary-path ALL_DEVICES_APP out/linux-x64-all-devices-clang/all-devices-app
+    --override-binary-path ALL_DEVICES_APP ./out/linux-x64-all-devices-clang/all-devices-app
 ```
 
 ### Execution Method B: Explicit Combined Harness (`run_python_test.py`)

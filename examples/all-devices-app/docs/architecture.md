@@ -67,7 +67,7 @@ These directories contain hardware-specific or OS-specific drivers, entrypoint
 
 ---
 
-## 3. Key Component Hierarchies
+## 3. Key Core Classes
 
 ### The Device Interface
 

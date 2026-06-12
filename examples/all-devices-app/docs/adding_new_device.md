@@ -232,7 +232,7 @@ Next, register your implementation files across our core build scripts.
 
 Add the compile-time CMake hook:
 
-```c
+```text
 #cmakedefine01 ALL_DEVICES_ENABLE_MY_SENSOR
 ```
 
@@ -353,7 +353,8 @@ Fully validate your new device integration using end-to-end testing tools.
 Build the executable using the standard Python build scripts:
 
 ```bash
-scripts/run_in_build_env.sh "./scripts/build/build_examples.py --target linux-x64-all-devices-clang build"
+source scripts/activate.sh
+./scripts/build/build_examples.py --target linux-x64-all-devices-clang build
 ```
 
 ### 2. Execute Basic Composition Verification
@@ -383,6 +384,7 @@ For manual interactive validation, execute `chip-tool` (refer to the
 1. Compile `chip-tool` from source:
 
     ```bash
+    source scripts/activate.sh
     ./scripts/build/build_examples.py --target linux-x64-chip-tool-clang build
     ```
 
