@@ -27,8 +27,8 @@ namespace chip {
 namespace app {
 
 BridgedNodeDevice::BridgedNodeDevice(TimerDelegate & timerDelegate, std::string uniqueId, std::string nodeLabel) :
-    SingleEndpointDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kBridgedNode, 1)),
-    mTimerDelegate(timerDelegate), mUniqueId(std::move(uniqueId)), mNodeLabel(std::move(nodeLabel))
+    SingleEndpointDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kBridgedNode, 1)), mTimerDelegate(timerDelegate),
+    mUniqueId(std::move(uniqueId)), mNodeLabel(std::move(nodeLabel))
 {}
 
 CHIP_ERROR BridgedNodeDevice::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointId parentId)
