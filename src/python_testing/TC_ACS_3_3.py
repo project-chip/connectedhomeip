@@ -206,8 +206,6 @@ class TC_ACS_3_3(MatterBaseTest):
                 '{"Name":"SetAmbientContextSupport","EndpointId":1,"AmbientContextType":[{"TypeId":73, "TagId":3},{"TypeId":74, "TagId":4},{"TypeId":75,"TagId":3}]}')
             # f'{{"Name":"AddAmbientContextDetect", "EndpointId":{endpoint}, "AmbientContextType":[{{"TypeId":73, "TagId":3}},{{"TypeId":74, "TagId":4}},{{"TypeId":75, "TagId":3}}]}}')
             await asyncio.sleep(1)
-        ambientContextTypeSupported = await self.read_single_attribute_check_success(
-            endpoint=endpoint, cluster=cluster, attribute=attr.AmbientContextTypeSupported)
 
         self.step("2", "TH establishes a wildcard subscription to all attributes on Ambient Context Sensing Cluster on the endpoint under test. Subscription min interval = 0 and max interval = 30 seconds.")
         attribute_list = await self.read_single_attribute_check_success(
