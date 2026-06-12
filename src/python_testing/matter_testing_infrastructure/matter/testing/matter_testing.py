@@ -350,7 +350,7 @@ class MatterBaseTest(base_test.BaseTestClass):
                     [(0, Clusters.BasicInformation.Attributes.VendorID)]
                 )
             except Exception as e:  # DUT may be unreachable or mid-reboot; skip all DUT cleanup rather than failing the test
-                LOGGER.warning(f"[CLN] DUT is unreachable, skipping all DUT cleanup: {e}")
+                LOGGER.warning("[CLN] DUT is unreachable, skipping all DUT cleanup: %s", e)
                 dut_reachable = False
 
         if dut_reachable:
@@ -412,11 +412,11 @@ class MatterBaseTest(base_test.BaseTestClass):
         """
         for ctrl in self._extra_controllers:
             try:
-                LOGGER.info(f"[CLN] shutting down controller nodeId={ctrl.nodeId:#x}")
+                LOGGER.info("[CLN] shutting down controller nodeId=%#x", ctrl.nodeId)
                 ctrl.Shutdown()
-                LOGGER.info(f"[CLN] controller nodeId={ctrl.nodeId:#x} shut down successfully")
+                LOGGER.info("[CLN] controller nodeId=%#x shut down successfully", ctrl.nodeId)
             except Exception as e:  # Shutdown can fail if the controller is already stopped or the stack is in a bad state
-                LOGGER.warning(f"[CLN] controller shutdown failed: {e}")
+                LOGGER.warning("[CLN] controller shutdown failed: %s", e)
         self._extra_controllers.clear()
 
         # Shut down each CA and remove it from the manager's active list and from
@@ -424,7 +424,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         mgr = self.certificate_authority_manager
         for ca in self._extra_cas:
             try:
-                LOGGER.info(f"[CLN] shutting down CA index {ca.caIndex}")
+                LOGGER.info("[CLN] shutting down CA index %d", ca.caIndex)
                 ca.Shutdown()
                 if ca in mgr._activeCaList:
                     mgr._activeCaList.remove(ca)
@@ -432,9 +432,9 @@ class MatterBaseTest(base_test.BaseTestClass):
                 if str(ca.caIndex) in ca_list:
                     del ca_list[str(ca.caIndex)]
                     mgr._persistentStorage.SetKey('caList', ca_list)
-                LOGGER.info(f"[CLN] CA index {ca.caIndex} removed successfully")
+                LOGGER.info("[CLN] CA index %d removed successfully", ca.caIndex)
             except Exception as e:  # Storage may be inconsistent if the controller was shut down in a bad state
-                LOGGER.warning(f"[CLN] CA removal failed: {e}")
+                LOGGER.warning("[CLN] CA removal failed: %s", e)
         self._extra_cas.clear()
 
     async def _disarm_failsafes(self) -> None:
@@ -449,11 +449,11 @@ class MatterBaseTest(base_test.BaseTestClass):
                 )
             )
             if resp.errorCode != Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kOk:
-                LOGGER.warning(f"[CLN] disarm failsafe returned errorCode {resp.errorCode}")
+                LOGGER.warning("[CLN] disarm failsafe returned errorCode %s", resp.errorCode)
             else:
                 LOGGER.info("[CLN] failsafe disarmed successfully")
         except Exception as e:  # DUT may be unreachable or session may have expired; log and continue cleanup
-            LOGGER.warning(f"[CLN] disarm failsafe failed: {e}")
+            LOGGER.warning("[CLN] disarm failsafe failed: %s", e)
 
     async def _reset_acls_to_default(self) -> None:
         """Restores the ACL on endpoint 0 to the state captured before the test ran.
@@ -470,11 +470,11 @@ class MatterBaseTest(base_test.BaseTestClass):
                 [(0, Clusters.AccessControl.Attributes.Acl(self._original_acl))]
             )
             if result[0].Status != Status.Success:
-                LOGGER.warning(f"[CLN] ACL reset returned status {result[0].Status}")
+                LOGGER.warning("[CLN] ACL reset returned status %s", result[0].Status)
             else:
                 LOGGER.info("[CLN] ACL restored successfully")
         except Exception as e:  # Session may have expired or DUT ACL may be in a state that rejects the write
-            LOGGER.warning(f"[CLN] ACL reset failed: {e}")
+            LOGGER.warning("[CLN] ACL reset failed: %s", e)
 
     async def _remove_extra_fabrics(self) -> None:
         """Removes any fabric on the DUT that is not the default controller's fabric."""
@@ -498,7 +498,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             )
         except Exception as e:  # DUT may be unreachable or session may have expired after a multi-fabric test
             LOGGER.warning(
-                f"[CLN] could not read fabric list (DUT unreachable, session expired, or attribute read error), skipping fabric removal: {e}")
+                "[CLN] could not read fabric list (DUT unreachable, session expired, or attribute read error), skipping fabric removal: %s", e)
             return
 
         extra_fabric_indices = [f.fabricIndex for f in fabrics if f.fabricIndex != th1_fabric_index]
@@ -507,17 +507,17 @@ class MatterBaseTest(base_test.BaseTestClass):
             LOGGER.info("[CLN] no extra fabrics to remove")
             return
 
-        LOGGER.info(f"[CLN] removing {len(extra_fabric_indices)} extra fabric(s) from DUT")
+        LOGGER.info("[CLN] removing %d extra fabric(s) from DUT", len(extra_fabric_indices))
         for fabric_index in extra_fabric_indices:
-            LOGGER.info(f"[CLN] sending RemoveFabric(fabricIndex={fabric_index})")
+            LOGGER.info("[CLN] sending RemoveFabric(fabricIndex=%d)", fabric_index)
             try:
                 await self.send_single_cmd(
                     cmd=Clusters.OperationalCredentials.Commands.RemoveFabric(fabricIndex=fabric_index),
                     endpoint=0
                 )
-                LOGGER.info(f"[CLN] fabric index {fabric_index} removed successfully")
+                LOGGER.info("[CLN] fabric index %d removed successfully", fabric_index)
             except Exception as e:  # RemoveFabric may fail if the fabric was already removed by the test or a prior cleanup
-                LOGGER.warning(f"[CLN] RemoveFabric({fabric_index}) failed: {e}")
+                LOGGER.warning("[CLN] RemoveFabric(%d) failed: %s", fabric_index, e)
 
     async def _purge_groups(self) -> None:
         """Removes all non-IPK group key sets and clears the group key map on the DUT.
@@ -537,13 +537,13 @@ class MatterBaseTest(base_test.BaseTestClass):
             # Remove all non-IPK key sets, key set 0 (IPK) cannot be removed
             for key_set_id in resp.groupKeySetIDs:
                 if key_set_id != 0:
-                    LOGGER.info(f"[CLN] removing group key set {key_set_id}")
+                    LOGGER.info("[CLN] removing group key set %d", key_set_id)
                     await self.send_single_cmd(
                         cmd=Clusters.GroupKeyManagement.Commands.KeySetRemove(groupKeySetID=key_set_id),
                         endpoint=0
                     )
         except Exception as e:  # DUT may be unreachable, or key sets may already be absent; skip rather than aborting cleanup
-            LOGGER.warning(f"[CLN] key set removal failed: {e}")
+            LOGGER.warning("[CLN] key set removal failed: %s", e)
 
         # Clear all group key mappings
         try:
@@ -552,11 +552,11 @@ class MatterBaseTest(base_test.BaseTestClass):
                 [(0, Clusters.GroupKeyManagement.Attributes.GroupKeyMap([]))]
             )
             if result[0].Status != Status.Success:
-                LOGGER.warning(f"[CLN] GroupKeyMap clear returned status {result[0].Status}")
+                LOGGER.warning("[CLN] GroupKeyMap clear returned status %s", result[0].Status)
             else:
                 LOGGER.info("[CLN] group key map cleared successfully")
         except Exception as e:  # Write may fail if session expired or the DUT rejected the empty map
-            LOGGER.warning(f"[CLN] GroupKeyMap clear failed: {e}")
+            LOGGER.warning("[CLN] GroupKeyMap clear failed: %s", e)
 
     async def _purge_scenes(self) -> None:
         """Removes all scenes from all groups on every endpoint that has ScenesManagement.
@@ -586,15 +586,15 @@ class MatterBaseTest(base_test.BaseTestClass):
                 group_ids = resp.groupList
                 if not group_ids:
                     continue
-                LOGGER.info(f"[CLN] removing scenes for groups {group_ids} on endpoint {endpoint_id}")
+                LOGGER.info("[CLN] removing scenes for groups %s on endpoint %d", group_ids, endpoint_id)
                 for gid in group_ids:
                     await self.send_single_cmd(
                         cmd=Clusters.ScenesManagement.Commands.RemoveAllScenes(groupID=gid),
                         endpoint=endpoint_id
                     )
-                LOGGER.info(f"[CLN] scenes cleared on endpoint {endpoint_id}")
+                LOGGER.info("[CLN] scenes cleared on endpoint %d", endpoint_id)
             except Exception as e:  # DUT may be unreachable or the group may have been removed by the test
-                LOGGER.warning(f"[CLN] scene removal failed on endpoint {endpoint_id}: {e}")
+                LOGGER.warning("[CLN] scene removal failed on endpoint %d: %s", endpoint_id, e)
 
     async def _purge_group_memberships(self) -> None:
         """Removes all group memberships from the DUT's group table.
@@ -611,15 +611,15 @@ class MatterBaseTest(base_test.BaseTestClass):
                                 cluster=Clusters.Groups):  # type: ignore[arg-type]
                 continue
             found_any = True
-            LOGGER.info(f"[CLN] sending RemoveAllGroups on endpoint {endpoint_id}")
+            LOGGER.info("[CLN] sending RemoveAllGroups on endpoint %d", endpoint_id)
             try:
                 await self.send_single_cmd(
                     cmd=Clusters.Groups.Commands.RemoveAllGroups(),
                     endpoint=endpoint_id
                 )
-                LOGGER.info(f"[CLN] group memberships cleared on endpoint {endpoint_id}")
+                LOGGER.info("[CLN] group memberships cleared on endpoint %d", endpoint_id)
             except Exception as e:  # DUT may be unreachable or session may have expired after a multi-fabric test
-                LOGGER.warning(f"[CLN] RemoveAllGroups failed on endpoint {endpoint_id}: {e}")
+                LOGGER.warning("[CLN] RemoveAllGroups failed on endpoint %d: %s", endpoint_id, e)
         if not found_any:
             LOGGER.info("[CLN] Groups cluster not present on any endpoint, skipping group membership cleanup")
 
@@ -635,7 +635,7 @@ class MatterBaseTest(base_test.BaseTestClass):
                                 cluster=Clusters.DoorLock):  # type: ignore[arg-type]
                 continue
             found_any = True
-            LOGGER.info(f"[CLN] clearing DoorLock users and credentials on endpoint {endpoint_id}")
+            LOGGER.info("[CLN] clearing DoorLock users and credentials on endpoint %d", endpoint_id)
             try:
                 await self.send_single_cmd(
                     cmd=Clusters.DoorLock.Commands.ClearCredential(credential=NullValue),
@@ -647,9 +647,9 @@ class MatterBaseTest(base_test.BaseTestClass):
                     endpoint=endpoint_id,
                     timedRequestTimeoutMs=1000
                 )
-                LOGGER.info(f"[CLN] DoorLock users and credentials cleared on endpoint {endpoint_id}")
+                LOGGER.info("[CLN] DoorLock users and credentials cleared on endpoint %d", endpoint_id)
             except Exception as e:  # DUT may be unreachable or DoorLock may be in a state that rejects the clear
-                LOGGER.warning(f"[CLN] DoorLock cleanup failed on endpoint {endpoint_id}: {e}")
+                LOGGER.warning("[CLN] DoorLock cleanup failed on endpoint %d: %s", endpoint_id, e)
         if not found_any:
             LOGGER.info("[CLN] DoorLock cluster not present on any endpoint, skipping DoorLock cleanup")
 
@@ -676,18 +676,18 @@ class MatterBaseTest(base_test.BaseTestClass):
                     )
                 )
                 if not provisioned:
-                    LOGGER.info(f"[CLN] no TLS endpoints provisioned on endpoint {endpoint_id}")
+                    LOGGER.info("[CLN] no TLS endpoints provisioned on endpoint %d", endpoint_id)
                     continue
-                LOGGER.info(f"[CLN] removing {len(provisioned)} TLS endpoint(s) on endpoint {endpoint_id}")
+                LOGGER.info("[CLN] removing %d TLS endpoint(s) on endpoint %d", len(provisioned), endpoint_id)
                 for tls_ep in provisioned:
                     await self.send_single_cmd(
                         cmd=Clusters.TlsClientManagement.Commands.RemoveEndpoint(endpointID=tls_ep.endpointID),
                         endpoint=endpoint_id,
                         payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD
                     )
-                LOGGER.info(f"[CLN] TLS endpoints removed on endpoint {endpoint_id}")
+                LOGGER.info("[CLN] TLS endpoints removed on endpoint %d", endpoint_id)
             except Exception as e:  # DUT may be unreachable or TLS endpoint may have already been removed
-                LOGGER.warning(f"[CLN] TLS endpoint cleanup failed on endpoint {endpoint_id}: {e}")
+                LOGGER.warning("[CLN] TLS endpoint cleanup failed on endpoint %d: %s", endpoint_id, e)
         if not found_any:
             LOGGER.info("[CLN] TlsClientManagement cluster not present on any endpoint, skipping TLS endpoint cleanup")
 
@@ -705,7 +705,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             )
             LOGGER.info("[CLN] commissioning window revoked successfully")
         except Exception as e:  # Expected when no commissioning window is open; the DUT returns an error in that case
-            LOGGER.info(f"[CLN] RevokeCommissioning skipped (likely no window open): {e}")
+            LOGGER.info("[CLN] RevokeCommissioning skipped (likely no window open): %s", e)
 
     async def _unregister_icd_clients(self) -> None:
         """Unregisters all ICD clients registered on the DUT via the default controller"""
@@ -726,7 +726,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             LOGGER.info("[CLN] no ICD clients registered, skipping")
             return
 
-        LOGGER.info(f"[CLN] unregistering {len(registered_clients)} ICD client(s)")
+        LOGGER.info("[CLN] unregistering %d ICD client(s)", len(registered_clients))
         for entry in registered_clients:
             try:
                 await self.send_single_cmd(
@@ -735,9 +735,9 @@ class MatterBaseTest(base_test.BaseTestClass):
                     ),
                     endpoint=0
                 )
-                LOGGER.info(f"[CLN] unregistered ICD client {entry.checkInNodeID:#x}")
+                LOGGER.info("[CLN] unregistered ICD client %#x", entry.checkInNodeID)
             except Exception as e:  # DUT may be unreachable or the client may have already been unregistered
-                LOGGER.warning(f"[CLN] UnregisterClient({entry.checkInNodeID:#x}) failed: {e}")
+                LOGGER.warning("[CLN] UnregisterClient(%#x) failed: %s", entry.checkInNodeID, e)
 
     def _format_summary_value(self, key: str, value: Any) -> str:
         """Format values for end-of-test summary logs."""
@@ -793,7 +793,7 @@ class MatterBaseTest(base_test.BaseTestClass):
 
         if self.is_pics_sdk_ci_only:
             test_name = self.__class__.__name__
-            LOGGER.info(f"===== PICS_SDK_CI_ONLY is enabled (True) for test '{test_name}'.")
+            LOGGER.info("===== PICS_SDK_CI_ONLY is enabled (True) for test '%s'.", test_name)
 
         LOGGER.info("===== EXECUTION FLAGS SUMMARY END =====")
 
@@ -827,10 +827,10 @@ class MatterBaseTest(base_test.BaseTestClass):
             dump_string: The data to be logged
         """
         lines = dump_string.splitlines()
-        LOGGER.info(f'{start_tag}BEGIN ({len(lines)} lines)====')
+        LOGGER.info('%sBEGIN (%s lines)====', start_tag, len(lines))
         for line in lines:
-            LOGGER.info(f'{start_tag}{line}')
-        LOGGER.info(f'{start_tag}END ====')
+            LOGGER.info('%s%s', start_tag, line)
+        LOGGER.info('%sEND ====', start_tag)
 
     def setup_test(self):
         """Set up for each individual test execution.
@@ -1344,7 +1344,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             stepnum: The step number or identifier.
             title: The descriptive title of the step.
         """
-        LOGGER.info(f'***** Test Step {stepnum} : {title}')
+        LOGGER.info('***** Test Step %s : %s', stepnum, title)
 
     def skip_step(self, step):
         """Execute and immediately mark a step as skipped.
@@ -1370,7 +1370,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             # TODO: I very much do not want to have people passing in strings here. Do we really need the expression
             #       as a string? Does it get used by the TH?
             self.runner_hook.step_skipped(name=str(num), expression="")
-        LOGGER.info(f'**** Skipping: {num}')
+        LOGGER.info('**** Skipping: %s', num)
         self.step_skipped = True
 
     def mark_all_remaining_steps_skipped(self, starting_step_number: typing.Union[int, str]) -> None:
@@ -1867,17 +1867,17 @@ class MatterBaseTest(base_test.BaseTestClass):
         # remotely via SSH from the target device.
         if dut_ip is None:
             with open(app_pipe, "w") as app_pipe_fp:
-                LOGGER.info(f"Sending out-of-band command: {command} to file: {app_pipe}")
+                LOGGER.info("Sending out-of-band command: %s to file: %s", command, app_pipe)
                 app_pipe_fp.write(json.dumps(command_dict) + "\n")
             # TODO(#31239): remove the need for sleep
             # This was tested with matter.js as being reliable enough
             time.sleep(0.05)
         else:
-            LOGGER.info(f"Using DUT IP address: {dut_ip}")
+            LOGGER.info("Using DUT IP address: %s", dut_ip)
 
             dut_uname = os.getenv('LINUX_DUT_USER')
             asserts.assert_true(dut_uname is not None, "The LINUX_DUT_USER environment variable must be set")
-            LOGGER.info(f"Using DUT user name: {dut_uname}")
+            LOGGER.info("Using DUT user name: %s", dut_uname)
             command_fixed = shlex.quote(json.dumps(command_dict))
             cmd = "echo \"%s\" | ssh %s@%s \'cat > %s\'" % (command_fixed, dut_uname, dut_ip, app_pipe)
             os.system(cmd)
@@ -2041,8 +2041,8 @@ class MatterBaseTest(base_test.BaseTestClass):
                                          placeholder=prompt_msg_placeholder,
                                          default_value=default_value)
 
-        LOGGER.info(f"========= USER PROMPT for Endpoint {endpoint_id} =========")
-        LOGGER.info(f">>> {prompt_msg.rstrip()} (press enter to confirm)")
+        LOGGER.info("========= USER PROMPT for Endpoint %s =========", endpoint_id)
+        LOGGER.info(">>> %s (press enter to confirm)", prompt_msg.rstrip())
         try:
             return input()
         except EOFError:
@@ -2092,7 +2092,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             hook_method = getattr(self.runner_hook, hook_method_name)
             hook_method(msg=prompt_msg)
 
-            LOGGER.info(f"========= USER PROMPT for {validation_name} =========")
+            LOGGER.info("========= USER PROMPT for %s =========", validation_name)
 
             try:
                 result = input()
@@ -2182,9 +2182,9 @@ class MatterBaseTest(base_test.BaseTestClass):
                     if controller.isActive:
                         try:
                             controller.ExpireSessions(self.dut_node_id)
-                            LOGGER.info(f"Expired sessions on controller with nodeId {controller.nodeId}")
+                            LOGGER.info("Expired sessions on controller with nodeId %s", controller.nodeId)
                         except ChipStackError as e:  # chipstack-ok
-                            LOGGER.warning(f"Failed to expire sessions on controller {controller.nodeId}: {e}")
+                            LOGGER.warning("Failed to expire sessions on controller %s: %s", controller.nodeId, e)
 
     async def request_device_reboot(self):
         """Request a reboot of the Device Under Test (DUT).
@@ -2224,7 +2224,7 @@ class MatterBaseTest(base_test.BaseTestClass):
                 LOGGER.info("App reboot completed successfully")
 
             except Exception as e:
-                LOGGER.error(f"Failed to reboot app: {e}")
+                LOGGER.error("Failed to reboot app: %s", e)
                 asserts.fail(f"App reboot failed: {e}")
 
     async def request_device_factory_reset(self, reset_ctrl: bool = False) -> None:

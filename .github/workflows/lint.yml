@@ -36,7 +36,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:194
+            image: ghcr.io/project-chip/chip-build:200
 
         steps:
             - name: Checkout
@@ -44,6 +44,20 @@ jobs:
 
             - name: Mark workspace as safe for Git
               run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+
+            - name: Check CodeQL action pins are consistent
+              if: always()
+              # All github/codeql-action pins (init, analyze, upload-sarif) must
+              # share one SHA; a mismatch breaks CodeQL with a CLI/config version skew.
+              run: |
+                  shas=$(grep -rhoE '^[[:space:]]*uses:[[:space:]]+github/codeql-action/[^@[:space:]]+@[0-9a-f]{40}' \
+                      .github/workflows .github/actions | grep -oE '[0-9a-f]{40}' | sort -u)
+                  if [ "$(printf '%s\n' "$shas" | grep -c .)" -gt 1 ]; then
+                      echo "::error::github/codeql-action pins diverge across workflows/actions:"
+                      printf '%s\n' "$shas"
+                      exit 1
+                  fi
+                  echo "codeql-action pinned consistently: ${shas:-<none>}"
 
             - name: Check for orphaned gn files
               if: always()

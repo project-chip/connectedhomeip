@@ -16,7 +16,7 @@
 #
 
 # Authoritative device configuration for the CMake (ESP32) build.
-# Parallel to all-devices-common/devices/enabled_devices.gni for the GN build.
+# Parallel to all-devices-common/device-factory/enabled_devices.gni for the GN build.
 #
 # Callers must define ALL_DEVICES_COMMON_DIR before including this file.
 #
@@ -35,17 +35,22 @@
 # ---------------------------------------------------------------------------
 set(ALL_DEVICES_DEVICE_SOURCES
     # keep-sorted: start
+    "${ALL_DEVICES_COMMON_DIR}/devices/aggregator/AggregatorDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/air-quality-sensor/AirQualitySensorDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/boolean-state-sensor/BooleanStateSensorDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/chime/ChimeDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/dimmable-light/DimmableLightDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/dimmable-light/impl/LoggingDimmableLightDevice.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/devices/fan/FanDevice.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/devices/fan/impl/LoggingFanDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/interface/DeviceInterface.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/interface/SingleEndpointDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/network-infrastructure-manager/NetworkInfrastructureManagerDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/occupancy-sensor/OccupancySensorDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/occupancy-sensor/impl/TogglingOccupancySensorDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/on-off-light/LoggingOnOffLightDevice.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/devices/power-source/BatteryPowerSourceDevice.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/devices/power-source/impl/DecreasingBatteryPowerSourceDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/proximity-ranger/DefaultProximityRangingDriver.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/proximity-ranger/ProximityRangerDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/proximity-ranger/RangingTechnologyController.cpp"
@@ -97,13 +102,16 @@ endif()
 #   - Update scripts/build/build/targets.py to include the new device
 foreach(_key
         # keep-sorted: start
+        aggregator
         air-quality-sensor
         chime
         contact-sensor
         dimmable-light
+        fan
         network-infrastructure-manager
         occupancy-sensor
         on-off-light
+        power-source
         proximity-ranger
         soil-sensor
         speaker
