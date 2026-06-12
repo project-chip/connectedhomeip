@@ -25,7 +25,7 @@ the Matter Device Library Specification) to determine:
 
 ---
 
-## Designing for Modularity & ReUse
+## Architectural Best Practices
 
 When implementing your device, keep these key architectural patterns in mind to
 make your code highly reusable across different platforms and easy to test:
