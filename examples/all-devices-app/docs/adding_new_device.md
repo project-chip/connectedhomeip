@@ -27,7 +27,8 @@ the Matter Device Library Specification) to determine:
 
 ## Design Principles: Generic Structure & Dependency Injection
 
-To ensure application code portability and testability, adhere strictly to these architectural patterns:
+To ensure application code portability and testability, adhere strictly to these
+architectural patterns:
 
 1. **Keep the `devices/` Directory Platform-Agnostic**:
 
@@ -383,11 +384,13 @@ For manual interactive validation, execute `chip-tool` (refer to the
 `chip-tool-testing` skill for detailed commissioning setups):
 
 1. Compile `chip-tool` from source:
+
     ```bash
     ./scripts/build/build_examples.py --target linux-x64-chip-tool-clang build
     ```
 
 2. Start your application configured with your new device:
+
     ```bash
     ./out/linux-x64-all-devices-clang/all-devices-app --device my-sensor
     ```
