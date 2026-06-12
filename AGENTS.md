@@ -103,7 +103,11 @@ Code-driven clusters are implementations in `src/app/clusters` that use
 
 ### Example Applications (Documentation Discovery)
 
-When operating on or analyzing reference applications (such as `examples/all-devices-app` or custom simulator tools), always inspect that application's dedicated `docs/` folder or `ARCHITECTURE.md` file to understand its dynamic runtime Interaction Model, specific CLI parameters, and recommended product baseline patterns before modifying or generating code.
+When operating on or analyzing reference applications (such as
+`examples/all-devices-app` or custom simulator tools), always inspect that
+application's dedicated `docs/` folder or `ARCHITECTURE.md` file to understand
+its dynamic runtime Interaction Model, specific CLI parameters, and recommended
+product baseline patterns before modifying or generating code.
 
 ## Common Commands
 

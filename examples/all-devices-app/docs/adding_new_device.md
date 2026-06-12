@@ -1,17 +1,22 @@
 # How to Add a New Simulated Device
 
-This guide shows how to implement a simulated Matter device in the `all-devices-app`.
+This guide shows how to implement a simulated Matter device in the
+`all-devices-app`.
 
-We will create an example device named `MySensor` (`--device my-sensor`), implement it, and register it in the build configurations.
+We will create an example device named `MySensor` (`--device my-sensor`),
+implement it, and register it in the build configurations.
 
 ---
 
 ## Step 1: Create the Device Implementation
 
-Create a new directory in `all-devices-common/devices/` for your implementation, e.g., `all-devices-common/devices/my-sensor/`.
+Create a new directory in `all-devices-common/devices/` for your implementation,
+e.g., `all-devices-common/devices/my-sensor/`.
 
 ### The Header (`MySensorDevice.h`)
-Derive your class from `SingleEndpointDevice` and encapsulate your Code-Driven server clusters using `LazyRegisteredServerCluster`.
+
+Derive your class from `SingleEndpointDevice` and encapsulate your Code-Driven
+server clusters using `LazyRegisteredServerCluster`.
 
 ```cpp
 #pragma once
@@ -47,7 +52,9 @@ protected:
 ```
 
 ### The Source (`MySensorDevice.cpp`)
-Implement `Register()` to create dynamic clusters and register them with the provider, and `Unregister()` to destroy them.
+
+Implement `Register()` to create dynamic clusters and register them with the
+provider, and `Unregister()` to destroy them.
 
 ```cpp
 #include "MySensorDevice.h"
@@ -108,24 +115,27 @@ Clusters::MySensorCluster & MySensorDevice::MySensorCluster()
 
 ## Step 2: Register the Capability in `DeviceFactory`
 
-To enable the `--device my-sensor` CLI flag, register its creator callback in `all-devices-common/device-factory/DeviceFactory.h`.
+To enable the `--device my-sensor` CLI flag, register its creator callback in
+`all-devices-common/device-factory/DeviceFactory.h`.
 
 1. **Include your Header**:
-   ```cpp
-   #include <devices/my-sensor/MySensorDevice.h>
-   ```
+
+    ```cpp
+    #include <devices/my-sensor/MySensorDevice.h>
+    ```
 
 2. **Add the Initialization Block** inside the `DeviceFactory()` constructor:
-   ```cpp
-   if constexpr (ALL_DEVICES_ENABLE_MY_SENSOR)
-   {
-       RegisterCreator("my-sensor", [this]() {
-           VerifyOrDie(mContext.has_value());
-           return std::make_unique<MySensorDevice>(mContext->timerDelegate);
-       });
-   }
-   ```
-   *Note: If your device requires timers, storage, or group data providers, extract them from `mContext` and inject them into your constructor.*
+    ```cpp
+    if constexpr (ALL_DEVICES_ENABLE_MY_SENSOR)
+    {
+        RegisterCreator("my-sensor", [this]() {
+            VerifyOrDie(mContext.has_value());
+            return std::make_unique<MySensorDevice>(mContext->timerDelegate);
+        });
+    }
+    ```
+    _Note: If your device requires timers, storage, or group data providers,
+    extract them from `mContext` and inject them into your constructor._
 
 ---
 
@@ -134,9 +144,12 @@ To enable the `--device my-sensor` CLI flag, register its creator callback in `a
 Register source files and macros in the build configurations.
 
 ### 1. GN Build (`all-devices-common/devices/my-sensor/BUILD.gn`)
-Create a `BUILD.gn` file for your device source set and ensure it is referenced upstream by `all-devices-common/device-factory/BUILD.gn`.
+
+Create a `BUILD.gn` file for your device source set and ensure it is referenced
+upstream by `all-devices-common/device-factory/BUILD.gn`.
 
 ### 2. CMake Configuration (`all-devices-common/device-factory/enabled_devices.cmake`)
+
 Add your `.cpp` source file to `ALL_DEVICES_DEVICE_SOURCES`:
 
 ```cmake
@@ -149,7 +162,8 @@ set(ALL_DEVICES_DEVICE_SOURCES
 )
 ```
 
-Also add your device configuration name to the activation loop inside the same file:
+Also add your device configuration name to the activation loop inside the same
+file:
 
 ```cmake
 foreach(_key
@@ -162,7 +176,9 @@ foreach(_key
 ```
 
 ### 3. GN Configuration (`all-devices-common/device-factory/enabled_devices.gni`)
-Keep the macro definition structure exactly synchronized with the CMake loop by updating `_available_devices`:
+
+Keep the macro definition structure exactly synchronized with the CMake loop by
+updating `_available_devices`:
 
 ```gni
 _available_devices = [
@@ -176,7 +192,9 @@ _available_devices = [
 ```
 
 ### 4. Macro Template (`all-devices-common/device-factory/enabled_devices_config.h.in`)
-Add the compile-time `#cmakedefine01` hook so `enabled_devices.h` exposes the boolean:
+
+Add the compile-time `#cmakedefine01` hook so `enabled_devices.h` exposes the
+boolean:
 
 ```c
 #cmakedefine01 ALL_DEVICES_ENABLE_MY_SENSOR

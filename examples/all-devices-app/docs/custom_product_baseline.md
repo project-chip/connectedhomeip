@@ -1,26 +1,30 @@
 # Custom Product Baseline Guide
 
-A production Matter device requires a fixed application architecture rather than the CLI-configured simulator approach.
+A production Matter device requires a fixed application architecture rather than
+the CLI-configured simulator approach.
 
-This guide explains adapting `all-devices-app` patterns to build a standalone product application.
+This guide explains adapting `all-devices-app` patterns to build a standalone
+product application.
 
 ---
 
 ## 1. Architectural Differences
 
-When transitioning to a product application, replace dynamic configurations with static definitions:
+When transitioning to a product application, replace dynamic configurations with
+static definitions:
 
-| Component / Layer | `all-devices-app` | Custom Application |
-| :--- | :--- | :--- |
-| **Data Model Structure** | Dynamic, parsed entirely from CLI `--device` arguments at boot. | **Static / Fixed**, defined explicitly in your application initialization code. |
-| **Capability Registry** | Uses `DeviceFactory` singleton to map string names to device creators. | **Removed**. Devices are instantiated directly as members. |
-| **Build Source List** | `enabled_devices.cmake`/`.gni` compiling all capabilities. | Only compiles the C++ device classes required by the product. |
+| Component / Layer        | `all-devices-app`                                                      | Custom Application                                                              |
+| :----------------------- | :--------------------------------------------------------------------- | :------------------------------------------------------------------------------ |
+| **Data Model Structure** | Dynamic, parsed entirely from CLI `--device` arguments at boot.        | **Static / Fixed**, defined explicitly in your application initialization code. |
+| **Capability Registry**  | Uses `DeviceFactory` singleton to map string names to device creators. | **Removed**. Devices are instantiated directly as members.                      |
+| **Build Source List**    | `enabled_devices.cmake`/`.gni` compiling all capabilities.             | Only compiles the C++ device classes required by the product.                   |
 
 ---
 
 ## 2. Recommended Project Structure
 
-For a standalone firmware product (e.g., `examples/my-custom-bulb-app/`), mirror the decoupled platform structure:
+For a standalone firmware product (e.g., `examples/my-custom-bulb-app/`), mirror
+the decoupled platform structure:
 
 ```text
 my-custom-bulb-app/
@@ -39,9 +43,11 @@ my-custom-bulb-app/
 
 ## 3. Extracting the Product Baseline Code
 
-Rather than using `DeviceFactory`, implement a `DeviceManager` to own Matter endpoints and Interaction Model clusters.
+Rather than using `DeviceFactory`, implement a `DeviceManager` to own Matter
+endpoints and Interaction Model clusters.
 
 ### The Device Manager Header (`MyBulbDeviceManager.h`)
+
 Instantiate device classes (such as `LoggingDimmableLightDevice`) directly.
 
 ```cpp
@@ -86,6 +92,7 @@ private:
 ```
 
 ### The Device Manager Source (`MyBulbDeviceManager.cpp`)
+
 Instantiate endpoints and bind them to hardcoded `EndpointId` values.
 
 ```cpp
@@ -131,7 +138,8 @@ void MyBulbDeviceManager::Shutdown()
 
 ## 4. Hooking into Application Entrypoints
 
-In the platform entrypoint (`main.cpp` or `AppTask::Init()`), initialize the static configuration after the Matter stack initializes:
+In the platform entrypoint (`main.cpp` or `AppTask::Init()`), initialize the
+static configuration after the Matter stack initializes:
 
 ```cpp
 #include "MyBulbDeviceManager.h"
@@ -158,6 +166,12 @@ void ApplicationShutdownHook()
 
 ## 5. Commercial Firmware Guidelines
 
-1. **Link Specific Devices**: In `BUILD.gn` or `CMakeLists.txt`, link directly against required device modules (e.g., `all-devices-common/devices/dimmable-light`) rather than `device-factory` to minimize RAM and Flash usage.
-2. **Hardcode Endpoint Topologies**: Hardcode fixed `EndpointId` parameters instead of using auto-incrementing IDs to ensure a fixed data model.
-3. **Persist Hardware State**: Replace simulated cluster implementations with hardware drivers (e.g., binding a PWM driver to WriteAttribute callbacks) and persist calibration data via storage delegates.
+1. **Link Specific Devices**: In `BUILD.gn` or `CMakeLists.txt`, link directly
+   against required device modules (e.g.,
+   `all-devices-common/devices/dimmable-light`) rather than `device-factory` to
+   minimize RAM and Flash usage.
+2. **Hardcode Endpoint Topologies**: Hardcode fixed `EndpointId` parameters
+   instead of using auto-incrementing IDs to ensure a fixed data model.
+3. **Persist Hardware State**: Replace simulated cluster implementations with
+   hardware drivers (e.g., binding a PWM driver to WriteAttribute callbacks) and
+   persist calibration data via storage delegates.
