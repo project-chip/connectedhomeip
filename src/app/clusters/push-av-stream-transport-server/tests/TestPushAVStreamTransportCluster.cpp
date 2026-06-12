@@ -560,18 +560,18 @@ TEST_F(TestPushAVStreamTransportServerLogic, TestValidateIncomingTransportOption
     transportOptions.expiryTime.ClearValue();
 
     // Test 1: Create video streams with 17 entries (>kMaxVideoStreams=16)
-    // Use fixed char arrays to avoid dangling pointer issues with Span
-    // Pre-allocate to prevent vector reallocation from invalidating pointers
+    // Use std::vector<std::string> with reserve to keep CharSpan lifetimes stable
     constexpr size_t kNumTestStreams = 17;
-    static char sVideoStreamNames[kNumTestStreams][16];
+    std::vector<std::string> videoStreamNames;
     std::vector<Structs::VideoStreamStruct::Type> videoStreams;
+    videoStreamNames.reserve(kNumTestStreams);
     videoStreams.reserve(kNumTestStreams);
     for (size_t i = 0; i < kNumTestStreams; i++)
     {
-        snprintf(sVideoStreamNames[i], sizeof(sVideoStreamNames[i]), "Stream%zu", i);
+        videoStreamNames.push_back("Stream" + std::to_string(i));
         Structs::VideoStreamStruct::Type videoStream;
         videoStream.videoStreamID   = static_cast<uint16_t>(i);
-        videoStream.videoStreamName = Span(sVideoStreamNames[i], strlen(sVideoStreamNames[i]));
+        videoStream.videoStreamName = CharSpan(videoStreamNames.back().data(), videoStreamNames.back().size());
         videoStreams.push_back(videoStream);
     }
 
@@ -610,15 +610,16 @@ TEST_F(TestPushAVStreamTransportServerLogic, TestValidateIncomingTransportOption
     // Test 2: Create audio streams with 17 entries (>kMaxAudioStreams=16)
     transportOptions.videoStreams.ClearValue();
 
-    static char sAudioStreamNames[kNumTestStreams][16];
+    std::vector<std::string> audioStreamNames;
     std::vector<Structs::AudioStreamStruct::Type> audioStreams;
+    audioStreamNames.reserve(kNumTestStreams);
     audioStreams.reserve(kNumTestStreams);
     for (size_t i = 0; i < kNumTestStreams; i++)
     {
-        snprintf(sAudioStreamNames[i], sizeof(sAudioStreamNames[i]), "AudioStream%zu", i);
+        audioStreamNames.push_back("AudioStream" + std::to_string(i));
         Structs::AudioStreamStruct::Type audioStream;
         audioStream.audioStreamID   = static_cast<uint16_t>(i);
-        audioStream.audioStreamName = Span(sAudioStreamNames[i], strlen(sAudioStreamNames[i]));
+        audioStream.audioStreamName = CharSpan(audioStreamNames.back().data(), audioStreamNames.back().size());
         audioStreams.push_back(audioStream);
     }
 

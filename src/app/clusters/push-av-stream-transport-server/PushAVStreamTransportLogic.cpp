@@ -392,17 +392,22 @@ Status PushAvStreamTransportServerLogic::ValidateIncomingTransportOptions(
         transportOptions.streamUsage != StreamUsageEnum::kUnknownEnumValue, Status::ConstraintError,
         ChipLogError(Zcl, "Transport Options verification from command data[ep=%d]: Invalid streamUsage ", mEndpointId));
 
-    // Check for video stream list count constraint (spec: 1 to 16)
+    // Check for video stream list count constraint (spec: max 16)
     if (transportOptions.videoStreams.HasValue())
     {
-        size_t vsCount = 0;
-        VerifyOrReturnValue(transportOptions.videoStreams.Value().ComputeSize(&vsCount) == CHIP_NO_ERROR &&
-                                vsCount <= kMaxVideoStreams,
-                            Status::ConstraintError,
+        size_t vsCount   = 0;
+        CHIP_ERROR vsErr = transportOptions.videoStreams.Value().ComputeSize(&vsCount);
+        VerifyOrReturnValue(vsErr == CHIP_NO_ERROR, Status::ConstraintError,
+                            ChipLogError(Zcl,
+                                         "Transport Options verification from command data[ep=%d]: VideoStreams list TLV "
+                                         "validation failed: %" CHIP_ERROR_FORMAT,
+                                         mEndpointId, vsErr.Format()));
+        VerifyOrReturnValue(vsCount <= kMaxVideoStreams, Status::ConstraintError,
                             ChipLogError(Zcl,
                                          "Transport Options verification from command data[ep=%d]: VideoStreams count %u "
                                          "exceeds max %u",
-                                         mEndpointId, static_cast<unsigned>(vsCount), static_cast<unsigned>(kMaxVideoStreams)));
+                                         mEndpointId, static_cast<unsigned>(vsCount),
+                                         static_cast<unsigned>(kMaxVideoStreams)));
 
         for (auto iter = transportOptions.videoStreams.Value().begin(); iter.Next();)
         {
@@ -416,17 +421,22 @@ Status PushAvStreamTransportServerLogic::ValidateIncomingTransportOptions(
         }
     }
 
-    // Check for audio stream list count constraint (spec: 1 to 16)
+    // Check for audio stream list count constraint (spec: max 16)
     if (transportOptions.audioStreams.HasValue())
     {
-        size_t asCount = 0;
-        VerifyOrReturnValue(transportOptions.audioStreams.Value().ComputeSize(&asCount) == CHIP_NO_ERROR &&
-                                asCount <= kMaxAudioStreams,
-                            Status::ConstraintError,
+        size_t asCount   = 0;
+        CHIP_ERROR asErr = transportOptions.audioStreams.Value().ComputeSize(&asCount);
+        VerifyOrReturnValue(asErr == CHIP_NO_ERROR, Status::ConstraintError,
+                            ChipLogError(Zcl,
+                                         "Transport Options verification from command data[ep=%d]: AudioStreams list TLV "
+                                         "validation failed: %" CHIP_ERROR_FORMAT,
+                                         mEndpointId, asErr.Format()));
+        VerifyOrReturnValue(asCount <= kMaxAudioStreams, Status::ConstraintError,
                             ChipLogError(Zcl,
                                          "Transport Options verification from command data[ep=%d]: AudioStreams count %u "
                                          "exceeds max %u",
-                                         mEndpointId, static_cast<unsigned>(asCount), static_cast<unsigned>(kMaxAudioStreams)));
+                                         mEndpointId, static_cast<unsigned>(asCount),
+                                         static_cast<unsigned>(kMaxAudioStreams)));
 
         for (auto iter = transportOptions.audioStreams.Value().begin(); iter.Next();)
         {
