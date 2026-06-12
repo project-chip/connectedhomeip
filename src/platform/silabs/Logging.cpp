@@ -357,7 +357,7 @@ extern "C" void sli_zigbee_af_print_internal_var_arg(uint16_t area, uint32_t log
 
         char buffer[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE];
         int chWritten = vsnprintf(buffer, sizeof(buffer), formatString, ap);
-        if (chWritten <0)
+        if (chWritten < 0)
         {
             uartConsoleWrite("ZB CLI response too large", sizeof("ZB CLI response too large"));
         }
