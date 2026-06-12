@@ -37,41 +37,51 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-asr:194
+            image: ghcr.io/project-chip/chip-build-asr:200
             options: --user root
 
         steps:
             - name: Checkout
-              uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+              uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
                 platform: asr
-            - name: Build all ASR582X examples (part1)
+            - name: Build all-clusters-app (PR)
+              if: github.event_name == 'pull_request'
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
                         --target asr-asr582x-all-clusters \
-                        --target asr-asr582x-all-clusters-minimal \
-                        --target asr-asr582x-lighting-ota \
-                        --target asr-asr582x-light-switch-shell \
-                        --target asr-asr582x-lock-no_logging \
-                        --target asr-asr582x-ota-requestor \
                         build \
                      "
-            - name: Clean out directory (make some room for more compiles)
-              run: rm -rf out/
-            - name: Build all ASR582X examples (part2)
+                  rm -rf out/
+            - name: Build all ASR582X examples (master)
+              if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+              shell: bash
               run: |
-                  ./scripts/run_in_build_env.sh \
-                     "./scripts/build/build_examples.py \
-                        --target asr-asr582x-bridge-factory \
-                        --target asr-asr582x-temperature-measurement-rotating_id \
-                        --target asr-asr582x-thermostat-rio \
-                        --target asr-asr582x-dishwasher \
-                        --target asr-asr582x-refrigerator \
-                        build \
-                     "
+                  targets=(
+                      asr-asr582x-all-clusters
+                      asr-asr582x-all-clusters-minimal
+                      asr-asr582x-lighting-ota
+                      asr-asr582x-light-switch-shell
+                      asr-asr582x-lock-no_logging
+                      asr-asr582x-ota-requestor
+                      asr-asr582x-bridge-factory
+                      asr-asr582x-temperature-measurement-rotating_id
+                      asr-asr582x-thermostat-rio
+                      asr-asr582x-dishwasher
+                      asr-asr582x-refrigerator
+                  )
+                  for target in "${targets[@]}"; do
+                      echo "=== Building $target ==="
+                      ./scripts/run_in_build_env.sh \
+                         "./scripts/build/build_examples.py \
+                            --target $target \
+                            build \
+                         "
+                      rm -rf out/
+                  done
             - name: Notify Slack on Failure
               if: failure()
               uses: ./.github/actions/notify-slack-failure

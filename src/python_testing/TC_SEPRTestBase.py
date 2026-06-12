@@ -115,7 +115,9 @@ class CommodityPriceTestBaseHelper:
         else:
             asserts.assert_is_none(struct.description)
 
-        log.info(f"PRICE: from: {self.convert_epoch_s_to_time(struct.periodStart, tz=None)} to {self.convert_epoch_s_to_time(struct.periodEnd, tz=None)} : Price: {struct.price} / PriceLevel: {struct.priceLevel} / Description: {struct.description}")
+        log.info("PRICE: from: %s to %s : Price: %s / PriceLevel: %s / Description: %s",
+                 self.convert_epoch_s_to_time(struct.periodStart, tz=None), self.convert_epoch_s_to_time(struct.periodEnd, tz=None),
+                 struct.price, struct.priceLevel, struct.description)
 
         if details & cluster.Bitmaps.CommodityPriceDetailBitmap.kComponents:
             if struct.components is not None:
@@ -148,8 +150,8 @@ class CommodityPriceTestBaseHelper:
         if struct.tariffComponentID is not None:
             matter_asserts.assert_valid_uint32(struct.tariffComponentID, 'TariffComponentID')
 
-        log.info(
-            f"  Component: price: {struct.price} source: {struct.source}, desc: {struct.description} tariffComponentID: {struct.tariffComponentID}")
+        log.info("  Component: price: %s source: %s, desc: %s tariffComponentID: %s",
+                 struct.price, struct.source, struct.description, struct.tariffComponentID)
 
     async def send_get_detailed_price_request(self, endpoint=None,
                                               details: Clusters.CommodityPrice.Bitmaps =

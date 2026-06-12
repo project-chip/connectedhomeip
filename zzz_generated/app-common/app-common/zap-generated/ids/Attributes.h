@@ -27,9 +27,11 @@
 #include <clusters/AdministratorCommissioning/AttributeIds.h>
 #include <clusters/AirQuality/AttributeIds.h>
 #include <clusters/AmbientContextSensing/AttributeIds.h>
+#include <clusters/AmbientSensingUnion/AttributeIds.h>
 #include <clusters/ApplicationBasic/AttributeIds.h>
 #include <clusters/ApplicationLauncher/AttributeIds.h>
 #include <clusters/AudioOutput/AttributeIds.h>
+#include <clusters/AvAnalysis/AttributeIds.h>
 #include <clusters/BallastConfiguration/AttributeIds.h>
 #include <clusters/BasicInformation/AttributeIds.h>
 #include <clusters/Binding/AttributeIds.h>
@@ -61,6 +63,7 @@
 #include <clusters/DoorLock/AttributeIds.h>
 #include <clusters/DynamicLighting/AttributeIds.h>
 #include <clusters/EcosystemInformation/AttributeIds.h>
+#include <clusters/ElectricalAlarm/AttributeIds.h>
 #include <clusters/ElectricalDistribution/AttributeIds.h>
 #include <clusters/ElectricalEnergyMeasurement/AttributeIds.h>
 #include <clusters/ElectricalGridConditions/AttributeIds.h>
@@ -144,6 +147,7 @@
 #include <clusters/Switch/AttributeIds.h>
 #include <clusters/TargetNavigator/AttributeIds.h>
 #include <clusters/TemperatureControl/AttributeIds.h>
+#include <clusters/TemperatureControlledCabinetTopology/AttributeIds.h>
 #include <clusters/TemperatureMeasurement/AttributeIds.h>
 #include <clusters/Thermostat/AttributeIds.h>
 #include <clusters/ThermostatUserInterfaceConfiguration/AttributeIds.h>
