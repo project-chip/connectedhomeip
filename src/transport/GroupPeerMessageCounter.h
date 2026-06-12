@@ -52,8 +52,8 @@ public:
 
     // The calls to Find/Add/Remove GroupSender entries for the GroupFabric are made through the GroupPeerTable.
     // The group peer table implements the Find/Add/Remove logic by treating these arrays as LRU caches,
-    // and handles the movemenet of GroupSender elements to maintain order accordingly. The most recently used 
-    // GroupSender entry will be at index 0 (and least recently used will be at the end of the list). 
+    // and handles the movemenet of GroupSender elements to maintain order accordingly. The most recently used
+    // GroupSender entry will be at index 0 (and least recently used will be at the end of the list).
     GroupSender mDataGroupSenders[CHIP_CONFIG_MAX_GROUP_DATA_PEERS];
     GroupSender mControlGroupSenders[CHIP_CONFIG_MAX_GROUP_CONTROL_PEERS];
 };

@@ -122,13 +122,13 @@ TEST(TestGroupMessageCounter, AddPeerTest)
         EXPECT_EQ(mGroupPeerMsgCounter.GetNodeIdAt(0, i, false), peerNodeId + (CHIP_CONFIG_MAX_GROUP_DATA_PEERS - 1 - i));
     }
 
-    // Add (CHIP_CONFIG_MAX_GROUP_DATA_PEERS + 1)th peer (should trigger eviction of 1234, 
+    // Add (CHIP_CONFIG_MAX_GROUP_DATA_PEERS + 1)th peer (should trigger eviction of 1234,
     // which was at index CHIP_CONFIG_MAX_GROUP_DATA_PEERS - 1)
     NodeId newPeerNodeId = peerNodeId + CHIP_CONFIG_MAX_GROUP_DATA_PEERS;
-    err = mGroupPeerMsgCounter.FindOrAddPeer(fabricIndex, newPeerNodeId, false, counter);
+    err                  = mGroupPeerMsgCounter.FindOrAddPeer(fabricIndex, newPeerNodeId, false, counter);
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
-    // Verify the entire list ordering after eviction (newPeerNodeId at index 0, down to 
+    // Verify the entire list ordering after eviction (newPeerNodeId at index 0, down to
     // 1235 at index CHIP_CONFIG_MAX_GROUP_DATA_PEERS - 1)
     for (uint8_t i = 0; i < CHIP_CONFIG_MAX_GROUP_DATA_PEERS; i++)
     {
@@ -352,7 +352,7 @@ TEST(TestGroupMessageCounter, ReorderPeerRemovalTest)
     err = mGroupPeerMsgCounter.FindOrAddPeer(2, 8, false, counter);
 
     // Initial order (MRU at 0): 8, 7, 6, 5, 4, 3, 2, 1
-    
+
     // Remove node id 7 (index 1). Shift left.
     // New order: 8, 6, 5, 4, 3, 2, 1
     err = mGroupPeerMsgCounter.RemovePeer(2, 7, false);

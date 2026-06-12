@@ -36,7 +36,7 @@ void ShiftAndInsert(GroupSender * list, uint32_t oldIndex, GroupSender & newEntr
     // The element at oldIndex is being overwritten, so we must destroy it first.
     list[oldIndex].~GroupSender();
 
-    // Iterate through and shift all elements before oldIndex 1 to the right. 
+    // Iterate through and shift all elements before oldIndex 1 to the right.
     // This will free up an empty space at index 0 to add the newEntry.
     for (uint32_t j = oldIndex; j > 0; j--)
     {
@@ -44,13 +44,13 @@ void ShiftAndInsert(GroupSender * list, uint32_t oldIndex, GroupSender & newEntr
         list[j - 1].~GroupSender();
     }
 
-    // The new entry being added is now the most recently used GroupSender entry. 
+    // The new entry being added is now the most recently used GroupSender entry.
     // Most recently used elements will always be at the front of the list.
     new (&list[0]) GroupSender(std::move(newEntry));
 }
 
 CHIP_ERROR FindOrAddPeerFabricFound(GroupSender * list, uint32_t maxLimit, uint8_t & peerCount, NodeId nodeId,
-                             chip::Transport::PeerMessageCounter *& counter, const char * peerType)
+                                    chip::Transport::PeerMessageCounter *& counter, const char * peerType)
 {
     // Search for peer
     for (uint32_t i = 0; i < peerCount; i++)
@@ -81,8 +81,8 @@ CHIP_ERROR FindOrAddPeerFabricFound(GroupSender * list, uint32_t maxLimit, uint8
     else
     {
         // Evict LRU
-        ChipLogProgress(SecureChannel, "GroupPeerTable: Evicting %s peer " ChipLogFormatX64 " due to table being full",
-                        peerType, ChipLogValueX64(list[maxLimit - 1].mNodeId));
+        ChipLogProgress(SecureChannel, "GroupPeerTable: Evicting %s peer " ChipLogFormatX64 " due to table being full", peerType,
+                        ChipLogValueX64(list[maxLimit - 1].mNodeId));
         ShiftAndInsert(list, maxLimit - 1, temp);
     }
     counter = &(list[0].msgCounter);
@@ -126,10 +126,10 @@ CHIP_ERROR GroupPeerTable::FindOrAddPeer(FabricIndex fabricIndex, NodeId nodeId,
             if (isControl)
             {
                 return FindOrAddPeerFabricFound(groupFabric.mControlGroupSenders, CHIP_CONFIG_MAX_GROUP_CONTROL_PEERS,
-                                         groupFabric.mControlPeerCount, nodeId, counter, "control");
+                                                groupFabric.mControlPeerCount, nodeId, counter, "control");
             }
             return FindOrAddPeerFabricFound(groupFabric.mDataGroupSenders, CHIP_CONFIG_MAX_GROUP_DATA_PEERS,
-                                        groupFabric.mDataPeerCount, nodeId, counter, "data");
+                                            groupFabric.mDataPeerCount, nodeId, counter, "data");
         }
     }
 
@@ -243,9 +243,9 @@ void GroupPeerTable::CompactPeers(GroupSender * list, uint32_t size)
     {
         // readIndex and writeIndex will iterate together, until a point
         // is found where the node id at the read index is kUndefinedNodeId. This
-        // means the GroupSender entry at this index has been removed (likely by 
-        // RemoveSpecificPeer()). When this removed entry index is found, the read 
-        // index will be 1 ahead of the write index, and then all entries 
+        // means the GroupSender entry at this index has been removed (likely by
+        // RemoveSpecificPeer()). When this removed entry index is found, the read
+        // index will be 1 ahead of the write index, and then all entries
         // that follow will be shifted down the list (moving 1 to the left).
         if (list[readIndex].mNodeId != kUndefinedNodeId)
         {
@@ -258,7 +258,7 @@ void GroupPeerTable::CompactPeers(GroupSender * list, uint32_t size)
         }
     }
 
-    // Cleanup old entries at the end of the list. These were entries that were 
+    // Cleanup old entries at the end of the list. These were entries that were
     // moved further up in the list, and the entries from the writeIndex onwards
     // are in an unspecifed state.
     for (uint32_t i = writeIndex; i < size; i++)
