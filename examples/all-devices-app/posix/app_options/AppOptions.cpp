@@ -208,7 +208,8 @@ OptionSet * AppOptions::GetOptions()
         result.append("*");
         result.append(">");
         result += "\n";
-        result += "       Select the device to start up. Format: 'type' or 'type:endpoint' or 'type:endpoint,parent=parentId[,bridged]'.\n";
+        result += "       Select the device to start up. Format: 'type' or 'type:endpoint' or "
+                  "'type:endpoint,parent=parentId[,bridged]'.\n";
         result += "       Use '*' to select all supported leaf devices (e.g. --device \"*:1\").\n";
         result += "       Use 'bridged' to automatically create a parent bridged-node endpoint for the device.\n";
         result += "       Can be specified multiple times for multi-endpoint devices.\n";

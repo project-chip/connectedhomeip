@@ -373,44 +373,34 @@ TEST_F(TestDeviceTypeParser, ExpandWildcards_WildcardBridged)
 
 TEST_F(TestDeviceTypeParser, ValidateConfig_Valid)
 {
-    std::vector<DeviceTypeParser::Entry> entries = {
-        { .type = "aggregator", .endpoint = 1, .parentId = kInvalidEndpointId },
-        { .type = "bridged-node", .endpoint = 2, .parentId = 1 },
-        { .type = "chime", .endpoint = 3, .parentId = 2 }
-    };
+    std::vector<DeviceTypeParser::Entry> entries = { { .type = "aggregator", .endpoint = 1, .parentId = kInvalidEndpointId },
+                                                     { .type = "bridged-node", .endpoint = 2, .parentId = 1 },
+                                                     { .type = "chime", .endpoint = 3, .parentId = 2 } };
     EXPECT_EQ(DeviceTypeParser::ValidateConfig(entries), CHIP_NO_ERROR);
 }
 
 TEST_F(TestDeviceTypeParser, ValidateConfig_DuplicateEndpoints)
 {
-    std::vector<DeviceTypeParser::Entry> entries = {
-        { .type = "chime", .endpoint = 1, .parentId = kInvalidEndpointId },
-        { .type = "speaker", .endpoint = 1, .parentId = kInvalidEndpointId }
-    };
+    std::vector<DeviceTypeParser::Entry> entries = { { .type = "chime", .endpoint = 1, .parentId = kInvalidEndpointId },
+                                                     { .type = "speaker", .endpoint = 1, .parentId = kInvalidEndpointId } };
     EXPECT_NE(DeviceTypeParser::ValidateConfig(entries), CHIP_NO_ERROR);
 }
 
 TEST_F(TestDeviceTypeParser, ValidateConfig_BridgedNodeNoParent)
 {
-    std::vector<DeviceTypeParser::Entry> entries = {
-        { .type = "bridged-node", .endpoint = 2, .parentId = kInvalidEndpointId }
-    };
+    std::vector<DeviceTypeParser::Entry> entries = { { .type = "bridged-node", .endpoint = 2, .parentId = kInvalidEndpointId } };
     EXPECT_NE(DeviceTypeParser::ValidateConfig(entries), CHIP_NO_ERROR);
 }
 
 TEST_F(TestDeviceTypeParser, ValidateConfig_ParentDoesNotExist)
 {
-    std::vector<DeviceTypeParser::Entry> entries = {
-        { .type = "chime", .endpoint = 2, .parentId = 1 }
-    };
+    std::vector<DeviceTypeParser::Entry> entries = { { .type = "chime", .endpoint = 2, .parentId = 1 } };
     EXPECT_NE(DeviceTypeParser::ValidateConfig(entries), CHIP_NO_ERROR);
 }
 
 TEST_F(TestDeviceTypeParser, ValidateConfig_BridgedNodeParentNotAggregator)
 {
-    std::vector<DeviceTypeParser::Entry> entries = {
-        { .type = "chime", .endpoint = 1, .parentId = kInvalidEndpointId },
-        { .type = "bridged-node", .endpoint = 2, .parentId = 1 }
-    };
+    std::vector<DeviceTypeParser::Entry> entries = { { .type = "chime", .endpoint = 1, .parentId = kInvalidEndpointId },
+                                                     { .type = "bridged-node", .endpoint = 2, .parentId = 1 } };
     EXPECT_NE(DeviceTypeParser::ValidateConfig(entries), CHIP_NO_ERROR);
 }

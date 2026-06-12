@@ -89,12 +89,12 @@ bool DeviceTypeParser::ParseDeviceTypeEntry(const char * value, Entry & entry)
     if (comma != nullptr)
     {
         std::string optionsStr = comma + 1;
-        size_t pos = 0;
+        size_t pos             = 0;
         while (pos < optionsStr.size())
         {
             size_t nextComma = optionsStr.find(',', pos);
-            std::string opt = (nextComma == std::string::npos) ? optionsStr.substr(pos) : optionsStr.substr(pos, nextComma - pos);
-            pos = (nextComma == std::string::npos) ? optionsStr.size() : nextComma + 1;
+            std::string opt  = (nextComma == std::string::npos) ? optionsStr.substr(pos) : optionsStr.substr(pos, nextComma - pos);
+            pos              = (nextComma == std::string::npos) ? optionsStr.size() : nextComma + 1;
 
             if (opt.empty())
             {
