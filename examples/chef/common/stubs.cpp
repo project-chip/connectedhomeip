@@ -824,10 +824,3 @@ void ApplicationShutdown()
 // No-op function, used to force linking this file,
 // instead of the weak functions from other files
 extern "C" void chef_include_stubs_impl(void) {}
-
-#ifdef MATTER_DM_PLUGIN_SMOKE_CO_ALARM_SERVER
-// SmokeCoAlarm is a code-driven cluster; init happens via the data-model registry,
-// not MATTER_PLUGINS_INIT. These empty stubs satisfy the codegen-emitted symbols.
-void MatterSmokeCoAlarmPluginServerInitCallback() {}
-void MatterSmokeCoAlarmPluginServerShutdownCallback() {}
-#endif
