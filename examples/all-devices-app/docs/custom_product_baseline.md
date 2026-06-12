@@ -149,7 +149,7 @@ void ApplicationResumedHook(PersistentStorageDelegate & storageDelegate)
 {
     // Fetch SDK core dependencies
     auto & groupDataProvider = *Credentials::GetGroupDataProvider();
-    auto & fabricTable       = Server::Instance().GetFabricTable();
+    auto & fabricTable       = Server::GetInstance().GetFabricTable();
 
     // Boot our optimized custom production device topology
     VerifyOrDie(chip::app::MyBulbDeviceManager::Instance().Init(storageDelegate, groupDataProvider, fabricTable) == CHIP_NO_ERROR);
