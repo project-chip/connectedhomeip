@@ -143,6 +143,17 @@ device types. When an endpoint is specified, it represents the starting number.
     ./out/linux-x64-all-devices-boringssl/all-devices-app --device aggregator:1 --device "*:2,parent=1"
     ```
 
+-   **Compound Bridged Wildcard:** Start all devices sequentially from endpoint 2, but wrap each one in a `bridged-node` parent endpoint.
+    ```bash
+    ./out/linux-x64-all-devices-boringssl/all-devices-app --device aggregator:1 --device "*:2,parent=1,bridged"
+    ```
+    This automatically generates:
+    - `bridged-node:2,parent=1` (parent of device 1)
+    - `air-quality-sensor:3,parent=2`
+    - `bridged-node:4,parent=1` (parent of device 2)
+    - `chime:5,parent=4`
+    - ...
+
 ## Testing with chip-tool
 
 You can use `chip-tool` as a controller to interact with the `all-devices-app`.
