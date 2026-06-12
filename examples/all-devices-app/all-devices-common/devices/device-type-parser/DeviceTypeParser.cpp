@@ -129,8 +129,7 @@ const std::vector<DeviceTypeParser::Entry> & DeviceTypeParser::GetDeviceTypeEntr
 
 void DeviceTypeParser::ExpandWildcards(const std::vector<std::string> & wildcardExpandedTypes)
 {
-    if (std::none_of(mDeviceTypeEntries.begin(), mDeviceTypeEntries.end(),
-                     [](const auto & entry) { return entry.type == "*"; }))
+    if (std::none_of(mDeviceTypeEntries.begin(), mDeviceTypeEntries.end(), [](const auto & entry) { return entry.type == "*"; }))
     {
         return;
     }
