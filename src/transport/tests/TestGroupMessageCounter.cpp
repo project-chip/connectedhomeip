@@ -117,7 +117,7 @@ TEST(TestGroupMessageCounter, AddPeerTest)
     }
 
     // Verify they are in the table in the correct LRU order (most recent at index 0)
-    for (uint32_t i = 0; i < CHIP_CONFIG_MAX_GROUP_DATA_PEERS; i++)
+    for (uint8_t i = 0; i < CHIP_CONFIG_MAX_GROUP_DATA_PEERS; i++)
     {
         EXPECT_EQ(mGroupPeerMsgCounter.GetNodeIdAt(0, i, false), peerNodeId + (CHIP_CONFIG_MAX_GROUP_DATA_PEERS - 1 - i));
     }
@@ -130,13 +130,13 @@ TEST(TestGroupMessageCounter, AddPeerTest)
 
     // Verify the entire list ordering after eviction (newPeerNodeId at index 0, down to 
     // 1235 at index CHIP_CONFIG_MAX_GROUP_DATA_PEERS - 1)
-    for (uint32_t i = 0; i < CHIP_CONFIG_MAX_GROUP_DATA_PEERS; i++)
+    for (uint8_t i = 0; i < CHIP_CONFIG_MAX_GROUP_DATA_PEERS; i++)
     {
         EXPECT_EQ(mGroupPeerMsgCounter.GetNodeIdAt(0, i, false), newPeerNodeId - i);
     }
 
     // Test fabric limit (fabrics do not evict, so this should still fail)
-    int fabricCount = 1;
+    FabricIndex fabricCount = 1;
     do
     {
         fabricCount++;
