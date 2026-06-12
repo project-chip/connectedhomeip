@@ -116,6 +116,7 @@ You can use the wildcard `*` to automatically instantiate all supported leaf
 device types. When an endpoint is specified, it represents the starting number.
 
 -   **Standard Wildcard:** Start all devices from endpoint 1 sequentially.
+
     ```bash
     ./out/linux-x64-all-devices-boringssl/all-devices-app --device *:1
     ```
