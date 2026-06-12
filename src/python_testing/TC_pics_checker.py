@@ -98,9 +98,9 @@ class TC_PICS_Checker(BasicCompositionTests):
                 TestStep(7, "Ensure that the PICS_SDK_CI_ONLY PICS does not appear in the PICS file", "CI PICS is not present"),
                 TestStep(8, "If the device has a root node device type on this endpoint, ensure the MCORE.ROLE.COMMISSIONEE PICS code is set",
                          "PICS is set if root node is present"),
-                TestStep(9, "If the device has any onboarding payload (MCORE.DD.QR or MCORE.DD.NFC), it has the manual pairing code PICS set (MCORE.DD.MANUAL_PC)",
-                         "Manual pairing code PICS is set if QR or NFC is set"),
-                TestStep(10, "When --endpoint is 0: for every Base/MCORE PICS code derivable from the wildcard read (bridge role, OTA requestor/provider, multi-endpoint groups, MCORE.ROLE.COMMISSIONEE, MCORE.IDM.S), ensure each code's value in the PICS file matches what the device protocol reports. Skipped on other endpoints since Base/MCORE codes are conventionally declared only in EP0's PICS slice.",
+                TestStep(9, "When endpoint is 0: if the device has any onboarding payload (MCORE.DD.QR or MCORE.DD.NFC), it has the manual pairing code PICS set (MCORE.DD.MANUAL_PC). Skipped on other endpoints since DD PICS codes are conventionally declared only in EP0's PICS slice.",
+                         "Manual pairing code PICS is set if QR or NFC is set on EP0; skipped elsewhere."),
+                TestStep(10, "When endpoint is 0: for every Base/MCORE PICS code derivable from the wildcard read (bridge role, OTA requestor/provider, multi-endpoint groups, MCORE.ROLE.COMMISSIONEE, MCORE.IDM.S), ensure each code's value in the PICS file matches what the device protocol reports. Skipped on other endpoints since Base/MCORE codes are conventionally declared only in EP0's PICS slice.",
                          "Base/MCORE PICS exactly match the device on EP0; skipped elsewhere."),
                 TestStep(11, "If --bool-arg assert_mandatory_events is set: for every event the spec marks MANDATORY for clusters on this endpoint (excluding OTA clusters, which appear to have no PICS codes today), ensure the corresponding event PICS code (cluster.S.E<id>) is marked in the PICS file. Skipped by default.",
                          "Event PICS match spec conformance for clusters on this endpoint."),
@@ -208,14 +208,20 @@ class TC_PICS_Checker(BasicCompositionTests):
             self.success = False
 
         self.step(9)
-        # If the device supports a QR code or NFC code, it must also support a manual code per spec 5.7.6
-        # The only way a commissionable device can opt not to have these is if it is an in-field upgrade,
-        # in which case, there is no packaged onboarding code of any type. Subsequent codes generated from
-        # opening a commissioning window are tested as a part of the administrator commissioning test.
-        if (self.check_pics('MCORE.DD.QR') or self.check_pics('MCORE.DD.NFC')) and not self.check_pics('MCORE.DD.MANUAL_PC'):
-            self.record_error("PICS check", location=UnknownProblemLocation(),
-                              problem="Devices that support onboarding payloads must support a manual code")
-            self.success = False
+        # DD PICS codes are device-wide but conventionally only declared in EP0's PICS slice.
+        # Skip on other endpoints to avoid false-positives on PICS files that correctly omit
+        # MCORE.DD from non-EP0 endpoint slices.
+        if self.endpoint_id == 0:
+            # If the device supports a QR code or NFC code, it must also support a manual code per spec 5.7.6
+            # The only way a commissionable device can opt not to have these is if it is an in-field upgrade,
+            # in which case, there is no packaged onboarding code of any type. Subsequent codes generated from
+            # opening a commissioning window are tested as a part of the administrator commissioning test.
+            if (self.check_pics('MCORE.DD.QR') or self.check_pics('MCORE.DD.NFC')) and not self.check_pics('MCORE.DD.MANUAL_PC'):
+                self.record_error("PICS check", location=UnknownProblemLocation(),
+                                  problem="Devices that support onboarding payloads must support a manual code")
+                self.success = False
+        else:
+            self.mark_current_step_skipped()
 
         # Derive base facts once for Steps 10 and 11. Helper is wildcard-only,
         # so it's safe to run regardless of --endpoint.
