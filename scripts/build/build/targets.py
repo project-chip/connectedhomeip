@@ -44,6 +44,7 @@ from .target import BuildTarget, TargetPart
 # in all-devices: examples/all-devices-app/all-devices-common/devices
 _ALL_DEVICES_APP_DEVICES = [
     # keep-sorted: start
+    'aggregator',
     'chime',
     'contact-sensor',
     'dimmable-light',
