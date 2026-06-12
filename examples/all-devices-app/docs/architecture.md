@@ -74,7 +74,8 @@ These directories contain hardware-specific or OS-specific drivers, entrypoint
 
 ### The Device Interface
 
-All devices in the application implement `DeviceInterface` and its core base class, `SingleEndpointDevice`.
+All devices in the application implement `DeviceInterface` and its core base
+class, `SingleEndpointDevice`.
 
 ```mermaid
 classDiagram
