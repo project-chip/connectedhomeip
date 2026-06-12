@@ -56,6 +56,8 @@ public:
     CHIP_ERROR WiFiCredentialsNeeded(chip::EndpointId endpoint) override;
     CHIP_ERROR ThreadCredentialsNeeded(chip::EndpointId endpoint) override;
 
+    void OnInitialPhaseComplete(chip::PeerId peerId, chip::Transport::Type transportType, bool isUnpowered) override;
+
     // Other helper methods
     void SetDeviceNodeID(chip::NodeId deviceNodeId);
 

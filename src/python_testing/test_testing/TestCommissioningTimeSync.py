@@ -33,11 +33,11 @@ log = logging.getLogger(__name__)
 # so this is hardcoded.
 # I realize this is dodgy, not sure how to cross the enum from c++ to python cleanly
 kCheckForMatchingFabric = 3
-kConfigureUTCTime = 6
-kConfigureTimeZone = 7
-kConfigureDSTOffset = 8
-kConfigureDefaultNTP = 9
-kConfigureTrustedTimeSource = 19
+kConfigureUTCTime = 5
+kConfigureTimeZone = 6
+kConfigureDSTOffset = 7
+kConfigureDefaultNTP = 8
+kConfigureTrustedTimeSource = 20
 
 
 class TestCommissioningTimeSync(MatterBaseTest):
