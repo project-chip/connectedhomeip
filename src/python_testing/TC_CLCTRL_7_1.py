@@ -256,7 +256,7 @@ class TC_CLCTRL_7_1(MatterBaseTest):
         self.step("2c")
 
         log.info("Checking if TestEventTrigger attribute is enabled")
-        self.check_test_event_triggers_enabled()
+        await self.check_test_event_triggers_enabled()
 
         # STEP 2d: TH reads from the DUT the (0xFFFB) AttributeList attribute
         self.step("2d")
