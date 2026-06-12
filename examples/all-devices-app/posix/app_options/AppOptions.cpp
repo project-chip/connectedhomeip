@@ -240,10 +240,11 @@ OptionSet * AppOptions::GetOptions()
         result.append("*");
         result.append(">");
         result += "\n";
-        result += "       Select the device to start up. Format: 'type' or 'type:endpoint' or 'type:endpoint,parent=parentId'.\n";
+        result += "       Select the device to start up. Format: 'type' or 'type:endpoint' or 'type:endpoint,parent=parentId[,bridged]'.\n";
         result += "       Use '*' to select all supported leaf devices (e.g. --device \"*:1\").\n";
+        result += "       Use 'bridged' to automatically create a parent bridged-node endpoint for the device.\n";
         result += "       Can be specified multiple times for multi-endpoint devices.\n";
-        result += "       Example: --device chime:1 --device speaker:2,parent=1\n\n";
+        result += "       Example: --device aggregator:1 --device \"chime:2,parent=1,bridged\"\n\n";
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
         result += "  --ble-controller <number>\n";
