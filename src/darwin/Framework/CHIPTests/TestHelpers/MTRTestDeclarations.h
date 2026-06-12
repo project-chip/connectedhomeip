@@ -54,6 +54,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (void)forceLocalhostAdvertisingOnly;
 - (void)removeDevice:(MTRDevice *)device;
 - (void)syncRunOnWorkQueue:(void (^)(void))block error:(NSError * __autoreleasing *)error;
+- (void)asyncDispatchToMatterQueue:(dispatch_block_t)block errorHandler:(nullable MTRDeviceErrorHandler)errorHandler;
 @property (nonatomic, readonly, nullable) id<MTRDeviceControllerDataStoreAttributeStoreMethods> controllerDataStore;
 @property (nonatomic, readonly) MTRAsyncWorkQueue<MTRDeviceController *> * concurrentSubscriptionPool;
 @end
@@ -103,6 +104,11 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL)unitTestClusterHasBeenPersisted:(MTRClusterPath *)path;
 - (NSUInteger)unitTestAttributeCount;
 - (void)unitTestSyncRunOnDeviceQueue:(dispatch_block_t)block;
+- (void)unitTestSetLastSubscriptionIPAddressFromString:(NSString * _Nullable)addressString;
+- (BOOL)unitTestHasCachedLastSubscriptionIPAddress;
+- (void)unitTestReenterEnsureSubscriptionForExistingDelegatesUnderLock:(NSString *)reason;
+- (MTRDeviceFirstThreadSubscribeFlags)unitTestSnapshotFirstThreadSubscribeFlags;
+- (uint64_t)unitTestFirstThreadSubscribeWatchdogGeneration;
 @end
 #endif
 
