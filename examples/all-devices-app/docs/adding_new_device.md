@@ -282,9 +282,6 @@ foreach(_key
 
 ### 4. Device Factory Dependency (`all-devices-common/device-factory/BUILD.gn`)
 
-<<<<<<< conflict 2 of 3 +++++++ lntxykqw 2a6a8351 "Fix misspell CI check
-failures in all-devices-app documentation" (rebase destination)
-
 Add your new device target to the `public_deps` of `device-factory` (keep
 sorted):
 
@@ -298,9 +295,6 @@ sorted):
 ````
 
 ### 5. Platform Executable Dependencies (`BUILD.gn` files)
-
-<<<<<<< conflict 3 of 3 +++++++ lntxykqw 2a6a8351 "Fix misspell CI check
-failures in all-devices-app documentation" (rebase destination)
 
 Add the target dependency to the relevant platform executable targets where
 `all-devices-app` is built (e.g., `examples/all-devices-app/posix/BUILD.gn`, and
