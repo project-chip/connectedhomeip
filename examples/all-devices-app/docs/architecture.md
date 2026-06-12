@@ -82,8 +82,8 @@ specialization, `SingleEndpointDevice`.
 classDiagram
     class DeviceInterface {
         <<interface>>
-        +Init(EndpointId parentId)* CHIP_ERROR
-        +Shutdown()*
+        +Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointId parentId)* CHIP_ERROR
+        +Unregister(CodeDrivenDataModelProvider & provider)*
         +GetEndpointId() EndpointId
         +GetParentEndpointId() EndpointId
     }
@@ -93,15 +93,15 @@ classDiagram
         -mEndpointId: EndpointId
         -mParentEndpointId: EndpointId
         -mDeviceTypeList: Span<DeviceTypeDescriptor>
-        +Init(EndpointId parentId) CHIP_ERROR
-        +Shutdown()
+        +Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointId parentId) CHIP_ERROR
+        +Unregister(CodeDrivenDataModelProvider & provider)
         +SetEndpointId(EndpointId id)
     }
 
     class OccupancySensorDevice {
         -mOccupancySensingCluster: OccupancySensingCluster
         -mBridgedDeviceBasicInformationCluster: BridgedDeviceBasicInformationCluster
-        +Init(EndpointId parentId) CHIP_ERROR
+        +Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointId parentId) CHIP_ERROR
     }
 
     DeviceInterface <|-- SingleEndpointDevice
@@ -110,7 +110,7 @@ classDiagram
 
 -   **`DeviceInterface`**
     (`all-devices-common/devices/interface/DeviceInterface.h`): Defines the pure
-    virtual lifecycle contracts (`Init`, `Shutdown`, etc.) required for
+    virtual lifecycle contracts (`Register`, `Unregister`, etc.) required for
     registering a block of data model elements into the active server.
 -   **`SingleEndpointDevice`**
     (`all-devices-common/devices/interface/SingleEndpointDevice.h`):
@@ -118,8 +118,9 @@ classDiagram
     endpoint relationship (for bridges or composite devices), and a list of
     `DeviceTypeDescriptor` structures.
 -   **Concrete Devices** (e.g., `OccupancySensorDevice`): Inherit from
-    `SingleEndpointDevice`, own one or more concrete `DefaultServerCluster`
-    instances, and bind them to the endpoint during initialization.
+    `SingleEndpointDevice`, own one or more concrete strongly-typed cluster
+    instances (`LazyRegisteredServerCluster`), and bind them to the endpoint
+    during registration.
 
 ### The Device Factory
 
@@ -149,9 +150,10 @@ following guidelines:
    from device classes. Use the injected `DeviceInfoProvider` or
    `DeviceInstanceInfoProvider` interfaces to handle non-volatile runtime
    variables and user settings.
-3. **RAII for Cluster and Endpoint Lifecycles**: Ensure registered data model
-   elements are cleaned up during `Shutdown()`. Explicitly unregister endpoints
-   to prevent dangling pointers in the Interaction Model.
+3. **Explicit Lifecycle Management**: Do not rely on RAII or C++ destructors
+   for automated endpoint teardown. Core device type implementations must use
+   `~Device() override = default;` and manage lifecycle teardown explicitly by
+   executing `Unregister(provider)`.
 4. **Concrete Naming**: Avoid ambiguous umbrella folders or generic utility
    names. Use specific operational titles (e.g., `DeviceTypeParser.h`,
    `NetworkInfrastructureManager.h`).
