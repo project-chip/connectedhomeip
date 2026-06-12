@@ -459,23 +459,22 @@ tests:
               - name: "SceneID"
                 value: 0x01
 
-    - label: "Wait 1+ s"
+    - label: "Wait for the DUT to reach AC1 (CurrentLevel -> 100)"
       PICS: PICS_SDK_CI_ONLY
       cluster: "DelayCommands"
-      command: "WaitForMs"
+      command: "WaitForAttributeValue"
       arguments:
           values:
-              - name: "ms"
-                value: 1250
-
-    - label:
-          "TH confirm the DUT reached AC1 (on level control cluster) after 1s"
-      PICS: PICS_SDK_CI_ONLY && S.S.C05.Rsp
-      cluster: "Level Control"
-      command: "readAttribute"
-      attribute: "CurrentLevel"
-      response:
-          value: 100
+              - name: "attribute"
+                value: "CurrentLevel"
+              - name: "expectedValue"
+                value: 100
+              - name: "expectedDurationMs"
+                value: 1000
+              - name: "cluster"
+                value: "Level Control"
+              - name: "endpoint"
+                value: 1
 
     - label: "Verify DUT returns to AC1."
       verification: |

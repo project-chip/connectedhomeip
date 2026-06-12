@@ -531,6 +531,10 @@
 #include <clusters/TemperatureControl/Commands.h>
 #include <clusters/TemperatureControl/Events.h>
 #include <clusters/TemperatureControl/Structs.h>
+#include <clusters/TemperatureControlledCabinetTopology/Attributes.h>
+#include <clusters/TemperatureControlledCabinetTopology/Commands.h>
+#include <clusters/TemperatureControlledCabinetTopology/Events.h>
+#include <clusters/TemperatureControlledCabinetTopology/Structs.h>
 #include <clusters/TemperatureMeasurement/Attributes.h>
 #include <clusters/TemperatureMeasurement/Commands.h>
 #include <clusters/TemperatureMeasurement/Events.h>

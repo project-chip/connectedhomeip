@@ -31,7 +31,6 @@ Checks: >
   -bugprone-easily-swappable-parameters,
   -bugprone-forward-declaration-namespace,
   -bugprone-forwarding-reference-overload,
-  -bugprone-implicit-widening-of-multiplication-result,
   -bugprone-inc-dec-in-conditions,
   -bugprone-macro-parentheses,
   -bugprone-misplaced-widening-cast,

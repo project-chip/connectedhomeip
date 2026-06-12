@@ -25,15 +25,17 @@ executable("all-devices-app") {
   ]
 
   deps = [
+    "${chip_root}/examples/all-devices-app/all-devices-common/device-factory",
+    "${chip_root}/examples/all-devices-app/all-devices-common/devices/aggregator",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/boolean-state-sensor",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/chime",
-    "${chip_root}/examples/all-devices-app/all-devices-common/devices/device-factory",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/network-infrastructure-manager",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/occupancy-sensor",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/proximity-ranger",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/proximity-ranger/impl:ble-rssi",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/root-node",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/root-node:wifi",
+    "${chip_root}/examples/all-devices-app/all-devices-common/devices/smoke-co-alarm",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/soil-sensor",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/speaker",
     "${chip_root}/examples/all-devices-app/all-devices-common/providers:all-devices-example-device-info-provider",

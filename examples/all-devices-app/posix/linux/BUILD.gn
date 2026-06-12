@@ -33,7 +33,7 @@ source_set("linux") {
   ]
 
   deps = [
-    "${chip_root}/examples/all-devices-app/all-devices-common/devices/device-factory",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device-factory",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/interface:device-interface",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/root-node",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/root-node:wifi",

@@ -19,14 +19,18 @@
 
 #include <app_config/enabled_devices.h>
 #include <devices/Types.h>
+#include <devices/aggregator/AggregatorDevice.h>
 #include <devices/air-quality-sensor/AirQualitySensorDevice.h>
 #include <devices/boolean-state-sensor/BooleanStateSensorDevice.h>
 #include <devices/chime/ChimeDevice.h>
 #include <devices/dimmable-light/impl/LoggingDimmableLightDevice.h>
+#include <devices/fan/impl/LoggingFanDevice.h>
 #include <devices/network-infrastructure-manager/NetworkInfrastructureManagerDevice.h>
 #include <devices/occupancy-sensor/impl/TogglingOccupancySensorDevice.h>
 #include <devices/on-off-light/LoggingOnOffLightDevice.h>
+#include <devices/power-source/impl/DecreasingBatteryPowerSourceDevice.h>
 #include <devices/proximity-ranger/ProximityRangerDevice.h>
+#include <devices/smoke-co-alarm/SmokeCoAlarmDevice.h>
 #include <devices/soil-sensor/impl/IncreasingMoistureSoilSensorDevice.h>
 #include <devices/speaker/impl/LoggingSpeakerDevice.h>
 #include <devices/temperature-sensor/impl/IncreasingTemperatureSensorDevice.h>
@@ -113,6 +117,13 @@ private:
         // NOTE: context is set in `::Init`, so each lambda checks its
         //       existence separately. `Init` must be called before mRegistry
         //       factories are usable.
+        if constexpr (ALL_DEVICES_ENABLE_AGGREGATOR)
+        {
+            RegisterCreator("aggregator", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return std::make_unique<AggregatorDevice>(mContext->timerDelegate);
+            });
+        }
         if constexpr (ALL_DEVICES_ENABLE_AIR_QUALITY_SENSOR)
         {
             RegisterCreator("air-quality-sensor", [this]() {
@@ -211,6 +222,27 @@ private:
         {
             RegisterCreator("temperature-sensor", []() { return std::make_unique<IncreasingTemperatureSensorDevice>(); });
         }
+        if constexpr (ALL_DEVICES_ENABLE_FAN)
+        {
+            RegisterCreator("fan", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return std::make_unique<LoggingFanDevice>(LoggingFanDevice::Context{
+                    .groupDataProvider   = mContext->groupDataProvider,
+                    .fabricTable         = mContext->fabricTable,
+                    .timerDelegate       = mContext->timerDelegate,
+                    .includeOnOffCluster = true,
+                });
+            });
+            RegisterCreator("fan-no-onoff", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return std::make_unique<LoggingFanDevice>(LoggingFanDevice::Context{
+                    .groupDataProvider   = mContext->groupDataProvider,
+                    .fabricTable         = mContext->fabricTable,
+                    .timerDelegate       = mContext->timerDelegate,
+                    .includeOnOffCluster = false,
+                });
+            });
+        }
 
         if constexpr (ALL_DEVICES_ENABLE_PROXIMITY_RANGER)
         {
@@ -218,6 +250,26 @@ private:
                 VerifyOrDie(mContext.has_value());
                 return std::make_unique<ProximityRangerDevice>(mContext->timerDelegate,
                                                                Span<Clusters::ProximityRanging::RangingAdapter * const>());
+            });
+        }
+        if constexpr (ALL_DEVICES_ENABLE_POWER_SOURCE)
+        {
+            RegisterCreator("power-source", []() { return std::make_unique<DecreasingBatteryPowerSourceDevice>(); });
+        }
+        if constexpr (ALL_DEVICES_ENABLE_SMOKE_CO_ALARM)
+        {
+            RegisterCreator("smoke-co-alarm", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return std::make_unique<SmokeCoAlarmDevice>(
+                    mContext->timerDelegate,
+                    SmokeCoAlarmDevice::ConcentrationCluster::Config{
+                        .clusterId = Clusters::CarbonMonoxideConcentrationMeasurement::Id,
+                        .features  = BitFlags<Clusters::ConcentrationMeasurement::Feature>(
+                            Clusters::ConcentrationMeasurement::Feature::kNumericMeasurement,
+                            Clusters::ConcentrationMeasurement::Feature::kLevelIndication),
+                        .medium = Clusters::ConcentrationMeasurement::MeasurementMediumEnum::kAir,
+                        .unit   = Clusters::ConcentrationMeasurement::MeasurementUnitEnum::kPpm,
+                    });
             });
         }
 
