@@ -242,9 +242,6 @@ pw_python_package("matter-core-module") {
     "matter/ble/library_handle.py",
     "matter/ble/scan_devices.py",
     "matter/ble/types.py",
-    "matter/clusters/Attribute.py",
-    "matter/clusters/Command.py",
-    "matter/clusters/__init__.py",
     "matter/commissioning/__init__.py",
     "matter/commissioning/commissioning_flow_blocks.py",
     "matter/commissioning/pase.py",
@@ -388,11 +385,14 @@ pw_python_distribution("matter-core") {
 pw_python_package("matter-clusters-module") {
   sources = [
     "matter/ChipUtility.py",
+    "matter/clusters/Attribute.py",
     "matter/clusters/CHIPClusters.py",
     "matter/clusters/ClusterObjects.py",
+    "matter/clusters/Command.py",
     "matter/clusters/Objects.py",
     "matter/clusters/TestObjects.py",
     "matter/clusters/Types.py",
+    "matter/clusters/__init__.py",
     "matter/clusters/enum.py",
     "matter/tlv/__init__.py",
     "matter/tlv/tlvlist.py",
@@ -410,10 +410,14 @@ pw_python_package("matter-clusters-module") {
       python_requires = chip_python_requires
       install_requires = [
         "aenum",
+        "construct",
         "dacite",
+        "rich",
       ]
     }
   }
+
+  python_deps = [ ":matter-core-module" ]
 }
 
 pw_python_distribution("matter-clusters") {
