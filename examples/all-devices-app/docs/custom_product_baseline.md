@@ -16,8 +16,8 @@ static definitions:
 | Component / Layer        | `all-devices-app`                                                      | Custom Application                                                              |
 | :----------------------- | :--------------------------------------------------------------------- | :------------------------------------------------------------------------------ |
 | **Data Model Structure** | Dynamic, parsed entirely from CLI `--device` arguments at boot.        | **Static / Fixed**, defined explicitly in your application initialization code. |
-| **Capability Registry**  | Uses `DeviceFactory` singleton to map string names to device creators. | **Removed**. Devices are instantiated directly as members.                      |
-| **Build Source List**    | `enabled_devices.cmake`/`.gni` compiling all capabilities.             | Only compiles the C++ device classes required by the product.                   |
+| **Device Registry**      | Uses `DeviceFactory` singleton to map string names to device creators. | **Removed**. Devices are instantiated directly as members.                      |
+| **Build Source List**    | `enabled_devices.cmake`/`.gni` compiling all device types.             | Only compiles the C++ device classes required by the product.                   |
 
 ---
 
@@ -29,7 +29,7 @@ the decoupled platform structure:
 ```text
 my-custom-bulb-app/
 ├── BUILD.gn                     # Root build configuration for your app
-├── CMakeLists.txt               # ESP32 / ESP-IDF CMake orchestration
+├── CMakeLists.txt               # ESP32 / ESP-IDF CMake build setup
 ├── include/
 │   └── CHIPProjectAppConfig.h   # Feature configurations and descriptor Overrides
 ├── common/

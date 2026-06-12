@@ -58,7 +58,7 @@ compiles independently of the operating system or hardware drivers. It includes:
     `AllDevicesExampleDeviceInfoProviderImpl`) that supply node lifecycle
     information, storage interfaces, and descriptor details.
 
-### Platform-Specific Specializations (`posix/`, `esp32/`, `silabs/`, `telink/`)
+### Platform-Specific Target Builds (`posix/`, `esp32/`, `silabs/`, `telink/`)
 
 These directories contain hardware-specific or OS-specific drivers, entrypoint
 `main()` functions, and build configurations.
@@ -74,8 +74,7 @@ These directories contain hardware-specific or OS-specific drivers, entrypoint
 
 ### The Device Interface
 
-All devices in the application implement `DeviceInterface` and its
-specialization, `SingleEndpointDevice`.
+All devices in the application implement `DeviceInterface` and its core base class, `SingleEndpointDevice`.
 
 ```mermaid
 classDiagram
@@ -123,9 +122,9 @@ classDiagram
 
 ### The Device Factory
 
-The `DeviceFactory` singleton acts as the instantiation broker.
+The `DeviceFactory` singleton acts as the central device creator.
 
-1. When a particular device capability is enabled during the build, its static
+1. When a particular device type is enabled during the build, its static
    self-registering factory macro executes at startup.
 2. The factory maintains an internal map of string keys (e.g.,
    `"occupancy-sensor"`) to creation callbacks.

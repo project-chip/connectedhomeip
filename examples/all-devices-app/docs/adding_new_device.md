@@ -193,7 +193,7 @@ source_set("my-sensor") {
 
 ---
 
-## Step 2: Register the Capability in `DeviceFactory`
+## Step 2: Register the Device Type in `DeviceFactory`
 
 To enable runtime initialization via the `--device my-sensor` CLI flag, register
 your device creation callback in
