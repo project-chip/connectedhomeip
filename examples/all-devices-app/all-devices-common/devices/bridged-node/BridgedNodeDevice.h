@@ -40,8 +40,8 @@ public:
 
 protected:
     TimerDelegate & mTimerDelegate;
-    std::string mResolvedUniqueId;
-    std::string mResolvedNodeLabel;
+    std::string mUniqueId;
+    std::string mNodeLabel;
     LazyRegisteredServerCluster<Clusters::BridgedDeviceBasicInformationCluster> mBridgedDeviceBasicInformationCluster;
 };
 

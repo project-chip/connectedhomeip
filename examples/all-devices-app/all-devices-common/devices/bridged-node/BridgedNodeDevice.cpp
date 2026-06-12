@@ -28,7 +28,7 @@ namespace app {
 
 BridgedNodeDevice::BridgedNodeDevice(TimerDelegate & timerDelegate, std::string uniqueId, std::string nodeLabel) :
     SingleEndpointDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kBridgedNode, 1)),
-    mTimerDelegate(timerDelegate), mResolvedUniqueId(std::move(uniqueId)), mResolvedNodeLabel(std::move(nodeLabel))
+    mTimerDelegate(timerDelegate), mUniqueId(std::move(uniqueId)), mNodeLabel(std::move(nodeLabel))
 {}
 
 CHIP_ERROR BridgedNodeDevice::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointId parentId)
@@ -39,10 +39,10 @@ CHIP_ERROR BridgedNodeDevice::Register(EndpointId endpoint, CodeDrivenDataModelP
     mBridgedDeviceBasicInformationCluster.Create(endpoint,
                                                  BridgedDeviceBasicInformationCluster::MutableData{
                                                      .reachable = true,
-                                                     .nodeLabel = mResolvedNodeLabel,
+                                                     .nodeLabel = mNodeLabel,
                                                  },
                                                  BridgedDeviceBasicInformationCluster::FixedData{
-                                                     .uniqueId = mResolvedUniqueId,
+                                                     .uniqueId = mUniqueId,
                                                  },
                                                  BridgedDeviceBasicInformationCluster::Context{
                                                      .delegate      = *this,
