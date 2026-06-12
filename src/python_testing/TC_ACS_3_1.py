@@ -176,7 +176,6 @@ class TC_ACS_3_1(MatterBaseTest):
         asserts.assert_less_equal(holdTimeLimits.holdTimeMin, holdTime_input, "Expected to be between HoldTimeMin and HoldTimeMax.")
         asserts.assert_less_equal(holdTime_input, holdTimeLimits.holdTimeMax, "Expected to be between HoldTimeMin and HoldTimeMax.")
         await self.write_single_attribute(attr.HoldTime(holdTime_input))
-        holdTime = holdTime_input
 
         # Add AmbientContextSupported elements based on DUT capability
         # Human activity walking, Object identification person, Audio identification barking are default
