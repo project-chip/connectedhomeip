@@ -103,7 +103,7 @@ const AppOptions::AppConfig & AppOptions::GetConfig()
     }
 
     mConfig.deviceTypeEntries = finalEntries;
-    expanded = true;
+    expanded                  = true;
     return mConfig;
 }
 

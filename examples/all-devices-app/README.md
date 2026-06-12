@@ -109,19 +109,23 @@ rm -rf /tmp/chip_*
 # Run a chime on endpoint 1, a speaker on endpoint 2 (child of endpoint 1), and a dimmable light on endpoint 3
 ./out/linux-x64-all-devices-boringssl-no-ble/all-devices-app --device chime:1 --device speaker:2,parent=1 --device dimmable-light:3
 ```
+
 ## Advanced Topology: Wildcard Expansion (`*`)
 
-You can use the wildcard `*` to automatically instantiate all supported leaf device types. When an endpoint is specified, it represents the starting number.
+You can use the wildcard `*` to automatically instantiate all supported leaf
+device types. When an endpoint is specified, it represents the starting number.
 
-- **Standard Wildcard:** Start all devices from endpoint 1 sequentially.
-  ```bash
-  ./out/linux-x64-all-devices-boringssl/all-devices-app --device *:1
-  ```
+-   **Standard Wildcard:** Start all devices from endpoint 1 sequentially.
 
-- **Parented Wildcard:** Start all devices from endpoint 2 sequentially and make them all children of parent endpoint 1.
-  ```bash
-  ./out/linux-x64-all-devices-boringssl/all-devices-app --device speaker:1 --device *:2,parent=1
-  ```
+    ```bash
+    ./out/linux-x64-all-devices-boringssl/all-devices-app --device *:1
+    ```
+
+-   **Parented Wildcard:** Start all devices from endpoint 2 sequentially and
+    make them all children of parent endpoint 1.
+    ```bash
+    ./out/linux-x64-all-devices-boringssl/all-devices-app --device speaker:1 --device *:2,parent=1
+    ```
 
 ## Testing with chip-tool
 
