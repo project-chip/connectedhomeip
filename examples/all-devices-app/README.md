@@ -6,27 +6,33 @@ generated code (ZAP tool) and global instances. This is the recommended approach
 for developing Matter applications, as it allows testing various device types
 and clusters without requiring recompilation for each configuration.
 
-## What’s The “All Devices App”?
+## Code-Driven Paradigm Advantages
 
 The Code-Driven paradigm offers several advantages:
 
 -   **Unit Testable**: Allows clusters to be unit tested easily.
 -   **Dynamic Data Model**: Allows applications to change their data model
     dynamically at runtime without requiring recompilation.
--   **Complex Products**: Makes it easier to develop complex products such as
-    bridges.
--   **Software Evolution**: Makes it easier to iterate and evolve product
-    software.
+-   **Composite Devices**: Supports multi-endpoint devices and bridges.
+-   **Maintainability**: Decouples cluster implementations from application configuration.
 
-The application simulates various device types and is highly extensible.
+The application simulates various device types.
+
+## Documentation Suite
+
+The [`docs/`](docs/) directory contains documentation for this application:
+
+- **[Architecture & Design Patterns](docs/architecture.md)**: Describes the Code-Driven Data Model, component hierarchies (`DeviceFactory`, `SingleEndpointDevice`), and platform separation.
+- **[Starting Up & CLI Reference](docs/starting_up.md)**: Describes application initialization, endpoint composition flags (`--device`), and network settings.
+- **[Testing & Simulation Guide](docs/testing.md)**: Instructions for `chip-tool` commissioning and executing automated Python regression suites (`src/python_testing/`).
+- **[How to Add a New Simulated Device](docs/adding_new_device.md)**: Instructions for implementing Matter devices, binding code-driven clusters, and updating build configurations.
+- **[Custom Product Baseline Guide](docs/custom_product_baseline.md)**: Guide on transitioning from this simulator baseline to a custom product application.
 
 ## Architecture and File Structure
 
-The `all-devices-app` is organized to be **platform-agnostic** at its core, with
-platform-specific specializations kept separate:
+The `all-devices-app` separates platform-agnostic code from platform-specific implementations:
 
--   **`all-devices-common/`**: Contains the platform-agnostic core of the
-    application. This includes:
+-   **`all-devices-common/`**: Contains platform-agnostic code, including:
     -   Core cluster logic and device interfaces.
     -   Base device implementations.
     -   The **`DeviceFactory`** (in
@@ -38,15 +44,11 @@ platform-specific specializations kept separate:
     -   For example, `posix/linux/DeviceFactoryPlatformOverride.cpp` registers
         platform-specific overrides for devices at build-time.
 
-This separation ensures that the core logic remains clean and reusable across
-different operating systems and hardware platforms, while still allowing for
-deep platform integration when needed.
+This separation ensures core logic remains reusable across operating systems and hardware platforms while allowing platform-specific driver integration.
 
 ## Supported Devices
 
-The application supports the following device types (specified via the
-`--device` flag). Note that this list represents what is supported currently,
-but the application is constantly evolving and new device types are added often:
+The application supports the following device types (specified via the `--device` flag). Currently supported device types include:
 
 -   `contact-sensor`
 -   `water-leak-detector`
