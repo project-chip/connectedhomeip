@@ -26,28 +26,40 @@
 #include <clusters/DeviceEnergyManagementMode/Commands.h>
 #include <clusters/DeviceEnergyManagementMode/Enums.h>
 #include <clusters/DeviceEnergyManagementMode/Metadata.h>
+#include <clusters/DishwasherMode/Metadata.h>
+#include <clusters/EnergyEvseMode/Metadata.h>
+#include <clusters/LaundryWasherMode/Metadata.h>
+#include <clusters/MicrowaveOvenMode/Metadata.h>
+#include <clusters/OvenMode/Metadata.h>
+#include <clusters/RefrigeratorAndTemperatureControlledCabinetMode/Metadata.h>
+#include <clusters/RvcCleanMode/Metadata.h>
+#include <clusters/RvcRunMode/Metadata.h>
+#include <clusters/WaterHeaterMode/Metadata.h>
 #include <lib/core/DataModelTypes.h>
 
-#include <array>
 #include <utility>
 
-namespace chip {
-namespace app {
-namespace Clusters {
-namespace ModeBase {
+namespace chip::app::Clusters::ModeBase {
 
-// The 10 cluster IDs that share this attribute structure.
-static constexpr std::array<ClusterId, 10> AliasedClusters = {
-    DeviceEnergyManagementMode::Id,
-    DishwasherMode::Id,
-    EnergyEvseMode::Id,
-    LaundryWasherMode::Id,
-    MicrowaveOvenMode::Id,
-    OvenMode::Id,
-    RefrigeratorAndTemperatureControlledCabinetMode::Id,
-    RvcCleanMode::Id,
-    RvcRunMode::Id,
-    WaterHeaterMode::Id,
+// A pair of cluster ID and revision.
+struct ClusterRevisionEntry
+{
+    ClusterId id;
+    uint32_t revision;
+};
+
+// The 10 clusters that share this attribute structure.
+static constexpr ClusterRevisionEntry kAliasedClusters[] = {
+    { DeviceEnergyManagementMode::Id, DeviceEnergyManagementMode::kRevision },
+    { DishwasherMode::Id, DishwasherMode::kRevision },
+    { EnergyEvseMode::Id, EnergyEvseMode::kRevision },
+    { LaundryWasherMode::Id, LaundryWasherMode::kRevision },
+    { MicrowaveOvenMode::Id, MicrowaveOvenMode::kRevision },
+    { OvenMode::Id, OvenMode::kRevision },
+    { RefrigeratorAndTemperatureControlledCabinetMode::Id, RefrigeratorAndTemperatureControlledCabinetMode::kRevision },
+    { RvcCleanMode::Id, RvcCleanMode::kRevision },
+    { RvcRunMode::Id, RvcRunMode::kRevision },
+    { WaterHeaterMode::Id, WaterHeaterMode::kRevision },
 };
 
 // All aliased clusters share features, mandatory attributes, and commands (except MicrowaveOvenMode).
@@ -127,7 +139,4 @@ enum class StatusCode : uint8_t
     kInvalidInMode   = 0x3,
 };
 
-} // namespace ModeBase
-} // namespace Clusters
-} // namespace app
-} // namespace chip
+} // namespace chip::app::Clusters::ModeBase
