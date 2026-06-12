@@ -36,67 +36,69 @@ When the application boots, it executes the following sequence:
 
 ---
 
-## Command Line Options
+## Core Runtime Composition
 
-### Endpoint Composition Options
+Unlike static Matter targets, `all-devices-app` allows you to dynamically
+assemble your exact endpoint structure at boot using the `--device` option.
 
--   **`--device <type>[:<endpoint>][,parent=<parentId>]`** _(Required, can be
-    repeated multiple times)_ Instantiates a Matter device on the server.
+### `--device <type>[:<endpoint>][,parent=<parentId>]`
 
-    -   `<type>`: The registered runtime key (e.g., `contact-sensor`,
-        `dimmable-light`, `occupancy-sensor`).
-    -   `:<endpoint>` _(Optional)_: Assigns a specific endpoint index. If
-        omitted, the runtime assigns an auto-incrementing ID.
-    -   `,parent=<parentId>` _(Optional)_: Establishes a parent/child endpoint
-        relationship for composite endpoints or bridged devices.
+Instantiates a specific simulated device feature on the Matter server. This flag
+can be repeated multiple times to build composite or multi-endpoint topologies.
 
-    **Examples:**
+-   `<type>`: The registered runtime key (e.g., `contact-sensor`,
+    `dimmable-light`, `occupancy-sensor`).
+-   `:<endpoint>` _(Optional)_: Assigns an explicit endpoint index. If omitted,
+    the runtime automatically assigns an incrementing ID starting from 1.
+-   `,parent=<parentId>` _(Optional)_: Attaches this endpoint as a child of
+    another endpoint, establishing a logical tree composition (such as attaching
+    a Speaker to a parent Chime or building an Aggregator bridge).
 
-    ```bash
-    # Launch a single self-contained chime on auto-assigned Endpoint 1
-    ./out/linux-x64-all-devices-clang/all-devices-app --device chime
+> [!TIP] This application inherits the Matter SDK's complete baseline option
+> parser. For the complete, live list of available network commissioning
+> (`--wifi`, `--ble-controller`), operational binding (`--port`,
+> `--interface-id`), descriptor (`--discriminator`, `--vendor-id`), and
+> persistent storage (`--KVS`) arguments, execute the binary with `--help`:
+>
+> ```bash
+> ./out/linux-x64-all-devices-clang/all-devices-app --help
+> ```
 
-    # Launch an explicit Chime on Endpoint 1 and attach a Speaker on Endpoint 2 as its child
-    ./out/linux-x64-all-devices-clang/all-devices-app --device chime:1 --device speaker:2,parent=1
-    ```
+---
 
-### Commissioning & Network Options
+## Practical Operating Recipes
 
--   **`--wifi`** _(Conditional: Only active if built with
-    `CHIP_DEVICE_CONFIG_ENABLE_WIFI`)_ Enables Wi-Fi network commissioning.
+### Recipe 1: Booting a Clean Composite Tree Device
 
--   **`--ble-controller <number>`** _(Conditional: Only active if built with
-    `CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE`)_ Selects the Bluetooth adapter
-    controller index (e.g., `0` for `hci0`) for Matter BLE commissioning
-    advertisements.
+When launching new multi-endpoint devices, always wipe your previous persistent
+storage to ensure the server doesn't reload stale data model definitions:
 
--   **`--port <number>`** Binds the UDP Server to a specified port (Default is
-    `5540`). Used for running multiple simulator instances concurrently on the
-    same host interface.
+```bash
+# Safely wipe the default storage file
+rm -rf /tmp/chip_all_devices_kvs
 
--   **`--interface-id <number>`** Binds Matter multicast advertisements and
-    operational MDNS traffic to a specific Network Interface index.
+# Boot an explicit Chime on Endpoint 1 and attach a Speaker on Endpoint 2 as its child
+./out/linux-x64-all-devices-clang/all-devices-app --device chime:1 --device speaker:2,parent=1
+```
 
--   **`--groupcast`** Enables multi-node groupcast communication.
+### Recipe 2: Running Multiple Simulators Concurrently
 
-### Identification & Descriptor Options
+To launch multiple independent simulator processes side-by-side on the same host
+interface without socket or commissioning collisions, provide distinct UDP
+ports, storage paths, and Setup Discriminators:
 
--   **`--discriminator <number>`** Overrides the 12-bit Setup Discriminator
-    advertised during uncommissioned discovery (Default is `3840`).
+```bash
+# Boot Instance Alpha (Default settings)
+./out/linux-x64-all-devices-clang/all-devices-app \
+    --device occupancy-sensor:1 \
+    --KVS /tmp/chip_kvs_alpha \
+    --port 5540 \
+    --discriminator 3840
 
--   **`--vendor-id <number>`** / **`--product-id <number>`** Overrides the Basic
-    Information Vendor ID (VID) and Product ID (PID) descriptors announced
-    during commissioning.
-
-### Persistent Storage Options
-
--   **`--KVS <path>`** Sets the file path for Key-Value Store (KVS) persistent
-    storage (Default is `/tmp/chip_all_devices_kvs`).
-
-    _Note_: Remove this file when changing the `--device` configuration between
-    runs to avoid loading stale data:
-
-    ```bash
-    rm -rf /tmp/chip_all_devices_kvs
-    ./out/linux-x64-all-devices-clang/all-devices-app --device contact-sensor:1
-    ```
+# Boot Instance Beta (Isolated settings)
+./out/linux-x64-all-devices-clang/all-devices-app \
+    --device contact-sensor:1 \
+    --KVS /tmp/chip_kvs_beta \
+    --port 5541 \
+    --discriminator 3841
+```
