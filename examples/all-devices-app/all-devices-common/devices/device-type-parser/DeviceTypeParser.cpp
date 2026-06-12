@@ -138,14 +138,14 @@ void DeviceTypeParser::ExpandWildcards(const std::vector<std::string> & wildcard
     chip::EndpointId maxEp = 0;
     for (const auto & entry : mDeviceTypeEntries)
     {
-        if (entry.type != "*" && entry.endpoint != chip::kInvalidEndpointId && entry.endpoint > maxEp)
+        if (entry.endpoint != chip::kInvalidEndpointId && entry.endpoint > maxEp)
         {
             maxEp = entry.endpoint;
         }
     }
 
     std::vector<Entry> expandedEntries;
-    chip::EndpointId nextAvailableEp = (maxEp == 0) ? 1 : static_cast<chip::EndpointId>(maxEp + 1);
+    chip::EndpointId nextAvailableEp = static_cast<chip::EndpointId>(maxEp + 1);
 
     for (const auto & entry : mDeviceTypeEntries)
     {

@@ -259,3 +259,32 @@ TEST_F(TestDeviceTypeParser, ExpandWildcards_Subtrees)
     EXPECT_EQ(configs[5].endpoint, 24);
     EXPECT_EQ(configs[5].parentId, 20);
 }
+
+TEST_F(TestDeviceTypeParser, ExpandWildcards_WildcardExplicitMaxEp)
+{
+    EXPECT_EQ(mParser.ParseSingleDeviceString("*,parent=1"), CHIP_NO_ERROR);
+    EXPECT_EQ(mParser.ParseSingleDeviceString("*:10,parent=20"), CHIP_NO_ERROR);
+
+    std::vector<std::string> deviceTypes = { "chime", "speaker" };
+    mParser.ExpandWildcards(deviceTypes);
+
+    const auto & configs = mParser.GetDeviceTypeEntries();
+    EXPECT_EQ(configs.size(), 4U);
+
+    // Because *:10 is parsed, maxEp is 10.
+    // Therefore, the first wildcard starts at maxEp + 1 = 11.
+    EXPECT_EQ(configs[0].type, "chime");
+    EXPECT_EQ(configs[0].endpoint, 11);
+    EXPECT_EQ(configs[0].parentId, 1);
+    EXPECT_EQ(configs[1].type, "speaker");
+    EXPECT_EQ(configs[1].endpoint, 12);
+    EXPECT_EQ(configs[1].parentId, 1);
+
+    // The second wildcard starts at its explicit endpoint 10.
+    EXPECT_EQ(configs[2].type, "chime");
+    EXPECT_EQ(configs[2].endpoint, 10);
+    EXPECT_EQ(configs[2].parentId, 20);
+    EXPECT_EQ(configs[3].type, "speaker");
+    EXPECT_EQ(configs[3].endpoint, 11);
+    EXPECT_EQ(configs[3].parentId, 20);
+}
