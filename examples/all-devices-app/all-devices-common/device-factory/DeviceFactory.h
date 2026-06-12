@@ -22,6 +22,7 @@
 #include <devices/aggregator/AggregatorDevice.h>
 #include <devices/air-quality-sensor/AirQualitySensorDevice.h>
 #include <devices/boolean-state-sensor/BooleanStateSensorDevice.h>
+#include <devices/bridged-node/BridgedNodeDevice.h>
 #include <devices/chime/ChimeDevice.h>
 #include <devices/dimmable-light/impl/LoggingDimmableLightDevice.h>
 #include <devices/fan/impl/LoggingFanDevice.h>
@@ -144,6 +145,15 @@ private:
                                 .unit      = MeasurementUnitEnum::kPpm,
                             },
                     });
+            });
+        }
+        if constexpr (ALL_DEVICES_ENABLE_BRIDGED_NODE)
+        {
+            RegisterCreator("bridged-node", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return std::make_unique<BridgedNodeDevice>(
+                    mContext->timerDelegate, [](EndpointId endpoint) { return "bridged-node-EP" + std::to_string(endpoint); },
+                    [](EndpointId) { return "Bridged Node"; });
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_CONTACT_SENSOR)
