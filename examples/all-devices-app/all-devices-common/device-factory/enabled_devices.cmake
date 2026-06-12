@@ -35,6 +35,7 @@
 # ---------------------------------------------------------------------------
 set(ALL_DEVICES_DEVICE_SOURCES
     # keep-sorted: start
+    "${ALL_DEVICES_COMMON_DIR}/devices/aggregator/AggregatorDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/air-quality-sensor/AirQualitySensorDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/boolean-state-sensor/BooleanStateSensorDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/chime/ChimeDevice.cpp"
@@ -59,6 +60,7 @@ set(ALL_DEVICES_DEVICE_SOURCES
     "${ALL_DEVICES_COMMON_DIR}/devices/soil-sensor/impl/IncreasingMoistureSoilSensorDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/speaker/SpeakerDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/speaker/impl/LoggingSpeakerDevice.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/devices/smoke-co-alarm/SmokeCoAlarmDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/temperature-sensor/TemperatureSensorDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/temperature-sensor/impl/IncreasingTemperatureSensorDevice.cpp"
     # keep-sorted: end
@@ -101,6 +103,7 @@ endif()
 #   - Update scripts/build/build/targets.py to include the new device
 foreach(_key
         # keep-sorted: start
+        aggregator
         air-quality-sensor
         chime
         contact-sensor
@@ -112,6 +115,7 @@ foreach(_key
         power-source
         proximity-ranger
         soil-sensor
+        smoke-co-alarm
         speaker
         temperature-sensor
         water-leak-detector

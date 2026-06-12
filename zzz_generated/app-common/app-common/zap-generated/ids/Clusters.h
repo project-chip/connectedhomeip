@@ -147,6 +147,7 @@
 #include <clusters/Switch/ClusterId.h>
 #include <clusters/TargetNavigator/ClusterId.h>
 #include <clusters/TemperatureControl/ClusterId.h>
+#include <clusters/TemperatureControlledCabinetTopology/ClusterId.h>
 #include <clusters/TemperatureMeasurement/ClusterId.h>
 #include <clusters/Thermostat/ClusterId.h>
 #include <clusters/ThermostatUserInterfaceConfiguration/ClusterId.h>

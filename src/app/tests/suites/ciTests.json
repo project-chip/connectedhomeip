@@ -242,7 +242,8 @@
         "TestOperationalState",
         "TestRVCOperationalState",
         "TestDishwasherAlarm",
-        "Test_AddNewFabricFromExistingFabric"
+        "Test_AddNewFabricFromExistingFabric",
+        "Test_WaitForAttributeValue"
     ],
     "MultiAdmin": ["TestMultiAdmin"],
     "SoftwareDiagnostics": [],

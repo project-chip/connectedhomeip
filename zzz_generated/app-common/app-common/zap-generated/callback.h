@@ -447,6 +447,16 @@ void emberAfLaundryDryerControlsClusterShutdownCallback(chip::EndpointId endpoin
 /**
  * @param endpoint    Endpoint that is being initialized
  */
+void emberAfTemperatureControlledCabinetTopologyClusterInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfTemperatureControlledCabinetTopologyClusterShutdownCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
 void emberAfModeSelectClusterInitCallback(chip::EndpointId endpoint);
 
 /**
@@ -3134,6 +3144,45 @@ chip::Protocols::InteractionModel::Status MatterLaundryDryerControlsClusterServe
  * @param endpoint  Endpoint that is being served
  */
 void emberAfLaundryDryerControlsClusterServerTickCallback(chip::EndpointId endpoint);
+
+//
+// Temperature Controlled Cabinet Topology Cluster
+//
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfTemperatureControlledCabinetTopologyClusterServerInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterTemperatureControlledCabinetTopologyClusterServerShutdownCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfTemperatureControlledCabinetTopologyClusterClientInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param attributePath Concrete attribute path that changed
+ */
+void MatterTemperatureControlledCabinetTopologyClusterServerAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath);
+
+/**
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status MatterTemperatureControlledCabinetTopologyClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/**
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfTemperatureControlledCabinetTopologyClusterServerTickCallback(chip::EndpointId endpoint);
 
 //
 // Mode Select Cluster
