@@ -87,7 +87,9 @@
 #define MATTER_BINDING_TABLE_SIZE 64
 
 // Enable some test-only interaction model APIs.
+#ifndef CONFIG_BUILD_FOR_HOST_UNIT_TEST
 #define CONFIG_BUILD_FOR_HOST_UNIT_TEST 1
+#endif
 
 #define CHIP_ENABLE_ROTATING_DEVICE_ID 1
 
