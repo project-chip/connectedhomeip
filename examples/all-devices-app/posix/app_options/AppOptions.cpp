@@ -21,11 +21,26 @@
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceConfig.h>
 
+#include <algorithm>
 #include <cstdlib>
 #include <cstring>
 
 using namespace chip;
 using namespace chip::ArgParser;
+
+namespace {
+
+bool IsExcludedFromWildcard(const std::string & type)
+{
+    static const std::vector<std::string> kExcludedDevices = {
+        "aggregator",
+        "bridged-node",
+        "fan-no-onoff",
+    };
+    return std::find(kExcludedDevices.begin(), kExcludedDevices.end(), type) != kExcludedDevices.end();
+}
+
+} // namespace
 
 // App custom argument handling
 constexpr uint16_t kOptionDeviceType    = 0xffd0;
@@ -60,7 +75,7 @@ const AppOptions::AppConfig & AppOptions::GetConfig()
             chip::EndpointId nextEp = entry.endpoint;
             for (const auto & deviceType : chip::app::DeviceFactory::GetInstance().SupportedDeviceTypes())
             {
-                if (deviceType == "aggregator" || deviceType == "bridged-node" || deviceType == "fan-no-onoff")
+                if (IsExcludedFromWildcard(deviceType))
                 {
                     continue;
                 }
