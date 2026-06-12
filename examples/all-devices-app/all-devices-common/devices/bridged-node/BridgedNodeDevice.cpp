@@ -26,18 +26,14 @@ using namespace chip::app::Clusters;
 namespace chip {
 namespace app {
 
-BridgedNodeDevice::BridgedNodeDevice(TimerDelegate & timerDelegate, UniqueIdGenerator uniqueIdGenerator,
-                                     NodeLabelGenerator nodeLabelGenerator) :
+BridgedNodeDevice::BridgedNodeDevice(TimerDelegate & timerDelegate, std::string uniqueId, std::string nodeLabel) :
     SingleEndpointDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kBridgedNode, 1)),
-    mTimerDelegate(timerDelegate), mUniqueIdGenerator(uniqueIdGenerator), mNodeLabelGenerator(nodeLabelGenerator)
+    mTimerDelegate(timerDelegate), mResolvedUniqueId(std::move(uniqueId)), mResolvedNodeLabel(std::move(nodeLabel))
 {}
 
 CHIP_ERROR BridgedNodeDevice::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointId parentId)
 {
     ReturnErrorOnFailure(SingleEndpointRegistration(endpoint, provider, parentId));
-
-    mResolvedUniqueId  = mUniqueIdGenerator(endpoint);
-    mResolvedNodeLabel = mNodeLabelGenerator(endpoint);
 
     // Create the Bridged Device Basic Information cluster.
     mBridgedDeviceBasicInformationCluster.Create(endpoint,

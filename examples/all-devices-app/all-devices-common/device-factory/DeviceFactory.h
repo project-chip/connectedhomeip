@@ -151,9 +151,12 @@ private:
         {
             RegisterCreator("bridged-node", [this]() {
                 VerifyOrDie(mContext.has_value());
+                static int sBridgedNodeCount = 0;
+                sBridgedNodeCount++;
                 return std::make_unique<BridgedNodeDevice>(
-                    mContext->timerDelegate, [](EndpointId endpoint) { return "bridged-node-EP" + std::to_string(endpoint); },
-                    [](EndpointId) { return "Bridged Node"; });
+                    mContext->timerDelegate,
+                    "bridged-node-unique-id-" + std::to_string(sBridgedNodeCount),
+                    "Bridged Node " + std::to_string(sBridgedNodeCount));
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_CONTACT_SENSOR)

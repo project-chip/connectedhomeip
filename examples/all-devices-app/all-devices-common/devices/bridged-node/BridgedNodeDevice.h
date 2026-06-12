@@ -31,10 +31,7 @@ namespace app {
 class BridgedNodeDevice : public SingleEndpointDevice, public Clusters::BridgedDeviceBasicInformationDelegate
 {
 public:
-    using UniqueIdGenerator  = std::function<std::string(chip::EndpointId)>;
-    using NodeLabelGenerator = std::function<std::string(chip::EndpointId)>;
-
-    BridgedNodeDevice(TimerDelegate & timerDelegate, UniqueIdGenerator uniqueIdGenerator, NodeLabelGenerator nodeLabelGenerator);
+    BridgedNodeDevice(TimerDelegate & timerDelegate, std::string uniqueId, std::string nodeLabel);
     ~BridgedNodeDevice() override = default;
 
     CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
@@ -43,8 +40,6 @@ public:
 
 protected:
     TimerDelegate & mTimerDelegate;
-    UniqueIdGenerator mUniqueIdGenerator;
-    NodeLabelGenerator mNodeLabelGenerator;
     std::string mResolvedUniqueId;
     std::string mResolvedNodeLabel;
     LazyRegisteredServerCluster<Clusters::BridgedDeviceBasicInformationCluster> mBridgedDeviceBasicInformationCluster;
