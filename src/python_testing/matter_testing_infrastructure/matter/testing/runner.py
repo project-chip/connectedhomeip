@@ -494,8 +494,8 @@ def run_tests_no_exit(
                 node_id = matter_test_config.dut_node_ids[0]
 
                 if matter_test_config.commissioning_method is not None and setup_code is not None:
-                    # Path 1: PASE + commissioning — CommissionDeviceTest will open PASE again, so close
-                    # the pre-commissioning session after the wildcard read to avoid competing sessions.
+                    # Path 1: PASE + commissioning — prefetch PASE + wildcard read, then keep the commissionee
+                    # session so CommissionDeviceTest's FindOrEstablishPASESession reuses it (same nodeId).
                     try:
                         commissionee = event_loop.run_until_complete(
                             default_controller.FindOrEstablishPASESession(
@@ -505,9 +505,8 @@ def run_tests_no_exit(
                         if commissionee is not None:
                             stored_global_wildcard = read_global_wildcard(event_loop, default_controller, node_id)
                             test_config.user_params["stored_global_wildcard"] = global_stash.stash_globally(stored_global_wildcard)
-                            # Drop the prefetch PASE session so CommissionDeviceTest (and PASE-first tests such as
-                            # TC_SC_7_1) do not compete with this controller session.
-                            default_controller.ExpireSessions(nodeId=node_id)
+                            # Do not ExpireSessions here: commissioning reuses this commissionee via
+                            # FindOrEstablishPASESession; tearing down forced flaky second discovery.
                         else:
                             LOGGER.error("FindOrEstablishPASESession returned None")
                     except Exception:
