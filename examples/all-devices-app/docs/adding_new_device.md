@@ -27,15 +27,23 @@ the Matter Device Library Specification) to determine:
 
 ## Designing for Modularity & ReUse
 
-When implementing your device, keep these key architectural patterns in mind to make your code highly reusable across different platforms and easy to test:
+When implementing your device, keep these key architectural patterns in mind to
+make your code highly reusable across different platforms and easy to test:
 
 1. **Abstract Hardware Interactions**:
-    - Build your core device class so it doesn't depend on specific RTOS or platform libraries.
-    - Abstract hardware-specific actions (like toggling LED pins or playing sound) behind pure virtual delegate interfaces. This allows contributors to reuse your exact device behavior on their specific target boards.
+
+    - Build your core device class so it doesn't depend on specific RTOS or
+      platform libraries.
+    - Abstract hardware-specific actions (like toggling LED pins or playing
+      sound) behind pure virtual delegate interfaces. This allows contributors
+      to reuse your exact device behavior on their specific target boards.
 
 2. **Pass Dependencies via Constructors**:
-    - Rather than managing global singletons (like system timers or hardware drivers) inside your device logic, accept them as references in your constructor.
-    - This allows platform entry points to inject exactly what they need at boot while keeping your class standalone.
+    - Rather than managing global singletons (like system timers or hardware
+      drivers) inside your device logic, accept them as references in your
+      constructor.
+    - This allows platform entry points to inject exactly what they need at boot
+      while keeping your class standalone.
 
 ---
 
@@ -86,7 +94,9 @@ protected:
 
 ### The Source (`MySensorDevice.cpp`)
 
-In `Register()`, create your strongly typed clusters and bind them to the provider. If an intermediate setup step fails, remember to roll back clean so no orphaned structures remain. Use `Unregister()` to shut down cleanly.
+In `Register()`, create your strongly typed clusters and bind them to the
+provider. If an intermediate setup step fails, remember to roll back clean so no
+orphaned structures remain. Use `Unregister()` to shut down cleanly.
 
 ```cpp
 #include "MySensorDevice.h"
@@ -214,8 +224,9 @@ your device creation callback in
 
 Next, register your implementation files across our core build scripts.
 
-> [!NOTE]
-> To keep project lists clean, our build systems enforce alphabetical sorting. Please insert your new device entries in alphabetical order to ensure automated CI formatting checks pass successfully.
+> [!NOTE] To keep project lists clean, our build systems enforce alphabetical
+> sorting. Please insert your new device entries in alphabetical order to ensure
+> automated CI formatting checks pass successfully.
 
 ### 1. Macro Template (`all-devices-common/device-factory/enabled_devices_config.h.in`)
 
@@ -312,7 +323,9 @@ _ALL_DEVICES_APP_DEVICES = [
 
 ### 2. Update Build Test Golden Snapshots
 
-Our automated PR workflows verify that build variants match a golden snapshot. Updating `targets.py` will temporarily cause `scripts/build/test.py` to fail until you regenerate this golden file:
+Our automated PR workflows verify that build variants match a golden snapshot.
+Updating `targets.py` will temporarily cause `scripts/build/test.py` to fail
+until you regenerate this golden file:
 
 1. Run the build script tests within the activated build environment (this run
    will fail but generate an actual output file):
