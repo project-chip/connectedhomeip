@@ -31,6 +31,10 @@ NSString * const MTRErrorDomain = @"MTRErrorDomain";
 
 NSString * const MTRInteractionErrorDomain = @"MTRInteractionErrorDomain";
 
+NSString * const MTRErrorNetworkCommissioningStatusKey = @"MTRNetworkCommissioningStatus";
+NSString * const MTRErrorNetworkCommissioningConnectErrorValueKey = @"MTRNetworkCommissioningConnectErrorValue";
+NSString * const MTRErrorNetworkCommissioningDebugTextKey = @"MTRNetworkCommissioningDebugText";
+
 // Class for holding on to a CHIP_ERROR that we can use as the value
 // in a dictionary.
 @interface MTRErrorHolder : NSObject
@@ -56,15 +60,79 @@ NSString * const MTRInteractionErrorDomain = @"MTRInteractionErrorDomain";
 
 + (NSError *)errorForCHIPErrorCode:(CHIP_ERROR)errorCode logContext:(id)contextToLog
 {
+    return [MTRError errorForCHIPErrorCode:errorCode logContext:contextToLog networkCommissioningStatus:chip::NullOptional];
+}
+
++ (NSError *)errorForCHIPErrorCode:(CHIP_ERROR)errorCode
+                        logContext:(id)contextToLog
+        networkCommissioningStatus:
+            (const chip::Optional<chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatusEnum> &)
+                networkCommissioningStatus
+{
+    return [MTRError errorForCHIPErrorCode:errorCode
+                                logContext:contextToLog
+                networkCommissioningStatus:networkCommissioningStatus
+                  connectNetworkErrorValue:chip::NullOptional
+             networkCommissioningDebugText:std::string()];
+}
+
++ (NSError *)errorForCHIPErrorCode:(CHIP_ERROR)errorCode
+                        logContext:(id)contextToLog
+        networkCommissioningStatus:
+            (const chip::Optional<chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatusEnum> &)
+                networkCommissioningStatus
+          connectNetworkErrorValue:(const chip::Optional<int32_t> &)connectNetworkErrorValue
+     networkCommissioningDebugText:(const std::string &)networkCommissioningDebugText
+{
     if (errorCode == CHIP_NO_ERROR) {
         return nil;
     }
 
     ChipLogError(Controller, "Creating NSError from %" CHIP_ERROR_FORMAT " (context: %@)", errorCode.Format(), contextToLog);
 
+    // Helper that layers any CompletionStatus-derived userInfo entries on top
+    // of an existing userInfo dictionary, mutating-and-returning a fresh dict
+    // when at least one entry is present. The same logic is used on both the
+    // IM-status (MTRInteractionErrorDomain) and the non-IM (MTRErrorDomain)
+    // branches so the consumer contract -- "key is present whenever the
+    // commissionee actually reported the value" -- is uniform across domains.
+    auto attachCompletionStatusUserInfo = ^NSDictionary *(NSDictionary * baseUserInfo)
+    {
+        BOOL hasNCStatus = networkCommissioningStatus.HasValue();
+        BOOL hasConnectErr = connectNetworkErrorValue.HasValue();
+        BOOL hasDebugText = !networkCommissioningDebugText.empty();
+        if (!hasNCStatus && !hasConnectErr && !hasDebugText) {
+            return baseUserInfo;
+        }
+        NSMutableDictionary * combined = baseUserInfo ? [baseUserInfo mutableCopy] : [NSMutableDictionary dictionary];
+        if (hasNCStatus) {
+            combined[MTRErrorNetworkCommissioningStatusKey] = @(chip::to_underlying(networkCommissioningStatus.Value()));
+        }
+        if (hasConnectErr) {
+            combined[MTRErrorNetworkCommissioningConnectErrorValueKey] = @(connectNetworkErrorValue.Value());
+        }
+        if (hasDebugText) {
+            NSString * debugText = [[NSString alloc] initWithBytes:networkCommissioningDebugText.data()
+                                                            length:networkCommissioningDebugText.size()
+                                                          encoding:NSUTF8StringEncoding];
+            if (debugText != nil) {
+                combined[MTRErrorNetworkCommissioningDebugTextKey] = debugText;
+            }
+        }
+        return combined;
+    };
+
     if (errorCode.IsIMStatus()) {
         chip::app::StatusIB status(errorCode);
-        return [MTRError errorForIMStatus:status];
+        NSError * imError = [MTRError errorForIMStatus:status];
+        if (imError == nil) {
+            return nil;
+        }
+        NSDictionary * extendedUserInfo = attachCompletionStatusUserInfo(imError.userInfo);
+        if (extendedUserInfo == imError.userInfo) {
+            return imError;
+        }
+        return [NSError errorWithDomain:imError.domain code:imError.code userInfo:extendedUserInfo];
     }
 
     MTRErrorCode code;
@@ -150,6 +218,7 @@ NSString * const MTRInteractionErrorDomain = @"MTRInteractionErrorDomain";
         [combined addEntriesFromDictionary:additionalUserInfo];
         userInfo = combined;
     }
+    userInfo = attachCompletionStatusUserInfo(userInfo);
 
     auto * error = [NSError errorWithDomain:MTRErrorDomain code:code userInfo:userInfo];
     void * key = (__bridge void *) [MTRErrorHolder class];
@@ -160,6 +229,18 @@ NSString * const MTRInteractionErrorDomain = @"MTRInteractionErrorDomain";
 + (NSError *)errorForCHIPIntegerCode:(uint32_t)errorCode
 {
     return [MTRError errorForCHIPErrorCode:chip::ChipError(errorCode)];
+}
+
++ (NSError *)errorForCHIPIntegerCode:(uint32_t)errorCode
+       hasNetworkCommissioningStatus:(BOOL)hasNetworkCommissioningStatus
+          networkCommissioningStatus:(uint8_t)networkCommissioningStatus
+{
+    using chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatusEnum;
+    chip::Optional<NetworkCommissioningStatusEnum> optionalStatus;
+    if (hasNetworkCommissioningStatus) {
+        optionalStatus.SetValue(static_cast<NetworkCommissioningStatusEnum>(networkCommissioningStatus));
+    }
+    return [MTRError errorForCHIPErrorCode:chip::ChipError(errorCode) logContext:nil networkCommissioningStatus:optionalStatus];
 }
 
 + (NSError *)errorForIMStatus:(const chip::app::StatusIB &)status

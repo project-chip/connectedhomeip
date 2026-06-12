@@ -25,6 +25,52 @@ MTR_EXTERN NSErrorDomain const MTRErrorDomain MTR_AVAILABLE(ios(16.1), macos(13.
 MTR_EXTERN NSErrorDomain const MTRInteractionErrorDomain MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 /**
+ * userInfo key for NSErrors that arose from a commissioning failure where
+ * the commissionee returned a NetworkCommissioning cluster
+ * ConnectNetworkResponse / NetworkConfigResponse with a non-success
+ * NetworkCommissioningStatus.  The value is an NSNumber wrapping an
+ * MTRNetworkCommissioningStatus byte (e.g. NetworkNotFound, AuthFailure).
+ *
+ * The key is present whenever the commissioning failure carried a
+ * NetworkCommissioning status byte, regardless of whether the resulting
+ * NSError lives in MTRErrorDomain or MTRInteractionErrorDomain.  Its absence
+ * means the commissionee did not report a NetworkCommissioning status.
+ *
+ * The underlying string value is @"MTRNetworkCommissioningStatus" and is
+ * considered stable ABI: it appears in archived NSError userInfo
+ * dictionaries and may be read by string-key lookup from clients that do
+ * not link against this symbol.
+ */
+MTR_EXTERN NSString * const MTRErrorNetworkCommissioningStatusKey MTR_AVAILABLE(ios(26.0), macos(26.0), watchos(26.0), tvos(26.0));
+
+/**
+ * userInfo key carrying the device-reported low-level driver errorValue from
+ * a NetworkCommissioning ConnectNetworkResponse (e.g. driver-specific
+ * association-failure code, distinct from the spec-level
+ * NetworkCommissioningStatus already exposed under
+ * MTRErrorNetworkCommissioningStatusKey).  Value is an NSNumber wrapping
+ * int32_t.
+ *
+ * The key is present only when the commissionee reported a non-empty
+ * connectNetworkErrorValue alongside the failure.
+ *
+ * The underlying string value is @"MTRNetworkCommissioningConnectErrorValue".
+ */
+MTR_EXTERN NSString * const MTRErrorNetworkCommissioningConnectErrorValueKey MTR_AVAILABLE(ios(26.0), macos(26.0), watchos(26.0), tvos(26.0));
+
+/**
+ * userInfo key carrying the device-supplied NetworkCommissioning debugText
+ * string from a NetworkConfigResponse / ConnectNetworkResponse.  Value is an
+ * NSString.
+ *
+ * The key is present only when the commissionee supplied a non-empty
+ * debugText string alongside the failure.
+ *
+ * The underlying string value is @"MTRNetworkCommissioningDebugText".
+ */
+MTR_EXTERN NSString * const MTRErrorNetworkCommissioningDebugTextKey MTR_AVAILABLE(ios(26.0), macos(26.0), watchos(26.0), tvos(26.0));
+
+/**
  * MTRErrorDomain contains errors caused by data processing the framework
  * itself is performing.  These can be caused by invalid values provided to a
  * framework API, failure to decode an incoming message, and so forth.
@@ -35,7 +81,7 @@ MTR_EXTERN NSErrorDomain const MTRInteractionErrorDomain MTR_AVAILABLE(ios(16.1)
  * Errors reported by the server side of a Matter interaction via the normal
  * Matter error-reporting mechanisms use MTRInteractionErrorDomain instead.
  */
-typedef NS_ERROR_ENUM(MTRErrorDomain, MTRErrorCode){
+typedef NS_ERROR_ENUM(MTRErrorDomain, MTRErrorCode) {
     /**
      * MTRErrorCodeGeneralError represents a generic Matter error with no
      * further categorization.
@@ -45,16 +91,16 @@ typedef NS_ERROR_ENUM(MTRErrorDomain, MTRErrorCode){
      * values should not be assumed to be stable across releases, but may be
      * useful in logging and debugging.
      */
-    MTRErrorCodeGeneralError         = 1,
-    MTRErrorCodeInvalidStringLength  = 2,
-    MTRErrorCodeInvalidIntegerValue  = 3,
-    MTRErrorCodeInvalidArgument      = 4,
+    MTRErrorCodeGeneralError = 1,
+    MTRErrorCodeInvalidStringLength = 2,
+    MTRErrorCodeInvalidIntegerValue = 3,
+    MTRErrorCodeInvalidArgument = 4,
     MTRErrorCodeInvalidMessageLength = 5,
-    MTRErrorCodeInvalidState         = 6,
-    MTRErrorCodeWrongAddressType     = 7,
+    MTRErrorCodeInvalidState = 6,
+    MTRErrorCodeWrongAddressType = 7,
     MTRErrorCodeIntegrityCheckFailed = 8,
-    MTRErrorCodeTimeout              = 9,
-    MTRErrorCodeBufferTooSmall       = 10,
+    MTRErrorCodeTimeout = 9,
+    MTRErrorCodeBufferTooSmall = 10,
 
     /**
      * MTRErrorCodeFabricExists is returned when trying to commission a device
@@ -125,39 +171,39 @@ typedef NS_ERROR_ENUM(MTRErrorDomain, MTRErrorCode){
  * was reported.  This key will be absent if there was no cluster-specific
  * status.
  */
-typedef NS_ERROR_ENUM(MTRInteractionErrorDomain, MTRInteractionErrorCode){
+typedef NS_ERROR_ENUM(MTRInteractionErrorDomain, MTRInteractionErrorCode) {
     // These values come from the general status code table in the Matter
     // Interaction Model specification.
-    MTRInteractionErrorCodeFailure                                                                            = 0x01,
-    MTRInteractionErrorCodeInvalidSubscription                                                                = 0x7d,
-    MTRInteractionErrorCodeUnsupportedAccess                                                                  = 0x7e,
-    MTRInteractionErrorCodeUnsupportedEndpoint                                                                = 0x7f,
-    MTRInteractionErrorCodeInvalidAction                                                                      = 0x80,
-    MTRInteractionErrorCodeUnsupportedCommand                                                                 = 0x81,
-    MTRInteractionErrorCodeInvalidCommand                                                                     = 0x85,
-    MTRInteractionErrorCodeUnsupportedAttribute                                                               = 0x86,
-    MTRInteractionErrorCodeConstraintError                                                                    = 0x87,
-    MTRInteractionErrorCodeUnsupportedWrite                                                                   = 0x88,
-    MTRInteractionErrorCodeResourceExhausted                                                                  = 0x89,
-    MTRInteractionErrorCodeNotFound                                                                           = 0x8b,
-    MTRInteractionErrorCodeUnreportableAttribute                                                              = 0x8c,
-    MTRInteractionErrorCodeInvalidDataType                                                                    = 0x8d,
-    MTRInteractionErrorCodeUnsupportedRead                                                                    = 0x8f,
-    MTRInteractionErrorCodeDataVersionMismatch                                                                = 0x92,
-    MTRInteractionErrorCodeTimeout                                                                            = 0x94,
-    MTRInteractionErrorCodeBusy                                                                               = 0x9c,
-    MTRInteractionErrorCodeAccessRestricted MTR_AVAILABLE(ios(26.0), macos(26.0), watchos(26.0), tvos(26.0))  = 0x9d,
-    MTRInteractionErrorCodeUnsupportedCluster                                                                 = 0xc3,
-    MTRInteractionErrorCodeNoUpstreamSubscription                                                             = 0xc5,
-    MTRInteractionErrorCodeNeedsTimedInteraction                                                              = 0xc6,
-    MTRInteractionErrorCodeUnsupportedEvent                                                                   = 0xc7,
-    MTRInteractionErrorCodePathsExhausted                                                                     = 0xc8,
-    MTRInteractionErrorCodeTimedRequestMismatch                                                               = 0xc9,
-    MTRInteractionErrorCodeFailsafeRequired                                                                   = 0xca,
-    MTRInteractionErrorCodeInvalidInState MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))    = 0xcb,
+    MTRInteractionErrorCodeFailure = 0x01,
+    MTRInteractionErrorCodeInvalidSubscription = 0x7d,
+    MTRInteractionErrorCodeUnsupportedAccess = 0x7e,
+    MTRInteractionErrorCodeUnsupportedEndpoint = 0x7f,
+    MTRInteractionErrorCodeInvalidAction = 0x80,
+    MTRInteractionErrorCodeUnsupportedCommand = 0x81,
+    MTRInteractionErrorCodeInvalidCommand = 0x85,
+    MTRInteractionErrorCodeUnsupportedAttribute = 0x86,
+    MTRInteractionErrorCodeConstraintError = 0x87,
+    MTRInteractionErrorCodeUnsupportedWrite = 0x88,
+    MTRInteractionErrorCodeResourceExhausted = 0x89,
+    MTRInteractionErrorCodeNotFound = 0x8b,
+    MTRInteractionErrorCodeUnreportableAttribute = 0x8c,
+    MTRInteractionErrorCodeInvalidDataType = 0x8d,
+    MTRInteractionErrorCodeUnsupportedRead = 0x8f,
+    MTRInteractionErrorCodeDataVersionMismatch = 0x92,
+    MTRInteractionErrorCodeTimeout = 0x94,
+    MTRInteractionErrorCodeBusy = 0x9c,
+    MTRInteractionErrorCodeAccessRestricted MTR_AVAILABLE(ios(26.0), macos(26.0), watchos(26.0), tvos(26.0)) = 0x9d,
+    MTRInteractionErrorCodeUnsupportedCluster = 0xc3,
+    MTRInteractionErrorCodeNoUpstreamSubscription = 0xc5,
+    MTRInteractionErrorCodeNeedsTimedInteraction = 0xc6,
+    MTRInteractionErrorCodeUnsupportedEvent = 0xc7,
+    MTRInteractionErrorCodePathsExhausted = 0xc8,
+    MTRInteractionErrorCodeTimedRequestMismatch = 0xc9,
+    MTRInteractionErrorCodeFailsafeRequired = 0xca,
+    MTRInteractionErrorCodeInvalidInState MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6)) = 0xcb,
     MTRInteractionErrorCodeNoCommandResponse MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6)) = 0xcc,
-    MTRInteractionErrorCodeDynamicConstraintError MTR_PROVISIONALLY_AVAILABLE                                 = 0xcf,
-    MTRInteractionErrorCodeInvalidTransportType MTR_PROVISIONALLY_AVAILABLE                                   = 0xd1,
+    MTRInteractionErrorCodeDynamicConstraintError MTR_PROVISIONALLY_AVAILABLE = 0xcf,
+    MTRInteractionErrorCodeInvalidTransportType MTR_PROVISIONALLY_AVAILABLE = 0xd1,
 } MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 NS_ASSUME_NONNULL_END
