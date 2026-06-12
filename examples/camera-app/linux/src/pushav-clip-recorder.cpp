@@ -901,164 +901,150 @@ void PushAVClipRecorder::FinalizeMPD(const std::string & mpdPath)
     // After av_write_trailer, the MPD is already static with type="static",
     // mediaPresentationDuration, and no minimumUpdatePeriod/suggestedPresentationDelay.
     // The only missing piece is the SegmentTimeline inside each SegmentTemplate.
-    bool modified = false;
+    bool modified                       = false;
     std::vector<std::string> outputLines;
-    size_t streamIdx = 0;
+    size_t streamIdx                    = 0;
 
-    // State for tracking multi-line SegmentTemplate elements where the opening tag
-    // and closing tag are on different lines (e.g., after av_write_trailer converts
-    // the MPD to static with multi-line formatting).
-    bool inMultiLineSegmentTemplate = false;
-    std::string pendingTimelineOpen;
-    std::string pendingTimelineEntry;
-    std::string pendingTimelineClose;
+    bool inSegmentTemplate              = false;
+    std::string templateIndent;
+    int64_t timescale                   = 90000;
+    int64_t segDurationTs               = 0;
 
     for (size_t i = 0; i < lines.size(); i++)
     {
-        // If we're inside a multi-line SegmentTemplate, look for the closing tag
-        if (inMultiLineSegmentTemplate)
+        std::string line = lines[i];
+
+        if (!inSegmentTemplate)
         {
-            size_t closeTagPos = lines[i].find("</SegmentTemplate>");
-            if (closeTagPos != std::string::npos)
+            size_t stPos = line.find("<SegmentTemplate");
+            if (stPos != std::string::npos)
             {
-                // Insert SegmentTimeline before the closing tag line
-                outputLines.push_back(pendingTimelineOpen);
-                outputLines.push_back(pendingTimelineEntry);
-                outputLines.push_back(pendingTimelineClose);
-                outputLines.push_back(lines[i]);
-                modified                   = true;
-                inMultiLineSegmentTemplate = false;
+                inSegmentTemplate = true;
+                timescale         = 90000;
+                segDurationTs     = 0;
+                templateIndent.clear();
+                for (char c : line)
+                {
+                    if (c == ' ' || c == '\t')
+                    {
+                        templateIndent += c;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (inSegmentTemplate)
+        {
+            size_t tsPos = line.find("timescale=\"");
+            if (tsPos != std::string::npos)
+            {
+                size_t valStart = tsPos + 11;
+                size_t valEnd   = line.find("\"", valStart);
+                if (valEnd != std::string::npos)
+                {
+                    std::string valStr = line.substr(valStart, valEnd - valStart);
+                    char * endPtr      = nullptr;
+                    long val           = std::strtol(valStr.c_str(), &endPtr, 10);
+                    if (endPtr != valStr.c_str() && *endPtr == '\0' && val >= 0)
+                    {
+                        timescale = val;
+                    }
+                }
+            }
+
+            size_t durPos = line.find("duration=\"");
+            if (durPos != std::string::npos)
+            {
+                size_t valStart = durPos + 10;
+                size_t valEnd   = line.find("\"", valStart);
+                if (valEnd != std::string::npos)
+                {
+                    std::string valStr = line.substr(valStart, valEnd - valStart);
+                    char * endPtr      = nullptr;
+                    long val           = std::strtol(valStr.c_str(), &endPtr, 10);
+                    if (endPtr != valStr.c_str() && *endPtr == '\0' && val >= 0)
+                    {
+                        segDurationTs = val;
+                    }
+                }
+            }
+
+            size_t selfClosePos = line.find("/>");
+            size_t closeTagPos  = line.find("</SegmentTemplate>");
+
+            if (selfClosePos != std::string::npos && (closeTagPos == std::string::npos || selfClosePos < closeTagPos))
+            {
+                if (segDurationTs == 0 && streamIdx < segmentCounts.size())
+                {
+                    segDurationTs = (static_cast<int64_t>(mClipInfo.mSegmentDurationMs) * timescale) / 1000;
+                }
+
+                int segCount = (streamIdx < segmentCounts.size()) ? segmentCounts[streamIdx] : 0;
+                if (segCount > 0 && segDurationTs > 0)
+                {
+                    line.replace(selfClosePos, 2, ">");
+                    outputLines.push_back(line);
+                    outputLines.push_back(templateIndent + "<SegmentTimeline>");
+                    if (segCount == 1)
+                    {
+                        outputLines.push_back(templateIndent + "    <S t=\"0\" d=\"" + std::to_string(segDurationTs) + "\" />");
+                    }
+                    else
+                    {
+                        outputLines.push_back(templateIndent + "    <S t=\"0\" d=\"" + std::to_string(segDurationTs) + "\" r=\"" +
+                                              std::to_string(segCount - 1) + "\" />");
+                    }
+                    outputLines.push_back(templateIndent + "</SegmentTimeline>");
+                    outputLines.push_back(templateIndent + "</SegmentTemplate>");
+                    modified = true;
+                }
+                else
+                {
+                    outputLines.push_back(line);
+                }
+                inSegmentTemplate = false;
                 streamIdx++;
-                continue;
             }
-            outputLines.push_back(lines[i]);
-            continue;
-        }
-
-        outputLines.push_back(lines[i]);
-
-        // Look for SegmentTemplate opening tag
-        size_t stPos = lines[i].find("<SegmentTemplate");
-        if (stPos == std::string::npos)
-        {
-            continue;
-        }
-
-        // Check if this is a self-closing tag or has a closing tag on the same line
-        size_t selfClosePos = lines[i].find("/>", stPos);
-        size_t closeTagPos  = lines[i].find("</SegmentTemplate>", stPos);
-
-        // Extract timescale and duration from this SegmentTemplate line
-        int64_t timescale     = 90000; // default
-        int64_t segDurationTs = 0;     // segment duration in timescale units
-
-        size_t tsPos = lines[i].find("timescale=\"", stPos);
-        if (tsPos != std::string::npos)
-        {
-            size_t valStart = tsPos + 11;
-            size_t valEnd   = lines[i].find("\"", valStart);
-            if (valEnd != std::string::npos)
+            else if (closeTagPos != std::string::npos)
             {
-                std::string valStr = lines[i].substr(valStart, valEnd - valStart);
-                char * endPtr      = nullptr;
-                long val           = std::strtol(valStr.c_str(), &endPtr, 10);
-                if (endPtr != valStr.c_str() && *endPtr == '\0' && val >= 0)
+                if (segDurationTs == 0 && streamIdx < segmentCounts.size())
                 {
-                    timescale = val;
+                    segDurationTs = (static_cast<int64_t>(mClipInfo.mSegmentDurationMs) * timescale) / 1000;
                 }
-            }
-        }
 
-        size_t durPos = lines[i].find("duration=\"", stPos);
-        if (durPos != std::string::npos)
-        {
-            size_t valStart = durPos + 10;
-            size_t valEnd   = lines[i].find("\"", valStart);
-            if (valEnd != std::string::npos)
-            {
-                std::string valStr = lines[i].substr(valStart, valEnd - valStart);
-                char * endPtr      = nullptr;
-                long val           = std::strtol(valStr.c_str(), &endPtr, 10);
-                if (endPtr != valStr.c_str() && *endPtr == '\0' && val >= 0)
+                int segCount = (streamIdx < segmentCounts.size()) ? segmentCounts[streamIdx] : 0;
+                if (segCount > 0 && segDurationTs > 0)
                 {
-                    segDurationTs = val;
+                    outputLines.push_back(templateIndent + "<SegmentTimeline>");
+                    if (segCount == 1)
+                    {
+                        outputLines.push_back(templateIndent + "    <S t=\"0\" d=\"" + std::to_string(segDurationTs) + "\" />");
+                    }
+                    else
+                    {
+                        outputLines.push_back(templateIndent + "    <S t=\"0\" d=\"" + std::to_string(segDurationTs) + "\" r=\"" +
+                                              std::to_string(segCount - 1) + "\" />");
+                    }
+                    outputLines.push_back(templateIndent + "</SegmentTimeline>");
+                    modified = true;
                 }
-            }
-        }
-
-        // If no duration attribute, calculate from configured segment duration
-        if (segDurationTs == 0 && streamIdx < segmentCounts.size())
-        {
-            segDurationTs = (static_cast<int64_t>(mClipInfo.mSegmentDurationMs) * timescale) / 1000;
-        }
-
-        int segCount = (streamIdx < segmentCounts.size()) ? segmentCounts[streamIdx] : 0;
-        if (segCount <= 0 || segDurationTs <= 0)
-        {
-            streamIdx++;
-            continue;
-        }
-
-        // Build SegmentTimeline XML - derive indentation from the SegmentTemplate line
-        std::string indent;
-        for (char c : lines[i])
-        {
-            if (c == ' ' || c == '\t')
-            {
-                indent += c;
+                outputLines.push_back(line);
+                inSegmentTemplate = false;
+                streamIdx++;
             }
             else
             {
-                break;
+                outputLines.push_back(line);
             }
         }
-        std::string timelineOpen = indent + "<SegmentTimeline>";
-        // Use r attribute for repeat count: r="N" means the S element repeats N additional times (total N+1)
-        std::string timelineEntry;
-        if (segCount == 1)
-        {
-            timelineEntry = indent + "    <S t=\"0\" d=\"" + std::to_string(segDurationTs) + "\" />";
-        }
         else
         {
-            // r = segCount - 1 (the S element itself counts as 1, r adds segCount-1 more)
-            timelineEntry =
-                indent + "    <S t=\"0\" d=\"" + std::to_string(segDurationTs) + "\" r=\"" + std::to_string(segCount - 1) + "\" />";
+            outputLines.push_back(line);
         }
-        std::string timelineClose = indent + "</SegmentTimeline>";
-
-        if (selfClosePos != std::string::npos && (closeTagPos == std::string::npos || selfClosePos < closeTagPos))
-        {
-            // Self-closing tag: convert to open/close with SegmentTimeline inside
-            // Replace "/>" with ">"
-            std::string & currentLine = outputLines.back();
-            currentLine.replace(selfClosePos, 2, ">");
-            // Add SegmentTimeline lines
-            outputLines.push_back(timelineOpen);
-            outputLines.push_back(timelineEntry);
-            outputLines.push_back(timelineClose);
-            outputLines.push_back(indent + "</SegmentTemplate>");
-            modified = true;
-        }
-        else if (closeTagPos != std::string::npos)
-        {
-            // Has a closing tag on the same line - insert SegmentTimeline before it
-            outputLines.push_back(timelineOpen);
-            outputLines.push_back(timelineEntry);
-            outputLines.push_back(timelineClose);
-            modified = true;
-        }
-        else
-        {
-            // Neither /> nor </SegmentTemplate> on the same line - multi-line SegmentTemplate.
-            // Store the timeline entries and insert them when we find the closing tag.
-            inMultiLineSegmentTemplate = true;
-            pendingTimelineOpen        = timelineOpen;
-            pendingTimelineEntry       = timelineEntry;
-            pendingTimelineClose       = timelineClose;
-        }
-
-        streamIdx++;
     }
 
     // Write the modified MPD

@@ -332,39 +332,37 @@ std::string ProcessM4SUploadPath(std::string path, const std::vector<std::string
         const auto numEnd   = result.find(".m4s", numStart);
         if (numEnd != std::string::npos)
         {
+            std::string numStr = result.substr(numStart, numEnd - numStart);
+            bool valid         = !numStr.empty();
+            for (char c : numStr)
             {
-                std::string numStr = result.substr(numStart, numEnd - numStart);
-                bool valid         = !numStr.empty();
-                for (char c : numStr)
+                if (!std::isdigit(static_cast<unsigned char>(c)))
                 {
-                    if (!std::isdigit(static_cast<unsigned char>(c)))
-                    {
-                        valid = false;
-                        break;
-                    }
+                    valid = false;
+                    break;
                 }
-                if (valid)
+            }
+            if (valid)
+            {
+                char * endPtr = nullptr;
+                long segNum   = std::strtol(numStr.c_str(), &endPtr, 10);
+                if (endPtr == numStr.c_str() || segNum < 0 || segNum > INT_MAX - 1000)
                 {
-                    char * endPtr = nullptr;
-                    long segNum   = std::strtol(numStr.c_str(), &endPtr, 10);
-                    if (endPtr == numStr.c_str() || segNum < 0 || segNum > INT_MAX - 1000)
-                    {
-                        ChipLogError(Camera, "Segment number out of range: %s", numStr.c_str());
-                        return path;
-                    }
-                    segNum += 1000; // Offset: 1 -> 1001, 2 -> 1002, etc.
-                    if (segNum > 9999)
-                    {
-                        ChipLogError(Camera, "Segment number overflow: %ld", segNum);
-                        segNum = 0;
-                    }
-                    result.replace(numStart, numEnd - numStart, std::to_string(segNum));
-                }
-                else
-                {
-                    ChipLogError(Camera, "Failed to parse segment number from path: %s", result.c_str());
+                    ChipLogError(Camera, "Segment number out of range: %s", numStr.c_str());
                     return path;
                 }
+                segNum += 1000; // Offset: 1 -> 1001, 2 -> 1002, etc.
+                if (segNum > 9999)
+                {
+                    ChipLogError(Camera, "Segment number overflow: %ld", segNum);
+                    segNum = 0;
+                }
+                result.replace(numStart, numEnd - numStart, std::to_string(segNum));
+            }
+            else
+            {
+                ChipLogError(Camera, "Failed to parse segment number from path: %s", result.c_str());
+                return path;
             }
         }
     }
