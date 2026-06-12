@@ -64,6 +64,12 @@ public:
     const std::vector<Entry> & GetDeviceTypeEntries();
 
     /**
+     * Validates that the list of device entries contains no duplicate endpoints,
+     * and that parentage rules are followed for bridged nodes.
+     */
+    static CHIP_ERROR ValidateConfig(const std::vector<Entry> & entries);
+
+    /**
      * Clears the list of parsed device configurations.
      */
     void Clear() { mDeviceTypeEntries.clear(); }
