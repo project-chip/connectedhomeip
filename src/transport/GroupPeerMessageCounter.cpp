@@ -31,7 +31,7 @@ namespace Transport {
 
 namespace {
 
-void ShiftAndInsert(GroupSender * list, uint32_t size, uint32_t oldIndex, GroupSender & newEntry)
+void ShiftAndInsert(GroupSender * list, uint32_t oldIndex, GroupSender & newEntry)
 {
     // The element at oldIndex is being overwritten, so we must destroy it first.
     list[oldIndex].~GroupSender();
@@ -63,7 +63,7 @@ CHIP_ERROR FindOrAddPeerFabricFound(GroupSender * list, uint32_t maxLimit, uint8
             if (i > 0)
             {
                 GroupSender temp(list[i]);
-                ShiftAndInsert(list, maxLimit, i, temp);
+                ShiftAndInsert(list, i, temp);
             }
             counter = &(list[0].msgCounter);
             return CHIP_NO_ERROR;
@@ -75,7 +75,7 @@ CHIP_ERROR FindOrAddPeerFabricFound(GroupSender * list, uint32_t maxLimit, uint8
     temp.mNodeId = nodeId;
     if (peerCount < maxLimit)
     {
-        ShiftAndInsert(list, maxLimit, peerCount, temp);
+        ShiftAndInsert(list, peerCount, temp);
         peerCount++;
     }
     else
@@ -83,7 +83,7 @@ CHIP_ERROR FindOrAddPeerFabricFound(GroupSender * list, uint32_t maxLimit, uint8
         // Evict LRU
         ChipLogProgress(SecureChannel, "GroupPeerTable: Evicting %s peer " ChipLogFormatX64 " due to table being full",
                         peerType, ChipLogValueX64(list[maxLimit - 1].mNodeId));
-        ShiftAndInsert(list, maxLimit, maxLimit - 1, temp);
+        ShiftAndInsert(list, maxLimit - 1, temp);
     }
     counter = &(list[0].msgCounter);
     return CHIP_NO_ERROR;
@@ -128,11 +128,8 @@ CHIP_ERROR GroupPeerTable::FindOrAddPeer(FabricIndex fabricIndex, NodeId nodeId,
                 return FindOrAddPeerFabricFound(groupFabric.mControlGroupSenders, CHIP_CONFIG_MAX_GROUP_CONTROL_PEERS,
                                          groupFabric.mControlPeerCount, nodeId, counter, "control");
             }
-            else
-            {
-                return FindOrAddPeerFabricFound(groupFabric.mDataGroupSenders, CHIP_CONFIG_MAX_GROUP_DATA_PEERS,
-                                         groupFabric.mDataPeerCount, nodeId, counter, "data");
-            }
+            return FindOrAddPeerFabricFound(groupFabric.mDataGroupSenders, CHIP_CONFIG_MAX_GROUP_DATA_PEERS,
+                                        groupFabric.mDataPeerCount, nodeId, counter, "data");
         }
     }
 
@@ -256,11 +253,18 @@ void GroupPeerTable::CompactPeers(GroupSender * list, uint32_t size)
             {
                 list[writeIndex].~GroupSender();
                 new (&list[writeIndex]) GroupSender(std::move(list[readIndex]));
-                list[readIndex].~GroupSender();
-                new (&list[readIndex]) GroupSender();
             }
             writeIndex++;
         }
+    }
+
+    // Cleanup old entries at the end of the list. These were entries that were 
+    // moved further up in the list, and the entries from the writeIndex onwards
+    // are in an unspecifed state.
+    for (uint32_t i = writeIndex; i < size; i++)
+    {
+        list[i].~GroupSender();
+        new (&list[i]) GroupSender();
     }
 }
 
