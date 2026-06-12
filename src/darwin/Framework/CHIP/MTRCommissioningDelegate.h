@@ -109,10 +109,25 @@ MTR_AVAILABLE(ios(26.2), macos(26.2), watchos(26.2), tvos(26.2))
 
 /**
  * Notification that commissioning has succeeded.
+ *
+ * This selector will not be used if commissioning:succeededForNodeID:metrics:context: is supported.
  */
 - (void)commissioning:(MTRCommissioningOperation *)commissioning
     succeededForNodeID:(NSNumber *)nodeID
                metrics:(MTRMetrics *)metrics;
+
+/**
+ * Notification that commissioning has succeeded.
+ *
+ * If supported, this selector will be used in preference to commissioning:succeededForNodeID:metrics:.
+ *
+ * The context parameter is a dictionary with NSString keys and values of type id.
+ * The supported keys are defined above in this file.
+ */
+- (void)commissioning:(MTRCommissioningOperation *)commissioning
+    succeededForNodeID:(NSNumber *)nodeID
+               metrics:(MTRMetrics *)metrics
+               context:(NSDictionary<NSString *, id> *)context MTR_AVAILABLE(ios(27.0), macos(27.0), watchos(27.0), tvos(27.0));
 
 @end
 
