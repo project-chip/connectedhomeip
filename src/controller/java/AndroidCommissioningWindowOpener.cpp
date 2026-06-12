@@ -111,7 +111,12 @@ void AndroidCommissioningWindowOpener::OnOpenCommissioningWindowResponse(void * 
 {
     auto * self  = static_cast<AndroidCommissioningWindowOpener *>(context);
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-    VerifyOrExit(env != nullptr, ChipLogError(Controller, "Could not get JNIEnv for current thread"));
+    if (env == nullptr)
+    {
+        ChipLogError(Controller, "Could not get JNIEnv for current thread");
+        delete self;
+        return;
+    }
     JniLocalReferenceScope scope(env);
 
     VerifyOrExit(self->mJavaCallback.HasValidObjectRef(), ChipLogError(Controller, "mJavaCallback is not allocated."));
