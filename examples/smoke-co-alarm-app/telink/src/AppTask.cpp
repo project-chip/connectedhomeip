@@ -20,6 +20,8 @@
 #include "SmokeCoAlarmManager.h"
 #include "platform/CHIPDeviceLayer.h"
 
+#include <app/clusters/smoke-co-alarm-server/smoke-co-alarm-server.h>
+
 LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
 
 AppTask AppTask::sAppTask;
