@@ -22,12 +22,17 @@ menu "Demo"
 
     choice
         prompt "Device Type"
+        default DEVICE_TYPE_ESP32_C5_DEVKITC if IDF_TARGET_ESP32C5
         default DEVICE_TYPE_ESP32_C6_DEVKITC if IDF_TARGET_ESP32C6
         help
             Specifies the type of ESP32 device.
 
             Note that the "ESP32-DevKitC" choice is compatible with a number of clone devices
             available from third-party manufacturers.
+
+        config DEVICE_TYPE_ESP32_C5_DEVKITC
+            bool "ESP32C5-DevKitC"
+            depends on IDF_TARGET_ESP32C5
 
         config DEVICE_TYPE_ESP32_C6_DEVKITC
             bool "ESP32C6-DevKitC"

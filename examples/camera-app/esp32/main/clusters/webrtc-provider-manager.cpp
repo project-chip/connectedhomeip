@@ -110,7 +110,7 @@ WebRTCProviderManager::HandleSolicitOffer(const OfferRequestArgs & args, WebRTCS
 
     outDeferredOffer = deferred_offer;
 
-    ChipLogError(Camera, "Deferred Offer is set to: %d", outDeferredOffer);
+    ChipLogProgress(Camera, "Deferred Offer is set to: %d", outDeferredOffer);
 
     WebrtcTransport * transport = GetTransport(args.sessionId);
     WebrtcTransport::RequestArgs requestArgs;
