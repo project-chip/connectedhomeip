@@ -37,6 +37,8 @@
 using namespace chip::app::Clusters::OnOff::Attributes;
 #endif // MATTER_DM_PLUGIN_ON_OFF_SERVER
 
+#include <map>
+
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
@@ -46,9 +48,27 @@ using chip::Protocols::InteractionModel::Status;
 
 namespace chip::app::Clusters::ModeBase {
 
+namespace {
+
+// A map of cluster IDs to their corresponding cluster revisions.
+std::map<ClusterId, const uint32_t> gClusterRevisionMap = {
+    { DeviceEnergyManagementMode::Id, DeviceEnergyManagementMode::kRevision },
+    { DishwasherMode::Id, DishwasherMode::kRevision },
+    { EnergyEvseMode::Id, EnergyEvseMode::kRevision },
+    { LaundryWasherMode::Id, LaundryWasherMode::kRevision },
+    { MicrowaveOvenMode::Id, MicrowaveOvenMode::kRevision },
+    { OvenMode::Id, OvenMode::kRevision },
+    { RefrigeratorAndTemperatureControlledCabinetMode::Id, RefrigeratorAndTemperatureControlledCabinetMode::kRevision },
+    { RvcCleanMode::Id, RvcCleanMode::kRevision },
+    { RvcRunMode::Id, RvcRunMode::kRevision },
+    { WaterHeaterMode::Id, WaterHeaterMode::kRevision },
+};
+
 // A set of pointers to all initialised ModeBase instances. It provides a way to access all ModeBase derived clusters.
-// todo change once there is a clear public interface for the OnOff cluster data dependencies (#27508)
-static IntrusiveList<Instance> gModeBaseInstances;
+// TODO: change once there is a clear public interface for the OnOff cluster data dependencies (#27508)
+IntrusiveList<Instance> gModeBaseInstances;
+
+} // namespace
 
 IntrusiveList<Instance> & GetModeBaseInstanceList()
 {
@@ -70,42 +90,9 @@ CHIP_ERROR Instance::Init()
     const EmberAfCluster * cluster = emberAfFindServerCluster(mClusterPath.mEndpointId, mClusterPath.mClusterId);
     VerifyOrReturnError(cluster != nullptr, CHIP_ERROR_NOT_FOUND);
 
-    uint32_t clusterRevision = 0;
-    switch (mClusterPath.mClusterId)
-    {
-    case DeviceEnergyManagementMode::Id:
-        clusterRevision = DeviceEnergyManagementMode::kRevision;
-        break;
-    case DishwasherMode::Id:
-        clusterRevision = DishwasherMode::kRevision;
-        break;
-    case EnergyEvseMode::Id:
-        clusterRevision = EnergyEvseMode::kRevision;
-        break;
-    case LaundryWasherMode::Id:
-        clusterRevision = LaundryWasherMode::kRevision;
-        break;
-    case MicrowaveOvenMode::Id:
-        clusterRevision = MicrowaveOvenMode::kRevision;
-        break;
-    case OvenMode::Id:
-        clusterRevision = OvenMode::kRevision;
-        break;
-    case RefrigeratorAndTemperatureControlledCabinetMode::Id:
-        clusterRevision = RefrigeratorAndTemperatureControlledCabinetMode::kRevision;
-        break;
-    case RvcCleanMode::Id:
-        clusterRevision = RvcCleanMode::kRevision;
-        break;
-    case RvcRunMode::Id:
-        clusterRevision = RvcRunMode::kRevision;
-        break;
-    case WaterHeaterMode::Id:
-        clusterRevision = WaterHeaterMode::kRevision;
-        break;
-    default:
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
+    auto it = gClusterRevisionMap.find(mClusterPath.mClusterId);
+    VerifyOrReturnError(it != gClusterRevisionMap.end(), CHIP_ERROR_INVALID_ARGUMENT);
+    uint32_t clusterRevision = it->second;
 
     // Although StartUpMode attribute is optional, spec says that none of the aliased clusters supports it.
     VerifyOrReturnError(!emberAfContainsAttribute(mClusterPath.mEndpointId, mClusterPath.mClusterId, StartUpMode::Id),
