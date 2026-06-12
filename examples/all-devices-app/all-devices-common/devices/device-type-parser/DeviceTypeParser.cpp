@@ -134,8 +134,18 @@ void DeviceTypeParser::ExpandWildcards(const std::vector<std::string> & wildcard
         return;
     }
 
+    // Find the highest explicit endpoint ID in the list
+    chip::EndpointId maxEp = 0;
+    for (const auto & entry : mDeviceTypeEntries)
+    {
+        if (entry.type != "*" && entry.endpoint != chip::kInvalidEndpointId && entry.endpoint > maxEp)
+        {
+            maxEp = entry.endpoint;
+        }
+    }
+
     std::vector<Entry> expandedEntries;
-    chip::EndpointId nextAvailableEp = 1;
+    chip::EndpointId nextAvailableEp = (maxEp == 0) ? 1 : static_cast<chip::EndpointId>(maxEp + 1);
 
     for (const auto & entry : mDeviceTypeEntries)
     {
@@ -158,10 +168,6 @@ void DeviceTypeParser::ExpandWildcards(const std::vector<std::string> & wildcard
         else
         {
             expandedEntries.push_back(entry);
-            if (entry.endpoint != chip::kInvalidEndpointId && entry.endpoint >= nextAvailableEp)
-            {
-                nextAvailableEp = entry.endpoint + 1;
-            }
         }
     }
 

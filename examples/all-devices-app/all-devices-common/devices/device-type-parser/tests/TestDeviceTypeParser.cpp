@@ -201,3 +201,61 @@ TEST_F(TestDeviceTypeParser, ExpandWildcards_MultipleWildcards)
     EXPECT_EQ(configs[3].type, "speaker");
     EXPECT_EQ(configs[3].endpoint, 4);
 }
+
+TEST_F(TestDeviceTypeParser, ExpandWildcards_MixedOrderingAfter)
+{
+    EXPECT_EQ(mParser.ParseSingleDeviceString("*"), CHIP_NO_ERROR);
+    EXPECT_EQ(mParser.ParseSingleDeviceString("light:10"), CHIP_NO_ERROR);
+
+    std::vector<std::string> deviceTypes = { "chime", "speaker" };
+    mParser.ExpandWildcards(deviceTypes);
+
+    const auto & configs = mParser.GetDeviceTypeEntries();
+    EXPECT_EQ(configs.size(), 3U);
+    // Wildcard expanded starting at maxEp + 1 = 11
+    EXPECT_EQ(configs[0].type, "chime");
+    EXPECT_EQ(configs[0].endpoint, 11);
+    EXPECT_EQ(configs[1].type, "speaker");
+    EXPECT_EQ(configs[1].endpoint, 12);
+    // light explicit endpoint at 10
+    EXPECT_EQ(configs[2].type, "light");
+    EXPECT_EQ(configs[2].endpoint, 10);
+}
+
+TEST_F(TestDeviceTypeParser, ExpandWildcards_Subtrees)
+{
+    EXPECT_EQ(mParser.ParseSingleDeviceString("aggregator:1"), CHIP_NO_ERROR);
+    EXPECT_EQ(mParser.ParseSingleDeviceString("*,parent=1"), CHIP_NO_ERROR);
+    EXPECT_EQ(mParser.ParseSingleDeviceString("aggregator:20"), CHIP_NO_ERROR);
+    EXPECT_EQ(mParser.ParseSingleDeviceString("*,parent=20"), CHIP_NO_ERROR);
+
+    std::vector<std::string> deviceTypes = { "chime", "speaker" };
+    mParser.ExpandWildcards(deviceTypes);
+
+    const auto & configs = mParser.GetDeviceTypeEntries();
+    EXPECT_EQ(configs.size(), 6U);
+
+    // aggregator:1
+    EXPECT_EQ(configs[0].type, "aggregator");
+    EXPECT_EQ(configs[0].endpoint, 1);
+
+    // first wildcard block starts at maxEp + 1 = 21
+    EXPECT_EQ(configs[1].type, "chime");
+    EXPECT_EQ(configs[1].endpoint, 21);
+    EXPECT_EQ(configs[1].parentId, 1);
+    EXPECT_EQ(configs[2].type, "speaker");
+    EXPECT_EQ(configs[2].endpoint, 22);
+    EXPECT_EQ(configs[2].parentId, 1);
+
+    // aggregator:20
+    EXPECT_EQ(configs[3].type, "aggregator");
+    EXPECT_EQ(configs[3].endpoint, 20);
+
+    // second wildcard block starts at nextAvailableEp = 23
+    EXPECT_EQ(configs[4].type, "chime");
+    EXPECT_EQ(configs[4].endpoint, 23);
+    EXPECT_EQ(configs[4].parentId, 20);
+    EXPECT_EQ(configs[5].type, "speaker");
+    EXPECT_EQ(configs[5].endpoint, 24);
+    EXPECT_EQ(configs[5].parentId, 20);
+}
