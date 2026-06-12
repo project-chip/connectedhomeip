@@ -21,7 +21,6 @@
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceConfig.h>
 
-#include <algorithm>
 #include <cstdlib>
 #include <cstring>
 
@@ -37,7 +36,14 @@ bool IsExcludedFromWildcard(const std::string & type)
         "bridged-node",
         "fan-no-onoff",
     };
-    return std::find(kExcludedDevices.begin(), kExcludedDevices.end(), type) != kExcludedDevices.end();
+    for (const auto & excluded : kExcludedDevices)
+    {
+        if (excluded == type)
+        {
+            return true;
+        }
+    }
+    return false;
 }
 
 } // namespace
@@ -71,8 +77,17 @@ const AppOptions::AppConfig & AppOptions::GetConfig()
     }
 
     // Check if wildcard expansion is needed
-    if (std::none_of(mConfig.deviceTypeEntries.begin(), mConfig.deviceTypeEntries.end(),
-                     [](const auto & entry) { return entry.type == "*"; }))
+    bool hasWildcard = false;
+    for (const auto & entry : mConfig.deviceTypeEntries)
+    {
+        if (entry.type == "*")
+        {
+            hasWildcard = true;
+            break;
+        }
+    }
+
+    if (!hasWildcard)
     {
         return mConfig;
     }
