@@ -77,7 +77,7 @@ const AppOptions::AppConfig & AppOptions::GetConfig()
         return mConfig;
     }
 
-    std::vector<DeviceTypeParser::Entry> finalEntries;
+    std::vector<DeviceTypeParser::Entry> expandedEntries;
 
     // Process and expand wildcard (*) entries
     for (const auto & entry : mConfig.deviceTypeEntries)
@@ -91,7 +91,7 @@ const AppOptions::AppConfig & AppOptions::GetConfig()
                 {
                     continue;
                 }
-                finalEntries.push_back({
+                expandedEntries.push_back({
                     .type     = deviceType,
                     .endpoint = nextEp++,
                     .parentId = entry.parentId,
@@ -100,11 +100,11 @@ const AppOptions::AppConfig & AppOptions::GetConfig()
         }
         else
         {
-            finalEntries.push_back(entry);
+            expandedEntries.push_back(entry);
         }
     }
 
-    mConfig.deviceTypeEntries = finalEntries;
+    mConfig.deviceTypeEntries = expandedEntries;
     return mConfig;
 }
 
