@@ -150,8 +150,8 @@ following guidelines:
    from device classes. Use the injected `DeviceInfoProvider` or
    `DeviceInstanceInfoProvider` interfaces to handle non-volatile runtime
    variables and user settings.
-3. **Explicit Lifecycle Management**: Do not rely on RAII or C++ destructors
-   for automated endpoint teardown. Core device type implementations must use
+3. **Explicit Lifecycle Management**: Do not rely on RAII or C++ destructors for
+   automated endpoint teardown. Core device type implementations must use
    `~Device() override = default;` and manage lifecycle teardown explicitly by
    executing `Unregister(provider)`.
 4. **Concrete Naming**: Avoid ambiguous umbrella folders or generic utility
