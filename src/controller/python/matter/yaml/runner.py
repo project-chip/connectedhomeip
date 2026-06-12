@@ -15,8 +15,10 @@
 #    limitations under the License.
 #
 
+import asyncio
 import logging
 import queue
+import time
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from enum import Enum, IntEnum
@@ -736,6 +738,82 @@ class NotImplementedAction(BaseAction):
         raise Exception(f"NOT YET IMPLEMENTED: {self.cluster}::{self.command}")
 
 
+class WaitForAttributeValueAction(BaseAction):
+    ''' Wait for attribute value action to be executed.'''
+
+    def __init__(self, test_step, context: _ExecutionContext):
+        super().__init__(test_step)
+
+        args = test_step.arguments['values']
+        args_dict = Converter.convert_list_of_name_value_pair_to_dict(args)
+
+        self._attribute_name = to_pascal_case(args_dict['attribute'])
+        self._cluster = args_dict['cluster'].replace(' ', '').replace('/', '').replace('.', '')
+        self._endpoint = args_dict['endpoint']
+        self._expected_value = args_dict['expectedValue']
+        self._expected_duration_ms = args_dict['expectedDurationMs']
+        self._node_id = test_step.node_id
+
+        self._fabric_filtered = True
+        if test_step.fabric_filtered is not None:
+            self._fabric_filtered = test_step.fabric_filtered
+
+        self._extra_duration_ms = test_step.get_config_value('valueWaitExtraDurationMs', 250)
+
+        self._cluster_object = context.data_model_lookup.get_cluster(self._cluster)
+        if self._cluster_object is None:
+            raise UnexpectedActionCreationError(
+                f'WaitForAttributeValue failed to find cluster object:{self._cluster}')
+
+        self._request_object = context.data_model_lookup.get_attribute(
+            self._cluster, self._attribute_name)
+        if self._request_object is None:
+            raise UnexpectedActionCreationError(
+                f'WaitForAttributeValue failed to find attribute:{self._attribute_name} '
+                f'in cluster:{self._cluster}')
+
+        if self._request_object.attribute_type is None:
+            raise UnexpectedActionCreationError(
+                'WaitForAttributeValue attribute doesn\'t have valid attribute_type')
+
+    async def run_action(self, dev_ctrl: ChipDeviceController) -> _ActionResult:
+        start_time = time.monotonic()
+        timeout_s = (self._expected_duration_ms + self._extra_duration_ms) / 1000.0
+        poll_interval_s = 0.1
+
+        LOGGER.info("Waiting for attribute %s.%s to become %s (timeout: %ss)",
+                    self._cluster, self._attribute_name, self._expected_value, timeout_s)
+
+        while True:
+            try:
+                raw_resp = await dev_ctrl.ReadAttribute(self._node_id,
+                                                        [(self._endpoint, self._request_object)],
+                                                        fabricFiltered=self._fabric_filtered)
+
+                resp = raw_resp[self._endpoint][self._cluster_object][self._request_object]
+                if not isinstance(resp, ValueDecodeFailure):
+                    return_val = self._request_object(resp)
+                    if return_val.value == self._expected_value:
+                        LOGGER.info("Attribute reached expected value %s after %.2fs",
+                                    self._expected_value, time.monotonic() - start_time)
+                        return _ActionResult(status=_ActionStatus.SUCCESS, response=None)
+            except (AttributeError, NameError, TypeError):
+                # Let programming errors (bugs in our code or test definition)
+                # propagate immediately instead of timing out.
+                raise
+            except (MatterInteractionModel.InteractionModelError, ChipStackError, TimeoutError, KeyError) as e:
+                LOGGER.debug("ReadAttribute failed during wait: %s", e)
+
+            if time.monotonic() - start_time >= timeout_s:
+                break
+
+            await asyncio.sleep(poll_interval_s)
+
+        LOGGER.error("Timeout waiting for attribute %s.%s to become %s",
+                     self._cluster, self._attribute_name, self._expected_value)
+        return _ActionResult(status=_ActionStatus.ERROR, response=None)
+
+
 class ReplTestRunner:
     '''Test runner to encode/decode values from YAML test Parser for executing the TestStep.
 
@@ -822,6 +900,9 @@ class ReplTestRunner:
     def _wait_for_commissionee_action_factory(self, test_step):
         return WaitForCommissioneeAction(test_step)
 
+    def _wait_for_attribute_value_action_factory(self, test_step):
+        return WaitForAttributeValueAction(test_step, self._context)
+
     def _wait_for_report_action_factory(self, test_step):
         return WaitForReportAction(test_step, self._context)
 
@@ -848,6 +929,8 @@ class ReplTestRunner:
             return DiscoveryCommandAction(request)
         if cluster == 'DelayCommands' and command == 'WaitForCommissionee':
             action = self._wait_for_commissionee_action_factory(request)
+        elif cluster == 'DelayCommands' and command == 'WaitForAttributeValue':
+            action = self._wait_for_attribute_value_action_factory(request)
         elif command == 'writeAttribute':
             action = self._attribute_write_action_factory(request, cluster)
         elif command == 'readAttribute':

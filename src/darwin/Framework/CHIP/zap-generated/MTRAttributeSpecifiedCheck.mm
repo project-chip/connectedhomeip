@@ -1891,6 +1891,37 @@ static BOOL AttributeIsSpecifiedInLaundryDryerControlsCluster(AttributeId aAttri
     }
     }
 }
+static BOOL AttributeIsSpecifiedInTemperatureControlledCabinetTopologyCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::TemperatureControlledCabinetTopology;
+    switch (aAttributeId) {
+    case Attributes::DisabledCabinets::Id: {
+        return YES;
+    }
+    case Attributes::Topology::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        // Not a known TemperatureControlledCabinetTopology attribute.
+        return NO;
+    }
+    }
+}
 static BOOL AttributeIsSpecifiedInModeSelectCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::ModeSelect;
@@ -7650,6 +7681,9 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     }
     case Clusters::LaundryDryerControls::Id: {
         return AttributeIsSpecifiedInLaundryDryerControlsCluster(aAttributeId);
+    }
+    case Clusters::TemperatureControlledCabinetTopology::Id: {
+        return AttributeIsSpecifiedInTemperatureControlledCabinetTopologyCluster(aAttributeId);
     }
     case Clusters::ModeSelect::Id: {
         return AttributeIsSpecifiedInModeSelectCluster(aAttributeId);

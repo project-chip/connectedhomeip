@@ -131,6 +131,7 @@
         "target-navigator-cluster.xml",
         "temperature-control-cluster.xml",
         "microwave-oven-control-cluster.xml",
+        "temperature-controlled-cabinet-topology-cluster.xml",
         "temperature-measurement-cluster.xml",
         "test-cluster.xml",
         "thermostat-cluster.xml",
@@ -851,7 +852,13 @@
             "FeatureMap"
         ],
         "Power Topology": ["FeatureMap"],
-        "Power Source": ["ClusterRevision"],
+        "Power Source": [
+            "ClusterRevision",
+            "ActiveWiredFaults",
+            "ActiveBatFaults",
+            "ActiveBatChargeFaults",
+            "EndpointList"
+        ],
         "Valve Configuration and Control": [
             "OpenDuration",
             "AutoCloseTime",

@@ -13,7 +13,7 @@
 # limitations under the License.
 
 # Authoritative device-selection configuration for the GN (POSIX) build.
-# Parallel to all-devices-common/devices/enabled_devices.cmake for the CMake build.
+# Parallel to all-devices-common/device-factory/enabled_devices.cmake for the CMake build.
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 import("${chip_root}/build/chip/buildconfig_header.gni")
@@ -42,6 +42,10 @@ _all_devices_all_enabled = all_devices_enabled_devices == []
 #   - Remember to also update enabled_devices_config.h.in
 #   - Update scripts/build/build/targets.py to include the new device
 _available_devices = [
+  [
+    "aggregator",
+    "AGGREGATOR",
+  ],
   [
     "air-quality-sensor",
     "AIR_QUALITY_SENSOR",
@@ -75,12 +79,20 @@ _available_devices = [
     "ON_OFF_LIGHT",
   ],
   [
+    "power-source",
+    "POWER_SOURCE",
+  ],
+  [
     "proximity-ranger",
     "PROXIMITY_RANGER",
   ],
   [
     "soil-sensor",
     "SOIL_SENSOR",
+  ],
+  [
+    "smoke-co-alarm",
+    "SMOKE_CO_ALARM",
   ],
   [
     "speaker",

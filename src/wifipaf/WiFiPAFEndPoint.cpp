@@ -1316,8 +1316,37 @@ void WiFiPAFEndPoint::HandleWaitResourceTimeout(chip::System::Layer * systemLaye
 
 void WiFiPAFEndPoint::ClearAll()
 {
-    memset(reinterpret_cast<uint8_t *>(this), 0, sizeof(WiFiPAFEndPoint));
-    return;
+    // Return the end point to the free state the pool relies on (GetFree()/Find() key off
+    // mWiFiPafLayer == nullptr). The endpoint owns ref-counted PacketBufferHandles (mSendQueue,
+    // mAckToSend, ReorderQueue and buffers inside mPafTP); release those explicitly, then reset
+    // the trivially-copyable state. Any owning member added here later must be released too.
+    mSendQueue = nullptr;
+    mAckToSend = nullptr;
+    for (auto & queued : ReorderQueue)
+    {
+        queued = nullptr;
+    }
+    ItemsInReorderQueue = 0;
+    mPafTP.ClearRxPacket();
+    mPafTP.ClearTxPacket();
+
+    mWiFiPafLayer           = nullptr;
+    mOnPafSubscribeComplete = nullptr;
+    mOnPafSubscribeError    = nullptr;
+    mAppState               = nullptr;
+    OnMessageReceived       = nullptr;
+    OnConnectionClosed      = nullptr;
+
+    mState = kState_Ready;
+    mRole  = kWiFiPafRole_Publisher;
+    mRxAck = 0;
+    mConnStateFlags.ClearAll();
+    mTimerStateFlags.ClearAll();
+    mLocalReceiveWindowSize  = 0;
+    mRemoteReceiveWindowSize = 0;
+    mReceiveWindowMaxSize    = 0;
+    mResourceWaitCount       = 0;
+    mSessionInfo             = WiFiPAFSession{};
 }
 
 } /* namespace WiFiPAF */
