@@ -31,6 +31,7 @@ public:
         std::string type;
         chip::EndpointId endpoint;
         chip::EndpointId parentId = chip::kInvalidEndpointId;
+        bool bridged              = false;
     };
 
     DeviceTypeParser()  = default;

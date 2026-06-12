@@ -82,6 +82,28 @@ TEST_F(TestDeviceTypeParser, Parse_EmptyString)
     EXPECT_NE(mParser.ParseSingleDeviceString(""), CHIP_NO_ERROR);
 }
 
+TEST_F(TestDeviceTypeParser, Parse_BridgedOption)
+{
+    EXPECT_EQ(mParser.ParseSingleDeviceString("chime:2,bridged"), CHIP_NO_ERROR);
+    const auto & configs = mParser.GetDeviceTypeEntries();
+    EXPECT_EQ(configs.size(), 1U);
+    EXPECT_EQ(configs[0].type, "chime");
+    EXPECT_EQ(configs[0].endpoint, 2);
+    EXPECT_EQ(configs[0].parentId, kInvalidEndpointId);
+    EXPECT_TRUE(configs[0].bridged);
+}
+
+TEST_F(TestDeviceTypeParser, Parse_MultipleOptions)
+{
+    EXPECT_EQ(mParser.ParseSingleDeviceString("chime:2,parent=1,bridged"), CHIP_NO_ERROR);
+    const auto & configs = mParser.GetDeviceTypeEntries();
+    EXPECT_EQ(configs.size(), 1U);
+    EXPECT_EQ(configs[0].type, "chime");
+    EXPECT_EQ(configs[0].endpoint, 2);
+    EXPECT_EQ(configs[0].parentId, 1);
+    EXPECT_TRUE(configs[0].bridged);
+}
+
 TEST_F(TestDeviceTypeParser, AccumulateDevices)
 {
     EXPECT_EQ(mParser.ParseSingleDeviceString("chime:1"), CHIP_NO_ERROR);
@@ -287,4 +309,64 @@ TEST_F(TestDeviceTypeParser, ExpandWildcards_WildcardExplicitMaxEp)
     EXPECT_EQ(configs[3].type, "speaker");
     EXPECT_EQ(configs[3].endpoint, 11);
     EXPECT_EQ(configs[3].parentId, 20);
+}
+
+TEST_F(TestDeviceTypeParser, ExpandWildcards_ExplicitBridged)
+{
+    EXPECT_EQ(mParser.ParseSingleDeviceString("chime:2,parent=1,bridged"), CHIP_NO_ERROR);
+
+    std::vector<std::string> deviceTypes = { "chime" };
+    mParser.ExpandWildcards(deviceTypes);
+
+    const auto & configs = mParser.GetDeviceTypeEntries();
+    EXPECT_EQ(configs.size(), 2U);
+
+    // Explicit chime:2,bridged is expanded into a parent bridged-node and the chime child.
+    EXPECT_EQ(configs[0].type, "bridged-node");
+    EXPECT_EQ(configs[0].endpoint, 2);
+    EXPECT_EQ(configs[0].parentId, 1);
+    EXPECT_TRUE(configs[0].bridged);
+
+    EXPECT_EQ(configs[1].type, "chime");
+    EXPECT_EQ(configs[1].endpoint, 3);
+    EXPECT_EQ(configs[1].parentId, 2);
+    EXPECT_TRUE(configs[1].bridged);
+}
+
+TEST_F(TestDeviceTypeParser, ExpandWildcards_WildcardBridged)
+{
+    EXPECT_EQ(mParser.ParseSingleDeviceString("aggregator:1"), CHIP_NO_ERROR);
+    EXPECT_EQ(mParser.ParseSingleDeviceString("*,parent=1,bridged"), CHIP_NO_ERROR);
+
+    std::vector<std::string> deviceTypes = { "chime", "speaker" };
+    mParser.ExpandWildcards(deviceTypes);
+
+    const auto & configs = mParser.GetDeviceTypeEntries();
+    EXPECT_EQ(configs.size(), 5U);
+
+    EXPECT_EQ(configs[0].type, "aggregator");
+    EXPECT_EQ(configs[0].endpoint, 1);
+    EXPECT_FALSE(configs[0].bridged);
+
+    // Wildcard block starts at maxEp + 1 = 2.
+    // For each device in wildcard, we get [bridged-node, device]
+    EXPECT_EQ(configs[1].type, "bridged-node");
+    EXPECT_EQ(configs[1].endpoint, 2);
+    EXPECT_EQ(configs[1].parentId, 1);
+    EXPECT_TRUE(configs[1].bridged);
+
+    EXPECT_EQ(configs[2].type, "chime");
+    EXPECT_EQ(configs[2].endpoint, 3);
+    EXPECT_EQ(configs[2].parentId, 2);
+    EXPECT_TRUE(configs[2].bridged);
+
+    EXPECT_EQ(configs[3].type, "bridged-node");
+    EXPECT_EQ(configs[3].endpoint, 4);
+    EXPECT_EQ(configs[3].parentId, 1);
+    EXPECT_TRUE(configs[3].bridged);
+
+    EXPECT_EQ(configs[4].type, "speaker");
+    EXPECT_EQ(configs[4].endpoint, 5);
+    EXPECT_EQ(configs[4].parentId, 4);
+    EXPECT_TRUE(configs[4].bridged);
 }

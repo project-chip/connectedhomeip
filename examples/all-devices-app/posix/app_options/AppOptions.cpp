@@ -61,6 +61,11 @@ AppOptions::AppConfig AppOptions::mConfig;
 
 const AppOptions::AppConfig & AppOptions::GetConfig()
 {
+    if (mConfig.expanded)
+    {
+        return mConfig;
+    }
+
     // Default device fallback if no devices are configured
     if (mConfig.deviceTypeEntries.empty())
     {
@@ -69,6 +74,7 @@ const AppOptions::AppConfig & AppOptions::GetConfig()
             .endpoint = 1,
             .parentId = chip::kInvalidEndpointId,
         });
+        mConfig.expanded = true;
         return mConfig;
     }
 
@@ -85,6 +91,49 @@ const AppOptions::AppConfig & AppOptions::GetConfig()
     sParser.ExpandWildcards(supportedTypes);
     mConfig.deviceTypeEntries = sParser.GetDeviceTypeEntries();
 
+    // Validate the expanded entries
+    for (const auto & entry : mConfig.deviceTypeEntries)
+    {
+        // 1. A bridged-node must specify a parent (cannot be directly under root node in this bridge topology)
+        if (entry.type == "bridged-node" && entry.parentId == chip::kInvalidEndpointId)
+        {
+            ChipLogError(Support, "Error: bridged-node (endpoint %u) must specify a parent (e.g. parent=aggregatorId)",
+                         entry.endpoint);
+            VerifyOrDie(false);
+        }
+
+        // 2. If it has a parent, verify the parent exists in the config
+        if (entry.parentId != chip::kInvalidEndpointId)
+        {
+            bool parentExists = false;
+            std::string parentType;
+            for (const auto & other : mConfig.deviceTypeEntries)
+            {
+                if (other.endpoint == entry.parentId)
+                {
+                    parentExists = true;
+                    parentType   = other.type;
+                    break;
+                }
+            }
+            if (!parentExists)
+            {
+                ChipLogError(Support, "Error: Parent endpoint %u for device %s (endpoint %u) does not exist in configuration",
+                             entry.parentId, entry.type.c_str(), entry.endpoint);
+                VerifyOrDie(false);
+            }
+
+            // 3. If this is a bridged-node, its parent must be an aggregator (or power-source for testing)
+            if (entry.type == "bridged-node" && parentType != "aggregator" && parentType != "power-source")
+            {
+                ChipLogError(Support, "Error: Parent of bridged-node (endpoint %u) must be aggregator, but found %s (endpoint %u)",
+                             entry.endpoint, parentType.c_str(), entry.parentId);
+                VerifyOrDie(false);
+            }
+        }
+    }
+
+    mConfig.expanded = true;
     return mConfig;
 }
 
@@ -94,6 +143,7 @@ bool AppOptions::AllDevicesAppOptionHandler(const char * program, OptionSet * op
     switch (identifier)
     {
     case kOptionDeviceType: {
+        mConfig.expanded = false;
         if (sParser.ParseSingleDeviceString(value) != CHIP_NO_ERROR)
         {
             return false;

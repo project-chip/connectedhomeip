@@ -85,25 +85,40 @@ bool DeviceTypeParser::ParseDeviceTypeEntry(const char * value, Entry & entry)
         return false;
     }
 
-    // Parse options: "parent=parentId"
+    // Parse options: comma-separated list of options
     if (comma != nullptr)
     {
-        const char * optionsStr   = comma + 1;
-        const char * parentPrefix = "parent=";
-        const char * parentPtr    = strstr(optionsStr, parentPrefix);
-        if (parentPtr != nullptr)
+        std::string optionsStr = comma + 1;
+        size_t pos = 0;
+        while (pos < optionsStr.size())
         {
-            const char * parentValStr = parentPtr + strlen(parentPrefix);
-            if (!ParseEndpointId(parentValStr, entry.parentId))
+            size_t nextComma = optionsStr.find(',', pos);
+            std::string opt = (nextComma == std::string::npos) ? optionsStr.substr(pos) : optionsStr.substr(pos, nextComma - pos);
+            pos = (nextComma == std::string::npos) ? optionsStr.size() : nextComma + 1;
+
+            if (opt.empty())
             {
-                ChipLogError(Support, "Invalid parent endpoint ID in device config: %s\n", value);
+                continue;
+            }
+
+            if (opt.rfind("parent=", 0) == 0) // starts with "parent="
+            {
+                std::string parentValStr = opt.substr(7);
+                if (!ParseEndpointId(parentValStr.c_str(), entry.parentId))
+                {
+                    ChipLogError(Support, "Invalid parent endpoint ID in device config: %s\n", value);
+                    return false;
+                }
+            }
+            else if (opt == "bridged")
+            {
+                entry.bridged = true;
+            }
+            else
+            {
+                ChipLogError(Support, "Unknown option '%s' in device config: %s\n", opt.c_str(), value);
                 return false;
             }
-        }
-        else
-        {
-            ChipLogError(Support, "Unknown option in device config: %s\n", value);
-            return false;
         }
     }
 
@@ -129,18 +144,17 @@ const std::vector<DeviceTypeParser::Entry> & DeviceTypeParser::GetDeviceTypeEntr
 
 void DeviceTypeParser::ExpandWildcards(const std::vector<std::string> & wildcardExpandedTypes)
 {
-    if (std::none_of(mDeviceTypeEntries.begin(), mDeviceTypeEntries.end(), [](const auto & entry) { return entry.type == "*"; }))
-    {
-        return;
-    }
-
     // Find the highest explicit endpoint ID in the list
     chip::EndpointId maxEp = 0;
     for (const auto & entry : mDeviceTypeEntries)
     {
-        if (entry.endpoint != chip::kInvalidEndpointId && entry.endpoint > maxEp)
+        if (entry.endpoint != chip::kInvalidEndpointId)
         {
-            maxEp = entry.endpoint;
+            chip::EndpointId effectiveEp = entry.bridged ? static_cast<chip::EndpointId>(entry.endpoint + 1) : entry.endpoint;
+            if (effectiveEp > maxEp)
+            {
+                maxEp = effectiveEp;
+            }
         }
     }
 
@@ -154,16 +168,54 @@ void DeviceTypeParser::ExpandWildcards(const std::vector<std::string> & wildcard
             chip::EndpointId nextEp = (entry.endpoint == chip::kInvalidEndpointId) ? nextAvailableEp : entry.endpoint;
             for (const auto & deviceType : wildcardExpandedTypes)
             {
-                expandedEntries.push_back({
-                    .type     = deviceType,
-                    .endpoint = nextEp++,
-                    .parentId = entry.parentId,
-                });
+                if (entry.bridged)
+                {
+                    // For bridged wildcard, add a bridged-node parent, then the device itself
+                    expandedEntries.push_back({
+                        .type     = "bridged-node",
+                        .endpoint = nextEp,
+                        .parentId = entry.parentId,
+                        .bridged  = true,
+                    });
+                    expandedEntries.push_back({
+                        .type     = deviceType,
+                        .endpoint = static_cast<chip::EndpointId>(nextEp + 1),
+                        .parentId = nextEp,
+                        .bridged  = true,
+                    });
+                    nextEp = static_cast<chip::EndpointId>(nextEp + 2);
+                }
+                else
+                {
+                    // Non-bridged wildcard
+                    expandedEntries.push_back({
+                        .type     = deviceType,
+                        .endpoint = nextEp++,
+                        .parentId = entry.parentId,
+                        .bridged  = false,
+                    });
+                }
             }
             if (nextEp > nextAvailableEp)
             {
                 nextAvailableEp = nextEp;
             }
+        }
+        else if (entry.bridged && entry.type != "bridged-node")
+        {
+            // Explicit bridged entry: expand to bridged-node + target device
+            expandedEntries.push_back({
+                .type     = "bridged-node",
+                .endpoint = entry.endpoint,
+                .parentId = entry.parentId,
+                .bridged  = true,
+            });
+            expandedEntries.push_back({
+                .type     = entry.type,
+                .endpoint = static_cast<chip::EndpointId>(entry.endpoint + 1),
+                .parentId = entry.endpoint,
+                .bridged  = true,
+            });
         }
         else
         {
