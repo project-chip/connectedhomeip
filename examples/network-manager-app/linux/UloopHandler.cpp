@@ -103,12 +103,12 @@ void UloopHandler::UloopFdSet(uloop_fd * fd, unsigned int events)
     VerifyOrDieWithMsg(!(events & ~(ULOOP_READ | ULOOP_WRITE | ULOOP_BLOCKING)), DeviceLayer,
                        "Unsupported uloop fd_set events: 0x%x", events);
 
-    CHIP_ERROR err;
     auto & system = SystemLayer();
     System::SocketWatchToken watch;
-    SuccessOrExit(err = system.StartWatchingSocket(fd->fd, &watch)); // or find existing watch
+    CHIP_ERROR err = system.StartWatchingSocket(fd->fd, &watch); // or find existing watch
     if (events != 0)
     {
+        SuccessOrExit(err);
         int changed = fd->flags ^ events;
         if (changed & ULOOP_READ)
         {
@@ -135,6 +135,11 @@ void UloopHandler::UloopFdSet(uloop_fd * fd, unsigned int events)
     }
     else
     {
+        // We're being asked to stop watching a socket (events == 0), so an error
+        // from StartWatchingSocket() means there is no existing watch token and
+        // we failed to allocate a new one. The end result is that we're not
+        // watching the socket, so there is no need to log an error.
+        VerifyOrReturn(err == CHIP_NO_ERROR);
         SuccessOrExit(err = system.StopWatchingSocket(&watch));
     }
 
