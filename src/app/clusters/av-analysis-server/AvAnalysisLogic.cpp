@@ -202,15 +202,19 @@ std::optional<DataModel::ActionReturnStatus> AvAnalysisServerLogic::HandleLocalE
                 return Status::DynamicConstraintError;
             }
             
-            // The trigger context is valid, now check the ZoneIDs, which can only be present of PERZONEDETECT is set
+            // The trigger context is valid, now check the ZoneIDs, which can only be present of PERZONEDETECT is set, likewise,
+            // if we have the feature, then ZoneIDs have to be present
             //
-            if (contextTrigger.zoneIDs.HasValue())
-            {
-                if (!HasFeature(AvAnalysis::Feature::kPerZoneContextDetection)) 
-                {
-                    return Status::InvalidCommand;
-                }
+            bool hasZoneIDs = contextTrigger.zoneIDs.HasValue();
             
+            if ((hasZoneIDs && !HasFeature(AvAnalysis::Feature::kPerZoneContextDetection)) ||
+                (!hasZoneIDs && HasFeature(AvAnalysis::Feature::kPerZoneContextDetection)))
+            {
+                return Status::InvalidCommand;
+            }
+            
+            if (hasZoneIDs)
+            {
                 // Verify via the delegate that the provided list of ZoneIDs contains values present in ZoneManagement only
                 // if the zoneIDs we have are not Null.
                 //
@@ -239,36 +243,58 @@ std::optional<DataModel::ActionReturnStatus> AvAnalysisServerLogic::HandleLocalE
                     return ct.context.namespaceID == contextTrigger.context.namespaceID && ct.context.tag == contextTrigger.context.tag;
             });
 
-            // Convert the ZoneIDs from a DecodableList to a format we can use to instantiat a List
+            // If we don't have provided ZoneIDs, set our Active trigger zones to Null, meaning the whole frame
             //
-            size_t size;
-            CHIP_ERROR err = contextTrigger.zoneIDs.Value().Value().ComputeSize(&size);
-            if (err != CHIP_NO_ERROR) 
+            if (!hasZoneIDs)
             {
-                return Status::Failure;
-            }
-            
-            std::vector<uint16_t> zoneIDs(size);
-            auto zone_iter = contextTrigger.zoneIDs.Value().Value().begin();
-                
-            while (zone_iter.Next())
-            {
-                zoneIDs.push_back(zone_iter.GetValue());
-            }
-            
-            if (it2 == mActiveAmbientContextTriggers.end()) 
-            {
-                // This is a new context, add to the end
-                //
-                AvAnalysis::Structs::ContextTriggerStruct::Type newContextTrigger;
-                newContextTrigger.context = contextTrigger.context;
-                newContextTrigger.zoneIDs = chip::MakeOptional(DataModel::MakeNullable(DataModel::List<const uint16_t>(zoneIDs.data(), size)));
-                mActiveAmbientContextTriggers.push_back(newContextTrigger);
+                if (it2 == mActiveAmbientContextTriggers.end()) 
+                {
+                    // This is a new context, add to the end
+                    //
+                    AvAnalysis::Structs::ContextTriggerStruct::Type newContextTrigger;
+                    newContextTrigger.context = contextTrigger.context;
+                    newContextTrigger.zoneIDs = chip::MakeOptional(DataModel::NullNullable);
+                    mActiveAmbientContextTriggers.push_back(newContextTrigger);
+                }
+                else
+                {
+                    // Update just the ZoneIDs
+                    it2->zoneIDs = chip::MakeOptional(DataModel::NullNullable);
+                }
             }
             else
-            {
-                // Update just the ZoneIDs
-                it2->zoneIDs = chip::MakeOptional(DataModel::MakeNullable(DataModel::List<const uint16_t>(zoneIDs.data(), size)));
+            {  
+                // Convert the ZoneIDs from a DecodableList to a format we can use to instantiate a List
+                //
+                size_t size;
+                CHIP_ERROR err = contextTrigger.zoneIDs.Value().Value().ComputeSize(&size);
+                if (err != CHIP_NO_ERROR) 
+                {
+                    return Status::Failure;
+                }
+            
+                std::vector<uint16_t> zoneIDs(size);
+                auto zone_iter = contextTrigger.zoneIDs.Value().Value().begin();
+                
+                while (zone_iter.Next())
+                {
+                    zoneIDs.push_back(zone_iter.GetValue());
+                }
+            
+                if (it2 == mActiveAmbientContextTriggers.end()) 
+                {
+                    // This is a new context, add to the end
+                    //
+                    AvAnalysis::Structs::ContextTriggerStruct::Type newContextTrigger;
+                    newContextTrigger.context = contextTrigger.context;
+                    newContextTrigger.zoneIDs = chip::MakeOptional(DataModel::MakeNullable(DataModel::List<const uint16_t>(zoneIDs.data(), size)));
+                    mActiveAmbientContextTriggers.push_back(newContextTrigger);
+                }
+                else
+                {
+                    // Update just the ZoneIDs
+                    it2->zoneIDs = chip::MakeOptional(DataModel::MakeNullable(DataModel::List<const uint16_t>(zoneIDs.data(), size)));
+                }
             }
         }
     }

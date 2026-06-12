@@ -203,21 +203,20 @@ TEST_F(TestLocalAvAnalysisCluster, TestReadWriteTrackingEnabled)
     EXPECT_FALSE(trackingEnabled);
 }
 
-TEST_F(TestLocalAvAnalysisCluster, ExecuteEnableContextTriggersCommandTest)
+// EnableContextTriggers Sub-tests
+// 1. Null, verify the active set is the supported set, with ZoneIDs set to Null.
+// 2. Provide a context that doesn't exist, ensure error
+// 3. Existing context, missing ZoneIDs, ensure error
+// 4. Existing context, null ZoneIDs, ensure success for all zones
+// 5. Existing context, non-null ZoneIDs, ensure success
+TEST_F(TestLocalAvAnalysisCluster, ExecuteEnableContextTriggersCommandTestContextTriggersIsNull)
 {
     Testing::MockCommandHandler commandHandler;
     commandHandler.SetFabricIndex(1);
     ConcreteCommandPath kCommandPath{ 1, Clusters::AvAnalysis::Id, Commands::EnableContextTriggers::Id };
     Commands::EnableContextTriggers::DecodableType commandData;
-
-    // Sub-tests
-    // 1. Null, verify the active set is the supported set, with ZoneIDs set to Null.
-    // 2. Provide a context that doesn't exist, ensure error
-    // 3. Existing context, missing ZoneIDs, ensure error
-    // 4. Existing context, null ZoneIDs, ensure success for all zones
-    // 5. Existing context, non-null ZoneIDs, ensure success
-    
-    // 1. Null context triggers, active set is the same as the supported set.
+  
+    // Null context triggers, active set is the same as the supported set.
     commandData.contextTriggers.SetNull();
     auto response = mServer.GetLogic().HandleEnableContextTriggers(commandHandler, kCommandPath, commandData);
 
@@ -264,8 +263,16 @@ TEST_F(TestLocalAvAnalysisCluster, ExecuteEnableContextTriggersCommandTest)
         return p1.namespaceID == p2.namespaceID && p1.tag == p2.tag;
     });
     ASSERT_TRUE(are_equal);
-    
-    // 2. Provide a context that doesn't exist, ensure error
+}
+     
+TEST_F(TestLocalAvAnalysisCluster, ExecuteEnableContextTriggersCommandTestContextTriggerDoesNotExist)
+{
+    Testing::MockCommandHandler commandHandler;
+    commandHandler.SetFabricIndex(1);
+    ConcreteCommandPath kCommandPath{ 1, Clusters::AvAnalysis::Id, Commands::EnableContextTriggers::Id };
+    Commands::EnableContextTriggers::DecodableType commandData;
+
+    // Provide a context that doesn't exist, ensure error
     uint8_t tlvBuffer[512];
     Structs::ContextTriggerStruct::Type cts;
     cts.context = testErrorAmbientContext.front();
@@ -300,7 +307,7 @@ TEST_F(TestLocalAvAnalysisCluster, ExecuteEnableContextTriggersCommandTest)
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
     commandData.contextTriggers = DataModel::MakeNullable(decodedList);    
-    response = mServer.GetLogic().HandleEnableContextTriggers(commandHandler, kCommandPath, commandData);
+    auto response = mServer.GetLogic().HandleEnableContextTriggers(commandHandler, kCommandPath, commandData);
 
     if (response.has_value())
     {
@@ -311,9 +318,62 @@ TEST_F(TestLocalAvAnalysisCluster, ExecuteEnableContextTriggersCommandTest)
         // Fail the test case
         FAIL();
     }
-
 }
-       
+
+TEST_F(TestLocalAvAnalysisCluster, ExecuteEnableContextTriggersCommandTestContextTriggerHasNoZones)
+{
+    Testing::MockCommandHandler commandHandler;
+    commandHandler.SetFabricIndex(1);
+    ConcreteCommandPath kCommandPath{ 1, Clusters::AvAnalysis::Id, Commands::EnableContextTriggers::Id };
+    Commands::EnableContextTriggers::DecodableType commandData;
+
+    // Provide a context that does exist but no ZoneIDs, ensure error
+    uint8_t tlvBuffer[512];
+    Structs::ContextTriggerStruct::Type cts;
+    cts.context = testAmbientContexts.front();
+    cts.zoneIDs.ClearValue();
+    
+    // Encode into a TLV buffer
+    TLV::TLVWriter writer;
+    writer.Init(tlvBuffer, sizeof(tlvBuffer));
+
+    TLV::TLVWriter containerWriter;
+    CHIP_ERROR err;
+
+    err = writer.OpenContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, containerWriter);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    err = DataModel::Encode(containerWriter, TLV::AnonymousTag(), cts);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    err = writer.CloseContainer(containerWriter);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    size_t encodedLen = writer.GetLengthWritten();
+
+    // Decode the TLV into a DecodableList
+    TLV::TLVReader ctsReader;
+    ctsReader.Init(tlvBuffer, static_cast<uint32_t>(encodedLen));
+    err = ctsReader.Next();
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    DataModel::DecodableList<Structs::ContextTriggerStruct::DecodableType> decodedList;
+    err = decodedList.Decode(ctsReader);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    commandData.contextTriggers = DataModel::MakeNullable(decodedList);    
+    auto response = mServer.GetLogic().HandleEnableContextTriggers(commandHandler, kCommandPath, commandData);
+
+    if (response.has_value())
+    {
+        ASSERT_EQ(response.value().GetStatusCode().GetStatus(), Status::InvalidCommand);
+    }
+    else
+    {
+        // Fail the test case
+        FAIL();
+    }
+}
 
 TEST_F(TestLocalAvAnalysisCluster, ExecuteDisableContextTriggersCommandTest)
 {
