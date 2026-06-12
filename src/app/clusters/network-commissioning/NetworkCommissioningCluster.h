@@ -206,6 +206,11 @@ private:
     void SendNonConcurrentConnectNetworkResponse();
 #endif
 
+#if CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION && CHIP_DEVICE_CONFIG_WIFIPAF_EARLY_CONNECT_NETWORK_RESPONSE
+    void SendEarlyConnectNetworkResponseForWiFiPAF();
+    static void StartWiFiConnectAfterPafAck(intptr_t arg);
+#endif
+
 // TODO: This could be guarded by a separate multi-interface condition instead
 #if CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
     class NetworkInstanceList : public IntrusiveList<NetworkCommissioningLogicListNode>
@@ -240,10 +245,13 @@ private:
     uint8_t mLastNetworkIDLen = 0;
     Optional<uint64_t> mCurrentOperationBreadcrumb;
     bool mScanningWasDirected = false;
-#if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
-    // Tracks whether ConnectNetworkResponse was already sent from HandleConnectNetwork()
-    // on the PASE/BLE path. OnResult() uses this to avoid sending a duplicate response
-    // after the attach callback, and the flag is reset at command start / fail-safe expiry.
+#if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION || CHIP_DEVICE_CONFIG_WIFIPAF_EARLY_CONNECT_NETWORK_RESPONSE
+    // Tracks whether ConnectNetworkResponse was already sent from HandleConnectNetwork().
+    //  - Non-concurrent: set after SendNonConcurrentConnectNetworkResponse on the PASE/BLE path.
+    //  - Concurrent + CHIP_DEVICE_CONFIG_WIFIPAF_EARLY_CONNECT_NETWORK_RESPONSE:
+    //    set after SendEarlyConnectNetworkResponseForWiFiPAF on the PAF path.
+    // OnResult() uses this to avoid double-responding and to drive post-success
+    // cleanup when the response was already sent.
     bool mConnectNetworkResponseSentEarly = false;
 #endif
     Context mClusterContext;

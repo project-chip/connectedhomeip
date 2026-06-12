@@ -74,6 +74,16 @@ public:
     CHIP_ERROR Init(BluezAdapter1 * apAdapter, bool aIsCentral);
     void Shutdown();
 
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
+    // Flip the endpoint's role after Init has run.  Used by the commissioning-proxy
+    // app to transition from peripheral (own commissioning) to central (BLE proxy
+    // ops) after Step 1 completes.  The existing peripheral GATT server objects
+    // stay registered — harmless because advertising is stopped — but
+    // BluezConnection::Init and HandleNewDevice subsequently observe mIsCentral=true
+    // and take the central code path.
+    void SetCentralMode(bool aIsCentral) { mIsCentral = aIsCentral; }
+#endif
+
     CHIP_ERROR RegisterGattApplication();
     GDBusObjectManagerServer * GetGattApplicationObjectManager() const { return mRoot.get(); }
 

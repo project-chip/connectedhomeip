@@ -26,6 +26,11 @@
 #include <lib/support/Span.h>
 #include <lib/support/ThreadOperationalDataset.h>
 
+#include <app/CommandSender.h>
+#include <controller/CHIPDeviceControllerSystemState.h>
+#include <transport/Session.h>
+#include <transport/raw/ProxyTransport.h>
+
 #include <optional>
 #include <thread>
 
@@ -44,6 +49,7 @@ enum class PairingMode
     AlreadyDiscoveredByIndexWithCode,
     OnNetwork,
     Nfc,
+    Proxy, ///< Commission via a Commissioning Proxy (ProxyMessageRequest/Response tunnel)
 #if CHIP_SUPPORT_THREAD_MESHCOP
     ThreadMeshcop,
 #endif
@@ -60,7 +66,9 @@ enum class PairingNetworkType
 class PairingCommand : public CHIPCommand,
                        public chip::Controller::DevicePairingDelegate,
                        public chip::Controller::DeviceDiscoveryDelegate,
-                       public chip::Credentials::DeviceAttestationDelegate
+                       public chip::Credentials::DeviceAttestationDelegate,
+                       public chip::Transport::ProxyTransportDelegate,
+                       public chip::app::CommandSender::Callback
 {
 public:
     PairingCommand(const char * commandName, PairingMode mode, PairingNetworkType networkType,
@@ -69,7 +77,9 @@ public:
         CHIPCommand(commandName, credIssuerCmds),
         mPairingMode(mode), mNetworkType(networkType), mFilterType(filterType),
         mRemoteAddr{ IPAddress::Any, chip::Inet::InterfaceId::Null() }, mComplex_TimeZones(&mTimeZoneList),
-        mComplex_DSTOffsets(&mDSTOffsetList), mCurrentFabricRemoveCallback(OnCurrentFabricRemove, this)
+        mComplex_DSTOffsets(&mDSTOffsetList), mCurrentFabricRemoveCallback(OnCurrentFabricRemove, this),
+        mOnProxyConnectedCallback(OnProxyDeviceConnected, this),
+        mOnProxyConnectionFailureCallback(OnProxyDeviceConnectionFailed, this)
     {
         AddArgument("node-id", 0, UINT64_MAX, &mNodeId);
         AddArgument("bypass-attestation-verifier", 0, 1, &mBypassAttestationVerifier,
@@ -139,6 +149,20 @@ public:
             AddArgument("skip-commissioning-complete", 0, 1, &mSkipCommissioningComplete);
             AddArgument("setup-pin-code", 0, 134217727, &mSetupPINCode.emplace());
             AddArgument("discriminator", 0, 4096, &mDiscriminator.emplace());
+            break;
+        case PairingMode::Proxy:
+            AddArgument("skip-commissioning-complete", 0, 1, &mSkipCommissioningComplete);
+            AddArgument("setup-pin-code", 0, 134217727, &mSetupPINCode.emplace());
+            AddArgument("discriminator", 0, 4096, &mDiscriminator.emplace());
+            AddArgument("proxy-node-id", 0, UINT64_MAX, &mProxyNodeId,
+                        "Node ID of the commissioning-proxy-app to tunnel packets through");
+            AddArgument("proxy-connect-timeout", 0, UINT16_MAX, &mProxyConnectTimeout,
+                        "Timeout in seconds for the ProxyConnectRequest");
+            AddArgument("proxy-transport", &mProxyTransport,
+                        "Required: which transport the proxy should use to reach the commissionee. "
+                        "One of: ble | wifipaf");
+            AddArgument("proxy-wifi-band", &mProxyWiFiBand,
+                        "Optional WiFi band hint for proxy-transport=wifipaf. One of: 2g4 | 5g");
             break;
         case PairingMode::OnNetwork:
             AddArgument("skip-commissioning-complete", 0, 1, &mSkipCommissioningComplete);
@@ -353,4 +377,52 @@ private:
     std::string mPromptedSSID;
     std::string mPromptedPassword;
     std::string mPromptedOperationalDataset;
+
+    // ------------------------------------------------------------------
+    // Proxy commissioning support
+    // ------------------------------------------------------------------
+
+    /** Kick off the proxy pairing flow. */
+    CHIP_ERROR PairViaProxy(NodeId remoteId);
+
+    /** Called when CASE session to the proxy is established. */
+    static void OnProxyDeviceConnected(void * context, chip::Messaging::ExchangeManager & exchangeMgr,
+                                       const chip::SessionHandle & sessionHandle);
+    static void OnProxyDeviceConnectionFailed(void * context, const chip::ScopedNodeId & nodeId, CHIP_ERROR error);
+
+    /** Called after ProxyConnectResponse arrives to kick off PairDevice. */
+    void OnProxyConnected(uint16_t sessionId);
+
+    // ProxyTransportDelegate — sends ProxyMessageRequest when ProxyTransport needs to forward a packet
+    CHIP_ERROR SendProxyMessage(uint16_t sessionId, chip::ByteSpan message) override;
+
+    // CommandSender::Callback — receives ProxyMessageResponse
+    void OnResponse(chip::app::CommandSender * client, const chip::app::ConcreteCommandPath & path,
+                    const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override;
+    void OnError(const chip::app::CommandSender * client, CHIP_ERROR error) override;
+    void OnDone(chip::app::CommandSender * client) override;
+
+    NodeId mProxyNodeId           = chip::kUndefinedNodeId;
+    uint16_t mProxySessionId      = 0;
+    uint16_t mProxyConnectTimeout = 0;
+    char * mProxyTransport        = nullptr;
+    chip::Optional<char *> mProxyWiFiBand;
+
+    // Exchange context to the proxy, kept alive for ProxyMessageRequest invokes.
+    chip::Messaging::ExchangeManager * mProxyExchangeMgr = nullptr;
+    chip::SessionHolder mProxySession;
+
+    // Outstanding ProxyMessageRequest CommandSender (null when idle).
+    chip::Platform::UniquePtr<chip::app::CommandSender> mProxyCmdSender;
+
+    // CommandSender for the teardown ProxyDisconnectRequest.
+    chip::Platform::UniquePtr<chip::app::CommandSender> mProxyDisconnectCmdSender;
+    // Exit status to deliver once the ProxyDisconnectResponse is received (or times out).
+    CHIP_ERROR mProxyDisconnectExitErr = CHIP_NO_ERROR;
+
+    /** Send ProxyDisconnectRequest to the proxy then call SetCommandExitStatus(exitErr). */
+    void SendProxyDisconnect(CHIP_ERROR exitErr);
+
+    chip::Callback::Callback<chip::OnDeviceConnected> mOnProxyConnectedCallback;
+    chip::Callback::Callback<chip::OnDeviceConnectionFailure> mOnProxyConnectionFailureCallback;
 };

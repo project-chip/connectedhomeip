@@ -271,6 +271,35 @@ bool WiFiPAFLayer::OnWiFiPAFMessageReceived(WiFiPAFSession & RxInfo, System::Pac
     VerifyOrReturnError(err == CHIP_NO_ERROR, false,
                         ChipLogError(WiFiPAF, "Receive failed, err = %" CHIP_ERROR_FORMAT, err.Format()));
 
+    // If PostNetworkConnect has requested a NAN publisher cancel, fire it now
+    // once the send queue is empty and all outstanding PAFTP fragment acks have
+    // been received.  This is the earliest safe point: all data the device sent
+    // via PAF (including the ConnectNetworkResponse) has been confirmed by the
+    // peer, so tearing down NAN cannot cause packet loss.
+    if (mCancelPublishersOnTxIdle && endPoint->mSendQueue.IsNull() && !endPoint->mPafTP.ExpectingAck())
+    {
+        // Stop the send-ack timer before tearing down the publisher.  The just-
+        // received packet started the send-ack timer to ACK the peer's sequence
+        // number.  If we cancel the publisher without stopping that timer, the
+        // timer fires ~2.5 s later with no active NAN publish slot, causing
+        // "failed to transmit follow-up" and a spurious PAF session shutdown.
+        endPoint->StopSendAckTimer();
+
+        ChipLogProgress(WiFiPAF, "PAFTP tx idle after WiFi connect: cancelling NAN publishers");
+        mCancelPublishersOnTxIdle   = false;
+        OnCancelDeviceHandle cb     = mCancelPublishersCallback;
+        OnTxIdleActionFunct afterCb = mOnTxIdleAfterCb;
+        void * afterCtx             = mOnTxIdleAfterCtx;
+        mCancelPublishersCallback   = nullptr;
+        mOnTxIdleAfterCb            = nullptr;
+        mOnTxIdleAfterCtx           = nullptr;
+        CancelAllPublisherSessions(cb);
+        if (afterCb != nullptr)
+        {
+            afterCb(afterCtx);
+        }
+    }
+
     return true;
 }
 
@@ -406,6 +435,49 @@ void WiFiPAFLayer::CleanPafInfo(WiFiPAFSession & SessionInfo)
     return;
 }
 
+void WiFiPAFLayer::ScheduleCancelPublishersOnTxIdle(OnCancelDeviceHandle cancelCb, OnTxIdleActionFunct afterCb, void * afterCtx)
+{
+    mCancelPublishersOnTxIdle = true;
+    mCancelPublishersCallback = cancelCb;
+    mOnTxIdleAfterCb          = afterCb;
+    mOnTxIdleAfterCtx         = afterCtx;
+}
+
+void WiFiPAFLayer::FlushPendingAcks()
+{
+    // Drive any pending standalone ACKs on all active PAFTP endpoints before
+    // the event loop is about to block on synchronous D-Bus calls (e.g. during
+    // WiFi network association).  This prevents the peer's ack-recv timer from
+    // expiring while the event loop is frozen.
+    for (size_t i = 0; i < WIFIPAF_LAYER_NUM_PAF_ENDPOINTS; i++)
+    {
+        WiFiPAFEndPoint * ep = sWiFiPAFEndPointPool.Get(i);
+        if (ep != nullptr && ep->IsConnected(ep->mState) &&
+            ep->mTimerStateFlags.Has(WiFiPAFEndPoint::TimerStateFlag::kSendAckTimerRunning))
+        {
+            ChipLogProgress(WiFiPAF, "FlushPendingAcks: driving stand-alone ack on ep %p", ep);
+            CHIP_ERROR err = ep->DriveStandAloneAck();
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(WiFiPAF, "FlushPendingAcks: DriveStandAloneAck failed: %" CHIP_ERROR_FORMAT, err.Format());
+            }
+        }
+    }
+}
+
+void WiFiPAFLayer::CancelAllPublisherSessions(OnCancelDeviceHandle OnCancelDevice)
+{
+    for (uint8_t i = 0; i < WIFIPAF_LAYER_NUM_PAF_ENDPOINTS; i++)
+    {
+        WiFiPAFSession * pPafSession = &mPafInfoVect[i];
+        if (pPafSession->role == kWiFiPafRole_Publisher && pPafSession->id != kUndefinedWiFiPafSessionId)
+        {
+            ChipLogProgress(WiFiPAF, "CancelAllPublisherSessions: cancelling publish id=%u", pPafSession->id);
+            OnCancelDevice(pPafSession->id, pPafSession->role);
+        }
+    }
+}
+
 CHIP_ERROR WiFiPAFLayer::AddPafSession(PafInfoAccess accType, WiFiPAFSession & SessionInfo)
 {
     uint8_t i;
@@ -481,7 +553,14 @@ CHIP_ERROR WiFiPAFLayer::RmPafSession(PafInfoAccess accType, WiFiPAFSession & Se
             if (pPafSession->id == SessionInfo.id)
             {
                 ChipLogProgress(WiFiPAF, "Removing session with id: %u", pPafSession->id);
-                // Clear the slot
+                CleanPafInfo(*pPafSession);
+                return CHIP_NO_ERROR;
+            }
+            break;
+        case PafInfoAccess::kAccNodeInfo:
+            if (pPafSession->nodeId == SessionInfo.nodeId)
+            {
+                ChipLogProgress(WiFiPAF, "Removing session with nodeId: %" PRIu64, pPafSession->nodeId);
                 CleanPafInfo(*pPafSession);
                 return CHIP_NO_ERROR;
             }
@@ -493,6 +572,22 @@ CHIP_ERROR WiFiPAFLayer::RmPafSession(PafInfoAccess accType, WiFiPAFSession & Se
     ChipLogError(WiFiPAF, "No PAF session found");
     return CHIP_ERROR_NOT_FOUND;
 }
+
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
+void WiFiPAFLayer::CloseEndPoint(WiFiPAFSession & SessionInfo)
+{
+    WiFiPAFEndPoint * endPoint = sWiFiPAFEndPointPool.Find(reinterpret_cast<WIFIPAF_CONNECTION_OBJECT>(&SessionInfo));
+    if (endPoint != nullptr)
+    {
+        ChipLogProgress(WiFiPAF, "CloseEndPoint: closing PAFTP endpoint for session id=%u", SessionInfo.id);
+        endPoint->DoClose(kWiFiPAFCloseFlag_AbortTransmission, WIFIPAF_ERROR_APP_CLOSED_CONNECTION);
+    }
+    else
+    {
+        ChipLogDetail(WiFiPAF, "CloseEndPoint: no endpoint found for session id=%u", SessionInfo.id);
+    }
+}
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
 
 WiFiPAFSession * WiFiPAFLayer::GetPAFInfo(PafInfoAccess accType, WiFiPAFSession & SessionInfo)
 {

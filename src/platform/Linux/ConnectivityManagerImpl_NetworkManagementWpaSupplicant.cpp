@@ -396,8 +396,8 @@ void ConnectivityManagerImpl::_OnWpaPropertiesChanged(WpaSupplicant1Interface * 
         if (mAssociationStarted)
         {
             TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([this]() {
-                OnConnectResult(NetworkCommissioning::Status::kSuccess, CharSpan(), 0);
                 ConnectivityMgrImpl().PostNetworkConnect();
+                OnConnectResult(NetworkCommissioning::Status::kSuccess, CharSpan(), 0);
             });
         }
         NotifyWiFiConnectivityChange(kConnectivity_Established);
@@ -909,6 +909,13 @@ ConnectivityManagerImpl::ConnectWiFiNetworkAsync(ByteSpan ssid, ByteSpan credent
     VerifyOrReturnError(ssid.size() <= kMaxWiFiSSIDLength, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(credentials.size() <= kMaxWiFiKeyLength, CHIP_ERROR_INVALID_ARGUMENT);
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    // Flush pending PAFTP standalone ACKs BEFORE acquiring mWpaSupplicantMutex.
+    // _WiFiPAFSend() (called from FlushPendingAcks) also acquires the mutex;
+    // calling it while already holding the mutex would deadlock.
+    WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer().FlushPendingAcks();
+#endif
+
     std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
     VerifyOrReturnError(mWpaSupplicant.iface, CHIP_ERROR_INCORRECT_STATE);
 
@@ -964,6 +971,10 @@ CHIP_ERROR ConnectivityManagerImpl::ConnectWiFiNetworkWithPDCAsync(
     NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * connectCallback)
 {
     VerifyOrReturnError(ssid.size() <= kMaxWiFiSSIDLength, CHIP_ERROR_INVALID_ARGUMENT);
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer().FlushPendingAcks();
+#endif
 
     std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
     VerifyOrReturnError(mWpaSupplicant.iface, CHIP_ERROR_INCORRECT_STATE);
@@ -1041,6 +1052,20 @@ CHIP_ERROR ConnectivityManagerImpl::ConnectWiFiNetworkWithPDCAsync(
 
 void ConnectivityManagerImpl::PostNetworkConnect()
 {
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    // Restore NAN channel availability now that WiFi is connected and the radio
+    // is no longer busy with scanning/association/DHCP.  Restoring it earlier
+    // (e.g. at scan-done) risks sending PAFTP frames while the radio is still
+    // occupied, causing them to be silently dropped.
+    mPafChannelAvailable = true;
+    // Flush any PAFTP ACKs that were deferred while the channel was unavailable.
+    // This submits the ACK to wpa_supplicant via nantransmit_sync before
+    // OnConnectResult runs, ensuring the ACK is delivered ahead of the
+    // ConnectNetworkResponse (kOperationInFlight blocks the response until the
+    // ACK's done callback fires).
+    WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer().FlushPendingAcks();
+#endif
+
     // Iterate on the network interface to see if we already have beed assigned addresses.
     // The temporary hack for getting IP address change on linux for network provisioning in the rendezvous session.
     // This should be removed or find a better place once we deprecate the rendezvous session.

@@ -23,6 +23,7 @@
 #include "WiFiPAFRole.h"
 #include <lib/core/CHIPError.h>
 #include <lib/support/DLLUtil.h>
+#include <platform/CHIPDeviceConfig.h>
 #include <system/SystemLayer.h>
 #include <system/SystemPacketBuffer.h>
 
@@ -169,7 +170,34 @@ public:
     WiFiPAFLayer();
     static WiFiPAFLayer & GetWiFiPAFLayer();
     CHIP_ERROR Init(chip::System::Layer * systemLayer);
+
+    typedef void (*OnCancelDeviceHandle)(uint32_t id, WiFiPAF::WiFiPafRole role);
+    typedef void (*OnTxIdleActionFunct)(void * ctx);
     void Shutdown();
+    /** Cancel all active NAN publisher sessions, leaving subscriber sessions
+     *  intact.  Call after WiFi connects to release the radio for IPv6 DAD
+     *  and mDNS advertising. */
+    void CancelAllPublisherSessions(OnCancelDeviceHandle OnCancelDevice);
+
+    /** Arrange for CancelAllPublisherSessions(cancelCb) to fire automatically
+     *  once the PAFTP send queue is drained and all outstanding fragment acks
+     *  have been received from the peer.  This is the earliest safe point to
+     *  tear down NAN after WiFi connects without risking loss of in-flight
+     *  data.  Tearing down publish here closes the PAFTP session per Matter
+     *  spec §4.20.3.10 [4.780] and discharges any pending standalone-ACK
+     *  obligation per §4.20.3.8 [4.771].
+     *
+     *  If supplied, `afterCb(afterCtx)` runs once after the publishers have
+     *  been cancelled; used to defer mDNS / operational advertisement until
+     *  PAFTP traffic has cleared the shared radio. */
+    void ScheduleCancelPublishersOnTxIdle(OnCancelDeviceHandle cancelCb, OnTxIdleActionFunct afterCb = nullptr,
+                                          void * afterCtx = nullptr);
+
+    /** Drive any pending standalone ACKs on all active PAFTP endpoints.
+     *  Call this before blocking the event loop (e.g. synchronous D-Bus calls
+     *  during WiFi association) so that the remote peer's ack-recv timer does
+     *  not expire while the loop is frozen. */
+    void FlushPendingAcks();
     bool OnWiFiPAFMessageReceived(WiFiPAFSession & RxInfo, System::PacketBufferHandle && msg);
     CHIP_ERROR OnWiFiPAFMsgRxComplete(WiFiPAFSession & RxInfo, System::PacketBufferHandle && msg);
     State GetWiFiPAFState() { return mAppState; };
@@ -191,11 +219,23 @@ public:
     CHIP_ERROR RmPafSession(PafInfoAccess accType, WiFiPAFSession & SessionInfo);
     WiFiPAFSession * GetPAFInfo(PafInfoAccess accType, WiFiPAFSession & SessionInfo);
 
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
+    /** Close the PAFTP endpoint for a session, cancelling all pending timers.
+     *  Matches by session id, peer_id and peer_addr.  Safe to call after
+     *  RmPafSession since it uses the endpoint's own mSessionInfo, not
+     *  mPafInfoVect. */
+    void CloseEndPoint(WiFiPAFSession & SessionInfo);
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
+
 private:
     void InitialPafInfo();
     void CleanPafInfo(WiFiPAFSession & SessionInfo);
     WiFiPAFSession mPafInfoVect[WIFIPAF_LAYER_NUM_PAF_ENDPOINTS];
     chip::System::Layer * mSystemLayer;
+    bool mCancelPublishersOnTxIdle                 = false;
+    OnCancelDeviceHandle mCancelPublishersCallback = nullptr;
+    OnTxIdleActionFunct mOnTxIdleAfterCb           = nullptr;
+    void * mOnTxIdleAfterCtx                       = nullptr;
 };
 
 } /* namespace WiFiPAF */
