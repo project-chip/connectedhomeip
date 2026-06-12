@@ -24,9 +24,72 @@
 #include <transport/GroupPeerMessageCounter.h>
 
 #include <crypto/RandUtils.h>
+#include <utility>
 
 namespace chip {
 namespace Transport {
+
+namespace {
+
+void ShiftAndInsert(GroupSender * list, uint32_t size, uint32_t oldIndex, GroupSender & newEntry)
+{
+    // The element at oldIndex is being overwritten, so we must destroy it first.
+    list[oldIndex].~GroupSender();
+
+    // Iterate through and shift all elements before oldIndex 1 to the right. 
+    // This will free up an empty space at index 0 to add the newEntry.
+    for (uint32_t j = oldIndex; j > 0; j--)
+    {
+        new (&list[j]) GroupSender(std::move(list[j - 1]));
+        list[j - 1].~GroupSender();
+    }
+
+    // The new entry being added is now the most recently used GroupSender entry. 
+    // Most recently used elements will always be at the front of the list.
+    new (&list[0]) GroupSender(std::move(newEntry));
+}
+
+CHIP_ERROR FindOrAddPeerFabricFound(GroupSender * list, uint32_t maxLimit, uint8_t & peerCount, NodeId nodeId,
+                             chip::Transport::PeerMessageCounter *& counter, const char * peerType)
+{
+    // Search for peer
+    for (uint32_t i = 0; i < peerCount; i++)
+    {
+        if (list[i].mNodeId == nodeId)
+        {
+            // If the node id is found and it is not already at the start of the list (i.e.
+            // it isn't already the most recently used element), then we need to move it to
+            // the front and shift the other elements.
+            if (i > 0)
+            {
+                GroupSender temp(list[i]);
+                ShiftAndInsert(list, maxLimit, i, temp);
+            }
+            counter = &(list[0].msgCounter);
+            return CHIP_NO_ERROR;
+        }
+    }
+
+    // GroupSender was not found, must add a new one for this node id.
+    GroupSender temp;
+    temp.mNodeId = nodeId;
+    if (peerCount < maxLimit)
+    {
+        ShiftAndInsert(list, maxLimit, peerCount, temp);
+        peerCount++;
+    }
+    else
+    {
+        // Evict LRU
+        ChipLogProgress(SecureChannel, "GroupPeerTable: Evicting %s peer " ChipLogFormatX64 " due to table being full",
+                        peerType, ChipLogValueX64(list[maxLimit - 1].mNodeId));
+        ShiftAndInsert(list, maxLimit, maxLimit - 1, temp);
+    }
+    counter = &(list[0].msgCounter);
+    return CHIP_NO_ERROR;
+}
+
+} // anonymous namespace
 
 CHIP_ERROR GroupPeerTable::FindOrAddPeer(FabricIndex fabricIndex, NodeId nodeId, bool isControl,
                                          chip::Transport::PeerMessageCounter *& counter)
@@ -62,53 +125,19 @@ CHIP_ERROR GroupPeerTable::FindOrAddPeer(FabricIndex fabricIndex, NodeId nodeId,
         {
             if (isControl)
             {
-                for (auto & node : groupFabric.mControlGroupSenders)
-                {
-                    if (node.mNodeId == kUndefinedNodeId)
-                    {
-                        // Already iterated through all known NodeIds
-                        // Add the new peer to save some processing time
-                        node.mNodeId = nodeId;
-                        counter      = &(node.msgCounter);
-                        groupFabric.mControlPeerCount++;
-                        return CHIP_NO_ERROR;
-                    }
-
-                    if (node.mNodeId == nodeId)
-                    {
-                        counter = &(node.msgCounter);
-                        return CHIP_NO_ERROR;
-                    }
-                }
+                return FindOrAddPeerFabricFound(groupFabric.mControlGroupSenders, CHIP_CONFIG_MAX_GROUP_CONTROL_PEERS,
+                                         groupFabric.mControlPeerCount, nodeId, counter, "control");
             }
             else
             {
-                for (auto & node : groupFabric.mDataGroupSenders)
-                {
-                    if (node.mNodeId == kUndefinedNodeId)
-                    {
-                        // Already iterated through all known NodeIds
-                        // Add the new peer to save some processing time
-                        node.mNodeId = nodeId;
-                        counter      = &(node.msgCounter);
-                        groupFabric.mDataPeerCount++;
-                        return CHIP_NO_ERROR;
-                    }
-
-                    if (node.mNodeId == nodeId)
-                    {
-                        counter = &(node.msgCounter);
-                        return CHIP_NO_ERROR;
-                    }
-                }
+                return FindOrAddPeerFabricFound(groupFabric.mDataGroupSenders, CHIP_CONFIG_MAX_GROUP_DATA_PEERS,
+                                         groupFabric.mDataPeerCount, nodeId, counter, "data");
             }
-            // Exceeded the Max number of Group peers
-            return CHIP_ERROR_TOO_MANY_PEER_NODES;
         }
     }
 
-    // Exceeded the Max number of Group peers
-    return CHIP_ERROR_TOO_MANY_PEER_NODES;
+    // Exceeded the Max number of Group fabrics
+    return CHIP_ERROR_NO_MEMORY;
 }
 
 // Used in case of MCSP failure
@@ -212,23 +241,25 @@ void GroupPeerTable::CompactPeers(GroupSender * list, uint32_t size)
         return;
     }
 
-    for (uint32_t peerIndex = 0; peerIndex < size; peerIndex++)
+    uint32_t writeIndex = 0;
+    for (uint32_t readIndex = 0; readIndex < size; readIndex++)
     {
-        if (list[peerIndex].mNodeId != kUndefinedNodeId)
+        // readIndex and writeIndex will iterate together, until a point
+        // is found where the node id at the read index is kUndefinedNodeId. This
+        // means the GroupSender entry at this index has been removed (likely by 
+        // RemoveSpecificPeer()). When this removed entry index is found, the read 
+        // index will be 1 ahead of the write index, and then all entries 
+        // that follow will be shifted down the list (moving 1 to the left).
+        if (list[readIndex].mNodeId != kUndefinedNodeId)
         {
-            continue;
-        }
-
-        for (uint32_t i = (size - 1); i > peerIndex; i--)
-        {
-            if (list[i].mNodeId != kUndefinedNodeId)
+            if (readIndex != writeIndex)
             {
-                // Logic works since all buffer are static
-                // move it up front
-                new (&list[peerIndex]) GroupSender(list[i]);
-                new (&list[i]) GroupSender();
-                break;
+                list[writeIndex].~GroupSender();
+                new (&list[writeIndex]) GroupSender(std::move(list[readIndex]));
+                list[readIndex].~GroupSender();
+                new (&list[readIndex]) GroupSender();
             }
+            writeIndex++;
         }
     }
 }
